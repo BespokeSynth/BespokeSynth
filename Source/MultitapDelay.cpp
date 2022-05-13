@@ -247,7 +247,7 @@ void MultitapDelay::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "MultitapeDelay: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    mDelayBuffer.LoadState(in);
 }

@@ -603,20 +603,20 @@ void PlaySequencer::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "PlaySequencer: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    mGrid->LoadState(in);
 
    int numPatterns;
    in >> numPatterns;
-   LoadStateValidate(numPatterns == mSavedPatterns.size());
+   LoadStateValidate(numPatterns == mSavedPatterns.size(), "PlaySequencer: numPatterns(" + ofToString(numPatterns) + ") == mSavedPatterns.size()(" + ofToString(mSavedPatterns.size()) + ")");
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
       in >> mSavedPatterns[i].mNumMeasures;
       in >> mSavedPatterns[i].mHasSequence;
       int size;
       in >> size;
-      LoadStateValidate(size == (int)mSavedPatterns[i].mData.size());
+      LoadStateValidate(size == (int)mSavedPatterns[i].mData.size(), "PlaySequencer: size(" + ofToString(size) + ") == mSavedPatterns[i(" + ofToString(i) + ")].mData.size()(" + ofToString(mSavedPatterns[i].mData.size()) + ")");
       for (int j = 0; j < size; ++j)
          in >> mSavedPatterns[i].mData[j];
    }

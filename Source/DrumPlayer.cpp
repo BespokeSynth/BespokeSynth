@@ -1201,7 +1201,7 @@ void DrumPlayer::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "DrumPlayer: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {

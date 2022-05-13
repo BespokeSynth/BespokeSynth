@@ -223,7 +223,7 @@ void NoteCounter::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "NoteCounter: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    in >> mWidth;
    in >> mHeight;

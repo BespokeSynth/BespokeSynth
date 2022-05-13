@@ -403,17 +403,11 @@ void VSTPlugin::CreateParameterSliders()
       mParameterSliders[i].mValue = parameters[i]->getValue();
       juce::String name = parameters[i]->getName(32);
       std::string label(name.getCharPointer());
-      try
+      int append = 0;
+      while (FindUIControl(label.c_str(), false))
       {
-         int append = 0;
-         while (FindUIControl(label.c_str()))
-         {
-            ++append;
-            label = name.toStdString() + ofToString(append);
-         }
-      }
-      catch (UnknownUIControlException& e)
-      {
+         ++append;
+         label = name.toStdString() + ofToString(append);
       }
       mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), -1, -1, 200, 15, &mParameterSliders[i].mValue, 0, 1);
       mParameterSliders[i].mParameter = parameters[i];
@@ -1063,7 +1057,7 @@ void VSTPlugin::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "VSTPlugin: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    bool hasPlugin;
    in >> hasPlugin;

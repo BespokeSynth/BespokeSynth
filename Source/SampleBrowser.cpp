@@ -260,7 +260,7 @@ void SampleBrowser::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "SampleBrowser: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    std::string currentDirectory;
    in >> currentDirectory;

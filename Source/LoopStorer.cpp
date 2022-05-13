@@ -296,7 +296,7 @@ void LoopStorer::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "LoopStorer: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    in >> mCurrentBufferIdx;
    mQueuedSwapBufferIdx = -1;

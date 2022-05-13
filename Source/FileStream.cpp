@@ -149,7 +149,7 @@ FileStreamIn& FileStreamIn::operator>>(std::string& var)
    }
 
    if (TheSynth->IsLoadingModule())
-      LoadStateValidate(len < 99999); //probably garbage beyond this point
+      LoadStateValidate(len < 99999, "FileStreamIn: len(" + ofToString(len) + ") < 99999"); //probably garbage beyond this point
    else
       assert(len < 99999); //probably garbage beyond this point
 
@@ -179,6 +179,11 @@ void FileStreamIn::Peek(void* buffer, int size)
    auto pos = mStream->getPosition();
    mStream->read(buffer, size);
    mStream->setPosition(pos);
+}
+
+int FileStreamIn::bytesRemaining() const
+{
+   return int(mStream->getNumBytesRemaining());
 }
 
 bool FileStreamIn::Eof() const

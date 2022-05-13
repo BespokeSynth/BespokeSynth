@@ -209,11 +209,11 @@ void Beats::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "Beats: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    int numColumns;
    in >> numColumns;
-   LoadStateValidate(numColumns == (int)mBeatColumns.size());
+   LoadStateValidate(numColumns == (int)mBeatColumns.size(), "Beats: numColumns(" + ofToString(numColumns) + ") == mBeatColumns.size()(" + ofToString(mBeatColumns.size()) + ")");
    for (size_t i = 0; i < mBeatColumns.size(); ++i)
       mBeatColumns[i]->LoadState(in);
 }

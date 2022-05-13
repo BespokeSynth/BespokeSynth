@@ -301,7 +301,7 @@ void SampleCapturer::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "SampleCapturer: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    int readLength;
    for (int i = 0; i < mSamples.size(); ++i)

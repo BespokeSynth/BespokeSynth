@@ -37,6 +37,8 @@
 #include "EffectChain.h"
 #include "ClickButton.h"
 #include "UserPrefs.h"
+#include "Logger.h"
+#include "VersionInfo.h"
 
 #include "juce_audio_processors/juce_audio_processors.h"
 
@@ -102,10 +104,18 @@ ModularSynth::ModularSynth()
 , mIsLoadingModule(false)
 , mLastClapboardTime(-9999)
 , mPixelRatio(1)
+, mLogger(nullptr)
 {
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
    TheSynth = this;
+
+#if DEBUG
+   mLogger = std::make_unique<Bespoke::Logger>("BespokeSynth.log", Bespoke::LogLevel::Debug);
+#else
+   mLogger = std::make_unique<Bespoke::Logger>("BespokeSynth.log", Bespoke::LogLevel::Info);
+#endif
+   Log(GetBuildInfoString() + " Git info: " + Bespoke::GIT_BRANCH + " " + Bespoke::GIT_HASH + " build at: " + Bespoke::BUILD_DATE + " " + Bespoke::BUILD_TIME);
 
 #if BESPOKE_WINDOWS
    SetUnhandledExceptionFilter(TopLevelExceptionHandler);
@@ -916,6 +926,8 @@ void ModularSynth::DrawConsole()
 
 void ModularSynth::Exit()
 {
+   Log("Exiting.");
+   mLogger = nullptr;
    mAudioThreadMutex.Lock("exiting");
    mAudioPaused = true;
    mAudioThreadMutex.Unlock();
@@ -2421,6 +2433,13 @@ void ModularSynth::LogEvent(std::string event, LogEventType type)
       mEvents.pop_front();
 }
 
+void ModularSynth::Log(std::string message, Bespoke::LogLevel level /* = Bespoke::LogLevel::Info */, bool toCout /* = true */)
+{
+   mLogger->Log(message, level, toCout);
+   if (level >= Bespoke::LogLevel::Error)
+      mErrors.push_back(message);
+}
+
 IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
 {
    {
@@ -2553,11 +2572,11 @@ void ModularSynth::SetStartupSaveStateFile(std::string bskPath)
 
 void ModularSynth::LoadState(std::string file)
 {
-   ofLog() << "LoadState() " << file;
+   bsLog() << "LoadState() " << file;
 
    if (!juce::File(file).existsAsFile())
    {
-      LogEvent("couldn't find file " + file, kLogEventType_Error);
+      bsLog() << "Couldn't find file " << file << bsLog::opt::error;
       return;
    }
 
@@ -2568,7 +2587,7 @@ void ModularSynth::LoadState(std::string file)
 
    if (in.Eof())
    {
-      LogEvent("File is empty: " + file, kLogEventType_Error);
+      bsLog() << "File is empty: " << file << bsLog::opt::error;
       return;
    }
 

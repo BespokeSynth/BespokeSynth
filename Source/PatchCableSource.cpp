@@ -730,6 +730,7 @@ void PatchCableSource::LoadState(FileStreamIn& in)
          }
          catch (UnknownUIControlException& e)
          {
+            bsLog() << "PatchCableSource::LoadState UnknownUIControlException: " << e.what();
          }
       }
       mPatchCables[i] = new PatchCable(this);

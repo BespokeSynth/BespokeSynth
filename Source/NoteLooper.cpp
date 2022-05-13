@@ -440,7 +440,7 @@ void NoteLooper::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "NoteLooper: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    in >> mWidth;
    in >> mHeight;
@@ -451,7 +451,7 @@ void NoteLooper::LoadState(FileStreamIn& in)
 
    int numPatterns;
    in >> numPatterns;
-   LoadStateValidate(numPatterns == mSavedPatterns.size());
+   LoadStateValidate(numPatterns == mSavedPatterns.size(), "NoteLooper: numPatterns(" + ofToString(numPatterns) + ") == mSavedPatterns.size()(" + ofToString(mSavedPatterns.size()) + ")");
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
       int numNotes;

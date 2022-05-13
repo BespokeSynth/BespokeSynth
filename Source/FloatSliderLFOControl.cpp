@@ -541,7 +541,7 @@ void LFOSettings::LoadState(FileStreamIn& in)
    {
       isDataRevved = true;
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= kSaveStateRev, "LFOSettings: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
       in >> temp;
    }
    mInterval = (NoteInterval)temp;

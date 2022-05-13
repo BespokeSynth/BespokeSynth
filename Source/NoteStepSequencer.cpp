@@ -1162,7 +1162,7 @@ void NoteStepSequencer::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "NoteStepSequencer: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    mGrid->LoadState(in);
    mVelocityGrid->LoadState(in);

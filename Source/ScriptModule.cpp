@@ -1508,7 +1508,7 @@ void ScriptModule::LoadState(FileStreamIn& in)
    if (ModularSynth::sLoadingFileSaveStateRev >= 421)
    {
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= kSaveStateRev, "ScriptModule: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
    }
 
    if (rev >= 2)
@@ -1523,7 +1523,7 @@ void ScriptModule::LoadState(FileStreamIn& in)
    if (ModularSynth::sLoadingFileSaveStateRev == 420)
    {
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= kSaveStateRev, "ScriptModule: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
    }
 
    float w, h;

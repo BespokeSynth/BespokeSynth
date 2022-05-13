@@ -343,7 +343,7 @@ void ControlSequencer::LoadState(FileStreamIn& in)
    if (ModularSynth::sLoadingFileSaveStateRev >= 422)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= kSaveStateRev, "Beats: ControlSequencer(" + ofToString(mLoadRev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
    }
 
    IDrawableModule::LoadState(in);
@@ -351,7 +351,7 @@ void ControlSequencer::LoadState(FileStreamIn& in)
    if (ModularSynth::sLoadingFileSaveStateRev <= 421)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= kSaveStateRev, "Beats: ControlSequencer(" + ofToString(mLoadRev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
    }
 
    mGrid->LoadState(in);

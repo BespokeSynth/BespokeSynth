@@ -14,6 +14,7 @@
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
 #include "Minimap.h"
+#include "Logger.h"
 
 #ifdef BESPOKE_LINUX
 #include <climits>
@@ -133,6 +134,7 @@ public:
    bool IsModalFocusItem(IDrawableModule* item) const;
 
    void LogEvent(std::string event, LogEventType type);
+   void Log(std::string message, Bespoke::LogLevel level = Bespoke::LogLevel::Info, bool toCout = true);
    void SetNextDrawTooltip(std::string tooltip) { mNextDrawTooltip = tooltip; }
 
    bool LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayout = true);
@@ -352,6 +354,7 @@ private:
    };
    std::list<LogEventItem> mEvents;
    std::list<std::string> mErrors;
+   std::unique_ptr<Bespoke::Logger> mLogger;
 
    NamedMutex mAudioThreadMutex;
 

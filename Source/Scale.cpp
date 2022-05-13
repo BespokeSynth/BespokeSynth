@@ -791,7 +791,7 @@ void Scale::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev >= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "Scale: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    int inton;
    in >> inton;

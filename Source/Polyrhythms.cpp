@@ -169,11 +169,11 @@ void Polyrhythms::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "Polyrhythms: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    int size;
    in >> size;
-   LoadStateValidate(size == (int)mRhythmLines.size());
+   LoadStateValidate(size == (int)mRhythmLines.size(), "Polyrhythms: size(" + ofToString(size) + ") == mRhythmLines.size()(" + ofToString(mRhythmLines.size()) + ")");
    for (size_t i = 0; i < mRhythmLines.size(); ++i)
       mRhythmLines[i]->mGrid->LoadState(in);
 }

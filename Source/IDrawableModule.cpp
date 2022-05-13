@@ -714,18 +714,19 @@ IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/
       }
    }
    if (fail)
-      throw UnknownUIControlException();
+      throw UnknownUIControlException("UIControl: " + ofToString(name) + " not found.");
    return nullptr;
 }
 
-IDrawableModule* IDrawableModule::FindChild(const char* name) const
+IDrawableModule* IDrawableModule::FindChild(const char* name, bool fail /* = true */) const
 {
    for (int i = 0; i < mChildren.size(); ++i)
    {
       if (strcmp(mChildren[i]->Name(), name) == 0)
          return mChildren[i];
    }
-   throw UnknownModuleException(name);
+   if (fail)
+      throw UnknownModuleException("Could not find child: " + ofToString(name));
    return nullptr;
 }
 
@@ -848,6 +849,12 @@ void IDrawableModule::AddUIControl(IUIControl* control)
             {
                //we're duplicating the name of a non-saving ui control, assume that we are also not saving (hopefully that's true), and this is fine
             }
+            else if (name == "uigrid")
+            {
+               //TODO(Noxy): uigrid is handled weirdly and is added more than once in some places.
+               // Obviously this is incorrect and making uigrid behave the same like any other ui control is the best solution
+               // but this involve some tinkering to make old savestates work correctly with grids.
+            }
             else
             {
                assert(false); //can't have multiple ui controls with the same name!
@@ -857,6 +864,7 @@ void IDrawableModule::AddUIControl(IUIControl* control)
    }
    catch (UnknownUIControlException& e)
    {
+      bsLog() << "IDrawableModule::AddUIControl UnknownUIControlException: " << e.what();
    }
 
    mUIControls.push_back(control);
@@ -1109,7 +1117,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    out << (int)controlsToSave.size();
    for (auto* control : controlsToSave)
    {
-      //ofLog() << "Saving control " << control->Name();
+      bsLog() << "Saving control " << control->Name();
       out << std::string(control->Name());
       control->SaveState(out);
       for (int i = 0; i < kControlSeparatorLength; ++i)
@@ -1123,7 +1131,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
 
    for (auto* child : mChildren)
    {
-      out << std::string(child->Name());
+      out << std::string(child->GetTypeName());
       child->SaveState(out);
    }
 
@@ -1142,27 +1150,30 @@ void IDrawableModule::LoadState(FileStreamIn& in)
 
    int numUIControls;
    in >> numUIControls;
+   bsLog() << "IDrawableModule::LoadState revision: " << rev << " number of controls: " << numUIControls;
+
    for (int i = 0; i < numUIControls; ++i)
    {
-      std::string uicontrolname;
-      in >> uicontrolname;
-
-      UpdateOldControlName(uicontrolname);
-
       bool threwException = false;
+      std::string uicontrolname;
       try
       {
+         in >> uicontrolname;
+         bsLog() << " Loading UIControl: " << uicontrolname;
+         UpdateOldControlName(uicontrolname);
+
          if (LoadOldControl(in, uicontrolname))
          {
             //old data loaded, we're good now!
+            bsLog() << " loaded old control " + uicontrolname;
          }
          else
          {
-            //ofLog() << "loading control " << uicontrolname;
+            bsLog() << "  loading control " << uicontrolname;
             auto* control = FindUIControl(uicontrolname.c_str(), false);
 
             if (control == nullptr)
-               throw UnknownUIControlException();
+               throw UnknownUIControlException("Could not find UIControl: " + uicontrolname);
 
             bool setValue = true;
             if (VectorContains(control, ControlsToNotSetDuringLoadState()))
@@ -1176,24 +1187,25 @@ void IDrawableModule::LoadState(FileStreamIn& in)
             in >> separatorChar;
             if (separatorChar != kControlSeparator[j])
             {
-               ofLog() << "Error loading state for " << uicontrolname;
+               bsLog() << "Error loading state for UIControl: " << uicontrolname << bsLog::opt::error;
                //something went wrong, let's print some info to try to figure it out
-               ofLog() << "Read char " + ofToString(separatorChar) + " but expected " + kControlSeparator[j] + "!";
-               ofLog() << "Save state file position is " + ofToString(in.GetFilePosition()) + ", EoF is " + (in.Eof() ? "true" : "false");
-               std::string nextFewChars = "Next 10 characters are:";
+               bsLog() << "  Read char " + ofToString(separatorChar) + " but expected " + kControlSeparator[j] + "!";
+               bsLog() << "  Save state file position is " + ofToString(in.GetFilePosition()) + ", EoF is " + (in.Eof() ? "true" : "false");
+               std::string nextFewChars = "  Next 10 characters are:";
                for (int c = 0; c < 10; ++c)
                {
                   char ch;
                   in >> ch;
                   nextFewChars += ofToString(ch);
                }
-               ofLog() << nextFewChars;
+               bsLog() << nextFewChars;
             }
             assert(separatorChar == kControlSeparator[j]);
          }
       }
       catch (UnknownUIControlException& e)
       {
+         bsLog() << "IDrawableModule::LoadState UnknownUIControlException: " << e.what();
          threwException = true;
       }
       catch (LoadStateException& e)
@@ -1203,7 +1215,7 @@ void IDrawableModule::LoadState(FileStreamIn& in)
 
       if (threwException)
       {
-         TheSynth->LogEvent("Error in module \"" + std::string(Name()) + "\" loading state for control \"" + uicontrolname + "\"", kLogEventType_Error);
+         bsLog() << "Error in module \"" << Name() << "\" loading state for control \"" << uicontrolname << "\"" << bsLog::opt::error;
 
          //read through the rest of the module until we find the spacer, so we can continue loading the next module
          int separatorProgress = 0;
@@ -1216,7 +1228,10 @@ void IDrawableModule::LoadState(FileStreamIn& in)
             else
                separatorProgress = 0;
             if (separatorProgress == kControlSeparatorLength)
+            {
+               bsLog() << "Found next control seperator!";
                break; //we did it!
+            }
          }
       }
    }
@@ -1226,16 +1241,35 @@ void IDrawableModule::LoadState(FileStreamIn& in)
 
    int numChildren;
    in >> numChildren;
-   LoadStateValidate(numChildren <= mChildren.size());
+   if (numChildren > mChildren.size())
+   {
+      bsLog() << "IDrawableModule: numChildren(" << numChildren << ") <= mChildren.size()(" << mChildren.size() << ")" << bsLog::opt::error;
+      bsLog() << "Attempting to load the children anyway ... ";
+   }
 
    for (int i = 0; i < numChildren; ++i)
    {
       std::string childName;
       in >> childName;
-      //ofLog() << "Loading " << childName;
-      IDrawableModule* child = FindChild(childName.c_str());
-      LoadStateValidate(child);
-      child->LoadState(in);
+      bsLog() << "Loading child: " << childName;
+      IDrawableModule* child = FindChild(childName.c_str(), false);
+      // Attempt a hacky fix for saves that were saved with module name instead of module type.
+      if (!child)
+      {
+         bsLog() << "Child with name '" << childName << "' not found attempting to find: '" << childName.substr(0, childName.length() - 1).c_str() << "'";
+         child = FindChild(childName.substr(0, childName.length() - 1).c_str(), false);
+      }
+
+      if (child)
+      {
+         LoadStateValidate(child, "IDrawableModule: child(" + ofToString(child) + ")");
+         child->LoadState(in);
+      }
+      else
+      {
+         //@TODO(Noxy): Any data beyond this point is questionable.
+         bsLog() << "Loading of child '" << childName << "' failed." << bsLog::opt::error;
+      }
    }
 
    if (rev >= 1)

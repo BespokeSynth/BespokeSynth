@@ -313,7 +313,7 @@ void CanvasElement::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kCESaveStateRev);
+   LoadStateValidate(rev <= kCESaveStateRev, "CavnasElement: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kCESaveStateRev) + ")");
 
    if (rev < 1)
    {
@@ -443,7 +443,7 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kNCESaveStateRev);
+   LoadStateValidate(rev <= kNCESaveStateRev, "NoteCanvasElement: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kNCESaveStateRev) + ")");
 
    in >> mVelocity;
 }
@@ -597,7 +597,7 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSCESaveStateRev);
+   LoadStateValidate(rev <= kSCESaveStateRev, "SampleCanvasElement: rev(" + ofToString(rev) + ") <= kSCESaveStateRev(" + ofToString(kSCESaveStateRev) + ")");
 
    bool hasSample;
    in >> hasSample;
@@ -752,7 +752,7 @@ void EventCanvasElement::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kECESaveStateRev);
+   LoadStateValidate(rev <= kECESaveStateRev, "EventCanvasElement: rev(" + ofToString(rev) + ") <= kECESaveStateRev(" + ofToString(kECESaveStateRev) + ")");
 
    in >> mValue;
    if (rev < 1)

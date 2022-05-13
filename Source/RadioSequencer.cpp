@@ -379,7 +379,7 @@ void RadioSequencer::LoadState(FileStreamIn& in)
    if (ModularSynth::sLoadingFileSaveStateRev >= 422)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= kSaveStateRev, "RadioSequencer: mLoadRev(" + ofToString(mLoadRev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
    }
 
    IDrawableModule::LoadState(in);
@@ -387,7 +387,7 @@ void RadioSequencer::LoadState(FileStreamIn& in)
    if (ModularSynth::sLoadingFileSaveStateRev <= 421)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= kSaveStateRev, "RadioSequencer: mLoadRev(" + ofToString(mLoadRev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
    }
 
    int size;

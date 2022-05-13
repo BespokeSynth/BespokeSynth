@@ -73,6 +73,7 @@ public:
    void ReadGeneric(void* buffer, int size);
    void Peek(void* buffer, int size);
    int GetFilePosition() const;
+   int bytesRemaining() const;
    bool OpenedOk() const;
    bool Eof() const;
    static bool s32BitMode;

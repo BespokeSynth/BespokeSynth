@@ -439,12 +439,12 @@ IUIControl* ModuleContainer::FindUIControl(std::string path)
       }
       catch (UnknownUIControlException& e)
       {
-         TheSynth->LogEvent("Couldn't find UI control at path \"" + path + "\"", kLogEventType_Error);
+         bsLog() << "Couldn't find UI control '" << control << "' at path '" << path << "'" << bsLog::opt::error;
          return nullptr;
       }
    }
 
-   TheSynth->LogEvent("Couldn't find module at path \"" + modulePath + "\"", kLogEventType_Error);
+   bsLog() << "Couldn't find module at path \"" << modulePath << "\"" << bsLog::opt::error;
    return nullptr;
 }
 
@@ -608,25 +608,46 @@ void ModuleContainer::LoadState(FileStreamIn& in)
 
    int header;
    in >> header;
+
+   bsLog() << "Header: revision: " << header << " current revision: " << ModularSynth::kSaveStateRev;
+
    assert(header <= ModularSynth::kSaveStateRev);
    ModularSynth::sLoadingFileSaveStateRev = header;
 
    int savedModules;
    in >> savedModules;
 
+   bsLog() << "Saved modules: " << savedModules;
+
    if (mOwner)
       IClickable::SetLoadContext(mOwner);
 
    for (int i = 0; i < savedModules; ++i)
    {
+      if (in.Eof() || in.bytesRemaining() < 9) // No point in going further if we are at the end of the file (8 bytes are needed for the string length even if it is an empty string).
+      {
+         bsLog() << "Reached end of file before loading all modules. (savedModules: " << savedModules << " i: " << i << ")";
+         break;
+      }
+
       std::string moduleName;
-      in >> moduleName;
-      //ofLog() << "Loading " << moduleName;
-      IDrawableModule* module = FindModule(moduleName, false);
       try
       {
+         in >> moduleName;
+      }
+      catch (std::exception& e)
+      {
+         bsLog() << "Failed to read module name from file. " << e.what();
+         break;
+      }
+
+      try
+      {
+         bsLog() << " Loading module: " << moduleName;
+         IDrawableModule* module = FindModule(moduleName, false);
+
          if (module == nullptr)
-            throw LoadStateException();
+            throw LoadStateException("Module: '" + moduleName + "' == nullptr");
 
          module->LoadState(in);
 
@@ -636,10 +657,10 @@ void ModuleContainer::LoadState(FileStreamIn& in)
             in >> separatorChar;
             if (separatorChar != GetModuleSeparator()[j])
             {
-               ofLog() << "Error loading state for " << module->Name();
+               bsLog() << "Error loading state for " << module->Name() << bsLog::opt::error;
                //something went wrong, let's print some info to try to figure it out
-               ofLog() << "Read char " + ofToString(separatorChar) + " but expected " + GetModuleSeparator()[j] + "!";
-               ofLog() << "Save state file position is " + ofToString(in.GetFilePosition()) + ", EoF is " + (in.Eof() ? "true" : "false");
+               bsLog() << "Read char " + ofToString(separatorChar) + " but expected " + GetModuleSeparator()[j] + "!";
+               bsLog() << "Save state file position is " + ofToString(in.GetFilePosition()) + ", EoF is " + (in.Eof() ? "true" : "false");
                std::string nextFewChars = "Next 10 characters are:";
                for (int c = 0; c < 10; ++c)
                {
@@ -647,19 +668,20 @@ void ModuleContainer::LoadState(FileStreamIn& in)
                   in >> ch;
                   nextFewChars += ofToString(ch);
                }
-               ofLog() << nextFewChars;
+               bsLog() << nextFewChars;
             }
             assert(separatorChar == GetModuleSeparator()[j]);
          }
       }
       catch (LoadStateException& e)
       {
-         TheSynth->LogEvent("Error loading state for module \"" + moduleName + "\"", kLogEventType_Error);
+         bsLog() << "Error loading state for module \"" << moduleName << "\": " << e.what() << bsLog::opt::error;
 
          //read through the rest of the module until we find the spacer, so we can continue loading the next module
          int separatorProgress = 0;
          juce::uint64 safetyCheck = 0;
-         while (!in.Eof() && safetyCheck < 1000000)
+         bsLog() << "Attempting to find next module seperator ...";
+         while (!in.Eof())
          {
             char val;
             in >> val;
@@ -668,8 +690,16 @@ void ModuleContainer::LoadState(FileStreamIn& in)
             else
                separatorProgress = 0;
             if (separatorProgress == GetModuleSeparatorLength())
+            {
+               bsLog() << "  Found next module seperator!";
                break; //we did it!
-            ++safetyCheck;
+            }
+            if (++safetyCheck > 1000000)
+            {
+               //@TODO(Noxy) At this point we should probably completely fail the loading since whatever data is left will only cause errors.
+               bsLog() << "  Safety check failed!";
+               break;
+            }
          }
       }
    }

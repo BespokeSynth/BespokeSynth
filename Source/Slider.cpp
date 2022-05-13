@@ -1229,7 +1229,7 @@ void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kIntSliderSaveStateRev);
+   LoadStateValidate(rev <= kIntSliderSaveStateRev, "IntSlider: rev(" + ofToString(rev) + ") <= kIntSliderSaveStateRev(" + ofToString(kIntSliderSaveStateRev) + ")");
 
    float var;
    in >> var;

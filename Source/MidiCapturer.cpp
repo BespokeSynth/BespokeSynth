@@ -54,7 +54,7 @@ void MidiCapturerDummyController::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "MidiCapturerDummyController: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 }
 
 MidiCapturer::MidiCapturer()

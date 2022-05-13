@@ -608,7 +608,7 @@ void Presets::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev == kSaveStateRev, "Presets: rev(" + ofToString(rev) + ") == kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    int collSize;
    in >> collSize;

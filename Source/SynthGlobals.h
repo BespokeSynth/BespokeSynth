@@ -40,6 +40,7 @@
 #include <cctype>
 #include <random>
 #include <float.h>
+#include "Logger.h"
 
 //#define BESPOKE_DEBUG_ALLOCATIONS
 
@@ -157,14 +158,22 @@ class UnknownEffectTypeException : public std::exception
 class BadUIControlPathException : public std::exception
 {
 };
-class UnknownUIControlException : public std::exception
+class UnknownUIControlException : public std::runtime_error
 {
+public:
+   UnknownUIControlException(const std::string& message)
+   : std::runtime_error(message){};
+   ~UnknownUIControlException() throw() {}
 };
 class WrongModuleTypeException : public std::exception
 {
 };
-class LoadStateException : public std::exception
+class LoadStateException : public std::runtime_error
 {
+public:
+   LoadStateException(const std::string& message)
+   : std::runtime_error(message){};
+   ~LoadStateException() throw() {}
 };
 
 void SynthInit();
@@ -213,7 +222,7 @@ void SetMemoryTrackingEnabled(bool enabled);
 void DumpUnfreedMemory();
 float DistSqToLine(ofVec2f point, ofVec2f a, ofVec2f b);
 uint32_t JenkinsHash(const char* key);
-void LoadStateValidate(bool assertion);
+void LoadStateValidate(bool assertion, std::string message = "No message defined");
 float GetLeftPanGain(float pan);
 float GetRightPanGain(float pan);
 void DrawFallbackText(const char* text, float posX, float posY);
@@ -306,4 +315,83 @@ public:
 private:
    std::string mMessage;
    bool mSendToBespokeConsole;
+};
+
+class bsLog
+{
+public:
+   bsLog()
+   : mSendToBespokeConsole(false)
+   , mSendToCout(true)
+   {}
+   ~bsLog();
+
+   enum class opt
+   {
+      to_console,
+      not_console,
+      to_cout,
+      not_cout,
+      debug,
+      info,
+      warning,
+      error,
+      fatal
+   };
+
+   bsLog& operator<<(const opt value)
+   {
+      switch (value)
+      {
+         case opt::to_console:
+            mSendToBespokeConsole = true;
+            break;
+         case opt::not_console:
+            mSendToBespokeConsole = true;
+            break;
+         case opt::to_cout:
+            mSendToCout = true;
+            break;
+         case opt::not_cout:
+            mSendToCout = false;
+            break;
+         case opt::debug:
+            mLogLevel = Bespoke::LogLevel::Debug;
+            break;
+         case opt::info:
+            mLogLevel = Bespoke::LogLevel::Info;
+            break;
+         case opt::warning:
+            mLogLevel = Bespoke::LogLevel::Warning;
+            break;
+         case opt::error:
+            mLogLevel = Bespoke::LogLevel::Error;
+            break;
+         case opt::fatal:
+            mLogLevel = Bespoke::LogLevel::Fatal;
+            break;
+         default:
+            break;
+      }
+      return *this;
+   }
+
+   template <class T>
+   bsLog& operator<<(const T& value)
+   {
+      mMessage += ofToString(value);
+      return *this;
+   }
+
+   bsLog& operator!()
+   {
+      mSendToBespokeConsole = false;
+      return *this;
+   }
+
+private:
+   std::string mMessage;
+   Bespoke::LogLevel mLogLevel = Bespoke::LogLevel::Debug;
+   bool mSendToBespokeConsole;
+   bool mSendToCout;
 };

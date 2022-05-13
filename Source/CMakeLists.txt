@@ -259,6 +259,8 @@ target_sources(BespokeSynth PRIVATE
     LockFreeQueue.h
     LoopStorer.cpp
     LoopStorer.h
+    Logger.cpp
+    Logger.h
     Looper.cpp
     Looper.h
     LooperGranulator.cpp

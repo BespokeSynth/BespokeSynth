@@ -637,7 +637,7 @@ void NoteTable::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "NoteTable: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    mGrid->LoadState(in);
    GridUpdated(mGrid, 0, 0, 0, 0);

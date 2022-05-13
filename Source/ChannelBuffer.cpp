@@ -184,7 +184,7 @@ void ChannelBuffer::Load(FileStreamIn& in, int& readLength, LoadMode loadMode)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "ChannelBuffer: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    in >> readLength;
    if (loadMode == LoadMode::kSetBufferSize)

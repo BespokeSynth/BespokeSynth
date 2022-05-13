@@ -494,7 +494,7 @@ void SamplerGrid::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "SampleGrid: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    //LoadStateValidate(false); //TODO(Ryan) temp hack fix because samplergrid was loading funny
 

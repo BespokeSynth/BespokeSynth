@@ -566,7 +566,7 @@ void FubbleModule::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "FubbleModule: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    mAxisH.mCurve.LoadState(in);
    mAxisV.mCurve.LoadState(in);

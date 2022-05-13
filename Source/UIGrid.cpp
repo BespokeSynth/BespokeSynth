@@ -522,7 +522,7 @@ void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev, "UIGrid: rev(" + ofToString(rev) + ") <= kSaveStateRev(" + ofToString(kSaveStateRev) + ")");
 
    int cols = MAX_GRID_SIZE;
    int rows = MAX_GRID_SIZE;

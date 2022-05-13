@@ -39,6 +39,8 @@
 #include "IPulseReceiver.h"
 #include "exprtk/exprtk.hpp"
 #include "UserPrefs.h"
+#include "Logger.h"
+#include <memory>
 
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -748,10 +750,10 @@ uint32_t JenkinsHash(const char* key)
    return hash;
 }
 
-void LoadStateValidate(bool assertion)
+void LoadStateValidate(bool assertion, std::string message)
 {
    if (!assertion)
-      throw LoadStateException();
+      throw LoadStateException("Assertion failed: " + message);
 }
 
 float GetLeftPanGain(float pan)
@@ -11481,6 +11483,13 @@ ofLog::~ofLog()
    DBG(output);
    if (mSendToBespokeConsole)
       TheSynth->LogEvent(output, kLogEventType_Verbose);
+}
+
+bsLog::~bsLog()
+{
+   TheSynth->Log(mMessage, mLogLevel, mSendToCout);
+   if (mSendToBespokeConsole)
+      TheSynth->LogEvent(mMessage, kLogEventType_Verbose);
 }
 
 #ifdef BESPOKE_DEBUG_ALLOCATIONS
