@@ -106,12 +106,12 @@ private:
                 mHasLFO == other.mHasLFO;
       }
       std::string mControlPath;
-      float mValue = 0;
-      bool mHasLFO = false;
+      float mValue{ 0 };
+      bool mHasLFO{ false };
       LFOSettings mLFOSettings;
-      int mGridCols = 0;
-      int mGridRows = 0;
-      std::vector<float> mGridContents;
+      int mGridCols{ 0 };
+      int mGridRows{ 0 };
+      std::vector<float> mGridContents{};
       std::string mString;
    };
 
@@ -123,26 +123,26 @@ private:
 
    struct ControlRamp
    {
-      IUIControl* mUIControl;
+      IUIControl* mUIControl{ nullptr };
       Ramp mRamp;
    };
 
-   UIGrid* mGrid;
+   UIGrid* mGrid{ nullptr };
    std::vector<PresetCollection> mPresetCollection;
-   ClickButton* mRandomizeButton;
-   int mDrawSetPresetsCountdown;
-   std::vector<IDrawableModule*> mPresetModules;
-   std::vector<IUIControl*> mPresetControls;
-   bool mBlending;
-   float mBlendTime;
-   FloatSlider* mBlendTimeSlider;
-   float mBlendProgress = 0;
+   ClickButton* mRandomizeButton{ nullptr };
+   int mDrawSetPresetsCountdown{ 0 };
+   std::vector<IDrawableModule*> mPresetModules{};
+   std::vector<IUIControl*> mPresetControls{};
+   bool mBlending{ false };
+   float mBlendTime{ 0 };
+   FloatSlider* mBlendTimeSlider{ nullptr };
+   float mBlendProgress{ 0 };
    std::vector<ControlRamp> mBlendRamps;
    ofMutex mRampMutex;
-   int mCurrentPreset;
-   IntSlider* mCurrentPresetSlider;
-   PatchCableSource* mModuleCable;
-   PatchCableSource* mUIControlCable;
+   int mCurrentPreset{ 0 };
+   IntSlider* mCurrentPresetSlider{ nullptr };
+   PatchCableSource* mModuleCable{ nullptr };
+   PatchCableSource* mUIControlCable{ nullptr };
    bool mShiftHeld{ false };
 };
 

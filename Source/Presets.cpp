@@ -32,16 +32,6 @@
 std::vector<IUIControl*> Presets::sPresetHighlightControls;
 
 Presets::Presets()
-: mGrid(nullptr)
-, mDrawSetPresetsCountdown(0)
-, mBlending(false)
-, mBlendTime(0)
-, mBlendTimeSlider(nullptr)
-, mRandomizeButton(nullptr)
-, mCurrentPreset(0)
-, mCurrentPresetSlider(nullptr)
-, mModuleCable(nullptr)
-, mUIControlCable(nullptr)
 {
 }
 
