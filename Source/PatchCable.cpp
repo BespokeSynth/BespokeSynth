@@ -208,7 +208,7 @@ void PatchCable::Render()
       {
          ofSetLineWidth(lineWidth);
 
-         for (int half=0; half<2; ++half)
+         for (int half = 0; half < 2; ++half)
          {
             if (!UserPrefs.fade_cable_middle.Get())
                ofSetColor(lineColorAlphaed);
@@ -243,7 +243,7 @@ void PatchCable::Render()
                ofSetColor(color);
                ofSetLineWidth(3);
 
-               for (int half=0; half<2; ++half)
+               for (int half = 0; half < 2; ++half)
                {
                   if (!UserPrefs.fade_cable_middle.Get())
                      ofSetColor(color);
@@ -285,7 +285,7 @@ void PatchCable::Render()
                {
                   ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
 
-                  for (int half=0; half<2; ++half)
+                  for (int half = 0; half < 2; ++half)
                   {
                      if (!UserPrefs.fade_cable_middle.Get())
                         ofSetColor(lineColor);
@@ -348,7 +348,7 @@ void PatchCable::Render()
                drawColor.set(lineColorAlphaed.g, lineColorAlphaed.r, lineColorAlphaed.b, lineColorAlphaed.a);
             ofVec2f offset((ch - (vizBuff->NumChannels() - 1) * .5f) * 2 * dy, (ch - (vizBuff->NumChannels() - 1) * .5f) * 2 * -dx);
 
-            for (int half=0; half<2; ++half)
+            for (int half = 0; half < 2; ++half)
             {
                if (!UserPrefs.fade_cable_middle.Get())
                   ofSetColor(drawColor);
@@ -412,7 +412,7 @@ void PatchCable::Render()
       else
       {
          ofSetLineWidth(lineWidth);
-         for (int half=0; half<2; ++half)
+         for (int half = 0; half < 2; ++half)
          {
             if (!UserPrefs.fade_cable_middle.Get())
                ofSetColor(lineColorAlphaed);
