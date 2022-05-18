@@ -37,6 +37,7 @@
 #include "RadioButton.h"
 #include "MidiController.h"
 #include "IModulator.h"
+#include "UserPrefs.h"
 
 PatchCable* PatchCable::sActivePatchCable = nullptr;
 
@@ -73,6 +74,8 @@ void PatchCable::Render()
    PatchCablePos cable = GetPatchCablePos();
    mX = cable.start.x;
    mY = cable.start.y;
+   ofVec2f cableFadeOut = cable.start * .47 + cable.end * .53f;
+   ofVec2f cableFadeIn = cable.start * .53f + cable.end * .47f;
 
    float lineWidth = 1;
    float plugWidth = 4;
@@ -204,16 +207,29 @@ void PatchCable::Render()
           type == kConnectionType_UIControl)
       {
          ofSetLineWidth(lineWidth);
-         ofSetColor(lineColorAlphaed);
-         ofBeginShape();
-         ofVertex(cable.start.x, cable.start.y);
-         for (int i = 1; i < wireLength - 1; ++i)
+
+         for (int half=0; half<2; ++half)
          {
-            ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
-            ofVertex(pos.x, pos.y);
+            if (!UserPrefs.fade_cable_middle.Get())
+               ofSetColor(lineColorAlphaed);
+            else if (half == 0)
+               ofSetColorGradient(lineColorAlphaed, ofColor::clear, cable.start, cableFadeOut);
+            else
+               ofSetColorGradient(ofColor::clear, lineColorAlphaed, cableFadeIn, cable.end);
+
+            ofBeginShape();
+            ofVertex(cable.start.x, cable.start.y);
+            for (int i = 1; i < wireLength - 1; ++i)
+            {
+               ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+               ofVertex(pos.x, pos.y);
+            }
+            ofVertex(cable.plug.x, cable.plug.y);
+            ofEndShape();
+
+            if (!UserPrefs.fade_cable_middle.Get())
+               break;
          }
-         ofVertex(cable.plug.x, cable.plug.y);
-         ofEndShape();
 
          IModulator* modulator = mOwner->GetModulatorOwner();
          if (modulator != nullptr)
@@ -227,15 +243,28 @@ void PatchCable::Render()
                ofSetColor(color);
                ofSetLineWidth(3);
 
-               ofBeginShape();
-               ofVertex(cable.start.x, cable.start.y);
-               for (int i = 1; i < wireLength - 1; ++i)
+               for (int half=0; half<2; ++half)
                {
-                  ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
-                  ofVertex(pos.x, pos.y);
+                  if (!UserPrefs.fade_cable_middle.Get())
+                     ofSetColor(color);
+                  else if (half == 0)
+                     ofSetColorGradient(color, ofColor::clear, cable.start, cableFadeOut);
+                  else
+                     ofSetColorGradient(ofColor::clear, color, cableFadeIn, cable.end);
+
+                  ofBeginShape();
+                  ofVertex(cable.start.x, cable.start.y);
+                  for (int i = 1; i < wireLength - 1; ++i)
+                  {
+                     ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                     ofVertex(pos.x, pos.y);
+                  }
+                  ofVertex(cable.plug.x, cable.plug.y);
+                  ofEndShape();
+
+                  if (!UserPrefs.fade_cable_middle.Get())
+                     break;
                }
-               ofVertex(cable.plug.x, cable.plug.y);
-               ofEndShape();
 
                //change plug color
                if (delta > 0)
@@ -246,8 +275,6 @@ void PatchCable::Render()
          }
          else
          {
-            ofSetColor(lineColor);
-
             float lastElapsed = 0;
             for (int i = 0; i < NoteHistory::kHistorySize; ++i)
             {
@@ -257,14 +284,27 @@ void PatchCable::Render()
                if (event.mOn)
                {
                   ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
-                  ofBeginShape();
-                  ofVec2f pos;
-                  for (int j = lastElapsed * wireLength; j < clampedElapsed * wireLength; ++j)
+
+                  for (int half=0; half<2; ++half)
                   {
-                     pos = MathUtils::Bezier(ofClamp(j / wireLength, 0, 1), cable.start, bezierControl1, bezierControl2, cable.plug);
-                     ofVertex(pos.x, pos.y);
+                     if (!UserPrefs.fade_cable_middle.Get())
+                        ofSetColor(lineColor);
+                     else if (half == 0)
+                        ofSetColorGradient(lineColor, ofColor::clear, cable.start, cableFadeOut);
+                     else
+                        ofSetColorGradient(ofColor::clear, lineColor, cableFadeIn, cable.end);
+                     ofBeginShape();
+                     ofVec2f pos;
+                     for (int j = lastElapsed * wireLength; j < clampedElapsed * wireLength; ++j)
+                     {
+                        pos = MathUtils::Bezier(ofClamp(j / wireLength, 0, 1), cable.start, bezierControl1, bezierControl2, cable.plug);
+                        ofVertex(pos.x, pos.y);
+                     }
+                     ofEndShape();
+
+                     if (!UserPrefs.fade_cable_middle.Get())
+                        break;
                   }
-                  ofEndShape();
 
                   /*if (clampedElapsed < 1)
                   {
@@ -301,24 +341,40 @@ void PatchCable::Render()
 
          for (int ch = 0; ch < vizBuff->NumChannels(); ++ch)
          {
-            ofSetColor(lineColorAlphaed);
-            if (ch != 0)
-               ofSetColor(lineColorAlphaed.g, lineColorAlphaed.r, lineColorAlphaed.b, lineColorAlphaed.a);
+            ofColor drawColor;
+            if (ch == 0)
+               drawColor.set(lineColorAlphaed.r, lineColorAlphaed.g, lineColorAlphaed.b, lineColorAlphaed.a);
+            else
+               drawColor.set(lineColorAlphaed.g, lineColorAlphaed.r, lineColorAlphaed.b, lineColorAlphaed.a);
             ofVec2f offset((ch - (vizBuff->NumChannels() - 1) * .5f) * 2 * dy, (ch - (vizBuff->NumChannels() - 1) * .5f) * 2 * -dx);
-            ofBeginShape();
-            ofVertex(cable.start.x + offset.x, cable.start.y + offset.y);
-            for (int i = 1; i < wireLength - 1; ++i)
+
+            for (int half=0; half<2; ++half)
             {
-               ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
-               float sample = vizBuff->GetSample((i / wireLength * numSamples), ch);
-               sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
-               sample = ofClamp(sample, -1.0f, 1.0f);
-               ofVec2f sampleOffsetDir = MathUtils::BezierPerpendicular(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
-               pos += sampleOffsetDir * 10 * sample;
-               ofVertex(pos.x + offset.x, pos.y + offset.y);
+               if (!UserPrefs.fade_cable_middle.Get())
+                  ofSetColor(drawColor);
+               else if (half == 0)
+                  ofSetColorGradient(drawColor, ofColor::clear, cable.start, cableFadeOut);
+               else
+                  ofSetColorGradient(ofColor::clear, drawColor, cableFadeIn, cable.end);
+
+               ofBeginShape();
+               ofVertex(cable.start.x + offset.x, cable.start.y + offset.y);
+               for (int i = 1; i < wireLength - 1; ++i)
+               {
+                  ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                  float sample = vizBuff->GetSample((i / wireLength * numSamples), ch);
+                  sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
+                  sample = ofClamp(sample, -1.0f, 1.0f);
+                  ofVec2f sampleOffsetDir = MathUtils::BezierPerpendicular(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                  pos += sampleOffsetDir * 10 * sample;
+                  ofVertex(pos.x + offset.x, pos.y + offset.y);
+               }
+               ofVertex(cable.plug.x + offset.x, cable.plug.y + offset.y);
+               ofEndShape();
+
+               if (!UserPrefs.fade_cable_middle.Get())
+                  break;
             }
-            ofVertex(cable.plug.x + offset.x, cable.plug.y + offset.y);
-            ofEndShape();
          }
 
          ofSetLineWidth(plugWidth);
@@ -356,16 +412,28 @@ void PatchCable::Render()
       else
       {
          ofSetLineWidth(lineWidth);
-         ofSetColor(lineColorAlphaed);
-         ofBeginShape();
-         ofVertex(cable.start.x, cable.start.y);
-         for (int i = 1; i < wireLength - 1; ++i)
+         for (int half=0; half<2; ++half)
          {
-            ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
-            ofVertex(pos.x, pos.y);
+            if (!UserPrefs.fade_cable_middle.Get())
+               ofSetColor(lineColorAlphaed);
+            else if (half == 0)
+               ofSetColorGradient(lineColorAlphaed, ofColor::clear, cable.start, cableFadeOut);
+            else
+               ofSetColorGradient(ofColor::clear, lineColorAlphaed, cableFadeIn, cable.end);
+
+            ofBeginShape();
+            ofVertex(cable.start.x, cable.start.y);
+            for (int i = 1; i < wireLength - 1; ++i)
+            {
+               ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+               ofVertex(pos.x, pos.y);
+            }
+            ofVertex(cable.plug.x, cable.plug.y);
+            ofEndShape();
+
+            if (!UserPrefs.fade_cable_middle.Get())
+               break;
          }
-         ofVertex(cable.plug.x, cable.plug.y);
-         ofEndShape();
 
          ofSetLineWidth(plugWidth);
          ofSetColor(lineColor);
