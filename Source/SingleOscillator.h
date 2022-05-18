@@ -86,39 +86,39 @@ private:
    bool Enabled() const override { return mEnabled; }
    void UpdateOldControlName(std::string& oldName) override;
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    OscillatorVoiceParams mVoiceParams;
-   FloatSlider* mVolSlider;
-   FloatSlider* mPhaseOffsetSlider;
-   DropdownList* mOscSelector;
-   FloatSlider* mPulseWidthSlider;
-   FloatSlider* mSoftenSlider;
-   int mMult;
-   DropdownList* mMultSelector;
-   ADSRDisplay* mADSRDisplay;
-   Checkbox* mSyncCheckbox;
-   FloatSlider* mSyncFreqSlider;
-   FloatSlider* mDetuneSlider;
-   IntSlider* mUnisonSlider;
-   FloatSlider* mUnisonWidthSlider;
-   FloatSlider* mShuffleSlider;
-   float mLengthMultiplier;
-   FloatSlider* mLengthMultiplierSlider;
-   FloatSlider* mVelToVolumeSlider;
-   FloatSlider* mVelToEnvelopeSlider;
-   Checkbox* mLiteCPUModeCheckbox;
+   FloatSlider* mVolSlider{ nullptr };
+   FloatSlider* mPhaseOffsetSlider{ nullptr };
+   DropdownList* mOscSelector{ nullptr };
+   FloatSlider* mPulseWidthSlider{ nullptr };
+   FloatSlider* mSoftenSlider{ nullptr };
+   int mMult{ 1 };
+   DropdownList* mMultSelector{ nullptr };
+   ADSRDisplay* mADSRDisplay{ nullptr };
+   Checkbox* mSyncCheckbox{ nullptr };
+   FloatSlider* mSyncFreqSlider{ nullptr };
+   FloatSlider* mDetuneSlider{ nullptr };
+   IntSlider* mUnisonSlider{ nullptr };
+   FloatSlider* mUnisonWidthSlider{ nullptr };
+   FloatSlider* mShuffleSlider{ nullptr };
+   float mLengthMultiplier{ 1 };
+   FloatSlider* mLengthMultiplierSlider{ nullptr };
+   FloatSlider* mVelToVolumeSlider{ nullptr };
+   FloatSlider* mVelToEnvelopeSlider{ nullptr };
+   Checkbox* mLiteCPUModeCheckbox{ nullptr };
 
-   FloatSlider* mFilterCutoffMaxSlider;
-   FloatSlider* mFilterCutoffMinSlider;
-   FloatSlider* mFilterQSlider;
-   ADSRDisplay* mFilterADSRDisplay;
+   FloatSlider* mFilterCutoffMaxSlider{ nullptr };
+   FloatSlider* mFilterCutoffMinSlider{ nullptr };
+   FloatSlider* mFilterQSlider{ nullptr };
+   ADSRDisplay* mFilterADSRDisplay{ nullptr };
 
    ChannelBuffer mWriteBuffer;
 
-   Oscillator mDrawOsc;
+   Oscillator mDrawOsc{ OscillatorType::kOsc_Square };
 
    std::string mDebugLines;
 };

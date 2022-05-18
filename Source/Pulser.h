@@ -87,26 +87,26 @@ private:
       kTimeMode_Reset
    };
 
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
 
-   TimeMode mTimeMode;
-   DropdownList* mTimeModeSelector;
+   TimeMode mTimeMode{ TimeMode::kTimeMode_Step };
+   DropdownList* mTimeModeSelector{ nullptr };
 
-   bool mRandomStep;
-   Checkbox* mRandomStepCheckbox;
+   bool mRandomStep{ false };
+   Checkbox* mRandomStepCheckbox{ nullptr };
 
-   bool mWaitingForDownbeat;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
+   bool mWaitingForDownbeat{ false };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
 
-   FloatSlider* mFreeTimeSlider;
-   float mFreeTimeStep;
-   float mFreeTimeCounter;
-   int mResetLength;
-   IntSlider* mResetLengthSlider;
-   int mCustomDivisor;
-   IntSlider* mCustomDivisorSlider;
+   FloatSlider* mFreeTimeSlider{ nullptr };
+   float mFreeTimeStep{ 30 };
+   float mFreeTimeCounter{ 0 };
+   int mResetLength{ 8 };
+   IntSlider* mResetLengthSlider{ nullptr };
+   int mCustomDivisor{ 8 };
+   IntSlider* mCustomDivisorSlider{ nullptr };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

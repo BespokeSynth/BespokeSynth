@@ -74,30 +74,30 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mAudioView[BUFFER_VIZ_SIZE][2];
-   bool mDoubleBufferFlip;
+   float mAudioView[BUFFER_VIZ_SIZE][2]{};
+   bool mDoubleBufferFlip{ false };
 
-   int mBufferVizOffset[2];
-   float mVizPhase[2];
+   int mBufferVizOffset[2]{};
+   float mVizPhase[2]{};
 
-   float mDisplayFreq;
-   int mLengthSamples;
-   float mDrawGain;
-   bool mPhaseAlign;
-   float mWidth;
-   float mHeight;
-   bool mDrawWaveform;
-   bool mDrawCircle;
+   float mDisplayFreq{ 220 };
+   int mLengthSamples{ 2048 };
+   float mDrawGain{ 2 };
+   bool mPhaseAlign{ true };
+   float mWidth{ 600 };
+   float mHeight{ 150 };
+   bool mDrawWaveform{ true };
+   bool mDrawCircle{ false };
 
-   FloatSlider* mHueNote;
-   FloatSlider* mHueAudio;
-   FloatSlider* mHueInstrument;
-   FloatSlider* mHueNoteSource;
-   FloatSlider* mSaturation;
-   FloatSlider* mBrightness;
-   TextEntry* mDisplayFreqEntry;
-   IntSlider* mLengthSamplesSlider;
-   FloatSlider* mDrawGainSlider;
+   FloatSlider* mHueNote{ nullptr };
+   FloatSlider* mHueAudio{ nullptr };
+   FloatSlider* mHueInstrument{ nullptr };
+   FloatSlider* mHueNoteSource{ nullptr };
+   FloatSlider* mSaturation{ nullptr };
+   FloatSlider* mBrightness{ nullptr };
+   TextEntry* mDisplayFreqEntry{ nullptr };
+   IntSlider* mLengthSamplesSlider{ nullptr };
+   FloatSlider* mDrawGainSlider{ nullptr };
 };
 
 #endif /* defined(__modularSynth__WaveformViewer__) */

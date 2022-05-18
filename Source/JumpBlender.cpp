@@ -28,7 +28,6 @@
 #include "Profiler.h"
 
 JumpBlender::JumpBlender()
-: mBlending(false)
 {
 }
 

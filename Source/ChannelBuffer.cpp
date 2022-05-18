@@ -29,9 +29,7 @@
 
 ChannelBuffer::ChannelBuffer(int bufferSize)
 {
-   mActiveChannels = 1;
    mNumChannels = kMaxNumChannels;
-   mRecentActiveChannels = 1;
    mOwnsBuffers = true;
 
    Setup(bufferSize);
@@ -41,7 +39,6 @@ ChannelBuffer::ChannelBuffer(float* data, int bufferSize)
 {
    //intended as a temporary holder for passing raw data to methods that want a ChannelBuffer
 
-   mActiveChannels = 1;
    mNumChannels = 1;
    mOwnsBuffers = false;
 

@@ -30,9 +30,7 @@
 #include "ModularSynth.h"
 
 CanvasTimeline::CanvasTimeline(Canvas* canvas, std::string name)
-: mClick(false)
-, mHoverMode(HoverMode::kNone)
-, mCanvas(canvas)
+: mCanvas(canvas)
 {
    SetName(name.c_str());
    SetParent(canvas->GetModuleParent());

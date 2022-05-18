@@ -585,7 +585,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
    //update direction to match found side
    startDirection = mOwner->GetCableStartDir(mSourceIndex, end);
 
-   if (mTargetRadioButton && mUIControlConnection && !mDragging)
+   if (mTargetRadioButton && mUIControlConnection && !mDragging && target != nullptr)
    {
       target->GetDimensions(wThat, hThat);
       target->GetPosition(xThat, yThat);

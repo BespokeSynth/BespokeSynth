@@ -67,13 +67,13 @@ private:
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
 
    static const int kMaxDestinations = 16;
-   std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables;
-   float mWidth;
-   float mHeight;
-   std::array<int, 128> mLastNoteDestinations;
-   int mCurrentDestinationIndex;
-   ClickButton* mResetButton;
-   int mLength;
-   IntSlider* mLengthSlider;
-   double mLastNoteOnTime;
+   std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables{};
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   std::array<int, 128> mLastNoteDestinations{};
+   int mCurrentDestinationIndex{ -1 };
+   ClickButton* mResetButton{ nullptr };
+   int mLength{ 4 };
+   IntSlider* mLengthSlider{ nullptr };
+   double mLastNoteOnTime{ -9999 };
 };

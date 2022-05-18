@@ -32,13 +32,6 @@
 #include "CanvasElement.h"
 
 CanvasControls::CanvasControls()
-: mDummyFloat(0)
-, mDummyInt(0)
-, mCanvas(nullptr)
-, mSelectedElement(nullptr)
-, mRemoveElementButton(nullptr)
-, mNumVisibleRowsEntry(nullptr)
-, mClearButton(nullptr)
 {
 }
 

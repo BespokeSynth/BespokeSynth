@@ -74,23 +74,23 @@ private:
 
    void Step(double time, float velocity, int pulseFlags);
 
-   float mWidth;
-   float mHeight;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   int mStart;
-   IntSlider* mStartSlider;
-   int mLength;
-   IntSlider* mLengthSlider;
-   int mStep;
-   Checkbox* mSyncCheckbox;
-   bool mSync;
-   int mCustomDivisor;
-   IntSlider* mCustomDivisorSlider;
-   bool mRandom;
-   Checkbox* mRandomCheckbox;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   int mStart{ 0 };
+   IntSlider* mStartSlider{ nullptr };
+   int mLength{ 16 };
+   IntSlider* mLengthSlider{ nullptr };
+   int mStep{ 0 };
+   Checkbox* mSyncCheckbox{ nullptr };
+   bool mSync{ false };
+   int mCustomDivisor{ 8 };
+   IntSlider* mCustomDivisorSlider{ nullptr };
+   bool mRandom{ false };
+   Checkbox* mRandomCheckbox{ nullptr };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 
    bool mHasExternalPulseSource{ false };
 };

@@ -29,17 +29,6 @@
 #include "UIControlMacros.h"
 
 TremoloEffect::TremoloEffect()
-: mAmount(0)
-, mAmountSlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mOscType(kOsc_Square)
-, mOscSelector(nullptr)
-, mDuty(.5f)
-, mDutySlider(nullptr)
-, mWindowPos(0)
 {
    mLFO.SetPeriod(mInterval);
    mLFO.SetType(mOscType);

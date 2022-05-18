@@ -31,8 +31,6 @@
 #include "UIControlMacros.h"
 
 GlobalControls::GlobalControls()
-: mMouseScrollX(0)
-, mMouseScrollY(0)
 {
 }
 

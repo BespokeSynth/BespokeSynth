@@ -31,9 +31,6 @@
 #include "UIControlMacros.h"
 
 MidiControlChange::MidiControlChange()
-: mControl(0)
-, mValue(0)
-, mResendDuplicateValue(true)
 {
 }
 

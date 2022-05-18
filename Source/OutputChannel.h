@@ -64,17 +64,15 @@ private:
 
    int GetNumChannels() const { return mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2; }
 
-   float mWidth;
-   float mHeight;
-   DropdownList* mChannelSelector;
-   int mChannelSelectionIndex;
-   int mStereoSelectionOffset;
-   float mLimit;
+   float mWidth{ 64 };
+   float mHeight{ 40 };
+   DropdownList* mChannelSelector{ nullptr };
+   int mChannelSelectionIndex{ 0 };
+   int mStereoSelectionOffset{ 0 };
+   float mLimit{ 1 };
 
    struct LevelMeter
    {
-      float mLevel;
-      float mMaxLevel;
       PeakTracker mPeakTracker;
       PeakTracker mPeakTrackerSlow;
    };

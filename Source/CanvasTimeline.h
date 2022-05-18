@@ -75,12 +75,12 @@ private:
    void DrawTriangle(float posX, int direction);
    float GetQuantizedForX(float posX, HoverMode clampSide);
 
-   float mWidth;
-   float mHeight;
-   bool mClick;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   bool mClick{ false };
    ofVec2f mClickMousePos;
    ofVec2f mDragOffset;
-   HoverMode mHoverMode;
+   HoverMode mHoverMode{ HoverMode::kNone };
 
    Canvas* mCanvas;
 };

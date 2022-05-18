@@ -79,16 +79,12 @@ private:
    class Clip
    {
    public:
-      Clip()
-      : mSample(nullptr)
-      {
-      }
-
+      Clip() {}
       void Process(float* left, float* right, int bufferSize);
 
-      Sample* mSample;
-      int mStartSample;
-      int mEndSample;
+      Sample* mSample{ nullptr };
+      int mStartSample{ 0 };
+      int mEndSample{ 0 };
    };
 
    enum ClipMoveMode
@@ -96,18 +92,18 @@ private:
       kMoveMode_None,
       kMoveMode_Start,
       kMoveMode_End
-   } mMoveMode;
+   } mMoveMode{ ClipMoveMode::kMoveMode_None };
 
    Clip* GetEmptyClip();
 
    Clip mClips[MAX_CLIPS];
 
-   float mBufferWidth;
-   float mBufferHeight;
-   int mHighlightClip;
-   bool mMouseDown;
-   int mLastMouseX;
-   int mLastMouseY;
+   float mBufferWidth{ 800 };
+   float mBufferHeight{ 80 };
+   int mHighlightClip{ -1 };
+   bool mMouseDown{ false };
+   int mLastMouseX{ -1 };
+   int mLastMouseY{ -1 };
    NamedMutex mMutex;
 };
 

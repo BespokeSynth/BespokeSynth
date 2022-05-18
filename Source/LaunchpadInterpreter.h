@@ -70,13 +70,12 @@ public:
    static int LaunchpadColor(int r, int g);
 
 private:
-   void ClearStoredLights();
    bool IsMonome() const;
 
    ILaunchpadListener* mListener;
    int mLights[64 + 8 + 8]; //grid + side + top
-   MidiController* mController;
-   int mControllerPage;
+   MidiController* mController{ nullptr };
+   int mControllerPage{ 0 };
 };
 
 #endif /* defined(__modularSynth__LaunchpadInterpreter__) */

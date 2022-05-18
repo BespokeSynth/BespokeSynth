@@ -36,10 +36,6 @@
 
 SampleCapturer::SampleCapturer()
 : IAudioProcessor(gBufferSize)
-, mCurrentSampleIndex(0)
-, mWantRecord(false)
-, mIsRecording(false)
-, mIsDragging(false)
 {
 }
 

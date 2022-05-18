@@ -42,34 +42,8 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mMax(max)
 , mModulatorMin(min)
 , mModulatorMax(max)
-, mMouseDown(false)
-, mFineRefX(-999)
-, mRefY(-999)
 , mShowDigits(digits)
 , mOwner(owner)
-, mLFOControl(nullptr)
-, mRelative(false)
-, mTouching(false)
-, mRelativeOffset(-999)
-, mClamped(true)
-, mMode(kNormal)
-, mOriginalValue(0)
-, mClampIntMin(-999)
-, mMinValueDisplay("")
-, mMaxValueDisplay("")
-, mShowName(true)
-, mBezierControl(1)
-, mModulator(nullptr)
-, mSmooth(0)
-, mIsSmoothing(false)
-, mComputeHasBeenCalledOnce(false)
-, mLastComputeTime(0)
-, mLastComputeSamplesIn(0)
-, mLastDisplayedValue(FLT_MAX)
-, mFloatEntry(nullptr)
-, mAllowMinMaxAdjustment(true)
-, mMinEntry(nullptr)
-, mMaxEntry(nullptr)
 {
    assert(owner);
    SetName(label);
@@ -380,7 +354,6 @@ void FloatSlider::SetValueForMouse(int x, int y)
 {
    float* var = GetModifyValue();
    float fX = x;
-   bool clampInt = false;
    if (GetKeyModifiers() & kModifier_Shift)
    {
       if (mFineRefX == -999)
@@ -393,7 +366,6 @@ void FloatSlider::SetValueForMouse(int x, int y)
    else
    {
       mFineRefX = -999;
-      mClampIntMin = -999;
    }
    float oldVal = *var;
    float pos = ofMap(fX + mX, mX + 1, mX + mWidth - 1, 0.0f, 1.0f);
@@ -419,8 +391,6 @@ void FloatSlider::SetValueForMouse(int x, int y)
       }
    }
    *var = ofClamp(*var, mMin, mMax);
-   if (clampInt)
-      *var = ofClamp(*var, mClampIntMin, mClampIntMax);
 
    if (oldVal != *var)
    {

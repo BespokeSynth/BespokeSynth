@@ -30,7 +30,6 @@
 #include "UIControlMacros.h"
 
 MidiClockOut::MidiClockOut()
-: mDevice(nullptr)
 {
 }
 

@@ -30,9 +30,6 @@
 #define L2SC (float)3.32192809488736218171
 
 PitchDetector::PitchDetector()
-: mTune(440)
-, mPitch(0)
-, mConfidence(0)
 {
    mfs = gSampleRate;
 

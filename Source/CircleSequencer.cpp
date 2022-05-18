@@ -183,16 +183,9 @@ void CircleSequencer::LoadState(FileStreamIn& in)
 
 
 CircleSequencerRing::CircleSequencerRing(CircleSequencer* owner, int index)
-: mLength(4)
-, mLengthSelector(nullptr)
-, mPitch(index)
-, mNoteSelector(nullptr)
+: mPitch(index)
 , mOwner(owner)
 , mIndex(index)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mCurrentlyClickedStepIdx(-1)
-, mHighlightStepIdx(-1)
 {
    mSteps.fill(0);
 }

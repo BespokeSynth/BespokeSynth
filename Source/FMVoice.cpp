@@ -32,13 +32,7 @@
 #include "PolyphonyMgr.h"
 
 FMVoice::FMVoice(IDrawableModule* owner)
-: mOscPhase(0)
-, mHarmPhase(0)
-, mHarmPhase2(0)
-, mOsc(kOsc_Sin)
-, mHarm(kOsc_Sin)
-, mHarm2(kOsc_Sin)
-, mOwner(owner)
+: mOwner(owner)
 {
 }
 

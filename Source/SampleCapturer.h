@@ -68,22 +68,20 @@ private:
    {
       SampleElement()
       : mBuffer(gSampleRate * kMaxSampleLengthSeconds)
-      , mRecordingLength(0)
-      , mPlaybackPos(-1)
       {
       }
 
       ChannelBuffer mBuffer;
-      int mRecordingLength;
-      int mPlaybackPos;
+      int mRecordingLength{ 0 };
+      int mPlaybackPos{ -1 };
    };
    std::array<SampleElement, 10> mSamples;
-   int mCurrentSampleIndex;
-   bool mWantRecord;
-   Checkbox* mWantRecordCheckbox;
-   bool mIsRecording;
-   ClickButton* mDeleteButton;
-   ClickButton* mSaveButton;
-   ClickButton* mPlayButton;
-   bool mIsDragging;
+   int mCurrentSampleIndex{ 0 };
+   bool mWantRecord{ false };
+   Checkbox* mWantRecordCheckbox{ nullptr };
+   bool mIsRecording{ false };
+   ClickButton* mDeleteButton{ nullptr };
+   ClickButton* mSaveButton{ nullptr };
+   ClickButton* mPlayButton{ nullptr };
+   bool mIsDragging{ false };
 };

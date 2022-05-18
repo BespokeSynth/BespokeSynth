@@ -253,16 +253,6 @@ void MultitapDelay::LoadState(FileStreamIn& in)
 }
 
 
-MultitapDelay::DelayMPETap::DelayMPETap()
-: mADSR(100, 0, 1, 100)
-, mPitch(0)
-, mPitchBend(nullptr)
-, mPressure(nullptr)
-, mModWheel(nullptr)
-, mOwner(nullptr)
-{
-}
-
 void MultitapDelay::DelayMPETap::Process(float* sampleOut, int offset, int ch)
 {
    /*if (!mADSR.IsDone(gTime) && sampleLength > 0)
@@ -329,12 +319,7 @@ void MultitapDelay::DelayMPETap::Draw(float w, float h)
 
 
 MultitapDelay::DelayTap::DelayTap()
-: mDelayMs(100)
-, mGain(0)
-, mFeedback(0)
-, mPan(0)
-, mOwner(nullptr)
-, mTapBuffer(gBufferSize)
+: mTapBuffer(gBufferSize)
 {
 }
 

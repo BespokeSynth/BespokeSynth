@@ -56,8 +56,8 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   Checkbox* mGroupCheckbox;
-   bool mGroupEnabled;
+   Checkbox* mGroupCheckbox{ nullptr };
+   bool mGroupEnabled{ false };
 
    std::vector<PatchCableSource*> mControlCables;
 };

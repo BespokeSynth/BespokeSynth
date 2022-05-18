@@ -63,5 +63,5 @@ private:
    bool Enabled() const override { return mEnabled; }
 
    RollingBuffer mVizBuffer2;
-   PatchCableSource* mPatchCableSource2;
+   PatchCableSource* mPatchCableSource2{ nullptr };
 };

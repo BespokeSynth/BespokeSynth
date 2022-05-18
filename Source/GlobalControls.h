@@ -57,20 +57,20 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   FloatSlider* mZoomSlider;
-   FloatSlider* mXSlider;
-   FloatSlider* mYSlider;
-   FloatSlider* mMouseScrollXSlider;
-   FloatSlider* mMouseScrollYSlider;
-   FloatSlider* mBackgroundLissajousRSlider;
-   FloatSlider* mBackgroundLissajousGSlider;
-   FloatSlider* mBackgroundLissajousBSlider;
-   FloatSlider* mBackgroundRSlider;
-   FloatSlider* mBackgroundGSlider;
-   FloatSlider* mBackgroundBSlider;
+   FloatSlider* mZoomSlider{ nullptr };
+   FloatSlider* mXSlider{ nullptr };
+   FloatSlider* mYSlider{ nullptr };
+   FloatSlider* mMouseScrollXSlider{ nullptr };
+   FloatSlider* mMouseScrollYSlider{ nullptr };
+   FloatSlider* mBackgroundLissajousRSlider{ nullptr };
+   FloatSlider* mBackgroundLissajousGSlider{ nullptr };
+   FloatSlider* mBackgroundLissajousBSlider{ nullptr };
+   FloatSlider* mBackgroundRSlider{ nullptr };
+   FloatSlider* mBackgroundGSlider{ nullptr };
+   FloatSlider* mBackgroundBSlider{ nullptr };
 
-   float mWidth;
-   float mHeight;
-   float mMouseScrollX;
-   float mMouseScrollY;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   float mMouseScrollX{ 0 };
+   float mMouseScrollY{ 0 };
 };

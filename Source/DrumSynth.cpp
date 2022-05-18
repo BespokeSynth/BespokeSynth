@@ -38,10 +38,6 @@
 #define DRUMSYNTH_NO_CUTOFF 10000
 
 DrumSynth::DrumSynth()
-: mVolume(1)
-, mVolSlider(nullptr)
-, mUseIndividualOuts(false)
-, mMonoOutput(false)
 {
    for (int i = 0; i < (int)mHits.size(); ++i)
    {
@@ -300,20 +296,10 @@ void DrumSynth::SetUpFromSaveData()
 }
 
 DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y)
-: mPhase(0)
-, mVolSlider(nullptr)
-, mFreqMaxSlider(nullptr)
-, mFreqMinSlider(nullptr)
-, mToneType(nullptr)
-, mToneAdsrDisplay(nullptr)
-, mFreqAdsrDisplay(nullptr)
-, mVolNoiseSlider(nullptr)
-, mNoiseAdsrDisplay(nullptr)
-, mParent(parent)
+: mParent(parent)
 , mIndex(index)
 , mX(x)
 , mY(y)
-, mIndividualOutput(nullptr)
 {
    mFilter.SetFilterType(kFilterType_Lowpass);
    mFilter.SetFilterParams(1000, sqrt(2) / 2);
@@ -387,7 +373,6 @@ void DrumSynth::DrumSynthHit::Play(double time, float velocity)
    mData.mFilterAdsr.Start(time, 1, envelopeScale);
    mData.mTone.GetADSR()->Start(time, velocity, envelopeScale);
    mData.mNoise.GetADSR()->Start(time, velocity, envelopeScale);
-   mStartTime = time;
 }
 
 void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize, int oversampling, double sampleRate, double sampleIncrementMs)

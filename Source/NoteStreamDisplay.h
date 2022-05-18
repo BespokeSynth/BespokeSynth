@@ -68,19 +68,19 @@ private:
 
    struct NoteStreamElement
    {
-      int pitch;
-      int velocity;
-      double timeOn;
-      double timeOff;
+      int pitch{ 0 };
+      int velocity{ 0 };
+      double timeOn{ -1 };
+      double timeOff{ -1 };
    };
 
    static const int kNoteStreamCapacity = 100;
    NoteStreamElement mNoteStream[kNoteStreamCapacity];
-   float mWidth;
-   float mHeight;
-   float mDurationMs;
-   int mPitchMin;
-   int mPitchMax;
-   ClickButton* mResetButton;
+   float mWidth{ 400 };
+   float mHeight{ 200 };
+   float mDurationMs{ 2000 };
+   int mPitchMin{ 127 };
+   int mPitchMax{ 0 };
+   ClickButton* mResetButton{ nullptr };
    std::string mDebugLines;
 };

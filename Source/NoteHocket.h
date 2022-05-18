@@ -66,9 +66,9 @@ private:
 
    static const int kMaxDestinations = 5;
    float mWeight[kMaxDestinations];
-   FloatSlider* mWeightSlider[kMaxDestinations];
-   AdditionalNoteCable* mDestinationCables[kMaxDestinations];
-   float mWidth;
-   float mHeight;
+   FloatSlider* mWeightSlider[kMaxDestinations]{ nullptr };
+   AdditionalNoteCable* mDestinationCables[kMaxDestinations]{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    int mLastNoteDestinations[128];
 };

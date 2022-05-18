@@ -30,18 +30,7 @@
 #include "ModularSynth.h"
 
 EnvelopeModulator::EnvelopeModulator()
-: mWidth(250)
-, mHeight(122)
-, mAdvancedDisplayCheckbox(nullptr)
-, mAdvancedDisplay(false)
-, mAdsrDisplay(nullptr)
-, mEnvelopeControl(ofVec2f(105, 5), ofVec2f(mWidth - 110, mHeight - 10))
-, mUseVelocity(false)
-, mADSRViewLength(1000)
-, mADSRViewLengthSlider(nullptr)
-, mHasSustainStageCheckbox(nullptr)
-, mSustainStageSlider(nullptr)
-, mMaxSustainSlider(nullptr)
+: mEnvelopeControl(ofVec2f(105, 5), ofVec2f(mWidth - 110, mHeight - 10))
 {
    mEnvelopeControl.SetViewLength(mADSRViewLength);
    mEnvelopeControl.SetADSR(&mAdsr);

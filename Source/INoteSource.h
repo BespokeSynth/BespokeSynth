@@ -93,7 +93,7 @@ public:
    void Flush(double time) { mNoteOutput.Flush(time); }
 
 private:
-   PatchCableSource* mCable;
+   PatchCableSource* mCable{ nullptr };
 };
 
 #endif

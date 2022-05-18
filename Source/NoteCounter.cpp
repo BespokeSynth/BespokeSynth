@@ -33,13 +33,6 @@
 #include "UIControlMacros.h"
 
 NoteCounter::NoteCounter()
-: mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mStart(0)
-, mLength(16)
-, mStep(0)
-, mCustomDivisor(8)
-, mRandom(false)
 {
 }
 

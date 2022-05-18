@@ -35,11 +35,6 @@ PitchShifter::PitchShifter(int fftBins)
 , mRollingInputBuffer(mFFTBins)
 , mRollingOutputBuffer(mFFTBins)
 , mFFTData(mFFTBins, mFFTBins / 2 + 1)
-, mRatio(1)
-, gRover(false)
-, gInit(false)
-, mLatency(0)
-, mOversampling(4)
 {
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[mFFTBins];

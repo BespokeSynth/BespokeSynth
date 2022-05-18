@@ -34,16 +34,9 @@
 ADSRDisplay::DisplayMode ADSRDisplay::sDisplayMode = ADSRDisplay::kDisplayEnvelope;
 
 ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ::ADSR* adsr)
-: mClick(false)
-, mWidth(w)
+: mWidth(w)
 , mHeight(h)
 , mAdsr(adsr)
-, mVol(1)
-, mMaxTime(1000)
-, mAdjustMode(kAdjustNone)
-, mHighlighted(false)
-, mEditor(nullptr)
-, mOverrideDrawTime(-1)
 {
    assert(owner);
    SetName(name);
@@ -242,7 +235,7 @@ void ADSRDisplay::UpdateSliderVisibility()
       slidersActive = true;
    if (mRSlider && mRSlider->GetModulator() != nullptr && mRSlider->GetModulator()->Active())
       slidersActive = true;
-   if (mASlider)
+   if (mAdsr != nullptr && mASlider)
    {
       if (mAdsr->IsStandardADSR())
       {

@@ -29,28 +29,6 @@
 #include "ModularSynth.h"
 
 PSMoveController::PSMoveController()
-: mConnectButton(nullptr)
-, mVibronomeOn(false)
-, mVibronomeCheckbox(nullptr)
-, mMetronomeLagOffset(50)
-, mOffsetSlider(nullptr)
-, mRoll(.5f)
-, mPitch(.5f)
-, mYaw(0)
-, mEnergy(0)
-, mPitchSlider(nullptr)
-, mYawSlider(nullptr)
-, mRollSlider(nullptr)
-, mEnergySlider(nullptr)
-, mBindPitch(nullptr)
-, mBindYaw(nullptr)
-, mBindRoll(nullptr)
-, mBindEnergy(nullptr)
-, mPitchUIControl(nullptr)
-, mYawUIControl(nullptr)
-, mRollUIControl(nullptr)
-, mEnergyUIControl(nullptr)
-, mPSButtonDown(false)
 {
    mMoveMgr.Setup();
 

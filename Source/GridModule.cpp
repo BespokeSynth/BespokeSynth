@@ -36,11 +36,6 @@
 #include "PatchCableSource.h"
 
 GridModule::GridModule()
-: mGridControlTarget(nullptr)
-, mGrid(nullptr)
-, mGridControllerOwner(nullptr)
-, mMomentary(false)
-, mDirectColorMode(true)
 {
    for (size_t i = 0; i < mHighlightCells.size(); ++i)
       mHighlightCells[i].time = -1;

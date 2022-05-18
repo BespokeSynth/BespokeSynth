@@ -32,16 +32,6 @@
 #include "UIControlMacros.h"
 
 NoteCreator::NoteCreator()
-: mTriggerButton(nullptr)
-, mPitch(48)
-, mVelocity(1)
-, mDuration(100)
-, mPitchEntry(nullptr)
-, mVelocitySlider(nullptr)
-, mNoteOn(false)
-, mStartTime(0)
-, mNoteOnCheckbox(nullptr)
-, mVoiceIndex(-1)
 {
 }
 

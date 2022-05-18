@@ -31,7 +31,6 @@
 #include "Checkbox.h"
 
 PulseGate::PulseGate()
-: mAllow(true)
 {
 }
 

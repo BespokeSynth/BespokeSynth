@@ -61,9 +61,9 @@ public:
 private:
    struct NoteInfo
    {
-      int mPitch;
-      int mVelocity;
-      double mTriggerTime;
+      int mPitch{ 0 };
+      int mVelocity{ 0 };
+      double mTriggerTime{ 0 };
       ModulationParameters mModulation;
    };
 
@@ -76,15 +76,15 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mDelay;
-   FloatSlider* mDelaySlider;
+   float mDelay{ .25 };
+   FloatSlider* mDelaySlider{ nullptr };
 
-   float mLastNoteOnTime;
+   float mLastNoteOnTime{ 0 };
 
    static const int kQueueSize = 500;
    NoteInfo mInputNotes[kQueueSize];
-   int mConsumeIndex;
-   int mAppendIndex;
+   int mConsumeIndex{ 0 };
+   int mAppendIndex{ 0 };
 };
 
 #endif /* defined(__Bespoke__NoteDelayer__) */

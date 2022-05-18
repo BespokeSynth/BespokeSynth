@@ -103,10 +103,10 @@ public:
    void ButtonClicked(ClickButton* button) override;
 
 private:
-   int mWidth;
-   int mHeight;
-   ClickButton* mConfirmButton;
-   ClickButton* mCancelButton;
+   int mWidth{ 200 };
+   int mHeight{ 20 };
+   ClickButton* mConfirmButton{ nullptr };
+   ClickButton* mCancelButton{ nullptr };
 };
 
 class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public WindowCloseListener
@@ -151,25 +151,25 @@ private:
    bool HiddenByZoom() const;
    float GetPixelWidth() const;
 
-   ClickButton* mPlayPauseButton;
-   ClickButton* mSaveLayoutButton;
-   ClickButton* mResetLayoutButton;
-   ClickButton* mSaveStateButton;
-   ClickButton* mSaveStateAsButton;
-   ClickButton* mLoadStateButton;
-   ClickButton* mWriteAudioButton;
-   DropdownList* mLoadLayoutDropdown;
-   ClickButton* mDisplayHelpButton;
-   ClickButton* mDisplayUserPrefsEditorButton;
-   Checkbox* mEventLookaheadCheckbox;
-   int mLoadLayoutIndex;
-   Checkbox* mShouldAutosaveCheckbox;
+   ClickButton* mPlayPauseButton{ nullptr };
+   ClickButton* mSaveLayoutButton{ nullptr };
+   ClickButton* mResetLayoutButton{ nullptr };
+   ClickButton* mSaveStateButton{ nullptr };
+   ClickButton* mSaveStateAsButton{ nullptr };
+   ClickButton* mLoadStateButton{ nullptr };
+   ClickButton* mWriteAudioButton{ nullptr };
+   DropdownList* mLoadLayoutDropdown{ nullptr };
+   ClickButton* mDisplayHelpButton{ nullptr };
+   ClickButton* mDisplayUserPrefsEditorButton{ nullptr };
+   Checkbox* mEventLookaheadCheckbox{ nullptr };
+   int mLoadLayoutIndex{ -1 };
+   Checkbox* mShouldAutosaveCheckbox{ nullptr };
 
-   HelpDisplay* mHelpDisplay;
+   HelpDisplay* mHelpDisplay{ nullptr };
 
    SpawnListManager mSpawnLists;
 
-   bool mLeftCornerHovered;
+   bool mLeftCornerHovered{ false };
 
    std::unique_ptr<PluginListWindow> mPluginListWindow;
 

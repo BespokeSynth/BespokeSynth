@@ -82,8 +82,8 @@ private:
       TextEntry* mToPitchEntry;
    };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    std::array<Remap, 8> mRemaps;
    std::array<NoteInfo, 128> mInputNotes;
 };

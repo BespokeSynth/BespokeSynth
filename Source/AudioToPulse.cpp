@@ -34,12 +34,6 @@
 
 AudioToPulse::AudioToPulse()
 : IAudioProcessor(gBufferSize)
-, mThresholdSlider(nullptr)
-, mReleaseSlider(nullptr)
-, mPeak(0)
-, mEnvelope(0)
-, mThreshold(.5f)
-, mRelease(150)
 {
 }
 

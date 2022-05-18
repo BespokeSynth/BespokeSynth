@@ -108,17 +108,17 @@ private:
       void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
 
-      float mPlay;
-      float mPitch;
-      ModulationChain* mPitchBend;
-      ModulationChain* mPressure;
-      ModulationChain* mModWheel;
+      float mPlay{ 0 };
+      float mPitch{ 0 };
+      ModulationChain* mPitchBend{ nullptr };
+      ModulationChain* mPressure{ nullptr };
+      ModulationChain* mModWheel{ nullptr };
 
-      float mGain;
+      float mGain{ 0 };
 
-      ::ADSR mADSR;
+      ::ADSR mADSR{ 100, 0, 1, 100 };
       Granulator mGranulator;
-      SeaOfGrain* mOwner;
+      SeaOfGrain* mOwner{ nullptr };
    };
 
    struct GrainManualVoice
@@ -127,24 +127,24 @@ private:
       void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
 
-      float mGain;
-      float mPosition;
-      float mPan;
+      float mGain{ 0 };
+      float mPosition{ 0 };
+      float mPan{ 0 };
 
       Granulator mGranulator;
-      SeaOfGrain* mOwner;
+      SeaOfGrain* mOwner{ nullptr };
 
-      FloatSlider* mGainSlider;
-      FloatSlider* mPositionSlider;
-      FloatSlider* mOverlapSlider;
-      FloatSlider* mSpeedSlider;
-      FloatSlider* mLengthMsSlider;
-      FloatSlider* mPosRandomizeSlider;
-      FloatSlider* mSpeedRandomizeSlider;
-      FloatSlider* mSpacingRandomizeSlider;
-      Checkbox* mOctaveCheckbox;
-      FloatSlider* mWidthSlider;
-      FloatSlider* mPanSlider;
+      FloatSlider* mGainSlider{ nullptr };
+      FloatSlider* mPositionSlider{ nullptr };
+      FloatSlider* mOverlapSlider{ nullptr };
+      FloatSlider* mSpeedSlider{ nullptr };
+      FloatSlider* mLengthMsSlider{ nullptr };
+      FloatSlider* mPosRandomizeSlider{ nullptr };
+      FloatSlider* mSpeedRandomizeSlider{ nullptr };
+      FloatSlider* mSpacingRandomizeSlider{ nullptr };
+      Checkbox* mOctaveCheckbox{ nullptr };
+      FloatSlider* mWidthSlider{ nullptr };
+      FloatSlider* mPanSlider{ nullptr };
    };
 
    static const int kNumMPEVoices = 16;
@@ -152,26 +152,26 @@ private:
    static const int kNumManualVoices = 6;
    GrainManualVoice mManualVoices[kNumManualVoices];
 
-   Sample* mSample;
+   Sample* mSample{ nullptr };
    RollingBuffer mRecordBuffer;
 
-   ClickButton* mLoadButton;
-   bool mRecordInput;
-   Checkbox* mRecordInputCheckbox;
-   bool mHasRecordedInput;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   bool mLoading;
-   FloatSlider* mDisplayOffsetSlider;
-   float mDisplayOffset;
-   FloatSlider* mDisplayLengthSlider;
-   float mDisplayLength;
-   int mDisplayStartSamples;
-   int mDisplayEndSamples;
-   DropdownList* mKeyboardBasePitchSelector;
-   int mKeyboardBasePitch;
-   DropdownList* mKeyboardNumPitchesSelector;
-   int mKeyboardNumPitches;
+   ClickButton* mLoadButton{ nullptr };
+   bool mRecordInput{ false };
+   Checkbox* mRecordInputCheckbox{ nullptr };
+   bool mHasRecordedInput{ false };
+   float mVolume{ .6 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   bool mLoading{ false };
+   FloatSlider* mDisplayOffsetSlider{ nullptr };
+   float mDisplayOffset{ 0 };
+   FloatSlider* mDisplayLengthSlider{ nullptr };
+   float mDisplayLength{ 10 };
+   int mDisplayStartSamples{ 0 };
+   int mDisplayEndSamples{ 0 };
+   DropdownList* mKeyboardBasePitchSelector{ nullptr };
+   int mKeyboardBasePitch{ 36 };
+   DropdownList* mKeyboardNumPitchesSelector{ nullptr };
+   int mKeyboardNumPitches{ 24 };
 };
 
 #endif /* defined(__Bespoke__SeaOfGrain__) */

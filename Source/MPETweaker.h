@@ -63,22 +63,22 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
-   float mPitchBendMultiplier;
-   FloatSlider* mPitchBendMultiplierSlider;
-   float mPitchBendOffset;
-   FloatSlider* mPitchBendOffsetSlider;
-   float mPressureMultiplier;
-   FloatSlider* mPressureMultiplierSlider;
-   float mPressureOffset;
-   FloatSlider* mPressureOffsetSlider;
-   float mModWheelMultiplier;
-   FloatSlider* mModWheelMultiplierSlider;
-   float mModWheelOffset;
-   FloatSlider* mModWheelOffsetSlider;
+   float mPitchBendMultiplier{ 1 };
+   FloatSlider* mPitchBendMultiplierSlider{ nullptr };
+   float mPitchBendOffset{ 0 };
+   FloatSlider* mPitchBendOffsetSlider{ nullptr };
+   float mPressureMultiplier{ 1 };
+   FloatSlider* mPressureMultiplierSlider{ nullptr };
+   float mPressureOffset{ 0 };
+   FloatSlider* mPressureOffsetSlider{ nullptr };
+   float mModWheelMultiplier{ 1 };
+   FloatSlider* mModWheelMultiplierSlider{ nullptr };
+   float mModWheelOffset{ 0 };
+   FloatSlider* mModWheelOffsetSlider{ nullptr };
 
-   Modulations mModulationMult;
-   Modulations mModulationOffset;
+   Modulations mModulationMult{ true };
+   Modulations mModulationOffset{ true };
 };

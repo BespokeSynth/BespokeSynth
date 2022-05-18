@@ -33,6 +33,7 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
 : mWidth(35)
 , mHeight(kItemSpacing)
 , mVar(var)
+, mLastSetValue(*var)
 , mModalList(this)
 , mOwner(owner)
 , mMaxPerColumn(40)

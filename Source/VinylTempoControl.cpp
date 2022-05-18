@@ -33,11 +33,7 @@ VinylTempoControl* TheVinylTempoControl = nullptr;
 
 VinylTempoControl::VinylTempoControl()
 : IAudioProcessor(gBufferSize)
-, mReferencePitch(1)
 , mVinylProcessor(gSampleRate)
-, mUseVinylControl(false)
-, mUseVinylControlCheckbox(nullptr)
-, mSpeed(1)
 {
    //mModulationBuffer = new float[gBufferSize];
 }
@@ -168,6 +164,7 @@ VinylProcessor::~VinylProcessor()
    timecoder_free_lookup();
 }
 
+//@TODO(Noxy): Warning C6262 Function uses '16448' bytes of stack : exceeds / analyze : stacksize '16384'. Consider moving some data to heap.
 void VinylProcessor::Process(float* left, float* right, int numSamples)
 {
    float* in[2];

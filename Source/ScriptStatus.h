@@ -69,11 +69,11 @@ private:
       mHeight = h;
    }
 
-   ClickButton* mResetAll;
+   ClickButton* mResetAll{ nullptr };
 
    std::string mStatus;
-   double mNextUpdateTime;
+   double mNextUpdateTime{ 0 };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

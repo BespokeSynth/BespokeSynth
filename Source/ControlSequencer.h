@@ -119,7 +119,7 @@ private:
    bool mHasExternalPulseSource{ false };
    int mStep{ 0 };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__Bespoke__ControlSequencer__) */

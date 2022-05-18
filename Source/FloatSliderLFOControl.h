@@ -40,29 +40,16 @@
 
 struct LFOSettings
 {
-   LFOSettings()
-   : mInterval(kInterval_1n)
-   , mLFOOffset(0)
-   , mBias(0)
-   , mSpread(0)
-   , mSoften(0)
-   , mShuffle(0)
-   , mFreeRate(1)
-   , mLength(1)
-   , mLowResMode(false)
-   {
-   }
-
-   NoteInterval mInterval;
-   OscillatorType mOscType;
-   float mLFOOffset;
-   float mBias;
-   float mSpread;
-   float mSoften;
-   float mShuffle;
-   float mFreeRate;
-   float mLength;
-   bool mLowResMode;
+   NoteInterval mInterval{ kInterval_1n };
+   OscillatorType mOscType{ kOsc_Sin };
+   float mLFOOffset{ 0 };
+   float mBias{ 0 };
+   float mSpread{ 0 };
+   float mSoften{ 0 };
+   float mShuffle{ 0 };
+   float mFreeRate{ 1 };
+   float mLength{ 1 };
+   bool mLowResMode{ false };
 
    void SaveState(FileStreamOut& out) const;
    void LoadState(FileStreamIn& in);
@@ -133,22 +120,22 @@ private:
    LFOSettings mLFOSettings;
 
    LFO mLFO;
-   DropdownList* mIntervalSelector;
-   DropdownList* mOscSelector;
-   FloatSlider* mOffsetSlider;
-   FloatSlider* mBiasSlider;
-   FloatSlider* mSpreadSlider;
-   FloatSlider* mSoftenSlider;
-   FloatSlider* mShuffleSlider;
-   FloatSlider* mFreeRateSlider;
-   FloatSlider* mLengthSlider;
-   ClickButton* mPinButton;
-   Checkbox* mEnableLFOCheckbox;
-   Checkbox* mLowResModeCheckbox;
-   float mWidth;
-   float mHeight;
+   DropdownList* mIntervalSelector{ nullptr };
+   DropdownList* mOscSelector{ nullptr };
+   FloatSlider* mOffsetSlider{ nullptr };
+   FloatSlider* mBiasSlider{ nullptr };
+   FloatSlider* mSpreadSlider{ nullptr };
+   FloatSlider* mSoftenSlider{ nullptr };
+   FloatSlider* mShuffleSlider{ nullptr };
+   FloatSlider* mFreeRateSlider{ nullptr };
+   FloatSlider* mLengthSlider{ nullptr };
+   ClickButton* mPinButton{ nullptr };
+   Checkbox* mEnableLFOCheckbox{ nullptr };
+   Checkbox* mLowResModeCheckbox{ nullptr };
+   float mWidth{ 100 };
+   float mHeight{ 20 };
 
-   bool mPinned;
+   bool mPinned{ false };
 };
 
 class LFOPool

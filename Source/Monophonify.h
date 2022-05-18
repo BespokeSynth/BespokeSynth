@@ -66,17 +66,17 @@ private:
    int GetMostRecentPitch() const;
 
    double mHeldNotes[128];
-   int mInitialPitch;
-   int mLastPlayedPitch;
-   int mLastVelocity;
-   float mWidth;
-   float mHeight;
-   int mVoiceIdx;
+   int mInitialPitch{ -1 };
+   int mLastPlayedPitch{ -1 };
+   int mLastVelocity{ 0 };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mVoiceIdx{ 0 };
 
-   bool mRequireHeldNote;
-   Checkbox* mRequireHeldNoteCheckbox;
-   float mGlideTime;
-   FloatSlider* mGlideSlider;
+   bool mRequireHeldNote{ false };
+   Checkbox* mRequireHeldNoteCheckbox{ nullptr };
+   float mGlideTime{ 0 };
+   FloatSlider* mGlideSlider{ nullptr };
    ModulationChain mPitchBend;
 };
 

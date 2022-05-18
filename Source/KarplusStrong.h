@@ -80,23 +80,23 @@ private:
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    KarplusStrongVoiceParams mVoiceParams;
-   FloatSlider* mFilterSlider;
-   FloatSlider* mFeedbackSlider;
-   float mVolume;
-   FloatSlider* mVolSlider;
-   DropdownList* mSourceDropdown;
-   Checkbox* mInvertCheckbox;
+   FloatSlider* mFilterSlider{ nullptr };
+   FloatSlider* mFeedbackSlider{ nullptr };
+   float mVolume{ 1 };
+   FloatSlider* mVolSlider{ nullptr };
+   DropdownList* mSourceDropdown{ nullptr };
+   Checkbox* mInvertCheckbox{ nullptr };
    BiquadFilterEffect mBiquad;
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
 
-   Checkbox* mStretchCheckbox;
-   FloatSlider* mExciterFreqSlider;
-   FloatSlider* mExciterAttackSlider;
-   FloatSlider* mExciterDecaySlider;
-   FloatSlider* mPitchToneSlider;
-   FloatSlider* mVelToVolumeSlider;
-   FloatSlider* mVelToEnvelopeSlider;
-   Checkbox* mLiteCPUModeCheckbox;
+   Checkbox* mStretchCheckbox{ nullptr };
+   FloatSlider* mExciterFreqSlider{ nullptr };
+   FloatSlider* mExciterAttackSlider{ nullptr };
+   FloatSlider* mExciterDecaySlider{ nullptr };
+   FloatSlider* mPitchToneSlider{ nullptr };
+   FloatSlider* mVelToVolumeSlider{ nullptr };
+   FloatSlider* mVelToEnvelopeSlider{ nullptr };
+   Checkbox* mLiteCPUModeCheckbox{ nullptr };
 
    ChannelBuffer mWriteBuffer;
 };

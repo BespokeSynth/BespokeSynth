@@ -136,27 +136,27 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mMix;
-   float mDrive;
-   float mThreshold;
-   float mRatio;
-   float mAttack;
-   float mRelease;
-   float mLookahead;
-   float mOutputAdjust;
-   FloatSlider* mMixSlider;
-   FloatSlider* mDriveSlider;
-   FloatSlider* mThresholdSlider;
-   FloatSlider* mRatioSlider;
-   FloatSlider* mAttackSlider;
-   FloatSlider* mReleaseSlider;
-   FloatSlider* mLookaheadSlider;
-   FloatSlider* mOutputAdjustSlider;
+   float mMix{ 1 };
+   float mDrive{ 1 };
+   float mThreshold{ -24 };
+   float mRatio{ 4 };
+   float mAttack{ .1 };
+   float mRelease{ 100 };
+   float mLookahead{ 3 };
+   float mOutputAdjust{ 1 };
+   FloatSlider* mMixSlider{ nullptr };
+   FloatSlider* mDriveSlider{ nullptr };
+   FloatSlider* mThresholdSlider{ nullptr };
+   FloatSlider* mRatioSlider{ nullptr };
+   FloatSlider* mAttackSlider{ nullptr };
+   FloatSlider* mReleaseSlider{ nullptr };
+   FloatSlider* mLookaheadSlider{ nullptr };
+   FloatSlider* mOutputAdjustSlider{ nullptr };
 
-   double mCurrentInputDb;
-   double mOutputGain;
-   float mWidth;
-   float mHeight;
+   double mCurrentInputDb{ 0 };
+   double mOutputGain{ 1 };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
    // runtime variables
    double envdB_; // over-threshold envelope (dB)

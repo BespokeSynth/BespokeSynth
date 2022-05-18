@@ -29,7 +29,6 @@
 
 InputChannel::InputChannel()
 : IAudioProcessor(gBufferSize)
-, mChannelSelectionIndex(0)
 {
 }
 

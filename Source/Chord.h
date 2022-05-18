@@ -50,9 +50,9 @@ struct Chord
    , mInversion(inversion)
    {}
 
-   int mRootPitch;
-   ChordType mType;
-   int mInversion;
+   int mRootPitch{ 0 };
+   ChordType mType{ kChord_Unknown };
+   int mInversion{ 0 };
 
    std::string Name(bool withDegree, bool withAccidentals, ScalePitches* scale = nullptr);
    void SetFromDegreeAndScale(int degree, const ScalePitches& scale, int inversion = 0);

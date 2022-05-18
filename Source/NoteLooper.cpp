@@ -33,17 +33,7 @@
 #include "UIControlMacros.h"
 
 NoteLooper::NoteLooper()
-: mWidth(370)
-, mHeight(140)
-, mMinRow(127)
-, mMaxRow(0)
-, mWrite(false)
-, mWriteCheckbox(nullptr)
-, mNumMeasures(1)
-, mNumMeasuresSlider(nullptr)
-, mDeleteOrMute(false)
-, mDeleteOrMuteCheckbox(nullptr)
-, mVoiceRoundRobin(kNumVoices - 1)
+: mVoiceRoundRobin(kNumVoices - 1)
 {
 }
 

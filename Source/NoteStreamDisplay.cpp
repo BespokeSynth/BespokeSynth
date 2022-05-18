@@ -31,16 +31,7 @@
 #include "UIControlMacros.h"
 
 NoteStreamDisplay::NoteStreamDisplay()
-: mWidth(400)
-, mHeight(200)
-, mDurationMs(2000)
-, mPitchMin(127)
-, mPitchMax(0)
 {
-   for (int i = 0; i < kNoteStreamCapacity; ++i)
-   {
-      mNoteStream[i].timeOn = -1;
-   }
 }
 
 void NoteStreamDisplay::CreateUIControls()

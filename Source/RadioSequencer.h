@@ -121,5 +121,5 @@ private:
    int mStep{ 0 };
    int mLoadRev{ -1 };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

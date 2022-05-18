@@ -30,8 +30,6 @@
 #include "UIControlMacros.h"
 
 Capo::Capo()
-: mCapo(0)
-, mRetrigger(false)
 {
 }
 

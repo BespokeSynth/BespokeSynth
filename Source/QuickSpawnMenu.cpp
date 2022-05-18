@@ -39,8 +39,6 @@ namespace
 }
 
 QuickSpawnMenu::QuickSpawnMenu()
-: mLastHoverX(0)
-, mLastHoverY(0)
 {
    assert(TheQuickSpawnMenu == nullptr);
    TheQuickSpawnMenu = this;

@@ -31,14 +31,6 @@
 #include "UIControlMacros.h"
 
 MPETweaker::MPETweaker()
-: mPitchBendMultiplier(1)
-, mPitchBendOffset(0)
-, mPressureMultiplier(1)
-, mPressureOffset(0)
-, mModWheelMultiplier(1)
-, mModWheelOffset(0)
-, mModulationMult(true)
-, mModulationOffset(true)
 {
    for (int voiceIdx = -1; voiceIdx < kNumVoices; ++voiceIdx)
    {

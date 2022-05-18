@@ -53,8 +53,6 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
 
 private:
-   void Go();
-
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override
@@ -64,12 +62,12 @@ private:
    }
    bool Enabled() const override { return true; }
 
-   bool mPass;
+   bool mPass{ false };
 
-   Checkbox* mPassCheckbox;
+   Checkbox* mPassCheckbox{ nullptr };
    Ramp mRamp;
-   float mRampTimeMs;
-   FloatSlider* mRampTimeSlider;
+   float mRampTimeMs{ 3 };
+   FloatSlider* mRampTimeSlider{ nullptr };
 };
 
 

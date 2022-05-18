@@ -84,18 +84,6 @@ false;
 ofxJSONElement ScriptModule::sStyleJSON;
 
 ScriptModule::ScriptModule()
-: mCodeEntry(nullptr)
-, mRunButton(nullptr)
-, mStopButton(nullptr)
-, mHotloadScripts(false)
-, mA(0)
-, mB(0)
-, mC(0)
-, mD(0)
-, mNextLineToExecute(-1)
-, mInitExecutePriority(0)
-, mOscInputPort(-1)
-, mShowJediWarning(false)
 {
    CheckIfPythonEverSuccessfullyInitialized();
    if ((TheSynth->IsLoadingState() || Prefab::sLoadingPrefab) && sHasPythonEverSuccessfullyInitialized)
@@ -1089,7 +1077,7 @@ std::pair<int, int> ScriptModule::RunScript(double time, int lineStart /*=-1*/, 
    int executionEndLine = (int)lines.size();
    if (lineStart != -1)
    {
-      for (size_t i = (size_t)lineStart; i >= 0; --i)
+      for (auto i = lineStart; i >= 0; --i)
       {
          if (lines[i][0] != ' ') //no indentation
          {
@@ -1098,7 +1086,7 @@ std::pair<int, int> ScriptModule::RunScript(double time, int lineStart /*=-1*/, 
          }
       }
 
-      for (size_t i = (size_t)lineEnd + 1; i < (int)lines.size(); ++i)
+      for (auto i = lineEnd + 1; i < (int)lines.size(); ++i)
       {
          if (lines[i][0] != ' ') //no indentation
          {
@@ -1560,9 +1548,6 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 }
 
 ScriptReferenceDisplay::ScriptReferenceDisplay()
-: mWidth(750)
-, mHeight(335)
-, mMaxScrollAmount(0)
 {
    LoadText();
 }

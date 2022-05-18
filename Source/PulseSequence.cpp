@@ -33,14 +33,6 @@
 #include "PatchCableSource.h"
 
 PulseSequence::PulseSequence()
-: mInterval(kInterval_8n)
-, mIntervalSelector(nullptr)
-, mHasExternalPulseSource(false)
-, mLength(8)
-, mLengthSlider(nullptr)
-, mStep(0)
-, mAdvanceBackwardButton(nullptr)
-, mAdvanceForwardButton(nullptr)
 {
    for (int i = 0; i < kMaxSteps; ++i)
       mVels[i] = 1;

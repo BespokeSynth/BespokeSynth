@@ -38,13 +38,6 @@ namespace
 }
 
 MidiOutputModule::MidiOutputModule()
-: mControllerIndex(-1)
-, mControllerList(nullptr)
-, mDevice(nullptr)
-, mChannel(1)
-, mPitchBendRange(2)
-, mModwheelCC(1) //or 74 in Multidimensional Polyphonic Expression (MPE) spec
-, mUseVoiceAsChannel(false)
 {
    mChannelModulations.resize(kGlobalModulationIdx + 1);
 }

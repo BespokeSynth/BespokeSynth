@@ -36,11 +36,7 @@
 
 Rewriter::Rewriter()
 : IAudioProcessor(gBufferSize)
-, mRewriteButton(nullptr)
-, mConnectedLooper(nullptr)
 , mRecordBuffer(MAX_BUFFER_SIZE)
-, mStartRecordTime(-1)
-, mStartRecordTimeButton(nullptr)
 {
 }
 

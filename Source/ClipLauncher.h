@@ -80,38 +80,27 @@ private:
    class SampleData
    {
    public:
-      SampleData()
-      : mSample(nullptr)
-      , mNumBars(1)
-      , mVolume(1)
-      , mGrabCheckbox(nullptr)
-      , mPlayCheckbox(nullptr)
-      , mClipLauncher(nullptr)
-      , mIndex(0)
-      , mPlay(false)
-      , mHasSample(false)
-      {
-      }
+      SampleData() {}
       ~SampleData();
 
       void Init(ClipLauncher* launcher, int index);
       void Draw();
 
-      Sample* mSample;
-      int mNumBars;
-      float mVolume;
-      Checkbox* mGrabCheckbox;
-      Checkbox* mPlayCheckbox;
-      ClipLauncher* mClipLauncher;
-      int mIndex;
-      bool mPlay;
-      bool mHasSample;
+      Sample* mSample{ nullptr };
+      int mNumBars{ 1 };
+      float mVolume{ 1 };
+      Checkbox* mGrabCheckbox{ nullptr };
+      Checkbox* mPlayCheckbox{ nullptr };
+      ClipLauncher* mClipLauncher{ nullptr };
+      int mIndex{ 0 };
+      bool mPlay{ false };
+      bool mHasSample{ false };
    };
 
-   Looper* mLooper;
+   Looper* mLooper{ nullptr };
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
+   float mVolume{ 1 };
+   FloatSlider* mVolumeSlider{ nullptr };
 
    std::vector<SampleData> mSamples;
    JumpBlender mJumpBlender;

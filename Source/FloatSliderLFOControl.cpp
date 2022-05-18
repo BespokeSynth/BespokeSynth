@@ -30,14 +30,6 @@
 #include "UIControlMacros.h"
 
 FloatSliderLFOControl::FloatSliderLFOControl()
-: mIntervalSelector(nullptr)
-, mOscSelector(nullptr)
-, mOffsetSlider(nullptr)
-, mBiasSlider(nullptr)
-, mSpreadSlider(nullptr)
-, mSoftenSlider(nullptr)
-, mShuffleSlider(nullptr)
-, mPinned(false)
 {
    mLFOSettings.mInterval = kInterval_1n;
    mLFOSettings.mOscType = kOsc_Sin;

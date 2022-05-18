@@ -114,28 +114,27 @@ private:
       void Draw();
 
       DrumSynthHitSerialData mData;
-      float mPhase;
-      ADSRDisplay* mToneAdsrDisplay;
-      ADSRDisplay* mFreqAdsrDisplay;
-      ADSRDisplay* mNoiseAdsrDisplay;
-      ADSRDisplay* mFilterAdsrDisplay;
-      FloatSlider* mVolSlider;
-      FloatSlider* mFreqMaxSlider;
-      FloatSlider* mFreqMinSlider;
-      RadioButton* mToneType;
-      double mStartTime;
+      float mPhase{ 0 };
+      ADSRDisplay* mToneAdsrDisplay{ nullptr };
+      ADSRDisplay* mFreqAdsrDisplay{ nullptr };
+      ADSRDisplay* mNoiseAdsrDisplay{ nullptr };
+      ADSRDisplay* mFilterAdsrDisplay{ nullptr };
+      FloatSlider* mVolSlider{ nullptr };
+      FloatSlider* mFreqMaxSlider{ nullptr };
+      FloatSlider* mFreqMinSlider{ nullptr };
+      RadioButton* mToneType{ nullptr };
       PeakTracker mLevel;
-      FloatSlider* mVolNoiseSlider;
-      FloatSlider* mFilterCutoffMaxSlider;
-      FloatSlider* mFilterCutoffMinSlider;
-      FloatSlider* mFilterQSlider;
+      FloatSlider* mVolNoiseSlider{ nullptr };
+      FloatSlider* mFilterCutoffMaxSlider{ nullptr };
+      FloatSlider* mFilterCutoffMinSlider{ nullptr };
+      FloatSlider* mFilterQSlider{ nullptr };
       DrumSynth* mParent;
       int mIndex;
       int mX;
       int mY;
       BiquadFilter mFilter;
 
-      IndividualOutput* mIndividualOutput;
+      IndividualOutput* mIndividualOutput{ nullptr };
    };
 
    struct IndividualOutput
@@ -172,12 +171,12 @@ private:
    void OnClicked(int x, int y, bool right) override;
 
    std::array<DrumSynthHit*, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mHits;
-   std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity;
+   std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity{};
 
-   float mVolume;
-   FloatSlider* mVolSlider;
-   bool mUseIndividualOuts;
-   bool mMonoOutput;
+   float mVolume{ 1 };
+   FloatSlider* mVolSlider{ nullptr };
+   bool mUseIndividualOuts{ false };
+   bool mMonoOutput{ false };
    int mOversampling{ 1 };
-   DropdownList* mOversamplingSelector;
+   DropdownList* mOversamplingSelector{ nullptr };
 };

@@ -31,22 +31,6 @@
 LiveGranulator::LiveGranulator()
 : mBufferLength(gSampleRate * 5)
 , mBuffer(mBufferLength)
-, mGranOverlap(nullptr)
-, mGranPosRandomize(nullptr)
-, mGranSpeed(nullptr)
-, mGranSpeedRandomize(nullptr)
-, mGranLengthMs(nullptr)
-, mFreeze(false)
-, mFreezeCheckbox(nullptr)
-, mGranOctaveCheckbox(nullptr)
-, mFreezeExtraSamples(0)
-, mPos(0)
-, mPosSlider(nullptr)
-, mDry(0)
-, mDrySlider(nullptr)
-, mAutoCaptureInterval(kInterval_None)
-, mAutoCaptureDropdown(nullptr)
-, mGranSpacingRandomize(nullptr)
 {
    mGranulator.SetLiveMode(true);
    mGranulator.mSpeed = 1;

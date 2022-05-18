@@ -61,20 +61,20 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mSpread;
-   FloatSlider* mSpreadSlider;
-   float mCenter;
-   FloatSlider* mCenterSlider;
+   float mSpread{ 1 };
+   FloatSlider* mSpreadSlider{ nullptr };
+   float mCenter{ 0 };
+   FloatSlider* mCenterSlider{ nullptr };
 
    static const int kPanHistoryDisplaySize = 10;
    struct PanHistoryDisplayItem
    {
-      float time;
-      float pan;
+      float time{ -9999 };
+      float pan{ 0 };
    };
    PanHistoryDisplayItem mPanHistoryDisplay[kPanHistoryDisplaySize];
-   int mPanHistoryDisplayIndex;
+   int mPanHistoryDisplayIndex{ 0 };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

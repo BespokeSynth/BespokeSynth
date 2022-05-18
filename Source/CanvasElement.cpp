@@ -328,9 +328,6 @@ void CanvasElement::LoadState(FileStreamIn& in)
 
 NoteCanvasElement::NoteCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
 : CanvasElement(canvas, col, row, offset, length)
-, mVelocity(.5f)
-, mVoiceIdx(-1)
-, mPan(0)
 {
    if (canvas != nullptr && canvas->GetControls())
    {

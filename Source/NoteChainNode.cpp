@@ -32,18 +32,6 @@
 #include "PatchCableSource.h"
 
 NoteChainNode::NoteChainNode()
-: mTriggerButton(nullptr)
-, mPitch(48)
-, mVelocity(1)
-, mDuration(.25f)
-, mPitchEntry(nullptr)
-, mVelocitySlider(nullptr)
-, mStartTime(0)
-, mNoteOn(false)
-, mWaitingToTrigger(false)
-, mNextSelector(nullptr)
-, mNextInterval(kInterval_8n)
-, mQueueTrigger(false)
 {
 }
 

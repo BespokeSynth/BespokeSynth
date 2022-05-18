@@ -87,24 +87,23 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   int mVels[VSS_MAX_STEPS];
-   IntSlider* mVelSliders[VSS_MAX_STEPS];
+   int mVels[VSS_MAX_STEPS]{};
+   IntSlider* mVelSliders[VSS_MAX_STEPS]{};
 
-   NoteInterval mInterval;
-   int mArpIndex;
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   int mArpIndex{ -1 };
 
-   DropdownList* mIntervalSelector;
-   bool mResetOnDownbeat;
-   Checkbox* mResetOnDownbeatCheckbox;
-   int mCurrentVelocity;
+   DropdownList* mIntervalSelector{ nullptr };
+   bool mResetOnDownbeat{ true };
+   Checkbox* mResetOnDownbeatCheckbox{ nullptr };
+   int mCurrentVelocity{ 80 };
 
-   int mLength;
-   IntSlider* mLengthSlider;
-   bool mSetLength;
+   int mLength{ VSS_MAX_STEPS };
+   IntSlider* mLengthSlider{ nullptr };
 
-   MidiController* mController;
+   MidiController* mController{ nullptr };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__Bespoke__VelocityStepSequencer__) */

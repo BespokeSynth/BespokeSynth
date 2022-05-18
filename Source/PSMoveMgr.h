@@ -18,7 +18,6 @@ class PSMoveMgr
 {
 public:
    PSMoveMgr()
-   : mListener(NULL)
    {}
 
    void Setup();
@@ -40,8 +39,8 @@ private:
    _PSMove* SetUpMove(int id);
    void SendButtonMessage(int id, std::string button, int val);
 
-   _PSMove* mMove[MAX_NUM_PS_MOVES];
-   int mButtons[MAX_NUM_PS_MOVES];
+   _PSMove* mMove[MAX_NUM_PS_MOVES]{};
+   int mButtons[MAX_NUM_PS_MOVES]{};
 
-   PSMoveListener* mListener;
+   PSMoveListener* mListener{ nullptr };
 };

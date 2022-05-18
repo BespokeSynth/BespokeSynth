@@ -40,10 +40,10 @@ public:
    float Process(float sample, int samplesIn);
 
 private:
-   bool mBlending;
+   bool mBlending{ false };
    Ramp mRamp;
-   float mSamples[JUMP_BLEND_SAMPLES];
-   int mBlendSample;
+   float mSamples[JUMP_BLEND_SAMPLES]{};
+   int mBlendSample{ 0 };
 };
 
 #endif /* defined(__modularSynth__JumpBlender__) */

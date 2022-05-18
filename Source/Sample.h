@@ -28,6 +28,7 @@
 
 #include "OpenFrameworksPort.h"
 #include "ChannelBuffer.h"
+#include <limits>
 
 #include "juce_events/juce_events.h"
 
@@ -97,23 +98,23 @@ private:
    void timerCallback();
 
    ChannelBuffer mData;
-   int mNumSamples;
-   double mStartTime;
-   double mOffset;
-   float mRate;
-   float mSampleRateRatio;
-   int mStopPoint;
+   int mNumSamples{ 0 };
+   double mStartTime{ 0 };
+   double mOffset{ std::numeric_limits<float>::max() }; //@TODO(Noxy): Shouldn't this be std::numeric_limits<double>::max() instead of float? (It was originally FLT_MAX).
+   float mRate{ 1 };
+   float mSampleRateRatio{ 1 };
+   int mStopPoint{ -1 };
    std::string mName;
    std::string mReadPath;
    ofMutex mDataMutex;
    ofMutex mPlayMutex;
-   bool mLooping;
-   int mNumBars;
-   float mVolume;
+   bool mLooping{ false };
+   int mNumBars{ -1 };
+   float mVolume{ 1 };
 
-   juce::AudioFormatReader* mReader;
+   juce::AudioFormatReader* mReader{};
    std::unique_ptr<juce::AudioSampleBuffer> mReadBuffer;
-   int mSamplesLeftToRead;
+   int mSamplesLeftToRead{ 0 };
 };
 
 #endif /* defined(__modularSynth__Sample__) */

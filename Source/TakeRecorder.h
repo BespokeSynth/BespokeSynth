@@ -67,10 +67,6 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mStartSeconds;
-   FloatSlider* mStartSecondsSlider;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
-   bool mRecording;
-   Checkbox* mRecordingCheckbox;
+   float mStartSeconds{ 0 };
+   FloatSlider* mStartSecondsSlider{ nullptr };
 };

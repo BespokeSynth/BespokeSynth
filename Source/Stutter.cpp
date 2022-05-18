@@ -36,17 +36,6 @@ int Stutter::sStutterSubdivide = 1;
 Stutter::Stutter()
 : mRecordBuffer(STUTTER_BUFFER_SIZE)
 , mStutterBuffer(STUTTER_BUFFER_SIZE)
-, mEnabled(true)
-, mStuttering(false)
-, mAutoStutter(false)
-, mAutoCheckbox(nullptr)
-, mFadeCheckbox(nullptr)
-, mSubdivideSlider(nullptr)
-, mNanopadScene(0)
-, mCurrentStutter(kInterval_None, 0)
-, mFadeStutter(false)
-, mFreeStutterLength(.1f)
-, mFreeStutterSpeed(1)
 {
    mBlendRamp.SetValue(0);
 }

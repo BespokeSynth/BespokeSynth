@@ -33,14 +33,6 @@
 #include "UIControlMacros.h"
 
 ModulatorGravity::ModulatorGravity()
-: mValue(0)
-, mGravity(-.1f)
-, mKickAmount(1)
-, mDrag(.005f)
-, mGravitySlider(nullptr)
-, mKickAmountSlider(nullptr)
-, mDragSlider(nullptr)
-, mKickButton(nullptr)
 {
 }
 

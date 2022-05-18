@@ -230,9 +230,7 @@ inline std::string ofToString(const T& value, int precision)
 class RetinaTrueTypeFont
 {
 public:
-   RetinaTrueTypeFont()
-   : mLoaded(false)
-   {}
+   RetinaTrueTypeFont() {}
    void LoadFont(std::string path);
    void DrawString(std::string str, float size, float x, float y);
    ofRectangle DrawStringWrap(std::string str, float size, float x, float y, float width);
@@ -243,9 +241,9 @@ public:
    std::string GetFontPath() const { return mFontPath; }
 
 private:
-   int mFontHandle;
-   int mFontBoundsHandle;
-   bool mLoaded;
+   int mFontHandle{};
+   int mFontBoundsHandle{};
+   bool mLoaded{ false };
    std::string mFontPath;
 };
 

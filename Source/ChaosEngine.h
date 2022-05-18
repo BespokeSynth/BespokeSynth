@@ -77,14 +77,12 @@ private:
       ProgressionChord(int degree, int beatLength = -1)
       : mDegree(degree)
       , mBeatLength(beatLength)
-      , mInversion(0)
       {}
 
       ProgressionChord(int degree, std::vector<Accidental> accidentals, int beatLength = -1)
       : mDegree(degree)
       , mAccidentals(accidentals)
       , mBeatLength(beatLength)
-      , mInversion(0)
       {}
 
       ProgressionChord(const ofxJSONElement& chordInfo, ScalePitches scale);
@@ -97,7 +95,7 @@ private:
       int mDegree;
       int mBeatLength;
       std::vector<Accidental> mAccidentals;
-      int mInversion;
+      int mInversion{ 0 };
    };
 
    struct SongSection
@@ -109,10 +107,10 @@ private:
    struct Song
    {
       std::string mName;
-      float mTempo;
-      int mTimeSigTop;
-      int mTimeSigBottom;
-      int mScaleRoot;
+      float mTempo{ 120 };
+      int mTimeSigTop{ 4 };
+      int mTimeSigBottom{ 4 };
+      int mScaleRoot{ 0 };
       std::string mScaleType;
       std::vector<SongSection> mSections;
    };
@@ -137,49 +135,49 @@ private:
    }
    void OnClicked(int x, int y, bool right) override;
 
-   ClickButton* mChaosButton;
-   bool mTotalChaos;
-   Checkbox* mTotalChaosCheckbox;
-   double mChaosArrivalTime;
-   int mLastAudioUpdateMeasure;
-   int mLastAudioUpdateBeat;
-   int mBeatsLeftToChordChange;
-   bool mRestarting;
+   ClickButton* mChaosButton{ nullptr };
+   bool mTotalChaos{ false };
+   Checkbox* mTotalChaosCheckbox{ nullptr };
+   double mChaosArrivalTime{ -1 };
+   int mLastAudioUpdateMeasure{ -1 };
+   int mLastAudioUpdateBeat{ -1 };
+   int mBeatsLeftToChordChange{ -1 };
+   bool mRestarting{ false };
 
-   int mChordProgressionIdx;
+   int mChordProgressionIdx{ -1 };
    std::vector<ProgressionChord> mChordProgression;
    ofMutex mProgressionMutex;
-   IntSlider* mChordProgressionSlider;
+   IntSlider* mChordProgressionSlider{ nullptr };
 
-   int mSectionIdx;
-   RadioButton* mSectionDropdown;
+   int mSectionIdx{ 0 };
+   RadioButton* mSectionDropdown{ nullptr };
 
-   int mSongIdx;
-   DropdownList* mSongDropdown;
+   int mSongIdx{ -1 };
+   DropdownList* mSongDropdown{ nullptr };
    std::vector<Song> mSongs;
-   ClickButton* mReadSongsButton;
+   ClickButton* mReadSongsButton{ nullptr };
 
-   bool mPlayChord;
-   Checkbox* mPlayChordCheckbox;
-   bool mProgress;
-   Checkbox* mProgressCheckbox;
+   bool mPlayChord{ false };
+   Checkbox* mPlayChordCheckbox{ nullptr };
+   bool mProgress{ true };
+   Checkbox* mProgressCheckbox{ nullptr };
 
-   int mDegree;
-   IntSlider* mDegreeSlider;
+   int mDegree{ 0 };
+   IntSlider* mDegreeSlider{ nullptr };
    Chord mInputChord;
-   DropdownList* mRootNoteList;
-   DropdownList* mChordTypeList;
-   IntSlider* mInversionSlider;
+   DropdownList* mRootNoteList{ nullptr };
+   DropdownList* mChordTypeList{ nullptr };
+   IntSlider* mInversionSlider{ nullptr };
 
    std::vector<Chord> mInputChords;
-   ClickButton* mAddChordButton;
-   ClickButton* mRemoveChordButton;
-   ClickButton* mSetProgressionButton;
+   ClickButton* mAddChordButton{ nullptr };
+   ClickButton* mRemoveChordButton{ nullptr };
+   ClickButton* mSetProgressionButton{ nullptr };
 
-   ClickButton* mRandomProgressionButton;
+   ClickButton* mRandomProgressionButton{ nullptr };
 
-   bool mHideBeat;
-   Checkbox* mHideBeatCheckbox;
+   bool mHideBeat{ false };
+   Checkbox* mHideBeatCheckbox{ nullptr };
 };
 
 #endif /* defined(__modularSynth__ChaosEngine__) */

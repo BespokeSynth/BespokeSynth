@@ -31,8 +31,7 @@
 #include "ChannelBuffer.h"
 
 SingleOscillatorVoice::SingleOscillatorVoice(IDrawableModule* owner)
-: mUseFilter(false)
-, mOwner(owner)
+: mOwner(owner)
 {
 }
 

@@ -83,7 +83,7 @@ private:
       kAdjustNone,
       kAdjustAttackAR,
       kAdjustReleaseAR,
-   } mAdjustMode;
+   } mAdjustMode{ AdjustParam::kAdjustNone };
 
    void OnClicked(int x, int y, bool right) override;
    void GetDimensions(float& width, float& height) override
@@ -96,21 +96,21 @@ private:
 
    float mWidth;
    float mHeight;
-   float mVol;
-   float mMaxTime;
-   bool mClick;
+   float mVol{ 1 };
+   float mMaxTime{ 1000 };
+   bool mClick{ false };
    ::ADSR* mAdsr;
    ::ADSR mViewAdsr; //for ADSR simulation in drawing
    ofVec2f mClickStart;
    ::ADSR mClickAdsr;
-   bool mHighlighted;
-   FloatSlider* mASlider;
-   FloatSlider* mDSlider;
-   FloatSlider* mSSlider;
-   FloatSlider* mRSlider;
+   bool mHighlighted{ false };
+   FloatSlider* mASlider{ nullptr };
+   FloatSlider* mDSlider{ nullptr };
+   FloatSlider* mSSlider{ nullptr };
+   FloatSlider* mRSlider{ nullptr };
    static DisplayMode sDisplayMode;
-   EnvelopeEditor* mEditor;
-   double mOverrideDrawTime;
+   EnvelopeEditor* mEditor{ nullptr };
+   double mOverrideDrawTime{ -1 };
 };
 
 

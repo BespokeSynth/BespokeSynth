@@ -27,7 +27,6 @@
 #include "SynthGlobals.h"
 
 NoteGate::NoteGate()
-: mGate(true)
 {
 }
 

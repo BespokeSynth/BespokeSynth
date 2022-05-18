@@ -35,12 +35,12 @@
 
 struct OscMap
 {
-   int mControl;
+   int mControl{ 0 };
    std::string mAddress;
-   bool mIsFloat;
-   float mFloatValue;
-   int mIntValue;
-   double mLastChangedTime;
+   bool mIsFloat{ false };
+   float mFloatValue{ 0 };
+   int mIntValue{ 0 };
+   double mLastChangedTime{ -9999 }; //@TODO(Noxy): Unused but is in savestates.
 };
 
 class OscController : public INonstandardController,

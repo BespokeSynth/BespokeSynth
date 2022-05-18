@@ -96,7 +96,7 @@ private:
       }
       std::string id;
       std::string product;
-      int port;
+      int port{ 0 };
       std::string GetDescription() { return id + " " + product; }
    };
 

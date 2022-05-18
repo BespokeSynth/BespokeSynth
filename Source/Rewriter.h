@@ -72,18 +72,18 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
-   double mStartRecordTime;
+   double mStartRecordTime{ -1 };
 
-   ClickButton* mRewriteButton;
-   ClickButton* mStartRecordTimeButton;
+   ClickButton* mRewriteButton{ nullptr };
+   ClickButton* mStartRecordTimeButton{ nullptr };
 
    RollingBuffer mRecordBuffer;
-   Looper* mConnectedLooper;
+   Looper* mConnectedLooper{ nullptr };
 
-   PatchCableSource* mLooperCable;
+   PatchCableSource* mLooperCable{ nullptr };
 };
 
 

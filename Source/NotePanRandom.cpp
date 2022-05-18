@@ -32,9 +32,6 @@
 #include "UIControlMacros.h"
 
 NotePanRandom::NotePanRandom()
-: mSpread(1)
-, mCenter(0)
-, mPanHistoryDisplayIndex(0)
 {
    for (int i = 0; i < kPanHistoryDisplaySize; ++i)
       mPanHistoryDisplay[i].time = -9999;

@@ -92,36 +92,34 @@ private:
       void Process(float* sampleOut, int offset, int ch);
       void Draw(float w, float h);
 
-      float mDelayMs;
-      float mGain;
-      float mFeedback;
-      float mPan;
+      float mDelayMs{ 100 };
+      float mGain{ 0 };
+      float mFeedback{ 0 };
+      float mPan{ 0 };
 
-      MultitapDelay* mOwner;
+      MultitapDelay* mOwner{ nullptr };
 
-      FloatSlider* mDelayMsSlider;
-      FloatSlider* mGainSlider;
-      FloatSlider* mFeedbackSlider;
-      FloatSlider* mPanSlider;
+      FloatSlider* mDelayMsSlider{ nullptr };
+      FloatSlider* mGainSlider{ nullptr };
+      FloatSlider* mFeedbackSlider{ nullptr };
+      FloatSlider* mPanSlider{ nullptr };
 
       ChannelBuffer mTapBuffer;
    };
 
    struct DelayMPETap
    {
-      DelayMPETap();
       void Process(float* sampleOut, int offset, int ch);
       void Draw(float w, float h);
 
-      float mPlay;
-      float mPitch;
-      ModulationChain* mPitchBend;
-      ModulationChain* mPressure;
-      ModulationChain* mModWheel;
+      float mPitch{ 0 };
+      ModulationChain* mPitchBend{ nullptr };
+      ModulationChain* mPressure{ nullptr };
+      ModulationChain* mModWheel{ nullptr };
 
-      ::ADSR mADSR;
+      ::ADSR mADSR{ 100, 0, 1, 100 };
 
-      MultitapDelay* mOwner;
+      MultitapDelay* mOwner{ nullptr };
    };
 
    int mNumTaps;

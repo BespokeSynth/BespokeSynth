@@ -1326,7 +1326,7 @@ std::string MidiController::GetDefaultTooltip(MidiMessageType type, int control)
 
 UIControlConnection* MidiController::GetConnectionForCableSource(const PatchCableSource* source)
 {
-   for (auto c : mLayoutControls)
+   for (const auto& c : mLayoutControls)
    {
       if (c.mActive && c.mControlCable == source)
       {
@@ -1687,7 +1687,7 @@ void MidiController::LoadControllerLayout(std::string filename)
                   messageType = kMidiMessage_PitchBend;
                if (mLayoutData["groups"][group]["messageType"] == "program")
                   messageType = kMidiMessage_Program;
-               ControlDrawType drawType;
+               ControlDrawType drawType{ kDrawType_Slider };
                if (mLayoutData["groups"][group]["drawType"] == "button")
                   drawType = kDrawType_Button;
                if (mLayoutData["groups"][group]["drawType"] == "knob")

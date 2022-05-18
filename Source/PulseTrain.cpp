@@ -33,12 +33,6 @@
 #include "PatchCableSource.h"
 
 PulseTrain::PulseTrain()
-: mInterval(kInterval_8n)
-, mIntervalSelector(nullptr)
-, mLength(8)
-, mLengthSlider(nullptr)
-, mStep(9999)
-, mResetOnStart(true)
 {
    for (int i = 0; i < kMaxSteps; ++i)
       mVels[i] = 1;

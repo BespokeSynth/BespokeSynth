@@ -75,13 +75,13 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mDelay;
-   FloatSlider* mDelaySlider;
+   float mDelay{ .25 };
+   FloatSlider* mDelaySlider{ nullptr };
 
    float mLastPulseTime;
 
    static const int kQueueSize = 50;
-   PulseInfo mInputPulses[kQueueSize];
-   int mConsumeIndex;
-   int mAppendIndex;
+   PulseInfo mInputPulses[kQueueSize]{};
+   int mConsumeIndex{ 0 };
+   int mAppendIndex{ 0 };
 };

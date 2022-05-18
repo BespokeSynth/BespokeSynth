@@ -388,7 +388,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
       }
       case kInterval_None:
          interval = kInterval_16n; //just pick some default value
-         //intentionally fall through
+         [[fallthrough]];
       case kInterval_2n:
       case kInterval_2nt:
       case kInterval_4n:

@@ -37,15 +37,6 @@
 #define ARP_HOLD -101
 
 VelocityStepSequencer::VelocityStepSequencer()
-: mInterval(kInterval_16n)
-, mArpIndex(-1)
-, mIntervalSelector(nullptr)
-, mLength(VSS_MAX_STEPS)
-, mLengthSlider(nullptr)
-, mResetOnDownbeat(true)
-, mResetOnDownbeatCheckbox(nullptr)
-, mCurrentVelocity(80)
-, mController(nullptr)
 {
 }
 

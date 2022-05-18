@@ -68,20 +68,20 @@ protected:
       h = mHeight;
    }
 
-   int mWidth;
-   int mHeight;
+   int mWidth{ 200 };
+   int mHeight{ 20 };
 
-   ClickButton* mTriggerButton;
-   TextEntry* mPitchEntry;
-   FloatSlider* mVelocitySlider;
-   FloatSlider* mDurationSlider;
-   Checkbox* mNoteOnCheckbox;
-   int mPitch;
-   float mVelocity;
-   float mDuration;
-   double mStartTime;
-   bool mNoteOn;
-   int mVoiceIndex;
+   ClickButton* mTriggerButton{ nullptr };
+   TextEntry* mPitchEntry{ nullptr };
+   FloatSlider* mVelocitySlider{ nullptr };
+   FloatSlider* mDurationSlider{ nullptr };
+   Checkbox* mNoteOnCheckbox{ nullptr };
+   int mPitch{ 48 };
+   float mVelocity{ 1 };
+   float mDuration{ 100 };
+   double mStartTime{ 0 };
+   bool mNoteOn{ false };
+   int mVoiceIndex{ -1 };
 };
 
 #endif /* defined(__Bespoke__NoteCreator__) */

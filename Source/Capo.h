@@ -57,15 +57,10 @@ public:
 private:
    struct NoteInfo
    {
-      NoteInfo()
-      : mOn(false)
-      , mVelocity(0)
-      , mVoiceIdx(-1)
-      {}
-      bool mOn;
-      int mVelocity;
-      int mVoiceIdx;
-      int mOutputPitch;
+      bool mOn{ false };
+      int mVelocity{ 0 };
+      int mVoiceIdx{ -1 };
+      int mOutputPitch{ 0 };
    };
 
    //IDrawableModule
@@ -77,13 +72,13 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   int mCapo;
-   IntSlider* mCapoSlider;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mCapo{ 0 };
+   IntSlider* mCapoSlider{ nullptr };
    std::array<NoteInfo, 128> mInputNotes;
-   Checkbox* mRetriggerCheckbox;
-   bool mRetrigger;
+   Checkbox* mRetriggerCheckbox{ nullptr };
+   bool mRetrigger{ false };
 };
 
 

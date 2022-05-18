@@ -41,10 +41,10 @@ public:
 private:
    ////////////////////////////////////////
    //ported
-   float mTune;
-   float mPitch;
-   float mConfidence;
-   float mLatency;
+   float mTune{ 440 };
+   float mPitch{ 0 };
+   float mConfidence{ 0 };
+   float mLatency{ 0 };
    ::FFT* mFFT;
 
    unsigned long mfs; // Sample rate
@@ -63,8 +63,8 @@ private:
    float* mfftfreqim;
 
    // VARIABLES FOR LOW-RATE SECTION
-   float maref; // A tuning reference (Hz)
-   float mconf; // Confidence of pitch period estimate (between 0 and 1)
+   float maref{ 440 }; // A tuning reference (Hz)
+   float mconf{ 0 }; // Confidence of pitch period estimate (between 0 and 1)
    float mvthresh; // Voiced speech threshold
 
    float mpmax; // Maximum allowable pitch period (seconds)

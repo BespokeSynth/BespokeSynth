@@ -30,7 +30,6 @@
 #include "PatchCableSource.h"
 
 GridSliders::GridSliders()
-: mDirection(Direction::kVertical)
 {
 }
 

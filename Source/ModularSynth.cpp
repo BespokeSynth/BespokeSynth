@@ -2068,14 +2068,14 @@ void ModularSynth::ResetLayout()
    delete mQuickSpawn;
    delete mUserPrefsEditor;
 
-   TitleBar* titleBar = new TitleBar();
-   titleBar->SetPosition(0, 0);
-   titleBar->SetName("titlebar");
-   titleBar->SetTypeName("titlebar");
-   titleBar->CreateUIControls();
-   titleBar->SetModuleFactory(&mModuleFactory);
-   titleBar->Init();
-   mUILayerModuleContainer.AddModule(titleBar);
+   TheTitleBar = new TitleBar();
+   TheTitleBar->SetPosition(0, 0);
+   TheTitleBar->SetName("titlebar");
+   TheTitleBar->SetTypeName("titlebar");
+   TheTitleBar->CreateUIControls();
+   TheTitleBar->SetModuleFactory(&mModuleFactory);
+   TheTitleBar->Init();
+   mUILayerModuleContainer.AddModule(TheTitleBar);
 
    if (UserPrefs.show_minimap.Get())
    {

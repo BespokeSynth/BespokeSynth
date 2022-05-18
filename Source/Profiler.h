@@ -62,8 +62,8 @@ private:
       int mHistoryIdx{ 0 };
    };
 
-   unsigned long long mTimerStart;
-   int mIndex;
+   unsigned long long mTimerStart{ 0 };
+   int mIndex{ -1 };
 
    static Cost sCosts[PROFILER_MAX_TRACK];
    static bool sEnableProfiler;

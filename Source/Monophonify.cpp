@@ -29,13 +29,6 @@
 #include "UIControlMacros.h"
 
 Monophonify::Monophonify()
-: mInitialPitch(-1)
-, mLastPlayedPitch(-1)
-, mLastVelocity(0)
-, mVoiceIdx(0)
-, mRequireHeldNote(false)
-, mGlideTime(0)
-, mGlideSlider(nullptr)
 {
    for (int i = 0; i < 128; ++i)
       mHeldNotes[i] = -1;

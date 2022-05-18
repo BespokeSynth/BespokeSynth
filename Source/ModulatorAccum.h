@@ -77,11 +77,11 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   float mValue;
-   float mVelocity;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   float mValue{ 0 };
+   float mVelocity{ 0 };
 
-   FloatSlider* mValueSlider;
-   FloatSlider* mVelocitySlider;
+   FloatSlider* mValueSlider{ nullptr };
+   FloatSlider* mVelocitySlider{ nullptr };
 };

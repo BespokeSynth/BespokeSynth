@@ -67,6 +67,6 @@ private:
 
    EnvelopeControl mEnvelopeControl;
    ::ADSR mAdsr;
-   float mLastInputVelocity;
+   float mLastInputVelocity{ 0 };
    double mLastInputTime{ -9999 };
 };

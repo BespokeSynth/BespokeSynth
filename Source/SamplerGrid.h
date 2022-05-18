@@ -40,7 +40,7 @@
 
 class ofxJSONElement;
 
-#define MAX_SAMPLER_GRID_LENGTH 5 * 44100
+#define MAX_SAMPLER_GRID_LENGTH 5 * 44100 //@TODO(Noxy): Shouldn't this 44100 be gSampleRate instead?
 #define SAMPLE_RAMP_MS 3
 
 class SamplerGrid : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IGridControllerListener, public UIGridListener, public INoteReceiver
@@ -101,53 +101,51 @@ private:
 
    int GridToIdx(int x, int y) { return x + y * mCols; }
 
-   Checkbox* mClearCheckbox;
-   bool mClear;
+   Checkbox* mClearCheckbox{ nullptr };
+   bool mClear{ false };
 
    struct GridSample
    {
-      float mSampleData[MAX_SAMPLER_GRID_LENGTH];
-      int mPlayhead;
-      bool mHasSample;
-      bool mRecordingArmed;
-      int mSampleLength;
+      float mSampleData[MAX_SAMPLER_GRID_LENGTH]{};
+      int mPlayhead{ 0 };
+      bool mHasSample{ false };
+      bool mRecordingArmed{ false };
+      int mSampleLength{ 0 };
       Ramp mRamp;
-      int mSampleStart;
-      int mSampleEnd;
+      int mSampleStart{ 0 };
+      int mSampleEnd{ 0 };
    };
 
    void SetEditSample(GridSample* sample);
 
-   GridSample* mGridSamples;
-   int mRecordingSample;
+   GridSample* mGridSamples{ nullptr };
+   int mRecordingSample{ -1 };
 
-   bool mPassthrough;
-   Checkbox* mPassthroughCheckbox;
+   bool mPassthrough{ true };
+   Checkbox* mPassthroughCheckbox{ nullptr };
 
-   float* mWriteBuffer;
+   float mVolume{ 1 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   bool mEditMode{ false };
+   Checkbox* mEditCheckbox{ nullptr };
+   bool mDuplicate{ false };
+   Checkbox* mDuplicateCheckbox{ nullptr };
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   bool mEditMode;
-   Checkbox* mEditCheckbox;
-   bool mDuplicate;
-   Checkbox* mDuplicateCheckbox;
+   GridControlTarget* mGridControlTarget{ nullptr };
+   int mCols{ 8 };
+   int mRows{ 8 };
+   bool mLastColumnIsGroup{ true }; //@TODO(Noxy): Not used?
 
-   GridControlTarget* mGridControlTarget;
-   int mCols;
-   int mRows;
-   bool mLastColumnIsGroup;
+   int mEditSampleX{ 2 };
+   int mEditSampleY{ 95 };
+   float mEditSampleWidth{ 395 };
+   float mEditSampleHeight{ 200 };
+   GridSample* mEditSample{ nullptr };
+   IntSlider* mEditStartSlider{ nullptr };
+   IntSlider* mEditEndSlider{ nullptr };
+   int mDummyInt{ 0 };
 
-   int mEditSampleX;
-   int mEditSampleY;
-   float mEditSampleWidth;
-   float mEditSampleHeight;
-   GridSample* mEditSample;
-   IntSlider* mEditStartSlider;
-   IntSlider* mEditEndSlider;
-   int mDummyInt;
-
-   UIGrid* mGrid;
+   UIGrid* mGrid{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SamplerGrid__) */

@@ -33,20 +33,6 @@
 #include "PatchCableSource.h"
 
 Pulser::Pulser()
-: mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mTimeMode(kTimeMode_Step)
-, mTimeModeSelector(nullptr)
-, mWaitingForDownbeat(false)
-, mFreeTimeStep(30)
-, mFreeTimeSlider(nullptr)
-, mFreeTimeCounter(0)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mRandomStep(false)
-, mRandomStepCheckbox(nullptr)
-, mResetLength(8)
-, mCustomDivisor(8)
 {
 }
 

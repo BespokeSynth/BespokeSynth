@@ -73,11 +73,11 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   unsigned int mRows;
-   unsigned int mCols;
+   unsigned int mRows{ 0 };
+   unsigned int mCols{ 0 };
    std::vector<IGridController*> mGrids;
-   Arrangements mArrangement;
-   IGridControllerListener* mOwner;
+   Arrangements mArrangement{ Arrangements::kHorizontal };
+   IGridControllerListener* mOwner{ nullptr };
 };
 
 #endif /* defined(__Bespoke__ComboGridController__) */

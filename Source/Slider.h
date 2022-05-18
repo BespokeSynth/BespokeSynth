@@ -27,6 +27,7 @@
 #define __modularSynth__Slider__
 
 #include <iostream>
+#include <limits>
 #include "IUIControl.h"
 #include "TextEntry.h"
 #include "Ramp.h"
@@ -132,7 +133,7 @@ public:
    void TextEntryCancelled(TextEntry* entry) override;
 
    void UpdateTouching();
-   bool mTouching; //to be controlled with external checkbox for "relative" sliders
+   bool mTouching{ false }; //to be controlled with external checkbox for "relative" sliders
 
 protected:
    ~FloatSlider(); //protected so that it can't be created on the stack
@@ -154,42 +155,40 @@ private:
    float mMax;
    float mModulatorMin;
    float mModulatorMax;
-   bool mMouseDown;
-   int mFineRefX;
-   int mRefY;
+   bool mMouseDown{ false };
+   int mFineRefX{ -999 };
+   int mRefY{ -999 };
    int mShowDigits;
-   IFloatSliderListener* mOwner;
-   FloatSliderLFOControl* mLFOControl;
-   IModulator* mModulator;
-   float mClampIntMin;
-   float mClampIntMax;
-   bool mRelative;
-   float mRelativeOffset;
-   bool mClamped;
-   Mode mMode;
-   float mOriginalValue;
-   std::string mMinValueDisplay;
-   std::string mMaxValueDisplay;
-   bool mShowName;
-   float mBezierControl;
-   float mSmooth;
-   float mSmoothTarget;
+   IFloatSliderListener* mOwner{ nullptr };
+   FloatSliderLFOControl* mLFOControl{ nullptr };
+   IModulator* mModulator{ nullptr };
+   bool mRelative{ false };
+   float mRelativeOffset{ -999 };
+   bool mClamped{ true };
+   Mode mMode{ Mode::kNormal };
+   float mOriginalValue{ 0 };
+   std::string mMinValueDisplay{ "" };
+   std::string mMaxValueDisplay{ "" };
+   bool mShowName{ true };
+   float mBezierControl{ 1 };
+   float mSmooth{ 0 };
+   float mSmoothTarget{ 0 };
    Ramp mRamp;
-   bool mIsSmoothing;
-   bool mComputeHasBeenCalledOnce;
-   double mLastComputeTime;
-   int mLastComputeSamplesIn;
+   bool mIsSmoothing{ false };
+   bool mComputeHasBeenCalledOnce{ false };
+   double mLastComputeTime{ 0 };
+   int mLastComputeSamplesIn{ 0 };
    double* mLastComputeCacheTime;
    float* mLastComputeCacheValue;
 
-   float mLastDisplayedValue;
+   float mLastDisplayedValue{ std::numeric_limits<float>::max() };
 
-   TextEntry* mFloatEntry;
-   char mEntryString[MAX_TEXTENTRY_LENGTH];
+   TextEntry* mFloatEntry{ nullptr };
+   char mEntryString[MAX_TEXTENTRY_LENGTH]{};
 
-   bool mAllowMinMaxAdjustment;
-   TextEntry* mMinEntry;
-   TextEntry* mMaxEntry;
+   bool mAllowMinMaxAdjustment{ true };
+   TextEntry* mMinEntry{ nullptr };
+   TextEntry* mMaxEntry{ nullptr };
 };
 
 class IntSlider;

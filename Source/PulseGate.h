@@ -58,8 +58,8 @@ private:
    }
    bool Enabled() const override { return true; }
 
-   bool mAllow;
-   Checkbox* mAllowCheckbox;
-   float mWidth;
-   float mHeight;
+   bool mAllow{ true };
+   Checkbox* mAllowCheckbox{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

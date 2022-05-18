@@ -40,19 +40,6 @@ namespace
 }
 
 Scale::Scale()
-: mRootSelector(nullptr)
-, mScaleSelector(nullptr)
-, mScaleDegree(0)
-, mScaleDegreeSlider(nullptr)
-, mNumSeptatonicScales(0)
-, mPitchesPerOctave(12)
-, mReferenceFreq(440)
-, mReferencePitch(69)
-, mPitchesPerOctaveEntry(nullptr)
-, mReferenceFreqEntry(nullptr)
-, mReferencePitchEntry(nullptr)
-, mIntonation(kIntonation_Equal)
-, mIntonationSelector(nullptr)
 {
    assert(TheScale == nullptr);
    TheScale = this;

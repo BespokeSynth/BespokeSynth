@@ -112,19 +112,19 @@ private:
    ofColor GetColor(int colorIndex) const;
    void UpdateLights();
 
-   GridControlTarget* mGridControlTarget;
-   PatchCableSource* mGridOutputCable;
-   IGridControllerListener* mGridControllerOwner;
+   GridControlTarget* mGridControlTarget{ nullptr };
+   PatchCableSource* mGridOutputCable{ nullptr };
+   IGridControllerListener* mGridControllerOwner{ nullptr };
 
-   UIGrid* mGrid;
+   UIGrid* mGrid{ nullptr };
    std::vector<std::string> mLabels;
    std::vector<ofColor> mColors;
 
    struct HighlightCellElement
    {
-      double time;
+      double time{ -1 };
       Vec2i position;
-      double duration;
+      double duration{ 0 };
       ofColor color;
    };
    std::array<HighlightCellElement, 50> mHighlightCells;
@@ -134,7 +134,7 @@ private:
 
    std::list<ScriptModule*> mScriptListeners;
 
-   Checkbox* mMomentaryCheckbox;
-   bool mMomentary;
-   bool mDirectColorMode;
+   Checkbox* mMomentaryCheckbox{ nullptr };
+   bool mMomentary{ false };
+   bool mDirectColorMode{ true };
 };

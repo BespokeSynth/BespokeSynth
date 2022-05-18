@@ -62,16 +62,16 @@ private:
 
    ofVec2f mPosition;
    ofVec2f mDimensions;
-   ::ADSR* mAdsr;
+   ::ADSR* mAdsr{ nullptr };
    ::ADSR mViewAdsr;
    ::ADSR mClickAdsr;
-   bool mClick;
+   bool mClick{ false };
    ofVec2f mClickStart;
-   float mViewLength;
-   int mHighlightPoint;
-   int mHighlightCurve;
-   double mLastClickTime;
-   bool mFixedLengthMode;
+   float mViewLength{ 2000 };
+   int mHighlightPoint{ -1 };
+   int mHighlightCurve{ -1 };
+   double mLastClickTime{ 0 };
+   bool mFixedLengthMode{ false };
 };
 
 class EnvelopeEditor : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IIntSliderListener
@@ -121,14 +121,14 @@ private:
 
    EnvelopeControl mEnvelopeControl;
 
-   ADSRDisplay* mADSRDisplay;
-   ClickButton* mPinButton;
-   bool mPinned;
-   float mADSRViewLength;
-   FloatSlider* mADSRViewLengthSlider;
-   Checkbox* mHasSustainStageCheckbox;
-   IntSlider* mSustainStageSlider;
-   FloatSlider* mMaxSustainSlider;
-   Checkbox* mFreeReleaseLevelCheckbox;
-   PatchCableSource* mTargetCable;
+   ADSRDisplay* mADSRDisplay{ nullptr };
+   ClickButton* mPinButton{ nullptr };
+   bool mPinned{ false };
+   float mADSRViewLength{ 2000 };
+   FloatSlider* mADSRViewLengthSlider{ nullptr };
+   Checkbox* mHasSustainStageCheckbox{ nullptr };
+   IntSlider* mSustainStageSlider{ nullptr };
+   FloatSlider* mMaxSustainSlider{ nullptr };
+   Checkbox* mFreeReleaseLevelCheckbox{ nullptr };
+   PatchCableSource* mTargetCable{ nullptr };
 };

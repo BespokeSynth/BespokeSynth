@@ -147,92 +147,92 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
-   ClickButton* mPythonInstalledConfirmButton;
-   DropdownList* mLoadScriptSelector;
-   ClickButton* mLoadScriptButton;
-   ClickButton* mSaveScriptButton;
-   ClickButton* mShowReferenceButton;
-   CodeEntry* mCodeEntry;
-   ClickButton* mRunButton;
-   ClickButton* mStopButton;
-   FloatSlider* mASlider;
-   FloatSlider* mBSlider;
-   FloatSlider* mCSlider;
-   FloatSlider* mDSlider;
-   int mLoadScriptIndex;
+   ClickButton* mPythonInstalledConfirmButton{ nullptr };
+   DropdownList* mLoadScriptSelector{ nullptr };
+   ClickButton* mLoadScriptButton{ nullptr };
+   ClickButton* mSaveScriptButton{ nullptr };
+   ClickButton* mShowReferenceButton{ nullptr };
+   CodeEntry* mCodeEntry{ nullptr };
+   ClickButton* mRunButton{ nullptr };
+   ClickButton* mStopButton{ nullptr };
+   FloatSlider* mASlider{ nullptr };
+   FloatSlider* mBSlider{ nullptr };
+   FloatSlider* mCSlider{ nullptr };
+   FloatSlider* mDSlider{ nullptr };
+   int mLoadScriptIndex{ 0 };
    std::string mLoadedScriptPath;
    juce::Time mLoadedScriptFiletime;
-   bool mHotloadScripts;
+   bool mHotloadScripts{ false };
    static ofxJSONElement sStyleJSON;
-   float mA;
-   float mB;
-   float mC;
-   float mD;
+   float mA{ 0 };
+   float mB{ 0 };
+   float mC{ 0 };
+   float mD{ 0 };
 
-   float mWidth;
-   float mHeight;
-   std::array<double, 20> mScheduledPulseTimes;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   std::array<double, 20> mScheduledPulseTimes{};
    static double sMostRecentRunTime;
    std::string mLastError;
    size_t mScriptModuleIndex;
    std::string mLastRunLiteralCode;
-   int mNextLineToExecute;
-   int mInitExecutePriority;
-   int mOscInputPort;
+   int mNextLineToExecute{ -1 };
+   int mInitExecutePriority{ 0 };
+   int mOscInputPort{ -1 };
 
    struct ScheduledNoteOutput
    {
-      double startTime;
-      double time;
-      float pitch;
-      float velocity;
-      float pan;
-      int noteOutputIndex;
-      int lineNum;
+      double startTime{ 0 };
+      double time{ 0 };
+      float pitch{ 0 };
+      float velocity{ 0 };
+      float pan{ .5 };
+      int noteOutputIndex{ -1 };
+      int lineNum{ -1 };
    };
    std::array<ScheduledNoteOutput, 200> mScheduledNoteOutput;
 
    struct ScheduledMethodCall
    {
-      double startTime;
-      double time;
+      double startTime{ 0 };
+      double time{ 0 };
       std::string method;
-      int lineNum;
+      int lineNum{ -1 };
    };
    std::array<ScheduledMethodCall, 50> mScheduledMethodCall;
 
    struct ScheduledUIControlValue
    {
-      double startTime;
-      double time;
-      IUIControl* control;
-      float value;
-      int lineNum;
+      double startTime{ 0 };
+      double time{ 0 };
+      IUIControl* control{ nullptr };
+      float value{ 0 };
+      int lineNum{ -1 };
    };
    std::array<ScheduledUIControlValue, 50> mScheduledUIControlValue;
 
    struct PendingNoteInput
    {
-      double time;
-      int pitch;
-      int velocity;
+      double time{ 0 };
+      int pitch{ 0 };
+      int velocity{ 0 };
    };
    std::array<PendingNoteInput, 50> mPendingNoteInput;
 
    struct PrintDisplay
    {
-      double time;
+      double time{ 0 };
       std::string text;
-      int lineNum;
+      int lineNum{ -1 };
    };
    std::array<PrintDisplay, 10> mPrintDisplay;
 
    struct UIControlModificationDisplay
    {
-      double time;
+      double time{ 0 };
       ofVec2f position;
-      float value;
-      int lineNum;
+      float value{ 0 };
+      int lineNum{ -1 };
    };
    std::array<UIControlModificationDisplay, 10> mUIControlModifications;
 
@@ -257,8 +257,8 @@ private:
       void Draw(CodeEntry* codeEntry, int style, ofColor color);
 
    private:
-      std::array<double, 256> mTimes;
-      std::array<std::string, 256> mText;
+      std::array<double, 256> mTimes{};
+      std::array<std::string, 256> mText{};
    };
 
    LineEventTracker mLineExecuteTracker;
@@ -268,22 +268,22 @@ private:
 
    struct BoundModuleConnection
    {
-      int mLineIndex;
+      int mLineIndex{ -1 };
       std::string mLineText;
-      IDrawableModule* mTarget;
+      IDrawableModule* mTarget{ nullptr };
    };
    std::vector<BoundModuleConnection> mBoundModuleConnections;
 
    std::vector<std::string> mScriptFilePaths;
 
-   std::vector<AdditionalNoteCable*> mExtraNoteOutputs;
-   std::array<ModulationChain, 128> mPitchBends;
-   std::array<ModulationChain, 128> mModWheels;
-   std::array<ModulationChain, 128> mPressures;
+   std::vector<AdditionalNoteCable*> mExtraNoteOutputs{};
+   std::array<ModulationChain, 128> mPitchBends{};
+   std::array<ModulationChain, 128> mModWheels{};
+   std::array<ModulationChain, 128> mPressures{};
    std::list<std::string> mMidiMessageQueue;
    ofMutex mMidiMessageQueueMutex;
 
-   bool mShowJediWarning;
+   bool mShowJediWarning{ false };
 };
 
 class ScriptReferenceDisplay : public IDrawableModule, public IButtonListener
@@ -314,9 +314,9 @@ private:
    void LoadText();
 
    std::vector<std::string> mText;
-   ClickButton* mCloseButton;
-   float mWidth;
-   float mHeight;
+   ClickButton* mCloseButton{ nullptr };
+   float mWidth{ 750 };
+   float mHeight{ 335 };
    ofVec2f mScrollOffset;
-   float mMaxScrollAmount;
+   float mMaxScrollAmount{ 0 };
 };

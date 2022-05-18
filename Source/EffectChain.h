@@ -101,26 +101,26 @@ private:
    std::vector<IAudioEffect*> mEffects;
    ChannelBuffer mDryBuffer;
    std::vector<EffectControls> mEffectControls;
-   std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels;
+   std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels{};
 
-   double mSwapTime;
-   int mSwapFromIdx;
-   int mSwapToIdx;
+   double mSwapTime{ -1 };
+   int mSwapFromIdx{ -1 };
+   int mSwapToIdx{ -1 };
    ofVec2f mSwapFromPos;
    ofVec2f mSwapToPos;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   int mNumFXWide;
-   bool mInitialized;
-   bool mShowSpawnList;
-   int mWantToDeleteEffectAtIndex;
-   IAudioEffect* mPush2DisplayEffect;
+   float mVolume{ 1 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   int mNumFXWide{ 3 };
+   bool mInitialized{ false };
+   bool mShowSpawnList{ true };
+   int mWantToDeleteEffectAtIndex{ -1 };
+   IAudioEffect* mPush2DisplayEffect{ nullptr };
 
    std::vector<std::string> mEffectTypesToSpawn;
-   int mSpawnIndex;
-   DropdownList* mEffectSpawnList;
-   ClickButton* mSpawnEffectButton;
-   ClickButton* mPush2ExitEffectButton;
+   int mSpawnIndex{ -1 };
+   DropdownList* mEffectSpawnList{ nullptr };
+   ClickButton* mSpawnEffectButton{ nullptr };
+   ClickButton* mPush2ExitEffectButton{ nullptr };
 
    ofMutex mEffectMutex;
 };

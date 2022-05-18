@@ -30,8 +30,6 @@
 
 AudioRouter::AudioRouter()
 : IAudioProcessor(gBufferSize)
-, mRouteIndex(0)
-, mRouteSelector(nullptr)
 , mBlankVizBuffer(VIZ_BUFFER_SECONDS * gSampleRate)
 {
 }

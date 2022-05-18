@@ -97,20 +97,20 @@ private:
    void Step(double time, float velocity, int flags);
 
    static const int kMaxSteps = 32;
-   float mVels[kMaxSteps];
-   int mLength;
-   IntSlider* mLengthSlider;
-   int mStep;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   bool mHasExternalPulseSource;
-   ClickButton* mAdvanceBackwardButton;
-   ClickButton* mAdvanceForwardButton;
+   float mVels[kMaxSteps]{};
+   int mLength{ 8 };
+   IntSlider* mLengthSlider{ nullptr };
+   int mStep{ 0 };
+   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   DropdownList* mIntervalSelector{ nullptr };
+   bool mHasExternalPulseSource{ false };
+   ClickButton* mAdvanceBackwardButton{ nullptr };
+   ClickButton* mAdvanceForwardButton{ nullptr };
 
    static const int kIndividualStepCables = kMaxSteps;
-   PatchCableSource* mStepCables[kIndividualStepCables];
+   PatchCableSource* mStepCables[kIndividualStepCables]{};
 
-   UIGrid* mVelocityGrid;
+   UIGrid* mVelocityGrid{ nullptr };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

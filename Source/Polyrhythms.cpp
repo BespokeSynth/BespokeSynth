@@ -31,7 +31,6 @@
 
 Polyrhythms::Polyrhythms()
 {
-   mWidth = 350;
    mHeight = mRhythmLines.size() * 17 + 5;
 }
 

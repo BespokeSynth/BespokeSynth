@@ -79,31 +79,31 @@ private:
 
    float GetMinDelayMs() const;
 
-   float mDelay;
-   float mFeedback;
-   bool mEcho;
+   float mDelay{ 500 };
+   float mFeedback{ 0 };
+   bool mEcho{ true };
    RollingBuffer mDelayBuffer;
-   FloatSlider* mFeedbackSlider;
-   FloatSlider* mDelaySlider;
-   Checkbox* mEchoCheckbox;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
+   FloatSlider* mFeedbackSlider{ nullptr };
+   FloatSlider* mDelaySlider{ nullptr };
+   Checkbox* mEchoCheckbox{ nullptr };
+   NoteInterval mInterval{ NoteInterval::kInterval_8nd };
+   DropdownList* mIntervalSelector{ nullptr };
 
-   bool mShortTime;
-   Checkbox* mShortTimeCheckbox;
+   bool mShortTime{ false };
+   Checkbox* mShortTimeCheckbox{ nullptr };
    Ramp mDelayRamp;
    Ramp mAmountRamp;
-   bool mAcceptInput;
-   bool mDry;
-   bool mInvert;
-   Checkbox* mDryCheckbox;
-   Checkbox* mAcceptInputCheckbox;
-   Checkbox* mInvertCheckbox;
+   bool mAcceptInput{ true };
+   bool mDry{ true };
+   bool mInvert{ false };
+   Checkbox* mDryCheckbox{ nullptr };
+   Checkbox* mAcceptInputCheckbox{ nullptr };
+   Checkbox* mInvertCheckbox{ nullptr };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
-   bool mFeedbackModuleMode; //special mode when this delay effect is being used in a FeedbackModule
+   bool mFeedbackModuleMode{ false }; //special mode when this delay effect is being used in a FeedbackModule
 };
 
 #endif /* defined(__modularSynth__DelayEffect__) */

@@ -77,27 +77,27 @@ private:
    float mBufferLength;
    RollingBuffer mBuffer;
    Granulator mGranulator;
-   FloatSlider* mGranOverlap;
-   FloatSlider* mGranSpeed;
-   FloatSlider* mGranLengthMs;
-   FloatSlider* mGranPosRandomize;
-   FloatSlider* mGranSpeedRandomize;
-   FloatSlider* mGranSpacingRandomize;
-   Checkbox* mGranOctaveCheckbox;
-   float mDry;
-   FloatSlider* mDrySlider;
-   bool mFreeze;
-   Checkbox* mFreezeCheckbox;
-   int mFreezeExtraSamples;
-   float mPos;
-   FloatSlider* mPosSlider;
-   NoteInterval mAutoCaptureInterval;
-   DropdownList* mAutoCaptureDropdown;
-   FloatSlider* mWidthSlider;
+   FloatSlider* mGranOverlap{ nullptr };
+   FloatSlider* mGranSpeed{ nullptr };
+   FloatSlider* mGranLengthMs{ nullptr };
+   FloatSlider* mGranPosRandomize{ nullptr };
+   FloatSlider* mGranSpeedRandomize{ nullptr };
+   FloatSlider* mGranSpacingRandomize{ nullptr };
+   Checkbox* mGranOctaveCheckbox{ nullptr };
+   float mDry{ 0 };
+   FloatSlider* mDrySlider{ nullptr };
+   bool mFreeze{ false };
+   Checkbox* mFreezeCheckbox{ nullptr };
+   int mFreezeExtraSamples{ 0 };
+   float mPos{ 0 };
+   FloatSlider* mPosSlider{ nullptr };
+   NoteInterval mAutoCaptureInterval{ NoteInterval::kInterval_None };
+   DropdownList* mAutoCaptureDropdown{ nullptr };
+   FloatSlider* mWidthSlider{ nullptr };
 
-   float mWidth;
-   float mHeight;
-   float mBufferX;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   float mBufferX{ 0 };
 };
 
 #endif /* defined(__modularSynth__LiveGranulator__) */

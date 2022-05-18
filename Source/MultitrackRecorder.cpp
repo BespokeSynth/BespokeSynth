@@ -34,10 +34,6 @@
 #include "UserPrefs.h"
 
 MultitrackRecorder::MultitrackRecorder()
-: mRecord(false)
-, mWidth(700)
-, mHeight(142)
-, mStatusStringTime(-9999)
 {
    mModuleContainer.SetOwner(this);
 }
@@ -269,9 +265,6 @@ namespace
 
 MultitrackRecorderTrack::MultitrackRecorderTrack()
 : IAudioProcessor(gBufferSize)
-, mRecorder(nullptr)
-, mDoRecording(false)
-, mRecordingLength(0)
 {
 }
 

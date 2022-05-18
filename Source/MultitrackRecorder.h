@@ -72,20 +72,20 @@ private:
    void AddTrack();
    int GetRecordingLength();
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 700 };
+   float mHeight{ 142 };
 
    ModuleContainer mModuleContainer;
 
-   ClickButton* mAddTrackButton;
-   Checkbox* mRecordCheckbox;
-   bool mRecord;
-   ClickButton* mBounceButton;
-   ClickButton* mClearButton;
+   ClickButton* mAddTrackButton{ nullptr };
+   Checkbox* mRecordCheckbox{ nullptr };
+   bool mRecord{ false };
+   ClickButton* mBounceButton{ nullptr };
+   ClickButton* mClearButton{ nullptr };
 
    std::vector<MultitrackRecorderTrack*> mTracks;
    std::string mStatusString;
-   double mStatusStringTime;
+   double mStatusStringTime{ -9999 };
 };
 
 class MultitrackRecorderTrack : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IButtonListener
@@ -120,10 +120,10 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
 
-   MultitrackRecorder* mRecorder;
+   MultitrackRecorder* mRecorder{ nullptr };
 
    std::vector<ChannelBuffer*> mRecordChunks;
-   bool mDoRecording;
-   int mRecordingLength;
-   ClickButton* mDeleteButton;
+   bool mDoRecording{ false };
+   int mRecordingLength{ 0 };
+   ClickButton* mDeleteButton{ nullptr };
 };

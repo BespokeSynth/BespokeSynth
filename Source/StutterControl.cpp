@@ -30,7 +30,6 @@
 
 StutterControl::StutterControl()
 : IAudioProcessor(gBufferSize)
-, mGridControlTarget(nullptr)
 {
    for (int i = 0; i < kNumStutterTypes; ++i)
       mStutter[i] = false;

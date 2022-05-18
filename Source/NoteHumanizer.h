@@ -68,12 +68,12 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mTime;
-   FloatSlider* mTimeSlider;
-   float mVelocity;
-   FloatSlider* mVelocitySlider;
+   float mTime{ 33 };
+   FloatSlider* mTimeSlider{ nullptr };
+   float mVelocity{ .1 };
+   FloatSlider* mVelocitySlider{ nullptr };
 
-   std::array<float, 128> mLastDelayMs;
+   std::array<float, 128> mLastDelayMs{};
 };
 
 

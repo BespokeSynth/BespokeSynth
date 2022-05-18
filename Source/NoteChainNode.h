@@ -77,22 +77,22 @@ private:
 
    void TriggerNote(double time);
 
-   ClickButton* mTriggerButton;
-   TextEntry* mPitchEntry;
-   FloatSlider* mVelocitySlider;
-   FloatSlider* mDurationSlider;
-   DropdownList* mNextSelector;
-   int mPitch;
-   float mVelocity;
-   float mDuration;
-   float mDurationMs;
-   NoteInterval mNextInterval;
-   float mNext;
-   double mStartTime;
-   bool mNoteOn;
-   bool mWaitingToTrigger;
-   bool mQueueTrigger;
-   PatchCableSource* mNextNodeCable;
+   ClickButton* mTriggerButton{ nullptr };
+   TextEntry* mPitchEntry{ nullptr };
+   FloatSlider* mVelocitySlider{ nullptr };
+   FloatSlider* mDurationSlider{ nullptr };
+   DropdownList* mNextSelector{ nullptr };
+   int mPitch{ 48 };
+   float mVelocity{ 1 };
+   float mDuration{ .25 };
+   float mDurationMs{ 50 };
+   NoteInterval mNextInterval{ NoteInterval::kInterval_8n };
+   float mNext{ 0 };
+   double mStartTime{ 0 };
+   bool mNoteOn{ false };
+   bool mWaitingToTrigger{ false };
+   bool mQueueTrigger{ false };
+   PatchCableSource* mNextNodeCable{ nullptr };
 };
 
 #endif /* defined(__Bespoke__NoteChainNode__) */

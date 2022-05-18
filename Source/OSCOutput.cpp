@@ -31,9 +31,6 @@
 #include "UIControlMacros.h"
 
 OSCOutput::OSCOutput()
-: mOscOutAddress("127.0.0.1")
-, mOscOutPort(7000)
-, mNoteOutLabel("note")
 {
    for (int i = 0; i < OSC_OUTPUT_MAX_PARAMS; ++i)
    {

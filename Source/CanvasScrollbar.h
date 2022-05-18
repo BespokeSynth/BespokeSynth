@@ -73,14 +73,14 @@ private:
    float GetBarStart() const;
    float GetBarEnd() const;
 
-   float mWidth;
-   float mHeight;
-   bool mClick;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   bool mClick{ false };
    ofVec2f mClickMousePos;
    ofVec2f mDragOffset;
-   float mScrollBarOffset;
+   float mScrollBarOffset{ 0 };
    Style mStyle;
-   bool mAutoHide;
+   bool mAutoHide{ true };
 
    Canvas* mCanvas;
 };

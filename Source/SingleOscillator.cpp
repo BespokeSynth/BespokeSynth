@@ -33,25 +33,9 @@
 #include "UIControlMacros.h"
 
 SingleOscillator::SingleOscillator()
-: mVolSlider(nullptr)
-, mPhaseOffsetSlider(nullptr)
-, mOscSelector(nullptr)
-, mPulseWidthSlider(nullptr)
-, mMult(1)
-, mMultSelector(nullptr)
-, mADSRDisplay(nullptr)
-, mSyncCheckbox(nullptr)
-, mSyncFreqSlider(nullptr)
-, mDetuneSlider(nullptr)
-, mUnisonSlider(nullptr)
-, mUnisonWidthSlider(nullptr)
-, mShuffleSlider(nullptr)
-, mPolyMgr(this)
+: mPolyMgr(this)
 , mNoteInputBuffer(this)
-, mLengthMultiplier(1)
-, mLengthMultiplierSlider(nullptr)
 , mWriteBuffer(gBufferSize)
-, mDrawOsc(kOsc_Square)
 {
    mVoiceParams.mAdsr.Set(10, 0, 1, 10);
    mVoiceParams.mVol = .25f;

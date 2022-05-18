@@ -40,21 +40,12 @@ class ADSR
 public:
    struct Stage
    {
-      Stage()
-      : target(0)
-      , time(1)
-      , curve(0)
-      {}
-      float target;
-      float time;
-      float curve;
+      float target{ 0 };
+      float time{ 1 };
+      float curve{ 0 };
    };
 
    ADSR(float a, float d, float s, float r)
-   : mNextEventPointer(0)
-   , mMaxSustain(-1)
-   , mFreeReleaseLevel(false)
-   , mTimeScale(1)
    {
       Set(a, d, s, r);
    }
@@ -105,7 +96,6 @@ public:
 private:
    struct EventInfo
    {
-      EventInfo() { Reset(); }
       void Reset()
       {
          mStartBlendFromValue = 0;
@@ -114,11 +104,11 @@ private:
          mStartTime = -10000;
          mStopTime = -10000;
       }
-      float mStartBlendFromValue;
-      float mStopBlendFromValue;
-      float mMult;
-      double mStartTime;
-      double mStopTime;
+      float mStartBlendFromValue{ 0 };
+      float mStopBlendFromValue{ 0 };
+      float mMult{ 1 };
+      double mStartTime{ -10000 };
+      double mStopTime{ -10000 };
    };
 
    EventInfo* GetEvent(double time);
@@ -126,12 +116,12 @@ private:
    float GetStageTimeScale(int stage) const;
 
    std::array<EventInfo, 5> mEvents;
-   int mNextEventPointer;
-   int mSustainStage;
-   float mMaxSustain;
+   int mNextEventPointer{ 0 };
+   int mSustainStage{ 0 };
+   float mMaxSustain{ -1 };
    Stage mStages[MAX_ADSR_STAGES];
-   int mNumStages;
-   bool mHasSustainStage;
-   bool mFreeReleaseLevel;
-   float mTimeScale;
+   int mNumStages{ 0 };
+   bool mHasSustainStage{ false };
+   bool mFreeReleaseLevel{ false };
+   float mTimeScale{ 1 };
 };

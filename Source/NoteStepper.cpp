@@ -33,9 +33,6 @@
 #include "UIControlMacros.h"
 
 NoteStepper::NoteStepper()
-: mCurrentDestinationIndex(-1)
-, mLength(4)
-, mLastNoteOnTime(-9999)
 {
    for (int i = 0; i < 128; ++i)
       mLastNoteDestinations[i] = -1;

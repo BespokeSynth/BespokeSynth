@@ -101,8 +101,7 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool Enabled() const override { return mEnabled; }
 
-   int mNumLines;
-   float mWidth;
+   float mWidth{ 350 };
    float mHeight;
    std::array<RhythmLine*, 8> mRhythmLines;
 };

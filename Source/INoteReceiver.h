@@ -46,10 +46,10 @@ public:
 
 struct NoteInputElement
 {
-   double time;
-   int pitch;
-   float velocity;
-   int voiceIdx;
+   double time{ 0 };
+   int pitch{ 0 };
+   float velocity{ 0 };
+   int voiceIdx{ -1 };
    ModulationParameters modulation;
 };
 

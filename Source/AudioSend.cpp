@@ -33,10 +33,6 @@
 
 AudioSend::AudioSend()
 : IAudioProcessor(gBufferSize)
-, mCrossfade(false)
-, mCrossfadeCheckbox(nullptr)
-, mAmount(0)
-, mAmountSlider(nullptr)
 , mVizBuffer2(VIZ_BUFFER_SECONDS * gSampleRate)
 {
 }

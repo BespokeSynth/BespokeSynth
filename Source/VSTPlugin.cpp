@@ -157,23 +157,6 @@ namespace VSTLookup
 
 VSTPlugin::VSTPlugin()
 : IAudioProcessor(gBufferSize)
-, mVol(1)
-, mVolSlider(nullptr)
-, mPluginReady(false)
-, mPlugin(nullptr)
-, mNumInputs(2)
-, mNumOutputs(2)
-, mChannel(1)
-, mPitchBendRange(2)
-, mModwheelCC(1) //or 74 in Multidimensional Polyphonic Expression (MPE) spec
-, mUseVoiceAsChannel(false)
-, mPresetFileSelector(nullptr)
-, mPresetFileIndex(-1)
-, mOpenEditorButton(nullptr)
-//, mWindowOverlay(nullptr)
-, mDisplayMode(kDisplayMode_Sliders)
-, mShowParameterIndex(-1)
-, mTemporarilyDisplayedParamIndex(-1)
 {
    juce::File(ofToDataPath("vst")).createDirectory();
    juce::File(ofToDataPath("vst/presets")).createDirectory();
