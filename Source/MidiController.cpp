@@ -2807,7 +2807,7 @@ void ControlLayoutElement::Setup(MidiController* owner, MidiMessageType type, in
       mControlCable = new PatchCableSource(owner, kConnectionType_UIControl);
       owner->AddPatchCableSource(mControlCable);
       ofColor color = mControlCable->GetColor();
-      color.a *= .2f;
+      color.a *= .25f;
       mControlCable->SetColor(color);
    }
 }

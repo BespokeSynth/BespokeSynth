@@ -318,6 +318,7 @@ public:
    UserPrefTextEntryInt max_input_channels{ "max_input_channels", 16, 1, 1024, 5, UserPrefCategory::General };
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
+   UserPrefBool fade_cable_middle{ "fade_cable_middle", true, UserPrefCategory::Graphics };
    UserPrefFloat lissajous_r{ "lissajous_r", 0.408f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat lissajous_g{ "lissajous_g", 0.245f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat lissajous_b{ "lissajous_b", 0.418f, 0, 1, UserPrefCategory::Graphics };
