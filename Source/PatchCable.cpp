@@ -76,6 +76,7 @@ void PatchCable::Render()
    mY = cable.start.y;
    ofVec2f cableFadeOut = cable.start * .47 + cable.end * .53f;
    ofVec2f cableFadeIn = cable.start * .53f + cable.end * .47f;
+   float cableQuality = gDrawScale * UserPrefs.cable_quality.Get();
 
    float lineWidth = 1;
    float plugWidth = 4;
@@ -192,13 +193,11 @@ void PatchCable::Render()
    if (!isInsideSelf)
    {
       IAudioSource* audioSource = nullptr;
-      ofVec2f wireLineMag = cable.plug - cable.start;
-      wireLineMag.x = MAX(50, fabsf(wireLineMag.x));
-      wireLineMag.y = MAX(50, fabsf(wireLineMag.y));
-      ofVec2f endDirection = MathUtils::Normal(cable.plug - cable.end);
-      ofVec2f bezierControl1 = cable.start + MathUtils::ScaleVec(cable.startDirection, wireLineMag * .5f);
-      ofVec2f bezierControl2 = cable.plug + MathUtils::ScaleVec(endDirection, wireLineMag * .5f);
       float wireLength = sqrtf((cable.plug - cable.start).lengthSquared());
+      float bezierStrength = wireLength * .15f;
+      ofVec2f endDirection = MathUtils::Normal(cable.plug - cable.end);
+      ofVec2f bezierControl1 = cable.start + cable.startDirection * bezierStrength;
+      ofVec2f bezierControl2 = cable.plug + endDirection * bezierStrength;
 
       if (type == kConnectionType_Note ||
           type == kConnectionType_Grid ||
@@ -207,6 +206,7 @@ void PatchCable::Render()
           type == kConnectionType_UIControl)
       {
          ofSetLineWidth(lineWidth);
+         float cableStepSize = ofClamp(wireLength / (60 * cableQuality), 1, 1000);
 
          for (int half = 0; half < 2; ++half)
          {
@@ -219,7 +219,7 @@ void PatchCable::Render()
 
             ofBeginShape();
             ofVertex(cable.start.x, cable.start.y);
-            for (int i = 1; i < wireLength - 1; ++i)
+            for (float i = 1; i < wireLength - 1; i += cableStepSize)
             {
                ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                ofVertex(pos.x, pos.y);
@@ -254,7 +254,7 @@ void PatchCable::Render()
 
                   ofBeginShape();
                   ofVertex(cable.start.x, cable.start.y);
-                  for (int i = 1; i < wireLength - 1; ++i)
+                  for (float i = 1; i < wireLength - 1; i += cableStepSize)
                   {
                      ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                      ofVertex(pos.x, pos.y);
@@ -338,6 +338,7 @@ void PatchCable::Render()
          int numSamples = vizBuff->Size();
          float dx = (cable.plug.x - cable.start.x) / wireLength;
          float dy = (cable.plug.y - cable.start.y) / wireLength;
+         float cableStepSize = ofClamp(wireLength / (100 * cableQuality), 1, 7);
 
          for (int ch = 0; ch < vizBuff->NumChannels(); ++ch)
          {
@@ -359,7 +360,7 @@ void PatchCable::Render()
 
                ofBeginShape();
                ofVertex(cable.start.x + offset.x, cable.start.y + offset.y);
-               for (int i = 1; i < wireLength - 1; ++i)
+               for (float i = 1; i < wireLength - 1; i += cableStepSize)
                {
                   ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                   float sample = vizBuff->GetSample((i / wireLength * numSamples), ch);
@@ -412,6 +413,8 @@ void PatchCable::Render()
       else
       {
          ofSetLineWidth(lineWidth);
+         float cableStepSize = ofClamp(wireLength / (60 * cableQuality), 1, 1000);
+
          for (int half = 0; half < 2; ++half)
          {
             if (!UserPrefs.fade_cable_middle.Get())
@@ -423,7 +426,7 @@ void PatchCable::Render()
 
             ofBeginShape();
             ofVertex(cable.start.x, cable.start.y);
-            for (int i = 1; i < wireLength - 1; ++i)
+            for (float i = 1; i < wireLength - 1; i += cableStepSize)
             {
                ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                ofVertex(pos.x, pos.y);
@@ -605,7 +608,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
    return cable;
 }
 
-ofVec2f PatchCable::FindClosestSide(int x, int y, int w, int h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection)
+ofVec2f PatchCable::FindClosestSide(float x, float y, float w, float h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection)
 {
    ofVec2f dirs[4];
    dirs[0].set(-1, 0);
