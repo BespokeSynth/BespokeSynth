@@ -79,8 +79,6 @@ private:
    void SetPreset(int idx);
    void Store(int idx);
    void UpdateGridValues();
-   void Save();
-   void Load();
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
@@ -99,7 +97,6 @@ private:
       Preset(std::string path, float val)
       : mControlPath(path)
       , mValue(val)
-      , mHasLFO(false)
       {}
       Preset(IUIControl* control, Presets* presets);
       bool operator==(const Preset& other) const
@@ -109,12 +106,12 @@ private:
                 mHasLFO == other.mHasLFO;
       }
       std::string mControlPath;
-      float mValue;
-      bool mHasLFO;
+      float mValue{ 0 };
+      bool mHasLFO{ false };
       LFOSettings mLFOSettings;
-      int mGridCols;
-      int mGridRows;
-      std::vector<float> mGridContents;
+      int mGridCols{ 0 };
+      int mGridRows{ 0 };
+      std::vector<float> mGridContents{};
       std::string mString;
    };
 
@@ -126,27 +123,26 @@ private:
 
    struct ControlRamp
    {
-      IUIControl* mUIControl;
+      IUIControl* mUIControl{ nullptr };
       Ramp mRamp;
    };
 
-   UIGrid* mGrid;
+   UIGrid* mGrid{ nullptr };
    std::vector<PresetCollection> mPresetCollection;
-   ClickButton* mSaveButton;
-   ClickButton* mRandomizeButton;
-   int mDrawSetPresetsCountdown;
-   std::vector<IDrawableModule*> mPresetModules;
-   std::vector<IUIControl*> mPresetControls;
-   bool mBlending;
-   float mBlendTime;
-   FloatSlider* mBlendTimeSlider;
-   float mBlendProgress;
+   ClickButton* mRandomizeButton{ nullptr };
+   int mDrawSetPresetsCountdown{ 0 };
+   std::vector<IDrawableModule*> mPresetModules{};
+   std::vector<IUIControl*> mPresetControls{};
+   bool mBlending{ false };
+   float mBlendTime{ 0 };
+   FloatSlider* mBlendTimeSlider{ nullptr };
+   float mBlendProgress{ 0 };
    std::vector<ControlRamp> mBlendRamps;
    ofMutex mRampMutex;
-   int mCurrentPreset;
-   IntSlider* mCurrentPresetSlider;
-   PatchCableSource* mModuleCable;
-   PatchCableSource* mUIControlCable;
+   int mCurrentPreset{ 0 };
+   IntSlider* mCurrentPresetSlider{ nullptr };
+   PatchCableSource* mModuleCable{ nullptr };
+   PatchCableSource* mUIControlCable{ nullptr };
    bool mShiftHeld{ false };
 };
 
