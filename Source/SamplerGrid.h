@@ -40,7 +40,7 @@
 
 class ofxJSONElement;
 
-#define MAX_SAMPLER_GRID_LENGTH 5 * 44100 //@TODO(Noxy): Shouldn't this 44100 be gSampleRate instead?
+#define MAX_SAMPLER_GRID_LENGTH 5 * 44100
 #define SAMPLE_RAMP_MS 3
 
 class SamplerGrid : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IGridControllerListener, public UIGridListener, public INoteReceiver

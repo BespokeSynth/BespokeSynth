@@ -100,7 +100,7 @@ private:
    ChannelBuffer mData;
    int mNumSamples{ 0 };
    double mStartTime{ 0 };
-   double mOffset{ std::numeric_limits<float>::max() }; //@TODO(Noxy): Shouldn't this be std::numeric_limits<double>::max() instead of float? (It was originally FLT_MAX).
+   double mOffset{ std::numeric_limits<double>::max() };
    float mRate{ 1 };
    float mSampleRateRatio{ 1 };
    int mStopPoint{ -1 };
