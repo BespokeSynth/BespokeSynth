@@ -40,7 +40,7 @@
 
 class ofxJSONElement;
 
-#define MAX_SAMPLER_GRID_LENGTH 5 * 44100
+#define MAX_SAMPLER_GRID_LENGTH 5 * 44100 //just 5-ish seconds of audio. don't need to adjust for actual sample rate.
 #define SAMPLE_RAMP_MS 3
 
 class SamplerGrid : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IGridControllerListener, public UIGridListener, public INoteReceiver
