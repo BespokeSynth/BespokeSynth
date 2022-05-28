@@ -326,6 +326,7 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    {
       mPlugin->enableAllBuses();
       mPlugin->disableNonMainBuses();
+      mPlugin->addListener(this);
 
       /*
        * For now, since Bespoke is at best stereo in stereo out,
@@ -379,7 +380,7 @@ void VSTPlugin::CreateParameterSliders()
 
    const auto& parameters = mPlugin->getParameters();
 
-   int numParameters = MIN(1000, parameters.size());
+   int numParameters = MIN(10000, parameters.size());
    mParameterSliders.resize(numParameters);
    for (int i = 0; i < numParameters; ++i)
    {
@@ -421,16 +422,22 @@ void VSTPlugin::Poll()
       {
          float value = mParameterSliders[i].mParameter->getValue();
          if (mParameterSliders[i].mValue != value)
-         {
             mParameterSliders[i].mValue = value;
-            if (!mParameterSliders[i].mInSelectorList && mTemporarilyDisplayedParamIndex != i)
-            {
-               if (mTemporarilyDisplayedParamIndex != -1)
-                  mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
-               mTemporarilyDisplayedParamIndex = i;
-               mShowParameterDropdown->AddLabel(mParameterSliders[i].mSlider->Name(), i);
-            }
+      }
+
+      if (mChangeGestureParameterIndex != -1)
+      {
+         if (mChangeGestureParameterIndex < (int)mParameterSliders.size() &&
+             !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList &&
+             mTemporarilyDisplayedParamIndex != mChangeGestureParameterIndex)
+         {
+            if (mTemporarilyDisplayedParamIndex != -1)
+               mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
+            mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
+            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mSlider->Name(), mChangeGestureParameterIndex);
          }
+
+         mChangeGestureParameterIndex = -1;
       }
    }
 
@@ -447,6 +454,12 @@ void VSTPlugin::Poll()
       }
       mWantOpenVstWindow = false;
    }
+}
+
+void VSTPlugin::audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex)
+{
+   //set this parameter so we can check it in Poll()
+   mChangeGestureParameterIndex = parameterIndex;
 }
 
 void VSTPlugin::Process(double time)

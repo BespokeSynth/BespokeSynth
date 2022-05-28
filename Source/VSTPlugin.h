@@ -55,7 +55,7 @@ namespace VSTLookup
    void SortByLastUsed(std::vector<std::string>& vsts);
 }
 
-class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener
+class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener, public juce::AudioProcessorListener
 {
 public:
    VSTPlugin();
@@ -110,6 +110,11 @@ private:
    void CreateParameterSliders();
    void RefreshPresetFiles();
 
+   //juce::AudioProcessorListener
+   void audioProcessorParameterChanged(juce::AudioProcessor* processor, int parameterIndex, float newValue) override {}
+   void audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details) override {}
+   void audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex) override;
+
    float mVol{ 1 };
    FloatSlider* mVolSlider{ nullptr };
    int mPresetFileIndex{ -1 };
@@ -140,6 +145,7 @@ private:
    };
 
    std::vector<ParameterSlider> mParameterSliders;
+   int mChangeGestureParameterIndex{ -1 };
 
    int mChannel{ 1 };
    bool mUseVoiceAsChannel{ false };
