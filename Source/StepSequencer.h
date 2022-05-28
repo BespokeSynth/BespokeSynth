@@ -62,22 +62,19 @@ public:
    int GetRowPitch() const { return mRowPitch; }
 
 private:
-   UIGrid* mGrid;
+   UIGrid* mGrid{ nullptr };
    int mRow;
-   StepSequencer* mSeq;
-   float mOffset;
+   StepSequencer* mSeq{ nullptr };
+   float mOffset{ 0 };
 
    struct PlayedStep
    {
-      PlayedStep()
-      : time(-1)
-      {}
-      int step;
-      double time;
+      int step{ 0 };
+      double time{ -1 };
    };
-   std::array<PlayedStep, 5> mPlayedSteps;
-   int mPlayedStepsRoundRobin;
-   TextEntry* mRowPitchEntry;
+   std::array<PlayedStep, 5> mPlayedSteps{};
+   int mPlayedStepsRoundRobin{ 0 };
+   TextEntry* mRowPitchEntry{ nullptr };
    int mRowPitch;
 };
 
@@ -228,50 +225,50 @@ private:
       RepeatHeld
    };
 
-   UIGrid* mGrid;
-   float mStrength;
-   FloatSlider* mStrengthSlider;
-   int mGridYOff;
-   DropdownList* mPresetDropdown;
-   int mPreset;
-   int mColorOffset;
-   DropdownList* mGridYOffDropdown;
-   std::array<StepSequencerRow*, NUM_STEPSEQ_ROWS> mRows;
-   bool mAdjustOffsets;
-   Checkbox* mAdjustOffsetsCheckbox;
-   std::array<float, NUM_STEPSEQ_ROWS> mOffsets;
-   std::array<FloatSlider*, NUM_STEPSEQ_ROWS> mOffsetSlider;
-   std::array<ClickButton*, NUM_STEPSEQ_ROWS> mRandomizeRowButton;
-   std::map<int, int> mPadPressures;
-   NoteInterval mRepeatRate;
-   DropdownList* mRepeatRateDropdown;
-   std::array<NoteRepeat*, NUM_STEPSEQ_ROWS> mNoteRepeats;
-   int mNumRows;
-   int mNumMeasures;
-   IntSlider* mNumMeasuresSlider;
-   NoteInterval mStepInterval;
-   DropdownList* mStepIntervalDropdown;
-   GridControlTarget* mGridControlTarget;
-   GridControlTarget* mVelocityGridController;
-   GridControlTarget* mMetaStepGridController;
-   int mCurrentColumn;
-   IntSlider* mCurrentColumnSlider;
+   UIGrid* mGrid{ nullptr };
+   float mStrength{ 1 };
+   FloatSlider* mStrengthSlider{ nullptr };
+   int mGridYOff{ 0 };
+   DropdownList* mPresetDropdown{ nullptr };
+   int mPreset{ -1 };
+   int mColorOffset{ 3 };
+   DropdownList* mGridYOffDropdown{ nullptr };
+   std::array<StepSequencerRow*, NUM_STEPSEQ_ROWS> mRows{};
+   bool mAdjustOffsets{ false };
+   Checkbox* mAdjustOffsetsCheckbox{ nullptr };
+   std::array<float, NUM_STEPSEQ_ROWS> mOffsets{};
+   std::array<FloatSlider*, NUM_STEPSEQ_ROWS> mOffsetSlider{};
+   std::array<ClickButton*, NUM_STEPSEQ_ROWS> mRandomizeRowButton{};
+   std::map<int, int> mPadPressures{};
+   NoteInterval mRepeatRate{ NoteInterval::kInterval_None };
+   DropdownList* mRepeatRateDropdown{ nullptr };
+   std::array<NoteRepeat*, NUM_STEPSEQ_ROWS> mNoteRepeats{};
+   int mNumRows{ 8 };
+   int mNumMeasures{ 1 };
+   IntSlider* mNumMeasuresSlider{ nullptr };
+   NoteInterval mStepInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mStepIntervalDropdown{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
+   GridControlTarget* mVelocityGridController{ nullptr };
+   GridControlTarget* mMetaStepGridController{ nullptr };
+   int mCurrentColumn{ 0 };
+   IntSlider* mCurrentColumnSlider{ nullptr };
    StepSequencerNoteFlusher mFlusher;
-   ClickButton* mShiftLeftButton;
-   ClickButton* mShiftRightButton;
-   std::list<HeldButton> mHeldButtons;
+   ClickButton* mShiftLeftButton{ nullptr };
+   ClickButton* mShiftRightButton{ nullptr };
+   std::list<HeldButton> mHeldButtons{};
    juce::uint32* mMetaStepMasks;
-   bool mIsSetUp;
-   NoteInputMode mNoteInputMode;
-   bool mHasExternalPulseSource;
-   bool mPush2Connected;
-   float mRandomizationAmount;
-   FloatSlider* mRandomizationAmountSlider;
-   float mRandomizationDensity;
-   FloatSlider* mRandomizationDensitySlider;
-   ClickButton* mRandomizeButton;
+   bool mIsSetUp{ false };
+   NoteInputMode mNoteInputMode{ NoteInputMode::PlayStepIndex };
+   bool mHasExternalPulseSource{ false };
+   bool mPush2Connected{ false };
+   float mRandomizationAmount{ 1 };
+   FloatSlider* mRandomizationAmountSlider{ nullptr };
+   float mRandomizationDensity{ .25 };
+   FloatSlider* mRandomizationDensitySlider{ nullptr };
+   ClickButton* mRandomizeButton{ nullptr };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 

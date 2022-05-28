@@ -30,10 +30,6 @@
 
 OutputChannel::OutputChannel()
 : IAudioProcessor(gBufferSize)
-, mWidth(64)
-, mHeight(40)
-, mChannelSelectionIndex(0)
-, mLimit(1)
 {
    for (size_t i = 0; i < mLevelMeters.size(); ++i)
    {

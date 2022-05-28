@@ -118,48 +118,48 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 235 };
+   float mHeight{ 125 };
    RollingBuffer mRecordBuffer;
    std::vector<Looper*> mLoopers;
-   int mNumBars;
-   DropdownList* mNumBarsSelector;
-   float mSpeed;
-   float mBaseTempo;
-   ClickButton* mResampleButton;
-   ClickButton* mResampAndSetButton;
-   Looper* mMergeSource;
-   Looper* mSwapSource;
-   Looper* mCopySource;
-   int mCommitCount;
-   ClickButton* mDoubleTempoButton;
-   ClickButton* mHalfTempoButton;
-   ClickButton* mShiftMeasureButton;
-   ClickButton* mHalfShiftButton;
-   ClickButton* mClearOverdubButton;
+   int mNumBars{ 1 };
+   DropdownList* mNumBarsSelector{ nullptr };
+   float mSpeed{ 1 };
+   float mBaseTempo{ 120 };
+   ClickButton* mResampleButton{ nullptr };
+   ClickButton* mResampAndSetButton{ nullptr };
+   Looper* mMergeSource{ nullptr };
+   Looper* mSwapSource{ nullptr };
+   Looper* mCopySource{ nullptr };
+   int mCommitCount{ 0 };
+   ClickButton* mDoubleTempoButton{ nullptr };
+   ClickButton* mHalfTempoButton{ nullptr };
+   ClickButton* mShiftMeasureButton{ nullptr };
+   ClickButton* mHalfShiftButton{ nullptr };
+   ClickButton* mClearOverdubButton{ nullptr };
    Ramp mQuietInputRamp;
-   double mUnquietInputTime;
-   ClickButton* mShiftDownbeatButton;
-   ClickButton* mOrigSpeedButton;
-   ClickButton* mSnapPitchButton;
-   IAudioReceiver* mHeadphonesTarget;
-   IAudioReceiver* mOutputTarget;
-   float mCommitDelay;
-   FloatSlider* mCommitDelaySlider;
+   double mUnquietInputTime{ -1 };
+   ClickButton* mShiftDownbeatButton{ nullptr };
+   ClickButton* mOrigSpeedButton{ nullptr };
+   ClickButton* mSnapPitchButton{ nullptr };
+   IAudioReceiver* mHeadphonesTarget{ nullptr };
+   IAudioReceiver* mOutputTarget{ nullptr };
+   float mCommitDelay{ 0 };
+   FloatSlider* mCommitDelaySlider{ nullptr };
    ChannelBuffer mWriteBuffer;
-   Looper* mCommitToLooper;
+   Looper* mCommitToLooper{ nullptr };
    std::vector<PatchCableSource*> mLooperPatchCables;
-   ClickButton* mCommit1BarButton;
-   ClickButton* mCommit2BarsButton;
-   ClickButton* mCommit4BarsButton;
-   ClickButton* mCommit8BarsButton;
-   IntSlider* mNextCommitTargetSlider;
-   int mNextCommitTargetIndex;
+   ClickButton* mCommit1BarButton{ nullptr };
+   ClickButton* mCommit2BarsButton{ nullptr };
+   ClickButton* mCommit4BarsButton{ nullptr };
+   ClickButton* mCommit8BarsButton{ nullptr };
+   IntSlider* mNextCommitTargetSlider{ nullptr };
+   int mNextCommitTargetIndex{ 0 };
 
-   bool mFreeRecording;
-   Checkbox* mFreeRecordingCheckbox;
-   double mStartFreeRecordTime;
-   ClickButton* mCancelFreeRecordButton;
+   bool mFreeRecording{ false };
+   Checkbox* mFreeRecordingCheckbox{ nullptr };
+   double mStartFreeRecordTime{ 0 };
+   ClickButton* mCancelFreeRecordButton{ nullptr };
 
    enum RecorderMode
    {
@@ -167,8 +167,8 @@ private:
       kRecorderMode_Overdub,
       kRecorderMode_Loop
    };
-   RecorderMode mRecorderMode;
-   DropdownList* mModeSelector;
+   RecorderMode mRecorderMode{ RecorderMode::kRecorderMode_Record };
+   DropdownList* mModeSelector{ nullptr };
 };
 
 

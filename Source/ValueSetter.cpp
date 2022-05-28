@@ -32,9 +32,6 @@
 #include "UIControlMacros.h"
 
 ValueSetter::ValueSetter()
-: mControlCable(nullptr)
-, mValue(0)
-, mValueEntry(nullptr)
 {
 }
 

@@ -237,28 +237,25 @@ enum ControlDrawType
 struct ControlLayoutElement
 {
    ControlLayoutElement()
-   : mActive(false)
-   , mControlCable(nullptr)
-   , mConnectionType(kControlType_Slider)
    {}
    void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
 
-   bool mActive;
-   MidiMessageType mType;
-   int mControl;
+   bool mActive{ false };
+   MidiMessageType mType{ MidiMessageType::kMidiMessage_Control };
+   int mControl{ 0 };
    ofVec2f mPosition;
    ofVec2f mDimensions;
-   ControlDrawType mDrawType;
-   float mIncrementAmount;
-   int mOffVal;
-   int mOnVal;
-   bool mScaleOutput;
-   ControlType mConnectionType;
+   ControlDrawType mDrawType{ kDrawType_Slider };
+   float mIncrementAmount{ 0 };
+   int mOffVal{ 0 };
+   int mOnVal{ 127 };
+   bool mScaleOutput{ true };
+   ControlType mConnectionType{ kControlType_Slider };
 
-   PatchCableSource* mControlCable;
+   PatchCableSource* mControlCable{ nullptr };
 
-   float mLastValue;
-   float mLastActivityTime;
+   float mLastValue{ 0 };
+   float mLastActivityTime{ -9999 };
 };
 
 struct GridLayout
@@ -272,11 +269,11 @@ struct GridLayout
       }
    }
 
-   int mRows;
-   int mCols;
+   int mRows{ 1 };
+   int mCols{ 8 };
    ofVec2f mPosition;
    ofVec2f mDimensions;
-   MidiMessageType mType;
+   MidiMessageType mType{ kMidiMessage_Note };
    std::vector<int> mControls;
    std::vector<int> mColors;
 
@@ -409,16 +406,16 @@ private:
    int mNoteOffset;
    float mPitchBendRange;
    int mModwheelCC;
-   float mModWheelOffset;
-   float mPressureOffset;
+   float mModWheelOffset{ 0 };
+   float mPressureOffset{ 0 };
 
    Modulations mModulation;
 
    std::string mDeviceIn;
    std::string mDeviceOut;
-   int mOutChannel;
+   int mOutChannel{ 1 };
    MidiDevice mDevice;
-   double mInitialConnectionTime;
+   double mInitialConnectionTime{ 0 };
    ofxJSONElement mConnectionsJson;
    std::list<UIControlConnection*> mConnections;
    bool mSendCCOutput{ false };
@@ -429,25 +426,25 @@ private:
    bool mTwoWay;
    bool mSendTwoWayOnChange;
    bool mResendFeedbackOnRelease;
-   ClickButton* mAddConnectionButton;
+   ClickButton* mAddConnectionButton{ nullptr };
    std::list<MidiNote> mQueuedNotes;
    std::list<MidiControl> mQueuedControls;
    std::list<MidiProgramChange> mQueuedProgramChanges;
    std::list<MidiPitchBend> mQueuedPitchBends;
    DropdownList* mControllerList;
-   Checkbox* mDrawCablesCheckbox;
+   Checkbox* mDrawCablesCheckbox{ nullptr };
    MappingDisplayMode mMappingDisplayMode;
    RadioButton* mMappingDisplayModeSelector;
-   int mLayoutFileIndex;
-   DropdownList* mLayoutFileDropdown;
+   int mLayoutFileIndex{ 0 };
+   DropdownList* mLayoutFileDropdown{ nullptr };
    int mOscInPort;
-   TextEntry* mOscInPortEntry;
+   TextEntry* mOscInPortEntry{ nullptr };
    int mMonomeDeviceIndex;
-   DropdownList* mMonomeDeviceDropdown;
+   DropdownList* mMonomeDeviceDropdown{ nullptr };
 
    int mControllerIndex;
    double mLastActivityTime;
-   bool mLastActivityBound;
+   bool mLastActivityBound{ false };
    bool mShowActivityUIOverlay{ true };
    bool mBlink;
    int mControllerPage;

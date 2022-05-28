@@ -39,13 +39,6 @@ namespace
 EnvelopeControl::EnvelopeControl(ofVec2f position, ofVec2f dimensions)
 : mPosition(position)
 , mDimensions(dimensions)
-, mAdsr(nullptr)
-, mClick(false)
-, mViewLength(2000)
-, mHighlightPoint(-1)
-, mHighlightCurve(-1)
-, mLastClickTime(0)
-, mFixedLengthMode(false)
 {
 }
 
@@ -388,15 +381,6 @@ float EnvelopeControl::GetYForValue(float value)
 
 EnvelopeEditor::EnvelopeEditor()
 : mEnvelopeControl(ofVec2f(10, 40), ofVec2f(380, 200))
-, mADSRDisplay(nullptr)
-, mPinned(false)
-, mADSRViewLength(2000)
-, mADSRViewLengthSlider(nullptr)
-, mHasSustainStageCheckbox(nullptr)
-, mSustainStageSlider(nullptr)
-, mMaxSustainSlider(nullptr)
-, mFreeReleaseLevelCheckbox(nullptr)
-, mTargetCable(nullptr)
 {
    mEnvelopeControl.SetViewLength(mADSRViewLength);
 }

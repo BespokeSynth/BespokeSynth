@@ -123,24 +123,21 @@ private:
 
    struct UndoBufferEntry
    {
-      UndoBufferEntry()
-      : mCaretPos(0)
-      {}
       std::string mString;
-      int mCaretPos;
+      int mCaretPos{ 0 };
    };
 
    struct AutocompleteSignatureInfo
    {
-      bool valid;
-      int entryIndex;
+      bool valid{ false };
+      int entryIndex{ 0 };
       std::vector<std::string> params;
-      int caretPos;
+      int caretPos{ 0 };
    };
 
    struct AutocompleteInfo
    {
-      bool valid;
+      bool valid{ false };
       std::string autocompleteFull;
       std::string autocompleteRest;
    };
@@ -148,43 +145,41 @@ private:
    ICodeEntryListener* mListener;
    float mWidth;
    float mHeight;
-   float mCharWidth;
-   float mCharHeight;
+   float mCharWidth{ 5.85 };
+   float mCharHeight{ 15 };
    std::string mString;
    std::string mPublishedString;
    std::array<UndoBufferEntry, 50> mUndoBuffer;
-   int mUndoBufferPos;
-   int mUndosLeft;
-   int mRedosLeft;
-   int mCaretPosition;
-   int mCaretPosition2;
-   float mCaretBlinkTimer;
-   bool mCaretBlink;
-   bool mHovered;
-   double mLastPublishTime;
-   int mLastPublishedLineStart;
-   int mLastPublishedLineEnd;
-   bool mHasError;
-   int mErrorLine;
+   int mUndoBufferPos{ 0 };
+   int mUndosLeft{ 0 };
+   int mRedosLeft{ 0 };
+   int mCaretPosition{ 0 };
+   int mCaretPosition2{ 0 };
+   float mCaretBlinkTimer{ 0 };
+   bool mCaretBlink{ true };
+   bool mHovered{ false };
+   double mLastPublishTime{ -999 };
+   int mLastPublishedLineStart{ 0 };
+   int mLastPublishedLineEnd{ 0 };
+   bool mHasError{ false };
+   int mErrorLine{ -1 };
    ofVec2f mScroll;
    std::vector<int> mSyntaxHighlightMapping;
-
    /*
     * For syntax highlighting we have both a static (system wide) and mDo (per insdtance)
     * control and then we use and
     */
    static bool sDoSyntaxHighlighting;
    static bool sDoPythonAutocomplete;
-   bool mDoSyntaxHighlighting;
+   bool mDoSyntaxHighlighting{ false };
 
-   double mLastInputTime;
    std::array<AutocompleteSignatureInfo, 10> mAutocompleteSignatures;
    std::array<AutocompleteInfo, 10> mAutocompletes;
-   float mAutocompleteUpdateTimer;
+   float mAutocompleteUpdateTimer{ 0 };
    ofVec2f mAutocompleteCaretCoords;
-   bool mWantToShowAutocomplete;
-   int mAutocompleteHighlightIndex;
-   bool mCodeUpdated;
+   bool mWantToShowAutocomplete{ false };
+   int mAutocompleteHighlightIndex{ 0 };
+   bool mCodeUpdated{ false };
 
 
    // Style Sheet
@@ -211,5 +206,5 @@ private:
    ofColor jediParamsHighlight{ 230, 230, 255 };
    ofColor unknownColor = ofColor::white;
 
-   float mFontSize = 14;
+   float mFontSize{ 14 };
 };

@@ -51,7 +51,6 @@ private:
    float* mLastPhase;
    float* mSumPhase;
    float* mWindower;
-   float mRover;
    float* mAnalysisMag;
    float* mAnalysisFreq;
    float* mSynthesisMag;
@@ -61,22 +60,22 @@ private:
    RollingBuffer mRollingInputBuffer;
    RollingBuffer mRollingOutputBuffer;
 
-   float mRatio;
-   int mOversampling;
-   float mLatency;
+   float mRatio{ 1 };
+   int mOversampling{ 4 };
+   float mLatency{ 0 };
 
-   float gInFIFO[MAX_FRAME_LENGTH];
-   float gOutFIFO[MAX_FRAME_LENGTH];
-   float gFFTworksp[2 * MAX_FRAME_LENGTH];
-   float gLastPhase[MAX_FRAME_LENGTH / 2 + 1];
-   float gSumPhase[MAX_FRAME_LENGTH / 2 + 1];
-   float gOutputAccum[2 * MAX_FRAME_LENGTH];
-   float gAnaFreq[MAX_FRAME_LENGTH];
-   float gAnaMagn[MAX_FRAME_LENGTH];
-   float gSynFreq[MAX_FRAME_LENGTH];
-   float gSynMagn[MAX_FRAME_LENGTH];
-   long gRover;
-   long gInit;
+   float gInFIFO[MAX_FRAME_LENGTH]{};
+   float gOutFIFO[MAX_FRAME_LENGTH]{};
+   float gFFTworksp[2 * MAX_FRAME_LENGTH]{};
+   float gLastPhase[MAX_FRAME_LENGTH / 2 + 1]{};
+   float gSumPhase[MAX_FRAME_LENGTH / 2 + 1]{};
+   float gOutputAccum[2 * MAX_FRAME_LENGTH]{};
+   float gAnaFreq[MAX_FRAME_LENGTH]{};
+   float gAnaMagn[MAX_FRAME_LENGTH]{};
+   float gSynFreq[MAX_FRAME_LENGTH]{};
+   float gSynMagn[MAX_FRAME_LENGTH]{};
+   long gRover{ false };
+   long gInit{ false };
 };
 
 #endif /* defined(__Bespoke__PitchShifter__) */

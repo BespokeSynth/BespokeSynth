@@ -104,10 +104,10 @@ private:
    {
       std::string mName;
       std::string mSampleFiles[NUM_DRUM_HITS];
-      int mLinkIds[NUM_DRUM_HITS];
-      float mVols[NUM_DRUM_HITS];
-      float mSpeeds[NUM_DRUM_HITS];
-      float mPans[NUM_DRUM_HITS];
+      int mLinkIds[NUM_DRUM_HITS]{};
+      float mVols[NUM_DRUM_HITS]{};
+      float mSpeeds[NUM_DRUM_HITS]{};
+      float mPans[NUM_DRUM_HITS]{};
    };
 
    void LoadKit(int kit);
@@ -194,7 +194,6 @@ private:
       }
       DrumPlayer* mDrumPlayer;
       int mHitIndex;
-      int mOutputIndex;
       RollingBuffer* mVizBuffer;
       PatchCableSource* mPatchCableSource;
    };
@@ -205,15 +204,12 @@ private:
    {
       struct Playhead
       {
-         Playhead()
-         : mStartTime(-1)
-         {}
-         double mStartTime;
-         double mCutOffTime;
-         double mOffset;
-         double mEnvelopeTime;
-         double mEnvelopeScale;
-         float mSpeedTweak;
+         double mStartTime{ -1 };
+         double mCutOffTime{ -1 };
+         double mOffset{ 0 };
+         double mEnvelopeTime{ 0 };
+         double mEnvelopeScale{ 1 };
+         float mSpeedTweak{ 1 };
       };
 
       DrumHit()
@@ -275,23 +271,23 @@ private:
       int mButtonHeldVelocity;
 
       DrumPlayer* mOwner;
-      FloatSlider* mVolSlider;
-      FloatSlider* mSpeedSlider;
-      ClickButton* mTestButton;
-      ClickButton* mRandomButton;
-      ClickButton* mNextButton;
-      ClickButton* mPrevButton;
-      ClickButton* mGrabSampleButton;
-      Checkbox* mUseEnvelopeCheckbox;
-      ADSRDisplay* mEnvelopeDisplay;
-      FloatSlider* mPanSlider;
-      IntSlider* mWidenSlider;
-      Checkbox* mIndividualOutputCheckbox;
-      FloatSlider* mEnvelopeLengthSlider;
-      IntSlider* mLinkIdSlider;
-      DropdownList* mHitCategoryDropdown;
-      FloatSlider* mStartOffsetSlider;
-      int mHitCategoryIndex;
+      FloatSlider* mVolSlider{ nullptr };
+      FloatSlider* mSpeedSlider{ nullptr };
+      ClickButton* mTestButton{ nullptr };
+      ClickButton* mRandomButton{ nullptr };
+      ClickButton* mNextButton{ nullptr };
+      ClickButton* mPrevButton{ nullptr };
+      ClickButton* mGrabSampleButton{ nullptr };
+      Checkbox* mUseEnvelopeCheckbox{ nullptr };
+      ADSRDisplay* mEnvelopeDisplay{ nullptr };
+      FloatSlider* mPanSlider{ nullptr };
+      IntSlider* mWidenSlider{ nullptr };
+      Checkbox* mIndividualOutputCheckbox{ nullptr };
+      FloatSlider* mEnvelopeLengthSlider{ nullptr };
+      IntSlider* mLinkIdSlider{ nullptr };
+      DropdownList* mHitCategoryDropdown{ nullptr };
+      FloatSlider* mStartOffsetSlider{ nullptr };
+      int mHitCategoryIndex{ -1 };
       std::string mHitCategory;
       RollingBuffer mWidenerBuffer;
       int mSamplesRemainingToProcess;

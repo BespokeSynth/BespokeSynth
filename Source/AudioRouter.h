@@ -64,13 +64,13 @@ private:
    void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return true; }
 
-   int mRouteIndex;
-   RadioButton* mRouteSelector;
+   int mRouteIndex{ 0 };
+   RadioButton* mRouteSelector{ nullptr };
    std::vector<PatchCableSource*> mDestinationCables;
    RollingBuffer mBlankVizBuffer;
 
    std::array<Ramp, 16> mSwitchAndRampIn;
-   int mLastProcessedRouteIndex;
+   int mLastProcessedRouteIndex{ 0 };
 };
 
 

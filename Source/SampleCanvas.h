@@ -83,16 +83,16 @@ private:
    void UpdateNumColumns();
    double GetCurPos(double time) const;
 
-   Canvas* mCanvas;
-   CanvasControls* mCanvasControls;
-   CanvasTimeline* mCanvasTimeline;
-   CanvasScrollbar* mCanvasScrollbarHorizontal;
-   CanvasScrollbar* mCanvasScrollbarVertical;
+   Canvas* mCanvas{ nullptr };
+   CanvasControls* mCanvasControls{ nullptr };
+   CanvasTimeline* mCanvasTimeline{ nullptr };
+   CanvasScrollbar* mCanvasScrollbarHorizontal{ nullptr };
+   CanvasScrollbar* mCanvasScrollbarVertical{ nullptr };
 
-   IntSlider* mNumMeasuresSlider;
-   int mNumMeasures;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
+   IntSlider* mNumMeasuresSlider{ nullptr };
+   int mNumMeasures{ 4 };
+   NoteInterval mInterval{ NoteInterval::kInterval_1n };
+   DropdownList* mIntervalSelector{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SampleCanvas__) */

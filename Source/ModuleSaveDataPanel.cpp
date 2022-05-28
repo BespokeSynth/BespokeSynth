@@ -38,13 +38,6 @@ ModuleSaveDataPanel* TheSaveDataPanel = nullptr;
 const float itemSpacing = 20;
 
 ModuleSaveDataPanel::ModuleSaveDataPanel()
-: mSaveModule(nullptr)
-, mHeight(100)
-, mAlignmentX(100)
-, mApplyButton(nullptr)
-, mDeleteButton(nullptr)
-, mDrawDebugCheckbox(nullptr)
-, mResetSequencerButton(nullptr)
 {
    assert(TheSaveDataPanel == nullptr);
    TheSaveDataPanel = this;

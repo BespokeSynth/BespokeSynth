@@ -28,13 +28,6 @@
 #include "ModularSynth.h"
 
 ClipArranger::ClipArranger()
-: mBufferWidth(800)
-, mBufferHeight(80)
-, mHighlightClip(-1)
-, mMouseDown(false)
-, mMoveMode(kMoveMode_None)
-, mLastMouseX(-1)
-, mLastMouseY(-1)
 {
 }
 

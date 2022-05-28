@@ -42,52 +42,7 @@ const float mBufferH = 200;
 const float mRemixBufferY = mBufferY + mBufferH + 60;
 
 BeatBloks::BeatBloks()
-: mVolume(.6f)
-, mVolumeSlider(nullptr)
-, mSample(nullptr)
-, mPlay(false)
-, mPlayCheckbox(nullptr)
-, mLoop(true)
-, mLoopCheckbox(nullptr)
-, mMeasureEarly(0)
-, mClipStart(0)
-, mClipStartSlider(nullptr)
-, mClipEnd(1)
-, mClipEndSlider(nullptr)
-, mZoomStart(0)
-, mZoomStartSlider(nullptr)
-, mZoomEnd(1)
-, mZoomEndSlider(nullptr)
-, mNumBars(1)
-, mNumBarsSlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mWriteButton(nullptr)
-, mPlayheadRemainder(0)
-, mPlayheadWhole(0)
-, mWantWrite(false)
-, mDoubleLengthButton(nullptr)
-, mHalveLengthButton(nullptr)
-, mDrawBlokType(kBlok_Bar)
-, mDrawBlokTypeDropdown(nullptr)
-, mLoading(false)
-, mHeldBlok(nullptr)
-, mRemixPlayhead(0)
-, mPlayRemix(false)
-, mPlayRemixCheckbox(nullptr)
-, mLastPlayedRemixBlok(nullptr)
-, mLastLookupPlayhead(0)
-, mClearRemixButton(nullptr)
-, mDrawSources(false)
-, mDrawSourcesCheckbox(nullptr)
-, mRemixZoomStart(0)
-, mRemixZoomStartSlider(nullptr)
-, mRemixZoomEnd(gSampleRate * 25)
-, mRemixZoomEndSlider(nullptr)
-, mBlockMultiPlaceEngaged(false)
-, mGetLuckyButton(nullptr)
-, mLoseYourselfButton(nullptr)
-, mLastRemovedRemixBlokIdx(-1)
+: mRemixZoomEnd(gSampleRate * 25)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -883,7 +838,7 @@ void BeatBloks::DrawModule()
       ofPopStyle();
    }
 
-   if (mHeldBlok)
+   if (mHeldBlok && mSample != nullptr)
    {
       ofPushMatrix();
       ofTranslate(mMouseX - mGrabOffsetX, mMouseY - mGrabOffsetY);

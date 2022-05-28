@@ -69,10 +69,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   bool mCrossfade;
-   Checkbox* mCrossfadeCheckbox;
-   float mAmount;
-   FloatSlider* mAmountSlider;
+   bool mCrossfade{ false };
+   Checkbox* mCrossfadeCheckbox{ nullptr };
+   float mAmount{ 0 };
+   FloatSlider* mAmountSlider{ nullptr };
    RollingBuffer mVizBuffer2;
-   PatchCableSource* mPatchCableSource2;
+   PatchCableSource* mPatchCableSource2{ nullptr };
 };

@@ -56,8 +56,8 @@ private:
    }
    bool Enabled() const override { return true; }
 
-   ClickButton* mButton;
-   float mWidth;
-   float mHeight;
+   ClickButton* mButton{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    bool mForceImmediate{ false };
 };

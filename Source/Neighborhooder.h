@@ -62,10 +62,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   int mMinPitch;
-   int mPitchRange;
-   IntSlider* mMinSlider;
-   IntSlider* mRangeSlider;
+   int mMinPitch{ 55 };
+   int mPitchRange{ 16 };
+   IntSlider* mMinSlider{ nullptr };
+   IntSlider* mRangeSlider{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Neighborhooder__) */

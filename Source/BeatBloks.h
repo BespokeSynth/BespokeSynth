@@ -104,7 +104,7 @@ private:
       float mStartTime;
       float mDuration;
       float mConfidence;
-      BlokType mType;
+      BlokType mType{ BlokType::kBlok_Bar };
    };
 
    enum ReadState
@@ -115,7 +115,7 @@ private:
       kReadState_Tatums,
       kReadState_Sections,
       kReadState_Segments
-   } mReadState;
+   } mReadState{ kReadState_Start };
 
    void UpdateSample();
    void DoWrite();
@@ -133,73 +133,73 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
 
-   Sample* mSample;
+   Sample* mSample{ nullptr };
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
+   float mVolume{ .6 };
+   FloatSlider* mVolumeSlider{ nullptr };
    float* mWriteBuffer;
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mLoop;
-   Checkbox* mLoopCheckbox;
-   int mMeasureEarly;
-   float mClipStart;
-   FloatSlider* mClipStartSlider;
-   float mClipEnd;
-   FloatSlider* mClipEndSlider;
-   float mZoomStart;
-   FloatSlider* mZoomStartSlider;
-   float mZoomEnd;
-   FloatSlider* mZoomEndSlider;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
-   ClickButton* mWriteButton;
-   float mPlayheadRemainder;
-   int mPlayheadWhole;
-   bool mWantWrite;
-   ClickButton* mDoubleLengthButton;
-   ClickButton* mHalveLengthButton;
+   bool mPlay{ false };
+   Checkbox* mPlayCheckbox{ nullptr };
+   bool mLoop{ true };
+   Checkbox* mLoopCheckbox{ nullptr };
+   int mMeasureEarly{ 0 };
+   float mClipStart{ 0 };
+   FloatSlider* mClipStartSlider{ nullptr };
+   float mClipEnd{ 1 };
+   FloatSlider* mClipEndSlider{ nullptr };
+   float mZoomStart{ 0 };
+   FloatSlider* mZoomStartSlider{ nullptr };
+   float mZoomEnd{ 1 };
+   FloatSlider* mZoomEndSlider{ nullptr };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   int mNumBars{ 1 };
+   IntSlider* mNumBarsSlider{ nullptr };
+   ClickButton* mWriteButton{ nullptr };
+   float mPlayheadRemainder{ 0 };
+   int mPlayheadWhole{ 0 };
+   bool mWantWrite{ false };
+   ClickButton* mDoubleLengthButton{ nullptr };
+   ClickButton* mHalveLengthButton{ nullptr };
    std::vector<Blok> mBars;
    std::vector<Blok> mBeats;
    std::vector<Blok> mTatums;
    std::vector<Blok> mSections;
    std::vector<Blok> mSegments;
    std::vector<Blok> mNothing;
-   BlokType mDrawBlokType;
-   DropdownList* mDrawBlokTypeDropdown;
-   bool mLoading;
-   Blok* mHeldBlok;
-   float mMouseX;
-   float mMouseY;
-   float mGrabOffsetX;
-   float mGrabOffsetY;
-   ClickButton* mGetLuckyButton;
-   ClickButton* mLoseYourselfButton;
+   BlokType mDrawBlokType{ BlokType::kBlok_Bar };
+   DropdownList* mDrawBlokTypeDropdown{ nullptr };
+   bool mLoading{ false };
+   Blok* mHeldBlok{ nullptr };
+   float mMouseX{ 0 };
+   float mMouseY{ 0 };
+   float mGrabOffsetX{ 0 };
+   float mGrabOffsetY{ 0 };
+   ClickButton* mGetLuckyButton{ nullptr };
+   ClickButton* mLoseYourselfButton{ nullptr };
 
-   float mRemixPlayhead;
-   bool mPlayRemix;
-   Checkbox* mPlayRemixCheckbox;
+   float mRemixPlayhead{ 0 };
+   bool mPlayRemix{ false };
+   Checkbox* mPlayRemixCheckbox{ nullptr };
    std::list<Blok*> mRemixBloks;
    JumpBlender mRemixJumpBlender;
-   Blok* mLastPlayedRemixBlok;
-   float mLastLookupPlayhead;
-   ClickButton* mClearRemixButton;
-   float mRemixZoomStart;
-   FloatSlider* mRemixZoomStartSlider;
+   Blok* mLastPlayedRemixBlok{ nullptr };
+   float mLastLookupPlayhead{ 0 };
+   ClickButton* mClearRemixButton{ nullptr };
+   float mRemixZoomStart{ 0 };
+   FloatSlider* mRemixZoomStartSlider{ nullptr };
    float mRemixZoomEnd;
-   FloatSlider* mRemixZoomEndSlider;
-   bool mBlockMultiPlaceEngaged;
+   FloatSlider* mRemixZoomEndSlider{ nullptr };
+   bool mBlockMultiPlaceEngaged{ false };
 
-   bool mPlayBlokPreview;
-   float mBlokPreviewPlayhead;
+   bool mPlayBlokPreview{ false };
+   float mBlokPreviewPlayhead{ 0 };
    Ramp mBlokPreviewRamp;
 
-   bool mDrawSources;
-   Checkbox* mDrawSourcesCheckbox;
+   bool mDrawSources{ false };
+   Checkbox* mDrawSourcesCheckbox{ nullptr };
 
-   int mLastRemovedRemixBlokIdx;
+   int mLastRemovedRemixBlokIdx{ -1 };
 };
 
 #endif /* defined(__modularSynth__BeatBloks__) */

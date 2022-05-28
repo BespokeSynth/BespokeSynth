@@ -36,33 +36,7 @@ namespace
 }
 
 StepSequencer::StepSequencer()
-: mGrid(nullptr)
-, mStrength(1)
-, mStrengthSlider(nullptr)
-, mGridControlTarget(nullptr)
-, mPreset(-1)
-, mPresetDropdown(nullptr)
-, mColorOffset(3)
-, mGridYOff(0)
-, mGridYOffDropdown(nullptr)
-, mAdjustOffsets(false)
-, mAdjustOffsetsCheckbox(nullptr)
-, mRepeatRate(kInterval_None)
-, mRepeatRateDropdown(nullptr)
-, mNumMeasures(1)
-, mStepInterval(kInterval_16n)
-, mStepIntervalDropdown(nullptr)
-, mCurrentColumn(0)
-, mCurrentColumnSlider(nullptr)
-, mFlusher(this)
-, mShiftLeftButton(nullptr)
-, mShiftRightButton(nullptr)
-, mIsSetUp(false)
-, mNoteInputMode(NoteInputMode::PlayStepIndex)
-, mHasExternalPulseSource(false)
-, mPush2Connected(false)
-, mRandomizationAmount(1)
-, mRandomizationDensity(.25f)
+: mFlusher(this)
 {
    mFlusher.SetInterval(mStepInterval);
 
@@ -1127,8 +1101,6 @@ StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)
 : mSeq(seq)
 , mGrid(grid)
 , mRow(row)
-, mOffset(0)
-, mPlayedStepsRoundRobin(0)
 {
    mRowPitch = row;
    TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(0, true), true);

@@ -29,8 +29,6 @@
 #include "SynthGlobals.h"
 
 VelocityToChance::VelocityToChance()
-: mLastRejectTime(0)
-, mLastAcceptTime(0)
 {
 }
 

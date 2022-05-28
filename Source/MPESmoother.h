@@ -67,15 +67,15 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
-   float mPitchSmooth;
-   FloatSlider* mPitchSmoothSlider;
-   float mPressureSmooth;
-   FloatSlider* mPressureSmoothSlider;
-   float mModWheelSmooth;
-   FloatSlider* mModWheelSmoothSlider;
+   float mPitchSmooth{ .02 };
+   FloatSlider* mPitchSmoothSlider{ nullptr };
+   float mPressureSmooth{ .02 };
+   FloatSlider* mPressureSmoothSlider{ nullptr };
+   float mModWheelSmooth{ .02 };
+   FloatSlider* mModWheelSmoothSlider{ nullptr };
 
    std::array<ModulationParameters, kNumVoices> mModulationInput;
    std::array<ModulationCollection, kNumVoices> mModulationOutput;

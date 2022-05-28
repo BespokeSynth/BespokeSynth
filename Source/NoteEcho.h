@@ -65,8 +65,8 @@ private:
 
    static const int kMaxDestinations = 5;
    std::array<float, kMaxDestinations> mDelay;
-   std::array<FloatSlider*, kMaxDestinations> mDelaySlider;
-   std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables;
-   float mWidth;
-   float mHeight;
+   std::array<FloatSlider*, kMaxDestinations> mDelaySlider{};
+   std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables{};
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

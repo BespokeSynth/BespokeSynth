@@ -72,22 +72,22 @@ private:
       h = 25;
    }
 
-   int mControllerIndex;
-   DropdownList* mControllerList;
+   int mControllerIndex{ -1 };
+   DropdownList* mControllerList{ nullptr };
 
-   MidiDevice mDevice;
+   MidiDevice mDevice{ nullptr };
 
-   int mChannel;
-   bool mUseVoiceAsChannel;
-   float mPitchBendRange;
-   int mModwheelCC;
+   int mChannel{ 1 };
+   bool mUseVoiceAsChannel{ false };
+   float mPitchBendRange{ 2 };
+   int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
 
    struct ChannelModulations
    {
       ModulationParameters mModulation;
-      float mLastPitchBend;
-      float mLastModWheel;
-      float mLastPressure;
+      float mLastPitchBend{ 0 };
+      float mLastModWheel{ 0 };
+      float mLastPressure{ 0 };
    };
 
    std::vector<ChannelModulations> mChannelModulations;

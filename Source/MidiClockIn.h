@@ -70,8 +70,8 @@ private:
       h = mHeight;
    }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
    enum class TempoRoundMode
    {
@@ -85,13 +85,13 @@ private:
    static constexpr int kMaxHistory = 40;
 
    int mDeviceIndex{ -1 };
-   DropdownList* mDeviceList;
+   DropdownList* mDeviceList{ nullptr };
    TempoRoundMode mTempoRoundMode{ TempoRoundMode::kWhole };
-   DropdownList* mTempoRoundModeList;
+   DropdownList* mTempoRoundModeList{ nullptr };
    float mStartOffsetMs{ 0 };
-   FloatSlider* mStartOffsetMsSlider;
+   FloatSlider* mStartOffsetMsSlider{ nullptr };
    int mSmoothAmount{ kMaxHistory / 2 };
-   IntSlider* mSmoothAmountSlider;
+   IntSlider* mSmoothAmountSlider{ nullptr };
 
    MidiDevice mDevice;
 

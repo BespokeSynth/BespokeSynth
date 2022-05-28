@@ -71,16 +71,16 @@ private:
       height = 35;
    }
 
-   float mPhase;
-   float mPhaseInc;
+   float mPhase{ 0 };
+   float mPhaseInc{ 0 };
 
 
-   EnvOscillator mOsc;
+   EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
+   float mVolume{ .5 };
+   FloatSlider* mVolumeSlider{ nullptr };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Metronome__) */

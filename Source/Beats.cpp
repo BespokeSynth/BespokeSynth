@@ -238,13 +238,7 @@ void BeatData::RecalcPos(double time, bool doubleTime, int numBars)
 
 BeatColumn::BeatColumn(Beats* owner, int index)
 : mOwner(owner)
-, mVolume(0)
-, mSampleIndex(-1)
 , mIndex(index)
-, mFilter(0)
-, mDoubleTime(false)
-, mNumBars(4)
-, mPan(0)
 {
    for (size_t i = 0; i < mLowpass.size(); ++i)
       mLowpass[i].SetFilterType(kFilterType_Lowpass);

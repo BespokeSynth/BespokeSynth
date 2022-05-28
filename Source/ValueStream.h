@@ -73,13 +73,13 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   IUIControl* mUIControl;
-   FloatSlider* mFloatSlider;
-   PatchCableSource* mControlCable;
-   float mWidth;
-   float mHeight;
-   float mSpeed;
-   FloatSlider* mSpeedSlider;
-   std::array<float, 100000> mValues;
-   int mValueDisplayPointer;
+   IUIControl* mUIControl{ nullptr };
+   FloatSlider* mFloatSlider{ nullptr };
+   PatchCableSource* mControlCable{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 120 };
+   float mSpeed{ 1 };
+   FloatSlider* mSpeedSlider{ nullptr };
+   std::array<float, 100000> mValues{};
+   int mValueDisplayPointer{ 0 };
 };

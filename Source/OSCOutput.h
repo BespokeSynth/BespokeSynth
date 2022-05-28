@@ -72,20 +72,20 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    char* mLabels[OSC_OUTPUT_MAX_PARAMS];
-   std::list<TextEntry*> mLabelEntry;
+   std::list<TextEntry*> mLabelEntry{ nullptr };
    float mParams[OSC_OUTPUT_MAX_PARAMS];
-   std::list<FloatSlider*> mSliders;
+   std::list<FloatSlider*> mSliders{ nullptr };
 
-   std::string mOscOutAddress;
-   TextEntry* mOscOutAddressEntry;
-   int mOscOutPort;
-   TextEntry* mOscOutPortEntry;
+   std::string mOscOutAddress{ "127.0.0.1" };
+   TextEntry* mOscOutAddressEntry{ nullptr };
+   int mOscOutPort{ 7000 };
+   TextEntry* mOscOutPortEntry{ nullptr };
 
-   std::string mNoteOutLabel;
-   TextEntry* mNoteOutLabelEntry;
+   std::string mNoteOutLabel{ "note" };
+   TextEntry* mNoteOutLabelEntry{ nullptr };
 
    juce::OSCSender mOscOut;
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

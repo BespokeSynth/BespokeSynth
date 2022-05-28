@@ -53,7 +53,7 @@ public:
    virtual void SetUpControl(IDrawableModule* owner) = 0;
    virtual void Save(int index, ofxJSONElement& prefsJson) = 0;
    virtual bool DiffersFromSavedValue() const = 0;
-   UserPrefCategory mCategory;
+   UserPrefCategory mCategory{ UserPrefCategory::General };
    std::string mName;
 };
 

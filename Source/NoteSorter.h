@@ -63,9 +63,9 @@ private:
    bool Enabled() const override { return true; }
 
    static const int kMaxDestinations = 5;
-   int mPitch[kMaxDestinations];
-   TextEntry* mPitchEntry[kMaxDestinations];
-   AdditionalNoteCable* mDestinationCables[kMaxDestinations];
-   float mWidth;
-   float mHeight;
+   int mPitch[kMaxDestinations]{};
+   TextEntry* mPitchEntry[kMaxDestinations]{};
+   AdditionalNoteCable* mDestinationCables[kMaxDestinations]{};
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

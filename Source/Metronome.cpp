@@ -29,11 +29,6 @@
 #include "Profiler.h"
 
 Metronome::Metronome()
-: mOsc(kOsc_Sin)
-, mPhase(0)
-, mPhaseInc(0)
-, mVolume(.5f)
-, mVolumeSlider(nullptr)
 {
 }
 

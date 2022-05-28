@@ -64,8 +64,8 @@ private:
    void SyncList();
    void SetIndex(int index);
 
-   RadioButton* mSelector;
-   int mCurrentValue;
+   RadioButton* mSelector{ nullptr };
+   int mCurrentValue{ 0 };
 
    std::vector<PatchCableSource*> mControlCables;
 };

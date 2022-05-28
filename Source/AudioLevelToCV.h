@@ -70,14 +70,14 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mGain;
+   float mGain{ 1 };
    float* mModulationBuffer;
-   FloatSlider* mGainSlider;
-   FloatSlider* mAttackSlider;
-   FloatSlider* mReleaseSlider;
-   float mVal;
-   float mAttack;
-   float mRelease;
-   float mAttackFactor;
-   float mReleaseFactor;
+   FloatSlider* mGainSlider{ nullptr };
+   FloatSlider* mAttackSlider{ nullptr };
+   FloatSlider* mReleaseSlider{ nullptr };
+   float mVal{ 0 };
+   float mAttack{ 10 };
+   float mRelease{ 10 };
+   float mAttackFactor{ .99 };
+   float mReleaseFactor{ .99 };
 };

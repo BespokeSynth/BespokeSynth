@@ -66,23 +66,23 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mAmount;
-   FloatSlider* mAmountSlider;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
+   float mAmount{ 0 };
+   FloatSlider* mAmountSlider{ nullptr };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
 
    LFO mLFO;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   OscillatorType mOscType;
-   DropdownList* mOscSelector;
-   FloatSlider* mDutySlider;
-   float mDuty;
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   OscillatorType mOscType{ OscillatorType::kOsc_Square };
+   DropdownList* mOscSelector{ nullptr };
+   FloatSlider* mDutySlider{ nullptr };
+   float mDuty{ .5 };
    static const int kAntiPopWindowSize = 300;
-   float mWindow[kAntiPopWindowSize];
-   int mWindowPos;
-   float mWidth;
-   float mHeight;
+   float mWindow[kAntiPopWindowSize]{};
+   int mWindowPos{ 0 };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 

@@ -70,8 +70,8 @@ private:
       h = mHeight;
    }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
    enum class ClockMultiplier
    {
@@ -83,11 +83,11 @@ private:
    };
 
    int mDeviceIndex{ -1 };
-   DropdownList* mDeviceList;
+   DropdownList* mDeviceList{ nullptr };
    bool mClockStartQueued{ false };
-   ClickButton* mStartButton;
+   ClickButton* mStartButton{ nullptr };
    ClockMultiplier mMultiplier{ ClockMultiplier::One };
-   DropdownList* mMultiplierSelector;
+   DropdownList* mMultiplierSelector{ nullptr };
 
-   MidiDevice mDevice;
+   MidiDevice mDevice{ nullptr };
 };

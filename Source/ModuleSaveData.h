@@ -91,24 +91,19 @@ public:
    {
       explicit SaveVal(std::string prop)
       : mProperty(std::move(prop))
-      , mString()
-      , mMin(0)
-      , mMax(10)
-      , mIsTextField(false)
-      , mFillDropdownFn(nullptr)
       {}
 
       std::string mProperty;
-      Type mType;
-      int mInt;
-      float mFloat;
-      bool mBool;
-      char mString[MAX_TEXTENTRY_LENGTH];
-      float mMin;
-      float mMax;
-      bool mIsTextField;
+      Type mType{ kInt };
+      int mInt{ 0 };
+      float mFloat{ 0 };
+      bool mBool{ false };
+      char mString[MAX_TEXTENTRY_LENGTH]{};
+      float mMin{ 0 };
+      float mMax{ 10 };
+      bool mIsTextField{ false };
       EnumMap mEnumValues;
-      FillDropdownFn mFillDropdownFn;
+      FillDropdownFn mFillDropdownFn{ nullptr };
    };
 
    std::list<SaveVal*>& GetSavedValues() { return mValues; }

@@ -28,9 +28,6 @@
 #include "Profiler.h"
 
 Muter::Muter()
-: mPass(false)
-, mPassCheckbox(nullptr)
-, mRampTimeMs(3)
 {
    mRamp.SetValue(0);
 }

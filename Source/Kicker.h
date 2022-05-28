@@ -62,7 +62,7 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   DrumPlayer* mDrumPlayer;
+   DrumPlayer* mDrumPlayer{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Kicker__) */

@@ -37,10 +37,6 @@
 #include "CanvasScrollbar.h"
 
 SampleCanvas::SampleCanvas()
-: mCanvas(nullptr)
-, mCanvasControls(nullptr)
-, mNumMeasures(4)
-, mInterval(kInterval_1n)
 {
 }
 

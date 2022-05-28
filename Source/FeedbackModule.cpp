@@ -30,10 +30,7 @@
 
 FeedbackModule::FeedbackModule()
 : IAudioProcessor(gBufferSize)
-, mFeedbackTarget(nullptr)
-, mFeedbackTargetCable(nullptr)
 , mFeedbackVizBuffer(VIZ_BUFFER_SECONDS * gSampleRate)
-, mSignalLimit(1)
 {
    AddChild(&mDelay);
    mDelay.SetPosition(4, 32);

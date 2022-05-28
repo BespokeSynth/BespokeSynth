@@ -110,50 +110,48 @@ private:
    void CreateParameterSliders();
    void RefreshPresetFiles();
 
-   float mVol;
-   FloatSlider* mVolSlider;
-   int mPresetFileIndex;
-   DropdownList* mPresetFileSelector;
-   ClickButton* mSavePresetFileButton;
+   float mVol{ 1 };
+   FloatSlider* mVolSlider{ nullptr };
+   int mPresetFileIndex{ -1 };
+   DropdownList* mPresetFileSelector{ nullptr };
+   ClickButton* mSavePresetFileButton{ nullptr };
    std::vector<std::string> mPresetFilePaths;
-   ClickButton* mOpenEditorButton;
-   ClickButton* mPanicButton;
+   ClickButton* mOpenEditorButton{ nullptr };
+   ClickButton* mPanicButton{ nullptr };
    std::atomic<bool> mWantsPanic{ false };
-   int mOverlayWidth;
-   int mOverlayHeight;
 
-   bool mPluginReady;
+   bool mPluginReady{ false };
    std::unique_ptr<juce::AudioProcessor> mPlugin;
    std::string mPluginName;
    std::unique_ptr<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;
    juce::MidiBuffer mFutureMidiBuffer;
    juce::CriticalSection mMidiInputLock;
-   int mNumInputs;
-   int mNumOutputs;
+   int mNumInputs{ 2 };
+   int mNumOutputs{ 2 };
 
    struct ParameterSlider
    {
-      float mValue;
-      FloatSlider* mSlider;
-      juce::AudioProcessorParameter* mParameter;
-      bool mShowing;
-      bool mInSelectorList;
+      float mValue{ 0 };
+      FloatSlider* mSlider{ nullptr };
+      juce::AudioProcessorParameter* mParameter{ nullptr };
+      bool mShowing{ false };
+      bool mInSelectorList{ true };
    };
 
    std::vector<ParameterSlider> mParameterSliders;
 
-   int mChannel;
-   bool mUseVoiceAsChannel;
-   float mPitchBendRange;
-   int mModwheelCC;
+   int mChannel{ 1 };
+   bool mUseVoiceAsChannel{ false };
+   float mPitchBendRange{ 2 };
+   int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
 
    struct ChannelModulations
    {
       ModulationParameters mModulation;
-      float mLastPitchBend;
-      float mLastModWheel;
-      float mLastPressure;
+      float mLastPitchBend{ 0 };
+      float mLastModWheel{ 0 };
+      float mLastPressure{ 0 };
    };
 
    std::vector<ChannelModulations> mChannelModulations;
@@ -161,7 +159,7 @@ private:
    ofMutex mVSTMutex;
    VSTPlayhead mPlayhead;
 
-   //NSWindowOverlay* mWindowOverlay;
+   //NSWindowOverlay* mWindowOverlay{ nullptr };
 
    enum DisplayMode
    {
@@ -169,10 +167,10 @@ private:
       kDisplayMode_PluginOverlay
    };
 
-   DisplayMode mDisplayMode;
-   int mShowParameterIndex;
-   DropdownList* mShowParameterDropdown;
-   int mTemporarilyDisplayedParamIndex;
+   DisplayMode mDisplayMode{ DisplayMode::kDisplayMode_Sliders };
+   int mShowParameterIndex{ -1 };
+   DropdownList* mShowParameterDropdown{ nullptr };
+   int mTemporarilyDisplayedParamIndex{ -1 };
 
    /*
     * Midi and MultiOut support

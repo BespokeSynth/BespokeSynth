@@ -34,16 +34,6 @@
 
 Sample::Sample()
 : mData(0)
-, mNumSamples(0)
-, mStartTime(0)
-, mOffset(FLT_MAX)
-, mRate(1)
-, mStopPoint(-1)
-, mLooping(false)
-, mNumBars(-1)
-, mVolume(1)
-, mReader(nullptr)
-, mSamplesLeftToRead(0)
 {
    mName[0] = 0;
 }

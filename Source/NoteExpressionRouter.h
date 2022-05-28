@@ -64,14 +64,14 @@ private:
    bool Enabled() const override { return true; }
 
    static const int kMaxDestinations = 5;
-   AdditionalNoteCable* mDestinationCables[kMaxDestinations];
-   float mWidth;
-   float mHeight;
+   AdditionalNoteCable* mDestinationCables[kMaxDestinations]{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
 private:
    exprtk::symbol_table<float> mSymbolTable;
    float mSTNote{ 0 }, mSTVelocity{ 0 }; // bound to the symbol table
    std::array<exprtk::expression<float>, kMaxDestinations> mExpressions;
-   TextEntry* mExpressionWidget[kMaxDestinations];
-   char mExpressionText[kMaxDestinations][MAX_TEXTENTRY_LENGTH];
+   TextEntry* mExpressionWidget[kMaxDestinations]{ nullptr };
+   char mExpressionText[kMaxDestinations][MAX_TEXTENTRY_LENGTH]{};
 };

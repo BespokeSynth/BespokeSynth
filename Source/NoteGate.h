@@ -53,8 +53,8 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
 
-   bool mGate;
-   Checkbox* mGateCheckbox;
+   bool mGate{ true };
+   Checkbox* mGateCheckbox{ nullptr };
    std::array<NoteInputElement, 128> mActiveNotes{ false };
    std::array<NoteInputElement, 128> mPendingNotes{ false };
 };

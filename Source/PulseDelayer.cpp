@@ -32,10 +32,6 @@
 #include "Profiler.h"
 
 PulseDelayer::PulseDelayer()
-: mDelay(.25f)
-, mDelaySlider(nullptr)
-, mConsumeIndex(0)
-, mAppendIndex(0)
 {
 }
 

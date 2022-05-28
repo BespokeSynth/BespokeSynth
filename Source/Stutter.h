@@ -47,11 +47,11 @@ class PatchCableSource;
 
 struct StutterParams
 {
+   StutterParams() {}
    StutterParams(NoteInterval _interval, float _speed)
    : interval(_interval)
    , speedStart(_speed)
    , speedEnd(_speed)
-   , speedBlendTime(0)
    {}
    StutterParams(NoteInterval _interval, float _speedStart, float _speedEnd, float _speedBlendTime)
    : interval(_interval)
@@ -67,10 +67,10 @@ struct StutterParams
              speedBlendTime == other.speedBlendTime;
    }
 
-   NoteInterval interval;
-   float speedStart;
-   float speedEnd;
-   float speedBlendTime;
+   NoteInterval interval{ NoteInterval::kInterval_16n };
+   float speedStart{ 1 };
+   float speedEnd{ 1 };
+   float speedBlendTime{ 0 };
 };
 
 class Stutter : public ITimeListener
@@ -92,8 +92,8 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   float mFreeStutterLength;
-   float mFreeStutterSpeed;
+   float mFreeStutterLength{ .1 };
+   float mFreeStutterSpeed{ 1 };
 
 private:
    void DoCapture();
@@ -105,26 +105,26 @@ private:
    RollingBuffer mRecordBuffer;
    ChannelBuffer mStutterBuffer;
 
-   bool mEnabled;
-   bool mStuttering;
-   int mCaptureLength;
-   int mStutterLength;
+   bool mEnabled{ true };
+   bool mStuttering{ false };
+   int mCaptureLength{ 1 };
+   int mStutterLength{ 1 };
    Ramp mStutterSpeed;
-   float mStutterPos;
-   bool mAutoStutter;
-   Checkbox* mAutoCheckbox;
+   float mStutterPos{ 0 };
+   bool mAutoStutter{ false };
+   Checkbox* mAutoCheckbox{ nullptr };
    Ramp mBlendRamp;
    static bool sQuantize;
    ofMutex mMutex;
    StutterParams mCurrentStutter;
    static int sStutterSubdivide;
-   IntSlider* mSubdivideSlider;
-   JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels];
-   int mNanopadScene;
+   IntSlider* mSubdivideSlider{ nullptr };
+   JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels]{};
+   int mNanopadScene{ 0 };
    std::list<StutterParams> mStutterStack;
    Ramp mStutterLengthRamp;
-   bool mFadeStutter;
-   Checkbox* mFadeCheckbox;
+   bool mFadeStutter{ false };
+   Checkbox* mFadeCheckbox{ nullptr };
 };
 
 

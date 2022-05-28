@@ -32,24 +32,7 @@
 #include "juce_core/juce_core.h"
 
 DelayEffect::DelayEffect()
-: mDelay(500)
-, mFeedback(0)
-, mEcho(true)
-, mDelayBuffer(DELAY_BUFFER_SIZE)
-, mDelaySlider(nullptr)
-, mFeedbackSlider(nullptr)
-, mEchoCheckbox(nullptr)
-, mInterval(kInterval_8nd)
-, mIntervalSelector(nullptr)
-, mAcceptInput(true)
-, mShortTime(false)
-, mShortTimeCheckbox(nullptr)
-, mDry(true)
-, mInvert(false)
-, mDryCheckbox(nullptr)
-, mFeedbackModuleMode(false)
-, mAcceptInputCheckbox(nullptr)
-, mInvertCheckbox(nullptr)
+: mDelayBuffer(DELAY_BUFFER_SIZE)
 {
 }
 

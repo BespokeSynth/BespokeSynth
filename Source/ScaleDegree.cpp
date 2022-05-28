@@ -30,9 +30,6 @@
 #include "UIControlMacros.h"
 
 ScaleDegree::ScaleDegree()
-: mScaleDegree(0)
-, mScaleDegreeSelector(nullptr)
-, mRetrigger(false)
 {
 }
 

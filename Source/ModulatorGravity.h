@@ -84,17 +84,17 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   float mValue;
-   float mVelocity;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   float mValue{ 0 };
+   float mVelocity{ 0 };
    Ramp mRamp;
-   float mGravity;
-   float mKickAmount;
-   float mDrag;
+   float mGravity{ -.1 };
+   float mKickAmount{ 1 };
+   float mDrag{ .005 };
 
-   FloatSlider* mGravitySlider;
-   FloatSlider* mKickAmountSlider;
-   FloatSlider* mDragSlider;
-   ClickButton* mKickButton;
+   FloatSlider* mGravitySlider{ nullptr };
+   FloatSlider* mKickAmountSlider{ nullptr };
+   FloatSlider* mDragSlider{ nullptr };
+   ClickButton* mKickButton{ nullptr };
 };

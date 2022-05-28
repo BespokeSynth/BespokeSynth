@@ -150,16 +150,7 @@ void SpawnList::SetPositionRelativeTo(SpawnList* list)
 }
 
 TitleBar::TitleBar()
-: mSaveLayoutButton(nullptr)
-, mResetLayoutButton(nullptr)
-, mSaveStateButton(nullptr)
-, mSaveStateAsButton(nullptr)
-, mLoadStateButton(nullptr)
-, mWriteAudioButton(nullptr)
-, mLoadLayoutDropdown(nullptr)
-, mLoadLayoutIndex(-1)
-, mSpawnLists(this)
-, mLeftCornerHovered(false)
+: mSpawnLists(this)
 {
    assert(TheTitleBar == nullptr);
    TheTitleBar = this;

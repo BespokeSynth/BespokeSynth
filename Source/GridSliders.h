@@ -81,10 +81,10 @@ private:
       kVertical
    };
 
-   Direction mDirection;
-   DropdownList* mDirectionSelector;
-   std::array<PatchCableSource*, 32> mControlCables;
-   GridControlTarget* mGridControlTarget;
+   Direction mDirection{ Direction::kVertical };
+   DropdownList* mDirectionSelector{ nullptr };
+   std::array<PatchCableSource*, 32> mControlCables{};
+   GridControlTarget* mGridControlTarget{ nullptr };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

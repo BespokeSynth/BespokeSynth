@@ -47,21 +47,7 @@ namespace
 }
 
 Compressor::Compressor()
-: mMix(1)
-, mDrive(1)
-, mThreshold(-24)
-, mRatio(4)
-, mAttack(.1f)
-, mRelease(100)
-, mLookahead(3)
-, mOutputAdjust(1)
-, mThresholdSlider(nullptr)
-, mRatioSlider(nullptr)
-, mAttackSlider(nullptr)
-, mReleaseSlider(nullptr)
-, mCurrentInputDb(0)
-, mOutputGain(1)
-, mDelayBuffer(kMaxLookaheadMs * gSampleRateMs)
+: mDelayBuffer(kMaxLookaheadMs * gSampleRateMs)
 {
    envdB_ = DC_OFFSET;
 }

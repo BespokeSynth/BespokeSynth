@@ -38,12 +38,12 @@ class IDrawableModule;
 class SampleVoiceParams : public IVoiceParams
 {
 public:
-   ::ADSR mAdsr;
-   float mVol;
-   float* mSampleData;
-   int mSampleLength;
-   float mDetectedFreq;
-   bool mLoop;
+   ::ADSR mAdsr{ 10, 0, 1, 10 };
+   float mVol{ 1 };
+   float* mSampleData{ nullptr };
+   int mSampleLength{ 0 };
+   float mDetectedFreq{ -1 };
+   bool mLoop{ false };
 };
 
 class SampleVoice : public IMidiVoice
@@ -62,8 +62,8 @@ public:
 
 private:
    ::ADSR mAdsr;
-   SampleVoiceParams* mVoiceParams;
-   float mPos;
+   SampleVoiceParams* mVoiceParams{};
+   float mPos{ 0 };
    IDrawableModule* mOwner;
 };
 

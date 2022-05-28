@@ -34,16 +34,6 @@ const double gSwapLength = 150.0;
 EffectChain::EffectChain()
 : IAudioProcessor(gBufferSize)
 , mDryBuffer(gBufferSize)
-, mVolume(1)
-, mVolumeSlider(nullptr)
-, mNumFXWide(3)
-, mSpawnIndex(-1)
-, mEffectSpawnList(nullptr)
-, mInitialized(false)
-, mSwapTime(-1)
-, mShowSpawnList(true)
-, mWantToDeleteEffectAtIndex(-1)
-, mPush2DisplayEffect(nullptr)
 {
 }
 

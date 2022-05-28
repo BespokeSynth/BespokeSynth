@@ -50,15 +50,10 @@ enum VoiceType
 
 struct VoiceInfo
 {
-   VoiceInfo()
-   : mPitch(-1)
-   , mNoteOn(false)
-   {}
-
-   float mPitch;
-   IMidiVoice* mVoice;
-   double mTime;
-   bool mNoteOn;
+   float mPitch{ -1 };
+   IMidiVoice* mVoice{ nullptr };
+   double mTime{ 0 };
+   bool mNoteOn{ false };
 };
 
 class PolyphonyMgr
@@ -84,7 +79,7 @@ private:
    int mLastVoice;
    ChannelBuffer mFadeOutBuffer;
    ChannelBuffer mFadeOutWorkBuffer;
-   float mWorkBuffer[2048];
+   float mWorkBuffer[2048]{};
    int mFadeOutBufferPos;
    IDrawableModule* mOwner;
    int mVoiceLimit;

@@ -66,11 +66,11 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    std::vector<std::string> mElements;
-   int mLastHoverX;
-   int mLastHoverY;
+   int mLastHoverX{ 0 };
+   int mLastHoverY{ 0 };
    juce::String mHeldKeys;
    ofVec2f mAppearAtMousePos;
 };

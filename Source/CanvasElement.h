@@ -112,17 +112,17 @@ public:
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
 
-   float mVelocity;
-   FloatSlider* mElementOffsetSlider;
-   FloatSlider* mElementLengthSlider;
-   IntSlider* mElementRowSlider;
-   IntSlider* mElementColSlider;
-   FloatSlider* mVelocitySlider;
-   int mVoiceIdx;
+   float mVelocity{ .5 };
+   FloatSlider* mElementOffsetSlider{ nullptr };
+   FloatSlider* mElementLengthSlider{ nullptr };
+   IntSlider* mElementRowSlider{ nullptr };
+   IntSlider* mElementColSlider{ nullptr };
+   FloatSlider* mVelocitySlider{ nullptr };
+   int mVoiceIdx{ -1 };
    ModulationChain mPitchBend;
    ModulationChain mModWheel;
    ModulationChain mPressure;
-   float mPan;
+   float mPan{ 0 };
    Curve mPitchBendCurve;
    Curve mModWheelCurve;
    Curve mPressureCurve;

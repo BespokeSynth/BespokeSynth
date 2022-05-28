@@ -33,13 +33,6 @@
 #include <algorithm>
 
 ValueStream::ValueStream()
-: mUIControl(nullptr)
-, mFloatSlider(nullptr)
-, mControlCable(nullptr)
-, mWidth(200)
-, mHeight(120)
-, mSpeed(1)
-, mValueDisplayPointer(0)
 {
 }
 
@@ -60,7 +53,7 @@ void ValueStream::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .1f, 5);
+   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .4f, 5);
    ENDUIBLOCK0();
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mControlCable);

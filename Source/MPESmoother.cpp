@@ -31,9 +31,6 @@
 #include "UIControlMacros.h"
 
 MPESmoother::MPESmoother()
-: mPitchSmooth(0.02f)
-, mPressureSmooth(0.02f)
-, mModWheelSmooth(0.02f)
 {
 }
 

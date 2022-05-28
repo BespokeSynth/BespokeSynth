@@ -80,10 +80,10 @@ private:
    void Save();
 
    UserPrefCategory mCategory{ UserPrefCategory::General };
-   RadioButton* mCategorySelector;
-   ClickButton* mSaveButton;
-   ClickButton* mCancelButton;
+   RadioButton* mCategorySelector{ nullptr };
+   ClickButton* mSaveButton{ nullptr };
+   ClickButton* mCancelButton{ nullptr };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 1150 };
+   float mHeight{ 50 };
 };

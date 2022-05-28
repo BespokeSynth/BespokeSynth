@@ -65,11 +65,11 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   int mControl;
-   TextEntry* mControlEntry;
-   float mValue;
-   FloatSlider* mValueSlider;
-   bool mResendDuplicateValue;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mControl{ 0 };
+   TextEntry* mControlEntry{ nullptr };
+   float mValue{ 0 };
+   FloatSlider* mValueSlider{ nullptr };
+   bool mResendDuplicateValue{ false };
 };

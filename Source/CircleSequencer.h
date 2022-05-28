@@ -57,18 +57,18 @@ public:
 private:
    float GetRadius() { return 90 - mIndex * 15; }
    int GetStepIndex(int x, int y, float& radiusOut);
-   int mLength;
-   DropdownList* mLengthSelector;
+   int mLength{ 4 };
+   DropdownList* mLengthSelector{ nullptr };
    int mPitch;
-   TextEntry* mNoteSelector;
-   CircleSequencer* mOwner;
+   TextEntry* mNoteSelector{ nullptr };
+   CircleSequencer* mOwner{ nullptr };
    int mIndex;
    std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   int mCurrentlyClickedStepIdx;
-   int mHighlightStepIdx;
-   float mLastMouseRadius;
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   int mCurrentlyClickedStepIdx{ -1 };
+   int mHighlightStepIdx{ -1 };
+   float mLastMouseRadius{ -1 };
 };
 
 class CircleSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener

@@ -86,20 +86,20 @@ public:
 private:
    void OnClicked(int x, int y, bool right) override;
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 250 };
+   float mHeight{ 122 };
 
-   Checkbox* mAdvancedDisplayCheckbox;
-   bool mAdvancedDisplay;
-   ADSRDisplay* mAdsrDisplay;
+   Checkbox* mAdvancedDisplayCheckbox{ nullptr };
+   bool mAdvancedDisplay{ false };
+   ADSRDisplay* mAdsrDisplay{ nullptr };
    EnvelopeControl mEnvelopeControl;
    ::ADSR mAdsr;
 
-   bool mUseVelocity;
-   Checkbox* mUseVelocityCheckbox;
-   float mADSRViewLength;
-   FloatSlider* mADSRViewLengthSlider;
-   Checkbox* mHasSustainStageCheckbox;
-   IntSlider* mSustainStageSlider;
-   FloatSlider* mMaxSustainSlider;
+   bool mUseVelocity{ false };
+   Checkbox* mUseVelocityCheckbox{ nullptr };
+   float mADSRViewLength{ 1000 };
+   FloatSlider* mADSRViewLengthSlider{ nullptr };
+   Checkbox* mHasSustainStageCheckbox{ nullptr };
+   IntSlider* mSustainStageSlider{ nullptr };
+   FloatSlider* mMaxSustainSlider{ nullptr };
 };

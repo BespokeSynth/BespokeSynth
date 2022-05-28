@@ -38,20 +38,7 @@
 #endif
 
 LinnstrumentControl::LinnstrumentControl()
-: mControllerIndex(-1)
-, mControllerList(nullptr)
-, mDevice(this)
-, mDecayMs(500)
-, mDecaySlider(nullptr)
-, mRequestedOctaveTime(0)
-, mBlackout(false)
-, mBlackoutCheckbox(nullptr)
-, mLightOctaves(false)
-, mLightOctavesCheckbox(nullptr)
-, mLinnstrumentOctave(5)
-, mGuitarLines(false)
-, mGuitarLinesCheckbox(nullptr)
-, mControlPlayedLights(true)
+: mDevice(this)
 {
    TheScale->AddListener(this);
 

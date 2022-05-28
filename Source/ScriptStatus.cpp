@@ -47,7 +47,6 @@
 namespace py = pybind11;
 
 ScriptStatus::ScriptStatus()
-: mNextUpdateTime(0)
 {
    ScriptModule::CheckIfPythonEverSuccessfullyInitialized();
    if ((TheSynth->IsLoadingState() || Prefab::sLoadingPrefab) && ScriptModule::sHasPythonEverSuccessfullyInitialized)

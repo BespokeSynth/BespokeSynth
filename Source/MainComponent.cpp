@@ -35,10 +35,12 @@ class MainContentComponent : public OpenGLAppComponent,
 public:
    //==============================================================================
    MainContentComponent()
-   : mLastFpsUpdateTime(0)
+   : mSpaceMouseReader(mSynth)
+   , mLastFpsUpdateTime(0)
    , mFrameCountAccum(0)
    , mPixelRatio(1)
-   , mSpaceMouseReader(mSynth)
+   , mFontBoundsVG(nullptr)
+   , mVG(nullptr)
    {
       ofLog() << "bespoke synth " << GetBuildInfoString();
 

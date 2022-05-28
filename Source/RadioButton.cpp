@@ -37,15 +37,9 @@ int RadioButton::GetSpacing()
 }
 
 RadioButton::RadioButton(IRadioButtonListener* owner, const char* name, int x, int y, int* var, RadioDirection direction /*= kRadioVertical*/)
-: mWidth(15)
-, mHeight(15)
-, mVar(var)
+: mVar(var)
 , mOwner(owner)
-, mMultiSelect(false)
 , mDirection(direction)
-, mElementWidth(8)
-, mSliderVal(0)
-, mForcedWidth(-1)
 {
    assert(owner);
    SetName(name);

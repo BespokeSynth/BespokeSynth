@@ -34,10 +34,6 @@
 #include "UIControlMacros.h"
 
 LooperGranulator::LooperGranulator()
-: mOn(false)
-, mFreeze(false)
-, mDummyPos(0)
-, mLooper(nullptr)
 {
 }
 

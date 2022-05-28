@@ -31,10 +31,6 @@
 #include "ModularSynth.h"
 
 NoteHumanizer::NoteHumanizer()
-: mTime(33.0f)
-, mTimeSlider(nullptr)
-, mVelocity(.1f)
-, mVelocitySlider(nullptr)
 {
 }
 

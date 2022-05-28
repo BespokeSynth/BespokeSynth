@@ -40,29 +40,29 @@
 class OscillatorVoiceParams : public IVoiceParams
 {
 public:
-   ::ADSR mAdsr;
-   float mVol;
-   float mPulseWidth;
-   bool mSync;
-   float mSyncFreq;
-   float mMult;
-   OscillatorType mOscType;
-   float mDetune;
-   float mShuffle;
-   float mPhaseOffset;
-   int mUnison;
-   float mUnisonWidth;
-   float mSoften;
+   ::ADSR mAdsr{ 10, 0, 1, 10 };
+   float mVol{ .25 };
+   float mPulseWidth{ .5 };
+   bool mSync{ false };
+   float mSyncFreq{ 200 };
+   float mMult{ 1 };
+   OscillatorType mOscType{ OscillatorType::kOsc_Square };
+   float mDetune{ 0 };
+   float mShuffle{ 0 };
+   float mPhaseOffset{ 0 };
+   int mUnison{ 1 };
+   float mUnisonWidth{ 0 };
+   float mSoften{ 0 };
 
-   float mFilterCutoffMax;
-   float mFilterCutoffMin;
-   float mFilterQ;
-   ::ADSR mFilterAdsr;
+   float mFilterCutoffMax{ SINGLEOSCILLATOR_NO_CUTOFF };
+   float mFilterCutoffMin{ 10 };
+   float mFilterQ{ float(sqrt(2) / 2) };
+   ::ADSR mFilterAdsr{ 1, 0, 1, 1000 };
 
-   float mVelToVolume;
-   float mVelToEnvelope;
+   float mVelToVolume{ .5 };
+   float mVelToEnvelope{ 0 };
 
-   bool mLiteCPUMode;
+   bool mLiteCPUMode{ false };
 };
 
 class SingleOscillatorVoice : public IMidiVoice
@@ -91,26 +91,20 @@ private:
 
    struct OscData
    {
-      OscData()
-      : mPhase(0)
-      , mSyncPhase(0)
-      , mOsc(kOsc_Square)
-      , mDetuneFactor(0)
-      {}
-      float mPhase;
-      float mSyncPhase;
-      Oscillator mOsc;
-      float mDetuneFactor;
-      float mCurrentPhaseInc;
+      float mPhase{ 0 };
+      float mSyncPhase{ 0 };
+      Oscillator mOsc{ kOsc_Square };
+      float mDetuneFactor{ 0 };
+      float mCurrentPhaseInc{ 0 };
    };
    OscData mOscData[kMaxUnison];
    ::ADSR mAdsr;
-   OscillatorVoiceParams* mVoiceParams;
+   OscillatorVoiceParams* mVoiceParams{ nullptr };
 
    ::ADSR mFilterAdsr;
    BiquadFilter mFilterLeft;
    BiquadFilter mFilterRight;
-   bool mUseFilter;
+   bool mUseFilter{ false };
 
    IDrawableModule* mOwner;
 };

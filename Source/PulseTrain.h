@@ -89,17 +89,17 @@ private:
    void Step(double time, float velocity, int flags);
 
    static const int kMaxSteps = 32;
-   float mVels[kMaxSteps];
-   int mLength;
-   IntSlider* mLengthSlider;
-   int mStep;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   bool mResetOnStart;
-   Checkbox* mResetOnStartCheckbox;
+   float mVels[kMaxSteps]{};
+   int mLength{ 8 };
+   IntSlider* mLengthSlider{ nullptr };
+   int mStep{ 9999 };
+   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   DropdownList* mIntervalSelector{ nullptr };
+   bool mResetOnStart{ true };
+   Checkbox* mResetOnStartCheckbox{ nullptr };
 
    static const int kIndividualStepCables = 16;
-   PatchCableSource* mStepCables[kIndividualStepCables];
+   PatchCableSource* mStepCables[kIndividualStepCables]{ nullptr };
 
-   UIGrid* mVelocityGrid;
+   UIGrid* mVelocityGrid{ nullptr };
 };

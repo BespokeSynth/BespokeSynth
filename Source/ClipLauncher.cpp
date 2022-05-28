@@ -33,8 +33,6 @@
 #include "FillSaveDropdown.h"
 
 ClipLauncher::ClipLauncher()
-: mVolume(1)
-, mVolumeSlider(nullptr)
 {
 }
 

@@ -97,11 +97,11 @@ private:
    void UpdateGridLights();
 
    Stutter mStutterProcessor;
-   Checkbox* mStutterCheckboxes[kNumStutterTypes];
-   bool mStutter[kNumStutterTypes];
-   FloatSlider* mFreeLengthSlider;
-   FloatSlider* mFreeSpeedSlider;
-   GridControlTarget* mGridControlTarget;
+   Checkbox* mStutterCheckboxes[StutterType::kNumStutterTypes]{ nullptr };
+   bool mStutter[StutterType::kNumStutterTypes]{};
+   FloatSlider* mFreeLengthSlider{ nullptr };
+   FloatSlider* mFreeSpeedSlider{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
 };
 
 #endif /* defined(__Bespoke__StutterControl__) */

@@ -62,10 +62,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   NoteInterval mRatchetDuration;
-   DropdownList* mRatchetDurationSelector;
-   NoteInterval mRatchetSubdivision;
-   DropdownList* mRatchetSubdivisionSelector;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   NoteInterval mRatchetDuration{ NoteInterval::kInterval_8n };
+   DropdownList* mRatchetDurationSelector{ nullptr };
+   NoteInterval mRatchetSubdivision{ NoteInterval::kInterval_32n };
+   DropdownList* mRatchetSubdivisionSelector{ nullptr };
 };

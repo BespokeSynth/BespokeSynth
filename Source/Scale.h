@@ -60,7 +60,7 @@ inline bool operator==(const Accidental& lhs, const Accidental& rhs)
 
 struct ScalePitches
 {
-   int mScaleRoot;
+   int mScaleRoot{ 0 };
    std::string mScaleType;
    std::vector<int> mScalePitches[2]; //double-buffered to avoid thread safety issues when modifying
    std::atomic<int> mScalePitchesFlip{ 0 };
@@ -179,28 +179,28 @@ private:
 
    ScalePitches mScale;
    std::list<IScaleListener*> mListeners;
-   DropdownList* mRootSelector;
-   DropdownList* mScaleSelector;
-   IntSlider* mScaleDegreeSlider;
-   int mScaleDegree;
+   DropdownList* mRootSelector{ nullptr };
+   DropdownList* mScaleSelector{ nullptr };
+   IntSlider* mScaleDegreeSlider{ nullptr };
+   int mScaleDegree{ 0 };
 
    ClickButton* mLoadSCLButton{ nullptr };
    ClickButton* mLoadKBMButton{ nullptr };
 
    std::vector<ScaleInfo> mScales;
-   int mNumSeptatonicScales;
-   int mScaleIndex;
+   int mNumSeptatonicScales{ 0 };
+   int mScaleIndex{ 0 };
 
-   int mPitchesPerOctave;
-   float mReferenceFreq;
-   float mReferencePitch;
-   TextEntry* mPitchesPerOctaveEntry;
-   TextEntry* mReferenceFreqEntry;
-   TextEntry* mReferencePitchEntry;
-   IntonationMode mIntonation;
-   DropdownList* mIntonationSelector;
+   int mPitchesPerOctave{ 12 };
+   float mReferenceFreq{ 440 };
+   float mReferencePitch{ 69 };
+   TextEntry* mPitchesPerOctaveEntry{ nullptr };
+   TextEntry* mReferenceFreqEntry{ nullptr };
+   TextEntry* mReferencePitchEntry{ nullptr };
+   IntonationMode mIntonation{ IntonationMode::kIntonation_Equal };
+   DropdownList* mIntonationSelector{ nullptr };
 
-   std::array<float, 256> mTuningTable;
+   std::array<float, 256> mTuningTable{};
 
    ChordDatabase mChordDatabase;
 

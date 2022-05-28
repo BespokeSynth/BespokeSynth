@@ -28,7 +28,6 @@
 
 LaunchpadInterpreter::LaunchpadInterpreter(ILaunchpadListener* listener)
 : mListener(listener)
-, mController(nullptr)
 {
    for (int i = 0; i < 64 + 8 + 8; ++i)
       mLights[i] = 0;

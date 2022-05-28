@@ -34,7 +34,7 @@
 struct DropdownListElement
 {
    std::string mLabel;
-   int mValue;
+   int mValue{ 0 };
 };
 
 class DropdownList;
@@ -84,8 +84,8 @@ private:
    int mWidth{ 1 };
    int mHeight{ 1 };
    int mColumnWidth{ 1 };
-   float mMouseX;
-   float mMouseY;
+   float mMouseX{ -1 };
+   float mMouseY{ -1 };
    DropdownList* mOwner;
    ClickButton* mPagePrevButton{ nullptr };
    ClickButton* mPageNextButton{ nullptr };
@@ -163,9 +163,9 @@ private:
    int mHeight;
    int mMaxItemWidth;
    int mMaxPerColumn;
-   int mDisplayColumns;
-   int mTotalColumns;
-   int mCurrentPagedColumn;
+   int mDisplayColumns{ 1 };
+   int mTotalColumns{ 1 };
+   int mCurrentPagedColumn{ 0 };
    std::vector<DropdownListElement> mElements;
    int* mVar;
    DropdownListModal mModalList;

@@ -42,22 +42,6 @@ const float mBufferH = 200;
 SeaOfGrain::SeaOfGrain()
 : IAudioProcessor(gBufferSize)
 , mRecordBuffer(10 * gSampleRate)
-, mRecordInput(false)
-, mHasRecordedInput(false)
-, mVolume(.6f)
-, mVolumeSlider(nullptr)
-, mSample(nullptr)
-, mLoading(false)
-, mDisplayOffset(0)
-, mDisplayOffsetSlider(nullptr)
-, mDisplayLength(10)
-, mDisplayLengthSlider(nullptr)
-, mKeyboardBasePitch(36)
-, mKeyboardBasePitchSelector(nullptr)
-, mKeyboardNumPitches(24)
-, mKeyboardNumPitchesSelector(nullptr)
-, mDisplayStartSamples(0)
-, mDisplayEndSamples(0)
 {
    mSample = new Sample();
 
@@ -440,13 +424,6 @@ void SeaOfGrain::LoadState(FileStreamIn& in)
 
 
 SeaOfGrain::GrainMPEVoice::GrainMPEVoice()
-: mADSR(100, 0, 1, 100)
-, mPitch(0)
-, mPitchBend(nullptr)
-, mPressure(nullptr)
-, mModWheel(nullptr)
-, mGain(0)
-, mOwner(nullptr)
 {
    mGranulator.mGrainLengthMs = 150;
 }
@@ -516,10 +493,6 @@ void SeaOfGrain::GrainMPEVoice::Draw(float w, float h)
 
 
 SeaOfGrain::GrainManualVoice::GrainManualVoice()
-: mGain(0)
-, mPosition(0)
-, mPan(0)
-, mOwner(nullptr)
 {
    mGranulator.mGrainLengthMs = 150;
 }

@@ -71,10 +71,10 @@ public:
 private:
    void Setup(int bufferSize);
 
-   int mActiveChannels;
-   int mNumChannels;
-   int mBufferSize;
+   int mActiveChannels{ 1 };
+   int mNumChannels{ 1 };
+   int mBufferSize{ 0 };
    float** mBuffers;
-   int mRecentActiveChannels;
-   bool mOwnsBuffers;
+   int mRecentActiveChannels{ 1 };
+   bool mOwnsBuffers{ true };
 };

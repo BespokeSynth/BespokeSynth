@@ -83,8 +83,8 @@ private:
    float PosForGain(float gain) { return .5f - gain / 30.0f; };
    float GainForPos(float pos) { return (.5f - pos) * 30; }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 825 };
+   float mHeight{ 255 };
 
    float* mWindower;
    float* mSmoother;
@@ -95,22 +95,22 @@ private:
 
    struct Filter
    {
-      bool mEnabled;
+      bool mEnabled{ false };
       std::array<BiquadFilter, 2> mFilter;
-      Checkbox* mEnabledCheckbox;
-      DropdownList* mTypeSelector;
-      FloatSlider* mFSlider;
-      FloatSlider* mGSlider;
-      FloatSlider* mQSlider;
-      bool mNeedToCalculateCoefficients;
+      Checkbox* mEnabledCheckbox{ nullptr };
+      DropdownList* mTypeSelector{ nullptr };
+      FloatSlider* mFSlider{ nullptr };
+      FloatSlider* mGSlider{ nullptr };
+      FloatSlider* mQSlider{ nullptr };
+      bool mNeedToCalculateCoefficients{ true };
 
       bool UpdateCoefficientsIfNecessary();
    };
 
    std::array<Filter, 8> mFilters;
-   int mHoveredFilterHandleIndex;
-   int mDragging;
-   std::array<float, 1024> mFrequencyResponse;
-   bool mNeedToUpdateFrequencyResponseGraph;
-   float mDrawGain;
+   int mHoveredFilterHandleIndex{ -1 };
+   int mDragging{ false };
+   std::array<float, 1024> mFrequencyResponse{};
+   bool mNeedToUpdateFrequencyResponseGraph{ true };
+   float mDrawGain{ 1 };
 };

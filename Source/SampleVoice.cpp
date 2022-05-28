@@ -31,8 +31,7 @@
 #include "ChannelBuffer.h"
 
 SampleVoice::SampleVoice(IDrawableModule* owner)
-: mPos(0)
-, mOwner(owner)
+: mOwner(owner)
 {
 }
 

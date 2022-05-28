@@ -131,46 +131,46 @@ private:
    void MouseReleased() override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 608 };
+   float mHeight{ 150 };
 
-   Sample* mSample;
-   bool mOwnsSample;
+   Sample* mSample{ nullptr };
+   bool mOwnsSample{ true };
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   float mSpeed;
-   float mPlaySpeed;
-   float mCuePointSpeed;
-   FloatSlider* mSpeedSlider;
-   ClickButton* mPlayButton;
-   ClickButton* mPauseButton;
-   ClickButton* mStopButton;
-   bool mPlay;
-   bool mLoop;
-   bool mRecord;
-   Checkbox* mLoopCheckbox;
-   Checkbox* mRecordCheckbox;
-   bool mScrubbingSample;
+   float mVolume{ 1 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   float mSpeed{ 1 };
+   float mPlaySpeed{ 1 };
+   float mCuePointSpeed{ 1 };
+   FloatSlider* mSpeedSlider{ nullptr };
+   ClickButton* mPlayButton{ nullptr };
+   ClickButton* mPauseButton{ nullptr };
+   ClickButton* mStopButton{ nullptr };
+   bool mPlay{ false };
+   bool mLoop{ false };
+   bool mRecord{ false };
+   Checkbox* mLoopCheckbox{ nullptr };
+   Checkbox* mRecordCheckbox{ nullptr };
+   bool mScrubbingSample{ false };
    std::string mYoutubeId;
-   ClickButton* mDownloadYoutubeButton;
-   TextEntry* mDownloadYoutubeSearch;
-   char mYoutubeSearch[MAX_TEXTENTRY_LENGTH];
-   ClickButton* mLoadFileButton;
-   ClickButton* mSaveFileButton;
-   bool mIsLoadingSample;
-   float mZoomLevel;
-   float mZoomOffset;
-   ClickButton* mTrimToZoomButton;
+   ClickButton* mDownloadYoutubeButton{ nullptr };
+   TextEntry* mDownloadYoutubeSearch{ nullptr };
+   char mYoutubeSearch[MAX_TEXTENTRY_LENGTH]{};
+   ClickButton* mLoadFileButton{ nullptr };
+   ClickButton* mSaveFileButton{ nullptr };
+   bool mIsLoadingSample{ false };
+   float mZoomLevel{ 1 };
+   float mZoomOffset{ 0 };
+   ClickButton* mTrimToZoomButton{ nullptr };
 
-   bool mOscWheelGrabbed;
-   float mOscWheelPos;
-   float mOscWheelSpeed;
+   bool mOscWheelGrabbed{ false };
+   float mOscWheelPos{ 0 };
+   float mOscWheelSpeed{ 0 };
 
-   ChannelBuffer mDrawBuffer;
+   ChannelBuffer mDrawBuffer{ 0 };
 
    NoteInputBuffer mNoteInputBuffer;
-   ::ADSR mAdsr;
+   ::ADSR mAdsr{ 10, 1, 1, 10 };
 
    struct SampleCuePoint
    {
@@ -180,27 +180,27 @@ private:
       bool stopOnNoteOff{ false };
    };
    std::vector<SampleCuePoint> mSampleCuePoints{ 128 };
-   DropdownList* mCuePointSelector;
-   FloatSlider* mCuePointStartSlider;
-   FloatSlider* mCuePointLengthSlider;
-   FloatSlider* mCuePointSpeedSlider;
-   Checkbox* mCuePointStopCheckbox;
-   int mActiveCuePointIndex;
-   int mHoveredCuePointIndex;
-   bool mSetCuePoint;
-   Checkbox* mSetCuePointCheckbox;
-   bool mSelectPlayedCuePoint;
-   Checkbox* mSelectPlayedCuePointCheckbox;
-   int mRecentPlayedCuePoint;
-   ClickButton* mPlayCurrentCuePointButton;
-   bool mShowGrid;
-   Checkbox* mShowGridCheckbox;
-   ClickButton* mAutoSlice4;
-   ClickButton* mAutoSlice8;
-   ClickButton* mAutoSlice16;
-   ClickButton* mAutoSlice32;
-   ClickButton* mPlayHoveredClipButton;
-   ClickButton* mGrabHoveredClipButton;
+   DropdownList* mCuePointSelector{ nullptr };
+   FloatSlider* mCuePointStartSlider{ nullptr };
+   FloatSlider* mCuePointLengthSlider{ nullptr };
+   FloatSlider* mCuePointSpeedSlider{ nullptr };
+   Checkbox* mCuePointStopCheckbox{ nullptr };
+   int mActiveCuePointIndex{ 0 };
+   int mHoveredCuePointIndex{ -1 };
+   bool mSetCuePoint{ false };
+   Checkbox* mSetCuePointCheckbox{ nullptr };
+   bool mSelectPlayedCuePoint{ false };
+   Checkbox* mSelectPlayedCuePointCheckbox{ nullptr };
+   int mRecentPlayedCuePoint{ -1 };
+   ClickButton* mPlayCurrentCuePointButton{ nullptr };
+   bool mShowGrid{ false };
+   Checkbox* mShowGridCheckbox{ nullptr };
+   ClickButton* mAutoSlice4{ nullptr };
+   ClickButton* mAutoSlice8{ nullptr };
+   ClickButton* mAutoSlice16{ nullptr };
+   ClickButton* mAutoSlice32{ nullptr };
+   ClickButton* mPlayHoveredClipButton{ nullptr };
+   ClickButton* mGrabHoveredClipButton{ nullptr };
 
    std::string mErrorString;
 
@@ -215,25 +215,25 @@ private:
    {
       std::string name;
       std::string channel;
-      float lengthSeconds;
+      float lengthSeconds{ 0 };
       std::string youtubeId;
    };
-   RunningProcessType mRunningProcessType;
-   juce::ChildProcess* mRunningProcess;
+   RunningProcessType mRunningProcessType{ RunningProcessType::None };
+   juce::ChildProcess* mRunningProcess{ nullptr };
    std::function<void()> mOnRunningProcessComplete;
    std::vector<YoutubeSearchResult> mYoutubeSearchResults;
-   std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons;
+   std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons{};
 
    SwitchAndRamp mSwitchAndRamp;
 
    std::vector<ChannelBuffer*> mRecordChunks;
-   bool mDoRecording; //separate this out from mRecord to allow setup in main thread before audio thread starts recording
-   int mRecordingLength;
-   bool mRecordingAppendMode;
-   Checkbox* mRecordingAppendModeCheckbox;
-   bool mRecordAsClips;
-   Checkbox* mRecordAsClipsCheckbox;
+   bool mDoRecording{ false }; //separate this out from mRecord to allow setup in main thread before audio thread starts recording
+   int mRecordingLength{ 0 };
+   bool mRecordingAppendMode{ false };
+   Checkbox* mRecordingAppendModeCheckbox{ nullptr };
+   bool mRecordAsClips{ false };
+   Checkbox* mRecordAsClipsCheckbox{ nullptr };
    GateEffect mRecordGate;
-   int mRecordAsClipsCueIndex;
+   int mRecordAsClipsCueIndex{ 0 };
    bool mStopOnNoteOff{ false };
 };

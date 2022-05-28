@@ -29,8 +29,6 @@
 #include "ModularSynth.h"
 
 Neighborhooder::Neighborhooder()
-: mMinPitch(55)
-, mPitchRange(16)
 {
 }
 

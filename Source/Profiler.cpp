@@ -54,7 +54,6 @@ namespace
 }
 
 Profiler::Profiler(const char* name, uint32_t hash)
-: mIndex(-1)
 {
    if (sEnableProfiler)
    {

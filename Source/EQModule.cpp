@@ -33,15 +33,9 @@
 
 EQModule::EQModule()
 : IAudioProcessor(gBufferSize)
-, mWidth(825)
-, mHeight(255)
 , mFFT(kNumFFTBins)
 , mFFTData(kNumFFTBins, kNumFFTBins / 2 + 1)
 , mRollingInputBuffer(kNumFFTBins)
-, mHoveredFilterHandleIndex(-1)
-, mDragging(false)
-, mNeedToUpdateFrequencyResponseGraph(true)
-, mDrawGain(1)
 {
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[kNumFFTBins];

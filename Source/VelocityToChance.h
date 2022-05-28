@@ -57,8 +57,8 @@ private:
    bool Enabled() const override { return mEnabled; }
 
    bool mFullVelocity{ true };
-   Checkbox* mFullVelocityCheckbox;
+   Checkbox* mFullVelocityCheckbox{ nullptr };
 
-   float mLastRejectTime;
-   float mLastAcceptTime;
+   float mLastRejectTime{ 0 };
+   float mLastAcceptTime{ 0 };
 };

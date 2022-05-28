@@ -70,15 +70,15 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
 
-   float mWidth;
-   Canvas* mCanvas;
-   CanvasElement* mSelectedElement;
-   ClickButton* mRemoveElementButton;
-   TextEntry* mNumVisibleRowsEntry;
-   ClickButton* mClearButton;
-   float mDummyFloat;
-   int mDummyInt;
-   DropdownList* mDragModeSelector;
+   float mWidth{ 200 };
+   Canvas* mCanvas{ nullptr };
+   CanvasElement* mSelectedElement{ nullptr };
+   ClickButton* mRemoveElementButton{ nullptr };
+   TextEntry* mNumVisibleRowsEntry{ nullptr };
+   ClickButton* mClearButton{ nullptr };
+   float mDummyFloat{ 0 };
+   int mDummyInt{ 0 };
+   DropdownList* mDragModeSelector{ nullptr };
 };
 
 #endif /* defined(__Bespoke__CanvasControls__) */

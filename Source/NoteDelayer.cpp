@@ -30,10 +30,6 @@
 #include "Profiler.h"
 
 NoteDelayer::NoteDelayer()
-: mDelay(.25f)
-, mDelaySlider(nullptr)
-, mConsumeIndex(0)
-, mAppendIndex(0)
 {
 }
 

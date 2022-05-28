@@ -272,7 +272,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    if (PatchCable::sActivePatchCable &&
-       (PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_Modulator || PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl) &&
+       (PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_Modulator && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl) &&
        !PatchCable::sActivePatchCable->IsValidTarget(this))
    {
       dimModule = true;

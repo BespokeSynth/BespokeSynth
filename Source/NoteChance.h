@@ -55,8 +55,8 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
 
-   float mChance;
-   FloatSlider* mChanceSlider;
-   float mLastRejectTime;
-   float mLastAcceptTime;
+   float mChance{ 1 };
+   FloatSlider* mChanceSlider{ nullptr };
+   float mLastRejectTime{ 0 };
+   float mLastAcceptTime{ 0 };
 };

@@ -32,8 +32,6 @@
 #include "UIControlMacros.h"
 
 TransposeFrom::TransposeFrom()
-: mRoot(0)
-, mRetrigger(false)
 {
    TheScale->AddListener(this);
 }

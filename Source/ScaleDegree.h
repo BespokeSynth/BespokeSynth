@@ -54,15 +54,10 @@ public:
 private:
    struct NoteInfo
    {
-      NoteInfo()
-      : mOn(false)
-      , mVelocity(0)
-      , mVoiceIdx(-1)
-      {}
-      int mOn;
-      int mVelocity;
-      int mVoiceIdx;
-      int mOutputPitch;
+      int mOn{ false };
+      int mVelocity{ 0 };
+      int mVoiceIdx{ -1 };
+      int mOutputPitch{ 0 };
    };
 
    int TransformPitch(int pitch);
@@ -76,13 +71,13 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   int mScaleDegree;
-   DropdownList* mScaleDegreeSelector;
-   std::array<NoteInfo, 128> mInputNotes;
-   Checkbox* mRetriggerCheckbox;
-   bool mRetrigger;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mScaleDegree{ 0 };
+   DropdownList* mScaleDegreeSelector{ nullptr };
+   std::array<NoteInfo, 128> mInputNotes{};
+   Checkbox* mRetriggerCheckbox{ nullptr };
+   bool mRetrigger{ false };
 };
 
 #endif /* defined(__Bespoke__ScaleDegree__) */

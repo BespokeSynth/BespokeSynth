@@ -40,8 +40,8 @@ public:
    : mTime(time)
    , mValue(value)
    {}
-   float mTime;
-   float mValue;
+   float mTime{ 0 };
+   float mValue{ 0 };
 };
 
 class Curve : public IClickable
@@ -85,8 +85,8 @@ private:
    int FindIndexForTime(float time);
    std::array<CurvePoint, 5000> mPoints;
    int mNumCurvePoints;
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    float mStart;
    float mEnd;
    ofColor mColor;

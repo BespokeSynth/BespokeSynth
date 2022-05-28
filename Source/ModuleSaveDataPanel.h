@@ -76,18 +76,18 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   IDrawableModule* mSaveModule;
+   IDrawableModule* mSaveModule{ nullptr };
    std::vector<IUIControl*> mSaveDataControls;
    std::vector<std::string> mLabels;
-   ClickButton* mApplyButton;
-   ClickButton* mDeleteButton;
-   Checkbox* mDrawDebugCheckbox;
-   ClickButton* mResetSequencerButton;
+   ClickButton* mApplyButton{ nullptr };
+   ClickButton* mDeleteButton{ nullptr };
+   Checkbox* mDrawDebugCheckbox{ nullptr };
+   ClickButton* mResetSequencerButton{ nullptr };
    std::map<DropdownList*, ModuleSaveData::SaveVal*> mStringDropdowns;
 
-   int mHeight;
-   float mAppearAmount;
-   float mAlignmentX;
+   int mHeight{ 100 };
+   float mAppearAmount{ 0 };
+   float mAlignmentX{ 100 };
 };
 
 #endif /* defined(__modularSynth__ModuleSaveDataPanel__) */

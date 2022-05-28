@@ -72,25 +72,25 @@ public:
    void RadioButtonUpdated(RadioButton* list, int oldVal);
 
 private:
-   RadioButton* mSelector;
-   int mSampleIndex;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
+   RadioButton* mSelector{ nullptr };
+   int mSampleIndex{ -1 };
+   float mVolume{ 0 };
+   FloatSlider* mVolumeSlider{ nullptr };
    BeatData mBeatData;
    int mIndex;
-   float mFilter;
-   FloatSlider* mFilterSlider;
+   float mFilter{ 0 };
+   FloatSlider* mFilterSlider{ nullptr };
    std::array<BiquadFilter, 2> mLowpass;
    std::array<BiquadFilter, 2> mHighpass;
    Beats* mOwner;
    Ramp mFilterRamp;
-   bool mDoubleTime;
-   Checkbox* mDoubleTimeCheckbox;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
+   bool mDoubleTime{ false };
+   Checkbox* mDoubleTimeCheckbox{ nullptr };
+   int mNumBars{ 4 };
+   IntSlider* mNumBarsSlider{ nullptr };
    std::vector<Sample*> mSamples;
-   float mPan;
-   FloatSlider* mPanSlider;
+   float mPan{ 0 };
+   FloatSlider* mPanSlider{ nullptr };
 };
 
 class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener

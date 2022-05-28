@@ -32,13 +32,6 @@
 
 AudioLevelToCV::AudioLevelToCV()
 : IAudioProcessor(gBufferSize)
-, mGain(1)
-, mGainSlider(nullptr)
-, mAttackSlider(nullptr)
-, mReleaseSlider(nullptr)
-, mVal(0)
-, mAttack(10)
-, mRelease(10)
 {
    mModulationBuffer = new float[gBufferSize];
 }

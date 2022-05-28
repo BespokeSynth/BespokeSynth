@@ -81,31 +81,31 @@ private:
 
    PSMoveMgr mMoveMgr;
    Ramp mVibration;
-   bool mVibronomeOn;
-   Checkbox* mVibronomeCheckbox;
-   ClickButton* mConnectButton;
-   float mMetronomeLagOffset;
-   FloatSlider* mOffsetSlider;
-   float mRoll;
-   float mPitch;
-   float mYaw;
-   float mEnergy;
-   FloatSlider* mPitchSlider;
-   FloatSlider* mYawSlider;
-   FloatSlider* mRollSlider;
-   FloatSlider* mEnergySlider;
-   ClickButton* mBindPitch;
-   ClickButton* mBindYaw;
-   ClickButton* mBindRoll;
-   ClickButton* mBindEnergy;
-   IUIControl* mPitchUIControl;
-   IUIControl* mYawUIControl;
-   IUIControl* mRollUIControl;
-   IUIControl* mEnergyUIControl;
+   bool mVibronomeOn{ false };
+   Checkbox* mVibronomeCheckbox{ nullptr };
+   ClickButton* mConnectButton{ nullptr };
+   float mMetronomeLagOffset{ 50 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   float mRoll{ .5 };
+   float mPitch{ .5 };
+   float mYaw{ 0 };
+   float mEnergy{ 0 };
+   FloatSlider* mPitchSlider{ nullptr };
+   FloatSlider* mYawSlider{ nullptr };
+   FloatSlider* mRollSlider{ nullptr };
+   FloatSlider* mEnergySlider{ nullptr };
+   ClickButton* mBindPitch{ nullptr };
+   ClickButton* mBindYaw{ nullptr };
+   ClickButton* mBindRoll{ nullptr };
+   ClickButton* mBindEnergy{ nullptr };
+   IUIControl* mPitchUIControl{ nullptr };
+   IUIControl* mYawUIControl{ nullptr };
+   IUIControl* mRollUIControl{ nullptr };
+   IUIControl* mEnergyUIControl{ nullptr };
 
-   bool mPSButtonDown;
+   bool mPSButtonDown{ false };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__modularSynth__PSMoveController__) */

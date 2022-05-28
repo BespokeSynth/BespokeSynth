@@ -31,7 +31,7 @@
 struct RadioButtonElement
 {
    std::string mLabel;
-   int mValue;
+   int mValue{ 0 };
 };
 
 enum RadioDirection
@@ -101,17 +101,17 @@ private:
 
    void OnClicked(int x, int y, bool right) override;
 
-   int mWidth;
-   int mHeight;
-   float mElementWidth;
+   int mWidth{ 15 };
+   int mHeight{ 15 };
+   float mElementWidth{ 8 };
    std::vector<RadioButtonElement> mElements;
    int* mVar;
    IRadioButtonListener* mOwner;
-   bool mMultiSelect; //makes this... not a radio button. mVar becomes a bitmask
+   bool mMultiSelect{ false }; //makes this... not a radio button. mVar becomes a bitmask
    RadioDirection mDirection;
-   float mSliderVal;
-   int mLastSetValue;
-   int mForcedWidth;
+   float mSliderVal{ 0 };
+   int mLastSetValue{ 0 };
+   int mForcedWidth{ -1 };
 };
 
 #endif /* defined(__modularSynth__RadioButton__) */

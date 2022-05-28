@@ -30,7 +30,6 @@
 #include "Profiler.h"
 
 GainStageEffect::GainStageEffect()
-: mGain(1)
 {
 }
 

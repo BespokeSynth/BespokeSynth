@@ -68,12 +68,12 @@ private:
 
    DelayEffect mDelay;
 
-   IAudioReceiver* mFeedbackTarget;
-   PatchCableSource* mFeedbackTargetCable;
+   IAudioReceiver* mFeedbackTarget{ nullptr };
+   PatchCableSource* mFeedbackTargetCable{ nullptr };
    RollingBuffer mFeedbackVizBuffer;
-   float mSignalLimit;
+   float mSignalLimit{ 1 };
    double mGainScale[ChannelBuffer::kMaxNumChannels];
-   FloatSlider* mSignalLimitSlider;
+   FloatSlider* mSignalLimitSlider{ nullptr };
 };
 
 #endif /* defined(__Bespoke__FeedbackModule__) */

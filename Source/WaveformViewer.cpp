@@ -30,21 +30,6 @@
 
 WaveformViewer::WaveformViewer()
 : IAudioProcessor(gBufferSize)
-, mDisplayFreq(220)
-, mLengthSamples(2048)
-, mDrawGain(2)
-, mPhaseAlign(true)
-, mDoubleBufferFlip(false)
-, mHueNote(nullptr)
-, mHueAudio(nullptr)
-, mHueInstrument(nullptr)
-, mHueNoteSource(nullptr)
-, mSaturation(nullptr)
-, mBrightness(nullptr)
-, mWidth(600)
-, mHeight(150)
-, mDrawWaveform(true)
-, mDrawCircle(false)
 {
    mBufferVizOffset[0] = 0;
    mBufferVizOffset[1] = 0;

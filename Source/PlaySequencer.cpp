@@ -32,22 +32,7 @@
 #include "UIControlMacros.h"
 
 PlaySequencer::PlaySequencer()
-: mInterval(kInterval_16n)
-, mNumMeasures(1)
-, mWrite(false)
-, mNoteRepeat(false)
-, mLinkColumns(false)
-, mWidth(240)
-, mUseLightVelocity(false)
-, mUseMedVelocity(false)
-, mClearLane(false)
-, mSustain(false)
-, mGrid(nullptr)
-, mVelocityFull(1)
-, mVelocityMed(.5f)
-, mVelocityLight(.25f)
 {
-
    mNoteOffScheduler.mOwner = this;
 }
 

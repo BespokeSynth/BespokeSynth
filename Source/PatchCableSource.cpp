@@ -240,7 +240,7 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
          mY = y + h / 2;
       }
    }
-   else
+   else if (mOwner != nullptr)
    {
       float x, y;
       mOwner->GetPosition(x, y);
@@ -397,7 +397,7 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
          kNone
       };
 
-      Direction dir;
+      Direction dir{ Direction::kNone };
       switch (mSide)
       {
          case Side::kBottom: dir = Direction::kDown; break;

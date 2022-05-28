@@ -29,9 +29,6 @@
 #include "SynthGlobals.h"
 
 PulseChance::PulseChance()
-: mChance(1)
-, mLastRejectTime(0)
-, mLastAcceptTime(0)
 {
 }
 

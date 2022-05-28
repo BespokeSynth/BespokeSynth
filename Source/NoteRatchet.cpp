@@ -32,8 +32,6 @@
 #include "UIControlMacros.h"
 
 NoteRatchet::NoteRatchet()
-: mRatchetDuration(kInterval_8n)
-, mRatchetSubdivision(kInterval_32n)
 {
 }
 

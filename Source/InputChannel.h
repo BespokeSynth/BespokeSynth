@@ -63,9 +63,9 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   DropdownList* mChannelSelector;
-   int mChannelSelectionIndex;
-   int mStereoSelectionOffset;
+   DropdownList* mChannelSelector{ nullptr };
+   int mChannelSelectionIndex{ 0 };
+   int mStereoSelectionOffset{ 0 };
 };
 
 #endif /* defined(__modularSynth__InputChannel__) */

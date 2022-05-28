@@ -86,68 +86,66 @@ private:
 
    float* mWorkingBuffer;
 
-   RadioButton* mASelector;
-   RadioButton* mBbSelector;
-   RadioButton* mBSelector;
-   RadioButton* mCSelector;
-   RadioButton* mDbSelector;
-   RadioButton* mDSelector;
-   RadioButton* mEbSelector;
-   RadioButton* mESelector;
-   RadioButton* mFSelector;
-   RadioButton* mGbSelector;
-   RadioButton* mGSelector;
-   RadioButton* mAbSelector;
+   RadioButton* mASelector{ nullptr };
+   RadioButton* mBbSelector{ nullptr };
+   RadioButton* mBSelector{ nullptr };
+   RadioButton* mCSelector{ nullptr };
+   RadioButton* mDbSelector{ nullptr };
+   RadioButton* mDSelector{ nullptr };
+   RadioButton* mEbSelector{ nullptr };
+   RadioButton* mESelector{ nullptr };
+   RadioButton* mFSelector{ nullptr };
+   RadioButton* mGbSelector{ nullptr };
+   RadioButton* mGSelector{ nullptr };
+   RadioButton* mAbSelector{ nullptr };
 
-   FloatSlider* mAmountSlider;
-   FloatSlider* mSmoothSlider;
-   IntSlider* mShiftSlider;
-   IntSlider* mScwarpSlider;
-   FloatSlider* mLfoampSlider;
-   FloatSlider* mLforateSlider;
-   IntSlider* mLfoshapeSlider;
-   FloatSlider* mLfosymmSlider;
-   Checkbox* mLfoquantCheckbox;
-   Checkbox* mFcorrCheckbox;
-   FloatSlider* mFwarpSlider;
-   FloatSlider* mMixSlider;
+   FloatSlider* mAmountSlider{ nullptr };
+   FloatSlider* mSmoothSlider{ nullptr };
+   IntSlider* mShiftSlider{ nullptr };
+   IntSlider* mScwarpSlider{ nullptr };
+   FloatSlider* mLfoampSlider{ nullptr };
+   FloatSlider* mLforateSlider{ nullptr };
+   IntSlider* mLfoshapeSlider{ nullptr };
+   FloatSlider* mLfosymmSlider{ nullptr };
+   Checkbox* mLfoquantCheckbox{ nullptr };
+   Checkbox* mFcorrCheckbox{ nullptr };
+   FloatSlider* mFwarpSlider{ nullptr };
+   FloatSlider* mMixSlider{ nullptr };
 
-   ClickButton* mSetFromScaleButton;
+   ClickButton* mSetFromScaleButton{ nullptr };
 
    ////////////////////////////////////////
    //ported
-   float mTune;
-   float mFixed;
-   float mPull;
-   int mA;
-   int mBb;
-   int mB;
-   int mC;
-   int mDb;
-   int mD;
-   int mEb;
-   int mE;
-   int mF;
-   int mGb;
-   int mG;
-   int mAb;
-   float mAmount;
-   float mSmooth;
-   int mShift;
-   int mScwarp;
-   float mLfoamp;
-   float mLforate;
-   int mLfoshape;
-   float mLfosymm;
-   bool mLfoquant;
-   bool mFcorr;
-   float mFwarp;
-   float mMix;
-   float mPitch;
-   float mConfidence;
-   float mInputBuffer1;
-   float mOutputBuffer1;
-   float mLatency;
+   float mTune{ 440 };
+   float mFixed{ 0 };
+   float mPull{ 0 };
+   int mA{ 0 };
+   int mBb{ 0 };
+   int mB{ 0 };
+   int mC{ 0 };
+   int mDb{ 0 };
+   int mD{ 0 };
+   int mEb{ 0 };
+   int mE{ 0 };
+   int mF{ 0 };
+   int mGb{ 0 };
+   int mG{ 0 };
+   int mAb{ 0 };
+   float mAmount{ 1 };
+   float mSmooth{ 0 };
+   int mShift{ 0 };
+   int mScwarp{ 0 };
+   float mLfoamp{ 0 };
+   float mLforate{ 0 };
+   int mLfoshape{ 0 };
+   float mLfosymm{ 0 };
+   bool mLfoquant{ false };
+   bool mFcorr{ false };
+   float mFwarp{ 0 };
+   float mMix{ 1 };
+   float mPitch{ 0 };
+   float mConfidence{ 0 };
+   float mLatency{ 0 };
    ::FFT* mFFT;
 
    unsigned long mfs; // Sample rate
@@ -170,10 +168,10 @@ private:
    float* mfftfreqim;
 
    // VARIABLES FOR LOW-RATE SECTION
-   float maref; // A tuning reference (Hz)
-   float minpitch; // Input pitch (semitones)
-   float mconf; // Confidence of pitch period estimate (between 0 and 1)
-   float moutpitch; // Output pitch (semitones)
+   float maref{ 440 }; // A tuning reference (Hz)
+   float minpitch{ 0 }; // Input pitch (semitones)
+   float mconf{ 0 }; // Confidence of pitch period estimate (between 0 and 1)
+   float moutpitch{ 0 }; // Output pitch (semitones)
    float mvthresh; // Voiced speech threshold
 
    float mpmax; // Maximum allowable pitch period (seconds)
@@ -190,7 +188,7 @@ private:
    // VARIABLES FOR PITCH SHIFTER
    float mphprdd; // default (unvoiced) phase period
    double minphinc; // input phase increment
-   double moutphinc; // input phase increment
+   double moutphinc{ 0 }; // input phase increment
    double mphincfact; // factor determining output phase increment
    double mphasein;
    double mphaseout;

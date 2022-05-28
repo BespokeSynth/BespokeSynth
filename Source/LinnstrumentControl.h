@@ -107,21 +107,15 @@ private:
       h = 7 + 17 * 4;
    }
 
-   int mControllerIndex;
-   DropdownList* mControllerList;
+   int mControllerIndex{ -1 };
+   DropdownList* mControllerList{ nullptr };
 
    struct NoteAge
    {
-      NoteAge()
-      {
-         mTime = 0;
-         mColor = 0;
-         mVoiceIndex = -1;
-      }
-      double mTime;
-      int mColor;
-      int mVoiceIndex;
-      int mOutputPitch;
+      double mTime{ 0 };
+      int mColor{ 0 };
+      int mVoiceIndex{ -1 };
+      int mOutputPitch{ 0 };
       void Update(int pitch, LinnstrumentControl* linnstrument);
    };
 
@@ -129,25 +123,25 @@ private:
    static const int kCols = 25;
    std::array<LinnstrumentColor, kRows * kCols> mGridColorState;
    std::array<NoteAge, 128> mNoteAge;
-   float mDecayMs;
-   FloatSlider* mDecaySlider;
-   bool mBlackout;
-   Checkbox* mBlackoutCheckbox;
-   bool mLightOctaves;
-   Checkbox* mLightOctavesCheckbox;
-   int mLinnstrumentOctave;
-   bool mGuitarLines;
-   Checkbox* mGuitarLinesCheckbox;
-   bool mControlPlayedLights;
+   float mDecayMs{ 500 };
+   FloatSlider* mDecaySlider{ nullptr };
+   bool mBlackout{ false };
+   Checkbox* mBlackoutCheckbox{ nullptr };
+   bool mLightOctaves{ false };
+   Checkbox* mLightOctavesCheckbox{ nullptr };
+   int mLinnstrumentOctave{ 5 };
+   bool mGuitarLines{ false };
+   Checkbox* mGuitarLinesCheckbox{ nullptr };
+   bool mControlPlayedLights{ true };
 
-   int mLastReceivedNRPNParamMSB;
-   int mLastReceivedNRPNParamLSB;
-   int mLastReceivedNRPNValueMSB;
-   int mLastReceivedNRPNValueLSB;
+   int mLastReceivedNRPNParamMSB{ 0 };
+   int mLastReceivedNRPNParamLSB{ 0 };
+   int mLastReceivedNRPNValueMSB{ 0 };
+   int mLastReceivedNRPNValueLSB{ 0 };
 
    std::array<ModulationParameters, kNumVoices> mModulators;
 
-   double mRequestedOctaveTime;
+   double mRequestedOctaveTime{ 0 };
 
    MidiDevice mDevice;
 };

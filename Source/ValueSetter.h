@@ -74,15 +74,15 @@ private:
 
    void Go();
 
-   PatchCableSource* mControlCable;
-   IUIControl* mTarget;
-   float mValue;
-   TextEntry* mValueEntry;
-   FloatSlider* mValueSlider;
-   ClickButton* mButton;
+   PatchCableSource* mControlCable{ nullptr };
+   IUIControl* mTarget{ nullptr };
+   float mValue{ 0 };
+   TextEntry* mValueEntry{ nullptr };
+   FloatSlider* mValueSlider{ nullptr };
+   ClickButton* mButton{ nullptr };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 #endif /* defined(__Bespoke__ValueSetter__) */

@@ -55,26 +55,7 @@ bool CodeEntry::sDoSyntaxHighlighting = false;
 
 CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
 : mListener(owner)
-, mCharWidth(5.85f)
-, mCharHeight(15)
-, mUndoBufferPos(0)
-, mUndosLeft(0)
-, mRedosLeft(0)
-, mCaretPosition(0)
-, mCaretPosition2(0)
-, mLastPublishTime(-999)
-, mHasError(false)
-, mErrorLine(-1)
-, mDoSyntaxHighlighting(false)
-, mAutocompleteUpdateTimer(0)
-, mWantToShowAutocomplete(false)
-, mAutocompleteHighlightIndex(0)
-, mCodeUpdated(false)
 {
-   mCaretBlink = true;
-   mCaretBlinkTimer = 0;
-   mHovered = false;
-
    SetName(name);
    SetPosition(x, y);
    mWidth = w;
@@ -1066,8 +1047,6 @@ void CodeEntry::UpdateString(std::string newString)
    mUndoBuffer[mUndoBufferPos].mString = mString;
 
    OnCodeUpdated();
-
-   mLastInputTime = gTime;
 }
 
 void CodeEntry::AddCharacter(char c)
