@@ -354,12 +354,15 @@ void PatchCableSource::Render()
          }
       }
 
-      if (mSide == Side::kBottom)
-         cableY += kPatchCableSpacing;
-      else if (mSide == Side::kLeft)
-         cableX -= kPatchCableSpacing;
-      else if (mSide == Side::kRight)
-         cableX += kPatchCableSpacing;
+      if (mHoverIndex != -1)
+      {
+         if (mSide == Side::kBottom)
+            cableY += kPatchCableSpacing;
+         else if (mSide == Side::kLeft)
+            cableX -= kPatchCableSpacing;
+         else if (mSide == Side::kRight)
+            cableX += kPatchCableSpacing;
+      }
    }
 
    ofPopStyle();
@@ -370,12 +373,15 @@ ofVec2f PatchCableSource::GetCableStart(int index) const
    float cableX = mX;
    float cableY = mY;
 
-   if (mSide == Side::kBottom)
-      cableY += kPatchCableSpacing * index;
-   else if (mSide == Side::kLeft)
-      cableX -= kPatchCableSpacing * index;
-   else if (mSide == Side::kRight)
-      cableX += kPatchCableSpacing * index;
+   if (mHoverIndex != -1)
+   {
+      if (mSide == Side::kBottom)
+         cableY += kPatchCableSpacing * index;
+      else if (mSide == Side::kLeft)
+         cableX -= kPatchCableSpacing * index;
+      else if (mSide == Side::kRight)
+         cableX += kPatchCableSpacing * index;
+   }
 
    return ofVec2f(cableX, cableY);
 }
@@ -406,7 +412,7 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
          case Side::kNone: dir = Direction::kNone; break;
       }
 
-      if (mPatchCables.size() > 0 && index < mPatchCables.size() - 1) //not the top of the cable stack
+      if (mHoverIndex != -1 && mPatchCables.size() > 0 && index < mPatchCables.size() - 1) //not the top of the cable stack
       {
          if (mSide == Side::kBottom)
          {
