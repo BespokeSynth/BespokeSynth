@@ -153,6 +153,7 @@ TitleBar::TitleBar()
 : mSpawnLists(this)
 {
    assert(TheTitleBar == nullptr);
+   TheTitleBar = this;
 
    mHelpDisplay = dynamic_cast<HelpDisplay*>(HelpDisplay::Create());
    mHelpDisplay->SetTypeName("helpdisplay");
