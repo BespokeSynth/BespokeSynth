@@ -472,7 +472,7 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 , mVolNoise(0)
 , mCutoffMax(DRUMSYNTH_NO_CUTOFF)
 , mCutoffMin(10)
-, mQ(1)
+, mQ(sqrt(2) / 2)
 {
    mTone.GetADSR()->SetNumStages(2);
    mTone.GetADSR()->GetHasSustainStage() = false;
