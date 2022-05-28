@@ -354,12 +354,15 @@ void PatchCableSource::Render()
          }
       }
 
-      if (mSide == Side::kBottom)
-         cableY += kPatchCableSpacing;
-      else if (mSide == Side::kLeft)
-         cableX -= kPatchCableSpacing;
-      else if (mSide == Side::kRight)
-         cableX += kPatchCableSpacing;
+      if (mHoverIndex != -1)
+      {
+         if (mSide == Side::kBottom)
+            cableY += kPatchCableSpacing;
+         else if (mSide == Side::kLeft)
+            cableX -= kPatchCableSpacing;
+         else if (mSide == Side::kRight)
+            cableX += kPatchCableSpacing;
+      }
    }
 
    ofPopStyle();
@@ -370,12 +373,15 @@ ofVec2f PatchCableSource::GetCableStart(int index) const
    float cableX = mX;
    float cableY = mY;
 
-   if (mSide == Side::kBottom)
-      cableY += kPatchCableSpacing * index;
-   else if (mSide == Side::kLeft)
-      cableX -= kPatchCableSpacing * index;
-   else if (mSide == Side::kRight)
-      cableX += kPatchCableSpacing * index;
+   if (mHoverIndex != -1)
+   {
+      if (mSide == Side::kBottom)
+         cableY += kPatchCableSpacing * index;
+      else if (mSide == Side::kLeft)
+         cableX -= kPatchCableSpacing * index;
+      else if (mSide == Side::kRight)
+         cableX += kPatchCableSpacing * index;
+   }
 
    return ofVec2f(cableX, cableY);
 }
@@ -406,7 +412,7 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
          case Side::kNone: dir = Direction::kNone; break;
       }
 
-      if (mPatchCables.size() > 0 && index < mPatchCables.size() - 1) //not the top of the cable stack
+      if (mHoverIndex != -1 && mPatchCables.size() > 0 && index < mPatchCables.size() - 1) //not the top of the cable stack
       {
          if (mSide == Side::kBottom)
          {
@@ -424,19 +430,30 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
          }
       }
 
+      ofVec2f ret(0, 0);
       switch (dir)
       {
          case Direction::kDown:
-            return ofVec2f(0, 1);
+            ret = ofVec2f(0, 1);
+            break;
          case Direction::kRight:
-            return ofVec2f(1, 0);
+            ret = ofVec2f(1, 0);
+            break;
          case Direction::kLeft:
-            return ofVec2f(-1, 0);
+            ret = ofVec2f(-1, 0);
+            break;
          case Direction::kUp:
-            return ofVec2f(0, -1);
-         default:
-            return ofVec2f(0, 0);
+            ret = ofVec2f(0, -1);
+            break;
+         case Direction::kNone:
+            ret = ofVec2f(0, 0);
+            break;
       }
+
+      if (mHoverIndex == -1 && mPatchCables.size() > 1)
+         ret = ret * .5f; //soften if there are multiple cables
+
+      return ret;
    }
 }
 

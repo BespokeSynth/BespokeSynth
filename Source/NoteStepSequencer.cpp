@@ -134,7 +134,7 @@ void NoteStepSequencer::CreateUIControls()
    FLOATSLIDER(mRandomizeVelocityDensitySlider, "rand vel density", &mRandomizeVelocityDensity, 0, 1);
    ENDUIBLOCK0();
 
-   mGrid = new UIGrid("notegrid", 5, 55, 200, 80, 8, 24, this);
+   mGrid = new UIGrid("notegrid", 5, 55, 210, 80, 8, 24, this);
    mVelocityGrid = new UIGrid("velocitygrid", 5, 117, 200, 45, 8, 1, this);
    mLoopResetPointSlider = new IntSlider(this, "loop reset", -1, -1, 100, 15, &mLoopResetPoint, 0, mLength);
 
@@ -330,13 +330,6 @@ void NoteStepSequencer::DrawModule()
 
    for (int i = 0; i < mGrid->GetCols(); ++i)
    {
-      if (mVels[i] == 0 || i >= mLength)
-      {
-         ofSetColor(0, 0, 0, 100);
-         ofFill();
-         ofRect(gridX + boxWidth * i, gridY, boxWidth, gridH);
-      }
-
       const float kPlayHighlightDurationMs = 250;
       if (mLastStepPlayTime[i] != -1)
       {
@@ -671,6 +664,14 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 
    mGrid->SetHighlightCol(time, mArpIndex);
    mVelocityGrid->SetHighlightCol(time, mArpIndex);
+
+   bool isPowerOfTwo = (mLength & (mLength - 1)) == 0;
+   int majorColSize = 4;
+   bool isAligned = !mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport) || (pulseFlags & kPulseFlag_Align);
+   if (isPowerOfTwo && majorColSize < mLength && isAligned)
+      mGrid->SetMajorColSize(majorColSize);
+   else
+      mGrid->SetMajorColSize(-1);
 
    UpdateLights();
    UpdateGridControllerLights(false);

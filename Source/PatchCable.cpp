@@ -210,7 +210,7 @@ void PatchCable::Render()
 
          for (int half = 0; half < 2; ++half)
          {
-            if (!UserPrefs.fade_cable_middle.Get())
+            if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                ofSetColor(lineColorAlphaed);
             else if (half == 0)
                ofSetColorGradient(lineColorAlphaed, ofColor::clear, cable.start, cableFadeOut);
@@ -227,7 +227,7 @@ void PatchCable::Render()
             ofVertex(cable.plug.x, cable.plug.y);
             ofEndShape();
 
-            if (!UserPrefs.fade_cable_middle.Get())
+            if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                break;
          }
 
@@ -245,7 +245,7 @@ void PatchCable::Render()
 
                for (int half = 0; half < 2; ++half)
                {
-                  if (!UserPrefs.fade_cable_middle.Get())
+                  if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                      ofSetColor(color);
                   else if (half == 0)
                      ofSetColorGradient(color, ofColor::clear, cable.start, cableFadeOut);
@@ -262,7 +262,7 @@ void PatchCable::Render()
                   ofVertex(cable.plug.x, cable.plug.y);
                   ofEndShape();
 
-                  if (!UserPrefs.fade_cable_middle.Get())
+                  if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                      break;
                }
 
@@ -287,7 +287,7 @@ void PatchCable::Render()
 
                   for (int half = 0; half < 2; ++half)
                   {
-                     if (!UserPrefs.fade_cable_middle.Get())
+                     if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                         ofSetColor(lineColor);
                      else if (half == 0)
                         ofSetColorGradient(lineColor, ofColor::clear, cable.start, cableFadeOut);
@@ -302,7 +302,7 @@ void PatchCable::Render()
                      }
                      ofEndShape();
 
-                     if (!UserPrefs.fade_cable_middle.Get())
+                     if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                         break;
                   }
 
@@ -351,7 +351,7 @@ void PatchCable::Render()
 
             for (int half = 0; half < 2; ++half)
             {
-               if (!UserPrefs.fade_cable_middle.Get())
+               if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                   ofSetColor(drawColor);
                else if (half == 0)
                   ofSetColorGradient(drawColor, ofColor::clear, cable.start, cableFadeOut);
@@ -373,7 +373,7 @@ void PatchCable::Render()
                ofVertex(cable.plug.x + offset.x, cable.plug.y + offset.y);
                ofEndShape();
 
-               if (!UserPrefs.fade_cable_middle.Get())
+               if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                   break;
             }
          }
@@ -417,7 +417,7 @@ void PatchCable::Render()
 
          for (int half = 0; half < 2; ++half)
          {
-            if (!UserPrefs.fade_cable_middle.Get())
+            if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                ofSetColor(lineColorAlphaed);
             else if (half == 0)
                ofSetColorGradient(lineColorAlphaed, ofColor::clear, cable.start, cableFadeOut);
@@ -434,7 +434,7 @@ void PatchCable::Render()
             ofVertex(cable.plug.x, cable.plug.y);
             ofEndShape();
 
-            if (!UserPrefs.fade_cable_middle.Get())
+            if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                break;
          }
 
