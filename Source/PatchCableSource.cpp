@@ -451,7 +451,7 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
       }
 
       if (mHoverIndex == -1 && mPatchCables.size() > 1)
-         ret = ret * .5f;  //soften if there are multiple cables
+         ret = ret * .5f; //soften if there are multiple cables
 
       return ret;
    }
