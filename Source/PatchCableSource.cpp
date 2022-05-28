@@ -430,19 +430,30 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
          }
       }
 
+      ofVec2f ret(0, 0);
       switch (dir)
       {
          case Direction::kDown:
-            return ofVec2f(0, 1);
+            ret = ofVec2f(0, 1);
+            break;
          case Direction::kRight:
-            return ofVec2f(1, 0);
+            ret = ofVec2f(1, 0);
+            break;
          case Direction::kLeft:
-            return ofVec2f(-1, 0);
+            ret = ofVec2f(-1, 0);
+            break;
          case Direction::kUp:
-            return ofVec2f(0, -1);
-         default:
-            return ofVec2f(0, 0);
+            ret = ofVec2f(0, -1);
+            break;
+         case Direction::kNone:
+            ret = ofVec2f(0, 0);
+            break;
       }
+
+      if (mHoverIndex == -1 && mPatchCables.size() > 1)
+         ret = ret * .5f;  //soften if there are multiple cables
+
+      return ret;
    }
 }
 
