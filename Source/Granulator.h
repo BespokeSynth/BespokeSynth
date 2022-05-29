@@ -66,23 +66,23 @@ public:
    void ClearGrains();
    void SetLiveMode(bool live) { mLiveMode = live; }
 
-   float mSpeed;
-   float mGrainLengthMs;
-   float mGrainOverlap;
-   float mPosRandomizeMs;
-   float mSpeedRandomize;
-   float mSpacingRandomize;
-   bool mOctaves;
-   float mWidth;
+   float mSpeed{ 1 };
+   float mGrainLengthMs{ 60 };
+   float mGrainOverlap{ 10 };
+   float mPosRandomizeMs{ 5 };
+   float mSpeedRandomize{ 0 };
+   float mSpacingRandomize{ 1 };
+   bool mOctaves{ false };
+   float mWidth{ 1 };
 
 private:
    void SpawnGrain(double time, double offset, float width);
 
-   double mNextGrainSpawnMs;
-   int mNextGrainIdx;
-   Grain mGrains[MAX_GRAINS];
-   bool mLiveMode;
-   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
+   double mNextGrainSpawnMs{ 0 };
+   int mNextGrainIdx{ 0 };
+   Grain mGrains[MAX_GRAINS]{};
+   bool mLiveMode{ false };
+   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};
 };
 
 #endif /* defined(__modularSynth__Granulator__) */

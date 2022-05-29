@@ -65,7 +65,7 @@ private:
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
 
    static const int kMaxDestinations = 5;
-   float mWeight[kMaxDestinations];
+   float mWeight[kMaxDestinations]{ 1 };
    FloatSlider* mWeightSlider[kMaxDestinations]{ nullptr };
    AdditionalNoteCable* mDestinationCables[kMaxDestinations]{ nullptr };
    float mWidth{ 200 };

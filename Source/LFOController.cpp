@@ -31,17 +31,6 @@
 LFOController* TheLFOController = nullptr;
 
 LFOController::LFOController()
-: dummy(0)
-, dummy2(0)
-, mIntervalSelector(nullptr)
-, mOscSelector(nullptr)
-, mMinSlider(nullptr)
-, mMaxSlider(nullptr)
-, mWantBind(false)
-, mBindButton(nullptr)
-, mLFO(nullptr)
-, mSlider(nullptr)
-, mStopBindTime(-1)
 {
    assert(TheLFOController == nullptr);
    TheLFOController = this;

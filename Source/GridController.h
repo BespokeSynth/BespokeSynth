@@ -104,8 +104,8 @@ private:
    }
    bool MouseMoved(float x, float y) override;
 
-   IGridControllerListener* mOwner;
-   IGridController* mGridController;
+   IGridControllerListener* mOwner{ nullptr };
+   IGridController* mGridController{ nullptr };
 };
 
 class GridControllerMidi : public IGridController
@@ -132,16 +132,16 @@ public:
    void OnInput(int control, float velocity);
 
 private:
-   unsigned int mRows;
-   unsigned int mCols;
-   int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
-   float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
-   int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
+   unsigned int mRows{ 8 };
+   unsigned int mCols{ 8 };
+   int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
+   float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
+   int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
    std::vector<int> mColors;
-   MidiMessageType mMessageType;
-   MidiController* mMidiController;
-   int mControllerPage;
-   IGridControllerListener* mOwner;
+   MidiMessageType mMessageType{ MidiMessageType::kMidiMessage_Note };
+   MidiController* mMidiController{ nullptr };
+   int mControllerPage{ 0 };
+   IGridControllerListener* mOwner{ nullptr };
 };
 
 #endif /* defined(__Bespoke__GridController__) */

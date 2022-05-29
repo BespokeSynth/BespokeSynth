@@ -65,12 +65,12 @@ private:
    bool Enabled() const override { return mEnabled; }
 
 
-   float mAmount;
-   int mWidth;
-   int mSampleCounter;
-   float mRandom;
-   FloatSlider* mAmountSlider;
-   IntSlider* mWidthSlider;
+   float mAmount{ 0 };
+   int mWidth{ 10 };
+   int mSampleCounter{ 0 };
+   float mRandom{ 0 };
+   FloatSlider* mAmountSlider{ nullptr };
+   IntSlider* mWidthSlider{ nullptr };
 };
 
 #endif /* defined(__modularSynth__NoiseEffect__) */

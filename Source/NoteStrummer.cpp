@@ -30,9 +30,6 @@
 #include "Scale.h"
 
 NoteStrummer::NoteStrummer()
-: mStrum(0)
-, mLastStrumPos(0)
-, mStrumSlider(nullptr)
 {
 }
 

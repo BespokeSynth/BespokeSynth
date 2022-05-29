@@ -70,8 +70,8 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mPitch;
-   ModulationChain* mPitchBend;
+   float mPitch{ 0 };
+   ModulationChain* mPitchBend{ nullptr };
 };
 
 #endif /* defined(__Bespoke__NoteToFreq__) */

@@ -62,9 +62,9 @@ private:
    bool Enabled() const override { return mEnabled; }
 
 
-   int mToneMod[7];
+   int mToneMod[7]{};
    IntSlider* mToneModSlider[7];
-   double mLastTimeTonePlayed[7];
+   double mLastTimeTonePlayed[7]{};
    int mLastNoteOnForPitch[127];
 };
 

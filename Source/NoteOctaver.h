@@ -58,14 +58,9 @@ public:
 private:
    struct NoteInfo
    {
-      NoteInfo()
-      : mOn(false)
-      , mVelocity(0)
-      , mVoiceIdx(-1)
-      {}
-      bool mOn;
-      int mVelocity;
-      int mVoiceIdx;
+      bool mOn{ false };
+      int mVelocity{ 0 };
+      int mVoiceIdx{ -1 };
    };
 
    //IDrawableModule
@@ -77,8 +72,8 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   int mOctave;
-   IntSlider* mOctaveSlider;
+   int mOctave{ 0 };
+   IntSlider* mOctaveSlider{ nullptr };
    std::array<NoteInfo, 128> mInputNotes;
 };
 

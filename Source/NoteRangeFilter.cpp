@@ -32,13 +32,7 @@
 #include "UIControlMacros.h"
 
 NoteRangeFilter::NoteRangeFilter()
-: mMinPitch(24)
-, mMinPitchSlider(nullptr)
-, mMaxPitch(36)
-, mMaxPitchSlider(nullptr)
-, mWrap(false)
 {
-   SetEnabled(true);
 }
 
 void NoteRangeFilter::CreateUIControls()

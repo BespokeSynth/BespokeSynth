@@ -30,10 +30,6 @@
 #include "Profiler.h"
 
 ControlTactileFeedback::ControlTactileFeedback()
-: mPhase(0)
-, mPhaseInc(0)
-, mVolume(.5f)
-, mVolumeSlider(nullptr)
 {
    mPhaseInc = GetPhaseInc(50);
 }

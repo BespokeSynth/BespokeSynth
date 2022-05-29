@@ -50,6 +50,7 @@ class ADSRDisplay;
 #define DRUMSYNTH_PAD_HEIGHT 236
 #define DRUMSYNTH_PADS_HORIZONTAL 4
 #define DRUMSYNTH_PADS_VERTICAL 2
+#define DRUMSYNTH_NO_CUTOFF 10000
 
 class DrumSynth : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public IRadioButtonListener, public ITextEntryListener
 {
@@ -86,17 +87,17 @@ private:
    {
       DrumSynthHitSerialData();
 
-      EnvOscillator mTone;
-      EnvOscillator mNoise;
+      EnvOscillator mTone{ OscillatorType::kOsc_Sin };
+      EnvOscillator mNoise{ OscillatorType::kOsc_Random };
       ::ADSR mFreqAdsr;
       ::ADSR mFilterAdsr;
-      float mFreqMax;
-      float mFreqMin;
-      float mVol;
-      float mVolNoise;
-      float mCutoffMax;
-      float mCutoffMin;
-      float mQ;
+      float mFreqMax{ 150 };
+      float mFreqMin{ 10 };
+      float mVol{ 0 };
+      float mVolNoise{ 0 };
+      float mCutoffMax{ DRUMSYNTH_NO_CUTOFF };
+      float mCutoffMin{ 10 };
+      float mQ{ 1 };
    };
 
    struct IndividualOutput;
@@ -129,9 +130,9 @@ private:
       FloatSlider* mFilterCutoffMinSlider{ nullptr };
       FloatSlider* mFilterQSlider{ nullptr };
       DrumSynth* mParent;
-      int mIndex;
-      int mX;
-      int mY;
+      int mIndex{ 0 };
+      int mX{ 0 };
+      int mY{ 0 };
       BiquadFilter mFilter;
 
       IndividualOutput* mIndividualOutput{ nullptr };
@@ -141,8 +142,6 @@ private:
    {
       IndividualOutput(DrumSynthHit* owner)
       : mHit(owner)
-      , mVizBuffer(nullptr)
-      , mPatchCableSource(nullptr)
       {
          mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS * gSampleRate);
          mPatchCableSource = new PatchCableSource(owner->mParent, kConnectionType_Audio);
@@ -157,9 +156,9 @@ private:
       {
          delete mVizBuffer;
       }
-      DrumSynthHit* mHit;
-      RollingBuffer* mVizBuffer;
-      PatchCableSource* mPatchCableSource;
+      DrumSynthHit* mHit{ nullptr };
+      RollingBuffer* mVizBuffer{ nullptr };
+      PatchCableSource* mPatchCableSource{ nullptr };
    };
 
    int GetAssociatedSampleIndex(int x, int y);

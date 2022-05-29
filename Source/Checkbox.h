@@ -76,16 +76,16 @@ private:
    void CalcSliderVal();
    void UpdateWidth();
 
-   float mWidth;
-   float mHeight;
-   bool* mVar;
-   IDrawableModule* mOwner;
-   bool mLastDisplayedValue;
-   bool mDisplayText;
-   bool mUseCircleLook;
+   float mWidth{ 15 };
+   float mHeight{ 15 };
+   bool* mVar{ nullptr };
+   IDrawableModule* mOwner{ nullptr };
+   bool mLastDisplayedValue{ false };
+   bool mDisplayText{ true };
+   bool mUseCircleLook{ false };
    ofColor mCustomColor;
-   float mSliderVal;
-   bool mLastSetValue;
+   float mSliderVal{ 0 };
+   bool mLastSetValue{ false };
 };
 
 #endif /* defined(__modularSynth__Checkbox__) */

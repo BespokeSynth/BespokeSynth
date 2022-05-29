@@ -61,15 +61,15 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mCrush;
-   float mDownsample;
-   int mSampleCounter[ChannelBuffer::kMaxNumChannels];
-   float mHeldDownsample[ChannelBuffer::kMaxNumChannels];
-   FloatSlider* mCrushSlider;
-   FloatSlider* mDownsampleSlider;
+   float mCrush{ 1 };
+   float mDownsample{ 1 };
+   int mSampleCounter[ChannelBuffer::kMaxNumChannels]{};
+   float mHeldDownsample[ChannelBuffer::kMaxNumChannels]{};
+   FloatSlider* mCrushSlider{ nullptr };
+   FloatSlider* mDownsampleSlider{ nullptr };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 #endif /* defined(__additiveSynth__BitcrushEffect__) */

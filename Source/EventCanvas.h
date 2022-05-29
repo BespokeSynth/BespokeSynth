@@ -86,26 +86,26 @@ private:
    void UpdateNumColumns();
    void SyncControlCablesToCanvas();
 
-   Canvas* mCanvas;
-   CanvasControls* mCanvasControls;
-   CanvasScrollbar* mCanvasScrollbarHorizontal;
-   float mScrollPartial;
-   TextEntry* mNumMeasuresEntry;
-   int mNumMeasures;
-   ClickButton* mQuantizeButton;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   float mPosition;
-   std::vector<PatchCableSource*> mControlCables;
-   std::vector<ofColor> mRowColors;
-   bool mRecord;
-   Checkbox* mRecordCheckbox;
-   float mPreviousPosition;
+   Canvas* mCanvas{ nullptr };
+   CanvasControls* mCanvasControls{ nullptr };
+   CanvasScrollbar* mCanvasScrollbarHorizontal{ nullptr };
+   float mScrollPartial{ 0 };
+   TextEntry* mNumMeasuresEntry{ nullptr };
+   int mNumMeasures{ 1 };
+   ClickButton* mQuantizeButton{ nullptr };
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   float mPosition{ 0 };
+   std::vector<PatchCableSource*> mControlCables{};
+   std::vector<ofColor> mRowColors{};
+   bool mRecord{ false };
+   Checkbox* mRecordCheckbox{ nullptr };
+   float mPreviousPosition{ 0 };
 
    struct ControlConnection
    {
-      IUIControl* mUIControl;
-      float mLastValue;
+      IUIControl* mUIControl{ nullptr };
+      float mLastValue{ 0 };
    };
 
    const int kMaxEventRows = 256;

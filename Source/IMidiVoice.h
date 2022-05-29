@@ -34,10 +34,7 @@ class IVoiceParams;
 class IMidiVoice
 {
 public:
-   IMidiVoice()
-   : mPitch(0)
-   , mPan(0)
-   {}
+   IMidiVoice() {}
    virtual ~IMidiVoice() {}
    virtual void ClearVoice() = 0;
    void SetPitch(float pitch) { mPitch = ofClamp(pitch, 0, 127); }
@@ -63,8 +60,8 @@ public:
    float GetPressure(int samplesIn) { return mModulators.pressure ? mModulators.pressure->GetValue(samplesIn) : 0.5f; }
 
 private:
-   float mPitch;
-   float mPan;
+   float mPitch{ 0 };
+   float mPan{ 0 };
    ModulationParameters mModulators;
 };
 

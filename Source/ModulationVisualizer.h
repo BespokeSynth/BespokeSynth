@@ -58,11 +58,8 @@ private:
 
    struct VizVoice
    {
-      VizVoice()
-      : mActive(false)
-      {}
       std::string GetInfoString();
-      bool mActive;
+      bool mActive{ false };
       ModulationParameters mModulators;
    };
 

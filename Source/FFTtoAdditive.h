@@ -79,7 +79,7 @@ private:
 
    FFTData mFFTData;
 
-   float* mWindower;
+   float* mWindower{ nullptr };
 
    ::FFT mFFT;
    RollingBuffer mRollingInputBuffer;
@@ -102,7 +102,7 @@ private:
 
    float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH + 1]{};
    int mHistoryPtr{ 0 };
-   float* mPhaseInc;
+   float* mPhaseInc{ nullptr };
 };
 
 #endif /* defined(__modularSynth__FFTtoAdditive__) */

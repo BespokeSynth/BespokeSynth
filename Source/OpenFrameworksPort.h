@@ -24,7 +24,6 @@ struct ofColor
    : r(_r)
    , g(_g)
    , b(_b)
-   , a(255)
    {}
    ofColor(int _r, int _g, int _b, int _a)
    : r(_r)
@@ -48,10 +47,10 @@ struct ofColor
    ofColor operator*(const ofColor& other);
    ofColor operator*(float f);
    ofColor operator+(const ofColor& other);
-   int r;
-   int g;
-   int b;
-   int a;
+   int r{ 0 };
+   int g{ 0 };
+   int b{ 0 };
+   int a{ 255 };
 
    static ofColor black, white, grey, red, green, yellow, blue, orange, purple, lime, magenta, clear;
 
@@ -64,8 +63,6 @@ struct ofColor
 struct ofVec2f
 {
    ofVec2f()
-   : x(0)
-   , y(0)
    {}
    ofVec2f(float _x, float _y)
    : x(_x)
@@ -120,16 +117,13 @@ struct ofVec2f
       y += other.y;
       return *this;
    }
-   float x;
-   float y;
+   float x{ 0 };
+   float y{ 0 };
 };
 
 struct ofVec3f
 {
    ofVec3f()
-   : x(0)
-   , y(0)
-   , z(0)
    {}
    ofVec3f(float _x, float _y, float _z)
    : x(_x)
@@ -140,18 +134,14 @@ struct ofVec3f
    {
       return sqrt(x * x + y * y + z * z);
    }
-   float x;
-   float y;
-   float z;
+   float x{ 0 };
+   float y{ 0 };
+   float z{ 0 };
 };
 
 struct ofRectangle
 {
    ofRectangle()
-   : x(0)
-   , y(0)
-   , width(100)
-   , height(100)
    {}
    ofRectangle(float _x, float _y, float _w, float _h)
    : x(_x)
@@ -186,10 +176,10 @@ struct ofRectangle
    float getMinY() const;
    float getMaxY() const;
    ofVec2f getCenter() const { return ofVec2f(x + width * .5f, y + height * .5f); }
-   float x;
-   float y;
-   float width;
-   float height;
+   float x{ 0 };
+   float y{ 0 };
+   float width{ 100 };
+   float height{ 100 };
 };
 
 using ofMutex = std::recursive_mutex;

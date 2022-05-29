@@ -66,29 +66,29 @@ private:
    void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return mEnabled; }
 
-   float mExpressionInput;
-   FloatSlider* mExpressionInputSlider;
-   float mA;
-   FloatSlider* mASlider;
-   float mB;
-   FloatSlider* mBSlider;
-   float mC;
-   FloatSlider* mCSlider;
-   float mD;
-   FloatSlider* mDSlider;
-   float mE;
-   FloatSlider* mESlider;
+   float mExpressionInput{ 0 };
+   FloatSlider* mExpressionInputSlider{ nullptr };
+   float mA{ 0 };
+   FloatSlider* mASlider{ nullptr };
+   float mB{ 0 };
+   FloatSlider* mBSlider{ nullptr };
+   float mC{ 0 };
+   FloatSlider* mCSlider{ nullptr };
+   float mD{ 0 };
+   FloatSlider* mDSlider{ nullptr };
+   float mE{ 0 };
+   FloatSlider* mESlider{ nullptr };
 
-   std::string mEntryString;
-   TextEntry* mTextEntry;
+   std::string mEntryString{ "x" };
+   TextEntry* mTextEntry{ nullptr };
    exprtk::symbol_table<float> mSymbolTable;
    exprtk::expression<float> mExpression;
    exprtk::symbol_table<float> mSymbolTableDraw;
    exprtk::expression<float> mExpressionDraw;
 
-   float mExpressionInputDraw;
-   float mT;
-   bool mExpressionValid;
-   float mLastDrawMinOutput;
-   float mLastDrawMaxOutput;
+   float mExpressionInputDraw{ 0 };
+   float mT{ 0 };
+   bool mExpressionValid{ false };
+   float mLastDrawMinOutput{ 0 };
+   float mLastDrawMaxOutput{ 1 };
 };

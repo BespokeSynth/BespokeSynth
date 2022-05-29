@@ -74,18 +74,18 @@ private:
 
    void ResetFilter();
 
-   float mF;
-   FloatSlider* mFSlider;
-   float mQ;
-   FloatSlider* mQSlider;
+   float mF{ 2000 };
+   FloatSlider* mFSlider{ nullptr };
+   float mQ{ 0 };
+   FloatSlider* mQSlider{ nullptr };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
-   CFilterButterworth24db mButterworth[ChannelBuffer::kMaxNumChannels];
+   CFilterButterworth24db mButterworth[ChannelBuffer::kMaxNumChannels]{};
    ChannelBuffer mDryBuffer;
 
-   bool mCoefficientsHaveChanged;
+   bool mCoefficientsHaveChanged{ true };
 };
 
 #endif /* defined(__Bespoke__ButterworthFilterEffect__) */

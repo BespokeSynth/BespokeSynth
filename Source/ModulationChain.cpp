@@ -26,11 +26,6 @@
 #include "ModulationChain.h"
 
 ModulationChain::ModulationChain()
-: mLFOAmount(0)
-, mPrev(nullptr)
-, mSidechain(nullptr)
-, mMultiplyIn(nullptr)
-, mBuffer(nullptr)
 {
    mLFO.SetMode(kLFOMode_Oscillator);
 }

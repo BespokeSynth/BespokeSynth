@@ -55,7 +55,7 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   ClickButton* mFlushButton;
+   ClickButton* mFlushButton{ nullptr };
 };
 
 

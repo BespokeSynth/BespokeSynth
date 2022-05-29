@@ -61,12 +61,12 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   int mMinPitch;
-   IntSlider* mMinPitchSlider;
-   int mMaxPitch;
-   IntSlider* mMaxPitchSlider;
-   bool mWrap;
-   Checkbox* mWrapCheckbox;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mMinPitch{ 24 };
+   IntSlider* mMinPitchSlider{ nullptr };
+   int mMaxPitch{ 36 };
+   IntSlider* mMaxPitchSlider{ nullptr };
+   bool mWrap{ false };
+   Checkbox* mWrapCheckbox{ nullptr };
 };

@@ -131,29 +131,29 @@ private:
          return 0;
    }
 
-   int mRootNote;
+   int mRootNote{ 4 }; // 4 = E
 
-   int mCurrentNotes[128];
-   bool mTestKeyHeld;
-   int mOctave;
-   IntSlider* mOctaveSlider;
-   bool mLatch;
-   Checkbox* mLatchCheckbox;
-   LaunchpadLayout mLayout;
-   DropdownList* mLayoutDropdown;
-   int mCurrentChord;
+   int mCurrentNotes[128]{};
+   bool mTestKeyHeld{ false };
+   int mOctave{ 3 };
+   IntSlider* mOctaveSlider{ nullptr };
+   bool mLatch{ false };
+   Checkbox* mLatchCheckbox{ nullptr };
+   LaunchpadLayout mLayout{ LaunchpadLayout::kChromatic };
+   DropdownList* mLayoutDropdown{ nullptr };
+   int mCurrentChord{ 0 };
    std::vector<std::vector<int> > mChords;
-   LaunchpadNoteDisplayer* mDisplayer;
-   ArrangementMode mArrangementMode;
-   DropdownList* mArrangementModeDropdown;
+   LaunchpadNoteDisplayer* mDisplayer{ nullptr };
+   ArrangementMode mArrangementMode{ ArrangementMode::kFull };
+   DropdownList* mArrangementModeDropdown{ nullptr };
    std::list<int> mHeldChordTones;
-   Chorder* mChorder;
-   bool mLatchChords;
-   Checkbox* mLatchChordsCheckbox;
-   bool mWasChorderEnabled;
-   bool mPreserveChordRoot;
-   Checkbox* mPreserveChordRootCheckbox;
-   GridControlTarget* mGridControlTarget;
+   Chorder* mChorder{ nullptr };
+   bool mLatchChords{ false };
+   Checkbox* mLatchChordsCheckbox{ nullptr };
+   bool mWasChorderEnabled{ false };
+   bool mPreserveChordRoot{ true };
+   Checkbox* mPreserveChordRootCheckbox{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
 
    std::string mDebugLines;
 };

@@ -46,10 +46,10 @@ public:
 private:
    std::vector<CLinkwitzRiley_4thOrder> mBands;
    std::vector<PeakTracker> mPeaks;
-   int mNumBands;
-   float mMinFreq;
-   float mMaxFreq;
-   float* mWorkBuffer;
+   int mNumBands{ 8 };
+   float mMinFreq{ 150 };
+   float mMaxFreq{ 15000 };
+   float* mWorkBuffer{ nullptr };
    ofMutex mMutex;
 };
 

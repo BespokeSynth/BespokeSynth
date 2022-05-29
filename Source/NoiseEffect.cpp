@@ -28,12 +28,6 @@
 #include "Profiler.h"
 
 NoiseEffect::NoiseEffect()
-: mAmount(0)
-, mWidth(10)
-, mSampleCounter(0)
-, mRandom(0)
-, mAmountSlider(nullptr)
-, mWidthSlider(nullptr)
 {
 }
 

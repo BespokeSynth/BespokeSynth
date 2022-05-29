@@ -29,8 +29,6 @@
 
 Amplifier::Amplifier()
 : IAudioProcessor(gBufferSize)
-, mGain(1)
-, mGainSlider(nullptr)
 {
 }
 

@@ -30,8 +30,6 @@
 #include "ModularSynth.h"
 
 FourOnTheFloor::FourOnTheFloor()
-: mTwoOnTheFloor(false)
-, mTwoOnTheFloorCheckbox(nullptr)
 {
 }
 

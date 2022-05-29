@@ -94,14 +94,14 @@ protected:
    virtual bool MouseMoved(float x, float y) { return false; }
    virtual bool MouseScrolled(int x, int y, float scrollX, float scrollY) { return false; }
 
-   float mX;
-   float mY;
-   IClickable* mParent;
-   bool mShowing;
+   float mX{ 0 };
+   float mY{ 0 };
+   IClickable* mParent{ nullptr };
+   bool mShowing{ true };
 
 private:
-   char mName[MAX_TEXTENTRY_LENGTH];
-   double mBeaconTime;
+   char mName[MAX_TEXTENTRY_LENGTH]{};
+   double mBeaconTime{ -999 };
 };
 
 #endif /* defined(__modularSynth__IClickable__) */

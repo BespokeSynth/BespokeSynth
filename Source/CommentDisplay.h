@@ -53,8 +53,8 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   char mComment[MAX_TEXTENTRY_LENGTH];
-   TextEntry* mCommentEntry;
+   char mComment[MAX_TEXTENTRY_LENGTH]{};
+   TextEntry* mCommentEntry{ nullptr };
 };
 
 

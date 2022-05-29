@@ -30,7 +30,6 @@
 #include "ModularSynth.h"
 
 ChordHolder::ChordHolder()
-: mOnlyPlayWhenPulsed(false)
 {
 }
 

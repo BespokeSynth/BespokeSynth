@@ -31,12 +31,6 @@
 #include "PatchCableSource.h"
 
 ModulatorAddCentered::ModulatorAddCentered()
-: mValue1(0)
-, mValue2(0)
-, mValue2Range(1)
-, mValue1Slider(nullptr)
-, mValue2Slider(nullptr)
-, mValue2RangeSlider(nullptr)
 {
 }
 

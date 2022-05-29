@@ -35,18 +35,6 @@ class CLinkwitzRiley_4thOrder
 public:
    CLinkwitzRiley_4thOrder(const double crossoverFreq = 1000.0)
    : mCrossoverFreq(crossoverFreq)
-   , mXm1(0.0)
-   , mXm2(0.0)
-   , mXm3(0.0)
-   , mXm4(0.0)
-   , mLYm1(0.0)
-   , mLYm2(0.0)
-   , mLYm3(0.0)
-   , mLYm4(0.0)
-   , mHYm1(0.0)
-   , mHYm2(0.0)
-   , mHYm3(0.0)
-   , mHYm4(0.0)
    {
       CalculateCoefficients();
    }
@@ -116,9 +104,9 @@ private:
    double mB1, mB2, mB3, mB4; // shared with lp & hp
    double mL_A0, mL_A1, mL_A2, mL_A3, mL_A4; // lp coefficients
    double mH_A0, mH_A1, mH_A2, mH_A3, mH_A4; // hp coefficients
-   double mXm1, mXm2, mXm3, mXm4; // incoming sample history
-   double mLYm1, mLYm2, mLYm3, mLYm4; // low output history
-   double mHYm1, mHYm2, mHYm3, mHYm4; // high output history
+   double mXm1{ 0 }, mXm2{ 0 }, mXm3{ 0 }, mXm4{ 0 }; // incoming sample history
+   double mLYm1{ 0 }, mLYm2{ 0 }, mLYm3{ 0 }, mLYm4{ 0 }; // low output history
+   double mHYm1{ 0 }, mHYm2{ 0 }, mHYm3{ 0 }, mHYm4{ 0 }; // high output history
 };
 
 /*As for how to use it, pretty easy:

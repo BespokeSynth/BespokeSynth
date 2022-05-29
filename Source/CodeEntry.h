@@ -143,8 +143,8 @@ private:
    };
 
    ICodeEntryListener* mListener;
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    float mCharWidth{ 5.85 };
    float mCharHeight{ 15 };
    std::string mString;

@@ -92,11 +92,11 @@ private:
    bool ButtonLit() const;
 
    void OnClicked(int x, int y, bool right) override;
-   float mWidth;
-   float mHeight;
-   double mClickTime;
-   IButtonListener* mOwner;
-   ButtonDisplayStyle mDisplayStyle;
+   float mWidth{ 20 };
+   float mHeight{ 15 };
+   double mClickTime{ -9999 };
+   IButtonListener* mOwner{ nullptr };
+   ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };
 };
 
 #endif /* defined(__modularSynth__ClickButton__) */

@@ -58,5 +58,5 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   bool mNoteState[128];
+   bool mNoteState[128]{};
 };

@@ -55,6 +55,6 @@ private:
    std::array<bool, 128> mGate;
    std::array<float, 128> mLastPlayTime;
    std::vector<Checkbox*> mGateCheckboxes;
-   int mMinPitch;
-   int mMaxPitch;
+   int mMinPitch{ 0 };
+   int mMaxPitch{ 7 };
 };

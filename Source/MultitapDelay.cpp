@@ -39,12 +39,7 @@ const float mBufferH = 200;
 
 MultitapDelay::MultitapDelay()
 : IAudioProcessor(gBufferSize)
-, mNumTaps(4)
 , mWriteBuffer(gBufferSize)
-, mDryAmountSlider(nullptr)
-, mDryAmount(1)
-, mDisplayLengthSlider(nullptr)
-, mDisplayLength(10)
 , mDelayBuffer(5 * gSampleRate)
 {
    mTaps.resize(mNumTaps);

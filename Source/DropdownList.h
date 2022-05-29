@@ -86,7 +86,7 @@ private:
    int mColumnWidth{ 1 };
    float mMouseX{ -1 };
    float mMouseY{ -1 };
-   DropdownList* mOwner;
+   DropdownList* mOwner{ nullptr };
    ClickButton* mPagePrevButton{ nullptr };
    ClickButton* mPageNextButton{ nullptr };
    bool mIsScrolling{ false };
@@ -159,25 +159,25 @@ private:
    void CalculateWidth();
    ofVec2f GetModalListPosition() const;
 
-   int mWidth;
-   int mHeight;
-   int mMaxItemWidth;
-   int mMaxPerColumn;
+   int mWidth{ 35 };
+   int mHeight{ DropdownList::kItemSpacing };
+   int mMaxItemWidth{ 20 };
+   int mMaxPerColumn{ 40 };
    int mDisplayColumns{ 1 };
    int mTotalColumns{ 1 };
    int mCurrentPagedColumn{ 0 };
-   std::vector<DropdownListElement> mElements;
+   std::vector<DropdownListElement> mElements{};
    int* mVar;
    DropdownListModal mModalList;
-   IDropdownListener* mOwner;
-   std::string mUnknownItemString;
-   bool mDrawLabel;
-   float mLabelSize;
-   float mSliderVal;
-   int mLastSetValue;
-   bool mAutoCalculateWidth;
-   bool mDrawTriangle;
-   double mLastScrolledTime;
+   IDropdownListener* mOwner{ nullptr };
+   std::string mUnknownItemString{ "-----" };
+   bool mDrawLabel{ false };
+   float mLabelSize{ 0 };
+   float mSliderVal{ 0 };
+   int mLastSetValue{ 0 };
+   bool mAutoCalculateWidth{ false };
+   bool mDrawTriangle{ true };
+   double mLastScrolledTime{ -9999 };
 };
 
 #endif /* defined(__modularSynth__DropdownList__) */

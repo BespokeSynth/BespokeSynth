@@ -54,7 +54,7 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
 
-   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
+   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};
 };
 
 #endif /* defined(__Bespoke__DCRemoverEffect__) */

@@ -30,12 +30,10 @@
 #include "ModularSynth.h"
 
 EnvelopeModulator::EnvelopeModulator()
-: mEnvelopeControl(ofVec2f(105, 5), ofVec2f(mWidth - 110, mHeight - 10))
 {
    mEnvelopeControl.SetViewLength(mADSRViewLength);
    mEnvelopeControl.SetADSR(&mAdsr);
    mAdsr.GetFreeReleaseLevel() = true;
-   mAdsr.Set(10, 100, .5f, 100);
 }
 
 void EnvelopeModulator::CreateUIControls()

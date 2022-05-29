@@ -35,8 +35,6 @@
 #include "ADSRDisplay.h"
 #include "UIControlMacros.h"
 
-#define DRUMSYNTH_NO_CUTOFF 10000
-
 DrumSynth::DrumSynth()
 {
    for (int i = 0; i < (int)mHits.size(); ++i)
@@ -464,15 +462,6 @@ void DrumSynth::DrumSynthHit::Draw()
 }
 
 DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
-: mTone(kOsc_Sin)
-, mNoise(kOsc_Random)
-, mFreqMax(150)
-, mFreqMin(10)
-, mVol(0)
-, mVolNoise(0)
-, mCutoffMax(DRUMSYNTH_NO_CUTOFF)
-, mCutoffMin(10)
-, mQ(1)
 {
    mTone.GetADSR()->SetNumStages(2);
    mTone.GetADSR()->GetHasSustainStage() = false;

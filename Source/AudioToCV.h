@@ -70,7 +70,7 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mGain;
-   float* mModulationBuffer;
-   FloatSlider* mGainSlider;
+   float mGain{ 1 };
+   float* mModulationBuffer{ nullptr };
+   FloatSlider* mGainSlider{ nullptr };
 };

@@ -62,8 +62,8 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   int mPitch;
-   IntSlider* mPitchSlider;
+   int mPitch{ 36 };
+   IntSlider* mPitchSlider{ nullptr };
 };
 
 #endif /* defined(__Bespoke__PitchAssigner__) */

@@ -83,12 +83,12 @@ private:
       virtual float Value(int samplesIn = 0) override;
       virtual bool Active() const override { return mOwner->Enabled(); }
 
-      MacroSlider* mOwner;
-      int mIndex;
+      MacroSlider* mOwner{ nullptr };
+      int mIndex{ 0 };
    };
 
-   FloatSlider* mSlider;
-   float mValue;
+   FloatSlider* mSlider{ nullptr };
+   float mValue{ 0 };
    std::vector<Mapping*> mMappings;
 };
 

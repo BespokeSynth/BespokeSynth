@@ -86,8 +86,8 @@ private:
    float mWidth{ 825 };
    float mHeight{ 255 };
 
-   float* mWindower;
-   float* mSmoother;
+   float* mWindower{ nullptr };
+   float* mSmoother{ nullptr };
 
    ::FFT mFFT;
    FFTData mFFTData;

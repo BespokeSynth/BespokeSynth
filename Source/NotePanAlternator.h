@@ -62,9 +62,9 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   bool mFlip;
-   float mPanOne;
-   FloatSlider* mPanOneSlider;
-   float mPanTwo;
-   FloatSlider* mPanTwoSlider;
+   bool mFlip{ false };
+   float mPanOne{ -1 };
+   FloatSlider* mPanOneSlider{ nullptr };
+   float mPanTwo{ 1 };
+   FloatSlider* mPanTwoSlider{ nullptr };
 };

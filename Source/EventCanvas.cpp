@@ -36,21 +36,7 @@
 #include "CanvasScrollbar.h"
 
 EventCanvas::EventCanvas()
-: mCanvas(nullptr)
-, mCanvasControls(nullptr)
-, mNumMeasuresEntry(nullptr)
-, mNumMeasures(1)
-, mQuantizeButton(nullptr)
-, mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mScrollPartial(0)
-, mPosition(0)
-, mRecord(false)
-, mRecordCheckbox(nullptr)
-, mPreviousPosition(0)
 {
-   SetEnabled(true);
-
    mRowColors.push_back(ofColor::red);
    mRowColors.push_back(ofColor::green);
    mRowColors.push_back(ofColor::blue);

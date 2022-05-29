@@ -74,36 +74,7 @@ void AtExit()
 }
 
 ModularSynth::ModularSynth()
-: mMoveModule(nullptr)
-, mIsMousePanning(false)
-, mGlobalRecordBuffer(nullptr)
-, mAudioPaused(false)
-, mIsLoadingState(false)
-, mClickStartX(INT_MAX)
-, mClickStartY(INT_MAX)
-, mWantReloadInitialLayout(false)
-, mHeldSample(nullptr)
-, mConsoleListener(nullptr)
-, mUserPrefsEditor(nullptr)
-, mLastClickedModule(nullptr)
-, mMinimap(nullptr)
-, mInitialized(false)
-, mRecordingLength(0)
-, mGroupSelectContext(nullptr)
-, mResizeModule(nullptr)
-, mShowLoadStatePopup(false)
-, mLastSaveTime(-9999)
-, mHasDuplicatedDuringDrag(false)
-, mHasAutopatchedToTargetDuringDrag(false)
-, mFrameRate(0)
-, mQuickSpawn(nullptr)
-, mScheduledEnvelopeEditorSpawnDisplay(nullptr)
-, mFrameCount(0)
-, mIsLoadingModule(false)
-, mLastClapboardTime(-9999)
-, mPixelRatio(1)
 {
-   mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
    TheSynth = this;
 

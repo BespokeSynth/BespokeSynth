@@ -35,16 +35,6 @@
 #include "ChannelBuffer.h"
 
 LoopStorer::LoopStorer()
-: mCurrentBufferIdx(0)
-, mRewriteToSelection(false)
-, mRewriteToSelectionCheckbox(nullptr)
-, mQuantization(kInterval_None)
-, mQuantizationDropdown(nullptr)
-, mQueuedSwapBufferIdx(-1)
-, mIsSwapping(false)
-, mLooper(nullptr)
-, mClearButton(nullptr)
-, mLooperCable(nullptr)
 {
 }
 
@@ -332,13 +322,6 @@ void LoopStorer::LoadState(FileStreamIn& in)
 }
 
 LoopStorer::SampleData::SampleData()
-: mBuffer(nullptr)
-, mNumBars(1)
-, mSelectCheckbox(nullptr)
-, mLoopStorer(nullptr)
-, mIndex(0)
-, mBufferLength(-1)
-, mIsCurrentBuffer(false)
 {
 }
 

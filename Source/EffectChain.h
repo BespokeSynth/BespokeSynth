@@ -91,14 +91,14 @@ private:
 
    struct EffectControls
    {
-      ClickButton* mMoveLeftButton;
-      ClickButton* mMoveRightButton;
-      ClickButton* mDeleteButton;
-      FloatSlider* mDryWetSlider;
-      ClickButton* mPush2DisplayEffectButton;
+      ClickButton* mMoveLeftButton{ nullptr };
+      ClickButton* mMoveRightButton{ nullptr };
+      ClickButton* mDeleteButton{ nullptr };
+      FloatSlider* mDryWetSlider{ nullptr };
+      ClickButton* mPush2DisplayEffectButton{ nullptr };
    };
 
-   std::vector<IAudioEffect*> mEffects;
+   std::vector<IAudioEffect*> mEffects{};
    ChannelBuffer mDryBuffer;
    std::vector<EffectControls> mEffectControls;
    std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels{};

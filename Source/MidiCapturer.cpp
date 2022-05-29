@@ -58,8 +58,6 @@ void MidiCapturerDummyController::LoadState(FileStreamIn& in)
 }
 
 MidiCapturer::MidiCapturer()
-: mRingBufferPos(0)
-, mPlayhead(0)
 {
    for (int i = 0; i < kRingBufferLength; ++i)
       mMessages[i].setTimeStamp(-1);

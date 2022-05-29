@@ -33,27 +33,6 @@
 #include "IAudioReceiver.h"
 
 ControllingSong::ControllingSong()
-: mVolume(.8f)
-, mVolumeSlider(nullptr)
-, mSongStartTime(0)
-, mNeedNewSong(true)
-, mLoadingSong(true)
-, mCurrentSongIndex(-1)
-, mShuffleIndex(0)
-, mNextSongButton(nullptr)
-, mSongSelector(nullptr)
-, mTestBeatOffset(0)
-, mTestBeatOffsetSlider(nullptr)
-, mPlay(false)
-, mPlayCheckbox(nullptr)
-, mShuffle(false)
-, mShuffleCheckbox(nullptr)
-, mPhraseBackButton(nullptr)
-, mPhraseForwardButton(nullptr)
-, mSpeed(1)
-, mSpeedSlider(nullptr)
-, mMute(false)
-, mMuteCheckbox(nullptr)
 {
 }
 

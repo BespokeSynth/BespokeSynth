@@ -47,13 +47,10 @@ class Beats;
 
 struct BeatData
 {
-   BeatData()
-   : mBeat(nullptr)
-   {}
    void LoadBeat(Sample* sample);
    void RecalcPos(double time, bool doubleTime, int numBars);
 
-   Sample* mBeat;
+   Sample* mBeat{ nullptr };
 };
 
 class BeatColumn
@@ -139,7 +136,7 @@ private:
 
    ChannelBuffer mWriteBuffer;
    std::array<BeatColumn*, 4> mBeatColumns;
-   int mRows;
+   int mRows{ 4 };
 };
 
 #endif /* defined(__modularSynth__Beats__) */

@@ -72,14 +72,14 @@ private:
 
    struct FilterBank
    {
-      BiquadFilter mBiquad[NUM_EQ_FILTERS];
+      BiquadFilter mBiquad[NUM_EQ_FILTERS]{};
    };
 
-   FilterBank mBanks[ChannelBuffer::kMaxNumChannels];
-   int mNumFilters;
+   FilterBank mBanks[ChannelBuffer::kMaxNumChannels]{};
+   int mNumFilters{ NUM_EQ_FILTERS };
 
-   UIGrid* mMultiSlider;
-   ClickButton* mEvenButton;
+   UIGrid* mMultiSlider{nullptr};
+   ClickButton* mEvenButton{nullptr};
 };
 
 #endif /* defined(__Bespoke__EQEffect__) */

@@ -77,14 +77,14 @@ private:
    int NumKeys() const;
    int GetPitchForTypingKey(int key) const;
 
-   float mWidth;
-   float mHeight;
-   int mRootOctave;
-   int mNumOctaves;
-   int mPlayingMousePitch;
-   bool mTypingInput;
-   bool mLatch;
-   bool mShowScale;
+   float mWidth{ 500 };
+   float mHeight{ 110 };
+   int mRootOctave{ 3 };
+   int mNumOctaves{ 3 };
+   int mPlayingMousePitch{ -1 };
+   bool mTypingInput{ false };
+   bool mLatch{ false };
+   bool mShowScale{ false };
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
 };

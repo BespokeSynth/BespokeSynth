@@ -49,7 +49,6 @@ namespace
 Compressor::Compressor()
 : mDelayBuffer(kMaxLookaheadMs * gSampleRateMs)
 {
-   envdB_ = DC_OFFSET;
 }
 
 void Compressor::CreateUIControls()

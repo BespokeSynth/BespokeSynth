@@ -92,8 +92,8 @@ private:
    Checkbox* mAdvancedDisplayCheckbox{ nullptr };
    bool mAdvancedDisplay{ false };
    ADSRDisplay* mAdsrDisplay{ nullptr };
-   EnvelopeControl mEnvelopeControl;
-   ::ADSR mAdsr;
+   EnvelopeControl mEnvelopeControl{ ofVec2f(105, 5), ofVec2f(mWidth - 110, mHeight - 10) };
+   ::ADSR mAdsr{ 10, 100, .5, 100 };
 
    bool mUseVelocity{ false };
    Checkbox* mUseVelocityCheckbox{ nullptr };

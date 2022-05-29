@@ -30,14 +30,8 @@
 #include "UIControlMacros.h"
 
 ButterworthFilterEffect::ButterworthFilterEffect()
-: mF(2000)
-, mFSlider(nullptr)
-, mQ(0)
-, mQSlider(nullptr)
-, mCoefficientsHaveChanged(true)
-, mDryBuffer(gBufferSize)
+: mDryBuffer(gBufferSize)
 {
-   SetEnabled(true);
 }
 
 void ButterworthFilterEffect::CreateUIControls()

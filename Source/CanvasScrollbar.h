@@ -79,8 +79,8 @@ private:
    ofVec2f mClickMousePos;
    ofVec2f mDragOffset;
    float mScrollBarOffset{ 0 };
-   Style mStyle;
+   Style mStyle{ Style::kHorizontal };
    bool mAutoHide{ true };
 
-   Canvas* mCanvas;
+   Canvas* mCanvas{ nullptr };
 };

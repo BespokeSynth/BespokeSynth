@@ -76,14 +76,14 @@ private:
 
    juce::OSCSender mToSerialOsc;
    juce::OSCSender mToMonome;
-   int mMonomeReceivePort;
+   int mMonomeReceivePort{ -1 };
    bool mIsOscSetUp{ false };
    bool mHasMonome{ false };
    bool mLightsInitialized{ false };
-   int mMaxColumns;
-   int mGridRotation;
-   juce::String mPrefix;
-   bool mJustRequestedDeviceList;
+   int mMaxColumns{ 16 };
+   int mGridRotation{ 0 };
+   juce::String mPrefix{ "monome" };
+   bool mJustRequestedDeviceList{ false };
    std::string mPendingDeviceDesc;
 
    struct MonomeDevice
@@ -102,20 +102,15 @@ private:
 
    std::vector<MonomeDevice> mConnectedDeviceList;
 
-   MidiDeviceListener* mListener;
-   DropdownList* mListForMidiController;
+   MidiDeviceListener* mListener{ nullptr };
+   DropdownList* mListForMidiController{ nullptr };
    MonomeDevice mLastConnectedDeviceInfo;
 
    struct LightInfo
    {
-      LightInfo()
-      : mValue(0)
-      , mLastUpdatedTime(0)
-      , mLastSentTime(0)
-      {}
-      float mValue;
-      double mLastUpdatedTime;
-      double mLastSentTime;
+      float mValue{ 0 };
+      double mLastUpdatedTime{ 0 };
+      double mLastSentTime{ 0 };
    };
 
    std::vector<LightInfo> mLights;

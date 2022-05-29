@@ -76,10 +76,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mInput;
-   float mSmooth;
+   float mInput{ 0 };
+   float mSmooth{ .1 };
    Ramp mRamp;
 
-   FloatSlider* mInputSlider;
-   FloatSlider* mSmoothSlider;
+   FloatSlider* mInputSlider{ nullptr };
+   FloatSlider* mSmoothSlider{ nullptr };
 };

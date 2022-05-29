@@ -31,13 +31,6 @@
 class PeakTracker
 {
 public:
-   PeakTracker()
-   : mPeak(0)
-   , mDecayTime(.01f)
-   , mLimit(-1)
-   , mHitLimitTime(-9999)
-   {}
-
    void Process(float* buffer, int bufferSize);
    float GetPeak() const { return mPeak; }
    void SetDecayTime(float time) { mDecayTime = time; }
@@ -46,10 +39,10 @@ public:
    double GetLastHitLimitTime() const { return mHitLimitTime; }
 
 private:
-   float mPeak;
-   float mDecayTime;
-   float mLimit;
-   double mHitLimitTime;
+   float mPeak{ 0 };
+   float mDecayTime{ .01 };
+   float mLimit{ -1 };
+   double mHitLimitTime{ -9999 };
 };
 
 #endif /* defined(__modularSynth__PeakTracker__) */

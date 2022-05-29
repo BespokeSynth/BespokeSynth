@@ -69,18 +69,18 @@ private:
       height = 77;
    }
 
-   int dummy;
-   float dummy2;
-   DropdownList* mIntervalSelector;
-   DropdownList* mOscSelector;
-   FloatSlider* mMinSlider;
-   FloatSlider* mMaxSlider;
-   bool mWantBind;
-   ClickButton* mBindButton;
-   double mStopBindTime;
+   int dummy{ 0 };
+   float dummy2{ 0 };
+   DropdownList* mIntervalSelector{ nullptr };
+   DropdownList* mOscSelector{ nullptr };
+   FloatSlider* mMinSlider{ nullptr };
+   FloatSlider* mMaxSlider{ nullptr };
+   bool mWantBind{ false };
+   ClickButton* mBindButton{ nullptr };
+   double mStopBindTime{ -1 };
 
-   FloatSlider* mSlider;
-   FloatSliderLFOControl* mLFO;
+   FloatSlider* mSlider{ nullptr };
+   FloatSliderLFOControl* mLFO{ nullptr };
 };
 
 #endif /* defined(__modularSynth__LFOController__) */

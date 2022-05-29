@@ -70,11 +70,11 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mValue1;
-   float mValue2;
-   float mValue2Range;
+   float mValue1{ 0 };
+   float mValue2{ 0 };
+   float mValue2Range{ 1 };
 
-   FloatSlider* mValue1Slider;
-   FloatSlider* mValue2Slider;
-   FloatSlider* mValue2RangeSlider;
+   FloatSlider* mValue1Slider{ nullptr };
+   FloatSlider* mValue2Slider{ nullptr };
+   FloatSlider* mValue2RangeSlider{ nullptr };
 };

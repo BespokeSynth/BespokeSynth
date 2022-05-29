@@ -56,24 +56,6 @@ float IDrawableModule::sSaturation = 145;
 float IDrawableModule::sBrightness = 220;
 
 IDrawableModule::IDrawableModule()
-: mModuleType(kModuleType_Unknown)
-, mMinimized(false)
-, mWasMinimizeAreaClicked(false)
-, mMinimizeAnimation(0)
-, mEnabled(true)
-, mEnabledCheckbox(nullptr)
-, mUIControlsCreated(false)
-, mInitialized(false)
-, mMainPatchCableSource(nullptr)
-, mOwningContainer(nullptr)
-, mTitleLabelWidth(0)
-, mShouldDrawOutline(true)
-, mHoveringOverResizeHandle(false)
-, mDeleted(false)
-, mCanReceiveAudio(false)
-, mCanReceiveNotes(false)
-, mCanReceivePulses(false)
-, mDrawDebug(false)
 {
 }
 

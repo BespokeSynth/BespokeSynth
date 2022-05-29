@@ -31,10 +31,6 @@
 #include "PatchCableSource.h"
 
 ModulatorMult::ModulatorMult()
-: mValue1(0)
-, mValue2(0)
-, mValue1Slider(nullptr)
-, mValue2Slider(nullptr)
 {
 }
 

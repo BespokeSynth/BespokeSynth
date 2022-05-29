@@ -12,9 +12,6 @@ namespace
 }
 
 Minimap::Minimap()
-: mClick(false)
-, mGrid(nullptr)
-, mHoveredBookmarkPos(-1, -1)
 {
 }
 

@@ -30,9 +30,6 @@
 #include "PatchCableSource.h"
 
 NoteRouter::NoteRouter()
-: mRouteMask(0)
-, mRouteSelector(nullptr)
-, mRadioButtonMode(false)
 {
 }
 

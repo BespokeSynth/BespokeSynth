@@ -28,11 +28,6 @@
 #include <algorithm>
 
 Curve::Curve()
-: mNumCurvePoints(0)
-, mStart(0)
-, mEnd(1)
-, mColor(ofColor::white)
-, mLastEvalIndex(0)
 {
 }
 

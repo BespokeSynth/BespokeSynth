@@ -28,8 +28,6 @@
 
 DCRemoverEffect::DCRemoverEffect()
 {
-   SetEnabled(true);
-
    for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
    {
       mBiquad[i].SetFilterParams(10, sqrt(2) / 2);

@@ -28,7 +28,6 @@
 #include "ModularSynth.h"
 
 NoteFlusher::NoteFlusher()
-: mFlushButton(nullptr)
 {
 }
 

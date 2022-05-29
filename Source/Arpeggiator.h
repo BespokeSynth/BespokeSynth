@@ -111,24 +111,24 @@ private:
    float mWidth;
    float mHeight;
 
-   NoteInterval mInterval;
-   int mLastPitch;
-   int mArpIndex;
-   char mArpString[MAX_TEXTENTRY_LENGTH];
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   int mLastPitch{ -1 };
+   int mArpIndex{ -1 };
+   char mArpString[MAX_TEXTENTRY_LENGTH]{};
 
-   DropdownList* mIntervalSelector;
-   int mArpStep;
-   int mArpPingPongDirection;
-   IntSlider* mArpStepSlider;
+   DropdownList* mIntervalSelector{ nullptr };
+   int mArpStep{ 1 };
+   int mArpPingPongDirection{ 1 };
+   IntSlider* mArpStepSlider{ nullptr };
 
-   int mCurrentOctaveOffset;
-   int mOctaveRepeats;
-   IntSlider* mOctaveRepeatsSlider;
+   int mCurrentOctaveOffset{ 0 };
+   int mOctaveRepeats{ 1 };
+   IntSlider* mOctaveRepeatsSlider{ nullptr };
 
    std::array<bool, 128> mInputNotes{ false };
    ofMutex mChordMutex;
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{nullptr};
 };
 
 #endif /* defined(__modularSynth__Arpeggiator__) */

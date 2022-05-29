@@ -46,9 +46,6 @@ class IUIControl : public IClickable
 {
 public:
    IUIControl()
-   : mRemoteControlCount(0)
-   , mNoHover(false)
-   , mShouldSaveState(true)
    {}
    virtual void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
@@ -103,9 +100,9 @@ public:
 protected:
    virtual ~IUIControl();
 
-   int mRemoteControlCount;
-   bool mNoHover;
-   bool mShouldSaveState;
+   int mRemoteControlCount{ 0 };
+   bool mNoHover{ false };
+   bool mShouldSaveState{ true };
 
    static IUIControl* sLastHoveredUIControl;
    static bool sLastUIHoverWasSetViaTab;

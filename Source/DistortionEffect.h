@@ -73,23 +73,23 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
-   DistortionType mType;
-   float mClip;
-   float mGain;
-   float mPreamp;
-   float mFuzzAmount;
-   bool mRemoveInputDC;
+   DistortionType mType{ DistortionType::kClean };
+   float mClip{ 1 };
+   float mGain{ 1 };
+   float mPreamp{ 1 };
+   float mFuzzAmount{ 0 };
+   bool mRemoveInputDC{ true };
 
-   DropdownList* mTypeDropdown;
-   FloatSlider* mClipSlider;
-   FloatSlider* mPreampSlider;
-   Checkbox* mRemoveInputDCCheckbox;
-   FloatSlider* mFuzzAmountSlider;
-   BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
-   PeakTracker mPeakTracker[ChannelBuffer::kMaxNumChannels];
+   DropdownList* mTypeDropdown{ nullptr };
+   FloatSlider* mClipSlider{ nullptr };
+   FloatSlider* mPreampSlider{ nullptr };
+   Checkbox* mRemoveInputDCCheckbox{ nullptr };
+   FloatSlider* mFuzzAmountSlider{ nullptr };
+   BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels]{};
+   PeakTracker mPeakTracker[ChannelBuffer::kMaxNumChannels]{};
 };
 
 #endif /* defined(__modularSynth__DistortionEffect__) */

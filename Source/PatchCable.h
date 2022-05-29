@@ -95,17 +95,17 @@ private:
    ofVec2f FindClosestSide(float x, float y, float w, float h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
    IClickable* GetDropTarget();
 
-   PatchCableSource* mOwner;
-   IClickable* mTarget;
-   RadioButton* mTargetRadioButton;
-   UIControlConnection* mUIControlConnection;
-   IAudioReceiver* mAudioReceiverTarget;
+   PatchCableSource* mOwner{ nullptr };
+   IClickable* mTarget{ nullptr };
+   RadioButton* mTargetRadioButton{ nullptr };
+   UIControlConnection* mUIControlConnection{ nullptr };
+   IAudioReceiver* mAudioReceiverTarget{ nullptr };
 
-   bool mHovered;
-   bool mDragging;
+   bool mHovered{ false };
+   bool mDragging{ false };
    ofVec2f mGrabPos;
-   bool mHoveringOnSource;
-   int mSourceIndex;
+   bool mHoveringOnSource{ false };
+   int mSourceIndex{ 0 };
 };
 
 #endif /* defined(__Bespoke__PatchCable__) */

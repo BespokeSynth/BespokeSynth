@@ -29,15 +29,8 @@
 #include "Profiler.h"
 
 BiquadFilterEffect::BiquadFilterEffect()
-: mTypeSelector(nullptr)
-, mFSlider(nullptr)
-, mQSlider(nullptr)
-, mGSlider(nullptr)
-, mMouseControl(false)
-, mCoefficientsHaveChanged(true)
-, mDryBuffer(gBufferSize)
+: mDryBuffer(gBufferSize)
 {
-   SetEnabled(true);
 }
 
 void BiquadFilterEffect::CreateUIControls()

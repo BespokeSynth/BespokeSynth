@@ -37,9 +37,6 @@ namespace
 }
 
 ModulatorCurve::ModulatorCurve()
-: mInput(0)
-, mEnvelopeControl(ofVec2f(3, 19), ofVec2f(100, 100))
-, mInputSlider(nullptr)
 {
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);

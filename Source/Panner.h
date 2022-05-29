@@ -70,10 +70,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mPan;
+   float mPan{ 0 };
    Ramp mPanRamp;
-   FloatSlider* mPanSlider;
-   float mWiden;
-   FloatSlider* mWidenSlider;
-   RollingBuffer mWidenerBuffer;
+   FloatSlider* mPanSlider{ nullptr };
+   float mWiden{ 0 };
+   FloatSlider* mWidenSlider{ nullptr };
+   RollingBuffer mWidenerBuffer{ 2048 };
 };

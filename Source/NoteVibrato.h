@@ -68,12 +68,12 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   NoteInterval mVibratoInterval;
-   DropdownList* mIntervalSelector;
-   float mVibratoAmount;
-   FloatSlider* mVibratoSlider;
+   NoteInterval mVibratoInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   float mVibratoAmount{ 0 };
+   FloatSlider* mVibratoSlider{ nullptr };
 
-   Modulations mModulation;
+   Modulations mModulation{ true };
 };
 
 #endif /* defined(__Bespoke__NoteVibrato__) */

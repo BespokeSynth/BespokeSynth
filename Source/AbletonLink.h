@@ -71,8 +71,8 @@ private:
    FloatSlider* mOffsetMsSlider;
 
    std::unique_ptr<ableton::Link> mLink;
-   double mTempo = 120.0;
-   std::size_t mNumPeers = 0;
+   double mTempo{ 120 };
+   std::size_t mNumPeers{ 0 };
    double mLastReceivedBeat{ 0 };
    double mSampleTime{ 0 };
 };

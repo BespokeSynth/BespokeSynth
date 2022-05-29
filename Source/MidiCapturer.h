@@ -84,8 +84,8 @@ private:
    bool Enabled() const override { return true; }
 
    static const int kRingBufferLength = 1000;
-   int mRingBufferPos;
+   int mRingBufferPos{ 0 };
    juce::MidiMessage mMessages[kRingBufferLength];
    std::list<MidiCapturerDummyController*> mDummyControllers;
-   int mPlayhead;
+   int mPlayhead{ 0 };
 };

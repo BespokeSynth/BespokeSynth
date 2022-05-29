@@ -34,40 +34,40 @@
 struct MidiNote
 {
    const char* mDeviceName;
-   double mTimestampMs;
-   int mPitch;
-   float mVelocity; //0-127
-   int mChannel;
+   double mTimestampMs{ 0 };
+   int mPitch{ 0 };
+   float mVelocity{ 0 }; //0-127
+   int mChannel{ -1 };
 };
 
 struct MidiControl
 {
    const char* mDeviceName;
-   int mControl;
-   float mValue;
-   int mChannel;
+   int mControl{ 0 };
+   float mValue{ 0 };
+   int mChannel{ -1 };
 };
 
 struct MidiProgramChange
 {
    const char* mDeviceName;
-   int mProgram;
-   int mChannel;
+   int mProgram{ 0 };
+   int mChannel{ -1 };
 };
 
 struct MidiPitchBend
 {
    const char* mDeviceName;
-   float mValue;
-   int mChannel;
+   float mValue{ 0 };
+   int mChannel{ -1 };
 };
 
 struct MidiPressure
 {
    const char* mDeviceName;
-   int mPitch;
-   float mPressure;
-   int mChannel;
+   int mPitch{ 0 };
+   float mPressure{ 0 };
+   int mChannel{ -1 };
 };
 
 class MidiDeviceListener
@@ -119,10 +119,10 @@ private:
    juce::String mDeviceNameIn;
    juce::String mDeviceNameOut;
 
-   std::unique_ptr<juce::MidiOutput> mMidiOut;
-   MidiDeviceListener* mListener;
-   int mOutputChannel;
-   bool mIsInputEnabled;
+   std::unique_ptr<juce::MidiOutput> mMidiOut{ nullptr };
+   MidiDeviceListener* mListener{ nullptr };
+   int mOutputChannel{ 1 };
+   bool mIsInputEnabled{ false };
 };
 
 #endif /* defined(__additiveSynth__MidiDevice__) */

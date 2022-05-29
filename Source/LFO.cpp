@@ -31,14 +31,6 @@
 PerlinNoise LFO::sPerlinNoise;
 
 LFO::LFO()
-: mPhaseOffset(0)
-, mOsc(kOsc_Sin)
-, mPeriod(kInterval_1n)
-, mDrunk(0)
-, mMode(kLFOMode_Envelope)
-, mFreePhase(0)
-, mFreeRate(1)
-, mLength(1)
 {
    SetPeriod(kInterval_1n);
 }

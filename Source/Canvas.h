@@ -137,9 +137,9 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
 
-   float mViewStart;
+   float mViewStart{ 0 };
    float mViewEnd;
-   float mLoopStart;
+   float mLoopStart{ 0 };
    float mLoopEnd;
 
 private:
@@ -153,38 +153,38 @@ private:
    bool IsOnElement(CanvasElement* element, float x, float y) const;
    float QuantizeToGrid(float input) const;
 
-   bool mClick;
-   CanvasElement* mClickedElement;
+   bool mClick{ false };
+   CanvasElement* mClickedElement{ nullptr };
    ofVec2f mClickedElementStartMousePos;
    float mWidth;
    float mHeight;
    float mLength;
-   ICanvasListener* mListener;
+   ICanvasListener* mListener{ nullptr };
    std::vector<CanvasElement*> mElements;
-   CanvasControls* mControls;
-   float mCursorPos;
+   CanvasControls* mControls{ nullptr };
+   float mCursorPos{ -1 };
    CreateCanvasElementFn mElementCreator;
-   int mRowOffset;
-   bool mWrap;
-   bool mDragSelecting;
+   int mRowOffset{ 0 };
+   bool mWrap{ false };
+   bool mDragSelecting{ false };
    ofRectangle mDragSelectRect;
-   bool mDragCanvasMoving;
-   bool mDragCanvasZooming;
+   bool mDragCanvasMoving{ false };
+   bool mDragCanvasZooming{ false };
    ofVec2f mDragCanvasStartMousePos;
    ofVec2f mDragCanvasStartCanvasPos;
    ofVec2f mDragZoomStartDimensions;
    HighlightEnd mHighlightEnd;
-   CanvasElement* mHighlightEndElement;
+   CanvasElement* mHighlightEndElement{ nullptr };
    HighlightEnd mDragEnd;
-   int mMajorColumnInterval;
-   bool mHasDuplicatedThisDrag;
-   float mScrollVerticalPartial;
+   int mMajorColumnInterval{ -1 };
+   bool mHasDuplicatedThisDrag{ false };
+   float mScrollVerticalPartial{ 0 };
    std::array<ofColor, 128> mRowColors;
 
    int mNumRows;
    int mNumCols;
    int mNumVisibleRows;
-   DragMode mDragMode;
+   DragMode mDragMode{ DragMode::kDragBoth };
 
    friend CanvasControls;
 };

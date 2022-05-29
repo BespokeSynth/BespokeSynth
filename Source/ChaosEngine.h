@@ -92,8 +92,8 @@ private:
          return mDegree == chord.mDegree &&
                 mAccidentals == chord.mAccidentals;
       }
-      int mDegree;
-      int mBeatLength;
+      int mDegree{ 0 };
+      int mBeatLength{ -1 };
       std::vector<Accidental> mAccidentals;
       int mInversion{ 0 };
    };

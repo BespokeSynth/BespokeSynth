@@ -31,17 +31,6 @@
 #include "UIControlMacros.h"
 
 Arpeggiator::Arpeggiator()
-: mInterval(kInterval_16n)
-, mArpIndex(-1)
-, mArpString()
-, mLastPitch(-1)
-, mIntervalSelector(nullptr)
-, mArpStep(1)
-, mArpPingPongDirection(1)
-, mArpStepSlider(nullptr)
-, mCurrentOctaveOffset(0)
-, mOctaveRepeats(1)
-, mOctaveRepeatsSlider(nullptr)
 {
    TheScale->AddListener(this);
 }

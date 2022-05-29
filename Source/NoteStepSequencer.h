@@ -151,75 +151,75 @@ private:
       kNoteMode_Fifths
    };
 
-   int mTones[NSS_MAX_STEPS];
-   int mVels[NSS_MAX_STEPS];
-   float mNoteLengths[NSS_MAX_STEPS];
+   int mTones[NSS_MAX_STEPS]{};
+   int mVels[NSS_MAX_STEPS]{};
+   float mNoteLengths[NSS_MAX_STEPS]{};
 
-   NoteInterval mInterval;
-   int mArpIndex;
+   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   int mArpIndex{ -1 };
 
-   DropdownList* mIntervalSelector;
-   Checkbox* mRepeatIsHoldCheckbox;
-   UIGrid* mGrid;
-   UIGrid* mVelocityGrid;
-   int mLastPitch;
-   int mLastVel;
-   int mLastStepIndex;
-   float mLastNoteLength;
-   double mLastNoteStartTime;
-   double mLastNoteEndTime;
-   bool mAlreadyDidNoteOff;
-   int mOctave;
-   IntSlider* mOctaveSlider;
-   NoteMode mNoteMode;
-   DropdownList* mNoteModeSelector;
-   IntSlider* mLoopResetPointSlider;
-   int mLoopResetPoint;
+   DropdownList* mIntervalSelector{ nullptr };
+   Checkbox* mRepeatIsHoldCheckbox{ nullptr };
+   UIGrid* mGrid{ nullptr };
+   UIGrid* mVelocityGrid{ nullptr };
+   int mLastPitch{ -1 };
+   int mLastVel{ 0 };
+   int mLastStepIndex{ -1 };
+   float mLastNoteLength{ 1 };
+   double mLastNoteStartTime{ 0 };
+   double mLastNoteEndTime{ 0 };
+   bool mAlreadyDidNoteOff{ false };
+   int mOctave{ 3 };
+   IntSlider* mOctaveSlider{ nullptr };
+   NoteMode mNoteMode{ NoteMode::kNoteMode_Scale };
+   DropdownList* mNoteModeSelector{ nullptr };
+   IntSlider* mLoopResetPointSlider{ nullptr };
+   int mLoopResetPoint{ 0 };
 
-   int mLength;
-   IntSlider* mLengthSlider;
-   bool mSetLength;
-   int mNoteRange;
-   bool mShowStepControls;
-   int mRowOffset;
+   int mLength{ 8 };
+   IntSlider* mLengthSlider{ nullptr };
+   bool mSetLength{ false };
+   int mNoteRange{ 15 };
+   bool mShowStepControls{ false };
+   int mRowOffset{ 0 };
 
-   MidiController* mController;
+   MidiController* mController{ nullptr };
 
-   ClickButton* mShiftBackButton;
-   ClickButton* mShiftForwardButton;
-   ClickButton* mClearButton;
+   ClickButton* mShiftBackButton{ nullptr };
+   ClickButton* mShiftForwardButton{ nullptr };
+   ClickButton* mClearButton{ nullptr };
 
-   ClickButton* mRandomizePitchButton;
-   ClickButton* mRandomizeLengthButton;
-   ClickButton* mRandomizeVelocityButton;
-   float mRandomizePitchChance;
-   float mRandomizePitchRange;
-   float mRandomizeLengthChance;
-   float mRandomizeLengthRange;
-   float mRandomizeVelocityChance;
-   float mRandomizeVelocityDensity;
-   FloatSlider* mRandomizePitchChanceSlider;
-   FloatSlider* mRandomizePitchRangeSlider;
-   FloatSlider* mRandomizeLengthChanceSlider;
-   FloatSlider* mRandomizeLengthRangeSlider;
-   FloatSlider* mRandomizeVelocityChanceSlider;
-   FloatSlider* mRandomizeVelocityDensitySlider;
+   ClickButton* mRandomizePitchButton{ nullptr };
+   ClickButton* mRandomizeLengthButton{ nullptr };
+   ClickButton* mRandomizeVelocityButton{ nullptr };
+   float mRandomizePitchChance{ 1 };
+   float mRandomizePitchRange{ 1 };
+   float mRandomizeLengthChance{ 1 };
+   float mRandomizeLengthRange{ 1 };
+   float mRandomizeVelocityChance{ 1 };
+   float mRandomizeVelocityDensity{ 1 };
+   FloatSlider* mRandomizePitchChanceSlider{ nullptr };
+   FloatSlider* mRandomizePitchRangeSlider{ nullptr };
+   FloatSlider* mRandomizeLengthChanceSlider{ nullptr };
+   FloatSlider* mRandomizeLengthRangeSlider{ nullptr };
+   FloatSlider* mRandomizeVelocityChanceSlider{ nullptr };
+   FloatSlider* mRandomizeVelocityDensitySlider{ nullptr };
 
    std::array<double, NSS_MAX_STEPS> mLastStepPlayTime{ -1 };
    std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;
    std::array<IntSlider*, NSS_MAX_STEPS> mVelocitySliders;
    std::array<FloatSlider*, NSS_MAX_STEPS> mLengthSliders;
 
-   bool mHasExternalPulseSource;
+   bool mHasExternalPulseSource{ false };
 
    std::array<AdditionalNoteCable*, NSS_MAX_STEPS> mStepCables;
 
-   TransportListenerInfo* mTransportListenerInfo;
-   GridControlTarget* mGridControlTarget;
-   int mGridControlOffsetX;
-   int mGridControlOffsetY;
-   IntSlider* mGridControlOffsetXSlider;
-   IntSlider* mGridControlOffsetYSlider;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
+   int mGridControlOffsetX{ 0 };
+   int mGridControlOffsetY{ 0 };
+   IntSlider* mGridControlOffsetXSlider{ nullptr };
+   IntSlider* mGridControlOffsetYSlider{ nullptr };
 };
 
 

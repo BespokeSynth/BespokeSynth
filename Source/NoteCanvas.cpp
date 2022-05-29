@@ -39,28 +39,7 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 NoteCanvas::NoteCanvas()
-: mCanvas(nullptr)
-, mCanvasControls(nullptr)
-, mCanvasTimeline(nullptr)
-, mCanvasScrollbarHorizontal(nullptr)
-, mCanvasScrollbarVertical(nullptr)
-, mNumMeasuresSlider(nullptr)
-, mNumMeasures(1)
-, mQuantizeButton(nullptr)
-, mPlay(true)
-, mPlayCheckbox(nullptr)
-, mRecord(false)
-, mRecordCheckbox(nullptr)
-, mStopQueued(false)
-, mInterval(kInterval_8n)
-, mIntervalSelector(nullptr)
-, mFreeRecordCheckbox(nullptr)
-, mFreeRecord(false)
-, mFreeRecordStartMeasure(0)
-, mClipButton(nullptr)
-, mShowIntervals(false)
 {
-   SetEnabled(true);
    mVoiceModulations.resize(kNumVoices + 1);
 }
 

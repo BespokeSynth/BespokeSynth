@@ -64,8 +64,8 @@ private:
    }
    bool Enabled() const override { return true; }
 
-   float mStrum;
-   float mLastStrumPos;
-   FloatSlider* mStrumSlider;
+   float mStrum{ 0 };
+   float mLastStrumPos{ 0 };
+   FloatSlider* mStrumSlider{ nullptr };
    std::list<int> mNotes;
 };

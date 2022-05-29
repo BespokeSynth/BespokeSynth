@@ -122,15 +122,15 @@ private:
       MultitapDelay* mOwner{ nullptr };
    };
 
-   int mNumTaps;
+   int mNumTaps{ 4 };
    std::vector<DelayTap> mTaps;
    static const int kNumMPETaps = 16;
    DelayMPETap mMPETaps[kNumMPETaps];
 
    ChannelBuffer mWriteBuffer;
-   FloatSlider* mDryAmountSlider;
-   float mDryAmount;
-   FloatSlider* mDisplayLengthSlider;
-   float mDisplayLength;
+   FloatSlider* mDryAmountSlider{ nullptr };
+   float mDryAmount{ 1 };
+   FloatSlider* mDisplayLengthSlider{ nullptr };
+   float mDisplayLength{ 10 };
    RollingBuffer mDelayBuffer;
 };

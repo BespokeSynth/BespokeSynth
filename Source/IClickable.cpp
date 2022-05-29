@@ -34,13 +34,7 @@ std::string IClickable::sPathLoadContext = "";
 std::string IClickable::sPathSaveContext = "";
 
 IClickable::IClickable()
-: mX(0)
-, mY(0)
-, mParent(nullptr)
-, mShowing(true)
-, mBeaconTime(-999)
 {
-   mName[0] = 0;
 }
 
 void IClickable::Draw()
