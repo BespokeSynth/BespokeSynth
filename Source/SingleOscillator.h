@@ -105,8 +105,6 @@ private:
    IntSlider* mUnisonSlider{ nullptr };
    FloatSlider* mUnisonWidthSlider{ nullptr };
    FloatSlider* mShuffleSlider{ nullptr };
-   float mLengthMultiplier{ 1 };
-   FloatSlider* mLengthMultiplierSlider{ nullptr };
    FloatSlider* mVelToVolumeSlider{ nullptr };
    FloatSlider* mVelToEnvelopeSlider{ nullptr };
    Checkbox* mLiteCPUModeCheckbox{ nullptr };

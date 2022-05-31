@@ -2839,12 +2839,12 @@ void ModularSynth::DoAutosave()
    SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk")), true);
 }
 
-IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float x, float y, bool addToContainer)
+IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, float x, float y, bool addToContainer, std::string name)
 {
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
 
-   std::vector<std::string> tokens = ofSplitString(moduleName, " ");
+   std::vector<std::string> tokens = ofSplitString(spawnCommand, " ");
    if (tokens.size() == 0)
       return nullptr;
 
@@ -2852,6 +2852,8 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float
       DoAutosave();
 
    std::string moduleType = tokens[0];
+   if (name == "")
+      name = moduleType;
 
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
@@ -2906,7 +2908,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float
    ofxJSONElement dummy;
    dummy["type"] = moduleType;
    std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
-   dummy["name"] = GetUniqueName(moduleType, modules);
+   dummy["name"] = GetUniqueName(name, modules);
    dummy["onthefly"] = true;
 
    if (moduleType == "effectchain")
@@ -2947,11 +2949,11 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float
    }
    catch (LoadingJSONException& e)
    {
-      LogEvent("Error spawning \"" + moduleName + "\" on the fly", kLogEventType_Warning);
+      LogEvent("Error spawning \"" + spawnCommand + "\" on the fly", kLogEventType_Warning);
    }
    catch (UnknownModuleException& e)
    {
-      LogEvent("Error spawning \"" + moduleName + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
+      LogEvent("Error spawning \"" + spawnCommand + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
    }
 
    if (prefabToSetUp != "")

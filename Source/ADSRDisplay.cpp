@@ -84,7 +84,7 @@ void ADSRDisplay::Render()
 
    ofTranslate(mX, mY);
 
-   ofSetColor(100, 100, .8f * gModuleDrawAlpha);
+   ofSetColor(100, 100, 100, .8f * gModuleDrawAlpha);
 
    ofSetLineWidth(.5f);
    ofRect(0, 0, mWidth, mHeight, 0);
@@ -146,6 +146,9 @@ void ADSRDisplay::Render()
       ofRect(0, 0, mWidth, mHeight, 0);
    }
 
+   ofSetColor(245, 58, 0, gModuleDrawAlpha);
+   ofCircle(mWidth - 5, 5, 2);
+
    if (sDisplayMode == kDisplayEnvelope)
    {
       ofSetColor(0, 255, 255, .2f * gModuleDrawAlpha);
@@ -163,6 +166,13 @@ void ADSRDisplay::Render()
          case kAdjustEnvelopeEditor:
             ofSetColor(255, 255, 255, .2f * gModuleDrawAlpha);
             ofRect(mWidth - 10, 0, 10, 10);
+            break;
+         case kAdjustViewLength:
+            ofSetColor(255, 255, 255, .2f * gModuleDrawAlpha);
+            ofRect(0, 0, mWidth, 10);
+            ofRect(ofMap(mMaxTime, 10, 10000, 0, mWidth - 3, K(clamp)), 0, 3, 10);
+            ofSetColor(255, 255, 255, .8f * gModuleDrawAlpha);
+            DrawTextNormal(ofToString(mMaxTime, 0) + " ms", 3, 8, 10);
             break;
          case kAdjustAttackAR:
             ofRect(0, 0, mWidth * .5f, mHeight);
@@ -271,7 +281,7 @@ void ADSRDisplay::SpawnEnvelopeEditor()
 {
    if (mEditor == nullptr)
    {
-      mEditor = dynamic_cast<EnvelopeEditor*>(TheSynth->SpawnModuleOnTheFly("envelopeeditor", -1, -1, false));
+      mEditor = dynamic_cast<EnvelopeEditor*>(TheSynth->SpawnModuleOnTheFly("envelopeeditor", -1, -1, false, "envelopepopup"));
       mEditor->SetADSRDisplay(this);
    }
    if (!mEditor->IsPinned())
@@ -326,6 +336,7 @@ void ADSRDisplay::OnClicked(int x, int y, bool right)
       mClick = true;
       mClickStart.set(x, y);
       mClickAdsr.Set(mViewAdsr);
+      mClickLength = mMaxTime;
    }
 }
 
@@ -341,6 +352,10 @@ bool ADSRDisplay::MouseMoved(float x, float y)
       if (x < 0 || y < 0 || x > mWidth || y > mHeight)
       {
          mAdjustMode = kAdjustNone;
+      }
+      else if (GetKeyModifiers() == kModifier_Shift)
+      {
+         mAdjustMode = kAdjustViewLength;
       }
       else if (x >= mWidth - 10 && x <= mWidth && y >= 0 && y <= 10)
       {
@@ -383,6 +398,11 @@ bool ADSRDisplay::MouseMoved(float x, float y)
          mousePosSq *= mousePosSq;
       switch (mAdjustMode)
       {
+         case kAdjustViewLength:
+         {
+            mMaxTime = std::clamp(mClickLength + mousePosSq * 500, 10.0f, 10000.0f);
+            break;
+         }
          case kAdjustAttack:
          case kAdjustAttackAR:
          {

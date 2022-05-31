@@ -70,15 +70,7 @@ namespace MathUtils
 
    float Curve(float t, float curve)
    {
-      /*float a = ofLerp(0, .5f+curve*.5f, t);
-      float b = ofLerp(.5f+curve*.5f, 1, t);
-      float c = ofLerp(a, b, t);
-      return c;*/
-      /*if (curve > 0)
-       return ofLerp(c, b, t);
-       else
-       return ofLerp(a, c, t);*/
-      return powf(t, powf(5, -curve));
+      return powf(t, expf(-2 * curve));
    }
 
    int HighestPow2(int n)
