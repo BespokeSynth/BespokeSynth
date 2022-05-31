@@ -394,19 +394,22 @@ void EnvelopeEditor::CreateUIControls()
    static bool dummyBool;
    static float dummyFloat;
 
-   UIBLOCK(3,3,130);
-   FLOATSLIDER(mADSRViewLengthSlider, "view length", &dummyFloat, 10, 10000);  UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER(mMaxSustainSlider, "max sustain", &dummyFloat, -1, 5000);  UIBLOCK_SHIFTRIGHT();
-   BUTTON(mPinButton, "pin"); UIBLOCK_SHIFTRIGHT();
+   UIBLOCK(3, 3, 130);
+   FLOATSLIDER(mADSRViewLengthSlider, "view length", &dummyFloat, 10, 10000);
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER(mMaxSustainSlider, "max sustain", &dummyFloat, -1, 5000);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mPinButton, "pin");
+   UIBLOCK_SHIFTRIGHT();
    ENDUIBLOCK0();
 
    UIBLOCK(3, mHeight - 70);
-   for (size_t i=0; i < mStageControls.size(); ++i)
+   for (size_t i = 0; i < mStageControls.size(); ++i)
    {
-      FLOATSLIDER(mStageControls[i].mTargetSlider, ("target"+ofToString(i)).c_str(), &dummyFloat, 0, 1);
-      FLOATSLIDER(mStageControls[i].mTimeSlider, ("time"+ofToString(i)).c_str(), &dummyFloat, 1, 1000);
-      FLOATSLIDER(mStageControls[i].mCurveSlider, ("curve"+ofToString(i)).c_str(), &dummyFloat, -1, 1);
-      CHECKBOX(mStageControls[i].mSustainCheckbox, ("sustain"+ofToString(i)).c_str(), &mStageControls[i].mIsSustainStage);
+      FLOATSLIDER(mStageControls[i].mTargetSlider, ("target" + ofToString(i)).c_str(), &dummyFloat, 0, 1);
+      FLOATSLIDER(mStageControls[i].mTimeSlider, ("time" + ofToString(i)).c_str(), &dummyFloat, 1, 1000);
+      FLOATSLIDER(mStageControls[i].mCurveSlider, ("curve" + ofToString(i)).c_str(), &dummyFloat, -1, 1);
+      CHECKBOX(mStageControls[i].mSustainCheckbox, ("sustain" + ofToString(i)).c_str(), &mStageControls[i].mIsSustainStage);
       UIBLOCK_NEWCOLUMN();
 
       mStageControls[i].mTimeSlider->SetMode(FloatSlider::kSquare);
@@ -431,7 +434,7 @@ void EnvelopeEditor::SetADSRDisplay(ADSRDisplay* adsrDisplay)
    mADSRViewLengthSlider->SetVar(&adsrDisplay->GetMaxTime());
    mMaxSustainSlider->SetVar(&adsrDisplay->GetADSR()->GetMaxSustain());
 
-   for (int i=0; i < (int)mStageControls.size(); ++i)
+   for (int i = 0; i < (int)mStageControls.size(); ++i)
    {
       mStageControls[i].mTargetSlider->SetVar(&adsrDisplay->GetADSR()->GetStageData(i).target);
       mStageControls[i].mTimeSlider->SetVar(&adsrDisplay->GetADSR()->GetStageData(i).time);
@@ -478,7 +481,7 @@ void EnvelopeEditor::DrawModule()
    mEnvelopeControl.Draw();
 
    int numStages = mADSRDisplay->GetADSR()->GetNumStages();
-   for (int i=0; i < (int)mStageControls.size(); ++i)
+   for (int i = 0; i < (int)mStageControls.size(); ++i)
    {
       mStageControls[i].mIsSustainStage = mADSRDisplay->GetADSR()->GetHasSustainStage() && (mADSRDisplay->GetADSR()->GetSustainStage() == i);
 
@@ -500,7 +503,7 @@ void EnvelopeEditor::Resize(float w, float h)
    h = MAX(h, 150);
    mEnvelopeControl.SetDimensions(ofVec2f(w - 10, h - 105));
 
-   for (int i=0; i < (int)mStageControls.size(); ++i)
+   for (int i = 0; i < (int)mStageControls.size(); ++i)
    {
       mStageControls[i].mTargetSlider->Move(0, h - mHeight);
       mStageControls[i].mTimeSlider->Move(0, h - mHeight);
@@ -537,7 +540,7 @@ bool EnvelopeEditor::MouseMoved(float x, float y)
 
 void EnvelopeEditor::CheckboxUpdated(Checkbox* checkbox)
 {
-   for (int i=0; i < (int)mStageControls.size(); ++i)
+   for (int i = 0; i < (int)mStageControls.size(); ++i)
    {
       if (checkbox == mStageControls[i].mSustainCheckbox)
       {
@@ -586,7 +589,7 @@ void EnvelopeEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mADSRViewLengthSlider)
    {
-      for (int i=0; i < (int)mStageControls.size(); ++i)
+      for (int i = 0; i < (int)mStageControls.size(); ++i)
       {
          mStageControls[i].mTimeSlider->SetExtents(1, mADSRDisplay->GetMaxTime());
       }

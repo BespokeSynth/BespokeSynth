@@ -141,5 +141,5 @@ private:
    FloatSlider* mADSRViewLengthSlider{ nullptr };
    FloatSlider* mMaxSustainSlider{ nullptr };
    PatchCableSource* mTargetCable{ nullptr };
-   std::array<StageControls, 10> mStageControls{ };
+   std::array<StageControls, 10> mStageControls{};
 };
