@@ -44,7 +44,6 @@ ModulatorCurve::ModulatorCurve()
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);
    mEnvelopeControl.SetFixedLengthMode(true);
-   mAdsr.GetFreeReleaseLevel() = true;
    mAdsr.SetNumStages(2);
    mAdsr.GetHasSustainStage() = false;
    mAdsr.GetStageData(0).target = 0;

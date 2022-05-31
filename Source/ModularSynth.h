@@ -109,7 +109,7 @@ public:
 
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
-   IDrawableModule* SpawnModuleOnTheFly(std::string moduleName, float x, float y, bool addToContainer = true);
+   IDrawableModule* SpawnModuleOnTheFly(std::string spawnCommand, float x, float y, bool addToContainer = true, std::string name = "");
    void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY, bool canStickToCursor);
 
    int GetNumInputChannels() const { return (int)mInputBuffers.size(); }

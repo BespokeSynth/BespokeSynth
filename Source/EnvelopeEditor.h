@@ -89,6 +89,8 @@ public:
    void CreateUIControls() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
 
    bool IsPinned() const { return mPinned; }
    void SetADSRDisplay(ADSRDisplay* adsrDisplay);
@@ -104,8 +106,8 @@ public:
 
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 400;
-      height = 300;
+      width = mWidth;
+      height = mHeight;
    }
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -119,16 +121,25 @@ private:
    void OnClicked(int x, int y, bool right) override;
    void Pin();
 
+   struct StageControls
+   {
+      FloatSlider* mTargetSlider{ nullptr };
+      FloatSlider* mTimeSlider{ nullptr };
+      FloatSlider* mCurveSlider{ nullptr };
+      Checkbox* mSustainCheckbox{ nullptr };
+      bool mIsSustainStage{ false };
+   };
+
    EnvelopeControl mEnvelopeControl;
+
+   float mWidth{ 320 };
+   float mHeight{ 210 };
 
    ADSRDisplay* mADSRDisplay{ nullptr };
    ClickButton* mPinButton{ nullptr };
    bool mPinned{ false };
-   float mADSRViewLength{ 2000 };
    FloatSlider* mADSRViewLengthSlider{ nullptr };
-   Checkbox* mHasSustainStageCheckbox{ nullptr };
-   IntSlider* mSustainStageSlider{ nullptr };
    FloatSlider* mMaxSustainSlider{ nullptr };
-   Checkbox* mFreeReleaseLevelCheckbox{ nullptr };
    PatchCableSource* mTargetCable{ nullptr };
+   std::array<StageControls, 10> mStageControls{ };
 };

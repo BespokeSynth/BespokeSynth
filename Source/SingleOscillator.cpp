@@ -95,7 +95,6 @@ void SingleOscillator::CreateUIControls()
    FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mVoiceParams.mDetune, -.05f, .05f, 3);
    INTSLIDER(mUnisonSlider, "unison", &mVoiceParams.mUnison, 1, SingleOscillatorVoice::kMaxUnison);
    FLOATSLIDER(mUnisonWidthSlider, "width", &mVoiceParams.mUnisonWidth, 0, 1);
-   FLOATSLIDER_DIGITS(mLengthMultiplierSlider, "adsr len", &mLengthMultiplier, .01f, 10, 1);
    CHECKBOX(mLiteCPUModeCheckbox, "lite cpu", &mVoiceParams.mLiteCPUMode);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
@@ -122,8 +121,6 @@ void SingleOscillator::CreateUIControls()
    mSyncFreqSlider->SetShowName(false);
 
    mFilterCutoffMaxSlider->SetMaxValueDisplay("none");
-
-   mLengthMultiplierSlider->SetMode(FloatSlider::kSquare);
 
    mMultSelector->AddLabel("1/8", -8);
    mMultSelector->AddLabel("1/7", -7);
@@ -232,7 +229,6 @@ void SingleOscillator::DrawModule()
 
    mVolSlider->Draw();
    mPhaseOffsetSlider->Draw();
-   mLengthMultiplierSlider->Draw();
    mPulseWidthSlider->Draw();
    mSyncCheckbox->Draw();
    mSyncFreqSlider->Draw();
@@ -297,12 +293,12 @@ void SingleOscillator::DrawModule()
       ofPopStyle();
    }
 
-   DrawTextRightJustify("wave", kGap + kColumnWidth - 3, 15);
-   DrawTextRightJustify("volume", (kGap + kColumnWidth) * 2 - 3, 15);
+   DrawTextRightJustify("wave", kGap + kColumnWidth - 11, 15);
+   DrawTextRightJustify("volume", (kGap + kColumnWidth) * 2 - 11, 15);
    ofPushStyle();
    if (mVoiceParams.mFilterCutoffMax == SINGLEOSCILLATOR_NO_CUTOFF)
       ofSetColor(100, 100, 100);
-   DrawTextRightJustify("filter", (kGap + kColumnWidth) * 3 - 3, 15);
+   DrawTextRightJustify("filter", (kGap + kColumnWidth) * 3 - 11, 15);
    ofPopStyle();
 }
 
@@ -370,11 +366,6 @@ void SingleOscillator::RadioButtonUpdated(RadioButton* list, int oldVal)
 
 void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mLengthMultiplierSlider)
-   {
-      mADSRDisplay->SetMaxTime(1000 * mLengthMultiplier);
-      mFilterADSRDisplay->SetMaxTime(1000 * mLengthMultiplier);
-   }
    if (slider == mShuffleSlider)
       mDrawOsc.SetShuffle(mVoiceParams.mShuffle);
    if (slider == mPulseWidthSlider)

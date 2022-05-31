@@ -55,7 +55,7 @@ public:
    void CreateUIControls() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool IsResizable() const override { return mAdvancedDisplay; }
+   bool IsResizable() const override { return false; }
    void Resize(float w, float h) override;
 
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -89,17 +89,9 @@ private:
    float mWidth{ 250 };
    float mHeight{ 122 };
 
-   Checkbox* mAdvancedDisplayCheckbox{ nullptr };
-   bool mAdvancedDisplay{ false };
    ADSRDisplay* mAdsrDisplay{ nullptr };
-   EnvelopeControl mEnvelopeControl;
    ::ADSR mAdsr;
 
    bool mUseVelocity{ false };
    Checkbox* mUseVelocityCheckbox{ nullptr };
-   float mADSRViewLength{ 1000 };
-   FloatSlider* mADSRViewLengthSlider{ nullptr };
-   Checkbox* mHasSustainStageCheckbox{ nullptr };
-   IntSlider* mSustainStageSlider{ nullptr };
-   FloatSlider* mMaxSustainSlider{ nullptr };
 };
