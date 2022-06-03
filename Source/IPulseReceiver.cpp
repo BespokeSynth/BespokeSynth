@@ -34,7 +34,7 @@ void IPulseSource::DispatchPulse(PatchCableSource* destination, double time, flo
       return;
 
    const std::vector<IPulseReceiver*>& receivers = destination->GetPulseReceivers();
-   destination->AddHistoryEvent(time, true);
+   destination->AddHistoryEvent(time, true, flags);
    destination->AddHistoryEvent(time + 15, false);
    for (auto* receiver : receivers)
       receiver->OnPulse(time, velocity, flags);

@@ -302,6 +302,17 @@ void PatchCable::Render()
                      }
                      ofEndShape();
 
+                     if (type == kConnectionType_Pulse && (event.mData & kPulseFlag_Reset))
+                     {
+                        ofPushStyle();
+                        pos = MathUtils::Bezier(ofClamp(clampedElapsed, 0, 1), cable.start, bezierControl1, bezierControl2, cable.plug);
+                        ofSetLineWidth(1);
+                        ofFill();
+                        ofSetColor(ofColor::black);
+                        ofCircle(pos.x, pos.y, 3);
+                        ofPopStyle();
+                     }
+
                      if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                         break;
                   }
