@@ -53,32 +53,24 @@ enum PatchCableDrawMode
 
 struct NoteHistoryEvent
 {
-   NoteHistoryEvent()
-   : mOn(false)
-   , mTime(0)
-   {}
-   bool mOn;
-   double mTime;
+   bool mOn{ false };
+   double mTime{ 0 };
+   int mData{ 0 };
 };
 
 class NoteHistory
 {
 public:
-   NoteHistory()
-   {
-      mHistoryPos = 0;
-      mLastOnEventTime = -999;
-   }
-   void AddEvent(double time, bool on);
+   void AddEvent(double time, bool on, int data);
    bool CurrentlyOn();
    double GetLastOnEventTime() { return mLastOnEventTime; }
    const NoteHistoryEvent& GetHistoryEvent(int ago) const;
    static const int kHistorySize = 100;
 
 private:
-   NoteHistoryEvent mHistory[kHistorySize];
-   int mHistoryPos;
-   double mLastOnEventTime;
+   NoteHistoryEvent mHistory[kHistorySize]{};
+   int mHistoryPos{ 0 };
+   double mLastOnEventTime{ -999 };
 };
 
 class PatchCableSource : public IClickable
@@ -142,9 +134,9 @@ public:
    void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
    IModulator* GetModulatorOwner() const { return mModulatorOwner; }
 
-   void AddHistoryEvent(double time, bool on)
+   void AddHistoryEvent(double time, bool on, int data = 0)
    {
-      mNoteHistory.AddEvent(time, on);
+      mNoteHistory.AddEvent(time, on, data);
       if (on)
       {
          mLastOnEventTime = time;

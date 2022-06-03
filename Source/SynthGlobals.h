@@ -224,6 +224,15 @@ inline static float RandomSample()
    return gRandomBipolarDist(gRandom);
 }
 
+inline static int DeterministicRandom(int seed, int index)
+{
+   uint64_t x = seed + ((uint64_t)index << 32);
+   x = (x ^ (x >> 30)) * (0xbf58476d1ce4e5b9);
+   x = (x ^ (x >> 27)) * (0x94d049bb133111eb);
+   x = x ^ (x >> 31);
+   return (int)x;
+}
+
 inline static std::string GetPathSeparator()
 {
 #if BESPOKE_WINDOWS
