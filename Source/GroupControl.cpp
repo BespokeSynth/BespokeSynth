@@ -70,7 +70,7 @@ void GroupControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
                mControlCables.push_back(cable);
             }
          }
-         else if (cableSource->GetTarget() == nullptr)
+         else if (cableSource->GetTarget() == nullptr && fromUserClick)
          {
             RemoveFromVector(cableSource, mControlCables);
          }

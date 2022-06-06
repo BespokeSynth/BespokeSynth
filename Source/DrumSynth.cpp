@@ -472,7 +472,7 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 , mVolNoise(0)
 , mCutoffMax(DRUMSYNTH_NO_CUTOFF)
 , mCutoffMin(10)
-, mQ(1)
+, mQ(sqrt(2) / 2)
 {
    mTone.GetADSR()->SetNumStages(2);
    mTone.GetADSR()->GetHasSustainStage() = false;
@@ -490,7 +490,6 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 
    mFreqAdsr.SetNumStages(2);
    mFreqAdsr.GetHasSustainStage() = false;
-   mFreqAdsr.GetFreeReleaseLevel() = true;
    mFreqAdsr.GetStageData(0).time = 1;
    mFreqAdsr.GetStageData(0).target = 1;
    mFreqAdsr.GetStageData(1).time = 500;
@@ -498,7 +497,6 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 
    mFilterAdsr.SetNumStages(2);
    mFilterAdsr.GetHasSustainStage() = false;
-   mFilterAdsr.GetFreeReleaseLevel() = true;
    mFilterAdsr.GetStageData(0).time = 1;
    mFilterAdsr.GetStageData(0).target = 1;
    mFilterAdsr.GetStageData(1).time = 500;

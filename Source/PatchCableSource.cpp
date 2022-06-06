@@ -756,7 +756,7 @@ void PatchCableSource::LoadState(FileStreamIn& in)
    mOwner->PostRepatch(this, false);
 }
 
-void NoteHistory::AddEvent(double time, bool on)
+void NoteHistory::AddEvent(double time, bool on, int data)
 {
    if (on)
       mLastOnEventTime = time;
@@ -764,6 +764,7 @@ void NoteHistory::AddEvent(double time, bool on)
    mHistoryPos = (mHistoryPos + 1) % kHistorySize;
    mHistory[mHistoryPos].mTime = time;
    mHistory[mHistoryPos].mOn = on;
+   mHistory[mHistoryPos].mData = data;
 }
 
 bool NoteHistory::CurrentlyOn()
