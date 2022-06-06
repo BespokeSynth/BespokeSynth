@@ -49,9 +49,10 @@ class ofxJSONElement;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(std::vector<std::string>& vsts);
+   void GetAvailableVSTs(std::vector<juce::PluginDescription>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
+   juce::PluginDescription GetVSTDesc(int id);
    void SortByLastUsed(std::vector<std::string>& vsts);
 }
 
@@ -72,7 +73,7 @@ public:
 
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
 
-   void SetVST(std::string vstName);
+   void SetVST(std::string vstName, int id);
    void OnVSTWindowClosed();
 
    //IAudioSource
@@ -104,8 +105,10 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
+   void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
 
    std::string GetPluginName() const;
+   std::string GetPluginFormatName() const;
    std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
