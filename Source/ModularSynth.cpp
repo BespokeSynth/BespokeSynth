@@ -2943,7 +2943,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
          {
             VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
             if (plugin != nullptr) {}
-//               plugin->SetVST(vstToSetUp);
+               plugin->SetVST(vstToSetUp, 0);
          }
       }
    }
