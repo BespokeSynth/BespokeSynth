@@ -68,7 +68,8 @@ namespace VSTLookup
             TheSynth->GetKnownPluginList().recreateFromXml(*xml);
          }
       }
-
+      
+      TheSynth->GetKnownPluginList().sort(KnownPluginList::SortMethod::sortAlphabetically, true);
       auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i = 0; i < types.size(); ++i)
          vsts.push_back(types[i]);
