@@ -310,9 +310,24 @@ void SpawnListManager::SetUpVstDropdown()
    std::vector<juce::PluginDescription> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
    std::vector<std::pair<std::string, int>> vstIDs;
+   std::string suffix = "";
    for (auto vst : vsts)
    {
-      vstIDs.push_back(std::make_pair(vst.name.toStdString() + " [" + vst.pluginFormatName.toLowerCase().toStdString() + "]", vst.uniqueId));
+      int count = 0;
+      suffix = "";
+      for (auto &elem : vsts)
+      {
+         if (vst.name == elem.name)
+         {
+            count++;
+            if (count >= 2)
+            {
+               suffix = " [" + vst.pluginFormatName.toLowerCase().toStdString() + "]";
+               break;
+            }
+         }
+      }
+      vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst.uniqueId));
    }
    vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, 0));
    mVstPlugins.SetListVST(vstIDs, "vstplugin");
