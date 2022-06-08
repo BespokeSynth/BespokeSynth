@@ -314,6 +314,7 @@ void SpawnListManager::SetUpVstDropdown()
    std::string suffix = "";
    for (auto vst : vsts)
    {
+      std::string format = vst.pluginFormatName.toLowerCase().toStdString();
       int count = 0;
       suffix = "";
       for (auto &elem : vsts)
@@ -323,12 +324,20 @@ void SpawnListManager::SetUpVstDropdown()
             count++;
             if (count >= 2)
             {
-               suffix = " [" + vst.pluginFormatName.toLowerCase().toStdString() + "]";
+               suffix = " [" + format + "]";
                break;
             }
          }
       }
-      vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst.uniqueId));
+      if (format == "ladspa")
+      {
+         vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, 0));
+      }
+      else
+      {
+         vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst.uniqueId));
+      }
+      
    }
    vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, 0));
    mVstPlugins.SetListVST(vstIDs, "vstplugin");
