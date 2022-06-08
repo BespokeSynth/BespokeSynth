@@ -128,6 +128,22 @@ namespace VSTLookup
 
       return desc;
    }
+   
+   juce::PluginDescription GetVSTDesc(std::string vstName)
+   {
+      juce::PluginDescription desc;
+      auto types = TheSynth->GetKnownPluginList().getTypes();
+      for (int i = 0; i < types.size(); ++i)
+      {
+         if (vstName == types[i].name)
+         {
+            desc = types[i];
+            break;
+         }
+      }
+
+      return desc;
+   }   
 
    void SortByLastUsed(std::vector<std::string>& vsts)
    {
@@ -303,6 +319,11 @@ void VSTPlugin::SetVST(std::string vstName, int id)
       //vstDesc = GetVSTFileDesc(vstName);
       GetVSTFileDesc(vstName, vstDesc);
       id = vstDesc.uniqueId;
+   }
+   
+   else if (id == 1 && vstName != "")
+   {
+      vstDesc = VSTLookup::GetVSTDesc(vstName);
    }
 
    else

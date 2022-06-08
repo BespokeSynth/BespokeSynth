@@ -34,6 +34,7 @@
 struct DropdownListElement
 {
    std::string mLabel;
+   std::pair<std::string, int> mDesc;
    int mValue{ 0 };
 };
 
@@ -98,6 +99,7 @@ public:
    DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
    void AddLabel(std::string label, int value);
+   void AddLabel(std::pair<std::string, int> desc, int value);
    void RemoveLabel(int value);
    std::string GetLabel(int val) const;
    void Render() override;

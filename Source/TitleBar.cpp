@@ -92,9 +92,9 @@ void SpawnList::SetListVST(std::vector<std::pair<std::string, int>> spawnableVST
    mSpawnableVSTs = spawnableVSTs;
    for (int i = 0; i < mSpawnableVSTs.size(); ++i)
    {
-      std::string name = mSpawnableVSTs[i].first.c_str();
-      int id = mSpawnableVSTs[i].second;
-      mSpawnList->AddLabel(name, id);
+      //std::string name = mSpawnableVSTs[i].first.c_str();
+      //int id = mSpawnableVSTs[i].second;
+      mSpawnList->AddLabel(mSpawnableVSTs[i], i);
    }
 }
 
@@ -144,7 +144,6 @@ IDrawableModule* SpawnList::Spawn()
 
 IDrawableModule* SpawnList::SpawnVST()
 {
-   //std::string moduleType = mSpawnableVSTs[mSpawnIndex].first;
    //if (mOverrideModuleType != "")
    std::string moduleType = mOverrideModuleType;
 
@@ -159,9 +158,11 @@ IDrawableModule* SpawnList::SpawnVST()
    if (mOverrideModuleType == "vstplugin")
    {
       VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      std::string name = mLabel.substr(0, mLabel.find(" [", 0));
-      plugin->SetVST(name, mSpawnIndex);
-      //DBG(mSpawnIndex);
+      std::string nameUnstripped = mSpawnableVSTs[mSpawnIndex].first.c_str();
+      std::string name = nameUnstripped.substr(0, nameUnstripped.find(" [", 0));
+      DBG(mSpawnIndex << " " + name);
+      plugin->SetVST(name, mSpawnableVSTs[mSpawnIndex].second);
+
    }
 
    return module;
@@ -331,7 +332,7 @@ void SpawnListManager::SetUpVstDropdown()
       }
       if (format == "ladspa")
       {
-         vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, 0));
+         vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, 1));
       }
       else
       {
