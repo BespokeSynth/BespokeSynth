@@ -159,7 +159,8 @@ IDrawableModule* SpawnList::SpawnVST()
    if (mOverrideModuleType == "vstplugin")
    {
       VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      plugin->SetVST("", mSpawnIndex);
+      std::string name = mLabel.substr(0, mLabel.find(" [", 0));
+      plugin->SetVST(name, mSpawnIndex);
       //DBG(mSpawnIndex);
    }
 
