@@ -88,7 +88,7 @@ void NoteHocket::DrawModule()
    {
       ofRectangle lengthRect = mLengthEntry->GetRect(true);
       ofPushStyle();
-      ofSetColor(0,255,0);
+      ofSetColor(0, 255, 0);
       ofFill();
       float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
       const float kPipSize = 3;
