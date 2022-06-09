@@ -27,9 +27,11 @@
 
 #include "NoteChance.h"
 #include "SynthGlobals.h"
+#include "UIControlMacros.h"
 
 NoteChance::NoteChance()
 {
+   Reseed();
 }
 
 NoteChance::~NoteChance()
@@ -40,7 +42,18 @@ void NoteChance::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mChanceSlider = new FloatSlider(this, "chance", 3, 2, 100, 15, &mChance, 0, 1);
+   UIBLOCK0();
+   FLOATSLIDER(mChanceSlider, "chance", &mChance, 0, 1);
+   UIBLOCK_SHIFTY(5);
+   TEXTENTRY_NUM(mLengthEntry, "beat length", 3, &mLength, 1, 128);
+   TEXTENTRY_NUM(mSeedEntry, "seed", 4, &mSeed, 0, 9999);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mReseedButton, "reseed");
+   ENDUIBLOCK0();
+
+   mLengthEntry->DrawLabel(true);
+   mSeedEntry->DrawLabel(true);
+   mReseedButton->PositionTo(mSeedEntry, kAnchor_Right);
 }
 
 void NoteChance::DrawModule()
@@ -67,6 +80,27 @@ void NoteChance::DrawModule()
       ofRect(106, 9, 10, 7);
       ofPopStyle();
    }
+
+   mLengthEntry->SetShowing(mDeterministic);
+   mLengthEntry->Draw();
+   mSeedEntry->SetShowing(mDeterministic);
+   mSeedEntry->Draw();
+   mReseedButton->SetShowing(mDeterministic);
+   mReseedButton->Draw();
+
+   if (mDeterministic)
+   {
+      ofRectangle lengthRect = mLengthEntry->GetRect(true);
+      ofPushStyle();
+      ofSetColor(0, 255, 0);
+      ofFill();
+      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
+      const float kPipSize = 3;
+      float moduleWidth, moduleHeight;
+      GetModuleDimensions(moduleWidth, moduleHeight);
+      ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
+      ofPopStyle();
+   }
 }
 
 void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -80,7 +114,20 @@ void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    if (velocity > 0)
       ComputeSliders(0);
 
-   bool accept = ofRandom(1) <= mChance;
+   float random;
+   if (mDeterministic)
+   {
+      const int kStepResolution = 128;
+      uint64_t step = int(TheTransport->GetMeasureTime(time) * kStepResolution);
+      int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
+      random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0f);
+   }
+   else
+   {
+      random = ofRandom(1);
+   }
+
+   bool accept = random <= mChance;
    if (accept || velocity == 0)
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 
@@ -93,15 +140,27 @@ void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
+void NoteChance::Reseed()
+{
+   mSeed = gRandom() % 10000;
+}
+
+void NoteChance::ButtonClicked(ClickButton* button)
+{
+   if (button == mReseedButton)
+      Reseed();
+}
+
 void NoteChance::GetModuleDimensions(float& width, float& height)
 {
    width = 118;
-   height = 20;
+   height = mDeterministic ? 60 : 20;
 }
 
 void NoteChance::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("deterministic", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -109,4 +168,6 @@ void NoteChance::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteChance::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+
+   mDeterministic = mModuleSaveData.GetBool("deterministic");
 }
