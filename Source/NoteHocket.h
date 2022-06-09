@@ -78,7 +78,7 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
    int mLastNoteDestinations[128];
-   bool mDeterministic{ true };
+   bool mDeterministic{ false };
    int mLength{ 4 };
    TextEntry* mLengthEntry{ nullptr };
    int mSeed{ 0 };

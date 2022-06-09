@@ -83,6 +83,20 @@ void NoteHocket::DrawModule()
    mSeedEntry->Draw();
    mReseedButton->SetShowing(mDeterministic);
    mReseedButton->Draw();
+
+   if (mDeterministic)
+   {
+      ofRectangle lengthRect = mLengthEntry->GetRect(true);
+      ofPushStyle();
+      ofSetColor(0,255,0);
+      ofFill();
+      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
+      const float kPipSize = 3;
+      float moduleWidth, moduleHeight;
+      GetModuleDimensions(moduleWidth, moduleHeight);
+      ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
+      ofPopStyle();
+   }
 }
 
 void NoteHocket::AdjustHeight()

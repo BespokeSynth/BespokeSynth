@@ -169,6 +169,8 @@ pulser~send pulse messages at an interval
 
 pulsehocket~sends pulses to randomized destinations
 ~weight *~chance that pulse goes to this destination
+~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
+~reseed~generate a new random seed
 
 
 
@@ -184,7 +186,8 @@ pulsedelayer~delay pulses
 
 pulsechance~randomly allow pulses through, based on chance
 ~chance~chance that pulses are allowed through
-
+~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
+~reseed~generate a new random seed
 
 
 pulsebutton~trigger a pulse with a button press
@@ -1595,6 +1598,9 @@ notehumanizer~add randomness to timing and velocity
 
 notehocket~sends notes to random destinations
 ~weight *~chance that note goes to this destination
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~reseed~generate a new random seed
 
 
 
@@ -1636,6 +1642,9 @@ notedelayer~delay input notes by a specified amount
 
 notechance~randomly allow notes through
 ~chance~probability that a note is allowed
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~reseed~generate a new random seed
 
 
 
