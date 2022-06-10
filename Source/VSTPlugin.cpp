@@ -451,7 +451,7 @@ void VSTPlugin::CreateParameterSliders()
 
    const auto& parameters = mPlugin->getParameters();
 
-   int numParameters = MIN(10000, parameters.size());
+   int numParameters = MIN(1000, parameters.size());
    mParameterSliders.resize(numParameters);
    for (int i = 0; i < numParameters; ++i)
    {
