@@ -334,9 +334,11 @@ void VSTPlugin::SetVST(std::string vstName, int id)
    if (vstName == "")
       vstName = vstDesc.name.toStdString();
 
+   juce::String pluginID = vstDesc.createIdentifierString();
+
    mModuleSaveData.SetString("vst", vstName);
    mModuleSaveData.SetInt("vstId", id);
-
+   mModuleSaveData.SetString("pluginID", pluginID.toStdString());
    //mark VST as used
    //{
    //    ofxJSONElement root;
