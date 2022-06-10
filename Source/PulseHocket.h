@@ -74,7 +74,7 @@ private:
    std::vector<PatchCableSource*> mDestinationCables;
    float mWidth{ 200 };
    float mHeight{ 20 };
-   bool mDeterministic{ true };
+   bool mDeterministic{ false };
    int mSeed{ 0 };
    int mRandomIndex{ 0 };
    TextEntry* mSeedEntry{ nullptr };

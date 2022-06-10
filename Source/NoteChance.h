@@ -28,14 +28,15 @@
 #pragma once
 #include "NoteEffectBase.h"
 #include "Slider.h"
+#include "ClickButton.h"
+#include "TextEntry.h"
 
-class NoteChance : public NoteEffectBase, public IFloatSliderListener, public IDrawableModule
+class NoteChance : public NoteEffectBase, public IFloatSliderListener, public IDrawableModule, public ITextEntryListener, public IButtonListener
 {
 public:
    NoteChance();
    virtual ~NoteChance();
    static IDrawableModule* Create() { return new NoteChance(); }
-
 
    void CreateUIControls() override;
 
@@ -45,6 +46,8 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -55,8 +58,16 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
 
+   void Reseed();
+
    float mChance{ 1 };
    FloatSlider* mChanceSlider{ nullptr };
    float mLastRejectTime{ 0 };
    float mLastAcceptTime{ 0 };
+   bool mDeterministic{ false };
+   int mLength{ 4 };
+   TextEntry* mLengthEntry{ nullptr };
+   int mSeed{ 0 };
+   TextEntry* mSeedEntry{ nullptr };
+   ClickButton* mReseedButton{ nullptr };
 };
