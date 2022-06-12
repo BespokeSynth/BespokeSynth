@@ -99,16 +99,18 @@ void ADSRDisplay::Render()
       mViewAdsr.Set(*mAdsr);
       mViewAdsr.Clear();
       mViewAdsr.Start(0, 1);
+      float timeBeforeSustain = mMaxTime;
       float releaseTime = mMaxTime;
       if (mViewAdsr.GetMaxSustain() == -1 && mViewAdsr.GetHasSustainStage())
       {
-         releaseTime = mMaxTime * .2f;
+         timeBeforeSustain = 0;
          for (int i = 0; i < mViewAdsr.GetNumStages(); ++i)
          {
-            releaseTime += mViewAdsr.GetStageData(i).time;
+            timeBeforeSustain += mViewAdsr.GetStageData(i).time;
             if (i == mViewAdsr.GetSustainStage())
                break;
          }
+         releaseTime = timeBeforeSustain + mMaxTime * .2f;
          mViewAdsr.Stop(releaseTime);
       }
       ofVertex(0, mHeight);
@@ -120,8 +122,6 @@ void ADSRDisplay::Render()
       }
       ofEndShape(false);
 
-      ofSetLineWidth(1);
-      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
       float drawTime = 0;
       if (mOverrideDrawTime != -1)
       {
@@ -134,8 +134,63 @@ void ADSRDisplay::Render()
          if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
             drawTime = releaseTime + (gTime - mAdsr->GetStopTime(gTime));
       }
+
+      ofPushStyle();
+      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
+      float x = drawTime / mMaxTime * mWidth;
+      float y = (1 - mViewAdsr.Value(drawTime) * mVol) * mHeight;
+      if (drawTime >= timeBeforeSustain && drawTime <= releaseTime)
+      {
+         ofSetLineWidth(1.5f);
+         ofLine(drawTime / mMaxTime * mWidth, y, releaseTime / mMaxTime * mWidth, y);
+      }
+
       if (drawTime > 0 && drawTime < mMaxTime)
-         ofLine(drawTime / mMaxTime * mWidth, 0, drawTime / mMaxTime * mWidth, mHeight);
+      {
+         ofPushMatrix();
+         ofClipWindow(0, 0, mWidth, mHeight, true);
+         ofCircle(x, y, 1);
+         ofLine(x, y, x, mHeight);
+         ofPopMatrix();
+      }
+
+      mDrawTimeHistory[mDrawTimeHistoryIndex] = drawTime;
+
+      for (size_t i = 0; i < mDrawTimeHistory.size() - 1; ++i)
+      {
+         ofFill();
+         ofSetColor(0, 255, 0, gModuleDrawAlpha * ofLerp(.3f, 0, float(i) / mDrawTimeHistory.size()));
+         int indexLeading = (mDrawTimeHistoryIndex - i + (int)mDrawTimeHistory.size()) % (int)mDrawTimeHistory.size();
+         //int indexPast = (indexLeading - 1 + (int)mDrawTimeHistory.size()) % (int)mDrawTimeHistory.size();
+         double timeLeading = mDrawTimeHistory[indexLeading];
+         //double timePast = mDrawTimeHistory[indexPast];
+         float xLeading = timeLeading / mMaxTime * mWidth;
+         float yLeading = (1 - mViewAdsr.Value(timeLeading) * mVol) * mHeight;
+         //float xPast = timePast / mMaxTime * mWidth;
+         //float yPast = (1 - mViewAdsr.Value(timePast) * mVol) * mHeight;
+
+         ofLine(xLeading, yLeading, xLeading, mHeight);
+
+         /*bool discontinuity = false;
+         if (timeLeading < timePast)
+            discontinuity = true;
+         if (timeLeading >= releaseTime - gBufferSizeMs && timePast <= releaseTime)
+            discontinuity = true;
+
+         if (!discontinuity)
+         {
+            ofBeginShape();
+            ofVertex(xLeading, yLeading);
+            ofVertex(xLeading, mHeight);
+            ofVertex(xPast, mHeight);
+            ofVertex(xPast, yPast);
+            ofEndShape();
+         }*/
+      }
+
+      mDrawTimeHistoryIndex = (mDrawTimeHistoryIndex + 1) % mDrawTimeHistory.size();
+
+      ofPopStyle();
    }
 
    ofFill();

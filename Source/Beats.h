@@ -70,6 +70,7 @@ public:
    void LoadState(FileStreamIn& in);
 
    void RadioButtonUpdated(RadioButton* list, int oldVal);
+   void ButtonClicked(ClickButton* button);
 
 private:
    RadioButton* mSelector{ nullptr };
@@ -91,6 +92,7 @@ private:
    std::vector<Sample*> mSamples;
    float mPan{ 0 };
    FloatSlider* mPanSlider{ nullptr };
+   ClickButton* mDeleteButton{ nullptr };
 };
 
 class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener
@@ -113,6 +115,7 @@ public:
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
+   bool MouseMoved(float x, float y) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -140,6 +143,7 @@ private:
    ChannelBuffer mWriteBuffer;
    std::array<BeatColumn*, 4> mBeatColumns;
    int mRows;
+   int mHighlightColumn{ -1 };
 };
 
 #endif /* defined(__modularSynth__Beats__) */
