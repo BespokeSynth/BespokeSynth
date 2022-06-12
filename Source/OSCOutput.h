@@ -72,9 +72,9 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    char* mLabels[OSC_OUTPUT_MAX_PARAMS];
-   std::list<TextEntry*> mLabelEntry{ };
+   std::list<TextEntry*> mLabelEntry{};
    float mParams[OSC_OUTPUT_MAX_PARAMS];
-   std::list<FloatSlider*> mSliders{ };
+   std::list<FloatSlider*> mSliders{};
 
    std::string mOscOutAddress{ "127.0.0.1" };
    TextEntry* mOscOutAddressEntry{ nullptr };

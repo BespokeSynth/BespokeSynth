@@ -114,7 +114,7 @@ private:
    static DisplayMode sDisplayMode;
    EnvelopeEditor* mEditor{ nullptr };
    double mOverrideDrawTime{ -1 };
-   std::array<double, 10> mDrawTimeHistory{ };
+   std::array<double, 10> mDrawTimeHistory{};
    int mDrawTimeHistoryIndex{ 0 };
 };
 
