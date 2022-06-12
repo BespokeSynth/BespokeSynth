@@ -2852,8 +2852,6 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
       DoAutosave();
 
    std::string moduleType = tokens[0];
-   if (name == "")
-      name = moduleType;
 
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
@@ -2904,6 +2902,9 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
             effectToSetUp += " ";
       }
    }
+
+   if (name == "")
+      name = moduleType;
 
    ofxJSONElement dummy;
    dummy["type"] = moduleType;

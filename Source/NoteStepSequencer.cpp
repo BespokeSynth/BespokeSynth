@@ -67,11 +67,11 @@ NoteStepSequencer::NoteStepSequencer()
 , mLoopResetPointSlider(nullptr)
 , mHasExternalPulseSource(false)
 , mRandomizePitchChance(1)
-, mRandomizePitchRange(1)
+, mRandomizePitchVariety(4)
 , mRandomizeLengthChance(1)
 , mRandomizeLengthRange(1)
 , mRandomizeVelocityChance(1)
-, mRandomizeVelocityDensity(1)
+, mRandomizeVelocityDensity(.6f)
 , mGridControlOffsetX(0)
 , mGridControlOffsetY(0)
 {
@@ -82,7 +82,7 @@ NoteStepSequencer::NoteStepSequencer()
       mNoteLengths[i] = 1;
    }
 
-   RandomizePitches(true);
+   RandomizePitches(false);
 
    TheScale->AddListener(this);
 }
@@ -125,7 +125,7 @@ void NoteStepSequencer::CreateUIControls()
 
    UIBLOCK(220, 20, 150);
    FLOATSLIDER(mRandomizePitchChanceSlider, "rand pitch chance", &mRandomizePitchChance, 0, 1);
-   FLOATSLIDER(mRandomizePitchRangeSlider, "rand pitch range", &mRandomizePitchRange, 0, 1);
+   INTSLIDER(mRandomizePitchVarietySlider, "rand pitch variety", &mRandomizePitchVariety, 1, 10);
    UIBLOCK_NEWCOLUMN();
    FLOATSLIDER(mRandomizeLengthChanceSlider, "rand len chance", &mRandomizeLengthChance, 0, 1);
    FLOATSLIDER(mRandomizeLengthRangeSlider, "rand len range", &mRandomizeLengthRange, 0, 1);
@@ -253,7 +253,7 @@ void NoteStepSequencer::DrawModule()
    mGridControlOffsetXSlider->Draw();
    mGridControlOffsetYSlider->Draw();
    mRandomizePitchChanceSlider->Draw();
-   mRandomizePitchRangeSlider->Draw();
+   mRandomizePitchVarietySlider->Draw();
    mRandomizeLengthChanceSlider->Draw();
    mRandomizeLengthRangeSlider->Draw();
    mRandomizeVelocityChanceSlider->Draw();
@@ -367,7 +367,7 @@ void NoteStepSequencer::DrawModule()
       {
          mToneDropdowns[i]->SetShowing(mShowStepControls);
          mToneDropdowns[i]->SetPosition(gridX + boxWidth * i, controlYPos);
-         mToneDropdowns[i]->SetWidth(boxWidth);
+         mToneDropdowns[i]->SetWidth(std::min(boxWidth, 30.0f));
          mToneDropdowns[i]->Draw();
 
          mVelocitySliders[i]->SetShowing(mShowStepControls);
@@ -987,15 +987,15 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    }
    else
    {
+      //reduce overall randomness: choose from a limited pool of pitches
+      std::vector<int> newTones;
+      for (int i = 0; i < mRandomizePitchVariety; ++i)
+         newTones.push_back(ofClamp(int(ofRandom(0, mNoteRange) + .5f), 0, mNoteRange - 1));
+
       for (int i = 0; i < mLength; ++i)
       {
          if (ofRandom(1) <= mRandomizePitchChance)
-         {
-            float minValue = MAX(0, mTones[i] - mNoteRange * mRandomizePitchRange);
-            float maxValue = MIN(mNoteRange, mTones[i] + mNoteRange * mRandomizePitchRange);
-            if (minValue != maxValue)
-               mTones[i] = ofClamp(int(ofRandom(minValue, maxValue) + .5f), 0, mNoteRange - 1);
-         }
+            mTones[i] = newTones[gRandom() % newTones.size()];
       }
    }
 }

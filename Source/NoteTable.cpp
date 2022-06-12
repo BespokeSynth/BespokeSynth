@@ -245,7 +245,7 @@ void NoteTable::DrawModule()
       {
          mToneDropdowns[i]->SetShowing(mShowColumnControls);
          mToneDropdowns[i]->SetPosition(gridX + boxWidth * i, controlYPos);
-         mToneDropdowns[i]->SetWidth(boxWidth);
+         mToneDropdowns[i]->SetWidth(std::min(boxWidth, 30.0f));
          mToneDropdowns[i]->Draw();
       }
       else

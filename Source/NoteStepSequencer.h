@@ -193,13 +193,13 @@ private:
    ClickButton* mRandomizeLengthButton;
    ClickButton* mRandomizeVelocityButton;
    float mRandomizePitchChance;
-   float mRandomizePitchRange;
+   int mRandomizePitchVariety;
    float mRandomizeLengthChance;
    float mRandomizeLengthRange;
    float mRandomizeVelocityChance;
    float mRandomizeVelocityDensity;
    FloatSlider* mRandomizePitchChanceSlider;
-   FloatSlider* mRandomizePitchRangeSlider;
+   IntSlider* mRandomizePitchVarietySlider;
    FloatSlider* mRandomizeLengthChanceSlider;
    FloatSlider* mRandomizeLengthRangeSlider;
    FloatSlider* mRandomizeVelocityChanceSlider;

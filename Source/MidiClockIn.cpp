@@ -163,7 +163,7 @@ void MidiClockIn::OnMidi(const juce::MidiMessage& message)
    }
    if (message.isSongPositionPointer())
    {
-      ofLog() << "midi position pointer " << ofToString(message.getSongPositionPointerMidiBeat());
+      //ofLog() << "midi position pointer " << ofToString(message.getSongPositionPointerMidiBeat());
 
       if (mEnabled)
          TheTransport->SetMeasureTime(message.getSongPositionPointerMidiBeat() / TheTransport->GetTimeSigTop() + mStartOffsetMs / TheTransport->MsPerBar());
