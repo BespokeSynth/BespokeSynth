@@ -53,7 +53,7 @@ void NoteHocket::CreateUIControls()
       FLOATSLIDER(mWeightSlider[i], ("weight " + ofToString(i)).c_str(), &mWeight[i], 0, 1);
    }
    UIBLOCK_SHIFTY(5);
-   TEXTENTRY_NUM(mLengthEntry, "beat length", 3, &mLength, 1, 128);
+   INTSLIDER(mLengthSlider, "beat length", &mLength, 1, 16);
    TEXTENTRY_NUM(mSeedEntry, "seed", 4, &mSeed, 0, 9999);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mPrevSeedButton, "<");
@@ -62,10 +62,9 @@ void NoteHocket::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mNextSeedButton, ">");
    ENDUIBLOCK(mWidth, mHeight);
-   mWidth += 20;
+   mWidth = 121;
 
    GetPatchCableSource()->SetEnabled(false);
-   mLengthEntry->DrawLabel(true);
    mSeedEntry->DrawLabel(true);
    mPrevSeedButton->PositionTo(mSeedEntry, kAnchor_Right);
    mReseedButton->PositionTo(mPrevSeedButton, kAnchor_Right);
@@ -83,8 +82,8 @@ void NoteHocket::DrawModule()
       mWeightSlider[i]->Draw();
    }
 
-   mLengthEntry->SetShowing(mDeterministic);
-   mLengthEntry->Draw();
+   mLengthSlider->SetShowing(mDeterministic);
+   mLengthSlider->Draw();
    mSeedEntry->SetShowing(mDeterministic);
    mSeedEntry->Draw();
    mPrevSeedButton->SetShowing(mDeterministic);
@@ -96,7 +95,7 @@ void NoteHocket::DrawModule()
 
    if (mDeterministic)
    {
-      ofRectangle lengthRect = mLengthEntry->GetRect(true);
+      ofRectangle lengthRect = mLengthSlider->GetRect(true);
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
@@ -117,7 +116,7 @@ void NoteHocket::AdjustHeight()
       deterministicPad = 3;
 
    float height = mNumDestinations * 17 + deterministicPad;
-   mLengthEntry->Move(0, height - mHeight);
+   mLengthSlider->Move(0, height - mHeight);
    mSeedEntry->Move(0, height - mHeight);
    mPrevSeedButton->Move(0, height - mHeight);
    mReseedButton->Move(0, height - mHeight);

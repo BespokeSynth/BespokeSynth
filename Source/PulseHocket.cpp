@@ -61,7 +61,7 @@ void PulseHocket::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mNextSeedButton, ">");
    ENDUIBLOCK(mWidth, mHeight);
-   mWidth += 20;
+   mWidth = 121;
 
    GetPatchCableSource()->SetEnabled(false);
    mSeedEntry->DrawLabel(true);
