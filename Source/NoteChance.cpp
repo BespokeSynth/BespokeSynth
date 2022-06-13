@@ -48,12 +48,18 @@ void NoteChance::CreateUIControls()
    TEXTENTRY_NUM(mLengthEntry, "beat length", 3, &mLength, 1, 128);
    TEXTENTRY_NUM(mSeedEntry, "seed", 4, &mSeed, 0, 9999);
    UIBLOCK_SHIFTRIGHT();
-   BUTTON(mReseedButton, "reseed");
+   BUTTON(mPrevSeedButton, "<");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mReseedButton, "*");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mNextSeedButton, ">");
    ENDUIBLOCK0();
 
    mLengthEntry->DrawLabel(true);
    mSeedEntry->DrawLabel(true);
-   mReseedButton->PositionTo(mSeedEntry, kAnchor_Right);
+   mPrevSeedButton->PositionTo(mSeedEntry, kAnchor_Right);
+   mReseedButton->PositionTo(mPrevSeedButton, kAnchor_Right);
+   mNextSeedButton->PositionTo(mReseedButton, kAnchor_Right);
 }
 
 void NoteChance::DrawModule()
@@ -85,8 +91,12 @@ void NoteChance::DrawModule()
    mLengthEntry->Draw();
    mSeedEntry->SetShowing(mDeterministic);
    mSeedEntry->Draw();
+   mPrevSeedButton->SetShowing(mDeterministic);
+   mPrevSeedButton->Draw();
    mReseedButton->SetShowing(mDeterministic);
    mReseedButton->Draw();
+   mNextSeedButton->SetShowing(mDeterministic);
+   mNextSeedButton->Draw();
 
    if (mDeterministic)
    {
@@ -147,8 +157,12 @@ void NoteChance::Reseed()
 
 void NoteChance::ButtonClicked(ClickButton* button)
 {
+   if (button == mPrevSeedButton)
+      mSeed = (mSeed - 1 + 10000) % 10000;
    if (button == mReseedButton)
       Reseed();
+   if (button == mNextSeedButton)
+      mSeed = (mSeed + 1) % 10000;
 }
 
 void NoteChance::GetModuleDimensions(float& width, float& height)
