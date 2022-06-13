@@ -45,7 +45,7 @@ void NoteChance::CreateUIControls()
    UIBLOCK0();
    FLOATSLIDER(mChanceSlider, "chance", &mChance, 0, 1);
    UIBLOCK_SHIFTY(5);
-   TEXTENTRY_NUM(mLengthEntry, "beat length", 3, &mLength, 1, 128);
+   INTSLIDER(mLengthSlider, "beat length", &mLength, 1, 16);
    TEXTENTRY_NUM(mSeedEntry, "seed", 4, &mSeed, 0, 9999);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mPrevSeedButton, "<");
@@ -55,7 +55,6 @@ void NoteChance::CreateUIControls()
    BUTTON(mNextSeedButton, ">");
    ENDUIBLOCK0();
 
-   mLengthEntry->DrawLabel(true);
    mSeedEntry->DrawLabel(true);
    mPrevSeedButton->PositionTo(mSeedEntry, kAnchor_Right);
    mReseedButton->PositionTo(mPrevSeedButton, kAnchor_Right);
@@ -87,8 +86,8 @@ void NoteChance::DrawModule()
       ofPopStyle();
    }
 
-   mLengthEntry->SetShowing(mDeterministic);
-   mLengthEntry->Draw();
+   mLengthSlider->SetShowing(mDeterministic);
+   mLengthSlider->Draw();
    mSeedEntry->SetShowing(mDeterministic);
    mSeedEntry->Draw();
    mPrevSeedButton->SetShowing(mDeterministic);
@@ -100,7 +99,7 @@ void NoteChance::DrawModule()
 
    if (mDeterministic)
    {
-      ofRectangle lengthRect = mLengthEntry->GetRect(true);
+      ofRectangle lengthRect = mLengthSlider->GetRect(true);
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
