@@ -79,4 +79,6 @@ private:
    int mRandomIndex{ 0 };
    TextEntry* mSeedEntry{ nullptr };
    ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };
