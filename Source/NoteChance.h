@@ -31,7 +31,7 @@
 #include "ClickButton.h"
 #include "TextEntry.h"
 
-class NoteChance : public NoteEffectBase, public IFloatSliderListener, public IDrawableModule, public ITextEntryListener, public IButtonListener
+class NoteChance : public NoteEffectBase, public IFloatSliderListener, public IIntSliderListener, public IDrawableModule, public ITextEntryListener, public IButtonListener
 {
 public:
    NoteChance();
@@ -46,6 +46,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
    void TextEntryComplete(TextEntry* entry) override {}
    void ButtonClicked(ClickButton* button) override;
 
@@ -66,8 +67,10 @@ private:
    float mLastAcceptTime{ 0 };
    bool mDeterministic{ false };
    int mLength{ 4 };
-   TextEntry* mLengthEntry{ nullptr };
+   IntSlider* mLengthSlider{ nullptr };
    int mSeed{ 0 };
    TextEntry* mSeedEntry{ nullptr };
    ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

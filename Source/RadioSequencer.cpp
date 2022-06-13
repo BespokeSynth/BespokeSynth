@@ -71,9 +71,9 @@ void RadioSequencer::CreateUIControls()
    mGrid->SetMajorColSize(4);
    mGrid->SetListener(this);
 
-   /*mIntervalSelector->AddLabel("8", kInterval_8);
-    mIntervalSelector->AddLabel("4", kInterval_4);
-    mIntervalSelector->AddLabel("2", kInterval_2);*/
+   mIntervalSelector->AddLabel("8", kInterval_8);
+   mIntervalSelector->AddLabel("4", kInterval_4);
+   mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);

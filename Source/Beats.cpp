@@ -117,6 +117,16 @@ void Beats::DrawModule()
    int i = 0;
    for (BeatColumn* column : mBeatColumns)
    {
+      if (i == mHighlightColumn)
+      {
+         ofPushStyle();
+         ofFill();
+         ofSetColor(255, 255, 255, 40);
+         float width, height;
+         GetModuleDimensions(width, height);
+         ofRect(i * BEAT_COLUMN_WIDTH + 1, 3, BEAT_COLUMN_WIDTH - 2, height - 6);
+         ofPopStyle();
+      }
       column->Draw(i * BEAT_COLUMN_WIDTH + 3, 5);
       ++i;
    }
@@ -130,6 +140,8 @@ void Beats::FilesDropped(std::vector<std::string> files, int x, int y)
       sample->Read(file.c_str());
       SampleDropped(x, y, sample);
    }
+
+   mHighlightColumn = -1;
 }
 
 void Beats::SampleDropped(int x, int y, Sample* sample)
@@ -144,10 +156,28 @@ void Beats::SampleDropped(int x, int y, Sample* sample)
 
    if (column < (int)mBeatColumns.size())
       mBeatColumns[column]->AddBeat(sample);
+
+   mHighlightColumn = -1;
+}
+
+bool Beats::MouseMoved(float x, float y)
+{
+   IDrawableModule::MouseMoved(x, y);
+
+   int column = x / BEAT_COLUMN_WIDTH;
+
+   if (TheSynth->GetHeldSample() != nullptr && column >= 0 && column < (int)mBeatColumns.size())
+      mHighlightColumn = column;
+   else
+      mHighlightColumn = -1;
+
+   return false;
 }
 
 void Beats::ButtonClicked(ClickButton* button)
 {
+   for (BeatColumn* column : mBeatColumns)
+      column->ButtonClicked(button);
 }
 
 void Beats::CheckboxUpdated(Checkbox* checkbox)
@@ -369,6 +399,9 @@ void BeatColumn::Draw(int x, int y)
    mNumBarsSlider->Draw();
    mSelector->SetPosition(x, y + 120);
    mSelector->Draw();
+   mDeleteButton->SetPosition(x + 80, y + 88);
+   mDeleteButton->SetShowing(mSampleIndex != -1);
+   mDeleteButton->Draw();
 }
 
 void BeatColumn::CreateUIControls()
@@ -380,6 +413,7 @@ void BeatColumn::CreateUIControls()
    mDoubleTimeCheckbox = new Checkbox(mOwner, ("double" + ofToString(mIndex)).c_str(), 0, 0, &mDoubleTime);
    mNumBarsSlider = new IntSlider(mOwner, ("bars" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mNumBars, 1, 8);
    mSelector = new RadioButton(mOwner, ("selector" + ofToString(mIndex)).c_str(), 0, 0, &mSampleIndex);
+   mDeleteButton = new ClickButton(mOwner, ("delete " + ofToString(mIndex)).c_str(), 0, 0);
 
    mSelector->SetForcedWidth(controlWidth);
    mSelector->AddLabel("none", -1);
@@ -399,6 +433,19 @@ void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal)
    {
       if (mSampleIndex != -1 && mSampleIndex < (int)mSamples.size())
          mBeatData.LoadBeat(mSamples[mSampleIndex]);
+   }
+}
+
+void BeatColumn::ButtonClicked(ClickButton* button)
+{
+   if (button == mDeleteButton)
+   {
+      if (mSampleIndex >= 0 && mSampleIndex < (int)mSamples.size())
+      {
+         mSamples.erase(mSamples.begin() + mSampleIndex);
+         mSelector->RemoveLabel(mSampleIndex);
+         mSampleIndex = -1;
+      }
    }
 }
 

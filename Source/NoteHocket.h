@@ -36,7 +36,7 @@
 #include "TextEntry.h"
 #include "ClickButton.h"
 
-class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableModule, public IFloatSliderListener, public ITextEntryListener, public IButtonListener
+class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    NoteHocket();
@@ -49,6 +49,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
    void TextEntryComplete(TextEntry* entry) override {}
    void ButtonClicked(ClickButton* button) override;
 
@@ -80,8 +81,10 @@ private:
    int mLastNoteDestinations[128];
    bool mDeterministic{ false };
    int mLength{ 4 };
-   TextEntry* mLengthEntry{ nullptr };
+   IntSlider* mLengthSlider{ nullptr };
    int mSeed{ 0 };
    TextEntry* mSeedEntry{ nullptr };
    ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

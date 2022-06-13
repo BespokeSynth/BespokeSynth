@@ -119,6 +119,9 @@ globalcontrols~interface controls, intended to allow you to use midi controllers
 ~lissajous r~amount of red in background lissajous curve
 ~lissajous g~amount of green in background lissajous curve
 ~lissajous b~amount of blue in background lissajous curve
+~background r~amount of red in background color
+~background g~amount of green in background color
+~background b~amount of blue in background color
 
 
 
@@ -139,6 +142,26 @@ eventcanvas~schedule values to set over time
 
 comment~a box to display some text, to explain a section of a patch
 ~comment~type text here
+
+
+
+clockout~sends out clock pulses to synchronize external midi devices
+~device~device to target
+~send start~send a signal to reset the gear to the start of its sequence
+~multiplier~tempo multiplier for how the gear should respond to the signals
+
+
+
+clockin~reads in clock pulses from external midi devices to control bespoke's transport
+~device~device to receive from
+~rounding~precision to round incoming tempo data
+~start offset ms~offset in milliseconds to tweak synchronization between bespoke and gear
+~smoothing~how much to smooth incoming tempo
+
+
+
+abletonlink~synchronizes transport with software and devices that support ableton link
+~offset ms~offset in milliseconds to tweak synchronization
 
 
 
@@ -170,7 +193,9 @@ pulser~send pulse messages at an interval
 pulsehocket~sends pulses to randomized destinations
 ~weight *~chance that pulse goes to this destination
 ~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
-~reseed~generate a new random seed
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -187,7 +212,9 @@ pulsedelayer~delay pulses
 pulsechance~randomly allow pulses through, based on chance
 ~chance~chance that pulses are allowed through
 ~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
-~reseed~generate a new random seed
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 pulsebutton~trigger a pulse with a button press
@@ -219,6 +246,7 @@ velocitytocv~take a note's velocity and convert it to a modulation value
 valuesetter~set a specified value on a targeted control
 ~value~value to set
 ~set~click here to send the value (or, send a pulse to this module for the same result)
+~slider~value to set
 
 
 
@@ -521,6 +549,9 @@ notechain~trigger a note, followed by a pulse to trigger another note after a de
 
 notecanvas~looping note roll
 ~quantize~quantize selected notes to interval
+~save midi~export canvas contents to a midi file
+~load midi~import canvas contents from a midi file
+~loadtrack~which track number to import when using "load midi"
 ~play~play notes on canvas
 ~rec~record input notes to canvas
 ~free rec~enable record mode, and extend canvas if we reach the end
@@ -606,6 +637,7 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~r den~density of the randomizer output. the higher this is, the busier the random output will be.
 ~r amt~the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.
 ~r lock*~lock this row so it doesn't get randomized
+~random*~randomize this row
 
 
 
@@ -920,6 +952,7 @@ butterworth~filter using the butterworth formula
 
 compressor~try to keep volume at a certain level
 ~mix~amount of compression. lower this value for a "parallel compression" effect. you should use this mix slider instead of the effectchain's mix slider, to compensate for lookahead.
+~drive~rescale input to affect how much compression affects it
 ~threshold~threshold where gain should start to be reduced
 ~ratio~how much gain reduction to apply when the single passes the threshold
 ~attack~speed to apply gain reduction
@@ -1366,6 +1399,8 @@ drumplayer~sample player intended for drum playback
 ~test *~play this sample
 ~random *~choose a random sample from the selected hitcategory
 ~grab *~grab this sample
+~prev *~choose the previous sample from the selected hitcategory
+~next *~choose the next sample from the selected hitcategory
 
 
 
@@ -1376,6 +1411,7 @@ beats~multi-loop player, for mixing sample layers together
 ~double*~enable this to play at double speed
 ~bars*~how many measures long are the samples in this slot?
 ~selector*~which sample should we play in this slot? drag samples onto here to add them to this slot.
+~delete *~remove the current sample from the list
 
 
 
@@ -1404,6 +1440,11 @@ vibrato~add rhythmic oscillating pitch bend to notes
 
 
 
+velocitytochance~use a note's velocity to determine the chance that the note plays
+~full velocity~set velocity to full for notes that pass through
+
+
+
 velocitystepsequencer~adjusts the velocity of incoming notes based upon a sequence
 ~interval~speed to advance sequence
 ~len~length of sequence
@@ -1420,6 +1461,10 @@ velocitysetter~set a note's velocity to this value
 
 velocityscaler~scale a note's velocity to be higher or lower
 ~scale~amount to multiply velocity by
+
+
+
+velocitycurve~adjust velocity based upon a curve mapping
 
 
 
@@ -1487,7 +1532,7 @@ pressure~add pressure modulation to notes
 
 
 portamento~only allows one note to play at a time, and uses pitch bend to glide between notes
-~require held~if enabled, only glide to a new note if an old note is held. otherwise, always glide, based upon the prior input note.
+~mode~always: always glide to new notes\nretrigger held: bend to notes if the prior note is held, and retrigger\nbend held: bend to notes if the prior note is held, without retriggering
 ~glide~time to glide, in milliseconds
 
 
@@ -1551,6 +1596,11 @@ noteexpression~control where notes are routed based upon evaluated expressions. 
 
 
 
+noteecho~output incoming notes at specified delays
+~delay *~amount of time to delay this output, in measures
+
+
+
 noteratchet~rapidly repeat an input note over a duration
 ~duration~total length of time repeats should last
 ~subdivision~length of each repeat
@@ -1600,7 +1650,9 @@ notehocket~sends notes to random destinations
 ~weight *~chance that note goes to this destination
 ~beat length~restart the determined random sequence at this interval
 ~seed~number that determines the random sequence
-~reseed~generate a new random seed
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -1644,7 +1696,9 @@ notechance~randomly allow notes through
 ~chance~probability that a note is allowed
 ~beat length~restart the determined random sequence at this interval
 ~seed~number that determines the random sequence
-~reseed~generate a new random seed
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -1658,7 +1712,7 @@ mpetweaker~adjust incoming MPE modulation values
 
 
 
-mpesmoother~[no tooltip]
+mpesmoother~smooth out MPE parameters
 ~pitch~amount to smooth incoming pitchbend
 ~pressure~amount to smooth incoming pressure
 ~modwheel~amount to smooth incoming modwheel
@@ -1829,6 +1883,8 @@ scale~controls the global scale used by various modules
 ~PPO~pitches per octave
 ~tuning~what frequency does the pitch defined in "note" represent?
 ~note~the pitch that maps to the frequency defined in "tuning"
+~load SCL~load SCL file to determine scale
+~load KBM~load KBM file to determine keyboard mapping
 
 
 

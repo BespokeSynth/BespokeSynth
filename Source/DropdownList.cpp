@@ -119,13 +119,22 @@ void DropdownList::CalculateWidth()
    mMaxItemWidth = mWidth;
    for (int i = 0; i < mElements.size(); ++i)
    {
-      int width = GetStringWidth(mElements[i].mLabel) + 15;
+      int width = GetStringWidth(mElements[i].mLabel) + (mDrawTriangle ? 15 : 3);
       if (width > mMaxItemWidth)
          mMaxItemWidth = width;
    }
 
    if (mAutoCalculateWidth)
       mWidth = MIN(mMaxItemWidth, 180);
+}
+
+void DropdownList::SetWidth(int width)
+{
+   if (width != mWidth)
+   {
+      mWidth = width;
+      CalculateWidth();
+   }
 }
 
 std::string DropdownList::GetLabel(int val) const
@@ -173,7 +182,7 @@ void DropdownList::Render()
    ofSetColor(textColor);
 
    ofPushMatrix();
-   ofClipWindow(mX, mY, w - 12, h, true);
+   ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
    DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
    ofPopMatrix();
    if (mDrawTriangle)
