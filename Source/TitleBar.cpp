@@ -161,7 +161,7 @@ IDrawableModule* SpawnList::SpawnVST()
       std::string nameUnstripped = mSpawnableVSTs[mSpawnIndex].first.c_str();
       std::string name = nameUnstripped.substr(0, nameUnstripped.find(" [", 0));
       DBG(mSpawnIndex << " " + name);
-      plugin->SetVST(name, mSpawnableVSTs[mSpawnIndex].second);
+      plugin->SetVST(VSTLookup::GetVSTDesc(mSpawnableVSTs[mSpawnIndex].second));
    }
 
    return module;

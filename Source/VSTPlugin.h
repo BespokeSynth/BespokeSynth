@@ -54,7 +54,7 @@ namespace VSTLookup
    std::string GetVSTPath(std::string vstName);
    juce::PluginDescription GetVSTDesc(int id);
    juce::PluginDescription GetVSTDesc(std::string vstName);
-   juce::PluginDescription GetVSTDesc(juce::String vstName);
+   juce::PluginDescription GetPluginDesc(juce::String pluginId);
    void SortByLastUsed(std::vector<std::string>& vsts);
 }
 
@@ -75,7 +75,7 @@ public:
 
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
 
-   void SetVST(std::string vstName, int id);
+   void SetVST(juce::PluginDescription pluginDesc);
    void OnVSTWindowClosed();
 
    //IAudioSource
