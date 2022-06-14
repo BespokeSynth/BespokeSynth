@@ -334,11 +334,11 @@ void VSTPlugin::SetVST(std::string vstName, int id)
    if (vstName == "")
       vstName = vstDesc.name.toStdString();
 
-   juce::String pluginID = vstDesc.createIdentifierString();
+   juce::String pluginId = vstDesc.createIdentifierString();
 
    mModuleSaveData.SetString("vst", vstName);
    mModuleSaveData.SetInt("vstId", id);
-   mModuleSaveData.SetString("pluginID", pluginID.toStdString());
+   mModuleSaveData.SetString("pluginId", pluginId.toStdString());
    //mark VST as used
    //{
    //    ofxJSONElement root;
@@ -1066,7 +1066,8 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("vst", moduleInfo, "", VSTLookup::FillVSTList);
    mModuleSaveData.LoadInt("vstId", moduleInfo, 0, 0, 0);
-
+   mModuleSaveData.LoadString("pluginId", moduleInfo, "", VSTLookup::FillVSTList);
+   
    mModuleSaveData.LoadString("target", moduleInfo);
 
    mModuleSaveData.LoadInt("channel", moduleInfo, 1, 0, 16);
