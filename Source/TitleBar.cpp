@@ -333,7 +333,7 @@ void SpawnListManager::SetUpVstDropdown()
 
       
    }
-   //vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, 0));
+   vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, stump));
    mVstPlugins.SetListVST(vstIDs, "vstplugin");
 }
 

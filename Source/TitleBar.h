@@ -90,6 +90,7 @@ struct SpawnListManager
 
 private:
    std::vector<SpawnList*> mDropdowns;
+   juce::PluginDescription stump{};
 };
 
 class NewPatchConfirmPopup : public IDrawableModule, public IButtonListener
