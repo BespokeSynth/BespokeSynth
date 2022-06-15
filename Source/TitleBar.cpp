@@ -30,10 +30,10 @@
 #include "ModuleFactory.h"
 #include "ModuleSaveDataPanel.h"
 #include "HelpDisplay.h"
+#include "VSTPlugin.h"
 #include "Prefab.h"
 #include "UserPrefsEditor.h"
 #include "UIControlMacros.h"
-#include "VSTPlugin.h"
 #include "VSTScanner.h"
 #include "MidiController.h"
 
@@ -80,7 +80,7 @@ void SpawnList::SetList(std::vector<std::string> spawnables, std::string overrid
    }
 }
 
-void SpawnList::SetListVST(std::vector<std::pair<std::string, juce::PluginDescription>> spawnableVSTs, std::string overrideModuleType)
+void SpawnList::SetListVST(std::vector<std::pair<std::string, int>> spawnableVSTs, std::string overrideModuleType)
 {
    mOverrideModuleType = overrideModuleType;
    if (mSpawnList == nullptr)
@@ -161,7 +161,7 @@ IDrawableModule* SpawnList::SpawnVST()
       std::string nameUnstripped = mSpawnableVSTs[mSpawnIndex].first.c_str();
       std::string name = nameUnstripped.substr(0, nameUnstripped.find(" [", 0));
       DBG(mSpawnIndex << " " + name);
-      plugin->SetVST(mSpawnableVSTs[mSpawnIndex].second);
+      plugin->SetVST(VSTLookup::GetVSTDesc(mSpawnableVSTs[mSpawnIndex].second));
    }
 
    return module;
@@ -310,7 +310,7 @@ void SpawnListManager::SetUpVstDropdown()
 {
    std::vector<juce::PluginDescription> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
-   std::vector<std::pair<std::string, juce::PluginDescription>> vstIDs;
+   std::vector<std::pair<std::string, int>> vstIDs;
    std::string suffix = "";
    for (auto vst : vsts)
    {
@@ -329,11 +329,17 @@ void SpawnListManager::SetUpVstDropdown()
             }
          }
       }
-         vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst));
-
+      if (format == "ladspa")
+      {
+         vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, 1));
+      }
+      else
+      {
+         vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst.uniqueId));
+      }
       
    }
-   //vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, 0));
+   vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, 0));
    mVstPlugins.SetListVST(vstIDs, "vstplugin");
 }
 
