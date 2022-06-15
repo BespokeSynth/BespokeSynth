@@ -1077,28 +1077,33 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 void VSTPlugin::SetUpFromSaveData()
 {
    juce::PluginDescription pluginDesc;
-   if (mModuleSaveData.HasProperty("vstId") && mModuleSaveData.GetInt("vstId") != 0)
+   
+   if (mModuleSaveData.HasProperty("pluginId") && mModuleSaveData.GetString("pluginId") != "")
    {
-      std::string vstName = mModuleSaveData.GetString("vst");
+   DBG("try to use description ident");
+      auto pluginId = juce::String(mModuleSaveData.GetString("pluginId"));
+      DBG(pluginId);
+      pluginDesc = VSTLookup::GetPluginDesc(pluginId);
+   }
+  
+   else if (mModuleSaveData.HasProperty("vstId") && mModuleSaveData.GetInt("vstId") != 0)
+   {
+     DBG("try to use uniqueId");
       int vstId = mModuleSaveData.GetInt("vstId");
       if (vstId != 0)
       {
-         pluginDesc = VSTLookup::GetVSTDesc(vstName);
+         pluginDesc = VSTLookup::GetVSTDesc(vstId);
       }
    }
-   else if (mModuleSaveData.HasProperty("vst"))
+   
+   else
    {
+   DBG("try to use filename");
       std::string vstName = mModuleSaveData.GetString("vst");
       if (vstName != "")
       {
          GetVSTFileDesc(vstName, pluginDesc);
       }
-   }
-
-   else
-   {
-      auto pluginId = juce::String(mModuleSaveData.GetString("pluginId"));
-      pluginDesc = VSTLookup::GetPluginDesc(pluginId);
    }
 
    SetVST(pluginDesc);
