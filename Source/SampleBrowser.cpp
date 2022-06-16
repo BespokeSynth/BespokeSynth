@@ -242,6 +242,8 @@ void SampleBrowser::SetUpFromSaveData()
 
 void SampleBrowser::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mCurrentDirectory.toStdString();

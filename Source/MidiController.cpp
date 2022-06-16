@@ -2435,6 +2435,8 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
 
 void MidiController::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    bool hasNonstandardController = (mNonstandardController != nullptr);

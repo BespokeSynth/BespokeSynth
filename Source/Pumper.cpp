@@ -188,6 +188,8 @@ void Pumper::SyncToAdsr()
 
 void Pumper::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);

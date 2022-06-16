@@ -201,6 +201,8 @@ void MultitrackRecorder::SetUpFromSaveData()
 
 void MultitrackRecorder::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mWidth;

@@ -339,6 +339,8 @@ void GridModule::CheckboxUpdated(Checkbox* checkbox)
 
 void GridModule::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);

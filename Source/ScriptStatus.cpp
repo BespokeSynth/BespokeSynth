@@ -131,6 +131,8 @@ void ScriptStatus::SaveLayout(ofxJSONElement& moduleInfo)
 
 void ScriptStatus::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mWidth;

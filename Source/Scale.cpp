@@ -755,6 +755,8 @@ void Scale::SetUpFromSaveData()
 
 void Scale::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mIntonation;

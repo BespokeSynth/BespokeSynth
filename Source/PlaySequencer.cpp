@@ -557,6 +557,8 @@ void PlaySequencer::SetUpFromSaveData()
 
 void PlaySequencer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);

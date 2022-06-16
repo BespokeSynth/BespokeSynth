@@ -1324,6 +1324,8 @@ void Looper::SetUpFromSaveData()
 
 void Looper::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mLoopLength;

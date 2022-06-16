@@ -789,6 +789,8 @@ void LooperRecorder::SetUpFromSaveData()
 
 void LooperRecorder::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mBaseTempo;

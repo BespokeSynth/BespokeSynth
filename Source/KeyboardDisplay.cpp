@@ -334,6 +334,8 @@ void KeyboardDisplay::SetUpFromSaveData()
 
 void KeyboardDisplay::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mWidth;

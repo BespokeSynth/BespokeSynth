@@ -224,6 +224,8 @@ void DelayEffect::DropdownUpdated(DropdownList* list, int oldVal)
 
 void DelayEffect::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mDelayBuffer.SaveState(out);

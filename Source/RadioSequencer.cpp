@@ -369,7 +369,7 @@ void RadioSequencer::SaveState(FileStreamOut& out)
 
 void RadioSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   mLoadRev = -1;
+   mLoadRev = rev;
 
    if (ModularSynth::sLoadingFileSaveStateRev == 422)
    {

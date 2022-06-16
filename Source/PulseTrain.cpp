@@ -236,6 +236,8 @@ void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, float value, float 
 
 void PulseTrain::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mVelocityGrid->SaveState(out);

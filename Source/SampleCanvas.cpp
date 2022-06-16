@@ -285,6 +285,8 @@ void SampleCanvas::SetUpFromSaveData()
 
 void SampleCanvas::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mCanvas->GetWidth();

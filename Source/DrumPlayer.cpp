@@ -1176,6 +1176,8 @@ void DrumPlayer::SetUpFromSaveData()
 
 void DrumPlayer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    for (int i = 0; i < NUM_DRUM_HITS; ++i)

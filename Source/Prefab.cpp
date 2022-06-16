@@ -328,6 +328,8 @@ void Prefab::SetUpFromSaveData()
 
 void Prefab::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mPrefabName;

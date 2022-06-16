@@ -383,6 +383,8 @@ void SeaOfGrain::SetUpFromSaveData()
 
 void SeaOfGrain::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mHasRecordedInput;

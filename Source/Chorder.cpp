@@ -343,6 +343,8 @@ void Chorder::SetUpFromSaveData()
 
 void Chorder::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mChordGrid->SaveState(out);

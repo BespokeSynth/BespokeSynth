@@ -1403,6 +1403,8 @@ void SamplePlayer::SetUpFromSaveData()
 
 void SamplePlayer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    bool hasSample = (mSample != nullptr);

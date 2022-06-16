@@ -144,6 +144,8 @@ void ModulatorCurve::SetUpFromSaveData()
 
 void ModulatorCurve::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);

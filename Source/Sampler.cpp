@@ -316,6 +316,8 @@ void Sampler::CheckboxUpdated(Checkbox* checkbox)
 
 void Sampler::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out.Write(mSampleData, MAX_SAMPLER_LENGTH);

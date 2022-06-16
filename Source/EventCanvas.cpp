@@ -416,6 +416,8 @@ void EventCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 
 void EventCanvas::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << (int)mControlCables.size();

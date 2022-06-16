@@ -219,6 +219,8 @@ void Beats::SetUpFromSaveData()
 
 void Beats::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << (int)mBeatColumns.size();

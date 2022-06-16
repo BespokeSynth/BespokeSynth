@@ -150,6 +150,8 @@ void CircleSequencer::SetUpFromSaveData()
 
 void CircleSequencer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << (int)mCircleSequencerRings.size();

@@ -193,6 +193,8 @@ void NoteCounter::SetUpFromSaveData()
 
 void NoteCounter::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mWidth;

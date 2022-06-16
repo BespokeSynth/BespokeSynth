@@ -677,6 +677,8 @@ void Transport::SetUpFromSaveData()
 
 void Transport::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mMeasureTime;

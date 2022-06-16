@@ -148,6 +148,8 @@ void Polyrhythms::SetUpFromSaveData()
 
 void Polyrhythms::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << (int)mRhythmLines.size();

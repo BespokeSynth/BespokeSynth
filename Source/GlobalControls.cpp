@@ -138,6 +138,8 @@ std::vector<IUIControl*> GlobalControls::ControlsToNotSetDuringLoadState() const
 
 void GlobalControls::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 }
 

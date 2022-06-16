@@ -835,7 +835,7 @@ void IDrawableModule::AddUIControl(IUIControl* control)
    try
    {
       std::string name = control->Name();
-      if (CanSaveState() && name.empty() == false)
+      if (CanModuleTypeSaveState() && name.empty() == false)
       {
          IUIControl* dupe = FindUIControl(name.c_str(), false);
          if (dupe != nullptr)
@@ -1087,14 +1087,14 @@ void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
 
 namespace
 {
-   const int kBaseSaveStateRev = 1;
+   const int kBaseSaveStateRev = 2;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
 
 void IDrawableModule::SaveState(FileStreamOut& out)
 {
-   if (!CanSaveState())
+   if (!CanModuleTypeSaveState())
       return;
 
    out << GetModuleSaveStateRev();
@@ -1113,6 +1113,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    {
       //ofLog() << "Saving control " << control->Name();
       out << std::string(control->Name());
+      out << control->GetValue(); //save raw value to make it easier to port old values when we change versions
       control->SaveState(out);
       for (int i = 0; i < kControlSeparatorLength; ++i)
          out << kControlSeparator[i];
@@ -1138,7 +1139,7 @@ int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
 {
    int rev = -1;
 
-   if (ModularSynth::sLoadingFileSaveStateRev >= 423)
+   if (CanModuleTypeSaveState() && ModularSynth::sLoadingFileSaveStateRev >= 423)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
@@ -1147,8 +1148,15 @@ int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
 
 void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 {
-   if (!CanSaveState())
+   if (!CanModuleTypeSaveState())
       return;
+
+   if (rev != -1 && ModularSynth::sLoadingFileSaveStateRev >= 423)
+   {
+      int moduleRev;
+      in >> moduleRev;
+      LoadStateValidate(moduleRev == rev);
+   }
 
    int baseRev;
    in >> baseRev;
@@ -1159,7 +1167,11 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
    {
       std::string uicontrolname;
       in >> uicontrolname;
-
+      if (baseRev >= 2)
+      {
+         float rawValue;
+         in >> rawValue;   //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
+      }
       UpdateOldControlName(uicontrolname);
 
       bool threwException = false;

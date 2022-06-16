@@ -544,6 +544,8 @@ void FubbleModule::SetUpFromSaveData()
 
 void FubbleModule::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mAxisH.mCurve.SaveState(out);

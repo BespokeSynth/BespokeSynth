@@ -393,6 +393,8 @@ void NoteLooper::SetUpFromSaveData()
 
 void NoteLooper::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mWidth;

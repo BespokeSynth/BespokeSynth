@@ -1014,6 +1014,8 @@ void VSTPlugin::SetUpFromSaveData()
 
 void VSTPlugin::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    if (mPlugin)

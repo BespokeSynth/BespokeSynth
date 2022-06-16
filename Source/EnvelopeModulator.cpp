@@ -173,6 +173,8 @@ void EnvelopeModulator::SetUpFromSaveData()
 
 void EnvelopeModulator::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);

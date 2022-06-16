@@ -228,6 +228,8 @@ void M185Sequencer::SetUpFromSaveData()
 
 void M185Sequencer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    for (auto& step : mSteps)

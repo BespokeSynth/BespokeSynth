@@ -266,6 +266,8 @@ void CurveLooper::SetUpFromSaveData()
 
 void CurveLooper::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);

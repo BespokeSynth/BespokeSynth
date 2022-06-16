@@ -161,6 +161,8 @@ void ValueStream::SetUpFromSaveData()
 
 void ValueStream::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 }
 

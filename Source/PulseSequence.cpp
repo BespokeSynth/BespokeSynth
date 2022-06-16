@@ -260,6 +260,8 @@ void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, flo
 
 void PulseSequence::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mVelocityGrid->SaveState(out);

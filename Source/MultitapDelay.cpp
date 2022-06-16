@@ -229,6 +229,8 @@ void MultitapDelay::SetUpFromSaveData()
 
 void MultitapDelay::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mDelayBuffer.SaveState(out);

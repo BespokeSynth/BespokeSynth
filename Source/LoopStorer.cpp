@@ -267,6 +267,8 @@ void LoopStorer::SetUpFromSaveData()
 
 void LoopStorer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << mCurrentBufferIdx;

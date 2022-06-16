@@ -1472,8 +1472,7 @@ void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
 
 void ScriptModule::SaveState(FileStreamOut& out)
 {
-   if (!CanSaveState())
-      return;
+   out << GetModuleSaveStateRev();
 
    out << (int)mExtraNoteOutputs.size();
 

@@ -132,6 +132,8 @@ void VelocityCurve::SetUpFromSaveData()
 
 void VelocityCurve::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);

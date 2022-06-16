@@ -322,6 +322,8 @@ void ControlSequencer::SetUpFromSaveData()
 
 void ControlSequencer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);

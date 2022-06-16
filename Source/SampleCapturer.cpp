@@ -278,6 +278,8 @@ void SampleCapturer::SetUpFromSaveData()
 
 void SampleCapturer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    for (int i = 0; i < mSamples.size(); ++i)

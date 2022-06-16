@@ -215,6 +215,8 @@ void GridSliders::SetUpFromSaveData()
 
 void GridSliders::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << (int)mControlCables.size();

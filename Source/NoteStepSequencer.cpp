@@ -1143,6 +1143,8 @@ void NoteStepSequencer::SetUpFromSaveData()
 
 void NoteStepSequencer::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);

@@ -443,6 +443,8 @@ void SamplerGrid::CheckboxUpdated(Checkbox* checkbox)
 
 void SamplerGrid::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    for (int i = 0; i < mCols * mRows; ++i)

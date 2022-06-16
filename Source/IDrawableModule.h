@@ -168,8 +168,7 @@ public:
    virtual std::vector<IUIControl*> ControlsToIgnoreInSaveState() const;
    virtual void UpdateOldControlName(std::string& oldName) {}
    virtual bool LoadOldControl(FileStreamIn& in, std::string& oldName) { return false; }
-   virtual bool CanSaveState() const { return true; }
-   virtual size_t GetExpectedSaveStateNumChildren() const { return mChildren.size(); }
+   virtual bool CanModuleTypeSaveState() const { return true; }
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}

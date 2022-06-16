@@ -453,6 +453,8 @@ void Presets::SetUpFromSaveData()
 
 void Presets::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    out << (int)mPresetCollection.size();
