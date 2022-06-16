@@ -331,20 +331,21 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
    //ofLog() << "loading VST: " << vstName << "ID: " << id;
 
    juce::String pluginId = pluginDesc.createIdentifierString();
+   std::string strPluginId = pluginId.toStdString();
 
    //mModuleSaveData.SetString("vst", vstName);
    //mModuleSaveData.SetInt("vstId", id);
-   mModuleSaveData.SetString("pluginId", pluginDesc.createIdentifierString().toStdString());
+   mModuleSaveData.SetString("pluginId", strPluginId);
    //mark VST as used
-   //{
-   //    ofxJSONElement root;
-   //    root.open(ofToDataPath("vst/used_vsts.json"));
+   {
+       ofxJSONElement root;
+       root.open(ofToDataPath("vst/used_vsts.json"));
 
-   //    auto time = juce::Time::getCurrentTime();
-   //    root["vsts"][id] = (double)time.currentTimeMillis();
+       auto time = juce::Time::getCurrentTime();
+       root["vsts"][strPluginId] = (double)time.currentTimeMillis();
 
-   //    root.save(ofToDataPath("vst/used_vsts.json"), true);
-   //}
+       root.save(ofToDataPath("vst/used_vsts.json"), true);
+   }
 
    if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().matchesIdentifierString(pluginId))
       return; //this VST is already loaded! we're all set
