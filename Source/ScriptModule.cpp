@@ -1470,17 +1470,11 @@ void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
    IDrawableModule::SaveLayout(moduleInfo);
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void ScriptModule::SaveState(FileStreamOut& out)
 {
    if (!CanSaveState())
       return;
 
-   out << kSaveStateRev;
    out << (int)mExtraNoteOutputs.size();
 
    IDrawableModule::SaveState(out);
@@ -1489,14 +1483,12 @@ void ScriptModule::SaveState(FileStreamOut& out)
    out << mHeight;
 }
 
-void ScriptModule::LoadState(FileStreamIn& in)
+void ScriptModule::LoadState(FileStreamIn& in, int rev)
 {
-   int rev = -1;
-
-   if (ModularSynth::sLoadingFileSaveStateRev >= 421)
+   if (ModularSynth::sLoadingFileSaveStateRev >= 421 && ModularSynth::sLoadingFileSaveStateRev < 423)
    {
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
    if (rev >= 2)
@@ -1506,12 +1498,12 @@ void ScriptModule::LoadState(FileStreamIn& in)
       SetNumNoteOutputs(extraNoteOutputs + 1);
    }
 
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev == 420)
    {
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
    float w, h;

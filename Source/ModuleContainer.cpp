@@ -628,7 +628,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
          if (module == nullptr)
             throw LoadStateException();
 
-         module->LoadState(in);
+         module->LoadState(in, module->LoadModuleSaveStateRev(in));
 
          for (int j = 0; j < GetModuleSeparatorLength(); ++j)
          {

@@ -381,16 +381,9 @@ void SeaOfGrain::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void SeaOfGrain::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    out << mHasRecordedInput;
    if (mHasRecordedInput)
@@ -399,13 +392,13 @@ void SeaOfGrain::SaveState(FileStreamOut& out)
       mSample->SaveState(out);
 }
 
-void SeaOfGrain::LoadState(FileStreamIn& in)
+void SeaOfGrain::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mHasRecordedInput = false;
    if (rev > 0)

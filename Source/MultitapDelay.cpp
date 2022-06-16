@@ -227,27 +227,20 @@ void MultitapDelay::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void MultitapDelay::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
 
-   out << kSaveStateRev;
-
    mDelayBuffer.SaveState(out);
 }
 
-void MultitapDelay::LoadState(FileStreamIn& in)
+void MultitapDelay::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mDelayBuffer.LoadState(in);
 }

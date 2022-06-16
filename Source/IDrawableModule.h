@@ -160,7 +160,9 @@ public:
    virtual bool IsSaveable() { return true; }
    ModuleSaveData& GetSaveData() { return mModuleSaveData; }
    virtual void SaveState(FileStreamOut& out);
-   virtual void LoadState(FileStreamIn& in);
+   virtual void LoadState(FileStreamIn& in, int rev);
+   int LoadModuleSaveStateRev(FileStreamIn& in);
+   virtual int GetModuleSaveStateRev() const { return -1; }
    virtual void PostLoadState() {}
    virtual std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
    virtual std::vector<IUIControl*> ControlsToIgnoreInSaveState() const;

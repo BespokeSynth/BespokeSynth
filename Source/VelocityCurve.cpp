@@ -130,27 +130,20 @@ void VelocityCurve::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void VelocityCurve::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
 
-   out << kSaveStateRev;
-
    mAdsr.SaveState(out);
 }
 
-void VelocityCurve::LoadState(FileStreamIn& in)
+void VelocityCurve::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mAdsr.LoadState(in);
 }

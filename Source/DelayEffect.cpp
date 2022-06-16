@@ -28,6 +28,7 @@
 #include "Transport.h"
 #include "Profiler.h"
 #include "UIControlMacros.h"
+#include "ModularSynth.h"
 
 #include "juce_core/juce_core.h"
 
@@ -221,27 +222,20 @@ void DelayEffect::DropdownUpdated(DropdownList* list, int oldVal)
 {
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void DelayEffect::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
 
-   out << kSaveStateRev;
-
    mDelayBuffer.SaveState(out);
 }
 
-void DelayEffect::LoadState(FileStreamIn& in)
+void DelayEffect::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mDelayBuffer.LoadState(in);
 }

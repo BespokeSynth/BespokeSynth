@@ -276,28 +276,21 @@ void SampleCapturer::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void SampleCapturer::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    for (int i = 0; i < mSamples.size(); ++i)
       mSamples[i].mBuffer.Save(out, mSamples[i].mBuffer.BufferSize());
 }
 
-void SampleCapturer::LoadState(FileStreamIn& in)
+void SampleCapturer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int readLength;
    for (int i = 0; i < mSamples.size(); ++i)

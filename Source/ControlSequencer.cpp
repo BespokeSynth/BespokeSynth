@@ -320,15 +320,8 @@ void ControlSequencer::SetUpFromSaveData()
    }
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void ControlSequencer::SaveState(FileStreamOut& out)
 {
-   out << kSaveStateRev;
-
    IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
@@ -336,22 +329,22 @@ void ControlSequencer::SaveState(FileStreamOut& out)
    out << mGrid->GetHeight();
 }
 
-void ControlSequencer::LoadState(FileStreamIn& in)
+void ControlSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   mLoadRev = -1;
+   mLoadRev = rev;
 
-   if (ModularSynth::sLoadingFileSaveStateRev >= 422)
+   if (ModularSynth::sLoadingFileSaveStateRev == 422)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= GetModuleSaveStateRev());
    }
 
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev <= 421)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= GetModuleSaveStateRev());
    }
 
    mGrid->LoadState(in);

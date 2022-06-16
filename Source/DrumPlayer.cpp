@@ -1174,16 +1174,9 @@ void DrumPlayer::SetUpFromSaveData()
    //LoadKit(0);
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void DrumPlayer::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
@@ -1195,13 +1188,13 @@ void DrumPlayer::SaveState(FileStreamOut& out)
    }
 }
 
-void DrumPlayer::LoadState(FileStreamIn& in)
+void DrumPlayer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {

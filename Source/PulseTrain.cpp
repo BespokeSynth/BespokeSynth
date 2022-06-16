@@ -234,27 +234,20 @@ void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, float value, float 
    }
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void PulseTrain::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
 
-   out << kSaveStateRev;
-
    mVelocityGrid->SaveState(out);
 }
 
-void PulseTrain::LoadState(FileStreamIn& in)
+void PulseTrain::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mVelocityGrid->LoadState(in);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);

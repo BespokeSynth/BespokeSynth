@@ -391,16 +391,9 @@ void NoteLooper::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void NoteLooper::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    out << mWidth;
    out << mHeight;
@@ -421,16 +414,16 @@ void NoteLooper::SaveState(FileStreamOut& out)
    }
 }
 
-void NoteLooper::LoadState(FileStreamIn& in)
+void NoteLooper::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
    in >> mHeight;

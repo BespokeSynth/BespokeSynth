@@ -1087,7 +1087,7 @@ void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kBaseSaveStateRev = 1;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
@@ -1097,7 +1097,9 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    if (!CanSaveState())
       return;
 
-   out << kSaveStateRev;
+   out << GetModuleSaveStateRev();
+
+   out << kBaseSaveStateRev;
 
    std::vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
@@ -1132,13 +1134,24 @@ void IDrawableModule::SaveState(FileStreamOut& out)
       cable->SaveState(out);
 }
 
-void IDrawableModule::LoadState(FileStreamIn& in)
+int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
+{
+   int rev = -1;
+
+   if (ModularSynth::sLoadingFileSaveStateRev >= 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
+   return rev;
+}
+
+void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 {
    if (!CanSaveState())
       return;
 
-   int rev;
-   in >> rev;
+   int baseRev;
+   in >> baseRev;
 
    int numUIControls;
    in >> numUIControls;
@@ -1235,10 +1248,10 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       //ofLog() << "Loading " << childName;
       IDrawableModule* child = FindChild(childName.c_str());
       LoadStateValidate(child);
-      child->LoadState(in);
+      child->LoadState(in, child->LoadModuleSaveStateRev(in));
    }
 
-   if (rev >= 1)
+   if (baseRev >= 1)
    {
       int numPatchCableSources;
       in >> numPatchCableSources;

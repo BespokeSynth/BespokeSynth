@@ -146,29 +146,22 @@ void Polyrhythms::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Polyrhythms::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    out << (int)mRhythmLines.size();
    for (size_t i = 0; i < mRhythmLines.size(); ++i)
       mRhythmLines[i]->mGrid->SaveState(out);
 }
 
-void Polyrhythms::LoadState(FileStreamIn& in)
+void Polyrhythms::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int size;
    in >> size;

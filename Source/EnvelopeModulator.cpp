@@ -171,27 +171,20 @@ void EnvelopeModulator::SetUpFromSaveData()
    mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void EnvelopeModulator::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
 
-   out << kSaveStateRev;
-
    mAdsr.SaveState(out);
 }
 
-void EnvelopeModulator::LoadState(FileStreamIn& in)
+void EnvelopeModulator::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mAdsr.LoadState(in);
 }

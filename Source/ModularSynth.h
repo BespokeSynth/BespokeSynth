@@ -273,7 +273,7 @@ public:
    static float sBackgroundB;
 
    static int sLoadingFileSaveStateRev;
-   static constexpr int kSaveStateRev = 422;
+   static constexpr int kSaveStateRev = 423;
 
 private:
    void ResetLayout();

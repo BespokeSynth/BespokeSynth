@@ -787,29 +787,22 @@ void LooperRecorder::SetUpFromSaveData()
    SetOutputTarget(TheSynth->FindAudioReceiver(mModuleSaveData.GetString("outputtarget")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void LooperRecorder::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    out << mBaseTempo;
    out << mSpeed;
    mRecordBuffer.SaveState(out);
 }
 
-void LooperRecorder::LoadState(FileStreamIn& in)
+void LooperRecorder::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mBaseTempo;
    in >> mSpeed;

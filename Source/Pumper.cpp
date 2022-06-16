@@ -26,6 +26,7 @@
 #include "Pumper.h"
 #include "Profiler.h"
 #include "UIControlMacros.h"
+#include "ModularSynth.h"
 
 namespace
 {
@@ -185,27 +186,20 @@ void Pumper::SyncToAdsr()
    mAttack = mAdsr.GetStageData(0).time / kAdsrTime;
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Pumper::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
 
-   out << kSaveStateRev;
-
    mAdsr.SaveState(out);
 }
 
-void Pumper::LoadState(FileStreamIn& in)
+void Pumper::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mAdsr.LoadState(in);
 

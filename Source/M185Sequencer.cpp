@@ -240,9 +240,9 @@ void M185Sequencer::SaveState(FileStreamOut& out)
    out << mHasExternalPulseSource;
 }
 
-void M185Sequencer::LoadState(FileStreamIn& in)
+void M185Sequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    for (auto& step : mSteps)
    {

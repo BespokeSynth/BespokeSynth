@@ -148,32 +148,25 @@ void CircleSequencer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void CircleSequencer::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    out << (int)mCircleSequencerRings.size();
    for (size_t i = 0; i < mCircleSequencerRings.size(); ++i)
       mCircleSequencerRings[i]->SaveState(out);
 }
 
-void CircleSequencer::LoadState(FileStreamIn& in)
+void CircleSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int numRings;
    in >> numRings;

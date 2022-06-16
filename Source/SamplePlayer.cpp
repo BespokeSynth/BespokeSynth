@@ -1401,16 +1401,9 @@ void SamplePlayer::SetUpFromSaveData()
    Resize(mModuleSaveData.GetFloat("width"), mModuleSaveData.GetFloat("height"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void SamplePlayer::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    bool hasSample = (mSample != nullptr);
    out << hasSample;
@@ -1427,13 +1420,13 @@ void SamplePlayer::SaveState(FileStreamOut& out)
    }
 }
 
-void SamplePlayer::LoadState(FileStreamIn& in)
+void SamplePlayer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    bool hasSample;
    in >> hasSample;

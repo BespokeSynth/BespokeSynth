@@ -199,16 +199,9 @@ void MultitrackRecorder::SetUpFromSaveData()
       track->SetRecording(false);
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void MultitrackRecorder::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    out << mWidth;
 
@@ -218,13 +211,13 @@ void MultitrackRecorder::SaveState(FileStreamOut& out)
       out << (std::string)track->Name();
 }
 
-void MultitrackRecorder::LoadState(FileStreamIn& in)
+void MultitrackRecorder::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
 

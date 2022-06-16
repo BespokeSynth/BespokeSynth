@@ -337,16 +337,9 @@ void GridModule::CheckboxUpdated(Checkbox* checkbox)
       mGrid->SetMomentary(mMomentary);
 }
 
-namespace
-{
-   const int kSaveStateRev = 4;
-}
-
 void GridModule::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    mGrid->SaveState(out);
    out << mGrid->GetWidth();
@@ -364,13 +357,13 @@ void GridModule::SaveState(FileStreamOut& out)
       out << overlay;
 }
 
-void GridModule::LoadState(FileStreamIn& in)
+void GridModule::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    if (rev >= 1)
    {

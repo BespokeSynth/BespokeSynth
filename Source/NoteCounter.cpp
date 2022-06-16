@@ -191,32 +191,25 @@ void NoteCounter::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void NoteCounter::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-
-   out << kSaveStateRev;
 
    out << mWidth;
    out << mHeight;
    out << mHasExternalPulseSource;
 }
 
-void NoteCounter::LoadState(FileStreamIn& in)
+void NoteCounter::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
    in >> mHeight;

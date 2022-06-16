@@ -1311,7 +1311,7 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    std::string var;
    in >> var;

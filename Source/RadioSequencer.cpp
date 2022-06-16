@@ -347,14 +347,9 @@ void RadioSequencer::SetUpFromSaveData()
    mGrid->SetSingleColumnMode(mModuleSaveData.GetBool("one_per_column_mode"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void RadioSequencer::SaveState(FileStreamOut& out)
 {
-   out << kSaveStateRev;
+   out << GetModuleSaveStateRev();
 
    IDrawableModule::SaveState(out);
 
@@ -372,22 +367,22 @@ void RadioSequencer::SaveState(FileStreamOut& out)
    out << mGrid->GetHeight();
 }
 
-void RadioSequencer::LoadState(FileStreamIn& in)
+void RadioSequencer::LoadState(FileStreamIn& in, int rev)
 {
    mLoadRev = -1;
 
-   if (ModularSynth::sLoadingFileSaveStateRev >= 422)
+   if (ModularSynth::sLoadingFileSaveStateRev == 422)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= GetModuleSaveStateRev());
    }
 
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev <= 421)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= GetModuleSaveStateRev());
    }
 
    int size;
