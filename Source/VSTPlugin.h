@@ -52,10 +52,12 @@ namespace VSTLookup
    void GetAvailableVSTs(std::vector<juce::PluginDescription>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
-   juce::PluginDescription GetVSTDesc(int id);
-   juce::PluginDescription GetVSTDesc(std::string vstName);
+   juce::PluginDescription GetPluginDesc(int id);
+   juce::PluginDescription GetPluginDesc(std::string vstName);
    juce::PluginDescription GetPluginDesc(juce::String pluginId);
    void SortByLastUsed(std::vector<std::string>& vsts);
+   std::vector<juce::PluginDescription> GetRecentPlugins(int num);
+   //juce::PluginDescription stump{};
 }
 
 class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener, public juce::AudioProcessorListener
