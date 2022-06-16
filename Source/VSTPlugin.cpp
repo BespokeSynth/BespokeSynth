@@ -364,15 +364,29 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    mVSTMutex.unlock();
 }
 
+bool VSTPlugin::ParameterNameExists(std::string name, int checkUntilIndex) const
+{
+   for (int i = 0; i < checkUntilIndex; ++i)
+   {
+      if (mParameterSliders[i].mName == name)
+         return true;
+   }
+
+   return false;
+}
+
 void VSTPlugin::CreateParameterSliders()
 {
    assert(mPlugin);
 
    for (auto& slider : mParameterSliders)
    {
-      slider.mSlider->SetShowing(false);
-      RemoveUIControl(slider.mSlider);
-      slider.mSlider->Delete();
+      if (slider.mSlider)
+      {
+         slider.mSlider->SetShowing(false);
+         RemoveUIControl(slider.mSlider);
+         slider.mSlider->Delete();
+      }
    }
    mParameterSliders.clear();
 
@@ -385,26 +399,26 @@ void VSTPlugin::CreateParameterSliders()
    for (int i = 0; i < numParameters; ++i)
    {
       mParameterSliders[i].mValue = parameters[i]->getValue();
-      juce::String name = parameters[i]->getName(32);
-      std::string label(name.getCharPointer());
+      juce::String originalParamName = parameters[i]->getName(32);
+      std::string name(originalParamName.getCharPointer());
       try
       {
          int append = 0;
-         while (FindUIControl(label.c_str()))
+         while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
          {
             ++append;
-            label = name.toStdString() + ofToString(append);
+            name = originalParamName.toStdString() + ofToString(append);
          }
       }
       catch (UnknownUIControlException& e)
       {
       }
-      mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), -1, -1, 200, 15, &mParameterSliders[i].mValue, 0, 1);
       mParameterSliders[i].mParameter = parameters[i];
+      mParameterSliders[i].mName = name.c_str();
       mParameterSliders[i].mShowing = false;
-      if (numParameters <= 20) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
+      if (numParameters <= 30) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
-         mShowParameterDropdown->AddLabel(label.c_str(), i);
+         mShowParameterDropdown->AddLabel(name.c_str(), i);
          mParameterSliders[i].mInSelectorList = true;
       }
       else
@@ -434,7 +448,7 @@ void VSTPlugin::Poll()
             if (mTemporarilyDisplayedParamIndex != -1)
                mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
             mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mSlider->Name(), mChangeGestureParameterIndex);
+            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mName, mChangeGestureParameterIndex);
          }
 
          mChangeGestureParameterIndex = -1;
@@ -845,7 +859,11 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
             {
                int index = input->readInt();
                if (index < mParameterSliders.size())
+               {
                   mParameterSliders[index].mShowing = true;
+                  if (mParameterSliders[index].mSlider == nullptr)
+                     mParameterSliders[index].MakeSlider(this);
+               }
             }
          }
       }
@@ -854,6 +872,8 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
    if (list == mShowParameterDropdown)
    {
       mParameterSliders[mShowParameterIndex].mShowing = true;
+      if (mParameterSliders[mShowParameterIndex].mSlider == nullptr)
+         mParameterSliders[mShowParameterIndex].MakeSlider(this);
       mParameterSliders[mShowParameterIndex].mInSelectorList = true;
       mShowParameterIndex = -1;
       mTemporarilyDisplayedParamIndex = -1;
@@ -1016,8 +1036,6 @@ void VSTPlugin::SaveState(FileStreamOut& out)
 {
    out << GetModuleSaveStateRev();
 
-   IDrawableModule::SaveState(out);
-
    if (mPlugin)
    {
       out << true;
@@ -1046,16 +1064,35 @@ void VSTPlugin::SaveState(FileStreamOut& out)
    {
       out << false;
    }
+
+   IDrawableModule::SaveState(out);
 }
 
 void VSTPlugin::LoadState(FileStreamIn& in, int rev)
 {
+   if (rev >= 3)
+   {
+      LoadVSTFromSaveData(in, rev);
+   }
+   else
+   {
+      //make all sliders, like we used to, so that the controls can load correctly
+      for (auto& parameter : mParameterSliders)
+         parameter.MakeSlider(this);
+   }
+
    IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
+   if (rev < 3)
+      LoadVSTFromSaveData(in, rev);
+}
+
+void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
+{
    bool hasPlugin;
    in >> hasPlugin;
    if (hasPlugin)
@@ -1095,9 +1132,17 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
          {
             int index;
             in >> index;
-            if (index < mParameterSliders.size())
+            {
                mParameterSliders[index].mShowing = true;
+               if (mParameterSliders[index].mSlider == nullptr)
+                  mParameterSliders[index].MakeSlider(this);
+            }
          }
       }
    }
+}
+
+void VSTPlugin::ParameterSlider::MakeSlider(VSTPlugin* owner)
+{
+   mSlider = new FloatSlider(owner, mName.c_str(), -1, -1, 200, 15, &mValue, 0, 1);
 }
