@@ -308,10 +308,14 @@ void SpawnListManager::SetUpPrefabsDropdown()
 
 void SpawnListManager::SetUpVstDropdown()
 {
-   std::vector<juce::PluginDescription> vsts;
+   std::vector<juce::PluginDescription> vsts, recentPlugins;
    VSTLookup::GetAvailableVSTs(vsts);
    std::vector<std::pair<std::string, juce::PluginDescription>> vstIDs;
    std::string suffix = "";
+
+   recentPlugins = VSTLookup::GetRecentPlugins(3);
+   
+
    for (auto vst : vsts)
    {
       std::string format = vst.pluginFormatName.toLowerCase().toStdString();
@@ -329,10 +333,16 @@ void SpawnListManager::SetUpVstDropdown()
             }
          }
       }
-         vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst));
-
-      
+      vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst));
    }
+   
+   vstIDs.insert(vstIDs.begin(), std::make_pair(":------:", stump));
+   
+   for (auto recent : recentPlugins)
+       {
+           vstIDs.insert(vstIDs.begin(), std::make_pair(recent.name.toStdString(), recent));
+       }
+   
    vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, stump));
    mVstPlugins.SetListVST(vstIDs, "vstplugin");
 }

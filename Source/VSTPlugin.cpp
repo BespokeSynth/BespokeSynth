@@ -113,7 +113,7 @@ namespace VSTLookup
       return "";
    }
 
-   juce::PluginDescription GetVSTDesc(int id)
+   juce::PluginDescription GetPluginDesc(int id)
    {
       juce::PluginDescription desc;
       auto types = TheSynth->GetKnownPluginList().getTypes();
@@ -125,11 +125,10 @@ namespace VSTLookup
             break;
          }
       }
-
       return desc;
    }
    
-   juce::PluginDescription GetVSTDesc(std::string vstName)
+   juce::PluginDescription GetPluginDesc(std::string vstName)
    {
       juce::PluginDescription desc;
       auto types = TheSynth->GetKnownPluginList().getTypes();
@@ -141,7 +140,6 @@ namespace VSTLookup
             break;
          }
       }
-
       return desc;
    }   
 
@@ -157,8 +155,45 @@ namespace VSTLookup
             break;
          }
       }
-
       return desc;
+   }
+
+
+   std::vector<juce::PluginDescription> GetRecentPlugins(int num)
+   {
+      std::vector<juce::PluginDescription> recentPlugins;
+      std::map<double, std::string> lastUsedTimes;
+
+      if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
+      {
+         ofxJSONElement root;
+         root.open(ofToDataPath("vst/used_vsts.json"));
+         ofxJSONElement jsonList = root["vsts"];
+
+         for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
+         {
+            try
+            {
+                std::string name = it.key().asString();
+                double time = jsonList[name].asDouble();
+                lastUsedTimes.insert(std::make_pair(time, name));
+            }
+            catch (Json::LogicError& e)
+            {
+               TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+            }
+         }
+      }
+      std::map<double, std::string>::const_iterator it;
+      it = lastUsedTimes.begin();
+      while ( it != lastUsedTimes.end())
+      {
+          //DBG(it->second);
+          recentPlugins.push_back(GetPluginDesc(juce::String(it->second)));
+          ++it;
+      }
+
+      return recentPlugins;
    }
 
    void SortByLastUsed(std::vector<std::string>& vsts)
@@ -337,6 +372,7 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
    //mModuleSaveData.SetInt("vstId", id);
    mModuleSaveData.SetString("pluginId", strPluginId);
    //mark VST as used
+   if(strPluginId != "--0-0")
    {
        ofxJSONElement root;
        root.open(ofToDataPath("vst/used_vsts.json"));
@@ -1093,7 +1129,7 @@ void VSTPlugin::SetUpFromSaveData()
       int vstId = mModuleSaveData.GetInt("vstId");
       if (vstId != 0)
       {
-         pluginDesc = VSTLookup::GetVSTDesc(vstId);
+         pluginDesc = VSTLookup::GetPluginDesc(vstId);
       }
    }
    
