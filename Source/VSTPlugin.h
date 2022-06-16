@@ -95,7 +95,7 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
 private:
@@ -105,11 +105,13 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
+   void LoadVSTFromSaveData(FileStreamIn& in, int rev);
 
    std::string GetPluginName() const;
    std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
+   bool ParameterNameExists(std::string name, int checkUntilIndex) const;
 
    //juce::AudioProcessorListener
    void audioProcessorParameterChanged(juce::AudioProcessor* processor, int parameterIndex, float newValue) override {}
@@ -143,6 +145,8 @@ private:
       juce::AudioProcessorParameter* mParameter{ nullptr };
       bool mShowing{ false };
       bool mInSelectorList{ true };
+      std::string mName;
+      void MakeSlider(VSTPlugin* owner);
    };
 
    std::vector<ParameterSlider> mParameterSliders;
