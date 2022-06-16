@@ -799,11 +799,6 @@ std::vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
    return ignore;
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mPresetFileSelector)
@@ -919,7 +914,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
             juce::MemoryBlock vstProgramState;
             mPlugin->getCurrentProgramStateInformation(vstProgramState);
 
-            output.writeInt(kSaveStateRev);
+            output.writeInt(GetModuleSaveStateRev());
             output.writeInt64(vstState.getSize());
             output.write(vstState.getData(), vstState.getSize());
             output.writeInt64(vstProgramState.getSize());
@@ -1019,9 +1014,9 @@ void VSTPlugin::SetUpFromSaveData()
 
 void VSTPlugin::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    if (mPlugin)
    {
@@ -1053,13 +1048,13 @@ void VSTPlugin::SaveState(FileStreamOut& out)
    }
 }
 
-void VSTPlugin::LoadState(FileStreamIn& in)
+void VSTPlugin::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    bool hasPlugin;
    in >> hasPlugin;

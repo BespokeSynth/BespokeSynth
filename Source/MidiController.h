@@ -357,7 +357,8 @@ public:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
    static std::string GetDefaultTooltip(MidiMessageType type, int control);
 

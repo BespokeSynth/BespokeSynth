@@ -283,31 +283,26 @@ void SampleCanvas::SetUpFromSaveData()
    mCanvas->SetNumRows(mModuleSaveData.GetInt("rows"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void SampleCanvas::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mCanvas->GetWidth();
    out << mCanvas->GetHeight();
 }
 
-void SampleCanvas::LoadState(FileStreamIn& in)
+void SampleCanvas::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    float w, h;
    in >> w;

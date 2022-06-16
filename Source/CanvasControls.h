@@ -61,7 +61,7 @@ public:
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   bool CanSaveState() const override { return false; }
+   bool CanModuleTypeSaveState() const override { return false; }
 
 private:
    //IDrawableModule

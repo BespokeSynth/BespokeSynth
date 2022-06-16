@@ -753,32 +753,27 @@ void Scale::SetUpFromSaveData()
       mWantSetRandomRootAndScale = true;
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Scale::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mIntonation;
    out << mSclContents;
    out << mKbmContents;
 }
 
-void Scale::LoadState(FileStreamIn& in)
+void Scale::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev >= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev >= GetModuleSaveStateRev());
 
    int inton;
    in >> inton;

@@ -440,7 +440,7 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
 
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kNCESaveStateRev);
+   LoadStateValidate(rev <= kNCESaveStateRev);
 
    in >> mVelocity;
 }

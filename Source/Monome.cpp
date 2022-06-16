@@ -343,7 +343,7 @@ void Monome::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    in >> mPendingDeviceDesc;
 }

@@ -28,6 +28,7 @@
 #include "Scale.h"
 #include "ModuleContainer.h"
 #include "FileStream.h"
+#include "ModularSynth.h"
 
 namespace
 {
@@ -331,31 +332,26 @@ void KeyboardDisplay::SetUpFromSaveData()
    mShowScale = mModuleSaveData.GetBool("show_scale");
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void KeyboardDisplay::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mWidth;
    out << mHeight;
 }
 
-void KeyboardDisplay::LoadState(FileStreamIn& in)
+void KeyboardDisplay::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
    in >> mHeight;

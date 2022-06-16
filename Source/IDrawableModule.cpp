@@ -835,7 +835,7 @@ void IDrawableModule::AddUIControl(IUIControl* control)
    try
    {
       std::string name = control->Name();
-      if (CanSaveState() && name.empty() == false)
+      if (CanModuleTypeSaveState() && name.empty() == false)
       {
          IUIControl* dupe = FindUIControl(name.c_str(), false);
          if (dupe != nullptr)
@@ -1087,17 +1087,19 @@ void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kBaseSaveStateRev = 2;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
 
 void IDrawableModule::SaveState(FileStreamOut& out)
 {
-   if (!CanSaveState())
+   if (!CanModuleTypeSaveState())
       return;
 
-   out << kSaveStateRev;
+   out << GetModuleSaveStateRev();
+
+   out << kBaseSaveStateRev;
 
    std::vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
@@ -1111,6 +1113,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    {
       //ofLog() << "Saving control " << control->Name();
       out << std::string(control->Name());
+      out << control->GetValue(); //save raw value to make it easier to port old values when we change versions
       control->SaveState(out);
       for (int i = 0; i < kControlSeparatorLength; ++i)
          out << kControlSeparator[i];
@@ -1132,13 +1135,31 @@ void IDrawableModule::SaveState(FileStreamOut& out)
       cable->SaveState(out);
 }
 
-void IDrawableModule::LoadState(FileStreamIn& in)
+int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
 {
-   if (!CanSaveState())
+   int rev = -1;
+
+   if (CanModuleTypeSaveState() && ModularSynth::sLoadingFileSaveStateRev >= 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
+   return rev;
+}
+
+void IDrawableModule::LoadState(FileStreamIn& in, int rev)
+{
+   if (!CanModuleTypeSaveState())
       return;
 
-   int rev;
-   in >> rev;
+   if (rev != -1 && ModularSynth::sLoadingFileSaveStateRev >= 423)
+   {
+      int moduleRev;
+      in >> moduleRev;
+      LoadStateValidate(moduleRev == rev);
+   }
+
+   int baseRev;
+   in >> baseRev;
 
    int numUIControls;
    in >> numUIControls;
@@ -1146,7 +1167,11 @@ void IDrawableModule::LoadState(FileStreamIn& in)
    {
       std::string uicontrolname;
       in >> uicontrolname;
-
+      if (baseRev >= 2)
+      {
+         float rawValue;
+         in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
+      }
       UpdateOldControlName(uicontrolname);
 
       bool threwException = false;
@@ -1235,10 +1260,10 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       //ofLog() << "Loading " << childName;
       IDrawableModule* child = FindChild(childName.c_str());
       LoadStateValidate(child);
-      child->LoadState(in);
+      child->LoadState(in, child->LoadModuleSaveStateRev(in));
    }
 
-   if (rev >= 1)
+   if (baseRev >= 1)
    {
       int numPatchCableSources;
       in >> numPatchCableSources;

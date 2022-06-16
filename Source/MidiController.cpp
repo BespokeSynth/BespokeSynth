@@ -2433,16 +2433,11 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["connections"] = mConnectionsJson;
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void MidiController::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    bool hasNonstandardController = (mNonstandardController != nullptr);
    out << hasNonstandardController;
@@ -2450,16 +2445,16 @@ void MidiController::SaveState(FileStreamOut& out)
       mNonstandardController->SaveState(out);
 }
 
-void MidiController::LoadState(FileStreamIn& in)
+void MidiController::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    bool hasNonstandardController;
    in >> hasNonstandardController;

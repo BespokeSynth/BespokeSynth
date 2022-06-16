@@ -258,28 +258,23 @@ void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, flo
    }
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void PulseSequence::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mVelocityGrid->SaveState(out);
    out << mHasExternalPulseSource;
 }
 
-void PulseSequence::LoadState(FileStreamIn& in)
+void PulseSequence::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mVelocityGrid->LoadState(in);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);

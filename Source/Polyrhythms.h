@@ -85,10 +85,11 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   virtual void SetUpFromSaveData() override;
-   virtual void LoadState(FileStreamIn& in) override;
-   virtual void SaveState(FileStreamOut& out) override;
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   void SaveState(FileStreamOut& out) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule

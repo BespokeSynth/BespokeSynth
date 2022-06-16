@@ -617,27 +617,22 @@ void NoteTable::SetUpFromSaveData()
    SetUpColumnControls();
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void NoteTable::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
 }
 
-void NoteTable::LoadState(FileStreamIn& in)
+void NoteTable::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mGrid->LoadState(in);
    GridUpdated(mGrid, 0, 0, 0, 0);

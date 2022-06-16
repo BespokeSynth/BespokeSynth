@@ -606,6 +606,9 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    bool wasLoadingState = TheSynth->IsLoadingState();
    TheSynth->SetIsLoadingState(true);
 
+   static int sModuleContainerLoadStack = 0;
+   ++sModuleContainerLoadStack;
+
    int header;
    in >> header;
    assert(header <= ModularSynth::kSaveStateRev);
@@ -628,7 +631,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
          if (module == nullptr)
             throw LoadStateException();
 
-         module->LoadState(in);
+         module->LoadState(in, module->LoadModuleSaveStateRev(in));
 
          for (int j = 0; j < GetModuleSeparatorLength(); ++j)
          {
@@ -680,7 +683,10 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    IClickable::ClearLoadContext();
    TheSynth->SetIsLoadingState(wasLoadingState);
 
-   ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev; //reset to current
+   --sModuleContainerLoadStack;
+
+   if (sModuleContainerLoadStack <= 0)
+      ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev; //reset to current
 }
 
 //static
