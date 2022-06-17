@@ -29,10 +29,10 @@
 bool VSTPlayhead::getPosition(juce::AudioPlayHead::PositionInfo& result)
 {
    result.setBpm(TheTransport->GetTempo());
-   result.timeSigNumerator = TheTransport->GetTimeSigTop();
+   result.setTimeSignature({4,4});
    result.timeSigDenominator = TheTransport->GetTimeSigBottom();
-   result.timeInSamples = gTime * gSampleRateMs;
-   result.timeInSeconds = gTime / 1000.;
+   result.setTimeInSamples(gTime* gSampleRateMs);
+   result.setTimeInSeconds(gTime / 1000.;
 
    /*
    * getMeasureTime is a float of how many measures we are through with fractional
@@ -43,8 +43,8 @@ bool VSTPlayhead::getPosition(juce::AudioPlayHead::PositionInfo& result)
    double tsRatio = 4;
    if (result.timeSigDenominator > 0)
       tsRatio = 1.0 * result.timeSigNumerator / result.timeSigDenominator * 4;
-   result.ppqPosition = (TheTransport->GetMeasureTime(gTime)) * tsRatio;
-   result.ppqPositionOfLastBarStart = floor(TheTransport->GetMeasureTime(gTime)) * tsRatio;
+   result.setPpqPosition((TheTransport->GetMeasureTime(gTime)) * tsRatio);
+   result.setPpqPositionOfLastBarStart (floor(TheTransport->GetMeasureTime(gTime)) * tsRatio);
 
    result.isPlaying = true;
    result.isRecording = false;
