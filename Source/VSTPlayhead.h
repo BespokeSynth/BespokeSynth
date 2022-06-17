@@ -28,10 +28,10 @@
 
 #include "juce_audio_basics/juce_audio_basics.h"
 
-class VSTPlayhead : public juce::AudioPlayHead
+class VSTPlayhead : public juce::AudioPlayHead::PositionInfo
 {
 public:
-   bool getCurrentPosition(CurrentPositionInfo& result);
+   bool getPosition(PositionInfo& result);
 };
 
 #endif /* defined(__Bespoke__VSTPlayhead__) */

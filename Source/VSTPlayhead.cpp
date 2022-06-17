@@ -26,9 +26,9 @@
 #include "VSTPlayhead.h"
 #include "Transport.h"
 
-bool VSTPlayhead::getCurrentPosition(juce::AudioPlayHead::CurrentPositionInfo& result)
+bool VSTPlayhead::getPosition(juce::AudioPlayHead::PositionInfo& result)
 {
-   result.bpm = TheTransport->GetTempo();
+   result.setBpm(TheTransport->GetTempo());
    result.timeSigNumerator = TheTransport->GetTimeSigTop();
    result.timeSigDenominator = TheTransport->GetTimeSigBottom();
    result.timeInSamples = gTime * gSampleRateMs;
