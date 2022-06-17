@@ -1214,7 +1214,10 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
    {
       //make all sliders, like we used to, so that the controls can load correctly
       for (auto& parameter : mParameterSliders)
-         parameter.MakeSlider(this);
+      {
+         if (parameter.mSlider == nullptr)
+            parameter.MakeSlider(this);
+      }
    }
 
    IDrawableModule::LoadState(in, rev);
@@ -1281,4 +1284,13 @@ void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
 void VSTPlugin::ParameterSlider::MakeSlider(VSTPlugin* owner)
 {
    mSlider = new FloatSlider(owner, mName.c_str(), -1, -1, 200, 15, &mValue, 0, 1);
+}
+
+void VSTPlugin::OnUIControlRequested(const char* name)
+{
+   for (auto& parameter : mParameterSliders)
+   {
+      if (parameter.mName == name && parameter.mSlider == nullptr)
+         parameter.MakeSlider(this);
+   }
 }

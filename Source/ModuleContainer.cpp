@@ -435,6 +435,7 @@ IUIControl* ModuleContainer::FindUIControl(std::string path)
    {
       try
       {
+         module->OnUIControlRequested(control.c_str());
          return module->FindUIControl(control.c_str());
       }
       catch (UnknownUIControlException& e)
