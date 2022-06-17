@@ -28,11 +28,15 @@
 
 bool VSTPlayhead::getPosition(juce::AudioPlayHead::PositionInfo& result)
 {
+   timeSignature.numerator = TheTransport->GetTimeSigTop();
+   timeSignature.denominator = TheTransport->GetTimeSigBottom();
+   loopPoint.ppqStart = 0;
+   loopPoint.ppqEnd = 480 * result.getTimeSignature()->denominator;
+
    result.setBpm(TheTransport->GetTempo());
-   result.setTimeSignature({4,4});
-   result.timeSigDenominator = TheTransport->GetTimeSigBottom();
+   result.setTimeSignature(timeSignature);
    result.setTimeInSamples(gTime* gSampleRateMs);
-   result.setTimeInSeconds(gTime / 1000.;
+   result.setTimeInSeconds(gTime / 1000);
 
    /*
    * getMeasureTime is a float of how many measures we are through with fractional
@@ -41,17 +45,16 @@ bool VSTPlayhead::getPosition(juce::AudioPlayHead::PositionInfo& result)
    * the measure time
    */
    double tsRatio = 4;
-   if (result.timeSigDenominator > 0)
-      tsRatio = 1.0 * result.timeSigNumerator / result.timeSigDenominator * 4;
+   if (result.getTimeSignature()->numerator > 0)
+      tsRatio = 1.0 * result.getTimeSignature()->numerator / result.getTimeSignature()->denominator * 4;
    result.setPpqPosition((TheTransport->GetMeasureTime(gTime)) * tsRatio);
    result.setPpqPositionOfLastBarStart (floor(TheTransport->GetMeasureTime(gTime)) * tsRatio);
 
-   result.isPlaying = true;
-   result.isRecording = false;
-   result.isLooping = false;
-   result.ppqLoopStart = 0;
-   result.ppqLoopEnd = 480 * result.timeSigDenominator;
-   result.frameRate = AudioPlayHead::fps60;
+   result.setIsPlaying(true);
+   result.setIsRecording(false);
+   result.setIsLooping(false);
+   result.setLoopPoints(loopPoint);
+   result.setFrameRate(juce::AudioPlayHead::fps60);
 
    return true;
 }

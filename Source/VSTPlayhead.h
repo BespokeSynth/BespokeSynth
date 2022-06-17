@@ -32,7 +32,8 @@ class VSTPlayhead : public juce::AudioPlayHead::PositionInfo
 {
 public:
    bool getPosition(PositionInfo& result);
-   
+   juce::AudioPlayHead::TimeSignature timeSignature;
+   juce::AudioPlayHead::LoopPoints loopPoint;
 };
 
 #endif /* defined(__Bespoke__VSTPlayhead__) */
