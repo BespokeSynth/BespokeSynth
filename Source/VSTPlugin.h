@@ -49,10 +49,15 @@ class ofxJSONElement;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(std::vector<std::string>& vsts);
+   void GetAvailableVSTs(std::vector<juce::PluginDescription>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
+   juce::PluginDescription GetPluginDesc(int id);
+   juce::PluginDescription GetPluginDesc(std::string vstName);
+   juce::PluginDescription GetPluginDesc(juce::String pluginId);
    void SortByLastUsed(std::vector<std::string>& vsts);
+   std::vector<juce::PluginDescription> GetRecentPlugins(int num);
+   //juce::PluginDescription stump{};
 }
 
 class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener, public juce::AudioProcessorListener
@@ -72,7 +77,7 @@ public:
 
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
 
-   void SetVST(std::string vstName);
+   void SetVST(juce::PluginDescription pluginDesc);
    void OnVSTWindowClosed();
 
    //IAudioSource
@@ -106,8 +111,10 @@ private:
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
+   void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
 
    std::string GetPluginName() const;
+   std::string GetPluginFormatName() const;
    std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
