@@ -314,28 +314,23 @@ void Sampler::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Sampler::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out.Write(mSampleData, MAX_SAMPLER_LENGTH);
    out << mVoiceParams.mSampleLength;
 }
 
-void Sampler::LoadState(FileStreamIn& in)
+void Sampler::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in.Read(mSampleData, MAX_SAMPLER_LENGTH);
 

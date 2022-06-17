@@ -142,27 +142,22 @@ void ModulatorCurve::SetUpFromSaveData()
    mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void ModulatorCurve::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);
 }
 
-void ModulatorCurve::LoadState(FileStreamIn& in)
+void ModulatorCurve::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mAdsr.LoadState(in);
 }

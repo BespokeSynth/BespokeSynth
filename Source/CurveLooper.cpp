@@ -264,27 +264,22 @@ void CurveLooper::SetUpFromSaveData()
    mHeight = mModuleSaveData.GetInt("height");
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void CurveLooper::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);
 }
 
-void CurveLooper::LoadState(FileStreamIn& in)
+void CurveLooper::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    if (rev >= 1)
       mAdsr.LoadState(in);

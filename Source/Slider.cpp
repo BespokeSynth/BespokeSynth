@@ -773,7 +773,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
          }
          else if (rev > 0)
          {
-            mLFOControl->LoadState(in);
+            mLFOControl->LoadState(in, mLFOControl->LoadModuleSaveStateRev(in));
          }
          if (shouldSetValue)
             lfo->UpdateFromSettings();
@@ -818,7 +818,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
          }
          else if (rev > 0)
          {
-            mLFOControl->LoadState(in);
+            mLFOControl->LoadState(in, mLFOControl->LoadModuleSaveStateRev(in));
          }
          if (shouldSetValue)
             lfo->UpdateFromSettings();
@@ -1199,7 +1199,7 @@ void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kIntSliderSaveStateRev);
+   LoadStateValidate(rev <= kIntSliderSaveStateRev);
 
    float var;
    in >> var;

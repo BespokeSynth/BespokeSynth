@@ -1046,16 +1046,11 @@ void StepSequencer::SetUpFromSaveData()
    mIsSetUp = true;
 }
 
-namespace
-{
-   const int kSaveStateRev = 3;
-}
-
 void StepSequencer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
 
@@ -1069,13 +1064,13 @@ void StepSequencer::SaveState(FileStreamOut& out)
    out << mGrid->GetHeight();
 }
 
-void StepSequencer::LoadState(FileStreamIn& in)
+void StepSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mGrid->LoadState(in);
 

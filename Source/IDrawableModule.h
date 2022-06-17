@@ -160,14 +160,15 @@ public:
    virtual bool IsSaveable() { return true; }
    ModuleSaveData& GetSaveData() { return mModuleSaveData; }
    virtual void SaveState(FileStreamOut& out);
-   virtual void LoadState(FileStreamIn& in);
+   virtual void LoadState(FileStreamIn& in, int rev);
+   int LoadModuleSaveStateRev(FileStreamIn& in);
+   virtual int GetModuleSaveStateRev() const { return -1; }
    virtual void PostLoadState() {}
    virtual std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
    virtual std::vector<IUIControl*> ControlsToIgnoreInSaveState() const;
    virtual void UpdateOldControlName(std::string& oldName) {}
    virtual bool LoadOldControl(FileStreamIn& in, std::string& oldName) { return false; }
-   virtual bool CanSaveState() const { return true; }
-   virtual size_t GetExpectedSaveStateNumChildren() const { return mChildren.size(); }
+   virtual bool CanModuleTypeSaveState() const { return true; }
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}

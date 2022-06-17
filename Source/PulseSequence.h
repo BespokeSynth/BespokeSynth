@@ -82,7 +82,8 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
 
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 2; }
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;

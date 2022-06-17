@@ -2446,7 +2446,7 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    {
       FileStreamIn in(ofToDataPath("tmp"));
       mIsLoadingModule = true;
-      newModule->LoadState(in);
+      newModule->LoadState(in, newModule->LoadModuleSaveStateRev(in));
       mIsLoadingModule = false;
    }
 

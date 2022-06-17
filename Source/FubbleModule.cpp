@@ -542,16 +542,11 @@ void FubbleModule::SetUpFromSaveData()
    Resize(mModuleSaveData.GetInt("width"), mModuleSaveData.GetInt("height"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 3;
-}
-
 void FubbleModule::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mAxisH.mCurve.SaveState(out);
    mAxisV.mCurve.SaveState(out);
@@ -560,13 +555,13 @@ void FubbleModule::SaveState(FileStreamOut& out)
    out << mRecordStartOffset;
 }
 
-void FubbleModule::LoadState(FileStreamIn& in)
+void FubbleModule::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mAxisH.mCurve.LoadState(in);
    mAxisV.mCurve.LoadState(in);

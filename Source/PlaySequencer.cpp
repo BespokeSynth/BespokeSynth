@@ -555,16 +555,11 @@ void PlaySequencer::SetUpFromSaveData()
    mVelocityLight = mModuleSaveData.GetFloat("velocity_light");
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void PlaySequencer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
 
@@ -579,16 +574,16 @@ void PlaySequencer::SaveState(FileStreamOut& out)
    }
 }
 
-void PlaySequencer::LoadState(FileStreamIn& in)
+void PlaySequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mGrid->LoadState(in);
 

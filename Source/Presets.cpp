@@ -451,16 +451,11 @@ void Presets::SetUpFromSaveData()
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Presets::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << (int)mPresetCollection.size();
    for (auto& coll : mPresetCollection)
@@ -491,13 +486,13 @@ void Presets::SaveState(FileStreamOut& out)
       out << control->Path();
 }
 
-void Presets::LoadState(FileStreamIn& in)
+void Presets::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int collSize;
    in >> collSize;

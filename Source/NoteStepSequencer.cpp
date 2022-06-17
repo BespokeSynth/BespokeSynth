@@ -1141,29 +1141,24 @@ void NoteStepSequencer::SetUpFromSaveData()
    SetUpStepControls();
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void NoteStepSequencer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
    mVelocityGrid->SaveState(out);
    out << mHasExternalPulseSource;
 }
 
-void NoteStepSequencer::LoadState(FileStreamIn& in)
+void NoteStepSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mGrid->LoadState(in);
    mVelocityGrid->LoadState(in);
