@@ -93,6 +93,7 @@ public:
    IUIControl* FindUIControl(const char* name, bool fail = true) const;
    std::vector<IUIControl*> GetUIControls() const;
    std::vector<UIGrid*> GetUIGrids() const;
+   virtual void OnUIControlRequested(const char* name) {}
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);
    IDrawableModule* FindChild(const char* name) const;
@@ -195,9 +196,9 @@ public:
    bool mDrawDebug;
 
 protected:
-   virtual void Poll() override {}
-   virtual void OnClicked(int x, int y, bool right) override;
-   virtual bool MouseMoved(float x, float y) override;
+   void Poll() override {}
+   void OnClicked(int x, int y, bool right) override;
+   bool MouseMoved(float x, float y) override;
 
    ModuleSaveData mModuleSaveData;
    Checkbox* mEnabledCheckbox;
