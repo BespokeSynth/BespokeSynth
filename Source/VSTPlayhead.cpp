@@ -26,17 +26,20 @@
 #include "VSTPlayhead.h"
 #include "Transport.h"
 
-bool VSTPlayhead::getPosition(juce::AudioPlayHead::PositionInfo& result)
+juce::Optional<juce::AudioPlayHead::PositionInfo> VSTPlayhead::getPosition() const
 {
+   PositionInfo pos;
+   juce::AudioPlayHead::TimeSignature timeSignature;
+   juce::AudioPlayHead::LoopPoints loopPoint;
    timeSignature.numerator = TheTransport->GetTimeSigTop();
    timeSignature.denominator = TheTransport->GetTimeSigBottom();
    loopPoint.ppqStart = 0;
-   loopPoint.ppqEnd = 480 * result.getTimeSignature()->denominator;
+   loopPoint.ppqEnd = 480 * pos.getTimeSignature()->denominator;
 
-   result.setBpm(TheTransport->GetTempo());
-   result.setTimeSignature(timeSignature);
-   result.setTimeInSamples(gTime* gSampleRateMs);
-   result.setTimeInSeconds(gTime / 1000);
+   pos.setBpm(TheTransport->GetTempo());
+   pos.setTimeSignature(timeSignature);
+   pos.setTimeInSamples(gTime * gSampleRateMs);
+   pos.setTimeInSeconds(gTime / 1000);
 
    /*
    * getMeasureTime is a float of how many measures we are through with fractional
@@ -44,17 +47,21 @@ bool VSTPlayhead::getPosition(juce::AudioPlayHead::PositionInfo& result)
    * just the tsRatio times measure count, and for start of measure we simply floor
    * the measure time
    */
+
    double tsRatio = 4;
-   if (result.getTimeSignature()->numerator > 0)
-      tsRatio = 1.0 * result.getTimeSignature()->numerator / result.getTimeSignature()->denominator * 4;
-   result.setPpqPosition((TheTransport->GetMeasureTime(gTime)) * tsRatio);
-   result.setPpqPositionOfLastBarStart (floor(TheTransport->GetMeasureTime(gTime)) * tsRatio);
+   if (pos.getTimeSignature()->numerator > 0)
+      tsRatio = 1.0 * pos.getTimeSignature()->numerator / pos.getTimeSignature()->denominator * 4;
+   pos.setPpqPosition((TheTransport->GetMeasureTime(gTime)) * tsRatio);
+   pos.setPpqPositionOfLastBarStart(floor(TheTransport->GetMeasureTime(gTime)) * tsRatio);
 
-   result.setIsPlaying(true);
-   result.setIsRecording(false);
-   result.setIsLooping(false);
-   result.setLoopPoints(loopPoint);
-   result.setFrameRate(juce::AudioPlayHead::fps60);
+   pos.setIsPlaying(true);
+   pos.setIsRecording(false);
+   pos.setIsLooping(false);
+   pos.setLoopPoints(loopPoint);
+   pos.setFrameRate(juce::AudioPlayHead::fps60);
 
-   return true;
+   return pos;
 }
+
+
+
