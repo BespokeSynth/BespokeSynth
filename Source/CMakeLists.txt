@@ -12,6 +12,7 @@ juce_add_gui_app(BespokeSynth
     DOCUMENT_BROWSER_ENABLED      TRUE
     DOCUMENT_EXTENSIONS           .bsk
     BUNDLE_ID                     com.ryanchallinor.bespokesynth
+    PLUGINHOST_AU                 TRUE
     )
 
 bespoke_buildtime_version_info(BespokeSynth)
@@ -734,6 +735,8 @@ target_compile_definitions(BespokeSynth PRIVATE
 
     JUCE_PLUGINHOST_VST3=1
     JUCE_PLUGINHOST_VST=$<BOOL:${BESPOKE_VST2_SDK_LOCATION}>
+    JUCE_PLUGINHOST_LV2=1
+    JUCE_PLUGINHOST_LADSPA=1
 
     JUCE_CATCH_UNHANDLED_EXCEPTIONS=0
     )
