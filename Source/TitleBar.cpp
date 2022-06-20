@@ -312,11 +312,10 @@ void SpawnListManager::SetUpVstDropdown()
    VSTLookup::GetAvailableVSTs(vsts);
    std::vector<std::pair<std::string, juce::PluginDescription>> vstIDs;
    std::string suffix = "";
-
-   recentPlugins = VSTLookup::GetRecentPlugins(3);
    
-
-   for (auto vst : vsts)
+   recentPlugins = VSTLookup::GetRecentPlugins(8);
+      
+   for (auto &vst : vsts)
    {
       std::string format = vst.pluginFormatName.toLowerCase().toStdString();
       int count = 0;
@@ -326,7 +325,7 @@ void SpawnListManager::SetUpVstDropdown()
          if (vst.name == elem.name)
          {
             count++;
-            if (count >= 2)
+            if (count > 1)
             {
                suffix = " [" + format + "]";
                break;
@@ -336,12 +335,27 @@ void SpawnListManager::SetUpVstDropdown()
       vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst));
    }
    
-   vstIDs.insert(vstIDs.begin(), std::make_pair(":------:", stump));
+   vstIDs.insert(vstIDs.begin(), std::make_pair("--------------", stump));
    
-   for (auto recent : recentPlugins)
-       {
-           vstIDs.insert(vstIDs.begin(), std::make_pair(recent.name.toStdString(), recent));
-       }
+   for (auto &recent : recentPlugins)
+   {
+//       std::string format = recent.pluginFormatName.toLowerCase().toStdString();
+//       int count = 0;
+      suffix = "";
+//       for (auto &elem : recentPlugins)
+//       {
+//          if (recent.name == elem.name)
+//          {
+//             count++;
+//             if (count > 1)
+//             {
+//                suffix = " [" + format + "]";
+//                break;
+//             }
+//          }
+         vstIDs.insert(vstIDs.begin(), std::make_pair(recent.name.toStdString() + suffix, recent));
+//      }
+   }
    
    vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, stump));
    mVstPlugins.SetListVST(vstIDs, "vstplugin");

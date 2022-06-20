@@ -163,6 +163,7 @@ namespace VSTLookup
    {
       std::vector<juce::PluginDescription> recentPlugins;
       std::map<double, std::string> lastUsedTimes;
+      int i=0;
 
       if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
       {
@@ -184,13 +185,13 @@ namespace VSTLookup
             }
          }
       }
-      std::map<double, std::string>::const_iterator it;
-      it = lastUsedTimes.begin();
-      while ( it != lastUsedTimes.end())
+      std::map<double, std::string>::reverse_iterator rit;
+      rit = lastUsedTimes.rbegin();
+      while (rit != lastUsedTimes.rend() && ++i <= num)
       {
           //DBG(it->second);
-          recentPlugins.push_back(GetPluginDesc(juce::String(it->second)));
-          ++it;
+          recentPlugins.push_back(GetPluginDesc(juce::String(rit->second)));
+          ++rit;
       }
 
       return recentPlugins;
