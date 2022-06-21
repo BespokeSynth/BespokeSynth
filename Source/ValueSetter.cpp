@@ -99,17 +99,10 @@ void ValueSetter::Go()
 void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ValueSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("show_slider", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -117,9 +110,6 @@ void ValueSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ValueSetter::SetUpFromSaveData()
 {
-   mTarget = TheSynth->FindUIControl(mModuleSaveData.GetString("target"));
-   mControlCable->SetTarget(mTarget);
-
    bool showSlider = mModuleSaveData.GetBool("show_slider");
    mValueEntry->SetShowing(!showSlider);
    mValueSlider->SetShowing(showSlider);
