@@ -310,11 +310,12 @@ void SpawnListManager::SetUpVstDropdown()
 {
    std::vector<juce::PluginDescription> vsts, recentPlugins;
    VSTLookup::GetAvailableVSTs(vsts);
+   VSTLookup::GetRecentPlugins(recentPlugins, 8);
    std::vector<std::pair<std::string, juce::PluginDescription>> vstIDs;
    std::string suffix = "";
-   
-   recentPlugins = VSTLookup::GetRecentPlugins(8);
-      
+
+   std::reverse(recentPlugins.begin(), recentPlugins.end());
+         
    for (auto &vst : vsts)
    {
       std::string format = vst.pluginFormatName.toLowerCase().toStdString();

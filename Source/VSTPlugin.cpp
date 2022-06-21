@@ -159,9 +159,9 @@ namespace VSTLookup
    }
 
 
-   std::vector<juce::PluginDescription> GetRecentPlugins(int num)
+   void GetRecentPlugins(std::vector<PluginDescription>& recentPlugins, int num)
    {
-      std::vector<juce::PluginDescription> recentPlugins;
+      //std::vector<juce::PluginDescription> recentPlugins;
       std::map<double, std::string> lastUsedTimes;
       int i=0;
 
@@ -189,12 +189,10 @@ namespace VSTLookup
       rit = lastUsedTimes.rbegin();
       while (rit != lastUsedTimes.rend() && ++i <= num)
       {
-          //DBG(it->second);
+          DBG(rit->second);
           recentPlugins.push_back(GetPluginDesc(juce::String(rit->second)));
           ++rit;
       }
-
-      return recentPlugins;
    }
 
    void SortByLastUsed(std::vector<std::string>& vsts)
