@@ -217,12 +217,9 @@ void ModulatorExpression::GetModuleDimensions(float& w, float& h)
 
 void ModulatorExpression::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void ModulatorExpression::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }

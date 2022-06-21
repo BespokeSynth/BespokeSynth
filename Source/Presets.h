@@ -70,6 +70,7 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
+   void UpdateOldControlName(std::string& oldName) override;
 
    static std::vector<IUIControl*> sPresetHighlightControls;
 
@@ -131,6 +132,7 @@ private:
    UIGrid* mGrid{ nullptr };
    std::vector<PresetCollection> mPresetCollection;
    ClickButton* mRandomizeButton{ nullptr };
+   ClickButton* mAddButton{ nullptr };
    int mDrawSetPresetsCountdown{ 0 };
    std::vector<IDrawableModule*> mPresetModules{};
    std::vector<IUIControl*> mPresetControls{};
@@ -144,7 +146,6 @@ private:
    IntSlider* mCurrentPresetSlider{ nullptr };
    PatchCableSource* mModuleCable{ nullptr };
    PatchCableSource* mUIControlCable{ nullptr };
-   bool mShiftHeld{ false };
 };
 
 
