@@ -231,15 +231,12 @@ void CurveLooper::Resize(float w, float h)
 void CurveLooper::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   moduleInfo["uicontrol"] = mUIControl ? mUIControl->Path() : "";
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }
 
 void CurveLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("uicontrol", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, 200, 120, 1000);
    mModuleSaveData.LoadInt("height", moduleInfo, 120, 15, 1000);
 
@@ -248,18 +245,6 @@ void CurveLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void CurveLooper::SetUpFromSaveData()
 {
-   std::string controlPath = mModuleSaveData.GetString("uicontrol");
-   if (!controlPath.empty())
-   {
-      mUIControl = TheSynth->FindUIControl(controlPath);
-      if (mUIControl)
-         mControlCable->SetTarget(mUIControl);
-   }
-   else
-   {
-      mUIControl = nullptr;
-   }
-
    mWidth = mModuleSaveData.GetInt("width");
    mHeight = mModuleSaveData.GetInt("height");
 }
