@@ -40,7 +40,7 @@
 
 class PatchCableSource;
 
-class ControlSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IButtonListener, public IIntSliderListener, public IPulseReceiver, public INoteReceiver, public IDrivableSequencer
+class ControlSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IButtonListener, public IIntSliderListener, public IPulseReceiver, public INoteReceiver, public IDrivableSequencer, public IFloatSliderListener
 {
 public:
    ControlSequencer();
@@ -58,7 +58,7 @@ public:
 
    //IDrawableModule
    void Poll() override;
-   bool IsResizable() const override { return true; }
+   bool IsResizable() const override { return !mSliderMode; }
    void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
@@ -78,6 +78,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
 
@@ -88,7 +89,7 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    static std::list<ControlSequencer*> sControlSequencers;
 
@@ -109,9 +110,9 @@ private:
 
    UIGrid* mGrid{ nullptr };
    IUIControl* mUIControl{ nullptr };
-   NoteInterval mInterval{ kInterval_16n };
+   NoteInterval mInterval{ kInterval_4n };
    DropdownList* mIntervalSelector{ nullptr };
-   int mLength{ 16 };
+   int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
    std::string mOldLengthStr;
    int mLoadRev{ -1 };
@@ -119,6 +120,8 @@ private:
    ClickButton* mRandomize{ nullptr };
    bool mHasExternalPulseSource{ false };
    int mStep{ 0 };
+   bool mSliderMode{ true };
+   std::array<FloatSlider*, 32> mStepSliders{};
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
