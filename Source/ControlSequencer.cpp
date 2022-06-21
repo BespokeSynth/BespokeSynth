@@ -55,15 +55,22 @@ void ControlSequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    int width, height;
-   UIBLOCK(3, 3, 200);
-   INTSLIDER(mLengthSlider, "length", &mLength, 1, 64);
+   UIBLOCK(3, 3, 100);
+   INTSLIDER(mLengthSlider, "length", &mLength, 1, 32);
    UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomize, "random");
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, 25, mRandomize->GetRect().getMaxX() - 6, 40, 16, 1, this);
+   mGrid = new UIGrid("uigrid", 5, 25, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1, this);
+
+   UIBLOCK(15, height + 5);
+   for (size_t i = 0; i < mStepSliders.size(); ++i)
+   {
+      FLOATSLIDER(mStepSliders[i], ("step " + ofToString(i)).c_str(), &mGrid->GetVal(i, 0), 0, 1);
+   }
+   ENDUIBLOCK0();
 
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    //mControlCable->SetManualPosition(86, 10);
@@ -164,6 +171,7 @@ void ControlSequencer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mGrid->SetShowing(!mSliderMode);
    mGrid->Draw();
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
@@ -177,6 +185,38 @@ void ControlSequencer::DrawModule()
       float val = mGrid->GetVal(currentHover % mGrid->GetCols(), currentHover / mGrid->GetCols());
       DrawTextNormal(mUIControl->GetDisplayValue(mUIControl->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y + 12);
       ofPopStyle();
+   }
+
+   for (size_t i = 0; i < mStepSliders.size(); ++i)
+   {
+      if (mSliderMode)
+      {
+         bool showing = i < mLength;
+         mStepSliders[i]->SetShowing(showing);
+         mStepSliders[i]->Draw();
+
+         auto rect = mStepSliders[i]->GetRect(true);
+
+         if (showing && mUIControl)
+         {
+            float val = mGrid->GetVal(i, 0);
+
+            DrawTextNormal(mUIControl->GetDisplayValue(mUIControl->GetValueForMidiCC(val)), rect.getMaxX() + 5, rect.y + 12);
+         }
+
+         if (i == mStep)
+         {
+            ofPushStyle();
+            ofSetColor(0, 255, 0);
+            ofFill();
+            ofRect(rect.x - 12, rect.y + 3, 10, 10);
+            ofPopStyle();
+         }
+      }
+      else
+      {
+         mStepSliders[i]->SetShowing(false);
+      }
    }
 }
 
@@ -275,8 +315,16 @@ namespace
 
 void ControlSequencer::GetModuleDimensions(float& width, float& height)
 {
-   width = mGrid->GetWidth() + extraW;
-   height = mGrid->GetHeight() + extraH;
+   if (mSliderMode)
+   {
+      width = 200;
+      height = mLength * 17 + extraH;
+   }
+   else
+   {
+      width = mGrid->GetWidth() + extraW;
+      height = mGrid->GetHeight() + extraH;
+   }
 }
 
 void ControlSequencer::Resize(float w, float h)
@@ -305,6 +353,7 @@ void ControlSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ControlSequencer::SetUpFromSaveData()
 {
+   mSliderMode = mModuleSaveData.GetBool("slider_mode");
 }
 
 void ControlSequencer::SaveState(FileStreamOut& out)
@@ -380,6 +429,12 @@ void ControlSequencer::LoadState(FileStreamIn& in, int rev)
       mLengthSlider->GetRange(min, max);
       if (mLength > max)
          mLengthSlider->SetExtents(min, mLength);
+   }
+
+   if (rev < 2)
+   {
+      mSliderMode = false;
+      mModuleSaveData.SetBool("slider_mode", false);
    }
 }
 

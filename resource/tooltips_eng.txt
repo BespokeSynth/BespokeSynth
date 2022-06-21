@@ -391,6 +391,7 @@ controlsequencer~modulate a control step-wise at an interval
 ~interval~rate to advance
 ~length~length of the sequence
 ~random~randomize sequence values
+~step *~value for this step
 
 
 
