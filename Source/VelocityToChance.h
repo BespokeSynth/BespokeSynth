@@ -28,14 +28,15 @@
 #pragma once
 #include "NoteEffectBase.h"
 #include "Slider.h"
+#include "ClickButton.h"
+#include "TextEntry.h"
 
-class VelocityToChance : public NoteEffectBase, public IFloatSliderListener, public IDrawableModule
+class VelocityToChance : public NoteEffectBase, public IFloatSliderListener, public IIntSliderListener, public IDrawableModule, public IButtonListener, public ITextEntryListener
 {
 public:
    VelocityToChance();
    virtual ~VelocityToChance();
    static IDrawableModule* Create() { return new VelocityToChance(); }
-
 
    void CreateUIControls() override;
 
@@ -45,7 +46,10 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
    void CheckboxUpdated(Checkbox* checkbox) override {}
+   void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -56,9 +60,19 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
 
+   void Reseed();
+
    bool mFullVelocity{ true };
    Checkbox* mFullVelocityCheckbox{ nullptr };
 
    float mLastRejectTime{ 0 };
    float mLastAcceptTime{ 0 };
+   bool mDeterministic{ false };
+   int mLength{ 4 };
+   IntSlider* mLengthSlider{ nullptr };
+   int mSeed{ 0 };
+   TextEntry* mSeedEntry{ nullptr };
+   ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

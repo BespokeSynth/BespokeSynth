@@ -1442,6 +1442,11 @@ vibrato~add rhythmic oscillating pitch bend to notes
 
 velocitytochance~use a note's velocity to determine the chance that the note plays
 ~full velocity~set velocity to full for notes that pass through
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
