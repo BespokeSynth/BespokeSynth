@@ -597,6 +597,13 @@ void IDrawableModule::Exit()
 
 bool IDrawableModule::TestClick(int x, int y, bool right, bool testOnly /*=false*/)
 {
+   if (IsResizable() && mHoveringOverResizeHandle)
+   {
+      if (!testOnly)
+         TheSynth->SetResizeModule(this);
+      return true;
+   }
+
    for (auto source : mPatchCableSources)
    {
       if (source->TestClick(x, y, right, testOnly))
