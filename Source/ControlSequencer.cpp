@@ -305,7 +305,6 @@ void ControlSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ControlSequencer::SetUpFromSaveData()
 {
-   mSliderMode = mModuleSaveData.GetBool("slider_mode");
 }
 
 void ControlSequencer::SaveState(FileStreamOut& out)
