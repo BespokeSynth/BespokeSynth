@@ -151,24 +151,15 @@ void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void EnvelopeModulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void EnvelopeModulator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void EnvelopeModulator::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }
 
 void EnvelopeModulator::SaveState(FileStreamOut& out)

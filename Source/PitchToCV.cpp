@@ -85,22 +85,13 @@ float PitchToCV::Value(int samplesIn)
 void PitchToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void PitchToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void PitchToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

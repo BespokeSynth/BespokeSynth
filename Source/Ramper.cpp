@@ -173,28 +173,13 @@ void Ramper::GetModuleDimensions(float& width, float& height)
 void Ramper::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   moduleInfo["uicontrol"] = mUIControl ? mUIControl->Path() : "";
 }
 
 void Ramper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("uicontrol", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void Ramper::SetUpFromSaveData()
 {
-   std::string controlPath = mModuleSaveData.GetString("uicontrol");
-   if (!controlPath.empty())
-   {
-      mUIControl = TheSynth->FindUIControl(controlPath);
-      if (mUIControl)
-         mControlCable->SetTarget(mUIControl);
-   }
-   else
-   {
-      mUIControl = nullptr;
-   }
 }

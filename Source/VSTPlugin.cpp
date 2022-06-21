@@ -1272,6 +1272,7 @@ void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
          {
             int index;
             in >> index;
+            if (index < mParameterSliders.size())
             {
                mParameterSliders[index].mShowing = true;
                if (mParameterSliders[index].mSlider == nullptr)

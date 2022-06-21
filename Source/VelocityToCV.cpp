@@ -82,22 +82,13 @@ float VelocityToCV::Value(int samplesIn)
 void VelocityToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void VelocityToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void VelocityToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

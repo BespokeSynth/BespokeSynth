@@ -77,22 +77,13 @@ float NoteToMs::Value(int samplesIn)
 void NoteToMs::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void NoteToMs::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void NoteToMs::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

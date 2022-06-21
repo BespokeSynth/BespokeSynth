@@ -88,22 +88,13 @@ float ModulatorAdd::Value(int samplesIn)
 void ModulatorAdd::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ModulatorAdd::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void ModulatorAdd::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }
