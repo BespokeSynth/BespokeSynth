@@ -113,55 +113,53 @@ namespace VSTLookup
       return "";
    }
 
-   juce::PluginDescription GetPluginDesc(int id)
+   bool GetPluginDesc(juce::PluginDescription& desc, int id)
    {
-      juce::PluginDescription desc;
       auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i = 0; i < types.size(); ++i)
       {
          if (id == types[i].uniqueId)
          {
             desc = types[i];
-            break;
+            return true;
          }
       }
-      return desc;
+      return false;
    }
    
-   juce::PluginDescription GetPluginDesc(std::string vstName)
+   bool GetPluginDesc(juce::PluginDescription& desc, std::string vstName)
    {
-      juce::PluginDescription desc;
       auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i = 0; i < types.size(); ++i)
       {
          if (vstName == types[i].name)
          {
             desc = types[i];
-            break;
+            return true;
          }
       }
-      return desc;
+      return false;
    }   
 
-   juce::PluginDescription GetPluginDesc(juce::String pluginId)
+   bool GetPluginDesc(juce::PluginDescription& desc, juce::String pluginId)
    {
-      juce::PluginDescription desc;
       auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i = 0; i < types.size(); ++i)
       {
          if (types[i].createIdentifierString() == pluginId)
          {
             desc = types[i];
-            break;
+            return true;
          }
       }
-      return desc;
+      return false;
    }
 
 
    void GetRecentPlugins(std::vector<PluginDescription>& recentPlugins, int num)
    {
-      //std::vector<juce::PluginDescription> recentPlugins;
+      juce::PluginDescription pluginDesc{};
+      ;
       std::map<double, std::string> lastUsedTimes;
       int i=0;
 
@@ -190,7 +188,10 @@ namespace VSTLookup
       while (rit != lastUsedTimes.rend() && ++i <= num)
       {
           DBG(rit->second);
-          recentPlugins.push_back(GetPluginDesc(juce::String(rit->second)));
+          if (GetPluginDesc(pluginDesc, juce::String(rit->second)))
+              {
+              recentPlugins.push_back(pluginDesc);
+              }
           ++rit;
       }
    }
@@ -1134,7 +1135,8 @@ void VSTPlugin::SetUpFromSaveData()
    DBG("try to use description ident");
       auto pluginId = juce::String(mModuleSaveData.GetString("pluginId"));
       DBG(pluginId);
-      pluginDesc = VSTLookup::GetPluginDesc(pluginId);
+      if (VSTLookup::GetPluginDesc(pluginDesc, pluginId))
+         TheSynth->LogEvent("Plugin with " + pluginId.toStdString() + " id not found", kLogEventType_Error);
    }
   
    else if (mModuleSaveData.HasProperty("vstId") && mModuleSaveData.GetInt("vstId") != 0)
@@ -1143,7 +1145,8 @@ void VSTPlugin::SetUpFromSaveData()
       int vstId = mModuleSaveData.GetInt("vstId");
       if (vstId != 0)
       {
-         pluginDesc = VSTLookup::GetPluginDesc(vstId);
+         if (VSTLookup::GetPluginDesc(pluginDesc, vstId))
+            TheSynth->LogEvent("Plugin with " + juce::String(vstId).toStdString() + " id not found", kLogEventType_Error);
       }
    }
    

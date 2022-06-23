@@ -313,17 +313,20 @@ void SpawnListManager::SetUpVstDropdown()
    VSTLookup::GetRecentPlugins(recentPlugins, 8);
    std::vector<std::pair<std::string, juce::PluginDescription>> vstIDs;
    std::string suffix = "";
+   std::string separator = "--------------";
 
    std::reverse(recentPlugins.begin(), recentPlugins.end());
          
    for (auto &vst : vsts)
    {
       std::string format = vst.pluginFormatName.toLowerCase().toStdString();
+      std::string name = vst.name.toStdString();
+      separator.resize(std::max(11, static_cast<int>(name.size())), '=');
       int count = 0;
       suffix = "";
       for (auto &elem : vsts)
       {
-         if (vst.name == elem.name)
+         if (name == elem.name)
          {
             count++;
             if (count > 1)
@@ -333,29 +336,29 @@ void SpawnListManager::SetUpVstDropdown()
             }
          }
       }
-      vstIDs.push_back(std::make_pair(vst.name.toStdString() + suffix, vst));
+      vstIDs.push_back(std::make_pair(name + suffix, vst));
    }
    
-   vstIDs.insert(vstIDs.begin(), std::make_pair("--------------", stump));
+   vstIDs.insert(vstIDs.begin(), std::make_pair(separator, stump));
    
    for (auto &recent : recentPlugins)
    {
-//       std::string format = recent.pluginFormatName.toLowerCase().toStdString();
-//       int count = 0;
+       std::string format = recent.pluginFormatName.toLowerCase().toStdString();
+       int count = 0;
       suffix = "";
-//       for (auto &elem : recentPlugins)
-//       {
-//          if (recent.name == elem.name)
-//          {
-//             count++;
-//             if (count > 1)
-//             {
-//                suffix = " [" + format + "]";
-//                break;
-//             }
-//          }
-         vstIDs.insert(vstIDs.begin(), std::make_pair(recent.name.toStdString() + suffix, recent));
-//      }
+       for (auto &elem : recentPlugins)
+       {
+          if (recent.name == elem.name)
+          {
+             count++;
+             if (count > 1)
+             {
+                suffix = " [" + format + "]";
+                break;
+             }
+          }
+       }
+       vstIDs.insert(vstIDs.begin(), std::make_pair(recent.name.toStdString() + suffix, recent));
    }
    
    vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, stump));

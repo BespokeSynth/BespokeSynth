@@ -2856,6 +2856,8 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
    std::string vstToSetUp = "";
+   juce::PluginDescription pluginDesc;
+
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kVSTSuffix)
    {
       moduleType = "vstplugin";
@@ -2942,7 +2944,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
 
          if (vstToSetUp != "")
          {
-            auto pluginDesc = VSTLookup::GetPluginDesc(vstToSetUp);
+            VSTLookup::GetPluginDesc(pluginDesc,vstToSetUp);
             VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
             if (plugin != nullptr) {}
                plugin->SetVST(pluginDesc);
