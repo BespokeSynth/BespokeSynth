@@ -237,6 +237,7 @@ public:
 
    bool IsLoadingState() const { return mIsLoadingState; }
    bool IsLoadingModule() const { return mIsLoadingModule; }
+   bool IsDuplicatingModule() const { return mIsDuplicatingModule; }
    void SetIsLoadingState(bool loading) { mIsLoadingState = loading; }
 
    static std::string GetUserPrefsPath();
@@ -412,7 +413,8 @@ private:
 
    ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay;
 
-   bool mIsLoadingModule;
+   bool mIsLoadingModule{ false };
+   bool mIsDuplicatingModule{ false };
 
    std::list<IPollable*> mExtraPollers;
 

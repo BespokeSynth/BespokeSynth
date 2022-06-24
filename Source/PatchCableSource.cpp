@@ -749,6 +749,10 @@ void PatchCableSource::LoadState(FileStreamIn& in)
          {
          }
       }
+
+      if (TheSynth->IsDuplicatingModule() && mType == kConnectionType_Modulator)
+         target = nullptr; //TODO(Ryan) make it so that when you're duplicating a group, modulators preserve connections to the new copies of controls within that group
+
       mPatchCables[i] = new PatchCable(this);
       SetPatchCableTarget(mPatchCables[i], target, false);
    }
