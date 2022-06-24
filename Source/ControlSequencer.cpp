@@ -72,7 +72,7 @@ void ControlSequencer::CreateUIControls()
    }
    ENDUIBLOCK0();
 
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
+   mControlCable = new PatchCableSource(this, kConnectionType_ValueSetter);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
 
@@ -135,11 +135,16 @@ void ControlSequencer::Step(double time, int pulseFlags)
 
    mGrid->SetHighlightCol(time, mStep);
 
-   if (mUIControl && mEnabled)
+   if (mEnabled)
    {
-      mUIControl->SetFromMidiCC(mGrid->GetVal(mStep, 0), true);
       mControlCable->AddHistoryEvent(gTime, true);
       mControlCable->AddHistoryEvent(gTime + 15, false);
+
+      for (auto* target : mTargets)
+      {
+         if (target != nullptr)
+            target->SetFromMidiCC(mGrid->GetVal(mStep, 0), true);
+      }
    }
 }
 
@@ -178,12 +183,12 @@ void ControlSequencer::DrawModule()
    mRandomize->Draw();
 
    int currentHover = mGrid->CurrentHover();
-   if (currentHover != -1 && mUIControl)
+   if (currentHover != -1 && GetUIControl())
    {
       ofPushStyle();
       ofSetColor(ofColor::grey);
       float val = mGrid->GetVal(currentHover % mGrid->GetCols(), currentHover / mGrid->GetCols());
-      DrawTextNormal(mUIControl->GetDisplayValue(mUIControl->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y + 12);
+      DrawTextNormal(GetUIControl()->GetDisplayValue(GetUIControl()->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y + 12);
       ofPopStyle();
    }
 
@@ -197,11 +202,11 @@ void ControlSequencer::DrawModule()
 
          auto rect = mStepSliders[i]->GetRect(true);
 
-         if (showing && mUIControl)
+         if (showing && GetUIControl())
          {
             float val = mGrid->GetVal(i, 0);
 
-            DrawTextNormal(mUIControl->GetDisplayValue(mUIControl->GetValueForMidiCC(val)), rect.getMaxX() + 5, rect.y + 12);
+            DrawTextNormal(GetUIControl()->GetDisplayValue(GetUIControl()->GetValueForMidiCC(val)), rect.getMaxX() + 5, rect.y + 12);
          }
 
          if (i == mStep)
@@ -244,7 +249,7 @@ void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, 
 {
    if (grid == mGrid)
    {
-      int numValues = mUIControl ? mUIControl->GetNumValues() : 0;
+      int numValues = GetUIControl() ? GetUIControl()->GetNumValues() : 0;
       if (numValues > 1)
       {
          for (int i = 0; i < mGrid->GetCols(); ++i)
@@ -259,14 +264,20 @@ void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, 
 
 void ControlSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (mControlCable->GetPatchCables().empty() == false)
-      mUIControl = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[0]->GetTarget());
-   else
-      mUIControl = nullptr;
-   if (mUIControl)
+   bool wasEmpty = mControlCable->GetPatchCables().empty();
+
+   for (size_t i = 0; i < mTargets.size(); ++i)
+   {
+      if (i < mControlCable->GetPatchCables().size())
+         mTargets[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
+      else
+         mTargets[i] = nullptr;
+   }
+
+   if (wasEmpty && mControlCable->GetPatchCables().size() == 1)
    {
       for (int i = 0; i < mGrid->GetCols(); ++i)
-         mGrid->SetVal(i, 0, mUIControl->GetMidiValue());
+         mGrid->SetVal(i, 0, GetUIControl()->GetMidiValue());
    }
 }
 

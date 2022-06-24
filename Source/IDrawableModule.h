@@ -195,6 +195,8 @@ public:
 
    bool mDrawDebug;
 
+   static constexpr int kMaxOutputsPerPatchCableSource = 32;
+
 protected:
    void Poll() override {}
    void OnClicked(int x, int y, bool right) override;

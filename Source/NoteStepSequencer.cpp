@@ -189,7 +189,7 @@ void NoteStepSequencer::CreateUIControls()
    {
       mStepCables[i] = new AdditionalNoteCable();
       mStepCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mStepCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1));
+      mStepCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]->GetPatchCableSource());
    }
 }

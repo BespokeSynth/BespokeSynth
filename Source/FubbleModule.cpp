@@ -296,23 +296,23 @@ void FubbleModule::DrawModule()
    if (mAxisH.GetCableSource()->GetTarget() && mAxisH.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
       mAxisH.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
-      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0));
+      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
    }
    else
    {
       mAxisH.GetCableSource()->SetManualPosition(rightAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
-      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
+      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    }
 
    if (mAxisV.GetCableSource()->GetTarget() && mAxisV.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
       mAxisV.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 38);
-      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0));
+      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
    }
    else
    {
       mAxisV.GetCableSource()->SetManualPosition(rightAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 38);
-      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
+      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    }
 }
 

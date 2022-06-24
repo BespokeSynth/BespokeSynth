@@ -173,7 +173,7 @@ void PulseHocket::SetUpFromSaveData()
       for (int i = oldNumItems; i < mNumDestinations; ++i)
       {
          mDestinationCables.push_back(new PatchCableSource(this, kConnectionType_Pulse));
-         mDestinationCables[i]->SetOverrideCableDir(ofVec2f(1, 0));
+         mDestinationCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
          AddPatchCableSource(mDestinationCables[i]);
          ofRectangle rect = mWeightSlider[i]->GetRect(true);
          mDestinationCables[i]->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);

@@ -124,10 +124,11 @@ public:
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
-   void SetOverrideCableDir(ofVec2f dir)
+   void SetOverrideCableDir(ofVec2f dir, Side side)
    {
       mHasOverrideCableDir = true;
       mOverrideCableDir = dir;
+      mManualSide = side;
    }
    ofVec2f GetCableStart(int index) const;
    ofVec2f GetCableStartDir(int index, ofVec2f dest) const;

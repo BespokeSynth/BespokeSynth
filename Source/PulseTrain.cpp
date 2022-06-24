@@ -75,7 +75,7 @@ void PulseTrain::CreateUIControls()
    for (int i = 0; i < kIndividualStepCables; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
+      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]);
    }
 }

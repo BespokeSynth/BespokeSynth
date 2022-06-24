@@ -53,8 +53,9 @@ void GridSliders::CreateUIControls()
 
    for (size_t i = 0; i < mControlCables.size(); ++i)
    {
-      mControlCables[i] = new PatchCableSource(this, kConnectionType_Modulator);
+      mControlCables[i] = new PatchCableSource(this, kConnectionType_ValueSetter);
       mControlCables[i]->SetManualPosition(i * 12 + 8, 28);
+      mControlCables[i]->SetManualSide(PatchCableSource::Side::kBottom);
       AddPatchCableSource(mControlCables[i]);
    }
 }
@@ -128,7 +129,8 @@ void GridSliders::OnGridButton(int x, int y, float velocity, IGridController* gr
       if (sliderIndex < mControlCables.size() && mControlCables[sliderIndex]->GetTarget())
       {
          float value = squareIndex / float(length - 1);
-         dynamic_cast<IUIControl*>(mControlCables[sliderIndex]->GetTarget())->SetFromMidiCC(value);
+         for (auto& cable : mControlCables[sliderIndex]->GetPatchCables())
+            dynamic_cast<IUIControl*>(cable->GetTarget())->SetFromMidiCC(value);
       }
    }
 }
