@@ -99,7 +99,6 @@ ModularSynth::ModularSynth()
 , mQuickSpawn(nullptr)
 , mScheduledEnvelopeEditorSpawnDisplay(nullptr)
 , mFrameCount(0)
-, mIsLoadingModule(false)
 , mLastClapboardTime(-9999)
 , mPixelRatio(1)
 {
@@ -2446,7 +2445,9 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    {
       FileStreamIn in(ofToDataPath("tmp"));
       mIsLoadingModule = true;
+      mIsDuplicatingModule = true;
       newModule->LoadState(in, newModule->LoadModuleSaveStateRev(in));
+      mIsDuplicatingModule = false;
       mIsLoadingModule = false;
    }
 
