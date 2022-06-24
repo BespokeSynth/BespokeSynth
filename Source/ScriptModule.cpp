@@ -809,7 +809,7 @@ void ScriptModule::SetNumNoteOutputs(int num)
    {
       auto noteCable = new AdditionalNoteCable();
       noteCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1, 0));
+      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
       AddPatchCableSource(noteCable->GetPatchCableSource());
       noteCable->GetPatchCableSource()->SetManualPosition(0, 30 + 20 * (int)mExtraNoteOutputs.size());
       mExtraNoteOutputs.push_back(noteCable);

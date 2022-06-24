@@ -51,7 +51,7 @@ public:
    void CreateUIControls() override;
    void Init() override;
 
-   IUIControl* GetUIControl() const { return mUIControl; }
+   IUIControl* GetUIControl() const { return mTargets.size() == 0 ? nullptr : mTargets[0]; }
 
    //IGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
@@ -109,7 +109,7 @@ private:
    void MouseReleased() override;
 
    UIGrid* mGrid{ nullptr };
-   IUIControl* mUIControl{ nullptr };
+   std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
    NoteInterval mInterval{ kInterval_4n };
    DropdownList* mIntervalSelector{ nullptr };
    int mLength{ 8 };

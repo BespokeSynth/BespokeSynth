@@ -63,7 +63,7 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mDrawPass(DrawPass::kSource)
 , mParentMinimized(false)
 {
-   mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse || mType == kConnectionType_Audio || mType == kConnectionType_Modulator);
+   mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse || mType == kConnectionType_Audio || mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter);
    SetConnectionType(type);
 }
 
@@ -83,6 +83,12 @@ void PatchCableSource::SetConnectionType(ConnectionType type)
       mColor = IDrawableModule::GetColor(kModuleType_Audio);
    else if (mType == kConnectionType_Modulator)
       mColor = IDrawableModule::GetColor(kModuleType_Modulator);
+   else if (mType == kConnectionType_ValueSetter)
+   {
+      mColor = IDrawableModule::GetColor(kModuleType_Modulator);
+      mColor.setSaturation(mColor.getSaturation() * .6f);
+      mColor.setBrightness(mColor.getBrightness() * .7f);
+   }
    else if (mType == kConnectionType_Pulse)
       mColor = IDrawableModule::GetColor(kModuleType_Pulse);
    else
@@ -360,7 +366,7 @@ void PatchCableSource::Render()
             cableY += kPatchCableSpacing;
          else if (mSide == Side::kLeft)
             cableX -= kPatchCableSpacing;
-         else if (mSide == Side::kRight)
+         else if (mSide == Side::kRight || mSide == Side::kNone)
             cableX += kPatchCableSpacing;
       }
    }
@@ -379,7 +385,7 @@ ofVec2f PatchCableSource::GetCableStart(int index) const
          cableY += kPatchCableSpacing * index;
       else if (mSide == Side::kLeft)
          cableX -= kPatchCableSpacing * index;
-      else if (mSide == Side::kRight)
+      else if (mSide == Side::kRight || mSide == Side::kNone)
          cableX += kPatchCableSpacing * index;
    }
 
@@ -514,10 +520,12 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
                 mType == kConnectionType_Note ||
                 mType == kConnectionType_Pulse ||
                 mType == kConnectionType_UIControl ||
-                mType == kConnectionType_Special)
+                mType == kConnectionType_Special ||
+                mType == kConnectionType_ValueSetter)
             {
                PatchCable* newCable = AddPatchCable(nullptr);
-               newCable->Grab();
+               if (newCable)
+                  newCable->Grab();
             }
             else if (mType == kConnectionType_Audio)
             {
@@ -580,7 +588,7 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
          cableY += kPatchCableSpacing;
       else if (mSide == Side::kLeft)
          cableX -= kPatchCableSpacing;
-      else if (mSide == Side::kRight)
+      else if (mSide == Side::kRight || mSide == Side::kNone)
          cableX += kPatchCableSpacing;
    }
 
@@ -615,7 +623,7 @@ void PatchCableSource::FindValidTargets()
    TheSynth->GetAllModules(allModules);
    for (auto module : allModules)
    {
-      if ((mType == kConnectionType_Modulator || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
+      if ((mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
       {
          for (auto uicontrol : module->GetUIControls())
          {

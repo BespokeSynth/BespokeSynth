@@ -289,7 +289,7 @@ void ADSRDisplay::UpdateSliderVisibility()
       if (sDisplayMode == kDisplaySliders)
          slidersActive = true;
       if (PatchCable::sActivePatchCable != nullptr &&
-          (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator || PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl))
+          (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator || PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_ValueSetter || PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl))
          slidersActive = true;
    }
    if (mASlider && mASlider->GetModulator() != nullptr && mASlider->GetModulator()->Active())

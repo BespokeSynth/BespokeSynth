@@ -50,7 +50,8 @@ enum ConnectionType
    kConnectionType_Grid,
    kConnectionType_Special,
    kConnectionType_Pulse,
-   kConnectionType_Modulator
+   kConnectionType_Modulator,
+   kConnectionType_ValueSetter //for modulator-type that don't have a continuous connection to the control, and just set values as one-offs
 };
 
 class PatchCable : public IClickable

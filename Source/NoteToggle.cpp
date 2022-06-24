@@ -39,7 +39,7 @@ void NoteToggle::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
+   mControlCable = new PatchCableSource(this, kConnectionType_ValueSetter);
    AddPatchCableSource(mControlCable);
 }
 
@@ -51,7 +51,13 @@ void NoteToggle::DrawModule()
 
 void NoteToggle::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   mControlTarget = dynamic_cast<IUIControl*>(cableSource->GetTarget());
+   for (size_t i = 0; i < mTargets.size(); ++i)
+   {
+      if (i < mControlCable->GetPatchCables().size())
+         mTargets[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
+      else
+         mTargets[i] = nullptr;
+   }
 }
 
 void NoteToggle::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -66,8 +72,11 @@ void NoteToggle::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          hasHeldNotes = true;
    }
 
-   if (mControlTarget)
-      mControlTarget->SetValue(hasHeldNotes ? 1 : 0);
+   for (size_t i = 0; i < mTargets.size(); ++i)
+   {
+      if (mTargets[i] != nullptr)
+         mTargets[i]->SetValue(hasHeldNotes ? 1 : 0);
+   }
 }
 
 void NoteToggle::GetModuleDimensions(float& width, float& height)
