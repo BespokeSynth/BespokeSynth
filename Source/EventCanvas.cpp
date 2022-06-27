@@ -301,7 +301,7 @@ void EventCanvas::SyncControlCablesToCanvas()
       for (int i = oldSize; i < mControlCables.size(); ++i)
       {
          mControlCables[i] = new PatchCableSource(this, kConnectionType_UIControl);
-         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0));
+         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
          mControlCables[i]->SetColor(GetRowColor(i));
          AddPatchCableSource(mControlCables[i]);
       }

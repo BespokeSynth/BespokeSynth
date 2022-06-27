@@ -52,7 +52,7 @@ void ValueSetter::CreateUIControls()
    mValueSlider = new FloatSlider(this, "slider", entryRect.x, entryRect.y, entryRect.width, entryRect.height, &mValue, 0, 1);
    mValueSlider->SetShowing(false);
 
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
+   mControlCable = new PatchCableSource(this, kConnectionType_ValueSetter);
    AddPatchCableSource(mControlCable);
 }
 
@@ -68,7 +68,13 @@ void ValueSetter::DrawModule()
 
 void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
+   for (size_t i = 0; i < mTargets.size(); ++i)
+   {
+      if (i < mControlCable->GetPatchCables().size())
+         mTargets[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
+      else
+         mTargets[i] = nullptr;
+   }
 }
 
 void ValueSetter::OnPulse(double time, float velocity, int flags)
@@ -88,11 +94,13 @@ void ValueSetter::ButtonClicked(ClickButton* button)
 
 void ValueSetter::Go()
 {
-   if (mTarget)
+   mControlCable->AddHistoryEvent(gTime, true);
+   mControlCable->AddHistoryEvent(gTime + 15, false);
+
+   for (size_t i = 0; i < mTargets.size(); ++i)
    {
-      mTarget->SetValue(mValue);
-      mControlCable->AddHistoryEvent(gTime, true);
-      mControlCable->AddHistoryEvent(gTime + 15, false);
+      if (mTargets[i] != nullptr)
+         mTargets[i]->SetValue(mValue);
    }
 }
 

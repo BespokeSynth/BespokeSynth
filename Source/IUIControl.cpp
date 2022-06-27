@@ -136,6 +136,7 @@ void IUIControl::DrawPatchCableHover()
 {
    if (PatchCable::sActivePatchCable &&
        (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator ||
+        PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_ValueSetter ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Grid) &&
        PatchCable::sActivePatchCable->IsValidTarget(this))
@@ -153,7 +154,7 @@ void IUIControl::DrawPatchCableHover()
 
 bool IUIControl::CanBeTargetedBy(PatchCableSource* source) const
 {
-   return source->GetConnectionType() == kConnectionType_Modulator || source->GetConnectionType() == kConnectionType_UIControl;
+   return source->GetConnectionType() == kConnectionType_Modulator || source->GetConnectionType() == kConnectionType_ValueSetter || source->GetConnectionType() == kConnectionType_UIControl;
 }
 
 void IUIControl::StartBeacon()

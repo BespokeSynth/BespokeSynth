@@ -265,7 +265,7 @@ void VSTPlugin::CreateUIControls()
 
    mMidiOutCable = new AdditionalNoteCable();
    mMidiOutCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-   mMidiOutCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
+   mMidiOutCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    AddPatchCableSource(mMidiOutCable->GetPatchCableSource());
    mMidiOutCable->GetPatchCableSource()->SetManualPosition(206 - 10, 10);
 

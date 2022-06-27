@@ -106,7 +106,7 @@ void NoteTable::CreateUIControls()
    {
       mColumnCables[i] = new AdditionalNoteCable();
       mColumnCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mColumnCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1));
+      mColumnCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mColumnCables[i]->GetPatchCableSource());
    }
 }
