@@ -77,11 +77,11 @@ void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource, bool fromUser
 {
    OnModulatorRepatch();
 
-   if (mTarget)
+   if (mSliderTarget)
    {
-      mInput = mTarget->GetValue();
-      mInputSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mInputSlider->SetMode(mTarget->GetMode());
+      mInput = mSliderTarget->GetValue();
+      mInputSlider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
+      mInputSlider->SetMode(mSliderTarget->GetMode());
    }
 }
 

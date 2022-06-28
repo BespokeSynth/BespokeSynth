@@ -201,10 +201,10 @@ void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 {
    if (enabled && !mEnabled && !TheSynth->IsLoadingState()) //if turning on
    {
-      if (mTarget)
+      if (mSliderTarget)
       {
-         GetMin() = mTarget->GetValue();
-         GetMax() = mTarget->GetValue();
+         GetMin() = mSliderTarget->GetValue();
+         GetMax() = mSliderTarget->GetValue();
       }
    }
 
@@ -213,20 +213,21 @@ void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 
 void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
 {
-   if (mTarget == owner)
+   if (mSliderTarget == owner)
       return;
 
-   if (mTarget != nullptr)
+   if (mSliderTarget != nullptr)
    {
-      mTarget->SetLFO(nullptr);
+      mSliderTarget->SetLFO(nullptr);
    }
 
    if (owner != nullptr)
       owner->SetLFO(this);
 
-   mTarget = owner;
+   mSliderTarget = owner;
+   mUIControlTarget = owner;
 
-   if (mTarget != nullptr)
+   if (mSliderTarget != nullptr)
       InitializeRange();
 }
 
@@ -254,7 +255,7 @@ void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource, bool from
 {
    if (mTargetCable == nullptr)
       return;
-   if (mTarget != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
+   if (mSliderTarget != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
    {
       SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
       OnModulatorRepatch();
@@ -284,15 +285,19 @@ float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase
 
 float FloatSliderLFOControl::GetTargetMin() const
 {
-   if (mTarget != nullptr)
-      return mTarget->GetMin();
+   if (mSliderTarget != nullptr)
+      return mSliderTarget->GetMin();
+   else if (mMinSlider != nullptr)
+      return mMinSlider->GetMin();
    return 0;
 }
 
 float FloatSliderLFOControl::GetTargetMax() const
 {
-   if (mTarget != nullptr)
-      return mTarget->GetMax();
+   if (mSliderTarget != nullptr)
+      return mSliderTarget->GetMax();
+   else if (mMaxSlider != nullptr)
+      return mMaxSlider->GetMax();
    return 1;
 }
 
@@ -416,7 +421,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
             mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
             mTargetCable->SetModulatorOwner(this);
             AddPatchCableSource(mTargetCable);
-            mTargetCable->SetTarget(mTarget);
+            mTargetCable->SetTarget(mSliderTarget);
          }
       }
    }
@@ -425,24 +430,16 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
 void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   if (mTarget)
-      moduleInfo["target"] = mTarget->Path();
 }
 
 void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void FloatSliderLFOControl::SetUpFromSaveData()
 {
    mPinned = true; //only pinned sliders get saved
-   SetOwner(dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target"))));
-   if (mTarget)
-      mTarget->SetLFO(this);
 
    UpdateFromSettings();
    UpdateVisibleControls();
@@ -452,7 +449,6 @@ void FloatSliderLFOControl::SetUpFromSaveData()
       mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
       mTargetCable->SetModulatorOwner(this);
       AddPatchCableSource(mTargetCable);
-      mTargetCable->SetTarget(mTarget);
    }
 }
 

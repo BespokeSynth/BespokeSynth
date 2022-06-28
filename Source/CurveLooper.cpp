@@ -35,8 +35,7 @@ namespace
 }
 
 CurveLooper::CurveLooper()
-: mUIControl(nullptr)
-, mLength(1)
+: mLength(1)
 , mLengthSelector(nullptr)
 , mControlCable(nullptr)
 , mWidth(200)
@@ -73,7 +72,7 @@ void CurveLooper::CreateUIControls()
    mLengthSelector = new DropdownList(this, "length", 5, 3, (int*)(&mLength));
    mRandomizeButton = new ClickButton(this, "randomize", -1, -1);
 
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
+   mControlCable = new PatchCableSource(this, kConnectionType_ValueSetter);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
 
@@ -99,12 +98,17 @@ void CurveLooper::Poll()
 
 void CurveLooper::OnTransportAdvanced(float amount)
 {
-   if (mUIControl && mEnabled)
+   if (mEnabled)
    {
       mAdsr.Clear();
       mAdsr.Start(0, 1);
       mAdsr.Stop(kAdsrTime);
-      mUIControl->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime), true);
+
+      for (auto* control : mUIControls)
+      {
+         if (control != nullptr)
+            control->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime), true);
+      }
    }
 }
 
@@ -161,10 +165,13 @@ bool CurveLooper::MouseMoved(float x, float y)
 
 void CurveLooper::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (mControlCable->GetPatchCables().empty() == false)
-      mUIControl = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[0]->GetTarget());
-   else
-      mUIControl = nullptr;
+   for (size_t i = 0; i < mUIControls.size(); ++i)
+   {
+      if (i < mControlCable->GetPatchCables().size())
+         mUIControls[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
+      else
+         mUIControls[i] = nullptr;
+   }
 }
 
 void CurveLooper::CheckboxUpdated(Checkbox* checkbox)
