@@ -41,15 +41,16 @@ public:
    virtual bool Active() const = 0;
    virtual bool CanAdjustRange() const { return true; }
    virtual bool InitializeWithZeroRange() const { return false; }
-   float& GetMin() { return mTarget ? mTarget->GetModulatorMin() : mDummyMin; }
-   float& GetMax() { return mTarget ? mTarget->GetModulatorMax() : mDummyMax; }
+   float& GetMin() { return mSliderTarget ? mSliderTarget->GetModulatorMin() : mDummyMin; }
+   float& GetMax() { return mSliderTarget ? mSliderTarget->GetModulatorMax() : mDummyMax; }
    void OnModulatorRepatch();
    void Poll() override;
    float GetRecentChange() const;
+   void OnRemovedFrom(IUIControl* control);
 
 protected:
    void InitializeRange();
-   bool RequiresManualPolling() { return mUIControlTarget != nullptr && mTarget == nullptr; }
+   bool RequiresManualPolling() { return mUIControlTarget != nullptr && mSliderTarget == nullptr; }
 
    float mDummyMin;
    float mDummyMax;
@@ -57,7 +58,7 @@ protected:
    PatchCableSource* mTargetCable;
    FloatSlider* mMinSlider;
    FloatSlider* mMaxSlider;
-   FloatSlider* mTarget;
+   FloatSlider* mSliderTarget;
    IUIControl* mUIControlTarget;
    float mLastPollValue;
    float mSmoothedValue;

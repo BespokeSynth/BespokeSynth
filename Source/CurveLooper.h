@@ -43,10 +43,7 @@ public:
    ~CurveLooper();
    static IDrawableModule* Create() { return new CurveLooper(); }
 
-
    void CreateUIControls() override;
-
-   IUIControl* GetUIControl() const { return mUIControl; }
 
    void OnTransportAdvanced(float amount) override;
 
@@ -83,7 +80,7 @@ private:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
 
-   IUIControl* mUIControl;
+   std::array<IUIControl*, 16> mUIControls{ nullptr };
    int mLength;
    DropdownList* mLengthSelector;
    PatchCableSource* mControlCable;

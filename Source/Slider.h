@@ -120,6 +120,10 @@ public:
    void Halve() override;
    void ResetToOriginal() override;
    void Increment(float amount) override;
+
+   float PosToVal(float pos, bool ignoreSmooth) const;
+   float ValToPos(float val, bool ignoreSmooth) const;
+
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;
@@ -142,8 +146,6 @@ private:
    void OnClicked(int x, int y, bool right) override;
    void SetValueForMouse(int x, int y);
    float* GetModifyValue();
-   float PosToVal(float pos, bool ignoreSmooth) const;
-   float ValToPos(float val, bool ignoreSmooth) const;
    bool AdjustSmooth() const;
    void SmoothUpdated();
    void DoCompute(int samplesIn);

@@ -264,7 +264,7 @@ void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, 
 
 void ControlSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   bool wasEmpty = mControlCable->GetPatchCables().empty();
+   bool wasEmpty = (mTargets[0] == nullptr);
 
    for (size_t i = 0; i < mTargets.size(); ++i)
    {

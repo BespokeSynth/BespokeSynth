@@ -80,8 +80,8 @@ void ModulatorCurve::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 {
    OnModulatorRepatch();
 
-   if (mTarget)
-      mInput = mTarget->GetValue();
+   if (mSliderTarget)
+      mInput = mSliderTarget->GetValue();
 }
 
 float ModulatorCurve::Value(int samplesIn)

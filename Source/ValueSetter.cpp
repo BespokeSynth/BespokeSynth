@@ -88,8 +88,11 @@ void ValueSetter::OnPulse(double time, float velocity, int flags)
 
 void ValueSetter::ButtonClicked(ClickButton* button)
 {
-   if (button == mButton)
+   if (button == mButton && mLastClickTime != gTime)
+   {
+      mLastClickTime = gTime;
       Go();
+   }
 }
 
 void ValueSetter::Go()

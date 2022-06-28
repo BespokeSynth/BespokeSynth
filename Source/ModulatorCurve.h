@@ -51,7 +51,7 @@ public:
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
-   FloatSlider* GetTarget() { return mTarget; }
+   FloatSlider* GetTarget() { return mSliderTarget; }
 
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;

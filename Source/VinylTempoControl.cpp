@@ -128,8 +128,8 @@ void VinylTempoControl::SaveLayout(ofxJSONElement& moduleInfo)
    IDrawableModule::SaveLayout(moduleInfo);
 
    std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
+   if (mSliderTarget)
+      targetPath = mSliderTarget->Path();
 
    moduleInfo["target"] = targetPath;
 }

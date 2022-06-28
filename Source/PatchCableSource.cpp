@@ -740,9 +740,8 @@ void PatchCableSource::LoadState(FileStreamIn& in)
 
    int size;
    in >> size;
-   mPatchCables.resize(size);
 
-   for (int i = 0; i < mPatchCables.size(); ++i)
+   for (int i = 0; i < size; ++i)
    {
       std::string path;
       in >> path;
@@ -761,7 +760,8 @@ void PatchCableSource::LoadState(FileStreamIn& in)
       if (TheSynth->IsDuplicatingModule() && mType == kConnectionType_Modulator)
          target = nullptr; //TODO(Ryan) make it so that when you're duplicating a group, modulators preserve connections to the new copies of controls within that group
 
-      mPatchCables[i] = new PatchCable(this);
+      mPatchCables.push_back(new PatchCable(this));
+      assert(i == (int)mPatchCables.size() - 1);
       SetPatchCableTarget(mPatchCables[i], target, false);
    }
 
