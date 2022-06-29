@@ -562,24 +562,30 @@ namespace
    }
 }
 
-std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
+std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::string keys)
 {
-   std::vector<juce::String> modules;
+   //std::vector<juce::String> modules;
+   std::vector<QuickSpawnMenu::Element> modules{};
+   QuickSpawnMenu::Element module{};
+   //std::vector<juce::PluginDescription> plugins;
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if ((mIsHiddenModuleMap[iter->first] == false || gShowDevModules) &&
           CheckHeldKeysMatch(iter->first, keys))
-         modules.push_back(iter->first);
+      {
+         module.mLabel = iter->first;
+         modules.push_back(module);
+      }
    }
 
    std::vector<juce::PluginDescription> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
-   std::vector<std::string> matchingVsts;
+   std::vector<juce::PluginDescription> matchingVsts;
    for (auto vstFile : vsts)
    {
       std::string vstName = vstFile.name.toStdString();
       if (CheckHeldKeysMatch(vstName, keys))
-         matchingVsts.push_back(vstName);
+         matchingVsts.push_back(vstFile);
    }
    const int kMaxQuickspawnVstCount = 10;
    if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
@@ -588,7 +594,10 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
       {
          //std::string vstName = juce::File(vstFile).getFileName().toStdString();
          //modules.push_back(vstName + " " + kVSTSuffix);
-         modules.push_back(vstFile + " " + kVSTSuffix);
+         module.mLabel = vstFile.name.toStdString();
+         module.pluginFormat = "[" + vstFile.pluginFormatName.toStdString() + "]";
+         module.mDesc = vstFile;
+         modules.push_back(module);
       }
    }
    else
@@ -606,27 +615,37 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
    for (auto prefab : prefabs)
    {
       if (CheckHeldKeysMatch(prefab, keys) || keys[0] == ';')
-         modules.push_back(prefab + " " + kPrefabSuffix);
+      {
+         //modules.push_back(prefab + " " + kPrefabSuffix);
+         module.mLabel = prefab + " " + kPrefabSuffix;
+         modules.push_back(module);
+      }
    }
 
    std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
    for (auto midicontroller : midicontrollers)
    {
       if (CheckHeldKeysMatch(midicontroller, keys))
-         modules.push_back(midicontroller + " " + kMidiControllerSuffix);
+      {
+         module.mLabel = midicontroller + " " + kMidiControllerSuffix;
+         modules.push_back(module);
+      }
    }
 
    std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    for (auto effect : effects)
    {
       if (CheckHeldKeysMatch(effect, keys))
-         modules.push_back(effect + " " + kEffectChainSuffix);
+      {
+         module.mLabel = effect + " " + kEffectChainSuffix;
+         modules.push_back(module);
+      }
    }
-   sort(modules.begin(), modules.end());
+   //sort(modules.begin(), modules.end());
 
-   std::vector<std::string> ret;
+   std::vector<QuickSpawnMenu::Element> ret;
    for (size_t i = 0; i < modules.size(); ++i)
-      ret.push_back(modules[i].toStdString());
+      ret.push_back(modules[i]);
 
    return ret;
 }

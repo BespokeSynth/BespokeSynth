@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include "IDrawableModule.h"
+#include "QuickSpawnMenu.h"
 
 typedef IDrawableModule* (*CreateModuleFn)(void);
 typedef bool (*CanCreateModuleFn)(void);
@@ -38,7 +39,7 @@ public:
    ModuleFactory();
    IDrawableModule* MakeModule(std::string type);
    std::vector<std::string> GetSpawnableModules(ModuleType moduleType);
-   std::vector<std::string> GetSpawnableModules(std::string keys);
+   std::vector<QuickSpawnMenu::Element> GetSpawnableModules(std::string keys);
    ModuleType GetModuleType(std::string typeName);
    bool IsExperimental(std::string typeName);
    static void GetPrefabs(std::vector<std::string>& prefabs);
