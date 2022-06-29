@@ -111,8 +111,8 @@ float ModulatorExpression::Value(int samplesIn)
       return mExpression.value();
    }
 
-   if (mTarget)
-      return mTarget->GetMin();
+   if (mSliderTarget)
+      return mSliderTarget->GetMin();
    return 0;
 }
 
@@ -120,10 +120,10 @@ void ModulatorExpression::PostRepatch(PatchCableSource* cableSource, bool fromUs
 {
    OnModulatorRepatch();
 
-   if (mTarget)
+   if (mSliderTarget)
    {
-      //mValue1Slider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      //mValue1Slider->SetMode(mTarget->GetMode());
+      //mValue1Slider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
+      //mValue1Slider->SetMode(mSliderTarget->GetMode());
    }
 }
 

@@ -76,11 +76,11 @@ void ModulatorAccum::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 {
    OnModulatorRepatch();
 
-   if (mTarget)
+   if (mSliderTarget)
    {
-      mValue = mTarget->GetValue();
-      mValueSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mValueSlider->SetMode(mTarget->GetMode());
+      mValue = mSliderTarget->GetValue();
+      mValueSlider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
+      mValueSlider->SetMode(mSliderTarget->GetMode());
    }
 }
 
