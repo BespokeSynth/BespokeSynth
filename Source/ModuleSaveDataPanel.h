@@ -77,6 +77,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    IDrawableModule* mSaveModule{ nullptr };
+   TextEntry* mNameEntry{ nullptr };
    std::vector<IUIControl*> mSaveDataControls;
    std::vector<std::string> mLabels;
    ClickButton* mApplyButton{ nullptr };
