@@ -58,8 +58,8 @@ public:
    
    struct Element
    {
-      std::string mLabel;
-      std::string pluginFormat;
+      std::string mLabel = "";
+      std::string pluginFormat = "";
       juce::PluginDescription mDesc{};
       //int mValue{ 0 };
       //Element (std::string mLabel="");

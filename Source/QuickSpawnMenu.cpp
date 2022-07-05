@@ -96,7 +96,7 @@ void QuickSpawnMenu::UpdateDisplay()
       float width = 150;
       for (auto element : mElements)
       {
-         float elementWidth = GetStringWidth(element.mLabel) + 10;
+         float elementWidth = GetStringWidth(element.mLabel + " " + element.pluginFormat) + 10;
          if (elementWidth > width)
             width = elementWidth;
       }
@@ -139,7 +139,7 @@ void QuickSpawnMenu::DrawModule()
          ofSetColor(255, 255, 0);
       else
          ofSetColor(255, 255, 255);
-      DrawTextNormal(mElements[i].mLabel, 1, i * itemSpacing + 12);
+      DrawTextNormal(mElements[i].mLabel + " " + mElements[i].pluginFormat, 1, i * itemSpacing + 12);
    }
    if (mElements.size() == 0)
    {

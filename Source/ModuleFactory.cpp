@@ -588,8 +588,8 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
          matchingVsts.push_back(vstFile);
    }
    const int kMaxQuickspawnVstCount = 10;
-   if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
-   {
+   //if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
+   //{
       for (auto vstFile : matchingVsts)
       {
          //std::string vstName = juce::File(vstFile).getFileName().toStdString();
@@ -599,16 +599,16 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
          module.mDesc = vstFile;
          modules.push_back(module);
       }
-   }
-   else
+   //}
+   /*else
    {
-      /* VSTLookup::SortByLastUsed(matchingVsts);
+      VSTLookup::SortByLastUsed(matchingVsts);
       for (int i = 0; i < kMaxQuickspawnVstCount; ++i)
       {
          std::string vstName = juce::File(matchingVsts[i]).getFileName().toStdString();
          modules.push_back(vstName + " " + kVSTSuffix);
-      }*/
-   }
+      }
+   }*/
 
    std::vector<std::string> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
