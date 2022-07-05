@@ -50,9 +50,7 @@ IModulator::~IModulator()
 
 void IModulator::OnModulatorRepatch()
 {
-   assert(mTargetCable != nullptr);
-
-   if (mTargetCable->GetPatchCables().empty() == false)
+   if (mTargetCable && mTargetCable->GetPatchCables().empty() == false)
    {
       IUIControl* newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[0]->GetTarget());
       if (newTarget != mUIControlTarget)

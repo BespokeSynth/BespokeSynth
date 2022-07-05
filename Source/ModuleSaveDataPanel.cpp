@@ -100,12 +100,12 @@ void ModuleSaveDataPanel::ReloadSaveData()
    int x = mAlignmentX;
    int y = 5 + itemSpacing;
 
-   TextEntry* nameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
-   nameEntry->SetNoHover(true);
-   mSaveDataControls.push_back(nameEntry);
+   mNameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
+   mNameEntry->SetNoHover(true);
+   mSaveDataControls.push_back(mNameEntry);
    y += itemSpacing;
 
-   TextEntry* prevTextEntry = nameEntry;
+   TextEntry* prevTextEntry = mNameEntry;
 
    for (auto iter = values.begin(); iter != values.end(); ++iter)
    {
@@ -303,6 +303,16 @@ void ModuleSaveDataPanel::IntSliderUpdated(IntSlider* slider, int oldVal)
 
 void ModuleSaveDataPanel::TextEntryComplete(TextEntry* entry)
 {
+   if (entry == mNameEntry)
+   {
+      std::string desiredName = mSaveModule->Name();
+      ofStringReplace(desiredName, "~", ""); //strip out illegal character
+      if (desiredName.empty())
+         desiredName = mSaveModule->GetTypeName();
+      mSaveModule->SetName("~~~~~~~~~~~");
+      std::string availableName = GetUniqueName(desiredName, mSaveModule->GetOwningContainer()->GetModuleNames<IDrawableModule*>());
+      mSaveModule->SetName(availableName.c_str());
+   }
 }
 
 void ModuleSaveDataPanel::DropdownClicked(DropdownList* list)
