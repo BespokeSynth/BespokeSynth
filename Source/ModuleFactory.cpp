@@ -581,34 +581,38 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
    std::vector<juce::PluginDescription> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
    std::vector<juce::PluginDescription> matchingVsts;
-   for (auto vstFile : vsts)
+   for (auto& pluginDesc : vsts)
    {
-      std::string vstName = vstFile.name.toStdString();
-      if (CheckHeldKeysMatch(vstName, keys))
-         matchingVsts.push_back(vstFile);
+      std::string pluginName = pluginDesc.name.toStdString();
+      if (CheckHeldKeysMatch(pluginName, keys))
+         matchingVsts.push_back(pluginDesc);
    }
    const int kMaxQuickspawnVstCount = 10;
-   //if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
-   //{
-      for (auto& vstFile : matchingVsts)
+   if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
+   {
+      for (auto& pluginDesc : matchingVsts)
       {
          //std::string vstName = juce::File(vstFile).getFileName().toStdString();
          //modules.push_back(vstName + " " + kVSTSuffix);
-         module.mLabel = vstFile.name.toStdString();
-         module.pluginFormat = "[" + vstFile.pluginFormatName.toStdString() + "]";
-         module.mDesc = vstFile;
+         module.mLabel = pluginDesc.name.toStdString();
+         module.pluginFormat = "[" + pluginDesc.pluginFormatName.toStdString() + "]";
+         module.mDesc = pluginDesc;
+         //module.mType = "plugin";
          modules.push_back(module);
       }
-   //}
-   /*else
+   }
+   else
    {
-      VSTLookup::SortByLastUsed(matchingVsts);
+      VSTLookup::GetRecentPlugins(matchingVsts, kMaxQuickspawnVstCount);
       for (int i = 0; i < kMaxQuickspawnVstCount; ++i)
       {
-         std::string vstName = juce::File(matchingVsts[i]).getFileName().toStdString();
-         modules.push_back(vstName + " " + kVSTSuffix);
+         auto& pluginDesc = matchingVsts[i];
+         module.mLabel = pluginDesc.name.toStdString();
+         module.pluginFormat = "[" + pluginDesc.pluginFormatName.toStdString() + "]";
+         module.mDesc = pluginDesc;
+         modules.push_back(module);
       }
-   }*/
+   }
 
    std::vector<std::string> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
@@ -618,6 +622,7 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
       {
          //modules.push_back(prefab + " " + kPrefabSuffix);
          module.mLabel = prefab + " " + kPrefabSuffix;
+         module.pluginFormat = "";
          modules.push_back(module);
       }
    }
@@ -628,6 +633,7 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
       if (CheckHeldKeysMatch(midicontroller, keys))
       {
          module.mLabel = midicontroller + " " + kMidiControllerSuffix;
+         module.pluginFormat = "";
          modules.push_back(module);
       }
    }
@@ -638,15 +644,16 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
       if (CheckHeldKeysMatch(effect, keys))
       {
          module.mLabel = effect + " " + kEffectChainSuffix;
+         module.pluginFormat = "";
          modules.push_back(module);
       }
    }
    //sort(modules.begin(), modules.end());
-
+   
    std::vector<QuickSpawnMenu::Element> ret;
    for (size_t i = 0; i < modules.size(); ++i)
       ret.push_back(modules[i]);
-
+   
    return ret;
 }
 
@@ -654,8 +661,8 @@ ModuleType ModuleFactory::GetModuleType(std::string typeName)
 {
    if (mModuleTypeMap.find(typeName) != mModuleTypeMap.end())
       return mModuleTypeMap[typeName];
-   //if (juce::String(typeName).endsWith(kVSTSuffix))
-      //return kModuleType_Synth;
+   if (juce::String(typeName).endsWith(kVSTSuffix))
+      return kModuleType_Synth;
    if (juce::String(typeName).endsWith(kMidiControllerSuffix))
       return kModuleType_Instrument;
    if (juce::String(typeName).endsWith(kEffectChainSuffix))

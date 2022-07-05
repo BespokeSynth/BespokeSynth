@@ -60,9 +60,8 @@ public:
    {
       std::string mLabel = "";
       std::string pluginFormat = "";
+      std::string mType = "";
       juce::PluginDescription mDesc{};
-      //int mValue{ 0 };
-      //Element (std::string mLabel="");
    };
    
 private:
@@ -80,14 +79,11 @@ private:
    }
    float mWidth{ 200 };
    float mHeight{ 20 };
-   //std::vector<std::string> mElements;
    int mLastHoverX{ 0 };
    int mLastHoverY{ 0 };
    juce::String mHeldKeys;
    ofVec2f mAppearAtMousePos;
-   
-
-  std::vector<Element> mElements;
+   std::vector<Element> mElements;
 };
 
 extern QuickSpawnMenu* TheQuickSpawnMenu;
