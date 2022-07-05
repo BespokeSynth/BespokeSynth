@@ -94,7 +94,7 @@ void QuickSpawnMenu::UpdateDisplay()
       mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString());
 
       float width = 150;
-      for (auto element : mElements)
+      for (auto&  element : mElements)
       {
          float elementWidth = GetStringWidth(element.mLabel + " " + element.pluginFormat) + 10;
          if (elementWidth > width)
@@ -166,16 +166,22 @@ void QuickSpawnMenu::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
+   
+  
 
    std::string moduleTypeName = GetModuleTypeNameAt(x, y);
    std::string pluginFormat = GetPluginFormatAt(x, y);
+   
+   DBG("module name:" << moduleTypeName);
+   DBG(pluginFormat);
+   
    if (moduleTypeName != "" && pluginFormat == "")
    {
       IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
       TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
    }
    
-   if (moduleTypeName != "" && pluginFormat != "")
+   if (!moduleTypeName.empty() && !pluginFormat.empty())
    {
       auto pluginDesc = getPluginDescAt(x,y);
       IDrawableModule* module = TheSynth->SpawnPluginOnTheFly(pluginDesc, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
@@ -193,7 +199,7 @@ std::string QuickSpawnMenu::GetModuleTypeNameAt(int x, int y)
 {
    int index = y / itemSpacing;
    if (index >= 0 && index < mElements.size())
-      return mElements[index].mLabel + mElements[index].pluginFormat;
+      return mElements[index].mLabel;
 
    return {};
 }

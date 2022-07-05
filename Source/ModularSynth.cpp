@@ -2858,7 +2858,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    std::string moduleType = tokens[0];
 
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
-
+/*
    std::string vstToSetUp {};
    juce::PluginDescription pluginDesc;
 
@@ -2872,7 +2872,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
             vstToSetUp += " ";
       }
    }
-
+*/
    std::string prefabToSetUp = "";
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kPrefabSuffix)
    {
@@ -2935,6 +2935,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    dummy["position"][1u] = y;
 
    IDrawableModule* module = nullptr;
+   /*
    try
    {
       ScopedMutex mutex(&mAudioThreadMutex, "CreateModule");
@@ -2963,7 +2964,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    {
       LogEvent("Error spawning \"" + spawnCommand + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
    }
-
+*/
    if (prefabToSetUp != "")
    {
       Prefab* prefab = dynamic_cast<Prefab*>(module);
@@ -3019,17 +3020,11 @@ IDrawableModule* ModularSynth::SpawnPluginOnTheFly(juce::PluginDescription plugi
       if (module != nullptr)
       {
          if (addToContainer)
-            mModuleContainer.AddModule(module);
+         mModuleContainer.AddModule(module);
          SetUpModule(module, dummy);
          module->Init();
-
-         //if (vstToSetUp != "")
-         //{
-         //   VSTLookup::GetPluginDesc(pluginDesc,vstToSetUp);
-            VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-         //   if (plugin != nullptr) {}
-               plugin->SetVST(pluginDesc);
-         //}
+         VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+         plugin->SetVST(pluginDesc);
       }
    }
    catch (LoadingJSONException& e)

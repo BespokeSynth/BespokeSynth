@@ -590,7 +590,7 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
    const int kMaxQuickspawnVstCount = 10;
    //if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
    //{
-      for (auto vstFile : matchingVsts)
+      for (auto& vstFile : matchingVsts)
       {
          //std::string vstName = juce::File(vstFile).getFileName().toStdString();
          //modules.push_back(vstName + " " + kVSTSuffix);
@@ -654,8 +654,8 @@ ModuleType ModuleFactory::GetModuleType(std::string typeName)
 {
    if (mModuleTypeMap.find(typeName) != mModuleTypeMap.end())
       return mModuleTypeMap[typeName];
-   if (juce::String(typeName).endsWith(kVSTSuffix))
-      return kModuleType_Synth;
+   //if (juce::String(typeName).endsWith(kVSTSuffix))
+      //return kModuleType_Synth;
    if (juce::String(typeName).endsWith(kMidiControllerSuffix))
       return kModuleType_Instrument;
    if (juce::String(typeName).endsWith(kEffectChainSuffix))

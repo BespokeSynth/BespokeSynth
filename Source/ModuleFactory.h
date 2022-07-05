@@ -45,7 +45,7 @@ public:
    static void GetPrefabs(std::vector<std::string>& prefabs);
    static std::string FixUpTypeName(std::string typeName);
 
-   static constexpr const char* kVSTSuffix = "[vst]";
+   //static constexpr const char* kVSTSuffix = "[vst]";
    static constexpr const char* kPrefabSuffix = "[prefab]";
    static constexpr const char* kMidiControllerSuffix = "[midicontroller]";
    static constexpr const char* kEffectChainSuffix = "[effectchain]";
