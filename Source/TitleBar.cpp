@@ -153,14 +153,20 @@ IDrawableModule* SpawnList::SpawnVST()
       return nullptr;
    }
 
+   if (mSpawnableVSTs[mSpawnIndex].first == "-----------------------------------------")
+   {
+      DBG("we are here");
+      return nullptr;
+   }
+
    IDrawableModule* module = TheSynth->SpawnPluginOnTheFly(mSpawnableVSTs[mSpawnIndex].second, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
 
    if (mOverrideModuleType == "vstplugin")
    {
       VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      std::string nameUnstripped = mSpawnableVSTs[mSpawnIndex].first.c_str();
-      std::string name = nameUnstripped.substr(0, nameUnstripped.find(" [", 0));
-      DBG(mSpawnIndex << " " + name);
+//       std::string nameUnstripped = mSpawnableVSTs[mSpawnIndex].first.c_str();
+//       std::string name = nameUnstripped.substr(0, nameUnstripped.find(" [", 0));
+//       DBG(mSpawnIndex << " " + name);
       plugin->SetVST(mSpawnableVSTs[mSpawnIndex].second);
    }
 
@@ -313,7 +319,7 @@ void SpawnListManager::SetUpVstDropdown()
    VSTLookup::GetRecentPlugins(recentPlugins, 8);
    std::vector<std::pair<std::string, juce::PluginDescription>> vstIDs;
    std::string suffix = "";
-   std::string separator = "--------------";
+   std::string separator = "-----------------------------------------";
 
    std::reverse(recentPlugins.begin(), recentPlugins.end());
          
@@ -321,7 +327,7 @@ void SpawnListManager::SetUpVstDropdown()
    {
       std::string format = vst.pluginFormatName.toLowerCase().toStdString();
       std::string name = vst.name.toStdString();
-      separator.resize(std::max(11, static_cast<int>(name.size())), '=');
+      //separator.resize(std::max(11, static_cast<int>(name.size())), '=');
       int count = 0;
       suffix = "";
       for (auto &elem : vsts)
