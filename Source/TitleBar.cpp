@@ -153,7 +153,7 @@ IDrawableModule* SpawnList::SpawnVST()
       return nullptr;
    }
 
-   IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
+   IDrawableModule* module = TheSynth->SpawnPluginOnTheFly(mSpawnableVSTs[mSpawnIndex].second, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
 
    if (mOverrideModuleType == "vstplugin")
    {

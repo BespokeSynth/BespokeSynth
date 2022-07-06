@@ -1194,7 +1194,7 @@ void IntSlider::TextEntryCancelled(TextEntry* entry)
 
 namespace
 {
-   const int kIntSliderSaveStateRev = 0;
+   const int kIntSliderSaveStateRev = 1;
 }
 
 void IntSlider::SaveState(FileStreamOut& out)
@@ -1202,6 +1202,8 @@ void IntSlider::SaveState(FileStreamOut& out)
    out << kIntSliderSaveStateRev;
 
    out << (float)*mVar;
+   out << mMin;
+   out << mMax;
 }
 
 void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -1212,6 +1214,20 @@ void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 
    float var;
    in >> var;
+
+   if (rev >= 1)
+   {
+      in >> mMin;
+      in >> mMax;
+   }
+   else
+   {
+      if (var < mMin)
+         mMin = var;
+      if (var > mMax)
+         mMax = var;
+   }
+
    if (shouldSetValue)
       SetValueDirect(var);
 }

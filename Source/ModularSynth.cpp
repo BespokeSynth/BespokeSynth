@@ -2668,6 +2668,7 @@ INoteReceiver* ModularSynth::FindNoteReceiver(std::string name, bool fail)
 void ModularSynth::OnConsoleInput()
 {
    std::vector<std::string> tokens = ofSplitString(mConsoleText, " ", true, true);
+   //QuickSpawnMenu::Element cModule{};
    if (tokens.size() > 0)
    {
       if (tokens[0] == "")
@@ -2798,6 +2799,7 @@ void ModularSynth::OnConsoleInput()
       {
          ofLog() << "Creating: " << mConsoleText;
          ofVec2f grabOffset(-40, 10);
+         //cModule.mLabel = mConsoleText;
          IDrawableModule* module = SpawnModuleOnTheFly(mConsoleText, GetMouseX(&mModuleContainer) + grabOffset.x, GetMouseY(&mModuleContainer) + grabOffset.y);
          TheSynth->SetMoveModule(module, grabOffset.x, grabOffset.y, true);
       }
@@ -2842,6 +2844,7 @@ void ModularSynth::DoAutosave()
 
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, float x, float y, bool addToContainer, std::string name)
 {
+   DBG(spawnCommand);
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
 
@@ -2855,8 +2858,8 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    std::string moduleType = tokens[0];
 
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
-
-   std::string vstToSetUp = "";
+/*
+   std::string vstToSetUp {};
    juce::PluginDescription pluginDesc;
 
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kVSTSuffix)
@@ -2869,7 +2872,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
             vstToSetUp += " ";
       }
    }
-
+*/
    std::string prefabToSetUp = "";
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kPrefabSuffix)
    {
@@ -2932,6 +2935,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    dummy["position"][1u] = y;
 
    IDrawableModule* module = nullptr;
+   
    try
    {
       ScopedMutex mutex(&mAudioThreadMutex, "CreateModule");
@@ -2943,13 +2947,13 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
          SetUpModule(module, dummy);
          module->Init();
 
-         if (vstToSetUp != "")
-         {
-            VSTLookup::GetPluginDesc(pluginDesc,vstToSetUp);
-            VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-            if (plugin != nullptr) {}
-               plugin->SetVST(pluginDesc);
-         }
+//          if (vstToSetUp != "")
+//          {
+//             VSTLookup::GetPluginDesc(pluginDesc,vstToSetUp);
+//             VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+//             if (plugin != nullptr) {}
+//                plugin->SetVST(pluginDesc);
+//          }
       }
    }
    catch (LoadingJSONException& e)
@@ -2985,6 +2989,52 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
          effectChain->AddEffect(effectToSetUp, K(onTheFly));
    }
 
+   return module;
+}
+
+IDrawableModule* ModularSynth::SpawnPluginOnTheFly(juce::PluginDescription pluginDesc, float x, float y, bool addToContainer, std::string name)
+{
+   std::string pluginName = pluginDesc.name.toStdString();
+   DBG(pluginName);
+   if (mInitialized)
+      TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
+
+   //std::vector<std::string> tokens = ofSplitString(spawnCommand, " ");
+   //if (tokens.size() == 0)
+   //   return nullptr;
+
+   if (sShouldAutosave)
+      DoAutosave();
+   
+   ofxJSONElement dummy;
+   dummy["type"] = "vstplugin";
+   std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
+   dummy["name"] = pluginName;
+   dummy["onthefly"] = true;
+   
+   IDrawableModule* module = nullptr;
+   try
+   {
+      ScopedMutex mutex(&mAudioThreadMutex, "CreateModule");
+      module = CreateModule(dummy);
+      if (module != nullptr)
+      {
+         if (addToContainer)
+         mModuleContainer.AddModule(module);
+         SetUpModule(module, dummy);
+         module->Init();
+         VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+         plugin->SetVST(pluginDesc);
+      }
+   }
+   catch (LoadingJSONException& e)
+   {
+      LogEvent("Error spawning \"" + pluginName + "\" on the fly", kLogEventType_Warning);
+   }
+   catch (UnknownModuleException& e)
+   {
+      LogEvent("Error spawning \"" + pluginName + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
+   }
    return module;
 }
 

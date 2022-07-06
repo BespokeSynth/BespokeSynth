@@ -30,6 +30,7 @@
 #include "IDrawableModule.h"
 
 #include "juce_core/juce_core.h"
+#include "juce_audio_processors/juce_audio_processors.h"
 
 class QuickSpawnMenu : public IDrawableModule
 {
@@ -54,9 +55,19 @@ public:
    void MouseReleased() override;
 
    bool IsSingleton() const override { return true; }
-
+   
+   struct Element
+   {
+      std::string mLabel = "";
+      std::string pluginFormat = "";
+      std::string mType = "";
+      juce::PluginDescription mDesc{};
+   };
+   
 private:
    std::string GetModuleTypeNameAt(int x, int y);
+   std::string GetPluginFormatAt(int x, int y);
+   juce::PluginDescription getPluginDescAt(int x, int y);
    void UpdateDisplay();
 
    void OnClicked(int x, int y, bool right) override;
@@ -68,11 +79,11 @@ private:
    }
    float mWidth{ 200 };
    float mHeight{ 20 };
-   std::vector<std::string> mElements;
    int mLastHoverX{ 0 };
    int mLastHoverY{ 0 };
    juce::String mHeldKeys;
    ofVec2f mAppearAtMousePos;
+   std::vector<Element> mElements;
 };
 
 extern QuickSpawnMenu* TheQuickSpawnMenu;

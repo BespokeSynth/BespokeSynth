@@ -94,9 +94,9 @@ void QuickSpawnMenu::UpdateDisplay()
       mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString());
 
       float width = 150;
-      for (auto element : mElements)
+      for (auto&  element : mElements)
       {
-         float elementWidth = GetStringWidth(element) + 10;
+         float elementWidth = GetStringWidth(element.mLabel + " " + element.pluginFormat) + 10;
          if (elementWidth > width)
             width = elementWidth;
       }
@@ -133,13 +133,13 @@ void QuickSpawnMenu::DrawModule()
    ofRect(-2, -2, mWidth + 4, mHeight + 4);
    for (int i = 0; i < mElements.size(); ++i)
    {
-      ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i])) * (i == highlightIndex ? .7f : .5f), 255);
+      ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i].mLabel)) * (i == highlightIndex ? .7f : .5f), 255);
       ofRect(0, i * itemSpacing + 1, mWidth, itemSpacing - 1);
       if (i == highlightIndex)
          ofSetColor(255, 255, 0);
       else
          ofSetColor(255, 255, 255);
-      DrawTextNormal(mElements[i], 1, i * itemSpacing + 12);
+      DrawTextNormal(mElements[i].mLabel + " " + mElements[i].pluginFormat, 1, i * itemSpacing + 12);
    }
    if (mElements.size() == 0)
    {
@@ -166,11 +166,25 @@ void QuickSpawnMenu::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
+   
+  
 
    std::string moduleTypeName = GetModuleTypeNameAt(x, y);
-   if (moduleTypeName != "")
+   std::string pluginFormat = GetPluginFormatAt(x, y);
+   
+   DBG("module name:" << moduleTypeName);
+   DBG(pluginFormat);
+   
+   if (moduleTypeName != "" && pluginFormat == "")
    {
       IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
+      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
+   }
+   
+   if (!moduleTypeName.empty() && !pluginFormat.empty())
+   {
+      auto pluginDesc = getPluginDescAt(x,y);
+      IDrawableModule* module = TheSynth->SpawnPluginOnTheFly(pluginDesc, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
       TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
    }
 
@@ -181,12 +195,29 @@ std::string QuickSpawnMenu::GetHoveredModuleTypeName()
 {
    return GetModuleTypeNameAt(mLastHoverX, mLastHoverY);
 }
-
 std::string QuickSpawnMenu::GetModuleTypeNameAt(int x, int y)
 {
    int index = y / itemSpacing;
    if (index >= 0 && index < mElements.size())
-      return mElements[index];
+      return mElements[index].mLabel;
 
-   return "";
+   return {};
 }
+
+std::string QuickSpawnMenu::GetPluginFormatAt(int x, int y)
+{
+   int index = y / itemSpacing;
+   if (index >= 0 && index < mElements.size())
+      return mElements[index].pluginFormat;
+
+   return {};
+}
+
+juce::PluginDescription QuickSpawnMenu::getPluginDescAt(int x, int y)
+{
+   int index = y / itemSpacing;
+   if (index >= 0 && index < mElements.size())
+      return mElements[index].mDesc;
+
+   return {};
+}   
