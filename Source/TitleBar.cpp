@@ -47,6 +47,7 @@ bool TitleBar::sShowInitialHelpOverlay = true;
 namespace
 {
    const std::string kManageVSTsLabel = "manage VSTs...";
+   std::string separator = "========";
 }
 
 SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label)
@@ -153,9 +154,8 @@ IDrawableModule* SpawnList::SpawnVST()
       return nullptr;
    }
 
-   if (mSpawnableVSTs[mSpawnIndex].first == "-----------------------------------------")
+   if (mSpawnableVSTs[mSpawnIndex].first == separator)
    {
-      DBG("we are here");
       return nullptr;
    }
 
@@ -319,15 +319,14 @@ void SpawnListManager::SetUpVstDropdown()
    VSTLookup::GetRecentPlugins(recentPlugins, 8);
    std::vector<std::pair<std::string, juce::PluginDescription>> vstIDs;
    std::string suffix = "";
-   std::string separator = "-----------------------------------------";
-
+   
    std::reverse(recentPlugins.begin(), recentPlugins.end());
          
    for (auto &vst : vsts)
    {
       std::string format = vst.pluginFormatName.toLowerCase().toStdString();
       std::string name = vst.name.toStdString();
-      //separator.resize(std::max(11, static_cast<int>(name.size())), '=');
+      separator.resize(std::max(separator.size(), name.size()), '=');
       int count = 0;
       suffix = "";
       for (auto &elem : vsts)
