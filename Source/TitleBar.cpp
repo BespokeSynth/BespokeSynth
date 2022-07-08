@@ -47,7 +47,7 @@ bool TitleBar::sShowInitialHelpOverlay = true;
 namespace
 {
    const std::string kManageVSTsLabel = "manage VSTs...";
-   std::string separator = "========";
+   std::string separator = " - - - - - - ";
 }
 
 SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label)
@@ -275,7 +275,7 @@ SpawnListManager::SpawnListManager(IDropdownListener* owner)
 , mAudioModules(owner, this, 0, 0, "audio effects:")
 , mModulatorModules(owner, this, 0, 0, "modulators:")
 , mPulseModules(owner, this, 0, 0, "pulse:")
-, mVstPlugins(owner, this, 0, 0, "vst plugins:")
+, mVstPlugins(owner, this, 0, 0, "plugins:")
 , mOtherModules(owner, this, 0, 0, "other:")
 , mPrefabs(owner, this, 0, 0, "prefabs:")
 {
@@ -326,7 +326,15 @@ void SpawnListManager::SetUpVstDropdown()
    {
       std::string format = vst.pluginFormatName.toLowerCase().toStdString();
       std::string name = vst.name.toStdString();
-      separator.resize(std::max(separator.size(), name.size()), '=');
+      if (separator.size() < name.size())
+      {
+         auto diff = name.size() - separator.size();
+         for (auto i = 0; i < diff; ++i)
+         {
+            separator = separator + "- ";
+         }
+      }
+         
       int count = 0;
       suffix = "";
       for (auto &elem : vsts)

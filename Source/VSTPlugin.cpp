@@ -433,6 +433,7 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    {
       mPlugin->enableAllBuses();
       mPlugin->disableNonMainBuses();
+      mPlugin->addListener(this);
 
       /*
        * For now, since Bespoke is at best stereo in stereo out,
@@ -500,7 +501,7 @@ void VSTPlugin::CreateParameterSliders()
 
    const auto& parameters = mPlugin->getParameters();
 
-   int numParameters = MIN(1000, parameters.size());
+   int numParameters = MIN(10000, parameters.size());
    mParameterSliders.resize(numParameters);
    for (int i = 0; i < numParameters; ++i)
    {
@@ -579,6 +580,7 @@ void VSTPlugin::Poll()
 void VSTPlugin::audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex)
 {
    //set this parameter so we can check it in Poll()
+   DBG("changed");
    mChangeGestureParameterIndex = parameterIndex;
 }
 
