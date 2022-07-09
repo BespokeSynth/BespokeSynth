@@ -170,6 +170,7 @@ public:
    void SetUIScale(float scale) { mUILayerModuleContainer.SetDrawScale(scale); }
    float GetUIScale() { return mUILayerModuleContainer.GetDrawScale(); }
    ModuleContainer* GetRootContainer() { return &mModuleContainer; }
+   ModuleContainer* GetUIContainer() { return &mUILayerModuleContainer; }
    bool ShouldShowGridSnap() const;
    bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
 
@@ -284,7 +285,8 @@ public:
    static float sBackgroundB;
 
    static int sLoadingFileSaveStateRev;
-   static constexpr int kSaveStateRev = 423;
+   static int sLastLoadedFileSaveStateRev;
+   static constexpr int kSaveStateRev = 424;
 
 private:
    void ResetLayout();

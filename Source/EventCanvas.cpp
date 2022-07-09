@@ -113,8 +113,8 @@ void EventCanvas::OnTransportAdvanced(float amount)
    if (mCanvas == nullptr)
       return;
 
-   //look ahead one buffer so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
-   float posOffset = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
+   //look ahead two buffers so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
+   float posOffset = gBufferSizeMs * 2 / TheTransport->MsPerBar() / mNumMeasures;
 
    float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures + posOffset;
    FloatWrap(curPos, 1);
@@ -127,17 +127,21 @@ void EventCanvas::OnTransportAdvanced(float amount)
 
    for (auto* canvasElement : mCanvas->GetElements())
    {
+      bool jumpedBack = curPos < mPreviousPosition;
       float elementStart = canvasElement->GetStart();
-      bool startPassed = (elementStart > mPreviousPosition && elementStart <= curPos) ||
-                         (curPos < mPreviousPosition && (elementStart > mPreviousPosition || elementStart <= curPos));
+      bool startPassed = (curPos >= elementStart && mPreviousPosition < elementStart) ||
+                         (jumpedBack && (elementStart > mPreviousPosition || elementStart <= curPos)) ||
+                         mFirstProcess;
       float elementEnd = canvasElement->GetEnd();
-      FloatWrap(elementEnd, mCanvas->GetLength());
-      bool endPassed = (elementEnd > mPreviousPosition && elementEnd <= curPos) ||
-                       (curPos < mPreviousPosition && (elementEnd > mPreviousPosition || elementEnd <= curPos));
+      if (elementEnd > mCanvas->GetLength())
+         FloatWrap(elementEnd, mCanvas->GetLength());
+      bool endPassed = (curPos >= elementEnd && mPreviousPosition < elementEnd) ||
+                       (jumpedBack && (elementEnd > mPreviousPosition || elementEnd <= curPos)) ||
+                       mFirstProcess;
       if (startPassed || endPassed)
       {
          EventCanvasElement* element = static_cast<EventCanvasElement*>(canvasElement);
-         if (curPos > elementEnd)
+         if (curPos > elementEnd || curPos <= elementStart)
          {
             if (startPassed)
                element->Trigger(NextBufferTime(false));
@@ -179,6 +183,7 @@ void EventCanvas::OnTransportAdvanced(float amount)
    }
 
    mPreviousPosition = curPos;
+   mFirstProcess = false;
 }
 
 void EventCanvas::UpdateNumColumns()

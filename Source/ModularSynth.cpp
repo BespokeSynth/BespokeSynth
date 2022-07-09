@@ -62,6 +62,7 @@ float ModularSynth::sBackgroundR = 0.09f;
 float ModularSynth::sBackgroundG = 0.09f;
 float ModularSynth::sBackgroundB = 0.09f;
 int ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev;
+int ModularSynth::sLastLoadedFileSaveStateRev = ModularSynth::kSaveStateRev;
 std::thread::id ModularSynth::sAudioThreadId;
 
 #if BESPOKE_WINDOWS
@@ -2326,6 +2327,7 @@ void ModularSynth::LoadLayout(ofxJSONElement json)
    ResetLayout();
 
    mModuleContainer.LoadModules(json["modules"]);
+   mUILayerModuleContainer.LoadModules(json["ui_modules"]);
 
    //timer.PrintCosts();
 
@@ -2581,6 +2583,7 @@ ofxJSONElement ModularSynth::GetLayout()
    ofxJSONElement root;
 
    root["modules"] = mModuleContainer.WriteModules();
+   root["ui_modules"] = mUILayerModuleContainer.WriteModules();
    root["zoomlocations"] = mZoomer.GetSaveData();
 
    return root;
@@ -2663,6 +2666,7 @@ void ModularSynth::SaveState(std::string file, bool autosave)
 
    out << GetLayout().getRawString(true);
    mModuleContainer.SaveState(out);
+   mUILayerModuleContainer.SaveState(out);
 
    mAudioThreadMutex.Unlock();
 }
@@ -2716,6 +2720,8 @@ void ModularSynth::LoadState(std::string file)
    {
       mIsLoadingModule = true;
       mModuleContainer.LoadState(in);
+      if (ModularSynth::sLastLoadedFileSaveStateRev >= 424)
+         mUILayerModuleContainer.LoadState(in);
       mIsLoadingModule = false;
 
       TheTransport->Reset();

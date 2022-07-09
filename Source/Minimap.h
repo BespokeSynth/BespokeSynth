@@ -48,6 +48,7 @@ public:
 private:
    bool IsSingleton() const override { return true; };
    bool HasTitleBar() const override { return false; };
+   bool IsSaveable() override { return false; }
    void ComputeBoundingBox(ofRectangle& rect);
    ofRectangle CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& source);
    void DrawModulesOnMinimap(ofRectangle& boundingBox);

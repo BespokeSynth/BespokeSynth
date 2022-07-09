@@ -102,6 +102,7 @@ private:
    bool mRecord{ false };
    Checkbox* mRecordCheckbox{ nullptr };
    float mPreviousPosition{ 0 };
+   bool mFirstProcess{ true };
 
    struct ControlConnection
    {
