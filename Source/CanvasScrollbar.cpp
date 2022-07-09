@@ -94,7 +94,7 @@ float CanvasScrollbar::GetBarEnd() const
    return 1;
 }
 
-void CanvasScrollbar::OnClicked(int x, int y, bool right)
+void CanvasScrollbar::OnClicked(float x, float y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);

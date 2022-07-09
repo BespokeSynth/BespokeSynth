@@ -200,7 +200,7 @@ void Push2Control::PostRender()
       RenderPush2Display();
 }
 
-void Push2Control::OnClicked(int x, int y, bool right)
+void Push2Control::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

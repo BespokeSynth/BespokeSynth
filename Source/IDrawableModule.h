@@ -130,7 +130,7 @@ public:
    void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
    void RemovePatchCableSource(PatchCableSource* source);
-   bool TestClick(int x, int y, bool right, bool testOnly = false) override;
+   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    std::string GetTypeName() const { return mTypeName; }
    ModuleType GetModuleType() const { return mModuleType; }
    virtual bool IsSingleton() const { return false; }
@@ -199,7 +199,7 @@ public:
 
 protected:
    void Poll() override {}
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
    ModuleSaveData mModuleSaveData;

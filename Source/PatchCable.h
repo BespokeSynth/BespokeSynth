@@ -63,7 +63,7 @@ public:
    virtual ~PatchCable();
 
    void Render() override;
-   bool TestClick(int x, int y, bool right, bool testOnly = false) override;
+   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    void GetDimensions(float& width, float& height) override
@@ -88,7 +88,7 @@ public:
    static PatchCable* sActivePatchCable;
 
 protected:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
 private:
    void SetTarget(IClickable* target);

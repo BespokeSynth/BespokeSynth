@@ -126,7 +126,7 @@ std::string Arpeggiator::GetArpNoteDisplay(int pitch)
    return NoteName(pitch, false, true);
 }
 
-void Arpeggiator::OnClicked(int x, int y, bool right)
+void Arpeggiator::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }

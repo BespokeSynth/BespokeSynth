@@ -99,7 +99,7 @@ private:
    void CalcSliderVal();
    void UpdateDimensions();
 
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    int mWidth{ 15 };
    int mHeight{ 15 };

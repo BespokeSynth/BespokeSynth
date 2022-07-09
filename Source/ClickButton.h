@@ -91,7 +91,7 @@ protected:
 private:
    bool ButtonLit() const;
 
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    float mWidth;
    float mHeight;
    double mClickTime;

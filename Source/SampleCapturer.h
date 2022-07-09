@@ -60,7 +60,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
 

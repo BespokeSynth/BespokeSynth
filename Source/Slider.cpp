@@ -298,7 +298,7 @@ void FloatSlider::DisplayLFOControl()
    }
 }
 
-void FloatSlider::OnClicked(int x, int y, bool right)
+void FloatSlider::OnClicked(float x, float y, bool right)
 {
    if (right)
    {
@@ -1016,7 +1016,7 @@ void IntSlider::CalcSliderVal()
    mSliderVal = ofMap(*mVar, mMin, mMax, 0.0f, 1.0f, K(clamp));
 }
 
-void IntSlider::OnClicked(int x, int y, bool right)
+void IntSlider::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

@@ -369,7 +369,7 @@ void Producer::DrawModule()
       mBiquad[i].Draw();
 }
 
-void Producer::OnClicked(int x, int y, bool right)
+void Producer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

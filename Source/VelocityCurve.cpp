@@ -95,7 +95,7 @@ void VelocityCurve::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void VelocityCurve::OnClicked(int x, int y, bool right)
+void VelocityCurve::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

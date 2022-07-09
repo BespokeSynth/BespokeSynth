@@ -83,7 +83,7 @@ void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceId
    }
 }
 
-void KeyboardDisplay::OnClicked(int x, int y, bool right)
+void KeyboardDisplay::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

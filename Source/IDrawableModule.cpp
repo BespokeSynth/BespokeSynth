@@ -595,7 +595,7 @@ void IDrawableModule::Exit()
    }
 }
 
-bool IDrawableModule::TestClick(int x, int y, bool right, bool testOnly /*=false*/)
+bool IDrawableModule::TestClick(float x, float y, bool right, bool testOnly /*=false*/)
 {
    if (IsResizable() && mHoveringOverResizeHandle)
    {
@@ -616,7 +616,7 @@ bool IDrawableModule::TestClick(int x, int y, bool right, bool testOnly /*=false
    return false;
 }
 
-void IDrawableModule::OnClicked(int x, int y, bool right)
+void IDrawableModule::OnClicked(float x, float y, bool right)
 {
    float w, h;
    GetModuleDimensions(w, h);

@@ -225,7 +225,7 @@ bool UIGrid::CanAdjustMultislider() const
    return !mRequireShiftForMultislider || (GetKeyModifiers() & kModifier_Shift);
 }
 
-void UIGrid::OnClicked(int x, int y, bool right)
+void UIGrid::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

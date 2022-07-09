@@ -192,7 +192,7 @@ void PulseSequence::GetModuleDimensions(float& width, float& height)
    height = 52;
 }
 
-void PulseSequence::OnClicked(int x, int y, bool right)
+void PulseSequence::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

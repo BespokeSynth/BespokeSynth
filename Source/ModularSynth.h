@@ -280,7 +280,7 @@ private:
    void ResetLayout();
    void ReconnectMidiDevices();
    void DrawConsole();
-   void CheckClick(IDrawableModule* clickedModule, int x, int y, bool rightButton);
+   void CheckClick(IDrawableModule* clickedModule, float x, float y, bool rightButton);
    void UpdateUserPrefsLayout();
    void LoadStatePopupImp();
    IDrawableModule* DuplicateModule(IDrawableModule* module);

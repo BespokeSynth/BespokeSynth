@@ -96,7 +96,7 @@ float ModulatorCurve::Value(int samplesIn)
    return ofLerp(GetMin(), GetMax(), val);
 }
 
-void ModulatorCurve::OnClicked(int x, int y, bool right)
+void ModulatorCurve::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

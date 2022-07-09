@@ -112,7 +112,7 @@ bool Prefab::CanAddDropModules()
    return false;
 }
 
-void Prefab::OnClicked(int x, int y, bool right)
+void Prefab::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

@@ -117,7 +117,7 @@ protected:
    ~UIGrid(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;

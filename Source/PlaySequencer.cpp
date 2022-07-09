@@ -154,7 +154,7 @@ void PlaySequencer::DrawModule()
    ofPopStyle();
 }
 
-void PlaySequencer::OnClicked(int x, int y, bool right)
+void PlaySequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

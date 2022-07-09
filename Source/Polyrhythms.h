@@ -44,7 +44,7 @@ class RhythmLine
 public:
    RhythmLine(Polyrhythms* owner, int index);
    void Draw();
-   void OnClicked(int x, int y, bool right);
+   void OnClicked(float x, float y, bool right);
    void MouseReleased();
    void MouseMoved(float x, float y);
    void CreateUIControls();
@@ -99,7 +99,7 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 350 };

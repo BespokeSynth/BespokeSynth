@@ -62,7 +62,7 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override
    {

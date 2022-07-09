@@ -113,7 +113,7 @@ void Ramper::DrawModule()
    mTargetValueSlider->Draw();
 }
 
-void Ramper::OnClicked(int x, int y, bool right)
+void Ramper::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }

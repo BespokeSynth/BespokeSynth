@@ -145,7 +145,7 @@ double SampleCanvas::GetCurPos(double time) const
    return (((TheTransport->GetMeasure(time) % loopMeasures) + TheTransport->GetMeasurePos(time)) + mCanvas->mLoopStart) / mCanvas->GetLength();
 }
 
-void SampleCanvas::OnClicked(int x, int y, bool right)
+void SampleCanvas::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
