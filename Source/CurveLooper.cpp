@@ -140,7 +140,7 @@ void CurveLooper::DrawModule()
    ofPopStyle();
 }
 
-void CurveLooper::OnClicked(int x, int y, bool right)
+void CurveLooper::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

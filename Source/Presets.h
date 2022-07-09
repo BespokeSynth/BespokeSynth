@@ -90,7 +90,7 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
    struct Preset

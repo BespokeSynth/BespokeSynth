@@ -1672,15 +1672,15 @@ IDrawableModule* ModularSynth::GetModuleAtCursor(int offsetX /*=0*/, int offsetY
    return mModuleContainer.GetModuleAt(x, y);
 }
 
-void ModularSynth::CheckClick(IDrawableModule* clickedModule, int x, int y, bool rightButton)
+void ModularSynth::CheckClick(IDrawableModule* clickedModule, float x, float y, bool rightButton)
 {
    if (clickedModule != TheTitleBar)
       MoveToFront(clickedModule);
 
    //check to see if we clicked in the move area
    ofRectangle moduleRect = clickedModule->GetRect();
-   int modulePosX = x - moduleRect.x;
-   int modulePosY = y - moduleRect.y;
+   float modulePosX = x - moduleRect.x;
+   float modulePosY = y - moduleRect.y;
 
    if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnableCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
       SetMoveModule(clickedModule, moduleRect.x - x, moduleRect.y - y, false);

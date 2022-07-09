@@ -525,7 +525,7 @@ IClickable* PatchCable::GetDropTarget()
    return nullptr;
 }
 
-bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool PatchCable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (mHovered && !right)
    {
@@ -536,7 +536,7 @@ bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */
    return false;
 }
 
-void PatchCable::OnClicked(int x, int y, bool right)
+void PatchCable::OnClicked(float x, float y, bool right)
 {
 }
 

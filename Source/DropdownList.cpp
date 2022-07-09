@@ -332,7 +332,7 @@ namespace
    }
 }
 
-void DropdownList::OnClicked(int x, int y, bool right)
+void DropdownList::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
@@ -603,7 +603,7 @@ bool DropdownListModal::MouseMoved(float x, float y)
    return false;
 }
 
-void DropdownListModal::OnClicked(int x, int y, bool right)
+void DropdownListModal::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

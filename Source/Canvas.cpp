@@ -230,7 +230,7 @@ bool Canvas::IsRowVisible(int row) const
    return row >= mRowOffset && row < mRowOffset + GetNumVisibleRows();
 }
 
-void Canvas::OnClicked(int x, int y, bool right)
+void Canvas::OnClicked(float x, float y, bool right)
 {
    mClick = true;
    mHasDuplicatedThisDrag = false;

@@ -162,7 +162,7 @@ CurvePoint* Curve::GetPoint(int index)
    return &mPoints[index];
 }
 
-void Curve::OnClicked(int x, int y, bool right)
+void Curve::OnClicked(float x, float y, bool right)
 {
    ofLog() << "curve clicked";
 }

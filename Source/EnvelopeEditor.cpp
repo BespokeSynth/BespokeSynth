@@ -163,7 +163,7 @@ void EnvelopeControl::Draw()
    ofPopStyle();
 }
 
-void EnvelopeControl::OnClicked(int x, int y, bool right)
+void EnvelopeControl::OnClicked(float x, float y, bool right)
 {
    if (x > mPosition.x - pointClickRadius &&
        x < mPosition.x + mDimensions.x + pointClickRadius &&
@@ -515,7 +515,7 @@ void EnvelopeEditor::Resize(float w, float h)
    mHeight = h;
 }
 
-void EnvelopeEditor::OnClicked(int x, int y, bool right)
+void EnvelopeEditor::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

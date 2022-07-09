@@ -162,7 +162,7 @@ bool QuickSpawnMenu::MouseMoved(float x, float y)
    return false;
 }
 
-void QuickSpawnMenu::OnClicked(int x, int y, bool right)
+void QuickSpawnMenu::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

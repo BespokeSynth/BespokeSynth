@@ -78,7 +78,7 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    bool Initialize();
    void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio);

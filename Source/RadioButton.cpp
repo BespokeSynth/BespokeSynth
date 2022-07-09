@@ -214,7 +214,7 @@ bool RadioButton::MouseMoved(float x, float y)
    return false;
 }
 
-void RadioButton::OnClicked(int x, int y, bool right)
+void RadioButton::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

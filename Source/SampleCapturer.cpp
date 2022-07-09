@@ -220,7 +220,7 @@ void SampleCapturer::GetModuleDimensions(float& w, float& h)
    h = (int)mSamples.size() * (kBufferHeight + kBufferSpacing) + kBufferStartY;
 }
 
-void SampleCapturer::OnClicked(int x, int y, bool right)
+void SampleCapturer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

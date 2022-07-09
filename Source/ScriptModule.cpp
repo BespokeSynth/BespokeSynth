@@ -189,7 +189,7 @@ void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
    }
 }
 
-void ScriptModule::OnClicked(int x, int y, bool right)
+void ScriptModule::OnClicked(float x, float y, bool right)
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {

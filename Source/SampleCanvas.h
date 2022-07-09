@@ -57,7 +57,7 @@ public:
 
    void CanvasUpdated(Canvas* canvas) override;
 
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;

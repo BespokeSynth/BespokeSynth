@@ -102,7 +102,7 @@ void CircleSequencer::DrawModule()
    ofPopStyle();
 }
 
-void CircleSequencer::OnClicked(int x, int y, bool right)
+void CircleSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mCircleSequencerRings.size(); ++i)
@@ -264,7 +264,7 @@ int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
    return -1;
 }
 
-void CircleSequencerRing::OnClicked(int x, int y, bool right)
+void CircleSequencerRing::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

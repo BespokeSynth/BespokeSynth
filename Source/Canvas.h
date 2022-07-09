@@ -143,7 +143,7 @@ public:
    float mLoopEnd;
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;

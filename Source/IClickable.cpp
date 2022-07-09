@@ -51,7 +51,7 @@ void IClickable::Draw()
    Render();
 }
 
-bool IClickable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool IClickable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (!mShowing)
       return false;

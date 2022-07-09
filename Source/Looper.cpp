@@ -1059,7 +1059,7 @@ void Looper::GetModuleDimensions(float& width, float& height)
    height = 165;
 }
 
-void Looper::OnClicked(int x, int y, bool right)
+void Looper::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

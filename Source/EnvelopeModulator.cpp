@@ -106,7 +106,7 @@ void EnvelopeModulator::Resize(float w, float h)
    mHeight = MAX(h, 102);
 }
 
-void EnvelopeModulator::OnClicked(int x, int y, bool right)
+void EnvelopeModulator::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }

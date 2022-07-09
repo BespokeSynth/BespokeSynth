@@ -51,7 +51,7 @@ public:
       mX += moveX;
       mY += moveY;
    }
-   virtual bool TestClick(int x, int y, bool right, bool testOnly = false);
+   virtual bool TestClick(float x, float y, bool right, bool testOnly = false);
    IClickable* GetParent() const { return mParent; }
    void SetParent(IClickable* parent) { mParent = parent; }
    bool NotifyMouseMoved(float x, float y);
@@ -90,7 +90,7 @@ public:
    static std::string sPathSaveContext;
 
 protected:
-   virtual void OnClicked(int x, int y, bool right) {}
+   virtual void OnClicked(float x, float y, bool right) {}
    virtual bool MouseMoved(float x, float y) { return false; }
    virtual bool MouseScrolled(int x, int y, float scrollX, float scrollY) { return false; }
 

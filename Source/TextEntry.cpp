@@ -241,7 +241,7 @@ void TextEntry::GetDimensions(float& width, float& height)
    height = 15;
 }
 
-void TextEntry::OnClicked(int x, int y, bool right)
+void TextEntry::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

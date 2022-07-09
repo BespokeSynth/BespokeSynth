@@ -40,7 +40,7 @@ class EnvelopeControl
 public:
    EnvelopeControl(ofVec2f position, ofVec2f dimensions);
    void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
-   void OnClicked(int x, int y, bool right);
+   void OnClicked(float x, float y, bool right);
    void MouseMoved(float x, float y);
    void MouseReleased();
    void Draw();
@@ -118,7 +118,7 @@ protected:
    ~EnvelopeEditor();
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void Pin();
 
    struct StageControls

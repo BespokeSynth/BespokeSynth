@@ -82,7 +82,7 @@ public:
    void ButtonClicked(ClickButton* button) override;
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    int mWidth{ 1 };
    int mHeight{ 1 };
    int mColumnWidth{ 1 };
@@ -155,7 +155,7 @@ protected:
    ~DropdownList(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void CalcSliderVal();
    int FindItemIndex(float val) const;
    void SetValue(int value, bool forceUpdate);

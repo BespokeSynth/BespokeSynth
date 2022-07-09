@@ -159,7 +159,7 @@ void Presets::UpdateGridValues()
    }
 }
 
-void Presets::OnClicked(int x, int y, bool right)
+void Presets::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

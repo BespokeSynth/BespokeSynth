@@ -136,7 +136,7 @@ void Checkbox::Render()
    DrawHover(mX, mY, mWidth, mHeight);
 }
 
-void Checkbox::OnClicked(int x, int y, bool right)
+void Checkbox::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

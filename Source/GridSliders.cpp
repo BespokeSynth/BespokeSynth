@@ -161,7 +161,7 @@ void GridSliders::DrawModule()
    }
 }
 
-void GridSliders::OnClicked(int x, int y, bool right)
+void GridSliders::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }

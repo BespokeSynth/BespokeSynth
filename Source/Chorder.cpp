@@ -159,7 +159,7 @@ void Chorder::RemoveTone(int tone)
    }
 }
 
-void Chorder::OnClicked(int x, int y, bool right)
+void Chorder::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
