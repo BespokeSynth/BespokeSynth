@@ -76,7 +76,7 @@ public:
    void LoadState(FileStreamIn& in);
 
 protected:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
 

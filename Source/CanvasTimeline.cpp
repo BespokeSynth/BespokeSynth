@@ -133,7 +133,7 @@ float CanvasTimeline::GetQuantizedForX(float posX, HoverMode clampSide)
    return measure;
 }
 
-void CanvasTimeline::OnClicked(int x, int y, bool right)
+void CanvasTimeline::OnClicked(float x, float y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);

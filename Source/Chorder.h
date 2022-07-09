@@ -76,7 +76,7 @@ private:
       width = 135;
       height = 75;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 

@@ -1336,7 +1336,7 @@ UIControlConnection* MidiController::GetConnectionForCableSource(const PatchCabl
    return nullptr;
 }
 
-void MidiController::OnClicked(int x, int y, bool right)
+void MidiController::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

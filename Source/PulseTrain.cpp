@@ -176,7 +176,7 @@ void PulseTrain::GetModuleDimensions(float& width, float& height)
    height = 52;
 }
 
-void PulseTrain::OnClicked(int x, int y, bool right)
+void PulseTrain::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

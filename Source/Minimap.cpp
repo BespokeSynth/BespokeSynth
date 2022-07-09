@@ -244,7 +244,7 @@ void Minimap::DrawModule()
    }
 }
 
-void Minimap::OnClicked(int x, int y, bool right)
+void Minimap::OnClicked(float x, float y, bool right)
 {
    if (mGrid->TestClick(x, y, right, true))
    {

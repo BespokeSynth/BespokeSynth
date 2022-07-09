@@ -64,7 +64,7 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    EnvelopeControl mEnvelopeControl;
    ::ADSR mAdsr;

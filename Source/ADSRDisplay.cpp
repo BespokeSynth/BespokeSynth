@@ -347,7 +347,7 @@ void ADSRDisplay::SpawnEnvelopeEditor()
    }
 }
 
-void ADSRDisplay::OnClicked(int x, int y, bool right)
+void ADSRDisplay::OnClicked(float x, float y, bool right)
 {
    if (mASlider != nullptr && mASlider->IsShowing())
    {

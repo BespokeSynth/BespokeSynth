@@ -46,7 +46,7 @@ class CircleSequencerRing
 public:
    CircleSequencerRing(CircleSequencer* owner, int index);
    void Draw();
-   void OnClicked(int x, int y, bool right);
+   void OnClicked(float x, float y, bool right);
    void MouseReleased();
    void MouseMoved(float x, float y);
    void CreateUIControls();
@@ -110,7 +110,7 @@ private:
       width = 400;
       height = 200;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool Enabled() const override { return mEnabled; }
 
    std::vector<CircleSequencerRing*> mCircleSequencerRings;

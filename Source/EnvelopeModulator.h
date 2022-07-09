@@ -85,7 +85,7 @@ public:
    int GetModuleSaveStateRev() const override { return 0; }
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    float mWidth{ 250 };
    float mHeight{ 122 };

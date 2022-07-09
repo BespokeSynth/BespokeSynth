@@ -166,7 +166,7 @@ void MultitapDelay::ButtonClicked(ClickButton* button)
 {
 }
 
-void MultitapDelay::OnClicked(int x, int y, bool right)
+void MultitapDelay::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }

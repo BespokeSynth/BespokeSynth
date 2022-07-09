@@ -294,7 +294,7 @@ void TitleBar::ListLayouts()
    mSaveLayoutButton->PositionTo(mLoadLayoutDropdown, kAnchor_Right);
 }
 
-void TitleBar::OnClicked(int x, int y, bool right)
+void TitleBar::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

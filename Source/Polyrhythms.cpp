@@ -103,7 +103,7 @@ void Polyrhythms::Resize(float w, float h)
       mRhythmLines[i]->OnResize();
 }
 
-void Polyrhythms::OnClicked(int x, int y, bool right)
+void Polyrhythms::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mRhythmLines.size(); ++i)
@@ -234,7 +234,7 @@ void RhythmLine::Draw()
    mNoteSelector->Draw();
 }
 
-void RhythmLine::OnClicked(int x, int y, bool right)
+void RhythmLine::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

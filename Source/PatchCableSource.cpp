@@ -499,7 +499,7 @@ void PatchCableSource::MouseReleased()
       cable->MouseReleased();
 }
 
-bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (!Enabled())
       return false;
@@ -600,7 +600,7 @@ bool PatchCableSource::Enabled() const
    return mEnabled && (mAutomaticPositioning || !mOwner->Minimized());
 }
 
-void PatchCableSource::OnClicked(int x, int y, bool right)
+void PatchCableSource::OnClicked(float x, float y, bool right)
 {
 }
 

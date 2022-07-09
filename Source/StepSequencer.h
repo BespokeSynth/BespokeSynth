@@ -185,7 +185,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 

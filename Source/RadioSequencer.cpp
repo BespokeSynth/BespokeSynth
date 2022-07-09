@@ -222,7 +222,7 @@ void RadioSequencer::DrawModule()
    }
 }
 
-void RadioSequencer::OnClicked(int x, int y, bool right)
+void RadioSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

@@ -168,7 +168,7 @@ void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    }
 }
 
-void DrumSynth::OnClicked(int x, int y, bool right)
+void DrumSynth::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

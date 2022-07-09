@@ -719,7 +719,7 @@ void CodeEntry::SetError(bool error, int errorLine)
    mErrorLine = errorLine;
 }
 
-void CodeEntry::OnClicked(int x, int y, bool right)
+void CodeEntry::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

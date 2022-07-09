@@ -346,7 +346,7 @@ ofVec2f FubbleModule::GetFubbleMouseCoord()
                   ofClamp(1 - ((mMouseY - fubbleRect.y) / fubbleRect.height), 0, 1));
 }
 
-void FubbleModule::OnClicked(int x, int y, bool right)
+void FubbleModule::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

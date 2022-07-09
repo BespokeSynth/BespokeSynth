@@ -307,7 +307,7 @@ bool EQModule::Filter::UpdateCoefficientsIfNecessary()
    return false;
 }
 
-void EQModule::OnClicked(int x, int y, bool right)
+void EQModule::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

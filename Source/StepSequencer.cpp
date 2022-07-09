@@ -541,7 +541,7 @@ void StepSequencer::Resize(float w, float h)
    mGrid->SetDimensions(MAX(w - extraW, 185), MAX(h - extraH, 46 + 13 * mNumRows));
 }
 
-void StepSequencer::OnClicked(int x, int y, bool right)
+void StepSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    if (mGrid->TestClick(x, y, right))

@@ -774,7 +774,7 @@ void SamplePlayer::FillData(std::vector<float> data)
    UpdateSample(sample, true);
 }
 
-void SamplePlayer::OnClicked(int x, int y, bool right)
+void SamplePlayer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

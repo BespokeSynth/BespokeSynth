@@ -101,7 +101,7 @@ void ScriptStatus::DrawModule()
    DrawTextNormal(mStatus, 3, 35);
 }
 
-void ScriptStatus::OnClicked(int x, int y, bool right)
+void ScriptStatus::OnClicked(float x, float y, bool right)
 {
    if (ScriptModule::sHasPythonEverSuccessfullyInitialized)
    {

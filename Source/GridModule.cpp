@@ -265,7 +265,7 @@ void GridModule::Resize(float w, float h)
    mGrid->SetDimensions(mGrid->GetWidth() + w - curW, mGrid->GetHeight() + h - curH);
 }
 
-void GridModule::OnClicked(int x, int y, bool right)
+void GridModule::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

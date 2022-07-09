@@ -404,7 +404,7 @@ void NoteStepSequencer::DrawModule()
    ofPopStyle();
 }
 
-void NoteStepSequencer::OnClicked(int x, int y, bool right)
+void NoteStepSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

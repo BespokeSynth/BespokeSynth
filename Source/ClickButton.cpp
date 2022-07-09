@@ -162,7 +162,7 @@ bool ClickButton::ButtonLit() const
    return mClickTime + 200 > gTime;
 }
 
-void ClickButton::OnClicked(int x, int y, bool right)
+void ClickButton::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

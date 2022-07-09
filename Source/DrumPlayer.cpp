@@ -638,7 +638,7 @@ void DrumPlayer::SetHitSample(int sampleIndex, Sample* sample)
    mDrumHits[sampleIndex].mEnvelopeLength = mDrumHits[sampleIndex].mSample.LengthInSamples() * gInvSampleRateMs;
 }
 
-void DrumPlayer::OnClicked(int x, int y, bool right)
+void DrumPlayer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
