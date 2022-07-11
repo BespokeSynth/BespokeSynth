@@ -18,72 +18,205 @@
 /*
   ==============================================================================
 
-    QuickSpawnMenu.h
-    Created: 22 Oct 2017 7:49:16pm
+    QuickSpawnMenu.cpp
+    Created: 22 Oct 2017 7:49:17pm
     Author:  Ryan Challinor
 
   ==============================================================================
 */
 
-#pragma once
+#include "QuickSpawnMenu.h"
+#include "ModularSynth.h"
+#include "ModuleFactory.h"
+#include "TitleBar.h"
 
-#include "IDrawableModule.h"
+QuickSpawnMenu* TheQuickSpawnMenu = nullptr;
 
-#include "juce_core/juce_core.h"
-#include "juce_audio_processors/juce_audio_processors.h"
-
-class QuickSpawnMenu : public IDrawableModule
+namespace
 {
-public:
-   QuickSpawnMenu();
-   virtual ~QuickSpawnMenu();
+   const int itemSpacing = 15;
+   ofVec2f moduleGrabOffset(-40, 10);
+}
 
-   void Init() override;
-   void DrawModule() override;
-   void DrawModuleUnclipped() override;
-   void SetDimensions(int w, int h)
+QuickSpawnMenu::QuickSpawnMenu()
+{
+   assert(TheQuickSpawnMenu == nullptr);
+   TheQuickSpawnMenu = this;
+}
+
+QuickSpawnMenu::~QuickSpawnMenu()
+{
+   assert(TheQuickSpawnMenu == this);
+   TheQuickSpawnMenu = nullptr;
+}
+
+void QuickSpawnMenu::Init()
+{
+   IDrawableModule::Init();
+   SetShouldDrawOutline(false);
+   SetShowing(false);
+}
+
+void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
+{
+   IDrawableModule::KeyPressed(key, isRepeat);
+
+   if (isRepeat)
+      return;
+
+   if (mHeldKeys.isEmpty())
+      mAppearAtMousePos.set(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
+
+   if (key >= 0 && key < CHAR_MAX && ((key >= 'a' && key <= 'z') || key == ';') && !isRepeat && GetKeyModifiers() == kModifier_None)
+      mHeldKeys += (char)key;
+
+   UpdateDisplay();
+}
+
+void QuickSpawnMenu::KeyReleased(int key)
+{
+   if (key >= 0 && key < CHAR_MAX)
+      mHeldKeys = mHeldKeys.removeCharacters(juce::String::charToString((char)key));
+   if (mHeldKeys.isEmpty())
+      SetShowing(false);
+
+   UpdateDisplay();
+}
+
+void QuickSpawnMenu::UpdateDisplay()
+{
+   if (mHeldKeys.isEmpty() || TheSynth->GetMoveModule() != nullptr)
    {
-      mWidth = w;
-      mHeight = h;
+      SetShowing(false);
    }
-   bool HasTitleBar() const override { return false; }
-   bool IsSaveable() override { return false; }
-   std::string GetHoveredModuleTypeName();
-
-   void KeyPressed(int key, bool isRepeat) override;
-   void KeyReleased(int key) override;
-   void MouseReleased() override;
-
-   bool IsSingleton() const override { return true; }
-
-   struct Element
+   else
    {
-      std::string mLabel = "";
-      std::string pluginFormat = "";
-      std::string mType = "";
-      juce::PluginDescription mDesc{};
-   };
+      mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString());
 
-private:
-   std::string GetModuleTypeNameAt(int x, int y);
-   std::string GetPluginFormatAt(int x, int y);
-   juce::PluginDescription getPluginDescAt(int x, int y);
-   void UpdateDisplay();
+      float width = 150;
+      for (auto& element : mElements)
+      {
+         float elementWidth = GetStringWidth(element.mLabel + " " + element.pluginFormat) + 10;
+         if (elementWidth > width)
+            width = elementWidth;
+      }
 
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   void GetDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
+      SetDimensions(width, MAX((int)mElements.size(), 1) * itemSpacing);
+      float minX = 5;
+      float maxX = ofGetWidth() / GetOwningContainer()->GetDrawScale() - mWidth - 5;
+      float minY = TheTitleBar->GetRect().height + 5;
+      float maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
+      SetPosition(ofClamp(mAppearAtMousePos.x - mWidth / 2, minX, maxX),
+                  ofClamp(mAppearAtMousePos.y - mHeight / 2, minY, maxY));
+      SetShowing(true);
    }
-   float mWidth{ 200 };
-   float mHeight{ 20 };
-   int mLastHoverX{ 0 };
-   int mLastHoverY{ 0 };
-   juce::String mHeldKeys;
-   ofVec2f mAppearAtMousePos;
-   std::vector<Element> mElements;
-};
+}
 
-extern QuickSpawnMenu* TheQuickSpawnMenu;
+void QuickSpawnMenu::MouseReleased()
+{
+   if (IsShowing())
+   {
+      SetShowing(false);
+   }
+}
+
+void QuickSpawnMenu::DrawModule()
+{
+   ofPushStyle();
+
+   int highlightIndex = -1;
+   if (TheSynth->GetMouseY(GetOwningContainer()) > GetPosition().y)
+      highlightIndex = (TheSynth->GetMouseY(GetOwningContainer()) - GetPosition().y) / itemSpacing;
+
+   ofSetColor(50, 50, 50, 100);
+   ofFill();
+   ofRect(-2, -2, mWidth + 4, mHeight + 4);
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i].mLabel)) * (i == highlightIndex ? .7f : .5f), 255);
+      ofRect(0, i * itemSpacing + 1, mWidth, itemSpacing - 1);
+      if (i == highlightIndex)
+         ofSetColor(255, 255, 0);
+      else
+         ofSetColor(255, 255, 255);
+      DrawTextNormal(mElements[i].mLabel + " " + mElements[i].pluginFormat, 1, i * itemSpacing + 12);
+   }
+   if (mElements.size() == 0)
+   {
+      ofSetColor(255, 255, 255);
+      DrawTextNormal("no modules found", 1, 12);
+   }
+
+   ofPopStyle();
+}
+
+void QuickSpawnMenu::DrawModuleUnclipped()
+{
+   DrawTextBold(mHeldKeys.toStdString(), 3, -2, 17);
+}
+
+bool QuickSpawnMenu::MouseMoved(float x, float y)
+{
+   mLastHoverX = x;
+   mLastHoverY = y;
+   return false;
+}
+
+void QuickSpawnMenu::OnClicked(float x, float y, bool right)
+{
+   if (right)
+      return;
+
+
+   std::string moduleTypeName = GetModuleTypeNameAt(x, y);
+   std::string pluginFormat = GetPluginFormatAt(x, y);
+
+   DBG("module name:" << moduleTypeName);
+   DBG(pluginFormat);
+
+   if (moduleTypeName != "" && pluginFormat == "")
+   {
+      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
+      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
+   }
+
+   if (!moduleTypeName.empty() && !pluginFormat.empty())
+   {
+      auto pluginDesc = getPluginDescAt(x, y);
+      IDrawableModule* module = TheSynth->SpawnPluginOnTheFly(pluginDesc, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
+      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
+   }
+
+   SetShowing(false);
+}
+
+std::string QuickSpawnMenu::GetHoveredModuleTypeName()
+{
+   return GetModuleTypeNameAt(mLastHoverX, mLastHoverY);
+}
+std::string QuickSpawnMenu::GetModuleTypeNameAt(int x, int y)
+{
+   int index = y / itemSpacing;
+   if (index >= 0 && index < mElements.size())
+      return mElements[index].mLabel;
+
+   return {};
+}
+
+std::string QuickSpawnMenu::GetPluginFormatAt(int x, int y)
+{
+   int index = y / itemSpacing;
+   if (index >= 0 && index < mElements.size())
+      return mElements[index].pluginFormat;
+
+   return {};
+}
+
+juce::PluginDescription QuickSpawnMenu::getPluginDescAt(int x, int y)
+{
+   int index = y / itemSpacing;
+   if (index >= 0 && index < mElements.size())
+      return mElements[index].mDesc;
+
+   return {};
+}
