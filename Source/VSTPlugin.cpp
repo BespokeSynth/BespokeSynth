@@ -187,7 +187,6 @@ namespace VSTLookup
       rit = lastUsedTimes.rbegin();
       while (rit != lastUsedTimes.rend() && ++i <= num)
       {
-          DBG(rit->second);
           if (GetPluginDesc(pluginDesc, juce::String(rit->second)))
               {
               recentPlugins.push_back(pluginDesc);
@@ -580,7 +579,6 @@ void VSTPlugin::Poll()
 void VSTPlugin::audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex)
 {
    //set this parameter so we can check it in Poll()
-   DBG("changed");
    mChangeGestureParameterIndex = parameterIndex;
 }
 
