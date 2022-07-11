@@ -644,11 +644,11 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
       }
    }
    //sort(modules.begin(), modules.end());
-   
+
    std::vector<QuickSpawnMenu::Element> ret;
    for (size_t i = 0; i < modules.size(); ++i)
       ret.push_back(modules[i]);
-   
+
    return ret;
 }
 
