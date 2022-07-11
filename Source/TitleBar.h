@@ -47,20 +47,20 @@ class SpawnList
 public:
    SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label);
    void SetList(std::vector<std::string> spawnables, std::string overrideModuleType);
-   void SetListVST(std::vector<std::pair<std::string, juce::PluginDescription>> spawnableVSTs, std::string overrideModuleType);
+   void SetListPlugins(std::vector<std::pair<std::string, juce::PluginDescription>> spawnablePlugins, std::string overrideModuleType);
    void OnSelection(DropdownList* list);
-   void OnSelectionVST(DropdownList* list);
+   void OnSelectionPlugin(DropdownList* list);
    void SetPosition(int x, int y);
    void SetPositionRelativeTo(SpawnList* list);
    void Draw();
    DropdownList* GetList() { return mSpawnList; }
    IDrawableModule* Spawn();
-   IDrawableModule* SpawnVST();
+   IDrawableModule* SpawnPlugin();
 
 private:
    std::string mLabel;
    std::vector<std::string> mSpawnables;
-   std::vector<std::pair<std::string, juce::PluginDescription>> mSpawnableVSTs;
+   std::vector<std::pair<std::string, juce::PluginDescription>> mSpawnablePlugins;
    int mSpawnIndex;
    DropdownList* mSpawnList;
    IDropdownListener* mOwner;
@@ -75,7 +75,7 @@ struct SpawnListManager
 
    void SetModuleFactory(ModuleFactory* factory);
    void SetUpPrefabsDropdown();
-   void SetUpVstDropdown();
+   void SetUpPluginsDropdown();
 
    std::vector<SpawnList*> GetDropdowns() { return mDropdowns; }
 
@@ -86,7 +86,7 @@ struct SpawnListManager
    SpawnList mModulatorModules;
    SpawnList mPulseModules;
    SpawnList mOtherModules;
-   SpawnList mVstPlugins;
+   SpawnList mPlugins;
    SpawnList mPrefabs;
 
 private:
@@ -133,7 +133,7 @@ public:
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
-   void ManageVSTs();
+   void ManagePlugins();
 
    bool IsSaveable() override { return false; }
 

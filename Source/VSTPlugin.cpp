@@ -163,10 +163,10 @@ namespace VSTLookup
       std::map<double, std::string> lastUsedTimes;
       int i=0;
 
-      if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
+      if (juce::File(ofToDataPath("vst/recent_plugins.json")).existsAsFile())
       {
          ofxJSONElement root;
-         root.open(ofToDataPath("vst/used_vsts.json"));
+         root.open(ofToDataPath("vst/recent_plugins.json"));
          ofxJSONElement jsonList = root["vsts"];
 
          for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
@@ -200,10 +200,10 @@ namespace VSTLookup
    {
       std::map<std::string, double> lastUsedTimes;
 
-      if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
+      if (juce::File(ofToDataPath("vst/recent_plugins.json")).existsAsFile())
       {
          ofxJSONElement root;
-         root.open(ofToDataPath("vst/used_vsts.json"));
+         root.open(ofToDataPath("vst/recent_plugins.json"));
          ofxJSONElement jsonList = root["vsts"];
 
          for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
@@ -375,12 +375,12 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
    if(strPluginId != "--0-0")
    {
        ofxJSONElement root;
-       root.open(ofToDataPath("vst/used_vsts.json"));
+       root.open(ofToDataPath("vst/recent_plugins.json"));
 
        auto time = juce::Time::getCurrentTime();
        root["vsts"][strPluginId] = (double)time.currentTimeMillis();
 
-       root.save(ofToDataPath("vst/used_vsts.json"), true);
+       root.save(ofToDataPath("vst/recent_plugins.json"), true);
    }
 
    if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().matchesIdentifierString(pluginId))

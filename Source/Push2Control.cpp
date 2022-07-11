@@ -149,7 +149,7 @@ void Push2Control::CreateUIControls()
    mSpawnModuleControls.push_back(mSpawnLists.mAudioModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mModulatorModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mPulseModules.GetList());
-   mSpawnModuleControls.push_back(mSpawnLists.mVstPlugins.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mPlugins.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mOtherModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mPrefabs.GetList());
 }
@@ -729,7 +729,7 @@ ModuleType Push2Control::GetModuleTypeForSpawnList(IUIControl* control)
       moduleType = kModuleType_Pulse;
    if (control == mSpawnLists.mOtherModules.GetList())
       moduleType = kModuleType_Other;
-   if (control == mSpawnLists.mVstPlugins.GetList())
+   if (control == mSpawnLists.mPlugins.GetList())
       moduleType = kModuleType_Synth;
    if (control == mSpawnLists.mPrefabs.GetList())
       moduleType = kModuleType_Other;
