@@ -2668,7 +2668,6 @@ INoteReceiver* ModularSynth::FindNoteReceiver(std::string name, bool fail)
 void ModularSynth::OnConsoleInput()
 {
    std::vector<std::string> tokens = ofSplitString(mConsoleText, " ", true, true);
-   //QuickSpawnMenu::Element cModule{};
    if (tokens.size() > 0)
    {
       if (tokens[0] == "")
@@ -2799,7 +2798,6 @@ void ModularSynth::OnConsoleInput()
       {
          ofLog() << "Creating: " << mConsoleText;
          ofVec2f grabOffset(-40, 10);
-         //cModule.mLabel = mConsoleText;
          IDrawableModule* module = SpawnModuleOnTheFly(mConsoleText, GetMouseX(&mModuleContainer) + grabOffset.x, GetMouseY(&mModuleContainer) + grabOffset.y);
          TheSynth->SetMoveModule(module, grabOffset.x, grabOffset.y, true);
       }
@@ -2858,21 +2856,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    std::string moduleType = tokens[0];
 
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
-/*
-   std::string vstToSetUp {};
-   juce::PluginDescription pluginDesc;
 
-   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kVSTSuffix)
-   {
-      moduleType = "vstplugin";
-      for (size_t i = 0; i < tokens.size() - 1; ++i)
-      {
-         vstToSetUp += tokens[i];
-         if (i != tokens.size() - 2)
-            vstToSetUp += " ";
-      }
-   }
-*/
    std::string prefabToSetUp = "";
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kPrefabSuffix)
    {
@@ -2946,14 +2930,6 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
             mModuleContainer.AddModule(module);
          SetUpModule(module, dummy);
          module->Init();
-
-//          if (vstToSetUp != "")
-//          {
-//             VSTLookup::GetPluginDesc(pluginDesc,vstToSetUp);
-//             VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-//             if (plugin != nullptr) {}
-//                plugin->SetVST(pluginDesc);
-//          }
       }
    }
    catch (LoadingJSONException& e)
@@ -2998,10 +2974,6 @@ IDrawableModule* ModularSynth::SpawnPluginOnTheFly(juce::PluginDescription plugi
    DBG(pluginName);
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
-
-   //std::vector<std::string> tokens = ofSplitString(spawnCommand, " ");
-   //if (tokens.size() == 0)
-   //   return nullptr;
 
    if (sShouldAutosave)
       DoAutosave();

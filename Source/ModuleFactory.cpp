@@ -564,10 +564,8 @@ namespace
 
 std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::string keys)
 {
-   //std::vector<juce::String> modules;
    std::vector<QuickSpawnMenu::Element> modules{};
    QuickSpawnMenu::Element module{};
-   //std::vector<juce::PluginDescription> plugins;
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if ((mIsHiddenModuleMap[iter->first] == false || gShowDevModules) &&
@@ -592,8 +590,6 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
    {
       for (auto& pluginDesc : matchingVsts)
       {
-         //std::string vstName = juce::File(vstFile).getFileName().toStdString();
-         //modules.push_back(vstName + " " + kVSTSuffix);
          module.mLabel = pluginDesc.name.toStdString();
          module.pluginFormat = "[" + pluginDesc.pluginFormatName.toLowerCase().toStdString() + "]";
          module.mDesc = pluginDesc;
@@ -620,7 +616,6 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
    {
       if (CheckHeldKeysMatch(prefab, keys) || keys[0] == ';')
       {
-         //modules.push_back(prefab + " " + kPrefabSuffix);
          module.mLabel = prefab + " " + kPrefabSuffix;
          module.pluginFormat = "";
          modules.push_back(module);

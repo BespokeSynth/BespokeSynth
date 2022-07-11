@@ -336,7 +336,6 @@ void VSTPlugin::GetVSTFileDesc(std::string vstName, juce::PluginDescription& des
       {
          found = true;
          desc = types[i];
-         //return desc;
          break;
       }
    }
@@ -351,7 +350,6 @@ void VSTPlugin::GetVSTFileDesc(std::string vstName, juce::PluginDescription& des
          {
             found = true;
             desc = types[i];
-            //return desc;
             break;
          }
       }
@@ -360,9 +358,8 @@ void VSTPlugin::GetVSTFileDesc(std::string vstName, juce::PluginDescription& des
 
 void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
 {
-   //juce::PluginDescription vstDesc;
 
-   //ofLog() << "loading VST: " << vstName << "ID: " << id;
+   ofLog() << "loading Plugin: " << pluginDesc.name << "; Format: " << pluginDesc.pluginFormatName << "; ID: " << pluginDesc.uniqueId;
 
    juce::String pluginId = pluginDesc.createIdentifierString();
    std::string strPluginId = pluginId.toStdString();
