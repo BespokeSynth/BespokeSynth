@@ -595,7 +595,7 @@ std::vector<QuickSpawnMenu::Element> ModuleFactory::GetSpawnableModules(std::str
          //std::string vstName = juce::File(vstFile).getFileName().toStdString();
          //modules.push_back(vstName + " " + kVSTSuffix);
          module.mLabel = pluginDesc.name.toStdString();
-         module.pluginFormat = "[" + pluginDesc.pluginFormatName.toStdString() + "]";
+         module.pluginFormat = "[" + pluginDesc.pluginFormatName.toLowerCase().toStdString() + "]";
          module.mDesc = pluginDesc;
          //module.mType = "plugin";
          modules.push_back(module);

@@ -1112,9 +1112,7 @@ void VSTPlugin::RefreshPresetFiles()
 
 void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("vst", moduleInfo, "", VSTLookup::FillVSTList);
-   mModuleSaveData.LoadInt("vstId", moduleInfo, 0, 0, 0);
-   mModuleSaveData.LoadString("pluginId", moduleInfo, "", VSTLookup::FillVSTList);
+   mModuleSaveData.LoadString("pluginID", moduleInfo, "", VSTLookup::FillVSTList);
    
    mModuleSaveData.LoadString("target", moduleInfo);
 
