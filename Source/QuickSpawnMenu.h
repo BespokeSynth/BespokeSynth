@@ -55,7 +55,7 @@ public:
    void MouseReleased() override;
 
    bool IsSingleton() const override { return true; }
-   
+
    struct Element
    {
       std::string mLabel = "";
@@ -63,7 +63,7 @@ public:
       std::string mType = "";
       juce::PluginDescription mDesc{};
    };
-   
+
 private:
    std::string GetModuleTypeNameAt(int x, int y);
    std::string GetPluginFormatAt(int x, int y);
