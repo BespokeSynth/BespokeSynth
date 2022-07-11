@@ -62,6 +62,3 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> VSTPlayhead::getPosition() con
 
    return pos;
 }
-
-
-

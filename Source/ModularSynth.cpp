@@ -2919,7 +2919,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    dummy["position"][1u] = y;
 
    IDrawableModule* module = nullptr;
-   
+
    try
    {
       ScopedMutex mutex(&mAudioThreadMutex, "CreateModule");
@@ -2977,13 +2977,13 @@ IDrawableModule* ModularSynth::SpawnPluginOnTheFly(juce::PluginDescription plugi
 
    if (sShouldAutosave)
       DoAutosave();
-   
+
    ofxJSONElement dummy;
    dummy["type"] = "vstplugin";
    std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
    dummy["name"] = pluginName;
    dummy["onthefly"] = true;
-   
+
    IDrawableModule* module = nullptr;
    try
    {
@@ -2992,7 +2992,7 @@ IDrawableModule* ModularSynth::SpawnPluginOnTheFly(juce::PluginDescription plugi
       if (module != nullptr)
       {
          if (addToContainer)
-         mModuleContainer.AddModule(module);
+            mModuleContainer.AddModule(module);
          SetUpModule(module, dummy);
          module->Init();
          VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
