@@ -93,7 +93,7 @@ namespace VSTLookup
       std::vector<PluginDescription> vsts;
       GetAvailableVSTs(vsts);
       for (int i = 0; i < vsts.size(); ++i)
-         list->AddLabel(vsts[i].name.toStdString(), vsts[i].uniqueId);
+         list->AddLabel(vsts[i].createIdentifierString().toStdString(), i);
    }
 
    std::string GetVSTPath(std::string vstName)
@@ -1109,7 +1109,7 @@ void VSTPlugin::RefreshPresetFiles()
 
 void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("pluginID", moduleInfo, "", VSTLookup::FillVSTList);
+   mModuleSaveData.LoadString("pluginId", moduleInfo, "", VSTLookup::FillVSTList);
 
    mModuleSaveData.LoadString("target", moduleInfo);
 
@@ -1131,7 +1131,9 @@ void VSTPlugin::SetUpFromSaveData()
       auto pluginId = juce::String(mModuleSaveData.GetString("pluginId"));
       DBG(pluginId);
       if (VSTLookup::GetPluginDesc(pluginDesc, pluginId))
+      {
          TheSynth->LogEvent("Plugin with " + pluginId.toStdString() + " id not found", kLogEventType_Error);
+      }
    }
 
    else if (mModuleSaveData.HasProperty("vstId") && mModuleSaveData.GetInt("vstId") != 0)
@@ -1145,7 +1147,7 @@ void VSTPlugin::SetUpFromSaveData()
       }
    }
 
-   else
+   else if (mModuleSaveData.HasProperty("vst") && !mModuleSaveData.GetString("vstId").empty())
    {
       DBG("try to use filename");
       std::string vstName = mModuleSaveData.GetString("vst");
