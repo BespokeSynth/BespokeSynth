@@ -199,10 +199,10 @@ namespace VSTLookup
    {
       std::map<std::string, double> lastUsedTimes;
 
-      if (juce::File(ofToDataPath("vst/recent_plugins.json")).existsAsFile())
+      if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
       {
          ofxJSONElement root;
-         root.open(ofToDataPath("vst/recent_plugins.json"));
+         root.open(ofToDataPath("vst/used_vsts.json"));
          ofxJSONElement jsonList = root["vsts"];
 
          for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
