@@ -381,15 +381,15 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
    {
       LoadTooltips();
 
-      std::vector<ModuleType> moduleTypes = {
-         kModuleType_Note,
-         kModuleType_Synth,
-         kModuleType_Audio,
-         kModuleType_Instrument,
-         kModuleType_Processor,
-         kModuleType_Modulator,
-         kModuleType_Pulse,
-         kModuleType_Other
+      std::vector<ModuleCategory> moduleTypes = {
+         kModuleCategory_Note,
+         kModuleCategory_Synth,
+         kModuleCategory_Audio,
+         kModuleCategory_Instrument,
+         kModuleCategory_Processor,
+         kModuleCategory_Modulator,
+         kModuleCategory_Pulse,
+         kModuleCategory_Other
       };
       for (auto type : moduleTypes)
       {
@@ -469,15 +469,15 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       mScreenshotsToProcess.push_back("drumplayer");
       mScreenshotsToProcess.push_back("notesequencer");*/
 
-      std::vector<ModuleType> moduleTypes = {
-         kModuleType_Note,
-         kModuleType_Synth,
-         kModuleType_Audio,
-         kModuleType_Instrument,
-         kModuleType_Processor,
-         kModuleType_Modulator,
-         kModuleType_Pulse,
-         kModuleType_Other
+      std::vector<ModuleCategory> moduleTypes = {
+         kModuleCategory_Note,
+         kModuleCategory_Synth,
+         kModuleCategory_Audio,
+         kModuleCategory_Instrument,
+         kModuleCategory_Processor,
+         kModuleCategory_Modulator,
+         kModuleCategory_Pulse,
+         kModuleCategory_Other
       };
       for (auto type : moduleTypes)
       {
@@ -512,15 +512,15 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
          docs[moduleType.module]["canReceivePulses"] = false;
       }
 
-      std::vector<ModuleType> moduleTypes = {
-         kModuleType_Note,
-         kModuleType_Synth,
-         kModuleType_Audio,
-         kModuleType_Instrument,
-         kModuleType_Processor,
-         kModuleType_Modulator,
-         kModuleType_Pulse,
-         kModuleType_Other
+      std::vector<ModuleCategory> moduleTypes = {
+         kModuleCategory_Note,
+         kModuleCategory_Synth,
+         kModuleCategory_Audio,
+         kModuleCategory_Instrument,
+         kModuleCategory_Processor,
+         kModuleCategory_Modulator,
+         kModuleCategory_Pulse,
+         kModuleCategory_Other
       };
       for (auto type : moduleTypes)
       {
@@ -532,15 +532,15 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
             std::string moduleType;
             switch (module->GetModuleType())
             {
-               case kModuleType_Note: moduleType = "note effects"; break;
-               case kModuleType_Synth: moduleType = "synths"; break;
-               case kModuleType_Audio: moduleType = "audio effects"; break;
-               case kModuleType_Instrument: moduleType = "instruments"; break;
-               case kModuleType_Processor: moduleType = "effect chain"; break;
-               case kModuleType_Modulator: moduleType = "modulators"; break;
-               case kModuleType_Pulse: moduleType = "pulse"; break;
-               case kModuleType_Other: moduleType = "other"; break;
-               case kModuleType_Unknown: moduleType = "unknown"; break;
+               case kModuleCategory_Note: moduleType = "note effects"; break;
+               case kModuleCategory_Synth: moduleType = "synths"; break;
+               case kModuleCategory_Audio: moduleType = "audio effects"; break;
+               case kModuleCategory_Instrument: moduleType = "instruments"; break;
+               case kModuleCategory_Processor: moduleType = "effect chain"; break;
+               case kModuleCategory_Modulator: moduleType = "modulators"; break;
+               case kModuleCategory_Pulse: moduleType = "pulse"; break;
+               case kModuleCategory_Other: moduleType = "other"; break;
+               case kModuleCategory_Unknown: moduleType = "unknown"; break;
             }
 
             docs[toSpawn]["type"] = moduleType;

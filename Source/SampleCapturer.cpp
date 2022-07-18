@@ -172,7 +172,7 @@ void SampleCapturer::DrawModule()
       if (mCurrentSampleIndex == i)
          ofSetColor(ofColor::white);
       else
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Audio));
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Audio));
       ofRect(5, y, kBufferWidth, kBufferHeight);
 
       if (i == mCurrentSampleIndex)

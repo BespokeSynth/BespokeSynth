@@ -42,14 +42,16 @@ class PluginListWindow;
 class SpawnList
 {
 public:
-   SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label);
+   SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label, ModuleCategory moduleCategory);
    void SetList(std::vector<std::string> spawnables, std::string overrideModuleType);
    void OnSelection(DropdownList* list);
    void SetPosition(int x, int y);
    void SetPositionRelativeTo(SpawnList* list);
    void Draw();
    DropdownList* GetList() { return mSpawnList; }
-   IDrawableModule* Spawn();
+   IDrawableModule* Spawn(int index);
+   std::string GetLabel() const { return mLabel; }
+   ModuleCategory GetCategory() const { return mModuleCategory; }
 
 private:
    std::string mLabel;
@@ -60,6 +62,7 @@ private:
    SpawnListManager* mListManager;
    ofVec2f mPos;
    std::string mOverrideModuleType;
+   ModuleCategory mModuleCategory;
 };
 
 struct SpawnListManager
@@ -70,7 +73,7 @@ struct SpawnListManager
    void SetUpPrefabsDropdown();
    void SetUpVstDropdown();
 
-   std::vector<SpawnList*> GetDropdowns() { return mDropdowns; }
+   const std::vector<SpawnList*>& GetDropdowns() const { return mDropdowns; }
 
    SpawnList mInstrumentModules;
    SpawnList mNoteModules;
@@ -126,6 +129,7 @@ public:
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
    void ManageVSTs();
+   const std::vector<SpawnList*>& GetSpawnLists() const { return mSpawnLists.GetDropdowns(); }
 
    bool IsSaveable() override { return false; }
 

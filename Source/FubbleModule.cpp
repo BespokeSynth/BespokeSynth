@@ -202,7 +202,7 @@ void FubbleModule::DrawModule()
       }
    }
 
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    ofPushMatrix();
    if (mAxisH.GetCableSource()->GetTarget())
       DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), rect.width * .4f, rect.height - 2);
@@ -213,7 +213,7 @@ void FubbleModule::DrawModule()
 
    //draw curve
    ofPushStyle();
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    DrawTextNormal("length: " + ofToString(mLength, 2), 5, 15);
    ofSetColor(220, 220, 220);
    ofNoFill();
@@ -254,7 +254,7 @@ void FubbleModule::DrawModule()
    if (mIsDrawing || IsHovered() || mIsRightClicking)
    {
       ofNoFill();
-      ofSetColor(GetColor(kModuleType_Modulator), (mIsDrawing || mIsRightClicking) ? 255 : 50);
+      ofSetColor(GetColor(kModuleCategory_Modulator), (mIsDrawing || mIsRightClicking) ? 255 : 50);
       ofCircle(GetFubbleMouseCoord().x * rect.width, (1 - GetFubbleMouseCoord().y) * rect.height, 5);
    }
    ofPopStyle();
@@ -268,7 +268,7 @@ void FubbleModule::DrawModule()
    ofRect(0, 0, mWidth - 20, 20);
    mAxisH.mCurve.SetDimensions(mWidth - 20, 20);
    mAxisH.mCurve.Render();
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    if (mAxisH.GetCableSource()->GetTarget())
       DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), 5, 15);
 
@@ -277,7 +277,7 @@ void FubbleModule::DrawModule()
    ofRect(0, 0, mWidth - 20, 20);
    mAxisV.mCurve.SetDimensions(mWidth - 20, 20);
    mAxisV.mCurve.Render();
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    if (mAxisV.GetCableSource()->GetTarget())
       DrawTextNormal(mAxisV.GetCableSource()->GetTarget()->Name(), 5, 15);
 

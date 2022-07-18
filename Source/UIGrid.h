@@ -62,7 +62,7 @@ public:
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY) override;
    float& GetVal(int col, int row);
    void SetVal(int col, int row, float val, bool notifyListener = true);
    float GetValRefactor(int row, int col);

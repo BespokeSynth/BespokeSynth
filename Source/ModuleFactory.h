@@ -37,9 +37,9 @@ class ModuleFactory
 public:
    ModuleFactory();
    IDrawableModule* MakeModule(std::string type);
-   std::vector<std::string> GetSpawnableModules(ModuleType moduleType);
-   std::vector<std::string> GetSpawnableModules(std::string keys);
-   ModuleType GetModuleType(std::string typeName);
+   std::vector<std::string> GetSpawnableModules(ModuleCategory moduleType);
+   std::vector<std::string> GetSpawnableModules(std::string keys, bool continuousString);
+   ModuleCategory GetModuleType(std::string typeName);
    bool IsExperimental(std::string typeName);
    static void GetPrefabs(std::vector<std::string>& prefabs);
    static std::string FixUpTypeName(std::string typeName);
@@ -50,10 +50,10 @@ public:
    static constexpr const char* kEffectChainSuffix = "[effectchain]";
 
 private:
-   void Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental);
+   void Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleCategory moduleType, bool hidden, bool experimental);
    std::map<std::string, CreateModuleFn> mFactoryMap;
    std::map<std::string, CanCreateModuleFn> mCanCreateMap;
-   std::map<std::string, ModuleType> mModuleTypeMap;
+   std::map<std::string, ModuleCategory> mModuleTypeMap;
    std::map<std::string, bool> mIsHiddenModuleMap;
    std::map<std::string, bool> mIsExperimentalModuleMap;
 };

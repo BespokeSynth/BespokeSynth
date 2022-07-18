@@ -427,7 +427,7 @@ bool NoteStepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool NoteStepSequencer::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool NoteStepSequencer::MouseScrolled(float x, float y, float scrollX, float scrollY)
 {
    mGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
    mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
@@ -1108,7 +1108,7 @@ void NoteStepSequencer::SetUpStepControls()
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {
       mToneDropdowns[i]->Clear();
-      for (int j = 0; j < mNoteRange; ++j)
+      for (int j = mNoteRange - 1; j >= 0; --j)
          mToneDropdowns[i]->AddLabel(NoteName(RowToPitch(j), false, true), j);
    }
 }

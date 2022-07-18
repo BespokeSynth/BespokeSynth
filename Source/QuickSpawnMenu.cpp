@@ -30,6 +30,8 @@
 #include "ModuleFactory.h"
 #include "TitleBar.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 QuickSpawnMenu* TheQuickSpawnMenu = nullptr;
 
 namespace
@@ -57,6 +59,20 @@ void QuickSpawnMenu::Init()
    SetShowing(false);
 }
 
+void QuickSpawnMenu::ShowSpawnCategoriesPopup()
+{
+   ResetAppearPos();
+   mMenuMode = MenuMode::ModuleCategories;
+   mSearchString = "";
+   UpdateDisplay();
+}
+
+void QuickSpawnMenu::ResetAppearPos()
+{
+   mAppearAtMousePos.set(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
+   mScrollOffset = 0;
+}
+
 void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
@@ -64,34 +80,109 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
    if (isRepeat)
       return;
 
-   if (mHeldKeys.isEmpty())
-      mAppearAtMousePos.set(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
+   if (!IsShowing())
+      ResetAppearPos();
 
-   if (key >= 0 && key < CHAR_MAX && ((key >= 'a' && key <= 'z') || key == ';') && !isRepeat && GetKeyModifiers() == kModifier_None)
+   if ((!IsShowing() || mMenuMode == MenuMode::SingleLetter) && key >= 0 && key < CHAR_MAX && ((key >= 'a' && key <= 'z') || key == ';') && !isRepeat && GetKeyModifiers() == kModifier_None)
+   {
       mHeldKeys += (char)key;
+      mMenuMode = MenuMode::SingleLetter;
+      UpdateDisplay();
+   }
 
-   UpdateDisplay();
+   if (IsShowing())
+   {
+      if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
+      {
+         int oldIndex = mHighlightIndex;
+         mHighlightIndex = ofClamp(mHighlightIndex + (key == OF_KEY_DOWN || key == OF_KEY_RIGHT ? 1 : -1), 0, (int)mElements.size() - 1);
+         int change = mHighlightIndex - oldIndex;
+         mScrollOffset -= change * itemSpacing;
+         UpdatePosition();
+         MoveMouseToIndex(mHighlightIndex);
+      }
+
+      if (key == OF_KEY_RETURN)
+      {
+         if (mHighlightIndex < 0 || mHighlightIndex >= mElements.size())
+            mHighlightIndex = 0;
+         OnSelectItem(mHighlightIndex);
+      }
+
+      if (key >= 0 && key < CHAR_MAX && (key >= 'a' && key <= 'z') && mMenuMode != MenuMode::SingleLetter)
+      {
+         mSearchString += (char)key;
+         mMenuMode = MenuMode::Search;
+         UpdateDisplay();
+         MoveMouseToIndex(0);
+      }
+
+      if (mMenuMode == MenuMode::Search && key == juce::KeyPress::backspaceKey)
+      {
+         if (mSearchString.length() > 0)
+         {
+            mSearchString = mSearchString.substring(0, mSearchString.length() - 1);
+            if (mSearchString.length() == 0)
+            {
+               mMenuMode = MenuMode::ModuleCategories;
+               UpdateDisplay();
+            }
+            else
+            {
+               UpdateDisplay();
+               MoveMouseToIndex(0);
+            }
+         }
+      }
+   }
+
+   if (key == OF_KEY_ESC)
+      SetShowing(false);
 }
 
 void QuickSpawnMenu::KeyReleased(int key)
 {
-   if (key >= 0 && key < CHAR_MAX)
+   if (mMenuMode == MenuMode::SingleLetter && key >= 0 && key < CHAR_MAX)
+   {
       mHeldKeys = mHeldKeys.removeCharacters(juce::String::charToString((char)key));
-   if (mHeldKeys.isEmpty())
-      SetShowing(false);
-
-   UpdateDisplay();
+      UpdateDisplay();
+   }
 }
 
 void QuickSpawnMenu::UpdateDisplay()
 {
-   if (mHeldKeys.isEmpty() || TheSynth->GetMoveModule() != nullptr)
+   if ((mMenuMode == MenuMode::SingleLetter && mHeldKeys.isEmpty()) || TheSynth->GetMoveModule() != nullptr)
    {
       SetShowing(false);
    }
    else
    {
-      mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString());
+      if (mMenuMode == MenuMode::ModuleCategories)
+      {
+         mElements.clear();
+         for (auto* dropdown : TheTitleBar->GetSpawnLists())
+         {
+            std::string label = dropdown->GetLabel();
+            ofStringReplace(label, ":", "");
+            mElements.push_back(label);
+         }
+      }
+      else if (mMenuMode == MenuMode::SingleCategory)
+      {
+         mElements.clear();
+         auto* list = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetList();
+         for (int i = 0; i < list->GetNumValues(); ++i)
+            mElements.push_back(list->GetElement(i).mLabel);
+      }
+      else if (mMenuMode == MenuMode::Search)
+      {
+         mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mSearchString.toStdString(), true);
+      }
+      else
+      {
+         mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString(), false);
+         mScrollOffset = 0;
+      }
 
       float width = 150;
       for (auto element : mElements)
@@ -102,44 +193,73 @@ void QuickSpawnMenu::UpdateDisplay()
       }
 
       SetDimensions(width, MAX((int)mElements.size(), 1) * itemSpacing);
-      float minX = 5;
-      float maxX = ofGetWidth() / GetOwningContainer()->GetDrawScale() - mWidth - 5;
-      float minY = TheTitleBar->GetRect().height + 5;
-      float maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
-      SetPosition(ofClamp(mAppearAtMousePos.x - mWidth / 2, minX, maxX),
-                  ofClamp(mAppearAtMousePos.y - mHeight / 2, minY, maxY));
+      UpdatePosition();
       SetShowing(true);
+   }
+}
+
+void QuickSpawnMenu::UpdatePosition()
+{
+   float minX = 5;
+   float maxX = ofGetWidth() / GetOwningContainer()->GetDrawScale() - mWidth - 5;
+   float minY = TheTitleBar->GetRect().height + 5;
+   float maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
+
+   if (mMenuMode == MenuMode::SingleLetter)
+   {
+      SetPosition(ofClamp(mAppearAtMousePos.x - mWidth / 2, minX, maxX),
+                  ofClamp(mAppearAtMousePos.y - mHeight / 2, minY, maxY) + mScrollOffset);
+   }
+   else
+   {
+      SetPosition(ofClamp(mAppearAtMousePos.x - 5, minX, maxX),
+                  mAppearAtMousePos.y - itemSpacing / 2 + mScrollOffset);
    }
 }
 
 void QuickSpawnMenu::MouseReleased()
 {
-   if (IsShowing())
-   {
-      SetShowing(false);
-   }
+}
+
+bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scrollY)
+{
+   float newY = ofClamp(y + scrollY * 5, itemSpacing / 2, mHeight - itemSpacing / 2);
+   float changeAmount = newY - y;
+   mScrollOffset -= changeAmount;
+   UpdatePosition();
+
+   return true;
+}
+
+void QuickSpawnMenu::MoveMouseToIndex(int index)
+{
+   mHighlightIndex = index;
+   TheSynth->SetMousePosition(GetOwningContainer(), mX + 5, mY + (index + .5f) * itemSpacing);
 }
 
 void QuickSpawnMenu::DrawModule()
 {
    ofPushStyle();
 
-   int highlightIndex = -1;
+   mHighlightIndex = -1;
    if (TheSynth->GetMouseY(GetOwningContainer()) > GetPosition().y)
-      highlightIndex = (TheSynth->GetMouseY(GetOwningContainer()) - GetPosition().y) / itemSpacing;
+      mHighlightIndex = GetIndexAt(TheSynth->GetMouseX(GetOwningContainer()) - GetPosition().x, TheSynth->GetMouseY(GetOwningContainer()) - GetPosition().y);
 
    ofSetColor(50, 50, 50, 100);
    ofFill();
    ofRect(-2, -2, mWidth + 4, mHeight + 4);
    for (int i = 0; i < mElements.size(); ++i)
    {
-      ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i])) * (i == highlightIndex ? .7f : .5f), 255);
+      if (mMenuMode == MenuMode::ModuleCategories)
+         ofSetColor(IDrawableModule::GetColor(TheTitleBar->GetSpawnLists()[i]->GetCategory()) * (i == mHighlightIndex ? .7f : .5f), 255);
+      else
+         ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i])) * (i == mHighlightIndex ? .7f : .5f), 255);
       ofRect(0, i * itemSpacing + 1, mWidth, itemSpacing - 1);
-      if (i == highlightIndex)
+      if (i == mHighlightIndex)
          ofSetColor(255, 255, 0);
       else
          ofSetColor(255, 255, 255);
-      DrawTextNormal(mElements[i], 1, i * itemSpacing + 12);
+      DrawTextNormal(mElements[i], mMenuMode == MenuMode::SingleLetter ? 1 : 12, i * itemSpacing + 12);
    }
    if (mElements.size() == 0)
    {
@@ -152,7 +272,10 @@ void QuickSpawnMenu::DrawModule()
 
 void QuickSpawnMenu::DrawModuleUnclipped()
 {
-   DrawTextBold(mHeldKeys.toStdString(), 3, -2, 17);
+   if (mMenuMode == MenuMode::SingleLetter)
+      DrawTextBold(mHeldKeys.toStdString(), 3, -2, 17);
+   if (mMenuMode == MenuMode::Search)
+      DrawTextBold(mSearchString.toStdString(), 3, -2, 17);
 }
 
 bool QuickSpawnMenu::MouseMoved(float x, float y)
@@ -165,26 +288,71 @@ bool QuickSpawnMenu::MouseMoved(float x, float y)
 void QuickSpawnMenu::OnClicked(float x, float y, bool right)
 {
    if (right)
-      return;
-
-   std::string moduleTypeName = GetModuleTypeNameAt(x, y);
-   if (moduleTypeName != "")
    {
-      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
-      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
+      if (IsShowing())
+         SetShowing(false);
+      return;
    }
 
-   SetShowing(false);
+   OnSelectItem(GetIndexAt(x, y));
+}
+
+void QuickSpawnMenu::OnSelectItem(int index)
+{
+   if (mMenuMode == MenuMode::SingleLetter || mMenuMode == MenuMode::Search)
+   {
+      std::string moduleTypeName = GetElementName(index);
+      if (moduleTypeName != "")
+      {
+         IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
+         TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
+      }
+      SetShowing(false);
+   }
+
+   if (mMenuMode == MenuMode::SingleCategory)
+   {
+      if (mSelectedCategoryIndex >= 0 &&
+          mSelectedCategoryIndex < (int)TheTitleBar->GetSpawnLists().size() &&
+          index >= 0 &&
+          index < TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetList()->GetNumValues())
+      {
+         IDrawableModule* module = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->Spawn(index);
+         TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
+      }
+      SetShowing(false);
+   }
+
+   if (mMenuMode == MenuMode::ModuleCategories)
+   {
+      mSelectedCategoryIndex = index;
+      if (mSelectedCategoryIndex >= 0 && mSelectedCategoryIndex < mElements.size())
+      {
+         mMenuMode = MenuMode::SingleCategory;
+         ResetAppearPos();
+         UpdateDisplay();
+      }
+      else
+      {
+         SetShowing(false);
+      }
+   }
 }
 
 std::string QuickSpawnMenu::GetHoveredModuleTypeName()
 {
-   return GetModuleTypeNameAt(mLastHoverX, mLastHoverY);
+   return GetElementName(GetIndexAt(mLastHoverX, mLastHoverY));
 }
 
-std::string QuickSpawnMenu::GetModuleTypeNameAt(int x, int y)
+int QuickSpawnMenu::GetIndexAt(int x, int y) const
 {
-   int index = y / itemSpacing;
+   if (x >= 0 && x < mWidth)
+      return y / itemSpacing;
+   return -1;
+}
+
+std::string QuickSpawnMenu::GetElementName(int index) const
+{
    if (index >= 0 && index < mElements.size())
       return mElements[index];
 

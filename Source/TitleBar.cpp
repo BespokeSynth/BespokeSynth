@@ -49,13 +49,14 @@ namespace
    const std::string kManageVSTsLabel = "manage VSTs...";
 }
 
-SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label)
+SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label, ModuleCategory moduleCategory)
 : mLabel(label)
 , mSpawnIndex(-1)
 , mSpawnList(nullptr)
 , mOwner(owner)
 , mListManager(listManager)
 , mPos(x, y)
+, mModuleCategory(moduleCategory)
 {
 }
 
@@ -89,22 +90,22 @@ void SpawnList::OnSelection(DropdownList* list)
 {
    if (list == mSpawnList)
    {
-      IDrawableModule* module = Spawn();
+      IDrawableModule* module = Spawn(mSpawnIndex);
       if (module != nullptr)
          TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
       mSpawnIndex = -1;
    }
 }
 
-IDrawableModule* SpawnList::Spawn()
+IDrawableModule* SpawnList::Spawn(int index)
 {
-   std::string moduleType = mSpawnables[mSpawnIndex];
+   std::string moduleType = mSpawnables[index];
    if (mOverrideModuleType != "")
       moduleType = mOverrideModuleType;
 
    if (mOverrideModuleType == "vstplugin")
    {
-      if (mSpawnables[mSpawnIndex] == kManageVSTsLabel)
+      if (mSpawnables[index] == kManageVSTsLabel)
       {
          TheTitleBar->ManageVSTs();
          return nullptr;
@@ -116,13 +117,13 @@ IDrawableModule* SpawnList::Spawn()
    if (mOverrideModuleType == "vstplugin")
    {
       VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      plugin->SetVST(mSpawnables[mSpawnIndex]);
+      plugin->SetVST(mSpawnables[index]);
    }
 
    if (mOverrideModuleType == "prefab")
    {
       Prefab* prefab = dynamic_cast<Prefab*>(module);
-      prefab->LoadPrefab("prefabs" + GetPathSeparator() + mSpawnables[mSpawnIndex]);
+      prefab->LoadPrefab("prefabs" + GetPathSeparator() + mSpawnables[index]);
    }
 
    return module;
@@ -224,27 +225,27 @@ void TitleBar::OnWindowClosed()
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
-: mInstrumentModules(owner, this, 500, 16, "instruments:")
-, mNoteModules(owner, this, 0, 0, "note effects:")
-, mSynthModules(owner, this, 0, 0, "synths:")
-, mAudioModules(owner, this, 0, 0, "audio effects:")
-, mModulatorModules(owner, this, 0, 0, "modulators:")
-, mPulseModules(owner, this, 0, 0, "pulse:")
-, mVstPlugins(owner, this, 0, 0, "vst plugins:")
-, mOtherModules(owner, this, 0, 0, "other:")
-, mPrefabs(owner, this, 0, 0, "prefabs:")
+: mInstrumentModules(owner, this, 500, 16, "instruments:", kModuleCategory_Instrument)
+, mNoteModules(owner, this, 0, 0, "note effects:", kModuleCategory_Note)
+, mSynthModules(owner, this, 0, 0, "synths:", kModuleCategory_Synth)
+, mAudioModules(owner, this, 0, 0, "audio effects:", kModuleCategory_Audio)
+, mModulatorModules(owner, this, 0, 0, "modulators:", kModuleCategory_Modulator)
+, mPulseModules(owner, this, 0, 0, "pulse:", kModuleCategory_Pulse)
+, mVstPlugins(owner, this, 0, 0, "vst plugins:", kModuleCategory_Synth)
+, mOtherModules(owner, this, 0, 0, "other:", kModuleCategory_Other)
+, mPrefabs(owner, this, 0, 0, "prefabs:", kModuleCategory_Other)
 {
 }
 
 void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
 {
-   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument), "");
-   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note), "");
-   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth), "");
-   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio), "");
-   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), "");
-   mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse), "");
-   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
+   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleCategory_Instrument), "");
+   mNoteModules.SetList(factory->GetSpawnableModules(kModuleCategory_Note), "");
+   mSynthModules.SetList(factory->GetSpawnableModules(kModuleCategory_Synth), "");
+   mAudioModules.SetList(factory->GetSpawnableModules(kModuleCategory_Audio), "");
+   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleCategory_Modulator), "");
+   mPulseModules.SetList(factory->GetSpawnableModules(kModuleCategory_Pulse), "");
+   mOtherModules.SetList(factory->GetSpawnableModules(kModuleCategory_Other), "");
 
    SetUpVstDropdown();
    SetUpPrefabsDropdown();
@@ -381,21 +382,11 @@ void TitleBar::DrawModule()
 
    float x = startX;
    float y = startY;
-   std::array<SpawnList*, 9> lists = { &mSpawnLists.mInstrumentModules,
-                                       &mSpawnLists.mNoteModules,
-                                       &mSpawnLists.mSynthModules,
-                                       &mSpawnLists.mAudioModules,
-                                       &mSpawnLists.mModulatorModules,
-                                       &mSpawnLists.mPulseModules,
-                                       &mSpawnLists.mVstPlugins,
-                                       &mSpawnLists.mOtherModules,
-                                       &mSpawnLists.mPrefabs };
-
-   for (auto list : lists)
+   for (auto* spawnList : mSpawnLists.GetDropdowns())
    {
-      list->SetPosition(x, y);
+      spawnList->SetPosition(x, y);
       float w, h;
-      list->GetList()->GetDimensions(w, h);
+      spawnList->GetList()->GetDimensions(w, h);
       x += w + 5;
 
       if (x >= pixelWidth - 260)
@@ -407,24 +398,11 @@ void TitleBar::DrawModule()
 
    //temporarily fake the module type to get the colors we want for each dropdown
    auto type = GetModuleType();
-   mModuleType = kModuleType_Instrument;
-   mSpawnLists.mInstrumentModules.Draw();
-   mModuleType = kModuleType_Note;
-   mSpawnLists.mNoteModules.Draw();
-   mModuleType = kModuleType_Synth;
-   mSpawnLists.mSynthModules.Draw();
-   mModuleType = kModuleType_Audio;
-   mSpawnLists.mAudioModules.Draw();
-   mModuleType = kModuleType_Modulator;
-   mSpawnLists.mModulatorModules.Draw();
-   mModuleType = kModuleType_Pulse;
-   mSpawnLists.mPulseModules.Draw();
-   mModuleType = kModuleType_Synth;
-   mSpawnLists.mVstPlugins.Draw();
-   mModuleType = kModuleType_Other;
-   mSpawnLists.mOtherModules.Draw();
-   mModuleType = kModuleType_Other;
-   mSpawnLists.mPrefabs.Draw();
+   for (auto* spawnList : mSpawnLists.GetDropdowns())
+   {
+      mModuleType = spawnList->GetCategory();
+      spawnList->Draw();
+   }
    mModuleType = type;
 
    float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
@@ -577,15 +555,8 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
       return;
    }
 
-   mSpawnLists.mInstrumentModules.OnSelection(list);
-   mSpawnLists.mNoteModules.OnSelection(list);
-   mSpawnLists.mSynthModules.OnSelection(list);
-   mSpawnLists.mAudioModules.OnSelection(list);
-   mSpawnLists.mModulatorModules.OnSelection(list);
-   mSpawnLists.mPulseModules.OnSelection(list);
-   mSpawnLists.mVstPlugins.OnSelection(list);
-   mSpawnLists.mOtherModules.OnSelection(list);
-   mSpawnLists.mPrefabs.OnSelection(list);
+   for (auto* spawnList : mSpawnLists.GetDropdowns())
+      spawnList->OnSelection(list);
 }
 
 void TitleBar::ButtonClicked(ClickButton* button)

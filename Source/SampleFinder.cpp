@@ -195,7 +195,7 @@ void SampleFinder::DrawModule()
    }
 }
 
-bool SampleFinder::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool SampleFinder::MouseScrolled(float x, float y, float scrollX, float scrollY)
 {
    ofVec2f bufferPos = ofVec2f(ofMap(x, 5, 5 + 900, 0, 1),
                                ofMap(y, 80, 80 + 310, 0, 1));
