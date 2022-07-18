@@ -126,7 +126,7 @@ public:
    void ClearListenersAndPollers();
    double GetDuration(NoteInterval interval);
    int GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs = nullptr);
-   double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time), 1); }
+   double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time) + 1, 1); }
    void SetMeasureTime(double measureTime) { mMeasureTime = measureTime; }
    int GetMeasure(double time) const { return (int)floor(GetMeasureTime(time)); }
    double GetMeasureTime(double time) const;
@@ -218,6 +218,7 @@ private:
    int mQueuedMeasure{ -1 };
    int mQueuedMeasureSwitchAtMeasure{ -1 };
    bool mWantSetRandomTempo{ false };
+   bool mResetTransport{ true };
 
    std::list<TransportListenerInfo> mListeners;
    std::list<IAudioPoller*> mAudioPollers;

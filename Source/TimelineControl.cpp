@@ -37,6 +37,7 @@ void TimelineControl::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mTimeSlider = new FloatSlider(this, "measure", 3, 3, GetSliderWidth(), 15, &mTime, 0, mNumMeasures);
    mNumMeasuresEntry = new TextEntry(this, "length", -1, -1, 5, &mNumMeasures, 4, 2048);
+   mResetButton = new ClickButton(this, "reset", -1, -1);
    mLoopCheckbox = new Checkbox(this, "loop", -1, -1, &mLoop);
    mDockCheckbox = new Checkbox(this, "dock", -1, -1, &mDock);
    mLoopStartSlider = new IntSlider(this, "loop start", -1, -1, GetSliderWidth(), 15, &mLoopStart, 0, mNumMeasures);
@@ -44,7 +45,8 @@ void TimelineControl::CreateUIControls()
 
    mNumMeasuresEntry->DrawLabel(true);
    mNumMeasuresEntry->PositionTo(mTimeSlider, kAnchor_Below);
-   mLoopCheckbox->PositionTo(mNumMeasuresEntry, kAnchor_Right_Padded);
+   mResetButton->PositionTo(mNumMeasuresEntry, kAnchor_Right_Padded);
+   mLoopCheckbox->PositionTo(mResetButton, kAnchor_Right_Padded);
    mDockCheckbox->PositionTo(mLoopCheckbox, kAnchor_Right_Padded);
    mLoopStartSlider->PositionTo(mNumMeasuresEntry, kAnchor_Below);
    mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchor_Below);
@@ -76,6 +78,7 @@ void TimelineControl::DrawModule()
 
    mTimeSlider->Draw();
    mNumMeasuresEntry->Draw();
+   mResetButton->Draw();
    mLoopCheckbox->Draw();
    mDockCheckbox->Draw();
    mLoopStartSlider->Draw();
@@ -167,6 +170,12 @@ void TimelineControl::TextEntryComplete(TextEntry* entry)
       mLoopStartSlider->SetExtents(0, mNumMeasures);
       mLoopEndSlider->SetExtents(0, mNumMeasures);
    }
+}
+
+void TimelineControl::ButtonClicked(ClickButton* button)
+{
+   if (button == mResetButton)
+      TheTransport->Reset();
 }
 
 void TimelineControl::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -30,8 +30,9 @@
 #include "OpenFrameworksPort.h"
 #include "Slider.h"
 #include "TextEntry.h"
+#include "ClickButton.h"
 
-class TimelineControl : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener
+class TimelineControl : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    TimelineControl();
@@ -44,6 +45,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void TextEntryComplete(TextEntry* entry) override;
+   void ButtonClicked(ClickButton* button) override;
 
    bool HasTitleBar() const override { return !mDock; }
    bool IsResizable() const override { return !mDock; }
@@ -66,6 +68,7 @@ private:
    TextEntry* mNumMeasuresEntry{ nullptr };
    float mTime{ 0 };
    FloatSlider* mTimeSlider{ nullptr };
+   ClickButton* mResetButton{ nullptr };
    bool mLoop{ false };
    Checkbox* mLoopCheckbox{ nullptr };
    int mLoopStart{ 0 };
