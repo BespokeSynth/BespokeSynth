@@ -58,6 +58,7 @@ namespace VSTLookup
 {
    void GetAvailableVSTs(std::vector<PluginDescription>& vsts)
    {
+      vsts.clear();
       static bool sFirstTime = true;
       if (sFirstTime)
       {
@@ -155,11 +156,10 @@ namespace VSTLookup
       return false;
    }
 
-
    void GetRecentPlugins(std::vector<PluginDescription>& recentPlugins, int num)
    {
+      recentPlugins.clear();
       juce::PluginDescription pluginDesc{};
-      ;
       std::map<double, std::string> lastUsedTimes;
       int i = 0;
 
@@ -173,9 +173,9 @@ namespace VSTLookup
          {
             try
             {
-               std::string name = it.key().asString();
-               double time = jsonList[name].asDouble();
-               lastUsedTimes.insert(std::make_pair(time, name));
+               std::string id = it.key().asString();
+               double time = jsonList[id].asDouble();
+               lastUsedTimes.insert(std::make_pair(time, id));
             }
             catch (Json::LogicError& e)
             {
@@ -195,14 +195,14 @@ namespace VSTLookup
       }
    }
 
-   void SortByLastUsed(std::vector<std::string>& vsts)
+   void SortByLastUsed(std::vector<juce::PluginDescription>& vsts)
    {
       std::map<std::string, double> lastUsedTimes;
 
-      if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
+      if (juce::File(ofToDataPath("vst/recent_plugins.json")).existsAsFile())
       {
          ofxJSONElement root;
-         root.open(ofToDataPath("vst/used_vsts.json"));
+         root.open(ofToDataPath("vst/recent_plugins.json"));
          ofxJSONElement jsonList = root["vsts"];
 
          for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
@@ -219,10 +219,10 @@ namespace VSTLookup
          }
       }
 
-      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](std::string a, std::string b)
+      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](juce::PluginDescription a, juce::PluginDescription b)
                 {
-                   auto itA = lastUsedTimes.find(a);
-                   auto itB = lastUsedTimes.find(b);
+                   auto itA = lastUsedTimes.find(a.createIdentifierString().toStdString());
+                   auto itB = lastUsedTimes.find(b.createIdentifierString().toStdString());
                    double timeA = 0;
                    double timeB = 0;
                    if (itA != lastUsedTimes.end())
@@ -231,7 +231,7 @@ namespace VSTLookup
                       timeB = (*itB).second;
 
                    if (timeA == timeB)
-                      return a < b;
+                      return a.name < b.name;
 
                    return timeA > timeB;
                 });
@@ -358,7 +358,6 @@ void VSTPlugin::GetVSTFileDesc(std::string vstName, juce::PluginDescription& des
 
 void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
 {
-
    ofLog() << "loading Plugin: " << pluginDesc.name << "; Format: " << pluginDesc.pluginFormatName << "; ID: " << pluginDesc.uniqueId;
 
    juce::String pluginId = pluginDesc.createIdentifierString();

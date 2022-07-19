@@ -109,8 +109,7 @@ public:
 
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
-   IDrawableModule* SpawnModuleOnTheFly(std::string spawnCommand, float x, float y, bool addToContainer = true, std::string name = "");
-   IDrawableModule* SpawnPluginOnTheFly(juce::PluginDescription pluginDesc, float x, float y, bool addToContainer = true, std::string name = "");
+   IDrawableModule* SpawnModuleOnTheFly(ModuleFactory::Spawnable spawnable, float x, float y, bool addToContainer = true, std::string name = "");
 
    void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY, bool canStickToCursor);
 

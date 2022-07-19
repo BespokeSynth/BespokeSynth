@@ -123,8 +123,7 @@ void HelpDisplay::DrawModule()
          std::string typeName = mScreenshotModule->GetTypeName();
          if (!mScreenshotsToProcess.empty())
          {
-            typeName = *mScreenshotsToProcess.begin();
-            ofStringReplace(typeName, " " + std::string(ModuleFactory::kEffectChainSuffix), ""); //strip this suffix if it's there
+            typeName = mScreenshotsToProcess.begin()->mLabel;
             mScreenshotsToProcess.pop_front();
          }
 
@@ -143,7 +142,7 @@ void HelpDisplay::DrawModule()
       {
          mScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
 
-         if (mScreenshotsToProcess.front() == "drumplayer")
+         if (mScreenshotsToProcess.front().mLabel == "drumplayer")
             mScreenshotModule->FindUIControl("edit")->SetValue(1);
 
          sScreenshotDelay = 10;
@@ -393,8 +392,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
-         for (auto toSpawn : spawnable)
+         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         for (auto toSpawn : modules)
             TheSynth->SpawnModuleOnTheFly(toSpawn, 0, 0);
       }
 
@@ -481,13 +480,18 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
-         for (auto toSpawn : spawnable)
+         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         for (auto toSpawn : modules)
             mScreenshotsToProcess.push_back(toSpawn);
       }
 
       for (auto effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
-         mScreenshotsToProcess.push_back(effect + " " + ModuleFactory::kEffectChainSuffix);
+      {
+         ModuleFactory::Spawnable spawnable;
+         spawnable.mLabel = effect;
+         spawnable.mSpawnMethod = ModuleFactory::SpawnMethod::EffectChain;
+         mScreenshotsToProcess.push_back(spawnable);
+      }
    }
    if (button == mDoModuleDocumentationButton)
    {
@@ -524,8 +528,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
-         for (auto toSpawn : spawnable)
+         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         for (auto toSpawn : modules)
          {
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);
 
@@ -543,10 +547,10 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
                case kModuleType_Unknown: moduleType = "unknown"; break;
             }
 
-            docs[toSpawn]["type"] = moduleType;
-            docs[toSpawn]["canReceiveAudio"] = module->CanReceiveAudio();
-            docs[toSpawn]["canReceiveNote"] = module->CanReceiveNotes();
-            docs[toSpawn]["canReceivePulses"] = module->CanReceivePulses();
+            docs[toSpawn.mLabel]["type"] = moduleType;
+            docs[toSpawn.mLabel]["canReceiveAudio"] = module->CanReceiveAudio();
+            docs[toSpawn.mLabel]["canReceiveNote"] = module->CanReceiveNotes();
+            docs[toSpawn.mLabel]["canReceivePulses"] = module->CanReceivePulses();
 
             module->GetOwningContainer()->DeleteModule(module);
          }

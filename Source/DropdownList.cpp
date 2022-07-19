@@ -267,6 +267,15 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
          ofRect(mMaxItemWidth * col, (i % maxPerColumn) * kItemSpacing + pageHeaderShift, mMaxItemWidth, kItemSpacing);
       }
 
+      if (VectorContains(i, mSeparators))
+      {
+         ofPushStyle();
+         ofSetColor(100, 100, 100, 100);
+         ofSetLineWidth(.5f);
+         ofLine(mMaxItemWidth * col + 3, (i % maxPerColumn) * kItemSpacing + pageHeaderShift, mMaxItemWidth * (col + 1) - 3, (i % maxPerColumn) * kItemSpacing + pageHeaderShift);
+         ofPopStyle();
+      }
+
       if (mVar && mElements[i].mValue == *mVar)
          ofSetColor(255, 255, 0);
       else

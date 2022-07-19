@@ -29,6 +29,7 @@
 #include "IDrawableModule.h"
 #include "RadioButton.h"
 #include "ClickButton.h"
+#include "ModuleFactory.h"
 
 class HelpDisplay : public IDrawableModule, public IRadioButtonListener, public IButtonListener
 {
@@ -94,7 +95,7 @@ private:
    static bool sTooltipsLoaded;
    static std::list<ModuleTooltipInfo> sTooltips;
 
-   std::list<std::string> mScreenshotsToProcess;
+   std::list<ModuleFactory::Spawnable> mScreenshotsToProcess;
    IDrawableModule* mScreenshotModule;
 };
 

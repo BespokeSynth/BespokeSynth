@@ -131,6 +131,8 @@ public:
    DropdownListModal* GetModalDropdown() { return &mModalList; }
    float GetMaxItemWidth() const { return mMaxItemWidth; }
    void ChangePage(int direction);
+   void AddSeparator(int index) { mSeparators.push_back(index); }
+   void ClearSeparators() { mSeparators.clear(); }
 
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override;
@@ -181,6 +183,7 @@ private:
    bool mAutoCalculateWidth;
    bool mDrawTriangle;
    double mLastScrolledTime;
+   std::vector<int> mSeparators;
 };
 
 #endif /* defined(__modularSynth__DropdownList__) */

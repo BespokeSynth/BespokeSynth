@@ -28,9 +28,7 @@
 #pragma once
 
 #include "IDrawableModule.h"
-
-#include "juce_core/juce_core.h"
-#include "juce_audio_processors/juce_audio_processors.h"
+#include "ModuleFactory.h"
 
 class QuickSpawnMenu : public IDrawableModule
 {
@@ -56,18 +54,8 @@ public:
 
    bool IsSingleton() const override { return true; }
 
-   struct Element
-   {
-      std::string mLabel = "";
-      std::string pluginFormat = "";
-      std::string mType = "";
-      juce::PluginDescription mDesc{};
-   };
-
 private:
-   std::string GetModuleTypeNameAt(int x, int y);
-   std::string GetPluginFormatAt(int x, int y);
-   juce::PluginDescription getPluginDescAt(int x, int y);
+   const ModuleFactory::Spawnable* GetElementAt(int x, int y) const;
    void UpdateDisplay();
 
    void OnClicked(float x, float y, bool right) override;
@@ -83,7 +71,7 @@ private:
    int mLastHoverY{ 0 };
    juce::String mHeldKeys;
    ofVec2f mAppearAtMousePos;
-   std::vector<Element> mElements;
+   std::vector<ModuleFactory::Spawnable> mElements;
 };
 
 extern QuickSpawnMenu* TheQuickSpawnMenu;

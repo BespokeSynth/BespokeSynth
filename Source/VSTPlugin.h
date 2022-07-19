@@ -55,7 +55,7 @@ namespace VSTLookup
    bool GetPluginDesc(juce::PluginDescription& desc, int id);
    bool GetPluginDesc(juce::PluginDescription& desc, std::string vstName);
    bool GetPluginDesc(juce::PluginDescription& desc, juce::String pluginId);
-   void SortByLastUsed(std::vector<std::string>& vsts);
+   void SortByLastUsed(std::vector<juce::PluginDescription>& vsts);
    void GetRecentPlugins(std::vector<juce::PluginDescription>& recentPlugins, int num);
 }
 

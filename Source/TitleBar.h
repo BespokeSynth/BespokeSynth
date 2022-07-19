@@ -35,6 +35,7 @@
 #include "Slider.h"
 #include "VSTPlugin.h"
 #include "WindowCloseListener.h"
+#include "ModuleFactory.h"
 
 class ModuleFactory;
 class TitleBar;
@@ -46,10 +47,8 @@ class SpawnList
 {
 public:
    SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label);
-   void SetList(std::vector<std::string> spawnables, std::string overrideModuleType);
-   void SetListPlugins(std::vector<std::pair<std::string, juce::PluginDescription>> spawnablePlugins, std::string overrideModuleType);
+   void SetList(std::vector<ModuleFactory::Spawnable> spawnables, std::string overrideModuleType, bool showDecorators = true);
    void OnSelection(DropdownList* list);
-   void OnSelectionPlugin(DropdownList* list);
    void SetPosition(int x, int y);
    void SetPositionRelativeTo(SpawnList* list);
    void Draw();
@@ -59,8 +58,7 @@ public:
 
 private:
    std::string mLabel;
-   std::vector<std::string> mSpawnables;
-   std::vector<std::pair<std::string, juce::PluginDescription>> mSpawnablePlugins;
+   std::vector<ModuleFactory::Spawnable> mSpawnables;
    int mSpawnIndex;
    DropdownList* mSpawnList;
    IDropdownListener* mOwner;

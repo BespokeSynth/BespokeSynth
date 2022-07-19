@@ -530,7 +530,9 @@ bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* 
             else if (mType == kConnectionType_Audio)
             {
                ofVec2f spawnOffset(-20, 10);
-               AudioSend* send = dynamic_cast<AudioSend*>(TheSynth->SpawnModuleOnTheFly("send", x + spawnOffset.x, y + spawnOffset.y));
+               ModuleFactory::Spawnable spawnable;
+               spawnable.mLabel = "send";
+               AudioSend* send = dynamic_cast<AudioSend*>(TheSynth->SpawnModuleOnTheFly(spawnable, x + spawnOffset.x, y + spawnOffset.y));
                send->SetTarget(GetTarget());
                SetTarget(send);
                send->SetSend(1, false);
@@ -539,7 +541,9 @@ bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* 
             else if (mType == kConnectionType_Modulator)
             {
                ofVec2f spawnOffset(-20, 10);
-               MacroSlider* macroSlider = dynamic_cast<MacroSlider*>(TheSynth->SpawnModuleOnTheFly("macroslider", x + spawnOffset.x, y + spawnOffset.y));
+               ModuleFactory::Spawnable spawnable;
+               spawnable.mLabel = "macroslider";
+               MacroSlider* macroSlider = dynamic_cast<MacroSlider*>(TheSynth->SpawnModuleOnTheFly(spawnable, x + spawnOffset.x, y + spawnOffset.y));
                IUIControl* currentTarget = dynamic_cast<IUIControl*>(GetTarget());
                SetTarget(macroSlider->GetSlider());
                macroSlider->SetOutputTarget(0, currentTarget);
