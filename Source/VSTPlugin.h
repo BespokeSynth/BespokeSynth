@@ -140,8 +140,11 @@ private:
    juce::MidiBuffer mMidiBuffer;
    juce::MidiBuffer mFutureMidiBuffer;
    juce::CriticalSection mMidiInputLock;
-   int mNumInputs{ 2 };
-   int mNumOutputs{ 2 };
+   int mNumInputChannels{ 2 };
+   int mNumOutputChannels{ 2 };
+
+   int mNumInBusses{ 0 };
+   int mNumOutBusses{ 0 };
 
    struct ParameterSlider
    {

@@ -383,9 +383,9 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
                //instance->enableAllBuses();
                instance->prepareToPlay(gSampleRate, gBufferSize);
                instance->setPlayHead(&mPlayhead);
-               mNumInputs = CLAMP(instance->getTotalNumInputChannels(), 1, 4);
-               mNumOutputs = CLAMP(instance->getTotalNumOutputChannels(), 1, 4);
-               ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
+               mNumInputChannels = CLAMP(instance->getTotalNumInputChannels(), 1, 4);
+               mNumOutputChannels = CLAMP(instance->getTotalNumOutputChannels(), 1, 4);
+               ofLog() << "vst inputs: " << mNumInputChannels << "  vst outputs: " << mNumOutputChannels;
                mPlugin = std::move(instance);
                mVSTMutex.unlock();
             }
@@ -402,28 +402,24 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    if (mPlugin != nullptr)
    {
       mPlugin->enableAllBuses();
-      mPlugin->disableNonMainBuses();
       mPlugin->addListener(this);
 
       /*
        * For now, since Bespoke is at best stereo in stereo out,
        * Disable all non-main input and output busses
        */
+      mNumInputChannels = mPlugin->getTotalNumInputChannels();
+      mNumOutputChannels = mPlugin->getTotalNumOutputChannels();
+      ofLog() << "vst channel - inputs: " << mNumInputChannels << " x outputs: " << mNumOutputChannels;
+
       auto layouts = mPlugin->getBusesLayout();
-
-      for (int busIndex = 1; busIndex < layouts.outputBuses.size(); ++busIndex)
-         layouts.outputBuses.getReference(busIndex) = AudioChannelSet::disabled();
-      for (int busIndex = 1; busIndex < layouts.inputBuses.size(); ++busIndex)
-         layouts.inputBuses.getReference(busIndex) = AudioChannelSet::disabled();
-
+      mNumInBusses = layouts.inputBuses.size();
+      mNumOutBusses = layouts.outputBuses.size();
+      mPlugin->enableAllBuses();
       ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
-      mPlugin->setBusesLayout(layouts);
 
       mPlugin->prepareToPlay(gSampleRate, gBufferSize);
       mPlugin->setPlayHead(&mPlayhead);
-      mNumInputs = mPlugin->getTotalNumInputChannels();
-      mNumOutputs = mPlugin->getTotalNumOutputChannels();
-      ofLog() << "vst channel - inputs: " << mNumInputs << " x outputs: " << mNumOutputs;
 
       mPluginName = mPlugin->getName().toStdString();
 
@@ -577,7 +573,8 @@ void VSTPlugin::Process(double time)
 
    PROFILER(VSTPlugin);
 
-   int inputChannels = MAX(2, mNumInputs);
+   int inputChannels = MAX(2, mNumInputChannels);
+   int outputChannels = MAX(2, mNumOutputChannels);
    GetBuffer()->SetNumActiveChannels(inputChannels);
    SyncBuffers();
 
@@ -585,7 +582,7 @@ void VSTPlugin::Process(double time)
     * Multi-out VSTs which can't disable those outputs will expect *something* in the
     * buffer even though we don't read it.
     */
-   int bufferChannels = MAX(inputChannels, mNumOutputs); // how much to allocate in the juce::AudioBuffer
+   int bufferChannels = MAX(MAX(inputChannels * mNumInBusses, outputChannels * mNumOutBusses), 2); // how much to allocate in the juce::AudioBuffer
 
    const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
 
