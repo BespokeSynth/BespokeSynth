@@ -744,7 +744,6 @@ target_compile_definitions(BespokeSynth PRIVATE
 if (APPLE)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_MAC=1
-        JUCE_PLUGINHOST_AU=1 # this needs work but if you turn it to 1 with the link below it works
         )
     target_sources(BespokeSynth PRIVATE
         CFMessaging/KontrolKommunicator.cpp
