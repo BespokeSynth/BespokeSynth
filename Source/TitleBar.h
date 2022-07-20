@@ -46,15 +46,13 @@ class PluginListWindow;
 class SpawnList
 {
 public:
-   SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label);
-   void SetList(std::vector<ModuleFactory::Spawnable> spawnables, std::string overrideModuleType, bool showDecorators = true);
+   SpawnList(IDropdownListener* owner, int x, int y, std::string label);
+   void SetList(std::vector<ModuleFactory::Spawnable> spawnables, bool showDecorators = true);
    void OnSelection(DropdownList* list);
    void SetPosition(int x, int y);
-   void SetPositionRelativeTo(SpawnList* list);
    void Draw();
    DropdownList* GetList() { return mSpawnList; }
    IDrawableModule* Spawn();
-   IDrawableModule* SpawnPlugin();
 
 private:
    std::string mLabel;
@@ -62,9 +60,7 @@ private:
    int mSpawnIndex;
    DropdownList* mSpawnList;
    IDropdownListener* mOwner;
-   SpawnListManager* mListManager;
    ofVec2f mPos;
-   std::string mOverrideModuleType;
 };
 
 struct SpawnListManager

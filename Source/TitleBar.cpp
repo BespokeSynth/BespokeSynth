@@ -47,22 +47,20 @@ bool TitleBar::sShowInitialHelpOverlay = true;
 namespace
 {
    const std::string kManagePluginsLabel = "manage plugins...";
-   std::string separator = " - - - - - - ";
+   const std::string kPluginsDropdownLabel = "plugins:";
 }
 
-SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label)
+SpawnList::SpawnList(IDropdownListener* owner, int x, int y, std::string label)
 : mLabel(label)
 , mSpawnIndex(-1)
 , mSpawnList(nullptr)
 , mOwner(owner)
-, mListManager(listManager)
 , mPos(x, y)
 {
 }
 
-void SpawnList::SetList(std::vector<ModuleFactory::Spawnable> spawnables, std::string overrideModuleType, bool showDecorators)
+void SpawnList::SetList(std::vector<ModuleFactory::Spawnable> spawnables, bool showDecorators)
 {
-   mOverrideModuleType = overrideModuleType;
    if (mSpawnList == nullptr)
       mSpawnList = new DropdownList(mOwner, mLabel.c_str(), mPos.x, mPos.y, &mSpawnIndex);
    mSpawnList->SetNoHover(true);
@@ -75,7 +73,7 @@ void SpawnList::SetList(std::vector<ModuleFactory::Spawnable> spawnables, std::s
       std::string name = mSpawnables[i].mLabel;
       if (showDecorators && !mSpawnables[i].mDecorator.empty())
          name += " " + mSpawnables[i].mDecorator;
-      if (mOverrideModuleType == "" && TheSynth->GetModuleFactory()->IsExperimental(name))
+      if (TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
       mSpawnList->AddLabel(name, i);
    }
@@ -99,7 +97,7 @@ void SpawnList::OnSelection(DropdownList* list)
 
 IDrawableModule* SpawnList::Spawn()
 {
-   if (mOverrideModuleType == "vstplugin" && mSpawnIndex == 0)
+   if (mLabel == kPluginsDropdownLabel && mSpawnIndex == 0)
    {
       TheTitleBar->ManagePlugins();
       return nullptr;
@@ -121,14 +119,6 @@ void SpawnList::Draw()
 void SpawnList::SetPosition(int x, int y)
 {
    mSpawnList->SetPosition(x, y);
-}
-
-void SpawnList::SetPositionRelativeTo(SpawnList* list)
-{
-   float x, y, w, h;
-   list->mSpawnList->GetPosition(x, y, true);
-   list->mSpawnList->GetDimensions(w, h);
-   mSpawnList->SetPosition(x + w + 5, y);
 }
 
 TitleBar::TitleBar()
@@ -206,27 +196,27 @@ void TitleBar::OnWindowClosed()
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
-: mInstrumentModules(owner, this, 500, 16, "instruments:")
-, mNoteModules(owner, this, 0, 0, "note effects:")
-, mSynthModules(owner, this, 0, 0, "synths:")
-, mAudioModules(owner, this, 0, 0, "audio effects:")
-, mModulatorModules(owner, this, 0, 0, "modulators:")
-, mPulseModules(owner, this, 0, 0, "pulse:")
-, mPlugins(owner, this, 0, 0, "plugins:")
-, mOtherModules(owner, this, 0, 0, "other:")
-, mPrefabs(owner, this, 0, 0, "prefabs:")
+: mInstrumentModules(owner, 500, 16, "instruments:")
+, mNoteModules(owner, 0, 0, "note effects:")
+, mSynthModules(owner, 0, 0, "synths:")
+, mAudioModules(owner, 0, 0, "audio effects:")
+, mModulatorModules(owner, 0, 0, "modulators:")
+, mPulseModules(owner, 0, 0, "pulse:")
+, mPlugins(owner, 0, 0, kPluginsDropdownLabel)
+, mOtherModules(owner, 0, 0, "other:")
+, mPrefabs(owner, 0, 0, "prefabs:")
 {
 }
 
 void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
 {
-   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument), "");
-   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note), "");
-   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth), "");
-   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio), "");
-   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), "");
-   mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse), "");
-   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
+   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument));
+   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note));
+   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth));
+   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio));
+   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator));
+   mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse));
+   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other));
 
    SetUpPluginsDropdown();
    SetUpPrefabsDropdown();
@@ -246,7 +236,7 @@ void SpawnListManager::SetUpPrefabsDropdown()
 {
    std::vector<ModuleFactory::Spawnable> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
-   mPrefabs.SetList(prefabs, "prefab", false);
+   mPrefabs.SetList(prefabs, false);
 }
 
 void SpawnListManager::SetUpPluginsDropdown()
@@ -281,7 +271,7 @@ void SpawnListManager::SetUpPluginsDropdown()
       list.push_back(spawnable);
    }
 
-   mPlugins.SetList(list, "vstplugin");
+   mPlugins.SetList(list);
    mPlugins.GetList()->ClearSeparators();
    mPlugins.GetList()->AddSeparator(1);
    if (!recentPlugins.empty())
@@ -467,7 +457,7 @@ void TitleBar::DrawModuleUnclipped()
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 50 + titleBarHeight;
-      gFontBold.DrawString("please close Plugin manager to continue", 50, x, y);
+      gFontBold.DrawString("please close plugin manager to continue", 50, x, y);
       ofPopStyle();
       return;
    }

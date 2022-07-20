@@ -52,8 +52,6 @@ namespace VSTLookup
    void GetAvailableVSTs(std::vector<juce::PluginDescription>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
-   bool GetPluginDesc(juce::PluginDescription& desc, int id);
-   bool GetPluginDesc(juce::PluginDescription& desc, std::string vstName);
    bool GetPluginDesc(juce::PluginDescription& desc, juce::String pluginId);
    void SortByLastUsed(std::vector<juce::PluginDescription>& vsts);
    void GetRecentPlugins(std::vector<juce::PluginDescription>& recentPlugins, int num);
@@ -163,6 +161,7 @@ private:
    bool mUseVoiceAsChannel{ false };
    float mPitchBendRange{ 2 };
    int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
+   std::string mOldVstPath{ "" }; //for loading save files that predate pluginId-style saving
 
    struct ChannelModulations
    {

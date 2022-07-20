@@ -462,7 +462,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleType_Audio);
    REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleType_Other);
    REGISTER_HIDDEN(ComboGridController, combogrid, kModuleType_Other);
-   REGISTER_HIDDEN(VSTPlugin, vstplugin, kModuleType_Synth);
+   REGISTER_HIDDEN(VSTPlugin, plugin, kModuleType_Synth);
    REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleType_Audio);
    REGISTER_HIDDEN(Producer, producer, kModuleType_Audio);
    REGISTER_HIDDEN(ChaosEngine, chaosengine, kModuleType_Other);
@@ -718,6 +718,9 @@ std::string ModuleFactory::FixUpTypeName(std::string name)
 
    if (name == "bandvocoder")
       return "vocoder";
+
+   if (name == "vstplugin")
+      return "plugin";
 
    return name;
 }
