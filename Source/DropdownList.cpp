@@ -83,20 +83,6 @@ void DropdownList::AddLabel(std::string label, int value)
    CalcSliderVal();
 }
 
-void DropdownList::AddLabel(std::pair<std::string, juce::PluginDescription> desc, int value)
-{
-   DropdownListElement element;
-   element.mLabel = desc.first.c_str();
-   element.mDesc = desc;
-   element.mValue = value;
-   mElements.push_back(element);
-
-   CalculateWidth();
-   mHeight = kItemSpacing;
-
-   CalcSliderVal();
-}
-
 void DropdownList::RemoveLabel(int value)
 {
    for (auto iter = mElements.begin(); iter != mElements.end(); ++iter)
