@@ -482,7 +482,7 @@ private:
       }
 #endif
 
-      if (key.getKeyCode() == juce::KeyPress::tabKey)
+      if (key.getKeyCode() == juce::KeyPress::F2Key)
       {
          mSynth.ToggleQuickSpawn();
          return true;
