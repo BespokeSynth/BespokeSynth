@@ -1560,6 +1560,18 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    }
 }
 
+void ModularSynth::ToggleQuickSpawn()
+{
+   if (mQuickSpawn != nullptr && mQuickSpawn->IsShowing())
+   {
+      mQuickSpawn->SetShowing(false);
+   }
+   else
+   {
+      mQuickSpawn->ShowSpawnCategoriesPopup();
+   }
+}
+
 void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
 {
    x *= UserPrefs.scroll_multiplier_horizontal.Get();

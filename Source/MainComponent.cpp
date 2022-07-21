@@ -482,6 +482,12 @@ private:
       }
 #endif
 
+      if (key.getKeyCode() == juce::KeyPress::tabKey)
+      {
+         mSynth.ToggleQuickSpawn();
+         return true;
+      }
+
       int keyCode = key.getTextCharacter();
       if (keyCode < 32 || key.getModifiers().isAltDown())
          keyCode = key.getKeyCode();

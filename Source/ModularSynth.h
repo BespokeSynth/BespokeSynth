@@ -256,6 +256,7 @@ public:
    void SaveCurrentState();
    void SaveStatePopup();
    void LoadStatePopup();
+   void ToggleQuickSpawn();
    double GetLastSaveTime() { return mLastSaveTime; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
