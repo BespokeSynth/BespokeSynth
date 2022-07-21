@@ -173,7 +173,7 @@ bool Curve::MouseMoved(float x, float y)
    return false;
 }
 
-bool Curve::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool Curve::MouseScrolled(float x, float y, float scrollX, float scrollY)
 {
    ofLog() << "curve mousescrolled";
    return false;

@@ -819,7 +819,7 @@ void VSTPlugin::DrawModule()
    mShowParameterDropdown->Draw();
 
    ofPushStyle();
-   ofSetColor(IDrawableModule::GetColor(kModuleType_Note));
+   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Note));
    DrawTextRightJustify("midi out:", 206 - 18, 14);
    ofPopStyle();
 

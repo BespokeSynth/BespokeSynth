@@ -51,7 +51,7 @@ void Presets::CreateUIControls()
 
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
-      ofColor color = IDrawableModule::GetColor(kModuleType_Other);
+      ofColor color = IDrawableModule::GetColor(kModuleCategory_Other);
       color.a *= .3f;
       mModuleCable->SetColor(color);
       mModuleCable->SetManualPosition(10, 10);
@@ -62,7 +62,7 @@ void Presets::CreateUIControls()
 
    {
       mUIControlCable = new PatchCableSource(this, kConnectionType_UIControl);
-      ofColor color = IDrawableModule::GetColor(kModuleType_Modulator);
+      ofColor color = IDrawableModule::GetColor(kModuleCategory_Modulator);
       color.a *= .3f;
       mUIControlCable->SetColor(color);
       mUIControlCable->SetManualPosition(25, 10);

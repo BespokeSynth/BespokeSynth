@@ -401,7 +401,7 @@ bool UIGrid::MouseMoved(float x, float y)
    return false;
 }
 
-bool UIGrid::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool UIGrid::MouseScrolled(float x, float y, float scrollX, float scrollY)
 {
    if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar)
    {

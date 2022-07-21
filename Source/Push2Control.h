@@ -94,7 +94,7 @@ private:
    void RemoveFavoriteControl(IUIControl* control);
    void BookmarkModuleToSlot(int slotIndex, IDrawableModule* module);
    void SwitchToBookmarkedModule(int slotIndex);
-   int GetPadColorForType(ModuleType type);
+   int GetPadColorForType(ModuleCategory type);
    bool GetGridIndex(int gridX, int gridY, int& gridIndex)
    {
       gridIndex = gridX + gridY * 8;
@@ -105,9 +105,9 @@ private:
    void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
    void DrawDisplayModuleRect(ofRectangle rect);
    std::string GetModuleTypeToSpawn();
-   ModuleType GetModuleTypeForSpawnList(IUIControl* control);
-   ofColor GetSpawnGridColor(int index, ModuleType moduleType) const;
-   int GetSpawnGridPadColor(int index, ModuleType moduleType) const;
+   ModuleCategory GetModuleTypeForSpawnList(IUIControl* control);
+   ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
+   int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
 
    unsigned char* mPixels;
    const int kPixelRatio = 1;

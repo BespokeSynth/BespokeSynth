@@ -1093,9 +1093,9 @@ void MidiController::DrawModule()
             else
             {
                if (control.mLastActivityTime > 0)
-                  ofSetColor(IDrawableModule::GetColor(GetModuleType()), gModuleDrawAlpha);
+                  ofSetColor(IDrawableModule::GetColor(GetModuleCategory()), gModuleDrawAlpha);
                else
-                  ofSetColor(IDrawableModule::GetColor(GetModuleType()), gModuleDrawAlpha * .3f);
+                  ofSetColor(IDrawableModule::GetColor(GetModuleCategory()), gModuleDrawAlpha * .3f);
             }
 
             if (control.mDrawType == kDrawType_Button)

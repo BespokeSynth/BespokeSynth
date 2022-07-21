@@ -52,7 +52,7 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
    SetParent(dynamic_cast<IClickable*>(owner));
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
 
-   mModalList.SetTypeName("dropdownlist");
+   mModalList.SetTypeName("dropdownlist", kModuleCategory_Other);
 
    if (width == -1)
       mAutoCalculateWidth = true;
@@ -197,7 +197,7 @@ void DropdownList::Render()
 
       ofPushStyle();
       ofFill();
-      ofColor color = IDrawableModule::GetColor(GetModuleParent()->GetModuleType());
+      ofColor color = IDrawableModule::GetColor(GetModuleParent()->GetModuleCategory());
       color.a = 80;
       ofSetColor(color);
       ofRect(mX, mY, w, mHeight);

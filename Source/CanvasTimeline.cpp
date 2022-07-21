@@ -200,7 +200,7 @@ bool CanvasTimeline::MouseMoved(float x, float y)
    return false;
 }
 
-bool CanvasTimeline::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool CanvasTimeline::MouseScrolled(float x, float y, float scrollX, float scrollY)
 {
    return false;
 }

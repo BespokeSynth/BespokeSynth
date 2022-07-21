@@ -48,6 +48,8 @@ public:
    bool IsSaveable() override { return false; }
    std::string GetHoveredModuleTypeName();
 
+   void ShowSpawnCategoriesPopup();
+
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
    void MouseReleased() override;
@@ -56,15 +58,30 @@ public:
 
 private:
    const ModuleFactory::Spawnable* GetElementAt(int x, int y) const;
+   int GetIndexAt(int x, int y) const;
    void UpdateDisplay();
+   void OnSelectItem(int index);
+   void MoveMouseToIndex(int index);
+   void ResetAppearPos();
+   void UpdatePosition();
 
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;
       height = mHeight;
    }
+
+   enum class MenuMode
+   {
+      SingleLetter,
+      ModuleCategories,
+      SingleCategory,
+      Search
+   };
+
    float mWidth{ 200 };
    float mHeight{ 20 };
    int mLastHoverX{ 0 };
@@ -72,6 +89,11 @@ private:
    juce::String mHeldKeys;
    ofVec2f mAppearAtMousePos;
    std::vector<ModuleFactory::Spawnable> mElements;
+   int mHighlightIndex{ -1 };
+   MenuMode mMenuMode{ MenuMode::SingleLetter };
+   int mSelectedCategoryIndex{ -1 };
+   juce::String mSearchString;
+   float mScrollOffset{ 0 };
 };
 
 extern QuickSpawnMenu* TheQuickSpawnMenu;

@@ -44,17 +44,17 @@ class PatchCableSource;
 class ModuleContainer;
 class UIGrid;
 
-enum ModuleType
+enum ModuleCategory
 {
-   kModuleType_Note,
-   kModuleType_Synth,
-   kModuleType_Audio,
-   kModuleType_Instrument,
-   kModuleType_Processor,
-   kModuleType_Modulator,
-   kModuleType_Pulse,
-   kModuleType_Other,
-   kModuleType_Unknown
+   kModuleCategory_Note,
+   kModuleCategory_Synth,
+   kModuleCategory_Audio,
+   kModuleCategory_Instrument,
+   kModuleCategory_Processor,
+   kModuleCategory_Modulator,
+   kModuleCategory_Pulse,
+   kModuleCategory_Other,
+   kModuleCategory_Unknown
 };
 
 struct PatchCableOld
@@ -113,7 +113,7 @@ public:
    virtual std::string GetTitleLabel() const { return Name(); }
    virtual bool HasTitleBar() const { return true; }
    static float TitleBarHeight() { return mTitleBarHeight; }
-   static ofColor GetColor(ModuleType type);
+   static ofColor GetColor(ModuleCategory type);
    virtual void SetEnabled(bool enabled) {}
    virtual bool CanMinimize() { return true; }
    virtual void SampleDropped(int x, int y, Sample* sample) {}
@@ -125,14 +125,18 @@ public:
    virtual bool IsResizable() const { return false; }
    virtual void Resize(float width, float height) { assert(false); }
    bool IsHoveringOverResizeHandle() const { return mHoveringOverResizeHandle; }
-   void SetTypeName(std::string type) { mTypeName = type; }
+   void SetTypeName(std::string type, ModuleCategory category)
+   {
+      mTypeName = type;
+      mModuleCategory = category;
+   }
    void SetTarget(IClickable* target);
    void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
    void RemovePatchCableSource(PatchCableSource* source);
    bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    std::string GetTypeName() const { return mTypeName; }
-   ModuleType GetModuleType() const { return mModuleType; }
+   ModuleCategory GetModuleCategory() const { return mModuleCategory; }
    virtual bool IsSingleton() const { return false; }
    virtual bool CanBeDeleted() const { return (IsSingleton() ? false : true); }
    virtual bool HasSpecialDelete() const { return false; }
@@ -205,7 +209,7 @@ protected:
    ModuleSaveData mModuleSaveData;
    Checkbox* mEnabledCheckbox;
    bool mEnabled;
-   ModuleType mModuleType;
+   ModuleCategory mModuleCategory;
 
 private:
    virtual void PreDrawModule() {}

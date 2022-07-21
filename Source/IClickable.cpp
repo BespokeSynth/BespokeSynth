@@ -80,7 +80,7 @@ bool IClickable::NotifyMouseMoved(float x, float y)
    return MouseMoved(x - mX, y - mY);
 }
 
-bool IClickable::NotifyMouseScrolled(int x, int y, float scrollX, float scrollY)
+bool IClickable::NotifyMouseScrolled(float x, float y, float scrollX, float scrollY)
 {
    if (!mShowing)
       return false;

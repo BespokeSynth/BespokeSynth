@@ -155,6 +155,7 @@ public:
    float GetRawMouseY() { return mMousePos.y; }
    float GetMouseX(ModuleContainer* context, float rawX = FLT_MAX);
    float GetMouseY(ModuleContainer* context, float rawY = FLT_MAX);
+   void SetMousePosition(ModuleContainer* context, float x, float y);
    bool IsMouseButtonHeld(int button) const;
    ofVec2f& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
    void SetDrawOffset(ofVec2f offset) { mModuleContainer.SetDrawOffset(offset); }
@@ -366,6 +367,7 @@ private:
    int mClickStartX; //to detect click and release in place
    int mClickStartY;
    bool mMouseMovedSignificantlySincePressed{ true };
+   bool mLastClickWasEmptySpace{ false };
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout;

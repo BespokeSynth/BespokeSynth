@@ -1197,7 +1197,7 @@ bool CodeEntry::MouseMoved(float x, float y)
    return false;
 }
 
-bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool CodeEntry::MouseScrolled(float x, float y, float scrollX, float scrollY)
 {
    if (fabs(scrollX) > fabsf(scrollY))
       scrollY = 0;

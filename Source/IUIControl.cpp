@@ -189,7 +189,7 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
 {
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(GetParent());
    if (module)
-      color = IDrawableModule::GetColor(module->GetModuleType());
+      color = IDrawableModule::GetColor(module->GetModuleCategory());
    else
       color = ofColor::white;
    float h, s, b;

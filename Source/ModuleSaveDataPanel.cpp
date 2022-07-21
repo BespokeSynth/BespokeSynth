@@ -35,7 +35,7 @@
 
 ModuleSaveDataPanel* TheSaveDataPanel = nullptr;
 
-const float itemSpacing = 20;
+const float kItemSpacing = 20;
 
 ModuleSaveDataPanel::ModuleSaveDataPanel()
 {
@@ -98,12 +98,12 @@ void ModuleSaveDataPanel::ReloadSaveData()
 
    mAlignmentX = 10 + maxWidth;
    int x = mAlignmentX;
-   int y = 5 + itemSpacing;
+   int y = 5 + kItemSpacing;
 
    mNameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
    mNameEntry->SetNoHover(true);
    mSaveDataControls.push_back(mNameEntry);
-   y += itemSpacing;
+   y += kItemSpacing;
 
    TextEntry* prevTextEntry = mNameEntry;
 
@@ -167,7 +167,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
       if (control != nullptr)
          control->SetNoHover(true);
       mSaveDataControls.push_back(control);
-      y += itemSpacing;
+      y += kItemSpacing;
    }
 
    y += 6;
@@ -180,14 +180,14 @@ void ModuleSaveDataPanel::ReloadSaveData()
       mDeleteButton->SetNoHover(true);
       mSaveDataControls.push_back(mDeleteButton);
    }
-   y += itemSpacing;
+   y += kItemSpacing;
 
    if (mSaveModule->HasDebugDraw())
    {
       mDrawDebugCheckbox = new Checkbox(this, "draw debug", x, y, &mSaveModule->mDrawDebug);
       mDrawDebugCheckbox->SetNoHover(true);
       mSaveDataControls.push_back(mDrawDebugCheckbox);
-      y += itemSpacing;
+      y += kItemSpacing;
    }
 
    IDrivableSequencer* sequencer = dynamic_cast<IDrivableSequencer*>(mSaveModule);
@@ -196,7 +196,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
       mResetSequencerButton = new ClickButton(this, "resume self-advance mode", x, y);
       mResetSequencerButton->SetNoHover(true);
       mSaveDataControls.push_back(mResetSequencerButton);
-      y += itemSpacing;
+      y += kItemSpacing;
    }
 
    mHeight = y + 5;
@@ -212,15 +212,15 @@ void ModuleSaveDataPanel::DrawModule()
 
    DrawTextRightJustify("type", x, y + 12);
    DrawTextBold(mSaveModule->GetTypeName(), mAlignmentX, y + 12);
-   y += itemSpacing;
+   y += kItemSpacing;
 
    DrawTextRightJustify("name", x, y + 12);
-   y += itemSpacing;
+   y += kItemSpacing;
 
    for (auto iter = mLabels.begin(); iter != mLabels.end(); ++iter)
    {
       DrawTextRightJustify(*iter, x, y + 12);
-      y += itemSpacing;
+      y += kItemSpacing;
    }
 
    for (auto iter = mSaveDataControls.begin(); iter != mSaveDataControls.end(); ++iter)

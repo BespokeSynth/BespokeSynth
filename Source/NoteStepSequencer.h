@@ -77,7 +77,7 @@ public:
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
