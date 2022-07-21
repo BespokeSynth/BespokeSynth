@@ -143,8 +143,8 @@ private:
    int mNumInputChannels{ 2 };
    int mNumOutputChannels{ 2 };
 
-   int mNumInBusses{ 0 };
-   int mNumOutBusses{ 0 };
+   int mNumInBuses{ 0 };
+   int mNumOutBuses{ 0 };
 
    struct ParameterSlider
    {

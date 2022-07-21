@@ -406,15 +406,15 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
 
       /*
        * For now, since Bespoke is at best stereo in stereo out,
-       * Disable all non-main input and output busses
+       * Disable all non-main input and output buses
        */
       mNumInputChannels = mPlugin->getTotalNumInputChannels();
       mNumOutputChannels = mPlugin->getTotalNumOutputChannels();
       ofLog() << "vst channel - inputs: " << mNumInputChannels << " x outputs: " << mNumOutputChannels;
 
       auto layouts = mPlugin->getBusesLayout();
-      mNumInBusses = layouts.inputBuses.size();
-      mNumOutBusses = layouts.outputBuses.size();
+      mNumInBuses = layouts.inputBuses.size();
+      mNumOutBuses = layouts.outputBuses.size();
       mPlugin->enableAllBuses();
       ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
 
@@ -582,7 +582,7 @@ void VSTPlugin::Process(double time)
     * Multi-out VSTs which can't disable those outputs will expect *something* in the
     * buffer even though we don't read it.
     */
-   int bufferChannels = MAX(MAX(inputChannels * mNumInBusses, outputChannels * mNumOutBusses), 2); // how much to allocate in the juce::AudioBuffer
+   int bufferChannels = MAX(MAX(inputChannels * mNumInBuses, outputChannels * mNumOutBuses), 2); // how much to allocate in the juce::AudioBuffer
 
    const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
 
