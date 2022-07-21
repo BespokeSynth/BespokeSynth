@@ -94,9 +94,9 @@ void QuickSpawnMenu::UpdateDisplay()
       mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString());
 
       float width = 150;
-      for (auto element : mElements)
+      for (auto& element : mElements)
       {
-         float elementWidth = GetStringWidth(element) + 10;
+         float elementWidth = GetStringWidth(element.mLabel + " " + element.mDecorator) + 10;
          if (elementWidth > width)
             width = elementWidth;
       }
@@ -139,7 +139,7 @@ void QuickSpawnMenu::DrawModule()
          ofSetColor(255, 255, 0);
       else
          ofSetColor(255, 255, 255);
-      DrawTextNormal(mElements[i], 1, i * itemSpacing + 12);
+      DrawTextNormal(mElements[i].mLabel + " " + mElements[i].mDecorator, 1, i * itemSpacing + 12);
    }
    if (mElements.size() == 0)
    {
@@ -167,10 +167,13 @@ void QuickSpawnMenu::OnClicked(float x, float y, bool right)
    if (right)
       return;
 
-   std::string moduleTypeName = GetModuleTypeNameAt(x, y);
-   if (moduleTypeName != "")
+   const ModuleFactory::Spawnable* element = GetElementAt(x, y);
+
+   if (element)
    {
-      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
+      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(*element,
+                                                              TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x,
+                                                              TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
       TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
    }
 
@@ -179,14 +182,18 @@ void QuickSpawnMenu::OnClicked(float x, float y, bool right)
 
 std::string QuickSpawnMenu::GetHoveredModuleTypeName()
 {
-   return GetModuleTypeNameAt(mLastHoverX, mLastHoverY);
+   auto* element = GetElementAt(mLastHoverX, mLastHoverY);
+   if (element)
+      return element->mLabel;
+   else
+      return "";
 }
 
-std::string QuickSpawnMenu::GetModuleTypeNameAt(int x, int y)
+const ModuleFactory::Spawnable* QuickSpawnMenu::GetElementAt(int x, int y) const
 {
    int index = y / itemSpacing;
    if (index >= 0 && index < mElements.size())
-      return mElements[index];
+      return &mElements[index];
 
-   return "";
+   return nullptr;
 }

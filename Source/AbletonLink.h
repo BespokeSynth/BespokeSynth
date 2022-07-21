@@ -25,6 +25,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
 #include "IDrawableModule.h"
 #include "Checkbox.h"

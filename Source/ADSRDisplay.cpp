@@ -336,7 +336,9 @@ void ADSRDisplay::SpawnEnvelopeEditor()
 {
    if (mEditor == nullptr)
    {
-      mEditor = dynamic_cast<EnvelopeEditor*>(TheSynth->SpawnModuleOnTheFly("envelopeeditor", -1, -1, false, "envelopepopup"));
+      ModuleFactory::Spawnable spawnable;
+      spawnable.mLabel = "envelopeeditor";
+      mEditor = dynamic_cast<EnvelopeEditor*>(TheSynth->SpawnModuleOnTheFly(spawnable, -1, -1, false, "envelopepopup"));
       mEditor->SetADSRDisplay(this);
    }
    if (!mEditor->IsPinned())

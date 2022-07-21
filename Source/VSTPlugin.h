@@ -49,10 +49,12 @@ class ofxJSONElement;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(std::vector<std::string>& vsts);
+   void GetAvailableVSTs(std::vector<juce::PluginDescription>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
-   void SortByLastUsed(std::vector<std::string>& vsts);
+   bool GetPluginDesc(juce::PluginDescription& desc, juce::String pluginId);
+   void SortByLastUsed(std::vector<juce::PluginDescription>& vsts);
+   void GetRecentPlugins(std::vector<juce::PluginDescription>& recentPlugins, int num);
 }
 
 class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener, public juce::AudioProcessorListener
@@ -72,7 +74,7 @@ public:
 
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
 
-   void SetVST(std::string vstName);
+   void SetVST(juce::PluginDescription pluginDesc);
    void OnVSTWindowClosed();
 
    //IAudioSource
@@ -107,8 +109,10 @@ private:
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
+   void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
 
    std::string GetPluginName() const;
+   std::string GetPluginFormatName() const;
    std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
@@ -136,8 +140,11 @@ private:
    juce::MidiBuffer mMidiBuffer;
    juce::MidiBuffer mFutureMidiBuffer;
    juce::CriticalSection mMidiInputLock;
-   int mNumInputs{ 2 };
-   int mNumOutputs{ 2 };
+   int mNumInputChannels{ 2 };
+   int mNumOutputChannels{ 2 };
+
+   int mNumInBuses{ 0 };
+   int mNumOutBuses{ 0 };
 
    struct ParameterSlider
    {
@@ -157,6 +164,7 @@ private:
    bool mUseVoiceAsChannel{ false };
    float mPitchBendRange{ 2 };
    int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
+   std::string mOldVstPath{ "" }; //for loading save files that predate pluginId-style saving
 
    struct ChannelModulations
    {

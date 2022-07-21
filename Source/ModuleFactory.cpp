@@ -462,7 +462,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleType_Audio);
    REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleType_Other);
    REGISTER_HIDDEN(ComboGridController, combogrid, kModuleType_Other);
-   REGISTER_HIDDEN(VSTPlugin, vstplugin, kModuleType_Synth);
+   REGISTER_HIDDEN(VSTPlugin, plugin, kModuleType_Synth);
    REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleType_Audio);
    REGISTER_HIDDEN(Producer, producer, kModuleType_Audio);
    REGISTER_HIDDEN(ChaosEngine, chaosengine, kModuleType_Other);
@@ -514,24 +514,34 @@ IDrawableModule* ModuleFactory::MakeModule(std::string type)
    return nullptr;
 }
 
-std::vector<std::string> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
+std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
 {
-   std::vector<std::string> modules;
+   std::vector<ModuleFactory::Spawnable> modules{};
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if (mModuleTypeMap[iter->first] == moduleType &&
           (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
-         modules.push_back(iter->first);
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = iter->first;
+         modules.push_back(spawnable);
+      }
    }
 
    if (moduleType == kModuleType_Audio)
    {
       std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
       for (auto effect : effects)
-         modules.push_back(effect + " " + kEffectChainSuffix);
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = effect;
+         spawnable.mDecorator = kEffectChainSuffix;
+         spawnable.mSpawnMethod = SpawnMethod::EffectChain;
+         modules.push_back(spawnable);
+      }
    }
 
-   sort(modules.begin(), modules.end());
+   std::sort(modules.begin(), modules.end(), Spawnable::compare);
    return modules;
 }
 
@@ -562,70 +572,82 @@ namespace
    }
 }
 
-std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
+std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::string keys)
 {
-   std::vector<juce::String> modules;
+   std::vector<ModuleFactory::Spawnable> modules{};
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if ((mIsHiddenModuleMap[iter->first] == false || gShowDevModules) &&
           CheckHeldKeysMatch(iter->first, keys))
-         modules.push_back(iter->first);
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = iter->first;
+         modules.push_back(spawnable);
+      }
    }
 
-   std::vector<std::string> vsts;
+   std::vector<juce::PluginDescription> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
-   std::vector<std::string> matchingVsts;
-   for (auto vstFile : vsts)
+   std::vector<juce::PluginDescription> matchingVsts;
+   for (auto& pluginDesc : vsts)
    {
-      std::string vstName = juce::File(vstFile).getFileName().toStdString();
-      if (CheckHeldKeysMatch(vstName, keys))
-         matchingVsts.push_back(vstFile);
+      std::string pluginName = pluginDesc.name.toStdString();
+      if (CheckHeldKeysMatch(pluginName, keys))
+         matchingVsts.push_back(pluginDesc);
    }
    const int kMaxQuickspawnVstCount = 10;
-   if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
-   {
-      for (auto vstFile : matchingVsts)
-      {
-         std::string vstName = juce::File(vstFile).getFileName().toStdString();
-         modules.push_back(vstName + " " + kVSTSuffix);
-      }
-   }
-   else
-   {
+   if ((int)matchingVsts.size() > kMaxQuickspawnVstCount)
       VSTLookup::SortByLastUsed(matchingVsts);
-      for (int i = 0; i < kMaxQuickspawnVstCount; ++i)
-      {
-         std::string vstName = juce::File(matchingVsts[i]).getFileName().toStdString();
-         modules.push_back(vstName + " " + kVSTSuffix);
-      }
+
+   for (int i = 0; i < (int)matchingVsts.size() && i < kMaxQuickspawnVstCount; ++i)
+   {
+      ModuleFactory::Spawnable spawnable{};
+      auto& pluginDesc = matchingVsts[i];
+      spawnable.mLabel = pluginDesc.name.toStdString();
+      spawnable.mDecorator = "[" + ModuleFactory::Spawnable::GetPluginLabel(pluginDesc) + "]";
+      spawnable.mPluginDesc = pluginDesc;
+      spawnable.mSpawnMethod = SpawnMethod::Plugin;
+      modules.push_back(spawnable);
    }
 
-   std::vector<std::string> prefabs;
+   std::vector<Spawnable> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
    for (auto prefab : prefabs)
    {
-      if (CheckHeldKeysMatch(prefab, keys) || keys[0] == ';')
-         modules.push_back(prefab + " " + kPrefabSuffix);
+      if (CheckHeldKeysMatch(prefab.mLabel, keys) || keys[0] == ';')
+         modules.push_back(prefab);
    }
 
    std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
    for (auto midicontroller : midicontrollers)
    {
       if (CheckHeldKeysMatch(midicontroller, keys))
-         modules.push_back(midicontroller + " " + kMidiControllerSuffix);
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = midicontroller;
+         spawnable.mDecorator = kMidiControllerSuffix;
+         spawnable.mSpawnMethod = SpawnMethod::MidiController;
+         modules.push_back(spawnable);
+      }
    }
 
    std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    for (auto effect : effects)
    {
       if (CheckHeldKeysMatch(effect, keys))
-         modules.push_back(effect + " " + kEffectChainSuffix);
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = effect;
+         spawnable.mDecorator = kEffectChainSuffix;
+         spawnable.mSpawnMethod = SpawnMethod::EffectChain;
+         modules.push_back(spawnable);
+      }
    }
-   sort(modules.begin(), modules.end());
+   sort(modules.begin(), modules.end(), Spawnable::compare);
 
-   std::vector<std::string> ret;
+   std::vector<ModuleFactory::Spawnable> ret;
    for (size_t i = 0; i < modules.size(); ++i)
-      ret.push_back(modules[i].toStdString());
+      ret.push_back(modules[i]);
 
    return ret;
 }
@@ -634,12 +656,27 @@ ModuleType ModuleFactory::GetModuleType(std::string typeName)
 {
    if (mModuleTypeMap.find(typeName) != mModuleTypeMap.end())
       return mModuleTypeMap[typeName];
-   if (juce::String(typeName).endsWith(kVSTSuffix))
+   if (juce::String(typeName).endsWith(kPluginSuffix))
       return kModuleType_Synth;
    if (juce::String(typeName).endsWith(kMidiControllerSuffix))
       return kModuleType_Instrument;
    if (juce::String(typeName).endsWith(kEffectChainSuffix))
       return kModuleType_Audio;
+   return kModuleType_Other;
+}
+
+ModuleType ModuleFactory::GetModuleType(Spawnable spawnable)
+{
+   if (spawnable.mSpawnMethod == SpawnMethod::Module && mModuleTypeMap.find(spawnable.mLabel) != mModuleTypeMap.end())
+      return mModuleTypeMap[spawnable.mLabel];
+   if (spawnable.mSpawnMethod == SpawnMethod::Plugin)
+      return kModuleType_Synth;
+   if (spawnable.mSpawnMethod == SpawnMethod::MidiController)
+      return kModuleType_Instrument;
+   if (spawnable.mSpawnMethod == SpawnMethod::EffectChain)
+      return kModuleType_Audio;
+   if (spawnable.mSpawnMethod == SpawnMethod::Prefab)
+      return kModuleType_Other;
    return kModuleType_Other;
 }
 
@@ -651,7 +688,7 @@ bool ModuleFactory::IsExperimental(std::string typeName)
 }
 
 //static
-void ModuleFactory::GetPrefabs(std::vector<std::string>& prefabs)
+void ModuleFactory::GetPrefabs(std::vector<ModuleFactory::Spawnable>& prefabs)
 {
    using namespace juce;
    File dir(ofToDataPath("prefabs"));
@@ -660,7 +697,13 @@ void ModuleFactory::GetPrefabs(std::vector<std::string>& prefabs)
    for (auto file : files)
    {
       if (file.getFileExtension() == ".pfb")
-         prefabs.push_back(file.getFileName().toStdString());
+      {
+         ModuleFactory::Spawnable spawnable;
+         spawnable.mLabel = file.getFileName().toStdString();
+         spawnable.mDecorator = kPrefabSuffix;
+         spawnable.mSpawnMethod = SpawnMethod::Prefab;
+         prefabs.push_back(spawnable);
+      }
    }
 }
 
@@ -675,6 +718,9 @@ std::string ModuleFactory::FixUpTypeName(std::string name)
 
    if (name == "bandvocoder")
       return "vocoder";
+
+   if (name == "vstplugin")
+      return "plugin";
 
    return name;
 }

@@ -2798,7 +2798,9 @@ void ModularSynth::OnConsoleInput()
       {
          ofLog() << "Creating: " << mConsoleText;
          ofVec2f grabOffset(-40, 10);
-         IDrawableModule* module = SpawnModuleOnTheFly(mConsoleText, GetMouseX(&mModuleContainer) + grabOffset.x, GetMouseY(&mModuleContainer) + grabOffset.y);
+         ModuleFactory::Spawnable spawnable;
+         spawnable.mLabel = mConsoleText;
+         IDrawableModule* module = SpawnModuleOnTheFly(spawnable, GetMouseX(&mModuleContainer) + grabOffset.x, GetMouseY(&mModuleContainer) + grabOffset.y);
          TheSynth->SetMoveModule(module, grabOffset.x, grabOffset.y, true);
       }
    }
@@ -2840,69 +2842,29 @@ void ModularSynth::DoAutosave()
    SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk")), true);
 }
 
-IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, float x, float y, bool addToContainer, std::string name)
+IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spawnable, float x, float y, bool addToContainer, std::string name)
 {
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
 
-   std::vector<std::string> tokens = ofSplitString(spawnCommand, " ");
-   if (tokens.size() == 0)
-      return nullptr;
-
    if (sShouldAutosave)
       DoAutosave();
 
-   std::string moduleType = tokens[0];
+   std::string moduleType = spawnable.mLabel;
 
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
-   std::string vstToSetUp = "";
-   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kVSTSuffix)
-   {
-      moduleType = "vstplugin";
-      for (size_t i = 0; i < tokens.size() - 1; ++i)
-      {
-         vstToSetUp += tokens[i];
-         if (i != tokens.size() - 2)
-            vstToSetUp += " ";
-      }
-   }
-
-   std::string prefabToSetUp = "";
-   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kPrefabSuffix)
-   {
-      moduleType = "prefab";
-      for (size_t i = 0; i < tokens.size() - 1; ++i)
-      {
-         prefabToSetUp += tokens[i];
-         if (i != tokens.size() - 2)
-            prefabToSetUp += " ";
-      }
-   }
-
-   std::string midiControllerToSetUp = "";
-   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kMidiControllerSuffix)
-   {
-      moduleType = "midicontroller";
-      for (size_t i = 0; i < tokens.size() - 1; ++i)
-      {
-         midiControllerToSetUp += tokens[i];
-         if (i != tokens.size() - 2)
-            midiControllerToSetUp += " ";
-      }
-   }
-
-   std::string effectToSetUp = "";
-   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kEffectChainSuffix)
-   {
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::EffectChain)
       moduleType = "effectchain";
-      for (size_t i = 0; i < tokens.size() - 1; ++i)
-      {
-         effectToSetUp += tokens[i];
-         if (i != tokens.size() - 2)
-            effectToSetUp += " ";
-      }
-   }
+
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Prefab)
+      moduleType = "prefab";
+
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
+      moduleType = "vstplugin";
+
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::MidiController)
+      moduleType = "midicontroller";
 
    if (name == "")
       name = moduleType;
@@ -2912,24 +2874,11 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
    std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
    dummy["name"] = GetUniqueName(name, modules);
    dummy["onthefly"] = true;
-
-   if (moduleType == "effectchain")
-   {
-      for (int i = 1; i < tokens.size(); ++i)
-      {
-         if (VectorContains(tokens[i], GetEffectFactory()->GetSpawnableEffects()))
-         {
-            ofxJSONElement effect;
-            effect["type"] = tokens[i];
-            dummy["effects"].append(effect);
-         }
-      }
-   }
-
    dummy["position"][0u] = x;
    dummy["position"][1u] = y;
 
    IDrawableModule* module = nullptr;
+
    try
    {
       ScopedMutex mutex(&mAudioThreadMutex, "CreateModule");
@@ -2940,46 +2889,46 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string spawnCommand, flo
             mModuleContainer.AddModule(module);
          SetUpModule(module, dummy);
          module->Init();
-
-         if (vstToSetUp != "")
-         {
-            VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-            if (plugin != nullptr)
-               plugin->SetVST(vstToSetUp);
-         }
       }
    }
    catch (LoadingJSONException& e)
    {
-      LogEvent("Error spawning \"" + spawnCommand + "\" on the fly", kLogEventType_Warning);
+      LogEvent("Error spawning \"" + spawnable.mLabel + "\" on the fly", kLogEventType_Warning);
    }
    catch (UnknownModuleException& e)
    {
-      LogEvent("Error spawning \"" + spawnCommand + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
+      LogEvent("Error spawning \"" + spawnable.mLabel + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
    }
 
-   if (prefabToSetUp != "")
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::EffectChain)
+   {
+      EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
+      if (effectChain != nullptr)
+         effectChain->AddEffect(spawnable.mLabel, K(onTheFly));
+   }
+
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Prefab)
    {
       Prefab* prefab = dynamic_cast<Prefab*>(module);
       if (prefab != nullptr)
-         prefab->LoadPrefab("prefabs" + GetPathSeparator() + prefabToSetUp);
+         prefab->LoadPrefab("prefabs" + GetPathSeparator() + spawnable.mLabel);
    }
 
-   if (midiControllerToSetUp != "")
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
+   {
+      VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+      if (plugin != nullptr)
+         plugin->SetVST(spawnable.mPluginDesc);
+   }
+
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::MidiController)
    {
       MidiController* controller = dynamic_cast<MidiController*>(module);
       if (controller != nullptr)
       {
-         controller->GetSaveData().SetString("devicein", midiControllerToSetUp);
+         controller->GetSaveData().SetString("devicein", spawnable.mLabel);
          controller->SetUpFromSaveData();
       }
-   }
-
-   if (effectToSetUp != "")
-   {
-      EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
-      if (effectChain != nullptr)
-         effectChain->AddEffect(effectToSetUp, K(onTheFly));
    }
 
    return module;

@@ -253,6 +253,15 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
          ofRect(mMaxItemWidth * col, (i % maxPerColumn) * kItemSpacing + pageHeaderShift, mMaxItemWidth, kItemSpacing);
       }
 
+      if (VectorContains(i, mSeparators))
+      {
+         ofPushStyle();
+         ofSetColor(100, 100, 100, 100);
+         ofSetLineWidth(.5f);
+         ofLine(mMaxItemWidth * col + 3, (i % maxPerColumn) * kItemSpacing + pageHeaderShift, mMaxItemWidth * (col + 1) - 3, (i % maxPerColumn) * kItemSpacing + pageHeaderShift);
+         ofPopStyle();
+      }
+
       if (mVar && mElements[i].mValue == *mVar)
          ofSetColor(255, 255, 0);
       else
@@ -339,7 +348,7 @@ void DropdownList::OnClicked(float x, float y, bool right)
    float maxY = ofGetHeight() - 5;
 
    const int kMinPerColumn = 3;
-   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (kItemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale())));
+   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (kItemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale()))) - 1;
    mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
    int maxDisplayColumns = std::max(1, int((ofGetWidth() / GetModuleParent()->GetOwningContainer()->GetDrawScale()) / mMaxItemWidth));
    mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);

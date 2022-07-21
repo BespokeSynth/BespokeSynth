@@ -90,7 +90,9 @@ void MultitrackRecorder::AddTrack()
 {
    int recordingLength = GetRecordingLength();
 
-   MultitrackRecorderTrack* track = dynamic_cast<MultitrackRecorderTrack*>(TheSynth->SpawnModuleOnTheFly("multitrackrecordertrack", 0, 0, true));
+   ModuleFactory::Spawnable spawnable;
+   spawnable.mLabel = "multitrackrecordertrack";
+   MultitrackRecorderTrack* track = dynamic_cast<MultitrackRecorderTrack*>(TheSynth->SpawnModuleOnTheFly(spawnable, 0, 0, true));
    track->Setup(this, recordingLength);
    track->SetName(GetUniqueName("track", mModuleContainer.GetModuleNames<MultitrackRecorderTrack*>()).c_str());
    mModuleContainer.TakeModule(track);

@@ -946,7 +946,9 @@ void ScriptModule::ButtonClicked(ClickButton* button)
       float moduleX, moduleY, moduleW, moduleH;
       GetPosition(moduleX, moduleY);
       GetDimensions(moduleW, moduleH);
-      TheSynth->SpawnModuleOnTheFly("scriptingreference", moduleX + moduleW, moduleY, true);
+      ModuleFactory::Spawnable spawnable;
+      spawnable.mLabel = "scriptingreference";
+      TheSynth->SpawnModuleOnTheFly(spawnable, moduleX + moduleW, moduleY, true);
    }
 }
 

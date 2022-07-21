@@ -191,7 +191,7 @@ void CustomPluginListComponent::OnResize()
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatManager, WindowCloseListener* listener)
-: juce::DocumentWindow("VST Manager",
+: juce::DocumentWindow("Plugin Manager",
                        juce::LookAndFeel::getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
                        juce::DocumentWindow::closeButton)
 , mListener(listener)

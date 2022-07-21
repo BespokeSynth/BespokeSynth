@@ -683,7 +683,9 @@ PYBIND11_EMBEDDED_MODULE(module, m)
    }, py::return_value_policy::reference);
    m.def("create", [](std::string moduleType, float x, float y)
    {
-      return TheSynth->SpawnModuleOnTheFly(moduleType, x, y);
+      ModuleFactory::Spawnable spawnable;
+      spawnable.mLabel = moduleType;
+      return TheSynth->SpawnModuleOnTheFly(spawnable, x, y);
    }, py::return_value_policy::reference);
    py::class_<IDrawableModule>(m, "module")
       .def("set_position", [](IDrawableModule& module, float x, float y)

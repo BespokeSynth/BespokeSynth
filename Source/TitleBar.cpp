@@ -30,10 +30,10 @@
 #include "ModuleFactory.h"
 #include "ModuleSaveDataPanel.h"
 #include "HelpDisplay.h"
-#include "VSTPlugin.h"
 #include "Prefab.h"
 #include "UserPrefsEditor.h"
 #include "UIControlMacros.h"
+#include "VSTPlugin.h"
 #include "VSTScanner.h"
 #include "MidiController.h"
 
@@ -46,22 +46,21 @@ bool TitleBar::sShowInitialHelpOverlay = true;
 
 namespace
 {
-   const std::string kManageVSTsLabel = "manage VSTs...";
+   const std::string kManagePluginsLabel = "manage plugins...";
+   const std::string kPluginsDropdownLabel = "plugins:";
 }
 
-SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label)
+SpawnList::SpawnList(IDropdownListener* owner, int x, int y, std::string label)
 : mLabel(label)
 , mSpawnIndex(-1)
 , mSpawnList(nullptr)
 , mOwner(owner)
-, mListManager(listManager)
 , mPos(x, y)
 {
 }
 
-void SpawnList::SetList(std::vector<std::string> spawnables, std::string overrideModuleType)
+void SpawnList::SetList(std::vector<ModuleFactory::Spawnable> spawnables, bool showDecorators)
 {
-   mOverrideModuleType = overrideModuleType;
    if (mSpawnList == nullptr)
       mSpawnList = new DropdownList(mOwner, mLabel.c_str(), mPos.x, mPos.y, &mSpawnIndex);
    mSpawnList->SetNoHover(true);
@@ -71,11 +70,11 @@ void SpawnList::SetList(std::vector<std::string> spawnables, std::string overrid
    mSpawnables = spawnables;
    for (int i = 0; i < mSpawnables.size(); ++i)
    {
-      std::string name = mSpawnables[i].c_str();
-      if (mOverrideModuleType == "" && TheSynth->GetModuleFactory()->IsExperimental(name))
+      std::string name = mSpawnables[i].mLabel;
+      if (showDecorators && !mSpawnables[i].mDecorator.empty())
+         name += " " + mSpawnables[i].mDecorator;
+      if (TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
-      if (mOverrideModuleType == "vstplugin" && name != kManageVSTsLabel)
-         name = juce::File(name).getFileName().toStdString();
       mSpawnList->AddLabel(name, i);
    }
 }
@@ -98,32 +97,13 @@ void SpawnList::OnSelection(DropdownList* list)
 
 IDrawableModule* SpawnList::Spawn()
 {
-   std::string moduleType = mSpawnables[mSpawnIndex];
-   if (mOverrideModuleType != "")
-      moduleType = mOverrideModuleType;
-
-   if (mOverrideModuleType == "vstplugin")
+   if (mLabel == kPluginsDropdownLabel && mSpawnIndex == 0)
    {
-      if (mSpawnables[mSpawnIndex] == kManageVSTsLabel)
-      {
-         TheTitleBar->ManageVSTs();
-         return nullptr;
-      }
+      TheTitleBar->ManagePlugins();
+      return nullptr;
    }
 
-   IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
-
-   if (mOverrideModuleType == "vstplugin")
-   {
-      VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      plugin->SetVST(mSpawnables[mSpawnIndex]);
-   }
-
-   if (mOverrideModuleType == "prefab")
-   {
-      Prefab* prefab = dynamic_cast<Prefab*>(module);
-      prefab->LoadPrefab("prefabs" + GetPathSeparator() + mSpawnables[mSpawnIndex]);
-   }
+   IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(mSpawnables[mSpawnIndex], TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
 
    return module;
 }
@@ -139,14 +119,6 @@ void SpawnList::Draw()
 void SpawnList::SetPosition(int x, int y)
 {
    mSpawnList->SetPosition(x, y);
-}
-
-void SpawnList::SetPositionRelativeTo(SpawnList* list)
-{
-   float x, y, w, h;
-   list->mSpawnList->GetPosition(x, y, true);
-   list->mSpawnList->GetDimensions(w, h);
-   mSpawnList->SetPosition(x + w + 5, y);
 }
 
 TitleBar::TitleBar()
@@ -208,7 +180,7 @@ TitleBar::~TitleBar()
    TheTitleBar = nullptr;
 }
 
-void TitleBar::ManageVSTs()
+void TitleBar::ManagePlugins()
 {
    if (mPluginListWindow == nullptr)
       mPluginListWindow.reset(new PluginListWindow(TheSynth->GetAudioPluginFormatManager(), this));
@@ -224,29 +196,29 @@ void TitleBar::OnWindowClosed()
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
-: mInstrumentModules(owner, this, 500, 16, "instruments:")
-, mNoteModules(owner, this, 0, 0, "note effects:")
-, mSynthModules(owner, this, 0, 0, "synths:")
-, mAudioModules(owner, this, 0, 0, "audio effects:")
-, mModulatorModules(owner, this, 0, 0, "modulators:")
-, mPulseModules(owner, this, 0, 0, "pulse:")
-, mVstPlugins(owner, this, 0, 0, "vst plugins:")
-, mOtherModules(owner, this, 0, 0, "other:")
-, mPrefabs(owner, this, 0, 0, "prefabs:")
+: mInstrumentModules(owner, 500, 16, "instruments:")
+, mNoteModules(owner, 0, 0, "note effects:")
+, mSynthModules(owner, 0, 0, "synths:")
+, mAudioModules(owner, 0, 0, "audio effects:")
+, mModulatorModules(owner, 0, 0, "modulators:")
+, mPulseModules(owner, 0, 0, "pulse:")
+, mPlugins(owner, 0, 0, kPluginsDropdownLabel)
+, mOtherModules(owner, 0, 0, "other:")
+, mPrefabs(owner, 0, 0, "prefabs:")
 {
 }
 
 void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
 {
-   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument), "");
-   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note), "");
-   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth), "");
-   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio), "");
-   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), "");
-   mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse), "");
-   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
+   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument));
+   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note));
+   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth));
+   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio));
+   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator));
+   mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse));
+   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other));
 
-   SetUpVstDropdown();
+   SetUpPluginsDropdown();
    SetUpPrefabsDropdown();
 
    mDropdowns.push_back(&mInstrumentModules);
@@ -255,24 +227,55 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mDropdowns.push_back(&mAudioModules);
    mDropdowns.push_back(&mModulatorModules);
    mDropdowns.push_back(&mPulseModules);
-   mDropdowns.push_back(&mVstPlugins);
+   mDropdowns.push_back(&mPlugins);
    mDropdowns.push_back(&mOtherModules);
    mDropdowns.push_back(&mPrefabs);
 }
 
 void SpawnListManager::SetUpPrefabsDropdown()
 {
-   std::vector<std::string> prefabs;
+   std::vector<ModuleFactory::Spawnable> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
-   mPrefabs.SetList(prefabs, "prefab");
+   mPrefabs.SetList(prefabs, false);
 }
 
-void SpawnListManager::SetUpVstDropdown()
+void SpawnListManager::SetUpPluginsDropdown()
 {
-   std::vector<std::string> vsts;
+   std::vector<ModuleFactory::Spawnable> list;
+
+   ModuleFactory::Spawnable scanDummy;
+   scanDummy.mLabel = kManagePluginsLabel;
+   list.push_back(scanDummy);
+
+   std::vector<juce::PluginDescription> recentPlugins;
+   VSTLookup::GetRecentPlugins(recentPlugins, 8);
+   for (auto& pluginDesc : recentPlugins)
+   {
+      ModuleFactory::Spawnable spawnable{};
+      spawnable.mLabel = pluginDesc.name.toStdString();
+      spawnable.mDecorator = "[" + ModuleFactory::Spawnable::GetPluginLabel(pluginDesc) + "]";
+      spawnable.mPluginDesc = pluginDesc;
+      spawnable.mSpawnMethod = ModuleFactory::SpawnMethod::Plugin;
+      list.push_back(spawnable);
+   }
+
+   std::vector<juce::PluginDescription> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
-   vsts.insert(vsts.begin(), kManageVSTsLabel);
-   mVstPlugins.SetList(vsts, "vstplugin");
+   for (auto& pluginDesc : vsts)
+   {
+      ModuleFactory::Spawnable spawnable{};
+      spawnable.mLabel = pluginDesc.name.toStdString();
+      spawnable.mDecorator = "[" + ModuleFactory::Spawnable::GetPluginLabel(pluginDesc) + "]";
+      spawnable.mPluginDesc = pluginDesc;
+      spawnable.mSpawnMethod = ModuleFactory::SpawnMethod::Plugin;
+      list.push_back(spawnable);
+   }
+
+   mPlugins.SetList(list);
+   mPlugins.GetList()->ClearSeparators();
+   mPlugins.GetList()->AddSeparator(1);
+   if (!recentPlugins.empty())
+      mPlugins.GetList()->AddSeparator((int)recentPlugins.size() + 1);
 }
 
 void TitleBar::ListLayouts()
@@ -387,7 +390,7 @@ void TitleBar::DrawModule()
                                        &mSpawnLists.mAudioModules,
                                        &mSpawnLists.mModulatorModules,
                                        &mSpawnLists.mPulseModules,
-                                       &mSpawnLists.mVstPlugins,
+                                       &mSpawnLists.mPlugins,
                                        &mSpawnLists.mOtherModules,
                                        &mSpawnLists.mPrefabs };
 
@@ -420,7 +423,7 @@ void TitleBar::DrawModule()
    mModuleType = kModuleType_Pulse;
    mSpawnLists.mPulseModules.Draw();
    mModuleType = kModuleType_Synth;
-   mSpawnLists.mVstPlugins.Draw();
+   mSpawnLists.mPlugins.Draw();
    mModuleType = kModuleType_Other;
    mSpawnLists.mOtherModules.Draw();
    mModuleType = kModuleType_Other;
@@ -454,7 +457,7 @@ void TitleBar::DrawModuleUnclipped()
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 50 + titleBarHeight;
-      gFontBold.DrawString("please close VST manager to continue", 50, x, y);
+      gFontBold.DrawString("please close plugin manager to continue", 50, x, y);
       ofPopStyle();
       return;
    }
@@ -561,8 +564,8 @@ void TitleBar::CheckboxUpdated(Checkbox* checkbox)
 
 void TitleBar::DropdownClicked(DropdownList* list)
 {
-   if (list == mSpawnLists.mVstPlugins.GetList())
-      mSpawnLists.SetUpVstDropdown();
+   if (list == mSpawnLists.mPlugins.GetList())
+      mSpawnLists.SetUpPluginsDropdown();
 
    if (list == mSpawnLists.mPrefabs.GetList())
       mSpawnLists.SetUpPrefabsDropdown();
@@ -583,7 +586,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
    mSpawnLists.mAudioModules.OnSelection(list);
    mSpawnLists.mModulatorModules.OnSelection(list);
    mSpawnLists.mPulseModules.OnSelection(list);
-   mSpawnLists.mVstPlugins.OnSelection(list);
+   mSpawnLists.mPlugins.OnSelection(list);
    mSpawnLists.mOtherModules.OnSelection(list);
    mSpawnLists.mPrefabs.OnSelection(list);
 }
