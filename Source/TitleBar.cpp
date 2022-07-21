@@ -50,7 +50,7 @@ namespace
    const std::string kPluginsDropdownLabel = "plugins:";
 }
 
-SpawnList::SpawnList(IDropdownListener* owner, int x, int y, std::string label)
+SpawnList::SpawnList(IDropdownListener* owner, int x, int y, std::string label, ModuleCategory moduleCategory)
 : mLabel(label)
 , mSpawnIndex(-1)
 , mSpawnList(nullptr)
@@ -197,27 +197,27 @@ void TitleBar::OnWindowClosed()
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
-: mInstrumentModules(owner, 500, 16, "instruments:")
-, mNoteModules(owner, 0, 0, "note effects:")
-, mSynthModules(owner, 0, 0, "synths:")
-, mAudioModules(owner, 0, 0, "audio effects:")
-, mModulatorModules(owner, 0, 0, "modulators:")
-, mPulseModules(owner, 0, 0, "pulse:")
-, mPlugins(owner, 0, 0, kPluginsDropdownLabel)
-, mOtherModules(owner, 0, 0, "other:")
-, mPrefabs(owner, 0, 0, "prefabs:")
+: mInstrumentModules(owner, 500, 16, "instruments:", kModuleCategory_Instrument)
+, mNoteModules(owner, 0, 0, "note effects:", kModuleCategory_Note)
+, mSynthModules(owner, 0, 0, "synths:", kModuleCategory_Synth)
+, mAudioModules(owner, 0, 0, "audio effects:", kModuleCategory_Audio)
+, mModulatorModules(owner, 0, 0, "modulators:", kModuleCategory_Modulator)
+, mPulseModules(owner, 0, 0, "pulse:", kModuleCategory_Pulse)
+, mPlugins(owner, 0, 0, kPluginsDropdownLabel, kModuleCategory_Synth)
+, mOtherModules(owner, 0, 0, "other:", kModuleCategory_Other)
+, mPrefabs(owner, 0, 0, "prefabs:", kModuleCategory_Other)
 {
 }
 
 void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
 {
-   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument));
-   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note));
-   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth));
-   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio));
-   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator));
-   mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse));
-   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other));
+   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleCategory_Instrument));
+   mNoteModules.SetList(factory->GetSpawnableModules(kModuleCategory_Note));
+   mSynthModules.SetList(factory->GetSpawnableModules(kModuleCategory_Synth));
+   mAudioModules.SetList(factory->GetSpawnableModules(kModuleCategory_Audio));
+   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleCategory_Modulator));
+   mPulseModules.SetList(factory->GetSpawnableModules(kModuleCategory_Pulse));
+   mOtherModules.SetList(factory->GetSpawnableModules(kModuleCategory_Other));
 
    SetUpPluginsDropdown();
    SetUpPrefabsDropdown();

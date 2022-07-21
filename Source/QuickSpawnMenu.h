@@ -59,7 +59,6 @@ public:
 private:
    const ModuleFactory::Spawnable* GetElementAt(int x, int y) const;
    int GetIndexAt(int x, int y) const;
-   std::string GetElementName(int index) const;
    void UpdateDisplay();
    void OnSelectItem(int index);
    void MoveMouseToIndex(int index);

@@ -455,28 +455,28 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteEcho, noteecho, kModuleCategory_Note);
    REGISTER(VelocityCurve, velocitycurve, kModuleCategory_Note);
 
-   //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
-   REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
-   REGISTER_HIDDEN(TakeRecorder, takerecorder, kModuleType_Audio);
-   REGISTER_HIDDEN(LoopStorer, loopstorer, kModuleType_Other);
-   REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleType_Audio);
-   REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleType_Other);
-   REGISTER_HIDDEN(ComboGridController, combogrid, kModuleType_Other);
-   REGISTER_HIDDEN(VSTPlugin, plugin, kModuleType_Synth);
-   REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleType_Audio);
-   REGISTER_HIDDEN(Producer, producer, kModuleType_Audio);
-   REGISTER_HIDDEN(ChaosEngine, chaosengine, kModuleType_Other);
-   REGISTER_HIDDEN(MultibandCompressor, multiband, kModuleType_Audio);
-   REGISTER_HIDDEN(ControllingSong, controllingsong, kModuleType_Synth);
-   REGISTER_HIDDEN(PanicButton, panicbutton, kModuleType_Other);
-   REGISTER_HIDDEN(DebugAudioSource, debugaudiosource, kModuleType_Synth);
-   REGISTER_HIDDEN(FollowingSong, followingsong, kModuleType_Synth);
-   REGISTER_HIDDEN(BeatBloks, beatbloks, kModuleType_Synth);
-   REGISTER_HIDDEN(FilterViz, filterviz, kModuleType_Other);
-   REGISTER_HIDDEN(FreqDomainBoilerplate, freqdomainboilerplate, kModuleType_Audio);
-   REGISTER_HIDDEN(FFTtoAdditive, ffttoadditive, kModuleType_Audio);
-   REGISTER_HIDDEN(SlowLayers, slowlayers, kModuleType_Audio);
-   REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleType_Synth);
+   //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
+   REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
+   REGISTER_HIDDEN(TakeRecorder, takerecorder, kModuleCategory_Audio);
+   REGISTER_HIDDEN(LoopStorer, loopstorer, kModuleCategory_Other);
+   REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleCategory_Audio);
+   REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleCategory_Other);
+   REGISTER_HIDDEN(ComboGridController, combogrid, kModuleCategory_Other);
+   REGISTER_HIDDEN(VSTPlugin, plugin, kModuleCategory_Synth);
+   REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleCategory_Audio);
+   REGISTER_HIDDEN(Producer, producer, kModuleCategory_Audio);
+   REGISTER_HIDDEN(ChaosEngine, chaosengine, kModuleCategory_Other);
+   REGISTER_HIDDEN(MultibandCompressor, multiband, kModuleCategory_Audio);
+   REGISTER_HIDDEN(ControllingSong, controllingsong, kModuleCategory_Synth);
+   REGISTER_HIDDEN(PanicButton, panicbutton, kModuleCategory_Other);
+   REGISTER_HIDDEN(DebugAudioSource, debugaudiosource, kModuleCategory_Synth);
+   REGISTER_HIDDEN(FollowingSong, followingsong, kModuleCategory_Synth);
+   REGISTER_HIDDEN(BeatBloks, beatbloks, kModuleCategory_Synth);
+   REGISTER_HIDDEN(FilterViz, filterviz, kModuleCategory_Other);
+   REGISTER_HIDDEN(FreqDomainBoilerplate, freqdomainboilerplate, kModuleCategory_Audio);
+   REGISTER_HIDDEN(FFTtoAdditive, ffttoadditive, kModuleCategory_Audio);
+   REGISTER_HIDDEN(SlowLayers, slowlayers, kModuleCategory_Audio);
+   REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleCategory_Synth);
 #ifdef BESPOKE_MAC
    REGISTER_HIDDEN(KompleteKontrol, kompletekontrol, kModuleCategory_Note);
 #endif
@@ -514,7 +514,7 @@ IDrawableModule* ModuleFactory::MakeModule(std::string type)
    return nullptr;
 }
 
-std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
+std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleCategory moduleType)
 {
    std::vector<ModuleFactory::Spawnable> modules{};
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
@@ -578,20 +578,18 @@ namespace
    }
 }
 
-std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys, bool continuousString)
+std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::string keys, bool continuousString)
 {
    std::vector<ModuleFactory::Spawnable> modules{};
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if ((mIsHiddenModuleMap[iter->first] == false || gShowDevModules) &&
-          CheckHeldKeysMatch(iter->first, keys))
+          CheckHeldKeysMatch(iter->first, keys, continuousString))
       {
          ModuleFactory::Spawnable spawnable{};
          spawnable.mLabel = iter->first;
          modules.push_back(spawnable);
       }
-          CheckHeldKeysMatch(iter->first, keys, continuousString))
-         modules.push_back(iter->first);
    }
 
    std::vector<juce::PluginDescription> vsts;
@@ -600,7 +598,7 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys, bo
    for (auto& pluginDesc : vsts)
    {
       std::string pluginName = pluginDesc.name.toStdString();
-      if (CheckHeldKeysMatch(pluginName, keys))
+      if (CheckHeldKeysMatch(pluginName, keys, continuousString))
          matchingVsts.push_back(pluginDesc);
    }
    const int kMaxQuickspawnVstCount = 10;
@@ -622,14 +620,14 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys, bo
    ModuleFactory::GetPrefabs(prefabs);
    for (auto prefab : prefabs)
    {
-      if (CheckHeldKeysMatch(prefab.mLabel, keys) || keys[0] == ';')
+      if (CheckHeldKeysMatch(prefab.mLabel, keys, continuousString) || keys[0] == ';')
          modules.push_back(prefab);
    }
 
    std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
    for (auto midicontroller : midicontrollers)
    {
-      if (CheckHeldKeysMatch(midicontroller, keys))
+      if (CheckHeldKeysMatch(midicontroller, keys, continuousString))
       {
          ModuleFactory::Spawnable spawnable{};
          spawnable.mLabel = midicontroller;
@@ -642,7 +640,7 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys, bo
    std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    for (auto effect : effects)
    {
-      if (CheckHeldKeysMatch(effect, keys))
+      if (CheckHeldKeysMatch(effect, keys, continuousString))
       {
          ModuleFactory::Spawnable spawnable{};
          spawnable.mLabel = effect;
@@ -665,7 +663,7 @@ ModuleCategory ModuleFactory::GetModuleType(std::string typeName)
    if (mModuleTypeMap.find(typeName) != mModuleTypeMap.end())
       return mModuleTypeMap[typeName];
    if (juce::String(typeName).endsWith(kPluginSuffix))
-      return kModuleType_Synth;
+      return kModuleCategory_Synth;
    if (juce::String(typeName).endsWith(kMidiControllerSuffix))
       return kModuleCategory_Instrument;
    if (juce::String(typeName).endsWith(kEffectChainSuffix))
@@ -673,19 +671,19 @@ ModuleCategory ModuleFactory::GetModuleType(std::string typeName)
    return kModuleCategory_Other;
 }
 
-ModuleType ModuleFactory::GetModuleType(Spawnable spawnable)
+ModuleCategory ModuleFactory::GetModuleType(Spawnable spawnable)
 {
    if (spawnable.mSpawnMethod == SpawnMethod::Module && mModuleTypeMap.find(spawnable.mLabel) != mModuleTypeMap.end())
       return mModuleTypeMap[spawnable.mLabel];
    if (spawnable.mSpawnMethod == SpawnMethod::Plugin)
-      return kModuleType_Synth;
+      return kModuleCategory_Synth;
    if (spawnable.mSpawnMethod == SpawnMethod::MidiController)
-      return kModuleType_Instrument;
+      return kModuleCategory_Instrument;
    if (spawnable.mSpawnMethod == SpawnMethod::EffectChain)
-      return kModuleType_Audio;
+      return kModuleCategory_Audio;
    if (spawnable.mSpawnMethod == SpawnMethod::Prefab)
-      return kModuleType_Other;
-   return kModuleType_Other;
+      return kModuleCategory_Other;
+   return kModuleCategory_Other;
 }
 
 bool ModuleFactory::IsExperimental(std::string typeName)

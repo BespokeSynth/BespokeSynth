@@ -164,7 +164,9 @@ void QuickSpawnMenu::UpdateDisplay()
          {
             std::string label = dropdown->GetLabel();
             ofStringReplace(label, ":", "");
-            mElements.push_back(label);
+            ModuleFactory::Spawnable dummy;
+            dummy.mLabel = label;
+            mElements.push_back(dummy);
          }
       }
       else if (mMenuMode == MenuMode::SingleCategory)
@@ -172,7 +174,11 @@ void QuickSpawnMenu::UpdateDisplay()
          mElements.clear();
          auto* list = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetList();
          for (int i = 0; i < list->GetNumValues(); ++i)
-            mElements.push_back(list->GetElement(i).mLabel);
+         {
+            ModuleFactory::Spawnable dummy;
+            dummy.mLabel = list->GetElement(i).mLabel;
+            mElements.push_back(dummy);
+         }
       }
       else if (mMenuMode == MenuMode::Search)
       {
@@ -259,8 +265,7 @@ void QuickSpawnMenu::DrawModule()
          ofSetColor(255, 255, 0);
       else
          ofSetColor(255, 255, 255);
-      DrawTextNormal(mElements[i].mLabel + " " + mElements[i].mDecorator, 1, i * itemSpacing + 12);
-      DrawTextNormal(mElements[i], mMenuMode == MenuMode::SingleLetter ? 1 : 12, i * itemSpacing + 12);
+      DrawTextNormal(mElements[i].mLabel + " " + mElements[i].mDecorator, mMenuMode == MenuMode::SingleLetter ? 1 : 12, i * itemSpacing + 12);
    }
    if (mElements.size() == 0)
    {
@@ -301,21 +306,13 @@ void QuickSpawnMenu::OnClicked(float x, float y, bool right)
 void QuickSpawnMenu::OnSelectItem(int index)
 {
    if (mMenuMode == MenuMode::SingleLetter || mMenuMode == MenuMode::Search)
-   const ModuleFactory::Spawnable* element = GetElementAt(x, y);
-
-   if (element)
    {
-      std::string moduleTypeName = GetElementName(index);
-      if (moduleTypeName != "")
+      if (index >= 0 && index < mElements.size())
       {
-         IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
+         IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(mElements[index], TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
          TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
       }
       SetShowing(false);
-      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(*element,
-                                                              TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x,
-                                                              TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
-      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
    }
 
    if (mMenuMode == MenuMode::SingleCategory)
@@ -349,19 +346,23 @@ void QuickSpawnMenu::OnSelectItem(int index)
 
 std::string QuickSpawnMenu::GetHoveredModuleTypeName()
 {
-   return GetElementName(GetIndexAt(mLastHoverX, mLastHoverY));
+   auto* element = GetElementAt(mLastHoverX, mLastHoverY);
+   if (element)
+      return element->mLabel;
+   else
+      return "";
 }
 
 int QuickSpawnMenu::GetIndexAt(int x, int y) const
-const ModuleFactory::Spawnable* QuickSpawnMenu::GetElementAt(int x, int y) const
 {
    if (x >= 0 && x < mWidth)
       return y / itemSpacing;
    return -1;
 }
 
-std::string QuickSpawnMenu::GetElementName(int index) const
+const ModuleFactory::Spawnable* QuickSpawnMenu::GetElementAt(int x, int y) const
 {
+   int index = GetIndexAt(x, y);
    if (index >= 0 && index < mElements.size())
       return &mElements[index];
 

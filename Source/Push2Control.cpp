@@ -729,7 +729,7 @@ ModuleCategory Push2Control::GetModuleTypeForSpawnList(IUIControl* control)
       moduleType = kModuleCategory_Pulse;
    if (control == mSpawnLists.mOtherModules.GetList())
       moduleType = kModuleCategory_Other;
-   if (control == mSpawnLists.mVstPlugins.GetList())
+   if (control == mSpawnLists.mPlugins.GetList())
       moduleType = kModuleCategory_Synth;
    if (control == mSpawnLists.mPrefabs.GetList())
       moduleType = kModuleCategory_Other;

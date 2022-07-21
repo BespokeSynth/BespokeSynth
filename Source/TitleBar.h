@@ -46,7 +46,7 @@ class PluginListWindow;
 class SpawnList
 {
 public:
-   SpawnList(IDropdownListener* owner, int x, int y, std::string label);
+   SpawnList(IDropdownListener* owner, int x, int y, std::string label, ModuleCategory moduleCategory);
    void SetList(std::vector<ModuleFactory::Spawnable> spawnables, bool showDecorators = true);
    void OnSelection(DropdownList* list);
    void SetPosition(int x, int y);
@@ -63,6 +63,7 @@ private:
    DropdownList* mSpawnList;
    IDropdownListener* mOwner;
    ofVec2f mPos;
+   ModuleCategory mModuleCategory;
 };
 
 struct SpawnListManager
@@ -129,7 +130,7 @@ public:
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
-   void ManageVSTs();
+   void ManagePlugins();
    const std::vector<SpawnList*>& GetSpawnLists() const { return mSpawnLists.GetDropdowns(); }
 
    bool IsSaveable() override { return false; }

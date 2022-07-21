@@ -73,13 +73,10 @@ public:
    };
 
    IDrawableModule* MakeModule(std::string type);
-   std::vector<Spawnable> GetSpawnableModules(ModuleType moduleType);
-   std::vector<Spawnable> GetSpawnableModules(std::string keys);
-   ModuleType GetModuleType(std::string typeName);
-   ModuleType GetModuleType(Spawnable spawnable);
-   std::vector<std::string> GetSpawnableModules(ModuleCategory moduleType);
-   std::vector<std::string> GetSpawnableModules(std::string keys, bool continuousString);
+   std::vector<Spawnable> GetSpawnableModules(ModuleCategory moduleType);
+   std::vector<Spawnable> GetSpawnableModules(std::string keys, bool continuousString);
    ModuleCategory GetModuleType(std::string typeName);
+   ModuleCategory GetModuleType(Spawnable spawnable);
    bool IsExperimental(std::string typeName);
    static void GetPrefabs(std::vector<Spawnable>& prefabs);
    static std::string FixUpTypeName(std::string typeName);
