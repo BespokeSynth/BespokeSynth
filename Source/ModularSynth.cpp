@@ -942,11 +942,15 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
        IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr &&
        !isRepeat)
    {
-      if (key == OF_KEY_DOWN || key == OF_KEY_UP)
+      if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
       {
          float inc;
-         if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
-             (key == OF_KEY_UP && gHoveredUIControl->InvertScrollDirection() == true))
+         if (key == OF_KEY_LEFT)
+            inc = -1;
+         else if (key == OF_KEY_RIGHT)
+            inc = 1;
+         else if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
+                  (key == OF_KEY_UP && gHoveredUIControl->InvertScrollDirection() == true))
             inc = -1;
          else
             inc = 1;
@@ -1073,6 +1077,13 @@ float ModularSynth::GetMouseX(ModuleContainer* context, float rawX /*= FLT_MAX*/
 float ModularSynth::GetMouseY(ModuleContainer* context, float rawY /*= FLT_MAX*/)
 {
    return ((rawY == FLT_MAX ? mMousePos.y : rawY) + UserPrefs.mouse_offset_y.Get()) / context->GetDrawScale() - context->GetDrawOffset().y;
+}
+
+void ModularSynth::SetMousePosition(ModuleContainer* context, float x, float y)
+{
+   x = (x + context->GetDrawOffset().x) * context->GetDrawScale() - UserPrefs.mouse_offset_x.Get() + mMainComponent->getScreenX();
+   y = (y + context->GetDrawOffset().y) * context->GetDrawScale() - UserPrefs.mouse_offset_y.Get() + mMainComponent->getScreenY();
+   Desktop::setMousePosition(Point<int>(x, y));
 }
 
 bool ModularSynth::IsMouseButtonHeld(int button) const
@@ -1374,6 +1385,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
    mMousePos.x = intX;
    mMousePos.y = intY;
+   mLastClickWasEmptySpace = false;
 
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
       mIsMouseButtonHeld[button] = true;
@@ -1539,6 +1551,12 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       {
          TheSaveDataPanel->SetModule(nullptr);
       }
+
+      if (clickedModule == nullptr)
+         mLastClickWasEmptySpace = true;
+
+      if (mQuickSpawn != nullptr && mQuickSpawn->IsShowing() && clickedModule != mQuickSpawn)
+         mQuickSpawn->SetShowing(false);
    }
 }
 
@@ -1742,6 +1760,8 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 
    mIsMousePanning = false;
 
+   bool rightButton = button == 2;
+
    if (button == 3)
       return;
 
@@ -1793,6 +1813,9 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 
    if (!mGroupSelectedModules.empty() && !mMouseMovedSignificantlySincePressed)
       mGroupSelectedModules.clear();
+
+   if (rightButton && mLastClickWasEmptySpace && !mMouseMovedSignificantlySincePressed && mQuickSpawn != nullptr)
+      mQuickSpawn->ShowSpawnCategoriesPopup();
 
    mClickStartX = INT_MAX;
    mClickStartY = INT_MAX;

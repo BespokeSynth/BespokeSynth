@@ -66,7 +66,7 @@ public:
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;

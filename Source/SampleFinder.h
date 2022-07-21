@@ -61,7 +61,7 @@ public:
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
 
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

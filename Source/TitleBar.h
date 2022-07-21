@@ -52,7 +52,9 @@ public:
    void SetPosition(int x, int y);
    void Draw();
    DropdownList* GetList() { return mSpawnList; }
-   IDrawableModule* Spawn();
+   IDrawableModule* Spawn(int index);
+   std::string GetLabel() const { return mLabel; }
+   ModuleCategory GetCategory() const { return mModuleCategory; }
 
 private:
    std::string mLabel;
@@ -71,7 +73,7 @@ struct SpawnListManager
    void SetUpPrefabsDropdown();
    void SetUpPluginsDropdown();
 
-   std::vector<SpawnList*> GetDropdowns() { return mDropdowns; }
+   const std::vector<SpawnList*>& GetDropdowns() const { return mDropdowns; }
 
    SpawnList mInstrumentModules;
    SpawnList mNoteModules;
@@ -127,7 +129,8 @@ public:
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
-   void ManagePlugins();
+   void ManageVSTs();
+   const std::vector<SpawnList*>& GetSpawnLists() const { return mSpawnLists.GetDropdowns(); }
 
    bool IsSaveable() override { return false; }
 

@@ -56,7 +56,7 @@ float IDrawableModule::sSaturation = 145;
 float IDrawableModule::sBrightness = 220;
 
 IDrawableModule::IDrawableModule()
-: mModuleType(kModuleType_Unknown)
+: mModuleType(kModuleCategory_Unknown)
 , mMinimized(false)
 , mWasMinimizeAreaClicked(false)
 , mMinimizeAnimation(0)
@@ -116,10 +116,10 @@ void IDrawableModule::Init()
    mInitialized = true;
 
    mModuleType = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
-   if (mModuleType == kModuleType_Other)
+   if (mModuleType == kModuleCategory_Other)
    {
       if (dynamic_cast<IAudioEffect*>(this))
-         mModuleType = kModuleType_Processor;
+         mModuleType = kModuleCategory_Processor;
    }
 
    mCanReceiveAudio = (dynamic_cast<IAudioReceiver*>(this) != nullptr);
@@ -235,7 +235,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    const bool kUseDropshadow = false;
-   if (kUseDropshadow && GetParent() == nullptr && GetModuleType() != kModuleType_Other)
+   if (kUseDropshadow && GetParent() == nullptr && GetModuleType() != kModuleCategory_Other)
    {
       const float shadowSize = 20;
       float shadowStrength = .2f + highlight;
@@ -407,19 +407,19 @@ void IDrawableModule::Render()
 
    if (CanReceiveAudio())
    {
-      ofSetColor(GetColor(kModuleType_Audio));
+      ofSetColor(GetColor(kModuleCategory_Audio));
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceiveNotes())
    {
-      ofSetColor(GetColor(kModuleType_Note));
+      ofSetColor(GetColor(kModuleCategory_Note));
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceivePulses())
    {
-      ofSetColor(GetColor(kModuleType_Pulse));
+      ofSetColor(GetColor(kModuleCategory_Pulse));
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
@@ -485,23 +485,23 @@ void IDrawableModule::DrawPatchCables(bool parentMinimized)
 }
 
 //static
-ofColor IDrawableModule::GetColor(ModuleType type)
+ofColor IDrawableModule::GetColor(ModuleCategory type)
 {
    ofColor color;
    color.setHsb(0, 0, sBrightness);
-   if (type == kModuleType_Note)
+   if (type == kModuleCategory_Note)
       color.setHsb(sHueNote, sSaturation, sBrightness);
-   if (type == kModuleType_Synth)
+   if (type == kModuleCategory_Synth)
       color.setHsb(sHueInstrument, sSaturation, sBrightness);
-   if (type == kModuleType_Audio)
+   if (type == kModuleCategory_Audio)
       color.setHsb(sHueAudio, sSaturation, sBrightness);
-   if (type == kModuleType_Instrument)
+   if (type == kModuleCategory_Instrument)
       color.setHsb(sHueNoteSource, sSaturation, sBrightness);
-   if (type == kModuleType_Processor)
+   if (type == kModuleCategory_Processor)
       color.setHsb(170, 100, 255);
-   if (type == kModuleType_Modulator)
+   if (type == kModuleCategory_Modulator)
       color.setHsb(200, 100, 255);
-   if (type == kModuleType_Pulse)
+   if (type == kModuleCategory_Pulse)
       color.setHsb(43, sSaturation, sBrightness);
    return color;
 }
@@ -531,7 +531,7 @@ void IDrawableModule::DrawConnection(IClickable* target)
 
    PatchCableOld cable = GetPatchCableOld(target);
 
-   ofColor lineColor = GetColor(kModuleType_Other);
+   ofColor lineColor = GetColor(kModuleCategory_Other);
    lineColor.setBrightness(lineColor.getBrightness() * .8f);
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a = lineAlpha;
