@@ -125,7 +125,11 @@ public:
    virtual bool IsResizable() const { return false; }
    virtual void Resize(float width, float height) { assert(false); }
    bool IsHoveringOverResizeHandle() const { return mHoveringOverResizeHandle; }
-   void SetTypeName(std::string type, ModuleCategory category) { mTypeName = type; mModuleCategory = category; }
+   void SetTypeName(std::string type, ModuleCategory category)
+   {
+      mTypeName = type;
+      mModuleCategory = category;
+   }
    void SetTarget(IClickable* target);
    void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
