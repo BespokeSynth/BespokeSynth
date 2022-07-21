@@ -79,7 +79,7 @@ void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
       otherEffectNames.push_back(e->Name());
    std::string name = GetUniqueName(type, otherEffectNames);
    effect->SetName(name.c_str());
-   effect->SetTypeName(type);
+   effect->SetTypeName(type, kModuleCategory_Processor);
    effect->SetParent(this);
    effect->CreateUIControls();
    if (onTheFly)

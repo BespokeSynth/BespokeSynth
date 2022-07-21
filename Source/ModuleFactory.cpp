@@ -445,7 +445,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(GridSliders, gridsliders, kModuleCategory_Modulator);
    REGISTER(MultitrackRecorder, multitrackrecorder, kModuleCategory_Other);
    REGISTER(NoteExpressionRouter, noteexpression, kModuleCategory_Note);
-   REGISTER(FloatSliderLFOControl, lfo, kModuleCategory_Other);
+   REGISTER(FloatSliderLFOControl, lfo, kModuleCategory_Modulator);
    REGISTER(NoteToggle, notetoggle, kModuleCategory_Other);
    REGISTER(NoteTable, notetable, kModuleCategory_Note);
    REGISTER(AbletonLink, abletonlink, kModuleCategory_Other);

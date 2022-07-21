@@ -2093,7 +2093,7 @@ void ModularSynth::ResetLayout()
    TitleBar* titleBar = new TitleBar();
    titleBar->SetPosition(0, 0);
    titleBar->SetName("titlebar");
-   titleBar->SetTypeName("titlebar");
+   titleBar->SetTypeName("titlebar", kModuleCategory_Other);
    titleBar->CreateUIControls();
    titleBar->SetModuleFactory(&mModuleFactory);
    titleBar->Init();
@@ -2103,7 +2103,7 @@ void ModularSynth::ResetLayout()
    {
       mMinimap = std::make_unique<Minimap>();
       mMinimap->SetName("minimap");
-      mMinimap->SetTypeName("minimap");
+      mMinimap->SetTypeName("minimap", kModuleCategory_Other);
       mMinimap->SetShouldDrawOutline(false);
       mMinimap->CreateUIControls();
       mMinimap->SetShowing(true);

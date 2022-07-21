@@ -125,14 +125,14 @@ public:
    virtual bool IsResizable() const { return false; }
    virtual void Resize(float width, float height) { assert(false); }
    bool IsHoveringOverResizeHandle() const { return mHoveringOverResizeHandle; }
-   void SetTypeName(std::string type) { mTypeName = type; }
+   void SetTypeName(std::string type, ModuleCategory category) { mTypeName = type; mModuleCategory = category; }
    void SetTarget(IClickable* target);
    void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
    void RemovePatchCableSource(PatchCableSource* source);
    bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    std::string GetTypeName() const { return mTypeName; }
-   ModuleCategory GetModuleType() const { return mModuleType; }
+   ModuleCategory GetModuleCategory() const { return mModuleCategory; }
    virtual bool IsSingleton() const { return false; }
    virtual bool CanBeDeleted() const { return (IsSingleton() ? false : true); }
    virtual bool HasSpecialDelete() const { return false; }
@@ -205,7 +205,7 @@ protected:
    ModuleSaveData mModuleSaveData;
    Checkbox* mEnabledCheckbox;
    bool mEnabled;
-   ModuleCategory mModuleType;
+   ModuleCategory mModuleCategory;
 
 private:
    virtual void PreDrawModule() {}

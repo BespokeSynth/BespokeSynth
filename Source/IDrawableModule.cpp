@@ -56,7 +56,7 @@ float IDrawableModule::sSaturation = 145;
 float IDrawableModule::sBrightness = 220;
 
 IDrawableModule::IDrawableModule()
-: mModuleType(kModuleCategory_Unknown)
+: mModuleCategory(kModuleCategory_Unknown)
 , mMinimized(false)
 , mWasMinimizeAreaClicked(false)
 , mMinimizeAnimation(0)
@@ -115,11 +115,11 @@ void IDrawableModule::Init()
    assert(!mInitialized);
    mInitialized = true;
 
-   mModuleType = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
-   if (mModuleType == kModuleCategory_Other)
+   mModuleCategory = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
+   if (mModuleCategory == kModuleCategory_Other)
    {
       if (dynamic_cast<IAudioEffect*>(this))
-         mModuleType = kModuleCategory_Processor;
+         mModuleCategory = kModuleCategory_Processor;
    }
 
    mCanReceiveAudio = (dynamic_cast<IAudioReceiver*>(this) != nullptr);
@@ -138,7 +138,7 @@ void IDrawableModule::Init()
    if (showEnableToggle)
    {
       mEnabledCheckbox->SetDisplayText(false);
-      mEnabledCheckbox->UseCircleLook(GetColor(mModuleType));
+      mEnabledCheckbox->UseCircleLook(GetColor(mModuleCategory));
    }
    else
    {
@@ -195,7 +195,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
 
    ofTranslate(mX, mY, 0);
 
-   ofColor color = GetColor(mModuleType);
+   ofColor color = GetColor(mModuleCategory);
 
    highlight = 0;
 
@@ -235,7 +235,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    const bool kUseDropshadow = false;
-   if (kUseDropshadow && GetParent() == nullptr && GetModuleType() != kModuleCategory_Other)
+   if (kUseDropshadow && GetParent() == nullptr && GetModuleCategory() != kModuleCategory_Other)
    {
       const float shadowSize = 20;
       float shadowStrength = .2f + highlight;
@@ -427,7 +427,7 @@ void IDrawableModule::Render()
 
    if (IsResizable() && !Minimized())
    {
-      ofColor color = GetColor(mModuleType);
+      ofColor color = GetColor(mModuleCategory);
       ofSetColor(color, 255);
       if (mHoveringOverResizeHandle)
          ofSetLineWidth(4);
@@ -466,7 +466,7 @@ void IDrawableModule::RenderUnclipped()
    ofPushStyle();
 
    ofTranslate(mX, mY, 0);
-   ofColor color = GetColor(mModuleType);
+   ofColor color = GetColor(mModuleCategory);
    ofSetColor(color);
 
    DrawModuleUnclipped();

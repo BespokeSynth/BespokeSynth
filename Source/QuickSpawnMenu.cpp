@@ -36,8 +36,9 @@ QuickSpawnMenu* TheQuickSpawnMenu = nullptr;
 
 namespace
 {
-   const int itemSpacing = 15;
-   ofVec2f moduleGrabOffset(-40, 10);
+   const int kItemSpacing = 15;
+   const int kRightClickShiftX = 11;
+   ofVec2f kModuleGrabOffset(-40, 10);
 }
 
 QuickSpawnMenu::QuickSpawnMenu()
@@ -97,7 +98,7 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
          int oldIndex = mHighlightIndex;
          mHighlightIndex = ofClamp(mHighlightIndex + (key == OF_KEY_DOWN || key == OF_KEY_RIGHT ? 1 : -1), 0, (int)mElements.size() - 1);
          int change = mHighlightIndex - oldIndex;
-         mScrollOffset -= change * itemSpacing;
+         mScrollOffset -= change * kItemSpacing;
          UpdatePosition();
          MoveMouseToIndex(mHighlightIndex);
       }
@@ -172,13 +173,9 @@ void QuickSpawnMenu::UpdateDisplay()
       else if (mMenuMode == MenuMode::SingleCategory)
       {
          mElements.clear();
-         auto* list = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetList();
-         for (int i = 0; i < list->GetNumValues(); ++i)
-         {
-            ModuleFactory::Spawnable dummy;
-            dummy.mLabel = list->GetElement(i).mLabel;
-            mElements.push_back(dummy);
-         }
+         const auto& elements = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetElements();
+         for (size_t i = 0; i < elements.size(); ++i)
+            mElements.push_back(elements[i]);
       }
       else if (mMenuMode == MenuMode::Search)
       {
@@ -193,12 +190,12 @@ void QuickSpawnMenu::UpdateDisplay()
       float width = 150;
       for (auto& element : mElements)
       {
-         float elementWidth = GetStringWidth(element.mLabel + " " + element.mDecorator) + 10;
+         float elementWidth = GetStringWidth(element.mLabel + " " + element.mDecorator) + 10 + (mMenuMode == MenuMode::SingleLetter ? 0 : kRightClickShiftX);
          if (elementWidth > width)
             width = elementWidth;
       }
 
-      SetDimensions(width, MAX((int)mElements.size(), 1) * itemSpacing);
+      SetDimensions(width, MAX((int)mElements.size(), 1) * kItemSpacing);
       UpdatePosition();
       SetShowing(true);
    }
@@ -219,7 +216,7 @@ void QuickSpawnMenu::UpdatePosition()
    else
    {
       SetPosition(ofClamp(mAppearAtMousePos.x - 5, minX, maxX),
-                  mAppearAtMousePos.y - itemSpacing / 2 + mScrollOffset);
+                  mAppearAtMousePos.y - kItemSpacing / 2 + mScrollOffset);
    }
 }
 
@@ -229,7 +226,7 @@ void QuickSpawnMenu::MouseReleased()
 
 bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scrollY)
 {
-   float newY = ofClamp(y + scrollY * 5, itemSpacing / 2, mHeight - itemSpacing / 2);
+   float newY = ofClamp(y + scrollY * 5, kItemSpacing / 2, mHeight - kItemSpacing / 2);
    float changeAmount = newY - y;
    mScrollOffset -= changeAmount;
    UpdatePosition();
@@ -240,7 +237,7 @@ bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scroll
 void QuickSpawnMenu::MoveMouseToIndex(int index)
 {
    mHighlightIndex = index;
-   TheSynth->SetMousePosition(GetOwningContainer(), mX + 5, mY + (index + .5f) * itemSpacing);
+   TheSynth->SetMousePosition(GetOwningContainer(), mX + 5, mY + (index + .5f) * kItemSpacing);
 }
 
 void QuickSpawnMenu::DrawModule()
@@ -260,12 +257,17 @@ void QuickSpawnMenu::DrawModule()
          ofSetColor(IDrawableModule::GetColor(TheTitleBar->GetSpawnLists()[i]->GetCategory()) * (i == mHighlightIndex ? .7f : .5f), 255);
       else
          ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i])) * (i == mHighlightIndex ? .7f : .5f), 255);
-      ofRect(0, i * itemSpacing + 1, mWidth, itemSpacing - 1);
+      ofRect(0, i * kItemSpacing + 1, mWidth, kItemSpacing - 1);
       if (i == mHighlightIndex)
          ofSetColor(255, 255, 0);
       else
          ofSetColor(255, 255, 255);
-      DrawTextNormal(mElements[i].mLabel + " " + mElements[i].mDecorator, mMenuMode == MenuMode::SingleLetter ? 1 : 12, i * itemSpacing + 12);
+
+      bool showDecorator = true;
+      if (mMenuMode == MenuMode::SingleCategory && mSelectedCategoryIndex >= 0 && mSelectedCategoryIndex < (int)TheTitleBar->GetSpawnLists().size())
+         showDecorator = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->ShouldShowDecorators();
+
+      DrawTextNormal(mElements[i].mLabel + (showDecorator ? (" " + mElements[i].mDecorator) : ""), 1 + (mMenuMode == MenuMode::SingleLetter ? 0 : kRightClickShiftX), i * kItemSpacing + 12);
    }
    if (mElements.size() == 0)
    {
@@ -309,8 +311,8 @@ void QuickSpawnMenu::OnSelectItem(int index)
    {
       if (index >= 0 && index < mElements.size())
       {
-         IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(mElements[index], TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
-         TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
+         IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(mElements[index], TheSynth->GetMouseX(TheSynth->GetRootContainer()) + kModuleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + kModuleGrabOffset.y);
+         TheSynth->SetMoveModule(module, kModuleGrabOffset.x, kModuleGrabOffset.y, true);
       }
       SetShowing(false);
    }
@@ -323,7 +325,7 @@ void QuickSpawnMenu::OnSelectItem(int index)
           index < TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetList()->GetNumValues())
       {
          IDrawableModule* module = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->Spawn(index);
-         TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
+         TheSynth->SetMoveModule(module, kModuleGrabOffset.x, kModuleGrabOffset.y, true);
       }
       SetShowing(false);
    }
@@ -356,7 +358,7 @@ std::string QuickSpawnMenu::GetHoveredModuleTypeName()
 int QuickSpawnMenu::GetIndexAt(int x, int y) const
 {
    if (x >= 0 && x < mWidth)
-      return y / itemSpacing;
+      return y / kItemSpacing;
    return -1;
 }
 

@@ -445,7 +445,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    {
       int color = 0;
       if (mBookmarkSlots[i] != nullptr && !mBookmarkSlots[i]->IsDeleted())
-         color = GetPadColorForType(mBookmarkSlots[i]->GetModuleType());
+         color = GetPadColorForType(mBookmarkSlots[i]->GetModuleCategory());
       SetLed(kMidiMessage_Control, kQuantizeButtonSection + i, color);
    }
 
@@ -591,7 +591,7 @@ void Push2Control::SetModuleGridLights()
          int gridIndex = gridX + (7 - gridY) * 8;
          int padNumber = 36 + i;
          if (mModuleGrid[gridIndex] != nullptr)
-            SetLed(kMidiMessage_Note, padNumber, GetPadColorForType(mModuleGrid[gridIndex]->GetModuleType()), mModuleGrid[gridIndex] == mDisplayModule ? 122 : -1);
+            SetLed(kMidiMessage_Note, padNumber, GetPadColorForType(mModuleGrid[gridIndex]->GetModuleCategory()), mModuleGrid[gridIndex] == mDisplayModule ? 122 : -1);
          else
             SetLed(kMidiMessage_Note, padNumber, 0);
       }
@@ -623,7 +623,7 @@ void Push2Control::DrawDisplayModuleControls()
       mDisplayModule->DrawFrame(kColumnSpacing * MAX(1, MAX(mSliderControls.size(), mButtonControls.size())) - 14, 80, false, titleBarHeight, highlight);
       mDisplayModule->SetPosition(x, y);
 
-      ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleType()));
+      ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleCategory()));
       ofNoFill();
 
       nvgFontSize(sVG, 16);
@@ -634,7 +634,7 @@ void Push2Control::DrawDisplayModuleControls()
       for (int i = 0; i < mButtonControls.size(); ++i)
       {
          if (i - mModuleColumnOffset >= 0 && i - mModuleColumnOffset < 8)
-            topRowLedColors[i - mModuleColumnOffset] = GetPadColorForType(mButtonControls[i]->GetModuleParent()->GetModuleType());
+            topRowLedColors[i - mModuleColumnOffset] = GetPadColorForType(mButtonControls[i]->GetModuleParent()->GetModuleCategory());
       }
       for (int i = 0; i < 8; ++i)
          SetLed(kMidiMessage_Control, i + kAboveScreenButtonRow, topRowLedColors[i]);
@@ -672,7 +672,7 @@ void Push2Control::DrawLowerModuleSelector()
       mModules[i]->SetPosition(x, y);
 
       if (i - round(mModuleListOffset) >= 0 && i - round(mModuleListOffset) < 8)
-         bottomRowLedColors[i - (int)round(mModuleListOffset)] = GetPadColorForType(mModules[i]->GetModuleType());
+         bottomRowLedColors[i - (int)round(mModuleListOffset)] = GetPadColorForType(mModules[i]->GetModuleCategory());
 
       ofPopMatrix();
       ofPopStyle();
@@ -751,7 +751,7 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
       controls[i]->SetPosition(x, y);
 
       ofPushStyle();
-      ModuleCategory moduleType = controls[i]->GetModuleParent()->GetModuleType();
+      ModuleCategory moduleType = controls[i]->GetModuleParent()->GetModuleCategory();
       if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
          moduleType = GetModuleTypeForSpawnList(controls[i]);
       if (controls[i]->IsShowing())
@@ -777,7 +777,7 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
             ofTranslate(kColumnSpacing * i + 3, yPos + kCentering - h * controls[i]->GetMidiValue());
             dropdown->DrawDropdown(w, h, true);
             ofFill();
-            ofColor color = IDrawableModule::GetColor(controls[i]->GetModuleParent()->GetModuleType());
+            ofColor color = IDrawableModule::GetColor(controls[i]->GetModuleParent()->GetModuleCategory());
             color.a = 25;
             ofSetColor(color);
             //ofCircle(w - 4, h * controls[i]->GetMidiValue(), 2);

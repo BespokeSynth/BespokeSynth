@@ -132,7 +132,7 @@ void Minimap::DrawModulesOnMinimap(ofRectangle& boundingBox)
          continue;
       }
       ofRectangle moduleRect = modules[i]->GetRect();
-      ofColor moduleColor(IDrawableModule::GetColor(modules[i]->GetModuleType()));
+      ofColor moduleColor(IDrawableModule::GetColor(modules[i]->GetModuleCategory()));
       ofSetColor(moduleColor);
       ofFill();
       ofRect(CoordsToMinimap(boundingBox, moduleRect));

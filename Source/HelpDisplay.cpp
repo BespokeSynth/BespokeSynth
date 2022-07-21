@@ -534,7 +534,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);
 
             std::string moduleType;
-            switch (module->GetModuleType())
+            switch (module->GetModuleCategory())
             {
                case kModuleCategory_Note: moduleType = "note effects"; break;
                case kModuleCategory_Synth: moduleType = "synths"; break;

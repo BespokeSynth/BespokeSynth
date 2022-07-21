@@ -116,7 +116,7 @@ FloatSliderLFOControl::~FloatSliderLFOControl()
 
 void FloatSliderLFOControl::DrawModule()
 {
-   if (!mPinned)
+   /*if (!mPinned)
    {
       float w, h;
       GetDimensions(w, h);
@@ -130,7 +130,7 @@ void FloatSliderLFOControl::DrawModule()
       ofSetColor(255, 255, 255);
       ofRect(0, 0, w, h);
       ofPopStyle();
-   }
+   }*/
 
    if (Minimized())
       return;
@@ -463,7 +463,7 @@ void LFOPool::Init()
       sLFOPool[i] = new FloatSliderLFOControl();
       sLFOPool[i]->CreateUIControls();
       sLFOPool[i]->Init();
-      sLFOPool[i]->SetTypeName("lfo");
+      sLFOPool[i]->SetTypeName("lfo", kModuleCategory_Modulator);
       sLFOPool[i]->SetLFOEnabled(false);
    }
    sInitialized = true;
