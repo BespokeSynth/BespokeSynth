@@ -115,6 +115,7 @@ private:
    std::string GetPluginFormatName() const;
    std::string GetPluginId() const;
    void CreateParameterSliders();
+   void AddParameterSlider(int index);
    void RefreshPresetFiles();
    bool ParameterNameExists(std::string name, int checkUntilIndex) const;
 

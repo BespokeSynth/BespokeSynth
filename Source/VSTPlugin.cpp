@@ -467,7 +467,7 @@ void VSTPlugin::CreateParameterSliders()
 
    const auto& parameters = mPlugin->getParameters();
 
-   int numParameters = MIN(10000, parameters.size());
+   int numParameters = MIN(31, parameters.size());
    mParameterSliders.resize(numParameters);
    for (int i = 0; i < numParameters; ++i)
    {
@@ -501,6 +501,22 @@ void VSTPlugin::CreateParameterSliders()
    }
 }
 
+void VSTPlugin::AddParameterSlider(int i)
+{
+   ParameterSlider tmp{};
+   juce::String originalParamName = mPlugin->getParameters()[i]->getName(32);
+   std::string name(originalParamName.getCharPointer());
+
+   tmp.mValue = mPlugin->getParameters()[i]->getValue();
+   tmp.mParameter = mPlugin->getParameters()[i];
+   tmp.mName = name.c_str();
+   tmp.mShowing = false;
+   tmp.mInSelectorList = true;
+   
+   mParameterSliders.push_back(tmp);
+   mShowParameterDropdown->AddLabel(name.c_str(), mParameterSliders.size() - 1);
+ }
+
 void VSTPlugin::Poll()
 {
    if (mDisplayMode == kDisplayMode_Sliders)
@@ -521,7 +537,8 @@ void VSTPlugin::Poll()
             if (mTemporarilyDisplayedParamIndex != -1)
                mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
             mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mName, mChangeGestureParameterIndex);
+            //mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mName, mChangeGestureParameterIndex);
+            AddParameterSlider(mChangeGestureParameterIndex);
          }
 
          mChangeGestureParameterIndex = -1;
