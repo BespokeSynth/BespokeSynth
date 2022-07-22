@@ -369,6 +369,8 @@ private:
    int mClickStartY;
    bool mMouseMovedSignificantlySincePressed{ true };
    bool mLastClickWasEmptySpace{ false };
+   bool mIsShiftPressed{ false };
+   double mLastShiftPressTime{ -9999 };
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout;

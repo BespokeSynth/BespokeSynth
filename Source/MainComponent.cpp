@@ -482,12 +482,6 @@ private:
       }
 #endif
 
-      if (key.getKeyCode() == juce::KeyPress::F2Key)
-      {
-         mSynth.ToggleQuickSpawn();
-         return true;
-      }
-
       int keyCode = key.getTextCharacter();
       if (keyCode < 32 || key.getModifiers().isAltDown())
          keyCode = key.getKeyCode();

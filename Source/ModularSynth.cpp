@@ -434,6 +434,22 @@ void ModularSynth::Poll()
       }
    }
 
+   bool shiftPressed = (GetKeyModifiers() == kModifier_Shift);
+   if (shiftPressed && !mIsShiftPressed)
+   {
+      double timeBetweenPresses = gTime - mLastShiftPressTime;
+      if (timeBetweenPresses < 400)
+      {
+         ToggleQuickSpawn();
+         mLastShiftPressTime = -9999;   //clear timer
+      }
+      else
+      {
+         mLastShiftPressTime = gTime;
+      }
+   }
+   mIsShiftPressed = shiftPressed;
+
    ++sFrameCount;
 }
 
