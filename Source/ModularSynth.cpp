@@ -434,6 +434,22 @@ void ModularSynth::Poll()
       }
    }
 
+   bool shiftPressed = (GetKeyModifiers() == kModifier_Shift);
+   if (shiftPressed && !mIsShiftPressed)
+   {
+      double timeBetweenPresses = gTime - mLastShiftPressTime;
+      if (timeBetweenPresses < 400)
+      {
+         ToggleQuickSpawn();
+         mLastShiftPressTime = -9999; //clear timer
+      }
+      else
+      {
+         mLastShiftPressTime = gTime;
+      }
+   }
+   mIsShiftPressed = shiftPressed;
+
    ++sFrameCount;
 }
 
@@ -1022,6 +1038,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
          IUIControl::SetNewManualHover(1);
    }
 
+   if (key == OF_KEY_RETURN)
+   {
+      if (mMoveModule)
+         mMoveModule = nullptr; //drop module
+   }
+
    mZoomer.OnKeyPressed(key);
 
    if (CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() & kModifier_Alt))
@@ -1557,6 +1579,18 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
       if (mQuickSpawn != nullptr && mQuickSpawn->IsShowing() && clickedModule != mQuickSpawn)
          mQuickSpawn->SetShowing(false);
+   }
+}
+
+void ModularSynth::ToggleQuickSpawn()
+{
+   if (mQuickSpawn != nullptr && mQuickSpawn->IsShowing())
+   {
+      mQuickSpawn->SetShowing(false);
+   }
+   else
+   {
+      mQuickSpawn->ShowSpawnCategoriesPopup();
    }
 }
 
