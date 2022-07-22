@@ -515,7 +515,7 @@ void VSTPlugin::AddParameterSlider(int i)
 
    mParameterSliders.push_back(tmp);
    mShowParameterDropdown->AddLabel(name.c_str(), mParameterSliders.size() - 1);
- }
+}
 
 void VSTPlugin::Poll()
 {
