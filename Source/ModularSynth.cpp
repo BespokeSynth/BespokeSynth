@@ -1038,6 +1038,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
          IUIControl::SetNewManualHover(1);
    }
 
+   if (key == OF_KEY_RETURN)
+   {
+      if (mMoveModule)
+         mMoveModule = nullptr; //drop module
+   }
+
    mZoomer.OnKeyPressed(key);
 
    if (CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() & kModifier_Alt))
