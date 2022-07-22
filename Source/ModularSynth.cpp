@@ -441,7 +441,7 @@ void ModularSynth::Poll()
       if (timeBetweenPresses < 400)
       {
          ToggleQuickSpawn();
-         mLastShiftPressTime = -9999;   //clear timer
+         mLastShiftPressTime = -9999; //clear timer
       }
       else
       {
