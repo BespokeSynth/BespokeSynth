@@ -512,7 +512,7 @@ void VSTPlugin::AddParameterSlider(int i)
    tmp.mName = name.c_str();
    tmp.mShowing = false;
    tmp.mInSelectorList = true;
-   
+
    mParameterSliders.push_back(tmp);
    mShowParameterDropdown->AddLabel(name.c_str(), mParameterSliders.size() - 1);
  }
@@ -537,7 +537,14 @@ void VSTPlugin::Poll()
             if (mTemporarilyDisplayedParamIndex != -1)
                mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
             mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            //mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mName, mChangeGestureParameterIndex);
+            AddParameterSlider(mChangeGestureParameterIndex);
+         }
+
+         if (mChangeGestureParameterIndex > (int)mParameterSliders.size() && mTemporarilyDisplayedParamIndex != mChangeGestureParameterIndex)
+         {
+            if (mTemporarilyDisplayedParamIndex != -1)
+               mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
+            mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
             AddParameterSlider(mChangeGestureParameterIndex);
          }
 
