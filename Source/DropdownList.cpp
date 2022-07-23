@@ -257,7 +257,7 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
       {
          ofPushStyle();
          ofSetColor(100, 100, 100, 100);
-         ofSetLineWidth(.5f);
+         ofSetLineWidth(1);
          ofLine(mMaxItemWidth * col + 3, (i % maxPerColumn) * kItemSpacing + pageHeaderShift, mMaxItemWidth * (col + 1) - 3, (i % maxPerColumn) * kItemSpacing + pageHeaderShift);
          ofPopStyle();
       }

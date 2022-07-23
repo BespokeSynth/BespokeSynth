@@ -130,7 +130,7 @@ bool CanvasScrollbar::MouseMoved(float x, float y)
    return false;
 }
 
-bool CanvasScrollbar::MouseScrolled(float x, float y, float scrollX, float scrollY)
+bool CanvasScrollbar::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }
