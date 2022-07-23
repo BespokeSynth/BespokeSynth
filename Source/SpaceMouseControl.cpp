@@ -285,7 +285,7 @@ void SpaceMouseMessageWindow::Impl::SbMotionEvent(SiSpwEvent* pEvent)
    }
    if (ry != 0)
    {
-      mSynth.MouseScrolled(0, ry * kTwistScale, false);
+      mSynth.MouseScrolled(0, ry * kTwistScale, true, false);
       usingTwist = true;
       mIsTwisting = true;
    }

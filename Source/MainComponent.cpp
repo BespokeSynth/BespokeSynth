@@ -447,7 +447,7 @@ private:
          scale = 30;
 
       if (!wheel.isInertial)
-         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert, true);
+         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert, wheel.isSmooth, true);
    }
 
    void mouseMagnify(const MouseEvent& e, float scaleFactor) override

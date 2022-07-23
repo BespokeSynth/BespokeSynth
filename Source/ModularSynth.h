@@ -90,7 +90,7 @@ public:
    void MouseDragged(int x, int y, int button, const juce::MouseInputSource& source);
    void MousePressed(int x, int y, int button, const juce::MouseInputSource& source);
    void MouseReleased(int x, int y, int button, const juce::MouseInputSource& source);
-   void MouseScrolled(float x, float y, bool canZoomCanvas);
+   void MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool canZoomCanvas);
    void MouseMagnify(int x, int y, float scaleFactor, const juce::MouseInputSource& source);
    void FilesDropped(std::vector<std::string> files, int x, int y);
 

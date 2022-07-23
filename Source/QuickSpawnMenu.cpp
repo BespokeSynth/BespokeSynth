@@ -224,9 +224,19 @@ void QuickSpawnMenu::MouseReleased()
 {
 }
 
-bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scrollY)
+bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll)
 {
-   float newY = ofClamp(y + scrollY * 5, kItemSpacing / 2, mHeight - kItemSpacing / 2);
+   const float kScrollSpeed = 5;
+
+   if (!isSmoothScroll)
+   {
+      if (scrollY < 0)
+         scrollY = -kItemSpacing / kScrollSpeed;
+      if (scrollY > 0)
+         scrollY = kItemSpacing / kScrollSpeed;
+   }
+
+   float newY = ofClamp(y - scrollY * kScrollSpeed, kItemSpacing / 2, mHeight - kItemSpacing / 2);
    float changeAmount = newY - y;
    mScrollOffset -= changeAmount;
    UpdatePosition();

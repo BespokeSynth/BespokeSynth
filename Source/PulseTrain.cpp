@@ -196,9 +196,9 @@ bool PulseTrain::MouseMoved(float x, float y)
    return false;
 }
 
-bool PulseTrain::MouseScrolled(float x, float y, float scrollX, float scrollY)
+bool PulseTrain::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll)
 {
-   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
+   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll);
    return false;
 }
 
