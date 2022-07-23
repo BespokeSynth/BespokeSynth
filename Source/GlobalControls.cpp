@@ -93,14 +93,14 @@ void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    if (slider == mMouseScrollXSlider && gHoveredUIControl != mMouseScrollXSlider) //avoid bad behavior when adjusting these via mouse
    {
       float delta = mMouseScrollX - oldVal;
-      TheSynth->MouseScrolled(-delta, 0, false, false);
+      TheSynth->MouseScrolled(-delta, 0, false, false, false);
       mMouseScrollX = 0;
    }
 
    if (slider == mMouseScrollYSlider && gHoveredUIControl != mMouseScrollYSlider) //avoid bad behavior when adjusting these via mouse
    {
       float delta = mMouseScrollY - oldVal;
-      TheSynth->MouseScrolled(0, -delta, false, false);
+      TheSynth->MouseScrolled(0, -delta, false, false, false);
       mMouseScrollY = 0;
    }
 }

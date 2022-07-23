@@ -224,9 +224,12 @@ void QuickSpawnMenu::MouseReleased()
 {
 }
 
-bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll)
+bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    const float kScrollSpeed = 5;
+
+   if (isInvertedScroll)
+      scrollY *= -1;
 
    if (!isSmoothScroll)
    {

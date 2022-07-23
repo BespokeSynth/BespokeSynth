@@ -1596,7 +1596,7 @@ void ModularSynth::ToggleQuickSpawn()
    }
 }
 
-void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool canZoomCanvas)
+void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas)
 {
    xScroll *= UserPrefs.scroll_multiplier_horizontal.Get();
    yScroll *= UserPrefs.scroll_multiplier_vertical.Get();
@@ -1653,13 +1653,13 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       val = ofClamp(val, 0, 1);
       gHoveredUIControl->SetFromMidiCC(val);
 
-      gHoveredUIControl->NotifyMouseScrolled(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), xScroll, yScroll, isSmoothScroll);
+      gHoveredUIControl->NotifyMouseScrolled(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), xScroll, yScroll, isSmoothScroll, isInvertedScroll);
    }
    else
    {
       IDrawableModule* module = GetModuleAtCursor();
       if (module)
-         module->NotifyMouseScrolled(GetMouseX(module->GetOwningContainer()), GetMouseY(module->GetOwningContainer()), xScroll, yScroll, isSmoothScroll);
+         module->NotifyMouseScrolled(GetMouseX(module->GetOwningContainer()), GetMouseY(module->GetOwningContainer()), xScroll, yScroll, isSmoothScroll, isInvertedScroll);
    }
 }
 

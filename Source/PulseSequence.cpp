@@ -212,9 +212,9 @@ bool PulseSequence::MouseMoved(float x, float y)
    return false;
 }
 
-bool PulseSequence::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll)
+bool PulseSequence::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll);
+   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
 }
 

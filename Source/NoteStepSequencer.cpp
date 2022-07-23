@@ -427,10 +427,10 @@ bool NoteStepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool NoteStepSequencer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll)
+bool NoteStepSequencer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   mGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll);
-   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll);
+   mGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
+   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
 }
 
