@@ -67,7 +67,7 @@ private:
 
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;

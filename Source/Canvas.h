@@ -83,7 +83,7 @@ public:
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void Clear();
    void SetListener(ICanvasListener* listener) { mListener = listener; }
    void SetDimensions(int width, int height)
