@@ -47,16 +47,39 @@ void NoteCounter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   UIBLOCK0();
+   float desiredWidth = 116;
+
+   UIBLOCK(3, 3, desiredWidth - 6);
    DROPDOWN(mIntervalSelector, "interval", ((int*)(&mInterval)), 50);
    UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mSyncCheckbox, "sync", &mSync);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_PUSHSLIDERWIDTH(75);
+   INTSLIDER(mCustomDivisorSlider, "div", &mCustomDivisor, 1, 32);
+   UIBLOCK_POPSLIDERWIDTH();
    UIBLOCK_NEWLINE();
    INTSLIDER(mStartSlider, "start", &mStart, 0, 32);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, 32);
    CHECKBOX(mRandomCheckbox, "random", &mRandom);
-   INTSLIDER(mCustomDivisorSlider, "div", &mCustomDivisor, 1, 32);
    ENDUIBLOCK(mWidth, mHeight);
+
+   UIBLOCK(3, mHeight + 5, desiredWidth - 6);
+   INTSLIDER(mDeterministicLengthSlider, "beat length", &mDeterministicLength, 1, 16);
+   TEXTENTRY_NUM(mSeedEntry, "seed", 4, &mSeed, 0, 9999);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mPrevSeedButton, "<");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mReseedButton, "*");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mNextSeedButton, ">");
+   ENDUIBLOCK0();
+
+   mWidth = desiredWidth;
+
+   mSeedEntry->DrawLabel(true);
+   mPrevSeedButton->PositionTo(mSeedEntry, kAnchor_Right);
+   mReseedButton->PositionTo(mPrevSeedButton, kAnchor_Right);
+   mNextSeedButton->PositionTo(mReseedButton, kAnchor_Right);
 
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -87,6 +110,31 @@ void NoteCounter::DrawModule()
    mRandomCheckbox->Draw();
    mCustomDivisorSlider->SetShowing(mInterval == kInterval_CustomDivisor);
    mCustomDivisorSlider->Draw();
+
+   mDeterministicLengthSlider->SetShowing(mDeterministic && mRandom);
+   mDeterministicLengthSlider->Draw();
+   mSeedEntry->SetShowing(mDeterministic && mRandom);
+   mSeedEntry->Draw();
+   mPrevSeedButton->SetShowing(mDeterministic && mRandom);
+   mPrevSeedButton->Draw();
+   mReseedButton->SetShowing(mDeterministic && mRandom);
+   mReseedButton->Draw();
+   mNextSeedButton->SetShowing(mDeterministic && mRandom);
+   mNextSeedButton->Draw();
+
+   if (mDeterministic && mRandom)
+   {
+      ofRectangle lengthRect = mDeterministicLengthSlider->GetRect(true);
+      ofPushStyle();
+      ofSetColor(0, 255, 0);
+      ofFill();
+      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mDeterministicLength, 1);
+      const float kPipSize = 3;
+      float moduleWidth, moduleHeight;
+      GetModuleDimensions(moduleWidth, moduleHeight);
+      ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
+      ofPopStyle();
+   }
 }
 
 void NoteCounter::Step(double time, float velocity, int pulseFlags)
@@ -105,7 +153,7 @@ void NoteCounter::Step(double time, float velocity, int pulseFlags)
       if (pulseFlags & kPulseFlag_Reset)
          mStep = 0;
       if (pulseFlags & kPulseFlag_Random)
-         mStep = gRandom() % mLength;
+         mStep = GetRandom(time, 999) % mLength;
       if (pulseFlags & kPulseFlag_Align)
       {
          int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
@@ -118,7 +166,7 @@ void NoteCounter::Step(double time, float velocity, int pulseFlags)
 
    mNoteOutput.Flush(time);
    if (mRandom)
-      PlayNoteOutput(time, gRandom() % mLength + mStart, 127, -1);
+      PlayNoteOutput(time, GetRandom(time, 0) % mLength + mStart, 127, -1);
    else
       PlayNoteOutput(time, mStep + mStart, 127, -1);
 
@@ -133,6 +181,24 @@ void NoteCounter::Step(double time, float velocity, int pulseFlags)
    }
 }
 
+std::uint64_t NoteCounter::GetRandom(double time, int seedOffset) const
+{
+   std::uint64_t random;
+   if (mDeterministic && mRandom)
+   {
+      const int kStepResolution = 128;
+      uint64_t step = int(TheTransport->GetMeasureTime(time) * kStepResolution);
+      int randomIndex = step % ((mDeterministicLength * kStepResolution) / TheTransport->GetTimeSigTop());
+      random = abs(DeterministicRandom(mSeed + seedOffset, randomIndex));
+   }
+   else
+   {
+      random = gRandom();
+   }
+
+   return random;
+}
+
 void NoteCounter::OnTimeEvent(double time)
 {
    if (!mHasExternalPulseSource)
@@ -144,6 +210,21 @@ void NoteCounter::OnPulse(double time, float velocity, int flags)
    mHasExternalPulseSource = true;
 
    Step(time, velocity, flags);
+}
+
+void NoteCounter::Reseed()
+{
+   mSeed = gRandom() % 10000;
+}
+
+void NoteCounter::ButtonClicked(ClickButton* button)
+{
+   if (button == mPrevSeedButton)
+      mSeed = (mSeed - 1 + 10000) % 10000;
+   if (button == mReseedButton)
+      Reseed();
+   if (button == mNextSeedButton)
+      mSeed = (mSeed + 1) % 10000;
 }
 
 void NoteCounter::CheckboxUpdated(Checkbox* checkbox)
@@ -175,13 +256,16 @@ void NoteCounter::GetModuleDimensions(float& width, float& height)
 {
    width = mWidth;
    height = mHeight;
-   if (!mCustomDivisorSlider->IsShowing())
-      height -= 17;
+   if (mDeterministic && mRandom)
+      height += 40;
+   if (mCustomDivisorSlider->IsShowing())
+      width += 60;
 }
 
 void NoteCounter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("deterministic_random", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -189,6 +273,7 @@ void NoteCounter::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteCounter::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mDeterministic = mModuleSaveData.GetBool("deterministic_random");
 }
 
 void NoteCounter::SaveState(FileStreamOut& out)
@@ -197,8 +282,6 @@ void NoteCounter::SaveState(FileStreamOut& out)
 
    IDrawableModule::SaveState(out);
 
-   out << mWidth;
-   out << mHeight;
    out << mHasExternalPulseSource;
 }
 
@@ -213,7 +296,11 @@ void NoteCounter::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   if (rev == 1)
+   {
+      float dummy;
+      in >> dummy;   //width
+      in >> dummy;   //height
+   }
    in >> mHasExternalPulseSource;
 }
