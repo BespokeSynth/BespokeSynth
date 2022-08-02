@@ -87,7 +87,7 @@ void BandVocoder::CreateUIControls()
    INTSLIDER(mNumBandsSlider, "bands", &mNumBands, 2, VOCODER_MAX_BANDS);
    FLOATSLIDER(mFBaseSlider, "f base", &mFreqBase, 20, 300);
    FLOATSLIDER(mFRangeSlider, "f range", &mFreqRange, 0, gSampleRate / 2 - 1000);
-   FLOATSLIDER(mQSlider, "q", &mQ, 20, 80);
+   FLOATSLIDER_DIGITS(mQSlider, "q", &mQ, 20, 80, 3);
    FLOATSLIDER_DIGITS(mRingTimeSlider, "ring", &mRingTime, .0001f, .1f, 4);
    ENDUIBLOCK0();
 
