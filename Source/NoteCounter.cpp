@@ -299,8 +299,8 @@ void NoteCounter::LoadState(FileStreamIn& in, int rev)
    if (rev == 1)
    {
       float dummy;
-      in >> dummy;   //width
-      in >> dummy;   //height
+      in >> dummy; //width
+      in >> dummy; //height
    }
    in >> mHasExternalPulseSource;
 }
