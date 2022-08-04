@@ -30,6 +30,7 @@
 #include "INoteReceiver.h"
 #include "IModulator.h"
 #include "Slider.h"
+#include "Checkbox.h"
 
 class PatchCableSource;
 
@@ -68,9 +69,11 @@ private:
    void GetModuleDimensions(float& width, float& height) override
    {
       width = 106;
-      height = 17 * 2 + 2;
+      height = 17 * 3 + 2;
    }
    bool Enabled() const override { return mEnabled; }
 
    int mVelocity;
+   bool mPassZero;
+   Checkbox* mPassZeroCheckbox;
 };
