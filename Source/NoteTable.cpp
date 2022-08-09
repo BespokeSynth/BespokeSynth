@@ -588,7 +588,7 @@ void NoteTable::SetUpColumnControls()
    for (int i = 0; i < kMaxLength; ++i)
    {
       mToneDropdowns[i]->Clear();
-      for (int j = 0; j < mNoteRange; ++j)
+      for (int j = mNoteRange - 1; j >= 0; --j)
          mToneDropdowns[i]->AddLabel(NoteName(RowToPitch(j), false, true), j);
    }
 }

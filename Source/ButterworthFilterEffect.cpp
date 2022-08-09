@@ -45,7 +45,7 @@ void ButterworthFilterEffect::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
    FLOATSLIDER(mFSlider, "F", &mF, 10, 4000);
-   FLOATSLIDER(mQSlider, "Q", &mQ, 0, 1);
+   FLOATSLIDER_DIGITS(mQSlider, "Q", &mQ, 0, 1, 3);
    ENDUIBLOCK(mWidth, mHeight);
 
    mFSlider->SetMaxValueDisplay("inf");

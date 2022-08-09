@@ -1270,7 +1270,7 @@ void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
    }
 }
 
-bool SamplePlayer::MouseScrolled(float x, float y, float scrollX, float scrollY)
+bool SamplePlayer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (fabs(scrollX) > fabsf(scrollY))
       scrollY = 0;

@@ -310,7 +310,7 @@ private:
       mWidth = w;
       mHeight = h;
    }
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void LoadText();
 

@@ -342,7 +342,7 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
    UIBLOCK_PUSHSLIDERWIDTH(filterAdsrWidth);
    FLOATSLIDER(mFilterCutoffMaxSlider, ("cutoffmax" + ofToString(mIndex)).c_str(), &mData.mCutoffMax, 10, DRUMSYNTH_NO_CUTOFF);
    FLOATSLIDER(mFilterCutoffMinSlider, ("cutoffmin" + ofToString(mIndex)).c_str(), &mData.mCutoffMin, 10, DRUMSYNTH_NO_CUTOFF);
-   FLOATSLIDER(mFilterQSlider, ("q" + ofToString(mIndex)).c_str(), &mData.mQ, .1, 20);
+   FLOATSLIDER_DIGITS(mFilterQSlider, ("q" + ofToString(mIndex)).c_str(), &mData.mQ, .1, 20, 3);
 
    ENDUIBLOCK0();
 

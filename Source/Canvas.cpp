@@ -487,7 +487,7 @@ void Canvas::MouseReleased()
    mDragCanvasZooming = false;
 }
 
-bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY)
+bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (GetKeyModifiers() & kModifier_Alt)
    {

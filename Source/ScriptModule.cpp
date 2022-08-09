@@ -1581,7 +1581,7 @@ void ScriptReferenceDisplay::DrawModule()
    }
 }
 
-bool ScriptReferenceDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY)
+bool ScriptReferenceDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mScrollOffset.y = ofClamp(mScrollOffset.y - scrollY * 10, 0, mMaxScrollAmount);
    return true;

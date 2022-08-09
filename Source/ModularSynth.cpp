@@ -951,6 +951,8 @@ IDrawableModule* ModularSynth::GetLastClickedModule() const
 
 void ModularSynth::KeyPressed(int key, bool isRepeat)
 {
+   mLastShiftPressTime = -9999; //reset timer for detecing double-shift press, so it doens't happen while typing
+
    if (!isRepeat)
       mHideTooltipsUntilMouseMove = true;
 
@@ -1594,20 +1596,20 @@ void ModularSynth::ToggleQuickSpawn()
    }
 }
 
-void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
+void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas)
 {
-   x *= UserPrefs.scroll_multiplier_horizontal.Get();
-   y *= UserPrefs.scroll_multiplier_vertical.Get();
+   xScroll *= UserPrefs.scroll_multiplier_horizontal.Get();
+   yScroll *= UserPrefs.scroll_multiplier_vertical.Get();
 
    if (IsKeyHeld(' ') || (GetModuleAtCursor() == nullptr && gHoveredUIControl == nullptr))
    {
       if (canZoomCanvas)
-         ZoomView(y / 50, true);
+         ZoomView(yScroll / 50, true);
    }
    else if (gHoveredUIControl)
    {
 #if JUCE_WINDOWS
-      y += x / 4; //taking advantage of logitech horizontal scroll wheel
+      yScroll += xScroll / 4; //taking advantage of logitech horizontal scroll wheel
 #endif
 
       float val = gHoveredUIControl->GetMidiValue();
@@ -1628,7 +1630,7 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
       if (clickButton)
          return;
 
-      float change = y / 100 * movementScale;
+      float change = yScroll / 100 * movementScale;
 
       if (floatSlider && floatSlider->GetModulator() && floatSlider->GetModulator()->Active() && floatSlider->GetModulator()->CanAdjustRange())
       {
@@ -1651,13 +1653,13 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
       val = ofClamp(val, 0, 1);
       gHoveredUIControl->SetFromMidiCC(val);
 
-      gHoveredUIControl->NotifyMouseScrolled(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), x, y);
+      gHoveredUIControl->NotifyMouseScrolled(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), xScroll, yScroll, isSmoothScroll, isInvertedScroll);
    }
    else
    {
       IDrawableModule* module = GetModuleAtCursor();
       if (module)
-         module->NotifyMouseScrolled(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), x, y);
+         module->NotifyMouseScrolled(GetMouseX(module->GetOwningContainer()), GetMouseY(module->GetOwningContainer()), xScroll, yScroll, isSmoothScroll, isInvertedScroll);
    }
 }
 
