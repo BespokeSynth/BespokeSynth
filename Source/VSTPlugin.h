@@ -115,9 +115,11 @@ private:
    std::string GetPluginFormatName() const;
    std::string GetPluginId() const;
    void CreateParameterSliders();
-   void AddParameterSlider(int index);
+   juce::String GetParameterID(int index);
+   void AddParameterSliderByID(juce::String);
    void RefreshPresetFiles();
    bool ParameterNameExists(std::string name, int checkUntilIndex) const;
+   void MapParamaters();
 
    //juce::AudioProcessorListener
    void audioProcessorParameterChanged(juce::AudioProcessor* processor, int parameterIndex, float newValue) override {}
@@ -152,12 +154,17 @@ private:
       float mValue{ 0 };
       FloatSlider* mSlider{ nullptr };
       juce::AudioProcessorParameter* mParameter{ nullptr };
+      juce::HostedAudioProcessorParameter* mHAPParameter { nullptr };
+      juce::String mID { "" };
       bool mShowing{ false };
       bool mInSelectorList{ true };
       std::string mName;
       void MakeSlider(VSTPlugin* owner);
    };
+   
+   bool mNoParamsToShow { false };
 
+   std::map<juce::String, juce::AudioProcessorParameter*> parameterForId;
    std::vector<ParameterSlider> mParameterSliders;
    int mChangeGestureParameterIndex{ -1 };
 

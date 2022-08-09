@@ -424,6 +424,7 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       mPluginName = mPlugin->getName().toStdString();
 
       CreateParameterSliders();
+      
 
       mPluginReady = true;
    }
@@ -451,6 +452,7 @@ bool VSTPlugin::ParameterNameExists(std::string name, int checkUntilIndex) const
 void VSTPlugin::CreateParameterSliders()
 {
    assert(mPlugin);
+   MapParamaters();
 
    for (auto& slider : mParameterSliders)
    {
@@ -464,58 +466,73 @@ void VSTPlugin::CreateParameterSliders()
    mParameterSliders.clear();
 
    mShowParameterDropdown->Clear();
-
-   const auto& parameters = mPlugin->getParameters();
-
-   int numParameters = MIN(31, parameters.size());
-   mParameterSliders.resize(numParameters);
-   for (int i = 0; i < numParameters; ++i)
+   
+   if(!mNoParamsToShow)
    {
-      mParameterSliders[i].mValue = parameters[i]->getValue();
-      juce::String originalParamName = parameters[i]->getName(32);
-      std::string name(originalParamName.getCharPointer());
-      try
+      for (auto parameter : parameterForId)
       {
-         int append = 0;
-         while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
-         {
-            ++append;
-            name = originalParamName.toStdString() + ofToString(append);
-         }
-      }
-      catch (UnknownUIControlException& e)
-      {
-      }
-      mParameterSliders[i].mParameter = parameters[i];
-      mParameterSliders[i].mName = name.c_str();
-      mParameterSliders[i].mShowing = false;
-      if (numParameters <= 30) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
-      {
-         mShowParameterDropdown->AddLabel(name.c_str(), i);
-         mParameterSliders[i].mInSelectorList = true;
-      }
-      else
-      {
-         mParameterSliders[i].mInSelectorList = false;
+         AddParameterSliderByID(parameter.first);
       }
    }
 }
 
-void VSTPlugin::AddParameterSlider(int i)
+void VSTPlugin::MapParamaters()
 {
-   ParameterSlider tmp{};
-   juce::String originalParamName = mPlugin->getParameters()[i]->getName(32);
-   std::string name(originalParamName.getCharPointer());
-
-   tmp.mValue = mPlugin->getParameters()[i]->getValue();
-   tmp.mParameter = mPlugin->getParameters()[i];
-   tmp.mName = name.c_str();
-   tmp.mShowing = false;
-   tmp.mInSelectorList = true;
-
-   mParameterSliders.push_back(tmp);
-   mShowParameterDropdown->AddLabel(name.c_str(), mParameterSliders.size() - 1);
+   auto* mPluginInstance = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get());
+   
+   for (auto parameterIndex = 0; parameterIndex < mPlugin->getParameters().size(); ++parameterIndex)
+   {
+    auto* parameter = mPluginInstance->getHostedParameter(parameterIndex);
+    parameterForId.emplace (parameter->getParameterID(), parameter);
+   }
+   
+   if (parameterForId.size() > 30)
+      mNoParamsToShow = true;
 }
+
+juce::String VSTPlugin::GetParameterID(int i)
+{
+    
+   auto* HAPParameter = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getHostedParameter(i);
+   juce::String ID = HAPParameter->getParameterID();
+   
+   return ID;
+}
+
+void VSTPlugin::AddParameterSliderByID(juce::String id)
+{
+   const auto iter = parameterForId.find (id);
+   
+   if (iter != parameterForId.cend())
+   {
+      ParameterSlider tmp{};
+      tmp.mParameter = iter->second;
+      juce::String originalParamName =  tmp.mParameter->getName(32);
+      std::string name(originalParamName.getCharPointer());
+      tmp.mValue = tmp.mParameter->getValue();
+      tmp.mName = name.c_str();
+      tmp.mShowing = false;
+      tmp.mInSelectorList = true;
+      tmp.mID = iter->first;
+      
+//       try
+//       {
+//          int append = 0;
+//          while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
+//          {
+//             ++append;
+//             name = originalParamName.toStdString() + ofToString(append);
+//          }
+//       }
+//       catch (UnknownUIControlException& e)
+//       {
+//       }
+      
+      mParameterSliders.push_back(tmp);
+      mShowParameterDropdown->AddLabel(name.c_str(), mParameterSliders.size() - 1);
+   }
+}
+
 
 void VSTPlugin::Poll()
 {
@@ -537,7 +554,7 @@ void VSTPlugin::Poll()
             if (mTemporarilyDisplayedParamIndex != -1)
                mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
             mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            AddParameterSlider(mChangeGestureParameterIndex);
+            AddParameterSliderByID(GetParameterID(mChangeGestureParameterIndex));
          }
 
          if (mChangeGestureParameterIndex > (int)mParameterSliders.size() && mTemporarilyDisplayedParamIndex != mChangeGestureParameterIndex)
@@ -545,7 +562,7 @@ void VSTPlugin::Poll()
             if (mTemporarilyDisplayedParamIndex != -1)
                mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
             mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            AddParameterSlider(mChangeGestureParameterIndex);
+             AddParameterSliderByID(GetParameterID(mChangeGestureParameterIndex));
          }
 
          mChangeGestureParameterIndex = -1;
@@ -1167,14 +1184,19 @@ void VSTPlugin::SaveState(FileStreamOut& out)
          out.WriteGeneric(vstProgramState.getData(), (int)vstProgramState.getSize());
 
       std::vector<int> exposedParams;
+      std::vector<juce::String> expParams;
       for (int i = 0; i < (int)mParameterSliders.size(); ++i)
       {
          if (mParameterSliders[i].mShowing)
-            exposedParams.push_back(i);
+            expParams.push_back(mParameterSliders[i].mID);
       }
-      out << (int)exposedParams.size();
-      for (int i : exposedParams)
-         out << i;
+      DBG("param size: " << expParams.size());
+      out << (int)expParams.size();
+      for (auto id : expParams)
+      {
+         DBG("parameter: " << id.toStdString());
+         out << id.toStdString();
+      }
    }
    else
    {
@@ -1245,18 +1267,24 @@ void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
       {
          int numParamsShowing;
          in >> numParamsShowing;
+         DBG(numParamsShowing);
          for (auto& param : mParameterSliders)
             param.mShowing = false;
          for (int i = 0; i < numParamsShowing; ++i)
          {
-            int index;
-            in >> index;
-            if (index < mParameterSliders.size())
-            {
-               mParameterSliders[index].mShowing = true;
-               if (mParameterSliders[index].mSlider == nullptr)
-                  mParameterSliders[index].MakeSlider(this);
+//            int index;
+            std::string id { "" };
+            in >> id;
+             if (i < parameterForId.size())
+             {
+                if (mNoParamsToShow)
+                   AddParameterSliderByID(id);
+                
+                mParameterSliders[i].mShowing = true;
+                if (mParameterSliders[i].mSlider == nullptr)
+                   mParameterSliders[i].MakeSlider(this);
             }
+            DBG(id);
          }
       }
    }
