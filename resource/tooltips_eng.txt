@@ -232,6 +232,11 @@ audiotopulse~sends a pulse when the audio level surpasses a specified threshold
 
 
 
+boundstopulse~sends a pulse when its input slider hits its max or min limit
+~input~the slider to check bounds on
+
+
+
 vinylcontrol~modulator which outputs a speed value based upon control vinyl input audio. provide it with a stereo signal from control vinyl (like you'd use to control serato) patched in from an "input" module.
 ~control~enable/disable transport control. when you enable it, it will use the current speed as the reference speed (so, the output will output a value of 1 until you change the vinyl's speed)
 

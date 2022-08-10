@@ -314,6 +314,8 @@ target_sources(BespokeSynth PRIVATE
     ModulatorAdd.h
     ModulatorAddCentered.cpp
     ModulatorAddCentered.h
+    BoundsToPulse.cpp
+    BoundsToPulse.h
     ModulatorCurve.cpp
     ModulatorCurve.h
     ModulatorExpression.cpp
