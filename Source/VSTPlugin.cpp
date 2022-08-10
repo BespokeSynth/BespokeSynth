@@ -476,7 +476,7 @@ void VSTPlugin::CreateParameterSliders()
       std::string name(originalParamName.getCharPointer());
       try
       {
-         int append = 0;
+         int append = i;
          while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
          {
             ++append;
