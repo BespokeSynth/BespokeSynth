@@ -240,6 +240,7 @@ vinylcontrol~modulator which outputs a speed value based upon control vinyl inpu
 velocitytocv~take a note's velocity and convert it to a modulation value
 ~min~output for velocity 0
 ~max~output for velocity 127
+~0 at note off~output zero when note is released
 
 
 
