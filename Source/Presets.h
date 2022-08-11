@@ -147,6 +147,7 @@ private:
    PatchCableSource* mModuleCable{ nullptr };
    PatchCableSource* mUIControlCable{ nullptr };
    int mQueuedPresetIndex{ -1 };
+   bool mForceImmediateSet{ false };
 };
 
 

@@ -208,7 +208,7 @@ void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
 
 void Presets::SetPreset(int idx, bool queueForMainThread)
 {
-   if (queueForMainThread)
+   if (queueForMainThread && !mForceImmediateSet)
    {
       mQueuedPresetIndex = idx;
       return;
@@ -224,6 +224,7 @@ void Presets::SetPreset(int idx, bool queueForMainThread)
       mBlendRamps.clear();
    }
 
+   sPresetHighlightControls.clear();
    const PresetCollection& coll = mPresetCollection[idx];
    for (std::list<Preset>::const_iterator i = coll.mPresets.begin();
         i != coll.mPresets.end(); ++i)
@@ -476,6 +477,7 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
    mModuleSaveData.LoadFloat("gridheight", moduleInfo, 50, 15, 1000);
+   mModuleSaveData.LoadBool("force_immediate_set", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -483,6 +485,7 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 void Presets::SetUpFromSaveData()
 {
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
+   mForceImmediateSet = mModuleSaveData.GetBool("force_immediate_set");
 }
 
 void Presets::SaveState(FileStreamOut& out)
