@@ -178,5 +178,4 @@ private:
    bool mUseIndividualOuts{ false };
    bool mMonoOutput{ false };
    int mOversampling{ 1 };
-   DropdownList* mOversamplingSelector{ nullptr };
 };
