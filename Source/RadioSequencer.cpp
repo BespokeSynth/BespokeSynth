@@ -339,6 +339,7 @@ void RadioSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("one_per_column_mode", moduleInfo, true);
+   mModuleSaveData.LoadInt("num_rows", moduleInfo, 8, 1, 16, false);
 
    SetUpFromSaveData();
 }
@@ -346,6 +347,8 @@ void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 void RadioSequencer::SetUpFromSaveData()
 {
    mGrid->SetSingleColumnMode(mModuleSaveData.GetBool("one_per_column_mode"));
+   mGrid->SetGrid(mLength, mModuleSaveData.GetInt("num_rows"));
+   SyncControlCablesToGrid();
 }
 
 void RadioSequencer::SaveState(FileStreamOut& out)
