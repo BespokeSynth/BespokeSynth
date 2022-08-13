@@ -80,6 +80,8 @@ void HelpDisplay::LoadHelp()
       ofStringReplace(help, "\r", "");
       mHelpText = ofSplitString(help, "\n");
    }
+
+   mMaxScrollAmount = (int)mHelpText.size() * 14;
 }
 
 void HelpDisplay::DrawModule()
@@ -109,11 +111,14 @@ void HelpDisplay::DrawModule()
    mDiscordLinkButton->Draw();
 
    mHeight = 100;
+   const int kLineHeight = 14;
+   ofClipWindow(0, mHeight, mWidth, (int)mHelpText.size() * kLineHeight, true);
    for (size_t i = 0; i < mHelpText.size(); ++i)
    {
-      DrawTextNormal(mHelpText[i], 4, mHeight);
+      DrawTextNormal(mHelpText[i], 4, mHeight - mScrollOffsetY);
       mHeight += 14;
    }
+   ofResetClipWindow();
 
    static int sScreenshotDelay = 0;
    if (sScreenshotDelay <= 0)
@@ -152,6 +157,12 @@ void HelpDisplay::DrawModule()
    {
       --sScreenshotDelay;
    }
+}
+
+bool HelpDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+{
+   mScrollOffsetY = ofClamp(mScrollOffsetY - scrollY * 10, 0, mMaxScrollAmount);
+   return true;
 }
 
 void HelpDisplay::GetModuleDimensions(float& w, float& h)
