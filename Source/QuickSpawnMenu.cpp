@@ -78,9 +78,6 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
 
-   if (isRepeat)
-      return;
-
    if (!IsShowing())
       ResetAppearPos();
 
