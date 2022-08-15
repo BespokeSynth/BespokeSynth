@@ -63,6 +63,8 @@ private:
       int mOutputPitch{ 0 };
    };
 
+   int TransformPitch(int pitch);
+
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
@@ -79,6 +81,8 @@ private:
    std::array<NoteInfo, 128> mInputNotes;
    Checkbox* mRetriggerCheckbox{ nullptr };
    bool mRetrigger{ false };
+   Checkbox* mDiatonicCheckbox{ nullptr };
+   bool mDiatonic{ false };
 };
 
 

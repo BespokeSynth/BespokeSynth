@@ -78,6 +78,8 @@ private:
    std::array<NoteInfo, 128> mInputNotes{};
    Checkbox* mRetriggerCheckbox{ nullptr };
    bool mRetrigger{ false };
+   Checkbox* mDiatonicCheckbox{ nullptr };
+   bool mDiatonic{ true };
 };
 
 #endif /* defined(__Bespoke__ScaleDegree__) */
