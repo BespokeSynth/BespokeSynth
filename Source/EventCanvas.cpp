@@ -154,16 +154,16 @@ void EventCanvas::OnTransportAdvanced(float amount)
          if (curPos > elementEnd)
          {
             if (startPassed)
-               element->Trigger();
+               element->Trigger(NextBufferTime());
             if (endPassed)
-               element->TriggerEnd();
+               element->TriggerEnd(NextBufferTime());
          }
          else
          {
             if (endPassed)
-               element->TriggerEnd();
+               element->TriggerEnd(NextBufferTime());
             if (startPassed)
-               element->Trigger();
+               element->Trigger(NextBufferTime());
          }
 
          IUIControl* control = mRowConnections[element->mRow].mUIControl;
@@ -333,7 +333,7 @@ void EventCanvas::GetModuleDimensions(float& width, float& height)
    height = mCanvas->GetHeight() + extraH;
 }
 
-void EventCanvas::CheckboxUpdated(Checkbox* checkbox)
+void EventCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -341,7 +341,7 @@ void EventCanvas::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void EventCanvas::ButtonClicked(ClickButton* button)
+void EventCanvas::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mQuantizeButton)
    {
@@ -365,11 +365,11 @@ void EventCanvas::ButtonClicked(ClickButton* button)
    }
 }
 
-void EventCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EventCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void EventCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
+void EventCanvas::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -381,7 +381,7 @@ void EventCanvas::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void EventCanvas::DropdownUpdated(DropdownList* list, int oldVal)
+void EventCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {

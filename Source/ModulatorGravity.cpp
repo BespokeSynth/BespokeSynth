@@ -102,7 +102,7 @@ void ModulatorGravity::OnPulse(double time, float velocity, int flags)
    Kick(velocity);
 }
 
-void ModulatorGravity::ButtonClicked(ClickButton* button)
+void ModulatorGravity::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mKickButton)
       Kick(1);

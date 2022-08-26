@@ -56,9 +56,9 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;

@@ -77,10 +77,10 @@ public:
    void RunCode(double time, std::string code);
 
    void OnPulse(double time, float velocity, int flags) override;
-   void ButtonClicked(ClickButton* button) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldValue) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldValue, double time) override {}
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldValue) override;
+   void DropdownUpdated(DropdownList* list, int oldValue, double time) override;
 
    //ICodeEntryListener
    void ExecuteCode() override;
@@ -115,6 +115,7 @@ public:
    static bool sPythonInitialized;
    static bool sHasPythonEverSuccessfullyInitialized;
    static bool sHasLoadedUntrustedScript;
+   static double sMostRecentRunTime;
 
    ModulationChain* GetPitchBend(int pitch) { return &mPitchBends[pitch]; }
    ModulationChain* GetModWheel(int pitch) { return &mModWheels[pitch]; }
@@ -124,7 +125,7 @@ public:
 
 private:
    void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
-   void AdjustUIControl(IUIControl* control, float value, int lineNum);
+   void AdjustUIControl(IUIControl* control, float value, double time, int lineNum);
    std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
    void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
@@ -179,7 +180,6 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
    std::array<double, 20> mScheduledPulseTimes{};
-   static double sMostRecentRunTime;
    std::string mLastError;
    size_t mScriptModuleIndex;
    std::string mLastRunLiteralCode;
@@ -303,7 +303,7 @@ public:
 
    void CreateUIControls() override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
 private:
    //IDrawableModule

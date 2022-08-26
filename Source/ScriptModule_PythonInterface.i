@@ -383,7 +383,7 @@ PYBIND11_EMBEDDED_MODULE(notecanvas, m)
       })
       .def("clear", [](NoteCanvas& canvas)
       {
-         canvas.Clear();
+         canvas.Clear(NextBufferTime());
       })
       .def("fit", [](NoteCanvas& canvas)
       {
@@ -754,7 +754,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
          ScriptModule::sMostRecentLineExecutedModule->ClearContext();
          if (control != nullptr)
          {
-            control->SetValue(value);
+            control->SetValue(value, ScriptModule::sMostRecentRunTime);
          }
       })
       .def("get", [](IDrawableModule& module, std::string path)
@@ -776,7 +776,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
             float min, max;
             control->GetRange(min, max);
             float value = ofClamp(control->GetValue() + amount, min, max);
-            control->SetValue(value);
+            control->SetValue(value, ScriptModule::sMostRecentRunTime);
          }
       });
 }

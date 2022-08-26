@@ -45,7 +45,7 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

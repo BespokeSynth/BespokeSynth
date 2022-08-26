@@ -537,7 +537,7 @@ void TitleBar::GetModuleDimensions(float& width, float& height)
       height = 36;
 }
 
-void TitleBar::CheckboxUpdated(Checkbox* checkbox)
+void TitleBar::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -550,7 +550,7 @@ void TitleBar::DropdownClicked(DropdownList* list)
       mSpawnLists.SetUpPrefabsDropdown();
 }
 
-void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
+void TitleBar::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mLoadLayoutDropdown)
    {
@@ -563,7 +563,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
       spawnList->OnSelection(list);
 }
 
-void TitleBar::ButtonClicked(ClickButton* button)
+void TitleBar::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSaveLayoutButton)
    {
@@ -625,7 +625,7 @@ void NewPatchConfirmPopup::DrawModule()
    mCancelButton->Draw();
 }
 
-void NewPatchConfirmPopup::ButtonClicked(ClickButton* button)
+void NewPatchConfirmPopup::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mConfirmButton)
       TheSynth->ReloadInitialLayout();

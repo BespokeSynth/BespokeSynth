@@ -95,14 +95,14 @@ void Beats::DropdownClicked(DropdownList* list)
 {
 }
 
-void Beats::DropdownUpdated(DropdownList* list, int oldVal)
+void Beats::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Beats::RadioButtonUpdated(RadioButton* list, int oldVal)
+void Beats::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
    for (BeatColumn* column : mBeatColumns)
-      column->RadioButtonUpdated(list, oldVal);
+      column->RadioButtonUpdated(list, oldVal, time);
 }
 
 void Beats::OnTimeEvent(double time)
@@ -174,13 +174,13 @@ bool Beats::MouseMoved(float x, float y)
    return false;
 }
 
-void Beats::ButtonClicked(ClickButton* button)
+void Beats::ButtonClicked(ClickButton* button, double time)
 {
    for (BeatColumn* column : mBeatColumns)
-      column->ButtonClicked(button);
+      column->ButtonClicked(button, time);
 }
 
-void Beats::CheckboxUpdated(Checkbox* checkbox)
+void Beats::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -192,11 +192,11 @@ void Beats::GetModuleDimensions(float& width, float& height)
       height = MAX(height, 132 + 15 * (mBeatColumns[i]->GetNumSamples() + 1));
 }
 
-void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Beats::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Beats::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -422,7 +422,7 @@ void BeatColumn::AddBeat(Sample* sample)
    mSamples.push_back(newSample);
 }
 
-void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal)
+void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
    if (list == mSelector)
    {
@@ -431,7 +431,7 @@ void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal)
    }
 }
 
-void BeatColumn::ButtonClicked(ClickButton* button)
+void BeatColumn::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mDeleteButton)
    {

@@ -575,7 +575,7 @@ void ScriptModule::Poll()
       if (mScheduledUIControlValue[i].time != -1 &&
           time + TheTransport->GetEventLookaheadMs() > mScheduledUIControlValue[i].time)
       {
-         AdjustUIControl(mScheduledUIControlValue[i].control, mScheduledUIControlValue[i].value, mScheduledUIControlValue[i].lineNum);
+         AdjustUIControl(mScheduledUIControlValue[i].control, mScheduledUIControlValue[i].value, mScheduledUIControlValue[i].time, mScheduledUIControlValue[i].lineNum);
          mScheduledUIControlValue[i].time = -1;
       }
    }
@@ -784,9 +784,9 @@ IUIControl* ScriptModule::GetUIControl(std::string path)
    return control;
 }
 
-void ScriptModule::AdjustUIControl(IUIControl* control, float value, int lineNum)
+void ScriptModule::AdjustUIControl(IUIControl* control, float value, double time, int lineNum)
 {
-   control->SetValue(value);
+   control->SetValue(value, time);
 
    mUIControlTracker.AddEvent(lineNum);
 
@@ -898,7 +898,7 @@ void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float 
    mMidiMessageQueueMutex.unlock();
 }
 
-void ScriptModule::ButtonClicked(ClickButton* button)
+void ScriptModule::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPythonInstalledConfirmButton)
       InitializePythonIfNecessary();
@@ -906,7 +906,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
    if (button == mRunButton)
    {
       mCodeEntry->Publish();
-      RunScript(gTime);
+      RunScript(time);
    }
 
    if (button == mStopButton)
@@ -1017,7 +1017,7 @@ void ScriptModule::DropdownClicked(DropdownList* list)
       RefreshScriptFiles();
 }
 
-void ScriptModule::DropdownUpdated(DropdownList* list, int oldValue)
+void ScriptModule::DropdownUpdated(DropdownList* list, int oldValue, double time)
 {
 }
 
@@ -1053,7 +1053,7 @@ void ScriptModule::RefreshScriptFiles()
 
 void ScriptModule::ExecuteCode()
 {
-   RunScript(gTime + gBufferSizeMs);
+   RunScript(NextBufferTime());
 }
 
 std::pair<int, int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
@@ -1416,7 +1416,7 @@ void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)
 
 void ScriptModule::Stop()
 {
-   double time = gTime + gBufferSizeMs;
+   double time = NextBufferTime();
 
    //run through any scheduled note offs for this pitch
    for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
@@ -1694,7 +1694,7 @@ void ScriptReferenceDisplay::GetModuleDimensions(float& w, float& h)
    h = mHeight;
 }
 
-void ScriptReferenceDisplay::ButtonClicked(ClickButton* button)
+void ScriptReferenceDisplay::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mCloseButton)
       GetOwningContainer()->DeleteModule(this);

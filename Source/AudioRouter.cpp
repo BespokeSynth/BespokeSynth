@@ -131,7 +131,7 @@ void AudioRouter::GetModuleDimensions(float& width, float& height)
    height = 8 + h;
 }
 
-void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
    if (radio == mRouteSelector)
    {

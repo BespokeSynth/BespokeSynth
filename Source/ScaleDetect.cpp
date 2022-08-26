@@ -118,7 +118,7 @@ bool ScaleDetect::ScaleSatisfied(int root, std::string type)
    return true;
 }
 
-void ScaleDetect::ButtonClicked(ClickButton* button)
+void ScaleDetect::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
    {
@@ -129,7 +129,7 @@ void ScaleDetect::ButtonClicked(ClickButton* button)
    }
 }
 
-void ScaleDetect::DropdownUpdated(DropdownList* list, int oldVal)
+void ScaleDetect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mMatchesDropdown)
    {

@@ -245,15 +245,15 @@ void SampleCanvas::UpdateNumColumns()
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval) / 4);
 }
 
-void SampleCanvas::CheckboxUpdated(Checkbox* checkbox)
+void SampleCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
    {
@@ -261,7 +261,7 @@ void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void SampleCanvas::DropdownUpdated(DropdownList* list, int oldVal)
+void SampleCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {

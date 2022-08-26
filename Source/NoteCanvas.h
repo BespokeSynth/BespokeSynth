@@ -60,7 +60,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void Clear();
+   void Clear(double time);
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
 
    /**
@@ -72,11 +72,11 @@ public:
 
    void CanvasUpdated(Canvas* canvas) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

@@ -118,7 +118,7 @@ void AudioSend::DrawModule()
    mCrossfadeCheckbox->Draw();
 }
 
-void AudioSend::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void AudioSend::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

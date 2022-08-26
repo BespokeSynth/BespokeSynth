@@ -32,7 +32,7 @@ public:
    void Init() override;
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    //IDrawableModule
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -48,10 +48,10 @@ public:
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
    //IDropdownListener
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;

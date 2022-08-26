@@ -70,7 +70,7 @@ void FourOnTheFloor::OnTimeEvent(double time)
    PlayNoteOutput(time, kick, 127, -1);
 }
 
-void FourOnTheFloor::CheckboxUpdated(Checkbox* checkbox)
+void FourOnTheFloor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mTwoOnTheFloorCheckbox)
    {

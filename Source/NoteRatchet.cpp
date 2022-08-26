@@ -82,7 +82,7 @@ void NoteRatchet::DrawModule()
    mRatchetSubdivisionSelector->Draw();
 }
 
-void NoteRatchet::CheckboxUpdated(Checkbox* checkbox)
+void NoteRatchet::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -106,7 +106,7 @@ void NoteRatchet::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 }
 
-void NoteRatchet::DropdownUpdated(DropdownList* slider, int oldVal)
+void NoteRatchet::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 

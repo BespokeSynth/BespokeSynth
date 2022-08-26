@@ -155,7 +155,7 @@ public:
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
 
-   virtual void CheckboxUpdated(Checkbox* checkbox) {}
+   virtual void CheckboxUpdated(Checkbox* checkbox, double time) {}
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName);
    virtual void CreateUIControls();

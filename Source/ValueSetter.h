@@ -50,13 +50,13 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void TextEntryComplete(TextEntry* entry) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -72,7 +72,7 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   void Go();
+   void Go(double time);
 
    PatchCableSource* mControlCable{ nullptr };
    std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};

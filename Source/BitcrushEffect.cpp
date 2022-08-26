@@ -101,14 +101,14 @@ float BitcrushEffect::GetEffectAmount()
    return ofClamp((mCrush - 1) / 24.0f + ((int)mDownsample - 1) / 40.0f, 0, 1);
 }
 
-void BitcrushEffect::CheckboxUpdated(Checkbox* checkbox)
+void BitcrushEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void BitcrushEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+void BitcrushEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void BitcrushEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void BitcrushEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }

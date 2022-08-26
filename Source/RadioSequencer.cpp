@@ -117,7 +117,7 @@ void RadioSequencer::UpdateGridLights()
          {
             if (mGrid->GetVal(col, row) == 1)
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Bright);
-            else if (col == mGrid->GetHighlightCol(gTime + gBufferSizeMs + TheTransport->GetEventLookaheadMs()))
+            else if (col == mGrid->GetHighlightCol(NextBufferTime() + TheTransport->GetEventLookaheadMs()))
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Dim);
             else
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColorOff);
@@ -175,13 +175,13 @@ void RadioSequencer::Step(double time, int pulseFlags)
             if (mGrid->GetVal(mStep, i) > 0)
                controlsToEnable.push_back(uicontrol);
             else
-               uicontrol->SetValue(0);
+               uicontrol->SetValue(0, time);
          }
       }
    }
 
    for (auto* control : controlsToEnable)
-      control->SetValue(1);
+      control->SetValue(1, time);
 
    UpdateGridLights();
 }
@@ -281,7 +281,7 @@ void RadioSequencer::SyncControlCablesToGrid()
    }
 }
 
-void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -291,7 +291,7 @@ void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void RadioSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void RadioSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {

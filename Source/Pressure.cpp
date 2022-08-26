@@ -75,13 +75,13 @@ void Pressure::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void Pressure::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Pressure::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mPressureSlider)
       mModulation.GetPressure(-1)->SetValue(mPressure);
 }
 
-void Pressure::CheckboxUpdated(Checkbox* checkbox)
+void Pressure::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

@@ -288,11 +288,10 @@ int NoteLooper::GetNewVoice(int voiceIdx)
    return ret;
 }
 
-void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
+void NoteLooper::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      double time = gTime + gBufferSizeMs;
       for (int i = 0; i < (int)mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
@@ -304,21 +303,20 @@ void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void NoteLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void NoteLooper::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteLooper::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
       SetNumMeasures(mNumMeasures);
 }
 
-void NoteLooper::ButtonClicked(ClickButton* button)
+void NoteLooper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
    {
-      double time = gTime + gBufferSizeMs;
       for (int i = 0; i < (int)mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
@@ -375,7 +373,7 @@ void NoteLooper::SetNumMeasures(int numMeasures)
    mCanvas->mLoopEnd = mNumMeasures;
 }
 
-void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 

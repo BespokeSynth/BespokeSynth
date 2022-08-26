@@ -201,7 +201,7 @@ float DistortionEffect::GetEffectAmount()
    return ofClamp((mPreamp - 1) / 10 + (1 - mClip), 0, 1);
 }
 
-void DistortionEffect::CheckboxUpdated(Checkbox* checkbox)
+void DistortionEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -210,7 +210,7 @@ void DistortionEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void DistortionEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void DistortionEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mClipSlider)
       SetClip(mClip);

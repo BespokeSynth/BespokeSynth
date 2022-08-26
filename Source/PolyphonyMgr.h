@@ -54,6 +54,7 @@ struct VoiceInfo
    IMidiVoice* mVoice{ nullptr };
    double mTime{ 0 };
    bool mNoteOn{ false };
+   float mActivity{ 0 };
 };
 
 class PolyphonyMgr

@@ -121,7 +121,7 @@ int MultitrackRecorder::GetRecordingLength()
    return recordingLength;
 }
 
-void MultitrackRecorder::ButtonClicked(ClickButton* button)
+void MultitrackRecorder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mAddTrackButton)
    {
@@ -159,7 +159,7 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
    }
 }
 
-void MultitrackRecorder::CheckboxUpdated(Checkbox* checkbox)
+void MultitrackRecorder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mRecordCheckbox)
    {
@@ -436,15 +436,15 @@ void MultitrackRecorderTrack::Clear()
    mRecordingLength = 0;
 }
 
-void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void MultitrackRecorderTrack::CheckboxUpdated(Checkbox* checkbox)
+void MultitrackRecorderTrack::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void MultitrackRecorderTrack::ButtonClicked(ClickButton* button)
+void MultitrackRecorderTrack::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mDeleteButton)
       mRecorder->RemoveTrack(this);

@@ -68,7 +68,7 @@ void MacroSlider::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void MacroSlider::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MacroSlider::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

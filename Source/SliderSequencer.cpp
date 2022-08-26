@@ -125,19 +125,19 @@ void SliderSequencer::DrawModule()
    }
 }
 
-void SliderSequencer::CheckboxUpdated(Checkbox* checkbox)
+void SliderSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SliderSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SliderSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SliderSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void SliderSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void SliderSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SliderSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

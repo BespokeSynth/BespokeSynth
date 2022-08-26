@@ -114,7 +114,7 @@ void ClipLauncher::DropdownClicked(DropdownList* list)
 {
 }
 
-void ClipLauncher::DropdownUpdated(DropdownList* list, int oldVal)
+void ClipLauncher::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -142,11 +142,11 @@ int ClipLauncher::GetRowY(int idx)
    return 20 + idx * 40;
 }
 
-void ClipLauncher::ButtonClicked(ClickButton* button)
+void ClipLauncher::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void ClipLauncher::CheckboxUpdated(Checkbox* checkbox)
+void ClipLauncher::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (int i = 0; i < mSamples.size(); ++i)
    {
@@ -175,7 +175,7 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox)
             float data[JUMP_BLEND_SAMPLES];
             ChannelBuffer temp(data, JUMP_BLEND_SAMPLES);
             if (currentlyPlaying != -1)
-               mSamples[currentlyPlaying].mSample->ConsumeData(gTime, &temp, JUMP_BLEND_SAMPLES, true);
+               mSamples[currentlyPlaying].mSample->ConsumeData(time, &temp, JUMP_BLEND_SAMPLES, true);
             mJumpBlender.CaptureForJump(0, data, JUMP_BLEND_SAMPLES, gBufferSize);
             mSampleMutex.unlock();
          }
@@ -214,7 +214,7 @@ void ClipLauncher::GetModuleDimensions(float& width, float& height)
    height = 180;
 }
 
-void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
@@ -231,7 +231,7 @@ void ClipLauncher::RecalcPos(double time, int idx)
    }
 }
 
-void ClipLauncher::IntSliderUpdated(IntSlider* slider, int oldVal)
+void ClipLauncher::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

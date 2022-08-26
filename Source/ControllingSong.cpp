@@ -260,7 +260,7 @@ void ControllingSong::DrawModule()
    ofPopStyle();
 }
 
-void ControllingSong::DropdownUpdated(DropdownList* list, int oldVal)
+void ControllingSong::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mSongSelector)
    {
@@ -268,7 +268,7 @@ void ControllingSong::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void ControllingSong::ButtonClicked(ClickButton* button)
+void ControllingSong::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mNextSongButton)
       mNeedNewSong = true;
@@ -285,15 +285,15 @@ void ControllingSong::ButtonClicked(ClickButton* button)
    }
 }
 
-void ControllingSong::CheckboxUpdated(Checkbox* checkbox)
+void ControllingSong::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void ControllingSong::RadioButtonUpdated(RadioButton* list, int oldVal)
+void ControllingSong::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
 }
 
-void ControllingSong::IntSliderUpdated(IntSlider* slider, int oldVal)
+void ControllingSong::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mTestBeatOffsetSlider)
    {
@@ -301,7 +301,7 @@ void ControllingSong::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void ControllingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ControllingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

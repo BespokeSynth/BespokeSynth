@@ -50,25 +50,25 @@ void ChordHolder::DrawModule()
    mOnlyPlayWhenPulsedCheckbox->Draw();
 }
 
-void ChordHolder::Stop()
+void ChordHolder::Stop(double time)
 {
    for (int i = 0; i < 128; ++i)
    {
       if (mNotePlaying[i] && !mNoteInputHeld[i])
       {
-         PlayNoteOutput(gTime + gBufferSizeMs, i, 0, -1);
+         PlayNoteOutput(time, i, 0, -1);
          mNotePlaying[i] = false;
       }
    }
 }
 
-void ChordHolder::ButtonClicked(ClickButton* button)
+void ChordHolder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mStopButton)
-      Stop();
+      Stop(time);
 }
 
-void ChordHolder::CheckboxUpdated(Checkbox* checkbox)
+void ChordHolder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -79,7 +79,7 @@ void ChordHolder::CheckboxUpdated(Checkbox* checkbox)
       }
       else
       {
-         Stop();
+         Stop(time);
       }
    }
 }

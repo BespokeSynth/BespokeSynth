@@ -40,9 +40,9 @@ public:
 
    void CreateUIControls() override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    bool IsResizable() const override { return true; }
    void Resize(float width, float height) override;

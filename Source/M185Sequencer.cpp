@@ -194,13 +194,13 @@ void M185Sequencer::GetModuleDimensions(float& width, float& height)
    height = mHeight;
 }
 
-void M185Sequencer::ButtonClicked(ClickButton* button)
+void M185Sequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (mResetStepButton == button)
       ResetStep();
 }
 
-void M185Sequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void M185Sequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -210,7 +210,7 @@ void M185Sequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void M185Sequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void M185Sequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

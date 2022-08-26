@@ -61,7 +61,7 @@ void NoteRouter::SetSelectedMask(int mask)
 {
    int oldMask = mRouteMask;
    mRouteMask = mask;
-   RadioButtonUpdated(mRouteSelector, oldMask);
+   RadioButtonUpdated(mRouteSelector, oldMask, NextBufferTime());
 }
 
 void NoteRouter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -76,14 +76,14 @@ void NoteRouter::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
    if (radio == mRouteSelector)
    {
       if (mRadioButtonMode)
       {
          if (oldVal < (int)mDestinationCables.size())
-            mDestinationCables[oldVal]->Flush(gTime + gBufferSizeMs);
+            mDestinationCables[oldVal]->Flush(time);
       }
       else //bitmask mode
       {
@@ -95,7 +95,7 @@ void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
             if (1 & (removed >> i))
             {
                if (i < (int)mDestinationCables.size())
-                  mDestinationCables[i]->Flush(gTime + gBufferSizeMs);
+                  mDestinationCables[i]->Flush(time);
             }
          }
       }

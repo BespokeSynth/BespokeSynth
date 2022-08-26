@@ -55,7 +55,7 @@ public:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
 private:
    //IDrawableModule

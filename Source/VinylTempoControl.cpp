@@ -114,7 +114,7 @@ bool VinylTempoControl::CanStartVinylControl()
    return !mVinylProcessor.GetStopped() && fabsf(mVinylProcessor.GetPitch()) > .001f;
 }
 
-void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox)
+void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mUseVinylControlCheckbox)
    {

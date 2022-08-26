@@ -110,7 +110,7 @@ void NoteStrummer::OnTransportAdvanced(float amount)
    }
 }
 
-void NoteStrummer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteStrummer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

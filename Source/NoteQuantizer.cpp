@@ -159,7 +159,7 @@ void NoteQuantizer::OnPulse(double time, float velocity, int flags)
    OnEvent(time, velocity);
 }
 
-void NoteQuantizer::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteQuantizer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mQuantizeIntervalSelector)
    {

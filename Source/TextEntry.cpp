@@ -513,7 +513,7 @@ void TextEntry::SetText(std::string text)
    mCaretPosition2 = 0;
 }
 
-void TextEntry::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void TextEntry::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    if (mType == kTextEntry_Int)
    {
@@ -556,7 +556,7 @@ float TextEntry::GetMidiValue() const
    return 0;
 }
 
-void TextEntry::SetValue(float value)
+void TextEntry::SetValue(float value, double time)
 {
    if (mType == kTextEntry_Int)
    {

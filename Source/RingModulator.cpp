@@ -137,15 +137,15 @@ void RingModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    }
 }
 
-void RingModulator::ButtonClicked(ClickButton* button)
+void RingModulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void RingModulator::CheckboxUpdated(Checkbox* checkbox)
+void RingModulator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void RingModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void RingModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mFreqSlider)
    {

@@ -86,14 +86,14 @@ float NoiseEffect::GetEffectAmount()
    return mAmount;
 }
 
-void NoiseEffect::CheckboxUpdated(Checkbox* checkbox)
+void NoiseEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void NoiseEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoiseEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void NoiseEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoiseEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }

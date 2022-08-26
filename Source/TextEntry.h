@@ -94,10 +94,10 @@ public:
    void GetDimensions(float& width, float& height) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
    float GetMidiValue() const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time) override;
    float GetValue() const override;
    int GetNumValues() override;
    std::string GetDisplayValue(float val) const override;

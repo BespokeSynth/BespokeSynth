@@ -82,28 +82,28 @@ void ValueSetter::OnPulse(double time, float velocity, int flags)
    if (velocity > 0 && mEnabled)
    {
       ComputeSliders((time - gTime) * gSampleRateMs);
-      Go();
+      Go(time);
    }
 }
 
-void ValueSetter::ButtonClicked(ClickButton* button)
+void ValueSetter::ButtonClicked(ClickButton* button, double time)
 {
-   if (button == mButton && mLastClickTime != gTime)
+   if (button == mButton && mLastClickTime != time)
    {
-      mLastClickTime = gTime;
-      Go();
+      mLastClickTime = time;
+      Go(time);
    }
 }
 
-void ValueSetter::Go()
+void ValueSetter::Go(double time)
 {
-   mControlCable->AddHistoryEvent(gTime, true);
-   mControlCable->AddHistoryEvent(gTime + 15, false);
+   mControlCable->AddHistoryEvent(time, true);
+   mControlCable->AddHistoryEvent(time + 15, false);
 
    for (size_t i = 0; i < mTargets.size(); ++i)
    {
       if (mTargets[i] != nullptr)
-         mTargets[i]->SetValue(mValue);
+         mTargets[i]->SetValue(mValue, time);
    }
 }
 

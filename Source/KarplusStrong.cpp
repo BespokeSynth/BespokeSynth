@@ -185,15 +185,15 @@ void KarplusStrong::DrawModuleUnclipped()
    }
 }
 
-void KarplusStrong::DropdownUpdated(DropdownList* list, int oldVal)
+void KarplusStrong::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void KarplusStrong::CheckboxUpdated(Checkbox* checkbox)
+void KarplusStrong::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

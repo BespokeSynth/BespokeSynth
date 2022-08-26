@@ -109,7 +109,7 @@ void ScriptStatus::OnClicked(float x, float y, bool right)
    }
 }
 
-void ScriptStatus::ButtonClicked(ClickButton* button)
+void ScriptStatus::ButtonClicked(ClickButton* button, double time)
 {
    ScriptModule::UninitializePython();
    ScriptModule::InitializePythonIfNecessary();

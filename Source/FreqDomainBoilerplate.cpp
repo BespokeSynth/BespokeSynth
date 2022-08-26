@@ -163,6 +163,6 @@ void FreqDomainBoilerplate::DrawModule()
    mPhaseOffsetSlider->Draw();
 }
 
-void FreqDomainBoilerplate::CheckboxUpdated(Checkbox* checkbox)
+void FreqDomainBoilerplate::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }

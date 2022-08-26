@@ -79,21 +79,21 @@ void PSMoveController::Poll()
    {
       mPitch = ofClamp(mPitch + gyros.x / 50000, 0, 1);
       if (mPitchUIControl)
-         mPitchUIControl->SetFromMidiCC(mPitch);
+         mPitchUIControl->SetFromMidiCC(mPitch, NextBufferTime(), false);
       isButtonDown = true;
    }
    if (mMoveMgr.IsButtonDown(0, Btn_SQUARE))
    {
       mYaw = ofClamp(mYaw - gyros.z / 50000, 0, 1);
       if (mYawUIControl)
-         mYawUIControl->SetFromMidiCC(mYaw);
+         mYawUIControl->SetFromMidiCC(mYaw, NextBufferTime(), false);
       isButtonDown = true;
    }
    if (mMoveMgr.IsButtonDown(0, Btn_T))
    {
       mRoll = ofClamp(mRoll + gyros.y / 80000, 0, 1);
       if (mRollUIControl)
-         mRollUIControl->SetFromMidiCC(mRoll);
+         mRollUIControl->SetFromMidiCC(mRoll, NextBufferTime(), false);
       isButtonDown = true;
    }
    if (isButtonDown)
@@ -118,7 +118,7 @@ void PSMoveController::Poll()
    mMoveMgr.GetAccel(0, accel);
    mEnergy = ofClamp(accel.length() / 5000 - .8f, 0, 1);
    if (mEnergyUIControl)
-      mEnergyUIControl->SetFromMidiCC(mEnergy);
+      mEnergyUIControl->SetFromMidiCC(mEnergy, NextBufferTime(), false);
 }
 
 void PSMoveController::Exit()
@@ -147,11 +147,11 @@ void PSMoveController::DrawModule()
    DrawTextNormal("b: " + ofToString(mMoveMgr.GetBattery(0), 1), 80, 14);
 }
 
-void PSMoveController::CheckboxUpdated(Checkbox* checkbox)
+void PSMoveController::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void PSMoveController::ButtonClicked(ClickButton* button)
+void PSMoveController::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mConnectButton)
       mMoveMgr.AddMoves();
@@ -189,7 +189,7 @@ void PSMoveController::OnTimeEvent(double time)
    }
 }
 
-void PSMoveController::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PSMoveController::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mOffsetSlider)
    {

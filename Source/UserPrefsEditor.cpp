@@ -379,7 +379,7 @@ void UserPrefsEditor::Save()
       juce::JUCEApplicationBase::quit();
 }
 
-void UserPrefsEditor::ButtonClicked(ClickButton* button)
+void UserPrefsEditor::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSaveButton)
    {
@@ -391,11 +391,11 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       SetShowing(false);
 }
 
-void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox)
+void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (!TheSynth->IsLoadingState())
    {
@@ -416,7 +416,7 @@ void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void UserPrefsEditor::IntSliderUpdated(IntSlider* slider, int oldVal)
+void UserPrefsEditor::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -424,7 +424,7 @@ void UserPrefsEditor::TextEntryComplete(TextEntry* entry)
 {
 }
 
-void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal)
+void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == UserPrefs.devicetype.GetDropdown())
    {
@@ -442,7 +442,7 @@ void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void UserPrefsEditor::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void UserPrefsEditor::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 

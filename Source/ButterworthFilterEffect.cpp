@@ -122,11 +122,11 @@ void ButterworthFilterEffect::ResetFilter()
       mButterworth[i].Clear();
 }
 
-void ButterworthFilterEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void ButterworthFilterEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void ButterworthFilterEffect::CheckboxUpdated(Checkbox* checkbox)
+void ButterworthFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -134,7 +134,7 @@ void ButterworthFilterEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void ButterworthFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ButterworthFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mFSlider || slider == mQSlider)
       mCoefficientsHaveChanged = true;

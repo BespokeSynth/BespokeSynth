@@ -253,7 +253,7 @@ void BandVocoder::CalcFilters()
    }
 }
 
-void BandVocoder::CheckboxUpdated(Checkbox* checkbox)
+void BandVocoder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -265,7 +265,7 @@ void BandVocoder::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal)
+void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumBandsSlider)
    {
@@ -273,7 +273,7 @@ void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void BandVocoder::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void BandVocoder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mFBaseSlider || slider == mFRangeSlider || slider == mQSlider || slider == mSpacingStyleSlider)
    {

@@ -54,10 +54,10 @@ void NoteOctaver::DrawModule()
    mRetriggerCheckbox->Draw();
 }
 
-void NoteOctaver::CheckboxUpdated(Checkbox* checkbox)
+void NoteOctaver::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -86,11 +86,10 @@ void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, velocity, mInputNotes[pitch].mVoiceIdx, modulation);
 }
 
-void NoteOctaver::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteOctaver::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mOctaveSlider && mEnabled && mRetrigger)
    {
-      double time = gTime + gBufferSizeMs;
       for (int pitch = 0; pitch < 128; ++pitch)
       {
          if (mInputNotes[pitch].mOn)

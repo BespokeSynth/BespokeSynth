@@ -64,10 +64,10 @@ public:
    bool HasPush2OverrideControls() const override { return true; }
    void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;

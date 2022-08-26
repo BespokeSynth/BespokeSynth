@@ -461,7 +461,7 @@ void EffectChain::UpdateReshuffledDryWetSliders()
    }
 }
 
-void EffectChain::ButtonClicked(ClickButton* button)
+void EffectChain::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSpawnEffectButton)
    {
@@ -492,15 +492,15 @@ void EffectChain::ButtonClicked(ClickButton* button)
    }
 }
 
-void EffectChain::CheckboxUpdated(Checkbox* checkbox)
+void EffectChain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EffectChain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EffectChain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void EffectChain::DropdownUpdated(DropdownList* list, int oldVal)
+void EffectChain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mEffectSpawnList)
    {

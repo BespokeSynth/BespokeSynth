@@ -185,11 +185,11 @@ void BiquadFilterEffect::ResetFilter()
    Clear();
 }
 
-void BiquadFilterEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void BiquadFilterEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void BiquadFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal)
+void BiquadFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
    if (list == mTypeSelector)
    {
@@ -213,14 +213,14 @@ bool BiquadFilterEffect::MouseMoved(float x, float y)
       GetPosition(thisx, thisy);
       x += thisx;
       y += thisy;
-      mFSlider->SetValue(x * 2 + 150);
-      mQSlider->SetValue(y / 100.0f);
+      mFSlider->SetValue(x * 2 + 150, NextBufferTime());
+      mQSlider->SetValue(y / 100.0f, NextBufferTime());
    }
 
    return false;
 }
 
-void BiquadFilterEffect::CheckboxUpdated(Checkbox* checkbox)
+void BiquadFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -229,7 +229,7 @@ void BiquadFilterEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mFSlider || slider == mQSlider || slider == mGSlider)
       mCoefficientsHaveChanged = true;

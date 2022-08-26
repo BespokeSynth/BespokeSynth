@@ -54,8 +54,8 @@ public:
 
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* dropdown, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* dropdown, int oldVal, double time) override;
 
    void OnScaleChanged() override;
 

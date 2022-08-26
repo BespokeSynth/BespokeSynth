@@ -117,7 +117,7 @@ void NoteStepper::SendCC(int control, int value, int voiceIdx)
    SendCCOutput(control, value, voiceIdx);
 }
 
-void NoteStepper::ButtonClicked(ClickButton* button)
+void NoteStepper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
       mCurrentDestinationIndex = -1;

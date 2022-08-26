@@ -683,7 +683,7 @@ ChaosEngine::ProgressionChord::ProgressionChord(const ofxJSONElement& chordInfo,
    }
 }
 
-void ChaosEngine::DropdownUpdated(DropdownList* list, int oldVal)
+void ChaosEngine::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mSongDropdown)
    {
@@ -726,11 +726,11 @@ void ChaosEngine::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void ChaosEngine::ButtonClicked(ClickButton* button)
+void ChaosEngine::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mChaosButton)
    {
-      mChaosArrivalTime = gTime + ofRandom(2000, 3000);
+      mChaosArrivalTime = time + ofRandom(2000, 3000);
    }
    if (button == mReadSongsButton)
    {
@@ -767,11 +767,11 @@ void ChaosEngine::ButtonClicked(ClickButton* button)
    }
 }
 
-void ChaosEngine::CheckboxUpdated(Checkbox* checkbox)
+void ChaosEngine::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void ChaosEngine::RadioButtonUpdated(RadioButton* list, int oldVal)
+void ChaosEngine::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
    if (list == mSectionDropdown)
    {
@@ -789,7 +789,7 @@ void ChaosEngine::RadioButtonUpdated(RadioButton* list, int oldVal)
    }
 }
 
-void ChaosEngine::IntSliderUpdated(IntSlider* slider, int oldVal)
+void ChaosEngine::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mDegreeSlider)
    {

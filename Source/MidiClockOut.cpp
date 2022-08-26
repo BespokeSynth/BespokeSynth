@@ -110,7 +110,7 @@ void MidiClockOut::OnTransportAdvanced(float amount)
       int pulsesPerMeasure = TheTransport->GetTimeSigTop() * pulsesPerBeat;
 
       double oldPulse = TheTransport->GetMeasureTime(gTime) * pulsesPerMeasure;
-      double newPulse = TheTransport->GetMeasureTime(gTime + gBufferSizeMs) * pulsesPerMeasure;
+      double newPulse = TheTransport->GetMeasureTime(NextBufferTime()) * pulsesPerMeasure;
       int pulses = int(floor(newPulse) - floor(oldPulse));
       double distToFirstPulse = 1 - fmod(oldPulse, 1);
       double pulseMs = TheTransport->GetDuration(kInterval_4n) / pulsesPerBeat;
@@ -129,7 +129,7 @@ void MidiClockOut::OnTransportAdvanced(float amount)
    }
 }
 
-void MidiClockOut::DropdownUpdated(DropdownList* list, int oldVal)
+void MidiClockOut::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mDeviceList)
    {
@@ -137,7 +137,7 @@ void MidiClockOut::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void MidiClockOut::ButtonClicked(ClickButton* button)
+void MidiClockOut::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mStartButton)
       mClockStartQueued = true;

@@ -48,7 +48,7 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

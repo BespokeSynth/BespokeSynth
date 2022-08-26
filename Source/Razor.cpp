@@ -391,7 +391,7 @@ void Razor::SetEnabled(bool enabled)
    mEnabled = enabled;
 }
 
-void Razor::CheckboxUpdated(Checkbox* checkbox)
+void Razor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
       SetEnabled(mEnabled);
@@ -402,11 +402,11 @@ void Razor::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void Razor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Razor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Razor::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Razor::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumPartialsSlider)
    {
@@ -414,7 +414,7 @@ void Razor::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void Razor::ButtonClicked(ClickButton* button)
+void Razor::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetDetuneButton)
    {

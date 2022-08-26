@@ -109,7 +109,7 @@ void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 }
 
-void NoteSustain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteSustain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

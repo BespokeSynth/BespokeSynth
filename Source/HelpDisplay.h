@@ -48,9 +48,9 @@ public:
    std::string GetModuleTooltip(IDrawableModule* module);
    std::string GetModuleTooltipFromName(std::string moduleTypeName);
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void ScreenshotModule(IDrawableModule* module);
 

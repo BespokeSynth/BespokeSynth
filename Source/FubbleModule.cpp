@@ -438,11 +438,11 @@ void FubbleModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
       mAxisV.UpdateControl();
 }
 
-void FubbleModule::CheckboxUpdated(Checkbox* checkbox)
+void FubbleModule::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal)
+void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    /*int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
@@ -465,7 +465,7 @@ void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal)
    }*/
 }
 
-void FubbleModule::ButtonClicked(ClickButton* button)
+void FubbleModule::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
       Clear();

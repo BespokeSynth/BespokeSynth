@@ -303,7 +303,7 @@ bool DropdownList::DropdownClickedAt(int x, int y)
    int index = GetItemIndexAt(x, y);
    if (index >= 0 && index < mElements.size())
    {
-      SetIndex(index, K(forceUpdate));
+      SetIndex(index, NextBufferTime(), K(forceUpdate));
       return true;
    }
    return false;
@@ -405,15 +405,15 @@ void DropdownList::Clear()
    mHeight = kItemSpacing;
 }
 
-void DropdownList::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void DropdownList::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
-   SetIndex(int(slider * mElements.size()));
+   SetIndex(int(slider * mElements.size()), time, false);
    mSliderVal = slider;
    mLastSetValue = *mVar;
 
    if (!setViaModulator)
-      mLastScrolledTime = gTime; //don't do scrolling display if a modulator is changing our value
+      mLastScrolledTime = time; //don't do scrolling display if a modulator is changing our value
 }
 
 float DropdownList::GetValueForMidiCC(float slider) const
@@ -426,22 +426,22 @@ float DropdownList::GetValueForMidiCC(float slider) const
    return mElements[index].mValue;
 }
 
-void DropdownList::SetIndex(int i, bool forceUpdate /*= false*/)
+void DropdownList::SetIndex(int i, double time, bool forceUpdate)
 {
    if (mElements.empty())
       return;
 
    i = ofClamp(i, 0, mElements.size() - 1);
 
-   SetValue(mElements[i].mValue, forceUpdate);
+   SetValue(mElements[i].mValue, time, forceUpdate);
 }
 
-void DropdownList::SetValue(float value)
+void DropdownList::SetValue(float value, double time)
 {
-   SetValue((int)value, false);
+   SetValue((int)value, time, false);
 }
 
-void DropdownList::SetValue(int value, bool forceUpdate)
+void DropdownList::SetValue(int value, double time, bool forceUpdate)
 {
    if (value != *mVar || forceUpdate)
    {
@@ -449,7 +449,7 @@ void DropdownList::SetValue(int value, bool forceUpdate)
       *mVar = value;
       CalcSliderVal();
       gControlTactileFeedback = 1;
-      mOwner->DropdownUpdated(this, oldVal);
+      mOwner->DropdownUpdated(this, oldVal, time);
    }
 }
 
@@ -497,7 +497,7 @@ void DropdownList::Increment(float amount)
 {
    int itemIndex = FindItemIndex(*mVar);
 
-   SetIndex(itemIndex + (int)amount);
+   SetIndex(itemIndex + (int)amount, gTime, false);
 }
 
 EnumMap DropdownList::GetEnumMap()
@@ -531,7 +531,7 @@ void DropdownList::LoadState(FileStreamIn& in, bool shouldSetValue)
       float var;
       in >> var;
       if (shouldSetValue)
-         SetValueDirect(var);
+         SetValueDirect(var, gTime);
    }
    else
    {
@@ -543,7 +543,7 @@ void DropdownList::LoadState(FileStreamIn& in, bool shouldSetValue)
          {
             if (mElements[i].mLabel == label)
             {
-               SetIndex(i);
+               SetIndex(i, gTime, false);
                break;
             }
          }
@@ -609,7 +609,7 @@ void DropdownListModal::OnClicked(float x, float y, bool right)
       TheSynth->PopModalFocusItem();
 }
 
-void DropdownListModal::ButtonClicked(ClickButton* button)
+void DropdownListModal::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPagePrevButton)
       mOwner->ChangePage(-1);

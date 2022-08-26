@@ -170,17 +170,17 @@ int Monophonify::GetMostRecentCurrentlyHeldPitch() const
    return mostRecentPitch;
 }
 
-void Monophonify::CheckboxUpdated(Checkbox* checkbox)
+void Monophonify::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
       for (int i = 0; i < 128; ++i)
          mHeldNotes[i] = -1;
    }
 }
 
-void Monophonify::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Monophonify::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

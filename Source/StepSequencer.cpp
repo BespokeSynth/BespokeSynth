@@ -586,7 +586,7 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
          float val = midiValue / 16320.0f;
          float oldStrength = mStrength;
          mStrength = val;
-         FloatSliderUpdated(mStrengthSlider, oldStrength);
+         FloatSliderUpdated(mStrengthSlider, oldStrength, gTime);
       }
       else
       {
@@ -873,13 +873,13 @@ void StepSequencer::RandomizeRow(int row)
    }
 }
 
-void StepSequencer::CheckboxUpdated(Checkbox* checkbox)
+void StepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mStrengthSlider)
    {
@@ -902,11 +902,11 @@ void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void StepSequencer::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void StepSequencer::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 
-void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
    {
@@ -929,7 +929,7 @@ void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void StepSequencer::ButtonClicked(ClickButton* button)
+void StepSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mShiftLeftButton || button == mShiftRightButton)
    {
@@ -957,7 +957,7 @@ void StepSequencer::ButtonClicked(ClickButton* button)
    }
 }
 
-void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mPresetDropdown)
       SetPreset(mPreset);

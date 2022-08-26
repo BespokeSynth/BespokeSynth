@@ -65,10 +65,10 @@ void NoteTransformer::DrawModule()
    }
 }
 
-void NoteTransformer::CheckboxUpdated(Checkbox* checkbox)
+void NoteTransformer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

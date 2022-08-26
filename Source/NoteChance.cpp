@@ -154,7 +154,7 @@ void NoteChance::Reseed()
    mSeed = gRandom() % 10000;
 }
 
-void NoteChance::ButtonClicked(ClickButton* button)
+void NoteChance::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPrevSeedButton)
       mSeed = (mSeed - 1 + 10000) % 10000;

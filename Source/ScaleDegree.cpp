@@ -69,10 +69,10 @@ void ScaleDegree::DrawModule()
    mDiatonicCheckbox->Draw();
 }
 
-void ScaleDegree::CheckboxUpdated(Checkbox* checkbox)
+void ScaleDegree::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -116,11 +116,10 @@ int ScaleDegree::TransformPitch(int pitch)
    }
 }
 
-void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
+void ScaleDegree::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (slider == mScaleDegreeSelector && mEnabled && mRetrigger)
+   if (list == mScaleDegreeSelector && mEnabled && mRetrigger)
    {
-      double time = gTime + gBufferSizeMs;
       for (int pitch = 0; pitch < 128; ++pitch)
       {
          if (mInputNotes[pitch].mOn)

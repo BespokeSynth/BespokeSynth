@@ -1651,7 +1651,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       else
          val += change;
       val = ofClamp(val, 0, 1);
-      gHoveredUIControl->SetFromMidiCC(val);
+      gHoveredUIControl->SetFromMidiCC(val, NextBufferTime(), false);
 
       gHoveredUIControl->NotifyMouseScrolled(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), xScroll, yScroll, isSmoothScroll, isInvertedScroll);
    }

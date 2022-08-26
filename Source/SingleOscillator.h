@@ -63,11 +63,11 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
 
    bool HasDebugDraw() const override { return true; }
 
@@ -118,7 +118,14 @@ private:
 
    Oscillator mDrawOsc{ OscillatorType::kOsc_Square };
 
-   std::string mDebugLines;
+   struct DebugLine
+   {
+      std::string text;
+      ofColor color;
+   };
+
+   std::array<DebugLine, 20> mDebugLines;
+   int mDebugLinesPos{ 0 };
 };
 
 

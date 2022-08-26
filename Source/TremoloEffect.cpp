@@ -118,7 +118,7 @@ float TremoloEffect::GetEffectAmount()
    return mAmount;
 }
 
-void TremoloEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void TremoloEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
       mLFO.SetPeriod(mInterval);
@@ -126,11 +126,11 @@ void TremoloEffect::DropdownUpdated(DropdownList* list, int oldVal)
       mLFO.SetType(mOscType);
 }
 
-void TremoloEffect::CheckboxUpdated(Checkbox* checkbox)
+void TremoloEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void TremoloEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void TremoloEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mOffsetSlider)
       mLFO.SetOffset(mOffset);

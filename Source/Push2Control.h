@@ -55,7 +55,7 @@ public:
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;

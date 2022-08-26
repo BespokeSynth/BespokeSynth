@@ -125,7 +125,7 @@ bool Polyrhythms::MouseMoved(float x, float y)
    return false;
 }
 
-void Polyrhythms::DropdownUpdated(DropdownList* list, int oldVal)
+void Polyrhythms::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    for (int i = 0; i < mRhythmLines.size(); ++i)
    {

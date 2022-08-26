@@ -72,7 +72,7 @@ void DCRemoverEffect::GetModuleDimensions(float& width, float& height)
    height = 0;
 }
 
-void DCRemoverEffect::CheckboxUpdated(Checkbox* checkbox)
+void DCRemoverEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

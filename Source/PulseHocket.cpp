@@ -143,7 +143,7 @@ void PulseHocket::Reseed()
    mSeed = gRandom() % 10000;
 }
 
-void PulseHocket::ButtonClicked(ClickButton* button)
+void PulseHocket::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPrevSeedButton)
       mSeed = (mSeed - 1 + 10000) % 10000;

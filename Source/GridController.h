@@ -88,8 +88,8 @@ public:
    IGridController* GetGridController() { return mGridController; }
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;

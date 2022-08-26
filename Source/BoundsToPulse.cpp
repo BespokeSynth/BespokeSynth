@@ -30,8 +30,16 @@ BoundsToPulse::BoundsToPulse()
 {
 }
 
+void BoundsToPulse::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
+}
+
 BoundsToPulse::~BoundsToPulse()
 {
+   TheTransport->RemoveAudioPoller(this);
 }
 
 void BoundsToPulse::CreateUIControls()
@@ -46,6 +54,12 @@ void BoundsToPulse::CreateUIControls()
    AddPatchCableSource(mMaxCable);
 }
 
+void BoundsToPulse::OnTransportAdvanced(float amount)
+{
+   for (int i = 0; i < gBufferSize; ++i)
+      ComputeSliders(i);
+}
+
 void BoundsToPulse::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -57,7 +71,7 @@ void BoundsToPulse::DrawModule()
    mMaxCable->SetManualPosition(100, 30);
 }
 
-void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (!mEnabled)
       return;
@@ -68,13 +82,13 @@ void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
       if (mValue == slider->GetMin() && mValue < oldVal)
       {
-         DispatchPulse(GetPatchCableSource(), gTime + gBufferSizeMs, 1.f, 0);
-         DispatchPulse(mMinCable, gTime + gBufferSizeMs, 1.f, 0);
+         DispatchPulse(GetPatchCableSource(), time, 1.f, 0);
+         DispatchPulse(mMinCable, time, 1.f, 0);
       }
       else if (mValue == slider->GetMax() && oldVal < mValue)
       {
-         DispatchPulse(GetPatchCableSource(), gTime + gBufferSizeMs, 1.f, 0);
-         DispatchPulse(mMaxCable, gTime + gBufferSizeMs, 1.f, 0);
+         DispatchPulse(GetPatchCableSource(), time, 1.f, 0);
+         DispatchPulse(mMaxCable, time, 1.f, 0);
       }
    }
 }

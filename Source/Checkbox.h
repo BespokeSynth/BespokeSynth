@@ -46,9 +46,9 @@ public:
    bool MouseMoved(float x, float y) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time) override;
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return 2; }

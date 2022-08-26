@@ -69,8 +69,8 @@ public:
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
-   void RadioButtonUpdated(RadioButton* list, int oldVal);
-   void ButtonClicked(ClickButton* button);
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time);
+   void ButtonClicked(ClickButton* button, double time);
 
 private:
    RadioButton* mSelector{ nullptr };
@@ -117,13 +117,13 @@ public:
    bool CanDropSample() const override { return true; }
    bool MouseMoved(float x, float y) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;

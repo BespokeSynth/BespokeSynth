@@ -110,15 +110,15 @@ void EQEffect::GetModuleDimensions(float& width, float& height)
    height = 80;
 }
 
-void EQEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void EQEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void EQEffect::RadioButtonUpdated(RadioButton* list, int oldVal)
+void EQEffect::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
 }
 
-void EQEffect::CheckboxUpdated(Checkbox* checkbox)
+void EQEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -130,11 +130,11 @@ void EQEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void EQEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+void EQEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void EQEffect::ButtonClicked(ClickButton* button)
+void EQEffect::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mEvenButton)
    {

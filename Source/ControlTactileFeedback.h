@@ -47,10 +47,10 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
 
-   void CheckboxUpdated(Checkbox* checkbox) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

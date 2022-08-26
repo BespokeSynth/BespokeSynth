@@ -52,7 +52,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    //ITextEntryListener
    void TextEntryComplete(TextEntry* entry) override;

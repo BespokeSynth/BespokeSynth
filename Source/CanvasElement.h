@@ -61,10 +61,10 @@ public:
    virtual bool IsResizable() const { return true; }
    virtual CanvasElement* CreateDuplicate() const = 0;
 
-   virtual void CheckboxUpdated(std::string label, bool value);
-   virtual void FloatSliderUpdated(std::string label, float oldVal, float newVal);
-   virtual void IntSliderUpdated(std::string label, int oldVal, float newVal);
-   virtual void ButtonClicked(std::string label);
+   virtual void CheckboxUpdated(std::string label, bool value, double time);
+   virtual void FloatSliderUpdated(std::string label, float oldVal, float newVal, double time);
+   virtual void IntSliderUpdated(std::string label, int oldVal, float newVal, double time);
+   virtual void ButtonClicked(std::string label, double time);
 
    virtual void SaveState(FileStreamOut& out);
    virtual void LoadState(FileStreamIn& in);
@@ -142,8 +142,8 @@ public:
 
    CanvasElement* CreateDuplicate() const override;
 
-   void CheckboxUpdated(std::string label, bool value) override;
-   void ButtonClicked(std::string label) override;
+   void CheckboxUpdated(std::string label, bool value, double time) override;
+   void ButtonClicked(std::string label, double time) override;
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
@@ -172,8 +172,8 @@ public:
 
    void SetUIControl(IUIControl* control);
    void SetValue(float value) { mValue = value; }
-   void Trigger();
-   void TriggerEnd();
+   void Trigger(double time);
+   void TriggerEnd(double time);
 
    bool IsResizable() const override { return mIsCheckbox; }
    float GetEnd() const override;

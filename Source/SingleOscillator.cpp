@@ -202,18 +202,13 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
 
    if (mDrawDebug)
    {
-      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
-      mDebugLines = "";
-      const int kNumDisplayLines = 10;
-      for (int i = 0; i < kNumDisplayLines - 1; ++i)
-      {
-         int lineIndex = (int)lines.size() - (kNumDisplayLines - 1) + i;
-         if (lineIndex >= 0)
-            mDebugLines += lines[lineIndex] + "\n";
-      }
-      std::string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
-      mDebugLines += debugLine;
-      ofLog() << debugLine;
+      mDebugLines[mDebugLinesPos].text = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
+      if (velocity > 0)
+         mDebugLines[mDebugLinesPos].color = ofColor::lime;
+      else
+         mDebugLines[mDebugLinesPos].color = ofColor::red;
+      ofLog() << mDebugLines[mDebugLinesPos].text;
+      ++mDebugLinesPos;
    }
 }
 
@@ -307,7 +302,14 @@ void SingleOscillator::DrawModuleUnclipped()
    if (mDrawDebug)
    {
       mPolyMgr.DrawDebug(mWidth + 3, 0);
-      DrawTextNormal(mDebugLines, 0, mHeight + 15);
+      float y = mHeight + 15;
+      for (size_t i = 0; i < mDebugLines.size(); ++i)
+      {
+         const DebugLine& line = mDebugLines[(mDebugLinesPos + i) % mDebugLines.size()];
+         ofSetColor(line.color);
+         DrawTextNormal(line.text, 0, y);
+         y += 15;
+      }
    }
 }
 
@@ -345,7 +347,7 @@ void SingleOscillator::SetUpFromSaveData()
 }
 
 
-void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal)
+void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mMultSelector)
    {
@@ -360,11 +362,11 @@ void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal)
       mDrawOsc.SetType(mVoiceParams.mOscType);
 }
 
-void SingleOscillator::RadioButtonUpdated(RadioButton* list, int oldVal)
+void SingleOscillator::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
 }
 
-void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mShuffleSlider)
       mDrawOsc.SetShuffle(mVoiceParams.mShuffle);
@@ -372,11 +374,11 @@ void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       mDrawOsc.SetPulseWidth(mVoiceParams.mPulseWidth);
 }
 
-void SingleOscillator::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SingleOscillator::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void SingleOscillator::CheckboxUpdated(Checkbox* checkbox)
+void SingleOscillator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
       mPolyMgr.KillAll();

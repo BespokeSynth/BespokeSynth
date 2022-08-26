@@ -155,30 +155,30 @@ void Rewriter::DrawModule()
    }
 }
 
-void Rewriter::ButtonClicked(ClickButton* button)
+void Rewriter::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mStartRecordTimeButton)
    {
       if (mStartRecordTime == -1)
-         mStartRecordTime = gTime + gBufferSizeMs;
+         mStartRecordTime = time;
       else
          mStartRecordTime = -1;
    }
    if (button == mRewriteButton)
-      Go();
+      Go(time);
 }
 
-void Rewriter::CheckboxUpdated(Checkbox* checkbox)
+void Rewriter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void Rewriter::Go()
+void Rewriter::Go(double time)
 {
    if (mConnectedLooper)
    {
       if (mStartRecordTime != -1)
       {
-         float recordedMs = gTime + gBufferSizeMs - mStartRecordTime;
+         float recordedMs = time - mStartRecordTime;
          float numBarsCurrentTempo = recordedMs / TheTransport->MsPerBar();
          int numBars = int(numBarsCurrentTempo + .5f);
          numBars = MAX(1, int(Pow2(floor(log2(numBars))))); //find closest power of 2

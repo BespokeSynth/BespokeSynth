@@ -46,7 +46,7 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "dcremover"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
 private:
    //IDrawableModule

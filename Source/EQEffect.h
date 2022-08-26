@@ -57,11 +57,11 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "basiceq"; }
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
 private:

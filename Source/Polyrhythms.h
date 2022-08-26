@@ -82,7 +82,7 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

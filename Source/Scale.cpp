@@ -681,7 +681,7 @@ float Scale::GetTuningTableRatio(int semitonesFromCenter)
    return mTuningTable[CLAMP(128 + semitonesFromCenter, 0, 255)];
 }
 
-void Scale::DropdownUpdated(DropdownList* list, int oldVal)
+void Scale::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mRootSelector)
       SetRoot(mScale.mScaleRoot, true);
@@ -691,15 +691,15 @@ void Scale::DropdownUpdated(DropdownList* list, int oldVal)
       UpdateTuningTable();
 }
 
-void Scale::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Scale::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Scale::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Scale::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void Scale::CheckboxUpdated(Checkbox* checkbox)
+void Scale::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -715,7 +715,7 @@ void Scale::TextEntryComplete(TextEntry* entry)
       UpdateTuningTable();
 }
 
-void Scale::ButtonClicked(ClickButton* button)
+void Scale::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mLoadSCLButton || button == mLoadKBMButton)
    {

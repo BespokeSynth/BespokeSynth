@@ -32,7 +32,6 @@
 #include "ModularSynth.h"
 #include "IModulator.h"
 #include "Push2Control.h"
-#include "Profiler.h"
 
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits /* = -1 */)
 : mVar(var)
@@ -348,7 +347,7 @@ void FloatSlider::MouseReleased()
    mMouseDown = false;
    mRefY = -999;
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
-      SetValue(0);
+      SetValue(0, NextBufferTime());
 }
 
 bool FloatSlider::MouseMoved(float x, float y)
@@ -403,7 +402,7 @@ void FloatSlider::SetValueForMouse(int x, int y)
 
    if (oldVal != *var)
    {
-      mOwner->FloatSliderUpdated(this, oldVal);
+      mOwner->FloatSliderUpdated(this, oldVal, NextBufferTime());
    }
 
    if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
@@ -437,9 +436,9 @@ void FloatSlider::SmoothUpdated()
    }
 }
 
-void FloatSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void FloatSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
-   SetValue(GetValueForMidiCC(slider));
+   SetValue(GetValueForMidiCC(slider), time);
 }
 
 float FloatSlider::GetValueForMidiCC(float slider) const
@@ -505,7 +504,7 @@ float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
    return 0;
 }
 
-void FloatSlider::SetValue(float value)
+void FloatSlider::SetValue(float value, double time)
 {
    if (TheLFOController && TheLFOController->WantsBinding(this))
    {
@@ -534,7 +533,7 @@ void FloatSlider::SetValue(float value)
    DisableLFO();
    if (oldVal != *var)
    {
-      mOwner->FloatSliderUpdated(this, oldVal);
+      mOwner->FloatSliderUpdated(this, oldVal, time);
    }
 }
 
@@ -543,7 +542,7 @@ void FloatSlider::UpdateTouching()
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
    {
       if (!mTouching)
-         SetValue(0);
+         SetValue(0, NextBufferTime());
       mRelativeOffset = -999;
    }
 }
@@ -635,7 +634,7 @@ void FloatSlider::DoCompute(int samplesIn /*= 0*/)
    }
 
    if (oldVal != *mVar)
-      mOwner->FloatSliderUpdated(this, oldVal);
+      mOwner->FloatSliderUpdated(this, oldVal, gTime + samplesIn * gInvSampleRateMs);
 }
 
 float* FloatSlider::GetModifyValue()
@@ -651,26 +650,26 @@ void FloatSlider::Double()
 {
    float doubl = *GetModifyValue() * 2.0f;
    if (doubl >= mMin && doubl <= mMax)
-      SetValue(doubl);
+      SetValue(doubl, NextBufferTime());
 }
 
 void FloatSlider::Halve()
 {
    float half = *GetModifyValue() * .5f;
    if (half >= mMin && half <= mMax)
-      SetValue(half);
+      SetValue(half, NextBufferTime());
 }
 
 void FloatSlider::Increment(float amount)
 {
    float val = *GetModifyValue() + amount;
    if (val >= mMin && val <= mMax)
-      SetValue(val);
+      SetValue(val, NextBufferTime());
 }
 
 void FloatSlider::ResetToOriginal()
 {
-   SetValue(mOriginalValue);
+   SetValue(mOriginalValue, NextBufferTime());
 }
 
 bool FloatSlider::CheckNeedsDraw()
@@ -702,7 +701,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
       if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
-         SetValue(evaluated);
+         SetValue(evaluated, NextBufferTime());
    }
    if (entry == mMaxEntry)
    {
@@ -835,7 +834,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    }
 
    if (shouldSetValue && (mModulator == nullptr || !mModulator->Active()))
-      SetValueDirect(var);
+      SetValueDirect(var, gTime);
 }
 
 IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y, int w, int h, int* var, int min, int max)
@@ -1068,14 +1067,14 @@ void IntSlider::SetValueForMouse(int x, int y)
    if (oldVal != *mVar)
    {
       CalcSliderVal();
-      mOwner->IntSliderUpdated(this, oldVal);
+      mOwner->IntSliderUpdated(this, oldVal, NextBufferTime());
    }
 }
 
-void IntSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void IntSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
-   SetValue(GetValueForMidiCC(slider));
+   SetValue(GetValueForMidiCC(slider), time);
    mSliderVal = slider;
    mLastSetValue = *mVar;
 }
@@ -1086,7 +1085,7 @@ float IntSlider::GetValueForMidiCC(float slider) const
    return (int)round(ofMap(slider, 0, 1, mMin, mMax));
 }
 
-void IntSlider::SetValue(float value)
+void IntSlider::SetValue(float value, double time)
 {
    int oldVal = *mVar;
    *mVar = (int)ofClamp(value, mMin, mMax);
@@ -1094,7 +1093,7 @@ void IntSlider::SetValue(float value)
    {
       CalcSliderVal();
       gControlTactileFeedback = 1;
-      mOwner->IntSliderUpdated(this, oldVal);
+      mOwner->IntSliderUpdated(this, oldVal, time);
    }
 }
 
@@ -1117,26 +1116,26 @@ void IntSlider::Double()
 {
    int doubl = *mVar * 2;
    if (doubl >= mMin && doubl <= mMax)
-      SetValue(doubl);
+      SetValue(doubl, NextBufferTime());
 }
 
 void IntSlider::Halve()
 {
    int half = *mVar / 2;
    if (half >= mMin && half <= mMax)
-      SetValue(half);
+      SetValue(half, NextBufferTime());
 }
 
 void IntSlider::Increment(float amount)
 {
    int val = *mVar + (int)amount;
    if (val >= mMin && val <= mMax)
-      SetValue(val);
+      SetValue(val, NextBufferTime());
 }
 
 void IntSlider::ResetToOriginal()
 {
-   SetValue(mOriginalValue);
+   SetValue(mOriginalValue, NextBufferTime());
 }
 
 bool IntSlider::CheckNeedsDraw()
@@ -1169,7 +1168,7 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
       int evaluatedInt = round(evaluated);
       if (expressionValid && ((evaluatedInt >= mMin && evaluatedInt <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
-         SetValue(evaluatedInt);
+         SetValue(evaluatedInt, NextBufferTime());
    }
    if (entry == mMaxEntry)
    {
@@ -1229,5 +1228,5 @@ void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    }
 
    if (shouldSetValue)
-      SetValueDirect(var);
+      SetValueDirect(var, gTime);
 }

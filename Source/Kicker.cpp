@@ -41,10 +41,10 @@ void Kicker::DrawModule()
       return;
 }
 
-void Kicker::CheckboxUpdated(Checkbox* checkbox)
+void Kicker::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void Kicker::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

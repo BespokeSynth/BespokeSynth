@@ -53,10 +53,10 @@ void Capo::DrawModule()
    mDiatonicCheckbox->Draw();
 }
 
-void Capo::CheckboxUpdated(Checkbox* checkbox)
+void Capo::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -102,11 +102,10 @@ int Capo::TransformPitch(int pitch)
    }
 }
 
-void Capo::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Capo::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mCapoSlider && mEnabled && mRetrigger)
    {
-      double time = gTime + gBufferSizeMs;
       for (int pitch = 0; pitch < 128; ++pitch)
       {
          if (mInputNotes[pitch].mOn)

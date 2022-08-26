@@ -240,7 +240,7 @@ void SampleFinder::DropdownClicked(DropdownList* list)
 {
 }
 
-void SampleFinder::DropdownUpdated(DropdownList* list, int oldVal)
+void SampleFinder::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -248,7 +248,7 @@ void SampleFinder::UpdateSample()
 {
 }
 
-void SampleFinder::ButtonClicked(ClickButton* button)
+void SampleFinder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mWriteButton)
    {
@@ -300,7 +300,7 @@ void SampleFinder::UpdateZoomExtents()
    mClipEndSlider->SetExtents(mZoomStart, mZoomEnd);
 }
 
-void SampleFinder::CheckboxUpdated(Checkbox* checkbox)
+void SampleFinder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mPlayCheckbox)
    {
@@ -323,11 +323,11 @@ void SampleFinder::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void SampleFinder::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SampleFinder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SampleFinder::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SampleFinder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {

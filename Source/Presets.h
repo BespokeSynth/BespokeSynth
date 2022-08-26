@@ -58,10 +58,10 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -78,7 +78,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
 private:
-   void SetPreset(int idx, bool queueForMainThread);
+   void SetPreset(int idx, double time, bool queueForMainThread);
    void Store(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);

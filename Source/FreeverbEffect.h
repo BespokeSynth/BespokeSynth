@@ -49,8 +49,8 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "freeverb"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
 private:
    //IDrawableModule

@@ -34,7 +34,7 @@ class IButtonListener
 {
 public:
    virtual ~IButtonListener() {}
-   virtual void ButtonClicked(ClickButton* button) = 0;
+   virtual void ButtonClicked(ClickButton* button, double time) = 0;
 };
 
 enum class ButtonDisplayStyle
@@ -69,8 +69,8 @@ public:
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
-   void SetValue(float value) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetValue(float value, double time) override;
    float GetValue() const override { return GetMidiValue(); }
    float GetMidiValue() const override;
    std::string GetDisplayValue(float val) const override;
@@ -89,6 +89,7 @@ protected:
    ~ClickButton(); //protected so that it can't be created on the stack
 
 private:
+   void DoClick(double time);
    bool ButtonLit() const;
 
    void OnClicked(float x, float y, bool right) override;

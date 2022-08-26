@@ -172,11 +172,11 @@ void UnstablePressure::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetPressure(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstablePressure::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UnstablePressure::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void UnstablePressure::CheckboxUpdated(Checkbox* checkbox)
+void UnstablePressure::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

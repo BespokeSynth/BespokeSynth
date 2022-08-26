@@ -123,11 +123,11 @@ float FreeverbEffect::GetEffectAmount()
    return mWet;
 }
 
-void FreeverbEffect::CheckboxUpdated(Checkbox* checkbox)
+void FreeverbEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void FreeverbEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FreeverbEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mRoomSizeSlider)
    {

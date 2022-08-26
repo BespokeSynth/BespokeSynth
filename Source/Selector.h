@@ -42,7 +42,7 @@ public:
 
    void CreateUIControls() override;
 
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -61,7 +61,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    void SyncList();
-   void SetIndex(int index);
+   void SetIndex(int index, double time);
 
    RadioButton* mSelector{ nullptr };
    int mCurrentValue{ 0 };

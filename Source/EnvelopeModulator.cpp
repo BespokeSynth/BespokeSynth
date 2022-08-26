@@ -136,15 +136,15 @@ void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource, bool fromUser
    OnModulatorRepatch();
 }
 
-void EnvelopeModulator::CheckboxUpdated(Checkbox* checkbox)
+void EnvelopeModulator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EnvelopeModulator::ButtonClicked(ClickButton* button)
+void EnvelopeModulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

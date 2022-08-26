@@ -41,7 +41,7 @@ class IFloatSliderListener
 {
 public:
    virtual ~IFloatSliderListener() {}
-   virtual void FloatSliderUpdated(FloatSlider* slider, float oldVal) = 0;
+   virtual void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) = 0;
 };
 
 class FloatSlider : public IUIControl, public ITextEntryListener, public IAudioPoller
@@ -105,9 +105,9 @@ public:
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time) override;
    float GetValue() const override;
    std::string GetDisplayValue(float val) const override;
    float GetMidiValue() const override;
@@ -199,7 +199,7 @@ class IIntSliderListener
 {
 public:
    virtual ~IIntSliderListener() {}
-   virtual void IntSliderUpdated(IntSlider* slider, int oldVal) = 0;
+   virtual void IntSliderUpdated(IntSlider* slider, int oldVal, double time) = 0;
 };
 
 class IntSlider : public IUIControl, public ITextEntryListener
@@ -230,9 +230,9 @@ public:
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time) override;
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return mMax - mMin + 1; }

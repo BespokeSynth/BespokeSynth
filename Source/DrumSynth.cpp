@@ -236,27 +236,27 @@ void DrumSynth::GetModuleDimensions(float& width, float& height)
    height = 2 + kPadYOffset + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;
 }
 
-void DrumSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void DrumSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void DrumSynth::IntSliderUpdated(IntSlider* slider, int oldVal)
+void DrumSynth::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void DrumSynth::DropdownUpdated(DropdownList* list, int oldVal)
+void DrumSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void DrumSynth::CheckboxUpdated(Checkbox* checkbox)
+void DrumSynth::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void DrumSynth::ButtonClicked(ClickButton* button)
+void DrumSynth::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void DrumSynth::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void DrumSynth::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 

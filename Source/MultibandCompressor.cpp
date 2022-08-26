@@ -166,7 +166,7 @@ void MultibandCompressor::CalcFilters()
    }
 }
 
-void MultibandCompressor::IntSliderUpdated(IntSlider* slider, int oldVal)
+void MultibandCompressor::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumBandsSlider)
    {
@@ -174,7 +174,7 @@ void MultibandCompressor::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void MultibandCompressor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MultibandCompressor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mFMinSlider || slider == mFMaxSlider)
    {

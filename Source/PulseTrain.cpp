@@ -114,7 +114,7 @@ void PulseTrain::DrawModule()
    }
 }
 
-void PulseTrain::CheckboxUpdated(Checkbox* checkbox)
+void PulseTrain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -202,7 +202,7 @@ bool PulseTrain::MouseScrolled(float x, float y, float scrollX, float scrollY, b
    return false;
 }
 
-void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal)
+void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -212,11 +212,11 @@ void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void PulseTrain::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PulseTrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
