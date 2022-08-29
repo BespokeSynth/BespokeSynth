@@ -2164,6 +2164,7 @@ void ModularSynth::ResetLayout()
 
    mUserPrefsEditor = new UserPrefsEditor();
    mUserPrefsEditor->SetName("userprefseditor");
+   mUserPrefsEditor->SetTypeName("userprefseditor", kModuleCategory_Other);
    mUserPrefsEditor->CreateUIControls();
    mUserPrefsEditor->Init();
    mUserPrefsEditor->SetPosition(100, 250);

@@ -33,7 +33,8 @@
 #include "ModulationChain.h"
 
 VelocityToCV::VelocityToCV()
-: mVelocity(0), mPassZero(false)
+: mVelocity(0)
+, mPassZero(false)
 {
 }
 

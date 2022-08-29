@@ -588,6 +588,7 @@ void TitleBar::ButtonClicked(ClickButton* button)
       mHelpDisplay->GetDimensions(w, h);
       mHelpDisplay->SetPosition(x - w + butW, y + butH);
       mHelpDisplay->SetOwningContainer(GetOwningContainer());
+      mHelpDisplay->Show();
       TheSynth->PushModalFocusItem(mHelpDisplay);
       sShowInitialHelpOverlay = false;
    }

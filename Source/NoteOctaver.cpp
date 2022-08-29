@@ -27,6 +27,7 @@
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
+#include "UIControlMacros.h"
 
 NoteOctaver::NoteOctaver()
 : mOctave(0)
@@ -37,16 +38,20 @@ NoteOctaver::NoteOctaver()
 void NoteOctaver::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mOctaveSlider = new IntSlider(this, "octave", 4, 2, 100, 15, &mOctave, -4, 4);
+
+   UIBLOCK0();
+   INTSLIDER(mOctaveSlider, "octave", &mOctave, -4, 4);
+   CHECKBOX(mRetriggerCheckbox, "retrigger", &mRetrigger);
+   ENDUIBLOCK(mWidth, mHeight);
 }
 
 void NoteOctaver::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
 
    mOctaveSlider->Draw();
+   mRetriggerCheckbox->Draw();
 }
 
 void NoteOctaver::CheckboxUpdated(Checkbox* checkbox)
@@ -70,6 +75,7 @@ void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
          mInputNotes[pitch].mOn = true;
          mInputNotes[pitch].mVelocity = velocity;
          mInputNotes[pitch].mVoiceIdx = voiceIdx;
+         mInputNotes[pitch].mOutputPitch = pitch + mOctave * TheScale->GetPitchesPerOctave();
       }
       else
       {
@@ -77,12 +83,12 @@ void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       }
    }
 
-   PlayNoteOutput(time, pitch + mOctave * 12, velocity, voiceIdx, modulation);
+   PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, velocity, mInputNotes[pitch].mVoiceIdx, modulation);
 }
 
 void NoteOctaver::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
-   if (slider == mOctaveSlider && mEnabled)
+   if (slider == mOctaveSlider && mEnabled && mRetrigger)
    {
       double time = gTime + gBufferSizeMs;
       for (int pitch = 0; pitch < 128; ++pitch)
@@ -90,7 +96,7 @@ void NoteOctaver::IntSliderUpdated(IntSlider* slider, int oldVal)
          if (mInputNotes[pitch].mOn)
          {
             PlayNoteOutput(time + .01, pitch + oldVal, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
-            PlayNoteOutput(time, pitch + mOctave * 12, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(time, pitch + mOctave * TheScale->GetPitchesPerOctave(), mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          }
       }
    }

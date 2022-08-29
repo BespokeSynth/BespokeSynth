@@ -232,6 +232,11 @@ audiotopulse~sends a pulse when the audio level surpasses a specified threshold
 
 
 
+boundstopulse~sends a pulse when its input slider hits its max or min limit
+~input~the slider to check bounds on
+
+
+
 vinylcontrol~modulator which outputs a speed value based upon control vinyl input audio. provide it with a stereo signal from control vinyl (like you'd use to control serato) patched in from an "input" module.
 ~control~enable/disable transport control. when you enable it, it will use the current speed as the reference speed (so, the output will output a value of 1 until you change the vinyl's speed)
 
@@ -1902,3 +1907,49 @@ output~route audio in here to send it to an output channel (your speakers or aud
 
 gain~adjusts volume of audio signal
 ~gain~amount to adjust signal. a value of 1 will cause no change to the signal.
+
+
+
+userprefseditor~settings for bespoke. some settings changes require bespoke to be restarted before taking effect.
+~devicetype~what kind of audio device bespoke should use (requires restart)
+~audio_output_device~which device to use for audio output (requires restart)
+~audio_input_device~which device to use for audio input (requires restart)
+~samplerate~what sample rate to use with your audio device (requires restart)
+~buffersize~what buffer size to use with your audio device. lower values use require more CPU power, higher values add more latency. (requires restart)
+~oversampling~global oversampling multiplier. uses additional CPU for higher-resolution audio processing. (requires restart)
+~width~width of bespoke's window on startup
+~height~height of bespoke's window on startup
+~set_manual_window_position~should we force bespoke to a specific position on startup
+~position_x~desired x position of upper-left corner
+~position_y~desired y position of upper-left corner
+~zoom~desired canvas zoom level on startup
+~ui_scale~scale of UI layer (title bar, quickspawn menu, etc)
+~grid_snap_size~grid size to use when snapping module position (hold alt/option while dragging a module)
+~scroll_multiplier_vertical~adjustment to vertical mouse/trackpad scroll speed
+~scroll_multiplier_horizontal~adjustment to horizontal mouse/trackpad scroll speed
+~autosave~should autosave be enabled on startup
+~show_tooltips_on_load~should tooltips be enabled on startup
+~show_minimap~should the minimap be displayed (requires restart)
+~record_buffer_length_minutes~length of always-on recording buffer for "write audio" button in the title bar (requires restart)
+~vst_always_on_top~should plugin windows always stay on top of bespoke when opened
+~max_output_channels~number of output channels to allocate (requires restart)
+~max_input_channels~number of input channels to allocate (requires restart)
+~plugin_preference_order~semicolon-separated list of plugin formats, in preferred order. if a plugin exists with multiple formats, only the most preferred format will be shown. leave this blank to always show all plugins. (default value: "VST3;VST;AudioUnit;LV2")
+~draw_background_lissajous~should the background lissajous curve draw
+~fade_cable_middle~should longer cables draw with a fadeout effect in the middle
+~cable_quality~visual resolution of the cables
+~lissajous_r~red RGB value of lissajous curve
+~lissajous_g~green RGB value of lissajous curve
+~lissajous_b~blue RGB value of lissajous curve
+~background_r~red RGB value of canvas background
+~background_g~green RGB value of canvas background
+~background_b~blue RGB value of canvas background
+~motion_trails~amount of visual motion blur to use (increases/decreases "ghosting" of previous frames)
+~draw_module_highlights~should modules visually flash in response to activity
+~mouse_offset_x~x offset between system mouse position and bespoke's cursor placement
+~mouse_offset_y~y offset between system mouse position and bespoke's cursor placement
+~recordings_path~where "write audio" and multitrackrecorder wav files save
+~tooltips~what path we should use for the tooltip file (changing this allows for other languages to be used for tooltips)
+~layout~what template bespoke should use on startup
+~youtube_dl_path~the path to your youtube-dl installation (used for youtube downloading in sampleplayer module)
+~ffmpeg_path~the path to your ffmpeg installation (used for youtube downloading in sampleplayer module)

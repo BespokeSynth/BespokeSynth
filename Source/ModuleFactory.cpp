@@ -254,6 +254,7 @@
 #include "VelocityToChance.h"
 #include "NoteEcho.h"
 #include "VelocityCurve.h"
+#include "BoundsToPulse.h"
 
 #include <juce_core/juce_core.h>
 
@@ -454,6 +455,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(VelocityToChance, velocitytochance, kModuleCategory_Note);
    REGISTER(NoteEcho, noteecho, kModuleCategory_Note);
    REGISTER(VelocityCurve, velocitycurve, kModuleCategory_Note);
+   REGISTER(BoundsToPulse, boundstopulse, kModuleCategory_Pulse);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

@@ -317,6 +317,7 @@ public:
    UserPrefBool vst_show_all_params{ "vst_show_all_params", false, UserPrefCategory::General };
    UserPrefTextEntryInt max_output_channels{ "max_output_channels", 16, 1, 1024, 5, UserPrefCategory::General };
    UserPrefTextEntryInt max_input_channels{ "max_input_channels", 16, 1, 1024, 5, UserPrefCategory::General };
+   UserPrefString plugin_preference_order{ "plugin_preference_order", "VST3;VST;AudioUnit;LV2", 70, UserPrefCategory::General };
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
    UserPrefBool fade_cable_middle{ "fade_cable_middle", true, UserPrefCategory::Graphics };

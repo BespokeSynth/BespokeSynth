@@ -58,6 +58,40 @@ using namespace juce;
 
 namespace VSTLookup
 {
+   struct PluginFormatSorter
+   {
+      explicit PluginFormatSorter(juce::String formatOrder)
+      {
+         mFormatOrder.addTokens(formatOrder, ";", "");
+      }
+
+      int compareElements(const PluginDescription& first, const PluginDescription& second) const
+      {
+         int indexFirst = mFormatOrder.indexOf(first.pluginFormatName);
+         int indexSecond = mFormatOrder.indexOf(second.pluginFormatName);
+         if (indexFirst < 0)
+            indexFirst = 999;
+         if (indexSecond < 0)
+            indexSecond = 999;
+         int diff = indexFirst - indexSecond;
+
+         if (diff == 0)
+            diff = first.name.compareNatural(second.name, false);
+
+         return diff;
+      }
+
+      juce::StringArray mFormatOrder;
+   };
+
+   struct PluginNameSorter
+   {
+      int compareElements(const PluginDescription& first, const PluginDescription& second) const
+      {
+         return first.name.compareNatural(second.name, false);
+      }
+   };
+
    void GetAvailableVSTs(std::vector<PluginDescription>& vsts)
    {
       vsts.clear();
@@ -72,10 +106,36 @@ namespace VSTLookup
          }
       }
 
-      TheSynth->GetKnownPluginList().sort(KnownPluginList::SortMethod::sortAlphabetically, true);
       auto types = TheSynth->GetKnownPluginList().getTypes();
+      std::string formatPreferenceOrder = UserPrefs.plugin_preference_order.Get();
+      bool allowDupes = formatPreferenceOrder.empty();
+      if (!allowDupes)
+      {
+         PluginFormatSorter formatSorter(formatPreferenceOrder);
+         types.sort(formatSorter);
+      }
+
+      Array<PluginDescription> filtered;
       for (int i = 0; i < types.size(); ++i)
-         vsts.push_back(types[i]);
+      {
+         bool hasDupe = false;
+         for (int j = 0; j < filtered.size(); ++j)
+         {
+            if (types[i].name == filtered[j].name)
+            {
+               hasDupe = true;
+               break;
+            }
+         }
+
+         if (!hasDupe || allowDupes)
+            filtered.add(types[i]);
+      }
+
+      PluginNameSorter nameSorter;
+      filtered.sort(nameSorter);
+      for (int i = 0; i < filtered.size(); ++i)
+         vsts.push_back(filtered[i]);
 
       //for (int i = 0; i < 2000; ++i)
       //   vsts.insert(vsts.begin(), std::string("c:/a+") + ofToString(gRandom()));
@@ -477,7 +537,7 @@ void VSTPlugin::CreateParameterSliders()
       std::string name(originalParamName.getCharPointer());
       try
       {
-         int append = 0;
+         int append = i;
          while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
          {
             ++append;

@@ -39,6 +39,7 @@ void ScaleDegree::CreateUIControls()
    UIBLOCK0();
    DROPDOWN(mScaleDegreeSelector, "degree", &mScaleDegree, 50);
    CHECKBOX(mRetriggerCheckbox, "retrigger", &mRetrigger);
+   CHECKBOX(mDiatonicCheckbox, "diatonic", &mDiatonic);
    ENDUIBLOCK(mWidth, mHeight);
 
    mScaleDegreeSelector->AddLabel("-I", -7);
@@ -65,6 +66,7 @@ void ScaleDegree::DrawModule()
 
    mScaleDegreeSelector->Draw();
    mRetriggerCheckbox->Draw();
+   mDiatonicCheckbox->Draw();
 }
 
 void ScaleDegree::CheckboxUpdated(Checkbox* checkbox)
@@ -101,9 +103,17 @@ void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 
 int ScaleDegree::TransformPitch(int pitch)
 {
-   int tone = TheScale->GetToneFromPitch(pitch);
-   tone += mScaleDegree;
-   return TheScale->GetPitchFromTone(tone);
+   if (mDiatonic)
+   {
+      int tone = TheScale->GetToneFromPitch(pitch);
+      tone += mScaleDegree;
+      return TheScale->GetPitchFromTone(tone);
+   }
+   else
+   {
+      int semitones = TheScale->GetPitchFromTone(mScaleDegree) - TheScale->ScaleRoot();
+      return pitch + semitones;
+   }
 }
 
 void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
