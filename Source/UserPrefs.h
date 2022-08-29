@@ -314,6 +314,7 @@ public:
 #if !BESPOKE_LINUX
    UserPrefBool vst_always_on_top{ "vst_always_on_top", true, UserPrefCategory::General };
 #endif
+   UserPrefBool vst_show_all_params{ "vst_show_all_params", false, UserPrefCategory::General };
    UserPrefTextEntryInt max_output_channels{ "max_output_channels", 16, 1, 1024, 5, UserPrefCategory::General };
    UserPrefTextEntryInt max_input_channels{ "max_input_channels", 16, 1, 1024, 5, UserPrefCategory::General };
 

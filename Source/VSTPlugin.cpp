@@ -33,6 +33,7 @@
 #include "Scale.h"
 #include "ModulationChain.h"
 #include "PatchCableSource.h"
+#include "UserPrefs.h"
 //#include "NSWindowOverlay.h"
 
 namespace
@@ -489,7 +490,7 @@ void VSTPlugin::CreateParameterSliders()
       mParameterSliders[i].mParameter = parameters[i];
       mParameterSliders[i].mName = name.c_str();
       mParameterSliders[i].mShowing = false;
-      if (numParameters <= 30) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
+      if (numParameters <= 30 || UserPrefs.vst_show_all_params.Get()) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
          mShowParameterDropdown->AddLabel(name.c_str(), i);
          mParameterSliders[i].mInSelectorList = true;
