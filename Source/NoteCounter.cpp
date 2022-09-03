@@ -41,6 +41,8 @@ void NoteCounter::Init()
    IDrawableModule::Init();
 
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
+
+   Reseed();
 }
 
 void NoteCounter::CreateUIControls()

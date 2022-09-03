@@ -87,7 +87,7 @@ void IModulator::Poll()
       float blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
       mSmoothedValue = mSmoothedValue * blend + mLastPollValue * (1 - blend);
       if (RequiresManualPolling())
-         mUIControlTarget->SetFromMidiCC(mLastPollValue, true);
+         mUIControlTarget->SetValue(mLastPollValue);
    }
 }
 
