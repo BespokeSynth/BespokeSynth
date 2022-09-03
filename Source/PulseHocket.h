@@ -29,8 +29,10 @@
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
 #include "Slider.h"
+#include "TextEntry.h"
+#include "ClickButton.h"
 
-class PulseHocket : public IDrawableModule, public IPulseSource, public IPulseReceiver, public IFloatSliderListener
+class PulseHocket : public IDrawableModule, public IPulseSource, public IPulseReceiver, public IFloatSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    PulseHocket();
@@ -46,6 +48,8 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -60,10 +64,21 @@ private:
    }
    bool Enabled() const override { return true; }
 
-   static const int kMaxDestinations = 5;
+   void Reseed();
+   void AdjustHeight();
+
+   static const int kMaxDestinations = 16;
+   int mNumDestinations{ 5 };
    float mWeight[kMaxDestinations]{};
    FloatSlider* mWeightSlider[kMaxDestinations]{};
-   PatchCableSource* mDestinationCables[kMaxDestinations]{};
+   std::vector<PatchCableSource*> mDestinationCables;
    float mWidth{ 200 };
    float mHeight{ 20 };
+   bool mDeterministic{ false };
+   int mSeed{ 0 };
+   int mRandomIndex{ 0 };
+   TextEntry* mSeedEntry{ nullptr };
+   ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

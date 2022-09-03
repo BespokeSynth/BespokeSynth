@@ -211,7 +211,7 @@ bool Canvas::IsRowVisible(int row) const
    return row >= mRowOffset && row < mRowOffset + GetNumVisibleRows();
 }
 
-void Canvas::OnClicked(int x, int y, bool right)
+void Canvas::OnClicked(float x, float y, bool right)
 {
    mClick = true;
    mHasDuplicatedThisDrag = false;
@@ -468,7 +468,7 @@ void Canvas::MouseReleased()
    mDragCanvasZooming = false;
 }
 
-bool Canvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (GetKeyModifiers() & kModifier_Alt)
    {

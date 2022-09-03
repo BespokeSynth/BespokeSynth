@@ -127,14 +127,12 @@ void ValueStream::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
 
-   moduleInfo["uicontrol"] = mUIControl ? mUIControl->Path() : "";
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }
 
 void ValueStream::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("uicontrol", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, 200, 120, 1000);
    mModuleSaveData.LoadInt("height", moduleInfo, 120, 15, 1000);
 
@@ -143,39 +141,22 @@ void ValueStream::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ValueStream::SetUpFromSaveData()
 {
-   std::string controlPath = mModuleSaveData.GetString("uicontrol");
-   if (!controlPath.empty())
-   {
-      mUIControl = TheSynth->FindUIControl(controlPath);
-      if (mUIControl)
-         mControlCable->SetTarget(mUIControl);
-   }
-   else
-   {
-      mUIControl = nullptr;
-   }
-
    mWidth = mModuleSaveData.GetInt("width");
    mHeight = mModuleSaveData.GetInt("height");
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void ValueStream::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 }
 
-void ValueStream::LoadState(FileStreamIn& in)
+void ValueStream::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 }

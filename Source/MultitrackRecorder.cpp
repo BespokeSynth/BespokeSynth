@@ -90,7 +90,9 @@ void MultitrackRecorder::AddTrack()
 {
    int recordingLength = GetRecordingLength();
 
-   MultitrackRecorderTrack* track = dynamic_cast<MultitrackRecorderTrack*>(TheSynth->SpawnModuleOnTheFly("multitrackrecordertrack", 0, 0, true));
+   ModuleFactory::Spawnable spawnable;
+   spawnable.mLabel = "multitrackrecordertrack";
+   MultitrackRecorderTrack* track = dynamic_cast<MultitrackRecorderTrack*>(TheSynth->SpawnModuleOnTheFly(spawnable, 0, 0, true));
    track->Setup(this, recordingLength);
    track->SetName(GetUniqueName("track", mModuleContainer.GetModuleNames<MultitrackRecorderTrack*>()).c_str());
    mModuleContainer.TakeModule(track);
@@ -199,16 +201,11 @@ void MultitrackRecorder::SetUpFromSaveData()
       track->SetRecording(false);
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void MultitrackRecorder::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mWidth;
 
@@ -218,13 +215,13 @@ void MultitrackRecorder::SaveState(FileStreamOut& out)
       out << (std::string)track->Name();
 }
 
-void MultitrackRecorder::LoadState(FileStreamIn& in)
+void MultitrackRecorder::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
 

@@ -89,7 +89,11 @@ std::string ofToFactoryPath(const std::string& subdir)
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentExecutableFile).getSiblingFile(subdir);
 #if BESPOKE_LINUX
    if (!resDir.isDirectory())
-      resDir = juce::File{ juce::CharPointer_UTF8{ Bespoke::CMAKE_INSTALL_PREFIX } }.getChildFile("share/BespokeSynth").getChildFile(subdir);
+   {
+      resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile("../../share/BespokeSynth").getChildFile(subdir);
+      if (!resDir.isDirectory())
+         resDir = juce::File{ juce::CharPointer_UTF8{ Bespoke::CMAKE_INSTALL_PREFIX } }.getChildFile("share/BespokeSynth").getChildFile(subdir);
+   }
 #endif
 #endif
    if (!resDir.isDirectory())

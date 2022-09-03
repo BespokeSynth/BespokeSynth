@@ -55,7 +55,7 @@ public:
    void CreateUIControls() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool IsResizable() const override { return mAdvancedDisplay; }
+   bool IsResizable() const override { return false; }
    void Resize(float w, float h) override;
 
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -81,25 +81,18 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    float mWidth{ 250 };
    float mHeight{ 122 };
 
-   Checkbox* mAdvancedDisplayCheckbox{ nullptr };
-   bool mAdvancedDisplay{ false };
    ADSRDisplay* mAdsrDisplay{ nullptr };
-   EnvelopeControl mEnvelopeControl{ ofVec2f(105, 5), ofVec2f(mWidth - 110, mHeight - 10) };
    ::ADSR mAdsr{ 10, 100, .5, 100 };
 
    bool mUseVelocity{ false };
    Checkbox* mUseVelocityCheckbox{ nullptr };
-   float mADSRViewLength{ 1000 };
-   FloatSlider* mADSRViewLengthSlider{ nullptr };
-   Checkbox* mHasSustainStageCheckbox{ nullptr };
-   IntSlider* mSustainStageSlider{ nullptr };
-   FloatSlider* mMaxSustainSlider{ nullptr };
 };

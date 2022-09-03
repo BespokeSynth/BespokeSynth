@@ -33,8 +33,10 @@
 #include "Checkbox.h"
 #include "INoteSource.h"
 #include "Slider.h"
+#include "TextEntry.h"
+#include "ClickButton.h"
 
-class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableModule, public IFloatSliderListener
+class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    NoteHocket();
@@ -47,6 +49,9 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
+   void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -63,12 +68,23 @@ private:
    bool Enabled() const override { return true; }
 
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+   void Reseed();
+   void AdjustHeight();
 
-   static const int kMaxDestinations = 5;
-   float mWeight[kMaxDestinations]{ 1 };
+   static const int kMaxDestinations = 16;
+   int mNumDestinations{ 5 };
+   float mWeight[kMaxDestinations];
    FloatSlider* mWeightSlider[kMaxDestinations]{ nullptr };
-   AdditionalNoteCable* mDestinationCables[kMaxDestinations]{ nullptr };
+   std::vector<AdditionalNoteCable*> mDestinationCables;
    float mWidth{ 200 };
    float mHeight{ 20 };
    int mLastNoteDestinations[128];
+   bool mDeterministic{ false };
+   int mLength{ 4 };
+   IntSlider* mLengthSlider{ nullptr };
+   int mSeed{ 0 };
+   TextEntry* mSeedEntry{ nullptr };
+   ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

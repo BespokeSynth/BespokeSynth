@@ -144,11 +144,7 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    }, "str"_a, "size"_a=50, "xPos"_a = 150, "yPos"_a = 250, "red"_a = 1, "green"_a = 1, "blue"_a = 1);
    m.def("random", [](int seed, int index)
    {
-      juce::uint64 x = seed + ((juce::uint64)index << 32);
-      x = (x ^ (x >> 30)) * (0xbf58476d1ce4e5b9);
-      x = (x ^ (x >> 27)) * (0x94d049bb133111eb);
-      x = x ^ (x >> 31);
-      return (int)x;
+      return DeterministicRandom(seed, index);
    });
    m.def("get_modules", []()
    {
@@ -687,7 +683,9 @@ PYBIND11_EMBEDDED_MODULE(module, m)
    }, py::return_value_policy::reference);
    m.def("create", [](std::string moduleType, float x, float y)
    {
-      return TheSynth->SpawnModuleOnTheFly(moduleType, x, y);
+      ModuleFactory::Spawnable spawnable;
+      spawnable.mLabel = moduleType;
+      return TheSynth->SpawnModuleOnTheFly(spawnable, x, y);
    }, py::return_value_policy::reference);
    py::class_<IDrawableModule>(m, "module")
       .def("set_position", [](IDrawableModule& module, float x, float y)

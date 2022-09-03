@@ -35,7 +35,7 @@
 
 ModuleSaveDataPanel* TheSaveDataPanel = nullptr;
 
-const float itemSpacing = 20;
+const float kItemSpacing = 20;
 
 ModuleSaveDataPanel::ModuleSaveDataPanel()
 {
@@ -98,14 +98,14 @@ void ModuleSaveDataPanel::ReloadSaveData()
 
    mAlignmentX = 10 + maxWidth;
    int x = mAlignmentX;
-   int y = 5 + itemSpacing;
+   int y = 5 + kItemSpacing;
 
-   TextEntry* nameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
-   nameEntry->SetNoHover(true);
-   mSaveDataControls.push_back(nameEntry);
-   y += itemSpacing;
+   mNameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
+   mNameEntry->SetNoHover(true);
+   mSaveDataControls.push_back(mNameEntry);
+   y += kItemSpacing;
 
-   TextEntry* prevTextEntry = nameEntry;
+   TextEntry* prevTextEntry = mNameEntry;
 
    for (auto iter = values.begin(); iter != values.end(); ++iter)
    {
@@ -167,7 +167,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
       if (control != nullptr)
          control->SetNoHover(true);
       mSaveDataControls.push_back(control);
-      y += itemSpacing;
+      y += kItemSpacing;
    }
 
    y += 6;
@@ -180,14 +180,14 @@ void ModuleSaveDataPanel::ReloadSaveData()
       mDeleteButton->SetNoHover(true);
       mSaveDataControls.push_back(mDeleteButton);
    }
-   y += itemSpacing;
+   y += kItemSpacing;
 
    if (mSaveModule->HasDebugDraw())
    {
       mDrawDebugCheckbox = new Checkbox(this, "draw debug", x, y, &mSaveModule->mDrawDebug);
       mDrawDebugCheckbox->SetNoHover(true);
       mSaveDataControls.push_back(mDrawDebugCheckbox);
-      y += itemSpacing;
+      y += kItemSpacing;
    }
 
    IDrivableSequencer* sequencer = dynamic_cast<IDrivableSequencer*>(mSaveModule);
@@ -196,7 +196,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
       mResetSequencerButton = new ClickButton(this, "resume self-advance mode", x, y);
       mResetSequencerButton->SetNoHover(true);
       mSaveDataControls.push_back(mResetSequencerButton);
-      y += itemSpacing;
+      y += kItemSpacing;
    }
 
    mHeight = y + 5;
@@ -212,15 +212,15 @@ void ModuleSaveDataPanel::DrawModule()
 
    DrawTextRightJustify("type", x, y + 12);
    DrawTextBold(mSaveModule->GetTypeName(), mAlignmentX, y + 12);
-   y += itemSpacing;
+   y += kItemSpacing;
 
    DrawTextRightJustify("name", x, y + 12);
-   y += itemSpacing;
+   y += kItemSpacing;
 
    for (auto iter = mLabels.begin(); iter != mLabels.end(); ++iter)
    {
       DrawTextRightJustify(*iter, x, y + 12);
-      y += itemSpacing;
+      y += kItemSpacing;
    }
 
    for (auto iter = mSaveDataControls.begin(); iter != mSaveDataControls.end(); ++iter)
@@ -303,6 +303,16 @@ void ModuleSaveDataPanel::IntSliderUpdated(IntSlider* slider, int oldVal)
 
 void ModuleSaveDataPanel::TextEntryComplete(TextEntry* entry)
 {
+   if (entry == mNameEntry)
+   {
+      std::string desiredName = mSaveModule->Name();
+      ofStringReplace(desiredName, "~", ""); //strip out illegal character
+      if (desiredName.empty())
+         desiredName = mSaveModule->GetTypeName();
+      mSaveModule->SetName("~~~~~~~~~~~");
+      std::string availableName = GetUniqueName(desiredName, mSaveModule->GetOwningContainer()->GetModuleNames<IDrawableModule*>());
+      mSaveModule->SetName(availableName.c_str());
+   }
 }
 
 void ModuleSaveDataPanel::DropdownClicked(DropdownList* list)

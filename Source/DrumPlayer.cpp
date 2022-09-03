@@ -614,7 +614,7 @@ void DrumPlayer::SetHitSample(int sampleIndex, Sample* sample)
    mDrumHits[sampleIndex].mEnvelopeLength = mDrumHits[sampleIndex].mSample.LengthInSamples() * gInvSampleRateMs;
 }
 
-void DrumPlayer::OnClicked(int x, int y, bool right)
+void DrumPlayer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -1150,16 +1150,11 @@ void DrumPlayer::SetUpFromSaveData()
    //LoadKit(0);
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void DrumPlayer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
@@ -1171,13 +1166,13 @@ void DrumPlayer::SaveState(FileStreamOut& out)
    }
 }
 
-void DrumPlayer::LoadState(FileStreamIn& in)
+void DrumPlayer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {

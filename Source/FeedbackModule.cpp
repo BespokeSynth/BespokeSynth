@@ -47,7 +47,7 @@ void FeedbackModule::CreateUIControls()
 
    mFeedbackTargetCable = new PatchCableSource(this, kConnectionType_Audio);
    mFeedbackTargetCable->SetManualPosition(108, 8);
-   mFeedbackTargetCable->SetOverrideCableDir(ofVec2f(1, 0));
+   mFeedbackTargetCable->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    mFeedbackTargetCable->SetOverrideVizBuffer(&mFeedbackVizBuffer);
    AddPatchCableSource(mFeedbackTargetCable);
 

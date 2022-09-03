@@ -28,8 +28,7 @@
 #include "PatchCableSource.h"
 
 Ramper::Ramper()
-: mUIControl(nullptr)
-, mLength(kInterval_1n)
+: mLength(kInterval_1n)
 , mLengthSelector(nullptr)
 , mControlCable(nullptr)
 , mTriggerButton(nullptr)
@@ -60,7 +59,7 @@ void Ramper::CreateUIControls()
    mTriggerButton = new ClickButton(this, "start", 67, 3);
    mTargetValueSlider = new FloatSlider(this, "target", 3, 20, 94, 15, &mTargetValue, 0, 1);
 
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
+   mControlCable = new PatchCableSource(this, kConnectionType_ValueSetter);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
 
@@ -84,7 +83,7 @@ void Ramper::CreateUIControls()
 
 void Ramper::OnTransportAdvanced(float amount)
 {
-   if (mUIControl && mRamping)
+   if (mRamping)
    {
       float curMeasure = TheTransport->GetMeasure(gTime) + TheTransport->GetMeasurePos(gTime);
       float measureProgress = curMeasure - mStartMeasure;
@@ -92,10 +91,13 @@ void Ramper::OnTransportAdvanced(float amount)
       float progress = measureProgress / length;
       if (progress >= 0 && progress < 1)
       {
-
-         mUIControl->SetValue(ofLerp(mStartValue, mTargetValue, progress));
+         for (auto* control : mUIControls)
+         {
+            if (control != nullptr)
+               control->SetValue(ofLerp(mStartValue, mTargetValue, progress));
+         }
       }
-      else
+      else if (progress >= 1)
       {
          mRamping = false;
       }
@@ -111,7 +113,7 @@ void Ramper::DrawModule()
    mTargetValueSlider->Draw();
 }
 
-void Ramper::OnClicked(int x, int y, bool right)
+void Ramper::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -129,24 +131,30 @@ bool Ramper::MouseMoved(float x, float y)
 
 void Ramper::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (mControlCable->GetPatchCables().empty() == false)
+   for (size_t i = 0; i < mUIControls.size(); ++i)
    {
-      mUIControl = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[0]->GetTarget());
-      FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(mUIControl);
-      if (floatSlider)
-         mTargetValueSlider->MatchExtents(floatSlider);
-   }
-   else
-   {
-      mUIControl = nullptr;
+      if (i < mControlCable->GetPatchCables().size())
+      {
+         mUIControls[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
+         if (i == 0)
+         {
+            FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(mUIControls[i]);
+            if (floatSlider)
+               mTargetValueSlider->MatchExtents(floatSlider);
+         }
+      }
+      else
+      {
+         mUIControls[i] = nullptr;
+      }
    }
 }
 
 void Ramper::Go(double time)
 {
-   if (mUIControl)
+   if (mUIControls[0] != nullptr)
    {
-      mStartValue = mUIControl->GetValue();
+      mStartValue = mUIControls[0]->GetValue();
       mStartMeasure = TheTransport->GetMeasureTime(time);
       mRamping = true;
    }
@@ -173,28 +181,13 @@ void Ramper::GetModuleDimensions(float& width, float& height)
 void Ramper::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   moduleInfo["uicontrol"] = mUIControl ? mUIControl->Path() : "";
 }
 
 void Ramper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("uicontrol", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void Ramper::SetUpFromSaveData()
 {
-   std::string controlPath = mModuleSaveData.GetString("uicontrol");
-   if (!controlPath.empty())
-   {
-      mUIControl = TheSynth->FindUIControl(controlPath);
-      if (mUIControl)
-         mControlCable->SetTarget(mUIControl);
-   }
-   else
-   {
-      mUIControl = nullptr;
-   }
 }

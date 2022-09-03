@@ -75,11 +75,12 @@ private:
    void Go();
 
    PatchCableSource* mControlCable{ nullptr };
-   IUIControl* mTarget{ nullptr };
+   std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
    float mValue{ 0 };
    TextEntry* mValueEntry{ nullptr };
    FloatSlider* mValueSlider{ nullptr };
    ClickButton* mButton{ nullptr };
+   double mLastClickTime{ 0 };
 
    float mWidth{ 200 };
    float mHeight{ 20 };

@@ -57,5 +57,5 @@ private:
 
    std::array<bool, 128> mHeldPitches{ false };
    PatchCableSource* mControlCable{ nullptr };
-   IUIControl* mControlTarget{ nullptr };
+   std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
 };

@@ -86,6 +86,7 @@ void PatchCable::Render()
           GetConnectionType() == kConnectionType_Grid ||
           GetConnectionType() == kConnectionType_Pulse ||
           GetConnectionType() == kConnectionType_Modulator ||
+          GetConnectionType() == kConnectionType_ValueSetter ||
           GetConnectionType() == kConnectionType_UIControl)
       {
          bool hasNote = false;
@@ -195,6 +196,7 @@ void PatchCable::Render()
           type == kConnectionType_Grid ||
           type == kConnectionType_Pulse ||
           type == kConnectionType_Modulator ||
+          type == kConnectionType_ValueSetter ||
           type == kConnectionType_UIControl)
       {
          ofSetLineWidth(lineWidth);
@@ -293,6 +295,17 @@ void PatchCable::Render()
                         ofVertex(pos.x, pos.y);
                      }
                      ofEndShape();
+
+                     if (type == kConnectionType_Pulse && (event.mData & kPulseFlag_Reset))
+                     {
+                        ofPushStyle();
+                        pos = MathUtils::Bezier(ofClamp(clampedElapsed, 0, 1), cable.start, bezierControl1, bezierControl2, cable.plug);
+                        ofSetLineWidth(1);
+                        ofFill();
+                        ofSetColor(ofColor::black);
+                        ofCircle(pos.x, pos.y, 3);
+                        ofPopStyle();
+                     }
 
                      if (!UserPrefs.fade_cable_middle.Get() || wireLength < 100)
                         break;
@@ -479,7 +492,7 @@ IClickable* PatchCable::GetDropTarget()
    {
       PatchCablePos cable = GetPatchCablePos();
       IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
-      if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
+      if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
       {
          const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
          for (auto uicontrol : uicontrols)
@@ -504,7 +517,7 @@ IClickable* PatchCable::GetDropTarget()
    return nullptr;
 }
 
-bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool PatchCable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (mHovered && !right)
    {
@@ -515,7 +528,7 @@ bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */
    return false;
 }
 
-void PatchCable::OnClicked(int x, int y, bool right)
+void PatchCable::OnClicked(float x, float y, bool right)
 {
 }
 

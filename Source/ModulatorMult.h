@@ -51,7 +51,7 @@ public:
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
 
-   FloatSlider* GetTarget() { return mTarget; }
+   FloatSlider* GetTarget() { return mSliderTarget; }
 
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}

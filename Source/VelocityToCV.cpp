@@ -34,6 +34,7 @@
 
 VelocityToCV::VelocityToCV()
 : mVelocity(0)
+, mPassZero(false)
 {
 }
 
@@ -50,6 +51,7 @@ void VelocityToCV::CreateUIControls()
 
    mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
+   mPassZeroCheckbox = new Checkbox(this, "0 at note off", mMaxSlider, kAnchor_Below, &mPassZero);
 }
 
 void VelocityToCV::DrawModule()
@@ -59,6 +61,7 @@ void VelocityToCV::DrawModule()
 
    mMinSlider->Draw();
    mMaxSlider->Draw();
+   mPassZeroCheckbox->Draw();
 }
 
 void VelocityToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
@@ -68,7 +71,7 @@ void VelocityToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 
 void VelocityToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && (mPassZero || velocity > 0))
    {
       mVelocity = velocity;
    }
@@ -82,22 +85,13 @@ float VelocityToCV::Value(int samplesIn)
 void VelocityToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void VelocityToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void VelocityToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

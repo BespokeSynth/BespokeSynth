@@ -73,11 +73,11 @@ void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource, bool fromUser
 {
    OnModulatorRepatch();
 
-   if (mTarget)
+   if (mSliderTarget)
    {
-      mInput = mTarget->GetValue();
-      mInputSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mInputSlider->SetMode(mTarget->GetMode());
+      mInput = mSliderTarget->GetValue();
+      mInputSlider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
+      mInputSlider->SetMode(mSliderTarget->GetMode());
    }
 }
 
@@ -95,22 +95,13 @@ float ModulatorSmoother::Value(int samplesIn)
 void ModulatorSmoother::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ModulatorSmoother::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void ModulatorSmoother::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

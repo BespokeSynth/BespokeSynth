@@ -102,7 +102,7 @@ void CircleSequencer::DrawModule()
    ofPopStyle();
 }
 
-void CircleSequencer::OnClicked(int x, int y, bool right)
+void CircleSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mCircleSequencerRings.size(); ++i)
@@ -148,32 +148,27 @@ void CircleSequencer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void CircleSequencer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << (int)mCircleSequencerRings.size();
    for (size_t i = 0; i < mCircleSequencerRings.size(); ++i)
       mCircleSequencerRings[i]->SaveState(out);
 }
 
-void CircleSequencer::LoadState(FileStreamIn& in)
+void CircleSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int numRings;
    in >> numRings;
@@ -269,7 +264,7 @@ int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
    return -1;
 }
 
-void CircleSequencerRing::OnClicked(int x, int y, bool right)
+void CircleSequencerRing::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

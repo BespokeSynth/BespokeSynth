@@ -112,7 +112,7 @@ bool Prefab::CanAddDropModules()
    return false;
 }
 
-void Prefab::OnClicked(int x, int y, bool right)
+void Prefab::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -326,29 +326,25 @@ void Prefab::SetUpFromSaveData()
 {
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void Prefab::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
-   out << kSaveStateRev;
    out << mPrefabName;
 }
 
-void Prefab::LoadState(FileStreamIn& in)
+void Prefab::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mPrefabName;
 }

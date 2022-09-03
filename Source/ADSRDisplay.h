@@ -45,6 +45,7 @@ public:
    void SetVol(float vol) { mVol = vol; }
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
    float GetMaxTime() const { return mMaxTime; }
+   float& GetMaxTime() { return mMaxTime; }
    void SetMaxTime(float maxTime);
    void SetADSR(::ADSR* adsr);
    ::ADSR* GetADSR() { return mAdsr; }
@@ -83,9 +84,10 @@ private:
       kAdjustNone,
       kAdjustAttackAR,
       kAdjustReleaseAR,
+      kAdjustViewLength
    } mAdjustMode{ AdjustParam::kAdjustNone };
 
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;
@@ -103,6 +105,7 @@ private:
    ::ADSR mViewAdsr; //for ADSR simulation in drawing
    ofVec2f mClickStart;
    ::ADSR mClickAdsr;
+   float mClickLength{ 1000 };
    bool mHighlighted{ false };
    FloatSlider* mASlider{ nullptr };
    FloatSlider* mDSlider{ nullptr };
@@ -111,6 +114,8 @@ private:
    static DisplayMode sDisplayMode;
    EnvelopeEditor* mEditor{ nullptr };
    double mOverrideDrawTime{ -1 };
+   std::array<double, 10> mDrawTimeHistory{};
+   int mDrawTimeHistoryIndex{ 0 };
 };
 
 

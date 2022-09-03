@@ -133,7 +133,7 @@ float CanvasTimeline::GetQuantizedForX(float posX, HoverMode clampSide)
    return measure;
 }
 
-void CanvasTimeline::OnClicked(int x, int y, bool right)
+void CanvasTimeline::OnClicked(float x, float y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
@@ -200,7 +200,7 @@ bool CanvasTimeline::MouseMoved(float x, float y)
    return false;
 }
 
-bool CanvasTimeline::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool CanvasTimeline::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }

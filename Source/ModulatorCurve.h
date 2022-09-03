@@ -51,7 +51,7 @@ public:
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
-   FloatSlider* GetTarget() { return mTarget; }
+   FloatSlider* GetTarget() { return mSliderTarget; }
 
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -64,7 +64,8 @@ public:
    void SetUpFromSaveData() override;
 
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
@@ -76,7 +77,7 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    float mInput{ 0 };
    EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100) };

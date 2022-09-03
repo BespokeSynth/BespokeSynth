@@ -101,7 +101,7 @@ void ScriptStatus::DrawModule()
    DrawTextNormal(mStatus, 3, 35);
 }
 
-void ScriptStatus::OnClicked(int x, int y, bool right)
+void ScriptStatus::OnClicked(float x, float y, bool right)
 {
    if (ScriptModule::sHasPythonEverSuccessfullyInitialized)
    {
@@ -129,28 +129,23 @@ void ScriptStatus::SaveLayout(ofxJSONElement& moduleInfo)
    IDrawableModule::SaveLayout(moduleInfo);
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void ScriptStatus::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mWidth;
    out << mHeight;
 }
 
-void ScriptStatus::LoadState(FileStreamIn& in)
+void ScriptStatus::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
    in >> mHeight;

@@ -152,7 +152,7 @@ void Chorder::RemoveTone(int tone)
    }
 }
 
-void Chorder::OnClicked(int x, int y, bool right)
+void Chorder::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -334,27 +334,22 @@ void Chorder::SetUpFromSaveData()
    mChordGrid->SetRequireShiftForMultislider(true);
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void Chorder::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mChordGrid->SaveState(out);
 }
 
-void Chorder::LoadState(FileStreamIn& in)
+void Chorder::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mChordGrid->LoadState(in);
 }

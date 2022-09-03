@@ -989,7 +989,7 @@ void Looper::GetModuleDimensions(float& width, float& height)
    height = 165;
 }
 
-void Looper::OnClicked(int x, int y, bool right)
+void Looper::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -1252,29 +1252,24 @@ void Looper::SetUpFromSaveData()
    mDecay = mModuleSaveData.GetFloat("decay");
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Looper::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mLoopLength;
    out << mBufferTempo;
    mBuffer->Save(out, mLoopLength);
 }
 
-void Looper::LoadState(FileStreamIn& in)
+void Looper::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mLoopLength;
    if (rev >= 1)

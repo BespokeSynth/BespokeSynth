@@ -78,7 +78,7 @@ void PulseSequence::CreateUIControls()
    for (int i = 0; i < kIndividualStepCables; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
+      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]);
    }
 }
@@ -192,7 +192,7 @@ void PulseSequence::GetModuleDimensions(float& width, float& height)
    height = 52;
 }
 
-void PulseSequence::OnClicked(int x, int y, bool right)
+void PulseSequence::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -212,9 +212,9 @@ bool PulseSequence::MouseMoved(float x, float y)
    return false;
 }
 
-bool PulseSequence::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool PulseSequence::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
+   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
 }
 
@@ -258,28 +258,23 @@ void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, flo
    }
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void PulseSequence::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mVelocityGrid->SaveState(out);
    out << mHasExternalPulseSource;
 }
 
-void PulseSequence::LoadState(FileStreamIn& in)
+void PulseSequence::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mVelocityGrid->LoadState(in);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);

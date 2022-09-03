@@ -255,16 +255,11 @@ void LoopStorer::SetUpFromSaveData()
       transportListenerInfo->mInterval = mQuantization;
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void LoopStorer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mCurrentBufferIdx;
 
@@ -280,13 +275,13 @@ void LoopStorer::SaveState(FileStreamOut& out)
    }
 }
 
-void LoopStorer::LoadState(FileStreamIn& in)
+void LoopStorer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mCurrentBufferIdx;
    mQueuedSwapBufferIdx = -1;

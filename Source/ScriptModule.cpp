@@ -189,7 +189,7 @@ void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
    }
 }
 
-void ScriptModule::OnClicked(int x, int y, bool right)
+void ScriptModule::OnClicked(float x, float y, bool right)
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
@@ -252,30 +252,30 @@ void ScriptModule::DrawModule()
    }
 
    mLineExecuteTracker.Draw(mCodeEntry, 0, ofColor::green);
-   mNotePlayTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Note));
-   mMethodCallTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Other));
-   mUIControlTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Modulator));
+   mNotePlayTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleCategory_Note));
+   mMethodCallTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleCategory_Other));
+   mUIControlTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleCategory_Modulator));
 
    for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           //mScheduledNoteOutput[i].velocity > 0 &&
           gTime + 50 < mScheduledNoteOutput[i].time)
-         DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleType_Note), mScheduledNoteOutput[i].velocity > 0);
+         DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleCategory_Note), mScheduledNoteOutput[i].velocity > 0);
    }
 
    for (size_t i = 0; i < mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time != -1 &&
           gTime + 50 < mScheduledMethodCall[i].time)
-         DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleType_Other), true);
+         DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleCategory_Other), true);
    }
 
    for (size_t i = 0; i < mScheduledUIControlValue.size(); ++i)
    {
       if (mScheduledUIControlValue[i].time != -1 &&
           gTime + 50 < mScheduledUIControlValue[i].time)
-         DrawTimer(mScheduledUIControlValue[i].lineNum, mScheduledUIControlValue[i].startTime, mScheduledUIControlValue[i].time, IDrawableModule::GetColor(kModuleType_Modulator), true);
+         DrawTimer(mScheduledUIControlValue[i].lineNum, mScheduledUIControlValue[i].startTime, mScheduledUIControlValue[i].time, IDrawableModule::GetColor(kModuleCategory_Modulator), true);
    }
 
    ofPushStyle();
@@ -305,7 +305,7 @@ void ScriptModule::DrawModule()
       float fadeMs = 500;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 255 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Modulator), 255 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
          ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, K(end));
          DrawTextNormal(ofToString(mUIControlModifications[i].value), linePos.x + 10, linePos.y + 15);
       }
@@ -388,7 +388,7 @@ void ScriptModule::DrawModuleUnclipped()
       float fadeMs = 200;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 100 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Modulator), 100 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
 
          ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, false);
 
@@ -414,7 +414,7 @@ void ScriptModule::DrawModuleUnclipped()
 
          ofVec2f linePos = mCodeEntry->GetLinePos(mBoundModuleConnections[i].mLineIndex, false);
 
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other), 30);
          ofFill();
          float codeY = mCodeEntry->GetPosition(true).y;
          float topY = ofClamp(linePos.y + 3, codeY, codeY + mCodeEntry->GetRect().height);
@@ -423,7 +423,7 @@ void ScriptModule::DrawModuleUnclipped()
          ofRect(lineRect, L(corner, 0));
 
          ofSetLineWidth(2);
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other), 30);
          float startX, startY, endX, endY;
          ofRectangle targetRect = mBoundModuleConnections[i].mTarget->GetRect();
          FindClosestSides(lineRect.x, lineRect.y, lineRect.width, lineRect.height, targetRect.x - mX, targetRect.y - mY, targetRect.width, targetRect.height, startX, startY, endX, endY, K(sidesOnly));
@@ -809,7 +809,7 @@ void ScriptModule::SetNumNoteOutputs(int num)
    {
       auto noteCable = new AdditionalNoteCable();
       noteCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1, 0));
+      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
       AddPatchCableSource(noteCable->GetPatchCableSource());
       noteCable->GetPatchCableSource()->SetManualPosition(0, 30 + 20 * (int)mExtraNoteOutputs.size());
       mExtraNoteOutputs.push_back(noteCable);
@@ -946,7 +946,9 @@ void ScriptModule::ButtonClicked(ClickButton* button)
       float moduleX, moduleY, moduleW, moduleH;
       GetPosition(moduleX, moduleY);
       GetDimensions(moduleW, moduleH);
-      TheSynth->SpawnModuleOnTheFly("scriptingreference", moduleX + moduleW, moduleY, true);
+      ModuleFactory::Spawnable spawnable;
+      spawnable.mLabel = "scriptingreference";
+      TheSynth->SpawnModuleOnTheFly(spawnable, moduleX + moduleW, moduleY, true);
    }
 }
 
@@ -1470,17 +1472,10 @@ void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
    IDrawableModule::SaveLayout(moduleInfo);
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void ScriptModule::SaveState(FileStreamOut& out)
 {
-   if (!CanSaveState())
-      return;
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
    out << (int)mExtraNoteOutputs.size();
 
    IDrawableModule::SaveState(out);
@@ -1489,14 +1484,12 @@ void ScriptModule::SaveState(FileStreamOut& out)
    out << mHeight;
 }
 
-void ScriptModule::LoadState(FileStreamIn& in)
+void ScriptModule::LoadState(FileStreamIn& in, int rev)
 {
-   int rev = -1;
-
-   if (ModularSynth::sLoadingFileSaveStateRev >= 421)
+   if (ModularSynth::sLoadingFileSaveStateRev >= 421 && ModularSynth::sLoadingFileSaveStateRev < 423)
    {
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
    if (rev >= 2)
@@ -1506,12 +1499,12 @@ void ScriptModule::LoadState(FileStreamIn& in)
       SetNumNoteOutputs(extraNoteOutputs + 1);
    }
 
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev == 420)
    {
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
    float w, h;
@@ -1588,7 +1581,7 @@ void ScriptReferenceDisplay::DrawModule()
    }
 }
 
-bool ScriptReferenceDisplay::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool ScriptReferenceDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mScrollOffset.y = ofClamp(mScrollOffset.y - scrollY * 10, 0, mMaxScrollAmount);
    return true;

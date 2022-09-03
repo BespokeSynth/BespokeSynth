@@ -331,7 +331,8 @@ public:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
    static std::string GetDefaultTooltip(MidiMessageType type, int control);
 
@@ -353,7 +354,7 @@ private:
    void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
    void ConnectDevice();
@@ -427,7 +428,7 @@ private:
    std::vector<ScriptModule*> mScriptListeners;
    bool mPrintInput{ false };
    std::string mLastInput;
-   INonstandardController* mNonstandardController;
+   INonstandardController* mNonstandardController{ nullptr };
    bool mIsConnected{ false };
    bool mHasCreatedConnectionUIControls{ false };
    float mReconnectWaitTimer{ 0 };

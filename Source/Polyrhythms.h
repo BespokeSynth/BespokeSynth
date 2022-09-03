@@ -44,7 +44,7 @@ class RhythmLine
 public:
    RhythmLine(Polyrhythms* owner, int index);
    void Draw();
-   void OnClicked(int x, int y, bool right);
+   void OnClicked(float x, float y, bool right);
    void MouseReleased();
    void MouseMoved(float x, float y);
    void CreateUIControls();
@@ -85,10 +85,11 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   virtual void SetUpFromSaveData() override;
-   virtual void LoadState(FileStreamIn& in) override;
-   virtual void SaveState(FileStreamOut& out) override;
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   void SaveState(FileStreamOut& out) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
@@ -98,7 +99,7 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 350 };

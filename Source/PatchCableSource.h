@@ -55,19 +55,20 @@ struct NoteHistoryEvent
 {
    bool mOn{ false };
    double mTime{ 0 };
+   int mData{ 0 };
 };
 
 class NoteHistory
 {
 public:
-   void AddEvent(double time, bool on);
+   void AddEvent(double time, bool on, int data);
    bool CurrentlyOn();
    double GetLastOnEventTime() { return mLastOnEventTime; }
    const NoteHistoryEvent& GetHistoryEvent(int ago) const;
    static const int kHistorySize = 100;
 
 private:
-   NoteHistoryEvent mHistory[kHistorySize];
+   NoteHistoryEvent mHistory[kHistorySize]{};
    int mHistoryPos{ 0 };
    double mLastOnEventTime{ -999 };
 };
@@ -123,19 +124,20 @@ public:
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
-   void SetOverrideCableDir(ofVec2f dir)
+   void SetOverrideCableDir(ofVec2f dir, Side side)
    {
       mHasOverrideCableDir = true;
       mOverrideCableDir = dir;
+      mManualSide = side;
    }
    ofVec2f GetCableStart(int index) const;
    ofVec2f GetCableStartDir(int index, ofVec2f dest) const;
    void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
    IModulator* GetModulatorOwner() const { return mModulatorOwner; }
 
-   void AddHistoryEvent(double time, bool on)
+   void AddHistoryEvent(double time, bool on, int data = 0)
    {
-      mNoteHistory.AddEvent(time, on);
+      mNoteHistory.AddEvent(time, on, data);
       if (on)
       {
          mLastOnEventTime = time;
@@ -147,7 +149,7 @@ public:
    void DrawSource();
    void DrawCables(bool parentMinimized);
    void Render() override;
-   bool TestClick(int x, int y, bool right, bool testOnly = false) override;
+   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    void GetDimensions(float& width, float& height) override
@@ -163,7 +165,7 @@ public:
    static bool sAllowInsert;
 
 protected:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
 private:
    bool InAddCableMode() const;

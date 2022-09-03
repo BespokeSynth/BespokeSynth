@@ -58,7 +58,7 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   FloatSlider* GetTarget() { return mTarget; }
+   FloatSlider* GetTarget() { return mSliderTarget; }
 
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}

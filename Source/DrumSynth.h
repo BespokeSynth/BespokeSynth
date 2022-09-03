@@ -97,7 +97,7 @@ private:
       float mVolNoise{ 0 };
       float mCutoffMax{ DRUMSYNTH_NO_CUTOFF };
       float mCutoffMin{ 10 };
-      float mQ{ 1 };
+      float mQ{ float(sqrt(2)) / 2 };
    };
 
    struct IndividualOutput;
@@ -167,7 +167,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    std::array<DrumSynthHit*, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mHits;
    std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity{};
@@ -177,5 +177,4 @@ private:
    bool mUseIndividualOuts{ false };
    bool mMonoOutput{ false };
    int mOversampling{ 1 };
-   DropdownList* mOversamplingSelector{ nullptr };
 };

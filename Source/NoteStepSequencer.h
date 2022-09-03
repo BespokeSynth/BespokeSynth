@@ -77,7 +77,7 @@ public:
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
@@ -120,14 +120,15 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 2; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void UpdateGridControllerLights(bool force);
 
    int ButtonToStep(int button);
@@ -193,13 +194,13 @@ private:
    ClickButton* mRandomizeLengthButton{ nullptr };
    ClickButton* mRandomizeVelocityButton{ nullptr };
    float mRandomizePitchChance{ 1 };
-   float mRandomizePitchRange{ 1 };
+   int mRandomizePitchVariety{ 4 };
    float mRandomizeLengthChance{ 1 };
    float mRandomizeLengthRange{ 1 };
    float mRandomizeVelocityChance{ 1 };
-   float mRandomizeVelocityDensity{ 1 };
+   float mRandomizeVelocityDensity{ .6 };
    FloatSlider* mRandomizePitchChanceSlider{ nullptr };
-   FloatSlider* mRandomizePitchRangeSlider{ nullptr };
+   IntSlider* mRandomizePitchVarietySlider{ nullptr };
    FloatSlider* mRandomizeLengthChanceSlider{ nullptr };
    FloatSlider* mRandomizeLengthRangeSlider{ nullptr };
    FloatSlider* mRandomizeVelocityChanceSlider{ nullptr };

@@ -50,7 +50,8 @@ enum ConnectionType
    kConnectionType_Grid,
    kConnectionType_Special,
    kConnectionType_Pulse,
-   kConnectionType_Modulator
+   kConnectionType_Modulator,
+   kConnectionType_ValueSetter //for modulator-type that don't have a continuous connection to the control, and just set values as one-offs
 };
 
 class PatchCable : public IClickable
@@ -62,7 +63,7 @@ public:
    virtual ~PatchCable();
 
    void Render() override;
-   bool TestClick(int x, int y, bool right, bool testOnly = false) override;
+   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    void GetDimensions(float& width, float& height) override
@@ -87,7 +88,7 @@ public:
    static PatchCable* sActivePatchCable;
 
 protected:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
 private:
    void SetTarget(IClickable* target);

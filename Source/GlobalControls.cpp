@@ -93,14 +93,14 @@ void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    if (slider == mMouseScrollXSlider && gHoveredUIControl != mMouseScrollXSlider) //avoid bad behavior when adjusting these via mouse
    {
       float delta = mMouseScrollX - oldVal;
-      TheSynth->MouseScrolled(-delta, 0, false);
+      TheSynth->MouseScrolled(-delta, 0, false, false, false);
       mMouseScrollX = 0;
    }
 
    if (slider == mMouseScrollYSlider && gHoveredUIControl != mMouseScrollYSlider) //avoid bad behavior when adjusting these via mouse
    {
       float delta = mMouseScrollY - oldVal;
-      TheSynth->MouseScrolled(0, -delta, false);
+      TheSynth->MouseScrolled(0, -delta, false, false, false);
       mMouseScrollY = 0;
    }
 }
@@ -136,23 +136,18 @@ std::vector<IUIControl*> GlobalControls::ControlsToNotSetDuringLoadState() const
    return ignore;
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void GlobalControls::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 }
 
-void GlobalControls::LoadState(FileStreamIn& in)
+void GlobalControls::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 }

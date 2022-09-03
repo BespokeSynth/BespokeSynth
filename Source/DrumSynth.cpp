@@ -35,12 +35,19 @@
 #include "ADSRDisplay.h"
 #include "UIControlMacros.h"
 
+#define DRUMSYNTH_NO_CUTOFF 10000
+
+namespace
+{
+   const int kPadYOffset = 20;
+}
+
 DrumSynth::DrumSynth()
 {
    for (int i = 0; i < (int)mHits.size(); ++i)
    {
       int x = (i % DRUMSYNTH_PADS_HORIZONTAL) * DRUMSYNTH_PAD_WIDTH + 5;
-      int y = (1 - (i / DRUMSYNTH_PADS_HORIZONTAL)) * DRUMSYNTH_PAD_HEIGHT + 50;
+      int y = (1 - (i / DRUMSYNTH_PADS_HORIZONTAL)) * DRUMSYNTH_PAD_HEIGHT + kPadYOffset;
       mHits[i] = new DrumSynthHit(this, i, x, y);
       if (i == 0)
          mHits[i]->mData.mVol = .5f;
@@ -52,14 +59,7 @@ void DrumSynth::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
    FLOATSLIDER(mVolSlider, "vol", &mVolume, 0, 2);
-   DROPDOWN(mOversamplingSelector, "oversampling", &mOversampling, 40);
    ENDUIBLOCK0();
-
-   mOversamplingSelector->DrawLabel(true);
-   mOversamplingSelector->AddLabel("1x", 1);
-   mOversamplingSelector->AddLabel("2x", 2);
-   mOversamplingSelector->AddLabel("4x", 4);
-   mOversamplingSelector->AddLabel("8x", 8);
 
    for (size_t i = 0; i < mHits.size(); ++i)
       mHits[i]->CreateUIControls();
@@ -166,7 +166,7 @@ void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    }
 }
 
-void DrumSynth::OnClicked(int x, int y, bool right)
+void DrumSynth::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -174,7 +174,7 @@ void DrumSynth::OnClicked(int x, int y, bool right)
       return;
 
    x -= 5;
-   y -= 50;
+   y -= kPadYOffset;
    if (x < 0 || y < 0)
       return;
    x /= DRUMSYNTH_PAD_WIDTH;
@@ -196,7 +196,6 @@ void DrumSynth::DrawModule()
       return;
 
    mVolSlider->Draw();
-   mOversamplingSelector->Draw();
 
    ofPushMatrix();
    for (size_t i = 0; i < mHits.size(); ++i)
@@ -234,7 +233,7 @@ int DrumSynth::GetAssociatedSampleIndex(int x, int y)
 void DrumSynth::GetModuleDimensions(float& width, float& height)
 {
    width = 10 + MIN(mHits.size(), DRUMSYNTH_PADS_HORIZONTAL) * DRUMSYNTH_PAD_WIDTH;
-   height = 52 + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;
+   height = 2 + kPadYOffset + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;
 }
 
 void DrumSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -270,6 +269,12 @@ void DrumSynth::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("individual_outs", moduleInfo, false);
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
+   EnumMap oversamplingMap;
+   oversamplingMap["1"] = 1;
+   oversamplingMap["2"] = 2;
+   oversamplingMap["4"] = 4;
+   oversamplingMap["8"] = 8;
+   mModuleSaveData.LoadEnum<int>("oversampling", moduleInfo, 1, nullptr, &oversamplingMap);
 
    SetUpFromSaveData();
 }
@@ -291,6 +296,8 @@ void DrumSynth::SetUpFromSaveData()
    mUseIndividualOuts = useIndividualOuts;
 
    mMonoOutput = mModuleSaveData.GetBool("mono");
+
+   mOversampling = mModuleSaveData.GetEnum<int>("oversampling");
 }
 
 DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y)
@@ -340,7 +347,7 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
    UIBLOCK_PUSHSLIDERWIDTH(filterAdsrWidth);
    FLOATSLIDER(mFilterCutoffMaxSlider, ("cutoffmax" + ofToString(mIndex)).c_str(), &mData.mCutoffMax, 10, DRUMSYNTH_NO_CUTOFF);
    FLOATSLIDER(mFilterCutoffMinSlider, ("cutoffmin" + ofToString(mIndex)).c_str(), &mData.mCutoffMin, 10, DRUMSYNTH_NO_CUTOFF);
-   FLOATSLIDER(mFilterQSlider, ("q" + ofToString(mIndex)).c_str(), &mData.mQ, .1, 20);
+   FLOATSLIDER_DIGITS(mFilterQSlider, ("q" + ofToString(mIndex)).c_str(), &mData.mQ, .1, 20, 3);
 
    ENDUIBLOCK0();
 
@@ -479,7 +486,6 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 
    mFreqAdsr.SetNumStages(2);
    mFreqAdsr.GetHasSustainStage() = false;
-   mFreqAdsr.GetFreeReleaseLevel() = true;
    mFreqAdsr.GetStageData(0).time = 1;
    mFreqAdsr.GetStageData(0).target = 1;
    mFreqAdsr.GetStageData(1).time = 500;
@@ -487,7 +493,6 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 
    mFilterAdsr.SetNumStages(2);
    mFilterAdsr.GetHasSustainStage() = false;
-   mFilterAdsr.GetFreeReleaseLevel() = true;
    mFilterAdsr.GetStageData(0).time = 1;
    mFilterAdsr.GetStageData(0).target = 1;
    mFilterAdsr.GetStageData(1).time = 500;

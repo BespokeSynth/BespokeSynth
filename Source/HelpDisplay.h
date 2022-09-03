@@ -29,6 +29,7 @@
 #include "IDrawableModule.h"
 #include "RadioButton.h"
 #include "ClickButton.h"
+#include "ModuleFactory.h"
 
 class HelpDisplay : public IDrawableModule, public IRadioButtonListener, public IButtonListener
 {
@@ -37,10 +38,11 @@ public:
    virtual ~HelpDisplay();
    static IDrawableModule* Create() { return new HelpDisplay(); }
 
-
    bool IsSaveable() override { return false; }
    bool HasTitleBar() const override { return false; }
    void CreateUIControls() override;
+
+   void Show() { mScrollOffsetY = 0; }
 
    std::string GetUIControlTooltip(IUIControl* control);
    std::string GetModuleTooltip(IDrawableModule* module);
@@ -59,6 +61,7 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void RenderScreenshot(int x, int y, int width, int height, std::string filename);
 
@@ -94,8 +97,11 @@ private:
    static bool sTooltipsLoaded;
    static std::list<ModuleTooltipInfo> sTooltips;
 
-   std::list<std::string> mScreenshotsToProcess;
+   std::list<ModuleFactory::Spawnable> mScreenshotsToProcess;
    IDrawableModule* mScreenshotModule{ nullptr };
+
+   float mScrollOffsetY{ 0 };
+   float mMaxScrollAmount{ 0 };
 };
 
 #endif /* defined(__Bespoke__HelpDisplay__) */

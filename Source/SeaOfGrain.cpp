@@ -310,7 +310,7 @@ void SeaOfGrain::ButtonClicked(ClickButton* button)
       LoadFile();
 }
 
-void SeaOfGrain::OnClicked(int x, int y, bool right)
+void SeaOfGrain::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -381,16 +381,11 @@ void SeaOfGrain::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void SeaOfGrain::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mHasRecordedInput;
    if (mHasRecordedInput)
@@ -399,13 +394,13 @@ void SeaOfGrain::SaveState(FileStreamOut& out)
       mSample->SaveState(out);
 }
 
-void SeaOfGrain::LoadState(FileStreamIn& in)
+void SeaOfGrain::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mHasRecordedInput = false;
    if (rev > 0)

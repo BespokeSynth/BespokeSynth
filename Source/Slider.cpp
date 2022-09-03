@@ -84,14 +84,23 @@ FloatSliderLFOControl* FloatSlider::AcquireLFO()
 
 void FloatSlider::SetLFO(FloatSliderLFOControl* lfo)
 {
-   mLFOControl = lfo;
-   mModulator = lfo;
+   if (lfo != mLFOControl)
+   {
+      SetModulator(lfo);
+      mLFOControl = lfo;
+   }
 }
 
 void FloatSlider::SetModulator(IModulator* modulator)
 {
-   mModulator = modulator;
-   mLFOControl = nullptr;
+   if (modulator != mModulator)
+   {
+      IModulator* oldModulator = mModulator;
+      mModulator = modulator;
+      mLFOControl = nullptr;
+      if (oldModulator != nullptr)
+         oldModulator->OnRemovedFrom(this);
+   }
 }
 
 void FloatSlider::Render()
@@ -289,7 +298,7 @@ void FloatSlider::DisplayLFOControl()
    }
 }
 
-void FloatSlider::OnClicked(int x, int y, bool right)
+void FloatSlider::OnClicked(float x, float y, bool right)
 {
    if (right)
    {
@@ -773,7 +782,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
          }
          else if (rev > 0)
          {
-            mLFOControl->LoadState(in);
+            mLFOControl->LoadState(in, mLFOControl->LoadModuleSaveStateRev(in));
          }
          if (shouldSetValue)
             lfo->UpdateFromSettings();
@@ -818,7 +827,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
          }
          else if (rev > 0)
          {
-            mLFOControl->LoadState(in);
+            mLFOControl->LoadState(in, mLFOControl->LoadModuleSaveStateRev(in));
          }
          if (shouldSetValue)
             lfo->UpdateFromSettings();
@@ -1007,7 +1016,7 @@ void IntSlider::CalcSliderVal()
    mSliderVal = ofMap(*mVar, mMin, mMax, 0.0f, 1.0f, K(clamp));
 }
 
-void IntSlider::OnClicked(int x, int y, bool right)
+void IntSlider::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
@@ -1185,7 +1194,7 @@ void IntSlider::TextEntryCancelled(TextEntry* entry)
 
 namespace
 {
-   const int kIntSliderSaveStateRev = 0;
+   const int kIntSliderSaveStateRev = 1;
 }
 
 void IntSlider::SaveState(FileStreamOut& out)
@@ -1193,16 +1202,32 @@ void IntSlider::SaveState(FileStreamOut& out)
    out << kIntSliderSaveStateRev;
 
    out << (float)*mVar;
+   out << mMin;
+   out << mMax;
 }
 
 void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kIntSliderSaveStateRev);
+   LoadStateValidate(rev <= kIntSliderSaveStateRev);
 
    float var;
    in >> var;
+
+   if (rev >= 1)
+   {
+      in >> mMin;
+      in >> mMax;
+   }
+   else
+   {
+      if (var < mMin)
+         mMin = var;
+      if (var > mMax)
+         mMax = var;
+   }
+
    if (shouldSetValue)
       SetValueDirect(var);
 }

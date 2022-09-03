@@ -103,7 +103,7 @@ void Polyrhythms::Resize(float w, float h)
       mRhythmLines[i]->OnResize();
 }
 
-void Polyrhythms::OnClicked(int x, int y, bool right)
+void Polyrhythms::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mRhythmLines.size(); ++i)
@@ -146,29 +146,24 @@ void Polyrhythms::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Polyrhythms::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << (int)mRhythmLines.size();
    for (size_t i = 0; i < mRhythmLines.size(); ++i)
       mRhythmLines[i]->mGrid->SaveState(out);
 }
 
-void Polyrhythms::LoadState(FileStreamIn& in)
+void Polyrhythms::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int size;
    in >> size;
@@ -239,7 +234,7 @@ void RhythmLine::Draw()
    mNoteSelector->Draw();
 }
 
-void RhythmLine::OnClicked(int x, int y, bool right)
+void RhythmLine::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;

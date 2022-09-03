@@ -44,11 +44,8 @@ public:
    ~Ramper();
    static IDrawableModule* Create() { return new Ramper(); }
 
-
    void CreateUIControls() override;
    void Init() override;
-
-   IUIControl* GetUIControl() const { return mUIControl; }
 
    //IDrawableModule
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -75,13 +72,13 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
 
    void Go(double time);
 
-   IUIControl* mUIControl;
+   std::array<IUIControl*, 16> mUIControls{ nullptr };
    NoteInterval mLength;
    DropdownList* mLengthSelector;
    PatchCableSource* mControlCable;

@@ -1,0 +1,109 @@
+{
+    "groups" : [
+        {
+          "rows": 1,
+          "cols": 8,
+          "position" : [ 0, 0 ],
+          "dimensions" : [22, 10],
+          "spacing" : [32, 12],
+          "controls" : [ 24, 25, 26, 27, 28, 29, 30, 31 ],
+          "colors" : [ 0, 127],
+          "messageType" : "control",
+          "drawType" : "button"
+       },
+        {
+            "rows": 2,
+            "cols": 8,
+            "position" : [ 0, 24 ],
+            "dimensions" : [24, 24],
+            "spacing" : [32, 60],
+            "controls" : [
+                 70, 71, 72, 73, 74, 75, 76, 77,
+                 78, 79, 80, 81, 82, 83, 85, 86, ],
+            "colors" : [ 0, 127],
+            "messageType" : "control",
+            "drawType" : "knob"
+        },
+       {
+          "rows": 1,
+          "cols": 8,
+          "position" : [ 0, 60 ],
+          "dimensions" : [22, 10],
+          "spacing" : [32, 12],
+          "controls" : [ 87, 88, 89, 90, 91, 92, 93, 94, ],
+          "colors" : [ 0, 127],
+          "messageType" : "control",
+          "drawType" : "button"
+       },
+              {
+          "rows": 1,
+          "cols": 8,
+          "position" : [ 280, 0 ],
+          "dimensions" : [20, 40],
+          "spacing" : [32, 42],
+          "controls" : [ 16, 17, 18, 19, 20, 21, 22, 23, ],
+          "colors" : [ 0, 127],
+          "messageType" : "control",
+          "drawType" : "slider"
+       },
+       {
+          "rows": 2,
+          "cols": 8,
+          "position" : [ 280, 60 ],
+          "dimensions" : [22, 10],
+          "spacing" : [32, 20],
+          "controls" : [ 40, 41, 42, 43, 44, 45, 46, 47,
+                         48, 49, 50, 51, 52, 53, 54, 55,],
+          "colors" : [ 0, 127],
+          "messageType" : "control",
+          "drawType" : "button"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 0, 120 ],
+            "dimensions" : [20, 60],
+                "controls" : [1],
+            "messageType" : "control",
+            "drawType" : "slider"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 0, 160 ],
+            "dimensions" : [60, 20],
+            "messageType" : "pitchbend",
+            "drawType" : "slider"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 100, 120 ],
+            "dimensions" : [20, 60],
+            "controls" : [67],
+            "messageType" : "control",
+            "drawType" : "slider"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 100, 160 ],
+            "dimensions" : [60, 20],
+            "controls" : [66],
+            "messageType" : "control",
+            "drawType" : "slider"
+        },
+        {
+            "rows": 1,
+            "cols": 8,
+            "position": [180, 130],
+            "dimensions": [40, 40],
+            "spacing": [44, 44],
+            "controls": [35, 36, 37, 38, 39, 40, 41, 42],
+            "messageType": "note",
+            "drawType": "button"
+        }
+            
+    ]
+ }
+ 

@@ -63,20 +63,20 @@ void ModulatorMult::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 {
    OnModulatorRepatch();
 
-   if (mTarget)
+   if (mSliderTarget)
    {
-      mValue1 = mTarget->GetValue();
+      mValue1 = mSliderTarget->GetValue();
       mValue2 = 0;
-      mValue1Slider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mValue1Slider->SetMode(mTarget->GetMode());
+      mValue1Slider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
+      mValue1Slider->SetMode(mSliderTarget->GetMode());
    }
 }
 
 float ModulatorMult::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   if (mTarget)
-      return ofClamp(mValue1 * mValue2, mTarget->GetMin(), mTarget->GetMax());
+   if (mSliderTarget)
+      return ofClamp(mValue1 * mValue2, mSliderTarget->GetMin(), mSliderTarget->GetMax());
    else
       return mValue1 * mValue2;
 }
@@ -84,22 +84,13 @@ float ModulatorMult::Value(int samplesIn)
 void ModulatorMult::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ModulatorMult::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void ModulatorMult::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

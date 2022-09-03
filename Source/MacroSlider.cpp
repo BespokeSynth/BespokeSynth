@@ -75,34 +75,11 @@ void MacroSlider::SaveLayout(ofxJSONElement& moduleInfo)
    IDrawableModule::SaveLayout(moduleInfo);
 
    moduleInfo["num_mappings"] = (int)mMappings.size();
-   for (int i = 0; i < mMappings.size(); ++i)
-   {
-      std::string targetPath = "";
-      if (mMappings[i]->GetCableSource()->GetTarget())
-         targetPath = mMappings[i]->GetCableSource()->GetTarget()->Path();
-
-      moduleInfo["mappings"][i]["target"] = targetPath;
-   }
 }
 
 void MacroSlider::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadInt("num_mappings", moduleInfo, 3, 1, 100, K(isTextField));
-
-   for (auto mapping : mMappings)
-      delete mapping;
-   mMappings.clear();
-   const Json::Value& mappings = moduleInfo["mappings"];
-   for (int i = 0; i < mappings.size(); ++i)
-   {
-      std::string target = mappings[i]["target"].asString();
-      Mapping* mapping = new Mapping(this, i);
-      mapping->CreateUIControls();
-      FloatSlider* slider = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(target));
-      mapping->GetCableSource()->SetTarget(slider);
-      mapping->UpdateControl();
-      mMappings.push_back(mapping);
-   }
 
    SetUpFromSaveData();
 }
@@ -151,7 +128,7 @@ void MacroSlider::Mapping::CreateUIControls()
    mTargetCable = new PatchCableSource(mOwner, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    mTargetCable->SetManualPosition(110, 39 + mIndex * kMappingSpacing);
-   mTargetCable->SetOverrideCableDir(ofVec2f(1, 0));
+   mTargetCable->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    mOwner->AddPatchCableSource(mTargetCable);
 }
 
@@ -171,13 +148,13 @@ void MacroSlider::Mapping::Draw()
    mMinSlider->Draw();
    mMaxSlider->Draw();
 
-   if (mTarget)
+   if (mSliderTarget)
    {
       float x, y, w, h;
       mMinSlider->GetPosition(x, y, K(local));
       mMinSlider->GetDimensions(w, h);
 
-      int lineX = ofMap(mTarget->GetValue(), mTarget->GetMin(), mTarget->GetMax(), x, x + w);
+      int lineX = ofLerp(x, x + w, mSliderTarget->ValToPos(mSliderTarget->GetValue(), true));
       int lineY1 = y;
       int lineY2 = y + h * 2;
       ofPushStyle();

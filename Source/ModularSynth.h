@@ -91,7 +91,7 @@ public:
    void MouseDragged(int x, int y, int button, const juce::MouseInputSource& source);
    void MousePressed(int x, int y, int button, const juce::MouseInputSource& source);
    void MouseReleased(int x, int y, int button, const juce::MouseInputSource& source);
-   void MouseScrolled(float x, float y, bool canZoomCanvas);
+   void MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas);
    void MouseMagnify(int x, int y, float scaleFactor, const juce::MouseInputSource& source);
    void FilesDropped(std::vector<std::string> files, int x, int y);
 
@@ -110,7 +110,8 @@ public:
 
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
-   IDrawableModule* SpawnModuleOnTheFly(std::string moduleName, float x, float y, bool addToContainer = true);
+   IDrawableModule* SpawnModuleOnTheFly(ModuleFactory::Spawnable spawnable, float x, float y, bool addToContainer = true, std::string name = "");
+
    void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY, bool canStickToCursor);
 
    int GetNumInputChannels() const { return (int)mInputBuffers.size(); }
@@ -155,6 +156,7 @@ public:
    float GetRawMouseY() { return mMousePos.y; }
    float GetMouseX(ModuleContainer* context, float rawX = FLT_MAX);
    float GetMouseY(ModuleContainer* context, float rawY = FLT_MAX);
+   void SetMousePosition(ModuleContainer* context, float x, float y);
    bool IsMouseButtonHeld(int button) const;
    ofVec2f& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
    void SetDrawOffset(ofVec2f offset) { mModuleContainer.SetDrawOffset(offset); }
@@ -238,6 +240,7 @@ public:
 
    bool IsLoadingState() const { return mIsLoadingState; }
    bool IsLoadingModule() const { return mIsLoadingModule; }
+   bool IsDuplicatingModule() const { return mIsDuplicatingModule; }
    void SetIsLoadingState(bool loading) { mIsLoadingState = loading; }
 
    static std::string GetUserPrefsPath();
@@ -254,6 +257,7 @@ public:
    void SaveCurrentState();
    void SaveStatePopup();
    void LoadStatePopup();
+   void ToggleQuickSpawn();
    double GetLastSaveTime() { return mLastSaveTime; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
@@ -274,13 +278,13 @@ public:
    static float sBackgroundB;
 
    static int sLoadingFileSaveStateRev;
-   static constexpr int kSaveStateRev = 422;
+   static constexpr int kSaveStateRev = 423;
 
 private:
    void ResetLayout();
    void ReconnectMidiDevices();
    void DrawConsole();
-   void CheckClick(IDrawableModule* clickedModule, int x, int y, bool rightButton);
+   void CheckClick(IDrawableModule* clickedModule, float x, float y, bool rightButton);
    void UpdateUserPrefsLayout();
    void LoadStatePopupImp();
    IDrawableModule* DuplicateModule(IDrawableModule* module);
@@ -357,6 +361,9 @@ private:
    int mClickStartX{ std::numeric_limits<int>::max() }; //to detect click and release in place
    int mClickStartY{ std::numeric_limits<int>::max() };
    bool mMouseMovedSignificantlySincePressed{ true };
+   bool mLastClickWasEmptySpace{ false };
+   bool mIsShiftPressed{ false };
+   double mLastShiftPressTime{ -9999 };
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout{ false };
@@ -406,6 +413,7 @@ private:
    ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay{ nullptr };
 
    bool mIsLoadingModule{ false };
+   bool mIsDuplicatingModule{ false };
 
    std::list<IPollable*> mExtraPollers;
 

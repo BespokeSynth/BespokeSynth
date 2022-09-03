@@ -131,7 +131,7 @@ void Checkbox::Render()
    DrawHover(mX, mY, mWidth, mHeight);
 }
 
-void Checkbox::OnClicked(int x, int y, bool right)
+void Checkbox::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
@@ -227,7 +227,7 @@ void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    float var;
    in >> var;

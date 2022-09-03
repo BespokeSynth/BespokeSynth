@@ -71,9 +71,9 @@ void RadioSequencer::CreateUIControls()
    mGrid->SetMajorColSize(4);
    mGrid->SetListener(this);
 
-   /*mIntervalSelector->AddLabel("8", kInterval_8);
-    mIntervalSelector->AddLabel("4", kInterval_4);
-    mIntervalSelector->AddLabel("2", kInterval_2);*/
+   mIntervalSelector->AddLabel("8", kInterval_8);
+   mIntervalSelector->AddLabel("4", kInterval_4);
+   mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -164,15 +164,16 @@ void RadioSequencer::Step(double time, int pulseFlags)
    std::vector<IUIControl*> controlsToEnable;
    for (int i = 0; i < mControlCables.size(); ++i)
    {
-      IUIControl* uicontrol = nullptr;
-      if (mControlCables[i]->GetTarget())
-         uicontrol = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
-      if (uicontrol)
+      for (auto* cable : mControlCables[i]->GetPatchCables())
       {
-         if (mGrid->GetVal(mStep, i) > 0)
-            controlsToEnable.push_back(uicontrol);
-         else
-            uicontrol->SetValue(0);
+         IUIControl* uicontrol = dynamic_cast<IUIControl*>(cable->GetTarget());
+         if (uicontrol)
+         {
+            if (mGrid->GetVal(mStep, i) > 0)
+               controlsToEnable.push_back(uicontrol);
+            else
+               uicontrol->SetValue(0);
+         }
       }
    }
 
@@ -221,7 +222,7 @@ void RadioSequencer::DrawModule()
    }
 }
 
-void RadioSequencer::OnClicked(int x, int y, bool right)
+void RadioSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -263,8 +264,8 @@ void RadioSequencer::SyncControlCablesToGrid()
       mControlCables.resize(mGrid->GetRows());
       for (int i = oldSize; i < mControlCables.size(); ++i)
       {
-         mControlCables[i] = new PatchCableSource(this, kConnectionType_Modulator);
-         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0));
+         mControlCables[i] = new PatchCableSource(this, kConnectionType_ValueSetter);
+         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
          //mControlCables[i]->SetColor(GetRowColor(i));
          AddPatchCableSource(mControlCables[i]);
       }
@@ -338,6 +339,7 @@ void RadioSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("one_per_column_mode", moduleInfo, true);
+   mModuleSaveData.LoadInt("num_rows", moduleInfo, 8, 1, 16, false);
 
    SetUpFromSaveData();
 }
@@ -345,59 +347,49 @@ void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 void RadioSequencer::SetUpFromSaveData()
 {
    mGrid->SetSingleColumnMode(mModuleSaveData.GetBool("one_per_column_mode"));
-}
-
-namespace
-{
-   const int kSaveStateRev = 1;
+   mGrid->SetGrid(mLength, mModuleSaveData.GetInt("num_rows"));
+   SyncControlCablesToGrid();
 }
 
 void RadioSequencer::SaveState(FileStreamOut& out)
 {
-   out << kSaveStateRev;
+   out << GetModuleSaveStateRev();
 
    IDrawableModule::SaveState(out);
-
-   out << (int)mControlCables.size();
-   for (auto cable : mControlCables)
-   {
-      std::string path = "";
-      if (cable->GetTarget())
-         path = cable->GetTarget()->Path();
-      out << path;
-   }
 
    mGrid->SaveState(out);
    out << mGrid->GetWidth();
    out << mGrid->GetHeight();
 }
 
-void RadioSequencer::LoadState(FileStreamIn& in)
+void RadioSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   mLoadRev = -1;
+   mLoadRev = rev;
 
-   if (ModularSynth::sLoadingFileSaveStateRev >= 422)
+   if (ModularSynth::sLoadingFileSaveStateRev == 422)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= GetModuleSaveStateRev());
    }
 
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev <= 421)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= GetModuleSaveStateRev());
    }
 
-   int size;
-   in >> size;
-   mControlCables.resize(size);
-   for (auto cable : mControlCables)
+   if (rev <= 1)
    {
-      std::string path;
-      in >> path;
-      cable->SetTarget(TheSynth->FindUIControl(path));
+      int size;
+      in >> size;
+      mControlCables.resize(size);
+      for (auto cable : mControlCables)
+      {
+         std::string path;
+         in >> path;
+      }
    }
 
    mGrid->LoadState(in);

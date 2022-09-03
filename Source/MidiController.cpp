@@ -1059,9 +1059,9 @@ void MidiController::DrawModule()
             else
             {
                if (control.mLastActivityTime > 0)
-                  ofSetColor(IDrawableModule::GetColor(GetModuleType()), gModuleDrawAlpha);
+                  ofSetColor(IDrawableModule::GetColor(GetModuleCategory()), gModuleDrawAlpha);
                else
-                  ofSetColor(IDrawableModule::GetColor(GetModuleType()), gModuleDrawAlpha * .3f);
+                  ofSetColor(IDrawableModule::GetColor(GetModuleCategory()), gModuleDrawAlpha * .3f);
             }
 
             if (control.mDrawType == kDrawType_Button)
@@ -1302,7 +1302,7 @@ UIControlConnection* MidiController::GetConnectionForCableSource(const PatchCabl
    return nullptr;
 }
 
-void MidiController::OnClicked(int x, int y, bool right)
+void MidiController::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -2399,16 +2399,11 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["connections"] = mConnectionsJson;
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void MidiController::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    bool hasNonstandardController = (mNonstandardController != nullptr);
    out << hasNonstandardController;
@@ -2416,16 +2411,16 @@ void MidiController::SaveState(FileStreamOut& out)
       mNonstandardController->SaveState(out);
 }
 
-void MidiController::LoadState(FileStreamIn& in)
+void MidiController::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    bool hasNonstandardController;
    in >> hasNonstandardController;

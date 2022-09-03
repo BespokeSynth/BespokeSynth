@@ -61,20 +61,25 @@ private:
       bool mOn{ false };
       int mVelocity{ 0 };
       int mVoiceIdx{ -1 };
+      int mOutputPitch{ 0 };
    };
 
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 108;
-      height = 22;
+      width = mWidth;
+      height = mHeight;
    }
    bool Enabled() const override { return mEnabled; }
 
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    int mOctave{ 0 };
    IntSlider* mOctaveSlider{ nullptr };
    std::array<NoteInfo, 128> mInputNotes;
+   Checkbox* mRetriggerCheckbox{ nullptr };
+   bool mRetrigger{ false };
 };
 
 

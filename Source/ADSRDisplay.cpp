@@ -84,7 +84,7 @@ void ADSRDisplay::Render()
 
    ofTranslate(mX, mY);
 
-   ofSetColor(100, 100, .8f * gModuleDrawAlpha);
+   ofSetColor(100, 100, 100, .8f * gModuleDrawAlpha);
 
    ofSetLineWidth(.5f);
    ofRect(0, 0, mWidth, mHeight, 0);
@@ -99,16 +99,18 @@ void ADSRDisplay::Render()
       mViewAdsr.Set(*mAdsr);
       mViewAdsr.Clear();
       mViewAdsr.Start(0, 1);
+      float timeBeforeSustain = mMaxTime;
       float releaseTime = mMaxTime;
       if (mViewAdsr.GetMaxSustain() == -1 && mViewAdsr.GetHasSustainStage())
       {
-         releaseTime = mMaxTime * .2f;
+         timeBeforeSustain = 0;
          for (int i = 0; i < mViewAdsr.GetNumStages(); ++i)
          {
-            releaseTime += mViewAdsr.GetStageData(i).time;
+            timeBeforeSustain += mViewAdsr.GetStageData(i).time;
             if (i == mViewAdsr.GetSustainStage())
                break;
          }
+         releaseTime = timeBeforeSustain + mMaxTime * .2f;
          mViewAdsr.Stop(releaseTime);
       }
       ofVertex(0, mHeight);
@@ -120,8 +122,6 @@ void ADSRDisplay::Render()
       }
       ofEndShape(false);
 
-      ofSetLineWidth(1);
-      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
       float drawTime = 0;
       if (mOverrideDrawTime != -1)
       {
@@ -134,8 +134,63 @@ void ADSRDisplay::Render()
          if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
             drawTime = releaseTime + (gTime - mAdsr->GetStopTime(gTime));
       }
+
+      ofPushStyle();
+      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
+      float x = drawTime / mMaxTime * mWidth;
+      float y = (1 - mViewAdsr.Value(drawTime) * mVol) * mHeight;
+      if (drawTime >= timeBeforeSustain && drawTime <= releaseTime)
+      {
+         ofSetLineWidth(1.5f);
+         ofLine(drawTime / mMaxTime * mWidth, y, releaseTime / mMaxTime * mWidth, y);
+      }
+
       if (drawTime > 0 && drawTime < mMaxTime)
-         ofLine(drawTime / mMaxTime * mWidth, 0, drawTime / mMaxTime * mWidth, mHeight);
+      {
+         ofPushMatrix();
+         ofClipWindow(0, 0, mWidth, mHeight, true);
+         ofCircle(x, y, 1);
+         ofLine(x, y, x, mHeight);
+         ofPopMatrix();
+      }
+
+      mDrawTimeHistory[mDrawTimeHistoryIndex] = drawTime;
+
+      for (size_t i = 0; i < mDrawTimeHistory.size() - 1; ++i)
+      {
+         ofFill();
+         ofSetColor(0, 255, 0, gModuleDrawAlpha * ofLerp(.3f, 0, float(i) / mDrawTimeHistory.size()));
+         int indexLeading = (mDrawTimeHistoryIndex - i + (int)mDrawTimeHistory.size()) % (int)mDrawTimeHistory.size();
+         //int indexPast = (indexLeading - 1 + (int)mDrawTimeHistory.size()) % (int)mDrawTimeHistory.size();
+         double timeLeading = mDrawTimeHistory[indexLeading];
+         //double timePast = mDrawTimeHistory[indexPast];
+         float xLeading = timeLeading / mMaxTime * mWidth;
+         float yLeading = (1 - mViewAdsr.Value(timeLeading) * mVol) * mHeight;
+         //float xPast = timePast / mMaxTime * mWidth;
+         //float yPast = (1 - mViewAdsr.Value(timePast) * mVol) * mHeight;
+
+         ofLine(xLeading, yLeading, xLeading, mHeight);
+
+         /*bool discontinuity = false;
+         if (timeLeading < timePast)
+            discontinuity = true;
+         if (timeLeading >= releaseTime - gBufferSizeMs && timePast <= releaseTime)
+            discontinuity = true;
+
+         if (!discontinuity)
+         {
+            ofBeginShape();
+            ofVertex(xLeading, yLeading);
+            ofVertex(xLeading, mHeight);
+            ofVertex(xPast, mHeight);
+            ofVertex(xPast, yPast);
+            ofEndShape();
+         }*/
+      }
+
+      mDrawTimeHistoryIndex = (mDrawTimeHistoryIndex + 1) % mDrawTimeHistory.size();
+
+      ofPopStyle();
    }
 
    ofFill();
@@ -145,6 +200,9 @@ void ADSRDisplay::Render()
       ofSetColor(255, 255, 0, .2f * gModuleDrawAlpha);
       ofRect(0, 0, mWidth, mHeight, 0);
    }
+
+   ofSetColor(245, 58, 0, gModuleDrawAlpha);
+   ofCircle(mWidth - 5, 5, 2);
 
    if (sDisplayMode == kDisplayEnvelope)
    {
@@ -163,6 +221,13 @@ void ADSRDisplay::Render()
          case kAdjustEnvelopeEditor:
             ofSetColor(255, 255, 255, .2f * gModuleDrawAlpha);
             ofRect(mWidth - 10, 0, 10, 10);
+            break;
+         case kAdjustViewLength:
+            ofSetColor(255, 255, 255, .2f * gModuleDrawAlpha);
+            ofRect(0, 0, mWidth, 10);
+            ofRect(ofMap(mMaxTime, 10, 10000, 0, mWidth - 3, K(clamp)), 0, 3, 10);
+            ofSetColor(255, 255, 255, .8f * gModuleDrawAlpha);
+            DrawTextNormal(ofToString(mMaxTime, 0) + " ms", 3, 8, 10);
             break;
          case kAdjustAttackAR:
             ofRect(0, 0, mWidth * .5f, mHeight);
@@ -224,7 +289,7 @@ void ADSRDisplay::UpdateSliderVisibility()
       if (sDisplayMode == kDisplaySliders)
          slidersActive = true;
       if (PatchCable::sActivePatchCable != nullptr &&
-          (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator || PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl))
+          (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator || PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_ValueSetter || PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl))
          slidersActive = true;
    }
    if (mASlider && mASlider->GetModulator() != nullptr && mASlider->GetModulator()->Active())
@@ -271,7 +336,9 @@ void ADSRDisplay::SpawnEnvelopeEditor()
 {
    if (mEditor == nullptr)
    {
-      mEditor = dynamic_cast<EnvelopeEditor*>(TheSynth->SpawnModuleOnTheFly("envelopeeditor", -1, -1, false));
+      ModuleFactory::Spawnable spawnable;
+      spawnable.mLabel = "envelopeeditor";
+      mEditor = dynamic_cast<EnvelopeEditor*>(TheSynth->SpawnModuleOnTheFly(spawnable, -1, -1, false, "envelopepopup"));
       mEditor->SetADSRDisplay(this);
    }
    if (!mEditor->IsPinned())
@@ -282,7 +349,7 @@ void ADSRDisplay::SpawnEnvelopeEditor()
    }
 }
 
-void ADSRDisplay::OnClicked(int x, int y, bool right)
+void ADSRDisplay::OnClicked(float x, float y, bool right)
 {
    if (mASlider != nullptr && mASlider->IsShowing())
    {
@@ -326,6 +393,7 @@ void ADSRDisplay::OnClicked(int x, int y, bool right)
       mClick = true;
       mClickStart.set(x, y);
       mClickAdsr.Set(mViewAdsr);
+      mClickLength = mMaxTime;
    }
 }
 
@@ -341,6 +409,10 @@ bool ADSRDisplay::MouseMoved(float x, float y)
       if (x < 0 || y < 0 || x > mWidth || y > mHeight)
       {
          mAdjustMode = kAdjustNone;
+      }
+      else if (GetKeyModifiers() == kModifier_Shift)
+      {
+         mAdjustMode = kAdjustViewLength;
       }
       else if (x >= mWidth - 10 && x <= mWidth && y >= 0 && y <= 10)
       {
@@ -383,6 +455,11 @@ bool ADSRDisplay::MouseMoved(float x, float y)
          mousePosSq *= mousePosSq;
       switch (mAdjustMode)
       {
+         case kAdjustViewLength:
+         {
+            mMaxTime = std::clamp(mClickLength + mousePosSq * 500, 10.0f, 10000.0f);
+            break;
+         }
          case kAdjustAttack:
          case kAdjustAttackAR:
          {

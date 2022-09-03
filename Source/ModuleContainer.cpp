@@ -125,10 +125,13 @@ void ModuleContainer::Clear()
    std::vector<IDrawableModule*> modulesToDelete = mModules;
    for (auto* module : modulesToDelete)
    {
-      if (module->GetContainer())
-         module->GetContainer()->Clear();
-      if (module->IsSingleton() == false)
-         DeleteModule(module);
+      if (module)
+      {
+         if (module->GetContainer())
+            module->GetContainer()->Clear();
+         if (module->IsSingleton() == false)
+            DeleteModule(module);
+      }
    }
    mModules.clear();
 }
@@ -433,6 +436,7 @@ IUIControl* ModuleContainer::FindUIControl(std::string path)
    {
       try
       {
+         module->OnUIControlRequested(control.c_str());
          return module->FindUIControl(control.c_str());
       }
       catch (UnknownUIControlException& e)
@@ -604,6 +608,9 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    bool wasLoadingState = TheSynth->IsLoadingState();
    TheSynth->SetIsLoadingState(true);
 
+   static int sModuleContainerLoadStack = 0;
+   ++sModuleContainerLoadStack;
+
    int header;
    in >> header;
    assert(header <= ModularSynth::kSaveStateRev);
@@ -626,7 +633,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
          if (module == nullptr)
             throw LoadStateException();
 
-         module->LoadState(in);
+         module->LoadState(in, module->LoadModuleSaveStateRev(in));
 
          for (int j = 0; j < GetModuleSeparatorLength(); ++j)
          {
@@ -678,7 +685,10 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    IClickable::ClearLoadContext();
    TheSynth->SetIsLoadingState(wasLoadingState);
 
-   ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev; //reset to current
+   --sModuleContainerLoadStack;
+
+   if (sModuleContainerLoadStack <= 0)
+      ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev; //reset to current
 }
 
 //static

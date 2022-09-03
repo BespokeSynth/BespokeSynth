@@ -768,14 +768,16 @@ void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 
 void NoteCanvas::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mCanvas->SaveState(out);
 }
 
-void NoteCanvas::LoadState(FileStreamIn& in)
+void NoteCanvas::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    mCanvas->LoadState(in);
 }

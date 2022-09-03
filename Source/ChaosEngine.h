@@ -133,7 +133,7 @@ private:
       width = 610;
       height = 700;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    ClickButton* mChaosButton{ nullptr };
    bool mTotalChaos{ false };

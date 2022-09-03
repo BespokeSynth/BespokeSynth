@@ -42,7 +42,7 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
    SetParent(dynamic_cast<IClickable*>(owner));
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
 
-   mModalList.SetTypeName("dropdownlist");
+   mModalList.SetTypeName("dropdownlist", kModuleCategory_Other);
 
    if (width == -1)
       mAutoCalculateWidth = true;
@@ -95,13 +95,22 @@ void DropdownList::CalculateWidth()
    mMaxItemWidth = mWidth;
    for (int i = 0; i < mElements.size(); ++i)
    {
-      int width = GetStringWidth(mElements[i].mLabel) + 15;
+      int width = GetStringWidth(mElements[i].mLabel) + (mDrawTriangle ? 15 : 3);
       if (width > mMaxItemWidth)
          mMaxItemWidth = width;
    }
 
    if (mAutoCalculateWidth)
       mWidth = MIN(mMaxItemWidth, 180);
+}
+
+void DropdownList::SetWidth(int width)
+{
+   if (width != mWidth)
+   {
+      mWidth = width;
+      CalculateWidth();
+   }
 }
 
 std::string DropdownList::GetLabel(int val) const
@@ -149,7 +158,7 @@ void DropdownList::Render()
    ofSetColor(textColor);
 
    ofPushMatrix();
-   ofClipWindow(mX, mY, w - 12, h, true);
+   ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
    DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
    ofPopMatrix();
    if (mDrawTriangle)
@@ -178,7 +187,7 @@ void DropdownList::Render()
 
       ofPushStyle();
       ofFill();
-      ofColor color = IDrawableModule::GetColor(GetModuleParent()->GetModuleType());
+      ofColor color = IDrawableModule::GetColor(GetModuleParent()->GetModuleCategory());
       color.a = 80;
       ofSetColor(color);
       ofRect(mX, mY, w, mHeight);
@@ -232,6 +241,15 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
       {
          ofSetColor(100, 100, 100, 100);
          ofRect(mMaxItemWidth * col, (i % maxPerColumn) * kItemSpacing + pageHeaderShift, mMaxItemWidth, kItemSpacing);
+      }
+
+      if (VectorContains(i, mSeparators))
+      {
+         ofPushStyle();
+         ofSetColor(100, 100, 100, 100);
+         ofSetLineWidth(1);
+         ofLine(mMaxItemWidth * col + 3, (i % maxPerColumn) * kItemSpacing + pageHeaderShift, mMaxItemWidth * (col + 1) - 3, (i % maxPerColumn) * kItemSpacing + pageHeaderShift);
+         ofPopStyle();
       }
 
       if (mVar && mElements[i].mValue == *mVar)
@@ -299,7 +317,7 @@ namespace
    }
 }
 
-void DropdownList::OnClicked(int x, int y, bool right)
+void DropdownList::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
@@ -320,7 +338,7 @@ void DropdownList::OnClicked(int x, int y, bool right)
    float maxY = ofGetHeight() - 5;
 
    const int kMinPerColumn = 3;
-   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (kItemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale())));
+   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (kItemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale()))) - 1;
    mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
    int maxDisplayColumns = std::max(1, int((ofGetWidth() / GetModuleParent()->GetOwningContainer()->GetDrawScale()) / mMaxItemWidth));
    mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);
@@ -570,7 +588,7 @@ bool DropdownListModal::MouseMoved(float x, float y)
    return false;
 }
 
-void DropdownListModal::OnClicked(int x, int y, bool right)
+void DropdownListModal::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

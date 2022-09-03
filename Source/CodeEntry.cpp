@@ -719,7 +719,7 @@ void CodeEntry::SetError(bool error, int errorLine)
    mErrorLine = errorLine;
 }
 
-void CodeEntry::OnClicked(int x, int y, bool right)
+void CodeEntry::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
@@ -1197,7 +1197,7 @@ bool CodeEntry::MouseMoved(float x, float y)
    return false;
 }
 
-bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool CodeEntry::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (fabs(scrollX) > fabsf(scrollY))
       scrollY = 0;
@@ -1311,7 +1311,7 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    std::string var;
    in >> var;

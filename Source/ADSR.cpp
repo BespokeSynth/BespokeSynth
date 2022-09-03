@@ -37,10 +37,10 @@ void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
    mStages[0].curve = 0;
    mStages[1].target = MAX(s, .0001f);
    mStages[1].time = MAX(d, 1);
-   mStages[0].curve = 0;
+   mStages[1].curve = -.5f;
    mStages[2].target = 0;
    mStages[2].time = MAX(r, 1);
-   mStages[0].curve = 0;
+   mStages[2].curve = -.5f;
    mNumStages = 3;
    mSustainStage = 1;
    mMaxSustain = h;
@@ -55,7 +55,6 @@ void ::ADSR::Set(const ADSR& other)
    mSustainStage = other.mSustainStage;
    mMaxSustain = other.mMaxSustain;
    mHasSustainStage = other.mHasSustainStage;
-   mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
 void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/)
@@ -241,7 +240,8 @@ void ::ADSR::SaveState(FileStreamOut& out)
    out << mMaxSustain;
    out << mNumStages;
    out << mHasSustainStage;
-   out << mFreeReleaseLevel;
+   bool dummyBool;
+   out << dummyBool;
    out << MAX_ADSR_STAGES;
    for (int i = 0; i < MAX_ADSR_STAGES; ++i)
    {
@@ -264,7 +264,8 @@ void ::ADSR::LoadState(FileStreamIn& in)
    in >> mMaxSustain;
    in >> mNumStages;
    in >> mHasSustainStage;
-   in >> mFreeReleaseLevel;
+   bool dummyBool;
+   in >> dummyBool;
    int maxNumStages;
    in >> maxNumStages;
    assert(maxNumStages == MAX_ADSR_STAGES);

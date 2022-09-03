@@ -246,7 +246,7 @@ void LooperRecorder::SyncCablesToLoopers()
             looper = mLoopers[i];
          mLooperPatchCables[i]->SetTarget(looper);
          mLooperPatchCables[i]->SetManualPosition(160 + i * 12, 117);
-         mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
+         mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
          ofColor color = mLooperPatchCables[i]->GetColor();
          color.a *= .3f;
          mLooperPatchCables[i]->SetColor(color);
@@ -787,29 +787,24 @@ void LooperRecorder::SetUpFromSaveData()
    SetOutputTarget(TheSynth->FindAudioReceiver(mModuleSaveData.GetString("outputtarget")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void LooperRecorder::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mBaseTempo;
    out << mSpeed;
    mRecordBuffer.SaveState(out);
 }
 
-void LooperRecorder::LoadState(FileStreamIn& in)
+void LooperRecorder::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mBaseTempo;
    in >> mSpeed;

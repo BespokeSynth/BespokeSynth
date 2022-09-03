@@ -67,6 +67,7 @@ public:
    void LoadState(FileStreamIn& in);
 
    void RadioButtonUpdated(RadioButton* list, int oldVal);
+   void ButtonClicked(ClickButton* button);
 
 private:
    RadioButton* mSelector{ nullptr };
@@ -74,12 +75,12 @@ private:
    float mVolume{ 0 };
    FloatSlider* mVolumeSlider{ nullptr };
    BeatData mBeatData;
-   int mIndex;
+   int mIndex{ 0 };
    float mFilter{ 0 };
    FloatSlider* mFilterSlider{ nullptr };
    std::array<BiquadFilter, 2> mLowpass;
    std::array<BiquadFilter, 2> mHighpass;
-   Beats* mOwner;
+   Beats* mOwner{ nullptr };
    Ramp mFilterRamp;
    bool mDoubleTime{ false };
    Checkbox* mDoubleTimeCheckbox{ nullptr };
@@ -88,6 +89,7 @@ private:
    std::vector<Sample*> mSamples;
    float mPan{ 0 };
    FloatSlider* mPanSlider{ nullptr };
+   ClickButton* mDeleteButton{ nullptr };
 };
 
 class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener
@@ -110,6 +112,7 @@ public:
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
+   bool MouseMoved(float x, float y) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -126,7 +129,8 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
@@ -136,7 +140,7 @@ private:
 
    ChannelBuffer mWriteBuffer;
    std::array<BeatColumn*, 4> mBeatColumns;
-   int mRows{ 4 };
+   int mHighlightColumn{ -1 };
 };
 
 #endif /* defined(__modularSynth__Beats__) */

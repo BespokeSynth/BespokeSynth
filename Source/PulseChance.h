@@ -29,14 +29,15 @@
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
 #include "Slider.h"
+#include "ClickButton.h"
+#include "TextEntry.h"
 
-class PulseChance : public IDrawableModule, public IPulseSource, public IPulseReceiver, public IFloatSliderListener
+class PulseChance : public IDrawableModule, public IPulseSource, public IPulseReceiver, public IFloatSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    PulseChance();
    virtual ~PulseChance();
    static IDrawableModule* Create() { return new PulseChance(); }
-
 
    void CreateUIControls() override;
 
@@ -46,6 +47,8 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -56,8 +59,17 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
 
+   void Reseed();
+
    float mChance{ 1 };
    FloatSlider* mChanceSlider{ nullptr };
    float mLastRejectTime{ 0 };
    float mLastAcceptTime{ 0 };
+   bool mDeterministic{ false };
+   int mSeed{ 0 };
+   int mRandomIndex{ 0 };
+   TextEntry* mSeedEntry{ nullptr };
+   ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

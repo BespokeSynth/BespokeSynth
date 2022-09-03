@@ -45,7 +45,7 @@ void IClickable::Draw()
    Render();
 }
 
-bool IClickable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool IClickable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (!mShowing)
       return false;
@@ -74,11 +74,11 @@ bool IClickable::NotifyMouseMoved(float x, float y)
    return MouseMoved(x - mX, y - mY);
 }
 
-bool IClickable::NotifyMouseScrolled(int x, int y, float scrollX, float scrollY)
+bool IClickable::NotifyMouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (!mShowing)
       return false;
-   return MouseScrolled(x - mX, y - mY, scrollX, scrollY);
+   return MouseScrolled(x - mX, y - mY, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
 }
 
 void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const

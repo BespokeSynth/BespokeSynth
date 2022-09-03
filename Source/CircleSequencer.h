@@ -46,7 +46,7 @@ class CircleSequencerRing
 public:
    CircleSequencerRing(CircleSequencer* owner, int index);
    void Draw();
-   void OnClicked(int x, int y, bool right);
+   void OnClicked(float x, float y, bool right);
    void MouseReleased();
    void MouseMoved(float x, float y);
    void CreateUIControls();
@@ -97,7 +97,8 @@ public:
    void TextEntryComplete(TextEntry* entry) override {}
 
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
@@ -109,7 +110,7 @@ private:
       width = 400;
       height = 200;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool Enabled() const override { return mEnabled; }
 
    std::vector<CircleSequencerRing*> mCircleSequencerRings;

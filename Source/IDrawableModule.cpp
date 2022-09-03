@@ -97,11 +97,11 @@ void IDrawableModule::Init()
    assert(!mInitialized);
    mInitialized = true;
 
-   mModuleType = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
-   if (mModuleType == kModuleType_Other)
+   mModuleCategory = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
+   if (mModuleCategory == kModuleCategory_Other)
    {
       if (dynamic_cast<IAudioEffect*>(this))
-         mModuleType = kModuleType_Processor;
+         mModuleCategory = kModuleCategory_Processor;
    }
 
    mCanReceiveAudio = (dynamic_cast<IAudioReceiver*>(this) != nullptr);
@@ -120,7 +120,7 @@ void IDrawableModule::Init()
    if (showEnableToggle)
    {
       mEnabledCheckbox->SetDisplayText(false);
-      mEnabledCheckbox->UseCircleLook(GetColor(mModuleType));
+      mEnabledCheckbox->UseCircleLook(GetColor(mModuleCategory));
    }
    else
    {
@@ -177,7 +177,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
 
    ofTranslate(mX, mY, 0);
 
-   ofColor color = GetColor(mModuleType);
+   ofColor color = GetColor(mModuleCategory);
 
    highlight = 0;
 
@@ -217,7 +217,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    const bool kUseDropshadow = false;
-   if (kUseDropshadow && GetParent() == nullptr && GetModuleType() != kModuleType_Other)
+   if (kUseDropshadow && GetParent() == nullptr && GetModuleCategory() != kModuleCategory_Other)
    {
       const float shadowSize = 20;
       float shadowStrength = .2f + highlight;
@@ -254,7 +254,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    if (PatchCable::sActivePatchCable &&
-       (PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_Modulator && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl) &&
+       (PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_Modulator && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_ValueSetter) &&
        !PatchCable::sActivePatchCable->IsValidTarget(this))
    {
       dimModule = true;
@@ -389,19 +389,19 @@ void IDrawableModule::Render()
 
    if (CanReceiveAudio())
    {
-      ofSetColor(GetColor(kModuleType_Audio));
+      ofSetColor(GetColor(kModuleCategory_Audio));
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceiveNotes())
    {
-      ofSetColor(GetColor(kModuleType_Note));
+      ofSetColor(GetColor(kModuleCategory_Note));
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceivePulses())
    {
-      ofSetColor(GetColor(kModuleType_Pulse));
+      ofSetColor(GetColor(kModuleCategory_Pulse));
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
@@ -409,7 +409,7 @@ void IDrawableModule::Render()
 
    if (IsResizable() && !Minimized())
    {
-      ofColor color = GetColor(mModuleType);
+      ofColor color = GetColor(mModuleCategory);
       ofSetColor(color, 255);
       if (mHoveringOverResizeHandle)
          ofSetLineWidth(4);
@@ -448,7 +448,7 @@ void IDrawableModule::RenderUnclipped()
    ofPushStyle();
 
    ofTranslate(mX, mY, 0);
-   ofColor color = GetColor(mModuleType);
+   ofColor color = GetColor(mModuleCategory);
    ofSetColor(color);
 
    DrawModuleUnclipped();
@@ -467,23 +467,23 @@ void IDrawableModule::DrawPatchCables(bool parentMinimized)
 }
 
 //static
-ofColor IDrawableModule::GetColor(ModuleType type)
+ofColor IDrawableModule::GetColor(ModuleCategory type)
 {
    ofColor color;
    color.setHsb(0, 0, sBrightness);
-   if (type == kModuleType_Note)
+   if (type == kModuleCategory_Note)
       color.setHsb(sHueNote, sSaturation, sBrightness);
-   if (type == kModuleType_Synth)
+   if (type == kModuleCategory_Synth)
       color.setHsb(sHueInstrument, sSaturation, sBrightness);
-   if (type == kModuleType_Audio)
+   if (type == kModuleCategory_Audio)
       color.setHsb(sHueAudio, sSaturation, sBrightness);
-   if (type == kModuleType_Instrument)
+   if (type == kModuleCategory_Instrument)
       color.setHsb(sHueNoteSource, sSaturation, sBrightness);
-   if (type == kModuleType_Processor)
+   if (type == kModuleCategory_Processor)
       color.setHsb(170, 100, 255);
-   if (type == kModuleType_Modulator)
+   if (type == kModuleCategory_Modulator)
       color.setHsb(200, 100, 255);
-   if (type == kModuleType_Pulse)
+   if (type == kModuleCategory_Pulse)
       color.setHsb(43, sSaturation, sBrightness);
    return color;
 }
@@ -513,7 +513,7 @@ void IDrawableModule::DrawConnection(IClickable* target)
 
    PatchCableOld cable = GetPatchCableOld(target);
 
-   ofColor lineColor = GetColor(kModuleType_Other);
+   ofColor lineColor = GetColor(kModuleCategory_Other);
    lineColor.setBrightness(lineColor.getBrightness() * .8f);
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a = lineAlpha;
@@ -577,8 +577,15 @@ void IDrawableModule::Exit()
    }
 }
 
-bool IDrawableModule::TestClick(int x, int y, bool right, bool testOnly /*=false*/)
+bool IDrawableModule::TestClick(float x, float y, bool right, bool testOnly /*=false*/)
 {
+   if (IsResizable() && mHoveringOverResizeHandle)
+   {
+      if (!testOnly)
+         TheSynth->SetResizeModule(this);
+      return true;
+   }
+
    for (auto source : mPatchCableSources)
    {
       if (source->TestClick(x, y, right, testOnly))
@@ -591,7 +598,7 @@ bool IDrawableModule::TestClick(int x, int y, bool right, bool testOnly /*=false
    return false;
 }
 
-void IDrawableModule::OnClicked(int x, int y, bool right)
+void IDrawableModule::OnClicked(float x, float y, bool right)
 {
    float w, h;
    GetModuleDimensions(w, h);
@@ -817,7 +824,7 @@ void IDrawableModule::AddUIControl(IUIControl* control)
    try
    {
       std::string name = control->Name();
-      if (CanSaveState() && name.empty() == false)
+      if (CanModuleTypeSaveState() && name.empty() == false)
       {
          IUIControl* dupe = FindUIControl(name.c_str(), false);
          if (dupe != nullptr)
@@ -1069,17 +1076,19 @@ void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kBaseSaveStateRev = 2;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
 
 void IDrawableModule::SaveState(FileStreamOut& out)
 {
-   if (!CanSaveState())
+   if (!CanModuleTypeSaveState())
       return;
 
-   out << kSaveStateRev;
+   out << GetModuleSaveStateRev();
+
+   out << kBaseSaveStateRev;
 
    std::vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
@@ -1093,6 +1102,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    {
       //ofLog() << "Saving control " << control->Name();
       out << std::string(control->Name());
+      out << control->GetValue(); //save raw value to make it easier to port old values when we change versions
       control->SaveState(out);
       for (int i = 0; i < kControlSeparatorLength; ++i)
          out << kControlSeparator[i];
@@ -1114,13 +1124,31 @@ void IDrawableModule::SaveState(FileStreamOut& out)
       cable->SaveState(out);
 }
 
-void IDrawableModule::LoadState(FileStreamIn& in)
+int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
 {
-   if (!CanSaveState())
+   int rev = -1;
+
+   if (CanModuleTypeSaveState() && ModularSynth::sLoadingFileSaveStateRev >= 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
+   return rev;
+}
+
+void IDrawableModule::LoadState(FileStreamIn& in, int rev)
+{
+   if (!CanModuleTypeSaveState())
       return;
 
-   int rev;
-   in >> rev;
+   if (rev != -1 && ModularSynth::sLoadingFileSaveStateRev >= 423)
+   {
+      int moduleRev;
+      in >> moduleRev;
+      LoadStateValidate(moduleRev == rev);
+   }
+
+   int baseRev;
+   in >> baseRev;
 
    int numUIControls;
    in >> numUIControls;
@@ -1128,7 +1156,11 @@ void IDrawableModule::LoadState(FileStreamIn& in)
    {
       std::string uicontrolname;
       in >> uicontrolname;
-
+      if (baseRev >= 2)
+      {
+         float rawValue;
+         in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
+      }
       UpdateOldControlName(uicontrolname);
 
       bool threwException = false;
@@ -1217,10 +1249,10 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       //ofLog() << "Loading " << childName;
       IDrawableModule* child = FindChild(childName.c_str());
       LoadStateValidate(child);
-      child->LoadState(in);
+      child->LoadState(in, child->LoadModuleSaveStateRev(in));
    }
 
-   if (rev >= 1)
+   if (baseRev >= 1)
    {
       int numPatchCableSources;
       in >> numPatchCableSources;

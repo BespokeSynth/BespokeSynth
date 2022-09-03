@@ -254,6 +254,7 @@
 #include "VelocityToChance.h"
 #include "NoteEcho.h"
 #include "VelocityCurve.h"
+#include "BoundsToPulse.h"
 
 #include <juce_core/juce_core.h>
 
@@ -263,234 +264,235 @@
 
 ModuleFactory::ModuleFactory()
 {
-   REGISTER(LooperRecorder, looperrecorder, kModuleType_Audio);
-   REGISTER(WaveformViewer, waveformviewer, kModuleType_Audio);
-   REGISTER(EffectChain, effectchain, kModuleType_Audio);
-   REGISTER(DrumPlayer, drumplayer, kModuleType_Synth);
-   REGISTER(Chorder, chorder, kModuleType_Note);
-   REGISTER(Arpeggiator, arpeggiator, kModuleType_Note);
-   REGISTER(Monophonify, portamento, kModuleType_Note);
-   REGISTER(StepSequencer, drumsequencer, kModuleType_Instrument);
-   REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleType_Instrument);
-   REGISTER(FMSynth, fmsynth, kModuleType_Synth);
-   REGISTER(MidiController, midicontroller, kModuleType_Instrument);
-   REGISTER(ScaleDetect, scaledetect, kModuleType_Note);
-   REGISTER(KarplusStrong, karplusstrong, kModuleType_Synth);
-   REGISTER(WhiteKeys, whitekeys, kModuleType_Note);
-   //REGISTER(Kicker, kicker, kModuleType_Note);
-   REGISTER(RingModulator, ringmodulator, kModuleType_Audio);
-   REGISTER(Neighborhooder, notewrap, kModuleType_Note);
-   REGISTER(Polyrhythms, polyrhythms, kModuleType_Instrument);
-   REGISTER(Looper, looper, kModuleType_Audio);
-   REGISTER(Rewriter, looperrewriter, kModuleType_Audio);
-   REGISTER(Metronome, metronome, kModuleType_Synth);
-   REGISTER(NoteRouter, noterouter, kModuleType_Note);
-   REGISTER(AudioRouter, audiorouter, kModuleType_Audio);
-   REGISTER(LaunchpadNoteDisplayer, gridnotedisplayer, kModuleType_Note);
-   REGISTER(Vocoder, fftvocoder, kModuleType_Audio);
-   REGISTER(FreqDelay, freqdelay, kModuleType_Audio);
-   REGISTER(VelocitySetter, velocitysetter, kModuleType_Note);
-   REGISTER(NoteSinger, notesinger, kModuleType_Instrument);
-   REGISTER(NoteOctaver, noteoctaver, kModuleType_Note);
-   REGISTER(FourOnTheFloor, fouronthefloor, kModuleType_Instrument);
-   REGISTER(Amplifier, gain, kModuleType_Audio);
-   REGISTER(Presets, presets, kModuleType_Other);
-   REGISTER(NoteStepSequencer, notesequencer, kModuleType_Instrument);
-   REGISTER(SingleOscillator, oscillator, kModuleType_Synth);
-   REGISTER(BandVocoder, vocoder, kModuleType_Audio);
-   REGISTER(Capo, capo, kModuleType_Note);
-   REGISTER(VocoderCarrierInput, vocodercarrier, kModuleType_Audio);
-   REGISTER(InputChannel, input, kModuleType_Audio);
-   REGISTER(OutputChannel, output, kModuleType_Audio);
-   //REGISTER(Eigenharp, eigenharp, kModuleType_Synth);
-   REGISTER(Beats, beats, kModuleType_Synth);
-   REGISTER(Sampler, sampler, kModuleType_Synth);
-   //REGISTER(NoteTransformer, notetransformer, kModuleType_Note);
-   REGISTER(SliderSequencer, slidersequencer, kModuleType_Instrument);
-   REGISTER(VelocityStepSequencer, velocitystepsequencer, kModuleType_Note);
-   REGISTER(SustainPedal, sustainpedal, kModuleType_Note);
-   REGISTER(SamplerGrid, samplergrid, kModuleType_Audio);
-   REGISTER(SignalGenerator, signalgenerator, kModuleType_Synth);
-   REGISTER(Lissajous, lissajous, kModuleType_Audio);
-   REGISTER(TimerDisplay, timerdisplay, kModuleType_Other);
-   REGISTER(DrumSynth, drumsynth, kModuleType_Synth);
-   //REGISTER(EigenChorder, eigenchorder, kModuleType_Note);
-   REGISTER(PitchBender, pitchbender, kModuleType_Note);
-   //REGISTER(EigenharpNoteSource, eigenharpnotesource, kModuleType_Instrument);
-   REGISTER(VinylTempoControl, vinylcontrol, kModuleType_Modulator);
-   REGISTER(NoteFlusher, noteflusher, kModuleType_Note);
-   REGISTER(NoteCanvas, notecanvas, kModuleType_Instrument);
-   REGISTER(CommentDisplay, comment, kModuleType_Other);
-   REGISTER(StutterControl, stutter, kModuleType_Audio);
-   REGISTER(CircleSequencer, circlesequencer, kModuleType_Instrument);
-   REGISTER(MidiOutputModule, midioutput, kModuleType_Note);
-   REGISTER(NoteDisplayer, notedisplayer, kModuleType_Note);
-   REGISTER(AudioMeter, audiometer, kModuleType_Audio);
-   REGISTER(NoteSustain, noteduration, kModuleType_Note);
-   REGISTER(ControlSequencer, controlsequencer, kModuleType_Modulator);
-   REGISTER(PitchSetter, pitchsetter, kModuleType_Note);
-   REGISTER(NoteFilter, notefilter, kModuleType_Note);
-   REGISTER(RandomNoteGenerator, randomnote, kModuleType_Instrument);
-   REGISTER(NoteToFreq, notetofreq, kModuleType_Modulator);
-   REGISTER(MacroSlider, macroslider, kModuleType_Modulator);
-   REGISTER(NoteVibrato, vibrato, kModuleType_Note);
-   REGISTER(ModulationVisualizer, modulationvizualizer, kModuleType_Note);
-   REGISTER(PitchDive, pitchdive, kModuleType_Note);
-   REGISTER(EventCanvas, eventcanvas, kModuleType_Other);
-   REGISTER(NoteCreator, notecreator, kModuleType_Instrument);
-   REGISTER(ValueSetter, valuesetter, kModuleType_Modulator);
-   REGISTER(PreviousNote, previousnote, kModuleType_Note);
-   REGISTER(PressureToVibrato, pressuretovibrato, kModuleType_Note);
-   REGISTER(ModwheelToVibrato, modwheeltovibrato, kModuleType_Note);
-   REGISTER(Pressure, pressure, kModuleType_Note);
-   REGISTER(ModWheel, modwheel, kModuleType_Note);
-   REGISTER(PressureToModwheel, pressuretomodwheel, kModuleType_Note);
-   REGISTER(ModwheelToPressure, modwheeltopressure, kModuleType_Note);
-   REGISTER(FeedbackModule, feedback, kModuleType_Audio);
-   REGISTER(NoteToMs, notetoms, kModuleType_Modulator);
-   REGISTER(Selector, selector, kModuleType_Other);
-   REGISTER(GroupControl, groupcontrol, kModuleType_Other);
-   REGISTER(CurveLooper, curvelooper, kModuleType_Modulator);
-   REGISTER(ScaleDegree, scaledegree, kModuleType_Note);
-   REGISTER(NoteChainNode, notechain, kModuleType_Instrument);
-   REGISTER(NoteDelayer, notedelayer, kModuleType_Note);
-   REGISTER(VelocityScaler, velocityscaler, kModuleType_Note);
-   REGISTER(KeyboardDisplay, keyboarddisplay, kModuleType_Instrument);
-   REGISTER(Ramper, ramper, kModuleType_Modulator);
-   REGISTER(NoteGate, notegate, kModuleType_Note);
-   REGISTER(Prefab, prefab, kModuleType_Other);
-   REGISTER(NoteHumanizer, notehumanizer, kModuleType_Note);
-   REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleType_Note);
-   REGISTER(RadioSequencer, radiosequencer, kModuleType_Other);
-   REGISTER(Splitter, splitter, kModuleType_Audio);
-   REGISTER(Panner, panner, kModuleType_Audio);
-   REGISTER(SamplePlayer, sampleplayer, kModuleType_Synth);
-   REGISTER(AudioSend, send, kModuleType_Audio);
-   REGISTER(EnvelopeModulator, envelope, kModuleType_Modulator);
-   REGISTER(AudioToCV, audiotocv, kModuleType_Modulator);
-   REGISTER(ModulatorAdd, add, kModuleType_Modulator);
-   REGISTER(ModulatorAddCentered, addcentered, kModuleType_Modulator);
-   REGISTER(ModulatorSubtract, subtract, kModuleType_Modulator);
-   REGISTER(PitchToCV, pitchtocv, kModuleType_Modulator);
-   REGISTER(VelocityToCV, velocitytocv, kModuleType_Modulator);
-   REGISTER(PressureToCV, pressuretocv, kModuleType_Modulator);
-   REGISTER(ModWheelToCV, modwheeltocv, kModuleType_Modulator);
-   REGISTER(ModulatorMult, mult, kModuleType_Modulator);
-   REGISTER(ModulatorCurve, curve, kModuleType_Modulator);
-   REGISTER(ModulatorSmoother, smoother, kModuleType_Modulator);
-   REGISTER(NotePanner, notepanner, kModuleType_Note);
-   REGISTER(PitchPanner, pitchpanner, kModuleType_Note);
-   REGISTER(NotePanAlternator, notepanalternator, kModuleType_Note);
-   REGISTER(ChordDisplayer, chorddisplayer, kModuleType_Note);
-   REGISTER(NoteStrummer, notestrummer, kModuleType_Note);
-   REGISTER(SeaOfGrain, seaofgrain, kModuleType_Synth);
-   REGISTER(PitchToSpeed, pitchtospeed, kModuleType_Modulator);
-   REGISTER(NoteToPulse, notetopulse, kModuleType_Pulse);
-   REGISTER(OSCOutput, oscoutput, kModuleType_Other);
-   REGISTER(AudioLevelToCV, leveltocv, kModuleType_Modulator);
-   REGISTER(Pulser, pulser, kModuleType_Pulse);
-   REGISTER(PulseSequence, pulsesequence, kModuleType_Pulse);
-   REGISTER(LinnstrumentControl, linnstrumentcontrol, kModuleType_Note);
-   REGISTER(MultitapDelay, multitapdelay, kModuleType_Audio);
-   REGISTER(Inverter, inverter, kModuleType_Audio);
-   REGISTER(SpectralDisplay, spectrum, kModuleType_Audio);
-   REGISTER(DCOffset, dcoffset, kModuleType_Audio);
-   REGISTER(SignalClamp, signalclamp, kModuleType_Audio);
-   REGISTER(Waveshaper, waveshaper, kModuleType_Audio);
-   REGISTER(NoteHocket, notehocket, kModuleType_Note);
-   REGISTER(NoteRangeFilter, noterangefilter, kModuleType_Note);
-   REGISTER(NoteChance, notechance, kModuleType_Note);
-   REGISTER(PulseChance, pulsechance, kModuleType_Pulse);
-   REGISTER(PulseDelayer, pulsedelayer, kModuleType_Pulse);
-   REGISTER(NotePanRandom, notepanrandom, kModuleType_Note);
-   REGISTER(PulseGate, pulsegate, kModuleType_Pulse);
-   REGISTER(PulseHocket, pulsehocket, kModuleType_Pulse);
-   REGISTER(Push2Control, push2control, kModuleType_Other);
-   REGISTER(PulseTrain, pulsetrain, kModuleType_Pulse);
-   REGISTER(NoteLatch, notelatch, kModuleType_Note);
-   REGISTER(ScriptModule, script, kModuleType_Other);
-   REGISTER(ScriptStatus, scriptstatus, kModuleType_Other);
-   REGISTER(ModulatorGravity, gravity, kModuleType_Modulator);
-   REGISTER(NoteStreamDisplay, notestream, kModuleType_Note);
-   REGISTER(PulseButton, pulsebutton, kModuleType_Pulse);
-   REGISTER(GridModule, grid, kModuleType_Other);
-   REGISTER(FubbleModule, fubble, kModuleType_Modulator);
-   REGISTER(GlobalControls, globalcontrols, kModuleType_Other);
-   REGISTER(ValueStream, valuestream, kModuleType_Other);
-   REGISTER(EQModule, eq, kModuleType_Audio);
-   REGISTER(SampleCapturer, samplecapturer, kModuleType_Audio);
-   REGISTER(NoteQuantizer, quantizer, kModuleType_Note);
-   REGISTER(NoteLooper, notelooper, kModuleType_Instrument);
-   REGISTER(PlaySequencer, playsequencer, kModuleType_Instrument);
-   REGISTER(UnstablePitch, unstablepitch, kModuleType_Note);
-   REGISTER(UnstableModWheel, unstablemodwheel, kModuleType_Note);
-   REGISTER(UnstablePressure, unstablepressure, kModuleType_Note);
-   REGISTER(ChordHolder, chordholder, kModuleType_Note);
-   REGISTER(LooperGranulator, loopergranulator, kModuleType_Other);
-   REGISTER(AudioToPulse, audiotopulse, kModuleType_Pulse);
-   REGISTER(NoteCounter, notecounter, kModuleType_Instrument);
-   REGISTER(PitchRemap, pitchremap, kModuleType_Note);
-   REGISTER(ModulatorExpression, expression, kModuleType_Modulator);
-   REGISTER(SampleCanvas, samplecanvas, kModuleType_Synth);
-   REGISTER(SampleBrowser, samplebrowser, kModuleType_Other);
-   REGISTER(TransposeFrom, transposefrom, kModuleType_Note);
-   REGISTER(NoteStepper, notestepper, kModuleType_Note);
-   REGISTER(M185Sequencer, m185sequencer, kModuleType_Instrument);
-   REGISTER(ModulatorAccum, accum, kModuleType_Modulator);
-   REGISTER(NoteSorter, notesorter, kModuleType_Note);
-   REGISTER(NoteRatchet, noteratchet, kModuleType_Note);
-   REGISTER(MPESmoother, mpesmoother, kModuleType_Note);
-   REGISTER(MidiControlChange, midicc, kModuleType_Note);
-   REGISTER(MPETweaker, mpetweaker, kModuleType_Note);
-   REGISTER(GridSliders, gridsliders, kModuleType_Modulator);
-   REGISTER(MultitrackRecorder, multitrackrecorder, kModuleType_Other);
-   REGISTER(NoteExpressionRouter, noteexpression, kModuleType_Note);
-   REGISTER(FloatSliderLFOControl, lfo, kModuleType_Other);
-   REGISTER(NoteToggle, notetoggle, kModuleType_Other);
-   REGISTER(NoteTable, notetable, kModuleType_Note);
-   REGISTER(AbletonLink, abletonlink, kModuleType_Other);
-   REGISTER(MidiClockIn, clockin, kModuleType_Other);
-   REGISTER(MidiClockOut, clockout, kModuleType_Other);
-   REGISTER(VelocityToChance, velocitytochance, kModuleType_Note);
-   REGISTER(NoteEcho, noteecho, kModuleType_Note);
-   REGISTER(VelocityCurve, velocitycurve, kModuleType_Note);
+   REGISTER(LooperRecorder, looperrecorder, kModuleCategory_Audio);
+   REGISTER(WaveformViewer, waveformviewer, kModuleCategory_Audio);
+   REGISTER(EffectChain, effectchain, kModuleCategory_Audio);
+   REGISTER(DrumPlayer, drumplayer, kModuleCategory_Synth);
+   REGISTER(Chorder, chorder, kModuleCategory_Note);
+   REGISTER(Arpeggiator, arpeggiator, kModuleCategory_Note);
+   REGISTER(Monophonify, portamento, kModuleCategory_Note);
+   REGISTER(StepSequencer, drumsequencer, kModuleCategory_Instrument);
+   REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleCategory_Instrument);
+   REGISTER(FMSynth, fmsynth, kModuleCategory_Synth);
+   REGISTER(MidiController, midicontroller, kModuleCategory_Instrument);
+   REGISTER(ScaleDetect, scaledetect, kModuleCategory_Note);
+   REGISTER(KarplusStrong, karplusstrong, kModuleCategory_Synth);
+   REGISTER(WhiteKeys, whitekeys, kModuleCategory_Note);
+   //REGISTER(Kicker, kicker, kModuleCategory_Note);
+   REGISTER(RingModulator, ringmodulator, kModuleCategory_Audio);
+   REGISTER(Neighborhooder, notewrap, kModuleCategory_Note);
+   REGISTER(Polyrhythms, polyrhythms, kModuleCategory_Instrument);
+   REGISTER(Looper, looper, kModuleCategory_Audio);
+   REGISTER(Rewriter, looperrewriter, kModuleCategory_Audio);
+   REGISTER(Metronome, metronome, kModuleCategory_Synth);
+   REGISTER(NoteRouter, noterouter, kModuleCategory_Note);
+   REGISTER(AudioRouter, audiorouter, kModuleCategory_Audio);
+   REGISTER(LaunchpadNoteDisplayer, gridnotedisplayer, kModuleCategory_Note);
+   REGISTER(Vocoder, fftvocoder, kModuleCategory_Audio);
+   REGISTER(FreqDelay, freqdelay, kModuleCategory_Audio);
+   REGISTER(VelocitySetter, velocitysetter, kModuleCategory_Note);
+   REGISTER(NoteSinger, notesinger, kModuleCategory_Instrument);
+   REGISTER(NoteOctaver, noteoctaver, kModuleCategory_Note);
+   REGISTER(FourOnTheFloor, fouronthefloor, kModuleCategory_Instrument);
+   REGISTER(Amplifier, gain, kModuleCategory_Audio);
+   REGISTER(Presets, presets, kModuleCategory_Other);
+   REGISTER(NoteStepSequencer, notesequencer, kModuleCategory_Instrument);
+   REGISTER(SingleOscillator, oscillator, kModuleCategory_Synth);
+   REGISTER(BandVocoder, vocoder, kModuleCategory_Audio);
+   REGISTER(Capo, capo, kModuleCategory_Note);
+   REGISTER(VocoderCarrierInput, vocodercarrier, kModuleCategory_Audio);
+   REGISTER(InputChannel, input, kModuleCategory_Audio);
+   REGISTER(OutputChannel, output, kModuleCategory_Audio);
+   //REGISTER(Eigenharp, eigenharp, kModuleCategory_Synth);
+   REGISTER(Beats, beats, kModuleCategory_Synth);
+   REGISTER(Sampler, sampler, kModuleCategory_Synth);
+   //REGISTER(NoteTransformer, notetransformer, kModuleCategory_Note);
+   REGISTER(SliderSequencer, slidersequencer, kModuleCategory_Instrument);
+   REGISTER(VelocityStepSequencer, velocitystepsequencer, kModuleCategory_Note);
+   REGISTER(SustainPedal, sustainpedal, kModuleCategory_Note);
+   REGISTER(SamplerGrid, samplergrid, kModuleCategory_Audio);
+   REGISTER(SignalGenerator, signalgenerator, kModuleCategory_Synth);
+   REGISTER(Lissajous, lissajous, kModuleCategory_Audio);
+   REGISTER(TimerDisplay, timerdisplay, kModuleCategory_Other);
+   REGISTER(DrumSynth, drumsynth, kModuleCategory_Synth);
+   //REGISTER(EigenChorder, eigenchorder, kModuleCategory_Note);
+   REGISTER(PitchBender, pitchbender, kModuleCategory_Note);
+   //REGISTER(EigenharpNoteSource, eigenharpnotesource, kModuleCategory_Instrument);
+   REGISTER(VinylTempoControl, vinylcontrol, kModuleCategory_Modulator);
+   REGISTER(NoteFlusher, noteflusher, kModuleCategory_Note);
+   REGISTER(NoteCanvas, notecanvas, kModuleCategory_Instrument);
+   REGISTER(CommentDisplay, comment, kModuleCategory_Other);
+   REGISTER(StutterControl, stutter, kModuleCategory_Audio);
+   REGISTER(CircleSequencer, circlesequencer, kModuleCategory_Instrument);
+   REGISTER(MidiOutputModule, midioutput, kModuleCategory_Note);
+   REGISTER(NoteDisplayer, notedisplayer, kModuleCategory_Note);
+   REGISTER(AudioMeter, audiometer, kModuleCategory_Audio);
+   REGISTER(NoteSustain, noteduration, kModuleCategory_Note);
+   REGISTER(ControlSequencer, controlsequencer, kModuleCategory_Modulator);
+   REGISTER(PitchSetter, pitchsetter, kModuleCategory_Note);
+   REGISTER(NoteFilter, notefilter, kModuleCategory_Note);
+   REGISTER(RandomNoteGenerator, randomnote, kModuleCategory_Instrument);
+   REGISTER(NoteToFreq, notetofreq, kModuleCategory_Modulator);
+   REGISTER(MacroSlider, macroslider, kModuleCategory_Modulator);
+   REGISTER(NoteVibrato, vibrato, kModuleCategory_Note);
+   REGISTER(ModulationVisualizer, modulationvizualizer, kModuleCategory_Note);
+   REGISTER(PitchDive, pitchdive, kModuleCategory_Note);
+   REGISTER(EventCanvas, eventcanvas, kModuleCategory_Other);
+   REGISTER(NoteCreator, notecreator, kModuleCategory_Instrument);
+   REGISTER(ValueSetter, valuesetter, kModuleCategory_Modulator);
+   REGISTER(PreviousNote, previousnote, kModuleCategory_Note);
+   REGISTER(PressureToVibrato, pressuretovibrato, kModuleCategory_Note);
+   REGISTER(ModwheelToVibrato, modwheeltovibrato, kModuleCategory_Note);
+   REGISTER(Pressure, pressure, kModuleCategory_Note);
+   REGISTER(ModWheel, modwheel, kModuleCategory_Note);
+   REGISTER(PressureToModwheel, pressuretomodwheel, kModuleCategory_Note);
+   REGISTER(ModwheelToPressure, modwheeltopressure, kModuleCategory_Note);
+   REGISTER(FeedbackModule, feedback, kModuleCategory_Audio);
+   REGISTER(NoteToMs, notetoms, kModuleCategory_Modulator);
+   REGISTER(Selector, selector, kModuleCategory_Other);
+   REGISTER(GroupControl, groupcontrol, kModuleCategory_Other);
+   REGISTER(CurveLooper, curvelooper, kModuleCategory_Modulator);
+   REGISTER(ScaleDegree, scaledegree, kModuleCategory_Note);
+   REGISTER(NoteChainNode, notechain, kModuleCategory_Instrument);
+   REGISTER(NoteDelayer, notedelayer, kModuleCategory_Note);
+   REGISTER(VelocityScaler, velocityscaler, kModuleCategory_Note);
+   REGISTER(KeyboardDisplay, keyboarddisplay, kModuleCategory_Instrument);
+   REGISTER(Ramper, ramper, kModuleCategory_Modulator);
+   REGISTER(NoteGate, notegate, kModuleCategory_Note);
+   REGISTER(Prefab, prefab, kModuleCategory_Other);
+   REGISTER(NoteHumanizer, notehumanizer, kModuleCategory_Note);
+   REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleCategory_Note);
+   REGISTER(RadioSequencer, radiosequencer, kModuleCategory_Other);
+   REGISTER(Splitter, splitter, kModuleCategory_Audio);
+   REGISTER(Panner, panner, kModuleCategory_Audio);
+   REGISTER(SamplePlayer, sampleplayer, kModuleCategory_Synth);
+   REGISTER(AudioSend, send, kModuleCategory_Audio);
+   REGISTER(EnvelopeModulator, envelope, kModuleCategory_Modulator);
+   REGISTER(AudioToCV, audiotocv, kModuleCategory_Modulator);
+   REGISTER(ModulatorAdd, add, kModuleCategory_Modulator);
+   REGISTER(ModulatorAddCentered, addcentered, kModuleCategory_Modulator);
+   REGISTER(ModulatorSubtract, subtract, kModuleCategory_Modulator);
+   REGISTER(PitchToCV, pitchtocv, kModuleCategory_Modulator);
+   REGISTER(VelocityToCV, velocitytocv, kModuleCategory_Modulator);
+   REGISTER(PressureToCV, pressuretocv, kModuleCategory_Modulator);
+   REGISTER(ModWheelToCV, modwheeltocv, kModuleCategory_Modulator);
+   REGISTER(ModulatorMult, mult, kModuleCategory_Modulator);
+   REGISTER(ModulatorCurve, curve, kModuleCategory_Modulator);
+   REGISTER(ModulatorSmoother, smoother, kModuleCategory_Modulator);
+   REGISTER(NotePanner, notepanner, kModuleCategory_Note);
+   REGISTER(PitchPanner, pitchpanner, kModuleCategory_Note);
+   REGISTER(NotePanAlternator, notepanalternator, kModuleCategory_Note);
+   REGISTER(ChordDisplayer, chorddisplayer, kModuleCategory_Note);
+   REGISTER(NoteStrummer, notestrummer, kModuleCategory_Note);
+   REGISTER(SeaOfGrain, seaofgrain, kModuleCategory_Synth);
+   REGISTER(PitchToSpeed, pitchtospeed, kModuleCategory_Modulator);
+   REGISTER(NoteToPulse, notetopulse, kModuleCategory_Pulse);
+   REGISTER(OSCOutput, oscoutput, kModuleCategory_Other);
+   REGISTER(AudioLevelToCV, leveltocv, kModuleCategory_Modulator);
+   REGISTER(Pulser, pulser, kModuleCategory_Pulse);
+   REGISTER(PulseSequence, pulsesequence, kModuleCategory_Pulse);
+   REGISTER(LinnstrumentControl, linnstrumentcontrol, kModuleCategory_Note);
+   REGISTER(MultitapDelay, multitapdelay, kModuleCategory_Audio);
+   REGISTER(Inverter, inverter, kModuleCategory_Audio);
+   REGISTER(SpectralDisplay, spectrum, kModuleCategory_Audio);
+   REGISTER(DCOffset, dcoffset, kModuleCategory_Audio);
+   REGISTER(SignalClamp, signalclamp, kModuleCategory_Audio);
+   REGISTER(Waveshaper, waveshaper, kModuleCategory_Audio);
+   REGISTER(NoteHocket, notehocket, kModuleCategory_Note);
+   REGISTER(NoteRangeFilter, noterangefilter, kModuleCategory_Note);
+   REGISTER(NoteChance, notechance, kModuleCategory_Note);
+   REGISTER(PulseChance, pulsechance, kModuleCategory_Pulse);
+   REGISTER(PulseDelayer, pulsedelayer, kModuleCategory_Pulse);
+   REGISTER(NotePanRandom, notepanrandom, kModuleCategory_Note);
+   REGISTER(PulseGate, pulsegate, kModuleCategory_Pulse);
+   REGISTER(PulseHocket, pulsehocket, kModuleCategory_Pulse);
+   REGISTER(Push2Control, push2control, kModuleCategory_Other);
+   REGISTER(PulseTrain, pulsetrain, kModuleCategory_Pulse);
+   REGISTER(NoteLatch, notelatch, kModuleCategory_Note);
+   REGISTER(ScriptModule, script, kModuleCategory_Other);
+   REGISTER(ScriptStatus, scriptstatus, kModuleCategory_Other);
+   REGISTER(ModulatorGravity, gravity, kModuleCategory_Modulator);
+   REGISTER(NoteStreamDisplay, notestream, kModuleCategory_Note);
+   REGISTER(PulseButton, pulsebutton, kModuleCategory_Pulse);
+   REGISTER(GridModule, grid, kModuleCategory_Other);
+   REGISTER(FubbleModule, fubble, kModuleCategory_Modulator);
+   REGISTER(GlobalControls, globalcontrols, kModuleCategory_Other);
+   REGISTER(ValueStream, valuestream, kModuleCategory_Other);
+   REGISTER(EQModule, eq, kModuleCategory_Audio);
+   REGISTER(SampleCapturer, samplecapturer, kModuleCategory_Audio);
+   REGISTER(NoteQuantizer, quantizer, kModuleCategory_Note);
+   REGISTER(NoteLooper, notelooper, kModuleCategory_Instrument);
+   REGISTER(PlaySequencer, playsequencer, kModuleCategory_Instrument);
+   REGISTER(UnstablePitch, unstablepitch, kModuleCategory_Note);
+   REGISTER(UnstableModWheel, unstablemodwheel, kModuleCategory_Note);
+   REGISTER(UnstablePressure, unstablepressure, kModuleCategory_Note);
+   REGISTER(ChordHolder, chordholder, kModuleCategory_Note);
+   REGISTER(LooperGranulator, loopergranulator, kModuleCategory_Other);
+   REGISTER(AudioToPulse, audiotopulse, kModuleCategory_Pulse);
+   REGISTER(NoteCounter, notecounter, kModuleCategory_Instrument);
+   REGISTER(PitchRemap, pitchremap, kModuleCategory_Note);
+   REGISTER(ModulatorExpression, expression, kModuleCategory_Modulator);
+   REGISTER(SampleCanvas, samplecanvas, kModuleCategory_Synth);
+   REGISTER(SampleBrowser, samplebrowser, kModuleCategory_Other);
+   REGISTER(TransposeFrom, transposefrom, kModuleCategory_Note);
+   REGISTER(NoteStepper, notestepper, kModuleCategory_Note);
+   REGISTER(M185Sequencer, m185sequencer, kModuleCategory_Instrument);
+   REGISTER(ModulatorAccum, accum, kModuleCategory_Modulator);
+   REGISTER(NoteSorter, notesorter, kModuleCategory_Note);
+   REGISTER(NoteRatchet, noteratchet, kModuleCategory_Note);
+   REGISTER(MPESmoother, mpesmoother, kModuleCategory_Note);
+   REGISTER(MidiControlChange, midicc, kModuleCategory_Note);
+   REGISTER(MPETweaker, mpetweaker, kModuleCategory_Note);
+   REGISTER(GridSliders, gridsliders, kModuleCategory_Modulator);
+   REGISTER(MultitrackRecorder, multitrackrecorder, kModuleCategory_Other);
+   REGISTER(NoteExpressionRouter, noteexpression, kModuleCategory_Note);
+   REGISTER(FloatSliderLFOControl, lfo, kModuleCategory_Modulator);
+   REGISTER(NoteToggle, notetoggle, kModuleCategory_Other);
+   REGISTER(NoteTable, notetable, kModuleCategory_Note);
+   REGISTER(AbletonLink, abletonlink, kModuleCategory_Other);
+   REGISTER(MidiClockIn, clockin, kModuleCategory_Other);
+   REGISTER(MidiClockOut, clockout, kModuleCategory_Other);
+   REGISTER(VelocityToChance, velocitytochance, kModuleCategory_Note);
+   REGISTER(NoteEcho, noteecho, kModuleCategory_Note);
+   REGISTER(VelocityCurve, velocitycurve, kModuleCategory_Note);
+   REGISTER(BoundsToPulse, boundstopulse, kModuleCategory_Pulse);
 
-   //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
-   REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
-   REGISTER_HIDDEN(TakeRecorder, takerecorder, kModuleType_Audio);
-   REGISTER_HIDDEN(LoopStorer, loopstorer, kModuleType_Other);
-   REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleType_Audio);
-   REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleType_Other);
-   REGISTER_HIDDEN(ComboGridController, combogrid, kModuleType_Other);
-   REGISTER_HIDDEN(VSTPlugin, vstplugin, kModuleType_Synth);
-   REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleType_Audio);
-   REGISTER_HIDDEN(Producer, producer, kModuleType_Audio);
-   REGISTER_HIDDEN(ChaosEngine, chaosengine, kModuleType_Other);
-   REGISTER_HIDDEN(MultibandCompressor, multiband, kModuleType_Audio);
-   REGISTER_HIDDEN(ControllingSong, controllingsong, kModuleType_Synth);
-   REGISTER_HIDDEN(PanicButton, panicbutton, kModuleType_Other);
-   REGISTER_HIDDEN(DebugAudioSource, debugaudiosource, kModuleType_Synth);
-   REGISTER_HIDDEN(FollowingSong, followingsong, kModuleType_Synth);
-   REGISTER_HIDDEN(BeatBloks, beatbloks, kModuleType_Synth);
-   REGISTER_HIDDEN(FilterViz, filterviz, kModuleType_Other);
-   REGISTER_HIDDEN(FreqDomainBoilerplate, freqdomainboilerplate, kModuleType_Audio);
-   REGISTER_HIDDEN(FFTtoAdditive, ffttoadditive, kModuleType_Audio);
-   REGISTER_HIDDEN(SlowLayers, slowlayers, kModuleType_Audio);
-   REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleType_Synth);
+   //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
+   REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
+   REGISTER_HIDDEN(TakeRecorder, takerecorder, kModuleCategory_Audio);
+   REGISTER_HIDDEN(LoopStorer, loopstorer, kModuleCategory_Other);
+   REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleCategory_Audio);
+   REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleCategory_Other);
+   REGISTER_HIDDEN(ComboGridController, combogrid, kModuleCategory_Other);
+   REGISTER_HIDDEN(VSTPlugin, plugin, kModuleCategory_Synth);
+   REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleCategory_Audio);
+   REGISTER_HIDDEN(Producer, producer, kModuleCategory_Audio);
+   REGISTER_HIDDEN(ChaosEngine, chaosengine, kModuleCategory_Other);
+   REGISTER_HIDDEN(MultibandCompressor, multiband, kModuleCategory_Audio);
+   REGISTER_HIDDEN(ControllingSong, controllingsong, kModuleCategory_Synth);
+   REGISTER_HIDDEN(PanicButton, panicbutton, kModuleCategory_Other);
+   REGISTER_HIDDEN(DebugAudioSource, debugaudiosource, kModuleCategory_Synth);
+   REGISTER_HIDDEN(FollowingSong, followingsong, kModuleCategory_Synth);
+   REGISTER_HIDDEN(BeatBloks, beatbloks, kModuleCategory_Synth);
+   REGISTER_HIDDEN(FilterViz, filterviz, kModuleCategory_Other);
+   REGISTER_HIDDEN(FreqDomainBoilerplate, freqdomainboilerplate, kModuleCategory_Audio);
+   REGISTER_HIDDEN(FFTtoAdditive, ffttoadditive, kModuleCategory_Audio);
+   REGISTER_HIDDEN(SlowLayers, slowlayers, kModuleCategory_Audio);
+   REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleCategory_Synth);
 #ifdef BESPOKE_MAC
-   REGISTER_HIDDEN(KompleteKontrol, kompletekontrol, kModuleType_Note);
+   REGISTER_HIDDEN(KompleteKontrol, kompletekontrol, kModuleCategory_Note);
 #endif
-   REGISTER_HIDDEN(PSMoveController, psmove, kModuleType_Other);
-   REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
-   REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
-   REGISTER_HIDDEN(LFOController, lfocontroller, kModuleType_Other); //old, probably irrelevant
-   REGISTER_HIDDEN(Razor, razor, kModuleType_Synth);
-   REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleType_Note);
-   REGISTER_HIDDEN(ScriptReferenceDisplay, scriptingreference, kModuleType_Other);
-   REGISTER_HIDDEN(MultitrackRecorderTrack, multitrackrecordertrack, kModuleType_Audio);
+   REGISTER_HIDDEN(PSMoveController, psmove, kModuleCategory_Other);
+   REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleCategory_Synth);
+   REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleCategory_Other);
+   REGISTER_HIDDEN(LFOController, lfocontroller, kModuleCategory_Other); //old, probably irrelevant
+   REGISTER_HIDDEN(Razor, razor, kModuleCategory_Synth);
+   REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleCategory_Note);
+   REGISTER_HIDDEN(ScriptReferenceDisplay, scriptingreference, kModuleCategory_Other);
+   REGISTER_HIDDEN(MultitrackRecorderTrack, multitrackrecordertrack, kModuleCategory_Audio);
 }
 
-void ModuleFactory::Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)
+void ModuleFactory::Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleCategory moduleType, bool hidden, bool experimental)
 {
    mFactoryMap[type] = creator;
    mCanCreateMap[type] = canCreate;
@@ -514,34 +516,50 @@ IDrawableModule* ModuleFactory::MakeModule(std::string type)
    return nullptr;
 }
 
-std::vector<std::string> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
+std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleCategory moduleType)
 {
-   std::vector<std::string> modules;
+   std::vector<ModuleFactory::Spawnable> modules{};
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if (mModuleTypeMap[iter->first] == moduleType &&
           (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
-         modules.push_back(iter->first);
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = iter->first;
+         modules.push_back(spawnable);
+      }
    }
 
-   if (moduleType == kModuleType_Audio)
+   if (moduleType == kModuleCategory_Audio)
    {
       std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
       for (auto effect : effects)
-         modules.push_back(effect + " " + kEffectChainSuffix);
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = effect;
+         spawnable.mDecorator = kEffectChainSuffix;
+         spawnable.mSpawnMethod = SpawnMethod::EffectChain;
+         modules.push_back(spawnable);
+      }
    }
 
-   sort(modules.begin(), modules.end());
+   std::sort(modules.begin(), modules.end(), Spawnable::compare);
    return modules;
 }
 
 namespace
 {
-   bool CheckHeldKeysMatch(juce::String name, std::string heldKeys)
+   bool CheckHeldKeysMatch(juce::String name, std::string heldKeys, bool continuous)
    {
       name = name.toLowerCase();
 
-      if (name.isEmpty() || heldKeys.empty() || name[0] != heldKeys[0])
+      if (name.isEmpty() || heldKeys.empty())
+         return false;
+
+      if (continuous)
+         return name.contains(heldKeys);
+
+      if (name[0] != heldKeys[0])
          return false;
 
       int stringPos = 0;
@@ -562,85 +580,112 @@ namespace
    }
 }
 
-std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
+std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::string keys, bool continuousString)
 {
-   std::vector<juce::String> modules;
+   std::vector<ModuleFactory::Spawnable> modules{};
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if ((mIsHiddenModuleMap[iter->first] == false || gShowDevModules) &&
-          CheckHeldKeysMatch(iter->first, keys))
-         modules.push_back(iter->first);
+          CheckHeldKeysMatch(iter->first, keys, continuousString))
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = iter->first;
+         modules.push_back(spawnable);
+      }
    }
 
-   std::vector<std::string> vsts;
+   std::vector<juce::PluginDescription> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
-   std::vector<std::string> matchingVsts;
-   for (auto vstFile : vsts)
+   std::vector<juce::PluginDescription> matchingVsts;
+   for (auto& pluginDesc : vsts)
    {
-      std::string vstName = juce::File(vstFile).getFileName().toStdString();
-      if (CheckHeldKeysMatch(vstName, keys))
-         matchingVsts.push_back(vstFile);
+      std::string pluginName = pluginDesc.name.toStdString();
+      if (CheckHeldKeysMatch(pluginName, keys, continuousString))
+         matchingVsts.push_back(pluginDesc);
    }
    const int kMaxQuickspawnVstCount = 10;
-   if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
-   {
-      for (auto vstFile : matchingVsts)
-      {
-         std::string vstName = juce::File(vstFile).getFileName().toStdString();
-         modules.push_back(vstName + " " + kVSTSuffix);
-      }
-   }
-   else
-   {
+   if ((int)matchingVsts.size() > kMaxQuickspawnVstCount)
       VSTLookup::SortByLastUsed(matchingVsts);
-      for (int i = 0; i < kMaxQuickspawnVstCount; ++i)
-      {
-         std::string vstName = juce::File(matchingVsts[i]).getFileName().toStdString();
-         modules.push_back(vstName + " " + kVSTSuffix);
-      }
+
+   for (int i = 0; i < (int)matchingVsts.size() && i < kMaxQuickspawnVstCount; ++i)
+   {
+      ModuleFactory::Spawnable spawnable{};
+      auto& pluginDesc = matchingVsts[i];
+      spawnable.mLabel = pluginDesc.name.toStdString();
+      spawnable.mDecorator = "[" + ModuleFactory::Spawnable::GetPluginLabel(pluginDesc) + "]";
+      spawnable.mPluginDesc = pluginDesc;
+      spawnable.mSpawnMethod = SpawnMethod::Plugin;
+      modules.push_back(spawnable);
    }
 
-   std::vector<std::string> prefabs;
+   std::vector<Spawnable> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
    for (auto prefab : prefabs)
    {
-      if (CheckHeldKeysMatch(prefab, keys) || keys[0] == ';')
-         modules.push_back(prefab + " " + kPrefabSuffix);
+      if (CheckHeldKeysMatch(prefab.mLabel, keys, continuousString) || keys[0] == ';')
+         modules.push_back(prefab);
    }
 
    std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
    for (auto midicontroller : midicontrollers)
    {
-      if (CheckHeldKeysMatch(midicontroller, keys))
-         modules.push_back(midicontroller + " " + kMidiControllerSuffix);
+      if (CheckHeldKeysMatch(midicontroller, keys, continuousString))
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = midicontroller;
+         spawnable.mDecorator = kMidiControllerSuffix;
+         spawnable.mSpawnMethod = SpawnMethod::MidiController;
+         modules.push_back(spawnable);
+      }
    }
 
    std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    for (auto effect : effects)
    {
-      if (CheckHeldKeysMatch(effect, keys))
-         modules.push_back(effect + " " + kEffectChainSuffix);
+      if (CheckHeldKeysMatch(effect, keys, continuousString))
+      {
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = effect;
+         spawnable.mDecorator = kEffectChainSuffix;
+         spawnable.mSpawnMethod = SpawnMethod::EffectChain;
+         modules.push_back(spawnable);
+      }
    }
-   sort(modules.begin(), modules.end());
+   sort(modules.begin(), modules.end(), Spawnable::compare);
 
-   std::vector<std::string> ret;
+   std::vector<ModuleFactory::Spawnable> ret;
    for (size_t i = 0; i < modules.size(); ++i)
-      ret.push_back(modules[i].toStdString());
+      ret.push_back(modules[i]);
 
    return ret;
 }
 
-ModuleType ModuleFactory::GetModuleType(std::string typeName)
+ModuleCategory ModuleFactory::GetModuleType(std::string typeName)
 {
    if (mModuleTypeMap.find(typeName) != mModuleTypeMap.end())
       return mModuleTypeMap[typeName];
-   if (juce::String(typeName).endsWith(kVSTSuffix))
-      return kModuleType_Synth;
+   if (juce::String(typeName).endsWith(kPluginSuffix))
+      return kModuleCategory_Synth;
    if (juce::String(typeName).endsWith(kMidiControllerSuffix))
-      return kModuleType_Instrument;
+      return kModuleCategory_Instrument;
    if (juce::String(typeName).endsWith(kEffectChainSuffix))
-      return kModuleType_Audio;
-   return kModuleType_Other;
+      return kModuleCategory_Audio;
+   return kModuleCategory_Other;
+}
+
+ModuleCategory ModuleFactory::GetModuleType(Spawnable spawnable)
+{
+   if (spawnable.mSpawnMethod == SpawnMethod::Module && mModuleTypeMap.find(spawnable.mLabel) != mModuleTypeMap.end())
+      return mModuleTypeMap[spawnable.mLabel];
+   if (spawnable.mSpawnMethod == SpawnMethod::Plugin)
+      return kModuleCategory_Synth;
+   if (spawnable.mSpawnMethod == SpawnMethod::MidiController)
+      return kModuleCategory_Instrument;
+   if (spawnable.mSpawnMethod == SpawnMethod::EffectChain)
+      return kModuleCategory_Audio;
+   if (spawnable.mSpawnMethod == SpawnMethod::Prefab)
+      return kModuleCategory_Other;
+   return kModuleCategory_Other;
 }
 
 bool ModuleFactory::IsExperimental(std::string typeName)
@@ -651,7 +696,7 @@ bool ModuleFactory::IsExperimental(std::string typeName)
 }
 
 //static
-void ModuleFactory::GetPrefabs(std::vector<std::string>& prefabs)
+void ModuleFactory::GetPrefabs(std::vector<ModuleFactory::Spawnable>& prefabs)
 {
    using namespace juce;
    File dir(ofToDataPath("prefabs"));
@@ -660,7 +705,13 @@ void ModuleFactory::GetPrefabs(std::vector<std::string>& prefabs)
    for (auto file : files)
    {
       if (file.getFileExtension() == ".pfb")
-         prefabs.push_back(file.getFileName().toStdString());
+      {
+         ModuleFactory::Spawnable spawnable;
+         spawnable.mLabel = file.getFileName().toStdString();
+         spawnable.mDecorator = kPrefabSuffix;
+         spawnable.mSpawnMethod = SpawnMethod::Prefab;
+         prefabs.push_back(spawnable);
+      }
    }
 }
 
@@ -675,6 +726,9 @@ std::string ModuleFactory::FixUpTypeName(std::string name)
 
    if (name == "bandvocoder")
       return "vocoder";
+
+   if (name == "vstplugin")
+      return "plugin";
 
    return name;
 }

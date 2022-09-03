@@ -44,16 +44,17 @@ void Presets::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid("uigrid", 5, 38, 120, 50, 8, 3, this);
-   mBlendTimeSlider = new FloatSlider(this, "blend ms", 5, 20, 70, 15, &mBlendTime, 0, 5000);
-   mCurrentPresetSlider = new IntSlider(this, "preset", 45, 3, 80, 15, &mCurrentPreset, 0, mGrid->GetCols() * mGrid->GetRows() - 1);
+   mBlendTimeSlider = new FloatSlider(this, "blend", 5, 20, 70, 15, &mBlendTime, 0, 5000);
+   mCurrentPresetSlider = new IntSlider(this, "preset", 35, 3, 64, 15, &mCurrentPreset, 0, mGrid->GetCols() * mGrid->GetRows() - 1);
    mRandomizeButton = new ClickButton(this, "random", 78, 20);
+   mAddButton = new ClickButton(this, "add", 101, 3);
 
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
-      ofColor color = IDrawableModule::GetColor(kModuleType_Other);
+      ofColor color = IDrawableModule::GetColor(kModuleCategory_Other);
       color.a *= .3f;
       mModuleCable->SetColor(color);
-      mModuleCable->SetManualPosition(15, 10);
+      mModuleCable->SetManualPosition(10, 10);
       mModuleCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
       //mModuleCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
       AddPatchCableSource(mModuleCable);
@@ -61,10 +62,10 @@ void Presets::CreateUIControls()
 
    {
       mUIControlCable = new PatchCableSource(this, kConnectionType_UIControl);
-      ofColor color = IDrawableModule::GetColor(kModuleType_Modulator);
+      ofColor color = IDrawableModule::GetColor(kModuleCategory_Modulator);
       color.a *= .3f;
       mUIControlCable->SetColor(color);
-      mUIControlCable->SetManualPosition(30, 10);
+      mUIControlCable->SetManualPosition(25, 10);
       mUIControlCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
       //mUIControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
       AddPatchCableSource(mUIControlCable);
@@ -77,13 +78,19 @@ void Presets::Init()
 
    int defaultPreset = mModuleSaveData.GetInt("defaultpreset");
    if (defaultPreset != -1)
-      SetPreset(defaultPreset);
+      SetPreset(defaultPreset, false);
 
    TheTransport->AddAudioPoller(this);
 }
 
 void Presets::Poll()
 {
+   if (mQueuedPresetIndex != -1)
+   {
+      SetPreset(mQueuedPresetIndex, false);
+      mQueuedPresetIndex = -1;
+   }
+
    if (mDrawSetPresetsCountdown > 0)
    {
       --mDrawSetPresetsCountdown;
@@ -106,6 +113,7 @@ void Presets::DrawModule()
    mBlendTimeSlider->Draw();
    mCurrentPresetSlider->Draw();
    mRandomizeButton->Draw();
+   mAddButton->Draw();
 
    int hover = mGrid->CurrentHover();
    if (hover != -1 && !mPresetCollection.empty())
@@ -129,10 +137,18 @@ void Presets::DrawModule()
       ofPopStyle();
    }
 
-   if (mShiftHeld != shiftHeld)
+   if (!shiftHeld)
    {
-      mShiftHeld = shiftHeld;
-      UpdateGridValues();
+      ofVec2f pos = mGrid->GetCellPosition(mCurrentPreset % mGrid->GetCols(), mCurrentPreset / mGrid->GetCols()) + mGrid->GetPosition(true);
+      float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+      float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+
+      ofPushStyle();
+      ofSetColor(255, 255, 255);
+      ofSetLineWidth(2);
+      ofNoFill();
+      ofRect(pos.x, pos.y, xsize, ysize);
+      ofPopStyle();
    }
 }
 
@@ -145,13 +161,11 @@ void Presets::UpdateGridValues()
       float val = 0;
       if (mPresetCollection[i].mPresets.empty() == false)
          val = .5f;
-      if (i == mCurrentPreset && !mShiftHeld)
-         val = 1;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
 }
 
-void Presets::OnClicked(int x, int y, bool right)
+void Presets::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -169,7 +183,7 @@ void Presets::OnClicked(int x, int y, bool right)
       if (GetKeyModifiers() == kModifier_Shift)
          Store(mCurrentPreset);
       else
-         SetPreset(mCurrentPreset);
+         SetPreset(mCurrentPreset, false);
 
       UpdateGridValues();
    }
@@ -187,13 +201,19 @@ void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    if (pitch < (int)mPresetCollection.size())
    {
       mCurrentPreset = pitch;
-      SetPreset(pitch);
+      SetPreset(pitch, true);
       UpdateGridValues();
    }
 }
 
-void Presets::SetPreset(int idx)
+void Presets::SetPreset(int idx, bool queueForMainThread)
 {
+   if (queueForMainThread && !mForceImmediateSet)
+   {
+      mQueuedPresetIndex = idx;
+      return;
+   }
+
    assert(idx >= 0 && idx < mPresetCollection.size());
 
    if (mBlendTime > 0)
@@ -204,6 +224,7 @@ void Presets::SetPreset(int idx)
       mBlendRamps.clear();
    }
 
+   sPresetHighlightControls.clear();
    const PresetCollection& coll = mPresetCollection[idx];
    for (std::list<Preset>::const_iterator i = coll.mPresets.begin();
         i != coll.mPresets.end(); ++i)
@@ -392,13 +413,27 @@ void Presets::ButtonClicked(ClickButton* button)
 {
    if (button == mRandomizeButton)
       RandomizeTargets();
+
+   if (button == mAddButton)
+   {
+      for (size_t i = 0; i < mPresetCollection.size(); ++i)
+      {
+         if (mPresetCollection[i].mPresets.empty())
+         {
+            Store(i);
+            mCurrentPreset = i;
+            UpdateGridValues();
+            break;
+         }
+      }
+   }
 }
 
 void Presets::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mCurrentPresetSlider)
    {
-      SetPreset(mCurrentPreset);
+      SetPreset(mCurrentPreset, true);
       UpdateGridValues();
    }
 }
@@ -442,6 +477,7 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
    mModuleSaveData.LoadFloat("gridheight", moduleInfo, 50, 15, 1000);
+   mModuleSaveData.LoadBool("force_immediate_set", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -449,18 +485,14 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 void Presets::SetUpFromSaveData()
 {
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
-}
-
-namespace
-{
-   const int kSaveStateRev = 1;
+   mForceImmediateSet = mModuleSaveData.GetBool("force_immediate_set");
 }
 
 void Presets::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << (int)mPresetCollection.size();
    for (auto& coll : mPresetCollection)
@@ -491,13 +523,13 @@ void Presets::SaveState(FileStreamOut& out)
       out << control->Path();
 }
 
-void Presets::LoadState(FileStreamIn& in)
+void Presets::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int collSize;
    in >> collSize;
@@ -556,6 +588,14 @@ void Presets::LoadState(FileStreamIn& in)
          mUIControlCable->AddPatchCable(control);
       }
    }
+}
+
+void Presets::UpdateOldControlName(std::string& oldName)
+{
+   IDrawableModule::UpdateOldControlName(oldName);
+
+   if (oldName == "blend ms")
+      oldName = "blend";
 }
 
 std::vector<IUIControl*> Presets::ControlsToNotSetDuringLoadState() const

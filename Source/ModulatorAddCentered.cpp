@@ -65,21 +65,21 @@ void ModulatorAddCentered::PostRepatch(PatchCableSource* cableSource, bool fromU
 {
    OnModulatorRepatch();
 
-   if (mTarget)
+   if (mSliderTarget)
    {
-      mValue1 = mTarget->GetValue();
+      mValue1 = mSliderTarget->GetValue();
       mValue2 = 0;
-      mValue1Slider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mValue1Slider->SetMode(mTarget->GetMode());
-      mValue2RangeSlider->SetExtents(0, mTarget->GetMax() - mTarget->GetMin());
+      mValue1Slider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
+      mValue1Slider->SetMode(mSliderTarget->GetMode());
+      mValue2RangeSlider->SetExtents(0, mSliderTarget->GetMax() - mSliderTarget->GetMin());
    }
 }
 
 float ModulatorAddCentered::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   if (mTarget)
-      return ofClamp(mValue1 + mValue2 * mValue2Range, mTarget->GetMin(), mTarget->GetMax());
+   if (mSliderTarget)
+      return ofClamp(mValue1 + mValue2 * mValue2Range, mSliderTarget->GetMin(), mSliderTarget->GetMax());
    else
       return mValue1 + mValue2 * mValue2Range;
 }
@@ -87,22 +87,13 @@ float ModulatorAddCentered::Value(int samplesIn)
 void ModulatorAddCentered::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ModulatorAddCentered::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void ModulatorAddCentered::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

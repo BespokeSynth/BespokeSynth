@@ -67,8 +67,10 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
+   void UpdateOldControlName(std::string& oldName) override;
 
    static std::vector<IUIControl*> sPresetHighlightControls;
 
@@ -76,7 +78,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
 private:
-   void SetPreset(int idx);
+   void SetPreset(int idx, bool queueForMainThread);
    void Store(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
@@ -88,7 +90,7 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
    struct Preset
@@ -130,6 +132,7 @@ private:
    UIGrid* mGrid{ nullptr };
    std::vector<PresetCollection> mPresetCollection;
    ClickButton* mRandomizeButton{ nullptr };
+   ClickButton* mAddButton{ nullptr };
    int mDrawSetPresetsCountdown{ 0 };
    std::vector<IDrawableModule*> mPresetModules{};
    std::vector<IUIControl*> mPresetControls{};
@@ -143,7 +146,8 @@ private:
    IntSlider* mCurrentPresetSlider{ nullptr };
    PatchCableSource* mModuleCable{ nullptr };
    PatchCableSource* mUIControlCable{ nullptr };
-   bool mShiftHeld{ false };
+   int mQueuedPresetIndex{ -1 };
+   bool mForceImmediateSet{ false };
 };
 
 

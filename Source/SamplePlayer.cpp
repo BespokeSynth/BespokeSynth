@@ -774,7 +774,7 @@ void SamplePlayer::FillData(std::vector<float> data)
    UpdateSample(sample, true);
 }
 
-void SamplePlayer::OnClicked(int x, int y, bool right)
+void SamplePlayer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -1270,7 +1270,7 @@ void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
    }
 }
 
-bool SamplePlayer::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool SamplePlayer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (fabs(scrollX) > fabsf(scrollY))
       scrollY = 0;
@@ -1401,16 +1401,11 @@ void SamplePlayer::SetUpFromSaveData()
    Resize(mModuleSaveData.GetFloat("width"), mModuleSaveData.GetFloat("height"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void SamplePlayer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    bool hasSample = (mSample != nullptr);
    out << hasSample;
@@ -1427,13 +1422,13 @@ void SamplePlayer::SaveState(FileStreamOut& out)
    }
 }
 
-void SamplePlayer::LoadState(FileStreamIn& in)
+void SamplePlayer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    bool hasSample;
    in >> hasSample;

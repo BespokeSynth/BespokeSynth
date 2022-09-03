@@ -53,10 +53,10 @@ radiosequencer~sequence to only enable one value at a time. patch it to the "ena
 
 
 presets~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
-~save~[todo]
-~blend ms~length of time to blend preset values over
+~blend~length of time in milliseconds over which to blend preset values
 ~preset~jump to a preset
 ~random~randomize connected controls
+~add~snapshot the currently connected controls to the next available preset slot
 
 
 
@@ -119,6 +119,9 @@ globalcontrols~interface controls, intended to allow you to use midi controllers
 ~lissajous r~amount of red in background lissajous curve
 ~lissajous g~amount of green in background lissajous curve
 ~lissajous b~amount of blue in background lissajous curve
+~background r~amount of red in background color
+~background g~amount of green in background color
+~background b~amount of blue in background color
 
 
 
@@ -139,6 +142,26 @@ eventcanvas~schedule values to set over time
 
 comment~a box to display some text, to explain a section of a patch
 ~comment~type text here
+
+
+
+clockout~sends out clock pulses to synchronize external midi devices
+~device~device to target
+~send start~send a signal to reset the gear to the start of its sequence
+~multiplier~tempo multiplier for how the gear should respond to the signals
+
+
+
+clockin~reads in clock pulses from external midi devices to control bespoke's transport
+~device~device to receive from
+~rounding~precision to round incoming tempo data
+~start offset ms~offset in milliseconds to tweak synchronization between bespoke and gear
+~smoothing~how much to smooth incoming tempo
+
+
+
+abletonlink~synchronizes transport with software and devices that support ableton link
+~offset ms~offset in milliseconds to tweak synchronization
 
 
 
@@ -169,6 +192,10 @@ pulser~send pulse messages at an interval
 
 pulsehocket~sends pulses to randomized destinations
 ~weight *~chance that pulse goes to this destination
+~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -184,7 +211,10 @@ pulsedelayer~delay pulses
 
 pulsechance~randomly allow pulses through, based on chance
 ~chance~chance that pulses are allowed through
-
+~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 pulsebutton~trigger a pulse with a button press
@@ -202,6 +232,11 @@ audiotopulse~sends a pulse when the audio level surpasses a specified threshold
 
 
 
+boundstopulse~sends a pulse when its input slider hits its max or min limit
+~input~the slider to check bounds on
+
+
+
 vinylcontrol~modulator which outputs a speed value based upon control vinyl input audio. provide it with a stereo signal from control vinyl (like you'd use to control serato) patched in from an "input" module.
 ~control~enable/disable transport control. when you enable it, it will use the current speed as the reference speed (so, the output will output a value of 1 until you change the vinyl's speed)
 
@@ -210,12 +245,14 @@ vinylcontrol~modulator which outputs a speed value based upon control vinyl inpu
 velocitytocv~take a note's velocity and convert it to a modulation value
 ~min~output for velocity 0
 ~max~output for velocity 127
+~0 at note off~output zero when note is released
 
 
 
 valuesetter~set a specified value on a targeted control
 ~value~value to set
 ~set~click here to send the value (or, send a pulse to this module for the same result)
+~slider~value to set
 
 
 
@@ -360,6 +397,7 @@ controlsequencer~modulate a control step-wise at an interval
 ~interval~rate to advance
 ~length~length of the sequence
 ~random~randomize sequence values
+~step *~value for this step
 
 
 
@@ -518,6 +556,9 @@ notechain~trigger a note, followed by a pulse to trigger another note after a de
 
 notecanvas~looping note roll
 ~quantize~quantize selected notes to interval
+~save midi~export canvas contents to a midi file
+~load midi~import canvas contents from a midi file
+~loadtrack~which track number to import when using "load midi"
 ~play~play notes on canvas
 ~rec~record input notes to canvas
 ~free rec~enable record mode, and extend canvas if we reach the end
@@ -603,6 +644,7 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~r den~density of the randomizer output. the higher this is, the busier the random output will be.
 ~r amt~the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.
 ~r lock*~lock this row so it doesn't get randomized
+~random*~randomize this row
 
 
 
@@ -917,6 +959,7 @@ butterworth~filter using the butterworth formula
 
 compressor~try to keep volume at a certain level
 ~mix~amount of compression. lower this value for a "parallel compression" effect. you should use this mix slider instead of the effectchain's mix slider, to compensate for lookahead.
+~drive~rescale input to affect how much compression affects it
 ~threshold~threshold where gain should start to be reduced
 ~ratio~how much gain reduction to apply when the single passes the threshold
 ~attack~speed to apply gain reduction
@@ -1363,6 +1406,8 @@ drumplayer~sample player intended for drum playback
 ~test *~play this sample
 ~random *~choose a random sample from the selected hitcategory
 ~grab *~grab this sample
+~prev *~choose the previous sample from the selected hitcategory
+~next *~choose the next sample from the selected hitcategory
 
 
 
@@ -1373,6 +1418,7 @@ beats~multi-loop player, for mixing sample layers together
 ~double*~enable this to play at double speed
 ~bars*~how many measures long are the samples in this slot?
 ~selector*~which sample should we play in this slot? drag samples onto here to add them to this slot.
+~delete *~remove the current sample from the list
 
 
 
@@ -1401,6 +1447,16 @@ vibrato~add rhythmic oscillating pitch bend to notes
 
 
 
+velocitytochance~use a note's velocity to determine the chance that the note plays
+~full velocity~set velocity to full for notes that pass through
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
+
+
+
 velocitystepsequencer~adjusts the velocity of incoming notes based upon a sequence
 ~interval~speed to advance sequence
 ~len~length of sequence
@@ -1417,6 +1473,10 @@ velocitysetter~set a note's velocity to this value
 
 velocityscaler~scale a note's velocity to be higher or lower
 ~scale~amount to multiply velocity by
+
+
+
+velocitycurve~adjust velocity based upon a curve mapping
 
 
 
@@ -1484,7 +1544,7 @@ pressure~add pressure modulation to notes
 
 
 portamento~only allows one note to play at a time, and uses pitch bend to glide between notes
-~require held~if enabled, only glide to a new note if an old note is held. otherwise, always glide, based upon the prior input note.
+~mode~always: always glide to new notes\nretrigger held: bend to notes if the prior note is held, and retrigger\nbend held: bend to notes if the prior note is held, without retriggering
 ~glide~time to glide, in milliseconds
 
 
@@ -1548,6 +1608,11 @@ noteexpression~control where notes are routed based upon evaluated expressions. 
 
 
 
+noteecho~output incoming notes at specified delays
+~delay *~amount of time to delay this output, in measures
+
+
+
 noteratchet~rapidly repeat an input note over a duration
 ~duration~total length of time repeats should last
 ~subdivision~length of each repeat
@@ -1595,6 +1660,11 @@ notehumanizer~add randomness to timing and velocity
 
 notehocket~sends notes to random destinations
 ~weight *~chance that note goes to this destination
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -1636,6 +1706,11 @@ notedelayer~delay input notes by a specified amount
 
 notechance~randomly allow notes through
 ~chance~probability that a note is allowed
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -1649,7 +1724,7 @@ mpetweaker~adjust incoming MPE modulation values
 
 
 
-mpesmoother~[no tooltip]
+mpesmoother~smooth out MPE parameters
 ~pitch~amount to smooth incoming pitchbend
 ~pressure~amount to smooth incoming pressure
 ~modwheel~amount to smooth incoming modwheel
@@ -1820,6 +1895,8 @@ scale~controls the global scale used by various modules
 ~PPO~pitches per octave
 ~tuning~what frequency does the pitch defined in "note" represent?
 ~note~the pitch that maps to the frequency defined in "tuning"
+~load SCL~load SCL file to determine scale
+~load KBM~load KBM file to determine keyboard mapping
 
 
 
@@ -1830,3 +1907,49 @@ output~route audio in here to send it to an output channel (your speakers or aud
 
 gain~adjusts volume of audio signal
 ~gain~amount to adjust signal. a value of 1 will cause no change to the signal.
+
+
+
+userprefseditor~settings for bespoke. some settings changes require bespoke to be restarted before taking effect.
+~devicetype~what kind of audio device bespoke should use (requires restart)
+~audio_output_device~which device to use for audio output (requires restart)
+~audio_input_device~which device to use for audio input (requires restart)
+~samplerate~what sample rate to use with your audio device (requires restart)
+~buffersize~what buffer size to use with your audio device. lower values use require more CPU power, higher values add more latency. (requires restart)
+~oversampling~global oversampling multiplier. uses additional CPU for higher-resolution audio processing. (requires restart)
+~width~width of bespoke's window on startup
+~height~height of bespoke's window on startup
+~set_manual_window_position~should we force bespoke to a specific position on startup
+~position_x~desired x position of upper-left corner
+~position_y~desired y position of upper-left corner
+~zoom~desired canvas zoom level on startup
+~ui_scale~scale of UI layer (title bar, quickspawn menu, etc)
+~grid_snap_size~grid size to use when snapping module position (hold alt/option while dragging a module)
+~scroll_multiplier_vertical~adjustment to vertical mouse/trackpad scroll speed
+~scroll_multiplier_horizontal~adjustment to horizontal mouse/trackpad scroll speed
+~autosave~should autosave be enabled on startup
+~show_tooltips_on_load~should tooltips be enabled on startup
+~show_minimap~should the minimap be displayed (requires restart)
+~record_buffer_length_minutes~length of always-on recording buffer for "write audio" button in the title bar (requires restart)
+~vst_always_on_top~should plugin windows always stay on top of bespoke when opened
+~max_output_channels~number of output channels to allocate (requires restart)
+~max_input_channels~number of input channels to allocate (requires restart)
+~plugin_preference_order~semicolon-separated list of plugin formats, in preferred order. if a plugin exists with multiple formats, only the most preferred format will be shown. leave this blank to always show all plugins. (default value: "VST3;VST;AudioUnit;LV2")
+~draw_background_lissajous~should the background lissajous curve draw
+~fade_cable_middle~should longer cables draw with a fadeout effect in the middle
+~cable_quality~visual resolution of the cables
+~lissajous_r~red RGB value of lissajous curve
+~lissajous_g~green RGB value of lissajous curve
+~lissajous_b~blue RGB value of lissajous curve
+~background_r~red RGB value of canvas background
+~background_g~green RGB value of canvas background
+~background_b~blue RGB value of canvas background
+~motion_trails~amount of visual motion blur to use (increases/decreases "ghosting" of previous frames)
+~draw_module_highlights~should modules visually flash in response to activity
+~mouse_offset_x~x offset between system mouse position and bespoke's cursor placement
+~mouse_offset_y~y offset between system mouse position and bespoke's cursor placement
+~recordings_path~where "write audio" and multitrackrecorder wav files save
+~tooltips~what path we should use for the tooltip file (changing this allows for other languages to be used for tooltips)
+~layout~what template bespoke should use on startup
+~youtube_dl_path~the path to your youtube-dl installation (used for youtube downloading in sampleplayer module)
+~ffmpeg_path~the path to your ffmpeg installation (used for youtube downloading in sampleplayer module)

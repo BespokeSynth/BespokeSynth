@@ -44,7 +44,7 @@ NoteStepSequencer::NoteStepSequencer()
       mNoteLengths[i] = 1;
    }
 
-   RandomizePitches(true);
+   RandomizePitches(false);
 
    TheScale->AddListener(this);
 }
@@ -87,7 +87,7 @@ void NoteStepSequencer::CreateUIControls()
 
    UIBLOCK(220, 20, 150);
    FLOATSLIDER(mRandomizePitchChanceSlider, "rand pitch chance", &mRandomizePitchChance, 0, 1);
-   FLOATSLIDER(mRandomizePitchRangeSlider, "rand pitch range", &mRandomizePitchRange, 0, 1);
+   INTSLIDER(mRandomizePitchVarietySlider, "rand pitch variety", &mRandomizePitchVariety, 1, 10);
    UIBLOCK_NEWCOLUMN();
    FLOATSLIDER(mRandomizeLengthChanceSlider, "rand len chance", &mRandomizeLengthChance, 0, 1);
    FLOATSLIDER(mRandomizeLengthRangeSlider, "rand len range", &mRandomizeLengthRange, 0, 1);
@@ -151,7 +151,7 @@ void NoteStepSequencer::CreateUIControls()
    {
       mStepCables[i] = new AdditionalNoteCable();
       mStepCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mStepCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1));
+      mStepCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]->GetPatchCableSource());
    }
 }
@@ -215,7 +215,7 @@ void NoteStepSequencer::DrawModule()
    mGridControlOffsetXSlider->Draw();
    mGridControlOffsetYSlider->Draw();
    mRandomizePitchChanceSlider->Draw();
-   mRandomizePitchRangeSlider->Draw();
+   mRandomizePitchVarietySlider->Draw();
    mRandomizeLengthChanceSlider->Draw();
    mRandomizeLengthRangeSlider->Draw();
    mRandomizeVelocityChanceSlider->Draw();
@@ -329,7 +329,7 @@ void NoteStepSequencer::DrawModule()
       {
          mToneDropdowns[i]->SetShowing(mShowStepControls);
          mToneDropdowns[i]->SetPosition(gridX + boxWidth * i, controlYPos);
-         mToneDropdowns[i]->SetWidth(boxWidth);
+         mToneDropdowns[i]->SetWidth(std::min(boxWidth, 30.0f));
          mToneDropdowns[i]->Draw();
 
          mVelocitySliders[i]->SetShowing(mShowStepControls);
@@ -366,7 +366,7 @@ void NoteStepSequencer::DrawModule()
    ofPopStyle();
 }
 
-void NoteStepSequencer::OnClicked(int x, int y, bool right)
+void NoteStepSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -389,10 +389,10 @@ bool NoteStepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool NoteStepSequencer::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool NoteStepSequencer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   mGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
-   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
+   mGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
+   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
 }
 
@@ -949,15 +949,15 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    }
    else
    {
+      //reduce overall randomness: choose from a limited pool of pitches
+      std::vector<int> newTones;
+      for (int i = 0; i < mRandomizePitchVariety; ++i)
+         newTones.push_back(ofClamp(int(ofRandom(0, mNoteRange) + .5f), 0, mNoteRange - 1));
+
       for (int i = 0; i < mLength; ++i)
       {
          if (ofRandom(1) <= mRandomizePitchChance)
-         {
-            float minValue = MAX(0, mTones[i] - mNoteRange * mRandomizePitchRange);
-            float maxValue = MIN(mNoteRange, mTones[i] + mNoteRange * mRandomizePitchRange);
-            if (minValue != maxValue)
-               mTones[i] = ofClamp(int(ofRandom(minValue, maxValue) + .5f), 0, mNoteRange - 1);
-         }
+            mTones[i] = newTones[gRandom() % newTones.size()];
       }
    }
 }
@@ -1070,7 +1070,7 @@ void NoteStepSequencer::SetUpStepControls()
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {
       mToneDropdowns[i]->Clear();
-      for (int j = 0; j < mNoteRange; ++j)
+      for (int j = mNoteRange - 1; j >= 0; --j)
          mToneDropdowns[i]->AddLabel(NoteName(RowToPitch(j), false, true), j);
    }
 }
@@ -1103,29 +1103,24 @@ void NoteStepSequencer::SetUpFromSaveData()
    SetUpStepControls();
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void NoteStepSequencer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
    mVelocityGrid->SaveState(out);
    out << mHasExternalPulseSource;
 }
 
-void NoteStepSequencer::LoadState(FileStreamIn& in)
+void NoteStepSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mGrid->LoadState(in);
    mVelocityGrid->LoadState(in);

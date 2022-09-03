@@ -355,7 +355,7 @@ void SamplerGrid::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void SamplerGrid::OnClicked(int x, int y, bool right)
+void SamplerGrid::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -441,16 +441,11 @@ void SamplerGrid::CheckboxUpdated(Checkbox* checkbox)
 {
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void SamplerGrid::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    for (int i = 0; i < mCols * mRows; ++i)
    {
@@ -464,13 +459,13 @@ void SamplerGrid::SaveState(FileStreamOut& out)
    }
 }
 
-void SamplerGrid::LoadState(FileStreamIn& in)
+void SamplerGrid::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    //LoadStateValidate(false); //TODO(Ryan) temp hack fix because samplergrid was loading funny
 

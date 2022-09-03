@@ -36,7 +36,7 @@ class Selector : public IDrawableModule, public IRadioButtonListener, public INo
 {
 public:
    Selector();
-   ~Selector();
+   ~Selector() override;
    static IDrawableModule* Create() { return new Selector(); }
 
 
@@ -45,7 +45,6 @@ public:
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
    //INoteReceiver

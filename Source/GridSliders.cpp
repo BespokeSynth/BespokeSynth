@@ -53,8 +53,9 @@ void GridSliders::CreateUIControls()
 
    for (size_t i = 0; i < mControlCables.size(); ++i)
    {
-      mControlCables[i] = new PatchCableSource(this, kConnectionType_Modulator);
+      mControlCables[i] = new PatchCableSource(this, kConnectionType_ValueSetter);
       mControlCables[i]->SetManualPosition(i * 12 + 8, 28);
+      mControlCables[i]->SetManualSide(PatchCableSource::Side::kBottom);
       AddPatchCableSource(mControlCables[i]);
    }
 }
@@ -128,7 +129,8 @@ void GridSliders::OnGridButton(int x, int y, float velocity, IGridController* gr
       if (sliderIndex < mControlCables.size() && mControlCables[sliderIndex]->GetTarget())
       {
          float value = squareIndex / float(length - 1);
-         dynamic_cast<IUIControl*>(mControlCables[sliderIndex]->GetTarget())->SetFromMidiCC(value);
+         for (auto& cable : mControlCables[sliderIndex]->GetPatchCables())
+            dynamic_cast<IUIControl*>(cable->GetTarget())->SetFromMidiCC(value);
       }
    }
 }
@@ -159,7 +161,7 @@ void GridSliders::DrawModule()
    }
 }
 
-void GridSliders::OnClicked(int x, int y, bool right)
+void GridSliders::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -213,16 +215,11 @@ void GridSliders::SetUpFromSaveData()
 {
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void GridSliders::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << (int)mControlCables.size();
    for (auto cable : mControlCables)
@@ -234,13 +231,13 @@ void GridSliders::SaveState(FileStreamOut& out)
    }
 }
 
-void GridSliders::LoadState(FileStreamIn& in)
+void GridSliders::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int size;
    in >> size;

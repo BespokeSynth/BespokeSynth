@@ -76,6 +76,8 @@ void HelpDisplay::LoadHelp()
       ofStringReplace(help, "\r", "");
       mHelpText = ofSplitString(help, "\n");
    }
+
+   mMaxScrollAmount = (int)mHelpText.size() * 14;
 }
 
 void HelpDisplay::DrawModule()
@@ -105,11 +107,14 @@ void HelpDisplay::DrawModule()
    mDiscordLinkButton->Draw();
 
    mHeight = 100;
+   const int kLineHeight = 14;
+   ofClipWindow(0, mHeight, mWidth, (int)mHelpText.size() * kLineHeight, true);
    for (size_t i = 0; i < mHelpText.size(); ++i)
    {
-      DrawTextNormal(mHelpText[i], 4, mHeight);
+      DrawTextNormal(mHelpText[i], 4, mHeight - mScrollOffsetY);
       mHeight += 14;
    }
+   ofResetClipWindow();
 
    static int sScreenshotDelay = 0;
    if (sScreenshotDelay <= 0)
@@ -119,8 +124,7 @@ void HelpDisplay::DrawModule()
          std::string typeName = mScreenshotModule->GetTypeName();
          if (!mScreenshotsToProcess.empty())
          {
-            typeName = *mScreenshotsToProcess.begin();
-            ofStringReplace(typeName, " " + std::string(ModuleFactory::kEffectChainSuffix), ""); //strip this suffix if it's there
+            typeName = mScreenshotsToProcess.begin()->mLabel;
             mScreenshotsToProcess.pop_front();
          }
 
@@ -139,7 +143,7 @@ void HelpDisplay::DrawModule()
       {
          mScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
 
-         if (mScreenshotsToProcess.front() == "drumplayer")
+         if (mScreenshotsToProcess.front().mLabel == "drumplayer")
             mScreenshotModule->FindUIControl("edit")->SetValue(1);
 
          sScreenshotDelay = 10;
@@ -149,6 +153,12 @@ void HelpDisplay::DrawModule()
    {
       --sScreenshotDelay;
    }
+}
+
+bool HelpDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+{
+   mScrollOffsetY = ofClamp(mScrollOffsetY - scrollY * 10, 0, mMaxScrollAmount);
+   return true;
 }
 
 void HelpDisplay::GetModuleDimensions(float& w, float& h)
@@ -377,20 +387,20 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
    {
       LoadTooltips();
 
-      std::vector<ModuleType> moduleTypes = {
-         kModuleType_Note,
-         kModuleType_Synth,
-         kModuleType_Audio,
-         kModuleType_Instrument,
-         kModuleType_Processor,
-         kModuleType_Modulator,
-         kModuleType_Pulse,
-         kModuleType_Other
+      std::vector<ModuleCategory> moduleTypes = {
+         kModuleCategory_Note,
+         kModuleCategory_Synth,
+         kModuleCategory_Audio,
+         kModuleCategory_Instrument,
+         kModuleCategory_Processor,
+         kModuleCategory_Modulator,
+         kModuleCategory_Pulse,
+         kModuleCategory_Other
       };
       for (auto type : moduleTypes)
       {
-         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
-         for (auto toSpawn : spawnable)
+         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         for (auto toSpawn : modules)
             TheSynth->SpawnModuleOnTheFly(toSpawn, 0, 0);
       }
 
@@ -465,25 +475,30 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       mScreenshotsToProcess.push_back("drumplayer");
       mScreenshotsToProcess.push_back("notesequencer");*/
 
-      std::vector<ModuleType> moduleTypes = {
-         kModuleType_Note,
-         kModuleType_Synth,
-         kModuleType_Audio,
-         kModuleType_Instrument,
-         kModuleType_Processor,
-         kModuleType_Modulator,
-         kModuleType_Pulse,
-         kModuleType_Other
+      std::vector<ModuleCategory> moduleTypes = {
+         kModuleCategory_Note,
+         kModuleCategory_Synth,
+         kModuleCategory_Audio,
+         kModuleCategory_Instrument,
+         kModuleCategory_Processor,
+         kModuleCategory_Modulator,
+         kModuleCategory_Pulse,
+         kModuleCategory_Other
       };
       for (auto type : moduleTypes)
       {
-         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
-         for (auto toSpawn : spawnable)
+         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         for (auto toSpawn : modules)
             mScreenshotsToProcess.push_back(toSpawn);
       }
 
       for (auto effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
-         mScreenshotsToProcess.push_back(effect + " " + ModuleFactory::kEffectChainSuffix);
+      {
+         ModuleFactory::Spawnable spawnable;
+         spawnable.mLabel = effect;
+         spawnable.mSpawnMethod = ModuleFactory::SpawnMethod::EffectChain;
+         mScreenshotsToProcess.push_back(spawnable);
+      }
    }
    if (button == mDoModuleDocumentationButton)
    {
@@ -508,41 +523,41 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
          docs[moduleType.module]["canReceivePulses"] = false;
       }
 
-      std::vector<ModuleType> moduleTypes = {
-         kModuleType_Note,
-         kModuleType_Synth,
-         kModuleType_Audio,
-         kModuleType_Instrument,
-         kModuleType_Processor,
-         kModuleType_Modulator,
-         kModuleType_Pulse,
-         kModuleType_Other
+      std::vector<ModuleCategory> moduleTypes = {
+         kModuleCategory_Note,
+         kModuleCategory_Synth,
+         kModuleCategory_Audio,
+         kModuleCategory_Instrument,
+         kModuleCategory_Processor,
+         kModuleCategory_Modulator,
+         kModuleCategory_Pulse,
+         kModuleCategory_Other
       };
       for (auto type : moduleTypes)
       {
-         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
-         for (auto toSpawn : spawnable)
+         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         for (auto toSpawn : modules)
          {
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);
 
             std::string moduleType;
-            switch (module->GetModuleType())
+            switch (module->GetModuleCategory())
             {
-               case kModuleType_Note: moduleType = "note effects"; break;
-               case kModuleType_Synth: moduleType = "synths"; break;
-               case kModuleType_Audio: moduleType = "audio effects"; break;
-               case kModuleType_Instrument: moduleType = "instruments"; break;
-               case kModuleType_Processor: moduleType = "effect chain"; break;
-               case kModuleType_Modulator: moduleType = "modulators"; break;
-               case kModuleType_Pulse: moduleType = "pulse"; break;
-               case kModuleType_Other: moduleType = "other"; break;
-               case kModuleType_Unknown: moduleType = "unknown"; break;
+               case kModuleCategory_Note: moduleType = "note effects"; break;
+               case kModuleCategory_Synth: moduleType = "synths"; break;
+               case kModuleCategory_Audio: moduleType = "audio effects"; break;
+               case kModuleCategory_Instrument: moduleType = "instruments"; break;
+               case kModuleCategory_Processor: moduleType = "effect chain"; break;
+               case kModuleCategory_Modulator: moduleType = "modulators"; break;
+               case kModuleCategory_Pulse: moduleType = "pulse"; break;
+               case kModuleCategory_Other: moduleType = "other"; break;
+               case kModuleCategory_Unknown: moduleType = "unknown"; break;
             }
 
-            docs[toSpawn]["type"] = moduleType;
-            docs[toSpawn]["canReceiveAudio"] = module->CanReceiveAudio();
-            docs[toSpawn]["canReceiveNote"] = module->CanReceiveNotes();
-            docs[toSpawn]["canReceivePulses"] = module->CanReceivePulses();
+            docs[toSpawn.mLabel]["type"] = moduleType;
+            docs[toSpawn.mLabel]["canReceiveAudio"] = module->CanReceiveAudio();
+            docs[toSpawn.mLabel]["canReceiveNote"] = module->CanReceiveNotes();
+            docs[toSpawn.mLabel]["canReceivePulses"] = module->CanReceivePulses();
 
             module->GetOwningContainer()->DeleteModule(module);
          }

@@ -225,7 +225,7 @@ bool UIGrid::CanAdjustMultislider() const
    return !mRequireShiftForMultislider || (GetKeyModifiers() & kModifier_Shift);
 }
 
-void UIGrid::OnClicked(int x, int y, bool right)
+void UIGrid::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
@@ -401,7 +401,7 @@ bool UIGrid::MouseMoved(float x, float y)
    return false;
 }
 
-bool UIGrid::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool UIGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar)
    {

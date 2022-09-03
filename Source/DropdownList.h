@@ -80,13 +80,13 @@ public:
    void ButtonClicked(ClickButton* button) override;
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    int mWidth{ 1 };
    int mHeight{ 1 };
    int mColumnWidth{ 1 };
    float mMouseX{ -1 };
    float mMouseY{ -1 };
-   DropdownList* mOwner{ nullptr };
+   DropdownList* mOwner;
    ClickButton* mPagePrevButton{ nullptr };
    ClickButton* mPageNextButton{ nullptr };
    bool mIsScrolling{ false };
@@ -115,7 +115,7 @@ public:
       CalculateWidth();
    }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
-   void SetWidth(int width) { mWidth = width; }
+   void SetWidth(int width);
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
    void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
    void SetMaxPerColumn(int max)
@@ -128,6 +128,8 @@ public:
    DropdownListModal* GetModalDropdown() { return &mModalList; }
    float GetMaxItemWidth() const { return mMaxItemWidth; }
    void ChangePage(int direction);
+   void AddSeparator(int index) { mSeparators.push_back(index); }
+   void ClearSeparators() { mSeparators.clear(); }
 
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override;
@@ -152,7 +154,7 @@ protected:
    ~DropdownList(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void CalcSliderVal();
    int FindItemIndex(float val) const;
    void SetValue(int value, bool forceUpdate);
@@ -178,6 +180,7 @@ private:
    bool mAutoCalculateWidth{ false };
    bool mDrawTriangle{ true };
    double mLastScrolledTime{ -9999 };
+   std::vector<int> mSeparators;
 };
 
 #endif /* defined(__modularSynth__DropdownList__) */

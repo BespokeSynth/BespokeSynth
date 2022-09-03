@@ -180,7 +180,7 @@ void FubbleModule::DrawModule()
       }
    }
 
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    ofPushMatrix();
    if (mAxisH.GetCableSource()->GetTarget())
       DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), rect.width * .4f, rect.height - 2);
@@ -191,7 +191,7 @@ void FubbleModule::DrawModule()
 
    //draw curve
    ofPushStyle();
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    DrawTextNormal("length: " + ofToString(mLength, 2), 5, 15);
    ofSetColor(220, 220, 220);
    ofNoFill();
@@ -232,7 +232,7 @@ void FubbleModule::DrawModule()
    if (mIsDrawing || IsHovered() || mIsRightClicking)
    {
       ofNoFill();
-      ofSetColor(GetColor(kModuleType_Modulator), (mIsDrawing || mIsRightClicking) ? 255 : 50);
+      ofSetColor(GetColor(kModuleCategory_Modulator), (mIsDrawing || mIsRightClicking) ? 255 : 50);
       ofCircle(GetFubbleMouseCoord().x * rect.width, (1 - GetFubbleMouseCoord().y) * rect.height, 5);
    }
    ofPopStyle();
@@ -246,7 +246,7 @@ void FubbleModule::DrawModule()
    ofRect(0, 0, mWidth - 20, 20);
    mAxisH.mCurve.SetDimensions(mWidth - 20, 20);
    mAxisH.mCurve.Render();
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    if (mAxisH.GetCableSource()->GetTarget())
       DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), 5, 15);
 
@@ -255,7 +255,7 @@ void FubbleModule::DrawModule()
    ofRect(0, 0, mWidth - 20, 20);
    mAxisV.mCurve.SetDimensions(mWidth - 20, 20);
    mAxisV.mCurve.Render();
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    if (mAxisV.GetCableSource()->GetTarget())
       DrawTextNormal(mAxisV.GetCableSource()->GetTarget()->Name(), 5, 15);
 
@@ -274,23 +274,23 @@ void FubbleModule::DrawModule()
    if (mAxisH.GetCableSource()->GetTarget() && mAxisH.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
       mAxisH.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
-      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0));
+      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
    }
    else
    {
       mAxisH.GetCableSource()->SetManualPosition(rightAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
-      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
+      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    }
 
    if (mAxisV.GetCableSource()->GetTarget() && mAxisV.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
       mAxisV.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 38);
-      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0));
+      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
    }
    else
    {
       mAxisV.GetCableSource()->SetManualPosition(rightAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 38);
-      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
+      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    }
 }
 
@@ -324,7 +324,7 @@ ofVec2f FubbleModule::GetFubbleMouseCoord()
                   ofClamp(1 - ((mMouseY - fubbleRect.y) / fubbleRect.height), 0, 1));
 }
 
-void FubbleModule::OnClicked(int x, int y, bool right)
+void FubbleModule::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -520,16 +520,11 @@ void FubbleModule::SetUpFromSaveData()
    Resize(mModuleSaveData.GetInt("width"), mModuleSaveData.GetInt("height"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 3;
-}
-
 void FubbleModule::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mAxisH.mCurve.SaveState(out);
    mAxisV.mCurve.SaveState(out);
@@ -538,13 +533,13 @@ void FubbleModule::SaveState(FileStreamOut& out)
    out << mRecordStartOffset;
 }
 
-void FubbleModule::LoadState(FileStreamIn& in)
+void FubbleModule::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mAxisH.mCurve.LoadState(in);
    mAxisV.mCurve.LoadState(in);
