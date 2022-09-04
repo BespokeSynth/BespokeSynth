@@ -35,14 +35,7 @@
 ChannelBuffer gMidiVoiceWorkChannelBuffer(kWorkBufferSize);
 
 PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
-: mAllowStealing(true)
-, mLastVoice(-1)
-, mFadeOutBufferPos(0)
-, mOwner(owner)
-, mFadeOutBuffer(kVoiceFadeSamples)
-, mFadeOutWorkBuffer(kVoiceFadeSamples)
-, mVoiceLimit(kNumVoices)
-, mOversampling(1)
+: mOwner(owner)
 {
 }
 

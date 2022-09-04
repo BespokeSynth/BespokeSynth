@@ -34,9 +34,6 @@ namespace
 }
 
 Pumper::Pumper()
-: mInterval(kInterval_4n)
-, mIntervalSelector(nullptr)
-, mLastValue(0)
 {
    mAdsr.SetNumStages(2);
 

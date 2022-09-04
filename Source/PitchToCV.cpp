@@ -33,8 +33,6 @@
 #include "ModulationChain.h"
 
 PitchToCV::PitchToCV()
-: mPitch(0)
-, mPitchBend(nullptr)
 {
 }
 

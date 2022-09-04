@@ -30,19 +30,6 @@
 #include "ModularSynth.h"
 
 RandomNoteGenerator::RandomNoteGenerator()
-: mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mProbability(.5f)
-, mProbabilitySlider(nullptr)
-, mPitch(36)
-, mPitchSlider(nullptr)
-, mVelocity(.8f)
-, mVelocitySlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mSkip(1)
-, mSkipSlider(nullptr)
-, mSkipCount(0)
 {
 }
 

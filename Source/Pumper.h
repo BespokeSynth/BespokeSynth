@@ -70,21 +70,21 @@ private:
    double GetIntervalPos(double time);
    void SyncToAdsr();
 
-   FloatSlider* mAmountSlider;
-   FloatSlider* mLengthSlider;
-   FloatSlider* mCurveSlider;
-   FloatSlider* mAttackSlider;
+   FloatSlider* mAmountSlider{ nullptr };
+   FloatSlider* mLengthSlider{ nullptr };
+   FloatSlider* mCurveSlider{ nullptr };
+   FloatSlider* mAttackSlider{ nullptr };
 
    ::ADSR mAdsr;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   float mLastValue;
-   float mAmount;
-   float mLength;
-   float mAttack;
+   NoteInterval mInterval{ NoteInterval::kInterval_4n };
+   DropdownList* mIntervalSelector{ nullptr };
+   float mLastValue{ 0 };
+   float mAmount{ 0 };
+   float mLength{ 0 };
+   float mAttack{ 0 };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 #endif /* defined(__modularSynth__Pumper__) */

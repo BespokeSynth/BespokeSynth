@@ -39,7 +39,6 @@ IDrawableModule* Prefab::sJustReleasedModule = nullptr;
 Prefab::Prefab()
 {
    mModuleContainer.SetOwner(this);
-   mPrefabName = "";
 }
 
 Prefab::~Prefab()

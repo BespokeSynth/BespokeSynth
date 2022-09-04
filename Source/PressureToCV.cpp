@@ -33,7 +33,6 @@
 #include "ModulationChain.h"
 
 PressureToCV::PressureToCV()
-: mPressure(nullptr)
 {
 }
 

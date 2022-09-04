@@ -88,25 +88,8 @@ namespace
 #include "leathers/pop"
 
 Push2Control::Push2Control()
-: mDisplayModule(nullptr)
+: mSpawnLists(this)
 , mDevice(this)
-, mModuleColumnOffset(0)
-, mModuleColumnOffsetSmoothed(0)
-, mModuleListOffset(0)
-, mModuleListOffsetSmoothed(0)
-, mNewButtonHeld(false)
-, mDeleteButtonHeld(false)
-, mModulationButtonHeld(false)
-, mAddModuleBookmarkButtonHeld(false)
-, mHeldModule(nullptr)
-, mAllowRepatch(false)
-, mModuleHistoryPosition(-1)
-, mInMidiControllerBindMode(false)
-, mScreenDisplayMode(ScreenDisplayMode::kNormal)
-, mGridControlModule(nullptr)
-, mDisplayModuleCanControlGrid(false)
-, mSpawnLists(this)
-, mSelectedGridSpawnListIndex(-1)
 {
    Initialize();
    for (int i = 0; i < 128 * 2; ++i)

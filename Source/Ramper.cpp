@@ -28,15 +28,6 @@
 #include "PatchCableSource.h"
 
 Ramper::Ramper()
-: mLength(kInterval_1n)
-, mLengthSelector(nullptr)
-, mControlCable(nullptr)
-, mTriggerButton(nullptr)
-, mStartMeasure(0)
-, mStartValue(0)
-, mRamping(false)
-, mTargetValue(0)
-, mTargetValueSlider(nullptr)
 {
 }
 

@@ -51,13 +51,13 @@ public:
    void OnResize();
    void UpdateGrid();
 
-   int mIndex;
-   UIGrid* mGrid;
-   int mLength;
-   DropdownList* mLengthSelector;
-   int mPitch;
-   TextEntry* mNoteSelector;
-   Polyrhythms* mOwner;
+   int mIndex{ 0 };
+   UIGrid* mGrid{ nullptr };
+   int mLength{ 4 };
+   DropdownList* mLengthSelector{ nullptr };
+   int mPitch{ 0 };
+   TextEntry* mNoteSelector{ nullptr };
+   Polyrhythms* mOwner{ nullptr };
 };
 
 class Polyrhythms : public INoteSource, public IDrawableModule, public IAudioPoller, public IDropdownListener, public ITextEntryListener

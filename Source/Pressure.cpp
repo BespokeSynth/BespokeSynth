@@ -28,9 +28,6 @@
 #include "ModularSynth.h"
 
 Pressure::Pressure()
-: mPressure(0)
-, mPressureSlider(nullptr)
-, mModulation(true)
 {
 }
 

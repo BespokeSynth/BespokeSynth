@@ -72,5 +72,5 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   ModulationChain* mPressure;
+   ModulationChain* mPressure{ nullptr };
 };

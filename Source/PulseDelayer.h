@@ -61,9 +61,9 @@ public:
 private:
    struct PulseInfo
    {
-      float mVelocity;
-      int mFlags;
-      double mTriggerTime;
+      float mVelocity{ 0 };
+      int mFlags{ 0 };
+      double mTriggerTime{ 0 };
    };
 
    //IDrawableModule
