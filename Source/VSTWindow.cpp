@@ -37,9 +37,6 @@ VSTWindow::VSTWindow(VSTPlugin* vst,
                  DocumentWindow::minimiseButton | DocumentWindow::closeButton)
 , mType(t)
 , mOwner(vst)
-#ifdef JUCE_MAC
-, mNSViewComponent(nullptr)
-#endif
 {
    setSize(400, 300);
    setResizable(true, true);
