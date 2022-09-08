@@ -73,7 +73,7 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   int mVelocity;
-   bool mPassZero;
-   Checkbox* mPassZeroCheckbox;
+   int mVelocity{ 0 };
+   bool mPassZero{ false };
+   Checkbox* mPassZeroCheckbox{ nullptr };
 };

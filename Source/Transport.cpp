@@ -36,27 +36,6 @@ bool Transport::sDoEventLookahead = false;
 double Transport::sEventEarlyMs = 150;
 
 Transport::Transport()
-: mTempo(120)
-, mTimeSigTop(4)
-, mTimeSigBottom(4)
-, mMeasureTime(0)
-, mSwingInterval(8)
-, mSwing(.5f)
-, mSwingSlider(nullptr)
-, mResetButton(nullptr)
-, mTimeSigTopDropdown(nullptr)
-, mTimeSigBottomDropdown(nullptr)
-, mSwingIntervalDropdown(nullptr)
-, mSetTempoBool(false)
-, mSetTempoCheckbox(nullptr)
-, mStartRecordTime(-1)
-, mNudgeBackButton(nullptr)
-, mNudgeForwardButton(nullptr)
-, mIncreaseTempoButton(nullptr)
-, mDecreaseTempoButton(nullptr)
-, mTempoSlider(nullptr)
-, mLoopStartMeasure(-1)
-, mLoopEndMeasure(-1)
 {
    assert(TheTransport == nullptr);
    TheTransport = this;

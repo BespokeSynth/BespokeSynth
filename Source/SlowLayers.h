@@ -81,16 +81,16 @@ private:
    static const int BUFFER_W = 155;
    static const int BUFFER_H = 93;
 
-   float* mBuffer;
-   float mLoopPos;
-   int mNumBars;
-   float mVol;
-   float mFeedIn;
-   float mSmoothedVol;
-   FloatSlider* mVolSlider;
-   ClickButton* mClearButton;
-   DropdownList* mNumBarsSelector;
-   FloatSlider* mFeedInSlider;
+   float* mBuffer{ nullptr };
+   float mLoopPos{ 0 };
+   int mNumBars{ 1 };
+   float mVol{ 1 };
+   float mFeedIn{ 1 };
+   float mSmoothedVol{ 1 };
+   FloatSlider* mVolSlider{ nullptr };
+   ClickButton* mClearButton{ nullptr };
+   DropdownList* mNumBarsSelector{ nullptr };
+   FloatSlider* mFeedInSlider{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SlowLayers__) */

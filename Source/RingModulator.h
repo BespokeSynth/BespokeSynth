@@ -77,18 +77,18 @@ private:
 
    ChannelBuffer mDryBuffer;
 
-   float mFreq;
-   float mDryWet;
-   float mVolume;
-   FloatSlider* mFreqSlider;
-   FloatSlider* mDryWetSlider;
-   FloatSlider* mVolumeSlider;
+   float mFreq{ 220 };
+   float mDryWet{ 1 };
+   float mVolume{ 1 };
+   FloatSlider* mFreqSlider{ nullptr };
+   FloatSlider* mDryWetSlider{ nullptr };
+   FloatSlider* mVolumeSlider{ nullptr };
 
-   EnvOscillator mModOsc;
-   float mPhase;
+   EnvOscillator mModOsc{ kOsc_Sin };
+   float mPhase{ 0 };
    Ramp mFreqRamp;
-   float mGlideTime;
-   FloatSlider* mGlideSlider;
+   float mGlideTime{ 0 };
+   FloatSlider* mGlideSlider{ nullptr };
 };
 
 

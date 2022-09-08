@@ -30,11 +30,7 @@
 #include "DrumPlayer.h"
 
 SliderSequencer::SliderSequencer()
-: mLastMeasurePos(0)
-, mDivision(1)
-, mDivisionSlider(nullptr)
 {
-
    for (int i = 0; i < 8; ++i)
       mSliderLines.push_back(new SliderLine(this, 10, 40 + i * 15, i));
 }
@@ -155,16 +151,7 @@ void SliderSequencer::SetUpFromSaveData()
 
 
 SliderLine::SliderLine(SliderSequencer* owner, int x, int y, int index)
-: mSlider(nullptr)
-, mPoint(0)
-, mVelocity(0)
-, mVelocitySlider(nullptr)
-, mPitch(0)
-, mNoteSelector(nullptr)
-, mPlayTime(0)
-, mPlaying(false)
-, mPlayingCheckbox(nullptr)
-, mX(x)
+: mX(x)
 , mY(y)
 , mOwner(owner)
 , mIndex(index)

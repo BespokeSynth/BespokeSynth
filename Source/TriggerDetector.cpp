@@ -27,12 +27,7 @@
 #include "SynthGlobals.h"
 
 TriggerDetector::TriggerDetector()
-: mTriggered(false)
-, mThreshold(.2f)
-, mWaitingForFall(false)
-, mHistory(gSampleRate)
-, mSharpness(0)
-, mAvg(0)
+: mHistory(gSampleRate)
 {
 }
 

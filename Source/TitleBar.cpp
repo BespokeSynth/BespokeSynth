@@ -52,8 +52,6 @@ namespace
 
 SpawnList::SpawnList(IDropdownListener* owner, int x, int y, std::string label, ModuleCategory moduleCategory, bool showDecorators)
 : mLabel(label)
-, mSpawnIndex(-1)
-, mSpawnList(nullptr)
 , mOwner(owner)
 , mPos(x, y)
 , mModuleCategory(moduleCategory)

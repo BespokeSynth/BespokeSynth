@@ -53,8 +53,8 @@ private:
       height = 56;
    }
 
-   double mStartTime;
-   ClickButton* mResetButton;
+   double mStartTime{ 0 };
+   ClickButton* mResetButton{ nullptr };
 };
 
 #endif /* defined(__Bespoke__TimerDisplay__) */

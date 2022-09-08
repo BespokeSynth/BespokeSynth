@@ -33,9 +33,7 @@
 #include "juce_audio_formats/juce_audio_formats.h"
 
 Sample::Sample()
-: mData(0)
 {
-   mName[0] = 0;
 }
 
 Sample::~Sample()

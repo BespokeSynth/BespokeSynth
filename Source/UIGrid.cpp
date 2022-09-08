@@ -31,24 +31,8 @@
 #include <cstring>
 
 UIGrid::UIGrid(std::string name, int x, int y, int w, int h, int cols, int rows, IClickable* parent)
-: mClick(false)
-, mWidth(w)
+: mWidth(w)
 , mHeight(h)
-, mNextHighlightColPointer(0)
-, mMajorCol(-1)
-, mSingleColumn(false)
-, mFlip(false)
-, mStrength(1)
-, mCurrentHover(-1)
-, mListener(nullptr)
-, mGridMode(kNormal)
-, mHoldCol(0)
-, mHoldRow(0)
-, mLastClickWasClear(false)
-, mRestrictDragToRow(false)
-, mRequireShiftForMultislider(false)
-, mShouldDrawValue(false)
-, mMomentary(false)
 {
    SetName(name.c_str());
    SetPosition(x, y);

@@ -31,11 +31,7 @@
 #include "UIControlMacros.h"
 
 UnstablePitch::UnstablePitch()
-: mPerlin(.2f, .1f, 0)
-, mModulation(false)
-, mVoiceRoundRobin(0)
 {
-
    for (int voice = 0; voice < kNumVoices; ++voice)
       mModulation.GetPitchBend(voice)->CreateBuffer();
 }

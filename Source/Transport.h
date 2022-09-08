@@ -76,8 +76,8 @@ struct OffsetInfo
    : mOffset(offset)
    , mOffsetIsInMs(offsetIsInMs)
    {}
-   double mOffset;
-   bool mOffsetIsInMs;
+   double mOffset{ 0 };
+   bool mOffsetIsInMs{ false };
 };
 
 struct TransportListenerInfo
@@ -87,14 +87,13 @@ struct TransportListenerInfo
    , mInterval(interval)
    , mOffsetInfo(offsetInfo)
    , mUseEventLookahead(useEventLookahead)
-   , mCustomDivisor(8)
    {}
 
-   ITimeListener* mListener;
-   NoteInterval mInterval;
+   ITimeListener* mListener{ nullptr };
+   NoteInterval mInterval{ NoteInterval::kInterval_None };
    OffsetInfo mOffsetInfo;
-   bool mUseEventLookahead;
-   int mCustomDivisor;
+   bool mUseEventLookahead{ false };
+   int mCustomDivisor{ 8 };
 };
 
 class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener
@@ -189,28 +188,28 @@ private:
    }
    bool Enabled() const override { return true; }
 
-   float mTempo;
-   int mTimeSigTop;
-   int mTimeSigBottom;
-   double mMeasureTime;
-   int mSwingInterval;
-   float mSwing;
-   FloatSlider* mSwingSlider;
-   ClickButton* mResetButton;
-   ClickButton* mPlayPauseButton;
-   DropdownList* mTimeSigTopDropdown;
-   DropdownList* mTimeSigBottomDropdown;
-   DropdownList* mSwingIntervalDropdown;
-   bool mSetTempoBool;
-   Checkbox* mSetTempoCheckbox;
-   double mStartRecordTime;
-   ClickButton* mNudgeBackButton;
-   ClickButton* mNudgeForwardButton;
-   ClickButton* mIncreaseTempoButton;
-   ClickButton* mDecreaseTempoButton;
-   FloatSlider* mTempoSlider;
-   int mLoopStartMeasure;
-   int mLoopEndMeasure;
+   float mTempo{ 120 };
+   int mTimeSigTop{ 4 };
+   int mTimeSigBottom{ 4 };
+   double mMeasureTime{ 0 };
+   int mSwingInterval{ 8 };
+   float mSwing{ .5 };
+   FloatSlider* mSwingSlider{ nullptr };
+   ClickButton* mResetButton{ nullptr };
+   ClickButton* mPlayPauseButton{ nullptr };
+   DropdownList* mTimeSigTopDropdown{ nullptr };
+   DropdownList* mTimeSigBottomDropdown{ nullptr };
+   DropdownList* mSwingIntervalDropdown{ nullptr };
+   bool mSetTempoBool{ false };
+   Checkbox* mSetTempoCheckbox{ nullptr };
+   double mStartRecordTime{ -1 };
+   ClickButton* mNudgeBackButton{ nullptr };
+   ClickButton* mNudgeForwardButton{ nullptr };
+   ClickButton* mIncreaseTempoButton{ nullptr };
+   ClickButton* mDecreaseTempoButton{ nullptr };
+   FloatSlider* mTempoSlider{ nullptr };
+   int mLoopStartMeasure{ -1 };
+   int mLoopEndMeasure{ -1 };
    bool mWantSetRandomTempo{ false };
 
    std::list<TransportListenerInfo> mListeners;

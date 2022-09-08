@@ -59,16 +59,16 @@ private:
 
    float GetSliderWidth() { return mWidth - 50; }
 
-   float mWidth;
-   float mNumMeasures;
-   float mTime;
-   FloatSlider* mTimeSlider;
-   bool mLoop;
-   Checkbox* mLoopCheckbox;
-   int mLoopStart;
-   IntSlider* mLoopStartSlider;
-   int mLoopEnd;
-   IntSlider* mLoopEndSlider;
+   float mWidth{ 400 };
+   float mNumMeasures{ 32 };
+   float mTime{ 0 };
+   FloatSlider* mTimeSlider{ nullptr };
+   bool mLoop{ false };
+   Checkbox* mLoopCheckbox{ nullptr };
+   int mLoopStart{ 0 };
+   IntSlider* mLoopStartSlider{ nullptr };
+   int mLoopEnd{ 8 };
+   IntSlider* mLoopEndSlider{ nullptr };
 };
 
 #endif /* defined(__Bespoke__TimelineControl__) */

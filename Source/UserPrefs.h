@@ -83,8 +83,8 @@ public:
 private:
    std::string mValue;
    std::string mDefault;
-   TextEntry* mTextEntry;
-   int mCharWidth;
+   TextEntry* mTextEntry{ nullptr };
+   int mCharWidth{ 0 };
 };
 
 class UserPrefDropdownInt : public UserPref
@@ -110,11 +110,11 @@ public:
    bool DiffersFromSavedValue() const override;
 
 private:
-   int mValue;
-   int mDefault;
-   int mIndex;
-   DropdownList* mDropdown;
-   float mWidth;
+   int mValue{ 0 };
+   int mDefault{ 0 };
+   int mIndex{ -1 };
+   DropdownList* mDropdown{ nullptr };
+   float mWidth{ 100 };
 };
 
 class UserPrefDropdownString : public UserPref
@@ -123,7 +123,6 @@ public:
    UserPrefDropdownString(std::string name, std::string defaultValue, int width, UserPrefCategory category)
    : mValue(defaultValue)
    , mDefault(defaultValue)
-   , mIndex(-1)
    , mWidth(width)
    {
       RegisterUserPref(this);
@@ -143,9 +142,9 @@ public:
 private:
    std::string mValue;
    std::string mDefault;
-   int mIndex;
-   DropdownList* mDropdown;
-   float mWidth;
+   int mIndex{ -1 };
+   DropdownList* mDropdown{ nullptr };
+   float mWidth{ 100 };
 };
 
 class UserPrefTextEntryInt : public UserPref
@@ -172,12 +171,12 @@ public:
    bool DiffersFromSavedValue() const override;
 
 private:
-   int mValue;
-   int mDefault;
-   TextEntry* mTextEntry;
-   int mMin;
-   int mMax;
-   int mDigits;
+   int mValue{ 0 };
+   int mDefault{ 0 };
+   TextEntry* mTextEntry{ nullptr };
+   int mMin{ 0 };
+   int mMax{ 1 };
+   int mDigits{ 5 };
 };
 
 class UserPrefTextEntryFloat : public UserPref
@@ -204,12 +203,12 @@ public:
    bool DiffersFromSavedValue() const override;
 
 private:
-   float mValue;
-   float mDefault;
-   TextEntry* mTextEntry;
-   float mMin;
-   float mMax;
-   int mDigits;
+   float mValue{ 0 };
+   float mDefault{ 0 };
+   TextEntry* mTextEntry{ nullptr };
+   float mMin{ 0 };
+   float mMax{ 1 };
+   int mDigits{ 5 };
 };
 
 class UserPrefBool : public UserPref
@@ -232,9 +231,9 @@ public:
    bool DiffersFromSavedValue() const override;
 
 private:
-   bool mValue;
-   bool mDefault;
-   Checkbox* mCheckbox;
+   bool mValue{ 0 };
+   bool mDefault{ 0 };
+   Checkbox* mCheckbox{ nullptr };
 };
 
 class UserPrefFloat : public UserPref
@@ -260,11 +259,11 @@ public:
    bool DiffersFromSavedValue() const override;
 
 private:
-   float mValue;
-   float mDefault;
-   FloatSlider* mSlider;
-   float mMin;
-   float mMax;
+   float mValue{ 0 };
+   float mDefault{ 0 };
+   FloatSlider* mSlider{ nullptr };
+   float mMin{ 0 };
+   float mMax{ 1 };
 };
 
 namespace

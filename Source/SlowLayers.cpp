@@ -32,15 +32,6 @@
 
 SlowLayers::SlowLayers()
 : IAudioProcessor(gBufferSize)
-, mBuffer(nullptr)
-, mLoopPos(0)
-, mNumBars(1)
-, mVol(1)
-, mSmoothedVol(1)
-, mVolSlider(nullptr)
-, mNumBarsSelector(nullptr)
-, mFeedInSlider(nullptr)
-, mFeedIn(1)
 {
    //TODO(Ryan) buffer sizes
    mBuffer = new float[MAX_BUFFER_SIZE];

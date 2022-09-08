@@ -28,7 +28,6 @@
 #include "ModularSynth.h"
 
 SustainPedal::SustainPedal()
-: mSustain(false)
 {
 }
 

@@ -63,10 +63,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mVelocity;
-   FloatSlider* mVelocitySlider;
-   float mRandomness;
-   FloatSlider* mRandomnessSlider;
+   float mVelocity{ 1 };
+   FloatSlider* mVelocitySlider{ nullptr };
+   float mRandomness{ 0 };
+   FloatSlider* mRandomnessSlider{ nullptr };
 };
 
 

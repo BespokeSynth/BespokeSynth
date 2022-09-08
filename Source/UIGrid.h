@@ -131,38 +131,34 @@ private:
 
    struct HighlightColBuffer
    {
-      HighlightColBuffer()
-      : time(0)
-      , col(-1)
-      {}
-      double time;
-      int col;
+      double time{ 0 };
+      int col{ -1 };
    };
 
-   float mWidth;
-   float mHeight;
-   int mRows;
-   int mCols;
-   bool mClick;
+   float mWidth{ 200 };
+   float mHeight{ 200 };
+   int mRows{ 0 };
+   int mCols{ 0 };
+   bool mClick{ false };
    float mHoldVal;
-   int mHoldCol;
-   int mHoldRow;
-   bool mLastClickWasClear;
-   std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE> mData;
-   std::array<HighlightColBuffer, 10> mHighlightColBuffer;
-   int mNextHighlightColPointer;
-   int mMajorCol;
-   bool mSingleColumn;
-   bool mFlip;
-   float mStrength;
-   int mCurrentHover;
-   UIGridListener* mListener;
-   std::array<float, MAX_GRID_SIZE> mDrawOffset;
-   GridMode mGridMode;
-   bool mRestrictDragToRow;
-   bool mRequireShiftForMultislider;
-   bool mShouldDrawValue;
-   bool mMomentary;
+   int mHoldCol{ 0 };
+   int mHoldRow{ 0 };
+   bool mLastClickWasClear{ false };
+   std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE> mData{};
+   std::array<HighlightColBuffer, 10> mHighlightColBuffer{};
+   int mNextHighlightColPointer{ 0 };
+   int mMajorCol{ -1 };
+   bool mSingleColumn{ false };
+   bool mFlip{ false };
+   float mStrength{ 1 };
+   int mCurrentHover{ -1 };
+   UIGridListener* mListener{ nullptr };
+   std::array<float, MAX_GRID_SIZE> mDrawOffset{};
+   GridMode mGridMode{ GridMode::kNormal };
+   bool mRestrictDragToRow{ false };
+   bool mRequireShiftForMultislider{ false };
+   bool mShouldDrawValue{ false };
+   bool mMomentary{ false };
 };
 
 #endif /* defined(__modularSynth__Grid__) */

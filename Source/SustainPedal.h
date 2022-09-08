@@ -59,8 +59,8 @@ private:
    bool Enabled() const override { return true; }
 
    std::array<bool, 128> mIsNoteBeingSustained{ false };
-   bool mSustain;
-   Checkbox* mSustainCheckbox;
+   bool mSustain{ false };
+   Checkbox* mSustainCheckbox{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SustainPedal__) */

@@ -67,7 +67,7 @@ private:
    juce::String mCurrentDirectory;
    juce::StringArray mDirectoryListing;
    std::array<ClickButton*, 30> mButtons;
-   ClickButton* mBackButton;
-   ClickButton* mForwardButton;
-   int mCurrentPage;
+   ClickButton* mBackButton{ nullptr };
+   ClickButton* mForwardButton{ nullptr };
+   int mCurrentPage{ 0 };
 };

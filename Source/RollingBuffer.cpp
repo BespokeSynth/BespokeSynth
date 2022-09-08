@@ -29,8 +29,6 @@
 RollingBuffer::RollingBuffer(int sizeInSamples)
 : mBuffer(sizeInSamples)
 {
-   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
-      mOffsetToNow[i] = 0;
 }
 
 RollingBuffer::~RollingBuffer()

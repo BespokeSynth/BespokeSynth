@@ -63,7 +63,7 @@ public:
 
 private:
    UIGrid* mGrid{ nullptr };
-   int mRow;
+   int mRow{ 0 };
    StepSequencer* mSeq{ nullptr };
    float mOffset{ 0 };
 
@@ -75,7 +75,7 @@ private:
    std::array<PlayedStep, 5> mPlayedSteps{};
    int mPlayedStepsRoundRobin{ 0 };
    TextEntry* mRowPitchEntry{ nullptr };
-   int mRowPitch;
+   int mRowPitch{ 0 };
 };
 
 class NoteRepeat : public ITimeListener
@@ -88,10 +88,10 @@ public:
    void SetOffset(float offset);
 
 private:
-   int mRow;
-   StepSequencer* mSeq;
-   NoteInterval mInterval;
-   float mOffset;
+   int mRow{ 0 };
+   StepSequencer* mSeq{ nullptr };
+   NoteInterval mInterval{ NoteInterval::kInterval_None };
+   float mOffset{ 0 };
 };
 
 class StepSequencerNoteFlusher : public ITimeListener
@@ -215,9 +215,9 @@ private:
          mRow = row;
          mTime = gTime;
       }
-      int mCol;
-      int mRow;
-      double mTime;
+      int mCol{ 0 };
+      int mRow{ 0 };
+      double mTime{ 0 };
    };
 
    enum class NoteInputMode

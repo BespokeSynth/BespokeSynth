@@ -28,12 +28,6 @@
 #include "ModularSynth.h"
 
 ScaleDetect::ScaleDetect()
-: mResetButton(nullptr)
-, mLastPitch(0)
-, mDoDetect(true)
-, mNeedsUpdate(false)
-, mSelectedMatch(0)
-, mMatchesDropdown(nullptr)
 {
 }
 
