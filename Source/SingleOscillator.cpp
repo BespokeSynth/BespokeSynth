@@ -208,7 +208,7 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
       else
          mDebugLines[mDebugLinesPos].color = ofColor::red;
       ofLog() << mDebugLines[mDebugLinesPos].text;
-      ++mDebugLinesPos;
+      mDebugLinesPos = (mDebugLinesPos + 1) % (int)mDebugLines.size();
    }
 }
 
