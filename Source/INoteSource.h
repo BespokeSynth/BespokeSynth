@@ -44,7 +44,6 @@ public:
    {}
 
    void Flush(double time);
-   void FlushTarget(double time, INoteReceiver* target);
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

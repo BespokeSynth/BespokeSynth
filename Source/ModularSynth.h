@@ -14,6 +14,7 @@
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
 #include "Minimap.h"
+#include <thread>
 
 #ifdef BESPOKE_LINUX
 #include <climits>
@@ -230,6 +231,7 @@ public:
    float GetFrameRate() const { return mFrameRate; }
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
+   static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
 
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
    void SetUpModule(IDrawableModule* module, const ofxJSONElement& moduleInfo);
@@ -360,6 +362,7 @@ private:
    std::list<std::string> mErrors;
 
    NamedMutex mAudioThreadMutex;
+   static std::thread::id sAudioThreadId;
 
    bool mAudioPaused;
    bool mIsLoadingState;

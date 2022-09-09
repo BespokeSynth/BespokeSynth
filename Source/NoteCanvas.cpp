@@ -219,7 +219,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
 
    if (mStopQueued)
    {
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(NextBufferTime());
       for (int i = 0; i < mCurrentNotes.size(); ++i)
          mCurrentNotes[i] = nullptr;
       mStopQueued = false;

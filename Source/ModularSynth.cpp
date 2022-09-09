@@ -61,6 +61,7 @@ float ModularSynth::sBackgroundR = 0.09f;
 float ModularSynth::sBackgroundG = 0.09f;
 float ModularSynth::sBackgroundB = 0.09f;
 int ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev;
+std::thread::id ModularSynth::sAudioThreadId;
 
 #if BESPOKE_WINDOWS
 LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
@@ -1888,6 +1889,8 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
 {
    PROFILER(audioOut_total);
+
+   sAudioThreadId = std::this_thread::get_id();
 
    static bool sFirst = true;
    if (sFirst)

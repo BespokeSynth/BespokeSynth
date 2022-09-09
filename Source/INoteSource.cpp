@@ -128,21 +128,15 @@ void NoteOutput::Flush(double time)
       mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, false);
 }
 
-void NoteOutput::FlushTarget(double time, INoteReceiver* target)
-{
-   if (target)
-   {
-      for (int i = 0; i < 128; ++i)
-      {
-         if (mNotes[i])
-            target->PlayNote(time, i, 0);
-      }
-   }
-}
-
 void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    PROFILER(INoteSourcePlayOutput);
+
+   if (std::this_thread::get_id() != ModularSynth::GetAudioThreadID())
+   {
+      ofLog() << "PlayNote() called from non-audio thread";
+   }
+
    if (time < gTime)
       ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time / 1000) << " < " << ofToString(gTime / 1000);
 
@@ -160,5 +154,5 @@ void INoteSource::SendCCOutput(int control, int value, int voiceIdx /*=-1*/)
 
 void INoteSource::PreRepatch(PatchCableSource* cableSource)
 {
-   mNoteOutput.Flush(gTime);
+   mNoteOutput.Flush(NextBufferTime());
 }

@@ -160,7 +160,7 @@ void ChaosEngine::UpdateProgression(int beat)
       mBeatsLeftToChordChange = TheTransport->GetTimeSigTop() - beat;
    mProgressionMutex.unlock();
 
-   mNoteOutput.Flush(gTime);
+   mNoteOutput.Flush(NextBufferTime());
    if (mPlayChord)
    {
       std::vector<int> pitches = GetCurrentChordPitches();
