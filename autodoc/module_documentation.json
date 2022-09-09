@@ -2380,6 +2380,20 @@
       "description" : "trigger notes along a continuous timeline",
       "type" : "instruments"
    },
+   "smashtunes" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : true,
+      "controls" : {
+         "text" : "text to turn into MIDI notes",
+         "velocity*" : "velocity of this element",
+         "duration" : "how long to play each note for",
+         "min note" : "if we would produce a note less than this, play this value instead",
+         "max note" : "if we would produce a note greater than this, play the note modulo this"
+      },
+      "description" : "turn text into notes. hook it up to something like pulsesequence. based on https://princess.software/smashtunes",
+      "type" : "instruments"
+   },
    "smoother" : {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
