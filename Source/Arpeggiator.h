@@ -128,7 +128,7 @@ private:
    std::array<bool, 128> mInputNotes{ false };
    ofMutex mChordMutex;
 
-   TransportListenerInfo* mTransportListenerInfo{nullptr};
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Arpeggiator__) */

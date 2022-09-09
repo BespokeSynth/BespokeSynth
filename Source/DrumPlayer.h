@@ -271,7 +271,7 @@ private:
       int mSamplesRemainingToProcess{ 0 };
 
       std::array<Playhead, 2> mPlayheads;
-      int mCurrentPlayheadIndex{0};
+      int mCurrentPlayheadIndex{ 0 };
    };
 
    std::array<DrumHit, NUM_DRUM_HITS> mDrumHits;

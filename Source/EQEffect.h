@@ -78,8 +78,8 @@ private:
    FilterBank mBanks[ChannelBuffer::kMaxNumChannels]{};
    int mNumFilters{ NUM_EQ_FILTERS };
 
-   UIGrid* mMultiSlider{nullptr};
-   ClickButton* mEvenButton{nullptr};
+   UIGrid* mMultiSlider{ nullptr };
+   ClickButton* mEvenButton{ nullptr };
 };
 
 #endif /* defined(__Bespoke__EQEffect__) */
