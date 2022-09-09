@@ -125,13 +125,10 @@ void ModuleContainer::Clear()
    std::vector<IDrawableModule*> modulesToDelete = mModules;
    for (auto* module : modulesToDelete)
    {
-      if (module)
-      {
-         if (module->GetContainer())
-            module->GetContainer()->Clear();
-         if (module->IsSingleton() == false)
-            DeleteModule(module);
-      }
+      if (module->GetContainer())
+         module->GetContainer()->Clear();
+      if (module->IsSingleton() == false)
+         DeleteModule(module);
    }
    mModules.clear();
 }

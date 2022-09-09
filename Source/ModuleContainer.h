@@ -92,7 +92,7 @@ public:
    static bool DoesModuleHaveMoreSaveData(FileStreamIn& in);
 
 private:
-   std::vector<IDrawableModule*> mModules{ nullptr };
+   std::vector<IDrawableModule*> mModules;
    IDrawableModule* mOwner{ nullptr };
 
    ofVec2f mDrawOffset;
