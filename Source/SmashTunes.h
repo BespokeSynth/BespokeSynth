@@ -82,7 +82,7 @@ protected:
    double mStartTime{ 0 };
    int mVoiceIndex{ -1 };
 
-   private:
+private:
    int mCurrentStringIndex{ 0 };
    int NextNote();
 };
