@@ -45,6 +45,7 @@ class ADSRDisplay;
 class UserPrefsEditor;
 class Minimap;
 class ScriptWarningPopup;
+class NoteOutputQueue;
 
 enum LogEventType
 {
@@ -232,6 +233,7 @@ public:
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
+   NoteOutputQueue* GetNoteOutputQueue() { return mNoteOutputQueue; }
 
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
    void SetUpModule(IDrawableModule* module, const ofxJSONElement& moduleInfo);
@@ -363,6 +365,7 @@ private:
 
    NamedMutex mAudioThreadMutex;
    static std::thread::id sAudioThreadId;
+   NoteOutputQueue* mNoteOutputQueue{ nullptr };
 
    bool mAudioPaused;
    bool mIsLoadingState;

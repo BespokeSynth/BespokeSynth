@@ -37,6 +37,7 @@
 #include "EffectChain.h"
 #include "ClickButton.h"
 #include "UserPrefs.h"
+#include "NoteOutputQueue.h"
 
 #include "juce_audio_processors/juce_audio_processors.h"
 
@@ -1108,7 +1109,7 @@ void ModularSynth::SetMousePosition(ModuleContainer* context, float x, float y)
 {
    x = (x + context->GetDrawOffset().x) * context->GetDrawScale() - UserPrefs.mouse_offset_x.Get() + mMainComponent->getScreenX();
    y = (y + context->GetDrawOffset().y) * context->GetDrawScale() - UserPrefs.mouse_offset_y.Get() + mMainComponent->getScreenY();
-   Desktop::setMousePosition(Point<int>(x, y));
+   Desktop::setMousePosition(juce::Point<int>(x, y));
 }
 
 bool ModularSynth::IsMouseButtonHeld(int button) const
@@ -1912,6 +1913,8 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
    ScopedMutex mutex(&mAudioThreadMutex, "audioOut()");
 
    /////////// AUDIO PROCESSING STARTS HERE /////////////
+   mNoteOutputQueue->Process();
+
    assert(bufferSize == mIOBufferSize);
    assert(nChannels == (int)mOutputBuffers.size());
    assert(mIOBufferSize == gBufferSize); //need to be the same for now
@@ -2156,6 +2159,7 @@ void ModularSynth::ResetLayout()
    delete TheSaveDataPanel;
    delete mQuickSpawn;
    delete mUserPrefsEditor;
+   delete mNoteOutputQueue;
 
    TitleBar* titleBar = new TitleBar();
    titleBar->SetPosition(0, 0);
@@ -2210,6 +2214,8 @@ void ModularSynth::ResetLayout()
    GetDrawOffset().set(0, 0);
 
    SetUIScale(UserPrefs.ui_scale.Get());
+
+   mNoteOutputQueue = new NoteOutputQueue();
 }
 
 bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayout /*= true*/)

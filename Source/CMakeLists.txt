@@ -395,6 +395,8 @@ target_sources(BespokeSynth PRIVATE
     NoteLooper.h
     NoteOctaver.cpp
     NoteOctaver.h
+    NoteOutputQueue.cpp
+    NoteOutputQueue.h
     NotePanAlternator.cpp
     NotePanAlternator.h
     NotePanRandom.cpp
@@ -825,6 +827,7 @@ target_link_libraries(BespokeSynth PRIVATE
     $<$<STREQUAL:${BESPOKE_SYSTEM_TUNING_LIBRARY},OFF>:tuning-library>
     oddsound-mts
     Ableton::Link
+    readerwriterqueue
 
     juce::juce_audio_basics
     juce::juce_audio_devices

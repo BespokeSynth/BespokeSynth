@@ -30,6 +30,7 @@
 #include "Scale.h"
 #include "PatchCableSource.h"
 #include "Profiler.h"
+#include "NoteOutputQueue.h"
 
 void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
@@ -39,6 +40,15 @@ void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 
 void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   if (std::this_thread::get_id() != ModularSynth::GetAudioThreadID())
+   {
+      time += TheTransport->GetEventLookaheadMs();
+      if (velocity == 0)
+         time += gBufferSizeMs; //1 buffer later, to make sure notes get cleared
+      TheSynth->GetNoteOutputQueue()->QueuePlayNote(this, time, pitch, velocity, voiceIdx, modulation);
+      return;
+   }
+
    const int kMaxDepth = 100;
    if (mStackDepth > kMaxDepth)
    {
@@ -108,6 +118,12 @@ std::list<int> NoteOutput::GetHeldNotesList()
 
 void NoteOutput::Flush(double time)
 {
+   if (std::this_thread::get_id() != ModularSynth::GetAudioThreadID())
+   {
+      TheSynth->GetNoteOutputQueue()->QueueFlush(this, time + TheTransport->GetEventLookaheadMs() + gBufferSizeMs); //include event lookahead, and make it 1 buffer later, to make sure notes get cleared
+      return;
+   }
+
    bool flushed = false;
 
    for (int i = 0; i < 128; ++i)
@@ -131,11 +147,6 @@ void NoteOutput::Flush(double time)
 void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    PROFILER(INoteSourcePlayOutput);
-
-   if (std::this_thread::get_id() != ModularSynth::GetAudioThreadID())
-   {
-      ofLog() << "PlayNote() called from non-audio thread";
-   }
 
    if (time < gTime)
       ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time / 1000) << " < " << ofToString(gTime / 1000);
