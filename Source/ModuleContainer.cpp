@@ -623,12 +623,27 @@ void ModuleContainer::LoadState(FileStreamIn& in)
 
    for (int i = 0; i < savedModules; ++i)
    {
+      if (in.Eof() || in.bytesRemaining() < 9) // No point in going further if we are at the end of the file (8 bytes are needed for the string length even if it is an empty string).
+      {
+         ofLog() << "Reached end of file before loading all modules. (savedModules: " << savedModules << " i: " << i << ")";
+         break;
+      }
+
       std::string moduleName;
-      in >> moduleName;
-      //ofLog() << "Loading " << moduleName;
-      IDrawableModule* module = FindModule(moduleName, false);
       try
       {
+         in >> moduleName;
+      }
+      catch (std::exception& e)
+      {
+         ofLog() << "Failed to read module name from file. " << e.what();
+         break;
+      }
+
+      //ofLog() << "Loading " << moduleName;
+      try
+      {
+         IDrawableModule* module = FindModule(moduleName, false);
          if (module == nullptr)
             throw LoadStateException();
 
@@ -663,7 +678,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
          //read through the rest of the module until we find the spacer, so we can continue loading the next module
          int separatorProgress = 0;
          juce::uint64 safetyCheck = 0;
-         while (!in.Eof() && safetyCheck < 1000000)
+         while (!in.Eof())
          {
             char val;
             in >> val;
@@ -673,7 +688,12 @@ void ModuleContainer::LoadState(FileStreamIn& in)
                separatorProgress = 0;
             if (separatorProgress == GetModuleSeparatorLength())
                break; //we did it!
-            ++safetyCheck;
+            if (++safetyCheck > 1000000)
+            {
+               //@TODO(Noxy) At this point we should probably completely fail the loading since whatever data is left will only cause errors.
+               ofLog() << "  Safety check failed!";
+               break;
+            }
          }
       }
    }

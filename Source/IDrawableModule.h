@@ -96,7 +96,7 @@ public:
    virtual void OnUIControlRequested(const char* name) {}
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);
-   IDrawableModule* FindChild(const char* name) const;
+   IDrawableModule* FindChild(const char* name, bool fail = true) const;
    void GetDimensions(float& width, float& height) override;
    virtual void GetModuleDimensions(float& width, float& height)
    {

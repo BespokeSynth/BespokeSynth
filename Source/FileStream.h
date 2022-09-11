@@ -72,6 +72,7 @@ public:
    void Read(float* buffer, int size);
    void ReadGeneric(void* buffer, int size);
    void Peek(void* buffer, int size);
+   int bytesRemaining() const;
    int GetFilePosition() const;
    bool OpenedOk() const;
    bool Eof() const;
