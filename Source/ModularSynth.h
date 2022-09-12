@@ -43,6 +43,7 @@ class QuickSpawnMenu;
 class ADSRDisplay;
 class UserPrefsEditor;
 class Minimap;
+class ScriptWarningPopup;
 
 enum LogEventType
 {
@@ -105,7 +106,7 @@ public:
 
    bool IsReady();
    bool IsAudioPaused() const { return mAudioPaused; }
-   void ToggleAudioPaused() { mAudioPaused = !mAudioPaused; }
+   void SetAudioPaused(bool paused) { mAudioPaused = paused; }
 
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
@@ -204,6 +205,7 @@ public:
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
    const std::vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
    bool ShouldAccentuateActiveModules() const;
+   bool ShouldDimModule(IDrawableModule* module);
    LocationZoomer* GetLocationZoomer() { return &mZoomer; }
    IDrawableModule* GetModuleAtCursor(int offsetX = 0, int offsetY = 0);
 

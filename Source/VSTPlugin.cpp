@@ -168,6 +168,8 @@ namespace VSTLookup
       auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i = 0; i < types.size(); ++i)
       {
+         if (types[i].pluginFormatName == juce::AudioUnitPluginFormat::getFormatName())
+            continue; //"fileOrIdentifier" is not a valid path, can't check
          juce::File vst(types[i].fileOrIdentifier);
          if (vst.getFileNameWithoutExtension().toStdString() == vstName)
             return types[i].fileOrIdentifier.toStdString();

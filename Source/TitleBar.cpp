@@ -602,7 +602,7 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->PushModalFocusItem(&mNewPatchConfirmPopup);
    }
    if (button == mPlayPauseButton)
-      TheSynth->ToggleAudioPaused();
+      TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
 }
 
 void NewPatchConfirmPopup::CreateUIControls()

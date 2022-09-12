@@ -72,6 +72,7 @@ public:
    void OnModuleReferenceBound(IDrawableModule* target);
    void SetContext();
    void ClearContext();
+   bool IsScriptTrusted() const { return !mIsScriptUntrusted; }
 
    void RunCode(double time, std::string code);
 
@@ -113,6 +114,7 @@ public:
    static ofColor sBackgroundTextColor;
    static bool sPythonInitialized;
    static bool sHasPythonEverSuccessfullyInitialized;
+   static bool sHasLoadedUntrustedScript;
 
    ModulationChain* GetPitchBend(int pitch) { return &mPitchBends[pitch]; }
    ModulationChain* GetModWheel(int pitch) { return &mModWheels[pitch]; }
@@ -137,6 +139,8 @@ private:
    void RefreshScriptFiles();
    void RefreshStyleFiles();
    void Reset();
+   juce::String GetScriptChecksum() const;
+   void RecordScriptAsTrusted();
 
    //IDrawableModule
    void DrawModule() override;
@@ -160,6 +164,8 @@ private:
    FloatSlider* mBSlider{ nullptr };
    FloatSlider* mCSlider{ nullptr };
    FloatSlider* mDSlider{ nullptr };
+   ClickButton* mTrustScriptButton{ nullptr };
+   ClickButton* mDontTrustScriptButton{ nullptr };
    int mLoadScriptIndex{ 0 };
    std::string mLoadedScriptPath;
    juce::Time mLoadedScriptFiletime;
@@ -180,6 +186,7 @@ private:
    int mNextLineToExecute{ -1 };
    int mInitExecutePriority{ 0 };
    int mOscInputPort{ -1 };
+   bool mIsScriptUntrusted{ false };
 
    struct ScheduledNoteOutput
    {
@@ -294,7 +301,6 @@ public:
    virtual ~ScriptReferenceDisplay();
    static IDrawableModule* Create() { return new ScriptReferenceDisplay(); }
 
-
    void CreateUIControls() override;
 
    void ButtonClicked(ClickButton* button) override;
@@ -320,4 +326,31 @@ private:
    float mHeight{ 335 };
    ofVec2f mScrollOffset;
    float mMaxScrollAmount{ 0 };
+};
+
+
+class ScriptWarningPopup : public IDrawableModule
+{
+public:
+   ScriptWarningPopup() {}
+   virtual ~ScriptWarningPopup() {}
+   static IDrawableModule* Create() { return new ScriptWarningPopup(); }
+
+   void CreateUIControls() override;
+   void Poll() override;
+
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+private:
+   void DrawModule() override;
+   bool Enabled() const override { return true; }
+
+   int mWidth{ 600 };
+   int mHeight{ 120 };
+
+   int mRemainingUntrustedScriptModules{ 0 };
 };

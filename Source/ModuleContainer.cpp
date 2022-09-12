@@ -34,6 +34,7 @@
 #include "PerformanceTimer.h"
 #include "SynthGlobals.h"
 #include "QuickSpawnMenu.h"
+#include "Prefab.h"
 
 #include "juce_core/juce_core.h"
 
@@ -604,6 +605,8 @@ void ModuleContainer::SaveState(FileStreamOut& out)
 
 void ModuleContainer::LoadState(FileStreamIn& in)
 {
+   Prefab::sLastLoadWasPrefab = Prefab::sLoadingPrefab;
+
    bool wasLoadingState = TheSynth->IsLoadingState();
    TheSynth->SetIsLoadingState(true);
 

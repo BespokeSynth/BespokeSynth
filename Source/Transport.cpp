@@ -283,7 +283,7 @@ void Transport::ButtonClicked(ClickButton* button)
    if (button == mDecreaseTempoButton)
       AdjustTempo(-1);
    if (button == mPlayPauseButton)
-      TheSynth->ToggleAudioPaused();
+      TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
 }
 
 TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)

@@ -489,6 +489,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(Razor, razor, kModuleCategory_Synth);
    REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleCategory_Note);
    REGISTER_HIDDEN(ScriptReferenceDisplay, scriptingreference, kModuleCategory_Other);
+   REGISTER_HIDDEN(ScriptWarningPopup, scriptwarning, kModuleCategory_Other);
    REGISTER_HIDDEN(MultitrackRecorderTrack, multitrackrecordertrack, kModuleCategory_Audio);
 }
 
