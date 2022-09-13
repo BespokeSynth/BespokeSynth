@@ -840,13 +840,13 @@ void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int veloci
 {
    if (index == 0)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
       return;
    }
 
    if (index - 1 < (int)mExtraNoteOutputs.size())
    {
-      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
    }
 }
 

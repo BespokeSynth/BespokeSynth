@@ -66,7 +66,7 @@ void NoteOutputQueue::Process()
       else
       {
          //ofLog() << "playing queued note " << output.time << " " << output.pitch << " " << output.velocity << " " << gTime;
-         output.target->PlayNoteInternal(output.time, output.pitch, output.velocity, output.voiceIdx, output.modulation);
+         output.target->PlayNoteInternal(output.time, output.pitch, output.velocity, output.voiceIdx, output.modulation, false);
       }
    }
 }

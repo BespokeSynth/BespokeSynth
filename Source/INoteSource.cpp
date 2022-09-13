@@ -35,16 +35,19 @@
 void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    ResetStackDepth();
-   PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation, false);
 }
 
-void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled)
 {
    if (std::this_thread::get_id() != ModularSynth::GetAudioThreadID())
    {
-      time += TheTransport->GetEventLookaheadMs();
-      if (velocity == 0)
-         time += gBufferSizeMs; //1 buffer later, to make sure notes get cleared
+      if (!isFromMainThreadAndScheduled)   //if we specifically scheduled this ahead of time, there's no need to make adjustments. otherwise, account for immediately requesting a note from the non-audio thread
+      {
+         time += TheTransport->GetEventLookaheadMs();
+         if (velocity == 0)
+            time += gBufferSizeMs; //1 buffer later, to make sure notes get cleared
+      }
       TheSynth->GetNoteOutputQueue()->QueuePlayNote(this, time, pitch, velocity, voiceIdx, modulation);
       return;
    }
@@ -144,7 +147,7 @@ void NoteOutput::Flush(double time)
       mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, false);
 }
 
-void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled)
 {
    PROFILER(INoteSourcePlayOutput);
 
@@ -154,7 +157,7 @@ void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voice
    if (!mInNoteOutput)
       mNoteOutput.ResetStackDepth();
    mInNoteOutput = true;
-   mNoteOutput.PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation);
+   mNoteOutput.PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation, isFromMainThreadAndScheduled);
    mInNoteOutput = false;
 }
 
