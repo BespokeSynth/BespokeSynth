@@ -263,23 +263,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    else
       gModuleDrawAlpha = 100;
 
-   bool dimModule = false;
-
-   if (TheSynth->GetGroupSelectedModules().empty() == false)
-   {
-      if (!VectorContains(GetModuleParent(), TheSynth->GetGroupSelectedModules()))
-         dimModule = true;
-   }
-
-   if (PatchCable::sActivePatchCable &&
-       (PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_Modulator && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_ValueSetter) &&
-       !PatchCable::sActivePatchCable->IsValidTarget(this))
-   {
-      dimModule = true;
-   }
-
-   if (TheSynth->GetHeldSample() != nullptr && !CanDropSample())
-      dimModule = true;
+   bool dimModule = TheSynth->ShouldDimModule(this);
 
    if (dimModule)
       gModuleDrawAlpha *= .2f;

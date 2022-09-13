@@ -64,6 +64,7 @@ public:
    void LoadPrefab(std::string loadPath);
 
    static bool sLoadingPrefab;
+   static bool sLastLoadWasPrefab;
    static IDrawableModule* sJustReleasedModule;
 
 private:

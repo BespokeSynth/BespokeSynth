@@ -48,6 +48,7 @@
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
 #include "leathers/pop"
+#include "juce_cryptography/juce_cryptography.h"
 
 namespace py = pybind11;
 using namespace juce;
@@ -79,6 +80,8 @@ true;
 #else
 false;
 #endif
+//static
+bool ScriptModule::sHasLoadedUntrustedScript = false;
 
 //static
 ofxJSONElement ScriptModule::sStyleJSON;
@@ -129,6 +132,12 @@ void ScriptModule::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
+
+   UIBLOCK0();
+   BUTTON(mTrustScriptButton, "yes, I trust this script, load it");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mDontTrustScriptButton, "no, I don't trust this script, abort load");
+   ENDUIBLOCK0();
 
    mPythonInstalledConfirmButton = new ClickButton(this, "yes, I have Python installed", 20, 100);
 
@@ -227,6 +236,13 @@ void ScriptModule::DrawModule()
       return;
    }
 
+   mTrustScriptButton->SetShowing(mIsScriptUntrusted);
+   mDontTrustScriptButton->SetShowing(mIsScriptUntrusted);
+   mLoadScriptSelector->SetShowing(!mIsScriptUntrusted);
+   mLoadScriptButton->SetShowing(!mIsScriptUntrusted);
+   mSaveScriptButton->SetShowing(!mIsScriptUntrusted);
+   mShowReferenceButton->SetShowing(!mIsScriptUntrusted);
+
    mPythonInstalledConfirmButton->SetShowing(false);
    mCodeEntry->SetShowing(true);
 
@@ -241,6 +257,24 @@ void ScriptModule::DrawModule()
    mBSlider->Draw();
    mCSlider->Draw();
    mDSlider->Draw();
+
+   if (mIsScriptUntrusted)
+   {
+      mTrustScriptButton->Draw();
+      mDontTrustScriptButton->Draw();
+      ofPushStyle();
+      ofFill();
+
+      ofRectangle buttonRect = mTrustScriptButton->GetRect(K(local));
+      ofSetColor(0, 255, 0, 80);
+      ofRect(buttonRect);
+
+      buttonRect = mDontTrustScriptButton->GetRect(K(local));
+      ofSetColor(255, 0, 0, 80);
+      ofRect(buttonRect);
+
+      ofPopStyle();
+   }
 
    if (mLastError != "")
    {
@@ -480,6 +514,19 @@ void ScriptModule::Poll()
 
    if (!sPythonInitialized)
       return;
+
+   if (ScriptModule::sHasLoadedUntrustedScript)
+   {
+      if (TheSynth->FindModule("scriptwarning") == nullptr)
+      {
+         ModuleFactory::Spawnable spawnable;
+         spawnable.mLabel = "scriptwarning";
+         TheSynth->SpawnModuleOnTheFly(spawnable, 50, 100, true);
+         TheSynth->SetAudioPaused(true);
+      }
+      mCodeEntry->Publish();
+      return;
+   }
 
    if (sScriptsRequestingInitExecution.size() > 0)
    {
@@ -950,6 +997,18 @@ void ScriptModule::ButtonClicked(ClickButton* button)
       spawnable.mLabel = "scriptingreference";
       TheSynth->SpawnModuleOnTheFly(spawnable, moduleX + moduleW, moduleY, true);
    }
+
+   if (button == mTrustScriptButton)
+   {
+      RecordScriptAsTrusted();
+      mIsScriptUntrusted = false;
+   }
+
+   if (button == mDontTrustScriptButton)
+   {
+      TheSynth->SetAudioPaused(false);
+      TheSynth->ReloadInitialLayout();
+   }
 }
 
 void ScriptModule::DropdownClicked(DropdownList* list)
@@ -1123,6 +1182,12 @@ void ScriptModule::RunCode(double time, std::string code)
    if (!sPythonInitialized)
    {
       TheSynth->LogEvent("trying to call ScriptModule::RunCode() before python is initialized", kLogEventType_Error);
+      return;
+   }
+
+   if (sHasLoadedUntrustedScript)
+   {
+      TheSynth->LogEvent("can't run scripts until user has added all loaded scripts to the allow list", kLogEventType_Error);
       return;
    }
 
@@ -1482,6 +1547,8 @@ void ScriptModule::SaveState(FileStreamOut& out)
 
    out << mWidth;
    out << mHeight;
+
+   RecordScriptAsTrusted();
 }
 
 void ScriptModule::LoadState(FileStreamIn& in, int rev)
@@ -1511,6 +1578,40 @@ void ScriptModule::LoadState(FileStreamIn& in, int rev)
    in >> w;
    in >> h;
    Resize(w, h);
+
+   juce::String checksum = GetScriptChecksum();
+   juce::File trusted_python_scripts = File(ofToDataPath("internal/trusted_python_scripts"));
+   bool isScriptTrusted = false;
+   if (trusted_python_scripts.existsAsFile())
+   {
+      StringArray lines;
+      trusted_python_scripts.readLines(lines);
+      for (auto& line : lines)
+      {
+         if (line == checksum)
+            isScriptTrusted = true;
+      }
+   }
+
+   if (!isScriptTrusted)
+      sHasLoadedUntrustedScript = true;
+   mIsScriptUntrusted = !isScriptTrusted;
+}
+
+juce::String ScriptModule::GetScriptChecksum() const
+{
+   juce::String code = mCodeEntry->GetText(false);
+   juce::String checksum = juce::SHA256(code.toUTF8()).toHexString();
+   return checksum;
+}
+
+void ScriptModule::RecordScriptAsTrusted()
+{
+   juce::File trusted_python_scripts = File(ofToDataPath("internal/trusted_python_scripts"));
+   bool isScriptTrusted = false;
+   if (!trusted_python_scripts.existsAsFile())
+      trusted_python_scripts.create();
+   trusted_python_scripts.appendText("\n" + GetScriptChecksum());
 }
 
 void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofColor color)
@@ -1597,4 +1698,53 @@ void ScriptReferenceDisplay::ButtonClicked(ClickButton* button)
 {
    if (button == mCloseButton)
       GetOwningContainer()->DeleteModule(this);
+}
+
+void ScriptWarningPopup::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+}
+
+void ScriptWarningPopup::Poll()
+{
+   IDrawableModule::Poll();
+
+   std::vector<IDrawableModule*> modules;
+   TheSynth->GetAllModules(modules);
+
+   int untrustedCount = 0;
+   for (auto* module : modules)
+   {
+      ScriptModule* script = dynamic_cast<ScriptModule*>(module);
+      if (script != nullptr && !script->IsScriptTrusted())
+         ++untrustedCount;
+   }
+   mRemainingUntrustedScriptModules = untrustedCount;
+
+   if (untrustedCount == 0)
+   {
+      TheSynth->SetAudioPaused(false);
+      ScriptModule::sHasLoadedUntrustedScript = false;
+      if (Prefab::sLastLoadWasPrefab)
+      {
+         //get rid of this popup and continue loading prefab
+         GetOwningContainer()->DeleteModule(this);
+      }
+      else
+      {
+         //reload save file fresh
+         TheSynth->LoadState(TheSynth->GetLastSavePath());
+      }
+   }
+}
+
+void ScriptWarningPopup::DrawModule()
+{
+   DrawTextNormal(std::string("") +
+                  "heads up: this BSK file contains python scripts.\n\n" +
+                  "generally, these python scripts are innocuous, and used to do cool things within bespoke.\n" +
+                  "however, a malicious user could theoretically use python scripts to do bad things to your computer.\n\n" +
+                  "do you trust the creator of this file? if so, please go to each script window and approve the script\n" +
+                  "(" + ofToString(mRemainingUntrustedScriptModules) + " script" + (mRemainingUntrustedScriptModules == 1 ? "" : "s") + " remaining to be approved)",
+                  3, 14);
 }

@@ -33,7 +33,7 @@
 
 //static
 bool Prefab::sLoadingPrefab = false;
-//static
+bool Prefab::sLastLoadWasPrefab = false;
 IDrawableModule* Prefab::sJustReleasedModule = nullptr;
 
 Prefab::Prefab()

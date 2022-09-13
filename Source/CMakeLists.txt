@@ -830,6 +830,7 @@ target_link_libraries(BespokeSynth PRIVATE
     juce::juce_audio_devices
     juce::juce_audio_formats
     juce::juce_audio_processors
+    juce::juce_cryptography
     juce::juce_gui_basics
     juce::juce_opengl
     juce::juce_osc

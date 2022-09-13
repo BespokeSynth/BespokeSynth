@@ -1680,6 +1680,32 @@ bool ModularSynth::ShouldAccentuateActiveModules() const
    return IsKeyHeld('s', kModifier_Shift);
 }
 
+bool ModularSynth::ShouldDimModule(IDrawableModule* module)
+{
+   if (TheSynth->GetGroupSelectedModules().empty() == false)
+   {
+      if (!VectorContains(module->GetModuleParent(), TheSynth->GetGroupSelectedModules()))
+         return true;
+   }
+
+   if (PatchCable::sActivePatchCable &&
+       (PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_Modulator && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_ValueSetter) &&
+       !PatchCable::sActivePatchCable->IsValidTarget(module))
+   {
+      return true;
+   }
+
+   if (TheSynth->GetHeldSample() != nullptr && !module->CanDropSample())
+      return true;
+
+   if (ScriptModule::sHasLoadedUntrustedScript &&
+       dynamic_cast<ScriptModule*>(module) == nullptr &&
+       dynamic_cast<ScriptWarningPopup*>(module) == nullptr)
+      return true;
+
+   return false;
+}
+
 void ModularSynth::RegisterPatchCable(PatchCable* cable)
 {
    mPatchCables.push_back(cable);
@@ -2105,6 +2131,8 @@ void ModularSynth::ResetLayout()
    LFOPool::Shutdown();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
    ScriptModule::sBackgroundTextString = "";
+   ScriptModule::sHasLoadedUntrustedScript = false; //reset
+   ScriptModule::sScriptsRequestingInitExecution.clear();
 
    mErrors.clear();
 
