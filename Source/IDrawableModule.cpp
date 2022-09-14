@@ -1140,7 +1140,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
 
    for (auto* child : mChildren)
    {
-      out << std::string(child->GetTypeName());
+      out << std::string(child->Name());
       child->SaveState(out);
    }
 
