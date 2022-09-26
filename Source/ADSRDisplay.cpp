@@ -169,7 +169,8 @@ void ADSRDisplay::Render()
          //float xPast = timePast / mMaxTime * mWidth;
          //float yPast = (1 - mViewAdsr.Value(timePast) * mVol) * mHeight;
 
-         ofLine(xLeading, yLeading, xLeading, mHeight);
+         if (xLeading <= mWidth)
+            ofLine(xLeading, yLeading, xLeading, mHeight);
 
          /*bool discontinuity = false;
          if (timeLeading < timePast)

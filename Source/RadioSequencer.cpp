@@ -100,7 +100,10 @@ void RadioSequencer::OnControllerPageSelected()
 void RadioSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
    if (velocity > 0)
-      mGrid->SetVal(x, y, 1);
+   {
+      float currentVal = mGrid->GetVal(x, y);
+      mGrid->SetVal(x, y, currentVal > 0 ? 0 : 1);
+   }
    UpdateGridLights();
 }
 
