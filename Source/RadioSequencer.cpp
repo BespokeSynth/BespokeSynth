@@ -90,6 +90,7 @@ void RadioSequencer::CreateUIControls()
 
 void RadioSequencer::Poll()
 {
+   UpdateGridLights();
 }
 
 void RadioSequencer::OnControllerPageSelected()
@@ -109,6 +110,11 @@ void RadioSequencer::OnGridButton(int x, int y, float velocity, IGridController*
 
 void RadioSequencer::UpdateGridLights()
 {
+   bool blinkOn = true;
+   TransportListenerInfo transportInfo(this, kInterval_16n, OffsetInfo(0, false), false);
+   if (TheTransport->GetQuantized(gTime, &transportInfo) % 2 == 1)
+      blinkOn = false;
+
    if (mGridControlTarget->GetGridController())
    {
       for (int row = 0; row < mGrid->GetRows(); ++row)
@@ -118,7 +124,7 @@ void RadioSequencer::UpdateGridLights()
             if (mGrid->GetVal(col, row) == 1)
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Bright);
             else if (col == mGrid->GetHighlightCol(NextBufferTime(true)))
-               mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Dim);
+               mGridControlTarget->GetGridController()->SetLight(col, row, blinkOn ? GridColor::kGridColor1Dim : GridColor::kGridColorOff);
             else
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColorOff);
          }

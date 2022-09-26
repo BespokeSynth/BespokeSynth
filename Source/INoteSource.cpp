@@ -42,7 +42,7 @@ void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voic
 {
    if (std::this_thread::get_id() != ModularSynth::GetAudioThreadID())
    {
-      if (!isFromMainThreadAndScheduled)   //if we specifically scheduled this ahead of time, there's no need to make adjustments. otherwise, account for immediately requesting a note from the non-audio thread
+      if (!isFromMainThreadAndScheduled) //if we specifically scheduled this ahead of time, there's no need to make adjustments. otherwise, account for immediately requesting a note from the non-audio thread
       {
          time += TheTransport->GetEventLookaheadMs();
          if (velocity == 0)
