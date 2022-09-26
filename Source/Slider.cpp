@@ -347,7 +347,7 @@ void FloatSlider::MouseReleased()
    mMouseDown = false;
    mRefY = -999;
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
-      SetValue(0, NextBufferTime());
+      SetValue(0, NextBufferTime(false));
 }
 
 bool FloatSlider::MouseMoved(float x, float y)
@@ -402,7 +402,7 @@ void FloatSlider::SetValueForMouse(int x, int y)
 
    if (oldVal != *var)
    {
-      mOwner->FloatSliderUpdated(this, oldVal, NextBufferTime());
+      mOwner->FloatSliderUpdated(this, oldVal, NextBufferTime(false));
    }
 
    if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
@@ -542,7 +542,7 @@ void FloatSlider::UpdateTouching()
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
    {
       if (!mTouching)
-         SetValue(0, NextBufferTime());
+         SetValue(0, NextBufferTime(false));
       mRelativeOffset = -999;
    }
 }
@@ -650,26 +650,26 @@ void FloatSlider::Double()
 {
    float doubl = *GetModifyValue() * 2.0f;
    if (doubl >= mMin && doubl <= mMax)
-      SetValue(doubl, NextBufferTime());
+      SetValue(doubl, NextBufferTime(false));
 }
 
 void FloatSlider::Halve()
 {
    float half = *GetModifyValue() * .5f;
    if (half >= mMin && half <= mMax)
-      SetValue(half, NextBufferTime());
+      SetValue(half, NextBufferTime(false));
 }
 
 void FloatSlider::Increment(float amount)
 {
    float val = *GetModifyValue() + amount;
    if (val >= mMin && val <= mMax)
-      SetValue(val, NextBufferTime());
+      SetValue(val, NextBufferTime(false));
 }
 
 void FloatSlider::ResetToOriginal()
 {
-   SetValue(mOriginalValue, NextBufferTime());
+   SetValue(mOriginalValue, NextBufferTime(false));
 }
 
 bool FloatSlider::CheckNeedsDraw()
@@ -701,7 +701,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
       if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
-         SetValue(evaluated, NextBufferTime());
+         SetValue(evaluated, NextBufferTime(false));
    }
    if (entry == mMaxEntry)
    {
@@ -1067,7 +1067,7 @@ void IntSlider::SetValueForMouse(int x, int y)
    if (oldVal != *mVar)
    {
       CalcSliderVal();
-      mOwner->IntSliderUpdated(this, oldVal, NextBufferTime());
+      mOwner->IntSliderUpdated(this, oldVal, NextBufferTime(false));
    }
 }
 
@@ -1116,26 +1116,26 @@ void IntSlider::Double()
 {
    int doubl = *mVar * 2;
    if (doubl >= mMin && doubl <= mMax)
-      SetValue(doubl, NextBufferTime());
+      SetValue(doubl, NextBufferTime(false));
 }
 
 void IntSlider::Halve()
 {
    int half = *mVar / 2;
    if (half >= mMin && half <= mMax)
-      SetValue(half, NextBufferTime());
+      SetValue(half, NextBufferTime(false));
 }
 
 void IntSlider::Increment(float amount)
 {
    int val = *mVar + (int)amount;
    if (val >= mMin && val <= mMax)
-      SetValue(val, NextBufferTime());
+      SetValue(val, NextBufferTime(false));
 }
 
 void IntSlider::ResetToOriginal()
 {
-   SetValue(mOriginalValue, NextBufferTime());
+   SetValue(mOriginalValue, NextBufferTime(false));
 }
 
 bool IntSlider::CheckNeedsDraw()
@@ -1168,7 +1168,7 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
       int evaluatedInt = round(evaluated);
       if (expressionValid && ((evaluatedInt >= mMin && evaluatedInt <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
-         SetValue(evaluatedInt, NextBufferTime());
+         SetValue(evaluatedInt, NextBufferTime(false));
    }
    if (entry == mMaxEntry)
    {

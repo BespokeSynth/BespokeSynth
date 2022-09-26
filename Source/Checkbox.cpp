@@ -143,7 +143,7 @@ void Checkbox::OnClicked(float x, float y, bool right)
 
    *mVar = !(*mVar);
    CalcSliderVal();
-   mOwner->CheckboxUpdated(this, NextBufferTime());
+   mOwner->CheckboxUpdated(this, NextBufferTime(false));
 }
 
 void Checkbox::CalcSliderVal()

@@ -104,7 +104,7 @@ void Monome::SetLightInternal(int x, int y, float value)
    Vec2i pos = Rotate(x, y, mGridRotation);
    int index = pos.x + pos.y * mMaxColumns;
    mLights[index].mValue = value;
-   mLights[index].mLastUpdatedTime = NextBufferTime();
+   mLights[index].mLastUpdatedTime = NextBufferTime(false);
 }
 
 void Monome::SetLight(int x, int y, float value)
@@ -195,7 +195,7 @@ void Monome::ConnectToDevice(std::string deviceDesc)
       for (int i = 0; i < mListForMidiController->GetNumValues(); ++i)
       {
          if (mListForMidiController->GetLabel(i) == device->GetDescription())
-            mListForMidiController->SetValueDirect(i, NextBufferTime());
+            mListForMidiController->SetValueDirect(i, NextBufferTime(false));
       }
    }
 

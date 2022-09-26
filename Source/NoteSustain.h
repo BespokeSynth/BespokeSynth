@@ -45,7 +45,7 @@ public:
    void SetEnabled(bool enabled) override
    {
       mEnabled = enabled;
-      mNoteOutput.Flush(NextBufferTime());
+      mNoteOutput.Flush(NextBufferTime(false));
    }
 
    void OnTransportAdvanced(float amount) override;

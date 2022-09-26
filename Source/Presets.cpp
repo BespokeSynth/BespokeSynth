@@ -87,7 +87,7 @@ void Presets::Poll()
 {
    if (mQueuedPresetIndex != -1)
    {
-      SetPreset(mQueuedPresetIndex, NextBufferTime(), false);
+      SetPreset(mQueuedPresetIndex, NextBufferTime(false), false);
       mQueuedPresetIndex = -1;
    }
 
@@ -183,7 +183,7 @@ void Presets::OnClicked(float x, float y, bool right)
       if (GetKeyModifiers() == kModifier_Shift)
          Store(mCurrentPreset);
       else
-         SetPreset(mCurrentPreset, NextBufferTime(), false);
+         SetPreset(mCurrentPreset, NextBufferTime(false), false);
 
       UpdateGridValues();
    }
@@ -305,7 +305,7 @@ void Presets::RandomizeControl(IUIControl* control)
       return;
    if (dynamic_cast<ClickButton*>(control) != nullptr)
       return;
-   control->SetFromMidiCC(ofRandom(1), NextBufferTime(), true);
+   control->SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
 }
 
 void Presets::OnTransportAdvanced(float amount)

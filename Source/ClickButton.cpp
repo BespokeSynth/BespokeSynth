@@ -167,7 +167,7 @@ void ClickButton::OnClicked(float x, float y, bool right)
    if (right)
       return;
 
-   DoClick(NextBufferTime());
+   DoClick(NextBufferTime(false));
 }
 
 void ClickButton::DoClick(double time)

@@ -303,7 +303,7 @@ bool DropdownList::DropdownClickedAt(int x, int y)
    int index = GetItemIndexAt(x, y);
    if (index >= 0 && index < mElements.size())
    {
-      SetIndex(index, NextBufferTime(), K(forceUpdate));
+      SetIndex(index, NextBufferTime(false), K(forceUpdate));
       return true;
    }
    return false;

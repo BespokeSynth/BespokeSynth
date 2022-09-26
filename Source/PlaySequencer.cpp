@@ -440,9 +440,9 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
             mGrid->Clear();
 
          if (x >= 4 && y == 0)
-            ButtonClicked(mSavedPatterns[x - 4].mStoreButton, NextBufferTime());
+            ButtonClicked(mSavedPatterns[x - 4].mStoreButton, NextBufferTime(false));
          if (x >= 4 && y == 1)
-            ButtonClicked(mSavedPatterns[x - 4].mLoadButton, NextBufferTime());
+            ButtonClicked(mSavedPatterns[x - 4].mLoadButton, NextBufferTime(false));
 
          if (y >= 4)
          {

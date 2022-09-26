@@ -116,7 +116,7 @@ void NoteCreator::TextEntryComplete(TextEntry* entry)
    {
       if (mNoteOn)
       {
-         double time = NextBufferTime();
+         double time = NextBufferTime(false);
          mNoteOutput.Flush(time);
          PlayNoteOutput(time + .1f, mPitch, mVelocity * 127, mVoiceIndex);
       }

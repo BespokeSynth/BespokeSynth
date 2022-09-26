@@ -138,7 +138,7 @@ void Chorder::AddTone(int tone, float velocity)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(NextBufferTime(), outPitch, mVelocity * velocity, -1, ModulationParameters());
+         PlayChorderNote(NextBufferTime(false), outPitch, mVelocity * velocity, -1, ModulationParameters());
       }
    }
 }
@@ -154,7 +154,7 @@ void Chorder::RemoveTone(int tone)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(NextBufferTime(), outPitch, 0, -1, ModulationParameters());
+         PlayChorderNote(NextBufferTime(false), outPitch, 0, -1, ModulationParameters());
       }
    }
 }

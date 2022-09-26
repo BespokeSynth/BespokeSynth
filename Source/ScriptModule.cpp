@@ -1053,7 +1053,7 @@ void ScriptModule::RefreshScriptFiles()
 
 void ScriptModule::ExecuteCode()
 {
-   RunScript(NextBufferTime());
+   RunScript(NextBufferTime(false));
 }
 
 std::pair<int, int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
@@ -1416,7 +1416,7 @@ void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)
 
 void ScriptModule::Stop()
 {
-   double time = NextBufferTime();
+   double time = NextBufferTime(false);
 
    //run through any scheduled note offs for this pitch
    for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)

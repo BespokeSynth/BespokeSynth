@@ -182,7 +182,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
 {
    bool bOn = velocity > 0;
    int pitch = GridToPitch(x, y);
-   double time = NextBufferTime();
+   double time = NextBufferTime(false);
 
    if (pitch == INVALID_PITCH)
    {
@@ -210,7 +210,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
       {
          mLatch = !mLatch;
          if (!mLatch)
-            mNoteOutput.Flush(NextBufferTime());
+            mNoteOutput.Flush(NextBufferTime(false));
          UpdateLights();
       }
       return;
@@ -238,7 +238,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
                currentPitch = i;
             mCurrentNotes[i] = 0;
          }
-         mNoteOutput.Flush(NextBufferTime());
+         mNoteOutput.Flush(NextBufferTime(false));
 
          if (currentPitch == pitch)
          {
@@ -326,7 +326,7 @@ void LaunchpadKeyboard::ReleaseNoteFor(int x, int y)
    int pitch = GridToPitch(x, y);
    if (pitch >= 0 && pitch < 128)
    {
-      double time = NextBufferTime();
+      double time = NextBufferTime(false);
       PlayKeyboardNote(time, pitch, 0);
       mCurrentNotes[pitch] = 0;
    }

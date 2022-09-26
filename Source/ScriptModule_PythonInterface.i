@@ -383,7 +383,7 @@ PYBIND11_EMBEDDED_MODULE(notecanvas, m)
       })
       .def("clear", [](NoteCanvas& canvas)
       {
-         canvas.Clear(NextBufferTime());
+         canvas.Clear(NextBufferTime(false));
       })
       .def("fit", [](NoteCanvas& canvas)
       {

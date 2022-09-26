@@ -79,21 +79,21 @@ void PSMoveController::Poll()
    {
       mPitch = ofClamp(mPitch + gyros.x / 50000, 0, 1);
       if (mPitchUIControl)
-         mPitchUIControl->SetFromMidiCC(mPitch, NextBufferTime(), false);
+         mPitchUIControl->SetFromMidiCC(mPitch, NextBufferTime(false), false);
       isButtonDown = true;
    }
    if (mMoveMgr.IsButtonDown(0, Btn_SQUARE))
    {
       mYaw = ofClamp(mYaw - gyros.z / 50000, 0, 1);
       if (mYawUIControl)
-         mYawUIControl->SetFromMidiCC(mYaw, NextBufferTime(), false);
+         mYawUIControl->SetFromMidiCC(mYaw, NextBufferTime(false), false);
       isButtonDown = true;
    }
    if (mMoveMgr.IsButtonDown(0, Btn_T))
    {
       mRoll = ofClamp(mRoll + gyros.y / 80000, 0, 1);
       if (mRollUIControl)
-         mRollUIControl->SetFromMidiCC(mRoll, NextBufferTime(), false);
+         mRollUIControl->SetFromMidiCC(mRoll, NextBufferTime(false), false);
       isButtonDown = true;
    }
    if (isButtonDown)
@@ -118,7 +118,7 @@ void PSMoveController::Poll()
    mMoveMgr.GetAccel(0, accel);
    mEnergy = ofClamp(accel.length() / 5000 - .8f, 0, 1);
    if (mEnergyUIControl)
-      mEnergyUIControl->SetFromMidiCC(mEnergy, NextBufferTime(), false);
+      mEnergyUIControl->SetFromMidiCC(mEnergy, NextBufferTime(false), false);
 }
 
 void PSMoveController::Exit()

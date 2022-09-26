@@ -130,7 +130,7 @@ void GridSliders::OnGridButton(int x, int y, float velocity, IGridController* gr
       {
          float value = squareIndex / float(length - 1);
          for (auto& cable : mControlCables[sliderIndex]->GetPatchCables())
-            dynamic_cast<IUIControl*>(cable->GetTarget())->SetFromMidiCC(value, NextBufferTime(), false);
+            dynamic_cast<IUIControl*>(cable->GetTarget())->SetFromMidiCC(value, NextBufferTime(false), false);
       }
    }
 }

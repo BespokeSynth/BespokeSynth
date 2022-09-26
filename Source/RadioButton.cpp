@@ -220,9 +220,9 @@ void RadioButton::OnClicked(float x, float y, bool right)
       return;
 
    if (mDirection == kRadioVertical)
-      SetIndex(y / radioSpacing, NextBufferTime());
+      SetIndex(y / radioSpacing, NextBufferTime(false));
    else //kRadioHorizontal
-      SetIndex(int(x / mElementWidth), NextBufferTime());
+      SetIndex(int(x / mElementWidth), NextBufferTime(false));
 }
 
 ofVec2f RadioButton::GetOptionPosition(int optionIndex)
@@ -339,7 +339,7 @@ void RadioButton::Increment(float amount)
       }
    }
 
-   SetIndex(current + (int)amount, NextBufferTime());
+   SetIndex(current + (int)amount, NextBufferTime(false));
 }
 
 EnumMap RadioButton::GetEnumMap()

@@ -61,7 +61,7 @@ void NoteRouter::SetSelectedMask(int mask)
 {
    int oldMask = mRouteMask;
    mRouteMask = mask;
-   RadioButtonUpdated(mRouteSelector, oldMask, NextBufferTime());
+   RadioButtonUpdated(mRouteSelector, oldMask, NextBufferTime(false));
 }
 
 void NoteRouter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

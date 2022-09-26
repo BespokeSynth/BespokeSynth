@@ -95,9 +95,9 @@ void NoteSorter::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void NoteSorter::TextEntryComplete(TextEntry* entry)
 {
-   mNoteOutput.Flush(NextBufferTime());
+   mNoteOutput.Flush(NextBufferTime(false));
    for (int i = 0; i < kMaxDestinations; ++i)
-      mDestinationCables[i]->Flush(NextBufferTime());
+      mDestinationCables[i]->Flush(NextBufferTime(false));
 }
 
 void NoteSorter::SetUpFromSaveData()

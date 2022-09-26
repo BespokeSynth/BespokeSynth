@@ -234,7 +234,7 @@ void StutterControl::OnControllerPageSelected()
 void StutterControl::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
    int index = x + y * grid->NumCols();
-   double time = NextBufferTime();
+   double time = NextBufferTime(false);
    if (index < kNumStutterTypes)
    {
       mStutter[index] = velocity > 0;

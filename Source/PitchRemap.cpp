@@ -117,7 +117,7 @@ void PitchRemap::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 void PitchRemap::TextEntryComplete(TextEntry* entry)
 {
    //TODO(Ryan) make this handle mappings changing while notes are input
-   mNoteOutput.Flush(NextBufferTime());
+   mNoteOutput.Flush(NextBufferTime(false));
 }
 
 void PitchRemap::LoadLayout(const ofxJSONElement& moduleInfo)

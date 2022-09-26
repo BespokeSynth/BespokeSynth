@@ -168,5 +168,5 @@ void INoteSource::SendCCOutput(int control, int value, int voiceIdx /*=-1*/)
 
 void INoteSource::PreRepatch(PatchCableSource* cableSource)
 {
-   mNoteOutput.Flush(NextBufferTime());
+   mNoteOutput.Flush(NextBufferTime(false));
 }

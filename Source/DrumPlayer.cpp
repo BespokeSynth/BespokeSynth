@@ -673,7 +673,7 @@ void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* gri
    {
       if (velocity > 0 && mQuantizeInterval == kInterval_None)
       {
-         PlayNote(NextBufferTime(), sampleIdx, velocity * 127);
+         PlayNote(NextBufferTime(false), sampleIdx, velocity * 127);
       }
       else
       {

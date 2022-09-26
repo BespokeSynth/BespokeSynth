@@ -692,7 +692,7 @@ void NoteStepSequencer::UpdateLights()
          int color = 0;
          if (i < mLength)
          {
-            if (i == mGrid->GetHighlightCol(NextBufferTime() + TheTransport->GetEventLookaheadMs()))
+            if (i == mGrid->GetHighlightCol(NextBufferTime(true)))
             {
                color = LaunchpadInterpreter::LaunchpadColor(0, 3);
             }
@@ -849,7 +849,7 @@ void NoteStepSequencer::UpdateGridControllerLights(bool force)
             int row = y - mGridControlOffsetY;
 
             GridColor color = GridColor::kGridColorOff;
-            bool isHighlightCol = (column == mGrid->GetHighlightCol(NextBufferTime() + TheTransport->GetEventLookaheadMs()));
+            bool isHighlightCol = (column == mGrid->GetHighlightCol(NextBufferTime(true)));
             if (isHighlightCol)
                color = GridColor::kGridColor2Dim;
             if (column < mLength)

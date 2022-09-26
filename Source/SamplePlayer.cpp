@@ -791,7 +791,7 @@ void SamplePlayer::OnClicked(float x, float y, bool right)
       mStopOnNoteOff = false;
       mPlay = true;
       mAdsr.Clear();
-      mAdsr.Start(NextBufferTime(), 1);
+      mAdsr.Start(NextBufferTime(false), 1);
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mScrubbingSample = true;
 
@@ -841,7 +841,7 @@ bool SamplePlayer::MouseMoved(float x, float y)
       mSwitchAndRamp.StartSwitch();
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mAdsr.Clear();
-      mAdsr.Start(NextBufferTime(), 1);
+      mAdsr.Start(NextBufferTime(false), 1);
 
       if (mSetCuePoint)
          SetCuePointForX(x);

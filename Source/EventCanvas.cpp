@@ -154,16 +154,16 @@ void EventCanvas::OnTransportAdvanced(float amount)
          if (curPos > elementEnd)
          {
             if (startPassed)
-               element->Trigger(NextBufferTime());
+               element->Trigger(NextBufferTime(false));
             if (endPassed)
-               element->TriggerEnd(NextBufferTime());
+               element->TriggerEnd(NextBufferTime(false));
          }
          else
          {
             if (endPassed)
-               element->TriggerEnd(NextBufferTime());
+               element->TriggerEnd(NextBufferTime(false));
             if (startPassed)
-               element->Trigger(NextBufferTime());
+               element->Trigger(NextBufferTime(false));
          }
 
          IUIControl* control = mRowConnections[element->mRow].mUIControl;

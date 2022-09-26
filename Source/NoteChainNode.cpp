@@ -96,13 +96,13 @@ void NoteChainNode::OnTimeEvent(double time)
 
 void NoteChainNode::OnTransportAdvanced(float amount)
 {
-   if (mNoteOn && NextBufferTime() > mStartTime + mDurationMs)
+   if (mNoteOn && NextBufferTime(true) > mStartTime + mDurationMs)
    {
       mNoteOn = false;
       mNoteOutput.Flush(mStartTime + mDurationMs);
    }
 
-   if (mWaitingToTrigger && NextBufferTime() > mStartTime + mNext)
+   if (mWaitingToTrigger && NextBufferTime(true) > mStartTime + mNext)
    {
       mWaitingToTrigger = false;
       DispatchPulse(mNextNodeCable, mStartTime + mNext, 1, 0);
@@ -148,7 +148,7 @@ void NoteChainNode::TextEntryComplete(TextEntry* entry)
    if (entry == mPitchEntry)
    {
       mNoteOn = false;
-      mNoteOutput.Flush(NextBufferTime());
+      mNoteOutput.Flush(NextBufferTime(false));
    }
 }
 

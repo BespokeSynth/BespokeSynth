@@ -754,6 +754,14 @@ void LoadStateValidate(bool assertion)
       throw LoadStateException();
 }
 
+double NextBufferTime(bool includeLookahead)
+{
+   double time = gTime + gBufferSizeMs;
+   if (includeLookahead)
+      time += TheTransport->GetEventLookaheadMs();
+   return time;
+}
+
 float GetLeftPanGain(float pan)
 {
    return 1 - ofClamp(pan, -1, 1);

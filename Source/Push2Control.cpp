@@ -1123,7 +1123,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
          float currentNormalized = mSliderControls[controlIndex]->GetMidiValue();
          float increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
          increment *= .005f;
-         mSliderControls[controlIndex]->SetFromMidiCC(currentNormalized + increment, NextBufferTime(), false);
+         mSliderControls[controlIndex]->SetFromMidiCC(currentNormalized + increment, NextBufferTime(false), false);
       }
    }
    else if (control.mControl >= kAboveScreenButtonRow && control.mControl < kAboveScreenButtonRow + 8) //buttons below encoders
@@ -1153,7 +1153,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
                {
                   float current = mButtonControls[controlIndex]->GetMidiValue();
                   float newValue = current > 0 ? 0 : 1;
-                  mButtonControls[controlIndex]->SetFromMidiCC(newValue, NextBufferTime(), false);
+                  mButtonControls[controlIndex]->SetFromMidiCC(newValue, NextBufferTime(false), false);
                }
             }
             else

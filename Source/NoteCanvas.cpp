@@ -219,7 +219,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
 
    if (mStopQueued)
    {
-      mNoteOutput.Flush(NextBufferTime());
+      mNoteOutput.Flush(NextBufferTime(false));
       for (int i = 0; i < mCurrentNotes.size(); ++i)
          mCurrentNotes[i] = nullptr;
       mStopQueued = false;
@@ -623,7 +623,7 @@ void NoteCanvas::LoadMidi()
       bool wasPlaying = mPlay;
       mPlay = false;
 
-      Clear(NextBufferTime());
+      Clear(NextBufferTime(false));
       SetNumMeasures(1);
       File file = chooser.getResult();
       FileInputStream inputStream(file);

@@ -213,8 +213,8 @@ bool BiquadFilterEffect::MouseMoved(float x, float y)
       GetPosition(thisx, thisy);
       x += thisx;
       y += thisy;
-      mFSlider->SetValue(x * 2 + 150, NextBufferTime());
-      mQSlider->SetValue(y / 100.0f, NextBufferTime());
+      mFSlider->SetValue(x * 2 + 150, NextBufferTime(false));
+      mQSlider->SetValue(y / 100.0f, NextBufferTime(false));
    }
 
    return false;

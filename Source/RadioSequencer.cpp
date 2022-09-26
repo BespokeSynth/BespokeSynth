@@ -117,7 +117,7 @@ void RadioSequencer::UpdateGridLights()
          {
             if (mGrid->GetVal(col, row) == 1)
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Bright);
-            else if (col == mGrid->GetHighlightCol(NextBufferTime() + TheTransport->GetEventLookaheadMs()))
+            else if (col == mGrid->GetHighlightCol(NextBufferTime(true)))
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Dim);
             else
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColorOff);
