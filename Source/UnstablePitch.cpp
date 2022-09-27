@@ -172,11 +172,11 @@ void UnstablePitch::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetPitchBend(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void UnstablePitch::CheckboxUpdated(Checkbox* checkbox)
+void UnstablePitch::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

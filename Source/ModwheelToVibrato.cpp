@@ -79,15 +79,15 @@ void ModwheelToVibrato::PlayNote(double time, int pitch, int velocity, int voice
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void ModwheelToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ModwheelToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void ModwheelToVibrato::DropdownUpdated(DropdownList* list, int oldVal)
+void ModwheelToVibrato::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void ModwheelToVibrato::CheckboxUpdated(Checkbox* checkbox)
+void ModwheelToVibrato::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

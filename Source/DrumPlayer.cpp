@@ -673,7 +673,7 @@ void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* gri
    {
       if (velocity > 0 && mQuantizeInterval == kInterval_None)
       {
-         PlayNote(gTime + gBufferSizeMs, sampleIdx, velocity * 127);
+         PlayNote(NextBufferTime(false), sampleIdx, velocity * 127);
       }
       else
       {
@@ -986,7 +986,7 @@ void DrumPlayer::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mAuditionSlider)
    {
@@ -1005,7 +1005,7 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
             LoadSampleLock();
             mDrumHits[mSelectedHitIdx].mSample.Read(file.c_str());
             LoadSampleUnlock();
-            mDrumHits[mSelectedHitIdx].StartPlayhead(gTime, 0, 1);
+            mDrumHits[mSelectedHitIdx].StartPlayhead(time, 0, 1);
             mDrumHits[mSelectedHitIdx].mVelocity = .5f;
             mDrumHits[mSelectedHitIdx].mEnvelopeLength = mDrumHits[mSelectedHitIdx].mSample.LengthInSamples() * gInvSampleRateMs;
          }
@@ -1013,11 +1013,11 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void DrumPlayer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void DrumPlayer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal)
+void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mKitSelector)
       LoadKit(mLoadedKit);
@@ -1035,7 +1035,7 @@ void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
+void DrumPlayer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEditCheckbox)
       UpdateVisibleControls();
@@ -1063,7 +1063,7 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void DrumPlayer::ButtonClicked(ClickButton* button)
+void DrumPlayer::ButtonClicked(ClickButton* button, double time)
 {
    /*if (button == mSaveButton)
       SaveKits();
@@ -1075,7 +1075,7 @@ void DrumPlayer::ButtonClicked(ClickButton* button)
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       if (button == mDrumHits[i].mTestButton)
-         PlayNote(gTime + gBufferSizeMs, i, 127);
+         PlayNote(time, i, 127);
       if (button == mDrumHits[i].mRandomButton)
          mDrumHits[i].LoadRandomSample();
       if (button == mDrumHits[i].mGrabSampleButton)

@@ -41,7 +41,7 @@ public:
 
    void CreateUIControls() override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
 private:
    //IDrawableModule

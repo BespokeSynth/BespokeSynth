@@ -158,11 +158,11 @@ float Pumper::GetEffectAmount()
    return mAmount;
 }
 
-void Pumper::DropdownUpdated(DropdownList* list, int oldVal)
+void Pumper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Pumper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Pumper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mAmountSlider)
    {

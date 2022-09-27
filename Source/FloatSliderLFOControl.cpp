@@ -339,11 +339,11 @@ void FloatSliderLFOControl::DoSpecialDelete()
    mPinned = false;
 }
 
-void FloatSliderLFOControl::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void FloatSliderLFOControl::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 
-void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal)
+void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -379,7 +379,7 @@ void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mOffsetSlider)
       mLFO.SetOffset(mLFOSettings.mLFOOffset);
@@ -395,7 +395,7 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
       mLFO.SetLength(mLFOSettings.mLength);
 }
 
-void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox)
+void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -404,7 +404,7 @@ void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
+void FloatSliderLFOControl::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPinButton)
    {

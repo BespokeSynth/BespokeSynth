@@ -202,12 +202,21 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    mFadeOutBuffer.SetNumActiveChannels(out->NumActiveChannels());
    mFadeOutWorkBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
+   float debugRef = 0;
    for (int i = 0; i < mVoiceLimit; ++i)
    {
-      mVoices[i].mVoice->Process(time, out, mOversampling);
+      if (mVoices[i].mPitch != -1)
+      {
+         mVoices[i].mVoice->Process(time, out, mOversampling);
 
-      if (mVoices[i].mPitch != -1 && !mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))
-         mVoices[i].mPitch = -1;
+         float testSample = out->GetChannel(0)[0];
+         mVoices[i].mActivity = testSample - debugRef;
+
+         if (!mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))
+            mVoices[i].mPitch = -1;
+
+         debugRef = testSample;
+      }
    }
 
    for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
@@ -236,7 +245,13 @@ void PolyphonyMgr::DrawDebug(float x, float y)
          ofSetColor(0, 255, 0);
       else
          ofSetColor(255, 0, 0);
-      DrawTextNormal(mVoices[i].mPitch == -1 ? "voice " + ofToString(i) + " unused" : "voice " + ofToString(i) + " used: " + ofToString(mVoices[i].mPitch) + (mVoices[i].mNoteOn ? " (note on)" : " (note off)"), 0, i * 18);
+      std::string outputLine = "voice " + ofToString(i);
+      if (mVoices[i].mPitch == -1)
+         outputLine += " unused";
+      else
+         outputLine += " used: " + ofToString(mVoices[i].mPitch) + (mVoices[i].mNoteOn ? " (note on)" : " (note off)");
+      outputLine += "   " + ofToString(mVoices[i].mActivity, 3);
+      DrawTextNormal(outputLine, 0, i * 18);
    }
    ofPopStyle();
    ofPopMatrix();

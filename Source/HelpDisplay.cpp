@@ -148,7 +148,7 @@ void HelpDisplay::DrawModule()
          mScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
 
          if (mScreenshotsToProcess.front().mLabel == "drumplayer")
-            mScreenshotModule->FindUIControl("edit")->SetValue(1);
+            mScreenshotModule->FindUIControl("edit")->SetValue(1, gTime);
 
          sScreenshotDelay = 10;
       }
@@ -179,7 +179,7 @@ void HelpDisplay::GetModuleDimensions(float& w, float& h)
    }
 }
 
-void HelpDisplay::CheckboxUpdated(Checkbox* checkbox)
+void HelpDisplay::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mShowTooltipsCheckbox)
    {
@@ -369,7 +369,7 @@ std::string HelpDisplay::GetModuleTooltipFromName(std::string moduleTypeName)
    return moduleTypeName + ": " + tooltip;
 }
 
-void HelpDisplay::ButtonClicked(ClickButton* button)
+void HelpDisplay::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTutorialVideoLinkButton)
    {

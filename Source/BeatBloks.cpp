@@ -397,7 +397,7 @@ void BeatBloks::DropdownClicked(DropdownList* list)
 {
 }
 
-void BeatBloks::DropdownUpdated(DropdownList* list, int oldVal)
+void BeatBloks::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -405,7 +405,7 @@ void BeatBloks::UpdateSample()
 {
 }
 
-void BeatBloks::ButtonClicked(ClickButton* button)
+void BeatBloks::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mWriteButton)
    {
@@ -916,7 +916,7 @@ BeatBloks::Blok* BeatBloks::RemoveBlokAt(int x)
    return nullptr;
 }
 
-void BeatBloks::CheckboxUpdated(Checkbox* checkbox)
+void BeatBloks::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mPlayCheckbox)
    {
@@ -936,7 +936,7 @@ void BeatBloks::GetModuleDimensions(float& width, float& height)
    height = mRemixBufferY + mBufferH + 45;
 }
 
-void BeatBloks::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void BeatBloks::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {
@@ -966,7 +966,7 @@ void BeatBloks::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void BeatBloks::IntSliderUpdated(IntSlider* slider, int oldVal)
+void BeatBloks::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

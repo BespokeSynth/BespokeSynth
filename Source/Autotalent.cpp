@@ -951,7 +951,7 @@ void Autotalent::DrawModule()
    ofLine(x, 90, x, 90 - ofMap(mConfidence, 0, 1, 0, 50));
 }
 
-void Autotalent::ButtonClicked(ClickButton* button)
+void Autotalent::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSetFromScaleButton)
    {

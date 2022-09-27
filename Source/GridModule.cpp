@@ -331,7 +331,7 @@ void GridModule::SetUpFromSaveData()
    mDirectColorMode = mModuleSaveData.GetBool("direct_color_mode");
 }
 
-void GridModule::CheckboxUpdated(Checkbox* checkbox)
+void GridModule::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mMomentaryCheckbox)
       mGrid->SetMomentary(mMomentary);

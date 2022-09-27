@@ -290,10 +290,10 @@ bool NoteTable::MouseMoved(float x, float y)
    return false;
 }
 
-void NoteTable::CheckboxUpdated(Checkbox* checkbox)
+void NoteTable::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteTable::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
@@ -456,7 +456,7 @@ void NoteTable::OnGridButton(int x, int y, float velocity, IGridController* grid
    }
 }
 
-void NoteTable::ButtonClicked(ClickButton* button)
+void NoteTable::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizePitchButton)
    {
@@ -509,7 +509,7 @@ void NoteTable::RandomizePitches(bool fifths)
    }
 }
 
-void NoteTable::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteTable::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mNoteModeSelector)
    {
@@ -524,7 +524,7 @@ void NoteTable::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {

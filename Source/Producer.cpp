@@ -178,7 +178,7 @@ void Producer::DropdownClicked(DropdownList* list)
 {
 }
 
-void Producer::DropdownUpdated(DropdownList* list, int oldVal)
+void Producer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -186,7 +186,7 @@ void Producer::UpdateSample()
 {
 }
 
-void Producer::ButtonClicked(ClickButton* button)
+void Producer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mWriteButton)
    {
@@ -395,7 +395,7 @@ void Producer::OnClicked(float x, float y, bool right)
    }
 }
 
-void Producer::CheckboxUpdated(Checkbox* checkbox)
+void Producer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mPlayCheckbox)
    {
@@ -410,7 +410,7 @@ void Producer::GetModuleDimensions(float& width, float& height)
    height = 430;
 }
 
-void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {
@@ -436,7 +436,7 @@ void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void Producer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Producer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

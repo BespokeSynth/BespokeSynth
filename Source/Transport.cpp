@@ -270,7 +270,7 @@ void Transport::Reset(float rewindAmount)
    mMeasureTime = -rewindAmount;
 }
 
-void Transport::ButtonClicked(ClickButton* button)
+void Transport::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
       Reset();
@@ -634,22 +634,22 @@ void Transport::OnDrumEvent(NoteInterval drumEvent)
    }
 }
 
-void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Transport::CheckboxUpdated(Checkbox* checkbox)
+void Transport::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mSetTempoCheckbox)
    {
       if (mSetTempoBool)
       {
-         mStartRecordTime = gTime;
+         mStartRecordTime = time;
       }
       else if (mStartRecordTime != -1)
       {
          int numBars = 1;
-         float recordedTime = gTime - mStartRecordTime;
+         float recordedTime = time - mStartRecordTime;
          int beats = numBars * GetTimeSigTop();
          float minutes = recordedTime / 1000.0f / 60.0f;
          SetTempo(beats / minutes);
@@ -658,7 +658,7 @@ void Transport::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void Transport::DropdownUpdated(DropdownList* list, int oldVal)
+void Transport::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 

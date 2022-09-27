@@ -44,7 +44,6 @@ public:
    {}
 
    void Flush(double time);
-   void FlushTarget(double time, INoteReceiver* target);
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -52,7 +51,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override;
    void SendMidi(const juce::MidiMessage& message) override;
 
-   void PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
+   void PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled);
 
    void ResetStackDepth() { mStackDepth = 0; }
    bool* GetNotes() { return mNotes; }
@@ -74,7 +73,7 @@ public:
    , mInNoteOutput(false)
    {}
    virtual ~INoteSource() {}
-   void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
+   void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters(), bool isFromMainThreadAndScheduled = false);
    void SendCCOutput(int control, int value, int voiceIdx = -1);
 
    //IPatchable

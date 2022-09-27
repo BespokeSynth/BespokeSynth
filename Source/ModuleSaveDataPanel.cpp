@@ -272,7 +272,7 @@ void ModuleSaveDataPanel::FillDropdownList(DropdownList* list, ModuleSaveData::S
       list->SetUnknownItemString(save->mString);
 }
 
-void ModuleSaveDataPanel::ButtonClicked(ClickButton* button)
+void ModuleSaveDataPanel::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mApplyButton)
       ApplyChanges();
@@ -289,15 +289,15 @@ void ModuleSaveDataPanel::ButtonClicked(ClickButton* button)
    }
 }
 
-void ModuleSaveDataPanel::CheckboxUpdated(Checkbox* checkbox)
+void ModuleSaveDataPanel::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void ModuleSaveDataPanel::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ModuleSaveDataPanel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void ModuleSaveDataPanel::IntSliderUpdated(IntSlider* slider, int oldVal)
+void ModuleSaveDataPanel::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -326,7 +326,7 @@ void ModuleSaveDataPanel::DropdownClicked(DropdownList* list)
    }
 }
 
-void ModuleSaveDataPanel::DropdownUpdated(DropdownList* list, int oldVal)
+void ModuleSaveDataPanel::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    for (auto iter = mStringDropdowns.begin(); iter != mStringDropdowns.end(); ++iter)
    {

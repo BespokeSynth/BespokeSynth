@@ -339,11 +339,11 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
    void PreRepatch(PatchCableSource* cableSource) override;

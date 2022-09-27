@@ -94,7 +94,7 @@ void Ramper::OnTransportAdvanced(float amount)
          for (auto* control : mUIControls)
          {
             if (control != nullptr)
-               control->SetValue(ofLerp(mStartValue, mTargetValue, progress));
+               control->SetValue(ofLerp(mStartValue, mTargetValue, progress), gTime);
          }
       }
       else if (progress >= 1)
@@ -166,10 +166,10 @@ void Ramper::OnPulse(double time, float velocity, int flags)
       Go(time);
 }
 
-void Ramper::ButtonClicked(ClickButton* button)
+void Ramper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTriggerButton)
-      Go(gTime);
+      Go(time);
 }
 
 void Ramper::GetModuleDimensions(float& width, float& height)

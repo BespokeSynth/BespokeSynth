@@ -108,14 +108,14 @@ void GateEffect::DrawModule()
    ofPopStyle();
 }
 
-void GateEffect::CheckboxUpdated(Checkbox* checkbox)
+void GateEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void GateEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+void GateEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void GateEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void GateEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }

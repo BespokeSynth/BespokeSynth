@@ -55,14 +55,14 @@ void PulseButton::DrawModule()
    mButton->Draw();
 }
 
-void PulseButton::ButtonClicked(ClickButton* button)
+void PulseButton::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mButton)
    {
-      double time = gTime + TheTransport->GetEventLookaheadMs();
+      double scheduledTime = gTime + TheTransport->GetEventLookaheadMs();
       if (mForceImmediate)
-         time = gTime;
-      DispatchPulse(GetPatchCableSource(), time, 1, 0);
+         scheduledTime = time;
+      DispatchPulse(GetPatchCableSource(), scheduledTime, 1, 0);
    }
 }
 

@@ -234,7 +234,7 @@ void FFTtoAdditive::DrawViz()
    ofPopStyle();
 }
 
-void FFTtoAdditive::CheckboxUpdated(Checkbox* checkbox)
+void FFTtoAdditive::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

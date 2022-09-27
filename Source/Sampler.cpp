@@ -276,21 +276,21 @@ void Sampler::SetUpFromSaveData()
 }
 
 
-void Sampler::DropdownUpdated(DropdownList* list, int oldVal)
+void Sampler::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Sampler::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Sampler::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mVolSlider)
       mADSRDisplay->SetVol(mVoiceParams.mVol);
 }
 
-void Sampler::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Sampler::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void Sampler::CheckboxUpdated(Checkbox* checkbox)
+void Sampler::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mRecordCheckbox)
    {

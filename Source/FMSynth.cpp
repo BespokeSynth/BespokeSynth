@@ -262,19 +262,19 @@ void FMSynth::UpdateHarmonicRatio()
    mVoiceParams.mHarmRatio2 *= mHarmRatioTweak2;
 }
 
-void FMSynth::DropdownUpdated(DropdownList* list, int oldVal)
+void FMSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mHarmRatioBaseDropdown || list == mHarmRatioBaseDropdown2)
       UpdateHarmonicRatio();
 }
 
-void FMSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FMSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mHarmSlider || slider == mHarmSlider2)
       UpdateHarmonicRatio();
 }
 
-void FMSynth::CheckboxUpdated(Checkbox* checkbox)
+void FMSynth::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
       mPolyMgr.KillAll();

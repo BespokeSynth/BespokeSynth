@@ -298,7 +298,7 @@ void Stutter::OnTimeEvent(double time)
    }
 }
 
-void Stutter::SetEnabled(bool enabled)
+void Stutter::SetEnabled(double time, bool enabled)
 {
    if (enabled != mEnabled)
    {
@@ -308,7 +308,7 @@ void Stutter::SetEnabled(bool enabled)
          mMutex.lock();
          mStutterStack.clear();
          mMutex.unlock();
-         StopStutter(gTime + gBufferSizeMs);
+         StopStutter(time);
       }
    }
 }

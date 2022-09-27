@@ -135,27 +135,27 @@ void FollowingSong::DrawModule()
    ofPopStyle();
 }
 
-void FollowingSong::DropdownUpdated(DropdownList* list, int oldVal)
+void FollowingSong::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void FollowingSong::ButtonClicked(ClickButton* button)
+void FollowingSong::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void FollowingSong::CheckboxUpdated(Checkbox* checkbox)
+void FollowingSong::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void FollowingSong::RadioButtonUpdated(RadioButton* list, int oldVal)
+void FollowingSong::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
 }
 
-void FollowingSong::IntSliderUpdated(IntSlider* slider, int oldVal)
+void FollowingSong::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void FollowingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FollowingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

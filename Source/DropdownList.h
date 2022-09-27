@@ -44,7 +44,7 @@ class IDropdownListener
 public:
    virtual ~IDropdownListener() {}
    virtual void DropdownClicked(DropdownList* list) {}
-   virtual void DropdownUpdated(DropdownList* list, int oldVal) = 0;
+   virtual void DropdownUpdated(DropdownList* list, int oldVal, double time) = 0;
 };
 
 class DropdownListModal : public IDrawableModule, public IButtonListener
@@ -77,7 +77,7 @@ public:
    void SetShowPagingControls(bool show);
    void SetIsScrolling(bool scrolling) { mIsScrolling = scrolling; }
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
 private:
    void OnClicked(float x, float y, bool right) override;
@@ -105,7 +105,7 @@ public:
    void MouseReleased() override;
    void DrawDropdown(int w, int h, bool isScrolling);
    bool DropdownClickedAt(int x, int y);
-   void SetIndex(int i, bool forceUpdate = false);
+   void SetIndex(int i, double time, bool forceUpdate);
    void Clear();
    void SetVar(int* var) { mVar = var; }
    EnumMap GetEnumMap();
@@ -132,9 +132,9 @@ public:
    void ClearSeparators() { mSeparators.clear(); }
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time) override;
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
@@ -157,7 +157,7 @@ private:
    void OnClicked(float x, float y, bool right) override;
    void CalcSliderVal();
    int FindItemIndex(float val) const;
-   void SetValue(int value, bool forceUpdate);
+   void SetValue(int value, double time, bool forceUpdate);
    void CalculateWidth();
    ofVec2f GetModalListPosition() const;
 

@@ -268,7 +268,7 @@ void SeaOfGrain::DropdownClicked(DropdownList* list)
 {
 }
 
-void SeaOfGrain::DropdownUpdated(DropdownList* list, int oldVal)
+void SeaOfGrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -304,7 +304,7 @@ void SeaOfGrain::LoadFile()
    }
 }
 
-void SeaOfGrain::ButtonClicked(ClickButton* button)
+void SeaOfGrain::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mLoadButton)
       LoadFile();
@@ -325,7 +325,7 @@ bool SeaOfGrain::MouseMoved(float x, float y)
    return IDrawableModule::MouseMoved(x, y);
 }
 
-void SeaOfGrain::CheckboxUpdated(Checkbox* checkbox)
+void SeaOfGrain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mRecordInputCheckbox)
    {
@@ -343,13 +343,13 @@ void SeaOfGrain::GetModuleDimensions(float& width, float& height)
    height = mBufferY + mBufferH + 202;
 }
 
-void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mDisplayOffsetSlider || slider == mDisplayLengthSlider)
       UpdateDisplaySamples();
 }
 
-void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

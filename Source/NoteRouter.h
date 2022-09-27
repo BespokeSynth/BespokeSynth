@@ -50,7 +50,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    //IRadioButtonListener
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

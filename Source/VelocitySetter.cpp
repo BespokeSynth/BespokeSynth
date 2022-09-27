@@ -52,7 +52,7 @@ void VelocitySetter::DrawModule()
    mRandomnessSlider->Draw();
 }
 
-void VelocitySetter::CheckboxUpdated(Checkbox* checkbox)
+void VelocitySetter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

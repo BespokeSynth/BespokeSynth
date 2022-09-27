@@ -177,7 +177,7 @@ bool PlaySequencer::MouseMoved(float x, float y)
    return false;
 }
 
-void PlaySequencer::CheckboxUpdated(Checkbox* checkbox)
+void PlaySequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (size_t i = 0; i < mLanes.size(); ++i)
    {
@@ -440,9 +440,9 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
             mGrid->Clear();
 
          if (x >= 4 && y == 0)
-            ButtonClicked(mSavedPatterns[x - 4].mStoreButton);
+            ButtonClicked(mSavedPatterns[x - 4].mStoreButton, NextBufferTime(false));
          if (x >= 4 && y == 1)
-            ButtonClicked(mSavedPatterns[x - 4].mLoadButton);
+            ButtonClicked(mSavedPatterns[x - 4].mLoadButton, NextBufferTime(false));
 
          if (y >= 4)
          {
@@ -495,7 +495,7 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
    }
 }
 
-void PlaySequencer::ButtonClicked(ClickButton* button)
+void PlaySequencer::ButtonClicked(ClickButton* button, double time)
 {
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
@@ -523,7 +523,7 @@ void PlaySequencer::ButtonClicked(ClickButton* button)
    }
 }
 
-void PlaySequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void PlaySequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
       UpdateInterval();
@@ -531,7 +531,7 @@ void PlaySequencer::DropdownUpdated(DropdownList* list, int oldVal)
       UpdateNumMeasures(oldVal);
 }
 
-void PlaySequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PlaySequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

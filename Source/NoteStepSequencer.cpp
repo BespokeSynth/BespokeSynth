@@ -434,10 +434,10 @@ bool NoteStepSequencer::MouseScrolled(float x, float y, float scrollX, float scr
    return false;
 }
 
-void NoteStepSequencer::CheckboxUpdated(Checkbox* checkbox)
+void NoteStepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
@@ -692,7 +692,7 @@ void NoteStepSequencer::UpdateLights()
          int color = 0;
          if (i < mLength)
          {
-            if (i == mGrid->GetHighlightCol(gTime + gBufferSizeMs + TheTransport->GetEventLookaheadMs()))
+            if (i == mGrid->GetHighlightCol(NextBufferTime(true)))
             {
                color = LaunchpadInterpreter::LaunchpadColor(0, 3);
             }
@@ -849,7 +849,7 @@ void NoteStepSequencer::UpdateGridControllerLights(bool force)
             int row = y - mGridControlOffsetY;
 
             GridColor color = GridColor::kGridColorOff;
-            bool isHighlightCol = (column == mGrid->GetHighlightCol(gTime + gBufferSizeMs + TheTransport->GetEventLookaheadMs()));
+            bool isHighlightCol = (column == mGrid->GetHighlightCol(NextBufferTime(true)));
             if (isHighlightCol)
                color = GridColor::kGridColor2Dim;
             if (column < mLength)
@@ -894,7 +894,7 @@ void NoteStepSequencer::OnGridButton(int x, int y, float velocity, IGridControll
    }
 }
 
-void NoteStepSequencer::ButtonClicked(ClickButton* button)
+void NoteStepSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mShiftBackButton)
       ShiftSteps(-1);
@@ -1000,7 +1000,7 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    }
 }
 
-void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -1021,7 +1021,7 @@ void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {
@@ -1030,7 +1030,7 @@ void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLoopResetPointSlider || slider == mLengthSlider)
       mLoopResetPoint = MIN(mLoopResetPoint, mLength - 1);
@@ -1150,6 +1150,10 @@ void NoteStepSequencer::SaveState(FileStreamOut& out)
    mGrid->SaveState(out);
    mVelocityGrid->SaveState(out);
    out << mHasExternalPulseSource;
+   float width, height;
+   GetModuleDimensions(width, height);
+   out << width;
+   out << height;
 }
 
 void NoteStepSequencer::LoadState(FileStreamIn& in, int rev)
@@ -1166,4 +1170,11 @@ void NoteStepSequencer::LoadState(FileStreamIn& in, int rev)
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);
    if (rev >= 2)
       in >> mHasExternalPulseSource;
+   if (rev >= 3)
+   {
+      float width, height;
+      in >> width;
+      in >> height;
+      Resize(width, height);
+   }
 }

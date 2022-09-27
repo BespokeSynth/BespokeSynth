@@ -92,7 +92,7 @@ void TimelineControl::Resize(float width, float height)
    mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchor_Below);
 }
 
-void TimelineControl::CheckboxUpdated(Checkbox* checkbox)
+void TimelineControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mLoopCheckbox)
    {
@@ -105,7 +105,7 @@ void TimelineControl::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void TimelineControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void TimelineControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mTimeSlider)
    {
@@ -113,7 +113,7 @@ void TimelineControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void TimelineControl::IntSliderUpdated(IntSlider* slider, int oldVal)
+void TimelineControl::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLoopStartSlider || slider == mLoopEndSlider)
    {

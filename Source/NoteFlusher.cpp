@@ -45,11 +45,10 @@ void NoteFlusher::DrawModule()
    mFlushButton->Draw();
 }
 
-void NoteFlusher::ButtonClicked(ClickButton* button)
+void NoteFlusher::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mFlushButton)
    {
-      double time = gTime + gBufferSizeMs;
       mNoteOutput.Flush(time);
       for (int i = 0; i < 127; ++i)
          mNoteOutput.PlayNote(time, i, 0);

@@ -57,10 +57,10 @@ void NoteHumanizer::DrawModule()
    mVelocitySlider->Draw();
 }
 
-void NoteHumanizer::CheckboxUpdated(Checkbox* checkbox)
+void NoteHumanizer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime + gBufferSizeMs);
+      mNoteOutput.Flush(time);
 }
 
 void NoteHumanizer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -87,7 +87,7 @@ void NoteHumanizer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    PlayNoteOutput(time + delayMs, pitch, outputVelocity, voiceIdx, modulation);
 }
 
-void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

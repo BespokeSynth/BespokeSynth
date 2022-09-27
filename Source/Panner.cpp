@@ -122,19 +122,19 @@ void Panner::DrawModule()
    GetRightPanGain(mPan);
 }
 
-void Panner::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Panner::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Panner::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Panner::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void Panner::ButtonClicked(ClickButton* button)
+void Panner::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void Panner::CheckboxUpdated(Checkbox* checkbox)
+void Panner::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

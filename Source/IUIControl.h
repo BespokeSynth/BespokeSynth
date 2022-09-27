@@ -53,10 +53,10 @@ public:
    virtual void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }
-   virtual void SetFromMidiCC(float slider, bool setViaModulator = false) = 0;
+   virtual void SetFromMidiCC(float slider, double time, bool setViaModulator) = 0;
    virtual float GetValueForMidiCC(float slider) const { return 0; }
-   virtual void SetValue(float value) = 0;
-   virtual void SetValueDirect(float value) { SetValue(value); } //override if you need special control here
+   virtual void SetValue(float value, double time) = 0;
+   virtual void SetValueDirect(float value, double time) { SetValue(value, time); } //override if you need special control here
    virtual float GetValue() const { return 0; }
    virtual float GetMidiValue() const { return 0; }
    virtual int GetNumValues() { return 0; } //the number of distinct values that you can have for this control, zero indicates infinite (like a float slider)

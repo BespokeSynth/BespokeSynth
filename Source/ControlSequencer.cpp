@@ -143,7 +143,7 @@ void ControlSequencer::Step(double time, int pulseFlags)
       for (auto* target : mTargets)
       {
          if (target != nullptr)
-            target->SetFromMidiCC(mGrid->GetVal(mStep, 0), true);
+            target->SetFromMidiCC(mGrid->GetVal(mStep, 0), time, true);
       }
    }
 }
@@ -281,7 +281,7 @@ void ControlSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    }
 }
 
-void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -299,7 +299,7 @@ void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -309,7 +309,7 @@ void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void ControlSequencer::ButtonClicked(ClickButton* button)
+void ControlSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomize)
    {

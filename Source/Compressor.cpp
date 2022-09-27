@@ -169,13 +169,13 @@ void Compressor::DrawModule()
    ofPopStyle();
 }
 
-void Compressor::CheckboxUpdated(Checkbox* checkbox)
+void Compressor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
       envdB_ = DC_OFFSET; //reset state
 }
 
-void Compressor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Compressor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mAttackSlider)
       mEnv.setAttack(MAX(.1f, mAttack));

@@ -192,7 +192,7 @@ void SampleCapturer::DrawModule()
    mDeleteButton->Draw();
 }
 
-void SampleCapturer::ButtonClicked(ClickButton* button)
+void SampleCapturer::ButtonClicked(ClickButton* button, double time)
 {
    using namespace juce;
    if (button == mPlayButton)

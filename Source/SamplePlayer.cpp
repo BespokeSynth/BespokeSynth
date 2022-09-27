@@ -420,7 +420,7 @@ void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float spee
    {
       float startSeconds, lengthSeconds, speed;
       GetPlayInfoForPitch(index, startSeconds, lengthSeconds, speed, mStopOnNoteOff);
-      mSample->SetPlayPosition(((gTime - time) / 1000 + startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
+      mSample->SetPlayPosition((startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
       mCuePointSpeed = speed * speedMult;
       mPlay = true;
       mAdsr.Clear();
@@ -435,13 +435,13 @@ void SamplePlayer::DropdownClicked(DropdownList* list)
 {
 }
 
-void SamplePlayer::DropdownUpdated(DropdownList* list, int oldVal)
+void SamplePlayer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mCuePointSelector)
       UpdateActiveCuePoint();
 }
 
-void SamplePlayer::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void SamplePlayer::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 
@@ -519,7 +519,7 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    mIsLoadingSample = true;
 }
 
-void SamplePlayer::ButtonClicked(ClickButton* button)
+void SamplePlayer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPlayButton && mSample != nullptr)
    {
@@ -529,7 +529,7 @@ void SamplePlayer::ButtonClicked(ClickButton* button)
          mStopOnNoteOff = false;
          mPlay = true;
          mAdsr.Clear();
-         mAdsr.Start(gTime + gBufferSize * gInvSampleRateMs, 1);
+         mAdsr.Start(time * gInvSampleRateMs, 1);
       }
    }
    if (button == mPauseButton && mSample != nullptr)
@@ -589,7 +589,7 @@ void SamplePlayer::ButtonClicked(ClickButton* button)
    }
 
    if (button == mPlayCurrentCuePointButton)
-      PlayCuePoint(gTime, mActiveCuePointIndex, 127, 1, 0);
+      PlayCuePoint(time, mActiveCuePointIndex, 127, 1, 0);
 
    if (button == mAutoSlice4)
       AutoSlice(4);
@@ -601,7 +601,7 @@ void SamplePlayer::ButtonClicked(ClickButton* button)
       AutoSlice(32);
 
    if (button == mPlayHoveredClipButton)
-      PlayCuePoint(gTime, mHoveredCuePointIndex, 127, 1, 0);
+      PlayCuePoint(time, mHoveredCuePointIndex, 127, 1, 0);
    if (button == mGrabHoveredClipButton)
    {
       ChannelBuffer* data = GetCueSampleData(mHoveredCuePointIndex);
@@ -791,7 +791,7 @@ void SamplePlayer::OnClicked(float x, float y, bool right)
       mStopOnNoteOff = false;
       mPlay = true;
       mAdsr.Clear();
-      mAdsr.Start(gTime + gBufferSizeMs, 1);
+      mAdsr.Start(NextBufferTime(false), 1);
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mScrubbingSample = true;
 
@@ -841,7 +841,7 @@ bool SamplePlayer::MouseMoved(float x, float y)
       mSwitchAndRamp.StartSwitch();
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mAdsr.Clear();
-      mAdsr.Start(gTime + gBufferSizeMs, 1);
+      mAdsr.Start(NextBufferTime(false), 1);
 
       if (mSetCuePoint)
          SetCuePointForX(x);
@@ -1292,7 +1292,7 @@ bool SamplePlayer::MouseScrolled(float x, float y, float scrollX, float scrollY,
    return false;
 }
 
-void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
+void SamplePlayer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mLoopCheckbox)
    {
@@ -1370,11 +1370,11 @@ void SamplePlayer::GetModuleDimensions(float& width, float& height)
    height = mHeight;
 }
 
-void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SamplePlayer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SamplePlayer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

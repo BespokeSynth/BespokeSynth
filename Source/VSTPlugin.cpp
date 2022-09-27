@@ -952,7 +952,7 @@ std::vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
    return ignore;
 }
 
-void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
+void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mPresetFileSelector)
    {
@@ -1019,7 +1019,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    for (int i = 0; i < mParameterSliders.size(); ++i)
    {
@@ -1030,15 +1030,15 @@ void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void VSTPlugin::IntSliderUpdated(IntSlider* slider, int oldVal)
+void VSTPlugin::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void VSTPlugin::CheckboxUpdated(Checkbox* checkbox)
+void VSTPlugin::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void VSTPlugin::ButtonClicked(ClickButton* button)
+void VSTPlugin::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mOpenEditorButton)
       mWantOpenVstWindow = true;

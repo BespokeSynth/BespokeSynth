@@ -80,7 +80,7 @@ void GlobalControls::DrawModule()
    mBackgroundBSlider->Draw();
 }
 
-void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mZoomSlider && gHoveredUIControl != mZoomSlider) //avoid bad behavior when adjusting these via mouse
    {

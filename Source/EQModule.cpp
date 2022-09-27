@@ -334,8 +334,8 @@ bool EQModule::MouseMoved(float x, float y)
    {
       if (mHoveredFilterHandleIndex != -1)
       {
-         mFilters[mHoveredFilterHandleIndex].mFSlider->SetValue(FreqForPos(x / w));
-         mFilters[mHoveredFilterHandleIndex].mGSlider->SetValue(GainForPos((y - kDrawYOffset) / h));
+         mFilters[mHoveredFilterHandleIndex].mFSlider->SetValue(FreqForPos(x / w), NextBufferTime(false));
+         mFilters[mHoveredFilterHandleIndex].mGSlider->SetValue(GainForPos((y - kDrawYOffset) / h), NextBufferTime(false));
       }
    }
    else
@@ -356,7 +356,7 @@ bool EQModule::MouseMoved(float x, float y)
    return false;
 }
 
-void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    for (auto& filter : mFilters)
    {
@@ -370,7 +370,7 @@ void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void EQModule::DropdownUpdated(DropdownList* list, int oldVal)
+void EQModule::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    for (auto& filter : mFilters)
    {
@@ -382,7 +382,7 @@ void EQModule::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void EQModule::CheckboxUpdated(Checkbox* checkbox)
+void EQModule::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (auto& filter : mFilters)
    {

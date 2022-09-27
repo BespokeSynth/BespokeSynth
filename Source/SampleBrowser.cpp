@@ -84,7 +84,7 @@ void SampleBrowser::DrawModule()
       DrawTextNormal(ofToString(mCurrentPage + 1) + "/" + ofToString(numPages), 40, mBackButton->GetPosition(true).y + 12);
 }
 
-void SampleBrowser::ButtonClicked(ClickButton* button)
+void SampleBrowser::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mBackButton)
       ShowPage(mCurrentPage - 1);

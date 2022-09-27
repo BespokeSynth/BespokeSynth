@@ -129,7 +129,7 @@ void PulseChance::Reseed()
    mSeed = gRandom() % 10000;
 }
 
-void PulseChance::ButtonClicked(ClickButton* button)
+void PulseChance::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPrevSeedButton)
       mSeed = (mSeed - 1 + 10000) % 10000;

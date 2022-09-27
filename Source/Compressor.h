@@ -123,8 +123,8 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    std::string GetType() override { return "compressor"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
 private:
    //IDrawableModule

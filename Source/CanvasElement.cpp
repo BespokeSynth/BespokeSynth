@@ -265,34 +265,34 @@ void CanvasElement::AddElementUIControl(IUIControl* control)
    control->SetShowing(false);
 }
 
-void CanvasElement::CheckboxUpdated(std::string label, bool value)
+void CanvasElement::CheckboxUpdated(std::string label, bool value, double time)
 {
    for (auto* control : mUIControls)
    {
       if (control->Name() == label)
-         control->SetValue(value);
+         control->SetValue(value, time);
    }
 }
 
-void CanvasElement::FloatSliderUpdated(std::string label, float oldVal, float newVal)
+void CanvasElement::FloatSliderUpdated(std::string label, float oldVal, float newVal, double time)
 {
    for (auto* control : mUIControls)
    {
       if (control->Name() == label)
-         control->SetValue(newVal);
+         control->SetValue(newVal, time);
    }
 }
 
-void CanvasElement::IntSliderUpdated(std::string label, int oldVal, float newVal)
+void CanvasElement::IntSliderUpdated(std::string label, int oldVal, float newVal, double time)
 {
    for (auto* control : mUIControls)
    {
       if (control->Name() == label)
-         control->SetValue(newVal);
+         control->SetValue(newVal, time);
    }
 }
 
-void CanvasElement::ButtonClicked(std::string label)
+void CanvasElement::ButtonClicked(std::string label, double time)
 {
 }
 
@@ -485,14 +485,14 @@ void SampleCanvasElement::SetSample(Sample* sample)
    mSample = sample;
 }
 
-void SampleCanvasElement::CheckboxUpdated(std::string label, bool value)
+void SampleCanvasElement::CheckboxUpdated(std::string label, bool value, double time)
 {
-   CanvasElement::CheckboxUpdated(label, value);
+   CanvasElement::CheckboxUpdated(label, value, time);
 }
 
-void SampleCanvasElement::ButtonClicked(std::string label)
+void SampleCanvasElement::ButtonClicked(std::string label, double time)
 {
-   CanvasElement::ButtonClicked(label);
+   CanvasElement::ButtonClicked(label, time);
    if (label == "split")
    {
       ChannelBuffer* firstHalf = new ChannelBuffer(mSample->Data()->BufferSize() / 2);
@@ -702,21 +702,21 @@ void EventCanvasElement::SetUIControl(IUIControl* control)
       mValue = 1;
 }
 
-void EventCanvasElement::Trigger()
+void EventCanvasElement::Trigger(double time)
 {
    if (mUIControl)
    {
       if (mIsCheckbox)
-         mUIControl->SetValue(1);
+         mUIControl->SetValue(1, time);
       else
-         mUIControl->SetValue(mValue);
+         mUIControl->SetValue(mValue, time);
    }
 }
 
-void EventCanvasElement::TriggerEnd()
+void EventCanvasElement::TriggerEnd(double time)
 {
    if (mUIControl && mIsCheckbox)
-      mUIControl->SetValue(0);
+      mUIControl->SetValue(0, time);
 }
 
 float EventCanvasElement::GetEnd() const

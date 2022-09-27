@@ -52,7 +52,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IRadioButtonListener
-   void RadioButtonUpdated(RadioButton* button, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* button, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

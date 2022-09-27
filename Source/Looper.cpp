@@ -345,7 +345,7 @@ void Looper::Process(double time)
    if (mPitchShift != 1)
       latencyOffset = mPitchShifter[0]->GetLatency();
 
-   double processStartTime = gTime;
+   double processStartTime = time;
    for (int i = 0; i < bufferSize; ++i)
    {
       float smooth = .001f;
@@ -419,7 +419,7 @@ void Looper::Process(double time)
    GetBuffer()->Reset();
 
    if (mCommitBuffer && !mClearCommitBuffer && !mWantRewrite)
-      DoCommit();
+      DoCommit(time);
    if (mWantShiftMeasure)
       DoShiftMeasure();
    if (mWantHalfShift)
@@ -432,11 +432,11 @@ void Looper::Process(double time)
    {
       mWantRewrite = false;
       if (mRewriter)
-         mRewriter->Go();
+         mRewriter->Go(gTime);
    }
 }
 
-void Looper::DoCommit()
+void Looper::DoCommit(double time)
 {
    PROFILER(LooperDoCommit);
 
@@ -454,7 +454,7 @@ void Looper::DoCommit()
    {
       Clear();
       mMute = false;
-      mMuteRamp.Start(gTime, mMute ? 0 : 1, gTime + 1);
+      mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
    }
 
    {
@@ -1076,7 +1076,7 @@ void Looper::OnClicked(float x, float y, bool right)
    }
 }
 
-void Looper::ButtonClicked(ClickButton* button)
+void Looper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
    {
@@ -1128,7 +1128,7 @@ void Looper::ButtonClicked(ClickButton* button)
       ResampleForSpeed(GetPlaybackSpeed());
 }
 
-void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mScratchSpeedSlider)
    {
@@ -1149,17 +1149,17 @@ void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void Looper::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void Looper::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 
-void Looper::DropdownUpdated(DropdownList* list, int oldVal)
+void Looper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mNumBarsSelector)
       UpdateNumBars(oldVal);
 }
 
-void Looper::CheckboxUpdated(Checkbox* checkbox)
+void Looper::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mAllowScratchCheckbox)
    {
@@ -1171,7 +1171,7 @@ void Looper::CheckboxUpdated(Checkbox* checkbox)
    }
    if (checkbox == mMuteCheckbox)
    {
-      mMuteRamp.Start(gTime, mMute ? 0 : 1, gTime + 1);
+      mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
    }
    if (checkbox == mWriteInputCheckbox)
    {
@@ -1179,11 +1179,11 @@ void Looper::CheckboxUpdated(Checkbox* checkbox)
       {
          if (mBufferTempo != TheTransport->GetTempo())
             ResampleForSpeed(GetPlaybackSpeed());
-         mWriteInputRamp.Start(gTime, 1, gTime + 10);
+         mWriteInputRamp.Start(time, 1, time + 10);
       }
       else
       {
-         mWriteInputRamp.Start(gTime, 0, gTime + 10);
+         mWriteInputRamp.Start(time, 0, time + 10);
       }
    }
 }

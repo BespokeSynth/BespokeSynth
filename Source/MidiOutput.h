@@ -53,7 +53,7 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;

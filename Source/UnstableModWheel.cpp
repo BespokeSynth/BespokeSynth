@@ -172,11 +172,11 @@ void UnstableModWheel::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetModWheel(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void UnstableModWheel::CheckboxUpdated(Checkbox* checkbox)
+void UnstableModWheel::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

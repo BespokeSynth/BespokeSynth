@@ -78,7 +78,7 @@ void Presets::Init()
 
    int defaultPreset = mModuleSaveData.GetInt("defaultpreset");
    if (defaultPreset != -1)
-      SetPreset(defaultPreset, false);
+      SetPreset(defaultPreset, gTime, false);
 
    TheTransport->AddAudioPoller(this);
 }
@@ -87,7 +87,7 @@ void Presets::Poll()
 {
    if (mQueuedPresetIndex != -1)
    {
-      SetPreset(mQueuedPresetIndex, false);
+      SetPreset(mQueuedPresetIndex, NextBufferTime(false), false);
       mQueuedPresetIndex = -1;
    }
 
@@ -183,7 +183,7 @@ void Presets::OnClicked(float x, float y, bool right)
       if (GetKeyModifiers() == kModifier_Shift)
          Store(mCurrentPreset);
       else
-         SetPreset(mCurrentPreset, false);
+         SetPreset(mCurrentPreset, NextBufferTime(false), false);
 
       UpdateGridValues();
    }
@@ -201,12 +201,12 @@ void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    if (pitch < (int)mPresetCollection.size())
    {
       mCurrentPreset = pitch;
-      SetPreset(pitch, true);
+      SetPreset(pitch, time, true);
       UpdateGridValues();
    }
 }
 
-void Presets::SetPreset(int idx, bool queueForMainThread)
+void Presets::SetPreset(int idx, double time, bool queueForMainThread)
 {
    if (queueForMainThread && !mForceImmediateSet)
    {
@@ -241,7 +241,7 @@ void Presets::SetPreset(int idx, bool queueForMainThread)
              !i->mGridContents.empty() ||
              !i->mString.empty())
          {
-            control->SetValueDirect(i->mValue);
+            control->SetValueDirect(i->mValue, time);
 
             FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
             if (slider)
@@ -305,7 +305,7 @@ void Presets::RandomizeControl(IUIControl* control)
       return;
    if (dynamic_cast<ClickButton*>(control) != nullptr)
       return;
-   control->SetFromMidiCC(ofRandom(1), true);
+   control->SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
 }
 
 void Presets::OnTransportAdvanced(float amount)
@@ -318,7 +318,7 @@ void Presets::OnTransportAdvanced(float amount)
 
       for (auto& ramp : mBlendRamps)
       {
-         ramp.mUIControl->SetValueDirect(ramp.mRamp.Value(mBlendProgress));
+         ramp.mUIControl->SetValueDirect(ramp.mRamp.Value(mBlendProgress), gTime);
       }
 
       if (mBlendProgress >= mBlendTime)
@@ -409,7 +409,7 @@ namespace
    const int maxGridSide = 20;
 }
 
-void Presets::ButtonClicked(ClickButton* button)
+void Presets::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizeButton)
       RandomizeTargets();
@@ -429,11 +429,11 @@ void Presets::ButtonClicked(ClickButton* button)
    }
 }
 
-void Presets::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Presets::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mCurrentPresetSlider)
    {
-      SetPreset(mCurrentPreset, true);
+      SetPreset(mCurrentPreset, time, true);
       UpdateGridValues();
    }
 }

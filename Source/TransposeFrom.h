@@ -52,8 +52,8 @@ public:
    //IScaleListener
    void OnScaleChanged() override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -77,7 +77,7 @@ private:
    bool Enabled() const override { return mEnabled; }
 
    int GetTransposeAmount() const;
-   void OnRootChanged();
+   void OnRootChanged(double time);
 
    float mWidth{ 200 };
    float mHeight{ 20 };

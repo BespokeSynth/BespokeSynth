@@ -819,7 +819,7 @@ void Push2Control::Poll()
             IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn(mSpawnLists.GetDropdowns()[i]->GetList()->GetValue());
             ofRectangle rect = module->GetRect();
             module->SetPosition(newModulePos.x, newModulePos.y);
-            mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
+            mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1, gTime);
             mScreenDisplayMode = ScreenDisplayMode::kNormal;
             SetDisplayModule(module, true);
             break;
@@ -1037,7 +1037,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
             for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
             {
                if (i != note.mPitch)
-                  mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
+                  mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1, gTime);
             }
          }
       }
@@ -1055,7 +1055,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
             gridIndex = gridX + (7 - gridY) * 8;
             if (gridIndex < list->GetNumValues())
             {
-               list->SetValueDirect(gridIndex);
+               list->SetValueDirect(gridIndex, gTime);
                mSelectedGridSpawnListIndex = -1;
             }
          }
@@ -1123,7 +1123,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
          float currentNormalized = mSliderControls[controlIndex]->GetMidiValue();
          float increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
          increment *= .005f;
-         mSliderControls[controlIndex]->SetFromMidiCC(currentNormalized + increment);
+         mSliderControls[controlIndex]->SetFromMidiCC(currentNormalized + increment, NextBufferTime(false), false);
       }
    }
    else if (control.mControl >= kAboveScreenButtonRow && control.mControl < kAboveScreenButtonRow + 8) //buttons below encoders
@@ -1153,7 +1153,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
                {
                   float current = mButtonControls[controlIndex]->GetMidiValue();
                   float newValue = current > 0 ? 0 : 1;
-                  mButtonControls[controlIndex]->SetFromMidiCC(newValue);
+                  mButtonControls[controlIndex]->SetFromMidiCC(newValue, NextBufferTime(false), false);
                }
             }
             else
@@ -1174,7 +1174,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
                mSelectedGridSpawnListIndex = -1;
 
             for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
-               mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
+               mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1, gTime);
          }
       }
    }
@@ -1244,7 +1244,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
             mScreenDisplayMode = ScreenDisplayMode::kAddModule;
             mGridControlModule = nullptr;
             for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
-               mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
+               mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1, gTime);
             mSelectedGridSpawnListIndex = -1;
          }
 

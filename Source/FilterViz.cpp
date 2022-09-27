@@ -142,14 +142,14 @@ void FilterViz::GraphFilter()
    }
 }
 
-void FilterViz::DropdownUpdated(DropdownList* list, int oldVal)
+void FilterViz::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void FilterViz::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FilterViz::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void FilterViz::ButtonClicked(ClickButton* button)
+void FilterViz::ButtonClicked(ClickButton* button, double time)
 {
 }

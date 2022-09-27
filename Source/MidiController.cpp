@@ -606,7 +606,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                   float sign = change > 0 ? 1 : -1;
                   change = sign * sqrtf(fabsf(change)); //make response fall off for bigger changes
                   curValue += increment * change;
-                  uicontrol->SetFromMidiCC(curValue);
+                  uicontrol->SetFromMidiCC(curValue, NextBufferTime(false), false);
                }
             }
             else
@@ -615,7 +615,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                   value = value > 0 ? 1 : 0;
                if (connection->mScaleOutput && (connection->mMidiOffValue != 0 || connection->mMidiOnValue != 127))
                   value = ofLerp(connection->mMidiOffValue / 127.0f, connection->mMidiOnValue / 127.0f, value);
-               uicontrol->SetFromMidiCC(value);
+               uicontrol->SetFromMidiCC(value, NextBufferTime(false), false);
             }
             uicontrol->StartBeacon();
          }
@@ -624,7 +624,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             if (value > 0)
             {
                float val = uicontrol->GetMidiValue();
-               uicontrol->SetValue(val == 0);
+               uicontrol->SetValue(val == 0, NextBufferTime(false));
                uicontrol->StartBeacon();
             }
          }
@@ -635,7 +635,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                if (connection->mIncrementAmount != 0)
                   uicontrol->Increment(connection->mIncrementAmount);
                else
-                  uicontrol->SetValue(connection->mValue);
+                  uicontrol->SetValue(connection->mValue, NextBufferTime(false));
                uicontrol->StartBeacon();
             }
          }
@@ -646,13 +646,13 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                if (connection->mIncrementAmount != 0)
                   uicontrol->Increment(connection->mIncrementAmount);
                else
-                  uicontrol->SetValue(connection->mValue);
+                  uicontrol->SetValue(connection->mValue, NextBufferTime(false));
                uicontrol->StartBeacon();
             }
          }
          else if (connection->mType == kControlType_Direct)
          {
-            uicontrol->SetValue(value * 127);
+            uicontrol->SetValue(value * 127, NextBufferTime(false));
             uicontrol->StartBeacon();
          }
 
@@ -1838,7 +1838,7 @@ void MidiController::OnDeviceChanged()
    mModulation.GetPressure(-1)->SetValue(mPressureOffset);
 }
 
-void MidiController::CheckboxUpdated(Checkbox* checkbox)
+void MidiController::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)
    {
@@ -1851,7 +1851,7 @@ void MidiController::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void MidiController::ButtonClicked(ClickButton* button)
+void MidiController::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mAddConnectionButton)
    {
@@ -1892,7 +1892,7 @@ void MidiController::ButtonClicked(ClickButton* button)
    }
 }
 
-void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
+void MidiController::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mPageSelector)
    {
@@ -1957,7 +1957,7 @@ void MidiController::DropdownClicked(DropdownList* list)
    }
 }
 
-void MidiController::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void MidiController::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
    if (radio == mMappingDisplayModeSelector)
    {

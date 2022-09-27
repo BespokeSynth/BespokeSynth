@@ -64,8 +64,7 @@ void Muter::DrawModule()
    mRampTimeSlider->Draw();
 }
 
-void Muter::CheckboxUpdated(Checkbox* checkbox)
+void Muter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
-   double time = gTime + gBufferSizeMs;
    mRamp.Start(time, mPass ? 1 : 0, time + mRampTimeMs);
 }

@@ -207,7 +207,7 @@ void Prefab::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void Prefab::ButtonClicked(ClickButton* button)
+void Prefab::ButtonClicked(ClickButton* button, double time)
 {
    using namespace juce;
    if (button == mSaveButton)

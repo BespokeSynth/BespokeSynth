@@ -258,7 +258,7 @@ void Vocoder::DrawModule()
    mGate.Draw();
 }
 
-void Vocoder::CheckboxUpdated(Checkbox* checkbox)
+void Vocoder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

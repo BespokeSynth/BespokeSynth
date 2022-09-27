@@ -48,7 +48,7 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    //IDrawableModule
    void Init() override;

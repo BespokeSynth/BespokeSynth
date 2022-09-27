@@ -14,6 +14,7 @@
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
 #include "Minimap.h"
+#include <thread>
 
 #ifdef BESPOKE_LINUX
 #include <climits>
@@ -44,6 +45,7 @@ class ADSRDisplay;
 class UserPrefsEditor;
 class Minimap;
 class ScriptWarningPopup;
+class NoteOutputQueue;
 
 enum LogEventType
 {
@@ -230,6 +232,8 @@ public:
    float GetFrameRate() const { return mFrameRate; }
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
+   static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
+   NoteOutputQueue* GetNoteOutputQueue() { return mNoteOutputQueue; }
 
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
    void SetUpModule(IDrawableModule* module, const ofxJSONElement& moduleInfo);
@@ -360,6 +364,8 @@ private:
    std::list<std::string> mErrors;
 
    NamedMutex mAudioThreadMutex;
+   static std::thread::id sAudioThreadId;
+   NoteOutputQueue* mNoteOutputQueue{ nullptr };
 
    bool mAudioPaused;
    bool mIsLoadingState;

@@ -184,7 +184,7 @@ void NoteHocket::SendCC(int control, int value, int voiceIdx)
    SendCCOutput(control, value, voiceIdx);
 }
 
-void NoteHocket::ButtonClicked(ClickButton* button)
+void NoteHocket::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPrevSeedButton)
       mSeed = (mSeed - 1 + 10000) % 10000;

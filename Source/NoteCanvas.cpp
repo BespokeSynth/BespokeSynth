@@ -219,7 +219,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
 
    if (mStopQueued)
    {
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(NextBufferTime(false));
       for (int i = 0; i < mCurrentNotes.size(); ++i)
          mCurrentNotes[i] = nullptr;
       mStopQueued = false;
@@ -325,7 +325,7 @@ void NoteCanvas::UpdateNumColumns()
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval) / 4);
 }
 
-void NoteCanvas::Clear()
+void NoteCanvas::Clear(double time)
 {
    bool wasPlaying = mPlay;
    mPlay = false;
@@ -334,7 +334,7 @@ void NoteCanvas::Clear()
       mInputNotes[pitch] = nullptr;
       mCurrentNotes[pitch] = nullptr;
    }
-   mNoteOutput.Flush(gTime);
+   mNoteOutput.Flush(time);
    mCanvas->Clear();
    mPlay = wasPlaying;
 }
@@ -623,7 +623,7 @@ void NoteCanvas::LoadMidi()
       bool wasPlaying = mPlay;
       mPlay = false;
 
-      mCanvas->Clear();
+      Clear(NextBufferTime(false));
       SetNumMeasures(1);
       File file = chooser.getResult();
       FileInputStream inputStream(file);
@@ -699,13 +699,13 @@ void NoteCanvas::SaveMidi()
    }
 }
 
-void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
+void NoteCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
       for (int pitch = 0; pitch < 128; ++pitch)
          mInputNotes[pitch] = nullptr;
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
    }
    if (checkbox == mPlayCheckbox)
    {
@@ -729,7 +729,7 @@ void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void NoteCanvas::ButtonClicked(ClickButton* button)
+void NoteCanvas::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mQuantizeButton)
       QuantizeNotes();
@@ -744,11 +744,11 @@ void NoteCanvas::ButtonClicked(ClickButton* button)
       SaveMidi();
 }
 
-void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
    {
@@ -756,7 +756,7 @@ void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void NoteCanvas::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {

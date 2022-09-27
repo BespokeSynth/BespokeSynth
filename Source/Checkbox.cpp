@@ -143,7 +143,7 @@ void Checkbox::OnClicked(float x, float y, bool right)
 
    *mVar = !(*mVar);
    CalcSliderVal();
-   mOwner->CheckboxUpdated(this);
+   mOwner->CheckboxUpdated(this, NextBufferTime(false));
 }
 
 void Checkbox::CalcSliderVal()
@@ -158,7 +158,7 @@ bool Checkbox::MouseMoved(float x, float y)
    return false;
 }
 
-void Checkbox::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void Checkbox::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
    mSliderVal = slider;
@@ -167,7 +167,7 @@ void Checkbox::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
    {
       *mVar = on;
       mLastSetValue = *mVar;
-      mOwner->CheckboxUpdated(this);
+      mOwner->CheckboxUpdated(this, time);
    }
 }
 
@@ -176,14 +176,14 @@ float Checkbox::GetValueForMidiCC(float slider) const
    return slider > .5f ? 1 : 0;
 }
 
-void Checkbox::SetValue(float value)
+void Checkbox::SetValue(float value, double time)
 {
    bool on = value > 0.5f;
    if (*mVar != on)
    {
       *mVar = on;
       CalcSliderVal();
-      mOwner->CheckboxUpdated(this);
+      mOwner->CheckboxUpdated(this, time);
    }
 }
 
@@ -237,5 +237,5 @@ void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
    float var;
    in >> var;
    if (shouldSetValue)
-      SetValueDirect(var);
+      SetValueDirect(var, gTime);
 }

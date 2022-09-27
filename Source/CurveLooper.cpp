@@ -107,7 +107,7 @@ void CurveLooper::OnTransportAdvanced(float amount)
       for (auto* control : mUIControls)
       {
          if (control != nullptr)
-            control->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime), true);
+            control->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime), gTime, true);
       }
    }
 }
@@ -174,11 +174,11 @@ void CurveLooper::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void CurveLooper::CheckboxUpdated(Checkbox* checkbox)
+void CurveLooper::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal)
+void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    /*int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
@@ -201,7 +201,7 @@ void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal)
    }*/
 }
 
-void CurveLooper::ButtonClicked(ClickButton* button)
+void CurveLooper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizeButton)
    {

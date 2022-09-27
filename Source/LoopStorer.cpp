@@ -176,7 +176,7 @@ void LoopStorer::DropdownClicked(DropdownList* list)
 {
 }
 
-void LoopStorer::DropdownUpdated(DropdownList* list, int oldVal)
+void LoopStorer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mQuantizationDropdown)
    {
@@ -186,7 +186,7 @@ void LoopStorer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void LoopStorer::ButtonClicked(ClickButton* button)
+void LoopStorer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
    {
@@ -203,7 +203,7 @@ void LoopStorer::ButtonClicked(ClickButton* button)
    }
 }
 
-void LoopStorer::CheckboxUpdated(Checkbox* checkbox)
+void LoopStorer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (int i = 0; i < mSamples.size(); ++i)
    {
@@ -223,11 +223,11 @@ void LoopStorer::GetModuleDimensions(float& width, float& height)
    height = GetRowY((int)mSamples.size());
 }
 
-void LoopStorer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void LoopStorer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void LoopStorer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void LoopStorer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

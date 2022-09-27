@@ -126,11 +126,11 @@ void LooperGranulator::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    }
 }
 
-void LooperGranulator::ButtonClicked(ClickButton* button)
+void LooperGranulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void LooperGranulator::DropdownUpdated(DropdownList* list, int oldVal)
+void LooperGranulator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 

@@ -47,7 +47,7 @@ public:
    //IAudioSource
    void Process(double time) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

@@ -145,10 +145,10 @@ void AbletonLink::DrawModule()
    DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, 40);
 }
 
-void AbletonLink::CheckboxUpdated(Checkbox* checkbox)
+void AbletonLink::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void AbletonLink::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void AbletonLink::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }

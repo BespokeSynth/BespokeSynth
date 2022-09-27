@@ -51,8 +51,8 @@ void AudioLevelToCV::CreateUIControls()
    mReleaseSlider->SetMode(FloatSlider::kSquare);
 
    //update mAttackFactor and mReleaseFactor
-   FloatSliderUpdated(mAttackSlider, 0);
-   FloatSliderUpdated(mReleaseSlider, 0);
+   FloatSliderUpdated(mAttackSlider, 0, gTime);
+   FloatSliderUpdated(mReleaseSlider, 0, gTime);
 
    GetPatchCableSource()->SetEnabled(false);
 
@@ -129,7 +129,7 @@ float AudioLevelToCV::Value(int samplesIn)
    return ofMap(mModulationBuffer[samplesIn], 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
-void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mAttackSlider)
       mAttackFactor = powf(.01f, 1.0f / (mAttack * gSampleRateMs));

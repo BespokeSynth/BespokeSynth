@@ -105,8 +105,8 @@ public:
    ofVec2f GetCellPosition(int col, int row);
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
 

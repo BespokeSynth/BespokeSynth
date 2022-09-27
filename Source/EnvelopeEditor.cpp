@@ -538,7 +538,7 @@ bool EnvelopeEditor::MouseMoved(float x, float y)
    return false;
 }
 
-void EnvelopeEditor::CheckboxUpdated(Checkbox* checkbox)
+void EnvelopeEditor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (int i = 0; i < (int)mStageControls.size(); ++i)
    {
@@ -557,7 +557,7 @@ void EnvelopeEditor::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void EnvelopeEditor::ButtonClicked(ClickButton* button)
+void EnvelopeEditor::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPinButton)
    {
@@ -585,7 +585,7 @@ void EnvelopeEditor::Pin()
    }
 }
 
-void EnvelopeEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EnvelopeEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mADSRViewLengthSlider)
    {
