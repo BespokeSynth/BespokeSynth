@@ -49,7 +49,7 @@ public:
    void OnRemovedFrom(IUIControl* control);
 
 protected:
-   void InitializeRange();
+   void InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode);
    bool RequiresManualPolling() { return mUIControlTarget != nullptr && mSliderTarget == nullptr; }
 
    float mDummyMin;

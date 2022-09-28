@@ -228,7 +228,7 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
    mUIControlTarget = owner;
 
    if (mSliderTarget != nullptr)
-      InitializeRange();
+      InitializeRange(mSliderTarget->GetValue(), mSliderTarget->GetMin(), mSliderTarget->GetMax(), mSliderTarget->GetMode());
 }
 
 void FloatSliderLFOControl::RandomizeSettings()

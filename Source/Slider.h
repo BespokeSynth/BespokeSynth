@@ -212,6 +212,8 @@ public:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override { mMouseDown = false; }
    bool IsMouseDown() const override { return mMouseDown; }
+   int GetMin() const { return mMin; }
+   int GetMax() const { return mMax; }
    void SetExtents(int min, int max)
    {
       mMin = min;

@@ -731,7 +731,7 @@ void FloatSlider::OnTransportAdvanced(float amount)
 
 namespace
 {
-   const int kFloatSliderSaveStateRev = 5;
+   const int kFloatSliderSaveStateRev = 6;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
@@ -749,6 +749,7 @@ void FloatSlider::SaveState(FileStreamOut& out)
 
    out << mMin;
    out << mMax;
+   out << (int)mMode;
 
    bool hasLFO = mLFOControl && mLFOControl->Active();
    out << hasLFO;
@@ -808,6 +809,13 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    {
       in >> mMin;
       in >> mMax;
+   }
+
+   if (rev >= 6)
+   {
+      int modeInt;
+      in >> modeInt;
+      mMode = (Mode)modeInt;
    }
 
    if (rev >= 5)

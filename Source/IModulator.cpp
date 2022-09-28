@@ -60,11 +60,20 @@ void IModulator::OnModulatorRepatch()
 
          mUIControlTarget = newTarget;
          mSliderTarget = dynamic_cast<FloatSlider*>(mUIControlTarget);
+         IntSlider* intSlider = dynamic_cast<IntSlider*>(mUIControlTarget);
 
          if (mSliderTarget != nullptr)
          {
             mSliderTarget->SetModulator(this);
-            InitializeRange();
+            InitializeRange(mSliderTarget->GetValue(), mSliderTarget->GetMin(), mSliderTarget->GetMax(), mSliderTarget->GetMode());
+         }
+         else if (intSlider != nullptr)
+         {
+            InitializeRange(intSlider->GetValue(), intSlider->GetMin(), intSlider->GetMax(), FloatSlider::kNormal);
+         }
+         else
+         {
+            InitializeRange(mUIControlTarget->GetValue(), 0, 1, FloatSlider::kNormal);
          }
       }
    }
@@ -112,38 +121,39 @@ void IModulator::OnRemovedFrom(IUIControl* control)
    OnModulatorRepatch();
 }
 
-void IModulator::InitializeRange()
+void IModulator::InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode)
 {
-   if (mSliderTarget != nullptr)
+   if (!TheSynth->IsLoadingState())
    {
-      if (!TheSynth->IsLoadingState())
+      if (!TheSynth->IsLoadingModule())
       {
-         if (!TheSynth->IsLoadingModule())
+         if (InitializeWithZeroRange())
          {
-            if (InitializeWithZeroRange())
-            {
-               GetMin() = mSliderTarget->GetValue();
-               GetMax() = mSliderTarget->GetValue();
-            }
-            else
-            {
-               GetMin() = mSliderTarget->GetMin();
-               GetMax() = mSliderTarget->GetMax();
-            }
+            GetMin() = currentValue;
+            GetMax() = currentValue;
+         }
+         else
+         {
+            GetMin() = min;
+            GetMax() = max;
+         }
+
+         if (mMinSlider)
+         {
+            mMinSlider->SetExtents(min, max);
+            mMinSlider->SetMode(sliderMode);
+         }
+
+         if (mMaxSlider)
+         {
+            mMaxSlider->SetExtents(min, max);
+            mMaxSlider->SetMode(sliderMode);
          }
       }
-
-      if (mMinSlider)
-      {
-         mMinSlider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
-         mMinSlider->SetMode(mSliderTarget->GetMode());
-         mMinSlider->SetVar(&GetMin());
-      }
-      if (mMaxSlider)
-      {
-         mMaxSlider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
-         mMaxSlider->SetMode(mSliderTarget->GetMode());
-         mMaxSlider->SetVar(&GetMax());
-      }
    }
+
+   if (mMinSlider)
+      mMinSlider->SetVar(&GetMin());
+   if (mMaxSlider)
+      mMaxSlider->SetVar(&GetMax());
 }
