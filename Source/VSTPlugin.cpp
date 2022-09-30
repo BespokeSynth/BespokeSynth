@@ -597,9 +597,12 @@ void VSTPlugin::Poll()
    {
       if (mPlugin != nullptr)
       {
-         if (mWindow == nullptr)
-            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
-         mWindow->ShowWindow();
+         juce::Timer::callAfterDelay(0, [this]() {
+                                        if (mWindow == nullptr)
+                                           mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
+
+                                        mWindow->ShowWindow();
+                                     });
 
          //if (mWindow->GetNSViewComponent())
          //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
