@@ -597,7 +597,8 @@ void VSTPlugin::Poll()
    {
       if (mPlugin != nullptr)
       {
-         juce::Timer::callAfterDelay(0, [this]() {
+         juce::Timer::callAfterDelay(1, [this]()
+                                     {
                                         if (mWindow == nullptr)
                                            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
 
