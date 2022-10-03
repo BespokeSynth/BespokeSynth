@@ -94,7 +94,7 @@ private:
    void OnClicked(float x, float y, bool right) override;
    float mWidth{ 20 };
    float mHeight{ 15 };
-   double mClickTime{ 0 };
+   double mClickTime{ -9999 };
    IButtonListener* mOwner{ nullptr };
    ButtonDisplayStyle mDisplayStyle;
 };
