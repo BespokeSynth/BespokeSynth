@@ -173,9 +173,9 @@ private:
    ofVec2f mDragCanvasStartMousePos;
    ofVec2f mDragCanvasStartCanvasPos;
    ofVec2f mDragZoomStartDimensions;
-   HighlightEnd mHighlightEnd;
+   HighlightEnd mHighlightEnd{ HighlightEnd::kHighlightEnd_None };
    CanvasElement* mHighlightEndElement{ nullptr };
-   HighlightEnd mDragEnd;
+   HighlightEnd mDragEnd{ HighlightEnd::kHighlightEnd_None };
    int mMajorColumnInterval{ -1 };
    bool mHasDuplicatedThisDrag{ false };
    float mScrollVerticalPartial{ 0 };

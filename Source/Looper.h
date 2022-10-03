@@ -185,7 +185,7 @@ private:
    ClickButton* mUndoButton{ nullptr };
    bool mWantUndo{ false };
    bool mReplaceOnCommit{ false };
-   float mLoopPosOffset{ true };
+   float mLoopPosOffset{ 0 };
    FloatSlider* mLoopPosOffsetSlider{ nullptr };
    bool mAllowChop{ false };
    Checkbox* mAllowChopCheckbox{ nullptr };
