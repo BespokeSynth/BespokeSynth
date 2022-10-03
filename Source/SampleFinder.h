@@ -84,36 +84,36 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   Sample* mSample;
+   Sample* mSample{ nullptr };
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   float* mWriteBuffer;
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mLoop;
-   Checkbox* mLoopCheckbox;
-   int mMeasureEarly;
-   bool mEditMode;
-   Checkbox* mEditCheckbox;
-   int mClipStart;
-   IntSlider* mClipStartSlider;
-   int mClipEnd;
-   IntSlider* mClipEndSlider;
-   float mZoomStart;
-   float mZoomEnd;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
-   ClickButton* mWriteButton;
-   double mPlayhead;
-   bool mWantWrite;
-   ClickButton* mDoubleLengthButton;
-   ClickButton* mHalveLengthButton;
+   float mVolume{ .6 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   float* mWriteBuffer{ nullptr };
+   bool mPlay{ false };
+   Checkbox* mPlayCheckbox{ nullptr };
+   bool mLoop{ true };
+   Checkbox* mLoopCheckbox{ nullptr };
+   int mMeasureEarly{ 0 };
+   bool mEditMode{ true };
+   Checkbox* mEditCheckbox{ nullptr };
+   int mClipStart{ 0 };
+   IntSlider* mClipStartSlider{ nullptr };
+   int mClipEnd{ 1 };
+   IntSlider* mClipEndSlider{ nullptr };
+   float mZoomStart{ 0 };
+   float mZoomEnd{ 1 };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   int mNumBars{ 1 };
+   IntSlider* mNumBarsSlider{ nullptr };
+   ClickButton* mWriteButton{ nullptr };
+   double mPlayhead{ 0 };
+   bool mWantWrite{ false };
+   ClickButton* mDoubleLengthButton{ nullptr };
+   ClickButton* mHalveLengthButton{ nullptr };
    SampleDrawer mSampleDrawer;
-   bool mReverse;
-   Checkbox* mReverseCheckbox;
+   bool mReverse{ false };
+   Checkbox* mReverseCheckbox{ nullptr };
 };
 
 #endif /* defined(__modularSynth__SampleFinder__) */

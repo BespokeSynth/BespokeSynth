@@ -75,13 +75,13 @@ private:
       , mPitch(pitch)
       , mVoiceIdx(voiceIdx)
       {}
-      double mTime;
-      int mPitch;
-      int mVoiceIdx;
+      double mTime{ 0 };
+      int mPitch{ 0 };
+      int mVoiceIdx{ -1 };
    };
 
-   float mSustain;
-   FloatSlider* mSustainSlider;
+   float mSustain{ .25 };
+   FloatSlider* mSustainSlider{ nullptr };
    std::list<QueuedNoteOff> mNoteOffs;
 };
 

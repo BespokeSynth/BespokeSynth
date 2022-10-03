@@ -30,13 +30,6 @@
 #include "UIControlMacros.h"
 
 DistortionEffect::DistortionEffect()
-: mType(kClean)
-, mTypeDropdown(nullptr)
-, mClipSlider(nullptr)
-, mPreamp(1.0f)
-, mPreampSlider(nullptr)
-, mFuzzAmount(0)
-, mRemoveInputDC(true)
 {
    SetClip(1);
 

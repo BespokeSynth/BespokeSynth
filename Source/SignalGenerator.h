@@ -123,7 +123,7 @@ private:
    FloatSlider* mPhaseOffsetSlider{ nullptr };
    double mResetPhaseAtMs{ -9999 };
 
-   float* mWriteBuffer;
+   float* mWriteBuffer{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SignalGenerator__) */

@@ -29,10 +29,6 @@
 #include "ModularSynth.h"
 
 VelocitySetter::VelocitySetter()
-: mVelocity(1)
-, mVelocitySlider(nullptr)
-, mRandomness(0)
-, mRandomnessSlider(nullptr)
 {
 }
 

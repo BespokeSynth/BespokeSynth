@@ -29,8 +29,6 @@
 #include "ModularSynth.h"
 
 VelocityScaler::VelocityScaler()
-: mScale(1)
-, mScaleSlider(nullptr)
 {
 }
 

@@ -79,14 +79,13 @@ private:
    {
       Node(const T& val)
       : value(val)
-      , next(nullptr)
       {}
 
       T value;
-      Node* next;
+      Node* next{ nullptr };
    };
 
-   Node* first;
+   Node* first{ nullptr };
    Atomic<Node*> divider, last;
 };
 

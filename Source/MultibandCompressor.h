@@ -72,21 +72,21 @@ private:
 
    void CalcFilters();
 
-   float* mWorkBuffer;
-   float* mOutBuffer;
+   float* mWorkBuffer{ nullptr };
+   float* mOutBuffer{ nullptr };
 
-   float mDryWet;
-   FloatSlider* mDryWetSlider;
-   IntSlider* mNumBandsSlider;
-   int mNumBands;
-   float mFreqMin;
-   float mFreqMax;
-   FloatSlider* mFMinSlider;
-   FloatSlider* mFMaxSlider;
-   float mRingTime;
-   FloatSlider* mRingTimeSlider;
-   float mMaxBand;
-   FloatSlider* mMaxBandSlider;
+   float mDryWet{ 1 };
+   FloatSlider* mDryWetSlider{ nullptr };
+   IntSlider* mNumBandsSlider{ nullptr };
+   int mNumBands{ 4 };
+   float mFreqMin{ 150 };
+   float mFreqMax{ 7500 };
+   FloatSlider* mFMinSlider{ nullptr };
+   FloatSlider* mFMaxSlider{ nullptr };
+   float mRingTime{ .01 };
+   FloatSlider* mRingTimeSlider{ nullptr };
+   float mMaxBand{ .3 };
+   FloatSlider* mMaxBandSlider{ nullptr };
 
    CLinkwitzRiley_4thOrder mFilters[COMPRESSOR_MAX_BANDS];
    PeakTracker mPeaks[COMPRESSOR_MAX_BANDS];

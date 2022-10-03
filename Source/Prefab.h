@@ -82,12 +82,12 @@ private:
    void SavePrefab(std::string savePath);
    void UpdatePrefabName(std::string path);
 
-   PatchCableSource* mRemoveModuleCable;
-   ClickButton* mSaveButton;
-   ClickButton* mLoadButton;
-   ClickButton* mDisbandButton;
+   PatchCableSource* mRemoveModuleCable{ nullptr };
+   ClickButton* mSaveButton{ nullptr };
+   ClickButton* mLoadButton{ nullptr };
+   ClickButton* mDisbandButton{ nullptr };
    ModuleContainer mModuleContainer;
-   std::string mPrefabName;
+   std::string mPrefabName{ "" };
 };
 
 

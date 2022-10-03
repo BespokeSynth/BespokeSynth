@@ -93,10 +93,10 @@ private:
    bool ButtonLit() const;
 
    void OnClicked(float x, float y, bool right) override;
-   float mWidth;
-   float mHeight;
-   double mClickTime;
-   IButtonListener* mOwner;
+   float mWidth{ 20 };
+   float mHeight{ 15 };
+   double mClickTime{ -9999 };
+   IButtonListener* mOwner{ nullptr };
    ButtonDisplayStyle mDisplayStyle;
 };
 

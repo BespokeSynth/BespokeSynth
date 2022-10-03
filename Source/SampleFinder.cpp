@@ -31,33 +31,6 @@
 #include "Profiler.h"
 
 SampleFinder::SampleFinder()
-: mVolume(.6f)
-, mVolumeSlider(nullptr)
-, mSample(nullptr)
-, mPlay(false)
-, mPlayCheckbox(nullptr)
-, mLoop(true)
-, mLoopCheckbox(nullptr)
-, mMeasureEarly(0)
-, mEditMode(true)
-, mEditCheckbox(nullptr)
-, mClipStart(0)
-, mClipStartSlider(nullptr)
-, mClipEnd(1)
-, mClipEndSlider(nullptr)
-, mZoomStart(0)
-, mZoomEnd(1)
-, mNumBars(1)
-, mNumBarsSlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mWriteButton(nullptr)
-, mPlayhead(0)
-, mWantWrite(false)
-, mDoubleLengthButton(nullptr)
-, mHalveLengthButton(nullptr)
-, mReverse(false)
-, mReverseCheckbox(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);

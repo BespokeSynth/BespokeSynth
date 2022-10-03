@@ -93,30 +93,30 @@ private:
       void Init(LoopStorer* storer, int index);
       void Draw();
 
-      ChannelBuffer* mBuffer;
-      int mNumBars;
-      Checkbox* mSelectCheckbox;
-      LoopStorer* mLoopStorer;
-      int mIndex;
-      int mBufferLength;
-      bool mIsCurrentBuffer;
+      ChannelBuffer* mBuffer{ nullptr };
+      int mNumBars{ 1 };
+      Checkbox* mSelectCheckbox{ nullptr };
+      LoopStorer* mLoopStorer{ nullptr };
+      int mIndex{ 0 };
+      int mBufferLength{ -1 };
+      bool mIsCurrentBuffer{ false };
    };
 
-   Looper* mLooper;
-   Checkbox* mRewriteToSelectionCheckbox;
-   bool mRewriteToSelection;
-   DropdownList* mQuantizationDropdown;
-   NoteInterval mQuantization;
-   int mQueuedSwapBufferIdx;
+   Looper* mLooper{ nullptr };
+   Checkbox* mRewriteToSelectionCheckbox{ nullptr };
+   bool mRewriteToSelection{ false };
+   DropdownList* mQuantizationDropdown{ nullptr };
+   NoteInterval mQuantization{ NoteInterval::kInterval_None };
+   int mQueuedSwapBufferIdx{ -1 };
    ofMutex mSwapMutex;
-   bool mIsSwapping;
-   ClickButton* mClearButton;
+   bool mIsSwapping{ false };
+   ClickButton* mClearButton{ nullptr };
    ofMutex mLoadMutex;
 
    std::vector<SampleData*> mSamples;
-   int mCurrentBufferIdx;
+   int mCurrentBufferIdx{ 0 };
 
-   PatchCableSource* mLooperCable;
+   PatchCableSource* mLooperCable{ nullptr };
 };
 
 #endif /* defined(__Bespoke__LoopStorer__) */

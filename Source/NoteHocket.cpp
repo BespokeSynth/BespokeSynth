@@ -34,9 +34,6 @@
 
 NoteHocket::NoteHocket()
 {
-   mWeight[0] = 1;
-   for (int i = 1; i < kMaxDestinations; ++i)
-      mWeight[i] = 0;
    for (int i = 0; i < 128; ++i)
       mLastNoteDestinations[i] = -1;
 

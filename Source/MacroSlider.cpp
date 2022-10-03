@@ -31,8 +31,6 @@
 #include "Transport.h"
 
 MacroSlider::MacroSlider()
-: mSlider(nullptr)
-, mValue(0)
 {
 }
 

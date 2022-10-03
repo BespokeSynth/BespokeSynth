@@ -30,13 +30,7 @@
 int Monome::sNextMonomeReceivePort = 13338;
 
 Monome::Monome(MidiDeviceListener* listener)
-: mMonomeReceivePort(-1)
-, mMaxColumns(16)
-, mGridRotation(0)
-, mPrefix("monome")
-, mJustRequestedDeviceList(false)
-, mListener(listener)
-, mListForMidiController(nullptr)
+: mListener(listener)
 {
 }
 

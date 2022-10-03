@@ -61,12 +61,12 @@ public:
 private:
    std::string mLabel;
    std::vector<ModuleFactory::Spawnable> mSpawnables;
-   int mSpawnIndex;
-   DropdownList* mSpawnList;
-   IDropdownListener* mOwner;
+   int mSpawnIndex{ -1 };
+   DropdownList* mSpawnList{ nullptr };
+   IDropdownListener* mOwner{ nullptr };
    ofVec2f mPos;
    ModuleCategory mModuleCategory;
-   bool mShowDecorators;
+   bool mShowDecorators{ false };
 };
 
 struct SpawnListManager

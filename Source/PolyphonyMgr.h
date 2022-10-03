@@ -76,15 +76,15 @@ public:
 
 private:
    VoiceInfo mVoices[kNumVoices];
-   bool mAllowStealing;
-   int mLastVoice;
-   ChannelBuffer mFadeOutBuffer;
-   ChannelBuffer mFadeOutWorkBuffer;
+   bool mAllowStealing{ true };
+   int mLastVoice{ -1 };
+   ChannelBuffer mFadeOutBuffer{ kVoiceFadeSamples };
+   ChannelBuffer mFadeOutWorkBuffer{ kVoiceFadeSamples };
    float mWorkBuffer[2048]{};
-   int mFadeOutBufferPos;
+   int mFadeOutBufferPos{ 0 };
    IDrawableModule* mOwner;
-   int mVoiceLimit;
-   int mOversampling;
+   int mVoiceLimit{ kNumVoices };
+   int mOversampling{ 1 };
 };
 
 #endif /* defined(__additiveSynth__PolyphonyMgr__) */

@@ -73,5 +73,5 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   ModulationChain* mModWheel;
+   ModulationChain* mModWheel{ nullptr };
 };

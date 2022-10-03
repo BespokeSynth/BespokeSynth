@@ -30,7 +30,6 @@
 #include "EffectFactory.h"
 
 FilterViz::FilterViz()
-: mNeedUpdate(true)
 {
    mImpulseBuffer = new float[FILTER_VIZ_BINS];
    mFFTOutReal = new float[FILTER_VIZ_BINS];

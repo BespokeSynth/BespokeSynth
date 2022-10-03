@@ -84,21 +84,21 @@ private:
    UIControlTooltipInfo* FindControlInfo(IUIControl* control);
 
    std::vector<std::string> mHelpText;
-   Checkbox* mShowTooltipsCheckbox;
-   ClickButton* mCopyBuildInfoButton;
-   ClickButton* mDumpModuleInfoButton;
-   ClickButton* mDoModuleScreenshotsButton;
-   ClickButton* mDoModuleDocumentationButton;
-   ClickButton* mTutorialVideoLinkButton;
-   ClickButton* mDocsLinkButton;
-   ClickButton* mDiscordLinkButton;
-   float mWidth;
-   float mHeight;
+   Checkbox* mShowTooltipsCheckbox{ nullptr };
+   ClickButton* mCopyBuildInfoButton{ nullptr };
+   ClickButton* mDumpModuleInfoButton{ nullptr };
+   ClickButton* mDoModuleScreenshotsButton{ nullptr };
+   ClickButton* mDoModuleDocumentationButton{ nullptr };
+   ClickButton* mTutorialVideoLinkButton{ nullptr };
+   ClickButton* mDocsLinkButton{ nullptr };
+   ClickButton* mDiscordLinkButton{ nullptr };
+   float mWidth{ 700 };
+   float mHeight{ 700 };
    static bool sTooltipsLoaded;
    static std::list<ModuleTooltipInfo> sTooltips;
 
    std::list<ModuleFactory::Spawnable> mScreenshotsToProcess;
-   IDrawableModule* mScreenshotModule;
+   IDrawableModule* mScreenshotModule{ nullptr };
 
    float mScrollOffsetY{ 0 };
    float mMaxScrollAmount{ 0 };

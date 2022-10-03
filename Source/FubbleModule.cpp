@@ -33,31 +33,9 @@
 
 #include "juce_core/juce_core.h"
 
-namespace
-{
-   const int kTopControlHeight = 22;
-   const int kTimelineSectionHeight = 50;
-   const int kBottomControlHeight = 58;
-}
-
 FubbleModule::FubbleModule()
 : mAxisH(this, true)
 , mAxisV(this, false)
-, mLength(0)
-, mQuantizeLength(false)
-, mQuantizeLengthCheckbox(nullptr)
-, mQuantizeInterval(kInterval_4n)
-, mQuantizeLengthSelector(nullptr)
-, mSpeed(1)
-, mSpeedSlider(nullptr)
-, mWidth(220)
-, mHeight(kTopControlHeight + 200 + kTimelineSectionHeight + kBottomControlHeight)
-, mRecordStartOffset(0)
-, mIsDrawing(false)
-, mIsRightClicking(false)
-, mPerlinStrength(0)
-, mPerlinScale(1)
-, mPerlinSpeed(1)
 {
    UpdatePerlinSeed();
 }

@@ -77,17 +77,17 @@ private:
 
    void ResetFilter();
 
-   RadioButton* mTypeSelector;
+   RadioButton* mTypeSelector{ nullptr };
 
-   FloatSlider* mFSlider;
-   FloatSlider* mQSlider;
-   FloatSlider* mGSlider;
-   bool mMouseControl;
+   FloatSlider* mFSlider{ nullptr };
+   FloatSlider* mQSlider{ nullptr };
+   FloatSlider* mGSlider{ nullptr };
+   bool mMouseControl{ false };
 
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
    ChannelBuffer mDryBuffer;
 
-   bool mCoefficientsHaveChanged;
+   bool mCoefficientsHaveChanged{ true };
 };
 
 #endif /* defined(__modularSynth__BiquadFilterEffect__) */

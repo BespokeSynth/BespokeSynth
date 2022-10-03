@@ -31,17 +31,7 @@
 
 RingModulator::RingModulator()
 : IAudioProcessor(gBufferSize)
-, mDryWet(1)
-, mVolume(1)
-, mFreqSlider(nullptr)
-, mDryWetSlider(nullptr)
-, mVolumeSlider(nullptr)
-, mPhase(0)
-, mModOsc(kOsc_Sin)
-, mGlideTime(0)
-, mGlideSlider(nullptr)
 , mDryBuffer(gBufferSize)
-, mFreq(220)
 {
    mModOsc.Start(gTime, 1);
    mFreqRamp.Start(gTime, 220, gTime + mGlideTime);

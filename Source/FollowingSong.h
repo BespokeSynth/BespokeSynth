@@ -76,13 +76,13 @@ private:
    }
 
    ofMutex mLoadSongMutex;
-   bool mLoadingSong;
+   bool mLoadingSong{ true };
 
    Sample mSample;
-   float mVolume;
-   bool mPlay;
-   bool mMute;
-   Checkbox* mMuteCheckbox;
+   float mVolume{ 1 };
+   bool mPlay{ false };
+   bool mMute{ false };
+   Checkbox* mMuteCheckbox{ nullptr };
 };
 
 

@@ -62,11 +62,11 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mLevel;
-   float mMaxLevel;
-   FloatSlider* mLevelSlider;
+   float mLevel{ 0 };
+   float mMaxLevel{ 1 };
+   FloatSlider* mLevelSlider{ nullptr };
    PeakTracker mPeakTracker;
-   float* mAnalysisBuffer;
+   float* mAnalysisBuffer{ nullptr };
 };
 
 #endif /* defined(__Bespoke__AudioMeter__) */

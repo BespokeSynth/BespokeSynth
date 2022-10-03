@@ -59,10 +59,10 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
 
-   float mRatio;
-   FloatSlider* mRatioSlider;
-   int mRatioSelection;
-   RadioButton* mRatioSelector;
+   float mRatio{ 1 };
+   FloatSlider* mRatioSlider{ nullptr };
+   int mRatioSelection{ 10 };
+   RadioButton* mRatioSelector{ nullptr };
    PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
 };
 

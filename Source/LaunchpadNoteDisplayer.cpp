@@ -30,7 +30,6 @@
 #include "FillSaveDropdown.h"
 
 LaunchpadNoteDisplayer::LaunchpadNoteDisplayer()
-: mLaunchpad(nullptr)
 {
 }
 

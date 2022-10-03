@@ -62,6 +62,6 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mOffset;
-   FloatSlider* mOffsetSlider;
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
 };

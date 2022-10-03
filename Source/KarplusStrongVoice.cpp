@@ -36,10 +36,7 @@
 #include "juce_core/juce_core.h"
 
 KarplusStrongVoice::KarplusStrongVoice(IDrawableModule* owner)
-: mOscPhase(0)
-, mOsc(kOsc_Sin)
-, mBuffer(gSampleRate)
-, mFilteredSample(0)
+: mBuffer(gSampleRate)
 , mOwner(owner)
 {
    mOsc.Start(0, 1);

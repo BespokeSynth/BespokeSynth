@@ -66,15 +66,15 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   float mScale;
-   FloatSlider* mScaleSlider;
+   float mWidth{ 500 };
+   float mHeight{ 500 };
+   float mScale{ 1 };
+   FloatSlider* mScaleSlider{ nullptr };
 
    ofVec2f mLissajousPoints[NUM_LISSAJOUS_POINTS];
-   int mOffset;
-   bool mAutocorrelationMode;
-   bool mOnlyHasOneChannel;
+   int mOffset{ 0 };
+   bool mAutocorrelationMode{ true };
+   bool mOnlyHasOneChannel{ true };
 };
 
 

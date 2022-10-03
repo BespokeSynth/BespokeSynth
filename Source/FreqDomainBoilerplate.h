@@ -71,26 +71,26 @@ private:
 
    FFTData mFFTData;
 
-   float* mWindower;
+   float* mWindower{ nullptr };
 
    ::FFT mFFT;
    RollingBuffer mRollingInputBuffer;
    RollingBuffer mRollingOutputBuffer;
 
-   float mInputPreamp;
-   float mValue1;
-   float mVolume;
-   FloatSlider* mInputSlider;
-   FloatSlider* mValue1Slider;
-   FloatSlider* mVolumeSlider;
-   float mDryWet;
-   FloatSlider* mDryWetSlider;
-   float mValue2;
-   FloatSlider* mValue2Slider;
-   float mValue3;
-   FloatSlider* mValue3Slider;
-   float mPhaseOffset;
-   FloatSlider* mPhaseOffsetSlider;
+   float mInputPreamp{ 1 };
+   float mValue1{ 1 };
+   float mVolume{ 1 };
+   FloatSlider* mInputSlider{ nullptr };
+   FloatSlider* mValue1Slider{ nullptr };
+   FloatSlider* mVolumeSlider{ nullptr };
+   float mDryWet{ 1 };
+   FloatSlider* mDryWetSlider{ nullptr };
+   float mValue2{ 1 };
+   FloatSlider* mValue2Slider{ nullptr };
+   float mValue3{ 0 };
+   FloatSlider* mValue3Slider{ nullptr };
+   float mPhaseOffset{ 0 };
+   FloatSlider* mPhaseOffsetSlider{ nullptr };
 };
 
 

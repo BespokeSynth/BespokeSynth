@@ -30,8 +30,6 @@
 #include "UIControlMacros.h"
 
 NoteOctaver::NoteOctaver()
-: mOctave(0)
-, mOctaveSlider(nullptr)
 {
 }
 

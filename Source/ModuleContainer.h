@@ -93,10 +93,10 @@ public:
 
 private:
    std::vector<IDrawableModule*> mModules;
-   IDrawableModule* mOwner;
+   IDrawableModule* mOwner{ nullptr };
 
    ofVec2f mDrawOffset;
-   float mDrawScale;
+   float mDrawScale{ 1 };
 };
 
 #endif // MODULECONTAINER_H_INCLUDED

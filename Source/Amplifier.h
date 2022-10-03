@@ -62,8 +62,8 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mGain;
-   FloatSlider* mGainSlider;
+   float mGain{ 1 };
+   FloatSlider* mGainSlider{ nullptr };
 };
 
 

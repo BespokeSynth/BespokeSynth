@@ -30,9 +30,7 @@
 #include <cstring>
 
 CommentDisplay::CommentDisplay()
-: mCommentEntry(nullptr)
 {
-   mComment[0] = 0;
 }
 
 CommentDisplay::~CommentDisplay()

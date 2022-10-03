@@ -92,15 +92,15 @@ private:
 
    void FillModulationBuffer(double time, int voiceIdx);
 
-   UnstablePerlinModulation mPerlin;
-   FloatSlider* mAmountSlider;
-   FloatSlider* mWarbleSlider;
-   FloatSlider* mNoiseSlider;
-   float mWidth;
-   float mHeight;
+   UnstablePerlinModulation mPerlin{ .2, .1, 0 };
+   FloatSlider* mAmountSlider{ nullptr };
+   FloatSlider* mWarbleSlider{ nullptr };
+   FloatSlider* mNoiseSlider{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    std::array<bool, kNumVoices> mIsVoiceUsed{ false };
-   std::array<int, 128> mPitchToVoice;
-   int mVoiceRoundRobin;
+   std::array<int, 128> mPitchToVoice{};
+   int mVoiceRoundRobin{ 0 };
 
-   Modulations mModulation;
+   Modulations mModulation{ false };
 };

@@ -30,16 +30,7 @@
 #include "UIControlMacros.h"
 
 FormantFilterEffect::FormantFilterEffect()
-: mEE(1)
-, mOO(0)
-, mI(0)
-, mE(0)
-, mU(0)
-, mA(0)
-, mRescaling(false)
 {
-   SetEnabled(true);
-
    mOutputBuffer = new float[gBufferSize];
 
    for (int i = 0; i < NUM_FORMANT_BANDS; ++i)

@@ -75,8 +75,8 @@ private:
 
    float mWidth{ 200 };
    float mHeight{ 20 };
-   int mOctave;
-   IntSlider* mOctaveSlider;
+   int mOctave{ 0 };
+   IntSlider* mOctaveSlider{ nullptr };
    std::array<NoteInfo, 128> mInputNotes;
    Checkbox* mRetriggerCheckbox{ nullptr };
    bool mRetrigger{ false };

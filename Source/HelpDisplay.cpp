@@ -40,10 +40,6 @@ bool HelpDisplay::sTooltipsLoaded = false;
 std::list<HelpDisplay::ModuleTooltipInfo> HelpDisplay::sTooltips;
 
 HelpDisplay::HelpDisplay()
-: mShowTooltipsCheckbox(nullptr)
-, mWidth(700)
-, mHeight(700)
-, mScreenshotModule(nullptr)
 {
    LoadHelp();
 

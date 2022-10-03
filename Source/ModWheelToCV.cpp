@@ -33,7 +33,6 @@
 #include "ModulationChain.h"
 
 ModWheelToCV::ModWheelToCV()
-: mModWheel(nullptr)
 {
 }
 

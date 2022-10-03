@@ -47,21 +47,6 @@ bool PatchCableSource::sAllowInsert = true;
 PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 : mOwner(owner)
 , mType(type)
-, mHoverIndex(-1)
-, mOverrideVizBuffer(nullptr)
-, mAutomaticPositioning(true)
-, mAudioReceiver(nullptr)
-, mDefaultPatchBehavior(kDefaultPatchBehavior_Repatch)
-, mPatchCableDrawMode(kPatchCableDrawMode_Normal)
-, mEnabled(true)
-, mClickable(true)
-, mSide(Side::kNone)
-, mManualSide(Side::kNone)
-, mHasOverrideCableDir(false)
-, mLastOnEventTime(-9999)
-, mModulatorOwner(nullptr)
-, mDrawPass(DrawPass::kSource)
-, mParentMinimized(false)
 {
    mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse || mType == kConnectionType_Audio || mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter);
    SetConnectionType(type);

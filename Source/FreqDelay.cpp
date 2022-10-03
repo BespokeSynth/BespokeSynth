@@ -30,8 +30,6 @@
 
 FreqDelay::FreqDelay()
 : IAudioProcessor(gBufferSize)
-, mDryWet(1)
-, mDryWetSlider(nullptr)
 , mDryBuffer(gBufferSize)
 {
    AddChild(&mDelayEffect);

@@ -36,22 +36,6 @@
 #include "MathUtils.h"
 
 NoteTable::NoteTable()
-: mLength(8)
-, mLengthSlider(nullptr)
-, mGrid(nullptr)
-, mOctave(3)
-, mOctaveSlider(nullptr)
-, mNoteMode(kNoteMode_Scale)
-, mNoteModeSelector(nullptr)
-, mNoteRange(15)
-, mShowColumnControls(false)
-, mRowOffset(0)
-, mSetLength(false)
-, mRandomizePitchButton(nullptr)
-, mRandomizePitchChance(1)
-, mRandomizePitchRange(1)
-, mGridControlOffsetX(0)
-, mGridControlOffsetY(0)
 {
    for (int i = 0; i < mLength; ++i)
       mTones[i] = i;

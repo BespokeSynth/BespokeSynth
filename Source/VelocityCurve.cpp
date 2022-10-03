@@ -34,7 +34,6 @@ namespace
 }
 
 VelocityCurve::VelocityCurve()
-: mEnvelopeControl(ofVec2f(3, 3), ofVec2f(100, 100))
 {
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);

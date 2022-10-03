@@ -33,10 +33,6 @@
 #include "ModulationChain.h"
 
 PitchToSpeed::PitchToSpeed()
-: mPitch(0)
-, mPitchBend(nullptr)
-, mReferenceFreqSlider(nullptr)
-, mReferenceFreq(440)
 {
 }
 

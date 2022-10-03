@@ -42,14 +42,6 @@
 PatchCable* PatchCable::sActivePatchCable = nullptr;
 
 PatchCable::PatchCable(PatchCableSource* owner)
-: mHovered(false)
-, mDragging(false)
-, mHoveringOnSource(false)
-, mSourceIndex(0)
-, mTarget(nullptr)
-, mTargetRadioButton(nullptr)
-, mUIControlConnection(nullptr)
-, mAudioReceiverTarget(nullptr)
 {
    mOwner = owner;
    TheSynth->RegisterPatchCable(this);

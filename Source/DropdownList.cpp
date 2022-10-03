@@ -30,20 +30,10 @@
 #include "Push2Control.h"
 
 DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width)
-: mWidth(35)
-, mHeight(kItemSpacing)
-, mVar(var)
+: mVar(var)
 , mLastSetValue(*var)
 , mModalList(this)
 , mOwner(owner)
-, mMaxPerColumn(40)
-, mMaxItemWidth(20)
-, mUnknownItemString("-----")
-, mDrawLabel(false)
-, mSliderVal(0)
-, mAutoCalculateWidth(false)
-, mDrawTriangle(true)
-, mLastScrolledTime(-9999)
 {
    assert(owner);
    SetName(name);

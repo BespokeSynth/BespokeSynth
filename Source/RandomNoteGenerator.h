@@ -68,19 +68,19 @@ private:
    bool Enabled() const override { return mEnabled; }
 
 
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   float mProbability;
-   FloatSlider* mProbabilitySlider;
-   int mPitch;
-   IntSlider* mPitchSlider;
-   float mVelocity;
-   FloatSlider* mVelocitySlider;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   int mSkip;
-   IntSlider* mSkipSlider;
-   int mSkipCount;
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   float mProbability{ .5 };
+   FloatSlider* mProbabilitySlider{ nullptr };
+   int mPitch{ 36 };
+   IntSlider* mPitchSlider{ nullptr };
+   float mVelocity{ .8 };
+   FloatSlider* mVelocitySlider{ nullptr };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   int mSkip{ 1 };
+   IntSlider* mSkipSlider{ nullptr };
+   int mSkipCount{ 0 };
 };
 
 #endif /* defined(__Bespoke__RandomNoteGenerator__) */

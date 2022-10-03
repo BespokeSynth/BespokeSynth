@@ -31,11 +31,7 @@
 #include "UIControlMacros.h"
 
 UnstablePressure::UnstablePressure()
-: mPerlin(.2f, .1f, 0)
-, mModulation(false)
-, mVoiceRoundRobin(0)
 {
-
    for (int voice = 0; voice < kNumVoices; ++voice)
       mModulation.GetPressure(voice)->CreateBuffer();
 }

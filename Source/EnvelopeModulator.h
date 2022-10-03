@@ -91,7 +91,7 @@ private:
    float mHeight{ 122 };
 
    ADSRDisplay* mAdsrDisplay{ nullptr };
-   ::ADSR mAdsr;
+   ::ADSR mAdsr{ 10, 100, .5, 100 };
 
    bool mUseVelocity{ false };
    Checkbox* mUseVelocityCheckbox{ nullptr };

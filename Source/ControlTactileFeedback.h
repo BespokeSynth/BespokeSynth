@@ -65,12 +65,12 @@ private:
       height = 60;
    }
 
-   float mPhase;
-   float mPhaseInc;
+   float mPhase{ 0 };
+   float mPhaseInc{ 0 };
 
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
+   float mVolume{ .5 };
+   FloatSlider* mVolumeSlider{ nullptr };
 };
 
 

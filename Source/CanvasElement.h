@@ -83,8 +83,8 @@ protected:
    float GetStart(int col, float offset) const;
    float GetEnd(int col, float offset, float length) const;
 
-   Canvas* mCanvas;
-   bool mHighlighted;
+   Canvas* mCanvas{ nullptr };
+   bool mHighlighted{ false };
    std::vector<IUIControl*> mUIControls;
 };
 
@@ -151,14 +151,14 @@ public:
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
 
-   Sample* mSample;
-   FloatSlider* mElementOffsetSlider;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   bool mMute;
-   Checkbox* mMuteCheckbox;
-   ClickButton* mSplitSampleButton;
-   ClickButton* mResetSpeedButton;
+   Sample* mSample{ nullptr };
+   FloatSlider* mElementOffsetSlider{ nullptr };
+   float mVolume{ 1 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   bool mMute{ false };
+   Checkbox* mMuteCheckbox{ nullptr };
+   ClickButton* mSplitSampleButton{ nullptr };
+   ClickButton* mResetSpeedButton{ nullptr };
 };
 
 class EventCanvasElement : public CanvasElement
@@ -184,12 +184,12 @@ public:
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
 
-   IUIControl* mUIControl;
-   float mValue;
-   TextEntry* mValueEntry;
-   EventCanvas* mEventCanvas;
-   bool mIsCheckbox;
-   bool mIsButton;
+   IUIControl* mUIControl{ nullptr };
+   float mValue{ 0 };
+   TextEntry* mValueEntry{ nullptr };
+   EventCanvas* mEventCanvas{ nullptr };
+   bool mIsCheckbox{ false };
+   bool mIsButton{ false };
 };
 
 #endif /* defined(__Bespoke__CanvasElement__) */

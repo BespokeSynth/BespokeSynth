@@ -40,7 +40,6 @@ class NoteOutput : public INoteReceiver
 public:
    explicit NoteOutput(INoteSource* source)
    : mNoteSource(source)
-   , mStackDepth(0)
    {}
 
    void Flush(double time);
@@ -61,8 +60,8 @@ public:
 private:
    bool mNotes[128]{};
    double mNoteOnTimes[128]{};
-   INoteSource* mNoteSource;
-   int mStackDepth;
+   INoteSource* mNoteSource{ nullptr };
+   int mStackDepth{ 0 };
 };
 
 class INoteSource : public virtual IPatchable
@@ -70,7 +69,6 @@ class INoteSource : public virtual IPatchable
 public:
    INoteSource()
    : mNoteOutput(this)
-   , mInNoteOutput(false)
    {}
    virtual ~INoteSource() {}
    void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters(), bool isFromMainThreadAndScheduled = false);
@@ -81,7 +79,7 @@ public:
 
 protected:
    NoteOutput mNoteOutput;
-   bool mInNoteOutput;
+   bool mInNoteOutput{ false };
 };
 
 class AdditionalNoteCable : public INoteSource

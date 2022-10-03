@@ -39,23 +39,7 @@ namespace
 }
 
 ModulatorExpression::ModulatorExpression()
-: mExpressionInput(0)
-, mExpressionInputSlider(nullptr)
-, mA(0)
-, mASlider(nullptr)
-, mB(0)
-, mBSlider(nullptr)
-, mC(0)
-, mCSlider(nullptr)
-, mD(0)
-, mDSlider(nullptr)
-, mE(0)
-, mESlider(nullptr)
-, mExpressionValid(false)
-, mLastDrawMinOutput(0)
-, mLastDrawMaxOutput(1)
 {
-   mEntryString = "x";
 }
 
 void ModulatorExpression::CreateUIControls()

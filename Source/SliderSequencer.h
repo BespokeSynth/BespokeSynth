@@ -45,19 +45,19 @@ public:
    void Draw();
    void CreateUIControls();
 
-   float mPoint;
-   FloatSlider* mSlider;
-   float mVelocity;
-   FloatSlider* mVelocitySlider;
-   int mPitch;
-   TextEntry* mNoteSelector;
-   double mPlayTime;
-   bool mPlaying;
-   Checkbox* mPlayingCheckbox;
-   int mX;
-   int mY;
-   SliderSequencer* mOwner;
-   int mIndex;
+   float mPoint{ 0 };
+   FloatSlider* mSlider{ nullptr };
+   float mVelocity{ 0 };
+   FloatSlider* mVelocitySlider{ nullptr };
+   int mPitch{ 0 };
+   TextEntry* mNoteSelector{ nullptr };
+   double mPlayTime{ 0 };
+   bool mPlaying{ false };
+   Checkbox* mPlayingCheckbox{ nullptr };
+   int mX{ 0 };
+   int mY{ 0 };
+   SliderSequencer* mOwner{ nullptr };
+   int mIndex{ 0 };
 };
 
 class SliderSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public IIntSliderListener, public ITextEntryListener
@@ -97,10 +97,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mLastMeasurePos;
+   float mLastMeasurePos{ 0 };
    std::vector<SliderLine*> mSliderLines;
-   int mDivision;
-   IntSlider* mDivisionSlider;
+   int mDivision{ 1 };
+   IntSlider* mDivisionSlider{ nullptr };
 };
 
 

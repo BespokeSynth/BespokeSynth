@@ -82,7 +82,7 @@ private:
    float mLastNoteOnTime{ 0 };
 
    static const int kQueueSize = 500;
-   NoteInfo mInputNotes[kQueueSize];
+   NoteInfo mInputNotes[kQueueSize]{};
    int mConsumeIndex{ 0 };
    int mAppendIndex{ 0 };
 };

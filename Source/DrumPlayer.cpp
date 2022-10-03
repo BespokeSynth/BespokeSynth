@@ -37,32 +37,8 @@
 using namespace juce;
 
 DrumPlayer::DrumPlayer()
-: mSpeed(1)
-, mSpeedRandomization(0)
-, mVolume(1)
-, mLoadedKit(0)
-, mVolSlider(nullptr)
-, mSpeedSlider(nullptr)
-, mKitSelector(nullptr)
-, mEditMode(false)
-, mEditCheckbox(nullptr)
-, mSaveButton(nullptr)
-, mNewKitButton(nullptr)
-, mAuditionSampleIdx(0)
-, mAuditionInc(0)
-, mAuditionSlider(nullptr)
-, mNewKitNameEntry(nullptr)
-, mLoadingSamples(false)
-, mShuffleButton(nullptr)
-, mSelectedHitIdx(0)
-, mOutputBuffer(gBufferSize)
-, mMonoOutput(false)
-, mMonoCheckbox(nullptr)
-, mGridControlTarget(nullptr)
+: mOutputBuffer(gBufferSize)
 , mNoteInputBuffer(this)
-, mNeedSetup(true)
-, mNoteRepeat(false)
-, mQuantizeInterval(kInterval_None)
 {
 
    ReadKits();

@@ -28,9 +28,6 @@
 #include "ModularSynth.h"
 
 ModWheel::ModWheel()
-: mModWheel(0)
-, mModWheelSlider(nullptr)
-, mModulation(true)
 {
 }
 

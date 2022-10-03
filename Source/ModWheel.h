@@ -67,10 +67,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mModWheel;
-   FloatSlider* mModWheelSlider;
+   float mModWheel{ 0 };
+   FloatSlider* mModWheelSlider{ nullptr };
 
-   Modulations mModulation;
+   Modulations mModulation{ true };
 };
 
 #endif /* defined(__Bespoke__ModWheel__) */

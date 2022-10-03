@@ -29,16 +29,6 @@
 #include "ModularSynth.h"
 
 TimelineControl::TimelineControl()
-: mTime(0)
-, mTimeSlider(nullptr)
-, mWidth(400)
-, mLoop(false)
-, mLoopCheckbox(nullptr)
-, mNumMeasures(32)
-, mLoopStart(0)
-, mLoopEnd(8)
-, mLoopStartSlider(nullptr)
-, mLoopEndSlider(nullptr)
 {
 }
 

@@ -197,7 +197,7 @@ public:
    static float sSaturation;
    static float sBrightness;
 
-   bool mDrawDebug;
+   bool mDrawDebug{ false };
 
    static constexpr int kMaxOutputsPerPatchCableSource = 32;
 
@@ -207,9 +207,9 @@ protected:
    bool MouseMoved(float x, float y) override;
 
    ModuleSaveData mModuleSaveData;
-   Checkbox* mEnabledCheckbox;
-   bool mEnabled;
-   ModuleCategory mModuleCategory;
+   Checkbox* mEnabledCheckbox{ nullptr };
+   bool mEnabled{ true };
+   ModuleCategory mModuleCategory{ ModuleCategory::kModuleCategory_Unknown };
 
 private:
    virtual void PreDrawModule() {}
@@ -226,25 +226,25 @@ private:
    static const int mTitleBarHeight = 12;
    std::string mTypeName;
    static const int sResizeCornerSize = 8;
-   ModuleContainer* mOwningContainer;
+   ModuleContainer* mOwningContainer{ nullptr };
 
-   bool mMinimized;
-   bool mWasMinimizeAreaClicked;
-   float mMinimizeAnimation;
-   bool mUIControlsCreated;
-   bool mInitialized;
+   bool mMinimized{ false };
+   bool mWasMinimizeAreaClicked{ false };
+   float mMinimizeAnimation{ 0 };
+   bool mUIControlsCreated{ false };
+   bool mInitialized{ false };
    std::string mLastTitleLabel;
-   float mTitleLabelWidth;
-   bool mShouldDrawOutline;
-   bool mHoveringOverResizeHandle;
-   bool mDeleted;
-   bool mCanReceiveAudio;
-   bool mCanReceiveNotes;
-   bool mCanReceivePulses;
+   float mTitleLabelWidth{ 0 };
+   bool mShouldDrawOutline{ true };
+   bool mHoveringOverResizeHandle{ false };
+   bool mDeleted{ false };
+   bool mCanReceiveAudio{ false };
+   bool mCanReceiveNotes{ false };
+   bool mCanReceivePulses{ false };
 
    ofMutex mSliderMutex;
 
-   PatchCableSource* mMainPatchCableSource;
+   PatchCableSource* mMainPatchCableSource{ nullptr };
    std::vector<PatchCableSource*> mPatchCableSources;
 };
 

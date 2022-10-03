@@ -33,7 +33,6 @@
 #include "UIControlMacros.h"
 
 NoteLooper::NoteLooper()
-: mVoiceRoundRobin(kNumVoices - 1)
 {
 }
 

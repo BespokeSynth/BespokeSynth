@@ -59,11 +59,11 @@ private:
    int GetStepIndex(int x, int y, float& radiusOut);
    int mLength{ 4 };
    DropdownList* mLengthSelector{ nullptr };
-   int mPitch;
+   int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
    CircleSequencer* mOwner{ nullptr };
-   int mIndex;
-   std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps;
+   int mIndex{ 0 };
+   std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
    float mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mCurrentlyClickedStepIdx{ -1 };

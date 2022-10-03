@@ -39,9 +39,9 @@ public:
    void Inverse(float* input_re, float* input_im, float* output);
 
 private:
-   int mNfft; // size of FFT
-   int mNumfreqs; // number of frequencies represented (nfft/2 + 1)
-   float* mFft_data; // array for writing/reading to/from FFT function
+   int mNfft{ 0 }; // size of FFT
+   int mNumfreqs{ 0 }; // number of frequencies represented (nfft/2 + 1)
+   float* mFft_data{ nullptr }; // array for writing/reading to/from FFT function
 };
 
 struct FFTData
@@ -65,11 +65,11 @@ struct FFTData
 
    void Clear();
 
-   int mWindowSize;
-   int mFreqDomainSize;
-   float* mRealValues;
-   float* mImaginaryValues;
-   float* mTimeDomain;
+   int mWindowSize{ 0 };
+   int mFreqDomainSize{ 0 };
+   float* mRealValues{ nullptr };
+   float* mImaginaryValues{ nullptr };
+   float* mTimeDomain{ nullptr };
 };
 
 

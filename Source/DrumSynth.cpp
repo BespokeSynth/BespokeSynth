@@ -469,15 +469,6 @@ void DrumSynth::DrumSynthHit::Draw()
 }
 
 DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
-: mTone(kOsc_Sin)
-, mNoise(kOsc_Random)
-, mFreqMax(150)
-, mFreqMin(10)
-, mVol(0)
-, mVolNoise(0)
-, mCutoffMax(DRUMSYNTH_NO_CUTOFF)
-, mCutoffMin(10)
-, mQ(sqrt(2) / 2)
 {
    mTone.GetADSR()->SetNumStages(2);
    mTone.GetADSR()->GetHasSustainStage() = false;

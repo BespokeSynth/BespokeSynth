@@ -32,10 +32,6 @@
 #include "MathUtils.h"
 
 ModulatorSmoother::ModulatorSmoother()
-: mInput(0)
-, mSmooth(.1f)
-, mInputSlider(nullptr)
-, mSmoothSlider(nullptr)
 {
 }
 

@@ -39,25 +39,6 @@
 #define KEY_LATCH_BUTTON -996
 
 LaunchpadKeyboard::LaunchpadKeyboard()
-: mRootNote(4) //4 = E
-, mGridControlTarget(nullptr)
-, mTestKeyHeld(false)
-, mLayout(kChromatic)
-, mLayoutDropdown(nullptr)
-, mOctave(3)
-, mOctaveSlider(nullptr)
-, mLatch(false)
-, mLatchCheckbox(nullptr)
-, mCurrentChord(0)
-, mDisplayer(nullptr)
-, mArrangementMode(kFull)
-, mArrangementModeDropdown(nullptr)
-, mChorder(nullptr)
-, mLatchChords(false)
-, mLatchChordsCheckbox(nullptr)
-, mWasChorderEnabled(false)
-, mPreserveChordRoot(true)
-, mPreserveChordRootCheckbox(nullptr)
 {
    for (int i = 0; i < 128; ++i)
       mCurrentNotes[i] = 0;

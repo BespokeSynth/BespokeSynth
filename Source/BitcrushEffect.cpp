@@ -30,18 +30,7 @@
 #include "UIControlMacros.h"
 
 BitcrushEffect::BitcrushEffect()
-: mCrush(1)
-, mDownsample(1)
-, mCrushSlider(nullptr)
-, mDownsampleSlider(nullptr)
 {
-   SetEnabled(true);
-
-   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
-   {
-      mSampleCounter[i] = 0;
-      mHeldDownsample[i] = 0;
-   }
 }
 
 void BitcrushEffect::CreateUIControls()

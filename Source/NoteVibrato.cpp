@@ -28,11 +28,6 @@
 #include "ModularSynth.h"
 
 NoteVibrato::NoteVibrato()
-: mVibratoInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mVibratoAmount(0)
-, mVibratoSlider(nullptr)
-, mModulation(true)
 {
 }
 

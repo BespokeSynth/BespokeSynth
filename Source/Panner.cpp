@@ -32,11 +32,6 @@
 
 Panner::Panner()
 : IAudioProcessor(gBufferSize)
-, mPan(0)
-, mPanSlider(nullptr)
-, mWiden(0)
-, mWidenSlider(nullptr)
-, mWidenerBuffer(2048)
 {
 }
 

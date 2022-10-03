@@ -75,13 +75,13 @@ private:
    bool Enabled() const override { return true; }
 
    std::array<bool, 128> mPitchOn{ false };
-   ClickButton* mResetButton;
-   int mLastPitch;
-   bool mDoDetect;
-   bool mNeedsUpdate;
+   ClickButton* mResetButton{ nullptr };
+   int mLastPitch{ 0 };
+   bool mDoDetect{ true };
+   bool mNeedsUpdate{ false };
 
-   DropdownList* mMatchesDropdown;
-   int mSelectedMatch;
+   DropdownList* mMatchesDropdown{ nullptr };
+   int mSelectedMatch{ 0 };
 };
 
 #endif /* defined(__modularSynth__ScaleDetect__) */

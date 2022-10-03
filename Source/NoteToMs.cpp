@@ -31,8 +31,6 @@
 #include "ModulationChain.h"
 
 NoteToMs::NoteToMs()
-: mPitch(0)
-, mPitchBend(nullptr)
 {
 }
 

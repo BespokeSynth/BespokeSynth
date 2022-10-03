@@ -29,19 +29,6 @@
 
 MultibandCompressor::MultibandCompressor()
 : IAudioProcessor(gBufferSize)
-, mDryWet(1)
-, mDryWetSlider(nullptr)
-, mNumBands(4)
-, mNumBandsSlider(nullptr)
-, mFreqMin(150)
-, mFMinSlider(nullptr)
-, mFreqMax(7500)
-, mFMaxSlider(nullptr)
-, mRingTime(.01f)
-, mRingTimeSlider(nullptr)
-, mMaxBand(.3f)
-, mMaxBandSlider(nullptr)
-
 {
    mWorkBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mWorkBuffer, GetBuffer()->BufferSize());

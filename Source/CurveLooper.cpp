@@ -35,13 +35,6 @@ namespace
 }
 
 CurveLooper::CurveLooper()
-: mLength(1)
-, mLengthSelector(nullptr)
-, mControlCable(nullptr)
-, mWidth(200)
-, mHeight(120)
-, mEnvelopeControl(ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30))
-, mRandomizeButton(nullptr)
 {
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);

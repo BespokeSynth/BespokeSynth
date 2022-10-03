@@ -64,11 +64,11 @@ private:
       height = 200;
    }
 
-   float* mImpulseBuffer;
-   float* mFFTOutReal;
-   float* mFFTOutImag;
+   float* mImpulseBuffer{ nullptr };
+   float* mFFTOutReal{ nullptr };
+   float* mFFTOutImag{ nullptr };
 
-   bool mNeedUpdate;
+   bool mNeedUpdate{ true };
    std::vector<IAudioEffect*> mFilters;
 };
 

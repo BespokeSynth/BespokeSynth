@@ -56,6 +56,6 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    std::array<bool, 128> mHeldPitches{ false };
-   PatchCableSource* mControlCable;
+   PatchCableSource* mControlCable{ nullptr };
    std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
 };

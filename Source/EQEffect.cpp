@@ -29,12 +29,7 @@
 #include "Profiler.h"
 
 EQEffect::EQEffect()
-: mNumFilters(NUM_EQ_FILTERS)
-, mMultiSlider(nullptr)
-, mEvenButton(nullptr)
 {
-   SetEnabled(true);
-
    for (int ch = 0; ch < ChannelBuffer::kMaxNumChannels; ++ch)
    {
       for (int i = 0; i < NUM_EQ_FILTERS; ++i)

@@ -60,7 +60,7 @@ private:
    }
    bool Enabled() const override { return true; }
 
-   LaunchpadKeyboard* mLaunchpad;
+   LaunchpadKeyboard* mLaunchpad{ nullptr };
 };
 
 #endif /* defined(__modularSynth__LaunchpadNoteDisplayer__) */

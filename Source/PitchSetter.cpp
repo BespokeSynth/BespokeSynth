@@ -29,10 +29,7 @@
 #include "ModularSynth.h"
 
 PitchSetter::PitchSetter()
-: mPitch(36)
-, mPitchSlider(nullptr)
 {
-   SetEnabled(true);
 }
 
 void PitchSetter::CreateUIControls()

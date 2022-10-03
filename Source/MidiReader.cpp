@@ -26,9 +26,7 @@
 #include "MidiReader.h"
 
 MidiReader::MidiReader()
-: /*mSequencer(nullptr)
-,*/
-mBeatOffset(0)
+//: mSequencer(nullptr)
 {
 }
 

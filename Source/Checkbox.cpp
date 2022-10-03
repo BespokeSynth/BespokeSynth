@@ -29,13 +29,8 @@
 #include "FileStream.h"
 
 Checkbox::Checkbox(IDrawableModule* owner, const char* label, int x, int y, bool* var)
-: mWidth(15)
-, mHeight(15)
-, mVar(var)
+: mVar(var)
 , mOwner(owner)
-, mDisplayText(true)
-, mUseCircleLook(false)
-, mSliderVal(0)
 {
    assert(owner);
    SetLabel(label);

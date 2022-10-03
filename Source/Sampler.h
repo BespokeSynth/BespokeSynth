@@ -94,24 +94,24 @@ private:
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    SampleVoiceParams mVoiceParams;
-   FloatSlider* mVolSlider;
-   ADSRDisplay* mADSRDisplay;
-   float mThresh;
-   FloatSlider* mThreshSlider;
+   FloatSlider* mVolSlider{ nullptr };
+   ADSRDisplay* mADSRDisplay{ nullptr };
+   float mThresh{ .2 };
+   FloatSlider* mThreshSlider{ nullptr };
 
-   float* mSampleData;
-   int mRecordPos;
-   bool mRecording;
-   Checkbox* mRecordCheckbox;
-   bool mPitchCorrect;
-   Checkbox* mPitchCorrectCheckbox;
-   bool mPassthrough;
-   Checkbox* mPassthroughCheckbox;
+   float* mSampleData{ nullptr };
+   int mRecordPos{ 0 };
+   bool mRecording{ false };
+   Checkbox* mRecordCheckbox{ nullptr };
+   bool mPitchCorrect{ false };
+   Checkbox* mPitchCorrectCheckbox{ nullptr };
+   bool mPassthrough{ false };
+   Checkbox* mPassthroughCheckbox{ nullptr };
 
    ChannelBuffer mWriteBuffer;
 
    PitchDetector mPitchDetector;
-   bool mWantDetectPitch;
+   bool mWantDetectPitch{ false };
 };
 
 

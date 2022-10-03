@@ -28,11 +28,6 @@
 #include "ModularSynth.h"
 
 ModwheelToVibrato::ModwheelToVibrato()
-: mVibratoInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mVibratoAmount(1)
-, mVibratoSlider(nullptr)
-, mModulation(true)
 {
 }
 

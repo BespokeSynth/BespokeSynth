@@ -71,7 +71,7 @@ private:
    std::array<bool, 128> mNoteInputHeld{ false };
    std::array<bool, 128> mNotePlaying{ false };
 
-   ClickButton* mStopButton;
-   bool mOnlyPlayWhenPulsed;
-   Checkbox* mOnlyPlayWhenPulsedCheckbox;
+   ClickButton* mStopButton{ nullptr };
+   bool mOnlyPlayWhenPulsed{ false };
+   Checkbox* mOnlyPlayWhenPulsedCheckbox{ nullptr };
 };

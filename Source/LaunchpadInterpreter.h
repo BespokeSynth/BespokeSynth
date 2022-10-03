@@ -41,11 +41,11 @@ struct LightUpdate
    , mG(g)
    , mIntensity(intensity)
    {}
-   int mX;
-   int mY;
-   char mR;
-   char mG;
-   float mIntensity;
+   int mX{ 0 };
+   int mY{ 0 };
+   char mR{ 0 };
+   char mG{ 0 };
+   float mIntensity{ 1 };
 };
 
 class ILaunchpadListener
@@ -72,8 +72,8 @@ public:
 private:
    bool IsMonome() const;
 
-   ILaunchpadListener* mListener;
-   int mLights[64 + 8 + 8]; //grid + side + top
+   ILaunchpadListener* mListener{ nullptr };
+   int mLights[64 + 8 + 8]{}; //grid + side + top
    MidiController* mController{ nullptr };
    int mControllerPage{ 0 };
 };

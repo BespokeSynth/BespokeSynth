@@ -172,44 +172,44 @@ private:
    int GetHoverIndex(float x, float y) const;
 
    std::vector<PatchCable*> mPatchCables;
-   int mHoverIndex; //-1 = not hovered
-   ConnectionType mType;
-   bool mAllowMultipleTargets;
-   DefaultPatchBehavior mDefaultPatchBehavior;
-   PatchCableDrawMode mPatchCableDrawMode;
-   IDrawableModule* mOwner;
-   RollingBuffer* mOverrideVizBuffer;
-   bool mAutomaticPositioning;
-   int mManualPositionX;
-   int mManualPositionY;
+   int mHoverIndex{ -1 }; //-1 = not hovered
+   ConnectionType mType{ ConnectionType::kConnectionType_Audio };
+   bool mAllowMultipleTargets{ true };
+   DefaultPatchBehavior mDefaultPatchBehavior{ DefaultPatchBehavior::kDefaultPatchBehavior_Repatch };
+   PatchCableDrawMode mPatchCableDrawMode{ PatchCableDrawMode::kPatchCableDrawMode_Normal };
+   IDrawableModule* mOwner{ nullptr };
+   RollingBuffer* mOverrideVizBuffer{ nullptr };
+   bool mAutomaticPositioning{ true };
+   int mManualPositionX{ 0 };
+   int mManualPositionY{ 0 };
    ofColor mColor;
-   bool mEnabled;
-   bool mClickable;
-   Side mSide;
-   Side mManualSide;
-   bool mHasOverrideCableDir;
+   bool mEnabled{ true };
+   bool mClickable{ true };
+   Side mSide{ Side::kNone };
+   Side mManualSide{ Side::kNone };
+   bool mHasOverrideCableDir{ false };
    ofVec2f mOverrideCableDir;
 
    std::vector<INoteReceiver*> mNoteReceivers;
    std::vector<IPulseReceiver*> mPulseReceivers;
-   IAudioReceiver* mAudioReceiver;
+   IAudioReceiver* mAudioReceiver{ nullptr };
 
    std::vector<std::string> mTypeFilter;
    std::vector<IClickable*> mValidTargets;
 
    NoteHistory mNoteHistory;
-   double mLastOnEventTime;
+   double mLastOnEventTime{ -9999 };
 
-   IModulator* mModulatorOwner;
+   IModulator* mModulatorOwner{ nullptr };
 
    enum class DrawPass
    {
       kSource,
       kCables
    };
-   DrawPass mDrawPass;
-   bool mParentMinimized;
-   IDrawableModule* mLastSeenAutopatchableModule;
+   DrawPass mDrawPass{ DrawPass::kSource };
+   bool mParentMinimized{ false };
+   IDrawableModule* mLastSeenAutopatchableModule{ nullptr };
 };
 
 #endif /* defined(__Bespoke__PatchCableSource__) */

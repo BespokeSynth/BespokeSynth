@@ -64,8 +64,8 @@ private:
    bool Enabled() const override { return mEnabled; }
 
 
-   bool mTwoOnTheFloor;
-   Checkbox* mTwoOnTheFloorCheckbox;
+   bool mTwoOnTheFloor{ false };
+   Checkbox* mTwoOnTheFloorCheckbox{ nullptr };
 };
 
 #endif /* defined(__modularSynth__FourOnTheFloor__) */

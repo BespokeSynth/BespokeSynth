@@ -62,8 +62,8 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mMin;
-   FloatSlider* mMinSlider;
-   float mMax;
-   FloatSlider* mMaxSlider;
+   float mMin{ -1 };
+   FloatSlider* mMinSlider{ nullptr };
+   float mMax{ 1 };
+   FloatSlider* mMaxSlider{ nullptr };
 };

@@ -28,11 +28,9 @@
 
 OscController::OscController(MidiDeviceListener* listener, std::string outAddress, int outPort, int inPort)
 : mListener(listener)
-, mConnected(false)
 , mOutAddress(outAddress)
 , mOutPort(outPort)
 , mInPort(inPort)
-, mOutputConnected(false)
 {
    Connect();
 }

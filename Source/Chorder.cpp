@@ -33,13 +33,6 @@
 #include <cstring>
 
 Chorder::Chorder()
-: mVelocity(0)
-, mDiatonic(false)
-, mDiatonicCheckbox(nullptr)
-, mChordDropdown(nullptr)
-, mInversionDropdown(nullptr)
-, mChordIndex(0)
-, mInversion(0)
 {
    std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
    std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));

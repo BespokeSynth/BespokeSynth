@@ -33,8 +33,7 @@
 #include "PatchCableSource.h"
 
 Beats::Beats()
-: mRows(4)
-, mWriteBuffer(gBufferSize)
+: mWriteBuffer(gBufferSize)
 {
 
    for (size_t i = 0; i < mBeatColumns.size(); ++i)

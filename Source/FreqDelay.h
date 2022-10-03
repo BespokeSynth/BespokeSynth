@@ -66,8 +66,8 @@ private:
    bool Enabled() const override { return true; }
 
    ChannelBuffer mDryBuffer;
-   float mDryWet;
-   FloatSlider* mDryWetSlider;
+   float mDryWet{ 1 };
+   FloatSlider* mDryWetSlider{ nullptr };
 
    DelayEffect mDelayEffect;
 };

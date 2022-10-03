@@ -175,11 +175,7 @@ void Polyrhythms::LoadState(FileStreamIn& in, int rev)
 
 RhythmLine::RhythmLine(Polyrhythms* owner, int index)
 : mIndex(index)
-, mGrid(nullptr)
-, mLength(4)
-, mLengthSelector(nullptr)
 , mPitch(index)
-, mNoteSelector(nullptr)
 , mOwner(owner)
 {
 }

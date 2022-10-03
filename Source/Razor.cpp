@@ -39,41 +39,6 @@ namespace
 }
 
 Razor::Razor()
-: mPitch(-1)
-, mVol(.05f)
-, mUseNumPartials(NUM_PARTIALS)
-, mNumPartialsSlider(nullptr)
-, mBumpAmpSlider(nullptr)
-, mBumpAmpAmtSlider(nullptr)
-, mBumpAmpDecaySlider(nullptr)
-, mBumpAmpSlider2(nullptr)
-, mBumpAmpAmtSlider2(nullptr)
-, mBumpAmpDecaySlider2(nullptr)
-, mBumpAmpSlider3(nullptr)
-, mBumpAmpAmtSlider3(nullptr)
-, mBumpAmpDecaySlider3(nullptr)
-, mA(1)
-, mD(0)
-, mS(1)
-, mR(1)
-, mASlider(nullptr)
-, mDSlider(nullptr)
-, mSSlider(nullptr)
-, mRSlider(nullptr)
-, mHistoryPtr(0)
-, mHarmonicSelector(1)
-, mHarmonicSelectorSlider(nullptr)
-, mPowFalloff(1)
-, mPowFalloffSlider(nullptr)
-, mNegHarmonics(0)
-, mNegHarmonicsSlider(nullptr)
-, mHarshnessCut(0)
-, mHarshnessCutSlider(nullptr)
-, mManualControl(false)
-, mManualControlCheckbox(nullptr)
-, mPitchBend(nullptr)
-, mModWheel(nullptr)
-, mPressure(nullptr)
 {
    std::memset(mAmp, 0, sizeof(float) * NUM_PARTIALS);
    std::memset(mPeakHistory, 0, sizeof(float) * (VIZ_WIDTH + 1) * RAZOR_HISTORY);
@@ -81,13 +46,6 @@ Razor::Razor()
 
    for (int i = 0; i < NUM_PARTIALS; ++i)
       mDetune[i] = 1;
-
-   for (int i = 0; i < NUM_BUMPS; ++i)
-   {
-      mBumps[i].mFreq = 100;
-      mBumps[i].mAmt = 0;
-      mBumps[i].mDecay = .005f;
-   }
 }
 
 void Razor::CreateUIControls()

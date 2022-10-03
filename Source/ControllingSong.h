@@ -81,34 +81,34 @@ private:
    void LoadSong(int index);
 
    ofMutex mLoadSongMutex;
-   bool mLoadingSong;
+   bool mLoadingSong{ true };
 
-   int mCurrentSongIndex;
+   int mCurrentSongIndex{ -1 };
    MidiReader mMidiReader;
    Sample mSample;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   bool mNeedNewSong;
-   double mSongStartTime;
+   float mVolume{ .8 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   bool mNeedNewSong{ true };
+   double mSongStartTime{ 0 };
    ofxJSONElement mSongList;
-   int mTestBeatOffset;
-   IntSlider* mTestBeatOffsetSlider;
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mShuffle;
-   Checkbox* mShuffleCheckbox;
-   ClickButton* mPhraseForwardButton;
-   ClickButton* mPhraseBackButton;
-   float mSpeed;
-   FloatSlider* mSpeedSlider;
-   bool mMute;
-   Checkbox* mMuteCheckbox;
+   int mTestBeatOffset{ 0 };
+   IntSlider* mTestBeatOffsetSlider{ nullptr };
+   bool mPlay{ false };
+   Checkbox* mPlayCheckbox{ nullptr };
+   bool mShuffle{ false };
+   Checkbox* mShuffleCheckbox{ nullptr };
+   ClickButton* mPhraseForwardButton{ nullptr };
+   ClickButton* mPhraseBackButton{ nullptr };
+   float mSpeed{ 1 };
+   FloatSlider* mSpeedSlider{ nullptr };
+   bool mMute{ false };
+   Checkbox* mMuteCheckbox{ nullptr };
 
-   DropdownList* mSongSelector;
-   ClickButton* mNextSongButton;
-   int mShuffleIndex;
-   std::vector<int> mShuffleList;
-   std::vector<FollowingSong*> mFollowSongs;
+   DropdownList* mSongSelector{ nullptr };
+   ClickButton* mNextSongButton{ nullptr };
+   int mShuffleIndex{ 0 };
+   std::vector<int> mShuffleList{};
+   std::vector<FollowingSong*> mFollowSongs{};
 };
 
 #endif /* defined(__Bespoke__ControllingSong__) */

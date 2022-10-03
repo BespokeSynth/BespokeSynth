@@ -81,14 +81,14 @@ private:
    void MouseReleased() override;
 
    std::array<IUIControl*, 16> mUIControls{ nullptr };
-   int mLength;
-   DropdownList* mLengthSelector;
-   PatchCableSource* mControlCable;
-   float mWidth;
-   float mHeight;
-   EnvelopeControl mEnvelopeControl;
+   int mLength{ 1 };
+   DropdownList* mLengthSelector{ nullptr };
+   PatchCableSource* mControlCable{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 120 };
+   EnvelopeControl mEnvelopeControl{ ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30) };
    ::ADSR mAdsr;
-   ClickButton* mRandomizeButton;
+   ClickButton* mRandomizeButton{ nullptr };
 };
 
 #endif /* defined(__Bespoke__CurveLooper__) */

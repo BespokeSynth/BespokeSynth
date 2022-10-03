@@ -27,11 +27,7 @@
 #include "SynthGlobals.h"
 
 BiquadFilter::BiquadFilter()
-: mType(kFilterType_Lowpass)
-, mF(4000)
-, mQ(sqrt(2) / 2)
-, mDbGain(0)
-, mSampleRate(gSampleRate)
+: mSampleRate(gSampleRate)
 {
    Clear();
    UpdateFilterCoeff();

@@ -31,8 +31,6 @@
 #include "ModulationChain.h"
 
 NoteToFreq::NoteToFreq()
-: mPitch(0)
-, mPitchBend(nullptr)
 {
 }
 

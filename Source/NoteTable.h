@@ -117,35 +117,35 @@ private:
       kNoteMode_Fifths
    };
 
-   UIGrid* mGrid;
-   int mOctave;
-   IntSlider* mOctaveSlider;
-   NoteMode mNoteMode;
-   DropdownList* mNoteModeSelector;
-   int mLength;
-   IntSlider* mLengthSlider;
-   bool mSetLength;
-   int mNoteRange;
-   bool mShowColumnControls;
-   int mRowOffset;
+   UIGrid* mGrid{ nullptr };
+   int mOctave{ 3 };
+   IntSlider* mOctaveSlider{ nullptr };
+   NoteMode mNoteMode{ NoteMode::kNoteMode_Scale };
+   DropdownList* mNoteModeSelector{ nullptr };
+   int mLength{ 8 };
+   IntSlider* mLengthSlider{ nullptr };
+   bool mSetLength{ false };
+   int mNoteRange{ 15 };
+   bool mShowColumnControls{ false };
+   int mRowOffset{ 0 };
 
-   ClickButton* mRandomizePitchButton;
-   float mRandomizePitchChance;
-   float mRandomizePitchRange;
-   FloatSlider* mRandomizePitchChanceSlider;
-   FloatSlider* mRandomizePitchRangeSlider;
+   ClickButton* mRandomizePitchButton{ nullptr };
+   float mRandomizePitchChance{ 1 };
+   float mRandomizePitchRange{ 1 };
+   FloatSlider* mRandomizePitchChanceSlider{ nullptr };
+   FloatSlider* mRandomizePitchRangeSlider{ nullptr };
 
    static constexpr int kMaxLength = 32;
 
-   int mTones[kMaxLength];
+   int mTones[kMaxLength]{};
    std::array<double, kMaxLength> mLastColumnPlayTime{ -1 };
    std::array<int, kMaxLength> mLastColumnNoteOnPitch{ -1 };
    std::array<DropdownList*, kMaxLength> mToneDropdowns{ nullptr };
    std::array<AdditionalNoteCable*, kMaxLength> mColumnCables{ nullptr };
 
-   GridControlTarget* mGridControlTarget;
-   int mGridControlOffsetX;
-   int mGridControlOffsetY;
-   IntSlider* mGridControlOffsetXSlider;
-   IntSlider* mGridControlOffsetYSlider;
+   GridControlTarget* mGridControlTarget{ nullptr };
+   int mGridControlOffsetX{ 0 };
+   int mGridControlOffsetY{ 0 };
+   IntSlider* mGridControlOffsetXSlider{ nullptr };
+   IntSlider* mGridControlOffsetYSlider{ nullptr };
 };

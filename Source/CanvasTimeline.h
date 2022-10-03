@@ -82,5 +82,5 @@ private:
    ofVec2f mDragOffset;
    HoverMode mHoverMode{ HoverMode::kNone };
 
-   Canvas* mCanvas;
+   Canvas* mCanvas{ nullptr };
 };

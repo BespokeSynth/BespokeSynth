@@ -52,7 +52,7 @@ public:
    void LoadState(FileStreamIn& in);
 
 private:
-   int mOffsetToNow[ChannelBuffer::kMaxNumChannels];
+   int mOffsetToNow[ChannelBuffer::kMaxNumChannels]{};
    ChannelBuffer mBuffer;
 };
 

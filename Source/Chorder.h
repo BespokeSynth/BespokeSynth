@@ -84,17 +84,17 @@ private:
    void CheckLeftovers();
    void SyncChord();
 
-   UIGrid* mChordGrid;
-   int mVelocity;
-   bool mInputNotes[TOTAL_NUM_NOTES];
-   int mHeldCount[TOTAL_NUM_NOTES];
+   UIGrid* mChordGrid{ nullptr };
+   int mVelocity{ 0 };
+   bool mInputNotes[TOTAL_NUM_NOTES]{};
+   int mHeldCount[TOTAL_NUM_NOTES]{};
 
-   bool mDiatonic;
-   int mChordIndex;
-   int mInversion;
-   Checkbox* mDiatonicCheckbox;
-   DropdownList* mChordDropdown;
-   DropdownList* mInversionDropdown;
+   bool mDiatonic{ false };
+   int mChordIndex{ 0 };
+   int mInversion{ 0 };
+   Checkbox* mDiatonicCheckbox{ nullptr };
+   DropdownList* mChordDropdown{ nullptr };
+   DropdownList* mInversionDropdown{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Chorder__) */

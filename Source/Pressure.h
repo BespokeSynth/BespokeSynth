@@ -67,10 +67,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mPressure;
-   FloatSlider* mPressureSlider;
+   float mPressure{ 0 };
+   FloatSlider* mPressureSlider{ nullptr };
 
-   Modulations mModulation;
+   Modulations mModulation{ true };
 };
 
 #endif /* defined(__Bespoke__Pressure__) */

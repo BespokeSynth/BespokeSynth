@@ -30,28 +30,6 @@
 
 BandVocoder::BandVocoder()
 : IAudioProcessor(gBufferSize)
-, mInputPreamp(1)
-, mCarrierPreamp(1)
-, mVolume(1)
-, mInputSlider(nullptr)
-, mCarrierSlider(nullptr)
-, mVolumeSlider(nullptr)
-, mDryWet(1)
-, mDryWetSlider(nullptr)
-, mNumBands(40)
-, mNumBandsSlider(nullptr)
-, mFreqBase(200)
-, mFBaseSlider(nullptr)
-, mFreqRange(6000)
-, mFRangeSlider(nullptr)
-, mQ(40)
-, mQSlider(nullptr)
-, mRingTime(.03f)
-, mRingTimeSlider(nullptr)
-, mMaxBand(1.0f)
-, mMaxBandSlider(nullptr)
-, mSpacingStyle(0)
-, mCarrierDataSet(false)
 {
    mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());

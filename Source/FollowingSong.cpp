@@ -32,11 +32,6 @@
 #include "IAudioReceiver.h"
 
 FollowingSong::FollowingSong()
-: mVolume(1)
-, mLoadingSong(true)
-, mPlay(false)
-, mMute(false)
-, mMuteCheckbox(nullptr)
 {
 }
 

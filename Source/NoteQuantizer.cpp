@@ -29,9 +29,6 @@
 #include "SynthGlobals.h"
 
 NoteQuantizer::NoteQuantizer()
-: mNoteRepeat(false)
-, mQuantizeInterval(kInterval_16n)
-, mHasReceivedPulse(false)
 {
 }
 

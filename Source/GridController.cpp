@@ -30,7 +30,6 @@
 
 GridControlTarget::GridControlTarget(IGridControllerListener* owner, const char* name, int x, int y)
 : mOwner(owner)
-, mGridController(nullptr)
 {
    SetName(name);
    SetPosition(x, y);
@@ -99,16 +98,7 @@ void GridControlTarget::LoadState(FileStreamIn& in, bool shouldSetValue)
 //----------------
 
 GridControllerMidi::GridControllerMidi()
-: mMessageType(kMidiMessage_Note)
-, mMidiController(nullptr)
-, mControllerPage(0)
-, mRows(8)
-, mCols(8)
-, mOwner(nullptr)
 {
-   std::memset(mControls, 0, sizeof(int) * MAX_GRIDCONTROLLER_ROWS * MAX_GRIDCONTROLLER_COLS);
-   std::memset(mInput, 0, sizeof(float) * MAX_GRIDCONTROLLER_ROWS * MAX_GRIDCONTROLLER_COLS);
-   std::memset(mLights, 0, sizeof(int) * MAX_GRIDCONTROLLER_ROWS * MAX_GRIDCONTROLLER_COLS);
 }
 
 void GridControllerMidi::OnControllerPageSelected()

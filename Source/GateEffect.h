@@ -63,14 +63,14 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mThreshold;
-   float mAttackTime;
-   float mReleaseTime;
-   FloatSlider* mThresholdSlider;
-   FloatSlider* mAttackSlider;
-   FloatSlider* mReleaseSlider;
-   float mEnvelope;
-   float mPeak;
+   float mThreshold{ .1 };
+   float mAttackTime{ 1 };
+   float mReleaseTime{ 1 };
+   FloatSlider* mThresholdSlider{ nullptr };
+   FloatSlider* mAttackSlider{ nullptr };
+   FloatSlider* mReleaseSlider{ nullptr };
+   float mEnvelope{ 0 };
+   float mPeak{ 0 };
 };
 
 #endif /* defined(__modularSynth__GateEffect__) */

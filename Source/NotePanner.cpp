@@ -31,8 +31,6 @@
 #include "ModularSynth.h"
 
 NotePanner::NotePanner()
-: mPan(0)
-, mPanSlider(nullptr)
 {
 }
 

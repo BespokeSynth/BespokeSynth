@@ -97,15 +97,15 @@ private:
    //juce::Timer
    void timerCallback();
 
-   ChannelBuffer mData;
+   ChannelBuffer mData{ 0 };
    int mNumSamples{ 0 };
    double mStartTime{ 0 };
    double mOffset{ std::numeric_limits<double>::max() };
    float mRate{ 1 };
    float mSampleRateRatio{ 1 };
    int mStopPoint{ -1 };
-   std::string mName;
-   std::string mReadPath;
+   std::string mName{ "" };
+   std::string mReadPath{ "" };
    ofMutex mDataMutex;
    ofMutex mPlayMutex;
    bool mLooping{ false };

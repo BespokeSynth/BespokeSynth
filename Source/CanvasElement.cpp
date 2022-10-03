@@ -40,7 +40,6 @@ CanvasElement::CanvasElement(Canvas* canvas, int col, int row, float offset, flo
 , mLength(length)
 , mCol(col)
 , mRow(row)
-, mHighlighted(false)
 {
 }
 
@@ -449,9 +448,6 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
 
 SampleCanvasElement::SampleCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
 : CanvasElement(canvas, col, row, offset, length)
-, mSample(nullptr)
-, mVolume(1)
-, mMute(false)
 {
    mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()), "offset", 0, 0, 100, 15, &mOffset, -1, 1);
    AddElementUIControl(mElementOffsetSlider);
@@ -623,7 +619,6 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
 
 EventCanvasElement::EventCanvasElement(Canvas* canvas, int col, int row, float offset)
 : CanvasElement(canvas, col, row, offset, .5f)
-, mValue(0)
 {
    mValueEntry = new TextEntry(dynamic_cast<ITextEntryListener*>(canvas->GetControls()), "value", 60, 2, 7, &mValue, -99999, 99999);
    AddElementUIControl(mValueEntry);

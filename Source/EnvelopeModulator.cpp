@@ -32,7 +32,6 @@
 
 EnvelopeModulator::EnvelopeModulator()
 {
-   mAdsr.Set(10, 100, .5f, 100);
 }
 
 void EnvelopeModulator::CreateUIControls()

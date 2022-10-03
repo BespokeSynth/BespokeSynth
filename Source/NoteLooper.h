@@ -111,7 +111,7 @@ private:
    std::array<NoteCanvasElement*, 128> mCurrentNotes{};
    Canvas* mCanvas{ nullptr };
    ClickButton* mClearButton{ nullptr };
-   int mVoiceRoundRobin;
+   int mVoiceRoundRobin{ kNumVoices - 1 };
 
    std::array<ModulationParameters, kNumVoices + 1> mVoiceModulations{};
    std::array<int, kNumVoices> mVoiceMap{};

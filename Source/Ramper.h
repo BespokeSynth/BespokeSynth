@@ -79,15 +79,15 @@ private:
    void Go(double time);
 
    std::array<IUIControl*, 16> mUIControls{ nullptr };
-   NoteInterval mLength;
-   DropdownList* mLengthSelector;
-   PatchCableSource* mControlCable;
-   ClickButton* mTriggerButton;
-   FloatSlider* mTargetValueSlider;
-   float mTargetValue;
-   float mStartMeasure;
-   float mStartValue;
-   bool mRamping;
+   NoteInterval mLength{ NoteInterval::kInterval_1n };
+   DropdownList* mLengthSelector{ nullptr };
+   PatchCableSource* mControlCable{ nullptr };
+   ClickButton* mTriggerButton{ nullptr };
+   FloatSlider* mTargetValueSlider{ nullptr };
+   float mTargetValue{ 0 };
+   float mStartMeasure{ 0 };
+   float mStartValue{ 0 };
+   bool mRamping{ false };
 };
 
 #endif /* defined(__Bespoke__Ramper__) */

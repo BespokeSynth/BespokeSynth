@@ -62,10 +62,10 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
 
-   int mRouteMask;
-   RadioButton* mRouteSelector;
+   int mRouteMask{ 0 };
+   RadioButton* mRouteSelector{ nullptr };
    std::vector<AdditionalNoteCable*> mDestinationCables;
-   bool mRadioButtonMode;
+   bool mRadioButtonMode{ false };
 };
 
 #endif /* defined(__modularSynth__NoteRouter__) */

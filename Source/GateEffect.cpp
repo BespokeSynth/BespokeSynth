@@ -28,14 +28,6 @@
 #include "Profiler.h"
 
 GateEffect::GateEffect()
-: mThreshold(.1f)
-, mAttackTime(1)
-, mReleaseTime(1)
-, mThresholdSlider(nullptr)
-, mAttackSlider(nullptr)
-, mReleaseSlider(nullptr)
-, mEnvelope(0)
-, mPeak(0)
 {
 }
 

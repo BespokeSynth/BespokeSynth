@@ -90,14 +90,14 @@ private:
 
    int GetPitchForBucket(int bucket);
 
-   int mOctave;
-   IntSlider* mOctaveSlider;
+   int mOctave{ 0 };
+   IntSlider* mOctaveSlider{ nullptr };
 
-   int mPitch;
+   int mPitch{ 0 };
 
-   float* mWorkBuffer;
+   float* mWorkBuffer{ nullptr };
 
-   int mNumBuckets;
+   int mNumBuckets{ 28 };
    BiquadFilter mBands[NOTESINGER_MAX_BUCKETS];
    PeakTracker mPeaks[NOTESINGER_MAX_BUCKETS];
 };

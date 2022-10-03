@@ -31,8 +31,6 @@
 
 NoteLatch::NoteLatch()
 {
-   for (int i = 0; i < 128; ++i)
-      mNoteState[i] = false;
 }
 
 void NoteLatch::DrawModule()

@@ -27,8 +27,6 @@
 #include "SynthGlobals.h"
 
 NoteFilter::NoteFilter()
-: mMinPitch(0)
-, mMaxPitch(7)
 {
    for (int i = 0; i < 128; ++i)
    {

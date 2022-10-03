@@ -66,25 +66,19 @@ private:
 
    struct InputInfo
    {
-      InputInfo()
-      : velocity(0)
-      , voiceIdx(-1)
-      , held(false)
-      , hasPlayedYet(false)
-      {}
-      int velocity;
-      int voiceIdx;
-      bool held;
-      bool hasPlayedYet;
+      int velocity{ 0 };
+      int voiceIdx{ -1 };
+      bool held{ false };
+      bool hasPlayedYet{ false };
       ModulationParameters modulation;
    };
 
-   bool mNoteRepeat;
-   Checkbox* mNoteRepeatCheckbox;
-   NoteInterval mQuantizeInterval;
-   DropdownList* mQuantizeIntervalSelector;
+   bool mNoteRepeat{ false };
+   Checkbox* mNoteRepeatCheckbox{ nullptr };
+   NoteInterval mQuantizeInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mQuantizeIntervalSelector{ nullptr };
    std::array<InputInfo, 128> mInputInfos{};
    std::array<bool, 128> mScheduledOffs{};
    std::array<bool, 128> mPreScheduledOffs{};
-   bool mHasReceivedPulse;
+   bool mHasReceivedPulse{ false };
 };

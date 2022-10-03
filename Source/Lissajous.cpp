@@ -29,13 +29,6 @@
 
 Lissajous::Lissajous()
 : IAudioProcessor(gBufferSize)
-, mOffset(0)
-, mAutocorrelationMode(true)
-, mWidth(500)
-, mHeight(500)
-, mOnlyHasOneChannel(true)
-, mScaleSlider(nullptr)
-, mScale(1)
 {
    for (int i = 0; i < NUM_LISSAJOUS_POINTS; ++i)
       mLissajousPoints[i].set(0, 0);

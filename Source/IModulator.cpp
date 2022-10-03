@@ -31,15 +31,6 @@
 #include "ModularSynth.h"
 
 IModulator::IModulator()
-: mDummyMin(0)
-, mDummyMax(1)
-, mTargetCable(nullptr)
-, mMinSlider(nullptr)
-, mMaxSlider(nullptr)
-, mSliderTarget(nullptr)
-, mUIControlTarget(nullptr)
-, mLastPollValue(0)
-, mSmoothedValue(0)
 {
 }
 

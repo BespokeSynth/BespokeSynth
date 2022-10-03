@@ -27,8 +27,6 @@
 #include "SynthGlobals.h"
 
 PreviousNote::PreviousNote()
-: mPitch(-1)
-, mVelocity(0)
 {
 }
 

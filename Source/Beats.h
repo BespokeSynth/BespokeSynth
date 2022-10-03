@@ -47,13 +47,10 @@ class Beats;
 
 struct BeatData
 {
-   BeatData()
-   : mBeat(nullptr)
-   {}
    void LoadBeat(Sample* sample);
    void RecalcPos(double time, bool doubleTime, int numBars);
 
-   Sample* mBeat;
+   Sample* mBeat{ nullptr };
 };
 
 class BeatColumn
@@ -78,12 +75,12 @@ private:
    float mVolume{ 0 };
    FloatSlider* mVolumeSlider{ nullptr };
    BeatData mBeatData;
-   int mIndex;
+   int mIndex{ 0 };
    float mFilter{ 0 };
    FloatSlider* mFilterSlider{ nullptr };
    std::array<BiquadFilter, 2> mLowpass;
    std::array<BiquadFilter, 2> mHighpass;
-   Beats* mOwner;
+   Beats* mOwner{ nullptr };
    Ramp mFilterRamp;
    bool mDoubleTime{ false };
    Checkbox* mDoubleTimeCheckbox{ nullptr };
@@ -143,7 +140,6 @@ private:
 
    ChannelBuffer mWriteBuffer;
    std::array<BeatColumn*, 4> mBeatColumns;
-   int mRows;
    int mHighlightColumn{ -1 };
 };
 

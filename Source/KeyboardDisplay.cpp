@@ -36,14 +36,6 @@ namespace
 }
 
 KeyboardDisplay::KeyboardDisplay()
-: mWidth(500)
-, mHeight(110)
-, mRootOctave(3)
-, mNumOctaves(3)
-, mPlayingMousePitch(-1)
-, mTypingInput(false)
-, mLatch(false)
-, mShowScale(false)
 {
    for (int i = 0; i < 128; ++i)
    {

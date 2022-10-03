@@ -39,8 +39,6 @@
 #include "juce_core/juce_core.h"
 
 ModuleContainer::ModuleContainer()
-: mOwner(nullptr)
-, mDrawScale(1)
 {
 }
 
@@ -128,10 +126,13 @@ void ModuleContainer::Clear()
    std::vector<IDrawableModule*> modulesToDelete = mModules;
    for (auto* module : modulesToDelete)
    {
-      if (module->GetContainer())
-         module->GetContainer()->Clear();
-      if (module->IsSingleton() == false)
-         DeleteModule(module);
+      if (module)
+      {
+         if (module->GetContainer())
+            module->GetContainer()->Clear();
+         if (module->IsSingleton() == false)
+            DeleteModule(module);
+      }
    }
    mModules.clear();
 }

@@ -27,8 +27,6 @@
 #include "SynthGlobals.h"
 
 NoteSustain::NoteSustain()
-: mSustain(.25f)
-, mSustainSlider(nullptr)
 {
 }
 

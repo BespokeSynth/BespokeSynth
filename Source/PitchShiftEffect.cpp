@@ -29,10 +29,6 @@
 #include "Profiler.h"
 
 PitchShiftEffect::PitchShiftEffect()
-: mRatio(1)
-, mRatioSlider(nullptr)
-, mRatioSelector(nullptr)
-, mRatioSelection(10)
 {
    for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
       mPitchShifter[i] = new PitchShifter(1024);

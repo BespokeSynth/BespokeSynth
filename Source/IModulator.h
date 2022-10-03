@@ -52,14 +52,14 @@ protected:
    void InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode);
    bool RequiresManualPolling() { return mUIControlTarget != nullptr && mSliderTarget == nullptr; }
 
-   float mDummyMin;
-   float mDummyMax;
+   float mDummyMin{ 0 };
+   float mDummyMax{ 1 };
 
-   PatchCableSource* mTargetCable;
-   FloatSlider* mMinSlider;
-   FloatSlider* mMaxSlider;
-   FloatSlider* mSliderTarget;
-   IUIControl* mUIControlTarget;
-   float mLastPollValue;
-   float mSmoothedValue;
+   PatchCableSource* mTargetCable{ nullptr };
+   FloatSlider* mMinSlider{ nullptr };
+   FloatSlider* mMaxSlider{ nullptr };
+   FloatSlider* mSliderTarget{ nullptr };
+   IUIControl* mUIControlTarget{ nullptr };
+   float mLastPollValue{ 0 };
+   float mSmoothedValue{ 0 };
 };

@@ -30,10 +30,7 @@
 #include <cstring>
 
 ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)
-: mWidth(20)
-, mHeight(15)
-, mClickTime(-9999)
-, mOwner(owner)
+: mOwner(owner)
 , mDisplayStyle(displayStyle)
 {
    assert(owner);

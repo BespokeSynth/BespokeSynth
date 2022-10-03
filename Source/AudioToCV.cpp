@@ -32,8 +32,6 @@
 
 AudioToCV::AudioToCV()
 : IAudioProcessor(gBufferSize)
-, mGain(1)
-, mGainSlider(nullptr)
 {
    mModulationBuffer = new float[gBufferSize];
 }

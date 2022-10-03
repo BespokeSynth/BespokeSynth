@@ -58,9 +58,9 @@ private:
    ofVec2f CoordsToViewport(ofRectangle& boundingBox, float x, float y);
    void ForcePosition();
 
-   bool mClick;
-   UIGrid* mGrid;
-   GridCell mHoveredBookmarkPos;
+   bool mClick{ false };
+   UIGrid* mGrid{ nullptr };
+   GridCell mHoveredBookmarkPos{ -1, -1 };
 };
 
 #endif /* defined(__Bespoke__Minimap__) */
