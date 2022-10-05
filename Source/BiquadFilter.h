@@ -68,7 +68,7 @@ public:
    void Filter(float* buffer, int bufferSize);
 
    float mF{ 4000 };
-   float mQ{ sqrt(2.0f) / 2 };
+   float mQ{ static_cast<float>(sqrt(2.0f) / 2) };
    float mDbGain{ 0 };
    FilterType mType{ FilterType::kFilterType_Lowpass };
 
