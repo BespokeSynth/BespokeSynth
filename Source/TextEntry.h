@@ -107,6 +107,7 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool IsTextEntry() const override { return true; }
+   bool ModulatorUsesLiteralValue() const override { return true; }
 
 protected:
    ~TextEntry(); //protected so that it can't be created on the stack

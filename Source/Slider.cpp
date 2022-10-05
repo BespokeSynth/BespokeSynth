@@ -1096,7 +1096,7 @@ float IntSlider::GetValueForMidiCC(float slider) const
 void IntSlider::SetValue(float value, double time)
 {
    int oldVal = *mVar;
-   *mVar = (int)ofClamp(value, mMin, mMax);
+   *mVar = (int)round(ofClamp(value, mMin, mMax));
    if (oldVal != *mVar)
    {
       CalcSliderVal();

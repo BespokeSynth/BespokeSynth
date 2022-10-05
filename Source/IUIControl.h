@@ -90,6 +90,9 @@ public:
    virtual bool IsButtonControl() { return false; }
    virtual bool IsMouseDown() const { return false; }
    virtual bool IsTextEntry() const { return false; }
+   virtual bool ModulatorUsesLiteralValue() const { return false; }
+   virtual float GetModulationRangeMin() const { return 0; }
+   virtual float GetModulationRangeMax() const { return 1; }
 
    static void SetNewManualHover(int direction);
    static bool WasLastHoverSetViaTab() { return sLastUIHoverWasSetViaTab; }
