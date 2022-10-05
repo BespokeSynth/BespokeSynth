@@ -51,20 +51,15 @@ void IModulator::OnModulatorRepatch()
 
          mUIControlTarget = newTarget;
          mSliderTarget = dynamic_cast<FloatSlider*>(mUIControlTarget);
-         IntSlider* intSlider = dynamic_cast<IntSlider*>(mUIControlTarget);
 
          if (mSliderTarget != nullptr)
          {
             mSliderTarget->SetModulator(this);
-            InitializeRange(mSliderTarget->GetValue(), mSliderTarget->GetMin(), mSliderTarget->GetMax(), mSliderTarget->GetMode());
-         }
-         else if (intSlider != nullptr)
-         {
-            InitializeRange(intSlider->GetValue(), intSlider->GetMin(), intSlider->GetMax(), FloatSlider::kNormal);
+            InitializeRange(mSliderTarget->GetValue(), mUIControlTarget->GetModulationRangeMin(), mUIControlTarget->GetModulationRangeMax(), mSliderTarget->GetMode());
          }
          else
          {
-            InitializeRange(mUIControlTarget->GetValue(), 0, 1, FloatSlider::kNormal);
+            InitializeRange(mUIControlTarget->GetValue(), mUIControlTarget->GetModulationRangeMin(), mUIControlTarget->GetModulationRangeMax(), FloatSlider::kNormal);
          }
       }
    }
@@ -96,7 +91,12 @@ void IModulator::Poll()
       float blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
       mSmoothedValue = mSmoothedValue * blend + mLastPollValue * (1 - blend);
       if (RequiresManualPolling())
-         mUIControlTarget->SetValue(mLastPollValue, NextBufferTime(false));
+      {
+         if (mUIControlTarget->ModulatorUsesLiteralValue())
+            mUIControlTarget->SetValue(mLastPollValue, NextBufferTime(false));
+         else
+            mUIControlTarget->SetFromMidiCC(mLastPollValue, NextBufferTime(false), true);
+      }
    }
 }
 

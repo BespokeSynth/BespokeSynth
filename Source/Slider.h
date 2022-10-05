@@ -88,6 +88,9 @@ public:
    IModulator* GetModulator() { return mModulator; }
    float& GetModulatorMin() { return mModulatorMin; }
    float& GetModulatorMax() { return mModulatorMax; }
+   bool ModulatorUsesLiteralValue() const override { return true; }
+   float GetModulationRangeMin() const override { return mMin; }
+   float GetModulationRangeMax() const override { return mMax; }
    void OnTransportAdvanced(float amount) override;
 
    void Init() override;
@@ -238,6 +241,9 @@ public:
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return mMax - mMin + 1; }
+   bool ModulatorUsesLiteralValue() const override { return true; }
+   float GetModulationRangeMin() const override { return mMin; }
+   float GetModulationRangeMax() const override { return mMax; }
    std::string GetDisplayValue(float val) const override;
    void GetRange(int& min, int& max)
    {
