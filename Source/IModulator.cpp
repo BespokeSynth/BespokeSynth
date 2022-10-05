@@ -55,7 +55,7 @@ void IModulator::OnModulatorRepatch()
          if (mSliderTarget != nullptr)
          {
             mSliderTarget->SetModulator(this);
-            InitializeRange(mSliderTarget->GetValue(),  mUIControlTarget->GetModulationRangeMin(), mUIControlTarget->GetModulationRangeMax(), mSliderTarget->GetMode());
+            InitializeRange(mSliderTarget->GetValue(), mUIControlTarget->GetModulationRangeMin(), mUIControlTarget->GetModulationRangeMax(), mSliderTarget->GetMode());
          }
          else
          {
