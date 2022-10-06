@@ -345,20 +345,14 @@ std::string VSTPlugin::GetPluginName() const
 std::string VSTPlugin::GetPluginFormatName() const
 {
    if (mPlugin)
-   {
-      const auto& desc = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription();
-      return ofToString(desc.pluginFormatName.toLowerCase());
-   }
+      return mPluginFormatName;
    return "plugin";
 }
 
 std::string VSTPlugin::GetPluginId() const
 {
    if (mPlugin)
-   {
-      const auto& desc = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription();
-      return GetPluginName() + "_" + ofToString(desc.uniqueId);
-   }
+      return mPluginId;
    return "no plugin loaded";
 }
 
@@ -487,6 +481,8 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       mPlugin->setPlayHead(&mPlayhead);
 
       mPluginName = mPlugin->getName().toStdString();
+      mPluginFormatName = ofToString(desc.pluginFormatName.toLowerCase());
+      mPluginId = GetPluginName() + "_" + ofToString(desc.uniqueId);
 
       CreateParameterSliders();
 
