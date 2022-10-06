@@ -509,6 +509,28 @@ bool VSTPlugin::ParameterNameExists(std::string name, int checkUntilIndex) const
    return false;
 }
 
+const std::string VSTPlugin::getUniquifiedParameterName(int i, const juce::Array<juce::AudioProcessorParameter*>& parameters)
+{
+   if (i < 0 || i >= parameters.size())
+   {
+      return std::string("ERROR PARAM ") + std::to_string(i);
+   }
+   auto originalParamName = parameters[i]->getName(64).toStdString();
+   auto name = originalParamName;
+   try
+   {
+      int append = i;
+      while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
+      {
+         ++append;
+         name = originalParamName + std::to_string(append);
+      }
+   }
+   catch (UnknownUIControlException& e)
+   {
+   }
+   return name;
+}
 void VSTPlugin::CreateParameterSliders()
 {
    assert(mPlugin);
@@ -533,20 +555,7 @@ void VSTPlugin::CreateParameterSliders()
    for (int i = 0; i < numParameters; ++i)
    {
       mParameterSliders[i].mValue = parameters[i]->getValue();
-      juce::String originalParamName = parameters[i]->getName(32);
-      std::string name(originalParamName.getCharPointer());
-      try
-      {
-         int append = i;
-         while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
-         {
-            ++append;
-            name = originalParamName.toStdString() + ofToString(append);
-         }
-      }
-      catch (UnknownUIControlException& e)
-      {
-      }
+      auto name = getUniquifiedParameterName(i, parameters);
       mParameterSliders[i].mParameter = parameters[i];
       mParameterSliders[i].mName = name.c_str();
       mParameterSliders[i].mShowing = false;
@@ -564,6 +573,18 @@ void VSTPlugin::CreateParameterSliders()
 
 void VSTPlugin::Poll()
 {
+   if (mRescanParameterNames)
+   {
+      mRescanParameterNames = false;
+      const auto& parameters = mPlugin->getParameters();
+
+      int numParameters = MIN(mParameterSliders.size(), parameters.size());
+      for (int i = 0; i < numParameters; ++i)
+      {
+         auto name = getUniquifiedParameterName(i, parameters);
+         mParameterSliders[i].mName = name;
+      }
+   }
    if (mDisplayMode == kDisplayMode_Sliders)
    {
       for (int i = 0; i < mParameterSliders.size(); ++i)
@@ -601,6 +622,13 @@ void VSTPlugin::Poll()
          //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
       }
       mWantOpenVstWindow = false;
+   }
+}
+void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
+{
+   if (details.parameterInfoChanged)
+   {
+      mRescanParameterNames = true;
    }
 }
 

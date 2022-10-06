@@ -120,8 +120,9 @@ private:
 
    //juce::AudioProcessorListener
    void audioProcessorParameterChanged(juce::AudioProcessor* processor, int parameterIndex, float newValue) override {}
-   void audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details) override {}
+   void audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details) override;
    void audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex) override;
+   const std::string getUniquifiedParameterName(int parameterIndex, const juce::Array<juce::AudioProcessorParameter*>&);
 
    float mVol{ 1 };
    FloatSlider* mVolSlider{ nullptr };
@@ -142,6 +143,7 @@ private:
    juce::MidiBuffer mMidiBuffer;
    juce::MidiBuffer mFutureMidiBuffer;
    juce::CriticalSection mMidiInputLock;
+   std::atomic<bool> mRescanParameterNames{ false };
    int mNumInputChannels{ 2 };
    int mNumOutputChannels{ 2 };
 
