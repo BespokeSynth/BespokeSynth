@@ -520,7 +520,7 @@ const std::string VSTPlugin::getUniquifiedParameterName(int i, const juce::Array
    try
    {
       int append = i;
-      while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
+      while (ParameterNameExists(name, i) || FindUIControl(name.c_str(), false))
       {
          ++append;
          name = originalParamName + std::to_string(append);
