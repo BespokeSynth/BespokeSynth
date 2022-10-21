@@ -41,6 +41,8 @@ IModulator::~IModulator()
 
 void IModulator::OnModulatorRepatch()
 {
+   bool wasEmpty = (mTargets[0].mUIControlTarget == nullptr);
+
    for (size_t i = 0; i < mTargets.size(); ++i)
    {
       IUIControl* newTarget = nullptr;
@@ -48,6 +50,9 @@ void IModulator::OnModulatorRepatch()
          newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[i]->GetTarget());
       if (newTarget != mTargets[i].mUIControlTarget)
       {
+         if (mTargets[i].mSliderTarget != nullptr && mTargets[i].mSliderTarget->GetModulator() == this)
+            mTargets[i].mSliderTarget->SetModulator(nullptr); //clear old target's pointer to this
+
          if (i + 1 < mTargets.size() && newTarget == mTargets[i + 1].mUIControlTarget) //one got deleted, shift the rest down
          {
             for (; i < mTargets.size(); ++i)
@@ -66,9 +71,6 @@ void IModulator::OnModulatorRepatch()
             break;
          }
 
-         if (mTargets[i].mSliderTarget != nullptr && mTargets[i].mSliderTarget->GetModulator() == this)
-            mTargets[i].mSliderTarget->SetModulator(nullptr); //clear old target's pointer to this
-
          mTargets[i].mUIControlTarget = newTarget;
          mTargets[i].mSliderTarget = dynamic_cast<FloatSlider*>(mTargets[i].mUIControlTarget);
 
@@ -77,12 +79,12 @@ void IModulator::OnModulatorRepatch()
             if (mTargets[i].mSliderTarget != nullptr)
             {
                mTargets[i].mSliderTarget->SetModulator(this);
-               if (i == 0)
+               if (wasEmpty)
                   InitializeRange(mTargets[i].mSliderTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), mTargets[i].mSliderTarget->GetMode());
             }
             else
             {
-               if (i == 0)
+               if (wasEmpty)
                   InitializeRange(mTargets[i].mUIControlTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), FloatSlider::kNormal);
             }
          }
