@@ -65,21 +65,21 @@ void ModulatorAddCentered::PostRepatch(PatchCableSource* cableSource, bool fromU
 {
    OnModulatorRepatch();
 
-   if (mSliderTarget)
+   if (GetSliderTarget())
    {
-      mValue1 = mSliderTarget->GetValue();
+      mValue1 = GetSliderTarget()->GetValue();
       mValue2 = 0;
-      mValue1Slider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
-      mValue1Slider->SetMode(mSliderTarget->GetMode());
-      mValue2RangeSlider->SetExtents(0, mSliderTarget->GetMax() - mSliderTarget->GetMin());
+      mValue1Slider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
+      mValue1Slider->SetMode(GetSliderTarget()->GetMode());
+      mValue2RangeSlider->SetExtents(0, GetSliderTarget()->GetMax() - GetSliderTarget()->GetMin());
    }
 }
 
 float ModulatorAddCentered::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   if (mSliderTarget)
-      return ofClamp(mValue1 + mValue2 * mValue2Range, mSliderTarget->GetMin(), mSliderTarget->GetMax());
+   if (GetSliderTarget())
+      return ofClamp(mValue1 + mValue2 * mValue2Range, GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
    else
       return mValue1 + mValue2 * mValue2Range;
 }

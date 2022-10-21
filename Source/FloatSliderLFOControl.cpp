@@ -201,10 +201,10 @@ void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 {
    if (enabled && !mEnabled && !TheSynth->IsLoadingState()) //if turning on
    {
-      if (mSliderTarget)
+      if (GetSliderTarget())
       {
-         GetMin() = mSliderTarget->GetValue();
-         GetMax() = mSliderTarget->GetValue();
+         GetMin() = GetSliderTarget()->GetValue();
+         GetMax() = GetSliderTarget()->GetValue();
       }
    }
 
@@ -213,22 +213,22 @@ void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 
 void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
 {
-   if (mSliderTarget == owner)
+   if (GetSliderTarget() == owner)
       return;
 
-   if (mSliderTarget != nullptr)
+   if (GetSliderTarget() != nullptr)
    {
-      mSliderTarget->SetLFO(nullptr);
+      GetSliderTarget()->SetLFO(nullptr);
    }
 
    if (owner != nullptr)
       owner->SetLFO(this);
 
-   mSliderTarget = owner;
-   mUIControlTarget = owner;
+   mTargets[0].mSliderTarget = owner;
+   mTargets[0].mUIControlTarget = owner;
 
-   if (mSliderTarget != nullptr)
-      InitializeRange(mSliderTarget->GetValue(), mSliderTarget->GetMin(), mSliderTarget->GetMax(), mSliderTarget->GetMode());
+   if (GetSliderTarget() != nullptr)
+      InitializeRange(GetSliderTarget()->GetValue(), GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax(), GetSliderTarget()->GetMode());
 }
 
 void FloatSliderLFOControl::RandomizeSettings()
@@ -255,11 +255,9 @@ void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource, bool from
 {
    if (mTargetCable == nullptr)
       return;
-   if (mSliderTarget != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
-   {
+   if (GetSliderTarget() != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
       SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
-      OnModulatorRepatch();
-   }
+   OnModulatorRepatch();
 }
 
 void FloatSliderLFOControl::Load(LFOSettings settings)
@@ -285,8 +283,8 @@ float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase
 
 float FloatSliderLFOControl::GetTargetMin() const
 {
-   if (mSliderTarget != nullptr)
-      return mSliderTarget->GetMin();
+   if (GetSliderTarget() != nullptr)
+      return GetSliderTarget()->GetMin();
    else if (mMinSlider != nullptr)
       return mMinSlider->GetMin();
    return 0;
@@ -294,8 +292,8 @@ float FloatSliderLFOControl::GetTargetMin() const
 
 float FloatSliderLFOControl::GetTargetMax() const
 {
-   if (mSliderTarget != nullptr)
-      return mSliderTarget->GetMax();
+   if (GetSliderTarget() != nullptr)
+      return GetSliderTarget()->GetMax();
    else if (mMaxSlider != nullptr)
       return mMaxSlider->GetMax();
    return 1;
@@ -421,7 +419,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button, double time)
             mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
             mTargetCable->SetModulatorOwner(this);
             AddPatchCableSource(mTargetCable);
-            mTargetCable->SetTarget(mSliderTarget);
+            mTargetCable->SetTarget(GetSliderTarget());
          }
       }
    }

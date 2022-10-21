@@ -126,18 +126,10 @@ void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox, double time)
 void VinylTempoControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mSliderTarget)
-      targetPath = mSliderTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
