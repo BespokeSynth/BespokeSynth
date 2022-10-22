@@ -63,20 +63,20 @@ void ModulatorMult::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 {
    OnModulatorRepatch();
 
-   if (mSliderTarget)
+   if (GetSliderTarget())
    {
-      mValue1 = mSliderTarget->GetValue();
+      mValue1 = GetSliderTarget()->GetValue();
       mValue2 = 0;
-      mValue1Slider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
-      mValue1Slider->SetMode(mSliderTarget->GetMode());
+      mValue1Slider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
+      mValue1Slider->SetMode(GetSliderTarget()->GetMode());
    }
 }
 
 float ModulatorMult::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   if (mSliderTarget)
-      return ofClamp(mValue1 * mValue2, mSliderTarget->GetMin(), mSliderTarget->GetMax());
+   if (GetSliderTarget())
+      return ofClamp(mValue1 * mValue2, GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
    else
       return mValue1 * mValue2;
 }

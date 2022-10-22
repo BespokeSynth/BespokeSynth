@@ -461,8 +461,13 @@ bool PatchCableSource::MouseMoved(float x, float y)
 
    mHoverIndex = GetHoverIndex(x, y);
 
-   if (mHoverIndex != -1 && gHoveredUIControl != nullptr && !gHoveredUIControl->IsMouseDown())
-      gHoveredUIControl = nullptr; //if we're hovering over a patch cable, get rid of ui control hover
+   if (mHoverIndex != -1 && gHoveredUIControl != nullptr)
+   {
+      if (gHoveredUIControl->IsMouseDown())
+         mHoverIndex = -1; //if we're dragging a control, don't show cables bubbling out
+      else
+         gHoveredUIControl = nullptr; //if we're hovering over a patch cable, get rid of ui control hover
+   }
 
    for (size_t i = 0; i < mPatchCables.size(); ++i)
    {
@@ -506,7 +511,8 @@ bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* 
                 mType == kConnectionType_Pulse ||
                 mType == kConnectionType_UIControl ||
                 mType == kConnectionType_Special ||
-                mType == kConnectionType_ValueSetter)
+                mType == kConnectionType_ValueSetter ||
+                mType == kConnectionType_Modulator)
             {
                PatchCable* newCable = AddPatchCable(nullptr);
                if (newCable)
@@ -522,17 +528,6 @@ bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* 
                SetTarget(send);
                send->SetSend(1, false);
                TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y, false);
-            }
-            else if (mType == kConnectionType_Modulator)
-            {
-               ofVec2f spawnOffset(-20, 10);
-               ModuleFactory::Spawnable spawnable;
-               spawnable.mLabel = "macroslider";
-               MacroSlider* macroSlider = dynamic_cast<MacroSlider*>(TheSynth->SpawnModuleOnTheFly(spawnable, x + spawnOffset.x, y + spawnOffset.y));
-               IUIControl* currentTarget = dynamic_cast<IUIControl*>(GetTarget());
-               SetTarget(macroSlider->GetSlider());
-               macroSlider->SetOutputTarget(0, currentTarget);
-               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y, false);
             }
          }
          else

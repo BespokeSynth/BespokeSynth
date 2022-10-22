@@ -125,8 +125,8 @@ bool EnvelopeModulator::MouseMoved(float x, float y)
 float EnvelopeModulator::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
-   if (mSliderTarget)
-      return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), mSliderTarget->GetMin(), mSliderTarget->GetMax());
+   if (GetSliderTarget())
+      return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
    return 0;
 }
 

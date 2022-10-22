@@ -148,13 +148,13 @@ void MacroSlider::Mapping::Draw()
    mMinSlider->Draw();
    mMaxSlider->Draw();
 
-   if (mSliderTarget)
+   if (GetSliderTarget())
    {
       float x, y, w, h;
       mMinSlider->GetPosition(x, y, K(local));
       mMinSlider->GetDimensions(w, h);
 
-      int lineX = ofLerp(x, x + w, mSliderTarget->ValToPos(mSliderTarget->GetValue(), true));
+      int lineX = ofLerp(x, x + w, GetSliderTarget()->ValToPos(GetSliderTarget()->GetValue(), true));
       int lineY1 = y;
       int lineY2 = y + h * 2;
       ofPushStyle();

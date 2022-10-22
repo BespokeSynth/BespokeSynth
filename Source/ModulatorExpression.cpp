@@ -95,8 +95,8 @@ float ModulatorExpression::Value(int samplesIn)
       return mExpression.value();
    }
 
-   if (mSliderTarget)
-      return mSliderTarget->GetMin();
+   if (GetSliderTarget())
+      return GetSliderTarget()->GetMin();
    return 0;
 }
 
@@ -104,7 +104,7 @@ void ModulatorExpression::PostRepatch(PatchCableSource* cableSource, bool fromUs
 {
    OnModulatorRepatch();
 
-   if (mSliderTarget)
+   if (GetSliderTarget())
    {
       //mValue1Slider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
       //mValue1Slider->SetMode(mSliderTarget->GetMode());
@@ -113,6 +113,7 @@ void ModulatorExpression::PostRepatch(PatchCableSource* cableSource, bool fromUs
 
 void ModulatorExpression::TextEntryComplete(TextEntry* entry)
 {
+   mExpressionValid = false;
    exprtk::parser<float> parser;
    mExpressionValid = parser.compile(mEntryString, mExpression);
    if (mExpressionValid)
