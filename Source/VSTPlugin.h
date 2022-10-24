@@ -94,6 +94,7 @@ public:
    void ButtonClicked(ClickButton* button, double time) override;
 
    void OnUIControlRequested(const char* name) override;
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
@@ -116,13 +117,11 @@ private:
    std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
-   bool ParameterNameExists(std::string name, int checkUntilIndex) const;
 
    //juce::AudioProcessorListener
    void audioProcessorParameterChanged(juce::AudioProcessor* processor, int parameterIndex, float newValue) override {}
    void audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details) override;
    void audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex) override;
-   const std::string getUniquifiedParameterName(int parameterIndex, const juce::Array<juce::AudioProcessorParameter*>&);
 
    float mVol{ 1 };
    FloatSlider* mVolSlider{ nullptr };
@@ -152,13 +151,15 @@ private:
 
    struct ParameterSlider
    {
+      VSTPlugin* mOwner{ nullptr };
       float mValue{ 0 };
       FloatSlider* mSlider{ nullptr };
       juce::AudioProcessorParameter* mParameter{ nullptr };
       bool mShowing{ false };
       bool mInSelectorList{ true };
-      std::string mName;
-      void MakeSlider(VSTPlugin* owner);
+      std::string mDisplayName;
+      std::string mID;
+      void MakeSlider();
    };
 
    std::vector<ParameterSlider> mParameterSliders;
@@ -169,6 +170,7 @@ private:
    float mPitchBendRange{ 2 };
    int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
    std::string mOldVstPath{ "" }; //for loading save files that predate pluginId-style saving
+   int mParameterVersion{ 1 };
 
    struct ChannelModulations
    {

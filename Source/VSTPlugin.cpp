@@ -498,39 +498,6 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    mVSTMutex.unlock();
 }
 
-bool VSTPlugin::ParameterNameExists(std::string name, int checkUntilIndex) const
-{
-   for (int i = 0; i < checkUntilIndex; ++i)
-   {
-      if (mParameterSliders[i].mName == name)
-         return true;
-   }
-
-   return false;
-}
-
-const std::string VSTPlugin::getUniquifiedParameterName(int i, const juce::Array<juce::AudioProcessorParameter*>& parameters)
-{
-   if (i < 0 || i >= parameters.size())
-   {
-      return std::string("ERROR PARAM ") + std::to_string(i);
-   }
-   auto originalParamName = parameters[i]->getName(64).toStdString();
-   auto name = originalParamName;
-   try
-   {
-      int append = i;
-      while (ParameterNameExists(name, i) || FindUIControl(name.c_str(), false))
-      {
-         ++append;
-         name = originalParamName + std::to_string(append);
-      }
-   }
-   catch (UnknownUIControlException& e)
-   {
-   }
-   return name;
-}
 void VSTPlugin::CreateParameterSliders()
 {
    assert(mPlugin);
@@ -554,14 +521,19 @@ void VSTPlugin::CreateParameterSliders()
    mParameterSliders.resize(numParameters);
    for (int i = 0; i < numParameters; ++i)
    {
+      mParameterSliders[i].mOwner = this;
       mParameterSliders[i].mValue = parameters[i]->getValue();
-      auto name = getUniquifiedParameterName(i, parameters);
       mParameterSliders[i].mParameter = parameters[i];
-      mParameterSliders[i].mName = name.c_str();
+      mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
+      HostedAudioProcessorParameter* parameterWithId = dynamic_cast<HostedAudioProcessorParameter*>(parameters[i]);
+      if (parameterWithId)
+         mParameterSliders[i].mID = "paramid_" + parameterWithId->getParameterID().toStdString();
+      else
+         mParameterSliders[i].mID = "param_" + ofToString(parameters[i]->getParameterIndex());
       mParameterSliders[i].mShowing = false;
       if (numParameters <= 30) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
-         mShowParameterDropdown->AddLabel(name.c_str(), i);
+         mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
          mParameterSliders[i].mInSelectorList = true;
       }
       else
@@ -581,8 +553,9 @@ void VSTPlugin::Poll()
       int numParameters = MIN(mParameterSliders.size(), parameters.size());
       for (int i = 0; i < numParameters; ++i)
       {
-         auto name = getUniquifiedParameterName(i, parameters);
-         mParameterSliders[i].mName = name;
+         mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
+         if (mParameterSliders[i].mSlider != nullptr)
+            mParameterSliders[i].mSlider->SetOverrideDisplayName(mParameterSliders[i].mDisplayName);
       }
    }
    if (mDisplayMode == kDisplayMode_Sliders)
@@ -603,7 +576,7 @@ void VSTPlugin::Poll()
             if (mTemporarilyDisplayedParamIndex != -1)
                mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
             mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mName, mChangeGestureParameterIndex);
+            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mDisplayName, mChangeGestureParameterIndex);
          }
 
          mChangeGestureParameterIndex = -1;
@@ -1025,7 +998,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
                {
                   mParameterSliders[index].mShowing = true;
                   if (mParameterSliders[index].mSlider == nullptr)
-                     mParameterSliders[index].MakeSlider(this);
+                     mParameterSliders[index].MakeSlider();
                }
             }
          }
@@ -1036,7 +1009,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
    {
       mParameterSliders[mShowParameterIndex].mShowing = true;
       if (mParameterSliders[mShowParameterIndex].mSlider == nullptr)
-         mParameterSliders[mShowParameterIndex].MakeSlider(this);
+         mParameterSliders[mShowParameterIndex].MakeSlider();
       mParameterSliders[mShowParameterIndex].mInSelectorList = true;
       mShowParameterIndex = -1;
       mTemporarilyDisplayedParamIndex = -1;
@@ -1166,6 +1139,12 @@ void VSTPlugin::RefreshPresetFiles()
    }
 }
 
+void VSTPlugin::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule::SaveLayout(moduleInfo);
+
+   moduleInfo["parameterversion"] = 1;
+}
 
 void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
@@ -1182,6 +1161,14 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
       mOldVstPath = moduleInfo["vst"].asString();
    else
       mOldVstPath = "";
+
+   if (!moduleInfo["onthefly"])
+   {
+      if (!moduleInfo["parameterversion"].isNull())
+         mParameterVersion = moduleInfo["parameterversion"].asInt();
+      else
+         mParameterVersion = 0;
+   }
 
    SetUpFromSaveData();
 }
@@ -1261,7 +1248,7 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
       for (auto& parameter : mParameterSliders)
       {
          if (parameter.mSlider == nullptr)
-            parameter.MakeSlider(this);
+            parameter.MakeSlider();
       }
    }
 
@@ -1320,23 +1307,40 @@ void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
             {
                mParameterSliders[index].mShowing = true;
                if (mParameterSliders[index].mSlider == nullptr)
-                  mParameterSliders[index].MakeSlider(this);
+                  mParameterSliders[index].MakeSlider();
             }
          }
       }
    }
 }
 
-void VSTPlugin::ParameterSlider::MakeSlider(VSTPlugin* owner)
+void VSTPlugin::ParameterSlider::MakeSlider()
 {
-   mSlider = new FloatSlider(owner, mName.c_str(), -1, -1, 200, 15, &mValue, 0, 1);
+   const char* sliderID;
+   if (mOwner->mParameterVersion == 0)
+      sliderID = mDisplayName.c_str(); //old save files used unstable parameters names
+   else
+      sliderID = mID.c_str(); //now we use parameter IDs for more stability
+   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 200, 15, &mValue, 0, 1);
+   mSlider->SetOverrideDisplayName(mDisplayName);
 }
 
 void VSTPlugin::OnUIControlRequested(const char* name)
 {
-   for (auto& parameter : mParameterSliders)
+   if (mParameterVersion == 0) //legacy path
    {
-      if (parameter.mName == name && parameter.mSlider == nullptr)
-         parameter.MakeSlider(this);
+      for (auto& parameter : mParameterSliders)
+      {
+         if (parameter.mDisplayName == name && parameter.mSlider == nullptr)
+            parameter.MakeSlider();
+      }
+   }
+   else
+   {
+      for (auto& parameter : mParameterSliders)
+      {
+         if (parameter.mID == name && parameter.mSlider == nullptr)
+            parameter.MakeSlider();
+      }
    }
 }
