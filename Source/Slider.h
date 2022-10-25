@@ -92,6 +92,11 @@ public:
    float GetModulationRangeMin() const override { return mMin; }
    float GetModulationRangeMax() const override { return mMax; }
    void OnTransportAdvanced(float amount) override;
+   void SetOverrideDisplayName(std::string name)
+   {
+      mHasOverrideDisplayName = true;
+      mOverrideDisplayName = name;
+   }
 
    void Init() override;
 
@@ -185,6 +190,8 @@ private:
    int mLastComputeSamplesIn{ 0 };
    double* mLastComputeCacheTime;
    float* mLastComputeCacheValue;
+   bool mHasOverrideDisplayName{ false };
+   std::string mOverrideDisplayName{ "" };
 
    float mLastDisplayedValue{ std::numeric_limits<float>::max() };
 

@@ -197,7 +197,7 @@ void FloatSlider::Render()
    else
    {
       if (mShowName)
-         display = std::string(Name());
+         display = std::string(mHasOverrideDisplayName ? mOverrideDisplayName : Name());
       if (display.length() > 0) //only show a colon if there's a label
          display += ":";
       if (mFloatEntry)
