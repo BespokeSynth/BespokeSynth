@@ -165,7 +165,6 @@ jobs:
 
       - bash: |
           set -e
-          sudo xcode-select -s /Applications/Xcode_12.2.app
           echo Building with TARGET = $CMAKE_TARGET
           cmake --build build --config $CMAKE_CONFIG --target $CMAKE_TARGET
         displayName: mac - build with cmake
