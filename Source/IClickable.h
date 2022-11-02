@@ -71,7 +71,7 @@ public:
    }
    const char* Name() const { return mName; }
    char* NameMutable() { return mName; }
-   std::string Path(bool ignoreContext = false);
+   std::string Path(bool ignoreContext = false, bool useDisplayName = false);
    virtual bool CheckNeedsDraw();
    virtual void SetShowing(bool showing) { mShowing = showing; }
    bool IsShowing() const { return mShowing; }
@@ -80,6 +80,15 @@ public:
    void DrawBeacon(int x, int y);
    IClickable* GetRootParent();
    IDrawableModule* GetModuleParent();
+   void SetOverrideDisplayName(std::string name)
+   {
+      mHasOverrideDisplayName = true;
+      mOverrideDisplayName = name;
+   }
+   std::string GetDisplayName()
+   {
+      return mHasOverrideDisplayName ? mOverrideDisplayName : mName;
+   }
 
    static void SetLoadContext(IClickable* context) { sPathLoadContext = context->Path() + "~"; }
    static void ClearLoadContext() { sPathLoadContext = ""; }
@@ -102,6 +111,8 @@ protected:
 private:
    char mName[MAX_TEXTENTRY_LENGTH]{};
    double mBeaconTime{ -999 };
+   bool mHasOverrideDisplayName{ false };
+   std::string mOverrideDisplayName{ "" };
 };
 
 #endif /* defined(__modularSynth__IClickable__) */

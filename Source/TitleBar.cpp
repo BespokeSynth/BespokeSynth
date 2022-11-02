@@ -493,7 +493,7 @@ void TitleBar::DrawModuleUnclipped()
       {
          drawControl = MidiController::sLastActivityUIControl;
          if (drawControl != nullptr)
-            displayString = drawControl->Path() + ": " + drawControl->GetDisplayValue(drawControl->GetValue());
+            displayString = drawControl->Path(false, true) + ": " + drawControl->GetDisplayValue(drawControl->GetValue());
       }
 
       if (!displayString.empty() && drawControl != nullptr)

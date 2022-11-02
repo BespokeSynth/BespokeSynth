@@ -139,14 +139,16 @@ IDrawableModule* IClickable::GetModuleParent()
    return dynamic_cast<IDrawableModule*>(parent);
 }
 
-std::string IClickable::Path(bool ignoreContext)
+std::string IClickable::Path(bool ignoreContext, bool useDisplayName)
 {
    if (mName[0] == 0) //must have a name
       return "";
 
-   std::string path = mName;
+   std::string name = useDisplayName ? GetDisplayName() : mName;
+
+   std::string path = name;
    if (mParent != nullptr)
-      path = mParent->Path(true) + "~" + mName;
+      path = mParent->Path(true) + "~" + name;
 
    if (!ignoreContext)
    {

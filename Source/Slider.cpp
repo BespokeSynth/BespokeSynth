@@ -197,7 +197,7 @@ void FloatSlider::Render()
    else
    {
       if (mShowName)
-         display = std::string(mHasOverrideDisplayName ? mOverrideDisplayName : Name());
+         display = GetDisplayName();
       if (display.length() > 0) //only show a colon if there's a label
          display += ":";
       if (mFloatEntry)
@@ -951,7 +951,7 @@ void IntSlider::Render()
 
    std::string display;
    if (mShowName)
-      display = std::string(Name());
+      display = GetDisplayName();
    if (display.length() > 0) //only show a colon if there's a label
       display += ":";
    if (mIntEntry)
