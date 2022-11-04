@@ -255,6 +255,7 @@
 #include "NoteEcho.h"
 #include "VelocityCurve.h"
 #include "BoundsToPulse.h"
+#include "SmashTunes.h"
 
 #include <juce_core/juce_core.h>
 
@@ -275,6 +276,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleCategory_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleCategory_Synth);
    REGISTER(MidiController, midicontroller, kModuleCategory_Instrument);
+   REGISTER(SmashTunes, smashtunes, kModuleCategory_Instrument);
    REGISTER(ScaleDetect, scaledetect, kModuleCategory_Note);
    REGISTER(KarplusStrong, karplusstrong, kModuleCategory_Synth);
    REGISTER(WhiteKeys, whitekeys, kModuleCategory_Note);

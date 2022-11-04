@@ -436,6 +436,15 @@ slidersequencer~trigger notes along a continuous timeline
 
 
 
+smashtunes~turn text into notes. hook it up to something like pulsesequence. based on https://princess.software/smashtunes
+~text~text to turn into MIDI notes
+~velocity*~velocity of this element
+~duration~how long to play each note for
+~min note~if we would produce a note less than this, play this value instead
+~max note~if we would produce a note greater than this, play the note modulo this
+
+
+
 randomnote~play a note at a given interval with a random chance
 ~interval~the note length
 ~probability~the chance that a note will play each interval
