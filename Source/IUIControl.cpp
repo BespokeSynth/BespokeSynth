@@ -208,6 +208,14 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
    }
 }
 
+void IUIControl::RemoveFromOwner()
+{
+   IDrawableModule* owner = dynamic_cast<IDrawableModule*>(GetParent());
+   assert(owner);
+   if (owner)
+      owner->RemoveUIControl(this);
+}
+
 //static
 void IUIControl::SetNewManualHover(int direction)
 {

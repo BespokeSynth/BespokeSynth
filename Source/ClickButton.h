@@ -48,7 +48,10 @@ enum class ButtonDisplayStyle
    kSampleIcon,
    kFolderIcon,
    kArrowRight,
-   kArrowLeft
+   kArrowLeft,
+   kPlus,
+   kMinus,
+   kHamburger
 };
 
 class ClickButton : public IUIControl
@@ -97,7 +100,7 @@ private:
    float mHeight{ 15 };
    double mClickTime{ -9999 };
    IButtonListener* mOwner{ nullptr };
-   ButtonDisplayStyle mDisplayStyle;
+   ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };
 };
 
 #endif /* defined(__modularSynth__ClickButton__) */

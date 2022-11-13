@@ -545,6 +545,25 @@ float TextEntry::GetMidiValue() const
    return 0;
 }
 
+void TextEntry::GetRange(float& min, float& max)
+{
+   if (mType == kTextEntry_Int)
+   {
+      min = mIntMin;
+      max = mIntMax;
+   }
+   else if (mType == kTextEntry_Float)
+   {
+      min = mFloatMin;
+      max = mFloatMax;
+   }
+   else
+   {
+      min = 0;
+      max = 1;
+   }
+}
+
 void TextEntry::SetValue(float value, double time)
 {
    if (mType == kTextEntry_Int)

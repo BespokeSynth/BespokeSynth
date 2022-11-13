@@ -92,6 +92,12 @@ private:
    bool mIsScrolling{ false };
 };
 
+enum class DropdownDisplayStyle
+{
+   kNormal,
+   kHamburger
+};
+
 class DropdownList : public IUIControl
 {
 public:
@@ -100,6 +106,7 @@ public:
    void AddLabel(std::string label, int value);
    void RemoveLabel(int value);
    std::string GetLabel(int val) const;
+   void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
@@ -181,6 +188,7 @@ private:
    bool mDrawTriangle{ true };
    double mLastScrolledTime{ -9999 };
    std::vector<int> mSeparators;
+   DropdownDisplayStyle mDisplayStyle{ DropdownDisplayStyle::kNormal };
 };
 
 #endif /* defined(__modularSynth__DropdownList__) */

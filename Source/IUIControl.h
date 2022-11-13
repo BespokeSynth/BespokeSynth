@@ -86,6 +86,7 @@ public:
    void GetColors(ofColor& color, ofColor& textColor);
    bool GetShouldSaveState() const { return mShouldSaveState; }
    void SetShouldSaveState(bool save) { mShouldSaveState = save; }
+   void RemoveFromOwner();
    virtual bool IsSliderControl() { return true; }
    virtual bool IsButtonControl() { return false; }
    virtual bool IsMouseDown() const { return false; }
