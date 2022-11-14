@@ -1268,3 +1268,10 @@ std::vector<IUIControl*> IDrawableModule::ControlsToIgnoreInSaveState() const
 {
    return std::vector<IUIControl*>(); //empty
 }
+
+bool IDrawableModule::IsSpawningOnTheFly(const ofxJSONElement& moduleInfo)
+{
+   if (moduleInfo["onthefly"].isNull())
+      return false;
+   return moduleInfo["onthefly"].asBool();
+}

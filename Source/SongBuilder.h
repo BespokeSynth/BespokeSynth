@@ -31,10 +31,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "INoteReceiver.h"
 #include "IPulseReceiver.h"
 #include "Slider.h"
-#include "IDrivableSequencer.h"
 #include "TextEntry.h"
 
-class SongBuilder : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public IDrivableSequencer, public ITextEntryListener, public INoteReceiver
+class SongBuilder : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public ITextEntryListener, public INoteReceiver
 {
 public:
    SongBuilder();
@@ -55,10 +54,6 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendPressure(int pitch, int pressure) override {}
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-
-   //IDrivableSequencer
-   bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
-   void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -142,7 +137,6 @@ private:
       int mId{ -1 };
    };
 
-   bool mHasExternalPulseSource{ false };
    int mCurrentSection{ -1 };
 
    NoteInterval mInterval{ NoteInterval::kInterval_1n };

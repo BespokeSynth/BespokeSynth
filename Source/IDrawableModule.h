@@ -174,6 +174,7 @@ public:
    virtual void UpdateOldControlName(std::string& oldName) {}
    virtual bool LoadOldControl(FileStreamIn& in, std::string& oldName) { return false; }
    virtual bool CanModuleTypeSaveState() const { return true; }
+   bool IsSpawningOnTheFly(const ofxJSONElement& moduleInfo);
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}

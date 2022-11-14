@@ -1162,7 +1162,7 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
    else
       mOldVstPath = "";
 
-   if (!moduleInfo["onthefly"])
+   if (!IsSpawningOnTheFly(moduleInfo))
    {
       if (!moduleInfo["parameterversion"].isNull())
          mParameterVersion = moduleInfo["parameterversion"].asInt();

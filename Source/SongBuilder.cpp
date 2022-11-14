@@ -7,6 +7,7 @@
 #include "UIControlMacros.h"
 #include "FileStream.h"
 #include "PatchCableSource.h"
+#include "ofxJSONElement.h"
 
 namespace
 {
@@ -49,15 +50,6 @@ void SongBuilder::CreateUIControls()
    mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->SetShowing(false);
-
-   mSections.push_back(new SongSection("intro"));
-   mSections.push_back(new SongSection("verse"));
-   mSections.push_back(new SongSection("chorus"));
-   mSections.push_back(new SongSection("bridge"));
-   mSections.push_back(new SongSection("outro"));
-   mSections.push_back(new SongSection("done"));
-   for (auto* section : mSections)
-      section->CreateUIControls(this);
 }
 
 SongBuilder::~SongBuilder()
@@ -86,27 +78,17 @@ void SongBuilder::DrawModule()
 
 void SongBuilder::OnTimeEvent(double time)
 {
-   if (mHasExternalPulseSource)
-      return;
-
    OnStep(time, 1, 0);
-}
-
-void SongBuilder::OnPulse(double time, float velocity, int flags)
-{
-   mHasExternalPulseSource = true;
-   OnStep(time, velocity, flags);
 }
 
 void SongBuilder::OnStep(double time, float velocity, int flags)
 {
-   /*if (flags & kPulseFlag_Reset)
-      mStepIdx = -1;
+}
 
-   if (mEnabled)
-   {
-      mStepIdx = (mStepIdx + 1);
-   }*/
+void SongBuilder::OnPulse(double time, float velocity, int flags)
+{
+   if (velocity > 0 && mCurrentSection < (int)mSections.size() - 1)
+      SetActiveSection(time, mCurrentSection + 1);
 }
 
 void SongBuilder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -273,6 +255,20 @@ void SongBuilder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   if (IsSpawningOnTheFly(moduleInfo))
+   {
+      mSections.push_back(new SongSection("start"));
+      mSections.push_back(new SongSection("intro"));
+      mSections.push_back(new SongSection("verse"));
+      mSections.push_back(new SongSection("chorus"));
+      mSections.push_back(new SongSection("bridge"));
+      mSections.push_back(new SongSection("outro"));
+      mSections.push_back(new SongSection("done"));
+      for (auto* section : mSections)
+         section->CreateUIControls(this);
+   }
+
+   SetUpFromSaveData();
 }
 
 void SongBuilder::SetUpFromSaveData()
@@ -305,9 +301,6 @@ void SongBuilder::SaveState(FileStreamOut& out)
    }
 
    IDrawableModule::SaveState(out);
-
-   out << (int)mInterval;
-   out << mHasExternalPulseSource;
 }
 
 void SongBuilder::LoadState(FileStreamIn& in, int rev)
@@ -351,12 +344,6 @@ void SongBuilder::LoadState(FileStreamIn& in, int rev)
    }
 
    IDrawableModule::LoadState(in, rev);
-
-   int interval;
-   in >> interval;
-   mInterval = (NoteInterval)interval;
-
-   in >> mHasExternalPulseSource;
 }
 
 void SongBuilder::DuplicateSection(int sectionIndex)
@@ -562,7 +549,7 @@ IUIControl* SongBuilder::ControlTarget::GetTarget() const
 void SongBuilder::ControlTarget::TargetControlUpdated()
 {
    IUIControl* target = GetTarget();
-   mIsCheckbox = (dynamic_cast<Checkbox*>(target) != nullptr);
+   mIsCheckbox = (dynamic_cast<Checkbox*>(target) != nullptr || dynamic_cast<ClickButton*>(target) != nullptr);
 }
 
 void SongBuilder::ControlTarget::CleanUp()
