@@ -119,8 +119,8 @@ void UIGrid::Render()
          if (mCurrentHover == i + j * mCols && gHoveredUIControl == nullptr)
          {
             ofFill();
-            ofSetColor(255, 255, 0, 170);
-            ofRect(x + 2, y + 2, xsize - 4, ysize - 4);
+            ofSetColor(180, 180, 0, 160);
+            ofRect(x + 2, y + 2, std::min(xsize * mCurrentHoverAmount, xsize - 4), ysize - 4);
          }
       }
    }
@@ -209,6 +209,11 @@ bool UIGrid::CanAdjustMultislider() const
    return !mRequireShiftForMultislider || (GetKeyModifiers() & kModifier_Shift);
 }
 
+float UIGrid::GetSubdividedValue(float position) const
+{
+   return ofClamp(ceil(position * mClickSubdivisions) / mClickSubdivisions, 1.0f / mClickSubdivisions, 1);
+}
+
 void UIGrid::OnClicked(float x, float y, bool right)
 {
    if (right)
@@ -250,6 +255,7 @@ void UIGrid::OnClicked(float x, float y, bool right)
       else
       {
          float val = mStrength;
+
          if (mSingleColumn)
          {
             for (int i = 0; i < MAX_GRID_SIZE; ++i)
@@ -259,7 +265,10 @@ void UIGrid::OnClicked(float x, float y, bool right)
             }
          }
 
-         if (mData[dataIndex] > 0)
+         if (mClickSubdivisions != 1)
+            val = GetSubdividedValue(clickWidth);
+
+         if (mData[dataIndex] == val)
          {
             mData[dataIndex] = 0;
             mLastClickWasClear = true;
@@ -328,10 +337,28 @@ bool UIGrid::MouseMoved(float x, float y)
       cell.mRow = mHoldRow;
    }
 
+   if (mGridMode == kHorislider && CanAdjustMultislider())
+   {
+      if (cell.mCol > mHoldCol)
+         clickWidth = 1;
+      if (cell.mCol < mHoldCol)
+         clickWidth = 0;
+      cell.mCol = mHoldCol;
+   }
+
    if (isMouseOver)
+   {
       mCurrentHover = cell.mCol + cell.mRow * mCols;
+
+      if (mClickSubdivisions != -1)
+         mCurrentHoverAmount = GetSubdividedValue(clickWidth);
+      else
+         mCurrentHoverAmount = 1;
+   }
    else if (!mClick)
+   {
       mCurrentHover = -1;
+   }
 
    if (mClick && !mMomentary)
    {
@@ -349,6 +376,7 @@ bool UIGrid::MouseMoved(float x, float y)
       else if (mGridMode == kHorislider)
       {
          float val = mHoldVal;
+         mHoldCol = cell.mCol;
 
          if (mSingleColumn)
          {
@@ -361,6 +389,8 @@ bool UIGrid::MouseMoved(float x, float y)
 
          if (CanAdjustMultislider())
             val = clickWidth;
+         if (mClickSubdivisions != 1)
+            val = GetSubdividedValue(clickWidth);
 
          mData[dataIndex] = val;
       }
