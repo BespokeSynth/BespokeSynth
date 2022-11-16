@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__NoteStepSequencer__
-#define __modularSynth__NoteStepSequencer__
+#pragma once
 
 #include <iostream>
 #include "INoteReceiver.h"
@@ -219,6 +218,3 @@ private:
    IntSlider* mGridControlOffsetXSlider{ nullptr };
    IntSlider* mGridControlOffsetYSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__NoteStepSequencer__) */
