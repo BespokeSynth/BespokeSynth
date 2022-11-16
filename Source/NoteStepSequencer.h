@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__NoteStepSequencer__
-#define __modularSynth__NoteStepSequencer__
+#pragma once
 
 #include <iostream>
 #include "INoteReceiver.h"
@@ -160,14 +159,11 @@ private:
    int mArpIndex{ -1 };
 
    DropdownList* mIntervalSelector{ nullptr };
-   Checkbox* mRepeatIsHoldCheckbox{ nullptr };
    UIGrid* mGrid{ nullptr };
    UIGrid* mVelocityGrid{ nullptr };
    int mLastPitch{ -1 };
-   int mLastVel{ 0 };
    int mLastStepIndex{ -1 };
    float mLastNoteLength{ 1 };
-   double mLastNoteStartTime{ 0 };
    double mLastNoteEndTime{ 0 };
    bool mAlreadyDidNoteOff{ false };
    int mOctave{ 3 };
@@ -176,6 +172,7 @@ private:
    DropdownList* mNoteModeSelector{ nullptr };
    IntSlider* mLoopResetPointSlider{ nullptr };
    int mLoopResetPoint{ 0 };
+   int mStepLengthSubdivisions{ 2 };
 
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
@@ -191,8 +188,7 @@ private:
    ClickButton* mClearButton{ nullptr };
 
    ClickButton* mRandomizePitchButton{ nullptr };
-   ClickButton* mRandomizeLengthButton{ nullptr };
-   ClickButton* mRandomizeVelocityButton{ nullptr };
+   ClickButton* mRandomizeAllButton{ nullptr };
    float mRandomizePitchChance{ 1 };
    int mRandomizePitchVariety{ 4 };
    float mRandomizeLengthChance{ 1 };
@@ -222,6 +218,3 @@ private:
    IntSlider* mGridControlOffsetXSlider{ nullptr };
    IntSlider* mGridControlOffsetYSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__NoteStepSequencer__) */

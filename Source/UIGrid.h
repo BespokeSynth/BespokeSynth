@@ -91,6 +91,8 @@ public:
    void SetMomentary(bool momentary) { mMomentary = momentary; }
    const std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& GetData() const { return mData; }
    void SetData(std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& data) { mData = data; }
+   void SetClickValueSubdivisions(int subdivisions) { mClickSubdivisions = subdivisions; }
+   float GetSubdividedValue(float position) const;
 
    enum GridMode
    {
@@ -152,6 +154,7 @@ private:
    bool mFlip{ false };
    float mStrength{ 1 };
    int mCurrentHover{ -1 };
+   float mCurrentHoverAmount{ 1 };
    UIGridListener* mListener{ nullptr };
    std::array<float, MAX_GRID_SIZE> mDrawOffset{};
    GridMode mGridMode{ GridMode::kNormal };
@@ -159,6 +162,7 @@ private:
    bool mRequireShiftForMultislider{ false };
    bool mShouldDrawValue{ false };
    bool mMomentary{ false };
+   int mClickSubdivisions{ 1 };
 };
 
 #endif /* defined(__modularSynth__Grid__) */
