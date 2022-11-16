@@ -24,7 +24,7 @@ jobs:
         windows-x64:
           imageName: 'windows-2019'
           isWindows: True
-          cmakeArguments: "-A x64"
+          cmakeArguments: "-A x64 -DBESPOKE_PYTHON_ROOT='C:/hostedtoolcache/windows/Python/3.10.8/x64'"
           cmakeTarget: "BespokeSynth"
         code-formatting:
           imageName: 'ubuntu-20.04'
@@ -119,13 +119,6 @@ jobs:
           sudo installer -pkg python-3.10.0post2-macos11.pkg -target /
         condition: variables.isMac
         displayName: mac - install dependencies needed for distribution build
-
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.10.8'
-          addToPath: true
-          architecture: 'x64'
-        condition: variables.isWindows
 
       - task: InstallAppleCertificate@2
         inputs:
