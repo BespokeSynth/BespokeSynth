@@ -2093,6 +2093,8 @@ void ModularSynth::ArrangeAudioSourceDependencies()
 
 void ModularSynth::ResetLayout()
 {
+   ofLog() << "blah";
+   
    mMainComponent->getTopLevelComponent()->setName("bespoke synth");
    mCurrentSaveStatePath = "";
 
