@@ -37,7 +37,6 @@
 
 NoteStepSequencer::NoteStepSequencer()
 {
-
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {
       mVels[i] = ofRandom(1) < .5f ? 127 : 0;
