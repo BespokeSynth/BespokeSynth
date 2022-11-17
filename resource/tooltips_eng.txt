@@ -476,6 +476,7 @@ notesinger~output a note based on a detected pitch
 
 notesequencer~looping sequence of notes at an interval. pair with a "pulser" module for more interesting step control. hold "shift" to adjust step length.
 ~interval~note length
+~random~randomize pitch, length, and velocity of all steps.
 ~pitch~randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.
 ~len~randomize the length of each step's note.
 ~vel~randomize the velocity of each step's note.
@@ -493,7 +494,7 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 ~x offset~x offset of attached grid controller
 ~y offset~y offset of attached grid controller
 ~rand pitch chance~when clicking the random pitch button, what is the chance that a step gets changed?
-~rand pitch range~when clicking the random pitch button, how far will the pitch change?
+~rand pitch variety~how many different random pitches should we generate?
 ~rand len chance~when clicking the random length button, what is the chance that a step gets changed?
 ~rand len range~when clicking the random length button, how much will the length change?
 ~rand vel chance~when clicking the random velocity button, what is the chance that a step gets changed?
