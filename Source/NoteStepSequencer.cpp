@@ -54,12 +54,16 @@ void NoteStepSequencer::CreateUIControls()
    UIBLOCK(130);
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40);
    UIBLOCK_SHIFTRIGHT();
-   UIBLOCK_SHIFTX(58);
+   UIBLOCK_SHIFTX(4)
+   BUTTON(mRandomizeAllButton, "random");
+   UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomizePitchButton, "pitch");
    UIBLOCK_SHIFTRIGHT();
-   BUTTON(mRandomizeAllButton, "all");
+   BUTTON(mRandomizeVelocityButton, "vel");
    UIBLOCK_SHIFTRIGHT();
-   UIBLOCK_SHIFTX(30);
+   BUTTON(mRandomizeLengthButton, "len");
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(8);
    UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
    UIBLOCK_SHIFTRIGHT();
    INTSLIDER(mGridControlOffsetXSlider, "x offset", &mGridControlOffsetX, 0, 16);
@@ -142,8 +146,6 @@ void NoteStepSequencer::CreateUIControls()
 
    mLoopResetPointSlider->SetShowing(mHasExternalPulseSource);
 
-   mRandomizeAllButton->PositionTo(mRandomizePitchButton, kAnchor_Right);
-
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {
       mStepCables[i] = new AdditionalNoteCable();
@@ -204,8 +206,10 @@ void NoteStepSequencer::DrawModule()
    mShiftBackButton->Draw();
    mShiftForwardButton->Draw();
    mClearButton->Draw();
-   mRandomizePitchButton->Draw();
    mRandomizeAllButton->Draw();
+   mRandomizePitchButton->Draw();
+   mRandomizeLengthButton->Draw();
+   mRandomizeVelocityButton->Draw();
    mLoopResetPointSlider->Draw();
    mGridControlTarget->Draw();
    mGridControlOffsetXSlider->Draw();
@@ -248,8 +252,6 @@ void NoteStepSequencer::DrawModule()
              squareh * controllerRows);
       ofPopStyle();
    }
-
-   DrawTextRightJustify("random:", 102, 14);
 
    ofPushStyle();
    ofFill();
@@ -860,48 +862,26 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button, double time)
          mVels[i] = 0;
       SyncGridToSeq();
    }
+   if (button == mRandomizeAllButton)
+   {
+      RandomizePitches(GetKeyModifiers() & kModifier_Shift);
+      RandomizeVelocities();
+      RandomizeLengths();
+      SyncGridToSeq();
+   }
    if (button == mRandomizePitchButton)
    {
       RandomizePitches(GetKeyModifiers() & kModifier_Shift);
       SyncGridToSeq();
    }
-   if (button == mRandomizeAllButton)
+   if (button == mRandomizeVelocityButton)
    {
-      RandomizePitches(GetKeyModifiers() & kModifier_Shift);
-
-      for (int i = 0; i < mLength; ++i)
-      {
-         if (ofRandom(1) <= mRandomizeLengthChance)
-         {
-            float newLength = ofClamp(ofRandom(2), FLT_EPSILON, 1);
-            mNoteLengths[i] = ofLerp(mNoteLengths[i], newLength, mRandomizeLengthRange);
-         }
-
-         if (ofRandom(1) <= mRandomizeVelocityChance)
-         {
-            int newVelocity = 0;
-            if (ofRandom(1) < mRandomizeVelocityDensity)
-            {
-               switch (gRandom() % 4)
-               {
-                  case 0:
-                     newVelocity = 50;
-                     break;
-                  case 1:
-                     newVelocity = 80;
-                     break;
-                  case 2:
-                     newVelocity = 110;
-                     break;
-                  default:
-                     newVelocity = 127;
-                     break;
-               }
-            }
-
-            mVels[i] = newVelocity;
-         }
-      }
+      RandomizeVelocities();
+      SyncGridToSeq();
+   }
+   if (button == mRandomizeLengthButton)
+   {
+      RandomizeLengths();
       SyncGridToSeq();
    }
 }
@@ -946,6 +926,49 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
       {
          if (ofRandom(1) <= mRandomizePitchChance)
             mTones[i] = newTones[gRandom() % newTones.size()];
+      }
+   }
+}
+
+void NoteStepSequencer::RandomizeVelocities()
+{
+   for (int i = 0; i < mLength; ++i)
+   {
+      if (ofRandom(1) <= mRandomizeVelocityChance)
+      {
+         int newVelocity = 0;
+         if (ofRandom(1) < mRandomizeVelocityDensity)
+         {
+            switch (gRandom() % 4)
+            {
+               case 0:
+                  newVelocity = 50;
+                  break;
+               case 1:
+                  newVelocity = 80;
+                  break;
+               case 2:
+                  newVelocity = 110;
+                  break;
+               default:
+                  newVelocity = 127;
+                  break;
+            }
+         }
+
+         mVels[i] = newVelocity;
+      }
+   }
+}
+
+void NoteStepSequencer::RandomizeLengths()
+{
+   for (int i = 0; i < mLength; ++i)
+   {
+      if (ofRandom(1) <= mRandomizeLengthChance)
+      {
+         float newLength = ofClamp(ofRandom(2), FLT_EPSILON, 1);
+         mNoteLengths[i] = ofLerp(mNoteLengths[i], newLength, mRandomizeLengthRange);
       }
    }
 }
@@ -1020,7 +1043,6 @@ void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double t
 void NoteStepSequencer::SyncGridToSeq()
 {
    mGrid->Clear();
-   mVelocityGrid->Clear();
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {
       if (mTones[i] < 0)

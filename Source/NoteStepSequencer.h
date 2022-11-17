@@ -140,6 +140,8 @@ private:
    float ExtraWidth() const;
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
+   void RandomizeVelocities();
+   void RandomizeLengths();
    void Step(double time, float velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
 
@@ -187,8 +189,10 @@ private:
    ClickButton* mShiftForwardButton{ nullptr };
    ClickButton* mClearButton{ nullptr };
 
-   ClickButton* mRandomizePitchButton{ nullptr };
    ClickButton* mRandomizeAllButton{ nullptr };
+   ClickButton* mRandomizePitchButton{ nullptr };
+   ClickButton* mRandomizeLengthButton{ nullptr };
+   ClickButton* mRandomizeVelocityButton{ nullptr };
    float mRandomizePitchChance{ 1 };
    int mRandomizePitchVariety{ 4 };
    float mRandomizeLengthChance{ 1 };
