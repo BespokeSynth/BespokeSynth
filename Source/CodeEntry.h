@@ -81,6 +81,7 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool IsTextEntry() const override { return true; }
+   bool GetNoHover() const override { return true; }
 
    ofVec2f GetLinePos(int lineNum, bool end, bool published = true);
    float GetCharHeight() const { return mCharHeight; }

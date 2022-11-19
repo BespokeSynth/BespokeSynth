@@ -667,7 +667,7 @@ void ModularSynth::Draw(void* vg)
    }
    else if (HelpDisplay::sShowTooltips &&
             !mHideTooltipsUntilMouseMove &&
-            !IUIControl::WasLastHoverSetViaTab() &&
+            !IUIControl::WasLastHoverSetManually() &&
             mGroupSelectContext == nullptr &&
             PatchCable::sActivePatchCable == nullptr &&
             mGroupSelectedModules.empty() &&
@@ -936,19 +936,22 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    {
       if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
       {
-         float inc;
-         if (key == OF_KEY_LEFT)
-            inc = -1;
-         else if (key == OF_KEY_RIGHT)
-            inc = 1;
-         else if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
-                  (key == OF_KEY_UP && gHoveredUIControl->InvertScrollDirection() == true))
-            inc = -1;
-         else
-            inc = 1;
-         if (GetKeyModifiers() & kModifier_Shift)
-            inc *= .01f;
-         gHoveredUIControl->Increment(inc);
+         if (GetKeyModifiers() != kModifier_Command)
+         {
+            float inc;
+            if (key == OF_KEY_LEFT)
+               inc = -1;
+            else if (key == OF_KEY_RIGHT)
+               inc = 1;
+            else if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
+                     (key == OF_KEY_UP && gHoveredUIControl->InvertScrollDirection() == true))
+               inc = -1;
+            else
+               inc = 1;
+            if (GetKeyModifiers() & kModifier_Shift)
+               inc *= .01f;
+            gHoveredUIControl->Increment(inc);
+         }
       }
       else if (key == '[')
       {
@@ -1009,9 +1012,26 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    if (key == OF_KEY_TAB)
    {
       if (GetKeyModifiers() == kModifier_Shift)
-         IUIControl::SetNewManualHover(-1);
+         IUIControl::SetNewManualHoverViaTab(-1);
       else
-         IUIControl::SetNewManualHover(1);
+         IUIControl::SetNewManualHoverViaTab(1);
+   }
+
+   if (key == OF_KEY_LEFT || key == OF_KEY_RIGHT || key == OF_KEY_UP || key == OF_KEY_DOWN)
+   {
+      if (GetKeyModifiers() == kModifier_Command)
+      {
+         ofVec2f dir;
+         if (key == OF_KEY_LEFT)
+            dir = ofVec2f(-1, 0);
+         if (key == OF_KEY_RIGHT)
+            dir = ofVec2f(1, 0);
+         if (key == OF_KEY_UP)
+            dir = ofVec2f(0, -1);
+         if (key == OF_KEY_DOWN)
+            dir = ofVec2f(0, 1);
+         IUIControl::SetNewManualHoverViaArrow(dir);
+      }
    }
 
    if (key == OF_KEY_RETURN)
@@ -1429,7 +1449,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
    if (gHoveredUIControl != nullptr &&
        gHoveredUIControl->GetModuleParent() && !gHoveredUIControl->GetModuleParent()->IsDeleted() && !gHoveredUIControl->GetModuleParent()->IsHoveringOverResizeHandle() &&
-       !IUIControl::WasLastHoverSetViaTab() &&
+       !IUIControl::WasLastHoverSetManually() &&
        mGroupSelectedModules.empty() &&
        mQuickSpawn->IsShowing() == false &&
        (GetTopModalFocusItem() == nullptr || gHoveredUIControl->GetModuleParent() == GetTopModalFocusItem()))

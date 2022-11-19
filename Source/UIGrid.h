@@ -93,6 +93,7 @@ public:
    void SetData(std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& data) { mData = data; }
    void SetClickValueSubdivisions(int subdivisions) { mClickSubdivisions = subdivisions; }
    float GetSubdividedValue(float position) const;
+   bool GetNoHover() const override { return true; }
 
    enum GridMode
    {

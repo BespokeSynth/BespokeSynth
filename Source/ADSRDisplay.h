@@ -63,6 +63,7 @@ public:
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
+   bool GetNoHover() const override { return true; }
 
    enum DisplayMode
    {
