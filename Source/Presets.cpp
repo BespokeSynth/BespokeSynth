@@ -78,7 +78,7 @@ void Presets::Init()
 
    int defaultPreset = mModuleSaveData.GetInt("defaultpreset");
    if (defaultPreset != -1)
-      SetPreset(defaultPreset, gTime, false);
+      SetPreset(defaultPreset, gTime);
 
    TheTransport->AddAudioPoller(this);
 }
@@ -87,7 +87,7 @@ void Presets::Poll()
 {
    if (mQueuedPresetIndex != -1)
    {
-      SetPreset(mQueuedPresetIndex, NextBufferTime(false), false);
+      SetPreset(mQueuedPresetIndex, NextBufferTime(false));
       mQueuedPresetIndex = -1;
    }
 
@@ -183,7 +183,7 @@ void Presets::OnClicked(float x, float y, bool right)
       if (GetKeyModifiers() == kModifier_Shift)
          Store(mCurrentPreset);
       else
-         SetPreset(mCurrentPreset, NextBufferTime(false), false);
+         SetPreset(mCurrentPreset, NextBufferTime(false));
 
       UpdateGridValues();
    }
@@ -201,14 +201,14 @@ void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    if (pitch < (int)mPresetCollection.size())
    {
       mCurrentPreset = pitch;
-      SetPreset(pitch, time, true);
+      SetPreset(pitch, time);
       UpdateGridValues();
    }
 }
 
-void Presets::SetPreset(int idx, double time, bool queueForMainThread)
+void Presets::SetPreset(int idx, double time)
 {
-   if (queueForMainThread && !mForceImmediateSet)
+   if (!mAllowSetOnAudioThread && IsAudioThread())
    {
       mQueuedPresetIndex = idx;
       return;
@@ -433,7 +433,7 @@ void Presets::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mCurrentPresetSlider)
    {
-      SetPreset(mCurrentPreset, time, true);
+      SetPreset(mCurrentPreset, time);
       UpdateGridValues();
    }
 }
@@ -477,7 +477,7 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
    mModuleSaveData.LoadFloat("gridheight", moduleInfo, 50, 15, 1000);
-   mModuleSaveData.LoadBool("force_immediate_set", moduleInfo, false);
+   mModuleSaveData.LoadBool("allow_set_on_audio_thread", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -485,7 +485,7 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 void Presets::SetUpFromSaveData()
 {
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
-   mForceImmediateSet = mModuleSaveData.GetBool("force_immediate_set");
+   mAllowSetOnAudioThread = mModuleSaveData.GetBool("allow_set_on_audio_thread");
 }
 
 void Presets::SaveState(FileStreamOut& out)

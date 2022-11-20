@@ -144,6 +144,7 @@ public:
       mLoopStartMeasure = -1;
       mLoopEndMeasure = -1;
    }
+   void SetQueuedMeasure(int measure) { mQueuedMeasure = measure; }
    double GetMeasureFraction(NoteInterval interval);
    int GetStepsPerMeasure(ITimeListener* listener);
    int GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length = -1);
@@ -210,6 +211,7 @@ private:
    FloatSlider* mTempoSlider{ nullptr };
    int mLoopStartMeasure{ -1 };
    int mLoopEndMeasure{ -1 };
+   int mQueuedMeasure{ -1 };
    bool mWantSetRandomTempo{ false };
 
    std::list<TransportListenerInfo> mListeners;

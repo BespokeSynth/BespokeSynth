@@ -58,7 +58,7 @@ public:
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void TextEntryComplete(TextEntry* entry) override {}
+   void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -76,8 +76,20 @@ private:
 
    void OnStep(double time, float velocity, int flags);
    void SetActiveSection(double time, int newSection);
+   void SetActiveSectionById(double time, int newSectionId);
    void DuplicateSection(int sectionIndex);
    void AddTarget();
+   bool ShowSongSequencer() const { return mUseSequencer; }
+   void RefreshSequencerDropdowns();
+
+   enum class ContextMenuItems
+   {
+      kNone,
+      kDuplicate,
+      kDelete,
+      kMoveUp,
+      kMoveDown
+   };
 
    struct ControlTarget
    {
@@ -112,21 +124,12 @@ private:
       : mName(name)
       {}
       void CreateUIControls(SongBuilder* owner);
-      void Draw(float x, float y, int sectionIndex, bool isCurrentSection);
+      void Draw(SongBuilder* owner, float x, float y, int sectionIndex);
       void TargetControlUpdated(SongBuilder::ControlTarget* target, int targetIndex, bool wasManuallyPatched);
       void AddValue(SongBuilder* owner);
       void MoveValue(int index, int amount);
       float GetWidth() const;
       void CleanUp();
-
-      enum class ContextMenuItems
-      {
-         kNone,
-         kDuplicate,
-         kDelete,
-         kMoveUp,
-         kMoveDown
-      };
 
       std::string mName{};
       TextEntry* mNameEntry{ nullptr };
@@ -138,11 +141,32 @@ private:
    };
 
    int mCurrentSection{ -1 };
+   int mQueuedSection{ -1 };
+   int mSequenceStepIndex{ -1 };
+   int mSequenceStepMeasureCount{ 0 };
+   int mSequenceStartStepIndex{ 0 };
+   bool mSequenceStartQueued{ false };
+   bool mSequencePaused{ false };
 
-   NoteInterval mInterval{ NoteInterval::kInterval_1n };
-   DropdownList* mIntervalSelector{ nullptr };
+   static const int kMaxSequencerSections = 128;
+   static const int kSequenceEndId = -1;
+   static const int kSequenceLoopId = -2;
+
+   bool mUseSequencer{ false };
+   Checkbox* mUseSequencerCheckbox{ nullptr };
+   NoteInterval mChangeQuantizeInterval{ NoteInterval::kInterval_None };
+   DropdownList* mChangeQuantizeSelector{ nullptr };
+   ClickButton* mAddTargetButton{ nullptr };
+   ClickButton* mPlaySequenceButton{ nullptr };
+   ClickButton* mStopSequenceButton{ nullptr };
+   ClickButton* mPauseSequenceButton{ nullptr };
+   std::array<int, kMaxSequencerSections> mSequencerSectionId{};
+   std::array<DropdownList*, kMaxSequencerSections> mSequencerSectionSelector{};
+   std::array<int, kMaxSequencerSections> mSequencerStepLength{};
+   std::array<TextEntry*, kMaxSequencerSections> mSequencerStepLengthEntry{};
+   std::array<DropdownList*, kMaxSequencerSections> mSequencerContextMenu{};
+   std::array<ContextMenuItems, kMaxSequencerSections> mSequencerContextMenuSelection{};
 
    std::vector<SongSection*> mSections{};
    std::vector<ControlTarget*> mTargets{};
-   ClickButton* mAddTargetButton{ nullptr };
 };

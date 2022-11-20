@@ -1,3 +1,20 @@
+/**
+bespoke synth, a software modular synthesizer
+Copyright (C) 2022 Ryan Challinor (contact: awwbees@gmail.com)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+**/
 //
 // Created by Ryan Challinor on 11/05/22.
 //
@@ -11,7 +28,8 @@
 
 namespace
 {
-   const float kGridStartX = 3;
+   const float kLeftMarginX = 3;
+   const float kSongSequencerWidth = 160;
    const float kGridStartY = 20;
    const float kSectionTabWidth = 160;
    const float kTargetTabHeightTop = 30;
@@ -24,13 +42,22 @@ namespace
 
 SongBuilder::SongBuilder()
 {
+   for (int i = 0; i < kMaxSequencerSections; ++i)
+   {
+      mSequencerSectionId[i] = -1;
+      mSequencerSectionSelector[i] = nullptr;
+      mSequencerStepLength[i] = 4;
+      mSequencerStepLengthEntry[i] = nullptr;
+      mSequencerContextMenu[i] = nullptr;
+      mSequencerContextMenuSelection[i] = ContextMenuItems::kNone;
+   }
 }
 
 void SongBuilder::Init()
 {
    IDrawableModule::Init();
 
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
+   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(gBufferSizeMs, true), true);
 
    SetActiveSection(gTime, 0);
 }
@@ -40,16 +67,38 @@ void SongBuilder::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40);
+   CHECKBOX(mUseSequencerCheckbox, "use sequencer", &mUseSequencer);
+   BUTTON_STYLE(mPlaySequenceButton, "play", ButtonDisplayStyle::kPlay);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON_STYLE(mStopSequenceButton, "stop", ButtonDisplayStyle::kStop);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON_STYLE(mPauseSequenceButton, "pause", ButtonDisplayStyle::kPause);
+   UIBLOCK_NEWLINE();
+   for (int i = 0; i < kMaxSequencerSections; ++i)
+   {
+      DROPDOWN(mSequencerSectionSelector[i], ("section" + ofToString(i)).c_str(), &mSequencerSectionId[i], 80);
+      mSequencerSectionSelector[i]->SetDrawTriangle(false);
+      UIBLOCK_SHIFTRIGHT();
+      TEXTENTRY_NUM(mSequencerStepLengthEntry[i], ("bars" + ofToString(i)).c_str(), 4, &mSequencerStepLength[i], 1, 999);
+      UIBLOCK_SHIFTRIGHT();
+      DROPDOWN(mSequencerContextMenu[i], ("contextmenu" + ofToString(i)).c_str(), ((int*)&mSequencerContextMenuSelection[i]), 20);
+      mSequencerContextMenu[i]->AddLabel("duplicate", (int)ContextMenuItems::kDuplicate);
+      mSequencerContextMenu[i]->AddLabel("delete", (int)ContextMenuItems::kDelete);
+      mSequencerContextMenu[i]->AddLabel("move up", (int)ContextMenuItems::kMoveUp);
+      mSequencerContextMenu[i]->AddLabel("move down", (int)ContextMenuItems::kMoveDown);
+      mSequencerContextMenu[i]->SetDisplayStyle(DropdownDisplayStyle::kHamburger);
+      UIBLOCK_NEWLINE();
+   }
    ENDUIBLOCK0();
 
-   mAddTargetButton = new ClickButton(this, "add target", kGridStartX + kSectionTabWidth - 22, kGridStartY + 8, ButtonDisplayStyle::kPlus);
+   mChangeQuantizeSelector = new DropdownList(this, "change quantize", -1, -1, (int*)(&mChangeQuantizeInterval));
+   mAddTargetButton = new ClickButton(this, "add target", -1, -1, ButtonDisplayStyle::kPlus);
 
-   mIntervalSelector->AddLabel("4", kInterval_4);
-   mIntervalSelector->AddLabel("3", kInterval_3);
-   mIntervalSelector->AddLabel("2", kInterval_2);
-   mIntervalSelector->AddLabel("1n", kInterval_1n);
-   mIntervalSelector->SetShowing(false);
+   mChangeQuantizeSelector->AddLabel("none", kInterval_None);
+   mChangeQuantizeSelector->AddLabel("1n", kInterval_1n);
+   mChangeQuantizeSelector->AddLabel("2", kInterval_2);
+   mChangeQuantizeSelector->AddLabel("3", kInterval_3);
+   mChangeQuantizeSelector->AddLabel("4", kInterval_4);
 }
 
 SongBuilder::~SongBuilder()
@@ -62,27 +111,109 @@ void SongBuilder::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   mIntervalSelector->Draw();
+   int gridStartX = kLeftMarginX;
+   if (ShowSongSequencer())
+      gridStartX += kSongSequencerWidth;
+
+   mUseSequencerCheckbox->Draw();
+   mChangeQuantizeSelector->SetPosition(gridStartX, kGridStartY + kTargetTabHeightTop - 15);
+   mChangeQuantizeSelector->Draw();
+   mAddTargetButton->SetPosition(gridStartX + kSectionTabWidth - 22, kGridStartY + 8);
    mAddTargetButton->Draw();
+   mPlaySequenceButton->SetShowing(ShowSongSequencer());
+   mPlaySequenceButton->Draw();
+   mStopSequenceButton->SetShowing(ShowSongSequencer());
+   mStopSequenceButton->Draw();
+   mPauseSequenceButton->SetShowing(ShowSongSequencer());
+   mPauseSequenceButton->Draw();
 
    for (int i = 0; i < (int)mSections.size(); ++i)
-      mSections[i]->Draw(kGridStartX, kGridStartY + kTargetTabHeightTop + kSpacingY + i * (kRowHeight + kSpacingY), i, mCurrentSection == i);
+      mSections[i]->Draw(this, gridStartX, kGridStartY + kTargetTabHeightTop + kSpacingY + i * (kRowHeight + kSpacingY), i);
 
    for (int i = 0; i < (int)mTargets.size(); ++i)
-      mTargets[i]->Draw(kGridStartX + kSectionTabWidth + i * (kColumnWidth + kSpacingX), kGridStartY, (int)mSections.size());
+      mTargets[i]->Draw(gridStartX + kSectionTabWidth + i * (kColumnWidth + kSpacingX), kGridStartY, (int)mSections.size());
 
-   ofPushStyle();
+   bool sequenceComplete = false;
+   for (int i = 0; i < kMaxSequencerSections; ++i)
+   {
+      bool show = mUseSequencer && !sequenceComplete;
+      mSequencerSectionSelector[i]->SetShowing(show);
+      mSequencerStepLengthEntry[i]->SetShowing(show && mSequencerSectionId[i] != kSequenceEndId);
+      mSequencerContextMenu[i]->SetShowing(show && mSequencerSectionId[i] >= 0);
+      mSequencerSectionSelector[i]->Draw();
+      mSequencerStepLengthEntry[i]->Draw();
+      mSequencerContextMenu[i]->Draw();
+      if (mSequencerSectionId[i] < 0)
+         sequenceComplete = true;
+   }
 
-   ofPopStyle();
+   if (mSequenceStepIndex != -1)
+   {
+      ofPushStyle();
+      ofFill();
+
+      if (!mSequenceStartQueued)
+      {
+         ofSetColor(0, 255, 0, 100);
+         ofRectangle lengthEntryRect = mSequencerStepLengthEntry[mSequenceStepIndex]->GetRect(K(local));
+         float progress = MIN((TheTransport->GetMeasurePos(NextBufferTime(false)) + mSequenceStepMeasureCount) / mSequencerStepLength[mSequenceStepIndex], 1.0f);
+         lengthEntryRect.width *= progress;
+         ofRect(lengthEntryRect);
+      }
+
+      if (mSequencePaused)
+      {
+         ofSetColor(0, 0, 255, 100);
+         ofRectangle pauseButtonRect = mPauseSequenceButton->GetRect(K(local));
+         ofRect(pauseButtonRect);
+      }
+      else
+      {
+         ofSetColor(0, 255, 0, 100);
+         ofRectangle playButtonRect = mPlaySequenceButton->GetRect(K(local));
+         ofRect(playButtonRect);
+      }
+
+      ofPopStyle();
+   }
 }
 
 void SongBuilder::OnTimeEvent(double time)
 {
-   OnStep(time, 1, 0);
-}
+   if (mQueuedSection != -1 && TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset) % (int)TheTransport->GetMeasureFraction(mChangeQuantizeInterval) == 0)
+   {
+      SetActiveSection(time, mQueuedSection);
+      mQueuedSection = -1;
+   }
 
-void SongBuilder::OnStep(double time, float velocity, int flags)
-{
+   if (mSequenceStepIndex != -1)
+   {
+      ++mSequenceStepMeasureCount;
+      if (mSequenceStepMeasureCount >= mSequencerStepLength[mSequenceStepIndex] && !mSequencePaused)
+      {
+         mSequenceStepMeasureCount = 0;
+         ++mSequenceStepIndex;
+         if (mSequencerSectionId[mSequenceStepIndex] == kSequenceLoopId)
+            mSequenceStepIndex = mSequencerStepLength[mSequenceStepIndex]; //use length as destination index
+
+         if (mSequencerSectionId[mSequenceStepIndex] == kSequenceEndId)
+         {
+            mSequenceStepIndex = -1; //all done!
+         }
+         else
+         {
+            SetActiveSectionById(time, mSequencerSectionId[mSequenceStepIndex]);
+            TheTransport->SetQueuedMeasure(0);
+         }
+      }
+   }
+
+   if (mSequenceStartQueued)
+   {
+      mSequenceStepIndex = mSequenceStartStepIndex;
+      SetActiveSectionById(time, mSequencerSectionId[mSequenceStepIndex]);
+      mSequenceStartQueued = false;
+   }
 }
 
 void SongBuilder::OnPulse(double time, float velocity, int flags)
@@ -95,6 +226,18 @@ void SongBuilder::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 {
    if (velocity > 0 && pitch < (int)mSections.size())
       SetActiveSection(time, pitch);
+}
+
+void SongBuilder::SetActiveSectionById(double time, int newSectionId)
+{
+   for (int i = 0; i < (int)mSections.size(); ++i)
+   {
+      if (mSections[i]->mId == newSectionId)
+      {
+         SetActiveSection(time, i);
+         break;
+      }
+   }
 }
 
 void SongBuilder::SetActiveSection(double time, int newSection)
@@ -120,10 +263,38 @@ void SongBuilder::SetActiveSection(double time, int newSection)
    mCurrentSection = newSection;
 }
 
+void SongBuilder::RefreshSequencerDropdowns()
+{
+   for (int i = 0; i < kMaxSequencerSections; ++i)
+   {
+      mSequencerSectionSelector[i]->Clear();
+      mSequencerSectionSelector[i]->AddLabel("-stop-", -1);
+      for (auto* section : mSections)
+         mSequencerSectionSelector[i]->AddLabel(section->mName, section->mId);
+      mSequencerSectionSelector[i]->AddLabel("-loop-", -2);
+   }
+}
+
 void SongBuilder::GetModuleDimensions(float& width, float& height)
 {
-   width = kGridStartX + kSectionTabWidth + (int)mTargets.size() * (kColumnWidth + kSpacingX) + 3;
+   width = kLeftMarginX + kSectionTabWidth + (int)mTargets.size() * (kColumnWidth + kSpacingX) + 3;
+   if (ShowSongSequencer())
+      width += kSongSequencerWidth;
    height = kGridStartY + kTargetTabHeightTop + kTargetTabHeightBottom + kSpacingY + (int)mSections.size() * (kRowHeight + kSpacingY) + 3;
+
+   if (ShowSongSequencer())
+   {
+      for (int i = 0; i < kMaxSequencerSections; ++i)
+      {
+         if (i == kMaxSequencerSections - 1 || mSequencerSectionId[i] < 0)  //end of sequence
+         {
+            ofRectangle rect = mSequencerSectionSelector[i]->GetRect(K(local));
+            if (rect.getMaxY() + 3 > height)
+               height = rect.getMaxY() + 3;
+            break;
+         }
+      }
+   }
 }
 
 void SongBuilder::PostRepatch(PatchCableSource* cable, bool fromUserClick)
@@ -154,10 +325,51 @@ void SongBuilder::PostRepatch(PatchCableSource* cable, bool fromUserClick)
 
 void SongBuilder::ButtonClicked(ClickButton* button, double time)
 {
+   if (button == mPlaySequenceButton)
+   {
+      if (mSequencePaused)
+      {
+         mSequencePaused = false;
+      }
+      else
+      {
+         mSequenceStepIndex = mSequenceStartStepIndex;
+         mSequenceStepMeasureCount = 0;
+         mSequencePaused = false;
+         mSequenceStartQueued = true;
+         TheTransport->SetQueuedMeasure(0);
+      }
+   }
+
+   if (button == mStopSequenceButton)
+   {
+      mSequenceStartQueued = false;
+      mSequenceStepIndex = -1;
+      mSequencePaused = false;
+   }
+
+   if (button == mPauseSequenceButton)
+   {
+      if (mSequencePaused)
+      {
+         mSequencePaused = false;
+      }
+      else if (mSequenceStepIndex != -1)
+      {
+         mSequencePaused = true;
+         mSequenceStepMeasureCount = mSequencerStepLength[mSequenceStepIndex];
+      }
+   }
+
    for (int i = 0; i < (int)mSections.size(); ++i)
    {
       if (button == mSections[i]->mActivateButton)
-         SetActiveSection(time, i);
+      {
+         if (mChangeQuantizeInterval == kInterval_None)
+            SetActiveSection(time, i);
+         else
+            mQueuedSection = i;
+      }
    }
 
    for (int i = 0; i < (int)mTargets.size(); ++i)
@@ -194,55 +406,115 @@ void SongBuilder::ButtonClicked(ClickButton* button, double time)
       AddTarget();
 }
 
+void SongBuilder::TextEntryComplete(TextEntry* entry)
+{
+   for (int i = 0; i < (int)mSections.size(); ++i)
+   {
+      if (entry == mSections[i]->mNameEntry)
+         RefreshSequencerDropdowns();
+   }
+}
+
 void SongBuilder::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (list == mIntervalSelector)
-   {
-      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
-      if (transportListenerInfo != nullptr)
-         transportListenerInfo->mInterval = mInterval;
-   }
    for (int i = 0; i < (int)mSections.size(); ++i)
    {
       if (list == mSections[i]->mContextMenu)
       {
          switch (mSections[i]->mContextMenuSelection)
          {
-            case SongSection::ContextMenuItems::kDuplicate:
+            case ContextMenuItems::kDuplicate:
                DuplicateSection(i);
                break;
-            case SongSection::ContextMenuItems::kDelete:
+            case ContextMenuItems::kDelete:
                if (mSections.size() > 1)
                {
                   mSections[i]->CleanUp();
                   mSections.erase(mSections.begin() + i);
+                  RefreshSequencerDropdowns();
                   i = -1;
                }
                break;
-            case SongSection::ContextMenuItems::kMoveUp:
+            case ContextMenuItems::kMoveUp:
                if (i > 0)
                {
                   SongSection* section = mSections[i];
                   mSections.erase(mSections.begin() + i);
                   --i;
                   mSections.insert(mSections.begin() + i, section);
+                  RefreshSequencerDropdowns();
                }
                break;
-            case SongSection::ContextMenuItems::kMoveDown:
+            case ContextMenuItems::kMoveDown:
                if (i < (int)mSections.size() - 1)
                {
                   SongSection* section = mSections[i];
                   mSections.erase(mSections.begin() + i);
                   ++i;
                   mSections.insert(mSections.begin() + i, section);
+                  RefreshSequencerDropdowns();
                }
                break;
-            case SongSection::ContextMenuItems::kNone:
+            case ContextMenuItems::kNone:
                break;
          }
 
          if (i != -1)
-            mSections[i]->mContextMenuSelection = SongSection::ContextMenuItems::kNone;
+            mSections[i]->mContextMenuSelection = ContextMenuItems::kNone;
+
+         break;
+      }
+   }
+
+   for (int i = 0; i < kMaxSequencerSections; ++i)
+   {
+      if (list == mSequencerContextMenu[i])
+      {
+         switch (mSequencerContextMenuSelection[i])
+         {
+            case ContextMenuItems::kDuplicate:
+               for (int j = kMaxSequencerSections - 1; j > i; --j)
+               {
+                  mSequencerSectionId[j] = mSequencerSectionId[j - 1];
+                  mSequencerStepLength[j] = mSequencerStepLength[j - 1];
+               }
+               break;
+            case ContextMenuItems::kDelete:
+               for (int j = i; j < kMaxSequencerSections - 1; ++j)
+               {
+                  mSequencerSectionId[j] = mSequencerSectionId[j + 1];
+                  mSequencerStepLength[j] = mSequencerStepLength[j + 1];
+               }
+               break;
+            case ContextMenuItems::kMoveUp:
+               if (i > 0)
+               {
+                  int temp = mSequencerSectionId[i];
+                  mSequencerSectionId[i] = mSequencerSectionId[i - 1];
+                  mSequencerSectionId[i - 1] = temp;
+
+                  temp = mSequencerStepLength[i];
+                  mSequencerStepLength[i] = mSequencerStepLength[i - 1];
+                  mSequencerStepLength[i - 1] = temp;
+               }
+               break;
+            case ContextMenuItems::kMoveDown:
+               if (i < kMaxSequencerSections - 1 && mSequencerSectionId[i + 1] >= 0)
+               {
+                  int temp = mSequencerSectionId[i];
+                  mSequencerSectionId[i] = mSequencerSectionId[i + 1];
+                  mSequencerSectionId[i + 1] = temp;
+
+                  temp = mSequencerStepLength[i];
+                  mSequencerStepLength[i] = mSequencerStepLength[i + 1];
+                  mSequencerStepLength[i + 1] = temp;
+               }
+               break;
+            case ContextMenuItems::kNone:
+               break;
+         }
+
+         mSequencerContextMenuSelection[i] = ContextMenuItems::kNone;
 
          break;
       }
@@ -266,6 +538,8 @@ void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
       mSections.push_back(new SongSection("done"));
       for (auto* section : mSections)
          section->CreateUIControls(this);
+
+      RefreshSequencerDropdowns();
    }
 
    SetUpFromSaveData();
@@ -343,6 +617,8 @@ void SongBuilder::LoadState(FileStreamIn& in, int rev)
       }
    }
 
+   RefreshSequencerDropdowns();
+
    IDrawableModule::LoadState(in, rev);
 }
 
@@ -365,6 +641,8 @@ void SongBuilder::DuplicateSection(int sectionIndex)
       newValue->mValue = value->mValue;
       newValue->mBoolValue = value->mBoolValue;
    }
+
+   RefreshSequencerDropdowns();
 }
 
 void SongBuilder::AddTarget()
@@ -400,7 +678,6 @@ void SongBuilder::SongSection::CreateUIControls(SongBuilder* owner)
 #undef UIBLOCK_OWNER
 #define UIBLOCK_OWNER this //reset
 
-   //mContextMenu->SetNoHover(true);
    mContextMenu->AddLabel("duplicate", (int)ContextMenuItems::kDuplicate);
    mContextMenu->AddLabel("delete", (int)ContextMenuItems::kDelete);
    mContextMenu->AddLabel("move up", (int)ContextMenuItems::kMoveUp);
@@ -442,7 +719,7 @@ void SongBuilder::SongSection::TargetControlUpdated(SongBuilder::ControlTarget* 
    }
 }
 
-void SongBuilder::SongSection::Draw(float x, float y, int sectionIndex, bool isCurrentSection)
+void SongBuilder::SongSection::Draw(SongBuilder* owner, float x, float y, int sectionIndex)
 {
    float width = GetWidth();
    float height = kRowHeight;
@@ -450,10 +727,16 @@ void SongBuilder::SongSection::Draw(float x, float y, int sectionIndex, bool isC
    ofNoFill();
    ofSetColor(ofColor(150, 150, 150));
    ofRect(x, y, width, height);
-   if (isCurrentSection)
+   if (sectionIndex == owner->mCurrentSection)
    {
       ofFill();
       ofSetColor(ofColor(130, 130, 130, 130));
+      ofRect(x, y, width, height);
+   }
+   if (sectionIndex == owner->mQueuedSection)
+   {
+      ofFill();
+      ofSetColor(ofColor(0, 130, 0, ofMap(sin(TheTransport->GetMeasurePos(gTime) * TWO_PI * 4), -1, 1, 50, 100)));
       ofRect(x, y, width, height);
    }
    ofPopStyle();

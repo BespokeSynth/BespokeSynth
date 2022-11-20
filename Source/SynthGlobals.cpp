@@ -762,6 +762,11 @@ double NextBufferTime(bool includeLookahead)
    return time;
 }
 
+bool IsAudioThread()
+{
+   return std::this_thread::get_id() == ModularSynth::GetAudioThreadID();
+}
+
 float GetLeftPanGain(float pan)
 {
    return 1 - ofClamp(pan, -1, 1);

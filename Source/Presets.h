@@ -78,7 +78,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
 private:
-   void SetPreset(int idx, double time, bool queueForMainThread);
+   void SetPreset(int idx, double time);
    void Store(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
@@ -147,7 +147,7 @@ private:
    PatchCableSource* mModuleCable{ nullptr };
    PatchCableSource* mUIControlCable{ nullptr };
    int mQueuedPresetIndex{ -1 };
-   bool mForceImmediateSet{ false };
+   bool mAllowSetOnAudioThread{ false };
 };
 
 

@@ -125,7 +125,13 @@ void Transport::Advance(double ms)
 
    assert(amount > 0);
 
+   double oldMeasureTime = mMeasureTime;
    mMeasureTime += amount;
+   if (mQueuedMeasure != -1 && int(mMeasureTime) != int(oldMeasureTime))
+   {
+      mMeasureTime = fmod(mMeasureTime, 1) + mQueuedMeasure;
+      mQueuedMeasure = -1;
+   }
 
    if (mLoopStartMeasure != -1 && (GetMeasure(gTime) < mLoopStartMeasure || GetMeasure(gTime) >= mLoopEndMeasure))
       SetMeasure(mLoopStartMeasure);

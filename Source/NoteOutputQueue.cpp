@@ -50,7 +50,7 @@ void NoteOutputQueue::QueueFlush(NoteOutput* target, double time)
 
 void NoteOutputQueue::Process()
 {
-   assert(std::this_thread::get_id() == ModularSynth::GetAudioThreadID());
+   assert(IsAudioThread());
 
    PendingNoteOutput output;
    while (true)

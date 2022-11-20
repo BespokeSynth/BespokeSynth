@@ -1038,6 +1038,13 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    {
       if (mMoveModule)
          mMoveModule = nullptr; //drop module
+
+      if (IUIControl::WasLastHoverSetManually())
+      {
+         TextEntry* textEntry = dynamic_cast<TextEntry*>(gHoveredUIControl);
+         if (textEntry != nullptr)
+            textEntry->MakeActiveTextEntry(true);
+      }
    }
 
    mZoomer.OnKeyPressed(key);
