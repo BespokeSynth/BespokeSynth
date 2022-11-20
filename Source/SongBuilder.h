@@ -81,6 +81,7 @@ private:
    void AddTarget();
    bool ShowSongSequencer() const { return mUseSequencer; }
    void RefreshSequencerDropdowns();
+   void PlaySequence(int startIndex);
 
    enum class ContextMenuItems
    {
@@ -150,7 +151,6 @@ private:
 
    static const int kMaxSequencerSections = 128;
    static const int kSequenceEndId = -1;
-   static const int kSequenceLoopId = -2;
 
    bool mUseSequencer{ false };
    Checkbox* mUseSequencerCheckbox{ nullptr };
@@ -160,12 +160,19 @@ private:
    ClickButton* mPlaySequenceButton{ nullptr };
    ClickButton* mStopSequenceButton{ nullptr };
    ClickButton* mPauseSequenceButton{ nullptr };
+   bool mLoopSequence{ false };
+   Checkbox* mLoopCheckbox{ nullptr };
+   int mSequenceLoopStartIndex{ 0 };
+   TextEntry* mSequenceLoopStartEntry{ nullptr };
+   int mSequenceLoopEndIndex{ 0 };
+   TextEntry* mSequenceLoopEndEntry{ nullptr };
    std::array<int, kMaxSequencerSections> mSequencerSectionId{};
    std::array<DropdownList*, kMaxSequencerSections> mSequencerSectionSelector{};
    std::array<int, kMaxSequencerSections> mSequencerStepLength{};
    std::array<TextEntry*, kMaxSequencerSections> mSequencerStepLengthEntry{};
    std::array<DropdownList*, kMaxSequencerSections> mSequencerContextMenu{};
    std::array<ContextMenuItems, kMaxSequencerSections> mSequencerContextMenuSelection{};
+   std::array<ClickButton*, kMaxSequencerSections> mSequencerPlayFromButton{};
 
    std::vector<SongSection*> mSections{};
    std::vector<ControlTarget*> mTargets{};
