@@ -2316,8 +2316,6 @@ void MidiController::UpdateControllerIndex()
 
 void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    mConnectionsJson.clear();
    mConnectionsJson.resize((int)mConnections.size());
    int i = 0;

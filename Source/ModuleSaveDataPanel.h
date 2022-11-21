@@ -84,6 +84,7 @@ private:
    ClickButton* mDeleteButton{ nullptr };
    Checkbox* mDrawDebugCheckbox{ nullptr };
    ClickButton* mResetSequencerButton{ nullptr };
+   TextEntry* mTransportPriorityEntry{ nullptr };
    std::map<DropdownList*, ModuleSaveData::SaveVal*> mStringDropdowns;
 
    int mHeight{ 100 };

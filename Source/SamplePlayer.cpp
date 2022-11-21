@@ -1390,7 +1390,6 @@ void SamplePlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void SamplePlayer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

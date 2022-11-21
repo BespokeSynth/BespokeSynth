@@ -105,8 +105,6 @@ void GroupControl::GetModuleDimensions(float& width, float& height)
 
 void GroupControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["uicontrols"].resize((unsigned int)mControlCables.size() - 1);
    for (int i = 0; i < mControlCables.size() - 1; ++i)
    {

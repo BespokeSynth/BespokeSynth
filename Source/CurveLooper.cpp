@@ -230,7 +230,6 @@ void CurveLooper::Resize(float w, float h)
 
 void CurveLooper::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

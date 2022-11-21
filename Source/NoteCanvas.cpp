@@ -760,8 +760,6 @@ void NoteCanvas::SetUpFromSaveData()
 
 void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["canvaswidth"] = mCanvas->GetWidth();
    moduleInfo["canvasheight"] = mCanvas->GetHeight();
 }

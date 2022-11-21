@@ -170,7 +170,6 @@ void MultitrackRecorder::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void MultitrackRecorder::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["modules"] = mModuleContainer.WriteModules();
 }
 

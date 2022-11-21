@@ -142,8 +142,6 @@ void LooperGranulator::GetModuleDimensions(float& width, float& height)
 
 void LooperGranulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    std::string targetPath = "";
    if (mLooperCable->GetTarget())
       targetPath = mLooperCable->GetTarget()->Path();

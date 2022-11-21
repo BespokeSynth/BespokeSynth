@@ -199,7 +199,6 @@ void ComboGridController::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ComboGridController::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    std::string grids = "";
    for (int i = 0; i < mGrids.size(); ++i)
    {

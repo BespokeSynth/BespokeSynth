@@ -416,7 +416,6 @@ void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void EQModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

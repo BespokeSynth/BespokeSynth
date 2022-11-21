@@ -172,7 +172,5 @@ void AudioRouter::SetUpFromSaveData()
 
 void AudioRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["num_items"] = (int)mDestinationCables.size();
 }

@@ -769,7 +769,6 @@ void LooperRecorder::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void LooperRecorder::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["loopers"].resize((unsigned int)mLoopers.size());
    for (int i = 0; i < mLoopers.size(); ++i)
    {

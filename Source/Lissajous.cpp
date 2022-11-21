@@ -133,7 +133,6 @@ void Lissajous::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Lissajous::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
    moduleInfo["autocorrelation"] = mAutocorrelationMode;

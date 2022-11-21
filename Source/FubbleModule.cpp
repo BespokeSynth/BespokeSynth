@@ -471,8 +471,6 @@ void FubbleModule::Resize(float w, float h)
 
 void FubbleModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["uicontrol_h"] = mAxisH.GetCableSource()->GetTarget() ? mAxisH.GetCableSource()->GetTarget()->Path() : "";
    moduleInfo["uicontrol_v"] = mAxisV.GetCableSource()->GetTarget() ? mAxisV.GetCableSource()->GetTarget()->Path() : "";
    moduleInfo["width"] = mWidth;

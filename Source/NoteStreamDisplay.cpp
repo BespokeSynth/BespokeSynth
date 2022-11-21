@@ -224,7 +224,6 @@ void NoteStreamDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void NoteStreamDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

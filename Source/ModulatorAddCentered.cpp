@@ -86,7 +86,6 @@ float ModulatorAddCentered::Value(int samplesIn)
 
 void ModulatorAddCentered::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModulatorAddCentered::LoadLayout(const ofxJSONElement& moduleInfo)

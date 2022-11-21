@@ -171,7 +171,6 @@ void Ramper::GetModuleDimensions(float& width, float& height)
 
 void Ramper::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void Ramper::LoadLayout(const ofxJSONElement& moduleInfo)

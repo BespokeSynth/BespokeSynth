@@ -208,7 +208,6 @@ void Beats::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Beats::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void Beats::SetUpFromSaveData()

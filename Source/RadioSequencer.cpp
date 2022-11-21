@@ -342,7 +342,6 @@ void RadioSequencer::SetGridSize(float w, float h)
 
 void RadioSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)

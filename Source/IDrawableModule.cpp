@@ -1045,7 +1045,19 @@ void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string t
    mTypeName = typeName;
 }
 
-void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
+void IDrawableModule::LoadLayoutBase(const ofxJSONElement& moduleInfo)
+{
+   LoadLayout(moduleInfo);
+
+   ITimeListener* timeListener = dynamic_cast<ITimeListener*>(this);
+   if (timeListener)
+   {
+      mModuleSaveData.LoadInt("transport_priority", moduleInfo, timeListener->mTransportPriority, -9999, 9999, K(isTextField));
+      timeListener->mTransportPriority = mModuleSaveData.GetInt("transport_priority");
+   }
+}
+
+void IDrawableModule::SaveLayoutBase(ofxJSONElement& moduleInfo)
 {
    moduleInfo["position"][0u] = mX;
    moduleInfo["position"][1u] = mY;
@@ -1056,6 +1068,17 @@ void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
    if (TheSynth->IsLissajousDrawer(this))
       moduleInfo["draw_lissajous"] = true;
    mModuleSaveData.Save(moduleInfo);
+
+   SaveLayout(moduleInfo);
+}
+
+void IDrawableModule::SetUpFromSaveDataBase()
+{
+   ITimeListener* timeListener = dynamic_cast<ITimeListener*>(this);
+   if (timeListener)
+      timeListener->mTransportPriority = mModuleSaveData.GetInt("transport_priority");
+
+   SetUpFromSaveData();
 }
 
 namespace

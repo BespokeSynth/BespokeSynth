@@ -125,8 +125,6 @@ void ValueStream::Resize(float w, float h)
 
 void ValueStream::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

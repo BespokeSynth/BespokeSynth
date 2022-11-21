@@ -39,6 +39,7 @@ class ITimeListener
 public:
    virtual ~ITimeListener() {}
    virtual void OnTimeEvent(double time) = 0;
+   int mTransportPriority{ 100 };
 };
 
 enum NoteInterval

@@ -140,7 +140,6 @@ void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal, double 
 
 void AudioToPulse::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void AudioToPulse::LoadLayout(const ofxJSONElement& moduleInfo)

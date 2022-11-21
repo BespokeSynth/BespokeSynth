@@ -159,9 +159,9 @@ public:
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName);
    virtual void CreateUIControls();
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
-   virtual void SaveLayout(ofxJSONElement& moduleInfo);
-   virtual void SetUpFromSaveData() {}
+   void LoadLayoutBase(const ofxJSONElement& moduleInfo);
+   void SaveLayoutBase(ofxJSONElement& moduleInfo);
+   void SetUpFromSaveDataBase();
    virtual bool IsSaveable() { return true; }
    ModuleSaveData& GetSaveData() { return mModuleSaveData; }
    virtual void SaveState(FileStreamOut& out);
@@ -219,6 +219,9 @@ private:
    virtual bool Enabled() const { return true; }
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
+   virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
+   virtual void SetUpFromSaveData() {}
 
    std::vector<IUIControl*> mUIControls;
    std::vector<IDrawableModule*> mChildren;

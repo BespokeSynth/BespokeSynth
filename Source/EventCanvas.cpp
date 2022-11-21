@@ -394,8 +394,6 @@ void EventCanvas::SetUpFromSaveData()
 
 void EventCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["canvaswidth"] = mCanvas->GetWidth();
    moduleInfo["canvasheight"] = mCanvas->GetHeight();
 }

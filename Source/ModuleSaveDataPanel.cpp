@@ -97,8 +97,8 @@ void ModuleSaveDataPanel::ReloadSaveData()
       maxWidth = MAX(maxWidth, GetStringWidth(*iter));
 
    mAlignmentX = 10 + maxWidth;
-   int x = mAlignmentX;
-   int y = 5 + kItemSpacing;
+   float x = mAlignmentX;
+   float y = 5 + kItemSpacing;
 
    mNameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
    mNameEntry->SetNoHover(true);
@@ -247,7 +247,7 @@ void ModuleSaveDataPanel::UpdatePosition()
 void ModuleSaveDataPanel::ApplyChanges()
 {
    if (mSaveModule)
-      mSaveModule->SetUpFromSaveData();
+      mSaveModule->SetUpFromSaveDataBase();
    TheSaveDataPanel->SetModule(nullptr);
 }
 

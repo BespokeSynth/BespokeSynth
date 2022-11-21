@@ -204,7 +204,6 @@ void Push2Control::SetUpFromSaveData()
 
 void Push2Control::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 //static

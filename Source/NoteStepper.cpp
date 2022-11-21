@@ -134,5 +134,4 @@ void NoteStepper::SetUpFromSaveData()
 
 void NoteStepper::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }

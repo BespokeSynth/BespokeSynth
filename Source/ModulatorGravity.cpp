@@ -115,7 +115,6 @@ void ModulatorGravity::Kick(float strength)
 
 void ModulatorGravity::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModulatorGravity::LoadLayout(const ofxJSONElement& moduleInfo)

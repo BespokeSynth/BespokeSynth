@@ -2379,7 +2379,7 @@ void ModularSynth::SetUpModule(IDrawableModule* module, const ofxJSONElement& mo
    try
    {
       mIsLoadingModule = true;
-      module->LoadLayout(moduleInfo);
+      module->LoadLayoutBase(moduleInfo);
       mIsLoadingModule = false;
    }
    catch (UnknownModuleException& e)
@@ -2524,7 +2524,7 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    }
 
    ofxJSONElement layoutData;
-   module->SaveLayout(layoutData);
+   module->SaveLayoutBase(layoutData);
    std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
    std::string newName = GetUniqueName(layoutData["name"].asString(), modules);
    layoutData["name"] = newName;
@@ -3023,7 +3023,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
       if (controller != nullptr)
       {
          controller->GetSaveData().SetString("devicein", spawnable.mLabel);
-         controller->SetUpFromSaveData();
+         controller->SetUpFromSaveDataBase();
       }
    }
 

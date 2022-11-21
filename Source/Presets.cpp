@@ -465,8 +465,6 @@ void Presets::SetGridSize(float w, float h)
 
 void Presets::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["gridwidth"] = mGrid->GetWidth();
    moduleInfo["gridheight"] = mGrid->GetHeight();
 }

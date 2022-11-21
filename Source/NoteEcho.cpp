@@ -100,5 +100,4 @@ void NoteEcho::SetUpFromSaveData()
 
 void NoteEcho::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }

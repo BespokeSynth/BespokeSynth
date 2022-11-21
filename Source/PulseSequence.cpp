@@ -285,7 +285,6 @@ void PulseSequence::LoadState(FileStreamIn& in, int rev)
 
 void PulseSequence::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PulseSequence::LoadLayout(const ofxJSONElement& moduleInfo)

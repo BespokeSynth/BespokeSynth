@@ -1141,8 +1141,6 @@ void VSTPlugin::RefreshPresetFiles()
 
 void VSTPlugin::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["parameterversion"] = 1;
 }
 

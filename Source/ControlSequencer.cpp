@@ -352,7 +352,6 @@ void ControlSequencer::SetGridSize(float w, float h)
 
 void ControlSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ControlSequencer::LoadLayout(const ofxJSONElement& moduleInfo)

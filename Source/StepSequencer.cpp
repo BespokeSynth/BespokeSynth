@@ -1009,7 +1009,6 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
 
 void StepSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void StepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)

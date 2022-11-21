@@ -1534,7 +1534,6 @@ void ScriptModule::SetUpFromSaveData()
 
 void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ScriptModule::SaveState(FileStreamOut& out)

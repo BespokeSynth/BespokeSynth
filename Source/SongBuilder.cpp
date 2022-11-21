@@ -51,13 +51,15 @@ SongBuilder::SongBuilder()
       mSequencerContextMenu[i] = nullptr;
       mSequencerContextMenuSelection[i] = ContextMenuItems::kNone;
    }
+
+   mTransportPriority = -1000;
 }
 
 void SongBuilder::Init()
 {
    IDrawableModule::Init();
 
-   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(gBufferSizeMs, true), true);
+   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), true);
 
    SetActiveSection(gTime, 0);
 }
