@@ -42,6 +42,8 @@ ui controls
            the modulation max
    * hold ctrl/command and click the lower or upper half of a slider to adjust that slider's minimum or maximum value, to
        give it increased or reduced range   (warning! increasing range can lead to unpredictable behavior in some cases)
+   * press tab to cycle through controls on a module
+   * press ctrl/command+arrows to navigate around controls on a module
 
 
 saving

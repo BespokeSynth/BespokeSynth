@@ -78,6 +78,7 @@ public:
    float GetMidiValue() const override;
    std::string GetDisplayValue(float val) const override;
    int GetNumValues() override { return 2; }
+   void Increment(float amount) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;

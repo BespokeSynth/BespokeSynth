@@ -234,3 +234,8 @@ std::string ClickButton::GetDisplayValue(float val) const
       return "click";
    return "_";
 }
+
+void ClickButton::Increment(float amount)
+{
+   DoClick(NextBufferTime(false));
+}
