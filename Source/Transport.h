@@ -123,6 +123,7 @@ public:
    TransportListenerInfo* GetListenerInfo(ITimeListener* listener);
    void AddAudioPoller(IAudioPoller* poller);
    void RemoveAudioPoller(IAudioPoller* poller);
+   void ClearListenersAndPollers();
    double GetDuration(NoteInterval interval);
    int GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs = nullptr);
    double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time), 1); }

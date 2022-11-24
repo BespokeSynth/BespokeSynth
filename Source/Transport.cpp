@@ -337,6 +337,12 @@ void Transport::RemoveAudioPoller(IAudioPoller* poller)
    mAudioPollers.remove(poller);
 }
 
+void Transport::ClearListenersAndPollers()
+{
+   mListeners.clear();
+   mAudioPollers.clear();
+}
+
 int Transport::GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs /*=nullptr*/)
 {
    double offsetMs;

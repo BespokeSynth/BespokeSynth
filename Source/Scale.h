@@ -110,6 +110,7 @@ public:
    void SetScaleType(std::string type, bool force = true);
    void AddListener(IScaleListener* listener);
    void RemoveListener(IScaleListener* listener);
+   void ClearListeners();
    void Poll() override;
    void SetScaleDegree(int degree);
    int GetScaleDegree() { return mScaleDegree; }

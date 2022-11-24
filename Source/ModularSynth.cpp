@@ -2133,6 +2133,8 @@ void ModularSynth::ResetLayout()
    mSources.clear();
    mLissajousDrawers.clear();
    mMoveModule = nullptr;
+   TheTransport->ClearListenersAndPollers();
+   TheScale->ClearListeners();
    LFOPool::Shutdown();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
    ScriptModule::sBackgroundTextString = "";
