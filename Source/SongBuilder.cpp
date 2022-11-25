@@ -195,7 +195,7 @@ void SongBuilder::DrawModule()
          sequenceComplete = true;
    }
 
-   if (mSequenceStepIndex != -1)
+   if (ShowSongSequencer() && mSequenceStepIndex != -1)
    {
       ofPushStyle();
       ofFill();
