@@ -59,7 +59,7 @@ void SongBuilder::Init()
 {
    IDrawableModule::Init();
 
-   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), true);
+   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(gBufferSizeMs, true), true);
 
    SetActiveSection(gTime, 0);
 }
@@ -71,6 +71,9 @@ void SongBuilder::CreateUIControls()
    float width, height;
    UIBLOCK0();
    CHECKBOX(mUseSequencerCheckbox, "use sequencer", &mUseSequencer);
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mActivateFirstSceneOnStopCheckbox, "activate first scene on stop", &mActivateFirstSceneOnStop);
+   UIBLOCK_NEWLINE();
    BUTTON_STYLE(mPlaySequenceButton, "play", ButtonDisplayStyle::kPlay);
    UIBLOCK_SHIFTRIGHT();
    BUTTON_STYLE(mStopSequenceButton, "stop", ButtonDisplayStyle::kStop);
@@ -107,10 +110,10 @@ void SongBuilder::CreateUIControls()
    mChangeQuantizeSelector = new DropdownList(this, "change quantize", -1, -1, (int*)(&mChangeQuantizeInterval));
    mAddTargetButton = new ClickButton(this, "add target", -1, -1, ButtonDisplayStyle::kPlus);
 
-   mChangeQuantizeSelector->AddLabel("none", kInterval_None);
+   mChangeQuantizeSelector->AddLabel("switch", kInterval_Free);
+   mChangeQuantizeSelector->AddLabel("jump", kInterval_None);
    mChangeQuantizeSelector->AddLabel("1n", kInterval_1n);
    mChangeQuantizeSelector->AddLabel("2", kInterval_2);
-   mChangeQuantizeSelector->AddLabel("3", kInterval_3);
    mChangeQuantizeSelector->AddLabel("4", kInterval_4);
 }
 
@@ -129,7 +132,10 @@ void SongBuilder::DrawModule()
       gridStartX += kSongSequencerWidth;
 
    mUseSequencerCheckbox->Draw();
-   mChangeQuantizeSelector->SetPosition(gridStartX, kGridStartY + kTargetTabHeightTop - 15);
+   mActivateFirstSceneOnStopCheckbox->SetShowing(ShowSongSequencer());
+   mActivateFirstSceneOnStopCheckbox->SetPosition(gridStartX, 3);
+   mActivateFirstSceneOnStopCheckbox->Draw();
+   mChangeQuantizeSelector->SetPosition(gridStartX, kGridStartY + kTargetTabHeightTop - 29);
    mChangeQuantizeSelector->Draw();
    mAddTargetButton->SetPosition(gridStartX + kSectionTabWidth - 22, kGridStartY + 8);
    mAddTargetButton->Draw();
@@ -145,6 +151,8 @@ void SongBuilder::DrawModule()
    mSequenceLoopStartEntry->Draw();
    mSequenceLoopEndEntry->SetShowing(ShowSongSequencer() && mLoopSequence);
    mSequenceLoopEndEntry->Draw();
+
+   DrawTextNormal("scenes:", gridStartX, kGridStartY + kTargetTabHeightTop - 1);
 
    for (int i = 0; i < (int)mSections.size(); ++i)
       mSections[i]->Draw(this, gridStartX, kGridStartY + kTargetTabHeightTop + kSpacingY + i * (kRowHeight + kSpacingY), i);
@@ -195,7 +203,7 @@ void SongBuilder::DrawModule()
 
          ofSetColor(0, 255, 0, 100);
          ofRectangle lengthEntryRect = mSequencerStepLengthEntry[mSequenceStepIndex]->GetRect(K(local));
-         float progress = MIN((TheTransport->GetMeasurePos(NextBufferTime(false)) + mSequenceStepMeasureCount) / mSequencerStepLength[mSequenceStepIndex], 1.0f);
+         float progress = MIN(TheTransport->GetMeasureTime(NextBufferTime(false)) / mSequencerStepLength[mSequenceStepIndex], 1.0f);
          lengthEntryRect.width *= progress;
          ofRect(lengthEntryRect);
       }
@@ -219,7 +227,15 @@ void SongBuilder::DrawModule()
 
 void SongBuilder::OnTimeEvent(double time)
 {
-   if (mQueuedSection != -1 && TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset) % (int)TheTransport->GetMeasureFraction(mChangeQuantizeInterval) == 0)
+   if (mJustResetClock)
+   {
+      mJustResetClock = false;
+      return;
+   }
+
+   if (mQueuedSection != -1 &&
+       (mChangeQuantizeInterval == kInterval_None ||
+        TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset) % (int)TheTransport->GetMeasureFraction(mChangeQuantizeInterval) == 0))
    {
       SetActiveSection(time, mQueuedSection);
       mQueuedSection = -1;
@@ -244,7 +260,7 @@ void SongBuilder::OnTimeEvent(double time)
          else
          {
             SetActiveSectionById(time, mSequencerSectionId[mSequenceStepIndex]);
-            TheTransport->SetQueuedMeasure(0);
+            mWantResetClock = true;
          }
       }
    }
@@ -254,6 +270,14 @@ void SongBuilder::OnTimeEvent(double time)
       mSequenceStepIndex = mSequenceStartStepIndex;
       SetActiveSectionById(time, mSequencerSectionId[mSequenceStepIndex]);
       mSequenceStartQueued = false;
+      mWantResetClock = true;
+   }
+
+   if (mWantResetClock)
+   {
+      TheTransport->SetQueuedMeasure(time, 0);
+      mWantResetClock = false;
+      mJustResetClock = true;
    }
 }
 
@@ -326,7 +350,7 @@ void SongBuilder::GetModuleDimensions(float& width, float& height)
    {
       for (int i = 0; i < kMaxSequencerSections; ++i)
       {
-         if (i == kMaxSequencerSections - 1 || mSequencerSectionId[i] < 0)  //end of sequence
+         if (i == kMaxSequencerSections - 1 || mSequencerSectionId[i] < 0) //end of sequence
          {
             ofRectangle rect = mSequencerSectionSelector[i]->GetRect(K(local));
             if (rect.getMaxY() + 3 > height)
@@ -350,20 +374,25 @@ void SongBuilder::PostRepatch(PatchCableSource* cable, bool fromUserClick)
       }
    }
 
-   if (fromUserClick && targetIndex != -1)
+   if (targetIndex != -1)
    {
-      for (int i = 0; i < (int)mSections.size(); ++i)
-         mSections[i]->TargetControlUpdated(mTargets[targetIndex], targetIndex, true);
-
-      if (mTargets[targetIndex]->GetTarget() == nullptr)
+      if (fromUserClick)
       {
-         mTargets[targetIndex]->CleanUp();
-         mTargets.erase(mTargets.begin() + targetIndex);
+         for (int i = 0; i < (int)mSections.size(); ++i)
+            mSections[i]->TargetControlUpdated(mTargets[targetIndex], targetIndex, true);
+
+         if (mTargets[targetIndex]->GetTarget() == nullptr)
+         {
+            mTargets[targetIndex]->CleanUp();
+            mTargets.erase(mTargets.begin() + targetIndex);
+         }
       }
+
+      mTargets[targetIndex]->mHadTarget = (mTargets[targetIndex]->GetTarget() != nullptr);
    }
 }
 
-void SongBuilder::PlaySequence(int startIndex)
+void SongBuilder::PlaySequence(double time, int startIndex)
 {
    if (mSequencePaused && startIndex == -1)
    {
@@ -376,22 +405,25 @@ void SongBuilder::PlaySequence(int startIndex)
       else
          mSequenceStartStepIndex = startIndex;
       mSequenceStepMeasureCount = 0;
+      mWantResetClock = true;
       mSequencePaused = false;
       mSequenceStartQueued = true;
-      TheTransport->SetQueuedMeasure(0);
    }
 }
 
 void SongBuilder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPlaySequenceButton)
-      PlaySequence(-1);
+      PlaySequence(time, -1);
 
    if (button == mStopSequenceButton)
    {
       mSequenceStartQueued = false;
       mSequenceStepIndex = -1;
       mSequencePaused = false;
+
+      if (mActivateFirstSceneOnStop)
+         SetActiveSection(time, 0);
    }
 
    if (button == mPauseSequenceButton)
@@ -411,10 +443,20 @@ void SongBuilder::ButtonClicked(ClickButton* button, double time)
    {
       if (button == mSections[i]->mActivateButton)
       {
-         if (mChangeQuantizeInterval == kInterval_None)
+         mSequenceStepIndex = -1; //stop playing
+         if (mChangeQuantizeInterval == kInterval_Free) //switch
+         {
             SetActiveSection(time, i);
-         else
+         }
+         else if (mChangeQuantizeInterval == kInterval_None) //jump
+         {
             mQueuedSection = i;
+            TheTransport->Reset();
+         }
+         else
+         {
+            mQueuedSection = i;
+         }
       }
    }
 
@@ -454,7 +496,7 @@ void SongBuilder::ButtonClicked(ClickButton* button, double time)
    for (int i = 0; i < kMaxSequencerSections; ++i)
    {
       if (button == mSequencerPlayFromButton[i])
-         PlaySequence(i);
+         PlaySequence(time, i);
    }
 }
 
@@ -581,7 +623,7 @@ void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    if (IsSpawningOnTheFly(moduleInfo))
    {
-      mSections.push_back(new SongSection("start"));
+      mSections.push_back(new SongSection("off"));
       mSections.push_back(new SongSection("intro"));
       mSections.push_back(new SongSection("verse"));
       mSections.push_back(new SongSection("chorus"));
@@ -751,10 +793,11 @@ void SongBuilder::SongSection::TargetControlUpdated(SongBuilder::ControlTarget* 
    IUIControl* control = target->GetTarget();
    if (control != nullptr)
    {
-      if (target->mIsCheckbox)
+      if (!target->mHadTarget)
+      {
          mValues[targetIndex]->mBoolValue = control->GetValue() > 0;
-      else
          mValues[targetIndex]->mValue = control->GetValue();
+      }
 
       mValues[targetIndex]->mValueEntry->SetShowing(!target->mIsCheckbox);
       mValues[targetIndex]->mCheckbox->SetShowing(target->mIsCheckbox);
@@ -832,6 +875,7 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
 {
    mCable = new PatchCableSource(owner, kConnectionType_UIControl);
    owner->AddPatchCableSource(mCable);
+   mCable->SetAllowMultipleTargets(true);
    mCable->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
    mMoveLeftButton = new ClickButton(owner, "", -1, -1, ButtonDisplayStyle::kArrowLeft);
    mMoveRightButton = new ClickButton(owner, "", -1, -1, ButtonDisplayStyle::kArrowRight);

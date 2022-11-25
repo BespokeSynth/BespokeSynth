@@ -250,9 +250,10 @@ void Transport::DrawModule()
    ofRect(0, h - Swing(measurePos) * h, 4, 1);
 }
 
-void Transport::Reset(float rewindAmount)
+void Transport::Reset()
 {
-   mMeasureTime = -rewindAmount;
+   mMeasureTime = .99f;
+   SetQueuedMeasure(NextBufferTime(true), 0);
 }
 
 void Transport::ButtonClicked(ClickButton* button, double time)
@@ -526,6 +527,34 @@ double Transport::GetDuration(NoteInterval interval)
    return MsPerBar() * GetMeasureFraction(interval);
 }
 
+double Transport::GetMeasureTimeInternal(double time) const
+{
+   return mMeasureTime + (time - gTime) / MsPerBar();
+}
+
+double Transport::GetMeasureTime(double time) const
+{
+   double measureTime = GetMeasureTimeInternal(time);
+   if (mQueuedMeasure != -1 && measureTime >= mQueuedMeasureSwitchAtMeasure)
+      measureTime = mQueuedMeasure + measureTime - mQueuedMeasureSwitchAtMeasure;
+   return measureTime;
+}
+
+void Transport::SetQueuedMeasure(double time, int measure)
+{
+   mQueuedMeasure = -1; //clear
+   mQueuedMeasureSwitchAtMeasure = GetMeasure(time) + 1;
+   mQueuedMeasure = measure;
+}
+
+bool Transport::IsPastQueuedMeasureJump(double time) const
+{
+   double measureTime = GetMeasureTimeInternal(time);
+   if (mQueuedMeasure != -1 && measureTime >= mQueuedMeasureSwitchAtMeasure)
+      return true;
+   return false;
+}
+
 double Transport::GetMeasureFraction(NoteInterval interval)
 {
    switch (interval)
@@ -608,7 +637,10 @@ void Transport::UpdateListeners(double jumpMs)
             double remainderMs;
             int oldStep = GetQuantized(checkTime - jumpMs, &info);
             int newStep = GetQuantized(checkTime, &info, &remainderMs);
-            if (oldStep != newStep)
+            bool oldJumped = IsPastQueuedMeasureJump(checkTime - jumpMs);
+            bool newJumped = IsPastQueuedMeasureJump(checkTime);
+            if (oldStep != newStep ||
+                oldJumped != newJumped)
             {
                double time = checkTime - remainderMs + .0001; //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
                /*ofLog() << oldStep << " " << newStep << " " << remainderMs << " " << jumpMs << " " << checkTime << " " << time << " " << GetQuantized(checkTime, info.mInterval) << " " << GetQuantized(time, info.mInterval);

@@ -151,7 +151,7 @@ void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voice
 {
    PROFILER(INoteSourcePlayOutput);
 
-   if (time < gTime)
+   if (time < gTime && velocity > 0)
       ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time / 1000) << " < " << ofToString(gTime / 1000);
 
    if (!mInNoteOutput)

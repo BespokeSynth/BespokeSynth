@@ -129,11 +129,11 @@ public:
    double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time), 1); }
    void SetMeasureTime(double measureTime) { mMeasureTime = measureTime; }
    int GetMeasure(double time) const { return (int)floor(GetMeasureTime(time)); }
-   double GetMeasureTime(double time) const { return mMeasureTime + (time - gTime) / MsPerBar(); }
+   double GetMeasureTime(double time) const;
    void SetMeasure(int count) { mMeasureTime = mMeasureTime - (int)mMeasureTime + count; }
    void SetDownbeat() { mMeasureTime = mMeasureTime - (int)mMeasureTime - .001; }
    static int CountInStandardMeasure(NoteInterval interval);
-   void Reset(float rewindAmount = 0.005f);
+   void Reset();
    void OnDrumEvent(NoteInterval drumEvent);
    void SetLoop(int measureStart, int measureEnd)
    {
@@ -146,7 +146,8 @@ public:
       mLoopStartMeasure = -1;
       mLoopEndMeasure = -1;
    }
-   void SetQueuedMeasure(int measure) { mQueuedMeasure = measure; }
+   void SetQueuedMeasure(double time, int measure);
+   bool IsPastQueuedMeasureJump(double time) const;
    double GetMeasureFraction(NoteInterval interval);
    int GetStepsPerMeasure(ITimeListener* listener);
    int GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length = -1);
@@ -181,6 +182,7 @@ private:
    void Nudge(double amount);
    void AdjustTempo(double amount);
    void SetRandomTempo();
+   double GetMeasureTimeInternal(double time) const;
 
    //IDrawableModule
    void DrawModule() override;
@@ -214,6 +216,7 @@ private:
    int mLoopStartMeasure{ -1 };
    int mLoopEndMeasure{ -1 };
    int mQueuedMeasure{ -1 };
+   int mQueuedMeasureSwitchAtMeasure{ -1 };
    bool mWantSetRandomTempo{ false };
 
    std::list<TransportListenerInfo> mListeners;

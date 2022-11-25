@@ -1126,9 +1126,16 @@ void IDrawableModule::SaveState(FileStreamOut& out)
       child->SaveState(out);
    }
 
-   out << (int)mPatchCableSources.size();
-   for (auto* cable : mPatchCableSources)
-      cable->SaveState(out);
+   if (ShouldSavePatchCableSources())
+   {
+      out << (int)mPatchCableSources.size();
+      for (auto* cable : mPatchCableSources)
+         cable->SaveState(out);
+   }
+   else
+   {
+      out << 0; //no patch cable sources
+   }
 }
 
 int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)

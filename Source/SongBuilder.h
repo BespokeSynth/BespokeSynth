@@ -73,6 +73,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    bool IsResizable() const override { return false; }
    void PostRepatch(PatchCableSource* cable, bool fromUserClick) override;
+   bool ShouldSavePatchCableSources() const override { return false; }
 
    void OnStep(double time, float velocity, int flags);
    void SetActiveSection(double time, int newSection);
@@ -81,7 +82,7 @@ private:
    void AddTarget();
    bool ShowSongSequencer() const { return mUseSequencer; }
    void RefreshSequencerDropdowns();
-   void PlaySequence(int startIndex);
+   void PlaySequence(double time, int startIndex);
 
    enum class ContextMenuItems
    {
@@ -104,6 +105,7 @@ private:
       bool mIsCheckbox{ false };
       ClickButton* mMoveLeftButton{ nullptr };
       ClickButton* mMoveRightButton{ nullptr };
+      bool mHadTarget{ false };
    };
 
    struct ControlValue
@@ -148,12 +150,16 @@ private:
    int mSequenceStartStepIndex{ 0 };
    bool mSequenceStartQueued{ false };
    bool mSequencePaused{ false };
+   bool mWantResetClock{ false };
+   bool mJustResetClock{ false };
 
    static const int kMaxSequencerSections = 128;
    static const int kSequenceEndId = -1;
 
    bool mUseSequencer{ false };
    Checkbox* mUseSequencerCheckbox{ nullptr };
+   bool mActivateFirstSceneOnStop{ true };
+   Checkbox* mActivateFirstSceneOnStopCheckbox{ nullptr };
    NoteInterval mChangeQuantizeInterval{ NoteInterval::kInterval_None };
    DropdownList* mChangeQuantizeSelector{ nullptr };
    ClickButton* mAddTargetButton{ nullptr };

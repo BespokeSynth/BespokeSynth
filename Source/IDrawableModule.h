@@ -222,6 +222,7 @@ private:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
    virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
    virtual void SetUpFromSaveData() {}
+   virtual bool ShouldSavePatchCableSources() const { return true; }
 
    std::vector<IUIControl*> mUIControls;
    std::vector<IDrawableModule*> mChildren;
