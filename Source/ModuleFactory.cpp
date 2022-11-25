@@ -255,6 +255,7 @@
 #include "NoteEcho.h"
 #include "VelocityCurve.h"
 #include "BoundsToPulse.h"
+#include "SongBuilder.h"
 
 #include <juce_core/juce_core.h>
 
@@ -456,6 +457,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteEcho, noteecho, kModuleCategory_Note);
    REGISTER(VelocityCurve, velocitycurve, kModuleCategory_Note);
    REGISTER(BoundsToPulse, boundstopulse, kModuleCategory_Pulse);
+   REGISTER(SongBuilder, songbuilder, kModuleCategory_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

@@ -48,7 +48,10 @@ enum class ButtonDisplayStyle
    kSampleIcon,
    kFolderIcon,
    kArrowRight,
-   kArrowLeft
+   kArrowLeft,
+   kPlus,
+   kMinus,
+   kHamburger
 };
 
 class ClickButton : public IUIControl
@@ -75,6 +78,7 @@ public:
    float GetMidiValue() const override;
    std::string GetDisplayValue(float val) const override;
    int GetNumValues() override { return 2; }
+   void Increment(float amount) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;
@@ -97,7 +101,7 @@ private:
    float mHeight{ 15 };
    double mClickTime{ -9999 };
    IButtonListener* mOwner{ nullptr };
-   ButtonDisplayStyle mDisplayStyle;
+   ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };
 };
 
 #endif /* defined(__modularSynth__ClickButton__) */

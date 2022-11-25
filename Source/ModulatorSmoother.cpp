@@ -94,7 +94,6 @@ float ModulatorSmoother::Value(int samplesIn)
 
 void ModulatorSmoother::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModulatorSmoother::LoadLayout(const ofxJSONElement& moduleInfo)

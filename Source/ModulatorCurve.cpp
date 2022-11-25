@@ -118,7 +118,6 @@ bool ModulatorCurve::MouseMoved(float x, float y)
 
 void ModulatorCurve::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModulatorCurve::LoadLayout(const ofxJSONElement& moduleInfo)

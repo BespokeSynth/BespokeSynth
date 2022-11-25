@@ -579,7 +579,6 @@ void NoteTable::SetUpColumnControls()
 
 void NoteTable::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteTable::LoadLayout(const ofxJSONElement& moduleInfo)

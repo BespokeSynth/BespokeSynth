@@ -244,7 +244,7 @@ void FloatSlider::Render()
       ofPopStyle();
    }
 
-   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr)
+   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr && !IUIControl::WasLastHoverSetManually())
    {
       ofPushStyle();
       ofFill();
@@ -305,7 +305,7 @@ void FloatSlider::OnClicked(float x, float y, bool right)
       return;
    }
 
-   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment)
+   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && !IUIControl::WasLastHoverSetManually())
    {
       bool adjustMax;
       if (x > mWidth / 2)
@@ -997,7 +997,7 @@ void IntSlider::Render()
       ofPopStyle();
    }
 
-   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr)
+   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr && !IUIControl::WasLastHoverSetManually())
    {
       ofPushStyle();
       ofFill();
@@ -1028,7 +1028,7 @@ void IntSlider::OnClicked(float x, float y, bool right)
    if (right)
       return;
 
-   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment)
+   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && !IUIControl::WasLastHoverSetManually())
    {
       bool adjustMax;
       if (x > mWidth / 2)

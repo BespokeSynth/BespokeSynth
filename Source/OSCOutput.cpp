@@ -185,5 +185,4 @@ void OSCOutput::SetUpFromSaveData()
 
 void OSCOutput::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }

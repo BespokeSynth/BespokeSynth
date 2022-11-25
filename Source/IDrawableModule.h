@@ -159,9 +159,9 @@ public:
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName);
    virtual void CreateUIControls();
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
-   virtual void SaveLayout(ofxJSONElement& moduleInfo);
-   virtual void SetUpFromSaveData() {}
+   void LoadLayoutBase(const ofxJSONElement& moduleInfo);
+   void SaveLayoutBase(ofxJSONElement& moduleInfo);
+   void SetUpFromSaveDataBase();
    virtual bool IsSaveable() { return true; }
    ModuleSaveData& GetSaveData() { return mModuleSaveData; }
    virtual void SaveState(FileStreamOut& out);
@@ -174,6 +174,7 @@ public:
    virtual void UpdateOldControlName(std::string& oldName) {}
    virtual bool LoadOldControl(FileStreamIn& in, std::string& oldName) { return false; }
    virtual bool CanModuleTypeSaveState() const { return true; }
+   bool IsSpawningOnTheFly(const ofxJSONElement& moduleInfo);
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}
@@ -218,6 +219,10 @@ private:
    virtual bool Enabled() const { return true; }
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
+   virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
+   virtual void SetUpFromSaveData() {}
+   virtual bool ShouldSavePatchCableSources() const { return true; }
 
    std::vector<IUIControl*> mUIControls;
    std::vector<IDrawableModule*> mChildren;

@@ -83,7 +83,6 @@ float ModulatorAdd::Value(int samplesIn)
 
 void ModulatorAdd::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModulatorAdd::LoadLayout(const ofxJSONElement& moduleInfo)

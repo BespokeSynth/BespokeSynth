@@ -139,7 +139,6 @@ void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, float oldVal, doubl
 
 void AudioLevelToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void AudioLevelToCV::LoadLayout(const ofxJSONElement& moduleInfo)

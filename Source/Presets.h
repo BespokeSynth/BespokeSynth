@@ -36,8 +36,10 @@
 #include "Slider.h"
 #include "Ramp.h"
 #include "INoteReceiver.h"
+#include "DropdownList.h"
+#include "TextEntry.h"
 
-class Presets : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IIntSliderListener, public INoteReceiver
+class Presets : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener
 {
 public:
    Presets();
@@ -61,14 +63,16 @@ public:
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
+   int GetModuleSaveStateRev() const override { return 2; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 
@@ -78,7 +82,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
 private:
-   void SetPreset(int idx, double time, bool queueForMainThread);
+   void SetPreset(int idx, double time);
    void Store(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
@@ -88,6 +92,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
@@ -120,7 +125,7 @@ private:
    struct PresetCollection
    {
       std::list<Preset> mPresets;
-      std::string mDescription;
+      std::string mLabel;
    };
 
    struct ControlRamp
@@ -143,11 +148,14 @@ private:
    std::vector<ControlRamp> mBlendRamps;
    ofMutex mRampMutex;
    int mCurrentPreset{ 0 };
-   IntSlider* mCurrentPresetSlider{ nullptr };
+   DropdownList* mCurrentPresetSelector{ nullptr };
    PatchCableSource* mModuleCable{ nullptr };
    PatchCableSource* mUIControlCable{ nullptr };
    int mQueuedPresetIndex{ -1 };
-   bool mForceImmediateSet{ false };
+   bool mAllowSetOnAudioThread{ false };
+   TextEntry* mPresetLabelEntry{ nullptr };
+   std::string mPresetLabel;
+   int mLoadRev{ -1 };
 };
 
 

@@ -178,6 +178,7 @@ struct UIControlConnection
    int mChannel{ -1 };
    int mPage{ 0 };
    bool mPageless{ false };
+   std::string mShouldRetryForUIControlAt{ "" };
 
    static bool sDrawCables;
 

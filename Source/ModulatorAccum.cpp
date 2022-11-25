@@ -101,7 +101,6 @@ float ModulatorAccum::Value(int samplesIn)
 
 void ModulatorAccum::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModulatorAccum::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -97,6 +97,7 @@ public:
    void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
    float GetMidiValue() const override;
+   void GetRange(float& min, float& max) override;
    void SetValue(float value, double time) override;
    float GetValue() const override;
    int GetNumValues() override;

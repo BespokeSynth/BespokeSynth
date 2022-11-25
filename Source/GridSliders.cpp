@@ -203,7 +203,6 @@ void GridSliders::GetModuleDimensions(float& width, float& height)
 
 void GridSliders::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void GridSliders::LoadLayout(const ofxJSONElement& moduleInfo)

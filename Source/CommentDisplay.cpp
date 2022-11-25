@@ -77,7 +77,5 @@ void CommentDisplay::SetUpFromSaveData()
 
 void CommentDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["comment"] = mComment;
 }

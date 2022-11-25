@@ -240,6 +240,11 @@ public:
    void SetValue(float value, double time) override;
    float GetValue() const override;
    float GetMidiValue() const override;
+   void GetRange(float& min, float& max) override
+   {
+      min = mMin;
+      max = mMax;
+   }
    int GetNumValues() override { return mMax - mMin + 1; }
    bool ModulatorUsesLiteralValue() const override { return true; }
    float GetModulationRangeMin() const override { return mMin; }

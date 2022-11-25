@@ -125,7 +125,6 @@ void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void VinylTempoControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)

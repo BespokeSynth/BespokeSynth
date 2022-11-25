@@ -82,7 +82,6 @@ float VelocityToCV::Value(int samplesIn)
 
 void VelocityToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void VelocityToCV::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -136,6 +136,7 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
+   bool GetNoHover() const override { return true; }
 
    float mViewStart{ 0 };
    float mViewEnd;

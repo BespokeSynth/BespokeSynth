@@ -149,7 +149,6 @@ void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, do
 
 void EnvelopeModulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void EnvelopeModulator::LoadLayout(const ofxJSONElement& moduleInfo)

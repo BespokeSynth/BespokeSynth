@@ -45,9 +45,10 @@ void Presets::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid("uigrid", 5, 38, 120, 50, 8, 3, this);
    mBlendTimeSlider = new FloatSlider(this, "blend", 5, 20, 70, 15, &mBlendTime, 0, 5000);
-   mCurrentPresetSlider = new IntSlider(this, "preset", 35, 3, 64, 15, &mCurrentPreset, 0, mGrid->GetCols() * mGrid->GetRows() - 1);
+   mCurrentPresetSelector = new DropdownList(this, "preset", 35, 3, &mCurrentPreset, 64);
    mRandomizeButton = new ClickButton(this, "random", 78, 20);
    mAddButton = new ClickButton(this, "add", 101, 3);
+   mPresetLabelEntry = new TextEntry(this, "preset label", -1, -1, 12, &mPresetLabel);
 
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
@@ -70,6 +71,9 @@ void Presets::CreateUIControls()
       //mUIControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
       AddPatchCableSource(mUIControlCable);
    }
+
+   for (int i = 0; i < 32; ++i)
+      mCurrentPresetSelector->AddLabel(ofToString(i).c_str(), i);
 }
 
 void Presets::Init()
@@ -78,7 +82,7 @@ void Presets::Init()
 
    int defaultPreset = mModuleSaveData.GetInt("defaultpreset");
    if (defaultPreset != -1)
-      SetPreset(defaultPreset, gTime, false);
+      SetPreset(defaultPreset, gTime);
 
    TheTransport->AddAudioPoller(this);
 }
@@ -87,7 +91,7 @@ void Presets::Poll()
 {
    if (mQueuedPresetIndex != -1)
    {
-      SetPreset(mQueuedPresetIndex, NextBufferTime(false), false);
+      SetPreset(mQueuedPresetIndex, NextBufferTime(false));
       mQueuedPresetIndex = -1;
    }
 
@@ -111,17 +115,13 @@ void Presets::DrawModule()
 
    mGrid->Draw();
    mBlendTimeSlider->Draw();
-   mCurrentPresetSlider->Draw();
+   mCurrentPresetSelector->Draw();
    mRandomizeButton->Draw();
    mAddButton->Draw();
+   mPresetLabelEntry->SetPosition(3, mGrid->GetRect(K(local)).getMaxY() + 3);
+   mPresetLabelEntry->Draw();
 
    int hover = mGrid->CurrentHover();
-   if (hover != -1 && !mPresetCollection.empty())
-   {
-      assert(hover >= 0 && hover < mPresetCollection.size());
-      DrawTextNormal(mPresetCollection[hover].mDescription, 50, 0);
-   }
-
    bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
    if (shiftHeld)
    {
@@ -149,6 +149,33 @@ void Presets::DrawModule()
       ofNoFill();
       ofRect(pos.x, pos.y, xsize, ysize);
       ofPopStyle();
+   }
+}
+
+void Presets::DrawModuleUnclipped()
+{
+   int hover = mGrid->CurrentHover();
+   if (hover != -1 && !mPresetCollection.empty())
+   {
+      assert(hover >= 0 && hover < mPresetCollection.size());
+
+      std::string tooltip = mPresetCollection[hover].mLabel;
+      ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
+      pos.x += (mGrid->GetWidth() / mGrid->GetCols()) + 3;
+      pos.y += (mGrid->GetHeight() / mGrid->GetRows()) / 2;
+
+      float width = GetStringWidth(tooltip);
+
+      ofFill();
+      ofSetColor(50, 50, 50);
+      ofRect(pos.x, pos.y, width + 10, 15);
+
+      ofNoFill();
+      ofSetColor(255, 255, 255);
+      ofRect(pos.x, pos.y, width + 10, 15);
+
+      ofSetColor(255, 255, 255);
+      DrawTextNormal(tooltip, pos.x + 5, pos.y + 12);
    }
 }
 
@@ -183,7 +210,7 @@ void Presets::OnClicked(float x, float y, bool right)
       if (GetKeyModifiers() == kModifier_Shift)
          Store(mCurrentPreset);
       else
-         SetPreset(mCurrentPreset, NextBufferTime(false), false);
+         SetPreset(mCurrentPreset, NextBufferTime(false));
 
       UpdateGridValues();
    }
@@ -201,14 +228,14 @@ void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    if (pitch < (int)mPresetCollection.size())
    {
       mCurrentPreset = pitch;
-      SetPreset(pitch, time, true);
+      SetPreset(pitch, time);
       UpdateGridValues();
    }
 }
 
-void Presets::SetPreset(int idx, double time, bool queueForMainThread)
+void Presets::SetPreset(int idx, double time)
 {
-   if (queueForMainThread && !mForceImmediateSet)
+   if (!mAllowSetOnAudioThread && IsAudioThread())
    {
       mQueuedPresetIndex = idx;
       return;
@@ -286,6 +313,7 @@ void Presets::SetPreset(int idx, double time, bool queueForMainThread)
    }
 
    mDrawSetPresetsCountdown = 30;
+   mPresetLabel = coll.mLabel;
 }
 
 void Presets::RandomizeTargets()
@@ -400,12 +428,14 @@ void Presets::Store(int idx)
       for (auto* grid : mPresetModules[i]->GetUIGrids())
          coll.mPresets.push_back(Preset(grid, this));
    }
+
+   mPresetLabel = coll.mLabel;
 }
 
 namespace
 {
    const float extraW = 10;
-   const float extraH = 43;
+   const float extraH = 58;
    const int maxGridSide = 20;
 }
 
@@ -429,12 +459,21 @@ void Presets::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void Presets::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
+void Presets::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (slider == mCurrentPresetSlider)
+   if (list == mCurrentPresetSelector)
    {
-      SetPreset(mCurrentPreset, time, true);
+      SetPreset(mCurrentPreset, time);
       UpdateGridValues();
+   }
+}
+
+void Presets::TextEntryComplete(TextEntry* entry)
+{
+   if (entry == mPresetLabelEntry)
+   {
+      mPresetCollection[mCurrentPreset].mLabel = mPresetLabel;
+      mCurrentPresetSelector->SetLabel(mPresetLabel, mCurrentPreset);
    }
 }
 
@@ -446,27 +485,27 @@ void Presets::GetModuleDimensions(float& width, float& height)
 
 void Presets::Resize(float w, float h)
 {
-   w = MAX(w - extraW, 120);
-   h = MAX(h - extraH, 15);
-   SetGridSize(w, h);
+   SetGridSize(MAX(w - extraW, 120), MAX(h - extraH, 15));
 }
 
 void Presets::SetGridSize(float w, float h)
 {
    mGrid->SetDimensions(w, h);
-   int cols = MIN(w / 15, maxGridSide);
-   int rows = MIN(h / 15, maxGridSide);
+   int cols = MIN(w / 18, maxGridSide);
+   int rows = MIN(h / 18, maxGridSide);
    mGrid->SetGrid(cols, rows);
-   if (mPresetCollection.size() < size_t(cols) * rows)
+   int oldSize = (int)mPresetCollection.size();
+   if (oldSize < size_t(cols) * rows)
+   {
       mPresetCollection.resize(size_t(cols) * rows);
-   mCurrentPresetSlider->SetExtents(0, mGrid->GetCols() * mGrid->GetRows() - 1);
+      for (int i = oldSize; i < (int)mPresetCollection.size(); ++i)
+         mPresetCollection[i].mLabel = ofToString(i);
+   }
    UpdateGridValues();
 }
 
 void Presets::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["gridwidth"] = mGrid->GetWidth();
    moduleInfo["gridheight"] = mGrid->GetHeight();
 }
@@ -477,7 +516,7 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
    mModuleSaveData.LoadFloat("gridheight", moduleInfo, 50, 15, 1000);
-   mModuleSaveData.LoadBool("force_immediate_set", moduleInfo, false);
+   mModuleSaveData.LoadBool("allow_set_on_audio_thread", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -485,7 +524,7 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 void Presets::SetUpFromSaveData()
 {
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
-   mForceImmediateSet = mModuleSaveData.GetBool("force_immediate_set");
+   mAllowSetOnAudioThread = mModuleSaveData.GetBool("allow_set_on_audio_thread");
 }
 
 void Presets::SaveState(FileStreamOut& out)
@@ -511,7 +550,7 @@ void Presets::SaveState(FileStreamOut& out)
             out << preset.mGridContents[i];
          out << preset.mString;
       }
-      out << coll.mDescription;
+      out << coll.mLabel;
    }
 
    out << (int)mPresetModules.size();
@@ -521,10 +560,14 @@ void Presets::SaveState(FileStreamOut& out)
    out << (int)mPresetControls.size();
    for (auto control : mPresetControls)
       out << control->Path();
+
+   out << mCurrentPreset;
 }
 
 void Presets::LoadState(FileStreamIn& in, int rev)
 {
+   mLoadRev = rev;
+
    IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)
@@ -559,7 +602,10 @@ void Presets::LoadState(FileStreamIn& in, int rev)
             in >> presetData.mGridContents[k];
          in >> presetData.mString;
       }
-      in >> mPresetCollection[i].mDescription;
+      in >> mPresetCollection[i].mLabel;
+      if (rev < 2 && mPresetCollection[i].mLabel.empty())
+         mPresetCollection[i].mLabel = ofToString(i);
+      mCurrentPresetSelector->SetLabel(mPresetCollection[i].mLabel, i);
    }
 
    UpdateGridValues();
@@ -588,6 +634,9 @@ void Presets::LoadState(FileStreamIn& in, int rev)
          mUIControlCable->AddPatchCable(control);
       }
    }
+
+   if (rev >= 2)
+      in >> mCurrentPreset;
 }
 
 void Presets::UpdateOldControlName(std::string& oldName)
@@ -598,10 +647,32 @@ void Presets::UpdateOldControlName(std::string& oldName)
       oldName = "blend";
 }
 
+bool Presets::LoadOldControl(FileStreamIn& in, std::string& oldName)
+{
+   if (mLoadRev < 2)
+   {
+      if (oldName == "preset")
+      {
+         //load from int slider
+         int intSliderRev;
+         in >> intSliderRev;
+         in >> mCurrentPreset;
+         int dummy;
+         if (intSliderRev >= 1)
+         {
+            in >> dummy;
+            in >> dummy;
+         }
+         return true;
+      }
+   }
+   return false;
+}
+
 std::vector<IUIControl*> Presets::ControlsToNotSetDuringLoadState() const
 {
    std::vector<IUIControl*> ignore;
-   ignore.push_back(mCurrentPresetSlider);
+   ignore.push_back(mCurrentPresetSelector);
    return ignore;
 }
 

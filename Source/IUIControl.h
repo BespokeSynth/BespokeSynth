@@ -80,12 +80,13 @@ public:
    virtual void ResetToOriginal() {}
    virtual void Increment(float amount) {}
    void SetNoHover(bool noHover) { mNoHover = noHover; }
-   bool GetNoHover() const { return mNoHover; }
+   virtual bool GetNoHover() const { return mNoHover; }
    virtual bool AttemptTextInput() { return false; }
    void PositionTo(IUIControl* anchor, AnchorDirection direction);
    void GetColors(ofColor& color, ofColor& textColor);
    bool GetShouldSaveState() const { return mShouldSaveState; }
    void SetShouldSaveState(bool save) { mShouldSaveState = save; }
+   void RemoveFromOwner();
    virtual bool IsSliderControl() { return true; }
    virtual bool IsButtonControl() { return false; }
    virtual bool IsMouseDown() const { return false; }
@@ -94,8 +95,9 @@ public:
    virtual float GetModulationRangeMin() const { return 0; }
    virtual float GetModulationRangeMax() const { return 1; }
 
-   static void SetNewManualHover(int direction);
-   static bool WasLastHoverSetViaTab() { return sLastUIHoverWasSetViaTab; }
+   static void SetNewManualHoverViaTab(int direction);
+   static void SetNewManualHoverViaArrow(ofVec2f direction);
+   static bool WasLastHoverSetManually() { return sLastUIHoverWasSetManually; }
 
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
@@ -108,7 +110,7 @@ protected:
    bool mShouldSaveState{ true };
 
    static IUIControl* sLastHoveredUIControl;
-   static bool sLastUIHoverWasSetViaTab;
+   static bool sLastUIHoverWasSetManually;
 };
 
 #endif

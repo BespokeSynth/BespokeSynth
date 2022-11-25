@@ -427,7 +427,6 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button, double time)
 
 void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)

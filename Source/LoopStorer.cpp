@@ -232,7 +232,6 @@ void LoopStorer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void LoopStorer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["looper"] = mLooper ? mLooper->Name() : "";
 }
 

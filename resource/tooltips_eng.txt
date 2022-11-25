@@ -1866,7 +1866,7 @@ transposefrom~transpose input from a specified root to the root of the current s
 
 
 
-m185sequencer~sequencer using the unique paradigm of the the m185 or intellijel metropolis
+m185sequencer~sequencer using the unique paradigm of the m185 or intellijel metropolis
 ~interval~interval per step
 ~reset step~resets counter to first step
 ~pitch*~pitch to use for this row

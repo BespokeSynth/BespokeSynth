@@ -311,7 +311,6 @@ void Prefab::UpdatePrefabName(std::string path)
 
 void Prefab::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["modules"] = mModuleContainer.WriteModules();
 }
 

@@ -165,7 +165,6 @@ void SpectralDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void SpectralDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

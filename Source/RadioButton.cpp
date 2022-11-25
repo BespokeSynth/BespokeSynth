@@ -27,6 +27,7 @@
 #include "IDrawableModule.h"
 #include "SynthGlobals.h"
 #include "FileStream.h"
+#include "DropdownList.h"
 
 const int radioSpacing = 15;
 
@@ -348,6 +349,13 @@ EnumMap RadioButton::GetEnumMap()
    for (int i = 0; i < mElements.size(); ++i)
       ret[mElements[i].mLabel] = mElements[i].mValue;
    return ret;
+}
+
+void RadioButton::CopyContentsTo(DropdownList* list) const
+{
+   list->Clear();
+   for (auto& element : mElements)
+      list->AddLabel(element.mLabel, element.mValue);
 }
 
 void RadioButton::CalcSliderVal()

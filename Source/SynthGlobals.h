@@ -219,6 +219,7 @@ float GetRightPanGain(float pan);
 void DrawFallbackText(const char* text, float posX, float posY);
 bool EvaluateExpression(std::string expression, float currentValue, float& output);
 double NextBufferTime(bool includeLookahead);
+bool IsAudioThread();
 
 inline static float RandomSample()
 {

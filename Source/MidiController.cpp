@@ -231,6 +231,8 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
       controlConnection->mMessageType = msgType;
       controlConnection->mControl = control;
       controlConnection->SetUIControl(path);
+      if (controlConnection->mUIControl == nullptr && controlConnection->mSpecialBinding == kSpecialBinding_None)
+         controlConnection->mShouldRetryForUIControlAt = path;
 
       ControlType controlType = kControlType_SetValue;
       if (connection["toggle"].asBool())
@@ -2314,8 +2316,6 @@ void MidiController::UpdateControllerIndex()
 
 void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    mConnectionsJson.clear();
    mConnectionsJson.resize((int)mConnections.size());
    int i = 0;
@@ -2565,6 +2565,12 @@ void UIControlConnection::SetShowing(bool enabled)
 
 void UIControlConnection::Poll()
 {
+   if (!mShouldRetryForUIControlAt.empty())
+   {
+      SetUIControl(mShouldRetryForUIControlAt);
+      mShouldRetryForUIControlAt = "";
+   }
+
    if (mUIControl || mSpecialBinding != kSpecialBinding_None)
    {
       if (mSpecialBinding == kSpecialBinding_Hover)

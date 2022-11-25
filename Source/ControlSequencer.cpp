@@ -183,7 +183,7 @@ void ControlSequencer::DrawModule()
    mRandomize->Draw();
 
    int currentHover = mGrid->CurrentHover();
-   if (currentHover != -1 && GetUIControl())
+   if (!mSliderMode && currentHover != -1 && GetUIControl())
    {
       ofPushStyle();
       ofSetColor(ofColor::grey);
@@ -352,7 +352,6 @@ void ControlSequencer::SetGridSize(float w, float h)
 
 void ControlSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ControlSequencer::LoadLayout(const ofxJSONElement& moduleInfo)

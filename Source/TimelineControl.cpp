@@ -141,7 +141,5 @@ void TimelineControl::SetUpFromSaveData()
 
 void TimelineControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["width"] = mWidth;
 }

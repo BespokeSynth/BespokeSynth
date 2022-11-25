@@ -231,5 +231,4 @@ void NoteHocket::SetUpFromSaveData()
 
 void NoteHocket::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }

@@ -125,7 +125,13 @@ void Transport::Advance(double ms)
 
    assert(amount > 0);
 
+   double oldMeasureTime = mMeasureTime;
    mMeasureTime += amount;
+   if (mQueuedMeasure != -1 && int(mMeasureTime) != int(oldMeasureTime))
+   {
+      mMeasureTime = fmod(mMeasureTime, 1) + mQueuedMeasure;
+      mQueuedMeasure = -1;
+   }
 
    if (mLoopStartMeasure != -1 && (GetMeasure(gTime) < mLoopStartMeasure || GetMeasure(gTime) >= mLoopEndMeasure))
       SetMeasure(mLoopStartMeasure);
@@ -244,9 +250,10 @@ void Transport::DrawModule()
    ofRect(0, h - Swing(measurePos) * h, 4, 1);
 }
 
-void Transport::Reset(float rewindAmount)
+void Transport::Reset()
 {
-   mMeasureTime = -rewindAmount;
+   mMeasureTime = .99f;
+   SetQueuedMeasure(NextBufferTime(true), 0);
 }
 
 void Transport::ButtonClicked(ClickButton* button, double time)
@@ -329,6 +336,12 @@ void Transport::AddAudioPoller(IAudioPoller* poller)
 void Transport::RemoveAudioPoller(IAudioPoller* poller)
 {
    mAudioPollers.remove(poller);
+}
+
+void Transport::ClearListenersAndPollers()
+{
+   mListeners.clear();
+   mAudioPollers.clear();
 }
 
 int Transport::GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs /*=nullptr*/)
@@ -514,6 +527,34 @@ double Transport::GetDuration(NoteInterval interval)
    return MsPerBar() * GetMeasureFraction(interval);
 }
 
+double Transport::GetMeasureTimeInternal(double time) const
+{
+   return mMeasureTime + (time - gTime) / MsPerBar();
+}
+
+double Transport::GetMeasureTime(double time) const
+{
+   double measureTime = GetMeasureTimeInternal(time);
+   if (mQueuedMeasure != -1 && measureTime >= mQueuedMeasureSwitchAtMeasure)
+      measureTime = mQueuedMeasure + measureTime - mQueuedMeasureSwitchAtMeasure;
+   return measureTime;
+}
+
+void Transport::SetQueuedMeasure(double time, int measure)
+{
+   mQueuedMeasure = -1; //clear
+   mQueuedMeasureSwitchAtMeasure = GetMeasure(time) + 1;
+   mQueuedMeasure = measure;
+}
+
+bool Transport::IsPastQueuedMeasureJump(double time) const
+{
+   double measureTime = GetMeasureTimeInternal(time);
+   if (mQueuedMeasure != -1 && measureTime >= mQueuedMeasureSwitchAtMeasure)
+      return true;
+   return false;
+}
+
 double Transport::GetMeasureFraction(NoteInterval interval)
 {
    switch (interval)
@@ -569,35 +610,51 @@ double Transport::GetMeasureFraction(NoteInterval interval)
 
 void Transport::UpdateListeners(double jumpMs)
 {
-   for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   std::list<int> priorities;
+   for (const auto& info : mListeners)
    {
-      const TransportListenerInfo& info = *i;
-      if (info.mInterval != kInterval_None &&
-          info.mInterval != kInterval_Free)
+      if (info.mListener != nullptr && !ListContains(info.mListener->mTransportPriority, priorities))
+         priorities.push_back(info.mListener->mTransportPriority);
+   }
+
+   priorities.sort();
+
+   for (const auto& priority : priorities)
+   {
+      for (const auto& info : mListeners)
       {
-         double lookaheadMs = jumpMs;
-         if (info.mUseEventLookahead)
-            lookaheadMs = MAX(lookaheadMs, GetEventLookaheadMs());
-
-         double checkTime = gTime + lookaheadMs;
-
-         double remainderMs;
-         int oldStep = GetQuantized(checkTime - jumpMs, &info);
-         int newStep = GetQuantized(checkTime, &info, &remainderMs);
-         if (oldStep != newStep)
+         if (info.mListener != nullptr &&
+             info.mListener->mTransportPriority == priority &&
+             info.mInterval != kInterval_None &&
+             info.mInterval != kInterval_Free)
          {
-            double time = checkTime - remainderMs + .0001; //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
-            /*ofLog() << oldStep << " " << newStep << " " << remainderMs << " " << jumpMs << " " << checkTime << " " << time << " " << GetQuantized(checkTime, info.mInterval) << " " << GetQuantized(time, info.mInterval);
-            if (GetQuantized(checkTime + offsetMs, info.mInterval) != GetQuantized(time + offsetMs, info.mInterval))
+            double lookaheadMs = jumpMs;
+            if (info.mUseEventLookahead)
+               lookaheadMs = MAX(lookaheadMs, GetEventLookaheadMs());
+
+            double checkTime = gTime + lookaheadMs;
+
+            double remainderMs;
+            int oldStep = GetQuantized(checkTime - jumpMs, &info);
+            int newStep = GetQuantized(checkTime, &info, &remainderMs);
+            bool oldJumped = IsPastQueuedMeasureJump(checkTime - jumpMs);
+            bool newJumped = IsPastQueuedMeasureJump(checkTime);
+            if (oldStep != newStep ||
+                oldJumped != newJumped)
             {
-               double aboveRemainderMs;
-               GetQuantized(checkTime + offsetMs, info.mInterval, &aboveRemainderMs);
-               double remainderShouldBeZeroMs;
-               GetQuantized(time + offsetMs, info.mInterval, &remainderShouldBeZeroMs);
-               ofLog() << remainderShouldBeZeroMs;
-            }*/
-            //assert(GetQuantized(checkTime + offsetMs, info.mInterval) == GetQuantized(time + offsetMs, info.mInterval));
-            info.mListener->OnTimeEvent(time);
+               double time = checkTime - remainderMs + .0001; //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
+               /*ofLog() << oldStep << " " << newStep << " " << remainderMs << " " << jumpMs << " " << checkTime << " " << time << " " << GetQuantized(checkTime, info.mInterval) << " " << GetQuantized(time, info.mInterval);
+               if (GetQuantized(checkTime + offsetMs, info.mInterval) != GetQuantized(time + offsetMs, info.mInterval))
+               {
+                  double aboveRemainderMs;
+                  GetQuantized(checkTime + offsetMs, info.mInterval, &aboveRemainderMs);
+                  double remainderShouldBeZeroMs;
+                  GetQuantized(time + offsetMs, info.mInterval, &remainderShouldBeZeroMs);
+                  ofLog() << remainderShouldBeZeroMs;
+               }*/
+               //assert(GetQuantized(checkTime + offsetMs, info.mInterval) == GetQuantized(time + offsetMs, info.mInterval));
+               info.mListener->OnTimeEvent(time);
+            }
          }
       }
    }
@@ -605,9 +662,8 @@ void Transport::UpdateListeners(double jumpMs)
 
 void Transport::OnDrumEvent(NoteInterval drumEvent)
 {
-   for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   for (const auto& info : mListeners)
    {
-      const TransportListenerInfo& info = *i;
       if (info.mInterval == drumEvent)
          info.mListener->OnTimeEvent(0); //TODO(Ryan) calc sample offset
    }

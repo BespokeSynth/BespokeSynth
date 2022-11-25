@@ -106,5 +106,4 @@ void NoteSorter::SetUpFromSaveData()
 
 void NoteSorter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }

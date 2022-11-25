@@ -604,6 +604,8 @@ target_sources(BespokeSynth PRIVATE
     SliderSequencer.h
     SlowLayers.cpp
     SlowLayers.h
+    SongBuilder.cpp
+    SongBuilder.h
     SpaceMouseControl.cpp
     SpaceMouseControl.h
     SpectralDisplay.cpp

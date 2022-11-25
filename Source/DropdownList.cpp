@@ -90,6 +90,28 @@ void DropdownList::RemoveLabel(int value)
    }
 }
 
+void DropdownList::SetLabel(std::string label, int value)
+{
+   bool found = false;
+   for (auto iter = mElements.begin(); iter != mElements.end(); ++iter)
+   {
+      if (iter->mValue == value)
+      {
+         found = true;
+         iter->mLabel = label;
+
+         CalculateWidth();
+         mHeight = kItemSpacing;
+
+         CalcSliderVal();
+         break;
+      }
+   }
+
+   if (!found)
+      AddLabel(label, value);
+}
+
 void DropdownList::CalculateWidth()
 {
    mMaxItemWidth = mWidth;
@@ -133,38 +155,49 @@ void DropdownList::Render()
 {
    ofPushStyle();
 
-   float xOffset = 0;
-   if (mDrawLabel)
-   {
-      DrawTextNormal(Name(), mX, mY + 12);
-      xOffset = mLabelSize;
-   }
-
-   DrawBeacon(mX + mWidth / 2 + xOffset, mY + mHeight / 2);
-
    float w, h;
    GetDimensions(w, h);
 
    ofColor color, textColor;
    IUIControl::GetColors(color, textColor);
+   float xOffset = 0;
 
-   ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
-   ofRect(mX + 1 + xOffset, mY + 1, w - xOffset, h);
-   ofSetColor(color);
-   ofRect(mX + xOffset, mY, w - xOffset, h);
-   ofNoFill();
-
-   ofSetColor(textColor);
-
-   ofPushMatrix();
-   ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
-   DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
-   ofPopMatrix();
-   if (mDrawTriangle)
+   if (mDisplayStyle == DropdownDisplayStyle::kNormal)
    {
-      ofSetLineWidth(.5f);
-      ofTriangle(mX + w - 11, mY + 4, mX + w - 3, mY + 4, mX + w - 7, mY + 11);
+      if (mDrawLabel)
+      {
+         DrawTextNormal(Name(), mX, mY + 12);
+         xOffset = mLabelSize;
+      }
+
+      DrawBeacon(mX + mWidth / 2 + xOffset, mY + mHeight / 2);
+
+      ofFill();
+      ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+      ofRect(mX + 1 + xOffset, mY + 1, w - xOffset, h);
+      ofSetColor(color);
+      ofRect(mX + xOffset, mY, w - xOffset, h);
+      ofNoFill();
+
+      ofSetColor(textColor);
+
+      ofPushMatrix();
+      ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
+      DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
+      ofPopMatrix();
+      if (mDrawTriangle)
+      {
+         ofSetLineWidth(.5f);
+         ofTriangle(mX + w - 11, mY + 4, mX + w - 3, mY + 4, mX + w - 7, mY + 11);
+      }
+   }
+   else if (mDisplayStyle == DropdownDisplayStyle::kHamburger)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.0f);
+      ofLine(mX + 6, mY + 4.5f, mX + 14, mY + 4.5f);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofLine(mX + 6, mY + 10.5f, mX + 14, mY + 10.5f);
    }
 
    ofPopStyle();
@@ -278,6 +311,13 @@ void DropdownList::ChangePage(int direction)
    int newColumn = mCurrentPagedColumn + direction * mDisplayColumns;
    if (newColumn >= 0 && newColumn < ceil(float(mTotalColumns) / mDisplayColumns) * mDisplayColumns)
       mCurrentPagedColumn = newColumn;
+}
+
+void DropdownList::CopyContentsTo(DropdownList* list) const
+{
+   list->Clear();
+   for (auto& element : mElements)
+      list->AddLabel(element.mLabel, element.mValue);
 }
 
 void DropdownList::GetDimensions(float& width, float& height)

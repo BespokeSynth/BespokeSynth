@@ -598,8 +598,6 @@ void EnvelopeEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, doubl
 
 void EnvelopeEditor::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    if (mADSRDisplay != nullptr)
       moduleInfo["target"] = mADSRDisplay->Path();
 

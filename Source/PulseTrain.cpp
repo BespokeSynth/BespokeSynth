@@ -257,7 +257,6 @@ void PulseTrain::LoadState(FileStreamIn& in, int rev)
 
 void PulseTrain::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PulseTrain::LoadLayout(const ofxJSONElement& moduleInfo)

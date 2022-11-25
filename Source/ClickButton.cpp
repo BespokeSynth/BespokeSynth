@@ -148,6 +148,27 @@ void ClickButton::Render()
       ofLine(mX + 14, mY + 3, mX + 6, mY + 7);
       ofLine(mX + 14, mY + 11, mX + 6, mY + 7);
    }
+   else if (mDisplayStyle == ButtonDisplayStyle::kPlus)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.5f);
+      ofLine(mX + 10, mY + 3, mX + 10, mY + 12);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kMinus)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.5f);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kHamburger)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.0f);
+      ofLine(mX + 6, mY + 4.5f, mX + 14, mY + 4.5f);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofLine(mX + 6, mY + 10.5f, mX + 14, mY + 10.5f);
+   }
 
    ofPopStyle();
 
@@ -212,4 +233,9 @@ std::string ClickButton::GetDisplayValue(float val) const
    if (val > 0)
       return "click";
    return "_";
+}
+
+void ClickButton::Increment(float amount)
+{
+   DoClick(NextBufferTime(false));
 }

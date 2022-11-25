@@ -72,8 +72,6 @@ void MacroSlider::FloatSliderUpdated(FloatSlider* slider, float oldVal, double t
 
 void MacroSlider::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["num_mappings"] = (int)mMappings.size();
 }
 

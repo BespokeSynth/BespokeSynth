@@ -387,6 +387,11 @@ void Scale::RemoveListener(IScaleListener* listener)
    mListeners.remove(listener);
 }
 
+void Scale::ClearListeners()
+{
+   mListeners.clear();
+}
+
 void Scale::NotifyListeners()
 {
    for (std::list<IScaleListener*>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)

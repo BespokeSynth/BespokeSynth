@@ -85,8 +85,8 @@ void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
    if (onTheFly)
    {
       ofxJSONElement empty;
-      effect->LoadLayout(empty);
-      effect->SetUpFromSaveData();
+      effect->LoadLayoutBase(empty);
+      effect->SetUpFromSaveDataBase();
    }
 
    if (mInitialized) //if we've already been initialized, call init on this
@@ -562,7 +562,7 @@ void EffectChain::LoadLayout(const ofxJSONElement& moduleInfo)
       {
          std::string type = effects[i]["type"].asString();
          assert(mEffects[i]->GetType() == type);
-         mEffects[i]->LoadLayout(effects[i]);
+         mEffects[i]->LoadLayoutBase(effects[i]);
       }
       catch (Json::LogicError& e)
       {
@@ -580,18 +580,16 @@ void EffectChain::SetUpFromSaveData()
    mShowSpawnList = mModuleSaveData.GetBool("showspawnlist");
 
    for (int i = 0; i < mEffects.size(); ++i)
-      mEffects[i]->SetUpFromSaveData();
+      mEffects[i]->SetUpFromSaveDataBase();
 }
 
 void EffectChain::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["effects"].resize((unsigned int)mEffects.size());
    for (int i = 0; i < mEffects.size(); ++i)
    {
       ofxJSONElement save;
-      mEffects[i]->SaveLayout(save);
+      mEffects[i]->SaveLayoutBase(save);
       moduleInfo["effects"][i] = save;
       moduleInfo["effects"][i]["type"] = mEffects[i]->GetType();
    }

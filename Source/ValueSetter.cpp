@@ -115,7 +115,6 @@ void ValueSetter::Go(double time)
 
 void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ValueSetter::LoadLayout(const ofxJSONElement& moduleInfo)

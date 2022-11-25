@@ -212,8 +212,6 @@ void Rewriter::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Rewriter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    std::string targetPath = "";
    if (mConnectedLooper)
       targetPath = mConnectedLooper->Path();

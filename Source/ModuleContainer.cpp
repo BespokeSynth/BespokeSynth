@@ -565,7 +565,7 @@ ofxJSONElement ModuleContainer::WriteModules()
    for (int i = 0; i < saveModules.size(); ++i)
    {
       ofxJSONElement moduleInfo;
-      saveModules[i]->SaveLayout(moduleInfo);
+      saveModules[i]->SaveLayoutBase(moduleInfo);
       modules[i] = moduleInfo;
    }
    IClickable::ClearSaveContext();

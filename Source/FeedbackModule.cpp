@@ -159,7 +159,6 @@ void FeedbackModule::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void FeedbackModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["feedbacktarget"] = mFeedbackTarget ? dynamic_cast<IDrawableModule*>(mFeedbackTarget)->Name() : "";
 }
 

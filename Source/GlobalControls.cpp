@@ -122,7 +122,6 @@ void GlobalControls::SetUpFromSaveData()
 
 void GlobalControls::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 std::vector<IUIControl*> GlobalControls::ControlsToNotSetDuringLoadState() const

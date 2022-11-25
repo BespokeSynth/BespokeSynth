@@ -282,7 +282,6 @@ void Pulser::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void Pulser::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void Pulser::LoadLayout(const ofxJSONElement& moduleInfo)

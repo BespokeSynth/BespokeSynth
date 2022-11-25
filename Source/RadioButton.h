@@ -41,6 +41,7 @@ enum RadioDirection
 };
 
 class RadioButton;
+class DropdownList;
 
 class IRadioButtonListener
 {
@@ -62,6 +63,7 @@ public:
    void Clear();
    EnumMap GetEnumMap();
    void SetForcedWidth(int width) { mForcedWidth = width; }
+   void CopyContentsTo(DropdownList* list) const;
 
    bool MouseMoved(float x, float y) override;
 

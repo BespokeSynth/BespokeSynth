@@ -40,7 +40,7 @@ void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 
 void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled)
 {
-   if (std::this_thread::get_id() != ModularSynth::GetAudioThreadID())
+   if (!IsAudioThread())
    {
       if (!isFromMainThreadAndScheduled) //if we specifically scheduled this ahead of time, there's no need to make adjustments. otherwise, account for immediately requesting a note from the non-audio thread
       {
@@ -121,7 +121,7 @@ std::list<int> NoteOutput::GetHeldNotesList()
 
 void NoteOutput::Flush(double time)
 {
-   if (std::this_thread::get_id() != ModularSynth::GetAudioThreadID())
+   if (!IsAudioThread())
    {
       TheSynth->GetNoteOutputQueue()->QueueFlush(this, time + TheTransport->GetEventLookaheadMs() + gBufferSizeMs); //include event lookahead, and make it 1 buffer later, to make sure notes get cleared
       return;
@@ -151,7 +151,7 @@ void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voice
 {
    PROFILER(INoteSourcePlayOutput);
 
-   if (time < gTime)
+   if (time < gTime && velocity > 0)
       ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time / 1000) << " < " << ofToString(gTime / 1000);
 
    if (!mInNoteOutput)

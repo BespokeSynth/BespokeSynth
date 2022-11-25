@@ -1087,7 +1087,6 @@ void NoteStepSequencer::SetUpStepControls()
 
 void NoteStepSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)

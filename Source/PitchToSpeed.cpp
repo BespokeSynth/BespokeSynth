@@ -80,7 +80,6 @@ float PitchToSpeed::Value(int samplesIn)
 
 void PitchToSpeed::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PitchToSpeed::LoadLayout(const ofxJSONElement& moduleInfo)
