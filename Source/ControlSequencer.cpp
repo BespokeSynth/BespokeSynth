@@ -183,7 +183,7 @@ void ControlSequencer::DrawModule()
    mRandomize->Draw();
 
    int currentHover = mGrid->CurrentHover();
-   if (currentHover != -1 && GetUIControl())
+   if (!mSliderMode && currentHover != -1 && GetUIControl())
    {
       ofPushStyle();
       ofSetColor(ofColor::grey);

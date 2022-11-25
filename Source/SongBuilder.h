@@ -43,6 +43,7 @@ public:
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   void Poll() override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -56,6 +57,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
@@ -101,8 +103,15 @@ private:
       IUIControl* GetTarget() const;
       void CleanUp();
 
+      enum class DisplayType
+      {
+         TextEntry,
+         Checkbox,
+         Dropdown
+      };
+
       PatchCableSource* mCable{ nullptr };
-      bool mIsCheckbox{ false };
+      DisplayType mDisplayType{ DisplayType::TextEntry };
       ClickButton* mMoveLeftButton{ nullptr };
       ClickButton* mMoveRightButton{ nullptr };
       bool mHadTarget{ false };
@@ -113,11 +122,14 @@ private:
       void CreateUIControls(SongBuilder* owner);
       void Draw(float x, float y, int sectionIndex, int targetIndex);
       void CleanUp();
+      void UpdateDropdownContents(ControlTarget* target);
 
-      float mValue{ 0 };
+      float mFloatValue{ 0 };
       TextEntry* mValueEntry{ nullptr };
       bool mBoolValue{ false };
       Checkbox* mCheckbox{ nullptr };
+      int mIntValue{ 0 };
+      DropdownList* mValueSelector{ nullptr };
       int mId{ -1 };
    };
 
@@ -146,12 +158,12 @@ private:
    int mCurrentSection{ -1 };
    int mQueuedSection{ -1 };
    int mSequenceStepIndex{ -1 };
-   int mSequenceStepMeasureCount{ 0 };
    int mSequenceStartStepIndex{ 0 };
    bool mSequenceStartQueued{ false };
    bool mSequencePaused{ false };
    bool mWantResetClock{ false };
    bool mJustResetClock{ false };
+   bool mWantRefreshValueDropdowns{ false };
 
    static const int kMaxSequencerSections = 128;
    static const int kSequenceEndId = -1;

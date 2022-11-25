@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "FileStream.h"
 #include "PatchCableSource.h"
 #include "ofxJSONElement.h"
+#include "RadioButton.h"
 
 namespace
 {
@@ -110,8 +111,8 @@ void SongBuilder::CreateUIControls()
    mChangeQuantizeSelector = new DropdownList(this, "change quantize", -1, -1, (int*)(&mChangeQuantizeInterval));
    mAddTargetButton = new ClickButton(this, "add target", -1, -1, ButtonDisplayStyle::kPlus);
 
-   mChangeQuantizeSelector->AddLabel("switch", kInterval_Free);
    mChangeQuantizeSelector->AddLabel("jump", kInterval_None);
+   mChangeQuantizeSelector->AddLabel("switch", kInterval_Free);
    mChangeQuantizeSelector->AddLabel("1n", kInterval_1n);
    mChangeQuantizeSelector->AddLabel("2", kInterval_2);
    mChangeQuantizeSelector->AddLabel("4", kInterval_4);
@@ -151,6 +152,10 @@ void SongBuilder::DrawModule()
    mSequenceLoopStartEntry->Draw();
    mSequenceLoopEndEntry->SetShowing(ShowSongSequencer() && mLoopSequence);
    mSequenceLoopEndEntry->Draw();
+
+   //separator
+   if (ShowSongSequencer())
+      ofLine(gridStartX - 8, kGridStartY + kTargetTabHeightTop + kSpacingY, gridStartX - 8, kGridStartY + kTargetTabHeightTop + (int)mSections.size() * (kRowHeight + kSpacingY));
 
    DrawTextNormal("scenes:", gridStartX, kGridStartY + kTargetTabHeightTop - 1);
 
@@ -203,7 +208,7 @@ void SongBuilder::DrawModule()
 
          ofSetColor(0, 255, 0, 100);
          ofRectangle lengthEntryRect = mSequencerStepLengthEntry[mSequenceStepIndex]->GetRect(K(local));
-         float progress = MIN(TheTransport->GetMeasureTime(NextBufferTime(false)) / mSequencerStepLength[mSequenceStepIndex], 1.0f);
+         float progress = MIN(TheTransport->GetMeasureTime(gTime) / mSequencerStepLength[mSequenceStepIndex], 1.0f);
          lengthEntryRect.width *= progress;
          ofRect(lengthEntryRect);
       }
@@ -225,6 +230,19 @@ void SongBuilder::DrawModule()
    }
 }
 
+void SongBuilder::Poll()
+{
+   if (mWantRefreshValueDropdowns)
+   {
+      for (int i = 0; i < (int)mSections.size(); ++i)
+      {
+         for (int j = 0; j < (int)mTargets.size(); ++j)
+            mSections[i]->mValues[j]->UpdateDropdownContents(mTargets[j]);
+      }
+      mWantRefreshValueDropdowns = false;
+   }
+}
+
 void SongBuilder::OnTimeEvent(double time)
 {
    if (mJustResetClock)
@@ -243,11 +261,8 @@ void SongBuilder::OnTimeEvent(double time)
 
    if (mSequenceStepIndex != -1)
    {
-      ++mSequenceStepMeasureCount;
-      if (mSequenceStepMeasureCount >= mSequencerStepLength[mSequenceStepIndex] && !mSequencePaused)
+      if (TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset) >= mSequencerStepLength[mSequenceStepIndex] && !mSequencePaused)
       {
-         mSequenceStepMeasureCount = 0;
-
          if (mLoopSequence && mSequenceStepIndex == mSequenceLoopEndIndex && mSequenceLoopEndIndex >= mSequenceLoopStartIndex)
             mSequenceStepIndex = mSequenceLoopStartIndex;
          else
@@ -316,10 +331,12 @@ void SongBuilder::SetActiveSection(double time, int newSection)
             IUIControl* target = dynamic_cast<IUIControl*>(cable->GetTarget());
             if (target != nullptr)
             {
-               if (mTargets[i]->mIsCheckbox)
+               if (mTargets[i]->mDisplayType == ControlTarget::DisplayType::TextEntry)
+                  target->SetValue(mSections[newSection]->mValues[i]->mFloatValue, time);
+               if (mTargets[i]->mDisplayType == ControlTarget::DisplayType::Checkbox)
                   target->SetValue(mSections[newSection]->mValues[i]->mBoolValue ? 1 : 0, time);
-               else
-                  target->SetValue(mSections[newSection]->mValues[i]->mValue, time);
+               if (mTargets[i]->mDisplayType == ControlTarget::DisplayType::Dropdown)
+                  target->SetValue(mSections[newSection]->mValues[i]->mIntValue, time);
             }
          }
       }
@@ -404,7 +421,6 @@ void SongBuilder::PlaySequence(double time, int startIndex)
          mSequenceStartStepIndex = 0;
       else
          mSequenceStartStepIndex = startIndex;
-      mSequenceStepMeasureCount = 0;
       mWantResetClock = true;
       mSequencePaused = false;
       mSequenceStartQueued = true;
@@ -414,7 +430,11 @@ void SongBuilder::PlaySequence(double time, int startIndex)
 void SongBuilder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPlaySequenceButton)
+   {
       PlaySequence(time, -1);
+      if (mChangeQuantizeInterval == kInterval_None) //jump
+         TheTransport->Reset();
+   }
 
    if (button == mStopSequenceButton)
    {
@@ -435,7 +455,6 @@ void SongBuilder::ButtonClicked(ClickButton* button, double time)
       else if (mSequenceStepIndex != -1)
       {
          mSequencePaused = true;
-         mSequenceStepMeasureCount = mSequencerStepLength[mSequenceStepIndex];
       }
    }
 
@@ -496,7 +515,11 @@ void SongBuilder::ButtonClicked(ClickButton* button, double time)
    for (int i = 0; i < kMaxSequencerSections; ++i)
    {
       if (button == mSequencerPlayFromButton[i])
+      {
          PlaySequence(time, i);
+         if (mChangeQuantizeInterval == kInterval_None) //jump
+            TheTransport->Reset();
+      }
    }
 }
 
@@ -506,6 +529,38 @@ void SongBuilder::TextEntryComplete(TextEntry* entry)
    {
       if (entry == mSections[i]->mNameEntry)
          RefreshSequencerDropdowns();
+   }
+}
+
+void SongBuilder::DropdownClicked(DropdownList* list)
+{
+   int refreshValueColumn = -1;
+   for (int i = 0; i < (int)mSections.size(); ++i)
+   {
+      for (int j = 0; j < (int)mSections[i]->mValues.size(); ++j)
+      {
+         if (list == mSections[i]->mValues[j]->mValueSelector && mTargets[j]->GetTarget() != nullptr && mTargets[j]->mDisplayType == ControlTarget::DisplayType::Dropdown)
+            refreshValueColumn = j;
+      }
+   }
+
+   if (refreshValueColumn != -1)
+   {
+      for (int i = 0; i < (int)mSections.size(); ++i)
+         mSections[i]->mValues[refreshValueColumn]->UpdateDropdownContents(mTargets[refreshValueColumn]);
+   }
+}
+
+void SongBuilder::ControlValue::UpdateDropdownContents(ControlTarget* target)
+{
+   if (target->mDisplayType == ControlTarget::DisplayType::Dropdown)
+   {
+      DropdownList* targetList = dynamic_cast<DropdownList*>(target->GetTarget());
+      if (targetList)
+         targetList->CopyContentsTo(mValueSelector);
+      RadioButton* targetRadio = dynamic_cast<RadioButton*>(target->GetTarget());
+      if (targetRadio)
+         targetRadio->CopyContentsTo(mValueSelector);
    }
 }
 
@@ -651,7 +706,7 @@ void SongBuilder::SaveState(FileStreamOut& out)
    for (auto* target : mTargets)
    {
       target->mCable->SaveState(out);
-      out << target->mIsCheckbox;
+      out << (int)target->mDisplayType;
    }
 
    out << (int)mSections.size();
@@ -663,8 +718,9 @@ void SongBuilder::SaveState(FileStreamOut& out)
       for (auto* value : section->mValues)
       {
          out << value->mId;
-         out << value->mValue;
+         out << value->mFloatValue;
          out << value->mBoolValue;
+         out << value->mIntValue;
       }
    }
 
@@ -681,7 +737,9 @@ void SongBuilder::LoadState(FileStreamIn& in, int rev)
       mTargets[i] = new ControlTarget();
       mTargets[i]->CreateUIControls(this);
       mTargets[i]->mCable->LoadState(in);
-      in >> mTargets[i]->mIsCheckbox;
+      int displayType;
+      in >> displayType;
+      mTargets[i]->mDisplayType = (ControlTarget::DisplayType)displayType;
    }
 
    for (auto* section : mSections)
@@ -704,14 +762,16 @@ void SongBuilder::LoadState(FileStreamIn& in, int rev)
       {
          mSections[i]->mValues[j] = new ControlValue();
          in >> mSections[i]->mValues[j]->mId;
-         in >> mSections[i]->mValues[j]->mValue;
+         in >> mSections[i]->mValues[j]->mFloatValue;
          in >> mSections[i]->mValues[j]->mBoolValue;
+         in >> mSections[i]->mValues[j]->mIntValue;
          mSections[i]->mValues[j]->CreateUIControls(this);
          mSections[i]->TargetControlUpdated(mTargets[j], j, false);
       }
    }
 
    RefreshSequencerDropdowns();
+   mWantRefreshValueDropdowns = true;
 
    IDrawableModule::LoadState(in, rev);
 }
@@ -732,8 +792,9 @@ void SongBuilder::DuplicateSection(int sectionIndex)
    {
       newSection->AddValue(this);
       auto* newValue = newSection->mValues[newSection->mValues.size() - 1];
-      newValue->mValue = value->mValue;
+      newValue->mFloatValue = value->mFloatValue;
       newValue->mBoolValue = value->mBoolValue;
+      newValue->mIntValue = value->mIntValue;
    }
 
    RefreshSequencerDropdowns();
@@ -795,12 +856,16 @@ void SongBuilder::SongSection::TargetControlUpdated(SongBuilder::ControlTarget* 
    {
       if (!target->mHadTarget)
       {
+         mValues[targetIndex]->mFloatValue = control->GetValue();
          mValues[targetIndex]->mBoolValue = control->GetValue() > 0;
-         mValues[targetIndex]->mValue = control->GetValue();
+         mValues[targetIndex]->mIntValue = (int)control->GetValue();
+
+         mValues[targetIndex]->UpdateDropdownContents(target);
       }
 
-      mValues[targetIndex]->mValueEntry->SetShowing(!target->mIsCheckbox);
-      mValues[targetIndex]->mCheckbox->SetShowing(target->mIsCheckbox);
+      mValues[targetIndex]->mValueEntry->SetShowing(target->mDisplayType == ControlTarget::DisplayType::TextEntry);
+      mValues[targetIndex]->mCheckbox->SetShowing(target->mDisplayType == ControlTarget::DisplayType::Checkbox);
+      mValues[targetIndex]->mValueSelector->SetShowing(target->mDisplayType == ControlTarget::DisplayType::Dropdown);
    }
    else if (wasManuallyPatched) //user intentionally deleted connection
    {
@@ -811,6 +876,7 @@ void SongBuilder::SongSection::TargetControlUpdated(SongBuilder::ControlTarget* 
    {
       mValues[targetIndex]->mValueEntry->SetShowing(false);
       mValues[targetIndex]->mCheckbox->SetShowing(false);
+      mValues[targetIndex]->mValueSelector->SetShowing(false);
    }
 }
 
@@ -896,7 +962,7 @@ void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
       ofPushMatrix();
       ofClipWindow(x, y, kColumnWidth, kTargetTabHeightTop, true);
       std::string text = target->Path(false, true);
-      if (mIsCheckbox)
+      if (mDisplayType == DisplayType::Checkbox)
          ofStringReplace(text, "~enabled", "");
       std::string displayString;
       const int kSliceSize = 11;
@@ -928,7 +994,12 @@ IUIControl* SongBuilder::ControlTarget::GetTarget() const
 void SongBuilder::ControlTarget::TargetControlUpdated()
 {
    IUIControl* target = GetTarget();
-   mIsCheckbox = (dynamic_cast<Checkbox*>(target) != nullptr || dynamic_cast<ClickButton*>(target) != nullptr);
+   if (dynamic_cast<Checkbox*>(target) != nullptr || dynamic_cast<ClickButton*>(target) != nullptr)
+      mDisplayType = DisplayType::Checkbox;
+   else if (dynamic_cast<DropdownList*>(target) != nullptr || dynamic_cast<RadioButton*>(target) != nullptr)
+      mDisplayType = DisplayType::Dropdown;
+   else
+      mDisplayType = DisplayType::TextEntry;
 }
 
 void SongBuilder::ControlTarget::CleanUp()
@@ -954,9 +1025,11 @@ void SongBuilder::ControlValue::CreateUIControls(SongBuilder* owner)
       }
    }
 
-   mValueEntry = new TextEntry(owner, ("value " + ofToString(mId)).c_str(), -1, -1, 4, &mValue, -9999, 9999);
+   mValueEntry = new TextEntry(owner, ("value " + ofToString(mId)).c_str(), -1, -1, 4, &mFloatValue, -9999, 9999);
    mCheckbox = new Checkbox(owner, ("checkbox " + ofToString(mId)).c_str(), -1, -1, &mBoolValue);
    mCheckbox->SetDisplayText(false);
+   mValueSelector = new DropdownList(owner, ("dropdown " + ofToString(mId)).c_str(), -1, -1, &mIntValue, kColumnWidth);
+   mValueSelector->SetDrawTriangle(false);
 }
 
 void SongBuilder::ControlValue::Draw(float x, float y, int sectionIndex, int targetIndex)
@@ -971,10 +1044,13 @@ void SongBuilder::ControlValue::Draw(float x, float y, int sectionIndex, int tar
    mValueEntry->Draw();
    mCheckbox->SetPosition(x + 20, y + 3);
    mCheckbox->Draw();
+   mValueSelector->SetPosition(x, y + 2);
+   mValueSelector->Draw();
 }
 
 void SongBuilder::ControlValue::CleanUp()
 {
    mValueEntry->RemoveFromOwner();
    mCheckbox->RemoveFromOwner();
+   mValueSelector->RemoveFromOwner();
 }

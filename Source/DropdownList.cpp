@@ -90,6 +90,28 @@ void DropdownList::RemoveLabel(int value)
    }
 }
 
+void DropdownList::SetLabel(std::string label, int value)
+{
+   bool found = false;
+   for (auto iter = mElements.begin(); iter != mElements.end(); ++iter)
+   {
+      if (iter->mValue == value)
+      {
+         found = true;
+         iter->mLabel = label;
+
+         CalculateWidth();
+         mHeight = kItemSpacing;
+
+         CalcSliderVal();
+         break;
+      }
+   }
+
+   if (!found)
+      AddLabel(label, value);
+}
+
 void DropdownList::CalculateWidth()
 {
    mMaxItemWidth = mWidth;
@@ -289,6 +311,13 @@ void DropdownList::ChangePage(int direction)
    int newColumn = mCurrentPagedColumn + direction * mDisplayColumns;
    if (newColumn >= 0 && newColumn < ceil(float(mTotalColumns) / mDisplayColumns) * mDisplayColumns)
       mCurrentPagedColumn = newColumn;
+}
+
+void DropdownList::CopyContentsTo(DropdownList* list) const
+{
+   list->Clear();
+   for (auto& element : mElements)
+      list->AddLabel(element.mLabel, element.mValue);
 }
 
 void DropdownList::GetDimensions(float& width, float& height)

@@ -105,6 +105,7 @@ public:
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
    void AddLabel(std::string label, int value);
    void RemoveLabel(int value);
+   void SetLabel(std::string label, int value);
    std::string GetLabel(int val) const;
    void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
@@ -137,6 +138,7 @@ public:
    void ChangePage(int direction);
    void AddSeparator(int index) { mSeparators.push_back(index); }
    void ClearSeparators() { mSeparators.clear(); }
+   void CopyContentsTo(DropdownList* list) const;
 
    //IUIControl
    void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
