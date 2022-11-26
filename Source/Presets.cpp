@@ -436,6 +436,7 @@ namespace
 {
    const float extraW = 10;
    const float extraH = 58;
+   const float gridSquareDimension = 18;
    const int maxGridSide = 20;
 }
 
@@ -485,14 +486,14 @@ void Presets::GetModuleDimensions(float& width, float& height)
 
 void Presets::Resize(float w, float h)
 {
-   SetGridSize(MAX(w - extraW, 120), MAX(h - extraH, 15));
+   SetGridSize(MAX(w - extraW, 120), MAX(h - extraH, gridSquareDimension));
 }
 
 void Presets::SetGridSize(float w, float h)
 {
    mGrid->SetDimensions(w, h);
-   int cols = MIN(w / 18, maxGridSide);
-   int rows = MIN(h / 18, maxGridSide);
+   int cols = MIN(w / gridSquareDimension, maxGridSide);
+   int rows = MIN(h / gridSquareDimension, maxGridSide);
    mGrid->SetGrid(cols, rows);
    int oldSize = (int)mPresetCollection.size();
    if (oldSize < size_t(cols) * rows)
