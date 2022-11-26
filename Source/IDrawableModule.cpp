@@ -520,7 +520,10 @@ void IDrawableModule::DrawConnection(IClickable* target)
 
 void IDrawableModule::SetTarget(IClickable* target)
 {
-   mMainPatchCableSource->SetTarget(target);
+   if (mMainPatchCableSource != nullptr)
+      mMainPatchCableSource->SetTarget(target);
+   else if (!mPatchCableSources.empty())
+      mPatchCableSources[0]->SetTarget(target);
 }
 
 void IDrawableModule::SetUpPatchCables(std::string targets)
