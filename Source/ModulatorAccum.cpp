@@ -76,7 +76,7 @@ void ModulatorAccum::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 {
    OnModulatorRepatch();
 
-   if (GetSliderTarget())
+   if (GetSliderTarget() && fromUserClick)
    {
       mValue = GetSliderTarget()->GetValue();
       mValueSlider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());

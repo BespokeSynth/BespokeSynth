@@ -1613,6 +1613,28 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       yScroll += xScroll / 4; //taking advantage of logitech horizontal scroll wheel
 #endif
 
+      TextEntry* textEntry = dynamic_cast<TextEntry*>(gHoveredUIControl);
+      if (textEntry)
+      {
+         if (isSmoothScroll) //slow this down into steps if you're using a smooth trackpad
+         {
+            if (fabs(yScroll) < .1f) //need more than a miniscule change
+               return;
+            static float sLastSmoothScrollTimeMs = -999;
+            if (sLastSmoothScrollTimeMs + 100 > gTime)
+               return;
+            sLastSmoothScrollTimeMs = gTime;
+         }
+         float val = textEntry->GetValue();
+         float change = yScroll > 0 ? 1 : -1;
+         if (GetKeyModifiers() & kModifier_Shift)
+            change *= .01f;
+         float min, max;
+         textEntry->GetRange(min, max);
+         textEntry->SetValue(std::clamp(val + change, min, max), NextBufferTime(false));
+         return;
+      }
+
       float val = gHoveredUIControl->GetMidiValue();
       float movementScale = 3;
       FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(gHoveredUIControl);

@@ -63,10 +63,10 @@ void ModulatorSubtract::PostRepatch(PatchCableSource* cableSource, bool fromUser
 {
    OnModulatorRepatch();
 
-   if (GetSliderTarget())
+   if (GetSliderTarget() && fromUserClick)
    {
-      //mValue1 = mSliderTarget->GetValue();
-      //mValue2 = 0;
+      mValue1 = GetSliderTarget()->GetValue();
+      mValue2 = 0;
       mValue1Slider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
       mValue1Slider->SetMode(GetSliderTarget()->GetMode());
    }

@@ -63,10 +63,10 @@ void ModulatorMult::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 {
    OnModulatorRepatch();
 
-   if (GetSliderTarget())
+   if (GetSliderTarget() && fromUserClick)
    {
       mValue1 = GetSliderTarget()->GetValue();
-      mValue2 = 0;
+      mValue2 = 1;
       mValue1Slider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
       mValue1Slider->SetMode(GetSliderTarget()->GetMode());
    }

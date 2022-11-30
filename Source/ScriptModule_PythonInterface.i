@@ -752,7 +752,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       })
       .def("delete", [](IDrawableModule& module)
       {
-         module.GetOwningContainer()->DeleteModule(&module);
+         module.GetOwningContainer()->DeleteModule(&module, !K(fail));
       })
       .def("set", [](IDrawableModule& module, std::string path, float value)
       {

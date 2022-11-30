@@ -77,7 +77,7 @@ void ModulatorCurve::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 {
    OnModulatorRepatch();
 
-   if (GetSliderTarget())
+   if (GetSliderTarget() && fromUserClick)
       mInput = GetSliderTarget()->GetValue();
 }
 

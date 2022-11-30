@@ -434,7 +434,7 @@ void ScriptModule::DrawModuleUnclipped()
       }
    }
 
-   if (mBoundModuleConnections.size() > 0)
+   if (mDrawBoundModuleConnections && mBoundModuleConnections.size() > 0)
    {
       for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
       {
@@ -1494,6 +1494,7 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
                                  }
                               });
    mModuleSaveData.LoadBool("hotload_script_files", moduleInfo, false);
+   mModuleSaveData.LoadBool("draw_bound_module_connections", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -1530,6 +1531,7 @@ void ScriptModule::SetUpFromSaveData()
    }
 
    mHotloadScripts = mModuleSaveData.GetBool("hotload_script_files");
+   mDrawBoundModuleConnections = mModuleSaveData.GetBool("draw_bound_module_connections");
 }
 
 void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)

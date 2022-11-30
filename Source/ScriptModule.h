@@ -171,6 +171,7 @@ private:
    std::string mLoadedScriptPath;
    juce::Time mLoadedScriptFiletime;
    bool mHotloadScripts{ false };
+   bool mDrawBoundModuleConnections{ true };
    static ofxJSONElement sStyleJSON;
    float mA{ 0 };
    float mB{ 0 };

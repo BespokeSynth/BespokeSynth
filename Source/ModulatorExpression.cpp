@@ -104,7 +104,7 @@ void ModulatorExpression::PostRepatch(PatchCableSource* cableSource, bool fromUs
 {
    OnModulatorRepatch();
 
-   if (GetSliderTarget())
+   if (GetSliderTarget() && fromUserClick)
    {
       //mValue1Slider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
       //mValue1Slider->SetMode(mSliderTarget->GetMode());
