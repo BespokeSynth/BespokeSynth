@@ -125,30 +125,36 @@ void Presets::DrawModule()
    bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
    if (shiftHeld)
    {
-      ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
-      float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-      float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+      if (hover < mGrid->GetCols() * mGrid->GetRows())
+      {
+         ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
+         float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+         float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
 
-      ofPushStyle();
-      ofSetColor(0, 0, 0);
-      ofFill();
-      ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
-      ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
-      ofPopStyle();
+         ofPushStyle();
+         ofSetColor(0, 0, 0);
+         ofFill();
+         ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
+         ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
+         ofPopStyle();
+      }
    }
 
    if (!shiftHeld)
    {
-      ofVec2f pos = mGrid->GetCellPosition(mCurrentPreset % mGrid->GetCols(), mCurrentPreset / mGrid->GetCols()) + mGrid->GetPosition(true);
-      float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-      float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+      if (mCurrentPreset < mGrid->GetCols() * mGrid->GetRows())
+      {
+         ofVec2f pos = mGrid->GetCellPosition(mCurrentPreset % mGrid->GetCols(), mCurrentPreset / mGrid->GetCols()) + mGrid->GetPosition(true);
+         float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+         float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
 
-      ofPushStyle();
-      ofSetColor(255, 255, 255);
-      ofSetLineWidth(2);
-      ofNoFill();
-      ofRect(pos.x, pos.y, xsize, ysize);
-      ofPopStyle();
+         ofPushStyle();
+         ofSetColor(255, 255, 255);
+         ofSetLineWidth(2);
+         ofNoFill();
+         ofRect(pos.x, pos.y, xsize, ysize);
+         ofPopStyle();
+      }
    }
 }
 
@@ -241,7 +247,8 @@ void Presets::SetPreset(int idx, double time)
       return;
    }
 
-   assert(idx >= 0 && idx < mPresetCollection.size());
+   if (idx < 0 || idx >= (int)mPresetCollection.size())
+      return;
 
    if (mBlendTime > 0)
    {

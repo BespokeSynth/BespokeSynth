@@ -324,7 +324,7 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
       module->SetName(newName.c_str());
 }
 
-void ModuleContainer::DeleteModule(IDrawableModule* module)
+void ModuleContainer::DeleteModule(IDrawableModule* module, bool fail /*= true*/)
 {
    if (!module->CanBeDeleted())
       return;
@@ -332,14 +332,14 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
    if (module->HasSpecialDelete())
    {
       module->DoSpecialDelete();
-      RemoveFromVector(module, mModules, K(fail));
+      RemoveFromVector(module, mModules, fail);
       return;
    }
 
    if (module->GetParent())
       module->GetParent()->GetModuleParent()->RemoveChild(module);
 
-   RemoveFromVector(module, mModules, K(fail));
+   RemoveFromVector(module, mModules, fail);
    for (auto iter : mModules)
    {
       if (iter->GetPatchCableSource())

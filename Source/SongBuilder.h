@@ -78,9 +78,9 @@ private:
    bool ShouldSavePatchCableSources() const override { return false; }
 
    void OnStep(double time, float velocity, int flags);
-   void SetActiveSection(double time, int newSection);
-   void SetActiveSectionById(double time, int newSectionId);
-   void DuplicateSection(int sectionIndex);
+   void SetActiveScene(double time, int newScene);
+   void SetActiveSceneById(double time, int newSceneId);
+   void DuplicateScene(int sceneIndex);
    void AddTarget();
    bool ShowSongSequencer() const { return mUseSequencer; }
    void RefreshSequencerDropdowns();
@@ -107,20 +107,22 @@ private:
       {
          TextEntry,
          Checkbox,
-         Dropdown
+         Dropdown,
+         NumDisplayTypes
       };
 
       PatchCableSource* mCable{ nullptr };
       DisplayType mDisplayType{ DisplayType::TextEntry };
       ClickButton* mMoveLeftButton{ nullptr };
       ClickButton* mMoveRightButton{ nullptr };
+      ClickButton* mCycleDisplayTypeButton{ nullptr };
       bool mHadTarget{ false };
    };
 
    struct ControlValue
    {
       void CreateUIControls(SongBuilder* owner);
-      void Draw(float x, float y, int sectionIndex, int targetIndex);
+      void Draw(float x, float y, int sceneIndex, ControlTarget* target);
       void CleanUp();
       void UpdateDropdownContents(ControlTarget* target);
 
@@ -133,13 +135,13 @@ private:
       int mId{ -1 };
    };
 
-   struct SongSection
+   struct SongScene
    {
-      explicit SongSection(std::string name)
+      explicit SongScene(std::string name)
       : mName(name)
       {}
       void CreateUIControls(SongBuilder* owner);
-      void Draw(SongBuilder* owner, float x, float y, int sectionIndex);
+      void Draw(SongBuilder* owner, float x, float y, int sceneIndex);
       void TargetControlUpdated(SongBuilder::ControlTarget* target, int targetIndex, bool wasManuallyPatched);
       void AddValue(SongBuilder* owner);
       void MoveValue(int index, int amount);
@@ -155,8 +157,8 @@ private:
       int mId{ -1 };
    };
 
-   int mCurrentSection{ -1 };
-   int mQueuedSection{ -1 };
+   int mCurrentScene{ -1 };
+   int mQueuedScene{ -1 };
    int mSequenceStepIndex{ -1 };
    int mSequenceStartStepIndex{ 0 };
    bool mSequenceStartQueued{ false };
@@ -165,7 +167,7 @@ private:
    bool mJustResetClock{ false };
    bool mWantRefreshValueDropdowns{ false };
 
-   static const int kMaxSequencerSections = 128;
+   static const int kMaxSequencerScenes = 128;
    static const int kSequenceEndId = -1;
 
    bool mUseSequencer{ false };
@@ -184,14 +186,14 @@ private:
    TextEntry* mSequenceLoopStartEntry{ nullptr };
    int mSequenceLoopEndIndex{ 0 };
    TextEntry* mSequenceLoopEndEntry{ nullptr };
-   std::array<int, kMaxSequencerSections> mSequencerSectionId{};
-   std::array<DropdownList*, kMaxSequencerSections> mSequencerSectionSelector{};
-   std::array<int, kMaxSequencerSections> mSequencerStepLength{};
-   std::array<TextEntry*, kMaxSequencerSections> mSequencerStepLengthEntry{};
-   std::array<DropdownList*, kMaxSequencerSections> mSequencerContextMenu{};
-   std::array<ContextMenuItems, kMaxSequencerSections> mSequencerContextMenuSelection{};
-   std::array<ClickButton*, kMaxSequencerSections> mSequencerPlayFromButton{};
+   std::array<int, kMaxSequencerScenes> mSequencerSceneId{};
+   std::array<DropdownList*, kMaxSequencerScenes> mSequencerSceneSelector{};
+   std::array<int, kMaxSequencerScenes> mSequencerStepLength{};
+   std::array<TextEntry*, kMaxSequencerScenes> mSequencerStepLengthEntry{};
+   std::array<DropdownList*, kMaxSequencerScenes> mSequencerContextMenu{};
+   std::array<ContextMenuItems, kMaxSequencerScenes> mSequencerContextMenuSelection{};
+   std::array<ClickButton*, kMaxSequencerScenes> mSequencerPlayFromButton{};
 
-   std::vector<SongSection*> mSections{};
+   std::vector<SongScene*> mScenes{};
    std::vector<ControlTarget*> mTargets{};
 };

@@ -65,7 +65,7 @@ void ModulatorAddCentered::PostRepatch(PatchCableSource* cableSource, bool fromU
 {
    OnModulatorRepatch();
 
-   if (GetSliderTarget())
+   if (GetSliderTarget() && fromUserClick)
    {
       mValue1 = GetSliderTarget()->GetValue();
       mValue2 = 0;
