@@ -172,7 +172,7 @@ void TimelineControl::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void TimelineControl::ButtonClicked(ClickButton* button)
+void TimelineControl::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
       TheTransport->Reset();

@@ -127,14 +127,17 @@ void Transport::Advance(double ms)
 
    double oldMeasureTime = mMeasureTime;
    mMeasureTime += amount;
-   if (mQueuedMeasure != -1 && int(mMeasureTime) != int(oldMeasureTime))
+   if (int(mMeasureTime) != int(oldMeasureTime) && mMeasureTime >= mJumpFromMeasure)
    {
-      mMeasureTime = fmod(mMeasureTime, 1) + mQueuedMeasure;
-      mQueuedMeasure = -1;
+      if (mQueuedMeasure != -1)
+      {
+         SetMeasure(mQueuedMeasure);
+         if (mLoopStartMeasure != -1)
+            mQueuedMeasure = mLoopStartMeasure;
+         else
+            mQueuedMeasure = -1;
+      }
    }
-
-   if (mLoopStartMeasure != -1 && (GetMeasure(gTime) < mLoopStartMeasure || GetMeasure(gTime) >= mLoopEndMeasure))
-      SetMeasure(mLoopStartMeasure);
 
    if (TheChaosEngine)
       TheChaosEngine->AudioUpdate();
@@ -252,7 +255,10 @@ void Transport::DrawModule()
 
 void Transport::Reset()
 {
-   mMeasureTime = .99f;
+   if (mLoopEndMeasure != -1)
+      mMeasureTime = mLoopEndMeasure - .01f;
+   else
+      mMeasureTime = .99f;
    SetQueuedMeasure(NextBufferTime(true), 0);
 }
 
@@ -535,22 +541,25 @@ double Transport::GetMeasureTimeInternal(double time) const
 double Transport::GetMeasureTime(double time) const
 {
    double measureTime = GetMeasureTimeInternal(time);
-   if (mQueuedMeasure != -1 && measureTime >= mQueuedMeasureSwitchAtMeasure)
-      measureTime = mQueuedMeasure + measureTime - mQueuedMeasureSwitchAtMeasure;
+   if (mQueuedMeasure != -1 && measureTime >= mJumpFromMeasure)
+      measureTime = mQueuedMeasure + measureTime - mJumpFromMeasure;
    return measureTime;
 }
 
 void Transport::SetQueuedMeasure(double time, int measure)
 {
    mQueuedMeasure = -1; //clear
-   mQueuedMeasureSwitchAtMeasure = GetMeasure(time) + 1;
+   if (mLoopEndMeasure != -1)
+      mJumpFromMeasure = mLoopEndMeasure;
+   else
+      mJumpFromMeasure = GetMeasure(time) + 1;
    mQueuedMeasure = measure;
 }
 
 bool Transport::IsPastQueuedMeasureJump(double time) const
 {
    double measureTime = GetMeasureTimeInternal(time);
-   if (mQueuedMeasure != -1 && measureTime >= mQueuedMeasureSwitchAtMeasure)
+   if (mQueuedMeasure != -1 && measureTime >= mJumpFromMeasure)
       return true;
    return false;
 }
