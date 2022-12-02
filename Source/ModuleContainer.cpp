@@ -618,6 +618,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    in >> header;
    assert(header <= ModularSynth::kSaveStateRev);
    ModularSynth::sLoadingFileSaveStateRev = header;
+   ModularSynth::sLastLoadedFileSaveStateRev = header;
 
    int savedModules;
    in >> savedModules;

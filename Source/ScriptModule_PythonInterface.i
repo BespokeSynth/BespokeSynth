@@ -61,10 +61,10 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    {
       return (int)ScriptModule::GetScriptMeasureTime();
    });
-   m.def("reset_transport", [](float rewind_amount)
+   m.def("reset_transport", []()
    {
       TheTransport->Reset();
-   }, "rewind_amount"_a=.001f);
+   });
    m.def("get_step", [](int subdivision)
    {
       float subdivide = subdivision * ScriptModule::GetTimeSigRatio();

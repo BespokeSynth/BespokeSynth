@@ -74,6 +74,8 @@ void Ramper::CreateUIControls()
 
 void Ramper::OnTransportAdvanced(float amount)
 {
+   if (!mEnabled)
+      mRamping = false;
    if (mRamping)
    {
       float curMeasure = TheTransport->GetMeasure(gTime) + TheTransport->GetMeasurePos(gTime);

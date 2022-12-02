@@ -458,13 +458,13 @@ ModuleFactory::ModuleFactory()
    REGISTER(VelocityCurve, velocitycurve, kModuleCategory_Note);
    REGISTER(BoundsToPulse, boundstopulse, kModuleCategory_Pulse);
    REGISTER(SongBuilder, songbuilder, kModuleCategory_Other);
+   REGISTER(TimelineControl, timelinecontrol, kModuleCategory_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
    REGISTER_HIDDEN(TakeRecorder, takerecorder, kModuleCategory_Audio);
    REGISTER_HIDDEN(LoopStorer, loopstorer, kModuleCategory_Other);
    REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleCategory_Audio);
-   REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleCategory_Other);
    REGISTER_HIDDEN(ComboGridController, combogrid, kModuleCategory_Other);
    REGISTER_HIDDEN(VSTPlugin, plugin, kModuleCategory_Synth);
    REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleCategory_Audio);

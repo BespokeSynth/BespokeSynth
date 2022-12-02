@@ -11,11 +11,14 @@ timerdisplay~displays a timer to indicate how long a patch has been running
 
 
 
-timelinecontrol~[abandoned module, possibly broken] global timeline control to position transport
-~measure~[todo]
-~loop~[todo]
-~loop start~[todo]
-~loop end~[todo]
+timelinecontrol~control global transport position
+~measure~current position. click to jump around.
+~loop~should we have a looping section?
+~loop start~measure start of loop
+~loop end~measure end of loop
+~reset~reset to beginning
+~length~length of timeline display, in measures
+~dock~should we dock this module to the UI layer?
 
 
 

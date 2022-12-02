@@ -140,11 +140,14 @@ public:
       assert(measureStart < measureEnd);
       mLoopStartMeasure = measureStart;
       mLoopEndMeasure = measureEnd;
+      mQueuedMeasure = measureStart;
+      mJumpFromMeasure = measureEnd;
    }
    void ClearLoop()
    {
       mLoopStartMeasure = -1;
       mLoopEndMeasure = -1;
+      mQueuedMeasure = -1;
    }
    void SetQueuedMeasure(double time, int measure);
    bool IsPastQueuedMeasureJump(double time) const;
@@ -216,7 +219,7 @@ private:
    int mLoopStartMeasure{ -1 };
    int mLoopEndMeasure{ -1 };
    int mQueuedMeasure{ -1 };
-   int mQueuedMeasureSwitchAtMeasure{ -1 };
+   int mJumpFromMeasure{ -1 };
    bool mWantSetRandomTempo{ false };
 
    std::list<TransportListenerInfo> mListeners;

@@ -36,12 +36,19 @@ void TimelineControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mTimeSlider = new FloatSlider(this, "measure", 3, 3, GetSliderWidth(), 15, &mTime, 0, mNumMeasures);
+   mNumMeasuresEntry = new TextEntry(this, "length", -1, -1, 5, &mNumMeasures, 4, 2048);
+   mResetButton = new ClickButton(this, "reset", -1, -1);
    mLoopCheckbox = new Checkbox(this, "loop", -1, -1, &mLoop);
+   mDockCheckbox = new Checkbox(this, "dock", -1, -1, &mDock);
    mLoopStartSlider = new IntSlider(this, "loop start", -1, -1, GetSliderWidth(), 15, &mLoopStart, 0, mNumMeasures);
    mLoopEndSlider = new IntSlider(this, "loop end", -1, -1, GetSliderWidth(), 15, &mLoopEnd, 0, mNumMeasures);
 
-   mLoopCheckbox->PositionTo(mTimeSlider, kAnchor_Right);
-   mLoopStartSlider->PositionTo(mTimeSlider, kAnchor_Below);
+   mNumMeasuresEntry->DrawLabel(true);
+   mNumMeasuresEntry->PositionTo(mTimeSlider, kAnchor_Below);
+   mResetButton->PositionTo(mNumMeasuresEntry, kAnchor_Right_Padded);
+   mLoopCheckbox->PositionTo(mResetButton, kAnchor_Right_Padded);
+   mDockCheckbox->PositionTo(mLoopCheckbox, kAnchor_Right_Padded);
+   mLoopStartSlider->PositionTo(mNumMeasuresEntry, kAnchor_Below);
    mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchor_Below);
 
    mLoopStartSlider->SetShowing(mLoop);
@@ -56,11 +63,24 @@ void TimelineControl::DrawModule()
 {
    mTime = TheTransport->GetMeasureTime(gTime);
 
-   if (Minimized() || IsVisible() == false)
+   if (Minimized())
       return;
 
+   if (mDock)
+   {
+      float w, h;
+      GetModuleDimensions(w, h);
+      SetPosition(0, ofGetHeight() / GetOwningContainer()->GetDrawScale() - h);
+      Resize(ofGetWidth() / GetOwningContainer()->GetDrawScale(), h);
+   }
+
+   mDockCheckbox->SetShowing(GetOwningContainer() == TheSynth->GetRootContainer() || GetOwningContainer() == TheSynth->GetUIContainer());
+
    mTimeSlider->Draw();
+   mNumMeasuresEntry->Draw();
+   mResetButton->Draw();
    mLoopCheckbox->Draw();
+   mDockCheckbox->Draw();
    mLoopStartSlider->Draw();
    mLoopEndSlider->Draw();
 }
@@ -68,7 +88,7 @@ void TimelineControl::DrawModule()
 void TimelineControl::GetModuleDimensions(float& w, float& h)
 {
    w = mWidth;
-   h = mLoop ? 57 : 21;
+   h = mLoop ? 74 : 38;
 }
 
 void TimelineControl::Resize(float width, float height)
@@ -77,9 +97,6 @@ void TimelineControl::Resize(float width, float height)
    mTimeSlider->SetDimensions(GetSliderWidth(), 15);
    mLoopStartSlider->SetDimensions(GetSliderWidth(), 15);
    mLoopEndSlider->SetDimensions(GetSliderWidth(), 15);
-   mLoopCheckbox->PositionTo(mTimeSlider, kAnchor_Right);
-   mLoopStartSlider->PositionTo(mTimeSlider, kAnchor_Below);
-   mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchor_Below);
 }
 
 void TimelineControl::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -92,6 +109,28 @@ void TimelineControl::CheckboxUpdated(Checkbox* checkbox, double time)
          TheTransport->SetLoop(mLoopStart, mLoopEnd);
       else
          TheTransport->ClearLoop();
+   }
+
+   if (checkbox == mDockCheckbox)
+   {
+      if (mDock && GetOwningContainer() == TheSynth->GetRootContainer())
+      {
+         TheSynth->GetUIContainer()->TakeModule(this);
+         float w, h;
+         GetModuleDimensions(w, h);
+         Resize(ofGetWidth() / GetOwningContainer()->GetDrawScale(), h);
+         gHoveredUIControl = nullptr;
+      }
+
+      if (!mDock && GetOwningContainer() == TheSynth->GetUIContainer())
+      {
+         TheSynth->GetRootContainer()->TakeModule(this);
+         float w, h;
+         GetModuleDimensions(w, h);
+         Resize(ofGetWidth() / GetOwningContainer()->GetDrawScale(), h);
+         SetPosition(-TheSynth->GetDrawOffset().x, -TheSynth->GetDrawOffset().y + ofGetHeight() / GetOwningContainer()->GetDrawScale() - h);
+         gHoveredUIControl = nullptr;
+      }
    }
 }
 
@@ -122,10 +161,26 @@ void TimelineControl::IntSliderUpdated(IntSlider* slider, int oldVal, double tim
    }
 }
 
+void TimelineControl::TextEntryComplete(TextEntry* entry)
+{
+   if (entry == mNumMeasuresEntry)
+   {
+      mNumMeasures = std::max(mNumMeasures, 4);
+      mTimeSlider->SetExtents(0, mNumMeasures);
+      mLoopStartSlider->SetExtents(0, mNumMeasures);
+      mLoopEndSlider->SetExtents(0, mNumMeasures);
+   }
+}
+
+void TimelineControl::ButtonClicked(ClickButton* button, double time)
+{
+   if (button == mResetButton)
+      TheTransport->Reset();
+}
+
 void TimelineControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadFloat("width", moduleInfo, 390, 100, 99999, K(isTextField));
-   mModuleSaveData.LoadInt("num_measures", moduleInfo, 32, 1, 1024, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -133,10 +188,6 @@ void TimelineControl::LoadLayout(const ofxJSONElement& moduleInfo)
 void TimelineControl::SetUpFromSaveData()
 {
    Resize(mModuleSaveData.GetFloat("width"), 0);
-   mNumMeasures = mModuleSaveData.GetInt("num_measures");
-   mTimeSlider->SetExtents(0, mNumMeasures);
-   mLoopStartSlider->SetExtents(0, mNumMeasures);
-   mLoopEndSlider->SetExtents(0, mNumMeasures);
 }
 
 void TimelineControl::SaveLayout(ofxJSONElement& moduleInfo)
