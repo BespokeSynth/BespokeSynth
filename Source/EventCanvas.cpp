@@ -114,46 +114,43 @@ void EventCanvas::OnTransportAdvanced(float amount)
       return;
 
    //look ahead two buffers so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
-   float posOffset = gBufferSizeMs * 2 / TheTransport->MsPerBar() / mNumMeasures;
+   double lookaheadMsAmount = gBufferSizeMs * 2;
+   double lookaheadTime = gTime + lookaheadMsAmount;
+   double lookaheadPos = ((TheTransport->GetMeasure(lookaheadTime) % mNumMeasures) + TheTransport->GetMeasurePos(lookaheadTime)) / mNumMeasures;
+   FloatWrap(lookaheadPos, 1);
 
-   float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures + posOffset;
-   FloatWrap(curPos, 1);
-
-   mCanvas->SetCursorPos(curPos);
-   mPosition = curPos;
+   mCanvas->SetCursorPos(lookaheadPos);
+   mPosition = lookaheadPos;
+   double bufferOffsetAmount = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
+   mPreviousPosition = std::min(mPreviousPosition, lookaheadPos - bufferOffsetAmount);
 
    if (!mEnabled)
       return;
 
    for (auto* canvasElement : mCanvas->GetElements())
    {
-      bool jumpedBack = curPos < mPreviousPosition;
       float elementStart = canvasElement->GetStart();
-      bool startPassed = (curPos >= elementStart && mPreviousPosition < elementStart) ||
-                         (jumpedBack && (elementStart > mPreviousPosition || elementStart <= curPos)) ||
-                         mFirstProcess;
+      bool startPassed = (lookaheadPos >= elementStart && mPreviousPosition < elementStart);
       float elementEnd = canvasElement->GetEnd();
       if (elementEnd > mCanvas->GetLength())
          FloatWrap(elementEnd, mCanvas->GetLength());
-      bool endPassed = (curPos >= elementEnd && mPreviousPosition < elementEnd) ||
-                       (jumpedBack && (elementEnd > mPreviousPosition || elementEnd <= curPos)) ||
-                       mFirstProcess;
+      bool endPassed = (lookaheadPos >= elementEnd && mPreviousPosition < elementEnd);
       if (startPassed || endPassed)
       {
          EventCanvasElement* element = static_cast<EventCanvasElement*>(canvasElement);
-         if (curPos > elementEnd || curPos <= elementStart)
+         if (lookaheadPos > elementEnd)
          {
             if (startPassed)
-               element->Trigger(NextBufferTime(false));
+               element->Trigger(GetTriggerTime(lookaheadTime, lookaheadPos, elementStart));
             if (endPassed)
-               element->TriggerEnd(NextBufferTime(false));
+               element->TriggerEnd(GetTriggerTime(lookaheadTime, lookaheadPos, elementEnd));
          }
          else
          {
             if (endPassed)
-               element->TriggerEnd(NextBufferTime(false));
+               element->TriggerEnd(GetTriggerTime(lookaheadTime, lookaheadPos, elementEnd));
             if (startPassed)
-               element->Trigger(NextBufferTime(false));
+               element->Trigger(GetTriggerTime(lookaheadTime, lookaheadPos, elementStart));
          }
 
          IUIControl* control = mRowConnections[element->mRow].mUIControl;
@@ -170,7 +167,7 @@ void EventCanvas::OnTransportAdvanced(float amount)
 
          if (mRecord && mRowConnections[i].mLastValue != value)
          {
-            float colPos = curPos * mCanvas->GetNumCols();
+            float colPos = lookaheadPos * mCanvas->GetNumCols();
             int col = int(colPos + .5f);
             EventCanvasElement* element = new EventCanvasElement(mCanvas, col, i, colPos - col);
             element->SetUIControl(mRowConnections[i].mUIControl);
@@ -182,8 +179,18 @@ void EventCanvas::OnTransportAdvanced(float amount)
       }
    }
 
-   mPreviousPosition = curPos;
-   mFirstProcess = false;
+   mPreviousPosition = lookaheadPos;
+}
+
+double EventCanvas::GetTriggerTime(double lookaheadTime, double lookaheadPos, float eventPos)
+{
+   double cursorAdvanceSinceEvent = lookaheadPos - eventPos;
+   if (cursorAdvanceSinceEvent < 0)
+      cursorAdvanceSinceEvent += 1;
+   double time = lookaheadTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
+   if (time < gTime)
+      time = gTime;
+   return time;
 }
 
 void EventCanvas::UpdateNumColumns()

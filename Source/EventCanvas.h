@@ -86,6 +86,7 @@ private:
 
    void UpdateNumColumns();
    void SyncControlCablesToCanvas();
+   double GetTriggerTime(double lookaheadTime, double lookaheadPos, float eventPos);
 
    Canvas* mCanvas{ nullptr };
    CanvasControls* mCanvasControls{ nullptr };
@@ -101,8 +102,7 @@ private:
    std::vector<ofColor> mRowColors{};
    bool mRecord{ false };
    Checkbox* mRecordCheckbox{ nullptr };
-   float mPreviousPosition{ 0 };
-   bool mFirstProcess{ true };
+   double mPreviousPosition{ 0 };
 
    struct ControlConnection
    {
