@@ -614,7 +614,7 @@ void PatchCableSource::FindValidTargets()
             if (uicontrol->IsShowing() &&
                 (uicontrol->GetShouldSaveState() || dynamic_cast<ClickButton*>(uicontrol) != nullptr) &&
                 uicontrol->CanBeTargetedBy(this) &&
-                !uicontrol->GetNoHover())
+                (!uicontrol->GetNoHover() || mType == kConnectionType_Grid))
                mValidTargets.push_back(uicontrol);
          }
       }

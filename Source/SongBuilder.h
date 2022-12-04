@@ -174,7 +174,7 @@ private:
    Checkbox* mUseSequencerCheckbox{ nullptr };
    bool mActivateFirstSceneOnStop{ true };
    Checkbox* mActivateFirstSceneOnStopCheckbox{ nullptr };
-   NoteInterval mChangeQuantizeInterval{ NoteInterval::kInterval_None };
+   NoteInterval mChangeQuantizeInterval{ NoteInterval::kInterval_1n };
    DropdownList* mChangeQuantizeSelector{ nullptr };
    ClickButton* mAddTargetButton{ nullptr };
    ClickButton* mPlaySequenceButton{ nullptr };
