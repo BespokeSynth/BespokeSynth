@@ -72,7 +72,7 @@ void Presets::CreateUIControls()
       AddPatchCableSource(mUIControlCable);
    }
 
-   for (int i = 0; i < 32; ++i)
+   for (int i = 0; i < 400; ++i)
       mCurrentPresetSelector->AddLabel(ofToString(i).c_str(), i);
 }
 
