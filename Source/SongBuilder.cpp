@@ -696,10 +696,10 @@ void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
       mScenes.push_back(new SongScene("off"));
       mScenes.push_back(new SongScene("intro"));
       mScenes.push_back(new SongScene("verse"));
+      mScenes.push_back(new SongScene("prechorus"));
       mScenes.push_back(new SongScene("chorus"));
       mScenes.push_back(new SongScene("bridge"));
       mScenes.push_back(new SongScene("outro"));
-      mScenes.push_back(new SongScene("done"));
       for (auto* scene : mScenes)
          scene->CreateUIControls(this);
 
