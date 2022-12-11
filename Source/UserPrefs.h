@@ -301,8 +301,8 @@ public:
    UserPrefBool set_manual_window_position{ "set_manual_window_position", false, UserPrefCategory::General };
    UserPrefTextEntryInt position_x{ "position_x", 200, -10000, 10000, 5, UserPrefCategory::General };
    UserPrefTextEntryInt position_y{ "position_y", 200, -10000, 10000, 5, UserPrefCategory::General };
-   UserPrefFloat zoom{ "zoom", 1, .25f, 2, UserPrefCategory::General };
-   UserPrefFloat ui_scale{ "ui_scale", 1, .25f, 2, UserPrefCategory::General };
+   UserPrefFloat zoom{ "zoom", 1.3f, .25f, 2, UserPrefCategory::General };
+   UserPrefFloat ui_scale{ "ui_scale", 1.3f, .25f, 2, UserPrefCategory::General };
    UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::General };
    UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2, UserPrefCategory::General };
    UserPrefFloat scroll_multiplier_horizontal{ "scroll_multiplier_horizontal", 1, -2, 2, UserPrefCategory::General };
