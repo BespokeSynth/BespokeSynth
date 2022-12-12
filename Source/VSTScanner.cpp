@@ -24,7 +24,7 @@
 //
 
 #include "VSTScanner.h"
-#include "VSTPlugin.h"
+#include "Synths/VSTPlugin.h"
 #include "ModularSynth.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"

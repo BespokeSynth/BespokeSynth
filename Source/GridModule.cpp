@@ -31,7 +31,7 @@
 #include "ofxJSONElement.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 #include "ScriptModule.h"
 #include "PatchCableSource.h"
 

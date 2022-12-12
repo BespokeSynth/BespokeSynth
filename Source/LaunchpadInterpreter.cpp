@@ -24,7 +24,7 @@
 //
 
 #include "LaunchpadInterpreter.h"
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 
 LaunchpadInterpreter::LaunchpadInterpreter(ILaunchpadListener* listener)
 : mListener(listener)

@@ -24,7 +24,7 @@
 //
 
 #include "VSTWindow.h"
-#include "VSTPlugin.h"
+#include "Synths/VSTPlugin.h"
 #include "ModularSynth.h"
 #include "UserPrefs.h"
 

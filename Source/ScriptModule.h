@@ -36,7 +36,7 @@
 #include "Slider.h"
 #include "DropdownList.h"
 #include "ModulationChain.h"
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 
 #include "juce_osc/juce_osc.h"
 

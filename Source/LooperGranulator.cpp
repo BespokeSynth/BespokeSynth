@@ -29,7 +29,7 @@
 #include "ModularSynth.h"
 #include "Slider.h"
 #include "PatchCableSource.h"
-#include "Looper.h"
+#include "AudioEffects/Looper.h"
 #include "FillSaveDropdown.h"
 #include "UIControlMacros.h"
 

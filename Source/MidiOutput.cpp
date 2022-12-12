@@ -30,7 +30,7 @@
 #include "FillSaveDropdown.h"
 #include "ModulationChain.h"
 #include "PolyphonyMgr.h"
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 
 namespace
 {

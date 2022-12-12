@@ -26,7 +26,7 @@
 #include "Slider.h"
 #include "IDrawableModule.h"
 #include "SynthGlobals.h"
-#include "FloatSliderLFOControl.h"
+#include "Modulators/FloatSliderLFOControl.h"
 #include "LFOController.h"
 #include "FileStream.h"
 #include "ModularSynth.h"

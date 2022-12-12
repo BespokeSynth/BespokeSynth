@@ -18,58 +18,110 @@ juce_add_gui_app(BespokeSynth
 bespoke_buildtime_version_info(BespokeSynth)
 
 target_sources(BespokeSynth PRIVATE
-    ADSR.cpp
-    ADSR.h
-    ADSRDisplay.cpp
-    ADSRDisplay.h
     AbletonLink.cpp
     AbletonLink.h
-    Amplifier.cpp
-    Amplifier.h
-    Arpeggiator.cpp
-    Arpeggiator.h
+    ADSR.cpp
+    ADSRDisplay.cpp
+    ADSRDisplay.h
+    ADSR.h
     ArrangementController.cpp
     ArrangementController.h
-    AudioLevelToCV.cpp
-    AudioLevelToCV.h
-    AudioMeter.cpp
-    AudioMeter.h
-    AudioRouter.cpp
-    AudioRouter.h
-    AudioSend.cpp
-    AudioSend.h
-    AudioToCV.cpp
-    AudioToCV.h
-    AudioToPulse.cpp
-    AudioToPulse.h
-    Autotalent.cpp
-    Autotalent.h
-    BandVocoder.cpp
-    BandVocoder.h
-    BeatBloks.cpp
-    BeatBloks.h
-    Beats.cpp
-    Beats.h
+    AudioEffects/Amplifier.cpp
+    AudioEffects/Amplifier.h
+    AudioEffects/AudioMeter.cpp
+    AudioEffects/AudioMeter.h
+    AudioEffects/AudioRouter.cpp
+    AudioEffects/AudioRouter.h
+    AudioEffects/AudioSend.cpp
+    AudioEffects/AudioSend.h
+    AudioEffects/Autotalent.cpp
+    AudioEffects/Autotalent.h
+    AudioEffects/BandVocoder.cpp
+    AudioEffects/BandVocoder.h
+    AudioEffects/DCOffset.cpp
+    AudioEffects/DCOffset.h
+    AudioEffects/EffectChain.cpp
+    AudioEffects/EffectChain.h
+    AudioEffects/EQModule.cpp
+    AudioEffects/EQModule.h
+    AudioEffects/FeedbackModule.cpp
+    AudioEffects/FeedbackModule.h
+    AudioEffects/FFTtoAdditive.cpp
+    AudioEffects/FFTtoAdditive.h
+    AudioEffects/FreqDelay.cpp
+    AudioEffects/FreqDelay.h
+    AudioEffects/FreqDomainBoilerplate.cpp
+    AudioEffects/FreqDomainBoilerplate.h
+    AudioEffects/InputChannel.cpp
+    AudioEffects/InputChannel.h
+    AudioEffects/Inverter.cpp
+    AudioEffects/Inverter.h
+    AudioEffects/Lissajous.cpp
+    AudioEffects/Lissajous.h
+    AudioEffects/Looper.cpp
+    AudioEffects/Looper.h
+    AudioEffects/LooperRecorder.cpp
+    AudioEffects/LooperRecorder.h
+    AudioEffects/MultibandCompressor.cpp
+    AudioEffects/MultibandCompressor.h
+    AudioEffects/MultitapDelay.cpp
+    AudioEffects/MultitapDelay.h
+    AudioEffects/OutputChannel.cpp
+    AudioEffects/OutputChannel.h
+    AudioEffects/Panner.cpp
+    AudioEffects/Panner.h
+    AudioEffects/PitchChorus.cpp
+    AudioEffects/PitchChorus.h
+    AudioEffects/Producer.cpp
+    AudioEffects/Producer.h
+    AudioEffects/Rewriter.cpp
+    AudioEffects/Rewriter.h
+    AudioEffects/RingModulator.cpp
+    AudioEffects/RingModulator.h
+    AudioEffects/SampleCapturer.cpp
+    AudioEffects/SampleCapturer.h
+    AudioEffects/SampleFinder.cpp
+    AudioEffects/SampleFinder.h
+    AudioEffects/SamplerGrid.cpp
+    AudioEffects/SamplerGrid.h
+    AudioEffects/SignalClamp.cpp
+    AudioEffects/SignalClamp.h
+    AudioEffects/SlowLayers.cpp
+    AudioEffects/SlowLayers.h
+    AudioEffects/SpectralDisplay.cpp
+    AudioEffects/SpectralDisplay.h
+    AudioEffects/Splitter.cpp
+    AudioEffects/Splitter.h
+    AudioEffects/StutterControl.cpp
+    AudioEffects/StutterControl.h
+    AudioEffects/TakeRecorder.cpp
+    AudioEffects/TakeRecorder.h
+    AudioEffects/VocoderCarrierInput.cpp
+    AudioEffects/VocoderCarrierInput.h
+    AudioEffects/Vocoder.cpp
+    AudioEffects/Vocoder.h
+    AudioEffects/WaveformViewer.cpp
+    AudioEffects/WaveformViewer.h
+    AudioEffects/Waveshaper.cpp
+    AudioEffects/Waveshaper.h
     BiquadFilter.cpp
-    BiquadFilter.h
     BiquadFilterEffect.cpp
     BiquadFilterEffect.h
+    BiquadFilter.h
     BitcrushEffect.cpp
     BitcrushEffect.h
     ButterworthFilterEffect.cpp
     ButterworthFilterEffect.h
-    Canvas.cpp
-    Canvas.h
     CanvasControls.cpp
     CanvasControls.h
+    Canvas.cpp
     CanvasElement.cpp
     CanvasElement.h
+    Canvas.h
     CanvasScrollbar.cpp
     CanvasScrollbar.h
     CanvasTimeline.cpp
     CanvasTimeline.h
-    Capo.cpp
-    Capo.h
     ChannelBuffer.cpp
     ChannelBuffer.h
     ChaosEngine.cpp
@@ -77,23 +129,13 @@ target_sources(BespokeSynth PRIVATE
     Checkbox.cpp
     Checkbox.h
     Chord.cpp
-    Chord.h
     ChordDatabase.cpp
     ChordDatabase.h
-    ChordDisplayer.cpp
-    ChordDisplayer.h
-    ChordHolder.cpp
-    ChordHolder.h
-    Chorder.cpp
-    Chorder.h
-    CircleSequencer.cpp
-    CircleSequencer.h
+    Chord.h
     ClickButton.cpp
     ClickButton.h
     ClipArranger.cpp
     ClipArranger.h
-    ClipLauncher.cpp
-    ClipLauncher.h
     CodeEntry.cpp
     CodeEntry.h
     ComboGridController.cpp
@@ -102,58 +144,28 @@ target_sources(BespokeSynth PRIVATE
     CommentDisplay.h
     Compressor.cpp
     Compressor.h
-    ControlSequencer.cpp
-    ControlSequencer.h
-    ControlTactileFeedback.cpp
-    ControlTactileFeedback.h
-    ControllingSong.cpp
-    ControllingSong.h
     Curve.cpp
     Curve.h
-    CurveLooper.cpp
-    CurveLooper.h
-    DCOffset.cpp
-    DCOffset.h
     DCRemoverEffect.cpp
     DCRemoverEffect.h
-    DebugAudioSource.cpp
-    DebugAudioSource.h
     DelayEffect.cpp
     DelayEffect.h
     DistortionEffect.cpp
     DistortionEffect.h
     DropdownList.cpp
     DropdownList.h
-    DrumPlayer.cpp
-    DrumPlayer.h
-    DrumSynth.cpp
-    DrumSynth.h
-    EQEffect.cpp
-    EQEffect.h
-    EQModule.cpp
-    EQModule.h
-    EffectChain.cpp
-    EffectChain.h
     EffectFactory.cpp
     EffectFactory.h
-    EnvOscillator.cpp
-    EnvOscillator.h
     EnvelopeEditor.cpp
     EnvelopeEditor.h
-    EnvelopeModulator.cpp
-    EnvelopeModulator.h
+    EnvOscillator.cpp
+    EnvOscillator.h
+    EQEffect.cpp
+    EQEffect.h
     EventCanvas.cpp
     EventCanvas.h
     FFT.cpp
     FFT.h
-    FFTtoAdditive.cpp
-    FFTtoAdditive.h
-    FMSynth.cpp
-    FMSynth.h
-    FMVoice.cpp
-    FMVoice.h
-    FeedbackModule.cpp
-    FeedbackModule.h
     FileStream.cpp
     FileStream.h
     FillSaveDropdown.h
@@ -161,22 +173,12 @@ target_sources(BespokeSynth PRIVATE
     FilterButterworth24db.h
     FilterViz.cpp
     FilterViz.h
-    FloatSliderLFOControl.cpp
-    FloatSliderLFOControl.h
-    FollowingSong.cpp
-    FollowingSong.h
+    FMVoice.cpp
+    FMVoice.h
     FormantFilterEffect.cpp
     FormantFilterEffect.h
-    FourOnTheFloor.cpp
-    FourOnTheFloor.h
     FreeverbEffect.cpp
     FreeverbEffect.h
-    FreqDelay.cpp
-    FreqDelay.h
-    FreqDomainBoilerplate.cpp
-    FreqDomainBoilerplate.h
-    FubbleModule.cpp
-    FubbleModule.h
     GainStageEffect.cpp
     GainStageEffect.h
     GateEffect.cpp
@@ -189,8 +191,6 @@ target_sources(BespokeSynth PRIVATE
     GridController.h
     GridModule.cpp
     GridModule.h
-    GridSliders.cpp
-    GridSliders.h
     GroupControl.cpp
     GroupControl.h
     HelpDisplay.cpp
@@ -216,6 +216,42 @@ target_sources(BespokeSynth PRIVATE
     INoteReceiver.h
     INoteSource.cpp
     INoteSource.h
+    Instruments/CircleSequencer.cpp
+    Instruments/CircleSequencer.h
+    Instruments/FourOnTheFloor.cpp
+    Instruments/FourOnTheFloor.h
+    Instruments/KeyboardDisplay.cpp
+    Instruments/KeyboardDisplay.h
+    Instruments/LaunchpadKeyboard.cpp
+    Instruments/LaunchpadKeyboard.h
+    Instruments/M185Sequencer.cpp
+    Instruments/M185Sequencer.h
+    Instruments/MidiController.cpp
+    Instruments/MidiController.h
+    Instruments/NoteCanvas.cpp
+    Instruments/NoteCanvas.h
+    Instruments/NoteChainNode.cpp
+    Instruments/NoteChainNode.h
+    Instruments/NoteCounter.cpp
+    Instruments/NoteCounter.h
+    Instruments/NoteCreator.cpp
+    Instruments/NoteCreator.h
+    Instruments/NoteLooper.cpp
+    Instruments/NoteLooper.h
+    Instruments/NoteSinger.cpp
+    Instruments/NoteSinger.h
+    Instruments/NoteStepSequencer.cpp
+    Instruments/NoteStepSequencer.h
+    Instruments/PlaySequencer.cpp
+    Instruments/PlaySequencer.h
+    Instruments/Polyrhythms.cpp
+    Instruments/Polyrhythms.h
+    Instruments/RandomNoteGenerator.cpp
+    Instruments/RandomNoteGenerator.h
+    Instruments/StepSequencer.cpp
+    Instruments/StepSequencer.h
+    Instruments/SliderSequencer.cpp
+    Instruments/SliderSequencer.h
     IPatchable.h
     IPollable.h
     IPulseReceiver.cpp
@@ -223,73 +259,35 @@ target_sources(BespokeSynth PRIVATE
     IUIControl.cpp
     IUIControl.h
     IVoiceParams.h
-    InputChannel.cpp
-    InputChannel.h
-    Inverter.cpp
-    Inverter.h
     JumpBlender.cpp
     JumpBlender.h
-    KarplusStrong.cpp
-    KarplusStrong.h
     KarplusStrongVoice.cpp
     KarplusStrongVoice.h
-    KeyboardDisplay.cpp
-    KeyboardDisplay.h
-    Kicker.cpp
-    Kicker.h
-    LFO.cpp
-    LFO.h
-    LFOController.cpp
-    LFOController.h
     LaunchpadInterpreter.cpp
     LaunchpadInterpreter.h
-    LaunchpadKeyboard.cpp
-    LaunchpadKeyboard.h
-    LaunchpadNoteDisplayer.cpp
-    LaunchpadNoteDisplayer.h
+    LFOController.cpp
+    LFOController.h
+    LFO.cpp
+    LFO.h
     LinkwitzRileyFilter.cpp
     LinkwitzRileyFilter.h
-    LinnstrumentControl.cpp
-    LinnstrumentControl.h
-    Lissajous.cpp
-    Lissajous.h
     LiveGranulator.cpp
     LiveGranulator.h
     LocationZoomer.cpp
     LocationZoomer.h
     LockFreeQueue.h
-    LoopStorer.cpp
-    LoopStorer.h
-    Looper.cpp
-    Looper.h
     LooperGranulator.cpp
     LooperGranulator.h
-    LooperRecorder.cpp
-    LooperRecorder.h
-    M185Sequencer.cpp
-    M185Sequencer.h
-    MPESmoother.cpp
-    MPESmoother.h
-    MPETweaker.cpp
-    MPETweaker.h
-    MacroSlider.cpp
-    MacroSlider.h
-    Main.cpp
+    LoopStorer.cpp
+    LoopStorer.h
     MainComponent.cpp
+    Main.cpp
     MathUtils.cpp
     MathUtils.h
-    Metronome.cpp
-    Metronome.h
-    MidiCapturer.cpp
-    MidiCapturer.h
     MidiClockIn.cpp
     MidiClockIn.h
     MidiClockOut.cpp
     MidiClockOut.h
-    MidiControlChange.cpp
-    MidiControlChange.h
-    MidiController.cpp
-    MidiController.h
     MidiDevice.cpp
     MidiDevice.h
     MidiOutput.cpp
@@ -298,36 +296,66 @@ target_sources(BespokeSynth PRIVATE
     MidiReader.h
     Minimap.cpp
     Minimap.h
-    ModWheel.cpp
-    ModWheel.h
-    ModWheelToCV.cpp
-    ModWheelToCV.h
     ModularSynth.cpp
     ModularSynth.h
     ModulationChain.cpp
     ModulationChain.h
-    ModulationVisualizer.cpp
-    ModulationVisualizer.h
-    ModulatorAccum.cpp
-    ModulatorAccum.h
-    ModulatorAdd.cpp
-    ModulatorAdd.h
-    ModulatorAddCentered.cpp
-    ModulatorAddCentered.h
-    BoundsToPulse.cpp
-    BoundsToPulse.h
-    ModulatorCurve.cpp
-    ModulatorCurve.h
-    ModulatorExpression.cpp
-    ModulatorExpression.h
-    ModulatorGravity.cpp
-    ModulatorGravity.h
-    ModulatorMult.cpp
-    ModulatorMult.h
-    ModulatorSmoother.cpp
-    ModulatorSmoother.h
-    ModulatorSubtract.cpp
-    ModulatorSubtract.h
+    Modulators/AudioLevelToCV.cpp
+    Modulators/AudioLevelToCV.h
+    Modulators/AudioToCV.cpp
+    Modulators/AudioToCV.h
+    Modulators/ControlSequencer.cpp
+    Modulators/ControlSequencer.h
+    Modulators/CurveLooper.cpp
+    Modulators/CurveLooper.h
+    Modulators/EnvelopeModulator.cpp
+    Modulators/EnvelopeModulator.h
+    Modulators/FloatSliderLFOControl.cpp
+    Modulators/FloatSliderLFOControl.h
+    Modulators/FubbleModule.cpp
+    Modulators/FubbleModule.h
+    Modulators/GridSliders.cpp
+    Modulators/GridSliders.h
+    Modulators/MacroSlider.cpp
+    Modulators/MacroSlider.h
+    Modulators/ModulatorAccum.cpp
+    Modulators/ModulatorAccum.h
+    Modulators/ModulatorAddCentered.cpp
+    Modulators/ModulatorAddCentered.h
+    Modulators/ModulatorAdd.cpp
+    Modulators/ModulatorAdd.h
+    Modulators/ModulatorCurve.cpp
+    Modulators/ModulatorCurve.h
+    Modulators/ModulatorExpression.cpp
+    Modulators/ModulatorExpression.h
+    Modulators/ModulatorGravity.cpp
+    Modulators/ModulatorGravity.h
+    Modulators/ModulatorMult.cpp
+    Modulators/ModulatorMult.h
+    Modulators/ModulatorSmoother.cpp
+    Modulators/ModulatorSmoother.h
+    Modulators/ModulatorSubtract.cpp
+    Modulators/ModulatorSubtract.h
+    Modulators/ModWheelToCV.cpp
+    Modulators/ModWheelToCV.h
+    Modulators/NoteToFreq.cpp
+    Modulators/NoteToFreq.h
+    Modulators/NoteToMs.cpp
+    Modulators/NoteToMs.h
+    Modulators/PitchToCV.cpp
+    Modulators/PitchToCV.h
+    Modulators/PitchToSpeed.cpp
+    Modulators/PitchToSpeed.h
+    Modulators/PressureToCV.cpp
+    Modulators/PressureToCV.h
+    Modulators/Ramper.cpp
+    Modulators/Ramper.h
+    Modulators/ValueSetter.cpp
+    Modulators/ValueSetter.h
+    Modulators/VelocityToCV.cpp
+    Modulators/VelocityToCV.h
+    Modulators/VinylTempoControl.cpp
+    Modulators/VinylTempoControl.h
     ModuleContainer.cpp
     ModuleContainer.h
     ModuleFactory.cpp
@@ -336,127 +364,171 @@ target_sources(BespokeSynth PRIVATE
     ModuleSaveData.h
     ModuleSaveDataPanel.cpp
     ModuleSaveDataPanel.h
-    ModwheelToPressure.cpp
-    ModwheelToPressure.h
-    ModwheelToVibrato.cpp
-    ModwheelToVibrato.h
     Monome.cpp
     Monome.h
-    Monophonify.cpp
-    Monophonify.h
     MultiBandTracker.cpp
     MultiBandTracker.h
-    MultibandCompressor.cpp
-    MultibandCompressor.h
-    MultitapDelay.cpp
-    MultitapDelay.h
     MultitrackRecorder.cpp
     MultitrackRecorder.h
     Muter.cpp
     Muter.h
     NamedMutex.cpp
     NamedMutex.h
-    Neighborhooder.cpp
-    Neighborhooder.h
     NoiseEffect.cpp
     NoiseEffect.h
-    NoteCanvas.cpp
-    NoteCanvas.h
-    NoteChainNode.cpp
-    NoteChainNode.h
-    NoteChance.cpp
-    NoteChance.h
-    NoteCounter.cpp
-    NoteCounter.h
-    NoteCreator.cpp
-    NoteCreator.h
-    NoteDelayer.cpp
-    NoteDelayer.h
-    NoteDisplayer.cpp
-    NoteDisplayer.h
-    NoteEcho.cpp
-    NoteEcho.h
     NoteEffectBase.h
-    NoteExpressionRouter.cpp
-    NoteExpressionRouter.h
-    NoteFilter.cpp
-    NoteFilter.h
-    NoteFlusher.cpp
-    NoteFlusher.h
-    NoteGate.cpp
-    NoteGate.h
-    NoteHocket.cpp
-    NoteHocket.h
-    NoteHumanizer.cpp
-    NoteHumanizer.h
-    NoteLatch.cpp
-    NoteLatch.h
-    NoteLooper.cpp
-    NoteLooper.h
-    NoteOctaver.cpp
-    NoteOctaver.h
+    NoteEffects/Arpeggiator.cpp
+    NoteEffects/Arpeggiator.h
+    NoteEffects/Capo.cpp
+    NoteEffects/Capo.h
+    NoteEffects/ChordDisplayer.cpp
+    NoteEffects/ChordDisplayer.h
+    NoteEffects/Chorder.cpp
+    NoteEffects/Chorder.h
+    NoteEffects/ChordHolder.cpp
+    NoteEffects/ChordHolder.h
+    NoteEffects/Kicker.cpp
+    NoteEffects/Kicker.h
+    NoteEffects/LaunchpadNoteDisplayer.cpp
+    NoteEffects/LaunchpadNoteDisplayer.h
+    NoteEffects/LinnstrumentControl.cpp
+    NoteEffects/LinnstrumentControl.h
+    NoteEffects/MidiCapturer.cpp
+    NoteEffects/MidiCapturer.h
+    NoteEffects/MidiControlChange.cpp
+    NoteEffects/MidiControlChange.h
+    NoteEffects/ModulationVisualizer.cpp
+    NoteEffects/ModulationVisualizer.h
+    NoteEffects/ModWheel.cpp
+    NoteEffects/ModWheel.h
+    NoteEffects/ModwheelToPressure.cpp
+    NoteEffects/ModwheelToPressure.h
+    NoteEffects/ModwheelToVibrato.cpp
+    NoteEffects/ModwheelToVibrato.h
+    NoteEffects/Monophonify.cpp
+    NoteEffects/Monophonify.h
+    NoteEffects/MPESmoother.cpp
+    NoteEffects/MPESmoother.h
+    NoteEffects/MPETweaker.cpp
+    NoteEffects/MPETweaker.h
+    NoteEffects/Neighborhooder.cpp
+    NoteEffects/Neighborhooder.h
+    NoteEffects/NoteChance.cpp
+    NoteEffects/NoteChance.h
+    NoteEffects/NoteDelayer.cpp
+    NoteEffects/NoteDelayer.h
+    NoteEffects/NoteDisplayer.cpp
+    NoteEffects/NoteDisplayer.h
+    NoteEffects/NoteEcho.cpp
+    NoteEffects/NoteEcho.h
+    NoteEffects/NoteExpressionRouter.cpp
+    NoteEffects/NoteExpressionRouter.h
+    NoteEffects/NoteFilter.cpp
+    NoteEffects/NoteFilter.h
+    NoteEffects/NoteFlusher.cpp
+    NoteEffects/NoteFlusher.h
+    NoteEffects/NoteGate.cpp
+    NoteEffects/NoteGate.h
+    NoteEffects/NoteHocket.cpp
+    NoteEffects/NoteHocket.h
+    NoteEffects/NoteHumanizer.cpp
+    NoteEffects/NoteHumanizer.h
+    NoteEffects/NoteLatch.cpp
+    NoteEffects/NoteLatch.h
+    NoteEffects/NoteOctaver.cpp
+    NoteEffects/NoteOctaver.h
+    NoteEffects/NotePanAlternator.cpp
+    NoteEffects/NotePanAlternator.h
+    NoteEffects/NotePanner.cpp
+    NoteEffects/NotePanner.h
+    NoteEffects/NotePanRandom.cpp
+    NoteEffects/NotePanRandom.h
+    NoteEffects/NoteQuantizer.cpp
+    NoteEffects/NoteQuantizer.h
+    NoteEffects/NoteRangeFilter.cpp
+    NoteEffects/NoteRangeFilter.h
+    NoteEffects/NoteRatchet.cpp
+    NoteEffects/NoteRatchet.h
+    NoteEffects/NoteRouter.cpp
+    NoteEffects/NoteRouter.h
+    NoteEffects/NoteSorter.cpp
+    NoteEffects/NoteSorter.h
+    NoteEffects/NoteStepper.cpp
+    NoteEffects/NoteStepper.h
+    NoteEffects/NoteStreamDisplay.cpp
+    NoteEffects/NoteStreamDisplay.h
+    NoteEffects/NoteStrummer.cpp
+    NoteEffects/NoteStrummer.h
+    NoteEffects/NoteSustain.cpp
+    NoteEffects/NoteSustain.h
+    NoteEffects/NoteTable.cpp
+    NoteEffects/NoteTable.h
+    NoteEffects/NoteTransformer.cpp
+    NoteEffects/NoteTransformer.h
+    NoteEffects/NoteVibrato.cpp
+    NoteEffects/NoteVibrato.h
+    NoteEffects/PitchBender.cpp
+    NoteEffects/PitchBender.h
+    NoteEffects/PitchDive.cpp
+    NoteEffects/PitchDive.h
+    NoteEffects/PitchPanner.cpp
+    NoteEffects/PitchPanner.h
+    NoteEffects/PitchRemap.cpp
+    NoteEffects/PitchRemap.h
+    NoteEffects/PitchSetter.cpp
+    NoteEffects/PitchSetter.h
+    NoteEffects/Pressure.cpp
+    NoteEffects/Pressure.h
+    NoteEffects/PressureToModwheel.cpp
+    NoteEffects/PressureToModwheel.h
+    NoteEffects/PressureToVibrato.cpp
+    NoteEffects/PressureToVibrato.h
+    NoteEffects/PreviousNote.cpp
+    NoteEffects/PreviousNote.h
+    NoteEffects/ScaleDegree.cpp
+    NoteEffects/ScaleDegree.h
+    NoteEffects/ScaleDetect.cpp
+    NoteEffects/ScaleDetect.h
+    NoteEffects/SustainPedal.cpp
+    NoteEffects/SustainPedal.h
+    NoteEffects/TransposeFrom.cpp
+    NoteEffects/TransposeFrom.h
+    NoteEffects/UnstableModWheel.cpp
+    NoteEffects/UnstableModWheel.h
+    NoteEffects/UnstablePitch.cpp
+    NoteEffects/UnstablePitch.h
+    NoteEffects/UnstablePressure.cpp
+    NoteEffects/UnstablePressure.h
+    NoteEffects/VelocityCurve.cpp
+    NoteEffects/VelocityCurve.h
+    NoteEffects/VelocityScaler.cpp
+    NoteEffects/VelocityScaler.h
+    NoteEffects/VelocitySetter.cpp
+    NoteEffects/VelocitySetter.h
+    NoteEffects/VelocityStepSequencer.cpp
+    NoteEffects/VelocityStepSequencer.h
+    NoteEffects/VelocityToChance.cpp
+    NoteEffects/VelocityToChance.h
+    NoteEffects/VolcaBeatsControl.cpp
+    NoteEffects/VolcaBeatsControl.h
+    NoteEffects/WhiteKeys.cpp
+    NoteEffects/WhiteKeys.h
     NoteOutputQueue.cpp
     NoteOutputQueue.h
-    NotePanAlternator.cpp
-    NotePanAlternator.h
-    NotePanRandom.cpp
-    NotePanRandom.h
-    NotePanner.cpp
-    NotePanner.h
-    NoteQuantizer.cpp
-    NoteQuantizer.h
-    NoteRangeFilter.cpp
-    NoteRangeFilter.h
-    NoteRatchet.cpp
-    NoteRatchet.h
-    NoteRouter.cpp
-    NoteRouter.h
-    NoteSinger.cpp
-    NoteSinger.h
-    NoteSorter.cpp
-    NoteSorter.h
-    NoteStepSequencer.cpp
-    NoteStepSequencer.h
-    NoteStepper.cpp
-    NoteStepper.h
-    NoteStreamDisplay.cpp
-    NoteStreamDisplay.h
-    NoteStrummer.cpp
-    NoteStrummer.h
-    NoteSustain.cpp
-    NoteSustain.h
-    NoteTable.cpp
-    NoteTable.h
-    NoteToFreq.cpp
-    NoteToFreq.h
-    NoteToMs.cpp
-    NoteToMs.h
-    NoteToPulse.cpp
-    NoteToPulse.h
     NoteToggle.cpp
     NoteToggle.h
-    NoteTransformer.cpp
-    NoteTransformer.h
-    NoteVibrato.cpp
-    NoteVibrato.h
-    OSCOutput.cpp
-    OSCOutput.h
+    ofxJSONElement.cpp
+    ofxJSONElement.h
     OpenFrameworksPort.cpp
     OpenFrameworksPort.h
     OscController.cpp
     OscController.h
     Oscillator.cpp
     Oscillator.h
-    OutputChannel.cpp
-    OutputChannel.h
-    PSMoveController.cpp
-    PSMoveController.h
-    PSMoveMgr.cpp
-    PSMoveMgr.h
+    OSCOutput.cpp
+    OSCOutput.h
     PanicButton.cpp
     PanicButton.h
-    Panner.cpp
-    Panner.h
     PatchCable.cpp
     PatchCable.h
     PatchCableSource.cpp
@@ -467,68 +539,46 @@ target_sources(BespokeSynth PRIVATE
     PerformanceTimer.h
     PerlinNoise.cpp
     PerlinNoise.h
-    PitchBender.cpp
-    PitchBender.h
-    PitchChorus.cpp
-    PitchChorus.h
     PitchDetector.cpp
     PitchDetector.h
-    PitchDive.cpp
-    PitchDive.h
-    PitchPanner.cpp
-    PitchPanner.h
-    PitchRemap.cpp
-    PitchRemap.h
-    PitchSetter.cpp
-    PitchSetter.h
     PitchShiftEffect.cpp
     PitchShiftEffect.h
     PitchShifter.cpp
     PitchShifter.h
-    PitchToCV.cpp
-    PitchToCV.h
-    PitchToSpeed.cpp
-    PitchToSpeed.h
-    PlaySequencer.cpp
-    PlaySequencer.h
     PolyphonyMgr.cpp
     PolyphonyMgr.h
-    Polyrhythms.cpp
-    Polyrhythms.h
     Prefab.cpp
     Prefab.h
     Presets.cpp
     Presets.h
-    Pressure.cpp
-    Pressure.h
-    PressureToCV.cpp
-    PressureToCV.h
-    PressureToModwheel.cpp
-    PressureToModwheel.h
-    PressureToVibrato.cpp
-    PressureToVibrato.h
-    PreviousNote.cpp
-    PreviousNote.h
-    Producer.cpp
-    Producer.h
     Profiler.cpp
     Profiler.h
-    PulseButton.cpp
-    PulseButton.h
-    PulseChance.cpp
-    PulseChance.h
-    PulseDelayer.cpp
-    PulseDelayer.h
-    PulseGate.cpp
-    PulseGate.h
-    PulseHocket.cpp
-    PulseHocket.h
-    PulseSequence.cpp
-    PulseSequence.h
-    PulseTrain.cpp
-    PulseTrain.h
-    Pulser.cpp
-    Pulser.h
+    PSMoveController.cpp
+    PSMoveController.h
+    PSMoveMgr.cpp
+    PSMoveMgr.h
+    Pulse/AudioToPulse.cpp
+    Pulse/AudioToPulse.h
+    Pulse/NoteToPulse.cpp
+    Pulse/NoteToPulse.h
+    Pulse/BoundsToPulse.cpp
+    Pulse/BoundsToPulse.h
+    Pulse/PulseButton.cpp
+    Pulse/PulseButton.h
+    Pulse/PulseChance.cpp
+    Pulse/PulseChance.h
+    Pulse/PulseDelayer.cpp
+    Pulse/PulseDelayer.h
+    Pulse/PulseGate.cpp
+    Pulse/PulseGate.h
+    Pulse/PulseHocket.cpp
+    Pulse/PulseHocket.h
+    Pulse/Pulser.cpp
+    Pulse/Pulser.h
+    Pulse/PulseSequence.cpp
+    Pulse/PulseSequence.h
+    Pulse/PulseTrain.cpp
+    Pulse/PulseTrain.h
     Pumper.cpp
     Pumper.h
     Push2Control.cpp
@@ -541,91 +591,81 @@ target_sources(BespokeSynth PRIVATE
     RadioSequencer.h
     Ramp.cpp
     Ramp.h
-    Ramper.cpp
-    Ramper.h
-    RandomNoteGenerator.cpp
-    RandomNoteGenerator.h
-    Razor.cpp
-    Razor.h
-    Rewriter.cpp
-    Rewriter.h
-    RingModulator.cpp
-    RingModulator.h
     RollingBuffer.cpp
     RollingBuffer.h
-    Sample.cpp
-    Sample.h
     SampleBrowser.cpp
     SampleBrowser.h
-    SampleCanvas.cpp
-    SampleCanvas.h
-    SampleCapturer.cpp
-    SampleCapturer.h
+    Sample.cpp
     SampleDrawer.cpp
     SampleDrawer.h
-    SampleFinder.cpp
-    SampleFinder.h
+    Sample.h
     SampleLayerer.cpp
     SampleLayerer.h
-    SamplePlayer.cpp
-    SamplePlayer.h
     SampleVoice.cpp
     SampleVoice.h
-    Sampler.cpp
-    Sampler.h
-    SamplerGrid.cpp
-    SamplerGrid.h
     Scale.cpp
     Scale.h
-    ScaleDegree.cpp
-    ScaleDegree.h
-    ScaleDetect.cpp
-    ScaleDetect.h
     ScriptModule.cpp
     ScriptModule.h
     ScriptModule_PythonInterface.i
     ScriptStatus.cpp
     ScriptStatus.h
-    SeaOfGrain.cpp
-    SeaOfGrain.h
     Selector.cpp
     Selector.h
-    SignalClamp.cpp
-    SignalClamp.h
-    SignalGenerator.cpp
-    SignalGenerator.h
-    SingleOscillator.cpp
-    SingleOscillator.h
     SingleOscillatorVoice.cpp
     SingleOscillatorVoice.h
     Slider.cpp
     Slider.h
-    SliderSequencer.cpp
-    SliderSequencer.h
-    SlowLayers.cpp
-    SlowLayers.h
     SongBuilder.cpp
     SongBuilder.h
     SpaceMouseControl.cpp
     SpaceMouseControl.h
-    SpectralDisplay.cpp
-    SpectralDisplay.h
-    Splitter.cpp
-    Splitter.h
-    StepSequencer.cpp
-    StepSequencer.h
     Stutter.cpp
     Stutter.h
-    StutterControl.cpp
-    StutterControl.h
-    SustainPedal.cpp
-    SustainPedal.h
     SwitchAndRamp.cpp
     SwitchAndRamp.h
     SynthGlobals.cpp
     SynthGlobals.h
-    TakeRecorder.cpp
-    TakeRecorder.h
+    Synths/BeatBloks.cpp
+    Synths/BeatBloks.h
+    Synths/Beats.cpp
+    Synths/Beats.h
+    Synths/ClipLauncher.cpp
+    Synths/ClipLauncher.h
+    Synths/ControllingSong.cpp
+    Synths/ControllingSong.h
+    Synths/ControlTactileFeedback.cpp
+    Synths/ControlTactileFeedback.h
+    Synths/DebugAudioSource.cpp
+    Synths/DebugAudioSource.h
+    Synths/DrumPlayer.cpp
+    Synths/DrumPlayer.h
+    Synths/DrumSynth.cpp
+    Synths/DrumSynth.h
+    Synths/FMSynth.cpp
+    Synths/FMSynth.h
+    Synths/FollowingSong.cpp
+    Synths/FollowingSong.h
+    Synths/KarplusStrong.cpp
+    Synths/KarplusStrong.h
+    Synths/Metronome.cpp
+    Synths/Metronome.h
+    Synths/Razor.cpp
+    Synths/Razor.h
+    Synths/SampleCanvas.cpp
+    Synths/SampleCanvas.h
+    Synths/SamplePlayer.cpp
+    Synths/SamplePlayer.h
+    Synths/Sampler.cpp
+    Synths/Sampler.h
+    Synths/SeaOfGrain.cpp
+    Synths/SeaOfGrain.h
+    Synths/SignalGenerator.cpp
+    Synths/SignalGenerator.h
+    Synths/SingleOscillator.cpp
+    Synths/SingleOscillator.h
+    Synths/VSTPlugin.cpp
+    Synths/VSTPlugin.h
     TextEntry.cpp
     TextEntry.h
     TimelineControl.cpp
@@ -636,8 +676,6 @@ target_sources(BespokeSynth PRIVATE
     TitleBar.h
     Transport.cpp
     Transport.h
-    TransposeFrom.cpp
-    TransposeFrom.h
     TremoloEffect.cpp
     TremoloEffect.h
     TriggerDetector.cpp
@@ -645,59 +683,21 @@ target_sources(BespokeSynth PRIVATE
     UIControlMacros.h
     UIGrid.cpp
     UIGrid.h
-    UnstableModWheel.cpp
-    UnstableModWheel.h
-    UnstablePitch.cpp
-    UnstablePitch.h
-    UnstablePressure.cpp
-    UnstablePressure.h
     UserData.cpp
     UserData.h
     UserPrefs.cpp
-    UserPrefs.h
     UserPrefsEditor.cpp
     UserPrefsEditor.h
+    UserPrefs.h
+    ValueStream.cpp
+    ValueStream.h
     VSTPlayhead.cpp
     VSTPlayhead.h
-    VSTPlugin.cpp
-    VSTPlugin.h
     VSTScanner.cpp
     VSTScanner.h
     VSTWindow.cpp
     VSTWindow.h
-    ValueSetter.cpp
-    ValueSetter.h
-    ValueStream.cpp
-    ValueStream.h
-    VelocityCurve.cpp
-    VelocityCurve.h
-    VelocityScaler.cpp
-    VelocityScaler.h
-    VelocitySetter.cpp
-    VelocitySetter.h
-    VelocityStepSequencer.cpp
-    VelocityStepSequencer.h
-    VelocityToCV.cpp
-    VelocityToCV.h
-    VelocityToChance.cpp
-    VelocityToChance.h
-    VinylTempoControl.cpp
-    VinylTempoControl.h
-    Vocoder.cpp
-    Vocoder.h
-    VocoderCarrierInput.cpp
-    VocoderCarrierInput.h
-    VolcaBeatsControl.cpp
-    VolcaBeatsControl.h
-    WaveformViewer.cpp
-    WaveformViewer.h
-    Waveshaper.cpp
-    Waveshaper.h
-    WhiteKeys.cpp
-    WhiteKeys.h
     WindowCloseListener.h
-    ofxJSONElement.cpp
-    ofxJSONElement.h
     )
 
 if(BESPOKE_NIGHTLY)
@@ -756,8 +756,8 @@ if (APPLE)
         CFMessaging/ListenPort.cpp
         CFMessaging/NIMessage.cpp
         CFMessaging/SendPort.cpp
-        KompleteKontrol.cpp
-        KompleteKontrol.h
+        NoteEffects/KompleteKontrol.cpp
+        NoteEffects/KompleteKontrol.h
         )
     target_link_libraries(BespokeSynth PRIVATE "-framework CoreAudioKit")
 

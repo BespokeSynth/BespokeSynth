@@ -35,7 +35,7 @@
 #include "MathUtils.h"
 #include "IPulseReceiver.h"
 #include "RadioButton.h"
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 #include "IModulator.h"
 #include "UserPrefs.h"
 

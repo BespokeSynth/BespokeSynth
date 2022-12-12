@@ -28,7 +28,7 @@
 #include "ModuleContainer.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "FloatSliderLFOControl.h"
+#include "Modulators/FloatSliderLFOControl.h"
 #include "ModuleSaveDataPanel.h"
 #include "TitleBar.h"
 #include "PerformanceTimer.h"

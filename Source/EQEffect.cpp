@@ -25,7 +25,7 @@
 
 #include "EQEffect.h"
 #include "SynthGlobals.h"
-#include "FloatSliderLFOControl.h"
+#include "Modulators/FloatSliderLFOControl.h"
 #include "Profiler.h"
 
 EQEffect::EQEffect()

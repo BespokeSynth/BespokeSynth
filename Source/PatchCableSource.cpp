@@ -30,8 +30,8 @@
 #include "INoteReceiver.h"
 #include "GridController.h"
 #include "IPulseReceiver.h"
-#include "AudioSend.h"
-#include "MacroSlider.h"
+#include "AudioEffects/AudioSend.h"
+#include "Modulators/MacroSlider.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 

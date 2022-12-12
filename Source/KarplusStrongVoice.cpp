@@ -24,7 +24,7 @@
 //
 
 #include "KarplusStrongVoice.h"
-#include "KarplusStrong.h"
+#include "Synths/KarplusStrong.h"
 #include "EnvOscillator.h"
 #include "SynthGlobals.h"
 #include "Scale.h"

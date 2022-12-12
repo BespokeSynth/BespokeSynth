@@ -33,9 +33,9 @@
 #include "Prefab.h"
 #include "UserPrefsEditor.h"
 #include "UIControlMacros.h"
-#include "VSTPlugin.h"
+#include "Synths/VSTPlugin.h"
 #include "VSTScanner.h"
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 

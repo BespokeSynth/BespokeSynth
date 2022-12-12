@@ -33,7 +33,7 @@
 #include "DropdownList.h"
 #include "ClickButton.h"
 #include "Slider.h"
-#include "VSTPlugin.h"
+#include "Synths/VSTPlugin.h"
 #include "WindowCloseListener.h"
 #include "ModuleFactory.h"
 

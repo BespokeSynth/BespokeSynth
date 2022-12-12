@@ -25,7 +25,7 @@
 
 #include "FormantFilterEffect.h"
 #include "SynthGlobals.h"
-#include "FloatSliderLFOControl.h"
+#include "Modulators/FloatSliderLFOControl.h"
 #include "Profiler.h"
 #include "UIControlMacros.h"
 

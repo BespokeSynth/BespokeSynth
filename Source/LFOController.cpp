@@ -26,7 +26,7 @@
 #include "LFOController.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
-#include "FloatSliderLFOControl.h"
+#include "Modulators/FloatSliderLFOControl.h"
 
 LFOController* TheLFOController = nullptr;
 

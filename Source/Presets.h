@@ -31,7 +31,7 @@
 #include "UIGrid.h"
 #include "ClickButton.h"
 #include "Checkbox.h"
-#include "FloatSliderLFOControl.h"
+#include "Modulators/FloatSliderLFOControl.h"
 #include "Transport.h"
 #include "Slider.h"
 #include "Ramp.h"

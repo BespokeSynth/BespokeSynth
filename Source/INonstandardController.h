@@ -26,7 +26,7 @@
 #ifndef Bespoke_INonstandardController_h
 #define Bespoke_INonstandardController_h
 
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 
 class ofxJSONElement;
 

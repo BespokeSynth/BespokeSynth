@@ -29,7 +29,7 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
-#include "Looper.h"
+#include "AudioEffects/Looper.h"
 #include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
 #include "ChannelBuffer.h"

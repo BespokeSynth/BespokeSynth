@@ -27,7 +27,7 @@
 #define __Bespoke__GridController__
 
 #include "IUIControl.h"
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 #include "UIGrid.h"
 #include "INoteSource.h"
 

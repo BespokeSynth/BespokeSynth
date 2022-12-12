@@ -29,7 +29,7 @@
 
 #include "IDrawableModule.h"
 #include "MidiDevice.h"
-#include "MidiController.h"
+#include "Instruments/MidiController.h"
 #include "TitleBar.h"
 #include "DropdownList.h"
 

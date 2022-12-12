@@ -42,7 +42,7 @@ using namespace juce::gl;
 #include "QuickSpawnMenu.h"
 #include "PatchCableSource.h"
 #include "DropdownList.h"
-#include "FloatSliderLFOControl.h"
+#include "Modulators/FloatSliderLFOControl.h"
 #include "UserPrefsEditor.h"
 #include "push2/JuceToPush2DisplayBridge.h"
 #include "push2/Push2-Bitmap.h"

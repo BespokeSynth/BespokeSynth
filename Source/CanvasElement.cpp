@@ -32,7 +32,7 @@
 #include "PatchCableSource.h"
 #include "ModularSynth.h"
 #include "EventCanvas.h"
-#include "SampleCanvas.h"
+#include "Synths/SampleCanvas.h"
 
 CanvasElement::CanvasElement(Canvas* canvas, int col, int row, float offset, float length)
 : mCanvas(canvas)

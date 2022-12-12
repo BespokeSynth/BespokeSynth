@@ -28,7 +28,7 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "TitleBar.h"
-#include "EffectChain.h"
+#include "AudioEffects/EffectChain.h"
 #include "UserPrefs.h"
 #include "VersionInfo.h"
 
