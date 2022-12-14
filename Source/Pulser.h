@@ -44,7 +44,9 @@ public:
    Pulser();
    virtual ~Pulser();
    static IDrawableModule* Create() { return new Pulser(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

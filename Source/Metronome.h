@@ -40,7 +40,9 @@ public:
    Metronome();
    ~Metronome();
    static IDrawableModule* Create() { return new Metronome(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

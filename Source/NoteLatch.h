@@ -36,7 +36,9 @@ class NoteLatch : public NoteEffectBase, public IDrawableModule
 public:
    NoteLatch();
    static IDrawableModule* Create() { return new NoteLatch(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 

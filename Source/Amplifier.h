@@ -38,7 +38,9 @@ public:
    Amplifier();
    virtual ~Amplifier();
    static IDrawableModule* Create() { return new Amplifier(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

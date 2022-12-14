@@ -40,6 +40,9 @@ public:
    Prefab();
    ~Prefab();
    static IDrawableModule* Create() { return new Prefab(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;

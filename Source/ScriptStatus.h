@@ -38,10 +38,11 @@ public:
    ScriptStatus();
    virtual ~ScriptStatus();
    static IDrawableModule* Create() { return new ScriptStatus(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void Poll() override;
-
-
    void CreateUIControls() override;
 
    void ButtonClicked(ClickButton* button, double time) override;

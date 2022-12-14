@@ -48,7 +48,9 @@ public:
    RadioSequencer();
    ~RadioSequencer();
    static IDrawableModule* Create() { return new RadioSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 

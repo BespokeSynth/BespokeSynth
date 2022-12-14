@@ -42,7 +42,9 @@ public:
    VolcaBeatsControl();
    virtual ~VolcaBeatsControl();
    static IDrawableModule* Create() { return new VolcaBeatsControl(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

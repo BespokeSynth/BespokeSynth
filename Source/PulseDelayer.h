@@ -39,7 +39,9 @@ public:
    PulseDelayer();
    ~PulseDelayer();
    static IDrawableModule* Create() { return new PulseDelayer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;

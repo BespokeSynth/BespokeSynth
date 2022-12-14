@@ -37,7 +37,9 @@ public:
    CommentDisplay();
    virtual ~CommentDisplay();
    static IDrawableModule* Create() { return new CommentDisplay(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

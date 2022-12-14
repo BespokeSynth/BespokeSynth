@@ -45,6 +45,9 @@ public:
    EnvelopeModulator();
    virtual ~EnvelopeModulator();
    static IDrawableModule* Create() { return new EnvelopeModulator(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
    void Delete() { delete this; }
    void DrawModule() override;
 

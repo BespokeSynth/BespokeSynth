@@ -37,7 +37,9 @@ public:
    TimerDisplay();
    ~TimerDisplay();
    static IDrawableModule* Create() { return new TimerDisplay(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

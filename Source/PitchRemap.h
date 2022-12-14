@@ -37,7 +37,9 @@ class PitchRemap : public NoteEffectBase, public IDrawableModule, public ITextEn
 public:
    PitchRemap();
    static IDrawableModule* Create() { return new PitchRemap(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

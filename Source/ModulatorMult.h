@@ -38,8 +38,9 @@ public:
    ModulatorMult();
    virtual ~ModulatorMult();
    static IDrawableModule* Create() { return new ModulatorMult(); }
-
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

@@ -41,7 +41,9 @@ public:
    FilterViz();
    ~FilterViz();
    static IDrawableModule* Create() { return new FilterViz(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

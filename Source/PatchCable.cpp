@@ -38,6 +38,7 @@
 #include "MidiController.h"
 #include "IModulator.h"
 #include "UserPrefs.h"
+#include "QuickSpawnMenu.h"
 
 PatchCable* PatchCable::sActivePatchCable = nullptr;
 
@@ -54,7 +55,7 @@ PatchCable::~PatchCable()
    TheSynth->UnregisterPatchCable(this);
 }
 
-void PatchCable::SetTarget(IClickable* target)
+void PatchCable::SetCableTarget(IClickable* target)
 {
    mTarget = target;
    mTargetRadioButton = dynamic_cast<RadioButton*>(target);
@@ -480,6 +481,21 @@ void PatchCable::MouseReleased()
          if (sActivePatchCable == this)
             sActivePatchCable = nullptr;
 
+         if (target == nullptr && GetKeyModifiers() == kModifier_Shift &&
+             (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Audio || GetConnectionType() == kConnectionType_Pulse))
+         {
+            TheSynth->GetQuickSpawn()->ShowSpawnCategoriesPopupForCable(this);
+            if (mTarget == nullptr) //if we're currently connected to nothing
+            {
+               mOwner->SetPatchCableTarget(this, TheSynth->GetQuickSpawn()->GetMainContainerFollower(), true);
+            }
+            else //if we're inserting
+            {
+               SetTempDrawTarget(TheSynth->GetQuickSpawn()->GetMainContainerFollower());
+               TheSynth->GetQuickSpawn()->SetTempConnection(mTarget, GetConnectionType());
+            }
+         }
+
          if (mTarget == nullptr)
             Destroy(true);
       }
@@ -539,8 +555,10 @@ PatchCablePos PatchCable::GetPatchCablePos()
    float wThat, hThat, xThat, yThat;
 
    int yThatAdjust = 0;
-   IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(mTarget);
    IClickable* target = mTarget;
+   if (mTempDrawTarget != nullptr)
+      target = mTempDrawTarget;
+   IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(target);
 
    if (targetModule != nullptr && targetModule->IsDeleted())
    {

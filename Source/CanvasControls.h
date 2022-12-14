@@ -41,7 +41,9 @@ public:
    CanvasControls();
    ~CanvasControls();
    static IDrawableModule* Create() { return new CanvasControls(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }

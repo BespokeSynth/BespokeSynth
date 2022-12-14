@@ -38,7 +38,9 @@ public:
    DCOffset();
    virtual ~DCOffset();
    static IDrawableModule* Create() { return new DCOffset(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

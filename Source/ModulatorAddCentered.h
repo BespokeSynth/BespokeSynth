@@ -38,7 +38,9 @@ public:
    ModulatorAddCentered();
    virtual ~ModulatorAddCentered();
    static IDrawableModule* Create() { return new ModulatorAddCentered(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

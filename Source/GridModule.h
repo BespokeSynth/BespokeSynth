@@ -45,8 +45,9 @@ public:
    GridModule();
    ~GridModule();
    static IDrawableModule* Create() { return new GridModule(); }
-
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
    void CreateUIControls() override;
 
    void Init() override;

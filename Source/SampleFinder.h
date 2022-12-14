@@ -46,7 +46,9 @@ public:
    SampleFinder();
    ~SampleFinder();
    static IDrawableModule* Create() { return new SampleFinder(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

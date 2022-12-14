@@ -265,6 +265,7 @@ public:
    void SaveStatePopup();
    void LoadStatePopup();
    void ToggleQuickSpawn();
+   QuickSpawnMenu* GetQuickSpawn() { return mQuickSpawn; }
    double GetLastSaveTime() { return mLastSaveTime; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 

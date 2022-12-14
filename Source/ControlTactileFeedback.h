@@ -38,7 +38,9 @@ public:
    ControlTactileFeedback();
    ~ControlTactileFeedback();
    static IDrawableModule* Create() { return new ControlTactileFeedback(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

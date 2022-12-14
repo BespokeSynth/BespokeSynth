@@ -38,7 +38,9 @@ class LaunchpadNoteDisplayer : public NoteEffectBase, public IDrawableModule
 public:
    LaunchpadNoteDisplayer();
    static IDrawableModule* Create() { return new LaunchpadNoteDisplayer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetLaunchpad(LaunchpadKeyboard* launchpad) { mLaunchpad = launchpad; }
 

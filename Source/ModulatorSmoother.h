@@ -40,7 +40,9 @@ public:
    ModulatorSmoother();
    virtual ~ModulatorSmoother();
    static IDrawableModule* Create() { return new ModulatorSmoother(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

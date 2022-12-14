@@ -42,7 +42,9 @@ public:
    RingModulator();
    virtual ~RingModulator();
    static IDrawableModule* Create() { return new RingModulator(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

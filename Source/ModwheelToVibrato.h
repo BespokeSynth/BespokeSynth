@@ -39,7 +39,9 @@ public:
    ModwheelToVibrato();
    virtual ~ModwheelToVibrato();
    static IDrawableModule* Create() { return new ModwheelToVibrato(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

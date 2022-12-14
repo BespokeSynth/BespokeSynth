@@ -43,6 +43,9 @@ public:
    AbletonLink();
    virtual ~AbletonLink();
    static IDrawableModule* Create() { return new AbletonLink(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void Init() override;
    void CreateUIControls() override;

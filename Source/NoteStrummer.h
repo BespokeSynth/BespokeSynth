@@ -38,7 +38,9 @@ public:
    NoteStrummer();
    virtual ~NoteStrummer();
    static IDrawableModule* Create() { return new NoteStrummer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

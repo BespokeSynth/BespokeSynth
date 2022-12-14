@@ -38,7 +38,9 @@ public:
    Selector();
    ~Selector() override;
    static IDrawableModule* Create() { return new Selector(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

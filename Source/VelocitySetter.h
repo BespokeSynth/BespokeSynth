@@ -37,7 +37,9 @@ class VelocitySetter : public NoteEffectBase, public IDrawableModule, public IFl
 public:
    VelocitySetter();
    static IDrawableModule* Create() { return new VelocitySetter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

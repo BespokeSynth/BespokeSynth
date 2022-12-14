@@ -44,7 +44,9 @@ public:
    Push2Control();
    virtual ~Push2Control();
    static IDrawableModule* Create() { return new Push2Control(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Poll() override;

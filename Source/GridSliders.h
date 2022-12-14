@@ -41,7 +41,9 @@ public:
    GridSliders();
    ~GridSliders();
    static IDrawableModule* Create() { return new GridSliders(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

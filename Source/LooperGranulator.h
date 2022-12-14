@@ -45,7 +45,9 @@ public:
    LooperGranulator();
    virtual ~LooperGranulator();
    static IDrawableModule* Create() { return new LooperGranulator(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

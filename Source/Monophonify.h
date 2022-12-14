@@ -38,7 +38,9 @@ class Monophonify : public NoteEffectBase, public IDrawableModule, public IFloat
 public:
    Monophonify();
    static IDrawableModule* Create() { return new Monophonify(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

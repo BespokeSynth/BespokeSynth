@@ -70,6 +70,9 @@ public:
    IDrawableModule();
    virtual ~IDrawableModule();
    static bool CanCreate() { return true; }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void Render() override;
    void RenderUnclipped();

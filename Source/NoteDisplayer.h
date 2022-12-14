@@ -34,7 +34,9 @@ class NoteDisplayer : public NoteEffectBase, public IDrawableModule
 public:
    NoteDisplayer() = default;
    static IDrawableModule* Create() { return new NoteDisplayer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

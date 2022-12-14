@@ -40,7 +40,9 @@ class MidiControlChange : public NoteEffectBase, public IDrawableModule, public 
 public:
    MidiControlChange();
    static IDrawableModule* Create() { return new MidiControlChange(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

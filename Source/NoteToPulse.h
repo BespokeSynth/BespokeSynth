@@ -39,7 +39,9 @@ public:
    NoteToPulse();
    virtual ~NoteToPulse();
    static IDrawableModule* Create() { return new NoteToPulse(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

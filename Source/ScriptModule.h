@@ -46,6 +46,9 @@ public:
    ScriptModule();
    virtual ~ScriptModule();
    static IDrawableModule* Create() { return new ScriptModule(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    static void UninitializePython();
    static void InitializePythonIfNecessary();
@@ -301,6 +304,9 @@ public:
    ScriptReferenceDisplay();
    virtual ~ScriptReferenceDisplay();
    static IDrawableModule* Create() { return new ScriptReferenceDisplay(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -336,6 +342,9 @@ public:
    ScriptWarningPopup() {}
    virtual ~ScriptWarningPopup() {}
    static IDrawableModule* Create() { return new ScriptWarningPopup(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Poll() override;

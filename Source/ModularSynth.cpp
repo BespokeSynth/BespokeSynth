@@ -640,6 +640,7 @@ void ModularSynth::Draw(void* vg)
       ofTranslate(mUILayerModuleContainer.GetDrawOffset().x, mUILayerModuleContainer.GetDrawOffset().y);
 
       mUILayerModuleContainer.Draw();
+      mUILayerModuleContainer.DrawPatchCables(false);
       mUILayerModuleContainer.DrawUnclipped();
 
       Profiler::Draw();
@@ -1582,7 +1583,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
          mLastClickWasEmptySpace = true;
 
       if (mQuickSpawn != nullptr && mQuickSpawn->IsShowing() && clickedModule != mQuickSpawn)
-         mQuickSpawn->SetShowing(false);
+         mQuickSpawn->Hide();
    }
 }
 
@@ -1590,7 +1591,7 @@ void ModularSynth::ToggleQuickSpawn()
 {
    if (mQuickSpawn != nullptr && mQuickSpawn->IsShowing())
    {
-      mQuickSpawn->SetShowing(false);
+      mQuickSpawn->Hide();
    }
    else
    {
@@ -2220,6 +2221,7 @@ void ModularSynth::ResetLayout()
    mQuickSpawn->CreateUIControls();
    mQuickSpawn->Init();
    mUILayerModuleContainer.AddModule(mQuickSpawn);
+   mModuleContainer.AddModule(mQuickSpawn->GetMainContainerFollower());
 
    mUserPrefsEditor = new UserPrefsEditor();
    mUserPrefsEditor->SetName("userprefseditor");

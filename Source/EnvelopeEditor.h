@@ -79,6 +79,9 @@ class EnvelopeEditor : public IDrawableModule, public IRadioButtonListener, publ
 public:
    EnvelopeEditor();
    static IDrawableModule* Create() { return new EnvelopeEditor(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
    void Delete() { delete this; }
    void DrawModule() override;
 

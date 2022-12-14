@@ -40,7 +40,9 @@ public:
    TakeRecorder();
    virtual ~TakeRecorder();
    static IDrawableModule* Create() { return new TakeRecorder(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

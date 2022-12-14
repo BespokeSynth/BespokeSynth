@@ -112,7 +112,9 @@ public:
    StepSequencer();
    ~StepSequencer();
    static IDrawableModule* Create() { return new StepSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 

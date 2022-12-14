@@ -62,7 +62,9 @@ public:
    UnstablePitch();
    virtual ~UnstablePitch();
    static IDrawableModule* Create() { return new UnstablePitch(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

@@ -38,7 +38,9 @@ public:
    SampleBrowser();
    ~SampleBrowser();
    static IDrawableModule* Create() { return new SampleBrowser(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

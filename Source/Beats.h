@@ -98,7 +98,9 @@ public:
    Beats();
    virtual ~Beats();
    static IDrawableModule* Create() { return new Beats(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

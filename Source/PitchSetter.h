@@ -37,7 +37,9 @@ class PitchSetter : public NoteEffectBase, public IDrawableModule, public IIntSl
 public:
    PitchSetter();
    static IDrawableModule* Create() { return new PitchSetter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

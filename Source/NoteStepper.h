@@ -40,7 +40,9 @@ class NoteStepper : public INoteReceiver, public INoteSource, public IDrawableMo
 public:
    NoteStepper();
    static IDrawableModule* Create() { return new NoteStepper(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

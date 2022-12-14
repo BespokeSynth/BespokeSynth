@@ -44,7 +44,9 @@ public:
    ~LFOController();
    static IDrawableModule* Create() { return new LFOController(); }
    static bool CanCreate() { return TheLFOController == nullptr; }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

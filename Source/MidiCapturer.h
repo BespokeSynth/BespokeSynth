@@ -57,7 +57,9 @@ public:
    MidiCapturer();
    virtual ~MidiCapturer();
    static IDrawableModule* Create() { return new MidiCapturer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void Init() override;
 

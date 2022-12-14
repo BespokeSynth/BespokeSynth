@@ -52,7 +52,9 @@ public:
    SamplePlayer();
    ~SamplePlayer();
    static IDrawableModule* Create() { return new SamplePlayer(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;

@@ -78,10 +78,11 @@ public:
    bool IsDragging() const { return mDragging; }
    void SetHoveringOnSource(bool hovering) { mHoveringOnSource = hovering; }
    void SetSourceIndex(int index) { mSourceIndex = index; }
-
+   PatchCableSource* GetOwner() const { return mOwner; }
    void Grab();
    bool IsValidTarget(IClickable* target) const;
    void Destroy(bool fromUserClick);
+   void SetTempDrawTarget(IClickable* target) { mTempDrawTarget = target; }
 
    void SetUIControlConnection(UIControlConnection* conn) { mUIControlConnection = conn; }
 
@@ -91,13 +92,14 @@ protected:
    void OnClicked(float x, float y, bool right) override;
 
 private:
-   void SetTarget(IClickable* target);
+   void SetCableTarget(IClickable* target);
    PatchCablePos GetPatchCablePos();
    ofVec2f FindClosestSide(float x, float y, float w, float h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
    IClickable* GetDropTarget();
 
    PatchCableSource* mOwner{ nullptr };
    IClickable* mTarget{ nullptr };
+   IClickable* mTempDrawTarget{ nullptr };
    RadioButton* mTargetRadioButton{ nullptr };
    UIControlConnection* mUIControlConnection{ nullptr };
    IAudioReceiver* mAudioReceiverTarget{ nullptr };

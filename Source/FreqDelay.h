@@ -39,7 +39,9 @@ public:
    FreqDelay();
    virtual ~FreqDelay();
    static IDrawableModule* Create() { return new FreqDelay(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

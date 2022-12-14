@@ -44,7 +44,9 @@ public:
    SampleCanvas();
    ~SampleCanvas();
    static IDrawableModule* Create() { return new SampleCanvas(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

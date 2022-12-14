@@ -38,7 +38,9 @@ public:
    PulseHocket();
    virtual ~PulseHocket();
    static IDrawableModule* Create() { return new PulseHocket(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 

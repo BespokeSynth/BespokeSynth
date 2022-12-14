@@ -36,7 +36,9 @@ class ScaleDegree : public NoteEffectBase, public IDrawableModule, public IDropd
 public:
    ScaleDegree();
    static IDrawableModule* Create() { return new ScaleDegree(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

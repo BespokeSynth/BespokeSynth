@@ -63,7 +63,9 @@ public:
    VinylTempoControl();
    ~VinylTempoControl();
    static IDrawableModule* Create() { return new VinylTempoControl(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void CreateUIControls() override;

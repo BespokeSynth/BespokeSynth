@@ -37,7 +37,9 @@ class VelocityScaler : public NoteEffectBase, public IDrawableModule, public IFl
 public:
    VelocityScaler();
    static IDrawableModule* Create() { return new VelocityScaler(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

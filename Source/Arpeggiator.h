@@ -44,7 +44,9 @@ public:
    Arpeggiator();
    ~Arpeggiator();
    static IDrawableModule* Create() { return new Arpeggiator(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

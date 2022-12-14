@@ -39,7 +39,9 @@ public:
    ModWheel();
    virtual ~ModWheel();
    static IDrawableModule* Create() { return new ModWheel(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

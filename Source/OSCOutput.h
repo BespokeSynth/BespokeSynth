@@ -44,6 +44,9 @@ public:
    OSCOutput();
    virtual ~OSCOutput();
    static IDrawableModule* Create() { return new OSCOutput(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void Init() override;
    void Poll() override;

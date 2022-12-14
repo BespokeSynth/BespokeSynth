@@ -42,7 +42,9 @@ public:
    NoteCounter();
    ~NoteCounter();
    static IDrawableModule* Create() { return new NoteCounter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;

@@ -49,7 +49,9 @@ public:
    ~ChaosEngine();
    static IDrawableModule* Create() { return new ChaosEngine(); }
    static bool CanCreate() { return TheChaosEngine == nullptr; }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

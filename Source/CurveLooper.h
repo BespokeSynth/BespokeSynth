@@ -42,6 +42,9 @@ public:
    CurveLooper();
    ~CurveLooper();
    static IDrawableModule* Create() { return new CurveLooper(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
