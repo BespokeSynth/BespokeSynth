@@ -66,7 +66,9 @@ public:
    SliderSequencer();
    ~SliderSequencer();
    static IDrawableModule* Create() { return new SliderSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

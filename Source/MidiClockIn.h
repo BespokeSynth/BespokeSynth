@@ -39,6 +39,9 @@ public:
    MidiClockIn();
    virtual ~MidiClockIn();
    static IDrawableModule* Create() { return new MidiClockIn(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

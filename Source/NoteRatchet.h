@@ -37,7 +37,9 @@ class NoteRatchet : public NoteEffectBase, public IDrawableModule, public IDropd
 public:
    NoteRatchet();
    static IDrawableModule* Create() { return new NoteRatchet(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

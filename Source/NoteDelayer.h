@@ -39,7 +39,9 @@ public:
    NoteDelayer();
    ~NoteDelayer();
    static IDrawableModule* Create() { return new NoteDelayer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

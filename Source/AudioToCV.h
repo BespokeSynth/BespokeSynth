@@ -39,7 +39,9 @@ public:
    AudioToCV();
    virtual ~AudioToCV();
    static IDrawableModule* Create() { return new AudioToCV(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

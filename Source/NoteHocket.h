@@ -41,7 +41,9 @@ class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableMod
 public:
    NoteHocket();
    static IDrawableModule* Create() { return new NoteHocket(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

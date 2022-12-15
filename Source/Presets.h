@@ -45,6 +45,9 @@ public:
    Presets();
    virtual ~Presets();
    static IDrawableModule* Create() { return new Presets(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

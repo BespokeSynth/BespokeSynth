@@ -38,7 +38,9 @@ class ChordHolder : public NoteEffectBase, public IDrawableModule, public IButto
 public:
    ChordHolder();
    static IDrawableModule* Create() { return new ChordHolder(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 

@@ -48,7 +48,9 @@ public:
    NoteSinger();
    ~NoteSinger();
    static IDrawableModule* Create() { return new NoteSinger(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

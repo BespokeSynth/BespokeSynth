@@ -37,6 +37,9 @@ public:
    HelpDisplay();
    virtual ~HelpDisplay();
    static IDrawableModule* Create() { return new HelpDisplay(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    bool IsSaveable() override { return false; }
    bool HasTitleBar() const override { return false; }

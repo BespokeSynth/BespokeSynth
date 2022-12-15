@@ -42,7 +42,9 @@ public:
    MultitrackRecorder();
    virtual ~MultitrackRecorder();
    static IDrawableModule* Create() { return new MultitrackRecorder(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
@@ -95,7 +97,9 @@ public:
    MultitrackRecorderTrack();
    virtual ~MultitrackRecorderTrack();
    static IDrawableModule* Create() { return new MultitrackRecorderTrack(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }

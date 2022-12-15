@@ -47,7 +47,9 @@ public:
    LooperRecorder();
    ~LooperRecorder();
    static IDrawableModule* Create() { return new LooperRecorder(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

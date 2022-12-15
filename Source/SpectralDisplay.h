@@ -40,7 +40,9 @@ public:
    SpectralDisplay();
    virtual ~SpectralDisplay();
    static IDrawableModule* Create() { return new SpectralDisplay(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

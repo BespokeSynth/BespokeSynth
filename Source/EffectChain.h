@@ -45,7 +45,9 @@ public:
    EffectChain();
    virtual ~EffectChain();
    static IDrawableModule* Create() { return new EffectChain(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

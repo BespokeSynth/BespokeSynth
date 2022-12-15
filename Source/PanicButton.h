@@ -36,6 +36,9 @@ public:
    PanicButton();
    ~PanicButton();
    static IDrawableModule* Create() { return new PanicButton(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
 private:
    //IDrawableModule

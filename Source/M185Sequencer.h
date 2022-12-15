@@ -26,7 +26,9 @@ public:
    M185Sequencer();
    virtual ~M185Sequencer();
    static IDrawableModule* Create() { return new M185Sequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;

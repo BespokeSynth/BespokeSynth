@@ -40,7 +40,9 @@ public:
    UnstablePressure();
    virtual ~UnstablePressure();
    static IDrawableModule* Create() { return new UnstablePressure(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

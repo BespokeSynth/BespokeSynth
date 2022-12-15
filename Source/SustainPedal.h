@@ -36,7 +36,9 @@ class SustainPedal : public NoteEffectBase, public IDrawableModule
 public:
    SustainPedal();
    static IDrawableModule* Create() { return new SustainPedal(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

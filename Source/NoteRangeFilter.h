@@ -36,7 +36,9 @@ class NoteRangeFilter : public NoteEffectBase, public IDrawableModule, public II
 public:
    NoteRangeFilter();
    static IDrawableModule* Create() { return new NoteRangeFilter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

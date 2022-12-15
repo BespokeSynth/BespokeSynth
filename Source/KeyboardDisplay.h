@@ -34,7 +34,9 @@ class KeyboardDisplay : public NoteEffectBase, public IDrawableModule
 public:
    KeyboardDisplay();
    static IDrawableModule* Create() { return new KeyboardDisplay(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

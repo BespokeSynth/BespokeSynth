@@ -47,6 +47,9 @@ public:
    NoteTable();
    virtual ~NoteTable();
    static IDrawableModule* Create() { return new NoteTable(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

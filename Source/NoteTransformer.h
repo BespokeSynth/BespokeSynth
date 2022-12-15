@@ -38,7 +38,9 @@ public:
    NoteTransformer();
    ~NoteTransformer();
    static IDrawableModule* Create() { return new NoteTransformer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 

@@ -36,7 +36,9 @@ public:
    PulseGate();
    virtual ~PulseGate();
    static IDrawableModule* Create() { return new PulseGate(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 

@@ -36,7 +36,9 @@ class WhiteKeys : public NoteEffectBase, public IDrawableModule
 public:
    WhiteKeys();
    static IDrawableModule* Create() { return new WhiteKeys(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 

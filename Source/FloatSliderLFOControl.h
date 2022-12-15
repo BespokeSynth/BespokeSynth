@@ -60,6 +60,9 @@ class FloatSliderLFOControl : public IDrawableModule, public IRadioButtonListene
 public:
    FloatSliderLFOControl();
    static IDrawableModule* Create() { return new FloatSliderLFOControl(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
    void Delete() { delete this; }
    void DrawModule() override;
 

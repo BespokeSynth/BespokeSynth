@@ -45,7 +45,9 @@ public:
    LinnstrumentControl();
    virtual ~LinnstrumentControl();
    static IDrawableModule* Create() { return new LinnstrumentControl(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

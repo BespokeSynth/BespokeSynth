@@ -41,6 +41,9 @@ public:
    UserPrefsEditor();
    ~UserPrefsEditor();
    static IDrawableModule* Create() { return new UserPrefsEditor(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

@@ -39,7 +39,9 @@ class Kicker : public NoteEffectBase, public IDrawableModule
 public:
    Kicker();
    static IDrawableModule* Create() { return new Kicker(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void SetDrumPlayer(DrumPlayer* drumPlayer) { mDrumPlayer = drumPlayer; }

@@ -38,7 +38,9 @@ public:
    ModulatorSubtract();
    virtual ~ModulatorSubtract();
    static IDrawableModule* Create() { return new ModulatorSubtract(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

@@ -43,6 +43,9 @@ public:
    Ramper();
    ~Ramper();
    static IDrawableModule* Create() { return new Ramper(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;

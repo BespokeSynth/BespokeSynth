@@ -44,6 +44,9 @@ public:
    BandVocoder();
    virtual ~BandVocoder();
    static IDrawableModule* Create() { return new BandVocoder(); }
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

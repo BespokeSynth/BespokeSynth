@@ -36,7 +36,9 @@ public:
    ModwheelToPressure();
    virtual ~ModwheelToPressure();
    static IDrawableModule* Create() { return new ModwheelToPressure(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 

@@ -111,7 +111,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
       RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    }
 
-   cable->SetTarget(target);
+   cable->SetCableTarget(target);
 
    INoteReceiver* noteReceiver = dynamic_cast<INoteReceiver*>(target);
    if (noteReceiver)

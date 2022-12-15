@@ -46,7 +46,9 @@ public:
    MultitapDelay();
    ~MultitapDelay();
    static IDrawableModule* Create() { return new MultitapDelay(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

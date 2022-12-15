@@ -72,11 +72,24 @@ public:
       }
    };
 
+   struct ModuleInfo
+   {
+      CreateModuleFn mCreatorFn{ nullptr };
+      CanCreateModuleFn mCanCreateFn{ nullptr };
+      ModuleCategory mCategory{ ModuleCategory::kModuleCategory_Unknown };
+      bool mIsHidden{ false };
+      bool mIsExperimental{ false };
+      bool mCanReceiveAudio{ false };
+      bool mCanReceiveNotes{ false };
+      bool mCanReceivePulses{ false };
+   };
+
    IDrawableModule* MakeModule(std::string type);
-   std::vector<Spawnable> GetSpawnableModules(ModuleCategory moduleType);
+   std::vector<Spawnable> GetSpawnableModules(ModuleCategory moduleCategory);
    std::vector<Spawnable> GetSpawnableModules(std::string keys, bool continuousString);
-   ModuleCategory GetModuleType(std::string typeName);
-   ModuleCategory GetModuleType(Spawnable spawnable);
+   ModuleCategory GetModuleCategory(std::string typeName);
+   ModuleCategory GetModuleCategory(Spawnable spawnable);
+   ModuleInfo GetModuleInfo(std::string typeName);
    bool IsExperimental(std::string typeName);
    static void GetPrefabs(std::vector<Spawnable>& prefabs);
    static std::string FixUpTypeName(std::string typeName);
@@ -87,12 +100,9 @@ public:
    static constexpr const char* kEffectChainSuffix = "[effectchain]";
 
 private:
-   void Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleCategory moduleType, bool hidden, bool experimental);
-   std::map<std::string, CreateModuleFn> mFactoryMap;
-   std::map<std::string, CanCreateModuleFn> mCanCreateMap;
-   std::map<std::string, ModuleCategory> mModuleTypeMap;
-   std::map<std::string, bool> mIsHiddenModuleMap;
-   std::map<std::string, bool> mIsExperimentalModuleMap;
+   void Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleCategory moduleCategory, bool hidden, bool experimental, bool canReceiveAudio, bool canReceiveNotes, bool canReceivePulses);
+
+   std::map<std::string, ModuleInfo> mFactoryMap;
 };
 
 #endif /* defined(__modularSynth__ModuleFactory__) */

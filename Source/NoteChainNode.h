@@ -41,7 +41,9 @@ public:
    NoteChainNode();
    virtual ~NoteChainNode();
    static IDrawableModule* Create() { return new NoteChainNode(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;

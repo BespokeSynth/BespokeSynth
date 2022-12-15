@@ -40,7 +40,9 @@ public:
    AudioToPulse();
    virtual ~AudioToPulse();
    static IDrawableModule* Create() { return new AudioToPulse(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

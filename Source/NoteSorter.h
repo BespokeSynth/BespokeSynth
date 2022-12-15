@@ -39,7 +39,9 @@ class NoteSorter : public INoteReceiver, public INoteSource, public IDrawableMod
 public:
    NoteSorter();
    static IDrawableModule* Create() { return new NoteSorter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

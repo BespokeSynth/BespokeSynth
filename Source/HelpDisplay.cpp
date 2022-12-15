@@ -523,7 +523,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          docs[moduleType.module]["canReceivePulses"] = false;
       }
 
-      std::vector<ModuleCategory> moduleTypes = {
+      std::vector<ModuleCategory> moduleCategories = {
          kModuleCategory_Note,
          kModuleCategory_Synth,
          kModuleCategory_Audio,
@@ -533,9 +533,9 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Pulse,
          kModuleCategory_Other
       };
-      for (auto type : moduleTypes)
+      for (auto category : moduleCategories)
       {
-         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(category);
          for (auto toSpawn : modules)
          {
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);

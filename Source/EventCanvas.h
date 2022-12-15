@@ -44,7 +44,9 @@ public:
    EventCanvas();
    ~EventCanvas();
    static IDrawableModule* Create() { return new EventCanvas(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

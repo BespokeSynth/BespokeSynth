@@ -45,7 +45,9 @@ public:
    FFTtoAdditive();
    virtual ~FFTtoAdditive();
    static IDrawableModule* Create() { return new FFTtoAdditive(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

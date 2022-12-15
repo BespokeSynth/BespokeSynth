@@ -39,6 +39,9 @@ class NoteEcho : public INoteReceiver, public INoteSource, public IDrawableModul
 public:
    NoteEcho();
    static IDrawableModule* Create() { return new NoteEcho(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

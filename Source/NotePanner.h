@@ -38,7 +38,9 @@ class NotePanner : public NoteEffectBase, public IDrawableModule, public IFloatS
 public:
    NotePanner();
    static IDrawableModule* Create() { return new NotePanner(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

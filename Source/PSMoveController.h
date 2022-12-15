@@ -43,7 +43,9 @@ public:
    PSMoveController();
    ~PSMoveController();
    static IDrawableModule* Create() { return new PSMoveController(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

@@ -38,7 +38,9 @@ class PitchPanner : public NoteEffectBase, public IDrawableModule, public IIntSl
 public:
    PitchPanner();
    static IDrawableModule* Create() { return new PitchPanner(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

@@ -97,16 +97,21 @@ void IDrawableModule::Init()
    assert(!mInitialized);
    mInitialized = true;
 
-   mModuleCategory = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
-   if (mModuleCategory == kModuleCategory_Other)
+   ModuleFactory::ModuleInfo moduleInfo = TheSynth->GetModuleFactory()->GetModuleInfo(mTypeName);
+   mModuleCategory = moduleInfo.mCategory;
+   if (mModuleCategory == kModuleCategory_Unknown)
    {
       if (dynamic_cast<IAudioEffect*>(this))
          mModuleCategory = kModuleCategory_Processor;
    }
 
-   mCanReceiveAudio = (dynamic_cast<IAudioReceiver*>(this) != nullptr);
-   mCanReceiveNotes = (dynamic_cast<INoteReceiver*>(this) != nullptr);
-   mCanReceivePulses = (dynamic_cast<IPulseReceiver*>(this) != nullptr);
+   mCanReceiveAudio = moduleInfo.mCanReceiveAudio;
+   mCanReceiveNotes = moduleInfo.mCanReceiveNotes;
+   mCanReceivePulses = moduleInfo.mCanReceivePulses;
+
+   assert(mCanReceiveAudio == (dynamic_cast<IAudioReceiver*>(this) != nullptr));
+   assert(mCanReceiveNotes == (dynamic_cast<INoteReceiver*>(this) != nullptr));
+   assert(mCanReceivePulses == (dynamic_cast<IPulseReceiver*>(this) != nullptr));
 
    bool wasEnabled = Enabled();
    bool showEnableToggle = false;

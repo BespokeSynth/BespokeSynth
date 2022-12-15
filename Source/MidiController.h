@@ -264,6 +264,9 @@ public:
    MidiController();
    ~MidiController();
    static IDrawableModule* Create() { return new MidiController(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

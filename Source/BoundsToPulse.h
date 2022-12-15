@@ -45,6 +45,9 @@ public:
    BoundsToPulse();
    virtual ~BoundsToPulse();
    static IDrawableModule* Create() { return new BoundsToPulse(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void Init() override;
    void CreateUIControls() override;

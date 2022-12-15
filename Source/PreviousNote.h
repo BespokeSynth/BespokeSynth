@@ -34,7 +34,9 @@ class PreviousNote : public NoteEffectBase, public IDrawableModule
 public:
    PreviousNote();
    static IDrawableModule* Create() { return new PreviousNote(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 

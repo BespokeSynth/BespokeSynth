@@ -38,7 +38,9 @@ class NotePanAlternator : public NoteEffectBase, public IDrawableModule, public 
 public:
    NotePanAlternator();
    static IDrawableModule* Create() { return new NotePanAlternator(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

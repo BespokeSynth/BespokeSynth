@@ -39,7 +39,9 @@ public:
    AudioSend();
    virtual ~AudioSend();
    static IDrawableModule* Create() { return new AudioSend(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

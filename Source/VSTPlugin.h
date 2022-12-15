@@ -63,6 +63,9 @@ public:
    VSTPlugin();
    virtual ~VSTPlugin() override;
    static IDrawableModule* Create() { return new VSTPlugin(); }
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;

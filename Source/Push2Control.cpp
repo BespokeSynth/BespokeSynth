@@ -350,7 +350,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
          std::string moduleTypeToSpawn = GetModuleTypeToSpawn();
          if (moduleTypeToSpawn != "")
          {
-            ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(moduleTypeToSpawn)));
+            ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleCategory(moduleTypeToSpawn)));
             text = "\ntap grid to spawn " + moduleTypeToSpawn;
          }
          DrawTextBold(text, 5, 80, 20);

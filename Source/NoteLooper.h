@@ -44,7 +44,9 @@ public:
    NoteLooper();
    ~NoteLooper();
    static IDrawableModule* Create() { return new NoteLooper(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

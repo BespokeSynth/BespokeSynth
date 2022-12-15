@@ -48,7 +48,9 @@ class ScaleDetect : public NoteEffectBase, public IDrawableModule, public IButto
 public:
    ScaleDetect();
    static IDrawableModule* Create() { return new ScaleDetect(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

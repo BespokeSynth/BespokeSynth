@@ -45,7 +45,9 @@ public:
    SignalGenerator();
    ~SignalGenerator();
    static IDrawableModule* Create() { return new SignalGenerator(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 

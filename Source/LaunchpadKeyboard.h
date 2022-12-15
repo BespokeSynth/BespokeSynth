@@ -47,7 +47,9 @@ public:
    LaunchpadKeyboard();
    ~LaunchpadKeyboard();
    static IDrawableModule* Create() { return new LaunchpadKeyboard(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;

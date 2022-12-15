@@ -40,7 +40,9 @@ public:
    DebugAudioSource();
    ~DebugAudioSource();
    static IDrawableModule* Create() { return new DebugAudioSource(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    //IAudioSource
    void Process(double time) override;

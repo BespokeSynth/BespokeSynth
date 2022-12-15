@@ -44,7 +44,9 @@ public:
    PulseTrain();
    virtual ~PulseTrain();
    static IDrawableModule* Create() { return new PulseTrain(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;

@@ -37,7 +37,9 @@ public:
    GlobalControls();
    virtual ~GlobalControls();
    static IDrawableModule* Create() { return new GlobalControls(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Poll() override;

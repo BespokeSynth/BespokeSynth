@@ -39,7 +39,9 @@ public:
    PitchToCV();
    virtual ~PitchToCV();
    static IDrawableModule* Create() { return new PitchToCV(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

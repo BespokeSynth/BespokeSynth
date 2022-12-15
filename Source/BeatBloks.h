@@ -49,7 +49,9 @@ public:
    BeatBloks();
    ~BeatBloks();
    static IDrawableModule* Create() { return new BeatBloks(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

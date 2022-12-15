@@ -46,7 +46,9 @@ public:
    ControllingSong();
    ~ControllingSong();
    static IDrawableModule* Create() { return new ControllingSong(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
