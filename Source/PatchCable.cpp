@@ -476,12 +476,9 @@ void PatchCable::MouseReleased()
          if (target)
             mOwner->SetPatchCableTarget(this, target, true);
 
-         mDragging = false;
-         mHovered = false;
-         if (sActivePatchCable == this)
-            sActivePatchCable = nullptr;
+         Release();
 
-         if (target == nullptr && GetKeyModifiers() == kModifier_Shift &&
+         if (target == nullptr &&
              (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Audio || GetConnectionType() == kConnectionType_Pulse))
          {
             TheSynth->GetQuickSpawn()->ShowSpawnCategoriesPopupForCable(this);
@@ -494,6 +491,7 @@ void PatchCable::MouseReleased()
                SetTempDrawTarget(TheSynth->GetQuickSpawn()->GetMainContainerFollower());
                TheSynth->GetQuickSpawn()->SetTempConnection(mTarget, GetConnectionType());
             }
+            TheSynth->GetQuickSpawn()->GetMainContainerFollower()->UpdateLocation();
          }
 
          if (mTarget == nullptr)
@@ -676,6 +674,17 @@ void PatchCable::Grab()
       gHoveredUIControl = nullptr;
       mGrabPos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
       mOwner->CableGrabbed();
+   }
+}
+
+void PatchCable::Release()
+{
+   if (mDragging)
+   {
+      mDragging = false;
+      mHovered = false;
+      if (sActivePatchCable == this)
+         sActivePatchCable = nullptr;
    }
 }
 

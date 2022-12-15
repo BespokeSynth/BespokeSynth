@@ -80,6 +80,7 @@ public:
    void SetSourceIndex(int index) { mSourceIndex = index; }
    PatchCableSource* GetOwner() const { return mOwner; }
    void Grab();
+   void Release();
    bool IsValidTarget(IClickable* target) const;
    void Destroy(bool fromUserClick);
    void SetTempDrawTarget(IClickable* target) { mTempDrawTarget = target; }

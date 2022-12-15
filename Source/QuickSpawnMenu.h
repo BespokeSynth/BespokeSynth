@@ -40,6 +40,9 @@ public:
    void GetDimensions(float& width, float& height) override;
    bool HasTitleBar() const override { return false; }
    bool IsSaveable() override { return false; }
+
+   void UpdateLocation();
+
    PatchCableSource* mTempConnectionCable{ nullptr };
 };
 

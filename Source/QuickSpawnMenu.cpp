@@ -446,14 +446,7 @@ void QuickSpawnMenu::DrawModule()
 
    ofPopStyle();
 
-   float x, y;
-   GetPosition(x, y);
-   float scaleFactor = UserPrefs.ui_scale.Get() / gDrawScale;
-   x *= scaleFactor;
-   y *= scaleFactor;
-   x -= TheSynth->GetDrawOffset().x;
-   y -= TheSynth->GetDrawOffset().y;
-   mMainContainerFollower->SetPosition(x, y);
+   mMainContainerFollower->UpdateLocation();
 }
 
 void QuickSpawnMenu::DrawModuleUnclipped()
@@ -553,4 +546,16 @@ void QuickSpawnFollower::GetDimensions(float& width, float& height)
 
    height -= 10;
    width -= 10;
+}
+
+void QuickSpawnFollower::UpdateLocation()
+{
+   float x, y;
+   TheQuickSpawnMenu->GetPosition(x, y);
+   float scaleFactor = UserPrefs.ui_scale.Get() / gDrawScale;
+   x *= scaleFactor;
+   y *= scaleFactor;
+   x -= TheSynth->GetDrawOffset().x;
+   y -= TheSynth->GetDrawOffset().y;
+   SetPosition(x, y);
 }

@@ -973,6 +973,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       }
    }
 
+   if (key == OF_KEY_ESC && PatchCable::sActivePatchCable != nullptr)
+   {
+      PatchCable::sActivePatchCable->Release();
+      return;
+   }
+
    if (IKeyboardFocusListener::GetActiveKeyboardFocus()) //active text entry captures all input
    {
       IKeyboardFocusListener::GetActiveKeyboardFocus()->OnKeyPressed(key, isRepeat);
