@@ -24,7 +24,7 @@ jobs:
         windows-x64:
           imageName: 'windows-2019'
           isWindows: True
-          cmakeArguments: "-A x64 -DBESPOKE_PYTHON_ROOT='C:/hostedtoolcache/windows/Python/3.10.8/x64'"
+          cmakeArguments: "-A x64"
           cmakeTarget: "BespokeSynth"
         code-formatting:
           imageName: 'ubuntu-20.04'
