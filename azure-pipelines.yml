@@ -120,12 +120,6 @@ jobs:
         condition: variables.isMac
         displayName: mac - install dependencies needed for distribution build
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.10'
-          addToPath: true
-          architecture: 'x64'
-
       - task: InstallAppleCertificate@2
         inputs:
           certSecureFile: 'bespoke_dev_id_app.p12'
