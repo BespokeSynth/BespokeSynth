@@ -85,6 +85,26 @@ void EQEffect::DrawModule()
    mEvenButton->Draw();
 }
 
+void EQEffect::OnClicked(float x, float y, bool right)
+{
+   IDrawableModule::OnClicked(x, y, right);
+
+   mMultiSlider->TestClick(x, y, right);
+}
+
+void EQEffect::MouseReleased()
+{
+   IDrawableModule::MouseReleased();
+   mMultiSlider->MouseReleased();
+}
+
+bool EQEffect::MouseMoved(float x, float y)
+{
+   IDrawableModule::MouseMoved(x, y);
+   mMultiSlider->NotifyMouseMoved(x, y);
+   return false;
+}
+
 float EQEffect::GetEffectAmount()
 {
    if (mEnabled)
