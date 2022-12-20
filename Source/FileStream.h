@@ -76,6 +76,7 @@ public:
    bool OpenedOk() const;
    bool Eof() const;
    static bool s32BitMode;
+   static const int sMaxStringLength = 999999; //the primary thing that might hit this limit is the json layout file (one user has had a file that exceeded a length of 100000)
 
 private:
    std::unique_ptr<juce::FileInputStream> mStream;

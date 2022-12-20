@@ -2717,7 +2717,7 @@ void ModularSynth::LoadState(std::string file)
    //this should definitely be removed if anything about the structure of the BSK format changes.
    uint64_t firstLength[1];
    in.Peek(firstLength, sizeof(uint64_t));
-   if (firstLength[0] >= 99999)
+   if (firstLength[0] >= FileStreamIn::sMaxStringLength)
       FileStreamIn::s32BitMode = true;
 
    std::string jsonString;
