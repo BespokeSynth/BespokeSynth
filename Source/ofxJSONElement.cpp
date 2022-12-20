@@ -37,11 +37,12 @@ bool ofxJSONElement::parse(std::string jsonString)
 {
    CharReaderBuilder rb;
    auto reader = std::unique_ptr<Json::CharReader>(rb.newCharReader());
+   Json::String errors;
    if (!reader->parse(jsonString.c_str(),
                       jsonString.c_str() + jsonString.size(),
-                      this, nullptr))
+                      this, &errors))
    {
-      ofLog() << "Unable to parse string";
+      ofLog() << "Unable to parse string: " << errors;
       return false;
    }
    return true;
