@@ -1944,7 +1944,9 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
    /////////// AUDIO PROCESSING STARTS HERE /////////////
    mNoteOutputQueue->Process();
 
-   assert(bufferSize == mIOBufferSize);
+   int oversampling = UserPrefs.oversampling.Get();
+
+   assert(bufferSize * oversampling == mIOBufferSize);
    assert(nChannels == (int)mOutputBuffers.size());
    assert(mIOBufferSize == gBufferSize); //need to be the same for now
    //if we want these different, need to fix outBuffer here, and also fix audioIn()
@@ -1965,7 +1967,6 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       //put it into speakers
       for (int i = 0; i < nChannels; ++i)
       {
-         int oversampling = UserPrefs.oversampling.Get();
          if (oversampling == 1)
          {
             BufferCopy(output[i], mOutputBuffers[i], gBufferSize);
@@ -2013,7 +2014,9 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
 
    ScopedMutex mutex(&mAudioThreadMutex, "audioIn()");
 
-   assert(bufferSize == mIOBufferSize);
+   int oversampling = UserPrefs.oversampling.Get();
+
+   assert(bufferSize * oversampling == mIOBufferSize);
    assert(nChannels == (int)mInputBuffers.size());
 
    for (int i = 0; i < nChannels; ++i)
