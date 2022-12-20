@@ -152,7 +152,6 @@ void Looper::SetRecorder(LooperRecorder* recorder)
    mRecorder = recorder;
    if (recorder)
    {
-      SetTarget(dynamic_cast<IDrawableModule*>(recorder->GetTarget()));
       mRecordBuffer = recorder->GetRecordBuffer();
       GetBuffer()->SetNumActiveChannels(mRecordBuffer->NumChannels());
    }
