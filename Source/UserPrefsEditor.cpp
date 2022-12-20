@@ -206,7 +206,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto rate : selectedDevice->getAvailableSampleRates())
       {
          UserPrefs.samplerate.GetDropdown()->AddLabel(ofToString(rate), i);
-         if (rate == gSampleRate)
+         if (rate == gSampleRate / UserPrefs.oversampling.Get())
             UserPrefs.samplerate.GetIndex() = i;
          ++i;
       }
@@ -220,7 +220,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto bufferSize : selectedDevice->getAvailableBufferSizes())
       {
          UserPrefs.buffersize.GetDropdown()->AddLabel(ofToString(bufferSize), i);
-         if (bufferSize == gBufferSize)
+         if (bufferSize == gBufferSize / UserPrefs.oversampling.Get())
             UserPrefs.buffersize.GetIndex() = i;
          ++i;
       }
