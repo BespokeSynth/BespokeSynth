@@ -42,6 +42,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   void Poll() override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
@@ -64,10 +65,13 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
 
+   bool IsIndexActive(int idx) const;
+
    int mRouteMask{ 0 };
    RadioButton* mRouteSelector{ nullptr };
    std::vector<AdditionalNoteCable*> mDestinationCables;
    bool mRadioButtonMode{ false };
+   bool mOnlyShowActiveCables{ false };
 };
 
 #endif /* defined(__modularSynth__NoteRouter__) */

@@ -43,6 +43,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   void Poll() override;
 
    void SetActiveIndex(int index) { mRouteIndex = index; }
 
@@ -73,6 +74,7 @@ private:
 
    std::array<Ramp, 16> mSwitchAndRampIn;
    int mLastProcessedRouteIndex{ 0 };
+   bool mOnlyShowActiveCable{ false };
 };
 
 
