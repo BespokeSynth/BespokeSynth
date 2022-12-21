@@ -156,6 +156,9 @@ private:
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
+   //IPatchable
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+
    ClickButton* mPythonInstalledConfirmButton{ nullptr };
    DropdownList* mLoadScriptSelector{ nullptr };
    ClickButton* mLoadScriptButton{ nullptr };

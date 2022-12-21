@@ -98,8 +98,6 @@ ScriptModule::ScriptModule()
    sScriptModules.push_back(this);
 
    OSCReceiver::addListener(this);
-
-   Transport::sDoEventLookahead = true; //scripts require lookahead to be able to schedule on time
 }
 
 ScriptModule::~ScriptModule()
@@ -466,6 +464,12 @@ void ScriptModule::DrawModuleUnclipped()
    }
 
    ofPopStyle();
+}
+
+void ScriptModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
+{
+   if (cableSource->GetTarget() != nullptr && cableSource->GetConnectionType() == kConnectionType_Note)
+      Transport::sDoEventLookahead = true; //scripts that output notes require lookahead to be able to schedule on time
 }
 
 bool ScriptModule::MouseMoved(float x, float y)
