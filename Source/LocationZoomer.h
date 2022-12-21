@@ -55,6 +55,7 @@ private:
       ofVec2f mOffset;
    };
 
+   Location mLoadLocation;
    std::map<int, Location> mLocations;
    Location mStart;
    Location mDestination;

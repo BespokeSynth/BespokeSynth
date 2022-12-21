@@ -204,6 +204,6 @@ void LocationZoomer::LoadFromSaveData(const ofxJSONElement& saveData)
          TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
       }
    }
-   MoveToLocation('1');
+   MoveToLocation(-1);
    mCurrentProgress = .999f;
 }

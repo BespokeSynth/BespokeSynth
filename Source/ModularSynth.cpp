@@ -2675,6 +2675,7 @@ void ModularSynth::SaveState(std::string file, bool autosave)
 
    FileStreamOut out(file);
 
+   mZoomer.WriteCurrentLocation(-1);
    out << GetLayout().getRawString(true);
    mModuleContainer.SaveState(out);
    mUILayerModuleContainer.SaveState(out);
