@@ -102,6 +102,7 @@ private:
    double mStartTime{ 0 };
    double mOffset{ std::numeric_limits<double>::max() };
    float mRate{ 1 };
+   int mOriginalSampleRate{ gSampleRate };
    float mSampleRateRatio{ 1 };
    int mStopPoint{ -1 };
    std::string mName{ "" };
