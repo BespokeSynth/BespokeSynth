@@ -156,7 +156,7 @@ void PatchCableSource::Clear()
 
 void PatchCableSource::UpdatePosition(bool parentMinimized)
 {
-   if ((mAutomaticPositioning || parentMinimized) && mOwner != nullptr)
+   if (mOwner != nullptr && (mAutomaticPositioning || parentMinimized || mOwner->Minimized()))
    {
       float x, y, w, h;
       mOwner->GetPosition(x, y);
@@ -581,7 +581,7 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
 
 bool PatchCableSource::Enabled() const
 {
-   return mEnabled && (mAutomaticPositioning || !mOwner->Minimized());
+   return mEnabled;
 }
 
 void PatchCableSource::OnClicked(float x, float y, bool right)
