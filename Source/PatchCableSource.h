@@ -116,7 +116,7 @@ public:
    void SetDefaultPatchBehavior(DefaultPatchBehavior beh) { mDefaultPatchBehavior = beh; }
    void SetPatchCableDrawMode(PatchCableDrawMode mode) { mPatchCableDrawMode = mode; }
    void SetColor(ofColor color) { mColor = color; }
-   ofColor GetColor() const { return mColor; }
+   ofColor GetColor() const;
    void SetEnabled(bool enabled) { mEnabled = enabled; }
    bool Enabled() const;
    void AddTypeFilter(std::string type) { mTypeFilter.push_back(type); }
@@ -134,6 +134,8 @@ public:
    ofVec2f GetCableStartDir(int index, ofVec2f dest) const;
    void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
    IModulator* GetModulatorOwner() const { return mModulatorOwner; }
+   void SetIsPartOfCircularDependency(bool set) { mIsPartOfCircularDependency = set; }
+   bool GetIsPartOfCircularDependency() const { return mIsPartOfCircularDependency; }
 
    void AddHistoryEvent(double time, bool on, int data = 0)
    {
@@ -189,6 +191,7 @@ private:
    Side mManualSide{ Side::kNone };
    bool mHasOverrideCableDir{ false };
    ofVec2f mOverrideCableDir;
+   bool mIsPartOfCircularDependency{ false };
 
    std::vector<INoteReceiver*> mNoteReceivers;
    std::vector<IPulseReceiver*> mPulseReceivers;

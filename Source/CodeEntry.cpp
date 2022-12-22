@@ -652,7 +652,9 @@ void CodeEntry::OnPythonInit()
 
               #print(token_type)
        except Exception as e:
-          print("exception when syntax highlighting: "+str(e))
+          exceptionText = str(e)
+          if not 'EOF' in exceptionText:
+            print("exception when syntax highlighting: "+exceptionText)
           pass
            
 

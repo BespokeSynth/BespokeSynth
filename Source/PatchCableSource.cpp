@@ -298,7 +298,7 @@ void PatchCableSource::Render()
       if (mDrawPass == DrawPass::kSource && (mPatchCableDrawMode != kPatchCableDrawMode_SourceOnHoverOnly || mHoverIndex != -1))
       {
          ofSetLineWidth(0);
-         ofColor color = mColor;
+         ofColor color = GetColor();
          float radius = kPatchCableSourceRadius;
          IDrawableModule* moveModule = TheSynth->GetMoveModule();
          if (GetKeyModifiers() == kModifier_Shift && moveModule != nullptr)
@@ -357,6 +357,16 @@ void PatchCableSource::Render()
    }
 
    ofPopStyle();
+}
+
+ofColor PatchCableSource::GetColor() const
+{
+   if (mIsPartOfCircularDependency)
+   {
+      float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .5f, 1);
+      return ofColor(255 * pulse, 255 * pulse, 0);
+   }
+   return mColor;
 }
 
 ofVec2f PatchCableSource::GetCableStart(int index) const
@@ -662,6 +672,7 @@ void PatchCableSource::KeyPressed(int key, bool isRepeat)
 void PatchCableSource::RemovePatchCable(PatchCable* cable, bool fromUserAction)
 {
    mOwner->PreRepatch(this);
+   bool hadAudioReceiver = (mAudioReceiver != nullptr);
    mAudioReceiver = nullptr;
    if (cable != nullptr)
    {
@@ -671,6 +682,9 @@ void PatchCableSource::RemovePatchCable(PatchCable* cable, bool fromUserAction)
    RemoveFromVector(cable, mPatchCables);
    mOwner->PostRepatch(this, fromUserAction);
    delete cable;
+
+   if (hadAudioReceiver)
+      TheSynth->ArrangeAudioSourceDependencies();
 }
 
 void PatchCableSource::ClearPatchCables()

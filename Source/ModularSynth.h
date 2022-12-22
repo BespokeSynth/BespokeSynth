@@ -300,6 +300,9 @@ private:
    void DeleteAllModules();
    void TriggerClapboard();
    void DoAutosave();
+   void FindCircularDependencies();
+   bool FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom);
+   void ClearCircularDependencyMarkers();
 
    void ReadClipboardTextFromSystem();
 
@@ -308,6 +311,7 @@ private:
    std::vector<IAudioSource*> mSources;
    std::vector<IDrawableModule*> mLissajousDrawers;
    std::vector<IDrawableModule*> mDeletedModules;
+   bool mHasCircularDependency{ false };
 
    std::vector<IDrawableModule*> mModalFocusItemStack;
 
@@ -365,6 +369,7 @@ private:
 
    bool mAudioPaused{ false };
    bool mIsLoadingState{ false };
+   bool mArrangeDependenciesWhenLoadCompletes{ false };
 
    ModuleFactory mModuleFactory;
    EffectFactory mEffectFactory;

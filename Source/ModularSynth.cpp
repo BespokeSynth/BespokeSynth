@@ -425,6 +425,12 @@ void ModularSynth::Poll()
    }
    mIsShiftPressed = shiftPressed;
 
+   if (mArrangeDependenciesWhenLoadCompletes && !mIsLoadingState)
+   {
+      ArrangeAudioSourceDependencies();
+      mArrangeDependenciesWhenLoadCompletes = false;
+   }
+
    ++sFrameCount;
 }
 
@@ -856,6 +862,15 @@ void ModularSynth::DrawConsole()
          DrawTextNormal(gHoveredUIControl->Path(), 0, consoleY - 4);
          ofPopStyle();
       }
+   }
+
+   if (mHasCircularDependency)
+   {
+      ofPushStyle();
+      float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .5f, 1);
+      ofSetColor(255 * pulse, 255 * pulse, 0);
+      DrawTextNormal("circular dependency detected", 0, consoleY + 20);
+      ofPopStyle();
    }
 
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
@@ -2076,6 +2091,12 @@ struct SourceDepInfo
 
 void ModularSynth::ArrangeAudioSourceDependencies()
 {
+   if (mIsLoadingState)
+   {
+      mArrangeDependenciesWhenLoadCompletes = true;
+      return;
+   }
+
    //ofLog() << "Calculating audio source dependencies:";
 
    std::vector<SourceDepInfo> deps;
@@ -2110,10 +2131,10 @@ void ModularSynth::ArrangeAudioSourceDependencies()
    }*/
 
    //TODO(Ryan) detect circular dependencies
-
+   const int kMaxLoopCount = 1000; //how many times we loop over the graph before deciding that it must contain a circular dependency
    mSources.clear();
    int loopCount = 0;
-   while (deps.size() > 0 && loopCount < 1000) //stupid circular dependency detection, make better
+   while (deps.size() > 0 && loopCount < kMaxLoopCount) //stupid circular dependency detection, make better
    {
       for (int i = 0; i < deps.size(); ++i)
       {
@@ -2139,16 +2160,96 @@ void ModularSynth::ArrangeAudioSourceDependencies()
       ++loopCount;
    }
 
-   if (loopCount == 1000) //circular dependency, don't lose the rest of the sources
+   if (loopCount == kMaxLoopCount) //circular dependency, don't lose the rest of the sources
    {
+      mHasCircularDependency = true;
       ofLog() << "circular dependency detected";
       for (int i = 0; i < deps.size(); ++i)
          mSources.push_back(deps[i].mMe);
+      FindCircularDependencies();
+   }
+   else
+   {
+      if (mHasCircularDependency) //we used to have a circular dependency, now we don't
+         ClearCircularDependencyMarkers();
+      mHasCircularDependency = false;
    }
 
    /*ofLog() << "new ordering:";
    for (int i=0; i<mSources.size(); ++i)
       ofLog() << dynamic_cast<IDrawableModule*>(mSources[i])->Name();*/
+}
+
+void ModularSynth::FindCircularDependencies()
+{
+   ClearCircularDependencyMarkers();
+   for (int i = 0; i < mSources.size(); ++i)
+   {
+      std::list<IAudioSource*> chain;
+      if (FindCircularDependencySearch(chain, mSources[i]))
+         break;
+   }
+}
+
+bool ModularSynth::FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom)
+{
+   /*std::string debugString = "FindCircularDependencySearch(): ";
+   for (auto& element : chain)
+      debugString += dynamic_cast<IDrawableModule*>(element)->GetDisplayName() + "->";
+   debugString += dynamic_cast<IDrawableModule*>(searchFrom)->GetDisplayName();
+   ofLog() << debugString;*/
+
+   chain.push_back(searchFrom);
+   IAudioSource* end = chain.back();
+   for (int i = 0; i < end->GetNumTargets(); ++i)
+   {
+      IAudioReceiver* receiver = end->GetTarget(i);
+      IAudioSource* targetAsSource = dynamic_cast<IAudioSource*>(receiver);
+      if (targetAsSource != nullptr)
+      {
+         if (ListContains(targetAsSource, chain)) //found a circular dependency
+         {
+            std::string debugString = "FindCircularDependencySearch(): found! ";
+            for (auto& element : chain)
+               debugString += dynamic_cast<IDrawableModule*>(element)->GetDisplayName() + "->";
+            debugString += dynamic_cast<IDrawableModule*>(targetAsSource)->GetDisplayName();
+            ofLog() << debugString;
+
+            chain.push_back(targetAsSource);
+            std::vector<IAudioSource*> chainVec;
+            for (auto& element : chain)
+               chainVec.push_back(element);
+            for (int j = 0; j < (int)chainVec.size() - 1; ++j)
+            {
+               IDrawableModule* module = dynamic_cast<IDrawableModule*>(chainVec[j]);
+               for (int k = 0; k < (int)module->GetPatchCableSources().size(); ++k)
+               {
+                  if (dynamic_cast<IAudioSource*>(module->GetPatchCableSource(k)->GetTarget()) == chainVec[j + 1])
+                     module->GetPatchCableSource(k)->SetIsPartOfCircularDependency(true);
+               }
+            }
+
+            return true;
+         }
+         else
+         {
+            if (FindCircularDependencySearch(chain, targetAsSource))
+               return true;
+         }
+      }
+   }
+
+   return false;
+}
+
+void ModularSynth::ClearCircularDependencyMarkers()
+{
+   for (int i = 0; i < mSources.size(); ++i)
+   {
+      IDrawableModule* module = dynamic_cast<IDrawableModule*>(mSources[i]);
+      for (int j = 0; j < (int)module->GetPatchCableSources().size(); ++j)
+         module->GetPatchCableSource(j)->SetIsPartOfCircularDependency(false);
+   }
 }
 
 void ModularSynth::ResetLayout()
