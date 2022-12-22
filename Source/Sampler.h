@@ -41,7 +41,7 @@
 
 class ofxJSONElement;
 
-#define MAX_SAMPLER_LENGTH 2 * gSampleRate
+#define MAX_SAMPLER_LENGTH 2 * 48000
 
 class Sampler : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener
 {
@@ -81,7 +81,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
 private:
    void StopRecording();
