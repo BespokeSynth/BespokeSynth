@@ -97,7 +97,7 @@ void AudioRouter::Process(double time)
 void AudioRouter::Poll()
 {
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
-      mDestinationCables[i]->SetShowing(!mOnlyShowActiveCable || i == mRouteIndex);
+      mDestinationCables[i]->SetShowing(!mOnlyShowActiveCable || i == mRouteIndex || mDestinationCables[i]->GetIsPartOfCircularDependency());
 }
 
 void AudioRouter::DrawModule()

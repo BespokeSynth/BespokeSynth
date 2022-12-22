@@ -183,8 +183,8 @@ void PatchCable::Render()
    GetDimensions(wThis, hThis);
    GetPosition(xThis, yThis);
 
-   bool isInsideSelf = cable.end.x >= xThis && cable.end.x <= (xThis + wThis) && cable.end.y >= yThis && cable.end.y <= (yThis + hThis);
-   if (!isInsideSelf)
+   //bool isInsideSelf = cable.end.x >= xThis && cable.end.x <= (xThis + wThis) && cable.end.y >= yThis && cable.end.y <= (yThis + hThis);
+   //if (!isInsideSelf)
    {
       IAudioSource* audioSource = nullptr;
       float wireLength = sqrtf((cable.plug - cable.start).lengthSquared());
