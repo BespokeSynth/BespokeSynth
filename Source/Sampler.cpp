@@ -320,7 +320,11 @@ void Sampler::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in.Read(mSampleData, MAX_SAMPLER_LENGTH);
+   int length = MAX_SAMPLER_LENGTH;
+   if (rev < 2)
+      length = 2 * gSampleRate;
+
+   in.Read(mSampleData, length);
 
    if (rev >= 1)
       in >> mVoiceParams.mSampleLength;
