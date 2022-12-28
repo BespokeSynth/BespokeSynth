@@ -547,7 +547,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleC
       }
    }
 
-   std::sort(modules.begin(), modules.end(), Spawnable::compare);
+   std::sort(modules.begin(), modules.end(), Spawnable::CompareAlphabetical);
    return modules;
 }
 
@@ -655,7 +655,11 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
          modules.push_back(spawnable);
       }
    }
-   sort(modules.begin(), modules.end(), Spawnable::compare);
+
+   if (continuousString)
+      sort(modules.begin(), modules.end(), Spawnable::CompareLength);
+   else
+      sort(modules.begin(), modules.end(), Spawnable::CompareAlphabetical);
 
    std::vector<ModuleFactory::Spawnable> ret;
    for (size_t i = 0; i < modules.size(); ++i)

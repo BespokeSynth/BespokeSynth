@@ -112,20 +112,18 @@ void SampleCanvas::Process(double time)
 
       for (int i = 0; i < bufferSize; ++i)
       {
-         float sample = 0;
+         float sampleIndex = 0;
 
          float pos = GetCurPos(time + i * gInvSampleRateMs);
 
-         sample = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
+         sampleIndex = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
 
-         sample *= vol;
-
-         if (sample >= 0 && sample < clip->LengthInSamples())
+         if (sampleIndex >= 0 && sampleIndex < clip->LengthInSamples())
          {
             for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
             {
                int sampleChannel = MAX(ch, clip->NumChannels() - 1);
-               gWorkChannelBuffer.GetChannel(ch)[i] += GetInterpolatedSample(sample, clip->Data()->GetChannel(sampleChannel), clip->LengthInSamples());
+               gWorkChannelBuffer.GetChannel(ch)[i] += GetInterpolatedSample(sampleIndex, clip->Data()->GetChannel(sampleChannel), clip->LengthInSamples()) * vol;
             }
          }
       }
