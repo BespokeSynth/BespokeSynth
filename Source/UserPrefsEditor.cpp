@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
+#include "PatchCable.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -64,6 +65,16 @@ void UserPrefsEditor::CreateUIControls()
       UserPrefs.oversampling.GetDropdown()->AddLabel(ofToString(oversample), oversample);
       if (UserPrefs.oversampling.Get() == oversample)
          UserPrefs.oversampling.GetIndex() = oversample;
+   }
+
+   UserPrefs.cable_drop_behavior.GetIndex() = 0;
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("show quickspawn", (int)CableDropBehavior::ShowQuickspawn);
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("do nothing", (int)CableDropBehavior::DoNothing);
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("disconnect", (int)CableDropBehavior::DisconnectCable);
+   for (int i = 0; i < UserPrefs.cable_drop_behavior.GetDropdown()->GetNumValues(); ++i)
+   {
+      if (UserPrefs.cable_drop_behavior.GetDropdown()->GetElement(i).mLabel == UserPrefs.cable_drop_behavior.Get())
+         UserPrefs.cable_drop_behavior.GetIndex() = i;
    }
 }
 

@@ -54,6 +54,13 @@ enum ConnectionType
    kConnectionType_ValueSetter //for modulator-type that don't have a continuous connection to the control, and just set values as one-offs
 };
 
+enum class CableDropBehavior
+{
+   ShowQuickspawn,
+   DoNothing,
+   DisconnectCable
+};
+
 class PatchCable : public IClickable
 {
    friend class PatchCableSource;

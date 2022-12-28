@@ -478,24 +478,40 @@ void PatchCable::MouseReleased()
 
          Release();
 
-         if (target == nullptr &&
-             (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Audio || GetConnectionType() == kConnectionType_Pulse))
+         if (target == nullptr)
          {
-            TheSynth->GetQuickSpawn()->ShowSpawnCategoriesPopupForCable(this);
-            if (mTarget == nullptr) //if we're currently connected to nothing
+            if ((CableDropBehavior)UserPrefs.cable_drop_behavior.GetIndex() == CableDropBehavior::ShowQuickspawn)
             {
-               mOwner->SetPatchCableTarget(this, TheSynth->GetQuickSpawn()->GetMainContainerFollower(), true);
+               if (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Audio || GetConnectionType() == kConnectionType_Pulse)
+               {
+                  TheSynth->GetQuickSpawn()->ShowSpawnCategoriesPopupForCable(this);
+                  if (mTarget == nullptr) //if we're currently connected to nothing
+                  {
+                     mOwner->SetPatchCableTarget(this, TheSynth->GetQuickSpawn()->GetMainContainerFollower(), true);
+                  }
+                  else //if we're inserting
+                  {
+                     SetTempDrawTarget(TheSynth->GetQuickSpawn()->GetMainContainerFollower());
+                     TheSynth->GetQuickSpawn()->SetTempConnection(mTarget, GetConnectionType());
+                  }
+                  TheSynth->GetQuickSpawn()->GetMainContainerFollower()->UpdateLocation();
+               }
             }
-            else //if we're inserting
-            {
-               SetTempDrawTarget(TheSynth->GetQuickSpawn()->GetMainContainerFollower());
-               TheSynth->GetQuickSpawn()->SetTempConnection(mTarget, GetConnectionType());
-            }
-            TheSynth->GetQuickSpawn()->GetMainContainerFollower()->UpdateLocation();
-         }
 
-         if (mTarget == nullptr)
-            Destroy(true);
+            if ((CableDropBehavior)UserPrefs.cable_drop_behavior.GetIndex() == CableDropBehavior::DoNothing)
+            {
+               //do nothing
+            }
+
+            if ((CableDropBehavior)UserPrefs.cable_drop_behavior.GetIndex() == CableDropBehavior::DisconnectCable)
+            {
+               mOwner->RemovePatchCable(this, true);
+               return;
+            }
+
+            if (mTarget == nullptr)
+               Destroy(true);
+         }
       }
    }
 }
