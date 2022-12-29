@@ -599,12 +599,15 @@ void Presets::LoadState(FileStreamIn& in, int rev)
          presetData.mLFOSettings.LoadState(in);
          in >> presetData.mGridCols;
          in >> presetData.mGridRows;
-         // Check if the loaded values are within an accaptable range.
-         // This is done because mGridCols and mGridRows could previously be saved with random values since they were not properly initialized.
-         if (presetData.mGridCols < 0 || presetData.mGridCols > maxGridSide)
-            presetData.mGridCols = 0;
-         if (presetData.mGridRows < 0 || presetData.mGridRows > maxGridSide)
-            presetData.mGridRows = 0;
+         if (rev < 3)
+         {
+            // Check if the loaded values are within an acceptable range.
+            // This is done because mGridCols and mGridRows could previously be saved with random values since they were not properly initialized.
+            if (presetData.mGridCols < 0 || presetData.mGridCols > 1000)
+               presetData.mGridCols = 0;
+            if (presetData.mGridRows < 0 || presetData.mGridRows > 1000)
+               presetData.mGridRows = 0;
+         }
          presetData.mGridContents.resize(size_t(presetData.mGridCols) * presetData.mGridRows);
          for (int k = 0; k < presetData.mGridCols * presetData.mGridRows; ++k)
             in >> presetData.mGridContents[k];
