@@ -115,4 +115,5 @@ private:
    std::array<float, 1024> mFrequencyResponse{};
    bool mNeedToUpdateFrequencyResponseGraph{ true };
    float mDrawGain{ 1 };
+   bool mLiteCpuModulation{ true };
 };
