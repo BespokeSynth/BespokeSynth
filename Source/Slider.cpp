@@ -609,7 +609,7 @@ void FloatSlider::DoCompute(int samplesIn /*= 0*/)
    float oldVal = *mVar;
 
    const bool kUseCache = true;
-   if (kUseCache && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
+   if (kUseCache && IsAudioThread() && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
    {
       *mVar = mLastComputeCacheValue[samplesIn];
    }
@@ -626,7 +626,7 @@ void FloatSlider::DoCompute(int samplesIn /*= 0*/)
       if (mIsSmoothing)
          *mVar = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
 
-      if (samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] != gTime)
+      if (IsAudioThread() && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] != gTime)
       {
          mLastComputeCacheValue[samplesIn] = *mVar;
          mLastComputeCacheTime[samplesIn] = gTime;

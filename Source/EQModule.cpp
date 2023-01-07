@@ -103,15 +103,18 @@ void EQModule::Process(double time)
 {
    PROFILER(EQModule);
 
-   ComputeSliders(0);
-
-   for (auto& filter : mFilters)
+   if (mLiteCpuModulation)
    {
-      if (filter.mEnabled)
+      ComputeSliders(0);
+
+      for (auto& filter : mFilters)
       {
-         bool updated = filter.UpdateCoefficientsIfNecessary();
-         if (updated)
-            mNeedToUpdateFrequencyResponseGraph = true;
+         if (filter.mEnabled)
+         {
+            bool updated = filter.UpdateCoefficientsIfNecessary();
+            if (updated)
+               mNeedToUpdateFrequencyResponseGraph = true;
+         }
       }
    }
 
@@ -129,16 +132,49 @@ void EQModule::Process(double time)
       ChannelBuffer* out = target->GetBuffer();
       gWorkChannelBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
+      if (!mLiteCpuModulation) //should we try to recalculate filters every sample?
+      {
+         for (int i = 0; i < GetBuffer()->BufferSize(); ++i)
+         {
+            ComputeSliders(i);
+
+            for (auto& filter : mFilters)
+            {
+               if (filter.mEnabled)
+               {
+                  bool updated = filter.UpdateCoefficientsIfNecessary();
+                  if (updated)
+                     mNeedToUpdateFrequencyResponseGraph = true;
+               }
+            }
+
+            for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+            {
+               float sample = GetBuffer()->GetChannel(ch)[i];
+               for (auto& filter : mFilters)
+               {
+                  if (filter.mEnabled)
+                     sample = filter.mFilter[ch].Filter(sample);
+               }
+               gWorkChannelBuffer.GetChannel(ch)[i] = sample;
+            }
+         }
+      }
+      else
+      {
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+         {
+            BufferCopy(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+            for (auto& filter : mFilters)
+            {
+               if (filter.mEnabled)
+                  filter.mFilter[ch].Filter(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize());
+            }
+         }
+      }
+
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
-         BufferCopy(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-         for (auto& filter : mFilters)
-         {
-            if (filter.mEnabled)
-               filter.mFilter[ch].Filter(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize());
-         }
-         //Add(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-
          Add(out->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
@@ -410,6 +446,7 @@ void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadInt("width", moduleInfo, mWidth, 50, 2000, K(isTextField));
    mModuleSaveData.LoadInt("height", moduleInfo, mHeight, 50, 2000, K(isTextField));
    mModuleSaveData.LoadFloat("draw_gain", moduleInfo, 1, .1f, 4, K(isTextField));
+   mModuleSaveData.LoadBool("lite_cpu_modulation", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -426,4 +463,5 @@ void EQModule::SetUpFromSaveData()
    mWidth = mModuleSaveData.GetInt("width");
    mHeight = mModuleSaveData.GetInt("height");
    mDrawGain = mModuleSaveData.GetFloat("draw_gain");
+   mLiteCpuModulation = mModuleSaveData.GetBool("lite_cpu_modulation");
 }

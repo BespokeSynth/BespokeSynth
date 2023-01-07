@@ -580,7 +580,7 @@ void ModuleContainer::SaveState(FileStreamOut& out)
    int savedModules = 0;
    for (auto* module : mModules)
    {
-      if (module != TheSaveDataPanel && module != TheTitleBar)
+      if (module->IsSaveable())
          ++savedModules;
    }
 
@@ -591,7 +591,7 @@ void ModuleContainer::SaveState(FileStreamOut& out)
 
    for (auto* module : mModules)
    {
-      if (module != TheSaveDataPanel && module != TheTitleBar)
+      if (module->IsSaveable())
       {
          //ofLog() << "Saving " << module->Name();
          out << std::string(module->Name());
