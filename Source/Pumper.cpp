@@ -85,9 +85,7 @@ void Pumper::ProcessAudio(double time, ChannelBuffer* buffer)
 
    double intervalPos = GetIntervalPos(time);
 
-   mAdsr.Clear();
-   mAdsr.Start(0, 1);
-   mAdsr.Stop(kAdsrTime);
+   ADSR::EventInfo adsrEvent(0, kAdsrTime);
 
    /*const float smoothingTimeMs = 35;
    float smoothingOffset = smoothingTimeMs / TheTransport->GetDuration(mInterval);
@@ -95,7 +93,7 @@ void Pumper::ProcessAudio(double time, ChannelBuffer* buffer)
 
    for (int i = 0; i < bufferSize; ++i)
    {
-      float adsrValue = mAdsr.Value((intervalPos + i * gInvSampleRateMs / TheTransport->GetDuration(mInterval)) * kAdsrTime);
+      float adsrValue = mAdsr.Value((intervalPos + i * gInvSampleRateMs / TheTransport->GetDuration(mInterval)) * kAdsrTime, &adsrEvent);
       float value = mLastValue * .99f + adsrValue * .01f;
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
          buffer->GetChannel(ch)[i] *= value;
@@ -128,14 +126,11 @@ void Pumper::DrawModule()
    ofPushStyle();
    ofSetColor(245, 58, 135);
    ofBeginShape();
-   ::ADSR drawAdsr(mAdsr);
-   drawAdsr.Clear();
-   drawAdsr.Start(0, 1);
-   drawAdsr.Stop(kAdsrTime);
+   ADSR::EventInfo adsrEvent(0, kAdsrTime);
    for (int i = 0; i < mWidth; i++)
    {
       float x = i;
-      float y = drawAdsr.Value(float(i) / mWidth * kAdsrTime) * mHeight;
+      float y = mAdsr.Value(float(i) / mWidth * kAdsrTime, &adsrEvent) * mHeight;
       ofVertex(x, mHeight - y);
    }
    ofEndShape(false);

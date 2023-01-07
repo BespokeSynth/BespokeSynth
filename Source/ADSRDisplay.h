@@ -103,7 +103,6 @@ private:
    float mMaxTime{ 1000 };
    bool mClick{ false };
    ::ADSR* mAdsr;
-   ::ADSR mViewAdsr; //for ADSR simulation in drawing
    ofVec2f mClickStart;
    ::ADSR mClickAdsr;
    float mClickLength{ 1000 };
