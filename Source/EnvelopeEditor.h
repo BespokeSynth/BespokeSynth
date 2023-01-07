@@ -63,7 +63,6 @@ private:
    ofVec2f mPosition;
    ofVec2f mDimensions;
    ::ADSR* mAdsr{ nullptr };
-   ::ADSR mViewAdsr;
    ::ADSR mClickAdsr;
    bool mClick{ false };
    ofVec2f mClickStart;
