@@ -137,8 +137,8 @@ void ControlSequencer::Step(double time, int pulseFlags)
 
    if (mEnabled)
    {
-      mControlCable->AddHistoryEvent(gTime, true);
-      mControlCable->AddHistoryEvent(gTime + 15, false);
+      mControlCable->AddHistoryEvent(time, true);
+      mControlCable->AddHistoryEvent(time + 15, false);
 
       for (auto* target : mTargets)
       {

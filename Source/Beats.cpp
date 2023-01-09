@@ -299,10 +299,10 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
          for (int ch = 0; ch < numChannels; ++ch)
          {
             float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
-            double time = gTime;
+            double channelTime = time;
             for (int i = 0; i < bufferSize; ++i)
             {
-               float filter = mFilterRamp.Value(time);
+               float filter = mFilterRamp.Value(channelTime);
 
                mLowpass[ch].SetFilterParams(ofMap(sqrtf(ofClamp(-filter, 0, 1)), 0, 1, 6000, 80), sqrt(2) / 2);
                mHighpass[ch].SetFilterParams(ofMap(ofClamp(filter, 0, 1), 0, 1, 10, 6000), sqrt(2) / 2);
@@ -322,7 +322,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
 
                sample *= volSq * panGain;
                buffer->GetChannel(ch)[i] += sample;
-               time += gInvSampleRateMs;
+               channelTime += gInvSampleRateMs;
             }
          }
       }

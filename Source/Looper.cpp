@@ -361,7 +361,7 @@ void Looper::Process(double time)
    {
       mWantRewrite = false;
       if (mRewriter)
-         mRewriter->Go(gTime);
+         mRewriter->Go(time);
    }
 }
 
@@ -1051,7 +1051,7 @@ void Looper::ButtonClicked(ClickButton* button, double time)
    if (button == mQueueCaptureButton)
    {
       mCaptureQueued = true;
-      mLastCommitTime = gTime;
+      mLastCommitTime = time;
    }
    if (button == mResampleButton)
       ResampleForSpeed(GetPlaybackSpeed());

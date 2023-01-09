@@ -310,11 +310,11 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
    info.mCustomDivisor = mLength;
 
    double remainderMs;
-   int oldStep = TheTransport->GetQuantized(gTime, &info);
-   int newStep = TheTransport->GetQuantized(NextBufferTime(false), &info, &remainderMs);
+   int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
+   int newStep = TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs);
    if (oldStep != newStep && mSteps[newStep] > 0)
    {
-      double time = NextBufferTime(false) - remainderMs;
+      double time = NextBufferTime(true) - remainderMs;
       mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
       mOwner->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
    }

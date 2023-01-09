@@ -88,7 +88,7 @@ void FeedbackModule::Process(double time)
    {
       mFeedbackTarget->GetBuffer()->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
       mFeedbackVizBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
-      mDelay.ProcessAudio(gTime, GetBuffer());
+      mDelay.ProcessAudio(time, GetBuffer());
 
       const double kReleaseMs = 50;
       const double kReleaseCoeff = exp(-1000.0 / (kReleaseMs * gSampleRate));

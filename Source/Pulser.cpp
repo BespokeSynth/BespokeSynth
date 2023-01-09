@@ -131,7 +131,7 @@ void Pulser::OnTransportAdvanced(float amount)
       mFreeTimeCounter += ms;
       if (mFreeTimeCounter > mFreeTimeStep)
       {
-         OnTimeEvent(gTime + (mFreeTimeCounter - mFreeTimeStep));
+         OnTimeEvent(NextBufferTime(true) + (mFreeTimeCounter - mFreeTimeStep));
          mFreeTimeCounter -= mFreeTimeStep;
       }
    }
