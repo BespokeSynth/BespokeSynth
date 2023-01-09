@@ -91,6 +91,7 @@ public:
    bool IsValidTarget(IClickable* target) const;
    void Destroy(bool fromUserClick);
    void SetTempDrawTarget(IClickable* target) { mTempDrawTarget = target; }
+   void ShowQuickspawnForCable();
 
    void SetUIControlConnection(UIControlConnection* conn) { mUIControlConnection = conn; }
 

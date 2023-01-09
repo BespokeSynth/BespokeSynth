@@ -483,19 +483,7 @@ void PatchCable::MouseReleased()
             if ((CableDropBehavior)UserPrefs.cable_drop_behavior.GetIndex() == CableDropBehavior::ShowQuickspawn)
             {
                if (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Audio || GetConnectionType() == kConnectionType_Pulse)
-               {
-                  TheSynth->GetQuickSpawn()->ShowSpawnCategoriesPopupForCable(this);
-                  if (mTarget == nullptr) //if we're currently connected to nothing
-                  {
-                     mOwner->SetPatchCableTarget(this, TheSynth->GetQuickSpawn()->GetMainContainerFollower(), true);
-                  }
-                  else //if we're inserting
-                  {
-                     SetTempDrawTarget(TheSynth->GetQuickSpawn()->GetMainContainerFollower());
-                     TheSynth->GetQuickSpawn()->SetTempConnection(mTarget, GetConnectionType());
-                  }
-                  TheSynth->GetQuickSpawn()->GetMainContainerFollower()->UpdateLocation();
-               }
+                  ShowQuickspawnForCable();
             }
 
             if ((CableDropBehavior)UserPrefs.cable_drop_behavior.GetIndex() == CableDropBehavior::DoNothing)
@@ -514,6 +502,23 @@ void PatchCable::MouseReleased()
          }
       }
    }
+}
+
+void PatchCable::ShowQuickspawnForCable()
+{
+   Release();
+
+   TheSynth->GetQuickSpawn()->ShowSpawnCategoriesPopupForCable(this);
+   if (mTarget == nullptr) //if we're currently connected to nothing
+   {
+      mOwner->SetPatchCableTarget(this, TheSynth->GetQuickSpawn()->GetMainContainerFollower(), true);
+   }
+   else //if we're inserting
+   {
+      SetTempDrawTarget(TheSynth->GetQuickSpawn()->GetMainContainerFollower());
+      TheSynth->GetQuickSpawn()->SetTempConnection(mTarget, GetConnectionType());
+   }
+   TheSynth->GetQuickSpawn()->GetMainContainerFollower()->UpdateLocation();
 }
 
 IClickable* PatchCable::GetDropTarget()
