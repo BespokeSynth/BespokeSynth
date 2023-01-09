@@ -162,19 +162,19 @@ void BeatBloks::Process(double time)
       int numSamples = mSample->LengthInSamples();
       float sampleRateRatio = mSample->GetSampleRateRatio();
 
+      double previewTime = time;
       for (int i = 0; i < bufferSize; ++i)
       {
-         double time = gTime + i * gInvSampleRateMs;
          if (mBlokPreviewPlayhead == 0)
          {
-            mBlokPreviewRamp.Start(time, 1, time + 1);
+            mBlokPreviewRamp.Start(previewTime, 1, previewTime + 1);
          }
          if (mBlokPreviewPlayhead > heldBlok->mDuration * numSamples)
          {
-            if (mBlokPreviewRamp.Target(time) != 0)
-               mBlokPreviewRamp.Start(time, 0, time + 1);
+            if (mBlokPreviewRamp.Target(previewTime) != 0)
+               mBlokPreviewRamp.Start(previewTime, 0, previewTime + 1);
 
-            if (mBlokPreviewRamp.Value(time) == 0)
+            if (mBlokPreviewRamp.Value(previewTime) == 0)
             {
                mPlayBlokPreview = false;
             }
@@ -183,10 +183,11 @@ void BeatBloks::Process(double time)
          float lookupPlayhead = StartTime(*heldBlok) * numSamples + mBlokPreviewPlayhead;
 
          out[i] = GetInterpolatedSample(lookupPlayhead, data, numSamples);
-         out[i] *= mBlokPreviewRamp.Value(time);
+         out[i] *= mBlokPreviewRamp.Value(previewTime);
          out[i] *= volSq;
 
          mBlokPreviewPlayhead += speed * sampleRateRatio;
+         previewTime += gInvSampleRateMs;
       }
    }
 

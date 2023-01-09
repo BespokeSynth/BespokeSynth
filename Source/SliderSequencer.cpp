@@ -77,7 +77,8 @@ void SliderSequencer::OnTransportAdvanced(float amount)
 
    ComputeSliders(0);
 
-   float current = MeasurePos(gTime + gBufferSize);
+   double time = NextBufferTime(true);
+   float current = MeasurePos(time);
 
    for (int i = 0; i < mSliderLines.size(); ++i)
    {
@@ -89,13 +90,12 @@ void SliderSequencer::OnTransportAdvanced(float amount)
          double remainder = current - mSliderLines[i]->mPoint;
          FloatWrap(remainder, 1);
          double remainderMs = TheTransport->MsPerBar() * remainder;
-         double time = gTime + gBufferSize - remainderMs;
-         PlayNoteOutput(time, mSliderLines[i]->mPitch, mSliderLines[i]->mVelocity * 127, -1);
-         PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mSliderLines[i]->mPitch, 0, -1);
-         mSliderLines[i]->mPlayTime = gTime;
+         PlayNoteOutput(time - remainderMs, mSliderLines[i]->mPitch, mSliderLines[i]->mVelocity * 127, -1);
+         PlayNoteOutput(time - remainderMs + TheTransport->GetDuration(kInterval_16n), mSliderLines[i]->mPitch, 0, -1);
+         mSliderLines[i]->mPlayTime = time;
       }
 
-      mSliderLines[i]->mPlaying = mSliderLines[i]->mPlayTime + 100 > gTime;
+      mSliderLines[i]->mPlaying = mSliderLines[i]->mPlayTime + 100 > time;
    }
 
    mLastMeasurePos = current;

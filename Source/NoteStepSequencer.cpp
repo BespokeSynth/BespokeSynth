@@ -509,11 +509,11 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
 
    if ((mLastNoteLength < 1 || mHasExternalPulseSource) && !mAlreadyDidNoteOff)
    {
-      if (gTime > mLastNoteEndTime)
+      if (NextBufferTime(true) > mLastNoteEndTime)
       {
-         PlayNoteOutput(gTime, mLastPitch, 0);
+         PlayNoteOutput(mLastNoteEndTime, mLastPitch, 0);
          if (mShowStepControls && mLastStepIndex < (int)mStepCables.size() && mLastStepIndex != -1)
-            SendNoteToCable(mLastStepIndex, gTime, mLastPitch, 0);
+            SendNoteToCable(mLastStepIndex, mLastNoteEndTime, mLastPitch, 0);
          mAlreadyDidNoteOff = true;
       }
    }
