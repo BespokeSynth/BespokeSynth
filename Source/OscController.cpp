@@ -130,8 +130,11 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       return;
    }
 
-   if (msg.size() == 0 || (!msg[0].isFloat32() && !msg[0].isInt32()))
-      return;
+   if (msg.size() == 0)
+      return; // Code beyond this point expects at least one parameter.
+
+   if (!msg[0].isFloat32() && !msg[0].isInt32())
+      return; // Code beyond this point expects at least one paramater of type int or float.
 
    // Handle note data and output these as notes instead of CC's.
    if (address.rfind("/note", 0) == 0 && msg.size() >= 2 && ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
@@ -154,6 +157,22 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       if (mListener != nullptr)
          mListener->OnMidiNote(note);
       return;
+   }
+
+   // Handle special command to zoom the bookmark
+   if (address == "/bespoke/bookmark/recall" && msg.size() == 1 && (msg[0].isInt32() || msg[0].isFloat32()))
+   {
+      int number = msg[0].isInt32() ? msg[0].getInt32() : static_cast<int>(msg[0].getFloat32());
+      TheSynth->GetLocationZoomer()->MoveToLocation(number);
+      return; // Stop the midicontroller from mapping this to a CC value.
+   }
+
+   // Handle special command to store current viewport as a bookmark
+   if (address == "/bespoke/bookmark/store" && msg.size() == 1 && (msg[0].isInt32() || msg[0].isFloat32()))
+   {
+      int number = msg[0].isInt32() ? msg[0].getInt32() : static_cast<int>(msg[0].getFloat32());
+      TheSynth->GetLocationZoomer()->WriteCurrentLocation(number);
+      return; // Stop the midicontroller from mapping this to a CC value.
    }
 
    for (int i = 0; i < msg.size(); ++i)
