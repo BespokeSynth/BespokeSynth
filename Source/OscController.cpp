@@ -133,6 +133,45 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    if (msg.size() == 0)
       return; // Code beyond this point expects at least one parameter.
 
+   std::string addressable_prefix = "/bespoke/addressable/";
+   if (address.rfind(addressable_prefix, 0) == 0 && msg.size() >= 1)
+   {
+      std::string control_path = address.substr(addressable_prefix.length());
+      std::replace(control_path.begin(), control_path.end(), '/', '~');
+      IUIControl* control = control = TheSynth->FindUIControl(control_path);
+      if (control != nullptr)
+      {
+         if (msg[0].isFloat32())
+         {
+
+            control->SetValue(msg[0].getFloat32(), gTime);
+            return; // Stop the midicontroller from mapping this to a CC value.
+         }
+         if (msg[0].isInt32())
+         {
+            control->SetValue(msg[0].getInt32(), gTime);
+            return; // Stop the midicontroller from mapping this to a CC value.
+         }
+         if (msg[0].isString())
+         {
+            TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
+            if (textEntry != nullptr)
+            {
+               textEntry->SetText(msg[0].getString().toStdString());
+               return; // Stop the midicontroller from mapping this to a CC value.
+            }
+            else
+            {
+               TheSynth->LogEvent("Could not find TextEntry " + control_path + " when trying to set a value through OSC.", kLogEventType_Error);
+            }
+         }
+      }
+      else
+      {
+         TheSynth->LogEvent("Could not find UI Control " + control_path + " when trying to set a value through OSC.", kLogEventType_Error);
+      }
+   }
+
    if (!msg[0].isFloat32() && !msg[0].isInt32())
       return; // Code beyond this point expects at least one paramater of type int or float.
 
