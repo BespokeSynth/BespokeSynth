@@ -130,9 +130,7 @@ void NoteLooper::OnTransportAdvanced(float amount)
       return;
    }
 
-   double cursorPlayTime = gTime;
-   //don't use Transport::sEventEarlyMs, it makes it not work well for recording in realtime, and causes issues with stuck notes
-   cursorPlayTime += amount * TheTransport->MsPerBar();
+   double cursorPlayTime = NextBufferTime(mAllowLookahead);
    double curPos = GetCurPos(cursorPlayTime);
 
    if (mDeleteOrMute)
@@ -379,6 +377,7 @@ void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 void NoteLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("allow_lookahead", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -386,6 +385,7 @@ void NoteLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteLooper::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mAllowLookahead = mModuleSaveData.GetBool("allow_lookahead");
 }
 
 void NoteLooper::SaveState(FileStreamOut& out)
