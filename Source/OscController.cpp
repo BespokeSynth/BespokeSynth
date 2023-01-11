@@ -117,7 +117,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
 {
    std::string address = msg.getAddressPattern().toString().toStdString();
 
-   if (address == "/jockey/sync")
+   if (address == "/jockey/sync") //support for handshake with Jockey OSC app
    {
       std::string outputAddress = msg[0].getString().toStdString();
       std::vector<std::string> tokens = ofSplitString(outputAddress, ":");
@@ -133,7 +133,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    if (msg.size() == 0)
       return; // Code beyond this point expects at least one parameter.
 
-   std::string addressable_prefix = "/bespoke/addressable/";
+   std::string addressable_prefix = "/bespoke/control/";
    if (address.rfind(addressable_prefix, 0) == 0 && msg.size() >= 1)
    {
       std::string control_path = address.substr(addressable_prefix.length());
@@ -143,37 +143,31 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       {
          if (msg[0].isFloat32())
          {
-
             control->SetValue(msg[0].getFloat32(), gTime);
-            return; // Stop the midicontroller from mapping this to a CC value.
          }
-         if (msg[0].isInt32())
+         else if (msg[0].isInt32())
          {
             control->SetValue(msg[0].getInt32(), gTime);
-            return; // Stop the midicontroller from mapping this to a CC value.
          }
-         if (msg[0].isString())
+         else if (msg[0].isString())
          {
             TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
             if (textEntry != nullptr)
-            {
                textEntry->SetText(msg[0].getString().toStdString());
-               return; // Stop the midicontroller from mapping this to a CC value.
-            }
             else
-            {
-               TheSynth->LogEvent("Could not find TextEntry " + control_path + " when trying to set a value through OSC.", kLogEventType_Error);
-            }
+               TheSynth->LogEvent("Could not find TextEntry " + control_path + " when trying to set string value through OSC.", kLogEventType_Error);
          }
       }
       else
       {
          TheSynth->LogEvent("Could not find UI Control " + control_path + " when trying to set a value through OSC.", kLogEventType_Error);
       }
+
+      return;
    }
 
    if (!msg[0].isFloat32() && !msg[0].isInt32())
-      return; // Code beyond this point expects at least one paramater of type int or float.
+      return; // Code beyond this point expects at least one parameter of type int or float.
 
    // Handle note data and output these as notes instead of CC's.
    if (address.rfind("/note", 0) == 0 && msg.size() >= 2 && ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
@@ -198,16 +192,16 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       return;
    }
 
-   // Handle special command to zoom the bookmark
-   if (address == "/bespoke/bookmark/recall" && msg.size() == 1 && (msg[0].isInt32() || msg[0].isFloat32()))
+   // Handle special command to zoom the location (and allow suffixes, as some OSC software doesn't allow duplicate addresses on controls)
+   if (address.rfind("/bespoke/location/recall", 0) == 0 && msg.size() == 1 && (msg[0].isInt32() || msg[0].isFloat32()))
    {
       int number = msg[0].isInt32() ? msg[0].getInt32() : static_cast<int>(msg[0].getFloat32());
       TheSynth->GetLocationZoomer()->MoveToLocation(number);
       return; // Stop the midicontroller from mapping this to a CC value.
    }
 
-   // Handle special command to store current viewport as a bookmark
-   if (address == "/bespoke/bookmark/store" && msg.size() == 1 && (msg[0].isInt32() || msg[0].isFloat32()))
+   // Handle special command to store current viewport as a location (and allow suffixes, as some OSC software doesn't allow duplicate addresses on controls)
+   if (address.rfind("/bespoke/location/store", 0) == 0 && msg.size() == 1 && (msg[0].isInt32() || msg[0].isFloat32()))
    {
       int number = msg[0].isInt32() ? msg[0].getInt32() : static_cast<int>(msg[0].getFloat32());
       TheSynth->GetLocationZoomer()->WriteCurrentLocation(number);

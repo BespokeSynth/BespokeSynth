@@ -1,4 +1,11 @@
-Bespoke supports OSC in various ways.
+When a midicontroller module set to "osccontroller" is placed in your patch, Bespoke supports OSC in various ways.
+
+Direct control addressing:
+	address: /bespoke/control/<control path>
+	parameters: [f] or [i] or [s]
+		This will attempt to write the value provided directly to the UI control's path.
+		The <control path> should be a path like shown in the top left of Bespoke when hovering over a control. (tilde-separated)
+	example: /bespoke/control/oscillator~vol .25
 
 Notes:
 	address: /note
@@ -6,28 +13,24 @@ Notes:
 		The second to last parameter is the note number corresponding to the standard midi notes.
 		The last parameter is the velocity of the note.
 		If three parameters are provided the first integer parameter will denote the note "channel".
+	example: /note 60 127
 
-Bookmark recall:
-	address: /bespoke/bookmark/recall
+Location store:
+	address: /bespoke/location/store
 	parameters: [f] or [i]
-		Will try to recall the specified viewport bookmark.
+		Will save and overwrite the current viewports location and zoom into the specified location slot.
 	Notes:
-		These are the same bookmarks used by the minimap.
-		There is a limit of 10 bookmarks (0 to 9).
+		These are the same location bookmarks used by the minimap.
+		There is a limit of 10 location bookmarks (0 to 9).
+	example: /bespoke/location/store 1
 
-Bookmark store:
-	address: /bespoke/bookmark/store
+Location recall:
+	address: /bespoke/location/recall
 	parameters: [f] or [i]
-		Will save and overwrite the current viewports location and zoom into the specified bookmark slot.
+		Will try to recall the specified viewport location.
 	Notes:
-		These are the same bookmarks used by the minimap.
-		There is a limit of 10 bookmarks (0 to 9).
+		These are the same location bookmarks used by the minimap.
+		There is a limit of 10 location bookmarks (0 to 9).
+	example: /bespoke/location/recall 1
 
-
-Direct addressing:
-	address: /bespoke/addressable/<control path>
-	parameters: [f] or [i] or [s]
-		This will attempt to write the value provided directly to the UI control's path.
-		The <control path> should be a path like shown in the top left of Bespoke when hovering over a control.
-
-Any other address (provided the parameters are only of type integer or float) will be mapped to CC's in the midicontroller interface.
+Any other addresses with parameters of type integer or float will be automapped to CC's in the midicontroller interface.
