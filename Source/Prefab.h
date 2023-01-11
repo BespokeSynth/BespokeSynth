@@ -80,6 +80,7 @@ private:
    void MouseReleased() override;
 
    bool CanAddDropModules();
+   bool IsAddableModule(IDrawableModule* module);
    bool IsMouseHovered();
 
    void SavePrefab(std::string savePath);
