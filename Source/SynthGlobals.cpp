@@ -490,6 +490,8 @@ void UpdateTarget(IDrawableModule* module)
          IDrawableModule* target = dynamic_cast<IDrawableModule*>(audioSource->GetTarget(i));
          if (target)
             targetName = target->Path();
+         else
+            targetName = "";
          module->GetSaveData().SetString("target" + (i == 0 ? "" : ofToString(i + 1)), targetName);
       }
    }
