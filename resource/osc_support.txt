@@ -2,10 +2,13 @@ When a midicontroller module set to "osccontroller" is placed in your patch, Bes
 
 Direct control addressing:
 	address: /bespoke/control/<control path>
-	parameters: [f] or [i] or [s]
+	parameters: [f] or [i] or [s] or [f, 1] or [i, 1]
 		This will attempt to write the value provided directly to the UI control's path.
 		The <control path> should be a path like shown in the top left of Bespoke when hovering over a control. (tilde-separated)
+		If the second parameter is provided and it is 1 the first parameter will be seen as a percentage instead.
+			This only works on sliders and the value is expected to be between 0 and 100.
 	example: /bespoke/control/oscillator~vol .25
+	example: /bespoke/control/looper~offset 25 1
 
 Notes:
 	address: /note

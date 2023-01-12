@@ -133,21 +133,30 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    if (msg.size() == 0)
       return; // Code beyond this point expects at least one parameter.
 
+   bool is_percentage = false;
    std::string addressable_prefix = "/bespoke/control/";
    if (address.rfind(addressable_prefix, 0) == 0 && msg.size() >= 1)
    {
+      if (msg.size() >= 2 && msg[1].isInt32())
+         is_percentage = msg[1].getInt32() == 1;
+
       std::string control_path = address.substr(addressable_prefix.length());
       std::replace(control_path.begin(), control_path.end(), '/', '~');
       IUIControl* control = control = TheSynth->FindUIControl(control_path);
       if (control != nullptr)
       {
-         if (msg[0].isFloat32())
+         if (msg[0].isFloat32() || msg[0].isInt32())
          {
-            control->SetValue(msg[0].getFloat32(), gTime);
-         }
-         else if (msg[0].isInt32())
-         {
-            control->SetValue(msg[0].getInt32(), gTime);
+            float new_value = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+            if (is_percentage)
+            {
+               new_value = ofClamp(new_value, 0, 100) / 100;
+               control->SetValue(control->GetModulationRangeMin() + new_value * (control->GetModulationRangeMax() - control->GetModulationRangeMin()), gTime);
+            }
+            else
+            {
+               control->SetValue(new_value, gTime);
+            }
          }
          else if (msg[0].isString())
          {
