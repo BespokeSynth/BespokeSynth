@@ -115,6 +115,8 @@ bool Prefab::IsAddableModule(IDrawableModule* module)
 {
    if (module == nullptr || module == this || VectorContains(module, mModuleContainer.GetModules()))
       return false;
+   if (dynamic_cast<Prefab*>(module) != nullptr)
+      return false;
    return true;
 }
 
