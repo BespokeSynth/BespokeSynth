@@ -672,10 +672,14 @@ bool IsInUnitBox(ofVec2f pos)
 
 std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existing)
 {
-   std::string origName = name;
-   while (origName.length() > 1 && CharacterFunctions::isDigit((char)origName[origName.length() - 1]))
-      origName.resize(origName.length() - 1);
+   std::string strippedName = name;
+   while (strippedName.length() > 1 && CharacterFunctions::isDigit((char)strippedName[strippedName.length() - 1]))
+      strippedName.resize(strippedName.length() - 1);
    int suffix = 1;
+   std::string suffixString = name;
+   ofStringReplace(suffixString, strippedName, "");
+   if (!suffixString.empty())
+      suffix = atoi(suffixString.c_str());
    while (true)
    {
       bool isNameUnique = true;
@@ -684,7 +688,7 @@ std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existi
          if (existing[i]->Name() == name)
          {
             ++suffix;
-            name = origName + ofToString(suffix);
+            name = strippedName + ofToString(suffix);
             isNameUnique = false;
             break;
          }
