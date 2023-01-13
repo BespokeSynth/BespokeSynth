@@ -69,7 +69,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 0; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
@@ -105,6 +105,7 @@ private:
       void TargetControlUpdated();
       IUIControl* GetTarget() const;
       void CleanUp();
+      ofColor GetColor() { return mOwner->mColors[mColorIndex].color; }
 
       enum class DisplayType
       {
@@ -114,12 +115,16 @@ private:
          NumDisplayTypes
       };
 
+      SongBuilder* mOwner;
       PatchCableSource* mCable{ nullptr };
       DisplayType mDisplayType{ DisplayType::TextEntry };
       ClickButton* mMoveLeftButton{ nullptr };
       ClickButton* mMoveRightButton{ nullptr };
       ClickButton* mCycleDisplayTypeButton{ nullptr };
+      DropdownList* mColorSelector{ nullptr };
       bool mHadTarget{ false };
+      int mColorIndex{ 0 };
+      int mId{ -1 };
    };
 
    struct ControlValue
@@ -160,6 +165,17 @@ private:
       int mId{ -1 };
    };
 
+   struct TargetColor
+   {
+      TargetColor(std::string _name, ofColor _color)
+      {
+         name = _name;
+         color = _color;
+      }
+      std::string name;
+      ofColor color;
+   };
+
    int mCurrentScene{ -1 };
    int mQueuedScene{ -1 };
    int mSequenceStepIndex{ -1 };
@@ -169,6 +185,7 @@ private:
    bool mWantResetClock{ false };
    bool mJustResetClock{ false };
    bool mWantRefreshValueDropdowns{ false };
+   std::vector<TargetColor> mColors{};
 
    static const int kMaxSequencerScenes = 128;
    static const int kSequenceEndId = -1;

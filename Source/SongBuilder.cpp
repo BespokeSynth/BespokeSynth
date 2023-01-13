@@ -53,6 +53,18 @@ SongBuilder::SongBuilder()
       mSequencerContextMenuSelection[i] = ContextMenuItems::kNone;
    }
 
+   const float kColorDim = .7f;
+   ofColor grey = IDrawableModule::GetColor(kModuleCategory_Other);
+   mColors.push_back(TargetColor("grey", grey * kColorDim));
+   mColors.push_back(TargetColor("red", ofColor::red * kColorDim));
+   mColors.push_back(TargetColor("orange", ofColor::orange * kColorDim));
+   mColors.push_back(TargetColor("yellow", ofColor::yellow * kColorDim));
+   mColors.push_back(TargetColor("green", ofColor::green * kColorDim));
+   mColors.push_back(TargetColor("cyan", ofColor::cyan * kColorDim));
+   mColors.push_back(TargetColor("blue", ofColor::blue * kColorDim));
+   mColors.push_back(TargetColor("purple", ofColor::purple * kColorDim));
+   mColors.push_back(TargetColor("magenta", ofColor::magenta * kColorDim));
+
    mTransportPriority = -1000;
 }
 
@@ -720,6 +732,7 @@ void SongBuilder::SaveState(FileStreamOut& out)
    out << (int)mTargets.size();
    for (auto* target : mTargets)
    {
+      out << target->mId;
       target->mCable->SaveState(out);
       out << (int)target->mDisplayType;
    }
@@ -750,6 +763,8 @@ void SongBuilder::LoadState(FileStreamIn& in, int rev)
    for (int i = 0; i < numTargets; ++i)
    {
       mTargets[i] = new ControlTarget();
+      if (rev >= 1)
+         in >> mTargets[i]->mId;
       mTargets[i]->CreateUIControls(this);
       mTargets[i]->mCable->LoadState(in);
       int displayType;
@@ -944,6 +959,19 @@ void SongBuilder::SongScene::CleanUp()
 
 void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
 {
+   if (mId == -1)
+   {
+      //find unique id
+      mId = 0;
+      for (auto* target : owner->mTargets)
+      {
+         if (target != this && target != nullptr && mId <= target->mId)
+            mId = target->mId + 1;
+      }
+   }
+
+   mOwner = owner;
+
    mCable = new PatchCableSource(owner, kConnectionType_UIControl);
    owner->AddPatchCableSource(mCable);
    mCable->SetAllowMultipleTargets(true);
@@ -951,13 +979,18 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
    mMoveLeftButton = new ClickButton(owner, "move left", -1, -1, ButtonDisplayStyle::kArrowLeft);
    mMoveRightButton = new ClickButton(owner, "move right", -1, -1, ButtonDisplayStyle::kArrowRight);
    mCycleDisplayTypeButton = new ClickButton(owner, "type", -1, -1);
+   mColorSelector = new DropdownList(owner, ("color" + ofToString(mId)).c_str(), -1, -1, &mColorIndex, 25);
+
+   for (int i = 0; i < (int)owner->mColors.size(); ++i)
+      mColorSelector->AddLabel(owner->mColors[i].name, i);
+   mColorSelector->SetDrawTriangle(false);
 }
 
 void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
 {
    ofPushStyle();
    ofFill();
-   ofSetColor(ofColor(130, 130, 130, 130));
+   ofSetColor(GetColor() * .7f);
    ofRect(x, y, kColumnWidth, kTargetTabHeightTop);
    ofRect(x, y + kTargetTabHeightTop + kSpacingY + numRows * (kRowHeight + kSpacingY), kColumnWidth, kTargetTabHeightBottom);
    ofPopStyle();
@@ -981,6 +1014,7 @@ void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
    }
    float bottomY = y + kTargetTabHeightTop + kSpacingY + numRows * (kRowHeight + kSpacingY);
    mCable->SetManualPosition(x + kColumnWidth * .5f, bottomY + 5);
+   mCable->SetColor(GetColor());
    mMoveLeftButton->SetPosition(x, bottomY - 3);
    if (gHoveredUIControl == mMoveLeftButton)
       mMoveLeftButton->Draw();
@@ -990,6 +1024,9 @@ void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
    mCycleDisplayTypeButton->SetPosition(x, y + kTargetTabHeightTop - 15);
    if (gHoveredUIControl == mCycleDisplayTypeButton)
       mCycleDisplayTypeButton->Draw();
+   mColorSelector->SetPosition(x + 25, y + kTargetTabHeightTop - 15);
+   if (gHoveredUIControl == mColorSelector)
+      mColorSelector->Draw();
 }
 
 IUIControl* SongBuilder::ControlTarget::GetTarget() const
@@ -1017,6 +1054,7 @@ void SongBuilder::ControlTarget::CleanUp()
    mMoveLeftButton->RemoveFromOwner();
    mMoveRightButton->RemoveFromOwner();
    mCycleDisplayTypeButton->RemoveFromOwner();
+   mColorSelector->RemoveFromOwner();
 }
 
 void SongBuilder::ControlValue::CreateUIControls(SongBuilder* owner)
@@ -1050,7 +1088,7 @@ void SongBuilder::ControlValue::Draw(float x, float y, int sceneIndex, ControlTa
 {
    ofPushStyle();
    ofFill();
-   ofSetColor(ofColor(130, 130, 130, 130));
+   ofSetColor(target->GetColor() * .7f);
    ofRect(x, y + 2, kColumnWidth, kRowHeight - 4);
    ofPopStyle();
 

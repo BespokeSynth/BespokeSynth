@@ -56,6 +56,7 @@ ofColor ofColor::blue(0, 0, 255);
 ofColor ofColor::purple(148, 0, 211);
 ofColor ofColor::lime(0, 255, 0);
 ofColor ofColor::magenta(255, 0, 255);
+ofColor ofColor::cyan(0, 255, 255);
 ofColor ofColor::clear(0, 0, 0, 0);
 
 NVGcontext* gNanoVG = nullptr;
