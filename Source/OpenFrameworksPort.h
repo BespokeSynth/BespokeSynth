@@ -52,7 +52,7 @@ struct ofColor
    int b{ 0 };
    int a{ 255 };
 
-   static ofColor black, white, grey, red, green, yellow, blue, orange, purple, lime, magenta, clear;
+   static ofColor black, white, grey, red, green, yellow, blue, orange, purple, lime, magenta, cyan, clear;
 
    static ofColor lerp(ofColor a, ofColor b, float t)
    {
