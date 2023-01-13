@@ -115,7 +115,7 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
    if (!IsShowing())
       ResetAppearPos();
 
-   if (!IsShowing() && PatchCable::sActivePatchCable != nullptr)
+   if (!IsShowing() && PatchCable::sActivePatchCable != nullptr && key >= 'a' && key <= 'z')
       PatchCable::sActivePatchCable->ShowQuickspawnForCable();
 
    if ((!IsShowing() || mMenuMode == MenuMode::SingleLetter) && key >= 0 && key < CHAR_MAX && ((key >= 'a' && key <= 'z') || key == ';') && !isRepeat && GetKeyModifiers() == kModifier_None)
