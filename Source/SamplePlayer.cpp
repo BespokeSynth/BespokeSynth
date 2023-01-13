@@ -504,7 +504,6 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    sample->SetLooping(mLoop);
    sample->SetRate(mSpeed);
    mSample = sample;
-   mVolume = 1;
    mPlay = false;
    mOwnsSample = ownsSample;
    mZoomLevel = 1;

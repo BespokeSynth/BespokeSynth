@@ -30,6 +30,7 @@
 class SwitchAndRamp
 {
 public:
+   SwitchAndRamp();
    void StartSwitch();
    float Process(int channel, float input, float rampSpeed = .005f);
 
