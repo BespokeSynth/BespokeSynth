@@ -223,7 +223,7 @@ void Prefab::ButtonClicked(ClickButton* button, double time)
       FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
-         std::string savePath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
+         std::string savePath = chooser.getResult().getFullPathName().toStdString();
          SavePrefab(savePath);
       }
    }
@@ -233,7 +233,7 @@ void Prefab::ButtonClicked(ClickButton* button, double time)
       FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToOpen())
       {
-         std::string loadPath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
+         std::string loadPath = chooser.getResult().getFullPathName().toStdString();
          LoadPrefab(ofToDataPath(loadPath));
       }
    }
