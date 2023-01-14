@@ -2730,7 +2730,7 @@ void ModularSynth::SaveLayoutAsPopup()
 {
    FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", true, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
-      SaveLayout(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
+      SaveLayout(chooser.getResult().getFullPathName().toStdString());
 }
 
 void ModularSynth::SaveCurrentState()
