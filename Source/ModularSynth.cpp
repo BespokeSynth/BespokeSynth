@@ -982,6 +982,10 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          gHoveredUIControl->ResetToOriginal();
       }
+      else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
+      {
+         TheSynth->CopyTextToClipboard(ofToString(gHoveredUIControl->GetValue()));
+      }
       else if (key != ' ' && key != OF_KEY_TAB && key != '`' && key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key) && (GetKeyModifiers() & kModifier_Alt) == false)
       {
          gHoveredUIControl->AttemptTextInput();
