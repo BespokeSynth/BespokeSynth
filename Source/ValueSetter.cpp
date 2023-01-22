@@ -73,7 +73,7 @@ void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
       if (i < mControlCable->GetPatchCables().size())
       {
          mTargets[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
-         if (mControlCable->GetPatchCables().size() == 1)
+         if (mControlCable->GetPatchCables().size() == 1 && mTargets[i] != nullptr)
             mValueSlider->SetExtents(mTargets[i]->GetModulationRangeMin(), mTargets[i]->GetModulationRangeMax());
       }
       else
