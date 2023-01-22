@@ -179,7 +179,9 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       return; // Code beyond this point expects at least one parameter of type int or float.
 
    // Handle note data and output these as notes instead of CC's.
-   if (address.rfind("/note", 0) == 0 && msg.size() >= 2 && ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
+   if (
+   (address.rfind("/note", 0) == 0 || address.rfind("/bespoke/note", 0) == 0) && msg.size() >= 2 &&
+   ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
    {
       MidiNote note;
       note.mDeviceName = "osccontroller";
