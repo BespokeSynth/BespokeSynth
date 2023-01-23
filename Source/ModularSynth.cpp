@@ -1629,7 +1629,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
    xScroll *= UserPrefs.scroll_multiplier_horizontal.Get();
    yScroll *= UserPrefs.scroll_multiplier_vertical.Get();
 
-   if (IsKeyHeld(' ') || (GetModuleAtCursor() == nullptr && gHoveredUIControl == nullptr))
+   if (IsKeyHeld(' ') || (GetModuleAtCursor() == nullptr && gHoveredUIControl == nullptr) || (dynamic_cast<Prefab*>(GetModuleAtCursor()) != nullptr && gHoveredUIControl == nullptr))
    {
       if (canZoomCanvas)
          ZoomView(yScroll / 50, true);
