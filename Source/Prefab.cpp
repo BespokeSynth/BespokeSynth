@@ -65,13 +65,18 @@ std::string Prefab::GetTitleLabel() const
    return "prefab";
 }
 
+namespace
+{
+   const int kPatchCableSourceClickRadius = 7; // Not sure how to reference the actual value in PatchCableSource.cpp here.
+}
+
 void Prefab::Poll()
 {
    float xMin, yMin;
    GetPosition(xMin, yMin);
    for (auto* module : mModuleContainer.GetModules())
    {
-      xMin = MIN(xMin, module->GetPosition().x);
+      xMin = MIN(xMin, module->GetPosition().x - kPatchCableSourceClickRadius);
       yMin = MIN(yMin, module->GetPosition().y - 30);
    }
 
