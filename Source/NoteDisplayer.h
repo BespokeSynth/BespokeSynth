@@ -44,18 +44,23 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h);
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 110;
-      height = 60;
+      width = mWidth;
+      height = mHeight;
    }
    bool Enabled() const override { return true; }
 
    void DrawNoteName(int pitch, float y) const;
 
+   float mWidth{ 110 };
+   float mHeight{ 60 };
    int mVelocities[127]{};
 };
 
