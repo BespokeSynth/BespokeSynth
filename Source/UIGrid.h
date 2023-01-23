@@ -30,7 +30,7 @@
 #include "IUIControl.h"
 #include "SynthGlobals.h"
 
-#define MAX_GRID_SIZE 128
+#define MAX_GRID_SIZE 1024
 
 class UIGrid;
 
