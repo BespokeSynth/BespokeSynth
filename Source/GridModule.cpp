@@ -314,11 +314,7 @@ void GridModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    if (cableSource == mGridOutputCable)
    {
       auto* target = dynamic_cast<GridControlTarget*>(cableSource->GetTarget());
-      if (target == mGridControlTarget)
-      {
-         cableSource->Clear();
-      }
-      else if (target)
+      if (target)
          target->SetGridController(this);
    }
 }
