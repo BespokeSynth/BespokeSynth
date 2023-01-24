@@ -147,7 +147,7 @@ protected:
 
 private:
    void OnClicked(float x, float y, bool right) override;
-   void SetValueForMouse(int x, int y);
+   void SetValueForMouse(float x, float y);
    float* GetModifyValue();
    bool AdjustSmooth() const;
    void SmoothUpdated();
@@ -277,7 +277,7 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void SetValueForMouse(int x, int y);
+   void SetValueForMouse(float x, float y);
    void CalcSliderVal();
 
    int mWidth;
