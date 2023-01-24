@@ -624,16 +624,16 @@ void SamplePlayer::DownloadYoutube(std::string url, std::string title)
    if (mSample)
       mSample->SetPlayPosition(0);
 
-   const char* tempDownloadName = "youtube.m4a";
+   auto tempDownloadName = juce::String(this->GetDisplayName() + "_youtube.m4a").retainCharacters("abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ_.");
    {
-      auto file = juce::File(ofToDataPath(tempDownloadName));
+      auto file = juce::File(ofToDataPath(tempDownloadName.toStdString()));
       if (file.existsAsFile())
          file.deleteFile();
    }
 
-   const char* tempConvertedName = "youtube.wav";
+   auto tempConvertedName = juce::String(this->GetDisplayName() + "_youtube.wav").retainCharacters("abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ_.");
    {
-      auto file = juce::File(ofToDataPath(tempConvertedName));
+      auto file = juce::File(ofToDataPath(tempConvertedName.toStdString()));
       if (file.existsAsFile())
          file.deleteFile();
    }
@@ -650,13 +650,13 @@ void SamplePlayer::DownloadYoutube(std::string url, std::string title)
    args.add("--ffmpeg-location");
    args.add(UserPrefs.ffmpeg_path.Get());
    args.add("-o");
-   args.add(ofToDataPath(tempDownloadName));
+   args.add(ofToDataPath(tempDownloadName.toStdString()));
 
    mRunningProcessType = RunningProcessType::DownloadYoutube;
 
    mOnRunningProcessComplete = [this, tempConvertedName, title]
    {
-      OnYoutubeDownloadComplete(tempConvertedName, title);
+      OnYoutubeDownloadComplete(tempConvertedName.toStdString(), title);
    };
 
    RunProcess(args);
