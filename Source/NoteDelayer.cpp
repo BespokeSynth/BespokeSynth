@@ -105,7 +105,10 @@ void NoteDelayer::OnTransportAdvanced(float amount)
 void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
+   {
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation); // Passthrough notes.
       return;
+   }
 
    if (velocity > 0)
       mLastNoteOnTime = time;
