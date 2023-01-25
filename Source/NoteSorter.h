@@ -57,17 +57,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
+   void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
 
-   static const int kMaxDestinations = 5;
-   int mPitch[kMaxDestinations]{};
-   TextEntry* mPitchEntry[kMaxDestinations]{};
-   AdditionalNoteCable* mDestinationCables[kMaxDestinations]{};
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   std::array<int, 128> mPitch;
+   std::vector<TextEntry*> mPitchEntry;
+   std::vector<AdditionalNoteCable*> mDestinationCables;
 };
