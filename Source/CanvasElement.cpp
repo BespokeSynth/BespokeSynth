@@ -261,6 +261,8 @@ void CanvasElement::MoveElementByDrag(ofVec2f dragOffset)
 void CanvasElement::AddElementUIControl(IUIControl* control)
 {
    mUIControls.push_back(control);
+   // Block modulation cables from targeting these controls.
+   control->SetNoCableTarget(true);
    control->SetShowing(false);
 }
 
