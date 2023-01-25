@@ -104,6 +104,7 @@ void SongBuilder::CreateUIControls()
    for (int i = 0; i < kMaxSequencerScenes; ++i)
    {
       DROPDOWN(mSequencerSceneSelector[i], ("scene" + ofToString(i)).c_str(), &mSequencerSceneId[i], 80);
+      mSequencerSceneSelector[i]->SetNoCableTarget(true);
       mSequencerSceneSelector[i]->SetDrawTriangle(false);
       UIBLOCK_SHIFTRIGHT();
       TEXTENTRY_NUM(mSequencerStepLengthEntry[i], ("bars" + ofToString(i)).c_str(), 3, &mSequencerStepLength[i], 1, 999);
@@ -115,6 +116,7 @@ void SongBuilder::CreateUIControls()
       mSequencerContextMenu[i]->AddLabel("delete", (int)ContextMenuItems::kDelete);
       mSequencerContextMenu[i]->AddLabel("move up", (int)ContextMenuItems::kMoveUp);
       mSequencerContextMenu[i]->AddLabel("move down", (int)ContextMenuItems::kMoveDown);
+      mSequencerContextMenu[i]->SetNoCableTarget(true);
       mSequencerContextMenu[i]->SetDisplayStyle(DropdownDisplayStyle::kHamburger);
       UIBLOCK_NEWLINE();
    }
@@ -122,6 +124,7 @@ void SongBuilder::CreateUIControls()
 
    mChangeQuantizeSelector = new DropdownList(this, "change quantize", -1, -1, (int*)(&mChangeQuantizeInterval));
    mAddTargetButton = new ClickButton(this, "add target", -1, -1, ButtonDisplayStyle::kPlus);
+   mAddTargetButton->SetNoCableTarget(true);
 
    mChangeQuantizeSelector->AddLabel("jump", kInterval_None);
    mChangeQuantizeSelector->AddLabel("switch", kInterval_Free);
@@ -867,6 +870,7 @@ void SongBuilder::SongScene::CreateUIControls(SongBuilder* owner)
    mContextMenu->AddLabel("delete", (int)ContextMenuItems::kDelete);
    mContextMenu->AddLabel("move up", (int)ContextMenuItems::kMoveUp);
    mContextMenu->AddLabel("move down", (int)ContextMenuItems::kMoveDown);
+   mContextMenu->SetNoCableTarget(true);
    mContextMenu->SetDisplayStyle(DropdownDisplayStyle::kHamburger);
 }
 
@@ -980,6 +984,11 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
    mMoveRightButton = new ClickButton(owner, "move right", -1, -1, ButtonDisplayStyle::kArrowRight);
    mCycleDisplayTypeButton = new ClickButton(owner, "type", -1, -1);
    mColorSelector = new DropdownList(owner, ("color" + ofToString(mId)).c_str(), -1, -1, &mColorIndex, 25);
+
+   // Block modulation calbes from connecting to these controls as it behaves wrong (and saves incorrectly) except for the color button, that one is fun and works.
+   mMoveLeftButton->SetNoCableTarget(true);
+   mMoveRightButton->SetNoCableTarget(true);
+   mCycleDisplayTypeButton->SetNoCableTarget(true);
 
    for (int i = 0; i < (int)owner->mColors.size(); ++i)
       mColorSelector->AddLabel(owner->mColors[i].name, i);
