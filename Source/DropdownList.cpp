@@ -367,6 +367,13 @@ void DropdownList::OnClicked(float x, float y, bool right)
    if (mElements.empty())
       return;
 
+   auto a = TheSynth->GetTopModalFocusItem();
+   if (a == &mModalList)
+   {
+      TheSynth->PopModalFocusItem();
+      return;
+   }
+
    mModalList.SetUpModal();
 
    ofVec2f modalPos = GetModalListPosition();

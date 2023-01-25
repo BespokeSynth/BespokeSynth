@@ -1510,7 +1510,8 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
          bool clicked = GetTopModalFocusItem()->TestClick(modalX, modalY, rightButton);
          if (!clicked)
          {
-            FloatSliderLFOControl* lfo = dynamic_cast<FloatSliderLFOControl*>(GetTopModalFocusItem());
+            auto lfo = dynamic_cast<FloatSliderLFOControl*>(GetTopModalFocusItem());
+            auto dropdown = dynamic_cast<DropdownListModal*>(GetTopModalFocusItem());
             if (lfo) //if it's an LFO, don't dismiss it if you're adjusting the slider
             {
                FloatSlider* slider = lfo->GetOwner();
@@ -1521,6 +1522,13 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
                if (x < uiX || y < uiY || x > uiX + w || y > uiY + h)
                   PopModalFocusItem();
+            }
+            else if (dropdown)
+            {
+               if (dynamic_cast<DropdownList*>(gHoveredUIControl) != dropdown->GetOwner())
+               {
+                  PopModalFocusItem();
+               }
             }
             else //otherwise, always dismiss if you click outside it
             {
