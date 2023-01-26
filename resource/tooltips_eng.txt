@@ -1620,6 +1620,7 @@ noteecho~output incoming notes at specified delays
 noteratchet~rapidly repeat an input note over a duration
 ~duration~total length of time repeats should last
 ~subdivision~length of each repeat
+~skip first~don't replay input note. this allows you to more easily separate the initial note from the ratcheted notes.
 
 
 

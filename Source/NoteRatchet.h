@@ -70,4 +70,6 @@ private:
    DropdownList* mRatchetDurationSelector{ nullptr };
    NoteInterval mRatchetSubdivision{ NoteInterval::kInterval_32n };
    DropdownList* mRatchetSubdivisionSelector{ nullptr };
+   bool mSkipFirst{ false };
+   Checkbox* mSkipFirstCheckbox{ nullptr };
 };
