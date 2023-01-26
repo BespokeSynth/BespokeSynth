@@ -82,7 +82,7 @@ public:
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
-   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
@@ -123,6 +123,7 @@ private:
    bool mHasExternalPulseSource{ false };
    int mStep{ 0 };
    int mLoadRev{ -1 };
+   bool mDisableAllWhenDisabled{ true };
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
