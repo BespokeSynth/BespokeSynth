@@ -75,7 +75,7 @@ private:
 
    static const int kMaxDestinations = 16;
    int mNumDestinations{ 5 };
-   float mWeight[kMaxDestinations];
+   float mWeight[kMaxDestinations]{};
    FloatSlider* mWeightSlider[kMaxDestinations]{ nullptr };
    std::vector<AdditionalNoteCable*> mDestinationCables;
    float mWidth{ 200 };
