@@ -370,8 +370,16 @@ void PatchCable::Render()
                {
                   ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                   float sample = vizBuff->GetSample((i / wireLength * numSamples), ch);
-                  sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
-                  sample = ofClamp(sample, -1.0f, 1.0f);
+                  if (isnan(sample))
+                  {
+                     ofSetColor(ofColor(255, 0, 0));
+                     sample = 0;
+                  }
+                  else
+                  {
+                     sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
+                     sample = ofClamp(sample, -1.0f, 1.0f);
+                  }
                   ofVec2f sampleOffsetDir = MathUtils::BezierPerpendicular(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                   pos += sampleOffsetDir * 10 * sample;
                   ofVertex(pos.x + offset.x, pos.y + offset.y);
