@@ -519,6 +519,8 @@ target_sources(BespokeSynth PRIVATE
     PulseChance.h
     PulseDelayer.cpp
     PulseDelayer.h
+    PulseFlag.cpp
+    PulseFlag.h
     PulseGate.cpp
     PulseGate.h
     PulseHocket.cpp

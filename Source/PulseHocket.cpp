@@ -32,9 +32,8 @@
 
 PulseHocket::PulseHocket()
 {
-   mWeight[0] = 1;
-   for (int i = 1; i < kMaxDestinations; ++i)
-      mWeight[i] = 0;
+   for (int i = 0; i < kMaxDestinations; ++i)
+      mWeight[i] = (i == 0) ? 1 : 0;
 
    Reseed();
 }

@@ -256,6 +256,7 @@
 #include "VelocityCurve.h"
 #include "BoundsToPulse.h"
 #include "SongBuilder.h"
+#include "PulseFlag.h"
 
 #include <juce_core/juce_core.h>
 
@@ -459,6 +460,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(BoundsToPulse, boundstopulse, kModuleCategory_Pulse);
    REGISTER(SongBuilder, songbuilder, kModuleCategory_Other);
    REGISTER(TimelineControl, timelinecontrol, kModuleCategory_Other);
+   REGISTER(PulseFlag, pulseflag, kModuleCategory_Pulse);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
