@@ -358,7 +358,7 @@ bool FloatSlider::MouseMoved(float x, float y)
    return mMouseDown;
 }
 
-void FloatSlider::SetValueForMouse(int x, int y)
+void FloatSlider::SetValueForMouse(float x, float y)
 {
    float* var = GetModifyValue();
    float fX = x;
@@ -1067,7 +1067,7 @@ bool IntSlider::MouseMoved(float x, float y)
    return mMouseDown;
 }
 
-void IntSlider::SetValueForMouse(int x, int y)
+void IntSlider::SetValueForMouse(float x, float y)
 {
    int oldVal = *mVar;
    *mVar = (int)round(ofMap(x + mX, mX + 1, mX + mWidth - 1, mMin, mMax));
