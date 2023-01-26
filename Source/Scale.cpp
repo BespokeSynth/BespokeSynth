@@ -62,7 +62,7 @@ void Scale::CreateUIControls()
    mScaleSelector = new DropdownList(this, "scale", 58, 5, &mScaleIndex);
    mScaleDegreeSlider = new IntSlider(this, "degree", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 115, 15, &mScaleDegree, -7, 7);
    mIntonationSelector = new DropdownList(this, "intonation", 58, 24, (int*)(&mIntonation));
-   mPitchesPerOctaveEntry = new TextEntry(this, "PPO", 4, 24, 2, &mPitchesPerOctave, 0, 99);
+   mPitchesPerOctaveEntry = new TextEntry(this, "PPO", 4, 24, 2, &mPitchesPerOctave, 1, 99);
    mReferenceFreqEntry = new TextEntry(this, "tuning", 4, 43, 3, &mReferenceFreq, 1, 999);
    mReferencePitchEntry = new TextEntry(this, "note", 76, 43, 3, &mReferencePitch, 0, 127);
    mLoadSCLButton = new ClickButton(this, "load SCL", 4, 62);
