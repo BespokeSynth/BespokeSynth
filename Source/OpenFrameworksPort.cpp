@@ -254,6 +254,16 @@ void ofCircle(float x, float y, float radius)
       nvgStroke(gNanoVG);
 }
 
+void ofArc(float x, float y, float radius, float angle0, float angle1, int dir /* = NVG_CW */)
+{
+   nvgBeginPath(gNanoVG);
+   nvgArc(gNanoVG, x, y, radius, angle0, angle1, dir);
+   if (sStyleStack.GetStyle().fill)
+      nvgFill(gNanoVG);
+   else
+      nvgStroke(gNanoVG);
+}
+
 void ofRect(float x, float y, float width, float height, float cornerRadius /*=3*/)
 {
    nvgBeginPath(gNanoVG);

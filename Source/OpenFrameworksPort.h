@@ -258,6 +258,7 @@ void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2f gr
 void ofFill();
 void ofNoFill();
 void ofCircle(float x, float y, float radius);
+void ofArc(float x, float y, float radius, float angle0, float angle1, int dir = 2 /* NVG_CW */);
 void ofRect(float x, float y, float width, float height, float cornerRadius = 3);
 void ofRect(const ofRectangle& rect, float cornerRadius = 3);
 float ofClamp(float val, float a, float b);

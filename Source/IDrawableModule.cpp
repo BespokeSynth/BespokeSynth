@@ -373,24 +373,29 @@ void IDrawableModule::Render()
    ofPushStyle();
    const float kPipWidth = 8;
    const float kPipSpacing = 2;
+   const float kHalfPipWidth = kPipWidth / 2;
+   const float kExtrasOffset = 1.25;
    float receiveIndicatorX = w - (kPipWidth + kPipSpacing);
    ofFill();
 
    if (CanReceiveAudio())
    {
       ofSetColor(GetColor(kModuleCategory_Audio));
+      ofArc(receiveIndicatorX + kHalfPipWidth, -titleBarHeight - kExtrasOffset, kHalfPipWidth, PI, TWO_PI);
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceiveNotes())
    {
       ofSetColor(GetColor(kModuleCategory_Note));
+      ofTriangle(receiveIndicatorX, -titleBarHeight - kExtrasOffset - kHalfPipWidth, receiveIndicatorX + kHalfPipWidth, -titleBarHeight - kExtrasOffset, receiveIndicatorX + kPipWidth, -titleBarHeight - kExtrasOffset - kHalfPipWidth);
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceivePulses())
    {
       ofSetColor(GetColor(kModuleCategory_Pulse));
+      ofRect(receiveIndicatorX + kPipSpacing, -titleBarHeight - 4 - kExtrasOffset, kPipWidth - kPipSpacing * 2, 4, 0.0f);
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
