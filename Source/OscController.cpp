@@ -210,7 +210,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
 
    for (int i = 0; i < msg.size(); ++i)
    {
-      auto calculated_address = (i > 0) ? address + " " + std::to_string(i + 1) : address;
+      auto calculated_address = (i > 0) ? address + "_" + std::to_string(i + 1) : address;
       int mapIndex = FindControl(calculated_address);
 
       bool isNew = false;
