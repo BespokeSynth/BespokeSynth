@@ -78,4 +78,5 @@ private:
    int mLength{ 4 };
    IntSlider* mLengthSlider{ nullptr };
    double mLastNoteOnTime{ -9999 };
+   bool mAllowChords{ false };
 };
