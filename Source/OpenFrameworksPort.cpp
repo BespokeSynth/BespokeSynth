@@ -352,6 +352,11 @@ void ofVertex(float x, float y, float z)
    gShapePoints.push_back(ofVec2f(x, y));
 }
 
+void ofVertex(ofVec2f point)
+{
+   ofVertex(point.x, point.y);
+}
+
 float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEnd, bool clamp)
 {
    float ret;

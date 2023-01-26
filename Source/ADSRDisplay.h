@@ -96,6 +96,7 @@ private:
    }
 
    void UpdateSliderVisibility();
+   ofVec2f GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent);
 
    float mWidth;
    float mHeight;
