@@ -59,7 +59,7 @@ void PulseButton::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mButton)
    {
-      double scheduledTime = gTime + TheTransport->GetEventLookaheadMs();
+      double scheduledTime = NextBufferTime(true);
       if (mForceImmediate)
          scheduledTime = time;
       DispatchPulse(GetPatchCableSource(), scheduledTime, 1, 0);
