@@ -122,7 +122,7 @@ public:
    int GetNumScaleTypes() { return (int)mScales.size(); }
    std::string GetScaleName(int index) { return mScales[index].mName; }
    int NumTonesInScale() const { return mScale.NumTonesInScale(); }
-   int GetPitchesPerOctave() const { return mPitchesPerOctave; }
+   int GetPitchesPerOctave() const { return MAX(1, mPitchesPerOctave); }
 
    float PitchToFreq(float pitch);
    float FreqToPitch(float freq);
