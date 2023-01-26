@@ -76,7 +76,7 @@ void Panner::Process(double time)
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
          mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       if (mWiden < 0)
-         mWidenerBuffer.ReadChunk(secondChannel, GetBuffer()->BufferSize(), abs(mWiden), 1);
+         mWidenerBuffer.ReadChunk(secondChannel, GetBuffer()->BufferSize(), abs(mWiden), (GetBuffer()->NumActiveChannels() == 1) ? 0 : 1);
       else
          mWidenerBuffer.ReadChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), abs(mWiden), 0);
    }
