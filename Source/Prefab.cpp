@@ -117,6 +117,8 @@ bool Prefab::IsAddableModule(IDrawableModule* module)
       return false;
    if (dynamic_cast<Prefab*>(module) != nullptr)
       return false;
+   if (dynamic_cast<Prefab*>(module->GetParent()) != nullptr)
+      return false;
    return true;
 }
 
