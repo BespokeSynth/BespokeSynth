@@ -31,20 +31,16 @@
 #include "UIControlMacros.h"
 #include "MathUtils.h"
 
-namespace
-{
-   const float kEarlyOffsetMs = 10;
-}
-
 RadioSequencer::RadioSequencer()
 {
+   mTransportPriority = 0;
 }
 
 void RadioSequencer::Init()
 {
    IDrawableModule::Init();
 
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(kEarlyOffsetMs, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
 }
 
 RadioSequencer::~RadioSequencer()
@@ -287,6 +283,25 @@ void RadioSequencer::SyncControlCablesToGrid()
    }
 }
 
+void RadioSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
+{
+   if (checkbox == mEnabledCheckbox)
+   {
+      if (!mEnabled && mDisableAllWhenDisabled)
+      {
+         for (int i = 0; i < mControlCables.size(); ++i)
+         {
+            for (auto* cable : mControlCables[i]->GetPatchCables())
+            {
+               IUIControl* uicontrol = dynamic_cast<IUIControl*>(cable->GetTarget());
+               if (uicontrol)
+                  uicontrol->SetValue(0, time);
+            }
+         }
+      }
+   }
+}
+
 void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
@@ -348,6 +363,7 @@ void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("one_per_column_mode", moduleInfo, true);
    mModuleSaveData.LoadInt("num_rows", moduleInfo, 8, 1, 16, false);
+   mModuleSaveData.LoadBool("disable_all_when_disabled", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -356,6 +372,7 @@ void RadioSequencer::SetUpFromSaveData()
 {
    mGrid->SetSingleColumnMode(mModuleSaveData.GetBool("one_per_column_mode"));
    mGrid->SetGrid(mLength, mModuleSaveData.GetInt("num_rows"));
+   mDisableAllWhenDisabled = mModuleSaveData.GetBool("disable_all_when_disabled");
    SyncControlCablesToGrid();
 }
 
