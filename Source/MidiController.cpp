@@ -1979,7 +1979,11 @@ void MidiController::PreRepatch(PatchCableSource* cableSource)
       {
          grid->mGridControlTarget[mControllerPage] = dynamic_cast<GridControlTarget*>(cableSource->GetTarget());
          if (grid->mGridControlTarget[mControllerPage] && grid->mGridControlTarget[mControllerPage]->GetGridController())
-            dynamic_cast<GridControllerMidi*>(grid->mGridControlTarget[mControllerPage]->GetGridController())->UnhookController();
+         {
+            GridControllerMidi* gridMidi = dynamic_cast<GridControllerMidi*>(grid->mGridControlTarget[mControllerPage]->GetGridController());
+            if (gridMidi != nullptr)
+               gridMidi->UnhookController();
+         }
          return;
       }
    }
