@@ -431,6 +431,12 @@ void EQModule::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
+void EQModule::GetModuleDimensions(float& w, float& h)
+{
+   w = MAX(208, mWidth);
+   h = MAX(150, mHeight);
+}
+
 void EQModule::Resize(float w, float h)
 {
    mWidth = w;
