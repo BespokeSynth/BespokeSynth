@@ -18,8 +18,8 @@
 /*
   ==============================================================================
 
-    PulseFlag.h
-    Created: 24 Feb 2023
+    PulseDisplayer.h
+    Created: 26 Jan 2023
     Author:  Ryan Challinor
 
   ==============================================================================
@@ -28,14 +28,13 @@
 #pragma once
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
-#include "DropdownList.h"
 
-class PulseFlag : public IDrawableModule, public IPulseSource, public IPulseReceiver, public IDropdownListener
+class PulseDisplayer : public IDrawableModule, public IPulseSource, public IPulseReceiver
 {
 public:
-   PulseFlag();
-   virtual ~PulseFlag();
-   static IDrawableModule* Create() { return new PulseFlag(); }
+   PulseDisplayer();
+   virtual ~PulseDisplayer();
+   static IDrawableModule* Create() { return new PulseDisplayer(); }
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return true; }
@@ -47,8 +46,6 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
-
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
@@ -59,11 +56,8 @@ private:
    bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 150 };
-   float mHeight{ 40 };
+   float mHeight{ 30 };
 
-   int mFlagValue{ 0 };
-   bool mReplaceFlags{ true };
-
-   DropdownList* mFlagValueSelector{ nullptr };
-   Checkbox* mReplaceFlagsCheckbox{ nullptr };
+   int mLastReceivedFlags{ 0 };
+   double mLastReceivedFlagTime{ 0 };
 };

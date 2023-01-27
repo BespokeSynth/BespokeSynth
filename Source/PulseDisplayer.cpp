@@ -18,79 +18,80 @@
 /*
   ==============================================================================
 
-    PulseFlag.cpp
-    Created: 24 Jan 2023
+    PulseDisplayer.cpp
+    Created: 26 Jan 2023
     Author:  Ryan Challinor
 
   ==============================================================================
 */
 
-#include "PulseFlag.h"
+#include "PulseDisplayer.h"
 #include "SynthGlobals.h"
 #include "UIControlMacros.h"
 #include "Transport.h"
 
-PulseFlag::PulseFlag()
+PulseDisplayer::PulseDisplayer()
 {
 }
 
-PulseFlag::~PulseFlag()
+PulseDisplayer::~PulseDisplayer()
 {
 }
 
-void PulseFlag::CreateUIControls()
+void PulseDisplayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-
-   UIBLOCK0();
-   DROPDOWN(mFlagValueSelector, "flag", &mFlagValue, 70);
-   CHECKBOX(mReplaceFlagsCheckbox, "replace", &mReplaceFlags);
-   ENDUIBLOCK(mWidth, mHeight);
-
-   mFlagValueSelector->AddLabel("none", kPulseFlag_None);
-   mFlagValueSelector->AddLabel("reset", kPulseFlag_Reset);
-   mFlagValueSelector->AddLabel("random", kPulseFlag_Random);
-   mFlagValueSelector->AddLabel("sync", kPulseFlag_SyncToTransport);
-   mFlagValueSelector->AddLabel("backward", kPulseFlag_Backward);
-   mFlagValueSelector->AddLabel("align", kPulseFlag_Align);
-   mFlagValueSelector->AddLabel("repeat", kPulseFlag_Repeat);
 }
 
-void PulseFlag::DrawModule()
+void PulseDisplayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
 
-   mFlagValueSelector->Draw();
-   mReplaceFlagsCheckbox->Draw();
+   float brightness = ofLerp(150, 255, 1 - ofClamp(gTime - mLastReceivedFlagTime, 0, 200) / 200.0f);
+   ofPushStyle();
+   ofSetColor(brightness, brightness, brightness);
+   std::string output;
+   if (mLastReceivedFlags == kPulseFlag_None)
+      output = "none";
+   if (mLastReceivedFlags & kPulseFlag_Reset)
+      output += "reset ";
+   if (mLastReceivedFlags & kPulseFlag_Random)
+      output += "random ";
+   if (mLastReceivedFlags & kPulseFlag_SyncToTransport)
+      output += "sync ";
+   if (mLastReceivedFlags & kPulseFlag_Backward)
+      output += "backward ";
+   if (mLastReceivedFlags & kPulseFlag_Align)
+      output += "align ";
+   if (mLastReceivedFlags & kPulseFlag_Repeat)
+      output += "repeat ";
+   DrawTextNormal(output, 5, 18);
+   ofPopStyle();
 }
 
-void PulseFlag::OnPulse(double time, float velocity, int flags)
+void PulseDisplayer::OnPulse(double time, float velocity, int flags)
 {
-   ComputeSliders(0);
-
-   if (mReplaceFlags)
-      flags = 0;
-
-   flags |= mFlagValue;
+   mLastReceivedFlags = flags;
+   mLastReceivedFlagTime = gTime;
 
    DispatchPulse(GetPatchCableSource(), time, velocity, flags);
 }
 
-void PulseFlag::GetModuleDimensions(float& width, float& height)
+void PulseDisplayer::GetModuleDimensions(float& width, float& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void PulseFlag::LoadLayout(const ofxJSONElement& moduleInfo)
+void PulseDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
 
    SetUpFromSaveData();
 }
 
-void PulseFlag::SetUpFromSaveData()
+void PulseDisplayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
