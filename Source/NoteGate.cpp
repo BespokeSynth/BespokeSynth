@@ -71,7 +71,7 @@ void NoteGate::CheckboxUpdated(Checkbox* checkbox, double time)
          {
             if (mActiveNotes[pitch].velocity > 0)
             {
-               PlayNoteOutput(NextBufferTime(true, time), pitch, 0, mActiveNotes[pitch].voiceIdx, mActiveNotes[pitch].modulation);
+               PlayNoteOutput(time + gBufferSizeMs, pitch, 0, mActiveNotes[pitch].voiceIdx, mActiveNotes[pitch].modulation);
                mActiveNotes[pitch].velocity = 0;
             }
          }

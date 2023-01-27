@@ -760,12 +760,12 @@ void LoadStateValidate(bool assertion)
       throw LoadStateException();
 }
 
-double NextBufferTime(bool includeLookahead, double time /* = -1 */)
+double NextBufferTime(bool includeLookahead)
 {
-   double nextTime = ((time > 0) ? time : gTime) + gBufferSizeMs;
+   double time = gTime + gBufferSizeMs;
    if (includeLookahead)
-      nextTime += TheTransport->GetEventLookaheadMs();
-   return nextTime;
+      time += TheTransport->GetEventLookaheadMs();
+   return time;
 }
 
 bool IsAudioThread()
