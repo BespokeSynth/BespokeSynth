@@ -324,10 +324,6 @@ void SingleOscillator::UpdateOldControlName(std::string& oldName)
 void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("vol", moduleInfo, .5, mVolSlider);
-   mModuleSaveData.LoadEnum<OscillatorType>("osc", moduleInfo, kOsc_Sin, mOscSelector);
-   mModuleSaveData.LoadFloat("detune", moduleInfo, 0, mDetuneSlider);
-   mModuleSaveData.LoadBool("pressure_envelope", moduleInfo);
    mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
