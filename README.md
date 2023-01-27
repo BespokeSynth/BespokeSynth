@@ -24,10 +24,14 @@ Find searchable, community-written documentation here! https://bespokesynth.gith
 
 ### Features
 * live-patchable environment, so you can build while the music is playing
-* VST hosting
+* VST, VST3, LV2 hosting
 * Python livecoding
-* MIDI controller mapping
+* MIDI & OSC controller mapping
 * Works on Windows, Mac, and Linux
+
+### License
+
+[GNU GPL v3](LICENSE)
 
 ### Releases
 Sign up here to receive an email whenever I put out a new release: http://bespokesynth.substack.com/
