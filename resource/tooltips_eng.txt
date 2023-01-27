@@ -212,6 +212,16 @@ pulsedelayer~delay pulses
 
 
 
+pulseflag~set properties on pulses
+~flag~property to add
+~replace~if disabled, the above flag is appended to the pulse's flags. if enabled, the pulse's flags are replaced by the above flag.
+
+
+
+pulsedisplayer~see what flags are on pulses
+
+
+
 pulsechance~randomly allow pulses through, based on chance
 ~chance~chance that pulses are allowed through
 ~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
