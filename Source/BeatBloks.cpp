@@ -267,7 +267,7 @@ void BeatBloks::FilesDropped(std::vector<std::string> files, int x, int y)
    if (!hasCached) //have to look it up with echonest
    {
       char command[2048];
-      sprintf(command, "export ECHO_NEST_API_KEY=SUZ3W7PAIVQQXZCAW; export PATH=/usr/local/bin:$PATH; python \"%s\" \"%s\"", ofToDataPath("get_echonest_remix_data.py").c_str(), files[0].c_str());
+      snprintf(command, sizeof(command), "export ECHO_NEST_API_KEY=SUZ3W7PAIVQQXZCAW; export PATH=/usr/local/bin:$PATH; python \"%s\" \"%s\"", ofToDataPath("get_echonest_remix_data.py").c_str(), files[0].c_str());
       output = popen(command, "r");
       cachedFile = fopen(ofToDataPath(cachedFilename).c_str(), "w");
    }
