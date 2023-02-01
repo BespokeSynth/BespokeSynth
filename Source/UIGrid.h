@@ -30,7 +30,8 @@
 #include "IUIControl.h"
 #include "SynthGlobals.h"
 
-#define MAX_GRID_SIZE 1024
+#define MAX_GRID_COLS 1024
+#define MAX_GRID_ROWS 128
 
 class UIGrid;
 
@@ -89,8 +90,8 @@ public:
    void SetRequireShiftForMultislider(bool set) { mRequireShiftForMultislider = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
    void SetMomentary(bool momentary) { mMomentary = momentary; }
-   const std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& GetData() const { return mData; }
-   void SetData(std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& data) { mData = data; }
+   const std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS>& GetData() const { return mData; }
+   void SetData(std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS>& data) { mData = data; }
    void SetClickValueSubdivisions(int subdivisions) { mClickSubdivisions = subdivisions; }
    float GetSubdividedValue(float position) const;
    bool GetNoHover() const override { return true; }
@@ -127,7 +128,7 @@ private:
       height = mHeight;
    }
 
-   int GetDataIndex(int col, int row) { return col + row * MAX_GRID_SIZE; }
+   int GetDataIndex(int col, int row) { return col + row * MAX_GRID_COLS; }
    float GetX(int col, int row) const;
    float GetY(int row) const;
    bool CanAdjustMultislider() const;
@@ -147,7 +148,7 @@ private:
    int mHoldCol{ 0 };
    int mHoldRow{ 0 };
    bool mLastClickWasClear{ false };
-   std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE> mData{};
+   std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
    std::array<HighlightColBuffer, 10> mHighlightColBuffer{};
    int mNextHighlightColPointer{ 0 };
    int mMajorCol{ -1 };
@@ -157,7 +158,7 @@ private:
    int mCurrentHover{ -1 };
    float mCurrentHoverAmount{ 1 };
    UIGridListener* mListener{ nullptr };
-   std::array<float, MAX_GRID_SIZE> mDrawOffset{};
+   std::array<float, MAX_GRID_ROWS> mDrawOffset{};
    GridMode mGridMode{ GridMode::kNormal };
    bool mRestrictDragToRow{ false };
    bool mRequireShiftForMultislider{ false };

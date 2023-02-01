@@ -258,7 +258,7 @@ void UIGrid::OnClicked(float x, float y, bool right)
 
          if (mSingleColumn)
          {
-            for (int i = 0; i < MAX_GRID_SIZE; ++i)
+            for (int i = 0; i < MAX_GRID_ROWS; ++i)
             {
                if (mData[GetDataIndex(cell.mCol, i)] != 0)
                   val = mData[GetDataIndex(cell.mCol, i)];
@@ -294,7 +294,7 @@ void UIGrid::OnClicked(float x, float y, bool right)
 
    if (mSingleColumn)
    {
-      for (int i = 0; i < MAX_GRID_SIZE; ++i)
+      for (int i = 0; i < MAX_GRID_ROWS; ++i)
       {
          if (i != cell.mRow)
             mData[GetDataIndex(cell.mCol, i)] = 0;
@@ -382,7 +382,7 @@ bool UIGrid::MouseMoved(float x, float y)
 
          if (mSingleColumn)
          {
-            for (int i = 0; i < MAX_GRID_SIZE; ++i)
+            for (int i = 0; i < MAX_GRID_ROWS; ++i)
             {
                if (mData[GetDataIndex(cell.mCol, i)] != 0)
                   val = mData[GetDataIndex(cell.mCol, i)];
@@ -403,7 +403,7 @@ bool UIGrid::MouseMoved(float x, float y)
 
       if (mSingleColumn)
       {
-         for (int i = 0; i < MAX_GRID_SIZE; ++i)
+         for (int i = 0; i < MAX_GRID_ROWS; ++i)
          {
             if (i != cell.mRow || mLastClickWasClear)
                mData[GetDataIndex(cell.mCol, i)] = 0;
@@ -443,8 +443,8 @@ bool UIGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool 
 
 void UIGrid::SetGrid(int cols, int rows)
 {
-   cols = ofClamp(cols, 0, MAX_GRID_SIZE);
-   rows = ofClamp(rows, 0, MAX_GRID_SIZE);
+   cols = ofClamp(cols, 0, MAX_GRID_COLS);
+   rows = ofClamp(rows, 0, MAX_GRID_ROWS);
    mRows = rows;
    mCols = cols;
 }
@@ -456,15 +456,15 @@ void UIGrid::Clear()
 
 float& UIGrid::GetVal(int col, int row)
 {
-   col = ofClamp(col, 0, MAX_GRID_SIZE - 1);
-   row = ofClamp(row, 0, MAX_GRID_SIZE - 1);
+   col = ofClamp(col, 0, MAX_GRID_COLS - 1);
+   row = ofClamp(row, 0, MAX_GRID_ROWS - 1);
    return mData[GetDataIndex(col, row)];
 }
 
 void UIGrid::SetVal(int col, int row, float val, bool notifyListener)
 {
-   col = ofClamp(col, 0, MAX_GRID_SIZE - 1);
-   row = ofClamp(row, 0, MAX_GRID_SIZE - 1);
+   col = ofClamp(col, 0, MAX_GRID_COLS - 1);
+   row = ofClamp(row, 0, MAX_GRID_ROWS - 1);
    if (val != mData[GetDataIndex(col, row)])
    {
       float oldValue = mData[GetDataIndex(col, row)];
@@ -472,7 +472,7 @@ void UIGrid::SetVal(int col, int row, float val, bool notifyListener)
 
       if (mSingleColumn && val > 0)
       {
-         for (int i = 0; i < MAX_GRID_SIZE; ++i)
+         for (int i = 0; i < MAX_GRID_ROWS; ++i)
          {
             if (i != row)
                mData[GetDataIndex(col, i)] = 0;
@@ -540,16 +540,20 @@ void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
 
-   int cols = MAX_GRID_SIZE;
-   int rows = MAX_GRID_SIZE;
+   int cols;
+   int rows;
 
    if (rev < 1)
    {
       cols = 100;
       rows = 100;
    }
-
-   if (rev >= 2)
+   else if (rev == 1)
+   {
+      cols = 128;
+      rows = 128;
+   }
+   else
    {
       in >> mCols;
       in >> mRows;
