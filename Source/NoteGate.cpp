@@ -51,7 +51,7 @@ void NoteGate::DrawModule()
 
 void NoteGate::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mGate || (velocity == 0 && mActiveNotes[pitch].velocity != 0))
+   if (mGate || (velocity == 0 && mActiveNotes[pitch].velocity > 0))
    {
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 
@@ -71,7 +71,7 @@ void NoteGate::CheckboxUpdated(Checkbox* checkbox, double time)
          {
             if (mActiveNotes[pitch].velocity > 0)
             {
-               PlayNoteOutput(time, pitch, 0, mActiveNotes[pitch].voiceIdx, mActiveNotes[pitch].modulation);
+               PlayNoteOutput(time + gBufferSizeMs, pitch, 0, mActiveNotes[pitch].voiceIdx, mActiveNotes[pitch].modulation);
                mActiveNotes[pitch].velocity = 0;
             }
          }
