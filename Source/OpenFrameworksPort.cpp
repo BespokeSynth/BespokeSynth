@@ -527,17 +527,17 @@ std::string ofGetTimestampString(std::string in)
    Time time = Time::getCurrentTime();
    ofStringReplace(in, "%Y", ofToString(time.getYear()));
    char buff[16];
-   sprintf(buff, "%02d", time.getMonth() + 1);
+   snprintf(buff, sizeof(buff), "%02d", time.getMonth() + 1);
    ofStringReplace(in, "%m", buff);
-   sprintf(buff, "%02d", time.getDayOfMonth());
+   snprintf(buff, sizeof(buff), "%02d", time.getDayOfMonth());
    ofStringReplace(in, "%d", buff);
-   sprintf(buff, "%02d", time.getHours());
+   snprintf(buff, sizeof(buff), "%02d", time.getHours());
    ofStringReplace(in, "%H", buff);
-   sprintf(buff, "%02d", time.getMinutes());
+   snprintf(buff, sizeof(buff), "%02d", time.getMinutes());
    ofStringReplace(in, "%M", buff);
-   sprintf(buff, "%02d", time.getSeconds());
+   snprintf(buff, sizeof(buff), "%02d", time.getSeconds());
    ofStringReplace(in, "%S", buff);
-   sprintf(buff, "%03d", time.getMilliseconds());
+   snprintf(buff, sizeof(buff), "%03d", time.getMilliseconds());
    ofStringReplace(in, "%i", buff);
    return in;
 }

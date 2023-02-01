@@ -11637,8 +11637,8 @@ void DumpUnfreedMemory()
       const AllocInfo* info = element.second;
       if (info && info->allocated)
       {
-         sprintf(buf, "%-90s:  LINE %5d,  ADDRESS %08x  %8d unfreed",
-                 info->file, info->line, info->address, info->size);
+         snprintf(buf, sizeof(buf), "%-90s:  LINE %5d,  ADDRESS %08x  %8d unfreed",
+                  info->file, info->line, info->address, info->size);
          ofLog() << buf;
          totalSize += info->size;
 
@@ -11648,12 +11648,12 @@ void DumpUnfreedMemory()
    ofLog() << "-----------------------------------------------------------";
    for (auto fileInfo : perFileTotal)
    {
-      sprintf(buf, "%-90s:  %10d unfreed",
-              fileInfo.first.c_str(), fileInfo.second);
+      snprintf(buf, sizeof(buf), "%-90s:  %10d unfreed",
+               fileInfo.first.c_str(), fileInfo.second);
       ofLog() << buf;
    }
    ofLog() << "-----------------------------------------------------------";
-   sprintf(buf, "Total Unfreed: %d bytes", totalSize);
+   snprintf(buf, sizeof(buf), "Total Unfreed: %d bytes", totalSize);
    ofLog() << buf;
 };
 
