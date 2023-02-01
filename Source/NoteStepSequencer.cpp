@@ -483,7 +483,7 @@ void NoteStepSequencer::SetStep(int index, int row, int velocity, float length)
 {
    if (index >= 0 && index < NSS_MAX_STEPS)
    {
-      mTones[index] = std::clamp(row, 0, MAX_GRID_SIZE - 1);
+      mTones[index] = std::clamp(row, 0, MAX_GRID_ROWS - 1);
       mVels[index] = ofClamp(velocity, 0, 127);
       mNoteLengths[index] = length;
       SyncGridToSeq();
