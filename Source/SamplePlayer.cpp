@@ -676,6 +676,10 @@ void SamplePlayer::OnYoutubeDownloadComplete(std::string filename, std::string t
       UpdateSample(new Sample(), true);
       mErrorString = "couldn't download sample. do you have youtube-dl and ffmpeg installed,\nwith their paths set in userprefs.json?";
    }
+
+   auto file = juce::File(ofToDataPath(filename));
+   if (file.existsAsFile())
+      file.deleteFile();
 }
 
 void SamplePlayer::RunProcess(const StringArray& args)
