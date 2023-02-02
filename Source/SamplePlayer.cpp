@@ -624,14 +624,14 @@ void SamplePlayer::DownloadYoutube(std::string url, std::string title)
    if (mSample)
       mSample->SetPlayPosition(0);
 
-   const char* tempDownloadName = "youtube.m4a";
+   auto tempDownloadName = ofToString(this) + "_youtube.m4a";
    {
       auto file = juce::File(ofToDataPath(tempDownloadName));
       if (file.existsAsFile())
          file.deleteFile();
    }
 
-   const char* tempConvertedName = "youtube.wav";
+   auto tempConvertedName = ofToString(this) + "_youtube.wav";
    {
       auto file = juce::File(ofToDataPath(tempConvertedName));
       if (file.existsAsFile())
@@ -676,6 +676,10 @@ void SamplePlayer::OnYoutubeDownloadComplete(std::string filename, std::string t
       UpdateSample(new Sample(), true);
       mErrorString = "couldn't download sample. do you have youtube-dl and ffmpeg installed,\nwith their paths set in userprefs.json?";
    }
+
+   auto file = juce::File(ofToDataPath(filename));
+   if (file.existsAsFile())
+      file.deleteFile();
 }
 
 void SamplePlayer::RunProcess(const StringArray& args)
