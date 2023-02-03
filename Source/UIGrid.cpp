@@ -132,13 +132,37 @@ void UIGrid::Render()
          ofRect(GetX(i, j), GetY(j), xsize, ysize);
    }
    ofNoFill();
-   ofSetColor(255, 200, 100, gModuleDrawAlpha);
-   for (int j = 0; j < mRows; ++j)
+   if (mMajorCol > 0)
    {
-      for (int i = 0; i < mCols; ++i)
+      ofSetColor(255, 200, 100, gModuleDrawAlpha);
+      for (int j = 0; j < mRows; ++j)
       {
-         if (mMajorCol > 0 && i % mMajorCol == 0)
+         for (int i = 0; i < mCols; i += mMajorCol)
+         {
             ofRect(GetX(i, j), GetY(j), xsize, ysize);
+         }
+      }
+      if (mCols > mMajorCol * mMajorCol)
+      {
+         ofSetColor(255, 255, 100, gModuleDrawAlpha);
+         for (int j = 0; j < mRows; ++j)
+         {
+            for (int i = 0; i < mCols; i += mMajorCol * mMajorCol)
+            {
+               ofRect(GetX(i, j), GetY(j), xsize, ysize);
+            }
+         }
+         if (mCols > mMajorCol * mMajorCol * mMajorCol)
+         {
+            ofSetColor(255, 255, 200, gModuleDrawAlpha);
+            for (int j = 0; j < mRows; ++j)
+            {
+               for (int i = 0; i < mCols; i += mMajorCol * mMajorCol * mMajorCol)
+               {
+                  ofRect(GetX(i, j), GetY(j), xsize, ysize);
+               }
+            }
+         }
       }
    }
    if (GetHighlightCol(gTime) != -1)
