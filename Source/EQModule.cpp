@@ -72,7 +72,7 @@ void EQModule::CreateUIControls()
 
       CHECKBOX(filter.mEnabledCheckbox, ("enabled" + ofToString(i)).c_str(), &filter.mEnabled);
       DROPDOWN(filter.mTypeSelector, ("type" + ofToString(i)).c_str(), (int*)(&filter.mFilter[0].mType), 45);
-      FLOATSLIDER(filter.mFSlider, ("f" + ofToString(i)).c_str(), &filter.mFilter[0].mF, 0, 10000);
+      FLOATSLIDER(filter.mFSlider, ("f" + ofToString(i)).c_str(), &filter.mFilter[0].mF, 20, 20000);
       FLOATSLIDER(filter.mGSlider, ("g" + ofToString(i)).c_str(), &filter.mFilter[0].mDbGain, -15, 15);
       FLOATSLIDER_DIGITS(filter.mQSlider, ("q" + ofToString(i)).c_str(), &filter.mFilter[0].mQ, .1f, 18, 3);
       UIBLOCK_NEWCOLUMN();
@@ -370,8 +370,10 @@ bool EQModule::MouseMoved(float x, float y)
    {
       if (mHoveredFilterHandleIndex != -1)
       {
-         mFilters[mHoveredFilterHandleIndex].mFSlider->SetValue(FreqForPos(x / w), NextBufferTime(false));
-         mFilters[mHoveredFilterHandleIndex].mGSlider->SetValue(GainForPos((y - kDrawYOffset) / h), NextBufferTime(false));
+         auto* fSlider = mFilters[mHoveredFilterHandleIndex].mFSlider;
+         auto* gSlider = mFilters[mHoveredFilterHandleIndex].mGSlider;
+         fSlider->SetValue(ofClamp(FreqForPos(x / w), fSlider->GetMin(), fSlider->GetMax()), NextBufferTime(false));
+         gSlider->SetValue(ofClamp(GainForPos((y - kDrawYOffset) / h), gSlider->GetMin(), gSlider->GetMax()), NextBufferTime(false));
       }
    }
    else
@@ -429,6 +431,12 @@ void EQModule::CheckboxUpdated(Checkbox* checkbox, double time)
          mNeedToUpdateFrequencyResponseGraph = true;
       }
    }
+}
+
+void EQModule::GetModuleDimensions(float& w, float& h)
+{
+   w = MAX(208, mWidth);
+   h = MAX(150, mHeight);
 }
 
 void EQModule::Resize(float w, float h)
