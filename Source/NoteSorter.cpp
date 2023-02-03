@@ -34,27 +34,12 @@
 
 NoteSorter::NoteSorter()
 {
-   for (int i = 0; i < kMaxDestinations; ++i)
-      mPitch[i] = -1;
+   std::fill(mPitch.begin(), mPitch.end(), -1);
 }
 
 void NoteSorter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-
-   UIBLOCK0();
-   for (int i = 0; i < kMaxDestinations; ++i)
-   {
-      TEXTENTRY_NUM(mPitchEntry[i], ("pitch " + ofToString(i)).c_str(), 4, &mPitch[i], -1, 127);
-      mDestinationCables[i] = new AdditionalNoteCable();
-      mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
-      AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
-      ofRectangle rect = mPitchEntry[i]->GetRect(true);
-      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
-   }
-   ENDUIBLOCK(mWidth, mHeight);
-   mWidth += 20;
 }
 
 void NoteSorter::DrawModule()
@@ -62,15 +47,19 @@ void NoteSorter::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   for (int i = 0; i < kMaxDestinations; ++i)
+   for (int i = 0; i < (int)mDestinationCables.size(); ++i)
+   {
       mPitchEntry[i]->Draw();
+      ofRectangle rect = mPitchEntry[i]->GetRect(true);
+      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 15, rect.y + rect.height / 2);
+   }
 }
 
 void NoteSorter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    bool foundPitch = false;
 
-   for (int i = 0; i < kMaxDestinations; ++i)
+   for (int i = 0; i < mDestinationCables.size(); ++i)
    {
       if (pitch == mPitch[i])
       {
@@ -90,20 +79,52 @@ void NoteSorter::SendCC(int control, int value, int voiceIdx)
 
 void NoteSorter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadInt("num_items", moduleInfo, 5, 1, 99, K(isTextField));
    SetUpFromSaveData();
 }
 
 void NoteSorter::TextEntryComplete(TextEntry* entry)
 {
    mNoteOutput.Flush(NextBufferTime(false));
-   for (int i = 0; i < kMaxDestinations; ++i)
+   for (int i = 0; i < mDestinationCables.size(); ++i)
       mDestinationCables[i]->Flush(NextBufferTime(false));
+}
+
+void NoteSorter::GetModuleDimensions(float& width, float& height)
+{
+   width = 80;
+   height = 12 + (mDestinationCables.size() * 19);
 }
 
 void NoteSorter::SetUpFromSaveData()
 {
+   int numItems = mModuleSaveData.GetInt("num_items");
+   int oldNumItems = (int)mDestinationCables.size();
+   if (numItems > oldNumItems)
+   {
+      for (int i = oldNumItems; i < numItems; ++i)
+      {
+         mPitchEntry.push_back(new TextEntry(this, ("pitch " + ofToString(i)).c_str(), 8, 8 + i * 19, 5, &mPitch[i], -1, 127));
+         auto* additionalCable = new AdditionalNoteCable();
+
+         additionalCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+         AddPatchCableSource(additionalCable->GetPatchCableSource());
+         mDestinationCables.push_back(additionalCable);
+      }
+   }
+   else if (numItems < oldNumItems)
+   {
+      for (int i = oldNumItems - 1; i >= numItems; --i)
+      {
+         RemoveUIControl(mPitchEntry[i]);
+         RemovePatchCableSource(mDestinationCables[i]->GetPatchCableSource());
+      }
+      mPitchEntry.resize(numItems);
+      mDestinationCables.resize(numItems);
+   }
 }
 
 void NoteSorter::SaveLayout(ofxJSONElement& moduleInfo)
 {
+   moduleInfo["num_items"] = (int)mDestinationCables.size();
 }
