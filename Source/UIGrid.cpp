@@ -144,7 +144,7 @@ void UIGrid::Render()
       }
       if (mCols > mMajorCol * mMajorCol)
       {
-         ofSetColor(200, 255, 100, gModuleDrawAlpha);
+         ofSetColor(255, 255, 100, gModuleDrawAlpha);
          for (int j = 0; j < mRows; ++j)
          {
             for (int i = 0; i < mCols; i += mMajorCol * mMajorCol)
@@ -154,7 +154,7 @@ void UIGrid::Render()
          }
          if (mCols > mMajorCol * mMajorCol * mMajorCol)
          {
-            ofSetColor(200, 100, 255, gModuleDrawAlpha);
+            ofSetColor(255, 255, 200, gModuleDrawAlpha);
             for (int j = 0; j < mRows; ++j)
             {
                for (int i = 0; i < mCols; i += mMajorCol * mMajorCol * mMajorCol)
