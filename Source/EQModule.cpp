@@ -370,8 +370,10 @@ bool EQModule::MouseMoved(float x, float y)
    {
       if (mHoveredFilterHandleIndex != -1)
       {
-         mFilters[mHoveredFilterHandleIndex].mFSlider->SetValue(ofClamp(FreqForPos(x / w), 20, 20000), NextBufferTime(false));
-         mFilters[mHoveredFilterHandleIndex].mGSlider->SetValue(ofClamp(GainForPos((y - kDrawYOffset) / h), -15, 15), NextBufferTime(false));
+         auto* fSlider = mFilters[mHoveredFilterHandleIndex].mFSlider;
+         auto* gSlider = mFilters[mHoveredFilterHandleIndex].mGSlider;
+         fSlider->SetValue(ofClamp(FreqForPos(x / w), fSlider->GetMin(), fSlider->GetMax()), NextBufferTime(false));
+         gSlider->SetValue(ofClamp(GainForPos((y - kDrawYOffset) / h), gSlider->GetMin(), gSlider->GetMax()), NextBufferTime(false));
       }
    }
    else
