@@ -79,6 +79,8 @@ public:
    virtual void Halve() {}
    virtual void ResetToOriginal() {}
    virtual void Increment(float amount) {}
+   void SetCableTargetable(bool targetable) { mCableTargetable = targetable; }
+   bool GetCableTargetable() const { return mCableTargetable; }
    void SetNoHover(bool noHover) { mNoHover = noHover; }
    virtual bool GetNoHover() const { return mNoHover; }
    virtual bool AttemptTextInput() { return false; }
@@ -106,6 +108,7 @@ protected:
    virtual ~IUIControl();
 
    int mRemoteControlCount{ 0 };
+   bool mCableTargetable{ true };
    bool mNoHover{ false };
    bool mShouldSaveState{ true };
 

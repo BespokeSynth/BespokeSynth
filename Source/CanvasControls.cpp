@@ -53,6 +53,13 @@ void CanvasControls::CreateUIControls()
 
    mNumVisibleRowsEntry->DrawLabel(true);
 
+   // Block modulator cables from connecting to these controls.
+   mRemoveElementButton->SetCableTargetable(false);
+   mNumVisibleRowsEntry->SetCableTargetable(false);
+   mClearButton->SetCableTargetable(false);
+   mDragModeSelector->SetCableTargetable(false);
+   mNumVisibleRowsEntry->SetCableTargetable(false);
+
    SetElement(nullptr);
 }
 
