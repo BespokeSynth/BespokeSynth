@@ -180,6 +180,7 @@ private:
    std::vector<DropdownListElement> mElements{};
    int* mVar;
    DropdownListModal mModalList;
+   bool mDropdownIsOpen{ false };
    IDropdownListener* mOwner{ nullptr };
    std::string mUnknownItemString{ "-----" };
    bool mDrawLabel{ false };

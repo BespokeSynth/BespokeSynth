@@ -149,6 +149,8 @@ void DropdownList::Poll()
 {
    if (*mVar != mLastSetValue)
       CalcSliderVal();
+
+   mDropdownIsOpen = (TheSynth->GetTopModalFocusItem() == &mModalList);
 }
 
 void DropdownList::Render()
@@ -359,7 +361,7 @@ namespace
 
 void DropdownList::OnClicked(float x, float y, bool right)
 {
-   if (right)
+   if (right || mDropdownIsOpen)
       return;
 
    mOwner->DropdownClicked(this);
