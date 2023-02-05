@@ -340,7 +340,7 @@ void PatchCableSource::Render()
             ofPushStyle();
             ofNoFill();
             ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other));
-            GridControlTarget::DrawGridIcon(mX + 7, mY - 6);
+            GridControlTarget::DrawGridIcon(cableX + 7, cableY - 6);
             ofPopStyle();
          }
       }
