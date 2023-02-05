@@ -122,7 +122,7 @@ private:
    bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 235 };
-   float mHeight{ 125 };
+   float mHeight{ 126 };
    RollingBuffer mRecordBuffer;
    std::vector<Looper*> mLoopers;
    int mNumBars{ 1 };
@@ -158,6 +158,8 @@ private:
    ClickButton* mCommit8BarsButton{ nullptr };
    IntSlider* mNextCommitTargetSlider{ nullptr };
    int mNextCommitTargetIndex{ 0 };
+   Checkbox* mAutoAdvanceThroughLoopersCheckbox{ nullptr };
+   bool mAutoAdvanceThroughLoopers{ true };
 
    bool mFreeRecording{ false };
    Checkbox* mFreeRecordingCheckbox{ nullptr };

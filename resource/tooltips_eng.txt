@@ -843,6 +843,7 @@ looperrecorder~command center to manage recording into multiple loopers, and all
 ~2xtempo~double global transport tempo, while keeping connected loopers sounding the same
 ~.5tempo~halve global transport tempo, while keeping connected loopers sounding the same
 ~target~looper to commit audio to when using the on-buffer capture buttons to the left
+~auto-advance~automatically advance to the next looper when committing
 ~mode~recorder mode: use "record" to record input and allow it to be committed to buffers when you're ready to loop, use "overdub" to record input and play the loop at our specified length, and use "loop" to play the current loop without adding input
 ~clear~clear the recorded buffer
 ~free rec~enable to start recording a loop with no predetermined length. disable to end recording, adjust global transport to match the loop length, and switch the recorder's mode to "loop"
@@ -872,7 +873,7 @@ looper~loop input audio. use with a "looperrecorder" for full functionality.
 ~.5x~make loop play at half speed
 ~undo~undo last loop commit
 ~offset~amount to offset looper's playhead from transport position
-~set~shift the contents of the looper so the current offset is the start of the buffer
+~apply~shift the contents of the looper so the current offset is the start of the buffer
 ~scrspd~playback speed, used with "scr" is enabled. modulate quickly for a vinyl-like scratching effect.
 ~scr~allow loop to be scratched by adjusting "scrspd"
 ~fourtet~use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this "fourtetified" audio.
