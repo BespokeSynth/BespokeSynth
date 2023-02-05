@@ -130,7 +130,19 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button, double time)
 
    if (button == mBounceButton)
    {
-      std::string filenamePrefix = ofGetTimestampString(UserPrefs.recordings_path.Get() + "multitrack_%Y-%m-%d_%H-%M_");
+      std::string save_prefix = "multitrack_";
+      if (!TheSynth->GetLastSavePath().empty())
+      {
+         // This assumes that mCurrentSaveStatePath always has a valid filename at the end
+         std::string filename = juce::File(TheSynth->GetLastSavePath()).getFileNameWithoutExtension().toStdString();
+         save_prefix = filename + "_";
+         // Crude way of checking if the filename does not have a date/time in it.
+         if (std::count(save_prefix.begin(), save_prefix.end(), '-') < 3)
+         {
+            save_prefix += "%Y-%m-%d_%H-%M_";
+         }
+      }
+      std::string filenamePrefix = ofGetTimestampString(UserPrefs.recordings_path.Get() + save_prefix);
 
       int numFiles = 0;
       for (int i = 0; i < (int)mTracks.size(); ++i)
