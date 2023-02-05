@@ -262,7 +262,7 @@ void CanvasElement::AddElementUIControl(IUIControl* control)
 {
    mUIControls.push_back(control);
    // Block modulation cables from targeting these controls.
-   control->SetNoCableTarget(true);
+   control->SetCableTargetable(false);
    control->SetShowing(false);
 }
 
