@@ -82,7 +82,7 @@ void Looper::CreateUIControls()
    mHalveSpeedButton = new ClickButton(this, ".5x", 147, 43);
    mUndoButton = new ClickButton(this, "undo", -1, -1);
    mLoopPosOffsetSlider = new FloatSlider(this, "offset", -1, -1, 130, 15, &mLoopPosOffset, 0, mLoopLength);
-   mWriteOffsetButton = new ClickButton(this, "set", -1, -1);
+   mWriteOffsetButton = new ClickButton(this, "apply", -1, -1);
    mScratchSpeedSlider = new FloatSlider(this, "scrspd", -1, -1, 130, 15, &mScratchSpeed, -2, 2);
    mAllowScratchCheckbox = new Checkbox(this, "scr", -1, -1, &mAllowScratch);
    mFourTetSlider = new FloatSlider(this, "fourtet", 4, 65, 65, 15, &mFourTet, 0, 1, 1);
@@ -1210,29 +1210,12 @@ void Looper::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modula
    //jump around in loop
    if (velocity > 0)
    {
-      int chop = pitch - 36;
-      if (chop == 3)
-      {
-         mLoopPosOffset = 0;
-         mLoopPosOffsetSlider->DisableLFO();
-      }
-      if (chop >= 9 && chop < 16 && chop % 2 == 1)
-      {
-         mChopMeasure = (chop / 2 - 4) % mNumBars;
-         float sampsPerBar = TheTransport->MsPerBar() / 1000.0f * gSampleRate;
-         mLoopPosOffset = -mLoopPos + mChopMeasure * sampsPerBar;
-         mLoopPosOffsetSlider->DisableLFO();
-      }
-      if (chop >= 0 && chop < 16 && chop % 2 == 0)
-      {
-         int slice = chop / 2;
-         float measurePos = slice / 8.0f;
-         float sampsPerBar = TheTransport->MsPerBar() / 1000.0f * gSampleRate;
-         mLoopPosOffset = -mLoopPos + (mChopMeasure + measurePos) * sampsPerBar;
-         if (mLoopPosOffset < 0)
-            mLoopPosOffset += mLoopLength;
-         mLoopPosOffsetSlider->DisableLFO();
-      }
+      float measurePos = fmod(pitch / 16.0f, mNumBars);
+      float sampsPerBar = TheTransport->MsPerBar() / 1000.0f * gSampleRate;
+      mLoopPosOffset = (measurePos - fmod(TheTransport->GetMeasureTime(time), mNumBars)) * sampsPerBar;
+      if (mLoopPosOffset < 0)
+         mLoopPosOffset += mLoopLength;
+      mLoopPosOffsetSlider->DisableLFO();
    }
 }
 

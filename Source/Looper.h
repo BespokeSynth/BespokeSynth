@@ -189,9 +189,6 @@ private:
    bool mReplaceOnCommit{ false };
    float mLoopPosOffset{ 0 };
    FloatSlider* mLoopPosOffsetSlider{ nullptr };
-   bool mAllowChop{ false };
-   Checkbox* mAllowChopCheckbox{ nullptr };
-   int mChopMeasure{ 0 };
    ClickButton* mWriteOffsetButton{ nullptr };
    float mScratchSpeed{ 1 };
    bool mAllowScratch{ false };

@@ -55,7 +55,7 @@ public:
    //IDrawableModule
    void Init() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h);
+   void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IClickable

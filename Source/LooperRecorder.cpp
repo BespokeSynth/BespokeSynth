@@ -68,7 +68,9 @@ void LooperRecorder::CreateUIControls()
    //BUTTON(mShiftMeasureButton, "shift"); UIBLOCK_SHIFTUP(); UIBLOCK_SHIFTX(30);
    //BUTTON(mHalfShiftButton, "half"); UIBLOCK_NEWLINE();
    //BUTTON(mShiftDownbeatButton, "downbeat");
+   UIBLOCK_SHIFTDOWN();
    INTSLIDER(mNextCommitTargetSlider, "target", &mNextCommitTargetIndex, 0, 3);
+   CHECKBOX(mAutoAdvanceThroughLoopersCheckbox, "auto-advance", &mAutoAdvanceThroughLoopers);
    UIBLOCK_NEWCOLUMN();
    UIBLOCK_PUSHSLIDERWIDTH(80);
    DROPDOWN(mModeSelector, "mode", ((int*)(&mRecorderMode)), 60);
@@ -245,7 +247,7 @@ void LooperRecorder::SyncCablesToLoopers()
          if (i < mLoopers.size())
             looper = mLoopers[i];
          mLooperPatchCables[i]->SetTarget(looper);
-         mLooperPatchCables[i]->SetManualPosition(160 + i * 12, 117);
+         mLooperPatchCables[i]->SetManualPosition(160 + i * 12, 120);
          mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
          ofColor color = mLooperPatchCables[i]->GetColor();
          color.a *= .3f;
@@ -320,6 +322,7 @@ void LooperRecorder::DrawModule()
    mFreeRecordingCheckbox->Draw();
    mCancelFreeRecordButton->Draw();
    mNextCommitTargetSlider->Draw();
+   mAutoAdvanceThroughLoopersCheckbox->Draw();
 
    if (mSpeed != 1)
    {
@@ -391,7 +394,16 @@ void LooperRecorder::DrawModule()
    if (mDrawDebug)
       mRecordBuffer.Draw(0, 162, 800, 100);
 
-   DrawTextNormal("loopers:", 155, 109);
+   DrawTextNormal("loopers:", 155, 112);
+   if (mNextCommitTargetIndex < (int)mLooperPatchCables.size())
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255);
+      ofVec2f cablePos = mLooperPatchCables[mNextCommitTargetIndex]->GetPosition();
+      cablePos -= GetPosition();
+      ofCircle(cablePos.x, cablePos.y, 5);
+      ofPopStyle();
+   }
 }
 
 void LooperRecorder::RemoveLooper(Looper* looper)
@@ -704,11 +716,14 @@ void LooperRecorder::ButtonClicked(ClickButton* button, double time)
       mNumBars = numBars;
       if (mNextCommitTargetIndex < (int)mLoopers.size())
          Commit(mLoopers[mNextCommitTargetIndex]);
-      for (int i = 0; i < (int)mLoopers.size(); ++i)
+      if (mAutoAdvanceThroughLoopers)
       {
-         mNextCommitTargetIndex = (mNextCommitTargetIndex + 1) % mLoopers.size();
-         if (mLoopers[mNextCommitTargetIndex] != nullptr)
-            break;
+         for (int i = 0; i < (int)mLoopers.size(); ++i)
+         {
+            mNextCommitTargetIndex = (mNextCommitTargetIndex + 1) % mLoopers.size();
+            if (mLoopers[mNextCommitTargetIndex] != nullptr)
+               break;
+         }
       }
    }
 }
