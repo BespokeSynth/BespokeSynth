@@ -375,6 +375,7 @@ void ControlSequencer::SaveState(FileStreamOut& out)
    mGrid->SaveState(out);
    out << mGrid->GetWidth();
    out << mGrid->GetHeight();
+   out << mHasExternalPulseSource;
 }
 
 void ControlSequencer::LoadState(FileStreamIn& in, int rev)
@@ -446,6 +447,9 @@ void ControlSequencer::LoadState(FileStreamIn& in, int rev)
       mSliderMode = false;
       mModuleSaveData.SetBool("slider_mode", false);
    }
+
+   if (rev >= 3)
+      in >> mHasExternalPulseSource;
 }
 
 bool ControlSequencer::LoadOldControl(FileStreamIn& in, std::string& oldName)
