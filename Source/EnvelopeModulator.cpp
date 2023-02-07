@@ -32,6 +32,7 @@
 
 EnvelopeModulator::EnvelopeModulator()
 {
+   mAdsr.GetFreeReleaseLevel() = true;
 }
 
 void EnvelopeModulator::CreateUIControls()

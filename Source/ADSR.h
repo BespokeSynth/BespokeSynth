@@ -115,6 +115,7 @@ public:
    float& GetMaxSustain() { return mMaxSustain; }
    int& GetSustainStage() { return mSustainStage; }
    bool& GetHasSustainStage() { return mHasSustainStage; }
+   bool& GetFreeReleaseLevel() { return mFreeReleaseLevel; }
 
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
@@ -131,5 +132,6 @@ private:
    Stage mStages[MAX_ADSR_STAGES];
    int mNumStages{ 0 };
    bool mHasSustainStage{ false };
+   bool mFreeReleaseLevel{ false };
    float mTimeScale{ 1 };
 };
