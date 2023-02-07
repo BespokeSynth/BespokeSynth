@@ -322,7 +322,7 @@ void EnvelopeControl::MouseMoved(float x, float y)
             mAdsr->GetStageData(mHighlightPoint + 1).time = mClickAdsr.GetStageData(mHighlightPoint + 1).time - timeAdjustment;
          }
 
-         if (mHighlightPoint < mAdsr->GetNumStages() - 1)
+         if (mHighlightPoint < mAdsr->GetNumStages() - 1 || mAdsr->GetFreeReleaseLevel())
             stage.target = ofClamp(originalStage.target + ((mClickStart.y - y) / mDimensions.y), 0, 1);
          else
             stage.target = 0;
@@ -405,6 +405,7 @@ void EnvelopeEditor::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mPinButton, "pin");
    UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mFreeReleaseLevelCheckbox, "free release", &dummyBool);
    ENDUIBLOCK0();
 
    UIBLOCK(3, mHeight - 70);
@@ -437,6 +438,7 @@ void EnvelopeEditor::SetADSRDisplay(ADSRDisplay* adsrDisplay)
    mADSRDisplay = adsrDisplay;
    mADSRViewLengthSlider->SetVar(&adsrDisplay->GetMaxTime());
    mMaxSustainSlider->SetVar(&adsrDisplay->GetADSR()->GetMaxSustain());
+   mFreeReleaseLevelCheckbox->SetVar(&adsrDisplay->GetADSR()->GetFreeReleaseLevel());
 
    for (int i = 0; i < (int)mStageControls.size(); ++i)
    {
@@ -478,6 +480,7 @@ void EnvelopeEditor::DrawModule()
 
    mADSRViewLengthSlider->Draw();
    mMaxSustainSlider->Draw();
+   mFreeReleaseLevelCheckbox->Draw();
    if (!mPinned)
       mPinButton->Draw();
 
@@ -502,6 +505,10 @@ void EnvelopeEditor::DrawModule()
          mStageControls[i].mCurveSlider->Draw();
          mStageControls[i].mSustainCheckbox->Draw();
       }
+
+      //move release level checkbox below final stage control
+      ofVec2f pos = mStageControls[numStages - 1].mSustainCheckbox->GetPosition(K(local));
+      mFreeReleaseLevelCheckbox->SetPosition(pos.x, pos.y);
    }
 }
 
