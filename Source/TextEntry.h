@@ -121,6 +121,7 @@ private:
    void AcceptEntry(bool pressedEnter) override;
    void CancelEntry() override;
    void MoveCaret(int pos, bool allowSelection = true);
+   void SelectAll();
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 

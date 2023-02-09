@@ -241,8 +241,7 @@ void TextEntry::OnClicked(float x, float y, bool right)
 
    if (sKeyboardFocusBeforeClick != this)
    {
-      mCaretPosition = 0;
-      mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+      SelectAll();
    }
    else
    {
@@ -296,6 +295,11 @@ void TextEntry::RemoveSelectedText()
    MoveCaret(caretStart, false);
 }
 
+void TextEntry::SelectAll()
+{
+   mCaretPosition = 0;
+   mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+}
 
 void TextEntry::OnKeyPressed(int key, bool isRepeat)
 {
@@ -316,7 +320,10 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
 
       if (pendingNewEntry)
+      {
          pendingNewEntry->MakeActiveTextEntry(true);
+         pendingNewEntry->SelectAll();
+      }
    }
    else if (key == juce::KeyPress::backspaceKey)
    {
@@ -436,9 +443,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (toupper(key) == 'A' && GetKeyModifiers() == kModifier_Command)
    {
-      int len = (int)strlen(mString);
-      mCaretPosition = 0;
-      mCaretPosition2 = len;
+      SelectAll();
    }
    else if (key == juce::KeyPress::homeKey)
    {
