@@ -36,6 +36,12 @@ bool Prefab::sLoadingPrefab = false;
 bool Prefab::sLastLoadWasPrefab = false;
 IDrawableModule* Prefab::sJustReleasedModule = nullptr;
 
+namespace
+{
+   const float paddingX = 10;
+   const float paddingY = 10;
+}
+
 Prefab::Prefab()
 {
    mModuleContainer.SetOwner(this);
@@ -71,7 +77,7 @@ void Prefab::Poll()
    GetPosition(xMin, yMin);
    for (auto* module : mModuleContainer.GetModules())
    {
-      xMin = MIN(xMin, module->GetPosition().x);
+      xMin = MIN(xMin, module->GetPosition().x - paddingX);
       yMin = MIN(yMin, module->GetPosition().y - 30);
    }
 
@@ -145,12 +151,6 @@ void Prefab::MouseReleased()
             mModuleContainer.TakeModule(module);
       }
    }
-}
-
-namespace
-{
-   const float paddingX = 10;
-   const float paddingY = 10;
 }
 
 void Prefab::DrawModule()

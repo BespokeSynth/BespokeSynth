@@ -86,6 +86,7 @@ void Pumper::ProcessAudio(double time, ChannelBuffer* buffer)
    double intervalPos = GetIntervalPos(time);
 
    ADSR::EventInfo adsrEvent(0, kAdsrTime);
+   adsrEvent.mStartBlendFromValue = 1;
 
    /*const float smoothingTimeMs = 35;
    float smoothingOffset = smoothingTimeMs / TheTransport->GetDuration(mInterval);
@@ -127,6 +128,7 @@ void Pumper::DrawModule()
    ofSetColor(245, 58, 135);
    ofBeginShape();
    ADSR::EventInfo adsrEvent(0, kAdsrTime);
+   adsrEvent.mStartBlendFromValue = 1;
    for (int i = 0; i < mWidth; i++)
    {
       float x = i;

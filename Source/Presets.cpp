@@ -231,7 +231,7 @@ bool Presets::MouseMoved(float x, float y)
 
 void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (pitch < (int)mPresetCollection.size())
+   if (velocity > 0 && pitch < (int)mPresetCollection.size())
    {
       mCurrentPreset = pitch;
       SetPreset(pitch, time);

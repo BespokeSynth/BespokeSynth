@@ -985,7 +985,7 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
    mCycleDisplayTypeButton = new ClickButton(owner, "type", -1, -1);
    mColorSelector = new DropdownList(owner, ("color" + ofToString(mId)).c_str(), -1, -1, &mColorIndex, 25);
 
-   // Block modulation cab;es from connecting to these controls as it behaves wrong (and saves incorrectly) except for the color button, that one is fun and works.
+   // Block modulation cables from connecting to these controls as it behaves wrong (and saves incorrectly) except for the color button, that one is fun and works.
    mMoveLeftButton->SetCableTargetable(false);
    mMoveRightButton->SetCableTargetable(false);
    mCycleDisplayTypeButton->SetCableTargetable(false);
