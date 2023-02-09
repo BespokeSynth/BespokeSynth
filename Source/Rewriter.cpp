@@ -49,7 +49,7 @@ void Rewriter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   BUTTON(mRewriteButton, " go ");
+   BUTTON(mRewriteButton, "go");
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mStartRecordTimeButton, "new loop");
    ENDUIBLOCK(mWidth, mHeight);

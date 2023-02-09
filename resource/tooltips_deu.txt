@@ -772,7 +772,7 @@ multitapdelay~Delay mit mehreren tap points
 
 
 looperrewriter~Schreibt den Inhalt eines Loopers mit dem empfangenen Input neu, damit Sie Ihre eigenen Loops neu sampeln können. Der graue Punkt wird an ein "looper"-Modul angeschlossen.\n\ Idealerweise wird dieses Modul direkt an einen "send" angeschlossen, der linke Ausgang des "send" wird mit der Effektverarbeitung verbunden (z. B. mit einer "effectchain"), die Effektverarbeitung wird mit diesem "rewriter" verbunden und der rechte Ausgang des "sends" wird ebenfalls mit diesem "rewriter" verbunden.
-~ go ~Den angeschlossenen Looper umschreiben, und wenn dieser Looper mit einem Send verbunden ist, diesen Send so einstellen, dass er nur am rechten Ausgang ausgegeben wird
+~go~Den angeschlossenen Looper umschreiben, und wenn dieser Looper mit einem Send verbunden ist, diesen Send so einstellen, dass er nur am rechten Ausgang ausgegeben wird
 ~new loop~Beginnen Sie mit der Aufnahme einer dynamischen Looplänge. Drücken Sie "go", wenn Sie diese in den Looper schreiben wollen. Dies ändert auch das globale Tempo von bespoke, um es an den neuen Loop anzupassen. es ist also ziemlich mächtig und beängstigend! klicken Sie erneut, um abzubrechen.
 
 
