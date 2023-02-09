@@ -323,7 +323,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
-   if ((Enabled() || groupSelected) && mShouldDrawOutline)
+   if ((Enabled() || groupSelected || TheSynth->GetMoveModule() == this) && mShouldDrawOutline)
    {
       ofPushStyle();
       ofNoFill();
@@ -333,6 +333,11 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2f, 1);
          ofSetColor(ofLerp(color.r, 255, pulse), ofLerp(color.g, 255, pulse), ofLerp(color.b, 255, pulse), 255);
          ofSetLineWidth(1.5f);
+      }
+      else if (TheSynth->GetMoveModule() == this)
+      {
+         ofSetColor(255, 255, 255);
+         ofSetLineWidth(.5f);
       }
       else
       {
