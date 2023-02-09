@@ -1537,18 +1537,25 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
       for (auto cable : mPatchCables)
       {
-         if (clickedModule &&
-             (cable->GetTarget() == nullptr || clickedModule != cable->GetTarget()->GetModuleParent()) &&
-             (clickedModule == GetTopModalFocusItem() ||
-              clickedModule->AlwaysOnTop() ||
-              mModuleContainer.IsHigherThan(clickedModule, cable->GetOwningModule())))
+         bool checkCable = true;
+         if (clickedModule != nullptr) //if we clicked on a module
          {
+            IDrawableModule* targetedModule = (cable->GetTarget() != nullptr) ? cable->GetTarget()->GetModuleParent() : nullptr;
+            if (targetedModule == nullptr || (clickedModule != targetedModule && clickedModule != targetedModule->GetParent())) //and it's not the module the cable is connected to, or its parent
+            {
+               if (clickedModule == GetTopModalFocusItem() || clickedModule->AlwaysOnTop() || //and the module is sorted above the source of the cable
+                   mModuleContainer.IsHigherThan(clickedModule, cable->GetOwningModule()))
+               {
+                  checkCable = false; //don't test this cable
+               }
+            }
          }
-         else
-         {
-            if (cable->TestClick(x, y, rightButton))
-               return;
-         }
+
+         bool cableClicked = false;
+         if (checkCable)
+            cableClicked = cable->TestClick(x, y, rightButton);
+         if (cableClicked)
+            return;
       }
 
       mClickStartX = x;
