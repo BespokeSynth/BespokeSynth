@@ -772,7 +772,7 @@ multitapdelay~birden fazla efekt noktasında gecikme
 
 
 looperrewriter~alınan girişle looper’daki kayıtları yeniden yazarak kendi loop’larınızı resample’lamanıza yardımcı olur. "looper" modülüne gri noktayı bağlayın.\n\n "looper" modülünü doğrudan "send” çıkışına bağlanması, "send" ayarının en solundaki çıkışın aktif efektlerinize ("effectchain” gibi) bağlanması, bu "rewriter” modülüne aktif efektin bağlanması ve ardından "send" ayarının en sağdaki çıkışının bu "rewriter” modülüne bağlanması bu modülün en iyi kullanım yoludur
-~ go ~bağlanan looper’ı yeniden yazın ve bu looper send’e bağlanmışsa bu send’i yalnızca sağ çıkışı kullanması için ayarlayın
+~go~bağlanan looper’ı yeniden yazın ve bu looper send’e bağlanmışsa bu send’i yalnızca sağ çıkışı kullanması için ayarlayın
 ~new loop~dinamik loop uzunluğunda kaydı başlatın. looper’a kaydı yeniden yazmak istediğinizde "go" tuşuna basın. bu işlem ayrıca bespoke global temposunu değiştirerek yeni loop ile eşleşir, böylelikle çok yararlı ve kullanışlı olabilir! iptal etmek için yeniden bu tuşa tıklayın.
 
 

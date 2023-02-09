@@ -766,7 +766,7 @@ multitapdelay~delay con múltiples puntos de tap
 
 
 looperrewriter~re-escribe los contenidos de un looper con la entrada recibida, para ayudarte a resamplear tus propios loops. adjunta el punto gris a un módulo looper .\n\nla forma ideal de usar este módulo es enganchando directamente el looper a un "send", engancha la salida más a la izquierda del módulo  "send" hacia tu effects processing (como un "effectchain"), engancha el  effect processing a este  "rewriter", y conecta también la salida mas a la derecha del "send" hacia este "rewriter"
-~ go ~re-escribe el looper conectado , y si ese looper está conectado a un send , establece ese send como salida únicamente en la salida derecha
+~go~re-escribe el looper conectado , y si ese looper está conectado a un send , establece ese send como salida únicamente en la salida derecha
 ~new loop~comienza a grabar un bucle de duración dinámica. presiona "go"cuando quieras sobreescribirlo al looper.esto también cambiará el tiempo global de Bespoke para igualar este nuevo loop, ¡ es muy poderoso y aterrador! click nuevamente para cancelar.
 
 

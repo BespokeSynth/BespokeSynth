@@ -829,7 +829,7 @@ multitapdelay~delay with multiple tap points
 
 
 looperrewriter~rewrites the contents of a looper with received input, to help you resample your own loops. attach the grey dot to a "looper" module.\n\nthe ideal way to use this module is to hook the "looper" directly up to a "send", hook the leftmost outlet of the "send" up to your effects processing (like an "effectchain"), hook the effect processing up to this "rewriter", and then also connect the rightmost outlet of the "send" up to this "rewriter"
-~ go ~rewrite the connected looper, and if that looper is connected to a send, set that send to output only to the right outlet
+~go~rewrite the connected looper, and if that looper is connected to a send, set that send to output only to the right outlet
 ~new loop~start recording a dynamic loop length. press "go" when you want to rewrite it to the looper. this will also change bespoke's global tempo to match this new loop, so it's quite powerful and scary! click it again to cancel.
 
 
