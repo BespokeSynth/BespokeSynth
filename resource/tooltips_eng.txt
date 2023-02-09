@@ -808,7 +808,7 @@ pitchchorus~output pitch-shifted version of input audio, based on input midi not
 
 
 panner~pan audio left and right. also, converts a mono input to a stereo output.
-~pan~amount to send signal to the left and right channels. a value of .5 is centered.
+~pan~amount to send signal to the left and right channels. a value of 0 is centered.
 ~widen~delay a channel by this many samples. results in a pan-like effect where the sound seems to come from from a direction.
 
 
