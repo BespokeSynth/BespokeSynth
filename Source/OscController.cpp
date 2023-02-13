@@ -94,7 +94,7 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
    {
       if (control == mOscMap[i].mControl) // && mOscMap[i].mLastChangedTime + 50 < gTime)
       {
-         juce::OSCMessage msg(mOscMap[i].mAddress.c_str());
+         juce::OSCMessage msg(juce::URL::addEscapeChars(mOscMap[i].mAddress.c_str(), true, true));
 
          if (mOscMap[i].mIsFloat)
          {
@@ -134,21 +134,34 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       return; // Code beyond this point expects at least one parameter.
 
    bool is_percentage = false;
-   std::string addressable_prefix = "/bespoke/control/";
-   if (address.rfind(addressable_prefix, 0) == 0 && msg.size() >= 1)
+   std::string control_prefix = "/bespoke/control/";
+   std::string control_scaled_prefix = "/bespoke/control_scaled/";
+   if (address.rfind(control_prefix, 0) == 0 || address.rfind(control_scaled_prefix, 0) == 0)
    {
-      if (msg.size() >= 2 && msg[1].isInt32())
-         is_percentage = msg[1].getInt32() == 1;
+      std::string control_path;
+      if (address.rfind(control_prefix, 0) == 0)
+      {
+         control_path = address.substr(control_prefix.length());
+      }
+      else if (address.rfind(control_scaled_prefix, 0) == 0)
+      {
+         is_percentage = true;
+         control_path = address.substr(control_scaled_prefix.length());
+      }
+      control_path = juce::URL::removeEscapeChars(control_path).toStdString();
 
-      std::string control_path = address.substr(addressable_prefix.length());
-      std::replace(control_path.begin(), control_path.end(), '/', '~');
       IUIControl* control = control = TheSynth->FindUIControl(control_path);
       if (control != nullptr)
       {
          if (msg[0].isFloat32() || msg[0].isInt32())
          {
             float new_value = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
-            if (is_percentage)
+            DropdownList* dropdown = dynamic_cast<DropdownList*>(control);
+            if (dropdown)
+            {
+               dropdown->SetIndex(new_value, gTime, true);
+            }
+            else if (is_percentage)
             {
                new_value = ofClamp(new_value, 0, 100) / 100;
                control->SetValue(control->GetModulationRangeMin() + new_value * (control->GetModulationRangeMax() - control->GetModulationRangeMin()), gTime);
