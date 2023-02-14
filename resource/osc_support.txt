@@ -5,10 +5,22 @@ Direct control addressing:
 	parameters: [f] or [i] or [s]
 		This will attempt to write the value provided directly to the UI control's path.
 		The <control path> should be a path like shown in the top left of Bespoke when hovering over a control. (tilde-separated)
-	example: /bespoke/control/oscillator~vol .25
+		Use URL escaping to represent spaces (i.e., add "%20" instead of a space)
+	example: /bespoke/control/notesequencer~length 4
+	example: /bespoke/control/sampleplayer~cue%20len 5.3
+
+Direct control addressing scaled:
+	address: /bespoke/control_scaled/<control path>
+	parameters: [f] or [i] or [s]
+		This will attempt to write the value provided directly to the UI control's path while scaling the value to within the min and max of the control.
+		The <control path> should be a path like shown in the top left of Bespoke when hovering over a control. (tilde-separated)
+		Use URL escaping to represent spaces (i.e., add "%20" instead of a space)
+		The the value is expected to be between 0 and 1.
+	example: /bespoke/control/looper~offset .3
+	example: /bespoke/control/sampleplayer~cue%20len .2
 
 Notes:
-	address: /note
+	address: /bespoke/note
 	parameters: [f, f] or [i, f, f]
 		The second to last parameter is the note number corresponding to the standard midi notes.
 		The last parameter is the velocity of the note.

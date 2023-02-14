@@ -94,7 +94,7 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
    {
       if (control == mOscMap[i].mControl) // && mOscMap[i].mLastChangedTime + 50 < gTime)
       {
-         juce::OSCMessage msg(mOscMap[i].mAddress.c_str());
+         juce::OSCMessage msg(juce::URL::addEscapeChars(mOscMap[i].mAddress.c_str(), true, true));
 
          if (mOscMap[i].mIsFloat)
          {
@@ -133,21 +133,36 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    if (msg.size() == 0)
       return; // Code beyond this point expects at least one parameter.
 
-   std::string addressable_prefix = "/bespoke/control/";
-   if (address.rfind(addressable_prefix, 0) == 0 && msg.size() >= 1)
+   bool is_percentage = false;
+   std::string control_prefix = "/bespoke/control/";
+   std::string control_scaled_prefix = "/bespoke/control_scaled/";
+   if (address.rfind(control_prefix, 0) == 0 || address.rfind(control_scaled_prefix, 0) == 0)
    {
-      std::string control_path = address.substr(addressable_prefix.length());
-      std::replace(control_path.begin(), control_path.end(), '/', '~');
+      std::string control_path;
+      if (address.rfind(control_prefix, 0) == 0)
+      {
+         control_path = address.substr(control_prefix.length());
+      }
+      else if (address.rfind(control_scaled_prefix, 0) == 0)
+      {
+         is_percentage = true;
+         control_path = address.substr(control_scaled_prefix.length());
+      }
+      control_path = juce::URL::removeEscapeChars(control_path).toStdString();
+
       IUIControl* control = control = TheSynth->FindUIControl(control_path);
       if (control != nullptr)
       {
-         if (msg[0].isFloat32())
+         if (msg[0].isFloat32() || msg[0].isInt32())
          {
-            control->SetValue(msg[0].getFloat32(), gTime);
-         }
-         else if (msg[0].isInt32())
-         {
-            control->SetValue(msg[0].getInt32(), gTime);
+            float new_value = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+            DropdownList* dropdown = dynamic_cast<DropdownList*>(control);
+            if (is_percentage)
+               control->SetFromMidiCC(new_value, gTime, false);
+            else if (dropdown)
+               dropdown->SetIndex(new_value, gTime, true);
+            else
+               control->SetValue(new_value, gTime);
          }
          else if (msg[0].isString())
          {
@@ -170,7 +185,9 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       return; // Code beyond this point expects at least one parameter of type int or float.
 
    // Handle note data and output these as notes instead of CC's.
-   if (address.rfind("/note", 0) == 0 && msg.size() >= 2 && ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
+   if (
+   (address.rfind("/note", 0) == 0 || address.rfind("/bespoke/note", 0) == 0) && msg.size() >= 2 &&
+   ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
    {
       MidiNote note;
       note.mDeviceName = "osccontroller";
