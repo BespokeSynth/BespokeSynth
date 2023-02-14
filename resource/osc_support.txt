@@ -16,8 +16,8 @@ Direct control addressing scaled:
 		The <control path> should be a path like shown in the top left of Bespoke when hovering over a control. (tilde-separated)
 		Use URL escaping to represent spaces (i.e., add "%20" instead of a space)
 		The the value is expected to be between 0 and 1.
-	example: /bespoke/control/looper~offset .3
-	example: /bespoke/control/sampleplayer~cue%20len .2
+	example: /bespoke/control_scaled/looper~offset .3
+	example: /bespoke/control_scaled/sampleplayer~cue%20len .2
 
 Notes:
 	address: /bespoke/note
