@@ -142,7 +142,7 @@ void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    if (velocity > 0)
       mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
    else
-      mPolyMgr.Stop(time, pitch);
+      mPolyMgr.StopOldest(time, pitch);
 }
 
 void KarplusStrong::SetEnabled(bool enabled)
