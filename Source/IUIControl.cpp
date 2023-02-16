@@ -24,7 +24,7 @@
 //
 
 #include "IUIControl.h"
-#include "Presets.h"
+#include "Snapshots.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "PatchCable.h"
@@ -46,7 +46,7 @@ IUIControl::~IUIControl()
 
 bool IUIControl::IsPreset()
 {
-   return VectorContains(this, Presets::sPresetHighlightControls);
+   return VectorContains(this, Snapshots::sSnapshotHighlightControls);
 }
 
 bool IUIControl::TestHover(int x, int y)

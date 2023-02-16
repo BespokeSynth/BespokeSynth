@@ -497,8 +497,6 @@ target_sources(BespokeSynth PRIVATE
     Polyrhythms.h
     Prefab.cpp
     Prefab.h
-    Presets.cpp
-    Presets.h
     Pressure.cpp
     Pressure.h
     PressureToCV.cpp
@@ -608,6 +606,8 @@ target_sources(BespokeSynth PRIVATE
     SliderSequencer.h
     SlowLayers.cpp
     SlowLayers.h
+    Snapshots.cpp
+    Snapshots.h
     SongBuilder.cpp
     SongBuilder.h
     SpaceMouseControl.cpp

@@ -40,7 +40,7 @@
 #include "ModuleSaveDataPanel.h"
 #include "GridController.h"
 #include "ControlSequencer.h"
-#include "Presets.h"
+#include "Snapshots.h"
 #include "PatchCableSource.h"
 #include "nanovg/nanovg.h"
 #include "IPulseReceiver.h"

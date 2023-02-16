@@ -73,7 +73,7 @@
 #include "SampleFinder.h"
 #include "FourOnTheFloor.h"
 #include "Amplifier.h"
-#include "Presets.h"
+#include "Snapshots.h"
 #include "LFOController.h"
 #include "NoteStepSequencer.h"
 #include "BeatBloks.h"
@@ -298,7 +298,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteOctaver, noteoctaver, kModuleCategory_Note);
    REGISTER(FourOnTheFloor, fouronthefloor, kModuleCategory_Instrument);
    REGISTER(Amplifier, gain, kModuleCategory_Audio);
-   REGISTER(Presets, presets, kModuleCategory_Other);
+   REGISTER(Snapshots, snapshots, kModuleCategory_Other);
    REGISTER(NoteStepSequencer, notesequencer, kModuleCategory_Instrument);
    REGISTER(SingleOscillator, oscillator, kModuleCategory_Synth);
    REGISTER(BandVocoder, vocoder, kModuleCategory_Audio);
@@ -748,6 +748,9 @@ std::string ModuleFactory::FixUpTypeName(std::string name)
 
    if (name == "vstplugin")
       return "plugin";
+
+   if (name == "presets")
+      return "snapshots";
 
    return name;
 }

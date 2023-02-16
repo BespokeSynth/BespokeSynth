@@ -55,11 +55,11 @@ radiosequencer~sequence to only enable one value at a time. patch it to the "ena
 
 
 
-presets~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
-~blend~length of time in milliseconds over which to blend preset values
-~preset~jump to a preset
+snapshots~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
+~blend~length of time in milliseconds over which to blend snapshot values
+~snapshot~jump to a snapshot
 ~random~randomize connected controls
-~add~snapshot the currently connected controls to the next available preset slot
+~add~snapshot the currently connected controls to the next available snapshot slot
 
 
 
@@ -1848,13 +1848,13 @@ newpatchconfirm~
 
 
 
-vstplugin~a VST plugin instance
+plugin~a hosted plugin instance, such as a VST
 ~vol~adjust the output volume
-~program change~send a program change message to the VST instance
+~program change~send a program change message to the plugin instance
 ~open~show the plugin window
-~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.
-~preset~choose from saved VST presets
-~save as~save the current VST settings as a preset to load again later
+~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a plugin has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the plugin's interface.
+~preset~choose from saved plugin presets
+~save as~save the current plugin settings as a preset to load again later
 ~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
 
 
