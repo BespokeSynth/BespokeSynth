@@ -16,39 +16,39 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  Presets.cpp
+//  Snapshots.cpp
 //  modularSynth
 //
 //  Created by Ryan Challinor on 7/29/13.
 //
 //
 
-#include "Presets.h"
+#include "Snapshots.h"
 #include "ModularSynth.h"
 #include "Slider.h"
 #include "ofxJSONElement.h"
 #include "PatchCableSource.h"
 
-std::vector<IUIControl*> Presets::sPresetHighlightControls;
+std::vector<IUIControl*> Snapshots::sSnapshotHighlightControls;
 
-Presets::Presets()
+Snapshots::Snapshots()
 {
 }
 
-Presets::~Presets()
+Snapshots::~Snapshots()
 {
    TheTransport->RemoveAudioPoller(this);
 }
 
-void Presets::CreateUIControls()
+void Snapshots::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid("uigrid", 5, 38, 120, 50, 8, 3, this);
    mBlendTimeSlider = new FloatSlider(this, "blend", 5, 20, 70, 15, &mBlendTime, 0, 5000);
-   mCurrentPresetSelector = new DropdownList(this, "preset", 35, 3, &mCurrentPreset, 64);
+   mCurrentSnapshotSelector = new DropdownList(this, "snapshot", 35, 3, &mCurrentSnapshot, 64);
    mRandomizeButton = new ClickButton(this, "random", 78, 20);
    mAddButton = new ClickButton(this, "add", 101, 3);
-   mPresetLabelEntry = new TextEntry(this, "preset label", -1, -1, 12, &mPresetLabel);
+   mSnapshotLabelEntry = new TextEntry(this, "snapshot label", -1, -1, 12, &mSnapshotLabel);
 
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
@@ -73,33 +73,33 @@ void Presets::CreateUIControls()
    }
 
    for (int i = 0; i < 32; ++i)
-      mCurrentPresetSelector->AddLabel(ofToString(i).c_str(), i);
+      mCurrentSnapshotSelector->AddLabel(ofToString(i).c_str(), i);
 }
 
-void Presets::Init()
+void Snapshots::Init()
 {
    IDrawableModule::Init();
 
-   int defaultPreset = mModuleSaveData.GetInt("defaultpreset");
-   if (defaultPreset != -1)
-      SetPreset(defaultPreset, gTime);
+   int defaultSnapshot = mModuleSaveData.GetInt("defaultsnapshot");
+   if (defaultSnapshot != -1)
+      SetSnapshot(defaultSnapshot, gTime);
 
    TheTransport->AddAudioPoller(this);
 }
 
-void Presets::Poll()
+void Snapshots::Poll()
 {
-   if (mQueuedPresetIndex != -1)
+   if (mQueuedSnapshotIndex != -1)
    {
-      SetPreset(mQueuedPresetIndex, NextBufferTime(false));
-      mQueuedPresetIndex = -1;
+      SetSnapshot(mQueuedSnapshotIndex, NextBufferTime(false));
+      mQueuedSnapshotIndex = -1;
    }
 
-   if (mDrawSetPresetsCountdown > 0)
+   if (mDrawSetSnapshotCountdown > 0)
    {
-      --mDrawSetPresetsCountdown;
-      if (mDrawSetPresetsCountdown == 0)
-         sPresetHighlightControls.clear();
+      --mDrawSetSnapshotCountdown;
+      if (mDrawSetSnapshotCountdown == 0)
+         sSnapshotHighlightControls.clear();
    }
 
    if (!mBlending && !mBlendRamps.empty())
@@ -108,18 +108,18 @@ void Presets::Poll()
    }
 }
 
-void Presets::DrawModule()
+void Snapshots::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
 
    mGrid->Draw();
    mBlendTimeSlider->Draw();
-   mCurrentPresetSelector->Draw();
+   mCurrentSnapshotSelector->Draw();
    mRandomizeButton->Draw();
    mAddButton->Draw();
-   mPresetLabelEntry->SetPosition(3, mGrid->GetRect(K(local)).getMaxY() + 3);
-   mPresetLabelEntry->Draw();
+   mSnapshotLabelEntry->SetPosition(3, mGrid->GetRect(K(local)).getMaxY() + 3);
+   mSnapshotLabelEntry->Draw();
 
    int hover = mGrid->CurrentHover();
    bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
@@ -142,9 +142,9 @@ void Presets::DrawModule()
 
    if (!shiftHeld)
    {
-      if (mCurrentPreset < mGrid->GetCols() * mGrid->GetRows())
+      if (mCurrentSnapshot < mGrid->GetCols() * mGrid->GetRows())
       {
-         ofVec2f pos = mGrid->GetCellPosition(mCurrentPreset % mGrid->GetCols(), mCurrentPreset / mGrid->GetCols()) + mGrid->GetPosition(true);
+         ofVec2f pos = mGrid->GetCellPosition(mCurrentSnapshot % mGrid->GetCols(), mCurrentSnapshot / mGrid->GetCols()) + mGrid->GetPosition(true);
          float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
          float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
 
@@ -158,14 +158,14 @@ void Presets::DrawModule()
    }
 }
 
-void Presets::DrawModuleUnclipped()
+void Snapshots::DrawModuleUnclipped()
 {
    int hover = mGrid->CurrentHover();
-   if (hover != -1 && !mPresetCollection.empty())
+   if (hover != -1 && !mSnapshotCollection.empty())
    {
-      assert(hover >= 0 && hover < mPresetCollection.size());
+      assert(hover >= 0 && hover < mSnapshotCollection.size());
 
-      std::string tooltip = mPresetCollection[hover].mLabel;
+      std::string tooltip = mSnapshotCollection[hover].mLabel;
       ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
       pos.x += (mGrid->GetWidth() / mGrid->GetCols()) + 3;
       pos.y += (mGrid->GetHeight() / mGrid->GetRows()) / 2;
@@ -185,20 +185,20 @@ void Presets::DrawModuleUnclipped()
    }
 }
 
-void Presets::UpdateGridValues()
+void Snapshots::UpdateGridValues()
 {
    mGrid->Clear();
-   assert(mPresetCollection.size() >= size_t(mGrid->GetRows()) * mGrid->GetCols());
+   assert(mSnapshotCollection.size() >= size_t(mGrid->GetRows()) * mGrid->GetCols());
    for (int i = 0; i < mGrid->GetRows() * mGrid->GetCols(); ++i)
    {
       float val = 0;
-      if (mPresetCollection[i].mPresets.empty() == false)
+      if (mSnapshotCollection[i].mSnapshots.empty() == false)
          val = .5f;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
 }
 
-void Presets::OnClicked(float x, float y, bool right)
+void Snapshots::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -211,43 +211,43 @@ void Presets::OnClicked(float x, float y, bool right)
       mGrid->GetPosition(gridX, gridY, true);
       GridCell cell = mGrid->GetGridCellAt(x - gridX, y - gridY);
 
-      mCurrentPreset = cell.mCol + cell.mRow * mGrid->GetCols();
+      mCurrentSnapshot = cell.mCol + cell.mRow * mGrid->GetCols();
 
       if (GetKeyModifiers() == kModifier_Shift)
-         Store(mCurrentPreset);
+         Store(mCurrentSnapshot);
       else
-         SetPreset(mCurrentPreset, NextBufferTime(false));
+         SetSnapshot(mCurrentSnapshot, NextBufferTime(false));
 
       UpdateGridValues();
    }
 }
 
-bool Presets::MouseMoved(float x, float y)
+bool Snapshots::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
-void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Snapshots::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (velocity > 0 && pitch < (int)mPresetCollection.size())
+   if (velocity > 0 && pitch < (int)mSnapshotCollection.size())
    {
-      mCurrentPreset = pitch;
-      SetPreset(pitch, time);
+      mCurrentSnapshot = pitch;
+      SetSnapshot(pitch, time);
       UpdateGridValues();
    }
 }
 
-void Presets::SetPreset(int idx, double time)
+void Snapshots::SetSnapshot(int idx, double time)
 {
    if (!mAllowSetOnAudioThread && IsAudioThread())
    {
-      mQueuedPresetIndex = idx;
+      mQueuedSnapshotIndex = idx;
       return;
    }
 
-   if (idx < 0 || idx >= (int)mPresetCollection.size())
+   if (idx < 0 || idx >= (int)mSnapshotCollection.size())
       return;
 
    if (mBlendTime > 0)
@@ -258,10 +258,10 @@ void Presets::SetPreset(int idx, double time)
       mBlendRamps.clear();
    }
 
-   sPresetHighlightControls.clear();
-   const PresetCollection& coll = mPresetCollection[idx];
-   for (std::list<Preset>::const_iterator i = coll.mPresets.begin();
-        i != coll.mPresets.end(); ++i)
+   sSnapshotHighlightControls.clear();
+   const SnapshotCollection& coll = mSnapshotCollection[idx];
+   for (std::list<Snapshot>::const_iterator i = coll.mSnapshots.begin();
+        i != coll.mSnapshots.end(); ++i)
    {
       auto context = IClickable::sPathLoadContext;
       IClickable::sPathLoadContext = GetParent() ? GetParent()->Path() + "~" : "";
@@ -310,7 +310,7 @@ void Presets::SetPreset(int idx, double time)
             mBlendRamps.push_back(ramp);
          }
 
-         sPresetHighlightControls.push_back(control);
+         sSnapshotHighlightControls.push_back(control);
       }
    }
 
@@ -319,22 +319,22 @@ void Presets::SetPreset(int idx, double time)
       mRampMutex.unlock();
    }
 
-   mDrawSetPresetsCountdown = 30;
-   mPresetLabel = coll.mLabel;
+   mDrawSetSnapshotCountdown = 30;
+   mSnapshotLabel = coll.mLabel;
 }
 
-void Presets::RandomizeTargets()
+void Snapshots::RandomizeTargets()
 {
-   for (int i = 0; i < mPresetControls.size(); ++i)
-      RandomizeControl(mPresetControls[i]);
-   for (int i = 0; i < mPresetModules.size(); ++i)
+   for (int i = 0; i < mSnapshotControls.size(); ++i)
+      RandomizeControl(mSnapshotControls[i]);
+   for (int i = 0; i < mSnapshotModules.size(); ++i)
    {
-      for (auto* control : mPresetModules[i]->GetUIControls())
+      for (auto* control : mSnapshotModules[i]->GetUIControls())
          RandomizeControl(control);
    }
 }
 
-void Presets::RandomizeControl(IUIControl* control)
+void Snapshots::RandomizeControl(IUIControl* control)
 {
    if (strcmp(control->Name(), "enabled") == 0) //don't randomize enabled/disable checkbox, too annoying
       return;
@@ -343,7 +343,7 @@ void Presets::RandomizeControl(IUIControl* control)
    control->SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
 }
 
-void Presets::OnTransportAdvanced(float amount)
+void Snapshots::OnTransportAdvanced(float amount)
 {
    if (mBlending)
    {
@@ -363,39 +363,39 @@ void Presets::OnTransportAdvanced(float amount)
    }
 }
 
-void Presets::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
+void Snapshots::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    if (TheSynth->IsLoadingState())
       return;
 
-   auto numModules = mPresetModules.size();
-   auto numControls = mPresetControls.size();
+   auto numModules = mSnapshotModules.size();
+   auto numControls = mSnapshotControls.size();
 
-   mPresetModules.clear();
+   mSnapshotModules.clear();
    for (auto cable : mModuleCable->GetPatchCables())
-      mPresetModules.push_back(static_cast<IDrawableModule*>(cable->GetTarget()));
-   mPresetControls.clear();
+      mSnapshotModules.push_back(static_cast<IDrawableModule*>(cable->GetTarget()));
+   mSnapshotControls.clear();
    for (auto cable : mUIControlCable->GetPatchCables())
-      mPresetControls.push_back(static_cast<IUIControl*>(cable->GetTarget()));
+      mSnapshotControls.push_back(static_cast<IUIControl*>(cable->GetTarget()));
 
-   if (mPresetModules.size() < numModules || mPresetControls.size() < numControls) //we removed something, clean up any presets that refer to it
+   if (mSnapshotModules.size() < numModules || mSnapshotControls.size() < numControls) //we removed something, clean up any snapshots that refer to it
    {
-      for (auto& square : mPresetCollection)
+      for (auto& square : mSnapshotCollection)
       {
-         std::vector<Preset> toRemove;
-         for (const auto& preset : square.mPresets)
+         std::vector<Snapshot> toRemove;
+         for (const auto& snapshot : square.mSnapshots)
          {
-            if (!IsConnectedToPath(preset.mControlPath))
-               toRemove.push_back(preset);
+            if (!IsConnectedToPath(snapshot.mControlPath))
+               toRemove.push_back(snapshot);
          }
 
          for (auto remove : toRemove)
-            square.mPresets.remove(remove);
+            square.mSnapshots.remove(remove);
       }
    }
 }
 
-bool Presets::IsConnectedToPath(std::string path) const
+bool Snapshots::IsConnectedToPath(std::string path) const
 {
    auto context = IClickable::sPathLoadContext;
    IClickable::sPathLoadContext = GetParent() ? GetParent()->Path() + "~" : "";
@@ -405,38 +405,38 @@ bool Presets::IsConnectedToPath(std::string path) const
    if (control == nullptr)
       return false;
 
-   if (VectorContains(control, mPresetControls))
+   if (VectorContains(control, mSnapshotControls))
       return true;
 
-   if (VectorContains(control->GetModuleParent(), mPresetModules))
+   if (VectorContains(control->GetModuleParent(), mSnapshotModules))
       return true;
 
    return false;
 }
 
-void Presets::Store(int idx)
+void Snapshots::Store(int idx)
 {
-   assert(idx >= 0 && idx < mPresetCollection.size());
+   assert(idx >= 0 && idx < mSnapshotCollection.size());
 
-   PresetCollection& coll = mPresetCollection[idx];
-   coll.mPresets.clear();
+   SnapshotCollection& coll = mSnapshotCollection[idx];
+   coll.mSnapshots.clear();
 
-   for (int i = 0; i < mPresetControls.size(); ++i)
+   for (int i = 0; i < mSnapshotControls.size(); ++i)
    {
-      coll.mPresets.push_back(Preset(mPresetControls[i], this));
+      coll.mSnapshots.push_back(Snapshot(mSnapshotControls[i], this));
    }
-   for (int i = 0; i < mPresetModules.size(); ++i)
+   for (int i = 0; i < mSnapshotModules.size(); ++i)
    {
-      for (auto* control : mPresetModules[i]->GetUIControls())
+      for (auto* control : mSnapshotModules[i]->GetUIControls())
       {
          if (dynamic_cast<ClickButton*>(control) == nullptr)
-            coll.mPresets.push_back(Preset(control, this));
+            coll.mSnapshots.push_back(Snapshot(control, this));
       }
-      for (auto* grid : mPresetModules[i]->GetUIGrids())
-         coll.mPresets.push_back(Preset(grid, this));
+      for (auto* grid : mSnapshotModules[i]->GetUIGrids())
+         coll.mSnapshots.push_back(Snapshot(grid, this));
    }
 
-   mPresetLabel = coll.mLabel;
+   mSnapshotLabel = coll.mLabel;
 }
 
 namespace
@@ -447,19 +447,19 @@ namespace
    const int maxGridSide = 20;
 }
 
-void Presets::ButtonClicked(ClickButton* button, double time)
+void Snapshots::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizeButton)
       RandomizeTargets();
 
    if (button == mAddButton)
    {
-      for (size_t i = 0; i < mPresetCollection.size(); ++i)
+      for (size_t i = 0; i < mSnapshotCollection.size(); ++i)
       {
-         if (mPresetCollection[i].mPresets.empty())
+         if (mSnapshotCollection[i].mSnapshots.empty())
          {
             Store(i);
-            mCurrentPreset = i;
+            mCurrentSnapshot = i;
             UpdateGridValues();
             break;
          }
@@ -467,60 +467,60 @@ void Presets::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void Presets::DropdownUpdated(DropdownList* list, int oldVal, double time)
+void Snapshots::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (list == mCurrentPresetSelector)
+   if (list == mCurrentSnapshotSelector)
    {
-      SetPreset(mCurrentPreset, time);
+      SetSnapshot(mCurrentSnapshot, time);
       UpdateGridValues();
    }
 }
 
-void Presets::TextEntryComplete(TextEntry* entry)
+void Snapshots::TextEntryComplete(TextEntry* entry)
 {
-   if (entry == mPresetLabelEntry)
+   if (entry == mSnapshotLabelEntry)
    {
-      mPresetCollection[mCurrentPreset].mLabel = mPresetLabel;
-      mCurrentPresetSelector->SetLabel(mPresetLabel, mCurrentPreset);
+      mSnapshotCollection[mCurrentSnapshot].mLabel = mSnapshotLabel;
+      mCurrentSnapshotSelector->SetLabel(mSnapshotLabel, mCurrentSnapshot);
    }
 }
 
-void Presets::GetModuleDimensions(float& width, float& height)
+void Snapshots::GetModuleDimensions(float& width, float& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH;
 }
 
-void Presets::Resize(float w, float h)
+void Snapshots::Resize(float w, float h)
 {
    SetGridSize(MAX(w - extraW, 120), MAX(h - extraH, gridSquareDimension));
 }
 
-void Presets::SetGridSize(float w, float h)
+void Snapshots::SetGridSize(float w, float h)
 {
    mGrid->SetDimensions(w, h);
    int cols = MIN(w / gridSquareDimension, maxGridSide);
    int rows = MIN(h / gridSquareDimension, maxGridSide);
    mGrid->SetGrid(cols, rows);
-   int oldSize = (int)mPresetCollection.size();
+   int oldSize = (int)mSnapshotCollection.size();
    if (oldSize < size_t(cols) * rows)
    {
-      mPresetCollection.resize(size_t(cols) * rows);
-      for (int i = oldSize; i < (int)mPresetCollection.size(); ++i)
-         mPresetCollection[i].mLabel = ofToString(i);
+      mSnapshotCollection.resize(size_t(cols) * rows);
+      for (int i = oldSize; i < (int)mSnapshotCollection.size(); ++i)
+         mSnapshotCollection[i].mLabel = ofToString(i);
    }
    UpdateGridValues();
 }
 
-void Presets::SaveLayout(ofxJSONElement& moduleInfo)
+void Snapshots::SaveLayout(ofxJSONElement& moduleInfo)
 {
    moduleInfo["gridwidth"] = mGrid->GetWidth();
    moduleInfo["gridheight"] = mGrid->GetHeight();
 }
 
-void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
+void Snapshots::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadInt("defaultpreset", moduleInfo, -1, -1, 100, true);
+   mModuleSaveData.LoadInt("defaultsnapshot", moduleInfo, -1, -1, 100, true);
 
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
    mModuleSaveData.LoadFloat("gridheight", moduleInfo, 50, 15, 1000);
@@ -529,50 +529,50 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
    SetUpFromSaveData();
 }
 
-void Presets::SetUpFromSaveData()
+void Snapshots::SetUpFromSaveData()
 {
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
    mAllowSetOnAudioThread = mModuleSaveData.GetBool("allow_set_on_audio_thread");
 }
 
-void Presets::SaveState(FileStreamOut& out)
+void Snapshots::SaveState(FileStreamOut& out)
 {
    out << GetModuleSaveStateRev();
 
    IDrawableModule::SaveState(out);
 
-   out << (int)mPresetCollection.size();
-   for (auto& coll : mPresetCollection)
+   out << (int)mSnapshotCollection.size();
+   for (auto& coll : mSnapshotCollection)
    {
-      out << (int)coll.mPresets.size();
-      for (auto& preset : coll.mPresets)
+      out << (int)coll.mSnapshots.size();
+      for (auto& snapshot : coll.mSnapshots)
       {
-         out << preset.mControlPath;
-         out << preset.mValue;
-         out << preset.mHasLFO;
-         preset.mLFOSettings.SaveState(out);
-         out << preset.mGridCols;
-         out << preset.mGridRows;
-         assert(preset.mGridContents.size() == size_t(preset.mGridCols) * preset.mGridRows);
-         for (size_t i = 0; i < preset.mGridContents.size(); ++i)
-            out << preset.mGridContents[i];
-         out << preset.mString;
+         out << snapshot.mControlPath;
+         out << snapshot.mValue;
+         out << snapshot.mHasLFO;
+         snapshot.mLFOSettings.SaveState(out);
+         out << snapshot.mGridCols;
+         out << snapshot.mGridRows;
+         assert(snapshot.mGridContents.size() == size_t(snapshot.mGridCols) * snapshot.mGridRows);
+         for (size_t i = 0; i < snapshot.mGridContents.size(); ++i)
+            out << snapshot.mGridContents[i];
+         out << snapshot.mString;
       }
       out << coll.mLabel;
    }
 
-   out << (int)mPresetModules.size();
-   for (auto module : mPresetModules)
+   out << (int)mSnapshotModules.size();
+   for (auto module : mSnapshotModules)
       out << module->Path();
 
-   out << (int)mPresetControls.size();
-   for (auto control : mPresetControls)
+   out << (int)mSnapshotControls.size();
+   for (auto control : mSnapshotControls)
       out << control->Path();
 
-   out << mCurrentPreset;
+   out << mCurrentSnapshot;
 }
 
-void Presets::LoadState(FileStreamIn& in, int rev)
+void Snapshots::LoadState(FileStreamIn& in, int rev)
 {
    mLoadRev = rev;
 
@@ -584,39 +584,39 @@ void Presets::LoadState(FileStreamIn& in, int rev)
 
    int collSize;
    in >> collSize;
-   mPresetCollection.resize(collSize);
+   mSnapshotCollection.resize(collSize);
    for (int i = 0; i < collSize; ++i)
    {
-      int presetSize;
-      in >> presetSize;
-      mPresetCollection[i].mPresets.resize(presetSize);
+      int snapshotSize;
+      in >> snapshotSize;
+      mSnapshotCollection[i].mSnapshots.resize(snapshotSize);
       int j = 0;
-      for (auto& presetData : mPresetCollection[i].mPresets)
+      for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
-         in >> presetData.mControlPath;
-         in >> presetData.mValue;
-         in >> presetData.mHasLFO;
-         presetData.mLFOSettings.LoadState(in);
-         in >> presetData.mGridCols;
-         in >> presetData.mGridRows;
+         in >> snapshotData.mControlPath;
+         in >> snapshotData.mValue;
+         in >> snapshotData.mHasLFO;
+         snapshotData.mLFOSettings.LoadState(in);
+         in >> snapshotData.mGridCols;
+         in >> snapshotData.mGridRows;
          if (rev < 3)
          {
             // Check if the loaded values are within an acceptable range.
             // This is done because mGridCols and mGridRows could previously be saved with random values since they were not properly initialized.
-            if (presetData.mGridCols < 0 || presetData.mGridCols > 1000)
-               presetData.mGridCols = 0;
-            if (presetData.mGridRows < 0 || presetData.mGridRows > 1000)
-               presetData.mGridRows = 0;
+            if (snapshotData.mGridCols < 0 || snapshotData.mGridCols > 1000)
+               snapshotData.mGridCols = 0;
+            if (snapshotData.mGridRows < 0 || snapshotData.mGridRows > 1000)
+               snapshotData.mGridRows = 0;
          }
-         presetData.mGridContents.resize(size_t(presetData.mGridCols) * presetData.mGridRows);
-         for (int k = 0; k < presetData.mGridCols * presetData.mGridRows; ++k)
-            in >> presetData.mGridContents[k];
-         in >> presetData.mString;
+         snapshotData.mGridContents.resize(size_t(snapshotData.mGridCols) * snapshotData.mGridRows);
+         for (int k = 0; k < snapshotData.mGridCols * snapshotData.mGridRows; ++k)
+            in >> snapshotData.mGridContents[k];
+         in >> snapshotData.mString;
       }
-      in >> mPresetCollection[i].mLabel;
-      if (rev < 2 && mPresetCollection[i].mLabel.empty())
-         mPresetCollection[i].mLabel = ofToString(i);
-      mCurrentPresetSelector->SetLabel(mPresetCollection[i].mLabel, i);
+      in >> mSnapshotCollection[i].mLabel;
+      if (rev < 2 && mSnapshotCollection[i].mLabel.empty())
+         mSnapshotCollection[i].mLabel = ofToString(i);
+      mCurrentSnapshotSelector->SetLabel(mSnapshotCollection[i].mLabel, i);
    }
 
    UpdateGridValues();
@@ -630,7 +630,7 @@ void Presets::LoadState(FileStreamIn& in, int rev)
       IDrawableModule* module = TheSynth->FindModule(path);
       if (module)
       {
-         mPresetModules.push_back(module);
+         mSnapshotModules.push_back(module);
          mModuleCable->AddPatchCable(module);
       }
    }
@@ -641,24 +641,26 @@ void Presets::LoadState(FileStreamIn& in, int rev)
       IUIControl* control = TheSynth->FindUIControl(path);
       if (control)
       {
-         mPresetControls.push_back(control);
+         mSnapshotControls.push_back(control);
          mUIControlCable->AddPatchCable(control);
       }
    }
 
    if (rev >= 2)
-      in >> mCurrentPreset;
+      in >> mCurrentSnapshot;
 }
 
-void Presets::UpdateOldControlName(std::string& oldName)
+void Snapshots::UpdateOldControlName(std::string& oldName)
 {
    IDrawableModule::UpdateOldControlName(oldName);
 
    if (oldName == "blend ms")
       oldName = "blend";
+   if (oldName == "preset")
+      oldName = "snapshot";
 }
 
-bool Presets::LoadOldControl(FileStreamIn& in, std::string& oldName)
+bool Snapshots::LoadOldControl(FileStreamIn& in, std::string& oldName)
 {
    if (mLoadRev < 2)
    {
@@ -667,7 +669,7 @@ bool Presets::LoadOldControl(FileStreamIn& in, std::string& oldName)
          //load from int slider
          int intSliderRev;
          in >> intSliderRev;
-         in >> mCurrentPreset;
+         in >> mCurrentSnapshot;
          int dummy;
          if (intSliderRev >= 1)
          {
@@ -680,17 +682,17 @@ bool Presets::LoadOldControl(FileStreamIn& in, std::string& oldName)
    return false;
 }
 
-std::vector<IUIControl*> Presets::ControlsToNotSetDuringLoadState() const
+std::vector<IUIControl*> Snapshots::ControlsToNotSetDuringLoadState() const
 {
    std::vector<IUIControl*> ignore;
-   ignore.push_back(mCurrentPresetSelector);
+   ignore.push_back(mCurrentSnapshotSelector);
    return ignore;
 }
 
-Presets::Preset::Preset(IUIControl* control, Presets* presets)
+Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
 {
    auto context = IClickable::sPathSaveContext;
-   IClickable::sPathSaveContext = presets->GetParent() ? presets->GetParent()->Path() + "~" : "";
+   IClickable::sPathSaveContext = snapshots->GetParent() ? snapshots->GetParent()->Path() + "~" : "";
    mControlPath = control->Path();
    IClickable::sPathSaveContext = context;
 

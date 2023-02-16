@@ -52,10 +52,10 @@ radiosequencer~Sequenz um nur einen Wert auf einmal zu aktivieren. Patchen Sie e
 
 
 
-presets~Speichern und Wiederherstellen von Werte-Sets. Verbinden Sie den grauen Kreis mit Modulen, um alle Steuerelemente dieses Moduls zu beeinflussen. Verbinden Sie den violetten Kreis mit einem Steuerelement, um nur dieses Steuerelement zu beeinflussen. Klicken Sie mit gedrückter Shifttaste auf das Raster, um eine Voreinstellung in diesem Feld zu speichern, und klicken Sie auf ein Rasterfeld, um diese Voreinstellung zu laden.
+snapshots~Speichern und Wiederherstellen von Werte-Sets. Verbinden Sie den grauen Kreis mit Modulen, um alle Steuerelemente dieses Moduls zu beeinflussen. Verbinden Sie den violetten Kreis mit einem Steuerelement, um nur dieses Steuerelement zu beeinflussen. Klicken Sie mit gedrückter Shifttaste auf das Raster, um eine Voreinstellung in diesem Feld zu speichern, und klicken Sie auf ein Rasterfeld, um diese Voreinstellung zu laden.
 ~save~[todo]
 ~blend ms~Dauer der Überblendung voreingestellter Werte
-~preset~Zu einer Voreinstellung springen
+~snapshot~Zu einer Voreinstellung springen
 
 
 
@@ -1756,7 +1756,7 @@ newpatchconfirm~
 
 
 
-vstplugin~Eine VST-Plugin-Instanz
+plugin~Eine VST-Plugin-Instanz
 ~vol~Einstellung der Ausgangslautstärke
 ~program change~Eine Program Change Nachricht an die VST-Instanz senden
 ~open~Das Plugin Fenster anzeigen
