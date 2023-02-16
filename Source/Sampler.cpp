@@ -154,7 +154,7 @@ void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    }
    else
    {
-      mPolyMgr.StopOldest(time, pitch);
+      mPolyMgr.Stop(time, pitch, voiceIdx);
       mVoiceParams.mAdsr.Stop(time); //for visualization
    }
 }
