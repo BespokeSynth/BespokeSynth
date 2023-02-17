@@ -96,8 +96,6 @@ ModularSynth::~ModularSynth()
    DeleteAllModules();
 
    delete mGlobalRecordBuffer;
-   delete[] mSaveOutputBuffer[0];
-   delete[] mSaveOutputBuffer[1];
    mAudioPluginFormatManager.reset();
    mKnownPluginList.reset();
 
@@ -237,8 +235,6 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
 
    mGlobalRecordBuffer = new RollingBuffer(UserPrefs.record_buffer_length_minutes.Get() * 60 * gSampleRate);
    mGlobalRecordBuffer->SetNumChannels(2);
-   mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
-   mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
 
    juce::File(ofToDataPath("savestate")).createDirectory();
    juce::File(ofToDataPath("savestate/autosave")).createDirectory();
@@ -3231,13 +3227,7 @@ void ModularSynth::SaveOutput()
 
    assert(mRecordingLength <= mGlobalRecordBuffer->Size());
 
-   for (int i = 0; i < mRecordingLength; ++i)
-   {
-      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength - i - 1, 0);
-      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength - i - 1, 1);
-   }
-
-   Sample::WriteDataToFile(filename, mSaveOutputBuffer, (int)mRecordingLength, 2);
+   Sample::WriteDataToFile(filename, mGlobalRecordBuffer->GetRawBuffer(), mRecordingLength);
 
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);

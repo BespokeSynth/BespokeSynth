@@ -389,8 +389,6 @@ private:
 
    Sample* mHeldSample{ nullptr };
 
-   float* mSaveOutputBuffer[2];
-
    IDrawableModule* mLastClickedModule{ nullptr };
    bool mInitialized{ false };
 
