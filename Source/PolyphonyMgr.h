@@ -67,7 +67,7 @@ public:
              IVoiceParams* mVoiceParams);
 
    void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
-   void Stop(double time, int pitch);
+   void Stop(double time, int pitch, int voiceIdx);
    void Process(double time, ChannelBuffer* out, int bufferSize);
    void DrawDebug(float x, float y);
    void SetVoiceLimit(int limit) { mVoiceLimit = limit; }

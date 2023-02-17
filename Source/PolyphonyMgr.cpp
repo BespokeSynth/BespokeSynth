@@ -92,19 +92,6 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    bool preserveVoice = voiceIdx != -1 && //we specified a voice
                         mVoices[voiceIdx].mPitch != -1; //there is a note playing from that voice
 
-   /*if (voiceIdx == -1) //haven't specified a voice
-   {
-      for (int i=0; i<kNumVoices; ++i)
-      {
-         if (mVoices[i].mPitch == pitch)
-         {
-            voiceIdx = i;   //reuse existing voice
-            preserveVoice = true;
-            break;
-         }
-      }
-   }*/
-
    if (voiceIdx == -1) //need a new voice
    {
       for (int i = 0; i < mVoiceLimit; ++i)
@@ -167,15 +154,24 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    mVoices[voiceIdx].mNoteOn = true;
 }
 
-void PolyphonyMgr::Stop(double time, int pitch)
+void PolyphonyMgr::Stop(double time, int pitch, int voiceIdx)
 {
-   for (int i = 0; i < kNumVoices; ++i)
+   if (voiceIdx == -1)
    {
-      if (mVoices[i].mPitch == pitch && mVoices[i].mNoteOn)
+      double oldest = std::numeric_limits<double>::max();
+      for (int i = 0; i < mVoiceLimit; ++i)
       {
-         mVoices[i].mVoice->Stop(time);
-         mVoices[i].mNoteOn = false;
+         if (mVoices[i].mPitch == pitch && mVoices[i].mNoteOn && mVoices[i].mTime < oldest)
+         {
+            oldest = mVoices[i].mTime;
+            voiceIdx = i;
+         }
       }
+   }
+   if (voiceIdx > -1 && mVoices[voiceIdx].mPitch == pitch && mVoices[voiceIdx].mNoteOn)
+   {
+      mVoices[voiceIdx].mVoice->Stop(time);
+      mVoices[voiceIdx].mNoteOn = false;
    }
 }
 

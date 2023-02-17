@@ -195,7 +195,7 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
    }
    else
    {
-      mPolyMgr.Stop(time, pitch);
+      mPolyMgr.Stop(time, pitch, voiceIdx);
       mVoiceParams.mAdsr.Stop(time, false); //for visualization
       mVoiceParams.mFilterAdsr.Stop(time, false); //for visualization
    }

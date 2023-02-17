@@ -163,7 +163,7 @@ void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    }
    else
    {
-      mPolyMgr.Stop(time, pitch);
+      mPolyMgr.Stop(time, pitch, voiceIdx);
       mVoiceParams.mOscADSRParams.Stop(time); //for visualization
    }
 
