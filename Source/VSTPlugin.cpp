@@ -486,6 +486,8 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
 
       CreateParameterSliders();
 
+      RefreshPresetFiles();
+
       mPluginReady = true;
    }
    else
