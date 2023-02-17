@@ -154,14 +154,6 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    mVoices[voiceIdx].mNoteOn = true;
 }
 
-void PolyphonyMgr::Stop(double time, int pitch)
-{
-   for (int i = 0; i < kNumVoices; ++i)
-   {
-      Stop(time, pitch, i);
-   }
-}
-
 void PolyphonyMgr::Stop(double time, int pitch, int voiceIdx)
 {
    if (voiceIdx == -1)
