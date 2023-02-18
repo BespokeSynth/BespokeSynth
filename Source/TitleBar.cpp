@@ -159,8 +159,8 @@ void TitleBar::CreateUIControls()
    CHECKBOX(mShouldAutosaveCheckbox, "autosave", &ModularSynth::sShouldAutosave);
    ENDUIBLOCK0();
 
-   mDisplayHelpButton = new ClickButton(this, " ? ", 380, 1);
-   mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
+   mDisplayHelpButton = new ClickButton(this, "help", 360, 1);
+   mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 310, 1);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
    mSaveLayoutButton = new ClickButton(this, "save layout", 280, 19);
 
@@ -416,7 +416,7 @@ void TitleBar::DrawModule()
    else
       ofSetColor(255, 255, 255);
    DrawTextRightJustify(stats, ofGetWidth() / GetOwningContainer()->GetDrawScale() - 5, 33);
-   mDisplayHelpButton->SetPosition(ofGetWidth() / GetOwningContainer()->GetDrawScale() - 20, 4);
+   mDisplayHelpButton->SetPosition(ofGetWidth() / GetOwningContainer()->GetDrawScale() - 33, 4);
    mDisplayHelpButton->Draw();
    mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - 55, 4);
    mDisplayUserPrefsEditorButton->Draw();

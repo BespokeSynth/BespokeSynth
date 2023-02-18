@@ -1423,7 +1423,7 @@ void MidiController::GetModuleDimensions(float& width, float& height)
 {
    if (mMappingDisplayMode == kList)
    {
-      width = 900;
+      width = 920;
       height = 72 + 20 * GetNumConnectionsOnPage(mControllerPage);
    }
    else if (mMappingDisplayMode == kLayout)
@@ -2497,7 +2497,7 @@ void UIControlConnection::CreateUIControls(int index)
    mScaleOutputCheckbox = new Checkbox(mUIOwner, "scale", mMidiOnEntry, kAnchor_Right, &mScaleOutput);
    mBlinkCheckbox = new Checkbox(mUIOwner, "blink", mScaleOutputCheckbox, kAnchor_Right, &mBlink);
    mPagelessCheckbox = new Checkbox(mUIOwner, "pageless", mBlinkCheckbox, kAnchor_Right, &mPageless);
-   mRemoveButton = new ClickButton(mUIOwner, " x ", mPagelessCheckbox, kAnchor_Right);
+   mRemoveButton = new ClickButton(mUIOwner, "delete", mPagelessCheckbox, kAnchor_Right);
    mCopyButton = new ClickButton(mUIOwner, "copy", mRemoveButton, kAnchor_Right);
    ++sControlID;
 
@@ -2520,7 +2520,7 @@ void UIControlConnection::CreateUIControls(int index)
 
    for (auto iter = mEditorControls.begin(); iter != mEditorControls.end(); ++iter)
    {
-      //(*iter)->SetNoHover(true);
+      (*iter)->SetCableTargetable(false);
       (*iter)->SetShouldSaveState(false);
    }
 

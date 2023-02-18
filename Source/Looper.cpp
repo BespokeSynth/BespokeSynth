@@ -69,7 +69,7 @@ void Looper::CreateUIControls()
    mClearButton = new ClickButton(this, "clear", -1, -1);
    mVolSlider = new FloatSlider(this, "volume", 3, 98, 130, 15, &mVol, 0, 2);
    mVolumeBakeButton = new ClickButton(this, "b", -1, -1);
-   mMergeButton = new ClickButton(this, " m ", -1, -1);
+   mMergeButton = new ClickButton(this, "m", -1, -1);
    mDecaySlider = new FloatSlider(this, "decay", -1, -1, 65, 15, &mDecay, 0, 1, 2);
    mSaveButton = new ClickButton(this, "save", -1, -1);
    mMuteCheckbox = new Checkbox(this, "mute", -1, -1, &mMute);

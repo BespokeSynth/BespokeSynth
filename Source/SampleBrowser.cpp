@@ -51,11 +51,15 @@ void SampleBrowser::CreateUIControls()
    for (int i = 0; i < (int)mButtons.size(); ++i)
    {
       BUTTON(mButtons[i], ("button" + ofToString(i)).c_str());
+      mButtons[i]->SetCableTargetable(false);
    }
    BUTTON(mBackButton, " < ");
    UIBLOCK_SHIFTX(80);
    BUTTON(mForwardButton, " > ");
    ENDUIBLOCK0();
+
+   mBackButton->SetCableTargetable(false);
+   mForwardButton->SetCableTargetable(false);
 
    SetDirectory(mCurrentDirectory);
 }

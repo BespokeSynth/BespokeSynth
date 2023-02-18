@@ -611,7 +611,7 @@ midicontroller~get midi input from external devices. to get a nice display in th
 ~twoway~should we send feedback to the controller? (to control the LEDs associated with the button/knob)
 ~feedback~which cc or note should we send the feedback to?
 ~pageless~should this connection work across all pages of the midicontroller?
-~ x ~delete this connection
+~delete~delete this connection
 ~copy~duplicate this connection
 ~layout~which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.
 ~monome~which monome should we use?
@@ -678,7 +678,7 @@ multitrackrecorder~record several synchronized tracks of audio, to write to disk
 
 
 multitrackrecordertrack~a track in a multitrack recorder
-~ X ~delete this track
+~delete~delete this track
 
 
 
@@ -860,7 +860,7 @@ looper~loop input audio. use with a "looperrecorder" for full functionality.
 ~clear~clear the loop audio
 ~volume~output volume
 ~b~bake current volume into waveform
-~ m ~take the contents of this looper and merge it into another. click this button on the merge source, then on the merge target.
+~m~take the contents of this looper and merge it into another. click this button on the merge source, then on the merge target.
 ~decay~amount to lower volume each loop
 ~save~save this loop to a wav file
 ~mute~silence this looper
@@ -1833,7 +1833,7 @@ titlebar~
 ~save as~save current state as a new .bsk file
 ~new patch~reset to the layout specified in "layout" in userprefs.json
 ~write audio~write the last 30 minutes of audio to your specified recordings_path
-~ ? ~show help
+~help~show help
 ~settings~adjust preferences, saved as userprefs.json
 ~load layout~[none]
 ~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
