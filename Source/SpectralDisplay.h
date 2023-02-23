@@ -59,6 +59,8 @@ public:
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -67,7 +69,6 @@ private:
       w = mWidth;
       h = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 400 };
    float mHeight{ 100 };

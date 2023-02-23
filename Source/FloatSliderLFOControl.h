@@ -71,12 +71,11 @@ public:
    LFOSettings* GetLFOSettings() { return &mLFOSettings; }
    void SetEnabled(bool enabled) override {} //don't use this one
    void SetLFOEnabled(bool enabled);
-   bool IsEnabled() const { return mEnabled; }
+   bool IsEnabled() const override { return mEnabled; }
    void SetRate(NoteInterval rate);
    void UpdateFromSettings();
    void SetOwner(FloatSlider* owner);
    FloatSlider* GetOwner() { return mTargets[0].mSliderTarget; }
-   bool Enabled() const override { return mEnabled; }
    bool HasTitleBar() const override { return mPinned; }
 
    bool IsSaveable() override { return mPinned; }

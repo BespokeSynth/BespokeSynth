@@ -75,6 +75,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void UpdateSample();
    void DoWrite();
@@ -83,7 +85,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
 
    Sample* mSample{ nullptr };

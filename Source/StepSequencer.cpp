@@ -1112,7 +1112,7 @@ void StepSequencerRow::CreateUIControls()
 
 void StepSequencerRow::OnTimeEvent(double time)
 {
-   if (mSeq->Enabled() == false || mSeq->HasExternalPulseSource())
+   if (mSeq->IsEnabled() == false || mSeq->HasExternalPulseSource())
       return;
 
    float offsetMs = mOffset * TheTransport->MsPerBar();

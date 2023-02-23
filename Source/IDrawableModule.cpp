@@ -113,10 +113,10 @@ void IDrawableModule::Init()
    assert(mCanReceiveNotes == (dynamic_cast<INoteReceiver*>(this) != nullptr));
    assert(mCanReceivePulses == (dynamic_cast<IPulseReceiver*>(this) != nullptr));
 
-   bool wasEnabled = Enabled();
+   bool wasEnabled = IsEnabled();
    bool showEnableToggle = false;
    SetEnabled(!wasEnabled);
-   if (Enabled() == wasEnabled) //nothing changed
+   if (IsEnabled() == wasEnabled) //nothing changed
       showEnableToggle = false; //so don't show toggle, this module doesn't support it
    else
       showEnableToggle = true;
@@ -186,7 +186,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
 
    highlight = 0;
 
-   if (Enabled())
+   if (IsEnabled())
    {
       IAudioSource* audioSource = dynamic_cast<IAudioSource*>(this);
       if (audioSource)
@@ -234,7 +234,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    ofFill();
-   if (Enabled())
+   if (IsEnabled())
       ofSetColor(color.r * (.25f + highlight), color.g * (.25f + highlight), color.b * (.25f + highlight), 210);
    else
       ofSetColor(color.r * .2f, color.g * .2f, color.b * .2f, 120);
@@ -245,7 +245,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    //gModuleShader.end();
    ofNoFill();
 
-   if (Enabled())
+   if (IsEnabled())
       gModuleDrawAlpha = 255;
    else
       gModuleDrawAlpha = 100;
@@ -323,7 +323,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
-   if ((Enabled() || groupSelected || TheSynth->GetMoveModule() == this) && mShouldDrawOutline)
+   if ((IsEnabled() || groupSelected || TheSynth->GetMoveModule() == this) && mShouldDrawOutline)
    {
       ofPushStyle();
       ofNoFill();

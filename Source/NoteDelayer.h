@@ -59,6 +59,7 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    struct NoteInfo
@@ -76,7 +77,6 @@ private:
       width = 108;
       height = 22;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mDelay{ .25 };
    FloatSlider* mDelaySlider{ nullptr };

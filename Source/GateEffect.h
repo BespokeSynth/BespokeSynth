@@ -53,6 +53,8 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -61,7 +63,6 @@ private:
       width = 120;
       height = 50;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mThreshold{ .1 };
    float mAttackTime{ 1 };

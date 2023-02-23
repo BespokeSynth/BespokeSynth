@@ -85,6 +85,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    bool CanStartVinylControl();
 
@@ -95,7 +97,6 @@ private:
       width = 90;
       height = 20;
    }
-   bool Enabled() const override { return mEnabled; }
 
    bool mUseVinylControl{ false };
    Checkbox* mUseVinylControlCheckbox{ nullptr };

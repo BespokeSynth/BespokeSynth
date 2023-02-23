@@ -71,6 +71,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -79,7 +81,6 @@ private:
       width = 152;
       height = 140;
    }
-   bool Enabled() const override { return mEnabled; }
 
    PSMoveMgr mMoveMgr;
    Ramp mVibration;

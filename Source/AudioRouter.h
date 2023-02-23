@@ -61,11 +61,12 @@ public:
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override;
-   bool Enabled() const override { return true; }
 
    int mRouteIndex{ 0 };
    RadioButton* mRouteSelector{ nullptr };

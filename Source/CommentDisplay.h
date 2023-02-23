@@ -49,10 +49,11 @@ public:
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
    char mComment[MAX_TEXTENTRY_LENGTH]{};

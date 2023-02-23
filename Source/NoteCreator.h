@@ -58,12 +58,13 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 protected:
    void TriggerNote(double time, float velocity);
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& w, float& h) override
    {
       w = mWidth;

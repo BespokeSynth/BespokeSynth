@@ -46,7 +46,7 @@ public:
 
 
    void CreateUIControls() override;
-   bool Enabled() const override { return mEnabled; }
+   bool IsEnabled() const override { return mEnabled; }
 
    void SetDelay(float delay);
    void SetShortMode(bool on);

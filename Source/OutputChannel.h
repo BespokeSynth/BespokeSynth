@@ -55,6 +55,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -63,7 +65,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return true; }
 
    int GetNumChannels() const { return mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2; }
 

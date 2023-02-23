@@ -68,10 +68,11 @@ public:
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
    char* mLabels[OSC_OUTPUT_MAX_PARAMS];

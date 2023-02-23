@@ -55,6 +55,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -63,7 +65,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
    void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override

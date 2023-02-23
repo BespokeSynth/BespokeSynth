@@ -52,6 +52,8 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -60,7 +62,6 @@ private:
       w = 80;
       h = 38;
    }
-   bool Enabled() const override { return true; }
 
    bool mPass{ false };
 

@@ -173,7 +173,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
    if (pitch == CHORD_ENABLE_BUTTON)
    {
       if (bOn && mChorder)
-         mChorder->SetEnabled(!mChorder->Enabled());
+         mChorder->SetEnabled(!mChorder->IsEnabled());
       return;
    }
    if (pitch == CHORD_LATCH_BUTTON)
@@ -641,7 +641,7 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
    bool isInPentatonic = pitch >= 0 && TheScale->IsInPentatonic(pitch);
    bool isChordButton = pitch != INVALID_PITCH && pitch < 0;
    bool isPressedChordButton = isChordButton && IsChordButtonPressed(pitch);
-   bool isChorderEnabled = mChorder && mChorder->Enabled();
+   bool isChorderEnabled = mChorder && mChorder->IsEnabled();
 
    if (mLayout == kChord)
    {
@@ -666,7 +666,7 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
    }
    else if (pitch == CHORD_ENABLE_BUTTON)
    {
-      if (mChorder && mChorder->Enabled())
+      if (mChorder && mChorder->IsEnabled())
          color = kGridColor1Bright;
       else
          color = kGridColor1Dim;
@@ -747,7 +747,7 @@ void LaunchpadKeyboard::KeyReleased(int key)
 
 void LaunchpadKeyboard::Poll()
 {
-   bool chorderEnabled = mChorder && mChorder->Enabled();
+   bool chorderEnabled = mChorder && mChorder->IsEnabled();
    if (chorderEnabled != mWasChorderEnabled)
    {
       mWasChorderEnabled = chorderEnabled;

@@ -481,7 +481,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
    int index = sNextLFOIndex;
    for (int i = 0; i < LFO_POOL_SIZE; ++i) //search for the next one that isn't enabled, but only one loop around
    {
-      if (!sLFOPool[index]->Enabled() && !sLFOPool[index]->IsPinned())
+      if (!sLFOPool[index]->IsEnabled() && !sLFOPool[index]->IsPinned())
          break; //found a disabled one
       index = (index + 1) % LFO_POOL_SIZE;
    }

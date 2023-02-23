@@ -56,6 +56,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -64,7 +66,6 @@ private:
       width = 138;
       height = 22;
    }
-   bool Enabled() const override { return mEnabled; }
 
    NoteInterval mVibratoInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };

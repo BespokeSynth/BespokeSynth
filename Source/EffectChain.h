@@ -77,11 +77,12 @@ public:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void UpdateOldControlName(std::string& oldName) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    int GetRowHeight(int row) const;

@@ -47,6 +47,8 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -55,7 +57,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return true; }
 
    void DrawNoteName(int pitch, float y) const;
 

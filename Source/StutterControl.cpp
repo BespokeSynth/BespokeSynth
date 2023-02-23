@@ -211,7 +211,7 @@ StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
 void StutterControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mStutterProcessor.SetEnabled(time, Enabled());
+      mStutterProcessor.SetEnabled(time, IsEnabled());
 
    for (int i = 0; i < kNumStutterTypes; ++i)
    {

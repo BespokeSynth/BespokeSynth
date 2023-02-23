@@ -70,10 +70,11 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
 
    IUIControl* mUIControl{ nullptr };

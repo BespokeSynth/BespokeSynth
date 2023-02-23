@@ -103,6 +103,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 0; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void SyncLoopLengths();
    void UpdateSpeed();
@@ -119,8 +121,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
-
    float mWidth{ 235 };
    float mHeight{ 126 };
    RollingBuffer mRecordBuffer;
