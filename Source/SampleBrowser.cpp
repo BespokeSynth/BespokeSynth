@@ -173,7 +173,7 @@ void SampleBrowser::SetDirectory(String dirPath)
          {
             for (auto& w : wildcards)
             {
-               if (file.getFileName().matchesWildcard(w, !File::areFileNamesCaseSensitive()))
+               if (file.getFileName().matchesWildcard(w, true))
                {
                   include = true;
                   break;
