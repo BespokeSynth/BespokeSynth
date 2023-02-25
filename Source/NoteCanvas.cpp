@@ -596,9 +596,9 @@ void NoteCanvas::QuantizeNotes()
 void NoteCanvas::LoadMidi()
 {
    using namespace juce;
-   String file_pattern = "*.mid,*.midi";
+   String file_pattern = "*.mid;*.midi";
    if (File::areFileNamesCaseSensitive())
-      file_pattern += file_pattern.toUpperCase();
+      file_pattern += ";" + file_pattern.toUpperCase();
    FileChooser chooser("Load midi", File(ofToDataPath("")), file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {

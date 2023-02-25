@@ -294,7 +294,7 @@ void SeaOfGrain::LoadFile()
    using namespace juce;
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
-      file_pattern += file_pattern.toUpperCase();
+      file_pattern += ";" + file_pattern.toUpperCase();
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
                        file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
