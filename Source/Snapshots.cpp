@@ -644,7 +644,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
    {
       in >> path;
       auto module = TheSynth->FindModule(path);
-      if (module)
+      if (module && !VectorContains(module, mSnapshotModules))
       {
          mSnapshotModules.push_back(module);
          mModuleCable->AddPatchCable(module);
@@ -655,7 +655,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
    {
       in >> path;
       auto control = TheSynth->FindUIControl(path);
-      if (control)
+      if (control && !VectorContains(control, mSnapshotControls))
       {
          mSnapshotControls.push_back(control);
          mUIControlCable->AddPatchCable(control);
