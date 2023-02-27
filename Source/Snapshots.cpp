@@ -183,16 +183,13 @@ void Snapshots::DrawModuleUnclipped()
       ofSetColor(255, 255, 255);
       DrawTextNormal(tooltip, pos.x + 5, pos.y + 12);
    }
-#ifdef DEBUG
-   mDrawDebug = true;
-#endif
    if (mDrawDebug)
    {
       float w, h;
-      this->GetDimensions(w, h);
-      w += 8;
-      float y = 0;
-      DrawTextNormal("Collection: " + ofToString(mSnapshotCollection.size()), w, y += 15);
+      GetDimensions(w, h);
+      w += 6;
+      float y = -15;
+      DrawTextNormal("Collections: " + ofToString(mSnapshotCollection.size()), w, y += 15);
       DrawTextNormal("Controls: " + ofToString(mSnapshotControls.size()), w, y += 15);
       DrawTextNormal("Modules: " + ofToString(mSnapshotModules.size()), w, y += 15);
    }

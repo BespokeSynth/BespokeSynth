@@ -1265,7 +1265,7 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 
    if (GetContainer())
       GetContainer()->LoadState(in);
-   else
+   if (!GetContainer() || ModularSynth::sLoadingFileSaveStateRev < 425)
    {
       int numChildren;
       in >> numChildren;
