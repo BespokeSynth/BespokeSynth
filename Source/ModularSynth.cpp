@@ -295,7 +295,7 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
 void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
 {
    for (int i = 0; i < inputChannelCount; ++i)
-      mInputBuffers.push_back(new float[gBufferSize * UserPrefs.oversampling.Get()]);
+      mInputBuffers.push_back(new float[gBufferSize]);
    for (int i = 0; i < outputChannelCount; ++i)
       mOutputBuffers.push_back(new float[gBufferSize]);
 }
@@ -2053,7 +2053,7 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
       }
       else
       {
-         for (int sampleIndex = 0; sampleIndex < gBufferSize * oversampling; ++sampleIndex)
+         for (int sampleIndex = 0; sampleIndex < bufferSize * oversampling; ++sampleIndex)
          {
             mInputBuffers[i][sampleIndex] = input[i][sampleIndex / oversampling];
          }
