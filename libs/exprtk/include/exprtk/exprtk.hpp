@@ -5849,7 +5849,7 @@ namespace exprtk
                   return const_value_ptr(0);
             }
 
-            std::size_t vector_size() const
+            std::size_t vector_size() const exprtk_override
             {
                return size_;
             }
