@@ -72,7 +72,7 @@ void OutputChannel::Process(double time)
       {
          const auto channelbuffer = TheSynth->GetOutputBuffer(channel);
          for (int i = 0; i < gBufferSize; ++i)
-            if (mLimit > 0 + std::numeric_limits<float>::epsilon())
+            if (mLimit > std::numeric_limits<float>::epsilon())
                channelbuffer[i] += std::clamp(buffer[i], -mLimit, mLimit);
             else
                channelbuffer[i] += buffer[i];
@@ -90,7 +90,7 @@ void OutputChannel::Process(double time)
       {
          const auto channel1buffer = TheSynth->GetOutputBuffer(channel1);
          for (int i = 0; i < gBufferSize; ++i)
-            if (mLimit > 0 + std::numeric_limits<float>::epsilon())
+            if (mLimit > std::numeric_limits<float>::epsilon())
                channel1buffer[i] += std::clamp(buffer1[i], -mLimit, mLimit);
             else
                channel1buffer[i] += buffer1[i];
@@ -103,7 +103,7 @@ void OutputChannel::Process(double time)
       {
          const auto channel2buffer = TheSynth->GetOutputBuffer(channel2);
          for (int i = 0; i < gBufferSize; ++i)
-            if (mLimit > 0 + std::numeric_limits<float>::epsilon())
+            if (mLimit > std::numeric_limits<float>::epsilon())
                channel2buffer[i] += std::clamp(buffer2[i], -mLimit, mLimit);
             else
                channel2buffer[i] += buffer2[i];
