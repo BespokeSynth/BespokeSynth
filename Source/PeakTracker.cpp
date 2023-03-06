@@ -27,20 +27,20 @@
 #include "SynthGlobals.h"
 #include "Profiler.h"
 
-void PeakTracker::Process(float* buffer, int bufferSize)
+void PeakTracker::Process(const float* buffer, int bufferSize)
 {
    PROFILER(PeakTracker);
 
    for (int j = 0; j < bufferSize; ++j)
    {
-      float scalar = powf(0.5f, 1.0f / (mDecayTime * gSampleRate));
-      float input = fabsf(buffer[j]);
+      const float scalar = powf(0.5f, 1.0f / (mDecayTime * gSampleRate));
+      const float input = fabsf(buffer[j]);
 
       if (input >= mPeak)
       {
          /* When we hit a peak, ride the peak to the top. */
          mPeak = input;
-         if (mLimit != -1 && mPeak >= mLimit)
+         if (mLimit > 0 + std::numeric_limits<float>::epsilon() && mPeak >= mLimit)
          {
             mPeak = mLimit;
             mHitLimitTime = gTime;

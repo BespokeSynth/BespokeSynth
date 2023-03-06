@@ -31,7 +31,7 @@
 class PeakTracker
 {
 public:
-   void Process(float* buffer, int bufferSize);
+   void Process(const float* buffer, int bufferSize);
    float GetPeak() const { return mPeak; }
    void SetDecayTime(float time) { mDecayTime = time; }
    void SetLimit(float limit) { mLimit = limit; }
