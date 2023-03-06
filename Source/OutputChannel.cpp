@@ -139,8 +139,8 @@ void OutputChannel::DrawModule()
       {
          ofPushStyle();
          ofFill();
-         const float level = mLevelMeters[i].mPeakTracker.GetPeak() / mLimit > 0 ? mLimit : 1;
-         const float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak() / mLimit > 0 ? mLimit : 1;
+         const float level = mLevelMeters[i].mPeakTracker.GetPeak() / (mLimit > 0 ? mLimit : 1);
+         const float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak() / (mLimit > 0 ? mLimit : 1);
          ofColor color(0, 255, 0);
          if (j > kNumSegments - 3)
             color.set(255, 0, 0);
