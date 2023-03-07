@@ -628,6 +628,9 @@ void EnvelopeEditor::LoadLayout(const ofxJSONElement& moduleInfo)
    {
       SetUpFromSaveData();
       Pin();
+      // Since `mPinned` is set after `IDrawableModule::LoadBasics` we need to manually set minimized
+      // after setting `mPinned` which is used to check if this module has a titlebar.
+      SetMinimized(moduleInfo["start_minimized"].asBool(), false);
    }
 }
 

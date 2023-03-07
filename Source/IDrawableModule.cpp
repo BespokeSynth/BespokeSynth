@@ -1047,10 +1047,7 @@ void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string t
 
    SetName(name.c_str());
 
-   SetMinimized(start_minimized);
-
-   if (mMinimized)
-      mMinimizeAnimation = 1;
+   SetMinimized(start_minimized, false);
 
    if (draw_lissajous)
       TheSynth->AddLissajousDrawer(this);
