@@ -2321,7 +2321,7 @@ void MidiController::UpdateControllerIndex()
 void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
 {
    mConnectionsJson.clear();
-   mConnectionsJson.resize((int)mConnections.size());
+   mConnectionsJson.resize((int)mConnections.size() + (int)mGrids.size());
    int i = 0;
    for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)
    {
