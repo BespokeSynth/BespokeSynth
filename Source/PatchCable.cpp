@@ -611,6 +611,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
       target->GetPosition(xThat, yThat);
 
       IDrawableModule* targetModuleParent = dynamic_cast<IDrawableModule*>(target->GetParent());
+      IDrawableModule* targetModuleGrandparent = dynamic_cast<IDrawableModule*>(targetModuleParent ? targetModuleParent->GetParent() : nullptr);
       ModuleContainer* targetModuleParentContainer = targetModuleParent ? targetModuleParent->GetOwningContainer() : nullptr;
       IDrawableModule* targetModuleParentContainerModule = targetModuleParentContainer ? targetModuleParentContainer->GetOwner() : nullptr;
       if (targetModuleParentContainerModule && targetModuleParentContainerModule->Minimized())
@@ -620,6 +621,13 @@ PatchCablePos PatchCable::GetPatchCablePos()
          targetModuleParent->GetPosition(xThat, yThat);
          targetModuleParent->GetDimensions(wThat, hThat);
          if (targetModuleParent->HasTitleBar() && !mDragging)
+            yThatAdjust = IDrawableModule::TitleBarHeight();
+      }
+      if (targetModuleGrandparent && (targetModuleGrandparent->Minimized() || target->IsShowing() == false))
+      {
+         targetModuleGrandparent->GetPosition(xThat, yThat);
+         targetModuleGrandparent->GetDimensions(wThat, hThat);
+         if (targetModuleGrandparent->HasTitleBar() && !mDragging)
             yThatAdjust = IDrawableModule::TitleBarHeight();
       }
    }
