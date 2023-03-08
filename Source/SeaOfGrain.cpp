@@ -292,8 +292,11 @@ void SeaOfGrain::UpdateDisplaySamples()
 void SeaOfGrain::LoadFile()
 {
    using namespace juce;
+   auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
+   if (File::areFileNamesCaseSensitive())
+      file_pattern += ";" + file_pattern.toUpperCase();
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetFileChooserParent());
+                       file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();
