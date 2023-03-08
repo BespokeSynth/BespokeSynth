@@ -99,10 +99,11 @@ void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceI
    int channel = voiceIdx + 1;
    if (voiceIdx == -1)
       channel = 1;
+   channel = mUseVoiceAsChannel ? channel : mChannel;
 
-   mDevice.SendNote(time, pitch, velocity, false, mUseVoiceAsChannel ? channel : mChannel);
+   mDevice.SendNote(time, pitch, velocity, false, channel);
 
-   int modIdx = voiceIdx;
+   int modIdx = channel - 1;
    if (voiceIdx == -1)
       modIdx = kGlobalModulationIdx;
 
