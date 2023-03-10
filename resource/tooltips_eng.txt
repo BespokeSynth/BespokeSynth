@@ -1131,8 +1131,9 @@ audiorouter~selector for switching where audio is routed to. connect to targets 
 
 
 
-audiometer~sets a slider to an audio level's volume. useful to map a midi display value to.
+audiometer~monitor audio levels. sets a slider to an audio level's volume. useful to map a midi display value to. optionally displays a VU meter.
 ~level~the input audio level. hook this up to an LED-display midi control to see the value displayed on your controller.
+~vu~turn VU meter on or off
 
 
 
