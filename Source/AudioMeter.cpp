@@ -31,12 +31,19 @@ AudioMeter::AudioMeter()
 : IAudioProcessor(gBufferSize)
 {
    mAnalysisBuffer = new float[gBufferSize];
+
+   for (size_t i = 0; i < mLevelMeters.size(); ++i)
+   {
+      mLevelMeters[i].mPeakTrackerSlow.SetDecayTime(3);
+      mLevelMeters[i].mPeakTrackerSlow.SetLimit(1);
+   }
 }
 
 void AudioMeter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mLevelSlider = new FloatSlider(this, "level", 5, 2, 110, 15, &mLevel, 0, mMaxLevel);
+   mLevelSlider = new FloatSlider(this, "level", 5, 2, 82, 15, &mLevel, 0, mMaxLevel);
+   mVUCheckbox = new Checkbox(this, "vu", 90, 2, &mVUMode);
 }
 
 AudioMeter::~AudioMeter()
@@ -59,14 +66,20 @@ void AudioMeter::Process(double time)
    IAudioReceiver* target = GetTarget();
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
+      float* chBuf = GetBuffer()->GetChannel(ch);
       if (target)
-         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-      Add(mAnalysisBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+         Add(target->GetBuffer()->GetChannel(ch), chBuf, gBufferSize);
+      Add(mAnalysisBuffer, chBuf, gBufferSize);
+      GetVizBuffer()->WriteChunk(chBuf, gBufferSize, ch);
+
+      mLevelMeters[ch].mPeakTracker.Process(chBuf, gBufferSize);
+      mLevelMeters[ch].mPeakTrackerSlow.Process(chBuf, gBufferSize);
    }
 
    mPeakTracker.Process(mAnalysisBuffer, gBufferSize);
    mLevel = sqrtf(mPeakTracker.GetPeak());
+
+   mNumChannels = GetBuffer()->NumActiveChannels();
 
    GetBuffer()->Reset();
 }
@@ -77,12 +90,70 @@ void AudioMeter::DrawModule()
       return;
 
    mLevelSlider->Draw();
+   mVUCheckbox->Draw();
+
+   if (!mVUMode)
+   {
+      mHeight = 22;
+      return;
+   }
+
+   //int numChannels = GetBuffer()->NumActiveChannels();
+   // for some reason this is more stable than calling GetBuffer()->NumActiveChannels(); here? idk
+   int numChannels = mNumChannels;
+
+   if (numChannels == 1)
+       mHeight = 32;
+   else
+      mHeight = 42;
+
+   const int kNumSegments = 20;
+   const int kPaddingOutside = 3;
+   const int kPaddingBetween = 1;
+   const int kBarHeight = 8;
+   const float kSegmentWidth = (mWidth - kPaddingOutside * 2) / kNumSegments;
+   const float kOffsetY = 20;
+   
+   for (int i = 0; i < numChannels; ++i)
+   {
+      for (int j = 0; j < kNumSegments; ++j)
+      {
+         ofPushStyle();
+         ofFill();
+         float level = mLevelMeters[i].mPeakTracker.GetPeak() / mLimit;
+         float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak() / mLimit;
+         ofColor color(0, 255, 0);
+         if (j > kNumSegments - 3)
+            color.set(255, 0, 0);
+         else if (j > kNumSegments - 6)
+            color.set(255, 255, 0);
+
+         if (slowLevel > 0 && ofClamp(int(slowLevel * kNumSegments), 0, kNumSegments - 1) == j)
+            ofSetColor(color);
+         else if (level > 0 && level >= j / (float)kNumSegments)
+            ofSetColor(color * .9f);
+         else
+            ofSetColor(color * .5f);
+         ofRect(kPaddingOutside + kSegmentWidth * j, kOffsetY + i * (kBarHeight + 2), kSegmentWidth - kPaddingBetween, kBarHeight, 0);
+         ofPopStyle();
+      }
+
+      if (mLevelMeters[i].mPeakTrackerSlow.GetLastHitLimitTime() > gTime - 1000)
+      {
+         ofPushStyle();
+         ofSetColor(ofColor::red);
+         DrawTextBold("clipped", kPaddingOutside + 10, kOffsetY + i * (kBarHeight + 2) + 8, 12.0f);
+         ofPopStyle();
+      }
+   }
 }
 
 void AudioMeter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("maxlevel", moduleInfo, 1);
+   mModuleSaveData.LoadFloat("limit", moduleInfo, 1, 0, 1000, K(isTextField));
+   mModuleSaveData.LoadBool("vu", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -92,4 +163,9 @@ void AudioMeter::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    mMaxLevel = mModuleSaveData.GetFloat("maxlevel");
    mLevelSlider->SetExtents(0, mMaxLevel);
+   mLimit = mModuleSaveData.GetFloat("limit");
+   mVUMode = mModuleSaveData.GetBool("vu");
+
+   for (size_t i = 0; i < mLevelMeters.size(); ++i)
+      mLevelMeters[i].mPeakTrackerSlow.SetLimit(mLimit);
 }

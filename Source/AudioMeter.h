@@ -30,6 +30,7 @@
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
+#include "Checkbox.h"
 #include "PeakTracker.h"
 
 class AudioMeter : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
@@ -51,6 +52,8 @@ public:
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
@@ -59,16 +62,30 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override
    {
-      w = 120;
-      h = 22;
+      w = mWidth;
+      h = mHeight;
    }
    bool Enabled() const override { return mEnabled; }
 
+   float mWidth{ 120 };
+   float mHeight{ 62 };
    float mLevel{ 0 };
    float mMaxLevel{ 1 };
    FloatSlider* mLevelSlider{ nullptr };
+   bool mVUMode{ false };
+   Checkbox* mVUCheckbox{ nullptr };
    PeakTracker mPeakTracker;
    float* mAnalysisBuffer{ nullptr };
+   float mLimit{ 1 };
+   int mNumChannels{ 1 };
+   
+   struct LevelMeter
+   {
+      PeakTracker mPeakTracker;
+      PeakTracker mPeakTrackerSlow;
+   };
+
+   std::array<LevelMeter, 2> mLevelMeters;
 };
 
 #endif /* defined(__Bespoke__AudioMeter__) */
