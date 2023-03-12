@@ -1,6 +1,6 @@
 include(cmake/lib.cmake)
 include(cmake/versiontools.cmake)
-include(../libs/link/AbletonLinkConfig.cmake)
+include(../libs/ableton-link/AbletonLinkConfig.cmake)
 
 juce_add_gui_app(BespokeSynth
     PRODUCT_NAME BespokeSynth
