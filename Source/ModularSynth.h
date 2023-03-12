@@ -230,6 +230,10 @@ public:
          mRenderLock.unlock();
       }
    }
+   std::lock_guard<std::recursive_mutex> LockRenderWithGuard()
+   {
+      return std::lock_guard<std::recursive_mutex>(mRenderLock);
+   }
    void UpdateFrameRate(float fps) { mFrameRate = fps; }
    float GetFrameRate() const { return mFrameRate; }
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
