@@ -46,6 +46,8 @@ void LocationZoomer::Init()
 
 void LocationZoomer::Update()
 {
+   auto g = TheSynth->LockRenderWithGuard();
+
    if (mCurrentProgress < 1)
    {
       mCurrentProgress = ofClamp(mCurrentProgress + ofGetLastFrameTime() * mSpeed, 0, 1);
