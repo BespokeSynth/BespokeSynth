@@ -53,7 +53,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
@@ -78,7 +78,7 @@ private:
    float* mAnalysisBuffer{ nullptr };
    float mLimit{ 1 };
    int mNumChannels{ 1 };
-   
+
    struct LevelMeter
    {
       PeakTracker mPeakTracker;

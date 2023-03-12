@@ -103,7 +103,7 @@ void AudioMeter::DrawModule()
    int numChannels = mNumChannels;
 
    if (numChannels == 1)
-       mHeight = 32;
+      mHeight = 32;
    else
       mHeight = 42;
 
@@ -113,7 +113,7 @@ void AudioMeter::DrawModule()
    const int kBarHeight = 8;
    const float kSegmentWidth = (mWidth - kPaddingOutside * 2) / kNumSegments;
    const float kOffsetY = 20;
-   
+
    for (int i = 0; i < numChannels; ++i)
    {
       for (int j = 0; j < kNumSegments; ++j)
