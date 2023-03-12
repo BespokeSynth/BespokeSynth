@@ -164,7 +164,11 @@ public:
    ofVec2f& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
    void SetDrawOffset(ofVec2f offset) { mModuleContainer.SetDrawOffset(offset); }
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
-   void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
+   void SetPixelRatio(double ratio)
+   {
+      auto g = LockRenderWithGuard();
+      mPixelRatio = ratio;
+   }
    double GetPixelRatio() const { return mPixelRatio; }
    long GetFrameCount() { return mFrameCount; }
    void SetUIScale(float scale) { mUILayerModuleContainer.SetDrawScale(scale); }
