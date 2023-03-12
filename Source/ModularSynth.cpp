@@ -2063,11 +2063,13 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
 
 float* ModularSynth::GetInputBuffer(int channel)
 {
+   assert(channel >= 0 && channel < mInputBuffers.size());
    return mInputBuffers[channel];
 }
 
 float* ModularSynth::GetOutputBuffer(int channel)
 {
+   assert(channel >= 0 && channel < mOutputBuffers.size());
    return mOutputBuffers[channel];
 }
 
