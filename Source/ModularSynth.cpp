@@ -40,6 +40,7 @@
 #include "NoteOutputQueue.h"
 
 #include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_audio_formats/juce_audio_formats.h"
 
 #if BESPOKE_WINDOWS
 #include <windows.h>
@@ -96,8 +97,6 @@ ModularSynth::~ModularSynth()
    DeleteAllModules();
 
    delete mGlobalRecordBuffer;
-   delete[] mSaveOutputBuffer[0];
-   delete[] mSaveOutputBuffer[1];
    mAudioPluginFormatManager.reset();
    mKnownPluginList.reset();
 
@@ -237,8 +236,6 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
 
    mGlobalRecordBuffer = new RollingBuffer(UserPrefs.record_buffer_length_minutes.Get() * 60 * gSampleRate);
    mGlobalRecordBuffer->SetNumChannels(2);
-   mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
-   mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
 
    juce::File(ofToDataPath("savestate")).createDirectory();
    juce::File(ofToDataPath("savestate/autosave")).createDirectory();
@@ -3231,16 +3228,31 @@ void ModularSynth::SaveOutput()
 
    assert(mRecordingLength <= mGlobalRecordBuffer->Size());
 
-   for (int i = 0; i < mRecordingLength; ++i)
+   int channels = 2;
+   auto wavFormat = std::make_unique<juce::WavAudioFormat>();
+   juce::File outputFile(ofToDataPath(filename));
+   outputFile.create();
+   auto outputTo = outputFile.createOutputStream();
+   assert(outputTo != nullptr);
+   bool b1{ false };
+   auto writer = std::unique_ptr<juce::AudioFormatWriter>(wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, 16, b1, 0));
+
+   long long samplesRemaining = mRecordingLength;
+   const int chunkSize = 256;
+   float leftChannel[chunkSize];
+   float rightChannel[chunkSize];
+   float* chunk[2]{ leftChannel, rightChannel };
+   while (samplesRemaining > 0)
    {
-      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength - i - 1, 0);
-      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength - i - 1, 1);
+      int numSamples = MIN(chunkSize, samplesRemaining);
+      for (int i = 0; i < numSamples; ++i)
+      {
+         chunk[0][i] = mGlobalRecordBuffer->GetSample(samplesRemaining - 1, 0);
+         chunk[1][i] = mGlobalRecordBuffer->GetSample(samplesRemaining - 1, 1);
+         --samplesRemaining;
+      }
+      writer->writeFromFloatArrays(chunk, channels, numSamples);
    }
-
-   Sample::WriteDataToFile(filename, mSaveOutputBuffer, (int)mRecordingLength, 2);
-
-   //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
-   //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);
 
    mGlobalRecordBuffer->ClearBuffer();
    mRecordingLength = 0;
