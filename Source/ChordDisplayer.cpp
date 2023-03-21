@@ -43,7 +43,7 @@ void ChordDisplayer::DrawModule()
    if (notes.size() > 2)
    {
       std::vector<int> chord{ std::begin(notes), std::end(notes) };
-      DrawTextNormal(TheScale->GetChordDatabase().GetChordName(chord), 4, 14);
+      DrawTextNormal(TheScale->GetChordDatabase().GetChordNameAdvanced(chord), 4, 14);
    }
 }
 

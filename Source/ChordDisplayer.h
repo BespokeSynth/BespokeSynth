@@ -48,7 +48,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 200;
+      width = 300;
       height = 20;
    }
    bool Enabled() const override { return true; }
