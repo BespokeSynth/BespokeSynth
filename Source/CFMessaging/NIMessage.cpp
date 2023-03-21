@@ -63,7 +63,7 @@ std::string TypeForMessageID(uint32_t messageId)
          return MessageIdToStringTable[i].className;
    }
    char messageIdStr[16];
-   sprintf(messageIdStr, "0x%08x", messageId);
+   snprintf(messageIdStr, sizeof(messageIdStr), "0x%08x", messageId);
    return std::string("Unknown message type ") + messageIdStr;
 }
 

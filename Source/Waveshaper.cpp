@@ -39,21 +39,7 @@ namespace
 
 Waveshaper::Waveshaper()
 : IAudioProcessor(gBufferSize)
-, mRescale(1)
-, mRescaleSlider(nullptr)
-, mA(0)
-, mASlider(nullptr)
-, mB(0)
-, mBSlider(nullptr)
-, mC(0)
-, mCSlider(nullptr)
-, mD(0)
-, mDSlider(nullptr)
-, mE(0)
-, mESlider(nullptr)
-, mExpressionValid(false)
 {
-   mEntryString = "x";
 }
 
 void Waveshaper::CreateUIControls()

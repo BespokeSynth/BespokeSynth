@@ -102,7 +102,7 @@ void CircleSequencer::DrawModule()
    ofPopStyle();
 }
 
-void CircleSequencer::OnClicked(int x, int y, bool right)
+void CircleSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mCircleSequencerRings.size(); ++i)
@@ -124,15 +124,15 @@ bool CircleSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-void CircleSequencer::CheckboxUpdated(Checkbox* checkbox)
+void CircleSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void CircleSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void CircleSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void CircleSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void CircleSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -148,32 +148,27 @@ void CircleSequencer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void CircleSequencer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << (int)mCircleSequencerRings.size();
    for (size_t i = 0; i < mCircleSequencerRings.size(); ++i)
       mCircleSequencerRings[i]->SaveState(out);
 }
 
-void CircleSequencer::LoadState(FileStreamIn& in)
+void CircleSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int numRings;
    in >> numRings;
@@ -269,7 +264,7 @@ int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
    return -1;
 }
 
-void CircleSequencerRing::OnClicked(int x, int y, bool right)
+void CircleSequencerRing::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
@@ -315,11 +310,14 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
    info.mCustomDivisor = mLength;
 
    double remainderMs;
-   int oldStep = TheTransport->GetQuantized(gTime, &info);
-   int newStep = TheTransport->GetQuantized(gTime + gBufferSizeMs, &info, &remainderMs);
-   if (oldStep != newStep && mSteps[newStep] > 0)
+   const int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
+   const int newStep = TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs);
+   const int oldMeasure = TheTransport->GetMeasure(NextBufferTime(true) - gBufferSizeMs);
+   const int newMeasure = TheTransport->GetMeasure(NextBufferTime(true));
+
+   if ((oldMeasure != newMeasure || oldStep != newStep) && mSteps[newStep] > 0)
    {
-      double time = gTime + gBufferSizeMs - remainderMs;
+      const double time = NextBufferTime(true) - remainderMs;
       mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
       mOwner->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
    }

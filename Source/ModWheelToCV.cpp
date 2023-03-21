@@ -33,7 +33,6 @@
 #include "ModulationChain.h"
 
 ModWheelToCV::ModWheelToCV()
-: mModWheel(nullptr)
 {
 }
 
@@ -82,23 +81,13 @@ float ModWheelToCV::Value(int samplesIn)
 
 void ModWheelToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ModWheelToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void ModWheelToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

@@ -45,7 +45,9 @@ public:
    SignalGenerator();
    ~SignalGenerator();
    static IDrawableModule* Create() { return new SignalGenerator(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 
@@ -62,10 +64,10 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -123,7 +125,7 @@ private:
    FloatSlider* mPhaseOffsetSlider{ nullptr };
    double mResetPhaseAtMs{ -9999 };
 
-   float* mWriteBuffer;
+   float* mWriteBuffer{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SignalGenerator__) */

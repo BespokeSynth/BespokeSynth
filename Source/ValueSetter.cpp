@@ -52,7 +52,7 @@ void ValueSetter::CreateUIControls()
    mValueSlider = new FloatSlider(this, "slider", entryRect.x, entryRect.y, entryRect.width, entryRect.height, &mValue, 0, 1);
    mValueSlider->SetShowing(false);
 
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
+   mControlCable = new PatchCableSource(this, kConnectionType_ValueSetter);
    AddPatchCableSource(mControlCable);
 }
 
@@ -68,7 +68,19 @@ void ValueSetter::DrawModule()
 
 void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
+   for (size_t i = 0; i < mTargets.size(); ++i)
+   {
+      if (i < mControlCable->GetPatchCables().size())
+      {
+         mTargets[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
+         if (mControlCable->GetPatchCables().size() == 1 && mTargets[i] != nullptr)
+            mValueSlider->SetExtents(mTargets[i]->GetModulationRangeMin(), mTargets[i]->GetModulationRangeMax());
+      }
+      else
+      {
+         mTargets[i] = nullptr;
+      }
+   }
 }
 
 void ValueSetter::OnPulse(double time, float velocity, int flags)
@@ -76,40 +88,37 @@ void ValueSetter::OnPulse(double time, float velocity, int flags)
    if (velocity > 0 && mEnabled)
    {
       ComputeSliders((time - gTime) * gSampleRateMs);
-      Go();
+      Go(time);
    }
 }
 
-void ValueSetter::ButtonClicked(ClickButton* button)
+void ValueSetter::ButtonClicked(ClickButton* button, double time)
 {
-   if (button == mButton)
-      Go();
+   if (button == mButton && mLastClickTime != time)
+   {
+      mLastClickTime = time;
+      Go(time);
+   }
 }
 
-void ValueSetter::Go()
+void ValueSetter::Go(double time)
 {
-   if (mTarget)
+   mControlCable->AddHistoryEvent(time, true);
+   mControlCable->AddHistoryEvent(time + 15, false);
+
+   for (size_t i = 0; i < mTargets.size(); ++i)
    {
-      mTarget->SetValue(mValue);
-      mControlCable->AddHistoryEvent(gTime, true);
-      mControlCable->AddHistoryEvent(gTime + 15, false);
+      if (mTargets[i] != nullptr)
+         mTargets[i]->SetValue(mValue, time);
    }
 }
 
 void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ValueSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("show_slider", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -117,9 +126,6 @@ void ValueSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ValueSetter::SetUpFromSaveData()
 {
-   mTarget = TheSynth->FindUIControl(mModuleSaveData.GetString("target"));
-   mControlCable->SetTarget(mTarget);
-
    bool showSlider = mModuleSaveData.GetBool("show_slider");
    mValueEntry->SetShowing(!showSlider);
    mValueSlider->SetShowing(showSlider);

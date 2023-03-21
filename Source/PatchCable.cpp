@@ -38,18 +38,11 @@
 #include "MidiController.h"
 #include "IModulator.h"
 #include "UserPrefs.h"
+#include "QuickSpawnMenu.h"
 
 PatchCable* PatchCable::sActivePatchCable = nullptr;
 
 PatchCable::PatchCable(PatchCableSource* owner)
-: mHovered(false)
-, mDragging(false)
-, mHoveringOnSource(false)
-, mSourceIndex(0)
-, mTarget(nullptr)
-, mTargetRadioButton(nullptr)
-, mUIControlConnection(nullptr)
-, mAudioReceiverTarget(nullptr)
 {
    mOwner = owner;
    TheSynth->RegisterPatchCable(this);
@@ -62,7 +55,7 @@ PatchCable::~PatchCable()
    TheSynth->UnregisterPatchCable(this);
 }
 
-void PatchCable::SetTarget(IClickable* target)
+void PatchCable::SetCableTarget(IClickable* target)
 {
    mTarget = target;
    mTargetRadioButton = dynamic_cast<RadioButton*>(target);
@@ -94,6 +87,7 @@ void PatchCable::Render()
           GetConnectionType() == kConnectionType_Grid ||
           GetConnectionType() == kConnectionType_Pulse ||
           GetConnectionType() == kConnectionType_Modulator ||
+          GetConnectionType() == kConnectionType_ValueSetter ||
           GetConnectionType() == kConnectionType_UIControl)
       {
          bool hasNote = false;
@@ -189,8 +183,8 @@ void PatchCable::Render()
    GetDimensions(wThis, hThis);
    GetPosition(xThis, yThis);
 
-   bool isInsideSelf = cable.end.x >= xThis && cable.end.x <= (xThis + wThis) && cable.end.y >= yThis && cable.end.y <= (yThis + hThis);
-   if (!isInsideSelf)
+   //bool isInsideSelf = cable.end.x >= xThis && cable.end.x <= (xThis + wThis) && cable.end.y >= yThis && cable.end.y <= (yThis + hThis);
+   //if (!isInsideSelf)
    {
       IAudioSource* audioSource = nullptr;
       float wireLength = sqrtf((cable.plug - cable.start).lengthSquared());
@@ -203,6 +197,7 @@ void PatchCable::Render()
           type == kConnectionType_Grid ||
           type == kConnectionType_Pulse ||
           type == kConnectionType_Modulator ||
+          type == kConnectionType_ValueSetter ||
           type == kConnectionType_UIControl)
       {
          ofSetLineWidth(lineWidth);
@@ -375,8 +370,16 @@ void PatchCable::Render()
                {
                   ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                   float sample = vizBuff->GetSample((i / wireLength * numSamples), ch);
-                  sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
-                  sample = ofClamp(sample, -1.0f, 1.0f);
+                  if (isnan(sample))
+                  {
+                     ofSetColor(ofColor(255, 0, 0));
+                     sample = 0;
+                  }
+                  else
+                  {
+                     sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
+                     sample = ofClamp(sample, -1.0f, 1.0f);
+                  }
                   ofVec2f sampleOffsetDir = MathUtils::BezierPerpendicular(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                   pos += sampleOffsetDir * 10 * sample;
                   ofVertex(pos.x + offset.x, pos.y + offset.y);
@@ -481,15 +484,49 @@ void PatchCable::MouseReleased()
          if (target)
             mOwner->SetPatchCableTarget(this, target, true);
 
-         mDragging = false;
-         mHovered = false;
-         if (sActivePatchCable == this)
-            sActivePatchCable = nullptr;
+         Release();
 
-         if (mTarget == nullptr)
-            Destroy(true);
+         if (target == nullptr)
+         {
+            if ((CableDropBehavior)UserPrefs.cable_drop_behavior.GetIndex() == CableDropBehavior::ShowQuickspawn)
+            {
+               if (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Audio || GetConnectionType() == kConnectionType_Pulse)
+                  ShowQuickspawnForCable();
+            }
+
+            if ((CableDropBehavior)UserPrefs.cable_drop_behavior.GetIndex() == CableDropBehavior::DoNothing)
+            {
+               //do nothing
+            }
+
+            if ((CableDropBehavior)UserPrefs.cable_drop_behavior.GetIndex() == CableDropBehavior::DisconnectCable)
+            {
+               mOwner->RemovePatchCable(this, true);
+               return;
+            }
+
+            if (mTarget == nullptr)
+               Destroy(true);
+         }
       }
    }
+}
+
+void PatchCable::ShowQuickspawnForCable()
+{
+   Release();
+
+   TheSynth->GetQuickSpawn()->ShowSpawnCategoriesPopupForCable(this);
+   if (mTarget == nullptr) //if we're currently connected to nothing
+   {
+      mOwner->SetPatchCableTarget(this, TheSynth->GetQuickSpawn()->GetMainContainerFollower(), true);
+   }
+   else //if we're inserting
+   {
+      SetTempDrawTarget(TheSynth->GetQuickSpawn()->GetMainContainerFollower());
+      TheSynth->GetQuickSpawn()->SetTempConnection(mTarget, GetConnectionType());
+   }
+   TheSynth->GetQuickSpawn()->GetMainContainerFollower()->UpdateLocation();
 }
 
 IClickable* PatchCable::GetDropTarget()
@@ -498,7 +535,7 @@ IClickable* PatchCable::GetDropTarget()
    {
       PatchCablePos cable = GetPatchCablePos();
       IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
-      if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
+      if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
       {
          const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
          for (auto uicontrol : uicontrols)
@@ -523,7 +560,7 @@ IClickable* PatchCable::GetDropTarget()
    return nullptr;
 }
 
-bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool PatchCable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (mHovered && !right)
    {
@@ -534,7 +571,7 @@ bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */
    return false;
 }
 
-void PatchCable::OnClicked(int x, int y, bool right)
+void PatchCable::OnClicked(float x, float y, bool right)
 {
 }
 
@@ -545,8 +582,10 @@ PatchCablePos PatchCable::GetPatchCablePos()
    float wThat, hThat, xThat, yThat;
 
    int yThatAdjust = 0;
-   IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(mTarget);
    IClickable* target = mTarget;
+   if (mTempDrawTarget != nullptr)
+      target = mTempDrawTarget;
+   IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(target);
 
    if (targetModule != nullptr && targetModule->IsDeleted())
    {
@@ -572,6 +611,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
       target->GetPosition(xThat, yThat);
 
       IDrawableModule* targetModuleParent = dynamic_cast<IDrawableModule*>(target->GetParent());
+      IDrawableModule* targetModuleGrandparent = dynamic_cast<IDrawableModule*>(targetModuleParent ? targetModuleParent->GetParent() : nullptr);
       ModuleContainer* targetModuleParentContainer = targetModuleParent ? targetModuleParent->GetOwningContainer() : nullptr;
       IDrawableModule* targetModuleParentContainerModule = targetModuleParentContainer ? targetModuleParentContainer->GetOwner() : nullptr;
       if (targetModuleParentContainerModule && targetModuleParentContainerModule->Minimized())
@@ -581,6 +621,13 @@ PatchCablePos PatchCable::GetPatchCablePos()
          targetModuleParent->GetPosition(xThat, yThat);
          targetModuleParent->GetDimensions(wThat, hThat);
          if (targetModuleParent->HasTitleBar() && !mDragging)
+            yThatAdjust = IDrawableModule::TitleBarHeight();
+      }
+      if (targetModuleGrandparent && (targetModuleGrandparent->Minimized() || target->IsShowing() == false))
+      {
+         targetModuleGrandparent->GetPosition(xThat, yThat);
+         targetModuleGrandparent->GetDimensions(wThat, hThat);
+         if (targetModuleGrandparent->HasTitleBar() && !mDragging)
             yThatAdjust = IDrawableModule::TitleBarHeight();
       }
    }
@@ -664,6 +711,17 @@ void PatchCable::Grab()
       gHoveredUIControl = nullptr;
       mGrabPos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
       mOwner->CableGrabbed();
+   }
+}
+
+void PatchCable::Release()
+{
+   if (mDragging)
+   {
+      mDragging = false;
+      mHovered = false;
+      if (sActivePatchCable == this)
+         sActivePatchCable = nullptr;
    }
 }
 

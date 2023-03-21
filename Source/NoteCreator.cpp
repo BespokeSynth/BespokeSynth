@@ -79,36 +79,38 @@ void NoteCreator::OnPulse(double time, float velocity, int flags)
 
 void NoteCreator::TriggerNote(double time, float velocity)
 {
+   if (!Enabled())
+      return;
+
    mStartTime = time;
    PlayNoteOutput(mStartTime, mPitch, velocity * 127, mVoiceIndex);
    PlayNoteOutput(mStartTime + mDuration, mPitch, 0, mVoiceIndex);
 }
 
-void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
+void NoteCreator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
-   double time = gTime + gBufferSizeMs;
-
    if (checkbox == mEnabledCheckbox)
       mNoteOutput.Flush(time);
    if (checkbox == mNoteOnCheckbox)
    {
       if (mNoteOn)
       {
-         PlayNoteOutput(time, mPitch, mVelocity * 127, mVoiceIndex);
+         if (Enabled())
+            PlayNoteOutput(time, mPitch, mVelocity * 127, mVoiceIndex);
       }
       else
       {
-         PlayNoteOutput(time, mPitch, 0, mVoiceIndex);
+         if (Enabled())
+            PlayNoteOutput(time, mPitch, 0, mVoiceIndex);
          mNoteOutput.Flush(time);
       }
    }
 }
 
-void NoteCreator::ButtonClicked(ClickButton* button)
+void NoteCreator::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTriggerButton)
    {
-      double time = gTime + gBufferSizeMs;
       TriggerNote(time, mVelocity);
    }
 }
@@ -119,7 +121,7 @@ void NoteCreator::TextEntryComplete(TextEntry* entry)
    {
       if (mNoteOn)
       {
-         double time = gTime + gBufferSizeMs;
+         double time = NextBufferTime(false);
          mNoteOutput.Flush(time);
          PlayNoteOutput(time + .1f, mPitch, mVelocity * 127, mVoiceIndex);
       }

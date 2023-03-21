@@ -29,27 +29,14 @@
 #include "Profiler.h"
 
 FreeverbEffect::FreeverbEffect()
-: mRoomSizeSlider(nullptr)
-, mDampSlider(nullptr)
-, mWetSlider(nullptr)
-, mDrySlider(nullptr)
-, mWidthSlider(nullptr)
-, mNeedUpdate(false)
 {
    //mFreeverb.setmode(GetParameter(KMode));
-   //mFreeverb.setroomsize(GetParameter(KRoomSize));
-   mFreeverb.setdamp(50);
-   mFreeverb.setwet(.5);
-   mFreeverb.setdry(1);
-   mFreeverb.setwidth(50);
+   mFreeverb.setroomsize(mRoomSize);
+   mFreeverb.setdamp(mDamp);
+   mFreeverb.setwet(mWet);
+   mFreeverb.setdry(mDry);
+   mFreeverb.setwidth(mVerbWidth);
    mFreeverb.update();
-
-   mFreeze = false;
-   mRoomSize = mFreeverb.getroomsize();
-   mDamp = mFreeverb.getdamp();
-   mWet = mFreeverb.getwet();
-   mDry = mFreeverb.getdry();
-   mVerbWidth = mFreeverb.getwidth();
 }
 
 FreeverbEffect::~FreeverbEffect()
@@ -123,11 +110,11 @@ float FreeverbEffect::GetEffectAmount()
    return mWet;
 }
 
-void FreeverbEffect::CheckboxUpdated(Checkbox* checkbox)
+void FreeverbEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void FreeverbEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FreeverbEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mRoomSizeSlider)
    {

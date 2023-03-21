@@ -36,7 +36,9 @@ class ModulationVisualizer : public NoteEffectBase, public IDrawableModule
 public:
    ModulationVisualizer();
    static IDrawableModule* Create() { return new ModulationVisualizer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
@@ -58,11 +60,8 @@ private:
 
    struct VizVoice
    {
-      VizVoice()
-      : mActive(false)
-      {}
       std::string GetInfoString();
-      bool mActive;
+      bool mActive{ false };
       ModulationParameters mModulators;
    };
 

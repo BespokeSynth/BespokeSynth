@@ -28,11 +28,9 @@
 
 OscController::OscController(MidiDeviceListener* listener, std::string outAddress, int outPort, int inPort)
 : mListener(listener)
-, mConnected(false)
 , mOutAddress(outAddress)
 , mOutPort(outPort)
 , mInPort(inPort)
-, mOutputConnected(false)
 {
    Connect();
 }
@@ -96,7 +94,7 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
    {
       if (control == mOscMap[i].mControl) // && mOscMap[i].mLastChangedTime + 50 < gTime)
       {
-         juce::OSCMessage msg(mOscMap[i].mAddress.c_str());
+         juce::OSCMessage msg(juce::URL::addEscapeChars(mOscMap[i].mAddress.c_str(), true, true));
 
          if (mOscMap[i].mIsFloat)
          {
@@ -119,7 +117,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
 {
    std::string address = msg.getAddressPattern().toString().toStdString();
 
-   if (address == "/jockey/sync")
+   if (address == "/jockey/sync") //support for handshake with Jockey OSC app
    {
       std::string outputAddress = msg[0].getString().toStdString();
       std::vector<std::string> tokens = ofSplitString(outputAddress, ":");
@@ -132,11 +130,64 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       return;
    }
 
-   if (msg.size() == 0 || (!msg[0].isFloat32() && !msg[0].isInt32()))
+   if (msg.size() == 0)
+      return; // Code beyond this point expects at least one parameter.
+
+   bool is_percentage = false;
+   std::string control_prefix = "/bespoke/control/";
+   std::string control_scaled_prefix = "/bespoke/control_scaled/";
+   if (address.rfind(control_prefix, 0) == 0 || address.rfind(control_scaled_prefix, 0) == 0)
+   {
+      std::string control_path;
+      if (address.rfind(control_prefix, 0) == 0)
+      {
+         control_path = address.substr(control_prefix.length());
+      }
+      else if (address.rfind(control_scaled_prefix, 0) == 0)
+      {
+         is_percentage = true;
+         control_path = address.substr(control_scaled_prefix.length());
+      }
+      control_path = juce::URL::removeEscapeChars(control_path).toStdString();
+
+      IUIControl* control = control = TheSynth->FindUIControl(control_path);
+      if (control != nullptr)
+      {
+         if (msg[0].isFloat32() || msg[0].isInt32())
+         {
+            float new_value = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+            DropdownList* dropdown = dynamic_cast<DropdownList*>(control);
+            if (is_percentage)
+               control->SetFromMidiCC(new_value, gTime, false);
+            else if (dropdown)
+               dropdown->SetIndex(new_value, gTime, true);
+            else
+               control->SetValue(new_value, gTime);
+         }
+         else if (msg[0].isString())
+         {
+            TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
+            if (textEntry != nullptr)
+               textEntry->SetText(msg[0].getString().toStdString());
+            else
+               TheSynth->LogEvent("Could not find TextEntry " + control_path + " when trying to set string value through OSC.", kLogEventType_Error);
+         }
+      }
+      else
+      {
+         TheSynth->LogEvent("Could not find UI Control " + control_path + " when trying to set a value through OSC.", kLogEventType_Error);
+      }
+
       return;
+   }
+
+   if (!msg[0].isFloat32() && !msg[0].isInt32())
+      return; // Code beyond this point expects at least one parameter of type int or float.
 
    // Handle note data and output these as notes instead of CC's.
-   if (address.rfind("/note", 0) == 0 && msg.size() >= 2 && ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
+   if (
+   (address.rfind("/note", 0) == 0 || address.rfind("/bespoke/note", 0) == 0) && msg.size() >= 2 &&
+   ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
    {
       MidiNote note;
       note.mDeviceName = "osccontroller";
@@ -158,9 +209,25 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       return;
    }
 
+   // Handle special command to zoom the location (and allow suffixes, as some OSC software doesn't allow duplicate addresses on controls)
+   if (address.rfind("/bespoke/location/recall", 0) == 0 && msg.size() == 1 && (msg[0].isInt32() || msg[0].isFloat32()))
+   {
+      int number = msg[0].isInt32() ? msg[0].getInt32() : static_cast<int>(msg[0].getFloat32());
+      TheSynth->GetLocationZoomer()->MoveToLocation(number);
+      return; // Stop the midicontroller from mapping this to a CC value.
+   }
+
+   // Handle special command to store current viewport as a location (and allow suffixes, as some OSC software doesn't allow duplicate addresses on controls)
+   if (address.rfind("/bespoke/location/store", 0) == 0 && msg.size() == 1 && (msg[0].isInt32() || msg[0].isFloat32()))
+   {
+      int number = msg[0].isInt32() ? msg[0].getInt32() : static_cast<int>(msg[0].getFloat32());
+      TheSynth->GetLocationZoomer()->WriteCurrentLocation(number);
+      return; // Stop the midicontroller from mapping this to a CC value.
+   }
+
    for (int i = 0; i < msg.size(); ++i)
    {
-      auto calculated_address = (i > 0) ? address + " " + std::to_string(i + 1) : address;
+      auto calculated_address = (i > 0) ? address + "_" + std::to_string(i + 1) : address;
       int mapIndex = FindControl(calculated_address);
 
       bool isNew = false;
@@ -255,7 +322,7 @@ void OscController::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    int mapSize;
    in >> mapSize;

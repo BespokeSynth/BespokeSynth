@@ -12,9 +12,6 @@ namespace
 }
 
 Minimap::Minimap()
-: mClick(false)
-, mGrid(nullptr)
-, mHoveredBookmarkPos(-1, -1)
 {
 }
 
@@ -132,7 +129,7 @@ void Minimap::DrawModulesOnMinimap(ofRectangle& boundingBox)
          continue;
       }
       ofRectangle moduleRect = modules[i]->GetRect();
-      ofColor moduleColor(IDrawableModule::GetColor(modules[i]->GetModuleType()));
+      ofColor moduleColor(IDrawableModule::GetColor(modules[i]->GetModuleCategory()));
       ofSetColor(moduleColor);
       ofFill();
       ofRect(CoordsToMinimap(boundingBox, moduleRect));
@@ -244,7 +241,7 @@ void Minimap::DrawModule()
    }
 }
 
-void Minimap::OnClicked(int x, int y, bool right)
+void Minimap::OnClicked(float x, float y, bool right)
 {
    if (mGrid->TestClick(x, y, right, true))
    {

@@ -37,7 +37,9 @@ public:
    CommentDisplay();
    virtual ~CommentDisplay();
    static IDrawableModule* Create() { return new CommentDisplay(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -53,8 +55,8 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   char mComment[MAX_TEXTENTRY_LENGTH];
-   TextEntry* mCommentEntry;
+   char mComment[MAX_TEXTENTRY_LENGTH]{};
+   TextEntry* mCommentEntry{ nullptr };
 };
 
 

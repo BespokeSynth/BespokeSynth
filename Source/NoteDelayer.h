@@ -39,7 +39,9 @@ public:
    NoteDelayer();
    ~NoteDelayer();
    static IDrawableModule* Create() { return new NoteDelayer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -51,8 +53,8 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -82,7 +84,7 @@ private:
    float mLastNoteOnTime{ 0 };
 
    static const int kQueueSize = 500;
-   NoteInfo mInputNotes[kQueueSize];
+   NoteInfo mInputNotes[kQueueSize]{};
    int mConsumeIndex{ 0 };
    int mAppendIndex{ 0 };
 };

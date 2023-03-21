@@ -44,17 +44,17 @@ class PatchCableSource;
 class ModuleContainer;
 class UIGrid;
 
-enum ModuleType
+enum ModuleCategory
 {
-   kModuleType_Note,
-   kModuleType_Synth,
-   kModuleType_Audio,
-   kModuleType_Instrument,
-   kModuleType_Processor,
-   kModuleType_Modulator,
-   kModuleType_Pulse,
-   kModuleType_Other,
-   kModuleType_Unknown
+   kModuleCategory_Note,
+   kModuleCategory_Synth,
+   kModuleCategory_Audio,
+   kModuleCategory_Instrument,
+   kModuleCategory_Processor,
+   kModuleCategory_Modulator,
+   kModuleCategory_Pulse,
+   kModuleCategory_Other,
+   kModuleCategory_Unknown
 };
 
 struct PatchCableOld
@@ -70,6 +70,9 @@ public:
    IDrawableModule();
    virtual ~IDrawableModule();
    static bool CanCreate() { return true; }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void Render() override;
    void RenderUnclipped();
@@ -93,6 +96,7 @@ public:
    IUIControl* FindUIControl(const char* name, bool fail = true) const;
    std::vector<IUIControl*> GetUIControls() const;
    std::vector<UIGrid*> GetUIGrids() const;
+   virtual void OnUIControlRequested(const char* name) {}
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);
    IDrawableModule* FindChild(const char* name) const;
@@ -112,7 +116,7 @@ public:
    virtual std::string GetTitleLabel() const { return Name(); }
    virtual bool HasTitleBar() const { return true; }
    static float TitleBarHeight() { return mTitleBarHeight; }
-   static ofColor GetColor(ModuleType type);
+   static ofColor GetColor(ModuleCategory type);
    virtual void SetEnabled(bool enabled) {}
    virtual bool CanMinimize() { return true; }
    virtual void SampleDropped(int x, int y, Sample* sample) {}
@@ -124,14 +128,18 @@ public:
    virtual bool IsResizable() const { return false; }
    virtual void Resize(float width, float height) { assert(false); }
    bool IsHoveringOverResizeHandle() const { return mHoveringOverResizeHandle; }
-   void SetTypeName(std::string type) { mTypeName = type; }
+   void SetTypeName(std::string type, ModuleCategory category)
+   {
+      mTypeName = type;
+      mModuleCategory = category;
+   }
    void SetTarget(IClickable* target);
    void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
    void RemovePatchCableSource(PatchCableSource* source);
-   bool TestClick(int x, int y, bool right, bool testOnly = false) override;
+   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    std::string GetTypeName() const { return mTypeName; }
-   ModuleType GetModuleType() const { return mModuleType; }
+   ModuleCategory GetModuleCategory() const { return mModuleCategory; }
    virtual bool IsSingleton() const { return false; }
    virtual bool CanBeDeleted() const { return (IsSingleton() ? false : true); }
    virtual bool HasSpecialDelete() const { return false; }
@@ -150,24 +158,26 @@ public:
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
 
-   virtual void CheckboxUpdated(Checkbox* checkbox) {}
+   virtual void CheckboxUpdated(Checkbox* checkbox, double time) {}
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName);
    virtual void CreateUIControls();
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
-   virtual void SaveLayout(ofxJSONElement& moduleInfo);
-   virtual void SetUpFromSaveData() {}
+   void LoadLayoutBase(const ofxJSONElement& moduleInfo);
+   void SaveLayoutBase(ofxJSONElement& moduleInfo);
+   void SetUpFromSaveDataBase();
    virtual bool IsSaveable() { return true; }
    ModuleSaveData& GetSaveData() { return mModuleSaveData; }
    virtual void SaveState(FileStreamOut& out);
-   virtual void LoadState(FileStreamIn& in);
+   virtual void LoadState(FileStreamIn& in, int rev);
+   int LoadModuleSaveStateRev(FileStreamIn& in);
+   virtual int GetModuleSaveStateRev() const { return -1; }
    virtual void PostLoadState() {}
    virtual std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
    virtual std::vector<IUIControl*> ControlsToIgnoreInSaveState() const;
    virtual void UpdateOldControlName(std::string& oldName) {}
    virtual bool LoadOldControl(FileStreamIn& in, std::string& oldName) { return false; }
-   virtual bool CanSaveState() const { return true; }
-   virtual size_t GetExpectedSaveStateNumChildren() const { return mChildren.size(); }
+   virtual bool CanModuleTypeSaveState() const { return true; }
+   bool IsSpawningOnTheFly(const ofxJSONElement& moduleInfo);
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}
@@ -191,17 +201,19 @@ public:
    static float sSaturation;
    static float sBrightness;
 
-   bool mDrawDebug;
+   bool mDrawDebug{ false };
+
+   static constexpr int kMaxOutputsPerPatchCableSource = 32;
 
 protected:
-   virtual void Poll() override {}
-   virtual void OnClicked(int x, int y, bool right) override;
-   virtual bool MouseMoved(float x, float y) override;
+   void Poll() override {}
+   void OnClicked(float x, float y, bool right) override;
+   bool MouseMoved(float x, float y) override;
 
    ModuleSaveData mModuleSaveData;
-   Checkbox* mEnabledCheckbox;
-   bool mEnabled;
-   ModuleType mModuleType;
+   Checkbox* mEnabledCheckbox{ nullptr };
+   bool mEnabled{ true };
+   ModuleCategory mModuleCategory{ ModuleCategory::kModuleCategory_Unknown };
 
 private:
    virtual void PreDrawModule() {}
@@ -210,6 +222,10 @@ private:
    virtual bool Enabled() const { return true; }
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
+   virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
+   virtual void SetUpFromSaveData() {}
+   virtual bool ShouldSavePatchCableSources() const { return true; }
 
    std::vector<IUIControl*> mUIControls;
    std::vector<IDrawableModule*> mChildren;
@@ -218,25 +234,25 @@ private:
    static const int mTitleBarHeight = 12;
    std::string mTypeName;
    static const int sResizeCornerSize = 8;
-   ModuleContainer* mOwningContainer;
+   ModuleContainer* mOwningContainer{ nullptr };
 
-   bool mMinimized;
-   bool mWasMinimizeAreaClicked;
-   float mMinimizeAnimation;
-   bool mUIControlsCreated;
-   bool mInitialized;
+   bool mMinimized{ false };
+   bool mWasMinimizeAreaClicked{ false };
+   float mMinimizeAnimation{ 0 };
+   bool mUIControlsCreated{ false };
+   bool mInitialized{ false };
    std::string mLastTitleLabel;
-   float mTitleLabelWidth;
-   bool mShouldDrawOutline;
-   bool mHoveringOverResizeHandle;
-   bool mDeleted;
-   bool mCanReceiveAudio;
-   bool mCanReceiveNotes;
-   bool mCanReceivePulses;
+   float mTitleLabelWidth{ 0 };
+   bool mShouldDrawOutline{ true };
+   bool mHoveringOverResizeHandle{ false };
+   bool mDeleted{ false };
+   bool mCanReceiveAudio{ false };
+   bool mCanReceiveNotes{ false };
+   bool mCanReceivePulses{ false };
 
    ofMutex mSliderMutex;
 
-   PatchCableSource* mMainPatchCableSource;
+   PatchCableSource* mMainPatchCableSource{ nullptr };
    std::vector<PatchCableSource*> mPatchCableSources;
 };
 

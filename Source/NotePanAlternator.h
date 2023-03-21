@@ -38,7 +38,9 @@ class NotePanAlternator : public NoteEffectBase, public IDrawableModule, public 
 public:
    NotePanAlternator();
    static IDrawableModule* Create() { return new NotePanAlternator(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -47,7 +49,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -62,9 +64,9 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   bool mFlip;
-   float mPanOne;
-   FloatSlider* mPanOneSlider;
-   float mPanTwo;
-   FloatSlider* mPanTwoSlider;
+   bool mFlip{ false };
+   float mPanOne{ -1 };
+   FloatSlider* mPanOneSlider{ nullptr };
+   float mPanTwo{ 1 };
+   FloatSlider* mPanTwoSlider{ nullptr };
 };

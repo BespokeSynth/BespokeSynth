@@ -43,7 +43,9 @@ public:
    PSMoveController();
    ~PSMoveController();
    static IDrawableModule* Create() { return new PSMoveController(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -58,13 +60,13 @@ public:
    void SetRollControl(IUIControl* control) { mRollUIControl = control; }
    void SetEnergyControl(IUIControl* control) { mEnergyUIControl = control; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    //ITimeListener
    void OnTimeEvent(double time) override;
    //IFloatSliderLIstener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

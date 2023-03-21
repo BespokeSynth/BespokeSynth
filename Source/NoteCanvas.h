@@ -47,7 +47,9 @@ public:
    NoteCanvas();
    ~NoteCanvas();
    static IDrawableModule* Create() { return new NoteCanvas(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -60,7 +62,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void Clear();
+   void Clear(double time);
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
 
    /**
@@ -72,18 +74,19 @@ public:
 
    void CanvasUpdated(Canvas* canvas) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
 
 private:
    //IDrawableModule
@@ -101,34 +104,34 @@ private:
    void LoadMidi();
    void SaveMidi();
 
-   Canvas* mCanvas;
-   CanvasControls* mCanvasControls;
-   CanvasTimeline* mCanvasTimeline;
-   CanvasScrollbar* mCanvasScrollbarHorizontal;
-   CanvasScrollbar* mCanvasScrollbarVertical;
+   Canvas* mCanvas{ nullptr };
+   CanvasControls* mCanvasControls{ nullptr };
+   CanvasTimeline* mCanvasTimeline{ nullptr };
+   CanvasScrollbar* mCanvasScrollbarHorizontal{ nullptr };
+   CanvasScrollbar* mCanvasScrollbarVertical{ nullptr };
    std::vector<CanvasElement*> mNoteChecker{ 128 };
    std::vector<NoteCanvasElement*> mInputNotes{ 128 };
    std::vector<NoteCanvasElement*> mCurrentNotes{ 128 };
-   IntSlider* mNumMeasuresSlider;
-   int mNumMeasures;
-   ClickButton* mQuantizeButton;
-   ClickButton* mSaveMidiButton;
-   ClickButton* mLoadMidiButton;
-   TextEntry* mLoadMidiTrackEntry;
+   IntSlider* mNumMeasuresSlider{ nullptr };
+   int mNumMeasures{ 1 };
+   ClickButton* mQuantizeButton{ nullptr };
+   ClickButton* mSaveMidiButton{ nullptr };
+   ClickButton* mLoadMidiButton{ nullptr };
+   TextEntry* mLoadMidiTrackEntry{ nullptr };
    int mLoadMidiTrack{ 1 };
-   ClickButton* mClipButton;
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mRecord;
-   Checkbox* mRecordCheckbox;
-   bool mStopQueued;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   bool mFreeRecord;
-   Checkbox* mFreeRecordCheckbox;
-   int mFreeRecordStartMeasure;
-   bool mShowIntervals;
-   Checkbox* mShowIntervalsCheckbox;
+   ClickButton* mClipButton{ nullptr };
+   bool mPlay{ true };
+   Checkbox* mPlayCheckbox{ nullptr };
+   bool mRecord{ false };
+   Checkbox* mRecordCheckbox{ nullptr };
+   bool mStopQueued{ false };
+   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   DropdownList* mIntervalSelector{ nullptr };
+   bool mFreeRecord{ false };
+   Checkbox* mFreeRecordCheckbox{ nullptr };
+   int mFreeRecordStartMeasure{ 0 };
+   bool mShowIntervals{ false };
+   Checkbox* mShowIntervalsCheckbox{ nullptr };
 
    std::vector<ModulationParameters> mVoiceModulations;
 };

@@ -84,7 +84,7 @@ public:
    void DrawStutterBuffer(float x, float y, float width, float height);
    void StartStutter(double time, StutterParams stutter);
    void EndStutter(double time, StutterParams stutter);
-   void SetEnabled(bool enabled);
+   void SetEnabled(double time, bool enabled);
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer);

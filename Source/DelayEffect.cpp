@@ -28,6 +28,7 @@
 #include "Transport.h"
 #include "Profiler.h"
 #include "UIControlMacros.h"
+#include "ModularSynth.h"
 
 #include "juce_core/juce_core.h"
 
@@ -197,7 +198,7 @@ void DelayEffect::SetEnabled(bool enabled)
       mDelayBuffer.ClearBuffer();
 }
 
-void DelayEffect::CheckboxUpdated(Checkbox* checkbox)
+void DelayEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mShortTimeCheckbox)
       SetShortMode(mShortTime);
@@ -208,40 +209,35 @@ void DelayEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void DelayEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void DelayEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mDelaySlider)
    {
       mInterval = kInterval_None;
-      mDelayRamp.Start(gTime, mDelay, gTime + 30);
+      mDelayRamp.Start(time, mDelay, time + 30);
    }
 }
 
-void DelayEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void DelayEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-}
-
-namespace
-{
-   const int kSaveStateRev = 0;
 }
 
 void DelayEffect::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mDelayBuffer.SaveState(out);
 }
 
-void DelayEffect::LoadState(FileStreamIn& in)
+void DelayEffect::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mDelayBuffer.LoadState(in);
 }

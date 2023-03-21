@@ -39,7 +39,9 @@ public:
    PressureToCV();
    virtual ~PressureToCV();
    static IDrawableModule* Create() { return new PressureToCV(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -56,7 +58,7 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -72,5 +74,5 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   ModulationChain* mPressure;
+   ModulationChain* mPressure{ nullptr };
 };

@@ -29,10 +29,6 @@
 #include "ModularSynth.h"
 
 VelocitySetter::VelocitySetter()
-: mVelocity(1)
-, mVelocitySlider(nullptr)
-, mRandomness(0)
-, mRandomnessSlider(nullptr)
 {
 }
 
@@ -52,7 +48,7 @@ void VelocitySetter::DrawModule()
    mRandomnessSlider->Draw();
 }
 
-void VelocitySetter::CheckboxUpdated(Checkbox* checkbox)
+void VelocitySetter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

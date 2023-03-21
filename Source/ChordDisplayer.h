@@ -35,7 +35,9 @@ class ChordDisplayer : public NoteEffectBase, public IDrawableModule
 public:
    ChordDisplayer();
    static IDrawableModule* Create() { return new ChordDisplayer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

@@ -25,6 +25,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
 #include "IDrawableModule.h"
 #include "Checkbox.h"
@@ -42,6 +43,9 @@ public:
    AbletonLink();
    virtual ~AbletonLink();
    static IDrawableModule* Create() { return new AbletonLink(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void Init() override;
    void CreateUIControls() override;
@@ -51,8 +55,8 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
 private:
    //IDrawableModule
@@ -71,8 +75,8 @@ private:
    FloatSlider* mOffsetMsSlider;
 
    std::unique_ptr<ableton::Link> mLink;
-   double mTempo = 120.0;
-   std::size_t mNumPeers = 0;
+   double mTempo{ 120 };
+   std::size_t mNumPeers{ 0 };
    double mLastReceivedBeat{ 0 };
    double mSampleTime{ 0 };
 };

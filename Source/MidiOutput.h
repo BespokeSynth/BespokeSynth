@@ -41,7 +41,9 @@ public:
    MidiOutputModule();
    virtual ~MidiOutputModule();
    static IDrawableModule* Create() { return new MidiOutputModule(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -53,7 +55,7 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;

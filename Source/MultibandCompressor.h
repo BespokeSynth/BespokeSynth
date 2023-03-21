@@ -43,7 +43,9 @@ public:
    MultibandCompressor();
    virtual ~MultibandCompressor();
    static IDrawableModule* Create() { return new MultibandCompressor(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -54,8 +56,8 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -72,21 +74,21 @@ private:
 
    void CalcFilters();
 
-   float* mWorkBuffer;
-   float* mOutBuffer;
+   float* mWorkBuffer{ nullptr };
+   float* mOutBuffer{ nullptr };
 
-   float mDryWet;
-   FloatSlider* mDryWetSlider;
-   IntSlider* mNumBandsSlider;
-   int mNumBands;
-   float mFreqMin;
-   float mFreqMax;
-   FloatSlider* mFMinSlider;
-   FloatSlider* mFMaxSlider;
-   float mRingTime;
-   FloatSlider* mRingTimeSlider;
-   float mMaxBand;
-   FloatSlider* mMaxBandSlider;
+   float mDryWet{ 1 };
+   FloatSlider* mDryWetSlider{ nullptr };
+   IntSlider* mNumBandsSlider{ nullptr };
+   int mNumBands{ 4 };
+   float mFreqMin{ 150 };
+   float mFreqMax{ 7500 };
+   FloatSlider* mFMinSlider{ nullptr };
+   FloatSlider* mFMaxSlider{ nullptr };
+   float mRingTime{ .01 };
+   FloatSlider* mRingTimeSlider{ nullptr };
+   float mMaxBand{ .3 };
+   FloatSlider* mMaxBandSlider{ nullptr };
 
    CLinkwitzRiley_4thOrder mFilters[COMPRESSOR_MAX_BANDS];
    PeakTracker mPeaks[COMPRESSOR_MAX_BANDS];

@@ -39,6 +39,7 @@ void ScaleDegree::CreateUIControls()
    UIBLOCK0();
    DROPDOWN(mScaleDegreeSelector, "degree", &mScaleDegree, 50);
    CHECKBOX(mRetriggerCheckbox, "retrigger", &mRetrigger);
+   CHECKBOX(mDiatonicCheckbox, "diatonic", &mDiatonic);
    ENDUIBLOCK(mWidth, mHeight);
 
    mScaleDegreeSelector->AddLabel("-I", -7);
@@ -65,12 +66,13 @@ void ScaleDegree::DrawModule()
 
    mScaleDegreeSelector->Draw();
    mRetriggerCheckbox->Draw();
+   mDiatonicCheckbox->Draw();
 }
 
-void ScaleDegree::CheckboxUpdated(Checkbox* checkbox)
+void ScaleDegree::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -101,21 +103,28 @@ void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 
 int ScaleDegree::TransformPitch(int pitch)
 {
-   int tone = TheScale->GetToneFromPitch(pitch);
-   tone += mScaleDegree;
-   return TheScale->GetPitchFromTone(tone);
+   if (mDiatonic)
+   {
+      int tone = TheScale->GetToneFromPitch(pitch);
+      tone += mScaleDegree;
+      return TheScale->GetPitchFromTone(tone);
+   }
+   else
+   {
+      int semitones = TheScale->GetPitchFromTone(mScaleDegree) - TheScale->ScaleRoot();
+      return pitch + semitones;
+   }
 }
 
-void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
+void ScaleDegree::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (slider == mScaleDegreeSelector && mEnabled && mRetrigger)
+   if (list == mScaleDegreeSelector && mEnabled && mRetrigger)
    {
-      double time = gTime + gBufferSizeMs;
       for (int pitch = 0; pitch < 128; ++pitch)
       {
          if (mInputNotes[pitch].mOn)
          {
-            PlayNoteOutput(time + .01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
             mInputNotes[pitch].mOutputPitch = TransformPitch(pitch);
             PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          }

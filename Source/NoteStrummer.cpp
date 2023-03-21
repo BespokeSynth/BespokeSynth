@@ -30,9 +30,6 @@
 #include "Scale.h"
 
 NoteStrummer::NoteStrummer()
-: mStrum(0)
-, mLastStrumPos(0)
-, mStrumSlider(nullptr)
 {
 }
 
@@ -110,7 +107,7 @@ void NoteStrummer::OnTransportAdvanced(float amount)
    }
 }
 
-void NoteStrummer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteStrummer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

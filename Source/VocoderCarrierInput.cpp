@@ -32,8 +32,6 @@
 
 VocoderCarrierInput::VocoderCarrierInput()
 : IAudioProcessor(gBufferSize)
-, mVocoder(nullptr)
-, mVocoderTarget(nullptr)
 {
 }
 

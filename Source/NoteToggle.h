@@ -36,6 +36,9 @@ public:
    NoteToggle();
    ~NoteToggle();
    static IDrawableModule* Create() { return new NoteToggle(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -56,6 +59,6 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    std::array<bool, 128> mHeldPitches{ false };
-   PatchCableSource* mControlCable;
-   IUIControl* mControlTarget;
+   PatchCableSource* mControlCable{ nullptr };
+   std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
 };

@@ -40,7 +40,7 @@ class EnvelopeControl
 public:
    EnvelopeControl(ofVec2f position, ofVec2f dimensions);
    void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
-   void OnClicked(int x, int y, bool right);
+   void OnClicked(float x, float y, bool right);
    void MouseMoved(float x, float y);
    void MouseReleased();
    void Draw();
@@ -63,7 +63,6 @@ private:
    ofVec2f mPosition;
    ofVec2f mDimensions;
    ::ADSR* mAdsr{ nullptr };
-   ::ADSR mViewAdsr;
    ::ADSR mClickAdsr;
    bool mClick{ false };
    ofVec2f mClickStart;
@@ -79,6 +78,9 @@ class EnvelopeEditor : public IDrawableModule, public IRadioButtonListener, publ
 public:
    EnvelopeEditor();
    static IDrawableModule* Create() { return new EnvelopeEditor(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
    void Delete() { delete this; }
    void DrawModule() override;
 
@@ -97,12 +99,12 @@ public:
    bool HasSpecialDelete() const override { return true; }
    void DoSpecialDelete() override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void GetModuleDimensions(float& width, float& height) override
    {
@@ -118,7 +120,7 @@ protected:
    ~EnvelopeEditor();
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void Pin();
 
    struct StageControls
@@ -140,6 +142,7 @@ private:
    bool mPinned{ false };
    FloatSlider* mADSRViewLengthSlider{ nullptr };
    FloatSlider* mMaxSustainSlider{ nullptr };
+   Checkbox* mFreeReleaseLevelCheckbox{ nullptr };
    PatchCableSource* mTargetCable{ nullptr };
    std::array<StageControls, 10> mStageControls{};
 };

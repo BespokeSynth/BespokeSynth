@@ -74,13 +74,14 @@ public:
    void SetDimensions(float width, float height);
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time) override {}
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool IsTextEntry() const override { return true; }
+   bool GetNoHover() const override { return true; }
 
    ofVec2f GetLinePos(int lineNum, bool end, bool published = true);
    float GetCharHeight() const { return mCharHeight; }
@@ -115,9 +116,9 @@ private:
    bool IsAutocompleteShowing();
    void AcceptAutocompletion();
 
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    static bool sWarnJediNotInstalled;
 
@@ -143,8 +144,8 @@ private:
    };
 
    ICodeEntryListener* mListener;
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    float mCharWidth{ 5.85 };
    float mCharHeight{ 15 };
    std::string mString;

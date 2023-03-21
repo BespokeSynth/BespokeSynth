@@ -38,7 +38,9 @@ class ChordHolder : public NoteEffectBase, public IDrawableModule, public IButto
 public:
    ChordHolder();
    static IDrawableModule* Create() { return new ChordHolder(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 
@@ -50,8 +52,8 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -66,12 +68,12 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   void Stop();
+   void Stop(double time);
 
    std::array<bool, 128> mNoteInputHeld{ false };
    std::array<bool, 128> mNotePlaying{ false };
 
-   ClickButton* mStopButton;
-   bool mOnlyPlayWhenPulsed;
-   Checkbox* mOnlyPlayWhenPulsedCheckbox;
+   ClickButton* mStopButton{ nullptr };
+   bool mOnlyPlayWhenPulsed{ false };
+   Checkbox* mOnlyPlayWhenPulsedCheckbox{ nullptr };
 };

@@ -76,21 +76,21 @@ public:
    void LoadState(FileStreamIn& in);
 
 protected:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
 private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
    int FindIndexForTime(float time);
    std::array<CurvePoint, 5000> mPoints;
-   int mNumCurvePoints;
+   int mNumCurvePoints{ 0 };
    float mWidth{ 200 };
    float mHeight{ 20 };
-   float mStart;
-   float mEnd;
-   ofColor mColor;
-   int mLastEvalIndex;
+   float mStart{ 0 };
+   float mEnd{ 1 };
+   ofColor mColor{ ofColor::white };
+   int mLastEvalIndex{ 0 };
 };
 
 #endif /* defined(__Bespoke__Curve__) */

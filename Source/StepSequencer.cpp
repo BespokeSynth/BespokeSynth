@@ -541,7 +541,7 @@ void StepSequencer::Resize(float w, float h)
    mGrid->SetDimensions(MAX(w - extraW, 185), MAX(h - extraH, 46 + 13 * mNumRows));
 }
 
-void StepSequencer::OnClicked(int x, int y, bool right)
+void StepSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    if (mGrid->TestClick(x, y, right))
@@ -586,7 +586,7 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
          float val = midiValue / 16320.0f;
          float oldStrength = mStrength;
          mStrength = val;
-         FloatSliderUpdated(mStrengthSlider, oldStrength);
+         FloatSliderUpdated(mStrengthSlider, oldStrength, gTime);
       }
       else
       {
@@ -873,13 +873,13 @@ void StepSequencer::RandomizeRow(int row)
    }
 }
 
-void StepSequencer::CheckboxUpdated(Checkbox* checkbox)
+void StepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mStrengthSlider)
    {
@@ -902,11 +902,11 @@ void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void StepSequencer::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void StepSequencer::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 
-void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
    {
@@ -929,7 +929,7 @@ void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void StepSequencer::ButtonClicked(ClickButton* button)
+void StepSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mShiftLeftButton || button == mShiftRightButton)
    {
@@ -957,7 +957,7 @@ void StepSequencer::ButtonClicked(ClickButton* button)
    }
 }
 
-void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mPresetDropdown)
       SetPreset(mPreset);
@@ -1009,7 +1009,6 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
 
 void StepSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void StepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -1046,16 +1045,11 @@ void StepSequencer::SetUpFromSaveData()
    mIsSetUp = true;
 }
 
-namespace
-{
-   const int kSaveStateRev = 3;
-}
-
 void StepSequencer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
 
@@ -1069,13 +1063,13 @@ void StepSequencer::SaveState(FileStreamOut& out)
    out << mGrid->GetHeight();
 }
 
-void StepSequencer::LoadState(FileStreamIn& in)
+void StepSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mGrid->LoadState(in);
 

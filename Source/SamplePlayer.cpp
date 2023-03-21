@@ -420,7 +420,7 @@ void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float spee
    {
       float startSeconds, lengthSeconds, speed;
       GetPlayInfoForPitch(index, startSeconds, lengthSeconds, speed, mStopOnNoteOff);
-      mSample->SetPlayPosition(((gTime - time) / 1000 + startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
+      mSample->SetPlayPosition((startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
       mCuePointSpeed = speed * speedMult;
       mPlay = true;
       mAdsr.Clear();
@@ -435,13 +435,13 @@ void SamplePlayer::DropdownClicked(DropdownList* list)
 {
 }
 
-void SamplePlayer::DropdownUpdated(DropdownList* list, int oldVal)
+void SamplePlayer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mCuePointSelector)
       UpdateActiveCuePoint();
 }
 
-void SamplePlayer::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void SamplePlayer::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 
@@ -504,7 +504,6 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    sample->SetLooping(mLoop);
    sample->SetRate(mSpeed);
    mSample = sample;
-   mVolume = 1;
    mPlay = false;
    mOwnsSample = ownsSample;
    mZoomLevel = 1;
@@ -519,7 +518,7 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    mIsLoadingSample = true;
 }
 
-void SamplePlayer::ButtonClicked(ClickButton* button)
+void SamplePlayer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPlayButton && mSample != nullptr)
    {
@@ -529,7 +528,7 @@ void SamplePlayer::ButtonClicked(ClickButton* button)
          mStopOnNoteOff = false;
          mPlay = true;
          mAdsr.Clear();
-         mAdsr.Start(gTime + gBufferSize * gInvSampleRateMs, 1);
+         mAdsr.Start(time * gInvSampleRateMs, 1);
       }
    }
    if (button == mPauseButton && mSample != nullptr)
@@ -589,7 +588,7 @@ void SamplePlayer::ButtonClicked(ClickButton* button)
    }
 
    if (button == mPlayCurrentCuePointButton)
-      PlayCuePoint(gTime, mActiveCuePointIndex, 127, 1, 0);
+      PlayCuePoint(time, mActiveCuePointIndex, 127, 1, 0);
 
    if (button == mAutoSlice4)
       AutoSlice(4);
@@ -601,7 +600,7 @@ void SamplePlayer::ButtonClicked(ClickButton* button)
       AutoSlice(32);
 
    if (button == mPlayHoveredClipButton)
-      PlayCuePoint(gTime, mHoveredCuePointIndex, 127, 1, 0);
+      PlayCuePoint(time, mHoveredCuePointIndex, 127, 1, 0);
    if (button == mGrabHoveredClipButton)
    {
       ChannelBuffer* data = GetCueSampleData(mHoveredCuePointIndex);
@@ -625,14 +624,14 @@ void SamplePlayer::DownloadYoutube(std::string url, std::string title)
    if (mSample)
       mSample->SetPlayPosition(0);
 
-   const char* tempDownloadName = "youtube.m4a";
+   auto tempDownloadName = ofToString(this) + "_youtube.m4a";
    {
       auto file = juce::File(ofToDataPath(tempDownloadName));
       if (file.existsAsFile())
          file.deleteFile();
    }
 
-   const char* tempConvertedName = "youtube.wav";
+   auto tempConvertedName = ofToString(this) + "_youtube.wav";
    {
       auto file = juce::File(ofToDataPath(tempConvertedName));
       if (file.existsAsFile())
@@ -677,6 +676,10 @@ void SamplePlayer::OnYoutubeDownloadComplete(std::string filename, std::string t
       UpdateSample(new Sample(), true);
       mErrorString = "couldn't download sample. do you have youtube-dl and ffmpeg installed,\nwith their paths set in userprefs.json?";
    }
+
+   auto file = juce::File(ofToDataPath(filename));
+   if (file.existsAsFile())
+      file.deleteFile();
 }
 
 void SamplePlayer::RunProcess(const StringArray& args)
@@ -740,8 +743,11 @@ void SamplePlayer::OnYoutubeSearchComplete(std::string searchTerm, double search
 
 void SamplePlayer::LoadFile()
 {
+   auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
+   if (File::areFileNamesCaseSensitive())
+      file_pattern += ";" + file_pattern.toUpperCase();
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetFileChooserParent());
+                       file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();
@@ -774,7 +780,7 @@ void SamplePlayer::FillData(std::vector<float> data)
    UpdateSample(sample, true);
 }
 
-void SamplePlayer::OnClicked(int x, int y, bool right)
+void SamplePlayer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -791,7 +797,7 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
       mStopOnNoteOff = false;
       mPlay = true;
       mAdsr.Clear();
-      mAdsr.Start(gTime + gBufferSizeMs, 1);
+      mAdsr.Start(NextBufferTime(false), 1);
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mScrubbingSample = true;
 
@@ -841,7 +847,7 @@ bool SamplePlayer::MouseMoved(float x, float y)
       mSwitchAndRamp.StartSwitch();
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mAdsr.Clear();
-      mAdsr.Start(gTime + gBufferSizeMs, 1);
+      mAdsr.Start(NextBufferTime(false), 1);
 
       if (mSetCuePoint)
          SetCuePointForX(x);
@@ -1270,7 +1276,7 @@ void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
    }
 }
 
-bool SamplePlayer::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool SamplePlayer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (fabs(scrollX) > fabsf(scrollY))
       scrollY = 0;
@@ -1292,7 +1298,7 @@ bool SamplePlayer::MouseScrolled(int x, int y, float scrollX, float scrollY)
    return false;
 }
 
-void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
+void SamplePlayer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mLoopCheckbox)
    {
@@ -1370,11 +1376,11 @@ void SamplePlayer::GetModuleDimensions(float& width, float& height)
    height = mHeight;
 }
 
-void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SamplePlayer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SamplePlayer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -1390,7 +1396,6 @@ void SamplePlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void SamplePlayer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }
@@ -1401,16 +1406,11 @@ void SamplePlayer::SetUpFromSaveData()
    Resize(mModuleSaveData.GetFloat("width"), mModuleSaveData.GetFloat("height"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void SamplePlayer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    bool hasSample = (mSample != nullptr);
    out << hasSample;
@@ -1427,13 +1427,13 @@ void SamplePlayer::SaveState(FileStreamOut& out)
    }
 }
 
-void SamplePlayer::LoadState(FileStreamIn& in)
+void SamplePlayer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    bool hasSample;
    in >> hasSample;

@@ -97,7 +97,7 @@ void ClipArranger::GetModuleDimensions(float& w, float& h)
    h = 25 + mBufferHeight;
 }
 
-void ClipArranger::OnClicked(int x, int y, bool right)
+void ClipArranger::OnClicked(float x, float y, bool right)
 {
    mMouseDown = true;
 
@@ -227,15 +227,15 @@ ClipArranger::Clip* ClipArranger::GetEmptyClip()
    return nullptr;
 }
 
-void ClipArranger::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ClipArranger::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void ClipArranger::ButtonClicked(ClickButton* button)
+void ClipArranger::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void ClipArranger::CheckboxUpdated(Checkbox* checkbox)
+void ClipArranger::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

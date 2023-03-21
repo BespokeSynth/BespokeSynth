@@ -30,14 +30,8 @@
 #include "UIControlMacros.h"
 
 ButterworthFilterEffect::ButterworthFilterEffect()
-: mF(2000)
-, mFSlider(nullptr)
-, mQ(0)
-, mQSlider(nullptr)
-, mCoefficientsHaveChanged(true)
-, mDryBuffer(gBufferSize)
+: mDryBuffer(gBufferSize)
 {
-   SetEnabled(true);
 }
 
 void ButterworthFilterEffect::CreateUIControls()
@@ -45,7 +39,7 @@ void ButterworthFilterEffect::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
    FLOATSLIDER(mFSlider, "F", &mF, 10, 4000);
-   FLOATSLIDER(mQSlider, "Q", &mQ, 0, 1);
+   FLOATSLIDER_DIGITS(mQSlider, "Q", &mQ, 0, 1, 3);
    ENDUIBLOCK(mWidth, mHeight);
 
    mFSlider->SetMaxValueDisplay("inf");
@@ -122,11 +116,11 @@ void ButterworthFilterEffect::ResetFilter()
       mButterworth[i].Clear();
 }
 
-void ButterworthFilterEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void ButterworthFilterEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void ButterworthFilterEffect::CheckboxUpdated(Checkbox* checkbox)
+void ButterworthFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -134,7 +128,7 @@ void ButterworthFilterEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void ButterworthFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ButterworthFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mFSlider || slider == mQSlider)
       mCoefficientsHaveChanged = true;

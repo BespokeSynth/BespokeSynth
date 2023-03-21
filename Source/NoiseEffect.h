@@ -48,11 +48,11 @@ public:
    std::string GetType() override { return "noisify"; }
 
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
 private:
    //IDrawableModule
@@ -65,12 +65,12 @@ private:
    bool Enabled() const override { return mEnabled; }
 
 
-   float mAmount;
-   int mWidth;
-   int mSampleCounter;
-   float mRandom;
-   FloatSlider* mAmountSlider;
-   IntSlider* mWidthSlider;
+   float mAmount{ 0 };
+   int mWidth{ 10 };
+   int mSampleCounter{ 0 };
+   float mRandom{ 0 };
+   FloatSlider* mAmountSlider{ nullptr };
+   IntSlider* mWidthSlider{ nullptr };
 };
 
 #endif /* defined(__modularSynth__NoiseEffect__) */

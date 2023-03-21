@@ -33,7 +33,6 @@
 #include "ModulationChain.h"
 
 PressureToCV::PressureToCV()
-: mPressure(nullptr)
 {
 }
 
@@ -82,23 +81,13 @@ float PressureToCV::Value(int samplesIn)
 
 void PressureToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void PressureToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void PressureToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

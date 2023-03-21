@@ -41,7 +41,9 @@ public:
    EQModule();
    virtual ~EQModule();
    static IDrawableModule* Create() { return new EQModule(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -56,20 +58,16 @@ public:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
+   void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
 
@@ -86,8 +84,8 @@ private:
    float mWidth{ 825 };
    float mHeight{ 255 };
 
-   float* mWindower;
-   float* mSmoother;
+   float* mWindower{ nullptr };
+   float* mSmoother{ nullptr };
 
    ::FFT mFFT;
    FFTData mFFTData;
@@ -113,4 +111,5 @@ private:
    std::array<float, 1024> mFrequencyResponse{};
    bool mNeedToUpdateFrequencyResponseGraph{ true };
    float mDrawGain{ 1 };
+   bool mLiteCpuModulation{ true };
 };

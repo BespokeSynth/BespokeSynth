@@ -46,12 +46,16 @@ public:
    PlaySequencer();
    ~PlaySequencer();
    static IDrawableModule* Create() { return new PlaySequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
+   //IDrawableModule
    void Init() override;
-
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IClickable
@@ -69,32 +73,30 @@ public:
    void OnTimeEvent(double time) override;
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IDropdownListener
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
+   void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
+   void SetGridSize(float w, float h);
    int GetStep(double time);
    void UpdateInterval();
    void UpdateNumMeasures(int oldNumMeasures);
@@ -148,7 +150,7 @@ private:
       ClickButton* mStoreButton{ nullptr };
       ClickButton* mLoadButton{ nullptr };
       float mNumMeasures{ 1 };
-      std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE> mData{};
+      std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
       bool mHasSequence{ false };
    };
 

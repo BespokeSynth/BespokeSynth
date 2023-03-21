@@ -36,22 +36,6 @@
 #include "MathUtils.h"
 
 NoteTable::NoteTable()
-: mLength(8)
-, mLengthSlider(nullptr)
-, mGrid(nullptr)
-, mOctave(3)
-, mOctaveSlider(nullptr)
-, mNoteMode(kNoteMode_Scale)
-, mNoteModeSelector(nullptr)
-, mNoteRange(15)
-, mShowColumnControls(false)
-, mRowOffset(0)
-, mSetLength(false)
-, mRandomizePitchButton(nullptr)
-, mRandomizePitchChance(1)
-, mRandomizePitchRange(1)
-, mGridControlOffsetX(0)
-, mGridControlOffsetY(0)
 {
    for (int i = 0; i < mLength; ++i)
       mTones[i] = i;
@@ -106,7 +90,7 @@ void NoteTable::CreateUIControls()
    {
       mColumnCables[i] = new AdditionalNoteCable();
       mColumnCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mColumnCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1));
+      mColumnCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mColumnCables[i]->GetPatchCableSource());
    }
 }
@@ -245,7 +229,7 @@ void NoteTable::DrawModule()
       {
          mToneDropdowns[i]->SetShowing(mShowColumnControls);
          mToneDropdowns[i]->SetPosition(gridX + boxWidth * i, controlYPos);
-         mToneDropdowns[i]->SetWidth(boxWidth);
+         mToneDropdowns[i]->SetWidth(std::min(boxWidth, 30.0f));
          mToneDropdowns[i]->Draw();
       }
       else
@@ -270,7 +254,7 @@ void NoteTable::DrawModule()
    ofPopStyle();
 }
 
-void NoteTable::OnClicked(int x, int y, bool right)
+void NoteTable::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -290,10 +274,10 @@ bool NoteTable::MouseMoved(float x, float y)
    return false;
 }
 
-void NoteTable::CheckboxUpdated(Checkbox* checkbox)
+void NoteTable::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteTable::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
@@ -456,7 +440,7 @@ void NoteTable::OnGridButton(int x, int y, float velocity, IGridController* grid
    }
 }
 
-void NoteTable::ButtonClicked(ClickButton* button)
+void NoteTable::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizePitchButton)
    {
@@ -509,7 +493,7 @@ void NoteTable::RandomizePitches(bool fifths)
    }
 }
 
-void NoteTable::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteTable::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mNoteModeSelector)
    {
@@ -524,7 +508,7 @@ void NoteTable::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -588,14 +572,13 @@ void NoteTable::SetUpColumnControls()
    for (int i = 0; i < kMaxLength; ++i)
    {
       mToneDropdowns[i]->Clear();
-      for (int j = 0; j < mNoteRange; ++j)
+      for (int j = mNoteRange - 1; j >= 0; --j)
          mToneDropdowns[i]->AddLabel(NoteName(RowToPitch(j), false, true), j);
    }
 }
 
 void NoteTable::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteTable::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -617,27 +600,22 @@ void NoteTable::SetUpFromSaveData()
    SetUpColumnControls();
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void NoteTable::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
 }
 
-void NoteTable::LoadState(FileStreamIn& in)
+void NoteTable::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mGrid->LoadState(in);
    GridUpdated(mGrid, 0, 0, 0, 0);

@@ -27,35 +27,8 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 
-#define VOCODER_WINDOW_SIZE 1024
-#define FFT_FREQDOMAIN_SIZE VOCODER_WINDOW_SIZE / 2 + 1
-
 Vocoder::Vocoder()
 : IAudioProcessor(gBufferSize)
-, mFFT(VOCODER_WINDOW_SIZE)
-, mRollingInputBuffer(VOCODER_WINDOW_SIZE)
-, mRollingOutputBuffer(VOCODER_WINDOW_SIZE)
-, mFFTData(VOCODER_WINDOW_SIZE, FFT_FREQDOMAIN_SIZE)
-, mRollingCarrierBuffer(VOCODER_WINDOW_SIZE)
-, mCarrierFFTData(VOCODER_WINDOW_SIZE, FFT_FREQDOMAIN_SIZE)
-, mInputPreamp(1)
-, mCarrierPreamp(1)
-, mVolume(1)
-, mInputSlider(nullptr)
-, mCarrierSlider(nullptr)
-, mVolumeSlider(nullptr)
-, mDryWet(1)
-, mDryWetSlider(nullptr)
-, mFricativeThresh(.07)
-, mFricativeSlider(nullptr)
-, mFricDetected(false)
-, mWhisper(0)
-, mWhisperSlider(nullptr)
-, mPhaseOffset(0)
-, mPhaseOffsetSlider(nullptr)
-, mCut(1)
-, mCutSlider(nullptr)
-, mCarrierDataSet(false)
 {
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[VOCODER_WINDOW_SIZE];
@@ -258,7 +231,7 @@ void Vocoder::DrawModule()
    mGate.Draw();
 }
 
-void Vocoder::CheckboxUpdated(Checkbox* checkbox)
+void Vocoder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

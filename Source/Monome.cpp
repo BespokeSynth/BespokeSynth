@@ -30,13 +30,7 @@
 int Monome::sNextMonomeReceivePort = 13338;
 
 Monome::Monome(MidiDeviceListener* listener)
-: mMonomeReceivePort(-1)
-, mMaxColumns(16)
-, mGridRotation(0)
-, mPrefix("monome")
-, mJustRequestedDeviceList(false)
-, mListener(listener)
-, mListForMidiController(nullptr)
+: mListener(listener)
 {
 }
 
@@ -104,7 +98,7 @@ void Monome::SetLightInternal(int x, int y, float value)
    Vec2i pos = Rotate(x, y, mGridRotation);
    int index = pos.x + pos.y * mMaxColumns;
    mLights[index].mValue = value;
-   mLights[index].mLastUpdatedTime = gTime + gBufferSizeMs;
+   mLights[index].mLastUpdatedTime = NextBufferTime(false);
 }
 
 void Monome::SetLight(int x, int y, float value)
@@ -195,7 +189,7 @@ void Monome::ConnectToDevice(std::string deviceDesc)
       for (int i = 0; i < mListForMidiController->GetNumValues(); ++i)
       {
          if (mListForMidiController->GetLabel(i) == device->GetDescription())
-            mListForMidiController->SetValueDirect(i);
+            mListForMidiController->SetValueDirect(i, NextBufferTime(false));
       }
    }
 
@@ -343,7 +337,7 @@ void Monome::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    in >> mPendingDeviceDesc;
 }

@@ -37,11 +37,13 @@ public:
    TimerDisplay();
    ~TimerDisplay();
    static IDrawableModule* Create() { return new TimerDisplay(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
 private:
    //IDrawableModule
@@ -53,8 +55,8 @@ private:
       height = 56;
    }
 
-   double mStartTime;
-   ClickButton* mResetButton;
+   double mStartTime{ 0 };
+   ClickButton* mResetButton{ nullptr };
 };
 
 #endif /* defined(__Bespoke__TimerDisplay__) */

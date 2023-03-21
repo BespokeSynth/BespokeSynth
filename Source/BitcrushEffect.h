@@ -47,9 +47,9 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "bitcrush"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
 private:
    //IDrawableModule
@@ -61,15 +61,15 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mCrush;
-   float mDownsample;
-   int mSampleCounter[ChannelBuffer::kMaxNumChannels];
-   float mHeldDownsample[ChannelBuffer::kMaxNumChannels];
-   FloatSlider* mCrushSlider;
-   FloatSlider* mDownsampleSlider;
+   float mCrush{ 1 };
+   float mDownsample{ 1 };
+   int mSampleCounter[ChannelBuffer::kMaxNumChannels]{};
+   float mHeldDownsample[ChannelBuffer::kMaxNumChannels]{};
+   FloatSlider* mCrushSlider{ nullptr };
+   FloatSlider* mDownsampleSlider{ nullptr };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 #endif /* defined(__additiveSynth__BitcrushEffect__) */

@@ -39,7 +39,9 @@ public:
    AudioLevelToCV();
    virtual ~AudioLevelToCV();
    static IDrawableModule* Create() { return new AudioLevelToCV(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -54,7 +56,7 @@ public:
    bool Active() const override { return mEnabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

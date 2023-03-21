@@ -70,10 +70,10 @@ public:
 #endif
 
 private:
-   WindowFormatType mType;
-   VSTPlugin* mOwner;
+   WindowFormatType mType{ WindowFormatType::Normal };
+   VSTPlugin* mOwner{ nullptr };
 #ifdef JUCE_MAC
-   juce::NSViewComponent* mNSViewComponent;
+   juce::NSViewComponent* mNSViewComponent{ nullptr };
 #endif
 
    float getDesktopScaleFactor() const override

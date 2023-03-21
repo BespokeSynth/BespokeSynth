@@ -30,10 +30,6 @@
 
 NoteSinger::NoteSinger()
 : IAudioReceiver(gBufferSize)
-, mPitch(0)
-, mOctave(0)
-, mOctaveSlider(nullptr)
-, mNumBuckets(28)
 {
    TheScale->AddListener(this);
 
@@ -145,15 +141,15 @@ int NoteSinger::GetPitchForBucket(int bucket)
    return TheScale->GetPitchFromTone(bucket + TheScale->NumTonesInScale() * 2);
 }
 
-void NoteSinger::ButtonClicked(ClickButton* button)
+void NoteSinger::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void NoteSinger::CheckboxUpdated(Checkbox* checkbox)
+void NoteSinger::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      PlayNoteOutput(gTime, mPitch, 0, -1);
+      PlayNoteOutput(time, mPitch, 0, -1);
       mPitch = -1;
    }
 }

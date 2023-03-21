@@ -33,8 +33,7 @@
 #include "PatchCableSource.h"
 
 Beats::Beats()
-: mRows(4)
-, mWriteBuffer(gBufferSize)
+: mWriteBuffer(gBufferSize)
 {
 
    for (size_t i = 0; i < mBeatColumns.size(); ++i)
@@ -95,14 +94,14 @@ void Beats::DropdownClicked(DropdownList* list)
 {
 }
 
-void Beats::DropdownUpdated(DropdownList* list, int oldVal)
+void Beats::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Beats::RadioButtonUpdated(RadioButton* list, int oldVal)
+void Beats::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
    for (BeatColumn* column : mBeatColumns)
-      column->RadioButtonUpdated(list, oldVal);
+      column->RadioButtonUpdated(list, oldVal, time);
 }
 
 void Beats::OnTimeEvent(double time)
@@ -117,6 +116,16 @@ void Beats::DrawModule()
    int i = 0;
    for (BeatColumn* column : mBeatColumns)
    {
+      if (i == mHighlightColumn)
+      {
+         ofPushStyle();
+         ofFill();
+         ofSetColor(255, 255, 255, 40);
+         float width, height;
+         GetModuleDimensions(width, height);
+         ofRect(i * BEAT_COLUMN_WIDTH + 1, 3, BEAT_COLUMN_WIDTH - 2, height - 6);
+         ofPopStyle();
+      }
       column->Draw(i * BEAT_COLUMN_WIDTH + 3, 5);
       ++i;
    }
@@ -130,6 +139,8 @@ void Beats::FilesDropped(std::vector<std::string> files, int x, int y)
       sample->Read(file.c_str());
       SampleDropped(x, y, sample);
    }
+
+   mHighlightColumn = -1;
 }
 
 void Beats::SampleDropped(int x, int y, Sample* sample)
@@ -144,13 +155,31 @@ void Beats::SampleDropped(int x, int y, Sample* sample)
 
    if (column < (int)mBeatColumns.size())
       mBeatColumns[column]->AddBeat(sample);
+
+   mHighlightColumn = -1;
 }
 
-void Beats::ButtonClicked(ClickButton* button)
+bool Beats::MouseMoved(float x, float y)
 {
+   IDrawableModule::MouseMoved(x, y);
+
+   int column = x / BEAT_COLUMN_WIDTH;
+
+   if (TheSynth->GetHeldSample() != nullptr && column >= 0 && column < (int)mBeatColumns.size())
+      mHighlightColumn = column;
+   else
+      mHighlightColumn = -1;
+
+   return false;
 }
 
-void Beats::CheckboxUpdated(Checkbox* checkbox)
+void Beats::ButtonClicked(ClickButton* button, double time)
+{
+   for (BeatColumn* column : mBeatColumns)
+      column->ButtonClicked(button, time);
+}
+
+void Beats::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -162,11 +191,11 @@ void Beats::GetModuleDimensions(float& width, float& height)
       height = MAX(height, 132 + 15 * (mBeatColumns[i]->GetNumSamples() + 1));
 }
 
-void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Beats::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Beats::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -179,7 +208,6 @@ void Beats::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Beats::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void Beats::SetUpFromSaveData()
@@ -187,29 +215,24 @@ void Beats::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Beats::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << (int)mBeatColumns.size();
    for (size_t i = 0; i < mBeatColumns.size(); ++i)
       mBeatColumns[i]->SaveState(out);
 }
 
-void Beats::LoadState(FileStreamIn& in)
+void Beats::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int numColumns;
    in >> numColumns;
@@ -276,10 +299,10 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
          for (int ch = 0; ch < numChannels; ++ch)
          {
             float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
-            double time = gTime;
+            double channelTime = time;
             for (int i = 0; i < bufferSize; ++i)
             {
-               float filter = mFilterRamp.Value(time);
+               float filter = mFilterRamp.Value(channelTime);
 
                mLowpass[ch].SetFilterParams(ofMap(sqrtf(ofClamp(-filter, 0, 1)), 0, 1, 6000, 80), sqrt(2) / 2);
                mHighpass[ch].SetFilterParams(ofMap(ofClamp(filter, 0, 1), 0, 1, 10, 6000), sqrt(2) / 2);
@@ -299,7 +322,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
 
                sample *= volSq * panGain;
                buffer->GetChannel(ch)[i] += sample;
-               time += gInvSampleRateMs;
+               channelTime += gInvSampleRateMs;
             }
          }
       }
@@ -369,6 +392,9 @@ void BeatColumn::Draw(int x, int y)
    mNumBarsSlider->Draw();
    mSelector->SetPosition(x, y + 120);
    mSelector->Draw();
+   mDeleteButton->SetPosition(x + 80, y + 88);
+   mDeleteButton->SetShowing(mSampleIndex != -1);
+   mDeleteButton->Draw();
 }
 
 void BeatColumn::CreateUIControls()
@@ -380,6 +406,7 @@ void BeatColumn::CreateUIControls()
    mDoubleTimeCheckbox = new Checkbox(mOwner, ("double" + ofToString(mIndex)).c_str(), 0, 0, &mDoubleTime);
    mNumBarsSlider = new IntSlider(mOwner, ("bars" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mNumBars, 1, 8);
    mSelector = new RadioButton(mOwner, ("selector" + ofToString(mIndex)).c_str(), 0, 0, &mSampleIndex);
+   mDeleteButton = new ClickButton(mOwner, ("delete " + ofToString(mIndex)).c_str(), 0, 0);
 
    mSelector->SetForcedWidth(controlWidth);
    mSelector->AddLabel("none", -1);
@@ -393,12 +420,25 @@ void BeatColumn::AddBeat(Sample* sample)
    mSamples.push_back(newSample);
 }
 
-void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal)
+void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
    if (list == mSelector)
    {
       if (mSampleIndex != -1 && mSampleIndex < (int)mSamples.size())
          mBeatData.LoadBeat(mSamples[mSampleIndex]);
+   }
+}
+
+void BeatColumn::ButtonClicked(ClickButton* button, double time)
+{
+   if (button == mDeleteButton)
+   {
+      if (mSampleIndex >= 0 && mSampleIndex < (int)mSamples.size())
+      {
+         mSamples.erase(mSamples.begin() + mSampleIndex);
+         mSelector->RemoveLabel(mSampleIndex);
+         mSampleIndex = -1;
+      }
    }
 }
 

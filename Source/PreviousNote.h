@@ -34,7 +34,9 @@ class PreviousNote : public NoteEffectBase, public IDrawableModule
 public:
    PreviousNote();
    static IDrawableModule* Create() { return new PreviousNote(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
@@ -54,8 +56,8 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   int mPitch;
-   int mVelocity;
+   int mPitch{ -1 };
+   int mVelocity{ 0 };
 };
 
 #endif /* defined(__Bespoke__PreviousNote__) */

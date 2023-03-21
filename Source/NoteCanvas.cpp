@@ -39,28 +39,7 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 NoteCanvas::NoteCanvas()
-: mCanvas(nullptr)
-, mCanvasControls(nullptr)
-, mCanvasTimeline(nullptr)
-, mCanvasScrollbarHorizontal(nullptr)
-, mCanvasScrollbarVertical(nullptr)
-, mNumMeasuresSlider(nullptr)
-, mNumMeasures(1)
-, mQuantizeButton(nullptr)
-, mPlay(true)
-, mPlayCheckbox(nullptr)
-, mRecord(false)
-, mRecordCheckbox(nullptr)
-, mStopQueued(false)
-, mInterval(kInterval_8n)
-, mIntervalSelector(nullptr)
-, mFreeRecordCheckbox(nullptr)
-, mFreeRecord(false)
-, mFreeRecordStartMeasure(0)
-, mClipButton(nullptr)
-, mShowIntervals(false)
 {
-   SetEnabled(true);
    mVoiceModulations.resize(kNumVoices + 1);
 }
 
@@ -219,7 +198,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
 
    if (mStopQueued)
    {
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(NextBufferTime(false));
       for (int i = 0; i < mCurrentNotes.size(); ++i)
          mCurrentNotes[i] = nullptr;
       mStopQueued = false;
@@ -325,7 +304,7 @@ void NoteCanvas::UpdateNumColumns()
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval) / 4);
 }
 
-void NoteCanvas::Clear()
+void NoteCanvas::Clear(double time)
 {
    bool wasPlaying = mPlay;
    mPlay = false;
@@ -334,7 +313,7 @@ void NoteCanvas::Clear()
       mInputNotes[pitch] = nullptr;
       mCurrentNotes[pitch] = nullptr;
    }
-   mNoteOutput.Flush(gTime);
+   mNoteOutput.Flush(time);
    mCanvas->Clear();
    mPlay = wasPlaying;
 }
@@ -617,13 +596,16 @@ void NoteCanvas::QuantizeNotes()
 void NoteCanvas::LoadMidi()
 {
    using namespace juce;
-   FileChooser chooser("Load midi", File(ofToDataPath("")), "*.mid", true, false, TheSynth->GetFileChooserParent());
+   String file_pattern = "*.mid;*.midi";
+   if (File::areFileNamesCaseSensitive())
+      file_pattern += ";" + file_pattern.toUpperCase();
+   FileChooser chooser("Load midi", File(ofToDataPath("")), file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
       bool wasPlaying = mPlay;
       mPlay = false;
 
-      mCanvas->Clear();
+      Clear(NextBufferTime(false));
       SetNumMeasures(1);
       File file = chooser.getResult();
       FileInputStream inputStream(file);
@@ -699,13 +681,13 @@ void NoteCanvas::SaveMidi()
    }
 }
 
-void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
+void NoteCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
       for (int pitch = 0; pitch < 128; ++pitch)
          mInputNotes[pitch] = nullptr;
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
    }
    if (checkbox == mPlayCheckbox)
    {
@@ -729,7 +711,7 @@ void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void NoteCanvas::ButtonClicked(ClickButton* button)
+void NoteCanvas::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mQuantizeButton)
       QuantizeNotes();
@@ -744,11 +726,11 @@ void NoteCanvas::ButtonClicked(ClickButton* button)
       SaveMidi();
 }
 
-void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
    {
@@ -756,7 +738,7 @@ void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void NoteCanvas::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -781,22 +763,22 @@ void NoteCanvas::SetUpFromSaveData()
 
 void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["canvaswidth"] = mCanvas->GetWidth();
    moduleInfo["canvasheight"] = mCanvas->GetHeight();
 }
 
 void NoteCanvas::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
    mCanvas->SaveState(out);
 }
 
-void NoteCanvas::LoadState(FileStreamIn& in)
+void NoteCanvas::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    mCanvas->LoadState(in);
 }

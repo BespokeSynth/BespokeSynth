@@ -31,11 +31,7 @@
 #include "UIControlMacros.h"
 
 UnstablePitch::UnstablePitch()
-: mPerlin(.2f, .1f, 0)
-, mModulation(false)
-, mVoiceRoundRobin(0)
 {
-
    for (int voice = 0; voice < kNumVoices; ++voice)
       mModulation.GetPitchBend(voice)->CreateBuffer();
 }
@@ -172,11 +168,11 @@ void UnstablePitch::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetPitchBend(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void UnstablePitch::CheckboxUpdated(Checkbox* checkbox)
+void UnstablePitch::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

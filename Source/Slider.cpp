@@ -32,7 +32,6 @@
 #include "ModularSynth.h"
 #include "IModulator.h"
 #include "Push2Control.h"
-#include "Profiler.h"
 
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits /* = -1 */)
 : mVar(var)
@@ -84,14 +83,23 @@ FloatSliderLFOControl* FloatSlider::AcquireLFO()
 
 void FloatSlider::SetLFO(FloatSliderLFOControl* lfo)
 {
-   mLFOControl = lfo;
-   mModulator = lfo;
+   if (lfo != mLFOControl)
+   {
+      SetModulator(lfo);
+      mLFOControl = lfo;
+   }
 }
 
 void FloatSlider::SetModulator(IModulator* modulator)
 {
-   mModulator = modulator;
-   mLFOControl = nullptr;
+   if (modulator != mModulator)
+   {
+      IModulator* oldModulator = mModulator;
+      mModulator = modulator;
+      mLFOControl = nullptr;
+      if (oldModulator != nullptr)
+         oldModulator->OnRemovedFrom(this);
+   }
 }
 
 void FloatSlider::Render()
@@ -189,7 +197,7 @@ void FloatSlider::Render()
    else
    {
       if (mShowName)
-         display = std::string(Name());
+         display = GetDisplayName();
       if (display.length() > 0) //only show a colon if there's a label
          display += ":";
       if (mFloatEntry)
@@ -236,7 +244,7 @@ void FloatSlider::Render()
       ofPopStyle();
    }
 
-   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr)
+   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr && !IUIControl::WasLastHoverSetManually())
    {
       ofPushStyle();
       ofFill();
@@ -289,7 +297,7 @@ void FloatSlider::DisplayLFOControl()
    }
 }
 
-void FloatSlider::OnClicked(int x, int y, bool right)
+void FloatSlider::OnClicked(float x, float y, bool right)
 {
    if (right)
    {
@@ -297,7 +305,7 @@ void FloatSlider::OnClicked(int x, int y, bool right)
       return;
    }
 
-   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment)
+   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && !IUIControl::WasLastHoverSetManually())
    {
       bool adjustMax;
       if (x > mWidth / 2)
@@ -339,7 +347,7 @@ void FloatSlider::MouseReleased()
    mMouseDown = false;
    mRefY = -999;
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
-      SetValue(0);
+      SetValue(0, NextBufferTime(false));
 }
 
 bool FloatSlider::MouseMoved(float x, float y)
@@ -350,7 +358,7 @@ bool FloatSlider::MouseMoved(float x, float y)
    return mMouseDown;
 }
 
-void FloatSlider::SetValueForMouse(int x, int y)
+void FloatSlider::SetValueForMouse(float x, float y)
 {
    float* var = GetModifyValue();
    float fX = x;
@@ -394,7 +402,7 @@ void FloatSlider::SetValueForMouse(int x, int y)
 
    if (oldVal != *var)
    {
-      mOwner->FloatSliderUpdated(this, oldVal);
+      mOwner->FloatSliderUpdated(this, oldVal, NextBufferTime(false));
    }
 
    if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
@@ -428,9 +436,9 @@ void FloatSlider::SmoothUpdated()
    }
 }
 
-void FloatSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void FloatSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
-   SetValue(GetValueForMidiCC(slider));
+   SetValue(GetValueForMidiCC(slider), time);
 }
 
 float FloatSlider::GetValueForMidiCC(float slider) const
@@ -496,7 +504,7 @@ float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
    return 0;
 }
 
-void FloatSlider::SetValue(float value)
+void FloatSlider::SetValue(float value, double time)
 {
    if (TheLFOController && TheLFOController->WantsBinding(this))
    {
@@ -525,7 +533,7 @@ void FloatSlider::SetValue(float value)
    DisableLFO();
    if (oldVal != *var)
    {
-      mOwner->FloatSliderUpdated(this, oldVal);
+      mOwner->FloatSliderUpdated(this, oldVal, time);
    }
 }
 
@@ -534,7 +542,7 @@ void FloatSlider::UpdateTouching()
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
    {
       if (!mTouching)
-         SetValue(0);
+         SetValue(0, NextBufferTime(false));
       mRelativeOffset = -999;
    }
 }
@@ -601,7 +609,7 @@ void FloatSlider::DoCompute(int samplesIn /*= 0*/)
    float oldVal = *mVar;
 
    const bool kUseCache = true;
-   if (kUseCache && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
+   if (kUseCache && IsAudioThread() && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
    {
       *mVar = mLastComputeCacheValue[samplesIn];
    }
@@ -618,7 +626,7 @@ void FloatSlider::DoCompute(int samplesIn /*= 0*/)
       if (mIsSmoothing)
          *mVar = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
 
-      if (samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] != gTime)
+      if (IsAudioThread() && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] != gTime)
       {
          mLastComputeCacheValue[samplesIn] = *mVar;
          mLastComputeCacheTime[samplesIn] = gTime;
@@ -626,7 +634,7 @@ void FloatSlider::DoCompute(int samplesIn /*= 0*/)
    }
 
    if (oldVal != *mVar)
-      mOwner->FloatSliderUpdated(this, oldVal);
+      mOwner->FloatSliderUpdated(this, oldVal, gTime + samplesIn * gInvSampleRateMs);
 }
 
 float* FloatSlider::GetModifyValue()
@@ -642,26 +650,26 @@ void FloatSlider::Double()
 {
    float doubl = *GetModifyValue() * 2.0f;
    if (doubl >= mMin && doubl <= mMax)
-      SetValue(doubl);
+      SetValue(doubl, NextBufferTime(false));
 }
 
 void FloatSlider::Halve()
 {
    float half = *GetModifyValue() * .5f;
    if (half >= mMin && half <= mMax)
-      SetValue(half);
+      SetValue(half, NextBufferTime(false));
 }
 
 void FloatSlider::Increment(float amount)
 {
    float val = *GetModifyValue() + amount;
    if (val >= mMin && val <= mMax)
-      SetValue(val);
+      SetValue(val, NextBufferTime(false));
 }
 
 void FloatSlider::ResetToOriginal()
 {
-   SetValue(mOriginalValue);
+   SetValue(mOriginalValue, NextBufferTime(false));
 }
 
 bool FloatSlider::CheckNeedsDraw()
@@ -693,7 +701,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
       if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
-         SetValue(evaluated);
+         SetValue(evaluated, NextBufferTime(false));
    }
    if (entry == mMaxEntry)
    {
@@ -723,7 +731,7 @@ void FloatSlider::OnTransportAdvanced(float amount)
 
 namespace
 {
-   const int kFloatSliderSaveStateRev = 5;
+   const int kFloatSliderSaveStateRev = 6;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
@@ -741,6 +749,7 @@ void FloatSlider::SaveState(FileStreamOut& out)
 
    out << mMin;
    out << mMax;
+   out << (int)mMode;
 
    bool hasLFO = mLFOControl && mLFOControl->Active();
    out << hasLFO;
@@ -773,7 +782,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
          }
          else if (rev > 0)
          {
-            mLFOControl->LoadState(in);
+            mLFOControl->LoadState(in, mLFOControl->LoadModuleSaveStateRev(in));
          }
          if (shouldSetValue)
             lfo->UpdateFromSettings();
@@ -802,6 +811,13 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       in >> mMax;
    }
 
+   if (rev >= 6)
+   {
+      int modeInt;
+      in >> modeInt;
+      mMode = (Mode)modeInt;
+   }
+
    if (rev >= 5)
    {
       bool hasLFO;
@@ -818,7 +834,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
          }
          else if (rev > 0)
          {
-            mLFOControl->LoadState(in);
+            mLFOControl->LoadState(in, mLFOControl->LoadModuleSaveStateRev(in));
          }
          if (shouldSetValue)
             lfo->UpdateFromSettings();
@@ -826,7 +842,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    }
 
    if (shouldSetValue && (mModulator == nullptr || !mModulator->Active()))
-      SetValueDirect(var);
+      SetValueDirect(var, gTime);
 }
 
 IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y, int w, int h, int* var, int min, int max)
@@ -935,7 +951,7 @@ void IntSlider::Render()
 
    std::string display;
    if (mShowName)
-      display = std::string(Name());
+      display = GetDisplayName();
    if (display.length() > 0) //only show a colon if there's a label
       display += ":";
    if (mIntEntry)
@@ -981,7 +997,7 @@ void IntSlider::Render()
       ofPopStyle();
    }
 
-   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr)
+   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr && !IUIControl::WasLastHoverSetManually())
    {
       ofPushStyle();
       ofFill();
@@ -1007,12 +1023,12 @@ void IntSlider::CalcSliderVal()
    mSliderVal = ofMap(*mVar, mMin, mMax, 0.0f, 1.0f, K(clamp));
 }
 
-void IntSlider::OnClicked(int x, int y, bool right)
+void IntSlider::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
 
-   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment)
+   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && !IUIControl::WasLastHoverSetManually())
    {
       bool adjustMax;
       if (x > mWidth / 2)
@@ -1051,7 +1067,7 @@ bool IntSlider::MouseMoved(float x, float y)
    return mMouseDown;
 }
 
-void IntSlider::SetValueForMouse(int x, int y)
+void IntSlider::SetValueForMouse(float x, float y)
 {
    int oldVal = *mVar;
    *mVar = (int)round(ofMap(x + mX, mX + 1, mX + mWidth - 1, mMin, mMax));
@@ -1059,14 +1075,14 @@ void IntSlider::SetValueForMouse(int x, int y)
    if (oldVal != *mVar)
    {
       CalcSliderVal();
-      mOwner->IntSliderUpdated(this, oldVal);
+      mOwner->IntSliderUpdated(this, oldVal, NextBufferTime(false));
    }
 }
 
-void IntSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void IntSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
-   SetValue(GetValueForMidiCC(slider));
+   SetValue(GetValueForMidiCC(slider), time);
    mSliderVal = slider;
    mLastSetValue = *mVar;
 }
@@ -1077,15 +1093,15 @@ float IntSlider::GetValueForMidiCC(float slider) const
    return (int)round(ofMap(slider, 0, 1, mMin, mMax));
 }
 
-void IntSlider::SetValue(float value)
+void IntSlider::SetValue(float value, double time)
 {
    int oldVal = *mVar;
-   *mVar = (int)ofClamp(value, mMin, mMax);
+   *mVar = (int)round(ofClamp(value, mMin, mMax));
    if (oldVal != *mVar)
    {
       CalcSliderVal();
       gControlTactileFeedback = 1;
-      mOwner->IntSliderUpdated(this, oldVal);
+      mOwner->IntSliderUpdated(this, oldVal, time);
    }
 }
 
@@ -1108,26 +1124,26 @@ void IntSlider::Double()
 {
    int doubl = *mVar * 2;
    if (doubl >= mMin && doubl <= mMax)
-      SetValue(doubl);
+      SetValue(doubl, NextBufferTime(false));
 }
 
 void IntSlider::Halve()
 {
    int half = *mVar / 2;
    if (half >= mMin && half <= mMax)
-      SetValue(half);
+      SetValue(half, NextBufferTime(false));
 }
 
 void IntSlider::Increment(float amount)
 {
    int val = *mVar + (int)amount;
    if (val >= mMin && val <= mMax)
-      SetValue(val);
+      SetValue(val, NextBufferTime(false));
 }
 
 void IntSlider::ResetToOriginal()
 {
-   SetValue(mOriginalValue);
+   SetValue(mOriginalValue, NextBufferTime(false));
 }
 
 bool IntSlider::CheckNeedsDraw()
@@ -1160,7 +1176,7 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
       int evaluatedInt = round(evaluated);
       if (expressionValid && ((evaluatedInt >= mMin && evaluatedInt <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
-         SetValue(evaluatedInt);
+         SetValue(evaluatedInt, NextBufferTime(false));
    }
    if (entry == mMaxEntry)
    {
@@ -1185,7 +1201,7 @@ void IntSlider::TextEntryCancelled(TextEntry* entry)
 
 namespace
 {
-   const int kIntSliderSaveStateRev = 0;
+   const int kIntSliderSaveStateRev = 1;
 }
 
 void IntSlider::SaveState(FileStreamOut& out)
@@ -1193,16 +1209,32 @@ void IntSlider::SaveState(FileStreamOut& out)
    out << kIntSliderSaveStateRev;
 
    out << (float)*mVar;
+   out << mMin;
+   out << mMax;
 }
 
 void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kIntSliderSaveStateRev);
+   LoadStateValidate(rev <= kIntSliderSaveStateRev);
 
    float var;
    in >> var;
+
+   if (rev >= 1)
+   {
+      in >> mMin;
+      in >> mMax;
+   }
+   else
+   {
+      if (var < mMin)
+         mMin = var;
+      if (var > mMax)
+         mMax = var;
+   }
+
    if (shouldSetValue)
-      SetValueDirect(var);
+      SetValueDirect(var, gTime);
 }

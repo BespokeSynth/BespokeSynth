@@ -39,25 +39,6 @@
 #define KEY_LATCH_BUTTON -996
 
 LaunchpadKeyboard::LaunchpadKeyboard()
-: mRootNote(4) //4 = E
-, mGridControlTarget(nullptr)
-, mTestKeyHeld(false)
-, mLayout(kChromatic)
-, mLayoutDropdown(nullptr)
-, mOctave(3)
-, mOctaveSlider(nullptr)
-, mLatch(false)
-, mLatchCheckbox(nullptr)
-, mCurrentChord(0)
-, mDisplayer(nullptr)
-, mArrangementMode(kFull)
-, mArrangementModeDropdown(nullptr)
-, mChorder(nullptr)
-, mLatchChords(false)
-, mLatchChordsCheckbox(nullptr)
-, mWasChorderEnabled(false)
-, mPreserveChordRoot(true)
-, mPreserveChordRootCheckbox(nullptr)
 {
    for (int i = 0; i < 128; ++i)
       mCurrentNotes[i] = 0;
@@ -182,7 +163,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
 {
    bool bOn = velocity > 0;
    int pitch = GridToPitch(x, y);
-   double time = gTime + gBufferSizeMs;
+   double time = NextBufferTime(false);
 
    if (pitch == INVALID_PITCH)
    {
@@ -210,7 +191,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
       {
          mLatch = !mLatch;
          if (!mLatch)
-            mNoteOutput.Flush(gTime);
+            mNoteOutput.Flush(NextBufferTime(false));
          UpdateLights();
       }
       return;
@@ -238,7 +219,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
                currentPitch = i;
             mCurrentNotes[i] = 0;
          }
-         mNoteOutput.Flush(gTime);
+         mNoteOutput.Flush(NextBufferTime(false));
 
          if (currentPitch == pitch)
          {
@@ -326,7 +307,7 @@ void LaunchpadKeyboard::ReleaseNoteFor(int x, int y)
    int pitch = GridToPitch(x, y);
    if (pitch >= 0 && pitch < 128)
    {
-      double time = gTime + gBufferSizeMs;
+      double time = NextBufferTime(false);
       PlayKeyboardNote(time, pitch, 0);
       mCurrentNotes[pitch] = 0;
    }
@@ -774,11 +755,10 @@ void LaunchpadKeyboard::Poll()
    }
 }
 
-void LaunchpadKeyboard::CheckboxUpdated(Checkbox* checkbox)
+void LaunchpadKeyboard::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      double time = gTime + gBufferSizeMs;
       mHeldChordTones.clear();
       mNoteOutput.Flush(time);
    }
@@ -796,25 +776,23 @@ void LaunchpadKeyboard::CheckboxUpdated(Checkbox* checkbox)
    {
       if (!mLatch)
       {
-         double time = gTime + gBufferSizeMs;
          mNoteOutput.Flush(time);
       }
    }
 }
 
-void LaunchpadKeyboard::IntSliderUpdated(IntSlider* slider, int oldVal)
+void LaunchpadKeyboard::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mOctaveSlider)
    {
       for (int i = 0; i < 128; ++i)
          mCurrentNotes[i] = 0;
-      double time = gTime + gBufferSizeMs;
       mNoteOutput.Flush(time);
       UpdateLights();
    }
 }
 
-void LaunchpadKeyboard::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void LaunchpadKeyboard::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
@@ -825,7 +803,7 @@ void LaunchpadKeyboard::Exit()
       mGridControlTarget->GetGridController()->ResetLights();
 }
 
-void LaunchpadKeyboard::DropdownUpdated(DropdownList* list, int oldVal)
+void LaunchpadKeyboard::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    UpdateLights();
 }

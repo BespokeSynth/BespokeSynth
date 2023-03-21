@@ -31,17 +31,6 @@
 LFOController* TheLFOController = nullptr;
 
 LFOController::LFOController()
-: dummy(0)
-, dummy2(0)
-, mIntervalSelector(nullptr)
-, mOscSelector(nullptr)
-, mMinSlider(nullptr)
-, mMaxSlider(nullptr)
-, mWantBind(false)
-, mBindButton(nullptr)
-, mLFO(nullptr)
-, mSlider(nullptr)
-, mStopBindTime(-1)
 {
    assert(TheLFOController == nullptr);
    TheLFOController = this;
@@ -145,7 +134,7 @@ void LFOController::DrawModule()
    }
 }
 
-void LFOController::DropdownUpdated(DropdownList* list, int oldVal)
+void LFOController::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (mLFO == nullptr)
       return;
@@ -153,7 +142,7 @@ void LFOController::DropdownUpdated(DropdownList* list, int oldVal)
    mLFO->UpdateFromSettings();
 }
 
-void LFOController::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void LFOController::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (mLFO == nullptr)
       return;
@@ -167,7 +156,7 @@ void LFOController::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       mLFO->GetMin() = MIN(mLFO->GetMax(), mLFO->GetMin());
 }
 
-void LFOController::ButtonClicked(ClickButton* button)
+void LFOController::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mBindButton)
       mWantBind = true;

@@ -175,7 +175,7 @@ void LiveGranulator::OnTimeEvent(double time)
    Freeze();
 }
 
-void LiveGranulator::CheckboxUpdated(Checkbox* checkbox)
+void LiveGranulator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
       mBuffer.ClearBuffer();
@@ -190,7 +190,7 @@ void LiveGranulator::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal)
+void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mAutoCaptureDropdown)
    {
@@ -205,7 +205,7 @@ void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void LiveGranulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void LiveGranulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mPosSlider)
    {

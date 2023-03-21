@@ -72,11 +72,11 @@ void NoteDelayer::DrawModule()
    }
 }
 
-void NoteDelayer::CheckboxUpdated(Checkbox* checkbox)
+void NoteDelayer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
       mAppendIndex = 0;
       mConsumeIndex = 0;
    }
@@ -94,7 +94,7 @@ void NoteDelayer::OnTransportAdvanced(float amount)
    for (int i = mConsumeIndex; i < end; ++i)
    {
       const NoteInfo& info = mInputNotes[i % kQueueSize];
-      if (gTime + gBufferSizeMs >= info.mTriggerTime)
+      if (NextBufferTime(true) >= info.mTriggerTime)
       {
          PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
          mConsumeIndex = (mConsumeIndex + 1) % kQueueSize;
@@ -105,7 +105,10 @@ void NoteDelayer::OnTransportAdvanced(float amount)
 void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
+   {
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation); // Passthrough notes.
       return;
+   }
 
    if (velocity > 0)
       mLastNoteOnTime = time;
@@ -122,7 +125,7 @@ void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 }
 
-void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

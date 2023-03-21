@@ -27,6 +27,7 @@
 #include "IDrawableModule.h"
 #include "SynthGlobals.h"
 #include "FileStream.h"
+#include "DropdownList.h"
 
 const int radioSpacing = 15;
 
@@ -214,15 +215,15 @@ bool RadioButton::MouseMoved(float x, float y)
    return false;
 }
 
-void RadioButton::OnClicked(int x, int y, bool right)
+void RadioButton::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
 
    if (mDirection == kRadioVertical)
-      SetIndex(y / radioSpacing);
+      SetIndex(y / radioSpacing, NextBufferTime(false));
    else //kRadioHorizontal
-      SetIndex(int(x / mElementWidth));
+      SetIndex(int(x / mElementWidth), NextBufferTime(false));
 }
 
 ofVec2f RadioButton::GetOptionPosition(int optionIndex)
@@ -235,7 +236,7 @@ ofVec2f RadioButton::GetOptionPosition(int optionIndex)
       return ofVec2f(x + float(mWidth) / GetNumValues() * (optionIndex + .5f), y + mHeight);
 }
 
-void RadioButton::SetIndex(int i)
+void RadioButton::SetIndex(int i, double time)
 {
    if (mElements.empty())
       return;
@@ -249,15 +250,15 @@ void RadioButton::SetIndex(int i)
    if (oldVal != *mVar)
    {
       CalcSliderVal();
-      mOwner->RadioButtonUpdated(this, oldVal);
+      mOwner->RadioButtonUpdated(this, oldVal, time);
       gControlTactileFeedback = 1;
    }
 }
 
-void RadioButton::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void RadioButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
-   SetIndex(int(slider * mElements.size()));
+   SetIndex(int(slider * mElements.size()), time);
    mSliderVal = slider;
    mLastSetValue = *mVar;
 }
@@ -272,14 +273,14 @@ float RadioButton::GetValueForMidiCC(float slider) const
    return mElements[index].mValue;
 }
 
-void RadioButton::SetValue(float value)
+void RadioButton::SetValue(float value, double time)
 {
    if (mMultiSelect)
       value = *mVar ^ (1 << (int)value);
-   SetValueDirect(value);
+   SetValueDirect(value, time);
 }
 
-void RadioButton::SetValueDirect(float value)
+void RadioButton::SetValueDirect(float value, double time)
 {
    int oldVal = *mVar;
 
@@ -287,7 +288,7 @@ void RadioButton::SetValueDirect(float value)
    if (oldVal != *mVar)
    {
       CalcSliderVal();
-      mOwner->RadioButtonUpdated(this, oldVal);
+      mOwner->RadioButtonUpdated(this, oldVal, time);
       gControlTactileFeedback = 1;
    }
 }
@@ -339,7 +340,7 @@ void RadioButton::Increment(float amount)
       }
    }
 
-   SetIndex(current + (int)amount);
+   SetIndex(current + (int)amount, NextBufferTime(false));
 }
 
 EnumMap RadioButton::GetEnumMap()
@@ -348,6 +349,13 @@ EnumMap RadioButton::GetEnumMap()
    for (int i = 0; i < mElements.size(); ++i)
       ret[mElements[i].mLabel] = mElements[i].mValue;
    return ret;
+}
+
+void RadioButton::CopyContentsTo(DropdownList* list) const
+{
+   list->Clear();
+   for (auto& element : mElements)
+      list->AddLabel(element.mLabel, element.mValue);
 }
 
 void RadioButton::CalcSliderVal()
@@ -384,10 +392,10 @@ void RadioButton::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    float var;
    in >> var;
    if (shouldSetValue)
-      SetValueDirect(var);
+      SetValueDirect(var, gTime);
 }

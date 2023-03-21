@@ -78,7 +78,7 @@ void PulseSequence::CreateUIControls()
    for (int i = 0; i < kIndividualStepCables; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
+      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]);
    }
 }
@@ -121,7 +121,7 @@ void PulseSequence::DrawModule()
    }
 }
 
-void PulseSequence::CheckboxUpdated(Checkbox* checkbox)
+void PulseSequence::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -192,7 +192,7 @@ void PulseSequence::GetModuleDimensions(float& width, float& height)
    height = 52;
 }
 
-void PulseSequence::OnClicked(int x, int y, bool right)
+void PulseSequence::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -212,21 +212,21 @@ bool PulseSequence::MouseMoved(float x, float y)
    return false;
 }
 
-bool PulseSequence::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool PulseSequence::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
+   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
 }
 
-void PulseSequence::ButtonClicked(ClickButton* button)
+void PulseSequence::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mAdvanceBackwardButton)
-      Step(1, 0, kPulseFlag_Backward);
+      Step(time, 0, kPulseFlag_Backward);
    if (button == mAdvanceForwardButton)
-      Step(1, 0, 0);
+      Step(time, 0, 0);
 }
 
-void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal)
+void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -236,11 +236,11 @@ void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void PulseSequence::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PulseSequence::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -258,28 +258,23 @@ void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, flo
    }
 }
 
-namespace
-{
-   const int kSaveStateRev = 2;
-}
-
 void PulseSequence::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mVelocityGrid->SaveState(out);
    out << mHasExternalPulseSource;
 }
 
-void PulseSequence::LoadState(FileStreamIn& in)
+void PulseSequence::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mVelocityGrid->LoadState(in);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);
@@ -290,7 +285,6 @@ void PulseSequence::LoadState(FileStreamIn& in)
 
 void PulseSequence::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PulseSequence::LoadLayout(const ofxJSONElement& moduleInfo)

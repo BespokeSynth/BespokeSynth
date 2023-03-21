@@ -36,21 +36,7 @@
 #include "CanvasScrollbar.h"
 
 EventCanvas::EventCanvas()
-: mCanvas(nullptr)
-, mCanvasControls(nullptr)
-, mNumMeasuresEntry(nullptr)
-, mNumMeasures(1)
-, mQuantizeButton(nullptr)
-, mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mScrollPartial(0)
-, mPosition(0)
-, mRecord(false)
-, mRecordCheckbox(nullptr)
-, mPreviousPosition(0)
 {
-   SetEnabled(true);
-
    mRowColors.push_back(ofColor::red);
    mRowColors.push_back(ofColor::green);
    mRowColors.push_back(ofColor::blue);
@@ -127,14 +113,16 @@ void EventCanvas::OnTransportAdvanced(float amount)
    if (mCanvas == nullptr)
       return;
 
-   //look ahead one buffer so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
-   float posOffset = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
+   //look ahead two buffers so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
+   double lookaheadMsAmount = gBufferSizeMs * 2;
+   double lookaheadTime = gTime + lookaheadMsAmount;
+   double lookaheadPos = ((TheTransport->GetMeasure(lookaheadTime) % mNumMeasures) + TheTransport->GetMeasurePos(lookaheadTime)) / mNumMeasures;
+   FloatWrap(lookaheadPos, 1);
 
-   float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures + posOffset;
-   FloatWrap(curPos, 1);
-
-   mCanvas->SetCursorPos(curPos);
-   mPosition = curPos;
+   mCanvas->SetCursorPos(lookaheadPos);
+   mPosition = lookaheadPos;
+   double bufferOffsetAmount = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
+   mPreviousPosition = std::min(mPreviousPosition, lookaheadPos - bufferOffsetAmount);
 
    if (!mEnabled)
       return;
@@ -142,28 +130,27 @@ void EventCanvas::OnTransportAdvanced(float amount)
    for (auto* canvasElement : mCanvas->GetElements())
    {
       float elementStart = canvasElement->GetStart();
-      bool startPassed = (elementStart > mPreviousPosition && elementStart <= curPos) ||
-                         (curPos < mPreviousPosition && (elementStart > mPreviousPosition || elementStart <= curPos));
+      bool startPassed = (lookaheadPos >= elementStart && mPreviousPosition < elementStart);
       float elementEnd = canvasElement->GetEnd();
-      FloatWrap(elementEnd, mCanvas->GetLength());
-      bool endPassed = (elementEnd > mPreviousPosition && elementEnd <= curPos) ||
-                       (curPos < mPreviousPosition && (elementEnd > mPreviousPosition || elementEnd <= curPos));
+      if (elementEnd > mCanvas->GetLength())
+         FloatWrap(elementEnd, mCanvas->GetLength());
+      bool endPassed = (lookaheadPos >= elementEnd && mPreviousPosition < elementEnd);
       if (startPassed || endPassed)
       {
          EventCanvasElement* element = static_cast<EventCanvasElement*>(canvasElement);
-         if (curPos > elementEnd)
+         if (lookaheadPos > elementEnd)
          {
             if (startPassed)
-               element->Trigger();
+               element->Trigger(GetTriggerTime(lookaheadTime, lookaheadPos, elementStart));
             if (endPassed)
-               element->TriggerEnd();
+               element->TriggerEnd(GetTriggerTime(lookaheadTime, lookaheadPos, elementEnd));
          }
          else
          {
             if (endPassed)
-               element->TriggerEnd();
+               element->TriggerEnd(GetTriggerTime(lookaheadTime, lookaheadPos, elementEnd));
             if (startPassed)
-               element->Trigger();
+               element->Trigger(GetTriggerTime(lookaheadTime, lookaheadPos, elementStart));
          }
 
          IUIControl* control = mRowConnections[element->mRow].mUIControl;
@@ -180,7 +167,7 @@ void EventCanvas::OnTransportAdvanced(float amount)
 
          if (mRecord && mRowConnections[i].mLastValue != value)
          {
-            float colPos = curPos * mCanvas->GetNumCols();
+            float colPos = lookaheadPos * mCanvas->GetNumCols();
             int col = int(colPos + .5f);
             EventCanvasElement* element = new EventCanvasElement(mCanvas, col, i, colPos - col);
             element->SetUIControl(mRowConnections[i].mUIControl);
@@ -192,7 +179,18 @@ void EventCanvas::OnTransportAdvanced(float amount)
       }
    }
 
-   mPreviousPosition = curPos;
+   mPreviousPosition = lookaheadPos;
+}
+
+double EventCanvas::GetTriggerTime(double lookaheadTime, double lookaheadPos, float eventPos)
+{
+   double cursorAdvanceSinceEvent = lookaheadPos - eventPos;
+   if (cursorAdvanceSinceEvent < 0)
+      cursorAdvanceSinceEvent += 1;
+   double time = lookaheadTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
+   if (time < gTime)
+      time = gTime;
+   return time;
 }
 
 void EventCanvas::UpdateNumColumns()
@@ -301,7 +299,7 @@ void EventCanvas::SyncControlCablesToCanvas()
       for (int i = oldSize; i < mControlCables.size(); ++i)
       {
          mControlCables[i] = new PatchCableSource(this, kConnectionType_UIControl);
-         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0));
+         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
          mControlCables[i]->SetColor(GetRowColor(i));
          AddPatchCableSource(mControlCables[i]);
       }
@@ -333,7 +331,7 @@ void EventCanvas::GetModuleDimensions(float& width, float& height)
    height = mCanvas->GetHeight() + extraH;
 }
 
-void EventCanvas::CheckboxUpdated(Checkbox* checkbox)
+void EventCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -341,7 +339,7 @@ void EventCanvas::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void EventCanvas::ButtonClicked(ClickButton* button)
+void EventCanvas::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mQuantizeButton)
    {
@@ -365,11 +363,11 @@ void EventCanvas::ButtonClicked(ClickButton* button)
    }
 }
 
-void EventCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EventCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void EventCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
+void EventCanvas::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -381,7 +379,7 @@ void EventCanvas::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void EventCanvas::DropdownUpdated(DropdownList* list, int oldVal)
+void EventCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -408,22 +406,15 @@ void EventCanvas::SetUpFromSaveData()
 
 void EventCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["canvaswidth"] = mCanvas->GetWidth();
    moduleInfo["canvasheight"] = mCanvas->GetHeight();
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void EventCanvas::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << (int)mControlCables.size();
    for (auto cable : mControlCables)
@@ -437,13 +428,13 @@ void EventCanvas::SaveState(FileStreamOut& out)
    mCanvas->SaveState(out);
 }
 
-void EventCanvas::LoadState(FileStreamIn& in)
+void EventCanvas::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int size;
    in >> size;

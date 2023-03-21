@@ -47,7 +47,7 @@ void FeedbackModule::CreateUIControls()
 
    mFeedbackTargetCable = new PatchCableSource(this, kConnectionType_Audio);
    mFeedbackTargetCable->SetManualPosition(108, 8);
-   mFeedbackTargetCable->SetOverrideCableDir(ofVec2f(1, 0));
+   mFeedbackTargetCable->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    mFeedbackTargetCable->SetOverrideVizBuffer(&mFeedbackVizBuffer);
    AddPatchCableSource(mFeedbackTargetCable);
 
@@ -88,7 +88,7 @@ void FeedbackModule::Process(double time)
    {
       mFeedbackTarget->GetBuffer()->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
       mFeedbackVizBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
-      mDelay.ProcessAudio(gTime, GetBuffer());
+      mDelay.ProcessAudio(time, GetBuffer());
 
       const double kReleaseMs = 50;
       const double kReleaseCoeff = exp(-1000.0 / (kReleaseMs * gSampleRate));
@@ -159,7 +159,6 @@ void FeedbackModule::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void FeedbackModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["feedbacktarget"] = mFeedbackTarget ? dynamic_cast<IDrawableModule*>(mFeedbackTarget)->Name() : "";
 }
 

@@ -43,7 +43,9 @@ public:
    FMSynth();
    ~FMSynth();
    static IDrawableModule* Create() { return new FMSynth(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -55,9 +57,9 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -80,27 +82,27 @@ private:
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    FMVoiceParams mVoiceParams;
-   FloatSlider* mVolSlider;
-   ADSRDisplay* mAdsrDisplayVol;
-   FloatSlider* mPhaseOffsetSlider0;
+   FloatSlider* mVolSlider{ nullptr };
+   ADSRDisplay* mAdsrDisplayVol{ nullptr };
+   FloatSlider* mPhaseOffsetSlider0{ nullptr };
 
-   FloatSlider* mHarmSlider;
-   ADSRDisplay* mAdsrDisplayHarm;
-   FloatSlider* mModSlider;
-   ADSRDisplay* mAdsrDisplayMod;
-   int mHarmRatioBase; //negative means 1/val
-   float mHarmRatioTweak;
-   DropdownList* mHarmRatioBaseDropdown;
-   FloatSlider* mPhaseOffsetSlider1;
+   FloatSlider* mHarmSlider{ nullptr };
+   ADSRDisplay* mAdsrDisplayHarm{ nullptr };
+   FloatSlider* mModSlider{ nullptr };
+   ADSRDisplay* mAdsrDisplayMod{ nullptr };
+   int mHarmRatioBase{ 1 }; //negative means 1/val
+   float mHarmRatioTweak{ 1 };
+   DropdownList* mHarmRatioBaseDropdown{ nullptr };
+   FloatSlider* mPhaseOffsetSlider1{ nullptr };
 
-   FloatSlider* mHarmSlider2;
-   ADSRDisplay* mAdsrDisplayHarm2;
-   FloatSlider* mModSlider2;
-   ADSRDisplay* mAdsrDisplayMod2;
-   int mHarmRatioBase2; //negative means 1/val
-   float mHarmRatioTweak2;
-   DropdownList* mHarmRatioBaseDropdown2;
-   FloatSlider* mPhaseOffsetSlider2;
+   FloatSlider* mHarmSlider2{ nullptr };
+   ADSRDisplay* mAdsrDisplayHarm2{ nullptr };
+   FloatSlider* mModSlider2{ nullptr };
+   ADSRDisplay* mAdsrDisplayMod2{ nullptr };
+   int mHarmRatioBase2{ 1 }; //negative means 1/val
+   float mHarmRatioTweak2{ 1 };
+   DropdownList* mHarmRatioBaseDropdown2{ nullptr };
+   FloatSlider* mPhaseOffsetSlider2{ nullptr };
 
    ChannelBuffer mWriteBuffer;
 

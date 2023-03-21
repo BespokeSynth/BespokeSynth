@@ -26,13 +26,15 @@ public:
    M185Sequencer();
    virtual ~M185Sequencer();
    static IDrawableModule* Create() { return new M185Sequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    //IDrawableModule
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -48,15 +50,16 @@ public:
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
    //IDropdownListener
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
 
 private:
    //IDrawableModule
@@ -77,47 +80,37 @@ private:
 
    struct Step
    {
-      Step()
-      : mPitch(0)
-      , mPulseCount(1)
-      , mGate(kGate_Repeat)
-      , xPos(0)
-      , yPos(0)
-      , mPitchSlider(nullptr)
-      , mPulseCountSlider(nullptr)
-      , mGateSelector(nullptr)
-      {
-      }
+      Step() {}
 
-      int mPitch;
-      int mPulseCount;
-      GateType mGate;
+      int mPitch{ 0 };
+      int mPulseCount{ 0 };
+      GateType mGate{ GateType::kGate_Repeat };
 
-      float xPos, yPos;
+      float xPos{ 0 }, yPos{ 0 };
 
-      IntSlider* mPitchSlider;
-      IntSlider* mPulseCountSlider;
-      DropdownList* mGateSelector;
+      IntSlider* mPitchSlider{ nullptr };
+      IntSlider* mPulseCountSlider{ nullptr };
+      DropdownList* mGateSelector{ nullptr };
    };
 
    std::array<Step, NUM_M185SEQUENCER_STEPS> mSteps;
-   float mWidth, mHeight;
-   bool mHasExternalPulseSource;
+   float mWidth{ 0 }, mHeight{ 0 };
+   bool mHasExternalPulseSource{ false };
 
    // Going through 0..(mSteps.size() - 1)
-   int mStepIdx;
-   int mLastPlayedStepIdx;
+   int mStepIdx{ 0 };
+   int mLastPlayedStepIdx{ 0 };
 
    // Going through 0..(mSteps[X].mPulseCount - 1)
-   int mStepPulseIdx;
+   int mStepPulseIdx{ 0 };
 
-   int mLastPitch;
+   int mLastPitch{ 0 };
 
-   NoteInterval mInterval;
+   NoteInterval mInterval{ NoteInterval::kInterval_8n };
 
-   DropdownList* mIntervalSelector;
+   DropdownList* mIntervalSelector{ nullptr };
 
-   ClickButton* mResetStepButton;
+   ClickButton* mResetStepButton{ nullptr };
 };
 
 #endif /* defined(__modularSynth__M185Sequencer__) */

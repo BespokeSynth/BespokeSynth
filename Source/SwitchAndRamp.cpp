@@ -25,6 +25,13 @@
 
 #include "SwitchAndRamp.h"
 
+SwitchAndRamp::SwitchAndRamp()
+{
+   mSwitching.fill(false);
+   mLastOutput.fill(0);
+   mOffset.fill(0);
+}
+
 void SwitchAndRamp::StartSwitch()
 {
    mSwitching.fill(true);

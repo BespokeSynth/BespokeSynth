@@ -24,7 +24,7 @@
 //
 
 #include "IUIControl.h"
-#include "Presets.h"
+#include "Snapshots.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "PatchCable.h"
@@ -34,7 +34,7 @@
 //static
 IUIControl* IUIControl::sLastHoveredUIControl = nullptr;
 //static
-bool IUIControl::sLastUIHoverWasSetViaTab = false;
+bool IUIControl::sLastUIHoverWasSetManually = false;
 
 IUIControl::~IUIControl()
 {
@@ -46,7 +46,7 @@ IUIControl::~IUIControl()
 
 bool IUIControl::IsPreset()
 {
-   return VectorContains(this, Presets::sPresetHighlightControls);
+   return VectorContains(this, Snapshots::sSnapshotHighlightControls);
 }
 
 bool IUIControl::TestHover(int x, int y)
@@ -91,7 +91,7 @@ void IUIControl::CheckHover(int x, int y)
    {
       gHoveredUIControl = this;
       sLastHoveredUIControl = this;
-      sLastUIHoverWasSetViaTab = false;
+      sLastUIHoverWasSetManually = false;
       sLastHoveredUIControlFrame = TheSynth->GetFrameCount();
    }
 }
@@ -136,6 +136,7 @@ void IUIControl::DrawPatchCableHover()
 {
    if (PatchCable::sActivePatchCable &&
        (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator ||
+        PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_ValueSetter ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Grid) &&
        PatchCable::sActivePatchCable->IsValidTarget(this))
@@ -153,7 +154,9 @@ void IUIControl::DrawPatchCableHover()
 
 bool IUIControl::CanBeTargetedBy(PatchCableSource* source) const
 {
-   return source->GetConnectionType() == kConnectionType_Modulator || source->GetConnectionType() == kConnectionType_UIControl;
+   if (!mCableTargetable)
+      return false;
+   return source->GetConnectionType() == kConnectionType_Modulator || source->GetConnectionType() == kConnectionType_ValueSetter || source->GetConnectionType() == kConnectionType_UIControl;
 }
 
 void IUIControl::StartBeacon()
@@ -188,7 +191,7 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
 {
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(GetParent());
    if (module)
-      color = IDrawableModule::GetColor(module->GetModuleType());
+      color = IDrawableModule::GetColor(module->GetModuleCategory());
    else
       color = ofColor::white;
    float h, s, b;
@@ -207,13 +210,21 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
    }
 }
 
+void IUIControl::RemoveFromOwner()
+{
+   IDrawableModule* owner = dynamic_cast<IDrawableModule*>(GetParent());
+   assert(owner);
+   if (owner)
+      owner->RemoveUIControl(this);
+}
+
 //static
-void IUIControl::SetNewManualHover(int direction)
+void IUIControl::SetNewManualHoverViaTab(int direction)
 {
    if (gHoveredUIControl == nullptr)
    {
       gHoveredUIControl = sLastHoveredUIControl;
-      sLastUIHoverWasSetViaTab = true;
+      sLastUIHoverWasSetManually = true;
    }
    else
    {
@@ -234,13 +245,80 @@ void IUIControl::SetNewManualHover(int direction)
          for (int i = 1; i < (int)controls.size(); ++i)
          {
             int newControlIndex = (controlIndex + i * direction + (int)controls.size()) % (int)controls.size();
-            if (controls[newControlIndex]->IsShowing())
+            if (controls[newControlIndex]->IsShowing() && !controls[newControlIndex]->GetNoHover())
             {
                gHoveredUIControl = controls[newControlIndex];
                sLastHoveredUIControl = gHoveredUIControl;
-               sLastUIHoverWasSetViaTab = true;
+               sLastUIHoverWasSetManually = true;
                break;
             }
+         }
+      }
+   }
+}
+
+namespace
+{
+   //only supports cardinal directions
+   float GetDistanceScore(ofVec2f direction, ofRectangle rectA, ofRectangle rectB)
+   {
+      float score = 0;
+      ofVec2f edgeA = rectA.getCenter() + ofVec2f(rectA.width * .5f * direction.x, rectA.height * .5f * direction.y);
+      ofVec2f edgeB = rectB.getCenter() + ofVec2f(rectB.width * -.5f * direction.x, rectB.height * -.5f * direction.y);
+      ofVec2f toRect = edgeB - edgeA;
+      float dot = direction.dot(toRect);
+      if (dot > 0)
+      {
+         ofVec2f perpendicularDirection(direction.y, direction.x);
+         float minExtentA = fabsf(rectA.getMinX() * perpendicularDirection.x + rectA.getMinY() * perpendicularDirection.y);
+         float maxExtentA = fabsf(rectA.getMaxX() * perpendicularDirection.x + rectA.getMaxY() * perpendicularDirection.y);
+         float minExtentB = fabsf(rectB.getMinX() * perpendicularDirection.x + rectB.getMinY() * perpendicularDirection.y);
+         float maxExtentB = fabsf(rectB.getMaxX() * perpendicularDirection.x + rectB.getMaxY() * perpendicularDirection.y);
+         if (minExtentA <= maxExtentB && maxExtentA >= minExtentB) //overlap, score based upon closest in the specified direction
+            score = 1 / direction.dot(toRect) + 1000; //bonus points so that overlapping ones win
+         else //no overlap,but still in the requested direction. score based upon overall distance
+            score = 1 / toRect.distanceSquared();
+      }
+
+      return score;
+   }
+}
+
+//static
+void IUIControl::SetNewManualHoverViaArrow(ofVec2f direction)
+{
+   if (gHoveredUIControl == nullptr)
+   {
+      gHoveredUIControl = sLastHoveredUIControl;
+      sLastUIHoverWasSetManually = true;
+   }
+   else
+   {
+      IDrawableModule* uiControlModule = gHoveredUIControl->GetModuleParent();
+      if (uiControlModule != nullptr)
+      {
+         const auto& controls = uiControlModule->GetUIControls();
+         ofRectangle currentControlRect = gHoveredUIControl->GetRect();
+         float bestScore = 0;
+         int bestScoreIndex = -1;
+         for (int i = 0; i < (int)controls.size(); ++i)
+         {
+            if (controls[i]->IsShowing() && !controls[i]->GetNoHover() && controls[i] != gHoveredUIControl)
+            {
+               float score = GetDistanceScore(direction, currentControlRect, controls[i]->GetRect());
+               if (score > bestScore)
+               {
+                  bestScore = score;
+                  bestScoreIndex = i;
+               }
+            }
+         }
+
+         if (bestScoreIndex != -1)
+         {
+            gHoveredUIControl = controls[bestScoreIndex];
+            sLastHoveredUIControl = gHoveredUIControl;
+            sLastUIHoverWasSetManually = true;
          }
       }
    }

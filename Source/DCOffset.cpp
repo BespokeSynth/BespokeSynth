@@ -31,8 +31,6 @@
 
 DCOffset::DCOffset()
 : IAudioProcessor(gBufferSize)
-, mOffset(0)
-, mOffsetSlider(nullptr)
 {
 }
 

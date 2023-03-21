@@ -38,7 +38,9 @@ public:
    SignalClamp();
    virtual ~SignalClamp();
    static IDrawableModule* Create() { return new SignalClamp(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -47,7 +49,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -62,8 +64,8 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mMin;
-   FloatSlider* mMinSlider;
-   float mMax;
-   FloatSlider* mMaxSlider;
+   float mMin{ -1 };
+   FloatSlider* mMinSlider{ nullptr };
+   float mMax{ 1 };
+   FloatSlider* mMaxSlider{ nullptr };
 };

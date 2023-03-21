@@ -47,8 +47,7 @@ static const double DC_OFFSET = 1.0E-25;
 class EnvelopeDetector
 {
 public:
-   EnvelopeDetector(
-   double ms = 1.0);
+   EnvelopeDetector(double ms = 1.0);
    virtual ~EnvelopeDetector() {}
 
    // time constant
@@ -62,8 +61,8 @@ public:
    }
 
 protected:
-   double ms_; // time constant in ms
-   double coef_; // runtime coefficient
+   double ms_{ 1 }; // time constant in ms
+   double coef_{ 0 }; // runtime coefficient
    virtual void setCoef(void); // coef calculation
 
 }; // end SimpleComp class
@@ -74,8 +73,7 @@ protected:
 class AttRelEnvelope
 {
 public:
-   AttRelEnvelope(
-   double att_ms = 10.0, double rel_ms = 100.0);
+   AttRelEnvelope(double att_ms = 10.0, double rel_ms = 100.0);
    virtual ~AttRelEnvelope() {}
 
    // attack time constant
@@ -123,8 +121,8 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    std::string GetType() override { return "compressor"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
 private:
    //IDrawableModule
@@ -159,7 +157,7 @@ private:
    float mHeight{ 20 };
 
    // runtime variables
-   double envdB_; // over-threshold envelope (dB)
+   double envdB_{ DC_OFFSET }; // over-threshold envelope (dB)
 
    AttRelEnvelope mEnv;
 

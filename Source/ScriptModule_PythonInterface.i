@@ -61,10 +61,10 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    {
       return (int)ScriptModule::GetScriptMeasureTime();
    });
-   m.def("reset_transport", [](float rewind_amount)
+   m.def("reset_transport", []()
    {
       TheTransport->Reset();
-   }, "rewind_amount"_a=.001f);
+   });
    m.def("get_step", [](int subdivision)
    {
       float subdivide = subdivision * ScriptModule::GetTimeSigRatio();
@@ -383,7 +383,7 @@ PYBIND11_EMBEDDED_MODULE(notecanvas, m)
       })
       .def("clear", [](NoteCanvas& canvas)
       {
-         canvas.Clear();
+         canvas.Clear(NextBufferTime(false));
       })
       .def("fit", [](NoteCanvas& canvas)
       {
@@ -683,7 +683,9 @@ PYBIND11_EMBEDDED_MODULE(module, m)
    }, py::return_value_policy::reference);
    m.def("create", [](std::string moduleType, float x, float y)
    {
-      return TheSynth->SpawnModuleOnTheFly(moduleType, x, y);
+      ModuleFactory::Spawnable spawnable;
+      spawnable.mLabel = moduleType;
+      return TheSynth->SpawnModuleOnTheFly(spawnable, x, y);
    }, py::return_value_policy::reference);
    py::class_<IDrawableModule>(m, "module")
       .def("set_position", [](IDrawableModule& module, float x, float y)
@@ -712,6 +714,13 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       })
       .def("set_target", [](IDrawableModule& module, IDrawableModule* target)
       {
+         module.SetTarget(target);
+      })
+      .def("set_target", [](IDrawableModule& module, std::string targetPath)
+      {
+         IClickable* target = TheSynth->FindModule(targetPath);
+         if (target == nullptr)
+            target = TheSynth->FindUIControl(targetPath);
          module.SetTarget(target);
       })
       .def("get_target", [](IDrawableModule& module)
@@ -743,7 +752,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       })
       .def("delete", [](IDrawableModule& module)
       {
-         module.GetOwningContainer()->DeleteModule(&module);
+         module.GetOwningContainer()->DeleteModule(&module, !K(fail));
       })
       .def("set", [](IDrawableModule& module, std::string path, float value)
       {
@@ -752,7 +761,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
          ScriptModule::sMostRecentLineExecutedModule->ClearContext();
          if (control != nullptr)
          {
-            control->SetValue(value);
+            control->SetValue(value, ScriptModule::sMostRecentRunTime);
          }
       })
       .def("get", [](IDrawableModule& module, std::string path)
@@ -774,7 +783,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
             float min, max;
             control->GetRange(min, max);
             float value = ofClamp(control->GetValue() + amount, min, max);
-            control->SetValue(value);
+            control->SetValue(value, ScriptModule::sMostRecentRunTime);
          }
       });
 }

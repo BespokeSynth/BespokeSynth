@@ -47,23 +47,8 @@ bool PatchCableSource::sAllowInsert = true;
 PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 : mOwner(owner)
 , mType(type)
-, mHoverIndex(-1)
-, mOverrideVizBuffer(nullptr)
-, mAutomaticPositioning(true)
-, mAudioReceiver(nullptr)
-, mDefaultPatchBehavior(kDefaultPatchBehavior_Repatch)
-, mPatchCableDrawMode(kPatchCableDrawMode_Normal)
-, mEnabled(true)
-, mClickable(true)
-, mSide(Side::kNone)
-, mManualSide(Side::kNone)
-, mHasOverrideCableDir(false)
-, mLastOnEventTime(-9999)
-, mModulatorOwner(nullptr)
-, mDrawPass(DrawPass::kSource)
-, mParentMinimized(false)
 {
-   mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse || mType == kConnectionType_Audio || mType == kConnectionType_Modulator);
+   mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse || mType == kConnectionType_Audio || mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter);
    SetConnectionType(type);
 }
 
@@ -78,15 +63,21 @@ void PatchCableSource::SetConnectionType(ConnectionType type)
    mType = type;
 
    if (mType == kConnectionType_Note)
-      mColor = IDrawableModule::GetColor(kModuleType_Note);
+      mColor = IDrawableModule::GetColor(kModuleCategory_Note);
    else if (mType == kConnectionType_Audio)
-      mColor = IDrawableModule::GetColor(kModuleType_Audio);
+      mColor = IDrawableModule::GetColor(kModuleCategory_Audio);
    else if (mType == kConnectionType_Modulator)
-      mColor = IDrawableModule::GetColor(kModuleType_Modulator);
+      mColor = IDrawableModule::GetColor(kModuleCategory_Modulator);
+   else if (mType == kConnectionType_ValueSetter)
+   {
+      mColor = IDrawableModule::GetColor(kModuleCategory_Modulator);
+      mColor.setSaturation(mColor.getSaturation() * .6f);
+      mColor.setBrightness(mColor.getBrightness() * .7f);
+   }
    else if (mType == kConnectionType_Pulse)
-      mColor = IDrawableModule::GetColor(kModuleType_Pulse);
+      mColor = IDrawableModule::GetColor(kModuleCategory_Pulse);
    else
-      mColor = IDrawableModule::GetColor(kModuleType_Other);
+      mColor = IDrawableModule::GetColor(kModuleCategory_Other);
    mColor.setBrightness(mColor.getBrightness() * .8f);
 }
 
@@ -120,7 +111,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
       RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    }
 
-   cable->SetTarget(target);
+   cable->SetCableTarget(target);
 
    INoteReceiver* noteReceiver = dynamic_cast<INoteReceiver*>(target);
    if (noteReceiver)
@@ -165,7 +156,7 @@ void PatchCableSource::Clear()
 
 void PatchCableSource::UpdatePosition(bool parentMinimized)
 {
-   if ((mAutomaticPositioning || parentMinimized) && mOwner != nullptr)
+   if (mOwner != nullptr && (mAutomaticPositioning || parentMinimized || mOwner->Minimized()))
    {
       float x, y, w, h;
       mOwner->GetPosition(x, y);
@@ -307,7 +298,7 @@ void PatchCableSource::Render()
       if (mDrawPass == DrawPass::kSource && (mPatchCableDrawMode != kPatchCableDrawMode_SourceOnHoverOnly || mHoverIndex != -1))
       {
          ofSetLineWidth(0);
-         ofColor color = mColor;
+         ofColor color = GetColor();
          float radius = kPatchCableSourceRadius;
          IDrawableModule* moveModule = TheSynth->GetMoveModule();
          if (GetKeyModifiers() == kModifier_Shift && moveModule != nullptr)
@@ -348,8 +339,8 @@ void PatchCableSource::Render()
          {
             ofPushStyle();
             ofNoFill();
-            ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
-            GridControlTarget::DrawGridIcon(mX + 7, mY - 6);
+            ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other));
+            GridControlTarget::DrawGridIcon(cableX + 7, cableY - 6);
             ofPopStyle();
          }
       }
@@ -360,12 +351,22 @@ void PatchCableSource::Render()
             cableY += kPatchCableSpacing;
          else if (mSide == Side::kLeft)
             cableX -= kPatchCableSpacing;
-         else if (mSide == Side::kRight)
+         else if (mSide == Side::kRight || mSide == Side::kNone)
             cableX += kPatchCableSpacing;
       }
    }
 
    ofPopStyle();
+}
+
+ofColor PatchCableSource::GetColor() const
+{
+   if (mIsPartOfCircularDependency)
+   {
+      float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .5f, 1);
+      return ofColor(255 * pulse, 255 * pulse, 0);
+   }
+   return mColor;
 }
 
 ofVec2f PatchCableSource::GetCableStart(int index) const
@@ -379,7 +380,7 @@ ofVec2f PatchCableSource::GetCableStart(int index) const
          cableY += kPatchCableSpacing * index;
       else if (mSide == Side::kLeft)
          cableX -= kPatchCableSpacing * index;
-      else if (mSide == Side::kRight)
+      else if (mSide == Side::kRight || mSide == Side::kNone)
          cableX += kPatchCableSpacing * index;
    }
 
@@ -470,8 +471,13 @@ bool PatchCableSource::MouseMoved(float x, float y)
 
    mHoverIndex = GetHoverIndex(x, y);
 
-   if (mHoverIndex != -1 && gHoveredUIControl != nullptr && !gHoveredUIControl->IsMouseDown())
-      gHoveredUIControl = nullptr; //if we're hovering over a patch cable, get rid of ui control hover
+   if (mHoverIndex != -1 && gHoveredUIControl != nullptr)
+   {
+      if (gHoveredUIControl->IsMouseDown())
+         mHoverIndex = -1; //if we're dragging a control, don't show cables bubbling out
+      else
+         gHoveredUIControl = nullptr; //if we're hovering over a patch cable, get rid of ui control hover
+   }
 
    for (size_t i = 0; i < mPatchCables.size(); ++i)
    {
@@ -493,7 +499,7 @@ void PatchCableSource::MouseReleased()
       cable->MouseReleased();
 }
 
-bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (!Enabled())
       return false;
@@ -514,28 +520,24 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
                 mType == kConnectionType_Note ||
                 mType == kConnectionType_Pulse ||
                 mType == kConnectionType_UIControl ||
-                mType == kConnectionType_Special)
+                mType == kConnectionType_Special ||
+                mType == kConnectionType_ValueSetter ||
+                mType == kConnectionType_Modulator)
             {
                PatchCable* newCable = AddPatchCable(nullptr);
-               newCable->Grab();
+               if (newCable)
+                  newCable->Grab();
             }
             else if (mType == kConnectionType_Audio)
             {
                ofVec2f spawnOffset(-20, 10);
-               AudioSend* send = dynamic_cast<AudioSend*>(TheSynth->SpawnModuleOnTheFly("send", x + spawnOffset.x, y + spawnOffset.y));
+               ModuleFactory::Spawnable spawnable;
+               spawnable.mLabel = "send";
+               AudioSend* send = dynamic_cast<AudioSend*>(TheSynth->SpawnModuleOnTheFly(spawnable, x + spawnOffset.x, y + spawnOffset.y));
                send->SetTarget(GetTarget());
                SetTarget(send);
                send->SetSend(1, false);
                TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y, false);
-            }
-            else if (mType == kConnectionType_Modulator)
-            {
-               ofVec2f spawnOffset(-20, 10);
-               MacroSlider* macroSlider = dynamic_cast<MacroSlider*>(TheSynth->SpawnModuleOnTheFly("macroslider", x + spawnOffset.x, y + spawnOffset.y));
-               IUIControl* currentTarget = dynamic_cast<IUIControl*>(GetTarget());
-               SetTarget(macroSlider->GetSlider());
-               macroSlider->SetOutputTarget(0, currentTarget);
-               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y, false);
             }
          }
          else
@@ -580,7 +582,7 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
          cableY += kPatchCableSpacing;
       else if (mSide == Side::kLeft)
          cableX -= kPatchCableSpacing;
-      else if (mSide == Side::kRight)
+      else if (mSide == Side::kRight || mSide == Side::kNone)
          cableX += kPatchCableSpacing;
    }
 
@@ -589,10 +591,10 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
 
 bool PatchCableSource::Enabled() const
 {
-   return mEnabled && (mAutomaticPositioning || !mOwner->Minimized());
+   return mEnabled;
 }
 
-void PatchCableSource::OnClicked(int x, int y, bool right)
+void PatchCableSource::OnClicked(float x, float y, bool right)
 {
 }
 
@@ -615,14 +617,14 @@ void PatchCableSource::FindValidTargets()
    TheSynth->GetAllModules(allModules);
    for (auto module : allModules)
    {
-      if ((mType == kConnectionType_Modulator || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
+      if ((mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
       {
          for (auto uicontrol : module->GetUIControls())
          {
             if (uicontrol->IsShowing() &&
                 (uicontrol->GetShouldSaveState() || dynamic_cast<ClickButton*>(uicontrol) != nullptr) &&
                 uicontrol->CanBeTargetedBy(this) &&
-                !uicontrol->GetNoHover())
+                (!uicontrol->GetNoHover() || mType == kConnectionType_Grid))
                mValidTargets.push_back(uicontrol);
          }
       }
@@ -670,6 +672,7 @@ void PatchCableSource::KeyPressed(int key, bool isRepeat)
 void PatchCableSource::RemovePatchCable(PatchCable* cable, bool fromUserAction)
 {
    mOwner->PreRepatch(this);
+   bool hadAudioReceiver = (mAudioReceiver != nullptr);
    mAudioReceiver = nullptr;
    if (cable != nullptr)
    {
@@ -679,6 +682,9 @@ void PatchCableSource::RemovePatchCable(PatchCable* cable, bool fromUserAction)
    RemoveFromVector(cable, mPatchCables);
    mOwner->PostRepatch(this, fromUserAction);
    delete cable;
+
+   if (hadAudioReceiver)
+      TheSynth->ArrangeAudioSourceDependencies();
 }
 
 void PatchCableSource::ClearPatchCables()
@@ -732,9 +738,8 @@ void PatchCableSource::LoadState(FileStreamIn& in)
 
    int size;
    in >> size;
-   mPatchCables.resize(size);
 
-   for (int i = 0; i < mPatchCables.size(); ++i)
+   for (int i = 0; i < size; ++i)
    {
       std::string path;
       in >> path;
@@ -749,7 +754,12 @@ void PatchCableSource::LoadState(FileStreamIn& in)
          {
          }
       }
-      mPatchCables[i] = new PatchCable(this);
+
+      if (TheSynth->IsDuplicatingModule() && mType == kConnectionType_Modulator)
+         target = nullptr; //TODO(Ryan) make it so that when you're duplicating a group, modulators preserve connections to the new copies of controls within that group
+
+      mPatchCables.push_back(new PatchCable(this));
+      assert(i == (int)mPatchCables.size() - 1);
       SetPatchCableTarget(mPatchCables[i], target, false);
    }
 

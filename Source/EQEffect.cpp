@@ -29,12 +29,7 @@
 #include "Profiler.h"
 
 EQEffect::EQEffect()
-: mNumFilters(NUM_EQ_FILTERS)
-, mMultiSlider(nullptr)
-, mEvenButton(nullptr)
 {
-   SetEnabled(true);
-
    for (int ch = 0; ch < ChannelBuffer::kMaxNumChannels; ++ch)
    {
       for (int i = 0; i < NUM_EQ_FILTERS; ++i)
@@ -49,7 +44,6 @@ void EQEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mMultiSlider = new UIGrid("uigrid", 5, 25, 80, 50, NUM_EQ_FILTERS, 1, this);
-   AddUIControl(mMultiSlider);
    mEvenButton = new ClickButton(this, "even", 5, 5);
 
    mMultiSlider->SetGridMode(UIGrid::kMultislider);
@@ -91,6 +85,26 @@ void EQEffect::DrawModule()
    mEvenButton->Draw();
 }
 
+void EQEffect::OnClicked(float x, float y, bool right)
+{
+   IDrawableModule::OnClicked(x, y, right);
+
+   mMultiSlider->TestClick(x, y, right);
+}
+
+void EQEffect::MouseReleased()
+{
+   IDrawableModule::MouseReleased();
+   mMultiSlider->MouseReleased();
+}
+
+bool EQEffect::MouseMoved(float x, float y)
+{
+   IDrawableModule::MouseMoved(x, y);
+   mMultiSlider->NotifyMouseMoved(x, y);
+   return false;
+}
+
 float EQEffect::GetEffectAmount()
 {
    if (mEnabled)
@@ -111,15 +125,15 @@ void EQEffect::GetModuleDimensions(float& width, float& height)
    height = 80;
 }
 
-void EQEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void EQEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void EQEffect::RadioButtonUpdated(RadioButton* list, int oldVal)
+void EQEffect::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
 }
 
-void EQEffect::CheckboxUpdated(Checkbox* checkbox)
+void EQEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -131,11 +145,11 @@ void EQEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void EQEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+void EQEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void EQEffect::ButtonClicked(ClickButton* button)
+void EQEffect::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mEvenButton)
    {

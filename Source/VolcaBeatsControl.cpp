@@ -31,26 +31,6 @@
 #include "ModularSynth.h"
 
 VolcaBeatsControl::VolcaBeatsControl()
-: mClapSpeed(.5f)
-, mClaveSpeed(.5f)
-, mAgogoSpeed(.5f)
-, mCrashSpeed(.5f)
-, mStutterTime(.5f)
-, mStutterDepth(0)
-, mTomDecay(.5f)
-, mClosedHatDecay(.5f)
-, mOpenHatDecay(.5f)
-, mHatGrain(.5f)
-, mClapSpeedSlider(nullptr)
-, mClaveSpeedSlider(nullptr)
-, mAgogoSpeedSlider(nullptr)
-, mCrashSpeedSlider(nullptr)
-, mStutterTimeSlider(nullptr)
-, mStutterDepthSlider(nullptr)
-, mTomDecaySlider(nullptr)
-, mClosedHatDecaySlider(nullptr)
-, mOpenHatDecaySlider(nullptr)
-, mHatGrainSlider(nullptr)
 {
    for (int i = 0; i < 10; ++i)
    {
@@ -208,7 +188,7 @@ void VolcaBeatsControl::PlayNote(double time, int pitch, int velocity, int voice
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void VolcaBeatsControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void VolcaBeatsControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mClapSpeedSlider)
       SendCC(50, (int)(mClapSpeed * 127));

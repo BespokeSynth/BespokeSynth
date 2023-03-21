@@ -208,12 +208,11 @@ StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
    return StutterParams(kInterval_None, 1);
 }
 
-void StutterControl::CheckboxUpdated(Checkbox* checkbox)
+void StutterControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mStutterProcessor.SetEnabled(Enabled());
+      mStutterProcessor.SetEnabled(time, Enabled());
 
-   double time = gTime + gBufferSizeMs;
    for (int i = 0; i < kNumStutterTypes; ++i)
    {
       if (checkbox == mStutterCheckboxes[i])
@@ -223,7 +222,7 @@ void StutterControl::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void StutterControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void StutterControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
@@ -235,7 +234,7 @@ void StutterControl::OnControllerPageSelected()
 void StutterControl::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
    int index = x + y * grid->NumCols();
-   double time = gTime + gBufferSizeMs;
+   double time = NextBufferTime(false);
    if (index < kNumStutterTypes)
    {
       mStutter[index] = velocity > 0;

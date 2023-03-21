@@ -84,7 +84,7 @@ void SampleBrowser::DrawModule()
       DrawTextNormal(ofToString(mCurrentPage + 1) + "/" + ofToString(numPages), 40, mBackButton->GetPosition(true).y + 12);
 }
 
-void SampleBrowser::ButtonClicked(ClickButton* button)
+void SampleBrowser::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mBackButton)
       ShowPage(mCurrentPage - 1);
@@ -173,7 +173,7 @@ void SampleBrowser::SetDirectory(String dirPath)
          {
             for (auto& w : wildcards)
             {
-               if (file.getFileName().matchesWildcard(w, !File::areFileNamesCaseSensitive()))
+               if (file.getFileName().matchesWildcard(w, true))
                {
                   include = true;
                   break;
@@ -240,27 +240,22 @@ void SampleBrowser::SetUpFromSaveData()
 {
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void SampleBrowser::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mCurrentDirectory.toStdString();
 }
 
-void SampleBrowser::LoadState(FileStreamIn& in)
+void SampleBrowser::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    std::string currentDirectory;
    in >> currentDirectory;

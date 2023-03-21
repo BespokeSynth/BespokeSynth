@@ -36,21 +36,24 @@
 #include "TextEntry.h"
 #include "ClickButton.h"
 
-class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableModule, public IFloatSliderListener, public ITextEntryListener, public IButtonListener
+class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    NoteHocket();
    static IDrawableModule* Create() { return new NoteHocket(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -72,16 +75,18 @@ private:
 
    static const int kMaxDestinations = 16;
    int mNumDestinations{ 5 };
-   float mWeight[kMaxDestinations];
+   float mWeight[kMaxDestinations]{};
    FloatSlider* mWeightSlider[kMaxDestinations]{ nullptr };
    std::vector<AdditionalNoteCable*> mDestinationCables;
    float mWidth{ 200 };
    float mHeight{ 20 };
    int mLastNoteDestinations[128];
-   bool mDeterministic{ true };
+   bool mDeterministic{ false };
    int mLength{ 4 };
-   TextEntry* mLengthEntry{ nullptr };
+   IntSlider* mLengthSlider{ nullptr };
    int mSeed{ 0 };
    TextEntry* mSeedEntry{ nullptr };
    ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

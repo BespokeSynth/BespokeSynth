@@ -38,19 +38,21 @@ public:
    ScriptStatus();
    virtual ~ScriptStatus();
    static IDrawableModule* Create() { return new ScriptStatus(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void Poll() override;
-
-
    void CreateUIControls() override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
@@ -61,7 +63,7 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override
    {

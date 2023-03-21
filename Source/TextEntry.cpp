@@ -91,17 +91,6 @@ void TextEntry::Construct(ITextEntryListener* owner, const char* name, int x, in
 {
    mCharWidth = charWidth;
    mListener = owner;
-   mCaretBlink = true;
-   mCaretBlinkTimer = 0;
-   mNextTextEntry = nullptr;
-   mPreviousTextEntry = nullptr;
-   mInErrorMode = false;
-   mDrawLabel = false;
-   mFlexibleWidth = false;
-   mHovered = false;
-   mRequireEnterToAccept = false;
-   mCaretPosition = 0;
-   mCaretPosition2 = 0;
 
    UpdateDisplayString();
 
@@ -241,7 +230,7 @@ void TextEntry::GetDimensions(float& width, float& height)
    height = 15;
 }
 
-void TextEntry::OnClicked(int x, int y, bool right)
+void TextEntry::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
@@ -252,8 +241,7 @@ void TextEntry::OnClicked(int x, int y, bool right)
 
    if (sKeyboardFocusBeforeClick != this)
    {
-      mCaretPosition = 0;
-      mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+      SelectAll();
    }
    else
    {
@@ -307,6 +295,11 @@ void TextEntry::RemoveSelectedText()
    MoveCaret(caretStart, false);
 }
 
+void TextEntry::SelectAll()
+{
+   mCaretPosition = 0;
+   mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+}
 
 void TextEntry::OnKeyPressed(int key, bool isRepeat)
 {
@@ -327,7 +320,10 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
 
       if (pendingNewEntry)
+      {
          pendingNewEntry->MakeActiveTextEntry(true);
+         pendingNewEntry->SelectAll();
+      }
    }
    else if (key == juce::KeyPress::backspaceKey)
    {
@@ -447,9 +443,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (toupper(key) == 'A' && GetKeyModifiers() == kModifier_Command)
    {
-      int len = (int)strlen(mString);
-      mCaretPosition = 0;
-      mCaretPosition2 = len;
+      SelectAll();
    }
    else if (key == juce::KeyPress::homeKey)
    {
@@ -513,7 +507,7 @@ void TextEntry::SetText(std::string text)
    mCaretPosition2 = 0;
 }
 
-void TextEntry::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void TextEntry::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    if (mType == kTextEntry_Int)
    {
@@ -556,7 +550,26 @@ float TextEntry::GetMidiValue() const
    return 0;
 }
 
-void TextEntry::SetValue(float value)
+void TextEntry::GetRange(float& min, float& max)
+{
+   if (mType == kTextEntry_Int)
+   {
+      min = mIntMin;
+      max = mIntMax;
+   }
+   else if (mType == kTextEntry_Float)
+   {
+      min = mFloatMin;
+      max = mFloatMax;
+   }
+   else
+   {
+      min = 0;
+      max = 1;
+   }
+}
+
+void TextEntry::SetValue(float value, double time)
 {
    if (mType == kTextEntry_Int)
    {
@@ -703,7 +716,7 @@ void TextEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    std::string var;
    in >> var;

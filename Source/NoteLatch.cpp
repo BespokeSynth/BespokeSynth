@@ -31,8 +31,6 @@
 
 NoteLatch::NoteLatch()
 {
-   for (int i = 0; i < 128; ++i)
-      mNoteState[i] = false;
 }
 
 void NoteLatch::DrawModule()
@@ -41,11 +39,10 @@ void NoteLatch::DrawModule()
       return;
 }
 
-void NoteLatch::CheckboxUpdated(Checkbox* checkbox)
+void NoteLatch::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      double time = gTime + gBufferSizeMs;
       for (int i = 0; i < 128; ++i)
       {
          if (mNoteState[i])

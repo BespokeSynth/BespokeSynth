@@ -30,28 +30,6 @@
 
 BandVocoder::BandVocoder()
 : IAudioProcessor(gBufferSize)
-, mInputPreamp(1)
-, mCarrierPreamp(1)
-, mVolume(1)
-, mInputSlider(nullptr)
-, mCarrierSlider(nullptr)
-, mVolumeSlider(nullptr)
-, mDryWet(1)
-, mDryWetSlider(nullptr)
-, mNumBands(40)
-, mNumBandsSlider(nullptr)
-, mFreqBase(200)
-, mFBaseSlider(nullptr)
-, mFreqRange(6000)
-, mFRangeSlider(nullptr)
-, mQ(40)
-, mQSlider(nullptr)
-, mRingTime(.03f)
-, mRingTimeSlider(nullptr)
-, mMaxBand(1.0f)
-, mMaxBandSlider(nullptr)
-, mSpacingStyle(0)
-, mCarrierDataSet(false)
 {
    mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
@@ -87,7 +65,7 @@ void BandVocoder::CreateUIControls()
    INTSLIDER(mNumBandsSlider, "bands", &mNumBands, 2, VOCODER_MAX_BANDS);
    FLOATSLIDER(mFBaseSlider, "f base", &mFreqBase, 20, 300);
    FLOATSLIDER(mFRangeSlider, "f range", &mFreqRange, 0, gSampleRate / 2 - 1000);
-   FLOATSLIDER(mQSlider, "q", &mQ, 20, 80);
+   FLOATSLIDER_DIGITS(mQSlider, "q", &mQ, 20, 80, 3);
    FLOATSLIDER_DIGITS(mRingTimeSlider, "ring", &mRingTime, .0001f, .1f, 4);
    ENDUIBLOCK0();
 
@@ -253,7 +231,7 @@ void BandVocoder::CalcFilters()
    }
 }
 
-void BandVocoder::CheckboxUpdated(Checkbox* checkbox)
+void BandVocoder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -265,7 +243,7 @@ void BandVocoder::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal)
+void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumBandsSlider)
    {
@@ -273,7 +251,7 @@ void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void BandVocoder::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void BandVocoder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mFBaseSlider || slider == mFRangeSlider || slider == mQSlider || slider == mSpacingStyleSlider)
    {

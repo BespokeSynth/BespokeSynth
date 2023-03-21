@@ -40,6 +40,9 @@ public:
    Prefab();
    ~Prefab();
    static IDrawableModule* Create() { return new Prefab(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
@@ -49,13 +52,14 @@ public:
    void Poll() override;
    bool ShouldClipContents() override { return false; }
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -63,6 +67,7 @@ public:
    void LoadPrefab(std::string loadPath);
 
    static bool sLoadingPrefab;
+   static bool sLastLoadWasPrefab;
    static IDrawableModule* sJustReleasedModule;
 
 private:
@@ -71,21 +76,22 @@ private:
    void DrawModuleUnclipped() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
 
    bool CanAddDropModules();
+   bool IsAddableModule(IDrawableModule* module);
    bool IsMouseHovered();
 
    void SavePrefab(std::string savePath);
    void UpdatePrefabName(std::string path);
 
-   PatchCableSource* mRemoveModuleCable;
-   ClickButton* mSaveButton;
-   ClickButton* mLoadButton;
-   ClickButton* mDisbandButton;
+   PatchCableSource* mRemoveModuleCable{ nullptr };
+   ClickButton* mSaveButton{ nullptr };
+   ClickButton* mLoadButton{ nullptr };
+   ClickButton* mDisbandButton{ nullptr };
    ModuleContainer mModuleContainer;
-   std::string mPrefabName;
+   std::string mPrefabName{ "" };
 };
 
 

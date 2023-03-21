@@ -112,20 +112,18 @@ void SampleCanvas::Process(double time)
 
       for (int i = 0; i < bufferSize; ++i)
       {
-         float sample = 0;
+         float sampleIndex = 0;
 
          float pos = GetCurPos(time + i * gInvSampleRateMs);
 
-         sample = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
+         sampleIndex = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
 
-         sample *= vol;
-
-         if (sample >= 0 && sample < clip->LengthInSamples())
+         if (sampleIndex >= 0 && sampleIndex < clip->LengthInSamples())
          {
             for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
             {
                int sampleChannel = MAX(ch, clip->NumChannels() - 1);
-               gWorkChannelBuffer.GetChannel(ch)[i] += GetInterpolatedSample(sample, clip->Data()->GetChannel(sampleChannel), clip->LengthInSamples());
+               gWorkChannelBuffer.GetChannel(ch)[i] += GetInterpolatedSample(sampleIndex, clip->Data()->GetChannel(sampleChannel), clip->LengthInSamples()) * vol;
             }
          }
       }
@@ -145,7 +143,7 @@ double SampleCanvas::GetCurPos(double time) const
    return (((TheTransport->GetMeasure(time) % loopMeasures) + TheTransport->GetMeasurePos(time)) + mCanvas->mLoopStart) / mCanvas->GetLength();
 }
 
-void SampleCanvas::OnClicked(int x, int y, bool right)
+void SampleCanvas::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -245,15 +243,15 @@ void SampleCanvas::UpdateNumColumns()
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval) / 4);
 }
 
-void SampleCanvas::CheckboxUpdated(Checkbox* checkbox)
+void SampleCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
    {
@@ -261,7 +259,7 @@ void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void SampleCanvas::DropdownUpdated(DropdownList* list, int oldVal)
+void SampleCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -283,31 +281,26 @@ void SampleCanvas::SetUpFromSaveData()
    mCanvas->SetNumRows(mModuleSaveData.GetInt("rows"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void SampleCanvas::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mCanvas->GetWidth();
    out << mCanvas->GetHeight();
 }
 
-void SampleCanvas::LoadState(FileStreamIn& in)
+void SampleCanvas::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    float w, h;
    in >> w;

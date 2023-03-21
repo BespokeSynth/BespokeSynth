@@ -55,6 +55,7 @@ void ::ADSR::Set(const ADSR& other)
    mSustainStage = other.mSustainStage;
    mMaxSustain = other.mMaxSustain;
    mHasSustainStage = other.mHasSustainStage;
+   mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
 void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/)
@@ -145,7 +146,11 @@ const ::ADSR::EventInfo* ::ADSR::GetEventConst(double time) const
 float ::ADSR::Value(double time) const
 {
    const EventInfo* e = GetEventConst(time);
+   return Value(time, e);
+}
 
+float ::ADSR::Value(double time, const EventInfo* e) const
+{
    //if (mStartTime < 0)
    //   return 0;
 
@@ -153,13 +158,13 @@ float ::ADSR::Value(double time) const
 
    float stageStartValue;
    double stageStartTime;
-   int stage = GetStage(time, stageStartTime);
+   int stage = GetStage(time, stageStartTime, e);
    if (stage == mNumStages) //done
       return mStages[stage - 1].target;
 
    if (stage == 0)
       stageStartValue = e->mStartBlendFromValue;
-   else if (mHasSustainStage && stage == mSustainStage + 1)
+   else if (mHasSustainStage && stage == mSustainStage + 1 && e->mStopBlendFromValue != std::numeric_limits<float>::max())
       stageStartValue = e->mStopBlendFromValue;
    else
       stageStartValue = mStages[stage - 1].target * e->mMult;
@@ -186,7 +191,11 @@ float ::ADSR::GetStageTimeScale(int stage) const
 int ::ADSR::GetStage(double time, double& stageStartTimeOut) const
 {
    const EventInfo* e = GetEventConst(time);
+   return GetStage(time, stageStartTimeOut, e);
+}
 
+int ::ADSR::GetStage(double time, double& stageStartTimeOut, const EventInfo* e) const
+{
    if (e->mStartTime < 0)
       return mNumStages;
 
@@ -219,12 +228,6 @@ bool ::ADSR::IsDone(double time) const
    return GetStage(time, dummy) == mNumStages;
 }
 
-int ::ADSR::GetStageForTime(double time) const
-{
-   double dummy;
-   return GetStage(time, dummy);
-}
-
 namespace
 {
    const int kSaveStateRev = 1;
@@ -240,8 +243,7 @@ void ::ADSR::SaveState(FileStreamOut& out)
    out << mMaxSustain;
    out << mNumStages;
    out << mHasSustainStage;
-   bool dummyBool;
-   out << dummyBool;
+   out << mFreeReleaseLevel;
    out << MAX_ADSR_STAGES;
    for (int i = 0; i < MAX_ADSR_STAGES; ++i)
    {
@@ -264,8 +266,7 @@ void ::ADSR::LoadState(FileStreamIn& in)
    in >> mMaxSustain;
    in >> mNumStages;
    in >> mHasSustainStage;
-   bool dummyBool;
-   in >> dummyBool;
+   in >> mFreeReleaseLevel;
    int maxNumStages;
    in >> maxNumStages;
    assert(maxNumStages == MAX_ADSR_STAGES);

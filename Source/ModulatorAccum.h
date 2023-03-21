@@ -42,7 +42,9 @@ public:
    ModulatorAccum();
    virtual ~ModulatorAccum();
    static IDrawableModule* Create() { return new ModulatorAccum(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -58,10 +60,10 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   FloatSlider* GetTarget() { return mTarget; }
+   FloatSlider* GetTarget() { return GetSliderTarget(); }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

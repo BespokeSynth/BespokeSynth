@@ -32,11 +32,6 @@
 
 Panner::Panner()
 : IAudioProcessor(gBufferSize)
-, mPan(0)
-, mPanSlider(nullptr)
-, mWiden(0)
-, mWidenSlider(nullptr)
-, mWidenerBuffer(2048)
 {
 }
 
@@ -81,7 +76,7 @@ void Panner::Process(double time)
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
          mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       if (mWiden < 0)
-         mWidenerBuffer.ReadChunk(secondChannel, GetBuffer()->BufferSize(), abs(mWiden), 1);
+         mWidenerBuffer.ReadChunk(secondChannel, GetBuffer()->BufferSize(), abs(mWiden), (GetBuffer()->NumActiveChannels() == 1) ? 0 : 1);
       else
          mWidenerBuffer.ReadChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), abs(mWiden), 0);
    }
@@ -122,19 +117,19 @@ void Panner::DrawModule()
    GetRightPanGain(mPan);
 }
 
-void Panner::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Panner::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Panner::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Panner::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void Panner::ButtonClicked(ClickButton* button)
+void Panner::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void Panner::CheckboxUpdated(Checkbox* checkbox)
+void Panner::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

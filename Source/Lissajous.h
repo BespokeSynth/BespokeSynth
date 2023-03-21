@@ -39,7 +39,9 @@ public:
    Lissajous();
    virtual ~Lissajous();
    static IDrawableModule* Create() { return new Lissajous(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -50,7 +52,7 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -66,15 +68,15 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
-   float mScale;
-   FloatSlider* mScaleSlider;
+   float mWidth{ 500 };
+   float mHeight{ 500 };
+   float mScale{ 1 };
+   FloatSlider* mScaleSlider{ nullptr };
 
    ofVec2f mLissajousPoints[NUM_LISSAJOUS_POINTS];
-   int mOffset;
-   bool mAutocorrelationMode;
-   bool mOnlyHasOneChannel;
+   int mOffset{ 0 };
+   bool mAutocorrelationMode{ true };
+   bool mOnlyHasOneChannel{ true };
 };
 
 

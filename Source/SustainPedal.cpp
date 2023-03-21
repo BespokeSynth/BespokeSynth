@@ -28,7 +28,6 @@
 #include "ModularSynth.h"
 
 SustainPedal::SustainPedal()
-: mSustain(false)
 {
 }
 
@@ -46,7 +45,7 @@ void SustainPedal::DrawModule()
    mSustainCheckbox->Draw();
 }
 
-void SustainPedal::CheckboxUpdated(Checkbox* checkbox)
+void SustainPedal::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mSustainCheckbox)
    {
@@ -56,7 +55,7 @@ void SustainPedal::CheckboxUpdated(Checkbox* checkbox)
          {
             if (mIsNoteBeingSustained[i])
             {
-               PlayNoteOutput(gTime + gBufferSize * gInvSampleRateMs, i, 0, -1);
+               PlayNoteOutput(time, i, 0, -1);
                mIsNoteBeingSustained[i] = false;
             }
          }

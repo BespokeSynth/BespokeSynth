@@ -39,7 +39,9 @@ public:
    FreqDelay();
    virtual ~FreqDelay();
    static IDrawableModule* Create() { return new FreqDelay(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -50,7 +52,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -66,8 +68,8 @@ private:
    bool Enabled() const override { return true; }
 
    ChannelBuffer mDryBuffer;
-   float mDryWet;
-   FloatSlider* mDryWetSlider;
+   float mDryWet{ 1 };
+   FloatSlider* mDryWetSlider{ nullptr };
 
    DelayEffect mDelayEffect;
 };

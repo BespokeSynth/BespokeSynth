@@ -52,10 +52,10 @@ radiosequencer~bir defada yalnızca bir değeri etkinleştiren sekans. bir defad
 
 
 
-presets~değerler dizisini kaydedin ve geri yükleyin. ilgili modüldeki tüm kontrolleri değiştirmek için gri çemberi farklı modüllere bağlayın. yalnızca ilgili kontrolü değiştirmek için kontrole mor çemberi bağlayın. ilgili kareye bir ön ayarı kaydetmek için shift tuşuna basarak ızgara karesi üzerine tıklayın ve ilgili ön ayarı yüklemek için ızgara karesi üzerine tıklayın.
+snapshots~değerler dizisini kaydedin ve geri yükleyin. ilgili modüldeki tüm kontrolleri değiştirmek için gri çemberi farklı modüllere bağlayın. yalnızca ilgili kontrolü değiştirmek için kontrole mor çemberi bağlayın. ilgili kareye bir ön ayarı kaydetmek için shift tuşuna basarak ızgara karesi üzerine tıklayın ve ilgili ön ayarı yüklemek için ızgara karesi üzerine tıklayın.
 ~save~[todo]
 ~blend ms~ön ayar değerlerinin zamana göre karıştırma süresi
-~preset~ön ayarı seçin
+~snapshot~ön ayarı seçin
 
 
 
@@ -772,7 +772,7 @@ multitapdelay~birden fazla efekt noktasında gecikme
 
 
 looperrewriter~alınan girişle looper’daki kayıtları yeniden yazarak kendi loop’larınızı resample’lamanıza yardımcı olur. "looper" modülüne gri noktayı bağlayın.\n\n "looper" modülünü doğrudan "send” çıkışına bağlanması, "send" ayarının en solundaki çıkışın aktif efektlerinize ("effectchain” gibi) bağlanması, bu "rewriter” modülüne aktif efektin bağlanması ve ardından "send" ayarının en sağdaki çıkışının bu "rewriter” modülüne bağlanması bu modülün en iyi kullanım yoludur
-~ go ~bağlanan looper’ı yeniden yazın ve bu looper send’e bağlanmışsa bu send’i yalnızca sağ çıkışı kullanması için ayarlayın
+~go~bağlanan looper’ı yeniden yazın ve bu looper send’e bağlanmışsa bu send’i yalnızca sağ çıkışı kullanması için ayarlayın
 ~new loop~dinamik loop uzunluğunda kaydı başlatın. looper’a kaydı yeniden yazmak istediğinizde "go" tuşuna basın. bu işlem ayrıca bespoke global temposunu değiştirerek yeni loop ile eşleşir, böylelikle çok yararlı ve kullanışlı olabilir! iptal etmek için yeniden bu tuşa tıklayın.
 
 
@@ -1756,7 +1756,7 @@ newpatchconfirm~
 
 
 
-vstplugin~VST eklentisi modülü
+plugin~VST eklentisi modülü
 ~vol~çıkış ses düzeyini ayarlayın
 ~program change~VST modülüne program değiştirme mesajı gönderin
 ~open~eklenti penceresini görüntüleyin

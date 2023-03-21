@@ -116,7 +116,7 @@ public:
    void SetDefaultPatchBehavior(DefaultPatchBehavior beh) { mDefaultPatchBehavior = beh; }
    void SetPatchCableDrawMode(PatchCableDrawMode mode) { mPatchCableDrawMode = mode; }
    void SetColor(ofColor color) { mColor = color; }
-   ofColor GetColor() const { return mColor; }
+   ofColor GetColor() const;
    void SetEnabled(bool enabled) { mEnabled = enabled; }
    bool Enabled() const;
    void AddTypeFilter(std::string type) { mTypeFilter.push_back(type); }
@@ -124,15 +124,18 @@ public:
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
-   void SetOverrideCableDir(ofVec2f dir)
+   void SetOverrideCableDir(ofVec2f dir, Side side)
    {
       mHasOverrideCableDir = true;
       mOverrideCableDir = dir;
+      mManualSide = side;
    }
    ofVec2f GetCableStart(int index) const;
    ofVec2f GetCableStartDir(int index, ofVec2f dest) const;
    void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
    IModulator* GetModulatorOwner() const { return mModulatorOwner; }
+   void SetIsPartOfCircularDependency(bool set) { mIsPartOfCircularDependency = set; }
+   bool GetIsPartOfCircularDependency() const { return mIsPartOfCircularDependency; }
 
    void AddHistoryEvent(double time, bool on, int data = 0)
    {
@@ -148,7 +151,7 @@ public:
    void DrawSource();
    void DrawCables(bool parentMinimized);
    void Render() override;
-   bool TestClick(int x, int y, bool right, bool testOnly = false) override;
+   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    void GetDimensions(float& width, float& height) override
@@ -164,51 +167,52 @@ public:
    static bool sAllowInsert;
 
 protected:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
 private:
    bool InAddCableMode() const;
    int GetHoverIndex(float x, float y) const;
 
    std::vector<PatchCable*> mPatchCables;
-   int mHoverIndex; //-1 = not hovered
-   ConnectionType mType;
-   bool mAllowMultipleTargets;
-   DefaultPatchBehavior mDefaultPatchBehavior;
-   PatchCableDrawMode mPatchCableDrawMode;
-   IDrawableModule* mOwner;
-   RollingBuffer* mOverrideVizBuffer;
-   bool mAutomaticPositioning;
-   int mManualPositionX;
-   int mManualPositionY;
+   int mHoverIndex{ -1 }; //-1 = not hovered
+   ConnectionType mType{ ConnectionType::kConnectionType_Audio };
+   bool mAllowMultipleTargets{ true };
+   DefaultPatchBehavior mDefaultPatchBehavior{ DefaultPatchBehavior::kDefaultPatchBehavior_Repatch };
+   PatchCableDrawMode mPatchCableDrawMode{ PatchCableDrawMode::kPatchCableDrawMode_Normal };
+   IDrawableModule* mOwner{ nullptr };
+   RollingBuffer* mOverrideVizBuffer{ nullptr };
+   bool mAutomaticPositioning{ true };
+   int mManualPositionX{ 0 };
+   int mManualPositionY{ 0 };
    ofColor mColor;
-   bool mEnabled;
-   bool mClickable;
-   Side mSide;
-   Side mManualSide;
-   bool mHasOverrideCableDir;
+   bool mEnabled{ true };
+   bool mClickable{ true };
+   Side mSide{ Side::kNone };
+   Side mManualSide{ Side::kNone };
+   bool mHasOverrideCableDir{ false };
    ofVec2f mOverrideCableDir;
+   bool mIsPartOfCircularDependency{ false };
 
    std::vector<INoteReceiver*> mNoteReceivers;
    std::vector<IPulseReceiver*> mPulseReceivers;
-   IAudioReceiver* mAudioReceiver;
+   IAudioReceiver* mAudioReceiver{ nullptr };
 
    std::vector<std::string> mTypeFilter;
    std::vector<IClickable*> mValidTargets;
 
    NoteHistory mNoteHistory;
-   double mLastOnEventTime;
+   double mLastOnEventTime{ -9999 };
 
-   IModulator* mModulatorOwner;
+   IModulator* mModulatorOwner{ nullptr };
 
    enum class DrawPass
    {
       kSource,
       kCables
    };
-   DrawPass mDrawPass;
-   bool mParentMinimized;
-   IDrawableModule* mLastSeenAutopatchableModule;
+   DrawPass mDrawPass{ DrawPass::kSource };
+   bool mParentMinimized{ false };
+   IDrawableModule* mLastSeenAutopatchableModule{ nullptr };
 };
 
 #endif /* defined(__Bespoke__PatchCableSource__) */

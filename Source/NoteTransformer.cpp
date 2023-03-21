@@ -32,9 +32,7 @@ NoteTransformer::NoteTransformer()
 {
    for (int i = 0; i < 7; ++i)
    {
-      mToneMod[i] = 0;
       mToneModSlider[i] = new IntSlider(this, ("tone " + ofToString(i)).c_str(), 17, 118 - i * 17, 100, 15, &mToneMod[i], -7, 7);
-      mLastTimeTonePlayed[i] = 0;
    }
 
    for (int i = 0; i < 127; ++i)
@@ -65,10 +63,10 @@ void NoteTransformer::DrawModule()
    }
 }
 
-void NoteTransformer::CheckboxUpdated(Checkbox* checkbox)
+void NoteTransformer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

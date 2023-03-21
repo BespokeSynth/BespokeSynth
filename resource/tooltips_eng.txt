@@ -11,11 +11,14 @@ timerdisplay~displays a timer to indicate how long a patch has been running
 
 
 
-timelinecontrol~[abandoned module, possibly broken] global timeline control to position transport
-~measure~[todo]
-~loop~[todo]
-~loop start~[todo]
-~loop end~[todo]
+timelinecontrol~control global transport position
+~measure~current position. click to jump around.
+~loop~should we have a looping section?
+~loop start~measure start of loop
+~loop end~measure end of loop
+~reset~reset to beginning
+~length~length of timeline display, in measures
+~dock~should we dock this module to the UI layer?
 
 
 
@@ -52,11 +55,11 @@ radiosequencer~sequence to only enable one value at a time. patch it to the "ena
 
 
 
-presets~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
-~save~[todo]
-~blend ms~length of time to blend preset values over
-~preset~jump to a preset
+snapshots~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
+~blend~length of time in milliseconds over which to blend snapshot values
+~snapshot~jump to a snapshot
 ~random~randomize connected controls
+~add~snapshot the currently connected controls to the next available snapshot slot
 
 
 
@@ -119,6 +122,9 @@ globalcontrols~interface controls, intended to allow you to use midi controllers
 ~lissajous r~amount of red in background lissajous curve
 ~lissajous g~amount of green in background lissajous curve
 ~lissajous b~amount of blue in background lissajous curve
+~background r~amount of red in background color
+~background g~amount of green in background color
+~background b~amount of blue in background color
 
 
 
@@ -139,6 +145,26 @@ eventcanvas~schedule values to set over time
 
 comment~a box to display some text, to explain a section of a patch
 ~comment~type text here
+
+
+
+clockout~sends out clock pulses to synchronize external midi devices
+~device~device to target
+~send start~send a signal to reset the gear to the start of its sequence
+~multiplier~tempo multiplier for how the gear should respond to the signals
+
+
+
+clockin~reads in clock pulses from external midi devices to control bespoke's transport
+~device~device to receive from
+~rounding~precision to round incoming tempo data
+~start offset ms~offset in milliseconds to tweak synchronization between bespoke and gear
+~smoothing~how much to smooth incoming tempo
+
+
+
+abletonlink~synchronizes transport with software and devices that support ableton link
+~offset ms~offset in milliseconds to tweak synchronization
 
 
 
@@ -169,6 +195,10 @@ pulser~send pulse messages at an interval
 
 pulsehocket~sends pulses to randomized destinations
 ~weight *~chance that pulse goes to this destination
+~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -182,9 +212,22 @@ pulsedelayer~delay pulses
 
 
 
+pulseflag~set properties on pulses
+~flag~property to add
+~replace~if disabled, the above flag is appended to the pulse's flags. if enabled, the pulse's flags are replaced by the above flag.
+
+
+
+pulsedisplayer~see what flags are on pulses
+
+
+
 pulsechance~randomly allow pulses through, based on chance
 ~chance~chance that pulses are allowed through
-
+~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 pulsebutton~trigger a pulse with a button press
@@ -202,6 +245,11 @@ audiotopulse~sends a pulse when the audio level surpasses a specified threshold
 
 
 
+boundstopulse~sends a pulse when its input slider hits its max or min limit
+~input~the slider to check bounds on
+
+
+
 vinylcontrol~modulator which outputs a speed value based upon control vinyl input audio. provide it with a stereo signal from control vinyl (like you'd use to control serato) patched in from an "input" module.
 ~control~enable/disable transport control. when you enable it, it will use the current speed as the reference speed (so, the output will output a value of 1 until you change the vinyl's speed)
 
@@ -210,12 +258,14 @@ vinylcontrol~modulator which outputs a speed value based upon control vinyl inpu
 velocitytocv~take a note's velocity and convert it to a modulation value
 ~min~output for velocity 0
 ~max~output for velocity 127
+~0 at note off~output zero when note is released
 
 
 
 valuesetter~set a specified value on a targeted control
 ~value~value to set
 ~set~click here to send the value (or, send a pulse to this module for the same result)
+~slider~value to set
 
 
 
@@ -360,6 +410,7 @@ controlsequencer~modulate a control step-wise at an interval
 ~interval~rate to advance
 ~length~length of the sequence
 ~random~randomize sequence values
+~step *~value for this step
 
 
 
@@ -438,6 +489,7 @@ notesinger~output a note based on a detected pitch
 
 notesequencer~looping sequence of notes at an interval. pair with a "pulser" module for more interesting step control. hold "shift" to adjust step length.
 ~interval~note length
+~random~randomize pitch, length, and velocity of all steps.
 ~pitch~randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.
 ~len~randomize the length of each step's note.
 ~vel~randomize the velocity of each step's note.
@@ -455,7 +507,7 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 ~x offset~x offset of attached grid controller
 ~y offset~y offset of attached grid controller
 ~rand pitch chance~when clicking the random pitch button, what is the chance that a step gets changed?
-~rand pitch range~when clicking the random pitch button, how far will the pitch change?
+~rand pitch variety~how many different random pitches should we generate?
 ~rand len chance~when clicking the random length button, what is the chance that a step gets changed?
 ~rand len range~when clicking the random length button, how much will the length change?
 ~rand vel chance~when clicking the random velocity button, what is the chance that a step gets changed?
@@ -518,6 +570,9 @@ notechain~trigger a note, followed by a pulse to trigger another note after a de
 
 notecanvas~looping note roll
 ~quantize~quantize selected notes to interval
+~save midi~export canvas contents to a midi file
+~load midi~import canvas contents from a midi file
+~loadtrack~which track number to import when using "load midi"
 ~play~play notes on canvas
 ~rec~record input notes to canvas
 ~free rec~enable record mode, and extend canvas if we reach the end
@@ -603,6 +658,7 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~r den~density of the randomizer output. the higher this is, the busier the random output will be.
 ~r amt~the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.
 ~r lock*~lock this row so it doesn't get randomized
+~random*~randomize this row
 
 
 
@@ -752,7 +808,7 @@ pitchchorus~output pitch-shifted version of input audio, based on input midi not
 
 
 panner~pan audio left and right. also, converts a mono input to a stereo output.
-~pan~amount to send signal to the left and right channels. a value of .5 is centered.
+~pan~amount to send signal to the left and right channels. a value of 0 is centered.
 ~widen~delay a channel by this many samples. results in a pan-like effect where the sound seems to come from from a direction.
 
 
@@ -773,7 +829,7 @@ multitapdelay~delay with multiple tap points
 
 
 looperrewriter~rewrites the contents of a looper with received input, to help you resample your own loops. attach the grey dot to a "looper" module.\n\nthe ideal way to use this module is to hook the "looper" directly up to a "send", hook the leftmost outlet of the "send" up to your effects processing (like an "effectchain"), hook the effect processing up to this "rewriter", and then also connect the rightmost outlet of the "send" up to this "rewriter"
-~ go ~rewrite the connected looper, and if that looper is connected to a send, set that send to output only to the right outlet
+~go~rewrite the connected looper, and if that looper is connected to a send, set that send to output only to the right outlet
 ~new loop~start recording a dynamic loop length. press "go" when you want to rewrite it to the looper. this will also change bespoke's global tempo to match this new loop, so it's quite powerful and scary! click it again to cancel.
 
 
@@ -787,6 +843,7 @@ looperrecorder~command center to manage recording into multiple loopers, and all
 ~2xtempo~double global transport tempo, while keeping connected loopers sounding the same
 ~.5tempo~halve global transport tempo, while keeping connected loopers sounding the same
 ~target~looper to commit audio to when using the on-buffer capture buttons to the left
+~auto-advance~automatically advance to the next looper when committing
 ~mode~recorder mode: use "record" to record input and allow it to be committed to buffers when you're ready to loop, use "overdub" to record input and play the loop at our specified length, and use "loop" to play the current loop without adding input
 ~clear~clear the recorded buffer
 ~free rec~enable to start recording a loop with no predetermined length. disable to end recording, adjust global transport to match the loop length, and switch the recorder's mode to "loop"
@@ -816,7 +873,7 @@ looper~loop input audio. use with a "looperrecorder" for full functionality.
 ~.5x~make loop play at half speed
 ~undo~undo last loop commit
 ~offset~amount to offset looper's playhead from transport position
-~set~shift the contents of the looper so the current offset is the start of the buffer
+~apply~shift the contents of the looper so the current offset is the start of the buffer
 ~scrspd~playback speed, used with "scr" is enabled. modulate quickly for a vinyl-like scratching effect.
 ~scr~allow loop to be scratched by adjusting "scrspd"
 ~fourtet~use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this "fourtetified" audio.
@@ -917,6 +974,7 @@ butterworth~filter using the butterworth formula
 
 compressor~try to keep volume at a certain level
 ~mix~amount of compression. lower this value for a "parallel compression" effect. you should use this mix slider instead of the effectchain's mix slider, to compensate for lookahead.
+~drive~rescale input to affect how much compression affects it
 ~threshold~threshold where gain should start to be reduced
 ~ratio~how much gain reduction to apply when the single passes the threshold
 ~attack~speed to apply gain reduction
@@ -1363,6 +1421,8 @@ drumplayer~sample player intended for drum playback
 ~test *~play this sample
 ~random *~choose a random sample from the selected hitcategory
 ~grab *~grab this sample
+~prev *~choose the previous sample from the selected hitcategory
+~next *~choose the next sample from the selected hitcategory
 
 
 
@@ -1373,6 +1433,7 @@ beats~multi-loop player, for mixing sample layers together
 ~double*~enable this to play at double speed
 ~bars*~how many measures long are the samples in this slot?
 ~selector*~which sample should we play in this slot? drag samples onto here to add them to this slot.
+~delete *~remove the current sample from the list
 
 
 
@@ -1401,6 +1462,16 @@ vibrato~add rhythmic oscillating pitch bend to notes
 
 
 
+velocitytochance~use a note's velocity to determine the chance that the note plays
+~full velocity~set velocity to full for notes that pass through
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
+
+
+
 velocitystepsequencer~adjusts the velocity of incoming notes based upon a sequence
 ~interval~speed to advance sequence
 ~len~length of sequence
@@ -1417,6 +1488,10 @@ velocitysetter~set a note's velocity to this value
 
 velocityscaler~scale a note's velocity to be higher or lower
 ~scale~amount to multiply velocity by
+
+
+
+velocitycurve~adjust velocity based upon a curve mapping
 
 
 
@@ -1484,7 +1559,7 @@ pressure~add pressure modulation to notes
 
 
 portamento~only allows one note to play at a time, and uses pitch bend to glide between notes
-~require held~if enabled, only glide to a new note if an old note is held. otherwise, always glide, based upon the prior input note.
+~mode~always: always glide to new notes\nretrigger held: bend to notes if the prior note is held, and retrigger\nbend held: bend to notes if the prior note is held, without retriggering
 ~glide~time to glide, in milliseconds
 
 
@@ -1548,9 +1623,15 @@ noteexpression~control where notes are routed based upon evaluated expressions. 
 
 
 
+noteecho~output incoming notes at specified delays
+~delay *~amount of time to delay this output, in measures
+
+
+
 noteratchet~rapidly repeat an input note over a duration
 ~duration~total length of time repeats should last
 ~subdivision~length of each repeat
+~skip first~don't replay input note. this allows you to more easily separate the initial note from the ratcheted notes.
 
 
 
@@ -1595,6 +1676,11 @@ notehumanizer~add randomness to timing and velocity
 
 notehocket~sends notes to random destinations
 ~weight *~chance that note goes to this destination
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -1636,6 +1722,11 @@ notedelayer~delay input notes by a specified amount
 
 notechance~randomly allow notes through
 ~chance~probability that a note is allowed
+~beat length~restart the determined random sequence at this interval
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~<~go to next seed
 
 
 
@@ -1649,7 +1740,7 @@ mpetweaker~adjust incoming MPE modulation values
 
 
 
-mpesmoother~[no tooltip]
+mpesmoother~smooth out MPE parameters
 ~pitch~amount to smooth incoming pitchbend
 ~pressure~amount to smooth incoming pressure
 ~modwheel~amount to smooth incoming modwheel
@@ -1757,13 +1848,13 @@ newpatchconfirm~
 
 
 
-vstplugin~a VST plugin instance
+plugin~a hosted plugin instance, such as a VST
 ~vol~adjust the output volume
-~program change~send a program change message to the VST instance
+~program change~send a program change message to the plugin instance
 ~open~show the plugin window
-~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.
-~preset~choose from saved VST presets
-~save as~save the current VST settings as a preset to load again later
+~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a plugin has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the plugin's interface.
+~preset~choose from saved plugin presets
+~save as~save the current plugin settings as a preset to load again later
 ~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
 
 
@@ -1790,7 +1881,7 @@ transposefrom~transpose input from a specified root to the root of the current s
 
 
 
-m185sequencer~sequencer using the unique paradigm of the the m185 or intellijel metropolis
+m185sequencer~sequencer using the unique paradigm of the m185 or intellijel metropolis
 ~interval~interval per step
 ~reset step~resets counter to first step
 ~pitch*~pitch to use for this row
@@ -1820,6 +1911,8 @@ scale~controls the global scale used by various modules
 ~PPO~pitches per octave
 ~tuning~what frequency does the pitch defined in "note" represent?
 ~note~the pitch that maps to the frequency defined in "tuning"
+~load SCL~load SCL file to determine scale
+~load KBM~load KBM file to determine keyboard mapping
 
 
 
@@ -1830,3 +1923,75 @@ output~route audio in here to send it to an output channel (your speakers or aud
 
 gain~adjusts volume of audio signal
 ~gain~amount to adjust signal. a value of 1 will cause no change to the signal.
+
+
+
+userprefseditor~settings for bespoke. some settings changes require bespoke to be restarted before taking effect.
+~devicetype~what kind of audio device bespoke should use (requires restart)
+~audio_output_device~which device to use for audio output (requires restart)
+~audio_input_device~which device to use for audio input (requires restart)
+~samplerate~what sample rate to use with your audio device (requires restart)
+~buffersize~what buffer size to use with your audio device. lower values use require more CPU power, higher values add more latency. (requires restart)
+~oversampling~global oversampling multiplier. uses additional CPU for higher-resolution audio processing. (requires restart)
+~width~width of bespoke's window on startup
+~height~height of bespoke's window on startup
+~set_manual_window_position~should we force bespoke to a specific position on startup
+~position_x~desired x position of upper-left corner
+~position_y~desired y position of upper-left corner
+~zoom~desired canvas zoom level on startup
+~ui_scale~scale of UI layer (title bar, quickspawn menu, etc)
+~grid_snap_size~grid size to use when snapping module position (hold alt/option while dragging a module)
+~scroll_multiplier_vertical~adjustment to vertical mouse/trackpad scroll speed
+~scroll_multiplier_horizontal~adjustment to horizontal mouse/trackpad scroll speed
+~autosave~should autosave be enabled on startup
+~show_tooltips_on_load~should tooltips be enabled on startup
+~show_minimap~should the minimap be displayed (requires restart)
+~record_buffer_length_minutes~length of always-on recording buffer for "write audio" button in the title bar (requires restart)
+~vst_always_on_top~should plugin windows always stay on top of bespoke when opened
+~max_output_channels~number of output channels to allocate (requires restart)
+~max_input_channels~number of input channels to allocate (requires restart)
+~plugin_preference_order~semicolon-separated list of plugin formats, in preferred order. if a plugin exists with multiple formats, only the most preferred format will be shown. leave this blank to always show all plugins. (default value: "VST3;VST;AudioUnit;LV2")
+~draw_background_lissajous~should the background lissajous curve draw
+~fade_cable_middle~should longer cables draw with a fadeout effect in the middle
+~cable_quality~visual resolution of the cables
+~lissajous_r~red RGB value of lissajous curve
+~lissajous_g~green RGB value of lissajous curve
+~lissajous_b~blue RGB value of lissajous curve
+~background_r~red RGB value of canvas background
+~background_g~green RGB value of canvas background
+~background_b~blue RGB value of canvas background
+~motion_trails~amount of visual motion blur to use (increases/decreases "ghosting" of previous frames)
+~draw_module_highlights~should modules visually flash in response to activity
+~mouse_offset_x~x offset between system mouse position and bespoke's cursor placement
+~mouse_offset_y~y offset between system mouse position and bespoke's cursor placement
+~recordings_path~where "write audio" and multitrackrecorder wav files save
+~tooltips~what path we should use for the tooltip file (changing this allows for other languages to be used for tooltips)
+~layout~what template bespoke should use on startup
+~youtube_dl_path~the path to your youtube-dl installation (used for youtube downloading in sampleplayer module)
+~ffmpeg_path~the path to your ffmpeg installation (used for youtube downloading in sampleplayer module)
+
+
+songbuilder~large-scale organizer to arrange settings into scenes and then sequence them. this is bespoke's "song mode"
+~use sequencer~show scene sequencer
+~activate first scene on stop~when stopping, activate the first scene. it is recommended that you use the first scene as an "off" scene, and have it disable all song elements.
+~play~play the sequence
+~stop~stop the sequence
+~pause~hold the sequence on the current scene
+~loop~enable a loop within the sequence
+~loop start~loop step index to start the loop on
+~loop end~loop step index that the loop ends
+~scene*~name of scene for this step
+~bars*~length in bars that this scene should play for
+~play from*~play sequence from this step
+~contextmenu*~options for this step
+~change quantize~when a change should happen after pressing the play button on a scene. "switch" changes immediately, and "jump" changes immediately and also resets the global transport.
+~add target~add a targeted control for scenes to affect
+~go*~play this scene
+~name*~name of this scene
+~context*~options for this scene
+~value*~value to use for target in this scene
+~checkbox*~value to use for target in this scene
+~dropdown*~value to use for target in this scene
+~move left~move this target left in the scene
+~move right~move this target right in the scene
+~type~change the control display type for this target

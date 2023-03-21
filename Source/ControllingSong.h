@@ -46,7 +46,9 @@ public:
    ControllingSong();
    ~ControllingSong();
    static IDrawableModule* Create() { return new ControllingSong(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -57,12 +59,12 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -81,34 +83,34 @@ private:
    void LoadSong(int index);
 
    ofMutex mLoadSongMutex;
-   bool mLoadingSong;
+   bool mLoadingSong{ true };
 
-   int mCurrentSongIndex;
+   int mCurrentSongIndex{ -1 };
    MidiReader mMidiReader;
    Sample mSample;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   bool mNeedNewSong;
-   double mSongStartTime;
+   float mVolume{ .8 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   bool mNeedNewSong{ true };
+   double mSongStartTime{ 0 };
    ofxJSONElement mSongList;
-   int mTestBeatOffset;
-   IntSlider* mTestBeatOffsetSlider;
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mShuffle;
-   Checkbox* mShuffleCheckbox;
-   ClickButton* mPhraseForwardButton;
-   ClickButton* mPhraseBackButton;
-   float mSpeed;
-   FloatSlider* mSpeedSlider;
-   bool mMute;
-   Checkbox* mMuteCheckbox;
+   int mTestBeatOffset{ 0 };
+   IntSlider* mTestBeatOffsetSlider{ nullptr };
+   bool mPlay{ false };
+   Checkbox* mPlayCheckbox{ nullptr };
+   bool mShuffle{ false };
+   Checkbox* mShuffleCheckbox{ nullptr };
+   ClickButton* mPhraseForwardButton{ nullptr };
+   ClickButton* mPhraseBackButton{ nullptr };
+   float mSpeed{ 1 };
+   FloatSlider* mSpeedSlider{ nullptr };
+   bool mMute{ false };
+   Checkbox* mMuteCheckbox{ nullptr };
 
-   DropdownList* mSongSelector;
-   ClickButton* mNextSongButton;
-   int mShuffleIndex;
-   std::vector<int> mShuffleList;
-   std::vector<FollowingSong*> mFollowSongs;
+   DropdownList* mSongSelector{ nullptr };
+   ClickButton* mNextSongButton{ nullptr };
+   int mShuffleIndex{ 0 };
+   std::vector<int> mShuffleList{};
+   std::vector<FollowingSong*> mFollowSongs{};
 };
 
 #endif /* defined(__Bespoke__ControllingSong__) */

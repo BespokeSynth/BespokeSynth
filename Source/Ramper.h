@@ -43,12 +43,12 @@ public:
    Ramper();
    ~Ramper();
    static IDrawableModule* Create() { return new Ramper(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;
-
-   IUIControl* GetUIControl() const { return mUIControl; }
 
    //IDrawableModule
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -59,9 +59,9 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -75,22 +75,22 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
 
    void Go(double time);
 
-   IUIControl* mUIControl;
-   NoteInterval mLength;
-   DropdownList* mLengthSelector;
-   PatchCableSource* mControlCable;
-   ClickButton* mTriggerButton;
-   FloatSlider* mTargetValueSlider;
-   float mTargetValue;
-   float mStartMeasure;
-   float mStartValue;
-   bool mRamping;
+   std::array<IUIControl*, 16> mUIControls{ nullptr };
+   NoteInterval mLength{ NoteInterval::kInterval_1n };
+   DropdownList* mLengthSelector{ nullptr };
+   PatchCableSource* mControlCable{ nullptr };
+   ClickButton* mTriggerButton{ nullptr };
+   FloatSlider* mTargetValueSlider{ nullptr };
+   float mTargetValue{ 0 };
+   float mStartMeasure{ 0 };
+   float mStartValue{ 0 };
+   bool mRamping{ false };
 };
 
 #endif /* defined(__Bespoke__Ramper__) */

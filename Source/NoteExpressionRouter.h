@@ -40,7 +40,9 @@ class NoteExpressionRouter : public INoteReceiver, public INoteSource, public ID
 public:
    NoteExpressionRouter();
    static IDrawableModule* Create() { return new NoteExpressionRouter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 

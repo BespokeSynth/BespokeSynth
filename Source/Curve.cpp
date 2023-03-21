@@ -28,11 +28,6 @@
 #include <algorithm>
 
 Curve::Curve()
-: mNumCurvePoints(0)
-, mStart(0)
-, mEnd(1)
-, mColor(ofColor::white)
-, mLastEvalIndex(0)
 {
 }
 
@@ -162,7 +157,7 @@ CurvePoint* Curve::GetPoint(int index)
    return &mPoints[index];
 }
 
-void Curve::OnClicked(int x, int y, bool right)
+void Curve::OnClicked(float x, float y, bool right)
 {
    ofLog() << "curve clicked";
 }
@@ -173,7 +168,7 @@ bool Curve::MouseMoved(float x, float y)
    return false;
 }
 
-bool Curve::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool Curve::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    ofLog() << "curve mousescrolled";
    return false;

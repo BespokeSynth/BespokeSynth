@@ -38,7 +38,9 @@ class PitchPanner : public NoteEffectBase, public IDrawableModule, public IIntSl
 public:
    PitchPanner();
    static IDrawableModule* Create() { return new PitchPanner(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -47,7 +49,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

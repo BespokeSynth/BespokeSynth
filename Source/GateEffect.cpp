@@ -28,14 +28,6 @@
 #include "Profiler.h"
 
 GateEffect::GateEffect()
-: mThreshold(.1f)
-, mAttackTime(1)
-, mReleaseTime(1)
-, mThresholdSlider(nullptr)
-, mAttackSlider(nullptr)
-, mReleaseSlider(nullptr)
-, mEnvelope(0)
-, mPeak(0)
 {
 }
 
@@ -108,14 +100,14 @@ void GateEffect::DrawModule()
    ofPopStyle();
 }
 
-void GateEffect::CheckboxUpdated(Checkbox* checkbox)
+void GateEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void GateEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+void GateEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void GateEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void GateEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }

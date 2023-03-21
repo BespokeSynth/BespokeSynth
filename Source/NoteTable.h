@@ -47,6 +47,9 @@ public:
    NoteTable();
    virtual ~NoteTable();
    static IDrawableModule* Create() { return new NoteTable(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -81,24 +84,25 @@ public:
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 2; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void UpdateGridControllerLights(bool force);
 
    void PlayColumn(double time, int column, int velocity, int voiceIdx, ModulationParameters modulation);
@@ -116,35 +120,35 @@ private:
       kNoteMode_Fifths
    };
 
-   UIGrid* mGrid;
-   int mOctave;
-   IntSlider* mOctaveSlider;
-   NoteMode mNoteMode;
-   DropdownList* mNoteModeSelector;
-   int mLength;
-   IntSlider* mLengthSlider;
-   bool mSetLength;
-   int mNoteRange;
-   bool mShowColumnControls;
-   int mRowOffset;
+   UIGrid* mGrid{ nullptr };
+   int mOctave{ 3 };
+   IntSlider* mOctaveSlider{ nullptr };
+   NoteMode mNoteMode{ NoteMode::kNoteMode_Scale };
+   DropdownList* mNoteModeSelector{ nullptr };
+   int mLength{ 8 };
+   IntSlider* mLengthSlider{ nullptr };
+   bool mSetLength{ false };
+   int mNoteRange{ 15 };
+   bool mShowColumnControls{ false };
+   int mRowOffset{ 0 };
 
-   ClickButton* mRandomizePitchButton;
-   float mRandomizePitchChance;
-   float mRandomizePitchRange;
-   FloatSlider* mRandomizePitchChanceSlider;
-   FloatSlider* mRandomizePitchRangeSlider;
+   ClickButton* mRandomizePitchButton{ nullptr };
+   float mRandomizePitchChance{ 1 };
+   float mRandomizePitchRange{ 1 };
+   FloatSlider* mRandomizePitchChanceSlider{ nullptr };
+   FloatSlider* mRandomizePitchRangeSlider{ nullptr };
 
    static constexpr int kMaxLength = 32;
 
-   int mTones[kMaxLength];
+   int mTones[kMaxLength]{};
    std::array<double, kMaxLength> mLastColumnPlayTime{ -1 };
    std::array<int, kMaxLength> mLastColumnNoteOnPitch{ -1 };
    std::array<DropdownList*, kMaxLength> mToneDropdowns{ nullptr };
    std::array<AdditionalNoteCable*, kMaxLength> mColumnCables{ nullptr };
 
-   GridControlTarget* mGridControlTarget;
-   int mGridControlOffsetX;
-   int mGridControlOffsetY;
-   IntSlider* mGridControlOffsetXSlider;
-   IntSlider* mGridControlOffsetYSlider;
+   GridControlTarget* mGridControlTarget{ nullptr };
+   int mGridControlOffsetX{ 0 };
+   int mGridControlOffsetY{ 0 };
+   IntSlider* mGridControlOffsetXSlider{ nullptr };
+   IntSlider* mGridControlOffsetYSlider{ nullptr };
 };

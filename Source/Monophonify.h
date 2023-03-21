@@ -29,16 +29,18 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 #include "ModulationChain.h"
+#include "DropdownList.h"
 
-class Monophonify : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener
+class Monophonify : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener, public IDropdownListener
 {
 public:
    Monophonify();
    static IDrawableModule* Create() { return new Monophonify(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -47,9 +49,9 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -63,7 +65,7 @@ private:
       height = mHeight;
    }
    bool Enabled() const override { return mEnabled; }
-   int GetMostRecentPitch() const;
+   int GetMostRecentCurrentlyHeldPitch() const;
 
    double mHeldNotes[128];
    int mInitialPitch{ -1 };
@@ -73,8 +75,15 @@ private:
    float mHeight{ 20 };
    int mVoiceIdx{ 0 };
 
-   bool mRequireHeldNote{ false };
-   Checkbox* mRequireHeldNoteCheckbox{ nullptr };
+   enum class PortamentoMode
+   {
+      kAlways,
+      kRetriggerHeld,
+      kBendHeld
+   };
+
+   PortamentoMode mPortamentoMode{ PortamentoMode::kAlways };
+   DropdownList* mPortamentoModeSelector{ nullptr };
    float mGlideTime{ 0 };
    FloatSlider* mGlideSlider{ nullptr };
    ModulationChain mPitchBend;

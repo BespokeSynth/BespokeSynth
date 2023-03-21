@@ -29,8 +29,6 @@
 
 MultiBandTracker::MultiBandTracker()
 {
-   mMinFreq = 150;
-   mMaxFreq = 15000;
    SetNumBands(8);
 
    mWorkBuffer = new float[gBufferSize];

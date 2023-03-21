@@ -42,7 +42,9 @@ public:
    Chorder();
    virtual ~Chorder();
    static IDrawableModule* Create() { return new Chorder(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -54,8 +56,8 @@ public:
 
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* dropdown, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* dropdown, int oldVal, double time) override;
 
    void OnScaleChanged() override;
 
@@ -65,7 +67,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
 
 private:
    //IDrawableModule
@@ -75,7 +78,7 @@ private:
       width = 135;
       height = 75;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
@@ -83,17 +86,17 @@ private:
    void CheckLeftovers();
    void SyncChord();
 
-   UIGrid* mChordGrid;
-   int mVelocity;
-   bool mInputNotes[TOTAL_NUM_NOTES];
-   int mHeldCount[TOTAL_NUM_NOTES];
+   UIGrid* mChordGrid{ nullptr };
+   int mVelocity{ 0 };
+   bool mInputNotes[TOTAL_NUM_NOTES]{};
+   int mHeldCount[TOTAL_NUM_NOTES]{};
 
-   bool mDiatonic;
-   int mChordIndex;
-   int mInversion;
-   Checkbox* mDiatonicCheckbox;
-   DropdownList* mChordDropdown;
-   DropdownList* mInversionDropdown;
+   bool mDiatonic{ false };
+   int mChordIndex{ 0 };
+   int mInversion{ 0 };
+   Checkbox* mDiatonicCheckbox{ nullptr };
+   DropdownList* mChordDropdown{ nullptr };
+   DropdownList* mInversionDropdown{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Chorder__) */

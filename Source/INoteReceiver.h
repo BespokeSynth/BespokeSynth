@@ -64,7 +64,7 @@ public:
 private:
    static const int kBufferSize = 50;
    NoteInputElement mBuffer[kBufferSize];
-   INoteReceiver* mReceiver;
+   INoteReceiver* mReceiver{ nullptr };
 };
 
 #endif

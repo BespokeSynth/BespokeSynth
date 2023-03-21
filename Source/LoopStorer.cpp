@@ -35,16 +35,6 @@
 #include "ChannelBuffer.h"
 
 LoopStorer::LoopStorer()
-: mCurrentBufferIdx(0)
-, mRewriteToSelection(false)
-, mRewriteToSelectionCheckbox(nullptr)
-, mQuantization(kInterval_None)
-, mQuantizationDropdown(nullptr)
-, mQueuedSwapBufferIdx(-1)
-, mIsSwapping(false)
-, mLooper(nullptr)
-, mClearButton(nullptr)
-, mLooperCable(nullptr)
 {
 }
 
@@ -176,7 +166,7 @@ void LoopStorer::DropdownClicked(DropdownList* list)
 {
 }
 
-void LoopStorer::DropdownUpdated(DropdownList* list, int oldVal)
+void LoopStorer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mQuantizationDropdown)
    {
@@ -186,7 +176,7 @@ void LoopStorer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void LoopStorer::ButtonClicked(ClickButton* button)
+void LoopStorer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
    {
@@ -203,7 +193,7 @@ void LoopStorer::ButtonClicked(ClickButton* button)
    }
 }
 
-void LoopStorer::CheckboxUpdated(Checkbox* checkbox)
+void LoopStorer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (int i = 0; i < mSamples.size(); ++i)
    {
@@ -223,11 +213,11 @@ void LoopStorer::GetModuleDimensions(float& width, float& height)
    height = GetRowY((int)mSamples.size());
 }
 
-void LoopStorer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void LoopStorer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void LoopStorer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void LoopStorer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -242,7 +232,6 @@ void LoopStorer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void LoopStorer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["looper"] = mLooper ? mLooper->Name() : "";
 }
 
@@ -265,16 +254,11 @@ void LoopStorer::SetUpFromSaveData()
       transportListenerInfo->mInterval = mQuantization;
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void LoopStorer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mCurrentBufferIdx;
 
@@ -290,13 +274,13 @@ void LoopStorer::SaveState(FileStreamOut& out)
    }
 }
 
-void LoopStorer::LoadState(FileStreamIn& in)
+void LoopStorer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mCurrentBufferIdx;
    mQueuedSwapBufferIdx = -1;
@@ -332,13 +316,6 @@ void LoopStorer::LoadState(FileStreamIn& in)
 }
 
 LoopStorer::SampleData::SampleData()
-: mBuffer(nullptr)
-, mNumBars(1)
-, mSelectCheckbox(nullptr)
-, mLoopStorer(nullptr)
-, mIndex(0)
-, mBufferLength(-1)
-, mIsCurrentBuffer(false)
 {
 }
 

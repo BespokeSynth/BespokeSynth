@@ -38,18 +38,6 @@ Sampler::Sampler()
 : IAudioProcessor(gBufferSize)
 , mPolyMgr(this)
 , mNoteInputBuffer(this)
-, mVolSlider(nullptr)
-, mADSRDisplay(nullptr)
-, mRecordPos(0)
-, mRecording(false)
-, mRecordCheckbox(nullptr)
-, mThresh(.2f)
-, mThreshSlider(nullptr)
-, mPitchCorrect(false)
-, mPitchCorrectCheckbox(nullptr)
-, mWantDetectPitch(false)
-, mPassthrough(false)
-, mPassthroughCheckbox(nullptr)
 , mWriteBuffer(gBufferSize)
 {
    mSampleData = new float[MAX_SAMPLER_LENGTH]; //store up to 2 seconds
@@ -166,7 +154,7 @@ void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    }
    else
    {
-      mPolyMgr.Stop(time, pitch);
+      mPolyMgr.Stop(time, pitch, voiceIdx);
       mVoiceParams.mAdsr.Stop(time); //for visualization
    }
 }
@@ -276,21 +264,21 @@ void Sampler::SetUpFromSaveData()
 }
 
 
-void Sampler::DropdownUpdated(DropdownList* list, int oldVal)
+void Sampler::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Sampler::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Sampler::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mVolSlider)
       mADSRDisplay->SetVol(mVoiceParams.mVol);
 }
 
-void Sampler::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Sampler::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void Sampler::CheckboxUpdated(Checkbox* checkbox)
+void Sampler::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mRecordCheckbox)
    {
@@ -314,30 +302,29 @@ void Sampler::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void Sampler::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out.Write(mSampleData, MAX_SAMPLER_LENGTH);
    out << mVoiceParams.mSampleLength;
 }
 
-void Sampler::LoadState(FileStreamIn& in)
+void Sampler::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in.Read(mSampleData, MAX_SAMPLER_LENGTH);
+   int length = MAX_SAMPLER_LENGTH;
+   if (rev < 2)
+      length = 2 * gSampleRate;
+
+   in.Read(mSampleData, length);
 
    if (rev >= 1)
       in >> mVoiceParams.mSampleLength;

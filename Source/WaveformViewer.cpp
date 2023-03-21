@@ -208,7 +208,6 @@ void WaveformViewer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void WaveformViewer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

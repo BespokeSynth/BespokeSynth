@@ -105,10 +105,10 @@ void VelocityStepSequencer::DrawModule()
    ofPopStyle();
 }
 
-void VelocityStepSequencer::CheckboxUpdated(Checkbox* checkbox)
+void VelocityStepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void VelocityStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -152,11 +152,11 @@ void VelocityStepSequencer::OnMidiControl(MidiControl& control)
    }
 }
 
-void VelocityStepSequencer::ButtonClicked(ClickButton* button)
+void VelocityStepSequencer::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void VelocityStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void VelocityStepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -169,7 +169,7 @@ void VelocityStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void VelocityStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void VelocityStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

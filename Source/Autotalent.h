@@ -43,7 +43,9 @@ public:
    Autotalent();
    ~Autotalent();
    static IDrawableModule* Create() { return new Autotalent(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -59,15 +61,15 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    //IRadioButtonListener
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

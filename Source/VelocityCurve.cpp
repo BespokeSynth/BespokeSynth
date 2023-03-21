@@ -34,11 +34,11 @@ namespace
 }
 
 VelocityCurve::VelocityCurve()
-: mEnvelopeControl(ofVec2f(3, 3), ofVec2f(100, 100))
 {
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);
    mEnvelopeControl.SetFixedLengthMode(true);
+   mAdsr.GetFreeReleaseLevel() = true;
    mAdsr.SetNumStages(2);
    mAdsr.GetHasSustainStage() = false;
    mAdsr.GetStageData(0).target = 0;
@@ -80,10 +80,8 @@ void VelocityCurve::PlayNote(double time, int pitch, int velocity, int voiceIdx,
          mLastInputTime = time;
 
          ComputeSliders(0);
-         mAdsr.Clear();
-         mAdsr.Start(0, 1);
-         mAdsr.Stop(kAdsrTime);
-         float val = ofClamp(mAdsr.Value(velocity / 127.0f * kAdsrTime), 0, 1);
+         ADSR::EventInfo adsrEvent(0, kAdsrTime);
+         float val = ofClamp(mAdsr.Value(velocity / 127.0f * kAdsrTime, &adsrEvent), 0, 1);
          if (val != val)
             val = 0;
          velocity = val * 127;
@@ -95,7 +93,7 @@ void VelocityCurve::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void VelocityCurve::OnClicked(int x, int y, bool right)
+void VelocityCurve::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -130,27 +128,22 @@ void VelocityCurve::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void VelocityCurve::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);
 }
 
-void VelocityCurve::LoadState(FileStreamIn& in)
+void VelocityCurve::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mAdsr.LoadState(in);
 }

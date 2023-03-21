@@ -37,8 +37,6 @@ namespace
 
 SpectralDisplay::SpectralDisplay()
 : IAudioProcessor(gBufferSize)
-, mWidth(400)
-, mHeight(100)
 , mFFT(kNumFFTBins)
 , mFFTData(kNumFFTBins, kNumFFTBins / 2 + 1)
 , mRollingInputBuffer(kNumFFTBins)
@@ -167,7 +165,6 @@ void SpectralDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void SpectralDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

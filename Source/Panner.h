@@ -42,7 +42,9 @@ public:
    Panner();
    virtual ~Panner();
    static IDrawableModule* Create() { return new Panner(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -52,10 +54,10 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -70,10 +72,10 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mPan;
+   float mPan{ 0 };
    Ramp mPanRamp;
-   FloatSlider* mPanSlider;
-   float mWiden;
-   FloatSlider* mWidenSlider;
-   RollingBuffer mWidenerBuffer;
+   FloatSlider* mPanSlider{ nullptr };
+   float mWiden{ 0 };
+   FloatSlider* mWidenSlider{ nullptr };
+   RollingBuffer mWidenerBuffer{ 2048 };
 };

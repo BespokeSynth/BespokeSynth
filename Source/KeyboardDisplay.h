@@ -34,7 +34,9 @@ class KeyboardDisplay : public NoteEffectBase, public IDrawableModule
 public:
    KeyboardDisplay();
    static IDrawableModule* Create() { return new KeyboardDisplay(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -50,7 +52,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
@@ -61,7 +64,7 @@ private:
       height = mHeight;
    }
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override
    {
@@ -77,14 +80,14 @@ private:
    int NumKeys() const;
    int GetPitchForTypingKey(int key) const;
 
-   float mWidth;
-   float mHeight;
-   int mRootOctave;
-   int mNumOctaves;
-   int mPlayingMousePitch;
-   bool mTypingInput;
-   bool mLatch;
-   bool mShowScale;
+   float mWidth{ 500 };
+   float mHeight{ 110 };
+   int mRootOctave{ 3 };
+   int mNumOctaves{ 3 };
+   int mPlayingMousePitch{ -1 };
+   bool mTypingInput{ false };
+   bool mLatch{ false };
+   bool mShowScale{ false };
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
 };

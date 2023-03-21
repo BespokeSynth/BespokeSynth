@@ -34,13 +34,7 @@ std::string IClickable::sPathLoadContext = "";
 std::string IClickable::sPathSaveContext = "";
 
 IClickable::IClickable()
-: mX(0)
-, mY(0)
-, mParent(nullptr)
-, mShowing(true)
-, mBeaconTime(-999)
 {
-   mName[0] = 0;
 }
 
 void IClickable::Draw()
@@ -51,7 +45,7 @@ void IClickable::Draw()
    Render();
 }
 
-bool IClickable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool IClickable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (!mShowing)
       return false;
@@ -80,11 +74,11 @@ bool IClickable::NotifyMouseMoved(float x, float y)
    return MouseMoved(x - mX, y - mY);
 }
 
-bool IClickable::NotifyMouseScrolled(int x, int y, float scrollX, float scrollY)
+bool IClickable::NotifyMouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (!mShowing)
       return false;
-   return MouseScrolled(x - mX, y - mY, scrollX, scrollY);
+   return MouseScrolled(x - mX, y - mY, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
 }
 
 void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
@@ -145,14 +139,16 @@ IDrawableModule* IClickable::GetModuleParent()
    return dynamic_cast<IDrawableModule*>(parent);
 }
 
-std::string IClickable::Path(bool ignoreContext)
+std::string IClickable::Path(bool ignoreContext, bool useDisplayName)
 {
    if (mName[0] == 0) //must have a name
       return "";
 
-   std::string path = mName;
+   std::string name = useDisplayName ? GetDisplayName() : mName;
+
+   std::string path = name;
    if (mParent != nullptr)
-      path = mParent->Path(true) + "~" + mName;
+      path = mParent->Path(true) + "~" + name;
 
    if (!ignoreContext)
    {

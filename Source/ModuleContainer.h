@@ -64,7 +64,7 @@ public:
    void MoveToFront(IDrawableModule* module);
    void AddModule(IDrawableModule* module);
    void TakeModule(IDrawableModule* module);
-   void DeleteModule(IDrawableModule* module);
+   void DeleteModule(IDrawableModule* module, bool fail = true);
    IDrawableModule* FindModule(std::string name, bool fail = true);
    IUIControl* FindUIControl(std::string path);
    bool IsHigherThan(IDrawableModule* checkFor, IDrawableModule* checkAgainst) const;
@@ -93,10 +93,10 @@ public:
 
 private:
    std::vector<IDrawableModule*> mModules;
-   IDrawableModule* mOwner;
+   IDrawableModule* mOwner{ nullptr };
 
    ofVec2f mDrawOffset;
-   float mDrawScale;
+   float mDrawScale{ 1 };
 };
 
 #endif // MODULECONTAINER_H_INCLUDED

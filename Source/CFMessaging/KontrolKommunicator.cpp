@@ -497,7 +497,7 @@ void KontrolKommunicator::Output(std::string str)
 std::string KontrolKommunicator::FormatString(std::string format, int number)
 {
    char buffer[100];
-   sprintf(buffer, format.c_str(), number);
+   snprintf(buffer, sizeof(buffer), format.c_str(), number);
    return (std::string)buffer;
 }
 

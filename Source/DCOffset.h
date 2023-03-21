@@ -38,7 +38,9 @@ public:
    DCOffset();
    virtual ~DCOffset();
    static IDrawableModule* Create() { return new DCOffset(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -47,7 +49,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -62,6 +64,6 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mOffset;
-   FloatSlider* mOffsetSlider;
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
 };

@@ -54,6 +54,7 @@ struct VoiceInfo
    IMidiVoice* mVoice{ nullptr };
    double mTime{ 0 };
    bool mNoteOn{ false };
+   float mActivity{ 0 };
 };
 
 class PolyphonyMgr
@@ -66,7 +67,7 @@ public:
              IVoiceParams* mVoiceParams);
 
    void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
-   void Stop(double time, int pitch);
+   void Stop(double time, int pitch, int voiceIdx);
    void Process(double time, ChannelBuffer* out, int bufferSize);
    void DrawDebug(float x, float y);
    void SetVoiceLimit(int limit) { mVoiceLimit = limit; }
@@ -75,15 +76,15 @@ public:
 
 private:
    VoiceInfo mVoices[kNumVoices];
-   bool mAllowStealing;
-   int mLastVoice;
-   ChannelBuffer mFadeOutBuffer;
-   ChannelBuffer mFadeOutWorkBuffer;
+   bool mAllowStealing{ true };
+   int mLastVoice{ -1 };
+   ChannelBuffer mFadeOutBuffer{ kVoiceFadeSamples };
+   ChannelBuffer mFadeOutWorkBuffer{ kVoiceFadeSamples };
    float mWorkBuffer[2048]{};
-   int mFadeOutBufferPos;
+   int mFadeOutBufferPos{ 0 };
    IDrawableModule* mOwner;
-   int mVoiceLimit;
-   int mOversampling;
+   int mVoiceLimit{ kNumVoices };
+   int mOversampling{ 1 };
 };
 
 #endif /* defined(__additiveSynth__PolyphonyMgr__) */

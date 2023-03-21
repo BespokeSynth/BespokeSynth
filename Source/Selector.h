@@ -36,16 +36,17 @@ class Selector : public IDrawableModule, public IRadioButtonListener, public INo
 {
 public:
    Selector();
-   ~Selector();
+   ~Selector() override;
    static IDrawableModule* Create() { return new Selector(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
    //INoteReceiver
@@ -62,7 +63,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    void SyncList();
-   void SetIndex(int index);
+   void SetIndex(int index, double time);
 
    RadioButton* mSelector{ nullptr };
    int mCurrentValue{ 0 };

@@ -33,7 +33,6 @@
 #include "UIControlMacros.h"
 
 NoteLooper::NoteLooper()
-: mVoiceRoundRobin(kNumVoices - 1)
 {
 }
 
@@ -131,9 +130,7 @@ void NoteLooper::OnTransportAdvanced(float amount)
       return;
    }
 
-   double cursorPlayTime = gTime;
-   //don't use Transport::sEventEarlyMs, it makes it not work well for recording in realtime, and causes issues with stuck notes
-   cursorPlayTime += amount * TheTransport->MsPerBar();
+   double cursorPlayTime = NextBufferTime(mAllowLookahead);
    double curPos = GetCurPos(cursorPlayTime);
 
    if (mDeleteOrMute)
@@ -288,11 +285,10 @@ int NoteLooper::GetNewVoice(int voiceIdx)
    return ret;
 }
 
-void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
+void NoteLooper::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      double time = gTime + gBufferSizeMs;
       for (int i = 0; i < (int)mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
@@ -304,21 +300,20 @@ void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void NoteLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void NoteLooper::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteLooper::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
       SetNumMeasures(mNumMeasures);
 }
 
-void NoteLooper::ButtonClicked(ClickButton* button)
+void NoteLooper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
    {
-      double time = gTime + gBufferSizeMs;
       for (int i = 0; i < (int)mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
@@ -375,13 +370,14 @@ void NoteLooper::SetNumMeasures(int numMeasures)
    mCanvas->mLoopEnd = mNumMeasures;
 }
 
-void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
 void NoteLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("allow_lookahead", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -389,18 +385,14 @@ void NoteLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteLooper::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-}
-
-namespace
-{
-   const int kSaveStateRev = 0;
+   mAllowLookahead = mModuleSaveData.GetBool("allow_lookahead");
 }
 
 void NoteLooper::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mWidth;
    out << mHeight;
@@ -421,16 +413,16 @@ void NoteLooper::SaveState(FileStreamOut& out)
    }
 }
 
-void NoteLooper::LoadState(FileStreamIn& in)
+void NoteLooper::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
    in >> mHeight;

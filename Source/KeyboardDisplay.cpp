@@ -28,6 +28,7 @@
 #include "Scale.h"
 #include "ModuleContainer.h"
 #include "FileStream.h"
+#include "ModularSynth.h"
 
 namespace
 {
@@ -35,14 +36,6 @@ namespace
 }
 
 KeyboardDisplay::KeyboardDisplay()
-: mWidth(500)
-, mHeight(110)
-, mRootOctave(3)
-, mNumOctaves(3)
-, mPlayingMousePitch(-1)
-, mTypingInput(false)
-, mLatch(false)
-, mShowScale(false)
 {
    for (int i = 0; i < 128; ++i)
    {
@@ -82,14 +75,14 @@ void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceId
    }
 }
 
-void KeyboardDisplay::OnClicked(int x, int y, bool right)
+void KeyboardDisplay::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
    if (IsHoveringOverResizeHandle())
       return;
 
-   double time = gTime + gBufferSizeMs;
+   double time = NextBufferTime(false);
    for (int i = 0; i < NumKeys(); ++i)
    {
       for (int pass = 0; pass < 2; ++pass)
@@ -128,7 +121,7 @@ void KeyboardDisplay::MouseReleased()
    IDrawableModule::MouseReleased();
    if (mPlayingMousePitch != -1 && !mLatch)
    {
-      double time = gTime + gBufferSizeMs;
+      double time = NextBufferTime(false);
       PlayNote(time, mPlayingMousePitch, 0);
       mPlayingMousePitch = -1;
    }
@@ -291,7 +284,7 @@ void KeyboardDisplay::KeyPressed(int key, bool isRepeat)
 
    if (mTypingInput && mEnabled && !isRepeat)
    {
-      double time = gTime + gBufferSizeMs;
+      double time = NextBufferTime(false);
       int pitch = GetPitchForTypingKey(key);
       if (pitch != -1)
          PlayNote(time, pitch, 127);
@@ -302,7 +295,7 @@ void KeyboardDisplay::KeyReleased(int key)
 {
    if (mTypingInput && mEnabled)
    {
-      double time = gTime + gBufferSizeMs;
+      double time = NextBufferTime(false);
       int pitch = GetPitchForTypingKey(key);
       if (pitch != -1)
          PlayNote(time, pitch, 0);
@@ -331,31 +324,26 @@ void KeyboardDisplay::SetUpFromSaveData()
    mShowScale = mModuleSaveData.GetBool("show_scale");
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void KeyboardDisplay::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mWidth;
    out << mHeight;
 }
 
-void KeyboardDisplay::LoadState(FileStreamIn& in)
+void KeyboardDisplay::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
    in >> mHeight;

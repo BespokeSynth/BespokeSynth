@@ -63,7 +63,7 @@ public:
 
 private:
    UIGrid* mGrid{ nullptr };
-   int mRow;
+   int mRow{ 0 };
    StepSequencer* mSeq{ nullptr };
    float mOffset{ 0 };
 
@@ -75,7 +75,7 @@ private:
    std::array<PlayedStep, 5> mPlayedSteps{};
    int mPlayedStepsRoundRobin{ 0 };
    TextEntry* mRowPitchEntry{ nullptr };
-   int mRowPitch;
+   int mRowPitch{ 0 };
 };
 
 class NoteRepeat : public ITimeListener
@@ -88,10 +88,10 @@ public:
    void SetOffset(float offset);
 
 private:
-   int mRow;
-   StepSequencer* mSeq;
-   NoteInterval mInterval;
-   float mOffset;
+   int mRow{ 0 };
+   StepSequencer* mSeq{ nullptr };
+   NoteInterval mInterval{ NoteInterval::kInterval_None };
+   float mOffset{ 0 };
 };
 
 class StepSequencerNoteFlusher : public ITimeListener
@@ -112,7 +112,9 @@ public:
    StepSequencer();
    ~StepSequencer();
    static IDrawableModule* Create() { return new StepSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 
@@ -166,25 +168,26 @@ public:
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 3; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 
@@ -214,9 +217,9 @@ private:
          mRow = row;
          mTime = gTime;
       }
-      int mCol;
-      int mRow;
-      double mTime;
+      int mCol{ 0 };
+      int mRow{ 0 };
+      double mTime{ 0 };
    };
 
    enum class NoteInputMode

@@ -37,7 +37,9 @@ public:
    NoteSustain();
    ~NoteSustain();
    static IDrawableModule* Create() { return new NoteSustain(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -45,7 +47,7 @@ public:
    void SetEnabled(bool enabled) override
    {
       mEnabled = enabled;
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(NextBufferTime(false));
    }
 
    void OnTransportAdvanced(float amount) override;
@@ -53,7 +55,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -75,13 +77,13 @@ private:
       , mPitch(pitch)
       , mVoiceIdx(voiceIdx)
       {}
-      double mTime;
-      int mPitch;
-      int mVoiceIdx;
+      double mTime{ 0 };
+      int mPitch{ 0 };
+      int mVoiceIdx{ -1 };
    };
 
-   float mSustain;
-   FloatSlider* mSustainSlider;
+   float mSustain{ .25 };
+   FloatSlider* mSustainSlider{ nullptr };
    std::list<QueuedNoteOff> mNoteOffs;
 };
 

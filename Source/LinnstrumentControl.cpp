@@ -346,7 +346,7 @@ void LinnstrumentControl::OnMidiControl(MidiControl& control)
    }
 }
 
-void LinnstrumentControl::DropdownUpdated(DropdownList* list, int oldVal)
+void LinnstrumentControl::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mControllerList)
    {
@@ -360,7 +360,7 @@ void LinnstrumentControl::DropdownClicked(DropdownList* list)
    BuildControllerList();
 }
 
-void LinnstrumentControl::CheckboxUpdated(Checkbox* checkbox)
+void LinnstrumentControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mBlackoutCheckbox)
    {

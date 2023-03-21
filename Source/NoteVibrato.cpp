@@ -28,11 +28,6 @@
 #include "ModularSynth.h"
 
 NoteVibrato::NoteVibrato()
-: mVibratoInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mVibratoAmount(0)
-, mVibratoSlider(nullptr)
-, mModulation(true)
 {
 }
 
@@ -89,19 +84,19 @@ void NoteVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mVibratoSlider)
       mModulation.GetPitchBend(-1)->SetLFO(mVibratoInterval, mVibratoAmount);
 }
 
-void NoteVibrato::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteVibrato::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
       mModulation.GetPitchBend(-1)->SetLFO(mVibratoInterval, mVibratoAmount);
 }
 
-void NoteVibrato::CheckboxUpdated(Checkbox* checkbox)
+void NoteVibrato::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

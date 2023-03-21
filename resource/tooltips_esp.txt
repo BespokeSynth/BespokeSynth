@@ -53,10 +53,10 @@ radiosequencer~secuenciador de un valor a la vez. Conéctalo a la casilla "enabl
 
 
 
-presets~guarda y recupera sets de valores.Conecta el círculo gris de los módulos para afectar todos los controles en ese módulo. Conecta el círculo morado de un control para mapear solo ese control. Shift-click en la rejilla para guardar un preset en ese recuadro, y click en un recuadro de la rejilla para cargar ese preset.
+snapshots~guarda y recupera sets de valores.Conecta el círculo gris de los módulos para afectar todos los controles en ese módulo. Conecta el círculo morado de un control para mapear solo ese control. Shift-click en la rejilla para guardar un preset en ese recuadro, y click en un recuadro de la rejilla para cargar ese preset.
 ~save~[todo]
 ~blend ms~tiempo de fundido entre valores
-~preset~salta a un preset
+~snapshot~salta a un snapshot
 ~random~añade aleatoriedad al los controles conectados
 
 
@@ -766,7 +766,7 @@ multitapdelay~delay con múltiples puntos de tap
 
 
 looperrewriter~re-escribe los contenidos de un looper con la entrada recibida, para ayudarte a resamplear tus propios loops. adjunta el punto gris a un módulo looper .\n\nla forma ideal de usar este módulo es enganchando directamente el looper a un "send", engancha la salida más a la izquierda del módulo  "send" hacia tu effects processing (como un "effectchain"), engancha el  effect processing a este  "rewriter", y conecta también la salida mas a la derecha del "send" hacia este "rewriter"
-~ go ~re-escribe el looper conectado , y si ese looper está conectado a un send , establece ese send como salida únicamente en la salida derecha
+~go~re-escribe el looper conectado , y si ese looper está conectado a un send , establece ese send como salida únicamente en la salida derecha
 ~new loop~comienza a grabar un bucle de duración dinámica. presiona "go"cuando quieras sobreescribirlo al looper.esto también cambiará el tiempo global de Bespoke para igualar este nuevo loop, ¡ es muy poderoso y aterrador! click nuevamente para cancelar.
 
 
@@ -1738,7 +1738,7 @@ titlebar~
 
 
 
-vstplugin~una instancia de interfaz VST 
+plugin~una instancia de interfaz VST
 ~vol~ajusta el volumen de salida
 ~program change~envía un mensaje de tipo program change message a la instancia VST 
 ~open~muestra la ventana de plugin

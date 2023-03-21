@@ -94,6 +94,12 @@ void AudioRouter::Process(double time)
    GetBuffer()->Reset();
 }
 
+void AudioRouter::Poll()
+{
+   for (int i = 0; i < (int)mDestinationCables.size(); ++i)
+      mDestinationCables[i]->SetShowing(!mOnlyShowActiveCable || i == mRouteIndex || mDestinationCables[i]->GetIsPartOfCircularDependency());
+}
+
 void AudioRouter::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -131,7 +137,7 @@ void AudioRouter::GetModuleDimensions(float& width, float& height)
    height = 8 + h;
 }
 
-void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
    if (radio == mRouteSelector)
    {
@@ -141,6 +147,7 @@ void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
 void AudioRouter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadInt("num_items", moduleInfo, 2, 1, 99, K(isTextField));
+   mModuleSaveData.LoadBool("only_show_active_cable", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -168,11 +175,10 @@ void AudioRouter::SetUpFromSaveData()
       }
       mDestinationCables.resize(numItems);
    }
+   mOnlyShowActiveCable = mModuleSaveData.GetBool("only_show_active_cable");
 }
 
 void AudioRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["num_items"] = (int)mDestinationCables.size();
 }

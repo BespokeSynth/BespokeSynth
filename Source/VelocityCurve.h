@@ -36,6 +36,9 @@ class VelocityCurve : public NoteEffectBase, public IDrawableModule
 public:
    VelocityCurve();
    static IDrawableModule* Create() { return new VelocityCurve(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -51,7 +54,8 @@ public:
    virtual void SetUpFromSaveData() override;
 
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
@@ -63,9 +67,9 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
-   EnvelopeControl mEnvelopeControl;
+   EnvelopeControl mEnvelopeControl{ ofVec2f{ 3, 3 }, ofVec2f{ 100, 100 } };
    ::ADSR mAdsr;
    float mLastInputVelocity{ 0 };
    double mLastInputTime{ -9999 };

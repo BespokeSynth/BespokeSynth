@@ -51,11 +51,11 @@ public:
       mX += moveX;
       mY += moveY;
    }
-   virtual bool TestClick(int x, int y, bool right, bool testOnly = false);
+   virtual bool TestClick(float x, float y, bool right, bool testOnly = false);
    IClickable* GetParent() const { return mParent; }
    void SetParent(IClickable* parent) { mParent = parent; }
    bool NotifyMouseMoved(float x, float y);
-   bool NotifyMouseScrolled(int x, int y, float scrollX, float scrollY);
+   bool NotifyMouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll);
    virtual void MouseReleased() {}
    virtual void GetDimensions(float& width, float& height)
    {
@@ -71,7 +71,7 @@ public:
    }
    const char* Name() const { return mName; }
    char* NameMutable() { return mName; }
-   std::string Path(bool ignoreContext = false);
+   std::string Path(bool ignoreContext = false, bool useDisplayName = false);
    virtual bool CheckNeedsDraw();
    virtual void SetShowing(bool showing) { mShowing = showing; }
    bool IsShowing() const { return mShowing; }
@@ -80,6 +80,15 @@ public:
    void DrawBeacon(int x, int y);
    IClickable* GetRootParent();
    IDrawableModule* GetModuleParent();
+   void SetOverrideDisplayName(std::string name)
+   {
+      mHasOverrideDisplayName = true;
+      mOverrideDisplayName = name;
+   }
+   std::string GetDisplayName()
+   {
+      return mHasOverrideDisplayName ? mOverrideDisplayName : mName;
+   }
 
    static void SetLoadContext(IClickable* context) { sPathLoadContext = context->Path() + "~"; }
    static void ClearLoadContext() { sPathLoadContext = ""; }
@@ -90,18 +99,20 @@ public:
    static std::string sPathSaveContext;
 
 protected:
-   virtual void OnClicked(int x, int y, bool right) {}
+   virtual void OnClicked(float x, float y, bool right) {}
    virtual bool MouseMoved(float x, float y) { return false; }
-   virtual bool MouseScrolled(int x, int y, float scrollX, float scrollY) { return false; }
+   virtual bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) { return false; }
 
-   float mX;
-   float mY;
-   IClickable* mParent;
-   bool mShowing;
+   float mX{ 0 };
+   float mY{ 0 };
+   IClickable* mParent{ nullptr };
+   bool mShowing{ true };
 
 private:
-   char mName[MAX_TEXTENTRY_LENGTH];
-   double mBeaconTime;
+   char mName[MAX_TEXTENTRY_LENGTH]{};
+   double mBeaconTime{ -999 };
+   bool mHasOverrideDisplayName{ false };
+   std::string mOverrideDisplayName{ "" };
 };
 
 #endif /* defined(__modularSynth__IClickable__) */

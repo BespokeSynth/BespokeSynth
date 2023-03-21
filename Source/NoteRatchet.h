@@ -37,7 +37,9 @@ class NoteRatchet : public NoteEffectBase, public IDrawableModule, public IDropd
 public:
    NoteRatchet();
    static IDrawableModule* Create() { return new NoteRatchet(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -46,8 +48,8 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -68,4 +70,6 @@ private:
    DropdownList* mRatchetDurationSelector{ nullptr };
    NoteInterval mRatchetSubdivision{ NoteInterval::kInterval_32n };
    DropdownList* mRatchetSubdivisionSelector{ nullptr };
+   bool mSkipFirst{ false };
+   Checkbox* mSkipFirstCheckbox{ nullptr };
 };

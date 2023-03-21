@@ -48,19 +48,20 @@ public:
 private:
    bool IsSingleton() const override { return true; };
    bool HasTitleBar() const override { return false; };
+   bool IsSaveable() override { return false; }
    void ComputeBoundingBox(ofRectangle& rect);
    ofRectangle CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& source);
    void DrawModulesOnMinimap(ofRectangle& boundingBox);
    void RectUnion(ofRectangle& target, ofRectangle& unionRect);
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    ofVec2f CoordsToViewport(ofRectangle& boundingBox, float x, float y);
    void ForcePosition();
 
-   bool mClick;
-   UIGrid* mGrid;
-   GridCell mHoveredBookmarkPos;
+   bool mClick{ false };
+   UIGrid* mGrid{ nullptr };
+   GridCell mHoveredBookmarkPos{ -1, -1 };
 };
 
 #endif /* defined(__Bespoke__Minimap__) */

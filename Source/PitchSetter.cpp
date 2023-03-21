@@ -29,10 +29,7 @@
 #include "ModularSynth.h"
 
 PitchSetter::PitchSetter()
-: mPitch(36)
-, mPitchSlider(nullptr)
 {
-   SetEnabled(true);
 }
 
 void PitchSetter::CreateUIControls()
@@ -50,16 +47,16 @@ void PitchSetter::DrawModule()
    mPitchSlider->Draw();
 }
 
-void PitchSetter::CheckboxUpdated(Checkbox* checkbox)
+void PitchSetter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mPitchSlider)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

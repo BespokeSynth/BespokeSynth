@@ -38,7 +38,9 @@ public:
    NoteToFreq();
    virtual ~NoteToFreq();
    static IDrawableModule* Create() { return new NoteToFreq(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -70,8 +72,8 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mPitch;
-   ModulationChain* mPitchBend;
+   float mPitch{ 0 };
+   ModulationChain* mPitchBend{ nullptr };
 };
 
 #endif /* defined(__Bespoke__NoteToFreq__) */

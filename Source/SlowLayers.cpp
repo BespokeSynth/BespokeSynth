@@ -32,15 +32,6 @@
 
 SlowLayers::SlowLayers()
 : IAudioProcessor(gBufferSize)
-, mBuffer(nullptr)
-, mLoopPos(0)
-, mNumBars(1)
-, mVol(1)
-, mSmoothedVol(1)
-, mVolSlider(nullptr)
-, mNumBarsSelector(nullptr)
-, mFeedInSlider(nullptr)
-, mFeedIn(1)
 {
    //TODO(Ryan) buffer sizes
    mBuffer = new float[MAX_BUFFER_SIZE];
@@ -164,25 +155,25 @@ void SlowLayers::GetModuleDimensions(float& width, float& height)
    height = 155;
 }
 
-void SlowLayers::ButtonClicked(ClickButton* button)
+void SlowLayers::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
       ::Clear(mBuffer, MAX_BUFFER_SIZE);
 }
 
-void SlowLayers::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SlowLayers::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SlowLayers::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void SlowLayers::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 
-void SlowLayers::DropdownUpdated(DropdownList* list, int oldVal)
+void SlowLayers::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void SlowLayers::CheckboxUpdated(Checkbox* checkbox)
+void SlowLayers::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

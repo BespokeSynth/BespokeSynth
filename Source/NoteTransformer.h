@@ -38,15 +38,17 @@ public:
    NoteTransformer();
    ~NoteTransformer();
    static IDrawableModule* Create() { return new NoteTransformer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -62,9 +64,9 @@ private:
    bool Enabled() const override { return mEnabled; }
 
 
-   int mToneMod[7];
+   int mToneMod[7]{};
    IntSlider* mToneModSlider[7];
-   double mLastTimeTonePlayed[7];
+   double mLastTimeTonePlayed[7]{};
    int mLastNoteOnForPitch[127];
 };
 

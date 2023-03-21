@@ -39,14 +39,14 @@ public:
    void SetThreshold(float thresh) { mThreshold = thresh; }
    void Draw(int x, int y);
 
-   float mSharpness;
+   float mSharpness{ 0 };
 
 private:
-   float mThreshold;
-   bool mTriggered;
-   bool mWaitingForFall;
+   float mThreshold{ .2 };
+   bool mTriggered{ false };
+   bool mWaitingForFall{ false };
    RollingBuffer mHistory;
-   float mAvg;
+   float mAvg{ 0 };
 };
 
 #endif /* defined(__modularSynth__TriggerDetector__) */

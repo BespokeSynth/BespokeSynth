@@ -75,7 +75,7 @@ void PulseTrain::CreateUIControls()
    for (int i = 0; i < kIndividualStepCables; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
+      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]);
    }
 }
@@ -114,7 +114,7 @@ void PulseTrain::DrawModule()
    }
 }
 
-void PulseTrain::CheckboxUpdated(Checkbox* checkbox)
+void PulseTrain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -176,7 +176,7 @@ void PulseTrain::GetModuleDimensions(float& width, float& height)
    height = 52;
 }
 
-void PulseTrain::OnClicked(int x, int y, bool right)
+void PulseTrain::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -196,13 +196,13 @@ bool PulseTrain::MouseMoved(float x, float y)
    return false;
 }
 
-bool PulseTrain::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool PulseTrain::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
+   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
 }
 
-void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal)
+void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -212,11 +212,11 @@ void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void PulseTrain::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PulseTrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -234,27 +234,22 @@ void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, float value, float 
    }
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void PulseTrain::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mVelocityGrid->SaveState(out);
 }
 
-void PulseTrain::LoadState(FileStreamIn& in)
+void PulseTrain::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mVelocityGrid->LoadState(in);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);
@@ -262,7 +257,6 @@ void PulseTrain::LoadState(FileStreamIn& in)
 
 void PulseTrain::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PulseTrain::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -43,7 +43,9 @@ public:
    VocoderCarrierInput();
    virtual ~VocoderCarrierInput();
    static IDrawableModule* Create() { return new VocoderCarrierInput(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -66,8 +68,8 @@ private:
    }
    bool Enabled() const override { return true; }
 
-   VocoderBase* mVocoder;
-   IAudioReceiver* mVocoderTarget;
+   VocoderBase* mVocoder{ nullptr };
+   IAudioReceiver* mVocoderTarget{ nullptr };
 };
 
 

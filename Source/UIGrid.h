@@ -30,7 +30,8 @@
 #include "IUIControl.h"
 #include "SynthGlobals.h"
 
-#define MAX_GRID_SIZE 128
+#define MAX_GRID_COLS 1024
+#define MAX_GRID_ROWS 128
 
 class UIGrid;
 
@@ -62,7 +63,7 @@ public:
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    float& GetVal(int col, int row);
    void SetVal(int col, int row, float val, bool notifyListener = true);
    float GetValRefactor(int row, int col);
@@ -89,8 +90,11 @@ public:
    void SetRequireShiftForMultislider(bool set) { mRequireShiftForMultislider = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
    void SetMomentary(bool momentary) { mMomentary = momentary; }
-   const std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& GetData() const { return mData; }
-   void SetData(std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& data) { mData = data; }
+   const std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS>& GetData() const { return mData; }
+   void SetData(std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS>& data) { mData = data; }
+   void SetClickValueSubdivisions(int subdivisions) { mClickSubdivisions = subdivisions; }
+   float GetSubdividedValue(float position) const;
+   bool GetNoHover() const override { return true; }
 
    enum GridMode
    {
@@ -105,8 +109,8 @@ public:
    ofVec2f GetCellPosition(int col, int row);
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
 
@@ -117,52 +121,50 @@ protected:
    ~UIGrid(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   int GetDataIndex(int col, int row) { return col + row * MAX_GRID_SIZE; }
+   int GetDataIndex(int col, int row) { return col + row * MAX_GRID_COLS; }
    float GetX(int col, int row) const;
    float GetY(int row) const;
    bool CanAdjustMultislider() const;
 
    struct HighlightColBuffer
    {
-      HighlightColBuffer()
-      : time(0)
-      , col(-1)
-      {}
-      double time;
-      int col;
+      double time{ 0 };
+      int col{ -1 };
    };
 
-   float mWidth;
-   float mHeight;
-   int mRows;
-   int mCols;
-   bool mClick;
+   float mWidth{ 200 };
+   float mHeight{ 200 };
+   int mRows{ 0 };
+   int mCols{ 0 };
+   bool mClick{ false };
    float mHoldVal;
-   int mHoldCol;
-   int mHoldRow;
-   bool mLastClickWasClear;
-   std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE> mData;
-   std::array<HighlightColBuffer, 10> mHighlightColBuffer;
-   int mNextHighlightColPointer;
-   int mMajorCol;
-   bool mSingleColumn;
-   bool mFlip;
-   float mStrength;
-   int mCurrentHover;
-   UIGridListener* mListener;
-   std::array<float, MAX_GRID_SIZE> mDrawOffset;
-   GridMode mGridMode;
-   bool mRestrictDragToRow;
-   bool mRequireShiftForMultislider;
-   bool mShouldDrawValue;
-   bool mMomentary;
+   int mHoldCol{ 0 };
+   int mHoldRow{ 0 };
+   bool mLastClickWasClear{ false };
+   std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
+   std::array<HighlightColBuffer, 10> mHighlightColBuffer{};
+   int mNextHighlightColPointer{ 0 };
+   int mMajorCol{ -1 };
+   bool mSingleColumn{ false };
+   bool mFlip{ false };
+   float mStrength{ 1 };
+   int mCurrentHover{ -1 };
+   float mCurrentHoverAmount{ 1 };
+   UIGridListener* mListener{ nullptr };
+   std::array<float, MAX_GRID_ROWS> mDrawOffset{};
+   GridMode mGridMode{ GridMode::kNormal };
+   bool mRestrictDragToRow{ false };
+   bool mRequireShiftForMultislider{ false };
+   bool mShouldDrawValue{ false };
+   bool mMomentary{ false };
+   int mClickSubdivisions{ 1 };
 };
 
 #endif /* defined(__modularSynth__Grid__) */

@@ -50,16 +50,16 @@ void Neighborhooder::DrawModule()
    DrawTextNormal(NoteName(mMinPitch) + ofToString(mMinPitch / 12 - 2), 91, 15);
 }
 
-void Neighborhooder::CheckboxUpdated(Checkbox* checkbox)
+void Neighborhooder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void Neighborhooder::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Neighborhooder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mMinSlider || slider == mRangeSlider)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

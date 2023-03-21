@@ -46,6 +46,9 @@ public:
    ScriptModule();
    virtual ~ScriptModule();
    static IDrawableModule* Create() { return new ScriptModule(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    static void UninitializePython();
    static void InitializePythonIfNecessary();
@@ -72,14 +75,15 @@ public:
    void OnModuleReferenceBound(IDrawableModule* target);
    void SetContext();
    void ClearContext();
+   bool IsScriptTrusted() const { return !mIsScriptUntrusted; }
 
    void RunCode(double time, std::string code);
 
    void OnPulse(double time, float velocity, int flags) override;
-   void ButtonClicked(ClickButton* button) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldValue) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldValue, double time) override {}
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldValue) override;
+   void DropdownUpdated(DropdownList* list, int oldValue, double time) override;
 
    //ICodeEntryListener
    void ExecuteCode() override;
@@ -95,7 +99,8 @@ public:
    bool HasDebugDraw() const override { return true; }
 
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 2; }
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -112,6 +117,8 @@ public:
    static ofColor sBackgroundTextColor;
    static bool sPythonInitialized;
    static bool sHasPythonEverSuccessfullyInitialized;
+   static bool sHasLoadedUntrustedScript;
+   static double sMostRecentRunTime;
 
    ModulationChain* GetPitchBend(int pitch) { return &mPitchBends[pitch]; }
    ModulationChain* GetModWheel(int pitch) { return &mModWheels[pitch]; }
@@ -121,7 +128,7 @@ public:
 
 private:
    void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
-   void AdjustUIControl(IUIControl* control, float value, int lineNum);
+   void AdjustUIControl(IUIControl* control, float value, double time, int lineNum);
    std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
    void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
@@ -136,6 +143,8 @@ private:
    void RefreshScriptFiles();
    void RefreshStyleFiles();
    void Reset();
+   juce::String GetScriptChecksum() const;
+   void RecordScriptAsTrusted();
 
    //IDrawableModule
    void DrawModule() override;
@@ -144,8 +153,11 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
+
+   //IPatchable
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    ClickButton* mPythonInstalledConfirmButton{ nullptr };
    DropdownList* mLoadScriptSelector{ nullptr };
@@ -159,10 +171,13 @@ private:
    FloatSlider* mBSlider{ nullptr };
    FloatSlider* mCSlider{ nullptr };
    FloatSlider* mDSlider{ nullptr };
+   ClickButton* mTrustScriptButton{ nullptr };
+   ClickButton* mDontTrustScriptButton{ nullptr };
    int mLoadScriptIndex{ 0 };
    std::string mLoadedScriptPath;
    juce::Time mLoadedScriptFiletime;
    bool mHotloadScripts{ false };
+   bool mDrawBoundModuleConnections{ true };
    static ofxJSONElement sStyleJSON;
    float mA{ 0 };
    float mB{ 0 };
@@ -172,13 +187,13 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
    std::array<double, 20> mScheduledPulseTimes{};
-   static double sMostRecentRunTime;
    std::string mLastError;
    size_t mScriptModuleIndex;
    std::string mLastRunLiteralCode;
    int mNextLineToExecute{ -1 };
    int mInitExecutePriority{ 0 };
    int mOscInputPort{ -1 };
+   bool mIsScriptUntrusted{ false };
 
    struct ScheduledNoteOutput
    {
@@ -292,11 +307,13 @@ public:
    ScriptReferenceDisplay();
    virtual ~ScriptReferenceDisplay();
    static IDrawableModule* Create() { return new ScriptReferenceDisplay(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
 private:
    //IDrawableModule
@@ -309,7 +326,7 @@ private:
       mWidth = w;
       mHeight = h;
    }
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void LoadText();
 
@@ -319,4 +336,34 @@ private:
    float mHeight{ 335 };
    ofVec2f mScrollOffset;
    float mMaxScrollAmount{ 0 };
+};
+
+
+class ScriptWarningPopup : public IDrawableModule
+{
+public:
+   ScriptWarningPopup() {}
+   virtual ~ScriptWarningPopup() {}
+   static IDrawableModule* Create() { return new ScriptWarningPopup(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
+   void CreateUIControls() override;
+   void Poll() override;
+
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+private:
+   void DrawModule() override;
+   bool Enabled() const override { return true; }
+
+   int mWidth{ 600 };
+   int mHeight{ 120 };
+
+   int mRemainingUntrustedScriptModules{ 0 };
 };

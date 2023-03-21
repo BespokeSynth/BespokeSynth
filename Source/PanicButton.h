@@ -36,6 +36,9 @@ public:
    PanicButton();
    ~PanicButton();
    static IDrawableModule* Create() { return new PanicButton(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
 private:
    //IDrawableModule
@@ -46,7 +49,7 @@ private:
       width = 300;
       height = 150;
    }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 };
 
 #endif /* defined(__Bespoke__PanicButton__) */

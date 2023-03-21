@@ -40,7 +40,9 @@ public:
    SpectralDisplay();
    virtual ~SpectralDisplay();
    static IDrawableModule* Create() { return new SpectralDisplay(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -55,7 +57,7 @@ public:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
 private:
    //IDrawableModule
@@ -67,11 +69,11 @@ private:
    }
    bool Enabled() const override { return mEnabled; }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 400 };
+   float mHeight{ 100 };
 
-   float* mWindower;
-   float* mSmoother;
+   float* mWindower{ nullptr };
+   float* mSmoother{ nullptr };
 
    ::FFT mFFT;
    FFTData mFFTData;

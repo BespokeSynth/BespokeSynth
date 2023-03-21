@@ -147,7 +147,7 @@ void MidiOutputModule::OnTransportAdvanced(float amount)
    }
 }
 
-void MidiOutputModule::DropdownUpdated(DropdownList* list, int oldVal)
+void MidiOutputModule::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    mDevice.ConnectOutput(mControllerIndex);
 }

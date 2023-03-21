@@ -54,7 +54,9 @@ public:
    Looper();
    ~Looper();
    static IDrawableModule* Create() { return new Looper(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -107,27 +109,28 @@ public:
    bool CheckNeedsDraw() override { return true; }
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    //IRadioButtonListener
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IDropdownListener
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    void DoShiftMeasure();
    void DoHalfShift();
    void DoShiftDownbeat();
    void DoShiftOffset();
-   void DoCommit();
+   void DoCommit(double time);
    void UpdateNumBars(int oldNumBars);
    void BakeVolume();
    void DoUndo();
@@ -143,104 +146,101 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    static const int BUFFER_X = 3;
    static const int BUFFER_Y = 3;
    static const int BUFFER_W = 170;
    static const int BUFFER_H = 93;
 
-   ChannelBuffer* mBuffer;
+   ChannelBuffer* mBuffer{ nullptr };
    ChannelBuffer mWorkBuffer;
-   int mLoopLength;
-   float mLoopPos;
-   RollingBuffer* mRecordBuffer;
-   int mNumBars;
-   ClickButton* mClearButton;
-   DropdownList* mNumBarsSelector;
-   float mVol;
-   float mSmoothedVol;
-   FloatSlider* mVolSlider;
-   float mSpeed;
-   LooperRecorder* mRecorder;
-   ClickButton* mMergeButton;
-   ClickButton* mSwapButton;
-   ClickButton* mCopyButton;
-   RollingBuffer* mCommitBuffer; //if this is set, a commit happens next audio frame
-   ClickButton* mVolumeBakeButton;
-   bool mWantBakeVolume;
-   int mLastCommit;
-   ClickButton* mSaveButton;
-   bool mWantShiftMeasure;
-   bool mWantHalfShift;
-   bool mWantShiftDownbeat;
-   bool mWantShiftOffset;
-   bool mMute;
-   Checkbox* mMuteCheckbox;
-   ClickButton* mCommitButton;
-   ClickButton* mDoubleSpeedButton;
-   ClickButton* mHalveSpeedButton;
-   ChannelBuffer* mUndoBuffer;
-   ClickButton* mUndoButton;
-   bool mWantUndo;
-   bool mReplaceOnCommit;
-   float mLoopPosOffset;
-   FloatSlider* mLoopPosOffsetSlider;
-   bool mAllowChop;
-   Checkbox* mAllowChopCheckbox;
-   int mChopMeasure;
-   ClickButton* mWriteOffsetButton;
-   float mScratchSpeed;
-   bool mAllowScratch;
-   FloatSlider* mScratchSpeedSlider;
-   Checkbox* mAllowScratchCheckbox;
-   double mLastCommitTime;
-   float mFourTet;
-   FloatSlider* mFourTetSlider;
-   int mFourTetSlices;
-   DropdownList* mFourTetSlicesDropdown;
+   int mLoopLength{ -1 };
+   float mLoopPos{ 0 };
+   RollingBuffer* mRecordBuffer{ nullptr };
+   int mNumBars{ 1 };
+   ClickButton* mClearButton{ nullptr };
+   DropdownList* mNumBarsSelector{ nullptr };
+   float mVol{ 1 };
+   float mSmoothedVol{ 1 };
+   FloatSlider* mVolSlider{ nullptr };
+   float mSpeed{ 1 };
+   LooperRecorder* mRecorder{ nullptr };
+   ClickButton* mMergeButton{ nullptr };
+   ClickButton* mSwapButton{ nullptr };
+   ClickButton* mCopyButton{ nullptr };
+   RollingBuffer* mCommitBuffer{ nullptr }; //if this is set, a commit happens next audio frame
+   ClickButton* mVolumeBakeButton{ nullptr };
+   bool mWantBakeVolume{ false };
+   int mLastCommit{ 0 };
+   ClickButton* mSaveButton{ nullptr };
+   bool mWantShiftMeasure{ false };
+   bool mWantHalfShift{ false };
+   bool mWantShiftDownbeat{ false };
+   bool mWantShiftOffset{ false };
+   bool mMute{ false };
+   Checkbox* mMuteCheckbox{ nullptr };
+   ClickButton* mCommitButton{ nullptr };
+   ClickButton* mDoubleSpeedButton{ nullptr };
+   ClickButton* mHalveSpeedButton{ nullptr };
+   ChannelBuffer* mUndoBuffer{ nullptr };
+   ClickButton* mUndoButton{ nullptr };
+   bool mWantUndo{ false };
+   bool mReplaceOnCommit{ false };
+   float mLoopPosOffset{ 0 };
+   FloatSlider* mLoopPosOffsetSlider{ nullptr };
+   ClickButton* mWriteOffsetButton{ nullptr };
+   float mScratchSpeed{ 1 };
+   bool mAllowScratch{ false };
+   FloatSlider* mScratchSpeedSlider{ nullptr };
+   Checkbox* mAllowScratchCheckbox{ nullptr };
+   double mLastCommitTime{ 0 };
+   float mFourTet{ 0 };
+   FloatSlider* mFourTetSlider{ nullptr };
+   int mFourTetSlices{ 4 };
+   DropdownList* mFourTetSlicesDropdown{ nullptr };
    ofMutex mBufferMutex;
    Ramp mMuteRamp;
    JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels];
-   bool mClearCommitBuffer;
-   Rewriter* mRewriter;
-   bool mWantRewrite;
-   int mLoopCount;
-   ChannelBuffer* mQueuedNewBuffer;
-   float mDecay;
-   FloatSlider* mDecaySlider;
-   bool mWriteInput;
-   Checkbox* mWriteInputCheckbox;
-   ClickButton* mQueueCaptureButton;
-   bool mCaptureQueued;
+   bool mClearCommitBuffer{ false };
+   Rewriter* mRewriter{ nullptr };
+   bool mWantRewrite{ false };
+   int mLoopCount{ 0 };
+   ChannelBuffer* mQueuedNewBuffer{ nullptr };
+   float mDecay{ 0 };
+   FloatSlider* mDecaySlider{ nullptr };
+   bool mWriteInput{ false };
+   Checkbox* mWriteInputCheckbox{ nullptr };
+   ClickButton* mQueueCaptureButton{ nullptr };
+   bool mCaptureQueued{ false };
    Ramp mWriteInputRamp;
    float mLastInputSample[ChannelBuffer::kMaxNumChannels];
-   float mBufferTempo;
-   ClickButton* mResampleButton;
+   float mBufferTempo{ -1 };
+   ClickButton* mResampleButton{ nullptr };
 
    //beatwheel
-   bool mBeatwheel;
+   bool mBeatwheel{ false };
    static float mBeatwheelPosRight;
    static float mBeatwheelDepthRight;
    static float mBeatwheelPosLeft;
    static float mBeatwheelDepthLeft;
-   Checkbox* mBeatwheelCheckbox;
-   FloatSlider* mBeatwheelPosRightSlider;
-   FloatSlider* mBeatwheelDepthRightSlider;
-   FloatSlider* mBeatwheelPosLeftSlider;
-   FloatSlider* mBeatwheelDepthLeftSlider;
-   bool mBeatwheelControlFlip;
+   Checkbox* mBeatwheelCheckbox{ nullptr };
+   FloatSlider* mBeatwheelPosRightSlider{ nullptr };
+   FloatSlider* mBeatwheelDepthRightSlider{ nullptr };
+   FloatSlider* mBeatwheelPosLeftSlider{ nullptr };
+   FloatSlider* mBeatwheelDepthLeftSlider{ nullptr };
+   bool mBeatwheelControlFlip{ false };
    static bool mBeatwheelSingleMeasure;
-   Checkbox* mBeatwheelSingleMeasureCheckbox;
+   Checkbox* mBeatwheelSingleMeasureCheckbox{ nullptr };
 
    //pitch shifter
    PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
-   float mPitchShift;
-   FloatSlider* mPitchShiftSlider;
-   bool mKeepPitch;
-   Checkbox* mKeepPitchCheckbox;
+   float mPitchShift{ 1 };
+   FloatSlider* mPitchShiftSlider{ nullptr };
+   bool mKeepPitch{ false };
+   Checkbox* mKeepPitchCheckbox{ nullptr };
 
-   LooperGranulator* mGranulator;
+   LooperGranulator* mGranulator{ nullptr };
 
    SwitchAndRamp mSwitchAndRamp;
 };

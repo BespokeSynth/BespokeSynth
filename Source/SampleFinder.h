@@ -46,7 +46,9 @@ public:
    SampleFinder();
    ~SampleFinder();
    static IDrawableModule* Create() { return new SampleFinder(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -61,14 +63,14 @@ public:
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
 
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -84,36 +86,36 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   Sample* mSample;
+   Sample* mSample{ nullptr };
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   float* mWriteBuffer;
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mLoop;
-   Checkbox* mLoopCheckbox;
-   int mMeasureEarly;
-   bool mEditMode;
-   Checkbox* mEditCheckbox;
-   int mClipStart;
-   IntSlider* mClipStartSlider;
-   int mClipEnd;
-   IntSlider* mClipEndSlider;
-   float mZoomStart;
-   float mZoomEnd;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
-   ClickButton* mWriteButton;
-   double mPlayhead;
-   bool mWantWrite;
-   ClickButton* mDoubleLengthButton;
-   ClickButton* mHalveLengthButton;
+   float mVolume{ .6 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   float* mWriteBuffer{ nullptr };
+   bool mPlay{ false };
+   Checkbox* mPlayCheckbox{ nullptr };
+   bool mLoop{ true };
+   Checkbox* mLoopCheckbox{ nullptr };
+   int mMeasureEarly{ 0 };
+   bool mEditMode{ true };
+   Checkbox* mEditCheckbox{ nullptr };
+   int mClipStart{ 0 };
+   IntSlider* mClipStartSlider{ nullptr };
+   int mClipEnd{ 1 };
+   IntSlider* mClipEndSlider{ nullptr };
+   float mZoomStart{ 0 };
+   float mZoomEnd{ 1 };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   int mNumBars{ 1 };
+   IntSlider* mNumBarsSlider{ nullptr };
+   ClickButton* mWriteButton{ nullptr };
+   double mPlayhead{ 0 };
+   bool mWantWrite{ false };
+   ClickButton* mDoubleLengthButton{ nullptr };
+   ClickButton* mHalveLengthButton{ nullptr };
    SampleDrawer mSampleDrawer;
-   bool mReverse;
-   Checkbox* mReverseCheckbox;
+   bool mReverse{ false };
+   Checkbox* mReverseCheckbox{ nullptr };
 };
 
 #endif /* defined(__modularSynth__SampleFinder__) */

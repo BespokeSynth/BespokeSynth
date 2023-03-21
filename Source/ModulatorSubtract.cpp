@@ -31,10 +31,6 @@
 #include "PatchCableSource.h"
 
 ModulatorSubtract::ModulatorSubtract()
-: mValue1(0)
-, mValue2(0)
-, mValue1Slider(nullptr)
-, mValue2Slider(nullptr)
 {
 }
 
@@ -67,43 +63,33 @@ void ModulatorSubtract::PostRepatch(PatchCableSource* cableSource, bool fromUser
 {
    OnModulatorRepatch();
 
-   if (mTarget)
+   if (GetSliderTarget() && fromUserClick)
    {
-      //mValue1 = mTarget->GetValue();
-      //mValue2 = 0;
-      mValue1Slider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mValue1Slider->SetMode(mTarget->GetMode());
+      mValue1 = GetSliderTarget()->GetValue();
+      mValue2 = 0;
+      mValue1Slider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
+      mValue1Slider->SetMode(GetSliderTarget()->GetMode());
    }
 }
 
 float ModulatorSubtract::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   if (mTarget)
-      return ofClamp(mValue1 - mValue2, mTarget->GetMin(), mTarget->GetMax());
+   if (GetSliderTarget())
+      return ofClamp(mValue1 - mValue2, GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
    else
       return mValue1 - mValue2;
 }
 
 void ModulatorSubtract::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ModulatorSubtract::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void ModulatorSubtract::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

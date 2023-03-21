@@ -32,7 +32,7 @@
 
 EnvelopeModulator::EnvelopeModulator()
 {
-   mAdsr.Set(10, 100, .5f, 100);
+   mAdsr.GetFreeReleaseLevel() = true;
 }
 
 void EnvelopeModulator::CreateUIControls()
@@ -106,7 +106,7 @@ void EnvelopeModulator::Resize(float w, float h)
    mHeight = MAX(h, 102);
 }
 
-void EnvelopeModulator::OnClicked(int x, int y, bool right)
+void EnvelopeModulator::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -126,8 +126,8 @@ bool EnvelopeModulator::MouseMoved(float x, float y)
 float EnvelopeModulator::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
-   if (mTarget)
-      return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), mTarget->GetMin(), mTarget->GetMax());
+   if (GetSliderTarget())
+      return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
    return 0;
 }
 
@@ -136,62 +136,47 @@ void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource, bool fromUser
    OnModulatorRepatch();
 }
 
-void EnvelopeModulator::CheckboxUpdated(Checkbox* checkbox)
+void EnvelopeModulator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EnvelopeModulator::ButtonClicked(ClickButton* button)
+void EnvelopeModulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
 void EnvelopeModulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void EnvelopeModulator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void EnvelopeModulator::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
-}
-
-namespace
-{
-   const int kSaveStateRev = 0;
 }
 
 void EnvelopeModulator::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mAdsr.SaveState(out);
 }
 
-void EnvelopeModulator::LoadState(FileStreamIn& in)
+void EnvelopeModulator::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mAdsr.LoadState(in);
 }

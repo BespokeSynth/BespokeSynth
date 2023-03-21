@@ -38,7 +38,9 @@ public:
    PulseHocket();
    virtual ~PulseHocket();
    static IDrawableModule* Create() { return new PulseHocket(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 
@@ -47,9 +49,9 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -74,9 +76,11 @@ private:
    std::vector<PatchCableSource*> mDestinationCables;
    float mWidth{ 200 };
    float mHeight{ 20 };
-   bool mDeterministic{ true };
+   bool mDeterministic{ false };
    int mSeed{ 0 };
    int mRandomIndex{ 0 };
    TextEntry* mSeedEntry{ nullptr };
    ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

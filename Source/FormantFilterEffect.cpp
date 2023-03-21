@@ -30,16 +30,7 @@
 #include "UIControlMacros.h"
 
 FormantFilterEffect::FormantFilterEffect()
-: mEE(1)
-, mOO(0)
-, mI(0)
-, mE(0)
-, mU(0)
-, mA(0)
-, mRescaling(false)
 {
-   SetEnabled(true);
-
    mOutputBuffer = new float[gBufferSize];
 
    for (int i = 0; i < NUM_FORMANT_BANDS; ++i)
@@ -158,15 +149,15 @@ void FormantFilterEffect::UpdateFilters()
       mBiquads[i].SetFilterParams(formant[i], formant[i] / (bandwidth / 2));
 }
 
-void FormantFilterEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void FormantFilterEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void FormantFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal)
+void FormantFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
 }
 
-void FormantFilterEffect::CheckboxUpdated(Checkbox* checkbox)
+void FormantFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -174,7 +165,7 @@ void FormantFilterEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void FormantFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FormantFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (!mRescaling)
    {
@@ -183,7 +174,7 @@ void FormantFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       {
          if (mSliders[i] != slider)
          {
-            mSliders[i]->SetValue(mSliders[i]->GetValue() * (1 - (slider->GetValue() - oldVal)));
+            mSliders[i]->SetValue(mSliders[i]->GetValue() * (1 - (slider->GetValue() - oldVal)), time);
          }
       }
       UpdateFilters();

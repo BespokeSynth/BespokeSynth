@@ -61,10 +61,10 @@ void GainStageEffect::DrawModule()
    mGainSlider->Draw();
 }
 
-void GainStageEffect::CheckboxUpdated(Checkbox* checkbox)
+void GainStageEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void GainStageEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void GainStageEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }

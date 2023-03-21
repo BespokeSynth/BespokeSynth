@@ -46,7 +46,9 @@ public:
    LoopStorer();
    ~LoopStorer();
    static IDrawableModule* Create() { return new LoopStorer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -62,18 +64,19 @@ public:
 
    void OnTimeEvent(double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
 
 private:
    //IDrawableModule
@@ -92,30 +95,30 @@ private:
       void Init(LoopStorer* storer, int index);
       void Draw();
 
-      ChannelBuffer* mBuffer;
-      int mNumBars;
-      Checkbox* mSelectCheckbox;
-      LoopStorer* mLoopStorer;
-      int mIndex;
-      int mBufferLength;
-      bool mIsCurrentBuffer;
+      ChannelBuffer* mBuffer{ nullptr };
+      int mNumBars{ 1 };
+      Checkbox* mSelectCheckbox{ nullptr };
+      LoopStorer* mLoopStorer{ nullptr };
+      int mIndex{ 0 };
+      int mBufferLength{ -1 };
+      bool mIsCurrentBuffer{ false };
    };
 
-   Looper* mLooper;
-   Checkbox* mRewriteToSelectionCheckbox;
-   bool mRewriteToSelection;
-   DropdownList* mQuantizationDropdown;
-   NoteInterval mQuantization;
-   int mQueuedSwapBufferIdx;
+   Looper* mLooper{ nullptr };
+   Checkbox* mRewriteToSelectionCheckbox{ nullptr };
+   bool mRewriteToSelection{ false };
+   DropdownList* mQuantizationDropdown{ nullptr };
+   NoteInterval mQuantization{ NoteInterval::kInterval_None };
+   int mQueuedSwapBufferIdx{ -1 };
    ofMutex mSwapMutex;
-   bool mIsSwapping;
-   ClickButton* mClearButton;
+   bool mIsSwapping{ false };
+   ClickButton* mClearButton{ nullptr };
    ofMutex mLoadMutex;
 
    std::vector<SampleData*> mSamples;
-   int mCurrentBufferIdx;
+   int mCurrentBufferIdx{ 0 };
 
-   PatchCableSource* mLooperCable;
+   PatchCableSource* mLooperCable{ nullptr };
 };
 
 #endif /* defined(__Bespoke__LoopStorer__) */

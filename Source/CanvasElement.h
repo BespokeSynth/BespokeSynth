@@ -61,10 +61,10 @@ public:
    virtual bool IsResizable() const { return true; }
    virtual CanvasElement* CreateDuplicate() const = 0;
 
-   virtual void CheckboxUpdated(std::string label, bool value);
-   virtual void FloatSliderUpdated(std::string label, float oldVal, float newVal);
-   virtual void IntSliderUpdated(std::string label, int oldVal, float newVal);
-   virtual void ButtonClicked(std::string label);
+   virtual void CheckboxUpdated(std::string label, bool value, double time);
+   virtual void FloatSliderUpdated(std::string label, float oldVal, float newVal, double time);
+   virtual void IntSliderUpdated(std::string label, int oldVal, float newVal, double time);
+   virtual void ButtonClicked(std::string label, double time);
 
    virtual void SaveState(FileStreamOut& out);
    virtual void LoadState(FileStreamIn& in);
@@ -83,8 +83,8 @@ protected:
    float GetStart(int col, float offset) const;
    float GetEnd(int col, float offset, float length) const;
 
-   Canvas* mCanvas;
-   bool mHighlighted;
+   Canvas* mCanvas{ nullptr };
+   bool mHighlighted{ false };
    std::vector<IUIControl*> mUIControls;
 };
 
@@ -142,8 +142,8 @@ public:
 
    CanvasElement* CreateDuplicate() const override;
 
-   void CheckboxUpdated(std::string label, bool value) override;
-   void ButtonClicked(std::string label) override;
+   void CheckboxUpdated(std::string label, bool value, double time) override;
+   void ButtonClicked(std::string label, double time) override;
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
@@ -151,14 +151,14 @@ public:
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
 
-   Sample* mSample;
-   FloatSlider* mElementOffsetSlider;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   bool mMute;
-   Checkbox* mMuteCheckbox;
-   ClickButton* mSplitSampleButton;
-   ClickButton* mResetSpeedButton;
+   Sample* mSample{ nullptr };
+   FloatSlider* mElementOffsetSlider{ nullptr };
+   float mVolume{ 1 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   bool mMute{ false };
+   Checkbox* mMuteCheckbox{ nullptr };
+   ClickButton* mSplitSampleButton{ nullptr };
+   ClickButton* mResetSpeedButton{ nullptr };
 };
 
 class EventCanvasElement : public CanvasElement
@@ -172,8 +172,8 @@ public:
 
    void SetUIControl(IUIControl* control);
    void SetValue(float value) { mValue = value; }
-   void Trigger();
-   void TriggerEnd();
+   void Trigger(double time);
+   void TriggerEnd(double time);
 
    bool IsResizable() const override { return mIsCheckbox; }
    float GetEnd() const override;
@@ -184,12 +184,12 @@ public:
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
 
-   IUIControl* mUIControl;
-   float mValue;
-   TextEntry* mValueEntry;
-   EventCanvas* mEventCanvas;
-   bool mIsCheckbox;
-   bool mIsButton;
+   IUIControl* mUIControl{ nullptr };
+   float mValue{ 0 };
+   TextEntry* mValueEntry{ nullptr };
+   EventCanvas* mEventCanvas{ nullptr };
+   bool mIsCheckbox{ false };
+   bool mIsButton{ false };
 };
 
 #endif /* defined(__Bespoke__CanvasElement__) */

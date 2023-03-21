@@ -265,7 +265,7 @@ void GridModule::Resize(float w, float h)
    mGrid->SetDimensions(mGrid->GetWidth() + w - curW, mGrid->GetHeight() + h - curH);
 }
 
-void GridModule::OnClicked(int x, int y, bool right)
+void GridModule::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -314,7 +314,9 @@ void GridModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    if (cableSource == mGridOutputCable)
    {
       auto* target = dynamic_cast<GridControlTarget*>(cableSource->GetTarget());
-      if (target)
+      if (target == mGridControlTarget) //patched into ourself
+         cableSource->Clear();
+      else if (target)
          target->SetGridController(this);
    }
 }
@@ -331,22 +333,17 @@ void GridModule::SetUpFromSaveData()
    mDirectColorMode = mModuleSaveData.GetBool("direct_color_mode");
 }
 
-void GridModule::CheckboxUpdated(Checkbox* checkbox)
+void GridModule::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mMomentaryCheckbox)
       mGrid->SetMomentary(mMomentary);
 }
 
-namespace
-{
-   const int kSaveStateRev = 4;
-}
-
 void GridModule::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
    out << mGrid->GetWidth();
@@ -364,13 +361,13 @@ void GridModule::SaveState(FileStreamOut& out)
       out << overlay;
 }
 
-void GridModule::LoadState(FileStreamIn& in)
+void GridModule::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    if (rev >= 1)
    {

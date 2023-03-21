@@ -48,6 +48,7 @@
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
 #include "leathers/pop"
+#include "juce_cryptography/juce_cryptography.h"
 
 namespace py = pybind11;
 using namespace juce;
@@ -79,6 +80,8 @@ true;
 #else
 false;
 #endif
+//static
+bool ScriptModule::sHasLoadedUntrustedScript = false;
 
 //static
 ofxJSONElement ScriptModule::sStyleJSON;
@@ -95,8 +98,6 @@ ScriptModule::ScriptModule()
    sScriptModules.push_back(this);
 
    OSCReceiver::addListener(this);
-
-   Transport::sDoEventLookahead = true; //scripts require lookahead to be able to schedule on time
 }
 
 ScriptModule::~ScriptModule()
@@ -129,6 +130,12 @@ void ScriptModule::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
+
+   UIBLOCK0();
+   BUTTON(mTrustScriptButton, "yes, I trust this script, load it");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mDontTrustScriptButton, "no, I don't trust this script, abort load");
+   ENDUIBLOCK0();
 
    mPythonInstalledConfirmButton = new ClickButton(this, "yes, I have Python installed", 20, 100);
 
@@ -189,7 +196,7 @@ void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
    }
 }
 
-void ScriptModule::OnClicked(int x, int y, bool right)
+void ScriptModule::OnClicked(float x, float y, bool right)
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
@@ -227,6 +234,13 @@ void ScriptModule::DrawModule()
       return;
    }
 
+   mTrustScriptButton->SetShowing(mIsScriptUntrusted);
+   mDontTrustScriptButton->SetShowing(mIsScriptUntrusted);
+   mLoadScriptSelector->SetShowing(!mIsScriptUntrusted);
+   mLoadScriptButton->SetShowing(!mIsScriptUntrusted);
+   mSaveScriptButton->SetShowing(!mIsScriptUntrusted);
+   mShowReferenceButton->SetShowing(!mIsScriptUntrusted);
+
    mPythonInstalledConfirmButton->SetShowing(false);
    mCodeEntry->SetShowing(true);
 
@@ -242,6 +256,24 @@ void ScriptModule::DrawModule()
    mCSlider->Draw();
    mDSlider->Draw();
 
+   if (mIsScriptUntrusted)
+   {
+      mTrustScriptButton->Draw();
+      mDontTrustScriptButton->Draw();
+      ofPushStyle();
+      ofFill();
+
+      ofRectangle buttonRect = mTrustScriptButton->GetRect(K(local));
+      ofSetColor(0, 255, 0, 80);
+      ofRect(buttonRect);
+
+      buttonRect = mDontTrustScriptButton->GetRect(K(local));
+      ofSetColor(255, 0, 0, 80);
+      ofRect(buttonRect);
+
+      ofPopStyle();
+   }
+
    if (mLastError != "")
    {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
@@ -252,30 +284,30 @@ void ScriptModule::DrawModule()
    }
 
    mLineExecuteTracker.Draw(mCodeEntry, 0, ofColor::green);
-   mNotePlayTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Note));
-   mMethodCallTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Other));
-   mUIControlTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Modulator));
+   mNotePlayTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleCategory_Note));
+   mMethodCallTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleCategory_Other));
+   mUIControlTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleCategory_Modulator));
 
    for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           //mScheduledNoteOutput[i].velocity > 0 &&
           gTime + 50 < mScheduledNoteOutput[i].time)
-         DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleType_Note), mScheduledNoteOutput[i].velocity > 0);
+         DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleCategory_Note), mScheduledNoteOutput[i].velocity > 0);
    }
 
    for (size_t i = 0; i < mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time != -1 &&
           gTime + 50 < mScheduledMethodCall[i].time)
-         DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleType_Other), true);
+         DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleCategory_Other), true);
    }
 
    for (size_t i = 0; i < mScheduledUIControlValue.size(); ++i)
    {
       if (mScheduledUIControlValue[i].time != -1 &&
           gTime + 50 < mScheduledUIControlValue[i].time)
-         DrawTimer(mScheduledUIControlValue[i].lineNum, mScheduledUIControlValue[i].startTime, mScheduledUIControlValue[i].time, IDrawableModule::GetColor(kModuleType_Modulator), true);
+         DrawTimer(mScheduledUIControlValue[i].lineNum, mScheduledUIControlValue[i].startTime, mScheduledUIControlValue[i].time, IDrawableModule::GetColor(kModuleCategory_Modulator), true);
    }
 
    ofPushStyle();
@@ -305,7 +337,7 @@ void ScriptModule::DrawModule()
       float fadeMs = 500;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 255 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Modulator), 255 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
          ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, K(end));
          DrawTextNormal(ofToString(mUIControlModifications[i].value), linePos.x + 10, linePos.y + 15);
       }
@@ -388,7 +420,7 @@ void ScriptModule::DrawModuleUnclipped()
       float fadeMs = 200;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 100 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Modulator), 100 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
 
          ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, false);
 
@@ -400,7 +432,7 @@ void ScriptModule::DrawModuleUnclipped()
       }
    }
 
-   if (mBoundModuleConnections.size() > 0)
+   if (mDrawBoundModuleConnections && mBoundModuleConnections.size() > 0)
    {
       for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
       {
@@ -414,7 +446,7 @@ void ScriptModule::DrawModuleUnclipped()
 
          ofVec2f linePos = mCodeEntry->GetLinePos(mBoundModuleConnections[i].mLineIndex, false);
 
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other), 30);
          ofFill();
          float codeY = mCodeEntry->GetPosition(true).y;
          float topY = ofClamp(linePos.y + 3, codeY, codeY + mCodeEntry->GetRect().height);
@@ -423,7 +455,7 @@ void ScriptModule::DrawModuleUnclipped()
          ofRect(lineRect, L(corner, 0));
 
          ofSetLineWidth(2);
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other), 30);
          float startX, startY, endX, endY;
          ofRectangle targetRect = mBoundModuleConnections[i].mTarget->GetRect();
          FindClosestSides(lineRect.x, lineRect.y, lineRect.width, lineRect.height, targetRect.x - mX, targetRect.y - mY, targetRect.width, targetRect.height, startX, startY, endX, endY, K(sidesOnly));
@@ -432,6 +464,12 @@ void ScriptModule::DrawModuleUnclipped()
    }
 
    ofPopStyle();
+}
+
+void ScriptModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
+{
+   if (cableSource->GetTarget() != nullptr && cableSource->GetConnectionType() == kConnectionType_Note)
+      Transport::sDoEventLookahead = true; //scripts that output notes require lookahead to be able to schedule on time
 }
 
 bool ScriptModule::MouseMoved(float x, float y)
@@ -481,6 +519,19 @@ void ScriptModule::Poll()
    if (!sPythonInitialized)
       return;
 
+   if (ScriptModule::sHasLoadedUntrustedScript)
+   {
+      if (TheSynth->FindModule("scriptwarning") == nullptr)
+      {
+         ModuleFactory::Spawnable spawnable;
+         spawnable.mLabel = "scriptwarning";
+         TheSynth->SpawnModuleOnTheFly(spawnable, 50, 100, true);
+         TheSynth->SetAudioPaused(true);
+      }
+      mCodeEntry->Publish();
+      return;
+   }
+
    if (sScriptsRequestingInitExecution.size() > 0)
    {
       for (auto s : sScriptsRequestingInitExecution)
@@ -528,7 +579,7 @@ void ScriptModule::Poll()
       if (mScheduledUIControlValue[i].time != -1 &&
           time + TheTransport->GetEventLookaheadMs() > mScheduledUIControlValue[i].time)
       {
-         AdjustUIControl(mScheduledUIControlValue[i].control, mScheduledUIControlValue[i].value, mScheduledUIControlValue[i].lineNum);
+         AdjustUIControl(mScheduledUIControlValue[i].control, mScheduledUIControlValue[i].value, mScheduledUIControlValue[i].time, mScheduledUIControlValue[i].lineNum);
          mScheduledUIControlValue[i].time = -1;
       }
    }
@@ -737,9 +788,9 @@ IUIControl* ScriptModule::GetUIControl(std::string path)
    return control;
 }
 
-void ScriptModule::AdjustUIControl(IUIControl* control, float value, int lineNum)
+void ScriptModule::AdjustUIControl(IUIControl* control, float value, double time, int lineNum)
 {
-   control->SetValue(value);
+   control->SetValue(value, time);
 
    mUIControlTracker.AddEvent(lineNum);
 
@@ -793,13 +844,13 @@ void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int veloci
 {
    if (index == 0)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
       return;
    }
 
    if (index - 1 < (int)mExtraNoteOutputs.size())
    {
-      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
    }
 }
 
@@ -809,7 +860,7 @@ void ScriptModule::SetNumNoteOutputs(int num)
    {
       auto noteCable = new AdditionalNoteCable();
       noteCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1, 0));
+      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
       AddPatchCableSource(noteCable->GetPatchCableSource());
       noteCable->GetPatchCableSource()->SetManualPosition(0, 30 + 20 * (int)mExtraNoteOutputs.size());
       mExtraNoteOutputs.push_back(noteCable);
@@ -851,7 +902,7 @@ void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float 
    mMidiMessageQueueMutex.unlock();
 }
 
-void ScriptModule::ButtonClicked(ClickButton* button)
+void ScriptModule::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPythonInstalledConfirmButton)
       InitializePythonIfNecessary();
@@ -859,7 +910,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
    if (button == mRunButton)
    {
       mCodeEntry->Publish();
-      RunScript(gTime);
+      RunScript(time);
    }
 
    if (button == mStopButton)
@@ -946,7 +997,21 @@ void ScriptModule::ButtonClicked(ClickButton* button)
       float moduleX, moduleY, moduleW, moduleH;
       GetPosition(moduleX, moduleY);
       GetDimensions(moduleW, moduleH);
-      TheSynth->SpawnModuleOnTheFly("scriptingreference", moduleX + moduleW, moduleY, true);
+      ModuleFactory::Spawnable spawnable;
+      spawnable.mLabel = "scriptingreference";
+      TheSynth->SpawnModuleOnTheFly(spawnable, moduleX + moduleW, moduleY, true);
+   }
+
+   if (button == mTrustScriptButton)
+   {
+      RecordScriptAsTrusted();
+      mIsScriptUntrusted = false;
+   }
+
+   if (button == mDontTrustScriptButton)
+   {
+      TheSynth->SetAudioPaused(false);
+      TheSynth->ReloadInitialLayout();
    }
 }
 
@@ -956,7 +1021,7 @@ void ScriptModule::DropdownClicked(DropdownList* list)
       RefreshScriptFiles();
 }
 
-void ScriptModule::DropdownUpdated(DropdownList* list, int oldValue)
+void ScriptModule::DropdownUpdated(DropdownList* list, int oldValue, double time)
 {
 }
 
@@ -992,7 +1057,7 @@ void ScriptModule::RefreshScriptFiles()
 
 void ScriptModule::ExecuteCode()
 {
-   RunScript(gTime + gBufferSizeMs);
+   RunScript(NextBufferTime(false));
 }
 
 std::pair<int, int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
@@ -1121,6 +1186,12 @@ void ScriptModule::RunCode(double time, std::string code)
    if (!sPythonInitialized)
    {
       TheSynth->LogEvent("trying to call ScriptModule::RunCode() before python is initialized", kLogEventType_Error);
+      return;
+   }
+
+   if (sHasLoadedUntrustedScript)
+   {
+      TheSynth->LogEvent("can't run scripts until user has added all loaded scripts to the allow list", kLogEventType_Error);
       return;
    }
 
@@ -1349,7 +1420,7 @@ void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)
 
 void ScriptModule::Stop()
 {
-   double time = gTime + gBufferSizeMs;
+   double time = NextBufferTime(false);
 
    //run through any scheduled note offs for this pitch
    for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
@@ -1427,6 +1498,7 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
                                  }
                               });
    mModuleSaveData.LoadBool("hotload_script_files", moduleInfo, false);
+   mModuleSaveData.LoadBool("draw_bound_module_connections", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -1463,40 +1535,33 @@ void ScriptModule::SetUpFromSaveData()
    }
 
    mHotloadScripts = mModuleSaveData.GetBool("hotload_script_files");
+   mDrawBoundModuleConnections = mModuleSaveData.GetBool("draw_bound_module_connections");
 }
 
 void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-}
-
-namespace
-{
-   const int kSaveStateRev = 2;
 }
 
 void ScriptModule::SaveState(FileStreamOut& out)
 {
-   if (!CanSaveState())
-      return;
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
    out << (int)mExtraNoteOutputs.size();
 
    IDrawableModule::SaveState(out);
 
    out << mWidth;
    out << mHeight;
+
+   RecordScriptAsTrusted();
 }
 
-void ScriptModule::LoadState(FileStreamIn& in)
+void ScriptModule::LoadState(FileStreamIn& in, int rev)
 {
-   int rev = -1;
-
-   if (ModularSynth::sLoadingFileSaveStateRev >= 421)
+   if (ModularSynth::sLoadingFileSaveStateRev >= 421 && ModularSynth::sLoadingFileSaveStateRev < 423)
    {
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
    if (rev >= 2)
@@ -1506,18 +1571,52 @@ void ScriptModule::LoadState(FileStreamIn& in)
       SetNumNoteOutputs(extraNoteOutputs + 1);
    }
 
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev == 420)
    {
       in >> rev;
-      LoadStateValidate(rev <= kSaveStateRev);
+      LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
    float w, h;
    in >> w;
    in >> h;
    Resize(w, h);
+
+   juce::String checksum = GetScriptChecksum();
+   juce::File trusted_python_scripts = File(ofToDataPath("internal/trusted_python_scripts"));
+   bool isScriptTrusted = false;
+   if (trusted_python_scripts.existsAsFile())
+   {
+      StringArray lines;
+      trusted_python_scripts.readLines(lines);
+      for (auto& line : lines)
+      {
+         if (line == checksum)
+            isScriptTrusted = true;
+      }
+   }
+
+   if (!isScriptTrusted)
+      sHasLoadedUntrustedScript = true;
+   mIsScriptUntrusted = !isScriptTrusted;
+}
+
+juce::String ScriptModule::GetScriptChecksum() const
+{
+   juce::String code = mCodeEntry->GetText(false);
+   juce::String checksum = juce::SHA256(code.toUTF8()).toHexString();
+   return checksum;
+}
+
+void ScriptModule::RecordScriptAsTrusted()
+{
+   juce::File trusted_python_scripts = File(ofToDataPath("internal/trusted_python_scripts"));
+   bool isScriptTrusted = false;
+   if (!trusted_python_scripts.existsAsFile())
+      trusted_python_scripts.create();
+   trusted_python_scripts.appendText("\n" + GetScriptChecksum());
 }
 
 void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofColor color)
@@ -1588,7 +1687,7 @@ void ScriptReferenceDisplay::DrawModule()
    }
 }
 
-bool ScriptReferenceDisplay::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool ScriptReferenceDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mScrollOffset.y = ofClamp(mScrollOffset.y - scrollY * 10, 0, mMaxScrollAmount);
    return true;
@@ -1600,8 +1699,57 @@ void ScriptReferenceDisplay::GetModuleDimensions(float& w, float& h)
    h = mHeight;
 }
 
-void ScriptReferenceDisplay::ButtonClicked(ClickButton* button)
+void ScriptReferenceDisplay::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mCloseButton)
       GetOwningContainer()->DeleteModule(this);
+}
+
+void ScriptWarningPopup::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+}
+
+void ScriptWarningPopup::Poll()
+{
+   IDrawableModule::Poll();
+
+   std::vector<IDrawableModule*> modules;
+   TheSynth->GetAllModules(modules);
+
+   int untrustedCount = 0;
+   for (auto* module : modules)
+   {
+      ScriptModule* script = dynamic_cast<ScriptModule*>(module);
+      if (script != nullptr && !script->IsScriptTrusted())
+         ++untrustedCount;
+   }
+   mRemainingUntrustedScriptModules = untrustedCount;
+
+   if (untrustedCount == 0)
+   {
+      TheSynth->SetAudioPaused(false);
+      ScriptModule::sHasLoadedUntrustedScript = false;
+      if (Prefab::sLastLoadWasPrefab)
+      {
+         //get rid of this popup and continue loading prefab
+         GetOwningContainer()->DeleteModule(this);
+      }
+      else
+      {
+         //reload save file fresh
+         TheSynth->LoadState(TheSynth->GetLastSavePath());
+      }
+   }
+}
+
+void ScriptWarningPopup::DrawModule()
+{
+   DrawTextNormal(std::string("") +
+                  "heads up: this BSK file contains python scripts.\n\n" +
+                  "generally, these python scripts are innocuous, and used to do cool things within bespoke.\n" +
+                  "however, a malicious user could theoretically use python scripts to do bad things to your computer.\n\n" +
+                  "do you trust the creator of this file? if so, please go to each script window and approve the script\n" +
+                  "(" + ofToString(mRemainingUntrustedScriptModules) + " script" + (mRemainingUntrustedScriptModules == 1 ? "" : "s") + " remaining to be approved)",
+                  3, 14);
 }

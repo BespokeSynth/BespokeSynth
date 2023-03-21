@@ -40,7 +40,9 @@ public:
    Waveshaper();
    virtual ~Waveshaper();
    static IDrawableModule* Create() { return new Waveshaper(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -49,7 +51,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    //ITextEntryListener
    void TextEntryComplete(TextEntry* entry) override;
@@ -63,50 +65,43 @@ private:
    void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return mEnabled; }
 
-   float mRescale;
-   FloatSlider* mRescaleSlider;
-   float mA;
-   FloatSlider* mASlider;
-   float mB;
-   FloatSlider* mBSlider;
-   float mC;
-   FloatSlider* mCSlider;
-   float mD;
-   FloatSlider* mDSlider;
-   float mE;
-   FloatSlider* mESlider;
+   float mRescale{ 1 };
+   FloatSlider* mRescaleSlider{ nullptr };
+   float mA{ 0 };
+   FloatSlider* mASlider{ nullptr };
+   float mB{ 0 };
+   FloatSlider* mBSlider{ nullptr };
+   float mC{ 0 };
+   FloatSlider* mCSlider{ nullptr };
+   float mD{ 0 };
+   FloatSlider* mDSlider{ nullptr };
+   float mE{ 0 };
+   FloatSlider* mESlider{ nullptr };
 
-   std::string mEntryString;
-   TextEntry* mTextEntry;
+   std::string mEntryString{ "x" };
+   TextEntry* mTextEntry{ nullptr };
    exprtk::symbol_table<float> mSymbolTable;
    exprtk::expression<float> mExpression;
    exprtk::symbol_table<float> mSymbolTableDraw;
    exprtk::expression<float> mExpressionDraw;
 
-   float mExpressionInput;
-   float mHistPre1;
-   float mHistPre2;
-   float mHistPost1;
-   float mHistPost2;
-   float mExpressionInputDraw;
-   float mT;
-   bool mExpressionValid;
-   float mSmoothMax;
-   float mSmoothMin;
+   float mExpressionInput{ 0 };
+   float mHistPre1{ 0 };
+   float mHistPre2{ 0 };
+   float mHistPost1{ 0 };
+   float mHistPost2{ 0 };
+   float mExpressionInputDraw{ 0 };
+   float mT{ 0 };
+   bool mExpressionValid{ false };
+   float mSmoothMax{ 0 };
+   float mSmoothMin{ 0 };
 
    struct BiquadState
    {
-      BiquadState()
-      : mHistPre1(0)
-      , mHistPre2(0)
-      , mHistPost1(0)
-      , mHistPost2(0)
-      {
-      }
-      float mHistPre1;
-      float mHistPre2;
-      float mHistPost1;
-      float mHistPost2;
+      float mHistPre1{ 0 };
+      float mHistPre2{ 0 };
+      float mHistPost1{ 0 };
+      float mHistPost2{ 0 };
    };
 
    BiquadState mBiquadState[ChannelBuffer::kMaxNumChannels];

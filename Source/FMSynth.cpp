@@ -31,26 +31,7 @@
 #include "Profiler.h"
 
 FMSynth::FMSynth()
-: mHarmRatioBase(1)
-, mHarmRatioBaseDropdown(nullptr)
-, mHarmRatioTweak(1)
-, mHarmRatioBase2(1)
-, mHarmRatioBaseDropdown2(nullptr)
-, mHarmRatioTweak2(1)
-, mHarmSlider(nullptr)
-, mModSlider(nullptr)
-, mHarmSlider2(nullptr)
-, mModSlider2(nullptr)
-, mVolSlider(nullptr)
-, mAdsrDisplayVol(nullptr)
-, mAdsrDisplayHarm(nullptr)
-, mAdsrDisplayMod(nullptr)
-, mAdsrDisplayHarm2(nullptr)
-, mAdsrDisplayMod2(nullptr)
-, mPhaseOffsetSlider0(nullptr)
-, mPhaseOffsetSlider1(nullptr)
-, mPhaseOffsetSlider2(nullptr)
-, mPolyMgr(this)
+: mPolyMgr(this)
 , mNoteInputBuffer(this)
 , mWriteBuffer(gBufferSize)
 {
@@ -182,7 +163,7 @@ void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    }
    else
    {
-      mPolyMgr.Stop(time, pitch);
+      mPolyMgr.Stop(time, pitch, voiceIdx);
       mVoiceParams.mOscADSRParams.Stop(time); //for visualization
    }
 
@@ -262,19 +243,19 @@ void FMSynth::UpdateHarmonicRatio()
    mVoiceParams.mHarmRatio2 *= mHarmRatioTweak2;
 }
 
-void FMSynth::DropdownUpdated(DropdownList* list, int oldVal)
+void FMSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mHarmRatioBaseDropdown || list == mHarmRatioBaseDropdown2)
       UpdateHarmonicRatio();
 }
 
-void FMSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FMSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mHarmSlider || slider == mHarmSlider2)
       UpdateHarmonicRatio();
 }
 
-void FMSynth::CheckboxUpdated(Checkbox* checkbox)
+void FMSynth::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
       mPolyMgr.KillAll();

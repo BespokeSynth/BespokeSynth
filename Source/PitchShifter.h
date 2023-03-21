@@ -48,13 +48,13 @@ private:
 
    FFTData mFFTData;
 
-   float* mLastPhase;
-   float* mSumPhase;
-   float* mWindower;
-   float* mAnalysisMag;
-   float* mAnalysisFreq;
-   float* mSynthesisMag;
-   float* mSynthesisFreq;
+   float* mLastPhase{ nullptr };
+   float* mSumPhase{ nullptr };
+   float* mWindower{ nullptr };
+   float* mAnalysisMag{ nullptr };
+   float* mAnalysisFreq{ nullptr };
+   float* mSynthesisMag{ nullptr };
+   float* mSynthesisFreq{ nullptr };
 
    ::FFT mFFT;
    RollingBuffer mRollingInputBuffer;

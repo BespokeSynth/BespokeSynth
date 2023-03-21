@@ -30,6 +30,7 @@
 #include "INoteReceiver.h"
 #include "IModulator.h"
 #include "Slider.h"
+#include "Checkbox.h"
 
 class PatchCableSource;
 
@@ -39,7 +40,9 @@ public:
    VelocityToCV();
    virtual ~VelocityToCV();
    static IDrawableModule* Create() { return new VelocityToCV(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -56,7 +59,7 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -68,9 +71,11 @@ private:
    void GetModuleDimensions(float& width, float& height) override
    {
       width = 106;
-      height = 17 * 2 + 2;
+      height = 17 * 3 + 2;
    }
    bool Enabled() const override { return mEnabled; }
 
-   int mVelocity;
+   int mVelocity{ 0 };
+   bool mPassZero{ false };
+   Checkbox* mPassZeroCheckbox{ nullptr };
 };

@@ -52,10 +52,10 @@ radiosequencer~Sequenz um nur einen Wert auf einmal zu aktivieren. Patchen Sie e
 
 
 
-presets~Speichern und Wiederherstellen von Werte-Sets. Verbinden Sie den grauen Kreis mit Modulen, um alle Steuerelemente dieses Moduls zu beeinflussen. Verbinden Sie den violetten Kreis mit einem Steuerelement, um nur dieses Steuerelement zu beeinflussen. Klicken Sie mit gedrückter Shifttaste auf das Raster, um eine Voreinstellung in diesem Feld zu speichern, und klicken Sie auf ein Rasterfeld, um diese Voreinstellung zu laden.
+snapshots~Speichern und Wiederherstellen von Werte-Sets. Verbinden Sie den grauen Kreis mit Modulen, um alle Steuerelemente dieses Moduls zu beeinflussen. Verbinden Sie den violetten Kreis mit einem Steuerelement, um nur dieses Steuerelement zu beeinflussen. Klicken Sie mit gedrückter Shifttaste auf das Raster, um eine Voreinstellung in diesem Feld zu speichern, und klicken Sie auf ein Rasterfeld, um diese Voreinstellung zu laden.
 ~save~[todo]
 ~blend ms~Dauer der Überblendung voreingestellter Werte
-~preset~Zu einer Voreinstellung springen
+~snapshot~Zu einer Voreinstellung springen
 
 
 
@@ -772,7 +772,7 @@ multitapdelay~Delay mit mehreren tap points
 
 
 looperrewriter~Schreibt den Inhalt eines Loopers mit dem empfangenen Input neu, damit Sie Ihre eigenen Loops neu sampeln können. Der graue Punkt wird an ein "looper"-Modul angeschlossen.\n\ Idealerweise wird dieses Modul direkt an einen "send" angeschlossen, der linke Ausgang des "send" wird mit der Effektverarbeitung verbunden (z. B. mit einer "effectchain"), die Effektverarbeitung wird mit diesem "rewriter" verbunden und der rechte Ausgang des "sends" wird ebenfalls mit diesem "rewriter" verbunden.
-~ go ~Den angeschlossenen Looper umschreiben, und wenn dieser Looper mit einem Send verbunden ist, diesen Send so einstellen, dass er nur am rechten Ausgang ausgegeben wird
+~go~Den angeschlossenen Looper umschreiben, und wenn dieser Looper mit einem Send verbunden ist, diesen Send so einstellen, dass er nur am rechten Ausgang ausgegeben wird
 ~new loop~Beginnen Sie mit der Aufnahme einer dynamischen Looplänge. Drücken Sie "go", wenn Sie diese in den Looper schreiben wollen. Dies ändert auch das globale Tempo von bespoke, um es an den neuen Loop anzupassen. es ist also ziemlich mächtig und beängstigend! klicken Sie erneut, um abzubrechen.
 
 
@@ -1756,7 +1756,7 @@ newpatchconfirm~
 
 
 
-vstplugin~Eine VST-Plugin-Instanz
+plugin~Eine VST-Plugin-Instanz
 ~vol~Einstellung der Ausgangslautstärke
 ~program change~Eine Program Change Nachricht an die VST-Instanz senden
 ~open~Das Plugin Fenster anzeigen

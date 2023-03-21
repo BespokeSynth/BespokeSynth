@@ -55,17 +55,24 @@ void ControlSequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    int width, height;
-   UIBLOCK(3, 3, 200);
-   INTSLIDER(mLengthSlider, "length", &mLength, 1, 64);
+   UIBLOCK(3, 3, 100);
+   INTSLIDER(mLengthSlider, "length", &mLength, 1, 32);
    UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomize, "random");
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, 25, mRandomize->GetRect().getMaxX() - 6, 40, 16, 1, this);
+   mGrid = new UIGrid("uigrid", 5, 25, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1, this);
 
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
+   UIBLOCK(15, height + 5);
+   for (size_t i = 0; i < mStepSliders.size(); ++i)
+   {
+      FLOATSLIDER(mStepSliders[i], ("step " + ofToString(i)).c_str(), &mGrid->GetVal(i, 0), 0, 1);
+   }
+   ENDUIBLOCK0();
+
+   mControlCable = new PatchCableSource(this, kConnectionType_ValueSetter);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
 
@@ -128,11 +135,16 @@ void ControlSequencer::Step(double time, int pulseFlags)
 
    mGrid->SetHighlightCol(time, mStep);
 
-   if (mUIControl && mEnabled)
+   if (mEnabled)
    {
-      mUIControl->SetFromMidiCC(mGrid->GetVal(mStep, 0), true);
-      mControlCable->AddHistoryEvent(gTime, true);
-      mControlCable->AddHistoryEvent(gTime + 15, false);
+      mControlCable->AddHistoryEvent(time, true);
+      mControlCable->AddHistoryEvent(time + 15, false);
+
+      for (auto* target : mTargets)
+      {
+         if (target != nullptr)
+            target->SetFromMidiCC(mGrid->GetVal(mStep, 0), time, true);
+      }
    }
 }
 
@@ -164,23 +176,56 @@ void ControlSequencer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mGrid->SetShowing(!mSliderMode);
    mGrid->Draw();
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
    mRandomize->Draw();
 
    int currentHover = mGrid->CurrentHover();
-   if (currentHover != -1 && mUIControl)
+   if (!mSliderMode && currentHover != -1 && GetUIControl())
    {
       ofPushStyle();
       ofSetColor(ofColor::grey);
       float val = mGrid->GetVal(currentHover % mGrid->GetCols(), currentHover / mGrid->GetCols());
-      DrawTextNormal(mUIControl->GetDisplayValue(mUIControl->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y + 12);
+      DrawTextNormal(GetUIControl()->GetDisplayValue(GetUIControl()->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y + 12);
       ofPopStyle();
+   }
+
+   for (size_t i = 0; i < mStepSliders.size(); ++i)
+   {
+      if (mSliderMode)
+      {
+         bool showing = i < mLength;
+         mStepSliders[i]->SetShowing(showing);
+         mStepSliders[i]->Draw();
+
+         auto rect = mStepSliders[i]->GetRect(true);
+
+         if (showing && GetUIControl())
+         {
+            float val = mGrid->GetVal(i, 0);
+
+            DrawTextNormal(GetUIControl()->GetDisplayValue(GetUIControl()->GetValueForMidiCC(val)), rect.getMaxX() + 5, rect.y + 12);
+         }
+
+         if (i == mStep)
+         {
+            ofPushStyle();
+            ofSetColor(0, 255, 0);
+            ofFill();
+            ofRect(rect.x - 12, rect.y + 3, 10, 10);
+            ofPopStyle();
+         }
+      }
+      else
+      {
+         mStepSliders[i]->SetShowing(false);
+      }
    }
 }
 
-void ControlSequencer::OnClicked(int x, int y, bool right)
+void ControlSequencer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -204,7 +249,7 @@ void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, 
 {
    if (grid == mGrid)
    {
-      int numValues = mUIControl ? mUIControl->GetNumValues() : 0;
+      int numValues = GetUIControl() ? GetUIControl()->GetNumValues() : 0;
       if (numValues > 1)
       {
          for (int i = 0; i < mGrid->GetCols(); ++i)
@@ -219,18 +264,24 @@ void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, 
 
 void ControlSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (mControlCable->GetPatchCables().empty() == false)
-      mUIControl = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[0]->GetTarget());
-   else
-      mUIControl = nullptr;
-   if (mUIControl)
+   bool wasEmpty = (mTargets[0] == nullptr);
+
+   for (size_t i = 0; i < mTargets.size(); ++i)
+   {
+      if (i < mControlCable->GetPatchCables().size())
+         mTargets[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
+      else
+         mTargets[i] = nullptr;
+   }
+
+   if (wasEmpty && mControlCable->GetPatchCables().size() == 1)
    {
       for (int i = 0; i < mGrid->GetCols(); ++i)
-         mGrid->SetVal(i, 0, mUIControl->GetMidiValue());
+         mGrid->SetVal(i, 0, GetUIControl()->GetMidiValue());
    }
 }
 
-void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -248,7 +299,7 @@ void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -258,7 +309,7 @@ void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void ControlSequencer::ButtonClicked(ClickButton* button)
+void ControlSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomize)
    {
@@ -275,8 +326,16 @@ namespace
 
 void ControlSequencer::GetModuleDimensions(float& width, float& height)
 {
-   width = mGrid->GetWidth() + extraW;
-   height = mGrid->GetHeight() + extraH;
+   if (mSliderMode)
+   {
+      width = 200;
+      height = mLength * 17 + extraH;
+   }
+   else
+   {
+      width = mGrid->GetWidth() + extraW;
+      height = mGrid->GetHeight() + extraH;
+   }
 }
 
 void ControlSequencer::Resize(float w, float h)
@@ -293,65 +352,48 @@ void ControlSequencer::SetGridSize(float w, float h)
 
 void ControlSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   moduleInfo["uicontrol"] = mUIControl ? mUIControl->Path() : "";
 }
 
 void ControlSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("uicontrol", moduleInfo);
+   mModuleSaveData.LoadBool("slider_mode", moduleInfo, true);
 
    SetUpFromSaveData();
 }
 
 void ControlSequencer::SetUpFromSaveData()
 {
-   std::string controlPath = mModuleSaveData.GetString("uicontrol");
-   if (!controlPath.empty())
-   {
-      mUIControl = TheSynth->FindUIControl(controlPath);
-      if (mUIControl)
-         mControlCable->SetTarget(mUIControl);
-   }
-   else
-   {
-      mUIControl = nullptr;
-   }
-}
-
-namespace
-{
-   const int kSaveStateRev = 1;
+   mSliderMode = mModuleSaveData.GetBool("slider_mode");
 }
 
 void ControlSequencer::SaveState(FileStreamOut& out)
 {
-   out << kSaveStateRev;
+   out << GetModuleSaveStateRev();
 
    IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
    out << mGrid->GetWidth();
    out << mGrid->GetHeight();
+   out << mHasExternalPulseSource;
 }
 
-void ControlSequencer::LoadState(FileStreamIn& in)
+void ControlSequencer::LoadState(FileStreamIn& in, int rev)
 {
-   mLoadRev = -1;
+   mLoadRev = rev;
 
-   if (ModularSynth::sLoadingFileSaveStateRev >= 422)
+   if (ModularSynth::sLoadingFileSaveStateRev == 422)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= GetModuleSaveStateRev());
    }
 
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (ModularSynth::sLoadingFileSaveStateRev <= 421)
    {
       in >> mLoadRev;
-      LoadStateValidate(mLoadRev <= kSaveStateRev);
+      LoadStateValidate(mLoadRev <= GetModuleSaveStateRev());
    }
 
    mGrid->LoadState(in);
@@ -399,6 +441,15 @@ void ControlSequencer::LoadState(FileStreamIn& in)
       if (mLength > max)
          mLengthSlider->SetExtents(min, mLength);
    }
+
+   if (rev < 2)
+   {
+      mSliderMode = false;
+      mModuleSaveData.SetBool("slider_mode", false);
+   }
+
+   if (rev >= 3)
+      in >> mHasExternalPulseSource;
 }
 
 bool ControlSequencer::LoadOldControl(FileStreamIn& in, std::string& oldName)

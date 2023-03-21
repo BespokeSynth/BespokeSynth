@@ -268,7 +268,7 @@ void SeaOfGrain::DropdownClicked(DropdownList* list)
 {
 }
 
-void SeaOfGrain::DropdownUpdated(DropdownList* list, int oldVal)
+void SeaOfGrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -292,8 +292,11 @@ void SeaOfGrain::UpdateDisplaySamples()
 void SeaOfGrain::LoadFile()
 {
    using namespace juce;
+   auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
+   if (File::areFileNamesCaseSensitive())
+      file_pattern += ";" + file_pattern.toUpperCase();
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetFileChooserParent());
+                       file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();
@@ -304,13 +307,13 @@ void SeaOfGrain::LoadFile()
    }
 }
 
-void SeaOfGrain::ButtonClicked(ClickButton* button)
+void SeaOfGrain::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mLoadButton)
       LoadFile();
 }
 
-void SeaOfGrain::OnClicked(int x, int y, bool right)
+void SeaOfGrain::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -325,7 +328,7 @@ bool SeaOfGrain::MouseMoved(float x, float y)
    return IDrawableModule::MouseMoved(x, y);
 }
 
-void SeaOfGrain::CheckboxUpdated(Checkbox* checkbox)
+void SeaOfGrain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mRecordInputCheckbox)
    {
@@ -343,13 +346,13 @@ void SeaOfGrain::GetModuleDimensions(float& width, float& height)
    height = mBufferY + mBufferH + 202;
 }
 
-void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mDisplayOffsetSlider || slider == mDisplayLengthSlider)
       UpdateDisplaySamples();
 }
 
-void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -381,16 +384,11 @@ void SeaOfGrain::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void SeaOfGrain::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mHasRecordedInput;
    if (mHasRecordedInput)
@@ -399,13 +397,13 @@ void SeaOfGrain::SaveState(FileStreamOut& out)
       mSample->SaveState(out);
 }
 
-void SeaOfGrain::LoadState(FileStreamIn& in)
+void SeaOfGrain::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    mHasRecordedInput = false;
    if (rev > 0)

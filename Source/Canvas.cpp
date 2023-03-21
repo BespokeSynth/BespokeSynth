@@ -30,34 +30,15 @@
 #include "ModularSynth.h"
 
 Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator)
-: mClick(false)
-, mWidth(w)
+: mWidth(w)
 , mHeight(h)
 , mLength(length)
 , mNumRows(rows)
 , mNumCols(cols)
-, mListener(nullptr)
-, mViewStart(0)
 , mViewEnd(length)
-, mLoopStart(0)
 , mLoopEnd(length)
-, mControls(nullptr)
-, mCursorPos(-1)
 , mElementCreator(elementCreator)
-, mClickedElement(nullptr)
 , mNumVisibleRows(rows)
-, mRowOffset(0)
-, mWrap(false)
-, mDragSelecting(false)
-, mDragCanvasMoving(false)
-, mDragCanvasZooming(false)
-, mHighlightEnd(kHighlightEnd_None)
-, mHighlightEndElement(nullptr)
-, mDragEnd(kHighlightEnd_None)
-, mMajorColumnInterval(-1)
-, mHasDuplicatedThisDrag(false)
-, mScrollVerticalPartial(0)
-, mDragMode(kDragBoth)
 {
    SetName("canvas");
    SetPosition(x, y);
@@ -230,7 +211,7 @@ bool Canvas::IsRowVisible(int row) const
    return row >= mRowOffset && row < mRowOffset + GetNumVisibleRows();
 }
 
-void Canvas::OnClicked(int x, int y, bool right)
+void Canvas::OnClicked(float x, float y, bool right)
 {
    mClick = true;
    mHasDuplicatedThisDrag = false;
@@ -487,7 +468,7 @@ void Canvas::MouseReleased()
    mDragCanvasZooming = false;
 }
 
-bool Canvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (GetKeyModifiers() & kModifier_Alt)
    {

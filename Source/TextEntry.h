@@ -94,10 +94,11 @@ public:
    void GetDimensions(float& width, float& height) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
    float GetMidiValue() const override;
-   void SetValue(float value) override;
+   void GetRange(float& min, float& max) override;
+   void SetValue(float value, double time) override;
    float GetValue() const override;
    int GetNumValues() override;
    std::string GetDisplayValue(float val) const override;
@@ -107,6 +108,7 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool IsTextEntry() const override { return true; }
+   bool ModulatorUsesLiteralValue() const override { return true; }
 
 protected:
    ~TextEntry(); //protected so that it can't be created on the stack
@@ -119,33 +121,34 @@ private:
    void AcceptEntry(bool pressedEnter) override;
    void CancelEntry() override;
    void MoveCaret(int pos, bool allowSelection = true);
-   void OnClicked(int x, int y, bool right) override;
+   void SelectAll();
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
-   int mCharWidth;
-   ITextEntryListener* mListener;
-   char mString[MAX_TEXTENTRY_LENGTH];
-   char* mVarCString;
-   std::string* mVarString;
-   int* mVarInt;
-   float* mVarFloat;
-   int mIntMin;
-   int mIntMax;
-   float mFloatMin;
-   float mFloatMax;
-   int mCaretPosition;
-   int mCaretPosition2;
-   float mCaretBlinkTimer;
-   bool mCaretBlink;
-   TextEntryType mType;
-   TextEntry* mNextTextEntry;
-   TextEntry* mPreviousTextEntry;
-   bool mInErrorMode;
-   bool mDrawLabel;
-   float mLabelSize;
-   bool mFlexibleWidth;
-   bool mHovered;
-   bool mRequireEnterToAccept;
+   int mCharWidth{ 3 };
+   ITextEntryListener* mListener{ nullptr };
+   char mString[MAX_TEXTENTRY_LENGTH]{};
+   char* mVarCString{ nullptr };
+   std::string* mVarString{ nullptr };
+   int* mVarInt{ nullptr };
+   float* mVarFloat{ nullptr };
+   int mIntMin{ 0 };
+   int mIntMax{ 0 };
+   float mFloatMin{ 0 };
+   float mFloatMax{ 0 };
+   int mCaretPosition{ 0 };
+   int mCaretPosition2{ 0 };
+   float mCaretBlinkTimer{ 0 };
+   bool mCaretBlink{ true };
+   TextEntryType mType{ TextEntryType::kTextEntry_Text };
+   TextEntry* mNextTextEntry{ nullptr };
+   TextEntry* mPreviousTextEntry{ nullptr };
+   bool mInErrorMode{ false };
+   bool mDrawLabel{ false };
+   float mLabelSize{ 0 };
+   bool mFlexibleWidth{ false };
+   bool mHovered{ false };
+   bool mRequireEnterToAccept{ false };
 };
 
 #endif /* defined(__modularSynth__TextEntry__) */

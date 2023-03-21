@@ -33,13 +33,18 @@
 
 //static
 bool Prefab::sLoadingPrefab = false;
-//static
+bool Prefab::sLastLoadWasPrefab = false;
 IDrawableModule* Prefab::sJustReleasedModule = nullptr;
+
+namespace
+{
+   const float paddingX = 10;
+   const float paddingY = 10;
+}
 
 Prefab::Prefab()
 {
    mModuleContainer.SetOwner(this);
-   mPrefabName = "";
 }
 
 Prefab::~Prefab()
@@ -72,7 +77,7 @@ void Prefab::Poll()
    GetPosition(xMin, yMin);
    for (auto* module : mModuleContainer.GetModules())
    {
-      xMin = MIN(xMin, module->GetPosition().x);
+      xMin = MIN(xMin, module->GetPosition().x - paddingX);
       yMin = MIN(yMin, module->GetPosition().y - 30);
    }
 
@@ -94,9 +99,9 @@ bool Prefab::CanAddDropModules()
 {
    if (IsMouseHovered() && !TheSynth->IsGroupSelecting())
    {
-      if (TheSynth->GetMoveModule() != nullptr && !VectorContains(TheSynth->GetMoveModule(), mModuleContainer.GetModules()))
+      if (IsAddableModule(TheSynth->GetMoveModule()))
          return true;
-      if (sJustReleasedModule != nullptr && !VectorContains(sJustReleasedModule, mModuleContainer.GetModules()))
+      if (IsAddableModule(sJustReleasedModule))
          return true;
       if (!TheSynth->GetGroupSelectedModules().empty())
       {
@@ -104,7 +109,7 @@ bool Prefab::CanAddDropModules()
          {
             if (module == this || module->IsSingleton())
                return false;
-            if (!VectorContains(module, mModuleContainer.GetModules()))
+            if (IsAddableModule(module))
                return true;
          }
       }
@@ -112,7 +117,18 @@ bool Prefab::CanAddDropModules()
    return false;
 }
 
-void Prefab::OnClicked(int x, int y, bool right)
+bool Prefab::IsAddableModule(IDrawableModule* module)
+{
+   if (module == nullptr || module == this || VectorContains(module, mModuleContainer.GetModules()))
+      return false;
+   if (dynamic_cast<Prefab*>(module) != nullptr)
+      return false;
+   if (dynamic_cast<Prefab*>(module->GetParent()) != nullptr)
+      return false;
+   return true;
+}
+
+void Prefab::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -126,21 +142,15 @@ void Prefab::MouseReleased()
 
    if (CanAddDropModules() && !VectorContains<IDrawableModule*>(this, TheSynth->GetGroupSelectedModules()))
    {
-      if (sJustReleasedModule != nullptr && !VectorContains(sJustReleasedModule, mModuleContainer.GetModules()))
+      if (IsAddableModule(sJustReleasedModule))
          mModuleContainer.TakeModule(sJustReleasedModule);
 
       for (auto* module : TheSynth->GetGroupSelectedModules())
       {
-         if (!VectorContains(module, mModuleContainer.GetModules()))
+         if (IsAddableModule(module))
             mModuleContainer.TakeModule(module);
       }
    }
-}
-
-namespace
-{
-   const float paddingX = 10;
-   const float paddingY = 10;
 }
 
 void Prefab::DrawModule()
@@ -207,7 +217,7 @@ void Prefab::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void Prefab::ButtonClicked(ClickButton* button)
+void Prefab::ButtonClicked(ClickButton* button, double time)
 {
    using namespace juce;
    if (button == mSaveButton)
@@ -215,7 +225,7 @@ void Prefab::ButtonClicked(ClickButton* button)
       FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
-         std::string savePath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
+         std::string savePath = chooser.getResult().getFullPathName().toStdString();
          SavePrefab(savePath);
       }
    }
@@ -225,7 +235,7 @@ void Prefab::ButtonClicked(ClickButton* button)
       FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToOpen())
       {
-         std::string loadPath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
+         std::string loadPath = chooser.getResult().getFullPathName().toStdString();
          LoadPrefab(ofToDataPath(loadPath));
       }
    }
@@ -312,7 +322,6 @@ void Prefab::UpdatePrefabName(std::string path)
 
 void Prefab::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["modules"] = mModuleContainer.WriteModules();
 }
 
@@ -326,29 +335,25 @@ void Prefab::SetUpFromSaveData()
 {
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void Prefab::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
 
-   out << kSaveStateRev;
    out << mPrefabName;
 }
 
-void Prefab::LoadState(FileStreamIn& in)
+void Prefab::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mPrefabName;
 }

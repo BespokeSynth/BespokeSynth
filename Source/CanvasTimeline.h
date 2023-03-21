@@ -43,21 +43,22 @@ public:
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time) override {}
    void KeyPressed(int key, bool isRepeat) override {}
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
+   bool GetNoHover() const override { return true; }
 
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;
@@ -82,5 +83,5 @@ private:
    ofVec2f mDragOffset;
    HoverMode mHoverMode{ HoverMode::kNone };
 
-   Canvas* mCanvas;
+   Canvas* mCanvas{ nullptr };
 };

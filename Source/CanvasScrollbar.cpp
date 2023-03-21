@@ -94,7 +94,7 @@ float CanvasScrollbar::GetBarEnd() const
    return 1;
 }
 
-void CanvasScrollbar::OnClicked(int x, int y, bool right)
+void CanvasScrollbar::OnClicked(float x, float y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
@@ -130,7 +130,7 @@ bool CanvasScrollbar::MouseMoved(float x, float y)
    return false;
 }
 
-bool CanvasScrollbar::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool CanvasScrollbar::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }
