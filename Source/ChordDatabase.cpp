@@ -31,15 +31,13 @@
 
 ChordDatabase::ChordDatabase()
 {
-
-
    // Major scale like chords
    //
    // { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -1.0f } // Based on Mixolydian/Ionian mode
 
    // ref:                           {  0/12,  1/13,  2/14,  3/15,  4/16,  5/17,  6/18,  7/19,  8/20,  9/21, 10/22, 11/23}));
    //                                {     C,    C#,     D,    D#,     E,     F,    F#,     G,    G#,     A,    A#,     B}));
-
+   
    mChordShapes.push_back(ChordShape("", { 0, 4, 7 },
                                      { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -1.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("sus4", { 0, 5, 7 },
@@ -117,7 +115,7 @@ ChordDatabase::ChordDatabase()
                                      { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f }, 2.0f));
 
    mChordShapes.push_back(ChordShape("dom7dim5", { 0, 4, 6, 10 },
-                                     { 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("min/maj7", { 0, 3, 7, 11 },
                                      { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, -2.0f, 10.0f }, 2.0f));
 }
