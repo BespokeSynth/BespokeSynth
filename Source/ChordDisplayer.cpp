@@ -28,6 +28,7 @@
 #include "ChordDisplayer.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
+#include <set>
 
 ChordDisplayer::ChordDisplayer()
 {
@@ -43,7 +44,22 @@ void ChordDisplayer::DrawModule()
    if (notes.size() > 2)
    {
       std::vector<int> chord{ std::begin(notes), std::end(notes) };
-      DrawTextNormal(TheScale->GetChordDatabase().GetChordNameAdvanced(chord), 4, 14);
+      std::set<std::string> chordNames = TheScale->GetChordDatabase().GetChordNamesAdvanced(chord);
+
+      if (chordNames.size() < 4)
+      {
+         int drawY = 14;
+         int drawHeight = 20;
+         for (std::string chordName : chordNames)
+         {
+            DrawTextNormal(chordName, 4, drawY);
+            drawY += drawHeight;
+         } 
+      }     
+      else
+      {
+         DrawTextNormal("(ambiguous)", 4, 14);
+      }
    }
 }
 

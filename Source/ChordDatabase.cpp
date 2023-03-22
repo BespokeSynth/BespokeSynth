@@ -32,47 +32,45 @@
 ChordDatabase::ChordDatabase()
 {
 
-   mChordShapes.push_back(ChordShape("", { 0, 4, 7 },
-                                     { 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -1.0f }, 2.0f));
 
    // Major scale like chords
-   // 
+   //
    // { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -1.0f } // Based on Mixolydian/Ionian mode
 
    // ref:                           {  0/12,  1/13,  2/14,  3/15,  4/16,  5/17,  6/18,  7/19,  8/20,  9/21, 10/22, 11/23}));
    //                                {     C,    C#,     D,    D#,     E,     F,    F#,     G,    G#,     A,    A#,     B}));
 
    mChordShapes.push_back(ChordShape("", { 0, 4, 7 },
-                                     { 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -1.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -1.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("sus4", { 0, 5, 7 },
-                                     { 10.0f, -2.0f, -1.0f, -2.0f, -5.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, -5.0f, -5.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("sus2", { 0, 2, 7 },
-                                     { 10.0f, -2.0f, 10.0f, -2.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, 10.0f, -5.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
 
    mChordShapes.push_back(ChordShape("2", { 0, 2, 4, 7 },
-                                     { 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, 10.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("4", { 0, 4, 5, 7 },
-                                     { 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("6", { 0, 4, 7, 9 },
-                                     { 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, 10.0f, -1.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("7", { 0, 4, 7, 10 },
-                                     { 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("9", { 0, 4, 7, 10, 14 },
-                                     { 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, 10.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f,  8.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("11", { 0, 4, 7, 10, 14, 17 },
-                                     { 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f,  8.0f, -5.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f,  8.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("13", { 0, 4, 7, 10, 14, 17, 21 },
-                                     { 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f,  8.0f, -2.0f, 10.0f,  8.0f, -2.0f, 10.0f, -2.0f, 10.0f,  8.0f, -2.0f }, 2.0f));
 
-   
+
    mChordShapes.push_back(ChordShape("maj7", { 0, 4, 7, 11 },
-                                     { 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("maj9", { 0, 4, 7, 11, 14 },
-                                     { 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f }, 2.0f));
+                                     { 10.0f, -2.0f, 10.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f,  8.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("maj11", { 0, 4, 7, 11, 14, 17 },
-                                     { 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f }, 2.0f));
+                                     { 10.0f, -2.0f,  8.0f, -5.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f,  8.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("maj13", { 0, 4, 7, 11, 14, 17, 21 },
-                                     { 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, -2.0f, 10.0f }, 2.0f));
+                                     { 10.0f, -2.0f,  8.0f, -5.0f, 10.0f,  8.0f, -2.0f, 10.0f, -2.0f, 10.0f, -2.0f,  8.0f }, 2.0f));
 
    // Minor scale like chords
    // { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, -1.0f } // Based on Dorian/Aeolian mode
@@ -81,17 +79,17 @@ ChordDatabase::ChordDatabase()
    //                                {     C,    C#,     D,    D#,     E,     F,    F#,     G,    G#,     A,    A#,     B}));
 
    mChordShapes.push_back(ChordShape("m", { 0, 3, 7 },
-                                     { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, 10.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("m6", { 0, 3, 7, 9 },
-                                     { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, 10.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, 10.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, 10.0f, -1.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("m7", { 0, 3, 7, 10 },
-                                     { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, -1.0f, 10.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("m9", { 0, 3, 7, 10, 14 },
-                                     { 10.0f, -2.0f, 10.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f, 10.0f, 10.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f,  8.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("m11", { 0, 3, 7, 10, 14, 17 },
-                                     { 10.0f, -2.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f,  8.0f, 10.0f, -5.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f,  8.0f, -2.0f }, 2.0f));
    mChordShapes.push_back(ChordShape("m13", { 0, 3, 7, 10, 14, 17, 21 },
-                                     { 10.0f, -2.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, -2.0f, 10.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0f, -2.0f,  8.0f, 10.0f, -5.0f,  8.0f, -2.0f, 10.0f, -2.0f, 10.0f,  8.0f, -2.0f }, 2.0f));
 
    //// Mixed
    //mChordShapes.push_back(ChordShape("aug", { 0, 4, 8 },
@@ -112,12 +110,14 @@ ChordDatabase::ChordDatabase()
    //                                  { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f));
 }
 
-std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches) const
+std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int>& pitches) const
 {
-    // TODO: add logic for scale degrees and pitches :-)
+   std::set<std::string> chordNames;
+
+   // TODO: add logic for scale degrees and pitches :-)
    int numPitches = (int)pitches.size();
    if (numPitches < 3)
-      return "None";
+      return chordNames;
 
    // Create a boolean vector with each pitch played, set to be in one octave
    //std::vector<int> octavePitches(12);
@@ -131,9 +131,9 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches)
    // Considering each played note as a possible root, find the root and chord with the greatest weight
 
    float maxWeight = 0.0f;
-   ChordShape bestShape = mChordShapes[0];
-   int bestRoot = 0;
    int lowestPitch = pitches[0] % 12;
+
+   std::list<std::tuple<int, ChordShape>> bestChords; // Is this cursed?
 
    // For each note played
    for (int rootOctavePitch : octavePitches)
@@ -145,32 +145,52 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches)
 
          // Add some extra weight if the lowest played note is the root
          chordWeight += rootOctavePitch == lowestPitch ? shape.mRootPosBias : 0;
-
-         // Looping over the same stuff within the same loop, crazy!
+                  
+         // Add the weights for the pitches in the chord
          for (int octavePitch : octavePitches)
          {
-            chordWeight += 2.0f*shape.mWeights[(12 + octavePitch - rootOctavePitch) % 12];
+            // Looping over the same stuff within the same loop, crazy!
+            chordWeight += 2.0f * shape.mWeights[(12 + octavePitch - rootOctavePitch) % 12];
          }
 
-         // Consider the chord with the highest weight as the best fit
+         // Consider the chords with the highest weight as the best fit
          if (chordWeight > maxWeight + FLT_EPSILON)
          {
             maxWeight = chordWeight;
-            bestShape = shape;
-            bestRoot = rootOctavePitch;
+
+            // Better weight than found before, replace list with this chord
+            bestChords.clear();
+            bestChords.push_back(std::make_tuple(rootOctavePitch, shape));
+         }
+         else if (chordWeight >= maxWeight - FLT_EPSILON)
+         {
+            // Equal weight as current best, add to list
+            bestChords.push_back(std::make_tuple(rootOctavePitch, shape));
          }
       }
    }
-   
-   std::string chordName = NoteName(bestRoot) + bestShape.mName;
-   
+
+   std::string funnie;
+
+   for (const auto& chord : bestChords)
+   {
+      chordNames.insert(GetChordNameAdvanced(pitches, std::get<0>(chord), std::get<1>(chord)));
+   }
+
+   return chordNames;
+}
+
+std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches, const int root, const ChordShape shape) const
+{
+   std::string chordName = NoteName(root) + shape.mName;
+
    // Alterations
 
    std::set<int> rootScalePitches;
    const std::set<int> majorScalePitches = { 0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23 };
    const std::vector<std::string> Alterations = { "1", "(m2)", "2", "(m3)", "3", "4", "(b5)", "5", "(#5)", "6", "(b7)", "7",
-                                                    "8", "(b9)", "9", "(#9)", "10", "11", "(#11)", "12", "(b13)", "13", "(#13)", "14" };
-   
+                                                  "8", "(b9)", "9", "(#9)", "10", "11", "(#11)", "12", "(b13)", "13", "(#13)", "14" };
+
    std::string alterations = "";
 
    int rootPitch = 0;
@@ -179,12 +199,12 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches)
    // Find hightest root before other notes (Needed to distinguish between notes in different octaves and for inverted chords)
    for (int pitch : pitches)
    {
-      if ((12 + pitch - bestRoot) % 12 == 0)
+      if ((12 + pitch - root) % 12 == 0)
       {
          rootPitch = pitch;
          foundRoot = true;
          continue;
-      } 
+      }
       if (foundRoot)
          break;
    }
@@ -193,11 +213,11 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches)
    for (int pitch : pitches)
    {
       // Use difference between highest root up to two octaves, otherwise use first octave
-      rootScalePitches.insert(pitch - rootPitch >= 0 ? (pitch - rootPitch) % 24 : (12 + pitch - bestRoot) % 12);
-   }    
+      rootScalePitches.insert(pitch - rootPitch >= 0 ? (pitch - rootPitch) % 24 : (12 + pitch - root) % 12);
+   }
 
    // For all played notes
-   for (int shapePitch : bestShape.mElements)
+   for (int shapePitch : shape.mElements)
    {
       // If pitch played, continue
       if (rootScalePitches.find(shapePitch) != rootScalePitches.end() ||
@@ -214,7 +234,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches)
       {
          // Don't need to modulo the indices here because rootScalePitches are <24
          // and the indices must be found in rootScalePitches
-       
+
          // Alterations up
          if (rootScalePitches.find(shapePitch + 1) != rootScalePitches.end())
          {
@@ -224,7 +244,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches)
          else if (rootScalePitches.find(shapePitch + 12 + 1) != rootScalePitches.end())
          {
             // No +12 as the note from the shape is altered, not the note found in rootScalePitches
-            alterations += Alterations[shapePitch + 1]; 
+            alterations += Alterations[shapePitch + 1];
             rootScalePitches.erase((shapePitch + 12 + 1));
          }
          // Alterations down
@@ -238,13 +258,11 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches)
             alterations += Alterations[shapePitch - 1];
             rootScalePitches.erase((shapePitch + 12 - 1));
          }
-         continue;
-      }
-
-      // Otherwise, display missing pitches (except 5 because of neutral tone) as omitX
-      if (shapePitch != 7 && shapePitch != 19)
-      {
-         alterations += "omit" + Alterations[shapePitch];
+         // Otherwise, display missing pitches (except 5 because of neutral tone) as omitX
+         else if (shapePitch != 7 && shapePitch != 19)
+         {
+            alterations += "omit" + Alterations[shapePitch];
+         }
       }
    }
 
@@ -256,7 +274,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int> &pitches)
 
    // If lowest note is not the root, notate it ass the bass note
    // (kind of extra since there's lots of inversions, might need a check to see if note is in the chord shape, or a check on the distance between the rest of the notes)
-   int lowest = 12 + pitches[0] - bestRoot % 12;
+   int lowest = 12 + pitches[0] - root % 12;
    if (lowest % 12 != 0)
    {
 

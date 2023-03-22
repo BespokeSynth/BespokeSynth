@@ -29,13 +29,14 @@
 
 #include "SynthGlobals.h"
 #include <numeric>
+#include <set>
 
 class ChordDatabase
 {
 public:
    ChordDatabase();
    std::string GetChordName(std::vector<int> pitches) const;
-   std::string GetChordNameAdvanced(const std::vector<int> &pitches) const;
+   std::set<std::string> GetChordNamesAdvanced(const std::vector<int>& pitches) const;
    std::vector<int> GetChord(std::string name, int inversion) const;
    std::vector<std::string> GetChordNames() const;
 
@@ -72,4 +73,6 @@ private:
       float mRootPosBias;
    };
    std::vector<ChordShape> mChordShapes;
+
+   std::string GetChordNameAdvanced(const std::vector<int>& pitches, const int root, const ChordShape shape) const;
 };
