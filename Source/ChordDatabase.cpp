@@ -122,7 +122,7 @@ ChordDatabase::ChordDatabase()
                                      { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, -2.0f, 10.0f }, 2.0f));
 }
 
-std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int>& pitches) const
+std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int>& pitches, bool useScaleDegrees) const
 {
    std::set<std::string> chordNames;
 
@@ -182,19 +182,27 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
       }
    }
 
-   std::string funnie;
-
    for (const auto& chord : bestChords)
    {
-      chordNames.insert(GetChordNameAdvanced(pitches, std::get<0>(chord), std::get<1>(chord)));
+      chordNames.insert(GetChordNameAdvanced(pitches, std::get<0>(chord), std::get<1>(chord), useScaleDegrees));
    }
 
    return chordNames;
 }
 
-std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches, const int root, const ChordShape shape) const
+std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches, const int root, const ChordShape shape, bool useScaleDegrees) const
 {
-   std::string chordName = NoteName(root) + shape.mName;
+   std::string rootName;
+   if (useScaleDegrees)
+   {
+      int degree = TheScale->GetToneFromPitch(root) % 7;
+      rootName = GetRomanNumeralForDegree(degree);      
+   }
+   else
+   {
+      rootName = NoteName(root);
+   }
+   std::string chordName = rootName + shape.mName;
 
    // Alterations
 
@@ -289,8 +297,16 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
    int lowest = 12 + pitches[0] - root % 12;
    if (lowest % 12 != 0)
    {
-
-      alterations += "/" + NoteName(pitches[0]);
+      if (useScaleDegrees)
+      {
+         const std::vector<std::string> degrees = { "1st", "2nd", "3rd", "4th", "5th", "6th", "7th" };
+         int degree = TheScale->GetToneFromPitch(root) % 7;
+         alterations += "/" + degrees[degree];
+      }
+      else
+      {
+         alterations += "/" + NoteName(pitches[0]);
+      }
    }
 
    return chordName + alterations;

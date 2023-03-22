@@ -47,7 +47,7 @@ void ChordDisplayer::DrawModule()
       if (notes.size() > 2)
       {
          std::vector<int> chord{ std::begin(notes), std::end(notes) };
-         std::set<std::string> chordNames = TheScale->GetChordDatabase().GetChordNamesAdvanced(chord);
+         std::set<std::string> chordNames = TheScale->GetChordDatabase().GetChordNamesAdvanced(chord, mUseScaleDegrees);
 
          if (chordNames.size() <= 5)
          {
@@ -96,6 +96,7 @@ void ChordDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("advanced_detection", moduleInfo, false);
+   mModuleSaveData.LoadBool("use_scale_degrees", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -104,6 +105,7 @@ void ChordDisplayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mAdvancedDetection = mModuleSaveData.GetBool("advanced_detection");
+   mUseScaleDegrees = mModuleSaveData.GetBool("use_scale_degrees");
 }
 
 void ChordDisplayer::SaveState(FileStreamOut& out)
