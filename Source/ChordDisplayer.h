@@ -45,13 +45,14 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = 300;
-      height = 100;
-   }
+   void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
+   bool mAdvancedDetection{ false };
 };

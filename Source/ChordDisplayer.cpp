@@ -28,6 +28,7 @@
 #include "ChordDisplayer.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
+#include "FileStream.h"
 #include <set>
 
 ChordDisplayer::ChordDisplayer()
@@ -41,26 +42,35 @@ void ChordDisplayer::DrawModule()
 
    std::list<int> notes = mNoteOutput.GetHeldNotesList();
 
-   if (notes.size() > 2)
+   if (mAdvancedDetection)
    {
-      std::vector<int> chord{ std::begin(notes), std::end(notes) };
-      std::set<std::string> chordNames = TheScale->GetChordDatabase().GetChordNamesAdvanced(chord);
+      if (notes.size() > 2)
+      {
+         std::vector<int> chord{ std::begin(notes), std::end(notes) };
+         std::set<std::string> chordNames = TheScale->GetChordDatabase().GetChordNamesAdvanced(chord);
 
-      if (chordNames.size() <= 5)
-      {
-         int drawY = 14;
-         int drawHeight = 20;
-         for (std::string chordName : chordNames)
+         if (chordNames.size() <= 5)
          {
-            DrawTextNormal(chordName, 4, drawY);
-            drawY += drawHeight;
-         } 
-      }     
-      else
-      {
-         DrawTextNormal("(ambiguous)", 4, 14);
+            int drawY = 14;
+            int drawHeight = 20;
+            for (std::string chordName : chordNames)
+            {
+               DrawTextNormal(chordName, 4, drawY);
+               drawY += drawHeight;
+            }
+         }
+         else
+         {
+            DrawTextNormal("(ambiguous)", 4, 14);
+         }
       }
    }
+   else
+   {
+      std::vector<int> chord{ std::begin(notes), std::end(notes) };
+      DrawTextNormal(TheScale->GetChordDatabase().GetChordName(chord), 4, 14);
+   }
+
 }
 
 void ChordDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -68,9 +78,24 @@ void ChordDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
+void ChordDisplayer::GetModuleDimensions(float& width, float& height)
+{
+   if (mAdvancedDetection)
+   {
+      width = 300;
+      height = 80;
+   }
+   else 
+   {
+      width = 300;
+      height = 20;
+   }
+}
+
 void ChordDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("advanced_detection", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -78,4 +103,21 @@ void ChordDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void ChordDisplayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mAdvancedDetection = mModuleSaveData.GetBool("advanced_detection");
 }
+
+void ChordDisplayer::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+}
+
+void ChordDisplayer::LoadState(FileStreamIn& in, int rev)
+{
+   IDrawableModule::LoadState(in, rev);
+
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+}
+
+
