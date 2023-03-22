@@ -46,7 +46,7 @@ void ChordDisplayer::DrawModule()
       std::vector<int> chord{ std::begin(notes), std::end(notes) };
       std::set<std::string> chordNames = TheScale->GetChordDatabase().GetChordNamesAdvanced(chord);
 
-      if (chordNames.size() < 4)
+      if (chordNames.size() <= 5)
       {
          int drawY = 14;
          int drawHeight = 20;
