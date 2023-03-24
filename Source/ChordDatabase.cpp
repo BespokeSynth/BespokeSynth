@@ -198,7 +198,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
    }
    else
    {
-      rootName = NoteNameScaleRelative(root, useScaleDegrees);
+      rootName = NoteNameScaleRelative(root, false);
    }
    std::string chordName = rootName + shape.mName;
 
@@ -295,16 +295,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
    int lowest = 12 + pitches[0] - root % 12;
    if (lowest % 12 != 0)
    {
-      if (useScaleDegrees)
-      {
-         const std::vector<std::string> degrees = { "1st", "2nd", "3rd", "4th", "5th", "6th", "7th" };
-         int degree = TheScale->GetToneFromPitch(root) % 7;
-         alterations += "/" + degrees[degree];
-      }
-      else
-      {
-         alterations += "/" + NoteNameScaleRelative(pitches[0], useScaleDegrees);
-      }
+      alterations += "/" + NoteNameScaleRelative(pitches[0], useScaleDegrees);
    }
 
    return chordName + alterations;
@@ -312,14 +303,23 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
 
 std::string ChordDatabase::NoteNameScaleRelative(int pitch, bool useDegrees) const
 {
-   pitch %= 12;
 
    if (useDegrees)
    {
-      const std::vector<std::string> sharps = { "1^", "1#", "2^", "2#", "3^", "4^", "4#", "5^", "5#", "6^", "6#", "7^" };
+      int relpitch = (pitch + 12 - TheScale->ScaleRoot()) % 12;
+
+      //const std::vector<std::string> flats = { "1^", "2^b", "2^", "3^b", "3^", "4^", "5^b", "5^", "6^b", "6^", "7^b", "7^" };
+      //const std::vector<std::string> sharps = { "1^", "1^#", "2^", "2^#", "3^", "4^", "4^#", "5^", "5^#", "6^", "6^#", "7^" };
+      // Choice of flats or sharps here depends strongly on context that can't really be gathered, so instead use the more common option 
+      const std::vector<std::string> accidentals = { "1^", "2^b", "2^", "3^b", "3^", "4^", "5^b", "5^", "5^#", "6^", "7^b", "7^" };
+
+      // For consistency with scale types, all scales are related to the major scale. i.e. in C minor Cb is 3^b rather than 3^.
+      return accidentals[relpitch];
    }
    else
    {
+      pitch %= 12;
+
       if (TheScale->GetType() == "aeolian")
       {
          const std::vector<int> flatScales = {0, 2, 3, 5, 8, 10}; // D G C F Ab Eb Bb
