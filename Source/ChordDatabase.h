@@ -36,7 +36,7 @@ class ChordDatabase
 public:
    ChordDatabase();
    std::string GetChordName(std::vector<int> pitches) const;
-   std::set<std::string> GetChordNamesAdvanced(const std::vector<int>& pitches, bool useScaleDegrees) const;
+   std::set<std::string> GetChordNamesAdvanced(const std::vector<int>& pitches, bool useScaleDegrees, bool showIntervals) const;
    std::vector<int> GetChord(std::string name, int inversion) const;
    std::vector<std::string> GetChordNames() const;
 

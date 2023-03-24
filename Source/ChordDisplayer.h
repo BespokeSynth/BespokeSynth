@@ -56,4 +56,5 @@ private:
    bool Enabled() const override { return true; }
    bool mAdvancedDetection{ false };
    bool mUseScaleDegrees{ false };
+   bool mShowIntervals{ false };
 };

@@ -42,27 +42,27 @@ void ChordDisplayer::DrawModule()
 
    std::list<int> notes = mNoteOutput.GetHeldNotesList();
 
+   if (notes.size() == 0)
+      return;
+
    if (mAdvancedDetection)
    {
-      if (notes.size() > 2)
-      {
-         std::vector<int> chord{ std::begin(notes), std::end(notes) };
-         std::set<std::string> chordNames = TheScale->GetChordDatabase().GetChordNamesAdvanced(chord, mUseScaleDegrees);
+      std::vector<int> chord{ std::begin(notes), std::end(notes) };
+      std::set<std::string> chordNames = TheScale->GetChordDatabase().GetChordNamesAdvanced(chord, mUseScaleDegrees, mShowIntervals);
 
-         if (chordNames.size() <= 5)
+      if (chordNames.size() <= 5)
+      {
+         int drawY = 14;
+         int drawHeight = 20;
+         for (std::string chordName : chordNames)
          {
-            int drawY = 14;
-            int drawHeight = 20;
-            for (std::string chordName : chordNames)
-            {
-               DrawTextNormal(chordName, 4, drawY);
-               drawY += drawHeight;
-            }
+            DrawTextNormal(chordName, 4, drawY);
+            drawY += drawHeight;
          }
-         else
-         {
-            DrawTextNormal("(ambiguous)", 4, 14);
-         }
+      }
+      else
+      {
+         DrawTextNormal("(ambiguous)", 4, 14);
       }
    }
    else
@@ -97,6 +97,7 @@ void ChordDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("advanced_detection", moduleInfo, false);
    mModuleSaveData.LoadBool("use_scale_degrees", moduleInfo, false);
+   mModuleSaveData.LoadBool("show_intervals", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -106,6 +107,7 @@ void ChordDisplayer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mAdvancedDetection = mModuleSaveData.GetBool("advanced_detection");
    mUseScaleDegrees = mModuleSaveData.GetBool("use_scale_degrees");
+   mShowIntervals = mModuleSaveData.GetBool("show_intervals");
 }
 
 void ChordDisplayer::SaveState(FileStreamOut& out)

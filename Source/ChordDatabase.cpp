@@ -120,14 +120,29 @@ ChordDatabase::ChordDatabase()
                                      { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, -2.0f, 10.0f }, 2.0f));
 }
 
-std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int>& pitches, bool useScaleDegrees) const
+std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int>& pitches, bool useScaleDegrees, bool showIntervals) const
 {
    std::set<std::string> chordNames;
 
-   // TODO: add logic for scale degrees and pitches :-)
    int numPitches = (int)pitches.size();
-   if (numPitches < 3)
+   if (numPitches == 1 && useScaleDegrees && showIntervals)
+   {
+       // Show scale degree of played note. Not really chord detection, but may be useful
+      chordNames.insert(NoteNameScaleRelative(pitches[0], true));
       return chordNames;
+   }
+   else if (numPitches == 2 && showIntervals)
+   {
+      // Intervals up to 11th
+      const std::vector<std::string> intervals = { "1st", "min 2nd", "2nd", "min 3rd", "3rd", "4th", "aug 4th/dim 5th", "5th", 
+          "min 6th", "6th", "min 7th", "7th", "oct", "min 9th", "9th", "min 10th", "10th", "11th" };
+      int interval = abs(pitches[1] - pitches[0]);
+      int lowest = (pitches[0] < pitches[1] ? pitches[0] : pitches[1]) % 12;
+      if (interval < intervals.size())
+         chordNames.insert(intervals[interval] + "/" + NoteNameScaleRelative(lowest, useScaleDegrees));
+
+      return chordNames;
+   }
 
    // Create a boolean vector with each pitch played, set to be in one octave
    //std::vector<int> octavePitches(12);
@@ -137,6 +152,9 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
    {
       octavePitches.insert(pitch % 12);
    }
+
+   if (octavePitches.size() < 3)
+      return chordNames;
 
    // Considering each played note as a possible root, find the root and chord with the greatest weight
 
