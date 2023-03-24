@@ -198,7 +198,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
    }
    else
    {
-      rootName = NoteName(root);
+      rootName = NoteNameScaleRelative(root, useScaleDegrees);
    }
    std::string chordName = rootName + shape.mName;
 
@@ -303,12 +303,43 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
       }
       else
       {
-         alterations += "/" + NoteName(pitches[0]);
+         alterations += "/" + NoteNameScaleRelative(pitches[0], useScaleDegrees);
       }
    }
 
    return chordName + alterations;
 }
+
+std::string ChordDatabase::NoteNameScaleRelative(int pitch, bool useDegrees) const
+{
+   pitch %= 12;
+
+   if (useDegrees)
+   {
+      const std::vector<std::string> sharps = { "1^", "1#", "2^", "2#", "3^", "4^", "4#", "5^", "5#", "6^", "6#", "7^" };
+   }
+   else
+   {
+      if (TheScale->GetType() == "aeolian")
+      {
+         const std::vector<int> flatScales = {0, 2, 3, 5, 8, 10}; // D G C F Ab Eb Bb
+         if (std::find(flatScales.begin(), flatScales.end(), TheScale->ScaleRoot()) != flatScales.end())
+            return NoteName(pitch, true);
+         else
+            return NoteName(pitch);
+
+      }
+      else
+      {
+         const std::vector<int> flatScales = {0, 1, 3, 5, 6, 8, 10 }; // C F Bb Eb Ab Gb Db (Cb not included)
+         if (std::find(flatScales.begin(), flatScales.end(), TheScale->ScaleRoot()) != flatScales.end())
+            return NoteName(pitch, true);
+         else
+            return NoteName(pitch);
+      }
+   }
+
+} 
 
 std::string ChordDatabase::GetChordName(std::vector<int> pitches) const
 {
