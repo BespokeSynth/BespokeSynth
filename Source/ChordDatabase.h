@@ -75,5 +75,6 @@ private:
    std::vector<ChordShape> mChordShapes;
 
    std::string GetChordNameAdvanced(const std::vector<int>& pitches, const int root, const ChordShape shape, bool useScaleDegrees) const;
-   std::string NoteNameScaleRelative(int pitch, bool useDegrees) const; // Helper function for GetChordName, may be better off moved to synthglobals?
+   std::string NoteNameScaleRelative(int pitch, bool useDegrees) const; // Helper function for GetChordNameAdvanced, may be better off moved to synthglobals?
+   std::string ChordNameScaleRelative(int rootPitch) const; // Helper function for GetChordNameAdvanced, may be better off moved to synthglobals?
 };

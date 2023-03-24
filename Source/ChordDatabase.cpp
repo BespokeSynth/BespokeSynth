@@ -191,16 +191,18 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
 std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches, const int root, const ChordShape shape, bool useScaleDegrees) const
 {
    std::string rootName;
+   std::string chordName;
    if (useScaleDegrees)
    {
-      int degree = TheScale->GetToneFromPitch(root) % 7;
-      rootName = GetRomanNumeralForDegree(degree);      
+      rootName = ChordNameScaleRelative(root);
+      chordName = rootName + shape.mName;
    }
    else
    {
       rootName = NoteNameScaleRelative(root, false);
+      chordName = rootName + shape.mName;
    }
-   std::string chordName = rootName + shape.mName;
+   
 
    // Alterations
 
@@ -301,6 +303,13 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
    return chordName + alterations;
 }
 
+std::string ChordDatabase::ChordNameScaleRelative(int rootPitch) const
+{
+   const std::vector<std::string> chordNames = { "I", "bII", "II", "bIII", "III", "IV", "bV", "V", "bVI", "VI", "bVII", "VII" };
+   int relpitch = (rootPitch + 12 - TheScale->ScaleRoot()) % 12;
+   return chordNames[relpitch];
+}
+
 std::string ChordDatabase::NoteNameScaleRelative(int pitch, bool useDegrees) const
 {
 
@@ -310,7 +319,7 @@ std::string ChordDatabase::NoteNameScaleRelative(int pitch, bool useDegrees) con
 
       //const std::vector<std::string> flats = { "1^", "2^b", "2^", "3^b", "3^", "4^", "5^b", "5^", "6^b", "6^", "7^b", "7^" };
       //const std::vector<std::string> sharps = { "1^", "1^#", "2^", "2^#", "3^", "4^", "4^#", "5^", "5^#", "6^", "6^#", "7^" };
-      // Choice of flats or sharps here depends strongly on context that can't really be gathered, so instead use the more common option 
+      // Choice of flats or sharps here depends strongly on context that can't really be gathered, so instead use some common options
       const std::vector<std::string> accidentals = { "1^", "2^b", "2^", "3^b", "3^", "4^", "5^b", "5^", "5^#", "6^", "7^b", "7^" };
 
       // For consistency with scale types, all scales are related to the major scale. i.e. in C minor Cb is 3^b rather than 3^.
