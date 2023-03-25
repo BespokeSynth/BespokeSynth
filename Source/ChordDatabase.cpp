@@ -127,15 +127,15 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
    int numPitches = (int)pitches.size();
    if (numPitches == 1 && useScaleDegrees && showIntervals)
    {
-       // Show scale degree of played note. Not really chord detection, but may be useful
+      // Show scale degree of played note. Not really chord detection, but may be useful
       chordNames.insert(NoteNameScaleRelative(pitches[0], true));
       return chordNames;
    }
    else if (numPitches == 2 && showIntervals)
    {
       // Intervals up to 11th
-      const std::vector<std::string> intervals = { "1st", "min 2nd", "2nd", "min 3rd", "3rd", "4th", "aug 4th/dim 5th", "5th", 
-          "min 6th", "6th", "min 7th", "7th", "oct", "min 9th", "9th", "min 10th", "10th", "11th" };
+      const std::vector<std::string> intervals = { "1st", "min 2nd", "2nd", "min 3rd", "3rd", "4th", "aug 4th/dim 5th", "5th",
+                                                   "min 6th", "6th", "min 7th", "7th", "oct", "min 9th", "9th", "min 10th", "10th", "11th" };
       int interval = abs(pitches[1] - pitches[0]);
       int lowest = (pitches[0] < pitches[1] ? pitches[0] : pitches[1]) % 12;
       if (interval < intervals.size())
@@ -145,7 +145,6 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
    }
 
    // Create a boolean vector with each pitch played, set to be in one octave
-   //std::vector<int> octavePitches(12);
    std::set<int> octavePitches;
 
    for (int pitch : pitches)
@@ -173,7 +172,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
 
          // Add some extra weight if the lowest played note is the root
          chordWeight += rootOctavePitch == lowestPitch ? shape.mRootPosBias : 0;
-                  
+
          // Add the weights for the pitches in the chord
          for (int octavePitch : octavePitches)
          {
@@ -220,7 +219,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
       rootName = NoteNameScaleRelative(root, false);
       chordName = rootName + shape.mName;
    }
-   
+
 
    // Alterations
 
@@ -349,24 +348,22 @@ std::string ChordDatabase::NoteNameScaleRelative(int pitch, bool useDegrees) con
 
       if (TheScale->GetType() == "aeolian")
       {
-         const std::vector<int> flatScales = {0, 2, 3, 5, 8, 10}; // D G C F Ab Eb Bb
+         const std::vector<int> flatScales = { 0, 2, 3, 5, 8, 10 }; // D G C F Ab Eb Bb
          if (std::find(flatScales.begin(), flatScales.end(), TheScale->ScaleRoot()) != flatScales.end())
             return NoteName(pitch, true);
          else
             return NoteName(pitch);
-
       }
       else
       {
-         const std::vector<int> flatScales = {0, 1, 3, 5, 6, 8, 10 }; // C F Bb Eb Ab Gb Db (Cb not included)
+         const std::vector<int> flatScales = { 0, 1, 3, 5, 6, 8, 10 }; // C F Bb Eb Ab Gb Db (Cb not included)
          if (std::find(flatScales.begin(), flatScales.end(), TheScale->ScaleRoot()) != flatScales.end())
             return NoteName(pitch, true);
          else
             return NoteName(pitch);
       }
    }
-
-} 
+}
 
 std::string ChordDatabase::GetChordName(std::vector<int> pitches) const
 {
