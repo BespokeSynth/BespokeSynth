@@ -70,6 +70,7 @@ void ChordDisplayer::DrawModule()
       std::vector<int> chord{ std::begin(notes), std::end(notes) };
       DrawTextNormal(TheScale->GetChordDatabase().GetChordName(chord), 4, 14);
    }
+
 }
 
 void ChordDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -84,7 +85,7 @@ void ChordDisplayer::GetModuleDimensions(float& width, float& height)
       width = 300;
       height = 80;
    }
-   else
+   else 
    {
       width = 300;
       height = 20;
@@ -122,3 +123,5 @@ void ChordDisplayer::LoadState(FileStreamIn& in, int rev)
 
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 }
+
+
