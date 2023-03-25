@@ -406,5 +406,3 @@ run_cmake*.bat
 run_cmake*.sh
 
 scripts/installer_macOS/Bespoke-Mac.dmg
-/cleanbuild.bat
-/.gitignore
