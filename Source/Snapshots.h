@@ -155,6 +155,7 @@ private:
    PatchCableSource* mUIControlCable{ nullptr };
    int mQueuedSnapshotIndex{ -1 };
    bool mAllowSetOnAudioThread{ false };
+   bool mAutoStoreOnSwitch{ false };
    TextEntry* mSnapshotLabelEntry{ nullptr };
    std::string mSnapshotLabel;
    int mLoadRev{ -1 };

@@ -211,12 +211,12 @@ void Snapshots::OnClicked(float x, float y, bool right)
       mGrid->GetPosition(gridX, gridY, true);
       GridCell cell = mGrid->GetGridCellAt(x - gridX, y - gridY);
 
-      mCurrentSnapshot = cell.mCol + cell.mRow * mGrid->GetCols();
+      int idx = cell.mCol + cell.mRow * mGrid->GetCols();
 
       if (GetKeyModifiers() == kModifier_Shift)
-         Store(mCurrentSnapshot);
+         Store(idx);
       else
-         SetSnapshot(mCurrentSnapshot, NextBufferTime(false));
+         SetSnapshot(idx, NextBufferTime(false));
 
       UpdateGridValues();
    }
@@ -233,7 +233,6 @@ void Snapshots::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 {
    if (velocity > 0 && pitch < (int)mSnapshotCollection.size())
    {
-      mCurrentSnapshot = pitch;
       SetSnapshot(pitch, time);
       UpdateGridValues();
    }
@@ -249,6 +248,11 @@ void Snapshots::SetSnapshot(int idx, double time)
 
    if (idx < 0 || idx >= (int)mSnapshotCollection.size())
       return;
+
+   if (mAutoStoreOnSwitch)
+      Store(mCurrentSnapshot);
+
+   mCurrentSnapshot = idx;
 
    if (mBlendTime > 0)
    {
@@ -471,7 +475,9 @@ void Snapshots::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mCurrentSnapshotSelector)
    {
-      SetSnapshot(mCurrentSnapshot, time);
+      int newIdx = mCurrentSnapshot;
+      mCurrentSnapshot = oldVal;
+      SetSnapshot(newIdx, time);
       UpdateGridValues();
    }
 }
@@ -525,6 +531,7 @@ void Snapshots::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
    mModuleSaveData.LoadFloat("gridheight", moduleInfo, 50, 15, 1000);
    mModuleSaveData.LoadBool("allow_set_on_audio_thread", moduleInfo, true);
+   mModuleSaveData.LoadBool("auto_store_on_switch", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -533,6 +540,7 @@ void Snapshots::SetUpFromSaveData()
 {
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
    mAllowSetOnAudioThread = mModuleSaveData.GetBool("allow_set_on_audio_thread");
+   mAutoStoreOnSwitch = mModuleSaveData.GetBool("auto_store_on_switch");
 }
 
 void Snapshots::SaveState(FileStreamOut& out)
