@@ -86,6 +86,7 @@ public:
 private:
    void SetSnapshot(int idx, double time);
    void Store(int idx);
+   void Delete(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;

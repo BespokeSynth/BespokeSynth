@@ -123,7 +123,8 @@ void Snapshots::DrawModule()
 
    int hover = mGrid->CurrentHover();
    bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
-   if (shiftHeld)
+   bool altHeld = GetKeyModifiers() == kModifier_Alt;
+   if (shiftHeld || altHeld)
    {
       if (hover < mGrid->GetCols() * mGrid->GetRows())
       {
@@ -133,14 +134,21 @@ void Snapshots::DrawModule()
 
          ofPushStyle();
          ofSetColor(0, 0, 0);
-         ofFill();
-         ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
-         ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
+         if (shiftHeld)
+         {
+            ofFill();
+            ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
+            ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
+         }
+         if (altHeld && !mSnapshotCollection[hover].mSnapshots.empty())
+         {
+            ofLine(pos.x + 3, pos.y + 3, pos.x + xsize - 3, pos.y + ysize - 3);
+            ofLine(pos.x + xsize - 3, pos.y + 3, pos.x + 3, pos.y + ysize - 3);
+         }
          ofPopStyle();
       }
    }
-
-   if (!shiftHeld)
+   else
    {
       if (mCurrentSnapshot < mGrid->GetCols() * mGrid->GetRows())
       {
@@ -215,6 +223,8 @@ void Snapshots::OnClicked(float x, float y, bool right)
 
       if (GetKeyModifiers() == kModifier_Shift)
          Store(idx);
+      else if (GetKeyModifiers() == kModifier_Alt)
+         Delete(idx);
       else
          SetSnapshot(idx, NextBufferTime(false));
 
@@ -441,6 +451,15 @@ void Snapshots::Store(int idx)
    }
 
    mSnapshotLabel = coll.mLabel;
+}
+
+void Snapshots::Delete(int idx)
+{
+   assert(idx >= 0 && idx < mSnapshotCollection.size());
+
+   SnapshotCollection& coll = mSnapshotCollection[idx];
+   coll.mSnapshots.clear();
+   coll.mLabel = ofToString(idx);
 }
 
 namespace
