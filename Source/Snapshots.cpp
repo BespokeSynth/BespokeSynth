@@ -460,6 +460,7 @@ void Snapshots::Delete(int idx)
    SnapshotCollection& coll = mSnapshotCollection[idx];
    coll.mSnapshots.clear();
    coll.mLabel = ofToString(idx);
+   mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
 }
 
 namespace
