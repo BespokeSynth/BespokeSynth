@@ -88,6 +88,7 @@ public:
 private:
    void SetSnapshot(int idx, double time);
    void Store(int idx);
+   void Delete(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;
@@ -156,6 +157,7 @@ private:
    PatchCableSource* mUIControlCable{ nullptr };
    int mQueuedSnapshotIndex{ -1 };
    bool mAllowSetOnAudioThread{ false };
+   bool mAutoStoreOnSwitch{ false };
    TextEntry* mSnapshotLabelEntry{ nullptr };
    std::string mSnapshotLabel;
    int mLoadRev{ -1 };

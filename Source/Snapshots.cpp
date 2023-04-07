@@ -123,7 +123,8 @@ void Snapshots::DrawModule()
 
    int hover = mGrid->CurrentHover();
    bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
-   if (shiftHeld)
+   bool altHeld = GetKeyModifiers() == kModifier_Alt;
+   if (shiftHeld || altHeld)
    {
       if (hover < mGrid->GetCols() * mGrid->GetRows())
       {
@@ -133,14 +134,21 @@ void Snapshots::DrawModule()
 
          ofPushStyle();
          ofSetColor(0, 0, 0);
-         ofFill();
-         ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
-         ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
+         if (shiftHeld)
+         {
+            ofFill();
+            ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
+            ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
+         }
+         if (altHeld && !mSnapshotCollection[hover].mSnapshots.empty())
+         {
+            ofLine(pos.x + 3, pos.y + 3, pos.x + xsize - 3, pos.y + ysize - 3);
+            ofLine(pos.x + xsize - 3, pos.y + 3, pos.x + 3, pos.y + ysize - 3);
+         }
          ofPopStyle();
       }
    }
-
-   if (!shiftHeld)
+   else
    {
       if (mCurrentSnapshot < mGrid->GetCols() * mGrid->GetRows())
       {
@@ -211,12 +219,14 @@ void Snapshots::OnClicked(float x, float y, bool right)
       mGrid->GetPosition(gridX, gridY, true);
       GridCell cell = mGrid->GetGridCellAt(x - gridX, y - gridY);
 
-      mCurrentSnapshot = cell.mCol + cell.mRow * mGrid->GetCols();
+      int idx = cell.mCol + cell.mRow * mGrid->GetCols();
 
       if (GetKeyModifiers() == kModifier_Shift)
-         Store(mCurrentSnapshot);
+         Store(idx);
+      else if (GetKeyModifiers() == kModifier_Alt)
+         Delete(idx);
       else
-         SetSnapshot(mCurrentSnapshot, NextBufferTime(false));
+         SetSnapshot(idx, NextBufferTime(false));
 
       UpdateGridValues();
    }
@@ -233,7 +243,6 @@ void Snapshots::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 {
    if (velocity > 0 && pitch < (int)mSnapshotCollection.size())
    {
-      mCurrentSnapshot = pitch;
       SetSnapshot(pitch, time);
       UpdateGridValues();
    }
@@ -249,6 +258,11 @@ void Snapshots::SetSnapshot(int idx, double time)
 
    if (idx < 0 || idx >= (int)mSnapshotCollection.size())
       return;
+
+   if (mAutoStoreOnSwitch)
+      Store(mCurrentSnapshot);
+
+   mCurrentSnapshot = idx;
 
    if (mBlendTime > 0)
    {
@@ -439,6 +453,16 @@ void Snapshots::Store(int idx)
    mSnapshotLabel = coll.mLabel;
 }
 
+void Snapshots::Delete(int idx)
+{
+   assert(idx >= 0 && idx < mSnapshotCollection.size());
+
+   SnapshotCollection& coll = mSnapshotCollection[idx];
+   coll.mSnapshots.clear();
+   coll.mLabel = ofToString(idx);
+   mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
+}
+
 namespace
 {
    const float extraW = 10;
@@ -471,7 +495,9 @@ void Snapshots::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mCurrentSnapshotSelector)
    {
-      SetSnapshot(mCurrentSnapshot, time);
+      int newIdx = mCurrentSnapshot;
+      mCurrentSnapshot = oldVal;
+      SetSnapshot(newIdx, time);
       UpdateGridValues();
    }
 }
@@ -525,6 +551,7 @@ void Snapshots::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
    mModuleSaveData.LoadFloat("gridheight", moduleInfo, 50, 15, 1000);
    mModuleSaveData.LoadBool("allow_set_on_audio_thread", moduleInfo, true);
+   mModuleSaveData.LoadBool("auto_store_on_switch", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -533,6 +560,7 @@ void Snapshots::SetUpFromSaveData()
 {
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
    mAllowSetOnAudioThread = mModuleSaveData.GetBool("allow_set_on_audio_thread");
+   mAutoStoreOnSwitch = mModuleSaveData.GetBool("auto_store_on_switch");
 }
 
 void Snapshots::SaveState(FileStreamOut& out)
