@@ -50,6 +50,7 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -60,7 +61,6 @@ private:
       width = 80;
       height = 0;
    }
-   bool Enabled() const override { return true; }
 
    LaunchpadKeyboard* mLaunchpad{ nullptr };
 };

@@ -54,6 +54,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -62,7 +64,6 @@ private:
       w = 120;
       h = 22;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mLevel{ 0 };
    float mMaxLevel{ 1 };

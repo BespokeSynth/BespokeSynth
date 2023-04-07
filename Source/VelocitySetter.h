@@ -54,6 +54,7 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -63,7 +64,6 @@ private:
       width = 90;
       height = 38;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mVelocity{ 1 };
    FloatSlider* mVelocitySlider{ nullptr };

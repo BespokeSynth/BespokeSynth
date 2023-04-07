@@ -105,12 +105,13 @@ public:
    int GetModuleSaveStateRev() const override { return 3; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void PreDrawModule() override;
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
    void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);

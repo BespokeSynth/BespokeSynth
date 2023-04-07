@@ -126,6 +126,8 @@ public:
 
    static std::string GetBootstrapImportString() { return "import bespoke; import module; import scriptmodule; import random; import math"; }
 
+   bool IsEnabled() const override { return true; }
+
 private:
    void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
    void AdjustUIControl(IUIControl* control, float value, double time, int lineNum);
@@ -149,7 +151,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
@@ -315,10 +316,11 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override
@@ -358,9 +360,10 @@ public:
       height = mHeight;
    }
 
+   bool IsEnabled() const override { return true; }
+
 private:
    void DrawModule() override;
-   bool Enabled() const override { return true; }
 
    int mWidth{ 600 };
    int mHeight{ 120 };

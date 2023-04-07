@@ -122,7 +122,7 @@ public:
    void Poll() override;
    void PlayStepNote(double time, int note, float val);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   bool Enabled() const override { return mEnabled; }
+   bool IsEnabled() const override { return mEnabled; }
    int GetPadPressure(int row) { return mPadPressures[row]; }
    NoteInterval GetStepInterval() const { return mStepInterval; }
    int GetStepNum(double time);

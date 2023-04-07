@@ -66,6 +66,8 @@ public:
    virtual void SetUpFromSaveData() override;
 
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void DrawViz();
    float SinSample(float phase);
@@ -77,7 +79,6 @@ private:
       w = 235;
       h = 170;
    }
-   bool Enabled() const override { return mEnabled; }
 
    FFTData mFFTData;
 

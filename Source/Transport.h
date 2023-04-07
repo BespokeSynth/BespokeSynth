@@ -178,6 +178,8 @@ public:
    static bool sDoEventLookahead;
    static double sEventEarlyMs;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    void UpdateListeners(double jumpMs);
    double Swing(double measurePos);
@@ -194,7 +196,6 @@ private:
       width = 140;
       height = 100;
    }
-   bool Enabled() const override { return true; }
 
    float mTempo{ 120 };
    int mTimeSigTop{ 4 };

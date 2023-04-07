@@ -71,11 +71,12 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    bool IsResizable() const override { return false; }
    void PostRepatch(PatchCableSource* cable, bool fromUserClick) override;
    bool ShouldSavePatchCableSources() const override { return false; }

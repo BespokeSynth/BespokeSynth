@@ -79,6 +79,7 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -88,7 +89,6 @@ private:
       width = 100;
       height = 50;
    }
-   bool Enabled() const override { return mEnabled; }
 
    int GetPitchForBucket(int bucket);
 

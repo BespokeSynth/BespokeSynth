@@ -85,7 +85,7 @@ public:
    void DrawModule() override;
 
    void SetEnabled(bool enabled) override {} //don't use this one
-   bool Enabled() const override { return true; }
+   bool IsEnabled() const override { return true; }
    bool HasTitleBar() const override { return mPinned; }
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;

@@ -58,6 +58,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -66,7 +68,6 @@ private:
       w = 60;
       h = 0;
    }
-   bool Enabled() const override { return true; }
 
    VocoderBase* mVocoder{ nullptr };
    IAudioReceiver* mVocoderTarget{ nullptr };

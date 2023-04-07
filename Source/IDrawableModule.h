@@ -118,6 +118,7 @@ public:
    static float TitleBarHeight() { return mTitleBarHeight; }
    static ofColor GetColor(ModuleCategory type);
    virtual void SetEnabled(bool enabled) {}
+   virtual bool IsEnabled() const { return true; }
    virtual bool CanMinimize() { return true; }
    virtual void SampleDropped(int x, int y, Sample* sample) {}
    virtual bool CanDropSample() const { return false; }
@@ -219,7 +220,6 @@ private:
    virtual void PreDrawModule() {}
    virtual void DrawModule() = 0;
    virtual void DrawModuleUnclipped() {}
-   virtual bool Enabled() const { return true; }
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}

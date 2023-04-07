@@ -53,11 +53,12 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
 
    float mRatio{ 1 };
    FloatSlider* mRatioSlider{ nullptr };

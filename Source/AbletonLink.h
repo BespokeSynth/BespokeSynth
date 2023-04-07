@@ -57,6 +57,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -66,7 +67,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mWidth;
    float mHeight;

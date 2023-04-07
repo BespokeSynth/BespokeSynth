@@ -47,6 +47,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -55,7 +57,6 @@ private:
       width = 90;
       height = 18;
    }
-   bool Enabled() const override { return mEnabled; }
 
    ClickButton* mFlushButton{ nullptr };
 };

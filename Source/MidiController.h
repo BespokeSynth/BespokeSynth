@@ -345,6 +345,8 @@ public:
    static double sLastBoundControlTime;
    static IUIControl* sLastBoundUIControl;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    enum MappingDisplayMode
    {
@@ -357,7 +359,6 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 

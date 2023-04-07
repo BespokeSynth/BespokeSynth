@@ -103,6 +103,8 @@ public:
    int GetModuleSaveStateRev() const override { return 2; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void UpdateSample(Sample* sample, bool ownsSample);
    float GetPlayPositionForMouse(float mouseX) const;
@@ -127,7 +129,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;

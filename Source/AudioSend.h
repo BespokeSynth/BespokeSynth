@@ -61,6 +61,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -69,7 +71,6 @@ private:
       w = 86;
       h = 38;
    }
-   bool Enabled() const override { return mEnabled; }
 
    bool mCrossfade{ false };
    Checkbox* mCrossfadeCheckbox{ nullptr };

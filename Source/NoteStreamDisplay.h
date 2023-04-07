@@ -55,6 +55,8 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -64,7 +66,6 @@ private:
       w = mWidth;
       h = mHeight;
    }
-   bool Enabled() const override { return true; }
    bool IsElementActive(int index) const;
    float GetYPos(int pitch, float noteHeight) const;
 

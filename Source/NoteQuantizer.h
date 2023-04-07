@@ -56,6 +56,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -64,7 +66,6 @@ private:
       width = 80;
       height = 40;
    }
-   bool Enabled() const override { return true; }
    void OnEvent(double time, float strength);
 
    struct InputInfo

@@ -25,7 +25,7 @@ Notes:
 		The second to last parameter is the note number corresponding to the standard midi notes.
 		The last parameter is the velocity of the note.
 		If three parameters are provided the first integer parameter will denote the note "channel".
-	example: /note 60 127
+	example: /bespoke/note 60 127
 
 Location store:
 	address: /bespoke/location/store
@@ -45,4 +45,56 @@ Location recall:
 		There is a limit of 10 location bookmarks (0 to 9).
 	example: /bespoke/location/recall 1
 
+Direct module control:
+	Sending notes directly to a module:
+		address: /bespoke/module/note/<module name>
+		parameters: [f, f] or [i, i]
+			The first parameter is the note number corresponding to the standard midi notes.
+			The second parameter is the velocity of the note.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+		example: /bespoke/module/note/oscillator2 60 127
+
+	Sending pulses directly to a module:
+		address: /bespoke/module/pulse/<module name>
+		parameters: [f] or [i]
+			The first parameter is the velocity of the pulse.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+			The velocity for pulses is in the range of 0 and 1.
+		example: /bespoke/module/pulse/notesequencer 1
+		example: /bespoke/module/pulse/pulsesequence .7
+
+	(Un-)Minimizing a module:
+		address: /bespoke/module/pulse/<module name>
+		parameters: [f] or [i]
+			If the first parameter is 0 the module will be minimized.
+			If the first parameter is 1 the module will be un-minimized.
+			If the first parameter is -1 the module will toggle its minimized state.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+		example: /bespoke/module/minimize/notesequencer -1
+
+	Enabling or disabling a module:
+		address: /bespoke/module/enable/<module name>
+		parameters: [f] or [i]
+			If the first parameter is 0 the module will be disabled.
+			If the first parameter is 1 the module will be enabled.
+			If the first parameter is -1 the module will toggle its enabled state.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+	example: /bespoke/module/enable/notesequencer -1
+	
+	View and zoom to a module:
+		address: /bespoke/module/focus/<module name>
+		parameters: [f] or [i]
+			If the first parameter is greater than 0.1 the zoom will be set to this.
+			If the first parameter is between -0.1 and 0.1 the zoom will be set to view the entire module.
+			If the first parameter is less than -0.1 zoom will be left as it was.
+			Regardless of the first parameter the view will be moved so that the module is in the center of the screen.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+	example: /bespoke/module/focus/midicontroller -1
+	
+	
 Any other addresses with parameters of type integer or float will be automapped to CC's in the midicontroller interface.

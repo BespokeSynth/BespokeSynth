@@ -63,6 +63,7 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
 
 private:
    bool ScaleSatisfied(int root, std::string type);
@@ -74,7 +75,6 @@ private:
       width = 140;
       height = 36;
    }
-   bool Enabled() const override { return true; }
 
    std::array<bool, 128> mPitchOn{ false };
    ClickButton* mResetButton{ nullptr };

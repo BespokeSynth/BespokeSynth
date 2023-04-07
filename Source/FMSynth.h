@@ -66,6 +66,8 @@ public:
 
    bool HasDebugDraw() const override { return true; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void UpdateHarmonicRatio();
 
@@ -77,7 +79,6 @@ private:
       width = 180;
       height = 203;
    }
-   bool Enabled() const override { return mEnabled; }
 
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;

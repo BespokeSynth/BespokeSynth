@@ -69,11 +69,12 @@ public:
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& info) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
 
    void ResetFilter();
 

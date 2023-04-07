@@ -25,6 +25,8 @@
 
 #include "OscController.h"
 #include "SynthGlobals.h"
+#include "IPulseReceiver.h"
+#include "TitleBar.h"
 
 OscController::OscController(MidiDeviceListener* listener, std::string outAddress, int outPort, int inPort)
 : mListener(listener)
@@ -176,6 +178,81 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       else
       {
          TheSynth->LogEvent("Could not find UI Control " + control_path + " when trying to set a value through OSC.", kLogEventType_Error);
+      }
+
+      return;
+   }
+
+   // Handle module direct messaging
+   std::string module_prefix = "/bespoke/module/";
+   if (address.rfind(module_prefix, 0) == 0)
+   {
+      auto parts = ofSplitString(address, "/", true, true);
+      if (parts.size() < 4)
+         return;
+      auto subcommand = parts[2];
+      auto module_path = juce::URL::removeEscapeChars(parts[3]).toStdString();
+      auto selected_module = TheSynth->FindModule(module_path);
+      if (!selected_module)
+         return;
+      if (subcommand == "note")
+      {
+         if (msg.size() < 2)
+            return;
+         auto selected_note_receiver = dynamic_cast<INoteReceiver*>(selected_module);
+         if (!selected_note_receiver)
+            return;
+         float pitch = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         float velocity = msg[1].isFloat32() ? msg[1].getFloat32() : msg[1].getInt32();
+         selected_note_receiver->PlayNote(gTime, pitch, velocity);
+      }
+      else if (subcommand == "pulse")
+      {
+         auto selected_pulse_receiver = dynamic_cast<IPulseReceiver*>(selected_module);
+         if (!selected_pulse_receiver)
+            return;
+         float velocity = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         selected_pulse_receiver->OnPulse(gTime, velocity, PulseFlags::kPulseFlag_None);
+      }
+      else if (subcommand == "minimize")
+      {
+         float minimize = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         if (minimize == 0)
+            selected_module->SetMinimized(false);
+         else if (minimize == 1)
+            selected_module->SetMinimized(true);
+         else
+            selected_module->SetMinimized(!selected_module->Minimized());
+      }
+      else if (subcommand == "enable")
+      {
+         float enable = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         if (enable == 0)
+            selected_module->SetEnabled(false);
+         else if (enable == 1)
+            selected_module->SetEnabled(true);
+         else
+            selected_module->SetEnabled(!selected_module->IsEnabled());
+      }
+      else if (subcommand == "focus")
+      {
+         ofRectangle module_rect = selected_module->GetRect();
+         float zoom = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         if (zoom >= 0.1)
+            gDrawScale = ofClamp(zoom, 0.1, 8);
+         else if (fabs(zoom) < 0.1) // Close to 0
+         {
+            //calculate zoom to view the entire module
+            float margin = 60;
+            float w_ratio = ofGetWidth() / (module_rect.width + margin);
+            float h_ratio = ofGetHeight() / (module_rect.height + margin);
+            float ratio = (w_ratio < h_ratio) ? w_ratio : h_ratio;
+            gDrawScale = ofClamp(ratio, 0.1, 8);
+         }
+         // Move viewport to centered on the module
+         float w, h;
+         TheTitleBar->GetDimensions(w, h);
+         TheSynth->SetDrawOffset(ofVec2f(-module_rect.x + ofGetWidth() / gDrawScale / 2 - module_rect.width / 2, -module_rect.y + ofGetHeight() / gDrawScale / 2 - (module_rect.height - h / 2) / 2));
       }
 
       return;

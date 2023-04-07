@@ -177,7 +177,7 @@ void DistortionEffect::GetModuleDimensions(float& width, float& height)
 
 void DistortionEffect::DrawModule()
 {
-   if (!Enabled())
+   if (!IsEnabled())
       return;
 
    mClipSlider->Draw();

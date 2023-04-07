@@ -48,11 +48,12 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
 
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};
 };

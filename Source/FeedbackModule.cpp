@@ -115,7 +115,7 @@ void FeedbackModule::Process(double time)
             //assert(abs(channel[i]) <= mSignalLimit);
          }
 
-         if (mDelay.Enabled())
+         if (mDelay.IsEnabled())
          {
             Add(mFeedbackTarget->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
             mFeedbackVizBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
