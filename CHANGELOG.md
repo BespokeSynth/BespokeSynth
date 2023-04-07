@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added 
 
+- Added option to snapshot module to auto-store entries when switching between snapshots
+- Added ability to delete snapshots by holding alt and clicking
+- Added the ability to send notes and pulses directly to modules through OSC.
+- Added the ability to toggle minimize and enabled state of modules through OSC.
+- Added a way to move to a module as well as zoom to it through OSC.
 - Added outline stroke to held modules
 - Added `looperrecorder` option to disable auto-advancing to the next `looper`
 - Added `pulseflag` module to explicitly control pulse types
@@ -59,6 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Massive RAM savings by changing how global record buffer saves
+- Sort the file list in the vstplugin's preset dropdown.
 - Renamed `presets` to `snapshots`, to better reflect what the module does
 - Allow the OSC control messages to work in percentage mode.
 - Select all text when tabbing through text entries 
@@ -107,6 +114,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed that prefabs (or containers) were saving twice.
+- Fixed EnvelopeEditor modulation when minimized
+- Hard limit the number of `effectchain` modules instead of a crashing
+- Made the `effectchain` effect controls untargetable by modulation cables since this crashes when modules are deleted.
+- Fixed cables not moving to the correct location when a module that has direct children is minimized
+- Fixed notecreator not disabling correctly
+- Remove cables targeting controls on a deleting module
+- Fixed the `circlesequencer` not triggering a note when a circle is set to `1`
+- Made file extensions mostly case insensitive on all platforms.
+- Refresh the file list in a `vstplugin` so that MIDI/OSC and other modulation work on load.
 - Fixed a bug where note off's would turn off all notes with the same pitch even when specific voice id's were used
 - Don't light up `notefilter` when velocity 0 is received 
 - Fixed issues clicking cables inside `prefab`s
