@@ -1129,7 +1129,9 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    }
 
    if (GetContainer())
+   {
       GetContainer()->SaveState(out);
+   }
    else
    {
       out << (int)mChildren.size();
@@ -1140,6 +1142,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
          child->SaveState(out);
       }
    }
+
    if (ShouldSavePatchCableSources())
    {
       out << (int)mPatchCableSources.size();
@@ -1265,6 +1268,7 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 
    if (GetContainer())
       GetContainer()->LoadState(in);
+
    if (!GetContainer() || ModularSynth::sLoadingFileSaveStateRev < 425)
    {
       int numChildren;
