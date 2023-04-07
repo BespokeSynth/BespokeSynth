@@ -473,9 +473,6 @@ void EnvelopeEditor::DrawModule()
       ofPopStyle();
    }
 
-   if (Minimized())
-      return;
-
    mMaxSustainSlider->SetShowing(mADSRDisplay != nullptr && mADSRDisplay->GetADSR()->GetHasSustainStage());
 
    mADSRViewLengthSlider->Draw();
