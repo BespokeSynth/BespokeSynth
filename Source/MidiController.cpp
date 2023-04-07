@@ -114,8 +114,6 @@ void MidiController::Init()
    mConnections.clear();
 
    mHasCreatedConnectionUIControls = false;
-   for (int i = 0; i < mConnectionsJson.size(); ++i)
-      AddControlConnection(mConnectionsJson[i]);
 
    TheTransport->AddAudioPoller(this);
 }
@@ -2418,6 +2416,9 @@ void MidiController::SaveState(FileStreamOut& out)
 void MidiController::LoadState(FileStreamIn& in, int rev)
 {
    IDrawableModule::LoadState(in, rev);
+
+   for (int i = 0; i < mConnectionsJson.size(); ++i)
+      AddControlConnection(mConnectionsJson[i]);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
