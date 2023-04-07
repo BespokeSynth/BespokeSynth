@@ -58,8 +58,6 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
-   bool HasDebugDraw() const override { return true; }
-
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
@@ -90,7 +88,7 @@ private:
    void Store(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
-   bool IsConnectedToPath(const std::string& path) const;
+   bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
    void RandomizeControl(IUIControl* control);
 
@@ -98,18 +96,18 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
    struct Snapshot
    {
-      Snapshot() = default;
-      Snapshot(std::string path, const float val)
-      : mControlPath(std::move(path))
+      Snapshot() {}
+      Snapshot(std::string path, float val)
+      : mControlPath(path)
       , mValue(val)
       {}
-      Snapshot(IUIControl* control, const Snapshots* snapshots);
+      Snapshot(IUIControl* control, Snapshots* snapshots);
       bool operator==(const Snapshot& other) const
       {
          return mControlPath == other.mControlPath &&
