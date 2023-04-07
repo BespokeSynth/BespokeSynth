@@ -1129,14 +1129,18 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    }
 
    if (GetContainer())
-      GetContainer()->SaveState(out);
-
-   out << (int)mChildren.size();
-
-   for (auto* child : mChildren)
    {
-      out << std::string(child->Name());
-      child->SaveState(out);
+      GetContainer()->SaveState(out);
+   }
+   else
+   {
+      out << (int)mChildren.size();
+
+      for (auto* child : mChildren)
+      {
+         out << std::string(child->Name());
+         child->SaveState(out);
+      }
    }
 
    if (ShouldSavePatchCableSources())
@@ -1265,18 +1269,21 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
    if (GetContainer())
       GetContainer()->LoadState(in);
 
-   int numChildren;
-   in >> numChildren;
-   LoadStateValidate(numChildren <= mChildren.size());
-
-   for (int i = 0; i < numChildren; ++i)
+   if (!GetContainer() || ModularSynth::sLoadingFileSaveStateRev < 425)
    {
-      std::string childName;
-      in >> childName;
-      //ofLog() << "Loading " << childName;
-      IDrawableModule* child = FindChild(childName.c_str());
-      LoadStateValidate(child);
-      child->LoadState(in, child->LoadModuleSaveStateRev(in));
+      int numChildren;
+      in >> numChildren;
+      LoadStateValidate(numChildren <= mChildren.size());
+
+      for (int i = 0; i < numChildren; ++i)
+      {
+         std::string childName;
+         in >> childName;
+         //ofLog() << "Loading " << childName;
+         IDrawableModule* child = FindChild(childName.c_str());
+         LoadStateValidate(child);
+         child->LoadState(in, child->LoadModuleSaveStateRev(in));
+      }
    }
 
    if (baseRev >= 1)
