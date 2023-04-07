@@ -114,11 +114,6 @@ void MidiController::Init()
    mConnections.clear();
 
    mHasCreatedConnectionUIControls = false;
-   // Only add non-grid connections, because the persisted layout has not been loaded yet.
-   // The grid connections will be added in LoadState.
-   for (int i = 0; i < mConnectionsJson.size(); ++i)
-      if (!mConnectionsJson[i].isMember("grid_index"))
-         AddControlConnection(mConnectionsJson[i]);
 
    TheTransport->AddAudioPoller(this);
 }
@@ -2422,12 +2417,8 @@ void MidiController::LoadState(FileStreamIn& in, int rev)
 {
    IDrawableModule::LoadState(in, rev);
 
-   // Add grid connections here instead of in Init, because the controller
-   // layout file is selected and loaded in IDrawableModule::LoadState,
-   // so the mGrids are only now available to add connections.
    for (int i = 0; i < mConnectionsJson.size(); ++i)
-      if (mConnectionsJson[i].isMember("grid_index"))
-         AddControlConnection(mConnectionsJson[i]);
+      AddControlConnection(mConnectionsJson[i]);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
