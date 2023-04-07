@@ -68,9 +68,9 @@ Direct module control:
 	(Un-)Minimizing a module:
 		address: /bespoke/module/pulse/<module name>
 		parameters: [f] or [i]
-			If the first paramater is 0 the module will be minimized.
-			If the first paramater is 1 the module will be un-minimized.
-			If the first paramater is -1 the module will toggle its minimized state.
+			If the first parameter is 0 the module will be minimized.
+			If the first parameter is 1 the module will be un-minimized.
+			If the first parameter is -1 the module will toggle its minimized state.
 		Notes:
 			The <module name> should be the URL escaped name of the module.
 		example: /bespoke/module/minimize/notesequencer -1
@@ -78,9 +78,9 @@ Direct module control:
 	Enabling or disabling a module:
 		address: /bespoke/module/enable/<module name>
 		parameters: [f] or [i]
-			If the first paramater is 0 the module will be disabled.
-			If the first paramater is 1 the module will be enabled.
-			If the first paramater is -1 the module will toggle its enabled state.
+			If the first parameter is 0 the module will be disabled.
+			If the first parameter is 1 the module will be enabled.
+			If the first parameter is -1 the module will toggle its enabled state.
 		Notes:
 			The <module name> should be the URL escaped name of the module.
 	example: /bespoke/module/enable/notesequencer -1
@@ -88,9 +88,9 @@ Direct module control:
 	View and zoom to a module:
 		address: /bespoke/module/focus/<module name>
 		parameters: [f] or [i]
-			If the first paramater is greater than 0.1 the zoom will be set to this.
-			If the first paramater is between -0.1 and 0.1 the zoom will be set to view the entire module.
-			If the first paramater is less than -0.1 zoom will be left as it was.
+			If the first parameter is greater than 0.1 the zoom will be set to this.
+			If the first parameter is between -0.1 and 0.1 the zoom will be set to view the entire module.
+			If the first parameter is less than -0.1 zoom will be left as it was.
 			Regardless of the first parameter the view will be moved so that the module is in the center of the screen.
 		Notes:
 			The <module name> should be the URL escaped name of the module.
