@@ -88,7 +88,7 @@ void FeedbackModule::Process(double time)
    {
       mFeedbackTarget->GetBuffer()->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
       mFeedbackVizBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
-      mDelay.ProcessAudio(gTime, GetBuffer());
+      mDelay.ProcessAudio(time, GetBuffer());
 
       const double kReleaseMs = 50;
       const double kReleaseCoeff = exp(-1000.0 / (kReleaseMs * gSampleRate));
@@ -115,7 +115,7 @@ void FeedbackModule::Process(double time)
             //assert(abs(channel[i]) <= mSignalLimit);
          }
 
-         if (mDelay.Enabled())
+         if (mDelay.IsEnabled())
          {
             Add(mFeedbackTarget->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
             mFeedbackVizBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
@@ -159,7 +159,6 @@ void FeedbackModule::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void FeedbackModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["feedbacktarget"] = mFeedbackTarget ? dynamic_cast<IDrawableModule*>(mFeedbackTarget)->Name() : "";
 }
 

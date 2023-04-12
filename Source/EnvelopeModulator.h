@@ -45,12 +45,15 @@ public:
    EnvelopeModulator();
    virtual ~EnvelopeModulator();
    static IDrawableModule* Create() { return new EnvelopeModulator(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
    void Delete() { delete this; }
    void DrawModule() override;
 
    void Start(double time, const ::ADSR& adsr);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   bool Enabled() const override { return mEnabled; }
+   bool IsEnabled() const override { return mEnabled; }
 
    void CreateUIControls() override;
    void MouseReleased() override;
@@ -68,12 +71,12 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void GetModuleDimensions(float& width, float& height) override;
 
@@ -91,7 +94,7 @@ private:
    float mHeight{ 122 };
 
    ADSRDisplay* mAdsrDisplay{ nullptr };
-   ::ADSR mAdsr;
+   ::ADSR mAdsr{ 10, 100, .5, 100 };
 
    bool mUseVelocity{ false };
    Checkbox* mUseVelocityCheckbox{ nullptr };

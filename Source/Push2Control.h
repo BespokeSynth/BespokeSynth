@@ -44,7 +44,9 @@ public:
    Push2Control();
    virtual ~Push2Control();
    static IDrawableModule* Create() { return new Push2Control(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Poll() override;
@@ -55,7 +57,7 @@ public:
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -67,12 +69,13 @@ public:
    static void CreateStaticFramebuffer(); //windows was having trouble creating a nanovg context and fbo on the fly
    static IUIControl* sBindToUIControl;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void PostRender() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override
    {
       width = mWidth;
@@ -109,61 +112,61 @@ private:
    ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
    int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
 
-   unsigned char* mPixels;
+   unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
 
    const float kColumnSpacing = 121;
 
-   int mFontHandle;
-   int mFontHandleBold;
+   int mFontHandle{ 0 };
+   int mFontHandleBold{ 0 };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 100 };
+   float mHeight{ 20 };
 
-   IDrawableModule* mDisplayModule;
+   IDrawableModule* mDisplayModule{ nullptr };
    std::vector<IUIControl*> mSliderControls;
    std::vector<IUIControl*> mButtonControls;
    std::vector<IUIControl*> mDisplayedControls;
-   int mModuleColumnOffset;
-   float mModuleColumnOffsetSmoothed;
+   int mModuleColumnOffset{ 0 };
+   float mModuleColumnOffsetSmoothed{ 0 };
 
    std::vector<IDrawableModule*> mModules;
-   float mModuleListOffset;
-   float mModuleListOffsetSmoothed;
+   float mModuleListOffset{ 0 };
+   float mModuleListOffsetSmoothed{ 0 };
    IDrawableModule* mModuleGrid[8 * 8];
    ofRectangle mModuleGridRect;
 
    std::vector<IUIControl*> mFavoriteControls;
    std::vector<IUIControl*> mSpawnModuleControls;
-   bool mNewButtonHeld;
-   bool mDeleteButtonHeld;
-   bool mModulationButtonHeld;
-   bool mAddModuleBookmarkButtonHeld;
+   bool mNewButtonHeld{ false };
+   bool mDeleteButtonHeld{ false };
+   bool mModulationButtonHeld{ false };
+   bool mAddModuleBookmarkButtonHeld{ false };
    std::array<bool, 128> mNoteHeldState;
-   IDrawableModule* mHeldModule;
-   bool mAllowRepatch;
+   IDrawableModule* mHeldModule{ nullptr };
+   bool mAllowRepatch{ false };
    std::vector<IDrawableModule*> mModuleHistory;
-   int mModuleHistoryPosition;
+   int mModuleHistoryPosition{ -1 };
    std::vector<IDrawableModule*> mBookmarkSlots;
-   bool mInMidiControllerBindMode;
+   bool mInMidiControllerBindMode{ false };
 
    enum class ScreenDisplayMode
    {
       kNormal,
       kAddModule
    };
-   ScreenDisplayMode mScreenDisplayMode;
+   ScreenDisplayMode mScreenDisplayMode{ ScreenDisplayMode::kNormal };
 
-   IPush2GridController* mGridControlModule;
-   bool mDisplayModuleCanControlGrid;
+   IPush2GridController* mGridControlModule{ nullptr };
+   bool mDisplayModuleCanControlGrid{ false };
 
-   int mLedState[128 * 2]; //bottom 128 are notes, top 128 are CCs
+   int mLedState[128 * 2]{}; //bottom 128 are notes, top 128 are CCs
 
    MidiDevice mDevice;
 
    SpawnListManager mSpawnLists;
-   int mPendingSpawnPitch;
-   int mSelectedGridSpawnListIndex;
+   int mPendingSpawnPitch{ -1 };
+   int mSelectedGridSpawnListIndex{ -1 };
    std::string mPushBridgeInitErrMsg;
 };
 

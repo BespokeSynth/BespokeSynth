@@ -31,10 +31,6 @@
 
 SignalClamp::SignalClamp()
 : IAudioProcessor(gBufferSize)
-, mMin(-1)
-, mMinSlider(nullptr)
-, mMax(1)
-, mMaxSlider(nullptr)
 {
 }
 

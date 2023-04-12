@@ -29,46 +29,58 @@
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "Slider.h"
+#include "TextEntry.h"
+#include "ClickButton.h"
 
-class TimelineControl : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener
+class TimelineControl : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    TimelineControl();
    ~TimelineControl();
    static IDrawableModule* Create() { return new TimelineControl(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void TextEntryComplete(TextEntry* entry) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
-   bool IsResizable() const override { return true; }
+   bool HasTitleBar() const override { return !mDock; }
+   bool IsResizable() const override { return !mDock; }
    void Resize(float width, float height) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
 
-   float GetSliderWidth() { return mWidth - 50; }
+   float GetSliderWidth() { return mWidth - 6; }
 
-   float mWidth;
-   float mNumMeasures;
-   float mTime;
-   FloatSlider* mTimeSlider;
-   bool mLoop;
-   Checkbox* mLoopCheckbox;
-   int mLoopStart;
-   IntSlider* mLoopStartSlider;
-   int mLoopEnd;
-   IntSlider* mLoopEndSlider;
+   float mWidth{ 400 };
+   int mNumMeasures{ 32 };
+   TextEntry* mNumMeasuresEntry{ nullptr };
+   float mTime{ 0 };
+   FloatSlider* mTimeSlider{ nullptr };
+   ClickButton* mResetButton{ nullptr };
+   bool mLoop{ false };
+   Checkbox* mLoopCheckbox{ nullptr };
+   int mLoopStart{ 0 };
+   IntSlider* mLoopStartSlider{ nullptr };
+   int mLoopEnd{ 8 };
+   IntSlider* mLoopEndSlider{ nullptr };
+   bool mDock{ false };
+   Checkbox* mDockCheckbox{ nullptr };
 };
 
 #endif /* defined(__Bespoke__TimelineControl__) */

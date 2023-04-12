@@ -277,7 +277,7 @@ void SignalGenerator::SetUpFromSaveData()
    SetFreqMode(mModuleSaveData.GetEnum<FreqMode>("freq_mode"));
 }
 
-void SignalGenerator::DropdownUpdated(DropdownList* list, int oldVal)
+void SignalGenerator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mOscSelector)
    {
@@ -288,7 +288,7 @@ void SignalGenerator::DropdownUpdated(DropdownList* list, int oldVal)
       SetFreqMode(mFreqMode);
 }
 
-void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mPulseWidthSlider)
       mOsc.SetPulseWidth(mPulseWidth);
@@ -297,16 +297,16 @@ void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    if (slider == mFreqSlider)
    {
       if (mFreqMode == kFreqMode_Ramp)
-         mFreqRamp.Start(gTime, mFreq, gTime + mFreqRampTime);
+         mFreqRamp.Start(time, mFreq, time + mFreqRampTime);
    }
    if (slider == mSoftenSlider)
       mOsc.mOsc.SetSoften(mSoften);
 }
 
-void SignalGenerator::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SignalGenerator::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void SignalGenerator::CheckboxUpdated(Checkbox* checkbox)
+void SignalGenerator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }

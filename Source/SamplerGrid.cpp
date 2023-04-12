@@ -425,19 +425,19 @@ void SamplerGrid::SetUpFromSaveData()
    mLastColumnIsGroup = mModuleSaveData.GetBool("last_column_is_group");
 }
 
-void SamplerGrid::DropdownUpdated(DropdownList* list, int oldVal)
+void SamplerGrid::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void SamplerGrid::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SamplerGrid::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SamplerGrid::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SamplerGrid::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void SamplerGrid::CheckboxUpdated(Checkbox* checkbox)
+void SamplerGrid::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

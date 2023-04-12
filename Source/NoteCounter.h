@@ -42,7 +42,9 @@ public:
    NoteCounter();
    ~NoteCounter();
    static IDrawableModule* Create() { return new NoteCounter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -59,11 +61,11 @@ public:
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -71,11 +73,12 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 2; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
 
    void Step(double time, float velocity, int pulseFlags);
    void Reseed();

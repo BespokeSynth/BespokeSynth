@@ -40,7 +40,7 @@
 #include "ModuleSaveDataPanel.h"
 #include "GridController.h"
 #include "ControlSequencer.h"
-#include "Presets.h"
+#include "Snapshots.h"
 #include "PatchCableSource.h"
 #include "nanovg/nanovg.h"
 #include "IPulseReceiver.h"
@@ -56,24 +56,6 @@ float IDrawableModule::sSaturation = 145;
 float IDrawableModule::sBrightness = 220;
 
 IDrawableModule::IDrawableModule()
-: mModuleCategory(kModuleCategory_Unknown)
-, mMinimized(false)
-, mWasMinimizeAreaClicked(false)
-, mMinimizeAnimation(0)
-, mEnabled(true)
-, mEnabledCheckbox(nullptr)
-, mUIControlsCreated(false)
-, mInitialized(false)
-, mMainPatchCableSource(nullptr)
-, mOwningContainer(nullptr)
-, mTitleLabelWidth(0)
-, mShouldDrawOutline(true)
-, mHoveringOverResizeHandle(false)
-, mDeleted(false)
-, mCanReceiveAudio(false)
-, mCanReceiveNotes(false)
-, mCanReceivePulses(false)
-, mDrawDebug(false)
 {
 }
 
@@ -115,21 +97,26 @@ void IDrawableModule::Init()
    assert(!mInitialized);
    mInitialized = true;
 
-   mModuleCategory = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
-   if (mModuleCategory == kModuleCategory_Other)
+   ModuleFactory::ModuleInfo moduleInfo = TheSynth->GetModuleFactory()->GetModuleInfo(mTypeName);
+   mModuleCategory = moduleInfo.mCategory;
+   if (mModuleCategory == kModuleCategory_Unknown)
    {
       if (dynamic_cast<IAudioEffect*>(this))
          mModuleCategory = kModuleCategory_Processor;
    }
 
-   mCanReceiveAudio = (dynamic_cast<IAudioReceiver*>(this) != nullptr);
-   mCanReceiveNotes = (dynamic_cast<INoteReceiver*>(this) != nullptr);
-   mCanReceivePulses = (dynamic_cast<IPulseReceiver*>(this) != nullptr);
+   mCanReceiveAudio = moduleInfo.mCanReceiveAudio;
+   mCanReceiveNotes = moduleInfo.mCanReceiveNotes;
+   mCanReceivePulses = moduleInfo.mCanReceivePulses;
 
-   bool wasEnabled = Enabled();
+   assert(mCanReceiveAudio == (dynamic_cast<IAudioReceiver*>(this) != nullptr));
+   assert(mCanReceiveNotes == (dynamic_cast<INoteReceiver*>(this) != nullptr));
+   assert(mCanReceivePulses == (dynamic_cast<IPulseReceiver*>(this) != nullptr));
+
+   bool wasEnabled = IsEnabled();
    bool showEnableToggle = false;
    SetEnabled(!wasEnabled);
-   if (Enabled() == wasEnabled) //nothing changed
+   if (IsEnabled() == wasEnabled) //nothing changed
       showEnableToggle = false; //so don't show toggle, this module doesn't support it
    else
       showEnableToggle = true;
@@ -199,7 +186,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
 
    highlight = 0;
 
-   if (Enabled())
+   if (IsEnabled())
    {
       IAudioSource* audioSource = dynamic_cast<IAudioSource*>(this);
       if (audioSource)
@@ -247,7 +234,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    ofFill();
-   if (Enabled())
+   if (IsEnabled())
       ofSetColor(color.r * (.25f + highlight), color.g * (.25f + highlight), color.b * (.25f + highlight), 210);
    else
       ofSetColor(color.r * .2f, color.g * .2f, color.b * .2f, 120);
@@ -258,28 +245,12 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    //gModuleShader.end();
    ofNoFill();
 
-   if (Enabled())
+   if (IsEnabled())
       gModuleDrawAlpha = 255;
    else
       gModuleDrawAlpha = 100;
 
-   bool dimModule = false;
-
-   if (TheSynth->GetGroupSelectedModules().empty() == false)
-   {
-      if (!VectorContains(GetModuleParent(), TheSynth->GetGroupSelectedModules()))
-         dimModule = true;
-   }
-
-   if (PatchCable::sActivePatchCable &&
-       (PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_Modulator && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl && PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_ValueSetter) &&
-       !PatchCable::sActivePatchCable->IsValidTarget(this))
-   {
-      dimModule = true;
-   }
-
-   if (TheSynth->GetHeldSample() != nullptr && !CanDropSample())
-      dimModule = true;
+   bool dimModule = TheSynth->ShouldDimModule(this);
 
    if (dimModule)
       gModuleDrawAlpha *= .2f;
@@ -352,7 +323,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
-   if ((Enabled() || groupSelected) && mShouldDrawOutline)
+   if ((IsEnabled() || groupSelected || TheSynth->GetMoveModule() == this) && mShouldDrawOutline)
    {
       ofPushStyle();
       ofNoFill();
@@ -362,6 +333,11 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2f, 1);
          ofSetColor(ofLerp(color.r, 255, pulse), ofLerp(color.g, 255, pulse), ofLerp(color.b, 255, pulse), 255);
          ofSetLineWidth(1.5f);
+      }
+      else if (TheSynth->GetMoveModule() == this)
+      {
+         ofSetColor(255, 255, 255);
+         ofSetLineWidth(.5f);
       }
       else
       {
@@ -554,7 +530,10 @@ void IDrawableModule::DrawConnection(IClickable* target)
 
 void IDrawableModule::SetTarget(IClickable* target)
 {
-   mMainPatchCableSource->SetTarget(target);
+   if (mMainPatchCableSource != nullptr)
+      mMainPatchCableSource->SetTarget(target);
+   else if (!mPatchCableSources.empty())
+      mPatchCableSources[0]->SetTarget(target);
 }
 
 void IDrawableModule::SetUpPatchCables(std::string targets)
@@ -1086,7 +1065,19 @@ void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string t
    mTypeName = typeName;
 }
 
-void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
+void IDrawableModule::LoadLayoutBase(const ofxJSONElement& moduleInfo)
+{
+   LoadLayout(moduleInfo);
+
+   ITimeListener* timeListener = dynamic_cast<ITimeListener*>(this);
+   if (timeListener)
+   {
+      mModuleSaveData.LoadInt("transport_priority", moduleInfo, timeListener->mTransportPriority, -9999, 9999, K(isTextField));
+      timeListener->mTransportPriority = mModuleSaveData.GetInt("transport_priority");
+   }
+}
+
+void IDrawableModule::SaveLayoutBase(ofxJSONElement& moduleInfo)
 {
    moduleInfo["position"][0u] = mX;
    moduleInfo["position"][1u] = mY;
@@ -1097,6 +1088,17 @@ void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
    if (TheSynth->IsLissajousDrawer(this))
       moduleInfo["draw_lissajous"] = true;
    mModuleSaveData.Save(moduleInfo);
+
+   SaveLayout(moduleInfo);
+}
+
+void IDrawableModule::SetUpFromSaveDataBase()
+{
+   ITimeListener* timeListener = dynamic_cast<ITimeListener*>(this);
+   if (timeListener)
+      timeListener->mTransportPriority = mModuleSaveData.GetInt("transport_priority");
+
+   SetUpFromSaveData();
 }
 
 namespace
@@ -1134,19 +1136,30 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    }
 
    if (GetContainer())
-      GetContainer()->SaveState(out);
-
-   out << (int)mChildren.size();
-
-   for (auto* child : mChildren)
    {
-      out << std::string(child->Name());
-      child->SaveState(out);
+      GetContainer()->SaveState(out);
+   }
+   else
+   {
+      out << (int)mChildren.size();
+
+      for (auto* child : mChildren)
+      {
+         out << std::string(child->Name());
+         child->SaveState(out);
+      }
    }
 
-   out << (int)mPatchCableSources.size();
-   for (auto* cable : mPatchCableSources)
-      cable->SaveState(out);
+   if (ShouldSavePatchCableSources())
+   {
+      out << (int)mPatchCableSources.size();
+      for (auto* cable : mPatchCableSources)
+         cable->SaveState(out);
+   }
+   else
+   {
+      out << 0; //no patch cable sources
+   }
 }
 
 int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
@@ -1263,59 +1276,62 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
    if (GetContainer())
       GetContainer()->LoadState(in);
 
-   int numChildren;
-   in >> numChildren;
-   if (numChildren > mChildren.size())
+   if (!GetContainer() || ModularSynth::sLoadingFileSaveStateRev < 425)
    {
-      ofLog() << "IDrawableModule: numChildren(" << numChildren << ") <= mChildren.size()(" << mChildren.size() << ")";
-      ofLog() << "Attempting to load the children anyway ... ";
-   }
-
-   for (int i = 0; i < numChildren; ++i)
-   {
-      std::string childName;
-      in >> childName;
-      //ofLog() << "Loading " << childName;
-      IDrawableModule* child = FindChild(childName.c_str(), false);
-
-      // Attempt a hacky fix for saves that were saved with module name instead of module type.
-      if (!child)
+      int numChildren;
+      in >> numChildren;
+      LoadStateValidate(numChildren <= mChildren.size());
+      if (numChildren > mChildren.size())
       {
-         ofLog() << "Child with name '" << childName << "' not found attempting to find: '" << childName.substr(0, childName.length() - 1).c_str() << "'";
-         child = FindChild(childName.substr(0, childName.length() - 1).c_str(), false);
+         ofLog() << "IDrawableModule: numChildren(" << numChildren << ") <= mChildren.size()(" << mChildren.size() << ")";
+         ofLog() << "Attempting to load the children anyway ... ";
       }
+      for (int i = 0; i < numChildren; ++i)
+      {
+         std::string childName;
+         in >> childName;
+         //ofLog() << "Loading " << childName;
+         IDrawableModule* child = FindChild(childName.c_str(), false);
 
-      if (child)
-      {
-         LoadStateValidate(child);
-         child->LoadState(in, child->LoadModuleSaveStateRev(in));
-      }
-      else
-      {
-         //@TODO(Noxy): Any data beyond this point is questionable.
-         ofLog() << "Loading of child '" << childName << "' failed.";
-      }
-   }
-
-   if (baseRev >= 1)
-   {
-      int numPatchCableSources;
-      in >> numPatchCableSources;
-      PatchCableSource* dummy = nullptr;
-      for (int i = 0; i < numPatchCableSources; ++i)
-      {
-         PatchCableSource* readIn;
-         if (i < mPatchCableSources.size())
+         // Attempt a hacky fix for saves that were saved with module name instead of module type.
+         if (!child)
          {
-            readIn = mPatchCableSources[i];
+            ofLog() << "Child with name '" << childName << "' not found attempting to find: '" << childName.substr(0, childName.length() - 1).c_str() << "'";
+            child = FindChild(childName.substr(0, childName.length() - 1).c_str(), false);
+         }
+
+         if (child)
+         {
+            LoadStateValidate(child);
+            child->LoadState(in, child->LoadModuleSaveStateRev(in));
          }
          else
          {
-            if (dummy == nullptr)
-               dummy = new PatchCableSource(this, kConnectionType_Special);
-            readIn = dummy;
+            //@TODO(Noxy): Any data beyond this point is questionable.
+            ofLog() << "Loading of child '" << childName << "' failed.";
          }
-         readIn->LoadState(in);
+      }
+
+      if (baseRev >= 1)
+      {
+         int numPatchCableSources;
+         in >> numPatchCableSources;
+         PatchCableSource* dummy = nullptr;
+         for (int i = 0; i < numPatchCableSources; ++i)
+         {
+            PatchCableSource* readIn;
+            if (i < mPatchCableSources.size())
+            {
+               readIn = mPatchCableSources[i];
+            }
+            else
+            {
+               if (dummy == nullptr)
+                  dummy = new PatchCableSource(this, kConnectionType_Special);
+               readIn = dummy;
+            }
+            readIn->LoadState(in);
+         }
       }
    }
 }
@@ -1328,4 +1344,11 @@ std::vector<IUIControl*> IDrawableModule::ControlsToNotSetDuringLoadState() cons
 std::vector<IUIControl*> IDrawableModule::ControlsToIgnoreInSaveState() const
 {
    return std::vector<IUIControl*>(); //empty
+}
+
+bool IDrawableModule::IsSpawningOnTheFly(const ofxJSONElement& moduleInfo)
+{
+   if (moduleInfo["onthefly"].isNull())
+      return false;
+   return moduleInfo["onthefly"].asBool();
 }

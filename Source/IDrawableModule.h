@@ -70,6 +70,9 @@ public:
    IDrawableModule();
    virtual ~IDrawableModule();
    static bool CanCreate() { return true; }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void Render() override;
    void RenderUnclipped();
@@ -115,6 +118,7 @@ public:
    static float TitleBarHeight() { return mTitleBarHeight; }
    static ofColor GetColor(ModuleCategory type);
    virtual void SetEnabled(bool enabled) {}
+   virtual bool IsEnabled() const { return true; }
    virtual bool CanMinimize() { return true; }
    virtual void SampleDropped(int x, int y, Sample* sample) {}
    virtual bool CanDropSample() const { return false; }
@@ -155,13 +159,13 @@ public:
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
 
-   virtual void CheckboxUpdated(Checkbox* checkbox) {}
+   virtual void CheckboxUpdated(Checkbox* checkbox, double time) {}
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName);
    virtual void CreateUIControls();
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
-   virtual void SaveLayout(ofxJSONElement& moduleInfo);
-   virtual void SetUpFromSaveData() {}
+   void LoadLayoutBase(const ofxJSONElement& moduleInfo);
+   void SaveLayoutBase(ofxJSONElement& moduleInfo);
+   void SetUpFromSaveDataBase();
    virtual bool IsSaveable() { return true; }
    ModuleSaveData& GetSaveData() { return mModuleSaveData; }
    virtual void SaveState(FileStreamOut& out);
@@ -174,6 +178,7 @@ public:
    virtual void UpdateOldControlName(std::string& oldName) {}
    virtual bool LoadOldControl(FileStreamIn& in, std::string& oldName) { return false; }
    virtual bool CanModuleTypeSaveState() const { return true; }
+   bool IsSpawningOnTheFly(const ofxJSONElement& moduleInfo);
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}
@@ -197,7 +202,7 @@ public:
    static float sSaturation;
    static float sBrightness;
 
-   bool mDrawDebug;
+   bool mDrawDebug{ false };
 
    static constexpr int kMaxOutputsPerPatchCableSource = 32;
 
@@ -207,17 +212,20 @@ protected:
    bool MouseMoved(float x, float y) override;
 
    ModuleSaveData mModuleSaveData;
-   Checkbox* mEnabledCheckbox;
-   bool mEnabled;
-   ModuleCategory mModuleCategory;
+   Checkbox* mEnabledCheckbox{ nullptr };
+   bool mEnabled{ true };
+   ModuleCategory mModuleCategory{ ModuleCategory::kModuleCategory_Unknown };
 
 private:
    virtual void PreDrawModule() {}
    virtual void DrawModule() = 0;
    virtual void DrawModuleUnclipped() {}
-   virtual bool Enabled() const { return true; }
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
+   virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
+   virtual void SetUpFromSaveData() {}
+   virtual bool ShouldSavePatchCableSources() const { return true; }
 
    std::vector<IUIControl*> mUIControls;
    std::vector<IDrawableModule*> mChildren;
@@ -226,25 +234,25 @@ private:
    static const int mTitleBarHeight = 12;
    std::string mTypeName;
    static const int sResizeCornerSize = 8;
-   ModuleContainer* mOwningContainer;
+   ModuleContainer* mOwningContainer{ nullptr };
 
-   bool mMinimized;
-   bool mWasMinimizeAreaClicked;
-   float mMinimizeAnimation;
-   bool mUIControlsCreated;
-   bool mInitialized;
+   bool mMinimized{ false };
+   bool mWasMinimizeAreaClicked{ false };
+   float mMinimizeAnimation{ 0 };
+   bool mUIControlsCreated{ false };
+   bool mInitialized{ false };
    std::string mLastTitleLabel;
-   float mTitleLabelWidth;
-   bool mShouldDrawOutline;
-   bool mHoveringOverResizeHandle;
-   bool mDeleted;
-   bool mCanReceiveAudio;
-   bool mCanReceiveNotes;
-   bool mCanReceivePulses;
+   float mTitleLabelWidth{ 0 };
+   bool mShouldDrawOutline{ true };
+   bool mHoveringOverResizeHandle{ false };
+   bool mDeleted{ false };
+   bool mCanReceiveAudio{ false };
+   bool mCanReceiveNotes{ false };
+   bool mCanReceivePulses{ false };
 
    ofMutex mSliderMutex;
 
-   PatchCableSource* mMainPatchCableSource;
+   PatchCableSource* mMainPatchCableSource{ nullptr };
    std::vector<PatchCableSource*> mPatchCableSources;
 };
 

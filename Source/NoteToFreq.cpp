@@ -31,8 +31,6 @@
 #include "ModulationChain.h"
 
 NoteToFreq::NoteToFreq()
-: mPitch(0)
-, mPitchBend(nullptr)
 {
 }
 
@@ -76,7 +74,6 @@ float NoteToFreq::Value(int samplesIn)
 
 void NoteToFreq::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteToFreq::LoadLayout(const ofxJSONElement& moduleInfo)

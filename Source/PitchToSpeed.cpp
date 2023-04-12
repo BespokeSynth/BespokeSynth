@@ -33,10 +33,6 @@
 #include "ModulationChain.h"
 
 PitchToSpeed::PitchToSpeed()
-: mPitch(0)
-, mPitchBend(nullptr)
-, mReferenceFreqSlider(nullptr)
-, mReferenceFreq(440)
 {
 }
 
@@ -84,7 +80,6 @@ float PitchToSpeed::Value(int samplesIn)
 
 void PitchToSpeed::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PitchToSpeed::LoadLayout(const ofxJSONElement& moduleInfo)

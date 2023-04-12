@@ -30,9 +30,7 @@
 #include <cstring>
 
 CommentDisplay::CommentDisplay()
-: mCommentEntry(nullptr)
 {
-   mComment[0] = 0;
 }
 
 CommentDisplay::~CommentDisplay()
@@ -79,7 +77,5 @@ void CommentDisplay::SetUpFromSaveData()
 
 void CommentDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["comment"] = mComment;
 }

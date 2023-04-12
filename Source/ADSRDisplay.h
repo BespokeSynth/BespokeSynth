@@ -58,11 +58,12 @@ public:
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
+   bool GetNoHover() const override { return true; }
 
    enum DisplayMode
    {
@@ -95,6 +96,7 @@ private:
    }
 
    void UpdateSliderVisibility();
+   ofVec2f GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent);
 
    float mWidth;
    float mHeight;
@@ -102,7 +104,6 @@ private:
    float mMaxTime{ 1000 };
    bool mClick{ false };
    ::ADSR* mAdsr;
-   ::ADSR mViewAdsr; //for ADSR simulation in drawing
    ofVec2f mClickStart;
    ::ADSR mClickAdsr;
    float mClickLength{ 1000 };

@@ -187,7 +187,7 @@ bool NoteStreamDisplay::IsElementActive(int index) const
    return mNoteStream[index].timeOn != -1 && (mNoteStream[index].timeOff == -1 || gTime - mNoteStream[index].timeOff < mDurationMs);
 }
 
-void NoteStreamDisplay::ButtonClicked(ClickButton* button)
+void NoteStreamDisplay::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
    {
@@ -224,7 +224,6 @@ void NoteStreamDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void NoteStreamDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

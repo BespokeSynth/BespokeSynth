@@ -29,8 +29,6 @@
 LaunchpadInterpreter::LaunchpadInterpreter(ILaunchpadListener* listener)
 : mListener(listener)
 {
-   for (int i = 0; i < 64 + 8 + 8; ++i)
-      mLights[i] = 0;
 }
 
 void LaunchpadInterpreter::SetController(MidiController* controller, int page)

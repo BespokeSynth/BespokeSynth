@@ -44,7 +44,9 @@ public:
    Arpeggiator();
    ~Arpeggiator();
    static IDrawableModule* Create() { return new Arpeggiator(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -66,18 +68,20 @@ public:
    void OnScaleChanged() override;
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IDropdownListener
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -87,7 +91,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
    void OnClicked(float x, float y, bool right) override;
 
    std::string GetArpNoteDisplay(int pitch);
@@ -111,24 +114,24 @@ private:
    float mWidth;
    float mHeight;
 
-   NoteInterval mInterval;
-   int mLastPitch;
-   int mArpIndex;
-   char mArpString[MAX_TEXTENTRY_LENGTH];
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   int mLastPitch{ -1 };
+   int mArpIndex{ -1 };
+   char mArpString[MAX_TEXTENTRY_LENGTH]{};
 
-   DropdownList* mIntervalSelector;
-   int mArpStep;
-   int mArpPingPongDirection;
-   IntSlider* mArpStepSlider;
+   DropdownList* mIntervalSelector{ nullptr };
+   int mArpStep{ 1 };
+   int mArpPingPongDirection{ 1 };
+   IntSlider* mArpStepSlider{ nullptr };
 
-   int mCurrentOctaveOffset;
-   int mOctaveRepeats;
-   IntSlider* mOctaveRepeatsSlider;
+   int mCurrentOctaveOffset{ 0 };
+   int mOctaveRepeats{ 1 };
+   IntSlider* mOctaveRepeatsSlider{ nullptr };
 
    std::array<bool, 128> mInputNotes{ false };
    ofMutex mChordMutex;
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Arpeggiator__) */

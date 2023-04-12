@@ -38,7 +38,9 @@ public:
    NoteStrummer();
    virtual ~NoteStrummer();
    static IDrawableModule* Create() { return new NoteStrummer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -46,13 +48,15 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -62,10 +66,9 @@ private:
       width = 200;
       height = 35;
    }
-   bool Enabled() const override { return true; }
 
-   float mStrum;
-   float mLastStrumPos;
-   FloatSlider* mStrumSlider;
+   float mStrum{ 0 };
+   float mLastStrumPos{ 0 };
+   FloatSlider* mStrumSlider{ nullptr };
    std::list<int> mNotes;
 };

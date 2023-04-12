@@ -114,7 +114,7 @@ bool VinylTempoControl::CanStartVinylControl()
    return !mVinylProcessor.GetStopped() && fabsf(mVinylProcessor.GetPitch()) > .001f;
 }
 
-void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox)
+void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mUseVinylControlCheckbox)
    {
@@ -125,19 +125,10 @@ void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox)
 
 void VinylTempoControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mSliderTarget)
-      targetPath = mSliderTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 

@@ -137,13 +137,13 @@ void ControlSequencer::Step(double time, int pulseFlags)
 
    if (mEnabled)
    {
-      mControlCable->AddHistoryEvent(gTime, true);
-      mControlCable->AddHistoryEvent(gTime + 15, false);
+      mControlCable->AddHistoryEvent(time, true);
+      mControlCable->AddHistoryEvent(time + 15, false);
 
       for (auto* target : mTargets)
       {
          if (target != nullptr)
-            target->SetFromMidiCC(mGrid->GetVal(mStep, 0), true);
+            target->SetFromMidiCC(mGrid->GetVal(mStep, 0), time, true);
       }
    }
 }
@@ -183,7 +183,7 @@ void ControlSequencer::DrawModule()
    mRandomize->Draw();
 
    int currentHover = mGrid->CurrentHover();
-   if (currentHover != -1 && GetUIControl())
+   if (!mSliderMode && currentHover != -1 && GetUIControl())
    {
       ofPushStyle();
       ofSetColor(ofColor::grey);
@@ -281,7 +281,7 @@ void ControlSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    }
 }
 
-void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -299,7 +299,7 @@ void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -309,7 +309,7 @@ void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void ControlSequencer::ButtonClicked(ClickButton* button)
+void ControlSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomize)
    {
@@ -352,7 +352,6 @@ void ControlSequencer::SetGridSize(float w, float h)
 
 void ControlSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ControlSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -376,6 +375,7 @@ void ControlSequencer::SaveState(FileStreamOut& out)
    mGrid->SaveState(out);
    out << mGrid->GetWidth();
    out << mGrid->GetHeight();
+   out << mHasExternalPulseSource;
 }
 
 void ControlSequencer::LoadState(FileStreamIn& in, int rev)
@@ -447,6 +447,9 @@ void ControlSequencer::LoadState(FileStreamIn& in, int rev)
       mSliderMode = false;
       mModuleSaveData.SetBool("slider_mode", false);
    }
+
+   if (rev >= 3)
+      in >> mHasExternalPulseSource;
 }
 
 bool ControlSequencer::LoadOldControl(FileStreamIn& in, std::string& oldName)

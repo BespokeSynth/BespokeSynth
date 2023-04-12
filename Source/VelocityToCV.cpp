@@ -33,8 +33,6 @@
 #include "ModulationChain.h"
 
 VelocityToCV::VelocityToCV()
-: mVelocity(0)
-, mPassZero(false)
 {
 }
 
@@ -84,7 +82,6 @@ float VelocityToCV::Value(int samplesIn)
 
 void VelocityToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void VelocityToCV::LoadLayout(const ofxJSONElement& moduleInfo)

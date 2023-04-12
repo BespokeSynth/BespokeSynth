@@ -41,7 +41,7 @@
 
 class ofxJSONElement;
 
-#define MAX_SAMPLER_LENGTH 2 * gSampleRate
+#define MAX_SAMPLER_LENGTH 2 * 48000
 
 class Sampler : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener
 {
@@ -49,7 +49,9 @@ public:
    Sampler();
    ~Sampler();
    static IDrawableModule* Create() { return new Sampler(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -70,16 +72,18 @@ public:
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    void StopRecording();
@@ -88,30 +92,28 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-
 
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    SampleVoiceParams mVoiceParams;
-   FloatSlider* mVolSlider;
-   ADSRDisplay* mADSRDisplay;
-   float mThresh;
-   FloatSlider* mThreshSlider;
+   FloatSlider* mVolSlider{ nullptr };
+   ADSRDisplay* mADSRDisplay{ nullptr };
+   float mThresh{ .2 };
+   FloatSlider* mThreshSlider{ nullptr };
 
-   float* mSampleData;
-   int mRecordPos;
-   bool mRecording;
-   Checkbox* mRecordCheckbox;
-   bool mPitchCorrect;
-   Checkbox* mPitchCorrectCheckbox;
-   bool mPassthrough;
-   Checkbox* mPassthroughCheckbox;
+   float* mSampleData{ nullptr };
+   int mRecordPos{ 0 };
+   bool mRecording{ false };
+   Checkbox* mRecordCheckbox{ nullptr };
+   bool mPitchCorrect{ false };
+   Checkbox* mPitchCorrectCheckbox{ nullptr };
+   bool mPassthrough{ false };
+   Checkbox* mPassthroughCheckbox{ nullptr };
 
    ChannelBuffer mWriteBuffer;
 
    PitchDetector mPitchDetector;
-   bool mWantDetectPitch;
+   bool mWantDetectPitch{ false };
 };
 
 

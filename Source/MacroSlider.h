@@ -39,13 +39,15 @@ public:
    MacroSlider();
    virtual ~MacroSlider();
    static IDrawableModule* Create() { return new MacroSlider(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -58,6 +60,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    const static int kMappingSpacing = 32;
 
@@ -68,7 +72,6 @@ private:
       width = 110;
       height = 25 + (int)mMappings.size() * kMappingSpacing;
    }
-   bool Enabled() const override { return mEnabled; }
 
    struct Mapping : public IModulator
    {
@@ -81,14 +84,14 @@ private:
 
       //IModulator
       virtual float Value(int samplesIn = 0) override;
-      virtual bool Active() const override { return mOwner->Enabled(); }
+      virtual bool Active() const override { return mOwner->IsEnabled(); }
 
-      MacroSlider* mOwner;
-      int mIndex;
+      MacroSlider* mOwner{ nullptr };
+      int mIndex{ 0 };
    };
 
-   FloatSlider* mSlider;
-   float mValue;
+   FloatSlider* mSlider{ nullptr };
+   float mValue{ 0 };
    std::vector<Mapping*> mMappings;
 };
 

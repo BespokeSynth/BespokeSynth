@@ -45,8 +45,9 @@ public:
    GridModule();
    ~GridModule();
    static IDrawableModule* Create() { return new GridModule(); }
-
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
    void CreateUIControls() override;
 
    void Init() override;
@@ -91,7 +92,7 @@ public:
    bool HasInput() const override;
    bool IsConnected() const override { return true; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -99,11 +100,12 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 4; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool IsResizable() const override { return true; }

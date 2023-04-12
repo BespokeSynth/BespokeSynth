@@ -48,11 +48,11 @@ public:
 private:
    Ramp mRamp;
    LFO mLFO;
-   float mLFOAmount;
-   float* mBuffer;
-   ModulationChain* mPrev;
-   ModulationChain* mSidechain;
-   ModulationChain* mMultiplyIn;
+   float mLFOAmount{ 0 };
+   float* mBuffer{ nullptr };
+   ModulationChain* mPrev{ nullptr };
+   ModulationChain* mSidechain{ nullptr };
+   ModulationChain* mMultiplyIn{ nullptr };
 };
 
 struct ModulationCollection

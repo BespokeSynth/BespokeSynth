@@ -53,14 +53,16 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "formant"; }
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& info) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& info) override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -70,31 +72,30 @@ private:
       height = mHeight;
    }
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
 
    void ResetFilters();
    void UpdateFilters();
 
 #define NUM_FORMANT_BANDS 3
    BiquadFilter mBiquads[NUM_FORMANT_BANDS];
-   float* mDryBuffer;
+   float* mDryBuffer{ nullptr };
    int mDryBufferSize;
-   float mEE;
-   float mOO;
-   float mI;
-   float mE;
-   float mU;
-   float mA;
-   FloatSlider* mEESlider;
-   FloatSlider* mOOSlider;
-   FloatSlider* mISlider;
-   FloatSlider* mESlider;
-   FloatSlider* mUSlider;
-   FloatSlider* mASlider;
-   std::vector<FloatSlider*> mSliders;
-   bool mRescaling;
-   float mWidth;
-   float mHeight;
+   float mEE{ 1 };
+   float mOO{ 0 };
+   float mI{ 0 };
+   float mE{ 0 };
+   float mU{ 0 };
+   float mA{ 0 };
+   FloatSlider* mEESlider{ nullptr };
+   FloatSlider* mOOSlider{ nullptr };
+   FloatSlider* mISlider{ nullptr };
+   FloatSlider* mESlider{ nullptr };
+   FloatSlider* mUSlider{ nullptr };
+   FloatSlider* mASlider{ nullptr };
+   std::vector<FloatSlider*> mSliders{};
+   bool mRescaling{ false };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
    struct Formants
    {
@@ -108,12 +109,12 @@ private:
          mFreqs[2] = f3;
          mGains[2] = g3;
       }
-      float mFreqs[NUM_FORMANT_BANDS];
-      float mGains[NUM_FORMANT_BANDS];
+      float mFreqs[NUM_FORMANT_BANDS]{};
+      float mGains[NUM_FORMANT_BANDS]{};
    };
 
    std::vector<Formants> mFormants;
-   float* mOutputBuffer;
+   float* mOutputBuffer{ nullptr };
 };
 
 #endif /* defined(__Bespoke__FormantFilter__) */

@@ -47,7 +47,9 @@ public:
    PulseSequence();
    virtual ~PulseSequence();
    static IDrawableModule* Create() { return new PulseSequence(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -75,11 +77,11 @@ public:
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
@@ -88,11 +90,12 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    void OnClicked(float x, float y, bool right) override;
 
    void Step(double time, float velocity, int flags);

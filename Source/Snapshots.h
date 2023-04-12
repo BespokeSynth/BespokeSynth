@@ -16,15 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  Presets.h
+//  Snapshots.h
 //  modularSynth
 //
 //  Created by Ryan Challinor on 7/29/13.
 //
 //
 
-#ifndef __modularSynth__Presets__
-#define __modularSynth__Presets__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -36,13 +35,18 @@
 #include "Slider.h"
 #include "Ramp.h"
 #include "INoteReceiver.h"
+#include "DropdownList.h"
+#include "TextEntry.h"
 
-class Presets : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IIntSliderListener, public INoteReceiver
+class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener
 {
 public:
-   Presets();
-   virtual ~Presets();
-   static IDrawableModule* Create() { return new Presets(); }
+   Snapshots();
+   virtual ~Snapshots();
+   static IDrawableModule* Create() { return new Snapshots(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -58,28 +62,33 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
+   int GetModuleSaveStateRev() const override { return 3; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 
-   static std::vector<IUIControl*> sPresetHighlightControls;
+   static std::vector<IUIControl*> sSnapshotHighlightControls;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
-   void SetPreset(int idx, bool queueForMainThread);
+   void SetSnapshot(int idx, double time);
    void Store(int idx);
+   void Delete(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;
@@ -88,20 +97,20 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
-   struct Preset
+   struct Snapshot
    {
-      Preset() {}
-      Preset(std::string path, float val)
+      Snapshot() {}
+      Snapshot(std::string path, float val)
       : mControlPath(path)
       , mValue(val)
       {}
-      Preset(IUIControl* control, Presets* presets);
-      bool operator==(const Preset& other) const
+      Snapshot(IUIControl* control, Snapshots* snapshots);
+      bool operator==(const Snapshot& other) const
       {
          return mControlPath == other.mControlPath &&
                 mValue == other.mValue &&
@@ -117,10 +126,10 @@ private:
       std::string mString;
    };
 
-   struct PresetCollection
+   struct SnapshotCollection
    {
-      std::list<Preset> mPresets;
-      std::string mDescription;
+      std::list<Snapshot> mSnapshots;
+      std::string mLabel;
    };
 
    struct ControlRamp
@@ -130,25 +139,26 @@ private:
    };
 
    UIGrid* mGrid{ nullptr };
-   std::vector<PresetCollection> mPresetCollection;
+   std::vector<SnapshotCollection> mSnapshotCollection;
    ClickButton* mRandomizeButton{ nullptr };
    ClickButton* mAddButton{ nullptr };
-   int mDrawSetPresetsCountdown{ 0 };
-   std::vector<IDrawableModule*> mPresetModules{};
-   std::vector<IUIControl*> mPresetControls{};
+   int mDrawSetSnapshotCountdown{ 0 };
+   std::vector<IDrawableModule*> mSnapshotModules{};
+   std::vector<IUIControl*> mSnapshotControls{};
    bool mBlending{ false };
    float mBlendTime{ 0 };
    FloatSlider* mBlendTimeSlider{ nullptr };
    float mBlendProgress{ 0 };
    std::vector<ControlRamp> mBlendRamps;
    ofMutex mRampMutex;
-   int mCurrentPreset{ 0 };
-   IntSlider* mCurrentPresetSlider{ nullptr };
+   int mCurrentSnapshot{ 0 };
+   DropdownList* mCurrentSnapshotSelector{ nullptr };
    PatchCableSource* mModuleCable{ nullptr };
    PatchCableSource* mUIControlCable{ nullptr };
-   int mQueuedPresetIndex{ -1 };
-   bool mForceImmediateSet{ false };
+   int mQueuedSnapshotIndex{ -1 };
+   bool mAllowSetOnAudioThread{ false };
+   bool mAutoStoreOnSwitch{ false };
+   TextEntry* mSnapshotLabelEntry{ nullptr };
+   std::string mSnapshotLabel;
+   int mLoadRev{ -1 };
 };
-
-
-#endif /* defined(__modularSynth__Presets__) */

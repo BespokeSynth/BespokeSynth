@@ -30,19 +30,6 @@
 #include "ModularSynth.h"
 
 RandomNoteGenerator::RandomNoteGenerator()
-: mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mProbability(.5f)
-, mProbabilitySlider(nullptr)
-, mPitch(36)
-, mPitchSlider(nullptr)
-, mVelocity(.8f)
-, mVelocitySlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mSkip(1)
-, mSkipSlider(nullptr)
-, mSkipCount(0)
 {
 }
 
@@ -107,13 +94,13 @@ void RandomNoteGenerator::OnTimeEvent(double time)
    }
 }
 
-void RandomNoteGenerator::CheckboxUpdated(Checkbox* checkbox)
+void RandomNoteGenerator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mOffsetSlider)
    {
@@ -126,13 +113,13 @@ void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void RandomNoteGenerator::IntSliderUpdated(IntSlider* slider, int oldVal)
+void RandomNoteGenerator::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mPitchSlider)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void RandomNoteGenerator::DropdownUpdated(DropdownList* list, int oldVal)
+void RandomNoteGenerator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {

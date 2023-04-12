@@ -33,9 +33,7 @@
 #include "juce_audio_formats/juce_audio_formats.h"
 
 Sample::Sample()
-: mData(0)
 {
-   mName[0] = 0;
 }
 
 Sample::~Sample()
@@ -64,7 +62,8 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
 
       mNumSamples = (int)mReader->lengthInSamples;
       mOffset = mNumSamples;
-      mSampleRateRatio = float(mReader->sampleRate) / gSampleRate;
+      mOriginalSampleRate = mReader->sampleRate;
+      mSampleRateRatio = float(mOriginalSampleRate) / gSampleRate;
 
       mReadBuffer = std::make_unique<juce::AudioSampleBuffer>();
       mReadBuffer->setSize(mReader->numChannels, mNumSamples);
@@ -146,6 +145,7 @@ void Sample::Setup(int length)
    mNumSamples = length;
    mRate = 1;
    mOffset = length;
+   mOriginalSampleRate = gSampleRate;
    mSampleRateRatio = 1;
    mStopPoint = -1;
    mName = "newsample";
@@ -307,6 +307,7 @@ void Sample::CopyFrom(Sample* sample)
    mNumBars = sample->mNumBars;
    mLooping = sample->mLooping;
    mRate = sample->mRate;
+   mOriginalSampleRate = sample->mOriginalSampleRate;
    mSampleRateRatio = sample->mSampleRateRatio;
    mStopPoint = sample->mStopPoint;
    mName = sample->mName;
@@ -315,7 +316,7 @@ void Sample::CopyFrom(Sample* sample)
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void Sample::SaveState(FileStreamOut& out)
@@ -328,7 +329,7 @@ void Sample::SaveState(FileStreamOut& out)
    out << mNumBars;
    out << mLooping;
    out << mRate;
-   out << mSampleRateRatio;
+   out << mOriginalSampleRate;
    out << mStopPoint;
    out << mName;
    out << mReadPath;
@@ -357,7 +358,16 @@ void Sample::LoadState(FileStreamIn& in)
    in >> mNumBars;
    in >> mLooping;
    in >> mRate;
-   in >> mSampleRateRatio;
+   if (rev == 0)
+   {
+      in >> mSampleRateRatio;
+      mOriginalSampleRate = gSampleRate * mSampleRateRatio;
+   }
+   else
+   {
+      in >> mOriginalSampleRate;
+      mSampleRateRatio = float(mOriginalSampleRate) / gSampleRate;
+   }
    in >> mStopPoint;
    in >> mName;
    in >> mReadPath;

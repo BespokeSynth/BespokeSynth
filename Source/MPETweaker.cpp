@@ -102,7 +102,7 @@ void MPETweaker::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void MPETweaker::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MPETweaker::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mPitchBendMultiplierSlider)
    {
@@ -138,7 +138,7 @@ void MPETweaker::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void MPETweaker::CheckboxUpdated(Checkbox* checkbox)
+void MPETweaker::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

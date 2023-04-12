@@ -40,10 +40,6 @@ bool HelpDisplay::sTooltipsLoaded = false;
 std::list<HelpDisplay::ModuleTooltipInfo> HelpDisplay::sTooltips;
 
 HelpDisplay::HelpDisplay()
-: mShowTooltipsCheckbox(nullptr)
-, mWidth(700)
-, mHeight(700)
-, mScreenshotModule(nullptr)
 {
    LoadHelp();
 
@@ -148,7 +144,7 @@ void HelpDisplay::DrawModule()
          mScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
 
          if (mScreenshotsToProcess.front().mLabel == "drumplayer")
-            mScreenshotModule->FindUIControl("edit")->SetValue(1);
+            mScreenshotModule->FindUIControl("edit")->SetValue(1, gTime);
 
          sScreenshotDelay = 10;
       }
@@ -179,7 +175,7 @@ void HelpDisplay::GetModuleDimensions(float& w, float& h)
    }
 }
 
-void HelpDisplay::CheckboxUpdated(Checkbox* checkbox)
+void HelpDisplay::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mShowTooltipsCheckbox)
    {
@@ -369,7 +365,7 @@ std::string HelpDisplay::GetModuleTooltipFromName(std::string moduleTypeName)
    return moduleTypeName + ": " + tooltip;
 }
 
-void HelpDisplay::ButtonClicked(ClickButton* button)
+void HelpDisplay::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTutorialVideoLinkButton)
    {
@@ -527,7 +523,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
          docs[moduleType.module]["canReceivePulses"] = false;
       }
 
-      std::vector<ModuleCategory> moduleTypes = {
+      std::vector<ModuleCategory> moduleCategories = {
          kModuleCategory_Note,
          kModuleCategory_Synth,
          kModuleCategory_Audio,
@@ -537,9 +533,9 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
          kModuleCategory_Pulse,
          kModuleCategory_Other
       };
-      for (auto type : moduleTypes)
+      for (auto category : moduleCategories)
       {
-         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(category);
          for (auto toSpawn : modules)
          {
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);

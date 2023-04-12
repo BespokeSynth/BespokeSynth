@@ -41,12 +41,13 @@ enum RadioDirection
 };
 
 class RadioButton;
+class DropdownList;
 
 class IRadioButtonListener
 {
 public:
    virtual ~IRadioButtonListener() {}
-   virtual void RadioButtonUpdated(RadioButton* radio, int oldVal) = 0;
+   virtual void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) = 0;
 };
 
 class RadioButton : public IUIControl
@@ -62,16 +63,17 @@ public:
    void Clear();
    EnumMap GetEnumMap();
    void SetForcedWidth(int width) { mForcedWidth = width; }
+   void CopyContentsTo(DropdownList* list) const;
 
    bool MouseMoved(float x, float y) override;
 
    static int GetSpacing();
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
-   void SetValueDirect(float value) override;
+   void SetValue(float value, double time) override;
+   void SetValueDirect(float value, double time) override;
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
@@ -95,7 +97,7 @@ protected:
    ~RadioButton(); //protected so that it can't be created on the stack
 
 private:
-   void SetIndex(int i);
+   void SetIndex(int i, double time);
    void CalcSliderVal();
    void UpdateDimensions();
 

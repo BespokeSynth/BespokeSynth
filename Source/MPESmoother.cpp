@@ -108,11 +108,11 @@ void MPESmoother::OnTransportAdvanced(float amount)
    }
 }
 
-void MPESmoother::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MPESmoother::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void MPESmoother::CheckboxUpdated(Checkbox* checkbox)
+void MPESmoother::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

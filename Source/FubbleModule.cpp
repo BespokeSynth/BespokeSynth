@@ -33,31 +33,9 @@
 
 #include "juce_core/juce_core.h"
 
-namespace
-{
-   const int kTopControlHeight = 22;
-   const int kTimelineSectionHeight = 50;
-   const int kBottomControlHeight = 58;
-}
-
 FubbleModule::FubbleModule()
 : mAxisH(this, true)
 , mAxisV(this, false)
-, mLength(0)
-, mQuantizeLength(false)
-, mQuantizeLengthCheckbox(nullptr)
-, mQuantizeInterval(kInterval_4n)
-, mQuantizeLengthSelector(nullptr)
-, mSpeed(1)
-, mSpeedSlider(nullptr)
-, mWidth(220)
-, mHeight(kTopControlHeight + 200 + kTimelineSectionHeight + kBottomControlHeight)
-, mRecordStartOffset(0)
-, mIsDrawing(false)
-, mIsRightClicking(false)
-, mPerlinStrength(0)
-, mPerlinScale(1)
-, mPerlinSpeed(1)
 {
    UpdatePerlinSeed();
 }
@@ -438,11 +416,11 @@ void FubbleModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
       mAxisV.UpdateControl();
 }
 
-void FubbleModule::CheckboxUpdated(Checkbox* checkbox)
+void FubbleModule::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal)
+void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    /*int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
@@ -465,7 +443,7 @@ void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal)
    }*/
 }
 
-void FubbleModule::ButtonClicked(ClickButton* button)
+void FubbleModule::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
       Clear();
@@ -493,8 +471,6 @@ void FubbleModule::Resize(float w, float h)
 
 void FubbleModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["uicontrol_h"] = mAxisH.GetCableSource()->GetTarget() ? mAxisH.GetCableSource()->GetTarget()->Path() : "";
    moduleInfo["uicontrol_v"] = mAxisV.GetCableSource()->GetTarget() ? mAxisV.GetCableSource()->GetTarget()->Path() : "";
    moduleInfo["width"] = mWidth;

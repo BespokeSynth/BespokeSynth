@@ -54,6 +54,13 @@ enum ConnectionType
    kConnectionType_ValueSetter //for modulator-type that don't have a continuous connection to the control, and just set values as one-offs
 };
 
+enum class CableDropBehavior
+{
+   ShowQuickspawn,
+   DoNothing,
+   DisconnectCable
+};
+
 class PatchCable : public IClickable
 {
    friend class PatchCableSource;
@@ -78,10 +85,13 @@ public:
    bool IsDragging() const { return mDragging; }
    void SetHoveringOnSource(bool hovering) { mHoveringOnSource = hovering; }
    void SetSourceIndex(int index) { mSourceIndex = index; }
-
+   PatchCableSource* GetOwner() const { return mOwner; }
    void Grab();
+   void Release();
    bool IsValidTarget(IClickable* target) const;
    void Destroy(bool fromUserClick);
+   void SetTempDrawTarget(IClickable* target) { mTempDrawTarget = target; }
+   void ShowQuickspawnForCable();
 
    void SetUIControlConnection(UIControlConnection* conn) { mUIControlConnection = conn; }
 
@@ -91,22 +101,23 @@ protected:
    void OnClicked(float x, float y, bool right) override;
 
 private:
-   void SetTarget(IClickable* target);
+   void SetCableTarget(IClickable* target);
    PatchCablePos GetPatchCablePos();
    ofVec2f FindClosestSide(float x, float y, float w, float h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
    IClickable* GetDropTarget();
 
-   PatchCableSource* mOwner;
-   IClickable* mTarget;
-   RadioButton* mTargetRadioButton;
-   UIControlConnection* mUIControlConnection;
-   IAudioReceiver* mAudioReceiverTarget;
+   PatchCableSource* mOwner{ nullptr };
+   IClickable* mTarget{ nullptr };
+   IClickable* mTempDrawTarget{ nullptr };
+   RadioButton* mTargetRadioButton{ nullptr };
+   UIControlConnection* mUIControlConnection{ nullptr };
+   IAudioReceiver* mAudioReceiverTarget{ nullptr };
 
-   bool mHovered;
-   bool mDragging;
+   bool mHovered{ false };
+   bool mDragging{ false };
    ofVec2f mGrabPos;
-   bool mHoveringOnSource;
-   int mSourceIndex;
+   bool mHoveringOnSource{ false };
+   int mSourceIndex{ 0 };
 };
 
 #endif /* defined(__Bespoke__PatchCable__) */

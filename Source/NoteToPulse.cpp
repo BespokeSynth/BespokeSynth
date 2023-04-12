@@ -59,7 +59,6 @@ void NoteToPulse::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 
 void NoteToPulse::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteToPulse::LoadLayout(const ofxJSONElement& moduleInfo)

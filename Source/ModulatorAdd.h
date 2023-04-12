@@ -38,7 +38,9 @@ public:
    ModulatorAdd();
    virtual ~ModulatorAdd();
    static IDrawableModule* Create() { return new ModulatorAdd(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -51,14 +53,16 @@ public:
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
 
-   FloatSlider* GetTarget() { return mSliderTarget; }
+   FloatSlider* GetTarget() { return GetSliderTarget(); }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -68,11 +72,10 @@ private:
       w = 106;
       h = 17 * 2 + 4;
    }
-   bool Enabled() const override { return mEnabled; }
 
-   float mValue1;
-   float mValue2;
+   float mValue1{ 0 };
+   float mValue2{ 0 };
 
-   FloatSlider* mValue1Slider;
-   FloatSlider* mValue2Slider;
+   FloatSlider* mValue1Slider{ nullptr };
+   FloatSlider* mValue2Slider{ nullptr };
 };

@@ -52,8 +52,6 @@ namespace
 
 SpawnList::SpawnList(IDropdownListener* owner, int x, int y, std::string label, ModuleCategory moduleCategory, bool showDecorators)
 : mLabel(label)
-, mSpawnIndex(-1)
-, mSpawnList(nullptr)
 , mOwner(owner)
 , mPos(x, y)
 , mModuleCategory(moduleCategory)
@@ -495,7 +493,7 @@ void TitleBar::DrawModuleUnclipped()
       {
          drawControl = MidiController::sLastActivityUIControl;
          if (drawControl != nullptr)
-            displayString = drawControl->Path() + ": " + drawControl->GetDisplayValue(drawControl->GetValue());
+            displayString = drawControl->Path(false, true) + ": " + drawControl->GetDisplayValue(drawControl->GetValue());
       }
 
       if (!displayString.empty() && drawControl != nullptr)
@@ -537,7 +535,7 @@ void TitleBar::GetModuleDimensions(float& width, float& height)
       height = 36;
 }
 
-void TitleBar::CheckboxUpdated(Checkbox* checkbox)
+void TitleBar::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -550,7 +548,7 @@ void TitleBar::DropdownClicked(DropdownList* list)
       mSpawnLists.SetUpPrefabsDropdown();
 }
 
-void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
+void TitleBar::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mLoadLayoutDropdown)
    {
@@ -563,7 +561,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
       spawnList->OnSelection(list);
 }
 
-void TitleBar::ButtonClicked(ClickButton* button)
+void TitleBar::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSaveLayoutButton)
    {
@@ -602,7 +600,7 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->PushModalFocusItem(&mNewPatchConfirmPopup);
    }
    if (button == mPlayPauseButton)
-      TheSynth->ToggleAudioPaused();
+      TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
 }
 
 void NewPatchConfirmPopup::CreateUIControls()
@@ -625,7 +623,7 @@ void NewPatchConfirmPopup::DrawModule()
    mCancelButton->Draw();
 }
 
-void NewPatchConfirmPopup::ButtonClicked(ClickButton* button)
+void NewPatchConfirmPopup::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mConfirmButton)
       TheSynth->ReloadInitialLayout();

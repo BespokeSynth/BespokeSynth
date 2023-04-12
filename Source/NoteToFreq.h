@@ -38,7 +38,9 @@ public:
    NoteToFreq();
    virtual ~NoteToFreq();
    static IDrawableModule* Create() { return new NoteToFreq(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -60,6 +62,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -68,10 +72,9 @@ private:
       width = 110;
       height = 0;
    }
-   bool Enabled() const override { return mEnabled; }
 
-   float mPitch;
-   ModulationChain* mPitchBend;
+   float mPitch{ 0 };
+   ModulationChain* mPitchBend{ nullptr };
 };
 
 #endif /* defined(__Bespoke__NoteToFreq__) */

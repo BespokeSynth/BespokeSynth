@@ -581,7 +581,8 @@ void CodeEntry::OnPythonInit()
    else:
       text = unicode(syntax_highlight_code)
 
-   #print(token.tok_name) #   <--- dict of token-kinds.
+   tok_name = token.tok_name
+   #print(tok_name) #   <--- dict of token-kinds.
    
    output = []
    defined = []
@@ -594,59 +595,66 @@ void CodeEntry::OnPythonInit()
 
           for token in tokens:
               #print(token)
-              if token[0] in (0, 5, 56, 256):
+              if token.type in (0, 5, 56, 256):
                   continue
-              if not token[1] or (token[2] == token[3]):
+              if not token.string or (token.start == token.end):
                   continue
 
-              token_type = token[0]
+              token_type = token.type
               
-              if token_type == 1:
-                  if token[1] in {'print', 'def', 'class', 'break', 'continue', 'return', 'while', 'or', 'and', 'dir', 'if', 'elif', 'else', 'is', 'in', 'as', 'out', 'with', 'from', 'import', 'with', 'for'}:
+              if token.type == 1:
+                  if token.string in {'print', 'def', 'class', 'break', 'continue', 'return', 'while', 'or', 'and', 'dir', 'if', 'elif', 'else', 'is', 'in', 'as', 'out', 'with', 'from', 'import', 'with', 'for'}:
                       token_type = 90
-                  elif token[1] in {'False', 'True', 'yield', 'repr', 'range', 'enumerate', 'len', 'type', 'list', 'tuple', 'int', 'str', 'float'}:
+                  elif token.string in {'False', 'True', 'yield', 'repr', 'range', 'enumerate', 'len', 'type', 'list', 'tuple', 'int', 'str', 'float'}:
                       token_type = 91
-                  elif token[1] in globals() or token[1] in defined:
+                  elif token.string in globals() or token.string in defined:
                       token_type = 92
-                  else:
-                      defined.append(token[1])
+                  #else:
+                  #    defined.append(token.string) don't do this one, it makes for confusing highlighting
               elif isPython3 and token.type == 54:
                   # OPS
-                  # 7: 'LPAR', 8: 'RPAR
+                  # 7: 'LPAR', 8: 'RPAR'
                   # 9: 'LSQB', 10: 'RSQB'
                   # 25: 'LBRACE', 26: 'RBRACE'
                   if token.exact_type in {7, 8, 9, 10, 25, 26}:
                       token_type = token.exact_type
                   else:
                       token_type = 51
-              elif token_type == 51:
+              elif token.type == 51:
                   # OPS
                   # 7: 'LPAR', 8: 'RPAR
                   # 9: 'LSQB', 10: 'RSQB'
                   # 25: 'LBRACE', 26: 'RBRACE'
-                  if token[1] in {'(', ')'}:
+                  if token.string in {'(', ')'}:
                      token_type = 7
-                  elif token[1] in {'[', ']'}:
+                  elif token.string in {'[', ']'}:
                      token_type = 9
-                  elif token[1] in {'{', '}'}:
+                  elif token.string in {'{', '}'}:
                     token_type = 25
-                  elif token[1] in {'='}:
+                  elif token.string in {'='}:
                     token_type = 22
-                  elif token[1] in {','}:
+                  elif token.string in {','}:
                     token_type = 12
-              elif isPython3 and token_type == 60:
+              elif isPython3 and tok_name[token.type] == 'COMMENT':
                  token_type = 53
 
-              row_start, char_start = token[2][0]-1, token[2][1]
-              row_end, char_end = token[3][0]-1, token[3][1]
+              if not token_type in [3, 2, 1, 90, 91, 92, 22, 7, 8, 25, 26, 9, 10, 51, 12, 53, 52, 59]: #this list matches the list of matches we use for the DrawSyntaxHighlight() calls
+                 token_type = -1
+
+              row_start, char_start = token.start[0]-1, token.start[1]
+              row_end, char_end = token.end[0]-1, token.end[1]
               if lastRowEnd != row_end:
                  lastCharEnd = 0
 
               output = output + [99]*(char_start - lastCharEnd) + [token_type]*(char_end - char_start)
               lastCharEnd = char_end
               lastRowEnd = row_end
-       except:
-          #print("exception when syntax highlighting")
+
+              #print(token_type)
+       except Exception as e:
+          exceptionText = str(e)
+          if not 'EOF' in exceptionText:
+            print("exception when syntax highlighting: "+exceptionText)
           pass
            
 
@@ -1369,6 +1377,7 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement& vdict)
    fromRGB("number", numberColor);
    fromRGB("name1", name1Color);
    fromRGB("name2", name2Color);
+   fromRGB("name3", name3Color);
    fromRGB("defined", definedColor);
    fromRGB("equals", equalsColor);
    fromRGB("paren", parenColor);

@@ -39,7 +39,9 @@ public:
    AudioSend();
    virtual ~AudioSend();
    static IDrawableModule* Create() { return new AudioSend(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -54,10 +56,12 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    int GetNumTargets() override { return 2; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -67,7 +71,6 @@ private:
       w = 86;
       h = 38;
    }
-   bool Enabled() const override { return mEnabled; }
 
    bool mCrossfade{ false };
    Checkbox* mCrossfadeCheckbox{ nullptr };

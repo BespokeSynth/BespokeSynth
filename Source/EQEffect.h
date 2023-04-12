@@ -46,9 +46,7 @@ public:
 
    static IAudioEffect* Create() { return new EQEffect(); }
 
-
    void CreateUIControls() override;
-
    void Init() override;
 
    //IAudioEffect
@@ -57,29 +55,33 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "basiceq"; }
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
+   void OnClicked(float x, float y, bool right) override;
+   bool MouseMoved(float x, float y) override;
+   void MouseReleased() override;
 
    struct FilterBank
    {
-      BiquadFilter mBiquad[NUM_EQ_FILTERS];
+      BiquadFilter mBiquad[NUM_EQ_FILTERS]{};
    };
 
-   FilterBank mBanks[ChannelBuffer::kMaxNumChannels];
-   int mNumFilters;
+   FilterBank mBanks[ChannelBuffer::kMaxNumChannels]{};
+   int mNumFilters{ NUM_EQ_FILTERS };
 
-   UIGrid* mMultiSlider;
-   ClickButton* mEvenButton;
+   UIGrid* mMultiSlider{ nullptr };
+   ClickButton* mEvenButton{ nullptr };
 };
 
 #endif /* defined(__Bespoke__EQEffect__) */

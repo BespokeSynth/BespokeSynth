@@ -38,7 +38,9 @@ public:
    PulseHocket();
    virtual ~PulseHocket();
    static IDrawableModule* Create() { return new PulseHocket(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 
@@ -47,12 +49,14 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -62,7 +66,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return true; }
 
    void Reseed();
    void AdjustHeight();

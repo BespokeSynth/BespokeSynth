@@ -78,13 +78,13 @@ void PitchBender::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void PitchBender::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PitchBender::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mBendSlider)
       mModulation.GetPitchBend(-1)->SetValue(mBend);
 }
 
-void PitchBender::CheckboxUpdated(Checkbox* checkbox)
+void PitchBender::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    /*if (checkbox == &mBendingCheckbox)
    {

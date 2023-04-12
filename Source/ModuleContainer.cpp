@@ -34,12 +34,11 @@
 #include "PerformanceTimer.h"
 #include "SynthGlobals.h"
 #include "QuickSpawnMenu.h"
+#include "Prefab.h"
 
 #include "juce_core/juce_core.h"
 
 ModuleContainer::ModuleContainer()
-: mOwner(nullptr)
-, mDrawScale(1)
 {
 }
 
@@ -127,10 +126,13 @@ void ModuleContainer::Clear()
    std::vector<IDrawableModule*> modulesToDelete = mModules;
    for (auto* module : modulesToDelete)
    {
-      if (module->GetContainer())
-         module->GetContainer()->Clear();
-      if (module->IsSingleton() == false)
-         DeleteModule(module);
+      if (module)
+      {
+         if (module->GetContainer())
+            module->GetContainer()->Clear();
+         if (module->IsSingleton() == false)
+            DeleteModule(module);
+      }
    }
    mModules.clear();
 }
@@ -322,7 +324,7 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
       module->SetName(newName.c_str());
 }
 
-void ModuleContainer::DeleteModule(IDrawableModule* module)
+void ModuleContainer::DeleteModule(IDrawableModule* module, bool fail /*= true*/)
 {
    if (!module->CanBeDeleted())
       return;
@@ -330,15 +332,15 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
    if (module->HasSpecialDelete())
    {
       module->DoSpecialDelete();
-      RemoveFromVector(module, mModules, K(fail));
+      RemoveFromVector(module, mModules, fail);
       return;
    }
 
    if (module->GetParent())
       module->GetParent()->GetModuleParent()->RemoveChild(module);
 
-   RemoveFromVector(module, mModules, K(fail));
-   for (auto iter : mModules)
+   RemoveFromVector(module, mModules, fail);
+   for (const auto iter : mModules)
    {
       if (iter->GetPatchCableSource())
       {
@@ -348,12 +350,36 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
             if (cable->GetTarget() == module)
                cablesToDestroy.push_back(cable);
          }
-         for (auto cable : cablesToDestroy)
+         for (const auto cable : cablesToDestroy)
             cable->Destroy(false);
       }
    }
 
-   for (auto* child : module->GetChildren())
+   // Remove all cables that targetted control on this module
+   std::vector<IDrawableModule*> modules;
+   TheSynth->GetAllModules(modules);
+   std::vector<PatchCable*> cablesToDestroy;
+   for (const auto module_iter : modules)
+   {
+      for (const auto source : module_iter->GetPatchCableSources())
+      {
+         for (const auto cable : source->GetPatchCables())
+         {
+            for (const auto control : module->GetUIControls())
+            {
+               if (cable->GetTarget() == control)
+               {
+                  cablesToDestroy.push_back(cable);
+                  break;
+               }
+            }
+         }
+      }
+   }
+   for (const auto cable : cablesToDestroy)
+      cable->Destroy(false);
+
+   for (const auto child : module->GetChildren())
    {
       child->MarkAsDeleted();
       child->SetEnabled(false);
@@ -563,7 +589,7 @@ ofxJSONElement ModuleContainer::WriteModules()
    for (int i = 0; i < saveModules.size(); ++i)
    {
       ofxJSONElement moduleInfo;
-      saveModules[i]->SaveLayout(moduleInfo);
+      saveModules[i]->SaveLayoutBase(moduleInfo);
       modules[i] = moduleInfo;
    }
    IClickable::ClearSaveContext();
@@ -578,7 +604,7 @@ void ModuleContainer::SaveState(FileStreamOut& out)
    int savedModules = 0;
    for (auto* module : mModules)
    {
-      if (module != TheSaveDataPanel && module != TheTitleBar)
+      if (module->IsSaveable())
          ++savedModules;
    }
 
@@ -589,7 +615,7 @@ void ModuleContainer::SaveState(FileStreamOut& out)
 
    for (auto* module : mModules)
    {
-      if (module != TheSaveDataPanel && module != TheTitleBar)
+      if (module->IsSaveable())
       {
          //ofLog() << "Saving " << module->Name();
          out << std::string(module->Name());
@@ -604,6 +630,8 @@ void ModuleContainer::SaveState(FileStreamOut& out)
 
 void ModuleContainer::LoadState(FileStreamIn& in)
 {
+   Prefab::sLastLoadWasPrefab = Prefab::sLoadingPrefab;
+
    bool wasLoadingState = TheSynth->IsLoadingState();
    TheSynth->SetIsLoadingState(true);
 
@@ -614,6 +642,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    in >> header;
    assert(header <= ModularSynth::kSaveStateRev);
    ModularSynth::sLoadingFileSaveStateRev = header;
+   ModularSynth::sLastLoadedFileSaveStateRev = header;
 
    int savedModules;
    in >> savedModules;

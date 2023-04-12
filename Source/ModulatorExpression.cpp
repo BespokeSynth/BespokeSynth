@@ -39,23 +39,7 @@ namespace
 }
 
 ModulatorExpression::ModulatorExpression()
-: mExpressionInput(0)
-, mExpressionInputSlider(nullptr)
-, mA(0)
-, mASlider(nullptr)
-, mB(0)
-, mBSlider(nullptr)
-, mC(0)
-, mCSlider(nullptr)
-, mD(0)
-, mDSlider(nullptr)
-, mE(0)
-, mESlider(nullptr)
-, mExpressionValid(false)
-, mLastDrawMinOutput(0)
-, mLastDrawMaxOutput(1)
 {
-   mEntryString = "x";
 }
 
 void ModulatorExpression::CreateUIControls()
@@ -111,8 +95,8 @@ float ModulatorExpression::Value(int samplesIn)
       return mExpression.value();
    }
 
-   if (mSliderTarget)
-      return mSliderTarget->GetMin();
+   if (GetSliderTarget())
+      return GetSliderTarget()->GetMin();
    return 0;
 }
 
@@ -120,7 +104,7 @@ void ModulatorExpression::PostRepatch(PatchCableSource* cableSource, bool fromUs
 {
    OnModulatorRepatch();
 
-   if (mSliderTarget)
+   if (GetSliderTarget() && fromUserClick)
    {
       //mValue1Slider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
       //mValue1Slider->SetMode(mSliderTarget->GetMode());
@@ -129,6 +113,7 @@ void ModulatorExpression::PostRepatch(PatchCableSource* cableSource, bool fromUs
 
 void ModulatorExpression::TextEntryComplete(TextEntry* entry)
 {
+   mExpressionValid = false;
    exprtk::parser<float> parser;
    mExpressionValid = parser.compile(mEntryString, mExpression);
    if (mExpressionValid)
@@ -211,7 +196,7 @@ void ModulatorExpression::DrawModule()
 
 void ModulatorExpression::GetModuleDimensions(float& w, float& h)
 {
-   w = MAX(kGraphX + kGraphWidth + 2, 4 + strlen(mTextEntry->GetText()) * 7);
+   w = MAX(kGraphX + kGraphWidth + 2, 4 + mTextEntry->GetRect().width);
    h = kGraphY + kGraphHeight;
 }
 

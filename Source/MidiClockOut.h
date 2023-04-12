@@ -41,6 +41,9 @@ public:
    MidiClockOut();
    virtual ~MidiClockOut();
    static IDrawableModule* Create() { return new MidiClockOut(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -49,13 +52,15 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    void InitDevice();
@@ -63,7 +68,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& w, float& h) override
    {
       w = mWidth;

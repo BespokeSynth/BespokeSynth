@@ -33,27 +33,6 @@
 #include "IAudioReceiver.h"
 
 ControllingSong::ControllingSong()
-: mVolume(.8f)
-, mVolumeSlider(nullptr)
-, mSongStartTime(0)
-, mNeedNewSong(true)
-, mLoadingSong(true)
-, mCurrentSongIndex(-1)
-, mShuffleIndex(0)
-, mNextSongButton(nullptr)
-, mSongSelector(nullptr)
-, mTestBeatOffset(0)
-, mTestBeatOffsetSlider(nullptr)
-, mPlay(false)
-, mPlayCheckbox(nullptr)
-, mShuffle(false)
-, mShuffleCheckbox(nullptr)
-, mPhraseBackButton(nullptr)
-, mPhraseForwardButton(nullptr)
-, mSpeed(1)
-, mSpeedSlider(nullptr)
-, mMute(false)
-, mMuteCheckbox(nullptr)
 {
 }
 
@@ -260,7 +239,7 @@ void ControllingSong::DrawModule()
    ofPopStyle();
 }
 
-void ControllingSong::DropdownUpdated(DropdownList* list, int oldVal)
+void ControllingSong::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mSongSelector)
    {
@@ -268,7 +247,7 @@ void ControllingSong::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void ControllingSong::ButtonClicked(ClickButton* button)
+void ControllingSong::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mNextSongButton)
       mNeedNewSong = true;
@@ -285,15 +264,15 @@ void ControllingSong::ButtonClicked(ClickButton* button)
    }
 }
 
-void ControllingSong::CheckboxUpdated(Checkbox* checkbox)
+void ControllingSong::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void ControllingSong::RadioButtonUpdated(RadioButton* list, int oldVal)
+void ControllingSong::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
 }
 
-void ControllingSong::IntSliderUpdated(IntSlider* slider, int oldVal)
+void ControllingSong::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mTestBeatOffsetSlider)
    {
@@ -301,7 +280,7 @@ void ControllingSong::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void ControllingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ControllingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
@@ -330,8 +309,6 @@ void ControllingSong::SetUpFromSaveData()
 
 void ControllingSong::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["followsongs"].resize((unsigned int)mFollowSongs.size());
    for (int i = 0; i < mFollowSongs.size(); ++i)
    {

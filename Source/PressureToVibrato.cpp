@@ -28,11 +28,6 @@
 #include "ModularSynth.h"
 
 PressureToVibrato::PressureToVibrato()
-: mVibratoInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mVibratoAmount(1)
-, mVibratoSlider(nullptr)
-, mModulation(true)
 {
 }
 
@@ -79,15 +74,15 @@ void PressureToVibrato::PlayNote(double time, int pitch, int velocity, int voice
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void PressureToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PressureToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void PressureToVibrato::DropdownUpdated(DropdownList* list, int oldVal)
+void PressureToVibrato::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void PressureToVibrato::CheckboxUpdated(Checkbox* checkbox)
+void PressureToVibrato::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

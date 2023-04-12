@@ -39,7 +39,9 @@ class NoteSorter : public INoteReceiver, public INoteSource, public IDrawableMod
 public:
    NoteSorter();
    static IDrawableModule* Create() { return new NoteSorter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -52,20 +54,14 @@ public:
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& width, float& height) override;
 
-   static const int kMaxDestinations = 5;
-   int mPitch[kMaxDestinations]{};
-   TextEntry* mPitchEntry[kMaxDestinations]{};
-   AdditionalNoteCable* mDestinationCables[kMaxDestinations]{};
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   std::array<int, 128> mPitch;
+   std::vector<TextEntry*> mPitchEntry;
+   std::vector<AdditionalNoteCable*> mDestinationCables;
 };

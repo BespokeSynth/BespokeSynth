@@ -192,7 +192,7 @@ void SampleCapturer::DrawModule()
    mDeleteButton->Draw();
 }
 
-void SampleCapturer::ButtonClicked(ClickButton* button)
+void SampleCapturer::ButtonClicked(ClickButton* button, double time)
 {
    using namespace juce;
    if (button == mPlayButton)
@@ -202,7 +202,7 @@ void SampleCapturer::ButtonClicked(ClickButton* button)
 
    if (button == mSaveButton)
    {
-      FileChooser chooser("Save sample as...", File(ofToDataPath(ofGetTimestampString("samples/%Y-%m-%d_%H-%M.wav"))), "*.wav", true, false, TheSynth->GetFileChooserParent());
+      FileChooser chooser("Save sample as...", File(ofToDataPath(ofGetTimestampString("samples/%Y-%m-%d_%H-%M-%S.wav"))), "*.wav", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
          Sample::WriteDataToFile(chooser.getResult().getFullPathName().toStdString(), &mSamples[mCurrentSampleIndex].mBuffer, mSamples[mCurrentSampleIndex].mRecordingLength);
    }

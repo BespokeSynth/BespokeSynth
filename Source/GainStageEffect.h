@@ -44,8 +44,10 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    std::string GetType() override { return "gainstage"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -55,7 +57,6 @@ private:
       width = 120;
       height = 20;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mGain{ 1 };
    FloatSlider* mGainSlider{ nullptr };

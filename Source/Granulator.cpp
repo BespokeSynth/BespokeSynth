@@ -30,10 +30,6 @@
 #include "juce_dsp/maths/juce_FastMathApproximations.h"
 
 Granulator::Granulator()
-: mNextGrainIdx(0)
-, mNextGrainSpawnMs(0)
-, mLiveMode(false)
-, mOctaves(false)
 {
    Reset();
 }

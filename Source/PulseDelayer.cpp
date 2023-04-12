@@ -74,7 +74,7 @@ void PulseDelayer::DrawModule()
    }
 }
 
-void PulseDelayer::CheckboxUpdated(Checkbox* checkbox)
+void PulseDelayer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (!mEnabled)
       mConsumeIndex = mAppendIndex; //effectively clears the queue
@@ -119,7 +119,7 @@ void PulseDelayer::OnPulse(double time, float velocity, int flags)
    }
 }
 
-void PulseDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PulseDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

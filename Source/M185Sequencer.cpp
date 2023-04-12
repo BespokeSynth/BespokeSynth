@@ -12,16 +12,6 @@
 #include "FileStream.h"
 
 M185Sequencer::M185Sequencer()
-: mWidth(0)
-, mHeight(0)
-, mHasExternalPulseSource(false)
-, mStepIdx(0)
-, mLastPlayedStepIdx(0)
-, mStepPulseIdx(0)
-, mLastPitch(0)
-, mInterval(kInterval_8n)
-, mIntervalSelector(nullptr)
-, mResetStepButton(nullptr)
 {
 }
 
@@ -194,13 +184,13 @@ void M185Sequencer::GetModuleDimensions(float& width, float& height)
    height = mHeight;
 }
 
-void M185Sequencer::ButtonClicked(ClickButton* button)
+void M185Sequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (mResetStepButton == button)
       ResetStep();
 }
 
-void M185Sequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void M185Sequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -210,7 +200,7 @@ void M185Sequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void M185Sequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void M185Sequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

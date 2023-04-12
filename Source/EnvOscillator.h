@@ -36,7 +36,6 @@ class EnvOscillator
 public:
    EnvOscillator(OscillatorType type)
    : mOsc(type)
-   , mPulseWidth(.5f)
    {}
 
    void SetType(OscillatorType type) { mOsc.SetType(type); }
@@ -52,11 +51,11 @@ public:
    float Audio(double time, float phase);
    ::ADSR* GetADSR() { return &mAdsr; }
    void SetPulseWidth(float width) { mOsc.SetPulseWidth(width); }
-   Oscillator mOsc;
+   Oscillator mOsc{ OscillatorType::kOsc_Sin };
 
 private:
    ::ADSR mAdsr;
-   float mPulseWidth;
+   float mPulseWidth{ .5 };
 };
 
 #endif /* defined(__additiveSynth__EnvOscillator__) */

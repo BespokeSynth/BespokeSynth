@@ -28,12 +28,6 @@
 #include "ModularSynth.h"
 
 ScaleDetect::ScaleDetect()
-: mResetButton(nullptr)
-, mLastPitch(0)
-, mDoDetect(true)
-, mNeedsUpdate(false)
-, mSelectedMatch(0)
-, mMatchesDropdown(nullptr)
 {
 }
 
@@ -118,7 +112,7 @@ bool ScaleDetect::ScaleSatisfied(int root, std::string type)
    return true;
 }
 
-void ScaleDetect::ButtonClicked(ClickButton* button)
+void ScaleDetect::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
    {
@@ -129,7 +123,7 @@ void ScaleDetect::ButtonClicked(ClickButton* button)
    }
 }
 
-void ScaleDetect::DropdownUpdated(DropdownList* list, int oldVal)
+void ScaleDetect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mMatchesDropdown)
    {

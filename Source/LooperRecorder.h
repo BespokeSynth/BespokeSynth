@@ -47,7 +47,9 @@ public:
    LooperRecorder();
    ~LooperRecorder();
    static IDrawableModule* Create() { return new LooperRecorder(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -70,8 +72,8 @@ public:
    RollingBuffer* GetRecordBuffer() { return &mRecordBuffer; }
    Looper* GetNextCommitTarget() { return (mNextCommitTargetIndex < (int)mLoopers.size()) ? mLoopers[mNextCommitTargetIndex] : nullptr; }
 
-   void StartFreeRecord();
-   void EndFreeRecord();
+   void StartFreeRecord(double time);
+   void EndFreeRecord(double time);
    void CancelFreeRecord();
    bool InFreeRecord() { return mFreeRecording; }
 
@@ -85,12 +87,12 @@ public:
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    bool HasDebugDraw() const override { return true; }
 
@@ -100,6 +102,8 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 0; }
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    void SyncLoopLengths();
@@ -117,10 +121,8 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
-
    float mWidth{ 235 };
-   float mHeight{ 125 };
+   float mHeight{ 126 };
    RollingBuffer mRecordBuffer;
    std::vector<Looper*> mLoopers;
    int mNumBars{ 1 };
@@ -156,6 +158,8 @@ private:
    ClickButton* mCommit8BarsButton{ nullptr };
    IntSlider* mNextCommitTargetSlider{ nullptr };
    int mNextCommitTargetIndex{ 0 };
+   Checkbox* mAutoAdvanceThroughLoopersCheckbox{ nullptr };
+   bool mAutoAdvanceThroughLoopers{ true };
 
    bool mFreeRecording{ false };
    Checkbox* mFreeRecordingCheckbox{ nullptr };

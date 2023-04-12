@@ -31,17 +31,7 @@
 
 RingModulator::RingModulator()
 : IAudioProcessor(gBufferSize)
-, mDryWet(1)
-, mVolume(1)
-, mFreqSlider(nullptr)
-, mDryWetSlider(nullptr)
-, mVolumeSlider(nullptr)
-, mPhase(0)
-, mModOsc(kOsc_Sin)
-, mGlideTime(0)
-, mGlideSlider(nullptr)
 , mDryBuffer(gBufferSize)
-, mFreq(220)
 {
    mModOsc.Start(gTime, 1);
    mFreqRamp.Start(gTime, 220, gTime + mGlideTime);
@@ -137,15 +127,15 @@ void RingModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    }
 }
 
-void RingModulator::ButtonClicked(ClickButton* button)
+void RingModulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void RingModulator::CheckboxUpdated(Checkbox* checkbox)
+void RingModulator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void RingModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void RingModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mFreqSlider)
    {

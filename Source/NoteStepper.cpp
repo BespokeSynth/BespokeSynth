@@ -86,7 +86,7 @@ void NoteStepper::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    int selectedDestination = 0;
    if (velocity > 0)
    {
-      if (time > mLastNoteOnTime + 10) //slop, to make a chord count as a single step
+      if (time > mLastNoteOnTime + 10 || !mAllowChords) //slop, to make a chord count as a single step
          mCurrentDestinationIndex = (mCurrentDestinationIndex + 1) % mLength;
 
       selectedDestination = mCurrentDestinationIndex;
@@ -117,7 +117,7 @@ void NoteStepper::SendCC(int control, int value, int voiceIdx)
    SendCCOutput(control, value, voiceIdx);
 }
 
-void NoteStepper::ButtonClicked(ClickButton* button)
+void NoteStepper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
       mCurrentDestinationIndex = -1;
@@ -125,14 +125,16 @@ void NoteStepper::ButtonClicked(ClickButton* button)
 
 void NoteStepper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadBool("allow_chords", moduleInfo, false);
+
    SetUpFromSaveData();
 }
 
 void NoteStepper::SetUpFromSaveData()
 {
+   mAllowChords = mModuleSaveData.GetBool("allow_chords");
 }
 
 void NoteStepper::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }

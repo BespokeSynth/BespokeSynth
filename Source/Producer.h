@@ -49,7 +49,9 @@ public:
    Producer();
    ~Producer();
    static IDrawableModule* Create() { return new Producer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -65,20 +67,21 @@ public:
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
 
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    //IFloatSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    void UpdateSample();
@@ -92,43 +95,42 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
-   Sample* mSample;
+   Sample* mSample{ nullptr };
 
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   float* mWriteBuffer;
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mLoop;
-   Checkbox* mLoopCheckbox;
-   float mClipStart;
-   FloatSlider* mClipStartSlider;
-   float mClipEnd;
-   FloatSlider* mClipEndSlider;
-   float mZoomStart;
-   FloatSlider* mZoomStartSlider;
-   float mZoomEnd;
-   FloatSlider* mZoomEndSlider;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
-   ClickButton* mWriteButton;
-   int mPlayhead;
-   float mTempo;
-   FloatSlider* mTempoSlider;
-   int mStartOffset;
-   ClickButton* mCalcTempoButton;
-   IntSlider* mStartOffsetSlider;
-   ClickButton* mDoubleLengthButton;
-   ClickButton* mHalveLengthButton;
+   float mVolume{ .6 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   float* mWriteBuffer{ nullptr };
+   bool mPlay{ false };
+   Checkbox* mPlayCheckbox{ nullptr };
+   bool mLoop{ false };
+   Checkbox* mLoopCheckbox{ nullptr };
+   float mClipStart{ 0 };
+   FloatSlider* mClipStartSlider{ nullptr };
+   float mClipEnd{ 1 };
+   FloatSlider* mClipEndSlider{ nullptr };
+   float mZoomStart{ 0 };
+   FloatSlider* mZoomStartSlider{ nullptr };
+   float mZoomEnd{ 1 };
+   FloatSlider* mZoomEndSlider{ nullptr };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   int mNumBars{ 1 };
+   IntSlider* mNumBarsSlider{ nullptr };
+   ClickButton* mWriteButton{ nullptr };
+   int mPlayhead{ 0 };
+   float mTempo{ 120 };
+   FloatSlider* mTempoSlider{ nullptr };
+   int mStartOffset{ 0 };
+   ClickButton* mCalcTempoButton{ nullptr };
+   IntSlider* mStartOffsetSlider{ nullptr };
+   ClickButton* mDoubleLengthButton{ nullptr };
+   ClickButton* mHalveLengthButton{ nullptr };
    BiquadFilterEffect mBiquad[PRODUCER_NUM_BIQUADS];
    std::list<int> mSkipMeasures;
-   ClickButton* mRestartButton;
+   ClickButton* mRestartButton{ nullptr };
 };
 
 

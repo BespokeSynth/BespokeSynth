@@ -47,7 +47,9 @@ public:
    VelocityStepSequencer();
    ~VelocityStepSequencer();
    static IDrawableModule* Create() { return new VelocityStepSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -67,15 +69,17 @@ public:
    void OnMidiControl(MidiControl& control) override;
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -85,7 +89,6 @@ private:
       width = 160;
       height = 160;
    }
-   bool Enabled() const override { return mEnabled; }
 
    int mVels[VSS_MAX_STEPS]{};
    IntSlider* mVelSliders[VSS_MAX_STEPS]{};

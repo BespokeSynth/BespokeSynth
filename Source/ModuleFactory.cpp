@@ -73,7 +73,7 @@
 #include "SampleFinder.h"
 #include "FourOnTheFloor.h"
 #include "Amplifier.h"
-#include "Presets.h"
+#include "Snapshots.h"
 #include "LFOController.h"
 #include "NoteStepSequencer.h"
 #include "BeatBloks.h"
@@ -255,12 +255,15 @@
 #include "NoteEcho.h"
 #include "VelocityCurve.h"
 #include "BoundsToPulse.h"
+#include "SongBuilder.h"
+#include "PulseFlag.h"
+#include "PulseDisplayer.h"
 
 #include <juce_core/juce_core.h>
 
-#define REGISTER(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, false);
-#define REGISTER_HIDDEN(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, true, false);
-#define REGISTER_EXPERIMENTAL(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, true);
+#define REGISTER(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, false, class ::AcceptsAudio(), class ::AcceptsNotes(), class ::AcceptsPulses());
+#define REGISTER_HIDDEN(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, true, false, class ::AcceptsAudio(), class ::AcceptsNotes(), class ::AcceptsPulses());
+#define REGISTER_EXPERIMENTAL(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, true, class ::AcceptsAudio(), class ::AcceptsNotes(), class ::AcceptsPulses());
 
 ModuleFactory::ModuleFactory()
 {
@@ -295,7 +298,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteOctaver, noteoctaver, kModuleCategory_Note);
    REGISTER(FourOnTheFloor, fouronthefloor, kModuleCategory_Instrument);
    REGISTER(Amplifier, gain, kModuleCategory_Audio);
-   REGISTER(Presets, presets, kModuleCategory_Other);
+   REGISTER(Snapshots, snapshots, kModuleCategory_Other);
    REGISTER(NoteStepSequencer, notesequencer, kModuleCategory_Instrument);
    REGISTER(SingleOscillator, oscillator, kModuleCategory_Synth);
    REGISTER(BandVocoder, vocoder, kModuleCategory_Audio);
@@ -456,13 +459,16 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteEcho, noteecho, kModuleCategory_Note);
    REGISTER(VelocityCurve, velocitycurve, kModuleCategory_Note);
    REGISTER(BoundsToPulse, boundstopulse, kModuleCategory_Pulse);
+   REGISTER(SongBuilder, songbuilder, kModuleCategory_Other);
+   REGISTER(TimelineControl, timelinecontrol, kModuleCategory_Other);
+   REGISTER(PulseFlag, pulseflag, kModuleCategory_Pulse);
+   REGISTER(PulseDisplayer, pulsedisplayer, kModuleCategory_Pulse);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
    REGISTER_HIDDEN(TakeRecorder, takerecorder, kModuleCategory_Audio);
    REGISTER_HIDDEN(LoopStorer, loopstorer, kModuleCategory_Other);
    REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleCategory_Audio);
-   REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleCategory_Other);
    REGISTER_HIDDEN(ComboGridController, combogrid, kModuleCategory_Other);
    REGISTER_HIDDEN(VSTPlugin, plugin, kModuleCategory_Synth);
    REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleCategory_Audio);
@@ -489,40 +495,42 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(Razor, razor, kModuleCategory_Synth);
    REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleCategory_Note);
    REGISTER_HIDDEN(ScriptReferenceDisplay, scriptingreference, kModuleCategory_Other);
+   REGISTER_HIDDEN(ScriptWarningPopup, scriptwarning, kModuleCategory_Other);
    REGISTER_HIDDEN(MultitrackRecorderTrack, multitrackrecordertrack, kModuleCategory_Audio);
 }
 
-void ModuleFactory::Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleCategory moduleType, bool hidden, bool experimental)
+void ModuleFactory::Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleCategory moduleCategory, bool hidden, bool experimental, bool canReceiveAudio, bool canReceiveNotes, bool canReceivePulses)
 {
-   mFactoryMap[type] = creator;
-   mCanCreateMap[type] = canCreate;
-   mModuleTypeMap[type] = moduleType;
-   mIsHiddenModuleMap[type] = hidden;
-   mIsExperimentalModuleMap[type] = experimental;
+   ModuleInfo moduleInfo;
+   moduleInfo.mCreatorFn = creator;
+   moduleInfo.mCanCreateFn = canCreate;
+   moduleInfo.mCategory = moduleCategory;
+   moduleInfo.mIsHidden = hidden;
+   moduleInfo.mIsExperimental = experimental;
+   moduleInfo.mCanReceiveAudio = canReceiveAudio;
+   moduleInfo.mCanReceiveNotes = canReceiveNotes;
+   moduleInfo.mCanReceivePulses = canReceivePulses;
+   mFactoryMap[type] = moduleInfo;
 }
 
 IDrawableModule* ModuleFactory::MakeModule(std::string type)
 {
-   auto canCreate = mCanCreateMap.find(type);
-   if (canCreate != mCanCreateMap.end())
+   auto moduleInfo = mFactoryMap.find(type);
+   if (moduleInfo != mFactoryMap.end())
    {
-      if (canCreate->second())
-      {
-         auto iter = mFactoryMap.find(type);
-         if (iter != mFactoryMap.end())
-            return iter->second();
-      }
+      if (moduleInfo->second.mCanCreateFn())
+         return moduleInfo->second.mCreatorFn();
    }
    return nullptr;
 }
 
-std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleCategory moduleType)
+std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleCategory moduleCategory)
 {
    std::vector<ModuleFactory::Spawnable> modules{};
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
-      if (mModuleTypeMap[iter->first] == moduleType &&
-          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
+      if (iter->second.mCategory == moduleCategory &&
+          (!iter->second.mIsHidden || gShowDevModules))
       {
          ModuleFactory::Spawnable spawnable{};
          spawnable.mLabel = iter->first;
@@ -530,7 +538,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleC
       }
    }
 
-   if (moduleType == kModuleCategory_Audio)
+   if (moduleCategory == kModuleCategory_Audio)
    {
       std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
       for (auto effect : effects)
@@ -543,7 +551,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleC
       }
    }
 
-   std::sort(modules.begin(), modules.end(), Spawnable::compare);
+   std::sort(modules.begin(), modules.end(), Spawnable::CompareAlphabetical);
    return modules;
 }
 
@@ -585,7 +593,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
    std::vector<ModuleFactory::Spawnable> modules{};
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
-      if ((mIsHiddenModuleMap[iter->first] == false || gShowDevModules) &&
+      if ((!iter->second.mIsHidden || gShowDevModules) &&
           CheckHeldKeysMatch(iter->first, keys, continuousString))
       {
          ModuleFactory::Spawnable spawnable{};
@@ -651,7 +659,11 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
          modules.push_back(spawnable);
       }
    }
-   sort(modules.begin(), modules.end(), Spawnable::compare);
+
+   if (continuousString)
+      sort(modules.begin(), modules.end(), Spawnable::CompareLength);
+   else
+      sort(modules.begin(), modules.end(), Spawnable::CompareAlphabetical);
 
    std::vector<ModuleFactory::Spawnable> ret;
    for (size_t i = 0; i < modules.size(); ++i)
@@ -660,10 +672,10 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
    return ret;
 }
 
-ModuleCategory ModuleFactory::GetModuleType(std::string typeName)
+ModuleCategory ModuleFactory::GetModuleCategory(std::string typeName)
 {
-   if (mModuleTypeMap.find(typeName) != mModuleTypeMap.end())
-      return mModuleTypeMap[typeName];
+   if (mFactoryMap.find(typeName) != mFactoryMap.end())
+      return mFactoryMap[typeName].mCategory;
    if (juce::String(typeName).endsWith(kPluginSuffix))
       return kModuleCategory_Synth;
    if (juce::String(typeName).endsWith(kMidiControllerSuffix))
@@ -673,10 +685,10 @@ ModuleCategory ModuleFactory::GetModuleType(std::string typeName)
    return kModuleCategory_Other;
 }
 
-ModuleCategory ModuleFactory::GetModuleType(Spawnable spawnable)
+ModuleCategory ModuleFactory::GetModuleCategory(Spawnable spawnable)
 {
-   if (spawnable.mSpawnMethod == SpawnMethod::Module && mModuleTypeMap.find(spawnable.mLabel) != mModuleTypeMap.end())
-      return mModuleTypeMap[spawnable.mLabel];
+   if (spawnable.mSpawnMethod == SpawnMethod::Module && mFactoryMap.find(spawnable.mLabel) != mFactoryMap.end())
+      return mFactoryMap[spawnable.mLabel].mCategory;
    if (spawnable.mSpawnMethod == SpawnMethod::Plugin)
       return kModuleCategory_Synth;
    if (spawnable.mSpawnMethod == SpawnMethod::MidiController)
@@ -688,10 +700,17 @@ ModuleCategory ModuleFactory::GetModuleType(Spawnable spawnable)
    return kModuleCategory_Other;
 }
 
+ModuleFactory::ModuleInfo ModuleFactory::GetModuleInfo(std::string typeName)
+{
+   if (mFactoryMap.find(typeName) != mFactoryMap.end())
+      return mFactoryMap[typeName];
+   return ModuleInfo();
+}
+
 bool ModuleFactory::IsExperimental(std::string typeName)
 {
-   if (mIsExperimentalModuleMap.find(typeName) != mIsExperimentalModuleMap.end())
-      return mIsExperimentalModuleMap[typeName];
+   if (mFactoryMap.find(typeName) != mFactoryMap.end())
+      return mFactoryMap[typeName].mIsExperimental;
    return false;
 }
 
@@ -729,6 +748,9 @@ std::string ModuleFactory::FixUpTypeName(std::string name)
 
    if (name == "vstplugin")
       return "plugin";
+
+   if (name == "presets")
+      return "snapshots";
 
    return name;
 }

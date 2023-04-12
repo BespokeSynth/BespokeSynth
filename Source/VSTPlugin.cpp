@@ -168,6 +168,10 @@ namespace VSTLookup
       auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i = 0; i < types.size(); ++i)
       {
+#if BESPOKE_MAC
+         if (types[i].pluginFormatName == juce::AudioUnitPluginFormat::getFormatName())
+            continue; //"fileOrIdentifier" is not a valid path, can't check
+#endif
          juce::File vst(types[i].fileOrIdentifier);
          if (vst.getFileNameWithoutExtension().toStdString() == vstName)
             return types[i].fileOrIdentifier.toStdString();
@@ -341,20 +345,14 @@ std::string VSTPlugin::GetPluginName() const
 std::string VSTPlugin::GetPluginFormatName() const
 {
    if (mPlugin)
-   {
-      const auto& desc = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription();
-      return ofToString(desc.pluginFormatName.toLowerCase());
-   }
+      return mPluginFormatName;
    return "plugin";
 }
 
 std::string VSTPlugin::GetPluginId() const
 {
    if (mPlugin)
-   {
-      const auto& desc = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription();
-      return GetPluginName() + "_" + ofToString(desc.uniqueId);
-   }
+      return mPluginId;
    return "no plugin loaded";
 }
 
@@ -483,8 +481,12 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       mPlugin->setPlayHead(&mPlayhead);
 
       mPluginName = mPlugin->getName().toStdString();
+      mPluginFormatName = ofToString(desc.pluginFormatName.toLowerCase());
+      mPluginId = GetPluginName() + "_" + ofToString(desc.uniqueId);
 
       CreateParameterSliders();
+
+      RefreshPresetFiles();
 
       mPluginReady = true;
    }
@@ -496,17 +498,6 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
          mPluginName = mModuleSaveData.GetString("pluginId") + " (not loaded)";
    }
    mVSTMutex.unlock();
-}
-
-bool VSTPlugin::ParameterNameExists(std::string name, int checkUntilIndex) const
-{
-   for (int i = 0; i < checkUntilIndex; ++i)
-   {
-      if (mParameterSliders[i].mName == name)
-         return true;
-   }
-
-   return false;
 }
 
 void VSTPlugin::CreateParameterSliders()
@@ -528,31 +519,23 @@ void VSTPlugin::CreateParameterSliders()
 
    const auto& parameters = mPlugin->getParameters();
 
-   int numParameters = MIN(10000, parameters.size());
+   int numParameters = parameters.size();
    mParameterSliders.resize(numParameters);
    for (int i = 0; i < numParameters; ++i)
    {
+      mParameterSliders[i].mOwner = this;
       mParameterSliders[i].mValue = parameters[i]->getValue();
-      juce::String originalParamName = parameters[i]->getName(32);
-      std::string name(originalParamName.getCharPointer());
-      try
-      {
-         int append = i;
-         while (ParameterNameExists(name, i) || FindUIControl(name.c_str()))
-         {
-            ++append;
-            name = originalParamName.toStdString() + ofToString(append);
-         }
-      }
-      catch (UnknownUIControlException& e)
-      {
-      }
       mParameterSliders[i].mParameter = parameters[i];
-      mParameterSliders[i].mName = name.c_str();
+      mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
+      HostedAudioProcessorParameter* parameterWithId = dynamic_cast<HostedAudioProcessorParameter*>(parameters[i]);
+      if (parameterWithId)
+         mParameterSliders[i].mID = "paramid_" + parameterWithId->getParameterID().toStdString();
+      else
+         mParameterSliders[i].mID = "param_" + ofToString(parameters[i]->getParameterIndex());
       mParameterSliders[i].mShowing = false;
       if (numParameters <= 30) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
-         mShowParameterDropdown->AddLabel(name.c_str(), i);
+         mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
          mParameterSliders[i].mInSelectorList = true;
       }
       else
@@ -564,6 +547,19 @@ void VSTPlugin::CreateParameterSliders()
 
 void VSTPlugin::Poll()
 {
+   if (mRescanParameterNames)
+   {
+      mRescanParameterNames = false;
+      const auto& parameters = mPlugin->getParameters();
+
+      int numParameters = MIN(mParameterSliders.size(), parameters.size());
+      for (int i = 0; i < numParameters; ++i)
+      {
+         mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
+         if (mParameterSliders[i].mSlider != nullptr)
+            mParameterSliders[i].mSlider->SetOverrideDisplayName(mParameterSliders[i].mDisplayName);
+      }
+   }
    if (mDisplayMode == kDisplayMode_Sliders)
    {
       for (int i = 0; i < mParameterSliders.size(); ++i)
@@ -582,7 +578,7 @@ void VSTPlugin::Poll()
             if (mTemporarilyDisplayedParamIndex != -1)
                mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
             mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mName, mChangeGestureParameterIndex);
+            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mDisplayName, mChangeGestureParameterIndex);
          }
 
          mChangeGestureParameterIndex = -1;
@@ -601,6 +597,13 @@ void VSTPlugin::Poll()
          //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
       }
       mWantOpenVstWindow = false;
+   }
+}
+void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
+{
+   if (details.parameterInfoChanged)
+   {
+      mRescanParameterNames = true;
    }
 }
 
@@ -948,7 +951,7 @@ std::vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
    return ignore;
 }
 
-void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
+void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mPresetFileSelector)
    {
@@ -997,7 +1000,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
                {
                   mParameterSliders[index].mShowing = true;
                   if (mParameterSliders[index].mSlider == nullptr)
-                     mParameterSliders[index].MakeSlider(this);
+                     mParameterSliders[index].MakeSlider();
                }
             }
          }
@@ -1008,14 +1011,14 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
    {
       mParameterSliders[mShowParameterIndex].mShowing = true;
       if (mParameterSliders[mShowParameterIndex].mSlider == nullptr)
-         mParameterSliders[mShowParameterIndex].MakeSlider(this);
+         mParameterSliders[mShowParameterIndex].MakeSlider();
       mParameterSliders[mShowParameterIndex].mInSelectorList = true;
       mShowParameterIndex = -1;
       mTemporarilyDisplayedParamIndex = -1;
    }
 }
 
-void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    for (int i = 0; i < mParameterSliders.size(); ++i)
    {
@@ -1026,15 +1029,15 @@ void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void VSTPlugin::IntSliderUpdated(IntSlider* slider, int oldVal)
+void VSTPlugin::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void VSTPlugin::CheckboxUpdated(Checkbox* checkbox)
+void VSTPlugin::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void VSTPlugin::ButtonClicked(ClickButton* button)
+void VSTPlugin::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mOpenEditorButton)
       mWantOpenVstWindow = true;
@@ -1130,14 +1133,23 @@ void VSTPlugin::RefreshPresetFiles()
    juce::File(ofToDataPath("vst/presets/" + GetPluginId())).createDirectory();
    mPresetFilePaths.clear();
    mPresetFileSelector->Clear();
-   for (const auto& entry : RangedDirectoryIterator{ File{ ofToDataPath("vst/presets/" + GetPluginId()) }, false, "*.vstp" })
+   juce::Array<juce::File> fileList;
+   for (const auto& entry : RangedDirectoryIterator{ juce::File{ ofToDataPath("vst/presets/" + GetPluginId()) }, false, "*.vstp" })
    {
-      const auto& file = entry.getFile();
+      fileList.add(entry.getFile());
+   }
+   fileList.sort();
+   for (const auto& file : fileList)
+   {
       mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
       mPresetFilePaths.push_back(file.getFullPathName().toStdString());
    }
 }
 
+void VSTPlugin::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["parameterversion"] = 1;
+}
 
 void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
@@ -1154,6 +1166,14 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
       mOldVstPath = moduleInfo["vst"].asString();
    else
       mOldVstPath = "";
+
+   if (!IsSpawningOnTheFly(moduleInfo))
+   {
+      if (!moduleInfo["parameterversion"].isNull())
+         mParameterVersion = moduleInfo["parameterversion"].asInt();
+      else
+         mParameterVersion = 0;
+   }
 
    SetUpFromSaveData();
 }
@@ -1233,7 +1253,7 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
       for (auto& parameter : mParameterSliders)
       {
          if (parameter.mSlider == nullptr)
-            parameter.MakeSlider(this);
+            parameter.MakeSlider();
       }
    }
 
@@ -1292,23 +1312,40 @@ void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
             {
                mParameterSliders[index].mShowing = true;
                if (mParameterSliders[index].mSlider == nullptr)
-                  mParameterSliders[index].MakeSlider(this);
+                  mParameterSliders[index].MakeSlider();
             }
          }
       }
    }
 }
 
-void VSTPlugin::ParameterSlider::MakeSlider(VSTPlugin* owner)
+void VSTPlugin::ParameterSlider::MakeSlider()
 {
-   mSlider = new FloatSlider(owner, mName.c_str(), -1, -1, 200, 15, &mValue, 0, 1);
+   const char* sliderID;
+   if (mOwner->mParameterVersion == 0)
+      sliderID = mDisplayName.c_str(); //old save files used unstable parameters names
+   else
+      sliderID = mID.c_str(); //now we use parameter IDs for more stability
+   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 200, 15, &mValue, 0, 1);
+   mSlider->SetOverrideDisplayName(mDisplayName);
 }
 
 void VSTPlugin::OnUIControlRequested(const char* name)
 {
-   for (auto& parameter : mParameterSliders)
+   if (mParameterVersion == 0) //legacy path
    {
-      if (parameter.mName == name && parameter.mSlider == nullptr)
-         parameter.MakeSlider(this);
+      for (auto& parameter : mParameterSliders)
+      {
+         if (parameter.mDisplayName == name && parameter.mSlider == nullptr)
+            parameter.MakeSlider();
+      }
+   }
+   else
+   {
+      for (auto& parameter : mParameterSliders)
+      {
+         if (parameter.mID == name && parameter.mSlider == nullptr)
+            parameter.MakeSlider();
+      }
    }
 }

@@ -31,33 +31,6 @@
 #include "Profiler.h"
 
 SampleFinder::SampleFinder()
-: mVolume(.6f)
-, mVolumeSlider(nullptr)
-, mSample(nullptr)
-, mPlay(false)
-, mPlayCheckbox(nullptr)
-, mLoop(true)
-, mLoopCheckbox(nullptr)
-, mMeasureEarly(0)
-, mEditMode(true)
-, mEditCheckbox(nullptr)
-, mClipStart(0)
-, mClipStartSlider(nullptr)
-, mClipEnd(1)
-, mClipEndSlider(nullptr)
-, mZoomStart(0)
-, mZoomEnd(1)
-, mNumBars(1)
-, mNumBarsSlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mWriteButton(nullptr)
-, mPlayhead(0)
-, mWantWrite(false)
-, mDoubleLengthButton(nullptr)
-, mHalveLengthButton(nullptr)
-, mReverse(false)
-, mReverseCheckbox(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -240,7 +213,7 @@ void SampleFinder::DropdownClicked(DropdownList* list)
 {
 }
 
-void SampleFinder::DropdownUpdated(DropdownList* list, int oldVal)
+void SampleFinder::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -248,7 +221,7 @@ void SampleFinder::UpdateSample()
 {
 }
 
-void SampleFinder::ButtonClicked(ClickButton* button)
+void SampleFinder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mWriteButton)
    {
@@ -300,7 +273,7 @@ void SampleFinder::UpdateZoomExtents()
    mClipEndSlider->SetExtents(mZoomStart, mZoomEnd);
 }
 
-void SampleFinder::CheckboxUpdated(Checkbox* checkbox)
+void SampleFinder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mPlayCheckbox)
    {
@@ -323,11 +296,11 @@ void SampleFinder::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void SampleFinder::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SampleFinder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SampleFinder::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SampleFinder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {

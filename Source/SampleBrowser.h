@@ -38,11 +38,13 @@ public:
    SampleBrowser();
    ~SampleBrowser();
    static IDrawableModule* Create() { return new SampleBrowser(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -50,10 +52,11 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 0; }
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override
    {
       width = 300;
@@ -67,7 +70,7 @@ private:
    juce::String mCurrentDirectory;
    juce::StringArray mDirectoryListing;
    std::array<ClickButton*, 30> mButtons;
-   ClickButton* mBackButton;
-   ClickButton* mForwardButton;
-   int mCurrentPage;
+   ClickButton* mBackButton{ nullptr };
+   ClickButton* mForwardButton{ nullptr };
+   int mCurrentPage{ 0 };
 };

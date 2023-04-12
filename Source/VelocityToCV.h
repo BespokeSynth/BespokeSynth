@@ -40,7 +40,9 @@ public:
    VelocityToCV();
    virtual ~VelocityToCV();
    static IDrawableModule* Create() { return new VelocityToCV(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -57,11 +59,13 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -71,9 +75,8 @@ private:
       width = 106;
       height = 17 * 3 + 2;
    }
-   bool Enabled() const override { return mEnabled; }
 
-   int mVelocity;
-   bool mPassZero;
-   Checkbox* mPassZeroCheckbox;
+   int mVelocity{ 0 };
+   bool mPassZero{ false };
+   Checkbox* mPassZeroCheckbox{ nullptr };
 };

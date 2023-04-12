@@ -121,7 +121,7 @@ int MultitrackRecorder::GetRecordingLength()
    return recordingLength;
 }
 
-void MultitrackRecorder::ButtonClicked(ClickButton* button)
+void MultitrackRecorder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mAddTrackButton)
    {
@@ -130,7 +130,19 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
 
    if (button == mBounceButton)
    {
-      std::string filenamePrefix = ofGetTimestampString(UserPrefs.recordings_path.Get() + "multitrack_%Y-%m-%d_%H-%M_");
+      std::string save_prefix = "multitrack_";
+      if (!TheSynth->GetLastSavePath().empty())
+      {
+         // This assumes that mCurrentSaveStatePath always has a valid filename at the end
+         std::string filename = juce::File(TheSynth->GetLastSavePath()).getFileNameWithoutExtension().toStdString();
+         save_prefix = filename + "_";
+         // Crude way of checking if the filename does not have a date/time in it.
+         if (std::count(save_prefix.begin(), save_prefix.end(), '-') < 3)
+         {
+            save_prefix += "%Y-%m-%d_%H-%M_";
+         }
+      }
+      std::string filenamePrefix = ofGetTimestampString(UserPrefs.recordings_path.Get() + save_prefix);
 
       int numFiles = 0;
       for (int i = 0; i < (int)mTracks.size(); ++i)
@@ -159,7 +171,7 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
    }
 }
 
-void MultitrackRecorder::CheckboxUpdated(Checkbox* checkbox)
+void MultitrackRecorder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mRecordCheckbox)
    {
@@ -170,7 +182,6 @@ void MultitrackRecorder::CheckboxUpdated(Checkbox* checkbox)
 
 void MultitrackRecorder::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["modules"] = mModuleContainer.WriteModules();
 }
 
@@ -436,15 +447,15 @@ void MultitrackRecorderTrack::Clear()
    mRecordingLength = 0;
 }
 
-void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void MultitrackRecorderTrack::CheckboxUpdated(Checkbox* checkbox)
+void MultitrackRecorderTrack::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void MultitrackRecorderTrack::ButtonClicked(ClickButton* button)
+void MultitrackRecorderTrack::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mDeleteButton)
       mRecorder->RemoveTrack(this);

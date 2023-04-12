@@ -40,7 +40,6 @@ CanvasElement::CanvasElement(Canvas* canvas, int col, int row, float offset, flo
 , mLength(length)
 , mCol(col)
 , mRow(row)
-, mHighlighted(false)
 {
 }
 
@@ -262,37 +261,39 @@ void CanvasElement::MoveElementByDrag(ofVec2f dragOffset)
 void CanvasElement::AddElementUIControl(IUIControl* control)
 {
    mUIControls.push_back(control);
+   // Block modulation cables from targeting these controls.
+   control->SetCableTargetable(false);
    control->SetShowing(false);
 }
 
-void CanvasElement::CheckboxUpdated(std::string label, bool value)
+void CanvasElement::CheckboxUpdated(std::string label, bool value, double time)
 {
    for (auto* control : mUIControls)
    {
       if (control->Name() == label)
-         control->SetValue(value);
+         control->SetValue(value, time);
    }
 }
 
-void CanvasElement::FloatSliderUpdated(std::string label, float oldVal, float newVal)
+void CanvasElement::FloatSliderUpdated(std::string label, float oldVal, float newVal, double time)
 {
    for (auto* control : mUIControls)
    {
       if (control->Name() == label)
-         control->SetValue(newVal);
+         control->SetValue(newVal, time);
    }
 }
 
-void CanvasElement::IntSliderUpdated(std::string label, int oldVal, float newVal)
+void CanvasElement::IntSliderUpdated(std::string label, int oldVal, float newVal, double time)
 {
    for (auto* control : mUIControls)
    {
       if (control->Name() == label)
-         control->SetValue(newVal);
+         control->SetValue(newVal, time);
    }
 }
 
-void CanvasElement::ButtonClicked(std::string label)
+void CanvasElement::ButtonClicked(std::string label, double time)
 {
 }
 
@@ -449,9 +450,6 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
 
 SampleCanvasElement::SampleCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
 : CanvasElement(canvas, col, row, offset, length)
-, mSample(nullptr)
-, mVolume(1)
-, mMute(false)
 {
    mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()), "offset", 0, 0, 100, 15, &mOffset, -1, 1);
    AddElementUIControl(mElementOffsetSlider);
@@ -485,14 +483,14 @@ void SampleCanvasElement::SetSample(Sample* sample)
    mSample = sample;
 }
 
-void SampleCanvasElement::CheckboxUpdated(std::string label, bool value)
+void SampleCanvasElement::CheckboxUpdated(std::string label, bool value, double time)
 {
-   CanvasElement::CheckboxUpdated(label, value);
+   CanvasElement::CheckboxUpdated(label, value, time);
 }
 
-void SampleCanvasElement::ButtonClicked(std::string label)
+void SampleCanvasElement::ButtonClicked(std::string label, double time)
 {
-   CanvasElement::ButtonClicked(label);
+   CanvasElement::ButtonClicked(label, time);
    if (label == "split")
    {
       ChannelBuffer* firstHalf = new ChannelBuffer(mSample->Data()->BufferSize() / 2);
@@ -623,7 +621,6 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
 
 EventCanvasElement::EventCanvasElement(Canvas* canvas, int col, int row, float offset)
 : CanvasElement(canvas, col, row, offset, .5f)
-, mValue(0)
 {
    mValueEntry = new TextEntry(dynamic_cast<ITextEntryListener*>(canvas->GetControls()), "value", 60, 2, 7, &mValue, -99999, 99999);
    AddElementUIControl(mValueEntry);
@@ -702,21 +699,21 @@ void EventCanvasElement::SetUIControl(IUIControl* control)
       mValue = 1;
 }
 
-void EventCanvasElement::Trigger()
+void EventCanvasElement::Trigger(double time)
 {
    if (mUIControl)
    {
       if (mIsCheckbox)
-         mUIControl->SetValue(1);
+         mUIControl->SetValue(1, time);
       else
-         mUIControl->SetValue(mValue);
+         mUIControl->SetValue(mValue, time);
    }
 }
 
-void EventCanvasElement::TriggerEnd()
+void EventCanvasElement::TriggerEnd(double time)
 {
    if (mUIControl && mIsCheckbox)
-      mUIControl->SetValue(0);
+      mUIControl->SetValue(0, time);
 }
 
 float EventCanvasElement::GetEnd() const

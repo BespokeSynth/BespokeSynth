@@ -69,17 +69,17 @@ public:
    void LoadState(FileStreamIn& in) override;
 
 private:
-   MidiDeviceListener* mListener;
+   MidiDeviceListener* mListener{ nullptr };
 
    int FindControl(std::string address);
    void ConnectOutput();
 
    std::string mOutAddress;
-   int mOutPort;
-   int mInPort;
+   int mOutPort{ 0 };
+   int mInPort{ 0 };
    juce::OSCSender mOscOut;
-   bool mConnected;
-   bool mOutputConnected;
+   bool mConnected{ false };
+   bool mOutputConnected{ false };
 
    std::vector<OscMap> mOscMap;
 };

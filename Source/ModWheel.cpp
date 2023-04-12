@@ -28,9 +28,6 @@
 #include "ModularSynth.h"
 
 ModWheel::ModWheel()
-: mModWheel(0)
-, mModWheelSlider(nullptr)
-, mModulation(true)
 {
 }
 
@@ -75,13 +72,13 @@ void ModWheel::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void ModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mModWheelSlider)
       mModulation.GetModWheel(-1)->SetValue(mModWheel);
 }
 
-void ModWheel::CheckboxUpdated(Checkbox* checkbox)
+void ModWheel::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

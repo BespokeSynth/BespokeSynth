@@ -41,7 +41,9 @@ public:
    CanvasControls();
    ~CanvasControls();
    static IDrawableModule* Create() { return new CanvasControls(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
@@ -52,23 +54,24 @@ public:
 
    void AllowDragModeSelection(bool allow);
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    bool CanModuleTypeSaveState() const override { return false; }
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
    void PreDrawModule() override;
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return true; }
 
    float mWidth{ 200 };
    Canvas* mCanvas{ nullptr };

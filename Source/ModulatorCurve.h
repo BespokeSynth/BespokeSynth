@@ -39,7 +39,9 @@ public:
    ModulatorCurve();
    virtual ~ModulatorCurve();
    static IDrawableModule* Create() { return new ModulatorCurve(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -51,13 +53,13 @@ public:
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
-   FloatSlider* GetTarget() { return mSliderTarget; }
+   FloatSlider* GetTarget() { return GetSliderTarget(); }
 
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -67,6 +69,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -75,13 +79,12 @@ private:
       w = 106;
       h = 121;
    }
-   bool Enabled() const override { return mEnabled; }
 
    void OnClicked(float x, float y, bool right) override;
 
-   float mInput;
-   EnvelopeControl mEnvelopeControl;
+   float mInput{ 0 };
+   EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100) };
    ::ADSR mAdsr;
 
-   FloatSlider* mInputSlider;
+   FloatSlider* mInputSlider{ nullptr };
 };

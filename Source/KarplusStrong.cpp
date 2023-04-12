@@ -142,7 +142,7 @@ void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    if (velocity > 0)
       mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
    else
-      mPolyMgr.Stop(time, pitch);
+      mPolyMgr.Stop(time, pitch, voiceIdx);
 }
 
 void KarplusStrong::SetEnabled(bool enabled)
@@ -185,15 +185,15 @@ void KarplusStrong::DrawModuleUnclipped()
    }
 }
 
-void KarplusStrong::DropdownUpdated(DropdownList* list, int oldVal)
+void KarplusStrong::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void KarplusStrong::CheckboxUpdated(Checkbox* checkbox)
+void KarplusStrong::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

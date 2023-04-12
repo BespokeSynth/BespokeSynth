@@ -314,7 +314,9 @@ void GridModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    if (cableSource == mGridOutputCable)
    {
       auto* target = dynamic_cast<GridControlTarget*>(cableSource->GetTarget());
-      if (target)
+      if (target == mGridControlTarget) //patched into ourself
+         cableSource->Clear();
+      else if (target)
          target->SetGridController(this);
    }
 }
@@ -331,7 +333,7 @@ void GridModule::SetUpFromSaveData()
    mDirectColorMode = mModuleSaveData.GetBool("direct_color_mode");
 }
 
-void GridModule::CheckboxUpdated(Checkbox* checkbox)
+void GridModule::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mMomentaryCheckbox)
       mGrid->SetMomentary(mMomentary);

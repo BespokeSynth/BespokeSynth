@@ -31,8 +31,6 @@
 #include "ModulationChain.h"
 
 NoteToMs::NoteToMs()
-: mPitch(0)
-, mPitchBend(nullptr)
 {
 }
 
@@ -76,7 +74,6 @@ float NoteToMs::Value(int samplesIn)
 
 void NoteToMs::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteToMs::LoadLayout(const ofxJSONElement& moduleInfo)

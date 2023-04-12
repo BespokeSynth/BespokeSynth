@@ -34,11 +34,10 @@
 
 NoteHocket::NoteHocket()
 {
-   mWeight[0] = 1;
-   for (int i = 1; i < kMaxDestinations; ++i)
-      mWeight[i] = 0;
    for (int i = 0; i < 128; ++i)
       mLastNoteDestinations[i] = -1;
+   for (int i = 0; i < kMaxDestinations; ++i)
+      mWeight[i] = (i == 0) ? 1 : 0;
 
    Reseed();
 }
@@ -184,7 +183,7 @@ void NoteHocket::SendCC(int control, int value, int voiceIdx)
    SendCCOutput(control, value, voiceIdx);
 }
 
-void NoteHocket::ButtonClicked(ClickButton* button)
+void NoteHocket::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPrevSeedButton)
       mSeed = (mSeed - 1 + 10000) % 10000;
@@ -234,5 +233,4 @@ void NoteHocket::SetUpFromSaveData()
 
 void NoteHocket::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }

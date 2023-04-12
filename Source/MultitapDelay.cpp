@@ -39,12 +39,7 @@ const float mBufferH = 200;
 
 MultitapDelay::MultitapDelay()
 : IAudioProcessor(gBufferSize)
-, mNumTaps(4)
 , mWriteBuffer(gBufferSize)
-, mDryAmountSlider(nullptr)
-, mDryAmount(1)
-, mDisplayLengthSlider(nullptr)
-, mDisplayLength(10)
 , mDelayBuffer(5 * gSampleRate)
 {
    mTaps.resize(mNumTaps);
@@ -158,11 +153,11 @@ void MultitapDelay::DropdownClicked(DropdownList* list)
 {
 }
 
-void MultitapDelay::DropdownUpdated(DropdownList* list, int oldVal)
+void MultitapDelay::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void MultitapDelay::ButtonClicked(ClickButton* button)
+void MultitapDelay::ButtonClicked(ClickButton* button, double time)
 {
 }
 
@@ -181,7 +176,7 @@ bool MultitapDelay::MouseMoved(float x, float y)
    return IDrawableModule::MouseMoved(x, y);
 }
 
-void MultitapDelay::CheckboxUpdated(Checkbox* checkbox)
+void MultitapDelay::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -191,11 +186,11 @@ void MultitapDelay::GetModuleDimensions(float& width, float& height)
    height = mBufferY + mBufferH + 10 + 100 * mNumTaps;
 }
 
-void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void MultitapDelay::IntSliderUpdated(IntSlider* slider, int oldVal)
+void MultitapDelay::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

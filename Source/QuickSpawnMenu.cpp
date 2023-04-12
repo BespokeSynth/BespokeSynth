@@ -29,6 +29,9 @@
 #include "ModularSynth.h"
 #include "ModuleFactory.h"
 #include "TitleBar.h"
+#include "PatchCable.h"
+#include "PatchCableSource.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -51,13 +54,26 @@ QuickSpawnMenu::~QuickSpawnMenu()
 {
    assert(TheQuickSpawnMenu == this);
    TheQuickSpawnMenu = nullptr;
+   delete mMainContainerFollower;
 }
 
 void QuickSpawnMenu::Init()
 {
    IDrawableModule::Init();
    SetShouldDrawOutline(false);
-   SetShowing(false);
+   mMainContainerFollower = new QuickSpawnFollower();
+   mMainContainerFollower->SetName("quickspawnfollower");
+   mMainContainerFollower->CreateUIControls();
+   mMainContainerFollower->SetUp();
+   mMainContainerFollower->SetShowing(false);
+   Hide();
+}
+
+void QuickSpawnFollower::SetUp()
+{
+   mTempConnectionCable = new PatchCableSource(this, kConnectionType_Special);
+   AddPatchCableSource(mTempConnectionCable);
+   mTempConnectionCable->SetShowing(false);
 }
 
 void QuickSpawnMenu::ShowSpawnCategoriesPopup()
@@ -65,7 +81,25 @@ void QuickSpawnMenu::ShowSpawnCategoriesPopup()
    ResetAppearPos();
    mMenuMode = MenuMode::ModuleCategories;
    mSearchString = "";
+   mFilterForCable = nullptr;
    UpdateDisplay();
+}
+
+void QuickSpawnMenu::ShowSpawnCategoriesPopupForCable(PatchCable* cable)
+{
+   ResetAppearPos();
+   mMenuMode = MenuMode::ModuleCategories;
+   mSearchString = "";
+   mFilterForCable = cable;
+   mMainContainerFollower->mTempConnectionCable->SetShowing(false);
+   UpdateDisplay();
+}
+
+void QuickSpawnMenu::SetTempConnection(IClickable* target, ConnectionType connectionType)
+{
+   mMainContainerFollower->mTempConnectionCable->SetConnectionType(connectionType);
+   mMainContainerFollower->mTempConnectionCable->SetTarget(target);
+   mMainContainerFollower->mTempConnectionCable->SetShowing(true);
 }
 
 void QuickSpawnMenu::ResetAppearPos()
@@ -81,10 +115,14 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
    if (!IsShowing())
       ResetAppearPos();
 
+   if (!IsShowing() && PatchCable::sActivePatchCable != nullptr && key >= 'a' && key <= 'z')
+      PatchCable::sActivePatchCable->ShowQuickspawnForCable();
+
    if ((!IsShowing() || mMenuMode == MenuMode::SingleLetter) && key >= 0 && key < CHAR_MAX && ((key >= 'a' && key <= 'z') || key == ';') && !isRepeat && GetKeyModifiers() == kModifier_None)
    {
       mHeldKeys += (char)key;
       mMenuMode = MenuMode::SingleLetter;
+      mFilterForCable = nullptr;
       UpdateDisplay();
    }
 
@@ -107,7 +145,7 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
          OnSelectItem(mHighlightIndex);
       }
 
-      if (key >= 0 && key < CHAR_MAX && (key >= 'a' && key <= 'z') && mMenuMode != MenuMode::SingleLetter)
+      if (key >= 0 && key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key) && mMenuMode != MenuMode::SingleLetter)
       {
          mSearchString += (char)key;
          mMenuMode = MenuMode::Search;
@@ -135,7 +173,7 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
    }
 
    if (key == OF_KEY_ESC)
-      SetShowing(false);
+      Hide();
 }
 
 void QuickSpawnMenu::KeyReleased(int key)
@@ -147,24 +185,61 @@ void QuickSpawnMenu::KeyReleased(int key)
    }
 }
 
+void QuickSpawnMenu::Hide()
+{
+   SetShowing(false);
+   if (mFilterForCable != nullptr)
+   {
+      if (mMainContainerFollower->mTempConnectionCable->IsShowing())
+         mFilterForCable->SetTempDrawTarget(nullptr);
+      else
+         mFilterForCable->GetOwner()->SetPatchCableTarget(mFilterForCable, nullptr, true);
+   }
+   mFilterForCable = nullptr;
+   mMainContainerFollower->mTempConnectionCable->SetShowing(false);
+}
+
 void QuickSpawnMenu::UpdateDisplay()
 {
    if ((mMenuMode == MenuMode::SingleLetter && mHeldKeys.isEmpty()) || TheSynth->GetMoveModule() != nullptr)
    {
-      SetShowing(false);
+      Hide();
    }
    else
    {
       if (mMenuMode == MenuMode::ModuleCategories)
       {
          mElements.clear();
+         mCategoryIndices.clear();
+         int categoryIndex = 0;
          for (auto* dropdown : TheTitleBar->GetSpawnLists())
          {
-            std::string label = dropdown->GetLabel();
-            ofStringReplace(label, ":", "");
-            ModuleFactory::Spawnable dummy;
-            dummy.mLabel = label;
-            mElements.push_back(dummy);
+            bool containsValidTarget = false;
+            if (mFilterForCable == nullptr)
+            {
+               containsValidTarget = true;
+            }
+            else
+            {
+               const auto& spawnables = dropdown->GetElements();
+               for (size_t i = 0; i < spawnables.size(); ++i)
+               {
+                  if (MatchesFilter(spawnables[i]))
+                     containsValidTarget = true;
+               }
+            }
+
+            if (containsValidTarget)
+            {
+               std::string label = dropdown->GetLabel();
+               ofStringReplace(label, ":", "");
+               ModuleFactory::Spawnable dummy;
+               dummy.mLabel = label;
+               mElements.push_back(dummy);
+               mCategoryIndices.push_back(categoryIndex);
+            }
+
+            ++categoryIndex;
          }
       }
       else if (mMenuMode == MenuMode::SingleCategory)
@@ -172,15 +247,30 @@ void QuickSpawnMenu::UpdateDisplay()
          mElements.clear();
          const auto& elements = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetElements();
          for (size_t i = 0; i < elements.size(); ++i)
-            mElements.push_back(elements[i]);
+         {
+            if (MatchesFilter(elements[i]))
+               mElements.push_back(elements[i]);
+         }
       }
       else if (mMenuMode == MenuMode::Search)
       {
-         mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mSearchString.toStdString(), true);
+         mElements.clear();
+         const auto& elements = TheSynth->GetModuleFactory()->GetSpawnableModules(mSearchString.toStdString(), true);
+         for (size_t i = 0; i < elements.size(); ++i)
+         {
+            if (MatchesFilter(elements[i]))
+               mElements.push_back(elements[i]);
+         }
       }
       else
       {
-         mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString(), false);
+         mElements.clear();
+         const auto& elements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString(), false);
+         for (size_t i = 0; i < elements.size(); ++i)
+         {
+            if (MatchesFilter(elements[i]))
+               mElements.push_back(elements[i]);
+         }
          mScrollOffset = 0;
       }
 
@@ -196,6 +286,78 @@ void QuickSpawnMenu::UpdateDisplay()
       UpdatePosition();
       SetShowing(true);
    }
+}
+
+bool QuickSpawnMenu::MatchesFilter(const ModuleFactory::Spawnable& spawnable) const
+{
+   if (mFilterForCable == nullptr)
+      return true;
+
+   bool inputMatches = false;
+   bool outputMatches = false;
+
+   ModuleFactory::ModuleInfo info = TheSynth->GetModuleFactory()->GetModuleInfo(spawnable.mLabel);
+
+   if (mFilterForCable->GetConnectionType() == kConnectionType_Note)
+   {
+      if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
+         inputMatches = true;
+      if (info.mCanReceiveNotes)
+         inputMatches = true;
+   }
+
+   if (mFilterForCable->GetConnectionType() == kConnectionType_Audio)
+   {
+      if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
+         inputMatches = true;
+      if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::EffectChain)
+         inputMatches = true;
+      if (info.mCanReceiveAudio)
+         inputMatches = true;
+   }
+
+   if (mFilterForCable->GetConnectionType() == kConnectionType_Pulse)
+   {
+      if (info.mCanReceivePulses)
+         inputMatches = true;
+   }
+
+   if (mMainContainerFollower->mTempConnectionCable->IsShowing())
+   {
+      if (mMainContainerFollower->mTempConnectionCable->GetConnectionType() == kConnectionType_Note)
+      {
+         if (info.mCategory == kModuleCategory_Instrument)
+            outputMatches = true;
+         if (info.mCategory == kModuleCategory_Note)
+            outputMatches = true;
+      }
+
+      if (mMainContainerFollower->mTempConnectionCable->GetConnectionType() == kConnectionType_Audio)
+      {
+         if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
+            outputMatches = true;
+         if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::EffectChain)
+            outputMatches = true;
+         if (info.mCategory == kModuleCategory_Synth)
+            outputMatches = true;
+         if (info.mCategory == kModuleCategory_Audio)
+            outputMatches = true;
+         if (info.mCategory == kModuleCategory_Processor)
+            outputMatches = true;
+      }
+
+      if (mMainContainerFollower->mTempConnectionCable->GetConnectionType() == kConnectionType_Pulse)
+      {
+         if (info.mCategory == kModuleCategory_Pulse)
+            outputMatches = true;
+      }
+   }
+   else
+   {
+      outputMatches = true; //doesn't matter
+   }
+
+   return inputMatches && outputMatches;
 }
 
 void QuickSpawnMenu::UpdatePosition()
@@ -264,9 +426,9 @@ void QuickSpawnMenu::DrawModule()
    for (int i = 0; i < mElements.size(); ++i)
    {
       if (mMenuMode == MenuMode::ModuleCategories)
-         ofSetColor(IDrawableModule::GetColor(TheTitleBar->GetSpawnLists()[i]->GetCategory()) * (i == mHighlightIndex ? .7f : .5f), 255);
+         ofSetColor(IDrawableModule::GetColor(TheTitleBar->GetSpawnLists()[mCategoryIndices[i]]->GetCategory()) * (i == mHighlightIndex ? .7f : .5f), 255);
       else
-         ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i])) * (i == mHighlightIndex ? .7f : .5f), 255);
+         ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleCategory(mElements[i])) * (i == mHighlightIndex ? .7f : .5f), 255);
       ofRect(0, i * kItemSpacing + 1, mWidth, kItemSpacing - 1);
       if (i == mHighlightIndex)
          ofSetColor(255, 255, 0);
@@ -286,6 +448,8 @@ void QuickSpawnMenu::DrawModule()
    }
 
    ofPopStyle();
+
+   mMainContainerFollower->UpdateLocation();
 }
 
 void QuickSpawnMenu::DrawModuleUnclipped()
@@ -308,7 +472,7 @@ void QuickSpawnMenu::OnClicked(float x, float y, bool right)
    if (right)
    {
       if (IsShowing())
-         SetShowing(false);
+         Hide();
       return;
    }
 
@@ -317,41 +481,36 @@ void QuickSpawnMenu::OnClicked(float x, float y, bool right)
 
 void QuickSpawnMenu::OnSelectItem(int index)
 {
-   if (mMenuMode == MenuMode::SingleLetter || mMenuMode == MenuMode::Search)
+   if (mMenuMode == MenuMode::SingleLetter || mMenuMode == MenuMode::Search || mMenuMode == MenuMode::SingleCategory)
    {
       if (index >= 0 && index < mElements.size())
       {
          IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(mElements[index], TheSynth->GetMouseX(TheSynth->GetRootContainer()) + kModuleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + kModuleGrabOffset.y);
          TheSynth->SetMoveModule(module, kModuleGrabOffset.x, kModuleGrabOffset.y, true);
+         if (mFilterForCable != nullptr)
+         {
+            mFilterForCable->SetTempDrawTarget(nullptr);
+            if (mMainContainerFollower->mTempConnectionCable->IsShowing())
+               module->SetTarget(mMainContainerFollower->mTempConnectionCable->GetTarget());
+            mFilterForCable->GetOwner()->SetPatchCableTarget(mFilterForCable, module, true);
+            mFilterForCable = nullptr;
+         }
       }
-      SetShowing(false);
-   }
-
-   if (mMenuMode == MenuMode::SingleCategory)
-   {
-      if (mSelectedCategoryIndex >= 0 &&
-          mSelectedCategoryIndex < (int)TheTitleBar->GetSpawnLists().size() &&
-          index >= 0 &&
-          index < TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetList()->GetNumValues())
-      {
-         IDrawableModule* module = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->Spawn(index);
-         TheSynth->SetMoveModule(module, kModuleGrabOffset.x, kModuleGrabOffset.y, true);
-      }
-      SetShowing(false);
+      Hide();
    }
 
    if (mMenuMode == MenuMode::ModuleCategories)
    {
-      mSelectedCategoryIndex = index;
-      if (mSelectedCategoryIndex >= 0 && mSelectedCategoryIndex < mElements.size())
+      if (index >= 0 && index < mElements.size())
       {
+         mSelectedCategoryIndex = mCategoryIndices[index];
          mMenuMode = MenuMode::SingleCategory;
          ResetAppearPos();
          UpdateDisplay();
       }
       else
       {
-         SetShowing(false);
+         Hide();
       }
    }
 }
@@ -379,4 +538,27 @@ const ModuleFactory::Spawnable* QuickSpawnMenu::GetElementAt(int x, int y) const
       return &mElements[index];
 
    return nullptr;
+}
+
+void QuickSpawnFollower::GetDimensions(float& width, float& height)
+{
+   TheQuickSpawnMenu->GetDimensions(width, height);
+   float scaleFactor = UserPrefs.ui_scale.Get() / gDrawScale;
+   width *= scaleFactor;
+   height *= scaleFactor;
+
+   height -= 10;
+   width -= 10;
+}
+
+void QuickSpawnFollower::UpdateLocation()
+{
+   float x, y;
+   TheQuickSpawnMenu->GetPosition(x, y);
+   float scaleFactor = UserPrefs.ui_scale.Get() / gDrawScale;
+   x *= scaleFactor;
+   y *= scaleFactor;
+   x -= TheSynth->GetDrawOffset().x;
+   y -= TheSynth->GetDrawOffset().y;
+   SetPosition(x, y);
 }

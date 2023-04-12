@@ -42,7 +42,9 @@ public:
    VolcaBeatsControl();
    virtual ~VolcaBeatsControl();
    static IDrawableModule* Create() { return new VolcaBeatsControl(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -51,10 +53,12 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -64,32 +68,31 @@ private:
       width = 263;
       height = 170;
    }
-   bool Enabled() const override { return mEnabled; }
 
-   float mClapSpeed;
-   float mClaveSpeed;
-   float mAgogoSpeed;
-   float mCrashSpeed;
-   float mStutterTime;
-   float mStutterDepth;
-   float mTomDecay;
-   float mClosedHatDecay;
-   float mOpenHatDecay;
-   float mHatGrain;
+   float mClapSpeed{ .5 };
+   float mClaveSpeed{ .5 };
+   float mAgogoSpeed{ .5 };
+   float mCrashSpeed{ .5 };
+   float mStutterTime{ .5 };
+   float mStutterDepth{ 0 };
+   float mTomDecay{ .5 };
+   float mClosedHatDecay{ .5 };
+   float mOpenHatDecay{ .5 };
+   float mHatGrain{ .5 };
 
-   FloatSlider* mClapSpeedSlider;
-   FloatSlider* mClaveSpeedSlider;
-   FloatSlider* mAgogoSpeedSlider;
-   FloatSlider* mCrashSpeedSlider;
-   FloatSlider* mStutterTimeSlider;
-   FloatSlider* mStutterDepthSlider;
-   FloatSlider* mTomDecaySlider;
-   FloatSlider* mClosedHatDecaySlider;
-   FloatSlider* mOpenHatDecaySlider;
-   FloatSlider* mHatGrainSlider;
+   FloatSlider* mClapSpeedSlider{ nullptr };
+   FloatSlider* mClaveSpeedSlider{ nullptr };
+   FloatSlider* mAgogoSpeedSlider{ nullptr };
+   FloatSlider* mCrashSpeedSlider{ nullptr };
+   FloatSlider* mStutterTimeSlider{ nullptr };
+   FloatSlider* mStutterDepthSlider{ nullptr };
+   FloatSlider* mTomDecaySlider{ nullptr };
+   FloatSlider* mClosedHatDecaySlider{ nullptr };
+   FloatSlider* mOpenHatDecaySlider{ nullptr };
+   FloatSlider* mHatGrainSlider{ nullptr };
 
-   float mLevels[10];
-   FloatSlider* mLevelSliders[10];
+   float mLevels[10]{};
+   FloatSlider* mLevelSliders[10]{ nullptr };
 };
 
 

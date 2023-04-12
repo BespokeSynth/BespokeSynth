@@ -110,6 +110,7 @@ public:
    void SetScaleType(std::string type, bool force = true);
    void AddListener(IScaleListener* listener);
    void RemoveListener(IScaleListener* listener);
+   void ClearListeners();
    void Poll() override;
    void SetScaleDegree(int degree);
    int GetScaleDegree() { return mScaleDegree; }
@@ -121,26 +122,28 @@ public:
    int GetNumScaleTypes() { return (int)mScales.size(); }
    std::string GetScaleName(int index) { return mScales[index].mName; }
    int NumTonesInScale() const { return mScale.NumTonesInScale(); }
-   int GetPitchesPerOctave() const { return mPitchesPerOctave; }
+   int GetPitchesPerOctave() const { return MAX(1, mPitchesPerOctave); }
 
    float PitchToFreq(float pitch);
    float FreqToPitch(float freq);
 
    const ChordDatabase& GetChordDatabase() const { return mChordDatabase; }
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return true; }
 
 private:
    struct ScaleInfo
@@ -157,7 +160,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return true; }
 
    void NotifyListeners();
 

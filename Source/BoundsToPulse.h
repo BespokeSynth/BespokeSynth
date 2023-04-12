@@ -37,19 +37,26 @@
 #include "IAudioSource.h"
 #include "EnvOscillator.h"
 #include "IPulseReceiver.h"
+#include "IAudioPoller.h"
 
-class BoundsToPulse : public IDrawableModule, public IFloatSliderListener, public IPulseSource
+class BoundsToPulse : public IDrawableModule, public IFloatSliderListener, public IPulseSource, public IAudioPoller
 {
 public:
    BoundsToPulse();
    virtual ~BoundsToPulse();
    static IDrawableModule* Create() { return new BoundsToPulse(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
+   void Init() override;
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void OnTransportAdvanced(float amount) override;
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    float GetValue() const { return mValue; }
    FloatSlider* GetSlider() { return mSlider; }

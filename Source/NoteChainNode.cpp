@@ -96,13 +96,13 @@ void NoteChainNode::OnTimeEvent(double time)
 
 void NoteChainNode::OnTransportAdvanced(float amount)
 {
-   if (mNoteOn && gTime + gBufferSizeMs > mStartTime + mDurationMs)
+   if (mNoteOn && NextBufferTime(true) > mStartTime + mDurationMs)
    {
       mNoteOn = false;
       mNoteOutput.Flush(mStartTime + mDurationMs);
    }
 
-   if (mWaitingToTrigger && gTime + gBufferSizeMs > mStartTime + mNext)
+   if (mWaitingToTrigger && NextBufferTime(true) > mStartTime + mNext)
    {
       mWaitingToTrigger = false;
       DispatchPulse(mNextNodeCable, mStartTime + mNext, 1, 0);
@@ -131,13 +131,13 @@ void NoteChainNode::TriggerNote(double time)
    }
 }
 
-void NoteChainNode::CheckboxUpdated(Checkbox* checkbox)
+void NoteChainNode::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void NoteChainNode::ButtonClicked(ClickButton* button)
+void NoteChainNode::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTriggerButton)
       mQueueTrigger = true;
@@ -148,7 +148,7 @@ void NoteChainNode::TextEntryComplete(TextEntry* entry)
    if (entry == mPitchEntry)
    {
       mNoteOn = false;
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(NextBufferTime(false));
    }
 }
 

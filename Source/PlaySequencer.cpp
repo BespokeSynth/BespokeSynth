@@ -62,21 +62,21 @@ void PlaySequencer::CreateUIControls()
    UIBLOCK_SHIFTUP();
    CHECKBOX(mLinkColumnsCheckbox, "link columns", &mLinkColumns);
    ENDUIBLOCK(width, height);
-   mGrid = new UIGrid("uigrid", 3, height, mWidth - 16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size(), this);
-   mHeight = height + 153;
-   mGrid->SetFlip(true);
-   mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
-   mGrid->SetRequireShiftForMultislider(true);
-   mGrid->SetRestrictDragToRow(true);
 
-   UIBLOCK(3, mHeight + 3, 45);
+   UIBLOCK(3, height + 3, 45);
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
       BUTTON(mSavedPatterns[i].mStoreButton, ("store" + ofToString(i)).c_str());
       BUTTON(mSavedPatterns[i].mLoadButton, ("load" + ofToString(i)).c_str());
       UIBLOCK_NEWCOLUMN();
    }
-   ENDUIBLOCK(width, mHeight);
+   ENDUIBLOCK(width, height);
+   ofLog() << "width: " << width << " height: " << height;
+   mGrid = new UIGrid("uigrid", 3, height + 3, mWidth - 16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size(), this);
+   mGrid->SetFlip(true);
+   mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
+   mGrid->SetRequireShiftForMultislider(true);
+   mGrid->SetRestrictDragToRow(true);
 
    ofRectangle gridRect = mGrid->GetRect(true);
    for (int i = 0; i < (int)mLanes.size(); ++i)
@@ -177,7 +177,7 @@ bool PlaySequencer::MouseMoved(float x, float y)
    return false;
 }
 
-void PlaySequencer::CheckboxUpdated(Checkbox* checkbox)
+void PlaySequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (size_t i = 0; i < mLanes.size(); ++i)
    {
@@ -440,9 +440,9 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
             mGrid->Clear();
 
          if (x >= 4 && y == 0)
-            ButtonClicked(mSavedPatterns[x - 4].mStoreButton);
+            ButtonClicked(mSavedPatterns[x - 4].mStoreButton, NextBufferTime(false));
          if (x >= 4 && y == 1)
-            ButtonClicked(mSavedPatterns[x - 4].mLoadButton);
+            ButtonClicked(mSavedPatterns[x - 4].mLoadButton, NextBufferTime(false));
 
          if (y >= 4)
          {
@@ -495,7 +495,7 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
    }
 }
 
-void PlaySequencer::ButtonClicked(ClickButton* button)
+void PlaySequencer::ButtonClicked(ClickButton* button, double time)
 {
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
@@ -523,7 +523,7 @@ void PlaySequencer::ButtonClicked(ClickButton* button)
    }
 }
 
-void PlaySequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void PlaySequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
       UpdateInterval();
@@ -531,8 +531,40 @@ void PlaySequencer::DropdownUpdated(DropdownList* list, int oldVal)
       UpdateNumMeasures(oldVal);
 }
 
-void PlaySequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PlaySequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
+}
+
+namespace
+{
+   const float extraW = 25;
+   const float extraH = 100;
+}
+
+void PlaySequencer::GetModuleDimensions(float& width, float& height)
+{
+   width = mGrid->GetWidth() + extraW;
+   height = mGrid->GetHeight() + extraH;
+}
+
+void PlaySequencer::Resize(float w, float h)
+{
+   w = MAX(w - extraW, 219);
+   h = MAX(h - extraH, 111);
+   SetGridSize(w, h);
+
+   ofRectangle gridRect = mGrid->GetRect(true);
+   for (int i = 0; i < (int)mLanes.size(); ++i)
+   {
+      ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
+      mLanes[i].mMuteOrEraseCheckbox->SetPosition(gridRect.getMaxX() + 3, cellPos.y + 1);
+      mLanes[i].mMuteOrEraseCheckbox->SetBoxSize(MAX(10, mGrid->GetHeight() / mLanes.size()));
+   }
+}
+
+void PlaySequencer::SetGridSize(float w, float h)
+{
+   mGrid->SetDimensions(w, h);
 }
 
 void PlaySequencer::LoadLayout(const ofxJSONElement& moduleInfo)

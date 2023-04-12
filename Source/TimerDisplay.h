@@ -37,24 +37,27 @@ public:
    TimerDisplay();
    ~TimerDisplay();
    static IDrawableModule* Create() { return new TimerDisplay(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override
    {
       width = 150;
       height = 56;
    }
 
-   double mStartTime;
-   ClickButton* mResetButton;
+   double mStartTime{ 0 };
+   ClickButton* mResetButton{ nullptr };
 };
 
 #endif /* defined(__Bespoke__TimerDisplay__) */

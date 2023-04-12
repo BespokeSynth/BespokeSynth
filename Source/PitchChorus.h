@@ -40,7 +40,9 @@ public:
    PitchChorus();
    virtual ~PitchChorus();
    static IDrawableModule* Create() { return new PitchChorus(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -51,11 +53,13 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void CheckboxUpdated(Checkbox* checkbox) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
 
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -65,7 +69,6 @@ private:
       w = 120;
       h = 22;
    }
-   bool Enabled() const override { return mEnabled; }
 
    static const int kNumShifters = 5;
 

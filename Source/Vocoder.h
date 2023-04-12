@@ -37,13 +37,18 @@
 #include "BiquadFilterEffect.h"
 #include "VocoderCarrierInput.h"
 
+#define VOCODER_WINDOW_SIZE 1024
+#define FFT_FREQDOMAIN_SIZE VOCODER_WINDOW_SIZE / 2 + 1
+
 class Vocoder : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public VocoderBase, public IIntSliderListener
 {
 public:
    Vocoder();
    virtual ~Vocoder();
    static IDrawableModule* Create() { return new Vocoder(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -57,12 +62,14 @@ public:
    //IAudioSource
    void Process(double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -72,43 +79,42 @@ private:
       w = 235;
       h = 170;
    }
-   bool Enabled() const override { return mEnabled; }
 
-   FFTData mFFTData;
+   FFTData mFFTData{ VOCODER_WINDOW_SIZE, FFT_FREQDOMAIN_SIZE };
 
-   float* mWindower;
+   float* mWindower{ nullptr };
 
 
-   ::FFT mFFT;
-   RollingBuffer mRollingInputBuffer;
-   RollingBuffer mRollingOutputBuffer;
+   ::FFT mFFT{ VOCODER_WINDOW_SIZE };
+   RollingBuffer mRollingInputBuffer{ VOCODER_WINDOW_SIZE };
+   RollingBuffer mRollingOutputBuffer{ VOCODER_WINDOW_SIZE };
 
-   float* mCarrierInputBuffer;
-   RollingBuffer mRollingCarrierBuffer;
-   FFTData mCarrierFFTData;
+   float* mCarrierInputBuffer{ nullptr };
+   RollingBuffer mRollingCarrierBuffer{ VOCODER_WINDOW_SIZE };
+   FFTData mCarrierFFTData{ VOCODER_WINDOW_SIZE, FFT_FREQDOMAIN_SIZE };
 
-   float mInputPreamp;
-   float mCarrierPreamp;
-   float mVolume;
-   FloatSlider* mInputSlider;
-   FloatSlider* mCarrierSlider;
-   FloatSlider* mVolumeSlider;
-   float mDryWet;
-   FloatSlider* mDryWetSlider;
-   float mFricativeThresh;
-   FloatSlider* mFricativeSlider;
-   bool mFricDetected;
-   float mWhisper;
-   FloatSlider* mWhisperSlider;
-   float mPhaseOffset;
-   FloatSlider* mPhaseOffsetSlider;
+   float mInputPreamp{ 1 };
+   float mCarrierPreamp{ 1 };
+   float mVolume{ 1 };
+   FloatSlider* mInputSlider{ nullptr };
+   FloatSlider* mCarrierSlider{ nullptr };
+   FloatSlider* mVolumeSlider{ nullptr };
+   float mDryWet{ 1 };
+   FloatSlider* mDryWetSlider{ nullptr };
+   float mFricativeThresh{ .07 };
+   FloatSlider* mFricativeSlider{ nullptr };
+   bool mFricDetected{ false };
+   float mWhisper{ 0 };
+   FloatSlider* mWhisperSlider{ nullptr };
+   float mPhaseOffset{ 0 };
+   FloatSlider* mPhaseOffsetSlider{ nullptr };
 
-   int mCut;
-   IntSlider* mCutSlider;
+   int mCut{ 1 };
+   IntSlider* mCutSlider{ nullptr };
 
    GateEffect mGate;
 
-   bool mCarrierDataSet;
+   bool mCarrierDataSet{ false };
 };
 
 

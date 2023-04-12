@@ -75,7 +75,7 @@ void NoteToggle::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    for (size_t i = 0; i < mTargets.size(); ++i)
    {
       if (mTargets[i] != nullptr)
-         mTargets[i]->SetValue(hasHeldNotes ? 1 : 0);
+         mTargets[i]->SetValue(hasHeldNotes ? 1 : 0, time);
    }
 }
 

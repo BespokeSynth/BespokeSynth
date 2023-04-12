@@ -36,22 +36,6 @@
 #include "MathUtils.h"
 
 NoteTable::NoteTable()
-: mLength(8)
-, mLengthSlider(nullptr)
-, mGrid(nullptr)
-, mOctave(3)
-, mOctaveSlider(nullptr)
-, mNoteMode(kNoteMode_Scale)
-, mNoteModeSelector(nullptr)
-, mNoteRange(15)
-, mShowColumnControls(false)
-, mRowOffset(0)
-, mSetLength(false)
-, mRandomizePitchButton(nullptr)
-, mRandomizePitchChance(1)
-, mRandomizePitchRange(1)
-, mGridControlOffsetX(0)
-, mGridControlOffsetY(0)
 {
    for (int i = 0; i < mLength; ++i)
       mTones[i] = i;
@@ -290,10 +274,10 @@ bool NoteTable::MouseMoved(float x, float y)
    return false;
 }
 
-void NoteTable::CheckboxUpdated(Checkbox* checkbox)
+void NoteTable::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteTable::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
@@ -456,7 +440,7 @@ void NoteTable::OnGridButton(int x, int y, float velocity, IGridController* grid
    }
 }
 
-void NoteTable::ButtonClicked(ClickButton* button)
+void NoteTable::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizePitchButton)
    {
@@ -509,7 +493,7 @@ void NoteTable::RandomizePitches(bool fifths)
    }
 }
 
-void NoteTable::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteTable::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mNoteModeSelector)
    {
@@ -524,7 +508,7 @@ void NoteTable::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -595,7 +579,6 @@ void NoteTable::SetUpColumnControls()
 
 void NoteTable::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteTable::LoadLayout(const ofxJSONElement& moduleInfo)

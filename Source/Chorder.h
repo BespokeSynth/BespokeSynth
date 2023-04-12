@@ -42,7 +42,9 @@ public:
    Chorder();
    virtual ~Chorder();
    static IDrawableModule* Create() { return new Chorder(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -54,13 +56,13 @@ public:
 
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* dropdown, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* dropdown, int oldVal, double time) override;
 
    void OnScaleChanged() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   virtual bool Enabled() const override { return mEnabled; }
+   virtual bool IsEnabled() const override { return mEnabled; }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -84,17 +86,17 @@ private:
    void CheckLeftovers();
    void SyncChord();
 
-   UIGrid* mChordGrid;
-   int mVelocity;
-   bool mInputNotes[TOTAL_NUM_NOTES];
-   int mHeldCount[TOTAL_NUM_NOTES];
+   UIGrid* mChordGrid{ nullptr };
+   int mVelocity{ 0 };
+   bool mInputNotes[TOTAL_NUM_NOTES]{};
+   int mHeldCount[TOTAL_NUM_NOTES]{};
 
-   bool mDiatonic;
-   int mChordIndex;
-   int mInversion;
-   Checkbox* mDiatonicCheckbox;
-   DropdownList* mChordDropdown;
-   DropdownList* mInversionDropdown;
+   bool mDiatonic{ false };
+   int mChordIndex{ 0 };
+   int mInversion{ 0 };
+   Checkbox* mDiatonicCheckbox{ nullptr };
+   DropdownList* mChordDropdown{ nullptr };
+   DropdownList* mInversionDropdown{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Chorder__) */

@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
+#include "PatchCable.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -64,6 +65,16 @@ void UserPrefsEditor::CreateUIControls()
       UserPrefs.oversampling.GetDropdown()->AddLabel(ofToString(oversample), oversample);
       if (UserPrefs.oversampling.Get() == oversample)
          UserPrefs.oversampling.GetIndex() = oversample;
+   }
+
+   UserPrefs.cable_drop_behavior.GetIndex() = 0;
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("show quickspawn", (int)CableDropBehavior::ShowQuickspawn);
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("do nothing", (int)CableDropBehavior::DoNothing);
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("disconnect", (int)CableDropBehavior::DisconnectCable);
+   for (int i = 0; i < UserPrefs.cable_drop_behavior.GetDropdown()->GetNumValues(); ++i)
+   {
+      if (UserPrefs.cable_drop_behavior.GetDropdown()->GetElement(i).mLabel == UserPrefs.cable_drop_behavior.Get())
+         UserPrefs.cable_drop_behavior.GetIndex() = i;
    }
 }
 
@@ -206,7 +217,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto rate : selectedDevice->getAvailableSampleRates())
       {
          UserPrefs.samplerate.GetDropdown()->AddLabel(ofToString(rate), i);
-         if (rate == gSampleRate)
+         if (rate == gSampleRate / UserPrefs.oversampling.Get())
             UserPrefs.samplerate.GetIndex() = i;
          ++i;
       }
@@ -220,7 +231,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto bufferSize : selectedDevice->getAvailableBufferSizes())
       {
          UserPrefs.buffersize.GetDropdown()->AddLabel(ofToString(bufferSize), i);
-         if (bufferSize == gBufferSize)
+         if (bufferSize == gBufferSize / UserPrefs.oversampling.Get())
             UserPrefs.buffersize.GetIndex() = i;
          ++i;
       }
@@ -379,7 +390,7 @@ void UserPrefsEditor::Save()
       juce::JUCEApplicationBase::quit();
 }
 
-void UserPrefsEditor::ButtonClicked(ClickButton* button)
+void UserPrefsEditor::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSaveButton)
    {
@@ -391,11 +402,11 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       SetShowing(false);
 }
 
-void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox)
+void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (!TheSynth->IsLoadingState())
    {
@@ -416,7 +427,7 @@ void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void UserPrefsEditor::IntSliderUpdated(IntSlider* slider, int oldVal)
+void UserPrefsEditor::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -424,7 +435,7 @@ void UserPrefsEditor::TextEntryComplete(TextEntry* entry)
 {
 }
 
-void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal)
+void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == UserPrefs.devicetype.GetDropdown())
    {
@@ -442,7 +453,7 @@ void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void UserPrefsEditor::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void UserPrefsEditor::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 

@@ -32,8 +32,6 @@
 
 AudioToCV::AudioToCV()
 : IAudioProcessor(gBufferSize)
-, mGain(1)
-, mGainSlider(nullptr)
 {
    mModulationBuffer = new float[gBufferSize];
 }
@@ -114,7 +112,6 @@ float AudioToCV::Value(int samplesIn)
 
 void AudioToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void AudioToCV::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -395,6 +395,8 @@ target_sources(BespokeSynth PRIVATE
     NoteLooper.h
     NoteOctaver.cpp
     NoteOctaver.h
+    NoteOutputQueue.cpp
+    NoteOutputQueue.h
     NotePanAlternator.cpp
     NotePanAlternator.h
     NotePanRandom.cpp
@@ -495,8 +497,6 @@ target_sources(BespokeSynth PRIVATE
     Polyrhythms.h
     Prefab.cpp
     Prefab.h
-    Presets.cpp
-    Presets.h
     Pressure.cpp
     Pressure.h
     PressureToCV.cpp
@@ -517,6 +517,10 @@ target_sources(BespokeSynth PRIVATE
     PulseChance.h
     PulseDelayer.cpp
     PulseDelayer.h
+    PulseDisplayer.cpp
+    PulseDisplayer.h
+    PulseFlag.cpp
+    PulseFlag.h
     PulseGate.cpp
     PulseGate.h
     PulseHocket.cpp
@@ -602,6 +606,10 @@ target_sources(BespokeSynth PRIVATE
     SliderSequencer.h
     SlowLayers.cpp
     SlowLayers.h
+    Snapshots.cpp
+    Snapshots.h
+    SongBuilder.cpp
+    SongBuilder.h
     SpaceMouseControl.cpp
     SpaceMouseControl.h
     SpectralDisplay.cpp
@@ -825,11 +833,13 @@ target_link_libraries(BespokeSynth PRIVATE
     $<$<STREQUAL:${BESPOKE_SYSTEM_TUNING_LIBRARY},OFF>:tuning-library>
     oddsound-mts
     Ableton::Link
+    readerwriterqueue
 
     juce::juce_audio_basics
     juce::juce_audio_devices
     juce::juce_audio_formats
     juce::juce_audio_processors
+    juce::juce_cryptography
     juce::juce_gui_basics
     juce::juce_opengl
     juce::juce_osc

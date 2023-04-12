@@ -46,15 +46,16 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "dcremover"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
 
-   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
+   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};
 };
 
 #endif /* defined(__Bespoke__DCRemoverEffect__) */

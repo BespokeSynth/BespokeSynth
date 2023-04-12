@@ -76,15 +76,15 @@ void Selector::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
 {
    int range = (int)mControlCables.size() - 1;
    if (velocity > 0 && range > 0)
-      SetIndex(pitch % range);
+      SetIndex(pitch % range, time);
 }
 
-void Selector::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void Selector::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
-   SetIndex(mCurrentValue);
+   SetIndex(mCurrentValue, time);
 }
 
-void Selector::SetIndex(int index)
+void Selector::SetIndex(int index, double time)
 {
    mCurrentValue = index;
 
@@ -99,13 +99,13 @@ void Selector::SetIndex(int index)
             if (mCurrentValue == i)
                controlsToEnable.push_back(uicontrol);
             else
-               uicontrol->SetValue(0);
+               uicontrol->SetValue(0, time);
          }
       }
    }
 
    for (auto* control : controlsToEnable)
-      control->SetValue(1);
+      control->SetValue(1, time);
 }
 
 namespace

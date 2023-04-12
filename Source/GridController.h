@@ -88,13 +88,14 @@ public:
    IGridController* GetGridController() { return mGridController; }
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
+   bool GetNoHover() const override { return true; }
 
 private:
    void GetDimensions(float& width, float& height) override
@@ -104,8 +105,8 @@ private:
    }
    bool MouseMoved(float x, float y) override;
 
-   IGridControllerListener* mOwner;
-   IGridController* mGridController;
+   IGridControllerListener* mOwner{ nullptr };
+   IGridController* mGridController{ nullptr };
 };
 
 class GridControllerMidi : public IGridController
@@ -132,16 +133,16 @@ public:
    void OnInput(int control, float velocity);
 
 private:
-   unsigned int mRows;
-   unsigned int mCols;
-   int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
-   float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
-   int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
+   unsigned int mRows{ 8 };
+   unsigned int mCols{ 8 };
+   int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
+   float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
+   int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
    std::vector<int> mColors;
-   MidiMessageType mMessageType;
-   MidiController* mMidiController;
-   int mControllerPage;
-   IGridControllerListener* mOwner;
+   MidiMessageType mMessageType{ MidiMessageType::kMidiMessage_Note };
+   MidiController* mMidiController{ nullptr };
+   int mControllerPage{ 0 };
+   IGridControllerListener* mOwner{ nullptr };
 };
 
 #endif /* defined(__Bespoke__GridController__) */

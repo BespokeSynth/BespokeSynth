@@ -30,10 +30,7 @@
 #include <cstring>
 
 ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)
-: mWidth(20)
-, mHeight(15)
-, mClickTime(-9999)
-, mOwner(owner)
+: mOwner(owner)
 , mDisplayStyle(displayStyle)
 {
    assert(owner);
@@ -151,6 +148,27 @@ void ClickButton::Render()
       ofLine(mX + 14, mY + 3, mX + 6, mY + 7);
       ofLine(mX + 14, mY + 11, mX + 6, mY + 7);
    }
+   else if (mDisplayStyle == ButtonDisplayStyle::kPlus)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.5f);
+      ofLine(mX + 10, mY + 3, mX + 10, mY + 12);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kMinus)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.5f);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kHamburger)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.0f);
+      ofLine(mX + 6, mY + 4.5f, mX + 14, mY + 4.5f);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofLine(mX + 6, mY + 10.5f, mX + 14, mY + 10.5f);
+   }
 
    ofPopStyle();
 
@@ -167,8 +185,13 @@ void ClickButton::OnClicked(float x, float y, bool right)
    if (right)
       return;
 
-   mClickTime = gTime;
-   mOwner->ButtonClicked(this);
+   DoClick(NextBufferTime(false));
+}
+
+void ClickButton::DoClick(double time)
+{
+   mClickTime = time;
+   mOwner->ButtonClicked(this, time);
 }
 
 void ClickButton::MouseReleased()
@@ -182,18 +205,18 @@ bool ClickButton::MouseMoved(float x, float y)
    return false;
 }
 
-void ClickButton::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void ClickButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    if (slider > 0)
-      OnClicked(0, 0, false);
+      DoClick(time);
    else
       MouseReleased();
 }
 
-void ClickButton::SetValue(float value)
+void ClickButton::SetValue(float value, double time)
 {
    if (value > 0)
-      OnClicked(0, 0, false);
+      DoClick(time);
    else
       MouseReleased();
 }
@@ -210,4 +233,9 @@ std::string ClickButton::GetDisplayValue(float val) const
    if (val > 0)
       return "click";
    return "_";
+}
+
+void ClickButton::Increment(float amount)
+{
+   DoClick(NextBufferTime(false));
 }

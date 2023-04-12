@@ -35,14 +35,7 @@
 ChannelBuffer gMidiVoiceWorkChannelBuffer(kWorkBufferSize);
 
 PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
-: mAllowStealing(true)
-, mLastVoice(-1)
-, mFadeOutBufferPos(0)
-, mOwner(owner)
-, mFadeOutBuffer(kVoiceFadeSamples)
-, mFadeOutWorkBuffer(kVoiceFadeSamples)
-, mVoiceLimit(kNumVoices)
-, mOversampling(1)
+: mOwner(owner)
 {
 }
 
@@ -98,19 +91,6 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
 
    bool preserveVoice = voiceIdx != -1 && //we specified a voice
                         mVoices[voiceIdx].mPitch != -1; //there is a note playing from that voice
-
-   /*if (voiceIdx == -1) //haven't specified a voice
-   {
-      for (int i=0; i<kNumVoices; ++i)
-      {
-         if (mVoices[i].mPitch == pitch)
-         {
-            voiceIdx = i;   //reuse existing voice
-            preserveVoice = true;
-            break;
-         }
-      }
-   }*/
 
    if (voiceIdx == -1) //need a new voice
    {
@@ -174,15 +154,24 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    mVoices[voiceIdx].mNoteOn = true;
 }
 
-void PolyphonyMgr::Stop(double time, int pitch)
+void PolyphonyMgr::Stop(double time, int pitch, int voiceIdx)
 {
-   for (int i = 0; i < kNumVoices; ++i)
+   if (voiceIdx == -1)
    {
-      if (mVoices[i].mPitch == pitch && mVoices[i].mNoteOn)
+      double oldest = std::numeric_limits<double>::max();
+      for (int i = 0; i < mVoiceLimit; ++i)
       {
-         mVoices[i].mVoice->Stop(time);
-         mVoices[i].mNoteOn = false;
+         if (mVoices[i].mPitch == pitch && mVoices[i].mNoteOn && mVoices[i].mTime < oldest)
+         {
+            oldest = mVoices[i].mTime;
+            voiceIdx = i;
+         }
       }
+   }
+   if (voiceIdx > -1 && mVoices[voiceIdx].mPitch == pitch && mVoices[voiceIdx].mNoteOn)
+   {
+      mVoices[voiceIdx].mVoice->Stop(time);
+      mVoices[voiceIdx].mNoteOn = false;
    }
 }
 
@@ -202,12 +191,21 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    mFadeOutBuffer.SetNumActiveChannels(out->NumActiveChannels());
    mFadeOutWorkBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
+   float debugRef = 0;
    for (int i = 0; i < mVoiceLimit; ++i)
    {
-      mVoices[i].mVoice->Process(time, out, mOversampling);
+      if (mVoices[i].mPitch != -1)
+      {
+         mVoices[i].mVoice->Process(time, out, mOversampling);
 
-      if (mVoices[i].mPitch != -1 && !mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))
-         mVoices[i].mPitch = -1;
+         float testSample = out->GetChannel(0)[0];
+         mVoices[i].mActivity = testSample - debugRef;
+
+         if (!mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))
+            mVoices[i].mPitch = -1;
+
+         debugRef = testSample;
+      }
    }
 
    for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
@@ -236,7 +234,13 @@ void PolyphonyMgr::DrawDebug(float x, float y)
          ofSetColor(0, 255, 0);
       else
          ofSetColor(255, 0, 0);
-      DrawTextNormal(mVoices[i].mPitch == -1 ? "voice " + ofToString(i) + " unused" : "voice " + ofToString(i) + " used: " + ofToString(mVoices[i].mPitch) + (mVoices[i].mNoteOn ? " (note on)" : " (note off)"), 0, i * 18);
+      std::string outputLine = "voice " + ofToString(i);
+      if (mVoices[i].mPitch == -1)
+         outputLine += " unused";
+      else
+         outputLine += " used: " + ofToString(mVoices[i].mPitch) + (mVoices[i].mNoteOn ? " (note on)" : " (note off)");
+      outputLine += "   " + ofToString(mVoices[i].mActivity, 3);
+      DrawTextNormal(outputLine, 0, i * 18);
    }
    ofPopStyle();
    ofPopMatrix();

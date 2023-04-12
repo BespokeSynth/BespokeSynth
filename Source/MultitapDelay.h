@@ -46,7 +46,9 @@ public:
    MultitapDelay();
    ~MultitapDelay();
    static IDrawableModule* Create() { return new MultitapDelay(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -62,16 +64,16 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    //IFloatSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -80,10 +82,11 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 0; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
@@ -123,15 +126,15 @@ private:
       MultitapDelay* mOwner{ nullptr };
    };
 
-   int mNumTaps;
+   int mNumTaps{ 4 };
    std::vector<DelayTap> mTaps;
    static const int kNumMPETaps = 16;
    DelayMPETap mMPETaps[kNumMPETaps];
 
    ChannelBuffer mWriteBuffer;
-   FloatSlider* mDryAmountSlider;
-   float mDryAmount;
-   FloatSlider* mDisplayLengthSlider;
-   float mDisplayLength;
+   FloatSlider* mDryAmountSlider{ nullptr };
+   float mDryAmount{ 1 };
+   FloatSlider* mDisplayLengthSlider{ nullptr };
+   float mDisplayLength{ 10 };
    RollingBuffer mDelayBuffer;
 };

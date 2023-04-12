@@ -59,11 +59,11 @@ private:
    int GetStepIndex(int x, int y, float& radiusOut);
    int mLength{ 4 };
    DropdownList* mLengthSelector{ nullptr };
-   int mPitch;
+   int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
    CircleSequencer* mOwner{ nullptr };
-   int mIndex;
-   std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps;
+   int mIndex{ 0 };
+   std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
    float mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mCurrentlyClickedStepIdx{ -1 };
@@ -77,7 +77,9 @@ public:
    CircleSequencer();
    ~CircleSequencer();
    static IDrawableModule* Create() { return new CircleSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -91,9 +93,9 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    void SaveState(FileStreamOut& out) override;
@@ -101,6 +103,8 @@ public:
    int GetModuleSaveStateRev() const override { return 1; }
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -111,7 +115,6 @@ private:
       height = 200;
    }
    void OnClicked(float x, float y, bool right) override;
-   bool Enabled() const override { return mEnabled; }
 
    std::vector<CircleSequencerRing*> mCircleSequencerRings;
 };

@@ -28,8 +28,6 @@
 
 DCRemoverEffect::DCRemoverEffect()
 {
-   SetEnabled(true);
-
    for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
    {
       mBiquad[i].SetFilterParams(10, sqrt(2) / 2);
@@ -72,7 +70,7 @@ void DCRemoverEffect::GetModuleDimensions(float& width, float& height)
    height = 0;
 }
 
-void DCRemoverEffect::CheckboxUpdated(Checkbox* checkbox)
+void DCRemoverEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

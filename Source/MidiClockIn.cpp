@@ -174,7 +174,7 @@ void MidiClockIn::OnMidi(const juce::MidiMessage& message)
    }
 }
 
-void MidiClockIn::DropdownUpdated(DropdownList* list, int oldVal)
+void MidiClockIn::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mDeviceList)
    {

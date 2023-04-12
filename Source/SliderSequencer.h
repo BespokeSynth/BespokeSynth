@@ -45,19 +45,19 @@ public:
    void Draw();
    void CreateUIControls();
 
-   float mPoint;
-   FloatSlider* mSlider;
-   float mVelocity;
-   FloatSlider* mVelocitySlider;
-   int mPitch;
-   TextEntry* mNoteSelector;
-   double mPlayTime;
-   bool mPlaying;
-   Checkbox* mPlayingCheckbox;
-   int mX;
-   int mY;
-   SliderSequencer* mOwner;
-   int mIndex;
+   float mPoint{ 0 };
+   FloatSlider* mSlider{ nullptr };
+   float mVelocity{ 0 };
+   FloatSlider* mVelocitySlider{ nullptr };
+   int mPitch{ 0 };
+   TextEntry* mNoteSelector{ nullptr };
+   double mPlayTime{ 0 };
+   bool mPlaying{ false };
+   Checkbox* mPlayingCheckbox{ nullptr };
+   int mX{ 0 };
+   int mY{ 0 };
+   SliderSequencer* mOwner{ nullptr };
+   int mIndex{ 0 };
 };
 
 class SliderSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public IIntSliderListener, public ITextEntryListener
@@ -66,7 +66,9 @@ public:
    SliderSequencer();
    ~SliderSequencer();
    static IDrawableModule* Create() { return new SliderSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -76,14 +78,16 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    float MeasurePos(double time);
@@ -95,12 +99,11 @@ private:
       width = 320;
       height = 165;
    }
-   bool Enabled() const override { return mEnabled; }
 
-   float mLastMeasurePos;
+   float mLastMeasurePos{ 0 };
    std::vector<SliderLine*> mSliderLines;
-   int mDivision;
-   IntSlider* mDivisionSlider;
+   int mDivision{ 1 };
+   IntSlider* mDivisionSlider{ nullptr };
 };
 
 

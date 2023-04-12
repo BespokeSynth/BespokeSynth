@@ -46,7 +46,9 @@ public:
    ControlSequencer();
    ~ControlSequencer();
    static IDrawableModule* Create() { return new ControlSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -76,11 +78,11 @@ public:
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -89,12 +91,14 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
 
    static std::list<ControlSequencer*> sControlSequencers;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    void Step(double time, int pulseFlags);
@@ -102,7 +106,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;

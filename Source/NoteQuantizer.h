@@ -39,19 +39,24 @@ public:
    NoteQuantizer();
    virtual ~NoteQuantizer();
    static IDrawableModule* Create() { return new NoteQuantizer(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
    void Init() override;
-
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void OnTimeEvent(double time) override;
    void OnPulse(double time, float velocity, int flags) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -61,30 +66,23 @@ private:
       width = 80;
       height = 40;
    }
-   bool Enabled() const override { return true; }
    void OnEvent(double time, float strength);
 
    struct InputInfo
    {
-      InputInfo()
-      : velocity(0)
-      , voiceIdx(-1)
-      , held(false)
-      , hasPlayedYet(false)
-      {}
-      int velocity;
-      int voiceIdx;
-      bool held;
-      bool hasPlayedYet;
+      int velocity{ 0 };
+      int voiceIdx{ -1 };
+      bool held{ false };
+      bool hasPlayedYet{ false };
       ModulationParameters modulation;
    };
 
-   bool mNoteRepeat;
-   Checkbox* mNoteRepeatCheckbox;
-   NoteInterval mQuantizeInterval;
-   DropdownList* mQuantizeIntervalSelector;
+   bool mNoteRepeat{ false };
+   Checkbox* mNoteRepeatCheckbox{ nullptr };
+   NoteInterval mQuantizeInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mQuantizeIntervalSelector{ nullptr };
    std::array<InputInfo, 128> mInputInfos{};
    std::array<bool, 128> mScheduledOffs{};
    std::array<bool, 128> mPreScheduledOffs{};
-   bool mHasReceivedPulse;
+   bool mHasReceivedPulse{ false };
 };

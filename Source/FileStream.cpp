@@ -149,9 +149,9 @@ FileStreamIn& FileStreamIn::operator>>(std::string& var)
    }
 
    if (TheSynth->IsLoadingModule())
-      LoadStateValidate(len < 99999); //probably garbage beyond this point
+      LoadStateValidate(len < sMaxStringLength); //probably garbage beyond this point
    else
-      assert(len < 99999); //probably garbage beyond this point
+      assert(len < sMaxStringLength); //probably garbage beyond this point
 
    var.resize(len);
    mStream->read(var.data(), len);

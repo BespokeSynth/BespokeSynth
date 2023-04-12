@@ -33,8 +33,6 @@
 #include "ModulationChain.h"
 
 PitchToCV::PitchToCV()
-: mPitch(0)
-, mPitchBend(nullptr)
 {
 }
 
@@ -84,7 +82,6 @@ float PitchToCV::Value(int samplesIn)
 
 void PitchToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PitchToCV::LoadLayout(const ofxJSONElement& moduleInfo)

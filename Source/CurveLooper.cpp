@@ -35,17 +35,11 @@ namespace
 }
 
 CurveLooper::CurveLooper()
-: mLength(1)
-, mLengthSelector(nullptr)
-, mControlCable(nullptr)
-, mWidth(200)
-, mHeight(120)
-, mEnvelopeControl(ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30))
-, mRandomizeButton(nullptr)
 {
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);
    mEnvelopeControl.SetFixedLengthMode(true);
+   mAdsr.GetFreeReleaseLevel() = true;
    mAdsr.SetNumStages(2);
    mAdsr.GetHasSustainStage() = false;
    mAdsr.GetStageData(0).target = .5f;
@@ -100,14 +94,12 @@ void CurveLooper::OnTransportAdvanced(float amount)
 {
    if (mEnabled)
    {
-      mAdsr.Clear();
-      mAdsr.Start(0, 1);
-      mAdsr.Stop(kAdsrTime);
+      ADSR::EventInfo adsrEvent(0, kAdsrTime);
 
       for (auto* control : mUIControls)
       {
          if (control != nullptr)
-            control->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime), true);
+            control->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime, &adsrEvent), gTime, true);
       }
    }
 }
@@ -174,11 +166,11 @@ void CurveLooper::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void CurveLooper::CheckboxUpdated(Checkbox* checkbox)
+void CurveLooper::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal)
+void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    /*int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
@@ -201,7 +193,7 @@ void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal)
    }*/
 }
 
-void CurveLooper::ButtonClicked(ClickButton* button)
+void CurveLooper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizeButton)
    {
@@ -237,7 +229,6 @@ void CurveLooper::Resize(float w, float h)
 
 void CurveLooper::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

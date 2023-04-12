@@ -63,6 +63,9 @@ public:
    VSTPlugin();
    virtual ~VSTPlugin() override;
    static IDrawableModule* Create() { return new VSTPlugin(); }
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
@@ -87,13 +90,14 @@ public:
    void SendMidi(const juce::MidiMessage& message) override;
 
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void OnUIControlRequested(const char* name) override;
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
@@ -101,12 +105,13 @@ public:
    int GetModuleSaveStateRev() const override { return 3; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void PreDrawModule() override;
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
    void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
@@ -116,11 +121,10 @@ private:
    std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
-   bool ParameterNameExists(std::string name, int checkUntilIndex) const;
 
    //juce::AudioProcessorListener
    void audioProcessorParameterChanged(juce::AudioProcessor* processor, int parameterIndex, float newValue) override {}
-   void audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details) override {}
+   void audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details) override;
    void audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex) override;
 
    float mVol{ 1 };
@@ -136,10 +140,13 @@ private:
    bool mPluginReady{ false };
    std::unique_ptr<juce::AudioProcessor> mPlugin;
    std::string mPluginName;
+   std::string mPluginFormatName;
+   std::string mPluginId;
    std::unique_ptr<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;
    juce::MidiBuffer mFutureMidiBuffer;
    juce::CriticalSection mMidiInputLock;
+   std::atomic<bool> mRescanParameterNames{ false };
    int mNumInputChannels{ 2 };
    int mNumOutputChannels{ 2 };
 
@@ -148,13 +155,15 @@ private:
 
    struct ParameterSlider
    {
+      VSTPlugin* mOwner{ nullptr };
       float mValue{ 0 };
       FloatSlider* mSlider{ nullptr };
       juce::AudioProcessorParameter* mParameter{ nullptr };
       bool mShowing{ false };
       bool mInSelectorList{ true };
-      std::string mName;
-      void MakeSlider(VSTPlugin* owner);
+      std::string mDisplayName;
+      std::string mID;
+      void MakeSlider();
    };
 
    std::vector<ParameterSlider> mParameterSliders;
@@ -165,6 +174,7 @@ private:
    float mPitchBendRange{ 2 };
    int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
    std::string mOldVstPath{ "" }; //for loading save files that predate pluginId-style saving
+   int mParameterVersion{ 1 };
 
    struct ChannelModulations
    {

@@ -31,15 +31,6 @@
 #include "ModularSynth.h"
 
 IModulator::IModulator()
-: mDummyMin(0)
-, mDummyMax(1)
-, mTargetCable(nullptr)
-, mMinSlider(nullptr)
-, mMaxSlider(nullptr)
-, mSliderTarget(nullptr)
-, mUIControlTarget(nullptr)
-, mLastPollValue(0)
-, mSmoothedValue(0)
 {
 }
 
@@ -50,36 +41,64 @@ IModulator::~IModulator()
 
 void IModulator::OnModulatorRepatch()
 {
-   if (mTargetCable && mTargetCable->GetPatchCables().empty() == false)
+   bool wasEmpty = (mTargets[0].mUIControlTarget == nullptr);
+
+   for (size_t i = 0; i < mTargets.size(); ++i)
    {
-      IUIControl* newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[0]->GetTarget());
-      if (newTarget != mUIControlTarget)
+      IUIControl* newTarget = nullptr;
+      if (mTargetCable != nullptr && i < mTargetCable->GetPatchCables().size())
+         newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[i]->GetTarget());
+      if (newTarget != mTargets[i].mUIControlTarget)
       {
-         if (mSliderTarget != nullptr && mSliderTarget->GetModulator() == this)
-            mSliderTarget->SetModulator(nullptr); //clear old target's pointer to this
+         if (mTargets[i].mSliderTarget != nullptr && mTargets[i].mSliderTarget->GetModulator() == this)
+            mTargets[i].mSliderTarget->SetModulator(nullptr); //clear old target's pointer to this
 
-         mUIControlTarget = newTarget;
-         mSliderTarget = dynamic_cast<FloatSlider*>(mUIControlTarget);
-
-         if (mSliderTarget != nullptr)
+         if (i + 1 < mTargets.size() && newTarget == mTargets[i + 1].mUIControlTarget) //one got deleted, shift the rest down
          {
-            mSliderTarget->SetModulator(this);
-            InitializeRange();
+            for (; i < mTargets.size(); ++i)
+            {
+               if (i + 1 < mTargets.size())
+               {
+                  mTargets[i].mUIControlTarget = mTargets[i + 1].mUIControlTarget;
+                  mTargets[i].mSliderTarget = mTargets[i + 1].mSliderTarget;
+               }
+               else
+               {
+                  mTargets[i].mUIControlTarget = nullptr;
+                  mTargets[i].mSliderTarget = nullptr;
+               }
+            }
+            break;
+         }
+
+         mTargets[i].mUIControlTarget = newTarget;
+         mTargets[i].mSliderTarget = dynamic_cast<FloatSlider*>(mTargets[i].mUIControlTarget);
+
+         if (newTarget != nullptr)
+         {
+            if (mTargets[i].mSliderTarget != nullptr)
+            {
+               mTargets[i].mSliderTarget->SetModulator(this);
+               if (wasEmpty)
+                  InitializeRange(mTargets[i].mSliderTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), mTargets[i].mSliderTarget->GetMode());
+            }
+            else
+            {
+               if (wasEmpty)
+                  InitializeRange(mTargets[i].mUIControlTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), FloatSlider::kNormal);
+            }
+         }
+         else
+         {
+            if (i == 0)
+            {
+               if (mMinSlider)
+                  mMinSlider->SetVar(&mDummyMin);
+               if (mMaxSlider)
+                  mMaxSlider->SetVar(&mDummyMax);
+            }
          }
       }
-   }
-   else
-   {
-      if (mSliderTarget != nullptr && mSliderTarget->GetModulator() == this)
-         mSliderTarget->SetModulator(nullptr); //clear old target's pointer to this
-
-      mUIControlTarget = nullptr;
-      mSliderTarget = nullptr;
-
-      if (mMinSlider)
-         mMinSlider->SetVar(&mDummyMin);
-      if (mMaxSlider)
-         mMaxSlider->SetVar(&mDummyMax);
    }
 
    TheSynth->RemoveExtraPoller(this);
@@ -95,8 +114,16 @@ void IModulator::Poll()
       const float kBlendRate = -9.65784f;
       float blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
       mSmoothedValue = mSmoothedValue * blend + mLastPollValue * (1 - blend);
-      if (RequiresManualPolling())
-         mUIControlTarget->SetValue(mLastPollValue);
+      for (int i = 0; i < (int)mTargets.size(); ++i)
+      {
+         if (mTargets[i].RequiresManualPolling())
+         {
+            if (mTargets[i].mUIControlTarget->ModulatorUsesLiteralValue())
+               mTargets[i].mUIControlTarget->SetValue(mLastPollValue, NextBufferTime(false));
+            else
+               mTargets[i].mUIControlTarget->SetFromMidiCC(mLastPollValue, NextBufferTime(false), true);
+         }
+      }
    }
 }
 
@@ -107,43 +134,57 @@ float IModulator::GetRecentChange() const
 
 void IModulator::OnRemovedFrom(IUIControl* control)
 {
-   if (mTargetCable && mTargetCable->GetTarget() == mUIControlTarget)
-      mTargetCable->Clear();
-   OnModulatorRepatch();
-}
-
-void IModulator::InitializeRange()
-{
-   if (mSliderTarget != nullptr)
+   if (mTargetCable)
    {
-      if (!TheSynth->IsLoadingState())
+      auto& cables = mTargetCable->GetPatchCables();
+      for (size_t i = 0; i < mTargets.size(); ++i)
       {
-         if (!TheSynth->IsLoadingModule())
+         for (auto& cable : cables)
          {
-            if (InitializeWithZeroRange())
+            if (cable->GetTarget() == control && cable->GetTarget() == mTargets[i].mUIControlTarget)
             {
-               GetMin() = mSliderTarget->GetValue();
-               GetMax() = mSliderTarget->GetValue();
-            }
-            else
-            {
-               GetMin() = mSliderTarget->GetMin();
-               GetMax() = mSliderTarget->GetMax();
+               mTargetCable->RemovePatchCable(cable);
+               break;
             }
          }
       }
+   }
+   OnModulatorRepatch();
+}
 
-      if (mMinSlider)
+void IModulator::InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode)
+{
+   if (!TheSynth->IsLoadingState())
+   {
+      if (!TheSynth->IsLoadingModule())
       {
-         mMinSlider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
-         mMinSlider->SetMode(mSliderTarget->GetMode());
-         mMinSlider->SetVar(&GetMin());
-      }
-      if (mMaxSlider)
-      {
-         mMaxSlider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
-         mMaxSlider->SetMode(mSliderTarget->GetMode());
-         mMaxSlider->SetVar(&GetMax());
+         if (InitializeWithZeroRange())
+         {
+            GetMin() = currentValue;
+            GetMax() = currentValue;
+         }
+         else
+         {
+            GetMin() = min;
+            GetMax() = max;
+         }
+
+         if (mMinSlider)
+         {
+            mMinSlider->SetExtents(min, max);
+            mMinSlider->SetMode(sliderMode);
+         }
+
+         if (mMaxSlider)
+         {
+            mMaxSlider->SetExtents(min, max);
+            mMaxSlider->SetMode(sliderMode);
+         }
       }
    }
+
+   if (mMinSlider)
+      mMinSlider->SetVar(&GetMin());
+   if (mMaxSlider)
+      mMaxSlider->SetVar(&GetMax());
 }

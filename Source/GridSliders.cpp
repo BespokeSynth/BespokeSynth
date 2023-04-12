@@ -130,7 +130,7 @@ void GridSliders::OnGridButton(int x, int y, float velocity, IGridController* gr
       {
          float value = squareIndex / float(length - 1);
          for (auto& cable : mControlCables[sliderIndex]->GetPatchCables())
-            dynamic_cast<IUIControl*>(cable->GetTarget())->SetFromMidiCC(value);
+            dynamic_cast<IUIControl*>(cable->GetTarget())->SetFromMidiCC(value, NextBufferTime(false), false);
       }
    }
 }
@@ -181,7 +181,7 @@ void GridSliders::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
 }
 
-void GridSliders::DropdownUpdated(DropdownList* list, int oldVal)
+void GridSliders::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mDirectionSelector)
    {
@@ -203,7 +203,6 @@ void GridSliders::GetModuleDimensions(float& width, float& height)
 
 void GridSliders::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void GridSliders::LoadLayout(const ofxJSONElement& moduleInfo)

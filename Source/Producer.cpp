@@ -37,35 +37,6 @@ const float mBufferW = 900;
 const float mBufferH = 300;
 
 Producer::Producer()
-: mVolume(.6f)
-, mVolumeSlider(nullptr)
-, mSample(nullptr)
-, mPlay(false)
-, mPlayCheckbox(nullptr)
-, mLoop(false)
-, mLoopCheckbox(nullptr)
-, mClipStart(0)
-, mClipStartSlider(nullptr)
-, mClipEnd(1)
-, mClipEndSlider(nullptr)
-, mZoomStart(0)
-, mZoomStartSlider(nullptr)
-, mZoomEnd(1)
-, mZoomEndSlider(nullptr)
-, mNumBars(1)
-, mNumBarsSlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mWriteButton(nullptr)
-, mPlayhead(0)
-, mDoubleLengthButton(nullptr)
-, mHalveLengthButton(nullptr)
-, mTempo(120)
-, mTempoSlider(nullptr)
-, mStartOffset(0)
-, mStartOffsetSlider(nullptr)
-, mCalcTempoButton(nullptr)
-, mRestartButton(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -178,7 +149,7 @@ void Producer::DropdownClicked(DropdownList* list)
 {
 }
 
-void Producer::DropdownUpdated(DropdownList* list, int oldVal)
+void Producer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -186,7 +157,7 @@ void Producer::UpdateSample()
 {
 }
 
-void Producer::ButtonClicked(ClickButton* button)
+void Producer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mWriteButton)
    {
@@ -395,7 +366,7 @@ void Producer::OnClicked(float x, float y, bool right)
    }
 }
 
-void Producer::CheckboxUpdated(Checkbox* checkbox)
+void Producer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mPlayCheckbox)
    {
@@ -410,7 +381,7 @@ void Producer::GetModuleDimensions(float& width, float& height)
    height = 430;
 }
 
-void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {
@@ -436,7 +407,7 @@ void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void Producer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Producer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 

@@ -32,13 +32,7 @@
 #include "UIControlMacros.h"
 
 NoteRangeFilter::NoteRangeFilter()
-: mMinPitch(24)
-, mMinPitchSlider(nullptr)
-, mMaxPitch(36)
-, mMaxPitchSlider(nullptr)
-, mWrap(false)
 {
-   SetEnabled(true);
 }
 
 void NoteRangeFilter::CreateUIControls()
@@ -63,16 +57,16 @@ void NoteRangeFilter::DrawModule()
    mWrapCheckbox->Draw();
 }
 
-void NoteRangeFilter::CheckboxUpdated(Checkbox* checkbox)
+void NoteRangeFilter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void NoteRangeFilter::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteRangeFilter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mMinPitchSlider || slider == mMaxPitchSlider)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

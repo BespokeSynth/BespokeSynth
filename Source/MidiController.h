@@ -112,28 +112,8 @@ class ScriptModule;
 struct UIControlConnection
 {
    UIControlConnection(MidiController* owner)
-   {
-      mMessageType = kMidiMessage_Control;
-      mControl = -1;
-      mUIControl = nullptr;
-      mType = kControlType_Slider;
-      mValue = 0;
-      mLastControlValue = -1;
-      mMidiOnValue = 127;
-      mMidiOffValue = 0;
-      mScaleOutput = false;
-      mBlink = false;
-      mIncrementAmount = 0;
-      mTwoWay = true;
-      mFeedbackControl = -1;
-      mSpecialBinding = kSpecialBinding_None;
-      mChannel = -1;
-      mLastActivityTime = -9999;
-      mUIControlPathInput[0] = 0;
-      mPage = 0;
-      mPageless = false;
-      mUIOwner = owner;
-   }
+   : mUIOwner(owner)
+   {}
 
    ~UIControlConnection();
 
@@ -182,36 +162,37 @@ struct UIControlConnection
    void SetShowing(bool enabled);
    bool PostRepatch(PatchCableSource* cableSource, bool fromUserClick);
 
-   int mControl;
-   IUIControl* mUIControl;
-   ControlType mType;
-   MidiMessageType mMessageType;
-   float mValue;
-   int mMidiOnValue;
-   int mMidiOffValue;
-   bool mScaleOutput;
-   bool mBlink;
-   float mIncrementAmount;
-   bool mTwoWay;
-   int mFeedbackControl;
-   SpecialControlBinding mSpecialBinding;
-   int mChannel;
-   int mPage;
-   bool mPageless;
+   int mControl{ -1 };
+   IUIControl* mUIControl{ nullptr };
+   ControlType mType{ ControlType::kControlType_Slider };
+   MidiMessageType mMessageType{ MidiMessageType::kMidiMessage_Control };
+   float mValue{ 0 };
+   int mMidiOnValue{ 127 };
+   int mMidiOffValue{ 0 };
+   bool mScaleOutput{ false };
+   bool mBlink{ false };
+   float mIncrementAmount{ 0 };
+   bool mTwoWay{ true };
+   int mFeedbackControl{ -1 };
+   SpecialControlBinding mSpecialBinding{ SpecialControlBinding::kSpecialBinding_None };
+   int mChannel{ -1 };
+   int mPage{ 0 };
+   bool mPageless{ false };
+   std::string mShouldRetryForUIControlAt{ "" };
 
    static bool sDrawCables;
 
    //state
-   int mLastControlValue;
-   double mLastActivityTime;
-   MidiController* mUIOwner;
+   int mLastControlValue{ -1 };
+   double mLastActivityTime{ -9999 };
+   MidiController* mUIOwner{ nullptr };
 
    //editor controls
    DropdownList* mMessageTypeDropdown{ nullptr };
    TextEntry* mControlEntry{ nullptr };
    DropdownList* mChannelDropdown{ nullptr };
    TextEntry* mUIControlPathEntry{ nullptr };
-   char mUIControlPathInput[MAX_TEXTENTRY_LENGTH];
+   char mUIControlPathInput[MAX_TEXTENTRY_LENGTH]{};
    DropdownList* mControlTypeDropdown{ nullptr };
    TextEntry* mValueEntry{ nullptr };
    TextEntry* mMidiOffEntry{ nullptr };
@@ -245,12 +226,12 @@ struct ControlLayoutElement
    int mControl{ 0 };
    ofVec2f mPosition;
    ofVec2f mDimensions;
-   ControlDrawType mDrawType{ kDrawType_Slider };
+   ControlDrawType mDrawType{ ControlDrawType::kDrawType_Slider };
    float mIncrementAmount{ 0 };
    int mOffVal{ 0 };
    int mOnVal{ 127 };
    bool mScaleOutput{ true };
-   ControlType mConnectionType{ kControlType_Slider };
+   ControlType mConnectionType{ ControlType::kControlType_Slider };
 
    PatchCableSource* mControlCable{ nullptr };
 
@@ -261,13 +242,7 @@ struct ControlLayoutElement
 struct GridLayout
 {
    GridLayout()
-   : mGridCable(nullptr)
-   {
-      for (int i = 0; i < MAX_MIDI_PAGES; ++i)
-      {
-         mGridControlTarget[i] = nullptr;
-      }
-   }
+   {}
 
    int mRows{ 1 };
    int mCols{ 8 };
@@ -277,8 +252,8 @@ struct GridLayout
    std::vector<int> mControls;
    std::vector<int> mColors;
 
-   PatchCableSource* mGridCable;
-   GridControlTarget* mGridControlTarget[MAX_MIDI_PAGES];
+   PatchCableSource* mGridCable{ nullptr };
+   GridControlTarget* mGridControlTarget[MAX_MIDI_PAGES]{};
 };
 
 #define NUM_LAYOUT_CONTROLS 128 + 128 + 128 + 1 + 1 //128 notes, 128 ccs, 128 program change, 1 pitch bend, 1 dummy
@@ -289,6 +264,9 @@ public:
    MidiController();
    ~MidiController();
    static IDrawableModule* Create() { return new MidiController(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -339,11 +317,11 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
    void PreRepatch(PatchCableSource* cableSource) override;
@@ -367,6 +345,8 @@ public:
    static double sLastBoundControlTime;
    static IUIControl* sLastBoundUIControl;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    enum MappingDisplayMode
    {
@@ -379,7 +359,6 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
@@ -401,16 +380,16 @@ private:
 
    const std::string kDefaultLayout = "default";
 
-   float mVelocityMult;
-   bool mUseChannelAsVoice;
-   float mCurrentPitchBend;
-   int mNoteOffset;
-   float mPitchBendRange;
-   int mModwheelCC;
+   float mVelocityMult{ 1 };
+   bool mUseChannelAsVoice{ false };
+   float mCurrentPitchBend{ 0 };
+   int mNoteOffset{ 0 };
+   float mPitchBendRange{ 2 };
+   int mModwheelCC{ 1 }; // or 74 in Multidimensional Polyphonic Expression (MPE) spec
    float mModWheelOffset{ 0 };
    float mPressureOffset{ 0 };
 
-   Modulations mModulation;
+   Modulations mModulation{ true };
 
    std::string mDeviceIn;
    std::string mDeviceOut;
@@ -420,54 +399,54 @@ private:
    ofxJSONElement mConnectionsJson;
    std::list<UIControlConnection*> mConnections;
    bool mSendCCOutput{ false };
-   bool mUseNegativeEdge; //for midi toggle, accept on or off as a button press
-   bool mSlidersDefaultToIncremental;
-   bool mBindMode;
-   Checkbox* mBindCheckbox;
-   bool mTwoWay;
-   bool mSendTwoWayOnChange;
-   bool mResendFeedbackOnRelease;
+   bool mUseNegativeEdge{ false }; // for midi toggle, accept on or off as a button press
+   bool mSlidersDefaultToIncremental{ false };
+   bool mBindMode{ false };
+   Checkbox* mBindCheckbox{ nullptr };
+   bool mTwoWay{ true };
+   bool mSendTwoWayOnChange{ true };
+   bool mResendFeedbackOnRelease{ false };
    ClickButton* mAddConnectionButton{ nullptr };
    std::list<MidiNote> mQueuedNotes;
    std::list<MidiControl> mQueuedControls;
    std::list<MidiProgramChange> mQueuedProgramChanges;
    std::list<MidiPitchBend> mQueuedPitchBends;
-   DropdownList* mControllerList;
+   DropdownList* mControllerList{ nullptr };
    Checkbox* mDrawCablesCheckbox{ nullptr };
-   MappingDisplayMode mMappingDisplayMode;
-   RadioButton* mMappingDisplayModeSelector;
+   MappingDisplayMode mMappingDisplayMode{ MappingDisplayMode::kHide };
+   RadioButton* mMappingDisplayModeSelector{ nullptr };
    int mLayoutFileIndex{ 0 };
    DropdownList* mLayoutFileDropdown{ nullptr };
-   int mOscInPort;
+   int mOscInPort{ 8000 };
    TextEntry* mOscInPortEntry{ nullptr };
-   int mMonomeDeviceIndex;
+   int mMonomeDeviceIndex{ -1 };
    DropdownList* mMonomeDeviceDropdown{ nullptr };
 
-   int mControllerIndex;
-   double mLastActivityTime;
+   int mControllerIndex{ -1 };
+   double mLastActivityTime{ -9999 };
    bool mLastActivityBound{ false };
    bool mShowActivityUIOverlay{ true };
-   bool mBlink;
-   int mControllerPage;
-   DropdownList* mPageSelector;
+   bool mBlink{ false };
+   int mControllerPage{ 0 };
+   DropdownList* mPageSelector{ nullptr };
    std::vector<std::list<MidiDeviceListener*> > mListeners;
    std::vector<ScriptModule*> mScriptListeners;
-   bool mPrintInput;
+   bool mPrintInput{ false };
    std::string mLastInput;
-   INonstandardController* mNonstandardController;
-   bool mIsConnected;
-   bool mHasCreatedConnectionUIControls;
-   float mReconnectWaitTimer;
-   ChannelFilter mChannelFilter;
+   INonstandardController* mNonstandardController{ nullptr };
+   bool mIsConnected{ false };
+   bool mHasCreatedConnectionUIControls{ false };
+   float mReconnectWaitTimer{ 0 };
+   ChannelFilter mChannelFilter{ ChannelFilter::kAny };
    std::string mLastLoadedLayoutFile;
    ofxJSONElement mLayoutData;
    std::string mLayoutLoadError;
 
    std::array<ControlLayoutElement, NUM_LAYOUT_CONTROLS> mLayoutControls;
-   int mHighlightedLayoutElement;
-   int mHoveredLayoutElement;
-   int mLayoutWidth;
-   int mLayoutHeight;
+   int mHighlightedLayoutElement{ -1 };
+   int mHoveredLayoutElement{ -1 };
+   int mLayoutWidth{ 0 };
+   int mLayoutHeight{ 0 };
    std::vector<GridLayout*> mGrids;
 
    ofMutex mQueuedMessageMutex;

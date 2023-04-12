@@ -198,7 +198,7 @@ void DelayEffect::SetEnabled(bool enabled)
       mDelayBuffer.ClearBuffer();
 }
 
-void DelayEffect::CheckboxUpdated(Checkbox* checkbox)
+void DelayEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mShortTimeCheckbox)
       SetShortMode(mShortTime);
@@ -209,16 +209,16 @@ void DelayEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void DelayEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void DelayEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mDelaySlider)
    {
       mInterval = kInterval_None;
-      mDelayRamp.Start(gTime, mDelay, gTime + 30);
+      mDelayRamp.Start(time, mDelay, time + 30);
    }
 }
 
-void DelayEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void DelayEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 

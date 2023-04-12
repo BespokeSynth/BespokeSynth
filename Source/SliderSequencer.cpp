@@ -30,11 +30,7 @@
 #include "DrumPlayer.h"
 
 SliderSequencer::SliderSequencer()
-: mLastMeasurePos(0)
-, mDivision(1)
-, mDivisionSlider(nullptr)
 {
-
    for (int i = 0; i < 8; ++i)
       mSliderLines.push_back(new SliderLine(this, 10, 40 + i * 15, i));
 }
@@ -81,7 +77,8 @@ void SliderSequencer::OnTransportAdvanced(float amount)
 
    ComputeSliders(0);
 
-   float current = MeasurePos(gTime + gBufferSize);
+   double time = NextBufferTime(true);
+   float current = MeasurePos(time);
 
    for (int i = 0; i < mSliderLines.size(); ++i)
    {
@@ -93,13 +90,12 @@ void SliderSequencer::OnTransportAdvanced(float amount)
          double remainder = current - mSliderLines[i]->mPoint;
          FloatWrap(remainder, 1);
          double remainderMs = TheTransport->MsPerBar() * remainder;
-         double time = gTime + gBufferSize - remainderMs;
-         PlayNoteOutput(time, mSliderLines[i]->mPitch, mSliderLines[i]->mVelocity * 127, -1);
-         PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mSliderLines[i]->mPitch, 0, -1);
-         mSliderLines[i]->mPlayTime = gTime;
+         PlayNoteOutput(time - remainderMs, mSliderLines[i]->mPitch, mSliderLines[i]->mVelocity * 127, -1);
+         PlayNoteOutput(time - remainderMs + TheTransport->GetDuration(kInterval_16n), mSliderLines[i]->mPitch, 0, -1);
+         mSliderLines[i]->mPlayTime = time;
       }
 
-      mSliderLines[i]->mPlaying = mSliderLines[i]->mPlayTime + 100 > gTime;
+      mSliderLines[i]->mPlaying = mSliderLines[i]->mPlayTime + 100 > time;
    }
 
    mLastMeasurePos = current;
@@ -125,19 +121,19 @@ void SliderSequencer::DrawModule()
    }
 }
 
-void SliderSequencer::CheckboxUpdated(Checkbox* checkbox)
+void SliderSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SliderSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SliderSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SliderSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void SliderSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void SliderSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SliderSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -155,16 +151,7 @@ void SliderSequencer::SetUpFromSaveData()
 
 
 SliderLine::SliderLine(SliderSequencer* owner, int x, int y, int index)
-: mSlider(nullptr)
-, mPoint(0)
-, mVelocity(0)
-, mVelocitySlider(nullptr)
-, mPitch(0)
-, mNoteSelector(nullptr)
-, mPlayTime(0)
-, mPlaying(false)
-, mPlayingCheckbox(nullptr)
-, mX(x)
+: mX(x)
 , mY(y)
 , mOwner(owner)
 , mIndex(index)

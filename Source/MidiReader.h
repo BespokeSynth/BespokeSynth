@@ -45,7 +45,7 @@ public:
 private:
    //MIDIMultiTrack mTracks;
    //MIDISequencer* mSequencer;
-   int mBeatOffset;
+   int mBeatOffset{ 0 };
 };
 
 #endif /* defined(__Bespoke__MidiReader__) */

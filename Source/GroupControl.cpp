@@ -80,7 +80,7 @@ void GroupControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    }
 }
 
-void GroupControl::CheckboxUpdated(Checkbox* checkbox)
+void GroupControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (int i = 0; i < mControlCables.size(); ++i)
    {
@@ -88,7 +88,7 @@ void GroupControl::CheckboxUpdated(Checkbox* checkbox)
       if (mControlCables[i]->GetTarget())
          uicontrol = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
       if (uicontrol)
-         uicontrol->SetValue(mGroupEnabled ? 1 : 0);
+         uicontrol->SetValue(mGroupEnabled ? 1 : 0, time);
    }
 }
 
@@ -105,8 +105,6 @@ void GroupControl::GetModuleDimensions(float& width, float& height)
 
 void GroupControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["uicontrols"].resize((unsigned int)mControlCables.size() - 1);
    for (int i = 0; i < mControlCables.size() - 1; ++i)
    {

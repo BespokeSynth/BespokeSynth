@@ -227,15 +227,15 @@ ClipArranger::Clip* ClipArranger::GetEmptyClip()
    return nullptr;
 }
 
-void ClipArranger::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ClipArranger::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void ClipArranger::ButtonClicked(ClickButton* button)
+void ClipArranger::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void ClipArranger::CheckboxUpdated(Checkbox* checkbox)
+void ClipArranger::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 

@@ -57,7 +57,9 @@ public:
    MidiCapturer();
    virtual ~MidiCapturer();
    static IDrawableModule* Create() { return new MidiCapturer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void Init() override;
 
@@ -73,6 +75,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -81,11 +85,10 @@ private:
       width = 300;
       height = 150;
    }
-   bool Enabled() const override { return true; }
 
    static const int kRingBufferLength = 1000;
-   int mRingBufferPos;
+   int mRingBufferPos{ 0 };
    juce::MidiMessage mMessages[kRingBufferLength];
    std::list<MidiCapturerDummyController*> mDummyControllers;
-   int mPlayhead;
+   int mPlayhead{ 0 };
 };

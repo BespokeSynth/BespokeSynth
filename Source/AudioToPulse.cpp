@@ -54,7 +54,7 @@ void AudioToPulse::CreateUIControls()
    mReleaseSlider->SetMode(FloatSlider::kSquare);
 
    //update mReleaseFactor
-   FloatSliderUpdated(mReleaseSlider, 0);
+   FloatSliderUpdated(mReleaseSlider, 0, gTime);
 
    GetPatchCableSource()->SetConnectionType(kConnectionType_Pulse);
 }
@@ -132,7 +132,7 @@ void AudioToPulse::Process(double time)
    GetBuffer()->Reset();
 }
 
-void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mReleaseSlider)
       mReleaseFactor = powf(.01f, 1.0f / (mRelease * gSampleRateMs));
@@ -140,7 +140,6 @@ void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void AudioToPulse::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void AudioToPulse::LoadLayout(const ofxJSONElement& moduleInfo)

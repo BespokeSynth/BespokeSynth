@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <cmath>
+
 enum FilterType
 {
    kFilterType_Off,
@@ -65,19 +67,19 @@ public:
    float Filter(float sample);
    void Filter(float* buffer, int bufferSize);
 
-   float mF;
-   float mQ;
-   float mDbGain;
-   FilterType mType;
+   float mF{ 4000 };
+   float mQ{ static_cast<float>(sqrt(2.0f) / 2) };
+   float mDbGain{ 0 };
+   FilterType mType{ FilterType::kFilterType_Lowpass };
 
 private:
-   double mA0;
-   double mA1;
-   double mA2;
-   double mB1;
-   double mB2;
-   double mZ1;
-   double mZ2;
+   double mA0{ 1 };
+   double mA1{ 0 };
+   double mA2{ 0 };
+   double mB1{ 0 };
+   double mB2{ 0 };
+   double mZ1{ 0 };
+   double mZ2{ 0 };
    double mSampleRate;
 };
 

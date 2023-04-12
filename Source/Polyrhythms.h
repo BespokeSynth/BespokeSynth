@@ -51,13 +51,13 @@ public:
    void OnResize();
    void UpdateGrid();
 
-   int mIndex;
-   UIGrid* mGrid;
-   int mLength;
-   DropdownList* mLengthSelector;
-   int mPitch;
-   TextEntry* mNoteSelector;
-   Polyrhythms* mOwner;
+   int mIndex{ 0 };
+   UIGrid* mGrid{ nullptr };
+   int mLength{ 4 };
+   DropdownList* mLengthSelector{ nullptr };
+   int mPitch{ 0 };
+   TextEntry* mNoteSelector{ nullptr };
+   Polyrhythms* mOwner{ nullptr };
 };
 
 class Polyrhythms : public INoteSource, public IDrawableModule, public IAudioPoller, public IDropdownListener, public ITextEntryListener
@@ -66,7 +66,9 @@ public:
    Polyrhythms();
    ~Polyrhythms();
    static IDrawableModule* Create() { return new Polyrhythms(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -82,7 +84,7 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -90,6 +92,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    void SaveState(FileStreamOut& out) override;
    int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -100,7 +104,6 @@ private:
       height = mHeight;
    }
    void OnClicked(float x, float y, bool right) override;
-   bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 350 };
    float mHeight;

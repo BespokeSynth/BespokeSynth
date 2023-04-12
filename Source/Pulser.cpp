@@ -110,7 +110,7 @@ void Pulser::DrawModule()
    mCustomDivisorSlider->Draw();
 }
 
-void Pulser::CheckboxUpdated(Checkbox* checkbox)
+void Pulser::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -131,7 +131,7 @@ void Pulser::OnTransportAdvanced(float amount)
       mFreeTimeCounter += ms;
       if (mFreeTimeCounter > mFreeTimeStep)
       {
-         OnTimeEvent(gTime + (mFreeTimeCounter - mFreeTimeStep));
+         OnTimeEvent(NextBufferTime(true) + (mFreeTimeCounter - mFreeTimeStep));
          mFreeTimeCounter -= mFreeTimeStep;
       }
    }
@@ -198,7 +198,7 @@ void Pulser::GetModuleDimensions(float& width, float& height)
       height += 18;
 }
 
-void Pulser::ButtonClicked(ClickButton* button)
+void Pulser::ButtonClicked(ClickButton* button, double time)
 {
 }
 
@@ -221,7 +221,7 @@ float Pulser::GetOffset()
    return (-mOffset / TheTransport->CountInStandardMeasure(mInterval));
 }
 
-void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
+void Pulser::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -258,7 +258,7 @@ void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void Pulser::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Pulser::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mOffsetSlider)
    {
@@ -274,7 +274,7 @@ void Pulser::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void Pulser::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Pulser::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mCustomDivisorSlider)
       mTransportListenerInfo->mCustomDivisor = mCustomDivisor;
@@ -282,7 +282,6 @@ void Pulser::IntSliderUpdated(IntSlider* slider, int oldVal)
 
 void Pulser::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void Pulser::LoadLayout(const ofxJSONElement& moduleInfo)

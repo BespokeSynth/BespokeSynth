@@ -62,7 +62,7 @@ void Scale::CreateUIControls()
    mScaleSelector = new DropdownList(this, "scale", 58, 5, &mScaleIndex);
    mScaleDegreeSlider = new IntSlider(this, "degree", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 115, 15, &mScaleDegree, -7, 7);
    mIntonationSelector = new DropdownList(this, "intonation", 58, 24, (int*)(&mIntonation));
-   mPitchesPerOctaveEntry = new TextEntry(this, "PPO", 4, 24, 2, &mPitchesPerOctave, 0, 99);
+   mPitchesPerOctaveEntry = new TextEntry(this, "PPO", 4, 24, 2, &mPitchesPerOctave, 1, 99);
    mReferenceFreqEntry = new TextEntry(this, "tuning", 4, 43, 3, &mReferenceFreq, 1, 999);
    mReferencePitchEntry = new TextEntry(this, "note", 76, 43, 3, &mReferencePitch, 0, 127);
    mLoadSCLButton = new ClickButton(this, "load SCL", 4, 62);
@@ -387,6 +387,11 @@ void Scale::RemoveListener(IScaleListener* listener)
    mListeners.remove(listener);
 }
 
+void Scale::ClearListeners()
+{
+   mListeners.clear();
+}
+
 void Scale::NotifyListeners()
 {
    for (std::list<IScaleListener*>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
@@ -681,7 +686,7 @@ float Scale::GetTuningTableRatio(int semitonesFromCenter)
    return mTuningTable[CLAMP(128 + semitonesFromCenter, 0, 255)];
 }
 
-void Scale::DropdownUpdated(DropdownList* list, int oldVal)
+void Scale::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mRootSelector)
       SetRoot(mScale.mScaleRoot, true);
@@ -691,15 +696,15 @@ void Scale::DropdownUpdated(DropdownList* list, int oldVal)
       UpdateTuningTable();
 }
 
-void Scale::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Scale::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Scale::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Scale::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void Scale::CheckboxUpdated(Checkbox* checkbox)
+void Scale::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -715,13 +720,13 @@ void Scale::TextEntryComplete(TextEntry* entry)
       UpdateTuningTable();
 }
 
-void Scale::ButtonClicked(ClickButton* button)
+void Scale::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mLoadSCLButton || button == mLoadKBMButton)
    {
       std::string prompt = "Load ";
       prompt += (button == mLoadSCLButton) ? "SCL" : "KBM";
-      std::string pat = (button == mLoadSCLButton) ? "*.scl" : "*.kbm";
+      std::string pat = (button == mLoadSCLButton) ? "*.scl;*.SCL" : "*.kbm;*.KBM";
       juce::FileChooser chooser(prompt, juce::File(""), pat, true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToOpen())
       {

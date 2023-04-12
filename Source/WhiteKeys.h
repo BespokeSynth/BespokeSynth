@@ -36,17 +36,21 @@ class WhiteKeys : public NoteEffectBase, public IDrawableModule
 public:
    WhiteKeys();
    static IDrawableModule* Create() { return new WhiteKeys(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -56,7 +60,6 @@ private:
       width = 110;
       height = 0;
    }
-   bool Enabled() const override { return mEnabled; }
 };
 
 #endif /* defined(__modularSynth__WhiteKeys__) */

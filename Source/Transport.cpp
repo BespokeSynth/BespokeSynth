@@ -36,27 +36,6 @@ bool Transport::sDoEventLookahead = false;
 double Transport::sEventEarlyMs = 150;
 
 Transport::Transport()
-: mTempo(120)
-, mTimeSigTop(4)
-, mTimeSigBottom(4)
-, mMeasureTime(0)
-, mSwingInterval(8)
-, mSwing(.5f)
-, mSwingSlider(nullptr)
-, mResetButton(nullptr)
-, mTimeSigTopDropdown(nullptr)
-, mTimeSigBottomDropdown(nullptr)
-, mSwingIntervalDropdown(nullptr)
-, mSetTempoBool(false)
-, mSetTempoCheckbox(nullptr)
-, mStartRecordTime(-1)
-, mNudgeBackButton(nullptr)
-, mNudgeForwardButton(nullptr)
-, mIncreaseTempoButton(nullptr)
-, mDecreaseTempoButton(nullptr)
-, mTempoSlider(nullptr)
-, mLoopStartMeasure(-1)
-, mLoopEndMeasure(-1)
 {
    assert(TheTransport == nullptr);
    TheTransport = this;
@@ -146,10 +125,19 @@ void Transport::Advance(double ms)
 
    assert(amount > 0);
 
+   double oldMeasureTime = mMeasureTime;
    mMeasureTime += amount;
-
-   if (mLoopStartMeasure != -1 && (GetMeasure(gTime) < mLoopStartMeasure || GetMeasure(gTime) >= mLoopEndMeasure))
-      SetMeasure(mLoopStartMeasure);
+   if (int(mMeasureTime) != int(oldMeasureTime) && mMeasureTime >= mJumpFromMeasure)
+   {
+      if (mQueuedMeasure != -1)
+      {
+         SetMeasure(mQueuedMeasure);
+         if (mLoopStartMeasure != -1)
+            mQueuedMeasure = mLoopStartMeasure;
+         else
+            mQueuedMeasure = -1;
+      }
+   }
 
    if (TheChaosEngine)
       TheChaosEngine->AudioUpdate();
@@ -265,12 +253,16 @@ void Transport::DrawModule()
    ofRect(0, h - Swing(measurePos) * h, 4, 1);
 }
 
-void Transport::Reset(float rewindAmount)
+void Transport::Reset()
 {
-   mMeasureTime = -rewindAmount;
+   if (mLoopEndMeasure != -1)
+      mMeasureTime = mLoopEndMeasure - .01f;
+   else
+      mMeasureTime = .99f;
+   SetQueuedMeasure(NextBufferTime(true), 0);
 }
 
-void Transport::ButtonClicked(ClickButton* button)
+void Transport::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
       Reset();
@@ -283,7 +275,7 @@ void Transport::ButtonClicked(ClickButton* button)
    if (button == mDecreaseTempoButton)
       AdjustTempo(-1);
    if (button == mPlayPauseButton)
-      TheSynth->ToggleAudioPaused();
+      TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
 }
 
 TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
@@ -350,6 +342,12 @@ void Transport::AddAudioPoller(IAudioPoller* poller)
 void Transport::RemoveAudioPoller(IAudioPoller* poller)
 {
    mAudioPollers.remove(poller);
+}
+
+void Transport::ClearListenersAndPollers()
+{
+   mListeners.clear();
+   mAudioPollers.clear();
 }
 
 int Transport::GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs /*=nullptr*/)
@@ -535,6 +533,37 @@ double Transport::GetDuration(NoteInterval interval)
    return MsPerBar() * GetMeasureFraction(interval);
 }
 
+double Transport::GetMeasureTimeInternal(double time) const
+{
+   return mMeasureTime + (time - gTime) / MsPerBar();
+}
+
+double Transport::GetMeasureTime(double time) const
+{
+   double measureTime = GetMeasureTimeInternal(time);
+   if (mQueuedMeasure != -1 && measureTime >= mJumpFromMeasure)
+      measureTime = mQueuedMeasure + measureTime - mJumpFromMeasure;
+   return measureTime;
+}
+
+void Transport::SetQueuedMeasure(double time, int measure)
+{
+   mQueuedMeasure = -1; //clear
+   if (mLoopEndMeasure != -1)
+      mJumpFromMeasure = mLoopEndMeasure;
+   else
+      mJumpFromMeasure = GetMeasure(time) + 1;
+   mQueuedMeasure = measure;
+}
+
+bool Transport::IsPastQueuedMeasureJump(double time) const
+{
+   double measureTime = GetMeasureTimeInternal(time);
+   if (mQueuedMeasure != -1 && measureTime >= mJumpFromMeasure)
+      return true;
+   return false;
+}
+
 double Transport::GetMeasureFraction(NoteInterval interval)
 {
    switch (interval)
@@ -590,35 +619,51 @@ double Transport::GetMeasureFraction(NoteInterval interval)
 
 void Transport::UpdateListeners(double jumpMs)
 {
-   for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   std::list<int> priorities;
+   for (const auto& info : mListeners)
    {
-      const TransportListenerInfo& info = *i;
-      if (info.mInterval != kInterval_None &&
-          info.mInterval != kInterval_Free)
+      if (info.mListener != nullptr && !ListContains(info.mListener->mTransportPriority, priorities))
+         priorities.push_back(info.mListener->mTransportPriority);
+   }
+
+   priorities.sort();
+
+   for (const auto& priority : priorities)
+   {
+      for (const auto& info : mListeners)
       {
-         double lookaheadMs = jumpMs;
-         if (info.mUseEventLookahead)
-            lookaheadMs = MAX(lookaheadMs, GetEventLookaheadMs());
-
-         double checkTime = gTime + lookaheadMs;
-
-         double remainderMs;
-         int oldStep = GetQuantized(checkTime - jumpMs, &info);
-         int newStep = GetQuantized(checkTime, &info, &remainderMs);
-         if (oldStep != newStep)
+         if (info.mListener != nullptr &&
+             info.mListener->mTransportPriority == priority &&
+             info.mInterval != kInterval_None &&
+             info.mInterval != kInterval_Free)
          {
-            double time = checkTime - remainderMs + .0001; //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
-            /*ofLog() << oldStep << " " << newStep << " " << remainderMs << " " << jumpMs << " " << checkTime << " " << time << " " << GetQuantized(checkTime, info.mInterval) << " " << GetQuantized(time, info.mInterval);
-            if (GetQuantized(checkTime + offsetMs, info.mInterval) != GetQuantized(time + offsetMs, info.mInterval))
+            double lookaheadMs = jumpMs;
+            if (info.mUseEventLookahead)
+               lookaheadMs = MAX(lookaheadMs, GetEventLookaheadMs());
+
+            double checkTime = gTime + lookaheadMs;
+
+            double remainderMs;
+            int oldStep = GetQuantized(checkTime - jumpMs, &info);
+            int newStep = GetQuantized(checkTime, &info, &remainderMs);
+            bool oldJumped = IsPastQueuedMeasureJump(checkTime - jumpMs);
+            bool newJumped = IsPastQueuedMeasureJump(checkTime);
+            if (oldStep != newStep ||
+                oldJumped != newJumped)
             {
-               double aboveRemainderMs;
-               GetQuantized(checkTime + offsetMs, info.mInterval, &aboveRemainderMs);
-               double remainderShouldBeZeroMs;
-               GetQuantized(time + offsetMs, info.mInterval, &remainderShouldBeZeroMs);
-               ofLog() << remainderShouldBeZeroMs;
-            }*/
-            //assert(GetQuantized(checkTime + offsetMs, info.mInterval) == GetQuantized(time + offsetMs, info.mInterval));
-            info.mListener->OnTimeEvent(time);
+               double time = checkTime - remainderMs + .0001; //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
+               /*ofLog() << oldStep << " " << newStep << " " << remainderMs << " " << jumpMs << " " << checkTime << " " << time << " " << GetQuantized(checkTime, info.mInterval) << " " << GetQuantized(time, info.mInterval);
+               if (GetQuantized(checkTime + offsetMs, info.mInterval) != GetQuantized(time + offsetMs, info.mInterval))
+               {
+                  double aboveRemainderMs;
+                  GetQuantized(checkTime + offsetMs, info.mInterval, &aboveRemainderMs);
+                  double remainderShouldBeZeroMs;
+                  GetQuantized(time + offsetMs, info.mInterval, &remainderShouldBeZeroMs);
+                  ofLog() << remainderShouldBeZeroMs;
+               }*/
+               //assert(GetQuantized(checkTime + offsetMs, info.mInterval) == GetQuantized(time + offsetMs, info.mInterval));
+               info.mListener->OnTimeEvent(time);
+            }
          }
       }
    }
@@ -626,30 +671,29 @@ void Transport::UpdateListeners(double jumpMs)
 
 void Transport::OnDrumEvent(NoteInterval drumEvent)
 {
-   for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   for (const auto& info : mListeners)
    {
-      const TransportListenerInfo& info = *i;
       if (info.mInterval == drumEvent)
          info.mListener->OnTimeEvent(0); //TODO(Ryan) calc sample offset
    }
 }
 
-void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Transport::CheckboxUpdated(Checkbox* checkbox)
+void Transport::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mSetTempoCheckbox)
    {
       if (mSetTempoBool)
       {
-         mStartRecordTime = gTime;
+         mStartRecordTime = time;
       }
       else if (mStartRecordTime != -1)
       {
          int numBars = 1;
-         float recordedTime = gTime - mStartRecordTime;
+         float recordedTime = time - mStartRecordTime;
          int beats = numBars * GetTimeSigTop();
          float minutes = recordedTime / 1000.0f / 60.0f;
          SetTempo(beats / minutes);
@@ -658,7 +702,7 @@ void Transport::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void Transport::DropdownUpdated(DropdownList* list, int oldVal)
+void Transport::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 

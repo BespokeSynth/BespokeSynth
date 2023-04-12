@@ -30,20 +30,10 @@
 #include "Push2Control.h"
 
 DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width)
-: mWidth(35)
-, mHeight(kItemSpacing)
-, mVar(var)
+: mVar(var)
 , mLastSetValue(*var)
 , mModalList(this)
 , mOwner(owner)
-, mMaxPerColumn(40)
-, mMaxItemWidth(20)
-, mUnknownItemString("-----")
-, mDrawLabel(false)
-, mSliderVal(0)
-, mAutoCalculateWidth(false)
-, mDrawTriangle(true)
-, mLastScrolledTime(-9999)
 {
    assert(owner);
    SetName(name);
@@ -100,6 +90,28 @@ void DropdownList::RemoveLabel(int value)
    }
 }
 
+void DropdownList::SetLabel(std::string label, int value)
+{
+   bool found = false;
+   for (auto iter = mElements.begin(); iter != mElements.end(); ++iter)
+   {
+      if (iter->mValue == value)
+      {
+         found = true;
+         iter->mLabel = label;
+
+         CalculateWidth();
+         mHeight = kItemSpacing;
+
+         CalcSliderVal();
+         break;
+      }
+   }
+
+   if (!found)
+      AddLabel(label, value);
+}
+
 void DropdownList::CalculateWidth()
 {
    mMaxItemWidth = mWidth;
@@ -137,44 +149,57 @@ void DropdownList::Poll()
 {
    if (*mVar != mLastSetValue)
       CalcSliderVal();
+
+   mDropdownIsOpen = (TheSynth->GetTopModalFocusItem() == &mModalList);
 }
 
 void DropdownList::Render()
 {
    ofPushStyle();
 
-   float xOffset = 0;
-   if (mDrawLabel)
-   {
-      DrawTextNormal(Name(), mX, mY + 12);
-      xOffset = mLabelSize;
-   }
-
-   DrawBeacon(mX + mWidth / 2 + xOffset, mY + mHeight / 2);
-
    float w, h;
    GetDimensions(w, h);
 
    ofColor color, textColor;
    IUIControl::GetColors(color, textColor);
+   float xOffset = 0;
 
-   ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
-   ofRect(mX + 1 + xOffset, mY + 1, w - xOffset, h);
-   ofSetColor(color);
-   ofRect(mX + xOffset, mY, w - xOffset, h);
-   ofNoFill();
-
-   ofSetColor(textColor);
-
-   ofPushMatrix();
-   ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
-   DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
-   ofPopMatrix();
-   if (mDrawTriangle)
+   if (mDisplayStyle == DropdownDisplayStyle::kNormal)
    {
-      ofSetLineWidth(.5f);
-      ofTriangle(mX + w - 11, mY + 4, mX + w - 3, mY + 4, mX + w - 7, mY + 11);
+      if (mDrawLabel)
+      {
+         DrawTextNormal(Name(), mX, mY + 12);
+         xOffset = mLabelSize;
+      }
+
+      DrawBeacon(mX + mWidth / 2 + xOffset, mY + mHeight / 2);
+
+      ofFill();
+      ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+      ofRect(mX + 1 + xOffset, mY + 1, w - xOffset, h);
+      ofSetColor(color);
+      ofRect(mX + xOffset, mY, w - xOffset, h);
+      ofNoFill();
+
+      ofSetColor(textColor);
+
+      ofPushMatrix();
+      ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
+      DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
+      ofPopMatrix();
+      if (mDrawTriangle)
+      {
+         ofSetLineWidth(.5f);
+         ofTriangle(mX + w - 11, mY + 4, mX + w - 3, mY + 4, mX + w - 7, mY + 11);
+      }
+   }
+   else if (mDisplayStyle == DropdownDisplayStyle::kHamburger)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.0f);
+      ofLine(mX + 6, mY + 4.5f, mX + 14, mY + 4.5f);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofLine(mX + 6, mY + 10.5f, mX + 14, mY + 10.5f);
    }
 
    ofPopStyle();
@@ -290,6 +315,13 @@ void DropdownList::ChangePage(int direction)
       mCurrentPagedColumn = newColumn;
 }
 
+void DropdownList::CopyContentsTo(DropdownList* list) const
+{
+   list->Clear();
+   for (auto& element : mElements)
+      list->AddLabel(element.mLabel, element.mValue);
+}
+
 void DropdownList::GetDimensions(float& width, float& height)
 {
    width = mWidth;
@@ -303,7 +335,7 @@ bool DropdownList::DropdownClickedAt(int x, int y)
    int index = GetItemIndexAt(x, y);
    if (index >= 0 && index < mElements.size())
    {
-      SetIndex(index, K(forceUpdate));
+      SetIndex(index, NextBufferTime(false), K(forceUpdate));
       return true;
    }
    return false;
@@ -329,7 +361,7 @@ namespace
 
 void DropdownList::OnClicked(float x, float y, bool right)
 {
-   if (right)
+   if (right || mDropdownIsOpen)
       return;
 
    mOwner->DropdownClicked(this);
@@ -405,15 +437,15 @@ void DropdownList::Clear()
    mHeight = kItemSpacing;
 }
 
-void DropdownList::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void DropdownList::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
-   SetIndex(int(slider * mElements.size()));
+   SetIndex(int(slider * mElements.size()), time, false);
    mSliderVal = slider;
    mLastSetValue = *mVar;
 
    if (!setViaModulator)
-      mLastScrolledTime = gTime; //don't do scrolling display if a modulator is changing our value
+      mLastScrolledTime = time; //don't do scrolling display if a modulator is changing our value
 }
 
 float DropdownList::GetValueForMidiCC(float slider) const
@@ -426,22 +458,22 @@ float DropdownList::GetValueForMidiCC(float slider) const
    return mElements[index].mValue;
 }
 
-void DropdownList::SetIndex(int i, bool forceUpdate /*= false*/)
+void DropdownList::SetIndex(int i, double time, bool forceUpdate)
 {
    if (mElements.empty())
       return;
 
    i = ofClamp(i, 0, mElements.size() - 1);
 
-   SetValue(mElements[i].mValue, forceUpdate);
+   SetValue(mElements[i].mValue, time, forceUpdate);
 }
 
-void DropdownList::SetValue(float value)
+void DropdownList::SetValue(float value, double time)
 {
-   SetValue((int)value, false);
+   SetValue((int)value, time, false);
 }
 
-void DropdownList::SetValue(int value, bool forceUpdate)
+void DropdownList::SetValue(int value, double time, bool forceUpdate)
 {
    if (value != *mVar || forceUpdate)
    {
@@ -449,7 +481,7 @@ void DropdownList::SetValue(int value, bool forceUpdate)
       *mVar = value;
       CalcSliderVal();
       gControlTactileFeedback = 1;
-      mOwner->DropdownUpdated(this, oldVal);
+      mOwner->DropdownUpdated(this, oldVal, time);
    }
 }
 
@@ -497,7 +529,7 @@ void DropdownList::Increment(float amount)
 {
    int itemIndex = FindItemIndex(*mVar);
 
-   SetIndex(itemIndex + (int)amount);
+   SetIndex(itemIndex + (int)amount, gTime, false);
 }
 
 EnumMap DropdownList::GetEnumMap()
@@ -531,7 +563,7 @@ void DropdownList::LoadState(FileStreamIn& in, bool shouldSetValue)
       float var;
       in >> var;
       if (shouldSetValue)
-         SetValueDirect(var);
+         SetValueDirect(var, gTime);
    }
    else
    {
@@ -543,7 +575,7 @@ void DropdownList::LoadState(FileStreamIn& in, bool shouldSetValue)
          {
             if (mElements[i].mLabel == label)
             {
-               SetIndex(i);
+               SetIndex(i, gTime, false);
                break;
             }
          }
@@ -609,7 +641,7 @@ void DropdownListModal::OnClicked(float x, float y, bool right)
       TheSynth->PopModalFocusItem();
 }
 
-void DropdownListModal::ButtonClicked(ClickButton* button)
+void DropdownListModal::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPagePrevButton)
       mOwner->ChangePage(-1);

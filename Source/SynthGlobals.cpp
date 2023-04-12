@@ -490,6 +490,8 @@ void UpdateTarget(IDrawableModule* module)
          IDrawableModule* target = dynamic_cast<IDrawableModule*>(audioSource->GetTarget(i));
          if (target)
             targetName = target->Path();
+         else
+            targetName = "";
          module->GetSaveData().SetString("target" + (i == 0 ? "" : ofToString(i + 1)), targetName);
       }
    }
@@ -670,10 +672,14 @@ bool IsInUnitBox(ofVec2f pos)
 
 std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existing)
 {
-   std::string origName = name;
-   while (origName.length() > 1 && CharacterFunctions::isDigit((char)origName[origName.length() - 1]))
-      origName.resize(origName.length() - 1);
+   std::string strippedName = name;
+   while (strippedName.length() > 1 && CharacterFunctions::isDigit((char)strippedName[strippedName.length() - 1]))
+      strippedName.resize(strippedName.length() - 1);
    int suffix = 1;
+   std::string suffixString = name;
+   ofStringReplace(suffixString, strippedName, "");
+   if (!suffixString.empty())
+      suffix = atoi(suffixString.c_str());
    while (true)
    {
       bool isNameUnique = true;
@@ -682,7 +688,7 @@ std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existi
          if (existing[i]->Name() == name)
          {
             ++suffix;
-            name = origName + ofToString(suffix);
+            name = strippedName + ofToString(suffix);
             isNameUnique = false;
             break;
          }
@@ -752,6 +758,19 @@ void LoadStateValidate(bool assertion)
 {
    if (!assertion)
       throw LoadStateException();
+}
+
+double NextBufferTime(bool includeLookahead)
+{
+   double time = gTime + gBufferSizeMs;
+   if (includeLookahead)
+      time += TheTransport->GetEventLookaheadMs();
+   return time;
+}
+
+bool IsAudioThread()
+{
+   return std::this_thread::get_id() == ModularSynth::GetAudioThreadID();
 }
 
 float GetLeftPanGain(float pan)
@@ -11618,8 +11637,8 @@ void DumpUnfreedMemory()
       const AllocInfo* info = element.second;
       if (info && info->allocated)
       {
-         sprintf(buf, "%-90s:  LINE %5d,  ADDRESS %08x  %8d unfreed",
-                 info->file, info->line, info->address, info->size);
+         snprintf(buf, sizeof(buf), "%-90s:  LINE %5d,  ADDRESS %08x  %8d unfreed",
+                  info->file, info->line, info->address, info->size);
          ofLog() << buf;
          totalSize += info->size;
 
@@ -11629,12 +11648,12 @@ void DumpUnfreedMemory()
    ofLog() << "-----------------------------------------------------------";
    for (auto fileInfo : perFileTotal)
    {
-      sprintf(buf, "%-90s:  %10d unfreed",
-              fileInfo.first.c_str(), fileInfo.second);
+      snprintf(buf, sizeof(buf), "%-90s:  %10d unfreed",
+               fileInfo.first.c_str(), fileInfo.second);
       ofLog() << buf;
    }
    ofLog() << "-----------------------------------------------------------";
-   sprintf(buf, "Total Unfreed: %d bytes", totalSize);
+   snprintf(buf, sizeof(buf), "Total Unfreed: %d bytes", totalSize);
    ofLog() << buf;
 };
 

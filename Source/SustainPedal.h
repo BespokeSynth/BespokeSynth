@@ -36,17 +36,21 @@ class SustainPedal : public NoteEffectBase, public IDrawableModule
 public:
    SustainPedal();
    static IDrawableModule* Create() { return new SustainPedal(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -56,11 +60,10 @@ private:
       width = 90;
       height = 21;
    }
-   bool Enabled() const override { return true; }
 
    std::array<bool, 128> mIsNoteBeingSustained{ false };
-   bool mSustain;
-   Checkbox* mSustainCheckbox;
+   bool mSustain{ false };
+   Checkbox* mSustainCheckbox{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SustainPedal__) */

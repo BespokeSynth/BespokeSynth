@@ -80,7 +80,7 @@ void GlobalControls::DrawModule()
    mBackgroundBSlider->Draw();
 }
 
-void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mZoomSlider && gHoveredUIControl != mZoomSlider) //avoid bad behavior when adjusting these via mouse
    {
@@ -122,7 +122,6 @@ void GlobalControls::SetUpFromSaveData()
 
 void GlobalControls::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 std::vector<IUIControl*> GlobalControls::ControlsToNotSetDuringLoadState() const

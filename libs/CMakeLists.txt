@@ -13,6 +13,7 @@ add_subdirectory(nanovg EXCLUDE_FROM_ALL)
 add_subdirectory(oddsound-mts EXCLUDE_FROM_ALL)
 add_subdirectory(psmove EXCLUDE_FROM_ALL)
 add_subdirectory(push2 EXCLUDE_FROM_ALL)
+add_subdirectory(readerwriterqueue EXCLUDE_FROM_ALL)
 
 set(PYBIND11_NOPYTHON TRUE)
 if(NOT BESPOKE_SYSTEM_PYBIND11)

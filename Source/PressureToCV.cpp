@@ -33,7 +33,6 @@
 #include "ModulationChain.h"
 
 PressureToCV::PressureToCV()
-: mPressure(nullptr)
 {
 }
 
@@ -82,7 +81,6 @@ float PressureToCV::Value(int samplesIn)
 
 void PressureToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PressureToCV::LoadLayout(const ofxJSONElement& moduleInfo)

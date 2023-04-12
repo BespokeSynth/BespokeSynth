@@ -31,17 +31,6 @@
 #include "UIControlMacros.h"
 
 Arpeggiator::Arpeggiator()
-: mInterval(kInterval_16n)
-, mArpIndex(-1)
-, mArpString()
-, mLastPitch(-1)
-, mIntervalSelector(nullptr)
-, mArpStep(1)
-, mArpPingPongDirection(1)
-, mArpStepSlider(nullptr)
-, mCurrentOctaveOffset(0)
-, mOctaveRepeats(1)
-, mOctaveRepeatsSlider(nullptr)
 {
    TheScale->AddListener(this);
 }
@@ -142,7 +131,7 @@ bool Arpeggiator::MouseMoved(float x, float y)
    return false;
 }
 
-void Arpeggiator::CheckboxUpdated(Checkbox* checkbox)
+void Arpeggiator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -150,7 +139,7 @@ void Arpeggiator::CheckboxUpdated(Checkbox* checkbox)
       mChord.clear();
       mChordMutex.unlock();
 
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
    }
 }
 
@@ -276,17 +265,17 @@ void Arpeggiator::UpdateInterval()
       transportListenerInfo->mInterval = mInterval;
 }
 
-void Arpeggiator::ButtonClicked(ClickButton* button)
+void Arpeggiator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void Arpeggiator::DropdownUpdated(DropdownList* list, int oldVal)
+void Arpeggiator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
       UpdateInterval();
 }
 
-void Arpeggiator::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Arpeggiator::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mArpStepSlider)
    {

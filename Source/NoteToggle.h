@@ -36,6 +36,9 @@ public:
    NoteToggle();
    ~NoteToggle();
    static IDrawableModule* Create() { return new NoteToggle(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -49,13 +52,14 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
 
    std::array<bool, 128> mHeldPitches{ false };
-   PatchCableSource* mControlCable;
+   PatchCableSource* mControlCable{ nullptr };
    std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
 };

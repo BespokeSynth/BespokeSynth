@@ -104,7 +104,6 @@ void NoteExpressionRouter::SetUpFromSaveData()
 
 void NoteExpressionRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteExpressionRouter::TextEntryComplete(TextEntry* entry)

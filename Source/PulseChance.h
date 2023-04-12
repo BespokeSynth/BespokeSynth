@@ -38,6 +38,9 @@ public:
    PulseChance();
    virtual ~PulseChance();
    static IDrawableModule* Create() { return new PulseChance(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 
@@ -46,18 +49,19 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
 
    void Reseed();
 

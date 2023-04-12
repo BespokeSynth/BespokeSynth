@@ -27,8 +27,6 @@
 #include "SynthGlobals.h"
 
 NoteFilter::NoteFilter()
-: mMinPitch(0)
-, mMaxPitch(7)
 {
    for (int i = 0; i < 128; ++i)
    {
@@ -70,7 +68,8 @@ void NoteFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    {
       if (pitch >= 0 && pitch < 128)
       {
-         mLastPlayTime[pitch] = time;
+         if (velocity > 0)
+            mLastPlayTime[pitch] = time;
          if ((pitch >= mMinPitch && pitch <= mMaxPitch && mGate[pitch]) || velocity == 0)
             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }

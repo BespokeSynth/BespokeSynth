@@ -40,19 +40,23 @@ class NoteStepper : public INoteReceiver, public INoteSource, public IDrawableMo
 public:
    NoteStepper();
    static IDrawableModule* Create() { return new NoteStepper(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -62,7 +66,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return true; }
 
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
 
@@ -76,4 +79,5 @@ private:
    int mLength{ 4 };
    IntSlider* mLengthSlider{ nullptr };
    double mLastNoteOnTime{ -9999 };
+   bool mAllowChords{ false };
 };

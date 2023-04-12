@@ -45,6 +45,32 @@ public:
       float curve{ 0 };
    };
 
+   struct EventInfo
+   {
+      EventInfo(){};
+      EventInfo(double startTime, double stopTime)
+      {
+         mStartBlendFromValue = 0;
+         mStopBlendFromValue = std::numeric_limits<float>::max();
+         mMult = 1;
+         mStartTime = startTime;
+         mStopTime = stopTime;
+      }
+      void Reset()
+      {
+         mStartBlendFromValue = 0;
+         mStopBlendFromValue = 0;
+         mMult = 1;
+         mStartTime = -10000;
+         mStopTime = -10000;
+      }
+      float mStartBlendFromValue{ 0 };
+      float mStopBlendFromValue{ 0 };
+      float mMult{ 1 };
+      double mStartTime{ -10000 };
+      double mStopTime{ -10000 };
+   };
+
    ADSR(float a, float d, float s, float r)
    {
       Set(a, d, s, r);
@@ -57,6 +83,7 @@ public:
    void Start(double time, float target, const ADSR& adsr, float timeScale = 1);
    void Stop(double time, bool warn = true);
    float Value(double time) const;
+   float Value(double time, const EventInfo* event) const;
    void Set(float a, float d, float s, float r, float h = -1);
    void Set(const ADSR& other);
    void Clear()
@@ -76,8 +103,8 @@ public:
    int GetNumStages() const { return mNumStages; }
    void SetNumStages(int num) { mNumStages = CLAMP(num, 1, MAX_ADSR_STAGES); }
    Stage& GetStageData(int stage) { return mStages[stage]; }
-   int GetStageForTime(double time) const;
    int GetStage(double time, double& stageStartTimeOut) const;
+   int GetStage(double time, double& stageStartTimeOut, const EventInfo* e) const;
 
    float GetTimeScale() const { return mTimeScale; }
 
@@ -88,28 +115,12 @@ public:
    float& GetMaxSustain() { return mMaxSustain; }
    int& GetSustainStage() { return mSustainStage; }
    bool& GetHasSustainStage() { return mHasSustainStage; }
+   bool& GetFreeReleaseLevel() { return mFreeReleaseLevel; }
 
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
 private:
-   struct EventInfo
-   {
-      void Reset()
-      {
-         mStartBlendFromValue = 0;
-         mStopBlendFromValue = 0;
-         mMult = 1;
-         mStartTime = -10000;
-         mStopTime = -10000;
-      }
-      float mStartBlendFromValue{ 0 };
-      float mStopBlendFromValue{ 0 };
-      float mMult{ 1 };
-      double mStartTime{ -10000 };
-      double mStopTime{ -10000 };
-   };
-
    EventInfo* GetEvent(double time);
    const EventInfo* GetEventConst(double time) const;
    float GetStageTimeScale(int stage) const;
@@ -121,5 +132,6 @@ private:
    Stage mStages[MAX_ADSR_STAGES];
    int mNumStages{ 0 };
    bool mHasSustainStage{ false };
+   bool mFreeReleaseLevel{ false };
    float mTimeScale{ 1 };
 };

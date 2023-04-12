@@ -52,7 +52,9 @@ public:
    SamplePlayer();
    ~SamplePlayer();
    static IDrawableModule* Create() { return new SamplePlayer(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -84,14 +86,14 @@ public:
    void oscMessageReceived(const juce::OSCMessage& msg) override;
    void oscBundleReceived(const juce::OSCBundle& bundle) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -100,6 +102,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 2; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    void UpdateSample(Sample* sample, bool ownsSample);
@@ -125,7 +129,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;

@@ -33,7 +33,6 @@
 #include "ModulationChain.h"
 
 ModWheelToCV::ModWheelToCV()
-: mModWheel(nullptr)
 {
 }
 
@@ -82,7 +81,6 @@ float ModWheelToCV::Value(int samplesIn)
 
 void ModWheelToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModWheelToCV::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -39,7 +39,9 @@ public:
    PulseDelayer();
    ~PulseDelayer();
    static IDrawableModule* Create() { return new PulseDelayer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -51,19 +53,20 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    struct PulseInfo
    {
-      float mVelocity;
-      int mFlags;
-      double mTriggerTime;
+      float mVelocity{ 0 };
+      int mFlags{ 0 };
+      double mTriggerTime{ 0 };
    };
 
    //IDrawableModule
@@ -73,7 +76,6 @@ private:
       width = 108;
       height = 22;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mDelay{ .25 };
    FloatSlider* mDelaySlider{ nullptr };

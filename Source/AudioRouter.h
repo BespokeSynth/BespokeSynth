@@ -38,9 +38,12 @@ public:
    AudioRouter();
    virtual ~AudioRouter();
    static IDrawableModule* Create() { return new AudioRouter(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   void Poll() override;
 
    void SetActiveIndex(int index) { mRouteIndex = index; }
 
@@ -52,17 +55,18 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IRadioButtonListener
-   void RadioButtonUpdated(RadioButton* button, int oldVal) override;
+   void RadioButtonUpdated(RadioButton* button, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override;
-   bool Enabled() const override { return true; }
 
    int mRouteIndex{ 0 };
    RadioButton* mRouteSelector{ nullptr };
@@ -71,6 +75,7 @@ private:
 
    std::array<Ramp, 16> mSwitchAndRampIn;
    int mLastProcessedRouteIndex{ 0 };
+   bool mOnlyShowActiveCable{ false };
 };
 
 

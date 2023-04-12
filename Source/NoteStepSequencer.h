@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__NoteStepSequencer__
-#define __modularSynth__NoteStepSequencer__
+#pragma once
 
 #include <iostream>
 #include "INoteReceiver.h"
@@ -53,7 +52,9 @@ public:
    NoteStepSequencer();
    virtual ~NoteStepSequencer();
    static IDrawableModule* Create() { return new NoteStepSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 
@@ -110,24 +111,25 @@ public:
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    void OnClicked(float x, float y, bool right) override;
    void UpdateGridControllerLights(bool force);
 
@@ -141,6 +143,8 @@ private:
    float ExtraWidth() const;
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
+   void RandomizeVelocities();
+   void RandomizeLengths();
    void Step(double time, float velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
 
@@ -152,76 +156,72 @@ private:
       kNoteMode_Fifths
    };
 
-   int mTones[NSS_MAX_STEPS];
-   int mVels[NSS_MAX_STEPS];
-   float mNoteLengths[NSS_MAX_STEPS];
+   int mTones[NSS_MAX_STEPS]{};
+   int mVels[NSS_MAX_STEPS]{};
+   float mNoteLengths[NSS_MAX_STEPS]{};
 
-   NoteInterval mInterval;
-   int mArpIndex;
+   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   int mArpIndex{ -1 };
 
-   DropdownList* mIntervalSelector;
-   Checkbox* mRepeatIsHoldCheckbox;
-   UIGrid* mGrid;
-   UIGrid* mVelocityGrid;
-   int mLastPitch;
-   int mLastVel;
-   int mLastStepIndex;
-   float mLastNoteLength;
-   double mLastNoteStartTime;
-   double mLastNoteEndTime;
-   bool mAlreadyDidNoteOff;
-   int mOctave;
-   IntSlider* mOctaveSlider;
-   NoteMode mNoteMode;
-   DropdownList* mNoteModeSelector;
-   IntSlider* mLoopResetPointSlider;
-   int mLoopResetPoint;
+   DropdownList* mIntervalSelector{ nullptr };
+   UIGrid* mGrid{ nullptr };
+   UIGrid* mVelocityGrid{ nullptr };
+   int mLastPitch{ -1 };
+   int mLastStepIndex{ -1 };
+   float mLastNoteLength{ 1 };
+   double mLastNoteEndTime{ 0 };
+   bool mAlreadyDidNoteOff{ false };
+   int mOctave{ 3 };
+   IntSlider* mOctaveSlider{ nullptr };
+   NoteMode mNoteMode{ NoteMode::kNoteMode_Scale };
+   DropdownList* mNoteModeSelector{ nullptr };
+   IntSlider* mLoopResetPointSlider{ nullptr };
+   int mLoopResetPoint{ 0 };
+   int mStepLengthSubdivisions{ 2 };
 
-   int mLength;
-   IntSlider* mLengthSlider;
-   bool mSetLength;
-   int mNoteRange;
-   bool mShowStepControls;
-   int mRowOffset;
+   int mLength{ 8 };
+   IntSlider* mLengthSlider{ nullptr };
+   bool mSetLength{ false };
+   int mNoteRange{ 15 };
+   bool mShowStepControls{ false };
+   int mRowOffset{ 0 };
 
-   MidiController* mController;
+   MidiController* mController{ nullptr };
 
-   ClickButton* mShiftBackButton;
-   ClickButton* mShiftForwardButton;
-   ClickButton* mClearButton;
+   ClickButton* mShiftBackButton{ nullptr };
+   ClickButton* mShiftForwardButton{ nullptr };
+   ClickButton* mClearButton{ nullptr };
 
-   ClickButton* mRandomizePitchButton;
-   ClickButton* mRandomizeLengthButton;
-   ClickButton* mRandomizeVelocityButton;
-   float mRandomizePitchChance;
-   int mRandomizePitchVariety;
-   float mRandomizeLengthChance;
-   float mRandomizeLengthRange;
-   float mRandomizeVelocityChance;
-   float mRandomizeVelocityDensity;
-   FloatSlider* mRandomizePitchChanceSlider;
-   IntSlider* mRandomizePitchVarietySlider;
-   FloatSlider* mRandomizeLengthChanceSlider;
-   FloatSlider* mRandomizeLengthRangeSlider;
-   FloatSlider* mRandomizeVelocityChanceSlider;
-   FloatSlider* mRandomizeVelocityDensitySlider;
+   ClickButton* mRandomizeAllButton{ nullptr };
+   ClickButton* mRandomizePitchButton{ nullptr };
+   ClickButton* mRandomizeLengthButton{ nullptr };
+   ClickButton* mRandomizeVelocityButton{ nullptr };
+   float mRandomizePitchChance{ 1 };
+   int mRandomizePitchVariety{ 4 };
+   float mRandomizeLengthChance{ 1 };
+   float mRandomizeLengthRange{ 1 };
+   float mRandomizeVelocityChance{ 1 };
+   float mRandomizeVelocityDensity{ .6 };
+   FloatSlider* mRandomizePitchChanceSlider{ nullptr };
+   IntSlider* mRandomizePitchVarietySlider{ nullptr };
+   FloatSlider* mRandomizeLengthChanceSlider{ nullptr };
+   FloatSlider* mRandomizeLengthRangeSlider{ nullptr };
+   FloatSlider* mRandomizeVelocityChanceSlider{ nullptr };
+   FloatSlider* mRandomizeVelocityDensitySlider{ nullptr };
 
    std::array<double, NSS_MAX_STEPS> mLastStepPlayTime{ -1 };
    std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;
    std::array<IntSlider*, NSS_MAX_STEPS> mVelocitySliders;
    std::array<FloatSlider*, NSS_MAX_STEPS> mLengthSliders;
 
-   bool mHasExternalPulseSource;
+   bool mHasExternalPulseSource{ false };
 
    std::array<AdditionalNoteCable*, NSS_MAX_STEPS> mStepCables;
 
-   TransportListenerInfo* mTransportListenerInfo;
-   GridControlTarget* mGridControlTarget;
-   int mGridControlOffsetX;
-   int mGridControlOffsetY;
-   IntSlider* mGridControlOffsetXSlider;
-   IntSlider* mGridControlOffsetYSlider;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
+   int mGridControlOffsetX{ 0 };
+   int mGridControlOffsetY{ 0 };
+   IntSlider* mGridControlOffsetXSlider{ nullptr };
+   IntSlider* mGridControlOffsetYSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__NoteStepSequencer__) */

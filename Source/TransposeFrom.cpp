@@ -72,10 +72,10 @@ void TransposeFrom::DrawModule()
    mRetriggerCheckbox->Draw();
 }
 
-void TransposeFrom::CheckboxUpdated(Checkbox* checkbox)
+void TransposeFrom::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 int TransposeFrom::GetTransposeAmount() const
@@ -111,18 +111,17 @@ void TransposeFrom::PlayNote(double time, int pitch, int velocity, int voiceIdx,
 
 void TransposeFrom::OnScaleChanged()
 {
-   OnRootChanged();
+   OnRootChanged(gTime);
 }
 
-void TransposeFrom::DropdownUpdated(DropdownList* slider, int oldVal)
+void TransposeFrom::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (slider == mRootSelector && mEnabled && mRetrigger)
-      OnRootChanged();
+   if (list == mRootSelector && mEnabled && mRetrigger)
+      OnRootChanged(time);
 }
 
-void TransposeFrom::OnRootChanged()
+void TransposeFrom::OnRootChanged(double time)
 {
-   double time = gTime + gBufferSizeMs;
    for (int pitch = 0; pitch < 128; ++pitch)
    {
       if (mInputNotes[pitch].mOn)

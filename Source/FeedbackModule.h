@@ -39,7 +39,9 @@ public:
    FeedbackModule();
    virtual ~FeedbackModule();
    static IDrawableModule* Create() { return new FeedbackModule(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -50,11 +52,13 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -64,7 +68,6 @@ private:
       w = 115;
       h = 125;
    }
-   bool Enabled() const override { return mEnabled; }
 
    DelayEffect mDelay;
 

@@ -56,6 +56,7 @@ ofColor ofColor::blue(0, 0, 255);
 ofColor ofColor::purple(148, 0, 211);
 ofColor ofColor::lime(0, 255, 0);
 ofColor ofColor::magenta(255, 0, 255);
+ofColor ofColor::cyan(0, 255, 255);
 ofColor ofColor::clear(0, 0, 0, 0);
 
 NVGcontext* gNanoVG = nullptr;
@@ -351,6 +352,11 @@ void ofVertex(float x, float y, float z)
    gShapePoints.push_back(ofVec2f(x, y));
 }
 
+void ofVertex(ofVec2f point)
+{
+   ofVertex(point.x, point.y);
+}
+
 float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEnd, bool clamp)
 {
    float ret;
@@ -521,17 +527,17 @@ std::string ofGetTimestampString(std::string in)
    Time time = Time::getCurrentTime();
    ofStringReplace(in, "%Y", ofToString(time.getYear()));
    char buff[16];
-   sprintf(buff, "%02d", time.getMonth() + 1);
+   snprintf(buff, sizeof(buff), "%02d", time.getMonth() + 1);
    ofStringReplace(in, "%m", buff);
-   sprintf(buff, "%02d", time.getDayOfMonth());
+   snprintf(buff, sizeof(buff), "%02d", time.getDayOfMonth());
    ofStringReplace(in, "%d", buff);
-   sprintf(buff, "%02d", time.getHours());
+   snprintf(buff, sizeof(buff), "%02d", time.getHours());
    ofStringReplace(in, "%H", buff);
-   sprintf(buff, "%02d", time.getMinutes());
+   snprintf(buff, sizeof(buff), "%02d", time.getMinutes());
    ofStringReplace(in, "%M", buff);
-   sprintf(buff, "%02d", time.getSeconds());
+   snprintf(buff, sizeof(buff), "%02d", time.getSeconds());
    ofStringReplace(in, "%S", buff);
-   sprintf(buff, "%03d", time.getMilliseconds());
+   snprintf(buff, sizeof(buff), "%03d", time.getMilliseconds());
    ofStringReplace(in, "%i", buff);
    return in;
 }

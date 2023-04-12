@@ -45,7 +45,9 @@ public:
    EffectChain();
    virtual ~EffectChain();
    static IDrawableModule* Create() { return new EffectChain(); }
-
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -64,10 +66,10 @@ public:
    bool HasPush2OverrideControls() const override { return true; }
    void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -75,11 +77,12 @@ public:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void UpdateOldControlName(std::string& oldName) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    int GetRowHeight(int row) const;
@@ -91,14 +94,14 @@ private:
 
    struct EffectControls
    {
-      ClickButton* mMoveLeftButton;
-      ClickButton* mMoveRightButton;
-      ClickButton* mDeleteButton;
-      FloatSlider* mDryWetSlider;
-      ClickButton* mPush2DisplayEffectButton;
+      ClickButton* mMoveLeftButton{ nullptr };
+      ClickButton* mMoveRightButton{ nullptr };
+      ClickButton* mDeleteButton{ nullptr };
+      FloatSlider* mDryWetSlider{ nullptr };
+      ClickButton* mPush2DisplayEffectButton{ nullptr };
    };
 
-   std::vector<IAudioEffect*> mEffects;
+   std::vector<IAudioEffect*> mEffects{};
    ChannelBuffer mDryBuffer;
    std::vector<EffectControls> mEffectControls;
    std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels{};

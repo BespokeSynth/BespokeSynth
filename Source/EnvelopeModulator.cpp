@@ -32,7 +32,7 @@
 
 EnvelopeModulator::EnvelopeModulator()
 {
-   mAdsr.Set(10, 100, .5f, 100);
+   mAdsr.GetFreeReleaseLevel() = true;
 }
 
 void EnvelopeModulator::CreateUIControls()
@@ -126,8 +126,8 @@ bool EnvelopeModulator::MouseMoved(float x, float y)
 float EnvelopeModulator::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
-   if (mSliderTarget)
-      return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), mSliderTarget->GetMin(), mSliderTarget->GetMax());
+   if (GetSliderTarget())
+      return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
    return 0;
 }
 
@@ -136,21 +136,20 @@ void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource, bool fromUser
    OnModulatorRepatch();
 }
 
-void EnvelopeModulator::CheckboxUpdated(Checkbox* checkbox)
+void EnvelopeModulator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EnvelopeModulator::ButtonClicked(ClickButton* button)
+void EnvelopeModulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
 void EnvelopeModulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void EnvelopeModulator::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -28,15 +28,6 @@
 #include "PatchCableSource.h"
 
 Ramper::Ramper()
-: mLength(kInterval_1n)
-, mLengthSelector(nullptr)
-, mControlCable(nullptr)
-, mTriggerButton(nullptr)
-, mStartMeasure(0)
-, mStartValue(0)
-, mRamping(false)
-, mTargetValue(0)
-, mTargetValueSlider(nullptr)
 {
 }
 
@@ -83,6 +74,8 @@ void Ramper::CreateUIControls()
 
 void Ramper::OnTransportAdvanced(float amount)
 {
+   if (!mEnabled)
+      mRamping = false;
    if (mRamping)
    {
       float curMeasure = TheTransport->GetMeasure(gTime) + TheTransport->GetMeasurePos(gTime);
@@ -94,7 +87,7 @@ void Ramper::OnTransportAdvanced(float amount)
          for (auto* control : mUIControls)
          {
             if (control != nullptr)
-               control->SetValue(ofLerp(mStartValue, mTargetValue, progress));
+               control->SetValue(ofLerp(mStartValue, mTargetValue, progress), gTime);
          }
       }
       else if (progress >= 1)
@@ -166,10 +159,10 @@ void Ramper::OnPulse(double time, float velocity, int flags)
       Go(time);
 }
 
-void Ramper::ButtonClicked(ClickButton* button)
+void Ramper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTriggerButton)
-      Go(gTime);
+      Go(time);
 }
 
 void Ramper::GetModuleDimensions(float& width, float& height)
@@ -180,7 +173,6 @@ void Ramper::GetModuleDimensions(float& width, float& height)
 
 void Ramper::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void Ramper::LoadLayout(const ofxJSONElement& moduleInfo)

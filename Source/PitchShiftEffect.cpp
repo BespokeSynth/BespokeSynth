@@ -29,10 +29,6 @@
 #include "Profiler.h"
 
 PitchShiftEffect::PitchShiftEffect()
-: mRatio(1)
-, mRatioSlider(nullptr)
-, mRatioSelector(nullptr)
-, mRatioSelection(10)
 {
    for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
       mPitchShifter[i] = new PitchShifter(1024);
@@ -104,17 +100,17 @@ float PitchShiftEffect::GetEffectAmount()
    return ofClamp(fabsf((mRatio - 1) * 10), 0, 1);
 }
 
-void PitchShiftEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PitchShiftEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void PitchShiftEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PitchShiftEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mRatioSlider)
       mRatioSelection = -1;
 }
 
-void PitchShiftEffect::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void PitchShiftEffect::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
    if (radio == mRatioSelector)
       mRatio = mRatioSelection / 10.0f;

@@ -55,14 +55,15 @@ private:
       ofVec2f mOffset;
    };
 
+   Location mLoadLocation;
    std::map<int, Location> mLocations;
    Location mStart;
    Location mDestination;
-   float mCurrentProgress;
-   float mSpeed;
+   float mCurrentProgress{ 1 };
+   float mSpeed{ 2 };
    Location mHome;
 
-   bool mInVanityPanningMode;
+   bool mInVanityPanningMode{ false };
 };
 
 #endif /* defined(__Bespoke__LocationZoomer__) */

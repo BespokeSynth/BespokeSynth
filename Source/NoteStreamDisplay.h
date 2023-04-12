@@ -37,7 +37,9 @@ public:
    NoteStreamDisplay();
    static IDrawableModule* Create() { return new NoteStreamDisplay(); }
    void CreateUIControls() override;
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
@@ -45,13 +47,15 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    bool HasDebugDraw() const override { return true; }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -62,7 +66,6 @@ private:
       w = mWidth;
       h = mHeight;
    }
-   bool Enabled() const override { return true; }
    bool IsElementActive(int index) const;
    float GetYPos(int pitch, float noteHeight) const;
 

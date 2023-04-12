@@ -219,7 +219,7 @@ void NoteCounter::Reseed()
    mSeed = gRandom() % 10000;
 }
 
-void NoteCounter::ButtonClicked(ClickButton* button)
+void NoteCounter::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPrevSeedButton)
       mSeed = (mSeed - 1 + 10000) % 10000;
@@ -229,22 +229,22 @@ void NoteCounter::ButtonClicked(ClickButton* button)
       mSeed = (mSeed + 1) % 10000;
 }
 
-void NoteCounter::CheckboxUpdated(Checkbox* checkbox)
+void NoteCounter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
       mStep = 0;
    }
 }
 
-void NoteCounter::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteCounter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mCustomDivisorSlider)
       mTransportListenerInfo->mCustomDivisor = mCustomDivisor;
 }
 
-void NoteCounter::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteCounter::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {

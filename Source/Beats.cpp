@@ -33,8 +33,7 @@
 #include "PatchCableSource.h"
 
 Beats::Beats()
-: mRows(4)
-, mWriteBuffer(gBufferSize)
+: mWriteBuffer(gBufferSize)
 {
 
    for (size_t i = 0; i < mBeatColumns.size(); ++i)
@@ -95,14 +94,14 @@ void Beats::DropdownClicked(DropdownList* list)
 {
 }
 
-void Beats::DropdownUpdated(DropdownList* list, int oldVal)
+void Beats::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Beats::RadioButtonUpdated(RadioButton* list, int oldVal)
+void Beats::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
    for (BeatColumn* column : mBeatColumns)
-      column->RadioButtonUpdated(list, oldVal);
+      column->RadioButtonUpdated(list, oldVal, time);
 }
 
 void Beats::OnTimeEvent(double time)
@@ -174,13 +173,13 @@ bool Beats::MouseMoved(float x, float y)
    return false;
 }
 
-void Beats::ButtonClicked(ClickButton* button)
+void Beats::ButtonClicked(ClickButton* button, double time)
 {
    for (BeatColumn* column : mBeatColumns)
-      column->ButtonClicked(button);
+      column->ButtonClicked(button, time);
 }
 
-void Beats::CheckboxUpdated(Checkbox* checkbox)
+void Beats::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -192,11 +191,11 @@ void Beats::GetModuleDimensions(float& width, float& height)
       height = MAX(height, 132 + 15 * (mBeatColumns[i]->GetNumSamples() + 1));
 }
 
-void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void Beats::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Beats::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -209,7 +208,6 @@ void Beats::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Beats::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void Beats::SetUpFromSaveData()
@@ -301,10 +299,10 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
          for (int ch = 0; ch < numChannels; ++ch)
          {
             float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
-            double time = gTime;
+            double channelTime = time;
             for (int i = 0; i < bufferSize; ++i)
             {
-               float filter = mFilterRamp.Value(time);
+               float filter = mFilterRamp.Value(channelTime);
 
                mLowpass[ch].SetFilterParams(ofMap(sqrtf(ofClamp(-filter, 0, 1)), 0, 1, 6000, 80), sqrt(2) / 2);
                mHighpass[ch].SetFilterParams(ofMap(ofClamp(filter, 0, 1), 0, 1, 10, 6000), sqrt(2) / 2);
@@ -324,7 +322,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
 
                sample *= volSq * panGain;
                buffer->GetChannel(ch)[i] += sample;
-               time += gInvSampleRateMs;
+               channelTime += gInvSampleRateMs;
             }
          }
       }
@@ -422,7 +420,7 @@ void BeatColumn::AddBeat(Sample* sample)
    mSamples.push_back(newSample);
 }
 
-void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal)
+void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal, double time)
 {
    if (list == mSelector)
    {
@@ -431,7 +429,7 @@ void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal)
    }
 }
 
-void BeatColumn::ButtonClicked(ClickButton* button)
+void BeatColumn::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mDeleteButton)
    {

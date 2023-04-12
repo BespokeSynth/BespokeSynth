@@ -3,6 +3,7 @@
 
 #undef LoadString //undo some junk from a windows define
 
+#include <limits>
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
 #include "TextEntry.h"
@@ -14,6 +15,7 @@
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
 #include "Minimap.h"
+#include <thread>
 
 #ifdef BESPOKE_LINUX
 #include <climits>
@@ -43,6 +45,8 @@ class QuickSpawnMenu;
 class ADSRDisplay;
 class UserPrefsEditor;
 class Minimap;
+class ScriptWarningPopup;
+class NoteOutputQueue;
 
 enum LogEventType
 {
@@ -62,9 +66,10 @@ public:
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
 
+   bool IsEnabled() const override { return false; }
+
 private:
    void DrawModule() override {}
-   bool Enabled() const override { return false; }
 };
 
 class ModularSynth
@@ -105,7 +110,7 @@ public:
 
    bool IsReady();
    bool IsAudioPaused() const { return mAudioPaused; }
-   void ToggleAudioPaused() { mAudioPaused = !mAudioPaused; }
+   void SetAudioPaused(bool paused) { mAudioPaused = paused; }
 
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
@@ -166,6 +171,7 @@ public:
    void SetUIScale(float scale) { mUILayerModuleContainer.SetDrawScale(scale); }
    float GetUIScale() { return mUILayerModuleContainer.GetDrawScale(); }
    ModuleContainer* GetRootContainer() { return &mModuleContainer; }
+   ModuleContainer* GetUIContainer() { return &mUILayerModuleContainer; }
    bool ShouldShowGridSnap() const;
    bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
 
@@ -204,6 +210,7 @@ public:
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
    const std::vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
    bool ShouldAccentuateActiveModules() const;
+   bool ShouldDimModule(IDrawableModule* module);
    LocationZoomer* GetLocationZoomer() { return &mZoomer; }
    IDrawableModule* GetModuleAtCursor(int offsetX = 0, int offsetY = 0);
 
@@ -228,6 +235,8 @@ public:
    float GetFrameRate() const { return mFrameRate; }
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
+   static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
+   NoteOutputQueue* GetNoteOutputQueue() { return mNoteOutputQueue; }
 
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
    void SetUpModule(IDrawableModule* module, const ofxJSONElement& moduleInfo);
@@ -257,6 +266,7 @@ public:
    void SaveStatePopup();
    void LoadStatePopup();
    void ToggleQuickSpawn();
+   QuickSpawnMenu* GetQuickSpawn() { return mQuickSpawn; }
    double GetLastSaveTime() { return mLastSaveTime; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
@@ -277,7 +287,8 @@ public:
    static float sBackgroundB;
 
    static int sLoadingFileSaveStateRev;
-   static constexpr int kSaveStateRev = 423;
+   static int sLastLoadedFileSaveStateRev;
+   static constexpr int kSaveStateRev = 425;
 
 private:
    void ResetLayout();
@@ -290,58 +301,54 @@ private:
    void DeleteAllModules();
    void TriggerClapboard();
    void DoAutosave();
+   void FindCircularDependencies();
+   bool FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom);
+   void ClearCircularDependencyMarkers();
 
    void ReadClipboardTextFromSystem();
 
-   int mIOBufferSize;
+   int mIOBufferSize{ 0 };
 
    std::vector<IAudioSource*> mSources;
    std::vector<IDrawableModule*> mLissajousDrawers;
    std::vector<IDrawableModule*> mDeletedModules;
+   bool mHasCircularDependency{ false };
 
    std::vector<IDrawableModule*> mModalFocusItemStack;
 
-   IDrawableModule* mMoveModule;
-   int mMoveModuleOffsetX;
-   int mMoveModuleOffsetY;
+   IDrawableModule* mMoveModule{ nullptr };
+   int mMoveModuleOffsetX{ 0 };
+   int mMoveModuleOffsetY{ 0 };
    bool mMoveModuleCanStickToCursor{ false }; //if the most current mMoveModule can stick to the cursor if you release the mouse button before moving it
 
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
-   bool mIsMousePanning;
+   bool mIsMousePanning{ false };
    std::array<bool, 5> mIsMouseButtonHeld{ false };
    struct SpaceMouseInfo
    {
-      SpaceMouseInfo()
-      : mTwist(0)
-      , mZoom(0)
-      , mPan(0, 0)
-      , mUsingTwist(false)
-      , mUsingZoom(false)
-      , mUsingPan(false)
-      {}
-      float mTwist;
-      float mZoom;
-      ofVec2f mPan;
-      bool mUsingTwist;
-      bool mUsingZoom;
-      bool mUsingPan;
+      float mTwist{ 0 };
+      float mZoom{ 0 };
+      ofVec2f mPan{ 0, 0 };
+      bool mUsingTwist{ false };
+      bool mUsingZoom{ false };
+      bool mUsingPan{ false };
    };
    SpaceMouseInfo mSpaceMouseInfo;
 
-   char mConsoleText[MAX_TEXTENTRY_LENGTH];
-   TextEntry* mConsoleEntry;
-   ConsoleListener* mConsoleListener;
+   char mConsoleText[MAX_TEXTENTRY_LENGTH]{ 0 };
+   TextEntry* mConsoleEntry{ nullptr };
+   ConsoleListener* mConsoleListener{ nullptr };
 
    std::vector<MidiDevice*> mMidiDevices;
 
    LocationZoomer mZoomer;
-   QuickSpawnMenu* mQuickSpawn;
-   std::unique_ptr<Minimap> mMinimap;
-   UserPrefsEditor* mUserPrefsEditor;
+   QuickSpawnMenu* mQuickSpawn{ nullptr };
+   std::unique_ptr<Minimap> mMinimap{ nullptr };
+   UserPrefsEditor* mUserPrefsEditor{ nullptr };
 
-   RollingBuffer* mGlobalRecordBuffer;
-   long long mRecordingLength;
+   RollingBuffer* mGlobalRecordBuffer{ nullptr };
+   long long mRecordingLength{ 0 };
 
    struct LogEventItem
    {
@@ -350,51 +357,52 @@ private:
       , text(_text)
       , type(_type)
       {}
-      double time;
+      double time{ 0 };
       std::string text;
-      LogEventType type;
+      LogEventType type{ LogEventType::kLogEventType_Verbose };
    };
    std::list<LogEventItem> mEvents;
    std::list<std::string> mErrors;
 
    NamedMutex mAudioThreadMutex;
+   static std::thread::id sAudioThreadId;
+   NoteOutputQueue* mNoteOutputQueue{ nullptr };
 
-   bool mAudioPaused;
-   bool mIsLoadingState;
+   bool mAudioPaused{ false };
+   bool mIsLoadingState{ false };
+   bool mArrangeDependenciesWhenLoadCompletes{ false };
 
    ModuleFactory mModuleFactory;
    EffectFactory mEffectFactory;
 
-   int mClickStartX; //to detect click and release in place
-   int mClickStartY;
+   int mClickStartX{ std::numeric_limits<int>::max() }; //to detect click and release in place
+   int mClickStartY{ std::numeric_limits<int>::max() };
    bool mMouseMovedSignificantlySincePressed{ true };
    bool mLastClickWasEmptySpace{ false };
    bool mIsShiftPressed{ false };
    double mLastShiftPressTime{ -9999 };
 
    std::string mLoadedLayoutPath;
-   bool mWantReloadInitialLayout;
+   bool mWantReloadInitialLayout{ false };
    std::string mCurrentSaveStatePath;
    std::string mStartupSaveStateFile;
-   double mLastSaveTime;
+   double mLastSaveTime{ -9999 };
 
-   Sample* mHeldSample;
+   Sample* mHeldSample{ nullptr };
 
-   float* mSaveOutputBuffer[2];
-
-   IDrawableModule* mLastClickedModule;
-   bool mInitialized;
+   IDrawableModule* mLastClickedModule{ nullptr };
+   bool mInitialized{ false };
 
    ofRectangle mDrawRect;
 
    std::vector<IDrawableModule*> mGroupSelectedModules;
-   ModuleContainer* mGroupSelectContext;
-   bool mHasDuplicatedDuringDrag;
-   bool mHasAutopatchedToTargetDuringDrag;
+   ModuleContainer* mGroupSelectContext{ nullptr };
+   bool mHasDuplicatedDuringDrag{ false };
+   bool mHasAutopatchedToTargetDuringDrag{ false };
 
-   IDrawableModule* mResizeModule;
+   IDrawableModule* mResizeModule{ nullptr };
 
-   bool mShowLoadStatePopup;
+   bool mShowLoadStatePopup{ false };
 
    std::vector<PatchCable*> mPatchCables;
 
@@ -405,19 +413,19 @@ private:
    std::string mNextDrawTooltip;
    bool mHideTooltipsUntilMouseMove{ false };
 
-   juce::AudioDeviceManager* mGlobalAudioDeviceManager;
-   juce::AudioFormatManager* mGlobalAudioFormatManager;
-   juce::Component* mMainComponent;
-   juce::OpenGLContext* mOpenGLContext;
+   juce::AudioDeviceManager* mGlobalAudioDeviceManager{ nullptr };
+   juce::AudioFormatManager* mGlobalAudioFormatManager{ nullptr };
+   juce::Component* mMainComponent{ nullptr };
+   juce::OpenGLContext* mOpenGLContext{ nullptr };
 
    std::recursive_mutex mRenderLock;
-   float mFrameRate;
-   long mFrameCount;
+   float mFrameRate{ 0 };
+   long mFrameCount{ 0 };
 
    ModuleContainer mModuleContainer;
    ModuleContainer mUILayerModuleContainer;
 
-   ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay;
+   ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay{ nullptr };
 
    bool mIsLoadingModule{ false };
    bool mIsDuplicatingModule{ false };
@@ -426,9 +434,9 @@ private:
 
    std::string mFatalError;
 
-   double mLastClapboardTime;
+   double mLastClapboardTime{ -9999 };
 
-   double mPixelRatio;
+   double mPixelRatio{ 1 };
 
    std::vector<float*> mInputBuffers;
    std::vector<float*> mOutputBuffers;

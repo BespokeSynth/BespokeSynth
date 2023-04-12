@@ -71,10 +71,10 @@ void PitchRemap::DrawModule()
    }
 }
 
-void PitchRemap::CheckboxUpdated(Checkbox* checkbox)
+void PitchRemap::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void PitchRemap::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -117,7 +117,7 @@ void PitchRemap::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 void PitchRemap::TextEntryComplete(TextEntry* entry)
 {
    //TODO(Ryan) make this handle mappings changing while notes are input
-   mNoteOutput.Flush(gTime + gBufferSizeMs);
+   mNoteOutput.Flush(NextBufferTime(false));
 }
 
 void PitchRemap::LoadLayout(const ofxJSONElement& moduleInfo)

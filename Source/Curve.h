@@ -84,13 +84,13 @@ private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
    int FindIndexForTime(float time);
    std::array<CurvePoint, 5000> mPoints;
-   int mNumCurvePoints;
+   int mNumCurvePoints{ 0 };
    float mWidth{ 200 };
    float mHeight{ 20 };
-   float mStart;
-   float mEnd;
-   ofColor mColor;
-   int mLastEvalIndex;
+   float mStart{ 0 };
+   float mEnd{ 1 };
+   ofColor mColor{ ofColor::white };
+   int mLastEvalIndex{ 0 };
 };
 
 #endif /* defined(__Bespoke__Curve__) */

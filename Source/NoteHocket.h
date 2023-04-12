@@ -41,21 +41,25 @@ class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableMod
 public:
    NoteHocket();
    static IDrawableModule* Create() { return new NoteHocket(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -65,7 +69,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return true; }
 
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
    void Reseed();
@@ -73,7 +76,7 @@ private:
 
    static const int kMaxDestinations = 16;
    int mNumDestinations{ 5 };
-   float mWeight[kMaxDestinations];
+   float mWeight[kMaxDestinations]{};
    FloatSlider* mWeightSlider[kMaxDestinations]{ nullptr };
    std::vector<AdditionalNoteCable*> mDestinationCables;
    float mWidth{ 200 };

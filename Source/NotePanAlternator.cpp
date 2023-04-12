@@ -31,11 +31,6 @@
 #include "ModularSynth.h"
 
 NotePanAlternator::NotePanAlternator()
-: mPanOne(-1)
-, mPanOneSlider(nullptr)
-, mPanTwo(1)
-, mPanTwoSlider(nullptr)
-, mFlip(false)
 {
 }
 

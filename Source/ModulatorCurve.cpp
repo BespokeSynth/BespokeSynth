@@ -37,13 +37,11 @@ namespace
 }
 
 ModulatorCurve::ModulatorCurve()
-: mInput(0)
-, mEnvelopeControl(ofVec2f(3, 19), ofVec2f(100, 100))
-, mInputSlider(nullptr)
 {
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);
    mEnvelopeControl.SetFixedLengthMode(true);
+   mAdsr.GetFreeReleaseLevel() = true;
    mAdsr.SetNumStages(2);
    mAdsr.GetHasSustainStage() = false;
    mAdsr.GetStageData(0).target = 0;
@@ -80,17 +78,15 @@ void ModulatorCurve::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 {
    OnModulatorRepatch();
 
-   if (mSliderTarget)
-      mInput = mSliderTarget->GetValue();
+   if (GetSliderTarget() && fromUserClick)
+      mInput = GetSliderTarget()->GetValue();
 }
 
 float ModulatorCurve::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   mAdsr.Clear();
-   mAdsr.Start(0, 1);
-   mAdsr.Stop(kAdsrTime);
-   float val = ofClamp(mAdsr.Value(mInput * kAdsrTime), 0, 1);
+   ADSR::EventInfo adsrEvent(0, kAdsrTime);
+   float val = ofClamp(mAdsr.Value(mInput * kAdsrTime, &adsrEvent), 0, 1);
    if (val != val)
       val = 0;
    return ofLerp(GetMin(), GetMax(), val);
@@ -121,7 +117,6 @@ bool ModulatorCurve::MouseMoved(float x, float y)
 
 void ModulatorCurve::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModulatorCurve::LoadLayout(const ofxJSONElement& moduleInfo)

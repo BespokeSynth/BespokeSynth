@@ -37,6 +37,9 @@ public:
    HelpDisplay();
    virtual ~HelpDisplay();
    static IDrawableModule* Create() { return new HelpDisplay(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    bool IsSaveable() override { return false; }
    bool HasTitleBar() const override { return false; }
@@ -48,18 +51,19 @@ public:
    std::string GetModuleTooltip(IDrawableModule* module);
    std::string GetModuleTooltipFromName(std::string moduleTypeName);
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void ScreenshotModule(IDrawableModule* module);
 
    static bool sShowTooltips;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
@@ -84,21 +88,21 @@ private:
    UIControlTooltipInfo* FindControlInfo(IUIControl* control);
 
    std::vector<std::string> mHelpText;
-   Checkbox* mShowTooltipsCheckbox;
-   ClickButton* mCopyBuildInfoButton;
-   ClickButton* mDumpModuleInfoButton;
-   ClickButton* mDoModuleScreenshotsButton;
-   ClickButton* mDoModuleDocumentationButton;
-   ClickButton* mTutorialVideoLinkButton;
-   ClickButton* mDocsLinkButton;
-   ClickButton* mDiscordLinkButton;
-   float mWidth;
-   float mHeight;
+   Checkbox* mShowTooltipsCheckbox{ nullptr };
+   ClickButton* mCopyBuildInfoButton{ nullptr };
+   ClickButton* mDumpModuleInfoButton{ nullptr };
+   ClickButton* mDoModuleScreenshotsButton{ nullptr };
+   ClickButton* mDoModuleDocumentationButton{ nullptr };
+   ClickButton* mTutorialVideoLinkButton{ nullptr };
+   ClickButton* mDocsLinkButton{ nullptr };
+   ClickButton* mDiscordLinkButton{ nullptr };
+   float mWidth{ 700 };
+   float mHeight{ 700 };
    static bool sTooltipsLoaded;
    static std::list<ModuleTooltipInfo> sTooltips;
 
    std::list<ModuleFactory::Spawnable> mScreenshotsToProcess;
-   IDrawableModule* mScreenshotModule;
+   IDrawableModule* mScreenshotModule{ nullptr };
 
    float mScrollOffsetY{ 0 };
    float mMaxScrollAmount{ 0 };

@@ -53,6 +53,13 @@ void CanvasControls::CreateUIControls()
 
    mNumVisibleRowsEntry->DrawLabel(true);
 
+   // Block modulator cables from connecting to these controls.
+   mRemoveElementButton->SetCableTargetable(false);
+   mNumVisibleRowsEntry->SetCableTargetable(false);
+   mClearButton->SetCableTargetable(false);
+   mDragModeSelector->SetCableTargetable(false);
+   mNumVisibleRowsEntry->SetCableTargetable(false);
+
    SetElement(nullptr);
 }
 
@@ -122,30 +129,30 @@ void CanvasControls::GetModuleDimensions(float& width, float& height)
    height = 92;
 }
 
-void CanvasControls::CheckboxUpdated(Checkbox* checkbox)
+void CanvasControls::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (auto* element : mCanvas->GetElements())
    {
       if (element->GetHighlighted())
-         element->CheckboxUpdated(checkbox->Name(), checkbox->GetValue() > 0);
+         element->CheckboxUpdated(checkbox->Name(), checkbox->GetValue() > 0, time);
    }
 }
 
-void CanvasControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void CanvasControls::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    for (auto* element : mCanvas->GetElements())
    {
       if (element->GetHighlighted())
-         element->FloatSliderUpdated(slider->Name(), oldVal, slider->GetValue());
+         element->FloatSliderUpdated(slider->Name(), oldVal, slider->GetValue(), time);
    }
 }
 
-void CanvasControls::IntSliderUpdated(IntSlider* slider, int oldVal)
+void CanvasControls::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    for (auto* element : mCanvas->GetElements())
    {
       if (element->GetHighlighted())
-         element->IntSliderUpdated(slider->Name(), oldVal, slider->GetValue());
+         element->IntSliderUpdated(slider->Name(), oldVal, slider->GetValue(), time);
    }
 }
 
@@ -158,7 +165,7 @@ void CanvasControls::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void CanvasControls::ButtonClicked(ClickButton* button)
+void CanvasControls::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRemoveElementButton)
    {
@@ -189,7 +196,7 @@ void CanvasControls::ButtonClicked(ClickButton* button)
    for (auto* element : elements)
    {
       if (element->GetHighlighted())
-         element->ButtonClicked(button->Name());
+         element->ButtonClicked(button->Name(), time);
    }
 }
 

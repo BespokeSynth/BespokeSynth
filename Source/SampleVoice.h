@@ -64,7 +64,7 @@ private:
    ::ADSR mAdsr;
    SampleVoiceParams* mVoiceParams{};
    float mPos{ 0 };
-   IDrawableModule* mOwner;
+   IDrawableModule* mOwner{ nullptr };
 };
 
 #endif /* defined(__modularSynth__SampleVoice__) */

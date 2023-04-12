@@ -1,0 +1,100 @@
+When a midicontroller module set to "osccontroller" is placed in your patch, Bespoke supports OSC in various ways.
+
+Direct control addressing:
+	address: /bespoke/control/<control path>
+	parameters: [f] or [i] or [s]
+		This will attempt to write the value provided directly to the UI control's path.
+		The <control path> should be a path like shown in the top left of Bespoke when hovering over a control. (tilde-separated)
+		Use URL escaping to represent spaces (i.e., add "%20" instead of a space)
+	example: /bespoke/control/notesequencer~length 4
+	example: /bespoke/control/sampleplayer~cue%20len 5.3
+
+Direct control addressing scaled:
+	address: /bespoke/control_scaled/<control path>
+	parameters: [f] or [i] or [s]
+		This will attempt to write the value provided directly to the UI control's path while scaling the value to within the min and max of the control.
+		The <control path> should be a path like shown in the top left of Bespoke when hovering over a control. (tilde-separated)
+		Use URL escaping to represent spaces (i.e., add "%20" instead of a space)
+		The the value is expected to be between 0 and 1.
+	example: /bespoke/control_scaled/looper~offset .3
+	example: /bespoke/control_scaled/sampleplayer~cue%20len .2
+
+Notes:
+	address: /bespoke/note
+	parameters: [f, f] or [i, f, f]
+		The second to last parameter is the note number corresponding to the standard midi notes.
+		The last parameter is the velocity of the note.
+		If three parameters are provided the first integer parameter will denote the note "channel".
+	example: /bespoke/note 60 127
+
+Location store:
+	address: /bespoke/location/store
+	parameters: [f] or [i]
+		Will save and overwrite the current viewports location and zoom into the specified location slot.
+	Notes:
+		These are the same location bookmarks used by the minimap.
+		There is a limit of 10 location bookmarks (0 to 9).
+	example: /bespoke/location/store 1
+
+Location recall:
+	address: /bespoke/location/recall
+	parameters: [f] or [i]
+		Will try to recall the specified viewport location.
+	Notes:
+		These are the same location bookmarks used by the minimap.
+		There is a limit of 10 location bookmarks (0 to 9).
+	example: /bespoke/location/recall 1
+
+Direct module control:
+	Sending notes directly to a module:
+		address: /bespoke/module/note/<module name>
+		parameters: [f, f] or [i, i]
+			The first parameter is the note number corresponding to the standard midi notes.
+			The second parameter is the velocity of the note.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+		example: /bespoke/module/note/oscillator2 60 127
+
+	Sending pulses directly to a module:
+		address: /bespoke/module/pulse/<module name>
+		parameters: [f] or [i]
+			The first parameter is the velocity of the pulse.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+			The velocity for pulses is in the range of 0 and 1.
+		example: /bespoke/module/pulse/notesequencer 1
+		example: /bespoke/module/pulse/pulsesequence .7
+
+	(Un-)Minimizing a module:
+		address: /bespoke/module/pulse/<module name>
+		parameters: [f] or [i]
+			If the first parameter is 0 the module will be minimized.
+			If the first parameter is 1 the module will be un-minimized.
+			If the first parameter is -1 the module will toggle its minimized state.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+		example: /bespoke/module/minimize/notesequencer -1
+
+	Enabling or disabling a module:
+		address: /bespoke/module/enable/<module name>
+		parameters: [f] or [i]
+			If the first parameter is 0 the module will be disabled.
+			If the first parameter is 1 the module will be enabled.
+			If the first parameter is -1 the module will toggle its enabled state.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+	example: /bespoke/module/enable/notesequencer -1
+	
+	View and zoom to a module:
+		address: /bespoke/module/focus/<module name>
+		parameters: [f] or [i]
+			If the first parameter is greater than 0.1 the zoom will be set to this.
+			If the first parameter is between -0.1 and 0.1 the zoom will be set to view the entire module.
+			If the first parameter is less than -0.1 zoom will be left as it was.
+			Regardless of the first parameter the view will be moved so that the module is in the center of the screen.
+		Notes:
+			The <module name> should be the URL escaped name of the module.
+	example: /bespoke/module/focus/midicontroller -1
+	
+	
+Any other addresses with parameters of type integer or float will be automapped to CC's in the midicontroller interface.

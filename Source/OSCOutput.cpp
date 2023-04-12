@@ -142,7 +142,7 @@ void OSCOutput::GetModuleDimensions(float& w, float& h)
    h = mHeight;
 }
 
-void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    char address[120];
    address[0] = 0;
@@ -185,5 +185,4 @@ void OSCOutput::SetUpFromSaveData()
 
 void OSCOutput::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }

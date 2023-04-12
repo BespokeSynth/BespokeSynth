@@ -32,10 +32,6 @@
 #include "MathUtils.h"
 
 ModulatorSmoother::ModulatorSmoother()
-: mInput(0)
-, mSmooth(.1f)
-, mInputSlider(nullptr)
-, mSmoothSlider(nullptr)
 {
 }
 
@@ -77,11 +73,11 @@ void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource, bool fromUser
 {
    OnModulatorRepatch();
 
-   if (mSliderTarget)
+   if (GetSliderTarget() && fromUserClick)
    {
-      mInput = mSliderTarget->GetValue();
-      mInputSlider->SetExtents(mSliderTarget->GetMin(), mSliderTarget->GetMax());
-      mInputSlider->SetMode(mSliderTarget->GetMode());
+      mInput = GetSliderTarget()->GetValue();
+      mInputSlider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
+      mInputSlider->SetMode(GetSliderTarget()->GetMode());
    }
 }
 
@@ -98,7 +94,6 @@ float ModulatorSmoother::Value(int samplesIn)
 
 void ModulatorSmoother::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void ModulatorSmoother::LoadLayout(const ofxJSONElement& moduleInfo)

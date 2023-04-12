@@ -38,6 +38,9 @@ public:
    OutputChannel();
    virtual ~OutputChannel();
    static IDrawableModule* Create() { return new OutputChannel(); }
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -47,10 +50,12 @@ public:
    //IAudioSource
    void Process(double time) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -60,7 +65,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return true; }
 
    int GetNumChannels() const { return mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2; }
 

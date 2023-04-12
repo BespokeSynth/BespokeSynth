@@ -38,7 +38,9 @@ public:
    FourOnTheFloor();
    ~FourOnTheFloor();
    static IDrawableModule* Create() { return new FourOnTheFloor(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
    void Init() override;
@@ -48,10 +50,12 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
@@ -61,11 +65,10 @@ private:
       width = 120;
       height = 22;
    }
-   bool Enabled() const override { return mEnabled; }
 
 
-   bool mTwoOnTheFloor;
-   Checkbox* mTwoOnTheFloorCheckbox;
+   bool mTwoOnTheFloor{ false };
+   Checkbox* mTwoOnTheFloorCheckbox{ nullptr };
 };
 
 #endif /* defined(__modularSynth__FourOnTheFloor__) */

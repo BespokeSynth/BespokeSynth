@@ -40,7 +40,9 @@ class NoteExpressionRouter : public INoteReceiver, public INoteSource, public ID
 public:
    NoteExpressionRouter();
    static IDrawableModule* Create() { return new NoteExpressionRouter(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -53,6 +55,8 @@ public:
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -61,7 +65,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return true; }
 
    static const int kMaxDestinations = 5;
    AdditionalNoteCable* mDestinationCables[kMaxDestinations]{ nullptr };

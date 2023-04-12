@@ -31,20 +31,16 @@
 #include "UIControlMacros.h"
 #include "MathUtils.h"
 
-namespace
-{
-   const float kEarlyOffsetMs = 10;
-}
-
 RadioSequencer::RadioSequencer()
 {
+   mTransportPriority = 0;
 }
 
 void RadioSequencer::Init()
 {
    IDrawableModule::Init();
 
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(kEarlyOffsetMs, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
 }
 
 RadioSequencer::~RadioSequencer()
@@ -90,6 +86,7 @@ void RadioSequencer::CreateUIControls()
 
 void RadioSequencer::Poll()
 {
+   UpdateGridLights();
 }
 
 void RadioSequencer::OnControllerPageSelected()
@@ -100,12 +97,20 @@ void RadioSequencer::OnControllerPageSelected()
 void RadioSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
    if (velocity > 0)
-      mGrid->SetVal(x, y, 1);
+   {
+      float currentVal = mGrid->GetVal(x, y);
+      mGrid->SetVal(x, y, currentVal > 0 ? 0 : 1);
+   }
    UpdateGridLights();
 }
 
 void RadioSequencer::UpdateGridLights()
 {
+   bool blinkOn = true;
+   TransportListenerInfo transportInfo(this, kInterval_16n, OffsetInfo(0, false), false);
+   if (TheTransport->GetQuantized(gTime, &transportInfo) % 2 == 1)
+      blinkOn = false;
+
    if (mGridControlTarget->GetGridController())
    {
       for (int row = 0; row < mGrid->GetRows(); ++row)
@@ -114,8 +119,8 @@ void RadioSequencer::UpdateGridLights()
          {
             if (mGrid->GetVal(col, row) == 1)
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Bright);
-            else if (col == mGrid->GetHighlightCol(gTime + gBufferSizeMs + TheTransport->GetEventLookaheadMs()))
-               mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Dim);
+            else if (col == mGrid->GetHighlightCol(NextBufferTime(true)))
+               mGridControlTarget->GetGridController()->SetLight(col, row, blinkOn ? GridColor::kGridColor1Dim : GridColor::kGridColorOff);
             else
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColorOff);
          }
@@ -172,13 +177,13 @@ void RadioSequencer::Step(double time, int pulseFlags)
             if (mGrid->GetVal(mStep, i) > 0)
                controlsToEnable.push_back(uicontrol);
             else
-               uicontrol->SetValue(0);
+               uicontrol->SetValue(0, time);
          }
       }
    }
 
    for (auto* control : controlsToEnable)
-      control->SetValue(1);
+      control->SetValue(1, time);
 
    UpdateGridLights();
 }
@@ -278,7 +283,26 @@ void RadioSequencer::SyncControlCablesToGrid()
    }
 }
 
-void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void RadioSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
+{
+   if (checkbox == mEnabledCheckbox)
+   {
+      if (!mEnabled && mDisableAllWhenDisabled)
+      {
+         for (int i = 0; i < mControlCables.size(); ++i)
+         {
+            for (auto* cable : mControlCables[i]->GetPatchCables())
+            {
+               IUIControl* uicontrol = dynamic_cast<IUIControl*>(cable->GetTarget());
+               if (uicontrol)
+                  uicontrol->SetValue(0, time);
+            }
+         }
+      }
+   }
+}
+
+void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -288,7 +312,7 @@ void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void RadioSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+void RadioSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -333,13 +357,13 @@ void RadioSequencer::SetGridSize(float w, float h)
 
 void RadioSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("one_per_column_mode", moduleInfo, true);
    mModuleSaveData.LoadInt("num_rows", moduleInfo, 8, 1, 16, false);
+   mModuleSaveData.LoadBool("disable_all_when_disabled", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -348,6 +372,7 @@ void RadioSequencer::SetUpFromSaveData()
 {
    mGrid->SetSingleColumnMode(mModuleSaveData.GetBool("one_per_column_mode"));
    mGrid->SetGrid(mLength, mModuleSaveData.GetInt("num_rows"));
+   mDisableAllWhenDisabled = mModuleSaveData.GetBool("disable_all_when_disabled");
    SyncControlCablesToGrid();
 }
 

@@ -35,13 +35,17 @@ class ChordDisplayer : public NoteEffectBase, public IDrawableModule
 public:
    ChordDisplayer();
    static IDrawableModule* Create() { return new ChordDisplayer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
@@ -51,5 +55,4 @@ private:
       width = 200;
       height = 20;
    }
-   bool Enabled() const override { return true; }
 };

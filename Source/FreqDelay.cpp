@@ -30,8 +30,6 @@
 
 FreqDelay::FreqDelay()
 : IAudioProcessor(gBufferSize)
-, mDryWet(1)
-, mDryWetSlider(nullptr)
 , mDryBuffer(gBufferSize)
 {
    AddChild(&mDelayEffect);
@@ -101,7 +99,7 @@ void FreqDelay::DrawModule()
    mDryWetSlider->Draw();
 }
 
-void FreqDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FreqDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 

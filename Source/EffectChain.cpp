@@ -68,7 +68,8 @@ void EffectChain::Init()
 
 void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
 {
-   assert(mEffects.size() < MAX_EFFECTS_IN_CHAIN - 1);
+   if (mEffects.size() >= MAX_EFFECTS_IN_CHAIN)
+      return;
 
    IAudioEffect* effect = TheSynth->GetEffectFactory()->MakeEffect(type);
    if (effect == nullptr)
@@ -85,8 +86,8 @@ void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
    if (onTheFly)
    {
       ofxJSONElement empty;
-      effect->LoadLayout(empty);
-      effect->SetUpFromSaveData();
+      effect->LoadLayoutBase(empty);
+      effect->SetUpFromSaveDataBase();
    }
 
    if (mInitialized) //if we've already been initialized, call init on this
@@ -102,11 +103,16 @@ void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
 
    EffectControls controls;
    controls.mMoveLeftButton = new ClickButton(this, "<", 0, 0);
+   controls.mMoveLeftButton->SetCableTargetable(false);
    controls.mMoveRightButton = new ClickButton(this, ">", 0, 0);
+   controls.mMoveRightButton->SetCableTargetable(false);
    controls.mDeleteButton = new ClickButton(this, "x", 0, 0);
+   controls.mDeleteButton->SetCableTargetable(false);
    controls.mDryWetSlider = new FloatSlider(this, ("mix" + ofToString(mEffects.size() - 1)).c_str(), 0, 0, 60, 13, dryWet, 0, 1, 2);
+   controls.mDryWetSlider->SetCableTargetable(false);
    controls.mPush2DisplayEffectButton = new ClickButton(this, ("edit " + name).c_str(), 0, 0);
    controls.mPush2DisplayEffectButton->SetShowing(false);
+   controls.mPush2DisplayEffectButton->SetCableTargetable(false);
    mEffectControls.push_back(controls);
 }
 
@@ -461,7 +467,7 @@ void EffectChain::UpdateReshuffledDryWetSliders()
    }
 }
 
-void EffectChain::ButtonClicked(ClickButton* button)
+void EffectChain::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSpawnEffectButton)
    {
@@ -492,15 +498,15 @@ void EffectChain::ButtonClicked(ClickButton* button)
    }
 }
 
-void EffectChain::CheckboxUpdated(Checkbox* checkbox)
+void EffectChain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EffectChain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EffectChain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void EffectChain::DropdownUpdated(DropdownList* list, int oldVal)
+void EffectChain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mEffectSpawnList)
    {
@@ -562,7 +568,7 @@ void EffectChain::LoadLayout(const ofxJSONElement& moduleInfo)
       {
          std::string type = effects[i]["type"].asString();
          assert(mEffects[i]->GetType() == type);
-         mEffects[i]->LoadLayout(effects[i]);
+         mEffects[i]->LoadLayoutBase(effects[i]);
       }
       catch (Json::LogicError& e)
       {
@@ -580,18 +586,16 @@ void EffectChain::SetUpFromSaveData()
    mShowSpawnList = mModuleSaveData.GetBool("showspawnlist");
 
    for (int i = 0; i < mEffects.size(); ++i)
-      mEffects[i]->SetUpFromSaveData();
+      mEffects[i]->SetUpFromSaveDataBase();
 }
 
 void EffectChain::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    moduleInfo["effects"].resize((unsigned int)mEffects.size());
    for (int i = 0; i < mEffects.size(); ++i)
    {
       ofxJSONElement save;
-      mEffects[i]->SaveLayout(save);
+      mEffects[i]->SaveLayoutBase(save);
       moduleInfo["effects"][i] = save;
       moduleInfo["effects"][i]["type"] = mEffects[i]->GetType();
    }

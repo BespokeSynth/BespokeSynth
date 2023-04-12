@@ -33,9 +33,6 @@ using namespace juce;
 
 MidiDevice::MidiDevice(MidiDeviceListener* listener)
 : mListener(listener)
-, mMidiOut(nullptr)
-, mOutputChannel(1)
-, mIsInputEnabled(false)
 {
 }
 

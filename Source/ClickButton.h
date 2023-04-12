@@ -34,7 +34,7 @@ class IButtonListener
 {
 public:
    virtual ~IButtonListener() {}
-   virtual void ButtonClicked(ClickButton* button) = 0;
+   virtual void ButtonClicked(ClickButton* button, double time) = 0;
 };
 
 enum class ButtonDisplayStyle
@@ -48,7 +48,10 @@ enum class ButtonDisplayStyle
    kSampleIcon,
    kFolderIcon,
    kArrowRight,
-   kArrowLeft
+   kArrowLeft,
+   kPlus,
+   kMinus,
+   kHamburger
 };
 
 class ClickButton : public IUIControl
@@ -69,12 +72,13 @@ public:
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
-   void SetValue(float value) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetValue(float value, double time) override;
    float GetValue() const override { return GetMidiValue(); }
    float GetMidiValue() const override;
    std::string GetDisplayValue(float val) const override;
    int GetNumValues() override { return 2; }
+   void Increment(float amount) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;
@@ -89,14 +93,15 @@ protected:
    ~ClickButton(); //protected so that it can't be created on the stack
 
 private:
+   void DoClick(double time);
    bool ButtonLit() const;
 
    void OnClicked(float x, float y, bool right) override;
-   float mWidth;
-   float mHeight;
-   double mClickTime;
-   IButtonListener* mOwner;
-   ButtonDisplayStyle mDisplayStyle;
+   float mWidth{ 20 };
+   float mHeight{ 15 };
+   double mClickTime{ -9999 };
+   IButtonListener* mOwner{ nullptr };
+   ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };
 };
 
 #endif /* defined(__modularSynth__ClickButton__) */

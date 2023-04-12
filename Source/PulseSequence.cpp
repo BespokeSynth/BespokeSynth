@@ -121,7 +121,7 @@ void PulseSequence::DrawModule()
    }
 }
 
-void PulseSequence::CheckboxUpdated(Checkbox* checkbox)
+void PulseSequence::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -218,15 +218,15 @@ bool PulseSequence::MouseScrolled(float x, float y, float scrollX, float scrollY
    return false;
 }
 
-void PulseSequence::ButtonClicked(ClickButton* button)
+void PulseSequence::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mAdvanceBackwardButton)
-      Step(1, 0, kPulseFlag_Backward);
+      Step(time, 0, kPulseFlag_Backward);
    if (button == mAdvanceForwardButton)
-      Step(1, 0, 0);
+      Step(time, 0, 0);
 }
 
-void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal)
+void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -236,11 +236,11 @@ void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void PulseSequence::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PulseSequence::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -285,7 +285,6 @@ void PulseSequence::LoadState(FileStreamIn& in, int rev)
 
 void PulseSequence::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void PulseSequence::LoadLayout(const ofxJSONElement& moduleInfo)

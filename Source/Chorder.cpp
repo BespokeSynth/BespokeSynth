@@ -33,13 +33,6 @@
 #include <cstring>
 
 Chorder::Chorder()
-: mVelocity(0)
-, mDiatonic(false)
-, mDiatonicCheckbox(nullptr)
-, mChordDropdown(nullptr)
-, mInversionDropdown(nullptr)
-, mChordIndex(0)
-, mInversion(0)
 {
    std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
    std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));
@@ -138,7 +131,7 @@ void Chorder::AddTone(int tone, float velocity)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(gTime + gBufferSizeMs, outPitch, mVelocity * velocity, -1, ModulationParameters());
+         PlayChorderNote(NextBufferTime(false), outPitch, mVelocity * velocity, -1, ModulationParameters());
       }
    }
 }
@@ -154,7 +147,7 @@ void Chorder::RemoveTone(int tone)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(gTime + gBufferSizeMs, outPitch, 0, -1, ModulationParameters());
+         PlayChorderNote(NextBufferTime(false), outPitch, 0, -1, ModulationParameters());
       }
    }
 }
@@ -187,11 +180,11 @@ void Chorder::OnScaleChanged()
    mChordGrid->SetGrid(mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3);
 }
 
-void Chorder::CheckboxUpdated(Checkbox* checkbox)
+void Chorder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime + gBufferSizeMs);
+      mNoteOutput.Flush(time);
       std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
       std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));
    }
@@ -204,7 +197,7 @@ void Chorder::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal)
+void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal, double time)
 {
    if (dropdown == mChordDropdown || dropdown == mInversionDropdown)
    {

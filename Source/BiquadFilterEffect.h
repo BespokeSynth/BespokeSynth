@@ -60,34 +60,35 @@ public:
 
    bool MouseMoved(float x, float y) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& info) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& info) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
 
    void ResetFilter();
 
-   RadioButton* mTypeSelector;
+   RadioButton* mTypeSelector{ nullptr };
 
-   FloatSlider* mFSlider;
-   FloatSlider* mQSlider;
-   FloatSlider* mGSlider;
-   bool mMouseControl;
+   FloatSlider* mFSlider{ nullptr };
+   FloatSlider* mQSlider{ nullptr };
+   FloatSlider* mGSlider{ nullptr };
+   bool mMouseControl{ false };
 
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
    ChannelBuffer mDryBuffer;
 
-   bool mCoefficientsHaveChanged;
+   bool mCoefficientsHaveChanged{ true };
 };
 
 #endif /* defined(__modularSynth__BiquadFilterEffect__) */

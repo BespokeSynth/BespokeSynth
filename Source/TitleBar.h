@@ -61,12 +61,12 @@ public:
 private:
    std::string mLabel;
    std::vector<ModuleFactory::Spawnable> mSpawnables;
-   int mSpawnIndex;
-   DropdownList* mSpawnList;
-   IDropdownListener* mOwner;
+   int mSpawnIndex{ -1 };
+   DropdownList* mSpawnList{ nullptr };
+   IDropdownListener* mOwner{ nullptr };
    ofVec2f mPos;
    ModuleCategory mModuleCategory;
-   bool mShowDecorators;
+   bool mShowDecorators{ false };
 };
 
 struct SpawnListManager
@@ -108,7 +108,7 @@ public:
       height = mHeight;
    }
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
 private:
    int mWidth{ 200 };
@@ -140,19 +140,20 @@ public:
 
    void OnWindowClosed() override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    static bool sShowInitialHelpOverlay;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
