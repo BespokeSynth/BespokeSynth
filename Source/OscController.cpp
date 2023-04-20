@@ -96,7 +96,7 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
    {
       if (control == mOscMap[i].mControl) // && mOscMap[i].mLastChangedTime + 50 < gTime)
       {
-         juce::OSCMessage msg(juce::URL::addEscapeChars(mOscMap[i].mAddress.c_str(), true, true));
+         juce::OSCMessage msg(mOscMap[i].mAddress.c_str());
 
          if (mOscMap[i].mIsFloat)
          {
