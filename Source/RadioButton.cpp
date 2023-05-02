@@ -273,14 +273,19 @@ float RadioButton::GetValueForMidiCC(float slider) const
    return mElements[index].mValue;
 }
 
-void RadioButton::SetValue(float value, double time)
+void RadioButton::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    if (mMultiSelect)
       value = *mVar ^ (1 << (int)value);
-   SetValueDirect(value, time);
+   SetValueDirect(value, time, forceUpdate);
 }
 
 void RadioButton::SetValueDirect(float value, double time)
+{
+   SetValueDirect(value, time, false);
+}
+
+void RadioButton::SetValueDirect(float value, double time, bool forceUpdate)
 {
    int oldVal = *mVar;
 

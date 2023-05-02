@@ -213,7 +213,7 @@ void ClickButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
       MouseReleased();
 }
 
-void ClickButton::SetValue(float value, double time)
+void ClickButton::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    if (value > 0)
       DoClick(time);
