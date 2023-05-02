@@ -38,3 +38,6 @@ class midicontroller:
    def add_script_listener(this, script):
       pass
 
+   def resync_controller_state(this, ):
+      pass
+

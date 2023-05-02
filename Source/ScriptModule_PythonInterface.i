@@ -499,9 +499,15 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       {
          midicontroller.SendSysEx(page, data);
       }, "data"_a, "page"_a = 0)
+      ///description: Sends a system exclusive message. The given data will be wrapped with header and tail bytes of 0xf0 and 0xf7. The example enables Programmer-Mode on a Launchpad X. 
+      ///example: m.send_sysex(bytes([0, 32, 41, 2, 12, 14, 1]) 
       .def("add_script_listener", [](MidiController& midicontroller, ScriptModule* script)
       {
          midicontroller.AddScriptListener(script);
+      })
+      .def("resync_controller_state", [](MidiController& midicontroller)
+      {
+         midicontroller.ResyncControllerState();
       });
 }
 
