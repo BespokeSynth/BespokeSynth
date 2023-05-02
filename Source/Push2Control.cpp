@@ -375,7 +375,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       else if (mModulationButtonHeld)
          stateInfo = "tap a control to add/edit LFO...";
       else if (mAddModuleBookmarkButtonHeld && mDisplayModule != nullptr)
-         stateInfo = "tap a button in the column below this button to bookmark the \""+ std::string(mDisplayModule->Name()) + "\" module...";
+         stateInfo = "tap a button in the column below this button to bookmark the \"" + std::string(mDisplayModule->Name()) + "\" module...";
       else if (mInMidiControllerBindMode)
          stateInfo = "MIDI bind mode: hold a knob or button, then move/press a MIDI control to bind to that module control";
 
