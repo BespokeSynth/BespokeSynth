@@ -257,7 +257,7 @@ void Snapshots::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
          Delete(pitch);
       else
          SetSnapshot(pitch, time);
-      
+
       UpdateGridValues();
    }
 }
