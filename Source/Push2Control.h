@@ -61,7 +61,10 @@ public:
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
    static bool sDrawingPush2Display;
    static NVGcontext* sVG;
