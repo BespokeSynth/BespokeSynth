@@ -159,7 +159,7 @@ private:
    IntSlider* mNextCommitTargetSlider{ nullptr };
    int mNextCommitTargetIndex{ 0 };
    Checkbox* mAutoAdvanceThroughLoopersCheckbox{ nullptr };
-   bool mAutoAdvanceThroughLoopers{ true };
+   bool mAutoAdvanceThroughLoopers{ false };
 
    bool mFreeRecording{ false };
    Checkbox* mFreeRecordingCheckbox{ nullptr };

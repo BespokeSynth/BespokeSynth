@@ -184,6 +184,7 @@ private:
    ClickButton* mCommitButton{ nullptr };
    ClickButton* mDoubleSpeedButton{ nullptr };
    ClickButton* mHalveSpeedButton{ nullptr };
+   ClickButton* mExtendButton{ nullptr };
    ChannelBuffer* mUndoBuffer{ nullptr };
    ClickButton* mUndoButton{ nullptr };
    bool mWantUndo{ false };

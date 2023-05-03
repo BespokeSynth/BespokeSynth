@@ -2787,9 +2787,9 @@ void ModularSynth::SaveState(std::string file, bool autosave)
    if (!autosave)
    {
       mCurrentSaveStatePath = file;
-      mLastSaveTime = gTime;
       std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
       mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
+      TheTitleBar->DisplayTemporaryMessage("saved " + filename);
    }
 
    mAudioThreadMutex.Lock("SaveState()");
@@ -3258,6 +3258,8 @@ void ModularSynth::SaveOutput()
 
    mGlobalRecordBuffer->ClearBuffer();
    mRecordingLength = 0;
+
+   TheTitleBar->DisplayTemporaryMessage("wrote " + filename);
 }
 
 const String& ModularSynth::GetTextFromClipboard() const

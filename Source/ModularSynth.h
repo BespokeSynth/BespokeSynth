@@ -267,7 +267,6 @@ public:
    void LoadStatePopup();
    void ToggleQuickSpawn();
    QuickSpawnMenu* GetQuickSpawn() { return mQuickSpawn; }
-   double GetLastSaveTime() { return mLastSaveTime; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
@@ -386,7 +385,6 @@ private:
    bool mWantReloadInitialLayout{ false };
    std::string mCurrentSaveStatePath;
    std::string mStartupSaveStateFile;
-   double mLastSaveTime{ -9999 };
 
    Sample* mHeldSample{ nullptr };
 

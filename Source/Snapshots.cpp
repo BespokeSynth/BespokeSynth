@@ -48,6 +48,10 @@ void Snapshots::CreateUIControls()
    mCurrentSnapshotSelector = new DropdownList(this, "snapshot", 35, 3, &mCurrentSnapshot, 64);
    mRandomizeButton = new ClickButton(this, "random", 78, 20);
    mAddButton = new ClickButton(this, "add", 101, 3);
+   mClearButton = new ClickButton(this, "clear", mAddButton, kAnchor_Right);
+   mStoreCheckbox = new Checkbox(this, "store", mClearButton, kAnchor_Right, &mStoreMode);
+   mDeleteCheckbox = new Checkbox(this, "delete", mStoreCheckbox, kAnchor_Right, &mDeleteMode);
+   mAutoStoreOnSwitchCheckbox = new Checkbox(this, "auto-store on switch", mStoreCheckbox, kAnchor_Below, &mAutoStoreOnSwitch);
    mSnapshotLabelEntry = new TextEntry(this, "snapshot label", -1, -1, 12, &mSnapshotLabel);
 
    {
@@ -120,13 +124,17 @@ void Snapshots::DrawModule()
    mAddButton->Draw();
    mSnapshotLabelEntry->SetPosition(3, mGrid->GetRect(K(local)).getMaxY() + 3);
    mSnapshotLabelEntry->Draw();
+   mClearButton->Draw();
+   mStoreCheckbox->Draw();
+   mDeleteCheckbox->Draw();
+   mAutoStoreOnSwitchCheckbox->Draw();
 
    int hover = mGrid->CurrentHover();
-   bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
-   bool altHeld = GetKeyModifiers() == kModifier_Alt;
-   if (shiftHeld || altHeld)
+   bool storeMode = (GetKeyModifiers() == kModifier_Shift) || mStoreMode;
+   bool deleteMode = (GetKeyModifiers() == kModifier_Alt) || mDeleteMode;
+   if (storeMode || deleteMode)
    {
-      if (hover < mGrid->GetCols() * mGrid->GetRows())
+      if (hover >= 0 && hover < mGrid->GetCols() * mGrid->GetRows())
       {
          ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
          float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
@@ -134,13 +142,13 @@ void Snapshots::DrawModule()
 
          ofPushStyle();
          ofSetColor(0, 0, 0);
-         if (shiftHeld)
+         if (storeMode)
          {
             ofFill();
             ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
             ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
          }
-         if (altHeld && !mSnapshotCollection[hover].mSnapshots.empty())
+         else if (deleteMode && !mSnapshotCollection[hover].mSnapshots.empty())
          {
             ofLine(pos.x + 3, pos.y + 3, pos.x + xsize - 3, pos.y + ysize - 3);
             ofLine(pos.x + xsize - 3, pos.y + 3, pos.x + 3, pos.y + ysize - 3);
@@ -169,7 +177,7 @@ void Snapshots::DrawModule()
 void Snapshots::DrawModuleUnclipped()
 {
    int hover = mGrid->CurrentHover();
-   if (hover != -1 && !mSnapshotCollection.empty())
+   if (hover >= 0 && !mSnapshotCollection.empty())
    {
       assert(hover >= 0 && hover < mSnapshotCollection.size());
 
@@ -221,9 +229,9 @@ void Snapshots::OnClicked(float x, float y, bool right)
 
       int idx = cell.mCol + cell.mRow * mGrid->GetCols();
 
-      if (GetKeyModifiers() == kModifier_Shift)
+      if (GetKeyModifiers() == kModifier_Shift || mStoreMode)
          Store(idx);
-      else if (GetKeyModifiers() == kModifier_Alt)
+      else if (GetKeyModifiers() == kModifier_Alt || mDeleteMode)
          Delete(idx);
       else
          SetSnapshot(idx, NextBufferTime(false));
@@ -243,7 +251,13 @@ void Snapshots::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 {
    if (velocity > 0 && pitch < (int)mSnapshotCollection.size())
    {
-      SetSnapshot(pitch, time);
+      if (mStoreMode)
+         Store(pitch);
+      else if (mDeleteMode)
+         Delete(pitch);
+      else
+         SetSnapshot(pitch, time);
+
       UpdateGridValues();
    }
 }
@@ -259,7 +273,7 @@ void Snapshots::SetSnapshot(int idx, double time)
    if (idx < 0 || idx >= (int)mSnapshotCollection.size())
       return;
 
-   if (mAutoStoreOnSwitch)
+   if (mAutoStoreOnSwitch && idx != mCurrentSnapshot)
       Store(mCurrentSnapshot);
 
    mCurrentSnapshot = idx;
@@ -489,6 +503,16 @@ void Snapshots::ButtonClicked(ClickButton* button, double time)
          }
       }
    }
+
+   if (button == mClearButton)
+   {
+      for (size_t i = 0; i < mSnapshotCollection.size(); ++i)
+      {
+         if (!mSnapshotCollection[i].mSnapshots.empty())
+            Delete(i);
+      }
+      UpdateGridValues();
+   }
 }
 
 void Snapshots::DropdownUpdated(DropdownList* list, int oldVal, double time)
@@ -497,7 +521,12 @@ void Snapshots::DropdownUpdated(DropdownList* list, int oldVal, double time)
    {
       int newIdx = mCurrentSnapshot;
       mCurrentSnapshot = oldVal;
-      SetSnapshot(newIdx, time);
+      if (mStoreMode)
+         Store(newIdx);
+      else if (mDeleteMode)
+         Delete(newIdx);
+      else
+         SetSnapshot(newIdx, time);
       UpdateGridValues();
    }
 }
@@ -560,7 +589,6 @@ void Snapshots::SetUpFromSaveData()
 {
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
    mAllowSetOnAudioThread = mModuleSaveData.GetBool("allow_set_on_audio_thread");
-   mAutoStoreOnSwitch = mModuleSaveData.GetBool("auto_store_on_switch");
 }
 
 void Snapshots::SaveState(FileStreamOut& out)

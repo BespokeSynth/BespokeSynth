@@ -196,7 +196,6 @@ private:
    void UpdateMetaLights();
 
    void DrawRowLabel(const char* label, int row, int x, int y);
-   void SetPreset(int preset);
    int GetNumSteps(NoteInterval interval, int numMeasures) const;
    Vec2i ControllerToGrid(const Vec2i& controller);
    int GetNumControllerChunks(); //how many vertical chunks of the sequence are there to fit multi-rowed on the controller?
@@ -215,11 +214,9 @@ private:
       {
          mCol = col;
          mRow = row;
-         mTime = gTime;
       }
       int mCol{ 0 };
       int mRow{ 0 };
-      double mTime{ 0 };
    };
 
    enum class NoteInputMode
@@ -232,8 +229,7 @@ private:
    float mStrength{ 1 };
    FloatSlider* mStrengthSlider{ nullptr };
    int mGridYOff{ 0 };
-   DropdownList* mPresetDropdown{ nullptr };
-   int mPreset{ -1 };
+   ClickButton* mClearButton{ nullptr };
    int mColorOffset{ 3 };
    DropdownList* mGridYOffDropdown{ nullptr };
    std::array<StepSequencerRow*, NUM_STEPSEQ_ROWS> mRows{};

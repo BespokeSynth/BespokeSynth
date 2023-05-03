@@ -135,6 +135,7 @@ public:
    void ListLayouts();
    void ManagePlugins();
    const std::vector<SpawnList*>& GetSpawnLists() const { return mSpawnLists.GetDropdowns(); }
+   void DisplayTemporaryMessage(std::string message);
 
    bool IsSaveable() override { return false; }
 
@@ -184,6 +185,9 @@ private:
    std::unique_ptr<PluginListWindow> mPluginListWindow;
 
    NewPatchConfirmPopup mNewPatchConfirmPopup;
+
+   std::string mDisplayMessage;
+   double mDisplayMessageTime;
 };
 
 extern TitleBar* TheTitleBar;

@@ -1,3 +1,4 @@
+
 /**
     bespoke synth, a software modular synthesizer
     Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
@@ -157,8 +158,14 @@ private:
    PatchCableSource* mUIControlCable{ nullptr };
    int mQueuedSnapshotIndex{ -1 };
    bool mAllowSetOnAudioThread{ false };
-   bool mAutoStoreOnSwitch{ false };
    TextEntry* mSnapshotLabelEntry{ nullptr };
    std::string mSnapshotLabel;
    int mLoadRev{ -1 };
+   ClickButton* mClearButton;
+   bool mStoreMode{ false };
+   Checkbox* mStoreCheckbox;
+   bool mDeleteMode{ false };
+   Checkbox* mDeleteCheckbox;
+   bool mAutoStoreOnSwitch{ false };
+   Checkbox* mAutoStoreOnSwitchCheckbox;
 };
