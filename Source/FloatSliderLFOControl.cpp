@@ -52,9 +52,9 @@ void FloatSliderLFOControl::CreateUIControls()
    BUTTON(mPinButton, "pin");
    UIBLOCK_NEWLINE();
    UIBLOCK_SHIFTY(40);
-   DROPDOWN(mIntervalSelector, "interval", (int*)(&mLFOSettings.mInterval), 47);
+   DROPDOWN(mIntervalSelector, "interval", reinterpret_cast<int*>(&mLFOSettings.mInterval), 47);
    UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mOscSelector, "osc", (int*)(&mLFOSettings.mOscType), 47);
+   DROPDOWN(mOscSelector, "osc", reinterpret_cast<int*>(&mLFOSettings.mOscType), 47);
    UIBLOCK_NEWLINE();
    FLOATSLIDER(mOffsetSlider, "offset", &mLFOSettings.mLFOOffset, 0, 1);
    UIBLOCK_SHIFTUP();
@@ -110,9 +110,7 @@ void FloatSliderLFOControl::CreateUIControls()
    UpdateVisibleControls();
 }
 
-FloatSliderLFOControl::~FloatSliderLFOControl()
-{
-}
+FloatSliderLFOControl::~FloatSliderLFOControl() = default;
 
 void FloatSliderLFOControl::DrawModule()
 {
@@ -432,6 +430,9 @@ void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();
+   // Since `mPinned` is set after `IDrawableModule::LoadBasics` we need to manually set minimized
+   // after setting `mPinned` which is used to check if this module has a titlebar.
+   SetMinimized(moduleInfo["start_minimized"].asBool(), false);
 }
 
 void FloatSliderLFOControl::SetUpFromSaveData()

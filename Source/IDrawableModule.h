@@ -82,10 +82,13 @@ public:
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }
    void ToggleMinimized();
-   void SetMinimized(bool minimized)
+   void SetMinimized(bool minimized, bool animate = true)
    {
-      if (HasTitleBar())
-         mMinimized = minimized;
+      if (!HasTitleBar())
+         return;
+      mMinimized = minimized;
+      if (!animate)
+         mMinimizeAnimation = minimized ? 1 : 0;
    }
    virtual void KeyPressed(int key, bool isRepeat);
    virtual void KeyReleased(int key);
