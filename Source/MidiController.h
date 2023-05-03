@@ -284,6 +284,7 @@ public:
    std::string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
    UIControlConnection* GetConnectionForCableSource(const PatchCableSource* source);
+   void ResyncControllerState();
 
    void SetVelocityMult(float mult) { mVelocityMult = mult; }
    void SetUseChannelAsVoice(bool use) { mUseChannelAsVoice = use; }
@@ -365,7 +366,6 @@ private:
    void ConnectDevice();
    void MidiReceived(MidiMessageType messageType, int control, float scaledValue, int rawValue, int channel);
    void RemoveConnection(int control, MidiMessageType messageType, int channel, int page);
-   void ResyncTwoWay();
    int GetNumConnectionsOnPage(int page);
    void SetEntirePageToZero(int page);
    void BuildControllerList();
