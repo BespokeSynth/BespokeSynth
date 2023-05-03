@@ -171,10 +171,10 @@ float Checkbox::GetValueForMidiCC(float slider) const
    return slider > .5f ? 1 : 0;
 }
 
-void Checkbox::SetValue(float value, double time)
+void Checkbox::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    bool on = value > 0.5f;
-   if (*mVar != on)
+   if (*mVar != on || forceUpdate)
    {
       *mVar = on;
       CalcSliderVal();

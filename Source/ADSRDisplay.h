@@ -59,7 +59,7 @@ public:
 
    //IUIControl
    void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time) override {}
+   void SetValue(float value, double time, bool forceUpdate = false) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;

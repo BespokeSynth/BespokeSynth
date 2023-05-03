@@ -569,7 +569,7 @@ void TextEntry::GetRange(float& min, float& max)
    }
 }
 
-void TextEntry::SetValue(float value, double time)
+void TextEntry::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    if (mType == kTextEntry_Int)
    {

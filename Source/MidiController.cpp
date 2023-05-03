@@ -601,7 +601,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                if (connection->mIncrementAmount != 0)
                   uicontrol->Increment(connection->mIncrementAmount);
                else
-                  uicontrol->SetValue(connection->mValue, NextBufferTime(false));
+                  uicontrol->SetValue(connection->mValue, NextBufferTime(false), K(forceUpdate));
                uicontrol->StartBeacon();
             }
          }
@@ -612,13 +612,13 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                if (connection->mIncrementAmount != 0)
                   uicontrol->Increment(connection->mIncrementAmount);
                else
-                  uicontrol->SetValue(connection->mValue, NextBufferTime(false));
+                  uicontrol->SetValue(connection->mValue, NextBufferTime(false), K(forceUpdate));
                uicontrol->StartBeacon();
             }
          }
          else if (connection->mType == kControlType_Direct)
          {
-            uicontrol->SetValue(value * 127, NextBufferTime(false));
+            uicontrol->SetValue(value * 127, NextBufferTime(false), K(forceUpdate));
             uicontrol->StartBeacon();
          }
 
