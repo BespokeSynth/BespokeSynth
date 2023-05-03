@@ -206,6 +206,67 @@ void Push2Control::SaveLayout(ofxJSONElement& moduleInfo)
 {
 }
 
+void Push2Control::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+
+   out << (int)mBookmarkSlots.size();
+   for (size_t i = 0; i < mBookmarkSlots.size(); ++i)
+   {
+      if (mBookmarkSlots[i] != nullptr)
+         out << mBookmarkSlots[i]->Path();
+      else
+         out << std::string("");
+   }
+
+   out << (int)mFavoriteControls.size();
+   for (size_t i = 0; i < mFavoriteControls.size(); ++i)
+   {
+      if (mFavoriteControls[i] != nullptr)
+         out << mFavoriteControls[i]->Path();
+      else
+         out << std::string("");
+   }
+}
+
+void Push2Control::LoadState(FileStreamIn& in, int rev)
+{
+   IDrawableModule::LoadState(in, rev);
+
+   if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
+      return; //this was saved before we added versioning, bail out
+
+   LoadStateValidate(rev >= GetModuleSaveStateRev());
+
+   int numBookmarks;
+   in >> numBookmarks;
+   mBookmarkSlots.resize(numBookmarks);
+   for (int i = 0; i < numBookmarks; ++i)
+   {
+      std::string path;
+      in >> path;
+      if (path != "")
+         mBookmarkSlots[i] = TheSynth->FindModule(path);
+      else
+         mBookmarkSlots[i] = nullptr;
+   }
+
+   int numFaves;
+   in >> numFaves;
+   mFavoriteControls.resize(numFaves);
+   for (int i = 0; i < numFaves; ++i)
+   {
+      std::string path;
+      in >> path;
+      if (path != "")
+         mFavoriteControls[i] = TheSynth->FindUIControl(path);
+      else
+         mFavoriteControls[i] = nullptr;
+   }
+}
+
 //static
 void Push2Control::CreateStaticFramebuffer()
 {
@@ -313,8 +374,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
          stateInfo = "tap control to remove favorite...";
       else if (mModulationButtonHeld)
          stateInfo = "tap a control to add/edit LFO...";
-      else if (mAddModuleBookmarkButtonHeld)
-         stateInfo = "tap a button in the column below this button to bookmark the current module...";
+      else if (mAddModuleBookmarkButtonHeld && mDisplayModule != nullptr)
+         stateInfo = "tap a button in the column below this button to bookmark the \"" + std::string(mDisplayModule->Name()) + "\" module...";
       else if (mInMidiControllerBindMode)
          stateInfo = "MIDI bind mode: hold a knob or button, then move/press a MIDI control to bind to that module control";
 
@@ -1333,7 +1394,7 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 bool Push2Control::IsIgnorableModule(IDrawableModule* module)
 {
-   return module == TheTitleBar || module == TheSaveDataPanel || module == TheQuickSpawnMenu || module == TheSynth->GetUserPrefsEditor();
+   return module == TheTitleBar || module == TheSaveDataPanel || module == TheQuickSpawnMenu || module == TheSynth->GetUserPrefsEditor() || module == TheQuickSpawnMenu->GetMainContainerFollower();
 }
 
 std::vector<IDrawableModule*> Push2Control::SortModules(std::vector<IDrawableModule*> modules)
