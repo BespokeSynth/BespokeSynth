@@ -152,14 +152,17 @@ void MidiClockIn::OnMidi(const juce::MidiMessage& message)
    if (message.isMidiStart())
    {
       ofLog() << "midi start";
+      TheTransport->Reset();
    }
    if (message.isMidiStop())
    {
       ofLog() << "midi stop";
+      TheSynth->SetAudioPaused(true);
    }
    if (message.isMidiContinue())
    {
       ofLog() << "midi continue";
+      TheSynth->SetAudioPaused(false);
    }
    if (message.isSongPositionPointer())
    {
