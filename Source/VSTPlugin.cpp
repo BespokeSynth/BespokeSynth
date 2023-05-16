@@ -587,6 +587,7 @@ void VSTPlugin::Poll()
 
    if (mWantOpenVstWindow)
    {
+      mWantOpenVstWindow = false;
       if (mPlugin != nullptr)
       {
          if (mWindow == nullptr)
@@ -596,7 +597,6 @@ void VSTPlugin::Poll()
          //if (mWindow->GetNSViewComponent())
          //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
       }
-      mWantOpenVstWindow = false;
    }
 }
 void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
