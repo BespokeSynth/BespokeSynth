@@ -139,8 +139,12 @@ void Push2Control::Exit()
       SetLed(kMidiMessage_Note, i, 0);
       SetLed(kMidiMessage_Control, i, 0);
    }
-   bzero(mPixels, GetNumDisplayPixels());
-   ThePushBridge.Flip(mPixels);
+
+   if (mPixels != nullptr)
+   {
+      memset(mPixels, 0, sizeof(unsigned char) * GetNumDisplayPixels());
+      ThePushBridge.Flip(mPixels);
+   }
 
    mDevice.DisconnectInput();
    mDevice.DisconnectOutput();
