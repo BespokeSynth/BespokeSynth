@@ -189,6 +189,7 @@ private:
 
    ClickButton* mLoadSCLButton{ nullptr };
    ClickButton* mLoadKBMButton{ nullptr };
+   ClickButton* mQueuedButtonPress{ nullptr };
 
    std::vector<ScaleInfo> mScales;
    int mNumSeptatonicScales{ 0 };

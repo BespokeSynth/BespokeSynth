@@ -201,6 +201,11 @@ void Snapshots::DrawModuleUnclipped()
    }
 }
 
+bool Snapshots::HasSnapshot(int index) const
+{
+   return !mSnapshotCollection[index].mSnapshots.empty();
+}
+
 void Snapshots::UpdateGridValues()
 {
    mGrid->Clear();
@@ -211,6 +216,20 @@ void Snapshots::UpdateGridValues()
       if (mSnapshotCollection[i].mSnapshots.empty() == false)
          val = .5f;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
+   }
+}
+
+bool Snapshots::IsTargetingModule(IDrawableModule* module) const
+{
+   return VectorContains(module, mSnapshotModules);
+}
+
+void Snapshots::AddSnapshotTarget(IDrawableModule* target)
+{
+   if (!IsTargetingModule(target))
+   {
+      mSnapshotModules.push_back(target);
+      mModuleCable->AddPatchCable(target);
    }
 }
 
@@ -230,9 +249,9 @@ void Snapshots::OnClicked(float x, float y, bool right)
       int idx = cell.mCol + cell.mRow * mGrid->GetCols();
 
       if (GetKeyModifiers() == kModifier_Shift || mStoreMode)
-         Store(idx);
+         StoreSnapshot(idx);
       else if (GetKeyModifiers() == kModifier_Alt || mDeleteMode)
-         Delete(idx);
+         DeleteSnapshot(idx);
       else
          SetSnapshot(idx, NextBufferTime(false));
 
@@ -252,9 +271,9 @@ void Snapshots::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    if (velocity > 0 && pitch < (int)mSnapshotCollection.size())
    {
       if (mStoreMode)
-         Store(pitch);
+         StoreSnapshot(pitch);
       else if (mDeleteMode)
-         Delete(pitch);
+         DeleteSnapshot(pitch);
       else
          SetSnapshot(pitch, time);
 
@@ -274,7 +293,7 @@ void Snapshots::SetSnapshot(int idx, double time)
       return;
 
    if (mAutoStoreOnSwitch && idx != mCurrentSnapshot)
-      Store(mCurrentSnapshot);
+      StoreSnapshot(mCurrentSnapshot);
 
    mCurrentSnapshot = idx;
 
@@ -442,7 +461,7 @@ bool Snapshots::IsConnectedToPath(std::string path) const
    return false;
 }
 
-void Snapshots::Store(int idx)
+void Snapshots::StoreSnapshot(int idx)
 {
    assert(idx >= 0 && idx < mSnapshotCollection.size());
 
@@ -465,9 +484,11 @@ void Snapshots::Store(int idx)
    }
 
    mSnapshotLabel = coll.mLabel;
+
+   UpdateGridValues();
 }
 
-void Snapshots::Delete(int idx)
+void Snapshots::DeleteSnapshot(int idx)
 {
    assert(idx >= 0 && idx < mSnapshotCollection.size());
 
@@ -496,7 +517,7 @@ void Snapshots::ButtonClicked(ClickButton* button, double time)
       {
          if (mSnapshotCollection[i].mSnapshots.empty())
          {
-            Store(i);
+            StoreSnapshot(i);
             mCurrentSnapshot = i;
             UpdateGridValues();
             break;
@@ -509,7 +530,7 @@ void Snapshots::ButtonClicked(ClickButton* button, double time)
       for (size_t i = 0; i < mSnapshotCollection.size(); ++i)
       {
          if (!mSnapshotCollection[i].mSnapshots.empty())
-            Delete(i);
+            DeleteSnapshot(i);
       }
       UpdateGridValues();
    }
@@ -522,9 +543,9 @@ void Snapshots::DropdownUpdated(DropdownList* list, int oldVal, double time)
       int newIdx = mCurrentSnapshot;
       mCurrentSnapshot = oldVal;
       if (mStoreMode)
-         Store(newIdx);
+         StoreSnapshot(newIdx);
       else if (mDeleteMode)
-         Delete(newIdx);
+         DeleteSnapshot(newIdx);
       else
          SetSnapshot(newIdx, time);
       UpdateGridValues();

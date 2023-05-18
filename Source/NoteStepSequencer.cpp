@@ -185,6 +185,11 @@ void NoteStepSequencer::Init()
 
 void NoteStepSequencer::Poll()
 {
+   if (mGridSyncQueued)
+   {
+      SyncGridToSeq();
+      mGridSyncQueued = false;
+   }
    UpdateGridControllerLights(false);
 }
 
@@ -394,6 +399,13 @@ bool NoteStepSequencer::MouseScrolled(float x, float y, float scrollX, float scr
    return false;
 }
 
+void NoteStepSequencer::SetEnabled(bool on)
+{
+   mEnabled = on;
+   if (!on)
+      mNoteOutput.Flush(gTime);
+}
+
 void NoteStepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
@@ -501,6 +513,208 @@ void NoteStepSequencer::SetPitch(int index, int pitch, int velocity, float lengt
    }
 }
 
+void NoteStepSequencer::GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows)
+{
+   sequenceRows = (mLength - 1) / 8 + 1;
+   if (mNoteMode == kNoteMode_Scale && TheScale->NumTonesInScale() == 7)
+      pitchCols = 7;
+   else
+      pitchCols = 8;
+   pitchRows = (mNoteRange - 1) / pitchCols + 1;
+}
+
+bool NoteStepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+{
+   int sequenceRows, pitchCols, pitchRows;
+   GetPush2Layout(sequenceRows, pitchCols, pitchRows);
+
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex == 12)
+      {
+         mPush2VelocityHeld = (midiValue > 0);
+         return true;
+      }
+
+      if (controlIndex >= 36 && controlIndex <= 99)
+      {
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = 7 - gridIndex / 8;
+
+         if (y < sequenceRows)
+         {
+            int index = x + y * 8;
+            if (midiValue > 0)
+            {
+               mPush2HeldStep = index;
+               if (mVels[mPush2HeldStep] == 0)
+               {
+                  mVels[mPush2HeldStep] = mQueuedPush2Vel;
+                  mPush2HeldStepWasEdited = true;
+               }
+               else
+               {
+                  mPush2HeldStepWasEdited = false;
+               }
+               mPush2ButtonPressTime = gTime;
+            }
+            else if (index == mPush2HeldStep)
+            {
+               if (!mPush2HeldStepWasEdited && gTime - mPush2ButtonPressTime < 500)
+                  mVels[index] = 0;
+               mPush2HeldStep = -1;
+            }
+         }
+         else if (y < sequenceRows + pitchRows)
+         {
+            if (midiValue > 0)
+            {
+               int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+               if (index < 0 || index >= mNoteRange)
+               {
+                  //out of range, do nothing
+               }
+               else if (mPush2HeldStep != -1)
+               {
+                  mTones[mPush2HeldStep] = index;
+                  mPush2HeldStepWasEdited = true;
+               }
+               else
+               {
+                  mQueuedPush2Tone = index;
+               }
+            }
+         }
+         else if (y == 7)
+         {
+            if (midiValue > 0)
+            {
+               mPush2LengthHeld = true;
+               if (mPush2HeldStep != -1)
+               {
+                  mNoteLengths[mPush2HeldStep] = (x + 1) / 8.0f;
+                  mPush2HeldStepWasEdited = true;
+               }
+               else
+               {
+                  mQueuedPush2Length = (x + 1) / 8.0f;
+               }
+            }
+            else
+            {
+               mPush2LengthHeld = false;
+            }
+         }
+
+         SyncGridToSeq();
+
+         return true;
+      }
+   }
+
+   if (type == kMidiMessage_PitchBend)
+   {
+      float val = midiValue / MidiDevice::kPitchBendMax;
+      if (mPush2HeldStep != -1)
+      {
+         mVels[mPush2HeldStep] = int(val * 127);
+         mPush2HeldStepWasEdited = true;
+      }
+      else
+      {
+         mQueuedPush2Vel = int(val * 127);
+      }
+      SyncGridToSeq();
+
+      return true;
+   }
+
+   return false;
+}
+
+void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
+{
+   int sequenceRows, pitchCols, pitchRows;
+   GetPush2Layout(sequenceRows, pitchCols, pitchRows);
+
+   int displayStep = std::clamp(mArpIndex, 0, mLength - 1);
+   if (mPush2HeldStep != -1)
+      displayStep = mPush2HeldStep;
+
+   for (int x = 0; x < 8; ++x)
+   {
+      for (int y = 0; y < 8; ++y)
+      {
+         int pushColor;
+
+         if (y < sequenceRows)
+         {
+            int index = x + y * 8;
+            if (index >= mLength)
+               pushColor = 0;
+            else if (index == mPush2HeldStep)
+               pushColor = 125;
+            else if (index == displayStep)
+               pushColor = 101;
+            else if (mVels[index] > 0)
+               pushColor = mNoteLengths[index] == 1 ? 93 : 95;
+            else
+               pushColor = 92;
+         }
+         else if (y < sequenceRows + pitchRows)
+         {
+            int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+            int pitch = RowToPitch(index);
+            if (x >= pitchCols || index >= mNoteRange)
+               pushColor = 0;
+            else if (index == mQueuedPush2Tone)
+               pushColor = 126;
+            else if (index == mTones[displayStep] && ((mVels[displayStep] > 0 && !mAlreadyDidNoteOff) || mPush2HeldStep != -1))
+               pushColor = gTime - mLastStepPlayTime[displayStep] < 100 ? 127 : 2;
+            else if (TheScale->IsRoot(pitch))
+               pushColor = 69;
+            else if (TheScale->IsInPentatonic(pitch))
+               pushColor = 77;
+            else
+               pushColor = 78;
+         }
+         else if (y == 7)
+         {
+            float displayLength = 0;
+            if (mPush2LengthHeld && mPush2HeldStep == -1)
+               displayLength = mQueuedPush2Length;
+            else if (mVels[displayStep] > 0)
+               displayLength = mNoteLengths[displayStep];
+
+            if (displayLength * 8 - 1 >= x)
+               pushColor = 83;
+            else
+               pushColor = 84;
+         }
+         else
+         {
+            pushColor = 0;
+         }
+
+         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+      }
+   }
+
+   std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19 };
+   int displayVel = mVels[displayStep];
+   if (mPush2VelocityHeld && mPush2HeldStep == -1)
+      displayVel = mQueuedPush2Vel;
+   for (int i = 0; i < 16; ++i)
+   {
+      int ledLow = ((i * 2) / 32.0f) < displayVel / 127.0f;
+      int ledHigh = ((i * 2 + 1) / 32.0f) < displayVel / 127.0f;
+      unsigned char c = ledLow + (ledHigh << 3);
+      touchStripLights += c;
+   }
+   push2->GetDevice()->SendSysEx(touchStripLights);
+}
+
 void NoteStepSequencer::OnTransportAdvanced(float amount)
 {
    PROFILER(NoteStepSequencer);
@@ -574,6 +788,15 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    {
       offPitch = mLastPitch;
       offStep = mLastStepIndex;
+   }
+
+   if (mQueuedPush2Tone != -1)
+   {
+      mTones[mArpIndex] = mQueuedPush2Tone;
+      mVels[mArpIndex] = mQueuedPush2Vel;
+      mNoteLengths[mArpIndex] = mQueuedPush2Length;
+      mQueuedPush2Tone = -1;
+      mGridSyncQueued = true;
    }
 
    int current = mTones[mArpIndex];

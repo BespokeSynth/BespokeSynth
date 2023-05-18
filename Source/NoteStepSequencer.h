@@ -41,12 +41,13 @@
 #include "IPulseReceiver.h"
 #include "GridController.h"
 #include "IDrivableSequencer.h"
+#include "Push2Control.h"
 
 #define NSS_MAX_STEPS 32
 
 class PatchCableSource;
 
-class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver, public IGridControllerListener, public IDrivableSequencer
+class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver, public IGridControllerListener, public IDrivableSequencer, public IPush2GridController
 {
 public:
    NoteStepSequencer();
@@ -59,7 +60,7 @@ public:
    void CreateUIControls() override;
 
    void Init() override;
-   void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   void SetEnabled(bool enabled) override;
 
    void SetMidiController(std::string name);
 
@@ -79,6 +80,10 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+
+   //IPush2GridController
+   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
@@ -147,6 +152,7 @@ private:
    void RandomizeLengths();
    void Step(double time, float velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
+   void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
 
    enum NoteMode
    {
@@ -224,4 +230,13 @@ private:
    int mGridControlOffsetY{ 0 };
    IntSlider* mGridControlOffsetXSlider{ nullptr };
    IntSlider* mGridControlOffsetYSlider{ nullptr };
+   int mPush2HeldStep{ -1 };
+   bool mPush2HeldStepWasEdited{ false };
+   double mPush2ButtonPressTime{ -1 };
+   int mQueuedPush2Tone{ -1 };
+   int mQueuedPush2Vel{ 127 };
+   float mQueuedPush2Length{ 1 };
+   bool mGridSyncQueued{ false };
+   bool mPush2VelocityHeld{ false };
+   bool mPush2LengthHeld{ false };
 };

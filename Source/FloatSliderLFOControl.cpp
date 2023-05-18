@@ -195,6 +195,38 @@ void FloatSliderLFOControl::DrawModule()
             ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)), GetTargetMax(), GetTargetMin(), 0, height) + y, 2);
 }
 
+bool FloatSliderLFOControl::DrawToPush2Screen()
+{
+   FloatSlider* slider = GetOwner();
+   if (slider)
+   {
+      ofRectangle rect(30, -12, 100, 11);
+      ofSetColor(100, 100, 100);
+      ofRect(rect);
+
+      float screenPos = rect.x + 1 + (rect.width - 2) * slider->ValToPos(slider->GetValue(), true);
+      float lfomax = ofClamp(GetMax(), slider->GetMin(), slider->GetMax());
+      float screenPosMax = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomax, true);
+      float lfomin = ofClamp(GetMin(), slider->GetMin(), slider->GetMax());
+      float screenPosMin = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomin, true);
+
+      ofPushStyle();
+      ofSetColor(0, 200, 0);
+      ofFill();
+      if (fabs(screenPos - screenPosMin) > 1)
+         ofRect(screenPosMin, rect.y, screenPos - screenPosMin, rect.height, 1); //lfo bar
+      ofPopStyle();
+
+      ofPushStyle();
+      ofSetColor(0, 255, 0);
+      ofSetLineWidth(2);
+      ofLine(screenPosMin, rect.y + 1, screenPosMin, rect.getMaxY() - 1); //min bar
+      ofLine(screenPosMax, rect.y + 1, screenPosMax, rect.getMaxY() - 1); //max bar
+      ofPopStyle();
+   }
+   return false;
+}
+
 void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 {
    if (enabled && !mEnabled && !TheSynth->IsLoadingState()) //if turning on

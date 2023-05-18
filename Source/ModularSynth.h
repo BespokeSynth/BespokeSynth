@@ -176,7 +176,9 @@ public:
    bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
 
    void ZoomView(float zoomAmount, bool fromMouse);
+   void SetZoomLevel(float zoomLevel);
    void PanView(float x, float y);
+   void PanTo(float x, float y);
    void SetRawSpaceMouseTwist(float twist, bool isUsing)
    {
       mSpaceMouseInfo.mTwist = twist;

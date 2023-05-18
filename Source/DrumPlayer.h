@@ -44,12 +44,13 @@
 #include "PatchCableSource.h"
 #include "RollingBuffer.h"
 #include "GridController.h"
+#include "Push2Control.h"
 
 #define NUM_DRUM_HITS 16
 
 class SamplePlayer;
 
-class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener
+class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener, public IPush2GridController
 {
 public:
    DrumPlayer();
@@ -88,6 +89,10 @@ public:
 
    //ITimeListener
    void OnTimeEvent(double time) override;
+
+   //IPush2GridController
+   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;

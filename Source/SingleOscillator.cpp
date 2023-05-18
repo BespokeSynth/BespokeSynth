@@ -72,6 +72,18 @@ void SingleOscillator::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    float width, height;
+
+   UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
+   UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth, 36, &mVoiceParams.mAdsr));
+   FLOATSLIDER(mVolSlider, "vol", &mVoiceParams.mVol, 0, 1);
+   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mVoiceParams.mDetune, -.05f, .05f, 3);
+   INTSLIDER(mUnisonSlider, "unison", &mVoiceParams.mUnison, 1, SingleOscillatorVoice::kMaxUnison);
+   FLOATSLIDER(mUnisonWidthSlider, "width", &mVoiceParams.mUnisonWidth, 0, 1);
+   CHECKBOX(mLiteCPUModeCheckbox, "lite cpu", &mVoiceParams.mLiteCPUMode);
+   ENDUIBLOCK(width, height);
+   mWidth = MAX(width, mWidth);
+   mHeight = MAX(height, mHeight);
+
    UIBLOCK(3, 42, kColumnWidth);
    DROPDOWN(mOscSelector, "osc", (int*)(&mVoiceParams.mOscType), kColumnWidth / 2);
    UIBLOCK_SHIFTRIGHT();
@@ -87,15 +99,6 @@ void SingleOscillator::CreateUIControls()
    FLOATSLIDER(mSyncFreqSlider, "syncf", &mVoiceParams.mSyncFreq, 10, 999.9f);
    UIBLOCK_NEWLINE();
    UIBLOCK_POPSLIDERWIDTH();
-   ENDUIBLOCK(mWidth, mHeight);
-
-   UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
-   UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth, 36, &mVoiceParams.mAdsr));
-   FLOATSLIDER(mVolSlider, "vol", &mVoiceParams.mVol, 0, 1);
-   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mVoiceParams.mDetune, -.05f, .05f, 3);
-   INTSLIDER(mUnisonSlider, "unison", &mVoiceParams.mUnison, 1, SingleOscillatorVoice::kMaxUnison);
-   FLOATSLIDER(mUnisonWidthSlider, "width", &mVoiceParams.mUnisonWidth, 0, 1);
-   CHECKBOX(mLiteCPUModeCheckbox, "lite cpu", &mVoiceParams.mLiteCPUMode);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
    mHeight = MAX(height, mHeight);

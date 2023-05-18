@@ -185,11 +185,12 @@ public:
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}
+   virtual bool DrawToPush2Screen() { return false; }
 
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index = 0) override
    {
-      if (index == 0)
+      if (index == 0 && (mMainPatchCableSource != nullptr || mPatchCableSources.empty()))
          return mMainPatchCableSource;
       else
          return mPatchCableSources[index];

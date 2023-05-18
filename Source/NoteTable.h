@@ -38,10 +38,11 @@
 #include "UIGrid.h"
 #include "Scale.h"
 #include "GridController.h"
+#include "Push2Control.h"
 
 class PatchCableSource;
 
-class NoteTable : public IDrawableModule, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public UIGridListener, public IScaleListener, public INoteReceiver, public IGridControllerListener
+class NoteTable : public IDrawableModule, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public UIGridListener, public INoteReceiver, public IGridControllerListener, public IPush2GridController
 {
 public:
    NoteTable();
@@ -70,9 +71,6 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   //IScaleListener
-   void OnScaleChanged() override;
-
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
@@ -83,6 +81,10 @@ public:
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+
+   //IPush2GridController
+   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -107,11 +109,10 @@ private:
    void UpdateGridControllerLights(bool force);
 
    void PlayColumn(double time, int column, int velocity, int voiceIdx, ModulationParameters modulation);
-   void SetUpColumnControls();
-   void SyncGridToSeq();
    float ExtraWidth() const;
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
+   void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
 
    enum NoteMode
    {
@@ -128,9 +129,8 @@ private:
    DropdownList* mNoteModeSelector{ nullptr };
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
-   bool mSetLength{ false };
    int mNoteRange{ 15 };
-   bool mShowColumnControls{ false };
+   bool mShowColumnCables{ false };
    int mRowOffset{ 0 };
 
    ClickButton* mRandomizePitchButton{ nullptr };
@@ -141,15 +141,16 @@ private:
 
    static constexpr int kMaxLength = 32;
 
-   int mTones[kMaxLength]{};
-   std::array<double, kMaxLength> mLastColumnPlayTime{ -1 };
-   std::array<int, kMaxLength> mLastColumnNoteOnPitch{ -1 };
-   std::array<DropdownList*, kMaxLength> mToneDropdowns{ nullptr };
+   std::array<double, kMaxLength> mLastColumnPlayTime{};
+   std::array<bool[127], kMaxLength> mLastColumnNoteOnPitches{};
    std::array<AdditionalNoteCable*, kMaxLength> mColumnCables{ nullptr };
+   std::array<double, 127> mPitchPlayTimes{};
 
    GridControlTarget* mGridControlTarget{ nullptr };
    int mGridControlOffsetX{ 0 };
    int mGridControlOffsetY{ 0 };
    IntSlider* mGridControlOffsetXSlider{ nullptr };
    IntSlider* mGridControlOffsetYSlider{ nullptr };
+
+   int mPush2HeldStep{ -1 };
 };
