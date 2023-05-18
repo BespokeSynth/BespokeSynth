@@ -85,6 +85,7 @@ public:
    bool InLowResMode() const { return mLFOSettings.mLowResMode; }
    bool HasSpecialDelete() const override { return true; }
    void DoSpecialDelete() override;
+   bool DrawToPush2Screen() override;
 
    //IModulator
    float Value(int samplesIn = 0) override;

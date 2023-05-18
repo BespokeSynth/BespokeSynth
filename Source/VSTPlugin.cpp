@@ -988,7 +988,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
             mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
          }
 
-         if (rev >= 2)
+         if (rev >= 2 && mModuleSaveData.GetBool("preset_file_sets_params"))
          {
             int numParamsShowing = input->readInt();
             for (auto& param : mParameterSliders)
@@ -1161,6 +1161,8 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("usevoiceaschannel", moduleInfo, false);
    mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 1, 96, K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)", moduleInfo, 1, 0, 127, K(isTextField));
+
+   mModuleSaveData.LoadBool("preset_file_sets_params", moduleInfo, true);
 
    if (!moduleInfo["vst"].isNull())
       mOldVstPath = moduleInfo["vst"].asString();

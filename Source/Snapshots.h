@@ -57,6 +57,14 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
 
+   bool HasSnapshot(int index) const;
+   int GetCurrentSnapshot() const { return mCurrentSnapshot; }
+   bool IsTargetingModule(IDrawableModule* module) const;
+   void AddSnapshotTarget(IDrawableModule* target);
+   void SetSnapshot(int idx, double time);
+   void StoreSnapshot(int idx);
+   void DeleteSnapshot(int idx);
+
    void OnTransportAdvanced(float amount) override;
 
    //INoteReceiver
@@ -87,9 +95,6 @@ public:
    bool IsEnabled() const override { return true; }
 
 private:
-   void SetSnapshot(int idx, double time);
-   void Store(int idx);
-   void Delete(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;

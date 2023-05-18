@@ -470,9 +470,26 @@ void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
    mHideTooltipsUntilMouseMove = true;
 }
 
+void ModularSynth::SetZoomLevel(float zoomLevel)
+{
+   float oldDrawScale = gDrawScale;
+   gDrawScale = zoomLevel;
+   float zoomAmount = (gDrawScale - oldDrawScale) / oldDrawScale;
+   ofVec2f zoomCenter = ofVec2f(ofGetWidth() / gDrawScale * .5f, ofGetHeight() / gDrawScale * .5f);
+   GetDrawOffset() -= zoomCenter * zoomAmount;
+   mZoomer.CancelMovement();
+   mHideTooltipsUntilMouseMove = true;
+}
+
 void ModularSynth::PanView(float x, float y)
 {
    GetDrawOffset() += ofVec2f(x, y) / gDrawScale;
+   mHideTooltipsUntilMouseMove = true;
+}
+
+void ModularSynth::PanTo(float x, float y)
+{
+   SetDrawOffset(ofVec2f(ofGetWidth() / gDrawScale / 2 - x, ofGetHeight() / gDrawScale / 2 - y));
    mHideTooltipsUntilMouseMove = true;
 }
 

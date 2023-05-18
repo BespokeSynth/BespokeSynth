@@ -37,6 +37,7 @@ class NVGcontext;
 class NVGLUframebuffer;
 class IUIControl;
 class IPush2GridController;
+class Snapshots;
 
 class Push2Control : public IDrawableModule, public MidiDeviceListener, public IDropdownListener
 {
@@ -50,12 +51,15 @@ public:
 
    void CreateUIControls() override;
    void Poll() override;
+   void Exit() override;
 
    void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
 
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
+
+   MidiDevice* GetDevice() { return &mDevice; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
@@ -100,8 +104,8 @@ private:
    void RemoveFavoriteControl(IUIControl* control);
    void BookmarkModuleToSlot(int slotIndex, IDrawableModule* module);
    void SwitchToBookmarkedModule(int slotIndex);
-   int GetPadColorForType(ModuleCategory type);
-   bool GetGridIndex(int gridX, int gridY, int& gridIndex)
+   int GetPadColorForType(ModuleCategory type, bool enabled) const;
+   bool GetGridIndex(int gridX, int gridY, int& gridIndex) const
    {
       gridIndex = gridX + gridY * 8;
       return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8;
@@ -109,11 +113,12 @@ private:
    bool IsIgnorableModule(IDrawableModule* module);
    std::vector<IDrawableModule*> SortModules(std::vector<IDrawableModule*> modules);
    void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
-   void DrawDisplayModuleRect(ofRectangle rect);
+   void DrawDisplayModuleRect(ofRectangle rect, float thickness);
    std::string GetModuleTypeToSpawn();
    ModuleCategory GetModuleTypeForSpawnList(IUIControl* control);
    ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
    int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
+   int GetNumDisplayPixels() const;
 
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
@@ -127,11 +132,12 @@ private:
    float mHeight{ 20 };
 
    IDrawableModule* mDisplayModule{ nullptr };
+   Snapshots* mDisplayModuleSnapshots{ nullptr };
    std::vector<IUIControl*> mSliderControls;
    std::vector<IUIControl*> mButtonControls;
    std::vector<IUIControl*> mDisplayedControls;
-   int mModuleColumnOffset{ 0 };
-   float mModuleColumnOffsetSmoothed{ 0 };
+   int mModuleViewOffset{ 0 };
+   float mModuleViewOffsetSmoothed{ 0 };
 
    std::vector<IDrawableModule*> mModules;
    float mModuleListOffset{ 0 };
@@ -152,11 +158,15 @@ private:
    int mModuleHistoryPosition{ -1 };
    std::vector<IDrawableModule*> mBookmarkSlots;
    bool mInMidiControllerBindMode{ false };
+   bool mShiftHeld{ false };
+   bool mAddTrackHeld{ false };
+   int mHeldKnobIndex{ -1 };
 
    enum class ScreenDisplayMode
    {
       kNormal,
-      kAddModule
+      kAddModule,
+      kMap
    };
    ScreenDisplayMode mScreenDisplayMode{ ScreenDisplayMode::kNormal };
 

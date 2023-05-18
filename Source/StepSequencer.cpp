@@ -558,17 +558,9 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
 
    if (type == kMidiMessage_PitchBend)
    {
-      if (midiValue != 8192) //default value, happens on pitch bend release
-      {
-         float val = midiValue / 16320.0f;
-         float oldStrength = mStrength;
-         mStrength = val;
-         FloatSliderUpdated(mStrengthSlider, oldStrength, gTime);
-      }
-      else
-      {
-         mStrength = 1;
-      }
+      float val = midiValue / MidiDevice::kPitchBendMax;
+      mGridYOffDropdown->SetFromMidiCC(val, gTime, true);
+
       return true;
    }
 
@@ -578,17 +570,20 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
 void StepSequencer::UpdatePush2Leds(Push2Control* push2)
 {
    mPush2Connected = true;
+   int numYChunks = GetNumControllerChunks();
 
    for (int x = 0; x < 8; ++x)
    {
       for (int y = 0; y < 8; ++y)
       {
+         int rowsPerChunk = std::max(1, (8 / numYChunks));
+         int chunkIndex = y / rowsPerChunk;
          GridColor color = GetGridColor(x, y);
          int pushColor = 0;
          switch (color)
          {
             case kGridColorOff: //off
-               pushColor = 0;
+               pushColor = (chunkIndex % 2 == 0) ? 0 : 124;
                break;
             case kGridColor1Dim: //
                pushColor = 86;
@@ -612,6 +607,16 @@ void StepSequencer::UpdatePush2Leds(Push2Control* push2)
          push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
+
+   std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19 };
+   for (int i = 0; i < 16; ++i)
+   {
+      int ledLow = (int(((i * 2) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
+      int ledHigh = (int(((i * 2 + 1) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
+      unsigned char c = ledLow + (ledHigh << 3);
+      touchStripLights += c;
+   }
+   push2->GetDevice()->SendSysEx(touchStripLights);
 }
 
 int StepSequencer::GetNumSteps(NoteInterval interval, int numMeasures) const
