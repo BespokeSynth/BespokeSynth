@@ -51,6 +51,11 @@ public:
    ::ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
    void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
+   void SetDimensions(float w, float h)
+   {
+      mWidth = w;
+      mHeight = h;
+   }
    void SetShowing(bool showing) override
    {
       IUIControl::SetShowing(showing);

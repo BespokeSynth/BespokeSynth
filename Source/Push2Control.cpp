@@ -45,6 +45,7 @@ using namespace juce::gl;
 #include "FloatSliderLFOControl.h"
 #include "UserPrefsEditor.h"
 #include "Snapshots.h"
+#include "ADSRDisplay.h"
 #include "push2/JuceToPush2DisplayBridge.h"
 #include "push2/Push2-Bitmap.h"
 
@@ -408,10 +409,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       DrawDisplayModuleControls();
 
       std::string stateInfo = "";
-      if (mAllowRepatch && mHeldModule == nullptr)
-         stateInfo = "repatch mode: hold a source module and tap the destination module";
-      else if (mAllowRepatch && mHeldModule != nullptr)
-         stateInfo = "repatch mode: now tap destination for " + std::string(mHeldModule->Name());
+      if (AllowRepatch() && mHeldModule != nullptr)
+         stateInfo = "repatch mode: tap destination for " + std::string(mHeldModule->Name());
       else if (mNewButtonHeld)
          stateInfo = "tap control to add favorite...";
       else if (mDeleteButtonHeld)
@@ -554,7 +553,6 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kAutomateButton, 126, mModulationButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kMasterButton, 127, mAddModuleBookmarkButtonHeld ? 0 : -1);
-   SetLed(kMidiMessage_Control, kCircleButton, 8, mAllowRepatch ? 127 : -1);
    SetLed(kMidiMessage_Control, kAddDeviceButton, 127, mScreenDisplayMode == ScreenDisplayMode::kAddModule ? 0 : -1);
    SetLed(kMidiMessage_Control, kAddTrackButton, mDisplayModule != nullptr ? 127 : 0, mAddTrackHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kUserButton, 127, mScreenDisplayMode == ScreenDisplayMode::kMap ? 0 : -1);
@@ -888,15 +886,25 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
       if (i - mModuleViewOffset < -1 || i - mModuleViewOffset > 8)
          continue;
 
-      float x;
-      float y;
-      controls[i]->GetPosition(x, y, true);
-      controls[i]->SetPosition(kColumnSpacing * i + 3, yPos);
+      ADSRDisplay* adsr = dynamic_cast<ADSRDisplay*>(controls[i]);
+
+      ofRectangle originalRect = controls[i]->GetRect(true);
+      if (adsr != nullptr)
+      {
+         adsr->SetDimensions(80, 30);
+         controls[i]->SetPosition(kColumnSpacing * i + 3, yPos - 13);
+      }
+      else
+      {
+         controls[i]->SetPosition(kColumnSpacing * i + 3, yPos);
+      }
       ofPushMatrix();
-      ofClipWindow(kColumnSpacing * i, yPos, kColumnSpacing, 100, true);
+      ofClipWindow(kColumnSpacing * i, yPos - 15, kColumnSpacing, 100, true);
       controls[i]->Render();
       ofPopMatrix();
-      controls[i]->SetPosition(x, y);
+      controls[i]->SetPosition(originalRect.x, originalRect.y);
+      if (adsr != nullptr)
+         adsr->SetDimensions(originalRect.width, originalRect.height);
 
       ofPushStyle();
       ModuleCategory moduleType = controls[i]->GetModuleParent()->GetModuleCategory();
@@ -907,10 +915,13 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
       else
          ofSetColor(100, 100, 100);
 
-      if (mDisplayModule == this)
-         DrawTextBold(juce::String(controls[i]->Path()).replace("~", "\n").toRawUTF8(), kColumnSpacing * i + 3, yPos - 12, 10);
-      else
-         DrawTextBold(controls[i]->Name(), kColumnSpacing * i + 3, yPos - 5, 16);
+      if (adsr == nullptr)
+      {
+         if (mDisplayModule == this)
+            DrawTextBold(juce::String(controls[i]->Path()).replace("~", "\n").toRawUTF8(), kColumnSpacing * i + 3, yPos - 12, 10);
+         else
+            DrawTextBold(controls[i]->Name(), kColumnSpacing * i + 3, yPos - 5, 16);
+      }
 
       int pushControlIndex = i - mModuleViewOffset;
       if (sliders && pushControlIndex >= 0 && pushControlIndex < 8 && mNoteHeldState[pushControlIndex])
@@ -1028,6 +1039,13 @@ void Push2Control::Poll()
       if (changed)
          UpdateControlList();
    }
+}
+
+bool Push2Control::AllowRepatch() const
+{
+   if (mHeldModule)
+      return gTime - mModuleHeldTime > 300;
+   return false;
 }
 
 std::string Push2Control::GetModuleTypeToSpawn()
@@ -1210,7 +1228,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
                   sBindToUIControl = mSliderControls[controlIndex];
                }
 
-               if (mHeldModule && mAllowRepatch)
+               if (mHeldModule && AllowRepatch())
                {
                   PatchCableSource* cable = mHeldModule->GetPatchCableSource();
                   if (mShiftHeld && mHeldModule->GetPatchCableSources().size() >= 2)
@@ -1279,7 +1297,9 @@ void Push2Control::OnMidiNote(MidiNote& note)
          int gridIndex = gridX + (7 - gridY) * 8;
          if (mModuleGrid[gridIndex] != nullptr)
          {
-            if ((!mAllowRepatch && note.mVelocity > 0) || (mAllowRepatch && note.mVelocity == 0))
+            if (note.mVelocity > 0 && mHeldModule == nullptr)
+               mModuleHeldTime = gTime;
+            if (note.mVelocity == 0 && !mRepatchedHeldModule)
                SetDisplayModule(mModuleGrid[gridIndex], true);
          }
 
@@ -1290,18 +1310,20 @@ void Push2Control::OnMidiNote(MidiNote& note)
                PatchCableSource* cable = mHeldModule->GetPatchCableSource();
                if (mShiftHeld && mHeldModule->GetPatchCableSources().size() >= 2)
                   cable = mHeldModule->GetPatchCableSources()[1];
-               if (mAllowRepatch && cable != nullptr)
+               if (AllowRepatch() && cable != nullptr)
                {
                   cable->FindValidTargets();
                   if (cable->IsValidTarget(mModuleGrid[gridIndex]))
                      cable->SetTarget(mModuleGrid[gridIndex]);
                   else
                      cable->ClearPatchCables();
+                  mRepatchedHeldModule = true;
                }
             }
             else
             {
                mHeldModule = mModuleGrid[gridIndex];
+               mRepatchedHeldModule = false;
             }
          }
          else
@@ -1435,7 +1457,6 @@ void Push2Control::OnMidiControl(MidiControl& control)
    else if (control.mControl == kSetupButton && control.mValue > 0)
    {
       mInMidiControllerBindMode = !mInMidiControllerBindMode;
-      mAllowRepatch = false;
    }
    else if (control.mControl == kNewButton)
    {
@@ -1452,14 +1473,6 @@ void Push2Control::OnMidiControl(MidiControl& control)
    else if (control.mControl == kMasterButton)
    {
       mAddModuleBookmarkButtonHeld = control.mValue > 0;
-   }
-   else if (control.mControl == kCircleButton)
-   {
-      if (control.mValue > 0)
-      {
-         mAllowRepatch = !mAllowRepatch;
-         mInMidiControllerBindMode = false;
-      }
    }
    else if (control.mControl == kTapTempoButton)
    {
@@ -1533,7 +1546,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
             }
 
             if (mDisplayModuleSnapshots != nullptr)
-               mDisplayModuleSnapshots->StoreSnapshot(index);
+               mDisplayModuleSnapshots->StoreSnapshot(index, true);
          }
          else
          {

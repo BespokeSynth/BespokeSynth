@@ -70,6 +70,7 @@ FMSynth::FMSynth()
 void FMSynth::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+   mVolSlider = new FloatSlider(this, "vol", 94, 4, 80, 15, &mVoiceParams.mVol, 0, 2);
    mAdsrDisplayVol = new ADSRDisplay(this, "adsrosc", 4, 4, 80, 40, &mVoiceParams.mOscADSRParams);
    mAdsrDisplayHarm = new ADSRDisplay(this, "adsrharm", 4, 50, 80, 40, &mVoiceParams.mHarmRatioADSRParams);
    mAdsrDisplayMod = new ADSRDisplay(this, "adsrmod", 94, 50, 80, 40, &mVoiceParams.mModIdxADSRParams);
@@ -81,7 +82,6 @@ void FMSynth::CreateUIControls()
    mModSlider = new FloatSlider(this, "mod", mAdsrDisplayMod, kAnchor_Below, 80, 15, &mVoiceParams.mModIdx, 0, 20);
    mHarmSlider2 = new FloatSlider(this, "tweak2", mHarmRatioBaseDropdown2, kAnchor_Below, 80, 15, &mHarmRatioTweak2, .5f, 2, 3);
    mModSlider2 = new FloatSlider(this, "mod2", mAdsrDisplayMod2, kAnchor_Below, 80, 15, &mVoiceParams.mModIdx2, 0, 20);
-   mVolSlider = new FloatSlider(this, "vol", 94, 4, 80, 15, &mVoiceParams.mVol, 0, 2);
    mPhaseOffsetSlider0 = new FloatSlider(this, "phase0", mVolSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset0, 0, FTWO_PI);
    mPhaseOffsetSlider1 = new FloatSlider(this, "phase1", mModSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset1, 0, FTWO_PI);
    mPhaseOffsetSlider2 = new FloatSlider(this, "phase2", mModSlider2, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset2, 0, FTWO_PI);
