@@ -119,6 +119,7 @@ private:
    ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
    int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
    int GetNumDisplayPixels() const;
+   bool AllowRepatch() const;
 
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
@@ -153,7 +154,8 @@ private:
    bool mAddModuleBookmarkButtonHeld{ false };
    std::array<bool, 128> mNoteHeldState;
    IDrawableModule* mHeldModule{ nullptr };
-   bool mAllowRepatch{ false };
+   double mModuleHeldTime{ -1 };
+   bool mRepatchedHeldModule{ false };
    std::vector<IDrawableModule*> mModuleHistory;
    int mModuleHistoryPosition{ -1 };
    std::vector<IDrawableModule*> mBookmarkSlots;

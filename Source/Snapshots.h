@@ -62,7 +62,7 @@ public:
    bool IsTargetingModule(IDrawableModule* module) const;
    void AddSnapshotTarget(IDrawableModule* target);
    void SetSnapshot(int idx, double time);
-   void StoreSnapshot(int idx);
+   void StoreSnapshot(int idx, bool setAsCurrent);
    void DeleteSnapshot(int idx);
 
    void OnTransportAdvanced(float amount) override;

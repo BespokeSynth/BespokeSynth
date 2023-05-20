@@ -249,7 +249,7 @@ void Snapshots::OnClicked(float x, float y, bool right)
       int idx = cell.mCol + cell.mRow * mGrid->GetCols();
 
       if (GetKeyModifiers() == kModifier_Shift || mStoreMode)
-         StoreSnapshot(idx);
+         StoreSnapshot(idx, false);
       else if (GetKeyModifiers() == kModifier_Alt || mDeleteMode)
          DeleteSnapshot(idx);
       else
@@ -271,7 +271,7 @@ void Snapshots::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    if (velocity > 0 && pitch < (int)mSnapshotCollection.size())
    {
       if (mStoreMode)
-         StoreSnapshot(pitch);
+         StoreSnapshot(pitch, false);
       else if (mDeleteMode)
          DeleteSnapshot(pitch);
       else
@@ -293,7 +293,7 @@ void Snapshots::SetSnapshot(int idx, double time)
       return;
 
    if (mAutoStoreOnSwitch && idx != mCurrentSnapshot)
-      StoreSnapshot(mCurrentSnapshot);
+      StoreSnapshot(mCurrentSnapshot, false);
 
    mCurrentSnapshot = idx;
 
@@ -461,7 +461,7 @@ bool Snapshots::IsConnectedToPath(std::string path) const
    return false;
 }
 
-void Snapshots::StoreSnapshot(int idx)
+void Snapshots::StoreSnapshot(int idx, bool setAsCurrent)
 {
    assert(idx >= 0 && idx < mSnapshotCollection.size());
 
@@ -484,6 +484,9 @@ void Snapshots::StoreSnapshot(int idx)
    }
 
    mSnapshotLabel = coll.mLabel;
+
+   if (setAsCurrent)
+      mCurrentSnapshot = idx;
 
    UpdateGridValues();
 }
@@ -517,7 +520,7 @@ void Snapshots::ButtonClicked(ClickButton* button, double time)
       {
          if (mSnapshotCollection[i].mSnapshots.empty())
          {
-            StoreSnapshot(i);
+            StoreSnapshot(i, false);
             mCurrentSnapshot = i;
             UpdateGridValues();
             break;
@@ -543,7 +546,7 @@ void Snapshots::DropdownUpdated(DropdownList* list, int oldVal, double time)
       int newIdx = mCurrentSnapshot;
       mCurrentSnapshot = oldVal;
       if (mStoreMode)
-         StoreSnapshot(newIdx);
+         StoreSnapshot(newIdx, false);
       else if (mDeleteMode)
          DeleteSnapshot(newIdx);
       else
