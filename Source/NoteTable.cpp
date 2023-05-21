@@ -41,6 +41,8 @@ NoteTable::NoteTable()
       mLastColumnPlayTime[i] = -1;
    for (size_t i = 0; i < mPitchPlayTimes.size(); ++i)
       mPitchPlayTimes[i] = -1;
+   for (size_t i = 0; i < mQueuedPitches.size(); ++i)
+      mQueuedPitches[i] = false;
 }
 
 void NoteTable::CreateUIControls()
@@ -60,6 +62,8 @@ void NoteTable::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER_DIGITS(mRandomizePitchRangeSlider, "rand pitch range", &mRandomizePitchRange, 0, 1, 2);
    UIBLOCK_NEWLINE();
+   BUTTON(mClearButton, "clear");
+   UIBLOCK_SHIFTRIGHT();
    UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
    UIBLOCK_SHIFTRIGHT();
    INTSLIDER(mGridControlOffsetXSlider, "x offset", &mGridControlOffsetX, 0, 16);
@@ -67,7 +71,7 @@ void NoteTable::CreateUIControls()
    INTSLIDER(mGridControlOffsetYSlider, "y offset", &mGridControlOffsetY, 0, 16);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, height + 18, width - 10, 110, 8, 24, this);
+   mGrid = new UIGrid("uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange, this);
 
    mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
    mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);
@@ -114,6 +118,7 @@ void NoteTable::DrawModule()
    mOctaveSlider->Draw();
    mNoteModeSelector->Draw();
    mRandomizePitchButton->Draw();
+   mClearButton->Draw();
    mGridControlTarget->Draw();
    mGridControlOffsetXSlider->Draw();
    mGridControlOffsetYSlider->Draw();
@@ -183,10 +188,13 @@ void NoteTable::DrawModule()
    for (int i = 0; i < mGrid->GetCols(); ++i)
    {
       const float kPlayHighlightDurationMs = 250;
-      if (mLastColumnPlayTime[i] != -1 && gTime - mLastColumnPlayTime[i] > 0 && gTime - mLastColumnPlayTime[i] < kPlayHighlightDurationMs)
+      if (mLastColumnPlayTime[i] != -1)
       {
-         float fade = (1 - (gTime - mLastColumnPlayTime[i]) / kPlayHighlightDurationMs);
+         float fade = ofClamp(1 - (gTime - mLastColumnPlayTime[i]) / kPlayHighlightDurationMs, 0, 1);
          ofPushStyle();
+         ofFill();
+         ofSetColor(ofColor::white, ofLerp(20, 80, fade));
+         ofRect(mGrid->GetPosition(true).x + mGrid->GetWidth() / mLength * i, mGrid->GetPosition(true).y, mGrid->GetWidth() / mLength, mGrid->GetHeight());
          ofNoFill();
          ofSetLineWidth(3 * fade);
          for (int row = 0; row < mGrid->GetRows(); ++row)
@@ -348,15 +356,22 @@ void NoteTable::PlayColumn(double time, int column, int velocity, int voiceIdx, 
    }
    else
    {
+      mLastColumnPlayTime[column] = time;
       for (int row = 0; row < mGrid->GetRows(); ++row)
       {
+         int outputPitch = RowToPitch(row);
+
+         if (mQueuedPitches[outputPitch])
+         {
+            mGrid->SetVal(column, row, 1);
+            mQueuedPitches[outputPitch] = false;
+         }
+
          if (mGrid->GetVal(column, row) == 0)
             continue;
 
-         int outputPitch = RowToPitch(row);
          PlayNoteOutput(time, outputPitch, velocity, voiceIdx, modulation);
          mColumnCables[column]->PlayNoteOutput(time, outputPitch, velocity, voiceIdx, modulation);
-         mLastColumnPlayTime[column] = time;
          mLastColumnNoteOnPitches[column][outputPitch] = true;
          mPitchPlayTimes[outputPitch] = time;
       }
@@ -410,14 +425,14 @@ void NoteTable::OnGridButton(int x, int y, float velocity, IGridController* grid
 void NoteTable::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizePitchButton)
-   {
       RandomizePitches(GetKeyModifiers() & kModifier_Shift);
-   }
+   if (button == mClearButton)
+      mGrid->Clear();
 }
 
 void NoteTable::RandomizePitches(bool fifths)
 {
-   /*if (fifths)
+   if (fifths)
    {
       for (int i = 0; i < mLength; ++i)
       {
@@ -426,19 +441,19 @@ void NoteTable::RandomizePitches(bool fifths)
             switch (gRandom() % 5)
             {
                case 0:
-                  mTones[i] = 0;
+                  SetColumnRow(i, 0);
                   break;
                case 1:
-                  mTones[i] = 4;
+                  SetColumnRow(i, 4);
                   break;
                case 2:
-                  mTones[i] = 7;
+                  SetColumnRow(i, 7);
                   break;
                case 3:
-                  mTones[i] = 11;
+                  SetColumnRow(i, 11);
                   break;
                case 4:
-                  mTones[i] = 14;
+                  SetColumnRow(i, 14);
                   break;
             }
          }
@@ -450,13 +465,25 @@ void NoteTable::RandomizePitches(bool fifths)
       {
          if (ofRandom(1) <= mRandomizePitchChance)
          {
-            float minValue = MAX(0, mTones[i] - mNoteRange * mRandomizePitchRange);
-            float maxValue = MIN(mNoteRange, mTones[i] + mNoteRange * mRandomizePitchRange);
+            int row = ofRandom(0, mNoteRange);
+            for (int j = 0; j < mNoteRange; ++j)
+            {
+               if (mGrid->GetVal(i, j) > 0)
+                  row = j;
+            }
+            float minValue = MAX(0, row - mNoteRange * mRandomizePitchRange);
+            float maxValue = MIN(mNoteRange, row + mNoteRange * mRandomizePitchRange);
             if (minValue != maxValue)
-               mTones[i] = ofClamp(int(ofRandom(minValue, maxValue) + .5f), 0, mNoteRange - 1);
+               SetColumnRow(i, ofClamp(int(ofRandom(minValue, maxValue) + .5f), 0, mNoteRange - 1));
          }
       }
-   }*/
+   }
+}
+
+void NoteTable::SetColumnRow(int column, int row)
+{
+   for (int i = 0; i < mNoteRange; ++i)
+      mGrid->SetVal(column, i, i == row ? 1 : 0, false);
 }
 
 void NoteTable::GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows)
@@ -503,6 +530,10 @@ bool NoteTable::OnPush2Control(MidiMessageType type, int controlIndex, float mid
                {
                   mGrid->SetVal(mPush2HeldStep, index, mGrid->GetVal(mPush2HeldStep, index) > 0 ? 0 : 1);
                }
+               else
+               {
+                  mQueuedPitches[RowToPitch(index)] = true;
+               }
             }
          }
 
@@ -546,6 +577,8 @@ void NoteTable::UpdatePush2Leds(Push2Control* push2)
                pushColor = 127;
             else if (mPush2HeldStep == -1 && mNoteOutput.GetNotes()[pitch])
                pushColor = gTime - mPitchPlayTimes[pitch] < 100 ? 127 : 2;
+            else if (mQueuedPitches[pitch])
+               pushColor = 126;
             else if (TheScale->IsRoot(pitch))
                pushColor = 69;
             else if (TheScale->IsInPentatonic(pitch))
@@ -628,6 +661,8 @@ void NoteTable::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mNoteRange = mModuleSaveData.GetInt("gridrows");
    mShowColumnCables = mModuleSaveData.GetBool("columncables");
+
+   mGrid->SetGrid(mLength, mNoteRange);
 }
 
 void NoteTable::SaveState(FileStreamOut& out)
@@ -637,6 +672,8 @@ void NoteTable::SaveState(FileStreamOut& out)
    IDrawableModule::SaveState(out);
 
    mGrid->SaveState(out);
+   out << mGrid->GetWidth();
+   out << mGrid->GetHeight();
 }
 
 void NoteTable::LoadState(FileStreamIn& in, int rev)
@@ -649,4 +686,12 @@ void NoteTable::LoadState(FileStreamIn& in, int rev)
 
    mGrid->LoadState(in);
    GridUpdated(mGrid, 0, 0, 0, 0);
+
+   if (rev >= 3)
+   {
+      float width, height;
+      in >> width;
+      in >> height;
+      mGrid->SetDimensions(width, height);
+   }
 }

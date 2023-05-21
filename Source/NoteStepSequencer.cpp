@@ -571,9 +571,10 @@ bool NoteStepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, f
             if (midiValue > 0)
             {
                int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
-               if (index < 0 || index >= mNoteRange)
+               if (index < 0 || index >= mNoteRange || x >= pitchCols)
                {
-                  //out of range, do nothing
+                  //out of range
+                  mQueuedPush2Tone = -2;
                }
                else if (mPush2HeldStep != -1)
                {
@@ -666,8 +667,8 @@ void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
          {
             int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
             int pitch = RowToPitch(index);
-            if (x >= pitchCols || index >= mNoteRange)
-               pushColor = 0;
+            if (x >= pitchCols || index < 0 || index >= mNoteRange)
+               pushColor = mQueuedPush2Tone == -2 ? 126 : 0;
             else if (index == mQueuedPush2Tone)
                pushColor = 126;
             else if (index == mTones[displayStep] && ((mVels[displayStep] > 0 && !mAlreadyDidNoteOff) || mPush2HeldStep != -1))
@@ -792,9 +793,16 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 
    if (mQueuedPush2Tone != -1)
    {
-      mTones[mArpIndex] = mQueuedPush2Tone;
-      mVels[mArpIndex] = mQueuedPush2Vel;
-      mNoteLengths[mArpIndex] = mQueuedPush2Length;
+      if (mQueuedPush2Tone == -2)
+      {
+         mVels[mArpIndex] = 0;
+      }
+      else
+      {
+         mTones[mArpIndex] = mQueuedPush2Tone;
+         mVels[mArpIndex] = mQueuedPush2Vel;
+         mNoteLengths[mArpIndex] = mQueuedPush2Length;
+      }
       mQueuedPush2Tone = -1;
       mGridSyncQueued = true;
    }

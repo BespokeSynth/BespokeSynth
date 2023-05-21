@@ -530,6 +530,7 @@ notetable~map a pitch (starting from zero) to a scale pitch
 ~y offset~y offset of attached grid controller
 ~rand pitch chance~when clicking the random pitch button, what is the chance that a step gets changed?
 ~rand pitch range~when clicking the random pitch button, how far will the pitch change?
+~clear~clear grid
 
 
 
