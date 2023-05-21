@@ -97,6 +97,7 @@ private:
    void SetModuleGridLights();
    void DrawDisplayModuleControls();
    void DrawLowerModuleSelector();
+   void DrawRoutingDisplay();
    void SetDisplayModule(IDrawableModule* module, bool addToHistory);
    void DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
@@ -120,6 +121,7 @@ private:
    int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
    int GetNumDisplayPixels() const;
    bool AllowRepatch() const;
+   void UpdateRoutingModules();
 
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
@@ -164,15 +166,31 @@ private:
    bool mAddTrackHeld{ false };
    int mHeldKnobIndex{ -1 };
 
+   struct Routing
+   {
+      Routing(IDrawableModule* module, ofColor connectionColor)
+      {
+         mModule = module;
+         mConnectionColor = connectionColor;
+      }
+      IDrawableModule* mModule;
+      ofColor mConnectionColor;
+   };
+
+   std::vector<Routing> mRoutingInputModules;
+   std::vector<Routing> mRoutingOutputModules;
+
    enum class ScreenDisplayMode
    {
       kNormal,
       kAddModule,
-      kMap
+      kMap,
+      kRouting
    };
    ScreenDisplayMode mScreenDisplayMode{ ScreenDisplayMode::kNormal };
 
-   IPush2GridController* mGridControlModule{ nullptr };
+   IPush2GridController* mGridControlInterface{ nullptr };
+   IDrawableModule* mGridControlModule{ nullptr };
    bool mDisplayModuleCanControlGrid{ false };
 
    int mLedState[128 * 2]{}; //bottom 128 are notes, top 128 are CCs

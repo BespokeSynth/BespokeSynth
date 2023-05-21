@@ -62,7 +62,7 @@ private:
 
    float mWidth{ 110 };
    float mHeight{ 60 };
-   int mVelocities[127]{};
+   int mVelocities[128]{};
 };
 
 #endif /* defined(__Bespoke__NoteDisplayer__) */

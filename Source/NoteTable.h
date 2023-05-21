@@ -97,7 +97,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -113,6 +113,7 @@ private:
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
+   void SetColumnRow(int column, int row);
 
    enum NoteMode
    {
@@ -138,13 +139,15 @@ private:
    float mRandomizePitchRange{ 1 };
    FloatSlider* mRandomizePitchChanceSlider{ nullptr };
    FloatSlider* mRandomizePitchRangeSlider{ nullptr };
+   ClickButton* mClearButton{ nullptr };
 
    static constexpr int kMaxLength = 32;
 
    std::array<double, kMaxLength> mLastColumnPlayTime{};
-   std::array<bool[127], kMaxLength> mLastColumnNoteOnPitches{};
+   std::array<bool[128], kMaxLength> mLastColumnNoteOnPitches{};
    std::array<AdditionalNoteCable*, kMaxLength> mColumnCables{ nullptr };
-   std::array<double, 127> mPitchPlayTimes{};
+   std::array<double, 128> mPitchPlayTimes{};
+   std::array<bool, 128> mQueuedPitches{};
 
    GridControlTarget* mGridControlTarget{ nullptr };
    int mGridControlOffsetX{ 0 };

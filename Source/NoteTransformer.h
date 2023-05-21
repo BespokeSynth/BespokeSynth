@@ -67,7 +67,7 @@ private:
    int mToneMod[7]{};
    IntSlider* mToneModSlider[7];
    double mLastTimeTonePlayed[7]{};
-   int mLastNoteOnForPitch[127];
+   int mLastNoteOnForPitch[128];
 };
 
 

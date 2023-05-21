@@ -94,7 +94,7 @@ private:
    IntSlider* mLengthSlider{ nullptr };
    int mStep{ 0 };
    Checkbox* mSyncCheckbox{ nullptr };
-   bool mSync{ false };
+   bool mSync{ true };
    int mCustomDivisor{ 8 };
    IntSlider* mCustomDivisorSlider{ nullptr };
    bool mRandom{ false };
