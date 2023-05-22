@@ -501,6 +501,86 @@ void Snapshots::DeleteSnapshot(int idx)
    mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
 }
 
+bool Snapshots::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex >= 36 && controlIndex <= 99)
+      {
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = 7 - gridIndex / 8;
+         int index = x + (y - 1) * 8;
+
+         if (x == 0 && y == 0)
+         {
+            mStoreMode = midiValue > 0;
+         }
+         else if (x == 1 && y == 0)
+         {
+            mDeleteMode = midiValue > 0;
+         }
+         else if (midiValue > 0 && index >= 0 && index < (int)mSnapshotCollection.size())
+         {
+            if (mStoreMode)
+               StoreSnapshot(index, false);
+            else if (mDeleteMode)
+               DeleteSnapshot(index);
+            else
+               SetSnapshot(index, gTime);
+
+            UpdateGridValues();
+         }
+
+         return true;
+      }
+   }
+
+   return false;
+}
+
+void Snapshots::UpdatePush2Leds(Push2Control* push2)
+{
+   for (int x = 0; x < 8; ++x)
+   {
+      for (int y = 0; y < 8; ++y)
+      {
+         int pushColor;
+         int index = x + (y - 1) * 8;
+
+         if (x == 0 && y == 0)
+         {
+            if (mStoreMode)
+               pushColor = 126;
+            else
+               pushColor = 86;
+         }
+         else if (x == 1 && y == 0)
+         {
+            if (mDeleteMode)
+               pushColor = 127;
+            else
+               pushColor = 114;
+         }
+         else if (index >= 0 && index < (int)mSnapshotCollection.size())
+         {
+            if (index == mCurrentSnapshot)
+               pushColor = 120;
+            else if (mSnapshotCollection[index].mSnapshots.empty() == false)
+               pushColor = 125;
+            else
+               pushColor = 20;
+         }
+         else
+         {
+            pushColor = 0;
+         }
+
+         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+      }
+   }
+}
+
 namespace
 {
    const float extraW = 10;
