@@ -260,6 +260,56 @@ void StutterControl::UpdateGridLights()
    }
 }
 
+bool StutterControl::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex >= 36 && controlIndex <= 99)
+      {
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = 7 - gridIndex / 8;
+
+         if (y < 2)
+         {
+            int index = x + y * 8;
+            mStutter[index] = midiValue > 0;
+            SendStutter(gTime, GetStutter((StutterType)index), mStutter[index]);
+         }
+
+         return true;
+      }
+   }
+
+   return false;
+}
+
+void StutterControl::UpdatePush2Leds(Push2Control* push2)
+{
+   for (int x = 0; x < 8; ++x)
+   {
+      for (int y = 0; y < 8; ++y)
+      {
+         int pushColor;
+
+         if (y < 2)
+         {
+            int index = x + y * 8;
+            if (mStutter[index])
+               pushColor = 2;
+            else
+               pushColor = 1;
+         }
+         else
+         {
+            pushColor = 0;
+         }
+
+         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+      }
+   }
+}
+
 void StutterControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);

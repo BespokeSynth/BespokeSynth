@@ -551,6 +551,10 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       SetLed(kMidiMessage_Control, kPlayButton, mDisplayModule->IsEnabled() ? 126 : 127);
    else
       SetLed(kMidiMessage_Control, kPlayButton, 0);
+   if (mDisplayModule != nullptr)
+      SetLed(kMidiMessage_Control, kCircleButton, GetPadColorForType(mDisplayModule->GetModuleCategory(), !mDisplayModule->Minimized()));
+   else
+      SetLed(kMidiMessage_Control, kCircleButton, 0);
    SetLed(kMidiMessage_Control, kTapTempoButton, isHoveringOverNewModule ? 127 : 0, isHoveringOverNewModule ? 32 : 0);
    SetLed(kMidiMessage_Control, kMetronomeButton, mDisplayModule == this ? 127 : 8);
    SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
@@ -794,6 +798,23 @@ void Push2Control::DrawDisplayModuleControls()
 
       ofPopMatrix();
       ofPopStyle();
+
+      ofPushStyle();
+      ofSetLineWidth(.5f);
+      int length = MAX(mButtonControls.size(), mSliderControls.size());
+      if (length > 8)
+      {
+         ofRectangle bar(ableton::Push2DisplayBitmap::kWidth * kPixelRatio - 100, 3, 80, 10);
+         ofNoFill();
+         ofSetColor(100, 100, 100);
+         ofRect(bar);
+         ofFill();
+         ofSetColor(255, 255, 255);
+         bar.x += bar.width * mModuleViewOffsetSmoothed / length;
+         bar.width *= 8.0f / length;
+         ofRect(bar);
+      }
+      ofPopStyle();
    }
    else
    {
@@ -813,7 +834,7 @@ void Push2Control::DrawLowerModuleSelector()
       ofPushMatrix();
       ofPushStyle();
 
-      ofClipWindow(kColumnSpacing * i, 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
+      ofClipWindow(kColumnSpacing * (i - mModuleListOffsetSmoothed), 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
       float x;
       float y;
@@ -1848,6 +1869,11 @@ void Push2Control::OnMidiControl(MidiControl& control)
          else
             mDisplayModule->SetEnabled(!mDisplayModule->IsEnabled());
       }
+   }
+   else if (control.mControl == kCircleButton)
+   {
+      if (control.mValue > 0 && mDisplayModule != nullptr)
+         mDisplayModule->SetMinimized(!mDisplayModule->Minimized());
    }
    else
    {

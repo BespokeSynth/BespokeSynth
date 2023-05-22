@@ -38,8 +38,9 @@
 #include "INoteReceiver.h"
 #include "DropdownList.h"
 #include "TextEntry.h"
+#include "Push2Control.h"
 
-class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener
+class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IPush2GridController
 {
 public:
    Snapshots();
@@ -70,6 +71,10 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   //IPush2GridController
+   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
