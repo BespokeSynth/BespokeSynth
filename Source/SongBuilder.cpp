@@ -445,6 +445,102 @@ void SongBuilder::PlaySequence(double time, int startIndex)
    }
 }
 
+bool SongBuilder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex >= 36 && controlIndex <= 99 && midiValue > 0)
+      {
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = 7 - gridIndex / 8;
+
+         if (x == 0)
+         {
+            if (mUseSequencer)
+            {
+               switch (y)
+               {
+                  case 0: mPlaySequenceButton->SetValue(1, gTime); break;
+                  case 1: mStopSequenceButton->SetValue(1, gTime); break;
+                  default: break;
+               }
+            }
+         }
+         else
+         {
+            int index = y + (x - 1) * 8;
+            if (index < mScenes.size())
+               mScenes[index]->mActivateButton->SetValue(1, gTime);
+         }
+
+         return true;
+      }
+   }
+
+   return false;
+}
+
+void SongBuilder::UpdatePush2Leds(Push2Control* push2)
+{
+   for (int x = 0; x < 8; ++x)
+   {
+      for (int y = 0; y < 8; ++y)
+      {
+         int pushColor = 0;
+         int pushColorBlink = -1;
+
+         if (x == 0)
+         {
+            if (mUseSequencer)
+            {
+               switch (y)
+               {
+                  case 0:
+                     pushColor = mSequenceStepIndex == -1 ? 86 : 126;
+                     if (mSequenceStartQueued)
+                        pushColorBlink = 0;
+                     break;
+                  case 1:
+                     pushColor = mSequenceStepIndex == -1 ? 127 : 68;
+                     break;
+                  default: break;
+               }
+            }
+         }
+         else
+         {
+            int index = y + (x - 1) * 8;
+            if (index < mScenes.size())
+            {
+               if (index == mCurrentScene)
+                  pushColor = 120;
+               else
+                  pushColor = 124;
+
+               if (index == mQueuedScene)
+                  pushColorBlink = 0;
+            }
+         }
+
+         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor, pushColorBlink);
+      }
+   }
+}
+
+bool SongBuilder::DrawToPush2Screen()
+{
+   ofPushStyle();
+   ofSetColor(255, 255, 255);
+   if (mQueuedScene >= 0 && mQueuedScene < mScenes.size())
+      DrawTextNormal("queued: " + mScenes[mQueuedScene]->mName, 100, -2);
+   else if (mCurrentScene >= 0 && mCurrentScene < mScenes.size())
+      DrawTextNormal("scene: " + mScenes[mCurrentScene]->mName, 100, -2);
+   ofPopStyle();
+
+   return false;
+}
+
 void SongBuilder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPlaySequenceButton)

@@ -496,7 +496,7 @@ void NoteTable::GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteTable::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
    int sequenceRows, pitchCols, pitchRows;
    GetPush2Layout(sequenceRows, pitchCols, pitchRows);

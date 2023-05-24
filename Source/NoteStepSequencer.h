@@ -82,7 +82,7 @@ public:
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    //IPush2GridController
-   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    //IAudioPoller

@@ -501,7 +501,7 @@ void Snapshots::DeleteSnapshot(int idx)
    mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
 }
 
-bool Snapshots::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note)
    {

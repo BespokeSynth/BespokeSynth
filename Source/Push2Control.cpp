@@ -1015,11 +1015,6 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
       }
       ofPushMatrix();
       ofClipWindow(kColumnSpacing * i, yPos - 15, kColumnSpacing, 100, true);
-      controls[i]->Render();
-      ofPopMatrix();
-      controls[i]->SetPosition(originalRect.x, originalRect.y);
-      if (adsr != nullptr)
-         adsr->SetDimensions(originalRect.width, originalRect.height);
 
       ofPushStyle();
       ModuleCategory moduleType = controls[i]->GetModuleParent()->GetModuleCategory();
@@ -1029,7 +1024,6 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
          ofSetColor(IDrawableModule::GetColor(moduleType));
       else
          ofSetColor(100, 100, 100);
-
       if (adsr == nullptr)
       {
          if (mDisplayModule == this)
@@ -1037,7 +1031,15 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
          else
             DrawTextBold(controls[i]->Name(), kColumnSpacing * i + 3, yPos - 5, 16);
       }
+      controls[i]->Render();
+      ofPopStyle();
 
+      ofPopMatrix();
+      controls[i]->SetPosition(originalRect.x, originalRect.y);
+      if (adsr != nullptr)
+         adsr->SetDimensions(originalRect.width, originalRect.height);
+
+      ofPushStyle();
       int pushControlIndex = i - mModuleViewOffset;
       if (sliders && pushControlIndex >= 0 && pushControlIndex < 8 && mNoteHeldState[pushControlIndex])
       {
@@ -1059,7 +1061,6 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
             ofPopMatrix();
          }
       }
-
       ofPopStyle();
    }
 }
@@ -1305,7 +1306,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
 {
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnPush2Control(kMidiMessage_Note, note.mPitch, note.mVelocity);
+      bool handled = mGridControlInterface->OnPush2Control(this, kMidiMessage_Note, note.mPitch, note.mVelocity);
       if (handled)
          return;
    }
@@ -1462,7 +1463,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
 {
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnPush2Control(kMidiMessage_Control, control.mControl, control.mValue);
+      bool handled = mGridControlInterface->OnPush2Control(this, kMidiMessage_Control, control.mControl, control.mValue);
       if (handled)
          return;
    }
@@ -1855,8 +1856,17 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       if (control.mValue > 0 && mDisplayModule != nullptr)
       {
-         ofRectangle rect = mDisplayModule->GetRect();
-         TheSynth->PanTo(rect.getCenter().x, rect.getCenter().y);
+         if (mHeldKnobIndex == -1)
+         {
+            ofRectangle rect = mDisplayModule->GetRect();
+            TheSynth->PanTo(rect.getCenter().x, rect.getCenter().y);
+         }
+         else
+         {
+            int controlIndex = mHeldKnobIndex + mModuleViewOffset;
+            if (controlIndex < mSliderControls.size() && (mScreenDisplayMode == ScreenDisplayMode::kNormal || mScreenDisplayMode == ScreenDisplayMode::kMap))
+               mSliderControls[controlIndex]->ResetToOriginal();
+         }
       }
    }
    else if (control.mControl == kPlayButton)
@@ -1885,7 +1895,7 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnPush2Control(kMidiMessage_PitchBend, pitchBend.mChannel, pitchBend.mValue);
+      bool handled = mGridControlInterface->OnPush2Control(this, kMidiMessage_PitchBend, pitchBend.mChannel, pitchBend.mValue);
       if (handled)
          return;
    }

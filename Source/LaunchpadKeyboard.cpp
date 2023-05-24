@@ -392,7 +392,7 @@ void LaunchpadKeyboard::OnTimeEvent(double time)
 {
 }
 
-bool LaunchpadKeyboard::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+bool LaunchpadKeyboard::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note && controlIndex >= 36 && controlIndex <= 99)
    {

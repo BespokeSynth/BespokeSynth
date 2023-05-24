@@ -77,7 +77,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IPush2GridController
-   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;

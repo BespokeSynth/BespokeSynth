@@ -523,7 +523,7 @@ void NoteStepSequencer::GetPush2Layout(int& sequenceRows, int& pitchCols, int& p
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteStepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+bool NoteStepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
    int sequenceRows, pitchCols, pitchRows;
    GetPush2Layout(sequenceRows, pitchCols, pitchRows);

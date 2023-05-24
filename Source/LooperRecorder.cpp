@@ -587,6 +587,92 @@ void LooperRecorder::CancelFreeRecord()
    mStartFreeRecordTime = 0;
 }
 
+bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex >= 36 && controlIndex <= 99 && midiValue > 0)
+      {
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = 7 - gridIndex / 8;
+
+         if (y == 0)
+         {
+            switch (x)
+            {
+               case 0: mCommit8BarsButton->SetValue(1, gTime); break;
+               case 1: mCommit4BarsButton->SetValue(1, gTime); break;
+               case 2: mCommit2BarsButton->SetValue(1, gTime); break;
+               case 3: mCommit1BarButton->SetValue(1, gTime); break;
+               default: break;
+            }
+         }
+         else if (y == 1)
+         {
+            if (x < mLoopers.size())
+               mNextCommitTargetIndex = x;
+         }
+         else if (y - 2 < mLoopers.size())
+         {
+            int looperIndex = y - 2;
+            if (mLoopers[looperIndex] != nullptr)
+            {
+               if (x == 0)
+                  push2->SetDisplayModule(mLoopers[looperIndex]);
+               if (x == 1)
+                  mLoopers[looperIndex]->SetMute(gTime, !mLoopers[looperIndex]->GetMute());
+            }
+         }
+
+         return true;
+      }
+   }
+
+   return false;
+}
+
+void LooperRecorder::UpdatePush2Leds(Push2Control* push2)
+{
+   for (int x = 0; x < 8; ++x)
+   {
+      for (int y = 0; y < 8; ++y)
+      {
+         int pushColor = 0;
+
+         if (y == 0)
+         {
+            switch (x)
+            {
+               case 0: pushColor = mCommit8BarsButton->GetValue() > 0 ? 125 : 33; break;
+               case 1: pushColor = mCommit4BarsButton->GetValue() > 0 ? 125 : 33; break;
+               case 2: pushColor = mCommit2BarsButton->GetValue() > 0 ? 125 : 33; break;
+               case 3: pushColor = mCommit1BarButton->GetValue() > 0 ? 125 : 33; break;
+               default: break;
+            }
+         }
+         else if (y == 1)
+         {
+            if (x < mLoopers.size())
+               pushColor = (x == mNextCommitTargetIndex) ? 126 : 86;
+         }
+         else if (y - 2 < mLoopers.size())
+         {
+            int looperIndex = y - 2;
+            if (mLoopers[looperIndex] != nullptr)
+            {
+               if (x == 0)
+                  pushColor = (push2->GetDisplayModule() == mLoopers[looperIndex]) ? 125 : 33;
+               if (x == 1)
+                  pushColor = mLoopers[looperIndex]->GetMute() ? 127 : 68;
+            }
+         }
+
+         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+      }
+   }
+}
+
 void LooperRecorder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResampleButton)
