@@ -78,6 +78,7 @@ void DrumPlayer::CreateUIControls()
    mGridControlTarget = new GridControlTarget(this, "grid", 4, 50);
    mQuantizeIntervalSelector = new DropdownList(this, "quantize", 200, 4, (int*)(&mQuantizeInterval));
    mNoteRepeatCheckbox = new Checkbox(this, "repeat", 200, 22, &mNoteRepeat);
+   mFullVelocityCheckbox = new Checkbox(this, "full vel", 200, 40, &mFullVelocity);
 
    mKitSelector->SetShowing(false); //TODO(Ryan) replace "kits" concept with a better form of serialization
 
@@ -488,6 +489,9 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       return;
    }
 
+   if (velocity > 0 && mFullVelocityCheckbox)
+      velocity = 127;
+
    pitch %= 24;
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)
    {
@@ -516,7 +520,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-bool DrumPlayer::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -549,6 +553,8 @@ void DrumPlayer::UpdatePush2Leds(Push2Control* push2)
             int index = x + y * 4;
             if (mDrumHits[index].GetPlayProgress(gTime) < 1)
                pushColor = 2;
+            else if (mDrumHits[index].mButtonHeldVelocity > 0)
+               pushColor = 66;
             else
                pushColor = 1;
          }
@@ -751,6 +757,7 @@ void DrumPlayer::DrawModule()
       mShuffleButton->Draw();
       mQuantizeIntervalSelector->Draw();
       mNoteRepeatCheckbox->Draw();
+      mFullVelocityCheckbox->Draw();
 
       ofPushMatrix();
       ofPushStyle();

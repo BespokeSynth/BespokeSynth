@@ -91,7 +91,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IPush2GridController
-   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
@@ -172,6 +172,8 @@ private:
    Checkbox* mNoteRepeatCheckbox{ nullptr };
    NoteInterval mQuantizeInterval{ NoteInterval::kInterval_None };
    DropdownList* mQuantizeIntervalSelector{ nullptr };
+   bool mFullVelocity{ false };
+   Checkbox* mFullVelocityCheckbox{ nullptr };
 
    void LoadSampleLock();
    void LoadSampleUnlock();

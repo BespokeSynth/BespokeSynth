@@ -37,11 +37,12 @@
 #include "Looper.h"
 #include "Ramp.h"
 #include "DropdownList.h"
+#include "Push2Control.h"
 
 class Stutter;
 class PatchCableSource;
 
-class LooperRecorder : public IAudioProcessor, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IIntSliderListener, public IDropdownListener
+class LooperRecorder : public IAudioProcessor, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IIntSliderListener, public IDropdownListener, public IPush2GridController
 {
 public:
    LooperRecorder();
@@ -86,6 +87,10 @@ public:
    void Poll() override;
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+
+   //IPush2GridController
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;

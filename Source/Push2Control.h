@@ -54,6 +54,8 @@ public:
    void Exit() override;
 
    void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
+   void SetDisplayModule(IDrawableModule* module, bool addToHistory = true);
+   IDrawableModule* GetDisplayModule() const { return mDisplayModule; }
 
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
@@ -98,7 +100,6 @@ private:
    void DrawDisplayModuleControls();
    void DrawLowerModuleSelector();
    void DrawRoutingDisplay();
-   void SetDisplayModule(IDrawableModule* module, bool addToHistory);
    void DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
@@ -209,6 +210,6 @@ class IPush2GridController
 public:
    virtual ~IPush2GridController() {}
    virtual void OnPush2Connect() {}
-   virtual bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) = 0;
+   virtual bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) = 0;
    virtual void UpdatePush2Leds(Push2Control* push2) = 0;
 };

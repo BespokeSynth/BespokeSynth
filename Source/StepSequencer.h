@@ -159,7 +159,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    //IPush2GridController
-   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    bool IsMetaStepActive(double time, int col, int row);

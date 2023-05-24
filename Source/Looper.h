@@ -105,6 +105,8 @@ public:
    void SetLoopLength(int length);
    void SetRewriter(Rewriter* rewriter) { mRewriter = rewriter; }
    void Rewrite();
+   bool GetMute() const { return mMute; }
+   void SetMute(double time, bool mute);
 
    bool CheckNeedsDraw() override { return true; }
 

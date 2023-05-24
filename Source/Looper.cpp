@@ -957,6 +957,12 @@ void Looper::Commit(RollingBuffer* commitBuffer /* = nullptr */)
    }
 }
 
+void Looper::SetMute(double time, bool mute)
+{
+   mMute = mute;
+   mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
+}
+
 void Looper::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample sample;
@@ -1109,7 +1115,7 @@ void Looper::CheckboxUpdated(Checkbox* checkbox, double time)
    }
    if (checkbox == mMuteCheckbox)
    {
-      mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
+      SetMute(time, mMute);
    }
    if (checkbox == mWriteInputCheckbox)
    {

@@ -540,7 +540,7 @@ bool StepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
    mPush2Connected = true;
 
