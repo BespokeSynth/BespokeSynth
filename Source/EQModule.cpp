@@ -394,6 +394,25 @@ bool EQModule::MouseMoved(float x, float y)
    return false;
 }
 
+bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+{
+   if (mHoveredFilterHandleIndex != -1)
+   {
+      float add = scrollY;
+      if (GetKeyModifiers() & kModifier_Command)
+      {
+         add /= 10;
+      }
+      else if (GetKeyModifiers() & kModifier_Shift)
+      {
+         add *= 10;
+      }
+      auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
+      qSlider->SetValue(ofClamp(qSlider->GetValue() + add, qSlider->GetMin(), qSlider->GetMax()), NextBufferTime(false));
+   }
+   return false;
+}
+
 void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    for (auto& filter : mFilters)
