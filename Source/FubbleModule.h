@@ -119,7 +119,7 @@ private:
 
       FubbleModule* mOwner{ nullptr };
       bool mIsHorizontal{ false };
-      Curve mCurve;
+      Curve mCurve{ 0 };
       bool mHasRecorded{ false };
    };
 

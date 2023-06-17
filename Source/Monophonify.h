@@ -87,7 +87,7 @@ private:
    DropdownList* mPortamentoModeSelector{ nullptr };
    float mGlideTime{ 0 };
    FloatSlider* mGlideSlider{ nullptr };
-   ModulationChain mPitchBend;
+   ModulationChain mPitchBend{ 0 };
 };
 
 

@@ -119,14 +119,14 @@ private:
    IntSlider* mElementColSlider{ nullptr };
    FloatSlider* mVelocitySlider{ nullptr };
    int mVoiceIdx{ -1 };
-   ModulationChain mPitchBend;
-   ModulationChain mModWheel;
-   ModulationChain mPressure;
+   ModulationChain mPitchBend{ 0 };
+   ModulationChain mModWheel{ .5f };
+   ModulationChain mPressure{ .5f };
    float mPan{ 0 };
-   Curve mPitchBendCurve;
-   Curve mModWheelCurve;
-   Curve mPressureCurve;
-   Curve mPanCurve;
+   Curve mPitchBendCurve{ 0 };
+   Curve mModWheelCurve{ .5f };
+   Curve mPressureCurve{ .5f };
+   Curve mPanCurve{ 0 };
 };
 
 class SampleCanvasElement : public CanvasElement

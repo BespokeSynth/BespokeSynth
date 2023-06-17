@@ -25,8 +25,9 @@
 
 #include "ModulationChain.h"
 
-ModulationChain::ModulationChain()
+ModulationChain::ModulationChain(float initialValue)
 {
+   mRamp.SetValue(initialValue);
    mLFO.SetMode(kLFOMode_Oscillator);
 }
 

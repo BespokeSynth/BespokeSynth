@@ -47,7 +47,7 @@ public:
 class Curve : public IClickable
 {
 public:
-   Curve();
+   Curve(float defaultValue);
    void AddPoint(CurvePoint point);
    void AddPointAtEnd(CurvePoint point); //only use this if you are sure that there are no points already added at an earlier time
    float Evaluate(float time, bool holdEndForLoop = false);
@@ -91,6 +91,7 @@ private:
    float mEnd{ 1 };
    ofColor mColor{ ofColor::white };
    int mLastEvalIndex{ 0 };
+   float mDefaultValue{ 0 };
 };
 
 #endif /* defined(__Bespoke__Curve__) */
