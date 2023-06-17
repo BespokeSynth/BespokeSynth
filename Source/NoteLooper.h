@@ -76,6 +76,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 0; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    double GetCurPos(double time) const;
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
@@ -89,7 +91,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
 
    struct SavedPattern
    {

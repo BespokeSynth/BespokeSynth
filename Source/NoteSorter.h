@@ -54,11 +54,12 @@ public:
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return true; }
 
    std::array<int, 128> mPitch;
    std::vector<TextEntry*> mPitchEntry;

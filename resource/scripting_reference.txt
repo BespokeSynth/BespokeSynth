@@ -15,8 +15,7 @@ script module inputs:
 globals:
    bespoke.get_measure_time()
    bespoke.get_measure()
-   bespoke.reset_transport(rewind_amount)
-      optional: rewind_amount=.001f
+   bespoke.reset_transport()
    bespoke.get_step(subdivision)
    bespoke.count_per_measure(subdivision)
    bespoke.time_until_subdivision(subdivision)
@@ -141,13 +140,14 @@ import midicontroller
          optional: channel = -1, page = 0
       m.send_pitchbend(bend, channel, page)
          optional: channel = -1, page = 0
-      m.send_sysex(data, page = 0)
-         description: Sends a system exclusive message. The given data will be wrapped with header and tail bytes of 0xf0 and 0xf7. The example enables Session-Mode on a Launchpad X.
-         optional: page = 0
-         example: m.send_sysex(bytes([0, 32, 41, 2, 12, 16, 1])
       m.send_data(a, b, c, page)
          optional: page = 0
+      m.send_sysex(data, page)
+         optional: page = 0
+         description: Sends a system exclusive message. The given data will be wrapped with header and tail bytes of 0xf0 and 0xf7. The example enables Programmer-Mode on a Launchpad X. 
+         example: m.send_sysex(bytes([0, 32, 41, 2, 12, 14, 1]) 
       m.add_script_listener(script)
+      m.resync_controller_state()
 
 
 import linnstrument
@@ -208,6 +208,7 @@ import module
       m.get_width()
       m.get_height()
       m.set_target(target)
+      m.set_target(targetPath)
       m.get_target()
       m.get_targets()
       m.set_name(name)

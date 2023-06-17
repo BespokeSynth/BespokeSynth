@@ -48,7 +48,7 @@ public:
    //IUIControl
    void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value, double time) override;
+   void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return 2; }

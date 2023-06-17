@@ -122,7 +122,7 @@ public:
    void Poll() override;
    void PlayStepNote(double time, int note, float val);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   bool Enabled() const override { return mEnabled; }
+   bool IsEnabled() const override { return mEnabled; }
    int GetPadPressure(int row) { return mPadPressures[row]; }
    NoteInterval GetStepInterval() const { return mStepInterval; }
    int GetStepNum(double time);
@@ -159,7 +159,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    //IPush2GridController
-   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    bool IsMetaStepActive(double time, int col, int row);
@@ -196,7 +196,6 @@ private:
    void UpdateMetaLights();
 
    void DrawRowLabel(const char* label, int row, int x, int y);
-   void SetPreset(int preset);
    int GetNumSteps(NoteInterval interval, int numMeasures) const;
    Vec2i ControllerToGrid(const Vec2i& controller);
    int GetNumControllerChunks(); //how many vertical chunks of the sequence are there to fit multi-rowed on the controller?
@@ -215,11 +214,9 @@ private:
       {
          mCol = col;
          mRow = row;
-         mTime = gTime;
       }
       int mCol{ 0 };
       int mRow{ 0 };
-      double mTime{ 0 };
    };
 
    enum class NoteInputMode
@@ -232,8 +229,7 @@ private:
    float mStrength{ 1 };
    FloatSlider* mStrengthSlider{ nullptr };
    int mGridYOff{ 0 };
-   DropdownList* mPresetDropdown{ nullptr };
-   int mPreset{ -1 };
+   ClickButton* mClearButton{ nullptr };
    int mColorOffset{ 3 };
    DropdownList* mGridYOffDropdown{ nullptr };
    std::array<StepSequencerRow*, NUM_STEPSEQ_ROWS> mRows{};

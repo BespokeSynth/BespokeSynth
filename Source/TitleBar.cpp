@@ -439,17 +439,16 @@ void TitleBar::DrawModuleUnclipped()
       return;
    }
 
-   float saveCooldown = 1 - ofClamp((gTime - TheSynth->GetLastSaveTime()) / 1000, 0, 1);
-   if (saveCooldown > 0)
+   float displayMessageCooldown = 1 - ofClamp((gTime - mDisplayMessageTime) / 1000, 0, 1);
+   if (displayMessageCooldown > 0)
    {
       ofPushStyle();
-      ofSetColor(255, 255, 255, saveCooldown * 255);
+      ofSetColor(255, 255, 255, displayMessageCooldown * 255);
       float titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 40 + titleBarHeight;
-      std::string filename = juce::File(TheSynth->GetLastSavePath()).getFileName().toStdString();
-      gFontBold.DrawString("saved " + filename, 50, x, y);
+      gFontBold.DrawString(mDisplayMessage, 50, x, y);
       ofPopStyle();
    }
 
@@ -512,6 +511,12 @@ void TitleBar::DrawModuleUnclipped()
          ofPopStyle();
       }
    }
+}
+
+void TitleBar::DisplayTemporaryMessage(std::string message)
+{
+   mDisplayMessage = message;
+   mDisplayMessageTime = gTime;
 }
 
 bool TitleBar::HiddenByZoom() const

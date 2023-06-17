@@ -73,11 +73,12 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 2; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
 
    void Step(double time, float velocity, int pulseFlags);
    void Reseed();
@@ -93,7 +94,7 @@ private:
    IntSlider* mLengthSlider{ nullptr };
    int mStep{ 0 };
    Checkbox* mSyncCheckbox{ nullptr };
-   bool mSync{ false };
+   bool mSync{ true };
    int mCustomDivisor{ 8 };
    IntSlider* mCustomDivisorSlider{ nullptr };
    bool mRandom{ false };

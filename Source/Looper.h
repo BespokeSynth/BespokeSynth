@@ -105,6 +105,8 @@ public:
    void SetLoopLength(int length);
    void SetRewriter(Rewriter* rewriter) { mRewriter = rewriter; }
    void Rewrite();
+   bool GetMute() const { return mMute; }
+   void SetMute(double time, bool mute);
 
    bool CheckNeedsDraw() override { return true; }
 
@@ -124,6 +126,8 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    void DoShiftMeasure();
@@ -145,7 +149,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    void OnClicked(float x, float y, bool right) override;
 
    static const int BUFFER_X = 3;
@@ -183,6 +186,7 @@ private:
    ClickButton* mCommitButton{ nullptr };
    ClickButton* mDoubleSpeedButton{ nullptr };
    ClickButton* mHalveSpeedButton{ nullptr };
+   ClickButton* mExtendButton{ nullptr };
    ChannelBuffer* mUndoBuffer{ nullptr };
    ClickButton* mUndoButton{ nullptr };
    bool mWantUndo{ false };

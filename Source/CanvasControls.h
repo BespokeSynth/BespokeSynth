@@ -65,12 +65,13 @@ public:
    void SetUpFromSaveData() override;
    bool CanModuleTypeSaveState() const override { return false; }
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void PreDrawModule() override;
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return true; }
 
    float mWidth{ 200 };
    Canvas* mCanvas{ nullptr };

@@ -77,7 +77,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IPush2GridController
-   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -87,6 +87,8 @@ public:
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    enum LaunchpadLayout
@@ -114,7 +116,6 @@ private:
       width = 120;
       height = 74;
    }
-   bool Enabled() const override { return mEnabled; }
 
    void PlayKeyboardNote(double time, int pitch, int velocity);
    void UpdateLights(bool force = false);

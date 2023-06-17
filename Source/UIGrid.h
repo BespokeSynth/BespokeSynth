@@ -110,7 +110,7 @@ public:
 
    //IUIControl
    void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time) override {}
+   void SetValue(float value, double time, bool forceUpdate = false) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
 

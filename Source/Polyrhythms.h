@@ -93,6 +93,8 @@ public:
    void SaveState(FileStreamOut& out) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -102,7 +104,6 @@ private:
       height = mHeight;
    }
    void OnClicked(float x, float y, bool right) override;
-   bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 350 };
    float mHeight;

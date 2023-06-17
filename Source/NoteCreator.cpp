@@ -79,7 +79,7 @@ void NoteCreator::OnPulse(double time, float velocity, int flags)
 
 void NoteCreator::TriggerNote(double time, float velocity)
 {
-   if (!Enabled())
+   if (!IsEnabled())
       return;
 
    mStartTime = time;
@@ -95,12 +95,12 @@ void NoteCreator::CheckboxUpdated(Checkbox* checkbox, double time)
    {
       if (mNoteOn)
       {
-         if (Enabled())
+         if (IsEnabled())
             PlayNoteOutput(time, mPitch, mVelocity * 127, mVoiceIndex);
       }
       else
       {
-         if (Enabled())
+         if (IsEnabled())
             PlayNoteOutput(time, mPitch, 0, mVoiceIndex);
          mNoteOutput.Flush(time);
       }

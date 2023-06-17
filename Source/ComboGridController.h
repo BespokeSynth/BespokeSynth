@@ -60,6 +60,8 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    enum Arrangements
    {
@@ -72,7 +74,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
    unsigned int mRows{ 0 };

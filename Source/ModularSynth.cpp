@@ -470,9 +470,26 @@ void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
    mHideTooltipsUntilMouseMove = true;
 }
 
+void ModularSynth::SetZoomLevel(float zoomLevel)
+{
+   float oldDrawScale = gDrawScale;
+   gDrawScale = zoomLevel;
+   float zoomAmount = (gDrawScale - oldDrawScale) / oldDrawScale;
+   ofVec2f zoomCenter = ofVec2f(ofGetWidth() / gDrawScale * .5f, ofGetHeight() / gDrawScale * .5f);
+   GetDrawOffset() -= zoomCenter * zoomAmount;
+   mZoomer.CancelMovement();
+   mHideTooltipsUntilMouseMove = true;
+}
+
 void ModularSynth::PanView(float x, float y)
 {
    GetDrawOffset() += ofVec2f(x, y) / gDrawScale;
+   mHideTooltipsUntilMouseMove = true;
+}
+
+void ModularSynth::PanTo(float x, float y)
+{
+   SetDrawOffset(ofVec2f(ofGetWidth() / gDrawScale / 2 - x, ofGetHeight() / gDrawScale / 2 - y));
    mHideTooltipsUntilMouseMove = true;
 }
 
@@ -1816,7 +1833,7 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, float x, float y, 
    float modulePosX = x - moduleRect.x;
    float modulePosY = y - moduleRect.y;
 
-   if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnableCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
+   if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnabledCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
       SetMoveModule(clickedModule, moduleRect.x - x, moduleRect.y - y, false);
 
    float parentX = 0;
@@ -2060,11 +2077,13 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
 
 float* ModularSynth::GetInputBuffer(int channel)
 {
+   assert(channel >= 0 && channel < mInputBuffers.size());
    return mInputBuffers[channel];
 }
 
 float* ModularSynth::GetOutputBuffer(int channel)
 {
+   assert(channel >= 0 && channel < mOutputBuffers.size());
    return mOutputBuffers[channel];
 }
 
@@ -2785,9 +2804,9 @@ void ModularSynth::SaveState(std::string file, bool autosave)
    if (!autosave)
    {
       mCurrentSaveStatePath = file;
-      mLastSaveTime = gTime;
       std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
       mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
+      TheTitleBar->DisplayTemporaryMessage("saved " + filename);
    }
 
    mAudioThreadMutex.Lock("SaveState()");
@@ -3256,6 +3275,8 @@ void ModularSynth::SaveOutput()
 
    mGlobalRecordBuffer->ClearBuffer();
    mRecordingLength = 0;
+
+   TheTitleBar->DisplayTemporaryMessage("wrote " + filename);
 }
 
 const String& ModularSynth::GetTextFromClipboard() const

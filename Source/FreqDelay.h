@@ -57,6 +57,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -65,7 +67,6 @@ private:
       width = 130;
       height = 120;
    }
-   bool Enabled() const override { return true; }
 
    ChannelBuffer mDryBuffer;
    float mDryWet{ 1 };

@@ -69,6 +69,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -77,7 +79,6 @@ private:
       w = 235;
       h = 170;
    }
-   bool Enabled() const override { return mEnabled; }
 
    FFTData mFFTData{ VOCODER_WINDOW_SIZE, FFT_FREQDOMAIN_SIZE };
 

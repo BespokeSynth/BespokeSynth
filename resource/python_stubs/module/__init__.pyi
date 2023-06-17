@@ -25,6 +25,9 @@ class module:
    def set_target(this, target):
       pass
 
+   def set_target(this, targetPath):
+      pass
+
    def get_target(this, ):
       pass
 

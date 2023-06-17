@@ -92,6 +92,11 @@ void Ramper::OnTransportAdvanced(float amount)
       }
       else if (progress >= 1)
       {
+         for (auto* control : mUIControls)
+         {
+            if (control != nullptr)
+               control->SetValue(mTargetValue, gTime);
+         }
          mRamping = false;
       }
    }

@@ -54,6 +54,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    struct NoteInfo
    {
@@ -74,7 +76,6 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
 
    struct Remap
    {

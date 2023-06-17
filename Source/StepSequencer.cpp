@@ -61,7 +61,7 @@ void StepSequencer::CreateUIControls()
    mRandomizationDensitySlider = new FloatSlider(this, "r den", mRandomizeButton, kAnchor_Right, 65, 15, &mRandomizationDensity, 0, 1, 2);
    mRandomizationAmountSlider = new FloatSlider(this, "r amt", mRandomizationDensitySlider, kAnchor_Right, 65, 15, &mRandomizationAmount, 0, 1, 2);
    mNumMeasuresSlider = new IntSlider(this, "measures", 5, 22, 80, 15, &mNumMeasures, 1, 4);
-   mPresetDropdown = new DropdownList(this, "preset", 5, 4, &mPreset);
+   mClearButton = new ClickButton(this, "clear", 5, 4);
    mGridYOffDropdown = new DropdownList(this, "yoff", 295, 4, &mGridYOff);
    mAdjustOffsetsCheckbox = new Checkbox(this, "offsets", 175, 4, &mAdjustOffsets);
    mRepeatRateDropdown = new DropdownList(this, "repeat", 155, 22, (int*)(&mRepeatRate));
@@ -75,15 +75,6 @@ void StepSequencer::CreateUIControls()
 
    mGrid->SetMajorColSize(4);
    mGrid->SetFlip(true);
-
-   mPresetDropdown->AddLabel("clear", -1);
-   mPresetDropdown->AddLabel("16s", 0);
-   mPresetDropdown->AddLabel("8s", 1);
-   mPresetDropdown->AddLabel("kicksnare", 2);
-   mPresetDropdown->AddLabel("amen", 3);
-   mPresetDropdown->AddLabel("boogaloo", 4);
-   mPresetDropdown->AddLabel("dubstep", 5);
-   mPresetDropdown->AddLabel("trades", 6);
 
    mGridYOffDropdown->AddLabel("0", 0);
    mGridYOffDropdown->AddLabel("1", 1);
@@ -293,33 +284,20 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
             {
                mHeldButtons.push_back(HeldButton(gridPos.x, gridPos.y));
                float val = mGrid->GetVal(gridPos.x, gridPos.y);
-               if (val == 0)
-               {
-                  float strength = mStrength;
-                  mGrid->SetVal(gridPos.x, gridPos.y, strength);
-                  mHeldButtons.rbegin()->mTime = 0;
-               }
+               if (val != mStrength)
+                  mGrid->SetVal(gridPos.x, gridPos.y, mStrength);
+               else
+                  mGrid->SetVal(gridPos.x, gridPos.y, 0);
             }
             else
             {
-               double holdTime = 0;
                for (auto iter = mHeldButtons.begin(); iter != mHeldButtons.end(); ++iter)
                {
                   if (iter->mCol == gridPos.x && iter->mRow == gridPos.y)
                   {
-                     holdTime = gTime - iter->mTime;
                      mHeldButtons.erase(iter);
                      break;
                   }
-               }
-
-               if (holdTime < 500)
-               {
-                  float val = mGrid->GetVal(gridPos.x, gridPos.y);
-                  if (val == mStrength)
-                     mGrid->SetVal(gridPos.x, gridPos.y, 0);
-                  else
-                     mGrid->SetVal(gridPos.x, gridPos.y, mStrength);
                }
             }
          }
@@ -335,8 +313,8 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
       {
          for (auto iter : mHeldButtons)
          {
-            mGrid->SetVal(iter.mCol, iter.mRow, (8 - y) / 8.0f);
-            iter.mTime = 0;
+            float strength = (8 - y) / 8.0f;
+            mGrid->SetVal(iter.mCol, iter.mRow, strength);
          }
          UpdateVelocityLights();
       }
@@ -348,7 +326,6 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
          for (auto iter : mHeldButtons)
          {
             mMetaStepMasks[GetMetaStepMaskIndex(iter.mCol, iter.mRow)] ^= 1 << x;
-            iter.mTime = 0;
          }
          UpdateMetaLights();
       }
@@ -425,7 +402,7 @@ void StepSequencer::DrawModule()
    mGrid->Draw();
    mStrengthSlider->Draw();
    mNumMeasuresSlider->Draw();
-   mPresetDropdown->Draw();
+   mClearButton->Draw();
    mAdjustOffsetsCheckbox->Draw();
    mRepeatRateDropdown->Draw();
    mGridYOffDropdown->Draw();
@@ -563,7 +540,7 @@ bool StepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
    mPush2Connected = true;
 
@@ -581,17 +558,9 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
 
    if (type == kMidiMessage_PitchBend)
    {
-      if (midiValue != 8192) //default value, happens on pitch bend release
-      {
-         float val = midiValue / 16320.0f;
-         float oldStrength = mStrength;
-         mStrength = val;
-         FloatSliderUpdated(mStrengthSlider, oldStrength, gTime);
-      }
-      else
-      {
-         mStrength = 1;
-      }
+      float val = midiValue / MidiDevice::kPitchBendMax;
+      mGridYOffDropdown->SetFromMidiCC(val, gTime, true);
+
       return true;
    }
 
@@ -601,17 +570,20 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
 void StepSequencer::UpdatePush2Leds(Push2Control* push2)
 {
    mPush2Connected = true;
+   int numYChunks = GetNumControllerChunks();
 
    for (int x = 0; x < 8; ++x)
    {
       for (int y = 0; y < 8; ++y)
       {
+         int rowsPerChunk = std::max(1, (8 / numYChunks));
+         int chunkIndex = y / rowsPerChunk;
          GridColor color = GetGridColor(x, y);
          int pushColor = 0;
          switch (color)
          {
             case kGridColorOff: //off
-               pushColor = 0;
+               pushColor = (chunkIndex % 2 == 0) ? 0 : 124;
                break;
             case kGridColor1Dim: //
                pushColor = 86;
@@ -635,6 +607,16 @@ void StepSequencer::UpdatePush2Leds(Push2Control* push2)
          push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
+
+   std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19 };
+   for (int i = 0; i < 16; ++i)
+   {
+      int ledLow = (int(((i * 2) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
+      int ledHigh = (int(((i * 2 + 1) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
+      unsigned char c = ledLow + (ledHigh << 3);
+      touchStripLights += c;
+   }
+   push2->GetDevice()->SendSysEx(touchStripLights);
 }
 
 int StepSequencer::GetNumSteps(NoteInterval interval, int numMeasures) const
@@ -763,85 +745,6 @@ void StepSequencer::Exit()
       mGridControlTarget->GetGridController()->ResetLights();
 }
 
-void StepSequencer::SetPreset(int preset)
-{
-   mPreset = preset;
-
-   mGrid->Clear();
-
-   switch (preset)
-   {
-      case 0:
-         for (int i = 0; i < 16; ++i)
-            mGrid->SetValRefactor(2, i, 1.0f);
-         mGrid->SetValRefactor(0, 0, 1.0f);
-         mGrid->SetValRefactor(1, 4, 1.0f);
-         mGrid->SetValRefactor(0, 8, 1.0f);
-         mGrid->SetValRefactor(1, 12, 1.0f);
-         break;
-      case 1:
-         for (int i = 0; i < 16; i += 2)
-            mGrid->SetValRefactor(2, i, 1.0f);
-         mGrid->SetValRefactor(0, 0, 1.0f);
-         mGrid->SetValRefactor(1, 4, 1.0f);
-         mGrid->SetValRefactor(0, 8, 1.0f);
-         mGrid->SetValRefactor(1, 12, 1.0f);
-         break;
-      case 2:
-         mGrid->SetValRefactor(0, 0, 1.0f);
-         mGrid->SetValRefactor(0, 4, 1.0f);
-         mGrid->SetValRefactor(1, 4, 1.0f);
-         mGrid->SetValRefactor(0, 8, 1.0f);
-         mGrid->SetValRefactor(0, 12, 1.0f);
-         mGrid->SetValRefactor(1, 12, 1.0f);
-         break;
-      case 3: //amen
-         mGrid->SetValRefactor(0, 0, 1.0f);
-         mGrid->SetValRefactor(6, 0, .25f);
-         mGrid->SetValRefactor(0, 2, 1.0f);
-         mGrid->SetValRefactor(6, 2, .25f);
-         mGrid->SetValRefactor(1, 4, 1.0f);
-         mGrid->SetValRefactor(2, 6, 1.0f);
-         mGrid->SetValRefactor(6, 6, .25f);
-         mGrid->SetValRefactor(4, 7, .5f);
-         mGrid->SetValRefactor(2, 8, 1.0f);
-         mGrid->SetValRefactor(6, 8, .25f);
-         mGrid->SetValRefactor(4, 9, .5f);
-         mGrid->SetValRefactor(0, 10, 1.0f);
-         mGrid->SetValRefactor(6, 10, .25f);
-         mGrid->SetValRefactor(1, 12, 1.0f);
-         mGrid->SetValRefactor(2, 14, 1.0f);
-         mGrid->SetValRefactor(6, 15, .25f);
-         break;
-      case 4:
-         for (int i = 0; i < 16; i += 2)
-            mGrid->SetValRefactor(2, i, 1.0f);
-         mGrid->SetValRefactor(0, 0, 1.0f);
-         mGrid->SetValRefactor(1, 4, 1.0f);
-         mGrid->SetValRefactor(1, 7, 1.0f);
-         mGrid->SetValRefactor(1, 9, 1.0f);
-         mGrid->SetValRefactor(0, 10, 1.0f);
-         mGrid->SetValRefactor(1, 12, 1.0f);
-         break;
-      case 5:
-         mGrid->SetValRefactor(0, 0, 1.0f);
-         mGrid->SetValRefactor(1, 8, 1.0f);
-         break;
-      case 6:
-         mGrid->SetValRefactor(0, 0, 1.0f);
-         mGrid->SetValRefactor(2, 2, 1.0f);
-         mGrid->SetValRefactor(0, 4, 1.0f);
-         mGrid->SetValRefactor(1, 4, 1.0f);
-         mGrid->SetValRefactor(2, 6, 1.0f);
-         mGrid->SetValRefactor(0, 8, 1.0f);
-         mGrid->SetValRefactor(2, 10, 1.0f);
-         mGrid->SetValRefactor(0, 12, 1.0f);
-         mGrid->SetValRefactor(1, 12, 1.0f);
-         mGrid->SetValRefactor(2, 14, 1.0f);
-         break;
-   }
-}
-
 int StepSequencer::GetMetaStep(double time)
 {
    return TheTransport->GetMeasure(time) % kMetaStepLoop;
@@ -955,12 +858,12 @@ void StepSequencer::ButtonClicked(ClickButton* button, double time)
       if (button == mRandomizeRowButton[row])
          RandomizeRow(row);
    }
+   if (button == mClearButton)
+      mGrid->Clear();
 }
 
 void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (list == mPresetDropdown)
-      SetPreset(mPreset);
    if (list == mRepeatRateDropdown)
    {
       for (int i = 0; i < NUM_STEPSEQ_ROWS; ++i)
@@ -1112,7 +1015,7 @@ void StepSequencerRow::CreateUIControls()
 
 void StepSequencerRow::OnTimeEvent(double time)
 {
-   if (mSeq->Enabled() == false || mSeq->HasExternalPulseSource())
+   if (mSeq->IsEnabled() == false || mSeq->HasExternalPulseSource())
       return;
 
    float offsetMs = mOffset * TheTransport->MsPerBar();

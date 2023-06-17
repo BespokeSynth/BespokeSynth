@@ -87,6 +87,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    float MeasurePos(double time);
 
@@ -97,7 +99,6 @@ private:
       width = 320;
       height = 165;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mLastMeasurePos{ 0 };
    std::vector<SliderLine*> mSliderLines;

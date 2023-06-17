@@ -98,7 +98,7 @@ public:
    float GetValueForMidiCC(float slider) const override;
    float GetMidiValue() const override;
    void GetRange(float& min, float& max) override;
-   void SetValue(float value, double time) override;
+   void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
    int GetNumValues() override;
    std::string GetDisplayValue(float val) const override;

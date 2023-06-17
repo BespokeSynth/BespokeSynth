@@ -113,6 +113,7 @@ void InputChannel::DrawModule()
 
 void InputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadEnum<int>("channels", moduleInfo, 0, mChannelSelector);
    mModuleSaveData.LoadString("target", moduleInfo);
 
    SetUpFromSaveData();
@@ -120,5 +121,6 @@ void InputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void InputChannel::SetUpFromSaveData()
 {
+   mChannelSelectionIndex = mModuleSaveData.GetEnum<int>("channels");
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }

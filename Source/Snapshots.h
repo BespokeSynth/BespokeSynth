@@ -1,3 +1,4 @@
+
 /**
     bespoke synth, a software modular synthesizer
     Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
@@ -37,8 +38,9 @@
 #include "INoteReceiver.h"
 #include "DropdownList.h"
 #include "TextEntry.h"
+#include "Push2Control.h"
 
-class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener
+class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IPush2GridController
 {
 public:
    Snapshots();
@@ -56,11 +58,23 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
 
+   bool HasSnapshot(int index) const;
+   int GetCurrentSnapshot() const { return mCurrentSnapshot; }
+   bool IsTargetingModule(IDrawableModule* module) const;
+   void AddSnapshotTarget(IDrawableModule* target);
+   void SetSnapshot(int idx, double time);
+   void StoreSnapshot(int idx, bool setAsCurrent);
+   void DeleteSnapshot(int idx);
+
    void OnTransportAdvanced(float amount) override;
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   //IPush2GridController
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
@@ -83,9 +97,9 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
-   void SetSnapshot(int idx, double time);
-   void Store(int idx);
    void UpdateGridValues();
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;
@@ -95,7 +109,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -158,4 +171,11 @@ private:
    TextEntry* mSnapshotLabelEntry{ nullptr };
    std::string mSnapshotLabel;
    int mLoadRev{ -1 };
+   ClickButton* mClearButton;
+   bool mStoreMode{ false };
+   Checkbox* mStoreCheckbox;
+   bool mDeleteMode{ false };
+   Checkbox* mDeleteCheckbox;
+   bool mAutoStoreOnSwitch{ false };
+   Checkbox* mAutoStoreOnSwitchCheckbox;
 };

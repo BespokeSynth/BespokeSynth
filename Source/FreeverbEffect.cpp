@@ -46,11 +46,12 @@ FreeverbEffect::~FreeverbEffect()
 void FreeverbEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRoomSizeSlider = new FloatSlider(this, "room size", 5, 4, 85, 15, &mRoomSize, .1f, .99f, 2);
-   mDampSlider = new FloatSlider(this, "damp", 5, 20, 85, 15, &mDamp, 0, 100);
-   mWetSlider = new FloatSlider(this, "wet", 5, 36, 85, 15, &mWet, 0, 1);
-   mDrySlider = new FloatSlider(this, "dry", 5, 52, 85, 15, &mDry, 0, 1);
-   mWidthSlider = new FloatSlider(this, "width", 5, 68, 85, 15, &mVerbWidth, 0, 100);
+   mRoomSizeSlider = new FloatSlider(this, "room size", 5, 4, 95, 15, &mRoomSize, .1f, 1, 3);
+   mRoomSizeSlider->SetMode(FloatSlider::Mode::kBezier);
+   mDampSlider = new FloatSlider(this, "damp", 5, 20, 95, 15, &mDamp, 0, 100);
+   mWetSlider = new FloatSlider(this, "wet", 5, 36, 95, 15, &mWet, 0, 1);
+   mDrySlider = new FloatSlider(this, "dry", 5, 52, 95, 15, &mDry, 0, 1);
+   mWidthSlider = new FloatSlider(this, "width", 5, 68, 95, 15, &mVerbWidth, 0, 100);
 }
 
 void FreeverbEffect::ProcessAudio(double time, ChannelBuffer* buffer)
@@ -93,12 +94,12 @@ void FreeverbEffect::GetModuleDimensions(float& width, float& height)
 {
    if (mEnabled)
    {
-      width = 95;
+      width = 105;
       height = 84;
    }
    else
    {
-      width = 95;
+      width = 105;
       height = 0;
    }
 }

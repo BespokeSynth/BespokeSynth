@@ -56,6 +56,8 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    enum DistortionType
    {
@@ -71,7 +73,6 @@ private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 200 };
    float mHeight{ 20 };

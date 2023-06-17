@@ -60,6 +60,10 @@ snapshots~save and restore sets of values. connect the grey circle to modules to
 ~snapshot~jump to a snapshot
 ~random~randomize connected controls
 ~add~snapshot the currently connected controls to the next available snapshot slot
+~clear~clear all snapshots
+~store~when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)
+~delete~when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)
+~auto-store on switch~when switching to a new slot, automatically store state in the current slot
 
 
 
@@ -526,6 +530,7 @@ notetable~map a pitch (starting from zero) to a scale pitch
 ~y offset~y offset of attached grid controller
 ~rand pitch chance~when clicking the random pitch button, what is the chance that a step gets changed?
 ~rand pitch range~when clicking the random pitch button, how far will the pitch change?
+~clear~clear grid
 
 
 
@@ -641,7 +646,7 @@ fouronthefloor~sends note 0 every beat, to trigger a kick drum
 drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.
 ~vel~velocity to use when setting a step
 ~measures~length of the sequence in measures
-~preset~select a pattern preset
+~clear~clear sequence
 ~yoff~vertical offset for grid controller's view of the pattern
 ~offsets~show "offsets" sliders
 ~repeat~repeat input notes at this rate
@@ -871,6 +876,7 @@ looper~loop input audio. use with a "looperrecorder" for full functionality.
 ~copy~take the contents of this looper and copy it onto another. click this button on the copy source, then on the copy target.
 ~2x~make loop play at double speed
 ~.5x~make loop play at half speed
+~extend~make loop twice as long
 ~undo~undo last loop commit
 ~offset~amount to offset looper's playhead from transport position
 ~apply~shift the contents of the looper so the current offset is the start of the buffer

@@ -467,6 +467,33 @@ void Scale::Poll()
       SetRandomRootAndScale();
       mWantSetRandomRootAndScale = false;
    }
+
+   if (mQueuedButtonPress)
+   {
+      ClickButton* button = mQueuedButtonPress;
+      mQueuedButtonPress = nullptr;
+      if (button == mLoadSCLButton || button == mLoadKBMButton)
+      {
+         std::string prompt = "Load ";
+         prompt += (button == mLoadSCLButton) ? "SCL" : "KBM";
+         std::string pat = (button == mLoadSCLButton) ? "*.scl;*.SCL" : "*.kbm;*.KBM";
+         juce::FileChooser chooser(prompt, juce::File(""), pat, true, false, TheSynth->GetFileChooserParent());
+         if (chooser.browseForFileToOpen())
+         {
+            auto file = chooser.getResult();
+            std::cout << file.getFullPathName().toStdString() << std::endl;
+            if (button == mLoadSCLButton)
+            {
+               mSclContents = file.loadFileAsString().toStdString();
+            }
+            else
+            {
+               mKbmContents = file.loadFileAsString().toStdString();
+            }
+            UpdateTuningTable();
+         }
+      }
+   }
 }
 
 float Scale::RationalizeNumber(float input)
@@ -722,27 +749,7 @@ void Scale::TextEntryComplete(TextEntry* entry)
 
 void Scale::ButtonClicked(ClickButton* button, double time)
 {
-   if (button == mLoadSCLButton || button == mLoadKBMButton)
-   {
-      std::string prompt = "Load ";
-      prompt += (button == mLoadSCLButton) ? "SCL" : "KBM";
-      std::string pat = (button == mLoadSCLButton) ? "*.scl;*.SCL" : "*.kbm;*.KBM";
-      juce::FileChooser chooser(prompt, juce::File(""), pat, true, false, TheSynth->GetFileChooserParent());
-      if (chooser.browseForFileToOpen())
-      {
-         auto file = chooser.getResult();
-         std::cout << file.getFullPathName().toStdString() << std::endl;
-         if (button == mLoadSCLButton)
-         {
-            mSclContents = file.loadFileAsString().toStdString();
-         }
-         else
-         {
-            mKbmContents = file.loadFileAsString().toStdString();
-         }
-         UpdateTuningTable();
-      }
-   }
+   mQueuedButtonPress = button;
 }
 
 void Scale::LoadLayout(const ofxJSONElement& moduleInfo)

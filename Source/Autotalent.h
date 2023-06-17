@@ -74,6 +74,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void UpdateShiftSlider();
 
@@ -84,7 +86,6 @@ private:
       width = 260;
       height = 360;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float* mWorkingBuffer;
 

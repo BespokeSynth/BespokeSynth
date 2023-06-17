@@ -78,6 +78,7 @@ void DrumPlayer::CreateUIControls()
    mGridControlTarget = new GridControlTarget(this, "grid", 4, 50);
    mQuantizeIntervalSelector = new DropdownList(this, "quantize", 200, 4, (int*)(&mQuantizeInterval));
    mNoteRepeatCheckbox = new Checkbox(this, "repeat", 200, 22, &mNoteRepeat);
+   mFullVelocityCheckbox = new Checkbox(this, "full vel", 200, 40, &mFullVelocity);
 
    mKitSelector->SetShowing(false); //TODO(Ryan) replace "kits" concept with a better form of serialization
 
@@ -488,6 +489,9 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       return;
    }
 
+   if (velocity > 0 && mFullVelocityCheckbox)
+      velocity = 127;
+
    pitch %= 24;
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)
    {
@@ -512,6 +516,54 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          if (modulation.modWheel != nullptr)
             startOffsetPercent += modulation.modWheel->GetValue(0);
          mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity / 127.0f);
+      }
+   }
+}
+
+bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex >= 36 && controlIndex <= 99)
+      {
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = gridIndex / 8;
+
+         if (x < 4 && y < 4)
+            OnGridButton(x, 3 - y, midiValue / 127.0f, nullptr);
+
+         return true;
+      }
+   }
+
+   return false;
+}
+
+void DrumPlayer::UpdatePush2Leds(Push2Control* push2)
+{
+   for (int x = 0; x < 8; ++x)
+   {
+      for (int y = 0; y < 8; ++y)
+      {
+         int pushColor;
+
+         if (x < 4 && y < 4)
+         {
+            int index = x + y * 4;
+            if (mDrumHits[index].GetPlayProgress(gTime) < 1)
+               pushColor = 2;
+            else if (mDrumHits[index].mButtonHeldVelocity > 0)
+               pushColor = 66;
+            else
+               pushColor = 1;
+         }
+         else
+         {
+            pushColor = 0;
+         }
+
+         push2->SetLed(kMidiMessage_Note, x + y * 8 + 36, pushColor);
       }
    }
 }
@@ -705,6 +757,7 @@ void DrumPlayer::DrawModule()
       mShuffleButton->Draw();
       mQuantizeIntervalSelector->Draw();
       mNoteRepeatCheckbox->Draw();
+      mFullVelocityCheckbox->Draw();
 
       ofPushMatrix();
       ofPushStyle();

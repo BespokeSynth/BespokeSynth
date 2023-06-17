@@ -66,9 +66,10 @@ public:
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
 
+   bool IsEnabled() const override { return false; }
+
 private:
    void DrawModule() override {}
-   bool Enabled() const override { return false; }
 };
 
 class ModularSynth
@@ -175,7 +176,9 @@ public:
    bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
 
    void ZoomView(float zoomAmount, bool fromMouse);
+   void SetZoomLevel(float zoomLevel);
    void PanView(float x, float y);
+   void PanTo(float x, float y);
    void SetRawSpaceMouseTwist(float twist, bool isUsing)
    {
       mSpaceMouseInfo.mTwist = twist;
@@ -266,7 +269,6 @@ public:
    void LoadStatePopup();
    void ToggleQuickSpawn();
    QuickSpawnMenu* GetQuickSpawn() { return mQuickSpawn; }
-   double GetLastSaveTime() { return mLastSaveTime; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
@@ -287,7 +289,7 @@ public:
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
-   static constexpr int kSaveStateRev = 424;
+   static constexpr int kSaveStateRev = 425;
 
 private:
    void ResetLayout();
@@ -385,7 +387,6 @@ private:
    bool mWantReloadInitialLayout{ false };
    std::string mCurrentSaveStatePath;
    std::string mStartupSaveStateFile;
-   double mLastSaveTime{ -9999 };
 
    Sample* mHeldSample{ nullptr };
 

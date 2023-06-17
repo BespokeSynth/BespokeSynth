@@ -135,6 +135,7 @@ public:
    void ListLayouts();
    void ManagePlugins();
    const std::vector<SpawnList*>& GetSpawnLists() const { return mSpawnLists.GetDropdowns(); }
+   void DisplayTemporaryMessage(std::string message);
 
    bool IsSaveable() override { return false; }
 
@@ -148,11 +149,12 @@ public:
 
    static bool sShowInitialHelpOverlay;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -183,6 +185,9 @@ private:
    std::unique_ptr<PluginListWindow> mPluginListWindow;
 
    NewPatchConfirmPopup mNewPatchConfirmPopup;
+
+   std::string mDisplayMessage;
+   double mDisplayMessageTime;
 };
 
 extern TitleBar* TheTitleBar;

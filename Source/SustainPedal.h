@@ -50,6 +50,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -58,7 +60,6 @@ private:
       width = 90;
       height = 21;
    }
-   bool Enabled() const override { return true; }
 
    std::array<bool, 128> mIsNoteBeingSustained{ false };
    bool mSustain{ false };

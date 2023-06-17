@@ -48,6 +48,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -56,7 +58,6 @@ private:
       width = 120;
       height = 0;
    }
-   bool Enabled() const override { return mEnabled; }
 };
 
 #endif /* defined(__Bespoke__PressureToModwheel__) */

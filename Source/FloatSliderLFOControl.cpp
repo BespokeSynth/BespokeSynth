@@ -52,9 +52,9 @@ void FloatSliderLFOControl::CreateUIControls()
    BUTTON(mPinButton, "pin");
    UIBLOCK_NEWLINE();
    UIBLOCK_SHIFTY(40);
-   DROPDOWN(mIntervalSelector, "interval", (int*)(&mLFOSettings.mInterval), 47);
+   DROPDOWN(mIntervalSelector, "interval", reinterpret_cast<int*>(&mLFOSettings.mInterval), 47);
    UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mOscSelector, "osc", (int*)(&mLFOSettings.mOscType), 47);
+   DROPDOWN(mOscSelector, "osc", reinterpret_cast<int*>(&mLFOSettings.mOscType), 47);
    UIBLOCK_NEWLINE();
    FLOATSLIDER(mOffsetSlider, "offset", &mLFOSettings.mLFOOffset, 0, 1);
    UIBLOCK_SHIFTUP();
@@ -110,9 +110,7 @@ void FloatSliderLFOControl::CreateUIControls()
    UpdateVisibleControls();
 }
 
-FloatSliderLFOControl::~FloatSliderLFOControl()
-{
-}
+FloatSliderLFOControl::~FloatSliderLFOControl() = default;
 
 void FloatSliderLFOControl::DrawModule()
 {
@@ -195,6 +193,38 @@ void FloatSliderLFOControl::DrawModule()
       displayPhase += squeeze;
    ofCircle(displayPhase / squeeze * width + x,
             ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)), GetTargetMax(), GetTargetMin(), 0, height) + y, 2);
+}
+
+bool FloatSliderLFOControl::DrawToPush2Screen()
+{
+   FloatSlider* slider = GetOwner();
+   if (slider)
+   {
+      ofRectangle rect(30, -12, 100, 11);
+      ofSetColor(100, 100, 100);
+      ofRect(rect);
+
+      float screenPos = rect.x + 1 + (rect.width - 2) * slider->ValToPos(slider->GetValue(), true);
+      float lfomax = ofClamp(GetMax(), slider->GetMin(), slider->GetMax());
+      float screenPosMax = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomax, true);
+      float lfomin = ofClamp(GetMin(), slider->GetMin(), slider->GetMax());
+      float screenPosMin = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomin, true);
+
+      ofPushStyle();
+      ofSetColor(0, 200, 0);
+      ofFill();
+      if (fabs(screenPos - screenPosMin) > 1)
+         ofRect(screenPosMin, rect.y, screenPos - screenPosMin, rect.height, 1); //lfo bar
+      ofPopStyle();
+
+      ofPushStyle();
+      ofSetColor(0, 255, 0);
+      ofSetLineWidth(2);
+      ofLine(screenPosMin, rect.y + 1, screenPosMin, rect.getMaxY() - 1); //min bar
+      ofLine(screenPosMax, rect.y + 1, screenPosMax, rect.getMaxY() - 1); //max bar
+      ofPopStyle();
+   }
+   return false;
 }
 
 void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
@@ -432,6 +462,9 @@ void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();
+   // Since `mPinned` is set after `IDrawableModule::LoadBasics` we need to manually set minimized
+   // after setting `mPinned` which is used to check if this module has a titlebar.
+   SetMinimized(moduleInfo["start_minimized"].asBool(), false);
 }
 
 void FloatSliderLFOControl::SetUpFromSaveData()
@@ -481,7 +514,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
    int index = sNextLFOIndex;
    for (int i = 0; i < LFO_POOL_SIZE; ++i) //search for the next one that isn't enabled, but only one loop around
    {
-      if (!sLFOPool[index]->Enabled() && !sLFOPool[index]->IsPinned())
+      if (!sLFOPool[index]->IsEnabled() && !sLFOPool[index]->IsPinned())
          break; //found a disabled one
       index = (index + 1) % LFO_POOL_SIZE;
    }

@@ -82,13 +82,18 @@ void GroupControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 
 void GroupControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
-   for (int i = 0; i < mControlCables.size(); ++i)
+   for (auto& mControlCable : mControlCables)
    {
       IUIControl* uicontrol = nullptr;
-      if (mControlCables[i]->GetTarget())
-         uicontrol = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
-      if (uicontrol)
-         uicontrol->SetValue(mGroupEnabled ? 1 : 0, time);
+      for (auto& cable : mControlCable->GetPatchCables())
+      {
+         if (cable->GetTarget())
+         {
+            uicontrol = dynamic_cast<IUIControl*>(cable->GetTarget());
+            if (uicontrol)
+               uicontrol->SetValue(mGroupEnabled ? 1 : 0, time);
+         }
+      }
    }
 }
 

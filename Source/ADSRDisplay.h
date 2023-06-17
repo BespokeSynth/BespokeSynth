@@ -51,6 +51,11 @@ public:
    ::ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
    void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
+   void SetDimensions(float w, float h)
+   {
+      mWidth = w;
+      mHeight = h;
+   }
    void SetShowing(bool showing) override
    {
       IUIControl::SetShowing(showing);
@@ -59,7 +64,7 @@ public:
 
    //IUIControl
    void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time) override {}
+   void SetValue(float value, double time, bool forceUpdate = false) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;

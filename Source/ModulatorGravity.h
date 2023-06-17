@@ -74,6 +74,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void Kick(float strength);
 
@@ -84,7 +86,6 @@ private:
       w = mWidth;
       h = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
 
    float mWidth{ 200 };
    float mHeight{ 20 };

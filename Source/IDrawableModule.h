@@ -82,10 +82,13 @@ public:
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }
    void ToggleMinimized();
-   void SetMinimized(bool minimized)
+   void SetMinimized(bool minimized, bool animate = true)
    {
-      if (HasTitleBar())
-         mMinimized = minimized;
+      if (!HasTitleBar())
+         return;
+      mMinimized = minimized;
+      if (!animate)
+         mMinimizeAnimation = minimized ? 1 : 0;
    }
    virtual void KeyPressed(int key, bool isRepeat);
    virtual void KeyReleased(int key);
@@ -118,6 +121,7 @@ public:
    static float TitleBarHeight() { return mTitleBarHeight; }
    static ofColor GetColor(ModuleCategory type);
    virtual void SetEnabled(bool enabled) {}
+   virtual bool IsEnabled() const { return true; }
    virtual bool CanMinimize() { return true; }
    virtual void SampleDropped(int x, int y, Sample* sample) {}
    virtual bool CanDropSample() const { return false; }
@@ -150,7 +154,8 @@ public:
    virtual ModuleContainer* GetContainer() { return nullptr; }
    void SetShouldDrawOutline(bool should) { mShouldDrawOutline = should; }
    ofVec2f GetMinimumDimensions();
-   bool HasEnableCheckbox() const { return mEnabledCheckbox != nullptr; }
+   bool HasEnabledCheckbox() const { return mEnabledCheckbox != nullptr; }
+   Checkbox* GetEnabledCheckbox() const { return mEnabledCheckbox; }
    void MarkAsDeleted() { mDeleted = true; }
    bool IsDeleted() const { return mDeleted; }
    virtual bool ShouldClipContents() { return true; }
@@ -181,11 +186,12 @@ public:
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}
+   virtual bool DrawToPush2Screen() { return false; }
 
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index = 0) override
    {
-      if (index == 0)
+      if (index == 0 && (mMainPatchCableSource != nullptr || mPatchCableSources.empty()))
          return mMainPatchCableSource;
       else
          return mPatchCableSources[index];
@@ -219,7 +225,6 @@ private:
    virtual void PreDrawModule() {}
    virtual void DrawModule() = 0;
    virtual void DrawModuleUnclipped() {}
-   virtual bool Enabled() const { return true; }
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}

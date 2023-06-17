@@ -89,6 +89,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void UpdateSample();
    void UpdateDisplaySamples();
@@ -96,7 +98,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 

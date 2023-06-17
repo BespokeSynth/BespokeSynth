@@ -32,8 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "IPulseReceiver.h"
 #include "Slider.h"
 #include "TextEntry.h"
+#include "Push2Control.h"
 
-class SongBuilder : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public ITextEntryListener, public INoteReceiver
+class SongBuilder : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public ITextEntryListener, public INoteReceiver, public IPush2GridController
 {
 public:
    SongBuilder();
@@ -59,6 +60,11 @@ public:
    void SendPressure(int pitch, int pressure) override {}
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
+   //IPush2GridController
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
+   bool DrawToPush2Screen() override;
+
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -71,11 +77,12 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    bool IsResizable() const override { return false; }
    void PostRepatch(PatchCableSource* cable, bool fromUserClick) override;
    bool ShouldSavePatchCableSources() const override { return false; }

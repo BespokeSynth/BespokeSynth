@@ -78,8 +78,9 @@ void Looper::CreateUIControls()
    mWriteInputCheckbox = new Checkbox(this, "write", 80, 3, &mWriteInput);
    mSwapButton = new ClickButton(this, "swap", 137, 81);
    mCopyButton = new ClickButton(this, "copy", 140, 65);
-   mDoubleSpeedButton = new ClickButton(this, "2x", 151, 28);
-   mHalveSpeedButton = new ClickButton(this, ".5x", 147, 43);
+   mDoubleSpeedButton = new ClickButton(this, "2x", 153, 19);
+   mHalveSpeedButton = new ClickButton(this, ".5x", 149, 34);
+   mExtendButton = new ClickButton(this, "extend", 127, 49);
    mUndoButton = new ClickButton(this, "undo", -1, -1);
    mLoopPosOffsetSlider = new FloatSlider(this, "offset", -1, -1, 130, 15, &mLoopPosOffset, 0, mLoopLength);
    mWriteOffsetButton = new ClickButton(this, "apply", -1, -1);
@@ -104,6 +105,7 @@ void Looper::CreateUIControls()
    mNumBarsSelector->AddLabel(" 6 ", 6);
    mNumBarsSelector->AddLabel(" 8 ", 8);
    mNumBarsSelector->AddLabel("12 ", 12);
+   mNumBarsSelector->AddLabel("16 ", 16);
 
    mFourTetSlicesDropdown->AddLabel(" 1", 1);
    mFourTetSlicesDropdown->AddLabel(" 2", 2);
@@ -624,6 +626,7 @@ void Looper::DrawModule()
    mDecaySlider->Draw();
    mDoubleSpeedButton->Draw();
    mHalveSpeedButton->Draw();
+   mExtendButton->Draw();
    mUndoButton->Draw();
    mLoopPosOffsetSlider->Draw();
    mWriteOffsetButton->Draw();
@@ -954,6 +957,12 @@ void Looper::Commit(RollingBuffer* commitBuffer /* = nullptr */)
    }
 }
 
+void Looper::SetMute(double time, bool mute)
+{
+   mMute = mute;
+   mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
+}
+
 void Looper::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample sample;
@@ -1044,6 +1053,12 @@ void Looper::ButtonClicked(ClickButton* button, double time)
          ResampleForSpeed(GetPlaybackSpeed());
       }
    }
+   if (button == mExtendButton)
+   {
+      int newLength = mNumBars * 2;
+      if (newLength <= 16)
+         SetNumBars(newLength);
+   }
    if (button == mUndoButton)
       mWantUndo = true;
    if (button == mWriteOffsetButton)
@@ -1100,7 +1115,7 @@ void Looper::CheckboxUpdated(Checkbox* checkbox, double time)
    }
    if (checkbox == mMuteCheckbox)
    {
-      mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
+      SetMute(time, mMute);
    }
    if (checkbox == mWriteInputCheckbox)
    {

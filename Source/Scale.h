@@ -143,6 +143,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return true; }
+
 private:
    struct ScaleInfo
    {
@@ -158,7 +160,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return true; }
 
    void NotifyListeners();
 
@@ -188,6 +189,7 @@ private:
 
    ClickButton* mLoadSCLButton{ nullptr };
    ClickButton* mLoadKBMButton{ nullptr };
+   ClickButton* mQueuedButtonPress{ nullptr };
 
    std::vector<ScaleInfo> mScales;
    int mNumSeptatonicScales{ 0 };

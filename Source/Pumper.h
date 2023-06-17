@@ -58,6 +58,8 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -66,7 +68,6 @@ private:
       w = mWidth;
       h = mHeight;
    }
-   bool Enabled() const override { return mEnabled; }
    double GetIntervalPos(double time);
    void SyncToAdsr();
 

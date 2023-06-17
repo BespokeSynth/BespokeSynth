@@ -61,13 +61,14 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    void InitController();
    void BuildControllerList();
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override
    {
       w = 190;

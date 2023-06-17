@@ -211,7 +211,7 @@ StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
 void StutterControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mStutterProcessor.SetEnabled(time, Enabled());
+      mStutterProcessor.SetEnabled(time, IsEnabled());
 
    for (int i = 0; i < kNumStutterTypes; ++i)
    {
@@ -257,6 +257,56 @@ void StutterControl::UpdateGridLights()
    for (int i = 0; i < kNumStutterTypes; ++i)
    {
       mGridControlTarget->GetGridController()->SetLight(i % mGridControlTarget->GetGridController()->NumCols(), i / mGridControlTarget->GetGridController()->NumCols(), mStutter[i] ? kGridColor1Bright : kGridColor1Dim);
+   }
+}
+
+bool StutterControl::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex >= 36 && controlIndex <= 99)
+      {
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = 7 - gridIndex / 8;
+
+         if (y < 2)
+         {
+            int index = x + y * 8;
+            mStutter[index] = midiValue > 0;
+            SendStutter(gTime, GetStutter((StutterType)index), mStutter[index]);
+         }
+
+         return true;
+      }
+   }
+
+   return false;
+}
+
+void StutterControl::UpdatePush2Leds(Push2Control* push2)
+{
+   for (int x = 0; x < 8; ++x)
+   {
+      for (int y = 0; y < 8; ++y)
+      {
+         int pushColor;
+
+         if (y < 2)
+         {
+            int index = x + y * 8;
+            if (mStutter[index])
+               pushColor = 2;
+            else
+               pushColor = 1;
+         }
+         else
+         {
+            pushColor = 0;
+         }
+
+         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+      }
    }
 }
 

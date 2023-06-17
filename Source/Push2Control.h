@@ -37,6 +37,7 @@ class NVGcontext;
 class NVGLUframebuffer;
 class IUIControl;
 class IPush2GridController;
+class Snapshots;
 
 class Push2Control : public IDrawableModule, public MidiDeviceListener, public IDropdownListener
 {
@@ -50,18 +51,26 @@ public:
 
    void CreateUIControls() override;
    void Poll() override;
+   void Exit() override;
 
    void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
+   void SetDisplayModule(IDrawableModule* module, bool addToHistory = true);
+   IDrawableModule* GetDisplayModule() const { return mDisplayModule; }
 
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
 
+   MidiDevice* GetDevice() { return &mDevice; }
+
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
    static bool sDrawingPush2Display;
    static NVGcontext* sVG;
@@ -69,12 +78,13 @@ public:
    static void CreateStaticFramebuffer(); //windows was having trouble creating a nanovg context and fbo on the fly
    static IUIControl* sBindToUIControl;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void PostRender() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override
    {
       width = mWidth;
@@ -89,15 +99,15 @@ private:
    void SetModuleGridLights();
    void DrawDisplayModuleControls();
    void DrawLowerModuleSelector();
-   void SetDisplayModule(IDrawableModule* module, bool addToHistory);
+   void DrawRoutingDisplay();
    void DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
    void RemoveFavoriteControl(IUIControl* control);
    void BookmarkModuleToSlot(int slotIndex, IDrawableModule* module);
    void SwitchToBookmarkedModule(int slotIndex);
-   int GetPadColorForType(ModuleCategory type);
-   bool GetGridIndex(int gridX, int gridY, int& gridIndex)
+   int GetPadColorForType(ModuleCategory type, bool enabled) const;
+   bool GetGridIndex(int gridX, int gridY, int& gridIndex) const
    {
       gridIndex = gridX + gridY * 8;
       return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8;
@@ -105,11 +115,14 @@ private:
    bool IsIgnorableModule(IDrawableModule* module);
    std::vector<IDrawableModule*> SortModules(std::vector<IDrawableModule*> modules);
    void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
-   void DrawDisplayModuleRect(ofRectangle rect);
+   void DrawDisplayModuleRect(ofRectangle rect, float thickness);
    std::string GetModuleTypeToSpawn();
    ModuleCategory GetModuleTypeForSpawnList(IUIControl* control);
    ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
    int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
+   int GetNumDisplayPixels() const;
+   bool AllowRepatch() const;
+   void UpdateRoutingModules();
 
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
@@ -123,11 +136,12 @@ private:
    float mHeight{ 20 };
 
    IDrawableModule* mDisplayModule{ nullptr };
+   Snapshots* mDisplayModuleSnapshots{ nullptr };
    std::vector<IUIControl*> mSliderControls;
    std::vector<IUIControl*> mButtonControls;
    std::vector<IUIControl*> mDisplayedControls;
-   int mModuleColumnOffset{ 0 };
-   float mModuleColumnOffsetSmoothed{ 0 };
+   int mModuleViewOffset{ 0 };
+   float mModuleViewOffsetSmoothed{ 0 };
 
    std::vector<IDrawableModule*> mModules;
    float mModuleListOffset{ 0 };
@@ -143,20 +157,41 @@ private:
    bool mAddModuleBookmarkButtonHeld{ false };
    std::array<bool, 128> mNoteHeldState;
    IDrawableModule* mHeldModule{ nullptr };
-   bool mAllowRepatch{ false };
+   double mModuleHeldTime{ -1 };
+   bool mRepatchedHeldModule{ false };
    std::vector<IDrawableModule*> mModuleHistory;
    int mModuleHistoryPosition{ -1 };
    std::vector<IDrawableModule*> mBookmarkSlots;
    bool mInMidiControllerBindMode{ false };
+   bool mShiftHeld{ false };
+   bool mAddTrackHeld{ false };
+   int mHeldKnobIndex{ -1 };
+
+   struct Routing
+   {
+      Routing(IDrawableModule* module, ofColor connectionColor)
+      {
+         mModule = module;
+         mConnectionColor = connectionColor;
+      }
+      IDrawableModule* mModule;
+      ofColor mConnectionColor;
+   };
+
+   std::vector<Routing> mRoutingInputModules;
+   std::vector<Routing> mRoutingOutputModules;
 
    enum class ScreenDisplayMode
    {
       kNormal,
-      kAddModule
+      kAddModule,
+      kMap,
+      kRouting
    };
    ScreenDisplayMode mScreenDisplayMode{ ScreenDisplayMode::kNormal };
 
-   IPush2GridController* mGridControlModule{ nullptr };
+   IPush2GridController* mGridControlInterface{ nullptr };
+   IDrawableModule* mGridControlModule{ nullptr };
    bool mDisplayModuleCanControlGrid{ false };
 
    int mLedState[128 * 2]{}; //bottom 128 are notes, top 128 are CCs
@@ -175,6 +210,6 @@ class IPush2GridController
 public:
    virtual ~IPush2GridController() {}
    virtual void OnPush2Connect() {}
-   virtual bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) = 0;
+   virtual bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) = 0;
    virtual void UpdatePush2Leds(Push2Control* push2) = 0;
 };

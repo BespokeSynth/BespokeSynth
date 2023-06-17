@@ -504,7 +504,7 @@ float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
    return 0;
 }
 
-void FloatSlider::SetValue(float value, double time)
+void FloatSlider::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    if (TheLFOController && TheLFOController->WantsBinding(this))
    {
@@ -531,7 +531,7 @@ void FloatSlider::SetValue(float value, double time)
    else*/
    *var = value;
    DisableLFO();
-   if (oldVal != *var)
+   if (oldVal != *var || forceUpdate)
    {
       mOwner->FloatSliderUpdated(this, oldVal, time);
    }
@@ -1093,11 +1093,11 @@ float IntSlider::GetValueForMidiCC(float slider) const
    return (int)round(ofMap(slider, 0, 1, mMin, mMax));
 }
 
-void IntSlider::SetValue(float value, double time)
+void IntSlider::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    int oldVal = *mVar;
    *mVar = (int)round(ofClamp(value, mMin, mMax));
-   if (oldVal != *mVar)
+   if (oldVal != *mVar || forceUpdate)
    {
       CalcSliderVal();
       gControlTactileFeedback = 1;
