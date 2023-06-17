@@ -93,6 +93,8 @@ public:
    //IPush2GridController
    bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
+   bool HasPush2OverrideControls() const override { return mPush2SelectedHitIdx != -1; }
+   void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
@@ -174,6 +176,7 @@ private:
    DropdownList* mQuantizeIntervalSelector{ nullptr };
    bool mFullVelocity{ false };
    Checkbox* mFullVelocityCheckbox{ nullptr };
+   int mPush2SelectedHitIdx{ -1 };
 
    void LoadSampleLock();
    void LoadSampleUnlock();

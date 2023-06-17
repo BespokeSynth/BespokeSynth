@@ -61,6 +61,10 @@ public:
       IUIControl::SetShowing(showing);
       UpdateSliderVisibility();
    }
+   FloatSlider* GetASlider() { return mASlider; }
+   FloatSlider* GetDSlider() { return mDSlider; }
+   FloatSlider* GetSSlider() { return mSSlider; }
+   FloatSlider* GetRSlider() { return mRSlider; }
 
    //IUIControl
    void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}

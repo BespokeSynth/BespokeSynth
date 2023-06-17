@@ -190,7 +190,7 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox, double time)
 
             int bufferSize;
             mSamples[i].mSample->Create(mLooper->GetLoopBuffer(bufferSize));
-            mSamples[i].mNumBars = mLooper->NumBars();
+            mSamples[i].mNumBars = mLooper->GetNumBars();
             mLooper->Clear();
 
             if (mSamples[i].mPlay)

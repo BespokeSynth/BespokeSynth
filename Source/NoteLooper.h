@@ -53,6 +53,10 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
+   bool DrawToPush2Screen() override;
+
+   int GetNumMeasures() const { return mNumMeasures; }
+   void SetNumMeasures(int numMeasures);
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -81,7 +85,6 @@ public:
 private:
    double GetCurPos(double time) const;
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
-   void SetNumMeasures(int numMeasures);
    int GetNewVoice(int voiceIdx);
 
    //IDrawableModule

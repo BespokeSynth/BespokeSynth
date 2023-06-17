@@ -531,7 +531,23 @@ bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int c
          int y = gridIndex / 8;
 
          if (x < 4 && y < 4)
+         {
             OnGridButton(x, 3 - y, midiValue / 127.0f, nullptr);
+         }
+         else if (x < 4 && midiValue > 0)
+         {
+            int index = x + (y - 4) * 4;
+            if (index == mPush2SelectedHitIdx)
+            {
+               mPush2SelectedHitIdx = -1;
+            }
+            else
+            {
+               mPush2SelectedHitIdx = index;
+               mSelectedHitIdx = index;
+               UpdateVisibleControls();
+            }
+         }
 
          return true;
       }
@@ -546,7 +562,8 @@ void DrumPlayer::UpdatePush2Leds(Push2Control* push2)
    {
       for (int y = 0; y < 8; ++y)
       {
-         int pushColor;
+         int pushColor = 0;
+         int pushColorBlink = -1;
 
          if (x < 4 && y < 4)
          {
@@ -558,13 +575,50 @@ void DrumPlayer::UpdatePush2Leds(Push2Control* push2)
             else
                pushColor = 1;
          }
-         else
+         else if (x < 4)
          {
-            pushColor = 0;
+            int index = x + (y - 4) * 4;
+            if (index == mPush2SelectedHitIdx)
+            {
+               pushColor = 126;
+               pushColorBlink = 86;
+            }
+            else
+            {
+               pushColor = 86;
+            }
          }
 
-         push2->SetLed(kMidiMessage_Note, x + y * 8 + 36, pushColor);
+         push2->SetLed(kMidiMessage_Note, x + y * 8 + 36, pushColor, pushColorBlink);
       }
+   }
+}
+
+void DrumPlayer::GetPush2OverrideControls(std::vector<IUIControl*>& controls) const
+{
+   if (mPush2SelectedHitIdx != -1)
+   {
+      int i = mPush2SelectedHitIdx;
+      controls.push_back(mDrumHits[i].mVolSlider);
+      controls.push_back(mDrumHits[i].mSpeedSlider);
+      if (mDrumHits[i].mUseEnvelope)
+      {
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay);
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetASlider());
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetDSlider());
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetSSlider());
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetRSlider());
+      }
+      controls.push_back(mDrumHits[i].mTestButton);
+      controls.push_back(mDrumHits[i].mPrevButton);
+      controls.push_back(mDrumHits[i].mNextButton);
+      controls.push_back(mDrumHits[i].mRandomButton);
+      controls.push_back(mDrumHits[i].mUseEnvelopeCheckbox);
+      controls.push_back(mDrumHits[i].mPanSlider);
+      controls.push_back(mDrumHits[i].mWidenSlider);
+      controls.push_back(mDrumHits[i].mLinkIdSlider);
+      controls.push_back(mDrumHits[i].mHitCategoryDropdown);
+      controls.push_back(mDrumHits[i].mStartOffsetSlider);
    }
 }
 

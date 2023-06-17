@@ -65,7 +65,7 @@ public:
    void Commit(RollingBuffer* commitBuffer = nullptr);
    void Fill(ChannelBuffer* buffer, int length);
    void ResampleForSpeed(float speed);
-   int NumBars() const { return mNumBars; }
+   int GetNumBars() const { return mNumBars; }
    int GetRecorderNumBars() const;
    void SetNumBars(int numBars);
    void RecalcLoopLength() { UpdateNumBars(mNumBars); }
@@ -98,6 +98,7 @@ public:
 
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
+   bool DrawToPush2Screen() override;
 
    void MergeIn(Looper* otherLooper);
    void SwapBuffers(Looper* otherLooper);
@@ -150,11 +151,6 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
-
-   static const int BUFFER_X = 3;
-   static const int BUFFER_Y = 3;
-   static const int BUFFER_W = 170;
-   static const int BUFFER_H = 93;
 
    ChannelBuffer* mBuffer{ nullptr };
    ChannelBuffer mWorkBuffer;

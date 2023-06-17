@@ -140,6 +140,7 @@ private:
    std::vector<IUIControl*> mSliderControls;
    std::vector<IUIControl*> mButtonControls;
    std::vector<IUIControl*> mDisplayedControls;
+   bool mDisplayModuleIsShowingOverrideControls{ false };
    int mModuleViewOffset{ 0 };
    float mModuleViewOffsetSmoothed{ 0 };
 
@@ -166,6 +167,10 @@ private:
    bool mShiftHeld{ false };
    bool mAddTrackHeld{ false };
    int mHeldKnobIndex{ -1 };
+   double mLastResetTime{ -1 };
+   int mHeldModulePatchCableIndex{ 0 };
+   std::string mTextPopup;
+   double mTextPopupTime{ -1 };
 
    struct Routing
    {

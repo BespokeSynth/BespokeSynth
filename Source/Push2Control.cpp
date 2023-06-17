@@ -46,6 +46,8 @@ using namespace juce::gl;
 #include "UserPrefsEditor.h"
 #include "Snapshots.h"
 #include "ADSRDisplay.h"
+#include "Looper.h"
+#include "NoteLooper.h"
 #include "push2/JuceToPush2DisplayBridge.h"
 #include "push2/Push2-Bitmap.h"
 
@@ -409,7 +411,9 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       DrawDisplayModuleControls();
 
       std::string stateInfo = "";
-      if (AllowRepatch() && mHeldModule != nullptr)
+      if (gTime - mTextPopupTime < 1000)
+         stateInfo = mTextPopup;
+      else if (AllowRepatch() && mHeldModule != nullptr)
          stateInfo = "repatch mode: tap destination for " + std::string(mHeldModule->Name());
       else if (mNewButtonHeld)
          stateInfo = "tap control to add favorite...";
@@ -557,6 +561,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       SetLed(kMidiMessage_Control, kCircleButton, 0);
    SetLed(kMidiMessage_Control, kTapTempoButton, isHoveringOverNewModule ? 127 : 0, isHoveringOverNewModule ? 32 : 0);
    SetLed(kMidiMessage_Control, kMetronomeButton, mDisplayModule == this ? 127 : 8);
+   SetLed(kMidiMessage_Control, kConvertButton, mDisplayModule != nullptr ? 127 : 0);
+   SetLed(kMidiMessage_Control, kDoubleLoopButton, mDisplayModule != nullptr && (mDisplayModule->GetTypeName() == "looper" || mDisplayModule->GetTypeName() == "notelooper") ? 127 : 0);
    SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kAutomateButton, 126, mModulationButtonHeld ? 0 : -1);
@@ -588,6 +594,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       SetLed(kMidiMessage_Control, kPageRightButton, mModuleHistoryPosition < mModuleHistory.size() - 1 ? 127 : 0);
       SetLed(kMidiMessage_Control, kOctaveUpButton, 127);
       SetLed(kMidiMessage_Control, kOctaveDownButton, 127);
+      SetLed(kMidiMessage_Control, kSelectButton, mDisplayModule != nullptr ? 127 : 0);
    }
    else
    {
@@ -595,6 +602,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       SetLed(kMidiMessage_Control, kPageRightButton, 0, 127);
       SetLed(kMidiMessage_Control, kOctaveUpButton, 0, 127);
       SetLed(kMidiMessage_Control, kOctaveDownButton, 0, 127);
+      SetLed(kMidiMessage_Control, kSelectButton, 0, 127);
    }
    SetLed(kMidiMessage_Control, kSetupButton, mInMidiControllerBindMode ? 127 : 32, mInMidiControllerBindMode ? 0 : 32);
    if (mGridControlModule != nullptr)
@@ -621,7 +629,6 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       SetLed(kMidiMessage_Control, kQuantizeButtonSection + i, color, mDisplayModule == mBookmarkSlots[i] ? 0 : -1);
    }
    SetLed(kMidiMessage_Control, kShiftButton, 127, mShiftHeld ? 0 : -1);
-   SetLed(kMidiMessage_Control, kSelectButton, mDisplayModule != nullptr ? 127 : 0);
 
    //test led colors
    //SetLed(kMidiMessage_Note, 92, (int)mModuleListOffset);
@@ -1131,14 +1138,14 @@ void Push2Control::Poll()
       mPendingSpawnPitch = -1;
    }
 
+   bool controlsChanged = false;
    if (mDisplayModule != nullptr && mDisplayModule->HasPush2OverrideControls())
    {
       std::vector<IUIControl*> desiredControls;
       mDisplayModule->GetPush2OverrideControls(desiredControls);
-      bool changed = false;
       if (desiredControls.size() != mDisplayedControls.size())
       {
-         changed = true;
+         controlsChanged = true;
       }
       else
       {
@@ -1146,15 +1153,21 @@ void Push2Control::Poll()
          {
             if (desiredControls[i] != mDisplayedControls[i])
             {
-               changed = true;
+               controlsChanged = true;
                break;
             }
          }
       }
-
-      if (changed)
-         UpdateControlList();
    }
+
+   if (mDisplayModule != nullptr && mDisplayModule->HasPush2OverrideControls() != mDisplayModuleIsShowingOverrideControls)
+   {
+      controlsChanged = true;
+      mDisplayModuleIsShowingOverrideControls = mDisplayModule->HasPush2OverrideControls();
+   }
+
+   if (controlsChanged)
+      UpdateControlList();
 }
 
 bool Push2Control::AllowRepatch() const
@@ -1350,8 +1363,8 @@ void Push2Control::OnMidiNote(MidiNote& note)
                if (mHeldModule && AllowRepatch())
                {
                   PatchCableSource* cable = mHeldModule->GetPatchCableSource();
-                  if (mShiftHeld && mHeldModule->GetPatchCableSources().size() >= 2)
-                     cable = mHeldModule->GetPatchCableSources()[1];
+                  if (mHeldModulePatchCableIndex > 0)
+                     cable = mHeldModule->GetPatchCableSources()[mHeldModulePatchCableIndex];
                   if (cable != nullptr)
                   {
                      cable->FindValidTargets();
@@ -1426,16 +1439,32 @@ void Push2Control::OnMidiNote(MidiNote& note)
          {
             if (mHeldModule != nullptr)
             {
-               PatchCableSource* cable = mHeldModule->GetPatchCableSource();
-               if (mShiftHeld && mHeldModule->GetPatchCableSources().size() >= 2)
-                  cable = mHeldModule->GetPatchCableSources()[1];
-               if (AllowRepatch() && cable != nullptr)
+               PatchCableSource* heldModuleCable = mHeldModule->GetPatchCableSource();
+               if (mHeldModulePatchCableIndex > 0)
+                  heldModuleCable = mHeldModule->GetPatchCableSources()[mHeldModulePatchCableIndex];
+               if (AllowRepatch() && heldModuleCable != nullptr)
                {
-                  cable->FindValidTargets();
-                  if (cable->IsValidTarget(mModuleGrid[gridIndex]))
-                     cable->SetTarget(mModuleGrid[gridIndex]);
+                  IDrawableModule* touchedModule = mModuleGrid[gridIndex];
+
+                  heldModuleCable->FindValidTargets();
+                  if (heldModuleCable->IsValidTarget(touchedModule))
+                  {
+                     //insert
+                     if (mShiftHeld && touchedModule != nullptr && touchedModule->GetPatchCableSource() != nullptr)
+                     {
+                        IClickable* oldTarget = heldModuleCable->GetTarget();
+
+                        touchedModule->GetPatchCableSource()->FindValidTargets();
+                        if (touchedModule->GetPatchCableSource()->IsValidTarget(oldTarget))
+                           touchedModule->SetTarget(oldTarget);
+                     }
+
+                     heldModuleCable->SetTarget(touchedModule);
+                  }
                   else
-                     cable->ClearPatchCables();
+                  {
+                     heldModuleCable->ClearPatchCables();
+                  }
                   mRepatchedHeldModule = true;
                }
             }
@@ -1443,6 +1472,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
             {
                mHeldModule = mModuleGrid[gridIndex];
                mRepatchedHeldModule = false;
+               mHeldModulePatchCableIndex = 0;
             }
          }
          else
@@ -1471,7 +1501,8 @@ void Push2Control::OnMidiControl(MidiControl& control)
    if (control.mControl >= 71 && control.mControl <= 78) //main encoders
    {
       int controlIndex = control.mControl - 71 + mModuleViewOffset;
-      if (controlIndex < mSliderControls.size())
+      bool justResetParameter = gTime - mLastResetTime < 1000;
+      if (controlIndex < mSliderControls.size() && !justResetParameter)
       {
          float currentNormalized = mSliderControls[controlIndex]->GetMidiValue();
          float increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
@@ -1654,6 +1685,50 @@ void Push2Control::OnMidiControl(MidiControl& control)
          {
             mScreenDisplayMode = ScreenDisplayMode::kMap;
          }
+      }
+   }
+   else if (control.mControl == kConvertButton)
+   {
+      if (control.mValue > 0 && mDisplayModule != nullptr)
+      {
+         if (mDisplayModule->GetPatchCableSource() != nullptr &&
+             mDisplayModule->GetPatchCableSource()->GetConnectionType() == kConnectionType_Audio &&
+             mDisplayModule->GetPatchCableSource()->GetTarget() != nullptr &&
+             dynamic_cast<IDrawableModule*>(mDisplayModule->GetPatchCableSource()->GetTarget())->GetTypeName() != "looper")
+         {
+            ModuleFactory::Spawnable spawnable;
+            spawnable.mLabel = "looper";
+            IDrawableModule* looper = TheSynth->SpawnModuleOnTheFly(spawnable, mDisplayModule->GetRect().getMinX(), mDisplayModule->GetRect().getMaxY() + 40);
+            looper->SetTarget(mDisplayModule->GetPatchCableSource()->GetTarget());
+            mDisplayModule->SetTarget(looper);
+            SetDisplayModule(looper);
+         }
+
+         if (mDisplayModule->GetPatchCableSource() != nullptr &&
+             mDisplayModule->GetPatchCableSource()->GetConnectionType() == kConnectionType_Note &&
+             mDisplayModule->GetPatchCableSource()->GetTarget() != nullptr &&
+             dynamic_cast<IDrawableModule*>(mDisplayModule->GetPatchCableSource()->GetTarget())->GetTypeName() != "notelooper")
+         {
+            ModuleFactory::Spawnable spawnable;
+            spawnable.mLabel = "notelooper";
+            IDrawableModule* notelooper = TheSynth->SpawnModuleOnTheFly(spawnable, mDisplayModule->GetRect().getMinX(), mDisplayModule->GetRect().getMaxY() + 40);
+            notelooper->SetTarget(mDisplayModule->GetPatchCableSource()->GetTarget());
+            mDisplayModule->SetTarget(notelooper);
+            SetDisplayModule(notelooper);
+         }
+      }
+   }
+   else if (control.mControl == kDoubleLoopButton)
+   {
+      if (control.mValue > 0)
+      {
+         Looper* looper = dynamic_cast<Looper*>(mDisplayModule);
+         if (looper != nullptr)
+            looper->SetNumBars(looper->GetNumBars() * 2);
+
+         NoteLooper* noteLooper = dynamic_cast<NoteLooper*>(mDisplayModule);
+         if (noteLooper != nullptr)
+            noteLooper->SetNumMeasures(noteLooper->GetNumMeasures() * 2);
       }
    }
    else if (control.mControl == kDeviceButton || control.mControl == kMixButton || control.mControl == kBrowseButton || control.mControl == kClipButton)
@@ -1856,7 +1931,13 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       if (control.mValue > 0 && mDisplayModule != nullptr)
       {
-         if (mHeldKnobIndex == -1)
+         if (mHeldModule != nullptr && mHeldModule->GetPatchCableSources().size() > 1)
+         {
+            mHeldModulePatchCableIndex = (mHeldModulePatchCableIndex + 1) % mHeldModule->GetPatchCableSources().size();
+            mTextPopup = "setting selected cable output index to " + ofToString(mHeldModulePatchCableIndex);
+            mTextPopupTime = gTime;
+         }
+         else if (mHeldKnobIndex == -1)
          {
             ofRectangle rect = mDisplayModule->GetRect();
             TheSynth->PanTo(rect.getCenter().x, rect.getCenter().y);
@@ -1865,7 +1946,10 @@ void Push2Control::OnMidiControl(MidiControl& control)
          {
             int controlIndex = mHeldKnobIndex + mModuleViewOffset;
             if (controlIndex < mSliderControls.size() && (mScreenDisplayMode == ScreenDisplayMode::kNormal || mScreenDisplayMode == ScreenDisplayMode::kMap))
+            {
                mSliderControls[controlIndex]->ResetToOriginal();
+               mLastResetTime = gTime;
+            }
          }
       }
    }

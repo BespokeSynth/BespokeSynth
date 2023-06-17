@@ -84,7 +84,7 @@ void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2f offset)
    DrawContents(clamp, wrapped, offset);
    ofPopStyle();
 
-   if (mHighlighted)
+   if (mHighlighted && mCanvas == gHoveredUIControl)
    {
       ofPushStyle();
       ofNoFill();
