@@ -96,6 +96,7 @@ private:
    FloatSlider* mStartOffsetMsSlider{ nullptr };
    int mSmoothAmount{ kMaxHistory / 2 };
    IntSlider* mSmoothAmountSlider{ nullptr };
+   bool mObeyClockStartStop{ true };
 
    MidiDevice mDevice;
 

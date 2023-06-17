@@ -152,14 +152,23 @@ void MidiClockIn::OnMidi(const juce::MidiMessage& message)
    if (message.isMidiStart())
    {
       ofLog() << "midi start";
+      if (mObeyClockStartStop)
+      {
+         TheSynth->SetAudioPaused(false);
+         TheTransport->Reset();
+      }
    }
    if (message.isMidiStop())
    {
       ofLog() << "midi stop";
+      if (mObeyClockStartStop)
+         TheSynth->SetAudioPaused(true);
    }
    if (message.isMidiContinue())
    {
       ofLog() << "midi continue";
+      if (mObeyClockStartStop)
+         TheSynth->SetAudioPaused(false);
    }
    if (message.isSongPositionPointer())
    {
@@ -189,9 +198,11 @@ void MidiClockIn::DropdownClicked(DropdownList* list)
 
 void MidiClockIn::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadBool("obey_clock_start_stop", moduleInfo, true);
    SetUpFromSaveData();
 }
 
 void MidiClockIn::SetUpFromSaveData()
 {
+   mObeyClockStartStop = mModuleSaveData.GetBool("obey_clock_start_stop");
 }
