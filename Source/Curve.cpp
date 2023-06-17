@@ -27,7 +27,8 @@
 #include "FileStream.h"
 #include <algorithm>
 
-Curve::Curve()
+Curve::Curve(float defaultValue)
+: mDefaultValue(defaultValue)
 {
 }
 
@@ -84,7 +85,7 @@ int Curve::FindIndexForTime(float time)
 
 float Curve::Evaluate(float time, bool holdEndForLoop)
 {
-   float retVal = 0;
+   float retVal = mDefaultValue;
 
    if (mNumCurvePoints > 0)
    {

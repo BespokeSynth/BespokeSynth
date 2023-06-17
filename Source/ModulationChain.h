@@ -32,7 +32,7 @@
 class ModulationChain
 {
 public:
-   ModulationChain();
+   ModulationChain(float initialValue);
    float GetValue(int samplesIn) const;
    float GetIndividualValue(int samplesIn) const;
    void SetValue(float value);
@@ -57,9 +57,9 @@ private:
 
 struct ModulationCollection
 {
-   ModulationChain mPitchBend;
-   ModulationChain mModWheel;
-   ModulationChain mPressure;
+   ModulationChain mPitchBend{ 0 };
+   ModulationChain mModWheel{ .5f };
+   ModulationChain mPressure{ .5f };
 };
 
 struct ModulationParameters
