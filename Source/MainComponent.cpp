@@ -160,12 +160,14 @@ public:
       // but be careful - it will be called on the audio thread, not the GUI thread.
    }
 
-   void audioDeviceIOCallback(const float** inputChannelData,
-                              int numInputChannels,
-                              float** outputChannelData,
-                              int numOutputChannels,
-                              int numSamples) override
+   void audioDeviceIOCallbackWithContext(const float** inputChannelData,
+                                         int numInputChannels,
+                                         float** outputChannelData,
+                                         int numOutputChannels,
+                                         int numSamples,
+                                         const AudioIODeviceCallbackContext& context) override
    {
+      ignoreUnused(context);
       mSynth.AudioIn(inputChannelData, numSamples, numInputChannels);
       mSynth.AudioOut(outputChannelData, numSamples, numOutputChannels);
    }
