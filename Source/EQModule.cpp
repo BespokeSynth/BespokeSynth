@@ -394,6 +394,49 @@ bool EQModule::MouseMoved(float x, float y)
    return false;
 }
 
+bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+{
+   if (mHoveredFilterHandleIndex != -1)
+   {
+      auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
+      float add = (2 * scrollY) / MAX(qSlider->GetModulatorMax() / qSlider->GetValue(), 0.1);
+      if (GetKeyModifiers() & kModifier_Command)
+      {
+         add *= 4;
+      }
+      else if (GetKeyModifiers() & kModifier_Shift)
+      {
+         add /= 10;
+      }
+      qSlider->SetValue(ofClamp(qSlider->GetValue() + add, qSlider->GetMin(), qSlider->GetMax()), NextBufferTime(false));
+   }
+   return false;
+}
+
+void EQModule::KeyPressed(int key, bool isRepeat)
+{
+   if (mHoveredFilterHandleIndex != -1)
+   {
+      auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
+      if (key == '\\')
+      {
+         qSlider->ResetToOriginal();
+      }
+      else if (key == '[')
+      {
+         qSlider->Halve();
+      }
+      else if (key == ']')
+      {
+         qSlider->Double();
+      }
+      else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
+      {
+         TheSynth->CopyTextToClipboard(ofToString(qSlider->GetValue()));
+      }
+   }
+}
+
 void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    for (auto& filter : mFilters)

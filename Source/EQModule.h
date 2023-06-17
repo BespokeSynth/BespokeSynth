@@ -70,6 +70,8 @@ private:
    void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   void KeyPressed(int key, bool isRepeat) override;
    void MouseReleased() override;
 
    static const int kNumFFTBins = 1024 * 8;
