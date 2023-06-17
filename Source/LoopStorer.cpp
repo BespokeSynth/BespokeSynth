@@ -91,7 +91,7 @@ void LoopStorer::Poll()
       mSwapMutex.lock();
       int loopLength;
       mSamples[mCurrentBufferIdx]->mBuffer = mLooper->GetLoopBuffer(loopLength);
-      mSamples[mCurrentBufferIdx]->mNumBars = mLooper->NumBars();
+      mSamples[mCurrentBufferIdx]->mNumBars = mLooper->GetNumBars();
       mSamples[mCurrentBufferIdx]->mBufferLength = loopLength;
       mSwapMutex.unlock();
    }
@@ -293,7 +293,7 @@ void LoopStorer::LoadState(FileStreamIn& in, int rev)
 
       int loopLength;
       mSamples[mCurrentBufferIdx]->mBuffer = mLooper->GetLoopBuffer(loopLength);
-      mSamples[mCurrentBufferIdx]->mNumBars = mLooper->NumBars();
+      mSamples[mCurrentBufferIdx]->mNumBars = mLooper->GetNumBars();
       mSamples[mCurrentBufferIdx]->mBufferLength = loopLength;
    }
 
@@ -344,7 +344,7 @@ void LoopStorer::SampleData::Init(LoopStorer* storer, int index)
       if (looper)
       {
          mBuffer = looper->GetLoopBuffer(mBufferLength);
-         mNumBars = looper->NumBars();
+         mNumBars = looper->GetNumBars();
       }
       mIsCurrentBuffer = true;
    }

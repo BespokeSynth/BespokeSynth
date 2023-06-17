@@ -56,7 +56,7 @@ public:
 
    void Init() override;
    void SetNumBars(int numBars) { mNumBars = numBars; }
-   int NumBars() { return mNumBars; }
+   int GetNumBars() const { return mNumBars; }
    void Commit(Looper* looper);
    void RequestMerge(Looper* looper);
    void RequestSwap(Looper* looper);

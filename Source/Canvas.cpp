@@ -558,6 +558,10 @@ void Canvas::KeyPressed(int key, bool isRepeat)
       if (key == OF_KEY_UP || key == OF_KEY_DOWN)
       {
          int direction = (key == OF_KEY_UP) ? -1 : 1;
+
+         if (GetKeyModifiers() == kModifier_Shift)
+            direction *= 12; //octave
+
          for (auto* element : mElements)
          {
             if (element->GetHighlighted())

@@ -42,6 +42,11 @@ float Looper::mBeatwheelPosLeft = 0;
 float Looper::mBeatwheelDepthLeft = 0;
 bool Looper::mBeatwheelSingleMeasure = 0;
 
+namespace
+{
+   const int kMaxNumBars = 16;
+}
+
 Looper::Looper()
 : IAudioProcessor(gBufferSize)
 , mWorkBuffer(gBufferSize)
@@ -68,33 +73,33 @@ void Looper::CreateUIControls()
    mNumBarsSelector = new DropdownList(this, "num bars", 3, 3, &mNumBars);
    mClearButton = new ClickButton(this, "clear", -1, -1);
    mVolSlider = new FloatSlider(this, "volume", 3, 98, 130, 15, &mVol, 0, 2);
+   mWriteInputCheckbox = new Checkbox(this, "write", 80, 3, &mWriteInput);
+   mCommitButton = new ClickButton(this, "commit", 126, 3);
+   mQueueCaptureButton = new ClickButton(this, "capture", 126, 3);
+   mMuteCheckbox = new Checkbox(this, "mute", -1, -1, &mMute);
+   mUndoButton = new ClickButton(this, "undo", -1, -1);
+   mAllowScratchCheckbox = new Checkbox(this, "scr", -1, -1, &mAllowScratch);
    mVolumeBakeButton = new ClickButton(this, "b", -1, -1);
    mMergeButton = new ClickButton(this, " m ", -1, -1);
    mDecaySlider = new FloatSlider(this, "decay", -1, -1, 65, 15, &mDecay, 0, 1, 2);
    mSaveButton = new ClickButton(this, "save", -1, -1);
-   mMuteCheckbox = new Checkbox(this, "mute", -1, -1, &mMute);
-   mCommitButton = new ClickButton(this, "commit", 126, 3);
-   mQueueCaptureButton = new ClickButton(this, "capture", 126, 3);
-   mWriteInputCheckbox = new Checkbox(this, "write", 80, 3, &mWriteInput);
    mSwapButton = new ClickButton(this, "swap", 137, 81);
    mCopyButton = new ClickButton(this, "copy", 140, 65);
    mDoubleSpeedButton = new ClickButton(this, "2x", 153, 19);
    mHalveSpeedButton = new ClickButton(this, ".5x", 149, 34);
    mExtendButton = new ClickButton(this, "extend", 127, 49);
-   mUndoButton = new ClickButton(this, "undo", -1, -1);
    mLoopPosOffsetSlider = new FloatSlider(this, "offset", -1, -1, 130, 15, &mLoopPosOffset, 0, mLoopLength);
    mWriteOffsetButton = new ClickButton(this, "apply", -1, -1);
    mScratchSpeedSlider = new FloatSlider(this, "scrspd", -1, -1, 130, 15, &mScratchSpeed, -2, 2);
-   mAllowScratchCheckbox = new Checkbox(this, "scr", -1, -1, &mAllowScratch);
    mFourTetSlider = new FloatSlider(this, "fourtet", 4, 65, 65, 15, &mFourTet, 0, 1, 1);
    mFourTetSlicesDropdown = new DropdownList(this, "fourtetslices", -1, -1, &mFourTetSlices);
+   mPitchShiftSlider = new FloatSlider(this, "pitch", -1, -1, 130, 15, &mPitchShift, .5f, 2);
    mBeatwheelCheckbox = new Checkbox(this, "beatwheel on", HIDDEN_UICONTROL, HIDDEN_UICONTROL, &mBeatwheel);
    mBeatwheelPosRightSlider = new FloatSlider(this, "beatwheel pos right", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 1, 1, &mBeatwheelPosRight, 0, 1);
    mBeatwheelDepthRightSlider = new FloatSlider(this, "beatwheel depth right", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 1, 1, &mBeatwheelDepthRight, 0, 1);
    mBeatwheelPosLeftSlider = new FloatSlider(this, "beatwheel pos left", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 1, 1, &mBeatwheelPosLeft, 0, 1);
    mBeatwheelDepthLeftSlider = new FloatSlider(this, "beatwheel depth left", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 1, 1, &mBeatwheelDepthLeft, 0, 1);
    mBeatwheelSingleMeasureCheckbox = new Checkbox(this, "beatwheel single measure", HIDDEN_UICONTROL, HIDDEN_UICONTROL, &mBeatwheelSingleMeasure);
-   mPitchShiftSlider = new FloatSlider(this, "pitch", -1, -1, 130, 15, &mPitchShift, .5f, 2);
    mKeepPitchCheckbox = new Checkbox(this, "auto", -1, -1, &mKeepPitch);
    mResampleButton = new ClickButton(this, "resample for tempo", 15, 40);
 
@@ -106,6 +111,7 @@ void Looper::CreateUIControls()
    mNumBarsSelector->AddLabel(" 8 ", 8);
    mNumBarsSelector->AddLabel("12 ", 12);
    mNumBarsSelector->AddLabel("16 ", 16);
+   static_assert(kMaxNumBars == 16);
 
    mFourTetSlicesDropdown->AddLabel(" 1", 1);
    mFourTetSlicesDropdown->AddLabel(" 2", 2);
@@ -430,8 +436,8 @@ void Looper::DoUndo()
 int Looper::GetRecorderNumBars() const
 {
    if (mRecorder)
-      return mRecorder->NumBars();
-   return NumBars();
+      return mRecorder->GetNumBars();
+   return GetNumBars();
 }
 
 double Looper::GetPlaybackSpeed() const
@@ -594,6 +600,14 @@ void Looper::ResampleForSpeed(float speed)
    mBufferTempo = TheTransport->GetTempo();
 }
 
+namespace
+{
+   const float kBufferX = 3;
+   const float kBufferY = 3;
+   const float kBufferWidth = 170;
+   const float kBufferHeight = 93;
+}
+
 void Looper::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -601,19 +615,19 @@ void Looper::DrawModule()
 
    ofPushMatrix();
 
-   ofTranslate(BUFFER_X, BUFFER_Y);
+   ofTranslate(kBufferX, kBufferY);
 
    assert(mLoopLength > 0);
 
    float displayPos = GetActualLoopPos(0);
    mBufferMutex.lock();
-   DrawAudioBuffer(BUFFER_W, BUFFER_H, mBuffer, 0, mLoopLength, displayPos, mVol);
+   DrawAudioBuffer(kBufferWidth, kBufferHeight, mBuffer, 0, mLoopLength, displayPos, mVol);
    mBufferMutex.unlock();
    ofSetColor(255, 255, 0, gModuleDrawAlpha);
    for (int i = 1; i < mNumBars; ++i)
    {
-      float x = BUFFER_W / mNumBars * i;
-      ofLine(x, BUFFER_H / 2 - 5, x, BUFFER_H / 2 + 5);
+      float x = kBufferWidth / mNumBars * i;
+      ofLine(x, kBufferHeight / 2 - 5, x, kBufferHeight / 2 + 5);
    }
    ofSetColor(255, 255, 255, gModuleDrawAlpha);
 
@@ -816,6 +830,21 @@ void Looper::DrawBeatwheel()
    ofPopMatrix();
 }
 
+bool Looper::DrawToPush2Screen()
+{
+   ofPushMatrix();
+
+   ofTranslate(60, 3);
+   float displayPos = GetActualLoopPos(0);
+   mBufferMutex.lock();
+   DrawAudioBuffer(180, 74, mBuffer, 0, mLoopLength, displayPos, mVol);
+   mBufferMutex.unlock();
+
+   ofPopMatrix();
+
+   return false;
+}
+
 void Looper::Clear()
 {
    mBuffer->Clear();
@@ -827,9 +856,11 @@ void Looper::Clear()
 
 void Looper::SetNumBars(int numBars)
 {
+   numBars = MIN(numBars, kMaxNumBars);
    int oldNumBars = mNumBars;
    mNumBars = numBars;
-   UpdateNumBars(oldNumBars);
+   if (mNumBars != oldNumBars)
+      UpdateNumBars(oldNumBars);
 }
 
 void Looper::BakeVolume()
@@ -993,7 +1024,7 @@ void Looper::SampleDropped(int x, int y, Sample* sample)
 
 void Looper::GetModuleDimensions(float& width, float& height)
 {
-   width = BUFFER_X * 2 + BUFFER_W;
+   width = kBufferX * 2 + kBufferWidth;
    height = 165;
 }
 
@@ -1001,8 +1032,8 @@ void Looper::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
-   if (x >= BUFFER_X + BUFFER_W / 3 && x < BUFFER_X + (BUFFER_W * 2) / 3 &&
-       y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3 &&
+   if (x >= kBufferX + kBufferWidth / 3 && x < kBufferX + (kBufferWidth * 2) / 3 &&
+       y >= kBufferY + kBufferHeight / 3 && y < kBufferY + (kBufferHeight * 2) / 3 &&
        mBufferTempo == TheTransport->GetTempo() &&
        gHoveredUIControl == nullptr)
    {

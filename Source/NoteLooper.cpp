@@ -108,6 +108,22 @@ void NoteLooper::DrawModule()
    mCanvas->Draw();
 }
 
+bool NoteLooper::DrawToPush2Screen()
+{
+   ofRectangle rect = mCanvas->GetRect(true);
+
+   mCanvas->SetPosition(125, 3);
+   mCanvas->SetDimensions(600, 40);
+
+   mCanvas->SetCursorPos(GetCurPos(gTime));
+   mCanvas->Draw();
+
+   mCanvas->SetPosition(rect.x, rect.y);
+   mCanvas->SetDimensions(rect.width, rect.height);
+
+   return false;
+}
+
 void NoteLooper::Resize(float w, float h)
 {
    mWidth = MAX(w, 370);

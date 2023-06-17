@@ -187,7 +187,7 @@ void LooperRecorder::Process(double time)
 
    if (loop)
    {
-      int delaySamps = TheTransport->GetDuration(kInterval_1n) * NumBars() / gInvSampleRateMs;
+      int delaySamps = TheTransport->GetDuration(kInterval_1n) * GetNumBars() / gInvSampleRateMs;
       delaySamps = MIN(delaySamps, MAX_BUFFER_SIZE - 1);
       for (int i = 0; i < bufferSize; ++i)
       {
