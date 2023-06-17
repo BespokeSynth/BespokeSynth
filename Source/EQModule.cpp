@@ -398,16 +398,16 @@ bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, boo
 {
    if (mHoveredFilterHandleIndex != -1)
    {
-      float add = scrollY;
+      auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
+      float add = (2 * scrollY) / MAX(qSlider->GetMax() / qSlider->GetValue(), 0.1);
       if (GetKeyModifiers() & kModifier_Command)
       {
-         add /= 10;
+         add *= 4;
       }
       else if (GetKeyModifiers() & kModifier_Shift)
       {
-         add *= 10;
+         add /= 10;
       }
-      auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
       qSlider->SetValue(ofClamp(qSlider->GetValue() + add, qSlider->GetMin(), qSlider->GetMax()), NextBufferTime(false));
    }
    return false;
