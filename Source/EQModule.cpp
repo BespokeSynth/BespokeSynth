@@ -399,7 +399,7 @@ bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, boo
    if (mHoveredFilterHandleIndex != -1)
    {
       auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
-      float add = (2 * scrollY) / MAX(qSlider->GetMax() / qSlider->GetValue(), 0.1);
+      float add = (2 * scrollY) / MAX(qSlider->GetModulatorMax() / qSlider->GetValue(), 0.1);
       if (GetKeyModifiers() & kModifier_Command)
       {
          add *= 4;
