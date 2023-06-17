@@ -28,25 +28,53 @@
 #pragma once
 
 #include "SynthGlobals.h"
+#include <numeric>
+#include <set>
 
 class ChordDatabase
 {
 public:
    ChordDatabase();
    std::string GetChordName(std::vector<int> pitches) const;
+   std::set<std::string> GetChordNamesAdvanced(const std::vector<int>& pitches, bool useScaleDegrees, bool showIntervals) const;
    std::vector<int> GetChord(std::string name, int inversion) const;
    std::vector<std::string> GetChordNames() const;
 
 private:
    struct ChordShape
    {
-      ChordShape(std::string name, std::vector<int> elements)
+      ChordShape(std::string name, std::vector<int> elements, float rootPosBias = 0.0f)
+      {
+         std::vector<float> weights(12);
+         mName = name;
+         mElements = elements;
+         mWeights = weights;
+         mWeightSum = 0;
+         mRootPosBias = rootPosBias;
+      }
+
+      ChordShape(std::string name, std::vector<int> elements, std::vector<float> weights, float rootPosBias = 0.0f)
       {
          mName = name;
          mElements = elements;
+         mWeights = weights;
+         auto lambda = [&](float a, float b)
+         {
+            return b > 0.0f ? a - b : a;
+         };
+         mWeightSum = std::accumulate(
+         mWeights.begin(), mWeights.end(), 0.0f, lambda);
+         mRootPosBias = rootPosBias;
       }
       std::string mName;
       std::vector<int> mElements;
+      std::vector<float> mWeights;
+      float mWeightSum;
+      float mRootPosBias;
    };
    std::vector<ChordShape> mChordShapes;
+
+   std::string GetChordNameAdvanced(const std::vector<int>& pitches, const int root, const ChordShape shape, bool useScaleDegrees) const;
+   std::string NoteNameScaleRelative(int pitch, bool useDegrees) const; // Helper function for GetChordNameAdvanced, may be better off moved to synthglobals?
+   std::string ChordNameScaleRelative(int rootPitch) const; // Helper function for GetChordNameAdvanced, may be better off moved to synthglobals?
 };
