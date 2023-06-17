@@ -413,6 +413,30 @@ bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, boo
    return false;
 }
 
+void EQModule::KeyPressed(int key, bool isRepeat)
+{
+   if (mHoveredFilterHandleIndex != -1)
+   {
+      auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
+      if (key == '\\')
+      {
+         qSlider->ResetToOriginal();
+      }
+      else if (key == '[')
+      {
+         qSlider->Halve();
+      }
+      else if (key == ']')
+      {
+         qSlider->Double();
+      }
+      else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
+      {
+         TheSynth->CopyTextToClipboard(ofToString(qSlider->GetValue()));
+      }
+   }
+}
+
 void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    for (auto& filter : mFilters)
