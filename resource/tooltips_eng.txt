@@ -22,6 +22,12 @@ timelinecontrol~control global transport position
 
 
 
+buffershuffler~use notes to play back slices of a constantly-recording live input buffer. input notes trigger slices, with the pitch mapping to slice index.
+~num bars~number of bars to capture
+~interval~slice size
+
+
+
 selector~radio button control to only enable one value at a time. patch it to the "enabled" checkbox on several modules to only enable one module at a time. works well in conjunction with "groupcontrol" module.
 ~selector~which value should be set to 1
 
