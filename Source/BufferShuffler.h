@@ -31,8 +31,9 @@
 #include "Checkbox.h"
 #include "INoteReceiver.h"
 #include "SwitchAndRamp.h"
+#include "Push2Control.h"
 
-class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IIntSliderListener, public IDropdownListener
+class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IIntSliderListener, public IDropdownListener, public IPush2GridController
 {
 public:
    BufferShuffler();
@@ -43,6 +44,12 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override
+   {
+      mWidth = w;
+      mHeight = h;
+   }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
@@ -52,6 +59,10 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   //IPush2GridController
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
@@ -67,20 +78,27 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 200;
-      height = 68;
+      width = mWidth;
+      height = mHeight;
    }
+   void OnClicked(float x, float y, bool right) override;
+   bool DrawToPush2Screen() override;
 
    int GetWritePositionInSamples(double time);
    int GetLengthInSamples();
+   void DrawBuffer(float x, float y, float w, float h);
+   void PlayOneShot(int slice);
+   int GetNumSlices();
 
    ChannelBuffer mInputBuffer;
 
+   float mWidth{ 200 };
+   float mHeight{ 68 };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    NoteInterval mInterval{ kInterval_8n };
    DropdownList* mIntervalSelector{ nullptr };
-   int mPlayingSlice{ -1 };
+   int mQueuedSlice{ -1 };
    int mPlaybackSample{ -1 };
    double mPlaybackSampleStartTime{ -1 };
    double mPlaybackSampleStopTime{ -1 };
