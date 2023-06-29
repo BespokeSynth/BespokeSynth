@@ -70,6 +70,9 @@ public:
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -84,11 +87,24 @@ private:
    void OnClicked(float x, float y, bool right) override;
    bool DrawToPush2Screen() override;
 
+   enum class PlaybackStyle
+   {
+      Normal,
+      Double,
+      Half,
+      Reverse,
+      DoubleReverse,
+      HalfReverse,
+      None
+   };
+
    int GetWritePositionInSamples(double time);
    int GetLengthInSamples();
    void DrawBuffer(float x, float y, float w, float h);
    void PlayOneShot(int slice);
    int GetNumSlices();
+   float GetSlicePlaybackRate() const;
+   PlaybackStyle VelocityToPlaybackStyle(int velocity) const;
 
    ChannelBuffer mInputBuffer;
 
@@ -98,8 +114,13 @@ private:
    IntSlider* mNumBarsSlider{ nullptr };
    NoteInterval mInterval{ kInterval_8n };
    DropdownList* mIntervalSelector{ nullptr };
+   bool mFreezeInput{ false };
+   Checkbox* mFreezeInputCheckbox{ nullptr };
+   PlaybackStyle mPlaybackStyle{ PlaybackStyle::Normal };
+   DropdownList* mPlaybackStyleDropdown{ nullptr };
    int mQueuedSlice{ -1 };
-   int mPlaybackSample{ -1 };
+   PlaybackStyle mQueuedPlaybackStyle{ PlaybackStyle::None };
+   float mPlaybackSample{ -1 };
    double mPlaybackSampleStartTime{ -1 };
    double mPlaybackSampleStopTime{ -1 };
 

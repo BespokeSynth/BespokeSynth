@@ -755,8 +755,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button, double time)
       int newMeasure = int(TheTransport->GetMeasure(time) + TheTransport->GetMeasurePos(time) - .5f);
       if (newMeasure < 0)
          newMeasure = 7;
-      float newMeasurePos = TheTransport->GetMeasurePos(time) - .5f;
-      FloatWrap(newMeasurePos, 1);
+      float newMeasurePos = FloatWrap(TheTransport->GetMeasurePos(time) - .5f, 1);
       TheTransport->SetMeasureTime(newMeasure + newMeasurePos);
    }
 

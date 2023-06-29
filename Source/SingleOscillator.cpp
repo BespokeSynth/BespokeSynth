@@ -278,7 +278,7 @@ void SingleOscillator::DrawModule()
          phase += gTime * .005f;
          if (mVoiceParams.mSync)
          {
-            FloatWrap(phase, FTWO_PI);
+            phase = FloatWrap(phase, FTWO_PI);
             phase *= mVoiceParams.mSyncFreq / 200;
          }
          if (mDrawOsc.GetShuffle() > 0)

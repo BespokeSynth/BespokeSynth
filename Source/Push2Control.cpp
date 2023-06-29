@@ -1868,6 +1868,9 @@ void Push2Control::OnMidiControl(MidiControl& control)
 
             for (int i = 36; i <= 99; ++i)
                SetLed(kMidiMessage_Note, i, 0);
+            //turn touch strip off
+            std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+            GetDevice()->SendSysEx(touchStripLights);
             mGridControlInterface->OnPush2Connect();
 
             mScreenDisplayMode = ScreenDisplayMode::kNormal;

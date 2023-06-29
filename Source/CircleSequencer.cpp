@@ -38,8 +38,7 @@ namespace
 
    ofVec2f CarToPol(float x, float y)
    {
-      float pos = atan2(x, -y) / TWO_PI;
-      FloatWrap(pos, 1);
+      float pos = FloatWrap(atan2(x, -y) / TWO_PI, 1);
       return ofVec2f(pos, sqrtf(x * x + y * y));
    }
 }
@@ -250,8 +249,7 @@ void CircleSequencerRing::Draw()
 int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
 {
    ofVec2f polar = CarToPol(x - 100, y - 100);
-   float pos = polar.x + mOffset;
-   FloatWrap(pos, 1);
+   float pos = FloatWrap(polar.x + mOffset, 1);
    int idx = int(pos * mLength + .5f) % mLength;
 
    ofVec2f stepPos = PolToCar(float(idx) / mLength - mOffset, GetRadius());

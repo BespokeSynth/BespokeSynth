@@ -84,8 +84,8 @@ void SlowLayers::Process(double time)
       mSmoothedVol = mSmoothedVol * (1 - smooth) + mVol * smooth;
       float volSq = mSmoothedVol * mSmoothedVol;
 
-      float measurePos = TheTransport->GetMeasureTime(time);
-      FloatWrap(measurePos, 1 << layers * mNumBars);
+      double measurePos = TheTransport->GetMeasureTime(time);
+      measurePos = DoubleWrap(measurePos, 1 << layers * mNumBars);
       int offset = measurePos * loopLengthInSamples;
 
       mBuffer[offset % loopLengthInSamples] += GetBuffer()->GetChannel(0)[i] * mFeedIn;

@@ -42,12 +42,23 @@ void BufferShuffler::CreateUIControls()
    INTSLIDER(mNumBarsSlider, "num bars", &mNumBars, 1, 8);
    UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mIntervalSelector, "interval", (int*)&mInterval, 40);
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mPlaybackStyleDropdown, "playback style", (int*)&mPlaybackStyle, 80);
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mFreezeInputCheckbox, "freeze input", &mFreezeInput);
    ENDUIBLOCK0();
 
    mIntervalSelector->AddLabel("4n", kInterval_4n);
    mIntervalSelector->AddLabel("8n", kInterval_8n);
    mIntervalSelector->AddLabel("16n", kInterval_16n);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
+
+   mPlaybackStyleDropdown->AddLabel("normal", (int)PlaybackStyle::Normal);
+   mPlaybackStyleDropdown->AddLabel("double", (int)PlaybackStyle::Double);
+   mPlaybackStyleDropdown->AddLabel("half", (int)PlaybackStyle::Half);
+   mPlaybackStyleDropdown->AddLabel("reverse", (int)PlaybackStyle::Reverse);
+   mPlaybackStyleDropdown->AddLabel("double reverse", (int)PlaybackStyle::DoubleReverse);
+   mPlaybackStyleDropdown->AddLabel("half reverse", (int)PlaybackStyle::HalfReverse);
 }
 
 BufferShuffler::~BufferShuffler()
@@ -79,7 +90,13 @@ void BufferShuffler::Process(double time)
          if (mPlaybackSampleStartTime != -1 && time >= mPlaybackSampleStartTime)
          {
             int numSlices = GetNumSlices();
-            float slicePos = (mQueuedSlice % numSlices) / (float)numSlices;
+            int slicePosIndex = mQueuedSlice;
+            if (mQueuedPlaybackStyle != PlaybackStyle::None)
+               mPlaybackStyle = mQueuedPlaybackStyle;
+            mQueuedPlaybackStyle = PlaybackStyle::None;
+            if (GetSlicePlaybackRate() < 0)
+               slicePosIndex += 1;
+            float slicePos = (slicePosIndex % numSlices) / (float)numSlices;
             mPlaybackSample = int(GetLengthInSamples() * slicePos);
             mPlaybackSampleStartTime = -1;
             mSwitchAndRamp.StartSwitch();
@@ -94,16 +111,19 @@ void BufferShuffler::Process(double time)
 
          for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
          {
-            mInputBuffer.GetChannel(ch)[writePosition] = GetBuffer()->GetChannel(ch)[i];
+            if (!mFreezeInput)
+               mInputBuffer.GetChannel(ch)[writePosition] = GetBuffer()->GetChannel(ch)[i];
 
             float outputSample = GetBuffer()->GetChannel(ch)[i];
             if (mPlaybackSample != -1)
-               outputSample = mInputBuffer.GetChannel(ch)[mPlaybackSample];
+               outputSample = GetInterpolatedSample(mPlaybackSample, mInputBuffer.GetChannel(ch), GetLengthInSamples());
+            else if (mFreezeInput)
+               outputSample = mInputBuffer.GetChannel(ch)[writePosition];
             GetBuffer()->GetChannel(ch)[i] = mSwitchAndRamp.Process(ch, outputSample);
          }
 
          if (mPlaybackSample != -1)
-            mPlaybackSample = (mPlaybackSample + 1) % GetLengthInSamples();
+            mPlaybackSample = FloatWrap(mPlaybackSample + GetSlicePlaybackRate(), GetLengthInSamples());
 
          writePosition = (writePosition + 1) % GetLengthInSamples();
 
@@ -127,6 +147,8 @@ void BufferShuffler::DrawModule()
 
    mNumBarsSlider->Draw();
    mIntervalSelector->Draw();
+   mFreezeInputCheckbox->Draw();
+   mPlaybackStyleDropdown->Draw();
 
    DrawBuffer(5, 20, mWidth - 10, mHeight - 28);
 }
@@ -164,6 +186,7 @@ void BufferShuffler::PlayNote(double time, int pitch, int velocity, int voiceIdx
    if (velocity > 0)
    {
       mQueuedSlice = pitch;
+      mQueuedPlaybackStyle = VelocityToPlaybackStyle(velocity);
       mPlaybackSampleStartTime = time;
       mPlaybackSampleStopTime = -1;
    }
@@ -203,7 +226,7 @@ void BufferShuffler::PlayOneShot(int slice)
    TheTransport->GetQuantized(currentTime, &timeInfo, &remainderMs);
    double timeUntilNextInterval = sliceSizeMs - remainderMs;
    mPlaybackSampleStartTime = currentTime + timeUntilNextInterval;
-   mPlaybackSampleStopTime = mPlaybackSampleStartTime + sliceSizeMs;
+   mPlaybackSampleStopTime = mPlaybackSampleStartTime + sliceSizeMs / abs(GetSlicePlaybackRate());
 }
 
 int BufferShuffler::GetWritePositionInSamples(double time)
@@ -214,6 +237,43 @@ int BufferShuffler::GetWritePositionInSamples(double time)
 int BufferShuffler::GetLengthInSamples()
 {
    return mNumBars * TheTransport->MsPerBar() * gSampleRateMs;
+}
+
+BufferShuffler::PlaybackStyle BufferShuffler::VelocityToPlaybackStyle(int velocity) const
+{
+   if (velocity > 100)
+      return PlaybackStyle::Normal;
+   if (velocity > 80)
+      return PlaybackStyle::Double;
+   if (velocity > 60)
+      return PlaybackStyle::Half;
+   if (velocity > 40)
+      return PlaybackStyle::Reverse;
+   if (velocity > 20)
+      return PlaybackStyle::DoubleReverse;
+   else
+      return PlaybackStyle::HalfReverse;
+}
+
+float BufferShuffler::GetSlicePlaybackRate() const
+{
+   switch (mPlaybackStyle)
+   {
+      case PlaybackStyle::Normal:
+         return 1;
+      case PlaybackStyle::Double:
+         return 2;
+      case PlaybackStyle::Half:
+         return .5f;
+      case PlaybackStyle::Reverse:
+         return -1;
+      case PlaybackStyle::DoubleReverse:
+         return -2;
+      case PlaybackStyle::HalfReverse:
+         return -.5f;
+      default:
+         return 1;
+   }
 }
 
 bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
@@ -227,8 +287,17 @@ bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, i
          int y = 7 - gridIndex / 8;
          int index = x + y * 8;
 
-         if (index < GetNumSlices())
+         if (y == 7)
+         {
+            if (midiValue > 0 && x < 5)
+               mPlaybackStyle = PlaybackStyle(x + 1);
+            else
+               mPlaybackStyle = PlaybackStyle::Normal;
+         }
+         else if (index < GetNumSlices() && midiValue > 0)
+         {
             PlayOneShot(index);
+         }
 
          return true;
       }
@@ -243,11 +312,16 @@ void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
    {
       for (int y = 0; y < 8; ++y)
       {
-         int pushColor;
+         int pushColor = 0;
          int index = x + y * 8;
          int writeSlice = GetWritePositionInSamples(gTime) * GetNumSlices() / GetLengthInSamples();
          int playSlice = mPlaybackSample * GetNumSlices() / GetLengthInSamples();
-         if (index < GetNumSlices())
+         if (y == 7)
+         {
+            if (x < 5)
+               pushColor = (x == (int)mPlaybackStyle - 1) ? 2 : 1;
+         }
+         else if (index < GetNumSlices())
          {
             if (index == mQueuedSlice && mPlaybackSampleStartTime != -1)
                pushColor = 32;
@@ -258,10 +332,6 @@ void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
             else
                pushColor = 16;
          }
-         else
-         {
-            pushColor = 0;
-         }
 
          push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
@@ -270,7 +340,7 @@ void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
 
 bool BufferShuffler::DrawToPush2Screen()
 {
-   DrawBuffer(250, 10, 400, 60);
+   DrawBuffer(371, 10, 400, 60);
    return false;
 }
 
@@ -284,4 +354,59 @@ void BufferShuffler::LoadLayout(const ofxJSONElement& moduleInfo)
 void BufferShuffler::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+}
+
+void BufferShuffler::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+
+   out << mWidth;
+   out << mHeight;
+
+   out << gSampleRate;
+   out << GetLengthInSamples();
+   out << mInputBuffer.NumActiveChannels();
+   mInputBuffer.Save(out, GetLengthInSamples());
+}
+
+void BufferShuffler::LoadState(FileStreamIn& in, int rev)
+{
+   IDrawableModule::LoadState(in, rev);
+   if (rev < 0)
+      return;
+
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
+   in >> mWidth;
+   in >> mHeight;
+   Resize(mWidth, mHeight);
+
+   int savedSampleRate;
+   in >> savedSampleRate;
+   int savedLength;
+   in >> savedLength;
+   int savedChannelCount;
+   in >> savedChannelCount;
+   if (savedSampleRate == gSampleRate)
+   {
+      mInputBuffer.Load(in, savedLength, ChannelBuffer::LoadMode::kAnyBufferSize);
+   }
+   else
+   {
+      ChannelBuffer readBuffer(savedLength);
+      readBuffer.Load(in, savedLength, ChannelBuffer::LoadMode::kAnyBufferSize);
+
+      float sampleRateRatio = (float)gSampleRate / savedSampleRate;
+      int adjustedLength = savedLength * sampleRateRatio;
+      mInputBuffer.SetNumActiveChannels(savedChannelCount);
+      for (int ch = 0; ch < savedChannelCount; ++ch)
+      {
+         float* destBuffer = mInputBuffer.GetChannel(ch);
+         float* srcBuffer = readBuffer.GetChannel(ch);
+         for (int i = 0; i < adjustedLength; ++i)
+            destBuffer[i] = GetInterpolatedSample(i / sampleRateRatio, srcBuffer, savedLength);
+      }
+   }
 }

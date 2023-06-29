@@ -25,6 +25,8 @@ timelinecontrol~control global transport position
 buffershuffler~use notes to play back slices of a constantly-recording live input buffer. input notes trigger slices, with the pitch mapping to slice index. you can also click with a mouse to trigger slices.
 ~num bars~number of bars to capture
 ~interval~slice size
+~playback style~how to play clicked slices. or, with input notes, velocity range determines playback style.
+~freeze input~retain the current buffer, without writing in new input
 
 
 
@@ -875,6 +877,7 @@ looper~loop input audio. use with a "looperrecorder" for full functionality.
 ~decay~amount to lower volume each loop
 ~save~save this loop to a wav file
 ~mute~silence this looper
+~passthrough~allow input audio to pass through this looper
 ~commit~commit the current looperrecorder buffer to this loop
 ~capture~when the next loop begins, record input for the duration of the loop
 ~write~write input audio to loop buffer
@@ -899,6 +902,7 @@ looper~loop input audio. use with a "looperrecorder" for full functionality.
 ~pitch~amount to pitch shift looper output
 ~auto~should pitch shift auto-adjust as the transport tempo adjusts?
 ~resample for tempo~this button appears when the current global tempo no longer matches the tempo that the buffer was recorded at. click this to resample the buffer to match the new tempo.
+~passthrough~should we pass incoming audio through to the output? turn off to mute incoming audio.
 
 
 

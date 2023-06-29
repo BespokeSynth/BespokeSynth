@@ -159,8 +159,7 @@ void Vocoder::Process(double time)
 
       phase += ofRandom(mWhisper * FTWO_PI);
       mPhaseOffsetSlider->Compute();
-      phase += mPhaseOffset;
-      FloatWrap(phase, FTWO_PI);
+      phase = FloatWrap(phase + mPhaseOffset, FTWO_PI);
 
       if (i < mCut) //cut out superbass
          amp = 0;

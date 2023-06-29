@@ -77,6 +77,7 @@ void Looper::CreateUIControls()
    mCommitButton = new ClickButton(this, "commit", 126, 3);
    mQueueCaptureButton = new ClickButton(this, "capture", 126, 3);
    mMuteCheckbox = new Checkbox(this, "mute", -1, -1, &mMute);
+   mPassthroughCheckbox = new Checkbox(this, "passthrough", -1, -1, &mPassthrough);
    mUndoButton = new ClickButton(this, "undo", -1, -1);
    mAllowScratchCheckbox = new Checkbox(this, "scr", -1, -1, &mAllowScratch);
    mVolumeBakeButton = new ClickButton(this, "b", -1, -1);
@@ -138,6 +139,7 @@ void Looper::CreateUIControls()
    mWriteOffsetButton->PositionTo(mLoopPosOffsetSlider, kAnchor_Right);
    mScratchSpeedSlider->PositionTo(mLoopPosOffsetSlider, kAnchor_Below);
    mAllowScratchCheckbox->PositionTo(mScratchSpeedSlider, kAnchor_Right);
+   mPassthroughCheckbox->PositionTo(mScratchSpeedSlider, kAnchor_Below);
 }
 
 Looper::~Looper()
@@ -349,7 +351,8 @@ void Looper::Process(double time)
 
    for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
    {
-      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      if (mPassthrough || mWriteInput)
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
       Add(target->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
    }
 
@@ -447,8 +450,7 @@ double Looper::GetPlaybackSpeed() const
 
 void Looper::ProcessScratch()
 {
-   mLoopPosOffset = mLoopPosOffset - GetPlaybackSpeed() + mScratchSpeed;
-   FloatWrap(mLoopPosOffset, mLoopLength);
+   mLoopPosOffset = FloatWrap(mLoopPosOffset - GetPlaybackSpeed() + mScratchSpeed, mLoopLength);
 }
 
 void Looper::ProcessFourTet(double time, int sampleIdx)
@@ -467,9 +469,7 @@ void Looper::ProcessFourTet(double time, int sampleIdx)
       mLoopPosOffset = (1 - sliceProgress + slice / 2) * (mLoopLength / float(numSlices) * 2);
 
    //offset regular movement
-   mLoopPosOffset -= mLoopPos + sampleIdx * GetPlaybackSpeed();
-
-   FloatWrap(mLoopPosOffset, mLoopLength);
+   mLoopPosOffset = FloatWrap(mLoopPosOffset - (mLoopPos + sampleIdx * GetPlaybackSpeed()), mLoopLength);
 
    //smooth discontinuity
    if (oldOffset >= mLoopLength * .5f && mLoopPosOffset < mLoopLength * .5f)
@@ -536,9 +536,7 @@ void Looper::ProcessBeatwheel(double time, int sampleIdx)
          mLoopPosOffset = playSlice * (loopLength / numSlices);
 
          //offset regular movement
-         mLoopPosOffset -= mLoopPos + sampleIdx * GetPlaybackSpeed();
-
-         FloatWrap(mLoopPosOffset, mLoopLength);
+         mLoopPosOffset = FloatWrap(mLoopPosOffset - (mLoopPos + sampleIdx * GetPlaybackSpeed()), mLoopLength);
       }
    }
 }
@@ -555,8 +553,7 @@ int Looper::GetBeatwheelDepthLevel() const
 
 float Looper::GetActualLoopPos(int samplesIn) const
 {
-   float pos = mLoopPos + mLoopPosOffset + samplesIn;
-   FloatWrap(pos, mLoopLength);
+   float pos = FloatWrap(mLoopPos + mLoopPosOffset + samplesIn, mLoopLength);
    return pos;
 }
 
@@ -698,6 +695,7 @@ void Looper::DrawModule()
 
    mSaveButton->Draw();
    mMuteCheckbox->Draw();
+   mPassthroughCheckbox->Draw();
    mCommitButton->Draw();
 
    if (mGranulator)
@@ -1025,7 +1023,7 @@ void Looper::SampleDropped(int x, int y, Sample* sample)
 void Looper::GetModuleDimensions(float& width, float& height)
 {
    width = kBufferX * 2 + kBufferWidth;
-   height = 165;
+   height = 182;
 }
 
 void Looper::OnClicked(float x, float y, bool right)
