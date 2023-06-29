@@ -179,6 +179,8 @@ private:
    bool mWantShiftOffset{ false };
    bool mMute{ false };
    Checkbox* mMuteCheckbox{ nullptr };
+   bool mPassthrough{ true };
+   Checkbox* mPassthroughCheckbox{ nullptr };
    ClickButton* mCommitButton{ nullptr };
    ClickButton* mDoubleSpeedButton{ nullptr };
    ClickButton* mHalveSpeedButton{ nullptr };

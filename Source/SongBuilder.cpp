@@ -175,10 +175,16 @@ void SongBuilder::DrawModule()
    DrawTextNormal("scenes:", gridStartX, kGridStartY + kTargetTabHeightTop - 1);
 
    for (int i = 0; i < (int)mScenes.size(); ++i)
-      mScenes[i]->Draw(this, gridStartX, kGridStartY + kTargetTabHeightTop + kSpacingY + i * (kRowHeight + kSpacingY), i);
+   {
+      if (mScenes[i] != nullptr)
+         mScenes[i]->Draw(this, gridStartX, kGridStartY + kTargetTabHeightTop + kSpacingY + i * (kRowHeight + kSpacingY), i);
+   }
 
    for (int i = 0; i < (int)mTargets.size(); ++i)
-      mTargets[i]->Draw(gridStartX + kSceneTabWidth + i * (kColumnWidth + kSpacingX), kGridStartY, (int)mScenes.size());
+   {
+      if (mTargets[i] != nullptr)
+         mTargets[i]->Draw(gridStartX + kSceneTabWidth + i * (kColumnWidth + kSpacingX), kGridStartY, (int)mScenes.size());
+   }
 
    bool sequenceComplete = false;
    for (int i = 0; i < kMaxSequencerScenes; ++i)

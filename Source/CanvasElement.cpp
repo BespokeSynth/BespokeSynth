@@ -404,7 +404,7 @@ void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
 void NoteCanvasElement::UpdateModulation(float pos)
 {
    float curveTime = (pos - GetStart()) * mCanvas->GetLength();
-   FloatWrap(curveTime, mCanvas->GetLength());
+   curveTime = FloatWrap(curveTime, mCanvas->GetLength());
    mPitchBend.SetValue(mPitchBendCurve.Evaluate(curveTime));
    mModWheel.SetValue(mModWheelCurve.Evaluate(curveTime));
    mPressure.SetValue(mPressureCurve.Evaluate(curveTime));
@@ -414,7 +414,7 @@ void NoteCanvasElement::UpdateModulation(float pos)
 void NoteCanvasElement::WriteModulation(float pos, float pitchBend, float modWheel, float pressure, float pan)
 {
    float curveTime = (pos - GetStart()) * mCanvas->GetLength();
-   FloatWrap(curveTime, mCanvas->GetLength());
+   curveTime = FloatWrap(curveTime, mCanvas->GetLength());
    mPitchBendCurve.AddPoint(CurvePoint(curveTime, pitchBend));
    mModWheelCurve.AddPoint(CurvePoint(curveTime, modWheel));
    mPressureCurve.AddPoint(CurvePoint(curveTime, pressure));

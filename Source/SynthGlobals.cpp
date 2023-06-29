@@ -379,18 +379,20 @@ double GetPhaseInc(float freq)
    return freq * gTwoPiOverSampleRate;
 }
 
-void FloatWrap(float& num, float space)
+float FloatWrap(float num, float space)
 {
    if (space == 0)
       num = 0;
    num -= space * floor(num / space);
+   return num;
 }
 
-void FloatWrap(double& num, float space)
+double DoubleWrap(double num, float space)
 {
    if (space == 0)
       num = 0;
    num -= space * floor(num / space);
+   return num;
 }
 
 void DrawTextNormal(std::string text, int x, int y, float size)
@@ -420,7 +422,7 @@ void AssertIfDenormal(float input)
 
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
 {
-   FloatWrap(offset, bufferSize);
+   offset = DoubleWrap(offset, bufferSize);
    int pos = int(offset);
    int posNext = int(offset + 1) % bufferSize;
 
@@ -451,7 +453,7 @@ float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize
 
 void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float sample)
 {
-   FloatWrap(offset, bufferSize);
+   offset = DoubleWrap(offset, bufferSize);
    int pos = int(offset);
    int posNext = int(offset + 1) % bufferSize;
 

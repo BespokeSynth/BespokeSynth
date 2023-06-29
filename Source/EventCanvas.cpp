@@ -116,8 +116,7 @@ void EventCanvas::OnTransportAdvanced(float amount)
    //look ahead two buffers so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
    double lookaheadMsAmount = gBufferSizeMs * 2;
    double lookaheadTime = gTime + lookaheadMsAmount;
-   double lookaheadPos = ((TheTransport->GetMeasure(lookaheadTime) % mNumMeasures) + TheTransport->GetMeasurePos(lookaheadTime)) / mNumMeasures;
-   FloatWrap(lookaheadPos, 1);
+   double lookaheadPos = DoubleWrap(((TheTransport->GetMeasure(lookaheadTime) % mNumMeasures) + TheTransport->GetMeasurePos(lookaheadTime)) / mNumMeasures, 1);
 
    mCanvas->SetCursorPos(lookaheadPos);
    mPosition = lookaheadPos;
@@ -133,7 +132,7 @@ void EventCanvas::OnTransportAdvanced(float amount)
       bool startPassed = (lookaheadPos >= elementStart && mPreviousPosition < elementStart);
       float elementEnd = canvasElement->GetEnd();
       if (elementEnd > mCanvas->GetLength())
-         FloatWrap(elementEnd, mCanvas->GetLength());
+         elementEnd = FloatWrap(elementEnd, mCanvas->GetLength());
       bool endPassed = (lookaheadPos >= elementEnd && mPreviousPosition < elementEnd);
       if (startPassed || endPassed)
       {

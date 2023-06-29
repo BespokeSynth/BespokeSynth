@@ -99,8 +99,7 @@ void FreqDomainBoilerplate::Process(double time)
       float amp = 2. * sqrtf(real * real + imag * imag);
       float phase = atan2(imag, real);
 
-      phase += mPhaseOffset;
-      FloatWrap(phase, FTWO_PI);
+      phase = FloatWrap(phase + mPhaseOffset, FTWO_PI);
 
       //polar to cartesian
       real = amp * cos(phase);
