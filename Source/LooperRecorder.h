@@ -165,6 +165,7 @@ private:
    int mNextCommitTargetIndex{ 0 };
    Checkbox* mAutoAdvanceThroughLoopersCheckbox{ nullptr };
    bool mAutoAdvanceThroughLoopers{ false };
+   bool mTemporarilySilenceAfterCommit{ false };
 
    bool mFreeRecording{ false };
    Checkbox* mFreeRecordingCheckbox{ nullptr };
