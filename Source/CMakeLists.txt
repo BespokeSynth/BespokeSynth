@@ -296,6 +296,8 @@ target_sources(BespokeSynth PRIVATE
     MidiOutput.h
     MidiReader.cpp
     MidiReader.h
+    MiniBruteControl.cpp
+    MiniBruteControl.h
     Minimap.cpp
     Minimap.h
     ModWheel.cpp

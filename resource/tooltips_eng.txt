@@ -2001,3 +2001,19 @@ songbuilder~large-scale organizer to arrange settings into scenes and then seque
 ~move left~move this target left in the scene
 ~move right~move this target right in the scene
 ~type~change the control display type for this target
+
+
+minibrutecontrol~edit the hidden parameters on the arturia minibrute
+~sync source~select where you want to recive the clock signal from
+~velocity curve~set the velocity curve for the keyboard
+~note priority~set the note priority for the keyboard
+~aftertouch curve~set the aftertouch curve for the keyboard
+~audio in threshold~set the audio input threshold
+~arpeggiator hold~hold the arpeggiator notes
+~lfo retrig mode~retrigger the lfo when a note is pressed
+~envelope legato mode~make the synth retrigger the filter envelope when a note has already been pushed down
+~local on/off~decouple the keyboard from the synthesizer
+~receive channel~the midi channel you want to receive data on
+~send channel~the midi channel you want to send data on
+~panic~turn all midi notes off
+~send~send all of the midi data to the synthesizer
