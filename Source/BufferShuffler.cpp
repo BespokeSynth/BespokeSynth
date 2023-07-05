@@ -202,7 +202,7 @@ void BufferShuffler::PlayNote(double time, int pitch, int velocity, int voiceIdx
 
 int BufferShuffler::GetNumSlices()
 {
-   return TheTransport->CountInStandardMeasure(mInterval) * mNumBars;
+   return TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom() * mNumBars;
 }
 
 void BufferShuffler::OnClicked(float x, float y, bool right)
