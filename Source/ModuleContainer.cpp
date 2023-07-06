@@ -393,6 +393,30 @@ void ModuleContainer::DeleteModule(IDrawableModule* module, bool fail /*= true*/
    TheSynth->OnModuleDeleted(module);
 }
 
+void ModuleContainer::DeleteCablesForControl(const IUIControl* control)
+{
+   // Remove all cables that targetted control on this module
+   std::vector<IDrawableModule*> modules;
+   TheSynth->GetAllModules(modules);
+   std::vector<PatchCable*> cablesToDestroy;
+   for (const auto module_iter : modules)
+   {
+      for (const auto source : module_iter->GetPatchCableSources())
+      {
+         for (const auto cable : source->GetPatchCables())
+         {
+            if (cable->GetTarget() == control)
+            {
+               cablesToDestroy.push_back(cable);
+               break;
+            }
+         }
+      }
+   }
+   for (const auto cable : cablesToDestroy)
+      cable->Destroy(false);
+}
+
 IDrawableModule* ModuleContainer::FindModule(std::string name, bool fail)
 {
    /*string ownerPath = "";
