@@ -222,6 +222,7 @@ private:
    int mQueuedMeasure{ -1 };
    int mJumpFromMeasure{ -1 };
    bool mWantSetRandomTempo{ false };
+   float mNudgeFactor{ 0 };
 
    std::list<TransportListenerInfo> mListeners;
    std::list<IAudioPoller*> mAudioPollers;

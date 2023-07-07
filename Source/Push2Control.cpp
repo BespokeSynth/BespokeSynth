@@ -551,12 +551,9 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    }
 
    bool isHoveringOverNewModule = (gHoveredModule != mDisplayModule && gHoveredModule != nullptr);
+   SetLed(kMidiMessage_Control, kPlayButton, TheSynth->IsAudioPaused() ? 127 : 120);
    if (mDisplayModule != nullptr)
-      SetLed(kMidiMessage_Control, kPlayButton, mDisplayModule->IsEnabled() ? 126 : 127);
-   else
-      SetLed(kMidiMessage_Control, kPlayButton, 0);
-   if (mDisplayModule != nullptr)
-      SetLed(kMidiMessage_Control, kCircleButton, GetPadColorForType(mDisplayModule->GetModuleCategory(), !mDisplayModule->Minimized()));
+      SetLed(kMidiMessage_Control, kCircleButton, mDisplayModule->IsEnabled() ? 126 : 127);
    else
       SetLed(kMidiMessage_Control, kCircleButton, 0);
    SetLed(kMidiMessage_Control, kTapTempoButton, isHoveringOverNewModule ? 127 : 0, isHoveringOverNewModule ? 32 : 0);
@@ -565,7 +562,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    SetLed(kMidiMessage_Control, kDoubleLoopButton, mDisplayModule != nullptr && (mDisplayModule->GetTypeName() == "looper" || mDisplayModule->GetTypeName() == "notelooper") ? 127 : 0);
    SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
-   SetLed(kMidiMessage_Control, kAutomateButton, 126, mModulationButtonHeld ? 0 : -1);
+   SetLed(kMidiMessage_Control, kAutomateButton, GetPadColorForType(kModuleCategory_Modulator, true), mModulationButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kMasterButton, 127, mAddModuleBookmarkButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kAddDeviceButton, 127, mScreenDisplayMode == ScreenDisplayMode::kAddModule ? 0 : -1);
    SetLed(kMidiMessage_Control, kAddTrackButton, mDisplayModule != nullptr ? 127 : 0, mAddTrackHeld ? 0 : -1);
@@ -1554,6 +1551,9 @@ void Push2Control::OnMidiControl(MidiControl& control)
                {
                   float current = mButtonControls[controlIndex]->GetMidiValue();
                   float newValue = current > 0 ? 0 : 1;
+                  if (dynamic_cast<ClickButton*>(mButtonControls[controlIndex]) != nullptr)
+                     newValue = 1; //always "press" a button
+
                   mButtonControls[controlIndex]->SetFromMidiCC(newValue, NextBufferTime(false), false);
                }
             }
@@ -1958,6 +1958,16 @@ void Push2Control::OnMidiControl(MidiControl& control)
    }
    else if (control.mControl == kPlayButton)
    {
+      if (control.mValue > 0)
+      {
+         if (TheSynth->IsAudioPaused())
+            TheTransport->Reset();
+         else
+            TheSynth->SetAudioPaused(true);
+      }
+   }
+   else if (control.mControl == kCircleButton)
+   {
       if (control.mValue > 0 && mDisplayModule != nullptr)
       {
          Checkbox* enabledCheckbox = mDisplayModule->GetEnabledCheckbox();
@@ -1966,11 +1976,6 @@ void Push2Control::OnMidiControl(MidiControl& control)
          else
             mDisplayModule->SetEnabled(!mDisplayModule->IsEnabled());
       }
-   }
-   else if (control.mControl == kCircleButton)
-   {
-      if (control.mValue > 0 && mDisplayModule != nullptr)
-         mDisplayModule->SetMinimized(!mDisplayModule->Minimized());
    }
    else
    {

@@ -121,8 +121,21 @@ void Transport::AdjustTempo(double amount)
 
 void Transport::Advance(double ms)
 {
-   double amount = ms / MsPerBar();
+   if (mNudgeFactor != 0)
+   {
+      const float kNudgePower = .05f;
+      float nudgeScale = (1 + mNudgeFactor * kNudgePower);
 
+      const float kRamp = .005f;
+      if (mNudgeFactor > 0)
+         mNudgeFactor = MAX(0, mNudgeFactor - ms * kRamp);
+      if (mNudgeFactor < 0)
+         mNudgeFactor = MIN(0, mNudgeFactor + ms * kRamp);
+
+      ms *= nudgeScale;
+   }
+
+   double amount = ms / MsPerBar();
    assert(amount > 0);
 
    double oldMeasureTime = mMeasureTime;
@@ -195,7 +208,7 @@ double Transport::SwingBeat(double pos)
 
 void Transport::Nudge(double amount)
 {
-   mMeasureTime += amount;
+   mNudgeFactor += amount;
 }
 
 void Transport::DrawModule()
@@ -251,6 +264,11 @@ void Transport::DrawModule()
    }
    ofEndShape();
    ofRect(0, h - Swing(measurePos) * h, 4, 1);
+
+   float nudgeMinX = mNudgeBackButton->GetRect(true).getMinX();
+   float nudgeMaxX = mNudgeForwardButton->GetRect(true).getMaxX();
+   float nudgeX = ofLerp(nudgeMinX, nudgeMaxX, (mNudgeFactor / 15) + .5f);
+   ofLine(nudgeX, mNudgeBackButton->GetRect(true).getMinY(), nudgeX, mNudgeBackButton->GetRect(true).getMaxY());
 }
 
 void Transport::Reset()
@@ -260,6 +278,9 @@ void Transport::Reset()
    else
       mMeasureTime = .99f;
    SetQueuedMeasure(NextBufferTime(true), 0);
+
+   if (TheSynth->IsAudioPaused())
+      TheSynth->SetAudioPaused(false);
 }
 
 void Transport::ButtonClicked(ClickButton* button, double time)
@@ -267,9 +288,9 @@ void Transport::ButtonClicked(ClickButton* button, double time)
    if (button == mResetButton)
       Reset();
    if (button == mNudgeBackButton)
-      Nudge(-.03);
+      Nudge(-1);
    if (button == mNudgeForwardButton)
-      Nudge(.03);
+      Nudge(1);
    if (button == mIncreaseTempoButton)
       AdjustTempo(1);
    if (button == mDecreaseTempoButton)
