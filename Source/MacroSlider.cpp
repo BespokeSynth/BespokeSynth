@@ -116,6 +116,11 @@ MacroSlider::Mapping::Mapping(MacroSlider* owner, int index)
 
 MacroSlider::Mapping::~Mapping()
 {
+   mOwner->GetOwningContainer()->DeleteCablesForControl(mMinSlider);
+   mOwner->GetOwningContainer()->DeleteCablesForControl(mMaxSlider);
+   mOwner->RemoveUIControl(mMinSlider);
+   mOwner->RemoveUIControl(mMaxSlider);
+   mTargetCable->ClearPatchCables();
    mOwner->RemovePatchCableSource(mTargetCable);
 }
 
