@@ -90,7 +90,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float MeasurePos(double time);
+   double MeasurePos(double time);
 
    //IDrawableModule
    void DrawModule() override;

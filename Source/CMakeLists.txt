@@ -56,6 +56,8 @@ target_sources(BespokeSynth PRIVATE
     BiquadFilterEffect.h
     BitcrushEffect.cpp
     BitcrushEffect.h
+    BufferShuffler.cpp
+    BufferShuffler.h
     ButterworthFilterEffect.cpp
     ButterworthFilterEffect.h
     Canvas.cpp

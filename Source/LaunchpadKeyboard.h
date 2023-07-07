@@ -98,7 +98,9 @@ private:
       kChordIndividual,
       kChord,
       kGuitar,
-      kSeptatonic
+      kSeptatonic,
+      kDrum,
+      kAllPads
    };
 
    enum ArrangementMode

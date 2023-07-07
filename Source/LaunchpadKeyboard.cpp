@@ -147,6 +147,8 @@ void LaunchpadKeyboard::CreateUIControls()
    mLayoutDropdown->AddLabel("chord", kChord);
    mLayoutDropdown->AddLabel("guitar", kGuitar);
    mLayoutDropdown->AddLabel("septatonic", kSeptatonic);
+   mLayoutDropdown->AddLabel("drum", kDrum);
+   mLayoutDropdown->AddLabel("all pads", kAllPads);
 
    mArrangementModeDropdown->AddLabel("full", kFull);
    mArrangementModeDropdown->AddLabel("five", kFive);
@@ -591,7 +593,18 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
 
       return TheScale->GetPitchFromTone(tone) + TheScale->GetPitchesPerOctave() * (mRootNote / TheScale->GetPitchesPerOctave()) + TheScale->GetPitchesPerOctave() * mOctave;
    }
-   assert(false);
+   else if (mLayout == kDrum)
+   {
+      if (x < 4 && y < 4)
+         return x + y * 4;
+      else
+         return INVALID_PITCH;
+   }
+   else if (mLayout == kAllPads)
+   {
+      return x + y * 8;
+   }
+
    return 0;
 }
 
@@ -705,6 +718,10 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
    {
       color = kGridColor3Dim;
    }*/
+   else if (mLayout == kDrum || mLayout == kAllPads)
+   {
+      color = kGridColor3Bright;
+   }
    else if (isRoot)
    {
       color = kGridColor2Bright;

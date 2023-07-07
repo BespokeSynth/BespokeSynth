@@ -79,5 +79,3 @@ To be able to build you will need a few things, depending on your OS
 * On MacOS: install xcode; install xcode command line tools with `xcode-select --install` and install cmake with `brew install cmake` if you use homebrew or from cmake.org if not
 * On Linux you probably already have everything (gcc, git, etc...), but you will need to install required packages. The full list we
 install on a fresh ubuntu 20 box are listed in the azure-pipelines.yml
-
-<a rel="me" href="https://post.lurk.org/@awwbees">.</a>

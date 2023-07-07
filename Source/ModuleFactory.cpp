@@ -259,6 +259,7 @@
 #include "PulseFlag.h"
 #include "PulseDisplayer.h"
 #include "MiniBruteControl.h"
+#include "BufferShuffler.h"
 
 #include <juce_core/juce_core.h>
 
@@ -465,6 +466,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseFlag, pulseflag, kModuleCategory_Pulse);
    REGISTER(PulseDisplayer, pulsedisplayer, kModuleCategory_Pulse);
    REGISTER(MiniBruteControl, minibrutecontrol, kModuleCategory_Note);
+   REGISTER(BufferShuffler, buffershuffler, kModuleCategory_Audio);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

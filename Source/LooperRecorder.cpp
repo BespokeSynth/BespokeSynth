@@ -150,8 +150,11 @@ void LooperRecorder::Process(double time)
       mCommitToLooper->Commit();
 
       mRecorderMode = kRecorderMode_Record;
-      mQuietInputRamp.Start(time, 0, time + 10);
-      mUnquietInputTime = time + 1000; //no input for 1 second
+      if (mTemporarilySilenceAfterCommit)
+      {
+         mQuietInputRamp.Start(time, 0, time + 10);
+         mUnquietInputTime = time + 1000; //no input for 1 second
+      }
       mCommitToLooper = nullptr;
    }
 
@@ -752,8 +755,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button, double time)
       int newMeasure = int(TheTransport->GetMeasure(time) + TheTransport->GetMeasurePos(time) - .5f);
       if (newMeasure < 0)
          newMeasure = 7;
-      float newMeasurePos = TheTransport->GetMeasurePos(time) - .5f;
-      FloatWrap(newMeasurePos, 1);
+      float newMeasurePos = FloatWrap(TheTransport->GetMeasurePos(time) - .5f, 1);
       TheTransport->SetMeasureTime(newMeasure + newMeasurePos);
    }
 
@@ -856,6 +858,7 @@ void LooperRecorder::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("headphonestarget", moduleInfo, "", FillDropdown<IAudioReceiver*>);
    mModuleSaveData.LoadString("outputtarget", moduleInfo, "", FillDropdown<IAudioReceiver*>);
+   mModuleSaveData.LoadBool("temp_silence_after_commit", moduleInfo, false);
 
    if (!moduleInfo["loopers"].isNull())
    {
@@ -885,6 +888,7 @@ void LooperRecorder::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    SetHeadphonesTarget(TheSynth->FindAudioReceiver(mModuleSaveData.GetString("headphonestarget")));
    SetOutputTarget(TheSynth->FindAudioReceiver(mModuleSaveData.GetString("outputtarget")));
+   mTemporarilySilenceAfterCommit = mModuleSaveData.GetBool("temp_silence_after_commit");
 }
 
 void LooperRecorder::SaveState(FileStreamOut& out)
