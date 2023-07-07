@@ -114,8 +114,8 @@ private:
    int mArpeggiatorHold{ 0 };
    int mLocalOnOff{ 0 };
 
-   const int ccReciveChannel= 102;
-   const int ccSendChannel= 103;
+   const int ccReciveChannel = 102;
+   const int ccSendChannel = 103;
    const int ccSyncSource = 108;
    const int ccEnvLegatoMode = 109;
    const int ccLFORetrigMode = 110;
@@ -135,7 +135,7 @@ private:
 
    DropdownList* receiveChannel{ nullptr };
    DropdownList* sendChannel{ nullptr };
-   
+
    RadioButton* syncSource{ nullptr };
    RadioButton* envLegatoMode{ nullptr };
    RadioButton* lfoRetrigMode{ nullptr };
