@@ -120,12 +120,12 @@ private:
    FloatSlider* mVelocitySlider{ nullptr };
    int mVoiceIdx{ -1 };
    ModulationChain mPitchBend{ 0 };
-   ModulationChain mModWheel{ .5f };
-   ModulationChain mPressure{ .5f };
+   ModulationChain mModWheel{ 0 };
+   ModulationChain mPressure{ 0 };
    float mPan{ 0 };
    Curve mPitchBendCurve{ 0 };
-   Curve mModWheelCurve{ .5f };
-   Curve mPressureCurve{ .5f };
+   Curve mModWheelCurve{ 0 };
+   Curve mPressureCurve{ 0 };
    Curve mPanCurve{ 0 };
 };
 

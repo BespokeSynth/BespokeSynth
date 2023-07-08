@@ -58,8 +58,8 @@ private:
 struct ModulationCollection
 {
    ModulationChain mPitchBend{ 0 };
-   ModulationChain mModWheel{ .5f };
-   ModulationChain mPressure{ .5f };
+   ModulationChain mModWheel{ 0 };
+   ModulationChain mPressure{ 0 };
 };
 
 struct ModulationParameters
