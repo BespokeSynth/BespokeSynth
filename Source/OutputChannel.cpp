@@ -73,7 +73,10 @@ void OutputChannel::Process(double time)
       if (channel >= 0 && channel < TheSynth->GetNumOutputChannels())
       {
          for (int i = 0; i < gBufferSize; ++i)
-            TheSynth->GetOutputBuffer(channel)[i] += std::clamp(/*GetBuffer()->GetChannel(0)*/ getBufferGetChannel0[i], -mLimit, mLimit);
+            if (mLimit > std::numeric_limits<float>::epsilon())
+               TheSynth->GetOutputBuffer(channel)[i] += std::clamp(/*GetBuffer()->GetChannel(0)*/ getBufferGetChannel0[i], -mLimit, mLimit);
+            else
+               TheSynth->GetOutputBuffer(channel)[i] += getBufferGetChannel0[i];
       }
       GetVizBuffer()->WriteChunk(/*GetBuffer()->GetChannel(0)*/ getBufferGetChannel0, gBufferSize, 0);
 
@@ -86,7 +89,10 @@ void OutputChannel::Process(double time)
       if (channel1 >= 0 && channel1 < TheSynth->GetNumOutputChannels())
       {
          for (int i = 0; i < gBufferSize; ++i)
-            TheSynth->GetOutputBuffer(channel1)[i] += CLAMP(GetBuffer()->GetChannel(0)[i], -mLimit, mLimit);
+            if (mLimit > std::numeric_limits<float>::epsilon())
+               TheSynth->GetOutputBuffer(channel1)[i] += CLAMP(GetBuffer()->GetChannel(0)[i], -mLimit, mLimit);
+            else
+               TheSynth->GetOutputBuffer(channel1)[i] += GetBuffer()->GetChannel(0)[i];
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), gBufferSize, 0);
       }
       int channel2 = channel1 + 1;
@@ -94,7 +100,10 @@ void OutputChannel::Process(double time)
       if (channel2 >= 0 && channel2 < TheSynth->GetNumOutputChannels())
       {
          for (int i = 0; i < gBufferSize; ++i)
-            TheSynth->GetOutputBuffer(channel2)[i] += CLAMP(GetBuffer()->GetChannel(inputChannel2)[i], -mLimit, mLimit);
+            if (mLimit > std::numeric_limits<float>::epsilon())
+               TheSynth->GetOutputBuffer(channel2)[i] += CLAMP(GetBuffer()->GetChannel(inputChannel2)[i], -mLimit, mLimit);
+            else
+               TheSynth->GetOutputBuffer(channel2)[i] += GetBuffer()->GetChannel(inputChannel2)[i];
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(inputChannel2), gBufferSize, 1);
       }
 
@@ -127,8 +136,8 @@ void OutputChannel::DrawModule()
       {
          ofPushStyle();
          ofFill();
-         float level = mLevelMeters[i].mPeakTracker.GetPeak() / mLimit;
-         float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak() / mLimit;
+         float level = mLevelMeters[i].mPeakTracker.GetPeak() / (mLimit > 0 ? mLimit : 1);
+         float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak() / (mLimit > 0 ? mLimit : 1);
          ofColor color(0, 255, 0);
          if (j > kNumSegments - 3)
             color.set(255, 0, 0);
