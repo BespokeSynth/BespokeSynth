@@ -181,6 +181,11 @@ void FileStreamIn::Peek(void* buffer, int size)
    mStream->setPosition(pos);
 }
 
+int FileStreamIn::bytesRemaining() const
+{
+   return int(mStream->getNumBytesRemaining());
+}
+
 bool FileStreamIn::Eof() const
 {
    return mStream->isExhausted();

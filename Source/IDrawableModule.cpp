@@ -704,14 +704,15 @@ IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/
    return nullptr;
 }
 
-IDrawableModule* IDrawableModule::FindChild(const char* name) const
+IDrawableModule* IDrawableModule::FindChild(const char* name, bool fail /* = true */) const
 {
    for (int i = 0; i < mChildren.size(); ++i)
    {
       if (strcmp(mChildren[i]->Name(), name) == 0)
          return mChildren[i];
    }
-   throw UnknownModuleException(name);
+   if (fail)
+      throw UnknownModuleException("Could not find child: " + ofToString(name));
    return nullptr;
 }
 
@@ -833,6 +834,12 @@ void IDrawableModule::AddUIControl(IUIControl* control)
             else if (!dupe->GetShouldSaveState())
             {
                //we're duplicating the name of a non-saving ui control, assume that we are also not saving (hopefully that's true), and this is fine
+            }
+            else if (name == "uigrid")
+            {
+               //TODO(Noxy): uigrid is handled weirdly and is added more than once in some places.
+               // Obviously this is incorrect and making uigrid behave the same like any other ui control is the best solution
+               // but this involve some tinkering to make old savestates work correctly with grids.
             }
             else
             {
@@ -1183,17 +1190,17 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
    for (int i = 0; i < numUIControls; ++i)
    {
       std::string uicontrolname;
-      in >> uicontrolname;
-      if (baseRev >= 2)
-      {
-         float rawValue;
-         in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
-      }
-      UpdateOldControlName(uicontrolname);
-
       bool threwException = false;
       try
       {
+         in >> uicontrolname;
+         if (baseRev >= 2)
+         {
+            float rawValue;
+            in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
+         }
+         UpdateOldControlName(uicontrolname);
+
          if (LoadOldControl(in, uicontrolname))
          {
             //old data loaded, we're good now!
@@ -1271,37 +1278,57 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
       int numChildren;
       in >> numChildren;
       LoadStateValidate(numChildren <= mChildren.size());
-
+      if (numChildren > mChildren.size())
+      {
+         ofLog() << "IDrawableModule: numChildren(" << numChildren << ") <= mChildren.size()(" << mChildren.size() << ")";
+         ofLog() << "Attempting to load the children anyway ... ";
+      }
       for (int i = 0; i < numChildren; ++i)
       {
          std::string childName;
          in >> childName;
          //ofLog() << "Loading " << childName;
-         IDrawableModule* child = FindChild(childName.c_str());
-         LoadStateValidate(child);
-         child->LoadState(in, child->LoadModuleSaveStateRev(in));
-      }
-   }
+         IDrawableModule* child = FindChild(childName.c_str(), false);
 
-   if (baseRev >= 1)
-   {
-      int numPatchCableSources;
-      in >> numPatchCableSources;
-      PatchCableSource* dummy = nullptr;
-      for (int i = 0; i < numPatchCableSources; ++i)
-      {
-         PatchCableSource* readIn;
-         if (i < mPatchCableSources.size())
+         // Attempt a hacky fix for saves that were saved with module name instead of module type.
+         if (!child)
          {
-            readIn = mPatchCableSources[i];
+            ofLog() << "Child with name '" << childName << "' not found attempting to find: '" << childName.substr(0, childName.length() - 1).c_str() << "'";
+            child = FindChild(childName.substr(0, childName.length() - 1).c_str(), false);
+         }
+
+         if (child)
+         {
+            LoadStateValidate(child);
+            child->LoadState(in, child->LoadModuleSaveStateRev(in));
          }
          else
          {
-            if (dummy == nullptr)
-               dummy = new PatchCableSource(this, kConnectionType_Special);
-            readIn = dummy;
+            //@TODO(Noxy): Any data beyond this point is questionable.
+            ofLog() << "Loading of child '" << childName << "' failed.";
          }
-         readIn->LoadState(in);
+      }
+
+      if (baseRev >= 1)
+      {
+         int numPatchCableSources;
+         in >> numPatchCableSources;
+         PatchCableSource* dummy = nullptr;
+         for (int i = 0; i < numPatchCableSources; ++i)
+         {
+            PatchCableSource* readIn;
+            if (i < mPatchCableSources.size())
+            {
+               readIn = mPatchCableSources[i];
+            }
+            else
+            {
+               if (dummy == nullptr)
+                  dummy = new PatchCableSource(this, kConnectionType_Special);
+               readIn = dummy;
+            }
+            readIn->LoadState(in);
+         }
       }
    }
 }
