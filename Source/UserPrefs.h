@@ -310,6 +310,7 @@ public:
    UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
+   UserPrefBool immediate_paste{ "immediate_paste", false, UserPrefCategory::General };
    UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 30, 1, 120, 5, UserPrefCategory::General };
 #if !BESPOKE_LINUX
    UserPrefBool vst_always_on_top{ "vst_always_on_top", true, UserPrefCategory::General };
