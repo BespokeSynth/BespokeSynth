@@ -40,7 +40,7 @@ void PeakTracker::Process(float* buffer, int bufferSize)
       {
          /* When we hit a peak, ride the peak to the top. */
          mPeak = input;
-         if (mLimit != -1 && mPeak >= mLimit)
+         if (mLimit > std::numeric_limits<float>::epsilon() && mPeak >= mLimit)
          {
             mPeak = mLimit;
             mHitLimitTime = gTime;
@@ -50,7 +50,7 @@ void PeakTracker::Process(float* buffer, int bufferSize)
       {
          /* Exponential decay of output when signal is low. */
          mPeak = mPeak * scalar;
-         if (mPeak < FLT_EPSILON)
+         if (mPeak < std::numeric_limits<float>::epsilon())
             mPeak = 0.0;
       }
    }
