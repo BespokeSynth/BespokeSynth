@@ -1962,6 +1962,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~autosave~should autosave be enabled on startup
 ~show_tooltips_on_load~should tooltips be enabled on startup
 ~show_minimap~should the minimap be displayed (requires restart)
+~immediate_paste~when enabled, pasting values on UI controls will apply immediately instead of requiring you to press enter
 ~record_buffer_length_minutes~length of always-on recording buffer for "write audio" button in the title bar (requires restart)
 ~vst_always_on_top~should plugin windows always stay on top of bespoke when opened
 ~max_output_channels~number of output channels to allocate (requires restart)

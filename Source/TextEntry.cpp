@@ -29,6 +29,7 @@
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
 #include "FileStream.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -426,7 +427,10 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
 
       std::string newString = mString;
       strcpy(mString, (newString.substr(0, mCaretPosition) + clipboard.toStdString() + newString.substr(mCaretPosition)).c_str());
-      MoveCaret(mCaretPosition + clipboard.length());
+      if (UserPrefs.immediate_paste.Get())
+         AcceptEntry(true);
+      else
+         MoveCaret(mCaretPosition + clipboard.length());
    }
    else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
    {
