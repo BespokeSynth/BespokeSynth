@@ -132,6 +132,7 @@ private:
    double mPlaybackSampleStartTime{ -1 };
    double mPlaybackSampleStopTime{ -1 };
    GridControlTarget* mGridControlTarget{ nullptr };
+   bool mUseVelocitySpeedControl{ false };
 
    SwitchAndRamp mSwitchAndRamp;
 };

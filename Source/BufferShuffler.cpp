@@ -195,7 +195,8 @@ void BufferShuffler::PlayNote(double time, int pitch, int velocity, int voiceIdx
    if (velocity > 0)
    {
       mQueuedSlice = pitch;
-      mQueuedPlaybackStyle = VelocityToPlaybackStyle(velocity);
+      if (mUseVelocitySpeedControl)
+         mQueuedPlaybackStyle = VelocityToPlaybackStyle(velocity);
       mPlaybackSampleStartTime = time;
       mPlaybackSampleStopTime = -1;
    }
@@ -406,6 +407,7 @@ void BufferShuffler::UpdateGridControllerLights(bool force)
 void BufferShuffler::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("use_velocity_speed_control", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -413,6 +415,7 @@ void BufferShuffler::LoadLayout(const ofxJSONElement& moduleInfo)
 void BufferShuffler::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   mUseVelocitySpeedControl = mModuleSaveData.GetBool("use_velocity_speed_control");
 }
 
 void BufferShuffler::SaveState(FileStreamOut& out)
