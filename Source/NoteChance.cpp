@@ -44,6 +44,7 @@ void NoteChance::CreateUIControls()
 
    UIBLOCK0();
    FLOATSLIDER(mChanceSlider, "chance", &mChance, 0, 1);
+   CHECKBOX(mDeterministicCheckbox, "deterministic", &mDeterministic);
    UIBLOCK_SHIFTY(5);
    INTSLIDER(mLengthSlider, "beat length", &mLength, 1, 16);
    TEXTENTRY_NUM(mSeedEntry, "seed", 4, &mSeed, 0, 9999);
@@ -67,6 +68,7 @@ void NoteChance::DrawModule()
       return;
 
    mChanceSlider->Draw();
+   mDeterministicCheckbox->Draw();
 
    if (gTime - mLastAcceptTime > 0 && gTime - mLastAcceptTime < 200)
    {
@@ -167,13 +169,12 @@ void NoteChance::ButtonClicked(ClickButton* button, double time)
 void NoteChance::GetModuleDimensions(float& width, float& height)
 {
    width = 118;
-   height = mDeterministic ? 60 : 20;
+   height = mDeterministic ? 78 : 38;
 }
 
 void NoteChance::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("deterministic", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -181,6 +182,4 @@ void NoteChance::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteChance::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-
-   mDeterministic = mModuleSaveData.GetBool("deterministic");
 }
