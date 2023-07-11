@@ -54,7 +54,7 @@ public:
 
    void Init() override;
    void Poll() override;
-   void AddEffect(std::string type, bool onTheFly = false);
+   void AddEffect(std::string type, std::string desiredName, bool onTheFly);
    void SetWideCount(int count) { mNumFXWide = count; }
 
    //IAudioSource

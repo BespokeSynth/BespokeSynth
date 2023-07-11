@@ -3180,7 +3180,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
    {
       EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
       if (effectChain != nullptr)
-         effectChain->AddEffect(spawnable.mLabel, K(onTheFly));
+         effectChain->AddEffect(spawnable.mLabel, spawnable.mLabel, K(onTheFly));
    }
 
    if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Prefab)

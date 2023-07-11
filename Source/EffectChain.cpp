@@ -66,7 +66,7 @@ void EffectChain::Init()
    mInitialized = true;
 }
 
-void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
+void EffectChain::AddEffect(std::string type, std::string desiredName, bool onTheFly)
 {
    if (mEffects.size() >= MAX_EFFECTS_IN_CHAIN)
       return;
@@ -78,7 +78,7 @@ void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
    std::vector<std::string> otherEffectNames;
    for (auto* e : mEffects)
       otherEffectNames.push_back(e->Name());
-   std::string name = GetUniqueName(type, otherEffectNames);
+   std::string name = GetUniqueName(desiredName, otherEffectNames);
    effect->SetName(name.c_str());
    effect->SetTypeName(type, kModuleCategory_Processor);
    effect->SetParent(this);
@@ -473,7 +473,7 @@ void EffectChain::ButtonClicked(ClickButton* button, double time)
    {
       if (mSpawnIndex >= 0 && mSpawnIndex < (int)mEffectTypesToSpawn.size())
       {
-         AddEffect(mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
+         AddEffect(mEffectTypesToSpawn[mSpawnIndex], mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
          mSpawnIndex = -1;
       }
    }
@@ -512,7 +512,7 @@ void EffectChain::DropdownUpdated(DropdownList* list, int oldVal, double time)
    {
       if (TheSynth->GetTopModalFocusItem() == mEffectSpawnList->GetModalDropdown())
       {
-         AddEffect(mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
+         AddEffect(mEffectTypesToSpawn[mSpawnIndex], mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
          mSpawnIndex = -1;
       }
    }
@@ -544,7 +544,7 @@ void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeN
       try
       {
          std::string type = effects[i]["type"].asString();
-         AddEffect(type);
+         AddEffect(type, effects[i]["name"].asString(), !K(onTheFly));
       }
       catch (Json::LogicError& e)
       {
