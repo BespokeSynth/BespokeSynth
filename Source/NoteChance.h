@@ -70,6 +70,7 @@ private:
    float mLastRejectTime{ 0 };
    float mLastAcceptTime{ 0 };
    bool mDeterministic{ false };
+   Checkbox* mDeterministicCheckbox{ nullptr };
    int mLength{ 4 };
    IntSlider* mLengthSlider{ nullptr };
    int mSeed{ 0 };

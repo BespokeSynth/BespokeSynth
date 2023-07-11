@@ -45,6 +45,7 @@ void PulseChance::CreateUIControls()
 
    UIBLOCK0();
    FLOATSLIDER(mChanceSlider, "chance", &mChance, 0, 1);
+   CHECKBOX(mDeterministicCheckbox, "deterministic", &mDeterministic);
    UIBLOCK_SHIFTY(5);
    TEXTENTRY_NUM(mSeedEntry, "seed", 4, &mSeed, 0, 9999);
    UIBLOCK_SHIFTRIGHT();
@@ -67,6 +68,7 @@ void PulseChance::DrawModule()
       return;
 
    mChanceSlider->Draw();
+   mDeterministicCheckbox->Draw();
 
    if (gTime - mLastAcceptTime > 0 && gTime - mLastAcceptTime < 200)
    {
@@ -142,13 +144,12 @@ void PulseChance::ButtonClicked(ClickButton* button, double time)
 void PulseChance::GetModuleDimensions(float& width, float& height)
 {
    width = 118;
-   height = mDeterministic ? 43 : 20;
+   height = mDeterministic ? 61 : 38;
 }
 
 void PulseChance::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("deterministic", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -156,6 +157,4 @@ void PulseChance::LoadLayout(const ofxJSONElement& moduleInfo)
 void PulseChance::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-
-   mDeterministic = mModuleSaveData.GetBool("deterministic");
 }
