@@ -32,8 +32,9 @@
 #include "INoteReceiver.h"
 #include "SwitchAndRamp.h"
 #include "Push2Control.h"
+#include "GridController.h"
 
-class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IIntSliderListener, public IDropdownListener, public IPush2GridController
+class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IIntSliderListener, public IDropdownListener, public IPush2GridController, public IGridControllerListener
 {
 public:
    BufferShuffler();
@@ -43,6 +44,7 @@ public:
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
 
+   void Poll() override;
    void CreateUIControls() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override
@@ -63,6 +65,12 @@ public:
    //IPush2GridController
    bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
+
+   //IGridControllerListener
+   void OnControllerPageSelected() override;
+   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+
+   void UpdateGridControllerLights(bool force);
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
@@ -108,7 +116,7 @@ private:
 
    ChannelBuffer mInputBuffer;
 
-   float mWidth{ 200 };
+   float mWidth{ 245 };
    float mHeight{ 68 };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
@@ -123,6 +131,7 @@ private:
    float mPlaybackSample{ -1 };
    double mPlaybackSampleStartTime{ -1 };
    double mPlaybackSampleStopTime{ -1 };
+   GridControlTarget* mGridControlTarget{ nullptr };
 
    SwitchAndRamp mSwitchAndRamp;
 };
