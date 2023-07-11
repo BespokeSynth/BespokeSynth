@@ -39,6 +39,9 @@ void BufferShuffler::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
+   UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_PUSHSLIDERWIDTH(80);
    INTSLIDER(mNumBarsSlider, "num bars", &mNumBars, 1, 8);
    UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mIntervalSelector, "interval", (int*)&mInterval, 40);
@@ -63,6 +66,11 @@ void BufferShuffler::CreateUIControls()
 
 BufferShuffler::~BufferShuffler()
 {
+}
+
+void BufferShuffler::Poll()
+{
+   UpdateGridControllerLights(false);
 }
 
 void BufferShuffler::Process(double time)
@@ -149,6 +157,7 @@ void BufferShuffler::DrawModule()
    mIntervalSelector->Draw();
    mFreezeInputCheckbox->Draw();
    mPlaybackStyleDropdown->Draw();
+   mGridControlTarget->Draw();
 
    DrawBuffer(5, 20, mWidth - 10, mHeight - 28);
 }
@@ -207,6 +216,8 @@ int BufferShuffler::GetNumSlices()
 
 void BufferShuffler::OnClicked(float x, float y, bool right)
 {
+   IDrawableModule::OnClicked(x, y, right);
+
    if (!right && x >= 5 && x <= mWidth - 5 && y > 20)
    {
       float bufferWidth = mWidth - 10;
@@ -342,6 +353,54 @@ bool BufferShuffler::DrawToPush2Screen()
 {
    DrawBuffer(371, 10, 400, 60);
    return false;
+}
+
+void BufferShuffler::OnControllerPageSelected()
+{
+   if (mGridControlTarget->GetGridController())
+      mGridControlTarget->GetGridController()->ResetLights();
+   UpdateGridControllerLights(true);
+}
+
+void BufferShuffler::OnGridButton(int x, int y, float velocity, IGridController* grid)
+{
+   if (velocity > 0)
+   {
+      int index = x + y * mGridControlTarget->GetGridController()->NumCols();
+      if (index >= 0 && index < GetNumSlices())
+         PlayOneShot(index);
+   }
+}
+
+void BufferShuffler::UpdateGridControllerLights(bool force)
+{
+   if (mGridControlTarget->GetGridController() == nullptr)
+      return;
+
+   for (int x = 0; x < mGridControlTarget->GetGridController()->NumCols(); ++x)
+   {
+      for (int y = 0; y < mGridControlTarget->GetGridController()->NumRows(); ++y)
+      {
+         GridColor color = kGridColorOff;
+
+         int index = x + y * mGridControlTarget->GetGridController()->NumCols();
+         int writeSlice = GetWritePositionInSamples(gTime) * GetNumSlices() / GetLengthInSamples();
+         int playSlice = mPlaybackSample * GetNumSlices() / GetLengthInSamples();
+         if (index < GetNumSlices())
+         {
+            if (index == mQueuedSlice && mPlaybackSampleStartTime != -1)
+               color = kGridColor2Dim;
+            else if (mPlaybackSample >= 0 && index == playSlice)
+               color = kGridColor2Bright;
+            else if (mPlaybackSample == -1 && index == writeSlice)
+               color = kGridColor1Bright;
+            else
+               color = kGridColor1Dim;
+         }
+
+         mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
+      }
+   }
 }
 
 void BufferShuffler::LoadLayout(const ofxJSONElement& moduleInfo)
