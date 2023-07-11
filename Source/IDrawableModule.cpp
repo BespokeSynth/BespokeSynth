@@ -704,14 +704,15 @@ IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/
    return nullptr;
 }
 
-IDrawableModule* IDrawableModule::FindChild(const char* name) const
+IDrawableModule* IDrawableModule::FindChild(const char* name, bool fail) const
 {
    for (int i = 0; i < mChildren.size(); ++i)
    {
       if (strcmp(mChildren[i]->Name(), name) == 0)
          return mChildren[i];
    }
-   throw UnknownModuleException(name);
+   if (fail)
+      throw UnknownModuleException(name);
    return nullptr;
 }
 
@@ -1277,7 +1278,7 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
          std::string childName;
          in >> childName;
          //ofLog() << "Loading " << childName;
-         IDrawableModule* child = FindChild(childName.c_str());
+         IDrawableModule* child = FindChild(childName.c_str(), true);
          LoadStateValidate(child);
          child->LoadState(in, child->LoadModuleSaveStateRev(in));
       }

@@ -415,7 +415,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
             EffectChain* effectChain = dynamic_cast<EffectChain*>(topLevelModule);
             std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
             for (std::string effect : effects)
-               effectChain->AddEffect(effect);
+               effectChain->AddEffect(effect, effect, !K(onTheFly));
          }
 
          std::vector<IDrawableModule*> toDump;
