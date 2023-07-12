@@ -68,12 +68,12 @@ public:
    }
 
 private:
-   double mE2 { 0 };
-   double mT0 { 0 };
-   double mT1 { 0 };
+   double mE2{ 0 };
+   double mT0{ 0 };
+   double mT1{ 0 };
 
-   double mB { 0 };
-   double mC { 0 };
+   double mB{ 0 };
+   double mC{ 0 };
 
    inline void SetLPF(double bandwidth, double frequency)
    {
