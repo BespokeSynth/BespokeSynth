@@ -33,6 +33,56 @@
 
 class IAudioSource;
 
+//adapted from https://github.com/kushview/element/blob/f86f2c8d876abf635d96e5955b40995814248fa4/src/delaylockedloop.hpp
+class DelayLockedLoop
+{
+public:
+   /** Reset the DLL with a time, period and rate */
+   inline void reset(double now, double period, double rate)
+   {
+      mE2 = period / rate;
+      mT0 = now;
+      mT1 = mT0 + mE2;
+   }
+
+   /** Update the DLL with the next timestamp */
+   inline void update(double time)
+   {
+      const double e = time - mT1;
+
+      mT0 = mT1;
+      mT1 += mB * e + mE2;
+      mE2 += mC * e;
+   }
+
+   /** Set the dll's parameters. Bandwidth / Frequency */
+   inline void setParams(double bandwidth, double frequency)
+   {
+      SetLPF(bandwidth, frequency);
+   }
+
+   /**  Return the difference in filtered time (mT1 - mT0) */
+   inline double timeDiff()
+   {
+      return (mT1 - mT0);
+   }
+
+private:
+   double mE2{ 0 };
+   double mT0{ 0 };
+   double mT1{ 0 };
+
+   double mB{ 0 };
+   double mC{ 0 };
+
+   inline void SetLPF(double bandwidth, double frequency)
+   {
+      double omega = 2.0 * juce::MathConstants<double>::pi * bandwidth / frequency;
+      mB = juce::MathConstants<double>::sqrt2 * omega;
+      mC = omega * omega;
+   }
+};
+
 class MidiClockIn : public IDrawableModule, public IDropdownListener, public MidiDeviceListener, public IFloatSliderListener, public IIntSliderListener
 {
 public:
@@ -46,6 +96,7 @@ public:
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   bool HasDebugDraw() const override { return true; }
 
    void OnMidiNote(MidiNote& note) override {}
    void OnMidiControl(MidiControl& control) override {}
@@ -68,6 +119,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& w, float& h) override
    {
       w = mWidth;
@@ -103,4 +155,6 @@ private:
    std::array<float, kMaxHistory> mTempoHistory;
    int mTempoIdx{ -1 };
    double mLastTimestamp{ -1 };
+   int mReceivedPulseCount{ 0 };
+   DelayLockedLoop mDelayLockedLoop;
 };

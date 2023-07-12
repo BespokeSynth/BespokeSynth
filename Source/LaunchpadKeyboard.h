@@ -159,8 +159,6 @@ private:
    bool mPreserveChordRoot{ true };
    Checkbox* mPreserveChordRootCheckbox{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
-
-   std::string mDebugLines;
 };
 
 #endif /* defined(__modularSynth__LaunchpadKeyboard__) */

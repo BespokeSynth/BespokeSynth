@@ -185,7 +185,6 @@ private:
    double Swing(double measurePos);
    double SwingBeat(double pos);
    void Nudge(double amount);
-   void AdjustTempo(double amount);
    void SetRandomTempo();
    double GetMeasureTimeInternal(double time) const;
 

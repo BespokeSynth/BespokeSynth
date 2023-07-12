@@ -325,20 +325,7 @@ void LaunchpadKeyboard::PlayKeyboardNote(double time, int pitch, int velocity)
    }
 
    if (mDrawDebug)
-   {
-      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
-      mDebugLines = "";
-      const int kNumDisplayLines = 40;
-      for (int i = 0; i < kNumDisplayLines - 1; ++i)
-      {
-         int lineIndex = (int)lines.size() - (kNumDisplayLines - 1) + i;
-         if (lineIndex >= 0)
-            mDebugLines += lines[lineIndex] + "\n";
-      }
-      std::string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ")";
-      mDebugLines += debugLine;
-      ofLog() << debugLine;
-   }
+      AddDebugLine("PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ")", 40);
 }
 
 void LaunchpadKeyboard::HandleChordButton(int pitch, bool bOn)
@@ -473,7 +460,7 @@ void LaunchpadKeyboard::DrawModuleUnclipped()
 {
    if (mDrawDebug)
    {
-      DrawTextNormal(mDebugLines, 0, 90);
+      DrawTextNormal(mDebugDisplayText, 0, 90);
 
       for (int i = 0; i < 128; ++i)
          DrawTextNormal(ofToString(i) + " " + ofToString(mCurrentNotes[i]), 180 + (i / 24) * 20, (i % 24) * 9, 8);

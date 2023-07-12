@@ -85,5 +85,4 @@ private:
    int mPitchMin{ 127 };
    int mPitchMax{ 0 };
    ClickButton* mResetButton{ nullptr };
-   std::string mDebugLines;
 };

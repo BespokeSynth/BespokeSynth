@@ -114,11 +114,6 @@ void Transport::KeyPressed(int key, bool isRepeat)
    IDrawableModule::KeyPressed(key, isRepeat);
 }
 
-void Transport::AdjustTempo(double amount)
-{
-   SetTempo(MAX(1, GetTempo() + amount));
-}
-
 void Transport::Advance(double ms)
 {
    if (mNudgeFactor != 0)
@@ -292,9 +287,9 @@ void Transport::ButtonClicked(ClickButton* button, double time)
    if (button == mNudgeForwardButton)
       Nudge(1);
    if (button == mIncreaseTempoButton)
-      AdjustTempo(1);
+      SetTempo(floor(mTempo + 1));
    if (button == mDecreaseTempoButton)
-      AdjustTempo(-1);
+      SetTempo(ceil(mTempo - 1));
    if (button == mPlayPauseButton)
       TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
 }

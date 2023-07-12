@@ -216,10 +216,13 @@ protected:
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
+   void AddDebugLine(std::string text, int maxLines);
+
    ModuleSaveData mModuleSaveData;
    Checkbox* mEnabledCheckbox{ nullptr };
    bool mEnabled{ true };
    ModuleCategory mModuleCategory{ ModuleCategory::kModuleCategory_Unknown };
+   std::string mDebugDisplayText;
 
 private:
    virtual void PreDrawModule() {}

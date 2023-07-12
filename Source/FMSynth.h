@@ -106,8 +106,6 @@ private:
    FloatSlider* mPhaseOffsetSlider2{ nullptr };
 
    ChannelBuffer mWriteBuffer;
-
-   std::string mDebugLines;
 };
 
 #endif /* defined(__modularSynth__FMSynth__) */
