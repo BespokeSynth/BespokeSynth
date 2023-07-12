@@ -2004,43 +2004,45 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       for (int i = 0; i < mSources.size(); ++i)
          mSources[i]->Process(gTime);
 
+      if (gTime - mLastClapboardTime < 100)
+      {
+         for (int ch = 0; ch < nChannels; ++ch)
+         {
+            for (int i = 0; i < bufferSize; ++i)
+            {
+               float sample = sin(GetPhaseInc(440) * i) * (1 - ((gTime - mLastClapboardTime) / 100));
+               output[ch][i] = sample;
+            }
+         }
+      }
+
       //put it into speakers
-      for (int i = 0; i < nChannels; ++i)
+      for (int ch = 0; ch < nChannels; ++ch)
       {
          if (oversampling == 1)
          {
-            BufferCopy(output[i], mOutputBuffers[i], gBufferSize);
+            BufferCopy(output[ch], mOutputBuffers[ch], gBufferSize);
+            if (ch < 2)
+               mGlobalRecordBuffer->WriteChunk(output[ch], bufferSize, 0);
          }
          else
          {
             for (int sampleIndex = 0; sampleIndex < gBufferSize / oversampling; ++sampleIndex)
             {
-               output[i][sampleIndex] = 0;
-               for (int subsample = 0; subsample < oversampling; ++subsample)
+               output[ch][sampleIndex] = 0;
+               for (int subsampleIndex = 0; subsampleIndex < oversampling; ++subsampleIndex)
                {
-                  output[i][sampleIndex] += mOutputBuffers[i][sampleIndex * oversampling + subsample] / oversampling;
+                  float sample = mOutputBuffers[ch][sampleIndex * oversampling + subsampleIndex];
+                  output[ch][sampleIndex] += sample / oversampling;
+                  if (ch < 2)
+                     mGlobalRecordBuffer->Write(sample, ch);
                }
             }
          }
       }
    }
 
-   if (gTime - mLastClapboardTime < 100)
-   {
-      for (int ch = 0; ch < nChannels; ++ch)
-      {
-         for (int i = 0; i < bufferSize; ++i)
-         {
-            float sample = sin(GetPhaseInc(440) * i) * (1 - ((gTime - mLastClapboardTime) / 100));
-            output[ch][i] = sample;
-         }
-      }
-   }
    /////////// AUDIO PROCESSING ENDS HERE /////////////
-   if (nChannels >= 1)
-      mGlobalRecordBuffer->WriteChunk(output[0], bufferSize, 0);
-   if (nChannels >= 2)
-      mGlobalRecordBuffer->WriteChunk(output[1], bufferSize, 1);
    mRecordingLength += bufferSize;
    mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
 
