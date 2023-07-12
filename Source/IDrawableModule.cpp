@@ -1022,6 +1022,20 @@ bool IDrawableModule::CheckNeedsDraw()
    return false;
 }
 
+void IDrawableModule::AddDebugLine(std::string text, int maxLines)
+{
+   std::vector<std::string> lines = ofSplitString(mDebugDisplayText, "\n");
+   mDebugDisplayText = "";
+   for (int i = 0; i < maxLines - 1; ++i)
+   {
+      int lineIndex = (int)lines.size() - (maxLines - 1) + i;
+      if (lineIndex >= 0)
+         mDebugDisplayText += lines[lineIndex] + "\n";
+   }
+   mDebugDisplayText += text;
+   ofLog() << text;
+}
+
 void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName)
 {
    int x = 0;

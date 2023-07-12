@@ -46,7 +46,7 @@ void MidiClockIn::CreateUIControls()
 
    UIBLOCK(3, 3, 120);
    DROPDOWN(mDeviceList, "device", &mDeviceIndex, 120);
-   DROPDOWN(mTempoRoundModeList, "rounding", ((int*)&mTempoRoundMode), 40);
+   DROPDOWN(mTempoRoundModeList, "rounding", ((int*)&mTempoRoundMode), 50);
    FLOATSLIDER(mStartOffsetMsSlider, "start offset ms", &mStartOffsetMs, -300, 300);
    INTSLIDER(mSmoothAmountSlider, "smoothing", &mSmoothAmount, 1, (int)mTempoHistory.size());
    ENDUIBLOCK(mWidth, mHeight);
@@ -119,6 +119,12 @@ void MidiClockIn::DrawModule()
    DrawTextNormal("tempo: " + ofToString(GetRoundedTempo()), 4, mHeight - 5);
 }
 
+void MidiClockIn::DrawModuleUnclipped()
+{
+   if (mDrawDebug)
+      DrawTextNormal(mDebugDisplayText, 0, mHeight + 20);
+}
+
 void MidiClockIn::BuildDeviceList()
 {
    mDeviceList->Clear();
@@ -129,57 +135,98 @@ void MidiClockIn::BuildDeviceList()
 
 void MidiClockIn::OnMidi(const juce::MidiMessage& message)
 {
-   if (message.isMidiClock())
+   const int kDebugMaxLineCount = 40;
+
+   if (message.isMidiClock() || message.isSongPositionPointer())
    {
-      if (mLastTimestamp > 0)
+      const int kMinRequiredPulseCount = 48;
+      double time = message.getTimeStamp();
+      if (mDrawDebug)
+         AddDebugLine("midi clock " + ofToString(time, 3), kDebugMaxLineCount);
+
+      if (mReceivedPulseCount == 0)
       {
-         double deltaSeconds = (message.getTimeStamp() - mLastTimestamp);
+         double currentTempoDeltaSeconds = 1.0 / (TheTransport->GetTempo() / 60 * 24);
+         mDelayLockedLoop.reset(time, currentTempoDeltaSeconds, 1);
+         mDelayLockedLoop.setParams(gBufferSize, gSampleRate);
+      }
+      else
+      {
+         mDelayLockedLoop.update(time);
+      }
+
+      if (mReceivedPulseCount >= kMinRequiredPulseCount && time - mLastTimestamp > .001f)
+      {
+         double deltaSeconds = mDelayLockedLoop.timeDiff();
          double pulsesPerSecond = 1 / deltaSeconds;
          double beatsPerSecond = pulsesPerSecond / 24;
          double instantTempo = beatsPerSecond * 60;
 
-         if (mTempoIdx == -1)
-            mTempoHistory.fill(instantTempo);
-         else
-            mTempoHistory[mTempoIdx] = instantTempo;
-         mTempoIdx = (mTempoIdx + 1) % mTempoHistory.size();
+         if (instantTempo > 20 && instantTempo < 999)
+         {
+            if (mTempoIdx == -1)
+               mTempoHistory.fill(instantTempo);
+            else
+               mTempoHistory[mTempoIdx] = instantTempo;
+            mTempoIdx = (mTempoIdx + 1) % mTempoHistory.size();
 
-         if (mEnabled)
-            TheTransport->SetTempo(GetRoundedTempo());
+            if (mEnabled)
+               TheTransport->SetTempo(GetRoundedTempo());
+         }
+
+         if (mDrawDebug)
+            AddDebugLine("   deltaSeconds=" + ofToString(deltaSeconds, 6) + " instantTempo=" + ofToString(instantTempo, 2) + " rounded tempo:" + ofToString(GetRoundedTempo(), 1), kDebugMaxLineCount);
+
+         mLastTimestamp = time;
       }
-      mLastTimestamp = message.getTimeStamp();
+      ++mReceivedPulseCount;
    }
    if (message.isMidiStart())
    {
-      ofLog() << "midi start";
+      if (mDrawDebug)
+         AddDebugLine("midi start", kDebugMaxLineCount);
       if (mObeyClockStartStop)
       {
-         TheSynth->SetAudioPaused(false);
-         TheTransport->Reset();
+         mTempoIdx = -1;
+         mReceivedPulseCount = 0;
+         if (TheSynth->IsAudioPaused())
+         {
+            TheSynth->SetAudioPaused(false);
+            TheTransport->Reset();
+         }
       }
    }
    if (message.isMidiStop())
    {
-      ofLog() << "midi stop";
+      if (mDrawDebug)
+         AddDebugLine("midi stop", kDebugMaxLineCount);
       if (mObeyClockStartStop)
          TheSynth->SetAudioPaused(true);
    }
    if (message.isMidiContinue())
    {
-      ofLog() << "midi continue";
+      if (mDrawDebug)
+         AddDebugLine("midi continue", kDebugMaxLineCount);
+
       if (mObeyClockStartStop)
+      {
+         mTempoIdx = -1;
+         mReceivedPulseCount = 0;
          TheSynth->SetAudioPaused(false);
+      }
    }
    if (message.isSongPositionPointer())
    {
-      //ofLog() << "midi position pointer " << ofToString(message.getSongPositionPointerMidiBeat());
+      if (mDrawDebug)
+         AddDebugLine("midi position pointer " + ofToString(message.getSongPositionPointerMidiBeat()), kDebugMaxLineCount);
 
       if (mEnabled)
          TheTransport->SetMeasureTime(message.getSongPositionPointerMidiBeat() / TheTransport->GetTimeSigTop() + mStartOffsetMs / TheTransport->MsPerBar());
    }
    if (message.isQuarterFrame())
    {
-      //ofLog() << "midi quarter frame " << ofToString(message.getQuarterFrameValue()) << " " << ofToString(message.getQuarterFrameSequenceNumber());
+      if (mDrawDebug)
+         AddDebugLine("midi quarter frame " + ofToString(message.getQuarterFrameValue()) + " " + ofToString(message.getQuarterFrameSequenceNumber()), kDebugMaxLineCount);
    }
 }
 

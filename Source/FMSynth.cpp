@@ -168,20 +168,7 @@ void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    }
 
    if (mDrawDebug)
-   {
-      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
-      mDebugLines = "";
-      const int kNumDisplayLines = 10;
-      for (int i = 0; i < kNumDisplayLines - 1; ++i)
-      {
-         int lineIndex = (int)lines.size() - (kNumDisplayLines - 1) + i;
-         if (lineIndex >= 0)
-            mDebugLines += lines[lineIndex] + "\n";
-      }
-      std::string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
-      mDebugLines += debugLine;
-      ofLog() << debugLine;
-   }
+      AddDebugLine("PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")", 10);
 }
 
 void FMSynth::SetEnabled(bool enabled)
@@ -224,7 +211,7 @@ void FMSynth::DrawModuleUnclipped()
       float width, height;
       GetModuleDimensions(width, height);
       mPolyMgr.DrawDebug(width + 3, 0);
-      DrawTextNormal(mDebugLines, 0, height + 15);
+      DrawTextNormal(mDebugDisplayText, 0, height + 15);
    }
 }
 

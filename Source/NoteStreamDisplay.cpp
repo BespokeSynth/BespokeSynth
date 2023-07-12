@@ -101,7 +101,7 @@ void NoteStreamDisplay::DrawModuleUnclipped()
 {
    if (mDrawDebug)
    {
-      DrawTextNormal(mDebugLines, mWidth + 10, 0);
+      DrawTextNormal(mDebugDisplayText, mWidth + 10, 0);
    }
 }
 
@@ -166,20 +166,7 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
    }
 
    if (mDrawDebug)
-   {
-      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
-      mDebugLines = "";
-      const int kNumDisplayLines = 35;
-      for (int i = 0; i < kNumDisplayLines - 1; ++i)
-      {
-         int lineIndex = (int)lines.size() - (kNumDisplayLines - 1) + i;
-         if (lineIndex >= 0)
-            mDebugLines += lines[lineIndex] + "\n";
-      }
-      std::string line = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
-      mDebugLines += line;
-      ofLog() << line;
-   }
+      AddDebugLine("PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")", 35);
 }
 
 bool NoteStreamDisplay::IsElementActive(int index) const
