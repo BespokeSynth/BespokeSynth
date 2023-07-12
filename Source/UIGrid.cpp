@@ -508,16 +508,6 @@ void UIGrid::SetVal(int col, int row, float val, bool notifyListener)
    }
 }
 
-float UIGrid::GetValRefactor(int row, int col)
-{
-   return GetVal(col, row);
-}
-
-void UIGrid::SetValRefactor(int row, int col, float val)
-{
-   SetVal(col, row, val);
-}
-
 void UIGrid::SetHighlightCol(double time, int col)
 {
    mHighlightColBuffer[mNextHighlightColPointer].time = time;

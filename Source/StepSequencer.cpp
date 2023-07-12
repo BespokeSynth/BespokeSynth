@@ -881,9 +881,9 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
             float div = j * ((float)oldNumSteps / newNumSteps);
             int col = (int)div;
             if (div == col)
-               mGrid->SetValRefactor(i, j, oldGrid->GetValRefactor(i, col));
+               mGrid->SetVal(j, i, oldGrid->GetVal(col, i));
             else
-               mGrid->SetValRefactor(i, j, 0);
+               mGrid->SetVal(j, i, 0);
          }
       }
       oldGrid->Delete();

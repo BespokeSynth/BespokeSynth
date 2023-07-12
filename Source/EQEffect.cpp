@@ -27,6 +27,7 @@
 #include "SynthGlobals.h"
 #include "FloatSliderLFOControl.h"
 #include "Profiler.h"
+#include "ModularSynth.h"
 
 EQEffect::EQEffect()
 {
@@ -48,7 +49,7 @@ void EQEffect::CreateUIControls()
 
    mMultiSlider->SetGridMode(UIGrid::kMultislider);
    for (int i = 0; i < NUM_EQ_FILTERS; ++i)
-      mMultiSlider->SetValRefactor(0, i, .5f);
+      mMultiSlider->SetVal(i, 0, .5f);
    mMultiSlider->SetListener(this);
 }
 
@@ -181,4 +182,24 @@ void EQEffect::GridUpdated(UIGrid* grid, int col, int row, float value, float ol
             mBanks[ch].mBiquad[i].CopyCoeffFrom(mBanks[0].mBiquad[i]);
       }
    }
+}
+
+void EQEffect::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+
+   mMultiSlider->SaveState(out);
+}
+
+void EQEffect::LoadState(FileStreamIn& in, int rev)
+{
+   IDrawableModule::LoadState(in, rev);
+
+   if (ModularSynth::sLoadingFileSaveStateRev < 426)
+      return; //this was saved before we added versioning, bail out
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
+   mMultiSlider->LoadState(in);
 }

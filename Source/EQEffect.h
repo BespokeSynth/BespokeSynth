@@ -64,6 +64,10 @@ public:
 
    bool IsEnabled() const override { return mEnabled; }
 
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
