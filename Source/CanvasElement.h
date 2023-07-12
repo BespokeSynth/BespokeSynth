@@ -119,13 +119,13 @@ private:
    IntSlider* mElementColSlider{ nullptr };
    FloatSlider* mVelocitySlider{ nullptr };
    int mVoiceIdx{ -1 };
-   ModulationChain mPitchBend{ 0 };
-   ModulationChain mModWheel{ .5f };
-   ModulationChain mPressure{ .5f };
+   ModulationChain mPitchBend{ ModulationParameters::kDefaultPitchBend };
+   ModulationChain mModWheel{ ModulationParameters::kDefaultModWheel };
+   ModulationChain mPressure{ ModulationParameters::kDefaultPressure };
    float mPan{ 0 };
-   Curve mPitchBendCurve{ 0 };
-   Curve mModWheelCurve{ .5f };
-   Curve mPressureCurve{ .5f };
+   Curve mPitchBendCurve{ ModulationParameters::kDefaultPitchBend };
+   Curve mModWheelCurve{ ModulationParameters::kDefaultModWheel };
+   Curve mPressureCurve{ ModulationParameters::kDefaultPressure };
    Curve mPanCurve{ 0 };
 };
 

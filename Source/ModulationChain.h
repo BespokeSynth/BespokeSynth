@@ -55,13 +55,6 @@ private:
    ModulationChain* mMultiplyIn{ nullptr };
 };
 
-struct ModulationCollection
-{
-   ModulationChain mPitchBend{ 0 };
-   ModulationChain mModWheel{ .5f };
-   ModulationChain mPressure{ .5f };
-};
-
 struct ModulationParameters
 {
    ModulationParameters() {}
@@ -78,6 +71,17 @@ struct ModulationParameters
    ModulationChain* modWheel{ nullptr };
    ModulationChain* pressure{ nullptr };
    float pan{ 0 };
+
+   static constexpr float kDefaultPitchBend{ 0 };
+   static constexpr float kDefaultModWheel{ .5f };
+   static constexpr float kDefaultPressure{ .5f };
+};
+
+struct ModulationCollection
+{
+   ModulationChain mPitchBend{ ModulationParameters::kDefaultPitchBend };
+   ModulationChain mModWheel{ ModulationParameters::kDefaultModWheel };
+   ModulationChain mPressure{ ModulationParameters::kDefaultPressure };
 };
 
 class Modulations

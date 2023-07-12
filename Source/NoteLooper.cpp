@@ -212,9 +212,9 @@ void NoteLooper::OnTransportAdvanced(float amount)
          int modIdx = mInputNotes[pitch]->GetVoiceIdx();
          if (modIdx == -1)
             modIdx = kNumVoices;
-         float bend = 0;
-         float mod = 0;
-         float pressure = 0;
+         float bend = ModulationParameters::kDefaultPitchBend;
+         float mod = ModulationParameters::kDefaultModWheel;
+         float pressure = ModulationParameters::kDefaultPressure;
          if (mVoiceModulations[modIdx].pitchBend)
             bend = mVoiceModulations[modIdx].pitchBend->GetValue(0);
          if (mVoiceModulations[modIdx].modWheel)
