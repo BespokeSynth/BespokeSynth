@@ -177,6 +177,7 @@ clockin~reads in clock pulses from external midi devices to control bespoke's tr
 
 abletonlink~synchronizes transport with software and devices that support ableton link
 ~offset ms~offset in milliseconds to tweak synchronization
+~reset next downbeat~resets measure count on the next downbeat, to help synchronize to desired phase in session
 
 
 

@@ -78,6 +78,7 @@ void AbletonLink::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
    FLOATSLIDER(mOffsetMsSlider, "offset ms", &mOffsetMs, -1000, 1000);
+   BUTTON(mResetButton, "reset next downbeat");
    ENDUIBLOCK(mWidth, mHeight);
 
    mHeight = 80;
@@ -141,8 +142,9 @@ void AbletonLink::DrawModule()
       return;
 
    mOffsetMsSlider->Draw();
+   mResetButton->Draw();
 
-   DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, 40);
+   DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, 48);
 }
 
 void AbletonLink::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -151,4 +153,15 @@ void AbletonLink::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void AbletonLink::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
+}
+
+void AbletonLink::ButtonClicked(ClickButton* button, double time)
+{
+   if (button == mResetButton)
+   {
+      auto sessionState = mLink->captureAudioSessionState();
+      double quantum = TheTransport->GetTimeSigTop();
+      sessionState.requestBeatAtTime(0, mLink->clock().micros(), quantum);
+      mLink->commitAudioSessionState(sessionState);
+   }
 }
