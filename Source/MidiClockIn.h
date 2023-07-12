@@ -77,8 +77,8 @@ private:
 
    inline void SetLPF(double bandwidth, double frequency)
    {
-      double omega = 2.0 * M_PI * bandwidth / frequency;
-      mB = M_SQRT2 * omega;
+      double omega = 2.0 * juce::MathConstants<double>::pi * bandwidth / frequency;
+      mB = juce::MathConstants<double>::sqrt2 * omega;
       mC = omega * omega;
    }
 };
