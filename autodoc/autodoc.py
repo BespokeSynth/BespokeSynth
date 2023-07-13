@@ -43,6 +43,9 @@ for moduleName in documentation.keys():
    modulesByType[module["type"]].append(moduleName)
    longestColumn = max(longestColumn, len(modulesByType[module["type"]]))
 
+for moduleType in moduleTypes:
+   modulesByType[moduleType].sort()
+
 
 html = open("bespokesynth.com/docs/index.html", "w")
 html.write(before)

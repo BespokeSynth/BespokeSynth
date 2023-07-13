@@ -112,8 +112,7 @@ private:
    {
       None,
       WaitingForSpawn,
-      WaitingForScreenshot,
-      Done
+      WaitingForScreenshot
    };
    ScreenshotState mScreenshotState{ ScreenshotState::None };
    int mScreenshotCountdown{ 0 };
