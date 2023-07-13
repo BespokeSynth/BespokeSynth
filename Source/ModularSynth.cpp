@@ -1249,7 +1249,8 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
             if (!mHasAutopatchedToTargetDuringDrag)
             {
-               for (auto* patchCableSource : mMoveModule->GetPatchCableSources())
+               const auto patchCableSources = mMoveModule->GetPatchCableSources();
+               for (auto* patchCableSource : patchCableSources)
                {
                   if (patchCableSource && patchCableSource->GetTarget() == nullptr && module->HasTitleBar())
                   {
@@ -1313,9 +1314,6 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
 void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::MouseInputSource& source)
 {
-   mMousePos.x = intX;
-   mMousePos.y = intY;
-
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
 
@@ -1324,13 +1322,6 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
 
    if (button == 3)
       return;
-
-   for (auto* modal : mModalFocusItemStack)
-   {
-      float x = GetMouseX(modal->GetOwningContainer());
-      float y = GetMouseY(modal->GetOwningContainer());
-      modal->NotifyMouseMoved(x, y);
-   }
 
    if ((GetKeyModifiers() & kModifier_Alt) && !mHasDuplicatedDuringDrag)
    {
@@ -1435,12 +1426,6 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       newHeight = MAX(newHeight, minimumDimensions.y);
       mResizeModule->Resize(newWidth, newHeight);
    }
-
-   mModuleContainer.MouseMoved(x, y);
-
-   x = GetMouseX(&mUILayerModuleContainer);
-   y = GetMouseY(&mUILayerModuleContainer);
-   mUILayerModuleContainer.MouseMoved(x, y);
 }
 
 void ModularSynth::MousePressed(int intX, int intY, int button, const juce::MouseInputSource& source)
