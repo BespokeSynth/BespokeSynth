@@ -2023,7 +2023,7 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
          {
             BufferCopy(output[ch], mOutputBuffers[ch], gBufferSize);
             if (ch < 2)
-               mGlobalRecordBuffer->WriteChunk(output[ch], bufferSize, 0);
+               mGlobalRecordBuffer->WriteChunk(output[ch], bufferSize, ch);
          }
          else
          {
@@ -2043,7 +2043,7 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
    }
 
    /////////// AUDIO PROCESSING ENDS HERE /////////////
-   mRecordingLength += bufferSize;
+   mRecordingLength += bufferSize * oversampling;
    mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
 
    Profiler::PrintCounters();
