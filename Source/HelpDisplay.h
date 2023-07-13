@@ -44,6 +44,7 @@ public:
    bool IsSaveable() override { return false; }
    bool HasTitleBar() const override { return false; }
    void CreateUIControls() override;
+   void Poll() override;
 
    void Show() { mScrollOffsetY = 0; }
 
@@ -106,6 +107,16 @@ private:
 
    float mScrollOffsetY{ 0 };
    float mMaxScrollAmount{ 0 };
+
+   enum class ScreenshotState
+   {
+      None,
+      WaitingForSpawn,
+      WaitingForScreenshot,
+      Done
+   };
+   ScreenshotState mScreenshotState{ ScreenshotState::None };
+   int mScreenshotCountdown{ 0 };
 };
 
 #endif /* defined(__Bespoke__HelpDisplay__) */

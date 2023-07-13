@@ -116,17 +116,12 @@ void HelpDisplay::DrawModule()
    }
    ofResetClipWindow();
 
-   static int sScreenshotDelay = 0;
-   if (sScreenshotDelay <= 0)
+   if (mScreenshotCountdown <= 0)
    {
-      if (mScreenshotModule != nullptr)
+      if (mScreenshotState == ScreenshotState::WaitingForScreenshot)
       {
-         std::string typeName = mScreenshotModule->GetTypeName();
-         if (!mScreenshotsToProcess.empty())
-         {
-            typeName = mScreenshotsToProcess.begin()->mLabel;
-            mScreenshotsToProcess.pop_front();
-         }
+         std::string typeName = mScreenshotsToProcess.begin()->mLabel;
+         mScreenshotsToProcess.pop_front();
 
          ofRectangle rect = mScreenshotModule->GetRect();
          rect.y -= IDrawableModule::TitleBarHeight();
@@ -134,24 +129,32 @@ void HelpDisplay::DrawModule()
          rect.grow(10);
          RenderScreenshot(rect.x, rect.y, rect.width, rect.height, typeName + ".png");
 
-         mScreenshotModule->GetOwningContainer()->DeleteModule(mScreenshotModule);
-         mScreenshotModule = nullptr;
-
-         sScreenshotDelay = 10;
-      }
-      else if (!mScreenshotsToProcess.empty())
-      {
-         mScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
-
-         if (mScreenshotsToProcess.front().mLabel == "drumplayer")
-            mScreenshotModule->FindUIControl("edit")->SetValue(1, gTime);
-
-         sScreenshotDelay = 10;
+         mScreenshotCountdown = 10;
+         if (!mScreenshotsToProcess.empty())
+            mScreenshotState = ScreenshotState::WaitingForSpawn;
+         else
+            mScreenshotState = ScreenshotState::None;
       }
    }
    else
    {
-      --sScreenshotDelay;
+      --mScreenshotCountdown;
+   }
+}
+
+void HelpDisplay::Poll()
+{
+   if (mScreenshotState == ScreenshotState::WaitingForSpawn)
+   {
+      if (mScreenshotModule != nullptr)
+         mScreenshotModule->GetOwningContainer()->DeleteModule(mScreenshotModule);
+      mScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
+
+      if (mScreenshotsToProcess.front().mLabel == "drumplayer")
+         mScreenshotModule->FindUIControl("edit")->SetValue(1, gTime);
+
+      mScreenshotState = ScreenshotState::WaitingForScreenshot;
+      mScreenshotCountdown = 10;
    }
 }
 
@@ -499,6 +502,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          spawnable.mSpawnMethod = ModuleFactory::SpawnMethod::EffectChain;
          mScreenshotsToProcess.push_back(spawnable);
       }
+
+      mScreenshotState = ScreenshotState::WaitingForSpawn;
    }
    if (button == mDoModuleDocumentationButton)
    {
