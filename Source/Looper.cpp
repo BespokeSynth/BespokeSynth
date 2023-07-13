@@ -186,7 +186,8 @@ void Looper::Poll()
 {
    if (mClearCommitBuffer)
    {
-      mCommitBuffer->ClearBuffer();
+      if (mRecorder == nullptr)
+         mCommitBuffer->ClearBuffer();
       mCommitBuffer = nullptr;
       mClearCommitBuffer = false;
    }
