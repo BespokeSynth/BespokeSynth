@@ -66,8 +66,6 @@ public:
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    float& GetVal(int col, int row);
    void SetVal(int col, int row, float val, bool notifyListener = true);
-   float GetValRefactor(int row, int col);
-   void SetValRefactor(int row, int col, float val);
    void SetHighlightCol(double time, int col);
    int GetHighlightCol(double time) const;
    void SetMajorColSize(int size) { mMajorCol = size; }
