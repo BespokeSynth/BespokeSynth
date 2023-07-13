@@ -514,7 +514,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          mDrumHits[pitch].mPitchBend = modulation.pitchBend;
          float startOffsetPercent = mDrumHits[pitch].mStartOffset;
          if (modulation.modWheel != nullptr)
-            startOffsetPercent += modulation.modWheel->GetValue(0);
+            startOffsetPercent += MAX((modulation.modWheel->GetValue(0) - ModulationParameters::kDefaultModWheel) * 2, 0);
          mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity / 127.0f);
       }
    }
