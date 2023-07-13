@@ -1,31 +1,50 @@
 {
-   "accum" : {
+   "abletonlink" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "offset ms" : "offset in milliseconds to tweak synchronization",
+         "reset next downbeat" : "resets measure count on the next downbeat, to help synchronize to desired phase in session"
+      },
+      "description" : "synchronizes transport with software and devices that support ableton link",
+      "type" : "other"
+   },
+   "accum" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
          "value" : "output value",
          "velocity" : "amount to accumulate"
       },
       "description" : "accumulate a value over time",
       "type" : "modulators"
    },
-   "add" : {
+   "add" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "value 1" : "value to sum",
          "value 2" : "value to sum"
       },
       "description" : "outputs the result of value 1 plus value 2. value 1 and value 2 are intended to be patch targets for modulators.",
       "type" : "modulators"
    },
-   "addcentered" : {
+   "addcentered" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "range 2" : "modulation amount",
          "value 1" : "center value",
          "value 2" : "modulation value"
@@ -33,11 +52,13 @@
       "description" : "outputs the result of value 1 plus value 2, multiplied by range 2. optimized for using to modulation value 1 by range 2 at a frequency. value 1 or value 2 are intended to be patch targets for modulators.",
       "type" : "modulators"
    },
-   "arpeggiator" : {
+   "arpeggiator" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "interval" : "arpeggiation rate",
          "octaves" : "how many octaves to step through",
          "step" : "direction and distance to step through arpeggiation. a value of zero is \"pingpong\"."
@@ -45,31 +66,37 @@
       "description" : "arpeggiates held notes. there are several vestigial features in this module that should be cleaned up.",
       "type" : "note effects"
    },
-   "audiometer" : {
+   "audiometer" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "level" : "the input audio level. hook this up to an LED-display midi control to see the value displayed on your controller."
       },
       "description" : "sets a slider to an audio level's volume. useful to map a midi display value to.",
       "type" : "audio effects"
    },
-   "audiorouter" : {
+   "audiorouter" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "route" : "audio destination"
       },
       "description" : "selector for switching where audio is routed to. connect to targets to add them to the list.",
       "type" : "audio effects"
    },
-   "audiotocv" : {
+   "audiotocv" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "gain" : "multiply incoming audio",
          "max" : "maximum output value",
          "min" : "minimum output value"
@@ -77,22 +104,26 @@
       "description" : "use an audio signal to modulate a control. allow for audio-rate modulation, to achieve effects such as FM.",
       "type" : "modulators"
    },
-   "audiotopulse" : {
+   "audiotopulse" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "release" : "the cooldown time for the audio signal before a pulse can be triggered again",
          "threshold" : "send a pulse when the signal hits this threshold"
       },
       "description" : "sends a pulse when the audio level surpasses a specified threshold",
       "type" : "pulse"
    },
-   "autotalent" : {
+   "autotalent" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "A" : "[todo]",
          "Ab" : "[todo]",
          "B" : "[todo]",
@@ -122,22 +153,27 @@
       "description" : "[abandoned module, possibly broken]autotune using the \"autotalent\" code",
       "type" : "unknown"
    },
-   "basiceq" : {
-      "canReceiveAudio" : false,
+   "basiceq" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "even" : "reset EQ"
       },
       "description" : "simple multiband EQ",
       "type" : "effect chain"
    },
-   "beats" : {
+   "beats" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "bars*" : "how many measures long are the samples in this slot?",
+         "delete *" : "remove the current sample from the list",
          "double*" : "enable this to play at double speed",
          "filter*" : "layer filter. negative values bring in a low pass, positive values bring in a high pass.",
          "pan*" : "layer panorama",
@@ -147,11 +183,13 @@
       "description" : "multi-loop player, for mixing sample layers together",
       "type" : "synths"
    },
-   "biquad" : {
-      "canReceiveAudio" : false,
+   "biquad" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "F" : "frequency cutoff",
          "G" : "gain",
          "Q" : "resonance",
@@ -160,51 +198,88 @@
       "description" : "filter using biquad formula",
       "type" : "effect chain"
    },
-   "bitcrush" : {
-      "canReceiveAudio" : false,
+   "bitcrush" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "crush" : "sample resolution reduction",
          "downsamp" : "sample rate reduction"
       },
       "description" : "reduce sample resolution and sample rate for lo-fi effects",
       "type" : "effect chain"
    },
-   "butterworth" : {
+   "boundstopulse" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "input" : "the slider to check bounds on"
+      },
+      "description" : "sends a pulse when its input slider hits its max or min limit",
+      "type" : "pulse"
+   },
+   "buffershuffler" : 
+   {
+      "canReceiveAudio" : true,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "freeze input" : "retain the current buffer, without writing in new input",
+         "interval" : "slice size",
+         "num bars" : "number of bars to capture",
+         "playback style" : "how to play clicked slices. or, with input notes, velocity range determines playback style."
+      },
+      "description" : "use notes to play back slices of a constantly-recording live input buffer. input notes trigger slices, with the pitch mapping to slice index. you can also click with a mouse to trigger slices.",
+      "type" : "audio effects"
+   },
+   "butterworth" : 
+   {
+      "canReceiveAudio" : true,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
          "F" : "frequency cutoff",
          "Q" : "resonance"
       },
       "description" : "filter using the butterworth formula",
       "type" : "effect chain"
    },
-   "capo" : {
+   "capo" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "capo" : "number of semitones to shift",
+         "diatonic" : "should we keep transposed notes in the scale?",
          "retrigger" : "immediately replay current notes when changing the capo amount"
       },
       "description" : "shifts incoming notes by semitones",
       "type" : "note effects"
    },
-   "chorddisplayer" : {
+   "chorddisplayer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "display which chord is playing, in the context of the current scale",
       "type" : "note effects"
    },
-   "chorder" : {
+   "chorder" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "chord" : "chord presets",
          "diatonic" : "should the grid be chromatic, or locked to the scale only?",
          "inversion" : "inversion presets"
@@ -212,22 +287,26 @@
       "description" : "takes an incoming pitch and plays additional notes to form chords",
       "type" : "note effects"
    },
-   "chordholder" : {
+   "chordholder" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "pulse to play" : "when enabled, input notes aren't played immediately, but instead wait for an input pulse before playing",
          "stop" : "stop notes from playing"
       },
       "description" : "keeps any notes pressed at the same time sustaining, until new notes are pressed",
       "type" : "note effects"
    },
-   "circlesequencer" : {
+   "circlesequencer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "length*" : "number of steps in this ring",
          "note*" : "pitch to use for this ring",
          "offset*" : "timing offset for this ring"
@@ -235,22 +314,56 @@
       "description" : "polyrhythmic sequencer that displays a loop as a circle",
       "type" : "instruments"
    },
-   "comment" : {
+   "clockin" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "device" : "device to receive from",
+         "rounding" : "precision to round incoming tempo data",
+         "smoothing" : "how much to smooth incoming tempo",
+         "start offset ms" : "offset in milliseconds to tweak synchronization between bespoke and gear"
+      },
+      "description" : "reads in clock pulses from external midi devices to control bespoke's transport",
+      "type" : "other"
+   },
+   "clockout" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "device" : "device to target",
+         "multiplier" : "tempo multiplier for how the gear should respond to the signals",
+         "send start" : "send a signal to reset the gear to the start of its sequence"
+      },
+      "description" : "sends out clock pulses to synchronize external midi devices",
+      "type" : "other"
+   },
+   "comment" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
          "comment" : "type text here"
       },
       "description" : "a box to display some text, to explain a section of a patch",
       "type" : "other"
    },
-   "compressor" : {
-      "canReceiveAudio" : false,
+   "compressor" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "attack" : "speed to apply gain reduction",
+         "drive" : "rescale input to affect how much compression affects it",
          "lookahead" : "how much time to \"look ahead\" to adjust the compression envelope. this necessarily introduces a delay into your output, which could be compensated for by running sequencers slightly early.",
          "mix" : "amount of compression. lower this value for a \"parallel compression\" effect. you should use this mix slider instead of the effectchain's mix slider, to compensate for lookahead.",
          "output" : "makeup gain, to increase volume",
@@ -261,61 +374,73 @@
       "description" : "try to keep volume at a certain level",
       "type" : "effect chain"
    },
-   "controlsequencer" : {
+   "controlsequencer" : 
+   {
       "canReceiveAudio" : false,
-      "canReceiveNote" : false,
-      "canReceivePulses" : false,
-      "controls" : {
+      "canReceiveNote" : true,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
          "interval" : "rate to advance",
          "length" : "length of the sequence",
-         "random" : "randomize sequence values"
+         "random" : "randomize sequence values",
+         "step *" : "value for this step"
       },
       "description" : "modulate a control step-wise at an interval",
       "type" : "modulators"
    },
-   "curve" : {
+   "curve" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "input" : "input value (intended as a modulation target)"
       },
       "description" : "remap an input over its range with a curve. double-click on the curve to add points, right click on points to remove them, drag on lines to bend them.",
       "type" : "modulators"
    },
-   "curvelooper" : {
+   "curvelooper" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "length" : "length of the loop",
          "randomize" : "create a random curve"
       },
       "description" : "modulate a value over time with a looping curve",
       "type" : "modulators"
    },
-   "dcoffset" : {
+   "dcoffset" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "offset" : "amount of offset to add"
       },
       "description" : "add a constant offset to an audio signal",
       "type" : "audio effects"
    },
-   "dcremover" : {
-      "canReceiveAudio" : false,
+   "dcremover" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "description" : "high pass filter with a 10hz cutoff to remove DC offset, to keep signal from drifting away from zero",
       "type" : "effect chain"
    },
-   "delay" : {
-      "canReceiveAudio" : false,
+   "delay" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "amount" : "amount of delay that returns",
          "delay" : "delay in milliseconds",
          "dry" : "should the dry signal pass through, or just the delayed signal?",
@@ -328,11 +453,13 @@
       "description" : "echoing delay",
       "type" : "effect chain"
    },
-   "distortion" : {
-      "canReceiveAudio" : false,
+   "distortion" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "center input" : "remove dc offset from input signal to distort in a more controlled way",
          "clip" : "cutoff point of distortion, lower values result in more extreme distortion",
          "fuzz" : "push input signal off-center to distort asymmetrically",
@@ -342,11 +469,13 @@
       "description" : "waveshaping distortion",
       "type" : "effect chain"
    },
-   "drumplayer" : {
+   "drumplayer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "aud" : "scroll to audition samples in the current pad's head category, or a directory last dropped onto a pad",
          "edit" : "show pads for editing",
          "envelope *" : "should we apply a volume envelope to the sample?",
@@ -355,12 +484,16 @@
          "envelopedisplay *D" : "envelope decay",
          "envelopedisplay *R" : "envelope release",
          "envelopedisplay *S" : "envelope sustain",
+         "full vel" : "always play drum hits at full velocity",
+         "grab *" : "grab this sample",
          "grid" : "patch a grid in here from a \"midicontroller\" module",
          "hitcategory*" : "folder to choose from, when clicking the \"random\" button. these folders are found in the data/drums/hits/ directory",
          "kit" : "[none]",
          "linkid *" : "if linkid is not -1, silence any other sample with a matching linkid (useful for linking open and closed hats)",
          "mono" : "force output to mono",
+         "next *" : "choose the next sample from the selected hitcategory",
          "pan *" : "stereo pan position of sample",
+         "prev *" : "choose the previous sample from the selected hitcategory",
          "quantize" : "quantize input to this interval",
          "random *" : "choose a random sample from the selected hitcategory",
          "repeat" : "if quantizing, should held notes repeat at that interval?",
@@ -379,39 +512,44 @@
       "description" : "sample player intended for drum playback",
       "type" : "synths"
    },
-   "drumsequencer" : {
+   "drumsequencer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "<" : "shift whole pattern one step earlier",
          ">" : "shift whole pattern one step later",
+         "clear" : "clear sequence",
          "column" : "current column, to use for visualizing the step on a midi controller",
          "grid" : "patch a grid in here from a \"midicontroller\" module",
          "measures" : "length of the sequence in measures",
          "metastep" : "patch a grid in here from a \"midicontroller\" module to control the \"meta step\". I forget what this does. oops.",
          "offset*" : "shift row forward/backward in time. try making your snares a little early, your hats a little late, etc.",
          "offsets" : "show \"offsets\" sliders",
-         "preset" : "select a pattern preset",
          "r amt" : "the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.",
          "r den" : "density of the randomizer output. the higher this is, the busier the random output will be.",
+         "r lock*" : "lock this row so it doesn't get randomized",
+         "random*" : "randomize this row",
          "randomize" : "randomize the sequence",
          "repeat" : "repeat input notes at this rate",
          "rowpitch*" : "output pitch for this row",
          "step" : "length of each step",
-         "str" : "velocity to use when setting a step via a grid controller, if the checkbox next to this slider is checked",
-         "use str" : "if the \"str\" slider should be used for setting velocity",
+         "vel" : "velocity to use when setting a step",
          "velocity" : "patch a grid in here from a \"midicontroller\" module to control the velocity",
          "yoff" : "vertical offset for grid controller's view of the pattern"
       },
       "description" : "step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.",
       "type" : "instruments"
    },
-   "drumsynth" : {
+   "drumsynth" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "adsrfilter*" : "",
          "adsrfilter*A" : "",
          "adsrfilter*D" : "",
@@ -438,6 +576,7 @@
          "freqmax*" : "oscillator start frequency",
          "freqmin*" : "oscillator end frequency",
          "noise*" : "noise volume",
+         "oversampling" : "oversampling amount. increases sound quality, but also increases cpu usage.",
          "q*" : "filter resonance",
          "type*" : "oscillator type",
          "vol" : "the output volume",
@@ -446,11 +585,13 @@
       "description" : "oscillator+noise drum synth",
       "type" : "synths"
    },
-   "effectchain" : {
+   "effectchain" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "<" : "move this effect to earlier in the chain",
          ">" : "move this effect to later in the chain",
          "effect" : "select which effect to add",
@@ -463,11 +604,13 @@
       "description" : "container to hold a list of effects, applied in series. the effects can be easily reordered with the < and > buttons, and deleted with the x button. hold shift to expose a x button for all effects.",
       "type" : "audio effects"
    },
-   "envelope" : {
+   "envelope" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "adsr" : "envelope view",
          "adsrA" : "envelope attack",
          "adsrD" : "envelope decay",
@@ -485,11 +628,13 @@
       "description" : "modulate a value with a triggered envelope",
       "type" : "modulators"
    },
-   "eq" : {
+   "eq" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "enabled*" : "enable this band?",
          "f*" : "frequency cutoff for this band",
          "g*" : "gain for this band",
@@ -499,11 +644,13 @@
       "description" : "multi-band equalizer, to adjust output levels at frequency ranges",
       "type" : "audio effects"
    },
-   "eventcanvas" : {
+   "eventcanvas" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "canvas" : "canvas of events. canvas controls:\n-shift-click to add an event\n-hold shift and drag an event to duplicate\n-hold alt to drag an event without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view",
          "clear" : "delete all elements",
          "delete" : "delete highlighted elements",
@@ -519,37 +666,43 @@
       "description" : "schedule values to set over time",
       "type" : "other"
    },
-   "expression" : {
+   "expression" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "a" : "variable to use in expressions",
          "b" : "variable to use in expressions",
          "c" : "variable to use in expressions",
          "d" : "variable to use in expressions",
          "e" : "variable to use in expressions",
          "input" : "input to use as x variable",
-         "y=" : "expression to modify input. try something like \"x+sin(x*pi*a)\". available variables: a,b,c,d,e = the slider + sin(s below. t = time. x1,x2,y1,y2 = biquad state storage."
+         "y=" : "expression to modify input. try something like \"x+sin(x*pi*a)\". available variables: a,b,c,d,e = the sliders below. t = time."
       },
       "description" : "shape modulation with a text-based mathematical expression",
       "type" : "modulators"
    },
-   "feedback" : {
+   "feedback" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "limit" : "clip the feedback audio to this range, to avoid issues with feedback blowing out too intensely."
       },
       "description" : "feed delayed audio back into earlier in the signal chain. use the \"feedback out\" connector for sending the audio back up the chain, and the primary output connector for sending the resulting audio forward. using feedback can often lead to extreme and difficult-to-control results!",
       "type" : "audio effects"
    },
-   "fftvocoder" : {
+   "fftvocoder" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "carrier" : "carrier signal gain",
          "cut" : "how many bass partials to remove",
          "dry/wet" : "how much original input vs vocoded signal to output",
@@ -562,11 +715,13 @@
       "description" : "FFT-based vocoder",
       "type" : "audio effects"
    },
-   "fmsynth" : {
+   "fmsynth" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "adsrharm" : "",
          "adsrharm2" : "",
          "adsrharm2A" : "",
@@ -606,11 +761,13 @@
       "description" : "polyphonic fm synthesis",
       "type" : "synths"
    },
-   "formant" : {
+   "formant" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "a" : "[todo]",
          "e" : "[todo]",
          "ee" : "[todo]",
@@ -621,21 +778,25 @@
       "description" : "[unfinished, broken]filter focused on controlling formants",
       "type" : "unknown"
    },
-   "fouronthefloor" : {
+   "fouronthefloor" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "two" : "sends note only every two beats"
       },
       "description" : "sends note 0 every beat, to trigger a kick drum",
       "type" : "instruments"
    },
-   "freeverb" : {
-      "canReceiveAudio" : false,
+   "freeverb" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "damp" : "high frequency attenuation; a value of zero means all frequencies decay at the same rate, while higher settings will result in a faster decay of the high frequency range",
          "dry" : "amount of untouched signal",
          "room size" : "controls the length of the reverb, a higher value means longer reverb",
@@ -645,21 +806,25 @@
       "description" : "reverb using the \"freeverb\" algorithm",
       "type" : "effect chain"
    },
-   "freqdelay" : {
+   "freqdelay" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "dry/wet" : "how much of the effect to apply"
       },
       "description" : "delay effect with delay length based upon input notes",
       "type" : "audio effects"
    },
-   "fubble" : {
+   "fubble" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "clear" : "clear the drawing",
          "length" : "the interval to quantize to",
          "mutate amount" : "amount to affect drawing by perlin noise field",
@@ -672,31 +837,37 @@
       "description" : "draw on an X/Y pad and replay the drawing to modulate values. based on a concept proposed by olivia jack",
       "type" : "modulators"
    },
-   "gain" : {
+   "gain" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "gain" : "amount to adjust signal. a value of 1 will cause no change to the signal."
       },
       "description" : "adjusts volume of audio signal",
       "type" : "audio effects"
    },
-   "gainstage" : {
-      "canReceiveAudio" : false,
+   "gainstage" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "gain" : "volume multiplier"
       },
       "description" : "control volume within an effectchain",
       "type" : "effect chain"
    },
-   "gate" : {
-      "canReceiveAudio" : false,
+   "gate" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "attack" : "speed at which gate blends open",
          "release" : "speed at which gate blends closed",
          "threshold" : "volume threshold to open up the gate"
@@ -704,11 +875,16 @@
       "description" : "only allow signal in when it's above a certain threshold. useful to eliminate line noise, or just as an effect.",
       "type" : "effect chain"
    },
-   "globalcontrols" : {
+   "globalcontrols" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "background b" : "amount of blue in background color",
+         "background g" : "amount of green in background color",
+         "background r" : "amount of red in background color",
          "lissajous b" : "amount of blue in background lissajous curve",
          "lissajous g" : "amount of green in background lissajous curve",
          "lissajous r" : "amount of red in background lissajous curve",
@@ -721,11 +897,13 @@
       "description" : "interface controls, intended to allow you to use midi controllers to navigate the canvas. controlling these sliders directly with the mouse is not recommended.",
       "type" : "other"
    },
-   "granulator" : {
-      "canReceiveAudio" : false,
+   "granulator" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "autocapture" : "freeze input at this interval",
          "dry" : "amount of dry signal to allow through",
          "frz" : "freeze the current recorded buffer",
@@ -742,11 +920,13 @@
       "description" : "granulate live input",
       "type" : "effect chain"
    },
-   "gravity" : {
+   "gravity" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "drag" : "the resistance force to apply opposite the velocity",
          "gravity" : "the gravitational force to apply downwards",
          "kick" : "click to apply kick force (or, pulse this module for the same result)",
@@ -755,22 +935,26 @@
       "description" : "make a modulation value rise and fall with physics",
       "type" : "modulators"
    },
-   "grid" : {
+   "grid" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "grid" : "patch a grid in here, from a \"midicontroller\" module",
          "momentary" : "should clicks be treated as momentary inputs?"
       },
       "description" : "generic grid, to be used by \"script\" module, to assist in writing scripts that use grid-based midi controllers",
       "type" : "other"
    },
-   "gridkeyboard" : {
+   "gridkeyboard" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "arrangement" : "what style of layout should we use?",
          "ch.latch" : "latch chord button presses",
          "grid" : "patch a grid in here from a \"midicontroller\" module",
@@ -782,67 +966,80 @@
       "description" : "grid-based keyboard, intended primarily for 64-pad grid controllers",
       "type" : "instruments"
    },
-   "gridnotedisplayer" : {
+   "gridnotedisplayer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "use with a gridkeyboard to display currently playing notes, to visualize chords, arpeggiation, etc.",
       "type" : "note effects"
    },
-   "gridsliders" : {
+   "gridsliders" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "direction" : "should the grid display the sliders vertically, or horizontally?",
          "grid" : "patch a grid in here from a \"midicontroller\" module"
       },
       "description" : "use a grid controller to control multiple sliders",
       "type" : "modulators"
    },
-   "groupcontrol" : {
+   "groupcontrol" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "group enabled" : "controls the connected checkboxes"
       },
       "description" : "connect to several checkboxes, and control them all with one checkbox",
       "type" : "other"
    },
-   "helpdisplay" : {
+   "helpdisplay" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "copy build info" : "copy info about this build to the clipboard, for help requests",
          "help page" : "which page of help information to show",
          "show tooltips" : "displays these tooltips. you can also toggle them with the F1 key, and you can turn these on or off by default in the \"settings\" menu."
       },
       "description" : "displays help information",
       "type" : "unknown"
    },
-   "input" : {
+   "input" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "ch" : "which channel (or channels, if you want stereo) to use"
       },
       "description" : "get audio from input source, like a microphone",
       "type" : "audio effects"
    },
-   "inverter" : {
+   "inverter" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "description" : "multiply a signal by -1. enables some pretty interesting effects when used with sends, to subtract out parts of signals when recombined.",
       "type" : "audio effects"
    },
-   "karplusstrong" : {
+   "karplusstrong" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "feedback" : "amount of feedback for resonance",
          "filter" : "amount to filter resonance",
          "invert" : "should the feedback invert?",
@@ -859,18 +1056,21 @@
       "description" : "polyphonic plucked string physical modeling synth",
       "type" : "synths"
    },
-   "keyboarddisplay" : {
+   "keyboarddisplay" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "displays input notes on a keyboard, and allows you to click the keyboard to create notes",
       "type" : "instruments"
    },
-   "leveltocv" : {
+   "leveltocv" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "attack" : "rise to the input level at this rate",
          "gain" : "multiply the input audio by this value",
          "max" : "output when level is one",
@@ -880,11 +1080,13 @@
       "description" : "output a modulation value based on the level of incoming audio",
       "type" : "modulators"
    },
-   "lfo" : {
+   "lfo" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "bias" : "bias the waveform towards the low or high point",
          "enable" : "turn on/off modulation",
          "free rate" : "rate of oscillator running in non-clock-synced time",
@@ -901,13 +1103,15 @@
          "spread" : "spread the waveform out to be closer to the low and high points"
       },
       "description" : "modulates a slider with a low-frequency oscillator",
-      "type" : "unknown"
+      "type" : "modulators"
    },
-   "linnstrumentcontrol" : {
+   "linnstrumentcontrol" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "blackout" : "turn off all lights",
          "controller" : "midicontroller with the linnstrument",
          "decay" : "amount of time it takes for lit key to die off",
@@ -917,24 +1121,29 @@
       "description" : "[work in progress]control the lights of a linnstrument controller in various ways",
       "type" : "note effects"
    },
-   "lissajous" : {
+   "lissajous" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "scale" : "visual scale of lissajous image"
       },
       "description" : "draw input audio as a lissajous curve. turn off \"autocorrelation\" in the module's triangle menu to use stereo channels to show stereo width.",
       "type" : "audio effects"
    },
-   "looper" : {
+   "looper" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          " m " : "take the contents of this looper and merge it into another. click this button on the merge source, then on the merge target.",
          ".5x" : "make loop play at half speed",
          "2x" : "make loop play at double speed",
+         "apply" : "shift the contents of the looper so the current offset is the start of the buffer",
          "auto" : "should pitch shift auto-adjust as the transport tempo adjusts?",
          "b" : "bake current volume into waveform",
          "beatwheel depth left" : "[none]",
@@ -948,17 +1157,18 @@
          "commit" : "commit the current looperrecorder buffer to this loop",
          "copy" : "take the contents of this looper and copy it onto another. click this button on the copy source, then on the copy target.",
          "decay" : "amount to lower volume each loop",
+         "extend" : "make loop twice as long",
          "fourtet" : "use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this \"fourtetified\" audio.",
          "fourtetslices" : "chunk size to use for \"fourtet\" effect",
          "mute" : "silence this looper",
          "num bars" : "loop length in measures",
          "offset" : "amount to offset looper's playhead from transport position",
+         "passthrough" : "should we pass incoming audio through to the output? turn off to mute incoming audio.",
          "pitch" : "amount to pitch shift looper output",
          "resample for tempo" : "this button appears when the current global tempo no longer matches the tempo that the buffer was recorded at. click this to resample the buffer to match the new tempo.",
          "save" : "save this loop to a wav file",
          "scr" : "allow loop to be scratched by adjusting \"scrspd\"",
          "scrspd" : "playback speed, used with \"scr\" is enabled. modulate quickly for a vinyl-like scratching effect.",
-         "set" : "shift the contents of the looper so the current offset is the start of the buffer",
          "swap" : "swap the contents of this looper and with another. click this button on two loopers to swap them.",
          "undo" : "undo last loop commit",
          "volume" : "output volume",
@@ -967,11 +1177,13 @@
       "description" : "loop input audio. use with a \"looperrecorder\" for full functionality.",
       "type" : "audio effects"
    },
-   "loopergranulator" : {
+   "loopergranulator" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "freeze" : "stop advancing looper time",
          "len ms" : "length of each grain in milliseconds",
          "loop pos" : "playback position within loop",
@@ -987,17 +1199,20 @@
       "description" : "use with a \"looper\" module to play the contents with granular synthesis",
       "type" : "other"
    },
-   "looperrecorder" : {
+   "looperrecorder" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          ".5tempo" : "halve global transport tempo, while keeping connected loopers sounding the same",
          "1" : "capture the last measure to the currently-targeted looper",
          "2" : "capture the last 2 measures to the currently-targeted looper",
          "2xtempo" : "double global transport tempo, while keeping connected loopers sounding the same",
          "4" : "capture the last 4 measures to the currently-targeted looper",
          "8" : "capture the last 8 measures to the currently-targeted looper",
+         "auto-advance" : "automatically advance to the next looper when committing",
          "cancel free rec" : "if \"free rec\" is enabled, cancel recording without setting the loop length",
          "clear" : "clear the recorded buffer",
          "free rec" : "enable to start recording a loop with no predetermined length. disable to end recording, adjust global transport to match the loop length, and switch the recorder's mode to \"loop\"",
@@ -1012,22 +1227,26 @@
       "description" : "command center to manage recording into multiple loopers, and allow retroactive loop capture (i.e., always-on recording)",
       "type" : "audio effects"
    },
-   "looperrewriter" : {
+   "looperrewriter" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
-         " go " : "rewrite the connected looper, and if that looper is connected to a send, set that send to output only to the right outlet",
+      "controls" : 
+      {
+         "go" : "rewrite the connected looper, and if that looper is connected to a send, set that send to output only to the right outlet",
          "new loop" : "start recording a dynamic loop length. press \"go\" when you want to rewrite it to the looper. this will also change bespoke's global tempo to match this new loop, so it's quite powerful and scary! click it again to cancel."
       },
       "description" : "rewrites the contents of a looper with received input, to help you resample your own loops. attach the grey dot to a \"looper\" module.\n\nthe ideal way to use this module is to hook the \"looper\" directly up to a \"send\", hook the leftmost outlet of the \"send\" up to your effects processing (like an \"effectchain\"), hook the effect processing up to this \"rewriter\", and then also connect the rightmost outlet of the \"send\" up to this \"rewriter\"",
       "type" : "audio effects"
    },
-   "loopstorer" : {
+   "loopstorer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "clear" : "[todo]",
          "quantization" : "[todo]",
          "rewrite" : "[todo]",
@@ -1036,25 +1255,29 @@
       "description" : "[abandoned module, probably broken]store a looper's loops to swap them in and out",
       "type" : "unknown"
    },
-   "m185sequencer" : {
+   "m185sequencer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "gate*" : "behavior for each row: \"repeat\" plays every step, \"once\" plays just the first step, \"hold\" holds across all steps, \"rest\" plays no steps",
          "interval" : "interval per step",
          "pitch*" : "pitch to use for this row",
          "pulses*" : "number of steps this row should last",
          "reset step" : "resets counter to first step"
       },
-      "description" : "sequencer using the unique paradigm of the the m185 or intellijel metropolis",
+      "description" : "sequencer using the unique paradigm of the m185 or intellijel metropolis",
       "type" : "instruments"
    },
-   "macroslider" : {
+   "macroslider" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "end*" : "the output value at the top of the input's range",
          "input" : "the input value. intended to be a modulation patch target.",
          "start*" : "the output value at the bottom of the input's range"
@@ -1062,32 +1285,38 @@
       "description" : "take a value and send scaled versions of that value to multiple destinations",
       "type" : "modulators"
    },
-   "metronome" : {
+   "metronome" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "vol" : "metronome volume"
       },
       "description" : "beeps to the beat",
       "type" : "synths"
    },
-   "midicc" : {
+   "midicc" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "control" : "CC control number",
          "value" : "outputs a CC value when this changes"
       },
       "description" : "outputs midi control change messages to route to a \"midioutput\" module",
       "type" : "note effects"
    },
-   "midicontroller" : {
+   "midicontroller" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          " x " : "delete this connection",
          "add" : "add a mapping manually",
          "bind (hold shift)" : "when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift, and then using desired midi input",
@@ -1108,7 +1337,7 @@
          "osc input port" : "port to use for osccontroller input",
          "page" : "select which page of midi controls to use. each page acts like an independent midi controller, so you can use pages to allow one midi controller to switch between controlling many things",
          "pageless" : "should this connection work across all pages of the midicontroller?",
-         "path" : "path to the control that should be affected",
+         "path" : "path to the control that should be affected. you can also enter \"hover\" here, to affect whichever control the mouse is hovering over.",
          "scale" : "should the output of this midi slider be scaled between \"midi off\" and \"midi on\"?",
          "twoway" : "should we send feedback to the controller? (to control the LEDs associated with the button/knob)",
          "value" : "the value to set"
@@ -1116,79 +1345,93 @@
       "description" : "get midi input from external devices. to get a nice display in the \"layout\" view, create a .json file with the same name as your controller to describe your controller's layout, and place it in your \"data/controllers\" directory. look at the other files in that directory for examples.",
       "type" : "instruments"
    },
-   "midioutput" : {
+   "midioutput" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "controller" : "where to send midi to"
       },
       "description" : "send midi to an external destination, such as hardware or other software",
       "type" : "note effects"
    },
-   "modulationvizualizer" : {
+   "modulationvizualizer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "display MPE modulation values for notes",
       "type" : "note effects"
    },
-   "modwheel" : {
+   "modwheel" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "modwheel" : "expression level"
       },
       "description" : "adds an expression value to a note",
       "type" : "note effects"
    },
-   "modwheeltocv" : {
+   "modwheeltocv" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "max" : "output for modwheel value 127",
          "min" : "output for modwheel value 0"
       },
       "description" : "take a note's modwheel value and convert it to a modulation value",
       "type" : "modulators"
    },
-   "modwheeltopressure" : {
+   "modwheeltopressure" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "swaps expression input to midi pressure in the output",
       "type" : "note effects"
    },
-   "modwheeltovibrato" : {
+   "modwheeltovibrato" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "vibinterval" : "rate of vibrato",
          "vibrato" : "amount of pitch bend"
       },
       "description" : "convert note mod wheel input rhythmic pitch bend",
       "type" : "note effects"
    },
-   "mpesmoother" : {
+   "mpesmoother" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "modwheel" : "amount to smooth incoming modwheel",
          "pitch" : "amount to smooth incoming pitchbend",
          "pressure" : "amount to smooth incoming pressure"
       },
-      "description" : "[no tooltip]",
+      "description" : "smooth out MPE parameters",
       "type" : "note effects"
    },
-   "mpetweaker" : {
+   "mpetweaker" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "modwheel mult" : "amount to multiply incoming modwheel",
          "modwheel offset" : "amount to offset incoming modwheel",
          "pitchbend mult" : "amount to multiply incoming pitchbend",
@@ -1199,22 +1442,26 @@
       "description" : "adjust incoming MPE modulation values",
       "type" : "note effects"
    },
-   "mult" : {
+   "mult" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "value 1" : "",
          "value 2" : ""
       },
       "description" : "outputs the result of value 1 multiplier by value 2. value 1 and value 2 are intended to be patch targets for modulators.",
       "type" : "modulators"
    },
-   "multitapdelay" : {
+   "multitapdelay" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "delay *" : "tap delay time, in milliseconds",
          "display length" : "length of buffer display, in seconds",
          "dry" : "how much dry signal to allow through",
@@ -1225,11 +1472,13 @@
       "description" : "delay with multiple tap points",
       "type" : "audio effects"
    },
-   "multitrackrecorder" : {
+   "multitrackrecorder" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "add track" : "add an additional track",
          "bounce" : "write the tracks to your recordings directory",
          "clear" : "clear the audio in the tracks",
@@ -1238,53 +1487,77 @@
       "description" : "record several synchronized tracks of audio, to write to disk for mixing in an external DAW",
       "type" : "other"
    },
-   "multitrackrecordertrack" : {
+   "multitrackrecordertrack" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          " X " : "delete this track"
       },
       "description" : "a track in a multitrack recorder",
       "type" : "unknown"
    },
-   "muter" : {
-      "canReceiveAudio" : false,
+   "muter" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "ms" : "ramp time to mute/unmute signal",
          "pass" : "when true, the signal is allowed through"
       },
       "description" : "mute an incoming signal",
       "type" : "effect chain"
    },
-   "noisify" : {
+   "newpatchconfirm" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "cancel" : "dismiss this",
+         "confirm" : "clear everything and start fresh"
+      },
+      "description" : "",
+      "type" : "unknown"
+   },
+   "noisify" : 
+   {
+      "canReceiveAudio" : true,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
          "amount" : "amount of noise to apply",
          "width" : "how frequently a new noise sample should be chosen"
       },
       "description" : "multiply input signal by white noise",
       "type" : "effect chain"
    },
-   "notecanvas" : {
+   "notecanvas" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "canvas" : "canvas of notes. canvas controls:\n-shift-click to add a note\n-hold shift and drag a note to duplicate\n-hold alt to drag a note without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view",
          "clear" : "delete all elements",
          "delete" : "delete highlighted elements",
          "drag mode" : "direction that elements can be dragged",
          "free rec" : "enable record mode, and extend canvas if we reach the end",
          "interval" : "interval to quantize to",
+         "load midi" : "import canvas contents from a midi file",
+         "loadtrack" : "which track number to import when using \"load midi\"",
          "measures" : "loop length",
          "play" : "play notes on canvas",
          "quantize" : "quantize selected notes to interval",
          "rec" : "record input notes to canvas",
+         "save midi" : "export canvas contents to a midi file",
          "scrollh" : "horizontal scrollbar",
          "scrollv" : "vertical scrollbar",
          "show chord intervals" : "show brackets to indicate chord relationships",
@@ -1294,11 +1567,13 @@
       "description" : "looping note roll",
       "type" : "instruments"
    },
-   "notechain" : {
+   "notechain" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "duration" : "duration of note, in measures",
          "next" : "interval until sending pulse",
          "pitch" : "pitch to play",
@@ -1308,21 +1583,30 @@
       "description" : "trigger a note, followed by a pulse to trigger another note after a delay",
       "type" : "instruments"
    },
-   "notechance" : {
+   "notechance" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
-         "chance" : "probability that a note is allowed"
+      "controls" : 
+      {
+         "*" : "generate a new random seed",
+         "<" : "go to next seed",
+         "beat length" : "restart the deterministic random sequence at this interval",
+         "chance" : "probability that a note is allowed",
+         "deterministic" : "allow for randomness to be repeated over an interval",
+         "seed" : "number that determines the random sequence"
       },
       "description" : "randomly allow notes through",
       "type" : "note effects"
    },
-   "notecounter" : {
+   "notecounter" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
-      "canReceivePulses" : false,
-      "controls" : {
+      "canReceivePulses" : true,
+      "controls" : 
+      {
          "div" : "measure division, when using \"div\" as the interval",
          "interval" : "rate to advance",
          "length" : "length of the sequence",
@@ -1333,11 +1617,13 @@
       "description" : "advance through pitches sequentially. useful for driving the \"notesequencer\" or \"drumsequencer\" modules.",
       "type" : "instruments"
    },
-   "notecreator" : {
+   "notecreator" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "duration" : "note length when \"trigger\" button is used",
          "on" : "turn on to start note, turn off to end note",
          "pitch" : "output note pitch",
@@ -1347,38 +1633,69 @@
       "description" : "create a one-off note",
       "type" : "instruments"
    },
-   "notedelayer" : {
+   "notedelayer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "delay" : "amount of time to delay, in measures"
       },
       "description" : "delay input notes by a specified amount",
       "type" : "note effects"
    },
-   "notedisplayer" : {
+   "notedisplayer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "show input note info",
       "type" : "note effects"
    },
-   "noteduration" : {
+   "noteduration" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "duration" : "length of the note in measures"
       },
       "description" : "sets the length a note will play, ignoring the note-off message",
       "type" : "note effects"
    },
-   "notefilter" : {
+   "noteecho" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "delay *" : "amount of time to delay this output, in measures"
+      },
+      "description" : "output incoming notes at specified delays",
+      "type" : "note effects"
+   },
+   "noteexpression" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "expression*" : "expression to evaluate for this cable. example expression to route notes with pitch greater than 80 and velocity less than 60:\n\"p > 80 && v < 60\""
+      },
+      "description" : "control where notes are routed based upon evaluated expressions. the variable \"p\" represents pitch, and \"v\" represents velocity",
+      "type" : "note effects"
+   },
+   "notefilter" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
          "C#-2 (1)" : "",
          "C-2 (0)" : "",
          "D#-2 (3)" : "",
@@ -1391,59 +1708,74 @@
       "description" : "only allow a certain pitches through",
       "type" : "note effects"
    },
-   "noteflusher" : {
+   "noteflusher" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "flush" : "click to flush notes"
       },
       "description" : "send a note-off for all notes",
       "type" : "note effects"
    },
-   "notegate" : {
+   "notegate" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "open" : "if notes are allowed to pass"
       },
       "description" : "allow or disallow notes to pass through",
       "type" : "note effects"
    },
-   "notehocket" : {
+   "notehocket" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "*" : "generate a new random seed",
+         "<" : "go to next seed",
+         "beat length" : "restart the deterministic random sequence at this interval",
+         "seed" : "number that determines the random sequence",
          "weight *" : "chance that note goes to this destination"
       },
       "description" : "sends notes to random destinations",
       "type" : "note effects"
    },
-   "notehumanizer" : {
+   "notehumanizer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "time" : "amount of timing randomness, in milliseconds.",
          "velocity" : "amount of velocity randomness"
       },
       "description" : "add randomness to timing and velocity",
       "type" : "note effects"
    },
-   "notelatch" : {
+   "notelatch" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "use note on messages to toggle notes on and off",
       "type" : "note effects"
    },
-   "notelooper" : {
+   "notelooper" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "canvas" : "canvas of recorded notes",
          "clear" : "clear pattern",
          "del/mute" : "if \"write\" is enabled, erase notes as the playhead passes over them. otherwise, just mute them.",
@@ -1455,53 +1787,64 @@
       "description" : "note loop recorder with overdubbing and replacement functionality",
       "type" : "instruments"
    },
-   "noteoctaver" : {
+   "noteoctaver" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
-         "octave" : "number of octaves to raise or lower"
+      "controls" : 
+      {
+         "octave" : "number of octaves to raise or lower",
+         "retrigger" : "immediately replay current notes when changing the transpose amount"
       },
       "description" : "transpose a note by octaves",
       "type" : "note effects"
    },
-   "notepanalternator" : {
+   "notepanalternator" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "one" : "pan position, .5 is centered",
          "two" : "pan position, .5 is centered"
       },
       "description" : "sets a note's pan, alternating between two values, for the internal synths that support panned notes",
       "type" : "note effects"
    },
-   "notepanner" : {
+   "notepanner" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "pan" : "pan position, .5 is centered"
       },
       "description" : "sets a note's pan, for the internal synths that support panned notes",
       "type" : "note effects"
    },
-   "notepanrandom" : {
+   "notepanrandom" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "center" : "center pan position",
          "spread" : "amount of randomness"
       },
       "description" : "sets a note's pan to random values, for the internal synths that support panned notes",
       "type" : "note effects"
    },
-   "noterangefilter" : {
+   "noterangefilter" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "max" : "maximum pitch allowed",
          "min" : "minimum pitch allowed",
          "wrap" : "instead of rejecting notes outside of this range, should we wrap them to the range instead?"
@@ -1509,32 +1852,39 @@
       "description" : "only allows notes through within a certain pitch range",
       "type" : "note effects"
    },
-   "noteratchet" : {
+   "noteratchet" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "duration" : "total length of time repeats should last",
+         "skip first" : "don't replay input note. this allows you to more easily separate the initial note from the ratcheted notes.",
          "subdivision" : "length of each repeat"
       },
       "description" : "rapidly repeat an input note over a duration",
       "type" : "note effects"
    },
-   "noterouter" : {
+   "noterouter" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "route" : "the noterouter's destination module"
       },
       "description" : "allows you to control where notes are routed to using a UI control. to add destinations to the list, patch them as a target",
       "type" : "note effects"
    },
-   "notesequencer" : {
+   "notesequencer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "<" : "shift the sequence to the left",
          ">" : "shift the sequence to the right",
          "clear" : "clear all steps",
@@ -1550,9 +1900,10 @@
          "rand len chance" : "when clicking the random length button, what is the chance that a step gets changed?",
          "rand len range" : "when clicking the random length button, how much will the length change?",
          "rand pitch chance" : "when clicking the random pitch button, what is the chance that a step gets changed?",
-         "rand pitch range" : "when clicking the random pitch button, how far will the pitch change?",
+         "rand pitch variety" : "how many different random pitches should we generate?",
          "rand vel chance" : "when clicking the random velocity button, what is the chance that a step gets changed?",
          "rand vel density" : "when clicking the random velocity button, what are the chances that a step should have a note?",
+         "random" : "randomize pitch, length, and velocity of all steps.",
          "tone*" : "pitch for this column",
          "vel" : "randomize the velocity of each step's note.",
          "vel*" : "velocity for this column",
@@ -1562,93 +1913,141 @@
       "description" : "looping sequence of notes at an interval. pair with a \"pulser\" module for more interesting step control. hold \"shift\" to adjust step length.",
       "type" : "instruments"
    },
-   "notesinger" : {
+   "notesinger" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "oct" : "octave to adjust output pitch by"
       },
       "description" : "output a note based on a detected pitch",
       "type" : "instruments"
    },
-   "notesorter" : {
+   "notesorter" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "pitch *" : "pitch to use for this outlet"
       },
       "description" : "separate notes by pitch. any unmapped pitches go through the standard outlet.",
       "type" : "note effects"
    },
-   "notestepper" : {
+   "notestepper" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
-         "length" : "length of the sequence"
+      "controls" : 
+      {
+         "length" : "length of the sequence",
+         "reset" : "reset to the start"
       },
       "description" : "output notes through a round robin of patch cables, to create sequential variety",
       "type" : "note effects"
    },
-   "notestream" : {
+   "notestream" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "reset" : "reset the pitch range"
       },
       "description" : "view a stream of notes as they're played",
       "type" : "note effects"
    },
-   "notestrummer" : {
+   "notestrummer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "strum" : "move the slider past each note to strum it"
       },
       "description" : "send a chord into this, and move a slider to strum each note of the chord",
       "type" : "note effects"
    },
-   "notetofreq" : {
+   "notetable" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "clear" : "clear grid",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
+         "length" : "the number of pitches",
+         "notemode" : "which set of pitches should the rows represent?",
+         "octave" : "octave of the bottom pitch of this sequence",
+         "rand pitch chance" : "when clicking the random pitch button, what is the chance that a step gets changed?",
+         "rand pitch range" : "when clicking the random pitch button, how far will the pitch change?",
+         "random pitch" : "randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.",
+         "tone*" : "pitch for this column",
+         "x offset" : "x offset of attached grid controller",
+         "y offset" : "y offset of attached grid controller"
+      },
+      "description" : "map a pitch (starting from zero) to a scale pitch",
+      "type" : "note effects"
+   },
+   "notetofreq" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "takes an input note, and outputs that note's frequency in hertz",
       "type" : "modulators"
    },
-   "notetoms" : {
+   "notetoggle" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "description" : "turn a control on or off depending on if there are any input notes",
+      "type" : "other"
+   },
+   "notetoms" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "takes an input note, and outputs the period of that note's frequency in milliseconds. useful for setting delay lines to create specific pitches.",
       "type" : "modulators"
    },
-   "notetopulse" : {
+   "notetopulse" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "trigger a pulse whenever a note is received",
       "type" : "pulse"
    },
-   "notewrap" : {
+   "notewrap" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "min" : "bottom of pitch range",
          "range" : "number of semitones before wrapping back down to min pitch"
       },
       "description" : "wrap an input pitch to stay within a desired range",
       "type" : "note effects"
    },
-   "oscillator" : {
+   "oscillator" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "adsr len" : "view length of ADSR controls",
          "detune" : "when unison is 1, detunes oscillator by this amount. when unison is 2, one oscillator is tuned normally and the other is detuned by this amount. when unison is >2, oscillators are randomly detuned within this range.",
          "env" : "[none]",
@@ -1682,11 +2081,13 @@
       "description" : "polyphonic enveloped oscillator. modulations (with MPE support): modwheel closes filter further (if filter is enabled), pressure decreases detune amount",
       "type" : "synths"
    },
-   "oscoutput" : {
+   "oscoutput" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "label*" : "label to send slider value. the message will be sent in the format /bespoke/[label] [value]",
          "note out address" : "label to send input notes. the message will be sent in the format /bespoke/[label] [pitch] [velocity]",
          "osc out address" : "destination to send OSC messages to",
@@ -1696,127 +2097,151 @@
       "description" : "send OSC messages when slider values change or when notes are received",
       "type" : "other"
    },
-   "output" : {
+   "output" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "ch" : "channel (or channels, if you want stereo) to send audio to"
       },
       "description" : "route audio in here to send it to an output channel (your speakers or audio interface)",
       "type" : "audio effects"
    },
-   "panner" : {
+   "panner" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
-         "pan" : "amount to send signal to the left and right channels. a value of .5 is centered.",
+      "controls" : 
+      {
+         "pan" : "amount to send signal to the left and right channels. a value of 0 is centered.",
          "widen" : "delay a channel by this many samples. results in a pan-like effect where the sound seems to come from from a direction."
       },
       "description" : "pan audio left and right. also, converts a mono input to a stereo output.",
       "type" : "audio effects"
    },
-   "pitchbender" : {
+   "pitchbender" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "bend" : "bend amount, in semitones"
       },
       "description" : "add pitch bend to notes",
       "type" : "note effects"
    },
-   "pitchchorus" : {
+   "pitchchorus" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "passthrough" : "should the original audio pass through?"
       },
       "description" : "output pitch-shifted version of input audio, based on input midi notes. pitch 60 is the reference pitch used.",
       "type" : "unknown"
    },
-   "pitchdive" : {
+   "pitchdive" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "start" : "semitone offset to start from",
          "time" : "time in milliseconds to ramp from pitch offset into input pitch"
       },
       "description" : "use pitchbend to settle into an input pitch from a starting offset",
       "type" : "note effects"
    },
-   "pitchpanner" : {
+   "pitchpanner" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "left" : "pitch that represents full left pan",
          "right" : "pitch that represents full right pan"
       },
       "description" : "add pan modulation to notes based upon input pitch, so low pitches are panned in one direction and high pitches are panned in another",
       "type" : "note effects"
    },
-   "pitchremap" : {
+   "pitchremap" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "from*" : "pitch to change",
          "to*" : "desired pitch"
       },
       "description" : "remap input pitches to different output pitches",
       "type" : "note effects"
    },
-   "pitchsetter" : {
+   "pitchsetter" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "pitch" : "the pitch to use"
       },
       "description" : "set an incoming note to use a specified pitch",
       "type" : "note effects"
    },
-   "pitchshift" : {
-      "canReceiveAudio" : false,
+   "pitchshift" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "ratio" : "amount to pitchshift by (a value of 1 indicates no shift)",
          "ratioselector" : "shortcuts to useful pitch ratios"
       },
       "description" : "shifts a signal's pitch",
       "type" : "effect chain"
    },
-   "pitchtocv" : {
+   "pitchtocv" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "max" : "output for pitch 127",
          "min" : "output for pitch 0"
       },
       "description" : "take a note's pitch and convert it to a modulation value",
       "type" : "modulators"
    },
-   "pitchtospeed" : {
+   "pitchtospeed" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "ref freq" : "the output is the input frequency divided by this number"
       },
       "description" : "convert an input pitch to a speed ratio. you could use this to control a sample's playback speed and make it playable with a keyboard.",
       "type" : "modulators"
    },
-   "playsequencer" : {
+   "playsequencer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "grid" : "patch a grid in here from a \"midicontroller\" module",
          "interval" : "the step size",
          "link columns" : "if the mute/delete control should be shared across the entire column",
@@ -1830,33 +2255,57 @@
       "description" : "drum sequencer that allows you to punch in to record and overdub steps, inspired by the pulsar-23 drum machine",
       "type" : "instruments"
    },
-   "polyrhythms" : {
+   "plugin" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "open" : "show the plugin window",
+         "panic" : "send \"all notes off\" and \"all sounds off\" to this plugin in order to silence it immediately",
+         "preset" : "choose from saved plugin presets",
+         "program change" : "send a program change message to the plugin instance",
+         "save as" : "save the current plugin settings as a preset to load again later",
+         "show parameter" : "select parameters to display them, so they can be adjusted from within bespoke's interface. if a plugin has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the plugin's interface.",
+         "vol" : "adjust the output volume"
+      },
+      "description" : "a hosted plugin instance, such as a VST",
+      "type" : "unknown"
+   },
+   "polyrhythms" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
          "length*" : "number of steps for this line",
          "note*" : "pitch to use for this line"
       },
       "description" : "looping sequence with lines on different divisions",
       "type" : "instruments"
    },
-   "portamento" : {
+   "portamento" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "glide" : "time to glide, in milliseconds",
-         "require held" : "if enabled, only glide to a new note if an old note is held. otherwise, always glide, based upon the prior input note."
+         "mode" : "always: always glide to new notes\nretrigger held: bend to notes if the prior note is held, and retrigger\nbend held: bend to notes if the prior note is held, without retriggering"
       },
       "description" : "only allows one note to play at a time, and uses pitch bend to glide between notes",
       "type" : "note effects"
    },
-   "prefab" : {
+   "prefab" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "disband" : "free all modules from this prefab",
          "load" : "load a .pfb",
          "save" : "save as a .pfb file"
@@ -1864,122 +2313,158 @@
       "description" : "create a collection of modules that can be loaded from the \"prefabs\" menu. drag and drop modules onto here to add them to the prefab. drag the grey cable to any modules you want to remove from the prefab.",
       "type" : "other"
    },
-   "presets" : {
-      "canReceiveAudio" : false,
-      "canReceiveNote" : false,
-      "canReceivePulses" : false,
-      "controls" : {
-         "blend ms" : "time to blend preset values over",
-         "preset" : "jump to a preset",
-         "save" : "[todo]"
-      },
-      "description" : "save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.",
-      "type" : "other"
-   },
-   "pressure" : {
+   "pressure" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "pressure" : "pressure amount"
       },
       "description" : "add pressure modulation to notes",
       "type" : "note effects"
    },
-   "pressuretocv" : {
+   "pressuretocv" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "max" : "output for pressure 127",
          "min" : "output for pressure 0"
       },
       "description" : "take a note's pressure and convert it to a modulation value",
       "type" : "modulators"
    },
-   "pressuretomodwheel" : {
+   "pressuretomodwheel" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "takes midi pressure modulation input and changes it to modwheel modulation",
       "type" : "note effects"
    },
-   "pressuretovibrato" : {
+   "pressuretovibrato" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "vibinterval" : "vibrato speed",
          "vibrato" : "amount of vibrato"
       },
       "description" : "takes midi pressure modulation input and changes it to vibrato, using pitch bend",
       "type" : "note effects"
    },
-   "previousnote" : {
+   "previousnote" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "description" : "when receiving a note on, output the prior note on that we received",
       "type" : "note effects"
    },
-   "pulsebutton" : {
+   "pulsebutton" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "pulse" : "trigger a pulse"
       },
       "description" : "trigger a pulse with a button press",
       "type" : "pulse"
    },
-   "pulsechance" : {
+   "pulsechance" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
-         "chance" : "chance that pulses are allowed through"
+      "controls" : 
+      {
+         "*" : "generate a new random seed",
+         "<" : "go to next seed",
+         "chance" : "chance that pulses are allowed through",
+         "deterministic" : "allow for randomness to be repeated over an interval",
+         "seed" : "number that determines the random sequence. send reset pulses to restart the deterministic random sequence."
       },
       "description" : "randomly allow pulses through, based on chance",
       "type" : "pulse"
    },
-   "pulsedelayer" : {
+   "pulsedelayer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "delay" : "time to delay, in fractions of a measure"
       },
       "description" : "delay pulses",
       "type" : "pulse"
    },
-   "pulsegate" : {
+   "pulsedisplayer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "description" : "see what flags are on pulses",
+      "type" : "pulse"
+   },
+   "pulseflag" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
+         "flag" : "property to add",
+         "replace" : "if disabled, the above flag is appended to the pulse's flags. if enabled, the pulse's flags are replaced by the above flag."
+      },
+      "description" : "set properties on pulses",
+      "type" : "pulse"
+   },
+   "pulsegate" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
          "allow" : "can pulses pass through?"
       },
       "description" : "control if pulses are allowed through",
       "type" : "pulse"
    },
-   "pulsehocket" : {
+   "pulsehocket" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
+         "*" : "generate a new random seed",
+         "<" : "go to next seed",
+         "seed" : "number that determines the random sequence. send reset pulses to restart the deterministic random sequence.",
          "weight *" : "chance that pulse goes to this destination"
       },
       "description" : "sends pulses to randomized destinations",
       "type" : "pulse"
    },
-   "pulser" : {
+   "pulser" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "div" : "measure division, when using \"div\" as the interval",
          "interval" : "rate to send pulses",
-         "offset" : "pulse time offset, in fractions of a measure",
+         "offset" : "pulse time offset, in fractions of the interval",
          "random" : "tell pulsed modules to randomize their position",
          "reset" : "length of sequence before sending reset pulse",
          "t" : "pulse interval in milliseconds",
@@ -1988,11 +2473,13 @@
       "description" : "send pulse messages at an interval",
       "type" : "pulse"
    },
-   "pulsesequence" : {
+   "pulsesequence" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "<" : "shift sequence to the left",
          ">" : "shift sequence to the right",
          "interval" : "length of each step within the sequence",
@@ -2001,22 +2488,26 @@
       "description" : "defines a looping sequence of pulses",
       "type" : "pulse"
    },
-   "pulsetrain" : {
+   "pulsetrain" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "interval" : "length of each step within the sequence",
          "length" : "length of the sequence"
       },
       "description" : "defines a list of pulses to execute, once pulsed",
       "type" : "pulse"
    },
-   "pumper" : {
-      "canReceiveAudio" : false,
+   "pumper" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "amount" : "amount to lower volume",
          "attack" : "how sharply the volume drops",
          "curve" : "how the volume returns",
@@ -2026,29 +2517,34 @@
       "description" : "dip the volume of a signal rhythmically, to emulate a \"pumping sidechain\" effect",
       "type" : "effect chain"
    },
-   "push2control" : {
+   "push2control" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "description" : "use an ableton push 2 to control bespoke's interface",
       "type" : "other"
    },
-   "quantizer" : {
+   "quantizer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "quantize" : "the quantization interval",
          "repeat" : "when holding a note, should we repeat it every interval?"
       },
       "description" : "delay inputs until the next quantization interval",
       "type" : "note effects"
    },
-   "radiosequencer" : {
+   "radiosequencer" : 
+   {
       "canReceiveAudio" : false,
-      "canReceiveNote" : false,
-      "canReceivePulses" : false,
-      "controls" : {
+      "canReceiveNote" : true,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
          "grid" : "patch a grid in here from a \"midicontroller\" module",
          "interval" : "rate to advance",
          "length" : "length of sequence"
@@ -2056,11 +2552,13 @@
       "description" : "sequence to only enable one value at a time. patch it to the \"enabled\" checkbox on several modules to only enable one module at a time. works well in conjunction with \"groupcontrol\" module.",
       "type" : "other"
    },
-   "ramper" : {
+   "ramper" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "length" : "length of time to blend over",
          "start" : "begin blending (or, send a pulse to this module for the same result)",
          "target" : "the value to arrive at when the ramp is over"
@@ -2068,11 +2566,13 @@
       "description" : "blend a control to a specified value over a specified time",
       "type" : "modulators"
    },
-   "randomnote" : {
+   "randomnote" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "interval" : "the note length",
          "offset" : "the amount of time to offset playback within the interval",
          "pitch" : "the pitch to use",
@@ -2083,11 +2583,13 @@
       "description" : "play a note at a given interval with a random chance",
       "type" : "instruments"
    },
-   "ringmodulator" : {
+   "ringmodulator" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "dry/wet" : "how much of the original audio to use vs modulated audio",
          "freq" : "frequency to use. can also be set by patching a note input into this module.",
          "glide" : "how long an input note should take to glide to the desired frequency",
@@ -2096,22 +2598,26 @@
       "description" : "modulate a signal's amplitude at a frequency",
       "type" : "audio effects"
    },
-   "samplebrowser" : {
+   "samplebrowser" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          " < " : "previous page",
          " > " : "next page"
       },
       "description" : "browse your system for samples. drag samples from here to your desired targets (sampleplayer, drumplayer, seaofgrain, etc)",
       "type" : "other"
    },
-   "samplecanvas" : {
+   "samplecanvas" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "canvas" : "canvas of samples. drag and drop samples onto here. canvas controls:\n-hold shift and drag a sample to duplicate\n-hold alt to drag a sample without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view",
          "clear" : "delete all elements",
          "delete" : "delete highlighted elements",
@@ -2126,11 +2632,13 @@
       "description" : "sample arranging view",
       "type" : "synths"
    },
-   "samplecapturer" : {
+   "samplecapturer" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "delete" : "clear this clip",
          "play" : "play this clip",
          "record" : "should we record?",
@@ -2139,11 +2647,13 @@
       "description" : "[work in progress]record audio to short clips. recording starts when audio passes a threshold.",
       "type" : "audio effects"
    },
-   "sampleplayer" : {
+   "sampleplayer" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
-      "canReceivePulses" : false,
-      "controls" : {
+      "canReceivePulses" : true,
+      "controls" : 
+      {
          "16" : "auto-slice 16 slices",
          "32" : "auto-slice 32 slices",
          "4" : "auto-slice 4 slices",
@@ -2154,6 +2664,7 @@
          "cue len" : "length in seconds of the current cue. a value of zero will play to the end of the sample.",
          "cue speed" : "playback speed of the current cue",
          "cue start" : "start point in seconds of the current cue",
+         "cue stop" : "stop playing this cue if a note-off is received",
          "cuepoint" : "sets the current cue to edit",
          "grabhovered" : "grab a sample of this cue to drop onto another module",
          "load" : "show a file chooser to load a sample",
@@ -2180,11 +2691,13 @@
       "description" : "sample playback with triggerable cue points, clip extraction, and youtube search/download functionality. resize this module larger to access additional features. if you have a youtube URL in your clipboard, a button will appear to allow you to download the audio.",
       "type" : "synths"
    },
-   "sampler" : {
+   "sampler" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "env" : "volume envelope",
          "envA" : "volume envelope attack",
          "envD" : "volume envelope decay",
@@ -2199,11 +2712,13 @@
       "description" : "very basic polyphonic pitched sample player and recorder. send audio in, and use note input to play the recorded audio.",
       "type" : "synths"
    },
-   "samplergrid" : {
+   "samplergrid" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "clear" : "when enabled, clears any pressed grid squares",
          "duplicate" : "what enabled, duplicates last pressed sample onto any pressed grid squares",
          "edit" : "enable controls to adjust recorded sample for last pressed grid square",
@@ -2216,79 +2731,95 @@
       "description" : "record input onto pads, and play back the pads. intended to be used with an 64-pad grid controller.",
       "type" : "audio effects"
    },
-   "scale" : {
+   "scale" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "PPO" : "pitches per octave",
          "degree" : "",
          "intonation" : "which method to use to tune the scale",
+         "load KBM" : "load KBM file to determine keyboard mapping",
+         "load SCL" : "load SCL file to determine scale",
          "note" : "the pitch that maps to the frequency defined in \"tuning\"",
          "root" : "root note of the scale",
          "scale" : "which set of notes to use",
-         "tet" : "how many semitones make up an octave",
          "tuning" : "what frequency does the pitch defined in \"note\" represent?"
       },
       "description" : "controls the global scale used by various modules",
       "type" : "other"
    },
-   "scaledegree" : {
+   "scaledegree" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "degree" : "amount to transpose",
+         "diatonic" : "should we keep transposed notes in the scale?",
          "retrigger" : "immediately replay current notes when changing the transpose amount"
       },
       "description" : "transpose input based on current scale",
       "type" : "note effects"
    },
-   "scaledetect" : {
+   "scaledetect" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "matches" : "matching scales for this root",
          "reset" : "reset the input collection of notes"
       },
       "description" : "detect which scales fit a collection of entered notes. the last played pitch is used as the root.",
       "type" : "note effects"
    },
-   "script" : {
+   "script" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "?" : "show scripting reference",
-         "a" : "variable for the script to use, can be modulation by other sources",
-         "b" : "variable for the script to use, can be modulation by other sources",
-         "c" : "variable for the script to use, can be modulation by other sources",
+         "a" : "variable for the script to use, can be modulation by other sources. access via me.get(\"a\")",
+         "b" : "variable for the script to use, can be modulation by other sources. access via me.get(\"b\")",
+         "c" : "variable for the script to use, can be modulation by other sources. access via me.get(\"c\")",
          "code" : "write code here. press ctrl-R to execute the code, or ctrl-shift-R to just execute the current block.",
-         "d" : "variable for the script to use, can be modulation by other sources",
+         "d" : "variable for the script to use, can be modulation by other sources. access via me.get(\"d\")",
          "load" : "load selected script",
          "loadscript" : "choose a script from here, then press \"load\"",
          "run" : "click here to execute the code, or press ctrl-R",
          "save as" : "save the current script",
-         "stop" : "cancel any events scheduled by this script"
+         "stop" : "cancel any events scheduled by this script",
+         "style" : "choose a text theme, from script_styles.json"
       },
       "description" : "python scripting for livecoding notes and module control",
       "type" : "other"
    },
-   "scriptstatus" : {
+   "scriptstatus" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "reset all" : "resets scope variables"
       },
       "description" : "shows everything in the current python scope, for debugging",
       "type" : "other"
    },
-   "seaofgrain" : {
+   "seaofgrain" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "display length" : "amount of sample to view",
          "gain *" : "volume of this voice",
          "keyboard base pitch" : "midi pitch that represents the start of the sample",
@@ -2311,43 +2842,51 @@
       "description" : "granular synth, playable with sliders or MPE input",
       "type" : "synths"
    },
-   "selector" : {
+   "selector" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "selector" : "which value should be set to 1"
       },
       "description" : "radio button control to only enable one value at a time. patch it to the \"enabled\" checkbox on several modules to only enable one module at a time. works well in conjunction with \"groupcontrol\" module.",
       "type" : "other"
    },
-   "send" : {
+   "send" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "amount" : "amount to send out the right-side cable",
          "crossfade" : "when true, output of the left-side cable is reduced as \"amount\" increases"
       },
       "description" : "duplicate a signal and send it to a second destination",
       "type" : "audio effects"
    },
-   "signalclamp" : {
+   "signalclamp" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "max" : "maximum output value",
          "min" : "minimum output value"
       },
       "description" : "clamps an audio signal's value within a range",
       "type" : "audio effects"
    },
-   "signalgenerator" : {
+   "signalgenerator" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
-      "canReceivePulses" : false,
-      "controls" : {
+      "canReceivePulses" : true,
+      "controls" : 
+      {
          "detune" : "amount to detune from specified frequency",
          "freq" : "signal frequency",
          "freq mode" : "what mode should we use for input notes? \"instant\" changes to the input note's frequency instantly, \"ramp\" ramps to the frequency over time, and \"slider\" allows you to use a slider to interpolate between the last two input notes",
@@ -2363,14 +2902,16 @@
          "syncf" : "frequency to reset the phase, when \"sync\" is enabled",
          "vol" : "output volume"
       },
-      "description" : "basic oscillator signal",
+      "description" : "basic oscillator signal. send a note into it to set the frequency, and send a pulse to reset the phase.",
       "type" : "synths"
    },
-   "slidersequencer" : {
+   "slidersequencer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "division" : "rate to progress",
          "note*" : "pitch for this element",
          "playing*" : "is this element playing?",
@@ -2380,36 +2921,96 @@
       "description" : "trigger notes along a continuous timeline",
       "type" : "instruments"
    },
-   "smoother" : {
+   "smoother" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "input" : "set a value to smooth, patch a modulator into here",
          "smooth" : "amount of smoothing to apply"
       },
       "description" : "outputs a smoothed value of the input",
       "type" : "modulators"
    },
-   "spectrum" : {
+   "snapshots" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "add" : "snapshot the currently connected controls to the next available snapshot slot",
+         "auto-store on switch" : "when switching to a new slot, automatically store state in the current slot",
+         "blend" : "length of time in milliseconds over which to blend snapshot values",
+         "clear" : "clear all snapshots",
+         "delete" : "when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)",
+         "random" : "randomize connected controls",
+         "snapshot" : "jump to a snapshot",
+         "snapshot label" : "assign a label to this snapshot",
+         "store" : "when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)"
+      },
+      "description" : "save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.",
+      "type" : "other"
+   },
+   "songbuilder" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
+         "activate first scene on stop" : "when stopping, activate the first scene. it is recommended that you use the first scene as an \"off\" scene, and have it disable all song elements.",
+         "add target" : "add a targeted control for scenes to affect",
+         "bars*" : "length in bars that this scene should play for",
+         "change quantize" : "when a change should happen after pressing the play button on a scene. \"switch\" changes immediately, and \"jump\" changes immediately and also resets the global transport.",
+         "checkbox*" : "value to use for target in this scene",
+         "context*" : "options for this scene",
+         "contextmenu*" : "options for this step",
+         "dropdown*" : "value to use for target in this scene",
+         "go*" : "play this scene",
+         "loop" : "enable a loop within the sequence",
+         "loop end" : "loop step index that the loop ends",
+         "loop start" : "loop step index to start the loop on",
+         "move left" : "move this target left in the scene",
+         "move right" : "move this target right in the scene",
+         "name*" : "name of this scene",
+         "pause" : "hold the sequence on the current scene",
+         "play" : "play the sequence",
+         "play from*" : "play sequence from this step",
+         "scene*" : "name of scene for this step",
+         "stop" : "stop the sequence",
+         "type" : "change the control display type for this target",
+         "use sequencer" : "show scene sequencer",
+         "value*" : "value to use for target in this scene"
+      },
+      "description" : "large-scale organizer to arrange settings into scenes and then sequence them. this is bespoke's \"song mode\"",
+      "type" : "other"
+   },
+   "spectrum" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "description" : "display audio signal's spectral data",
       "type" : "audio effects"
    },
-   "splitter" : {
+   "splitter" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "description" : "splits a stereo signal into two mono signals, or duplicates a mono signal",
       "type" : "audio effects"
    },
-   "stutter" : {
+   "stutter" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "16th" : "16th note stutter",
          "32nd" : "32nd note stutter",
          "64th" : "64th note stutter",
@@ -2433,72 +3034,87 @@
       "description" : "captures and stutters input",
       "type" : "audio effects"
    },
-   "subtract" : {
+   "subtract" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "value 1" : "",
          "value 2" : ""
       },
       "description" : "outputs the result of value 2 subtracted from value 1. value 1 and value 2 are intended to be patch targets for modulators.",
       "type" : "modulators"
    },
-   "sustainpedal" : {
+   "sustainpedal" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "sustain" : "should we hold the input notes?"
       },
       "description" : "keeps input notes sustaining",
       "type" : "note effects"
    },
-   "takerecorder" : {
+   "takerecorder" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "start" : "[todo]"
       },
       "description" : "[abandoned module, possibly broken]",
       "type" : "unknown"
    },
-   "timelinecontrol" : {
+   "timelinecontrol" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
-         "loop" : "[todo]",
-         "loop end" : "[todo]",
-         "loop start" : "[todo]",
-         "measure" : "[todo]"
+      "controls" : 
+      {
+         "dock" : "should we dock this module to the UI layer?",
+         "length" : "length of timeline display, in measures",
+         "loop" : "should we have a looping section?",
+         "loop end" : "measure end of loop",
+         "loop start" : "measure start of loop",
+         "measure" : "current position. click to jump around.",
+         "reset" : "reset to beginning"
       },
-      "description" : "[abandoned module, possibly broken] global timeline control to position transport",
-      "type" : "unknown"
+      "description" : "control global transport position",
+      "type" : "other"
    },
-   "timerdisplay" : {
+   "timerdisplay" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "reset" : "reset timer to zero"
       },
       "description" : "displays a timer to indicate how long a patch has been running",
       "type" : "other"
    },
-   "titlebar" : {
+   "titlebar" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          " ? " : "show help",
          "autosave" : "every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.",
          "load" : "load a saved .bsk file to restore state",
          "load layout" : "[none]",
          "lookahead (exp.)" : "use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.",
+         "new patch" : "reset to the layout specified in \"layout\" in userprefs.json",
          "play/pause" : "stop all audio processing (shift-p)",
-         "reset layout" : "reset to the layout specified in \"layout\" in userprefs.json",
          "save" : "save current state as .bsk file, to be restored later",
          "save as" : "save current state as a new .bsk file",
          "save layout" : "[none]",
@@ -2508,15 +3124,18 @@
       "description" : "",
       "type" : "unknown"
    },
-   "transport" : {
+   "transport" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          " + " : "increase tempo by one",
          " - " : "decrease tempo by one",
          " < " : "nudge current time backward",
          " > " : "nudge current time forward",
+         "play/pause" : "stop all audio processing (shift-p)",
          "reset" : "reset timeline to zero",
          "set tempo" : "",
          "swing" : "where the halfway point of musical time within the swing interval should fall. a value of .5 represents no swing.",
@@ -2528,22 +3147,26 @@
       "description" : "controls tempo and current time position",
       "type" : "other"
    },
-   "transposefrom" : {
+   "transposefrom" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "retrigger" : "immediately replay current notes when changing the transpose root or the scale",
          "root" : "root to transpose from"
       },
       "description" : "transpose input from a specified root to the root of the current scale. the primary usage of this would be to allow you to play a keyboard in C, but it gets transposed to the current scale.",
       "type" : "note effects"
    },
-   "tremolo" : {
-      "canReceiveAudio" : false,
+   "tremolo" : 
+   {
+      "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "amount" : "amount to lower volume",
          "duty" : "pulse width of LFO",
          "interval" : "speed of LFO",
@@ -2553,11 +3176,13 @@
       "description" : "modulate signal's volume rhythmically",
       "type" : "effect chain"
    },
-   "unstablemodwheel" : {
+   "unstablemodwheel" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "amount" : "amount of mutation",
          "noise" : "fast-later mutation rate",
          "warble" : "slow-layer mutation rate"
@@ -2565,11 +3190,13 @@
       "description" : "mutate MPE slide with perlin noise",
       "type" : "note effects"
    },
-   "unstablepitch" : {
+   "unstablepitch" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "amount" : "amount of mutation",
          "noise" : "fast-later mutation rate",
          "warble" : "slow-layer mutation rate"
@@ -2577,11 +3204,13 @@
       "description" : "mutate MPE pitchbend with perlin noise",
       "type" : "note effects"
    },
-   "unstablepressure" : {
+   "unstablepressure" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "amount" : "amount of mutation",
          "noise" : "fast-later mutation rate",
          "warble" : "slow-layer mutation rate"
@@ -2589,53 +3218,127 @@
       "description" : "mutate MPE pressure with perlin noise",
       "type" : "note effects"
    },
-   "valuesetter" : {
+   "userprefseditor" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "audio_input_device" : "which device to use for audio input (requires restart)",
+         "audio_output_device" : "which device to use for audio output (requires restart)",
+         "autosave" : "should autosave be enabled on startup",
+         "background_b" : "blue RGB value of canvas background",
+         "background_g" : "green RGB value of canvas background",
+         "background_r" : "red RGB value of canvas background",
+         "buffersize" : "what buffer size to use with your audio device. lower values use require more CPU power, higher values add more latency. (requires restart)",
+         "cable_drop_behavior" : "what should be behavior be when you drag a cable and drop it into empty space?",
+         "cable_quality" : "visual resolution of the cables",
+         "devicetype" : "what kind of audio device bespoke should use (requires restart)",
+         "draw_background_lissajous" : "should the background lissajous curve draw",
+         "draw_module_highlights" : "should modules visually flash in response to activity",
+         "fade_cable_middle" : "should longer cables draw with a fadeout effect in the middle",
+         "ffmpeg_path" : "the path to your ffmpeg installation (used for youtube downloading in sampleplayer module)",
+         "grid_snap_size" : "grid size to use when snapping module position (hold alt/option while dragging a module)",
+         "height" : "height of bespoke's window on startup",
+         "immediate_paste" : "when enabled, pasting values on UI controls will apply immediately instead of requiring you to press enter",
+         "layout" : "what template bespoke should use on startup",
+         "lissajous_b" : "blue RGB value of lissajous curve",
+         "lissajous_g" : "green RGB value of lissajous curve",
+         "lissajous_r" : "red RGB value of lissajous curve",
+         "max_input_channels" : "number of input channels to allocate (requires restart)",
+         "max_output_channels" : "number of output channels to allocate (requires restart)",
+         "motion_trails" : "amount of visual motion blur to use (increases/decreases \"ghosting\" of previous frames)",
+         "mouse_offset_x" : "x offset between system mouse position and bespoke's cursor placement",
+         "mouse_offset_y" : "y offset between system mouse position and bespoke's cursor placement",
+         "oversampling" : "global oversampling multiplier. uses additional CPU for higher-resolution audio processing. (requires restart)",
+         "plugin_preference_order" : "semicolon-separated list of plugin formats, in preferred order. if a plugin exists with multiple formats, only the most preferred format will be shown. leave this blank to always show all plugins. (default value: \"VST3;VST;AudioUnit;LV2\")",
+         "position_x" : "desired x position of upper-left corner",
+         "position_y" : "desired y position of upper-left corner",
+         "record_buffer_length_minutes" : "length of always-on recording buffer for \"write audio\" button in the title bar (requires restart)",
+         "recordings_path" : "where \"write audio\" and multitrackrecorder wav files save",
+         "samplerate" : "what sample rate to use with your audio device (requires restart)",
+         "scroll_multiplier_horizontal" : "adjustment to horizontal mouse/trackpad scroll speed",
+         "scroll_multiplier_vertical" : "adjustment to vertical mouse/trackpad scroll speed",
+         "set_manual_window_position" : "should we force bespoke to a specific position on startup",
+         "show_minimap" : "should the minimap be displayed (requires restart)",
+         "show_tooltips_on_load" : "should tooltips be enabled on startup",
+         "tooltips" : "what path we should use for the tooltip file (changing this allows for other languages to be used for tooltips)",
+         "ui_scale" : "scale of UI layer (title bar, quickspawn menu, etc)",
+         "vst_always_on_top" : "should plugin windows always stay on top of bespoke when opened",
+         "width" : "width of bespoke's window on startup",
+         "youtube_dl_path" : "the path to your youtube-dl installation (used for youtube downloading in sampleplayer module)",
+         "zoom" : "desired canvas zoom level on startup"
+      },
+      "description" : "settings for bespoke. some settings changes require bespoke to be restarted before taking effect.",
+      "type" : "unknown"
+   },
+   "valuesetter" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : true,
-      "controls" : {
+      "controls" : 
+      {
          "set" : "click here to send the value (or, send a pulse to this module for the same result)",
+         "slider" : "value to set",
          "value" : "value to set"
       },
       "description" : "set a specified value on a targeted control",
       "type" : "modulators"
    },
-   "valuestream" : {
+   "valuestream" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "speed" : "how quickly display should scroll"
       },
-      "description" : "displays a control's value over time",
+      "description" : "displays a control's value over time. connect the cable to a UI control to see how it is changing.",
       "type" : "other"
    },
-   "velocityscaler" : {
+   "velocitycurve" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "description" : "adjust velocity based upon a curve mapping",
+      "type" : "note effects"
+   },
+   "velocityscaler" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
          "scale" : "amount to multiply velocity by"
       },
       "description" : "scale a note's velocity to be higher or lower",
       "type" : "note effects"
    },
-   "velocitysetter" : {
+   "velocitysetter" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "rand" : "randomness to reduce output velocity by",
          "vel" : "velocity to use"
       },
       "description" : "set a note's velocity to this value",
       "type" : "note effects"
    },
-   "velocitystepsequencer" : {
+   "velocitystepsequencer" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "downbeat" : "should we reset the sequence every downbeat?",
          "interval" : "speed to advance sequence",
          "len" : "length of sequence",
@@ -2644,43 +3347,68 @@
       "description" : "adjusts the velocity of incoming notes based upon a sequence",
       "type" : "note effects"
    },
-   "velocitytocv" : {
+   "velocitytochance" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
+         "*" : "generate a new random seed",
+         "<" : "go to next seed",
+         "beat length" : "restart the deterministic random sequence at this interval",
+         "full velocity" : "set velocity to full for notes that pass through",
+         "seed" : "number that determines the random sequence"
+      },
+      "description" : "use a note's velocity to determine the chance that the note plays",
+      "type" : "note effects"
+   },
+   "velocitytocv" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "0 at note off" : "output zero when note is released",
          "max" : "output for velocity 127",
          "min" : "output for velocity 0"
       },
       "description" : "take a note's velocity and convert it to a modulation value",
       "type" : "modulators"
    },
-   "vibrato" : {
+   "vibrato" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "vibinterval" : "speed of pitch bend oscillation",
          "vibrato" : "amount of pitch bend to add"
       },
       "description" : "add rhythmic oscillating pitch bend to notes",
       "type" : "note effects"
    },
-   "vinylcontrol" : {
+   "vinylcontrol" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "control" : "enable/disable transport control. when you enable it, it will use the current speed as the reference speed (so, the output will output a value of 1 until you change the vinyl's speed)"
       },
       "description" : "modulator which outputs a speed value based upon control vinyl input audio. provide it with a stereo signal from control vinyl (like you'd use to control serato) patched in from an \"input\" module.",
       "type" : "modulators"
    },
-   "vocoder" : {
+   "vocoder" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "bands" : "how many frequency bands to use",
          "carrier" : "carrier signal gain",
          "f base" : "frequency for lowest band",
@@ -2696,18 +3424,21 @@
       "description" : "frequency band-based vocoder. this must be paired with a \"vocodercarrier\" module. voice should be routed into this module, and a synth should be patched into the vocodercarrier.",
       "type" : "audio effects"
    },
-   "vocodercarrier" : {
+   "vocodercarrier" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "description" : "connect to \"vocoder\" or \"fftvocoder\" modules. send the synth audio into this module, and the voice audio into the vocoder module.",
       "type" : "audio effects"
    },
-   "volcabeatscontrol" : {
+   "volcabeatscontrol" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "agogo speed" : "",
          "clap speed" : "",
          "clave speed" : "",
@@ -2723,26 +3454,13 @@
       "description" : "outputs MIDI data to control various aspects of the KORG volca beats drum machine",
       "type" : "note effects"
    },
-   "vstplugin" : {
-      "canReceiveAudio" : false,
-      "canReceiveNote" : false,
-      "canReceivePulses" : false,
-      "controls" : {
-         "open" : "show the plugin window",
-         "preset" : "choose from saved VST presets",
-         "program change" : "send a program change message to the VST instance",
-         "save as" : "save the current VST settings as a preset to load again later",
-         "show parameter" : "select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.",
-         "vol" : "adjust the output volume"
-      },
-      "description" : "a VST plugin instance",
-      "type" : "other"
-   },
-   "waveformviewer" : {
+   "waveformviewer" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "draw gain" : "adjust waveform display scale",
          "freq" : "frequency to sync display to. gets automatically set if you patch a note input into this module",
          "length" : "number of samples to capture"
@@ -2750,23 +3468,26 @@
       "description" : "waveform display",
       "type" : "audio effects"
    },
-   "waveshaper" : {
+   "waveshaper" : 
+   {
       "canReceiveAudio" : true,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
-      "controls" : {
+      "controls" : 
+      {
          "a" : "variable to use in expressions",
          "b" : "variable to use in expressions",
          "c" : "variable to use in expressions",
          "d" : "variable to use in expressions",
          "e" : "variable to use in expressions",
          "rescale" : "rescales input before feeding it into expression",
-         "y=" : "waveshaping expression. try something like \"x+sin(x*pi*a)\". available variables: a,b,c,d,e = the slider + sin(s below. t = time. x1,x2,y1,y2 = biquad state storage."
+         "y=" : "waveshaping expression. try something like \"x+sin(x*pi*a)\". available variables: a,b,c,d,e = the sliders below. t = time. x1,x2,y1,y2 = biquad state storage."
       },
       "description" : "waveshaping with expressions",
       "type" : "audio effects"
    },
-   "whitekeys" : {
+   "whitekeys" : 
+   {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
       "canReceivePulses" : false,

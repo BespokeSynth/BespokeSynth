@@ -12,7 +12,13 @@ Navigation
 Creating Modules
    * drag items out of the top bar menus
        OR
+   * right-click and select from the popup menu
+       OR
+   * right-click and start typing the name of the module you want, then drag it out of the popup menu
+       OR
    * hold the first letter of a module and drag them out of the popup menu
+       OR
+   * drag a cable into space and spawn a connecting module from the popup
    * to delete a module, lasso select + backspace OR use the triangle menu and choose "delete module"
    * to duplicate a module, hold alt/option and drag from the title bar
 
