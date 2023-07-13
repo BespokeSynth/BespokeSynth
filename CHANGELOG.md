@@ -9,11 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added 
 
+- Added button to the `abletonlink` module to allow users to align their measure count phase with peers
+- Added checkboxes to enable deterministic modes on `notechance` and `pulsechance`
+- Added a setting that allows changing the behavior of pasting onto UI controls
+- Added drum pad mode to `gridkeyboard`
+- Added `buffershuffler` module for slicing live input
+- Added Push 2 integrations to many modules.
+- Added option to keep VST preset from resetting exposed param sliders
+- Added polyphony to `notetable`
+- Added interface to allow better control over storing/deleting snapshots via `midicontroller`
+- Added `extend` button to `looper`
 - Added option to snapshot module to auto-store entries when switching between snapshots
 - Added ability to delete snapshots by holding alt and clicking
-- Added the ability to send notes and pulses directly to modules through OSC.
-- Added the ability to toggle minimize and enabled state of modules through OSC.
-- Added a way to move to a module as well as zoom to it through OSC.
+- Added the ability to send notes and pulses directly to modules through OSC
+- Added the ability to toggle minimize and enabled state of modules through OSC
+- Added a way to move to a module as well as zoom to it through OSC
 - Added outline stroke to held modules
 - Added `looperrecorder` option to disable auto-advancing to the next `looper`
 - Added `pulseflag` module to explicitly control pulse types
@@ -33,8 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `songbuilder` module
 - Added timestamps to all control updates for sample-accurate actions
 - Added "diatonic" checkboxes to capo and scaledegree
-- `Radiosequencer`: added num_rows option
-- `Noteoctaver`: added retrigger option
+- Added num_rows option to `radiosequencer`
+- Added retrigger option to `noteoctaver`
 - Added `boundstopulse` module
 - New quickspawn features: right click to browse, right click + type to search, press shift twice quickly to launch quick spawn menu
 - Added slider mode to `controlsequencer`
@@ -64,6 +74,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Don't clear `looperrecorder` input buffer when committing to a `looper`
+- Made canvas contents snapshottable across all modules with canvases
+- Emproved midi clockin smoothness by switching to "delay-locked loop" setup
+- Made the `transport` increase/decrease buttons jump to integer tempos, as a convenience to hit an exact integer tempo
+- Allow disabling of `output` limiter
+- In the `tranpsort` module made nudge finer-grained, and made reset start a stopped transport
+- Added ability to stop passthrough on `looper`
+- Make `looperrecorder` not temporarily silence after committing a loop, added a triangle menu checkbox to bring the old behavior back
+- Listen to midi clock start/stop/reset messages, make start also resume playback
+- Improved the `chorddisplayer` module
+- Allow the scrollwheel to adjust the Q slider while hovering over a dot in the `eq` module
+- Make it possible to enable/disable the `quantizer` module
+- Changed how grid controllers edit drumsequencer, making it more responsive
+- Feedback is now given when `write audio` completes
+- Made the room size slider non linear in the `freeverb` effect
+- Allow the `freeverb` roomsize value to go to `1` since this also works perfectly without feedback.
+- When doing a "set" from the midicontroller, always force a value update
 - Massive RAM savings by changing how global record buffer saves
 - Sort the file list in the vstplugin's preset dropdown.
 - Renamed `presets` to `snapshots`, to better reflect what the module does
@@ -114,7 +141,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed that prefabs (or containers) were saving twice.
+- Fixed `basiceq` not saving state
+- Fixed issue where oversampling caused global record buffer to save at wrong rate
+- Fixed some modulation inconsistencies
+- Fixed a crash on load caused by effectchains with deleted prior effects of the same type
+- Move the timestamp check so that `MultitrackRecorder` bounces have a timestamp even when the savestate wasn't saved yet
+- Clean up data when removing a mapping in the `macroslider`
+- Fixed `notecanvas` arrows causing notes to double-move
+- Remove 0 from ADSR sliders to avoid the ability to cause NaNs
+- Initialize default values for modulation curves, fixes issue where `notecanvas` or `notelooper` notes sounded different from notes played from `keyboarddisplay`, `midicontroller`, etc
+- Made the `groupcontrol` module apply to all connections instead of only the first
+- Fixed crash when clicking `scale`'s "load SCL" or "load KBM" buttons via a `midicontroller`
+- Fixed issue where opening a plugin with a modal popup will endlessly spam the popup
+- Fixed a bug where `LFO` and `EnvelopeEditor` modules would not restore their minimized state
+- Fixed a bug where the `midioutput` would not correctly handle the UseVoiceAsChannel setting for modulation.
+- Fixed a bug where the ramper would never reach its target value
+- Fixed push2control not saving bookmarks and favorites 
+- Fixed that prefabs (or containers) were saving twice
 - Fixed EnvelopeEditor modulation when minimized
 - Hard limit the number of `effectchain` modules instead of a crashing
 - Made the `effectchain` effect controls untargetable by modulation cables since this crashes when modules are deleted.
@@ -122,7 +165,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed notecreator not disabling correctly
 - Remove cables targeting controls on a deleting module
 - Fixed the `circlesequencer` not triggering a note when a circle is set to `1`
-- Made file extensions mostly case insensitive on all platforms.
+- Made file extensions mostly case insensitive on all platforms
 - Refresh the file list in a `vstplugin` so that MIDI/OSC and other modulation work on load.
 - Fixed a bug where note off's would turn off all notes with the same pitch even when specific voice id's were used
 - Don't light up `notefilter` when velocity 0 is received 
@@ -202,6 +245,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Removed the `drumsequencer` presets, and replace them with a "clear" button
 - Removed a few options that were completely ignored in the `oscillator` module
 
 
