@@ -123,11 +123,11 @@ public:
    TitleBar();
    ~TitleBar();
 
-
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
    bool AlwaysOnTop() override { return true; }
    bool IsSingleton() const override { return true; }
+   void Poll() override;
 
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
 
