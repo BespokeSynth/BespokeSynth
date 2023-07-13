@@ -72,6 +72,7 @@ snapshots~save and restore sets of values. connect the grey circle to modules to
 ~store~when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)
 ~delete~when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)
 ~auto-store on switch~when switching to a new slot, automatically store state in the current slot
+~snapshot label~assign a label to this snapshot
 
 
 
@@ -208,7 +209,7 @@ pulser~send pulse messages at an interval
 
 pulsehocket~sends pulses to randomized destinations
 ~weight *~chance that pulse goes to this destination
-~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
+~seed~number that determines the random sequence. send reset pulses to restart the deterministic random sequence.
 ~<~go to previous seed
 ~*~generate a new random seed
 ~<~go to next seed
@@ -237,7 +238,8 @@ pulsedisplayer~see what flags are on pulses
 
 pulsechance~randomly allow pulses through, based on chance
 ~chance~chance that pulses are allowed through
-~seed~number that determines the random sequence. send reset pulses to restart the determined random sequence.
+~deterministic~allow for randomness to be repeated over an interval
+~seed~number that determines the random sequence. send reset pulses to restart the deterministic random sequence.
 ~<~go to previous seed
 ~*~generate a new random seed
 ~<~go to next seed
@@ -1420,6 +1422,7 @@ drumplayer~sample player intended for drum playback
 ~grid~patch a grid in here from a "midicontroller" module
 ~quantize~quantize input to this interval
 ~repeat~if quantizing, should held notes repeat at that interval?
+~full vel~always play drum hits at full velocity
 ~vol *~volume of sample 
 ~speed *~speed of sample
 ~pan *~stereo pan position of sample
@@ -1481,7 +1484,7 @@ vibrato~add rhythmic oscillating pitch bend to notes
 
 velocitytochance~use a note's velocity to determine the chance that the note plays
 ~full velocity~set velocity to full for notes that pass through
-~beat length~restart the determined random sequence at this interval
+~beat length~restart the deterministic random sequence at this interval
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
@@ -1547,6 +1550,7 @@ scaledetect~detect which scales fit a collection of entered notes. the last play
 scaledegree~transpose input based on current scale
 ~degree~amount to transpose
 ~retrigger~immediately replay current notes when changing the transpose amount
+~diatonic~should we keep transposed notes in the scale?
 
 
 
@@ -1678,6 +1682,7 @@ notepanalternator~sets a note's pan, alternating between two values, for the int
 
 noteoctaver~transpose a note by octaves
 ~octave~number of octaves to raise or lower
+~retrigger~immediately replay current notes when changing the transpose amount
 
 
 
@@ -1693,7 +1698,7 @@ notehumanizer~add randomness to timing and velocity
 
 notehocket~sends notes to random destinations
 ~weight *~chance that note goes to this destination
-~beat length~restart the determined random sequence at this interval
+~beat length~restart the deterministic random sequence at this interval
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
@@ -1739,7 +1744,8 @@ notedelayer~delay input notes by a specified amount
 
 notechance~randomly allow notes through
 ~chance~probability that a note is allowed
-~beat length~restart the determined random sequence at this interval
+~deterministic~allow for randomness to be repeated over an interval
+~beat length~restart the deterministic random sequence at this interval
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
@@ -1833,6 +1839,7 @@ chorddisplayer~display which chord is playing, in the context of the current sca
 capo~shifts incoming notes by semitones
 ~capo~number of semitones to shift
 ~retrigger~immediately replay current notes when changing the capo amount
+~diatonic~should we keep transposed notes in the scale?
 
 
 
@@ -1957,6 +1964,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~position_y~desired y position of upper-left corner
 ~zoom~desired canvas zoom level on startup
 ~ui_scale~scale of UI layer (title bar, quickspawn menu, etc)
+~cable_drop_behavior~what should be behavior be when you drag a cable and drop it into empty space?
 ~grid_snap_size~grid size to use when snapping module position (hold alt/option while dragging a module)
 ~scroll_multiplier_vertical~adjustment to vertical mouse/trackpad scroll speed
 ~scroll_multiplier_horizontal~adjustment to horizontal mouse/trackpad scroll speed
