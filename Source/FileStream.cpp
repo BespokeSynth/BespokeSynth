@@ -26,8 +26,6 @@
 #include "FileStream.h"
 #include "ModularSynth.h"
 
-#include "juce_core/juce_core.h"
-
 //static
 bool FileStreamIn::s32BitMode = false;
 
@@ -102,6 +100,11 @@ void FileStreamOut::Write(const float* buffer, int size)
 void FileStreamOut::WriteGeneric(const void* buffer, int size)
 {
    mStream->write(buffer, size);
+}
+
+juce::int64 FileStreamOut::GetSize() const
+{
+   return mStream->getPosition();
 }
 
 FileStreamIn& FileStreamIn::operator>>(int& var)

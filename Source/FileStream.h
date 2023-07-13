@@ -29,6 +29,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include "juce_core/juce_core.h"
 
 namespace juce
 {
@@ -51,6 +52,7 @@ public:
    FileStreamOut& operator<<(const char& var);
    void Write(const float* buffer, int size);
    void WriteGeneric(const void* buffer, int size);
+   juce::int64 GetSize() const;
 
 private:
    std::unique_ptr<juce::FileOutputStream> mStream;
