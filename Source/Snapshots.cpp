@@ -28,6 +28,8 @@
 #include "Slider.h"
 #include "ofxJSONElement.h"
 #include "PatchCableSource.h"
+#include "Canvas.h"
+#include "juce_core/juce_core.h"
 
 std::vector<IUIControl*> Snapshots::sSnapshotHighlightControls;
 
@@ -348,6 +350,19 @@ void Snapshots::SetSnapshot(int idx, double time)
             TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
             if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
                textEntry->SetText(i->mString);
+
+            Canvas* canvas = dynamic_cast<Canvas*>(control);
+            if (canvas && !i->mString.empty())
+            {
+               juce::MemoryOutputStream outputStream;
+               juce::Base64::convertFromBase64(outputStream, i->mString);
+               {
+                  FileStreamOut out(ofToDataPath("tmp"));
+                  out.WriteGeneric(outputStream.getData(), outputStream.getDataSize());
+               }
+               FileStreamIn in(ofToDataPath("tmp"));
+               canvas->LoadState(in, true);
+            }
          }
          else
          {
@@ -895,4 +910,20 @@ Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
    TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
    if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
       mString = textEntry->GetText();
+
+   Canvas* canvas = dynamic_cast<Canvas*>(control);
+   if (canvas)
+   {
+      juce::int64 size;
+      {
+         FileStreamOut out(ofToDataPath("tmp"));
+         canvas->SaveState(out);
+         size = out.GetSize();
+      }
+      FileStreamIn in(ofToDataPath("tmp"));
+      char* data = new char[size];
+      in.ReadGeneric(data, size);
+      mString = juce::Base64::toBase64(data, size).toStdString();
+      delete[] data;
+   }
 }
