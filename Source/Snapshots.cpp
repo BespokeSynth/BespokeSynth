@@ -921,8 +921,9 @@ Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
          size = out.GetSize();
       }
       FileStreamIn in(ofToDataPath("tmp"));
-      void* data[size];
+      char* data = new char[size];
       in.ReadGeneric(data, size);
       mString = juce::Base64::toBase64(data, size).toStdString();
+      delete[] data;
    }
 }
