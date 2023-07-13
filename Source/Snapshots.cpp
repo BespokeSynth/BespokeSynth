@@ -354,14 +354,16 @@ void Snapshots::SetSnapshot(int idx, double time)
             Canvas* canvas = dynamic_cast<Canvas*>(control);
             if (canvas && !i->mString.empty())
             {
+               std::string tempFileName = ofToDataPath("tmpread" + ofToString(this));
                juce::MemoryOutputStream outputStream;
                juce::Base64::convertFromBase64(outputStream, i->mString);
                {
-                  FileStreamOut out(ofToDataPath("tmp"));
+                  FileStreamOut out(tempFileName);
                   out.WriteGeneric(outputStream.getData(), outputStream.getDataSize());
                }
-               FileStreamIn in(ofToDataPath("tmp"));
+               FileStreamIn in(tempFileName);
                canvas->LoadState(in, true);
+               juce::File(tempFileName).deleteFile();
             }
          }
          else
@@ -914,16 +916,18 @@ Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
    Canvas* canvas = dynamic_cast<Canvas*>(control);
    if (canvas)
    {
+      std::string tempFileName = ofToDataPath("tmpsave" + ofToString(this));
       juce::int64 size;
       {
-         FileStreamOut out(ofToDataPath("tmp"));
+         FileStreamOut out(tempFileName);
          canvas->SaveState(out);
          size = out.GetSize();
       }
-      FileStreamIn in(ofToDataPath("tmp"));
+      FileStreamIn in(tempFileName);
       char* data = new char[size];
       in.ReadGeneric(data, size);
       mString = juce::Base64::toBase64(data, size).toStdString();
       delete[] data;
+      juce::File(tempFileName).deleteFile();
    }
 }
