@@ -2,4 +2,4 @@ workflow:
   steps:
     - trigger_services:
          project: home:bespokesynth
-         package: bespokesynth-current
+         package: bespokesynth-nightly
