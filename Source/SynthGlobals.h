@@ -52,6 +52,8 @@ void* operator new[](std::size_t size, const char* file, int line) throw(std::ba
 #endif
 #define new DEBUG_NEW
 
+#define BESPOKE_SUPPRESS_NIGHTLY_LABEL 0
+
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
