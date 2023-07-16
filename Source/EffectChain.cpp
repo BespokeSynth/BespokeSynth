@@ -544,7 +544,12 @@ void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeN
       try
       {
          std::string type = effects[i]["type"].asString();
-         AddEffect(type, effects[i]["name"].asString(), !K(onTheFly));
+         std::string name;
+         if (effects[i]["name"].isNull()) //old version before name was saved
+            name = type;
+         else
+            name = effects[i]["name"].asString();
+         AddEffect(type, name, !K(onTheFly));
       }
       catch (Json::LogicError& e)
       {
