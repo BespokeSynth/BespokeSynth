@@ -343,9 +343,9 @@ void TitleBar::DrawModule()
    if (gHoveredModule == this && mLeftCornerHovered)
       ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, .7f, .9f)));
    DrawTextBold("bespoke", 2, 28, 36);
-//#if BESPOKE_NIGHTLY
-//   DrawTextNormal("nightly", 90, 35, 10);
-//#endif
+#if BESPOKE_NIGHTLY && !BESPOKE_SUPPRESS_NIGHTLY_LABEL
+   DrawTextNormal("nightly", 90, 35, 10);
+#endif
 #if DEBUG
    ofFill();
    ofSetColor(0, 0, 0, 180);
