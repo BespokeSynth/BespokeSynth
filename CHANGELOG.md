@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [unreleased]
+
+### Fixed
+
+- Fixed an issue where savestates with `effectchain` modules saved prior to the 2022-11-25 build would not load
+
+
 ## [1.2.0] - 2023-07-13
 
 ### Added 
@@ -380,6 +387,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Commit log diffs
 
-[unreleased]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.1.0...main
+[unreleased]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.0...main
+[1.2.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/BespokeSynth/BespokeSynth/tree/v1.0.0
