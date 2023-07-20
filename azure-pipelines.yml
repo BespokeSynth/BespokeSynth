@@ -19,7 +19,7 @@ jobs:
         macOS-x64:
           imageName: 'macos-12'
           isMac: True
-          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES='arm64;x86_64'\" -DBESPOKE_SIGN_AS='$(MAC_SIGNING_CERT)' -DBESPOKE_PYTHON_ROOT='/Library/Frameworks/Python.framework/Versions/3.11'"
+          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES='arm64;x86_64'\" -DBESPOKE_SIGN_AS='$(MAC_SIGNING_CERT)' -DBESPOKE_PYTHON_ROOT='/Library/Frameworks/Python.framework/Versions/3.10'"
           cmakeTarget: "BespokeSynth"
         windows-x64:
           imageName: 'windows-2019'
@@ -115,8 +115,8 @@ jobs:
 
       - script: |
           npm install -g appdmg
-          wget https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg
-          sudo installer -pkg python-3.11.4-macos11.pkg -target /
+          wget https://www.python.org/ftp/python/3.10.0/python-3.10.0post2-macos11.pkg
+          sudo installer -pkg python-3.10.0post2-macos11.pkg -target /
         condition: variables.isMac
         displayName: mac - install dependencies needed for distribution build
 
