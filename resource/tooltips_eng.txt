@@ -2021,3 +2021,4 @@ songbuilder~large-scale organizer to arrange settings into scenes and then seque
 ~move left~move this target left in the scene
 ~move right~move this target right in the scene
 ~type~change the control display type for this target
+~color*~color to theme this target
