@@ -1941,7 +1941,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
    Prefab::sJustReleasedModule = nullptr;
 }
 
-void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
+void ModularSynth::AudioOut(float* const* output, int bufferSize, int nChannels)
 {
    PROFILER(audioOut_total);
 
@@ -2034,7 +2034,7 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
    Profiler::PrintCounters();
 }
 
-void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
+void ModularSynth::AudioIn(const float* const* input, int bufferSize, int nChannels)
 {
    if (mAudioPaused)
       return;

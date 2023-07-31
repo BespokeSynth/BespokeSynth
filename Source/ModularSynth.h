@@ -102,8 +102,8 @@ public:
    void AddExtraPoller(IPollable* poller);
    void RemoveExtraPoller(IPollable* poller);
 
-   void AudioOut(float** output, int bufferSize, int nChannels);
-   void AudioIn(const float** input, int bufferSize, int nChannels);
+   void AudioOut(float* const* output, int bufferSize, int nChannels);
+   void AudioIn(const float* const* input, int bufferSize, int nChannels);
 
    void OnConsoleInput();
    void ClearConsoleInput();
