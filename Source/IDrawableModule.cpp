@@ -539,19 +539,26 @@ void IDrawableModule::SetTarget(IClickable* target)
 
 void IDrawableModule::SetUpPatchCables(std::string targets)
 {
-   assert(mMainPatchCableSource != nullptr);
-   std::vector<std::string> targetVec = ofSplitString(targets, ",");
-   if (targetVec.empty() || targets == "")
+   if (IModulator* modulator = dynamic_cast<IModulator*>(this))
    {
-      mMainPatchCableSource->Clear();
+      modulator->SetUpPatchCables(targets);
    }
    else
    {
-      for (int i = 0; i < targetVec.size(); ++i)
+      assert(mMainPatchCableSource != nullptr);
+      std::vector<std::string> targetVec = ofSplitString(targets, ",");
+      if (targetVec.empty() || targets == "")
       {
-         IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
-         if (target)
-            mMainPatchCableSource->AddPatchCable(target);
+         mMainPatchCableSource->Clear();
+      }
+      else
+      {
+         for (int i = 0; i < targetVec.size(); ++i)
+         {
+            IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
+            if (target)
+               mMainPatchCableSource->AddPatchCable(target);
+         }
       }
    }
 }
