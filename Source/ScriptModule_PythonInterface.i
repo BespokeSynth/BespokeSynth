@@ -729,6 +729,11 @@ PYBIND11_EMBEDDED_MODULE(module, m)
             target = TheSynth->FindUIControl(targetPath);
          module.SetTarget(target);
       })
+      .def("set_targets", [](IDrawableModule& module, std::string targetList)
+      {
+         module.ClearAllPatchCableSources();
+         module.SetUpPatchCables(targetList);
+      })
       .def("get_target", [](IDrawableModule& module)
       {
          auto* cable = module.GetPatchCableSource();

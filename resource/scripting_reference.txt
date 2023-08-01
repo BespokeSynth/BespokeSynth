@@ -209,6 +209,7 @@ import module
       m.get_height()
       m.set_target(target)
       m.set_target(targetPath)
+      m.set_targets(targetPathList)
       m.get_target()
       m.get_targets()
       m.set_name(name)
