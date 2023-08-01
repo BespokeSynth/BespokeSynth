@@ -44,6 +44,7 @@ public:
    float& GetMin() { return mTargets[0].mSliderTarget ? mTargets[0].mSliderTarget->GetModulatorMin() : mDummyMin; }
    float& GetMax() { return mTargets[0].mSliderTarget ? mTargets[0].mSliderTarget->GetModulatorMax() : mDummyMax; }
    void SetUpPatchCables(std::string targets);
+   void ClearAllPatchCableSources();
    void OnModulatorRepatch();
    void Poll() override;
    float GetRecentChange() const;
