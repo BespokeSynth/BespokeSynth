@@ -536,6 +536,7 @@ void IDrawableModule::SetTarget(IClickable* target)
       mPatchCableSources[0]->SetTarget(target);
 }
 
+
 void IDrawableModule::SetUpPatchCables(std::string targets)
 {
    assert(mMainPatchCableSource != nullptr);
@@ -564,6 +565,15 @@ void IDrawableModule::RemovePatchCableSource(PatchCableSource* source)
 {
    RemoveFromVector(source, mPatchCableSources);
    delete source;
+}
+
+void IDrawableModule::ClearAllPatchCableSources()
+{
+   if (mMainPatchCableSource != nullptr)
+      mMainPatchCableSource->Clear();
+   else if (!mPatchCableSources.empty())
+      for (auto source : mPatchCableSources)
+         RemovePatchCableSource(source);
 }
 
 void IDrawableModule::Exit()

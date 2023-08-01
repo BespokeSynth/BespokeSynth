@@ -141,6 +141,7 @@ public:
    void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
    void RemovePatchCableSource(PatchCableSource* source);
+   void ClearAllPatchCableSources();
    bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    std::string GetTypeName() const { return mTypeName; }
    ModuleCategory GetModuleCategory() const { return mModuleCategory; }
