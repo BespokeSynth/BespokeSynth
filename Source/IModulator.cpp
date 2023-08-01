@@ -126,6 +126,13 @@ void IModulator::SetUpPatchCables(std::string targets)
    OnModulatorRepatch();
 }
 
+void IModulator::ClearAllPatchCableSources()
+{
+   assert(mTargetCable != nullptr);
+   mTargetCable->Clear();
+   OnModulatorRepatch();
+}
+
 void IModulator::Poll()
 {
    if (Active())

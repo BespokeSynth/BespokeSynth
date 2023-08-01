@@ -576,11 +576,19 @@ void IDrawableModule::RemovePatchCableSource(PatchCableSource* source)
 
 void IDrawableModule::ClearAllPatchCableSources()
 {
-   if (mMainPatchCableSource != nullptr)
-      mMainPatchCableSource->Clear();
-   else if (!mPatchCableSources.empty())
-      for (auto source : mPatchCableSources)
-         RemovePatchCableSource(source);
+   if (IModulator* modulator = dynamic_cast<IModulator*>(this))
+   {
+      modulator->ClearAllPatchCableSources();
+      return;
+   }
+   else
+   {
+      if (mMainPatchCableSource != nullptr)
+         mMainPatchCableSource->Clear();
+      else if (!mPatchCableSources.empty())
+         for (auto source : mPatchCableSources)
+            RemovePatchCableSource(source);
+   }
 }
 
 void IDrawableModule::Exit()
