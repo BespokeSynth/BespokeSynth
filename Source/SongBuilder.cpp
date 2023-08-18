@@ -187,6 +187,7 @@ void SongBuilder::DrawModule()
    }
 
    bool sequenceComplete = false;
+   int sequenceLength = 0;
    for (int i = 0; i < kMaxSequencerScenes; ++i)
    {
       bool show = mUseSequencer && !sequenceComplete;
@@ -213,7 +214,25 @@ void SongBuilder::DrawModule()
       }
 
       if (mSequencerSceneId[i] < 0)
+      {
+         if (!sequenceComplete)
+         {
+            ofRectangle rect = mSequencerStepLengthEntry[i]->GetRect(K(local));
+            int sequenceLengthSeconds = int(sequenceLength * TheTransport->MsPerBar() / 1000);
+            int sequenceLengthMinutes = sequenceLengthSeconds / 60;
+            sequenceLengthSeconds %= 60;
+            std::string lengthTime = ofToString(sequenceLengthMinutes) + ":";
+            if (sequenceLengthSeconds < 10)
+               lengthTime += "0"; //zero pad
+            lengthTime += ofToString(sequenceLengthSeconds);
+            DrawTextNormal(ofToString(sequenceLength) + " (" + lengthTime + ")", rect.x, rect.y + 12);
+         }
          sequenceComplete = true;
+      }
+      else if (!sequenceComplete)
+      {
+         sequenceLength += mSequencerStepLength[i];
+      }
    }
 
    if (ShowSongSequencer() && mSequenceStepIndex != -1)

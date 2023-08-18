@@ -109,7 +109,7 @@ void ValueSetter::Go(double time)
    for (size_t i = 0; i < mTargets.size(); ++i)
    {
       if (mTargets[i] != nullptr)
-         mTargets[i]->SetValue(mValue, time);
+         mTargets[i]->SetValue(mValue, time, K(forceUpdate));
    }
 }
 
