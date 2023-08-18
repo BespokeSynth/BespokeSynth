@@ -55,9 +55,9 @@ public:
       return mPan;
    }
 
-   float GetPitch(int samplesIn) { return mPitch + (mModulators.pitchBend ? mModulators.pitchBend->GetValue(samplesIn) : 0); }
-   float GetModWheel(int samplesIn) { return mModulators.modWheel ? mModulators.modWheel->GetValue(samplesIn) : 0.5f; }
-   float GetPressure(int samplesIn) { return mModulators.pressure ? mModulators.pressure->GetValue(samplesIn) : 0.5f; }
+   float GetPitch(int samplesIn) { return mPitch + (mModulators.pitchBend ? mModulators.pitchBend->GetValue(samplesIn) : ModulationParameters::kDefaultPitchBend); }
+   float GetModWheel(int samplesIn) { return mModulators.modWheel ? mModulators.modWheel->GetValue(samplesIn) : ModulationParameters::kDefaultModWheel; }
+   float GetPressure(int samplesIn) { return mModulators.pressure ? mModulators.pressure->GetValue(samplesIn) : ModulationParameters::kDefaultPressure; }
 
 private:
    float mPitch{ 0 };

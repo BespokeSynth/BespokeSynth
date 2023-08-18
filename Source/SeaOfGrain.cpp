@@ -433,9 +433,9 @@ void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize)
       double time = gTime;
       for (int i = 0; i < bufferSize; ++i)
       {
-         float pitchBend = mPitchBend ? mPitchBend->GetValue(i) : 0;
-         float pressure = mPressure ? mPressure->GetValue(i) : 0;
-         float modwheel = mModWheel ? mModWheel->GetValue(i) : 0;
+         float pitchBend = mPitchBend ? mPitchBend->GetValue(i) : ModulationParameters::kDefaultPitchBend;
+         float pressure = mPressure ? mPressure->GetValue(i) : ModulationParameters::kDefaultPressure;
+         float modwheel = mModWheel ? mModWheel->GetValue(i) : ModulationParameters::kDefaultModWheel;
          if (pressure > 0)
          {
             mGranulator.mGrainOverlap = ofMap(pressure * pressure, 0, 1, 3, MAX_GRAINS);
