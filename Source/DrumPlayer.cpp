@@ -489,7 +489,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       return;
    }
 
-   if (velocity > 0 && mFullVelocityCheckbox)
+   if (velocity > 0 && mFullVelocity)
       velocity = 127;
 
    pitch %= 24;
