@@ -53,7 +53,7 @@ void Transport::SetRandomTempo()
 void Transport::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTempoSlider = new FloatSlider(this, "tempo", 5, 4, 93, 15, &mTempo, 1, 225);
+   mTempoSlider = new FloatSlider(this, "tempo", 5, 4, 93, 15, &mTempo, 20, 225);
    mIncreaseTempoButton = new ClickButton(this, " + ", 118, 4);
    mDecreaseTempoButton = new ClickButton(this, " - ", 101, 4);
    mSwingSlider = new FloatSlider(this, "swing", 5, 22, 93, 15, &mSwing, .5f, .7f);

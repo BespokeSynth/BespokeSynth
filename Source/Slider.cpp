@@ -478,6 +478,7 @@ float FloatSlider::PosToVal(float pos, bool ignoreSmooth) const
 
 float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
 {
+   val = ofClamp(val, mMin, mMax);
    if (AdjustSmooth() && (gHoveredUIControl == this || mSmooth > 0) && !ignoreSmooth)
       return sqrtf(mSmooth);
    if (mMode == kNormal)
