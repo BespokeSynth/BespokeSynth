@@ -678,19 +678,19 @@ void VSTPlugin::Process(double time)
             if (mUseVoiceAsChannel == false)
                channel = mChannel;
 
-            float bend = mod.mModulation.pitchBend ? mod.mModulation.pitchBend->GetValue(0) : 0;
+            float bend = mod.mModulation.pitchBend ? mod.mModulation.pitchBend->GetValue(0) : ModulationParameters::kDefaultPitchBend;
             if (bend != mod.mLastPitchBend)
             {
                mod.mLastPitchBend = bend;
                mMidiBuffer.addEvent(juce::MidiMessage::pitchWheel(channel, (int)ofMap(bend, -mPitchBendRange, mPitchBendRange, 0, 16383, K(clamp))), 0);
             }
-            float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : 0;
+            float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel;
             if (modWheel != mod.mLastModWheel)
             {
                mod.mLastModWheel = modWheel;
                mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent(channel, mModwheelCC, ofClamp(modWheel * 127, 0, 127)), 0);
             }
-            float pressure = mod.mModulation.pressure ? mod.mModulation.pressure->GetValue(0) : 0;
+            float pressure = mod.mModulation.pressure ? mod.mModulation.pressure->GetValue(0) : ModulationParameters::kDefaultPressure;
             if (pressure != mod.mLastPressure)
             {
                mod.mLastPressure = pressure;

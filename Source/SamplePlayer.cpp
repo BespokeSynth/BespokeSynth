@@ -400,7 +400,7 @@ void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    }
 
    if (velocity > 0 && mSample != nullptr)
-      PlayCuePoint(time, pitch, velocity, modulation.pitchBend ? exp2(modulation.pitchBend->GetValue(0)) : 1, modulation.modWheel ? modulation.modWheel->GetValue(0) : 0);
+      PlayCuePoint(time, pitch, velocity, modulation.pitchBend ? exp2(modulation.pitchBend->GetValue(0)) : 1, (modulation.modWheel ? modulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel) - ModulationParameters::kDefaultModWheel);
 
    if (velocity == 0 && mStopOnNoteOff)
    {
@@ -495,6 +495,7 @@ void SamplePlayer::SampleDropped(int x, int y, Sample* sample)
 void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
 {
    Sample* oldSamplePtr = mSample;
+   bool ownedOldSample = mOwnsSample;
 
    float lengthSeconds = sample->LengthInSamples() / (gSampleRate * sample->GetSampleRateRatio());
    mCuePointStartSlider->SetExtents(0, lengthSeconds);
@@ -512,7 +513,7 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
 
    mErrorString = "";
 
-   if (mOwnsSample)
+   if (ownedOldSample)
       delete oldSamplePtr;
 
    mIsLoadingSample = true;

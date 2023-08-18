@@ -133,13 +133,13 @@ void MidiOutputModule::OnTransportAdvanced(float amount)
          mod.mLastPitchBend = bend;
          mDevice.SendPitchBend((int)ofMap(bend, -mPitchBendRange, mPitchBendRange, 0, 16383, K(clamp)), channel);
       }
-      float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : 0;
+      float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel;
       if (modWheel != mod.mLastModWheel)
       {
          mod.mLastModWheel = modWheel;
          mDevice.SendCC(mModwheelCC, modWheel * 127, channel);
       }
-      float pressure = mod.mModulation.pressure ? mod.mModulation.pressure->GetValue(0) : 0;
+      float pressure = mod.mModulation.pressure ? mod.mModulation.pressure->GetValue(0) : ModulationParameters::kDefaultPressure;
       if (pressure != mod.mLastPressure)
       {
          mod.mLastPressure = pressure;

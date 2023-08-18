@@ -75,7 +75,7 @@ void PressureToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
 
 float PressureToCV::Value(int samplesIn)
 {
-   float pressure = mPressure ? mPressure->GetValue(samplesIn) : 0;
+   float pressure = mPressure ? mPressure->GetValue(samplesIn) : ModulationParameters::kDefaultPressure;
    return ofMap(pressure, 0, 1, GetMin(), GetMax(), K(clamped));
 }
 

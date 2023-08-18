@@ -112,7 +112,7 @@ public:
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
 
-   float mVelocity{ .5 };
+   float mVelocity{ .8 };
    FloatSlider* mElementOffsetSlider{ nullptr };
    FloatSlider* mElementLengthSlider{ nullptr };
    IntSlider* mElementRowSlider{ nullptr };
