@@ -26,6 +26,8 @@
 */
 
 #include "Prefab.h"
+
+#include "Checkbox.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 
@@ -93,6 +95,17 @@ void Prefab::Poll()
 bool Prefab::IsMouseHovered()
 {
    return GetRect(false).contains(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
+}
+
+void Prefab::CheckboxUpdated(Checkbox* checkbox, double time)
+{
+   if (checkbox == mEnabledCheckbox)
+   {
+      for (auto& module : mModuleContainer.GetModules())
+      {
+         module->SetEnabled(mEnabled);
+      }
+   }
 }
 
 bool Prefab::CanAddDropModules()

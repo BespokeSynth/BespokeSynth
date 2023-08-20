@@ -46,6 +46,7 @@ public:
 
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
+   void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
 
@@ -83,6 +84,7 @@ private:
    bool CanAddDropModules();
    bool IsAddableModule(IDrawableModule* module);
    bool IsMouseHovered();
+   void CheckboxUpdated(Checkbox* checkbox, double time);
 
    void SavePrefab(std::string savePath);
    void UpdatePrefabName(std::string path);
