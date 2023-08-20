@@ -7,9 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Added
+
+- Added total duration to songbuilder sequencer
+
+
+### Changed
+
+- Made `valuesetter` force value updates
+- Adjusted transport minimum tempo to 20 to sidestep weird issues when tempo is lower
+
+
 ### Fixed
 
 - Fixed an issue where savestates with `effectchain` modules saved prior to the 2022-11-25 build would not load
+- Fixed an issues with the absence of modulation using incorrect defaults
+- Fixed NaN when adjusting slider with out-of-range value
+- Fixed velocity not working in drumplayer
 
 
 ## [1.2.0] - 2023-07-13
