@@ -129,7 +129,7 @@ void IDrawableModule::Init()
    }
    else
    {
-      RemoveUIControl(mEnabledCheckbox);
+      RemoveUIControl(mEnabledCheckbox, false);
       mEnabledCheckbox->Delete();
       mEnabledCheckbox = nullptr;
    }
@@ -856,8 +856,11 @@ void IDrawableModule::AddUIControl(IUIControl* control)
    }
 }
 
-void IDrawableModule::RemoveUIControl(IUIControl* control)
+void IDrawableModule::RemoveUIControl(IUIControl* control, bool cleanUpReferences /* = true */)
 {
+   if (cleanUpReferences)
+      IUIControl::DestroyCablesTargetingControls(std::vector<IUIControl*>{ control });
+
    RemoveFromVector(control, mUIControls, K(fail));
    FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
    if (slider)

@@ -109,7 +109,6 @@ void EffectChain::AddEffect(std::string type, std::string desiredName, bool onTh
    controls.mDeleteButton = new ClickButton(this, "x", 0, 0);
    controls.mDeleteButton->SetCableTargetable(false);
    controls.mDryWetSlider = new FloatSlider(this, ("mix" + ofToString(mEffects.size() - 1)).c_str(), 0, 0, 60, 13, dryWet, 0, 1, 2);
-   controls.mDryWetSlider->SetCableTargetable(false);
    controls.mPush2DisplayEffectButton = new ClickButton(this, ("edit " + name).c_str(), 0, 0);
    controls.mPush2DisplayEffectButton->SetShowing(false);
    controls.mPush2DisplayEffectButton->SetCableTargetable(false);

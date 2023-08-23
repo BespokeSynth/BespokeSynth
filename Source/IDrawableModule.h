@@ -94,7 +94,7 @@ public:
    virtual void KeyReleased(int key);
    void DrawConnection(IClickable* target);
    void AddUIControl(IUIControl* control);
-   void RemoveUIControl(IUIControl* control);
+   void RemoveUIControl(IUIControl* control, bool cleanUpReferences = true);
    void AddUIGrid(UIGrid* grid);
    IUIControl* FindUIControl(const char* name, bool fail = true) const;
    std::vector<IUIControl*> GetUIControls() const;
