@@ -101,6 +101,8 @@ public:
    static void SetNewManualHoverViaArrow(ofVec2f direction);
    static bool WasLastHoverSetManually() { return sLastUIHoverWasSetManually; }
 
+   static void DestroyCablesTargetingControls(std::vector<IUIControl*> controls);
+
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
 
