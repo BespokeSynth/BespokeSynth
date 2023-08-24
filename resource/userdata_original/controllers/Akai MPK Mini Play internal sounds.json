@@ -7,14 +7,24 @@
 			"position" : [0, 15],
 			"dimensions" : [58, 28],
 			"spacing" : [30],
+			"controls" : [11],
+			"messageType" : "control",
+			"drawType" : "slider"
+		},
+		{
+			"rows": 1,
+			"cols": 1,
+			"position" : [60, 0],
+			"dimensions" : [28, 58],
+			"spacing" : [30],
 			"messageType" : "pitchbend",
 			"drawType" : "slider"
 		},
 		{
 			"rows": 1,
 			"cols": 1,
-			"position" : [75, 0],
-			"dimensions" : [28, 58],
+			"position" : [90, 15],
+			"dimensions" : [58, 28],
 			"spacing" : [30],
 			"controls" : [1],
 			"messageType" : "control",
@@ -23,10 +33,13 @@
 		{
 			"rows": 2,
 			"cols": 4,
-			"position" : [120, 0],
+			"position" : [165, 0],
 			"dimensions" : [28, 28],
 			"spacing" : [30, 30],
-			"controls" : [70, 71, 72, 73, 74, 75, 76, 77],
+			"controls" : [
+				73, 72,  6,  6,
+				74, 71, 91, 93
+			],
 			"messageType" : "control",
 			"drawType" : "knob"
 		},
