@@ -337,6 +337,8 @@ void NoteTable::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 {
    if ((mEnabled || velocity == 0) && pitch < kMaxLength)
       PlayColumn(time, pitch, velocity, voiceIdx, modulation);
+   if (!mEnabled)
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NoteTable::PlayColumn(double time, int column, int velocity, int voiceIdx, ModulationParameters modulation)
