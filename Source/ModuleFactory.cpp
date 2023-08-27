@@ -165,6 +165,7 @@
 #include "VolcaBeatsControl.h"
 #include "RadioSequencer.h"
 #include "TakeRecorder.h"
+#include "AudioSplitter.h"
 #include "Splitter.h"
 #include "Panner.h"
 #include "SamplePlayer.h"
@@ -367,6 +368,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteHumanizer, notehumanizer, kModuleCategory_Note);
    REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleCategory_Note);
    REGISTER(RadioSequencer, radiosequencer, kModuleCategory_Other);
+   REGISTER(AudioSplitter, audiosplitter, kModuleCategory_Audio);
    REGISTER(Splitter, splitter, kModuleCategory_Audio);
    REGISTER(Panner, panner, kModuleCategory_Audio);
    REGISTER(SamplePlayer, sampleplayer, kModuleCategory_Synth);
