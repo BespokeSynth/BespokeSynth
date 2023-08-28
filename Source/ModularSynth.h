@@ -105,7 +105,7 @@ public:
    void AudioOut(float** output, int bufferSize, int nChannels);
    void AudioIn(const float** input, int bufferSize, int nChannels);
 
-   void OnConsoleInput();
+   void OnConsoleInput(std::string command = "");
    void ClearConsoleInput();
 
    bool IsReady();
