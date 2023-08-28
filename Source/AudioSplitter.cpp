@@ -38,12 +38,6 @@ AudioSplitter::AudioSplitter()
 void AudioSplitter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-
-   const auto additionalCable = new PatchCableSource(this, kConnectionType_Audio);
-   AddPatchCableSource(additionalCable);
-   mDestinationCables.push_back(additionalCable);
-
-   GetPatchCableSource()->SetEnabled(false);
 }
 
 void AudioSplitter::Process(double time)
@@ -80,7 +74,12 @@ void AudioSplitter::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 {
    IAudioSource::PostRepatch(cableSource, fromUserClick);
 
-   int numItems{ 1 };
+   int numItems{ 0 };
+
+   const auto maintarget = dynamic_cast<IAudioReceiver*>(GetPatchCableSource()->GetTarget());
+   if (maintarget)
+       numItems++;
+
    for (const auto cablesource : mDestinationCables)
    {
       const auto target = dynamic_cast<IAudioReceiver*>(cablesource->GetTarget());
@@ -120,17 +119,19 @@ void AudioSplitter::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   int offset{ 0 };
+   GetPatchCableSource()->SetManualPosition(20, 12);
+
+   int offset{ 20 };
    for (const auto cablesource : mDestinationCables)
    {
-      cablesource->SetManualPosition(offset += 25, 12);
+      cablesource->SetManualPosition(offset += 20, 12);
       cablesource->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
    }
 }
 
 void AudioSplitter::GetModuleDimensions(float& w, float& h)
 {
-   w = MAX(80, 25 + (25 * mDestinationCables.size()));
+   w = MAX(80, 40 + (20 * mDestinationCables.size()));
    h = 5;
 }
 
