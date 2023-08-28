@@ -52,7 +52,7 @@ void AudioSplitter::Process(double time)
 
    const auto numchannels = GetBuffer()->NumActiveChannels();
 
-   for (const auto cablesource : mDestinationCables)
+   for (const auto cablesource : GetPatchCableSources())
    {
       const auto target = dynamic_cast<IAudioReceiver*>(cablesource->GetTarget());
       if (target)
