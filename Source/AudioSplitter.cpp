@@ -38,6 +38,10 @@ AudioSplitter::AudioSplitter()
 void AudioSplitter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+
+   auto cable = new PatchCableSource(this, kConnectionType_Audio);
+   AddPatchCableSource(cable);
+   mDestinationCables.push_back(cable);
 }
 
 void AudioSplitter::Process(double time)
@@ -74,42 +78,27 @@ void AudioSplitter::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 {
    IAudioSource::PostRepatch(cableSource, fromUserClick);
 
-   int numItems{ 0 };
-
-   const auto maintarget = dynamic_cast<IAudioReceiver*>(GetPatchCableSource()->GetTarget());
-   if (maintarget)
-       numItems++;
-
-   for (const auto cablesource : mDestinationCables)
+   for (int i = 0; i < mDestinationCables.size(); ++i)
    {
-      const auto target = dynamic_cast<IAudioReceiver*>(cablesource->GetTarget());
-      if (target)
-         numItems++;
-   }
-   int cableSourceCount = static_cast<int>(mDestinationCables.size());
-   if (numItems > cableSourceCount)
-   {
-      for (int i = cableSourceCount; i < numItems; ++i)
+      if (mDestinationCables[i] == cableSource)
       {
-         auto* additionalCable = new PatchCableSource(this, kConnectionType_Audio);
-         AddPatchCableSource(additionalCable);
-         mDestinationCables.push_back(additionalCable);
-      }
-   }
-   else if (numItems < cableSourceCount)
-   {
-      for (int i = cableSourceCount - 1; i >= numItems; --i)
-      {
-         const auto target = dynamic_cast<IAudioReceiver*>(mDestinationCables[i]->GetTarget());
-         if (target == nullptr)
+         if (i == mDestinationCables.size() - 1)
          {
-            RemovePatchCableSource(mDestinationCables[i]);
-            cableSourceCount--;
+            if (cableSource->GetTarget())
+            {
+               auto cable = new PatchCableSource(this, kConnectionType_Audio);
+               AddPatchCableSource(cable);
+               mDestinationCables.push_back(cable);
+            }
          }
-         else
-            break;
+         else if (cableSource->GetTarget() == nullptr)
+         {
+            RemoveFromVector(cableSource, mDestinationCables);
+            RemovePatchCableSource(cableSource);
+         }
+
+         break;
       }
-      mDestinationCables.resize(cableSourceCount);
    }
 }
 
