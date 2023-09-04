@@ -167,7 +167,7 @@ void BufferShuffler::Process(double time)
                   mFourTetSampleIndex = readPosition;
                }
 
-               float fourTetSample = GetInterpolatedSample(readPosition, mInputBuffer.GetChannel(ch), GetLengthInSamples());;
+               float fourTetSample = GetInterpolatedSample(readPosition, mInputBuffer.GetChannel(ch), GetLengthInSamples());
                outputSample = ofLerp(outputSample, fourTetSample, mFourTet);
             }
 

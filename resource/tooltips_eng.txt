@@ -27,6 +27,9 @@ buffershuffler~use notes to play back slices of a constantly-recording live inpu
 ~interval~slice size
 ~playback style~how to play clicked slices. or, with input notes, velocity range determines playback style.
 ~freeze input~retain the current buffer, without writing in new input
+~fourtet~use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this "fourtetified" audio.
+~fourtetslices~chunk size to use for "fourtet" effect
+~grid~patch a grid in here from a "midicontroller" module
 
 
 
