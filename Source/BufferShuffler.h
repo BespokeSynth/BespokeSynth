@@ -34,7 +34,7 @@
 #include "Push2Control.h"
 #include "GridController.h"
 
-class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IIntSliderListener, public IDropdownListener, public IPush2GridController, public IGridControllerListener
+class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IPush2GridController, public IGridControllerListener
 {
 public:
    BufferShuffler();
@@ -49,8 +49,8 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override
    {
-      mWidth = w;
-      mHeight = h;
+      mWidth = MAX(w, 245);
+      mHeight = MAX(h, 85);
    }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -73,6 +73,7 @@ public:
    void UpdateGridControllerLights(bool force);
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void DropdownUpdated(DropdownList* dropdown, int oldVal, double time) override {}
 
@@ -83,10 +84,12 @@ public:
    int GetModuleSaveStateRev() const override { return 0; }
 
    bool IsEnabled() const override { return mEnabled; }
+   bool HasDebugDraw() const override { return true; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override
    {
       width = mWidth;
@@ -94,6 +97,7 @@ private:
    }
    void OnClicked(float x, float y, bool right) override;
    bool DrawToPush2Screen() override;
+   float GetFourTetPosition(double time);
 
    enum class PlaybackStyle
    {
@@ -117,7 +121,7 @@ private:
    ChannelBuffer mInputBuffer;
 
    float mWidth{ 245 };
-   float mHeight{ 68 };
+   float mHeight{ 85 };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    NoteInterval mInterval{ kInterval_8n };
@@ -126,13 +130,19 @@ private:
    Checkbox* mFreezeInputCheckbox{ nullptr };
    PlaybackStyle mPlaybackStyle{ PlaybackStyle::Normal };
    DropdownList* mPlaybackStyleDropdown{ nullptr };
+   float mFourTet{ 0 };
+   FloatSlider* mFourTetSlider{ nullptr };
+   int mFourTetSlices{ 4 };
+   DropdownList* mFourTetSlicesDropdown{ nullptr };
    int mQueuedSlice{ -1 };
    PlaybackStyle mQueuedPlaybackStyle{ PlaybackStyle::None };
-   float mPlaybackSample{ -1 };
+   float mPlaybackSampleIndex{ -1 };
    double mPlaybackSampleStartTime{ -1 };
    double mPlaybackSampleStopTime{ -1 };
    GridControlTarget* mGridControlTarget{ nullptr };
    bool mUseVelocitySpeedControl{ false };
+   bool mOnlyPlayWhenTriggered{ false };
+   float mFourTetSampleIndex{ 0 };
 
    SwitchAndRamp mSwitchAndRamp;
 };
