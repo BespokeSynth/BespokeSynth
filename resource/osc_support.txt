@@ -96,5 +96,11 @@ Direct module control:
 			The <module name> should be the URL escaped name of the module.
 	example: /bespoke/module/focus/midicontroller -1
 	
+Console commands:
+	address: /bespoke/console
+	parameters: [s]
+		Will execute the command in the parameter.
+	Notes:
+		Be warned, the console is experimental and can very easily crash bespoke.
 	
 Any other addresses with parameters of type integer or float will be automapped to CC's in the midicontroller interface.

@@ -2928,9 +2928,12 @@ INoteReceiver* ModularSynth::FindNoteReceiver(std::string name, bool fail)
    return n;
 }
 
-void ModularSynth::OnConsoleInput()
+void ModularSynth::OnConsoleInput(std::string command /* = "" */)
 {
-   std::vector<std::string> tokens = ofSplitString(mConsoleText, " ", true, true);
+   if (command.empty())
+      command = mConsoleText;
+   std::vector<std::string> tokens = ofSplitString(command, " ", true, true);
+
    if (tokens.size() > 0)
    {
       if (tokens[0] == "")

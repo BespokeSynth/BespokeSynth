@@ -135,6 +135,13 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    if (msg.size() == 0)
       return; // Code beyond this point expects at least one parameter.
 
+   if (address.rfind("/bespoke/console", 0) == 0)
+   {
+      if (msg[0].isString())
+         TheSynth->OnConsoleInput(msg[0].getString().toStdString());
+      return;
+   }
+
    bool is_percentage = false;
    std::string control_prefix = "/bespoke/control/";
    std::string control_scaled_prefix = "/bespoke/control_scaled/";
