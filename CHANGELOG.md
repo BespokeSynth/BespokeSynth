@@ -10,12 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added total duration to songbuilder sequencer
+- Added corner radius setting to the globalcontrols module
+- Added the ability to execute "console" commands directly from OSC using the `/bespoke/console` address
+- Added buffershuffler features: fourtet effect and ability to only play when triggered
 
 
 ### Changed
 
 - Made `valuesetter` force value updates
 - Adjusted transport minimum tempo to 20 to sidestep weird issues when tempo is lower
+- Allow toggling enabling state of prefabs, this will attempt to toggle the enabled state of all modules contained within
 
 
 ### Fixed
@@ -24,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issues with the absence of modulation using incorrect defaults
 - Fixed NaN when adjusting slider with out-of-range value
 - Fixed velocity not working in drumplayer
+- Fixed an issue where effectchain mix sliders couldn't be targeted by modulators
 
 
 ## [1.2.0] - 2023-07-13
