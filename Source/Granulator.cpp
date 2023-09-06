@@ -139,7 +139,7 @@ void Grain::Spawn(Granulator* owner, double time, double pos, float speedMult, f
 inline double Grain::GetWindow(double time)
 {
    double phase = (time - mStartTime) * mStartToEndInv;
-   return .5 * (1 - juce::dsp::FastMathApproximations::cos<double>(phase * TWO_PI));
+   return .5 + .5 * juce::dsp::FastMathApproximations::cos<double>(phase * TWO_PI - PI);
 }
 
 void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float* output)
