@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed NaN when adjusting slider with out-of-range value
 - Fixed velocity not working in drumplayer
 - Fixed an issue where effectchain mix sliders couldn't be targeted by modulators
+- Fixed a bug in the cosine window of the granulators that caused clicky noises at the end of grains
 
 
 ## [1.2.0] - 2023-07-13
