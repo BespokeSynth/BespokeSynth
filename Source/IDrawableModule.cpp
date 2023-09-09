@@ -451,10 +451,14 @@ void IDrawableModule::RenderUnclipped()
    ofPopStyle();
 }
 
-void IDrawableModule::DrawPatchCables(bool parentMinimized)
+void IDrawableModule::DrawPatchCables(bool parentMinimized, bool inFront)
 {
    for (auto source : mPatchCableSources)
    {
+      ConnectionType type = source->GetConnectionType();
+      if (inFront && (type == kConnectionType_Note || type == kConnectionType_Pulse || type == kConnectionType_Audio))
+         continue;
+
       source->UpdatePosition(parentMinimized);
       source->DrawCables(parentMinimized);
    }

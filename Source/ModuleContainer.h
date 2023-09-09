@@ -42,7 +42,7 @@ public:
    void SetOwner(IDrawableModule* owner) { mOwner = owner; }
    IDrawableModule* GetOwner() const { return mOwner; }
    void Draw();
-   void DrawPatchCables(bool parentMinimized);
+   void DrawPatchCables(bool parentMinimized, bool inFront);
    void DrawUnclipped();
    void PostRender();
    void Poll();

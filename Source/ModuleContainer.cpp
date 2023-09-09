@@ -95,16 +95,16 @@ void ModuleContainer::PostRender()
       mModules[i]->PostRender();
 }
 
-void ModuleContainer::DrawPatchCables(bool parentMinimized)
+void ModuleContainer::DrawPatchCables(bool parentMinimized, bool inFront)
 {
    if (mOwner != nullptr && mOwner->Minimized())
       parentMinimized = true;
 
    for (int i = (int)mModules.size() - 1; i >= 0; --i)
    {
-      mModules[i]->DrawPatchCables(parentMinimized);
+      mModules[i]->DrawPatchCables(parentMinimized, inFront);
       if (mModules[i]->GetContainer())
-         mModules[i]->GetContainer()->DrawPatchCables(parentMinimized);
+         mModules[i]->GetContainer()->DrawPatchCables(parentMinimized, inFront);
    }
 }
 
