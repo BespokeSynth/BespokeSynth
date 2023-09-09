@@ -575,8 +575,9 @@ void ModularSynth::Draw(void* vg)
    TheSaveDataPanel->SetShowing(TheSaveDataPanel->GetModule());
    TheSaveDataPanel->UpdatePosition();
 
+   mModuleContainer.DrawPatchCables(!K(parentMinimized), !K(inFront));
    mModuleContainer.Draw();
-   mModuleContainer.DrawPatchCables(false);
+   mModuleContainer.DrawPatchCables(!K(parentMinimized), K(inFront));
    mModuleContainer.DrawUnclipped();
 
    for (int i = 0; i < mLissajousDrawers.size(); ++i)
@@ -651,7 +652,7 @@ void ModularSynth::Draw(void* vg)
       float uiScale = mUILayerModuleContainer.GetDrawScale();
       if (uiScale < .01f)
       {
-         //safety check in case anything ever make the UI inaccessible
+         //safety check in case anything ever makes the UI inaccessible
          LogEvent("correcting UI scale", kLogEventType_Error);
          mUILayerModuleContainer.SetDrawScale(1);
          uiScale = mUILayerModuleContainer.GetDrawScale();
@@ -659,8 +660,9 @@ void ModularSynth::Draw(void* vg)
       ofScale(uiScale, uiScale, uiScale);
       ofTranslate(mUILayerModuleContainer.GetDrawOffset().x, mUILayerModuleContainer.GetDrawOffset().y);
 
+      mUILayerModuleContainer.DrawPatchCables(!K(parentMinimized), K(inFront));
       mUILayerModuleContainer.Draw();
-      mUILayerModuleContainer.DrawPatchCables(false);
+      mUILayerModuleContainer.DrawPatchCables(!K(parentMinimized), !K(inFront));
       mUILayerModuleContainer.DrawUnclipped();
 
       Profiler::Draw();

@@ -176,6 +176,7 @@ void PatchCable::Render()
    ofColor lineColor = mOwner->GetColor();
    if (mHoveringOnSource && sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())
       lineColor = ofColor::lerp(lineColor, ofColor::white, .5f);
+   lineColor.a *= UserPrefs.cable_alpha.Get();
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a *= lineAlpha;
 
@@ -234,7 +235,7 @@ void PatchCable::Render()
             {
                float delta = ofClamp(modulator->GetRecentChange() / range, -1, 1);
                ofColor color = ofColor::lerp(ofColor::blue, ofColor::red, delta * .5f + .5f);
-               color.a = abs(1 - ((1 - delta) * (1 - delta))) * 150;
+               color.a = abs(1 - ((1 - delta) * (1 - delta))) * 150 * UserPrefs.cable_alpha.Get();
                ofSetColor(color);
                ofSetLineWidth(3);
 
@@ -278,7 +279,7 @@ void PatchCable::Render()
                float clampedElapsed = MIN(elapsed, 1);
                if (event.mOn)
                {
-                  ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
+                  ofSetLineWidth(lineWidth * (2 + ofClamp(1 - elapsed * .7f, 0, 1) * 3 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
 
                   for (int half = 0; half < 2; ++half)
                   {

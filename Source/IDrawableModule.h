@@ -78,7 +78,7 @@ public:
    void RenderUnclipped();
    virtual void PostRender() {}
    void DrawFrame(float width, float height, bool drawModule, float& titleBarHeight, float& highlight);
-   void DrawPatchCables(bool parentMinimized);
+   void DrawPatchCables(bool parentMinimized, bool inFront);
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }
    void ToggleMinimized();
