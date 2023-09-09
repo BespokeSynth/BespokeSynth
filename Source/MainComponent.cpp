@@ -160,9 +160,9 @@ public:
       // but be careful - it will be called on the audio thread, not the GUI thread.
    }
 
-   void audioDeviceIOCallbackWithContext(const float** inputChannelData,
+   void audioDeviceIOCallbackWithContext(const float* const* inputChannelData,
                                          int numInputChannels,
-                                         float** outputChannelData,
+                                         float* const* outputChannelData,
                                          int numOutputChannels,
                                          int numSamples,
                                          const AudioIODeviceCallbackContext& context) override
