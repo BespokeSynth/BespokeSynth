@@ -320,7 +320,7 @@ public:
    UserPrefString plugin_preference_order{ "plugin_preference_order", "VST3;VST;AudioUnit;LV2", 70, UserPrefCategory::General };
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
-   UserPrefFloat cable_alpha{ "cable_alpha", 1, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat cable_alpha{ "cable_alpha", 1, 0.05f, 1, UserPrefCategory::Graphics };
    UserPrefBool fade_cable_middle{ "fade_cable_middle", true, UserPrefCategory::Graphics };
    UserPrefFloat cable_quality{ "cable_quality", 1, .1f, 3, UserPrefCategory::Graphics };
    UserPrefFloat lissajous_r{ "lissajous_r", 0.408f, 0, 1, UserPrefCategory::Graphics };
