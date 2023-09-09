@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added corner radius setting to the globalcontrols module
 - Added the ability to execute "console" commands directly from OSC using the `/bespoke/console` address
 - Added buffershuffler features: fourtet effect and ability to only play when triggered
+- Added new "cable_alpha" slider in settings that allows you to reduce cables to nearly invisible
 
 
 ### Changed
@@ -20,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Made `valuesetter` force value updates
 - Adjusted transport minimum tempo to 20 to sidestep weird issues when tempo is lower
 - Allow toggling enabling state of prefabs, this will attempt to toggle the enabled state of all modules contained within
+- Note cables have been made less thick
+- Audio, note, and pulse cables now draw behind modules
 
 
 ### Fixed
@@ -30,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed velocity not working in drumplayer
 - Fixed an issue where effectchain mix sliders couldn't be targeted by modulators
 - Fixed a bug in the cosine window of the granulators that caused clicky noises at the end of grains
+- Fixed a deadlock by upgrading JUCE that was causing startup hangs on MacOS 13
 
 
 ## [1.2.0] - 2023-07-13
