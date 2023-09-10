@@ -1999,6 +1999,8 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~layout~what template bespoke should use on startup
 ~youtube_dl_path~the path to your youtube-dl installation (used for youtube downloading in sampleplayer module)
 ~ffmpeg_path~the path to your ffmpeg installation (used for youtube downloading in sampleplayer module)
+~cable_alpha~opacity of the cables
+~wrap_mouse_on_pan~when panning canvas, wrap mouse position around when it goes offscreen, to allow you to pan endlessly
 
 
 songbuilder~large-scale organizer to arrange settings into scenes and then sequence them. this is bespoke's "song mode"
