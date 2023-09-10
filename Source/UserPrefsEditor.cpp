@@ -424,6 +424,8 @@ void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, doub
          ModularSynth::sBackgroundG = UserPrefs.background_g.Get();
          ModularSynth::sBackgroundB = UserPrefs.background_b.Get();
       }
+      if (slider == UserPrefs.cable_alpha.GetSlider())
+         ModularSynth::sCableAlpha = UserPrefs.cable_alpha.Get();
    }
 }
 

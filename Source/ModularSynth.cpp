@@ -62,6 +62,7 @@ float ModularSynth::sBackgroundLissajousB = 0.418f;
 float ModularSynth::sBackgroundR = 0.09f;
 float ModularSynth::sBackgroundG = 0.09f;
 float ModularSynth::sBackgroundB = 0.09f;
+float ModularSynth::sCableAlpha = 1.0f;
 int ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev;
 int ModularSynth::sLastLoadedFileSaveStateRev = ModularSynth::kSaveStateRev;
 std::thread::id ModularSynth::sAudioThreadId;
@@ -263,6 +264,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    sBackgroundR = UserPrefs.background_r.Get();
    sBackgroundG = UserPrefs.background_g.Get();
    sBackgroundB = UserPrefs.background_b.Get();
+   sCableAlpha = UserPrefs.cable_alpha.Get();
 
    Time time = Time::getCurrentTime();
    if (fabsf(sBackgroundR - UserPrefs.background_r.GetDefault()) < .001f && fabsf(sBackgroundG - UserPrefs.background_g.GetDefault()) < .001f && fabsf(sBackgroundB - UserPrefs.background_b.GetDefault()) < .001f && time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)

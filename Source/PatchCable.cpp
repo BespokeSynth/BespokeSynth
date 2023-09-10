@@ -176,7 +176,7 @@ void PatchCable::Render()
    ofColor lineColor = mOwner->GetColor();
    if (mHoveringOnSource && sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())
       lineColor = ofColor::lerp(lineColor, ofColor::white, .5f);
-   lineColor.a *= UserPrefs.cable_alpha.Get();
+   lineColor.a *= ModularSynth::sCableAlpha;
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a *= lineAlpha;
 

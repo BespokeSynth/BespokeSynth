@@ -73,6 +73,7 @@ private:
    FloatSlider* mBackgroundGSlider{ nullptr };
    FloatSlider* mBackgroundBSlider{ nullptr };
    FloatSlider* mCornerRadiusSlider{ nullptr };
+   FloatSlider* mCableAlphaSlider{ nullptr };
 
    float mWidth{ 200 };
    float mHeight{ 20 };
