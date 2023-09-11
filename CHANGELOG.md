@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added corner radius setting to the globalcontrols module
 - Added the ability to execute "console" commands directly from OSC using the `/bespoke/console` address
 - Added buffershuffler features: fourtet effect and ability to only play when triggered
-- Added new "cable_alpha" slider in settings that allows you to reduce cables to nearly invisible
+- Added new "cable_alpha" option in settings and in the `globalcontrols` module that allows you to reduce cables opacity to nearly invisible
+- Added an option to wrap mouse around when panning canvas
 
 
 ### Changed
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow toggling enabling state of prefabs, this will attempt to toggle the enabled state of all modules contained within
 - Note cables have been made less thick
 - Audio, note, and pulse cables now draw behind modules
+- Changed how settings menu is positioned so it always spawns on-screen
 
 
 ### Fixed
