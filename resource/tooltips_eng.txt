@@ -141,7 +141,8 @@ globalcontrols~interface controls, intended to allow you to use midi controllers
 ~background r~amount of red in background color
 ~background g~amount of green in background color
 ~background b~amount of blue in background color
-~corner roundness~how round bespoke's modules corners are
+~corner roundness~how round bespoke's rectangles are
+~cable alpha~opacity of the cables
 
 
 
