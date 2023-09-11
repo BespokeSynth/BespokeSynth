@@ -80,6 +80,8 @@ void UserPrefsEditor::CreateUIControls()
 
 void UserPrefsEditor::Show()
 {
+   SetPosition(100 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().x, 250 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().y);
+
    UpdateDropdowns({});
    SetShowing(true);
 

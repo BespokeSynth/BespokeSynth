@@ -1180,6 +1180,17 @@ void ModularSynth::MouseMoved(int intX, int intY)
    {
       GetDrawOffset() += (ofVec2f(intX, intY) - mLastMoveMouseScreenPos) / gDrawScale;
       mZoomer.CancelMovement();
+
+      if (UserPrefs.wrap_mouse_on_pan.Get() &&
+          (intX < 0 || intY < 0 || intX >= ofGetWidth() || intY >= ofGetHeight()))
+      {
+         int wrappedX = (intX + (int)ofGetWidth()) % (int)ofGetWidth();
+         int wrappedY = (intY + (int)ofGetHeight()) % (int)ofGetHeight();
+         Desktop::setMousePosition(juce::Point<int>(wrappedX + mMainComponent->getScreenX(),
+                                                    wrappedY + mMainComponent->getScreenY()));
+         intX = wrappedX;
+         intY = wrappedY;
+      }
    }
 
    mLastMoveMouseScreenPos = ofVec2f(intX, intY);
@@ -2366,7 +2377,6 @@ void ModularSynth::ResetLayout()
    mUserPrefsEditor->SetTypeName("userprefseditor", kModuleCategory_Other);
    mUserPrefsEditor->CreateUIControls();
    mUserPrefsEditor->Init();
-   mUserPrefsEditor->SetPosition(100, 250);
    mUserPrefsEditor->SetShowing(false);
    mModuleContainer.AddModule(mUserPrefsEditor);
    if (mFatalError != "")

@@ -307,6 +307,7 @@ public:
    UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::General };
    UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2, UserPrefCategory::General };
    UserPrefFloat scroll_multiplier_horizontal{ "scroll_multiplier_horizontal", 1, -2, 2, UserPrefCategory::General };
+   UserPrefBool wrap_mouse_on_pan{ "wrap_mouse_on_pan", true, UserPrefCategory::General };
    UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
