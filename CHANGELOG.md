@@ -414,7 +414,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Commit log diffs
 
-[unreleased]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.0...main
+[unreleased]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.1...main
+[1.2.1]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/BespokeSynth/BespokeSynth/tree/v1.0.0
