@@ -577,10 +577,31 @@ void ModularSynth::Draw(void* vg)
    TheSaveDataPanel->SetShowing(TheSaveDataPanel->GetModule());
    TheSaveDataPanel->UpdatePosition();
 
-   mModuleContainer.DrawPatchCables(!K(parentMinimized), !K(inFront));
-   mModuleContainer.Draw();
-   mModuleContainer.DrawPatchCables(!K(parentMinimized), K(inFront));
-   mModuleContainer.DrawUnclipped();
+   mModuleContainer.DrawContents();
+
+   IClickable* dropTarget = nullptr;
+   if (PatchCable::sActivePatchCable != nullptr)
+      dropTarget = PatchCable::sActivePatchCable->GetDropTarget();
+   if (dropTarget)
+   {
+      ofPushStyle();
+
+      ofSetColor(255, 255, 255, 100);
+      ofSetLineWidth(.5f);
+      ofFill();
+      ofRectangle rect = dropTarget->GetRect();
+
+      IDrawableModule* dropTargetModule = dynamic_cast<IDrawableModule*>(dropTarget);
+      if (dropTargetModule && dropTargetModule->HasTitleBar())
+      {
+         rect.y -= IDrawableModule::TitleBarHeight();
+         rect.height += IDrawableModule::TitleBarHeight();
+      }
+
+      ofRect(rect);
+
+      ofPopStyle();
+   }
 
    for (int i = 0; i < mLissajousDrawers.size(); ++i)
    {
@@ -662,10 +683,7 @@ void ModularSynth::Draw(void* vg)
       ofScale(uiScale, uiScale, uiScale);
       ofTranslate(mUILayerModuleContainer.GetDrawOffset().x, mUILayerModuleContainer.GetDrawOffset().y);
 
-      mUILayerModuleContainer.DrawPatchCables(!K(parentMinimized), K(inFront));
-      mUILayerModuleContainer.Draw();
-      mUILayerModuleContainer.DrawPatchCables(!K(parentMinimized), !K(inFront));
-      mUILayerModuleContainer.DrawUnclipped();
+      mUILayerModuleContainer.DrawContents();
 
       Profiler::Draw();
       DrawConsole();

@@ -59,7 +59,15 @@ void ModuleContainer::GetAllModules(std::vector<IDrawableModule*>& out)
    }
 }
 
-void ModuleContainer::Draw()
+void ModuleContainer::DrawContents()
+{
+   DrawPatchCables(!K(parentMinimized), !K(inFront));
+   DrawModules();
+   DrawPatchCables(!K(parentMinimized), K(inFront));
+   DrawUnclipped();
+}
+
+void ModuleContainer::DrawModules()
 {
    for (int i = (int)mModules.size() - 1; i >= 0; --i)
    {

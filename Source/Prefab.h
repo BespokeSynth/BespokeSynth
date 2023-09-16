@@ -54,6 +54,7 @@ public:
    bool ShouldClipContents() override { return false; }
 
    void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -84,7 +85,6 @@ private:
    bool CanAddDropModules();
    bool IsAddableModule(IDrawableModule* module);
    bool IsMouseHovered();
-   void CheckboxUpdated(Checkbox* checkbox, double time);
 
    void SavePrefab(std::string savePath);
    void UpdatePrefabName(std::string path);

@@ -150,28 +150,6 @@ void PatchCable::Render()
    ofPushStyle();
    ofNoFill();
 
-   IClickable* dropTarget = GetDropTarget();
-   if (dropTarget)
-   {
-      ofPushStyle();
-
-      ofSetColor(255, 255, 255, 100);
-      ofSetLineWidth(.5f);
-      ofFill();
-      ofRectangle rect = dropTarget->GetRect();
-
-      IDrawableModule* dropTargetModule = dynamic_cast<IDrawableModule*>(dropTarget);
-      if (dropTargetModule && dropTargetModule->HasTitleBar())
-      {
-         rect.y -= IDrawableModule::TitleBarHeight();
-         rect.height += IDrawableModule::TitleBarHeight();
-      }
-
-      ofRect(rect);
-
-      ofPopStyle();
-   }
-
    ConnectionType type = mOwner->GetConnectionType();
    ofColor lineColor = mOwner->GetColor();
    if (mHoveringOnSource && sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())

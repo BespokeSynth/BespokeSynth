@@ -92,6 +92,7 @@ public:
    void Destroy(bool fromUserClick);
    void SetTempDrawTarget(IClickable* target) { mTempDrawTarget = target; }
    void ShowQuickspawnForCable();
+   IClickable* GetDropTarget();
 
    void SetUIControlConnection(UIControlConnection* conn) { mUIControlConnection = conn; }
 
@@ -104,7 +105,6 @@ private:
    void SetCableTarget(IClickable* target);
    PatchCablePos GetPatchCablePos();
    ofVec2f FindClosestSide(float x, float y, float w, float h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
-   IClickable* GetDropTarget();
 
    PatchCableSource* mOwner{ nullptr };
    IClickable* mTarget{ nullptr };

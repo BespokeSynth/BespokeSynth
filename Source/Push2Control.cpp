@@ -532,10 +532,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       ofTranslate(TheSynth->GetDrawOffset().x, TheSynth->GetDrawOffset().y);
       ofTranslate(1500 / gDrawScale, -100 / gDrawScale); //center on display
 
-      TheSynth->GetRootContainer()->DrawPatchCables(!K(parentMinimized), !K(inFront));
-      TheSynth->GetRootContainer()->Draw();
-      TheSynth->GetRootContainer()->DrawPatchCables(!K(parentMinimized), K(inFront));
-      TheSynth->GetRootContainer()->DrawUnclipped();
+      TheSynth->GetRootContainer()->DrawContents();
 
       if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() &&
           mDisplayModule->GetOwningContainer() != nullptr && mDisplayModule->IsShowing())
