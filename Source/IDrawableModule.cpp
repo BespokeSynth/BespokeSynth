@@ -47,6 +47,7 @@
 #include "Push2Control.h"
 #include "UIGrid.h"
 #include "UserPrefs.h"
+#include "Prefab.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
@@ -234,10 +235,13 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    ofFill();
+   float backgroundAlpha = IsEnabled() ? 180 : 120;
+   if (dynamic_cast<Prefab*>(this) != nullptr)
+      backgroundAlpha = 60;
    if (IsEnabled())
-      ofSetColor(color.r * (.25f + highlight), color.g * (.25f + highlight), color.b * (.25f + highlight), 210);
+      ofSetColor(color.r * (.25f + highlight), color.g * (.25f + highlight), color.b * (.25f + highlight), backgroundAlpha);
    else
-      ofSetColor(color.r * .2f, color.g * .2f, color.b * .2f, 120);
+      ofSetColor(color.r * .2f, color.g * .2f, color.b * .2f, backgroundAlpha);
    //gModuleShader.begin();
    const float kHighlightGrowAmount = 40;
    ofRect(0 - highlight * kHighlightGrowAmount, -titleBarHeight - highlight * kHighlightGrowAmount,
@@ -296,8 +300,8 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    {
       float fadeRoundness = 100;
       float fadeLength = w / 3;
-      const float kFadeStrength = .75f;
-      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2f, color.g * .2f, color.b * .2f, 255 * kFadeStrength), nvgRGBA(0, 0, 0, 0));
+      const float kFadeStrength = .9f;
+      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2f, color.g * .2f, color.b * .2f, backgroundAlpha * kFadeStrength), nvgRGBA(0, 0, 0, 0));
       nvgBeginPath(gNanoVG);
       nvgRect(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight);
       nvgFillPaint(gNanoVG, shadowPaint);
@@ -456,7 +460,11 @@ void IDrawableModule::DrawPatchCables(bool parentMinimized, bool inFront)
    for (auto source : mPatchCableSources)
    {
       ConnectionType type = source->GetConnectionType();
-      if (inFront && (type == kConnectionType_Note || type == kConnectionType_Pulse || type == kConnectionType_Audio))
+      bool isHeld = false;
+      if (PatchCable::sActivePatchCable != nullptr)
+         isHeld = (PatchCable::sActivePatchCable->GetOwner() == source);
+      bool shouldDrawInFront = isHeld || (type != kConnectionType_Note && type != kConnectionType_Pulse && type != kConnectionType_Audio);
+      if ((inFront && !shouldDrawInFront) || (!inFront && shouldDrawInFront))
          continue;
 
       source->UpdatePosition(parentMinimized);
