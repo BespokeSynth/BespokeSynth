@@ -2,10 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [unreleased]
+## [1.2.1] - 2023-09-16
 
 ### Added
 
@@ -25,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Note cables have been made less thick
 - Audio, note, and pulse cables now draw behind modules
 - Changed how settings menu is positioned so it always spawns on-screen
+- Adjusted background color alpha of `prefab` to make it less imposing-looking
+- Changed how pulse width parameter affects sawtooth wave
 
 
 ### Fixed
