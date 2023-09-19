@@ -430,10 +430,13 @@ void IDrawableModule::Render()
    ofPopMatrix();
    ofPopStyle();
 
-   for (auto source : mPatchCableSources)
+   if (!Push2Control::sDrawingPush2Display)
    {
-      source->UpdatePosition(false);
-      source->DrawSource();
+      for (auto source : mPatchCableSources)
+      {
+         source->UpdatePosition(false);
+         source->DrawSource();
+      }
    }
 }
 
