@@ -81,7 +81,7 @@ void Looper::CreateUIControls()
    mUndoButton = new ClickButton(this, "undo", -1, -1);
    mAllowScratchCheckbox = new Checkbox(this, "scr", -1, -1, &mAllowScratch);
    mVolumeBakeButton = new ClickButton(this, "b", -1, -1);
-   mMergeButton = new ClickButton(this, " m ", -1, -1);
+   mMergeButton = new ClickButton(this, "m", -1, -1);
    mDecaySlider = new FloatSlider(this, "decay", -1, -1, 65, 15, &mDecay, 0, 1, 2);
    mSaveButton = new ClickButton(this, "save", -1, -1);
    mSwapButton = new ClickButton(this, "swap", 137, 81);

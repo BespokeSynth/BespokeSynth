@@ -285,8 +285,10 @@ void MultitrackRecorderTrack::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   BUTTON(mDeleteButton, " X ");
+   BUTTON(mDeleteButton, "delete");
    ENDUIBLOCK0();
+
+   mDeleteButton->SetCableTargetable(false);
 
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kRight);
 }

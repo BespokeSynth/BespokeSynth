@@ -552,7 +552,7 @@ midicontroller~obtiene entrada midi de dispositivos externos. para tener una bue
 ~twoway~¿ deberíamos mandar feedback al controlador ? (para controlar los LEDs asociados con el botón/perilla )
 ~feedback~¿ Hacia qué cc o nota deberíamos mandar el feedback ?
 ~pageless~¿ debería esta conexión funcionar en todas las páginas del midicontroller?
-~ x ~elimina esta conexión
+~delete~elimina esta conexión
 ~copy~duplica esta  conexión
 ~layout~¿ que archivo de layout deberíamos utilizar para este controlador ? estos pueden ser creados en tu carpeta Documents/BespokeSynth/controllers 
 ~monome~¿ qué monome deberíamos utilizar ?
@@ -615,7 +615,7 @@ multitrackrecorder~graba varias pistas de audio sincronizadas , grabalas al disc
 ~clear~borra el audio en las pistas
 
 multitrackrecordertrack~una pista en un grabador multipista “multitrackrecorder”
-~ X ~borra esta pista
+~delete~borra esta pista
 
 
 
@@ -796,7 +796,7 @@ looper~graba bucles de la entrada de audio. úsalo junto a un  "looperrecorder" 
 ~clear~borra el audio del bucle
 ~volume~volumen de salida
 ~b~cocina el volumen actual a una nueva forma de onda
-~ m ~toma los contenidos de este looper y añádelos a otro.haz click en este botón para añadir en la fuente, después en el destino.
+~m~toma los contenidos de este looper y añádelos a otro.haz click en este botón para añadir en la fuente, después en el destino.
 ~decay~cantidad de reducción de volumen a cada repetición
 ~save~guarda este bucle a un archivo wav
 ~mute~silencia este looper
@@ -1120,7 +1120,7 @@ sampler~sampler polifónico básico . manda audio como entrada, y usa las notas 
 ~envR~volumen de release
 ~rec~permite borrar la grabación actual, y grabar audio nuevo cuando el umbral de entrada sea alcanzado
 ~thresh~cuando recording está activado, sobrepasa este umbral con el audio entrante para comenzar la grabación
- ~pitch~¿ deberíamos intentar corregir el tono del audio ? 
+~pitch~¿ deberíamos intentar corregir el tono del audio ? 
 ~passthrough~¿ debería la entrada pasar a la salida mientras estamos grabando ? 
 
 
@@ -1675,7 +1675,7 @@ midicc~devuelve controles de Midi continuo (CC) para enrutarlos a un módulo "mi
 
 samplebrowser~navega tu sistema en busca de muestras. arrastra las muestras desde aquí a tus destinos deseados (sampleplayer, drumplayer, seaofgrain, etc)
 ~ < ~página anterior page
-~ > ~ página siguiente
+~ > ~página siguiente
 
 
 
@@ -1729,7 +1729,7 @@ titlebar~
 ~save as~guarda el estado actual como un nuevo archivo .bsk
 ~new patch~resetea el layout especificado en  "layout" en el archivo userprefs.json
 ~write audio~graba los últimos 30 minutos de audio a el directorio de grabaciones especificado “recordings_path”
-~ ? ~muestra ayuda
+~help~muestra ayuda
 ~settings~ajuste de preferencias, guardadas como userprefs.json
 ~load layout~[none]
 ~lookahead (exp.)~usa lookahead scheduling, el cual es necesario para el módulo script. se activa automaticamente cuando usas el módulo script. hasta el momento, lookahead scheduling no parece crear problemas, pero dejo esta casilla aquí por si acaso.

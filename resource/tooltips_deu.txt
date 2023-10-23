@@ -555,7 +555,7 @@ midicontroller~Midi Input von externen Geräten erhalten. Um eine schöne Anzeig
 ~twoway~Sollen wir eine Rückmeldung an den Controller senden? (zur Steuerung der mit Taste/Knopf verbundenen LEDs)
 ~feedback~An welche CC oder Note sollen wir die Rückmeldung senden?
 ~pageless~Soll diese Verbindung über alle Seiten des Midicontrollers hinweg funktionieren?
-~ x ~Diese Verbindung löschen
+~delete~Diese Verbindung löschen
 ~copy~Diese Verbindung duplizieren
 ~layout~Welche Layout-Datei sollen wir für diesen Controller verwenden? Diese können im Ordner Documents/BespokeSynth/controllers erstellt werden.
 ~monome~Welchen Monome sollen wir nehmen?
@@ -621,7 +621,7 @@ multitrackrecorder~Mehrere synchronisierte Audiospuren aufzeichnen, um sie zweck
 
 
 multitrackrecordertrack~Ein Track im Multitrack Recorder
-~ X ~Diesen Track löschen
+~delete~Diesen Track löschen
 
 
 
@@ -802,7 +802,7 @@ looper~Eingehendes Audio loopen. Verwendung mit einem "Looperrecorder" für voll
 ~clear~Loop-Audio löschen 
 ~volume~Ausgangslautstärke
 ~b~Aktuelle Lautstärke in Wellenform einbinden
-~ m ~Nehmen Sie den Inhalt dieses Loopers und fügen Sie ihn mit einem anderen zusammen. Klicken Sie auf diese Schaltfläche in der Merge-Quelle und dann im Merge-Ziel.
+~m~Nehmen Sie den Inhalt dieses Loopers und fügen Sie ihn mit einem anderen zusammen. Klicken Sie auf diese Schaltfläche in der Merge-Quelle und dann im Merge-Ziel.
 ~decay~Betrag um welchen die Lautstärke pro Loop verringert wird
 ~save~Diesen Loop als wav-Datei speichern
 ~mute~Looper stumm schalten
@@ -1741,7 +1741,7 @@ titlebar~
 ~save as~Den aktuellen Zustand als neue .bsk-Datei speichern
 ~new patch~Zurücksetzen auf das in "layout" in userprefs.json angegebene Layout
 ~write audio~Die letzten 30 Minuten des Audios in den angegebenen recordings_path schreiben
-~ ? ~Hilfe anzeigen
+~help~Hilfe anzeigen
 ~settings~Einstellungen anpassen, gespeichert als userprefs.json
 ~load layout~[none]
 ~lookahead (exp.)~lookahead scheduling verwenden, was für scriptmodule notwendig ist. Wird automatisch aktiviert, wenn Sie scriptmodule verwenden. Bis jetzt scheint lookahead scheduling keine Probleme zu verursachen, aber ich lasse dieses Kästchen hier nur für den Fall.

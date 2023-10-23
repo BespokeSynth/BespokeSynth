@@ -555,7 +555,7 @@ midicontroller~harici cihazlardan midi girişi alın. "layout" görünümünde k
 ~twoway~kontrolöre geri besleme göndermeli mi? (düğme/butonla ilişkilendirilmiş LED’leri kontrol etmek için)
 ~feedback~hangi cc ya da notaya geri besleme gönderilmeli?
 ~pageless~bu bağlantı midi kontrolörünün tüm sayfalarında çalışmalı mı?
-~ x ~bu bağlantıyı silin
+~delete~bu bağlantıyı silin
 ~copy~bu bağlantıyı kopyalayın
 ~layout~bu kontrolör için hangi yerleşim dosyasını kullanmalı? bu dosyaları Documents/BespokeSynth/controllers klasörünüzde oluşturabilirsiniz.
 ~monome~hangi monome kullanılmalı?
@@ -621,7 +621,7 @@ multitrackrecorder~harici DAW’de miksleme için diske yazmak amacıyla birden 
 
 
 multitrackrecordertrack~çok kanallı kaydedicideki kanal
-~ X ~bu kanalı silin
+~delete~bu kanalı silin
 
 
 
@@ -802,7 +802,7 @@ looper~giriş sesini loop’a alır. tam işlevsellik için "looperrecorder" ile
 ~clear~loop sesini temizleyin
 ~volume~çıkış ses düzeyi
 ~b~geçerli sesi dalga şekline dönüştürür
-~ m ~bu looper’daki kaydı alın ve başka bir kayıtla birleştirin, önce birleştirilecek kaynakta sonra birleştirme hedefinde bu düğmeye basın.
+~m~bu looper’daki kaydı alın ve başka bir kayıtla birleştirin, önce birleştirilecek kaynakta sonra birleştirme hedefinde bu düğmeye basın.
 ~decay~her loop’un ses düzeyini düşürme miktarı
 ~save~wav dosyasına bu loop’u kaydedin
 ~mute~bu looper’ı sessize alın
@@ -1741,7 +1741,7 @@ titlebar~
 ~save as~geçerli durumu yeni .bsk dosyası olarak kaydedin
 ~new patch~userprefs.json dosyasında "layout" olarak belirtilen yerleşime geçiş yapın
 ~write audio~belirtilen recordings_path dizininize son 30 dakikada kaydedilen sesi yazın
-~ ? ~show help
+~help~show help
 ~settings~userprefs.json dosyasında kaydedildiği şekliyle ayarları belirleyin
 ~load layout~[none]
 ~lookahead (exp.)~scriptmodule için gerekli olan lookahead planlamasından yararlanın. scriptmodule’den yararlandığınızda otomatik olarak açılır, bu zaman kadar lookahead planlaması sorunsuz çalışmaktadır, ancak aksi bir durumuyla karşılaşılması olasılığına karşı bu onay kutusu yerleştirilmiştir.
@@ -1777,7 +1777,7 @@ transport~tempo ve geçerli süre pozisyonunu kontrol eder
 ~timesigbottom~zaman işareti alt değeri
 ~reset~zaman çizelgesini sıfıra getirin
 ~ < ~geçerli süreyi hızlıca geriye getirin
-~> ~geçerli süreyi hızlıca ileriye getirin
+~ > ~geçerli süreyi hızlıca ileriye getirin
 ~set tempo~
 ~play/pause~tüm ses işlemesini durdurun (shift-p)
 
