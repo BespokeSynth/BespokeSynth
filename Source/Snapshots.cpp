@@ -740,11 +740,21 @@ void Snapshots::SaveState(FileStreamOut& out)
 
    out << (int)mSnapshotModules.size();
    for (auto module : mSnapshotModules)
-      out << module->Path();
+   {
+      if (module != nullptr && !module->IsDeleted())
+         out << module->Path();
+      else
+         out << std::string("");
+   }
 
    out << (int)mSnapshotControls.size();
    for (auto control : mSnapshotControls)
-      out << control->Path();
+   {
+      if (control != nullptr && !control->GetModuleParent()->IsDeleted())
+         out << control->Path();
+      else
+         out << std::string("");
+   }
 
    out << mCurrentSnapshot;
 }
@@ -804,22 +814,28 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
    for (int i = 0; i < size; ++i)
    {
       in >> path;
-      IDrawableModule* module = TheSynth->FindModule(path);
-      if (module)
+      if (path != "")
       {
-         mSnapshotModules.push_back(module);
-         mModuleCable->AddPatchCable(module);
+         IDrawableModule* module = TheSynth->FindModule(path);
+         if (module)
+         {
+            mSnapshotModules.push_back(module);
+            mModuleCable->AddPatchCable(module);
+         }
       }
    }
    in >> size;
    for (int i = 0; i < size; ++i)
    {
       in >> path;
-      IUIControl* control = TheSynth->FindUIControl(path);
-      if (control)
+      if (path != "")
       {
-         mSnapshotControls.push_back(control);
-         mUIControlCable->AddPatchCable(control);
+         IUIControl* control = TheSynth->FindUIControl(path);
+         if (control)
+         {
+            mSnapshotControls.push_back(control);
+            mUIControlCable->AddPatchCable(control);
+         }
       }
    }
 
