@@ -19,7 +19,7 @@ void M185Sequencer::Init()
 {
    IDrawableModule::Init();
 
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
 }
 
 void M185Sequencer::CreateUIControls()
@@ -125,6 +125,32 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
    if (flags & kPulseFlag_Reset)
       ResetStep();
 
+   if (flags & kPulseFlag_SyncToTransport)
+   {
+      int totalSteps = 0;
+      for (auto& step : mSteps)
+         totalSteps += step.mPulseCount;
+      int desiredStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, totalSteps);
+
+      int stepsRemaining = desiredStep;
+      mStepIdx = 0;
+      for (auto& step : mSteps)
+      {
+         if (stepsRemaining < step.mPulseCount)
+         {
+            mStepPulseIdx = stepsRemaining;
+            break;
+         }
+         stepsRemaining -= step.mPulseCount;
+         ++mStepIdx;
+      }
+      if (mStepIdx >= mSteps.size())
+      {
+         mStepIdx = 0;
+         mStepPulseIdx = 0;
+      }
+   }
+
    if (mEnabled)
    {
       bool stopPrevNote =
@@ -160,6 +186,11 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
    mLastPlayedStepIdx = mStepIdx;
 
    // Update step/pulse
+   FindNextStep();
+}
+
+void M185Sequencer::FindNextStep()
+{
    mStepPulseIdx++;
    int loopProtection = (int)mSteps.size() - 1;
    while (mStepPulseIdx >= mSteps[mStepIdx].mPulseCount)
@@ -176,6 +207,9 @@ void M185Sequencer::ResetStep()
 {
    mStepIdx = 0;
    mStepPulseIdx = 0;
+
+   if (mSteps[mStepIdx].mPulseCount == 0) //if we don't have any pulses on the first step, find a step that does
+      FindNextStep();
 }
 
 void M185Sequencer::GetModuleDimensions(float& width, float& height)
