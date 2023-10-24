@@ -345,7 +345,7 @@ void PatchCableSource::Render()
          }
       }
 
-      if (mHoverIndex != -1)
+      if (mHoverIndex != -1 && mDefaultPatchBehavior != kDefaultPatchBehavior_Add)
       {
          if (mSide == Side::kBottom)
             cableY += kPatchCableSpacing;
@@ -374,7 +374,7 @@ ofVec2f PatchCableSource::GetCableStart(int index) const
    float cableX = mX;
    float cableY = mY;
 
-   if (mHoverIndex != -1)
+   if (mHoverIndex != -1 && mDefaultPatchBehavior != kDefaultPatchBehavior_Add)
    {
       if (mSide == Side::kBottom)
          cableY += kPatchCableSpacing * index;
@@ -577,6 +577,9 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
    {
       if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceClickRadius * kPatchCableSourceClickRadius)
          return i;
+
+      if (mDefaultPatchBehavior == kDefaultPatchBehavior_Add)
+         break;
 
       if (mSide == Side::kBottom)
          cableY += kPatchCableSpacing;
