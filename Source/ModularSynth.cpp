@@ -1122,8 +1122,8 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    mModuleContainer.KeyPressed(key, isRepeat);
    mUILayerModuleContainer.KeyPressed(key, isRepeat);
 
-   if (key == '/' && !isRepeat)
-      ofToggleFullscreen();
+   //if (key == '/' && !isRepeat)
+   //   ofToggleFullscreen();
 
    if (key == 'p' && GetKeyModifiers() == kModifier_Shift && !isRepeat)
       mAudioPaused = !mAudioPaused;
@@ -2830,12 +2830,21 @@ void ModularSynth::SaveState(std::string file, bool autosave)
 
    mAudioThreadMutex.Lock("SaveState()");
 
-   FileStreamOut out(file);
+   //write to a temp file first, so we don't corrupt data if we crash mid-save
+   std::string tmpFilePath = ofToDataPath("tmp");
 
-   mZoomer.WriteCurrentLocation(-1);
-   out << GetLayout().getRawString(true);
-   mModuleContainer.SaveState(out);
-   mUILayerModuleContainer.SaveState(out);
+   {
+      FileStreamOut out(tmpFilePath);
+
+      mZoomer.WriteCurrentLocation(-1);
+      out << GetLayout().getRawString(true);
+      mModuleContainer.SaveState(out);
+      mUILayerModuleContainer.SaveState(out);
+   }
+
+   juce::File writtenFile(tmpFilePath);
+   juce::File targetFile(file);
+   writtenFile.copyFileTo(targetFile);
 
    mAudioThreadMutex.Unlock();
 }
