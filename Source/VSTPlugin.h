@@ -131,6 +131,7 @@ private:
    FloatSlider* mVolSlider{ nullptr };
    int mPresetFileIndex{ -1 };
    DropdownList* mPresetFileSelector{ nullptr };
+   bool mPresetFileUpdateQueued{ false };
    ClickButton* mSavePresetFileButton{ nullptr };
    std::vector<std::string> mPresetFilePaths;
    ClickButton* mOpenEditorButton{ nullptr };

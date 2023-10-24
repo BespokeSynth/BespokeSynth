@@ -598,6 +598,61 @@ void VSTPlugin::Poll()
          //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
       }
    }
+
+   if (mPresetFileUpdateQueued)
+   {
+      mPresetFileUpdateQueued = false;
+      if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
+      {
+         File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
+
+         if (!resourceFile.existsAsFile())
+         {
+            DBG("File doesn't exist ...");
+            return;
+         }
+
+         std::unique_ptr<FileInputStream> input(resourceFile.createInputStream());
+
+         if (!input->openedOk())
+         {
+            DBG("Failed to open file");
+            return;
+         }
+
+         int rev = input->readInt();
+
+         int64 vstStateSize = input->readInt64();
+         char* vstState = new char[vstStateSize];
+         input->read(vstState, vstStateSize);
+         mPlugin->setStateInformation(vstState, vstStateSize);
+
+         int64 vstProgramStateSize = input->readInt64();
+         if (vstProgramStateSize > 0)
+         {
+            char* vstProgramState = new char[vstProgramStateSize];
+            input->read(vstProgramState, vstProgramStateSize);
+            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+         }
+
+         if (rev >= 2 && mModuleSaveData.GetBool("preset_file_sets_params"))
+         {
+            int numParamsShowing = input->readInt();
+            for (auto& param : mParameterSliders)
+               param.mShowing = false;
+            for (int i = 0; i < numParamsShowing; ++i)
+            {
+               int index = input->readInt();
+               if (index < mParameterSliders.size())
+               {
+                  mParameterSliders[index].mShowing = true;
+                  if (mParameterSliders[index].mSlider == nullptr)
+                     mParameterSliders[index].MakeSlider();
+               }
+            }
+         }
+      }
+   }
 }
 void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
 {
@@ -954,58 +1009,7 @@ std::vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
 void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mPresetFileSelector)
-   {
-      if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
-      {
-         File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
-
-         if (!resourceFile.existsAsFile())
-         {
-            DBG("File doesn't exist ...");
-            return;
-         }
-
-         std::unique_ptr<FileInputStream> input(resourceFile.createInputStream());
-
-         if (!input->openedOk())
-         {
-            DBG("Failed to open file");
-            return;
-         }
-
-         int rev = input->readInt();
-
-         int64 vstStateSize = input->readInt64();
-         char* vstState = new char[vstStateSize];
-         input->read(vstState, vstStateSize);
-         mPlugin->setStateInformation(vstState, vstStateSize);
-
-         int64 vstProgramStateSize = input->readInt64();
-         if (vstProgramStateSize > 0)
-         {
-            char* vstProgramState = new char[vstProgramStateSize];
-            input->read(vstProgramState, vstProgramStateSize);
-            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
-         }
-
-         if (rev >= 2 && mModuleSaveData.GetBool("preset_file_sets_params"))
-         {
-            int numParamsShowing = input->readInt();
-            for (auto& param : mParameterSliders)
-               param.mShowing = false;
-            for (int i = 0; i < numParamsShowing; ++i)
-            {
-               int index = input->readInt();
-               if (index < mParameterSliders.size())
-               {
-                  mParameterSliders[index].mShowing = true;
-                  if (mParameterSliders[index].mSlider == nullptr)
-                     mParameterSliders[index].MakeSlider();
-               }
-            }
-         }
-      }
-   }
+      mPresetFileUpdateQueued = true;
 
    if (list == mShowParameterDropdown)
    {
