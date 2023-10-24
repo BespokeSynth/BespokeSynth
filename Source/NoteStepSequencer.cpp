@@ -201,8 +201,8 @@ void NoteStepSequencer::DrawModule()
    ofSetColor(255, 255, 255, gModuleDrawAlpha);
 
    mLoopResetPointSlider->SetShowing(mHasExternalPulseSource);
-   mGridControlOffsetXSlider->SetShowing(mGridControlTarget->GetGridController() != nullptr && mLength > mGridControlTarget->GetGridController()->NumCols());
-   mGridControlOffsetYSlider->SetShowing(mGridControlTarget->GetGridController() != nullptr && mNoteRange > mGridControlTarget->GetGridController()->NumRows());
+   mGridControlOffsetXSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && mLength > mGridControlTarget->GetGridController()->NumCols()) || mPush2GridDisplayMode == Push2GridDisplayMode::GridView);
+   mGridControlOffsetYSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && mNoteRange > mGridControlTarget->GetGridController()->NumRows()) || mPush2GridDisplayMode == Push2GridDisplayMode::GridView);
 
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
@@ -239,10 +239,15 @@ void NoteStepSequencer::DrawModule()
    }
    ofPopStyle();
 
-   if (mGridControlTarget->GetGridController())
+   if (mGridControlTarget->GetGridController() || mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
    {
-      int controllerCols = mGridControlTarget->GetGridController()->NumCols();
-      int controllerRows = mGridControlTarget->GetGridController()->NumRows();
+      int controllerCols = 8;
+      int controllerRows = 8;
+      if (mGridControlTarget->GetGridController() != nullptr)
+      {
+         controllerCols = mGridControlTarget->GetGridController()->NumCols();
+         controllerRows = mGridControlTarget->GetGridController()->NumRows();
+      }
 
       ofPushStyle();
       ofNoFill();
@@ -525,91 +530,153 @@ void NoteStepSequencer::GetPush2Layout(int& sequenceRows, int& pitchCols, int& p
 
 bool NoteStepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
-   int sequenceRows, pitchCols, pitchRows;
-   GetPush2Layout(sequenceRows, pitchCols, pitchRows);
-
-   if (type == kMidiMessage_Note)
+   if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {
-      if (controlIndex == 12)
-      {
-         mPush2VelocityHeld = (midiValue > 0);
-         return true;
-      }
+      int sequenceRows, pitchCols, pitchRows;
+      GetPush2Layout(sequenceRows, pitchCols, pitchRows);
 
-      if (controlIndex >= 36 && controlIndex <= 99)
+      if (type == kMidiMessage_Note)
+      {
+         if (controlIndex == 12)
+         {
+            mPush2VelocityHeld = (midiValue > 0);
+            return true;
+         }
+
+         if (controlIndex >= 36 && controlIndex <= 99)
+         {
+            int gridIndex = controlIndex - 36;
+            int x = gridIndex % 8;
+            int y = 7 - gridIndex / 8;
+
+            if (gridIndex >= 0 && gridIndex < 64 && y < sequenceRows)
+            {
+               int index = x + y * 8;
+               if (midiValue > 0)
+               {
+                  mPush2HeldStep = index;
+                  mPush2HeldStepWasEdited = false;
+                  mPush2ButtonPressTime = gTime;
+               }
+               else if (index == mPush2HeldStep)
+               {
+                  if (mVels[mPush2HeldStep] == 0)
+                     mVels[mPush2HeldStep] = mQueuedPush2Vel;
+                  else if (!mPush2HeldStepWasEdited && gTime - mPush2ButtonPressTime < 500)
+                     mVels[index] = 0;
+                  mPush2HeldStep = -1;
+               }
+            }
+            else if (y < sequenceRows + pitchRows)
+            {
+               if (midiValue > 0)
+               {
+                  int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+                  if (index < 0 || index >= mNoteRange || x >= pitchCols)
+                  {
+                     //out of range
+                     mQueuedPush2Tone = -2;
+                  }
+                  else if (mPush2HeldStep != -1)
+                  {
+                     mTones[mPush2HeldStep] = index;
+                     mPush2HeldStepWasEdited = true;
+                  }
+                  else
+                  {
+                     mQueuedPush2Tone = index;
+                  }
+               }
+            }
+            else if (y == 7)
+            {
+               if (midiValue > 0)
+               {
+                  mPush2LengthHeld = true;
+                  if (mPush2HeldStep != -1)
+                  {
+                     mNoteLengths[mPush2HeldStep] = (x + 1) / 8.0f;
+                     mPush2HeldStepWasEdited = true;
+                  }
+                  else
+                  {
+                     mQueuedPush2Length = (x + 1) / 8.0f;
+                  }
+               }
+               else
+               {
+                  mPush2LengthHeld = false;
+               }
+            }
+
+            SyncGridToSeq();
+
+            return true;
+         }
+      }
+   }
+   else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
+   {
+      if (type == kMidiMessage_Note)
       {
          int gridIndex = controlIndex - 36;
          int x = gridIndex % 8;
          int y = 7 - gridIndex / 8;
-
-         if (y < sequenceRows)
+         int col = x + mGridControlOffsetX;
+         int row = y - mGridControlOffsetY;
+         if (gridIndex >= 0 && gridIndex < 64 &&
+             col >= 0 && col < mLength &&
+             row >= 8 - mNoteRange && row < 8)
          {
-            int index = x + y * 8;
             if (midiValue > 0)
             {
-               mPush2HeldStep = index;
-               if (mVels[mPush2HeldStep] == 0)
-               {
-                  mVels[mPush2HeldStep] = mQueuedPush2Vel;
-                  mPush2HeldStepWasEdited = true;
-               }
-               else
-               {
-                  mPush2HeldStepWasEdited = false;
-               }
+               mPush2HeldStep = col;
+               mPush2HeldStepWasEdited = false;
                mPush2ButtonPressTime = gTime;
             }
-            else if (index == mPush2HeldStep)
+
+            int tone = 8 - 1 - row;
+            if (mTones[col] == tone && mVels[col] > 0)
             {
-               if (!mPush2HeldStepWasEdited && gTime - mPush2ButtonPressTime < 500)
-                  mVels[index] = 0;
-               mPush2HeldStep = -1;
-            }
-         }
-         else if (y < sequenceRows + pitchRows)
-         {
-            if (midiValue > 0)
-            {
-               int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
-               if (index < 0 || index >= mNoteRange || x >= pitchCols)
+               if (midiValue == 0 && !mPush2HeldStepWasEdited && gTime - mPush2ButtonPressTime < 500)
                {
-                  //out of range
-                  mQueuedPush2Tone = -2;
-               }
-               else if (mPush2HeldStep != -1)
-               {
-                  mTones[mPush2HeldStep] = index;
-                  mPush2HeldStepWasEdited = true;
-               }
-               else
-               {
-                  mQueuedPush2Tone = index;
-               }
-            }
-         }
-         else if (y == 7)
-         {
-            if (midiValue > 0)
-            {
-               mPush2LengthHeld = true;
-               if (mPush2HeldStep != -1)
-               {
-                  mNoteLengths[mPush2HeldStep] = (x + 1) / 8.0f;
-                  mPush2HeldStepWasEdited = true;
-               }
-               else
-               {
-                  mQueuedPush2Length = (x + 1) / 8.0f;
+                  if (mNoteLengths[col] < 1)
+                     mNoteLengths[col] = 1;
+                  else
+                     mVels[col] = 0;
+                  SyncGridToSeq();
                }
             }
             else
             {
-               mPush2LengthHeld = false;
+               if (midiValue > 0)
+               {
+                  mTones[col] = tone;
+                  mVels[col] = mQueuedPush2Vel;
+                  mNoteLengths[col] = .5f;
+                  mPush2HeldStepWasEdited = true;
+                  SyncGridToSeq();
+               }
             }
+
+            if (midiValue == 0)
+               mPush2HeldStep = -1;
          }
+         return true;
+      }
+   }
 
-         SyncGridToSeq();
-
+   if (type == kMidiMessage_Control)
+   {
+      if (controlIndex == push2->GetGridControllerOption1Control())
+      {
+         if (midiValue > 0)
+         {
+            if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
+               mPush2GridDisplayMode = Push2GridDisplayMode::GridView;
+            else
+               mPush2GridDisplayMode = Push2GridDisplayMode::PerStep;
+         }
          return true;
       }
    }
@@ -647,55 +714,82 @@ void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
    {
       for (int y = 0; y < 8; ++y)
       {
-         int pushColor;
+         int pushColor = 0;
 
-         if (y < sequenceRows)
+         if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
          {
-            int index = x + y * 8;
-            if (index >= mLength)
-               pushColor = 0;
-            else if (index == mPush2HeldStep)
-               pushColor = 125;
-            else if (index == displayStep)
-               pushColor = 101;
-            else if (mVels[index] > 0)
-               pushColor = mNoteLengths[index] == 1 ? 93 : 95;
-            else
-               pushColor = 92;
-         }
-         else if (y < sequenceRows + pitchRows)
-         {
-            int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
-            int pitch = RowToPitch(index);
-            if (x >= pitchCols || index < 0 || index >= mNoteRange)
-               pushColor = mQueuedPush2Tone == -2 ? 126 : 0;
-            else if (index == mQueuedPush2Tone)
-               pushColor = 126;
-            else if (index == mTones[displayStep] && ((mVels[displayStep] > 0 && !mAlreadyDidNoteOff) || mPush2HeldStep != -1))
-               pushColor = gTime - mLastStepPlayTime[displayStep] < 100 ? 127 : 2;
-            else if (TheScale->IsRoot(pitch))
-               pushColor = 69;
-            else if (TheScale->IsInPentatonic(pitch))
-               pushColor = 77;
-            else
-               pushColor = 78;
-         }
-         else if (y == 7)
-         {
-            float displayLength = 0;
-            if (mPush2LengthHeld && mPush2HeldStep == -1)
-               displayLength = mQueuedPush2Length;
-            else if (mVels[displayStep] > 0)
-               displayLength = mNoteLengths[displayStep];
+            if (y < sequenceRows)
+            {
+               int index = x + y * 8;
+               if (index >= mLength)
+                  pushColor = 0;
+               else if (index == mPush2HeldStep)
+                  pushColor = 125;
+               else if (index == displayStep)
+                  pushColor = 101;
+               else if (mVels[index] > 0)
+                  pushColor = mNoteLengths[index] == 1 ? 93 : 95;
+               else
+                  pushColor = 92;
+            }
+            else if (y < sequenceRows + pitchRows)
+            {
+               int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+               int pitch = RowToPitch(index);
+               if (x >= pitchCols || index < 0 || index >= mNoteRange)
+                  pushColor = mQueuedPush2Tone == -2 ? 126 : 0;
+               else if (index == mQueuedPush2Tone)
+                  pushColor = 126;
+               else if (index == mTones[displayStep] && ((mVels[displayStep] > 0 && !mAlreadyDidNoteOff) || mPush2HeldStep != -1))
+                  pushColor = gTime - mLastStepPlayTime[displayStep] < 100 ? 127 : 2;
+               else if (TheScale->IsRoot(pitch))
+                  pushColor = 69;
+               else if (TheScale->IsInPentatonic(pitch))
+                  pushColor = 77;
+               else
+                  pushColor = 78;
+            }
+            else if (y == 7)
+            {
+               float displayLength = 0;
+               if (mPush2LengthHeld && mPush2HeldStep == -1)
+                  displayLength = mQueuedPush2Length;
+               else if (mVels[displayStep] > 0)
+                  displayLength = mNoteLengths[displayStep];
 
-            if (displayLength * 8 - 1 >= x)
-               pushColor = 83;
-            else
-               pushColor = 84;
+               if (displayLength * 8 - 1 >= x)
+                  pushColor = 83;
+               else
+                  pushColor = 84;
+            }
          }
-         else
+         else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
          {
-            pushColor = 0;
+            int column = x + mGridControlOffsetX;
+            int row = y - mGridControlOffsetY;
+
+            if (column >= 0 && column < mLength && row >= 8 - mNoteRange && row < 8)
+            {
+               bool isHighlightCol = (column == mGrid->GetHighlightCol(NextBufferTime(true)));
+               int pitch = RowToPitch(row);
+               if (TheScale->IsRoot(pitch))
+                  pushColor = 69;
+               else if (TheScale->IsInPentatonic(pitch))
+                  pushColor = 77;
+               else
+                  pushColor = 78;
+               if (isHighlightCol)
+                  pushColor = 83;
+               if (mTones[column] == 8 - 1 - row && mVels[column] > 0)
+               {
+                  if (column == mPush2HeldStep)
+                     pushColor = 127;
+                  else if (isHighlightCol)
+                     pushColor = 126;
+                  else
+                     pushColor = mNoteLengths[column] == 1 ? 125 : 95;
+               }
+            }
          }
 
          push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
@@ -714,6 +808,8 @@ void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
       touchStripLights += c;
    }
    push2->GetDevice()->SendSysEx(touchStripLights);
+
+   push2->SetLed(kMidiMessage_Control, push2->GetGridControllerOption1Control(), 127);
 }
 
 void NoteStepSequencer::OnTransportAdvanced(float amount)

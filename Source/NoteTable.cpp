@@ -111,8 +111,8 @@ void NoteTable::DrawModule()
 
    ofSetColor(255, 255, 255, gModuleDrawAlpha);
 
-   mGridControlOffsetXSlider->SetShowing(mGridControlTarget->GetGridController() != nullptr && mLength > mGridControlTarget->GetGridController()->NumCols());
-   mGridControlOffsetYSlider->SetShowing(mGridControlTarget->GetGridController() != nullptr && mNoteRange > mGridControlTarget->GetGridController()->NumRows());
+   mGridControlOffsetXSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && mLength > mGridControlTarget->GetGridController()->NumCols()) || mPush2GridDisplayMode == Push2GridDisplayMode::GridView);
+   mGridControlOffsetYSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && mNoteRange > mGridControlTarget->GetGridController()->NumRows()) || mPush2GridDisplayMode == Push2GridDisplayMode::GridView);
 
    mLengthSlider->Draw();
    mOctaveSlider->Draw();
@@ -142,10 +142,15 @@ void NoteTable::DrawModule()
    }
    ofPopStyle();
 
-   if (mGridControlTarget->GetGridController())
+   if (mGridControlTarget->GetGridController() || mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
    {
-      int controllerCols = mGridControlTarget->GetGridController()->NumCols();
-      int controllerRows = mGridControlTarget->GetGridController()->NumRows();
+      int controllerCols = 8;
+      int controllerRows = 8;
+      if (mGridControlTarget->GetGridController() != nullptr)
+      {
+         controllerCols = mGridControlTarget->GetGridController()->NumCols();
+         controllerRows = mGridControlTarget->GetGridController()->NumRows();
+      }
 
       ofPushStyle();
       ofNoFill();
@@ -498,45 +503,90 @@ void NoteTable::GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows
 
 bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
 {
-   int sequenceRows, pitchCols, pitchRows;
-   GetPush2Layout(sequenceRows, pitchCols, pitchRows);
-
-   if (type == kMidiMessage_Note)
+   if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
+      int sequenceRows, pitchCols, pitchRows;
+      GetPush2Layout(sequenceRows, pitchCols, pitchRows);
+
+      if (type == kMidiMessage_Note)
+      {
+         if (controlIndex >= 36 && controlIndex <= 99)
+         {
+            int gridIndex = controlIndex - 36;
+            int x = gridIndex % 8;
+            int y = 7 - gridIndex / 8;
+
+            if (y < sequenceRows)
+            {
+               int index = x + y * 8;
+               if (midiValue > 0)
+                  mPush2HeldStep = index;
+               else if (index == mPush2HeldStep)
+                  mPush2HeldStep = -1;
+            }
+            else if (y < sequenceRows + pitchRows)
+            {
+               if (midiValue > 0)
+               {
+                  int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+                  if (index < 0 || index >= mNoteRange)
+                  {
+                     //out of range, do nothing
+                  }
+                  else if (mPush2HeldStep != -1)
+                  {
+                     mGrid->SetVal(mPush2HeldStep, index, mGrid->GetVal(mPush2HeldStep, index) > 0 ? 0 : 1);
+                  }
+                  else
+                  {
+                     //I'm not liking this "queued pitch" behavior, let's disable it for now
+                     //mQueuedPitches[RowToPitch(index)] = true;
+                  }
+               }
+            }
+
+            return true;
+         }
+      }
+   }
+   else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
+   {
+      if (type == kMidiMessage_Note)
       {
          int gridIndex = controlIndex - 36;
          int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
-
-         if (y < sequenceRows)
-         {
-            int index = x + y * 8;
-            if (midiValue > 0)
-               mPush2HeldStep = index;
-            else if (index == mPush2HeldStep)
-               mPush2HeldStep = -1;
-         }
-         else if (y < sequenceRows + pitchRows)
+         int y = gridIndex / 8;
+         int col = x + mGridControlOffsetX;
+         int row = y + mGridControlOffsetY;
+         if (gridIndex >= 0 && gridIndex < 64 &&
+             col >= 0 && col < mLength &&
+             row >= 0 && row < mNoteRange)
          {
             if (midiValue > 0)
             {
-               int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
-               if (index < 0 || index >= mNoteRange)
-               {
-                  //out of range, do nothing
-               }
-               else if (mPush2HeldStep != -1)
-               {
-                  mGrid->SetVal(mPush2HeldStep, index, mGrid->GetVal(mPush2HeldStep, index) > 0 ? 0 : 1);
-               }
-               else
-               {
-                  mQueuedPitches[RowToPitch(index)] = true;
-               }
+               mPush2HeldStep = col;
+               mGrid->SetVal(mPush2HeldStep, row, mGrid->GetVal(mPush2HeldStep, row) > 0 ? 0 : 1);
+            }
+            else
+            {
+               mPush2HeldStep = -1;
             }
          }
+         return true;
+      }
+   }
 
+   if (type == kMidiMessage_Control)
+   {
+      if (controlIndex == push2->GetGridControllerOption1Control())
+      {
+         if (midiValue > 0)
+         {
+            if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
+               mPush2GridDisplayMode = Push2GridDisplayMode::GridView;
+            else
+               mPush2GridDisplayMode = Push2GridDisplayMode::PerStep;
+         }
          return true;
       }
    }
@@ -553,47 +603,93 @@ void NoteTable::UpdatePush2Leds(Push2Control* push2)
    {
       for (int y = 0; y < 8; ++y)
       {
-         int pushColor;
+         int pushColor = 0;
 
-         if (y < sequenceRows)
+         if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
          {
-            int index = x + y * 8;
-            if (index >= mLength)
-               pushColor = 0;
-            else if (index == mPush2HeldStep)
-               pushColor = 125;
-            else if (mLastColumnPlayTime[index] != -1)
-               pushColor = 101;
-            else
-               pushColor = 93;
+            if (y < sequenceRows)
+            {
+               int index = x + y * 8;
+               if (index >= mLength)
+                  pushColor = 0;
+               else if (index == mPush2HeldStep)
+                  pushColor = 125;
+               else if (mLastColumnPlayTime[index] != -1)
+                  pushColor = 101;
+               else
+                  pushColor = 93;
+            }
+            else if (y < sequenceRows + pitchRows)
+            {
+               int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+               int pitch = RowToPitch(index);
+               if (x >= pitchCols || index >= mNoteRange)
+                  pushColor = 0;
+               else if (mPush2HeldStep != -1 && mGrid->GetVal(mPush2HeldStep, index) > 0)
+                  pushColor = 127;
+               else if (mPush2HeldStep == -1 && mNoteOutput.GetNotes()[pitch])
+                  pushColor = gTime - mPitchPlayTimes[pitch] < 100 ? 127 : 2;
+               else if (mQueuedPitches[pitch])
+                  pushColor = 126;
+               else if (TheScale->IsRoot(pitch))
+                  pushColor = 69;
+               else if (TheScale->IsInPentatonic(pitch))
+                  pushColor = 77;
+               else
+                  pushColor = 78;
+            }
          }
-         else if (y < sequenceRows + pitchRows)
+         else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
          {
-            int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
-            int pitch = RowToPitch(index);
-            if (x >= pitchCols || index >= mNoteRange)
-               pushColor = 0;
-            else if (mPush2HeldStep != -1 && mGrid->GetVal(mPush2HeldStep, index) > 0)
-               pushColor = 127;
-            else if (mPush2HeldStep == -1 && mNoteOutput.GetNotes()[pitch])
-               pushColor = gTime - mPitchPlayTimes[pitch] < 100 ? 127 : 2;
-            else if (mQueuedPitches[pitch])
-               pushColor = 126;
-            else if (TheScale->IsRoot(pitch))
-               pushColor = 69;
-            else if (TheScale->IsInPentatonic(pitch))
-               pushColor = 77;
-            else
-               pushColor = 78;
-         }
-         else
-         {
-            pushColor = 0;
+            int column = x + mGridControlOffsetX;
+            int row = (7 - y) + mGridControlOffsetY;
+
+            if (column >= 0 && column < mLength && row >= 0 && row < mNoteRange)
+            {
+               bool isHighlightCol = mLastColumnPlayTime[column] != -1;
+               int pitch = RowToPitch(row);
+               if (isHighlightCol && mPush2HeldStep == -1 && mNoteOutput.GetNotes()[pitch])
+                  pushColor = gTime - mPitchPlayTimes[pitch] < 100 ? 127 : 2;
+               else if (mGrid->GetVal(column, row) > 0)
+                  pushColor = 125;
+               else if (mQueuedPitches[pitch])
+                  pushColor = 126;
+               else if (isHighlightCol)
+                  pushColor = 83;
+               else if (TheScale->IsRoot(pitch))
+                  pushColor = 69;
+               else if (TheScale->IsInPentatonic(pitch))
+                  pushColor = 77;
+               else
+                  pushColor = 78;
+
+               /*bool isHighlightCol = mLastColumnPlayTime[column] != -1;
+               int pitch = RowToPitch(row);
+               if (TheScale->IsRoot(pitch))
+                  pushColor = 69;
+               else if (TheScale->IsInPentatonic(pitch))
+                  pushColor = 77;
+               else
+                  pushColor = 78;
+               if (isHighlightCol)
+                  pushColor = 83;
+               if (mTones[column] == 8 - 1 - row && mVels[column] > 0)
+               {
+                  if (column == mPush2HeldStep)
+                     pushColor = 127;
+                  else if (isHighlightCol)
+                     pushColor = 126;
+                  else
+                     pushColor = mNoteLengths[column] == 1 ? 125 : 95;
+               }*/
+            }
          }
 
          push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
+
+   push2->SetLed(kMidiMessage_Control, push2->GetGridControllerOption1Control(), 127);
 }
 
 void NoteTable::DropdownUpdated(DropdownList* list, int oldVal, double time)

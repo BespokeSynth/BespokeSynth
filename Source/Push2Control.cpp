@@ -123,7 +123,7 @@ Push2Control::Push2Control()
    Initialize();
    for (int i = 0; i < 128 * 2; ++i)
       mLedState[i] = -1;
-   for (int i = 0; i < 8 * 8; ++i)
+   for (int i = 0; i < (int)mModuleGrid.size(); ++i)
       mModuleGrid[i] = nullptr;
    for (int i = 0; i < 128; ++i)
       mNoteHeldState[i] = 0;
@@ -156,10 +156,14 @@ void Push2Control::Exit()
 void Push2Control::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   //UIBLOCK0();
-   //ENDUIBLOCK(mWidth, mHeight);
-   mWidth = 100;
-   mHeight = 20;
+
+   UIBLOCK0();
+   DROPDOWN(mModuleGridLayoutStyleDropdown, "grid style", (int*)(&mModuleGridLayoutStyle), 100);
+   CHECKBOX(mShowManualGridCheckbox, "show manual grid", &mShowManualGrid);
+   ENDUIBLOCK(mWidth, mHeight);
+
+   mModuleGridLayoutStyleDropdown->AddLabel("auto layout", (int)ModuleGridLayoutStyle::Automatic);
+   mModuleGridLayoutStyleDropdown->AddLabel("manual layout", (int)ModuleGridLayoutStyle::Manual);
 
    mSpawnLists.SetModuleFactory(TheSynth->GetModuleFactory());
    mSpawnLists.mNoteModules.GetList()->SetMaxPerColumn(9999);
@@ -177,6 +181,16 @@ void Push2Control::CreateUIControls()
    mSpawnModuleControls.push_back(mSpawnLists.mPlugins.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mOtherModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mPrefabs.GetList());
+
+   for (size_t i = 0; i < mModuleGridManualCables.size(); ++i)
+   {
+      mModuleGridManualCables[i] = new PatchCableSource(this, kConnectionType_Special);
+      ofColor color = IDrawableModule::GetColor(kModuleCategory_Other);
+      color.a *= .3f;
+      mModuleGridManualCables[i]->SetColor(color);
+      mModuleGridManualCables[i]->SetManualPosition((i % 8) * 12 + 8, (i / 8) * 12 + mHeight + 6);
+      AddPatchCableSource(mModuleGridManualCables[i]);
+   }
 }
 
 void Push2Control::DrawModule()
@@ -188,6 +202,14 @@ void Push2Control::DrawModule()
    {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
       DrawTextNormal(mPushBridgeInitErrMsg, 3, 15);
+   }
+   else
+   {
+      mModuleGridLayoutStyleDropdown->Draw();
+      mShowManualGridCheckbox->Draw();
+
+      for (auto& cable : mModuleGridManualCables)
+         cable->SetShowing(mShowManualGrid);
    }
 }
 
@@ -223,6 +245,35 @@ void Push2Control::PostRender()
 {
    if (ThePushBridge.IsInitialized())
       RenderPush2Display();
+}
+
+void Push2Control::KeyPressed(int key, bool isRepeat)
+{
+   if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
+   {
+      for (int i = 0; i < (int)mModuleGridManualCables.size(); ++i)
+      {
+         if (mModuleGridManualCables[i]->IsHovered())
+         {
+            int x = i % 8;
+            int y = i / 8;
+            int newX = x;
+            int newY = y;
+            if (key == OF_KEY_RIGHT)
+               newX = ofClamp(x + 1, 0, 7);
+            if (key == OF_KEY_LEFT)
+               newX = ofClamp(x - 1, 0, 7);
+            if (key == OF_KEY_UP)
+               newY = ofClamp(y - 1, 0, 7);
+            if (key == OF_KEY_DOWN)
+               newY = ofClamp(y + 1, 0, 7);
+
+            IClickable* target = mModuleGridManualCables[x + y * 8]->GetTarget();
+            mModuleGridManualCables[x + y * 8]->ClearPatchCables();
+            mModuleGridManualCables[newX + newY * 8]->SetTarget(target);
+         }
+      }
+   }
 }
 
 void Push2Control::OnClicked(float x, float y, bool right)
@@ -664,9 +715,6 @@ int Push2Control::GetSpawnGridPadColor(int index, ModuleCategory moduleType) con
 
 void Push2Control::SetModuleGridLights()
 {
-   for (int i = 0; i < 8 * 8; ++i)
-      mModuleGrid[i] = nullptr;
-
    float minX = 0;
    float minY = 0;
    float maxX = ofGetWidth();
@@ -687,31 +735,42 @@ void Push2Control::SetModuleGridLights()
    maxY += 1;
    mModuleGridRect.set(minX, minY, maxX - minX, maxY - minY);
 
-   for (int i = 0; i < mModules.size(); ++i)
+   if (mModuleGridLayoutStyle == ModuleGridLayoutStyle::Automatic || mScreenDisplayMode == ScreenDisplayMode::kAddModule)
    {
-      ofVec2f pos = mModules[i]->GetPosition();
-      int gridX = (pos.x - minX) / (maxX - minX) * 8;
-      int gridY = (pos.y - minY) / (maxY - minY) * 8;
-      while (gridX < 8 && gridY < 8)
+      for (int i = 0; i < (int)mModuleGrid.size(); ++i)
+         mModuleGrid[i] = nullptr;
+
+      for (int i = 0; i < mModules.size(); ++i)
       {
-         int index = gridX + gridY * 8;
-         if (mModuleGrid[index] == nullptr)
+         ofVec2f pos = mModules[i]->GetPosition();
+         int gridX = (pos.x - minX) / (maxX - minX) * 8;
+         int gridY = (pos.y - minY) / (maxY - minY) * 8;
+         while (gridX < 8 && gridY < 8)
          {
-            mModuleGrid[index] = mModules[i];
-            break;
-         }
-         else
-         {
-            //IDrawableModule* otherModule = mModuleGrid[index];
-            int peekGridIndex;
-            if (GetGridIndex(gridX + 1, gridY, peekGridIndex) && mModuleGrid[peekGridIndex] == nullptr)
-               ++gridX;
-            else if (GetGridIndex(gridX, gridY + 1, peekGridIndex) && mModuleGrid[peekGridIndex] == nullptr)
-               ++gridY;
+            int index = gridX + gridY * 8;
+            if (mModuleGrid[index] == nullptr)
+            {
+               mModuleGrid[index] = mModules[i];
+               break;
+            }
             else
-               ++gridX;
+            {
+               //IDrawableModule* otherModule = mModuleGrid[index];
+               int peekGridIndex;
+               if (GetGridIndex(gridX + 1, gridY, peekGridIndex) && mModuleGrid[peekGridIndex] == nullptr)
+                  ++gridX;
+               else if (GetGridIndex(gridX, gridY + 1, peekGridIndex) && mModuleGrid[peekGridIndex] == nullptr)
+                  ++gridY;
+               else
+                  ++gridX;
+            }
          }
       }
+   }
+   else if (mModuleGridLayoutStyle == ModuleGridLayoutStyle::Manual)
+   {
+      for (int i = 0; i < (int)mModuleGrid.size(); ++i)
+         mModuleGrid[i] = static_cast<IDrawableModule*>(mModuleGridManualCables[i]->GetTarget());
    }
 
    if (mScreenDisplayMode == ScreenDisplayMode::kAddModule && mSelectedGridSpawnListIndex != -1 && mSelectedGridSpawnListIndex < (int)mSpawnLists.GetDropdowns().size())
@@ -735,7 +794,7 @@ void Push2Control::SetModuleGridLights()
    }
    else
    {
-      for (int i = 0; i < 8 * 8; ++i)
+      for (int i = 0; i < (int)mModuleGrid.size(); ++i)
       {
          int gridX = i % 8;
          int gridY = i / 8;
@@ -1310,6 +1369,14 @@ void Push2Control::SetLed(MidiMessageType type, int index, int color, int flashC
    }
 }
 
+void Push2Control::SetGridControlInterface(IPush2GridController* controller, IDrawableModule* module)
+{
+   mGridControlInterface = controller;
+   mGridControlModule = module;
+   SetLed(kMidiMessage_Control, GetGridControllerOption1Control(), 0);
+   SetLed(kMidiMessage_Control, GetGridControllerOption2Control(), 0);
+}
+
 void Push2Control::OnMidiNote(MidiNote& note)
 {
    if (mGridControlInterface != nullptr)
@@ -1657,8 +1724,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
          else
          {
             mScreenDisplayMode = ScreenDisplayMode::kAddModule;
-            mGridControlInterface = nullptr;
-            mGridControlModule = nullptr;
+            SetGridControlInterface(nullptr, nullptr);
             for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
                mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1, gTime);
             mSelectedGridSpawnListIndex = -1;
@@ -1777,15 +1843,15 @@ void Push2Control::OnMidiControl(MidiControl& control)
          if (control.mControl == kRightButton)
             direction.x += 1;
 
-         if (mShiftHeld)
-         {
-            TheSynth->PanView(direction.x * -50, direction.y * -50);
-         }
-         else if (mDisplayModule)
+         if (mShiftHeld && mDisplayModule)
          {
             ofVec2f pos = mDisplayModule->GetPosition();
             pos += direction * 50;
             mDisplayModule->SetPosition(pos.x, pos.y);
+         }
+         else
+         {
+            TheSynth->PanView(direction.x * -100, direction.y * -100);
          }
       }
    }
@@ -1861,8 +1927,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
          IPush2GridController* controller = dynamic_cast<IPush2GridController*>(mDisplayModule);
          if (controller != nullptr && controller != mGridControlInterface)
          {
-            mGridControlInterface = controller;
-            mGridControlModule = mDisplayModule;
+            SetGridControlInterface(controller, mDisplayModule);
 
             for (int i = 36; i <= 99; ++i)
                SetLed(kMidiMessage_Note, i, 0);
@@ -1879,10 +1944,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
    else if (control.mControl == kSessionButton)
    {
       if (control.mValue > 0)
-      {
-         mGridControlInterface = nullptr;
-         mGridControlModule = nullptr;
-      }
+         SetGridControlInterface(nullptr, nullptr);
    }
    else if (control.mControl == kScaleButton)
    {
@@ -1994,6 +2056,16 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
    TheSynth->SetZoomLevel(pow(2, value * 2 - 1) + .1f);
 
    //ofLog() << "pitchbend " << pitchBend.mChannel << " " << pitchBend.mValue;
+}
+
+int Push2Control::GetGridControllerOption1Control() const
+{
+   return kRepeatButton;
+}
+
+int Push2Control::GetGridControllerOption2Control() const
+{
+   return kAccentButton;
 }
 
 void Push2Control::UpdateRoutingModules()

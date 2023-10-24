@@ -156,4 +156,10 @@ private:
    IntSlider* mGridControlOffsetYSlider{ nullptr };
 
    int mPush2HeldStep{ -1 };
+   enum class Push2GridDisplayMode
+   {
+      PerStep,
+      GridView
+   };
+   Push2GridDisplayMode mPush2GridDisplayMode{ Push2GridDisplayMode::PerStep };
 };
