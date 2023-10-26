@@ -160,6 +160,7 @@ public:
       height = 10;
    }
    void KeyPressed(int key, bool isRepeat);
+   bool IsHovered() const { return mHoverIndex != -1; }
 
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);

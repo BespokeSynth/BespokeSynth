@@ -31,8 +31,9 @@
 #include "IDrawableModule.h"
 #include "Sample.h"
 #include "ClickButton.h"
+#include "IAudioSource.h"
 
-class SampleBrowser : public IDrawableModule, public IButtonListener
+class SampleBrowser : public IDrawableModule, public IButtonListener, public IAudioSource
 {
 public:
    SampleBrowser();
@@ -43,6 +44,9 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+
+   //IAudioSource
+   void Process(double time) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
 
@@ -70,7 +74,10 @@ private:
    juce::String mCurrentDirectory;
    juce::StringArray mDirectoryListing;
    std::array<ClickButton*, 30> mButtons;
+   std::array<ClickButton*, 30> mPlayButtons;
    ClickButton* mBackButton{ nullptr };
    ClickButton* mForwardButton{ nullptr };
    int mCurrentPage{ 0 };
+   Sample mPlayingSample;
+   ofMutex mSampleMutex;
 };

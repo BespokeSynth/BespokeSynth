@@ -70,6 +70,7 @@ private:
 
    void StepBy(double time, float velocity, int flags);
    void ResetStep();
+   void FindNextStep();
 
    enum GateType
    {
@@ -97,6 +98,7 @@ private:
    std::array<Step, NUM_M185SEQUENCER_STEPS> mSteps;
    float mWidth{ 0 }, mHeight{ 0 };
    bool mHasExternalPulseSource{ false };
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 
    // Going through 0..(mSteps.size() - 1)
    int mStepIdx{ 0 };

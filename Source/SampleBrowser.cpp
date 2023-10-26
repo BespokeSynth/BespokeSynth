@@ -29,6 +29,8 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
+#include "IAudioReceiver.h"
+#include "Profiler.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
 
@@ -51,6 +53,11 @@ void SampleBrowser::CreateUIControls()
    for (int i = 0; i < (int)mButtons.size(); ++i)
    {
       BUTTON(mButtons[i], ("button" + ofToString(i)).c_str());
+      UIBLOCK_SHIFTX(270);
+      BUTTON(mPlayButtons[i], ("play" + ofToString(i)).c_str());
+      mPlayButtons[i]->SetDisplayStyle(ButtonDisplayStyle::kPlay);
+      mPlayButtons[i]->SetDimensions(20, 15);
+      UIBLOCK_NEWLINE();
    }
    BUTTON(mBackButton, " < ");
    UIBLOCK_SHIFTX(80);
@@ -76,6 +83,8 @@ void SampleBrowser::DrawModule()
 
    for (size_t i = 0; i < mButtons.size(); ++i)
       mButtons[i]->Draw();
+   for (size_t i = 0; i < mPlayButtons.size(); ++i)
+      mPlayButtons[i]->Draw();
    mBackButton->Draw();
    mForwardButton->Draw();
 
@@ -92,31 +101,71 @@ void SampleBrowser::ButtonClicked(ClickButton* button, double time)
       ShowPage(mCurrentPage + 1);
    for (int i = 0; i < (int)mButtons.size(); ++i)
    {
-      if (button == mButtons[i])
+      if (button == mButtons[i] || button == mPlayButtons[i])
       {
          int offset = mCurrentPage * (int)mButtons.size();
          int entryIndex = offset + i;
          if (entryIndex < (int)mDirectoryListing.size())
          {
             String clicked = mDirectoryListing[entryIndex];
-            if (clicked == "..")
+            if (button == mButtons[i])
             {
-               File dir(mCurrentDirectory);
-               if (dir.getParentDirectory().getFullPathName() != dir.getFullPathName())
-                  SetDirectory(File(mCurrentDirectory).getParentDirectory().getFullPathName());
+               if (clicked == "..")
+               {
+                  File dir(mCurrentDirectory);
+                  if (dir.getParentDirectory().getFullPathName() != dir.getFullPathName())
+                     SetDirectory(File(mCurrentDirectory).getParentDirectory().getFullPathName());
+                  else
+                     SetDirectory("");
+               }
+               else if (File(clicked).isDirectory())
+               {
+                  SetDirectory(clicked);
+               }
                else
-                  SetDirectory("");
+               {
+                  TheSynth->GrabSample(clicked.toStdString());
+               }
             }
-            else if (File(clicked).isDirectory())
+            if (button == mPlayButtons[i])
             {
-               SetDirectory(clicked);
-            }
-            else
-            {
-               TheSynth->GrabSample(clicked.toStdString());
+               if (File(clicked).existsAsFile())
+               {
+                  mSampleMutex.lock();
+                  mPlayingSample.Read(clicked.toStdString().c_str());
+                  mPlayingSample.Play(NextBufferTime(false), 1, 0);
+                  mSampleMutex.unlock();
+               }
             }
          }
       }
+   }
+}
+
+void SampleBrowser::Process(double time)
+{
+   PROFILER(SampleBrowser);
+
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
+      return;
+
+   int bufferSize = target->GetBuffer()->BufferSize();
+   assert(bufferSize == gBufferSize);
+
+   gWorkChannelBuffer.Clear();
+   mSampleMutex.lock();
+   if (mPlayingSample.IsPlaying())
+      mPlayingSample.ConsumeData(time, &gWorkChannelBuffer, bufferSize, true);
+   mSampleMutex.unlock();
+
+   const int kNumChannels = 2;
+   SyncOutputBuffer(kNumChannels);
+   for (int ch = 0; ch < kNumChannels; ++ch)
+   {
+      GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
+      Add(target->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
    }
 }
 
@@ -207,9 +256,15 @@ void SampleBrowser::ShowPage(int page)
       {
          mButtons[i]->SetShowing(true);
          if (mDirectoryListing[i + offset] == ".." || File(mDirectoryListing[i + offset]).isDirectory())
+         {
             mButtons[i]->SetDisplayStyle(ButtonDisplayStyle::kFolderIcon);
+            mPlayButtons[i]->SetShowing(false);
+         }
          else
+         {
             mButtons[i]->SetDisplayStyle(ButtonDisplayStyle::kSampleIcon);
+            mPlayButtons[i]->SetShowing(true);
+         }
 
          if (mDirectoryListing[i + offset] == "..")
             mButtons[i]->SetLabel("..");
@@ -219,6 +274,7 @@ void SampleBrowser::ShowPage(int page)
       else
       {
          mButtons[i]->SetShowing(false);
+         mPlayButtons[i]->SetShowing(false);
       }
    }
 

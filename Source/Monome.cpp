@@ -126,7 +126,7 @@ void Monome::Poll()
          ++updatedLightCount;
       }
 
-      static float kRateLimit = 16;
+      static float kRateLimit = 8;
       if (updatedLightCount > kRateLimit)
          break;
    }
@@ -215,10 +215,19 @@ void Monome::ConnectToDevice(std::string deviceDesc)
    written = mToMonome.send(sysInfoMsg);
    assert(written);
 
+   juce::OSCMessage listMsg("/serialosc/notify");
+   listMsg.addString("localhost");
+   listMsg.addInt32(mMonomeReceivePort);
+   written = mToSerialOsc.send(listMsg);
+   assert(written);
+
    /*OSCMessage setTiltMsg("/"+mPrefix+"/tilt/set");
    setTiltMsg.addInt32(0);
    setTiltMsg.addInt32(1);
    mToMonome.send(setTiltMsg);*/
+
+   for (auto& light : mLights)
+      light.mLastSentTime = 0;
 }
 
 bool Monome::Reconnect()
@@ -260,6 +269,30 @@ void Monome::oscMessageReceived(const juce::OSCMessage& msg)
       }
 
       mJustRequestedDeviceList = false;
+   }
+   else if (label == "/serialosc/add")
+   {
+      std::string id = msg[0].getString().toStdString();
+      if (id == mLastConnectedDeviceInfo.id)
+         mHasMonome = true;
+
+      juce::OSCMessage listMsg("/serialosc/notify");
+      listMsg.addString("localhost");
+      listMsg.addInt32(mMonomeReceivePort);
+      bool written = mToSerialOsc.send(listMsg);
+      assert(written);
+   }
+   else if (label == "/serialosc/remove")
+   {
+      std::string id = msg[0].getString().toStdString();
+      if (id == mLastConnectedDeviceInfo.id)
+         mHasMonome = false;
+
+      juce::OSCMessage listMsg("/serialosc/notify");
+      listMsg.addString("localhost");
+      listMsg.addInt32(mMonomeReceivePort);
+      bool written = mToSerialOsc.send(listMsg);
+      assert(written);
    }
    else if (label == "/sys/size")
    {
