@@ -28,6 +28,8 @@
 #include "CanvasElement.h"
 #include "FileStream.h"
 #include "ModularSynth.h"
+#include "PatchCableSource.h"
+#include "Snapshots.h"
 
 Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator)
 : mWidth(w)
@@ -278,6 +280,11 @@ float Canvas::QuantizeToGrid(float input) const
 {
    float col = int(input * GetNumCols() + .5f);
    return col / GetNumCols();
+}
+
+bool Canvas::CanBeTargetedBy(PatchCableSource* source) const
+{
+   return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
 }
 
 bool Canvas::MouseMoved(float x, float y)

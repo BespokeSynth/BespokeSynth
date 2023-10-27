@@ -137,6 +137,7 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool GetNoHover() const override { return true; }
+   bool CanBeTargetedBy(PatchCableSource* source) const override;
 
    float mViewStart{ 0 };
    float mViewEnd;

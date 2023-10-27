@@ -156,6 +156,8 @@ bool IUIControl::CanBeTargetedBy(PatchCableSource* source) const
 {
    if (!mCableTargetable)
       return false;
+   if (GetNoHover())
+      return false;
    return source->GetConnectionType() == kConnectionType_Modulator || source->GetConnectionType() == kConnectionType_ValueSetter || source->GetConnectionType() == kConnectionType_UIControl;
 }
 
