@@ -516,21 +516,38 @@ IClickable* PatchCable::GetDropTarget()
       IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
       if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
       {
+         IClickable* potentialUIControl = nullptr;
+
          const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
          for (auto uicontrol : uicontrols)
          {
             if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
                continue;
 
-            float x, y, w, h;
-            uicontrol->GetPosition(x, y);
-            uicontrol->GetDimensions(w, h);
-            if (cable.end.x >= x && cable.end.y >= y && cable.end.x < x + w && cable.end.y < y + h)
+            ofRectangle rect = uicontrol->GetRect();
+            if (rect.contains(cable.end.x, cable.end.y))
             {
-               potentialTarget = uicontrol;
+               potentialUIControl = uicontrol;
                break;
             }
          }
+
+         const auto& grids = (static_cast<IDrawableModule*>(potentialTarget))->GetUIGrids();
+         for (auto grid : grids)
+         {
+            if (grid->IsShowing() == false || !IsValidTarget(grid))
+               continue;
+
+            ofRectangle rect = grid->GetRect();
+            if (rect.contains(cable.end.x, cable.end.y))
+            {
+               potentialUIControl = grid;
+               break;
+            }
+         }
+
+         if (potentialUIControl != nullptr)
+            potentialTarget = potentialUIControl;
       }
       if (mOwner->IsValidTarget(potentialTarget))
          return potentialTarget;

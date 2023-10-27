@@ -493,10 +493,16 @@ bool PatchCableSource::MouseMoved(float x, float y)
 
 void PatchCableSource::MouseReleased()
 {
+   mValidTargets.clear();
    std::vector<PatchCable*> cables = mPatchCables; //copy, since list might get modified here
-   FindValidTargets();
    for (auto cable : cables)
-      cable->MouseReleased();
+   {
+      if (cable->IsDragging())
+      {
+         FindValidTargets();
+         cable->MouseReleased();
+      }
+   }
 }
 
 bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* = false */)
@@ -620,19 +626,24 @@ void PatchCableSource::FindValidTargets()
    TheSynth->GetAllModules(allModules);
    for (auto module : allModules)
    {
+      if (module == mOwner)
+         continue;
       if ((mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
       {
          for (auto uicontrol : module->GetUIControls())
          {
             if (uicontrol->IsShowing() &&
                 (uicontrol->GetShouldSaveState() || dynamic_cast<ClickButton*>(uicontrol) != nullptr) &&
-                uicontrol->CanBeTargetedBy(this) &&
-                (!uicontrol->GetNoHover() || mType == kConnectionType_Grid))
+                uicontrol->CanBeTargetedBy(this))
                mValidTargets.push_back(uicontrol);
          }
+         for (auto uigrid : module->GetUIGrids())
+         {
+            if (uigrid->IsShowing() &&
+                uigrid->CanBeTargetedBy(this))
+               mValidTargets.push_back(uigrid);
+         }
       }
-      if (module == mOwner)
-         continue;
       if (module == mOwner->GetParent())
          continue;
       if (mTypeFilter.empty() == false && !VectorContains(module->GetTypeName(), mTypeFilter))
