@@ -473,8 +473,13 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 void MidiController::OnMidi(const MidiMessage& message)
 {
-   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !message.isSysEx()))
+   int is_sysex = message.isSysEx();
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !is_sysex))
       return;
+   if (is_sysex)
+      for (auto* script : mScriptListeners)
+         script->SysExReceived(message.getSysExData(), message.getSysExDataSize());
+
    mNoteOutput.SendMidi(message);
 }
 
