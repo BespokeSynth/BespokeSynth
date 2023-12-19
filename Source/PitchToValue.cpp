@@ -29,7 +29,6 @@
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 #include "ModulationChain.h"
-#include "UIControlMacros.h"
 
 PitchToValue::PitchToValue()
 : mControlCable(nullptr)
@@ -43,8 +42,7 @@ PitchToValue::~PitchToValue()
 void PitchToValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
+   mControlCable = new PatchCableSource(this, kConnectionType_Modulator); // CHECKME: Need to set modulator owner?
    AddPatchCableSource(mControlCable);
 }
 
@@ -61,7 +59,7 @@ void PitchToValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 
 void PitchToValue::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mTarget)
+   if (mTarget) // CHECKME: Enabled? velocity > 0?
    {
       mTarget->SetValue(pitch);
       mControlCable->AddHistoryEvent(gTime, true);
