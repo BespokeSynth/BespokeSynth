@@ -30,9 +30,8 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "IPulseReceiver.h"
 
-class NoteMin : public NoteEffectBase, public IDrawableModule, public IPulseReceiver
+class NoteMin : public NoteEffectBase, public IDrawableModule
 {
 public:
    NoteMin();
@@ -46,11 +45,6 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
-
-   void CheckboxUpdated(Checkbox* checkbox) override;
-
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 private:
@@ -59,11 +53,6 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = 131; height = 21; }
    bool Enabled() const override { return mEnabled; }
 
-   void Stop();
-
    std::array<bool, 128> mNoteInputHeld{ false };
    std::array<bool, 128> mNotePlaying{ false };
-
-   bool mOnlyPlayWhenPulsed;
-   Checkbox* mOnlyPlayWhenPulsedCheckbox;
 };

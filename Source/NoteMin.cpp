@@ -30,38 +30,18 @@
 #include "ModularSynth.h"
 
 NoteMin::NoteMin()
-: mOnlyPlayWhenPulsed(false)
 {
 }
 
 void NoteMin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-
-   mOnlyPlayWhenPulsedCheckbox = new Checkbox(this, "pulse to play", 40, 3, &mOnlyPlayWhenPulsed);
 }
 
 void NoteMin::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   mOnlyPlayWhenPulsedCheckbox->Draw();
-}
-
-void NoteMin::CheckboxUpdated(Checkbox* checkbox)
-{
-   if (checkbox == mEnabledCheckbox)
-   {
-      if (mEnabled)
-      {
-         for (int i = 0; i < 128; ++i)
-            mNotePlaying[i] = mNoteInputHeld[i];
-      }
-      else
-      {
-         Stop();
-      }
-   }
 }
 
 void NoteMin::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -113,24 +93,6 @@ void NoteMin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    }
 
    mNoteInputHeld[pitch] = velocity > 0;
-}
-
-void NoteMin::OnPulse(double time, float velocity, int flags)
-{
-   for (int i = 0; i < 128; ++i)
-   {
-      if (mNotePlaying[i])
-      {
-         PlayNoteOutput(time, i, 0, -1);
-         mNotePlaying[i] = false;
-      }
-
-      if (mNoteInputHeld[i])
-      {
-         PlayNoteOutput(time, i, velocity * 127, -1);
-         mNotePlaying[i] = true;
-      }
-   }
 }
 
 void NoteMin::LoadLayout(const ofxJSONElement& moduleInfo)
