@@ -49,7 +49,7 @@ jobs:
           echo "BUILD REASON   = " $(Build.Reason)
           echo "cmakeArguments = " $(cmakeArguments)
 
-          if [ $(Build.Reason) == "PullRequest" ] || [ $(cmakeTarget) == "code-quality-pipeline-checks" ]; then
+          if [ $(Build.Reason) == "blah" ] || [ $(cmakeTarget) == "code-quality-pipeline-checks" ]; then
             export CMAKE_CONFIG=Debug
             export CMAKE_TARGET=$(cmakeTarget)
             echo "##vso[task.setvariable variable=CMAKE_CONFIG]Debug"
