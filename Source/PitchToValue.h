@@ -27,12 +27,11 @@
 #define __Bespoke__PitchToValue__
 
 #include "IDrawableModule.h"
-#include "IPulseReceiver.h"
 
 class PatchCableSource;
 class IUIControl;
 
-class PitchToValue : public IDrawableModule, public IPulseReceiver, public ITextEntryListener
+class PitchToValue : public IDrawableModule
 {
 public:
    PitchToValue();
