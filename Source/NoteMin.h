@@ -53,6 +53,5 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = 131; height = 21; }
    bool Enabled() const override { return mEnabled; }
 
-   std::array<bool, 128> mNoteInputHeld{ false };
-   std::array<bool, 128> mNotePlaying{ false };
+   int NotePlayed = -1;
 };

@@ -50,40 +50,10 @@ void NoteMin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    {
       if (velocity > 0)
       {
-         bool anyInputNotesHeld = false;
-         for (int i = 0; i < 128; ++i)
-         {
-            if (mNoteInputHeld[i])
-               anyInputNotesHeld = true;
-         }
-
-         if (!anyInputNotesHeld) //new input, clear any existing output
-         {
-            for (int i = 0; i < 128; ++i)
-            {
-               if (mNotePlaying[i])
-               {
-                  PlayNoteOutput(time, i, 0, -1);
-                  mNotePlaying[i] = false;
-               }
-            }
-         }
-
-         if (!mOnlyPlayWhenPulsed)
-         {
-            if (!mNotePlaying[pitch]) //don't replay already-sustained notes
-               PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-            mNotePlaying[pitch] = true;
-
-            //stop playing any voices in the chord that aren't being held anymore
-            for (int i = 0; i < 128; ++i)
-            {
-               if (i != pitch && mNotePlaying[i] && !mNoteInputHeld[i])
-               {
-                  PlayNoteOutput(time, i, 0, -1);
-                  mNotePlaying[i] = false;
-               }
-            }
+         if (NotePlayed == -1 || NotePlayed > pitch) {
+             PlayNoteOutput(time, NotePlayed, 0, -1); // stop the playing note
+             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation); // play the new note
+             NotePlayed = pitch;
          }
       }
    }
@@ -91,8 +61,6 @@ void NoteMin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    {
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
-
-   mNoteInputHeld[pitch] = velocity > 0;
 }
 
 void NoteMin::LoadLayout(const ofxJSONElement& moduleInfo)
