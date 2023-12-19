@@ -16,15 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  ValueSetter.h
+//  PitchToValue.h
 //  Bespoke
 //
 //  Created by Ryan Challinor on 1/1/16.
 //
 //
 
-#ifndef __Bespoke__ValueSetter__
-#define __Bespoke__ValueSetter__
+#ifndef __Bespoke__PitchToValue__
+#define __Bespoke__PitchToValue__
 
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
@@ -34,12 +34,12 @@
 class PatchCableSource;
 class IUIControl;
 
-class ValueSetter : public IDrawableModule, public IPulseReceiver, public ITextEntryListener, public IButtonListener
+class PitchToValue : public IDrawableModule, public IPulseReceiver, public ITextEntryListener, public IButtonListener
 {
 public:
-   ValueSetter();
-   virtual ~ValueSetter();
-   static IDrawableModule* Create() { return new ValueSetter(); }
+   PitchToValue();
+   virtual ~PitchToValue();
+   static IDrawableModule* Create() { return new PitchToValue(); }
    
    
    void CreateUIControls() override;
@@ -77,4 +77,4 @@ private:
    float mHeight;
 };
 
-#endif /* defined(__Bespoke__ValueSetter__) */
+#endif /* defined(__Bespoke__PitchToValue__) */

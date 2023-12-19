@@ -16,14 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  ValueSetter.cpp
+//  PitchToValue.cpp
 //  Bespoke
 //
 //  Created by Ryan Challinor on 1/1/16.
 //
 //
 
-#include "ValueSetter.h"
+#include "PitchToValue.h"
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
@@ -31,18 +31,18 @@
 #include "ModulationChain.h"
 #include "UIControlMacros.h"
 
-ValueSetter::ValueSetter()
+PitchToValue::PitchToValue()
 : mControlCable(nullptr)
 , mValue(0)
 , mValueEntry(nullptr)
 {
 }
 
-ValueSetter::~ValueSetter()
+PitchToValue::~PitchToValue()
 {
 }
 
-void ValueSetter::CreateUIControls()
+void PitchToValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
@@ -55,7 +55,7 @@ void ValueSetter::CreateUIControls()
    AddPatchCableSource(mControlCable);
 }
 
-void ValueSetter::DrawModule()
+void PitchToValue::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
@@ -64,12 +64,12 @@ void ValueSetter::DrawModule()
    mButton->Draw();
 }
 
-void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
+void PitchToValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
 }
 
-void ValueSetter::OnPulse(double time, float velocity, int flags)
+void PitchToValue::OnPulse(double time, float velocity, int flags)
 {
    if (velocity > 0 && mEnabled)
    {
@@ -77,13 +77,13 @@ void ValueSetter::OnPulse(double time, float velocity, int flags)
    }
 }
 
-void ValueSetter::ButtonClicked(ClickButton* button)
+void PitchToValue::ButtonClicked(ClickButton* button)
 {
    if (button == mButton)
       Go();
 }
 
-void ValueSetter::Go()
+void PitchToValue::Go()
 {
    if (mTarget)
    {
@@ -93,7 +93,7 @@ void ValueSetter::Go()
    }
 }
 
-void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
+void PitchToValue::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
@@ -104,14 +104,14 @@ void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["target"] = targetPath;
 }
 
-void ValueSetter::LoadLayout(const ofxJSONElement& moduleInfo)
+void PitchToValue::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    
    SetUpFromSaveData();
 }
 
-void ValueSetter::SetUpFromSaveData()
+void PitchToValue::SetUpFromSaveData()
 {
    mTarget = TheSynth->FindUIControl(mModuleSaveData.GetString("target"));
    mControlCable->SetTarget(mTarget);
