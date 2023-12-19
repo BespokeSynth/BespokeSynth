@@ -33,8 +33,6 @@
 
 PitchToValue::PitchToValue()
 : mControlCable(nullptr)
-, mValue(0)
-, mValueEntry(nullptr)
 {
 }
 
