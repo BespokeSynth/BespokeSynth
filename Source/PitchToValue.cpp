@@ -45,11 +45,6 @@ PitchToValue::~PitchToValue()
 void PitchToValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   UIBLOCK0();
-   UICONTROL_CUSTOM(mValueEntry, new TextEntry(UICONTROL_BASICS("value"),7,&mValue,-99999,99999); mValueEntry->DrawLabel(true););
-   UIBLOCK_SHIFTRIGHT();
-   UICONTROL_CUSTOM(mButton, new ClickButton(UICONTROL_BASICS("set")));
-   ENDUIBLOCK(mWidth, mHeight);
    
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    AddPatchCableSource(mControlCable);
@@ -59,9 +54,6 @@ void PitchToValue::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   mValueEntry->Draw();
-   mButton->Draw();
 }
 
 void PitchToValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
@@ -69,25 +61,11 @@ void PitchToValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
 }
 
-void PitchToValue::OnPulse(double time, float velocity, int flags)
-{
-   if (velocity > 0 && mEnabled)
-   {
-      Go();
-   }
-}
-
-void PitchToValue::ButtonClicked(ClickButton* button)
-{
-   if (button == mButton)
-      Go();
-}
-
-void PitchToValue::Go()
+void PitchToValue::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mTarget)
    {
-      mTarget->SetValue(mValue);
+      mTarget->SetValue(pitch);
       mControlCable->AddHistoryEvent(gTime, true);
       mControlCable->AddHistoryEvent(gTime + 15, false);
    }

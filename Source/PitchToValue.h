@@ -28,13 +28,11 @@
 
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
-#include "TextEntry.h"
-#include "ClickButton.h"
 
 class PatchCableSource;
 class IUIControl;
 
-class PitchToValue : public IDrawableModule, public IPulseReceiver, public ITextEntryListener, public IButtonListener
+class PitchToValue : public IDrawableModule, public IPulseReceiver, public ITextEntryListener
 {
 public:
    PitchToValue();
@@ -49,12 +47,8 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
    
-   void ButtonClicked(ClickButton* button) override;
-   
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
-   void TextEntryComplete(TextEntry* entry) override {}
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -70,8 +64,6 @@ private:
    PatchCableSource* mControlCable;
    IUIControl* mTarget;
    float mValue;
-   TextEntry* mValueEntry;
-   ClickButton* mButton;
    
    float mWidth;
    float mHeight;
