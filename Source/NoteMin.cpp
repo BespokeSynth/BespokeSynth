@@ -38,7 +38,6 @@ void NoteMin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mStopButton = new ClickButton(this, "stop", 3, 3);
    mOnlyPlayWhenPulsedCheckbox = new Checkbox(this, "pulse to play", 40, 3, &mOnlyPlayWhenPulsed);
 }
 
@@ -46,26 +45,7 @@ void NoteMin::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   mStopButton->Draw();
    mOnlyPlayWhenPulsedCheckbox->Draw();
-}
-
-void NoteMin::Stop()
-{
-   for (int i = 0; i < 128; ++i)
-   {
-      if (mNotePlaying[i] && !mNoteInputHeld[i])
-      {
-         PlayNoteOutput(gTime + gBufferSizeMs, i, 0, -1);
-         mNotePlaying[i] = false;
-      }
-   }
-}
-
-void NoteMin::ButtonClicked(ClickButton* button)
-{
-   if (button == mStopButton)
-      Stop();
 }
 
 void NoteMin::CheckboxUpdated(Checkbox* checkbox)

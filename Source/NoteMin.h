@@ -30,10 +30,9 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "ClickButton.h"
 #include "IPulseReceiver.h"
 
-class NoteMin : public NoteEffectBase, public IDrawableModule, public IButtonListener, public IPulseReceiver
+class NoteMin : public NoteEffectBase, public IDrawableModule, public IPulseReceiver
 {
 public:
    NoteMin();
@@ -51,7 +50,6 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -66,7 +64,6 @@ private:
    std::array<bool, 128> mNoteInputHeld{ false };
    std::array<bool, 128> mNotePlaying{ false };
 
-   ClickButton* mStopButton;
    bool mOnlyPlayWhenPulsed;
    Checkbox* mOnlyPlayWhenPulsedCheckbox;
 };
