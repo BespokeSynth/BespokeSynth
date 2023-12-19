@@ -40,12 +40,10 @@ if [[ ! -z $MAC_SIGNING_CERT ]]; then
                           --apple-id ${MAC_SIGNING_ID} \
                           --team-id ${MAC_SIGNING_TEAM} \
                           --password ${MAC_SIGNING_1UPW} \
-                          --wait >> "$NOTARY_LOG" 2>&1
-  echo >> "$NOTARY_LOG"
+                          --wait
 
   echo "running stapler"
-  xcrun stapler staple "${TARGET_DIR}/${OUTPUT_BASE_FILENAME}.dmg" >> "$NOTARY_LOG" 2>&1
-  echo >> "$NOTARY_LOG"
+  xcrun stapler staple "${TARGET_DIR}/${OUTPUT_BASE_FILENAME}.dmg"
 fi
 
 # clean up
