@@ -48,13 +48,22 @@ void NoteMin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
 {
    if (mEnabled)
    {
-      if (velocity > 0)
+      mNotePlaying[pitch] = velocity > 0;
+      int minNotePlaying = -1;
+      for (int i = 0; i < 128; ++i)
       {
-         if (NotePlayed == -1 || NotePlayed > pitch) {
-             PlayNoteOutput(time, NotePlayed, 0, -1); // stop the playing note
-             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation); // play the new note
-             NotePlayed = pitch;
-         }
+         if (mNotePlaying[i] && minNotePlaying == -1)
+            minNotePlaying = i;
+      }
+
+      if (velocity > 0) // new note playing
+      {
+          if (minNotePlaying == pitch)
+             PlayNoteOutput(time, minNotePlaying, velocity, voiceIdx, modulation);
+      } else { // played note is stopped
+          PlayNoteOutput(time, pitch, 0, -1);
+          if (minNotePlaying > pitch) // play the new lowest note
+             PlayNoteOutput(time, minNotePlaying, velocity, voiceIdx, modulation);
       }
    }
    else
