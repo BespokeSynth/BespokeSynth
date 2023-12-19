@@ -25,16 +25,16 @@
   ==============================================================================
 */
 
-#include "ChordHolder.h"
+#include "NoteMin.h"
 #include "OpenFrameworksPort.h"
 #include "ModularSynth.h"
 
-ChordHolder::ChordHolder()
+NoteMin::NoteMin()
 : mOnlyPlayWhenPulsed(false)
 {
 }
 
-void ChordHolder::CreateUIControls()
+void NoteMin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
@@ -42,7 +42,7 @@ void ChordHolder::CreateUIControls()
    mOnlyPlayWhenPulsedCheckbox = new Checkbox(this, "pulse to play", 40, 3, &mOnlyPlayWhenPulsed);
 }
 
-void ChordHolder::DrawModule()
+void NoteMin::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
@@ -50,7 +50,7 @@ void ChordHolder::DrawModule()
    mOnlyPlayWhenPulsedCheckbox->Draw();
 }
 
-void ChordHolder::Stop()
+void NoteMin::Stop()
 {
    for (int i = 0; i < 128; ++i)
    {
@@ -62,13 +62,13 @@ void ChordHolder::Stop()
    }
 }
 
-void ChordHolder::ButtonClicked(ClickButton* button)
+void NoteMin::ButtonClicked(ClickButton* button)
 {
    if (button == mStopButton)
       Stop();
 }
 
-void ChordHolder::CheckboxUpdated(Checkbox* checkbox)
+void NoteMin::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -84,7 +84,7 @@ void ChordHolder::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteMin::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled)
    {
@@ -135,7 +135,7 @@ void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    mNoteInputHeld[pitch] = velocity > 0;
 }
 
-void ChordHolder::OnPulse(double time, float velocity, int flags)
+void NoteMin::OnPulse(double time, float velocity, int flags)
 {
    for (int i = 0; i < 128; ++i)
    {
@@ -153,14 +153,14 @@ void ChordHolder::OnPulse(double time, float velocity, int flags)
    }
 }
 
-void ChordHolder::LoadLayout(const ofxJSONElement& moduleInfo)
+void NoteMin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
 
    SetUpFromSaveData();
 }
 
-void ChordHolder::SetUpFromSaveData()
+void NoteMin::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }

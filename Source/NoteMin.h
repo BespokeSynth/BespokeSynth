@@ -33,11 +33,11 @@
 #include "ClickButton.h"
 #include "IPulseReceiver.h"
 
-class ChordHolder : public NoteEffectBase, public IDrawableModule, public IButtonListener, public IPulseReceiver
+class NoteMin : public NoteEffectBase, public IDrawableModule, public IButtonListener, public IPulseReceiver
 {
 public:
-   ChordHolder();
-   static IDrawableModule* Create() { return new ChordHolder(); }
+   NoteMin();
+   static IDrawableModule* Create() { return new NoteMin(); }
 
    
    void CreateUIControls() override;
