@@ -27,11 +27,12 @@
 #define __Bespoke__PitchToValue__
 
 #include "IDrawableModule.h"
+#include "INoteReceiver.h"
 
 class PatchCableSource;
 class IUIControl;
 
-class PitchToValue : public IDrawableModule
+class PitchToValue : public IDrawableModule, public INoteReceiver
 {
 public:
    PitchToValue();
@@ -43,8 +44,8 @@ public:
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
