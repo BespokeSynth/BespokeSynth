@@ -41,51 +41,58 @@ public:
    MidiOutputModule();
    virtual ~MidiOutputModule();
    static IDrawableModule* Create() { return new MidiOutputModule(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return true; }
+
 private:
    void InitController();
    void BuildControllerList();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& w, float& h) override { w=190; h=25; }
-   
-   int mControllerIndex;
-   DropdownList* mControllerList;
-   
-   MidiDevice mDevice;
-   
-   int mChannel;
-   bool mUseVoiceAsChannel;
-   float mPitchBendRange;
-   int mModwheelCC;
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 190;
+      h = 25;
+   }
+
+   int mControllerIndex{ -1 };
+   DropdownList* mControllerList{ nullptr };
+
+   MidiDevice mDevice{ nullptr };
+
+   int mChannel{ 1 };
+   bool mUseVoiceAsChannel{ false };
+   float mPitchBendRange{ 2 };
+   int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
+
    struct ChannelModulations
    {
       ModulationParameters mModulation;
-      float mLastPitchBend;
-      float mLastModWheel;
-      float mLastPressure;
+      float mLastPitchBend{ 0 };
+      float mLastModWheel{ 0 };
+      float mLastPressure{ 0 };
    };
-   
+
    std::vector<ChannelModulations> mChannelModulations;
 };
 

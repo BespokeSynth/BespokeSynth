@@ -15,8 +15,7 @@ script module inputs:
 globals:
    bespoke.get_measure_time()
    bespoke.get_measure()
-   bespoke.reset_transport(rewind_amount)
-      optional: rewind_amount=.001f
+   bespoke.reset_transport()
    bespoke.get_step(subdivision)
    bespoke.count_per_measure(subdivision)
    bespoke.time_until_subdivision(subdivision)
@@ -64,6 +63,8 @@ script-relative:
       example: me.get_caller().play_note(60,127)
    me.set_num_note_outputs(num)
    me.connect_osc_input(port)
+   me.send_cc(control, value, output_index)
+      optional: output_index = 0
 
 
 import notesequencer
@@ -128,8 +129,8 @@ import midicontroller
    static:
       midicontroller.get(path)
    instance:
-      m.set_connection(messageType, control, controlPath, controlType, value, channel, page)
-         optional: controlType = Default, value = 0, channel = -1, page=0
+      m.set_connection(messageType, control, controlPath, controlType, value, channel, page, midi_off, midi_on, scale, blink, increment, twoway, feedbackControl, isPageless)
+         optional: controlType = Default, value = 0, channel = -1, page=0, midi_off=0, midi_on = 127, scale = false, blink = false, increment = 0, twoway = true, feedbackControl = -1, isPageless = false
          example: m.set_connection(m.Control, 32, "oscillator~pw"), or m.set_connection(m.Note, 10, "oscillator~osc", m.SetValue, 2)
       m.send_note(pitch, velocity, forceNoteOn, channel, page)
          optional: forceNoteOn = false, channel = -1, page = 0
@@ -141,7 +142,12 @@ import midicontroller
          optional: channel = -1, page = 0
       m.send_data(a, b, c, page)
          optional: page = 0
+      m.send_sysex(data, page)
+         optional: page = 0
+         description: Sends a system exclusive message. The given data will be wrapped with header and tail bytes of 0xf0 and 0xf7. The example enables Programmer-Mode on a Launchpad X. 
+         example: m.send_sysex(bytes([0, 32, 41, 2, 12, 14, 1]) 
       m.add_script_listener(script)
+      m.resync_controller_state()
 
 
 import linnstrument
@@ -182,6 +188,15 @@ import drumplayer
       d.import_sampleplayer_cue(samplePlayer, srcCueIndex, destHitIndex)
 
 
+import vstplugin
+   static:
+      vstplugin.get(path)
+   instance:
+      v.send_cc(ctl, value, channel)
+      v.send_program_change(program, channel)
+      v.send_data(a, b, c)
+
+
 import module
    static:
       module.get(path)
@@ -193,7 +208,9 @@ import module
       m.get_width()
       m.get_height()
       m.set_target(target)
+      m.set_target(targetPath)
       m.get_target()
+      m.get_targets()
       m.set_name(name)
       m.delete()
       m.set(path, value)

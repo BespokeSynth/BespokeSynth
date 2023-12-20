@@ -38,10 +38,10 @@ class Pumper : public IAudioEffect, public IDropdownListener, public IFloatSlide
 public:
    Pumper();
    virtual ~Pumper();
-   
+
    static IAudioEffect* Create() { return new Pumper(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -50,37 +50,42 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "pumper"; }
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w = mWidth; h = mHeight; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    double GetIntervalPos(double time);
    void SyncToAdsr();
-   
-   FloatSlider* mAmountSlider;
-   FloatSlider* mLengthSlider;
-   FloatSlider* mCurveSlider;
-   FloatSlider* mAttackSlider;
-   
+
+   FloatSlider* mAmountSlider{ nullptr };
+   FloatSlider* mLengthSlider{ nullptr };
+   FloatSlider* mCurveSlider{ nullptr };
+   FloatSlider* mAttackSlider{ nullptr };
+
    ::ADSR mAdsr;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   float mLastValue;
-   float mAmount;
-   float mLength;
-   float mAttack;
-   
-   float mWidth;
-   float mHeight;
+   NoteInterval mInterval{ NoteInterval::kInterval_4n };
+   DropdownList* mIntervalSelector{ nullptr };
+   float mLastValue{ 0 };
+   float mAmount{ 0 };
+   float mLength{ 0 };
+   float mAttack{ 0 };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 #endif /* defined(__modularSynth__Pumper__) */
-

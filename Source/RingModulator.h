@@ -42,8 +42,10 @@ public:
    RingModulator();
    virtual ~RingModulator();
    static IDrawableModule* Create() { return new RingModulator(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -56,36 +58,41 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 130; height = 68; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 130;
+      height = 68;
+   }
 
    ChannelBuffer mDryBuffer;
 
-   float mFreq;
-   float mDryWet;
-   float mVolume;
-   FloatSlider* mFreqSlider;
-   FloatSlider* mDryWetSlider;
-   FloatSlider* mVolumeSlider;
-   
-   EnvOscillator mModOsc;
-   float mPhase;
+   float mFreq{ 220 };
+   float mDryWet{ 1 };
+   float mVolume{ 1 };
+   FloatSlider* mFreqSlider{ nullptr };
+   FloatSlider* mDryWetSlider{ nullptr };
+   FloatSlider* mVolumeSlider{ nullptr };
+
+   EnvOscillator mModOsc{ kOsc_Sin };
+   float mPhase{ 0 };
    Ramp mFreqRamp;
-   float mGlideTime;
-   FloatSlider* mGlideSlider;
+   float mGlideTime{ 0 };
+   FloatSlider* mGlideSlider{ nullptr };
 };
 
 
 #endif /* defined(__modularSynth__RingModulator__) */
-

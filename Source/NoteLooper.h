@@ -44,89 +44,84 @@ public:
    NoteLooper();
    ~NoteLooper();
    static IDrawableModule* Create() { return new NoteLooper(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
+   bool DrawToPush2Screen() override;
+
+   int GetNumMeasures() const { return mNumMeasures; }
+   void SetNumMeasures(int numMeasures);
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
-   
+   void ButtonClicked(ClickButton* button, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    double GetCurPos(double time) const;
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
-   void SetNumMeasures(int numMeasures);
    int GetNewVoice(int voiceIdx);
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=mWidth; height=mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   struct NoteEvent
+   void GetModuleDimensions(float& width, float& height) override
    {
-      bool mValid;
-      float mPos;
-      int mPitch;
-      int mVelocity;
-      int mJustPlaced;
-      int mAssociatedEvent;   //associated note on/off
-   };
-   
-   struct CurrentNote
-   {
-      int mPitch;
-      int mVelocity;
-   };
+      width = mWidth;
+      height = mHeight;
+   }
 
    struct SavedPattern
    {
-      ClickButton* mStoreButton;
-      ClickButton* mLoadButton;
+      ClickButton* mStoreButton{ nullptr };
+      ClickButton* mLoadButton{ nullptr };
       std::vector<CanvasElement*> mNotes;
    };
 
-   float mWidth;
-   float mHeight;
-   int mMinRow;
-   int mMaxRow;
-   bool mWrite;
-   Checkbox* mWriteCheckbox;
-   bool mDeleteOrMute;
-   Checkbox* mDeleteOrMuteCheckbox;
-   IntSlider* mNumMeasuresSlider;
-   int mNumMeasures;
-   std::vector<CanvasElement*> mNoteChecker {128};
-   std::array<NoteCanvasElement*, 128> mInputNotes {};
-   std::array<NoteCanvasElement*, 128> mCurrentNotes {};
-   Canvas* mCanvas;
-   ClickButton* mClearButton;
-   int mVoiceRoundRobin;
+   float mWidth{ 370 };
+   float mHeight{ 140 };
+   int mMinRow{ 127 };
+   int mMaxRow{ 0 };
+   bool mWrite{ false };
+   Checkbox* mWriteCheckbox{ nullptr };
+   bool mDeleteOrMute{ false };
+   Checkbox* mDeleteOrMuteCheckbox{ nullptr };
+   IntSlider* mNumMeasuresSlider{ nullptr };
+   int mNumMeasures{ 1 };
+   std::vector<CanvasElement*> mNoteChecker{ 128 };
+   std::array<NoteCanvasElement*, 128> mInputNotes{};
+   std::array<NoteCanvasElement*, 128> mCurrentNotes{};
+   Canvas* mCanvas{ nullptr };
+   ClickButton* mClearButton{ nullptr };
+   int mVoiceRoundRobin{ kNumVoices - 1 };
+   bool mAllowLookahead{ false };
 
-   std::array<ModulationParameters, kNumVoices+1> mVoiceModulations {};
-   std::array<int, kNumVoices> mVoiceMap {};
+   std::array<ModulationParameters, kNumVoices + 1> mVoiceModulations{};
+   std::array<int, kNumVoices> mVoiceMap{};
 
    std::array<SavedPattern, 4> mSavedPatterns;
 };
-

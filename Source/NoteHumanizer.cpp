@@ -31,10 +31,6 @@
 #include "ModularSynth.h"
 
 NoteHumanizer::NoteHumanizer()
-: mTime(33.0f)
-, mTimeSlider(nullptr)
-, mVelocity(.1f)
-, mVelocitySlider(nullptr)
 {
 }
 
@@ -45,10 +41,10 @@ NoteHumanizer::~NoteHumanizer()
 void NoteHumanizer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mTimeSlider = new FloatSlider(this,"time",4,4,100,15,&mTime,0,500);
-   mVelocitySlider = new FloatSlider(this,"velocity",mTimeSlider,kAnchor_Below,100,15,&mVelocity,0,1);
-   
+
+   mTimeSlider = new FloatSlider(this, "time", 4, 4, 100, 15, &mTime, 0, 500);
+   mVelocitySlider = new FloatSlider(this, "velocity", mTimeSlider, kAnchor_Below, 100, 15, &mVelocity, 0, 1);
+
    mTimeSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -56,15 +52,15 @@ void NoteHumanizer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mTimeSlider->Draw();
    mVelocitySlider->Draw();
 }
 
-void NoteHumanizer::CheckboxUpdated(Checkbox *checkbox)
+void NoteHumanizer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime+gBufferSizeMs);
+      mNoteOutput.Flush(time);
 }
 
 void NoteHumanizer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -91,14 +87,14 @@ void NoteHumanizer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    PlayNoteOutput(time + delayMs, pitch, outputVelocity, voiceIdx, modulation);
 }
 
-void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
 void NoteHumanizer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

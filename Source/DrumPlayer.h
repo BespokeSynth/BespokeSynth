@@ -44,42 +44,45 @@
 #include "PatchCableSource.h"
 #include "RollingBuffer.h"
 #include "GridController.h"
+#include "Push2Control.h"
 
 #define NUM_DRUM_HITS 16
 
 class SamplePlayer;
 
-class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener
+class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener, public IPush2GridController
 {
 public:
    DrumPlayer();
    ~DrumPlayer();
    static IDrawableModule* Create() { return new DrumPlayer(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void Poll() override;
-   
+
    static void SetUpHitDirectories();
-   
+
    void ImportSampleCuePoint(SamplePlayer* player, int sourceCueIndex, int destHitIndex);
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    int GetNumTargets() override { return 1 + (int)mIndividualOutputs.size(); }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
@@ -87,28 +90,36 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
+   //IPush2GridController
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
+   bool HasPush2OverrideControls() const override { return mPush2SelectedHitIdx != -1; }
+   void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
-private:
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
+   bool IsEnabled() const override { return mEnabled; }
+
+private:
    struct StoredDrumKit
    {
       std::string mName;
       std::string mSampleFiles[NUM_DRUM_HITS];
-      int mLinkIds[NUM_DRUM_HITS];
-      float mVols[NUM_DRUM_HITS];
-      float mSpeeds[NUM_DRUM_HITS];
-      float mPans[NUM_DRUM_HITS];
+      int mLinkIds[NUM_DRUM_HITS]{};
+      float mVols[NUM_DRUM_HITS]{};
+      float mSpeeds[NUM_DRUM_HITS]{};
+      float mPans[NUM_DRUM_HITS]{};
    };
 
    void LoadKit(int kit);
@@ -122,63 +133,63 @@ private:
    void UpdateLights();
    void SetUpNewDrumPlayer();
    void SetHitSample(int sampleIndex, Sample* sample);
-   
+
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
-   
+
    ChannelBuffer mOutputBuffer;
-   float mSpeed;
-   float mSpeedRandomization;
-   float mVolume;
-   int mLoadedKit;
-   FloatSlider* mVolSlider;
-   FloatSlider* mSpeedSlider;
-   FloatSlider* mSpeedRandomizationSlider;
-   DropdownList* mKitSelector;
-   bool mEditMode;
-   Checkbox* mEditCheckbox;
+   float mSpeed{ 1 };
+   float mSpeedRandomization{ 0 };
+   float mVolume{ 1 };
+   int mLoadedKit{ 0 };
+   FloatSlider* mVolSlider{ nullptr };
+   FloatSlider* mSpeedSlider{ nullptr };
+   FloatSlider* mSpeedRandomizationSlider{ nullptr };
+   DropdownList* mKitSelector{ nullptr };
+   bool mEditMode{ false };
+   Checkbox* mEditCheckbox{ nullptr };
    std::vector<StoredDrumKit> mKits;
-   ClickButton* mSaveButton;
-   ClickButton* mNewKitButton;
-   int mAuditionSampleIdx;
-   float mAuditionInc;
-   FloatSlider* mAuditionSlider;
+   ClickButton* mSaveButton{ nullptr };
+   ClickButton* mNewKitButton{ nullptr };
+   int mAuditionSampleIdx{ 0 };
+   float mAuditionInc{ 0 };
+   FloatSlider* mAuditionSlider{ nullptr };
    std::string mAuditionDir;
-   char mNewKitName[MAX_TEXTENTRY_LENGTH];
-   TextEntry* mNewKitNameEntry;
+   char mNewKitName[MAX_TEXTENTRY_LENGTH]{};
+   TextEntry* mNewKitNameEntry{ nullptr };
    ofMutex mLoadSamplesAudioMutex;
    ofMutex mLoadSamplesDrawMutex;
-   bool mLoadingSamples;
-   ClickButton* mShuffleButton;
-   int mSelectedHitIdx;
-   bool mMonoOutput;
-   Checkbox* mMonoCheckbox;
-   GridControlTarget* mGridControlTarget;
-   NoteInputBuffer mNoteInputBuffer;
-   bool mNeedSetup;
-   bool mNoteRepeat;
-   Checkbox* mNoteRepeatCheckbox;
-   NoteInterval mQuantizeInterval;
-   DropdownList* mQuantizeIntervalSelector;
-   
+   bool mLoadingSamples{ false };
+   ClickButton* mShuffleButton{ nullptr };
+   int mSelectedHitIdx{ 0 };
+   bool mMonoOutput{ false };
+   Checkbox* mMonoCheckbox{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
+   NoteInputBuffer mNoteInputBuffer{ nullptr };
+   bool mNeedSetup{ true };
+   bool mNoteRepeat{ false };
+   Checkbox* mNoteRepeatCheckbox{ nullptr };
+   NoteInterval mQuantizeInterval{ NoteInterval::kInterval_None };
+   DropdownList* mQuantizeIntervalSelector{ nullptr };
+   bool mFullVelocity{ false };
+   Checkbox* mFullVelocityCheckbox{ nullptr };
+   int mPush2SelectedHitIdx{ -1 };
+
    void LoadSampleLock();
    void LoadSampleUnlock();
-   
+
    struct IndividualOutput
    {
       IndividualOutput(DrumPlayer* owner, int hitIndex)
       : mDrumPlayer(owner)
       , mHitIndex(hitIndex)
-      , mVizBuffer(nullptr)
-      , mPatchCableSource(nullptr)
       {
-         mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS*gSampleRate);
+         mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS * gSampleRate);
          mPatchCableSource = new PatchCableSource(owner, kConnectionType_Audio);
-         
+
          mPatchCableSource->SetOverrideVizBuffer(mVizBuffer);
          mPatchCableSource->SetManualSide(PatchCableSource::Side::kRight);
          owner->AddPatchCableSource(mPatchCableSource);
@@ -189,114 +200,94 @@ private:
       }
       void UpdatePosition(int outputIndex)
       {
-         float w,h;
-         mDrumPlayer->GetDimensions(w,h);
+         float w, h;
+         mDrumPlayer->GetDimensions(w, h);
          mPatchCableSource->SetManualPosition(w, 7 + outputIndex * 12);
       }
-      DrumPlayer* mDrumPlayer;
-      int mHitIndex;
-      int mOutputIndex;
-      RollingBuffer* mVizBuffer;
-      PatchCableSource* mPatchCableSource;
+      DrumPlayer* mDrumPlayer{ nullptr };
+      int mHitIndex{ 0 };
+      RollingBuffer* mVizBuffer{ nullptr };
+      PatchCableSource* mPatchCableSource{ nullptr };
    };
-   
+
    std::vector<IndividualOutput*> mIndividualOutputs;
-   
+
    struct DrumHit
    {
       struct Playhead
       {
-         Playhead() : mStartTime(-1) {}
-         double mStartTime;
-         double mCutOffTime;
-         double mOffset;
-         double mEnvelopeTime;
-         double mEnvelopeScale;
-         float mSpeedTweak;
+         double mStartTime{ -1 };
+         double mCutOffTime{ -1 };
+         double mOffset{ 0 };
+         double mEnvelopeTime{ 0 };
+         double mEnvelopeScale{ 1 };
+         float mSpeedTweak{ 1 };
       };
 
       DrumHit()
-      : mLinkId(-1)
-      , mVol(1)
-      , mSpeed(1)
-      , mVelocity(1)
-      , mPanInput(0)
-      , mStartOffset(0)
-      , mPitchBend(nullptr)
-      , mUseEnvelope(false)
-      , mEnvelopeLength(200)
-      , mPan(0)
-      , mWiden(0)
-      , mHasIndividualOutput(false)
-      , mOwner(nullptr)
-      , mWidenerBuffer(2048)
-      , mSamplesRemainingToProcess(0)
-      , mCurrentPlayheadIndex(0)
-      , mButtonHeldVelocity(0)
       {
          mEnvelope.GetHasSustainStage() = false;
-         mEnvelope.GetA() = 1;
-         mEnvelope.GetD() = 1;
-         mEnvelope.GetS() = 1;
-         mEnvelope.GetR() = 100;
          mEnvelope.Start(0, 1);
       }
-      
+
       void CreateUIControls(DrumPlayer* owner, int index);
       bool Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize);
       void SetUIControlsShowing(bool showing);
       void DrawUIControls();
       void UpdateHitDirectoryDropdown();
       void LoadRandomSample();
+      void LoadNextSample(int direction);
+      void LoadSample(std::string path);
       void GrabSample();
       void StartPlayhead(double time, float startOffsetPercent, float velocity);
       void StopLinked(double time);
       float GetPlayProgress(double time);
-      
-      Sample mSample;
-      int mLinkId;
-      float mVol;
-      float mSpeed;
-      float mVelocity;
-      float mPanInput;
-      float mStartOffset;
-      ModulationChain* mPitchBend;
-      
-      bool mUseEnvelope;
-      ::ADSR mEnvelope;
-      float mEnvelopeLength;
-      float mPan;
-      int mWiden;
-      bool mHasIndividualOutput;
-      std::string mHitDirectory;
-      int mButtonHeldVelocity;
-      
-      DrumPlayer* mOwner;
-      FloatSlider* mVolSlider;
-      FloatSlider* mSpeedSlider;
-      ClickButton* mTestButton;
-      ClickButton* mRandomButton;
-      ClickButton* mGrabSampleButton;
-      Checkbox* mUseEnvelopeCheckbox;
-      ADSRDisplay* mEnvelopeDisplay;
-      FloatSlider* mPanSlider;
-      IntSlider* mWidenSlider;
-      Checkbox* mIndividualOutputCheckbox;
-      FloatSlider* mEnvelopeLengthSlider;
-      IntSlider* mLinkIdSlider;
-      DropdownList* mHitCategoryDropdown;
-      FloatSlider* mStartOffsetSlider;
-      int mHitCategoryIndex;
-      std::string mHitCategory;
-      RollingBuffer mWidenerBuffer;
-      int mSamplesRemainingToProcess;
 
-      std::array<Playhead,2> mPlayheads;
-      int mCurrentPlayheadIndex;
+      Sample mSample;
+      int mLinkId{ -1 };
+      float mVol{ 1 };
+      float mSpeed{ 1 };
+      float mVelocity{ 1 };
+      float mPanInput{ 0 };
+      float mStartOffset{ 0 };
+      ModulationChain* mPitchBend{ nullptr };
+
+      bool mUseEnvelope{ false };
+      ::ADSR mEnvelope{ 1, 1, 1, 100 };
+      float mEnvelopeLength{ 200 };
+      float mPan{ 0 };
+      int mWiden{ 0 };
+      bool mHasIndividualOutput{ false };
+      std::string mHitDirectory;
+      int mButtonHeldVelocity{ 0 };
+
+      DrumPlayer* mOwner{ nullptr };
+      FloatSlider* mVolSlider{ nullptr };
+      FloatSlider* mSpeedSlider{ nullptr };
+      ClickButton* mTestButton{ nullptr };
+      ClickButton* mRandomButton{ nullptr };
+      ClickButton* mNextButton{ nullptr };
+      ClickButton* mPrevButton{ nullptr };
+      ClickButton* mGrabSampleButton{ nullptr };
+      Checkbox* mUseEnvelopeCheckbox{ nullptr };
+      ADSRDisplay* mEnvelopeDisplay{ nullptr };
+      FloatSlider* mPanSlider{ nullptr };
+      IntSlider* mWidenSlider{ nullptr };
+      Checkbox* mIndividualOutputCheckbox{ nullptr };
+      FloatSlider* mEnvelopeLengthSlider{ nullptr };
+      IntSlider* mLinkIdSlider{ nullptr };
+      DropdownList* mHitCategoryDropdown{ nullptr };
+      FloatSlider* mStartOffsetSlider{ nullptr };
+      int mHitCategoryIndex{ -1 };
+      std::string mHitCategory;
+      RollingBuffer mWidenerBuffer{ 2048 };
+      int mSamplesRemainingToProcess{ 0 };
+
+      std::array<Playhead, 2> mPlayheads;
+      int mCurrentPlayheadIndex{ 0 };
    };
-   
+
    std::array<DrumHit, NUM_DRUM_HITS> mDrumHits;
 };
 
 #endif /* defined(__modularSynth__DrumPlayer__) */
-

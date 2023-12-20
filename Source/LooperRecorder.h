@@ -37,23 +37,26 @@
 #include "Looper.h"
 #include "Ramp.h"
 #include "DropdownList.h"
+#include "Push2Control.h"
 
 class Stutter;
 class PatchCableSource;
 
-class LooperRecorder : public IAudioProcessor, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IIntSliderListener, public IDropdownListener
+class LooperRecorder : public IAudioProcessor, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IIntSliderListener, public IDropdownListener, public IPush2GridController
 {
 public:
    LooperRecorder();
    ~LooperRecorder();
    static IDrawableModule* Create() { return new LooperRecorder(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
    void Init() override;
    void SetNumBars(int numBars) { mNumBars = numBars; }
-   int NumBars() { return mNumBars; }
+   int GetNumBars() const { return mNumBars; }
    void Commit(Looper* looper);
    void RequestMerge(Looper* looper);
    void RequestSwap(Looper* looper);
@@ -69,37 +72,44 @@ public:
    float GetCommitDelay() { return mCommitDelay; }
    RollingBuffer* GetRecordBuffer() { return &mRecordBuffer; }
    Looper* GetNextCommitTarget() { return (mNextCommitTargetIndex < (int)mLoopers.size()) ? mLoopers[mNextCommitTargetIndex] : nullptr; }
-   
-   void StartFreeRecord();
-   void EndFreeRecord();
+
+   void StartFreeRecord(double time);
+   void EndFreeRecord(double time);
    void CancelFreeRecord();
    bool InFreeRecord() { return mFreeRecording; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void KeyPressed(int key, bool isRepeat) override;
    void Poll() override;
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+   //IPush2GridController
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
+
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
    bool HasDebugDraw() const override { return true; }
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void SyncLoopLengths();
    void UpdateSpeed();
@@ -108,65 +118,69 @@ private:
    void Resample(bool setKey);
    void DrawCircleHash(ofVec2f center, float progress, float width, float innerRadius, float outerRadius);
    void SyncCablesToLoopers();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mWidth;
-   float mHeight;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+   float mWidth{ 235 };
+   float mHeight{ 126 };
    RollingBuffer mRecordBuffer;
    std::vector<Looper*> mLoopers;
-   int mNumBars;
-   DropdownList* mNumBarsSelector;
-   float mSpeed;
-   float mBaseTempo;
-   ClickButton* mResampleButton;
-   ClickButton* mResampAndSetButton;
-   Looper* mMergeSource;
-   Looper* mSwapSource;
-   Looper* mCopySource;
-   int mCommitCount;
-   ClickButton* mDoubleTempoButton;
-   ClickButton* mHalfTempoButton;
-   ClickButton* mShiftMeasureButton;
-   ClickButton* mHalfShiftButton;
-   ClickButton* mClearOverdubButton;
+   int mNumBars{ 1 };
+   DropdownList* mNumBarsSelector{ nullptr };
+   float mSpeed{ 1 };
+   float mBaseTempo{ 120 };
+   ClickButton* mResampleButton{ nullptr };
+   ClickButton* mResampAndSetButton{ nullptr };
+   Looper* mMergeSource{ nullptr };
+   Looper* mSwapSource{ nullptr };
+   Looper* mCopySource{ nullptr };
+   int mCommitCount{ 0 };
+   ClickButton* mDoubleTempoButton{ nullptr };
+   ClickButton* mHalfTempoButton{ nullptr };
+   ClickButton* mShiftMeasureButton{ nullptr };
+   ClickButton* mHalfShiftButton{ nullptr };
+   ClickButton* mClearOverdubButton{ nullptr };
    Ramp mQuietInputRamp;
-   double mUnquietInputTime;
-   ClickButton* mShiftDownbeatButton;
-   ClickButton* mOrigSpeedButton;
-   ClickButton* mSnapPitchButton;
-   IAudioReceiver* mHeadphonesTarget;
-   IAudioReceiver* mOutputTarget;
-   float mCommitDelay;
-   FloatSlider* mCommitDelaySlider;
+   double mUnquietInputTime{ -1 };
+   ClickButton* mShiftDownbeatButton{ nullptr };
+   ClickButton* mOrigSpeedButton{ nullptr };
+   ClickButton* mSnapPitchButton{ nullptr };
+   IAudioReceiver* mHeadphonesTarget{ nullptr };
+   IAudioReceiver* mOutputTarget{ nullptr };
+   float mCommitDelay{ 0 };
+   FloatSlider* mCommitDelaySlider{ nullptr };
    ChannelBuffer mWriteBuffer;
-   Looper* mCommitToLooper;
+   Looper* mCommitToLooper{ nullptr };
    std::vector<PatchCableSource*> mLooperPatchCables;
-   ClickButton* mCommit1BarButton;
-   ClickButton* mCommit2BarsButton;
-   ClickButton* mCommit4BarsButton;
-   ClickButton* mCommit8BarsButton;
-   IntSlider* mNextCommitTargetSlider;
-   int mNextCommitTargetIndex;
-   
-   bool mFreeRecording;
-   Checkbox* mFreeRecordingCheckbox;
-   double mStartFreeRecordTime;
-   ClickButton* mCancelFreeRecordButton;
-   
+   ClickButton* mCommit1BarButton{ nullptr };
+   ClickButton* mCommit2BarsButton{ nullptr };
+   ClickButton* mCommit4BarsButton{ nullptr };
+   ClickButton* mCommit8BarsButton{ nullptr };
+   IntSlider* mNextCommitTargetSlider{ nullptr };
+   int mNextCommitTargetIndex{ 0 };
+   Checkbox* mAutoAdvanceThroughLoopersCheckbox{ nullptr };
+   bool mAutoAdvanceThroughLoopers{ false };
+   bool mTemporarilySilenceAfterCommit{ false };
+
+   bool mFreeRecording{ false };
+   Checkbox* mFreeRecordingCheckbox{ nullptr };
+   double mStartFreeRecordTime{ 0 };
+   ClickButton* mCancelFreeRecordButton{ nullptr };
+
    enum RecorderMode
    {
       kRecorderMode_Record,
       kRecorderMode_Overdub,
       kRecorderMode_Loop
    };
-   RecorderMode mRecorderMode;
-   DropdownList* mModeSelector;
+   RecorderMode mRecorderMode{ RecorderMode::kRecorderMode_Record };
+   DropdownList* mModeSelector{ nullptr };
 };
 
 
 #endif /* defined(__modularSynth__LooperRecorder__) */
-

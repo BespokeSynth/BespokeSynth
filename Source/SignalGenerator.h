@@ -45,37 +45,40 @@ public:
    SignalGenerator();
    ~SignalGenerator();
    static IDrawableModule* Create() { return new SignalGenerator(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
-   
+
    void SetVol(float vol) { mVol = vol; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   
+
    enum FreqMode
    {
       kFreqMode_Instant,
@@ -83,48 +86,47 @@ private:
       kFreqMode_Ramp,
       kFreqMode_Slider
    };
-   
+
    void SetType(OscillatorType type);
    void SetFreqMode(FreqMode mode);
-   
-   float mVol;
-   FloatSlider* mVolSlider;
-   OscillatorType mOscType;
-   DropdownList* mOscSelector;
-   float mPulseWidth;
-   FloatSlider* mPulseWidthSlider;
-   float mShuffle;
-   FloatSlider* mShuffleSlider;
-   int mMult;
-   DropdownList* mMultSelector;
-   bool mSync;
-   Checkbox* mSyncCheckbox;
-   float mSyncFreq;
-   FloatSlider* mSyncFreqSlider;
-   float mDetune;
-   FloatSlider* mDetuneSlider;
-   EnvOscillator mOsc;
-   float mFreq;
-   FloatSlider* mFreqSlider;
-   float mPhase;
-   float mSyncPhase;
-   FreqMode mFreqMode;
-   DropdownList* mFreqModeSelector;
-   float mFreqSliderStart;
-   float mFreqSliderEnd;
-   float mFreqSliderAmount;
-   FloatSlider* mFreqSliderAmountSlider;
+
+   float mVol{ 0 };
+   FloatSlider* mVolSlider{ nullptr };
+   OscillatorType mOscType{ OscillatorType::kOsc_Sin };
+   DropdownList* mOscSelector{ nullptr };
+   float mPulseWidth{ .5 };
+   FloatSlider* mPulseWidthSlider{ nullptr };
+   float mShuffle{ 0 };
+   FloatSlider* mShuffleSlider{ nullptr };
+   int mMult{ 1 };
+   DropdownList* mMultSelector{ nullptr };
+   bool mSync{ false };
+   Checkbox* mSyncCheckbox{ nullptr };
+   float mSyncFreq{ 200 };
+   FloatSlider* mSyncFreqSlider{ nullptr };
+   float mDetune{ 0 };
+   FloatSlider* mDetuneSlider{ nullptr };
+   EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
+   float mFreq{ 220 };
+   FloatSlider* mFreqSlider{ nullptr };
+   float mPhase{ 0 };
+   float mSyncPhase{ 0 };
+   FreqMode mFreqMode{ FreqMode::kFreqMode_Instant };
+   DropdownList* mFreqModeSelector{ nullptr };
+   float mFreqSliderStart{ 220 };
+   float mFreqSliderEnd{ 220 };
+   float mFreqSliderAmount{ 0 };
+   FloatSlider* mFreqSliderAmountSlider{ nullptr };
    Ramp mFreqRamp;
-   float mFreqRampTime;
-   FloatSlider* mFreqRampTimeSlider;
-   float mSoften;
-   FloatSlider* mSoftenSlider;
-   float mPhaseOffset;
-   FloatSlider* mPhaseOffsetSlider;
-   double mResetPhaseAtMs;
-   
-   float* mWriteBuffer;
+   float mFreqRampTime{ 200 };
+   FloatSlider* mFreqRampTimeSlider{ nullptr };
+   float mSoften{ 0 };
+   FloatSlider* mSoftenSlider{ nullptr };
+   float mPhaseOffset{ 0 };
+   FloatSlider* mPhaseOffsetSlider{ nullptr };
+   double mResetPhaseAtMs{ -9999 };
+
+   float* mWriteBuffer{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SignalGenerator__) */
-

@@ -36,45 +36,53 @@ class ScaleDegree : public NoteEffectBase, public IDrawableModule, public IDropd
 public:
    ScaleDegree();
    static IDrawableModule* Create() { return new ScaleDegree(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    struct NoteInfo
    {
-      NoteInfo() : mOn(false), mVelocity(0), mVoiceIdx(-1) {}
-      int mOn;
-      int mVelocity;
-      int mVoiceIdx;
-      int mOutputPitch;
+      int mOn{ false };
+      int mVelocity{ 0 };
+      int mVoiceIdx{ -1 };
+      int mOutputPitch{ 0 };
    };
-   
+
    int TransformPitch(int pitch);
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mWidth;
-   float mHeight;
-   int mScaleDegree;
-   DropdownList* mScaleDegreeSelector;
-   std::array<NoteInfo, 128> mInputNotes;
-   Checkbox* mRetriggerCheckbox;
-   bool mRetrigger;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mScaleDegree{ 0 };
+   DropdownList* mScaleDegreeSelector{ nullptr };
+   std::array<NoteInfo, 128> mInputNotes{};
+   Checkbox* mRetriggerCheckbox{ nullptr };
+   bool mRetrigger{ false };
+   Checkbox* mDiatonicCheckbox{ nullptr };
+   bool mDiatonic{ true };
 };
 
 #endif /* defined(__Bespoke__ScaleDegree__) */

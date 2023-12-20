@@ -32,7 +32,7 @@ class IPatchable
 {
 public:
    virtual ~IPatchable() {}
-   virtual PatchCableSource* GetPatchCableSource(int index=0) = 0;
+   virtual PatchCableSource* GetPatchCableSource(int index = 0) = 0;
    virtual void PreRepatch(PatchCableSource* cableSource) {}
    virtual void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) {}
    virtual void OnCableGrabbed(PatchCableSource* cableSource) {}

@@ -61,12 +61,12 @@
  }
 
  table.price-matrix th.header-plus,
- .paypal-price-plus {
+ .payment-price-plus {
    color: #91979e;
  }
 
  table.price-matrix th.header-pro,
- .paypal-price-pro {
+ .payment-price-pro {
    color: #b6c2ce;
  }
 
@@ -116,7 +116,7 @@
    z-index: 10;
  }
 
- td.paypal-td {
+ td.payment-td {
    border-right: 1px solid #464646;
    text-align:center;
    padding-top: 10px;
@@ -127,12 +127,12 @@
    font-size: 10px;
  }
 
- td.paypal-td:last-child {
+ td.payment-td:last-child {
    border-right: none;
  }
 
- .paypal-price-plus,
- .paypal-price-pro {
+ .payment-price-plus,
+ .payment-price-pro {
     font-size: 25px;
  }
  
@@ -156,4 +156,22 @@
    width: var(--width);
    border-bottom: var(--borderWidth) solid var(--borderColor);
    border-right: var(--borderWidth) solid var(--borderColor);
+ }
+
+ .donate-button {
+   background-color: #003F4E;
+   border: none;
+   color: white;
+   padding: 5px 11px;
+   text-align: center;
+   text-decoration: none;
+   display: inline-block;
+   font-size: 16px;
+   margin: 4px 2px;
+   cursor: pointer;
+   border-radius: 9999px;
+ }
+ .donate-button:hover {
+   background-color: #04AA6D;
+   color: white;
  }

@@ -45,17 +45,18 @@ using namespace juce;
 #include "Push2Control.h"
 #include "UserData.h"
 
-ofColor ofColor::black(0,0,0);
-ofColor ofColor::white(255,255,255);
-ofColor ofColor::grey(128,128,128);
-ofColor ofColor::red(255,0,0);
-ofColor ofColor::green(0,200,0);
-ofColor ofColor::yellow(255,255,0);
-ofColor ofColor::orange(255,165,0);
-ofColor ofColor::blue(0,0,255);
-ofColor ofColor::purple(148,0,211);
-ofColor ofColor::lime(0,255,0);
-ofColor ofColor::magenta(255,0,255);
+ofColor ofColor::black(0, 0, 0);
+ofColor ofColor::white(255, 255, 255);
+ofColor ofColor::grey(128, 128, 128);
+ofColor ofColor::red(255, 0, 0);
+ofColor ofColor::green(0, 200, 0);
+ofColor ofColor::yellow(255, 255, 0);
+ofColor ofColor::orange(255, 165, 0);
+ofColor ofColor::blue(0, 0, 255);
+ofColor ofColor::purple(148, 0, 211);
+ofColor ofColor::lime(0, 255, 0);
+ofColor ofColor::magenta(255, 0, 255);
+ofColor ofColor::cyan(0, 255, 255);
 ofColor ofColor::clear(0, 0, 0, 0);
 
 NVGcontext* gNanoVG = nullptr;
@@ -66,7 +67,8 @@ std::string ofToDataPath(const std::string& path)
    if (!path.empty() && (path[0] == '.' || juce::File::isAbsolutePath(path)))
       return path;
 
-   static const auto sDataDir = [] {
+   static const auto sDataDir = []
+   {
       auto dataDir = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
 #if BESPOKE_WINDOWS
       std::replace(begin(dataDir), end(dataDir), '\\', '/');
@@ -75,11 +77,11 @@ std::string ofToDataPath(const std::string& path)
       dataDir += '/';
       return dataDir;
    }();
-   
+
    return sDataDir + path;
 }
 
-std::string ofToFactoryPath(const std::string &subdir)
+std::string ofToFactoryPath(const std::string& subdir)
 {
    std::string result;
 #if BESPOKE_MAC
@@ -88,11 +90,15 @@ std::string ofToFactoryPath(const std::string &subdir)
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentExecutableFile).getSiblingFile(subdir);
 #if BESPOKE_LINUX
    if (!resDir.isDirectory())
-      resDir = juce::File{juce::CharPointer_UTF8{Bespoke::CMAKE_INSTALL_PREFIX}}.getChildFile("share/BespokeSynth").getChildFile(subdir);
+   {
+      resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile("../../share/BespokeSynth").getChildFile(subdir);
+      if (!resDir.isDirectory())
+         resDir = juce::File{ juce::CharPointer_UTF8{ Bespoke::CMAKE_INSTALL_PREFIX } }.getChildFile("share/BespokeSynth").getChildFile(subdir);
+   }
 #endif
 #endif
    if (!resDir.isDirectory())
-      throw std::runtime_error{"Application directory not found. Please reinstall Bespoke."};
+      throw std::runtime_error{ "Application directory not found. Please reinstall Bespoke." };
 
    result = resDir.getFullPathName().toStdString();
 #if BESPOKE_WINDOWS
@@ -114,17 +120,21 @@ struct StyleStack
 {
    struct Style
    {
-      Style() : fill(false), color(255,255,255), lineWidth(1) {}
+      Style()
+      : fill(false)
+      , color(255, 255, 255)
+      , lineWidth(1)
+      {}
       bool fill;
       ofColor color;
       float lineWidth;
    };
-   
+
    StyleStack() { stack.push_front(Style()); }
    void Push() { stack.push_front(GetStyle()); }
    void Pop() { stack.pop_front(); }
    Style& GetStyle() { return *stack.begin(); }
-   
+
    std::list<Style> stack;
 };
 
@@ -138,7 +148,7 @@ void ofPushStyle()
 void ofPopStyle()
 {
    sStyleStack.Pop();
-   
+
    ofSetColor(sStyleStack.GetStyle().color);
    ofSetLineWidth(sStyleStack.GetStyle().lineWidth);
 }
@@ -178,7 +188,7 @@ void ofResetClipWindow()
 
 void ofSetColor(float r, float g, float b, float a)
 {
-   sStyleStack.GetStyle().color = ofColor(r,g,b,a);
+   sStyleStack.GetStyle().color = ofColor(r, g, b, a);
    if (Push2Control::sDrawingPush2Display)
    {
       nvgStrokeColor(gNanoVG, nvgRGBA(r, g, b, a));
@@ -188,7 +198,7 @@ void ofSetColor(float r, float g, float b, float a)
    static int sImage = -1;
    if (sImage == -1)
       sImage = nvgCreateImage(gNanoVG, ofToResourcePath("noise.jpg").c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
-   NVGpaint pattern = nvgImagePattern(gNanoVG, ofRandom(0,10), ofRandom(0,10), 300 / gDrawScale / TheSynth->GetPixelRatio(), 300 / gDrawScale / TheSynth->GetPixelRatio(), ofRandom(0,10), sImage, a);
+   NVGpaint pattern = nvgImagePattern(gNanoVG, ofRandom(0, 10), ofRandom(0, 10), 300 / gDrawScale / TheSynth->GetPixelRatio(), 300 / gDrawScale / TheSynth->GetPixelRatio(), ofRandom(0, 10), sImage, a);
    pattern.innerColor = nvgRGBA(r, g, b, a);
    pattern.outerColor = nvgRGBA(r, g, b, a);
    nvgStrokePaint(gNanoVG, pattern);
@@ -211,17 +221,17 @@ void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2f gr
 
 void ofSetColor(float grey)
 {
-   ofSetColor(grey,grey,grey);
+   ofSetColor(grey, grey, grey);
 }
 
 void ofSetColor(const ofColor& color)
 {
-   ofSetColor(color.r,color.g,color.b,color.a);
+   ofSetColor(color.r, color.g, color.b, color.a);
 }
 
 void ofSetColor(const ofColor& color, float a)
 {
-   ofSetColor(color.r,color.g,color.b,a);
+   ofSetColor(color.r, color.g, color.b, a);
 }
 
 void ofFill()
@@ -256,7 +266,7 @@ void ofRect(float x, float y, float width, float height, float cornerRadius /*=3
 
 void ofRect(const ofRectangle& rect, float cornerRadius /*=3*/)
 {
-   ofRect(rect.x,rect.y,rect.width,rect.height, cornerRadius);
+   ofRect(rect.x, rect.y, rect.width, rect.height, cornerRadius);
 }
 
 float ofClamp(float val, float a, float b)
@@ -302,13 +312,13 @@ void ofLine(float x1, float y1, float x2, float y2)
 
 void ofLine(ofVec2f v1, ofVec2f v2)
 {
-   ofLine(v1.x,v1.y,v2.x,v2.y);
+   ofLine(v1.x, v1.y, v2.x, v2.y);
 }
 
 void ofSetLineWidth(float width)
 {
    sStyleStack.GetStyle().lineWidth = width;
-   
+
    const float kLineWidthAdjustAmount = 0.25f;
    const float kLineWidthAdjustFactor = 1.5f;
    nvgStrokeWidth(gNanoVG, width * kLineWidthAdjustFactor + kLineWidthAdjustAmount);
@@ -339,7 +349,12 @@ void ofVertex(float x, float y, float z)
       nvgMoveTo(gNanoVG, x, y);
    else
       nvgLineTo(gNanoVG, x, y);
-   gShapePoints.push_back(ofVec2f(x,y));
+   gShapePoints.push_back(ofVec2f(x, y));
+}
+
+void ofVertex(ofVec2f point)
+{
+   ofVertex(point.x, point.y);
 }
 
 float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEnd, bool clamp)
@@ -350,7 +365,7 @@ float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEn
    else
       ret = toEnd;
    if (clamp)
-      ret = ofClamp(ret, MIN(toStart,toEnd), MAX(toStart,toEnd));
+      ret = ofClamp(ret, MIN(toStart, toEnd), MAX(toStart, toEnd));
    return ret;
 }
 
@@ -365,28 +380,33 @@ float ofRandom(float x, float y)
    float low = 0;
    float randNum = 0;
    // if there is no range, return the value
-   if (x == y) return x; 			// float == ?, wise? epsilon?
-   high = MAX(x,y);
-   low = MIN(x,y);
-   randNum = low + ((high-low) * gRandom01(gRandom));
+   if (x == y)
+      return x; // float == ?, wise? epsilon?
+   high = MAX(x, y);
+   low = MIN(x, y);
+   randNum = low + ((high - low) * gRandom01(gRandom));
    return randNum;
 }
 
 void ofSetCircleResolution(float res)
 {
-   
 }
 
 #if BESPOKE_WINDOWS
 namespace windowsport
 {
-   struct timespec { long tv_sec; long tv_nsec; };    //header part
-   int clock_gettime(int, struct timespec *spec)      //C-file part
+   struct timespec
    {
-      __int64 wintime; GetSystemTimeAsFileTime((FILETIME*)&wintime);
-      wintime -= 116444736000000000ll;  //1jan1601 to 1jan1970
-      spec->tv_sec = wintime / 10000000ll;           //seconds
-      spec->tv_nsec = wintime % 10000000ll * 100;      //nano-seconds
+      long tv_sec;
+      long tv_nsec;
+   }; //header part
+   int clock_gettime(int, struct timespec* spec) //C-file part
+   {
+      __int64 wintime;
+      GetSystemTimeAsFileTime((FILETIME*)&wintime);
+      wintime -= 116444736000000000ll; //1jan1601 to 1jan1970
+      spec->tv_sec = wintime / 10000000ll; //seconds
+      spec->tv_nsec = wintime % 10000000ll * 100; //nano-seconds
       return 0;
    }
 }
@@ -427,36 +447,36 @@ float ofGetFrameRate()
 
 float ofLerp(float start, float stop, float amt)
 {
-   return start + (stop-start) * amt;
+   return start + (stop - start) * amt;
 }
 
 float ofDistSquared(float x1, float y1, float x2, float y2)
 {
-   return ( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
+   return ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty, bool trim)
 {
    StringArray tokens;
-   
+
    tokens.addTokens(String(str), String(splitter), "");
-   
+
    if (ignoreEmpty)
       tokens.removeEmptyStrings();
-   
+
    if (trim)
       tokens.trim();
-   
+
    std::vector<std::string> ret;
    for (auto s : tokens)
       ret.push_back(s.toStdString());
-   
+
    return ret;
 }
 
 bool ofIsStringInString(const std::string& haystack, const std::string& needle)
 {
-   return ( strstr(haystack.c_str(), needle.c_str() ) != nullptr );
+   return (strstr(haystack.c_str(), needle.c_str()) != nullptr);
 }
 
 void ofScale(float x, float y, float z)
@@ -485,15 +505,17 @@ void ofStringReplace(std::string& input, std::string searchStr, std::string repl
    size_t uPos = 0;
    size_t uFindLen = searchStr.length();
    size_t uReplaceLen = replaceStr.length();
-   
-   if( uFindLen == 0 ){
+
+   if (uFindLen == 0)
+   {
       return;
    }
-   
-   for( ;(uPos = input.find( searchStr, uPos )) != std::string::npos; ){
-      input.replace( uPos, uFindLen, replaceStr );
+
+   for (; (uPos = input.find(searchStr, uPos)) != std::string::npos;)
+   {
+      input.replace(uPos, uFindLen, replaceStr);
       uPos += uReplaceLen;
-      
+
       if (firstOnly)
          break;
    }
@@ -505,17 +527,17 @@ std::string ofGetTimestampString(std::string in)
    Time time = Time::getCurrentTime();
    ofStringReplace(in, "%Y", ofToString(time.getYear()));
    char buff[16];
-   sprintf(buff, "%02d", time.getMonth()+1);
+   snprintf(buff, sizeof(buff), "%02d", time.getMonth() + 1);
    ofStringReplace(in, "%m", buff);
-   sprintf(buff, "%02d", time.getDayOfMonth());
+   snprintf(buff, sizeof(buff), "%02d", time.getDayOfMonth());
    ofStringReplace(in, "%d", buff);
-   sprintf(buff, "%02d", time.getHours());
+   snprintf(buff, sizeof(buff), "%02d", time.getHours());
    ofStringReplace(in, "%H", buff);
-   sprintf(buff, "%02d", time.getMinutes());
+   snprintf(buff, sizeof(buff), "%02d", time.getMinutes());
    ofStringReplace(in, "%M", buff);
-   sprintf(buff, "%02d", time.getSeconds());
+   snprintf(buff, sizeof(buff), "%02d", time.getSeconds());
    ofStringReplace(in, "%S", buff);
-   sprintf(buff, "%03d", time.getMilliseconds());
+   snprintf(buff, sizeof(buff), "%03d", time.getMilliseconds());
    ofStringReplace(in, "%i", buff);
    return in;
 }
@@ -523,31 +545,31 @@ std::string ofGetTimestampString(std::string in)
 void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
    ofBeginShape();
-   ofVertex(x1,y1);
-   ofVertex(x2,y2);
-   ofVertex(x3,y3);
-   ofVertex(x1,y1);
+   ofVertex(x1, y1);
+   ofVertex(x2, y2);
+   ofVertex(x3, y3);
+   ofVertex(x1, y1);
    ofEndShape();
 }
 
 float ofRectangle::getMinX() const
 {
-   return MIN(x, x + width);  // - width
+   return MIN(x, x + width); // - width
 }
 
 float ofRectangle::getMaxX() const
 {
-   return MAX(x, x + width);  // - width
+   return MAX(x, x + width); // - width
 }
 
 float ofRectangle::getMinY() const
 {
-   return MIN(y, y + height);  // - height
+   return MIN(y, y + height); // - height
 }
 
 float ofRectangle::getMaxY() const
 {
-   return MAX(y, y + height);  // - height
+   return MAX(y, y + height); // - height
 }
 
 bool ofRectangle::intersects(const ofRectangle& other) const
@@ -572,10 +594,12 @@ void ofColor::setBrightness(int brightness)
 int ofColor::getBrightness() const
 {
    float max = r;
-   if(g > max) {
+   if (g > max)
+   {
       max = g;
    }
-   if(b > max) {
+   if (b > max)
+   {
       max = b;
    }
    return max;
@@ -591,47 +615,56 @@ void ofColor::setSaturation(int saturation)
 int ofColor::getSaturation() const
 {
    float max = getBrightness();
-   
+
    float min = r;
-   if(g < min)
+   if (g < min)
       min = g;
-   if(b < min)
+   if (b < min)
       min = b;
-   
-   if(max == min) // grays
+
+   if (max == min) // grays
       return 0;
-   
+
    return 255 * (max - min) / max;
 }
 
 void ofColor::getHsb(float& hue,
                      float& saturation,
-                     float& brightness) const {
+                     float& brightness) const
+{
    float max = getBrightness();
-   
+
    float min = r;
-   if(g < min) {
+   if (g < min)
+   {
       min = g;
    }
-   if(b < min) {
+   if (b < min)
+   {
       min = b;
    }
-   
-   if(max == min) { // grays
+
+   if (max == min)
+   { // grays
       hue = 0.f;
       saturation = 0.f;
       brightness = max;
       return;
    }
-   
+
    float hueSixth;
-   if(r == max) {
+   if (r == max)
+   {
       hueSixth = (g - b) / (max - min);
-      if(hueSixth < 0.f)
+      if (hueSixth < 0.f)
          hueSixth += 6.f;
-   } else if (g == max) {
+   }
+   else if (g == max)
+   {
       hueSixth = 2.f + (b - r) / (max - min);
-   } else {
+   }
+   else
+   {
       hueSixth = 4.f + (r - g) / (max - min);
    }
    hue = 255 * hueSixth / 6.f;
@@ -643,20 +676,27 @@ void ofColor::setHsb(int hue, int saturation, int brightness)
 {
    saturation = ofClamp(saturation, 0, 255);
    brightness = ofClamp(brightness, 0, 255);
-   if(brightness == 0) { // black
-      set(0,0,0);
-   } else if(saturation == 0) { // grays
-      set(brightness,brightness,brightness);
-   } else {
+   if (brightness == 0)
+   { // black
+      set(0, 0, 0);
+   }
+   else if (saturation == 0)
+   { // grays
+      set(brightness, brightness, brightness);
+   }
+   else
+   {
       float hueSix = hue * 6.f / 255.0f;
       float saturationNorm = saturation / 255.0f;
-      int hueSixCategory = (int) floorf(hueSix);
+      int hueSixCategory = (int)floorf(hueSix);
       float hueSixRemainder = hueSix - hueSixCategory;
       float pv = ((1.f - saturationNorm) * brightness);
       float qv = ((1.f - saturationNorm * hueSixRemainder) * brightness);
       float tv = ((1.f - saturationNorm * (1.f - hueSixRemainder)) * brightness);
-      switch(hueSixCategory) {
-         case 0: case 6: // r
+      switch (hueSixCategory)
+      {
+         case 0:
+         case 6: // r
             r = brightness;
             g = tv;
             b = pv;
@@ -692,17 +732,17 @@ void ofColor::setHsb(int hue, int saturation, int brightness)
 
 ofColor ofColor::operator*(const ofColor& other)
 {
-   return ofColor(r*other.r/255.0f, g*other.g/255.0f, b*other.b/255.0f, a*other.a/255.0f);
+   return ofColor(r * other.r / 255.0f, g * other.g / 255.0f, b * other.b / 255.0f, a * other.a / 255.0f);
 }
 
 ofColor ofColor::operator*(float f)
 {
-   return ofColor(r*f, g*f, b*f, a*f);
+   return ofColor(r * f, g * f, b * f, a * f);
 }
 
 ofColor ofColor::operator+(const ofColor& other)
 {
-   return ofColor(r+other.r, g+other.g, b+other.b, a+other.a);
+   return ofColor(r + other.r, g + other.g, b + other.b, a + other.a);
 }
 
 void RetinaTrueTypeFont::LoadFont(std::string path)
@@ -725,11 +765,11 @@ void RetinaTrueTypeFont::DrawString(std::string str, float size, float x, float 
 {
    if (!mLoaded)
       return;
-   
+
    nvgFontFaceId(gNanoVG, mFontHandle);
    nvgFontSize(gNanoVG, size);
-   
-   
+
+
    if (ofIsStringInString(str, "\n") == false)
    {
       nvgText(gNanoVG, x, y, str.c_str(), nullptr);
@@ -740,7 +780,7 @@ void RetinaTrueTypeFont::DrawString(std::string str, float size, float x, float 
       float bounds[4];
       nvgTextBounds(gNanoVG, 0, 0, str.c_str(), nullptr, bounds);
       float lineHeight = bounds[3] - bounds[1];
-      for (int i=0; i<lines.size(); ++i)
+      for (int i = 0; i < lines.size(); ++i)
       {
          nvgText(gNanoVG, x, y, lines[i].c_str(), nullptr);
          y += lineHeight;
@@ -752,14 +792,14 @@ ofRectangle RetinaTrueTypeFont::DrawStringWrap(std::string str, float size, floa
 {
    if (!mLoaded)
       return ofRectangle();
-   
+
    TheSynth->LockRender(true);
    nvgFontFaceId(gNanoVG, mFontHandle);
    nvgFontSize(gNanoVG, size);
    nvgTextBox(gNanoVG, x, y, width, str.c_str(), nullptr);
    float bounds[4];
    nvgTextBoxBounds(gNanoVG, x, y, width, str.c_str(), nullptr, bounds);
-   ofRectangle rect(bounds[0], bounds[1], bounds[2]-bounds[0], bounds[3]-bounds[1]);
+   ofRectangle rect(bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]);
    TheSynth->LockRender(false);
    return rect;
 }
@@ -768,7 +808,7 @@ float RetinaTrueTypeFont::GetStringWidth(std::string str, float size)
 {
    if (!mLoaded)
       return str.size() * 12;
-      
+
    NVGcontext* vg;
    int handle;
    if (TheSynth->GetOpenGLContext()->getCurrentContext() != nullptr)
@@ -781,12 +821,12 @@ float RetinaTrueTypeFont::GetStringWidth(std::string str, float size)
       vg = gFontBoundsNanoVG;
       handle = mFontBoundsHandle;
    }
-   
+
    nvgFontFaceId(vg, handle);
    nvgFontSize(vg, size);
    float bounds[4];
    float width = nvgTextBounds(vg, 0, 0, str.c_str(), nullptr, bounds);
-   
+
    return width;
 }
 
@@ -794,7 +834,7 @@ float RetinaTrueTypeFont::GetStringHeight(std::string str, float size)
 {
    if (!mLoaded)
       return str.size() * 12;
-      
+
    NVGcontext* vg;
    int handle;
    if (TheSynth->GetOpenGLContext()->getCurrentContext() != nullptr)
@@ -807,12 +847,12 @@ float RetinaTrueTypeFont::GetStringHeight(std::string str, float size)
       vg = gFontBoundsNanoVG;
       handle = mFontBoundsHandle;
    }
-   
+
    nvgFontFaceId(vg, handle);
    nvgFontSize(vg, size);
    float bounds[4];
    nvgTextBounds(vg, 0, 0, str.c_str(), nullptr, bounds);
-   
+
    float lineHeight = bounds[3] - bounds[1];
    return lineHeight;
 }

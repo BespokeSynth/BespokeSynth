@@ -45,7 +45,10 @@ public:
 
 struct Accidental
 {
-   Accidental(int pitch, int direction) : mPitch(pitch), mDirection(direction) {}
+   Accidental(int pitch, int direction)
+   : mPitch(pitch)
+   , mDirection(direction)
+   {}
    int mPitch;
    int mDirection;
 };
@@ -57,22 +60,22 @@ inline bool operator==(const Accidental& lhs, const Accidental& rhs)
 
 struct ScalePitches
 {
-   int mScaleRoot;
+   int mScaleRoot{ 0 };
    std::string mScaleType;
    std::vector<int> mScalePitches[2]; //double-buffered to avoid thread safety issues when modifying
-   std::atomic<int> mScalePitchesFlip{0};
+   std::atomic<int> mScalePitchesFlip{ 0 };
    std::vector<Accidental> mAccidentals;
-   
+
    void SetRoot(int root);
    void SetScaleType(std::string type);
    void SetAccidentals(const std::vector<Accidental>& accidentals);
-   
+
    const std::vector<int>& GetPitches() const { return mScalePitches[mScalePitchesFlip]; }
    int ScaleRoot() const { return mScaleRoot; }
    std::string GetType() const { return mScaleType; }
    void GetChordDegreeAndAccidentals(const Chord& chord, int& degree, std::vector<Accidental>& accidentals) const;
    int GetScalePitch(int index) const;
-   
+
    bool IsRoot(int pitch) const;
    bool IsInPentatonic(int pitch) const;
    bool IsInScale(int pitch) const;
@@ -83,19 +86,17 @@ struct ScalePitches
 
 class MTSClient;
 
-class Scale : public IDrawableModule, public IDropdownListener,
-        public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener,
-        public IButtonListener
+class Scale : public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    Scale();
    ~Scale();
    void Init() override;
-   
+
    void CreateUIControls() override;
-   
+
    bool IsSingleton() const override { return true; }
-   
+
    int MakeDiatonic(int pitch);
    bool IsRoot(int pitch);
    bool IsInPentatonic(int pitch);
@@ -109,6 +110,7 @@ public:
    void SetScaleType(std::string type, bool force = true);
    void AddListener(IScaleListener* listener);
    void RemoveListener(IScaleListener* listener);
+   void ClearListeners();
    void Poll() override;
    void SetScaleDegree(int degree);
    int GetScaleDegree() { return mScaleDegree; }
@@ -120,91 +122,100 @@ public:
    int GetNumScaleTypes() { return (int)mScales.size(); }
    std::string GetScaleName(int index) { return mScales[index].mName; }
    int NumTonesInScale() const { return mScale.NumTonesInScale(); }
-   int GetPitchesPerOctave() const { return mPitchesPerOctave; }
+   int GetPitchesPerOctave() const { return MAX(1, mPitchesPerOctave); }
 
    float PitchToFreq(float pitch);
    float FreqToPitch(float freq);
-   
+
    const ChordDatabase& GetChordDatabase() const { return mChordDatabase; }
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
 
-   void ButtonClicked(ClickButton *button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return true; }
 
 private:
    struct ScaleInfo
    {
       ScaleInfo() {}
-      ScaleInfo(std::string name, std::vector<int> pitches) : mName(name), mPitches(pitches) {}
+      ScaleInfo(std::string name, std::vector<int> pitches)
+      : mName(name)
+      , mPitches(pitches)
+      {}
       std::string mName;
       std::vector<int> mPitches;
    };
-   
+
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return true; }
-   
+
    void NotifyListeners();
-   
+
    void SetUpRootList();
    float RationalizeNumber(float input);
    void UpdateTuningTable();
    float GetTuningTableRatio(int semitonesFromCenter);
-   
+   void SetRandomRootAndScale();
+
    enum IntonationMode
    {
       kIntonation_Equal,
       kIntonation_Just,
       kIntonation_Pythagorean,
       kIntonation_Meantone,
-      kIntonation_Rational, 
+      kIntonation_Rational,
       kIntonation_SclFile,
       kIntonation_Oddsound
    };
-   
+
    ScalePitches mScale;
    std::list<IScaleListener*> mListeners;
-   DropdownList* mRootSelector;
-   DropdownList* mScaleSelector;
-   IntSlider* mScaleDegreeSlider;
-   int mScaleDegree;
+   DropdownList* mRootSelector{ nullptr };
+   DropdownList* mScaleSelector{ nullptr };
+   IntSlider* mScaleDegreeSlider{ nullptr };
+   int mScaleDegree{ 0 };
 
-   ClickButton* mLoadSCLButton{nullptr};
-   ClickButton* mLoadKBMButton{nullptr};
-   
+   ClickButton* mLoadSCLButton{ nullptr };
+   ClickButton* mLoadKBMButton{ nullptr };
+   ClickButton* mQueuedButtonPress{ nullptr };
+
    std::vector<ScaleInfo> mScales;
-   int mNumSeptatonicScales;
-   int mScaleIndex;
-   
-   int mPitchesPerOctave;
-   float mReferenceFreq;
-   float mReferencePitch;
-   TextEntry* mPitchesPerOctaveEntry;
-   TextEntry* mReferenceFreqEntry;
-   TextEntry* mReferencePitchEntry;
-   IntonationMode mIntonation;
-   DropdownList* mIntonationSelector;
-   
-   std::array<float, 256> mTuningTable;
-   
+   int mNumSeptatonicScales{ 0 };
+   int mScaleIndex{ 0 };
+
+   int mPitchesPerOctave{ 12 };
+   float mReferenceFreq{ 440 };
+   float mReferencePitch{ 69 };
+   TextEntry* mPitchesPerOctaveEntry{ nullptr };
+   TextEntry* mReferenceFreqEntry{ nullptr };
+   TextEntry* mReferencePitchEntry{ nullptr };
+   IntonationMode mIntonation{ IntonationMode::kIntonation_Equal };
+   DropdownList* mIntonationSelector{ nullptr };
+
+   std::array<float, 256> mTuningTable{};
+
    ChordDatabase mChordDatabase;
 
-   MTSClient* mOddsoundMTSClient{nullptr};
+   MTSClient* mOddsoundMTSClient{ nullptr };
 
    std::string mSclContents;
    std::string mKbmContents;
    std::string mCustomScaleDescription;
+   bool mWantSetRandomRootAndScale{ false };
 };
 
 extern Scale* TheScale;
 
 #endif /* defined(__modularSynth__Scale__) */
-

@@ -31,15 +31,13 @@
 
 DCOffset::DCOffset()
 : IAudioProcessor(gBufferSize)
-, mOffset(0)
-, mOffsetSlider(nullptr)
 {
 }
 
 void DCOffset::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mOffsetSlider = new FloatSlider(this,"offset",5,2,110,15,&mOffset,-1,1);
+   mOffsetSlider = new FloatSlider(this, "offset", 5, 2, 110, 15, &mOffset, -1, 1);
 }
 
 DCOffset::~DCOffset()
@@ -52,20 +50,20 @@ void DCOffset::Process(double time)
 
    if (!mEnabled)
       return;
-   
+
    ComputeSliders(0);
    SyncBuffers();
-   
+
    IAudioReceiver* target = GetTarget();
    if (target)
    {
       int bufferSize = GetBuffer()->BufferSize();
-      
+
       ChannelBuffer* out = target->GetBuffer();
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          float* buffer = GetBuffer()->GetChannel(ch);
-         for (int i=0; i<bufferSize; ++i)
+         for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
             buffer[i] += mOffset;
@@ -74,7 +72,7 @@ void DCOffset::Process(double time)
          GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
       }
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -82,7 +80,7 @@ void DCOffset::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mOffsetSlider->Draw();
 }
 

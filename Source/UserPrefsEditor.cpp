@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
+#include "PatchCable.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -57,10 +58,30 @@ void UserPrefsEditor::CreateUIControls()
    mCategorySelector->AddLabel("general", (int)UserPrefCategory::General);
    mCategorySelector->AddLabel("graphics", (int)UserPrefCategory::Graphics);
    mCategorySelector->AddLabel("paths", (int)UserPrefCategory::Paths);
+
+   std::array<int, 5> oversampleAmounts = { 1, 2, 4, 8, 16 };
+   for (int oversample : oversampleAmounts)
+   {
+      UserPrefs.oversampling.GetDropdown()->AddLabel(ofToString(oversample), oversample);
+      if (UserPrefs.oversampling.Get() == oversample)
+         UserPrefs.oversampling.GetIndex() = oversample;
+   }
+
+   UserPrefs.cable_drop_behavior.GetIndex() = 0;
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("show quickspawn", (int)CableDropBehavior::ShowQuickspawn);
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("do nothing", (int)CableDropBehavior::DoNothing);
+   UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("disconnect", (int)CableDropBehavior::DisconnectCable);
+   for (int i = 0; i < UserPrefs.cable_drop_behavior.GetDropdown()->GetNumValues(); ++i)
+   {
+      if (UserPrefs.cable_drop_behavior.GetDropdown()->GetElement(i).mLabel == UserPrefs.cable_drop_behavior.Get())
+         UserPrefs.cable_drop_behavior.GetIndex() = i;
+   }
 }
 
 void UserPrefsEditor::Show()
 {
+   SetPosition(100 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().x, 250 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().y);
+
    UpdateDropdowns({});
    SetShowing(true);
 
@@ -124,7 +145,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
          ++i;
       }
 
-      if (UserPrefs.audio_output_device.GetIndex() == -1)   //update dropdown to match requested value, in case audio system failed to start
+      if (UserPrefs.audio_output_device.GetIndex() == -1) //update dropdown to match requested value, in case audio system failed to start
       {
          for (int j = -2; j < i; ++j)
          {
@@ -153,7 +174,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
          ++i;
       }
 
-      if (UserPrefs.audio_input_device.GetIndex() < 0)   //update dropdown to match requested value, in case audio system failed to start
+      if (UserPrefs.audio_input_device.GetIndex() < 0) //update dropdown to match requested value, in case audio system failed to start
       {
          for (int j = -2; j < i; ++j)
          {
@@ -189,7 +210,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 
    if (selectedDevice == nullptr)
       return;
-   
+
    if (toUpdate.empty() || VectorContains(UserPrefs.samplerate.GetDropdown(), toUpdate))
    {
       UserPrefs.samplerate.GetIndex() = -1;
@@ -198,7 +219,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto rate : selectedDevice->getAvailableSampleRates())
       {
          UserPrefs.samplerate.GetDropdown()->AddLabel(ofToString(rate), i);
-         if (rate == gSampleRate)
+         if (rate == gSampleRate / UserPrefs.oversampling.Get())
             UserPrefs.samplerate.GetIndex() = i;
          ++i;
       }
@@ -212,7 +233,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto bufferSize : selectedDevice->getAvailableBufferSizes())
       {
          UserPrefs.buffersize.GetDropdown()->AddLabel(ofToString(bufferSize), i);
-         if (bufferSize == gBufferSize)
+         if (bufferSize == gBufferSize / UserPrefs.oversampling.Get())
             UserPrefs.buffersize.GetIndex() = i;
          ++i;
       }
@@ -297,12 +318,12 @@ void UserPrefsEditor::DrawModule()
 
    DrawRightLabel(UserPrefs.width.GetControl(), "(currently: " + ofToString(ofGetWidth()) + ")", ofColor::white);
    DrawRightLabel(UserPrefs.height.GetControl(), "(currently: " + ofToString(ofGetHeight()) + ")", ofColor::white);
-   
+
    if (UserPrefs.set_manual_window_position.Get())
    {
       auto pos = TheSynth->GetMainComponent()->getTopLevelComponent()->getScreenPosition();
-         DrawRightLabel(UserPrefs.position_y.GetControl(), "(currently: " + ofToString(pos.y) + ")", ofColor::white);
-         DrawRightLabel(UserPrefs.position_x.GetControl(), "(currently: " + ofToString(pos.x) + ")", ofColor::white);
+      DrawRightLabel(UserPrefs.position_y.GetControl(), "(currently: " + ofToString(pos.y) + ")", ofColor::white);
+      DrawRightLabel(UserPrefs.position_x.GetControl(), "(currently: " + ofToString(pos.x) + ")", ofColor::white);
    }
 
    DrawRightLabel(UserPrefs.zoom.GetControl(), "(currently: " + ofToString(gDrawScale) + ")", ofColor::white);
@@ -328,7 +349,7 @@ void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofCo
    }
 }
 
-void UserPrefsEditor::CleanUpSave(std::string& json)  //remove the markup hack that got the json file to save ordered
+void UserPrefsEditor::CleanUpSave(std::string& json) //remove the markup hack that got the json file to save ordered
 {
    for (int i = 0; i < (int)UserPrefs.mUserPrefs.size(); ++i)
       ofStringReplace(json, "**" + UserPrefsHolder::ToStringLeadingZeroes(i) + "**", "", true);
@@ -341,8 +362,9 @@ bool UserPrefsEditor::PrefRequiresRestart(UserPref* pref) const
           pref == &UserPrefs.audio_input_device ||
           pref == &UserPrefs.samplerate ||
           pref == &UserPrefs.buffersize ||
+          pref == &UserPrefs.oversampling ||
           pref == &UserPrefs.max_output_channels ||
-          pref == &UserPrefs.max_input_channels ||  
+          pref == &UserPrefs.max_input_channels ||
           pref == &UserPrefs.record_buffer_length_minutes ||
           pref == &UserPrefs.show_minimap;
 }
@@ -366,11 +388,11 @@ void UserPrefsEditor::Save()
    file.create();
    file.replaceWithText(output);
 
-   if (TheSynth->HasFatalError())   //this popup spawned at load due to a bad init setting. in this case, the button says "save and exit"
+   if (TheSynth->HasFatalError()) //this popup spawned at load due to a bad init setting. in this case, the button says "save and exit"
       juce::JUCEApplicationBase::quit();
 }
 
-void UserPrefsEditor::ButtonClicked(ClickButton* button)
+void UserPrefsEditor::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSaveButton)
    {
@@ -382,11 +404,11 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       SetShowing(false);
 }
 
-void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox)
+void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (!TheSynth->IsLoadingState())
    {
@@ -404,10 +426,12 @@ void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
          ModularSynth::sBackgroundG = UserPrefs.background_g.Get();
          ModularSynth::sBackgroundB = UserPrefs.background_b.Get();
       }
+      if (slider == UserPrefs.cable_alpha.GetSlider())
+         ModularSynth::sCableAlpha = UserPrefs.cable_alpha.Get();
    }
 }
 
-void UserPrefsEditor::IntSliderUpdated(IntSlider* slider, int oldVal)
+void UserPrefsEditor::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
@@ -415,7 +439,7 @@ void UserPrefsEditor::TextEntryComplete(TextEntry* entry)
 {
 }
 
-void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal)
+void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == UserPrefs.devicetype.GetDropdown())
    {
@@ -433,7 +457,7 @@ void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void UserPrefsEditor::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void UserPrefsEditor::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
 }
 

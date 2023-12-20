@@ -50,6 +50,7 @@ class ADSRDisplay;
 #define DRUMSYNTH_PAD_HEIGHT 236
 #define DRUMSYNTH_PADS_HORIZONTAL 4
 #define DRUMSYNTH_PADS_VERTICAL 2
+#define DRUMSYNTH_NO_CUTOFF 10000
 
 class DrumSynth : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public IRadioButtonListener, public ITextEntryListener
 {
@@ -57,7 +58,9 @@ public:
    DrumSynth();
    ~DrumSynth();
    static IDrawableModule* Create() { return new DrumSynth(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -70,33 +73,35 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    struct DrumSynthHitSerialData
    {
       DrumSynthHitSerialData();
 
-      EnvOscillator mTone;
-      EnvOscillator mNoise;
+      EnvOscillator mTone{ OscillatorType::kOsc_Sin };
+      EnvOscillator mNoise{ OscillatorType::kOsc_Random };
       ::ADSR mFreqAdsr;
       ::ADSR mFilterAdsr;
-      float mFreqMax;
-      float mFreqMin;
-      float mVol;
-      float mVolNoise;
-      float mCutoffMax;
-      float mCutoffMin;
-      float mQ;
+      float mFreqMax{ 150 };
+      float mFreqMin{ 10 };
+      float mVol{ 0 };
+      float mVolNoise{ 0 };
+      float mCutoffMax{ DRUMSYNTH_NO_CUTOFF };
+      float mCutoffMin{ 10 };
+      float mQ{ float(sqrt(2)) / 2 };
    };
 
    struct IndividualOutput;
@@ -114,38 +119,35 @@ private:
       void Draw();
 
       DrumSynthHitSerialData mData;
-      float mPhase;
-      ADSRDisplay* mToneAdsrDisplay;
-      ADSRDisplay* mFreqAdsrDisplay;
-      ADSRDisplay* mNoiseAdsrDisplay;
-      ADSRDisplay* mFilterAdsrDisplay;
-      FloatSlider* mVolSlider;
-      FloatSlider* mFreqMaxSlider;
-      FloatSlider* mFreqMinSlider;
-      RadioButton* mToneType;
-      double mStartTime;
+      float mPhase{ 0 };
+      ADSRDisplay* mToneAdsrDisplay{ nullptr };
+      ADSRDisplay* mFreqAdsrDisplay{ nullptr };
+      ADSRDisplay* mNoiseAdsrDisplay{ nullptr };
+      ADSRDisplay* mFilterAdsrDisplay{ nullptr };
+      FloatSlider* mVolSlider{ nullptr };
+      FloatSlider* mFreqMaxSlider{ nullptr };
+      FloatSlider* mFreqMinSlider{ nullptr };
+      RadioButton* mToneType{ nullptr };
       PeakTracker mLevel;
-      FloatSlider* mVolNoiseSlider;
-      FloatSlider* mFilterCutoffMaxSlider;
-      FloatSlider* mFilterCutoffMinSlider;
-      FloatSlider* mFilterQSlider;
+      FloatSlider* mVolNoiseSlider{ nullptr };
+      FloatSlider* mFilterCutoffMaxSlider{ nullptr };
+      FloatSlider* mFilterCutoffMinSlider{ nullptr };
+      FloatSlider* mFilterQSlider{ nullptr };
       DrumSynth* mParent;
-      int mIndex;
-      int mX;
-      int mY;
+      int mIndex{ 0 };
+      int mX{ 0 };
+      int mY{ 0 };
       BiquadFilter mFilter;
 
-      IndividualOutput* mIndividualOutput;
+      IndividualOutput* mIndividualOutput{ nullptr };
    };
 
    struct IndividualOutput
    {
       IndividualOutput(DrumSynthHit* owner)
-         : mHit(owner)
-         , mVizBuffer(nullptr)
-         , mPatchCableSource(nullptr)
+      : mHit(owner)
       {
-         mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS*gSampleRate);
+         mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS * gSampleRate);
          mPatchCableSource = new PatchCableSource(owner->mParent, kConnectionType_Audio);
 
          mPatchCableSource->SetOverrideVizBuffer(mVizBuffer);
@@ -158,9 +160,9 @@ private:
       {
          delete mVizBuffer;
       }
-      DrumSynthHit* mHit;
-      RollingBuffer* mVizBuffer;
-      PatchCableSource* mPatchCableSource;
+      DrumSynthHit* mHit{ nullptr };
+      RollingBuffer* mVizBuffer{ nullptr };
+      PatchCableSource* mPatchCableSource{ nullptr };
    };
 
    int GetAssociatedSampleIndex(int x, int y);
@@ -168,17 +170,14 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    std::array<DrumSynthHit*, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mHits;
-   std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity;
+   std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity{};
 
-   float mVolume;
-   FloatSlider* mVolSlider;
-   bool mUseIndividualOuts;
-   bool mMonoOutput;
+   float mVolume{ 1 };
+   FloatSlider* mVolSlider{ nullptr };
+   bool mUseIndividualOuts{ false };
+   bool mMonoOutput{ false };
    int mOversampling{ 1 };
-   DropdownList* mOversamplingSelector;
 };
-

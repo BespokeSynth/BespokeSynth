@@ -35,12 +35,12 @@
 
 struct OscMap
 {
-   int mControl;
+   int mControl{ 0 };
    std::string mAddress;
-   bool mIsFloat;
-   float mFloatValue;
-   int mIntValue;
-   double mLastChangedTime;
+   bool mIsFloat{ false };
+   float mFloatValue{ 0 };
+   int mIntValue{ 0 };
+   double mLastChangedTime{ -9999 }; //@TODO(Noxy): Unused but is in savestates.
 };
 
 class OscController : public INonstandardController,
@@ -50,14 +50,18 @@ class OscController : public INonstandardController,
 public:
    OscController(MidiDeviceListener* listener, std::string outAddress, int outPort, int inPort);
    ~OscController();
-   
+
    void Connect();
    void oscMessageReceived(const juce::OSCMessage& msg) override;
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override;
    int AddControl(std::string address, bool isFloat);
-   
+
    bool IsInputConnected() override { return mConnected; }
-   bool Reconnect() override { Connect(); return mConnected; }
+   bool Reconnect() override
+   {
+      Connect();
+      return mConnected;
+   }
    bool SetInPort(int port);
    std::string GetControlTooltip(MidiMessageType type, int control) override;
 
@@ -65,18 +69,18 @@ public:
    void LoadState(FileStreamIn& in) override;
 
 private:
-   MidiDeviceListener* mListener;
+   MidiDeviceListener* mListener{ nullptr };
 
    int FindControl(std::string address);
    void ConnectOutput();
-   
+
    std::string mOutAddress;
-   int mOutPort;
-   int mInPort;
+   int mOutPort{ 0 };
+   int mInPort{ 0 };
    juce::OSCSender mOscOut;
-   bool mConnected;
-   bool mOutputConnected;
-   
+   bool mConnected{ false };
+   bool mOutputConnected{ false };
+
    std::vector<OscMap> mOscMap;
 };
 

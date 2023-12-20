@@ -48,20 +48,22 @@ public:
    RadioSequencer();
    ~RadioSequencer();
    static IDrawableModule* Create() { return new RadioSequencer(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
-   
+
    //IGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
-   
+
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
 
@@ -71,7 +73,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
@@ -79,36 +81,38 @@ public:
    //IDrivableSequencer
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
-   
-   void CheckboxUpdated(Checkbox* checkbox) override {}
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 2; }
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void Step(double time, int pulseFlags);
    void SetGridSize(float w, float h);
    void SyncControlCablesToGrid();
    void UpdateGridLights();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   
+
    UIGrid* mGrid{ nullptr };
    NoteInterval mInterval{ kInterval_1n };
    DropdownList* mIntervalSelector{ nullptr };
@@ -120,6 +124,7 @@ private:
    bool mHasExternalPulseSource{ false };
    int mStep{ 0 };
    int mLoadRev{ -1 };
+   bool mDisableAllWhenDisabled{ true };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

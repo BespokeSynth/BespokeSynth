@@ -27,7 +27,7 @@
 
 #include "ModularSynth.h"
 #ifdef _MSC_VER
-#define ssize_t ssize_t_undef_hack  //fixes conflict with ssize_t typedefs between python and juce
+#define ssize_t ssize_t_undef_hack //fixes conflict with ssize_t typedefs between python and juce
 #endif
 #include "IDrawableModule.h"
 #include "CodeEntry.h"
@@ -40,8 +40,8 @@
 #include "leathers/push"
 #include "leathers/unused-value"
 #include "leathers/range-loop-analysis"
-   #include "pybind11/embed.h"
-   #include "pybind11/stl.h"
+#include "pybind11/embed.h"
+#include "pybind11/stl.h"
 #include "leathers/pop"
 
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -55,28 +55,9 @@ bool CodeEntry::sDoSyntaxHighlighting = false;
 
 CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
 : mListener(owner)
-, mCharWidth(5.85f)
-, mCharHeight(15)
-, mUndoBufferPos(0)
-, mUndosLeft(0)
-, mRedosLeft(0)
-, mCaretPosition(0)
-, mCaretPosition2(0)
-, mLastPublishTime(-999)
-, mHasError(false)
-, mErrorLine(-1)
-, mDoSyntaxHighlighting(false)
-, mAutocompleteUpdateTimer(0)
-, mWantToShowAutocomplete(false)
-, mAutocompleteHighlightIndex(0)
-, mCodeUpdated(false)
 {
-   mCaretBlink = true;
-   mCaretBlinkTimer = 0;
-   mHovered = false;
-   
    SetName(name);
-   SetPosition(x,y);
+   SetPosition(x, y);
    mWidth = w;
    mHeight = h;
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(owner);
@@ -99,9 +80,9 @@ void CodeEntry::Poll()
          {
             py::globals()["syntax_highlight_code"] = GetVisibleCode();
             py::object ret = py::eval("syntax_highlight_basic()", py::globals());
-            mSyntaxHighlightMapping = ret.cast< std::vector<int> >();
+            mSyntaxHighlightMapping = ret.cast<std::vector<int> >();
          }
-         catch (const std::exception &e)
+         catch (const std::exception& e)
          {
             ofLog() << "syntax highlight execution exception: " << e.what();
          }
@@ -113,10 +94,10 @@ void CodeEntry::Poll()
 
       if (mListener)
          mListener->OnCodeUpdated();
-      
+
       mCodeUpdated = false;
    }
-   
+
    if (mAutocompleteUpdateTimer > 0)
    {
       mAutocompleteUpdateTimer -= 1.0 / ofGetFrameRate();
@@ -138,7 +119,7 @@ void CodeEntry::Poll()
 
                   {
                      py::object ret = py::eval("jediScript.get_signatures(" + ofToString(coords.y + 2) + "," + ofToString(coords.x) + ")", py::globals());
-                     auto signatures = ret.cast< std::list<py::object> >();
+                     auto signatures = ret.cast<std::list<py::object> >();
 
                      size_t i = 0;
                      for (auto signature : signatures)
@@ -148,12 +129,12 @@ void CodeEntry::Poll()
                         {
                            mAutocompleteSignatures[i].valid = true;
                            mAutocompleteSignatures[i].entryIndex = signature.attr("index").cast<int>();
-                           auto params = signature.attr("params").cast< std::vector<py::object> >();
+                           auto params = signature.attr("params").cast<std::vector<py::object> >();
                            mAutocompleteSignatures[i].params.resize(params.size());
                            for (size_t j = 0; j < params.size(); ++j)
-                              mAutocompleteSignatures[i].params[j] = juce::String(py::str(params[j].attr("description"))).replace("param ","").toStdString();
-                           auto bracket_start = signature.attr("bracket_start").cast< std::tuple<int, int> >();
-                           mAutocompleteSignatures[i].caretPos = GetCaretPosition(std::get<1>(bracket_start), std::get<0>(bracket_start)-2);
+                              mAutocompleteSignatures[i].params[j] = juce::String(py::str(params[j].attr("description"))).replace("param ", "").toStdString();
+                           auto bracket_start = signature.attr("bracket_start").cast<std::tuple<int, int> >();
+                           mAutocompleteSignatures[i].caretPos = GetCaretPosition(std::get<1>(bracket_start), std::get<0>(bracket_start) - 2);
                            ++i;
                         }
                         else
@@ -168,7 +149,7 @@ void CodeEntry::Poll()
 
                   {
                      py::object ret = py::eval("jediScript.complete(" + ofToString(coords.y + 2) + "," + ofToString(coords.x) + ")", py::globals());
-                     auto autocompletes = ret.cast< std::list<py::object> >();
+                     auto autocompletes = ret.cast<std::list<py::object> >();
                      //ofLog() << "autocompletes:";
 
                      size_t i = 0;
@@ -239,16 +220,16 @@ void CodeEntry::Poll()
                         mAutocompletes[i].valid = false;
                   }
                }
-               catch (const std::exception &e)
+               catch (const std::exception& e)
                {
                   ofLog() << "autocomplete exception: " << e.what();
                }
             }
             else
             {
-               for (size_t i=0; i < mAutocompleteSignatures.size(); ++i)
+               for (size_t i = 0; i < mAutocompleteSignatures.size(); ++i)
                   mAutocompleteSignatures[i].valid = false;
-               for (size_t i=0; i < mAutocompletes.size(); ++i)
+               for (size_t i = 0; i < mAutocompletes.size(); ++i)
                   mAutocompletes[i].valid = false;
             }
          }
@@ -260,22 +241,22 @@ void CodeEntry::Render()
 {
    ofPushStyle();
    ofPushMatrix();
-   
+
    ofSetLineWidth(.5f);
-   
-   float w,h;
-   GetDimensions(w,h);
-   
+
+   float w, h;
+   GetDimensions(w, h);
+
    ofClipWindow(mX, mY, w, h, true);
-   
+
    bool isCurrent = IKeyboardFocusListener::GetActiveKeyboardFocus() == this;
-   
+
    ofColor color = ofColor::white;
-   
+
    ofFill();
 
    bool hasUnpublishedCode = (mString != mPublishedString);
-   
+
    if (isCurrent)
    {
       ofSetColor(currentBg);
@@ -288,17 +269,17 @@ void CodeEntry::Render()
          ofSetColor(publishedBg);
    }
    ofRect(mX, mY, w, h);
-   
+
    double timeSincePublished = gTime - mLastPublishTime;
    if (TheSynth->IsAudioPaused())
       timeSincePublished = 99999;
-   
+
    if (timeSincePublished < 400)
    {
-      ofSetColor(0,255,0,150*(1-timeSincePublished/400));
-      ofRect(mX, mLastPublishedLineStart * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight * (mLastPublishedLineEnd+1-mLastPublishedLineStart), L(corner, 2));
+      ofSetColor(0, 255, 0, 150 * (1 - timeSincePublished / 400));
+      ofRect(mX, mLastPublishedLineStart * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight * (mLastPublishedLineEnd + 1 - mLastPublishedLineStart), L(corner, 2));
    }
-   
+
    ofPushStyle();
    ofNoFill();
    if (mHasError)
@@ -309,36 +290,36 @@ void CodeEntry::Render()
    else if (hasUnpublishedCode)
    {
       float highlight = 1 - ofClamp(timeSincePublished / 150, 0, 1);
-      ofSetColor(ofLerp(170,255,highlight), 255, ofLerp(170,255,highlight), gModuleDrawAlpha);
+      ofSetColor(ofLerp(170, 255, highlight), 255, ofLerp(170, 255, highlight), gModuleDrawAlpha);
       ofSetLineWidth(2 + highlight * 3);
    }
    else
    {
-      ofSetColor(color,gModuleDrawAlpha);
+      ofSetColor(color, gModuleDrawAlpha);
    }
-   ofRect(mX,mY,w,h);
+   ofRect(mX, mY, w, h);
    ofPopStyle();
-   
+
    if (mHasError && mErrorLine >= 0)
    {
       ofPushStyle();
       ofFill();
       ofSetColor(255, 0, 0, gModuleDrawAlpha * .5f);
-      ofRect(mX, mErrorLine * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight, L(corner,2));
+      ofRect(mX, mErrorLine * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight, L(corner, 2));
       ofFill();
    }
-   
+
    mCharWidth = gFontFixedWidth.GetStringWidth("x", mFontSize);
    mCharHeight = gFontFixedWidth.GetStringHeight("x", mFontSize);
-   
+
    if (hasUnpublishedCode)
    {
       ofSetColor(color, gModuleDrawAlpha * .05f);
-      gFontFixedWidth.DrawString(mPublishedString, mFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
+      gFontFixedWidth.DrawString(mPublishedString, mFontSize, mX + 2 - mScroll.x, mY + mCharHeight - mScroll.y);
    }
-   
+
    ofSetColor(color, gModuleDrawAlpha);
-   
+
    std::string drawString = GetVisibleCode();
 
    ofPushStyle();
@@ -359,13 +340,13 @@ void CodeEntry::Render()
    DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 52, 59); //"error" token (like incomplete quotes)
    DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, -1, -1);
    ofPopStyle();
-   
+
    /*for (int i = 0; i<60; ++i)
    {
       for (int j=0; j<15; ++j)
          ofRect(mX + 2 + mCharWidth * i, mY + 2 + mCharHeight * j, mCharWidth, mCharHeight, L(corner,2));
    }*/
-   
+
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
    {
       ofVec2f coords = GetCaretCoords(mCaretPosition);
@@ -375,7 +356,7 @@ void CodeEntry::Render()
       {
          ofFill();
 
-         ofRect(caretPos.x, caretPos.y, 1, mCharHeight, L(corner,1));
+         ofRect(caretPos.x, caretPos.y, 1, mCharHeight, L(corner, 1));
       }
       mCaretBlinkTimer += ofGetLastFrameTime();
       if (mCaretBlinkTimer > .3f)
@@ -383,7 +364,7 @@ void CodeEntry::Render()
          mCaretBlinkTimer -= .3f;
          mCaretBlink = !mCaretBlink;
       }
-      
+
       if (mCaretPosition != mCaretPosition2)
       {
          ofPushStyle();
@@ -393,13 +374,13 @@ void CodeEntry::Render()
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
          ofVec2f coordsStart = GetCaretCoords(caretStart);
          ofVec2f coordsEnd = GetCaretCoords(caretEnd);
-         
+
          int startLineNum = (int)round(coordsStart.y);
          int endLineNum = (int)round(coordsEnd.y);
          int startCol = (int)round(coordsStart.x);
          int endCol = (int)round(coordsEnd.x);
          auto lines = GetLines(false);
-         for (int i=startLineNum; i<=endLineNum; ++i)
+         for (int i = startLineNum; i <= endLineNum; ++i)
          {
             int begin = 0;
             int end = 0;
@@ -409,13 +390,13 @@ void CodeEntry::Render()
                begin = startCol;
             if (i == endLineNum)
                end = endCol;
-            ofRect(begin * mCharWidth + mX + 1.5f - mScroll.x, i * mCharHeight + mY + 3 - mScroll.y, (end - begin) * mCharWidth, mCharHeight, L(corner,2));
+            ofRect(begin * mCharWidth + mX + 1.5f - mScroll.x, i * mCharHeight + mY + 3 - mScroll.y, (end - begin) * mCharWidth, mCharHeight, L(corner, 2));
          }
-         
+
          ofPopStyle();
-      }  
+      }
    }
-   
+
    /*if (mHovered)
    {
       ofSetColor(100, 100, 100, .8f*gModuleDrawAlpha);
@@ -452,7 +433,7 @@ void CodeEntry::RenderOverlay()
             ofSetColor(jediIndexBg);
          else
             ofSetColor(jediBg);
-         ofRect(x, y - mCharHeight+2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, mFontSize), mCharHeight);
+         ofRect(x, y - mCharHeight + 2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, mFontSize), mCharHeight);
 
          ofSetColor(jediAutoComplete);
          gFontFixedWidth.DrawString(mAutocompletes[i].autocompleteFull, mFontSize, x, y);
@@ -486,7 +467,7 @@ void CodeEntry::RenderOverlay()
                params += mAutocompleteSignatures[i].params[j];
                highlightParamString += placeholder;
             }
-            
+
             if (j < mAutocompleteSignatures[i].params.size() - 1)
             {
                params += ", ";
@@ -498,7 +479,7 @@ void CodeEntry::RenderOverlay()
          float x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
          float y = caretPos.y + mCharHeight * (i + 1) - 2;
          ofSetColor(jediBg);
-         ofRect(x, y-mCharHeight+2, gFontFixedWidth.GetStringWidth(params, mFontSize), mCharHeight+2);
+         ofRect(x, y - mCharHeight + 2, gFontFixedWidth.GetStringWidth(params, mFontSize), mCharHeight + 2);
          ofSetColor(jediParams);
          gFontFixedWidth.DrawString(params, mFontSize, x, y);
          ofSetColor(jediParamsHighlight);
@@ -513,28 +494,28 @@ std::string CodeEntry::GetVisibleCode()
    std::vector<std::string> lines = GetLines(false);
    if (lines.empty())
       return "";
-   
+
    int firstVisibleLine = -1;
    int lastVisibleLine = -1;
-   
-   for (int i=0; i<(int)lines.size(); ++i)
+
+   for (int i = 0; i < (int)lines.size(); ++i)
    {
-      if ((i+1) * mCharHeight >= mScroll.y && i * mCharHeight <= mScroll.y + mHeight)
+      if ((i + 1) * mCharHeight >= mScroll.y && i * mCharHeight <= mScroll.y + mHeight)
       {
          if (firstVisibleLine == -1)
             firstVisibleLine = i;
          lastVisibleLine = i;
       }
    }
-   
+
    while (firstVisibleLine > 0)
    {
       if (lines[firstVisibleLine][0] != ' ')
          break;
       --firstVisibleLine;
    }
-   
-   for (int i=0; i<(int)lines.size(); ++i)
+
+   for (int i = 0; i < (int)lines.size(); ++i)
    {
       if (i >= firstVisibleLine && i <= lastVisibleLine)
          visible += lines[i] + "\n";
@@ -548,19 +529,19 @@ void CodeEntry::DrawSyntaxHighlight(std::string input, ofColor color, std::vecto
 {
    std::string filtered = FilterText(input, mapping, filter1, filter2);
    ofSetColor(color, gModuleDrawAlpha);
-   
+
    float shake = (1 - ofClamp((gTime - mLastPublishTime) / 150, 0, 1)) * 3.0f;
    if (TheSynth->IsAudioPaused())
       shake = 0;
    float offsetX = ofRandom(-shake, shake);
    float offsetY = ofRandom(-shake, shake);
-   
-   gFontFixedWidth.DrawString(filtered, mFontSize, mX+2 - mScroll.x + offsetX, mY + mCharHeight - mScroll.y + offsetY);
+
+   gFontFixedWidth.DrawString(filtered, mFontSize, mX + 2 - mScroll.x + offsetX, mY + mCharHeight - mScroll.y + offsetY);
 }
 
 std::string CodeEntry::FilterText(std::string input, std::vector<int> mapping, int filter1, int filter2)
 {
-   for (size_t i=0; i<input.size(); ++i)
+   for (size_t i = 0; i < input.size(); ++i)
    {
       if (input[i] != '\n')
       {
@@ -600,7 +581,8 @@ void CodeEntry::OnPythonInit()
    else:
       text = unicode(syntax_highlight_code)
 
-   #print(token.tok_name) #   <--- dict of token-kinds.
+   tok_name = token.tok_name
+   #print(tok_name) #   <--- dict of token-kinds.
    
    output = []
    defined = []
@@ -613,71 +595,78 @@ void CodeEntry::OnPythonInit()
 
           for token in tokens:
               #print(token)
-              if token[0] in (0, 5, 56, 256):
+              if token.type in (0, 5, 56, 256):
                   continue
-              if not token[1] or (token[2] == token[3]):
+              if not token.string or (token.start == token.end):
                   continue
 
-              token_type = token[0]
+              token_type = token.type
               
-              if token_type == 1:
-                  if token[1] in {'print', 'def', 'class', 'break', 'continue', 'return', 'while', 'or', 'and', 'dir', 'if', 'elif', 'else', 'is', 'in', 'as', 'out', 'with', 'from', 'import', 'with', 'for'}:
+              if token.type == 1:
+                  if token.string in {'print', 'def', 'class', 'break', 'continue', 'return', 'while', 'or', 'and', 'dir', 'if', 'elif', 'else', 'is', 'in', 'as', 'out', 'with', 'from', 'import', 'with', 'for'}:
                       token_type = 90
-                  elif token[1] in {'False', 'True', 'yield', 'repr', 'range', 'enumerate', 'len', 'type', 'list', 'tuple', 'int', 'str', 'float'}:
+                  elif token.string in {'False', 'True', 'yield', 'repr', 'range', 'enumerate', 'len', 'type', 'list', 'tuple', 'int', 'str', 'float'}:
                       token_type = 91
-                  elif token[1] in globals() or token[1] in defined:
+                  elif token.string in globals() or token.string in defined:
                       token_type = 92
-                  else:
-                      defined.append(token[1])
+                  #else:
+                  #    defined.append(token.string) don't do this one, it makes for confusing highlighting
               elif isPython3 and token.type == 54:
                   # OPS
-                  # 7: 'LPAR', 8: 'RPAR
+                  # 7: 'LPAR', 8: 'RPAR'
                   # 9: 'LSQB', 10: 'RSQB'
                   # 25: 'LBRACE', 26: 'RBRACE'
                   if token.exact_type in {7, 8, 9, 10, 25, 26}:
                       token_type = token.exact_type
                   else:
                       token_type = 51
-              elif token_type == 51:
+              elif token.type == 51:
                   # OPS
                   # 7: 'LPAR', 8: 'RPAR
                   # 9: 'LSQB', 10: 'RSQB'
                   # 25: 'LBRACE', 26: 'RBRACE'
-                  if token[1] in {'(', ')'}:
+                  if token.string in {'(', ')'}:
                      token_type = 7
-                  elif token[1] in {'[', ']'}:
+                  elif token.string in {'[', ']'}:
                      token_type = 9
-                  elif token[1] in {'{', '}'}:
+                  elif token.string in {'{', '}'}:
                     token_type = 25
-                  elif token[1] in {'='}:
+                  elif token.string in {'='}:
                     token_type = 22
-                  elif token[1] in {','}:
+                  elif token.string in {','}:
                     token_type = 12
-              elif isPython3 and token_type == 60:
+              elif isPython3 and tok_name[token.type] == 'COMMENT':
                  token_type = 53
 
-              row_start, char_start = token[2][0]-1, token[2][1]
-              row_end, char_end = token[3][0]-1, token[3][1]
+              if not token_type in [3, 2, 1, 90, 91, 92, 22, 7, 8, 25, 26, 9, 10, 51, 12, 53, 52, 59]: #this list matches the list of matches we use for the DrawSyntaxHighlight() calls
+                 token_type = -1
+
+              row_start, char_start = token.start[0]-1, token.start[1]
+              row_end, char_end = token.end[0]-1, token.end[1]
               if lastRowEnd != row_end:
                  lastCharEnd = 0
 
               output = output + [99]*(char_start - lastCharEnd) + [token_type]*(char_end - char_start)
               lastCharEnd = char_end
               lastRowEnd = row_end
-       except:
-          #print("exception when syntax highlighting")
+
+              #print(token_type)
+       except Exception as e:
+          exceptionText = str(e)
+          if not 'EOF' in exceptionText:
+            print("exception when syntax highlighting: "+exceptionText)
           pass
            
 
    #print(output)
    return output)";
-   
+
    try
    {
       py::exec(syntaxHighlightCode, py::globals());
       sDoSyntaxHighlighting = true;
    }
-   catch (const std::exception &e)
+   catch (const std::exception& e)
    {
       ofLog() << "syntax highlight initialization exception: " << e.what();
    }
@@ -687,7 +676,7 @@ void CodeEntry::OnPythonInit()
    try
    {
       py::exec("import jedi", py::globals());
-      
+
       try
       {
          //py::exec("jedi.preload_module(['bespoke','module','scriptmodule','random','math'])", py::globals());
@@ -697,12 +686,12 @@ void CodeEntry::OnPythonInit()
          //py::exec("import sys;sys.path.append(\""+ ofToResourcePath("python_stubs")+"\")", py::globals());
          sDoPythonAutocomplete = true;
       }
-      catch (const std::exception &e)
+      catch (const std::exception& e)
       {
          ofLog() << "autocomplete setup exception: " << e.what();
       }
    }
-   catch (const std::exception &e)
+   catch (const std::exception& e)
    {
       ofLog() << "autocomplete initialization exception: " << e.what();
       ofLog() << "maybe jedi is not installed? if you want autocompletion, use \"python -m pip install jedi\" in your system console to install";
@@ -738,15 +727,15 @@ void CodeEntry::SetError(bool error, int errorLine)
    mErrorLine = errorLine;
 }
 
-void CodeEntry::OnClicked(int x, int y, bool right)
+void CodeEntry::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
-   
+
    float col = GetColForX(x);
    float row = GetRowForY(y);
    MoveCaret(GetCaretPosition(col, row));
-   
+
    MakeActive();
 }
 
@@ -774,7 +763,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       {
          MoveCaret(mCaretPosition - 1, false);
          if (mCaretPosition < mString.length() - 1)
-            UpdateString(mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition+1));
+            UpdateString(mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition + 1));
          else
             UpdateString(mString.substr(0, mCaretPosition));
       }
@@ -804,7 +793,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
          ofVec2f coords = GetCaretCoords(mCaretPosition);
          int spacesNeeded = kTabSize - (int)coords.x % kTabSize;
          std::string tab;
-         for (int i=0; i<spacesNeeded; ++i)
+         for (int i = 0; i < spacesNeeded; ++i)
             tab += " ";
          AddString(tab);
       }
@@ -826,7 +815,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       else
       {
          IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
-         UpdateString(mPublishedString);   //revert
+         UpdateString(mPublishedString); //revert
          mCaretPosition2 = mCaretPosition;
       }
    }
@@ -842,7 +831,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else
       {
-         if (!(GetKeyModifiers() & kModifier_Shift) && mCaretPosition != mCaretPosition2) 
+         if (!(GetKeyModifiers() & kModifier_Shift) && mCaretPosition != mCaretPosition2)
             MoveCaret(MIN(mCaretPosition, mCaretPosition2));
          else if (mCaretPosition > 0)
             MoveCaret(mCaretPosition - 1);
@@ -860,7 +849,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else
       {
-         if (!(GetKeyModifiers() & kModifier_Shift) && mCaretPosition != mCaretPosition2) 
+         if (!(GetKeyModifiers() & kModifier_Shift) && mCaretPosition != mCaretPosition2)
             MoveCaret(MAX(mCaretPosition, mCaretPosition2));
          else if (mCaretPosition < mString.length())
             MoveCaret(mCaretPosition + 1);
@@ -930,7 +919,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    {
       if (mCaretPosition != mCaretPosition2)
          RemoveSelectedText();
-      
+
       juce::String clipboard = TheSynth->GetTextFromClipboard();
       AddString(clipboard.toStdString());
    }
@@ -945,7 +934,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       {
          if (mCaretPosition != mCaretPosition2)
             RemoveSelectedText();
-         
+
          std::string insert = pasteName->Path();
          AddString(insert);
       }
@@ -956,8 +945,8 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       {
          int caretStart = MIN(mCaretPosition, mCaretPosition2);
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
-         TheSynth->CopyTextToClipboard(mString.substr(caretStart,caretEnd-caretStart));
-         
+         TheSynth->CopyTextToClipboard(mString.substr(caretStart, caretEnd - caretStart));
+
          if (toupper(key) == 'X')
             RemoveSelectedText();
       }
@@ -1027,11 +1016,11 @@ void CodeEntry::Undo()
       mUndoBufferPos = (mUndoBufferPos - 1 + size) % size;
       --mUndosLeft;
       mRedosLeft = MIN(mRedosLeft + 1, size);
-      
+
       mString = mUndoBuffer[mUndoBufferPos].mString;
       mCaretPosition = mUndoBuffer[mUndoBufferPos].mCaretPos;
       mCaretPosition2 = mUndoBuffer[mUndoBufferPos].mCaretPos;
-      
+
       OnCodeUpdated();
    }
 }
@@ -1044,11 +1033,11 @@ void CodeEntry::Redo()
       mUndoBufferPos = (mUndoBufferPos + 1) % size;
       --mRedosLeft;
       mUndosLeft = MIN(mUndosLeft + 1, size);
-      
+
       mString = mUndoBuffer[mUndoBufferPos].mString;
       mCaretPosition = mUndoBuffer[mUndoBufferPos].mCaretPos;
       mCaretPosition2 = mUndoBuffer[mUndoBufferPos].mCaretPos;
-      
+
       OnCodeUpdated();
    }
 }
@@ -1056,18 +1045,16 @@ void CodeEntry::Redo()
 void CodeEntry::UpdateString(std::string newString)
 {
    mUndoBuffer[mUndoBufferPos].mCaretPos = mCaretPosition;
-   
+
    mString = newString;
-   
+
    int size = (int)mUndoBuffer.size();
    mRedosLeft = 0;
    mUndosLeft = MIN(mUndosLeft + 1, size);
    mUndoBufferPos = (mUndoBufferPos + 1) % size;
    mUndoBuffer[mUndoBufferPos].mString = mString;
-   
+
    OnCodeUpdated();
-   
-   mLastInputTime = gTime;
 }
 
 void CodeEntry::AddCharacter(char c)
@@ -1086,14 +1073,14 @@ void CodeEntry::AddString(std::string s)
 {
    if (mCaretPosition != mCaretPosition2)
       RemoveSelectedText();
-   
+
    std::string toAdd;
-   for (int i=0; i<s.size(); ++i)
+   for (int i = 0; i < s.size(); ++i)
    {
       if (AllowCharacter(s[i]))
          toAdd += s[i];
    }
-   
+
    UpdateString(mString.substr(0, mCaretPosition) + toAdd + mString.substr(mCaretPosition));
    MoveCaret(mCaretPosition + (int)toAdd.size(), false);
 }
@@ -1119,21 +1106,21 @@ void CodeEntry::ShiftLines(bool backwards)
    int caretEnd = MAX(mCaretPosition, mCaretPosition2);
    ofVec2f coordsStart = GetCaretCoords(caretStart);
    ofVec2f coordsEnd = GetCaretCoords(caretEnd);
-   
+
    auto lines = GetLines(false);
    std::string newString = "";
-   for (size_t i=0; i<lines.size(); ++i)
+   for (size_t i = 0; i < lines.size(); ++i)
    {
       if (i >= coordsStart.y && i <= coordsEnd.y)
       {
          int numSpaces = 0;
-         for (size_t j=0; j<lines[i].size(); ++j)
+         for (size_t j = 0; j < lines[i].size(); ++j)
          {
             if (lines[i][j] != ' ')
                break;
             ++numSpaces;
          }
-         
+
          if (backwards)
          {
             int charsToRemove = numSpaces % kTabSize;
@@ -1150,7 +1137,7 @@ void CodeEntry::ShiftLines(bool backwards)
          else
          {
             int spacesNeeded = kTabSize - (int)numSpaces % kTabSize;
-            for (int j=0; j<spacesNeeded; ++j)
+            for (int j = 0; j < spacesNeeded; ++j)
                lines[i] = " " + lines[i];
             if (i == coordsStart.y)
                caretStart = (int)newString.size() + numSpaces + spacesNeeded;
@@ -1161,7 +1148,7 @@ void CodeEntry::ShiftLines(bool backwards)
       newString += lines[i] + "\n";
    }
    UpdateString(newString);
-   
+
    mCaretPosition = caretStart;
    mCaretPosition2 = caretEnd;
 }
@@ -1182,7 +1169,7 @@ void CodeEntry::MoveCaretToStart()
    int x = 0;
    if (coords.y < lines.size())
    {
-      for (size_t i=0; i<lines[coords.y].size(); ++i)
+      for (size_t i = 0; i < lines[coords.y].size(); ++i)
       {
          if (lines[coords.y][i] == ' ')
             ++x;
@@ -1218,7 +1205,7 @@ bool CodeEntry::MouseMoved(float x, float y)
    return false;
 }
 
-bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool CodeEntry::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (fabs(scrollX) > fabsf(scrollY))
       scrollY = 0;
@@ -1227,11 +1214,11 @@ bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
 
    mScroll.x = MAX(mScroll.x - scrollX * 10, 0);
    mScroll.y = MAX(mScroll.y - scrollY * 10, 0);
-   
+
    OnCodeUpdated();
 
    mWantToShowAutocomplete = false;
-   
+
    return false;
 }
 
@@ -1246,36 +1233,36 @@ int CodeEntry::GetCaretPosition(int col, int row)
 {
    auto lines = GetLines(false);
    int caretPos = 0;
-   for (size_t i=0; i<row && i<lines.size(); ++i)
+   for (size_t i = 0; i < row && i < lines.size(); ++i)
       caretPos += lines[i].length() + 1;
-   
+
    if (row >= 0 && row < (int)lines.size())
       caretPos += MIN(col, lines[row].length());
-   
+
    return MIN(caretPos, (int)mString.length());
 }
 
 int CodeEntry::GetColForX(float x)
 {
    x -= 2;
-   
+
    x += mScroll.x;
 
    if (x < 0)
       x = 0;
-   
+
    return round(x / mCharWidth);
 }
 
 int CodeEntry::GetRowForY(float y)
 {
    y -= 2;
-   
+
    y += mScroll.y;
 
    if (y < 0)
       y = 0;
-   
+
    return int(y / mCharHeight);
 }
 
@@ -1283,7 +1270,7 @@ ofVec2f CodeEntry::GetLinePos(int lineNum, bool end, bool published /*= true*/)
 {
    float x = mX - mScroll.x;
    float y = lineNum * mCharHeight + mY - mScroll.y;
-   
+
    if (end)
    {
       std::string str = published ? mPublishedString : mString;
@@ -1291,7 +1278,7 @@ ofVec2f CodeEntry::GetLinePos(int lineNum, bool end, bool published /*= true*/)
       if (lineNum < (int)lines.size())
          x += lines[lineNum].length() * mCharWidth;
    }
-   
+
    return ofVec2f(x, y);
 }
 
@@ -1300,7 +1287,7 @@ ofVec2f CodeEntry::GetCaretCoords(int caret)
    ofVec2f coords;
    int caretRemaining = caret;
    auto lines = GetLines(false);
-   for (size_t i=0; i<lines.size(); ++i)
+   for (size_t i = 0; i < lines.size(); ++i)
    {
       if (caretRemaining >= lines[i].length() + 1)
       {
@@ -1324,7 +1311,7 @@ namespace
 void CodeEntry::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
-   
+
    out << mString;
 }
 
@@ -1332,7 +1319,7 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 
    std::string var;
    in >> var;
@@ -1346,64 +1333,65 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    }
 }
 
-void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
-    auto fs = vdict.get("font-size", 14);
-    auto fsi = fs.asInt();
-    if (fsi > 2 && fsi < 200)
-        mFontSize = fsi;
+void CodeEntry::SetStyleFromJSON(const ofxJSONElement& vdict)
+{
+   auto fs = vdict.get("font-size", 14);
+   auto fsi = fs.asInt();
+   if (fsi > 2 && fsi < 200)
+      mFontSize = fsi;
 
-    auto fromRGB = [vdict](const std::string &key, ofColor &onto)
-    {
-        auto def = Json::Value(Json::arrayValue);
-        def[0u] = 255;
-        def[1u] = 0;
-        def[2u] = 0;
-        auto arr = vdict.get(key, def);
-        if (def.size() < 3)
-        {
-            onto.r = 255;
-            onto.g = 0;
-            onto.b = 0;
-        }
-        else
-        {
-           try
-           {
-              onto.r = arr[0u].asInt();
-              onto.g = arr[1u].asInt();
-              onto.b = arr[2u].asInt();
+   auto fromRGB = [vdict](const std::string& key, ofColor& onto)
+   {
+      auto def = Json::Value(Json::arrayValue);
+      def[0u] = 255;
+      def[1u] = 0;
+      def[2u] = 0;
+      auto arr = vdict.get(key, def);
+      if (def.size() < 3)
+      {
+         onto.r = 255;
+         onto.g = 0;
+         onto.b = 0;
+      }
+      else
+      {
+         try
+         {
+            onto.r = arr[0u].asInt();
+            onto.g = arr[1u].asInt();
+            onto.b = arr[2u].asInt();
 
-              if (def.size() > 3)
-                 onto.a = arr[3u].asInt();
-           }
-           catch (Json::LogicError& e)
-           {
-              TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
-           }
-        }
-    };
-    fromRGB("currentBg", currentBg);
-    fromRGB("publishedBg", publishedBg);
-    fromRGB("unpublishedBg", unpublishedBg);
-    fromRGB("string", stringColor);
-    fromRGB("number", numberColor);
-    fromRGB("name1", name1Color);
-    fromRGB("name2", name2Color);
-    fromRGB("defined", definedColor);
-    fromRGB("equals", equalsColor);
-    fromRGB("paren", parenColor);
-    fromRGB("brace", braceColor);
-    fromRGB("bracket", bracketColor);
-    fromRGB("op", opColor);
-    fromRGB("comma", commaColor);
-    fromRGB("comment", commentColor);
-    fromRGB("selectedOverlay", selectedOverlay);
+            if (def.size() > 3)
+               onto.a = arr[3u].asInt();
+         }
+         catch (Json::LogicError& e)
+         {
+            TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+         }
+      }
+   };
+   fromRGB("currentBg", currentBg);
+   fromRGB("publishedBg", publishedBg);
+   fromRGB("unpublishedBg", unpublishedBg);
+   fromRGB("string", stringColor);
+   fromRGB("number", numberColor);
+   fromRGB("name1", name1Color);
+   fromRGB("name2", name2Color);
+   fromRGB("name3", name3Color);
+   fromRGB("defined", definedColor);
+   fromRGB("equals", equalsColor);
+   fromRGB("paren", parenColor);
+   fromRGB("brace", braceColor);
+   fromRGB("bracket", bracketColor);
+   fromRGB("op", opColor);
+   fromRGB("comma", commaColor);
+   fromRGB("comment", commentColor);
+   fromRGB("selectedOverlay", selectedOverlay);
 
-    fromRGB("jediBg", jediBg);
-    fromRGB("jediIndexBg", jediIndexBg);
-    fromRGB("jediAutoComplete", jediAutoComplete);
-    fromRGB("jediAutoCompleteRest", jediAutoCompleteRest);
-    fromRGB("jediParams", jediParams);
-    fromRGB("jediParamsHighlight", jediParamsHighlight);
+   fromRGB("jediBg", jediBg);
+   fromRGB("jediIndexBg", jediIndexBg);
+   fromRGB("jediAutoComplete", jediAutoComplete);
+   fromRGB("jediAutoCompleteRest", jediAutoCompleteRest);
+   fromRGB("jediParams", jediParams);
+   fromRGB("jediParamsHighlight", jediParamsHighlight);
 }
-

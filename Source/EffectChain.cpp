@@ -34,32 +34,22 @@ const double gSwapLength = 150.0;
 EffectChain::EffectChain()
 : IAudioProcessor(gBufferSize)
 , mDryBuffer(gBufferSize)
-, mVolume(1)
-, mVolumeSlider(nullptr)
-, mNumFXWide(3)
-, mSpawnIndex(-1)
-, mEffectSpawnList(nullptr)
-, mInitialized(false)
-, mSwapTime(-1)
-, mShowSpawnList(true)
-, mWantToDeleteEffectAtIndex(-1)
-, mPush2DisplayEffect(nullptr)
 {
 }
 
 EffectChain::~EffectChain()
 {
-   for (int i=0; i<mEffects.size(); ++i)
+   for (int i = 0; i < mEffects.size(); ++i)
       delete mEffects[i];
 }
 
 void EffectChain::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mVolumeSlider = new FloatSlider(this,"volume", 10, 100, 100, 15, &mVolume, 0, 2);
-   mEffectSpawnList = new DropdownList(this,"effect", 10, 100, &mSpawnIndex);
-   mSpawnEffectButton = new ClickButton(this,"spawn", -1, -1);
+
+   mVolumeSlider = new FloatSlider(this, "volume", 10, 100, 100, 15, &mVolume, 0, 2);
+   mEffectSpawnList = new DropdownList(this, "effect", 10, 100, &mSpawnIndex);
+   mSpawnEffectButton = new ClickButton(this, "spawn", -1, -1);
    mPush2ExitEffectButton = new ClickButton(this, "exit effect", HIDDEN_UICONTROL, HIDDEN_UICONTROL);
    mPush2ExitEffectButton->SetShowing(false);
 }
@@ -67,56 +57,61 @@ void EffectChain::CreateUIControls()
 void EffectChain::Init()
 {
    IDrawableModule::Init();
-   
+
    mEffectTypesToSpawn = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    mEffectSpawnList->SetUnknownItemString("add effect:");
-   for (int i=0; i<mEffectTypesToSpawn.size(); ++i)
+   for (int i = 0; i < mEffectTypesToSpawn.size(); ++i)
       mEffectSpawnList->AddLabel(mEffectTypesToSpawn[i].c_str(), i);
-   
+
    mInitialized = true;
 }
 
-void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
+void EffectChain::AddEffect(std::string type, std::string desiredName, bool onTheFly)
 {
-   assert(mEffects.size() < MAX_EFFECTS_IN_CHAIN - 1);
- 
+   if (mEffects.size() >= MAX_EFFECTS_IN_CHAIN)
+      return;
+
    IAudioEffect* effect = TheSynth->GetEffectFactory()->MakeEffect(type);
    if (effect == nullptr)
       throw UnknownEffectTypeException();
-   assert(effect->GetType() == type);  //make sure things are named the same in code
+   assert(effect->GetType() == type); //make sure things are named the same in code
    std::vector<std::string> otherEffectNames;
    for (auto* e : mEffects)
       otherEffectNames.push_back(e->Name());
-   std::string name = GetUniqueName(type, otherEffectNames);
+   std::string name = GetUniqueName(desiredName, otherEffectNames);
    effect->SetName(name.c_str());
-   effect->SetTypeName(type);
+   effect->SetTypeName(type, kModuleCategory_Processor);
    effect->SetParent(this);
    effect->CreateUIControls();
    if (onTheFly)
    {
       ofxJSONElement empty;
-      effect->LoadLayout(empty);
-      effect->SetUpFromSaveData();
+      effect->LoadLayoutBase(empty);
+      effect->SetUpFromSaveDataBase();
    }
-   
+
    if (mInitialized) //if we've already been initialized, call init on this
       effect->Init();
-   
+
    mEffectMutex.lock();
    mEffects.push_back(effect);
    mEffectMutex.unlock();
    AddChild(effect);
-   
-   float* dryWet = &(mDryWetLevels[mEffects.size()-1]);
+
+   float* dryWet = &(mDryWetLevels[mEffects.size() - 1]);
    *dryWet = 1;
-   
+
    EffectControls controls;
    controls.mMoveLeftButton = new ClickButton(this, "<", 0, 0);
+   controls.mMoveLeftButton->SetCableTargetable(false);
    controls.mMoveRightButton = new ClickButton(this, ">", 0, 0);
+   controls.mMoveRightButton->SetCableTargetable(false);
    controls.mDeleteButton = new ClickButton(this, "x", 0, 0);
+   controls.mDeleteButton->SetCableTargetable(false);
    controls.mDryWetSlider = new FloatSlider(this, ("mix" + ofToString(mEffects.size() - 1)).c_str(), 0, 0, 60, 13, dryWet, 0, 1, 2);
-   controls.mPush2DisplayEffectButton = new ClickButton(this, ("edit "+name).c_str(), 0, 0);
+   controls.mPush2DisplayEffectButton = new ClickButton(this, ("edit " + name).c_str(), 0, 0);
    controls.mPush2DisplayEffectButton->SetShowing(false);
+   controls.mPush2DisplayEffectButton->SetCableTargetable(false);
    mEffectControls.push_back(controls);
 }
 
@@ -130,19 +125,19 @@ void EffectChain::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
-   
+
    int bufferSize = GetBuffer()->BufferSize();
-   
+
    if (mEnabled)
    {
       mEffectMutex.lock();
-      
-      for (int i=0; i<mEffects.size(); ++i)
+
+      for (int i = 0; i < mEffects.size(); ++i)
       {
          mDryBuffer.CopyFrom(GetBuffer());
-         
-         mEffects[i]->ProcessAudio(time,GetBuffer());
-       
+
+         mEffects[i]->ProcessAudio(time, GetBuffer());
+
          float* dryWetBuffer = gWorkBuffer;
          float* invDryWetBuffer = gWorkBuffer + bufferSize;
          for (int j = 0; j < bufferSize; ++j)
@@ -152,27 +147,27 @@ void EffectChain::Process(double time)
             invDryWetBuffer[j] = 1.0f - mDryWetLevels[i];
          }
 
-         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
          {
             Mult(mDryBuffer.GetChannel(ch), invDryWetBuffer, bufferSize);
             Mult(GetBuffer()->GetChannel(ch), dryWetBuffer, bufferSize);
             Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
          }
       }
-      
+
       mEffectMutex.unlock();
    }
-   
-   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
       float* buffer = GetBuffer()->GetChannel(ch);
       float volSq = mVolume * mVolume;
-      for (int i=0; i<bufferSize; ++i)
+      for (int i = 0; i < bufferSize; ++i)
          buffer[i] *= volSq;
       Add(target->GetBuffer()->GetChannel(ch), buffer, bufferSize);
       GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -189,36 +184,36 @@ void EffectChain::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mEffectSpawnList->SetShowing(mShowSpawnList);
    mSpawnEffectButton->SetShowing(mShowSpawnList && mSpawnIndex != -1);
    if (mSpawnIndex != -1)
       mSpawnEffectButton->SetLabel((std::string("spawn ") + mEffectSpawnList->GetLabel(mSpawnIndex)).c_str());
 
-   for (int i=0; i<mEffects.size(); ++i)
+   for (int i = 0; i < mEffects.size(); ++i)
    {
       ofVec2f pos = GetEffectPos(i);
 
-      if (gTime < mSwapTime)  //in swap animation
+      if (gTime < mSwapTime) //in swap animation
       {
-         double progress = 1 - (mSwapTime - gTime)/gSwapLength;
+         double progress = 1 - (mSwapTime - gTime) / gSwapLength;
          if (i == mSwapFromIdx)
          {
-            pos.set(mSwapToPos.x * (1-progress) + pos.x * progress, 
-                    mSwapToPos.y * (1-progress) + pos.y * progress);
+            pos.set(mSwapToPos.x * (1 - progress) + pos.x * progress,
+                    mSwapToPos.y * (1 - progress) + pos.y * progress);
          }
          if (i == mSwapToIdx)
          {
-            pos.set(mSwapFromPos.x * (1-progress) + pos.x * progress, 
-                    mSwapFromPos.y * (1-progress) + pos.y * progress);
+            pos.set(mSwapFromPos.x * (1 - progress) + pos.x * progress,
+                    mSwapFromPos.y * (1 - progress) + pos.y * progress);
          }
       }
-      
+
       mEffects[i]->SetPosition(pos.x, pos.y);
       float w, h;
-      mEffects[i]->GetDimensions(w,h);
-      w = MAX(w,MIN_EFFECT_WIDTH);
-      
+      mEffects[i]->GetDimensions(w, h);
+      w = MAX(w, MIN_EFFECT_WIDTH);
+
       mEffectControls[i].mMoveLeftButton->SetShowing(i > 0);
       mEffectControls[i].mMoveLeftButton->SetPosition(pos.x + w / 2 - 46, pos.y - 30);
       mEffectControls[i].mMoveLeftButton->Draw();
@@ -234,16 +229,16 @@ void EffectChain::DrawModule()
       mEffectControls[i].mDryWetSlider->SetPosition(pos.x + w / 2 - 30, pos.y - 29);
       mEffectControls[i].mDryWetSlider->Draw();
    }
-   
-   for (int i=0; i<mEffects.size(); ++i)
+
+   for (int i = 0; i < mEffects.size(); ++i)
    {
       mEffects[i]->Draw();
-      
-      float x,y,w,h;
-      mEffects[i]->GetPosition(x,y,true);
-      mEffects[i]->GetDimensions(w,h);
-      w = MAX(w,MIN_EFFECT_WIDTH);
-      
+
+      float x, y, w, h;
+      mEffects[i]->GetPosition(x, y, true);
+      mEffects[i]->GetDimensions(w, h);
+      w = MAX(w, MIN_EFFECT_WIDTH);
+
       if (mDryWetLevels[i] == 0)
       {
          ofPushStyle();
@@ -252,37 +247,37 @@ void EffectChain::DrawModule()
          ofRect(x, y - IDrawableModule::TitleBarHeight(), w, h + IDrawableModule::TitleBarHeight());
          ofPopStyle();
       }
-      
+
       if (i < mEffects.size() - 1)
       {
          ofPushMatrix();
-         ofTranslate(x,y);
-         mEffects[i]->DrawConnection(mEffects[i+1]);
+         ofTranslate(x, y);
+         mEffects[i]->DrawConnection(mEffects[i + 1]);
          ofPopMatrix();
       }
    }
 
-   float w,h;
-   GetDimensions(w,h);
-   mVolumeSlider->SetPosition(4, h-17);
+   float w, h;
+   GetDimensions(w, h);
+   mVolumeSlider->SetPosition(4, h - 17);
    mVolumeSlider->Draw();
-   mEffectSpawnList->SetPosition(106, h-17);
+   mEffectSpawnList->SetPosition(106, h - 17);
    mEffectSpawnList->Draw();
-   mSpawnEffectButton->SetPosition(mEffectSpawnList->GetRect(true).getMaxX()+2, h-17);
+   mSpawnEffectButton->SetPosition(mEffectSpawnList->GetRect(true).getMaxX() + 2, h - 17);
    mSpawnEffectButton->Draw();
 }
 
 int EffectChain::NumRows() const
 {
-   return ((int)mEffects.size() + mNumFXWide - 1) / mNumFXWide;  //round up
+   return ((int)mEffects.size() + mNumFXWide - 1) / mNumFXWide; //round up
 }
 
 int EffectChain::GetRowHeight(int row) const
 {
    float max = 0;
-   for (int i=0; i<mEffects.size(); ++i)
+   for (int i = 0; i < mEffects.size(); ++i)
    {
-      if (i/mNumFXWide == row)
+      if (i / mNumFXWide == row)
       {
          float w, h;
          mEffects[i]->GetDimensions(w, h);
@@ -291,7 +286,7 @@ int EffectChain::GetRowHeight(int row) const
          max = MAX(h, max);
       }
    }
-   
+
    return max;
 }
 
@@ -301,7 +296,7 @@ ofVec2f EffectChain::GetEffectPos(int index) const
    float yPos = 32;
    for (int i = 0; i < mEffects.size(); ++i)
    {
-      if (i > 0 && i%mNumFXWide == 0) //newline
+      if (i > 0 && i % mNumFXWide == 0) //newline
       {
          xPos = 10;
          yPos += GetRowHeight(i / mNumFXWide - 1);
@@ -355,18 +350,18 @@ void EffectChain::GetPush2OverrideControls(std::vector<IUIControl*>& controls) c
 
 void EffectChain::GetModuleDimensions(float& width, float& height)
 {
-   int maxX=100;
+   int maxX = 100;
    if (mShowSpawnList)
       maxX += 100;
-   int maxY=0;
-   for (int i=0; i<mEffects.size(); ++i)
+   int maxY = 0;
+   for (int i = 0; i < mEffects.size(); ++i)
    {
-      float x,y,w,h;
-      mEffects[i]->GetPosition(x,y,true);
-      mEffects[i]->GetDimensions(w,h);
-      w = MAX(w,MIN_EFFECT_WIDTH);
-      maxX = MAX(maxX,x+w);
-      maxY = MAX(maxY,y+h);
+      float x, y, w, h;
+      mEffects[i]->GetPosition(x, y, true);
+      mEffects[i]->GetDimensions(w, h);
+      w = MAX(w, MIN_EFFECT_WIDTH);
+      maxX = MAX(maxX, x + w);
+      maxY = MAX(maxY, y + h);
    }
    width = maxX + 10;
    height = maxY + 24;
@@ -375,20 +370,20 @@ void EffectChain::GetModuleDimensions(float& width, float& height)
 void EffectChain::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
-   for (int i=0; i<mEffects.size(); ++i)
+   for (int i = 0; i < mEffects.size(); ++i)
       mEffects[i]->KeyPressed(key, isRepeat);
 }
 
 void EffectChain::KeyReleased(int key)
 {
-   for (int i=0; i<mEffects.size(); ++i)
+   for (int i = 0; i < mEffects.size(); ++i)
       mEffects[i]->KeyReleased(key);
 }
 
 void EffectChain::DeleteEffect(int index)
 {
    assert(!mEffects.empty());
-   
+
    {
       RemoveUIControl(mEffectControls[index].mMoveLeftButton);
       RemoveUIControl(mEffectControls[index].mMoveRightButton);
@@ -404,7 +399,7 @@ void EffectChain::DeleteEffect(int index)
       int i = 0;
       for (auto iter = mEffectControls.begin(); iter != mEffectControls.end(); ++iter)
       {
-         if (iter->mDeleteButton == mEffectControls[index].mDeleteButton)  //delete buttons match, we found the right one
+         if (iter->mDeleteButton == mEffectControls[index].mDeleteButton) //delete buttons match, we found the right one
          {
             mEffectControls.erase(iter);
             break;
@@ -417,7 +412,7 @@ void EffectChain::DeleteEffect(int index)
 
       UpdateReshuffledDryWetSliders();
    }
-   
+
    {
       mEffectMutex.lock();
       IAudioEffect* toRemove = mEffects[index];
@@ -471,19 +466,19 @@ void EffectChain::UpdateReshuffledDryWetSliders()
    }
 }
 
-void EffectChain::ButtonClicked(ClickButton* button)
+void EffectChain::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSpawnEffectButton)
    {
       if (mSpawnIndex >= 0 && mSpawnIndex < (int)mEffectTypesToSpawn.size())
       {
-         AddEffect(mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
+         AddEffect(mEffectTypesToSpawn[mSpawnIndex], mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
          mSpawnIndex = -1;
       }
    }
    if (button == mPush2ExitEffectButton)
       mPush2DisplayEffect = nullptr;
-   for (int i=0; i<(int)mEffectControls.size(); ++i)
+   for (int i = 0; i < (int)mEffectControls.size(); ++i)
    {
       if (button == mEffectControls[i].mMoveLeftButton)
          MoveEffect(i, -1);
@@ -502,21 +497,21 @@ void EffectChain::ButtonClicked(ClickButton* button)
    }
 }
 
-void EffectChain::CheckboxUpdated(Checkbox* checkbox)
+void EffectChain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EffectChain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void EffectChain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void EffectChain::DropdownUpdated(DropdownList* list, int oldVal)
+void EffectChain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mEffectSpawnList)
    {
       if (TheSynth->GetTopModalFocusItem() == mEffectSpawnList->GetModalDropdown())
       {
-         AddEffect(mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
+         AddEffect(mEffectTypesToSpawn[mSpawnIndex], mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
          mSpawnIndex = -1;
       }
    }
@@ -540,15 +535,20 @@ void EffectChain::UpdateOldControlName(std::string& oldName)
 void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName)
 {
    IDrawableModule::LoadBasics(moduleInfo, typeName);
-   
+
    const ofxJSONElement& effects = moduleInfo["effects"];
-   
-   for (int i=0; i<effects.size(); ++i)
+
+   for (int i = 0; i < effects.size(); ++i)
    {
       try
       {
          std::string type = effects[i]["type"].asString();
-         AddEffect(type);
+         std::string name;
+         if (effects[i]["name"].isNull()) //old version before name was saved
+            name = type;
+         else
+            name = effects[i]["name"].asString();
+         AddEffect(type, name, !K(onTheFly));
       }
       catch (Json::LogicError& e)
       {
@@ -560,19 +560,19 @@ void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeN
 void EffectChain::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("widecount",moduleInfo,5,1,50,true);
-   mModuleSaveData.LoadBool("showspawnlist",moduleInfo,true);
-   
+   mModuleSaveData.LoadInt("widecount", moduleInfo, 5, 1, 50, true);
+   mModuleSaveData.LoadBool("showspawnlist", moduleInfo, true);
+
    const ofxJSONElement& effects = moduleInfo["effects"];
-   
+
    assert(mEffects.size() == effects.size());
-   for (int i=0; i<mEffects.size(); ++i)
+   for (int i = 0; i < mEffects.size(); ++i)
    {
       try
       {
          std::string type = effects[i]["type"].asString();
          assert(mEffects[i]->GetType() == type);
-         mEffects[i]->LoadLayout(effects[i]);
+         mEffects[i]->LoadLayoutBase(effects[i]);
       }
       catch (Json::LogicError& e)
       {
@@ -588,20 +588,18 @@ void EffectChain::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    SetWideCount(mModuleSaveData.GetInt("widecount"));
    mShowSpawnList = mModuleSaveData.GetBool("showspawnlist");
-   
-   for (int i=0; i<mEffects.size(); ++i)
-      mEffects[i]->SetUpFromSaveData();
+
+   for (int i = 0; i < mEffects.size(); ++i)
+      mEffects[i]->SetUpFromSaveDataBase();
 }
 
 void EffectChain::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
    moduleInfo["effects"].resize((unsigned int)mEffects.size());
-   for (int i=0; i<mEffects.size(); ++i)
+   for (int i = 0; i < mEffects.size(); ++i)
    {
       ofxJSONElement save;
-      mEffects[i]->SaveLayout(save);
+      mEffects[i]->SaveLayoutBase(save);
       moduleInfo["effects"][i] = save;
       moduleInfo["effects"][i]["type"] = mEffects[i]->GetType();
    }

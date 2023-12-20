@@ -46,93 +46,95 @@ public:
    MultitapDelay();
    ~MultitapDelay();
    static IDrawableModule* Create() { return new MultitapDelay(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    //IFloatSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
-   
+   void ButtonClicked(ClickButton* button, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(int x, int y, bool right) override;
-   
+   void OnClicked(float x, float y, bool right) override;
+
    struct DelayTap
    {
       DelayTap();
       void Process(float* sampleOut, int offset, int ch);
       void Draw(float w, float h);
-      
-      float mDelayMs;
-      float mGain;
-      float mFeedback;
-      float mPan;
-      
-      MultitapDelay* mOwner;
-      
-      FloatSlider* mDelayMsSlider;
-      FloatSlider* mGainSlider;
-      FloatSlider* mFeedbackSlider;
-      FloatSlider* mPanSlider;
-      
+
+      float mDelayMs{ 100 };
+      float mGain{ 0 };
+      float mFeedback{ 0 };
+      float mPan{ 0 };
+
+      MultitapDelay* mOwner{ nullptr };
+
+      FloatSlider* mDelayMsSlider{ nullptr };
+      FloatSlider* mGainSlider{ nullptr };
+      FloatSlider* mFeedbackSlider{ nullptr };
+      FloatSlider* mPanSlider{ nullptr };
+
       ChannelBuffer mTapBuffer;
    };
-   
+
    struct DelayMPETap
    {
-      DelayMPETap();
       void Process(float* sampleOut, int offset, int ch);
       void Draw(float w, float h);
-      
-      float mPlay;
-      float mPitch;
-      ModulationChain* mPitchBend;
-      ModulationChain* mPressure;
-      ModulationChain* mModWheel;
-      
-      ::ADSR mADSR;
-   
-      MultitapDelay* mOwner;
+
+      float mPitch{ 0 };
+      ModulationChain* mPitchBend{ nullptr };
+      ModulationChain* mPressure{ nullptr };
+      ModulationChain* mModWheel{ nullptr };
+
+      ::ADSR mADSR{ 100, 0, 1, 100 };
+
+      MultitapDelay* mOwner{ nullptr };
    };
-   
-   int mNumTaps;
+
+   int mNumTaps{ 4 };
    std::vector<DelayTap> mTaps;
    static const int kNumMPETaps = 16;
    DelayMPETap mMPETaps[kNumMPETaps];
-   
+
    ChannelBuffer mWriteBuffer;
-   FloatSlider* mDryAmountSlider;
-   float mDryAmount;
-   FloatSlider* mDisplayLengthSlider;
-   float mDisplayLength;
+   FloatSlider* mDryAmountSlider{ nullptr };
+   float mDryAmount{ 1 };
+   FloatSlider* mDisplayLengthSlider{ nullptr };
+   float mDisplayLength{ 10 };
    RollingBuffer mDelayBuffer;
 };

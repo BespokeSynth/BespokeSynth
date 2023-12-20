@@ -35,37 +35,42 @@ class BitcrushEffect : public IAudioEffect, public IIntSliderListener, public IF
 {
 public:
    BitcrushEffect();
-   
+
    static IAudioEffect* Create() { return new BitcrushEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "bitcrush"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mCrush;
-   float mDownsample;
-   int mSampleCounter[ChannelBuffer::kMaxNumChannels];
-   float mHeldDownsample[ChannelBuffer::kMaxNumChannels];
-   FloatSlider* mCrushSlider;
-   FloatSlider* mDownsampleSlider;
-   
-   float mWidth;
-   float mHeight;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   float mCrush{ 1 };
+   float mDownsample{ 1 };
+   int mSampleCounter[ChannelBuffer::kMaxNumChannels]{};
+   float mHeldDownsample[ChannelBuffer::kMaxNumChannels]{};
+   FloatSlider* mCrushSlider{ nullptr };
+   FloatSlider* mDownsampleSlider{ nullptr };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 #endif /* defined(__additiveSynth__BitcrushEffect__) */
-

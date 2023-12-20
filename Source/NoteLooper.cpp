@@ -33,17 +33,6 @@
 #include "UIControlMacros.h"
 
 NoteLooper::NoteLooper()
-: mWidth(370)
-, mHeight(140)
-, mMinRow(127)
-, mMaxRow(0)
-, mWrite(false)
-, mWriteCheckbox(nullptr)
-, mNumMeasures(1)
-, mNumMeasuresSlider(nullptr)
-, mDeleteOrMute(false)
-, mDeleteOrMuteCheckbox(nullptr)
-, mVoiceRoundRobin(kNumVoices-1)
 {
 }
 
@@ -64,9 +53,9 @@ void NoteLooper::CreateUIControls()
    UIBLOCK_NEWCOLUMN();
    INTSLIDER(mNumMeasuresSlider, "num bars", &mNumMeasures, 1, 8);
    BUTTON(mClearButton, "clear");
-   ENDUIBLOCK(w,h);
+   ENDUIBLOCK(w, h);
 
-   UIBLOCK(w+10, 3, 45);
+   UIBLOCK(w + 10, 3, 45);
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
       BUTTON(mSavedPatterns[i].mStoreButton, ("store" + ofToString(i)).c_str());
@@ -75,7 +64,7 @@ void NoteLooper::CreateUIControls()
    }
    ENDUIBLOCK0();
 
-   mCanvas = new Canvas(this, 3, 45, mWidth-6, mHeight-48, L(length, 1), L(rows, 128), L(cols, 16), &(NoteCanvasElement::Create));
+   mCanvas = new Canvas(this, 3, 45, mWidth - 6, mHeight - 48, L(length, 1), L(rows, 128), L(cols, 16), &(NoteCanvasElement::Create));
    AddUIControl(mCanvas);
    mCanvas->SetNumVisibleRows(1);
    mCanvas->SetRowOffset(0);
@@ -119,6 +108,22 @@ void NoteLooper::DrawModule()
    mCanvas->Draw();
 }
 
+bool NoteLooper::DrawToPush2Screen()
+{
+   ofRectangle rect = mCanvas->GetRect(true);
+
+   mCanvas->SetPosition(125, 3);
+   mCanvas->SetDimensions(600, 40);
+
+   mCanvas->SetCursorPos(GetCurPos(gTime));
+   mCanvas->Draw();
+
+   mCanvas->SetPosition(rect.x, rect.y);
+   mCanvas->SetDimensions(rect.width, rect.height);
+
+   return false;
+}
+
 void NoteLooper::Resize(float w, float h)
 {
    mWidth = MAX(w, 370);
@@ -141,9 +146,7 @@ void NoteLooper::OnTransportAdvanced(float amount)
       return;
    }
 
-   double cursorPlayTime = gTime;
-   //don't use Transport::sEventEarlyMs, it makes it not work well for recording in realtime, and causes issues with stuck notes
-   cursorPlayTime += amount * TheTransport->MsPerBar();
+   double cursorPlayTime = NextBufferTime(mAllowLookahead);
    double curPos = GetCurPos(cursorPlayTime);
 
    if (mDeleteOrMute)
@@ -209,9 +212,9 @@ void NoteLooper::OnTransportAdvanced(float amount)
          int modIdx = mInputNotes[pitch]->GetVoiceIdx();
          if (modIdx == -1)
             modIdx = kNumVoices;
-         float bend = 0;
-         float mod = 0;
-         float pressure = 0;
+         float bend = ModulationParameters::kDefaultPitchBend;
+         float mod = ModulationParameters::kDefaultModWheel;
+         float pressure = ModulationParameters::kDefaultPressure;
          if (mVoiceModulations[modIdx].pitchBend)
             bend = mVoiceModulations[modIdx].pitchBend->GetValue(0);
          if (mVoiceModulations[modIdx].modWheel)
@@ -229,7 +232,7 @@ void NoteLooper::OnTransportAdvanced(float amount)
 
 void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (voiceIdx != -1)  //try to pick a voice that is unique, to avoid stomping on the voices of already-recorded notes when overdubbing
+   if (voiceIdx != -1) //try to pick a voice that is unique, to avoid stomping on the voices of already-recorded notes when overdubbing
    {
       if (velocity > 0)
          voiceIdx = GetNewVoice(voiceIdx);
@@ -259,7 +262,7 @@ void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-NoteCanvasElement* NoteLooper::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx/*=-1*/, ModulationParameters modulation/* = ModulationParameters()*/)
+NoteCanvasElement* NoteLooper::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx /*=-1*/, ModulationParameters modulation /* = ModulationParameters()*/)
 {
    double canvasPos = measurePos / mNumMeasures * mCanvas->GetNumCols();
    int col = int(canvasPos + .5f); //round off
@@ -291,18 +294,17 @@ int NoteLooper::GetNewVoice(int voiceIdx)
       //TODO(Ryan) do a round robin for now, maybe in the future do something smarter like looking at what voices are already recorded and pick an unused one
       ret = mVoiceRoundRobin;
 
-      const int kMinVoiceNumber = 2;   //MPE synths seem to reserve channels <2 for global params
+      const int kMinVoiceNumber = 2; //MPE synths seem to reserve channels <2 for global params
       mVoiceRoundRobin = ((mVoiceRoundRobin - kMinVoiceNumber) + 1) % (kNumVoices - kMinVoiceNumber) + kMinVoiceNumber; //wrap around a 2-15 range
       mVoiceMap[voiceIdx] = ret;
    }
    return ret;
 }
 
-void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
+void NoteLooper::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      double time = gTime + gBufferSizeMs;
       for (int i = 0; i < (int)mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
@@ -314,21 +316,20 @@ void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void NoteLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void NoteLooper::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteLooper::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
       SetNumMeasures(mNumMeasures);
 }
 
-void NoteLooper::ButtonClicked(ClickButton* button)
+void NoteLooper::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
    {
-      double time = gTime + gBufferSizeMs;
       for (int i = 0; i < (int)mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
@@ -385,13 +386,14 @@ void NoteLooper::SetNumMeasures(int numMeasures)
    mCanvas->mLoopEnd = mNumMeasures;
 }
 
-void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
 void NoteLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("allow_lookahead", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -399,25 +401,21 @@ void NoteLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteLooper::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-}
-
-namespace
-{
-   const int kSaveStateRev = 0;
+   mAllowLookahead = mModuleSaveData.GetBool("allow_lookahead");
 }
 
 void NoteLooper::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mWidth;
    out << mHeight;
 
    out << mMinRow;
    out << mMaxRow;
-   
+
    out << (int)mSavedPatterns.size();
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
@@ -431,16 +429,16 @@ void NoteLooper::SaveState(FileStreamOut& out)
    }
 }
 
-void NoteLooper::LoadState(FileStreamIn& in)
+void NoteLooper::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-      return;  //this was saved before we added versioning, bail out
+      return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    in >> mWidth;
    in >> mHeight;
@@ -467,4 +465,3 @@ void NoteLooper::LoadState(FileStreamIn& in)
       }
    }
 }
-

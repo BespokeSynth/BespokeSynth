@@ -30,21 +30,18 @@
 
 #include "juce_gui_extra/juce_gui_extra.h"
 
-VSTWindow::VSTWindow (VSTPlugin* vst,
-                      Component* const pluginEditor,
-                      WindowFormatType t)
-: DocumentWindow (pluginEditor->getName(), juce::Colours::lightblue,
-                  DocumentWindow::minimiseButton | DocumentWindow::closeButton)
+VSTWindow::VSTWindow(VSTPlugin* vst,
+                     Component* const pluginEditor,
+                     WindowFormatType t)
+: DocumentWindow(pluginEditor->getName(), juce::Colours::lightblue,
+                 DocumentWindow::minimiseButton | DocumentWindow::closeButton)
 , mType(t)
 , mOwner(vst)
-#ifdef JUCE_MAC
-, mNSViewComponent(nullptr)
-#endif
 {
-   setSize (400, 300);
+   setSize(400, 300);
    setResizable(true, true);
-   
-   setContentOwned (pluginEditor, true);
+
+   setContentOwned(pluginEditor, true);
 
    if (const auto* dpy = juce::Desktop::getInstance().getDisplays().getDisplayForRect(TheSynth->GetMainComponent()->getScreenBounds()))
    {
@@ -57,43 +54,42 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
 #if BESPOKE_LINUX
    setUsingNativeTitleBar(true);
 #endif
-   
+
 #ifdef JUCE_MAC
    if (pluginEditor->getNumChildComponents() > 0)
       mNSViewComponent = dynamic_cast<juce::NSViewComponent*>(pluginEditor->getChildComponent(0));
 #endif
-
 }
 
 //static
 VSTWindow* VSTWindow::CreateVSTWindow(VSTPlugin* vst, WindowFormatType type)
 {
    juce::AudioProcessorEditor* ui = nullptr;
-   
+
    if (type == Normal)
    {
       ui = vst->GetAudioProcessor()->createEditorIfNeeded();
-      
+
       if (ui == nullptr)
          type = Generic;
    }
-   
+
    if (ui == nullptr)
    {
       if (type == Generic || type == Parameters)
-         ui = new juce::GenericAudioProcessorEditor (*vst->GetAudioProcessor());
+         ui = new juce::GenericAudioProcessorEditor(*vst->GetAudioProcessor());
       else if (type == Programs)
-         ui = new ProgramAudioProcessorEditor (vst->GetAudioProcessor());
+         ui = new ProgramAudioProcessorEditor(vst->GetAudioProcessor());
    }
-   
+
    if (ui != nullptr)
    {
-      if (juce::AudioPluginInstance* const plugin = dynamic_cast<juce::AudioPluginInstance*> (vst->GetAudioProcessor()))
-         ui->setName (plugin->getName());
-      
+      if (juce::AudioPluginInstance* const plugin = dynamic_cast<juce::AudioPluginInstance*>(vst->GetAudioProcessor()))
+         ui->setName(plugin->getName());
+
       return new VSTWindow(vst, ui, type);
    }
-   
+
    return nullptr;
 }
 

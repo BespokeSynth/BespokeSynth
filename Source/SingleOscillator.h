@@ -48,78 +48,88 @@ public:
    SingleOscillator();
    ~SingleOscillator();
    static IDrawableModule* Create() { return new SingleOscillator(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetType(OscillatorType type) { mVoiceParams.mOscType = type; }
    void SetDetune(float detune) { mVoiceParams.mDetune = detune; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   
+
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
+
    bool HasDebugDraw() const override { return true; }
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void UpdateOldControlName(std::string& oldName) override;
-   
-   float mWidth;
-   float mHeight;
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    OscillatorVoiceParams mVoiceParams;
-   FloatSlider* mVolSlider;
-   FloatSlider* mPhaseOffsetSlider;
-   DropdownList* mOscSelector;
-   FloatSlider* mPulseWidthSlider;
-   FloatSlider* mSoftenSlider;
-   int mMult;
-   DropdownList* mMultSelector;
-   ADSRDisplay* mADSRDisplay;
-   Checkbox* mSyncCheckbox;
-   FloatSlider* mSyncFreqSlider;
-   FloatSlider* mDetuneSlider;
-   IntSlider* mUnisonSlider;
-   FloatSlider* mUnisonWidthSlider;
-   FloatSlider* mShuffleSlider;
-   float mLengthMultiplier;
-   FloatSlider* mLengthMultiplierSlider;
-   FloatSlider* mVelToVolumeSlider;
-   FloatSlider* mVelToEnvelopeSlider;
-   Checkbox* mLiteCPUModeCheckbox;
-   
-   FloatSlider* mFilterCutoffMaxSlider;
-   FloatSlider* mFilterCutoffMinSlider;
-   FloatSlider* mFilterQSlider;
-   ADSRDisplay* mFilterADSRDisplay;
+   FloatSlider* mVolSlider{ nullptr };
+   FloatSlider* mPhaseOffsetSlider{ nullptr };
+   DropdownList* mOscSelector{ nullptr };
+   FloatSlider* mPulseWidthSlider{ nullptr };
+   FloatSlider* mSoftenSlider{ nullptr };
+   int mMult{ 1 };
+   DropdownList* mMultSelector{ nullptr };
+   ADSRDisplay* mADSRDisplay{ nullptr };
+   Checkbox* mSyncCheckbox{ nullptr };
+   FloatSlider* mSyncFreqSlider{ nullptr };
+   FloatSlider* mDetuneSlider{ nullptr };
+   IntSlider* mUnisonSlider{ nullptr };
+   FloatSlider* mUnisonWidthSlider{ nullptr };
+   FloatSlider* mShuffleSlider{ nullptr };
+   FloatSlider* mVelToVolumeSlider{ nullptr };
+   FloatSlider* mVelToEnvelopeSlider{ nullptr };
+   Checkbox* mLiteCPUModeCheckbox{ nullptr };
+
+   FloatSlider* mFilterCutoffMaxSlider{ nullptr };
+   FloatSlider* mFilterCutoffMinSlider{ nullptr };
+   FloatSlider* mFilterQSlider{ nullptr };
+   ADSRDisplay* mFilterADSRDisplay{ nullptr };
 
    ChannelBuffer mWriteBuffer;
-   
-   Oscillator mDrawOsc;
-   
-   std::string mDebugLines;
+
+   Oscillator mDrawOsc{ OscillatorType::kOsc_Square };
+
+   struct DebugLine
+   {
+      std::string text;
+      ofColor color;
+   };
+
+   std::array<DebugLine, 20> mDebugLines;
+   int mDebugLinesPos{ 0 };
 };
 
 
-
 #endif /* defined(__modularSynth__SingleOscillator__) */
-

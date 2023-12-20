@@ -40,38 +40,46 @@ public:
    MPESmoother();
    virtual ~MPESmoother();
    static IDrawableModule* Create() { return new MPESmoother(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void Init() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void OnTransportAdvanced(float amount) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mWidth;
-   float mHeight;
-   
-   float mPitchSmooth;
-   FloatSlider* mPitchSmoothSlider;
-   float mPressureSmooth;
-   FloatSlider* mPressureSmoothSlider;
-   float mModWheelSmooth;
-   FloatSlider* mModWheelSmoothSlider;
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+
+   float mPitchSmooth{ .02 };
+   FloatSlider* mPitchSmoothSlider{ nullptr };
+   float mPressureSmooth{ .02 };
+   FloatSlider* mPressureSmoothSlider{ nullptr };
+   float mModWheelSmooth{ .02 };
+   FloatSlider* mModWheelSmoothSlider{ nullptr };
+
    std::array<ModulationParameters, kNumVoices> mModulationInput;
    std::array<ModulationCollection, kNumVoices> mModulationOutput;
 };

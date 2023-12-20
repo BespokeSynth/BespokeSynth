@@ -27,6 +27,7 @@
 #include "IDrawableModule.h"
 #include "SynthGlobals.h"
 #include "FileStream.h"
+#include "DropdownList.h"
 
 const int radioSpacing = 15;
 
@@ -37,21 +38,15 @@ int RadioButton::GetSpacing()
 }
 
 RadioButton::RadioButton(IRadioButtonListener* owner, const char* name, int x, int y, int* var, RadioDirection direction /*= kRadioVertical*/)
-: mWidth(15)
-, mHeight(15)
-, mVar(var)
+: mVar(var)
 , mOwner(owner)
-, mMultiSelect(false)
 , mDirection(direction)
-, mElementWidth(8)
-, mSliderVal(0)
-, mForcedWidth(-1)
 {
    assert(owner);
    SetName(name);
-   SetPosition(x,y);
+   SetPosition(x, y);
    SetParent(dynamic_cast<IClickable*>(owner));
-   
+
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
 }
 
@@ -71,20 +66,20 @@ void RadioButton::AddLabel(const char* label, int value)
    element.mLabel = label;
    element.mValue = value;
    mElements.push_back(element);
-   
+
    UpdateDimensions();
-   
+
    CalcSliderVal();
 }
 
 void RadioButton::SetLabel(const char* label, int value)
 {
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
    {
       if (mElements[i].mValue == value)
          mElements[i].mLabel = label;
    }
-   
+
    UpdateDimensions();
 }
 
@@ -98,7 +93,7 @@ void RadioButton::RemoveLabel(int value)
          break;
       }
    }
-   
+
    UpdateDimensions();
 }
 
@@ -106,7 +101,7 @@ void RadioButton::UpdateDimensions()
 {
    if (mDirection == kRadioVertical)
    {
-      for (int i=0; i<mElements.size(); ++i)
+      for (int i = 0; i < mElements.size(); ++i)
       {
          int width = GetStringWidth(mElements[i].mLabel) + 5;
          if (width > mWidth)
@@ -117,7 +112,7 @@ void RadioButton::UpdateDimensions()
    }
    else
    {
-      for (int i=0; i<mElements.size(); ++i)
+      for (int i = 0; i < mElements.size(); ++i)
       {
          int width = GetStringWidth(mElements[i].mLabel) + 5;
          if (width > mElementWidth)
@@ -150,21 +145,21 @@ void RadioButton::Poll()
 void RadioButton::Render()
 {
    ofPushStyle();
-   
-   DrawBeacon(mX+mWidth/2, mY+mHeight/2);
 
-   float w,h;
-   GetDimensions(w,h);
+   DrawBeacon(mX + mWidth / 2, mY + mHeight / 2);
+
+   float w, h;
+   GetDimensions(w, h);
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
-   ofRect(mX+1,mY+1,mWidth,mHeight);
+   ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofPushMatrix();
    ofClipWindow(mX, mY, mWidth, mHeight, true);
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
    {
-      ofColor color,textColor;
+      ofColor color, textColor;
       IUIControl::GetColors(color, textColor);
-      
+
       bool active = false;
       if (mVar)
       {
@@ -173,44 +168,44 @@ void RadioButton::Render()
          else
             active = mElements[i].mValue == *mVar;
       }
-      
+
       if (active)
       {
-         float h,s,b;
+         float h, s, b;
          color.getHsb(h, s, b);
          color.setHsb(42, s, b);
-         textColor.set(255,255,0,gModuleDrawAlpha);
+         textColor.set(255, 255, 0, gModuleDrawAlpha);
       }
 
       ofFill();
       if (active)
          color.setBrightness(ofLerp(color.getBrightness(), 255, .3f));
       ofSetColor(color);
-      
-      float x,y;
-      
+
+      float x, y;
+
       if (mDirection == kRadioVertical)
       {
          x = mX;
-         y = mY+i*radioSpacing;
-         ofRect(x,y,w,radioSpacing);
+         y = mY + i * radioSpacing;
+         ofRect(x, y, w, radioSpacing);
       }
       else
       {
          x = mX + mElementWidth * i;
          y = mY;
-         ofRect(x,y,mElementWidth,radioSpacing);
+         ofRect(x, y, mElementWidth, radioSpacing);
       }
-      
+
       ofNoFill();
 
       ofSetColor(textColor);
       //ofRect(mX,mY+i*radioSpacing,w,15);
-      DrawTextNormal(mElements[i].mLabel, x+2, y+12);
+      DrawTextNormal(mElements[i].mLabel, x + 2, y + 12);
    }
    ofPopMatrix();
    ofPopStyle();
-   
+
    DrawHover(mX, mY, w, h);
 }
 
@@ -220,33 +215,33 @@ bool RadioButton::MouseMoved(float x, float y)
    return false;
 }
 
-void RadioButton::OnClicked(int x, int y, bool right)
+void RadioButton::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
-   
+
    if (mDirection == kRadioVertical)
-      SetIndex(y/radioSpacing);
-   else  //kRadioHorizontal
-      SetIndex(int(x/mElementWidth));
+      SetIndex(y / radioSpacing, NextBufferTime(false));
+   else //kRadioHorizontal
+      SetIndex(int(x / mElementWidth), NextBufferTime(false));
 }
 
 ofVec2f RadioButton::GetOptionPosition(int optionIndex)
 {
-   float x,y;
+   float x, y;
    GetPosition(x, y, false);
    if (mDirection == kRadioVertical)
-      return ofVec2f(x + mWidth, y + float(mHeight)/GetNumValues() * (optionIndex + .5f));
-   else  //kRadioHorizontal
-      return ofVec2f(x + float(mWidth)/GetNumValues() * (optionIndex + .5f), y + mHeight);
+      return ofVec2f(x + mWidth, y + float(mHeight) / GetNumValues() * (optionIndex + .5f));
+   else //kRadioHorizontal
+      return ofVec2f(x + float(mWidth) / GetNumValues() * (optionIndex + .5f), y + mHeight);
 }
 
-void RadioButton::SetIndex(int i)
+void RadioButton::SetIndex(int i, double time)
 {
    if (mElements.empty())
       return;
 
-   i = ofClamp(i,0,mElements.size()-1);
+   i = ofClamp(i, 0, mElements.size() - 1);
    int oldVal = *mVar;
    if (mMultiSelect)
       *mVar ^= 1 << mElements[i].mValue;
@@ -255,15 +250,15 @@ void RadioButton::SetIndex(int i)
    if (oldVal != *mVar)
    {
       CalcSliderVal();
-      mOwner->RadioButtonUpdated(this, oldVal);
+      mOwner->RadioButtonUpdated(this, oldVal, time);
       gControlTactileFeedback = 1;
    }
 }
 
-void RadioButton::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void RadioButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
-   slider = ofClamp(slider,0,1);
-   SetIndex(int(slider*mElements.size()));
+   slider = ofClamp(slider, 0, 1);
+   SetIndex(int(slider * mElements.size()), time);
    mSliderVal = slider;
    mLastSetValue = *mVar;
 }
@@ -272,28 +267,33 @@ float RadioButton::GetValueForMidiCC(float slider) const
 {
    if (mElements.empty())
       return 0;
-   
-   int index = int(slider*mElements.size());
-   index = ofClamp(index,0,mElements.size()-1);
+
+   int index = int(slider * mElements.size());
+   index = ofClamp(index, 0, mElements.size() - 1);
    return mElements[index].mValue;
 }
 
-void RadioButton::SetValue(float value)
+void RadioButton::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    if (mMultiSelect)
       value = *mVar ^ (1 << (int)value);
-   SetValueDirect(value);
+   SetValueDirect(value, time, forceUpdate);
 }
 
-void RadioButton::SetValueDirect(float value)
+void RadioButton::SetValueDirect(float value, double time)
+{
+   SetValueDirect(value, time, false);
+}
+
+void RadioButton::SetValueDirect(float value, double time, bool forceUpdate)
 {
    int oldVal = *mVar;
-   
+
    *mVar = (int)value;
    if (oldVal != *mVar)
    {
       CalcSliderVal();
-      mOwner->RadioButtonUpdated(this, oldVal);
+      mOwner->RadioButtonUpdated(this, oldVal, time);
       gControlTactileFeedback = 1;
    }
 }
@@ -307,7 +307,7 @@ float RadioButton::GetMidiValue() const
 {
    if (mMultiSelect)
       return GetValue();
-   
+
    return mSliderVal;
 }
 
@@ -315,15 +315,15 @@ std::string RadioButton::GetDisplayValue(float val) const
 {
    if (mMultiSelect)
       return "multiselect";
-   
+
    int curIndex = -1;
-   
-   for (int i=0; i<mElements.size(); ++i)
+
+   for (int i = 0; i < mElements.size(); ++i)
    {
       if (mElements[i].mValue == val)
          curIndex = i;
    }
-   
+
    if (curIndex >= 0 && curIndex < mElements.size())
       return mElements[curIndex].mLabel;
    else
@@ -334,9 +334,9 @@ void RadioButton::Increment(float amount)
 {
    if (mMultiSelect)
       return;
-   
+
    int current = 0;
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
    {
       if (mElements[i].mValue == *mVar)
       {
@@ -344,22 +344,29 @@ void RadioButton::Increment(float amount)
          break;
       }
    }
-   
-   SetIndex(current + (int)amount);
+
+   SetIndex(current + (int)amount, NextBufferTime(false));
 }
 
 EnumMap RadioButton::GetEnumMap()
 {
    EnumMap ret;
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
       ret[mElements[i].mLabel] = mElements[i].mValue;
    return ret;
+}
+
+void RadioButton::CopyContentsTo(DropdownList* list) const
+{
+   list->Clear();
+   for (auto& element : mElements)
+      list->AddLabel(element.mLabel, element.mValue);
 }
 
 void RadioButton::CalcSliderVal()
 {
    int current = -1;
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
    {
       if (mElements[i].mValue == *mVar)
       {
@@ -382,7 +389,7 @@ namespace
 void RadioButton::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
-   
+
    out << (float)*mVar;
 }
 
@@ -390,10 +397,10 @@ void RadioButton::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
-   
+   LoadStateValidate(rev <= kSaveStateRev);
+
    float var;
    in >> var;
    if (shouldSetValue)
-      SetValueDirect(var);
+      SetValueDirect(var, gTime);
 }

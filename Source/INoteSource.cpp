@@ -30,29 +30,42 @@
 #include "Scale.h"
 #include "PatchCableSource.h"
 #include "Profiler.h"
+#include "NoteOutputQueue.h"
 
 void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    ResetStackDepth();
-   PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation, false);
 }
 
-void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled)
 {
+   if (!IsAudioThread())
+   {
+      if (!isFromMainThreadAndScheduled) //if we specifically scheduled this ahead of time, there's no need to make adjustments. otherwise, account for immediately requesting a note from the non-audio thread
+      {
+         time += TheTransport->GetEventLookaheadMs();
+         if (velocity == 0)
+            time += gBufferSizeMs; //1 buffer later, to make sure notes get cleared
+      }
+      TheSynth->GetNoteOutputQueue()->QueuePlayNote(this, time, pitch, velocity, voiceIdx, modulation);
+      return;
+   }
+
    const int kMaxDepth = 100;
    if (mStackDepth > kMaxDepth)
    {
       TheSynth->LogEvent("note chain hit max stack depth", kLogEventType_Error);
-      return;  //avoid stack overflow
+      return; //avoid stack overflow
    }
    ++mStackDepth;
-   
+
    if (pitch >= 0 && pitch <= 127)
    {
       for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
-         noteReceiver->PlayNote(time,pitch,velocity,voiceIdx,modulation);
+         noteReceiver->PlayNote(time, pitch, velocity, voiceIdx, modulation);
 
-      if (velocity>0)
+      if (velocity > 0)
       {
          mNoteOnTimes[pitch] = time;
          mNotes[pitch] = true;
@@ -62,7 +75,7 @@ void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voic
          if (time > mNoteOnTimes[pitch])
             mNotes[pitch] = false;
       }
-      
+
       mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, HasHeldNotes());
    }
 }
@@ -87,7 +100,7 @@ void NoteOutput::SendMidi(const juce::MidiMessage& message)
 
 bool NoteOutput::HasHeldNotes()
 {
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
    {
       if (mNotes[i])
          return true;
@@ -98,7 +111,7 @@ bool NoteOutput::HasHeldNotes()
 std::list<int> NoteOutput::GetHeldNotesList()
 {
    std::list<int> notes;
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
    {
       if (mNotes[i])
          notes.push_back(i);
@@ -108,48 +121,43 @@ std::list<int> NoteOutput::GetHeldNotesList()
 
 void NoteOutput::Flush(double time)
 {
+   if (!IsAudioThread())
+   {
+      TheSynth->GetNoteOutputQueue()->QueueFlush(this, time + TheTransport->GetEventLookaheadMs() + gBufferSizeMs); //include event lookahead, and make it 1 buffer later, to make sure notes get cleared
+      return;
+   }
+
    bool flushed = false;
-   
-   for (int i=0; i<128; ++i)
+
+   for (int i = 0; i < 128; ++i)
    {
       if (mNotes[i])
       {
          for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
          {
-            noteReceiver->PlayNote(time,i,0);
-            noteReceiver->PlayNote(time+Transport::sEventEarlyMs,i,0);
+            noteReceiver->PlayNote(time, i, 0);
+            noteReceiver->PlayNote(time + Transport::sEventEarlyMs, i, 0);
          }
          flushed = true;
          mNotes[i] = false;
       }
    }
-   
+
    if (flushed)
       mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, false);
 }
 
-void NoteOutput::FlushTarget(double time, INoteReceiver* target)
-{
-   if (target)
-   {
-      for (int i=0; i<128; ++i)
-      {
-         if (mNotes[i])
-            target->PlayNote(time,i,0);
-      }
-   }
-}
-
-void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled)
 {
    PROFILER(INoteSourcePlayOutput);
-   if (time < gTime)
-      ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time/1000) << " < " << ofToString(gTime/1000);
-   
+
+   if (time < gTime && velocity > 0)
+      ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time / 1000) << " < " << ofToString(gTime / 1000);
+
    if (!mInNoteOutput)
       mNoteOutput.ResetStackDepth();
    mInNoteOutput = true;
-   mNoteOutput.PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation);
+   mNoteOutput.PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation, isFromMainThreadAndScheduled);
    mInNoteOutput = false;
 }
 
@@ -160,5 +168,5 @@ void INoteSource::SendCCOutput(int control, int value, int voiceIdx /*=-1*/)
 
 void INoteSource::PreRepatch(PatchCableSource* cableSource)
 {
-   mNoteOutput.Flush(gTime);
+   mNoteOutput.Flush(NextBufferTime(false));
 }

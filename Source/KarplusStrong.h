@@ -45,8 +45,10 @@ public:
    KarplusStrong();
    ~KarplusStrong();
    static IDrawableModule* Create() { return new KarplusStrong(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
    //IAudioSource
@@ -57,46 +59,50 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    bool HasDebugDraw() const override { return true; }
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 275; height = 126; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 275;
+      height = 126;
+   }
 
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    KarplusStrongVoiceParams mVoiceParams;
-   FloatSlider* mFilterSlider;
-   FloatSlider* mFeedbackSlider;
-   float mVolume;
-   FloatSlider* mVolSlider;
-   DropdownList* mSourceDropdown;
-   Checkbox* mInvertCheckbox;
+   FloatSlider* mFilterSlider{ nullptr };
+   FloatSlider* mFeedbackSlider{ nullptr };
+   float mVolume{ 1 };
+   FloatSlider* mVolSlider{ nullptr };
+   DropdownList* mSourceDropdown{ nullptr };
+   Checkbox* mInvertCheckbox{ nullptr };
    BiquadFilterEffect mBiquad;
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
-   
-   Checkbox* mStretchCheckbox;
-   FloatSlider* mExciterFreqSlider;
-   FloatSlider* mExciterAttackSlider;
-   FloatSlider* mExciterDecaySlider;
-   FloatSlider* mPitchToneSlider;
-   FloatSlider* mVelToVolumeSlider;
-   FloatSlider* mVelToEnvelopeSlider;
-   Checkbox* mLiteCPUModeCheckbox;
+
+   Checkbox* mStretchCheckbox{ nullptr };
+   FloatSlider* mExciterFreqSlider{ nullptr };
+   FloatSlider* mExciterAttackSlider{ nullptr };
+   FloatSlider* mExciterDecaySlider{ nullptr };
+   FloatSlider* mPitchToneSlider{ nullptr };
+   FloatSlider* mVelToVolumeSlider{ nullptr };
+   FloatSlider* mVelToEnvelopeSlider{ nullptr };
+   Checkbox* mLiteCPUModeCheckbox{ nullptr };
 
    ChannelBuffer mWriteBuffer;
 };
 
 
 #endif /* defined(__modularSynth__KarplusStrong__) */
-

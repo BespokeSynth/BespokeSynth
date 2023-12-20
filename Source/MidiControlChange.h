@@ -40,33 +40,39 @@ class MidiControlChange : public NoteEffectBase, public IDrawableModule, public 
 public:
    MidiControlChange();
    static IDrawableModule* Create() { return new MidiControlChange(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mWidth;
-   float mHeight;
-   int mControl;
-   TextEntry* mControlEntry;
-   float mValue;
-   FloatSlider* mValueSlider;
-   bool mResendDuplicateValue;
-};
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mControl{ 0 };
+   TextEntry* mControlEntry{ nullptr };
+   float mValue{ 0 };
+   FloatSlider* mValueSlider{ nullptr };
+   bool mResendDuplicateValue{ false };
+};

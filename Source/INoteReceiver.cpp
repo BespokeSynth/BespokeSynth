@@ -31,16 +31,16 @@
 NoteInputBuffer::NoteInputBuffer(INoteReceiver* receiver)
 : mReceiver(receiver)
 {
-   for (int i=0; i<kBufferSize; ++i)
+   for (int i = 0; i < kBufferSize; ++i)
       mBuffer[i].time = -1;
 }
 
 void NoteInputBuffer::Process(double time)
 {
    PROFILER(NoteInputBuffer);
-   
+
    //process note offs first
-   for (int i=0; i<kBufferSize; ++i)
+   for (int i = 0; i < kBufferSize; ++i)
    {
       if (mBuffer[i].time != -1 && mBuffer[i].velocity == 0 &&
           IsTimeWithinFrame(mBuffer[i].time))
@@ -50,9 +50,9 @@ void NoteInputBuffer::Process(double time)
          mBuffer[i].time = -1;
       }
    }
-   
+
    //now process note ons
-   for (int i=0; i<kBufferSize; ++i)
+   for (int i = 0; i < kBufferSize; ++i)
    {
       if (mBuffer[i].time != -1 && mBuffer[i].velocity != 0 &&
           IsTimeWithinFrame(mBuffer[i].time))
@@ -66,7 +66,7 @@ void NoteInputBuffer::Process(double time)
 
 void NoteInputBuffer::QueueNote(double time, int pitch, float velocity, int voiceIdx, ModulationParameters modulation)
 {
-   for (int i=0; i<kBufferSize; ++i)
+   for (int i = 0; i < kBufferSize; ++i)
    {
       if (mBuffer[i].time == -1)
       {
@@ -84,5 +84,5 @@ void NoteInputBuffer::QueueNote(double time, int pitch, float velocity, int voic
 //static
 bool NoteInputBuffer::IsTimeWithinFrame(double time)
 {
-   return time <= gTime + gBufferSizeMs;
+   return time <= NextBufferTime(false);
 }

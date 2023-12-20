@@ -40,11 +40,14 @@ public:
 class ListenPort
 {
 public:
-   ListenPort() : mReceivePort(NULL) {}
+   ListenPort()
+   : mReceivePort(NULL)
+   {}
    ~ListenPort();
    void CreateListener(const char* portName, ListenPortCallback* callback);
    CFDataRef OnMessageReceived(SInt32 msgid, CFDataRef data);
    void Close();
+
 private:
    std::string mPortName;
    CFMessagePortRef mReceivePort;
@@ -55,11 +58,12 @@ private:
 class ListenPortReceiver
 {
 public:
-   static CFDataRef OnMessageReceived(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info);
+   static CFDataRef OnMessageReceived(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void* info);
    static void RegisterPort(ListenPort* port, CFMessagePortRef portRef);
+
 private:
    static ListenPort* LookupPort(CFMessagePortRef portRef);
-   
+
    static std::map<CFMessagePortRef, ListenPort*> mPortMap;
 };
 

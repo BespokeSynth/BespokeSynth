@@ -45,15 +45,20 @@ public:
    GridModule();
    ~GridModule();
    static IDrawableModule* Create() { return new GridModule(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    void SetGrid(int cols, int rows) { mGrid->SetGrid(cols, rows); }
    void SetLabel(int row, std::string label);
-   void Set(int col, int row, float value) { mGrid->SetVal(col, row, value, !K(notifyListener)); UpdateLights(); }
+   void Set(int col, int row, float value)
+   {
+      mGrid->SetVal(col, row, value, !K(notifyListener));
+      UpdateLights();
+   }
    float Get(int col, int row) { return mGrid->GetVal(col, row); }
    void HighlightCell(int col, int row, double time, double duration, int colorIndex);
    void SetDivision(int steps) { return mGrid->SetMajorColSize(steps); }
@@ -65,18 +70,18 @@ public:
    int GetCellColor(int col, int row) { return mGridOverlay[row * kGridOverlayMaxDim + col]; }
    void AddListener(ScriptModule* listener);
    void Clear();
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
-   
+
    //IGridController
    void SetGridControllerOwner(IGridControllerListener* owner) override { mGridControllerOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
@@ -86,52 +91,53 @@ public:
    int NumRows() override { return GetRows(); }
    bool HasInput() const override;
    bool IsConnected() const override { return true; }
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 4; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    ofColor GetColor(int colorIndex) const;
    void UpdateLights();
-   
-   GridControlTarget* mGridControlTarget;
-   PatchCableSource* mGridOutputCable;
-   IGridControllerListener* mGridControllerOwner;
-   
-   UIGrid* mGrid;
+
+   GridControlTarget* mGridControlTarget{ nullptr };
+   PatchCableSource* mGridOutputCable{ nullptr };
+   IGridControllerListener* mGridControllerOwner{ nullptr };
+
+   UIGrid* mGrid{ nullptr };
    std::vector<std::string> mLabels;
    std::vector<ofColor> mColors;
-   
+
    struct HighlightCellElement
    {
-      double time;
+      double time{ -1 };
       Vec2i position;
-      double duration;
+      double duration{ 0 };
       ofColor color;
    };
    std::array<HighlightCellElement, 50> mHighlightCells;
-   
-   static const int kGridOverlayMaxDim = 256;
-   std::array<int, kGridOverlayMaxDim*kGridOverlayMaxDim> mGridOverlay;
-   
-   std::list<ScriptModule*> mScriptListeners;
-   
-   Checkbox* mMomentaryCheckbox;
-   bool mMomentary;
-   bool mDirectColorMode;
-};
 
+   static const int kGridOverlayMaxDim = 256;
+   std::array<int, kGridOverlayMaxDim * kGridOverlayMaxDim> mGridOverlay;
+
+   std::list<ScriptModule*> mScriptListeners;
+
+   Checkbox* mMomentaryCheckbox{ nullptr };
+   bool mMomentary{ false };
+   bool mDirectColorMode{ true };
+};

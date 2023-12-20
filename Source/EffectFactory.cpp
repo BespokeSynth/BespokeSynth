@@ -96,4 +96,3 @@ std::vector<std::string> EffectFactory::GetSpawnableEffects()
    sort(effects.begin(), effects.end());
    return effects;
 }
-

@@ -1,0 +1,99 @@
+{
+   "groups" : [
+	   {
+	     "rows": 1,
+	     "cols": 1,
+	     "position" : [ 0, 0 ],
+	     "dimensions" : [8, 120],
+	     "spacing" : [30, 0],
+	     "controls" : [7],
+	     "messageType" : "control",
+	     "drawType" : "slider"
+	  },
+	  {
+	     "rows": 2,
+	     "cols": 1,
+	     "position" : [ 12, 0 ],
+	     "dimensions" : [9, 9],
+	     "spacing" : [14, 14],
+	     "controls" : [12,13],
+	     "messageType" : "control",
+	     "drawType" : "button"
+	  },
+      {
+         "rows": 1,
+         "cols": 8,
+         "position" : [ 34.5, 0 ],
+         "dimensions" : [18, 18],
+         "spacing" : [30, 0],
+         "controls" : [32,33,34,35,36,37,38,39],
+         "messageType" : "control",
+         "drawType" : "knob"
+      },
+	  {
+        "rows": 1,
+        "cols": 8,
+        "position" : [ 40, 30 ],
+        "dimensions" : [8, 60],
+        "spacing" : [30, 0],
+        "controls" : [40,41,42,43,44,45,46,47],
+        "messageType" : "control",
+        "drawType" : "slider"
+     },
+	 {
+        "rows": 1,
+        "cols": 1,
+        "position" : [ 280, 30 ],
+        "dimensions" : [8, 60],
+        "spacing" : [30, 0],
+        "controls" : [3],
+        "messageType" : "control",
+        "drawType" : "slider"
+     },
+	 {
+        "rows": 1,
+        "cols": 8,
+        "position" : [ 35, 100 ],
+        "dimensions" : [18, 18],
+        "spacing" : [30, 20],
+        "controls" : [56,57,58,59,60,61,62,63],
+        "messageType" : "control",
+        "drawType" : "button"
+     },
+	 
+	 {
+        "rows": 1,
+        "cols": 4,
+        "position" : [ 40, 130 ],
+        "dimensions" : [27, 27],
+        "spacing" : [54, 0],
+        "controls" : [48,49,50,51],
+        "messageType" : "control",
+        "drawType" : "knob"
+     },
+	 {
+        "rows": 1,
+        "cols": 4,
+        "position" : [ 67, 157 ],
+        "dimensions" : [27, 27],
+        "spacing" : [54, 0],
+		"controls" : [52,53,54,55],
+        "messageType" : "control",
+        "drawType" : "knob"
+     },
+	 
+	 {
+         "rows": 3,
+         "cols": 4,
+         "position" : [ 0, 200 ],
+         "dimensions" : [72, 36],
+         "spacing" : [74, 38],
+         "controls" : [44, 45, 46, 47,
+                       40, 41, 42, 43,
+                       36, 37, 38, 39],
+         "messageType" : "note",
+         "drawType" : "button"
+      }
+   ],
+   "resend_feedback_on_release" : true
+}

@@ -39,8 +39,10 @@ public:
    FreqDelay();
    virtual ~FreqDelay();
    static IDrawableModule* Create() { return new FreqDelay(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
    //IAudioSource
@@ -49,24 +51,28 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 130; height = 120; }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 130;
+      height = 120;
+   }
 
    ChannelBuffer mDryBuffer;
-   float mDryWet;
-   FloatSlider* mDryWetSlider;
+   float mDryWet{ 1 };
+   FloatSlider* mDryWetSlider{ nullptr };
 
    DelayEffect mDelayEffect;
 };
 
 #endif /* defined(__modularSynth__FreqDelay__) */
-

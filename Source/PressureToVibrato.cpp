@@ -28,11 +28,6 @@
 #include "ModularSynth.h"
 
 PressureToVibrato::PressureToVibrato()
-: mVibratoInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mVibratoAmount(1)
-, mVibratoSlider(nullptr)
-, mModulation(true)
 {
 }
 
@@ -43,9 +38,9 @@ PressureToVibrato::~PressureToVibrato()
 void PressureToVibrato::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVibratoSlider = new FloatSlider(this,"vibrato",3,3,90,15,&mVibratoAmount,0,1);
-   mIntervalSelector = new DropdownList(this,"vibinterval",96,3,(int*)(&mVibratoInterval));
-   
+   mVibratoSlider = new FloatSlider(this, "vibrato", 3, 3, 90, 15, &mVibratoAmount, 0, 1);
+   mIntervalSelector = new DropdownList(this, "vibinterval", 96, 3, (int*)(&mVibratoInterval));
+
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -75,26 +70,26 @@ void PressureToVibrato::PlayNote(double time, int pitch, int velocity, int voice
       modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
       modulation.pressure = nullptr;
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void PressureToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PressureToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void PressureToVibrato::DropdownUpdated(DropdownList* list, int oldVal)
+void PressureToVibrato::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void PressureToVibrato::CheckboxUpdated(Checkbox* checkbox)
+void PressureToVibrato::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
 void PressureToVibrato::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

@@ -32,13 +32,7 @@
 #include "PolyphonyMgr.h"
 
 FMVoice::FMVoice(IDrawableModule* owner)
-: mOscPhase(0)
-, mHarmPhase(0)
-, mHarmPhase2(0)
-, mOsc(kOsc_Sin)
-, mHarm(kOsc_Sin)
-, mHarm2(kOsc_Sin)
-, mOwner(owner)
+: mOwner(owner)
 {
 }
 
@@ -72,34 +66,43 @@ bool FMVoice::Process(double time, ChannelBuffer* out, int oversampling)
       sampleIncrementMs /= oversampling;
    }
 
-   for (int pos=0; pos<bufferSize; ++pos)
+   for (int pos = 0; pos < bufferSize; ++pos)
    {
       if (mOwner)
-         mOwner->ComputeSliders(pos/oversampling);
-      
-      float oscFreq = TheScale->PitchToFreq(GetPitch(pos/oversampling));
+         mOwner->ComputeSliders(pos / oversampling);
+
+      float oscFreq = TheScale->PitchToFreq(GetPitch(pos / oversampling));
       float harmFreq = oscFreq * mHarm.GetADSR()->Value(time) * mVoiceParams->mHarmRatio;
       float harmFreq2 = harmFreq * mHarm2.GetADSR()->Value(time) * mVoiceParams->mHarmRatio2;
-      
+
       float harmPhaseInc2 = GetPhaseInc(harmFreq2) / oversampling;
-      
+
       mHarmPhase2 += harmPhaseInc2;
-      while (mHarmPhase2 > FTWO_PI) { mHarmPhase2 -= FTWO_PI; }
-      
+      while (mHarmPhase2 > FTWO_PI)
+      {
+         mHarmPhase2 -= FTWO_PI;
+      }
+
       float modHarmFreq = harmFreq + mHarm2.Audio(time, mHarmPhase2 + mVoiceParams->mPhaseOffset2) * harmFreq2 * mModIdx2.Value(time) * mVoiceParams->mModIdx2;
-      
+
       float harmPhaseInc = GetPhaseInc(modHarmFreq) / oversampling;
-      
+
       mHarmPhase += harmPhaseInc;
-      while (mHarmPhase > FTWO_PI) { mHarmPhase -= FTWO_PI; }
+      while (mHarmPhase > FTWO_PI)
+      {
+         mHarmPhase -= FTWO_PI;
+      }
 
       float modOscFreq = oscFreq + mHarm.Audio(time, mHarmPhase + mVoiceParams->mPhaseOffset1) * harmFreq * mModIdx.Value(time) * mVoiceParams->mModIdx;
       float oscPhaseInc = GetPhaseInc(modOscFreq) / oversampling;
 
       mOscPhase += oscPhaseInc;
-      while (mOscPhase > FTWO_PI) { mOscPhase -= FTWO_PI; }
+      while (mOscPhase > FTWO_PI)
+      {
+         mOscPhase -= FTWO_PI;
+      }
 
-      float sample = mOsc.Audio(time, mOscPhase + mVoiceParams->mPhaseOffset0) * mVoiceParams->mVol/20.0f;
+      float sample = mOsc.Audio(time, mOscPhase + mVoiceParams->mPhaseOffset0) * mVoiceParams->mVol / 20.0f;
       if (channels == 1)
       {
          destBuffer->GetChannel(0)[pos] += sample;
@@ -130,7 +133,7 @@ bool FMVoice::Process(double time, ChannelBuffer* out, int oversampling)
       for (int ch = 0; ch < channels; ++ch)
          Add(out->GetChannel(ch), destBuffer->GetChannel(ch), bufferSize);
    }
-   
+
    return true;
 }
 
@@ -144,7 +147,7 @@ void FMVoice::Start(double time, float target)
       mHarm2.GetADSR()->Clear();
    if (mModIdx2.GetR() <= 1)
       mModIdx2.Clear();
-   
+
    mOsc.Start(time, target,
               mVoiceParams->mOscADSRParams);
    mHarm.Start(time, 1,

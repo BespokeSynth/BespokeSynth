@@ -35,20 +35,20 @@ PanicButton::~PanicButton()
 {
 }
 
-void PanicButton::OnClicked(int x, int y, bool right)
+void PanicButton::OnClicked(float x, float y, bool right)
 {
    TheSynth->LoadLayout(ofToDataPath("daftpunk.json"));
 }
 
 void PanicButton::DrawModule()
 {
-   gFont.DrawString("If anything goes horribly awry, click this\nand the party will be restored",15,5,12);
-   
+   gFont.DrawString("If anything goes horribly awry, click this\nand the party will be restored", 15, 5, 12);
+
    ofPushStyle();
    ofFill();
-   ofSetColor(70,0,0);
-   ofRect(10,40,270,80);
-   ofSetColor(255,0,0);
-   gFont.DrawString("PANIC",108,15,115);
+   ofSetColor(70, 0, 0);
+   ofRect(10, 40, 270, 80);
+   ofSetColor(255, 0, 0);
+   gFont.DrawString("PANIC", 108, 15, 115);
    ofPopStyle();
 }

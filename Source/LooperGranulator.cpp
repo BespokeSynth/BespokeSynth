@@ -34,10 +34,6 @@
 #include "UIControlMacros.h"
 
 LooperGranulator::LooperGranulator()
-   : mOn(false)
-   , mFreeze(false)
-   , mDummyPos(0)
-   , mLooper(nullptr)
 {
 }
 
@@ -48,8 +44,8 @@ LooperGranulator::~LooperGranulator()
 void LooperGranulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   UIBLOCK(3,3,120);
+
+   UIBLOCK(3, 3, 120);
    CHECKBOX(mOnCheckbox, "on", &mOn);
    FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5f, MAX_GRAINS);
    FLOATSLIDER(mGranSpeed, "speed", &mGranulator.mSpeed, -3, 3);
@@ -130,11 +126,11 @@ void LooperGranulator::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    }
 }
 
-void LooperGranulator::ButtonClicked(ClickButton* button)
+void LooperGranulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void LooperGranulator::DropdownUpdated(DropdownList* list, int oldVal)
+void LooperGranulator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
@@ -146,8 +142,6 @@ void LooperGranulator::GetModuleDimensions(float& width, float& height)
 
 void LooperGranulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    std::string targetPath = "";
    if (mLooperCable->GetTarget())
       targetPath = mLooperCable->GetTarget()->Path();
@@ -166,4 +160,3 @@ void LooperGranulator::SetUpFromSaveData()
 {
    mLooperCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("looper"), false));
 }
-

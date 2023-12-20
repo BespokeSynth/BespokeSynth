@@ -33,7 +33,6 @@
 #include "ModulationChain.h"
 
 VelocityToCV::VelocityToCV()
-: mVelocity(0)
 {
 }
 
@@ -47,18 +46,20 @@ void VelocityToCV::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
-   
+
    mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
+   mPassZeroCheckbox = new Checkbox(this, "0 at note off", mMaxSlider, kAnchor_Below, &mPassZero);
 }
 
 void VelocityToCV::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMinSlider->Draw();
    mMaxSlider->Draw();
+   mPassZeroCheckbox->Draw();
 }
 
 void VelocityToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
@@ -68,7 +69,7 @@ void VelocityToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 
 void VelocityToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && (mPassZero || velocity > 0))
    {
       mVelocity = velocity;
    }
@@ -76,28 +77,18 @@ void VelocityToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
 
 float VelocityToCV::Value(int samplesIn)
 {
-   return ofMap(mVelocity,0,127,GetMin(),GetMax(),K(clamped));
+   return ofMap(mVelocity, 0, 127, GetMin(), GetMax(), K(clamped));
 }
 
 void VelocityToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;
 }
 
 void VelocityToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
    SetUpFromSaveData();
 }
 
 void VelocityToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

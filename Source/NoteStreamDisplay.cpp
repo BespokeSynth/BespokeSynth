@@ -31,22 +31,13 @@
 #include "UIControlMacros.h"
 
 NoteStreamDisplay::NoteStreamDisplay()
-: mWidth(400)
-, mHeight(200)
-, mDurationMs(2000)
-, mPitchMin(127)
-, mPitchMax(0)
 {
-   for (int i=0; i<kNoteStreamCapacity; ++i)
-   {
-      mNoteStream[i].timeOn = -1;
-   }
 }
 
 void NoteStreamDisplay::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
    BUTTON(mResetButton, "reset");
    ENDUIBLOCK0();
@@ -56,22 +47,22 @@ void NoteStreamDisplay::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    int barLines = int(ceil(mDurationMs / TheTransport->MsPerBar()));
    ofSetColor(150, 150, 150);
-   for (int i=0; i<barLines; ++i)
+   for (int i = 0; i < barLines; ++i)
    {
       double measureStartTime = gTime - TheTransport->MsPerBar() * (TheTransport->GetMeasurePos(gTime) + i);
       float x = ofMap(gTime - measureStartTime, mDurationMs, 0, 0, mWidth);
       ofLine(x, 0, x, mHeight);
    }
-   
+
    ofFill();
    if (mPitchMin <= mPitchMax)
    {
       float noteHeight = mHeight / (mPitchMax - mPitchMin + 1);
-      
-      for (int i=0; i<kNoteStreamCapacity; ++i)
+
+      for (int i = 0; i < kNoteStreamCapacity; ++i)
       {
          if (IsElementActive(i))
          {
@@ -82,27 +73,27 @@ void NoteStreamDisplay::DrawModule()
             else
                xEnd = ofMap(gTime - mNoteStream[i].timeOff, mDurationMs, 0, 0, mWidth);
             float yStart = GetYPos(mNoteStream[i].pitch, noteHeight);
-            
-            ofSetColor(0,ofMap(mNoteStream[i].velocity, 0, 127.0f, 50, 200),0);
+
+            ofSetColor(0, ofMap(mNoteStream[i].velocity, 0, 127.0f, 50, 200), 0);
             ofRect(xStart, yStart, xEnd - xStart, noteHeight, L(cornerRadius, 2));
-            
+
             ofSetColor(mNoteStream[i].velocity / 127.0f * 255, mNoteStream[i].velocity / 127.0f * 255, mNoteStream[i].velocity / 127.0f * 255);
             ofRect(xStart, yStart, 3, noteHeight, L(cornerRadius, 2));
-            
-            ofSetColor(0,0,0);
-            ofRect(xEnd-3, yStart, 3, noteHeight, L(cornerRadius, 2));
+
+            ofSetColor(0, 0, 0);
+            ofRect(xEnd - 3, yStart, 3, noteHeight, L(cornerRadius, 2));
          }
       }
-      
-      ofSetColor(100,100,255);
+
+      ofSetColor(100, 100, 255);
       bool* notes = mNoteOutput.GetNotes();
-      for (int i=mPitchMin; i<=mPitchMax; ++i)
+      for (int i = mPitchMin; i <= mPitchMax; ++i)
       {
          if (notes[i])
-            ofRect(mWidth-3, GetYPos(i, noteHeight), 3, noteHeight, L(cornerRadius, 2));
+            ofRect(mWidth - 3, GetYPos(i, noteHeight), 3, noteHeight, L(cornerRadius, 2));
       }
    }
-   
+
    mResetButton->Draw();
 }
 
@@ -110,25 +101,25 @@ void NoteStreamDisplay::DrawModuleUnclipped()
 {
    if (mDrawDebug)
    {
-      DrawTextNormal(mDebugLines, mWidth+10, 0);
+      DrawTextNormal(mDebugDisplayText, mWidth + 10, 0);
    }
 }
 
 float NoteStreamDisplay::GetYPos(int pitch, float noteHeight) const
 {
-   return ofMap(pitch, mPitchMin, mPitchMax+1, mHeight-noteHeight, -noteHeight);
+   return ofMap(pitch, mPitchMin, mPitchMax + 1, mHeight - noteHeight, -noteHeight);
 }
 
 void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-   
+
    if (velocity > 0)
    {
       bool inserted = false;
       double oldest = -1;
       int oldestIndex = -1;
-      for (int i=0; i<kNoteStreamCapacity; ++i)
+      for (int i = 0; i < kNoteStreamCapacity; ++i)
       {
          if (!IsElementActive(i))
          {
@@ -136,7 +127,7 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
             mNoteStream[i].velocity = velocity;
             mNoteStream[i].timeOn = time;
             mNoteStream[i].timeOff = -1;
-            
+
             inserted = true;
             break;
          }
@@ -149,7 +140,7 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
             }
          }
       }
-      
+
       if (!inserted && oldestIndex != -1)
       {
          mNoteStream[oldestIndex].pitch = pitch;
@@ -157,7 +148,7 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
          mNoteStream[oldestIndex].timeOn = time;
          mNoteStream[oldestIndex].timeOff = -1;
       }
-      
+
       if (pitch < mPitchMin)
          mPitchMin = pitch;
       if (pitch > mPitchMax)
@@ -165,7 +156,7 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
    }
    else
    {
-      for (int i=0; i<kNoteStreamCapacity; ++i)
+      for (int i = 0; i < kNoteStreamCapacity; ++i)
       {
          if (mNoteStream[i].pitch == pitch &&
              mNoteStream[i].timeOff == -1 &&
@@ -173,22 +164,9 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
             mNoteStream[i].timeOff = time;
       }
    }
-   
+
    if (mDrawDebug)
-   {
-      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
-      mDebugLines = "";
-      const int kNumDisplayLines = 35;
-      for (int i=0; i<kNumDisplayLines-1; ++i)
-      {
-         int lineIndex = (int)lines.size()-(kNumDisplayLines-1) + i;
-         if (lineIndex >= 0)
-            mDebugLines += lines[lineIndex] + "\n";
-      }
-      std::string line = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
-      mDebugLines += line;
-      ofLog() << line;
-   }
+      AddDebugLine("PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")", 35);
 }
 
 bool NoteStreamDisplay::IsElementActive(int index) const
@@ -196,13 +174,13 @@ bool NoteStreamDisplay::IsElementActive(int index) const
    return mNoteStream[index].timeOn != -1 && (mNoteStream[index].timeOff == -1 || gTime - mNoteStream[index].timeOff < mDurationMs);
 }
 
-void NoteStreamDisplay::ButtonClicked(ClickButton* button)
+void NoteStreamDisplay::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
    {
       mPitchMin = 127;
       mPitchMax = 0;
-      for (int i=0; i<kNoteStreamCapacity; ++i)
+      for (int i = 0; i < kNoteStreamCapacity; ++i)
       {
          if (IsElementActive(i))
          {
@@ -227,13 +205,12 @@ void NoteStreamDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("duration_ms", moduleInfo, 2000, 0, 999999, K(isTextField));
    mModuleSaveData.LoadInt("width", moduleInfo, 400, 50, 999999, K(isTextField));
    mModuleSaveData.LoadInt("height", moduleInfo, 200, 50, 999999, K(isTextField));
-   
+
    SetUpFromSaveData();
 }
 
 void NoteStreamDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }

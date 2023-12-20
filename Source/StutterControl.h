@@ -35,35 +35,44 @@
 #include "IAudioProcessor.h"
 #include "GridController.h"
 #include "INoteReceiver.h"
+#include "Push2Control.h"
 
-class StutterControl : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IGridControllerListener, public INoteReceiver
+class StutterControl : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IGridControllerListener, public INoteReceiver, public IPush2GridController
 {
 public:
    StutterControl();
    ~StutterControl();
    static IDrawableModule* Create() { return new StutterControl(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    //IAudioSource
    void Process(double time) override;
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx) override {}
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
+   //IPush2GridController
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return true; }
+
 private:
    enum StutterType
    {
@@ -85,23 +94,22 @@ private:
       kFree,
       kNumStutterTypes
    };
-   
+
    StutterType GetStutterFromKey(int key);
    void SendStutter(double time, StutterParams stutter, bool on);
    StutterParams GetStutter(StutterType type);
-   
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
    void UpdateGridLights();
-   
+
    Stutter mStutterProcessor;
-   Checkbox* mStutterCheckboxes[kNumStutterTypes];
-   bool mStutter[kNumStutterTypes];
-   FloatSlider* mFreeLengthSlider;
-   FloatSlider* mFreeSpeedSlider;
-   GridControlTarget* mGridControlTarget;
+   Checkbox* mStutterCheckboxes[StutterType::kNumStutterTypes]{ nullptr };
+   bool mStutter[StutterType::kNumStutterTypes]{};
+   FloatSlider* mFreeLengthSlider{ nullptr };
+   FloatSlider* mFreeSpeedSlider{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
 };
 
 #endif /* defined(__Bespoke__StutterControl__) */

@@ -58,20 +58,21 @@ public:
 
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
+
 private:
-   NoteInterval mPeriod;
-   float mPhaseOffset;
-   Oscillator mOsc;
-   LFOMode mMode;
+   NoteInterval mPeriod{ NoteInterval::kInterval_1n };
+   float mPhaseOffset{ 0 };
+   Oscillator mOsc{ OscillatorType::kOsc_Sin };
+   LFOMode mMode{ LFOMode::kLFOMode_Envelope };
    Ramp mRandom;
-   float mDrunk;
-   double mFreePhase;
-   float mFreeRate;
-   float mLength;
-   int mPerlinSeed;
+   float mDrunk{ 0 };
+   double mFreePhase{ 0 };
+   float mFreeRate{ 1 };
+   float mLength{ 1 };
+   int mPerlinSeed{ 0 };
 
    static PerlinNoise sPerlinNoise;
 };

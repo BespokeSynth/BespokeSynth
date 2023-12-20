@@ -39,26 +39,39 @@ public:
    virtual ~IClickable() {}
    void Draw();
    virtual void Render() {}
-   void SetPosition(float x, float y) { mX = x; mY = y; }
+   void SetPosition(float x, float y)
+   {
+      mX = x;
+      mY = y;
+   }
    void GetPosition(float& x, float& y, bool local = false) const;
    ofVec2f GetPosition(bool local = false) const;
-   virtual void Move(float moveX, float moveY) { mX += moveX; mY += moveY; }
-   virtual bool TestClick(int x, int y, bool right, bool testOnly = false);
+   virtual void Move(float moveX, float moveY)
+   {
+      mX += moveX;
+      mY += moveY;
+   }
+   virtual bool TestClick(float x, float y, bool right, bool testOnly = false);
    IClickable* GetParent() const { return mParent; }
    void SetParent(IClickable* parent) { mParent = parent; }
    bool NotifyMouseMoved(float x, float y);
-   bool NotifyMouseScrolled(int x, int y, float scrollX, float scrollY);
+   bool NotifyMouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll);
    virtual void MouseReleased() {}
-   virtual void GetDimensions(float& width, float& height) { width = 10; height = 10; }
+   virtual void GetDimensions(float& width, float& height)
+   {
+      width = 10;
+      height = 10;
+   }
    ofVec2f GetDimensions();
    ofRectangle GetRect(bool local = false);
-   void SetName(const char* name) {
-     if (mName != name)
-       StringCopy(mName, name, MAX_TEXTENTRY_LENGTH);
+   void SetName(const char* name)
+   {
+      if (mName != name)
+         StringCopy(mName, name, MAX_TEXTENTRY_LENGTH);
    }
    const char* Name() const { return mName; }
    char* NameMutable() { return mName; }
-   std::string Path(bool ignoreContext = false);
+   std::string Path(bool ignoreContext = false, bool useDisplayName = false);
    virtual bool CheckNeedsDraw();
    virtual void SetShowing(bool showing) { mShowing = showing; }
    bool IsShowing() const { return mShowing; }
@@ -67,28 +80,39 @@ public:
    void DrawBeacon(int x, int y);
    IClickable* GetRootParent();
    IDrawableModule* GetModuleParent();
-   
-   static void SetLoadContext(IClickable* context) { sLoadContext = context->Path() + "~"; }
-   static void ClearLoadContext() { sLoadContext = ""; }
-   static void SetSaveContext(IClickable* context) { sSaveContext = context->Path() + "~"; }
-   static void ClearSaveContext() { sSaveContext = ""; }
-   
-   static std::string sLoadContext;
-   static std::string sSaveContext;
-   
+   void SetOverrideDisplayName(std::string name)
+   {
+      mHasOverrideDisplayName = true;
+      mOverrideDisplayName = name;
+   }
+   std::string GetDisplayName()
+   {
+      return mHasOverrideDisplayName ? mOverrideDisplayName : mName;
+   }
+
+   static void SetLoadContext(IClickable* context) { sPathLoadContext = context->Path() + "~"; }
+   static void ClearLoadContext() { sPathLoadContext = ""; }
+   static void SetSaveContext(IClickable* context) { sPathSaveContext = context->Path() + "~"; }
+   static void ClearSaveContext() { sPathSaveContext = ""; }
+
+   static std::string sPathLoadContext;
+   static std::string sPathSaveContext;
+
 protected:
-   virtual void OnClicked(int x, int y, bool right) {}
+   virtual void OnClicked(float x, float y, bool right) {}
    virtual bool MouseMoved(float x, float y) { return false; }
-   virtual bool MouseScrolled(int x, int y, float scrollX, float scrollY) { return false; }
-   
-   float mX;
-   float mY;
-   IClickable* mParent;
-   bool mShowing;
-   
+   virtual bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) { return false; }
+
+   float mX{ 0 };
+   float mY{ 0 };
+   IClickable* mParent{ nullptr };
+   bool mShowing{ true };
+
 private:
-   char mName[MAX_TEXTENTRY_LENGTH];
-   double mBeaconTime;
+   char mName[MAX_TEXTENTRY_LENGTH]{};
+   double mBeaconTime{ -999 };
+   bool mHasOverrideDisplayName{ false };
+   std::string mOverrideDisplayName{ "" };
 };
 
 #endif /* defined(__modularSynth__IClickable__) */

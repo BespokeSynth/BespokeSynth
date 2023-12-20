@@ -29,15 +29,8 @@
 #include "UIControlMacros.h"
 
 Monophonify::Monophonify()
-: mInitialPitch(-1)
-, mLastPlayedPitch(-1)
-, mLastVelocity(0)
-, mVoiceIdx(0)
-, mRequireHeldNote(false)
-, mGlideTime(0)
-, mGlideSlider(nullptr)
 {
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
       mHeldNotes[i] = -1;
 }
 
@@ -45,10 +38,13 @@ void Monophonify::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   CHECKBOX(mRequireHeldNoteCheckbox, "require held", &mRequireHeldNote);
+   DROPDOWN(mPortamentoModeSelector, "mode", ((int*)&mPortamentoMode), 90);
    FLOATSLIDER(mGlideSlider, "glide", &mGlideTime, 0, 1000);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
+   mPortamentoModeSelector->AddLabel("always", (int)PortamentoMode::kAlways);
+   mPortamentoModeSelector->AddLabel("retrigger held", (int)PortamentoMode::kRetriggerHeld);
+   mPortamentoModeSelector->AddLabel("bend held", (int)PortamentoMode::kBendHeld);
    mGlideSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -56,8 +52,8 @@ void Monophonify::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   mRequireHeldNoteCheckbox->Draw();
+
+   mPortamentoModeSelector->Draw();
    mGlideSlider->Draw();
 }
 
@@ -68,41 +64,48 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (pitch < 0 || pitch >= 128)
       return;
-   
+
    mPitchBend.AppendTo(modulation.pitchBend);
    modulation.pitchBend = &mPitchBend;
 
    voiceIdx = mVoiceIdx;
-   
+
    if (velocity > 0)
    {
       mLastVelocity = velocity;
-      
-      int bendFromPitch = GetMostRecentPitch();
-      
-      if (bendFromPitch != -1)
+
+      int currentlyHeldPitch = GetMostRecentCurrentlyHeldPitch();
+
+      if (currentlyHeldPitch != -1)
       {
-         if (mRequireHeldNote)
+         if (mPortamentoMode == PortamentoMode::kBendHeld)
          {
             //just bend to the new note
             mPitchBend.RampValue(time, mPitchBend.GetIndividualValue(0), pitch - mInitialPitch, mGlideTime);
          }
          else
          {
-            mPitchBend.RampValue(time, bendFromPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-            PlayNoteOutput(time, bendFromPitch, 0, -1, modulation);
+            //trigger new note and bend
+            mPitchBend.RampValue(time, currentlyHeldPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+            PlayNoteOutput(time, currentlyHeldPitch, 0, -1, modulation);
             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
          }
       }
       else
       {
-         if (!mRequireHeldNote && mLastPlayedPitch != -1)
+         if (mPortamentoMode == PortamentoMode::kAlways && mLastPlayedPitch != -1)
+         {
+            //bend to new note
             mPitchBend.RampValue(time, mLastPlayedPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+         }
          else
+         {
+            //reset pitch bend
             mPitchBend.RampValue(time, 0, 0, 0);
+         }
 
          mInitialPitch = pitch;
          PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
@@ -112,40 +115,50 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
    else
    {
-      bool wasCurrNote = pitch == GetMostRecentPitch();
-      
+      bool wasCurrNote = (pitch == GetMostRecentCurrentlyHeldPitch());
+
       mHeldNotes[pitch] = -1;
-      
-      int returnToPitch = GetMostRecentPitch();
-      
-      if (returnToPitch != -1)
+
+      if (wasCurrNote)
       {
-         if (wasCurrNote)
+         int returnToPitch = GetMostRecentCurrentlyHeldPitch();
+
+         if (returnToPitch != -1)
          {
-            if (mRequireHeldNote)
+            if (mPortamentoMode == PortamentoMode::kBendHeld)
             {
                //bend back to old note
                mPitchBend.RampValue(time, mPitchBend.GetIndividualValue(0), returnToPitch - mInitialPitch, mGlideTime);
             }
             else
             {
+               //bend back to old note and retrigger
                mPitchBend.RampValue(time, pitch - returnToPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
                PlayNoteOutput(time, returnToPitch, mLastVelocity, voiceIdx, modulation);
             }
          }
-      }
-      else
-      {
-         PlayNoteOutput(time, mRequireHeldNote ? mInitialPitch : pitch, 0, voiceIdx, modulation);
+         else
+         {
+            if (mPortamentoMode == PortamentoMode::kBendHeld)
+            {
+               //stop pitch that we started with
+               PlayNoteOutput(time, mInitialPitch, 0, voiceIdx, modulation);
+            }
+            else
+            {
+               //stop released pitch
+               PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+            }
+         }
       }
    }
 }
 
-int Monophonify::GetMostRecentPitch() const
+int Monophonify::GetMostRecentCurrentlyHeldPitch() const
 {
    int mostRecentPitch = -1;
    double mostRecentTime = 0;
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
    {
       if (mHeldNotes[i] > mostRecentTime)
       {
@@ -157,24 +170,24 @@ int Monophonify::GetMostRecentPitch() const
    return mostRecentPitch;
 }
 
-void Monophonify::CheckboxUpdated(Checkbox* checkbox)
+void Monophonify::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime);
-      for (int i=0; i<128; ++i)
+      mNoteOutput.Flush(time);
+      for (int i = 0; i < 128; ++i)
          mHeldNotes[i] = -1;
    }
 }
 
-void Monophonify::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void Monophonify::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
 void Monophonify::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("voice_idx", moduleInfo, 0, 0, kNumVoices-1);
+   mModuleSaveData.LoadInt("voice_idx", moduleInfo, 0, 0, kNumVoices - 1);
 
    SetUpFromSaveData();
 }
@@ -184,4 +197,3 @@ void Monophonify::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mVoiceIdx = mModuleSaveData.GetInt("voice_idx");
 }
-

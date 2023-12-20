@@ -34,7 +34,7 @@ class IButtonListener
 {
 public:
    virtual ~IButtonListener() {}
-   virtual void ButtonClicked(ClickButton* button) = 0;
+   virtual void ButtonClicked(ClickButton* button, double time) = 0;
 };
 
 enum class ButtonDisplayStyle
@@ -46,7 +46,12 @@ enum class ButtonDisplayStyle
    kStop,
    kGrabSample,
    kSampleIcon,
-   kFolderIcon
+   kFolderIcon,
+   kArrowRight,
+   kArrowLeft,
+   kPlus,
+   kMinus,
+   kHamburger
 };
 
 class ClickButton : public IUIControl
@@ -60,33 +65,43 @@ public:
    bool MouseMoved(float x, float y) override;
    void SetDisplayText(bool display) { mDisplayStyle = ButtonDisplayStyle::kNoLabel; }
    void SetDisplayStyle(ButtonDisplayStyle style) { mDisplayStyle = style; }
-   void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
+   void SetDimensions(float width, float height)
+   {
+      mWidth = width;
+      mHeight = height;
+   }
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
-   void SetValue(float value) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override { return GetMidiValue(); }
    float GetMidiValue() const override;
    std::string GetDisplayValue(float val) const override;
    int GetNumValues() override { return 2; }
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void Increment(float amount) override;
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void SaveState(FileStreamOut& out) override {}
    void LoadState(FileStreamIn& in, bool shouldSetValue) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
-   
+
 protected:
-   ~ClickButton();   //protected so that it can't be created on the stack
+   ~ClickButton(); //protected so that it can't be created on the stack
 
 private:
+   void DoClick(double time);
    bool ButtonLit() const;
 
-   void OnClicked(int x, int y, bool right) override;
-   float mWidth;
-   float mHeight;
-   double mClickTime;
-   IButtonListener* mOwner;
-   ButtonDisplayStyle mDisplayStyle;
+   void OnClicked(float x, float y, bool right) override;
+   float mWidth{ 20 };
+   float mHeight{ 15 };
+   double mClickTime{ -9999 };
+   IButtonListener* mOwner{ nullptr };
+   ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };
 };
 
 #endif /* defined(__modularSynth__ClickButton__) */

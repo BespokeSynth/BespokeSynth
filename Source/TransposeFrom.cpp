@@ -32,8 +32,6 @@
 #include "UIControlMacros.h"
 
 TransposeFrom::TransposeFrom()
-: mRoot(0)
-, mRetrigger(false)
 {
    TheScale->AddListener(this);
 }
@@ -47,37 +45,37 @@ void TransposeFrom::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   DROPDOWN(mRootSelector,"root",&mRoot,50);
-   CHECKBOX(mRetriggerCheckbox,"retrigger",&mRetrigger);
+   DROPDOWN(mRootSelector, "root", &mRoot, 50);
+   CHECKBOX(mRetriggerCheckbox, "retrigger", &mRetrigger);
    ENDUIBLOCK(mWidth, mHeight);
-   
-   mRootSelector->AddLabel("A",9);
-   mRootSelector->AddLabel("A#/Bb",10);
-   mRootSelector->AddLabel("B",11);
-   mRootSelector->AddLabel("C",0);
-   mRootSelector->AddLabel("C#/Db",1);
-   mRootSelector->AddLabel("D",2);
-   mRootSelector->AddLabel("D#/Eb",3);
-   mRootSelector->AddLabel("E",4);
-   mRootSelector->AddLabel("F",5);
-   mRootSelector->AddLabel("F#/Gb",6);
-   mRootSelector->AddLabel("G",7);
-   mRootSelector->AddLabel("G#/Ab",8);
+
+   mRootSelector->AddLabel("A", 9);
+   mRootSelector->AddLabel("A#/Bb", 10);
+   mRootSelector->AddLabel("B", 11);
+   mRootSelector->AddLabel("C", 0);
+   mRootSelector->AddLabel("C#/Db", 1);
+   mRootSelector->AddLabel("D", 2);
+   mRootSelector->AddLabel("D#/Eb", 3);
+   mRootSelector->AddLabel("E", 4);
+   mRootSelector->AddLabel("F", 5);
+   mRootSelector->AddLabel("F#/Gb", 6);
+   mRootSelector->AddLabel("G", 7);
+   mRootSelector->AddLabel("G#/Ab", 8);
 }
 
 void TransposeFrom::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mRootSelector->Draw();
    mRetriggerCheckbox->Draw();
 }
 
-void TransposeFrom::CheckboxUpdated(Checkbox *checkbox)
+void TransposeFrom::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 int TransposeFrom::GetTransposeAmount() const
@@ -92,7 +90,7 @@ void TransposeFrom::PlayNote(double time, int pitch, int velocity, int voiceIdx,
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (pitch >= 0 && pitch < 128)
    {
       if (velocity > 0)
@@ -106,30 +104,29 @@ void TransposeFrom::PlayNote(double time, int pitch, int velocity, int voiceIdx,
       {
          mInputNotes[pitch].mOn = false;
       }
-      
+
       PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, velocity, mInputNotes[pitch].mVoiceIdx, modulation);
    }
 }
 
 void TransposeFrom::OnScaleChanged()
 {
-   OnRootChanged();
+   OnRootChanged(gTime);
 }
 
-void TransposeFrom::DropdownUpdated(DropdownList* slider, int oldVal)
+void TransposeFrom::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (slider == mRootSelector && mEnabled && mRetrigger)
-      OnRootChanged();
+   if (list == mRootSelector && mEnabled && mRetrigger)
+      OnRootChanged(time);
 }
 
-void TransposeFrom::OnRootChanged()
+void TransposeFrom::OnRootChanged(double time)
 {
-   double time = gTime + gBufferSizeMs;
-   for (int pitch=0; pitch<128; ++pitch)
+   for (int pitch = 0; pitch < 128; ++pitch)
    {
       if (mInputNotes[pitch].mOn)
       {
-         PlayNoteOutput(time+.01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+         PlayNoteOutput(time + .01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          mInputNotes[pitch].mOutputPitch = pitch + GetTransposeAmount();
          PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
       }
@@ -147,4 +144,3 @@ void TransposeFrom::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

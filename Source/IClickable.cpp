@@ -30,44 +30,38 @@
 
 #include <cstring>
 
-std::string IClickable::sLoadContext = "";
-std::string IClickable::sSaveContext = "";
+std::string IClickable::sPathLoadContext = "";
+std::string IClickable::sPathSaveContext = "";
 
 IClickable::IClickable()
-: mX(0)
-, mY(0)
-, mParent(nullptr)
-, mShowing(true)
-, mBeaconTime(-999)
 {
-   mName[0] = 0;
 }
 
 void IClickable::Draw()
 {
    if (!mShowing)
       return;
-   
+
    Render();
 }
 
-bool IClickable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
+bool IClickable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
 {
    if (!mShowing)
       return false;
-   
+
    float w, h;
-   GetDimensions(w,h);
-   
+   GetDimensions(w, h);
+
    float titleBarHeight = 0;
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(this);
    if (module && module->HasTitleBar())
       titleBarHeight = IDrawableModule::TitleBarHeight();
-   
-   if (x >= mX && y >= mY-titleBarHeight && x <= mX+w && y <= mY+h)
+
+   if (x >= mX && y >= mY - titleBarHeight && x <= mX + w && y <= mY + h)
    {
       if (!testOnly)
-         OnClicked(x-mX, y-mY, right);
+         OnClicked(x - mX, y - mY, right);
       return true;
    }
    return false;
@@ -77,21 +71,21 @@ bool IClickable::NotifyMouseMoved(float x, float y)
 {
    if (!mShowing)
       return false;
-   return MouseMoved(x-mX, y-mY);
+   return MouseMoved(x - mX, y - mY);
 }
 
-bool IClickable::NotifyMouseScrolled(int x, int y, float scrollX, float scrollY)
+bool IClickable::NotifyMouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (!mShowing)
       return false;
-   return MouseScrolled(x-mX, y-mY, scrollX, scrollY);
+   return MouseScrolled(x - mX, y - mY, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
 }
 
 void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
 {
    if (mParent && !local)
    {
-      mParent->GetPosition(x,y,false);
+      mParent->GetPosition(x, y, false);
       x += mX;
       y += mY;
    }
@@ -104,30 +98,30 @@ void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
 
 ofVec2f IClickable::GetPosition(bool local /*= false*/) const
 {
-   float x,y;
+   float x, y;
    GetPosition(x, y, local);
-   return ofVec2f(x,y);
+   return ofVec2f(x, y);
 }
 
 ofVec2f IClickable::GetDimensions()
 {
-   float w,h;
-   GetDimensions(w,h);
-   return ofVec2f(w,h);
+   float w, h;
+   GetDimensions(w, h);
+   return ofVec2f(w, h);
 }
 
 ofRectangle IClickable::GetRect(bool local /*=false*/)
 {
-   float x,y,w,h;
+   float x, y, w, h;
    GetPosition(x, y, local);
-   GetDimensions(w,h);
-   return ofRectangle(x,y,w,h);
+   GetDimensions(w, h);
+   return ofRectangle(x, y, w, h);
 }
 
 IClickable* IClickable::GetRootParent()
 {
    IClickable* parent = this;
-   while (parent->GetParent())  //keep going up until there are no parents
+   while (parent->GetParent()) //keep going up until there are no parents
       parent = parent->GetParent();
    return parent;
 }
@@ -135,28 +129,30 @@ IClickable* IClickable::GetRootParent()
 IDrawableModule* IClickable::GetModuleParent()
 {
    IClickable* parent = this;
-   while (parent->GetParent())  //keep going up until there are no parents
+   while (parent->GetParent()) //keep going up until there are no parents
    {
       IDrawableModule* module = dynamic_cast<IDrawableModule*>(parent);
-      if (module && module->CanMinimize())   //"minimizable" modules doesn't include effects in effectchains, which we want to avoid
+      if (module && module->CanMinimize()) //"minimizable" modules doesn't include effects in effectchains, which we want to avoid
          return module;
       parent = parent->GetParent();
    }
    return dynamic_cast<IDrawableModule*>(parent);
 }
 
-std::string IClickable::Path(bool ignoreContext)
+std::string IClickable::Path(bool ignoreContext, bool useDisplayName)
 {
-   if (mName[0] == 0)  //must have a name
+   if (mName[0] == 0) //must have a name
       return "";
-   
-   std::string path = mName;
+
+   std::string name = useDisplayName ? GetDisplayName() : mName;
+
+   std::string path = name;
    if (mParent != nullptr)
-      path = mParent->Path(true) + "~" + mName;
-   
+      path = mParent->Path(true) + "~" + name;
+
    if (!ignoreContext)
    {
-      if (sLoadContext != "")
+      if (sPathLoadContext != "")
       {
          if (path[0] == '$')
          {
@@ -167,15 +163,15 @@ std::string IClickable::Path(bool ignoreContext)
          }
          else
          {
-            path = sLoadContext + path;
+            path = sPathLoadContext + path;
          }
       }
-      if (sSaveContext != "")
+      if (sPathSaveContext != "")
       {
-         if (strstr(path.c_str(), sSaveContext.c_str()) == path.c_str())   //path starts with sSaveContext
-            path = path.substr(sSaveContext.length(), path.length() - sSaveContext.length());
+         if (strstr(path.c_str(), sPathSaveContext.c_str()) == path.c_str()) //path starts with sSaveContext
+            path = path.substr(sPathSaveContext.length(), path.length() - sPathSaveContext.length());
          else
-            path = "$"+path; //path is outside of our context, and therefore invalid
+            path = "$" + path; //path is outside of our context, and therefore invalid
       }
    }
    return path;
@@ -198,10 +194,10 @@ void IClickable::DrawBeacon(int x, int y)
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255,255,0,40);
-      ofCircle(x, y, size*40);
-      ofSetColor(255,255,0,150);
-      ofCircle(x, y, size*3);
+      ofSetColor(255, 255, 0, 40);
+      ofCircle(x, y, size * 40);
+      ofSetColor(255, 255, 0, 150);
+      ofCircle(x, y, size * 3);
       ofPopStyle();
    }
 }

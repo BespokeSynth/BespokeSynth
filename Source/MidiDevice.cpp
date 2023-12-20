@@ -32,10 +32,7 @@
 using namespace juce;
 
 MidiDevice::MidiDevice(MidiDeviceListener* listener)
-   : mListener(listener)
-   , mMidiOut(nullptr)
-   , mOutputChannel(1)
-   , mIsInputEnabled(false)
+: mListener(listener)
 {
 }
 
@@ -50,17 +47,17 @@ MidiDevice::~MidiDevice()
 bool MidiDevice::ConnectInput(const char* name)
 {
    DisconnectInput();
-   
+
    mDeviceNameIn = name;
-   
+
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
    deviceManager.setMidiInputEnabled(mDeviceNameIn, true);
    deviceManager.addMidiInputCallback(mDeviceNameIn, this);
-   
+
    mIsInputEnabled = deviceManager.isMidiInputEnabled(mDeviceNameIn);
-   
-   TheSynth->AddMidiDevice(this);   //TODO(Ryan) need better place for this, but constructor is too early
-   
+
+   TheSynth->AddMidiDevice(this); //TODO(Ryan) need better place for this, but constructor is too early
+
    return mIsInputEnabled;
 }
 
@@ -75,32 +72,39 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
 
    bool found = false;
    StringArray devices = MidiOutput::getDevices();
-   for (int i=0; i<devices.size(); ++i)
+   for (int i = 0; i < devices.size(); ++i)
    {
       if (devices[i] == name)
       {
-         ConnectOutput(i, channel);
-         found = true;
+         found = ConnectOutput(i, channel);
          break;
       }
    }
-   
+
    if (!found)
+   {
+      TheSynth->LogEvent("Failed to connect to Midi Output: " + std::string(name), kLogEventType_Error);
       DisconnectOutput();
-   
+   }
+
    return found;
 }
 
-void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
+bool MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 {
    mMidiOut.reset();
    mMidiOut = MidiOutput::openDevice(index);
-   mMidiOut->startBackgroundThread();
+   if (mMidiOut)
+   {
+      mMidiOut->startBackgroundThread();
+      mDeviceNameOut = mMidiOut->getName();
 
-   mDeviceNameOut = mMidiOut->getName();
+      assert(channel > 0 && channel <= 16);
+      mOutputChannel = channel;
+      return true;
+   }
 
-   assert(channel > 0 && channel <= 16);
-   mOutputChannel = channel;
+   return false;
 }
 
 void MidiDevice::DisconnectInput()
@@ -112,7 +116,7 @@ void MidiDevice::DisconnectInput()
 
 void MidiDevice::DisconnectOutput()
 {
-   if (mMidiOut.get())
+   if (mMidiOut)
       mMidiOut->stopBackgroundThread();
    mMidiOut.reset();
    mMidiOut = nullptr;
@@ -133,11 +137,11 @@ bool MidiDevice::IsInputConnected(bool immediate)
 {
    static juce::Array<juce::MidiDeviceInfo> sConnectedInputDevices;
    static double sLastUpdatedListTime = -9999;
-   if (sLastUpdatedListTime + 5000 < gTime || immediate)  //refresh every 5 seconds (getAvailableDevices() is slow on windows)
+   if (sLastUpdatedListTime + 5000 < gTime || immediate) //refresh every 5 seconds (getAvailableDevices() is slow on windows)
    {
       sConnectedInputDevices = MidiInput::getAvailableDevices();
       sLastUpdatedListTime = gTime;
-   }   
+   }
 
    for (auto& device : sConnectedInputDevices)
    {
@@ -150,20 +154,20 @@ bool MidiDevice::IsInputConnected(bool immediate)
 std::vector<std::string> MidiDevice::GetPortList(bool forInput)
 {
    std::vector<std::string> portList;
-   
+
    if (forInput)
    {
       const StringArray input = MidiInput::getDevices();
-      for (int i=0; i<input.size(); ++i)
+      for (int i = 0; i < input.size(); ++i)
          portList.push_back(input[i].toStdString());
    }
    else
    {
       const StringArray output = MidiOutput::getDevices();
-      for (int i=0; i<output.size(); ++i)
+      for (int i = 0; i < output.size(); ++i)
          portList.push_back(output[i].toStdString());
    }
-   
+
    return portList;
 }
 
@@ -173,16 +177,16 @@ void MidiDevice::SendNote(double time, int pitch, int velocity, bool forceNoteOn
    {
       if (channel == -1)
          channel = mOutputChannel;
-      
+
       int sampleNumber = (time - gTime) * gSampleRateMs;
-      
+
       juce::MidiBuffer midiBuffer;
-      
+
       if (velocity > 0 || forceNoteOn)
          midiBuffer.addEvent(MidiMessage::noteOn(channel, pitch, (uint8)velocity), sampleNumber);
       else
          midiBuffer.addEvent(MidiMessage::noteOff(channel, pitch), sampleNumber);
-      
+
       mMidiOut->sendBlockOfMessages(midiBuffer, Time::getMillisecondCounter(), gSampleRate);
    }
 }
@@ -193,7 +197,7 @@ void MidiDevice::SendCC(int ctl, int value, int channel /* = -1*/)
    {
       if (channel == -1)
          channel = mOutputChannel;
-      
+
       mMidiOut->sendMessageNow(MidiMessage::controllerEvent(channel, ctl, value));
    }
 }
@@ -204,7 +208,7 @@ void MidiDevice::SendAftertouch(int pressure, int channel /* = -1*/)
    {
       if (channel == -1)
          channel = mOutputChannel;
-      
+
       //TODO_PORT(Ryan) pitch number?
       mMidiOut->sendMessageNow(MidiMessage::aftertouchChange(channel, 0, pressure));
    }
@@ -216,7 +220,7 @@ void MidiDevice::SendProgramChange(int program, int channel /* = -1*/)
    {
       if (channel == -1)
          channel = mOutputChannel;
-      
+
       mMidiOut->sendMessageNow(MidiMessage::programChange(channel, program));
    }
 }
@@ -227,8 +231,16 @@ void MidiDevice::SendPitchBend(int bend, int channel /* = -1*/)
    {
       if (channel == -1)
          channel = mOutputChannel;
-      
+
       mMidiOut->sendMessageNow(MidiMessage::pitchWheel(channel, bend));
+   }
+}
+
+void MidiDevice::SendSysEx(std::string data)
+{
+   if (mMidiOut)
+   {
+      mMidiOut->sendMessageNow(MidiMessage::createSysExMessage(data.c_str(), data.length()));
    }
 }
 
@@ -236,7 +248,20 @@ void MidiDevice::SendData(unsigned char a, unsigned char b, unsigned char c)
 {
    if (mMidiOut)
    {
-      mMidiOut->sendMessageNow(MidiMessage(a,b,c));
+      mMidiOut->sendMessageNow(MidiMessage(a, b, c));
+   }
+}
+
+void MidiDevice::SendMessage(double time, juce::MidiMessage message)
+{
+   if (mMidiOut)
+   {
+      int sampleNumber = (time - gTime) * gSampleRateMs;
+
+      juce::MidiBuffer midiBuffer;
+      midiBuffer.addEvent(message, sampleNumber);
+
+      mMidiOut->sendBlockOfMessages(midiBuffer, Time::getMillisecondCounter(), gSampleRate);
    }
 }
 
@@ -244,11 +269,11 @@ void MidiDevice::handleIncomingMidiMessage(MidiInput* source, const MidiMessage&
 {
    if (TheSynth->IsReady() == false)
       return;
-   
+
    if (mListener)
    {
       MidiDevice::SendMidiMessage(mListener, mDeviceNameIn.toRawUTF8(), message);
-      
+
       if (gPrintMidiInput)
          ofLog() << mDeviceNameIn << " " << message.getDescription();
    }
@@ -258,7 +283,7 @@ void MidiDevice::handleIncomingMidiMessage(MidiInput* source, const MidiMessage&
 void MidiDevice::SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const MidiMessage& message)
 {
    listener->OnMidi(message);
-   
+
    if (message.isNoteOnOrOff())
    {
       MidiNote note;
@@ -316,4 +341,46 @@ void MidiDevice::SendMidiMessage(MidiDeviceListener* listener, const char* devic
       pressure.mChannel = message.getChannel();
       listener->OnMidiPressure(pressure);
    }
+   /*if (message.isMidiClock())
+   {
+      static double sLastTime = -1;
+      static std::array<float, 40> sTempos;
+      static int sTempoIdx = 0;
+      if (sLastTime > 0)
+      {
+         double deltaSeconds = (message.getTimeStamp() - sLastTime);
+         double pulsesPerSecond = 1 / deltaSeconds;
+         double beatsPerSecond = pulsesPerSecond / 24;
+         double instantTempo = beatsPerSecond * 60;
+         sTempos[sTempoIdx] = instantTempo;
+         sTempoIdx = (sTempoIdx + 1) % sTempos.size();
+         double avgTempo = 0;
+         for (auto& tempo : sTempos)
+            avgTempo += tempo;
+         avgTempo /= sTempos.size();
+         if (sTempoIdx == 0)
+            ofLog() << avgTempo;
+      }
+      sLastTime = message.getTimeStamp();
+   }
+   if (message.isMidiStart())
+   {
+      ofLog() << "midi start";
+   }
+   if (message.isMidiStop())
+   {
+      ofLog() << "midi stop";
+   }
+   if (message.isMidiContinue())
+   {
+      ofLog() << "midi continue";
+   }
+   if (message.isSongPositionPointer())
+   {
+      ofLog() << "midi position pointer " << ofToString(message.getSongPositionPointerMidiBeat());
+   }
+   if (message.isQuarterFrame())
+   {
+      ofLog() << "midi quarter frame " << ofToString(message.getQuarterFrameValue()) << " " << ofToString(message.getQuarterFrameSequenceNumber());
+   }*/
 }

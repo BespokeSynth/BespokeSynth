@@ -29,6 +29,7 @@
 #include "IDrawableModule.h"
 #include "RadioButton.h"
 #include "ClickButton.h"
+#include "ModuleFactory.h"
 
 class HelpDisplay : public IDrawableModule, public IRadioButtonListener, public IButtonListener
 {
@@ -36,32 +37,39 @@ public:
    HelpDisplay();
    virtual ~HelpDisplay();
    static IDrawableModule* Create() { return new HelpDisplay(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    bool IsSaveable() override { return false; }
    bool HasTitleBar() const override { return false; }
    void CreateUIControls() override;
+   void Poll() override;
+
+   void Show() { mScrollOffsetY = 0; }
 
    std::string GetUIControlTooltip(IUIControl* control);
    std::string GetModuleTooltip(IDrawableModule* module);
    std::string GetModuleTooltipFromName(std::string moduleTypeName);
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void ScreenshotModule(IDrawableModule* module);
 
    static bool sShowTooltips;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void RenderScreenshot(int x, int y, int width, int height, std::string filename);
-   
+
    struct UIControlTooltipInfo
    {
       std::string controlName;
@@ -79,23 +87,35 @@ private:
    void LoadTooltips();
    ModuleTooltipInfo* FindModuleInfo(std::string moduleTypeName);
    UIControlTooltipInfo* FindControlInfo(IUIControl* control);
-   
+
    std::vector<std::string> mHelpText;
-   Checkbox* mShowTooltipsCheckbox;
-   ClickButton* mCopyBuildInfoButton;
-   ClickButton* mDumpModuleInfoButton;
-   ClickButton* mDoModuleScreenshotsButton;
-   ClickButton* mDoModuleDocumentationButton;
-   ClickButton* mTutorialVideoLinkButton;
-   ClickButton* mDocsLinkButton;
-   ClickButton* mDiscordLinkButton;
-   float mWidth;
-   float mHeight;
+   Checkbox* mShowTooltipsCheckbox{ nullptr };
+   ClickButton* mCopyBuildInfoButton{ nullptr };
+   ClickButton* mDumpModuleInfoButton{ nullptr };
+   ClickButton* mDoModuleScreenshotsButton{ nullptr };
+   ClickButton* mDoModuleDocumentationButton{ nullptr };
+   ClickButton* mTutorialVideoLinkButton{ nullptr };
+   ClickButton* mDocsLinkButton{ nullptr };
+   ClickButton* mDiscordLinkButton{ nullptr };
+   float mWidth{ 700 };
+   float mHeight{ 700 };
    static bool sTooltipsLoaded;
    static std::list<ModuleTooltipInfo> sTooltips;
 
-   std::list<std::string> mScreenshotsToProcess;
-   IDrawableModule* mScreenshotModule;
+   std::list<ModuleFactory::Spawnable> mScreenshotsToProcess;
+   IDrawableModule* mScreenshotModule{ nullptr };
+
+   float mScrollOffsetY{ 0 };
+   float mMaxScrollAmount{ 0 };
+
+   enum class ScreenshotState
+   {
+      None,
+      WaitingForSpawn,
+      WaitingForScreenshot
+   };
+   ScreenshotState mScreenshotState{ ScreenshotState::None };
+   int mScreenshotCountdown{ 0 };
 };
 
 #endif /* defined(__Bespoke__HelpDisplay__) */

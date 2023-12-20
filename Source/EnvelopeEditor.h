@@ -40,7 +40,7 @@ class EnvelopeControl
 public:
    EnvelopeControl(ofVec2f position, ofVec2f dimensions);
    void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
-   void OnClicked(int x, int y, bool right);
+   void OnClicked(float x, float y, bool right);
    void MouseMoved(float x, float y);
    void MouseReleased();
    void Draw();
@@ -50,6 +50,7 @@ public:
    void SetPosition(ofVec2f pos) { mPosition = pos; }
    void SetDimensions(ofVec2f dim) { mDimensions = dim; }
    void SetFixedLengthMode(bool fixed) { mFixedLengthMode = fixed; }
+
 private:
    void AddVertex(float x, float y);
    float GetPreSustainTime();
@@ -58,19 +59,18 @@ private:
    float GetValueForY(float y);
    float GetXForTime(float time);
    float GetYForValue(float value);
-   
+
    ofVec2f mPosition;
    ofVec2f mDimensions;
-   ::ADSR* mAdsr;
-   ::ADSR mViewAdsr;
+   ::ADSR* mAdsr{ nullptr };
    ::ADSR mClickAdsr;
-   bool mClick;
+   bool mClick{ false };
    ofVec2f mClickStart;
-   float mViewLength;
-   int mHighlightPoint;
-   int mHighlightCurve;
-   double mLastClickTime;
-   bool mFixedLengthMode;
+   float mViewLength{ 2000 };
+   int mHighlightPoint{ -1 };
+   int mHighlightCurve{ -1 };
+   double mLastClickTime{ 0 };
+   bool mFixedLengthMode{ false };
 };
 
 class EnvelopeEditor : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IIntSliderListener
@@ -78,52 +78,71 @@ class EnvelopeEditor : public IDrawableModule, public IRadioButtonListener, publ
 public:
    EnvelopeEditor();
    static IDrawableModule* Create() { return new EnvelopeEditor(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
    void Delete() { delete this; }
    void DrawModule() override;
-   
+
    void SetEnabled(bool enabled) override {} //don't use this one
-   bool Enabled() const override { return true; }
+   bool IsEnabled() const override { return true; }
    bool HasTitleBar() const override { return mPinned; }
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
+
    bool IsPinned() const { return mPinned; }
    void SetADSRDisplay(ADSRDisplay* adsrDisplay);
    bool HasSpecialDelete() const override { return true; }
    void DoSpecialDelete() override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   
-   void GetModuleDimensions(float& width, float& height) override { width = 400; height = 300; }
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 protected:
    ~EnvelopeEditor();
-   
+
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void Pin();
-   
+
+   struct StageControls
+   {
+      FloatSlider* mTargetSlider{ nullptr };
+      FloatSlider* mTimeSlider{ nullptr };
+      FloatSlider* mCurveSlider{ nullptr };
+      Checkbox* mSustainCheckbox{ nullptr };
+      bool mIsSustainStage{ false };
+   };
+
    EnvelopeControl mEnvelopeControl;
-   
-   ADSRDisplay* mADSRDisplay;
-   ClickButton* mPinButton;
-   bool mPinned;
-   float mADSRViewLength;
-   FloatSlider* mADSRViewLengthSlider;
-   Checkbox* mHasSustainStageCheckbox;
-   IntSlider* mSustainStageSlider;
-   FloatSlider* mMaxSustainSlider;
-   Checkbox* mFreeReleaseLevelCheckbox;
-   PatchCableSource* mTargetCable;
+
+   float mWidth{ 320 };
+   float mHeight{ 210 };
+
+   ADSRDisplay* mADSRDisplay{ nullptr };
+   ClickButton* mPinButton{ nullptr };
+   bool mPinned{ false };
+   FloatSlider* mADSRViewLengthSlider{ nullptr };
+   FloatSlider* mMaxSustainSlider{ nullptr };
+   Checkbox* mFreeReleaseLevelCheckbox{ nullptr };
+   PatchCableSource* mTargetCable{ nullptr };
+   std::array<StageControls, 10> mStageControls{};
 };

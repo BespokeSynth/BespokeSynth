@@ -30,8 +30,6 @@
 #include "ModularSynth.h"
 
 FourOnTheFloor::FourOnTheFloor()
-: mTwoOnTheFloor(false)
-, mTwoOnTheFloorCheckbox(nullptr)
 {
 }
 
@@ -45,7 +43,7 @@ void FourOnTheFloor::Init()
 void FourOnTheFloor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTwoOnTheFloorCheckbox = new Checkbox(this,"two",4,2,&mTwoOnTheFloor);
+   mTwoOnTheFloorCheckbox = new Checkbox(this, "two", 4, 2, &mTwoOnTheFloor);
 }
 
 FourOnTheFloor::~FourOnTheFloor()
@@ -65,12 +63,12 @@ void FourOnTheFloor::OnTimeEvent(double time)
 {
    if (!mEnabled)
       return;
-   
+
    int kick = 0;
    PlayNoteOutput(time, kick, 127, -1);
 }
 
-void FourOnTheFloor::CheckboxUpdated(Checkbox* checkbox)
+void FourOnTheFloor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mTwoOnTheFloorCheckbox)
    {
@@ -100,4 +98,3 @@ void FourOnTheFloor::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

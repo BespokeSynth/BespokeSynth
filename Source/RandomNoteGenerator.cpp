@@ -30,19 +30,6 @@
 #include "ModularSynth.h"
 
 RandomNoteGenerator::RandomNoteGenerator()
-: mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mProbability(.5f)
-, mProbabilitySlider(nullptr)
-, mPitch(36)
-, mPitchSlider(nullptr)
-, mVelocity(.8f)
-, mVelocitySlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mSkip(1)
-, mSkipSlider(nullptr)
-, mSkipCount(0)
 {
 }
 
@@ -56,7 +43,7 @@ void RandomNoteGenerator::Init()
 void RandomNoteGenerator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mIntervalSelector = new DropdownList(this,"interval",5,2,((int*)(&mInterval)));
+   mIntervalSelector = new DropdownList(this, "interval", 5, 2, ((int*)(&mInterval)));
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -67,11 +54,11 @@ void RandomNoteGenerator::CreateUIControls()
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
-   mProbabilitySlider = new FloatSlider(this,"probability",5,20,100,15,&mProbability,0,1);
-   mPitchSlider = new IntSlider(this,"pitch",5,38,100,15,&mPitch,0,127);
-   mVelocitySlider = new FloatSlider(this,"velocity",5,56,100,15,&mVelocity,0,1);
-   mOffsetSlider = new FloatSlider(this,"offset",5,74,100,15,&mOffset,-1,1);
-   mSkipSlider = new IntSlider(this,"skip",mIntervalSelector, kAnchor_Right,60,15,&mSkip,1,10);
+   mProbabilitySlider = new FloatSlider(this, "probability", 5, 20, 100, 15, &mProbability, 0, 1);
+   mPitchSlider = new IntSlider(this, "pitch", 5, 38, 100, 15, &mPitch, 0, 127);
+   mVelocitySlider = new FloatSlider(this, "velocity", 5, 56, 100, 15, &mVelocity, 0, 1);
+   mOffsetSlider = new FloatSlider(this, "offset", 5, 74, 100, 15, &mOffset, -1, 1);
+   mSkipSlider = new IntSlider(this, "skip", mIntervalSelector, kAnchor_Right, 60, 15, &mSkip, 1, 10);
 }
 
 RandomNoteGenerator::~RandomNoteGenerator()
@@ -95,25 +82,25 @@ void RandomNoteGenerator::OnTimeEvent(double time)
 {
    if (!mEnabled)
       return;
-   
+
    ++mSkipCount;
-   
+
    mNoteOutput.Flush(time);
    if (mSkipCount >= mSkip)
    {
       mSkipCount = 0;
       if (mProbability >= ofRandom(1))
-         PlayNoteOutput(time, mPitch, mVelocity*127, -1);
+         PlayNoteOutput(time, mPitch, mVelocity * 127, -1);
    }
 }
 
-void RandomNoteGenerator::CheckboxUpdated(Checkbox* checkbox)
+void RandomNoteGenerator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mOffsetSlider)
    {
@@ -126,13 +113,13 @@ void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-void RandomNoteGenerator::IntSliderUpdated(IntSlider* slider, int oldVal)
+void RandomNoteGenerator::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mPitchSlider)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void RandomNoteGenerator::DropdownUpdated(DropdownList* list, int oldVal)
+void RandomNoteGenerator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -148,7 +135,7 @@ void RandomNoteGenerator::DropdownUpdated(DropdownList* list, int oldVal)
 void RandomNoteGenerator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

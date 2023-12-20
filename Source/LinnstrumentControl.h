@@ -45,13 +45,15 @@ public:
    LinnstrumentControl();
    virtual ~LinnstrumentControl();
    static IDrawableModule* Create() { return new LinnstrumentControl(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void Init() override;
    void Poll() override;
-   
+
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
@@ -73,72 +75,76 @@ public:
    };
 
    void SetGridColor(int x, int y, LinnstrumentColor color, bool ignoreRow = false);
-   
+
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
-   
+
    void OnScaleChanged() override;
-   
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-private:   
+
+   bool IsEnabled() const override { return true; }
+
+private:
    void InitController();
    void BuildControllerList();
-   
+
    void UpdateScaleDisplay();
    void SendScaleInfo();
    LinnstrumentColor GetDesiredGridColor(int x, int y);
    int GridToPitch(int x, int y);
    void SetPitchColor(int pitch, LinnstrumentColor color);
    void SendNRPN(int param, int value);
-   
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& w, float& h) override { w=190; h=7+17*4; }
-   
-   int mControllerIndex;
-   DropdownList* mControllerList;
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 190;
+      h = 7 + 17 * 4;
+   }
+
+   int mControllerIndex{ -1 };
+   DropdownList* mControllerList{ nullptr };
+
    struct NoteAge
    {
-      NoteAge() { mTime = 0; mColor = 0; mVoiceIndex = -1; }
-      double mTime;
-      int mColor;
-      int mVoiceIndex;
-      int mOutputPitch;
+      double mTime{ 0 };
+      int mColor{ 0 };
+      int mVoiceIndex{ -1 };
+      int mOutputPitch{ 0 };
       void Update(int pitch, LinnstrumentControl* linnstrument);
    };
-   
+
    static const int kRows = 8;
    static const int kCols = 25;
-   std::array<LinnstrumentColor, kRows*kCols> mGridColorState;
+   std::array<LinnstrumentColor, kRows * kCols> mGridColorState;
    std::array<NoteAge, 128> mNoteAge;
-   float mDecayMs;
-   FloatSlider* mDecaySlider;
-   bool mBlackout;
-   Checkbox* mBlackoutCheckbox;
-   bool mLightOctaves;
-   Checkbox* mLightOctavesCheckbox;
-   int mLinnstrumentOctave;
-   bool mGuitarLines;
-   Checkbox* mGuitarLinesCheckbox;
-   bool mControlPlayedLights;
-   
-   int mLastReceivedNRPNParamMSB;
-   int mLastReceivedNRPNParamLSB;
-   int mLastReceivedNRPNValueMSB;
-   int mLastReceivedNRPNValueLSB;
-   
+   float mDecayMs{ 500 };
+   FloatSlider* mDecaySlider{ nullptr };
+   bool mBlackout{ false };
+   Checkbox* mBlackoutCheckbox{ nullptr };
+   bool mLightOctaves{ false };
+   Checkbox* mLightOctavesCheckbox{ nullptr };
+   int mLinnstrumentOctave{ 5 };
+   bool mGuitarLines{ false };
+   Checkbox* mGuitarLinesCheckbox{ nullptr };
+   bool mControlPlayedLights{ true };
+
+   int mLastReceivedNRPNParamMSB{ 0 };
+   int mLastReceivedNRPNParamLSB{ 0 };
+   int mLastReceivedNRPNValueMSB{ 0 };
+   int mLastReceivedNRPNValueLSB{ 0 };
+
    std::array<ModulationParameters, kNumVoices> mModulators;
-   
-   double mRequestedOctaveTime;
-   
+
+   double mRequestedOctaveTime{ 0 };
+
    MidiDevice mDevice;
 };

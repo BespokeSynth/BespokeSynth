@@ -29,16 +29,13 @@
 #include "ModularSynth.h"
 
 PitchSetter::PitchSetter()
-: mPitch(36)
-, mPitchSlider(nullptr)
 {
-   SetEnabled(true);
 }
 
 void PitchSetter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPitchSlider = new IntSlider(this,"pitch",5,2,80,15,&mPitch,0,127);
+   mPitchSlider = new IntSlider(this, "pitch", 5, 2, 80, 15, &mPitch, 0, 127);
 }
 
 void PitchSetter::DrawModule()
@@ -46,26 +43,26 @@ void PitchSetter::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPitchSlider->Draw();
 }
 
-void PitchSetter::CheckboxUpdated(Checkbox* checkbox)
+void PitchSetter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal)
+void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mPitchSlider)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    ComputeSliders(0);
-   
+
    if (mEnabled)
       PlayNoteOutput(time, mPitch, velocity, voiceIdx, modulation);
    else
@@ -75,7 +72,7 @@ void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 void PitchSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

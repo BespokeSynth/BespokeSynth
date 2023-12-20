@@ -29,7 +29,6 @@
 
 InputChannel::InputChannel()
 : IAudioProcessor(gBufferSize)
-, mChannelSelectionIndex(0)
 {
 }
 
@@ -58,7 +57,7 @@ void InputChannel::Process(double time)
 
    if (!mEnabled)
       return;
-   
+
    int channelSelectionIndex = mChannelSelectionIndex;
 
    int numChannels = 1;
@@ -68,8 +67,8 @@ void InputChannel::Process(double time)
    SyncBuffers(numChannels);
 
    IAudioReceiver* target = GetTarget();
-   
-   if (mChannelSelectionIndex < mStereoSelectionOffset)  //mono
+
+   if (mChannelSelectionIndex < mStereoSelectionOffset) //mono
    {
       float* buffer = gZeroBuffer;
       int channel = mChannelSelectionIndex;
@@ -81,7 +80,7 @@ void InputChannel::Process(double time)
 
       GetVizBuffer()->WriteChunk(buffer, gBufferSize, 0);
    }
-   else  //stereo
+   else //stereo
    {
       float* buffer1 = gZeroBuffer;
       float* buffer2 = gZeroBuffer;
@@ -114,6 +113,7 @@ void InputChannel::DrawModule()
 
 void InputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadEnum<int>("channels", moduleInfo, 0, mChannelSelector);
    mModuleSaveData.LoadString("target", moduleInfo);
 
    SetUpFromSaveData();
@@ -121,6 +121,6 @@ void InputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void InputChannel::SetUpFromSaveData()
 {
+   mChannelSelectionIndex = mModuleSaveData.GetEnum<int>("channels");
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
-

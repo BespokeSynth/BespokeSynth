@@ -37,31 +37,33 @@ class PitchShiftEffect : public IAudioEffect, public IIntSliderListener, public 
 public:
    PitchShiftEffect();
    ~PitchShiftEffect();
-   
+
    static IAudioEffect* Create() { return new PitchShiftEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "pitchshift"; }
-   
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   
-   float mRatio;
-   FloatSlider* mRatioSlider;
-   int mRatioSelection;
-   RadioButton* mRatioSelector;
+
+   float mRatio{ 1 };
+   FloatSlider* mRatioSlider{ nullptr };
+   int mRatioSelection{ 10 };
+   RadioButton* mRatioSelector{ nullptr };
    PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
 };
 

@@ -31,9 +31,6 @@
 #include "UIControlMacros.h"
 
 MPESmoother::MPESmoother()
-: mPitchSmooth(0.02f)
-, mPressureSmooth(0.02f)
-, mModWheelSmooth(0.02f)
 {
 }
 
@@ -52,7 +49,7 @@ void MPESmoother::Init()
 void MPESmoother::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK(110);
    FLOATSLIDER(mPitchSmoothSlider, "pitch", &mPitchSmooth, 0, 1);
    FLOATSLIDER(mPressureSmoothSlider, "pressure", &mPressureSmooth, 0, 1);
@@ -68,7 +65,7 @@ void MPESmoother::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPitchSmoothSlider->Draw();
    mPressureSmoothSlider->Draw();
    mModWheelSmoothSlider->Draw();
@@ -82,47 +79,47 @@ void MPESmoother::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       if (velocity > 0 && modulation.pitchBend != nullptr)
          mModulationOutput[voiceIdx].mPitchBend.SetValue(modulation.pitchBend->GetValue(0));
       modulation.pitchBend = &mModulationOutput[voiceIdx].mPitchBend;
-      
+
       mModulationInput[voiceIdx].pressure = modulation.pressure;
       if (velocity > 0 && modulation.pressure != nullptr)
          mModulationOutput[voiceIdx].mPressure.SetValue(modulation.pressure->GetValue(0));
       modulation.pressure = &mModulationOutput[voiceIdx].mPressure;
-      
+
       mModulationInput[voiceIdx].modWheel = modulation.modWheel;
       if (velocity > 0 && modulation.modWheel != nullptr)
          mModulationOutput[voiceIdx].mModWheel.SetValue(modulation.modWheel->GetValue(0));
       modulation.modWheel = &mModulationOutput[voiceIdx].mModWheel;
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void MPESmoother::OnTransportAdvanced(float amount)
 {
    const float kSmoothTime = 100;
-   for (int i=0; i<kNumVoices; ++i)
+   for (int i = 0; i < kNumVoices; ++i)
    {
       if (mModulationInput[i].pitchBend != nullptr)
-         mModulationOutput[i].mPitchBend.RampValue(gTime, mModulationOutput[i].mPitchBend.GetValue(0), mModulationInput[i].pitchBend->GetValue(0), (amount * TheTransport->MsPerBar() * (mPitchSmooth*kSmoothTime)));
+         mModulationOutput[i].mPitchBend.RampValue(gTime, mModulationOutput[i].mPitchBend.GetValue(0), mModulationInput[i].pitchBend->GetValue(0), (amount * TheTransport->MsPerBar() * (mPitchSmooth * kSmoothTime)));
       if (mModulationInput[i].pressure != nullptr)
-         mModulationOutput[i].mPressure.RampValue(gTime, mModulationOutput[i].mPressure.GetValue(0), mModulationInput[i].pressure->GetValue(0), (amount * TheTransport->MsPerBar() * (mPressureSmooth*kSmoothTime)));
+         mModulationOutput[i].mPressure.RampValue(gTime, mModulationOutput[i].mPressure.GetValue(0), mModulationInput[i].pressure->GetValue(0), (amount * TheTransport->MsPerBar() * (mPressureSmooth * kSmoothTime)));
       if (mModulationInput[i].modWheel != nullptr)
-         mModulationOutput[i].mModWheel.RampValue(gTime, mModulationOutput[i].mModWheel.GetValue(0), mModulationInput[i].modWheel->GetValue(0), (amount * TheTransport->MsPerBar() * (mModWheelSmooth*kSmoothTime)));
+         mModulationOutput[i].mModWheel.RampValue(gTime, mModulationOutput[i].mModWheel.GetValue(0), mModulationInput[i].modWheel->GetValue(0), (amount * TheTransport->MsPerBar() * (mModWheelSmooth * kSmoothTime)));
    }
 }
 
-void MPESmoother::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MPESmoother::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void MPESmoother::CheckboxUpdated(Checkbox* checkbox)
+void MPESmoother::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
 void MPESmoother::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

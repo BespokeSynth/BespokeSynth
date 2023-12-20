@@ -38,12 +38,12 @@ class IDrawableModule;
 class SampleVoiceParams : public IVoiceParams
 {
 public:
-   ::ADSR mAdsr;
-   float mVol;
-   float* mSampleData;
-   int mSampleLength;
-   float mDetectedFreq;
-   bool mLoop;
+   ::ADSR mAdsr{ 10, 0, 1, 10 };
+   float mVol{ 1 };
+   float* mSampleData{ nullptr };
+   int mSampleLength{ 0 };
+   float mDetectedFreq{ -1 };
+   bool mLoop{ false };
 };
 
 class SampleVoice : public IMidiVoice
@@ -51,7 +51,7 @@ class SampleVoice : public IMidiVoice
 public:
    SampleVoice(IDrawableModule* owner = nullptr);
    ~SampleVoice();
-   
+
    // IMidiVoice
    void Start(double time, float amount) override;
    void Stop(double time) override;
@@ -59,11 +59,12 @@ public:
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
+
 private:
    ::ADSR mAdsr;
-   SampleVoiceParams* mVoiceParams;
-   float mPos;
-   IDrawableModule* mOwner;
+   SampleVoiceParams* mVoiceParams{};
+   float mPos{ 0 };
+   IDrawableModule* mOwner{ nullptr };
 };
 
 #endif /* defined(__modularSynth__SampleVoice__) */

@@ -33,13 +33,6 @@
 #include <algorithm>
 
 ValueStream::ValueStream()
-   : mUIControl(nullptr)
-   , mFloatSlider(nullptr)
-   , mControlCable(nullptr)
-   , mWidth(200)
-   , mHeight(120)
-   , mSpeed(1)
-   , mValueDisplayPointer(0)
 {
 }
 
@@ -60,7 +53,7 @@ void ValueStream::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .1f, 5);
+   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .4f, 5);
    ENDUIBLOCK0();
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mControlCable);
@@ -97,7 +90,7 @@ void ValueStream::DrawModule()
       for (int i = 0; i < mWidth; ++i)
       {
          float x = mWidth - i;
-         int samplesAgo = int(i  / (mSpeed / 200)) + 1;
+         int samplesAgo = int(i / (mSpeed / 200)) + 1;
          if (samplesAgo < mValues.size())
          {
             float y = ofMap(mValues[(mValueDisplayPointer - samplesAgo + mValues.size()) % mValues.size()], mFloatSlider->GetMin(), mFloatSlider->GetMax(), mHeight - 10, 10);
@@ -132,16 +125,12 @@ void ValueStream::Resize(float w, float h)
 
 void ValueStream::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   moduleInfo["uicontrol"] = mUIControl ? mUIControl->Path() : "";
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }
 
 void ValueStream::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("uicontrol", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, 200, 120, 1000);
    mModuleSaveData.LoadInt("height", moduleInfo, 120, 15, 1000);
 
@@ -150,39 +139,22 @@ void ValueStream::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ValueStream::SetUpFromSaveData()
 {
-   std::string controlPath = mModuleSaveData.GetString("uicontrol");
-   if (!controlPath.empty())
-   {
-      mUIControl = TheSynth->FindUIControl(controlPath);
-      if (mUIControl)
-         mControlCable->SetTarget(mUIControl);
-   }
-   else
-   {
-      mUIControl = nullptr;
-   }
-
    mWidth = mModuleSaveData.GetInt("width");
    mHeight = mModuleSaveData.GetInt("height");
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void ValueStream::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 }
 
-void ValueStream::LoadState(FileStreamIn& in)
+void ValueStream::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 }

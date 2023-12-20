@@ -37,8 +37,10 @@ class Neighborhooder : public NoteEffectBase, public IDrawableModule, public IIn
 public:
    Neighborhooder();
    static IDrawableModule* Create() { return new Neighborhooder(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -46,22 +48,27 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 120; height = 38; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 38;
+   }
 
-   int mMinPitch;
-   int mPitchRange;
-   IntSlider* mMinSlider;
-   IntSlider* mRangeSlider;
+   int mMinPitch{ 55 };
+   int mPitchRange{ 16 };
+   IntSlider* mMinSlider{ nullptr };
+   IntSlider* mRangeSlider{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Neighborhooder__) */
-

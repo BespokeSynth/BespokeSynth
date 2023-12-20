@@ -40,15 +40,17 @@ public:
    ValueStream();
    ~ValueStream();
    static IDrawableModule* Create() { return new ValueStream(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
-   
    void CreateUIControls() override;
 
    IUIControl* GetUIControl() const { return mUIControl; }
 
    void OnTransportAdvanced(float amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    //IDrawableModule
    void Init() override;
@@ -62,24 +64,26 @@ public:
    void SetUpFromSaveData() override;
 
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   IUIControl* mUIControl;
-   FloatSlider* mFloatSlider;
-   PatchCableSource* mControlCable;
-   float mWidth;
-   float mHeight;
-   float mSpeed;
-   FloatSlider* mSpeedSlider;
-   std::array<float, 100000> mValues;
-   int mValueDisplayPointer;
+   IUIControl* mUIControl{ nullptr };
+   FloatSlider* mFloatSlider{ nullptr };
+   PatchCableSource* mControlCable{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 120 };
+   float mSpeed{ 1 };
+   FloatSlider* mSpeedSlider{ nullptr };
+   std::array<float, 100000> mValues{};
+   int mValueDisplayPointer{ 0 };
 };

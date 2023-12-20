@@ -40,55 +40,58 @@ public:
    ModulatorExpression();
    virtual ~ModulatorExpression();
    static IDrawableModule* Create() { return new ModulatorExpression(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    //ITextEntryListener
    void TextEntryComplete(TextEntry* entry) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override;
-   bool Enabled() const override { return mEnabled; }
-   
-   float mExpressionInput;
-   FloatSlider* mExpressionInputSlider;
-   float mA;
-   FloatSlider* mASlider;
-   float mB;
-   FloatSlider* mBSlider;
-   float mC;
-   FloatSlider* mCSlider;
-   float mD;
-   FloatSlider* mDSlider;
-   float mE;
-   FloatSlider* mESlider;
-   
-   std::string mEntryString;
-   TextEntry* mTextEntry;
+
+   float mExpressionInput{ 0 };
+   FloatSlider* mExpressionInputSlider{ nullptr };
+   float mA{ 0 };
+   FloatSlider* mASlider{ nullptr };
+   float mB{ 0 };
+   FloatSlider* mBSlider{ nullptr };
+   float mC{ 0 };
+   FloatSlider* mCSlider{ nullptr };
+   float mD{ 0 };
+   FloatSlider* mDSlider{ nullptr };
+   float mE{ 0 };
+   FloatSlider* mESlider{ nullptr };
+
+   std::string mEntryString{ "x" };
+   TextEntry* mTextEntry{ nullptr };
    exprtk::symbol_table<float> mSymbolTable;
    exprtk::expression<float> mExpression;
    exprtk::symbol_table<float> mSymbolTableDraw;
    exprtk::expression<float> mExpressionDraw;
-   
-   float mExpressionInputDraw;
-   float mT;
-   bool mExpressionValid;
-   float mLastDrawMinOutput;
-   float mLastDrawMaxOutput;
+
+   float mExpressionInputDraw{ 0 };
+   float mT{ 0 };
+   bool mExpressionValid{ false };
+   float mLastDrawMinOutput{ 0 };
+   float mLastDrawMaxOutput{ 1 };
 };

@@ -40,27 +40,37 @@
 
 #define STUTTER_BLEND_WRAPAROUND_SAMPLES 100
 #define STUTTER_START_BLEND_MS 3
-#define STUTTER_BUFFER_SIZE 5*gSampleRate
+#define STUTTER_BUFFER_SIZE 5 * gSampleRate
 
 class Looper;
 class PatchCableSource;
 
 struct StutterParams
 {
-   StutterParams(NoteInterval _interval, float _speed) : interval(_interval), speedStart(_speed), speedEnd(_speed), speedBlendTime(0) {}
-   StutterParams(NoteInterval _interval, float _speedStart, float _speedEnd, float _speedBlendTime) : interval(_interval), speedStart(_speedStart), speedEnd(_speedEnd),speedBlendTime(_speedBlendTime) {}
+   StutterParams() {}
+   StutterParams(NoteInterval _interval, float _speed)
+   : interval(_interval)
+   , speedStart(_speed)
+   , speedEnd(_speed)
+   {}
+   StutterParams(NoteInterval _interval, float _speedStart, float _speedEnd, float _speedBlendTime)
+   : interval(_interval)
+   , speedStart(_speedStart)
+   , speedEnd(_speedEnd)
+   , speedBlendTime(_speedBlendTime)
+   {}
    bool operator==(const StutterParams& other) const
    {
       return interval == other.interval &&
-      speedStart == other.speedStart &&
-      speedEnd == other.speedEnd &&
-      speedBlendTime == other.speedBlendTime;
+             speedStart == other.speedStart &&
+             speedEnd == other.speedEnd &&
+             speedBlendTime == other.speedBlendTime;
    }
-   
-   NoteInterval interval;
-   float speedStart;
-   float speedEnd;
-   float speedBlendTime;
+
+   NoteInterval interval{ NoteInterval::kInterval_16n };
+   float speedStart{ 1 };
+   float speedEnd{ 1 };
+   float speedBlendTime{ 0 };
 };
 
 class Stutter : public ITimeListener
@@ -68,55 +78,54 @@ class Stutter : public ITimeListener
 public:
    Stutter();
    ~Stutter();
-   
+
    void Init();
-   
+
    void DrawStutterBuffer(float x, float y, float width, float height);
    void StartStutter(double time, StutterParams stutter);
    void EndStutter(double time, StutterParams stutter);
-   void SetEnabled(bool enabled);
-   
+   void SetEnabled(double time, bool enabled);
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer);
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   float mFreeStutterLength;
-   float mFreeStutterSpeed;
-   
+   float mFreeStutterLength{ .1 };
+   float mFreeStutterSpeed{ 1 };
+
 private:
    void DoCapture();
    float GetStutterSampleWithWraparoundBlend(int pos, int ch);
    void DoStutter(double time, StutterParams stutter);
    void StopStutter(double time);
    float GetBufferReadPos(float stutterPos);
-   
+
    RollingBuffer mRecordBuffer;
    ChannelBuffer mStutterBuffer;
-   
-   bool mEnabled;
-   bool mStuttering;
-   int mCaptureLength;
-   int mStutterLength;
+
+   bool mEnabled{ true };
+   bool mStuttering{ false };
+   int mCaptureLength{ 1 };
+   int mStutterLength{ 1 };
    Ramp mStutterSpeed;
-   float mStutterPos;
-   bool mAutoStutter;
-   Checkbox* mAutoCheckbox;
+   float mStutterPos{ 0 };
+   bool mAutoStutter{ false };
+   Checkbox* mAutoCheckbox{ nullptr };
    Ramp mBlendRamp;
    static bool sQuantize;
    ofMutex mMutex;
    StutterParams mCurrentStutter;
    static int sStutterSubdivide;
-   IntSlider* mSubdivideSlider;
-   JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels];
-   int mNanopadScene;
+   IntSlider* mSubdivideSlider{ nullptr };
+   JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels]{};
+   int mNanopadScene{ 0 };
    std::list<StutterParams> mStutterStack;
    Ramp mStutterLengthRamp;
-   bool mFadeStutter;
-   Checkbox* mFadeCheckbox;
+   bool mFadeStutter{ false };
+   Checkbox* mFadeCheckbox{ nullptr };
 };
 
 
 #endif /* defined(__modularSynth__Stutter__) */
-

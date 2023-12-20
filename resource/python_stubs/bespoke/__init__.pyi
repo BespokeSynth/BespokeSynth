@@ -6,7 +6,7 @@ def get_measure_time():
 def get_measure():
    pass
 
-def reset_transport(rewind_amount=.001f):
+def reset_transport():
    pass
 
 def get_step(subdivision):

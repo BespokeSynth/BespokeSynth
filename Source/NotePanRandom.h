@@ -37,40 +37,47 @@ class NotePanRandom : public NoteEffectBase, public IDrawableModule, public IFlo
 public:
    NotePanRandom();
    static IDrawableModule* Create() { return new NotePanRandom(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mSpread;
-   FloatSlider* mSpreadSlider;
-   float mCenter;
-   FloatSlider* mCenterSlider;
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   float mSpread{ 1 };
+   FloatSlider* mSpreadSlider{ nullptr };
+   float mCenter{ 0 };
+   FloatSlider* mCenterSlider{ nullptr };
+
    static const int kPanHistoryDisplaySize = 10;
    struct PanHistoryDisplayItem
    {
-      float time;
-      float pan;
+      float time{ -9999 };
+      float pan{ 0 };
    };
    PanHistoryDisplayItem mPanHistoryDisplay[kPanHistoryDisplaySize];
-   int mPanHistoryDisplayIndex;
-   
-   float mWidth;
-   float mHeight;
+   int mPanHistoryDisplayIndex{ 0 };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

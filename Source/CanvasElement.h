@@ -50,30 +50,30 @@ public:
    void DrawOffscreen();
    void SetHighlight(bool highlight) { mHighlighted = highlight; }
    bool GetHighlighted() const { return mHighlighted; }
-   ofRectangle GetRect(bool clamp, bool wrapped, ofVec2f offset = ofVec2f(0,0)) const;
+   ofRectangle GetRect(bool clamp, bool wrapped, ofVec2f offset = ofVec2f(0, 0)) const;
    float GetStart() const;
    void SetStart(float start, bool preserveLength);
    virtual float GetEnd() const;
    void SetEnd(float end);
    std::vector<IUIControl*>& GetUIControls() { return mUIControls; }
    void MoveElementByDrag(ofVec2f dragOffset);
-   
+
    virtual bool IsResizable() const { return true; }
    virtual CanvasElement* CreateDuplicate() const = 0;
-   
-   virtual void CheckboxUpdated(std::string label, bool value);
-   virtual void FloatSliderUpdated(std::string label, float oldVal, float newVal);
-   virtual void IntSliderUpdated(std::string label, int oldVal, float newVal);
-   virtual void ButtonClicked(std::string label);
-   
+
+   virtual void CheckboxUpdated(std::string label, bool value, double time);
+   virtual void FloatSliderUpdated(std::string label, float oldVal, float newVal, double time);
+   virtual void IntSliderUpdated(std::string label, int oldVal, float newVal, double time);
+   virtual void ButtonClicked(std::string label, double time);
+
    virtual void SaveState(FileStreamOut& out);
    virtual void LoadState(FileStreamIn& in);
-   
+
    int mRow;
    int mCol;
    float mOffset;
    float mLength;
-   
+
 protected:
    virtual void DrawContents(bool clamp, bool wrapped, ofVec2f offset) = 0;
    void DrawElement(bool clamp, bool wrapped, ofVec2f offset);
@@ -82,9 +82,9 @@ protected:
    ofRectangle GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const;
    float GetStart(int col, float offset) const;
    float GetEnd(int col, float offset, float length) const;
-   
-   Canvas* mCanvas;
-   bool mHighlighted;
+
+   Canvas* mCanvas{ nullptr };
+   bool mHighlighted{ false };
    std::vector<IUIControl*> mUIControls;
 };
 
@@ -92,7 +92,7 @@ class NoteCanvasElement : public CanvasElement
 {
 public:
    NoteCanvasElement(Canvas* canvas, int col, int row, float offset, float length);
-   static CanvasElement* Create(Canvas* canvas, int col, int row) { return new NoteCanvasElement(canvas,col,row,0,1); }
+   static CanvasElement* Create(Canvas* canvas, int col, int row) { return new NoteCanvasElement(canvas, col, row, 0, 1); }
    void SetVelocity(float vel) { mVelocity = vel; }
    float GetVelocity() const { return mVelocity; }
    void SetVoiceIdx(int voiceIdx) { mVoiceIdx = voiceIdx; }
@@ -103,30 +103,30 @@ public:
    float GetPan() { return mPan; }
    void UpdateModulation(float pos);
    void WriteModulation(float pos, float pitchBend, float modWheel, float pressure, float pan);
-   
+
    CanvasElement* CreateDuplicate() const override;
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
-   
-   float mVelocity;
-   FloatSlider* mElementOffsetSlider;
-   FloatSlider* mElementLengthSlider;
-   IntSlider* mElementRowSlider;
-   IntSlider* mElementColSlider;
-   FloatSlider* mVelocitySlider;
-   int mVoiceIdx;
-   ModulationChain mPitchBend;
-   ModulationChain mModWheel;
-   ModulationChain mPressure;
-   float mPan;
-   Curve mPitchBendCurve;
-   Curve mModWheelCurve;
-   Curve mPressureCurve;
-   Curve mPanCurve;
+
+   float mVelocity{ .8 };
+   FloatSlider* mElementOffsetSlider{ nullptr };
+   FloatSlider* mElementLengthSlider{ nullptr };
+   IntSlider* mElementRowSlider{ nullptr };
+   IntSlider* mElementColSlider{ nullptr };
+   FloatSlider* mVelocitySlider{ nullptr };
+   int mVoiceIdx{ -1 };
+   ModulationChain mPitchBend{ ModulationParameters::kDefaultPitchBend };
+   ModulationChain mModWheel{ ModulationParameters::kDefaultModWheel };
+   ModulationChain mPressure{ ModulationParameters::kDefaultPressure };
+   float mPan{ 0 };
+   Curve mPitchBendCurve{ ModulationParameters::kDefaultPitchBend };
+   Curve mModWheelCurve{ ModulationParameters::kDefaultModWheel };
+   Curve mPressureCurve{ ModulationParameters::kDefaultPressure };
+   Curve mPanCurve{ 0 };
 };
 
 class SampleCanvasElement : public CanvasElement
@@ -134,31 +134,31 @@ class SampleCanvasElement : public CanvasElement
 public:
    SampleCanvasElement(Canvas* canvas, int col, int row, float offset, float length);
    ~SampleCanvasElement();
-   static CanvasElement* Create(Canvas* canvas, int col, int row) { return new SampleCanvasElement(canvas,col,row,0,1); }
+   static CanvasElement* Create(Canvas* canvas, int col, int row) { return new SampleCanvasElement(canvas, col, row, 0, 1); }
    void SetSample(Sample* sample);
    Sample* GetSample() const { return mSample; }
    float GetVolume() const { return mVolume; }
    bool IsMuted() const { return mMute; }
-   
+
    CanvasElement* CreateDuplicate() const override;
-   
-   void CheckboxUpdated(std::string label, bool value) override;
-   void ButtonClicked(std::string label) override;
-   
+
+   void CheckboxUpdated(std::string label, bool value, double time) override;
+   void ButtonClicked(std::string label, double time) override;
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
-   
-   Sample* mSample;
-   FloatSlider* mElementOffsetSlider;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   bool mMute;
-   Checkbox* mMuteCheckbox;
-   ClickButton* mSplitSampleButton;
-   ClickButton* mResetSpeedButton;
+
+   Sample* mSample{ nullptr };
+   FloatSlider* mElementOffsetSlider{ nullptr };
+   float mVolume{ 1 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   bool mMute{ false };
+   Checkbox* mMuteCheckbox{ nullptr };
+   ClickButton* mSplitSampleButton{ nullptr };
+   ClickButton* mResetSpeedButton{ nullptr };
 };
 
 class EventCanvasElement : public CanvasElement
@@ -166,30 +166,30 @@ class EventCanvasElement : public CanvasElement
 public:
    EventCanvasElement(Canvas* canvas, int col, int row, float offset);
    ~EventCanvasElement();
-   static CanvasElement* Create(Canvas* canvas, int col, int row) { return new EventCanvasElement(canvas,col,row,0); }
-   
+   static CanvasElement* Create(Canvas* canvas, int col, int row) { return new EventCanvasElement(canvas, col, row, 0); }
+
    CanvasElement* CreateDuplicate() const override;
-   
+
    void SetUIControl(IUIControl* control);
    void SetValue(float value) { mValue = value; }
-   void Trigger();
-   void TriggerEnd();
-   
+   void Trigger(double time);
+   void TriggerEnd(double time);
+
    bool IsResizable() const override { return mIsCheckbox; }
    float GetEnd() const override;
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
-   
-   IUIControl* mUIControl;
-   float mValue;
-   TextEntry* mValueEntry;
-   EventCanvas* mEventCanvas;
-   bool mIsCheckbox;
-   bool mIsButton;
+
+   IUIControl* mUIControl{ nullptr };
+   float mValue{ 0 };
+   TextEntry* mValueEntry{ nullptr };
+   EventCanvas* mEventCanvas{ nullptr };
+   bool mIsCheckbox{ false };
+   bool mIsButton{ false };
 };
 
 #endif /* defined(__Bespoke__CanvasElement__) */

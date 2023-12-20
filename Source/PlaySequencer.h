@@ -46,12 +46,16 @@ public:
    PlaySequencer();
    ~PlaySequencer();
    static IDrawableModule* Create() { return new PlaySequencer(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
-   
    void CreateUIControls() override;
 
+   //IDrawableModule
    void Init() override;
-
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IClickable
@@ -69,32 +73,35 @@ public:
    void OnTimeEvent(double time) override;
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IDropdownListener
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void GetModuleDimensions(float& w, float& h) override;
+   void OnClicked(float x, float y, bool right) override;
 
+   void SetGridSize(float w, float h);
    int GetStep(double time);
    void UpdateInterval();
    void UpdateNumMeasures(int oldNumMeasures);
-   void UpdateLights(bool betweener=false);
+   void UpdateLights(bool betweener = false);
    int GetVelocityLevel();
 
    class NoteOffScheduler : public ITimeListener
@@ -102,55 +109,53 @@ private:
    public:
       //ITimeListener
       void OnTimeEvent(double time) override;
-      PlaySequencer* mOwner;
+      PlaySequencer* mOwner{ nullptr };
    };
 
-   NoteInterval mInterval;
-   int mNumMeasures;
-   bool mWrite;
-   bool mNoteRepeat;
-   bool mLinkColumns;
-   float mWidth;
-   float mHeight;
-   bool mUseLightVelocity;
-   bool mUseMedVelocity;
-   bool mClearLane;
-   bool mSustain;
-   float mVelocityFull;
-   float mVelocityMed;
-   float mVelocityLight;
-   
-   DropdownList* mIntervalSelector;
-   Checkbox* mWriteCheckbox;
-   Checkbox* mNoteRepeatCheckbox;
-   Checkbox* mLinkColumnsCheckbox;
-   DropdownList* mNumMeasuresSelector;
-   UIGrid* mGrid;
-   GridControlTarget* mGridControlTarget;
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   int mNumMeasures{ 1 };
+   bool mWrite{ false };
+   bool mNoteRepeat{ false };
+   bool mLinkColumns{ false };
+   float mWidth{ 240 };
+   float mHeight{ 20 };
+   bool mUseLightVelocity{ false };
+   bool mUseMedVelocity{ false };
+   bool mClearLane{ false };
+   bool mSustain{ false };
+   float mVelocityFull{ 1 };
+   float mVelocityMed{ .5 };
+   float mVelocityLight{ .25 };
+
+   DropdownList* mIntervalSelector{ nullptr };
+   Checkbox* mWriteCheckbox{ nullptr };
+   Checkbox* mNoteRepeatCheckbox{ nullptr };
+   Checkbox* mLinkColumnsCheckbox{ nullptr };
+   DropdownList* mNumMeasuresSelector{ nullptr };
+   UIGrid* mGrid{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
    NoteOffScheduler mNoteOffScheduler;
 
    struct PlayLane
    {
-      PlayLane() : mInputVelocity(0), mIsPlaying(false), mMuteOrErase(false) {}
-      int mInputVelocity;
-      bool mIsPlaying;
-      Checkbox* mMuteOrEraseCheckbox;
-      bool mMuteOrErase;
+      int mInputVelocity{ 0 };
+      bool mIsPlaying{ false };
+      Checkbox* mMuteOrEraseCheckbox{ nullptr };
+      bool mMuteOrErase{ false };
    };
 
    std::array<PlayLane, 16> mLanes;
 
    struct SavedPattern
    {
-      SavedPattern() : mNumMeasures(1), mHasSequence(false) {}
-      ClickButton* mStoreButton;
-      ClickButton* mLoadButton;
-      float mNumMeasures;
-      std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE> mData;
-      bool mHasSequence;
+      ClickButton* mStoreButton{ nullptr };
+      ClickButton* mLoadButton{ nullptr };
+      float mNumMeasures{ 1 };
+      std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
+      bool mHasSequence{ false };
    };
 
    std::array<SavedPattern, 5> mSavedPatterns;
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

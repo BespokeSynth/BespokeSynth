@@ -30,9 +30,9 @@
 FFT::FFT(int nfft)
 {
    mNfft = nfft;
-   mNumfreqs = nfft/2 + 1;
+   mNumfreqs = nfft / 2 + 1;
 
-   mFft_data = (float*) calloc(nfft, sizeof(float));
+   mFft_data = (float*)calloc(nfft, sizeof(float));
 }
 
 // Destructor for FFT routine
@@ -50,18 +50,20 @@ FFT::~FFT()
 //     size nfft/2 + 1
 void FFT::Forward(float* input, float* output_re, float* output_im)
 {
-   int hnfft = mNfft/2;
+   int hnfft = mNfft / 2;
 
-   for (int ti=0; ti<mNfft; ti++) {
+   for (int ti = 0; ti < mNfft; ti++)
+   {
       mFft_data[ti] = input[ti];
    }
 
    mayer_realfft(mNfft, mFft_data);
 
    output_im[0] = 0;
-   for (int ti=0; ti<hnfft; ti++) {
+   for (int ti = 0; ti < hnfft; ti++)
+   {
       output_re[ti] = mFft_data[ti];
-      output_im[ti] = mFft_data[mNfft-1-ti];
+      output_im[ti] = mFft_data[mNfft - 1 - ti];
    }
    output_re[hnfft] = mFft_data[hnfft];
    output_im[hnfft] = 0;
@@ -78,22 +80,22 @@ void FFT::Inverse(float* input_re, float* input_im, float* output)
 {
    int hnfft;
 
-   hnfft = mNfft/2;
+   hnfft = mNfft / 2;
 
-   for (int ti=0; ti<hnfft; ti++) {
+   for (int ti = 0; ti < hnfft; ti++)
+   {
       mFft_data[ti] = input_re[ti];
-      mFft_data[mNfft-1-ti] = input_im[ti];
+      mFft_data[mNfft - 1 - ti] = input_im[ti];
    }
    mFft_data[hnfft] = input_re[hnfft];
 
    mayer_realifft(mNfft, mFft_data);
 
-   for (int ti=0; ti<mNfft; ti++) {
+   for (int ti = 0; ti < mNfft; ti++)
+   {
       output[ti] = mFft_data[ti];
    }
 }
-
-
 
 
 /* This is the FFT routine taken from PureData, a great piece of
@@ -159,58 +161,67 @@ void FFT::Inverse(float* input_re, float* input_im, float* output)
 #endif
 
 #if defined(GOOD_TRIG)
-#define FHT_SWAP(a,b,t) {(t)=(a);(a)=(b);(b)=(t);}
-#define TRIG_VARS                                                \
-int t_lam=0;
-#define TRIG_INIT(k,c,s)                                         \
-{                                                           \
-int i;                                                     \
-for (i=2 ; i<=k ; i++)                                     \
-{coswrk[i]=costab[i];sinwrk[i]=sintab[i];}             \
-t_lam = 0;                                                 \
-c = 1;                                                     \
-s = 0;                                                     \
-}
-#define TRIG_NEXT(k,c,s)                                         \
-{                                                           \
-int i,j;                                                \
-(t_lam)++;                                              \
-for (i=0 ; !((1<<i)&t_lam) ; i++);                      \
-i = k-i;                                                \
-s = sinwrk[i];                                          \
-c = coswrk[i];                                          \
-if (i>1)                                                \
-{                                                    \
-for (j=k-i+2 ; (1<<j)&t_lam ; j++);                 \
-j         = k - j;                                  \
-sinwrk[i] = halsec[i] * (sinwrk[i-1] + sinwrk[j]);  \
-coswrk[i] = halsec[i] * (coswrk[i-1] + coswrk[j]);  \
-}                                                    \
-}
-#define TRIG_RESET(k,c,s)
+#define FHT_SWAP(a, b, t) \
+   {                      \
+      (t) = (a);          \
+      (a) = (b);          \
+      (b) = (t);          \
+   }
+#define TRIG_VARS \
+   int t_lam = 0;
+#define TRIG_INIT(k, c, s)      \
+   {                            \
+      int i;                    \
+      for (i = 2; i <= k; i++)  \
+      {                         \
+         coswrk[i] = costab[i]; \
+         sinwrk[i] = sintab[i]; \
+      }                         \
+      t_lam = 0;                \
+      c = 1;                    \
+      s = 0;                    \
+   }
+#define TRIG_NEXT(k, c, s)                                    \
+   {                                                          \
+      int i, j;                                               \
+      (t_lam)++;                                              \
+      for (i = 0; !((1 << i) & t_lam); i++)                   \
+         ;                                                    \
+      i = k - i;                                              \
+      s = sinwrk[i];                                          \
+      c = coswrk[i];                                          \
+      if (i > 1)                                              \
+      {                                                       \
+         for (j = k - i + 2; (1 << j) & t_lam; j++)           \
+            ;                                                 \
+         j = k - j;                                           \
+         sinwrk[i] = halsec[i] * (sinwrk[i - 1] + sinwrk[j]); \
+         coswrk[i] = halsec[i] * (coswrk[i - 1] + coswrk[j]); \
+      }                                                       \
+   }
+#define TRIG_RESET(k, c, s)
 #endif
 
 #if defined(FAST_TRIG)
-#define TRIG_VARS                                        \
-REAL t_c,t_s;
-#define TRIG_INIT(k,c,s)                                 \
-{                                                    \
-t_c  = costab[k];                                   \
-t_s  = sintab[k];                                   \
-c    = 1;                                           \
-s    = 0;                                           \
-}
-#define TRIG_NEXT(k,c,s)                                 \
-{                                                    \
-REAL t = c;                                         \
-c   = t*t_c - s*t_s;                                \
-s   = t*t_s + s*t_c;                                \
-}
-#define TRIG_RESET(k,c,s)
+#define TRIG_VARS \
+   REAL t_c, t_s;
+#define TRIG_INIT(k, c, s) \
+   {                       \
+      t_c = costab[k];     \
+      t_s = sintab[k];     \
+      c = 1;               \
+      s = 0;               \
+   }
+#define TRIG_NEXT(k, c, s)   \
+   {                         \
+      REAL t = c;            \
+      c = t * t_c - s * t_s; \
+      s = t * t_s + s * t_c; \
+   }
+#define TRIG_RESET(k, c, s)
 #endif
 
-static REAL halsec[20]=
-{
+static REAL halsec[20] = {
    0,
    0,
    .54119610014619698439972320536638942006107206337801,
@@ -228,8 +239,7 @@ static REAL halsec[20]=
    .50000000229794635411562887767906868558991922348920,
    .50000000057448658687873302235147272458812263401372
 };
-static REAL costab[20]=
-{
+static REAL costab[20] = {
    .00000000000000000000000000000000000000000000000000,
    .70710678118654752440084436210484903928483593768847,
    .92387953251128675612818318939678828682241662586364,
@@ -247,8 +257,7 @@ static REAL costab[20]=
    .99999999540410731289097193313960614895889430318945,
    .99999999885102682756267330779455410840053741619428
 };
-static REAL sintab[20]=
-{
+static REAL sintab[20] = {
    1.0000000000000000000000000000000000000000000000000,
    .70710678118654752440084436210484903928483593768846,
    .38268343236508977172845998403039886676134456248561,
@@ -266,8 +275,7 @@ static REAL sintab[20]=
    .00009587379909597734587051721097647635118706561284,
    .00004793689960306688454900399049465887274686668768
 };
-static REAL coswrk[20]=
-{
+static REAL coswrk[20] = {
    .00000000000000000000000000000000000000000000000000,
    .70710678118654752440084436210484903928483593768847,
    .92387953251128675612818318939678828682241662586364,
@@ -285,8 +293,7 @@ static REAL coswrk[20]=
    .99999999540410731289097193313960614895889430318945,
    .99999999885102682756267330779455410840053741619428
 };
-static REAL sinwrk[20]=
-{
+static REAL sinwrk[20] = {
    1.0000000000000000000000000000000000000000000000000,
    .70710678118654752440084436210484903928483593768846,
    .38268343236508977172845998403039886676134456248561,
@@ -306,214 +313,239 @@ static REAL sinwrk[20]=
 };
 
 
-#define SQRT2_2   0.70710678118654752440084436210484
-#define SQRT2   2*0.70710678118654752440084436210484
+#define SQRT2_2 0.70710678118654752440084436210484
+#define SQRT2 2 * 0.70710678118654752440084436210484
 
-void mayer_fht(REAL *fz, int n)
+void mayer_fht(REAL* fz, int n)
 {
    /*  REAL a,b;
     REAL c1,s1,s2,c2,s3,c3,s4,c4;
     REAL f0,g0,f1,g1,f2,g2,f3,g3; */
-   int  k,k1,k2,k3,k4,kx;
-   REAL *fi,*fn,*gi;
+   int k, k1, k2, k3, k4, kx;
+   REAL *fi, *fn, *gi;
    TRIG_VARS;
 
-   for (k1=1,k2=0;k1<n;k1++)
+   for (k1 = 1, k2 = 0; k1 < n; k1++)
    {
       REAL aa;
-      for (k=n>>1; (!((k2^=k)&k)); k>>=1);
-      if (k1>k2)
+      for (k = n >> 1; (!((k2 ^= k) & k)); k >>= 1)
+         ;
+      if (k1 > k2)
       {
-         aa=fz[k1];fz[k1]=fz[k2];fz[k2]=aa;
+         aa = fz[k1];
+         fz[k1] = fz[k2];
+         fz[k2] = aa;
       }
    }
-   for ( k=0 ; (1<<k)<n ; k++ );
-   k  &= 1;
-   if (k==0)
+   for (k = 0; (1 << k) < n; k++)
+      ;
+   k &= 1;
+   if (k == 0)
    {
-      for (fi=fz,fn=fz+n;fi<fn;fi+=4)
+      for (fi = fz, fn = fz + n; fi < fn; fi += 4)
       {
-         REAL f0,f1,f2,f3;
-         f1     = fi[0 ]-fi[1 ];
-         f0     = fi[0 ]+fi[1 ];
-         f3     = fi[2 ]-fi[3 ];
-         f2     = fi[2 ]+fi[3 ];
-         fi[2 ] = (f0-f2);
-         fi[0 ] = (f0+f2);
-         fi[3 ] = (f1-f3);
-         fi[1 ] = (f1+f3);
+         REAL f0, f1, f2, f3;
+         f1 = fi[0] - fi[1];
+         f0 = fi[0] + fi[1];
+         f3 = fi[2] - fi[3];
+         f2 = fi[2] + fi[3];
+         fi[2] = (f0 - f2);
+         fi[0] = (f0 + f2);
+         fi[3] = (f1 - f3);
+         fi[1] = (f1 + f3);
       }
    }
    else
    {
-      for (fi=fz,fn=fz+n,gi=fi+1;fi<fn;fi+=8,gi+=8)
+      for (fi = fz, fn = fz + n, gi = fi + 1; fi < fn; fi += 8, gi += 8)
       {
-         REAL bs1,bc1,bs2,bc2,bs3,bc3,bs4,bc4,
-         bg0,bf0,bf1,bg1,bf2,bg2,bf3,bg3;
-         bc1     = fi[0 ] - gi[0 ];
-         bs1     = fi[0 ] + gi[0 ];
-         bc2     = fi[2 ] - gi[2 ];
-         bs2     = fi[2 ] + gi[2 ];
-         bc3     = fi[4 ] - gi[4 ];
-         bs3     = fi[4 ] + gi[4 ];
-         bc4     = fi[6 ] - gi[6 ];
-         bs4     = fi[6 ] + gi[6 ];
-         bf1     = (bs1 - bs2);
-         bf0     = (bs1 + bs2);
-         bg1     = (bc1 - bc2);
-         bg0     = (bc1 + bc2);
-         bf3     = (bs3 - bs4);
-         bf2     = (bs3 + bs4);
-         bg3     = SQRT2*bc4;
-         bg2     = SQRT2*bc3;
-         fi[4 ] = bf0 - bf2;
-         fi[0 ] = bf0 + bf2;
-         fi[6 ] = bf1 - bf3;
-         fi[2 ] = bf1 + bf3;
-         gi[4 ] = bg0 - bg2;
-         gi[0 ] = bg0 + bg2;
-         gi[6 ] = bg1 - bg3;
-         gi[2 ] = bg1 + bg3;
+         REAL bs1, bc1, bs2, bc2, bs3, bc3, bs4, bc4,
+         bg0, bf0, bf1, bg1, bf2, bg2, bf3, bg3;
+         bc1 = fi[0] - gi[0];
+         bs1 = fi[0] + gi[0];
+         bc2 = fi[2] - gi[2];
+         bs2 = fi[2] + gi[2];
+         bc3 = fi[4] - gi[4];
+         bs3 = fi[4] + gi[4];
+         bc4 = fi[6] - gi[6];
+         bs4 = fi[6] + gi[6];
+         bf1 = (bs1 - bs2);
+         bf0 = (bs1 + bs2);
+         bg1 = (bc1 - bc2);
+         bg0 = (bc1 + bc2);
+         bf3 = (bs3 - bs4);
+         bf2 = (bs3 + bs4);
+         bg3 = SQRT2 * bc4;
+         bg2 = SQRT2 * bc3;
+         fi[4] = bf0 - bf2;
+         fi[0] = bf0 + bf2;
+         fi[6] = bf1 - bf3;
+         fi[2] = bf1 + bf3;
+         gi[4] = bg0 - bg2;
+         gi[0] = bg0 + bg2;
+         gi[6] = bg1 - bg3;
+         gi[2] = bg1 + bg3;
       }
    }
-   if (n<16) return;
+   if (n < 16)
+      return;
 
    do
    {
-      REAL s1,c1;
+      REAL s1, c1;
       int ii;
-      k  += 2;
-      k1  = 1  << k;
-      k2  = k1 << 1;
-      k4  = k2 << 1;
-      k3  = k2 + k1;
-      kx  = k1 >> 1;
-      fi  = fz;
-      gi  = fi + kx;
-      fn  = fz + n;
+      k += 2;
+      k1 = 1 << k;
+      k2 = k1 << 1;
+      k4 = k2 << 1;
+      k3 = k2 + k1;
+      kx = k1 >> 1;
+      fi = fz;
+      gi = fi + kx;
+      fn = fz + n;
       do
       {
-         REAL g0,f0,f1,g1,f2,g2,f3,g3;
-         f1      = fi[0 ] - fi[k1];
-         f0      = fi[0 ] + fi[k1];
-         f3      = fi[k2] - fi[k3];
-         f2      = fi[k2] + fi[k3];
-         fi[k2]  = f0         - f2;
-         fi[0 ]  = f0         + f2;
-         fi[k3]  = f1         - f3;
-         fi[k1]  = f1         + f3;
-         g1      = gi[0 ] - gi[k1];
-         g0      = gi[0 ] + gi[k1];
-         g3      = SQRT2  * gi[k3];
-         g2      = SQRT2  * gi[k2];
-         gi[k2]  = g0         - g2;
-         gi[0 ]  = g0         + g2;
-         gi[k3]  = g1         - g3;
-         gi[k1]  = g1         + g3;
-         gi     += k4;
-         fi     += k4;
-      } while (fi<fn);
-      TRIG_INIT(k,c1,s1);
-      for (ii=1;ii<kx;ii++)
+         REAL g0, f0, f1, g1, f2, g2, f3, g3;
+         f1 = fi[0] - fi[k1];
+         f0 = fi[0] + fi[k1];
+         f3 = fi[k2] - fi[k3];
+         f2 = fi[k2] + fi[k3];
+         fi[k2] = f0 - f2;
+         fi[0] = f0 + f2;
+         fi[k3] = f1 - f3;
+         fi[k1] = f1 + f3;
+         g1 = gi[0] - gi[k1];
+         g0 = gi[0] + gi[k1];
+         g3 = SQRT2 * gi[k3];
+         g2 = SQRT2 * gi[k2];
+         gi[k2] = g0 - g2;
+         gi[0] = g0 + g2;
+         gi[k3] = g1 - g3;
+         gi[k1] = g1 + g3;
+         gi += k4;
+         fi += k4;
+      } while (fi < fn);
+      TRIG_INIT(k, c1, s1);
+      for (ii = 1; ii < kx; ii++)
       {
-         REAL c2,s2;
-         TRIG_NEXT(k,c1,s1);
-         c2 = c1*c1 - s1*s1;
-         s2 = 2*(c1*s1);
+         REAL c2, s2;
+         TRIG_NEXT(k, c1, s1);
+         c2 = c1 * c1 - s1 * s1;
+         s2 = 2 * (c1 * s1);
          fn = fz + n;
-         fi = fz +ii;
-         gi = fz +k1-ii;
+         fi = fz + ii;
+         gi = fz + k1 - ii;
          do
          {
-            REAL a,b,g0,f0,f1,g1,f2,g2,f3,g3;
-            b       = s2*fi[k1] - c2*gi[k1];
-            a       = c2*fi[k1] + s2*gi[k1];
-            f1      = fi[0 ]    - a;
-            f0      = fi[0 ]    + a;
-            g1      = gi[0 ]    - b;
-            g0      = gi[0 ]    + b;
-            b       = s2*fi[k3] - c2*gi[k3];
-            a       = c2*fi[k3] + s2*gi[k3];
-            f3      = fi[k2]    - a;
-            f2      = fi[k2]    + a;
-            g3      = gi[k2]    - b;
-            g2      = gi[k2]    + b;
-            b       = s1*f2     - c1*g3;
-            a       = c1*f2     + s1*g3;
-            fi[k2]  = f0        - a;
-            fi[0 ]  = f0        + a;
-            gi[k3]  = g1        - b;
-            gi[k1]  = g1        + b;
-            b       = c1*g2     - s1*f3;
-            a       = s1*g2     + c1*f3;
-            gi[k2]  = g0        - a;
-            gi[0 ]  = g0        + a;
-            fi[k3]  = f1        - b;
-            fi[k1]  = f1        + b;
-            gi     += k4;
-            fi     += k4;
-         } while (fi<fn);
+            REAL a, b, g0, f0, f1, g1, f2, g2, f3, g3;
+            b = s2 * fi[k1] - c2 * gi[k1];
+            a = c2 * fi[k1] + s2 * gi[k1];
+            f1 = fi[0] - a;
+            f0 = fi[0] + a;
+            g1 = gi[0] - b;
+            g0 = gi[0] + b;
+            b = s2 * fi[k3] - c2 * gi[k3];
+            a = c2 * fi[k3] + s2 * gi[k3];
+            f3 = fi[k2] - a;
+            f2 = fi[k2] + a;
+            g3 = gi[k2] - b;
+            g2 = gi[k2] + b;
+            b = s1 * f2 - c1 * g3;
+            a = c1 * f2 + s1 * g3;
+            fi[k2] = f0 - a;
+            fi[0] = f0 + a;
+            gi[k3] = g1 - b;
+            gi[k1] = g1 + b;
+            b = c1 * g2 - s1 * f3;
+            a = s1 * g2 + c1 * f3;
+            gi[k2] = g0 - a;
+            gi[0] = g0 + a;
+            fi[k3] = f1 - b;
+            fi[k1] = f1 + b;
+            gi += k4;
+            fi += k4;
+         } while (fi < fn);
       }
-      TRIG_RESET(k,c1,s1);
-   } while (k4<n);
+      TRIG_RESET(k, c1, s1);
+   } while (k4 < n);
 }
 
-void mayer_fft(int n, REAL *real, REAL *imag)
+void mayer_fft(int n, REAL* real, REAL* imag)
 {
-   REAL a,b,c,d;
-   REAL q,r,s,t;
-   int i,j,k;
-   for (i=1,j=n-1,k=n/2;i<k;i++,j--) {
-      a = real[i]; b = real[j];  q=a+b; r=a-b;
-      c = imag[i]; d = imag[j];  s=c+d; t=c-d;
-      real[i] = (q+t)*.5; real[j] = (q-t)*.5;
-      imag[i] = (s-r)*.5; imag[j] = (s+r)*.5;
-   }
-   mayer_fht(real,n);
-   mayer_fht(imag,n);
-}
-
-void mayer_ifft(int n, REAL *real, REAL *imag)
-{
-   REAL a,b,c,d;
-   REAL q,r,s,t;
-   int i,j,k;
-   mayer_fht(real,n);
-   mayer_fht(imag,n);
-   for (i=1,j=n-1,k=n/2;i<k;i++,j--) {
-      a = real[i]; b = real[j];  q=a+b; r=a-b;
-      c = imag[i]; d = imag[j];  s=c+d; t=c-d;
-      imag[i] = (s+r)*0.5;  imag[j] = (s-r)*0.5;
-      real[i] = (q-t)*0.5;  real[j] = (q+t)*0.5;
-   }
-}
-
-void mayer_realfft(int n, REAL *real)
-{
-   REAL a,b;
-   int i,j,k;
-
-   mayer_fht(real,n);
-   for (i=1,j=n-1,k=n/2;i<k;i++,j--) {
+   REAL a, b, c, d;
+   REAL q, r, s, t;
+   int i, j, k;
+   for (i = 1, j = n - 1, k = n / 2; i < k; i++, j--)
+   {
       a = real[i];
       b = real[j];
-      real[j] = (a-b)*0.5;
-      real[i] = (a+b)*0.5;
+      q = a + b;
+      r = a - b;
+      c = imag[i];
+      d = imag[j];
+      s = c + d;
+      t = c - d;
+      real[i] = (q + t) * .5;
+      real[j] = (q - t) * .5;
+      imag[i] = (s - r) * .5;
+      imag[j] = (s + r) * .5;
+   }
+   mayer_fht(real, n);
+   mayer_fht(imag, n);
+}
+
+void mayer_ifft(int n, REAL* real, REAL* imag)
+{
+   REAL a, b, c, d;
+   REAL q, r, s, t;
+   int i, j, k;
+   mayer_fht(real, n);
+   mayer_fht(imag, n);
+   for (i = 1, j = n - 1, k = n / 2; i < k; i++, j--)
+   {
+      a = real[i];
+      b = real[j];
+      q = a + b;
+      r = a - b;
+      c = imag[i];
+      d = imag[j];
+      s = c + d;
+      t = c - d;
+      imag[i] = (s + r) * 0.5;
+      imag[j] = (s - r) * 0.5;
+      real[i] = (q - t) * 0.5;
+      real[j] = (q + t) * 0.5;
    }
 }
 
-void mayer_realifft(int n, REAL *real)
+void mayer_realfft(int n, REAL* real)
 {
-   REAL a,b;
-   int i,j,k;
+   REAL a, b;
+   int i, j, k;
 
-   for (i=1,j=n-1,k=n/2;i<k;i++,j--) {
+   mayer_fht(real, n);
+   for (i = 1, j = n - 1, k = n / 2; i < k; i++, j--)
+   {
       a = real[i];
       b = real[j];
-      real[j] = (a-b);
-      real[i] = (a+b);
+      real[j] = (a - b) * 0.5;
+      real[i] = (a + b) * 0.5;
    }
-   mayer_fht(real,n);
+}
+
+void mayer_realifft(int n, REAL* real)
+{
+   REAL a, b;
+   int i, j, k;
+
+   for (i = 1, j = n - 1, k = n / 2; i < k; i++, j--)
+   {
+      a = real[i];
+      b = real[j];
+      real[j] = (a - b);
+      real[i] = (a + b);
+   }
+   mayer_fht(real, n);
 }
 
 void FFTData::Clear()
@@ -522,4 +554,3 @@ void FFTData::Clear()
    std::memset(mImaginaryValues, 0, mFreqDomainSize * sizeof(float));
    std::memset(mTimeDomain, 0, mWindowSize * sizeof(float));
 }
-

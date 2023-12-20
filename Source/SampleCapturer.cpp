@@ -35,11 +35,7 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 SampleCapturer::SampleCapturer()
-   : IAudioProcessor(gBufferSize)
-   , mCurrentSampleIndex(0)
-   , mWantRecord(false)
-   , mIsRecording(false)
-   , mIsDragging(false)
+: IAudioProcessor(gBufferSize)
 {
 }
 
@@ -176,7 +172,7 @@ void SampleCapturer::DrawModule()
       if (mCurrentSampleIndex == i)
          ofSetColor(ofColor::white);
       else
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Audio));
+         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Audio));
       ofRect(5, y, kBufferWidth, kBufferHeight);
 
       if (i == mCurrentSampleIndex)
@@ -196,7 +192,7 @@ void SampleCapturer::DrawModule()
    mDeleteButton->Draw();
 }
 
-void SampleCapturer::ButtonClicked(ClickButton* button)
+void SampleCapturer::ButtonClicked(ClickButton* button, double time)
 {
    using namespace juce;
    if (button == mPlayButton)
@@ -206,7 +202,7 @@ void SampleCapturer::ButtonClicked(ClickButton* button)
 
    if (button == mSaveButton)
    {
-      FileChooser chooser("Save sample as...", File(ofToDataPath(ofGetTimestampString("samples/%Y-%m-%d_%H-%M.wav"))), "*.wav", true, false, TheSynth->GetFileChooserParent());
+      FileChooser chooser("Save sample as...", File(ofToDataPath(ofGetTimestampString("samples/%Y-%m-%d_%H-%M-%S.wav"))), "*.wav", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
          Sample::WriteDataToFile(chooser.getResult().getFullPathName().toStdString(), &mSamples[mCurrentSampleIndex].mBuffer, mSamples[mCurrentSampleIndex].mRecordingLength);
    }
@@ -224,7 +220,7 @@ void SampleCapturer::GetModuleDimensions(float& w, float& h)
    h = (int)mSamples.size() * (kBufferHeight + kBufferSpacing) + kBufferStartY;
 }
 
-void SampleCapturer::OnClicked(int x, int y, bool right)
+void SampleCapturer::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -263,7 +259,6 @@ bool SampleCapturer::MouseMoved(float x, float y)
 
    if (mIsDragging)
    {
-
    }
 
    return false;
@@ -281,28 +276,23 @@ void SampleCapturer::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void SampleCapturer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    for (int i = 0; i < mSamples.size(); ++i)
       mSamples[i].mBuffer.Save(out, mSamples[i].mBuffer.BufferSize());
 }
 
-void SampleCapturer::LoadState(FileStreamIn& in)
+void SampleCapturer::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int readLength;
    for (int i = 0; i < mSamples.size(); ++i)

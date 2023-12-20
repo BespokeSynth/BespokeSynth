@@ -40,8 +40,10 @@ public:
    Metronome();
    ~Metronome();
    static IDrawableModule* Create() { return new Metronome(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
 
@@ -51,33 +53,37 @@ public:
 
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override {}
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& width, float& height) override { width=80; height=35; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 80;
+      height = 35;
+   }
 
-   float mPhase;
-   float mPhaseInc;
+   float mPhase{ 0 };
+   float mPhaseInc{ 0 };
 
-   
-   EnvOscillator mOsc;
-   
-   float mVolume;
-   FloatSlider* mVolumeSlider;
 
-   TransportListenerInfo* mTransportListenerInfo;
+   EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
+
+   float mVolume{ .5 };
+   FloatSlider* mVolumeSlider{ nullptr };
+
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Metronome__) */
-

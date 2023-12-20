@@ -38,10 +38,10 @@ class Muter : public IAudioEffect, public IFloatSliderListener
 public:
    Muter();
    virtual ~Muter();
-   
+
    static IAudioEffect* Create() { return new Muter(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -49,25 +49,27 @@ public:
    void SetEnabled(bool enabled) override {}
    std::string GetType() override { return "muter"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
+   bool IsEnabled() const override { return true; }
 
 private:
-   void Go();
-
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=80; h=38; }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 80;
+      h = 38;
+   }
 
-   bool mPass;
+   bool mPass{ false };
 
-   Checkbox* mPassCheckbox;
+   Checkbox* mPassCheckbox{ nullptr };
    Ramp mRamp;
-   float mRampTimeMs;
-   FloatSlider* mRampTimeSlider;
+   float mRampTimeMs{ 3 };
+   FloatSlider* mRampTimeSlider{ nullptr };
 };
 
 
 #endif /* defined(__modularSynth__Muter__) */
-

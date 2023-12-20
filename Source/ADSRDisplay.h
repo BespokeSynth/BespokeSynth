@@ -45,29 +45,44 @@ public:
    void SetVol(float vol) { mVol = vol; }
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
    float GetMaxTime() const { return mMaxTime; }
+   float& GetMaxTime() { return mMaxTime; }
    void SetMaxTime(float maxTime);
    void SetADSR(::ADSR* adsr);
    ::ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
    void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
-   void SetShowing(bool showing) override { IUIControl::SetShowing(showing); UpdateSliderVisibility(); }
-   
+   void SetDimensions(float w, float h)
+   {
+      mWidth = w;
+      mHeight = h;
+   }
+   void SetShowing(bool showing) override
+   {
+      IUIControl::SetShowing(showing);
+      UpdateSliderVisibility();
+   }
+   FloatSlider* GetASlider() { return mASlider; }
+   FloatSlider* GetDSlider() { return mDSlider; }
+   FloatSlider* GetSSlider() { return mSSlider; }
+   FloatSlider* GetRSlider() { return mRSlider; }
+
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time, bool forceUpdate = false) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
-   
+   bool GetNoHover() const override { return true; }
+
    enum DisplayMode
    {
       kDisplayEnvelope,
       kDisplaySliders
    };
    static void ToggleDisplayMode();
-   
+
 protected:
-   ~ADSRDisplay();   //protected so that it can't be created on the stack
+   ~ADSRDisplay(); //protected so that it can't be created on the stack
 
 private:
    enum AdjustParam
@@ -79,30 +94,38 @@ private:
       kAdjustNone,
       kAdjustAttackAR,
       kAdjustReleaseAR,
-   } mAdjustMode;
+      kAdjustViewLength
+   } mAdjustMode{ AdjustParam::kAdjustNone };
 
-   void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   
+   void OnClicked(float x, float y, bool right) override;
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    void UpdateSliderVisibility();
-   
+   ofVec2f GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent);
+
    float mWidth;
    float mHeight;
-   float mVol;
-   float mMaxTime;
-   bool mClick;
+   float mVol{ 1 };
+   float mMaxTime{ 1000 };
+   bool mClick{ false };
    ::ADSR* mAdsr;
-   ::ADSR mViewAdsr;   //for ADSR simulation in drawing
    ofVec2f mClickStart;
    ::ADSR mClickAdsr;
-   bool mHighlighted;
-   FloatSlider* mASlider;
-   FloatSlider* mDSlider;
-   FloatSlider* mSSlider;
-   FloatSlider* mRSlider;
+   float mClickLength{ 1000 };
+   bool mHighlighted{ false };
+   FloatSlider* mASlider{ nullptr };
+   FloatSlider* mDSlider{ nullptr };
+   FloatSlider* mSSlider{ nullptr };
+   FloatSlider* mRSlider{ nullptr };
    static DisplayMode sDisplayMode;
-   EnvelopeEditor* mEditor;
-   double mOverrideDrawTime;
+   EnvelopeEditor* mEditor{ nullptr };
+   double mOverrideDrawTime{ -1 };
+   std::array<double, 10> mDrawTimeHistory{};
+   int mDrawTimeHistoryIndex{ 0 };
 };
 
 

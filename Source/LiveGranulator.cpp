@@ -29,30 +29,13 @@
 #include "UIControlMacros.h"
 
 LiveGranulator::LiveGranulator()
-: mBufferLength(gSampleRate*5)
+: mBufferLength(gSampleRate * 5)
 , mBuffer(mBufferLength)
-, mGranOverlap(nullptr)
-, mGranPosRandomize(nullptr)
-, mGranSpeed(nullptr)
-, mGranSpeedRandomize(nullptr)
-, mGranLengthMs(nullptr)
-, mFreeze(false)
-, mFreezeCheckbox(nullptr)
-, mGranOctaveCheckbox(nullptr)
-, mFreezeExtraSamples(0)
-, mPos(0)
-, mPosSlider(nullptr)
-, mDry(0)
-, mDrySlider(nullptr)
-, mAutoCaptureInterval(kInterval_None)
-, mAutoCaptureDropdown(nullptr)
-, mGranSpacingRandomize(nullptr)
 {
    mGranulator.SetLiveMode(true);
    mGranulator.mSpeed = 1;
    mGranulator.mGrainOverlap = 12;
    mGranulator.mGrainLengthMs = 300;
-   
 }
 
 void LiveGranulator::Init()
@@ -72,32 +55,34 @@ void LiveGranulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK(80);
-   FLOATSLIDER(mGranOverlap,"overlap",&mGranulator.mGrainOverlap,.5f,MAX_GRAINS);
-   FLOATSLIDER(mGranSpeed,"speed",&mGranulator.mSpeed,-3,3);
-   FLOATSLIDER(mGranLengthMs,"len ms",&mGranulator.mGrainLengthMs,1,1000);
-   FLOATSLIDER(mDrySlider,"dry",&mDry,0,1);
-   DROPDOWN(mAutoCaptureDropdown,"autocapture",(int*)(&mAutoCaptureInterval), 45);
+   FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5f, MAX_GRAINS);
+   FLOATSLIDER(mGranSpeed, "speed", &mGranulator.mSpeed, -3, 3);
+   FLOATSLIDER(mGranLengthMs, "len ms", &mGranulator.mGrainLengthMs, 1, 1000);
+   FLOATSLIDER(mDrySlider, "dry", &mDry, 0, 1);
+   DROPDOWN(mAutoCaptureDropdown, "autocapture", (int*)(&mAutoCaptureInterval), 45);
    UIBLOCK_NEWCOLUMN();
-   FLOATSLIDER(mGranPosRandomize,"pos r",&mGranulator.mPosRandomizeMs,0,200);
-   FLOATSLIDER(mGranSpeedRandomize,"spd r",&mGranulator.mSpeedRandomize,0,.3f);
-   FLOATSLIDER(mGranSpacingRandomize,"spa r",&mGranulator.mSpacingRandomize,0,1);
-   CHECKBOX(mFreezeCheckbox,"frz",&mFreeze); UIBLOCK_SHIFTX(35);
-   CHECKBOX(mGranOctaveCheckbox,"g oct",&mGranulator.mOctaves); UIBLOCK_NEWLINE();
+   FLOATSLIDER(mGranPosRandomize, "pos r", &mGranulator.mPosRandomizeMs, 0, 200);
+   FLOATSLIDER(mGranSpeedRandomize, "spd r", &mGranulator.mSpeedRandomize, 0, .3f);
+   FLOATSLIDER(mGranSpacingRandomize, "spa r", &mGranulator.mSpacingRandomize, 0, 1);
+   CHECKBOX(mFreezeCheckbox, "frz", &mFreeze);
+   UIBLOCK_SHIFTX(35);
+   CHECKBOX(mGranOctaveCheckbox, "g oct", &mGranulator.mOctaves);
+   UIBLOCK_NEWLINE();
    FLOATSLIDER(mWidthSlider, "width", &mGranulator.mWidth, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
 
    mBufferX = mWidth + 3;
    mWidth += kBufferWidth + 3 * 2;
-   
+
    UIBLOCK(mBufferX, mHeight - 17, kBufferWidth);
-   FLOATSLIDER(mPosSlider,"pos",&mPos,-gSampleRate,gSampleRate);
+   FLOATSLIDER(mPosSlider, "pos", &mPos, -gSampleRate, gSampleRate);
    ENDUIBLOCK0();
-   
+
    mAutoCaptureDropdown->AddLabel("none", kInterval_None);
    mAutoCaptureDropdown->AddLabel("4n", kInterval_4n);
    mAutoCaptureDropdown->AddLabel("8n", kInterval_8n);
    mAutoCaptureDropdown->AddLabel("16n", kInterval_16n);
-   
+
    mGranPosRandomize->SetMode(FloatSlider::kSquare);
    mGranSpeedRandomize->SetMode(FloatSlider::kSquare);
    mGranLengthMs->SetMode(FloatSlider::kSquare);
@@ -111,36 +96,36 @@ LiveGranulator::~LiveGranulator()
 void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    PROFILER(LiveGranulator);
-   
+
    float bufferSize = buffer->BufferSize();
    mBuffer.SetNumChannels(buffer->NumActiveChannels());
 
-   for (int i=0; i<bufferSize; ++i)
+   for (int i = 0; i < bufferSize; ++i)
    {
       ComputeSliders(i);
-      
+
       mGranulator.SetLiveMode(!mFreeze);
       if (!mFreeze)
       {
-         for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
             mBuffer.Write(buffer->GetChannel(ch)[i], ch);
       }
       else if (mFreezeExtraSamples < FREEZE_EXTRA_SAMPLES_COUNT)
       {
          ++mFreezeExtraSamples;
-         for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
             mBuffer.Write(buffer->GetChannel(ch)[i], ch);
       }
-      
+
       if (mEnabled)
       {
          float sample[ChannelBuffer::kMaxNumChannels];
          Clear(sample, ChannelBuffer::kMaxNumChannels);
-         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0)-mFreezeExtraSamples-1+mPos, sample);
-         for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0) - mFreezeExtraSamples - 1 + mPos, sample);
+         for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
             buffer->GetChannel(ch)[i] = mDry * buffer->GetChannel(ch)[i] + sample[ch];
       }
-      
+
       time += gInvSampleRateMs;
    }
 }
@@ -149,7 +134,7 @@ void LiveGranulator::DrawModule()
 {
    if (!mEnabled)
       return;
-   
+
    mGranOverlap->Draw();
    mGranSpeed->Draw();
    mGranLengthMs->Draw();
@@ -164,11 +149,11 @@ void LiveGranulator::DrawModule()
    mWidthSlider->Draw();
    if (mEnabled)
    {
-      int drawLength = MIN(mBufferLength, gSampleRate*2);
+      int drawLength = MIN(mBufferLength, gSampleRate * 2);
       if (mFreeze)
          drawLength = MIN(mBufferLength, drawLength + mFreezeExtraSamples);
       mBuffer.Draw(mBufferX, 3, kBufferWidth, kBufferHeight, drawLength);
-      mGranulator.Draw(mBufferX, 3+20, kBufferWidth, kBufferHeight-20*2, mBuffer.GetRawBufferOffset(0)-drawLength, drawLength, mBufferLength);
+      mGranulator.Draw(mBufferX, 3 + 20, kBufferWidth, kBufferHeight - 20 * 2, mBuffer.GetRawBufferOffset(0) - drawLength, drawLength, mBufferLength);
    }
 }
 
@@ -176,7 +161,7 @@ float LiveGranulator::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp(.5f+fabsf(mGranulator.mSpeed-1),0,1);
+   return ofClamp(.5f + fabsf(mGranulator.mSpeed - 1), 0, 1);
 }
 
 void LiveGranulator::Freeze()
@@ -190,7 +175,7 @@ void LiveGranulator::OnTimeEvent(double time)
    Freeze();
 }
 
-void LiveGranulator::CheckboxUpdated(Checkbox* checkbox)
+void LiveGranulator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
       mBuffer.ClearBuffer();
@@ -205,7 +190,7 @@ void LiveGranulator::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal)
+void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mAutoCaptureDropdown)
    {
@@ -220,7 +205,7 @@ void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void LiveGranulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void LiveGranulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mPosSlider)
    {
@@ -228,4 +213,3 @@ void LiveGranulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
          mPos = MIN(mPos, 0);
    }
 }
-

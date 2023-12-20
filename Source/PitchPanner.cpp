@@ -41,15 +41,15 @@ PitchPanner::PitchPanner()
 void PitchPanner::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPitchLeftSlider = new IntSlider(this,"left",4,2,100,15,&mPitchLeft,0,127);
-   mPitchRightSlider = new IntSlider(this,"right",mPitchLeftSlider,kAnchor_Below,100,15,&mPitchRight,0,127);
+   mPitchLeftSlider = new IntSlider(this, "left", 4, 2, 100, 15, &mPitchLeft, 0, 127);
+   mPitchRightSlider = new IntSlider(this, "right", mPitchLeftSlider, kAnchor_Below, 100, 15, &mPitchRight, 0, 127);
 }
 
 void PitchPanner::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPitchLeftSlider->Draw();
    mPitchRightSlider->Draw();
 }
@@ -58,14 +58,14 @@ void PitchPanner::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 {
    if (mEnabled)
       modulation.pan = ofMap(pitch, mPitchLeft, mPitchRight, -1, 1);
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void PitchPanner::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

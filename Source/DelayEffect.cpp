@@ -28,46 +28,35 @@
 #include "Transport.h"
 #include "Profiler.h"
 #include "UIControlMacros.h"
+#include "ModularSynth.h"
 
 #include "juce_core/juce_core.h"
 
 DelayEffect::DelayEffect()
-: mDelay(500)
-, mFeedback(0)
-, mEcho(true)
-, mDelayBuffer(DELAY_BUFFER_SIZE)
-, mDelaySlider(nullptr)
-, mFeedbackSlider(nullptr)
-, mEchoCheckbox(nullptr)
-, mInterval(kInterval_8nd)
-, mIntervalSelector(nullptr)
-, mAcceptInput(true)
-, mShortTime(false)
-, mShortTimeCheckbox(nullptr)
-, mDry(true)
-, mInvert(false)
-, mDryCheckbox(nullptr)
-, mFeedbackModuleMode(false)
-, mAcceptInputCheckbox(nullptr)
-, mInvertCheckbox(nullptr)
+: mDelayBuffer(DELAY_BUFFER_SIZE)
 {
 }
 
 void DelayEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   FLOATSLIDER(mDelaySlider, "delay",&mDelay,GetMinDelayMs(),1000);
-   FLOATSLIDER(mFeedbackSlider, "amount",&mFeedback,0,1);
-   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 45); UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mShortTimeCheckbox, "short",&mShortTime); UIBLOCK_NEWLINE();
-   CHECKBOX(mDryCheckbox, "dry", &mDry);  UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mEchoCheckbox, "feedback", &mEcho);  UIBLOCK_NEWLINE();
-   CHECKBOX(mAcceptInputCheckbox, "input", &mAcceptInput); UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER(mDelaySlider, "delay", &mDelay, GetMinDelayMs(), 1000);
+   FLOATSLIDER(mFeedbackSlider, "amount", &mFeedback, 0, 1);
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 45);
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mShortTimeCheckbox, "short", &mShortTime);
+   UIBLOCK_NEWLINE();
+   CHECKBOX(mDryCheckbox, "dry", &mDry);
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mEchoCheckbox, "feedback", &mEcho);
+   UIBLOCK_NEWLINE();
+   CHECKBOX(mAcceptInputCheckbox, "input", &mAcceptInput);
+   UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mInvertCheckbox, "invert", &mInvert);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -85,18 +74,18 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
    if (!mEnabled)
       return;
-   
+
    float bufferSize = buffer->BufferSize();
    mDelayBuffer.SetNumChannels(buffer->NumActiveChannels());
 
    if (mInterval != kInterval_None)
    {
       mDelay = TheTransport->GetDuration(mInterval) + .1f; //+1 to avoid perfect sample collision
-      mDelayRamp.Start(time, mDelay, time+10);
+      mDelayRamp.Start(time, mDelay, time + 10);
    }
 
    mAmountRamp.Start(time, mFeedback, time + 3);
-   for (int i=0; i<bufferSize; ++i)
+   for (int i = 0; i < bufferSize; ++i)
    {
       mFeedback = mAmountRamp.Value(time);
 
@@ -107,18 +96,18 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       float delaySamps = delay / gInvSampleRateMs;
       if (mFeedbackModuleMode)
          delaySamps -= gBufferSize;
-      delaySamps = ofClamp(delaySamps, 0.1f, DELAY_BUFFER_SIZE-2);
+      delaySamps = ofClamp(delaySamps, 0.1f, DELAY_BUFFER_SIZE - 2);
 
       int sampsAgoA = int(delaySamps);
-      int sampsAgoB = sampsAgoA+1;
+      int sampsAgoB = sampsAgoA + 1;
 
-      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
          float sample = mDelayBuffer.GetSample(sampsAgoA, ch);
          float nextSample = mDelayBuffer.GetSample(sampsAgoB, ch);
          float a = delaySamps - sampsAgoA;
-         float delayedSample = (1-a)*sample + a*nextSample; //interpolate
-         
+         float delayedSample = (1 - a) * sample + a * nextSample; //interpolate
+
          float in = buffer->GetChannel(ch)[i];
 
          if (!mEcho && mAcceptInput) //single delay, no continuous feedback so do it pre
@@ -131,10 +120,10 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
          if (mEcho && mAcceptInput) //continuous feedback so do it post
             mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
-         
+
          if (!mAcceptInput)
             mDelayBuffer.Write(delayInput, ch);
-         
+
          if (!mDry)
             buffer->GetChannel(ch)[i] -= in;
       }
@@ -147,7 +136,7 @@ void DelayEffect::DrawModule()
 {
    if (!mEnabled)
       return;
-   
+
    mDelaySlider->Draw();
    mFeedbackSlider->Draw();
    mIntervalSelector->Draw();
@@ -168,14 +157,14 @@ float DelayEffect::GetEffectAmount()
 void DelayEffect::SetDelay(float delay)
 {
    mDelay = delay;
-   mDelayRamp.Start(gTime, mDelay, gTime+10);
+   mDelayRamp.Start(gTime, mDelay, gTime + 10);
    mInterval = kInterval_None;
 }
 
 void DelayEffect::SetShortMode(bool on)
 {
    mShortTime = on;
-   mDelaySlider->SetExtents(GetMinDelayMs(),mShortTime?20:1000);
+   mDelaySlider->SetExtents(GetMinDelayMs(), mShortTime ? 20 : 1000);
 }
 
 void DelayEffect::SetFeedbackModuleMode()
@@ -209,7 +198,7 @@ void DelayEffect::SetEnabled(bool enabled)
       mDelayBuffer.ClearBuffer();
 }
 
-void DelayEffect::CheckboxUpdated(Checkbox* checkbox)
+void DelayEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mShortTimeCheckbox)
       SetShortMode(mShortTime);
@@ -220,41 +209,35 @@ void DelayEffect::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void DelayEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void DelayEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mDelaySlider)
    {
       mInterval = kInterval_None;
-      mDelayRamp.Start(gTime, mDelay, gTime+30);
+      mDelayRamp.Start(time, mDelay, time + 30);
    }
 }
 
-void DelayEffect::DropdownUpdated(DropdownList* list, int oldVal)
+void DelayEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-}
-
-namespace
-{
-   const int kSaveStateRev = 0;
 }
 
 void DelayEffect::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
-   
-   out << kSaveStateRev;
-   
+
    mDelayBuffer.SaveState(out);
 }
 
-void DelayEffect::LoadState(FileStreamIn& in)
+void DelayEffect::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
-   
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
-   
+   IDrawableModule::LoadState(in, rev);
+
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
    mDelayBuffer.LoadState(in);
 }
-

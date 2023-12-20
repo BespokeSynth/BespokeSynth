@@ -52,31 +52,20 @@ class KarplusStrongVoiceParams : public IVoiceParams
 {
 public:
    KarplusStrongVoiceParams()
-   : mFilter(1)
-   , mFeedback(.98f)
-   , mSourceType(kSourceTypeMix)
-   , mInvert(false)
-   , mExciterFreq(100)
-   , mExciterAttack(1)
-   , mExciterDecay(3)
-   , mExcitation(0)
-   , mPitchTone(0)
-   , mVelToVolume(.5f)
-   , mVelToEnvelope(.5f)
-   , mLiteCPUMode(false)
-   {}
-   float mFilter;
-   float mFeedback;
-   KarplusStrongSourceType mSourceType;
-   bool mInvert;
-   float mExciterFreq;
-   float mExciterAttack;
-   float mExciterDecay;
-   float mExcitation;
-   float mPitchTone;
-   float mVelToVolume;
-   float mVelToEnvelope;
-   bool mLiteCPUMode;
+   {
+   }
+   float mFilter{ 1 };
+   float mFeedback{ .98 };
+   KarplusStrongSourceType mSourceType{ KarplusStrongSourceType::kSourceTypeMix };
+   bool mInvert{ false };
+   float mExciterFreq{ 100 };
+   float mExciterAttack{ 1 };
+   float mExciterDecay{ 3 };
+   float mExcitation{ 0 };
+   float mPitchTone{ 0 };
+   float mVelToVolume{ .5 };
+   float mVelToEnvelope{ .5 };
+   bool mLiteCPUMode{ false };
 };
 
 class KarplusStrongVoice : public IMidiVoice
@@ -92,6 +81,7 @@ public:
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
+
 private:
    void DoParameterUpdate(int samplesIn,
                           int oversampling,
@@ -100,18 +90,18 @@ private:
                           float& filterRate,
                           float& filterLerp,
                           float& oscPhaseInc);
-   
-   float mOscPhase;
-   EnvOscillator mOsc;
+
+   float mOscPhase{ 0 };
+   EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
    ::ADSR mEnv;
-   KarplusStrongVoiceParams* mVoiceParams;
+   KarplusStrongVoiceParams* mVoiceParams{ nullptr };
    RollingBuffer mBuffer;
-   float mFilteredSample;
+   float mFilteredSample{ 0 };
    Ramp mMuteRamp;
-   float mLastBufferSample;
-   bool mActive;
-   IDrawableModule* mOwner;
-   KarplusStrong* mKarplusStrongModule;
+   float mLastBufferSample{ 0 };
+   bool mActive{ false };
+   IDrawableModule* mOwner{ nullptr };
+   KarplusStrong* mKarplusStrongModule{ nullptr };
 };
 
 #endif /* defined(__modularSynth__KarplusStrongVoice__) */

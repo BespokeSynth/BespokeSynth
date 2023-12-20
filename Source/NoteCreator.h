@@ -39,45 +39,52 @@ public:
    NoteCreator();
    virtual ~NoteCreator();
    static IDrawableModule* Create() { return new NoteCreator(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void OnPulse(double time, float velocity, int flags) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 protected:
    void TriggerNote(double time, float velocity);
-   
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
-   
-   int mWidth;
-   int mHeight;
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
 
-   ClickButton* mTriggerButton;
-   TextEntry* mPitchEntry;
-   FloatSlider* mVelocitySlider;
-   FloatSlider* mDurationSlider;
-   Checkbox* mNoteOnCheckbox;
-   int mPitch;
-   float mVelocity;
-   float mDuration;
-   double mStartTime;
-   bool mNoteOn;
-   int mVoiceIndex;
+   int mWidth{ 200 };
+   int mHeight{ 20 };
+
+   ClickButton* mTriggerButton{ nullptr };
+   TextEntry* mPitchEntry{ nullptr };
+   FloatSlider* mVelocitySlider{ nullptr };
+   FloatSlider* mDurationSlider{ nullptr };
+   Checkbox* mNoteOnCheckbox{ nullptr };
+   int mPitch{ 48 };
+   float mVelocity{ 1 };
+   float mDuration{ 100 };
+   double mStartTime{ 0 };
+   bool mNoteOn{ false };
+   int mVoiceIndex{ -1 };
 };
 
 #endif /* defined(__Bespoke__NoteCreator__) */

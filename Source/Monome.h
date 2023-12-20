@@ -47,7 +47,7 @@ class Monome : public INonstandardController,
 public:
    Monome(MidiDeviceListener* listener);
    ~Monome();
-   
+
    void Poll() override;
    bool SetUpOsc();
    void ListMonomes();
@@ -57,11 +57,11 @@ public:
    void SetLayoutData(ofxJSONElement& layout) override;
    void ConnectToDevice(std::string deviceDesc);
    void UpdateDeviceList(DropdownList* list);
-   
+
    void oscMessageReceived(const juce::OSCMessage& msg) override;
-   
-   void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1)override;
-   
+
+   void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override;
+
    bool IsInputConnected() override { return mHasMonome; }
    bool Reconnect() override;
 
@@ -71,43 +71,48 @@ public:
 private:
    void SetLightInternal(int x, int y, float value);
    Vec2i Rotate(int x, int y, int rotations);
-   
+
    static int sNextMonomeReceivePort;
-   
+
    juce::OSCSender mToSerialOsc;
    juce::OSCSender mToMonome;
-   int mMonomeReceivePort;
-   bool mIsOscSetUp;
-   bool mHasMonome;
-   int mMaxColumns;
-   int mGridRotation;
-   juce::String mPrefix;
-   bool mJustRequestedDeviceList;
+   int mMonomeReceivePort{ -1 };
+   bool mIsOscSetUp{ false };
+   bool mHasMonome{ false };
+   bool mLightsInitialized{ false };
+   int mMaxColumns{ 16 };
+   int mGridRotation{ 0 };
+   juce::String mPrefix{ "monome" };
+   bool mJustRequestedDeviceList{ false };
    std::string mPendingDeviceDesc;
-   
+
    struct MonomeDevice
    {
-      void CopyFrom(MonomeDevice& other) { id = other.id; product = other.product; port = other.port; }
+      void CopyFrom(MonomeDevice& other)
+      {
+         id = other.id;
+         product = other.product;
+         port = other.port;
+      }
       std::string id;
       std::string product;
-      int port;
+      int port{ 0 };
       std::string GetDescription() { return id + " " + product; }
    };
-   
+
    std::vector<MonomeDevice> mConnectedDeviceList;
-   
-   MidiDeviceListener* mListener;
-   DropdownList* mListForMidiController;
+
+   MidiDeviceListener* mListener{ nullptr };
+   DropdownList* mListForMidiController{ nullptr };
    MonomeDevice mLastConnectedDeviceInfo;
-   
+
    struct LightInfo
    {
-      LightInfo() : mValue(0), mLastUpdatedTime(0), mLastSentTime(0) {}
-      float mValue;
-      double mLastUpdatedTime;
-      double mLastSentTime;
+      float mValue{ 0 };
+      double mLastUpdatedTime{ 0 };
+      double mLastSentTime{ 0 };
    };
-   
+
    std::vector<LightInfo> mLights;
 };
 

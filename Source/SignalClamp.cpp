@@ -31,18 +31,14 @@
 
 SignalClamp::SignalClamp()
 : IAudioProcessor(gBufferSize)
-, mMin(-1)
-, mMinSlider(nullptr)
-, mMax(1)
-, mMaxSlider(nullptr)
 {
 }
 
 void SignalClamp::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mMinSlider = new FloatSlider(this,"min",5,2,110,15,&mMin,-2,2);
-   mMaxSlider = new FloatSlider(this,"max",mMinSlider,kAnchor_Below,110,15,&mMax,-2,2);
+   mMinSlider = new FloatSlider(this, "min", 5, 2, 110, 15, &mMin, -2, 2);
+   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 110, 15, &mMax, -2, 2);
 }
 
 SignalClamp::~SignalClamp()
@@ -55,21 +51,21 @@ void SignalClamp::Process(double time)
 
    if (!mEnabled)
       return;
-   
+
    ComputeSliders(0);
    SyncBuffers();
 
    IAudioReceiver* target = GetTarget();
-   
+
    if (target)
    {
       int bufferSize = GetBuffer()->BufferSize();
-      
+
       ChannelBuffer* out = target->GetBuffer();
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          float* buffer = GetBuffer()->GetChannel(ch);
-         for (int i=0; i<bufferSize; ++i)
+         for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
             buffer[i] = ofClamp(buffer[i], mMin, mMax);
@@ -78,7 +74,7 @@ void SignalClamp::Process(double time)
          GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
       }
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -86,7 +82,7 @@ void SignalClamp::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMinSlider->Draw();
    mMaxSlider->Draw();
 }

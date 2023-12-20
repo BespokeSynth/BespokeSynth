@@ -28,14 +28,13 @@
 #include "ModularSynth.h"
 
 NoteFlusher::NoteFlusher()
-: mFlushButton(nullptr)
 {
 }
 
 void NoteFlusher::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mFlushButton = new ClickButton(this,"flush",5,2);
+   mFlushButton = new ClickButton(this, "flush", 5, 2);
 }
 
 void NoteFlusher::DrawModule()
@@ -45,13 +44,12 @@ void NoteFlusher::DrawModule()
    mFlushButton->Draw();
 }
 
-void NoteFlusher::ButtonClicked(ClickButton* button)
+void NoteFlusher::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mFlushButton)
    {
-      double time = gTime + gBufferSizeMs;
       mNoteOutput.Flush(time);
-      for (int i=0; i<127; ++i)
+      for (int i = 0; i < 127; ++i)
          mNoteOutput.PlayNote(time, i, 0);
    }
 }
@@ -59,7 +57,7 @@ void NoteFlusher::ButtonClicked(ClickButton* button)
 void NoteFlusher::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -67,5 +65,3 @@ void NoteFlusher::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-
-

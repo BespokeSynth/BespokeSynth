@@ -32,11 +32,14 @@
 class SendPort
 {
 public:
-   SendPort() : mSendPort(NULL) {}
+   SendPort()
+   : mSendPort(NULL)
+   {}
    ~SendPort();
    void CreateSender(const char* portName);
    void SendData(uint32_t messageId, CFDataRef data, CFDataRef& replyData);
    void Close();
+
 private:
    std::string mPortName;
    CFMessagePortRef mSendPort;

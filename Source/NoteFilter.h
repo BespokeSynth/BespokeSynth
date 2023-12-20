@@ -34,27 +34,30 @@ public:
    NoteFilter();
    virtual ~NoteFilter();
    static IDrawableModule* Create() { return new NoteFilter(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   
+
    std::array<bool, 128> mGate;
    std::array<float, 128> mLastPlayTime;
    std::vector<Checkbox*> mGateCheckboxes;
-   int mMinPitch;
-   int mMaxPitch;
+   int mMinPitch{ 0 };
+   int mMaxPitch{ 7 };
 };

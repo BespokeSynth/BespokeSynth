@@ -33,31 +33,9 @@
 
 #include "juce_core/juce_core.h"
 
-namespace
-{
-const int kTopControlHeight = 22;
-const int kTimelineSectionHeight = 50;
-const int kBottomControlHeight = 58;
-}
-
 FubbleModule::FubbleModule()
 : mAxisH(this, true)
 , mAxisV(this, false)
-, mLength(0)
-, mQuantizeLength(false)
-, mQuantizeLengthCheckbox(nullptr)
-, mQuantizeInterval(kInterval_4n)
-, mQuantizeLengthSelector(nullptr)
-, mSpeed(1)
-, mSpeedSlider(nullptr)
-, mWidth(220)
-, mHeight(kTopControlHeight+200+kTimelineSectionHeight+kBottomControlHeight)
-, mRecordStartOffset(0)
-, mIsDrawing(false)
-, mIsRightClicking(false)
-, mPerlinStrength(0)
-, mPerlinScale(1)
-, mPerlinSpeed(1)
 {
    UpdatePerlinSeed();
 }
@@ -72,26 +50,26 @@ void FubbleModule::CreateUIControls()
    UIBLOCK0();
    CHECKBOX(mQuantizeLengthCheckbox, "quantize", &mQuantizeLength);
    UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mQuantizeLengthSelector, "length", (int*)(&mQuantizeInterval),60);
+   DROPDOWN(mQuantizeLengthSelector, "length", (int*)(&mQuantizeInterval), 60);
    UIBLOCK_SHIFTLEFT();
    FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .1f, 10);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mClearButton, "clear");
    ENDUIBLOCK0();
-   
-   UIBLOCK(10,mHeight-kBottomControlHeight+3, 135);
+
+   UIBLOCK(10, mHeight - kBottomControlHeight + 3, 135);
    FLOATSLIDER(mPerlinStrengthSlider, "mutate amount", &mPerlinStrength, 0, 2);
    FLOATSLIDER(mPerlinScaleSlider, "mutate warp", &mPerlinScale, 0, 5);
    FLOATSLIDER(mPerlinSpeedSlider, "mutate noise", &mPerlinSpeed, 0, 2);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mUpdatePerlinSeedButton, "reseed");
    ENDUIBLOCK0();
-   
+
    mAxisH.SetCableSource(new PatchCableSource(this, kConnectionType_Modulator));
    AddPatchCableSource(mAxisH.GetCableSource());
    mAxisV.SetCableSource(new PatchCableSource(this, kConnectionType_Modulator));
    AddPatchCableSource(mAxisV.GetCableSource());
-   
+
    mQuantizeLengthSelector->AddLabel("8n", kInterval_8n);
    mQuantizeLengthSelector->AddLabel("4n", kInterval_4n);
    mQuantizeLengthSelector->AddLabel("2n", kInterval_2n);
@@ -122,19 +100,23 @@ void FubbleModule::Poll()
       {
          double perlinTime = gTime;
          int numPoints = mAxisH.mCurve.GetNumPoints();
-         for (int i=0; i<numPoints; ++i)
+         for (int i = 0; i < numPoints; ++i)
          {
             CurvePoint* pointH = mAxisH.mCurve.GetPoint(i);
             CurvePoint* pointV = mAxisV.mCurve.GetPoint(i);
             float deltaH = ofMap(GetPerlinNoiseValue(perlinTime, pointH->mValue, pointV->mValue, true), 0, 1, -mPerlinStrength, mPerlinStrength) * .003f;
             float deltaV = ofMap(GetPerlinNoiseValue(perlinTime, pointH->mValue, pointV->mValue, false), 0, 1, -mPerlinStrength, mPerlinStrength) * .003f;
-            
+
             //try to keep in bounds
-            if (pointH->mValue < 0) deltaH -= pointH->mValue * .1f;
-            if (pointH->mValue > 1) deltaH -= (pointH->mValue - 1) * .1f;
-            if (pointV->mValue < 0) deltaV -= pointV->mValue * .1f;
-            if (pointV->mValue > 1) deltaV -= (pointV->mValue - 1) * .1f;
-            
+            if (pointH->mValue < 0)
+               deltaH -= pointH->mValue * .1f;
+            if (pointH->mValue > 1)
+               deltaH -= (pointH->mValue - 1) * .1f;
+            if (pointV->mValue < 0)
+               deltaV -= pointV->mValue * .1f;
+            if (pointV->mValue > 1)
+               deltaV -= (pointV->mValue - 1) * .1f;
+
             pointH->mValue += deltaH;
             pointV->mValue += deltaV;
          }
@@ -147,7 +129,7 @@ float FubbleModule::GetPlaybackTime(double time)
    float measureTime = TheTransport->GetMeasureTime(time) - mRecordStartOffset;
    if (!mQuantizeLength)
       measureTime *= mSpeed;
-   
+
    if (mLength > 0)
    {
       while (measureTime < 0)
@@ -161,7 +143,7 @@ void FubbleModule::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mQuantizeLengthCheckbox->Draw();
    mQuantizeLengthSelector->SetShowing(mQuantizeLength);
    mQuantizeLengthSelector->Draw();
@@ -172,57 +154,57 @@ void FubbleModule::DrawModule()
    mPerlinScaleSlider->Draw();
    mPerlinSpeedSlider->Draw();
    mUpdatePerlinSeedButton->Draw();
-   
+
    ofPushStyle();
    ofSetColor(100, 100, 100, 100);
    ofFill();
-   
+
    ofPushMatrix();
    ofRectangle rect = GetFubbleRect();
    ofTranslate(rect.x, rect.y);
-   ofRect(0,0,rect.width,rect.height);
-   
+   ofRect(0, 0, rect.width, rect.height);
+
    if (mPerlinStrength > 0)
    {
       double perlinTime = gTime;
       const int kGridSize = 30;
-      for (int col=0; col<kGridSize; ++col)
+      for (int col = 0; col < kGridSize; ++col)
       {
-         for (int row=0; row<kGridSize; ++row)
+         for (int row = 0; row < kGridSize; ++row)
          {
-            float x = col * (rect.width/kGridSize);
-            float y = row * (rect.height/kGridSize);
-            ofSetColor(GetPerlinNoiseValue(perlinTime, x/rect.width, y/rect.height, true)*255, 0, GetPerlinNoiseValue(perlinTime, x/rect.width, y/rect.height, false)*255, ofClamp(mPerlinStrength, 0, 1) * 255);
-            ofRect(x,y,(rect.width/kGridSize)+.5f,(rect.height/kGridSize)+.5f,0);
+            float x = col * (rect.width / kGridSize);
+            float y = row * (rect.height / kGridSize);
+            ofSetColor(GetPerlinNoiseValue(perlinTime, x / rect.width, y / rect.height, true) * 255, 0, GetPerlinNoiseValue(perlinTime, x / rect.width, y / rect.height, false) * 255, ofClamp(mPerlinStrength, 0, 1) * 255);
+            ofRect(x, y, (rect.width / kGridSize) + .5f, (rect.height / kGridSize) + .5f, 0);
          }
       }
    }
-   
-   ofSetColor(GetColor(kModuleType_Modulator));
+
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    ofPushMatrix();
    if (mAxisH.GetCableSource()->GetTarget())
-      DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), rect.width*.4f, rect.height-2);
+      DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), rect.width * .4f, rect.height - 2);
    ofRotate(-PI * .5f);
    if (mAxisV.GetCableSource()->GetTarget())
-      DrawTextNormal(mAxisV.GetCableSource()->GetTarget()->Name(), -rect.height*.6f,rect.width-2);
+      DrawTextNormal(mAxisV.GetCableSource()->GetTarget()->Name(), -rect.height * .6f, rect.width - 2);
    ofPopMatrix();
-   
+
    //draw curve
    ofPushStyle();
-   ofSetColor(GetColor(kModuleType_Modulator));
-   DrawTextNormal("length: "+ofToString(mLength, 2), 5, 15);
-   ofSetColor(220,220,220);
+   ofSetColor(GetColor(kModuleCategory_Modulator));
+   DrawTextNormal("length: " + ofToString(mLength, 2), 5, 15);
+   ofSetColor(220, 220, 220);
    ofNoFill();
    ofBeginShape();
-   for (float t=0; t<mLength; t += .01f)
+   for (float t = 0; t < mLength; t += .01f)
    {
       float x = mAxisH.mCurve.Evaluate(t) * rect.width;
       float y = (1 - mAxisV.mCurve.Evaluate(t)) * rect.height;
-      
+
       ofVertex(x, y);
    }
    ofEndShape();
-   
+
    //draw individual points
    /*ofFill();
    ofSetColor(220,220,220,100);
@@ -236,9 +218,9 @@ void FubbleModule::DrawModule()
       //ofRect(x-3,y-3,6,6,0);
       ofCircle(x,y,2.5f);
    }*/
-   
+
    ofFill();
-   ofSetColor(255,255,255);
+   ofSetColor(255, 255, 255);
    if (mAxisH.mHasRecorded)
    {
       float time = mIsDrawing ? mRecordStartOffset : GetPlaybackTime(gTime);
@@ -246,69 +228,69 @@ void FubbleModule::DrawModule()
       float currentY = (1 - mAxisV.mCurve.Evaluate(time, true)) * rect.height;
       ofCircle(currentX, currentY, 4);
    }
-   
+
    if (mIsDrawing || IsHovered() || mIsRightClicking)
    {
       ofNoFill();
-      ofSetColor(GetColor(kModuleType_Modulator), (mIsDrawing || mIsRightClicking) ? 255 : 50);
+      ofSetColor(GetColor(kModuleCategory_Modulator), (mIsDrawing || mIsRightClicking) ? 255 : 50);
       ofCircle(GetFubbleMouseCoord().x * rect.width, (1 - GetFubbleMouseCoord().y) * rect.height, 5);
    }
    ofPopStyle();
-   
+
    ofPopMatrix();
-   
+
    ofPushMatrix();
-   ofTranslate(10, mHeight-(kTimelineSectionHeight+kBottomControlHeight)+3);
-   
+   ofTranslate(10, mHeight - (kTimelineSectionHeight + kBottomControlHeight) + 3);
+
    ofSetColor(100, 100, 100, 100);
-   ofRect(0,0,mWidth-20,20);
-   mAxisH.mCurve.SetDimensions(mWidth-20, 20);
+   ofRect(0, 0, mWidth - 20, 20);
+   mAxisH.mCurve.SetDimensions(mWidth - 20, 20);
    mAxisH.mCurve.Render();
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    if (mAxisH.GetCableSource()->GetTarget())
       DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), 5, 15);
-   
+
    ofTranslate(0, 25);
    ofSetColor(100, 100, 100, 100);
-   ofRect(0,0,mWidth-20,20);
-   mAxisV.mCurve.SetDimensions(mWidth-20, 20);
+   ofRect(0, 0, mWidth - 20, 20);
+   mAxisV.mCurve.SetDimensions(mWidth - 20, 20);
    mAxisV.mCurve.Render();
-   ofSetColor(GetColor(kModuleType_Modulator));
+   ofSetColor(GetColor(kModuleCategory_Modulator));
    if (mAxisV.GetCableSource()->GetTarget())
       DrawTextNormal(mAxisV.GetCableSource()->GetTarget()->Name(), 5, 15);
-   
+
    ofPopMatrix();
    ofPopStyle();
-   
+
    if (mLength > 0)
    {
       float playbackTime = GetPlaybackTime(gTime);
-      float lineX = ofLerp(10,mWidth-20,playbackTime/mLength);
-      ofLine(lineX, mHeight-(kTimelineSectionHeight+kBottomControlHeight), lineX, mHeight-(kBottomControlHeight));
+      float lineX = ofLerp(10, mWidth - 20, playbackTime / mLength);
+      ofLine(lineX, mHeight - (kTimelineSectionHeight + kBottomControlHeight), lineX, mHeight - (kBottomControlHeight));
    }
-   
-   float rightAlign = mWidth-5;
+
+   float rightAlign = mWidth - 5;
    float leftAlign = 5;
    if (mAxisH.GetCableSource()->GetTarget() && mAxisH.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
-      mAxisH.GetCableSource()->SetManualPosition(leftAlign, mHeight-(kBottomControlHeight+kTimelineSectionHeight) + 13);
-      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(-1,0));
+      mAxisH.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
+      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
    }
    else
    {
-      mAxisH.GetCableSource()->SetManualPosition(rightAlign, mHeight-(kBottomControlHeight+kTimelineSectionHeight) + 13);
-      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(1,0));
+      mAxisH.GetCableSource()->SetManualPosition(rightAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
+      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    }
-   
+
    if (mAxisV.GetCableSource()->GetTarget() && mAxisV.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
-      mAxisV.GetCableSource()->SetManualPosition(leftAlign, mHeight-(kBottomControlHeight+kTimelineSectionHeight) + 38);
-      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(-1,0));
+      mAxisV.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 38);
+      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
    }
    else
    {
-      mAxisV.GetCableSource()->SetManualPosition(rightAlign, mHeight-(kBottomControlHeight+kTimelineSectionHeight) + 38);
-      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(1,0));
+      mAxisV.GetCableSource()->SetManualPosition(rightAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 38);
+      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
    }
 }
 
@@ -317,9 +299,9 @@ float FubbleModule::GetPerlinNoiseValue(double time, float x, float y, bool hori
    float perlinScale = mPerlinScale * 2.0f;
    float perlinSpeed = mPerlinSpeed * .002f;
    if (horizontal)
-      return mNoise.noise(x*perlinScale, y*perlinScale, time * perlinSpeed + mPerlinSeed);
+      return mNoise.noise(x * perlinScale, y * perlinScale, time * perlinSpeed + mPerlinSeed);
    else
-      return mNoise.noise(y*perlinScale*.997f, x*perlinScale*.984f, time * 1.011f * perlinSpeed + 420 + mPerlinSeed);
+      return mNoise.noise(y * perlinScale * .997f, x * perlinScale * .984f, time * 1.011f * perlinSpeed + 420 + mPerlinSeed);
 }
 
 void FubbleModule::DrawModuleUnclipped()
@@ -332,23 +314,23 @@ void FubbleModule::DrawModuleUnclipped()
 
 ofRectangle FubbleModule::GetFubbleRect()
 {
-   return ofRectangle(10,kTopControlHeight,mWidth-20,mHeight-(kTimelineSectionHeight+kBottomControlHeight+kTopControlHeight));
+   return ofRectangle(10, kTopControlHeight, mWidth - 20, mHeight - (kTimelineSectionHeight + kBottomControlHeight + kTopControlHeight));
 }
 
 ofVec2f FubbleModule::GetFubbleMouseCoord()
 {
    ofRectangle fubbleRect = GetFubbleRect();
-   return ofVec2f(ofClamp((mMouseX-fubbleRect.x) / fubbleRect.width, 0, 1),
-                  ofClamp(1 - ((mMouseY-fubbleRect.y) / fubbleRect.height), 0, 1));
+   return ofVec2f(ofClamp((mMouseX - fubbleRect.x) / fubbleRect.width, 0, 1),
+                  ofClamp(1 - ((mMouseY - fubbleRect.y) / fubbleRect.height), 0, 1));
 }
 
-void FubbleModule::OnClicked(int x, int y, bool right)
+void FubbleModule::OnClicked(float x, float y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   
+   IDrawableModule::OnClicked(x, y, right);
+
    mMouseX = x;
    mMouseY = y;
-   
+
    if (IsHovered())
    {
       if (right)
@@ -396,16 +378,16 @@ void FubbleModule::RecordPoint()
 void FubbleModule::MouseReleased()
 {
    IDrawableModule::MouseReleased();
-   
+
    mIsRightClicking = false;
-   
+
    if (mIsDrawing)
    {
       mIsDrawing = false;
       if (mQuantizeLength)
       {
          float quantizeResolution = TheTransport->GetMeasureFraction(mQuantizeInterval);
-         int quantizeIntervalSteps = juce::roundToInt(mLength/quantizeResolution);
+         int quantizeIntervalSteps = juce::roundToInt(mLength / quantizeResolution);
          if (quantizeIntervalSteps <= 0)
             quantizeIntervalSteps = 1;
          float quantizedLength = quantizeResolution * quantizeIntervalSteps;
@@ -417,11 +399,11 @@ void FubbleModule::MouseReleased()
 
 bool FubbleModule::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
-   
+   IDrawableModule::MouseMoved(x, y);
+
    mMouseX = x;
    mMouseY = y;
-   
+
    return false;
 }
 
@@ -429,16 +411,16 @@ void FubbleModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 {
    if (cableSource == mAxisH.GetCableSource())
       mAxisH.UpdateControl();
-   
+
    if (cableSource == mAxisV.GetCableSource())
       mAxisV.UpdateControl();
 }
 
-void FubbleModule::CheckboxUpdated(Checkbox* checkbox)
+void FubbleModule::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal)
+void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    /*int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
@@ -461,7 +443,7 @@ void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal)
    }*/
 }
 
-void FubbleModule::ButtonClicked(ClickButton* button)
+void FubbleModule::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
       Clear();
@@ -489,8 +471,6 @@ void FubbleModule::Resize(float w, float h)
 
 void FubbleModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
    moduleInfo["uicontrol_h"] = mAxisH.GetCableSource()->GetTarget() ? mAxisH.GetCableSource()->GetTarget()->Path() : "";
    moduleInfo["uicontrol_v"] = mAxisV.GetCableSource()->GetTarget() ? mAxisV.GetCableSource()->GetTarget()->Path() : "";
    moduleInfo["width"] = mWidth;
@@ -503,7 +483,7 @@ void FubbleModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("uicontrol_v", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, mWidth, 120, 1000);
    mModuleSaveData.LoadInt("height", moduleInfo, mHeight, 15, 1000);
-   
+
    SetUpFromSaveData();
 }
 
@@ -521,7 +501,7 @@ void FubbleModule::SetUpFromSaveData()
          }
       }
    }
-   
+
    {
       std::string controlPathV = mModuleSaveData.GetString("uicontrol_v");
       if (!controlPathV.empty())
@@ -534,21 +514,16 @@ void FubbleModule::SetUpFromSaveData()
          }
       }
    }
-   
-   Resize(mModuleSaveData.GetInt("width"), mModuleSaveData.GetInt("height"));
-}
 
-namespace
-{
-   const int kSaveStateRev = 3;
+   Resize(mModuleSaveData.GetInt("width"), mModuleSaveData.GetInt("height"));
 }
 
 void FubbleModule::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
-   
-   out << kSaveStateRev;
-   
+
    mAxisH.mCurve.SaveState(out);
    mAxisV.mCurve.SaveState(out);
    out << mAxisH.mHasRecorded << mAxisV.mHasRecorded;
@@ -556,20 +531,20 @@ void FubbleModule::SaveState(FileStreamOut& out)
    out << mRecordStartOffset;
 }
 
-void FubbleModule::LoadState(FileStreamIn& in)
+void FubbleModule::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
-   
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
-   
+   IDrawableModule::LoadState(in, rev);
+
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
    mAxisH.mCurve.LoadState(in);
    mAxisV.mCurve.LoadState(in);
-   
+
    if (rev >= 2)
       in >> mAxisH.mHasRecorded >> mAxisV.mHasRecorded;
-   
+
    if (rev >= 3)
    {
       in >> mLength;

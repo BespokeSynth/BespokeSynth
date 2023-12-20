@@ -39,43 +39,48 @@ public:
    AudioLevelToCV();
    virtual ~AudioLevelToCV();
    static IDrawableModule* Create() { return new AudioLevelToCV(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void Process(double time) override;
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   
+
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=106; h=17*5+2; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mGain;
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 106;
+      h = 17 * 5 + 2;
+   }
+
+   float mGain{ 1 };
    float* mModulationBuffer;
-   FloatSlider* mGainSlider;
-   FloatSlider* mAttackSlider;
-   FloatSlider* mReleaseSlider;
-   float mVal;
-   float mAttack;
-   float mRelease;
-   float mAttackFactor;
-   float mReleaseFactor;
+   FloatSlider* mGainSlider{ nullptr };
+   FloatSlider* mAttackSlider{ nullptr };
+   FloatSlider* mReleaseSlider{ nullptr };
+   float mVal{ 0 };
+   float mAttack{ 10 };
+   float mRelease{ 10 };
+   float mAttackFactor{ .99 };
+   float mReleaseFactor{ .99 };
 };
-
-

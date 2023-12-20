@@ -19,9 +19,9 @@ using namespace Json;
 
 
 //--------------------------------------------------------------
-ofxJSONElement::ofxJSONElement(const Json::Value& v) : Value(v)
+ofxJSONElement::ofxJSONElement(const Json::Value& v)
+: Value(v)
 {
-   
 }
 
 
@@ -37,10 +37,12 @@ bool ofxJSONElement::parse(std::string jsonString)
 {
    CharReaderBuilder rb;
    auto reader = std::unique_ptr<Json::CharReader>(rb.newCharReader());
-   if(! reader->parse( jsonString.c_str(),
-                       jsonString.c_str() + jsonString.size(),
-                      this, nullptr)) {
-      ofLog() << "Unable to parse string";
+   Json::String errors;
+   if (!reader->parse(jsonString.c_str(),
+                      jsonString.c_str() + jsonString.size(),
+                      this, &errors))
+   {
+      ofLog() << "Unable to parse string: " << errors;
       return false;
    }
    return true;
@@ -51,7 +53,7 @@ bool ofxJSONElement::parse(std::string jsonString)
 bool ofxJSONElement::open(std::string filename)
 {
    juce::File file(filename);
-   
+
    if (file.exists())
    {
       juce::String str = file.loadFileAsString();
@@ -60,16 +62,18 @@ bool ofxJSONElement::open(std::string filename)
       auto reader = std::unique_ptr<CharReader>(builder.newCharReader());
       auto mS = str.toStdString();
 
-      if(!reader->parse( mS.c_str(), mS.c_str() + mS.size(), this, nullptr ))
+      if (!reader->parse(mS.c_str(), mS.c_str() + mS.size(), this, nullptr))
       {
-         ofLog() << "Unable to parse "+filename;
+         ofLog() << "Unable to parse " + filename;
          return false;
       }
-   } else {
+   }
+   else
+   {
       ofLog() << "Could not load file " + filename;
       return false;
    }
-   
+
    return true;
 }
 
@@ -80,23 +84,24 @@ bool ofxJSONElement::save(std::string filename, bool pretty)
    filename = ofToDataPath(filename);
    juce::File file(filename);
    file.create();
-   if (!file.exists()) {
-      ofLog() << "Unable to create "+filename;
+   if (!file.exists())
+   {
+      ofLog() << "Unable to create " + filename;
       return false;
    }
 
    Json::StreamWriterBuilder builder;
 
-   if(pretty) {
+   if (pretty)
+   {
       builder["indentation"] = "   ";
    }
    const std::string json_file = Json::writeString(builder, *this);
    file.replaceWithText(json_file);
 
-   ofLog() << "JSON saved to "+filename;
+   ofLog() << "JSON saved to " + filename;
    return true;
 }
-
 
 
 //--------------------------------------------------------------
@@ -105,7 +110,8 @@ std::string ofxJSONElement::getRawString(bool pretty)
    std::string raw;
    Json::StreamWriterBuilder builder;
 
-   if(pretty) {
+   if (pretty)
+   {
       builder["indentation"] = "   ";
    }
    raw = Json::writeString(builder, *this);
@@ -113,19 +119,23 @@ std::string ofxJSONElement::getRawString(bool pretty)
 }
 
 //--------------------------------------------------------------
-std::string ofxJSONElement::decodeURL(std::string &SRC)
+std::string ofxJSONElement::decodeURL(std::string& SRC)
 {
    std::string ret;
    char ch;
    int i, ii;
-   for (i=0; i<SRC.length(); i++) {
-      if (int(SRC[i])==37) {
-         sscanf(SRC.substr(i+1,2).c_str(), "%x", &ii);
-         ch=static_cast<char>(ii);
-         ret+=ch;
-         i=i+2;
-      } else {
-         ret+=SRC[i];
+   for (i = 0; i < SRC.length(); i++)
+   {
+      if (int(SRC[i]) == 37)
+      {
+         sscanf(SRC.substr(i + 1, 2).c_str(), "%x", &ii);
+         ch = static_cast<char>(ii);
+         ret += ch;
+         i = i + 2;
+      }
+      else
+      {
+         ret += SRC[i];
       }
    }
    return (ret);

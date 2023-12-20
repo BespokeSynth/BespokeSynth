@@ -37,28 +37,35 @@ class VelocityScaler : public NoteEffectBase, public IDrawableModule, public IFl
 public:
    VelocityScaler();
    static IDrawableModule* Create() { return new VelocityScaler(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 108; height = 22; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mScale;
-   FloatSlider* mScaleSlider;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 108;
+      height = 22;
+   }
+
+   float mScale{ 1 };
+   FloatSlider* mScaleSlider{ nullptr };
 };
 
 

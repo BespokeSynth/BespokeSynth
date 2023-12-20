@@ -33,28 +33,24 @@
 
 AudioSend::AudioSend()
 : IAudioProcessor(gBufferSize)
-, mCrossfade(false)
-, mCrossfadeCheckbox(nullptr)
-, mAmount(0)
-, mAmountSlider(nullptr)
-, mVizBuffer2(VIZ_BUFFER_SECONDS*gSampleRate)
+, mVizBuffer2(VIZ_BUFFER_SECONDS * gSampleRate)
 {
 }
 
 void AudioSend::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mAmountSlider = new FloatSlider(this,"amount",3,3,80,15,&mAmount,0,1,2);
-   mCrossfadeCheckbox = new Checkbox(this,"crossfade",mAmountSlider, kAnchor_Below,&mCrossfade);
-   
-   float w,h;
+
+   mAmountSlider = new FloatSlider(this, "amount", 3, 3, 80, 15, &mAmount, 0, 1, 2);
+   mCrossfadeCheckbox = new Checkbox(this, "crossfade", mAmountSlider, kAnchor_Below, &mCrossfade);
+
+   float w, h;
    GetDimensions(w, h);
-   GetPatchCableSource()->SetManualPosition(w/2-15,h+3);
+   GetPatchCableSource()->SetManualPosition(w / 2 - 15, h + 3);
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
-   
+
    mPatchCableSource2 = new PatchCableSource(this, kConnectionType_Audio);
-   mPatchCableSource2->SetManualPosition(w/2+15,h+3);
+   mPatchCableSource2->SetManualPosition(w / 2 + 15, h + 3);
    mPatchCableSource2->SetOverrideVizBuffer(&mVizBuffer2);
    mPatchCableSource2->SetManualSide(PatchCableSource::Side::kBottom);
    AddPatchCableSource(mPatchCableSource2);
@@ -67,28 +63,28 @@ AudioSend::~AudioSend()
 void AudioSend::Process(double time)
 {
    PROFILER(AudioSend);
-   
+
    if (!mEnabled)
       return;
-   
+
    ComputeSliders(0);
    SyncBuffers();
    mVizBuffer2.SetNumChannels(GetBuffer()->NumActiveChannels());
-   
+
    float* amountBuffer = gWorkBuffer;
-   float* dryAmountBuffer = gWorkBuffer+gBufferSize;
-   for (int i=0; i<gBufferSize; ++i)
+   float* dryAmountBuffer = gWorkBuffer + gBufferSize;
+   for (int i = 0; i < gBufferSize; ++i)
    {
       ComputeSliders(i);
       amountBuffer[i] = mAmount;
-      dryAmountBuffer[i] = 1-mAmount;
+      dryAmountBuffer[i] = 1 - mAmount;
    }
-   
+
    IAudioReceiver* target0 = GetTarget(0);
    if (target0)
    {
       gWorkChannelBuffer.CopyFrom(GetBuffer(), GetBuffer()->BufferSize());
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          ChannelBuffer* out = target0->GetBuffer();
          if (mCrossfade)
@@ -97,11 +93,11 @@ void AudioSend::Process(double time)
          GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
    }
-   
+
    IAudioReceiver* target1 = GetTarget(1);
    if (target1)
    {
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          ChannelBuffer* out2 = target1->GetBuffer();
          Mult(GetBuffer()->GetChannel(ch), amountBuffer, GetBuffer()->BufferSize());
@@ -109,7 +105,7 @@ void AudioSend::Process(double time)
          mVizBuffer2.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -117,21 +113,20 @@ void AudioSend::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mAmountSlider->Draw();
    mCrossfadeCheckbox->Draw();
 }
 
-void AudioSend::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void AudioSend::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   
 }
 
 void AudioSend::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("target2", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

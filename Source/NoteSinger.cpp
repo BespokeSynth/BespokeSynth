@@ -30,16 +30,12 @@
 
 NoteSinger::NoteSinger()
 : IAudioReceiver(gBufferSize)
-, mPitch(0)
-, mOctave(0)
-, mOctaveSlider(nullptr)
-, mNumBuckets(28)
 {
    TheScale->AddListener(this);
-   
+
    mWorkBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mWorkBuffer, GetBuffer()->BufferSize());
-   
+
    OnScaleChanged();
 }
 
@@ -53,7 +49,7 @@ void NoteSinger::Init()
 void NoteSinger::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mOctaveSlider = new IntSlider(this,"oct",35,32,60,15,&mOctave,-2,2);
+   mOctaveSlider = new IntSlider(this, "oct", 35, 32, 60, 15, &mOctave, -2, 2);
 }
 
 NoteSinger::~NoteSinger()
@@ -65,40 +61,40 @@ NoteSinger::~NoteSinger()
 void NoteSinger::OnTransportAdvanced(float amount)
 {
    PROFILER(NoteSinger);
-   
+
    if (!mEnabled)
       return;
 
    ComputeSliders(0);
    SyncInputBuffer();
-   
+
    int pitch = -1;
-   
+
    int bestBucket = -1;
    float bestPeak = -1;
-   for (int i=0; i<mNumBuckets; ++i)
+   for (int i = 0; i < mNumBuckets; ++i)
    {
-      BufferCopy(mWorkBuffer,GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
+      BufferCopy(mWorkBuffer, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
       mBands[i].Filter(mWorkBuffer, GetBuffer()->BufferSize());
       mPeaks[i].Process(mWorkBuffer, GetBuffer()->BufferSize());
-      
+
       float peak = mPeaks[i].GetPeak();
       if (peak > bestPeak)
       {
          int numPitchesInScale = TheScale->NumTonesInScale();
          if (bestBucket != -1 &&
-             peak < 2*bestPeak &&
+             peak < 2 * bestPeak &&
              i % numPitchesInScale == bestBucket % numPitchesInScale)
             continue; //don't let a harmonic beat a fundamental
-         
+
          bestBucket = i;
          bestPeak = peak;
       }
    }
    assert(bestBucket != -1);
-   
+
    pitch = GetPitchForBucket(bestBucket) + mOctave * 12;
-   
+
    if (pitch != mPitch && bestPeak > .01f)
    {
       PlayNoteOutput(gTime, pitch, 80, -1);
@@ -113,47 +109,47 @@ void NoteSinger::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mOctaveSlider->Draw();
 
-   for (int i=0; i<mNumBuckets; ++i)
+   for (int i = 0; i < mNumBuckets; ++i)
    {
-      float x = ofMap(i,0,mNumBuckets,0,100);
-      ofSetColor(255,0,255);
-      ofLine(x,50,x,50-ofMap(MIN(mPeaks[i].GetPeak(),1),0,1,0,50));
+      float x = ofMap(i, 0, mNumBuckets, 0, 100);
+      ofSetColor(255, 0, 255);
+      ofLine(x, 50, x, 50 - ofMap(MIN(mPeaks[i].GetPeak(), 1), 0, 1, 0, 50));
    }
 }
 
 void NoteSinger::OnScaleChanged()
 {
    mNumBuckets = MIN(TheScale->NumTonesInScale() * 4, NOTESINGER_MAX_BUCKETS);
-   
-   for (int i=0; i<mNumBuckets; ++i)
+
+   for (int i = 0; i < mNumBuckets; ++i)
    {
       int pitch = GetPitchForBucket(i);
       float f = TheScale->PitchToFreq(pitch);
-      
+
       mBands[i].SetFilterType(kFilterType_Bandpass);
-      mBands[i].SetFilterParams(f, 40+mNumBuckets*2-i*2);
-      
+      mBands[i].SetFilterParams(f, 40 + mNumBuckets * 2 - i * 2);
+
       mPeaks[i].SetDecayTime(.05f);
    }
 }
 
 int NoteSinger::GetPitchForBucket(int bucket)
 {
-   return TheScale->GetPitchFromTone(bucket+TheScale->NumTonesInScale()*2);
+   return TheScale->GetPitchFromTone(bucket + TheScale->NumTonesInScale() * 2);
 }
 
-void NoteSinger::ButtonClicked(ClickButton* button)
+void NoteSinger::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void NoteSinger::CheckboxUpdated(Checkbox* checkbox)
+void NoteSinger::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      PlayNoteOutput(gTime, mPitch, 0, -1);
+      PlayNoteOutput(time, mPitch, 0, -1);
       mPitch = -1;
    }
 }
@@ -169,4 +165,3 @@ void NoteSinger::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

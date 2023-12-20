@@ -43,13 +43,15 @@ public:
    PSMoveController();
    ~PSMoveController();
    static IDrawableModule* Create() { return new PSMoveController(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void Poll() override;
    void Exit() override;
 
@@ -58,49 +60,55 @@ public:
    void SetRollControl(IUIControl* control) { mRollUIControl = control; }
    void SetEnergyControl(IUIControl* control) { mEnergyUIControl = control; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    //ITimeListener
    void OnTimeEvent(double time) override;
    //IFloatSliderLIstener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 152; height = 140; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 152;
+      height = 140;
+   }
 
    PSMoveMgr mMoveMgr;
    Ramp mVibration;
-   bool mVibronomeOn;
-   Checkbox* mVibronomeCheckbox;
-   ClickButton* mConnectButton;
-   float mMetronomeLagOffset;
-   FloatSlider* mOffsetSlider;
-   float mRoll;
-   float mPitch;
-   float mYaw;
-   float mEnergy;
-   FloatSlider* mPitchSlider;
-   FloatSlider* mYawSlider;
-   FloatSlider* mRollSlider;
-   FloatSlider* mEnergySlider;
-   ClickButton* mBindPitch;
-   ClickButton* mBindYaw;
-   ClickButton* mBindRoll;
-   ClickButton* mBindEnergy;
-   IUIControl* mPitchUIControl;
-   IUIControl* mYawUIControl;
-   IUIControl* mRollUIControl;
-   IUIControl* mEnergyUIControl;
-   
-   bool mPSButtonDown;
+   bool mVibronomeOn{ false };
+   Checkbox* mVibronomeCheckbox{ nullptr };
+   ClickButton* mConnectButton{ nullptr };
+   float mMetronomeLagOffset{ 50 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   float mRoll{ .5 };
+   float mPitch{ .5 };
+   float mYaw{ 0 };
+   float mEnergy{ 0 };
+   FloatSlider* mPitchSlider{ nullptr };
+   FloatSlider* mYawSlider{ nullptr };
+   FloatSlider* mRollSlider{ nullptr };
+   FloatSlider* mEnergySlider{ nullptr };
+   ClickButton* mBindPitch{ nullptr };
+   ClickButton* mBindYaw{ nullptr };
+   ClickButton* mBindRoll{ nullptr };
+   ClickButton* mBindEnergy{ nullptr };
+   IUIControl* mPitchUIControl{ nullptr };
+   IUIControl* mYawUIControl{ nullptr };
+   IUIControl* mRollUIControl{ nullptr };
+   IUIControl* mEnergyUIControl{ nullptr };
 
-   TransportListenerInfo* mTransportListenerInfo;
+   bool mPSButtonDown{ false };
+
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__modularSynth__PSMoveController__) */

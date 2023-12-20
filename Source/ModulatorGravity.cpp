@@ -33,14 +33,6 @@
 #include "UIControlMacros.h"
 
 ModulatorGravity::ModulatorGravity()
-: mValue(0)
-, mGravity(-.1f)
-, mKickAmount(1)
-, mDrag(.005f)
-, mGravitySlider(nullptr)
-, mKickAmountSlider(nullptr)
-, mDragSlider(nullptr)
-, mKickButton(nullptr)
 {
 }
 
@@ -54,14 +46,14 @@ void ModulatorGravity::Init()
 void ModulatorGravity::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
    FLOATSLIDER(mGravitySlider, "gravity", &mGravity, -1, 1);
    FLOATSLIDER(mKickAmountSlider, "kick amt", &mKickAmount, -5, 5);
    FLOATSLIDER(mDragSlider, "drag", &mDrag, 0, .01f);
    BUTTON(mKickButton, "kick");
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
@@ -76,7 +68,7 @@ void ModulatorGravity::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mGravitySlider->Draw();
    mKickAmountSlider->Draw();
    mDragSlider->Draw();
@@ -110,7 +102,7 @@ void ModulatorGravity::OnPulse(double time, float velocity, int flags)
    Kick(velocity);
 }
 
-void ModulatorGravity::ButtonClicked(ClickButton* button)
+void ModulatorGravity::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mKickButton)
       Kick(1);
@@ -123,23 +115,13 @@ void ModulatorGravity::Kick(float strength)
 
 void ModulatorGravity::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;
 }
 
 void ModulatorGravity::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
    SetUpFromSaveData();
 }
 
 void ModulatorGravity::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

@@ -38,44 +38,50 @@ public:
    OutputChannel();
    virtual ~OutputChannel();
    static IDrawableModule* Create() { return new OutputChannel(); }
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    //IAudioReceiver
    InputMode GetInputMode() override { return mChannelSelectionIndex < mStereoSelectionOffset ? kInputMode_Mono : kInputMode_Multichannel; }
-   
+
    //IAudioSource
    void Process(double time) override;
-   
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=mWidth; height=mHeight; }
-   bool Enabled() const override { return true; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    int GetNumChannels() const { return mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2; }
-   
-   float mWidth;
-   float mHeight;
-   DropdownList* mChannelSelector;
-   int mChannelSelectionIndex;
-   int mStereoSelectionOffset;
-   float mLimit;
-   
+
+   float mWidth{ 64 };
+   float mHeight{ 40 };
+   DropdownList* mChannelSelector{ nullptr };
+   int mChannelSelectionIndex{ 0 };
+   int mStereoSelectionOffset{ 0 };
+   float mLimit{ 1 };
+
    struct LevelMeter
    {
-      float mLevel;
-      float mMaxLevel;
       PeakTracker mPeakTracker;
       PeakTracker mPeakTrackerSlow;
    };
-   
-   std::array<LevelMeter,2> mLevelMeters;
+
+   std::array<LevelMeter, 2> mLevelMeters;
 };
 
 #endif /* defined(__modularSynth__OutputChannel__) */

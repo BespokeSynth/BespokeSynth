@@ -37,9 +37,9 @@
 struct UnstablePerlinModulation
 {
    UnstablePerlinModulation(float amount, float warble, float noise)
-      : mPerlinAmount(amount)
-      , mPerlinWarble(warble)
-      , mPerlinNoise(noise)
+   : mPerlinAmount(amount)
+   , mPerlinWarble(warble)
+   , mPerlinNoise(noise)
    {
       mPerlinSeed = gRandom() % 10000;
    }
@@ -62,8 +62,10 @@ public:
    UnstablePitch();
    virtual ~UnstablePitch();
    static IDrawableModule* Create() { return new UnstablePitch(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
-   
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -74,29 +76,34 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
    void FillModulationBuffer(double time, int voiceIdx);
 
-   UnstablePerlinModulation mPerlin;
-   FloatSlider* mAmountSlider;
-   FloatSlider* mWarbleSlider;
-   FloatSlider* mNoiseSlider;
-   float mWidth;
-   float mHeight;
-   std::array<bool, kNumVoices> mIsVoiceUsed { false };
-   std::array<int, 128> mPitchToVoice;
-   int mVoiceRoundRobin;
+   UnstablePerlinModulation mPerlin{ .2, .1, 0 };
+   FloatSlider* mAmountSlider{ nullptr };
+   FloatSlider* mWarbleSlider{ nullptr };
+   FloatSlider* mNoiseSlider{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   std::array<bool, kNumVoices> mIsVoiceUsed{ false };
+   std::array<int, 128> mPitchToVoice{};
+   int mVoiceRoundRobin{ 0 };
 
-   Modulations mModulation;
+   Modulations mModulation{ false };
 };
-

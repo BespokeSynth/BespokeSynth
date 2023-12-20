@@ -40,35 +40,44 @@ class NoteStepper : public INoteReceiver, public INoteSource, public IDrawableMo
 public:
    NoteStepper();
    static IDrawableModule* Create() { return new NoteStepper(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
-   
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
-   
+
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return true; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
 
    static const int kMaxDestinations = 16;
-   std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables;
-   float mWidth;
-   float mHeight;
-   std::array<int, 128> mLastNoteDestinations;
-   int mCurrentDestinationIndex;
-   ClickButton* mResetButton;
-   int mLength;
-   IntSlider* mLengthSlider;
-   double mLastNoteOnTime;
+   std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables{};
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   std::array<int, 128> mLastNoteDestinations{};
+   int mCurrentDestinationIndex{ -1 };
+   ClickButton* mResetButton{ nullptr };
+   int mLength{ 4 };
+   IntSlider* mLengthSlider{ nullptr };
+   double mLastNoteOnTime{ -9999 };
+   bool mAllowChords{ false };
 };

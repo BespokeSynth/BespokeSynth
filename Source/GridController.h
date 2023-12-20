@@ -76,27 +76,37 @@ class GridControlTarget : public IUIControl
 public:
    GridControlTarget(IGridControllerListener* owner, const char* name, int x, int y);
    virtual ~GridControlTarget() {}
-   
+
    void Render() override;
    static void DrawGridIcon(float x, float y);
-   
-   void SetGridController(IGridController* gridController) { mGridController = gridController; gridController->SetGridControllerOwner(mOwner); }
+
+   void SetGridController(IGridController* gridController)
+   {
+      mGridController = gridController;
+      gridController->SetGridControllerOwner(mOwner);
+   }
    IGridController* GetGridController() { return mGridController; }
-   
+
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
-   void SetValue(float value) override {}
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetValue(float value, double time, bool forceUpdate = false) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
+   bool GetNoHover() const override { return true; }
+
 private:
-   void GetDimensions(float& width, float& height) override { width = 30; height = 15; }
+   void GetDimensions(float& width, float& height) override
+   {
+      width = 30;
+      height = 15;
+   }
    bool MouseMoved(float x, float y) override;
-   
-   IGridControllerListener* mOwner;
-   IGridController* mGridController;
+
+   IGridControllerListener* mOwner{ nullptr };
+   IGridController* mGridController{ nullptr };
 };
 
 class GridControllerMidi : public IGridController
@@ -104,10 +114,10 @@ class GridControllerMidi : public IGridController
 public:
    GridControllerMidi();
    virtual ~GridControllerMidi() {}
-   
+
    void SetUp(GridLayout* layout, int page, MidiController* controller);
    void UnhookController();
-   
+
    //IGridController
    void SetGridControllerOwner(IGridControllerListener* owner) override { mOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
@@ -118,21 +128,21 @@ public:
    bool HasInput() const override;
    //bool IsMultisliderGrid() const override { return mColors.empty(); }   //commented out... don't remember what types of grids this is supposed to be for
    bool IsConnected() const override { return mMidiController != nullptr; }
-   
+
    void OnControllerPageSelected();
    void OnInput(int control, float velocity);
-   
+
 private:
-   unsigned int mRows;
-   unsigned int mCols;
-   int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
-   float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
-   int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
+   unsigned int mRows{ 8 };
+   unsigned int mCols{ 8 };
+   int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
+   float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
+   int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
    std::vector<int> mColors;
-   MidiMessageType mMessageType;
-   MidiController* mMidiController;
-   int mControllerPage;
-   IGridControllerListener* mOwner;
+   MidiMessageType mMessageType{ MidiMessageType::kMidiMessage_Note };
+   MidiController* mMidiController{ nullptr };
+   int mControllerPage{ 0 };
+   IGridControllerListener* mOwner{ nullptr };
 };
 
 #endif /* defined(__Bespoke__GridController__) */

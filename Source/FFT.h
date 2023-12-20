@@ -37,17 +37,18 @@ public:
    ~FFT();
    void Forward(float* input, float* output_re, float* output_im);
    void Inverse(float* input_re, float* input_im, float* output);
+
 private:
-   int mNfft;        // size of FFT
-   int mNumfreqs;    // number of frequencies represented (nfft/2 + 1)
-   float* mFft_data; // array for writing/reading to/from FFT function
+   int mNfft{ 0 }; // size of FFT
+   int mNumfreqs{ 0 }; // number of frequencies represented (nfft/2 + 1)
+   float* mFft_data{ nullptr }; // array for writing/reading to/from FFT function
 };
 
 struct FFTData
 {
    FFTData(int windowSize, int freqDomainSize)
-      : mWindowSize(windowSize)
-      , mFreqDomainSize(freqDomainSize)
+   : mWindowSize(windowSize)
+   , mFreqDomainSize(freqDomainSize)
    {
       mRealValues = new float[freqDomainSize];
       mImaginaryValues = new float[freqDomainSize];
@@ -64,11 +65,11 @@ struct FFTData
 
    void Clear();
 
-   int mWindowSize;
-   int mFreqDomainSize;
-   float* mRealValues;
-   float* mImaginaryValues;
-   float* mTimeDomain;
+   int mWindowSize{ 0 };
+   int mFreqDomainSize{ 0 };
+   float* mRealValues{ nullptr };
+   float* mImaginaryValues{ nullptr };
+   float* mTimeDomain{ nullptr };
 };
 
 
@@ -77,11 +78,10 @@ struct FFTData
 
 #define REAL float
 
-void mayer_realfft(int n, REAL *real);
-void mayer_realifft(int n, REAL *real);
+void mayer_realfft(int n, REAL* real);
+void mayer_realifft(int n, REAL* real);
 
 #endif
-
 
 
 #endif /* defined(__modularSynth__FFT__) */

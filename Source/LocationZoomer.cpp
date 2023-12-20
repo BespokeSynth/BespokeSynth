@@ -31,16 +31,13 @@
 #include "juce_core/juce_core.h"
 
 LocationZoomer::LocationZoomer()
-: mCurrentProgress(1)
-, mSpeed(2)
-, mInVanityPanningMode(false)
 {
 }
 
 void LocationZoomer::Init()
 {
    mHome.mZoomLevel = UserPrefs.zoom.Get();
-   mHome.mOffset.set(0,0);
+   mHome.mOffset.set(0, 0);
    mStart = mHome;
    mDestination = mHome;
    mCurrentProgress = 1;
@@ -53,16 +50,16 @@ void LocationZoomer::Update()
    {
       mCurrentProgress = ofClamp(mCurrentProgress + ofGetLastFrameTime() * mSpeed, 0, 1);
       float ease;
-      if (mInVanityPanningMode)  //ease in/out
+      if (mInVanityPanningMode) //ease in/out
          ease = mCurrentProgress < 0.5 ? 2 * mCurrentProgress * mCurrentProgress : 1 - pow(-2 * mCurrentProgress + 2, 2) / 2;
-      else  //ease out
-         ease = -1 * mCurrentProgress*(mCurrentProgress-2);
+      else //ease out
+         ease = -1 * mCurrentProgress * (mCurrentProgress - 2);
       gDrawScale = ofLerp(mStart.mZoomLevel, mDestination.mZoomLevel, ease);
       ofVec2f offset;
       offset.x = ofLerp(mStart.mOffset.x, mDestination.mOffset.x, ease);
       offset.y = ofLerp(mStart.mOffset.y, mDestination.mOffset.y, ease);
       TheSynth->SetDrawOffset(offset);
-      
+
       if (mInVanityPanningMode && mCurrentProgress >= 1)
          PickNewVanityPanningDestination();
    }
@@ -127,9 +124,9 @@ void LocationZoomer::PickNewVanityPanningDestination()
 {
    std::vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
-   
+
    ofVec2f allModulesCenter;
-   for (int i=0; i<(int)modules.size(); ++i)
+   for (int i = 0; i < (int)modules.size(); ++i)
    {
       if (modules[i]->IsShowing() && !modules[i]->Minimized())
       {
@@ -137,11 +134,11 @@ void LocationZoomer::PickNewVanityPanningDestination()
          allModulesCenter += modulePos / (int)modules.size();
       }
    }
-   
+
    const int kRandomChoices = 3;
    ofVec2f randomModulesCenter;
    int attempts = 0;
-   for (int i=0; i<kRandomChoices; ++i)
+   for (int i = 0; i < kRandomChoices; ++i)
    {
       int choice = gRandom() % ((int)modules.size());
       if (modules[choice]->IsShowing() && !modules[choice]->Minimized())
@@ -151,24 +148,24 @@ void LocationZoomer::PickNewVanityPanningDestination()
       }
       else
       {
-         --i;  //try again
+         --i; //try again
       }
       ++attempts;
-      
-      if (attempts > 100)  //avoid infinite loop if all modules are hidden/minimized
+
+      if (attempts > 100) //avoid infinite loop if all modules are hidden/minimized
          break;
    }
-   
+
    ofVec2f center = allModulesCenter * .5f + randomModulesCenter * .5f;
-   
+
    float newScale = ofRandom(1, 1.5f) * UserPrefs.zoom.Get();
-   
+
    mStart.mZoomLevel = gDrawScale;
    mStart.mOffset = TheSynth->GetDrawOffset();
-   
+
    mDestination.mZoomLevel = newScale;
    mDestination.mOffset = (center * -1) + ofVec2f(ofGetWidth(), ofGetHeight()) / newScale * .5f;
-   
+
    mCurrentProgress = 0;
    mSpeed = ofRandom(.03f, .1f);
 }
@@ -177,7 +174,7 @@ ofxJSONElement LocationZoomer::GetSaveData()
 {
    ofxJSONElement save;
    save.resize((unsigned int)mLocations.size());
-   int i=0;
+   int i = 0;
    for (auto iter = mLocations.begin(); iter != mLocations.end(); ++iter)
    {
       const Location& loc = iter->second;
@@ -193,20 +190,20 @@ ofxJSONElement LocationZoomer::GetSaveData()
 void LocationZoomer::LoadFromSaveData(const ofxJSONElement& saveData)
 {
    mLocations.clear();
-   for (int i=0; i<saveData.size(); ++i)
+   for (int i = 0; i < saveData.size(); ++i)
    {
       try
       {
          int shortcut = saveData[i]["shortcut"].asInt();
          mLocations[shortcut].mZoomLevel = saveData[i]["zoomlevel"].asDouble();
          mLocations[shortcut].mOffset.set(saveData[i]["offset_x"].asDouble(),
-            saveData[i]["offset_y"].asDouble());
+                                          saveData[i]["offset_y"].asDouble());
       }
       catch (Json::LogicError& e)
       {
          TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
       }
    }
-   MoveToLocation('1');
+   MoveToLocation(-1);
    mCurrentProgress = .999f;
 }

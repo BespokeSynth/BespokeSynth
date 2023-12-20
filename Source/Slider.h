@@ -27,6 +27,7 @@
 #define __modularSynth__Slider__
 
 #include <iostream>
+#include <limits>
 #include "IUIControl.h"
 #include "TextEntry.h"
 #include "Ramp.h"
@@ -40,7 +41,7 @@ class IFloatSliderListener
 {
 public:
    virtual ~IFloatSliderListener() {}
-   virtual void FloatSliderUpdated(FloatSlider* slider, float oldVal) = 0;
+   virtual void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) = 0;
 };
 
 class FloatSlider : public IUIControl, public ITextEntryListener, public IAudioPoller
@@ -53,10 +54,14 @@ public:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    bool IsMouseDown() const override { return mMouseDown; }
-   void SetExtents(float min, float max) { mMin = min; mMax = max; }
+   void SetExtents(float min, float max)
+   {
+      mMin = min;
+      mMax = max;
+   }
    void Compute(int samplesIn = 0)
    {
-      mComputeHasBeenCalledOnce = true;   //mark this slider as one whose owner calls compute on it
+      mComputeHasBeenCalledOnce = true; //mark this slider as one whose owner calls compute on it
       if (mIsSmoothing || mModulator != nullptr)
          DoCompute(samplesIn);
    }
@@ -73,58 +78,81 @@ public:
    void SetMinValueDisplay(std::string display) { mMinValueDisplay = display; }
    void SetLFO(FloatSliderLFOControl* lfo);
    void SetShowName(bool show) { mShowName = show; }
-   void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
+   void SetDimensions(int w, int h)
+   {
+      mWidth = w;
+      mHeight = h;
+   }
    void SetBezierControl(float control) { mBezierControl = control; }
    void SetModulator(IModulator* modulator);
    IModulator* GetModulator() { return mModulator; }
    float& GetModulatorMin() { return mModulatorMin; }
    float& GetModulatorMax() { return mModulatorMax; }
+   bool ModulatorUsesLiteralValue() const override { return true; }
+   float GetModulationRangeMin() const override { return mMin; }
+   float GetModulationRangeMax() const override { return mMax; }
    void OnTransportAdvanced(float amount) override;
-   
+
    void Init() override;
-   
-   enum Mode { kNormal, kLogarithmic, kSquare, kBezier };
+
+   enum Mode
+   {
+      kNormal,
+      kLogarithmic,
+      kSquare,
+      kBezier
+   };
    void SetMode(Mode mode) { mMode = mode; }
    Mode GetMode() const { return mMode; }
-   
+
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
    std::string GetDisplayValue(float val) const override;
    float GetMidiValue() const override;
-   void GetRange(float& min, float& max) override { min = mMin; max = mMax; }
+   void GetRange(float& min, float& max) override
+   {
+      min = mMin;
+      max = mMax;
+   }
    void Double() override;
    void Halve() override;
    void ResetToOriginal() override;
    void Increment(float amount) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+
+   float PosToVal(float pos, bool ignoreSmooth) const;
+   float ValToPos(float val, bool ignoreSmooth) const;
+
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
-   
+
    bool AttemptTextInput() override;
    void TextEntryComplete(TextEntry* entry) override;
    void TextEntryCancelled(TextEntry* entry) override;
-   
+
    void UpdateTouching();
-   bool mTouching;   //to be controlled with external checkbox for "relative" sliders
-   
+   bool mTouching{ false }; //to be controlled with external checkbox for "relative" sliders
+
 protected:
-   ~FloatSlider();   //protected so that it can't be created on the stack
-   
+   ~FloatSlider(); //protected so that it can't be created on the stack
+
 private:
-   void OnClicked(int x, int y, bool right) override;
-   void SetValueForMouse(int x, int y);
+   void OnClicked(float x, float y, bool right) override;
+   void SetValueForMouse(float x, float y);
    float* GetModifyValue();
-   float PosToVal(float pos, bool ignoreSmooth) const;
-   float ValToPos(float val, bool ignoreSmooth) const;
    bool AdjustSmooth() const;
    void SmoothUpdated();
    void DoCompute(int samplesIn);
-   
+
    int mWidth;
    int mHeight;
    float* mVar;
@@ -132,42 +160,40 @@ private:
    float mMax;
    float mModulatorMin;
    float mModulatorMax;
-   bool mMouseDown;
-   int mFineRefX;
-   int mRefY;
+   bool mMouseDown{ false };
+   int mFineRefX{ -999 };
+   int mRefY{ -999 };
    int mShowDigits;
-   IFloatSliderListener* mOwner;
-   FloatSliderLFOControl* mLFOControl;
-   IModulator* mModulator;
-   float mClampIntMin;
-   float mClampIntMax;
-   bool mRelative;
-   float mRelativeOffset;
-   bool mClamped;
-   Mode mMode;
-   float mOriginalValue;
-   std::string mMinValueDisplay;
-   std::string mMaxValueDisplay;
-   bool mShowName;
-   float mBezierControl;
-   float mSmooth;
-   float mSmoothTarget;
+   IFloatSliderListener* mOwner{ nullptr };
+   FloatSliderLFOControl* mLFOControl{ nullptr };
+   IModulator* mModulator{ nullptr };
+   bool mRelative{ false };
+   float mRelativeOffset{ -999 };
+   bool mClamped{ true };
+   Mode mMode{ Mode::kNormal };
+   float mOriginalValue{ 0 };
+   std::string mMinValueDisplay{ "" };
+   std::string mMaxValueDisplay{ "" };
+   bool mShowName{ true };
+   float mBezierControl{ 1 };
+   float mSmooth{ 0 };
+   float mSmoothTarget{ 0 };
    Ramp mRamp;
-   bool mIsSmoothing;
-   bool mComputeHasBeenCalledOnce;
-   double mLastComputeTime;
-   int mLastComputeSamplesIn;
+   bool mIsSmoothing{ false };
+   bool mComputeHasBeenCalledOnce{ false };
+   double mLastComputeTime{ 0 };
+   int mLastComputeSamplesIn{ 0 };
    double* mLastComputeCacheTime;
    float* mLastComputeCacheValue;
-   
-   float mLastDisplayedValue;
-   
-   TextEntry* mFloatEntry;
-   char mEntryString[MAX_TEXTENTRY_LENGTH];
-   
-   bool mAllowMinMaxAdjustment;
-   TextEntry* mMinEntry;
-   TextEntry* mMaxEntry;
+
+   float mLastDisplayedValue{ std::numeric_limits<float>::max() };
+
+   TextEntry* mFloatEntry{ nullptr };
+   char mEntryString[MAX_TEXTENTRY_LENGTH]{};
+
+   bool mAllowMinMaxAdjustment{ true };
+   TextEntry* mMinEntry{ nullptr };
+   TextEntry* mMaxEntry{ nullptr };
 };
 
 class IntSlider;
@@ -176,7 +202,7 @@ class IIntSliderListener
 {
 public:
    virtual ~IIntSliderListener() {}
-   virtual void IntSliderUpdated(IntSlider* slider, int oldVal) = 0;
+   virtual void IntSliderUpdated(IntSlider* slider, int oldVal, double time) = 0;
 };
 
 class IntSlider : public IUIControl, public ITextEntryListener
@@ -189,23 +215,46 @@ public:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override { mMouseDown = false; }
    bool IsMouseDown() const override { return mMouseDown; }
-   void SetExtents(int min, int max) { mMin = min; mMax = max; CalcSliderVal(); }
+   int GetMin() const { return mMin; }
+   int GetMax() const { return mMax; }
+   void SetExtents(int min, int max)
+   {
+      mMin = min;
+      mMax = max;
+      CalcSliderVal();
+   }
    void SetShowName(bool show) { mShowName = show; }
-   void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
-   
+   void SetDimensions(int w, int h)
+   {
+      mWidth = w;
+      mHeight = h;
+   }
+
    void Init() override;
-   
+
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
    float GetMidiValue() const override;
+   void GetRange(float& min, float& max) override
+   {
+      min = mMin;
+      max = mMax;
+   }
    int GetNumValues() override { return mMax - mMin + 1; }
+   bool ModulatorUsesLiteralValue() const override { return true; }
+   float GetModulationRangeMin() const override { return mMin; }
+   float GetModulationRangeMax() const override { return mMax; }
    std::string GetDisplayValue(float val) const override;
-   void GetRange(int& min, int& max) { min = mMin; max = mMax; }
+   void GetRange(int& min, int& max)
+   {
+      min = mMin;
+      max = mMax;
+   }
    void Double() override;
    void Halve() override;
    void Increment(float amount) override;
@@ -213,20 +262,24 @@ public:
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
-   
+
    bool AttemptTextInput() override;
    void TextEntryComplete(TextEntry* entry) override;
    void TextEntryCancelled(TextEntry* entry) override;
-   
+
 protected:
-   ~IntSlider();   //protected so that it can't be created on the stack
-   
+   ~IntSlider(); //protected so that it can't be created on the stack
+
 private:
-   void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   void SetValueForMouse(int x, int y);
+   void OnClicked(float x, float y, bool right) override;
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+   void SetValueForMouse(float x, float y);
    void CalcSliderVal();
-   
+
    int mWidth;
    int mHeight;
    int* mVar;
@@ -235,15 +288,15 @@ private:
    bool mMouseDown;
    int mOriginalValue;
    IIntSliderListener* mOwner;
-   
+
    int mLastDisplayedValue;
    int mLastSetValue;
    float mSliderVal;
    bool mShowName;
-   
+
    TextEntry* mIntEntry;
    char mEntryString[MAX_TEXTENTRY_LENGTH];
-   
+
    bool mAllowMinMaxAdjustment;
    TextEntry* mMinEntry;
    TextEntry* mMaxEntry;

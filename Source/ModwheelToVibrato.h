@@ -39,32 +39,40 @@ public:
    ModwheelToVibrato();
    virtual ~ModwheelToVibrato();
    static IDrawableModule* Create() { return new ModwheelToVibrato(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 138; height = 22; }
-   bool Enabled() const override { return mEnabled; }
-   
-   NoteInterval mVibratoInterval;
-   DropdownList* mIntervalSelector;
-   float mVibratoAmount;
-   FloatSlider* mVibratoSlider;
-   
-   Modulations mModulation;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 138;
+      height = 22;
+   }
+
+   NoteInterval mVibratoInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   float mVibratoAmount{ 1 };
+   FloatSlider* mVibratoSlider{ nullptr };
+
+   Modulations mModulation{ true };
 };
 
 

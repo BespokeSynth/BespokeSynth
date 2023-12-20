@@ -38,22 +38,22 @@ class Granulator;
 class Grain
 {
 public:
-   Grain() : mPos(0), mSpeedMult(1), mStartTime(0), mEndTime(0), mVol(0), mStereoPosition(0) {}
    void Spawn(Granulator* owner, double time, double pos, float speedMult, float lengthInMs, float vol, float width);
    void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output);
    void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength);
    void Clear() { mVol = 0; }
+
 private:
    double GetWindow(double time);
-   double mPos;
-   float mSpeedMult;
-   double mStartTime;
-   double mEndTime;
-   double mStartToEnd, mStartToEndInv;
-   float mVol;
-   float mStereoPosition;
-   float mDrawPos;
-   Granulator* mOwner;
+   double mPos{ 0 };
+   float mSpeedMult{ 1 };
+   double mStartTime{ 0 };
+   double mEndTime{ 1 };
+   double mStartToEnd{ 1 }, mStartToEndInv{ 1 };
+   float mVol{ 0 };
+   float mStereoPosition{ 0 };
+   float mDrawPos{ .5 };
+   Granulator* mOwner{ nullptr };
 };
 
 class Granulator
@@ -65,24 +65,24 @@ public:
    void Reset();
    void ClearGrains();
    void SetLiveMode(bool live) { mLiveMode = live; }
-   
-   float mSpeed;
-   float mGrainLengthMs;
-   float mGrainOverlap;
-   float mPosRandomizeMs;
-   float mSpeedRandomize;
-   float mSpacingRandomize;
-   bool mOctaves;
-   float mWidth;
-   
+
+   float mSpeed{ 1 };
+   float mGrainLengthMs{ 60 };
+   float mGrainOverlap{ 10 };
+   float mPosRandomizeMs{ 5 };
+   float mSpeedRandomize{ 0 };
+   float mSpacingRandomize{ 1 };
+   bool mOctaves{ false };
+   float mWidth{ 1 };
+
 private:
    void SpawnGrain(double time, double offset, float width);
-   
-   double mNextGrainSpawnMs;
-   int mNextGrainIdx;
-   Grain mGrains[MAX_GRAINS];
-   bool mLiveMode;
-   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
+
+   double mNextGrainSpawnMs{ 0 };
+   int mNextGrainIdx{ 0 };
+   Grain mGrains[MAX_GRAINS]{};
+   bool mLiveMode{ false };
+   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};
 };
 
 #endif /* defined(__modularSynth__Granulator__) */

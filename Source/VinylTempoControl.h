@@ -30,9 +30,12 @@
 #include "IDrawableModule.h"
 #include "IAudioProcessor.h"
 #include "IModulator.h"
-extern "C" {
+// clang-format off
+extern "C"
+{
 #include "xwax/timecoder.h"
 }
+// clang-format on
 
 class VinylProcessor
 {
@@ -43,13 +46,13 @@ public:
    void Process(float* left, float* right, int numSamples);
 
    float GetPitch() { return mPitch; }
-   bool GetStopped() { return mHasSignal == false; }
+   bool GetStopped() { return mHasSignal == false; } //@TODO(Noxy): There is no way for mHasSignal to go true so GetStopped() (which is used in other places) is always true.
 
 private:
    int mSampleRate;
 
-   float mPitch;
-   bool mHasSignal;
+   float mPitch{ 0 };
+   bool mHasSignal{ false };
 
    timecoder mTimecoder;
 };
@@ -60,12 +63,13 @@ public:
    VinylTempoControl();
    ~VinylTempoControl();
    static IDrawableModule* Create() { return new VinylTempoControl(); }
-   
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void CreateUIControls() override;
-   
+
    void Process(double time) override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -74,26 +78,32 @@ public:
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    bool CanStartVinylControl();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 20; }
-   bool Enabled() const override { return mEnabled; }
-   
-   bool mUseVinylControl;
-   Checkbox* mUseVinylControlCheckbox;
-   float mReferencePitch;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 90;
+      height = 20;
+   }
+
+   bool mUseVinylControl{ false };
+   Checkbox* mUseVinylControlCheckbox{ nullptr };
+   float mReferencePitch{ 1 };
    VinylProcessor mVinylProcessor;
    //float* mModulationBuffer;
-   float mSpeed;
+   float mSpeed{ 1 };
 };
 
 #endif /* defined(__Bespoke__VinylTempoControl__) */

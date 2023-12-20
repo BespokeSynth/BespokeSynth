@@ -38,53 +38,59 @@ class INoteSource;
 class NoteOutput : public INoteReceiver
 {
 public:
-   explicit NoteOutput(INoteSource* source) : mNoteSource(source), mStackDepth(0) {}
-   
+   explicit NoteOutput(INoteSource* source)
+   : mNoteSource(source)
+   {}
+
    void Flush(double time);
-   void FlushTarget(double time, INoteReceiver* target);
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
    void SendMidi(const juce::MidiMessage& message) override;
-   
-   void PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
+
+   void PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled);
 
    void ResetStackDepth() { mStackDepth = 0; }
    bool* GetNotes() { return mNotes; }
    bool HasHeldNotes();
    std::list<int> GetHeldNotesList();
+
 private:
    bool mNotes[128]{};
    double mNoteOnTimes[128]{};
-   INoteSource* mNoteSource;
-   int mStackDepth;
+   INoteSource* mNoteSource{ nullptr };
+   int mStackDepth{ 0 };
 };
 
 class INoteSource : public virtual IPatchable
 {
 public:
-   INoteSource() : mNoteOutput(this), mInNoteOutput(false) {}
+   INoteSource()
+   : mNoteOutput(this)
+   {}
    virtual ~INoteSource() {}
-   void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
+   void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters(), bool isFromMainThreadAndScheduled = false);
    void SendCCOutput(int control, int value, int voiceIdx = -1);
-   
+
    //IPatchable
    void PreRepatch(PatchCableSource* cableSource) override;
+
 protected:
    NoteOutput mNoteOutput;
-   bool mInNoteOutput;
+   bool mInNoteOutput{ false };
 };
 
 class AdditionalNoteCable : public INoteSource
 {
 public:
    void SetPatchCableSource(PatchCableSource* cable) { mCable = cable; }
-   PatchCableSource* GetPatchCableSource(int index=0) override { return mCable; }
+   PatchCableSource* GetPatchCableSource(int index = 0) override { return mCable; }
    void Flush(double time) { mNoteOutput.Flush(time); }
+
 private:
-   PatchCableSource* mCable;
+   PatchCableSource* mCable{ nullptr };
 };
 
 #endif

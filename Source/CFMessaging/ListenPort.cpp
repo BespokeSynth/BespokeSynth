@@ -35,11 +35,11 @@ ListenPort::~ListenPort()
 void* SetupRunLoop(void* source)
 {
    //add the source to the run loop
-   CFRunLoopAddSource(CFRunLoopGetCurrent(), *((CFRunLoopSourceRef *)source), kCFRunLoopDefaultMode);
-   
+   CFRunLoopAddSource(CFRunLoopGetCurrent(), *((CFRunLoopSourceRef*)source), kCFRunLoopDefaultMode);
+
    // start the run loop
    CFRunLoopRun();
-   
+
    // exit thread when the runloop is done
    CFShow(CFSTR("thread exiting"));
    pthread_exit(0);
@@ -48,20 +48,20 @@ void* SetupRunLoop(void* source)
 void ListenPort::CreateListener(const char* portName, ListenPortCallback* callback)
 {
    std::cout << "Listening on port " << portName << std::endl;
-   
+
    mPortName = portName;
    mCallback = callback;
-   
+
    Boolean shouldFree;
    mReceivePort = CFMessagePortCreateLocal(kCFAllocatorDefault, CFStringCreateWithCString(kCFAllocatorDefault, portName, kCFStringEncodingASCII), ListenPortReceiver::OnMessageReceived, NULL, &shouldFree);
-   
+
    ListenPortReceiver::RegisterPort(this, mReceivePort);
-   
-   // create the runloop souce from the local message port passed in
+
+   // create the runloop source from the local message port passed in
    mLoopSource = CFMessagePortCreateRunLoopSource(kCFAllocatorDefault, mReceivePort, (CFIndex)0);
-   
+
    pthread_t a;
-   pthread_create(&a, 0, SetupRunLoop, (void *)&mLoopSource);
+   pthread_create(&a, 0, SetupRunLoop, (void*)&mLoopSource);
    pthread_detach(a);
 }
 
@@ -101,9 +101,9 @@ ListenPort* ListenPortReceiver::LookupPort(CFMessagePortRef portRef)
 }
 
 //static
-CFDataRef ListenPortReceiver::OnMessageReceived(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info)
+CFDataRef ListenPortReceiver::OnMessageReceived(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void* info)
 {
    ListenPort* port = LookupPort(local);
-   
+
    return port->OnMessageReceived(msgid, data);
 }

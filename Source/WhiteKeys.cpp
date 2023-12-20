@@ -39,10 +39,10 @@ void WhiteKeys::DrawModule()
       return;
 }
 
-void WhiteKeys::CheckboxUpdated(Checkbox *checkbox)
+void WhiteKeys::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void WhiteKeys::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -85,5 +85,3 @@ void WhiteKeys::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-
-

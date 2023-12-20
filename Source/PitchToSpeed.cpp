@@ -33,10 +33,6 @@
 #include "ModulationChain.h"
 
 PitchToSpeed::PitchToSpeed()
-: mPitch(0)
-, mPitchBend(nullptr)
-, mReferenceFreqSlider(nullptr)
-, mReferenceFreq(440)
 {
 }
 
@@ -50,7 +46,7 @@ void PitchToSpeed::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
-   
+
    mReferenceFreqSlider = new FloatSlider(this, "ref freq", 3, 2, 100, 15, &mReferenceFreq, 10, 1000);
 }
 
@@ -58,7 +54,7 @@ void PitchToSpeed::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mReferenceFreqSlider->Draw();
 }
 
@@ -79,29 +75,18 @@ void PitchToSpeed::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
 float PitchToSpeed::Value(int samplesIn)
 {
    float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
-   return TheScale->PitchToFreq(mPitch+bend) / mReferenceFreq;
+   return TheScale->PitchToFreq(mPitch + bend) / mReferenceFreq;
 }
 
 void PitchToSpeed::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;
 }
 
 void PitchToSpeed::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
    SetUpFromSaveData();
 }
 
 void PitchToSpeed::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }
-

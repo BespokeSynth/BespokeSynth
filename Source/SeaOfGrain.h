@@ -46,46 +46,51 @@ public:
    SeaOfGrain();
    ~SeaOfGrain();
    static IDrawableModule* Create() { return new SeaOfGrain(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    void Poll() override;
-   
+
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
+
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    //IFloatSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
-   
+   void ButtonClicked(ClickButton* button, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void UpdateSample();
    void UpdateDisplaySamples();
@@ -93,86 +98,84 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
 
    ChannelBuffer* GetSourceBuffer();
    float GetSourceStartSample();
    float GetSourceEndSample();
    float GetSourceBufferOffset();
-   
+
    struct GrainMPEVoice
    {
       GrainMPEVoice();
       void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
-      
-      float mPlay;
-      float mPitch;
-      ModulationChain* mPitchBend;
-      ModulationChain* mPressure;
-      ModulationChain* mModWheel;
-      
-      float mGain;
-      
-      ::ADSR mADSR;
+
+      float mPlay{ 0 };
+      float mPitch{ 0 };
+      ModulationChain* mPitchBend{ nullptr };
+      ModulationChain* mPressure{ nullptr };
+      ModulationChain* mModWheel{ nullptr };
+
+      float mGain{ 0 };
+
+      ::ADSR mADSR{ 100, 0, 1, 100 };
       Granulator mGranulator;
-      SeaOfGrain* mOwner;
+      SeaOfGrain* mOwner{ nullptr };
    };
-   
+
    struct GrainManualVoice
    {
       GrainManualVoice();
       void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
-      
-      float mGain;
-      float mPosition;
-      float mPan;
-      
+
+      float mGain{ 0 };
+      float mPosition{ 0 };
+      float mPan{ 0 };
+
       Granulator mGranulator;
-      SeaOfGrain* mOwner;
-      
-      FloatSlider* mGainSlider;
-      FloatSlider* mPositionSlider;
-      FloatSlider* mOverlapSlider;
-      FloatSlider* mSpeedSlider;
-      FloatSlider* mLengthMsSlider;
-      FloatSlider* mPosRandomizeSlider;
-      FloatSlider* mSpeedRandomizeSlider;
-      FloatSlider* mSpacingRandomizeSlider;
-      Checkbox* mOctaveCheckbox;
-      FloatSlider* mWidthSlider;
-      FloatSlider* mPanSlider;
+      SeaOfGrain* mOwner{ nullptr };
+
+      FloatSlider* mGainSlider{ nullptr };
+      FloatSlider* mPositionSlider{ nullptr };
+      FloatSlider* mOverlapSlider{ nullptr };
+      FloatSlider* mSpeedSlider{ nullptr };
+      FloatSlider* mLengthMsSlider{ nullptr };
+      FloatSlider* mPosRandomizeSlider{ nullptr };
+      FloatSlider* mSpeedRandomizeSlider{ nullptr };
+      FloatSlider* mSpacingRandomizeSlider{ nullptr };
+      Checkbox* mOctaveCheckbox{ nullptr };
+      FloatSlider* mWidthSlider{ nullptr };
+      FloatSlider* mPanSlider{ nullptr };
    };
-   
+
    static const int kNumMPEVoices = 16;
    GrainMPEVoice mMPEVoices[kNumMPEVoices];
    static const int kNumManualVoices = 6;
    GrainManualVoice mManualVoices[kNumManualVoices];
-   
-   Sample* mSample;
+
+   Sample* mSample{ nullptr };
    RollingBuffer mRecordBuffer;
-   
-   ClickButton* mLoadButton;
-   bool mRecordInput;
-   Checkbox* mRecordInputCheckbox;
-   bool mHasRecordedInput;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   bool mLoading;
-   FloatSlider* mDisplayOffsetSlider;
-   float mDisplayOffset;
-   FloatSlider* mDisplayLengthSlider;
-   float mDisplayLength;
-   int mDisplayStartSamples;
-   int mDisplayEndSamples;
-   DropdownList* mKeyboardBasePitchSelector;
-   int mKeyboardBasePitch;
-   DropdownList* mKeyboardNumPitchesSelector;
-   int mKeyboardNumPitches;
+
+   ClickButton* mLoadButton{ nullptr };
+   bool mRecordInput{ false };
+   Checkbox* mRecordInputCheckbox{ nullptr };
+   bool mHasRecordedInput{ false };
+   float mVolume{ .6 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   bool mLoading{ false };
+   FloatSlider* mDisplayOffsetSlider{ nullptr };
+   float mDisplayOffset{ 0 };
+   FloatSlider* mDisplayLengthSlider{ nullptr };
+   float mDisplayLength{ 10 };
+   int mDisplayStartSamples{ 0 };
+   int mDisplayEndSamples{ 0 };
+   DropdownList* mKeyboardBasePitchSelector{ nullptr };
+   int mKeyboardBasePitch{ 36 };
+   DropdownList* mKeyboardNumPitchesSelector{ nullptr };
+   int mKeyboardNumPitches{ 24 };
 };
 
 #endif /* defined(__Bespoke__SeaOfGrain__) */
-

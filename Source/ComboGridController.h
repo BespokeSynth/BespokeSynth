@@ -34,12 +34,14 @@ public:
    ComboGridController();
    ~ComboGridController() {}
    static IDrawableModule* Create() { return new ComboGridController(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    void SetGridControllerOwner(IGridControllerListener* owner) override { mOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
    void SetLightDirect(int x, int y, int color, bool force = false) override;
@@ -48,7 +50,7 @@ public:
    int NumRows() override { return mRows; }
    bool HasInput() const override;
    bool IsConnected() const override { return true; }
-   
+
    void SetTarget(IClickable* target);
 
    void OnControllerPageSelected() override {}
@@ -57,6 +59,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return true; }
 
 private:
    enum Arrangements
@@ -70,14 +74,13 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
 
-   unsigned int mRows;
-   unsigned int mCols;
+   unsigned int mRows{ 0 };
+   unsigned int mCols{ 0 };
    std::vector<IGridController*> mGrids;
-   Arrangements mArrangement;
-   IGridControllerListener* mOwner;
+   Arrangements mArrangement{ Arrangements::kHorizontal };
+   IGridControllerListener* mOwner{ nullptr };
 };
 
 #endif /* defined(__Bespoke__ComboGridController__) */

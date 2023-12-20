@@ -33,35 +33,39 @@
 class CLinkwitzRiley_4thOrder
 {
 public:
-   CLinkwitzRiley_4thOrder(const double crossoverFreq=1000.0)
-   :mCrossoverFreq(crossoverFreq),
-   mXm1(0.0), mXm2(0.0), mXm3(0.0), mXm4(0.0),
-   mLYm1(0.0), mLYm2(0.0), mLYm3(0.0), mLYm4(0.0),
-   mHYm1(0.0), mHYm2(0.0), mHYm3(0.0), mHYm4(0.0)
+   CLinkwitzRiley_4thOrder(const double crossoverFreq = 1000.0)
+   : mCrossoverFreq(crossoverFreq)
    {
       CalculateCoefficients();
    }
-   
+
    void SetCrossoverFreq(const double newCrossoverFreq)
    {
       mCrossoverFreq = newCrossoverFreq;
       CalculateCoefficients();
    }
-   
-   void ProcessSample(const float &sample, float &lowOut, float &highOut)
+
+   void ProcessSample(const float& sample, float& lowOut, float& highOut)
    {
-      static double smp;	// done in case sample is coming in as a reused var in the outs
+      static double smp; // done in case sample is coming in as a reused var in the outs
       smp = sample;
-      lowOut = mL_A0 * smp + mL_A1 * mXm1 + mL_A2 * mXm2 + mL_A3 * mXm3 + mL_A4 * mXm4
-      - mB1 * mLYm1 - mB2 * mLYm2 - mB3 * mLYm3 - mB4 * mLYm4;
-      highOut = mH_A0 * smp + mH_A1 * mXm1 + mH_A2 * mXm2 + mH_A3 * mXm3 + mH_A4 * mXm4
-      - mB1 * mHYm1 - mB2 * mHYm2 - mB3 * mHYm3 - mB4 * mHYm4;
+      lowOut = mL_A0 * smp + mL_A1 * mXm1 + mL_A2 * mXm2 + mL_A3 * mXm3 + mL_A4 * mXm4 - mB1 * mLYm1 - mB2 * mLYm2 - mB3 * mLYm3 - mB4 * mLYm4;
+      highOut = mH_A0 * smp + mH_A1 * mXm1 + mH_A2 * mXm2 + mH_A3 * mXm3 + mH_A4 * mXm4 - mB1 * mHYm1 - mB2 * mHYm2 - mB3 * mHYm3 - mB4 * mHYm4;
       // Shuffle history
-      mXm4 = mXm3;	mXm3 = mXm2;	mXm2 = mXm1;	mXm1 = smp;
-      mLYm4 = mLYm3;	mLYm3 = mLYm2;	mLYm2 = mLYm1; mLYm1 = lowOut;	// low
-      mHYm4 = mHYm3;	mHYm3 = mHYm2;	mHYm2 = mHYm1; mHYm1 = highOut;// high
+      mXm4 = mXm3;
+      mXm3 = mXm2;
+      mXm2 = mXm1;
+      mXm1 = smp;
+      mLYm4 = mLYm3;
+      mLYm3 = mLYm2;
+      mLYm2 = mLYm1;
+      mLYm1 = lowOut; // low
+      mHYm4 = mHYm3;
+      mHYm3 = mHYm2;
+      mHYm2 = mHYm1;
+      mHYm1 = highOut; // high
    }
-   
+
 private:
    void CalculateCoefficients()
    {
@@ -71,9 +75,9 @@ private:
       double wc3 = wc2 * wc;
       double wc4 = wc2 * wc2;
       double k = wc / tan(M_PI * mCrossoverFreq / gSampleRate);
-      double k2=k * k;
-      double k3=k2 * k;
-      double k4=k2 * k2;
+      double k2 = k * k;
+      double k3 = k2 * k;
+      double k4 = k2 * k2;
       double sqrt2 = sqrt(2.0);
       double sq_tmp1 = sqrt2 * wc3 * k;
       double sq_tmp2 = sqrt2 * wc * k3;
@@ -97,12 +101,12 @@ private:
       mH_A4 = mH_A0;
    }
    double mCrossoverFreq;
-   double mB1, mB2, mB3, mB4;	// shared with lp & hp
-   double mL_A0, mL_A1, mL_A2, mL_A3, mL_A4;	// lp coefficients
-   double mH_A0, mH_A1, mH_A2, mH_A3, mH_A4;	// hp coefficients
-   double mXm1, mXm2, mXm3, mXm4;	// incoming sample history
-   double mLYm1, mLYm2, mLYm3, mLYm4;	// low output history
-   double mHYm1, mHYm2, mHYm3, mHYm4;	// high output history
+   double mB1, mB2, mB3, mB4; // shared with lp & hp
+   double mL_A0, mL_A1, mL_A2, mL_A3, mL_A4; // lp coefficients
+   double mH_A0, mH_A1, mH_A2, mH_A3, mH_A4; // hp coefficients
+   double mXm1{ 0 }, mXm2{ 0 }, mXm3{ 0 }, mXm4{ 0 }; // incoming sample history
+   double mLYm1{ 0 }, mLYm2{ 0 }, mLYm3{ 0 }, mLYm4{ 0 }; // low output history
+   double mHYm1{ 0 }, mHYm2{ 0 }, mHYm3{ 0 }, mHYm4{ 0 }; // high output history
 };
 
 /*As for how to use it, pretty easy:

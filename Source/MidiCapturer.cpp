@@ -54,16 +54,13 @@ void MidiCapturerDummyController::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
 }
 
 MidiCapturer::MidiCapturer()
-: mRingBufferPos(0)
-, mPlayhead(0)
 {
-   for (int i=0; i<kRingBufferLength; ++i)
+   for (int i = 0; i < kRingBufferLength; ++i)
       mMessages[i].setTimeStamp(-1);
-   
 }
 
 void MidiCapturer::Init()
@@ -118,7 +115,7 @@ void MidiCapturer::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
 void MidiCapturer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

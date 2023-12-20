@@ -38,6 +38,7 @@ public:
    EffectFactory();
    IAudioEffect* MakeEffect(std::string type);
    std::vector<std::string> GetSpawnableEffects();
+
 private:
    void Register(std::string type, CreateEffectFn creator);
    std::map<std::string, CreateEffectFn> mFactoryMap;

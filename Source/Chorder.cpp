@@ -33,33 +33,34 @@
 #include <cstring>
 
 Chorder::Chorder()
-: mVelocity(0)
-, mDiatonic(false)
-, mDiatonicCheckbox(nullptr)
-, mChordDropdown(nullptr)
-, mInversionDropdown(nullptr)
-, mChordIndex(0)
-, mInversion(0)
 {
-   std::memset(mHeldCount, 0, TOTAL_NUM_NOTES*sizeof(int));
-   std::memset(mInputNotes, 0, TOTAL_NUM_NOTES*sizeof(bool));
+   std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
+   std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));
+
+   TheScale->AddListener(this);
+}
+
+Chorder::~Chorder()
+{
+   TheScale->RemoveListener(this);
 }
 
 void Chorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mChordGrid = new UIGrid(2,2,130,50,mDiatonic ? 7 : 12,3, this);
+
+   mChordGrid = new UIGrid("uigrid", 2, 2, 130, 50, mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3, this);
+
    mChordGrid->SetVal(0, 1, 1);
    mChordGrid->SetListener(this);
-   
+
    mDiatonicCheckbox = new Checkbox(this, "diatonic", mChordGrid, kAnchor_Below, &mDiatonic);
    mChordDropdown = new DropdownList(this, "chord", mDiatonicCheckbox, kAnchor_Right, &mChordIndex, 40);
    mInversionDropdown = new DropdownList(this, "inversion", mChordDropdown, kAnchor_Right, &mInversion, 30);
-   
+
    for (auto name : TheScale->GetChordDatabase().GetChordNames())
       mChordDropdown->AddLabel(name, mChordDropdown->GetNumValues());
-   
+
    mInversionDropdown->AddLabel("0", 0);
    mInversionDropdown->AddLabel("1", 1);
    mInversionDropdown->AddLabel("2", 2);
@@ -70,7 +71,33 @@ void Chorder::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
+   ofPushStyle();
+   ofFill();
+   for (int i = 0; i < mChordGrid->GetCols(); ++i)
+   {
+      bool addColor = false;
+      if (i == 0)
+      {
+         ofSetColor(0, 255, 0, 80);
+         addColor = true;
+      }
+      else if ((mDiatonic && i == 4 && TheScale->NumTonesInScale() == 7) || (!mDiatonic && i == 7 && TheScale->GetPitchesPerOctave() == 12))
+      {
+         ofSetColor(200, 150, 0, 80);
+         addColor = true;
+      }
+
+      if (addColor)
+      {
+         ofRectangle rect = mChordGrid->GetRect(true);
+         rect.width /= mChordGrid->GetCols();
+         rect.x += i * rect.width;
+         ofRect(rect);
+      }
+   }
+   ofPopStyle();
+
    mChordGrid->Draw();
    mDiatonicCheckbox->Draw();
    mChordDropdown->Draw();
@@ -81,11 +108,11 @@ void Chorder::GridUpdated(UIGrid* grid, int col, int row, float value, float old
 {
    if (!mDiatonic)
       return; //TODO(Ryan)
-   
-   int tone = col + (mChordGrid->GetRows()/2-row)*mChordGrid->GetCols();
+
+   int tone = col + (mChordGrid->GetRows() / 2 - row) * mChordGrid->GetCols();
    if (value > 0 && oldValue == 0)
    {
-      AddTone(tone, value*value);
+      AddTone(tone, value * value);
    }
    else if (value == 0 && oldValue > 0)
    {
@@ -95,43 +122,43 @@ void Chorder::GridUpdated(UIGrid* grid, int col, int row, float value, float old
 
 void Chorder::AddTone(int tone, float velocity)
 {
-   mChordGrid->SetVal((tone+mChordGrid->GetCols()*10) % mChordGrid->GetCols(),
-                      mChordGrid->GetRows() - 1 - (tone + (mChordGrid->GetRows()/2 * mChordGrid->GetCols())) / mChordGrid->GetCols(),
+   mChordGrid->SetVal((tone + mChordGrid->GetCols() * 10) % mChordGrid->GetCols(),
+                      mChordGrid->GetRows() - 1 - (tone + (mChordGrid->GetRows() / 2 * mChordGrid->GetCols())) / mChordGrid->GetCols(),
                       sqrtf(velocity), !K(notifyListeners));
-   for (int i=0; i<TOTAL_NUM_NOTES; ++i)
+   for (int i = 0; i < TOTAL_NUM_NOTES; ++i)
    {
       if (mInputNotes[i])
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(gTime + gBufferSizeMs, outPitch, mVelocity * velocity, -1, ModulationParameters());
+         PlayChorderNote(NextBufferTime(false), outPitch, mVelocity * velocity, -1, ModulationParameters());
       }
    }
 }
 
 void Chorder::RemoveTone(int tone)
 {
-   mChordGrid->SetVal((tone+mChordGrid->GetCols()*10) % mChordGrid->GetCols(),
-                      mChordGrid->GetRows() - 1 - (tone + (mChordGrid->GetRows()/2 * mChordGrid->GetCols())) / mChordGrid->GetCols(),
+   mChordGrid->SetVal((tone + mChordGrid->GetCols() * 10) % mChordGrid->GetCols(),
+                      mChordGrid->GetRows() - 1 - (tone + (mChordGrid->GetRows() / 2 * mChordGrid->GetCols())) / mChordGrid->GetCols(),
                       0, !K(notifyListeners));
-   for (int i=0; i<TOTAL_NUM_NOTES; ++i)
+   for (int i = 0; i < TOTAL_NUM_NOTES; ++i)
    {
       if (mInputNotes[i])
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(gTime + gBufferSizeMs, outPitch, 0, -1, ModulationParameters());
+         PlayChorderNote(NextBufferTime(false), outPitch, 0, -1, ModulationParameters());
       }
    }
 }
 
-void Chorder::OnClicked(int x, int y, bool right)
+void Chorder::OnClicked(float x, float y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   
+   IDrawableModule::OnClicked(x, y, right);
+
    if (right)
       return;
-   
+
    mChordGrid->TestClick(x, y, right);
 }
 
@@ -143,29 +170,34 @@ void Chorder::MouseReleased()
 
 bool Chorder::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
-   mChordGrid->NotifyMouseMoved(x,y);
+   IDrawableModule::MouseMoved(x, y);
+   mChordGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
-void Chorder::CheckboxUpdated(Checkbox *checkbox)
+void Chorder::OnScaleChanged()
+{
+   mChordGrid->SetGrid(mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3);
+}
+
+void Chorder::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime + gBufferSizeMs);
-      std::memset(mHeldCount, 0, TOTAL_NUM_NOTES*sizeof(int));
-      std::memset(mInputNotes, 0, TOTAL_NUM_NOTES*sizeof(bool));
+      mNoteOutput.Flush(time);
+      std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
+      std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));
    }
-   
+
    if (checkbox == mDiatonicCheckbox)
    {
       mChordDropdown->SetShowing(!mDiatonic);
       mInversionDropdown->SetShowing(!mDiatonic);
-      mChordGrid->SetGrid(mDiatonic ? 7 : 12, 3);
+      mChordGrid->SetGrid(mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3);
    }
 }
 
-void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal)
+void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal, double time)
 {
    if (dropdown == mChordDropdown || dropdown == mInversionDropdown)
    {
@@ -173,8 +205,8 @@ void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal)
       mChordGrid->Clear();
       for (int val : chord)
       {
-         int row = 2 - ((val + 12) / 12);
-         int col = (val + 12) % 12;
+         int row = 2 - ((val + TheScale->GetPitchesPerOctave()) / TheScale->GetPitchesPerOctave());
+         int col = (val + TheScale->GetPitchesPerOctave()) % TheScale->GetPitchesPerOctave();
          mChordGrid->SetVal(col, row, 1);
       }
    }
@@ -192,40 +224,42 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    if (mInputNotes[pitch] == noteOn)
       return;
    mInputNotes[pitch] = noteOn;
-   
+
    if (velocity > 0)
       mVelocity = velocity;
 
    int idx = 0;
-   for (int row=0; row<mChordGrid->GetRows(); ++row)
+   // iterate rows from bottom to top to go from lowest to highest note
+   // for compatibility with arpeggiator and strummer
+   for (int row = mChordGrid->GetRows() - 1; row >= 0; --row)
    {
-      for (int col=0; col<mChordGrid->GetCols(); ++col)
+      for (int col = 0; col < mChordGrid->GetCols(); ++col)
       {
          float val = mChordGrid->GetVal(col, row);
          if (val > 0)
          {
-            int gridPosition = col + (mChordGrid->GetRows()/2-row)*mChordGrid->GetCols();
+            int gridPosition = col + (mChordGrid->GetRows() / 2 - row) * mChordGrid->GetCols();
             int voice = (voiceIdx == -1) ? -1 : (voiceIdx + idx) % 16;
             int outPitch;
-            
+
             if (!mDiatonic)
             {
                outPitch = pitch + gridPosition;
             }
-            else if (gridPosition%TheScale->NumTonesInScale() == 0) //if this is the pressed note or an octave of it
+            else if (gridPosition % TheScale->NumTonesInScale() == 0) //if this is the pressed note or an octave of it
             {
                //play the pressed note (might not be in scale, so play it directly)
-               int octave = gridPosition/TheScale->NumTonesInScale();
-               outPitch = pitch+TheScale->GetPitchesPerOctave()*octave;
+               int octave = gridPosition / TheScale->NumTonesInScale();
+               outPitch = pitch + TheScale->GetPitchesPerOctave() * octave;
             }
             else
             {
                int tone = gridPosition + TheScale->GetToneFromPitch(pitch);
                outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(tone));
             }
-            
-            PlayChorderNote(time, outPitch, velocity*val*val, voice, modulation);
-            
+
+            PlayChorderNote(time, outPitch, velocity * val * val, voice, modulation);
+
             ++idx;
          }
       }
@@ -236,30 +270,30 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
 void Chorder::PlayChorderNote(double time, int pitch, int velocity, int voice /*=-1*/, ModulationParameters modulation)
 {
    assert(velocity >= 0);
-   
+
    if (pitch < 0 || pitch >= TOTAL_NUM_NOTES)
       return;
-   
+
    bool wasOn = mHeldCount[pitch] > 0;
-   
+
    if (velocity > 0)
       ++mHeldCount[pitch];
-   
+
    if (velocity == 0 && mHeldCount[pitch] > 0)
       --mHeldCount[pitch];
-   
+
    if (mHeldCount[pitch] > 0 && !wasOn)
       PlayNoteOutput(time, pitch, velocity, voice, modulation);
    if (mHeldCount[pitch] == 0 && wasOn)
       PlayNoteOutput(time, pitch, 0, voice, modulation);
-   
+
    //ofLog() << ofToString(pitch) + " " + ofToString(velocity) + ": " + ofToString(mHeldCount[pitch]) + " " + ofToString(voice);
 }
 
 void Chorder::CheckLeftovers()
 {
    bool anyHeldNotes = false;
-   for (int i=0; i<TOTAL_NUM_NOTES; ++i)
+   for (int i = 0; i < TOTAL_NUM_NOTES; ++i)
    {
       if (mInputNotes[i])
       {
@@ -267,10 +301,10 @@ void Chorder::CheckLeftovers()
          break;
       }
    }
-   
+
    if (!anyHeldNotes)
    {
-      for (int i=0; i<TOTAL_NUM_NOTES; ++i)
+      for (int i = 0; i < TOTAL_NUM_NOTES; ++i)
       {
          if (mHeldCount[i] > 0)
          {
@@ -293,36 +327,29 @@ void Chorder::LoadLayout(const ofxJSONElement& moduleInfo)
 void Chorder::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   
+
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
    mChordGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderBipolar : UIGrid::kNormal);
    mChordGrid->SetRestrictDragToRow(multisliderMode);
    mChordGrid->SetRequireShiftForMultislider(true);
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void Chorder::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
-   
-   out << kSaveStateRev;
-   
+
    mChordGrid->SaveState(out);
 }
 
-void Chorder::LoadState(FileStreamIn& in)
+void Chorder::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
-   
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
-   
+   IDrawableModule::LoadState(in, rev);
+
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
    mChordGrid->LoadState(in);
 }
-
-

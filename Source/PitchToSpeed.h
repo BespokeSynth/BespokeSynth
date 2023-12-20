@@ -39,39 +39,46 @@ public:
    PitchToSpeed();
    virtual ~PitchToSpeed();
    static IDrawableModule* Create() { return new PitchToSpeed(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IModulator
    virtual float Value(int samplesIn = 0) override;
    virtual bool Active() const override { return mEnabled; }
    virtual bool CanAdjustRange() const override { return false; }
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 106; height=17*2+2; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mPitch;
-   ModulationChain* mPitchBend;
-   
-   FloatSlider* mReferenceFreqSlider;
-   float mReferenceFreq;
-};
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 106;
+      height = 17 * 2 + 2;
+   }
 
+   float mPitch{ 0 };
+   ModulationChain* mPitchBend{ nullptr };
+
+   FloatSlider* mReferenceFreqSlider{ nullptr };
+   float mReferenceFreq{ 440 };
+};

@@ -40,47 +40,53 @@ public:
    TransposeFrom();
    virtual ~TransposeFrom();
    static IDrawableModule* Create() { return new TransposeFrom(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    //IScaleListener
    void OnScaleChanged() override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    struct NoteInfo
    {
-      NoteInfo() : mOn(false), mVelocity(0), mVoiceIdx(-1) {}
-      bool mOn;
-      int mVelocity;
-      int mVoiceIdx;
-      int mOutputPitch;
+      bool mOn{ false };
+      int mVelocity{ 0 };
+      int mVoiceIdx{ -1 };
+      int mOutputPitch{ 0 };
    };
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    int GetTransposeAmount() const;
-   void OnRootChanged();
-   
-   float mWidth;
-   float mHeight;
-   int mRoot;
-   DropdownList* mRootSelector;
-   std::array<NoteInfo, 128> mInputNotes;
-   Checkbox* mRetriggerCheckbox;
-   bool mRetrigger;
+   void OnRootChanged(double time);
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mRoot{ 0 };
+   DropdownList* mRootSelector{ nullptr };
+   std::array<NoteInfo, 128> mInputNotes{};
+   Checkbox* mRetriggerCheckbox{ nullptr };
+   bool mRetrigger{ false };
 };

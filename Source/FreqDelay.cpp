@@ -30,12 +30,10 @@
 
 FreqDelay::FreqDelay()
 : IAudioProcessor(gBufferSize)
-, mDryWet(1)
-, mDryWetSlider(nullptr)
 , mDryBuffer(gBufferSize)
 {
    AddChild(&mDelayEffect);
-   mDelayEffect.SetPosition(5,30);
+   mDelayEffect.SetPosition(5, 30);
    mDelayEffect.SetEnabled(true);
    mDelayEffect.SetDelay(15);
 }
@@ -60,7 +58,7 @@ void FreqDelay::Process(double time)
 
    if (target == nullptr)
       return;
-   
+
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
@@ -68,14 +66,14 @@ void FreqDelay::Process(double time)
 
    mDryBuffer.CopyFrom(GetBuffer());
    mDelayEffect.ProcessAudio(time, GetBuffer());
-   
-   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
-      Mult(mDryBuffer.GetChannel(ch), (1-mDryWet), bufferSize);
+      Mult(mDryBuffer.GetChannel(ch), (1 - mDryWet), bufferSize);
       Mult(GetBuffer()->GetChannel(ch), mDryWet, bufferSize);
       Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
       Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
    }
 
    GetBuffer()->Reset();
@@ -86,7 +84,7 @@ void FreqDelay::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    if (velocity > 0)
    {
       float freq = TheScale->PitchToFreq(pitch);
-      float ms = 1000/freq;
+      float ms = 1000 / freq;
       mDelayEffect.SetDelay(ms);
    }
 }
@@ -101,9 +99,8 @@ void FreqDelay::DrawModule()
    mDryWetSlider->Draw();
 }
 
-void FreqDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void FreqDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   
 }
 
 void FreqDelay::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -117,4 +114,3 @@ void FreqDelay::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
-

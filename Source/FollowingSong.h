@@ -44,42 +44,49 @@ public:
    FollowingSong();
    ~FollowingSong();
    static IDrawableModule* Create() { return new FollowingSong(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void LoadSample(const char* file);
    void SetPlaybackInfo(bool play, int position, float speed, float volume);
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& width, float& height) override { width=560; height=130; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 560;
+      height = 130;
+   }
+
    ofMutex mLoadSongMutex;
-   bool mLoadingSong;
-   
+   bool mLoadingSong{ true };
+
    Sample mSample;
-   float mVolume;
-   bool mPlay;
-   bool mMute;
-   Checkbox* mMuteCheckbox;
+   float mVolume{ 1 };
+   bool mPlay{ false };
+   bool mMute{ false };
+   Checkbox* mMuteCheckbox{ nullptr };
 };
 
 
 #endif /* defined(__Bespoke__FollowingSong__) */
-

@@ -42,55 +42,62 @@ public:
    ModulatorGravity();
    virtual ~ModulatorGravity();
    static IDrawableModule* Create() { return new ModulatorGravity(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
-   FloatSlider* GetTarget() { return mTarget; }
-   
+
+   FloatSlider* GetTarget() { return GetSliderTarget(); }
+
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
-   
+   void ButtonClicked(ClickButton* button, double time) override;
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void Kick(float strength);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mWidth;
-   float mHeight;
-   float mValue;
-   float mVelocity;
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   float mValue{ 0 };
+   float mVelocity{ 0 };
    Ramp mRamp;
-   float mGravity;
-   float mKickAmount;
-   float mDrag;
-   
-   FloatSlider* mGravitySlider;
-   FloatSlider* mKickAmountSlider;
-   FloatSlider* mDragSlider;
-   ClickButton* mKickButton;
+   float mGravity{ -.1 };
+   float mKickAmount{ 1 };
+   float mDrag{ .005 };
+
+   FloatSlider* mGravitySlider{ nullptr };
+   FloatSlider* mKickAmountSlider{ nullptr };
+   FloatSlider* mDragSlider{ nullptr };
+   ClickButton* mKickButton{ nullptr };
 };

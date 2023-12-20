@@ -28,11 +28,6 @@
 #include "ModularSynth.h"
 
 NoteVibrato::NoteVibrato()
-: mVibratoInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mVibratoAmount(0)
-, mVibratoSlider(nullptr)
-, mModulation(true)
 {
 }
 
@@ -51,9 +46,9 @@ NoteVibrato::~NoteVibrato()
 void NoteVibrato::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVibratoSlider = new FloatSlider(this,"vibrato",3,3,90,15,&mVibratoAmount,0,1);
-   mIntervalSelector = new DropdownList(this,"vibinterval",96,3,(int*)(&mVibratoInterval));
-   
+   mVibratoSlider = new FloatSlider(this, "vibrato", 3, 3, 90, 15, &mVibratoAmount, 0, 1);
+   mIntervalSelector = new DropdownList(this, "vibinterval", 96, 3, (int*)(&mVibratoInterval));
+
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -85,23 +80,23 @@ void NoteVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
       modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mVibratoSlider)
       mModulation.GetPitchBend(-1)->SetLFO(mVibratoInterval, mVibratoAmount);
 }
 
-void NoteVibrato::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteVibrato::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
       mModulation.GetPitchBend(-1)->SetLFO(mVibratoInterval, mVibratoAmount);
 }
 
-void NoteVibrato::CheckboxUpdated(Checkbox* checkbox)
+void NoteVibrato::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -109,7 +104,7 @@ void NoteVibrato::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("range", moduleInfo, 1, 0, 64, K(isTextField));
-   
+
    SetUpFromSaveData();
 }
 
@@ -118,4 +113,3 @@ void NoteVibrato::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mVibratoSlider->SetExtents(0, mModuleSaveData.GetFloat("range"));
 }
-

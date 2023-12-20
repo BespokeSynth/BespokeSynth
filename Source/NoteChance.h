@@ -28,35 +28,54 @@
 #pragma once
 #include "NoteEffectBase.h"
 #include "Slider.h"
+#include "ClickButton.h"
+#include "TextEntry.h"
 
-class NoteChance : public NoteEffectBase, public IFloatSliderListener, public IDrawableModule
+class NoteChance : public NoteEffectBase, public IFloatSliderListener, public IIntSliderListener, public IDrawableModule, public ITextEntryListener, public IButtonListener
 {
 public:
    NoteChance();
    virtual ~NoteChance();
    static IDrawableModule* Create() { return new NoteChance(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+   void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   
-   float mChance;
-   FloatSlider* mChanceSlider;
-   float mLastRejectTime;
-   float mLastAcceptTime;
+
+   void Reseed();
+
+   float mChance{ 1 };
+   FloatSlider* mChanceSlider{ nullptr };
+   float mLastRejectTime{ 0 };
+   float mLastAcceptTime{ 0 };
+   bool mDeterministic{ false };
+   Checkbox* mDeterministicCheckbox{ nullptr };
+   int mLength{ 4 };
+   IntSlider* mLengthSlider{ nullptr };
+   int mSeed{ 0 };
+   TextEntry* mSeedEntry{ nullptr };
+   ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

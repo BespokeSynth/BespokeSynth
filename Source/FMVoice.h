@@ -43,14 +43,14 @@ public:
    ::ADSR mHarmRatioADSRParams;
    ::ADSR mModIdxADSRParams2;
    ::ADSR mHarmRatioADSRParams2;
-   float mModIdx;
-   float mHarmRatio;
-   float mModIdx2;
-   float mHarmRatio2;
-   float mVol;
-   float mPhaseOffset0;
-   float mPhaseOffset1;
-   float mPhaseOffset2;
+   float mModIdx{ 0 };
+   float mHarmRatio{ 1 };
+   float mModIdx2{ 0 };
+   float mHarmRatio2{ 1 };
+   float mVol{ 1 };
+   float mPhaseOffset0{ 0 };
+   float mPhaseOffset1{ 0 };
+   float mPhaseOffset2{ 0 };
 };
 
 class FMVoice : public IMidiVoice
@@ -66,16 +66,17 @@ public:
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
+
 private:
-   float mOscPhase;
-   EnvOscillator mOsc;
-   float mHarmPhase;
-   EnvOscillator mHarm;
+   float mOscPhase{ 0 };
+   EnvOscillator mOsc{ kOsc_Sin };
+   float mHarmPhase{ 0 };
+   EnvOscillator mHarm{ kOsc_Sin };
    ::ADSR mModIdx;
-   float mHarmPhase2;
-   EnvOscillator mHarm2;
+   float mHarmPhase2{ 0 };
+   EnvOscillator mHarm2{ kOsc_Sin };
    ::ADSR mModIdx2;
-   FMVoiceParams* mVoiceParams;
+   FMVoiceParams* mVoiceParams{ nullptr };
    IDrawableModule* mOwner;
 };
 

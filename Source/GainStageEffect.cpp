@@ -30,14 +30,13 @@
 #include "Profiler.h"
 
 GainStageEffect::GainStageEffect()
-: mGain(1)
 {
 }
 
 void GainStageEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGainSlider = new FloatSlider(this,"gain",5,2,110,15,&mGain,0,4);
+   mGainSlider = new FloatSlider(this, "gain", 5, 2, 110, 15, &mGain, 0, 4);
 }
 
 void GainStageEffect::ProcessAudio(double time, ChannelBuffer* buffer)
@@ -46,7 +45,7 @@ void GainStageEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
    if (!mEnabled)
       return;
-   
+
    float bufferSize = buffer->BufferSize();
 
    for (int i = 0; i < bufferSize; ++i)
@@ -62,11 +61,10 @@ void GainStageEffect::DrawModule()
    mGainSlider->Draw();
 }
 
-void GainStageEffect::CheckboxUpdated(Checkbox *checkbox)
+void GainStageEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void GainStageEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void GainStageEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
-

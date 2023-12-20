@@ -52,7 +52,7 @@ PitchBender::~PitchBender()
 void PitchBender::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mBendSlider = new FloatSlider(this,"bend",5,2,110,15,&mBend,-mRange,mRange);
+   mBendSlider = new FloatSlider(this, "bend", 5, 2, 110, 15, &mBend, -mRange, mRange);
 }
 
 void PitchBender::DrawModule()
@@ -69,7 +69,7 @@ void PitchBender::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
       modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
@@ -78,13 +78,13 @@ void PitchBender::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void PitchBender::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PitchBender::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mBendSlider)
       mModulation.GetPitchBend(-1)->SetValue(mBend);
 }
 
-void PitchBender::CheckboxUpdated(Checkbox* checkbox)
+void PitchBender::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    /*if (checkbox == &mBendingCheckbox)
    {
@@ -96,7 +96,7 @@ void PitchBender::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("range", moduleInfo, 2, 0, 48, true);
-   
+
    SetUpFromSaveData();
 }
 
@@ -106,5 +106,3 @@ void PitchBender::SetUpFromSaveData()
    mRange = mModuleSaveData.GetFloat("range");
    mBendSlider->SetExtents(-mRange, mRange);
 }
-
-

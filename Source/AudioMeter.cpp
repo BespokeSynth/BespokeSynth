@@ -29,9 +29,6 @@
 
 AudioMeter::AudioMeter()
 : IAudioProcessor(gBufferSize)
-, mLevel(0)
-, mLevelSlider(nullptr)
-, mMaxLevel(1)
 {
    mAnalysisBuffer = new float[gBufferSize];
 }
@@ -39,7 +36,7 @@ AudioMeter::AudioMeter()
 void AudioMeter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mLevelSlider = new FloatSlider(this,"level",5,2,110,15,&mLevel,0,mMaxLevel);
+   mLevelSlider = new FloatSlider(this, "level", 5, 2, 110, 15, &mLevel, 0, mMaxLevel);
 }
 
 AudioMeter::~AudioMeter()
@@ -50,27 +47,27 @@ AudioMeter::~AudioMeter()
 void AudioMeter::Process(double time)
 {
    PROFILER(AudioMeter);
-   
+
    if (!mEnabled)
       return;
-   
+
    ComputeSliders(0);
    SyncBuffers();
-   
+
    Clear(mAnalysisBuffer, gBufferSize);
-   
+
    IAudioReceiver* target = GetTarget();
-   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
       if (target)
          Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
       Add(mAnalysisBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
    }
-   
+
    mPeakTracker.Process(mAnalysisBuffer, gBufferSize);
    mLevel = sqrtf(mPeakTracker.GetPeak());
-   
+
    GetBuffer()->Reset();
 }
 
@@ -78,7 +75,7 @@ void AudioMeter::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mLevelSlider->Draw();
 }
 
@@ -86,7 +83,7 @@ void AudioMeter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("maxlevel", moduleInfo, 1);
-   
+
    SetUpFromSaveData();
 }
 

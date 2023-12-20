@@ -29,22 +29,19 @@
 
 ChannelBuffer::ChannelBuffer(int bufferSize)
 {
-   mActiveChannels = 1;
    mNumChannels = kMaxNumChannels;
-   mRecentActiveChannels = 1;
    mOwnsBuffers = true;
-   
+
    Setup(bufferSize);
 }
 
 ChannelBuffer::ChannelBuffer(float* data, int bufferSize)
 {
    //intended as a temporary holder for passing raw data to methods that want a ChannelBuffer
-   
-   mActiveChannels = 1;
+
    mNumChannels = 1;
    mOwnsBuffers = false;
-   
+
    mBuffers = new float*[1];
    mBuffers[0] = data;
    mBufferSize = bufferSize;
@@ -54,7 +51,7 @@ ChannelBuffer::~ChannelBuffer()
 {
    if (mOwnsBuffers)
    {
-      for (int i=0; i<mNumChannels; ++i)
+      for (int i = 0; i < mNumChannels; ++i)
          delete[] mBuffers[i];
    }
    delete[] mBuffers;
@@ -64,10 +61,10 @@ void ChannelBuffer::Setup(int bufferSize)
 {
    mBuffers = new float*[mNumChannels];
    mBufferSize = bufferSize;
-   
-   for (int i=0; i<mNumChannels; ++i)
+
+   for (int i = 0; i < mNumChannels; ++i)
       mBuffers[i] = nullptr;
-   
+
    Clear();
 }
 
@@ -75,20 +72,20 @@ float* ChannelBuffer::GetChannel(int channel)
 {
    if (channel >= mActiveChannels)
       ofLog() << "error: requesting a higher channel index than we have active";
-   float* ret = mBuffers[MIN(channel, mActiveChannels-1)];
+   float* ret = mBuffers[MIN(channel, mActiveChannels - 1)];
    if (ret == nullptr)
    {
       assert(mOwnsBuffers);
       ret = new float[BufferSize()];
       ::Clear(ret, BufferSize());
-      mBuffers[MIN(channel, mActiveChannels-1)] = ret;
+      mBuffers[MIN(channel, mActiveChannels - 1)] = ret;
    }
    return ret;
 }
 
 void ChannelBuffer::Clear() const
 {
-   for (int i=0; i<mNumChannels; ++i)
+   for (int i = 0; i < mNumChannels; ++i)
    {
       if (mBuffers[i] != nullptr)
          ::Clear(mBuffers[i], BufferSize());
@@ -98,18 +95,18 @@ void ChannelBuffer::Clear() const
 void ChannelBuffer::SetMaxAllowedChannels(int channels)
 {
    float** newBuffers = new float*[channels];
-   for (int i=0; i<channels; ++i)
+   for (int i = 0; i < channels; ++i)
    {
       if (i < mNumChannels)
          newBuffers[i] = mBuffers[i];
       else
          newBuffers[i] = nullptr;
    }
-   
-   for (int i=channels; i<mNumChannels; ++i)
+
+   for (int i = channels; i < mNumChannels; ++i)
       delete[] mBuffers[i];
    delete[] mBuffers;
-   
+
    mBuffers = newBuffers;
    mNumChannels = channels;
    if (mActiveChannels > channels)
@@ -123,7 +120,7 @@ void ChannelBuffer::CopyFrom(ChannelBuffer* src, int length /*= -1*/, int startO
    assert(length <= mBufferSize);
    assert(length + startOffset <= src->mBufferSize);
    mActiveChannels = src->mActiveChannels;
-   for (int i=0; i<mActiveChannels; ++i)
+   for (int i = 0; i < mActiveChannels; ++i)
    {
       if (src->mBuffers[i])
       {
@@ -153,10 +150,10 @@ void ChannelBuffer::SetChannelPointer(float* data, int channel, bool deleteOldDa
 void ChannelBuffer::Resize(int bufferSize)
 {
    assert(mOwnsBuffers);
-   for (int i=0; i<mNumChannels; ++i)
+   for (int i = 0; i < mNumChannels; ++i)
       delete[] mBuffers[i];
    delete[] mBuffers;
-   
+
    Setup(bufferSize);
 }
 
@@ -168,7 +165,7 @@ namespace
 void ChannelBuffer::Save(FileStreamOut& out, int writeLength)
 {
    out << kSaveStateRev;
-   
+
    out << writeLength;
    out << mActiveChannels;
    for (int i = 0; i < mActiveChannels; ++i)
@@ -184,8 +181,8 @@ void ChannelBuffer::Load(FileStreamIn& in, int& readLength, LoadMode loadMode)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
-   
+   LoadStateValidate(rev <= kSaveStateRev);
+
    in >> readLength;
    if (loadMode == LoadMode::kSetBufferSize)
       Setup(readLength);
@@ -199,7 +196,7 @@ void ChannelBuffer::Load(FileStreamIn& in, int& readLength, LoadMode loadMode)
       bool hasBuffer = true;
       if (rev >= 1)
          in >> hasBuffer;
-      
+
       if (hasBuffer)
          in.Read(GetChannel(i), readLength);
    }

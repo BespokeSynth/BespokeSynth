@@ -38,42 +38,51 @@ class NoteOctaver : public NoteEffectBase, public IDrawableModule, public IIntSl
 public:
    NoteOctaver();
    static IDrawableModule* Create() { return new NoteOctaver(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IIntSliderListener
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    struct NoteInfo
    {
-      NoteInfo() : mOn(false), mVelocity(0), mVoiceIdx(-1) {}
-      bool mOn;
-      int mVelocity;
-      int mVoiceIdx;
+      bool mOn{ false };
+      int mVelocity{ 0 };
+      int mVoiceIdx{ -1 };
+      int mOutputPitch{ 0 };
    };
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 108; height = 22; }
-   bool Enabled() const override { return mEnabled; }   
-   
-   int mOctave;
-   IntSlider* mOctaveSlider;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mOctave{ 0 };
+   IntSlider* mOctaveSlider{ nullptr };
    std::array<NoteInfo, 128> mInputNotes;
+   Checkbox* mRetriggerCheckbox{ nullptr };
+   bool mRetrigger{ false };
 };
 
 
 #endif /* defined(__modularSynth__NoteOctaver__) */
-
