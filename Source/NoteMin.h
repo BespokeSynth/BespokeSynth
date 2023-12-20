@@ -50,7 +50,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 131; height = 21; }
+   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 0; }
    bool Enabled() const override { return mEnabled; }
 
    std::array<bool, 128> mNotePlaying{ false };
