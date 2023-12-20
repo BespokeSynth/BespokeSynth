@@ -241,6 +241,7 @@ target_sources(BespokeSynth PRIVATE
     PitchShifter.cpp
     PitchToCV.cpp
     PitchToSpeed.cpp
+    PitchToValue.cpp
     PlaySequencer.cpp
     PolyphonyMgr.cpp
     Polyrhythms.cpp
