@@ -60,7 +60,7 @@ void PitchToValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 
 void PitchToValue::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled) // CHECKME: velocity > 0?
+   if (mEnabled && velocity > 0)
    {
       mValue = pitch;
    }
