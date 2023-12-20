@@ -489,7 +489,6 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(FFTtoAdditive, ffttoadditive, kModuleCategory_Audio);
    REGISTER_HIDDEN(SlowLayers, slowlayers, kModuleCategory_Audio);
    REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleCategory_Synth);
-
 #ifdef BESPOKE_MAC
    REGISTER_HIDDEN(KompleteKontrol, kompletekontrol, kModuleCategory_Note);
 #endif
