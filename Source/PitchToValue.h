@@ -28,11 +28,12 @@
 
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
+#include "IModulator.h"
 
 class PatchCableSource;
 class IUIControl;
 
-class PitchToValue : public IDrawableModule, public INoteReceiver
+class PitchToValue : public IDrawableModule, public INoteReceiver, public IModulator
 {
 public:
    PitchToValue();
@@ -46,6 +47,12 @@ public:
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   //IModulator
+   float Value(int samplesIn = 0) override;
+   bool Active() const override { return mEnabled; }
+   bool CanAdjustRange() const override { return false; }
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -56,14 +63,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override { width = 110; height = 0; }
    bool Enabled() const override { return mEnabled; }
    
-   PatchCableSource* mControlCable;
-   IUIControl* mTarget;
-   
-   float mWidth;
-   float mHeight;
+   int mValue;
 };
 
 #endif /* defined(__Bespoke__PitchToValue__) */

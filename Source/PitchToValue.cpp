@@ -31,7 +31,7 @@
 #include "ModulationChain.h"
 
 PitchToValue::PitchToValue()
-: mControlCable(nullptr)
+: mValue(0)
 {
 }
 
@@ -42,8 +42,9 @@ PitchToValue::~PitchToValue()
 void PitchToValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mControlCable = new PatchCableSource(this, kConnectionType_Modulator); // CHECKME: Need to set modulator owner?
-   AddPatchCableSource(mControlCable);
+   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCable->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCable);
 }
 
 void PitchToValue::DrawModule()
@@ -54,17 +55,20 @@ void PitchToValue::DrawModule()
 
 void PitchToValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
+   OnModulatorRepatch();
 }
 
 void PitchToValue::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mTarget) // CHECKME: Enabled? velocity > 0?
+   if (mEnabled) // CHECKME: velocity > 0?
    {
-      mTarget->SetValue(pitch);
-      mControlCable->AddHistoryEvent(gTime, true);
-      mControlCable->AddHistoryEvent(gTime + 15, false);
+      mValue = pitch;
    }
+}
+
+float PitchToValue::Value(int samplesIn)
+{
+   return mValue;
 }
 
 void PitchToValue::SaveLayout(ofxJSONElement& moduleInfo)
@@ -87,6 +91,5 @@ void PitchToValue::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void PitchToValue::SetUpFromSaveData()
 {
-   mTarget = TheSynth->FindUIControl(mModuleSaveData.GetString("target"));
-   mControlCable->SetTarget(mTarget);
+   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }
