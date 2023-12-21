@@ -64,7 +64,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width = 110; height = 0; }
-   bool Enabled() const override { return mEnabled; }
+   bool IsEnabled() const override { return mEnabled; }
    
    int mValue;
 };
