@@ -62,26 +62,26 @@ void NoteMinMax::DrawModule()
 
 void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-      mNotePlaying[pitch] = velocity > 0;
-      mVelocityPlaying[pitch] = velocity;
-      mVoiceIdxPlaying[pitch] = voiceIdx;
+   mNotePlaying[pitch] = velocity > 0;
+   mVelocityPlaying[pitch] = velocity;
+   mVoiceIdxPlaying[pitch] = voiceIdx;
 
-      int minNotePlaying = -1;
-      for (int i = 0; i < 128; ++i)
-      {
-         if (mNotePlaying[i] && minNotePlaying == -1)
-            minNotePlaying = i;
-      }
+   int minNotePlaying = -1;
+   for (int i = 0; i < 128; ++i)
+   {
+      if (mNotePlaying[i] && minNotePlaying == -1)
+         minNotePlaying = i;
+   }
 
-      if (velocity > 0) // new note playing
-      {
-          if (minNotePlaying == pitch)
-             mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
-      } else { // played note is stopped
-          PlayNoteOutput(time, pitch, 0, -1);
-          if (minNotePlaying > pitch) // play the new lowest note
-             mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
-      }
+   if (velocity > 0) // new note playing
+   {
+       if (minNotePlaying == pitch)
+          mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
+   } else { // played note is stopped
+       mDestinationCables[0]->PlayNoteOutput(time, pitch, 0, -1);
+       if (minNotePlaying > pitch) // play the new lowest note
+          mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
+   }
 }
 
 void NoteMinMax::LoadLayout(const ofxJSONElement& moduleInfo)
