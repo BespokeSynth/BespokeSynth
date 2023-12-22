@@ -62,35 +62,69 @@ void NoteMinMax::DrawModule()
 
 void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   mNotePlaying[pitch] = velocity > 0;
-   mVelocityPlaying[pitch] = velocity;
-   mVoiceIdxPlaying[pitch] = voiceIdx;
-
-   int minNotePlaying = -1;
-   int maxNotePlaying = -1;
-   for (int i = 0; i < 128; ++i)
+   if (velocity > 0) // New note playing
    {
-      if (mNotePlaying[i])
+      // Detect previous min and max notes
+      int minNotePlaying = -1;
+      int maxNotePlaying = -1;
+      for (int i = 0; i < 128; ++i)
       {
-         if (minNotePlaying == -1)
-            minNotePlaying = i;
-         maxNotePlaying = i;
+         if (mNotePlaying[i])
+         {
+            if (minNotePlaying == -1)
+               minNotePlaying = i;
+            maxNotePlaying = i;
+         }
       }
-   }
 
-   if (velocity > 0) // new note playing
-   {
-      if (minNotePlaying == pitch)
-         mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
-      if (maxNotePlaying == pitch)
-         mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], modulation);
+      // Store the note
+      mNotePlaying[pitch] = true;
+      mVelocityPlaying[pitch] = velocity;
+      mVoiceIdxPlaying[pitch] = voiceIdx;
+
+      if (minNotePlaying == -1 || minNotePlaying > pitch)
+      {
+         if (minNotePlaying != -1)
+            mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, 0, -1);
+         mDestinationCables[0]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      }
+      if (maxNotePlaying == -1 || maxNotePlaying < pitch)
+      {
+         if (maxNotePlaying != -1)
+            mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, 0, -1);
+         mDestinationCables[1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      }
    } else { // played note is stopped
-      mDestinationCables[0]->PlayNoteOutput(time, pitch, 0, -1);
-      mDestinationCables[1]->PlayNoteOutput(time, pitch, 0, -1);
-      if (minNotePlaying > pitch) // play the new lowest note
-         mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
-      if (maxNotePlaying < pitch) // play the new highest note
-         mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], modulation);
+      // Unset the note
+      mNotePlaying[pitch] = false;
+      mVelocityPlaying[pitch] = velocity;
+      mVoiceIdxPlaying[pitch] = voiceIdx;
+
+      // Detect new min and max notes
+      int minNotePlaying = -1;
+      int maxNotePlaying = -1;
+      for (int i = 0; i < 128; ++i)
+      {
+         if (mNotePlaying[i])
+         {
+            if (minNotePlaying == -1)
+               minNotePlaying = i;
+            maxNotePlaying = i;
+         }
+      }
+
+      if (minNotePlaying == -1 || minNotePlaying > pitch)
+      {
+         mDestinationCables[0]->PlayNoteOutput(time, pitch, 0, -1);
+         if (minNotePlaying != -1)
+            mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
+      }
+      if (maxNotePlaying == -1 || maxNotePlaying < pitch)
+      {
+         mDestinationCables[1]->PlayNoteOutput(time, pitch, 0, -1);
+         if (maxNotePlaying != -1)
+            mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], modulation);
+      }
    }
 }
 
