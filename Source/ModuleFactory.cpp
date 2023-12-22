@@ -445,6 +445,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteToggle, notetoggle, kModuleType_Other);
    REGISTER(NoteTable, notetable, kModuleType_Note);
    REGISTER(NoteMin, notemin, kModuleType_Note);
+   REGISTER(NoteMinMax, noteminmax, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
