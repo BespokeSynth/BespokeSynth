@@ -249,6 +249,7 @@
 #include "NoteToggle.h"
 #include "NoteTable.h"
 #include "NoteMin.h"
+#include "NoteMinMax.h"
 
 #include <juce_core/juce_core.h>
 

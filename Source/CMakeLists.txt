@@ -195,6 +195,7 @@ target_sources(BespokeSynth PRIVATE
     NoteLatch.cpp
     NoteLooper.cpp
     NoteMin.cpp
+    NoteMinMax.cpp
     NoteOctaver.cpp
     NotePanAlternator.cpp
     NotePanRandom.cpp
