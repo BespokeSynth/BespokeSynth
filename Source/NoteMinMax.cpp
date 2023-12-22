@@ -68,16 +68,17 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       if (velocity > 0) // new note playing
       {
           if (minNotePlaying == pitch)
-             PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
+             mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
       } else { // played note is stopped
           PlayNoteOutput(time, pitch, 0, -1);
           if (minNotePlaying > pitch) // play the new lowest note
-             PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
+             mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
       }
    }
    else
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      mDestinationCables[0]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      mDestinationCables[1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
 }
 
