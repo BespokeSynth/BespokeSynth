@@ -42,6 +42,12 @@ void NoteMinMax::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+
+   DrawTextNormal("min", 3, 15);
+   DrawTextNormal("max", 3, 30);
+
+   mDestinationCables[0]->GetPatchCableSource()->SetManualPosition(20, 15);
+   mDestinationCables[1]->GetPatchCableSource()->SetManualPosition(20, 30);
 }
 
 void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
