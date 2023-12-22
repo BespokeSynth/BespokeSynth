@@ -30,6 +30,7 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
+#include "INoteSource.h"
 
 class NoteMinMax : public NoteEffectBase, public IDrawableModule
 {
@@ -50,8 +51,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 0; }
+   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 45; };
    bool Enabled() const override { return mEnabled; }
+
+   std::vector<AdditionalNoteCable*> mDestinationCables;
 
    std::array<bool, 128> mNotePlaying{ false };
    std::array<int, 128> mVelocityPlaying{ 0 };
