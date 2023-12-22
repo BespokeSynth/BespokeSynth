@@ -28,6 +28,7 @@
 #include "NoteMinMax.h"
 #include "OpenFrameworksPort.h"
 #include "ModularSynth.h"
+#include "PatchCableSource.h"
 
 NoteMinMax::NoteMinMax()
 {
@@ -36,6 +37,18 @@ NoteMinMax::NoteMinMax()
 void NoteMinMax::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+
+   mDestinationCables[0] = new AdditionalNoteCable();
+   mDestinationCables[0]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+   mDestinationCables[0]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
+   AddPatchCableSource(mDestinationCables[0]->GetPatchCableSource());
+   mDestinationCables[0]->GetPatchCableSource()->SetManualPosition(20, 15);
+
+   mDestinationCables[1] = new AdditionalNoteCable();
+   mDestinationCables[1]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+   mDestinationCables[1]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
+   AddPatchCableSource(mDestinationCables[1]->GetPatchCableSource());
+   mDestinationCables[1]->GetPatchCableSource()->SetManualPosition(20, 30);
 }
 
 void NoteMinMax::DrawModule()
@@ -45,15 +58,10 @@ void NoteMinMax::DrawModule()
 
    DrawTextNormal("min", 3, 15);
    DrawTextNormal("max", 3, 30);
-
-   mDestinationCables[0]->GetPatchCableSource()->SetManualPosition(20, 15);
-   mDestinationCables[1]->GetPatchCableSource()->SetManualPosition(20, 30);
 }
 
 void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled)
-   {
       mNotePlaying[pitch] = velocity > 0;
       mVelocityPlaying[pitch] = velocity;
       mVoiceIdxPlaying[pitch] = voiceIdx;
@@ -74,22 +82,18 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
           if (minNotePlaying > pitch) // play the new lowest note
              mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
       }
-   }
-   else
-   {
-      mDestinationCables[0]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-      mDestinationCables[1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-   }
 }
 
 void NoteMinMax::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void NoteMinMax::SetUpFromSaveData()
 {
-   SetUpPatchCables(mModuleSaveData.GetString("target"));
+}
+
+void NoteMinMax::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule::SaveLayout(moduleInfo);
 }

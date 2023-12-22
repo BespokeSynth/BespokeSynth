@@ -48,13 +48,14 @@ public:
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width = 90; height = 45; };
-   bool Enabled() const override { return mEnabled; }
+   bool Enabled() const override { return true; }
 
-   std::vector<AdditionalNoteCable*> mDestinationCables;
+   AdditionalNoteCable* mDestinationCables[2];
 
    std::array<bool, 128> mNotePlaying{ false };
    std::array<int, 128> mVelocityPlaying{ 0 };
