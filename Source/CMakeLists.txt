@@ -28,6 +28,8 @@ target_sources(BespokeSynth PRIVATE
     Amplifier.h
     Arpeggiator.cpp
     Arpeggiator.h
+        RhythmSequencer.cpp
+        RhythmSequencer.h
     ArrangementController.cpp
     ArrangementController.h
     AudioLevelToCV.cpp

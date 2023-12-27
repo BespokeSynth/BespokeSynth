@@ -202,15 +202,24 @@ void Push2Control::DrawModule()
    {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
       DrawTextNormal(mPushBridgeInitErrMsg, 3, 15);
+
+      mModuleGridLayoutStyleDropdown->SetShowing(false);
+      mShowManualGridCheckbox->SetShowing(false);
+
+      for (auto& cable : mModuleGridManualCables)
+         cable->SetShowing(false);
    }
    else
    {
-      mModuleGridLayoutStyleDropdown->Draw();
-      mShowManualGridCheckbox->Draw();
+      mModuleGridLayoutStyleDropdown->SetShowing(true);
+      mShowManualGridCheckbox->SetShowing(true);
 
       for (auto& cable : mModuleGridManualCables)
          cable->SetShowing(mShowManualGrid);
    }
+
+   mModuleGridLayoutStyleDropdown->Draw();
+   mShowManualGridCheckbox->Draw();
 }
 
 void Push2Control::DrawModuleUnclipped()

@@ -110,6 +110,10 @@ void IDrawableModule::Init()
    mCanReceiveNotes = moduleInfo.mCanReceiveNotes;
    mCanReceivePulses = moduleInfo.mCanReceivePulses;
 
+   // if you hit these asserts, it means that, for example, your module's
+   // AcceptsPulses() returns false, but it inherits IPulseReceiver.
+   // the fix is to make AcceptsPulses() (or the appropriate method) match the
+   // list of inherited classes.
    assert(mCanReceiveAudio == (dynamic_cast<IAudioReceiver*>(this) != nullptr));
    assert(mCanReceiveNotes == (dynamic_cast<INoteReceiver*>(this) != nullptr));
    assert(mCanReceivePulses == (dynamic_cast<IPulseReceiver*>(this) != nullptr));

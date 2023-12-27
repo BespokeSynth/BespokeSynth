@@ -2029,3 +2029,18 @@ songbuilder~large-scale organizer to arrange settings into scenes and then seque
 ~move right~move this target right in the scene
 ~type~change the control display type for this target
 ~color*~color to theme this target
+
+
+rhythmsequencer~repeats held input notes, to turn a sustained note into a rhythm
+~interval~rate to play notes at
+~length~length of the sequence
+~link lengths~should there be one global length, or a length for each column?
+~len act~length of the action column
+~len vel~length of the velocity column
+~len oct~length of the octave offset column
+~len deg~length of the scale degree offset column
+~action *~action for this step. on = play note, hold = sustain note, off = no note
+~vel *~velocity for this step
+~octave *~octave offset for this step
+~degree *~scale degree offset for this step
+
