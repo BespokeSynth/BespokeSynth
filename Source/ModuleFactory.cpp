@@ -259,6 +259,7 @@
 #include "PulseFlag.h"
 #include "PulseDisplayer.h"
 #include "BufferShuffler.h"
+#include "RhythmSequencer.h"
 
 #include <juce_core/juce_core.h>
 
@@ -465,6 +466,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseFlag, pulseflag, kModuleCategory_Pulse);
    REGISTER(PulseDisplayer, pulsedisplayer, kModuleCategory_Pulse);
    REGISTER(BufferShuffler, buffershuffler, kModuleCategory_Audio);
+   REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
@@ -753,6 +755,9 @@ std::string ModuleFactory::FixUpTypeName(std::string name)
 
    if (name == "presets")
       return "snapshots";
+
+   if (name == "arpsequencer")
+      return "rhythmsequencer";
 
    return name;
 }

@@ -33,7 +33,7 @@
 
 RadioSequencer::RadioSequencer()
 {
-   mTransportPriority = 0;
+   mTransportPriority = ITimeListener::kTransportPriorityEarly;
 }
 
 void RadioSequencer::Init()

@@ -65,7 +65,7 @@ SongBuilder::SongBuilder()
    mColors.push_back(TargetColor("purple", ofColor::purple * kColorDim));
    mColors.push_back(TargetColor("magenta", ofColor::magenta * kColorDim));
 
-   mTransportPriority = -1000;
+   mTransportPriority = ITimeListener::kTransportPriorityVeryEarly;
 }
 
 void SongBuilder::Init()
@@ -215,7 +215,7 @@ void SongBuilder::DrawModule()
 
       if (mSequencerSceneId[i] < 0)
       {
-         if (!sequenceComplete)
+         if (show && !sequenceComplete)
          {
             ofRectangle rect = mSequencerStepLengthEntry[i]->GetRect(K(local));
             int sequenceLengthSeconds = int(sequenceLength * TheTransport->MsPerBar() / 1000);

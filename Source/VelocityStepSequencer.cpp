@@ -176,7 +176,6 @@ void VelocityStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, doub
 void VelocityStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("chord_progression_mode", moduleInfo);
    mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
 
    SetUpFromSaveData();
