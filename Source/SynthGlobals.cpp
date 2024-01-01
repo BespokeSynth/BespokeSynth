@@ -36,7 +36,7 @@
 #include "PatchCableSource.h"
 #include "ChannelBuffer.h"
 #include "IPulseReceiver.h"
-#include "exprtk/exprtk.hpp"
+#include "exprtk.hpp"
 #include "UserPrefs.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
