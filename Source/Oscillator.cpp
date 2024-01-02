@@ -81,8 +81,8 @@ float Oscillator::Value(float phase) const
          break;
    }
 
-   if (mType != kOsc_Square && mType != kOsc_Saw && mType != kOsc_NegSaw && mPulseWidth != .5f)
-      sample = (Bias(sample / 2 + .5f, mPulseWidth) - .5f) * 2; //give "pulse width" to non-square/saw oscillators
+   if (mType != kOsc_Square && mPulseWidth != .5f)
+      sample = (Bias(sample / 2 + .5f, mPulseWidth) - .5f) * 2; //give "pulse width" to non-square oscillators
 
    return sample;
 }
@@ -90,14 +90,6 @@ float Oscillator::Value(float phase) const
 float Oscillator::SawSample(float phase) const
 {
    phase /= FTWO_PI;
-   if (mPulseWidth != .5f)
-   {
-      float slope = fabsf(.5f - mPulseWidth) * 2;
-      if (mPulseWidth > .5f)
-         phase -= slope;
-      phase /= 1 - slope;
-      phase = std::clamp(phase, 0.0f, 1.0f);
-   }
    if (mSoften == 0)
       return phase * 2 - 1;
    if (phase < 1 - mSoften)
