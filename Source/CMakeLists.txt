@@ -495,6 +495,8 @@ target_sources(BespokeSynth PRIVATE
     PitchToCV.h
     PitchToSpeed.cpp
     PitchToSpeed.h
+    PitchToValue.cpp
+    PitchToValue.h
     PlaySequencer.cpp
     PlaySequencer.h
     PolyphonyMgr.cpp

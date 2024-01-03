@@ -259,6 +259,7 @@
 #include "PulseFlag.h"
 #include "PulseDisplayer.h"
 #include "BufferShuffler.h"
+#include "PitchToValue.h"
 #include "RhythmSequencer.h"
 #include "DotSequencer.h"
 
@@ -467,6 +468,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseFlag, pulseflag, kModuleCategory_Pulse);
    REGISTER(PulseDisplayer, pulsedisplayer, kModuleCategory_Pulse);
    REGISTER(BufferShuffler, buffershuffler, kModuleCategory_Audio);
+   REGISTER(PitchToValue, pitchtovalue, kModuleCategory_Modulator);
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
 
