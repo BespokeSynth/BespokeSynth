@@ -722,6 +722,14 @@ void Transport::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
+//static
+bool Transport::IsTripletInterval(NoteInterval interval)
+{
+   if (interval == kInterval_2nt || interval == kInterval_4nt || interval == kInterval_8nt || interval == kInterval_16nt || interval == kInterval_32nt)
+      return true;
+   return false;
+}
+
 void Transport::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("randomize_tempo_on_load", moduleInfo, false);

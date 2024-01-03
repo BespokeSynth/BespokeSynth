@@ -39,7 +39,11 @@ class ITimeListener
 public:
    virtual ~ITimeListener() {}
    virtual void OnTimeEvent(double time) = 0;
-   int mTransportPriority{ 100 };
+   static constexpr int kDefaultTransportPriority = 100;
+   static constexpr int kTransportPriorityEarly = 0;
+   static constexpr int kTransportPriorityLate = 200;
+   static constexpr int kTransportPriorityVeryEarly = -1000;
+   int mTransportPriority{ kDefaultTransportPriority };
 };
 
 enum NoteInterval
@@ -179,6 +183,8 @@ public:
    static double sEventEarlyMs;
 
    bool IsEnabled() const override { return true; }
+
+   static bool IsTripletInterval(NoteInterval interval);
 
 private:
    void UpdateListeners(double jumpMs);

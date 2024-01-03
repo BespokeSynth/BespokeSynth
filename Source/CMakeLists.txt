@@ -124,6 +124,10 @@ target_sources(BespokeSynth PRIVATE
     DelayEffect.h
     DistortionEffect.cpp
     DistortionEffect.h
+    DotGrid.cpp
+    DotGrid.h
+    DotSequencer.cpp
+    DotSequencer.h
     DropdownList.cpp
     DropdownList.h
     DrumPlayer.cpp
@@ -555,6 +559,8 @@ target_sources(BespokeSynth PRIVATE
     Razor.h
     Rewriter.cpp
     Rewriter.h
+    RhythmSequencer.cpp
+    RhythmSequencer.h
     RingModulator.cpp
     RingModulator.h
     RollingBuffer.cpp
@@ -826,7 +832,7 @@ endif ()
 target_link_libraries(BespokeSynth PRIVATE
     bespoke::exprtk
     bespoke::freeverb
-    $<IF:$<STREQUAL:${BESPOKE_SYSTEM_JSONCPP},OFF>,bespoke::json,jsoncpp>
+    $<IF:$<STREQUAL:${BESPOKE_SYSTEM_JSONCPP},OFF>,bespoke::json,jsoncpp_lib>
     bespoke::leathers
     bespoke::nanovg
     bespoke::psmove
