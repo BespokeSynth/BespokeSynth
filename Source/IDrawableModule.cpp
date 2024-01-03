@@ -555,21 +555,29 @@ void IDrawableModule::SetTarget(IClickable* target)
       mPatchCableSources[0]->SetTarget(target);
 }
 
+
 void IDrawableModule::SetUpPatchCables(std::string targets)
 {
-   assert(mMainPatchCableSource != nullptr);
-   std::vector<std::string> targetVec = ofSplitString(targets, ",");
-   if (targetVec.empty() || targets == "")
+   if (IModulator* modulator = dynamic_cast<IModulator*>(this))
    {
-      mMainPatchCableSource->Clear();
+      modulator->SetUpPatchCables(targets);
    }
    else
    {
-      for (int i = 0; i < targetVec.size(); ++i)
+      assert(mMainPatchCableSource != nullptr);
+      std::vector<std::string> targetVec = ofSplitString(targets, ",");
+      if (targetVec.empty() || targets == "")
       {
-         IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
-         if (target)
-            mMainPatchCableSource->AddPatchCable(target);
+         mMainPatchCableSource->Clear();
+      }
+      else
+      {
+         for (int i = 0; i < targetVec.size(); ++i)
+         {
+            IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
+            if (target)
+               mMainPatchCableSource->AddPatchCable(target);
+         }
       }
    }
 }
@@ -583,6 +591,23 @@ void IDrawableModule::RemovePatchCableSource(PatchCableSource* source)
 {
    RemoveFromVector(source, mPatchCableSources);
    delete source;
+}
+
+void IDrawableModule::ClearAllPatchCableSources()
+{
+   if (IModulator* modulator = dynamic_cast<IModulator*>(this))
+   {
+      modulator->ClearAllPatchCableSources();
+      return;
+   }
+   else
+   {
+      if (mMainPatchCableSource != nullptr)
+         mMainPatchCableSource->Clear();
+      else if (!mPatchCableSources.empty())
+         for (auto source : mPatchCableSources)
+            RemovePatchCableSource(source);
+   }
 }
 
 void IDrawableModule::Exit()

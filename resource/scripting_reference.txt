@@ -209,6 +209,8 @@ import module
       m.get_height()
       m.set_target(target)
       m.set_target(targetPath)
+      m.set_targets(targetPathList)
+         example: m.set_targets("oscillator,oscillator1,oscillator2")
       m.get_target()
       m.get_targets()
       m.set_name(name)

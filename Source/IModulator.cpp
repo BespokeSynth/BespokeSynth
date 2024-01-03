@@ -106,6 +106,33 @@ void IModulator::OnModulatorRepatch()
    TheSynth->AddExtraPoller(this);
 }
 
+void IModulator::SetUpPatchCables(std::string targets)
+{
+   assert(mTargetCable != nullptr);
+   std::vector<std::string> targetVec = ofSplitString(targets, ",");
+   if (targetVec.empty() || targets == "")
+   {
+      mTargetCable->Clear();
+   }
+   else
+   {
+      for (int i = 0; i < targetVec.size(); ++i)
+      {
+         IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindUIControl(targetVec[i]));
+         if (target)
+            mTargetCable->AddPatchCable(target);
+      }
+   }
+   OnModulatorRepatch();
+}
+
+void IModulator::ClearAllPatchCableSources()
+{
+   assert(mTargetCable != nullptr);
+   mTargetCable->Clear();
+   OnModulatorRepatch();
+}
+
 void IModulator::Poll()
 {
    if (Active())
