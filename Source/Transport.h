@@ -184,6 +184,8 @@ public:
 
    bool IsEnabled() const override { return true; }
 
+   static bool IsTripletInterval(NoteInterval interval);
+
 private:
    void UpdateListeners(double jumpMs);
    double Swing(double measurePos);

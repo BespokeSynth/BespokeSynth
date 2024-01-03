@@ -28,8 +28,6 @@ target_sources(BespokeSynth PRIVATE
     Amplifier.h
     Arpeggiator.cpp
     Arpeggiator.h
-        RhythmSequencer.cpp
-        RhythmSequencer.h
     ArrangementController.cpp
     ArrangementController.h
     AudioLevelToCV.cpp
@@ -126,6 +124,10 @@ target_sources(BespokeSynth PRIVATE
     DelayEffect.h
     DistortionEffect.cpp
     DistortionEffect.h
+    DotGrid.cpp
+    DotGrid.h
+    DotSequencer.cpp
+    DotSequencer.h
     DropdownList.cpp
     DropdownList.h
     DrumPlayer.cpp
@@ -555,6 +557,8 @@ target_sources(BespokeSynth PRIVATE
     Razor.h
     Rewriter.cpp
     Rewriter.h
+    RhythmSequencer.cpp
+    RhythmSequencer.h
     RingModulator.cpp
     RingModulator.h
     RollingBuffer.cpp

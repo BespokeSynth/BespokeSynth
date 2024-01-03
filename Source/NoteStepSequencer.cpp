@@ -226,6 +226,12 @@ void NoteStepSequencer::DrawModule()
    mRandomizeVelocityChanceSlider->Draw();
    mRandomizeVelocityDensitySlider->Draw();
 
+   int majorColSize = Transport::IsTripletInterval(mInterval) ? 3 : 4;
+   if (majorColSize < mLength)
+      mGrid->SetMajorColSize(majorColSize);
+   else
+      mGrid->SetMajorColSize(-1);
+
    mGrid->Draw();
    mVelocityGrid->Draw();
 
@@ -947,14 +953,6 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 
    mGrid->SetHighlightCol(time, mArpIndex);
    mVelocityGrid->SetHighlightCol(time, mArpIndex);
-
-   bool isPowerOfTwo = (mLength & (mLength - 1)) == 0;
-   int majorColSize = 4;
-   bool isAligned = !mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport) || (pulseFlags & kPulseFlag_Align);
-   if (isPowerOfTwo && majorColSize < mLength && isAligned)
-      mGrid->SetMajorColSize(majorColSize);
-   else
-      mGrid->SetMajorColSize(-1);
 
    UpdateLights();
    UpdateGridControllerLights(false);

@@ -2044,3 +2044,14 @@ rhythmsequencer~repeats held input notes, to turn a sustained note into a rhythm
 ~octave *~octave offset for this step
 ~degree *~scale degree offset for this step
 
+
+dotsequencer~polyphonic note sequencer with adjustable note length and velocity. click and drag horizontally to adjust length. click and drag vertically to adjust the velocity. hover and use the arrow keys to move dots. hover and use the mouse wheel to tweak dot lengths.
+~interval~rate to play notes at
+~cols~number of columns
+~rows~number of rows
+~notemode~which set of pitches should the rows represent?
+~octave~octave of the bottom pitch of this sequence
+~row offset~amount to offset the mapping of row to pitch
+~clear~clear the contents of the dot grid
+~dotgrid~the dot grid
+

@@ -260,6 +260,7 @@
 #include "PulseDisplayer.h"
 #include "BufferShuffler.h"
 #include "RhythmSequencer.h"
+#include "DotSequencer.h"
 
 #include <juce_core/juce_core.h>
 
@@ -467,6 +468,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseDisplayer, pulsedisplayer, kModuleCategory_Pulse);
    REGISTER(BufferShuffler, buffershuffler, kModuleCategory_Audio);
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
+   REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
