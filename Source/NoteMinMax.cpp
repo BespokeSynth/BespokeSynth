@@ -83,6 +83,7 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       mNotePlaying[pitch] = true;
       mVelocityPlaying[pitch] = velocity;
       mVoiceIdxPlaying[pitch] = voiceIdx;
+      mModulationParametersPlaying[pitch] = modulation;
 
       if (minNotePlaying == -1 || minNotePlaying > pitch)
       {
@@ -101,6 +102,7 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       mNotePlaying[pitch] = false;
       mVelocityPlaying[pitch] = velocity;
       mVoiceIdxPlaying[pitch] = voiceIdx;
+      mModulationParametersPlaying[pitch] = modulation;
 
       // Detect new min and max notes
       int minNotePlaying = -1;
@@ -119,13 +121,13 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       {
          mDestinationCables[0]->PlayNoteOutput(time, pitch, 0, -1);
          if (minNotePlaying != -1)
-            mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], modulation);
+            mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[pitch]);
       }
       if (maxNotePlaying == -1 || maxNotePlaying < pitch)
       {
          mDestinationCables[1]->PlayNoteOutput(time, pitch, 0, -1);
          if (maxNotePlaying != -1)
-            mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], modulation);
+            mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[pitch]);
       }
    }
 }
