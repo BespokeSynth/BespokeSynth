@@ -52,7 +52,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 45; };
+   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 40; };
    bool Enabled() const override { return true; }
 
    AdditionalNoteCable* mDestinationCables[2];
