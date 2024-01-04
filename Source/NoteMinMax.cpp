@@ -49,6 +49,8 @@ void NoteMinMax::CreateUIControls()
    mDestinationCables[1]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
    AddPatchCableSource(mDestinationCables[1]->GetPatchCableSource());
    mDestinationCables[1]->GetPatchCableSource()->SetManualPosition(20, 30);
+
+   GetPatchCableSource()->SetEnabled(false);
 }
 
 void NoteMinMax::DrawModule()
