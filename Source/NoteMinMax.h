@@ -32,7 +32,7 @@
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 
-class NoteMinMax : public NoteEffectBase, public IDrawableModule
+class NoteMinMax : public INoteReceiver, public INoteSource, public IDrawableModule
 {
 public:
    NoteMinMax();
@@ -41,10 +41,9 @@ public:
 
    void CreateUIControls() override;
 
-   void SetEnabled(bool enabled) override { mEnabled = enabled; }
-
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

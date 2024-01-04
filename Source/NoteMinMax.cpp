@@ -130,6 +130,11 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
+void NoteMinMax::SendCC(int control, int value, int voiceIdx)
+{
+   SendCCOutput(control, value, voiceIdx);
+}
+
 void NoteMinMax::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();
