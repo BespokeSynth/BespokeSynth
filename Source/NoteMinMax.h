@@ -38,7 +38,7 @@ public:
    NoteMinMax();
    static IDrawableModule* Create() { return new NoteMinMax(); }
 
-   
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
