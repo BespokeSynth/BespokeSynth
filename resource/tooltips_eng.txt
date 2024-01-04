@@ -1829,3 +1829,7 @@ output~route audio in here to send it to an output channel (your speakers or aud
 
 gain~adjusts volume of audio signal
 ~gain~amount to adjust signal. a value of 1 will cause no change to the signal.
+
+
+
+noteminmax~finds the lowest and highest notes out ones played at the same time
