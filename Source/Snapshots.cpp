@@ -28,7 +28,6 @@
 #include "Slider.h"
 #include "ofxJSONElement.h"
 #include "PatchCableSource.h"
-#include "Canvas.h"
 #include "juce_core/juce_core.h"
 
 std::vector<IUIControl*> Snapshots::sSnapshotHighlightControls;
@@ -351,8 +350,7 @@ void Snapshots::SetSnapshot(int idx, double time)
             if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
                textEntry->SetText(i->mString);
 
-            Canvas* canvas = dynamic_cast<Canvas*>(control);
-            if (canvas && !i->mString.empty())
+            if (control->ShouldSerializeForSnapshot() && !i->mString.empty())
             {
                std::string tempFileName = ofToDataPath("tmpread" + ofToString(this));
                juce::MemoryOutputStream outputStream;
@@ -362,7 +360,7 @@ void Snapshots::SetSnapshot(int idx, double time)
                   out.WriteGeneric(outputStream.getData(), outputStream.getDataSize());
                }
                FileStreamIn in(tempFileName);
-               canvas->LoadState(in, true);
+               control->LoadState(in, true);
                juce::File(tempFileName).deleteFile();
             }
          }
@@ -929,14 +927,13 @@ Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
    if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
       mString = textEntry->GetText();
 
-   Canvas* canvas = dynamic_cast<Canvas*>(control);
-   if (canvas)
+   if (control->ShouldSerializeForSnapshot())
    {
       std::string tempFileName = ofToDataPath("tmpsave" + ofToString(this));
       juce::int64 size;
       {
          FileStreamOut out(tempFileName);
-         canvas->SaveState(out);
+         control->SaveState(out);
          size = out.GetSize();
       }
       FileStreamIn in(tempFileName);

@@ -108,6 +108,7 @@ private:
    IntSlider* mRowsSlider{ nullptr };
    int mRowOffset{ 0 };
    IntSlider* mRowOffsetSlider{ nullptr };
+   ClickButton* mDoubleButton{ nullptr };
 
    DotGrid* mDotGrid;
 

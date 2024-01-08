@@ -96,6 +96,7 @@ public:
    virtual bool ModulatorUsesLiteralValue() const { return false; }
    virtual float GetModulationRangeMin() const { return 0; }
    virtual float GetModulationRangeMax() const { return 1; }
+   virtual bool ShouldSerializeForSnapshot() const { return false; }
 
    static void SetNewManualHoverViaTab(int direction);
    static void SetNewManualHoverViaArrow(ofVec2f direction);

@@ -60,6 +60,8 @@ void DotSequencer::CreateUIControls()
    INTSLIDER(mRowOffsetSlider, "row offset", &mRowOffset, -12, 12);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mClearButton, "clear");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mDoubleButton, "double");
 
    UIBLOCK_NEWLINE();
    UIBLOCK_SHIFTX(40);
@@ -145,6 +147,7 @@ void DotSequencer::DrawModule()
    mColsSlider->Draw();
    mRowsSlider->Draw();
    mRowOffsetSlider->Draw();
+   mDoubleButton->Draw();
    mDotGrid->Draw();
 }
 
@@ -280,6 +283,19 @@ void DotSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
       mDotGrid->Clear();
+   if (button == mDoubleButton)
+   {
+      if (mCols * 2 <= mDotGrid->GetMaxColumns())
+      {
+         mCols *= 2;
+         mDotGrid->SetGrid(mCols, mRows);
+         for (int col = 0; col < mCols / 2; ++col)
+         {
+            for (int row = 0; row < mRows; ++row)
+               mDotGrid->CopyDot(DotGrid::DotPosition(col, row), DotGrid::DotPosition(col + mCols / 2, row));
+         }
+      }
+   }
 }
 
 void DotSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)

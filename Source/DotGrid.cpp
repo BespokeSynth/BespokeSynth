@@ -356,15 +356,25 @@ const DotGrid::DotData& DotGrid::GetDataAt(int col, int row) const
 
 void DotGrid::OnPlayed(double time, int col, int row)
 {
-   col = ofClamp(col, 0, kMaxCols - 1);
-   row = ofClamp(row, 0, kMaxRows - 1);
-   mData[GetDataIndex(col, row)].mLastPlayTime = time;
+   if (IsValidPosition(DotPosition(col, row)))
+      mData[GetDataIndex(col, row)].mLastPlayTime = time;
 }
 
 void DotGrid::Clear()
 {
    for (auto& data : mData)
       data.mOn = false;
+}
+
+bool DotGrid::IsValidPosition(DotPosition pos) const
+{
+   return pos.mCol >= 0 && pos.mCol < kMaxCols && pos.mRow >= 0 && pos.mRow < kMaxRows;
+}
+
+void DotGrid::CopyDot(DotPosition from, DotPosition to)
+{
+   if (IsValidPosition(from) && IsValidPosition(to))
+      mData[GetDataIndex(to.mCol, to.mRow)] = mData[GetDataIndex(from.mCol, from.mRow)];
 }
 
 void DotGrid::SetHighlightCol(double time, int col)
