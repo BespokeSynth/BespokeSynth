@@ -138,6 +138,7 @@ public:
    bool IsButtonControl() override { return false; }
    bool GetNoHover() const override { return true; }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
+   bool ShouldSerializeForSnapshot() const override { return true; }
 
    float mViewStart{ 0 };
    float mViewEnd;

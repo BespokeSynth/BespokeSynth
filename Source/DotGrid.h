@@ -90,6 +90,9 @@ public:
    const DotData& GetDataAt(int col, int row) const;
    void OnPlayed(double time, int col, int row);
    float GetDotSize() const;
+   int GetMaxColumns() const { return kMaxCols; }
+   void CopyDot(DotPosition from, DotPosition to);
+   bool IsValidPosition(DotPosition pos) const;
 
    DotPosition GetGridCellAt(float x, float y, bool clamp = true);
    ofVec2f GetCellPosition(int col, int row);
@@ -99,6 +102,7 @@ public:
    void SetValue(float value, double time, bool forceUpdate = false) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
+   bool ShouldSerializeForSnapshot() const override { return true; }
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
