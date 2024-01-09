@@ -166,6 +166,7 @@ public:
    void LoadState(FileStreamIn& in);
 
    static bool sAllowInsert;
+   static bool sIsLoadingModulePreset;
 
 protected:
    void OnClicked(float x, float y, bool right) override;

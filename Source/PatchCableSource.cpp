@@ -43,6 +43,7 @@ namespace
 }
 
 bool PatchCableSource::sAllowInsert = true;
+bool PatchCableSource::sIsLoadingModulePreset = false;
 
 PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 : mOwner(owner)
@@ -748,7 +749,12 @@ void PatchCableSource::SaveState(FileStreamOut& out)
 
 void PatchCableSource::LoadState(FileStreamIn& in)
 {
-   ClearPatchCables();
+   bool doDummyLoad = false;
+   if (sIsLoadingModulePreset)
+      doDummyLoad = true;
+
+   if (!doDummyLoad)
+      ClearPatchCables();
 
    int size;
    in >> size;
@@ -757,27 +763,32 @@ void PatchCableSource::LoadState(FileStreamIn& in)
    {
       std::string path;
       in >> path;
-      IClickable* target = TheSynth->FindModule(path, false);
-      if (target == nullptr)
+
+      if (!doDummyLoad)
       {
-         try
+         IClickable* target = TheSynth->FindModule(path, false);
+         if (target == nullptr)
          {
-            target = TheSynth->FindUIControl(path);
+            try
+            {
+               target = TheSynth->FindUIControl(path);
+            }
+            catch (UnknownUIControlException& e)
+            {
+            }
          }
-         catch (UnknownUIControlException& e)
-         {
-         }
+
+         if (TheSynth->IsDuplicatingModule() && mType == kConnectionType_Modulator)
+            target = nullptr; //TODO(Ryan) make it so that when you're duplicating a group, modulators preserve connections to the new copies of controls within that group
+
+         mPatchCables.push_back(new PatchCable(this));
+         assert(i == (int)mPatchCables.size() - 1);
+         SetPatchCableTarget(mPatchCables[i], target, false);
       }
-
-      if (TheSynth->IsDuplicatingModule() && mType == kConnectionType_Modulator)
-         target = nullptr; //TODO(Ryan) make it so that when you're duplicating a group, modulators preserve connections to the new copies of controls within that group
-
-      mPatchCables.push_back(new PatchCable(this));
-      assert(i == (int)mPatchCables.size() - 1);
-      SetPatchCableTarget(mPatchCables[i], target, false);
    }
 
-   mOwner->PostRepatch(this, false);
+   if (!doDummyLoad)
+      mOwner->PostRepatch(this, false);
 }
 
 void NoteHistory::AddEvent(double time, bool on, int data)

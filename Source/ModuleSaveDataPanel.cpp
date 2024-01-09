@@ -30,6 +30,8 @@
 #include "INoteReceiver.h"
 #include "ModuleContainer.h"
 #include "IDrivableSequencer.h"
+#include "ModularSynth.h"
+#include "PatchCableSource.h"
 
 #include <cstring>
 
@@ -103,6 +105,15 @@ void ModuleSaveDataPanel::ReloadSaveData()
    mNameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
    mNameEntry->SetNoHover(true);
    mSaveDataControls.push_back(mNameEntry);
+   y += kItemSpacing;
+
+   mPresetFileSelector = new DropdownList(this, "preset", x, y, &mPresetFileIndex, 150);
+   mPresetFileSelector->SetNoHover(true);
+   mPresetFileSelector->SetUnknownItemString("[none]");
+   mSaveDataControls.push_back(mPresetFileSelector);
+   mSavePresetAsButton = new ClickButton(this, "save as", mPresetFileSelector, kAnchor_Right);
+   mSavePresetAsButton->SetNoHover(true);
+   mSaveDataControls.push_back(mSavePresetAsButton);
    y += kItemSpacing;
 
    TextEntry* prevTextEntry = mNameEntry;
@@ -202,6 +213,32 @@ void ModuleSaveDataPanel::ReloadSaveData()
    mHeight = y + 5;
 }
 
+void ModuleSaveDataPanel::Poll()
+{
+   using namespace juce;
+
+   if (mPresetFileUpdateQueued)
+   {
+      mPresetFileUpdateQueued = false;
+      if (mSaveModule != nullptr && !TheSynth->IsLoadingState() && mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
+      {
+         LoadPreset(mSaveModule, mPresetFilePaths[mPresetFileIndex]);
+      }
+   }
+}
+
+//static
+void ModuleSaveDataPanel::LoadPreset(IDrawableModule* module, std::string presetFilePath)
+{
+   FileStreamIn presetFile(presetFilePath);
+   presetFile >> ModularSynth::sLoadingFileSaveStateRev;
+   TheSynth->SetIsLoadingState(true);
+   PatchCableSource::sIsLoadingModulePreset = true;
+   module->LoadState(presetFile, module->LoadModuleSaveStateRev(presetFile));
+   PatchCableSource::sIsLoadingModulePreset = true;
+   TheSynth->SetIsLoadingState(false);
+}
+
 void ModuleSaveDataPanel::DrawModule()
 {
    if (Minimized() || mAppearAmount < 1)
@@ -215,6 +252,9 @@ void ModuleSaveDataPanel::DrawModule()
    y += kItemSpacing;
 
    DrawTextRightJustify("name", x, y + 12);
+   y += kItemSpacing;
+
+   DrawTextRightJustify("preset", x, y + 12);
    y += kItemSpacing;
 
    for (auto iter = mLabels.begin(); iter != mLabels.end(); ++iter)
@@ -274,6 +314,8 @@ void ModuleSaveDataPanel::FillDropdownList(DropdownList* list, ModuleSaveData::S
 
 void ModuleSaveDataPanel::ButtonClicked(ClickButton* button, double time)
 {
+   using namespace juce;
+
    if (button == mApplyButton)
       ApplyChanges();
    if (button == mDeleteButton)
@@ -286,6 +328,30 @@ void ModuleSaveDataPanel::ButtonClicked(ClickButton* button, double time)
       IDrivableSequencer* sequencer = dynamic_cast<IDrivableSequencer*>(mSaveModule);
       if (sequencer && sequencer->HasExternalPulseSource())
          sequencer->ResetExternalPulseSource();
+   }
+   if (button == mSavePresetAsButton && mSaveModule != nullptr)
+   {
+      juce::File(ofToDataPath("presets/" + mSaveModule->GetTypeName())).createDirectory();
+      FileChooser chooser("Save preset as...", File(ofToDataPath("presets/" + mSaveModule->GetTypeName() + "/preset.preset")), "*.preset", true, false, TheSynth->GetFileChooserParent());
+      if (chooser.browseForFileToSave(true))
+      {
+         std::string path = chooser.getResult().getFullPathName().toStdString();
+         FileStreamOut output(path);
+
+         output << ModularSynth::kSaveStateRev;
+         mSaveModule->SaveState(output);
+
+         RefreshPresetFiles();
+
+         for (size_t i = 0; i < mPresetFilePaths.size(); ++i)
+         {
+            if (mPresetFilePaths[i] == path)
+            {
+               mPresetFileIndex = (int)i;
+               break;
+            }
+         }
+      }
    }
 }
 
@@ -324,6 +390,9 @@ void ModuleSaveDataPanel::DropdownClicked(DropdownList* list)
          FillDropdownList(list, iter->second);
       }
    }
+
+   if (list == mPresetFileSelector)
+      RefreshPresetFiles();
 }
 
 void ModuleSaveDataPanel::DropdownUpdated(DropdownList* list, int oldVal, double time)
@@ -335,6 +404,30 @@ void ModuleSaveDataPanel::DropdownUpdated(DropdownList* list, int oldVal, double
          ModuleSaveData::SaveVal* save = iter->second;
          StringCopy(save->mString, list->GetLabel(save->mInt).c_str(), MAX_TEXTENTRY_LENGTH);
       }
+   }
+
+   if (list == mPresetFileSelector)
+      mPresetFileUpdateQueued = true;
+}
+
+void ModuleSaveDataPanel::RefreshPresetFiles()
+{
+   if (mSaveModule == nullptr)
+      return;
+
+   juce::File(ofToDataPath("presets/" + mSaveModule->GetTypeName())).createDirectory();
+   mPresetFilePaths.clear();
+   mPresetFileSelector->Clear();
+   juce::Array<juce::File> fileList;
+   for (const auto& entry : juce::RangedDirectoryIterator{ juce::File{ ofToDataPath("presets/" + mSaveModule->GetTypeName()) }, false, "*.preset" })
+   {
+      fileList.add(entry.getFile());
+   }
+   fileList.sort();
+   for (const auto& file : fileList)
+   {
+      mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
+      mPresetFilePaths.push_back(file.getFullPathName().toStdString());
    }
 }
 

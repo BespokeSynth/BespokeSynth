@@ -668,6 +668,14 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
       }
    }
 
+   std::vector<Spawnable> presets;
+   ModuleFactory::GetPresets(presets);
+   for (auto preset : presets)
+   {
+      if (CheckHeldKeysMatch(preset.mLabel, keys, continuousString) || keys[0] == ';')
+         modules.push_back(preset);
+   }
+
    if (continuousString)
       sort(modules.begin(), modules.end(), Spawnable::CompareLength);
    else
@@ -705,6 +713,8 @@ ModuleCategory ModuleFactory::GetModuleCategory(Spawnable spawnable)
       return kModuleCategory_Audio;
    if (spawnable.mSpawnMethod == SpawnMethod::Prefab)
       return kModuleCategory_Other;
+   if (spawnable.mSpawnMethod == SpawnMethod::Preset)
+      return mFactoryMap[spawnable.mPresetModuleType].mCategory;
    return kModuleCategory_Other;
 }
 
@@ -738,6 +748,33 @@ void ModuleFactory::GetPrefabs(std::vector<ModuleFactory::Spawnable>& prefabs)
          spawnable.mDecorator = kPrefabSuffix;
          spawnable.mSpawnMethod = SpawnMethod::Prefab;
          prefabs.push_back(spawnable);
+      }
+   }
+}
+
+//static
+void ModuleFactory::GetPresets(std::vector<ModuleFactory::Spawnable>& presets)
+{
+   using namespace juce;
+   File dir(ofToDataPath("presets"));
+   Array<File> directories;
+   dir.findChildFiles(directories, File::findDirectories, false);
+   for (auto moduleDir : directories)
+   {
+      std::string moduleTypeName = moduleDir.getFileName().toStdString();
+      Array<File> files;
+      moduleDir.findChildFiles(files, File::findFiles, false);
+      for (auto file : files)
+      {
+         if (file.getFileExtension() == ".preset")
+         {
+            ModuleFactory::Spawnable spawnable;
+            spawnable.mLabel = file.getFileName().toStdString();
+            spawnable.mDecorator = "[" + moduleTypeName + "]";
+            spawnable.mPresetModuleType = moduleTypeName;
+            spawnable.mSpawnMethod = SpawnMethod::Preset;
+            presets.push_back(spawnable);
+         }
       }
    }
 }

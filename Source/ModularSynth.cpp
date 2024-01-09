@@ -3173,6 +3173,9 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
    if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::MidiController)
       moduleType = "midicontroller";
 
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Preset)
+      moduleType = spawnable.mPresetModuleType;
+
    if (name == "")
       name = moduleType;
 
@@ -3236,6 +3239,12 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
          controller->GetSaveData().SetString("devicein", spawnable.mLabel);
          controller->SetUpFromSaveDataBase();
       }
+   }
+
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Preset)
+   {
+      std::string presetFilePath = ofToDataPath("presets/" + spawnable.mPresetModuleType + "/" + spawnable.mLabel);
+      ModuleSaveDataPanel::LoadPreset(module, presetFilePath);
    }
 
    return module;
