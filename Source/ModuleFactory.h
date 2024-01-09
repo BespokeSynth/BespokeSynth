@@ -46,7 +46,8 @@ public:
       EffectChain,
       Prefab,
       Plugin,
-      MidiController
+      MidiController,
+      Preset
    };
 
    struct Spawnable
@@ -54,6 +55,7 @@ public:
       SpawnMethod mSpawnMethod{ SpawnMethod::Module };
       std::string mLabel{ "" };
       std::string mDecorator{ "" };
+      std::string mPresetModuleType{ "" };
       juce::PluginDescription mPluginDesc{};
 
       static std::string GetPluginLabel(juce::PluginDescription pluginDesc)
@@ -99,6 +101,7 @@ public:
    ModuleInfo GetModuleInfo(std::string typeName);
    bool IsExperimental(std::string typeName);
    static void GetPrefabs(std::vector<Spawnable>& prefabs);
+   static void GetPresets(std::vector<Spawnable>& presets);
    static std::string FixUpTypeName(std::string typeName);
 
    static constexpr const char* kPluginSuffix = "[plugin]";

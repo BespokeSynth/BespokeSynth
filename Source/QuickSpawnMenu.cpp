@@ -296,7 +296,12 @@ bool QuickSpawnMenu::MatchesFilter(const ModuleFactory::Spawnable& spawnable) co
    bool inputMatches = false;
    bool outputMatches = false;
 
-   ModuleFactory::ModuleInfo info = TheSynth->GetModuleFactory()->GetModuleInfo(spawnable.mLabel);
+   ModuleFactory::ModuleInfo info;
+
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Preset)
+      info = TheSynth->GetModuleFactory()->GetModuleInfo(spawnable.mPresetModuleType);
+   else
+      info = TheSynth->GetModuleFactory()->GetModuleInfo(spawnable.mLabel);
 
    if (mFilterForCable->GetConnectionType() == kConnectionType_Note)
    {
