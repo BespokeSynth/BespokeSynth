@@ -39,7 +39,7 @@ public:
    PitchToValue();
    virtual ~PitchToValue();
    static IDrawableModule* Create() { return new PitchToValue(); }
-
+   static bool AcceptsNotes() { return true; }
 
    void CreateUIControls() override;
 
