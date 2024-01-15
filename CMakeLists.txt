@@ -81,10 +81,6 @@ message(STATUS "Python version: ${Python_VERSION}")
 message(STATUS "Python executable: ${Python_EXECUTABLE}")
 message(STATUS "Python library: ${Python_LIBRARIES}")
 
-if(BESPOKE_SYSTEM_JSONCPP)
-    find_package(jsoncpp REQUIRED)
-endif()
-
 if(NOT BESPOKE_SYSTEM_JUCE)
   message(STATUS "Using JUCE from ${BESPOKE_JUCE_LOCATION}")
   add_subdirectory(${BESPOKE_JUCE_LOCATION} ${CMAKE_BINARY_DIR}/JUCE EXCLUDE_FROM_ALL)
@@ -98,6 +94,12 @@ else()
     pkg_search_module(ogg REQUIRED ogg)
     pkg_search_module(vorbis REQUIRED vorbis vorbisenc vorbisfile)
   endif()
+endif()
+
+if(BESPOKE_SYSTEM_JSONCPP)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(JSONCPP REQUIRED jsoncpp)
+    include_directories(${JSONCPP_INCLUDE_DIRS})
 endif()
 
 if (BESPOKE_VST2_SDK_LOCATION)
