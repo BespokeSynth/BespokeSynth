@@ -30,27 +30,30 @@
 #include "PatchCableSource.h"
 
 NoteRouter::NoteRouter()
-: mRouteMask(0)
-, mRouteSelector(nullptr)
-, mRadioButtonMode(false)
 {
 }
 
 void NoteRouter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRouteSelector = new RadioButton(this,"route",5,3,&mRouteMask);
-   
+   mRouteSelector = new RadioButton(this, "route", 5, 3, &mRouteMask);
+
    GetPatchCableSource()->SetEnabled(false);
+}
+
+void NoteRouter::Poll()
+{
+   for (int i = 0; i < (int)mDestinationCables.size(); ++i)
+      mDestinationCables[i]->GetPatchCableSource()->SetShowing(!mOnlyShowActiveCables || IsIndexActive(i));
 }
 
 void NoteRouter::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mRouteSelector->Draw();
-   for (int i=0; i<(int)mDestinationCables.size(); ++i)
+   for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
       ofVec2f pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
       mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(pos.x + 10, pos.y + 4);
@@ -61,41 +64,48 @@ void NoteRouter::SetSelectedMask(int mask)
 {
    int oldMask = mRouteMask;
    mRouteMask = mask;
-   RadioButtonUpdated(mRouteSelector, oldMask);
+   RadioButtonUpdated(mRouteSelector, oldMask, NextBufferTime(false));
+}
+
+bool NoteRouter::IsIndexActive(int idx) const
+{
+   if (mRadioButtonMode)
+      return mRouteMask == idx;
+   else
+      return mRouteMask & (1 << idx);
 }
 
 void NoteRouter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   for (int i=0; i<(int)mDestinationCables.size(); ++i)
+   for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
-      if ((mRadioButtonMode && mRouteMask == i) ||
-          (!mRadioButtonMode && (mRouteMask & (1 << i))))
+      if (IsIndexActive(i))
       {
          mDestinationCables[i]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
    }
 }
 
-void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
    if (radio == mRouteSelector)
    {
       if (mRadioButtonMode)
       {
          if (oldVal < (int)mDestinationCables.size())
-            mDestinationCables[oldVal]->Flush(gTime+gBufferSizeMs);
+            mDestinationCables[oldVal]->Flush(time);
       }
       else //bitmask mode
       {
          int changed = mRouteMask ^ oldVal;
          int removed = changed & oldVal;
-         
-         for (int i=0; i<=int(log2(removed)); ++i)
+
+         for (int i = 0; i <= int(log2(removed)); ++i)
          {
             if (1 & (removed >> i))
             {
                if (i < (int)mDestinationCables.size())
-                  mDestinationCables[i]->Flush(gTime+gBufferSizeMs);
+                  mDestinationCables[i]->Flush(time);
             }
          }
       }
@@ -105,8 +115,8 @@ void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
 void NoteRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    INoteSource::PostRepatch(cableSource, fromUserClick);
-   
-   for (int i=0; i<(int)mDestinationCables.size(); ++i)
+
+   for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
       if (cableSource == mDestinationCables[i]->GetPatchCableSource())
       {
@@ -119,17 +129,18 @@ void NoteRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 
 void NoteRouter::GetModuleDimensions(float& width, float& height)
 {
-   float w,h;
+   float w, h;
    mRouteSelector->GetDimensions(w, h);
-   width = 20+w;
-   height = 8+h;
+   width = 20 + w;
+   height = 8 + h;
 }
 
 void NoteRouter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadInt("num_items",moduleInfo,2,1,99,K(isTextField));
+   mModuleSaveData.LoadInt("num_items", moduleInfo, 2, 1, 99, K(isTextField));
    mModuleSaveData.LoadBool("radiobuttonmode", moduleInfo, true);
-   
+   mModuleSaveData.LoadBool("only_show_active_cables", moduleInfo, false);
+
    SetUpFromSaveData();
 }
 
@@ -139,7 +150,7 @@ void NoteRouter::SetUpFromSaveData()
    int oldNumItems = (int)mDestinationCables.size();
    if (numItems > oldNumItems)
    {
-      for (int i=oldNumItems; i<numItems; ++i)
+      for (int i = oldNumItems; i < numItems; ++i)
       {
          mRouteSelector->AddLabel("                      ", i);
          auto* additionalCable = new AdditionalNoteCable();
@@ -150,7 +161,7 @@ void NoteRouter::SetUpFromSaveData()
    }
    else if (numItems < oldNumItems)
    {
-      for (int i=oldNumItems-1; i>=numItems; --i)
+      for (int i = oldNumItems - 1; i >= numItems; --i)
       {
          mRouteSelector->RemoveLabel(i);
          RemovePatchCableSource(mDestinationCables[i]->GetPatchCableSource());
@@ -159,13 +170,10 @@ void NoteRouter::SetUpFromSaveData()
    }
    mRadioButtonMode = mModuleSaveData.GetBool("radiobuttonmode");
    mRouteSelector->SetMultiSelect(!mRadioButtonMode);
+   mOnlyShowActiveCables = mModuleSaveData.GetBool("only_show_active_cables");
 }
 
 void NoteRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
    moduleInfo["num_items"] = (int)mDestinationCables.size();
 }
-
-

@@ -39,48 +39,54 @@ public:
    NoteDelayer();
    ~NoteDelayer();
    static IDrawableModule* Create() { return new NoteDelayer(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void OnTransportAdvanced(float amount) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    struct NoteInfo
    {
-      int mPitch;
-      int mVelocity;
-      double mTriggerTime;
+      int mPitch{ 0 };
+      int mVelocity{ 0 };
+      double mTriggerTime{ 0 };
       ModulationParameters mModulation;
    };
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 108; height = 22; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mDelay;
-   FloatSlider* mDelaySlider;
-   
-   float mLastNoteOnTime;
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 108;
+      height = 22;
+   }
+
+   float mDelay{ .25 };
+   FloatSlider* mDelaySlider{ nullptr };
+
+   float mLastNoteOnTime{ 0 };
+
    static const int kQueueSize = 500;
-   NoteInfo mInputNotes[kQueueSize];
-   int mConsumeIndex;
-   int mAppendIndex;
+   NoteInfo mInputNotes[kQueueSize]{};
+   int mConsumeIndex{ 0 };
+   int mAppendIndex{ 0 };
 };
 
 #endif /* defined(__Bespoke__NoteDelayer__) */

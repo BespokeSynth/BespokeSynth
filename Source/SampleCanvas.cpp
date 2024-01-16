@@ -37,10 +37,6 @@
 #include "CanvasScrollbar.h"
 
 SampleCanvas::SampleCanvas()
-: mCanvas(nullptr)
-, mCanvasControls(nullptr)
-, mNumMeasures(4)
-, mInterval(kInterval_1n)
 {
 }
 
@@ -62,14 +58,14 @@ void SampleCanvas::CreateUIControls()
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
 
-   mCanvas = new Canvas(this, 5, 35, 790, 100, mNumMeasures, L(rows,4), L(cols,4), &(SampleCanvasElement::Create));
+   mCanvas = new Canvas(this, 5, 35, 790, 100, mNumMeasures, L(rows, 4), L(cols, 4), &(SampleCanvasElement::Create));
    AddUIControl(mCanvas);
    mCanvasControls = new CanvasControls();
    mCanvasControls->SetCanvas(mCanvas);
    mCanvasControls->CreateUIControls();
    AddChild(mCanvasControls);
    UpdateNumColumns();
-   
+
    mCanvas->SetListener(this);
 
    mCanvasTimeline = new CanvasTimeline(mCanvas, "timeline");
@@ -90,21 +86,21 @@ SampleCanvas::~SampleCanvas()
 void SampleCanvas::Process(double time)
 {
    PROFILER(SampleCanvas);
-   
+
    IAudioReceiver* target = GetTarget();
 
    if (!mEnabled || target == nullptr)
       return;
-   
+
    float canvasPos = GetCurPos(time);
-   
+
    mCanvas->SetCursorPos(canvasPos);
-   
+
    int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
-   
+
    gWorkChannelBuffer.Clear();
-   
+
    const std::vector<CanvasElement*>& elements = mCanvas->GetElements();
    for (int elemIdx = 0; elemIdx < elements.size(); ++elemIdx)
    {
@@ -113,28 +109,26 @@ void SampleCanvas::Process(double time)
       float vol = element->GetVolume();
       if (clip == nullptr || element->IsMuted())
          continue;
-      
-      for (int i=0; i<bufferSize; ++i)
+
+      for (int i = 0; i < bufferSize; ++i)
       {
-         float sample = 0;
-         
+         float sampleIndex = 0;
+
          float pos = GetCurPos(time + i * gInvSampleRateMs);
-         
-         sample = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
-         
-         sample *= vol;
-         
-         if (sample >= 0 && sample < clip->LengthInSamples())
+
+         sampleIndex = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
+
+         if (sampleIndex >= 0 && sampleIndex < clip->LengthInSamples())
          {
             for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
             {
                int sampleChannel = MAX(ch, clip->NumChannels() - 1);
-               gWorkChannelBuffer.GetChannel(ch)[i] += GetInterpolatedSample(sample, clip->Data()->GetChannel(sampleChannel), clip->LengthInSamples());
+               gWorkChannelBuffer.GetChannel(ch)[i] += GetInterpolatedSample(sampleIndex, clip->Data()->GetChannel(sampleChannel), clip->LengthInSamples()) * vol;
             }
          }
       }
    }
-   
+
    for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
    {
       ChannelBuffer* out = GetTarget()->GetBuffer();
@@ -149,18 +143,16 @@ double SampleCanvas::GetCurPos(double time) const
    return (((TheTransport->GetMeasure(time) % loopMeasures) + TheTransport->GetMeasurePos(time)) + mCanvas->mLoopStart) / mCanvas->GetLength();
 }
 
-void SampleCanvas::OnClicked(int x, int y, bool right)
+void SampleCanvas::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
-   
+
    /*float canvasX,canvasY;
    mCanvas->GetPosition(canvasX, canvasY, true);
    if (y >= 0 && y < canvasY)
    {
       float pos = float(x - canvasX)/mCanvas->GetWidth() * mCanvas->GetNumCols();
-      int measure = int(pos);
-      TheTransport->SetMeasure(measure);
-      TheTransport->SetMeasurePos(pos - measure);
+      TheTransport->SetMeasureTime(pos);
    }*/
 }
 
@@ -168,7 +160,6 @@ void SampleCanvas::CanvasUpdated(Canvas* canvas)
 {
    if (canvas == mCanvas)
    {
-      
    }
 }
 
@@ -195,15 +186,15 @@ void SampleCanvas::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
-   SampleDropped(x,y,&sample);
+   SampleDropped(x, y, &sample);
 }
 
 void SampleCanvas::SampleDropped(int x, int y, Sample* sample)
 {
    CanvasCoord coord = mCanvas->GetCoordAt(x - mCanvas->GetPosition(true).x, y - mCanvas->GetPosition(true).y);
-   coord.col = MAX(0,coord.col);
-   coord.row = MAX(0,coord.row);
-   SampleCanvasElement* element = static_cast<SampleCanvasElement*>(mCanvas->CreateElement(coord.col,coord.row));
+   coord.col = MAX(0, coord.col);
+   coord.row = MAX(0, coord.row);
+   SampleCanvasElement* element = static_cast<SampleCanvasElement*>(mCanvas->CreateElement(coord.col, coord.row));
    Sample* newSamp = new Sample();
    newSamp->CopyFrom(sample);
    element->SetSample(newSamp);
@@ -252,15 +243,15 @@ void SampleCanvas::UpdateNumColumns()
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval) / 4);
 }
 
-void SampleCanvas::CheckboxUpdated(Checkbox* checkbox)
+void SampleCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
+void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
    {
@@ -268,7 +259,7 @@ void SampleCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void SampleCanvas::DropdownUpdated(DropdownList* list, int oldVal)
+void SampleCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -290,31 +281,26 @@ void SampleCanvas::SetUpFromSaveData()
    mCanvas->SetNumRows(mModuleSaveData.GetInt("rows"));
 }
 
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
 void SampleCanvas::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
+   out << GetModuleSaveStateRev();
 
-   out << kSaveStateRev;
+   IDrawableModule::SaveState(out);
 
    out << mCanvas->GetWidth();
    out << mCanvas->GetHeight();
 }
 
-void SampleCanvas::LoadState(FileStreamIn& in)
+void SampleCanvas::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
+   IDrawableModule::LoadState(in, rev);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-      return;  //this was saved before we added versioning, bail out
+      return; //this was saved before we added versioning, bail out
 
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    float w, h;
    in >> w;

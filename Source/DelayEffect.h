@@ -35,18 +35,18 @@
 #include "Transport.h"
 #include "Ramp.h"
 
-#define DELAY_BUFFER_SIZE 5*gSampleRate
+#define DELAY_BUFFER_SIZE 5 * gSampleRate
 
 class DelayEffect : public IAudioEffect, public IFloatSliderListener, public IDropdownListener
 {
 public:
    DelayEffect();
-   
+
    static IAudioEffect* Create() { return new DelayEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   bool Enabled() const override { return mEnabled; }
+   bool IsEnabled() const override { return mEnabled; }
 
    void SetDelay(float delay);
    void SetShortMode(bool on);
@@ -54,53 +54,57 @@ public:
    void Clear() { mDelayBuffer.ClearBuffer(); }
    void SetDry(bool dry) { mDry = dry; }
    void SetFeedbackModuleMode();
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override;
    float GetEffectAmount() override;
    std::string GetType() override { return "delay"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
 private:
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void DrawModule() override;
-   
+
    float GetMinDelayMs() const;
-   
-   float mDelay;
-   float mFeedback;
-   bool mEcho;
+
+   float mDelay{ 500 };
+   float mFeedback{ 0 };
+   bool mEcho{ true };
    RollingBuffer mDelayBuffer;
-   FloatSlider* mFeedbackSlider;
-   FloatSlider* mDelaySlider;
-   Checkbox* mEchoCheckbox;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   
-   bool mShortTime;
-   Checkbox* mShortTimeCheckbox;
+   FloatSlider* mFeedbackSlider{ nullptr };
+   FloatSlider* mDelaySlider{ nullptr };
+   Checkbox* mEchoCheckbox{ nullptr };
+   NoteInterval mInterval{ NoteInterval::kInterval_8nd };
+   DropdownList* mIntervalSelector{ nullptr };
+
+   bool mShortTime{ false };
+   Checkbox* mShortTimeCheckbox{ nullptr };
    Ramp mDelayRamp;
    Ramp mAmountRamp;
-   bool mAcceptInput;
-   bool mDry;
-   bool mInvert;
-   Checkbox* mDryCheckbox;
-   Checkbox* mAcceptInputCheckbox;
-   Checkbox* mInvertCheckbox;
-   
-   float mWidth;
-   float mHeight;
-   
-   bool mFeedbackModuleMode; //special mode when this delay effect is being used in a FeedbackModule
+   bool mAcceptInput{ true };
+   bool mDry{ true };
+   bool mInvert{ false };
+   Checkbox* mDryCheckbox{ nullptr };
+   Checkbox* mAcceptInputCheckbox{ nullptr };
+   Checkbox* mInvertCheckbox{ nullptr };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+
+   bool mFeedbackModuleMode{ false }; //special mode when this delay effect is being used in a FeedbackModule
 };
 
 #endif /* defined(__modularSynth__DelayEffect__) */
-

@@ -28,9 +28,6 @@
 #include "ModularSynth.h"
 
 ModWheel::ModWheel()
-: mModWheel(0)
-, mModWheelSlider(nullptr)
-, mModulation(true)
 {
 }
 
@@ -49,7 +46,7 @@ ModWheel::~ModWheel()
 void ModWheel::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mModWheelSlider = new FloatSlider(this,"modwheel",5,2,110,15,&mModWheel,0,1);
+   mModWheelSlider = new FloatSlider(this, "modwheel", 5, 2, 110, 15, &mModWheel, 0, 1);
 }
 
 void ModWheel::DrawModule()
@@ -66,7 +63,7 @@ void ModWheel::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
       mModulation.GetModWheel(voiceIdx)->AppendTo(modulation.modWheel);
       modulation.modWheel = mModulation.GetModWheel(voiceIdx);
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
@@ -75,20 +72,20 @@ void ModWheel::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void ModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mModWheelSlider)
       mModulation.GetModWheel(-1)->SetValue(mModWheel);
 }
 
-void ModWheel::CheckboxUpdated(Checkbox* checkbox)
+void ModWheel::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
 void ModWheel::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

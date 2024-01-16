@@ -1,0 +1,80 @@
+{
+  "groups": [
+    {
+      "rows": 5,
+      "cols": 8,
+      "position": [ 0, 0 ],
+      "dimensions": [30, 18],
+      "spacing": [36, 24],
+      "controls": [32, 33, 34, 35, 36, 37, 38, 39,
+                   24, 25, 26, 27, 28, 29, 30, 31,
+                   16, 17, 18, 19, 20, 21, 22, 23,
+                    8,  9, 10, 11, 12, 13, 14, 15,
+                    0,  1,  2,  3,  4,  5,  6,  7
+      ],
+      "messageType": "note",
+      "drawType": "button"
+    },
+    {
+      "rows": 1,
+      "cols": 8,
+      "position": [0, 128],
+      "dimensions": [18, 18],
+      "spacing": [36, 18],
+      "controls":[64, 65, 66, 67, 68, 69, 70, 71],
+      "messageType": "note",
+      "drawType": "button"
+    },
+    {
+      "rows": 5,
+      "cols": 1,
+      "position": [292, 0],
+      "dimensions": [18, 18],
+      "spacing": [20, 24],
+      "controls": [82, 83, 84, 85, 86],
+      "messageType": "note",
+      "drawType": "button"
+    },
+    {
+      "rows": 1,
+      "cols": 1,
+      "position": [292, 126],
+      "dimensions": [18, 18],
+      "spacing": [18,18],
+      "controls": [81],
+      "messageType": "note",
+      "drawType": "button"
+    },
+    {
+      "rows": 2,
+      "cols": 4,
+      "position":[320,0],
+      "dimensions": [24,24],
+      "spacing": [49,49],
+      "controls": [48, 49, 50, 51,
+                   52, 53, 54, 55],
+      "messageType": "control",
+      "drawType": "knob"
+    },
+    {
+      "rows": 1,
+      "cols": 1,
+      "position": [320, 126],
+      "dimensions": [30, 18],
+      "spacing": [18,18],
+      "controls": [98],
+      "messageType": "note",
+      "drawType": "button"
+    },
+    {
+      "rows": 1,
+      "cols": 2,
+      "position": [428, 96],
+      "dimensions": [30, 18],
+      "spacing": [36, 24],
+      "controls": [91,93],
+      "messageType": "note",
+      "drawType": "button"
+    }
+  ]
+}

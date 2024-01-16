@@ -33,11 +33,7 @@ VinylTempoControl* TheVinylTempoControl = nullptr;
 
 VinylTempoControl::VinylTempoControl()
 : IAudioProcessor(gBufferSize)
-, mReferencePitch(1)
 , mVinylProcessor(gSampleRate)
-, mUseVinylControl(false)
-, mUseVinylControlCheckbox(nullptr)
-, mSpeed(1)
 {
    //mModulationBuffer = new float[gBufferSize];
 }
@@ -50,7 +46,7 @@ VinylTempoControl::~VinylTempoControl()
 void VinylTempoControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mUseVinylControlCheckbox = new Checkbox(this,"control",4,2,&mUseVinylControl);
+   mUseVinylControlCheckbox = new Checkbox(this, "control", 4, 2, &mUseVinylControl);
 
    GetPatchCableSource()->SetEnabled(false);
 
@@ -63,17 +59,17 @@ void VinylTempoControl::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mUseVinylControlCheckbox->Draw();
-   
+
    if (CanStartVinylControl())
-      DrawTextNormal(ofToString(mVinylProcessor.GetPitch(),2),60,14);
+      DrawTextNormal(ofToString(mVinylProcessor.GetPitch(), 2), 60, 14);
 }
 
 void VinylTempoControl::Process(double time)
 {
    PROFILER(VinylTempoControl);
-   
+
    if (!mEnabled)
       return;
 
@@ -118,7 +114,7 @@ bool VinylTempoControl::CanStartVinylControl()
    return !mVinylProcessor.GetStopped() && fabsf(mVinylProcessor.GetPitch()) > .001f;
 }
 
-void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox)
+void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mUseVinylControlCheckbox)
    {
@@ -129,19 +125,10 @@ void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox)
 
 void VinylTempoControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
@@ -154,7 +141,7 @@ void VinylTempoControl::SetUpFromSaveData()
 VinylProcessor::VinylProcessor(int sampleRate)
 : mSampleRate(sampleRate)
 {
-   struct timecode_def *def;
+   struct timecode_def* def;
 
    def = timecoder_find_definition("serato_2a");
    assert(def != NULL);
@@ -168,6 +155,7 @@ VinylProcessor::~VinylProcessor()
    timecoder_free_lookup();
 }
 
+//@TODO(Noxy): Warning C6262 Function uses '16448' bytes of stack : exceeds / analyze : stacksize '16384'. Consider moving some data to heap.
 void VinylProcessor::Process(float* left, float* right, int numSamples)
 {
    float* in[2];
@@ -179,7 +167,7 @@ void VinylProcessor::Process(float* left, float* right, int numSamples)
    for (int n = 0; n < numSamples; n++)
    {
       for (int ch = 0; ch < 2; ch++)
-         data[n * 2 + ch] = (signed short)(kConvert*(float)in[ch][n]);
+         data[n * 2 + ch] = (signed short)(kConvert * (float)in[ch][n]);
    }
 
    timecoder_submit(&mTimecoder, data, numSamples);

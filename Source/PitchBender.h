@@ -39,36 +39,43 @@ public:
    PitchBender();
    virtual ~PitchBender();
    static IDrawableModule* Create() { return new PitchBender(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 120; height = 22; }
-   bool Enabled() const override { return mEnabled; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 22;
+   }
+
    float mBend;
    FloatSlider* mBendSlider;
    float mRange;
    //Checkbox mBendingCheckbox;
-   
+
    Modulations mModulation;
 };
 
 #endif /* defined(__Bespoke__PitchBender__) */
-

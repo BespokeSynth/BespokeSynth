@@ -32,61 +32,71 @@
 #include "Checkbox.h"
 #include "UIGrid.h"
 #include "DropdownList.h"
+#include "Scale.h"
 
 #define TOTAL_NUM_NOTES 128
 
-class Chorder : public NoteEffectBase, public IDrawableModule, public UIGridListener, public IDropdownListener
+class Chorder : public NoteEffectBase, public IDrawableModule, public UIGridListener, public IDropdownListener, public IScaleListener
 {
 public:
    Chorder();
+   virtual ~Chorder();
    static IDrawableModule* Create() { return new Chorder(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
-   void AddTone(int tone, float velocity=1);
+
+   void AddTone(int tone, float velocity = 1);
    void RemoveTone(int tone);
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* dropdown, int oldVal) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* dropdown, int oldVal, double time) override;
+
+   void OnScaleChanged() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   virtual bool Enabled() const override { return mEnabled; }
-   
+   virtual bool IsEnabled() const override { return mEnabled; }
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 135; height = 75; }
-   void OnClicked(int x, int y, bool right) override;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 135;
+      height = 75;
+   }
+   void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
+
    void PlayChorderNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
    void CheckLeftovers();
    void SyncChord();
-   
-   UIGrid* mChordGrid;
-   int mVelocity;
-   bool mInputNotes[TOTAL_NUM_NOTES];
-   int mHeldCount[TOTAL_NUM_NOTES];
-   
-   bool mDiatonic;
-   int mChordIndex;
-   int mInversion;
-   Checkbox* mDiatonicCheckbox;
-   DropdownList* mChordDropdown;
-   DropdownList* mInversionDropdown;
+
+   UIGrid* mChordGrid{ nullptr };
+   int mVelocity{ 0 };
+   bool mInputNotes[TOTAL_NUM_NOTES]{};
+   int mHeldCount[TOTAL_NUM_NOTES]{};
+
+   bool mDiatonic{ false };
+   int mChordIndex{ 0 };
+   int mInversion{ 0 };
+   Checkbox* mDiatonicCheckbox{ nullptr };
+   DropdownList* mChordDropdown{ nullptr };
+   DropdownList* mInversionDropdown{ nullptr };
 };
 
 #endif /* defined(__modularSynth__Chorder__) */
-

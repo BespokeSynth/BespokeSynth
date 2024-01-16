@@ -31,9 +31,6 @@
 #include "UIControlMacros.h"
 
 MidiControlChange::MidiControlChange()
-: mControl(0)
-, mValue(0)
-, mResendDuplicateValue(true)
 {
 }
 
@@ -50,7 +47,7 @@ void MidiControlChange::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mControlEntry->Draw();
    mValueSlider->Draw();
 }
@@ -60,7 +57,7 @@ void MidiControlChange::PlayNote(double time, int pitch, int velocity, int voice
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void MidiControlChange::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void MidiControlChange::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mValueSlider && mEnabled)
    {

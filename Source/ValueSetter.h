@@ -30,51 +30,63 @@
 #include "IPulseReceiver.h"
 #include "TextEntry.h"
 #include "ClickButton.h"
+#include "Slider.h"
 
 class PatchCableSource;
 class IUIControl;
 
-class ValueSetter : public IDrawableModule, public IPulseReceiver, public ITextEntryListener, public IButtonListener
+class ValueSetter : public IDrawableModule, public IPulseReceiver, public ITextEntryListener, public IButtonListener, public IFloatSliderListener
 {
 public:
    ValueSetter();
    virtual ~ValueSetter();
    static IDrawableModule* Create() { return new ValueSetter(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
-   void ButtonClicked(ClickButton* button) override;
-   
+
+   void ButtonClicked(ClickButton* button, double time) override;
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    void TextEntryComplete(TextEntry* entry) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   void Go();
-   
-   PatchCableSource* mControlCable;
-   IUIControl* mTarget;
-   float mValue;
-   TextEntry* mValueEntry;
-   ClickButton* mButton;
-   
-   float mWidth;
-   float mHeight;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   void Go(double time);
+
+   PatchCableSource* mControlCable{ nullptr };
+   std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
+   float mValue{ 0 };
+   TextEntry* mValueEntry{ nullptr };
+   FloatSlider* mValueSlider{ nullptr };
+   ClickButton* mButton{ nullptr };
+   double mLastClickTime{ 0 };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 #endif /* defined(__Bespoke__ValueSetter__) */

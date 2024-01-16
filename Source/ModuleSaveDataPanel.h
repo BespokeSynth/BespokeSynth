@@ -46,48 +46,63 @@ public:
    ~ModuleSaveDataPanel();
    static IDrawableModule* Create() { return new ModuleSaveDataPanel(); }
    static bool CanCreate() { return TheSaveDataPanel == nullptr; }
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    std::string GetTitleLabel() const override { return ""; }
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }
-   
+   void Poll() override;
+
    void SetModule(IDrawableModule* module);
    IDrawableModule* GetModule() { return mSaveModule; }
    void UpdatePosition();
    void ReloadSaveData();
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+
    bool IsSaveable() override { return false; }
-   
+
+   bool IsEnabled() const override { return true; }
+
+   static void LoadPreset(IDrawableModule* module, std::string presetFilePath);
+
 private:
    void ApplyChanges();
    void FillDropdownList(DropdownList* list, ModuleSaveData::SaveVal* save);
-   
+   void RefreshPresetFiles();
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
-   
-   IDrawableModule* mSaveModule;
+
+   IDrawableModule* mSaveModule{ nullptr };
+   TextEntry* mNameEntry{ nullptr };
+   DropdownList* mPresetFileSelector{ nullptr };
+   ClickButton* mSavePresetAsButton{ nullptr };
    std::vector<IUIControl*> mSaveDataControls;
    std::vector<std::string> mLabels;
-   ClickButton* mApplyButton;
-   ClickButton* mDeleteButton;
-   Checkbox* mDrawDebugCheckbox;
-   ClickButton* mResetSequencerButton;
-   std::map<DropdownList*,ModuleSaveData::SaveVal*> mStringDropdowns;
+   ClickButton* mApplyButton{ nullptr };
+   ClickButton* mDeleteButton{ nullptr };
+   Checkbox* mDrawDebugCheckbox{ nullptr };
+   ClickButton* mResetSequencerButton{ nullptr };
+   TextEntry* mTransportPriorityEntry{ nullptr };
+   std::map<DropdownList*, ModuleSaveData::SaveVal*> mStringDropdowns;
 
-   int mHeight;
-   float mAppearAmount;
-   float mAlignmentX;
+   int mHeight{ 100 };
+   float mAppearAmount{ 0 };
+   float mAlignmentX{ 100 };
+   int mPresetFileIndex{ 0 };
+   bool mPresetFileUpdateQueued{ false };
+   std::vector<std::string> mPresetFilePaths;
 };
 
 #endif /* defined(__modularSynth__ModuleSaveDataPanel__) */

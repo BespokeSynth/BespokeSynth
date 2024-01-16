@@ -35,31 +35,34 @@
 #include "INoteReceiver.h"
 #include "ClickButton.h"
 #include "DropdownList.h"
+#include "TextEntry.h"
 
 class CanvasControls;
 class CanvasTimeline;
 class CanvasScrollbar;
 
-class NoteCanvas : public IDrawableModule, public INoteSource, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public INoteReceiver, public IButtonListener, public IDropdownListener
+class NoteCanvas : public IDrawableModule, public INoteSource, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public INoteReceiver, public IButtonListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    NoteCanvas();
    ~NoteCanvas();
    static IDrawableModule* Create() { return new NoteCanvas(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void KeyPressed(int key, bool isRepeat) override;
-   
+
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
-   void Clear();
+
+   void Clear(double time);
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
 
    /**
@@ -68,27 +71,30 @@ public:
    void FitNotes();
 
    void OnTransportAdvanced(float amount) override;
-   
+
    void CanvasUpdated(Canvas* canvas) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void TextEntryComplete(TextEntry* entry) override {}
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   
+
    double GetCurPos(double time) const;
    void UpdateNumColumns();
    void SetRecording(bool rec);
@@ -96,32 +102,38 @@ private:
    bool FreeRecordParityMatched();
    void ClipNotes();
    void QuantizeNotes();
-   
-   Canvas* mCanvas;
-   CanvasControls* mCanvasControls;
-   CanvasTimeline* mCanvasTimeline;
-   CanvasScrollbar* mCanvasScrollbarHorizontal;
-   CanvasScrollbar* mCanvasScrollbarVertical;
-   std::vector<CanvasElement*> mNoteChecker{128};
-   std::vector<NoteCanvasElement*> mInputNotes{128};
-   std::vector<NoteCanvasElement*> mCurrentNotes{128};
-   IntSlider* mNumMeasuresSlider;
-   int mNumMeasures;
-   ClickButton* mQuantizeButton;
-   ClickButton* mClipButton;
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mRecord;
-   Checkbox* mRecordCheckbox;
-   bool mStopQueued;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   bool mFreeRecord;
-   Checkbox* mFreeRecordCheckbox;
-   int mFreeRecordStartMeasure;
-   bool mShowIntervals;
-   Checkbox* mShowIntervalsCheckbox;
-   
+   void LoadMidi();
+   void SaveMidi();
+
+   Canvas* mCanvas{ nullptr };
+   CanvasControls* mCanvasControls{ nullptr };
+   CanvasTimeline* mCanvasTimeline{ nullptr };
+   CanvasScrollbar* mCanvasScrollbarHorizontal{ nullptr };
+   CanvasScrollbar* mCanvasScrollbarVertical{ nullptr };
+   std::vector<CanvasElement*> mNoteChecker{ 128 };
+   std::vector<NoteCanvasElement*> mInputNotes{ 128 };
+   std::vector<NoteCanvasElement*> mCurrentNotes{ 128 };
+   IntSlider* mNumMeasuresSlider{ nullptr };
+   int mNumMeasures{ 1 };
+   ClickButton* mQuantizeButton{ nullptr };
+   ClickButton* mSaveMidiButton{ nullptr };
+   ClickButton* mLoadMidiButton{ nullptr };
+   TextEntry* mLoadMidiTrackEntry{ nullptr };
+   int mLoadMidiTrack{ 1 };
+   ClickButton* mClipButton{ nullptr };
+   bool mPlay{ true };
+   Checkbox* mPlayCheckbox{ nullptr };
+   bool mRecord{ false };
+   Checkbox* mRecordCheckbox{ nullptr };
+   bool mStopQueued{ false };
+   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   DropdownList* mIntervalSelector{ nullptr };
+   bool mFreeRecord{ false };
+   Checkbox* mFreeRecordCheckbox{ nullptr };
+   int mFreeRecordStartMeasure{ 0 };
+   bool mShowIntervals{ false };
+   Checkbox* mShowIntervalsCheckbox{ nullptr };
+
    std::vector<ModulationParameters> mVoiceModulations;
 };
 

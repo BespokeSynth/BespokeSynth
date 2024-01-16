@@ -38,34 +38,45 @@ public:
    ScriptStatus();
    virtual ~ScriptStatus();
    static IDrawableModule* Create() { return new ScriptStatus(); }
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void Poll() override;
-   
-   
    void CreateUIControls() override;
-   
-   void ButtonClicked(ClickButton* button) override;
-   
+
+   void ButtonClicked(ClickButton* button, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   void OnClicked(int x, int y, bool right) override;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+   void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override { mWidth = w; mHeight = h; }
-   
-   ClickButton* mResetAll;
-   
+   void Resize(float w, float h) override
+   {
+      mWidth = w;
+      mHeight = h;
+   }
+
+   ClickButton* mResetAll{ nullptr };
+
    std::string mStatus;
-   double mNextUpdateTime;
-   
-   float mWidth;
-   float mHeight;
+   double mNextUpdateTime{ 0 };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

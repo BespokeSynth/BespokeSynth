@@ -31,8 +31,7 @@
 #include "ChannelBuffer.h"
 
 SingleOscillatorVoice::SingleOscillatorVoice(IDrawableModule* owner)
-: mUseFilter(false)
-, mOwner(owner)
+: mOwner(owner)
 {
 }
 
@@ -51,36 +50,36 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
 
    if (IsDone(time))
       return false;
-   
-   for (int u=0; u<mVoiceParams->mUnison && u<kMaxUnison; ++u)
+
+   for (int u = 0; u < mVoiceParams->mUnison && u < kMaxUnison; ++u)
       mOscData[u].mOsc.SetType(mVoiceParams->mOscType);
-   
+
    bool mono = (out->NumActiveChannels() == 1);
-      
+
    float syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
-   
+
    float pitch;
    float freq;
    float vol;
-   
+
    if (mVoiceParams->mLiteCPUMode)
       DoParameterUpdate(0, pitch, freq, vol);
-   
-   for (int pos=0; pos<out->BufferSize(); ++pos)
+
+   for (int pos = 0; pos < out->BufferSize(); ++pos)
    {
       if (!mVoiceParams->mLiteCPUMode)
          DoParameterUpdate(pos, pitch, freq, vol);
-      
+
       float adsrVal = mAdsr.Value(time);
-      
+
       float summedLeft = 0;
       float summedRight = 0;
-      for (int u=0; u<mVoiceParams->mUnison && u<kMaxUnison; ++u)
+      for (int u = 0; u < mVoiceParams->mUnison && u < kMaxUnison; ++u)
       {
          mOscData[u].mOsc.SetPulseWidth(mVoiceParams->mPulseWidth);
          mOscData[u].mOsc.SetShuffle(mVoiceParams->mShuffle);
          mOscData[u].mOsc.SetSoften(mVoiceParams->mSoften);
-         
+
          {
             //PROFILER(SingleOscillatorVoice_UpdatePhase);
             mOscData[u].mPhase += mOscData[u].mCurrentPhaseInc;
@@ -90,17 +89,17 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
             }
             else
             {
-               while (mOscData[u].mPhase > FTWO_PI*2)
+               while (mOscData[u].mPhase > FTWO_PI * 2)
                {
-                  mOscData[u].mPhase -= FTWO_PI*2;
+                  mOscData[u].mPhase -= FTWO_PI * 2;
                   mOscData[u].mSyncPhase = 0;
                }
             }
             mOscData[u].mSyncPhase += syncPhaseInc;
          }
-         
+
          float sample;
-         
+
          {
             //PROFILER(SingleOscillatorVoice_GetOscValue);
             if (mVoiceParams->mSync)
@@ -108,10 +107,10 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
             else
                sample = mOscData[u].mOsc.Value(mOscData[u].mPhase + mVoiceParams->mPhaseOffset * (1 + (float(u) / mVoiceParams->mUnison))) * adsrVal * vol;
          }
-         
+
          if (u >= 2)
             sample *= 1 - (mOscData[u].mDetuneFactor * .5f);
-         
+
          if (mono)
          {
             summedLeft += sample;
@@ -133,7 +132,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
             summedRight += sample * GetRightPanGain(pan);
          }
       }
-      
+
       if (mUseFilter)
       {
          //PROFILER(SingleOscillatorVoice_filter);
@@ -148,7 +147,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
             summedRight = mFilterRight.Filter(summedRight);
          }
       }
-      
+
       {
          //PROFILER(SingleOscillatorVoice_output);
          if (mono)
@@ -163,7 +162,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
       }
       time += gInvSampleRateMs;
    }
-   
+
    return true;
 }
 
@@ -174,12 +173,12 @@ void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
 {
    if (mOwner)
       mOwner->ComputeSliders(samplesIn);
-   
+
    pitch = GetPitch(samplesIn);
    freq = TheScale->PitchToFreq(pitch) * mVoiceParams->mMult;
    vol = mVoiceParams->mVol * .4f / mVoiceParams->mUnison;
-   
-   for (int u=0; u<mVoiceParams->mUnison && u<kMaxUnison; ++u)
+
+   for (int u = 0; u < mVoiceParams->mUnison && u < kMaxUnison; ++u)
    {
       float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 - GetPressure(samplesIn)));
       mOscData[u].mCurrentPhaseInc = GetPhaseInc(freq * detune);
@@ -191,7 +190,7 @@ float SingleOscillatorVoice::GetADSRScale(float velocity, float velToEnvelope)
 {
    if (velToEnvelope > 0)
       return ofLerp((1 - velToEnvelope), 1, velocity);
-   return ofClamp(ofLerp(1, 1+velToEnvelope, velocity), 0.001f, 1);
+   return ofClamp(ofLerp(1, 1 + velToEnvelope, velocity), 0.001f, 1);
 }
 
 void SingleOscillatorVoice::Start(double time, float target)
@@ -199,7 +198,7 @@ void SingleOscillatorVoice::Start(double time, float target)
    float volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target);
    float adsrScale = GetADSRScale(target, mVoiceParams->mVelToEnvelope);
    mAdsr.Start(time, volume, mVoiceParams->mAdsr, adsrScale);
-   
+
    if (mVoiceParams->mFilterCutoffMax != SINGLEOSCILLATOR_NO_CUTOFF)
    {
       mUseFilter = true;
@@ -223,17 +222,17 @@ void SingleOscillatorVoice::ClearVoice()
 {
    mAdsr.Clear();
    mFilterAdsr.Clear();
-   for (int u=0; u<kMaxUnison; ++u)
+   for (int u = 0; u < kMaxUnison; ++u)
    {
       mOscData[u].mPhase = 0;
       mOscData[u].mSyncPhase = 0;
    }
-   
+
    //set this up so it's different with each fresh voice, but doesn't reset when voice is retriggered
    mOscData[0].mDetuneFactor = 1;
    mOscData[1].mDetuneFactor = 0;
-   for (int u=2; u<kMaxUnison; ++u)
-      mOscData[u].mDetuneFactor = ofRandom(-1,1);
+   for (int u = 2; u < kMaxUnison; ++u)
+      mOscData[u].mDetuneFactor = ofRandom(-1, 1);
 }
 
 void SingleOscillatorVoice::SetVoiceParams(IVoiceParams* params)

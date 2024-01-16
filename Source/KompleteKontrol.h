@@ -45,48 +45,58 @@ public:
    KompleteKontrol();
    ~KompleteKontrol();
    static IDrawableModule* Create() { return new KompleteKontrol(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void Poll() override;
    void Exit() override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    //IScaleListener
    void OnScaleChanged() override;
-   
+
    //IKontrolListener
    void OnKontrolButton(int control, bool on) override;
    void OnKontrolEncoder(int control, float change) override;
    void OnKontrolOctave(int octave) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    const int kNumKeys = 61;
-   
+
+   bool IsEnabled() const override { return true; }
+
 private:
    struct TextBox
    {
-      TextBox() : slider(false), amount(0) {}
+      TextBox()
+      : slider(false)
+      , amount(0)
+      {}
       bool slider;
       float amount;
       std::string line1;
       std::string line2;
    };
-   
+
    void UpdateKeys();
    void UpdateText();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width=100; height=18; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 100;
+      height = 18;
+   }
+
    KontrolKommunicator mKontrol;
    bool mInitialized;
    int mKeyOffset;
@@ -95,7 +105,7 @@ private:
    uint16_t mCurrentSliders[NUM_SLIDER_SEGMENTS];
    TextBox mTextBoxes[9];
    MidiController* mController;
-   
+
    PatchCableSource* mMidiControllerCable;
 };
 

@@ -29,22 +29,20 @@
 #include "ModularSynth.h"
 
 VelocityScaler::VelocityScaler()
-: mScale(1)
-, mScaleSlider(nullptr)
 {
 }
 
 void VelocityScaler::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mScaleSlider = new FloatSlider(this,"scale",4,2,100,15,&mScale,0,2);
+   mScaleSlider = new FloatSlider(this, "scale", 4, 2, 100, 15, &mScale, 0, 2);
 }
 
 void VelocityScaler::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mScaleSlider->Draw();
 }
 
@@ -54,16 +52,16 @@ void VelocityScaler::PlayNote(double time, int pitch, int velocity, int voiceIdx
    {
       ComputeSliders(0);
       if (velocity > 0)
-         velocity = MAX(1,velocity*mScale);
+         velocity = MAX(1, velocity * mScale);
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void VelocityScaler::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

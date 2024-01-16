@@ -43,43 +43,49 @@ class EQEffect : public IAudioEffect, public IDropdownListener, public IIntSlide
 public:
    EQEffect();
    ~EQEffect();
-   
+
    static IAudioEffect* Create() { return new EQEffect(); }
-   
-   
+
    void CreateUIControls() override;
-   
    void Init() override;
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "basiceq"; }
-   
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
+   void OnClicked(float x, float y, bool right) override;
+   bool MouseMoved(float x, float y) override;
+   void MouseReleased() override;
 
    struct FilterBank
    {
-      BiquadFilter mBiquad[NUM_EQ_FILTERS];
+      BiquadFilter mBiquad[NUM_EQ_FILTERS]{};
    };
-   
-   FilterBank mBanks[ChannelBuffer::kMaxNumChannels];
-   int mNumFilters;
-   
-   UIGrid* mMultiSlider;
-   ClickButton* mEvenButton;
+
+   FilterBank mBanks[ChannelBuffer::kMaxNumChannels]{};
+   int mNumFilters{ NUM_EQ_FILTERS };
+
+   UIGrid* mMultiSlider{ nullptr };
+   ClickButton* mEvenButton{ nullptr };
 };
 
 #endif /* defined(__Bespoke__EQEffect__) */

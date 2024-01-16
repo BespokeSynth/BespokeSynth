@@ -40,42 +40,49 @@ public:
    ModulatorSmoother();
    virtual ~ModulatorSmoother();
    static IDrawableModule* Create() { return new ModulatorSmoother(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
-   FloatSlider* GetTarget() { return mTarget; }
-   
+
+   FloatSlider* GetTarget() { return GetSliderTarget(); }
+
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=106; h=17*2+4; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mInput;
-   float mSmooth;
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 106;
+      h = 17 * 2 + 4;
+   }
+
+   float mInput{ 0 };
+   float mSmooth{ .1 };
    Ramp mRamp;
-   
-   FloatSlider* mInputSlider;
-   FloatSlider* mSmoothSlider;
+
+   FloatSlider* mInputSlider{ nullptr };
+   FloatSlider* mSmoothSlider{ nullptr };
 };

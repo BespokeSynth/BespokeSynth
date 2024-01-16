@@ -43,9 +43,9 @@
 
 struct RazorBump
 {
-   float mFreq;
-   float mAmt;
-   float mDecay;
+   float mFreq{ 100 };
+   float mAmt{ 0 };
+   float mDecay{ .005 };
 };
 
 class Razor : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IButtonListener
@@ -54,27 +54,30 @@ public:
    Razor();
    ~Razor();
    static IDrawableModule* Create() { return new Razor(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    float SinSample(float phase); //phase 0-512
    void CalcAmp();
@@ -82,61 +85,63 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w = 1020; h = 420; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 1020;
+      h = 420;
+   }
 
-   float mVol;
-   float mPhase;
-   ::ADSR mAdsr[NUM_PARTIALS];
-   float mAmp[NUM_PARTIALS];
-   float mPhases[NUM_PARTIALS];
-   float mDetune[NUM_PARTIALS];
-   
-   int mPitch;
-   
-   int mUseNumPartials;
-   IntSlider* mNumPartialsSlider;
+   float mVol{ .05 };
+   float mPhase{ 0 };
+   ::ADSR mAdsr[NUM_PARTIALS]{};
+   float mAmp[NUM_PARTIALS]{};
+   float mPhases[NUM_PARTIALS]{};
+   float mDetune[NUM_PARTIALS]{};
+
+   int mPitch{ -1 };
+
+   int mUseNumPartials{ NUM_PARTIALS };
+   IntSlider* mNumPartialsSlider{ nullptr };
    RazorBump mBumps[NUM_BUMPS];
-   FloatSlider* mBumpAmpSlider;
-   FloatSlider* mBumpAmpAmtSlider;
-   FloatSlider* mBumpAmpDecaySlider;
-   FloatSlider* mBumpAmpSlider2;
-   FloatSlider* mBumpAmpAmtSlider2;
-   FloatSlider* mBumpAmpDecaySlider2;
-   FloatSlider* mBumpAmpSlider3;
-   FloatSlider* mBumpAmpAmtSlider3;
-   FloatSlider* mBumpAmpDecaySlider3;
-   FloatSlider* mASlider;
-   FloatSlider* mDSlider;
-   FloatSlider* mSSlider;
-   FloatSlider* mRSlider;
-   int mHarmonicSelector;
-   IntSlider* mHarmonicSelectorSlider;
-   float mPowFalloff;
-   FloatSlider* mPowFalloffSlider;
-   int mNegHarmonics;
-   IntSlider* mNegHarmonicsSlider;
-   float mHarshnessCut;
-   FloatSlider* mHarshnessCutSlider;
-   
-   bool mManualControl;
-   Checkbox* mManualControlCheckbox;
-   FloatSlider* mAmpSliders[NUM_AMP_SLIDERS];
+   FloatSlider* mBumpAmpSlider{ nullptr };
+   FloatSlider* mBumpAmpAmtSlider{ nullptr };
+   FloatSlider* mBumpAmpDecaySlider{ nullptr };
+   FloatSlider* mBumpAmpSlider2{ nullptr };
+   FloatSlider* mBumpAmpAmtSlider2{ nullptr };
+   FloatSlider* mBumpAmpDecaySlider2{ nullptr };
+   FloatSlider* mBumpAmpSlider3{ nullptr };
+   FloatSlider* mBumpAmpAmtSlider3{ nullptr };
+   FloatSlider* mBumpAmpDecaySlider3{ nullptr };
+   FloatSlider* mASlider{ nullptr };
+   FloatSlider* mDSlider{ nullptr };
+   FloatSlider* mSSlider{ nullptr };
+   FloatSlider* mRSlider{ nullptr };
+   int mHarmonicSelector{ 1 };
+   IntSlider* mHarmonicSelectorSlider{ nullptr };
+   float mPowFalloff{ 1 };
+   FloatSlider* mPowFalloffSlider{ nullptr };
+   int mNegHarmonics{ 0 };
+   IntSlider* mNegHarmonicsSlider{ nullptr };
+   float mHarshnessCut{ 0 };
+   FloatSlider* mHarshnessCutSlider{ nullptr };
+
+   bool mManualControl{ false };
+   Checkbox* mManualControlCheckbox{ nullptr };
+   FloatSlider* mAmpSliders[NUM_AMP_SLIDERS]{ nullptr };
    FloatSlider* mDetuneSliders[NUM_AMP_SLIDERS];
-   ClickButton* mResetDetuneButton;
+   ClickButton* mResetDetuneButton{ nullptr };
 
-   float mA;
-   float mD;
-   float mS;
-   float mR;
-   
-   ModulationChain* mPitchBend;
-   ModulationChain* mModWheel;
-   ModulationChain* mPressure;
+   float mA{ 1 };
+   float mD{ 0 };
+   float mS{ 1 };
+   float mR{ 1 };
 
-   float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH+1];
-   int mHistoryPtr;
+   ModulationChain* mPitchBend{ nullptr };
+   ModulationChain* mModWheel{ nullptr };
+   ModulationChain* mPressure{ nullptr };
+
+   float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH + 1]{};
+   int mHistoryPtr{ 0 };
 };
 
 #endif /* defined(__modularSynth__Razor__) */
-

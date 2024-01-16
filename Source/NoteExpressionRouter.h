@@ -40,34 +40,41 @@ class NoteExpressionRouter : public INoteReceiver, public INoteSource, public ID
 public:
    NoteExpressionRouter();
    static IDrawableModule* Create() { return new NoteExpressionRouter(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
-   void TextEntryComplete(TextEntry *entry) override;
-   
+   void TextEntryComplete(TextEntry* entry) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
    static const int kMaxDestinations = 5;
-   AdditionalNoteCable* mDestinationCables[kMaxDestinations];
-   float mWidth;
-   float mHeight;
+   AdditionalNoteCable* mDestinationCables[kMaxDestinations]{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
 private:
-
    exprtk::symbol_table<float> mSymbolTable;
-   float mSTNote{0}, mSTVelocity{0}; // bound to the symbol table
+   float mSTNote{ 0 }, mSTVelocity{ 0 }; // bound to the symbol table
    std::array<exprtk::expression<float>, kMaxDestinations> mExpressions;
-   TextEntry* mExpressionWidget[kMaxDestinations];
-   char mExpressionText[kMaxDestinations][MAX_TEXTENTRY_LENGTH];
+   TextEntry* mExpressionWidget[kMaxDestinations]{ nullptr };
+   char mExpressionText[kMaxDestinations][MAX_TEXTENTRY_LENGTH]{};
 };

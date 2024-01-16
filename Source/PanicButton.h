@@ -36,13 +36,21 @@ public:
    PanicButton();
    ~PanicButton();
    static IDrawableModule* Create() { return new PanicButton(); }
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width=300; height=150; }
-   void OnClicked(int x, int y, bool right) override;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 300;
+      height = 150;
+   }
+   void OnClicked(float x, float y, bool right) override;
 };
 
 #endif /* defined(__Bespoke__PanicButton__) */

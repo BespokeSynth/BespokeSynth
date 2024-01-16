@@ -37,35 +37,42 @@ class NoteRouter : public NoteEffectBase, public IDrawableModule, public IRadioB
 public:
    NoteRouter();
    static IDrawableModule* Create() { return new NoteRouter(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
+   void Poll() override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    void SetActiveIndex(int index) { mRouteMask = 1 << index; }
    void SetSelectedMask(int mask);
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    //IRadioButtonListener
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return true; }
 
-   int mRouteMask;
-   RadioButton* mRouteSelector;
+   bool IsIndexActive(int idx) const;
+
+   int mRouteMask{ 0 };
+   RadioButton* mRouteSelector{ nullptr };
    std::vector<AdditionalNoteCable*> mDestinationCables;
-   bool mRadioButtonMode;
+   bool mRadioButtonMode{ false };
+   bool mOnlyShowActiveCables{ false };
 };
 
 #endif /* defined(__modularSynth__NoteRouter__) */
-

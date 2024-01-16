@@ -41,43 +41,47 @@ public:
    CanvasControls();
    ~CanvasControls();
    static IDrawableModule* Create() { return new CanvasControls(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
    bool CanMinimize() override { return false; }
-   
+
    void SetCanvas(Canvas* canvas);
    void SetElement(CanvasElement* element);
-   
+
    void AllowDragModeSelection(bool allow);
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   bool CanSaveState() const override { return false; }
+   bool CanModuleTypeSaveState() const override { return false; }
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void PreDrawModule() override;
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return true; }
-   
-   float mWidth;
-   Canvas* mCanvas;
-   CanvasElement* mSelectedElement;
-   ClickButton* mRemoveElementButton;
-   TextEntry* mNumVisibleRowsEntry;
-   ClickButton* mClearButton;
-   float mDummyFloat;
-   int mDummyInt;
-   DropdownList* mDragModeSelector;
+
+   float mWidth{ 200 };
+   Canvas* mCanvas{ nullptr };
+   CanvasElement* mSelectedElement{ nullptr };
+   ClickButton* mRemoveElementButton{ nullptr };
+   TextEntry* mNumVisibleRowsEntry{ nullptr };
+   ClickButton* mClearButton{ nullptr };
+   float mDummyFloat{ 0 };
+   int mDummyInt{ 0 };
+   DropdownList* mDragModeSelector{ nullptr };
 };
 
 #endif /* defined(__Bespoke__CanvasControls__) */

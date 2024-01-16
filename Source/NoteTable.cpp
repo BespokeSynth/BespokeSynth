@@ -36,27 +36,13 @@
 #include "MathUtils.h"
 
 NoteTable::NoteTable()
-: mLength(8)
-, mLengthSlider(nullptr)
-, mGrid(nullptr)
-, mOctave(3)
-, mOctaveSlider(nullptr)
-, mNoteMode(kNoteMode_Scale)
-, mNoteModeSelector(nullptr)
-, mNoteRange(15)
-, mShowColumnControls(false)
-, mRowOffset(0)
-, mSetLength(false)
-, mRandomizePitchButton(nullptr)
-, mRandomizePitchChance(1)
-, mRandomizePitchRange(1)
-, mGridControlOffsetX(0)
-, mGridControlOffsetY(0)
-{  
-   for (int i=0; i < mLength; ++i)
-      mTones[i] = i;
-   
-   TheScale->AddListener(this);
+{
+   for (size_t i = 0; i < mLastColumnPlayTime.size(); ++i)
+      mLastColumnPlayTime[i] = -1;
+   for (size_t i = 0; i < mPitchPlayTimes.size(); ++i)
+      mPitchPlayTimes[i] = -1;
+   for (size_t i = 0; i < mQueuedPitches.size(); ++i)
+      mQueuedPitches[i] = false;
 }
 
 void NoteTable::CreateUIControls()
@@ -64,35 +50,34 @@ void NoteTable::CreateUIControls()
    IDrawableModule::CreateUIControls();
    float width, height;
    UIBLOCK(140);
-   INTSLIDER(mLengthSlider, "length", &mLength, 1, kMaxLength); UIBLOCK_SHIFTRIGHT();
-   INTSLIDER(mOctaveSlider, "octave", &mOctave, 0, 7); UIBLOCK_SHIFTRIGHT();
+   INTSLIDER(mLengthSlider, "length", &mLength, 1, kMaxLength);
+   UIBLOCK_SHIFTRIGHT();
+   INTSLIDER(mOctaveSlider, "octave", &mOctave, 0, 7);
+   UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mNoteModeSelector, "notemode", (int*)(&mNoteMode), 80);
    UIBLOCK_NEWLINE();
-   BUTTON(mRandomizePitchButton, "random pitch"); UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER_DIGITS(mRandomizePitchChanceSlider, "rand pitch chance", &mRandomizePitchChance, 0, 1, 2); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mRandomizePitchButton, "random pitch");
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER_DIGITS(mRandomizePitchChanceSlider, "rand pitch chance", &mRandomizePitchChance, 0, 1, 2);
+   UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER_DIGITS(mRandomizePitchRangeSlider, "rand pitch range", &mRandomizePitchRange, 0, 1, 2);
    UIBLOCK_NEWLINE();
-   UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid"))); UIBLOCK_SHIFTRIGHT();
-   INTSLIDER(mGridControlOffsetXSlider, "x offset", &mGridControlOffsetX, 0, 16); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mClearButton, "clear");
+   UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
+   UIBLOCK_SHIFTRIGHT();
+   INTSLIDER(mGridControlOffsetXSlider, "x offset", &mGridControlOffsetX, 0, 16);
+   UIBLOCK_SHIFTRIGHT();
    INTSLIDER(mGridControlOffsetYSlider, "y offset", &mGridControlOffsetY, 0, 16);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid(5, height + 18, width-10, 110, 8, 24, this);
-   
-   for (int i=0; i< kMaxLength; ++i)
-   {
-      mToneDropdowns[i] = new DropdownList(this,("tone"+ofToString(i)).c_str(),-1,-1,&(mTones[i]),40);
-      mToneDropdowns[i]->SetDrawTriangle(false);
-      mToneDropdowns[i]->SetShowing(false);
-   }
-   SetUpColumnControls();
-   
+   mGrid = new UIGrid("uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange, this);
+
    mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
    mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);
    mNoteModeSelector->AddLabel("pentatonic", kNoteMode_Pentatonic);
    mNoteModeSelector->AddLabel("5ths", kNoteMode_Fifths);
-   
-   mGrid->SetSingleColumnMode(true);
+
    mGrid->SetFlip(true);
    mGrid->SetListener(this);
 
@@ -100,21 +85,18 @@ void NoteTable::CreateUIControls()
    {
       mColumnCables[i] = new AdditionalNoteCable();
       mColumnCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mColumnCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1));
+      mColumnCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mColumnCables[i]->GetPatchCableSource());
    }
 }
 
 NoteTable::~NoteTable()
 {
-   TheScale->RemoveListener(this);
 }
 
 void NoteTable::Init()
 {
    IDrawableModule::Init();
-   
-   SyncGridToSeq();
 }
 
 void NoteTable::Poll()
@@ -126,50 +108,56 @@ void NoteTable::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   ofSetColor(255,255,255,gModuleDrawAlpha);
-   
-   mGridControlOffsetXSlider->SetShowing(mGridControlTarget->GetGridController() != nullptr && mLength > mGridControlTarget->GetGridController()->NumCols());
-   mGridControlOffsetYSlider->SetShowing(mGridControlTarget->GetGridController() != nullptr && mNoteRange > mGridControlTarget->GetGridController()->NumRows());
-   
+
+   ofSetColor(255, 255, 255, gModuleDrawAlpha);
+
+   mGridControlOffsetXSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && mLength > mGridControlTarget->GetGridController()->NumCols()) || mPush2GridDisplayMode == Push2GridDisplayMode::GridView);
+   mGridControlOffsetYSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && mNoteRange > mGridControlTarget->GetGridController()->NumRows()) || mPush2GridDisplayMode == Push2GridDisplayMode::GridView);
+
    mLengthSlider->Draw();
    mOctaveSlider->Draw();
    mNoteModeSelector->Draw();
    mRandomizePitchButton->Draw();
+   mClearButton->Draw();
    mGridControlTarget->Draw();
    mGridControlOffsetXSlider->Draw();
    mGridControlOffsetYSlider->Draw();
    mRandomizePitchChanceSlider->Draw();
    mRandomizePitchRangeSlider->Draw();
-   
+
    mGrid->Draw();
-   
+
    ofPushStyle();
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
    for (int i = 0; i < mGrid->GetCols(); ++i)
    {
-      ofVec2f pos = mGrid->GetCellPosition(i, mGrid->GetRows()-1) + mGrid->GetPosition(true);
+      ofVec2f pos = mGrid->GetCellPosition(i, mGrid->GetRows() - 1) + mGrid->GetPosition(true);
       DrawTextNormal(ofToString(i), pos.x + 1, pos.y - 7);
    }
-   for (int i=0; i<mGrid->GetRows(); ++i)
+   for (int i = 0; i < mGrid->GetRows(); ++i)
    {
-      ofVec2f pos = mGrid->GetCellPosition(0, i-1) + mGrid->GetPosition(true);
+      ofVec2f pos = mGrid->GetCellPosition(0, i - 1) + mGrid->GetPosition(true);
       float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 20);
-      DrawTextNormal(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x + 4, pos.y - (scale/8), scale);
+      DrawTextNormal(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x + 4, pos.y - (scale / 8), scale);
    }
    ofPopStyle();
-   
-   if (mGridControlTarget->GetGridController())
+
+   if (mGridControlTarget->GetGridController() || mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
    {
-      int controllerCols = mGridControlTarget->GetGridController()->NumCols();
-      int controllerRows = mGridControlTarget->GetGridController()->NumRows();
-      
+      int controllerCols = 8;
+      int controllerRows = 8;
+      if (mGridControlTarget->GetGridController() != nullptr)
+      {
+         controllerCols = mGridControlTarget->GetGridController()->NumCols();
+         controllerRows = mGridControlTarget->GetGridController()->NumRows();
+      }
+
       ofPushStyle();
       ofNoFill();
       ofSetLineWidth(4);
-      ofSetColor(255,0,0,50);
-      float squareh = float(mGrid->GetHeight())/mNoteRange;
-      float squarew = float(mGrid->GetWidth())/mLength;
+      ofSetColor(255, 0, 0, 50);
+      float squareh = float(mGrid->GetHeight()) / mNoteRange;
+      float squarew = float(mGrid->GetWidth()) / mLength;
       ofRectangle gridRect = mGrid->GetRect(K(local));
       ofRect(gridRect.x + squarew * mGridControlOffsetX,
              gridRect.y + gridRect.height - squareh * (mGridControlOffsetY + controllerRows),
@@ -177,77 +165,64 @@ void NoteTable::DrawModule()
              squareh * controllerRows);
       ofPopStyle();
    }
-   
+
    ofPushStyle();
    ofFill();
    float gridX, gridY, gridW, gridH;
    mGrid->GetPosition(gridX, gridY, true);
    gridW = mGrid->GetWidth();
    gridH = mGrid->GetHeight();
-   float boxHeight = (float(gridH)/mNoteRange);
-   float boxWidth = (float(gridW)/mGrid->GetCols());
-   
-   for (int i=0;i<mNoteRange;++i)
+   float boxHeight = (float(gridH) / mNoteRange);
+   float boxWidth = (float(gridW) / mGrid->GetCols());
+
+   for (int i = 0; i < mNoteRange; ++i)
    {
-      if (RowToPitch(i)%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot()%TheScale->GetPitchesPerOctave())
-         ofSetColor(0,255,0,80);
-      else if (TheScale->GetPitchesPerOctave() == 12 && RowToPitch(i)%TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot()+7)%TheScale->GetPitchesPerOctave())
-         ofSetColor(200,150,0,80);
+      if (RowToPitch(i) % TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot() % TheScale->GetPitchesPerOctave())
+         ofSetColor(0, 255, 0, 80);
+      else if (TheScale->GetPitchesPerOctave() == 12 && RowToPitch(i) % TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot() + 7) % TheScale->GetPitchesPerOctave())
+         ofSetColor(200, 150, 0, 80);
       else if (mNoteMode == kNoteMode_Chromatic && TheScale->IsInScale(RowToPitch(i)))
-         ofSetColor(100,75,0,80);
+         ofSetColor(100, 75, 0, 80);
       else
          continue;
-      
-      float y = gridY + gridH - i*boxHeight;
-      ofRect(gridX,y-boxHeight,gridW,boxHeight);
+
+      float y = gridY + gridH - i * boxHeight;
+      ofRect(gridX, y - boxHeight, gridW, boxHeight);
    }
-   
-   for (int i=0; i<mGrid->GetCols(); ++i)
+
+   for (int i = 0; i < mGrid->GetCols(); ++i)
    {
       const float kPlayHighlightDurationMs = 250;
       if (mLastColumnPlayTime[i] != -1)
       {
-         if (gTime - mLastColumnPlayTime[i] < kPlayHighlightDurationMs)
+         float fade = ofClamp(1 - (gTime - mLastColumnPlayTime[i]) / kPlayHighlightDurationMs, 0, 1);
+         ofPushStyle();
+         ofFill();
+         ofSetColor(ofColor::white, ofLerp(20, 80, fade));
+         ofRect(mGrid->GetPosition(true).x + mGrid->GetWidth() / mLength * i, mGrid->GetPosition(true).y, mGrid->GetWidth() / mLength, mGrid->GetHeight());
+         ofNoFill();
+         ofSetLineWidth(3 * fade);
+         for (int row = 0; row < mGrid->GetRows(); ++row)
          {
-            if (gTime - mLastColumnPlayTime[i] > 0)
+            if (mGrid->GetVal(i, row) > 0)
             {
-               float fade = (1 - (gTime - mLastColumnPlayTime[i]) / kPlayHighlightDurationMs);
-               ofPushStyle();
-               ofNoFill();
-               ofSetLineWidth(3 * fade);
-               ofVec2f pos = mGrid->GetCellPosition(i, mTones[i]) + mGrid->GetPosition(true);
+               ofVec2f pos = mGrid->GetCellPosition(i, row) + mGrid->GetPosition(true);
                float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
                float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
                ofSetColor(ofColor::white, fade * 255);
                ofRect(pos.x, pos.y, xsize, ysize);
-               ofPopStyle();
             }
          }
-         else
-         {
-            mLastColumnPlayTime[i] = -1;
-         }
+         ofPopStyle();
       }
    }
-   
-   float controlYPos = gridY+gridH;
+
+   float controlYPos = gridY + gridH;
    float moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
-   for (int i=0; i< kMaxLength; ++i)
+   for (int i = 0; i < kMaxLength; ++i)
    {
-      if (i < mLength)
-      {
-         mToneDropdowns[i]->SetShowing(mShowColumnControls);
-         mToneDropdowns[i]->SetPosition(gridX+boxWidth*i, controlYPos);
-         mToneDropdowns[i]->SetWidth(boxWidth);
-         mToneDropdowns[i]->Draw();
-      }
-      else
-      {
-         mToneDropdowns[i]->SetShowing(false);
-      }
-
-      if (i < mLength && mShowColumnControls)
+      if (i < mLength && mShowColumnCables)
       {
          ofVec2f pos = mGrid->GetCellPosition(i, 0) + mGrid->GetPosition(true);
          pos.x += mGrid->GetWidth() / float(mLength) * .5f;
@@ -260,15 +235,15 @@ void NoteTable::DrawModule()
          mColumnCables[i]->GetPatchCableSource()->SetEnabled(false);
       }
    }
-   
+
    ofPopStyle();
 }
 
-void NoteTable::OnClicked(int x, int y, bool right)
+void NoteTable::OnClicked(float x, float y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   
-   mGrid->TestClick(x,y,right);
+   IDrawableModule::OnClicked(x, y, right);
+
+   mGrid->TestClick(x, y, right);
 }
 
 void NoteTable::MouseReleased()
@@ -279,50 +254,30 @@ void NoteTable::MouseReleased()
 
 bool NoteTable::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
-   mGrid->NotifyMouseMoved(x,y);
+   IDrawableModule::MouseMoved(x, y);
+   mGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
-void NoteTable::CheckboxUpdated(Checkbox* checkbox)
+void NoteTable::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteTable::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
-   if (grid == mGrid)
-   {
-      for (int i=0; i<mGrid->GetCols(); ++i)
-      {
-         bool colHasPitch = false;
-         for (int j=0; j<mGrid->GetRows(); ++j)
-         {
-            float val = mGrid->GetVal(i,j);
-            if (val > 0)
-            {
-               mTones[i] = j;
-               colHasPitch = true;
-               break;
-            }
-         }
-
-         if (!colHasPitch)
-            mTones[i] = -1;
-      }
-   }
 }
 
 int NoteTable::RowToPitch(int row)
 {
    row += mRowOffset;
-   
+
    int numPitchesInScale = TheScale->NumTonesInScale();
    switch (mNoteMode)
    {
       case kNoteMode_Scale:
-         return TheScale->GetPitchFromTone(row+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
+         return TheScale->GetPitchFromTone(row + mOctave * numPitchesInScale + TheScale->GetScaleDegree());
       case kNoteMode_Chromatic:
          return row + mOctave * TheScale->GetPitchesPerOctave();
       case kNoteMode_Pentatonic:
@@ -335,16 +290,15 @@ int NoteTable::RowToPitch(int row)
             return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetPitchesPerOctave() + minorPentatonic[row % 5];
          else
             return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetPitchesPerOctave() + majorPentatonic[row % 5];
-
       }
       case kNoteMode_Fifths:
       {
-         int oct = (row/2)*numPitchesInScale;
-         bool isFifth = row%2 == 1;
+         int oct = (row / 2) * numPitchesInScale;
+         bool isFifth = row % 2 == 1;
          int fifths = oct;
          if (isFifth)
             fifths += 4;
-         return TheScale->GetPitchFromTone(fifths+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
+         return TheScale->GetPitchFromTone(fifths + mOctave * numPitchesInScale + TheScale->GetScaleDegree());
       }
    }
    return row;
@@ -352,7 +306,7 @@ int NoteTable::RowToPitch(int row)
 
 int NoteTable::PitchToRow(int pitch)
 {
-   for (int i=0; i<mGrid->GetRows(); ++i)
+   for (int i = 0; i < mGrid->GetRows(); ++i)
    {
       if (pitch == RowToPitch(i))
          return i;
@@ -368,7 +322,7 @@ float NoteTable::ExtraWidth() const
 float NoteTable::ExtraHeight() const
 {
    float height = 77;
-   if (mShowColumnControls)
+   if (mShowColumnCables)
       height += 22;
    return height;
 }
@@ -386,40 +340,64 @@ void NoteTable::Resize(float w, float h)
 
 void NoteTable::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled && pitch < kMaxLength &&
-       ((pitch < mLength || mTones[pitch] > -1) || velocity == 0))  //still allow note-offs through
+   if ((mEnabled || velocity == 0) && pitch < kMaxLength)
       PlayColumn(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NoteTable::PlayColumn(double time, int column, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   int outputPitch = RowToPitch(mTones[column]);
    if (velocity == 0)
-      outputPitch = mLastColumnNoteOnPitch[column];
-   PlayNoteOutput(time, outputPitch, velocity, voiceIdx, modulation);
-   if (velocity > 0)
+   {
+      mLastColumnPlayTime[column] = -1;
+      for (int i = 0; i < 128; ++i)
+      {
+         if (mLastColumnNoteOnPitches[column][i])
+         {
+            PlayNoteOutput(time, i, 0, voiceIdx, modulation);
+            mColumnCables[column]->PlayNoteOutput(time, i, 0, voiceIdx, modulation);
+            mLastColumnNoteOnPitches[column][i] = false;
+         }
+      }
+   }
+   else
    {
       mLastColumnPlayTime[column] = time;
-      mLastColumnNoteOnPitch[column] = outputPitch;
+      for (int row = 0; row < mGrid->GetRows(); ++row)
+      {
+         int outputPitch = RowToPitch(row);
+
+         if (mQueuedPitches[outputPitch])
+         {
+            mGrid->SetVal(column, row, 1);
+            mQueuedPitches[outputPitch] = false;
+         }
+
+         if (mGrid->GetVal(column, row) == 0)
+            continue;
+
+         PlayNoteOutput(time, outputPitch, velocity, voiceIdx, modulation);
+         mColumnCables[column]->PlayNoteOutput(time, outputPitch, velocity, voiceIdx, modulation);
+         mLastColumnNoteOnPitches[column][outputPitch] = true;
+         mPitchPlayTimes[outputPitch] = time;
+      }
    }
-   mColumnCables[column]->PlayNoteOutput(time, outputPitch, velocity, voiceIdx, modulation);
 }
 
 void NoteTable::UpdateGridControllerLights(bool force)
 {
    if (mGridControlTarget->GetGridController())
    {
-      for (int x=0; x<mGridControlTarget->GetGridController()->NumCols(); ++x)
+      for (int x = 0; x < mGridControlTarget->GetGridController()->NumCols(); ++x)
       {
-         for (int y=0; y<mGridControlTarget->GetGridController()->NumRows(); ++y)
+         for (int y = 0; y < mGridControlTarget->GetGridController()->NumRows(); ++y)
          {
             int column = x + mGridControlOffsetX;
             int row = y - mGridControlOffsetY;
-            
+
             GridColor color = GridColor::kGridColorOff;
             if (column < mLength)
             {
-               if (mTones[column] == mGridControlTarget->GetGridController()->NumRows() - 1 - row)
+               if (mGrid->GetVal(column, row) > 0)
                {
                   if (mLastColumnPlayTime[column] + 80 > gTime)
                      color = GridColor::kGridColor3Bright;
@@ -444,46 +422,43 @@ void NoteTable::OnGridButton(int x, int y, float velocity, IGridController* grid
    int row = y - mGridControlOffsetY;
    if (grid == mGridControlTarget->GetGridController() && col >= 0 && col < mLength && velocity > 0)
    {
-      int tone = mGridControlTarget->GetGridController()->NumRows() - 1 - row;
-      mTones[col] = tone;
-      SyncGridToSeq();
+      mGrid->SetVal(col, row, mGrid->GetVal(col, row) > 0 ? 0 : 1);
       UpdateGridControllerLights(false);
    }
 }
 
-void NoteTable::ButtonClicked(ClickButton* button)
+void NoteTable::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizePitchButton)
-   {
       RandomizePitches(GetKeyModifiers() & kModifier_Shift);
-      SyncGridToSeq();
-   }
+   if (button == mClearButton)
+      mGrid->Clear();
 }
 
 void NoteTable::RandomizePitches(bool fifths)
 {
    if (fifths)
    {
-      for (int i=0; i < mLength; ++i)
+      for (int i = 0; i < mLength; ++i)
       {
          if (ofRandom(1) <= mRandomizePitchChance)
          {
             switch (gRandom() % 5)
             {
                case 0:
-                  mTones[i] = 0;
+                  SetColumnRow(i, 0);
                   break;
                case 1:
-                  mTones[i] = 4;
+                  SetColumnRow(i, 4);
                   break;
                case 2:
-                  mTones[i] = 7;
+                  SetColumnRow(i, 7);
                   break;
                case 3:
-                  mTones[i] = 11;
+                  SetColumnRow(i, 11);
                   break;
                case 4:
-                  mTones[i] = 14;
+                  SetColumnRow(i, 14);
                   break;
             }
          }
@@ -491,35 +466,242 @@ void NoteTable::RandomizePitches(bool fifths)
    }
    else
    {
-      for (int i=0; i < mLength; ++i)
+      for (int i = 0; i < mLength; ++i)
       {
          if (ofRandom(1) <= mRandomizePitchChance)
          {
-            float minValue = MAX(0, mTones[i] - mNoteRange * mRandomizePitchRange);
-            float maxValue = MIN(mNoteRange, mTones[i] + mNoteRange * mRandomizePitchRange);
+            int row = ofRandom(0, mNoteRange);
+            for (int j = 0; j < mNoteRange; ++j)
+            {
+               if (mGrid->GetVal(i, j) > 0)
+                  row = j;
+            }
+            float minValue = MAX(0, row - mNoteRange * mRandomizePitchRange);
+            float maxValue = MIN(mNoteRange, row + mNoteRange * mRandomizePitchRange);
             if (minValue != maxValue)
-               mTones[i] = ofClamp(int(ofRandom(minValue, maxValue) + .5f), 0, mNoteRange-1);
+               SetColumnRow(i, ofClamp(int(ofRandom(minValue, maxValue) + .5f), 0, mNoteRange - 1));
          }
       }
    }
 }
 
-void NoteTable::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteTable::SetColumnRow(int column, int row)
+{
+   for (int i = 0; i < mNoteRange; ++i)
+      mGrid->SetVal(column, i, i == row ? 1 : 0, false);
+}
+
+void NoteTable::GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows)
+{
+   sequenceRows = (mLength - 1) / 8 + 1;
+   if (mNoteMode == kNoteMode_Scale && TheScale->NumTonesInScale() == 7)
+      pitchCols = 7;
+   else
+      pitchCols = 8;
+   pitchRows = (mNoteRange - 1) / pitchCols + 1;
+}
+
+bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
+   {
+      int sequenceRows, pitchCols, pitchRows;
+      GetPush2Layout(sequenceRows, pitchCols, pitchRows);
+
+      if (type == kMidiMessage_Note)
+      {
+         if (controlIndex >= 36 && controlIndex <= 99)
+         {
+            int gridIndex = controlIndex - 36;
+            int x = gridIndex % 8;
+            int y = 7 - gridIndex / 8;
+
+            if (y < sequenceRows)
+            {
+               int index = x + y * 8;
+               if (midiValue > 0)
+                  mPush2HeldStep = index;
+               else if (index == mPush2HeldStep)
+                  mPush2HeldStep = -1;
+            }
+            else if (y < sequenceRows + pitchRows)
+            {
+               if (midiValue > 0)
+               {
+                  int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+                  if (index < 0 || index >= mNoteRange)
+                  {
+                     //out of range, do nothing
+                  }
+                  else if (mPush2HeldStep != -1)
+                  {
+                     mGrid->SetVal(mPush2HeldStep, index, mGrid->GetVal(mPush2HeldStep, index) > 0 ? 0 : 1);
+                  }
+                  else
+                  {
+                     //I'm not liking this "queued pitch" behavior, let's disable it for now
+                     //mQueuedPitches[RowToPitch(index)] = true;
+                  }
+               }
+            }
+
+            return true;
+         }
+      }
+   }
+   else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
+   {
+      if (type == kMidiMessage_Note)
+      {
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = gridIndex / 8;
+         int col = x + mGridControlOffsetX;
+         int row = y + mGridControlOffsetY;
+         if (gridIndex >= 0 && gridIndex < 64 &&
+             col >= 0 && col < mLength &&
+             row >= 0 && row < mNoteRange)
+         {
+            if (midiValue > 0)
+            {
+               mPush2HeldStep = col;
+               mGrid->SetVal(mPush2HeldStep, row, mGrid->GetVal(mPush2HeldStep, row) > 0 ? 0 : 1);
+            }
+            else
+            {
+               mPush2HeldStep = -1;
+            }
+         }
+         return true;
+      }
+   }
+
+   if (type == kMidiMessage_Control)
+   {
+      if (controlIndex == push2->GetGridControllerOption1Control())
+      {
+         if (midiValue > 0)
+         {
+            if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
+               mPush2GridDisplayMode = Push2GridDisplayMode::GridView;
+            else
+               mPush2GridDisplayMode = Push2GridDisplayMode::PerStep;
+         }
+         return true;
+      }
+   }
+
+   return false;
+}
+
+void NoteTable::UpdatePush2Leds(Push2Control* push2)
+{
+   int sequenceRows, pitchCols, pitchRows;
+   GetPush2Layout(sequenceRows, pitchCols, pitchRows);
+
+   for (int x = 0; x < 8; ++x)
+   {
+      for (int y = 0; y < 8; ++y)
+      {
+         int pushColor = 0;
+
+         if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
+         {
+            if (y < sequenceRows)
+            {
+               int index = x + y * 8;
+               if (index >= mLength)
+                  pushColor = 0;
+               else if (index == mPush2HeldStep)
+                  pushColor = 125;
+               else if (mLastColumnPlayTime[index] != -1)
+                  pushColor = 101;
+               else
+                  pushColor = 93;
+            }
+            else if (y < sequenceRows + pitchRows)
+            {
+               int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+               int pitch = RowToPitch(index);
+               if (x >= pitchCols || index >= mNoteRange)
+                  pushColor = 0;
+               else if (mPush2HeldStep != -1 && mGrid->GetVal(mPush2HeldStep, index) > 0)
+                  pushColor = 127;
+               else if (mPush2HeldStep == -1 && mNoteOutput.GetNotes()[pitch])
+                  pushColor = gTime - mPitchPlayTimes[pitch] < 100 ? 127 : 2;
+               else if (mQueuedPitches[pitch])
+                  pushColor = 126;
+               else if (TheScale->IsRoot(pitch))
+                  pushColor = 69;
+               else if (TheScale->IsInPentatonic(pitch))
+                  pushColor = 77;
+               else
+                  pushColor = 78;
+            }
+         }
+         else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
+         {
+            int column = x + mGridControlOffsetX;
+            int row = (7 - y) + mGridControlOffsetY;
+
+            if (column >= 0 && column < mLength && row >= 0 && row < mNoteRange)
+            {
+               bool isHighlightCol = mLastColumnPlayTime[column] != -1;
+               int pitch = RowToPitch(row);
+               if (isHighlightCol && mPush2HeldStep == -1 && mNoteOutput.GetNotes()[pitch])
+                  pushColor = gTime - mPitchPlayTimes[pitch] < 100 ? 127 : 2;
+               else if (mGrid->GetVal(column, row) > 0)
+                  pushColor = 125;
+               else if (mQueuedPitches[pitch])
+                  pushColor = 126;
+               else if (isHighlightCol)
+                  pushColor = 83;
+               else if (TheScale->IsRoot(pitch))
+                  pushColor = 69;
+               else if (TheScale->IsInPentatonic(pitch))
+                  pushColor = 77;
+               else
+                  pushColor = 78;
+
+               /*bool isHighlightCol = mLastColumnPlayTime[column] != -1;
+               int pitch = RowToPitch(row);
+               if (TheScale->IsRoot(pitch))
+                  pushColor = 69;
+               else if (TheScale->IsInPentatonic(pitch))
+                  pushColor = 77;
+               else
+                  pushColor = 78;
+               if (isHighlightCol)
+                  pushColor = 83;
+               if (mTones[column] == 8 - 1 - row && mVels[column] > 0)
+               {
+                  if (column == mPush2HeldStep)
+                     pushColor = 127;
+                  else if (isHighlightCol)
+                     pushColor = 126;
+                  else
+                     pushColor = mNoteLengths[column] == 1 ? 125 : 95;
+               }*/
+            }
+         }
+
+         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+      }
+   }
+
+   push2->SetLed(kMidiMessage_Control, push2->GetGridControllerOption1Control(), 127);
+}
+
+void NoteTable::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mNoteModeSelector)
    {
       if (mNoteMode != oldVal)
          mRowOffset = 0;
-      SetUpColumnControls();
-   }
-   for (int i=0; i<kMaxLength; ++i)
-   {
-      if (list == mToneDropdowns[i])
-         SyncGridToSeq();
    }
 }
 
-void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
@@ -532,65 +714,32 @@ void NoteTable::IntSliderUpdated(IntSlider* slider, int oldVal)
          for (int i = oldVal; i < mLength; ++i)
          {
             int loopedFrom = i % oldLengthPow2;
-            mTones[i] = mTones[loopedFrom];
+            for (int row = 0; row < mGrid->GetRows(); ++row)
+               mGrid->SetVal(i, row, mGrid->GetVal(loopedFrom, row));
          }
       }
 
       mGrid->SetGrid(mLength, mNoteRange);
-      SyncGridToSeq();
+
+      if (mGridControlTarget->GetGridController())
+      {
+         int maxXOffset = mLength - mGridControlTarget->GetGridController()->NumCols();
+         if (maxXOffset >= 0)
+            mGridControlOffsetXSlider->SetExtents(0, maxXOffset);
+         int maxYOffset = mNoteRange - mGridControlTarget->GetGridController()->NumRows();
+         if (maxYOffset >= 0)
+            mGridControlOffsetYSlider->SetExtents(0, maxYOffset);
+
+         mGridControlOffsetX = MAX(MIN(mGridControlOffsetX, maxXOffset), 0);
+         mGridControlOffsetY = MAX(MIN(mGridControlOffsetY, maxYOffset), 0);
+      }
    }
-   if (slider == mOctaveSlider)
-      SetUpColumnControls();
    if (slider == mGridControlOffsetXSlider || slider == mGridControlOffsetYSlider)
       UpdateGridControllerLights(false);
 }
 
-void NoteTable::SyncGridToSeq()
-{
-   mGrid->Clear();
-   for (int i=0; i<kMaxLength; ++i)
-   {
-      if (mTones[i] < 0)
-         continue;
-
-      mGrid->SetVal(i,mTones[i], 1,false);
-   }
-   mGrid->SetGrid(mLength, mNoteRange);
-   if (mGridControlTarget->GetGridController())
-   {
-      int maxXOffset = mLength - mGridControlTarget->GetGridController()->NumCols();
-      if (maxXOffset >= 0)
-         mGridControlOffsetXSlider->SetExtents(0, maxXOffset);
-      int maxYOffset = mNoteRange - mGridControlTarget->GetGridController()->NumRows();
-      if (maxYOffset >= 0)
-         mGridControlOffsetYSlider->SetExtents(0, maxYOffset);
-      
-      mGridControlOffsetX = MAX(MIN(mGridControlOffsetX, maxXOffset), 0);
-      mGridControlOffsetY = MAX(MIN(mGridControlOffsetY, maxYOffset), 0);
-   }
-}
-
-void NoteTable::OnScaleChanged()
-{
-   SetUpColumnControls();
-}
-
-void NoteTable::SetUpColumnControls()
-{
-   if (TheSynth->IsLoadingModule())
-      return;
-   
-   for (int i=0; i<kMaxLength; ++i)
-   {
-      mToneDropdowns[i]->Clear();
-      for (int j=0; j<mNoteRange; ++j)
-         mToneDropdowns[i]->AddLabel(NoteName(RowToPitch(j), false, true), j);
-   }
-}
-
 void NoteTable::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void NoteTable::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -598,7 +747,7 @@ void NoteTable::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
 
    mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127, K(isTextField));
-   mModuleSaveData.LoadBool("columncontrols", moduleInfo, false);
+   mModuleSaveData.LoadBool("columncables", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -607,33 +756,38 @@ void NoteTable::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mNoteRange = mModuleSaveData.GetInt("gridrows");
-   mShowColumnControls = mModuleSaveData.GetBool("columncontrols");
-   SyncGridToSeq();
-   SetUpColumnControls();
-}
+   mShowColumnCables = mModuleSaveData.GetBool("columncables");
 
-namespace
-{
-   const int kSaveStateRev = 2;
+   mGrid->SetGrid(mLength, mNoteRange);
 }
 
 void NoteTable::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
-   
-   out << kSaveStateRev;
-   
+
    mGrid->SaveState(out);
+   out << mGrid->GetWidth();
+   out << mGrid->GetHeight();
 }
 
-void NoteTable::LoadState(FileStreamIn& in)
+void NoteTable::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
-   
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
-   
+   IDrawableModule::LoadState(in, rev);
+
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
    mGrid->LoadState(in);
    GridUpdated(mGrid, 0, 0, 0, 0);
+
+   if (rev >= 3)
+   {
+      float width, height;
+      in >> width;
+      in >> height;
+      mGrid->SetDimensions(width, height);
+   }
 }

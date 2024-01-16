@@ -29,10 +29,8 @@
 
 MultiBandTracker::MultiBandTracker()
 {
-   mMinFreq = 150;
-   mMaxFreq = 15000;
    SetNumBands(8);
-   
+
    mWorkBuffer = new float[gBufferSize];
 }
 
@@ -43,10 +41,10 @@ MultiBandTracker::~MultiBandTracker()
 
 void MultiBandTracker::SetRange(float minFreq, float maxFreq)
 {
-   for (int i=0; i<mNumBands; ++i)
+   for (int i = 0; i < mNumBands; ++i)
    {
-      float a = float(i)/mNumBands;
-      float f = mMinFreq * powf(mMaxFreq/mMinFreq, a);
+      float a = float(i) / mNumBands;
+      float f = mMinFreq * powf(mMaxFreq / mMinFreq, a);
       mBands[i].SetCrossoverFreq(f);
    }
 }
@@ -66,18 +64,18 @@ void MultiBandTracker::Process(float* buffer, int bufferSize)
    PROFILER(MultiBandTracker);
 
    mMutex.lock();
-   
-   for (int i=0; i<bufferSize; ++i)
+
+   for (int i = 0; i < bufferSize; ++i)
    {
       float lower;
       float highLeftover = buffer[i];
-      for (int j=0; j<mNumBands; ++j)
+      for (int j = 0; j < mNumBands; ++j)
       {
          mBands[j].ProcessSample(highLeftover, lower, highLeftover);
          mPeaks[j].Process(&lower, 1);
       }
    }
-   
+
    mMutex.unlock();
 }
 

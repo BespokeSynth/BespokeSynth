@@ -32,8 +32,6 @@
 #include "UIControlMacros.h"
 
 NoteRatchet::NoteRatchet()
-: mRatchetDuration(kInterval_8n)
-, mRatchetSubdivision(kInterval_32n)
 {
 }
 
@@ -43,6 +41,7 @@ void NoteRatchet::CreateUIControls()
    UIBLOCK0();
    DROPDOWN(mRatchetDurationSelector, "duration", (int*)&mRatchetDuration, 50);
    DROPDOWN(mRatchetSubdivisionSelector, "subdivision", (int*)&mRatchetSubdivision, 50);
+   CHECKBOX(mSkipFirstCheckbox, "skip first", &mSkipFirst);
    ENDUIBLOCK(mWidth, mHeight);
 
    mRatchetDurationSelector->AddLabel("1n", kInterval_1n);
@@ -82,9 +81,10 @@ void NoteRatchet::DrawModule()
 
    mRatchetDurationSelector->Draw();
    mRatchetSubdivisionSelector->Draw();
+   mSkipFirstCheckbox->Draw();
 }
 
-void NoteRatchet::CheckboxUpdated(Checkbox *checkbox)
+void NoteRatchet::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
@@ -100,15 +100,18 @@ void NoteRatchet::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    {
       double subdivisionMs = TheTransport->GetDuration(mRatchetSubdivision);
       int repetitions = TheTransport->CountInStandardMeasure(mRatchetSubdivision) / TheTransport->CountInStandardMeasure(mRatchetDuration);
-      for (int i = 0; i < repetitions; ++i)
+      int startIndex = 0;
+      if (mSkipFirst)
+         startIndex = 1;
+      for (int i = startIndex; i < repetitions; ++i)
       {
          PlayNoteOutput(time + subdivisionMs * i, pitch, velocity, voiceIdx, modulation);
-         PlayNoteOutput(time + subdivisionMs * (i+1), pitch, 0, voiceIdx, modulation);
+         PlayNoteOutput(time + subdivisionMs * (i + 1), pitch, 0, voiceIdx, modulation);
       }
    }
 }
 
-void NoteRatchet::DropdownUpdated(DropdownList* slider, int oldVal)
+void NoteRatchet::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 

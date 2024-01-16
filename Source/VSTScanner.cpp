@@ -69,7 +69,7 @@ bool CustomPluginScanner::findPluginTypesFor(juce::AudioPluginFormat& format,
    stream.writeString(format.getName());
    stream.writeString(fileOrIdentifier);
 
-   if (superprocess->sendMessageToFollower(block))
+   if (superprocess->sendMessageToWorker(block))
    {
       std::unique_lock<std::mutex> lock(mutex);
       gotResponse = false;
@@ -78,8 +78,11 @@ bool CustomPluginScanner::findPluginTypesFor(juce::AudioPluginFormat& format,
       for (;;)
       {
          if (condvar.wait_for(lock,
-            std::chrono::milliseconds(50),
-            [this] { return gotResponse || shouldExit(); }))
+                              std::chrono::milliseconds(50),
+                              [this]
+                              {
+                                 return gotResponse || shouldExit();
+                              }))
          {
             break;
          }
@@ -122,12 +125,12 @@ void CustomPluginScanner::changeListenerCallback(juce::ChangeBroadcaster*)
 }
 
 CustomPluginScanner::Superprocess::Superprocess(CustomPluginScanner& o)
-   : owner(o)
+: owner(o)
 {
-   launchFollowerProcess(juce::File::getSpecialLocation(juce::File::currentExecutableFile), kScanProcessUID, 0, 0);
+   launchWorkerProcess(juce::File::getSpecialLocation(juce::File::currentExecutableFile), kScanProcessUID, 0, 0);
 }
 
-void CustomPluginScanner::Superprocess::handleMessageFromFollower(const juce::MemoryBlock& mb)
+void CustomPluginScanner::Superprocess::handleMessageFromWorker(const juce::MemoryBlock& mb)
 {
    auto xml = parseXML(mb.toString());
 
@@ -149,11 +152,11 @@ void CustomPluginScanner::Superprocess::handleConnectionLost()
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 CustomPluginListComponent::CustomPluginListComponent(juce::AudioPluginFormatManager& manager,
-   juce::KnownPluginList& listToRepresent,
-   const juce::File& pedal,
-   juce::PropertiesFile* props,
-   bool async)
-   : juce::PluginListComponent(manager, listToRepresent, pedal, props, async)
+                                                     juce::KnownPluginList& listToRepresent,
+                                                     const juce::File& pedal,
+                                                     juce::PropertiesFile* props,
+                                                     bool async)
+: juce::PluginListComponent(manager, listToRepresent, pedal, props, async)
 {
    addAndMakeVisible(validationModeLabel);
    addAndMakeVisible(validationModeBox);
@@ -188,17 +191,17 @@ void CustomPluginListComponent::OnResize()
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatManager, WindowCloseListener* listener)
-   : juce::DocumentWindow("VST Manager",
-      juce::LookAndFeel::getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
-      juce::DocumentWindow::closeButton)
-   , mListener(listener)
+: juce::DocumentWindow("Plugin Manager",
+                       juce::LookAndFeel::getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
+                       juce::DocumentWindow::closeButton)
+, mListener(listener)
 {
    auto deadMansPedalFile(juce::File(ofToDataPath("vst/deadmanspedal.txt")));
 
-   VSTPlugin::sPluginList.setCustomScanner(std::make_unique<CustomPluginScanner>());
+   TheSynth->GetKnownPluginList().setCustomScanner(std::make_unique<CustomPluginScanner>());
 
    mComponent = new CustomPluginListComponent(pluginFormatManager,
-                                              VSTPlugin::sPluginList,
+                                              TheSynth->GetKnownPluginList(),
                                               deadMansPedalFile,
                                               getAppProperties().getUserSettings(), true);
 
@@ -213,7 +216,7 @@ PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatM
    {
       const auto& mainMon = dpy->userArea;
       setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
-         mainMon.getY() + mainMon.getHeight() / 4);
+                         mainMon.getY() + mainMon.getHeight() / 4);
    }
 
    restoreWindowStateFromString(getAppProperties().getUserSettings()->getValue("listWindowPos"));
@@ -245,7 +248,7 @@ PluginScannerSubprocess::PluginScannerSubprocess()
    formatManager.addDefaultFormats();
 }
 
-void PluginScannerSubprocess::handleMessageFromLeader(const juce::MemoryBlock& mb)
+void PluginScannerSubprocess::handleMessageFromCoordinator(const juce::MemoryBlock& mb)
 {
    {
       const std::lock_guard<std::mutex> lock(mutex);
@@ -296,7 +299,6 @@ void PluginScannerSubprocess::handleAsyncUpdate()
          xml.addChildElement(desc->createXml().release());
 
       const auto str = xml.toString();
-      sendMessageToLeader({ str.toRawUTF8(), str.getNumBytesAsUTF8() });
+      sendMessageToCoordinator({ str.toRawUTF8(), str.getNumBytesAsUTF8() });
    }
 }
-

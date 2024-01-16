@@ -29,35 +29,52 @@
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
 #include "Slider.h"
+#include "ClickButton.h"
+#include "TextEntry.h"
 
-class PulseChance : public IDrawableModule, public IPulseSource, public IPulseReceiver, public IFloatSliderListener
+class PulseChance : public IDrawableModule, public IPulseSource, public IPulseReceiver, public IFloatSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    PulseChance();
    virtual ~PulseChance();
    static IDrawableModule* Create() { return new PulseChance(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   
-   float mChance;
-   FloatSlider* mChanceSlider;
-   float mLastRejectTime;
-   float mLastAcceptTime;
+
+   void Reseed();
+
+   float mChance{ 1 };
+   FloatSlider* mChanceSlider{ nullptr };
+   float mLastRejectTime{ 0 };
+   float mLastAcceptTime{ 0 };
+   bool mDeterministic{ false };
+   Checkbox* mDeterministicCheckbox{ nullptr };
+   int mSeed{ 0 };
+   int mRandomIndex{ 0 };
+   TextEntry* mSeedEntry{ nullptr };
+   ClickButton* mReseedButton{ nullptr };
+   ClickButton* mPrevSeedButton{ nullptr };
+   ClickButton* mNextSeedButton{ nullptr };
 };

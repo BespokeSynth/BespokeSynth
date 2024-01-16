@@ -37,8 +37,10 @@ class VelocitySetter : public NoteEffectBase, public IDrawableModule, public IFl
 public:
    VelocitySetter();
    static IDrawableModule* Create() { return new VelocitySetter(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -46,25 +48,28 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 38; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mVelocity;
-   FloatSlider* mVelocitySlider;
-   float mRandomness;
-   FloatSlider* mRandomnessSlider;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 90;
+      height = 38;
+   }
+
+   float mVelocity{ 1 };
+   FloatSlider* mVelocitySlider{ nullptr };
+   float mRandomness{ 0 };
+   FloatSlider* mRandomnessSlider{ nullptr };
 };
 
 
 #endif /* defined(__modularSynth__VelocitySetter__) */
-

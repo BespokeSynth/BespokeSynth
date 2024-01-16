@@ -30,11 +30,11 @@
 
 void IPulseSource::DispatchPulse(PatchCableSource* destination, double time, float velocity, int flags)
 {
-   if (time == destination->GetLastOnEventTime())   //avoid stack overflow
+   if (time == destination->GetLastOnEventTime()) //avoid stack overflow
       return;
-   
+
    const std::vector<IPulseReceiver*>& receivers = destination->GetPulseReceivers();
-   destination->AddHistoryEvent(time, true);
+   destination->AddHistoryEvent(time, true, flags);
    destination->AddHistoryEvent(time + 15, false);
    for (auto* receiver : receivers)
       receiver->OnPulse(time, velocity, flags);

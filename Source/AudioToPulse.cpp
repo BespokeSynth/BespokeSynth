@@ -34,12 +34,6 @@
 
 AudioToPulse::AudioToPulse()
 : IAudioProcessor(gBufferSize)
-, mThresholdSlider(nullptr)
-, mReleaseSlider(nullptr)
-, mPeak(0)
-, mEnvelope(0)
-, mThreshold(.5f)
-, mRelease(150)
 {
 }
 
@@ -55,12 +49,12 @@ void AudioToPulse::CreateUIControls()
    FLOATSLIDER(mThresholdSlider, "threshold", &mThreshold, 0, 1);
    FLOATSLIDER(mReleaseSlider, "release", &mRelease, .01f, 1000);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mThresholdSlider->SetMode(FloatSlider::kSquare);
    mReleaseSlider->SetMode(FloatSlider::kSquare);
 
    //update mReleaseFactor
-   FloatSliderUpdated(mReleaseSlider, 0);
+   FloatSliderUpdated(mReleaseSlider, 0, gTime);
 
    GetPatchCableSource()->SetConnectionType(kConnectionType_Pulse);
 }
@@ -75,12 +69,12 @@ void AudioToPulse::DrawModule()
 
    ofPushStyle();
    ofFill();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha*.4f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4f);
    ofRectangle rect = mThresholdSlider->GetRect(true);
    rect.width *= ofClamp(sqrtf(mPeak), 0, 1);
    rect.height *= .5f;
    ofRect(rect);
-   ofSetColor(255, 0, 0, gModuleDrawAlpha*.4f);
+   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4f);
    rect = mThresholdSlider->GetRect(true);
    rect.width *= ofClamp(mEnvelope, 0, 1);
    rect.height *= .5f;
@@ -138,7 +132,7 @@ void AudioToPulse::Process(double time)
    GetBuffer()->Reset();
 }
 
-void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mReleaseSlider)
       mReleaseFactor = powf(.01f, 1.0f / (mRelease * gSampleRateMs));
@@ -146,7 +140,6 @@ void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void AudioToPulse::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
 void AudioToPulse::LoadLayout(const ofxJSONElement& moduleInfo)

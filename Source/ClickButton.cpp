@@ -30,15 +30,12 @@
 #include <cstring>
 
 ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)
-: mWidth(20)
-, mHeight(15)
-, mClickTime(-9999)
-, mOwner(owner)
+: mOwner(owner)
 , mDisplayStyle(displayStyle)
 {
    assert(owner);
    SetLabel(label);
-   SetPosition(x,y);
+   SetPosition(x, y);
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
    SetShouldSaveState(false);
@@ -69,22 +66,22 @@ void ClickButton::Render()
 {
    ofPushStyle();
 
-   float w,h;
-   GetDimensions(w,h);
+   float w, h;
+   GetDimensions(w, h);
 
-   ofColor color,textColor;
+   ofColor color, textColor;
    IUIControl::GetColors(color, textColor);
 
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
-   ofRect(mX+1,mY+1,w,h);
-   DrawBeacon(mX+w/2, mY+h/2);
+   ofRect(mX + 1, mY + 1, w, h);
+   DrawBeacon(mX + w / 2, mY + h / 2);
    float press = ofClamp((1 - (gTime - mClickTime) / 200), 0, 1);
    color.r = ofLerp(color.r, 0, press);
    color.g = ofLerp(color.g, 0, press);
    color.b = ofLerp(color.b, 0, press);
    ofSetColor(color);
-   ofRect(mX,mY,w,h);
+   ofRect(mX, mY, w, h);
 
    if (mDisplayStyle == ButtonDisplayStyle::kText)
    {
@@ -95,29 +92,29 @@ void ClickButton::Render()
    {
       ofSetColor(textColor);
       ofFill();
-      ofTriangle(mX+5, mY+2, mX+5, mY+12, mX+15, mY+7);
+      ofTriangle(mX + 5, mY + 2, mX + 5, mY + 12, mX + 15, mY + 7);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kPause)
    {
       ofSetColor(textColor);
       ofFill();
-      ofRect(mX+5,mY+2,4,10,0);
-      ofRect(mX+11,mY+2,4,10,0);
+      ofRect(mX + 5, mY + 2, 4, 10, 0);
+      ofRect(mX + 11, mY + 2, 4, 10, 0);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kStop)
    {
       ofSetColor(textColor);
       ofFill();
-      ofRect(mX+5,mY+2,10,10,0);
+      ofRect(mX + 5, mY + 2, 10, 10, 0);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kGrabSample)
    {
       ofSetColor(textColor);
-      for (int i=0; i<5; ++i)
+      for (int i = 0; i < 5; ++i)
       {
          float height = (i % 2 == 0) ? 6 : 10;
-         float x = mX+4+i*3;
-         ofLine(x, mY+7-height/2, x, mY+7+height/2);
+         float x = mX + 4 + i * 3;
+         ofLine(x, mY + 7 - height / 2, x, mY + 7 + height / 2);
       }
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kSampleIcon)
@@ -139,9 +136,42 @@ void ClickButton::Render()
       ofRect(mX + 2, mY + 4, 16, 9, 2);
       DrawTextNormal(Name(), mX + 22, mY + 12);
    }
-   
+   else if (mDisplayStyle == ButtonDisplayStyle::kArrowRight)
+   {
+      ofSetColor(textColor);
+      ofLine(mX + 6, mY + 3, mX + 14, mY + 7);
+      ofLine(mX + 6, mY + 11, mX + 14, mY + 7);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kArrowLeft)
+   {
+      ofSetColor(textColor);
+      ofLine(mX + 14, mY + 3, mX + 6, mY + 7);
+      ofLine(mX + 14, mY + 11, mX + 6, mY + 7);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kPlus)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.5f);
+      ofLine(mX + 10, mY + 3, mX + 10, mY + 12);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kMinus)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.5f);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kHamburger)
+   {
+      ofSetColor(textColor);
+      ofSetLineWidth(1.0f);
+      ofLine(mX + 6, mY + 4.5f, mX + 14, mY + 4.5f);
+      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofLine(mX + 6, mY + 10.5f, mX + 14, mY + 10.5f);
+   }
+
    ofPopStyle();
-   
+
    DrawHover(mX, mY, w, h);
 }
 
@@ -150,13 +180,18 @@ bool ClickButton::ButtonLit() const
    return mClickTime + 200 > gTime;
 }
 
-void ClickButton::OnClicked(int x, int y, bool right)
+void ClickButton::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
-   
-   mClickTime = gTime;
-   mOwner->ButtonClicked(this);
+
+   DoClick(NextBufferTime(false));
+}
+
+void ClickButton::DoClick(double time)
+{
+   mClickTime = time;
+   mOwner->ButtonClicked(this, time);
 }
 
 void ClickButton::MouseReleased()
@@ -170,18 +205,18 @@ bool ClickButton::MouseMoved(float x, float y)
    return false;
 }
 
-void ClickButton::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void ClickButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    if (slider > 0)
-      OnClicked(0,0,false);
+      DoClick(time);
    else
       MouseReleased();
 }
 
-void ClickButton::SetValue(float value)
+void ClickButton::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    if (value > 0)
-      OnClicked(0,0,false);
+      DoClick(time);
    else
       MouseReleased();
 }
@@ -198,4 +233,9 @@ std::string ClickButton::GetDisplayValue(float val) const
    if (val > 0)
       return "click";
    return "_";
+}
+
+void ClickButton::Increment(float amount)
+{
+   DoClick(NextBufferTime(false));
 }

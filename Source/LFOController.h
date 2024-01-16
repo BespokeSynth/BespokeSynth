@@ -44,40 +44,46 @@ public:
    ~LFOController();
    static IDrawableModule* Create() { return new LFOController(); }
    static bool CanCreate() { return TheLFOController == nullptr; }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetSlider(FloatSlider* slider);
    bool WantsBinding(FloatSlider* slider);
    FloatSlider* GetControlled() { return mSlider; }
-   
+
    //IDrawableModule
    void Poll() override;
-   
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   
+
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width=130; height=77; }
-   
-   int dummy;
-   float dummy2;
-   DropdownList* mIntervalSelector;
-   DropdownList* mOscSelector;
-   FloatSlider* mMinSlider;
-   FloatSlider* mMaxSlider;
-   bool mWantBind;
-   ClickButton* mBindButton;
-   double mStopBindTime;
-   
-   FloatSlider* mSlider;
-   FloatSliderLFOControl* mLFO;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 130;
+      height = 77;
+   }
+
+   int dummy{ 0 };
+   float dummy2{ 0 };
+   DropdownList* mIntervalSelector{ nullptr };
+   DropdownList* mOscSelector{ nullptr };
+   FloatSlider* mMinSlider{ nullptr };
+   FloatSlider* mMaxSlider{ nullptr };
+   bool mWantBind{ false };
+   ClickButton* mBindButton{ nullptr };
+   double mStopBindTime{ -1 };
+
+   FloatSlider* mSlider{ nullptr };
+   FloatSliderLFOControl* mLFO{ nullptr };
 };
 
 #endif /* defined(__modularSynth__LFOController__) */
-

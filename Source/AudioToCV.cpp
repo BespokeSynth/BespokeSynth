@@ -32,8 +32,6 @@
 
 AudioToCV::AudioToCV()
 : IAudioProcessor(gBufferSize)
-, mGain(1)
-, mGainSlider(nullptr)
 {
    mModulationBuffer = new float[gBufferSize];
 }
@@ -41,13 +39,13 @@ AudioToCV::AudioToCV()
 void AudioToCV::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mGainSlider = new FloatSlider(this, "gain", 3, 2, 100, 15, &mGain, 1, 10);
    mMinSlider = new FloatSlider(this, "min", mGainSlider, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
-   
+
    GetPatchCableSource()->SetEnabled(false);
-   
+
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
@@ -62,21 +60,21 @@ void AudioToCV::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mGainSlider->Draw();
    mMinSlider->Draw();
    mMaxSlider->Draw();
-   
+
    ofPushStyle();
-   ofSetColor(0,255,0,gModuleDrawAlpha);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha);
    ofBeginShape();
-   float x,y;
-   float w,h;
+   float x, y;
+   float w, h;
    mGainSlider->GetPosition(x, y, K(local));
    mGainSlider->GetDimensions(w, h);
-   for (int i=0; i<gBufferSize; ++i)
+   for (int i = 0; i < gBufferSize; ++i)
    {
-      ofVertex(ofMap(mModulationBuffer[i], -1, 1, x, x+w, K(clamp)), ofMap(i, 0, gBufferSize, y, y+h), K(clamp));
+      ofVertex(ofMap(mModulationBuffer[i], -1, 1, x, x + w, K(clamp)), ofMap(i, 0, gBufferSize, y, y + h), K(clamp));
    }
    ofEndShape();
    ofPopStyle();
@@ -85,20 +83,20 @@ void AudioToCV::DrawModule()
 void AudioToCV::Process(double time)
 {
    PROFILER(AudioToCV);
-   
+
    if (!mEnabled)
       return;
-   
+
    ComputeSliders(0);
    SyncBuffers();
-   
+
    assert(GetBuffer()->BufferSize());
    Clear(gWorkBuffer, gBufferSize);
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       Add(gWorkBuffer, GetBuffer()->GetChannel(ch), gBufferSize);
    BufferCopy(mModulationBuffer, gWorkBuffer, gBufferSize);
    Mult(mModulationBuffer, mGain, gBufferSize);
-   
+
    GetBuffer()->Reset();
 }
 
@@ -114,23 +112,13 @@ float AudioToCV::Value(int samplesIn)
 
 void AudioToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;
 }
 
 void AudioToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
    SetUpFromSaveData();
 }
 
 void AudioToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

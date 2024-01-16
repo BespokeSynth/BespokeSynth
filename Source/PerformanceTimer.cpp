@@ -40,7 +40,7 @@ TimerInstance::~TimerInstance()
 
 void PerformanceTimer::RecordCost(std::string name, long cost)
 {
-   mCostTable.push_back(PerformanceTimer::Cost(name,cost));
+   mCostTable.push_back(PerformanceTimer::Cost(name, cost));
 }
 
 bool PerformanceTimer::SortCosts(const PerformanceTimer::Cost& a, const PerformanceTimer::Cost& b)

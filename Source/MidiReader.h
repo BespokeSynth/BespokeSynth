@@ -41,11 +41,11 @@ public:
    void GetMeasurePos(double ms, int& measure, float& measurePos);
    void SetBeatOffset(int beatOffset) { mBeatOffset = beatOffset; }
    //MIDISequencer* GetSequencer() { return mSequencer; }
-   
+
 private:
    //MIDIMultiTrack mTracks;
    //MIDISequencer* mSequencer;
-   int mBeatOffset;
+   int mBeatOffset{ 0 };
 };
 
 #endif /* defined(__Bespoke__MidiReader__) */

@@ -32,13 +32,6 @@
 
 AudioLevelToCV::AudioLevelToCV()
 : IAudioProcessor(gBufferSize)
-, mGain(1)
-, mGainSlider(nullptr)
-, mAttackSlider(nullptr)
-, mReleaseSlider(nullptr)
-, mVal(0)
-, mAttack(10)
-, mRelease(10)
 {
    mModulationBuffer = new float[gBufferSize];
 }
@@ -46,23 +39,23 @@ AudioLevelToCV::AudioLevelToCV()
 void AudioLevelToCV::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mGainSlider = new FloatSlider(this, "gain", 3, 2, 100, 15, &mGain, 1, 100);
    mAttackSlider = new FloatSlider(this, "attack", mGainSlider, kAnchor_Below, 100, 15, &mAttack, .01f, 1000);
    mReleaseSlider = new FloatSlider(this, "release", mAttackSlider, kAnchor_Below, 100, 15, &mRelease, .01f, 1000);
    mMinSlider = new FloatSlider(this, "min", mReleaseSlider, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
-   
+
    mGainSlider->SetMode(FloatSlider::kSquare);
    mAttackSlider->SetMode(FloatSlider::kSquare);
    mReleaseSlider->SetMode(FloatSlider::kSquare);
-   
+
    //update mAttackFactor and mReleaseFactor
-   FloatSliderUpdated(mAttackSlider, 0);
-   FloatSliderUpdated(mReleaseSlider, 0);
-   
+   FloatSliderUpdated(mAttackSlider, 0, gTime);
+   FloatSliderUpdated(mReleaseSlider, 0, gTime);
+
    GetPatchCableSource()->SetEnabled(false);
-   
+
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
@@ -77,23 +70,23 @@ void AudioLevelToCV::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mGainSlider->Draw();
    mAttackSlider->Draw();
    mReleaseSlider->Draw();
    mMinSlider->Draw();
    mMaxSlider->Draw();
-   
+
    ofPushStyle();
-   ofSetColor(0,255,0,gModuleDrawAlpha);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha);
    ofBeginShape();
-   float x,y;
-   float w,h;
+   float x, y;
+   float w, h;
    mGainSlider->GetPosition(x, y, K(local));
    mGainSlider->GetDimensions(w, h);
-   for (int i=0; i<gBufferSize; ++i)
+   for (int i = 0; i < gBufferSize; ++i)
    {
-      ofVertex(ofMap(mModulationBuffer[i], 0, 1, x, x+w, K(clamp)), ofMap(i, 0, gBufferSize, y, y+h), K(clamp));
+      ofVertex(ofMap(mModulationBuffer[i], 0, 1, x, x + w, K(clamp)), ofMap(i, 0, gBufferSize, y, y + h), K(clamp));
    }
    ofEndShape();
    ofPopStyle();
@@ -102,18 +95,18 @@ void AudioLevelToCV::DrawModule()
 void AudioLevelToCV::Process(double time)
 {
    PROFILER(AudioLevelToCV);
-   
+
    if (!mEnabled)
       return;
-   
+
    ComputeSliders(0);
    SyncBuffers();
-   
+
    assert(GetBuffer()->BufferSize());
    Clear(gWorkBuffer, gBufferSize);
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       Add(gWorkBuffer, GetBuffer()->GetChannel(ch), gBufferSize);
-   for (int i=0; i<gBufferSize; ++i)
+   for (int i = 0; i < gBufferSize; ++i)
    {
       float sample = fabsf(gWorkBuffer[i]);
       if (sample > mVal)
@@ -122,7 +115,7 @@ void AudioLevelToCV::Process(double time)
          mVal = mReleaseFactor * (mVal - sample) + sample;
       mModulationBuffer[i] = mVal * mGain;
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -136,7 +129,7 @@ float AudioLevelToCV::Value(int samplesIn)
    return ofMap(mModulationBuffer[samplesIn], 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
-void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mAttackSlider)
       mAttackFactor = powf(.01f, 1.0f / (mAttack * gSampleRateMs));
@@ -146,23 +139,13 @@ void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void AudioLevelToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;
 }
 
 void AudioLevelToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
    SetUpFromSaveData();
 }
 
 void AudioLevelToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

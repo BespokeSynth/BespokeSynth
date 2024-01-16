@@ -40,33 +40,36 @@ public:
    TakeRecorder();
    virtual ~TakeRecorder();
    static IDrawableModule* Create() { return new TakeRecorder(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    //IAudioProcessor
    InputMode GetInputMode() override { return kInputMode_Mono; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=120; h=22; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mStartSeconds;
-   FloatSlider* mStartSecondsSlider;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
-   bool mRecording;
-   Checkbox* mRecordingCheckbox;
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 120;
+      h = 22;
+   }
+
+   float mStartSeconds{ 0 };
+   FloatSlider* mStartSecondsSlider{ nullptr };
 };

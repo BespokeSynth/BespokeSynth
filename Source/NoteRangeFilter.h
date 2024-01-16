@@ -36,33 +36,40 @@ class NoteRangeFilter : public NoteEffectBase, public IDrawableModule, public II
 public:
    NoteRangeFilter();
    static IDrawableModule* Create() { return new NoteRangeFilter(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mWidth;
-   float mHeight;
-   int mMinPitch;
-   IntSlider* mMinPitchSlider;
-   int mMaxPitch;
-   IntSlider* mMaxPitchSlider;
-   bool mWrap;
-   Checkbox* mWrapCheckbox;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   int mMinPitch{ 24 };
+   IntSlider* mMinPitchSlider{ nullptr };
+   int mMaxPitch{ 36 };
+   IntSlider* mMaxPitchSlider{ nullptr };
+   bool mWrap{ false };
+   Checkbox* mWrapCheckbox{ nullptr };
 };

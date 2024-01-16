@@ -45,61 +45,57 @@ public:
    EnvelopeModulator();
    virtual ~EnvelopeModulator();
    static IDrawableModule* Create() { return new EnvelopeModulator(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
    void Delete() { delete this; }
    void DrawModule() override;
-   
+
    void Start(double time, const ::ADSR& adsr);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   bool Enabled() const override { return mEnabled; }
-   
+   bool IsEnabled() const override { return mEnabled; }
+
    void CreateUIControls() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool IsResizable() const override { return mAdvancedDisplay; }
+   bool IsResizable() const override { return false; }
    void Resize(float w, float h) override;
-   
+
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
 private:
-   void OnClicked(int x, int y, bool right) override;
-   
-   float mWidth;
-   float mHeight;
-   
-   Checkbox* mAdvancedDisplayCheckbox;
-   bool mAdvancedDisplay;
-   ADSRDisplay* mAdsrDisplay;
-   EnvelopeControl mEnvelopeControl;
-   ::ADSR mAdsr;
-   
-   bool mUseVelocity;
-   Checkbox* mUseVelocityCheckbox;
-   float mADSRViewLength;
-   FloatSlider* mADSRViewLengthSlider;
-   Checkbox* mHasSustainStageCheckbox;
-   IntSlider* mSustainStageSlider;
-   FloatSlider* mMaxSustainSlider;
+   void OnClicked(float x, float y, bool right) override;
+
+   float mWidth{ 250 };
+   float mHeight{ 122 };
+
+   ADSRDisplay* mAdsrDisplay{ nullptr };
+   ::ADSR mAdsr{ 10, 100, .5, 100 };
+
+   bool mUseVelocity{ false };
+   Checkbox* mUseVelocityCheckbox{ nullptr };
 };

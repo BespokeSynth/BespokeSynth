@@ -40,25 +40,27 @@
 
 class PatchCableSource;
 
-class ControlSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IButtonListener, public IIntSliderListener, public IPulseReceiver, public INoteReceiver, public IDrivableSequencer
+class ControlSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IButtonListener, public IIntSliderListener, public IPulseReceiver, public INoteReceiver, public IDrivableSequencer, public IFloatSliderListener
 {
 public:
    ControlSequencer();
    ~ControlSequencer();
    static IDrawableModule* Create() { return new ControlSequencer(); }
-
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
    void Init() override;
 
-   IUIControl* GetUIControl() const { return mUIControl; }
+   IUIControl* GetUIControl() const { return mTargets.size() == 0 ? nullptr : mTargets[0]; }
 
    //IGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
    //IDrawableModule
    void Poll() override;
-   bool IsResizable() const override { return true; }
+   bool IsResizable() const override { return !mSliderMode; }
    void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
@@ -75,42 +77,45 @@ public:
    //IDrivableSequencer
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
-   
-   void CheckboxUpdated(Checkbox* checkbox) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
    void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 3; }
+
    static std::list<ControlSequencer*> sControlSequencers;
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void Step(double time, int pulseFlags);
    void SetGridSize(float w, float h);
-   
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   
+
    UIGrid* mGrid{ nullptr };
-   IUIControl* mUIControl{ nullptr };
-   NoteInterval mInterval{ kInterval_16n };
+   std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
+   NoteInterval mInterval{ kInterval_4n };
    DropdownList* mIntervalSelector{ nullptr };
-   int mLength{ 16 };
+   int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
    std::string mOldLengthStr;
    int mLoadRev{ -1 };
@@ -118,8 +123,10 @@ private:
    ClickButton* mRandomize{ nullptr };
    bool mHasExternalPulseSource{ false };
    int mStep{ 0 };
+   bool mSliderMode{ true };
+   std::array<FloatSlider*, 32> mStepSliders{};
 
-   TransportListenerInfo* mTransportListenerInfo;
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
 
 #endif /* defined(__Bespoke__ControlSequencer__) */

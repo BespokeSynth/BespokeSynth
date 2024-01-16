@@ -34,8 +34,6 @@
 #include "UIControlMacros.h"
 
 ModulatorAccum::ModulatorAccum()
-   : mValue(0)
-   , mVelocity(0)
 {
 }
 
@@ -78,11 +76,11 @@ void ModulatorAccum::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 {
    OnModulatorRepatch();
 
-   if (mTarget)
+   if (GetSliderTarget() && fromUserClick)
    {
-      mValue = mTarget->GetValue();
-      mValueSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mValueSlider->SetMode(mTarget->GetMode());
+      mValue = GetSliderTarget()->GetValue();
+      mValueSlider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
+      mValueSlider->SetMode(GetSliderTarget()->GetMode());
    }
 }
 
@@ -103,23 +101,13 @@ float ModulatorAccum::Value(int samplesIn)
 
 void ModulatorAccum::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-
-   moduleInfo["target"] = targetPath;
 }
 
 void ModulatorAccum::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    SetUpFromSaveData();
 }
 
 void ModulatorAccum::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

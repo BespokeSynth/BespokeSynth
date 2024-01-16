@@ -44,62 +44,66 @@ public:
    PulseTrain();
    virtual ~PulseTrain();
    static IDrawableModule* Create() { return new PulseTrain(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
-   
+
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
-   
+   void OnClicked(float x, float y, bool right) override;
+
    void Step(double time, float velocity, int flags);
-   
+
    static const int kMaxSteps = 32;
-   float mVels[kMaxSteps];
-   int mLength;
-   IntSlider* mLengthSlider;
-   int mStep;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   bool mResetOnStart;
-   Checkbox* mResetOnStartCheckbox;
-   
+   float mVels[kMaxSteps]{};
+   int mLength{ 8 };
+   IntSlider* mLengthSlider{ nullptr };
+   int mStep{ 9999 };
+   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   DropdownList* mIntervalSelector{ nullptr };
+   bool mResetOnStart{ true };
+   Checkbox* mResetOnStartCheckbox{ nullptr };
+
    static const int kIndividualStepCables = 16;
-   PatchCableSource* mStepCables[kIndividualStepCables];
-   
-   UIGrid* mVelocityGrid;
+   PatchCableSource* mStepCables[kIndividualStepCables]{ nullptr };
+
+   UIGrid* mVelocityGrid{ nullptr };
 };

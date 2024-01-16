@@ -30,9 +30,6 @@
 #include "UIControlMacros.h"
 
 ScaleDegree::ScaleDegree()
-: mScaleDegree(0)
-, mScaleDegreeSelector(nullptr)
-, mRetrigger(false)
 {
 }
 
@@ -40,10 +37,11 @@ void ScaleDegree::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   DROPDOWN(mScaleDegreeSelector,"degree",&mScaleDegree,50);
-   CHECKBOX(mRetriggerCheckbox,"retrigger",&mRetrigger);
+   DROPDOWN(mScaleDegreeSelector, "degree", &mScaleDegree, 50);
+   CHECKBOX(mRetriggerCheckbox, "retrigger", &mRetrigger);
+   CHECKBOX(mDiatonicCheckbox, "diatonic", &mDiatonic);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mScaleDegreeSelector->AddLabel("-I", -7);
    mScaleDegreeSelector->AddLabel("-II", -6);
    mScaleDegreeSelector->AddLabel("-III", -5);
@@ -65,15 +63,16 @@ void ScaleDegree::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mScaleDegreeSelector->Draw();
    mRetriggerCheckbox->Draw();
+   mDiatonicCheckbox->Draw();
 }
 
-void ScaleDegree::CheckboxUpdated(Checkbox *checkbox)
+void ScaleDegree::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -83,7 +82,7 @@ void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (pitch >= 0 && pitch < 128)
    {
       if (velocity > 0)
@@ -97,28 +96,35 @@ void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       {
          mInputNotes[pitch].mOn = false;
       }
-      
+
       PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, velocity, mInputNotes[pitch].mVoiceIdx, modulation);
    }
 }
 
 int ScaleDegree::TransformPitch(int pitch)
 {
-   int tone = TheScale->GetToneFromPitch(pitch);
-   tone += mScaleDegree;
-   return TheScale->GetPitchFromTone(tone);
+   if (mDiatonic)
+   {
+      int tone = TheScale->GetToneFromPitch(pitch);
+      tone += mScaleDegree;
+      return TheScale->GetPitchFromTone(tone);
+   }
+   else
+   {
+      int semitones = TheScale->GetPitchFromTone(mScaleDegree) - TheScale->ScaleRoot();
+      return pitch + semitones;
+   }
 }
 
-void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
+void ScaleDegree::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (slider == mScaleDegreeSelector && mEnabled && mRetrigger)
+   if (list == mScaleDegreeSelector && mEnabled && mRetrigger)
    {
-      double time = gTime + gBufferSizeMs;
-      for (int pitch=0; pitch<128; ++pitch)
+      for (int pitch = 0; pitch < 128; ++pitch)
       {
          if (mInputNotes[pitch].mOn)
          {
-            PlayNoteOutput(time+.01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
             mInputNotes[pitch].mOutputPitch = TransformPitch(pitch);
             PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          }
@@ -129,7 +135,7 @@ void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
 void ScaleDegree::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

@@ -39,44 +39,50 @@ public:
    RandomNoteGenerator();
    ~RandomNoteGenerator();
    static IDrawableModule* Create() { return new RandomNoteGenerator(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=120; height=92; }
-   bool Enabled() const override { return mEnabled; }
-   
-   
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   float mProbability;
-   FloatSlider* mProbabilitySlider;
-   int mPitch;
-   IntSlider* mPitchSlider;
-   float mVelocity;
-   FloatSlider* mVelocitySlider;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   int mSkip;
-   IntSlider* mSkipSlider;
-   int mSkipCount;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 92;
+   }
+
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   float mProbability{ .5 };
+   FloatSlider* mProbabilitySlider{ nullptr };
+   int mPitch{ 36 };
+   IntSlider* mPitchSlider{ nullptr };
+   float mVelocity{ .8 };
+   FloatSlider* mVelocitySlider{ nullptr };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+   int mSkip{ 1 };
+   IntSlider* mSkipSlider{ nullptr };
+   int mSkipCount{ 0 };
 };
 
 #endif /* defined(__Bespoke__RandomNoteGenerator__) */

@@ -33,7 +33,6 @@
 #include "ModulationChain.h"
 
 ModWheelToCV::ModWheelToCV()
-: mModWheel(nullptr)
 {
 }
 
@@ -47,7 +46,7 @@ void ModWheelToCV::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
-   
+
    mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 }
@@ -56,7 +55,7 @@ void ModWheelToCV::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMinSlider->Draw();
    mMaxSlider->Draw();
 }
@@ -76,29 +75,19 @@ void ModWheelToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
 
 float ModWheelToCV::Value(int samplesIn)
 {
-   float modWheel = mModWheel ? mModWheel->GetValue(samplesIn) : 0;
-   return ofMap(modWheel,0,1,GetMin(),GetMax(),K(clamped));
+   float modWheel = mModWheel ? mModWheel->GetValue(samplesIn) : ModulationParameters::kDefaultModWheel;
+   return ofMap(modWheel, 0, 1, GetMin(), GetMax(), K(clamped));
 }
 
 void ModWheelToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;
 }
 
 void ModWheelToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
    SetUpFromSaveData();
 }
 
 void ModWheelToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

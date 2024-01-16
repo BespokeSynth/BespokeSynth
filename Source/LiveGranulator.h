@@ -36,65 +36,69 @@
 #include "Transport.h"
 #include "DropdownList.h"
 
-#define FREEZE_EXTRA_SAMPLES_COUNT 2*gSampleRate
+#define FREEZE_EXTRA_SAMPLES_COUNT 2 * gSampleRate
 
 class LiveGranulator : public IAudioEffect, public IFloatSliderListener, public ITimeListener, public IDropdownListener
 {
 public:
    LiveGranulator();
    virtual ~LiveGranulator();
-   
+
    static IAudioEffect* Create() { return new LiveGranulator(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "granulator"; }
-   
+
    void OnTimeEvent(double time) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    void Freeze();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w = mWidth; h = mHeight; }
-   bool Enabled() const override { return mEnabled; }   
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
+
    float mBufferLength;
    RollingBuffer mBuffer;
    Granulator mGranulator;
-   FloatSlider* mGranOverlap;
-   FloatSlider* mGranSpeed;
-   FloatSlider* mGranLengthMs;
-   FloatSlider* mGranPosRandomize;
-   FloatSlider* mGranSpeedRandomize;
-   FloatSlider* mGranSpacingRandomize;
-   Checkbox* mGranOctaveCheckbox;
-   float mDry;
-   FloatSlider* mDrySlider;
-   bool mFreeze;
-   Checkbox* mFreezeCheckbox;
-   int mFreezeExtraSamples;
-   float mPos;
-   FloatSlider* mPosSlider;
-   NoteInterval mAutoCaptureInterval;
-   DropdownList* mAutoCaptureDropdown;
-   FloatSlider* mWidthSlider;
-   
-   float mWidth;
-   float mHeight;
-   float mBufferX;
+   FloatSlider* mGranOverlap{ nullptr };
+   FloatSlider* mGranSpeed{ nullptr };
+   FloatSlider* mGranLengthMs{ nullptr };
+   FloatSlider* mGranPosRandomize{ nullptr };
+   FloatSlider* mGranSpeedRandomize{ nullptr };
+   FloatSlider* mGranSpacingRandomize{ nullptr };
+   Checkbox* mGranOctaveCheckbox{ nullptr };
+   float mDry{ 0 };
+   FloatSlider* mDrySlider{ nullptr };
+   bool mFreeze{ false };
+   Checkbox* mFreezeCheckbox{ nullptr };
+   int mFreezeExtraSamples{ 0 };
+   float mPos{ 0 };
+   FloatSlider* mPosSlider{ nullptr };
+   NoteInterval mAutoCaptureInterval{ NoteInterval::kInterval_None };
+   DropdownList* mAutoCaptureDropdown{ nullptr };
+   FloatSlider* mWidthSlider{ nullptr };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   float mBufferX{ 0 };
 };
 
 #endif /* defined(__modularSynth__LiveGranulator__) */
-

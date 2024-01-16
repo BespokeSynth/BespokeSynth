@@ -28,20 +28,14 @@
 #include "ModularSynth.h"
 
 ScaleDetect::ScaleDetect()
-: mResetButton(nullptr)
-, mLastPitch(0)
-, mDoDetect(true)
-, mNeedsUpdate(false)
-, mSelectedMatch(0)
-, mMatchesDropdown(nullptr)
 {
 }
 
 void ScaleDetect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mResetButton = new ClickButton(this,"reset",4,18);
-   mMatchesDropdown = new DropdownList(this,"matches",25,2,&mSelectedMatch);
+   mResetButton = new ClickButton(this, "reset", 4, 18);
+   mMatchesDropdown = new DropdownList(this, "matches", 25, 2, &mSelectedMatch);
 }
 
 void ScaleDetect::DrawModule()
@@ -53,7 +47,7 @@ void ScaleDetect::DrawModule()
    mMatchesDropdown->Draw();
 
    DrawTextNormal(NoteName(mLastPitch), 5, 12);
-   
+
    if (mNeedsUpdate)
    {
       mMatchesDropdown->Clear();
@@ -63,30 +57,30 @@ void ScaleDetect::DrawModule()
       if (mDoDetect)
       {
          int numScaleTypes = TheScale->GetNumScaleTypes();
-         for (int j=0; j<numScaleTypes-1; ++j)
+         for (int j = 0; j < numScaleTypes - 1; ++j)
          {
-            if (ScaleSatisfied(mLastPitch%TheScale->GetPitchesPerOctave(), TheScale->GetScaleName(j)))
+            if (ScaleSatisfied(mLastPitch % TheScale->GetPitchesPerOctave(), TheScale->GetScaleName(j)))
                mMatchesDropdown->AddLabel(TheScale->GetScaleName(j).c_str(), numMatches++);
          }
       }
-      
+
       mNeedsUpdate = false;
    }
-   
+
    {
       std::string pitchString;
       std::vector<int> rootRelative;
-      for (int i=0; i<128; ++i)
+      for (int i = 0; i < 128; ++i)
       {
          if (mPitchOn[i])
          {
-            int entry = (i-mLastPitch+TheScale->GetPitchesPerOctave()*10)%TheScale->GetPitchesPerOctave();
+            int entry = (i - mLastPitch + TheScale->GetPitchesPerOctave() * 10) % TheScale->GetPitchesPerOctave();
             if (!VectorContains(entry, rootRelative))
                rootRelative.push_back(entry);
          }
       }
       sort(rootRelative.begin(), rootRelative.end());
-      for (int i=0; i<rootRelative.size(); ++i)
+      for (int i = 0; i < rootRelative.size(); ++i)
          pitchString += ofToString(rootRelative[i]) + " ";
       DrawTextNormal(pitchString, 40, 30);
    }
@@ -109,8 +103,8 @@ bool ScaleDetect::ScaleSatisfied(int root, std::string type)
    ScalePitches scale;
    scale.SetRoot(root);
    scale.SetScaleType(type);
-   
-   for (int i=0; i<128; ++i)
+
+   for (int i = 0; i < 128; ++i)
    {
       if (mPitchOn[i] && !scale.IsInScale(i))
          return false;
@@ -118,18 +112,18 @@ bool ScaleDetect::ScaleSatisfied(int root, std::string type)
    return true;
 }
 
-void ScaleDetect::ButtonClicked(ClickButton *button)
+void ScaleDetect::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mResetButton)
    {
-      for (int i=0; i<128; ++i)
+      for (int i = 0; i < 128; ++i)
          mPitchOn[i] = false;
       mMatchesDropdown->Clear();
       mNeedsUpdate = true;
    }
 }
 
-void ScaleDetect::DropdownUpdated(DropdownList* list, int oldVal)
+void ScaleDetect::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mMatchesDropdown)
    {
@@ -148,5 +142,3 @@ void ScaleDetect::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-
-

@@ -47,8 +47,10 @@ public:
    LaunchpadKeyboard();
    ~LaunchpadKeyboard();
    static IDrawableModule* Create() { return new LaunchpadKeyboard(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -57,14 +59,14 @@ public:
    void SetDisplayer(LaunchpadNoteDisplayer* displayer) { mDisplayer = displayer; }
    void DisplayNote(int pitch, int velocity);
    void SetChorder(Chorder* chorder) { mChorder = chorder; }
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
-   
+
    //IScaleListener
    void OnScaleChanged() override;
-   
+
    //IDrawableModule
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
@@ -73,19 +75,21 @@ public:
 
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    //IPush2GridController
-   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    enum LaunchpadLayout
    {
@@ -94,9 +98,11 @@ private:
       kChordIndividual,
       kChord,
       kGuitar,
-      kSeptatonic
+      kSeptatonic,
+      kDrum,
+      kAllPads
    };
-   
+
    enum ArrangementMode
    {
       kFull,
@@ -107,9 +113,12 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width=120; height=74; }
-   bool Enabled() const override { return mEnabled; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 74;
+   }
+
    void PlayKeyboardNote(double time, int pitch, int velocity);
    void UpdateLights(bool force = false);
    GridColor GetGridSquareColor(int x, int y);
@@ -119,34 +128,37 @@ private:
    void PressedNoteFor(int x, int y, int velocity);
    void ReleaseNoteFor(int x, int y);
    int GridToPitchChordSection(int x, int y);
-   int GetHeldVelocity(int pitch) { if (pitch >= 0 && pitch < 128) return mCurrentNotes[pitch]; else return 0; }
-   
-   int mRootNote;
-   
-   int mCurrentNotes[128];
-   bool mTestKeyHeld;
-   int mOctave;
-   IntSlider* mOctaveSlider;
-   bool mLatch;
-   Checkbox* mLatchCheckbox;
-   LaunchpadLayout mLayout;
-   DropdownList* mLayoutDropdown;
-   int mCurrentChord;
-   std::vector< std::vector<int> > mChords;
-   LaunchpadNoteDisplayer* mDisplayer;
-   ArrangementMode mArrangementMode;
-   DropdownList* mArrangementModeDropdown;
-   std::list<int> mHeldChordTones;
-   Chorder* mChorder;
-   bool mLatchChords;
-   Checkbox* mLatchChordsCheckbox;
-   bool mWasChorderEnabled;
-   bool mPreserveChordRoot;
-   Checkbox* mPreserveChordRootCheckbox;
-   GridControlTarget* mGridControlTarget;
+   int GetHeldVelocity(int pitch)
+   {
+      if (pitch >= 0 && pitch < 128)
+         return mCurrentNotes[pitch];
+      else
+         return 0;
+   }
 
-   std::string mDebugLines;
+   int mRootNote{ 4 }; // 4 = E
+
+   int mCurrentNotes[128]{};
+   bool mTestKeyHeld{ false };
+   int mOctave{ 3 };
+   IntSlider* mOctaveSlider{ nullptr };
+   bool mLatch{ false };
+   Checkbox* mLatchCheckbox{ nullptr };
+   LaunchpadLayout mLayout{ LaunchpadLayout::kChromatic };
+   DropdownList* mLayoutDropdown{ nullptr };
+   int mCurrentChord{ 0 };
+   std::vector<std::vector<int> > mChords;
+   LaunchpadNoteDisplayer* mDisplayer{ nullptr };
+   ArrangementMode mArrangementMode{ ArrangementMode::kFull };
+   DropdownList* mArrangementModeDropdown{ nullptr };
+   std::list<int> mHeldChordTones;
+   Chorder* mChorder{ nullptr };
+   bool mLatchChords{ false };
+   Checkbox* mLatchChordsCheckbox{ nullptr };
+   bool mWasChorderEnabled{ false };
+   bool mPreserveChordRoot{ true };
+   Checkbox* mPreserveChordRootCheckbox{ nullptr };
+   GridControlTarget* mGridControlTarget{ nullptr };
 };
 
 #endif /* defined(__modularSynth__LaunchpadKeyboard__) */
-

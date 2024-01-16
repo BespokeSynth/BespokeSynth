@@ -45,14 +45,15 @@ enum AnchorDirection
 class IUIControl : public IClickable
 {
 public:
-   IUIControl() : mRemoteControlCount(0), mNoHover(false), mShouldSaveState(true) {}
+   IUIControl()
+   {}
    virtual void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }
-   virtual void SetFromMidiCC(float slider, bool setViaModulator = false) = 0;
+   virtual void SetFromMidiCC(float slider, double time, bool setViaModulator) = 0;
    virtual float GetValueForMidiCC(float slider) const { return 0; }
-   virtual void SetValue(float value) = 0;
-   virtual void SetValueDirect(float value) { SetValue(value); } //override if you need special control here
+   virtual void SetValue(float value, double time, bool forceUpdate = false) = 0;
+   virtual void SetValueDirect(float value, double time) { SetValue(value, time); } //override if you need special control here
    virtual float GetValue() const { return 0; }
    virtual float GetMidiValue() const { return 0; }
    virtual int GetNumValues() { return 0; } //the number of distinct values that you can have for this control, zero indicates infinite (like a float slider)
@@ -62,7 +63,11 @@ public:
    virtual void KeyPressed(int key, bool isRepeat) {}
    void StartBeacon() override;
    bool IsPreset();
-   virtual void GetRange(float& min, float& max) { min = 0; max = 1; }
+   virtual void GetRange(float& min, float& max)
+   {
+      min = 0;
+      max = 1;
+   }
    virtual bool IsBitmask() { return false; }
    bool TestHover(int x, int y);
    void CheckHover(int x, int y);
@@ -74,32 +79,44 @@ public:
    virtual void Halve() {}
    virtual void ResetToOriginal() {}
    virtual void Increment(float amount) {}
+   void SetCableTargetable(bool targetable) { mCableTargetable = targetable; }
+   bool GetCableTargetable() const { return mCableTargetable; }
    void SetNoHover(bool noHover) { mNoHover = noHover; }
-   bool GetNoHover() const { return mNoHover; }
+   virtual bool GetNoHover() const { return mNoHover; }
    virtual bool AttemptTextInput() { return false; }
    void PositionTo(IUIControl* anchor, AnchorDirection direction);
    void GetColors(ofColor& color, ofColor& textColor);
    bool GetShouldSaveState() const { return mShouldSaveState; }
    void SetShouldSaveState(bool save) { mShouldSaveState = save; }
+   void RemoveFromOwner();
    virtual bool IsSliderControl() { return true; }
    virtual bool IsButtonControl() { return false; }
    virtual bool IsMouseDown() const { return false; }
    virtual bool IsTextEntry() const { return false; }
-   
-   static void SetNewManualHover(int direction);
-   static bool WasLastHoverSetViaTab() { return sLastUIHoverWasSetViaTab; }
-   
+   virtual bool ModulatorUsesLiteralValue() const { return false; }
+   virtual float GetModulationRangeMin() const { return 0; }
+   virtual float GetModulationRangeMax() const { return 1; }
+   virtual bool ShouldSerializeForSnapshot() const { return false; }
+
+   static void SetNewManualHoverViaTab(int direction);
+   static void SetNewManualHoverViaArrow(ofVec2f direction);
+   static bool WasLastHoverSetManually() { return sLastUIHoverWasSetManually; }
+
+   static void DestroyCablesTargetingControls(std::vector<IUIControl*> controls);
+
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
+
 protected:
    virtual ~IUIControl();
-   
-   int mRemoteControlCount;
-   bool mNoHover;
-   bool mShouldSaveState;
-   
+
+   int mRemoteControlCount{ 0 };
+   bool mCableTargetable{ true };
+   bool mNoHover{ false };
+   bool mShouldSaveState{ true };
+
    static IUIControl* sLastHoveredUIControl;
-   static bool sLastUIHoverWasSetViaTab;
+   static bool sLastUIHoverWasSetManually;
 };
 
 #endif

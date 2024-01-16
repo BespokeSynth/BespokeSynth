@@ -43,9 +43,9 @@ PitchDive::~PitchDive()
 void PitchDive::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mStartSlider = new FloatSlider(this,"start",5,2,110,15,&mStart,-3,3);
-   mTimeSlider = new FloatSlider(this,"time",5,20,110,15,&mTime,0,1000);
-   
+   mStartSlider = new FloatSlider(this, "start", 5, 2, 110, 15, &mStart, -3, 3);
+   mTimeSlider = new FloatSlider(this, "time", 5, 20, 110, 15, &mTime, 0, 1000);
+
    mTimeSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -67,22 +67,22 @@ void PitchDive::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
       pitchBend->AppendTo(modulation.pitchBend);
       modulation.pitchBend = pitchBend;
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void PitchDive::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PitchDive::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void PitchDive::CheckboxUpdated(Checkbox* checkbox)
+void PitchDive::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
 void PitchDive::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

@@ -42,46 +42,53 @@ public:
    MultitrackRecorder();
    virtual ~MultitrackRecorder();
    static IDrawableModule* Create() { return new MultitrackRecorder(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    bool IsResizable() const override { return true; }
    void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); }
-   
+
    void RemoveTrack(MultitrackRecorderTrack* track);
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
    void AddTrack();
    int GetRecordingLength();
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 700 };
+   float mHeight{ 142 };
 
    ModuleContainer mModuleContainer;
 
-   ClickButton* mAddTrackButton;
-   Checkbox* mRecordCheckbox;
-   bool mRecord;
-   ClickButton* mBounceButton;
-   ClickButton* mClearButton;
+   ClickButton* mAddTrackButton{ nullptr };
+   Checkbox* mRecordCheckbox{ nullptr };
+   bool mRecord{ false };
+   ClickButton* mBounceButton{ nullptr };
+   ClickButton* mClearButton{ nullptr };
 
    std::vector<MultitrackRecorderTrack*> mTracks;
    std::string mStatusString;
-   double mStatusStringTime;
+   double mStatusStringTime{ -9999 };
 };
 
 class MultitrackRecorderTrack : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IButtonListener
@@ -90,8 +97,10 @@ public:
    MultitrackRecorderTrack();
    virtual ~MultitrackRecorderTrack();
    static IDrawableModule* Create() { return new MultitrackRecorderTrack(); }
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
-   
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
 
@@ -104,9 +113,9 @@ public:
    void Clear();
    int GetRecordingLength() const { return mRecordingLength; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -116,10 +125,10 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
 
-   MultitrackRecorder* mRecorder;
+   MultitrackRecorder* mRecorder{ nullptr };
 
    std::vector<ChannelBuffer*> mRecordChunks;
-   bool mDoRecording;
-   int mRecordingLength;
-   ClickButton* mDeleteButton;
+   bool mDoRecording{ false };
+   int mRecordingLength{ 0 };
+   ClickButton* mDeleteButton{ nullptr };
 };

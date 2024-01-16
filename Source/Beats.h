@@ -47,11 +47,10 @@ class Beats;
 
 struct BeatData
 {
-   BeatData() : mBeat(nullptr) {}
    void LoadBeat(Sample* sample);
    void RecalcPos(double time, bool doubleTime, int numBars);
-   
-   Sample* mBeat;
+
+   Sample* mBeat{ nullptr };
 };
 
 class BeatColumn
@@ -66,29 +65,31 @@ public:
    int GetNumSamples() { return (int)mSamples.size(); }
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
-   
-   void RadioButtonUpdated(RadioButton* list, int oldVal);
-   
+
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time);
+   void ButtonClicked(ClickButton* button, double time);
+
 private:
-   RadioButton* mSelector;
-   int mSampleIndex;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
+   RadioButton* mSelector{ nullptr };
+   int mSampleIndex{ -1 };
+   float mVolume{ 0 };
+   FloatSlider* mVolumeSlider{ nullptr };
    BeatData mBeatData;
-   int mIndex;
-   float mFilter;
-   FloatSlider* mFilterSlider;
-   std::array<BiquadFilter,2> mLowpass;
-   std::array<BiquadFilter,2> mHighpass;
-   Beats* mOwner;
+   int mIndex{ 0 };
+   float mFilter{ 0 };
+   FloatSlider* mFilterSlider{ nullptr };
+   std::array<BiquadFilter, 2> mLowpass;
+   std::array<BiquadFilter, 2> mHighpass;
+   Beats* mOwner{ nullptr };
    Ramp mFilterRamp;
-   bool mDoubleTime;
-   Checkbox* mDoubleTimeCheckbox;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
+   bool mDoubleTime{ false };
+   Checkbox* mDoubleTimeCheckbox{ nullptr };
+   int mNumBars{ 4 };
+   IntSlider* mNumBarsSlider{ nullptr };
    std::vector<Sample*> mSamples;
-   float mPan;
-   FloatSlider* mPanSlider;
+   float mPan{ 0 };
+   FloatSlider* mPanSlider{ nullptr };
+   ClickButton* mDeleteButton{ nullptr };
 };
 
 class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener
@@ -97,48 +98,52 @@ public:
    Beats();
    virtual ~Beats();
    static IDrawableModule* Create() { return new Beats(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   bool MouseMoved(float x, float y) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
+
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    ChannelBuffer mWriteBuffer;
    std::array<BeatColumn*, 4> mBeatColumns;
-   int mRows;
+   int mHighlightColumn{ -1 };
 };
 
 #endif /* defined(__modularSynth__Beats__) */
-

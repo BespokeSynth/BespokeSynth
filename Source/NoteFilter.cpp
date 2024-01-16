@@ -27,10 +27,8 @@
 #include "SynthGlobals.h"
 
 NoteFilter::NoteFilter()
-: mMinPitch(0)
-, mMaxPitch(7)
 {
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
    {
       mGate[i] = true;
       mLastPlayTime[i] = -999;
@@ -50,15 +48,15 @@ void NoteFilter::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    int pitch = mMinPitch;
    for (auto* checkbox : mGateCheckboxes)
    {
       checkbox->Draw();
       ofPushStyle();
       ofFill();
-      ofSetColor(0,255,0,(1 - ofClamp((gTime - mLastPlayTime[pitch])/250,0,1))*255);
-      ofRect(75,checkbox->GetPosition(true).y+4,8,8);
+      ofSetColor(0, 255, 0, (1 - ofClamp((gTime - mLastPlayTime[pitch]) / 250, 0, 1)) * 255);
+      ofRect(75, checkbox->GetPosition(true).y + 4, 8, 8);
       ofPopStyle();
       ++pitch;
    }
@@ -70,7 +68,8 @@ void NoteFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    {
       if (pitch >= 0 && pitch < 128)
       {
-         mLastPlayTime[pitch] = time;
+         if (velocity > 0)
+            mLastPlayTime[pitch] = time;
          if ((pitch >= mMinPitch && pitch <= mMaxPitch && mGate[pitch]) || velocity == 0)
             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
@@ -92,26 +91,26 @@ void NoteFilter::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("min pitch", moduleInfo, 0, 0, 127, K(isTextField));
    mModuleSaveData.LoadInt("max pitch", moduleInfo, 7, 0, 127, K(isTextField));
-   
+
    SetUpFromSaveData();
 }
 
 void NoteFilter::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   
+
    mMinPitch = mModuleSaveData.GetInt("min pitch");
    mMaxPitch = mModuleSaveData.GetInt("max pitch");
-   
+
    for (auto* checkbox : mGateCheckboxes)
       RemoveUIControl(checkbox);
    mGateCheckboxes.clear();
-   
+
    int numCheckboxes = (mMaxPitch - mMinPitch + 1);
-   for (int i=0; i<numCheckboxes; ++i)
+   for (int i = 0; i < numCheckboxes; ++i)
    {
-      int pitch = i+mMinPitch;
-      Checkbox* checkbox = new Checkbox(this,(NoteName(pitch) + ofToString(pitch/12 - 2) + " (" + ofToString(pitch) + ")").c_str(),3,3+i*18,&mGate[pitch]);
+      int pitch = i + mMinPitch;
+      Checkbox* checkbox = new Checkbox(this, (NoteName(pitch) + ofToString(pitch / 12 - 2) + " (" + ofToString(pitch) + ")").c_str(), 3, 3 + i * 18, &mGate[pitch]);
       mGateCheckboxes.push_back(checkbox);
    }
 }

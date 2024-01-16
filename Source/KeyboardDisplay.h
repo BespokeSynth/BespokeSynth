@@ -34,49 +34,61 @@ class KeyboardDisplay : public NoteEffectBase, public IDrawableModule
 public:
    KeyboardDisplay();
    static IDrawableModule* Create() { return new KeyboardDisplay(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void MouseReleased() override;
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+   void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override { mWidth = w; mHeight = h; }
-   
+   void Resize(float w, float h) override
+   {
+      mWidth = w;
+      mHeight = h;
+   }
+
    void DrawKeyboard(int x, int y, int w, int h);
    void SetPitchColor(int pitch);
    ofRectangle GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;
-   
+
    int RootKey() const;
    int NumKeys() const;
    int GetPitchForTypingKey(int key) const;
-   
-   float mWidth;
-   float mHeight;
-   int mRootOctave;
-   int mNumOctaves;
-   int mPlayingMousePitch;
-   bool mTypingInput;
-   bool mLatch;
-   bool mShowScale;
+
+   float mWidth{ 500 };
+   float mHeight{ 110 };
+   int mRootOctave{ 3 };
+   int mNumOctaves{ 3 };
+   int mPlayingMousePitch{ -1 };
+   bool mTypingInput{ false };
+   bool mLatch{ false };
+   bool mShowScale{ false };
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
 };

@@ -28,35 +28,25 @@
 #include "ModularSynth.h"
 
 ClipArranger::ClipArranger()
-: mBufferWidth(800)
-, mBufferHeight(80)
-, mHighlightClip(-1)
-, mMouseDown(false)
-, mMoveMode(kMoveMode_None)
-, mLastMouseX(-1)
-, mLastMouseY(-1)
 {
-   
 }
 
 ClipArranger::~ClipArranger()
 {
-   
 }
 
 void ClipArranger::Poll()
 {
-   
 }
 
 void ClipArranger::Process(double time, float* left, float* right, int bufferSize)
 {
    if (mEnabled == false)
       return;
-   
+
    if (ArrangementController::mPlay)
    {
-      for (int i=0; i<MAX_CLIPS; ++i)
+      for (int i = 0; i < MAX_CLIPS; ++i)
          mClips[i].Process(left, right, bufferSize);
    }
 }
@@ -64,11 +54,11 @@ void ClipArranger::Process(double time, float* left, float* right, int bufferSiz
 void ClipArranger::DrawModule()
 {
    ofPushStyle();
-   ofSetColor(0,0,0);
+   ofSetColor(0, 0, 0);
    ofFill();
    ofRect(BUFFER_MARGIN_X, BUFFER_MARGIN_Y, mBufferWidth, mBufferHeight);
-   
-   for (int i=0; i<MAX_CLIPS; ++i)
+
+   for (int i = 0; i < MAX_CLIPS; ++i)
    {
       if (mClips[i].mSample != nullptr)
       {
@@ -79,7 +69,7 @@ void ClipArranger::DrawModule()
          for (; xPos < xEnd; xPos += sampleWidth)
          {
             ofPushMatrix();
-            ofTranslate(xPos,BUFFER_MARGIN_Y);
+            ofTranslate(xPos, BUFFER_MARGIN_Y);
             float length = mClips[i].mSample->LengthInSamples();
             if (xPos + sampleWidth > xEnd)
             {
@@ -90,14 +80,14 @@ void ClipArranger::DrawModule()
             DrawAudioBuffer(sampleWidth, mBufferHeight, mClips[i].mSample->Data(), 0, length, 0);
             ofPopMatrix();
          }
-         
+
          ofSetColor(0, 255, 255);
          ofNoFill();
          ofSetLineWidth(i == mHighlightClip ? 3 : 1);
          ofRect(xStart, BUFFER_MARGIN_Y, xEnd - xStart, mBufferHeight);
       }
    }
-   
+
    ofPopStyle();
 }
 
@@ -107,10 +97,10 @@ void ClipArranger::GetModuleDimensions(float& w, float& h)
    h = 25 + mBufferHeight;
 }
 
-void ClipArranger::OnClicked(int x, int y, bool right)
+void ClipArranger::OnClicked(float x, float y, bool right)
 {
    mMouseDown = true;
-   
+
    if (mHighlightClip != -1)
    {
       if (IsKeyHeld('x'))
@@ -136,7 +126,7 @@ void ClipArranger::MouseReleased()
       mMouseDown = false;
       mMoveMode = kMoveMode_None;
    }
-   
+
    if (IsMousePosWithinClip(mLastMouseX, mLastMouseY))
    {
       Sample* heldSample = TheSynth->GetHeldSample();
@@ -158,10 +148,10 @@ bool ClipArranger::MouseMoved(float x, float y)
    if (!mMouseDown)
    {
       bool found = false;
-      
+
       if (IsMousePosWithinClip(x, y))
       {
-         for (int i=0; i<MAX_CLIPS; ++i)
+         for (int i = 0; i < MAX_CLIPS; ++i)
          {
             if (mClips[i].mSample != nullptr)
             {
@@ -214,7 +204,7 @@ void ClipArranger::AddSample(Sample* sample, int x, int y)
 
 float ClipArranger::MouseXToBufferPos(float mouseX)
 {
-   return (mouseX-BUFFER_MARGIN_X)/mBufferWidth;
+   return (mouseX - BUFFER_MARGIN_X) / mBufferWidth;
 }
 
 int ClipArranger::MouseXToSample(float mouseX)
@@ -224,12 +214,12 @@ int ClipArranger::MouseXToSample(float mouseX)
 
 float ClipArranger::SampleToX(int sample)
 {
-   return float(sample)/ArrangementController::mSampleLength * mBufferWidth + BUFFER_MARGIN_X;
+   return float(sample) / ArrangementController::mSampleLength * mBufferWidth + BUFFER_MARGIN_X;
 }
 
 ClipArranger::Clip* ClipArranger::GetEmptyClip()
 {
-   for (int i=0; i<MAX_CLIPS; ++i)
+   for (int i = 0; i < MAX_CLIPS; ++i)
    {
       if (mClips[i].mSample == nullptr)
          return &mClips[i];
@@ -237,19 +227,16 @@ ClipArranger::Clip* ClipArranger::GetEmptyClip()
    return nullptr;
 }
 
-void ClipArranger::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void ClipArranger::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   
 }
 
-void ClipArranger::ButtonClicked(ClickButton* button)
+void ClipArranger::ButtonClicked(ClickButton* button, double time)
 {
-   
 }
 
-void ClipArranger::CheckboxUpdated(Checkbox* checkbox)
+void ClipArranger::CheckboxUpdated(Checkbox* checkbox, double time)
 {
-   
 }
 
 void ClipArranger::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -259,18 +246,17 @@ void ClipArranger::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ClipArranger::SetUpFromSaveData()
 {
-   
 }
 
 void ClipArranger::Clip::Process(float* left, float* right, int bufferSize)
 {
    if (mSample == nullptr)
       return;
-   
-   for (int i=0; i<bufferSize; ++i)
+
+   for (int i = 0; i < bufferSize; ++i)
    {
       int playhead = ArrangementController::mPlayhead + i;
-      
+
       if (playhead >= mStartSample &&
           playhead < mEndSample)
       {

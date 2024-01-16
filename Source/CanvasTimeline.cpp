@@ -30,9 +30,7 @@
 #include "ModularSynth.h"
 
 CanvasTimeline::CanvasTimeline(Canvas* canvas, std::string name)
-   : mClick(false)
-   , mHoverMode(HoverMode::kNone)
-   , mCanvas(canvas)
+: mCanvas(canvas)
 {
    SetName(name.c_str());
    SetParent(canvas->GetModuleParent());
@@ -41,7 +39,7 @@ CanvasTimeline::CanvasTimeline(Canvas* canvas, std::string name)
 void CanvasTimeline::Render()
 {
    ofRectangle canvasRect = mCanvas->GetRect(true);
-   SetPosition(canvasRect.x, canvasRect.y-10);
+   SetPosition(canvasRect.x, canvasRect.y - 10);
    SetDimensions(canvasRect.width, 10);
 
    ofPushMatrix();
@@ -72,7 +70,7 @@ void CanvasTimeline::Render()
       ofSetColor(100, 100, 100);
    ofFill();
    ofRect(startX, 0, endX - startX, mHeight / 2, 0);
-   
+
    if (mClick && mHoverMode == HoverMode::kStart)
    {
       ofSetColor(150, 150, 150);
@@ -88,7 +86,7 @@ void CanvasTimeline::Render()
    ofFill();
    DrawTriangle(startX, 1);
 
-   
+
    if (mClick && mHoverMode == HoverMode::kEnd)
    {
       ofSetColor(150, 150, 150);
@@ -135,7 +133,7 @@ float CanvasTimeline::GetQuantizedForX(float posX, HoverMode clampSide)
    return measure;
 }
 
-void CanvasTimeline::OnClicked(int x, int y, bool right)
+void CanvasTimeline::OnClicked(float x, float y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
@@ -174,7 +172,7 @@ void CanvasTimeline::MouseReleased()
 bool CanvasTimeline::MouseMoved(float x, float y)
 {
    CheckHover(x, y);
-   
+
    if (!mClick)
    {
       mHoverMode = HoverMode::kNone;
@@ -189,7 +187,7 @@ bool CanvasTimeline::MouseMoved(float x, float y)
       ofRectangle loopStartRect(startX, 0, mHeight, mHeight);
       if (loopStartRect.contains(x, y))
          mHoverMode = HoverMode::kStart;
-      
+
       ofRectangle loopEndRect(endX - mHeight, 0, mHeight, mHeight);
       if (loopEndRect.contains(x, y))
          mHoverMode = HoverMode::kEnd;
@@ -202,17 +200,15 @@ bool CanvasTimeline::MouseMoved(float x, float y)
    return false;
 }
 
-bool CanvasTimeline::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool CanvasTimeline::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }
 
 void CanvasTimeline::SaveState(FileStreamOut& out)
 {
-
 }
 
 void CanvasTimeline::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
-
 }

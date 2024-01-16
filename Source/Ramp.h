@@ -32,27 +32,26 @@
 class Ramp
 {
 public:
-   Ramp() : mRampDataPointer(0) {}
    void Start(double curTime, float end, double endTime);
    void Start(double curTime, float start, float end, double endTime);
    void SetValue(float val);
    bool HasValue(double time) const;
    float Value(double time) const;
    float Target(double time) const { return GetCurrentRampData(time)->mEndValue; }
+
 private:
    struct RampData
    {
-      RampData() : mStartTime(-1), mStartValue(0), mEndValue(1), mEndTime(-1) {}
-      double mStartTime;
-      float mStartValue;
-      float mEndValue;
-      double mEndTime;
+      double mStartTime{ -1 };
+      float mStartValue{ 0 };
+      float mEndValue{ 1 };
+      double mEndTime{ -1 };
    };
 
    const RampData* GetCurrentRampData(double time) const;
 
    std::array<RampData, 10> mRampDatas;
-   int mRampDataPointer;
+   int mRampDataPointer{ 0 };
 };
 
 #endif /* defined(__modularSynth__Ramp__) */

@@ -45,43 +45,46 @@ public:
    EffectChain();
    virtual ~EffectChain();
    static IDrawableModule* Create() { return new EffectChain(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void Init() override;
    void Poll() override;
-   void AddEffect(std::string type, bool onTheFly = false);
+   void AddEffect(std::string type, std::string desiredName, bool onTheFly);
    void SetWideCount(int count) { mNumFXWide = count; }
-   
+
    //IAudioSource
    void Process(double time) override;
-   
+
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
 
    bool HasPush2OverrideControls() const override { return true; }
    void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void UpdateOldControlName(std::string& oldName) override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
-   
+
    int GetRowHeight(int row) const;
    int NumRows() const;
    void DeleteEffect(int index);
@@ -91,37 +94,37 @@ private:
 
    struct EffectControls
    {
-      ClickButton* mMoveLeftButton;
-      ClickButton* mMoveRightButton;
-      ClickButton* mDeleteButton;
-      FloatSlider* mDryWetSlider;
-      ClickButton* mPush2DisplayEffectButton;
+      ClickButton* mMoveLeftButton{ nullptr };
+      ClickButton* mMoveRightButton{ nullptr };
+      ClickButton* mDeleteButton{ nullptr };
+      FloatSlider* mDryWetSlider{ nullptr };
+      ClickButton* mPush2DisplayEffectButton{ nullptr };
    };
-   
-   std::vector<IAudioEffect*> mEffects;
+
+   std::vector<IAudioEffect*> mEffects{};
    ChannelBuffer mDryBuffer;
    std::vector<EffectControls> mEffectControls;
-   std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels;
-   
-   double mSwapTime;
-   int mSwapFromIdx;
-   int mSwapToIdx;
+   std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels{};
+
+   double mSwapTime{ -1 };
+   int mSwapFromIdx{ -1 };
+   int mSwapToIdx{ -1 };
    ofVec2f mSwapFromPos;
    ofVec2f mSwapToPos;
-   float mVolume;
-   FloatSlider* mVolumeSlider;
-   int mNumFXWide;
-   bool mInitialized;
-   bool mShowSpawnList;
-   int mWantToDeleteEffectAtIndex;
-   IAudioEffect* mPush2DisplayEffect;
-   
+   float mVolume{ 1 };
+   FloatSlider* mVolumeSlider{ nullptr };
+   int mNumFXWide{ 3 };
+   bool mInitialized{ false };
+   bool mShowSpawnList{ true };
+   int mWantToDeleteEffectAtIndex{ -1 };
+   IAudioEffect* mPush2DisplayEffect{ nullptr };
+
    std::vector<std::string> mEffectTypesToSpawn;
-   int mSpawnIndex;
-   DropdownList* mEffectSpawnList;
-   ClickButton* mSpawnEffectButton;
-   ClickButton* mPush2ExitEffectButton;
-   
+   int mSpawnIndex{ -1 };
+   DropdownList* mEffectSpawnList{ nullptr };
+   ClickButton* mSpawnEffectButton{ nullptr };
+   ClickButton* mPush2ExitEffectButton{ nullptr };
+
    ofMutex mEffectMutex;
 };
 

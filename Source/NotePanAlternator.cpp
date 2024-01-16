@@ -31,29 +31,24 @@
 #include "ModularSynth.h"
 
 NotePanAlternator::NotePanAlternator()
-: mPanOne(-1)
-, mPanOneSlider(nullptr)
-, mPanTwo(1)
-, mPanTwoSlider(nullptr)
-, mFlip(false)
 {
 }
 
 void NotePanAlternator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPanOneSlider = new FloatSlider(this,"one",4,2,100,15,&mPanOne,-1,1);
-   mPanTwoSlider = new FloatSlider(this,"two",mPanOneSlider,kAnchor_Below,100,15,&mPanTwo,-1,1);
+   mPanOneSlider = new FloatSlider(this, "one", 4, 2, 100, 15, &mPanOne, -1, 1);
+   mPanTwoSlider = new FloatSlider(this, "two", mPanOneSlider, kAnchor_Below, 100, 15, &mPanTwo, -1, 1);
 }
 
 void NotePanAlternator::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPanOneSlider->Draw();
    mPanTwoSlider->Draw();
-   
+
    ofPushStyle();
    ofSetColor(0, 255, 0, 50);
    ofFill();
@@ -69,14 +64,14 @@ void NotePanAlternator::PlayNote(double time, int pitch, int velocity, int voice
       modulation.pan = mFlip ? mPanTwo : mPanOne;
       mFlip = !mFlip;
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NotePanAlternator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

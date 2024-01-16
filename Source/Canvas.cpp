@@ -28,39 +28,22 @@
 #include "CanvasElement.h"
 #include "FileStream.h"
 #include "ModularSynth.h"
+#include "PatchCableSource.h"
+#include "Snapshots.h"
 
 Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator)
-: mClick(false)
-, mWidth(w)
+: mWidth(w)
 , mHeight(h)
 , mLength(length)
 , mNumRows(rows)
 , mNumCols(cols)
-, mListener(nullptr)
-, mViewStart(0)
 , mViewEnd(length)
-, mLoopStart(0)
 , mLoopEnd(length)
-, mControls(nullptr)
-, mCursorPos(-1)
 , mElementCreator(elementCreator)
-, mClickedElement(nullptr)
 , mNumVisibleRows(rows)
-, mRowOffset(0)
-, mWrap(false)
-, mDragSelecting(false)
-, mDragCanvasMoving(false)
-, mDragCanvasZooming(false)
-, mHighlightEnd(kHighlightEnd_None)
-, mHighlightEndElement(nullptr)
-, mDragEnd(kHighlightEnd_None)
-, mMajorColumnInterval(-1)
-, mHasDuplicatedThisDrag(false)
-, mScrollVerticalPartial(0)
-, mDragMode(kDragBoth)
 {
    SetName("canvas");
-   SetPosition(x,y);
+   SetPosition(x, y);
    SetParent(parent);
 
    for (size_t i = 0; i < mRowColors.size(); ++i)
@@ -69,7 +52,7 @@ Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length
 
 Canvas::~Canvas()
 {
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
       delete mElements[i];
 }
 
@@ -79,27 +62,27 @@ void Canvas::Render()
    ofTranslate(mX, mY);
    ofPushStyle();
    ofSetLineWidth(.5f);
-   float w,h;
-   GetDimensions(w,h);
+   float w, h;
+   GetDimensions(w, h);
    ofNoFill();
-   ofRect(0,0,mWidth,mHeight,0);
-   ofRect(0,0,GetWidth(),GetHeight(),0);
-   
+   ofRect(0, 0, mWidth, mHeight, 0);
+   ofRect(0, 0, GetWidth(), GetHeight(), 0);
+
    ofPushStyle();
    ofFill();
    const float rowHeight = GetHeight() / GetNumVisibleRows();
-   for (int i=0; i<GetNumVisibleRows(); ++i)
+   for (int i = 0; i < GetNumVisibleRows(); ++i)
    {
       int row = mRowOffset + i;
       if (row >= 0 && row < mRowColors.size())
-         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1f), ofVec2f(0,i*rowHeight + rowHeight*0.0f), ofVec2f(0, i*rowHeight+rowHeight));
-      ofRect(0, i*rowHeight, GetWidth(), rowHeight, 0);
+         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1f), ofVec2f(0, i * rowHeight + rowHeight * 0.0f), ofVec2f(0, i * rowHeight + rowHeight));
+      ofRect(0, i * rowHeight, GetWidth(), rowHeight, 0);
    }
    ofPopStyle();
-   
-   for (int i=0; i<GetNumCols(); ++i)
+
+   for (int i = 0; i < GetNumCols(); ++i)
    {
-      float pos = ofMap(float(i)/GetNumCols(),mViewStart/mLength,mViewEnd/mLength,0,1) * GetWidth();
+      float pos = ofMap(float(i) / GetNumCols(), mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
       if (pos >= 0 && pos < GetWidth())
       {
          ofPushStyle();
@@ -110,7 +93,7 @@ void Canvas::Render()
       }
    }
 
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
    {
       //ofMap(GetStart() + offset,mCanvas->mStart/mCanvas->GetLength(),mCanvas->mEnd/mCanvas->GetLength(),0,1,clamp)
       bool visibleOnCanvas = mElements[i]->mRow >= mRowOffset && mElements[i]->mRow < mRowOffset + GetNumVisibleRows() &&
@@ -122,28 +105,28 @@ void Canvas::Render()
             offset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
          mElements[i]->Draw(offset);
       }
-      
+
       if (!visibleOnCanvas)
          mElements[i]->DrawOffscreen();
    }
-   
+
    if (mDragSelecting)
    {
       ofPushStyle();
-      ofSetColor(255,255,255);
+      ofSetColor(255, 255, 255);
       ofRect(mDragSelectRect);
       ofPopStyle();
    }
-   
-   float pos = ofMap(mCursorPos,mViewStart/mLength,mViewEnd/mLength,0,1) * GetWidth();
+
+   float pos = ofMap(mCursorPos, mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
    if (pos >= 0 && pos < GetWidth())
    {
       ofPushStyle();
-      ofSetColor(0,255,0);
-      ofLine(pos,0,pos,GetHeight());
+      ofSetColor(0, 255, 0);
+      ofLine(pos, 0, pos, GetHeight());
       ofPopStyle();
    }
-   
+
    ofPopStyle();
    ofPopMatrix();
 }
@@ -164,18 +147,18 @@ void Canvas::RemoveElement(CanvasElement* element)
 void Canvas::SelectElement(CanvasElement* element)
 {
    bool commandHeld = GetKeyModifiers() & kModifier_Command;
-   
+
    if (!commandHeld)
    {
       mClickedElement = element;
       if (mControls)
          mControls->SetElement(element);
-      
+
       if (element && element->GetHighlighted())
          return;
    }
-   
-   for (int i=0; i<mElements.size(); ++i)
+
+   for (int i = 0; i < mElements.size(); ++i)
    {
       if (mElements[i] == element)
       {
@@ -197,8 +180,8 @@ void Canvas::SelectElements(std::vector<CanvasElement*> elements)
    bool commandHeld = GetKeyModifiers() & kModifier_Command;
    if (mControls)
       mControls->SetElement(elements.empty() ? nullptr : elements[0]);
-   
-   for (int i=0; i<mElements.size(); ++i)
+
+   for (int i = 0; i < mElements.size(); ++i)
    {
       if (VectorContains(mElements[i], elements))
       {
@@ -217,12 +200,12 @@ void Canvas::SelectElements(std::vector<CanvasElement*> elements)
 
 ofVec2f Canvas::RescaleForZoom(float x, float y) const
 {
-   return ofVec2f(ofMap(x/mWidth,0,1,mViewStart,mViewEnd) * mWidth, y);
+   return ofVec2f(ofMap(x / mWidth, 0, 1, mViewStart, mViewEnd) * mWidth, y);
 }
 
 bool Canvas::IsOnElement(CanvasElement* element, float x, float y) const
 {
-   return element->GetRect(true, false).contains(x,y) || (mWrap && element->GetRect(true, true).contains(x,y));
+   return element->GetRect(true, false).contains(x, y) || (mWrap && element->GetRect(true, true).contains(x, y));
 }
 
 bool Canvas::IsRowVisible(int row) const
@@ -230,11 +213,11 @@ bool Canvas::IsRowVisible(int row) const
    return row >= mRowOffset && row < mRowOffset + GetNumVisibleRows();
 }
 
-void Canvas::OnClicked(int x, int y, bool right)
+void Canvas::OnClicked(float x, float y, bool right)
 {
    mClick = true;
    mHasDuplicatedThisDrag = false;
-   
+
    if (mHighlightEnd != kHighlightEnd_None)
    {
       mDragEnd = mHighlightEnd;
@@ -243,7 +226,7 @@ void Canvas::OnClicked(int x, int y, bool right)
    else
    {
       bool clickedElement = false;
-      for (int i=(int)mElements.size()-1; i>=0; --i)
+      for (int i = (int)mElements.size() - 1; i >= 0; --i)
       {
          if (IsOnElement(mElements[i], x, y))
          {
@@ -258,14 +241,14 @@ void Canvas::OnClicked(int x, int y, bool right)
       if (clickedElement == false)
       {
          SelectElement(nullptr);
-         
+
          if (GetKeyModifiers() & kModifier_Shift)
          {
             CanvasCoord coord = GetCoordAt(x, y);
-            CanvasElement* element = CreateElement(coord.col,coord.row);
+            CanvasElement* element = CreateElement(coord.col, coord.row);
             AddElement(element);
             SelectElement(element);
-            mHasDuplicatedThisDrag = true;   //to prevent a duplicate from being made
+            mHasDuplicatedThisDrag = true; //to prevent a duplicate from being made
             mClickedElementStartMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
          }
          else if (GetKeyModifiers() & kModifier_Alt)
@@ -284,11 +267,11 @@ void Canvas::OnClicked(int x, int y, bool right)
          else
          {
             mDragSelecting = true;
-            mDragSelectRect.set(x,y,1,1);
+            mDragSelectRect.set(x, y, 1, 1);
          }
       }
    }
-   
+
    if (mListener)
       mListener->CanvasUpdated(this);
 }
@@ -299,12 +282,17 @@ float Canvas::QuantizeToGrid(float input) const
    return col / GetNumCols();
 }
 
+bool Canvas::CanBeTargetedBy(PatchCableSource* source) const
+{
+   return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
+}
+
 bool Canvas::MouseMoved(float x, float y)
 {
    CheckHover(x, y);
 
    bool quantize = GetKeyModifiers() & kModifier_Command;
-   
+
    if (mDragEnd != kHighlightEnd_None)
    {
       ofVec2f scaled = RescaleForZoom(x, y);
@@ -342,8 +330,8 @@ bool Canvas::MouseMoved(float x, float y)
       }
       return true;
    }
-   
-   if (x >= 0 && x <mWidth && y>=0 && y<mHeight)
+
+   if (x >= 0 && x < mWidth && y >= 0 && y < mHeight)
    {
       if (mClick)
       {
@@ -378,12 +366,12 @@ bool Canvas::MouseMoved(float x, float y)
             float endX = rect.x + rect.width;
             if (y >= rect.y && y < rect.y + rect.height)
             {
-               if (fabsf(startX-x) < 3/gDrawScale && element->IsResizable())
+               if (fabsf(startX - x) < 3 / gDrawScale && element->IsResizable())
                {
                   mHighlightEnd = kHighlightEnd_Start;
                   mHighlightEndElement = element;
                }
-               if (fabsf(endX-x) < 3/gDrawScale && element->IsResizable())
+               if (fabsf(endX - x) < 3 / gDrawScale && element->IsResizable())
                {
                   mHighlightEnd = kHighlightEnd_End;
                   mHighlightEndElement = element;
@@ -395,7 +383,7 @@ bool Canvas::MouseMoved(float x, float y)
    else
    {
    }
-   
+
    if (mDragSelecting)
    {
       mDragSelectRect.width = x - mDragSelectRect.x;
@@ -404,7 +392,7 @@ bool Canvas::MouseMoved(float x, float y)
 
    if (mDragCanvasMoving && (GetKeyModifiers() & kModifier_Alt))
    {
-      
+
       ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
       ofVec2f delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
 
@@ -438,15 +426,15 @@ bool Canvas::MouseMoved(float x, float y)
          float originalViewHeight = mDragZoomStartDimensions.y;
          float originalViewCenterY = mDragCanvasStartCanvasPos.y;
          float newViewHeight = MAX((1 + delta.y / mHeight) * originalViewHeight, .01f);
-         mRowOffset = int(ofClamp(originalViewCenterY - newViewHeight * (mDragCanvasStartMousePos.y / mHeight), 0, mNumRows-1) + .5f);
-         mNumVisibleRows = int(ofClamp(originalViewCenterY + newViewHeight * (1 - mDragCanvasStartMousePos.y / mHeight), mRowOffset+1, mNumRows) + .5f) - mRowOffset;
+         mRowOffset = int(ofClamp(originalViewCenterY - newViewHeight * (mDragCanvasStartMousePos.y / mHeight), 0, mNumRows - 1) + .5f);
+         mNumVisibleRows = int(ofClamp(originalViewCenterY + newViewHeight * (1 - mDragCanvasStartMousePos.y / mHeight), mRowOffset + 1, mNumRows) + .5f) - mRowOffset;
       }
    }
    else
    {
       mDragCanvasZooming = false;
    }
-   
+
    return false;
 }
 
@@ -467,11 +455,11 @@ void Canvas::MouseReleased()
    mClick = false;
    mClickedElement = nullptr;
    mDragEnd = kHighlightEnd_None;
-   
+
    if (mDragSelecting)
    {
       std::vector<CanvasElement*> selectedElements;
-      for (int i=(int)mElements.size()-1; i>=0; --i)
+      for (int i = (int)mElements.size() - 1; i >= 0; --i)
       {
          if (mElements[i]->GetRect(true, false).intersects(mDragSelectRect) ||
              (mWrap && mElements[i]->GetRect(true, true).intersects(mDragSelectRect)))
@@ -487,7 +475,7 @@ void Canvas::MouseReleased()
    mDragCanvasZooming = false;
 }
 
-bool Canvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (GetKeyModifiers() & kModifier_Alt)
    {
@@ -500,7 +488,7 @@ bool Canvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
       float canvasX, canvasY;
       GetPosition(canvasX, canvasY, false);
       ofVec2f canvasPos = ofVec2f(ofMap(x, canvasX, canvasX + GetWidth(), 0, 1),
-         ofMap(y, canvasY, canvasY + GetHeight(), 0, 1));
+                                  ofMap(y, canvasY, canvasY + GetHeight(), 0, 1));
       if (IsInUnitBox(canvasPos))
       {
          float zoomCenter = ofLerp(mViewStart, mViewEnd, canvasPos.x);
@@ -519,7 +507,7 @@ bool Canvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
    else
    {
       if (x >= GetPosition(false).x && y >= GetPosition(false).y &&
-         x < GetPosition(false).x + GetWidth() && y < GetPosition(false).y + GetHeight())
+          x < GetPosition(false).x + GetWidth() && y < GetPosition(false).y + GetHeight())
       {
          mScrollVerticalPartial -= scrollY;
          int scrollWhole = int(mScrollVerticalPartial);
@@ -548,7 +536,7 @@ void Canvas::KeyPressed(int key, bool isRepeat)
       {
          if (mControls)
             mControls->SetElement(nullptr);
-         
+
          std::vector<CanvasElement*> toRemove;
          for (auto element : mElements)
          {
@@ -577,6 +565,10 @@ void Canvas::KeyPressed(int key, bool isRepeat)
       if (key == OF_KEY_UP || key == OF_KEY_DOWN)
       {
          int direction = (key == OF_KEY_UP) ? -1 : 1;
+
+         if (GetKeyModifiers() == kModifier_Shift)
+            direction *= 12; //octave
+
          for (auto* element : mElements)
          {
             if (element->GetHighlighted())
@@ -621,7 +613,7 @@ juce::MouseCursor Canvas::GetMouseCursorType()
 
 CanvasElement* Canvas::GetElementAt(float pos, int row)
 {
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
    {
       if (mElements[i]->mRow == row && pos >= mElements[i]->GetStart() && pos < mElements[i]->GetEnd())
          return mElements[i];
@@ -633,11 +625,11 @@ CanvasElement* Canvas::GetElementAt(float pos, int row)
 
 void Canvas::FillElementsAt(float pos, std::vector<CanvasElement*>& elementsAt) const
 {
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
    {
       if (mElements[i]->mRow == -1 || mElements[i]->mCol == -1 || mElements[i]->mRow >= elementsAt.size())
          continue;
-      
+
       bool on = false;
       if (pos >= mElements[i]->GetStart() && pos < mElements[i]->GetEnd())
          on = true;
@@ -677,7 +669,7 @@ CanvasCoord Canvas::GetCoordAt(int x, int y)
       int row = (y / GetHeight()) * GetNumVisibleRows() + mRowOffset;
       return CanvasCoord(col, row);
    }
-   return CanvasCoord(-1,-1);
+   return CanvasCoord(-1, -1);
 }
 
 void Canvas::Clear()
@@ -687,19 +679,21 @@ void Canvas::Clear()
 
 namespace
 {
-   const int kSaveStateRev = 2;
+   const int kSaveStateRev = 3;
 }
 
 void Canvas::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
-   
+
    out << mNumCols;
    out << mNumRows;
    out << mNumVisibleRows;
    out << mRowOffset;
+   out << mLoopStart;
+   out << mLoopEnd;
    out << (int)mElements.size();
-   for (int i=0; i<mElements.size(); ++i)
+   for (int i = 0; i < mElements.size(); ++i)
    {
       out << mElements[i]->mCol;
       out << mElements[i]->mRow;
@@ -712,23 +706,28 @@ void Canvas::LoadState(FileStreamIn& in, bool shouldSetValue)
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
+
    in >> mNumCols;
    in >> mNumRows;
    in >> mNumVisibleRows;
    in >> mRowOffset;
+   if (rev >= 3)
+   {
+      in >> mLoopStart;
+      in >> mLoopEnd;
+   }
    mElements.clear();
    int size;
    in >> size;
-   for (int i=0; i<size; ++i)
+   for (int i = 0; i < size; ++i)
    {
-      int col=0,row=0;
+      int col = 0, row = 0;
       if (rev >= 2)
       {
          in >> col;
          in >> row;
       }
-      CanvasElement* element = mElementCreator(this,col,row);
+      CanvasElement* element = mElementCreator(this, col, row);
       element->LoadState(in);
       mElements.push_back(element);
    }

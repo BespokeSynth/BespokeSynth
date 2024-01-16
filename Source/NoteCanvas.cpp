@@ -36,30 +36,11 @@
 #include "CanvasTimeline.h"
 #include "CanvasScrollbar.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 NoteCanvas::NoteCanvas()
-: mCanvas(nullptr)
-, mCanvasControls(nullptr)
-, mCanvasTimeline(nullptr)
-, mCanvasScrollbarHorizontal(nullptr)
-, mCanvasScrollbarVertical(nullptr)
-, mNumMeasuresSlider(nullptr)
-, mNumMeasures(1)
-, mQuantizeButton(nullptr)
-, mPlay(true)
-, mPlayCheckbox(nullptr)
-, mRecord(false)
-, mRecordCheckbox(nullptr)
-, mStopQueued(false)
-, mInterval(kInterval_8n)
-, mIntervalSelector(nullptr)
-, mFreeRecordCheckbox(nullptr)
-, mFreeRecord(false)
-, mFreeRecordStartMeasure(0)
-, mClipButton(nullptr)
-, mShowIntervals(false)
 {
-   SetEnabled(true);
-   mVoiceModulations.resize(kNumVoices+1);
+   mVoiceModulations.resize(kNumVoices + 1);
 }
 
 void NoteCanvas::Init()
@@ -72,16 +53,19 @@ void NoteCanvas::Init()
 void NoteCanvas::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mQuantizeButton = new ClickButton(this,"quantize",160,5);
+
+   mQuantizeButton = new ClickButton(this, "quantize", 160, 5);
+   mSaveMidiButton = new ClickButton(this, "save midi", 228, 5);
+   mLoadMidiButton = new ClickButton(this, "load midi", 290, 5);
+   mLoadMidiTrackEntry = new TextEntry(this, "loadtrack", 350, 5, 3, &mLoadMidiTrack, 0, 127);
    //mClipButton = new ClickButton(this,"clip",220,5);
-   mPlayCheckbox = new Checkbox(this,"play",5,5,&mPlay);
-   mRecordCheckbox = new Checkbox(this,"rec",50,5,&mRecord);
-   mFreeRecordCheckbox = new Checkbox(this,"free rec",90,5,&mFreeRecord);
-   mNumMeasuresSlider = new IntSlider(this,"measures",5,25,100,15,&mNumMeasures,1,16);
+   mPlayCheckbox = new Checkbox(this, "play", 5, 5, &mPlay);
+   mRecordCheckbox = new Checkbox(this, "rec", 50, 5, &mRecord);
+   mFreeRecordCheckbox = new Checkbox(this, "free rec", 90, 5, &mFreeRecord);
+   mNumMeasuresSlider = new IntSlider(this, "measures", 5, 25, 100, 15, &mNumMeasures, 1, 16);
    mShowIntervalsCheckbox = new Checkbox(this, "show chord intervals", 160, 25, &mShowIntervals);
-   
-   mIntervalSelector = new DropdownList(this,"interval",110,25,(int*)(&mInterval));
+
+   mIntervalSelector = new DropdownList(this, "interval", 110, 25, (int*)(&mInterval));
    mIntervalSelector->AddLabel("4n", kInterval_4n);
    mIntervalSelector->AddLabel("4nt", kInterval_4nt);
    mIntervalSelector->AddLabel("8n", kInterval_8n);
@@ -90,8 +74,8 @@ void NoteCanvas::CreateUIControls()
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
-   
-   mCanvas = new Canvas(this, 5, 55, 390, 200, L(length,1), L(rows,128), L(cols,16), &(NoteCanvasElement::Create));
+
+   mCanvas = new Canvas(this, 5, 55, 390, 200, L(length, 1), L(rows, 128), L(cols, 16), &(NoteCanvasElement::Create));
    AddUIControl(mCanvas);
    mCanvas->SetNumVisibleRows(16);
    mCanvas->SetRowOffset(60);
@@ -100,7 +84,7 @@ void NoteCanvas::CreateUIControls()
    mCanvasControls->CreateUIControls();
    AddChild(mCanvasControls);
    UpdateNumColumns();
-   
+
    mCanvas->SetListener(this);
 
    mCanvasTimeline = new CanvasTimeline(mCanvas, "timeline");
@@ -122,10 +106,10 @@ NoteCanvas::~NoteCanvas()
 void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
-   
+
    if (!mEnabled || !mRecord)
       return;
-   
+
    if (mInputNotes[pitch]) //handle note-offs or retriggers
    {
       double endPos = GetCurPos(time);
@@ -134,68 +118,35 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       mInputNotes[pitch]->SetEnd(endPos);
       mInputNotes[pitch] = nullptr;
    }
-   
+
    if (velocity > 0)
    {
       if (mFreeRecord && mFreeRecordStartMeasure == -1)
          mFreeRecordStartMeasure = TheTransport->GetMeasure(time);
-      
+
       double measurePos = GetCurPos(time) * mNumMeasures;
-      NoteCanvasElement* element = AddNote(measurePos, pitch, velocity, 1/mCanvas->GetNumCols(), voiceIdx, modulation);
+      NoteCanvasElement* element = AddNote(measurePos, pitch, velocity, 1 / mCanvas->GetNumCols(), voiceIdx, modulation);
       mInputNotes[pitch] = element;
-      mCanvas->SetRowOffset(element->mRow - mCanvas->GetNumVisibleRows()/2);
+      mCanvas->SetRowOffset(element->mRow - mCanvas->GetNumVisibleRows() / 2);
    }
 }
 
 void NoteCanvas::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
-
-   if (TheSynth->GetLastClickedModule() == this)
-   {
-      if (key == OF_KEY_UP || key == OF_KEY_DOWN || key == OF_KEY_RIGHT || key == OF_KEY_LEFT)
-      {
-         int directionUpDown = 0;
-         int directionLeftRight = 0;
-         if (key == OF_KEY_UP)
-            directionUpDown = -1;
-         if (key == OF_KEY_DOWN)
-            directionUpDown = 1;
-         if (key == OF_KEY_LEFT)
-            directionLeftRight = -1;
-         if (key == OF_KEY_RIGHT)
-            directionLeftRight = 1;
-         
-         if (GetKeyModifiers() == kModifier_Shift)
-            directionUpDown *= 12; //octave
-         
-         for (auto element : mCanvas->GetElements())
-         {
-            if (element->GetHighlighted())
-            {
-               element->mRow = ofClamp(element->mRow + directionUpDown, 0, 127);
-               element->mCol = ofClamp(element->mCol + directionLeftRight, 0, mCanvas->GetNumCols()-1);
-            }
-         }
-      }
-      else
-      {
-         mCanvas->KeyPressed(key, isRepeat);
-      }
-   }
 }
 
 bool NoteCanvas::FreeRecordParityMatched()
 {
-   int currentMeasureParity = (TheTransport->GetMeasure(gTime) % (mNumMeasures*2)) / mNumMeasures;
-   int recordStartMeasureParity = (mFreeRecordStartMeasure % (mNumMeasures*2)) / mNumMeasures;
+   int currentMeasureParity = (TheTransport->GetMeasure(gTime) % (mNumMeasures * 2)) / mNumMeasures;
+   int recordStartMeasureParity = (mFreeRecordStartMeasure % (mNumMeasures * 2)) / mNumMeasures;
    return currentMeasureParity == recordStartMeasureParity;
 }
 
 void NoteCanvas::OnTransportAdvanced(float amount)
 {
    PROFILER(NoteCanvas);
-   
+
    if (mFreeRecord && mFreeRecordStartMeasure != -1)
    {
       if (TheTransport->GetMeasurePos(gTime) < amount &&
@@ -206,20 +157,20 @@ void NoteCanvas::OnTransportAdvanced(float amount)
             mNumMeasures *= 2;
          int shift = mFreeRecordStartMeasure % mNumMeasures - mFreeRecordStartMeasure % oldNumMeasures;
          SetNumMeasures(mNumMeasures);
-         
+
          for (auto* element : mCanvas->GetElements())
             element->SetStart(element->GetStart() + float(shift) / mNumMeasures, true);
       }
    }
-   
+
    if (mStopQueued)
    {
-      mNoteOutput.Flush(gTime);
-      for (int i=0; i<mCurrentNotes.size(); ++i)
+      mNoteOutput.Flush(NextBufferTime(false));
+      for (int i = 0; i < mCurrentNotes.size(); ++i)
          mCurrentNotes[i] = nullptr;
       mStopQueued = false;
    }
-   
+
    if (!mEnabled || !mPlay)
    {
       mCanvas->SetCursorPos(-1);
@@ -230,17 +181,17 @@ void NoteCanvas::OnTransportAdvanced(float amount)
    //if (Transport::sDoEventLookahead)??? should we?
    //   cursorPlayTime += Transport::sEventEarlyMs;
    //else
-      cursorPlayTime += amount * TheTransport->MsPerBar();
+   cursorPlayTime += amount * TheTransport->MsPerBar();
    double curPos = GetCurPos(cursorPlayTime);
-   
+
    mCanvas->FillElementsAt(curPos, mNoteChecker);
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
    {
       int pitch = 128 - i - 1;
       bool wasOn = mCurrentNotes[pitch] != nullptr || mInputNotes[pitch];
       bool nowOn = mNoteChecker[i] != nullptr || mInputNotes[pitch];
       bool hasChanged = (nowOn || wasOn) && mCurrentNotes[pitch] != static_cast<NoteCanvasElement*>(mNoteChecker[i]);
-      
+
       if (wasOn && mInputNotes[pitch] == nullptr && hasChanged)
       {
          //note off
@@ -268,14 +219,14 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          if (time > gTime)
          {
             mCurrentNotes[pitch] = note;
-            mNoteOutput.PlayNote(time, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan()));
+            mNoteOutput.PlayNote(time, pitch, note->GetVelocity() * 127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan()));
          }
       }
-      
+
       mNoteChecker[i] = nullptr;
    }
-   
-   for (int pitch=0; pitch<128; ++pitch)
+
+   for (int pitch = 0; pitch < 128; ++pitch)
    {
       if (mInputNotes[pitch])
       {
@@ -283,13 +234,13 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          if (mInputNotes[pitch]->GetStart() > endPos)
             endPos += 1; //wrap
          mInputNotes[pitch]->SetEnd(endPos);
-         
+
          int modIdx = mInputNotes[pitch]->GetVoiceIdx();
          if (modIdx == -1)
             modIdx = kNumVoices;
-         float bend = 0;
-         float mod = 0;
-         float pressure = 0;
+         float bend = ModulationParameters::kDefaultPitchBend;
+         float mod = ModulationParameters::kDefaultModWheel;
+         float pressure = ModulationParameters::kDefaultPressure;
          if (mVoiceModulations[modIdx].pitchBend)
             bend = mVoiceModulations[modIdx].pitchBend->GetValue(0);
          if (mVoiceModulations[modIdx].modWheel)
@@ -320,23 +271,26 @@ void NoteCanvas::UpdateNumColumns()
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval) / 4);
 }
 
-void NoteCanvas::Clear()
+void NoteCanvas::Clear(double time)
 {
-   for (int pitch=0; pitch<128; ++pitch)
+   bool wasPlaying = mPlay;
+   mPlay = false;
+   for (int pitch = 0; pitch < 128; ++pitch)
    {
       mInputNotes[pitch] = nullptr;
       mCurrentNotes[pitch] = nullptr;
    }
-   mNoteOutput.Flush(gTime);
+   mNoteOutput.Flush(time);
    mCanvas->Clear();
+   mPlay = wasPlaying;
 }
 
-NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx/*=-1*/, ModulationParameters modulation/* = ModulationParameters()*/)
+NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx /*=-1*/, ModulationParameters modulation /* = ModulationParameters()*/)
 {
    double canvasPos = measurePos / mNumMeasures * mCanvas->GetNumCols();
    int col = int(canvasPos + .5f); //round off
-   int row = mCanvas->GetNumRows()-pitch-1;
-   NoteCanvasElement* element = static_cast<NoteCanvasElement*>(mCanvas->CreateElement(col,row));
+   int row = mCanvas->GetNumRows() - pitch - 1;
+   NoteCanvasElement* element = static_cast<NoteCanvasElement*>(mCanvas->CreateElement(col, row));
    element->mOffset = canvasPos - element->mCol; //the rounded off part
    element->mLength = length / mNumMeasures * mCanvas->GetNumCols();
    element->SetVelocity(velocity / 127.0f);
@@ -346,7 +300,7 @@ NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocit
       modIdx = kNumVoices;
    mVoiceModulations[modIdx] = modulation;
    mCanvas->AddElement(element);
-   
+
    return element;
 }
 
@@ -355,7 +309,7 @@ void NoteCanvas::FitNotes()
    float latest = 0.0;
    for (auto* element : mCanvas->GetElements())
    {
-      if(element->GetEnd() > latest)
+      if (element->GetEnd() > latest)
          latest = element->GetEnd();
    }
    SetNumMeasures(static_cast<int>(std::ceil(latest)));
@@ -365,7 +319,6 @@ void NoteCanvas::CanvasUpdated(Canvas* canvas)
 {
    if (canvas == mCanvas)
    {
-      
    }
 }
 
@@ -373,42 +326,42 @@ void NoteCanvas::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    ofPushStyle();
    ofFill();
-   for (int i=0;i<128;++i)
+   for (int i = 0; i < 128; ++i)
    {
-      int pitch = 127-i;
-      if (pitch%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot() % TheScale->GetPitchesPerOctave())
+      int pitch = 127 - i;
+      if (pitch % TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot() % TheScale->GetPitchesPerOctave())
          mCanvas->SetRowColor(i, ofColor(0, 255, 0, 80));
-      else if (pitch%TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot() + 7) % TheScale->GetPitchesPerOctave())
+      else if (pitch % TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot() + 7) % TheScale->GetPitchesPerOctave())
          mCanvas->SetRowColor(i, ofColor(200, 150, 0, 80));
       else if (TheScale->IsInScale(pitch))
          mCanvas->SetRowColor(i, ofColor(100, 75, 0, 80));
       else
-         mCanvas->SetRowColor(i, ofColor(100,100,100,30));
+         mCanvas->SetRowColor(i, ofColor(100, 100, 100, 30));
    }
    ofPopStyle();
-   
+
    mCanvas->SetCursorPos(GetCurPos(gTime));
-   
+
    mCanvas->Draw();
    mCanvasTimeline->Draw();
    mCanvasScrollbarHorizontal->Draw();
    mCanvasScrollbarVertical->Draw();
-   
+
    ofPushStyle();
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
-   for (int i=0;i<mCanvas->GetNumVisibleRows();++i)
+   for (int i = 0; i < mCanvas->GetNumVisibleRows(); ++i)
    {
-      int pitch = 127-mCanvas->GetRowOffset()-i;
-      float boxHeight = (float(mCanvas->GetHeight())/mCanvas->GetNumVisibleRows());
-      float y = mCanvas->GetPosition(true).y + i*boxHeight;
+      int pitch = 127 - mCanvas->GetRowOffset() - i;
+      float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
+      float y = mCanvas->GetPosition(true).y + i * boxHeight;
       float scale = MIN(boxHeight, 20);
-      DrawTextNormal(NoteName(pitch,false,true) + "("+ ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale/8) + boxHeight, scale);
+      DrawTextNormal(NoteName(pitch, false, true) + "(" + ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale / 8) + boxHeight, scale);
    }
    ofPopStyle();
-   
+
    if (mShowIntervals)
    {
       ofPushMatrix();
@@ -465,9 +418,12 @@ void NoteCanvas::DrawModule()
       ofPopStyle();
       ofPopMatrix();
    }
-   
+
    mCanvasControls->Draw();
    mQuantizeButton->Draw();
+   mSaveMidiButton->Draw();
+   mLoadMidiButton->Draw();
+   mLoadMidiTrackEntry->Draw();
    //mClipButton->Draw();
    mPlayCheckbox->Draw();
    mRecordCheckbox->Draw();
@@ -475,7 +431,7 @@ void NoteCanvas::DrawModule()
    mNumMeasuresSlider->Draw();
    mIntervalSelector->Draw();
    mShowIntervalsCheckbox->Draw();
-   
+
    if (mRecord)
    {
       ofPushStyle();
@@ -523,11 +479,11 @@ void NoteCanvas::SetNumMeasures(int numMeasures)
 void NoteCanvas::SetRecording(bool rec)
 {
    mRecord = rec;
-   
+
    if (mRecord)
       mPlay = true;
-   
-   for (int pitch=0; pitch<128; ++pitch)
+
+   for (int pitch = 0; pitch < 128; ++pitch)
       mInputNotes[pitch] = nullptr;
 }
 
@@ -557,12 +513,12 @@ void NoteCanvas::ClipNotes()
    {
       for (auto* remove : toDelete)
          mCanvas->RemoveElement(remove);
-      
+
       int earliestMeasure = int(earliest * mNumMeasures);
       int latestMeasure = int(latest * mNumMeasures) + 1;
       int clipStart = 0;
       int clipEnd = mNumMeasures;
-      
+
       while (earliestMeasure - clipStart >= (clipEnd - clipStart) / 2 ||
              clipEnd - latestMeasure >= (clipEnd - clipStart) / 2)
       {
@@ -571,13 +527,13 @@ void NoteCanvas::ClipNotes()
          if (clipEnd - latestMeasure >= (clipEnd - clipStart) / 2)
             clipEnd -= (clipEnd - clipStart) / 2;
       }
-      
+
       SetNumMeasures(clipEnd - clipStart);
-      
+
       ofLog() << earliest << " " << latest << " " << clipStart << " " << clipEnd;
-      
+
       int shift = -clipStart;
-      
+
       for (auto* element : mCanvas->GetElements())
          element->SetStart(element->GetStart() + float(shift) / mNumMeasures, true);
    }
@@ -604,13 +560,102 @@ void NoteCanvas::QuantizeNotes()
    }
 }
 
-void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
+void NoteCanvas::LoadMidi()
+{
+   using namespace juce;
+   String file_pattern = "*.mid;*.midi";
+   if (File::areFileNamesCaseSensitive())
+      file_pattern += ";" + file_pattern.toUpperCase();
+   FileChooser chooser("Load midi", File(ofToDataPath("")), file_pattern, true, false, TheSynth->GetFileChooserParent());
+   if (chooser.browseForFileToOpen())
+   {
+      bool wasPlaying = mPlay;
+      mPlay = false;
+
+      Clear(NextBufferTime(false));
+      SetNumMeasures(1);
+      File file = chooser.getResult();
+      FileInputStream inputStream(file);
+      MidiFile midifile;
+      if (midifile.readFrom(inputStream))
+      {
+         midifile.convertTimestampTicksToSeconds();
+         int ticksPerQuarterNote = midifile.getTimeFormat();
+         int trackToGet = 0;
+         if (midifile.getNumTracks() > 1)
+            trackToGet = mLoadMidiTrack;
+         const MidiMessageSequence* trackSequence = midifile.getTrack(trackToGet);
+         for (int eventIndex = 0; eventIndex < trackSequence->getNumEvents(); eventIndex++)
+         {
+            MidiMessageSequence::MidiEventHolder* noteEvent = trackSequence->getEventPointer(eventIndex);
+            if (noteEvent->noteOffObject)
+            {
+               int note = noteEvent->message.getNoteNumber();
+               int veloc = noteEvent->message.getVelocity() * 1.27;
+               double start = noteEvent->message.getTimeStamp() / ticksPerQuarterNote / TheTransport->CountInStandardMeasure(kInterval_4n);
+               double end = noteEvent->noteOffObject->message.getTimeStamp() / ticksPerQuarterNote / TheTransport->CountInStandardMeasure(kInterval_4n);
+               double length = end - start;
+               AddNote(start, note, veloc, length, -1, ModulationParameters());
+            }
+         }
+         float latest = 0.0;
+         for (auto* element : mCanvas->GetElements())
+         {
+            if (element->GetEnd() > latest)
+               latest = element->GetEnd();
+         }
+         mNumMeasuresSlider->SetExtents(0, static_cast<int>(std::ceil(latest)));
+         FitNotes();
+      }
+
+      mPlay = wasPlaying;
+   }
+}
+
+void NoteCanvas::SaveMidi()
+{
+   using namespace juce;
+   constexpr static int ticksPerQuarterNote = 960;
+
+   FileChooser chooser("Save midi", File(ofToDataPath("midi")), "*.mid", true, false, TheSynth->GetFileChooserParent());
+   if (chooser.browseForFileToSave(true))
+   {
+      MidiFile midifile;
+      midifile.setTicksPerQuarterNote(ticksPerQuarterNote);
+      MidiMessageSequence track1;
+      MidiMessage trackTimeSig = MidiMessage::timeSignatureMetaEvent(TheTransport->GetTimeSigTop(), TheTransport->GetTimeSigBottom());
+      track1.addEvent(trackTimeSig);
+      for (auto* element : mCanvas->GetElements())
+      {
+         NoteCanvasElement* noteOnElement = static_cast<NoteCanvasElement*>(element);
+         int noteNumber = mCanvas->GetNumRows() - noteOnElement->mRow - 1;
+         float noteStart = (element->mCol + element->mOffset) * ticksPerQuarterNote *
+                           +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
+         float velocity = noteOnElement->GetVelocity();
+         MidiMessage messageOn = MidiMessage::noteOn(1, noteNumber, velocity);
+         messageOn.setTimeStamp(noteStart);
+         track1.addEvent(messageOn);
+         float noteEnd = (element->mCol + element->mOffset + element->mLength) * ticksPerQuarterNote *
+                         +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
+         MidiMessage messageOff = MidiMessage::noteOff(1, noteNumber, velocity);
+         messageOff.setTimeStamp(noteEnd);
+         track1.addEvent(messageOff);
+      }
+      midifile.addTrack(track1);
+      std::string savePath = chooser.getResult().getFullPathName().toStdString();
+      File f(savePath);
+      FileOutputStream out(f);
+      midifile.writeTo(out);
+   }
+}
+
+void NoteCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      for (int pitch=0; pitch<128; ++pitch)
+      for (int pitch = 0; pitch < 128; ++pitch)
          mInputNotes[pitch] = nullptr;
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
    }
    if (checkbox == mPlayCheckbox)
    {
@@ -634,20 +679,26 @@ void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void NoteCanvas::ButtonClicked(ClickButton* button)
+void NoteCanvas::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mQuantizeButton)
       QuantizeNotes();
-   
+
    if (button == mClipButton)
       ClipNotes();
+
+   if (button == mLoadMidiButton)
+      LoadMidi();
+
+   if (button == mSaveMidiButton)
+      SaveMidi();
 }
 
-void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mNumMeasuresSlider)
    {
@@ -655,7 +706,7 @@ void NoteCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void NoteCanvas::DropdownUpdated(DropdownList* list, int oldVal)
+void NoteCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
    {
@@ -668,7 +719,7 @@ void NoteCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("canvaswidth", moduleInfo, 390, 390, 99999, K(isTextField));
    mModuleSaveData.LoadFloat("canvasheight", moduleInfo, 200, 40, 99999, K(isTextField));
-   
+
    SetUpFromSaveData();
 }
 
@@ -680,22 +731,22 @@ void NoteCanvas::SetUpFromSaveData()
 
 void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
    moduleInfo["canvaswidth"] = mCanvas->GetWidth();
    moduleInfo["canvasheight"] = mCanvas->GetHeight();
 }
 
 void NoteCanvas::SaveState(FileStreamOut& out)
 {
+   out << GetModuleSaveStateRev();
+
    IDrawableModule::SaveState(out);
-   
+
    mCanvas->SaveState(out);
 }
 
-void NoteCanvas::LoadState(FileStreamIn& in)
+void NoteCanvas::LoadState(FileStreamIn& in, int rev)
 {
-   IDrawableModule::LoadState(in);
-   
+   IDrawableModule::LoadState(in, rev);
+
    mCanvas->LoadState(in);
 }

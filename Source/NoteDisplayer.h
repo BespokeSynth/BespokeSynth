@@ -34,24 +34,35 @@ class NoteDisplayer : public NoteEffectBase, public IDrawableModule
 public:
    NoteDisplayer() = default;
    static IDrawableModule* Create() { return new NoteDisplayer(); }
-   
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 110; height = 60; }
-   bool Enabled() const override { return true; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    void DrawNoteName(int pitch, float y) const;
-   
-   int mVelocities[127]{};
+
+   float mWidth{ 110 };
+   float mHeight{ 60 };
+   int mVelocities[128]{};
 };
 
 #endif /* defined(__Bespoke__NoteDisplayer__) */

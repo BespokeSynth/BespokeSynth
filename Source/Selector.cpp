@@ -38,57 +38,32 @@ Selector::~Selector()
 void Selector::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mSelector = new RadioButton(this,"selector",3,3,&mCurrentValue);
+
+   mSelector = new RadioButton(this, "selector", 3, 3, &mCurrentValue);
 }
 
 void Selector::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   for (int i=0; i<mControlCables.size(); ++i)
+
+   for (int i = 0; i < (int)mControlCables.size(); ++i)
    {
-      mControlCables[i]->SetManualPosition(GetRect(true).width - 5, 3+RadioButton::GetSpacing()*(i+.5f));
+      mControlCables[i]->SetManualPosition(GetRect(true).width - 5, 3 + RadioButton::GetSpacing() * (i + .5f));
    }
-   
+
    mSelector->Draw();
 }
 
 void Selector::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (!fromUserClick)
-      return;
-
-   for (int i=0; i<mControlCables.size(); ++i)
-   {
-      if (mControlCables[i] == cableSource)
-      {
-         if (i == mControlCables.size() - 1)
-         {
-            if (cableSource->GetTarget())
-            {
-               PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
-               AddPatchCableSource(cable);
-               mControlCables.push_back(cable);
-            }
-         }
-         else if (cableSource->GetTarget() == nullptr)
-         {
-            RemoveFromVector(cableSource, mControlCables);
-         }
-         
-         SyncList();
-         
-         break;
-      }
-   }
+   SyncList();
 }
 
 void Selector::SyncList()
 {
    mSelector->Clear();
-   for (int i=0; i<mControlCables.size()-1; ++i)
+   for (int i = 0; i < (int)mControlCables.size(); ++i)
    {
       std::string controlName = "";
       if (mControlCables[i]->GetTarget())
@@ -101,41 +76,42 @@ void Selector::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
 {
    int range = (int)mControlCables.size() - 1;
    if (velocity > 0 && range > 0)
-      SetIndex(pitch % range);
+      SetIndex(pitch % range, time);
 }
 
-void Selector::RadioButtonUpdated(RadioButton* radio, int oldVal)
+void Selector::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
-   SetIndex(mCurrentValue);
+   SetIndex(mCurrentValue, time);
 }
 
-void Selector::SetIndex(int index)
+void Selector::SetIndex(int index, double time)
 {
    mCurrentValue = index;
 
-   IUIControl* controlToEnable = nullptr;
-   for (int i=0; i<mControlCables.size(); ++i)
+   std::vector<IUIControl*> controlsToEnable;
+   for (int i = 0; i < (int)mControlCables.size(); ++i)
    {
-      IUIControl* uicontrol = nullptr;
-      if (mControlCables[i]->GetTarget())
-         uicontrol = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
-      if (uicontrol)
+      for (auto* cable : mControlCables[i]->GetPatchCables())
       {
-         if (mCurrentValue == i)
-            controlToEnable = uicontrol;
-         else
-            uicontrol->SetValue(0);
+         IUIControl* uicontrol = dynamic_cast<IUIControl*>(cable->GetTarget());
+         if (uicontrol)
+         {
+            if (mCurrentValue == i)
+               controlsToEnable.push_back(uicontrol);
+            else
+               uicontrol->SetValue(0, time);
+         }
       }
    }
-   
-   if (controlToEnable)
-      controlToEnable->SetValue(1);
+
+   for (auto* control : controlsToEnable)
+      control->SetValue(1, time);
 }
 
 namespace
 {
    const float extraW = 20;
-   const float extraH = 6 + RadioButton::GetSpacing();
+   const float extraH = 6;
 }
 
 void Selector::GetModuleDimensions(float& width, float& height)
@@ -144,46 +120,37 @@ void Selector::GetModuleDimensions(float& width, float& height)
    height = mSelector->GetRect().height + extraH;
 }
 
-void Selector::SaveLayout(ofxJSONElement& moduleInfo)
-{
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   moduleInfo["uicontrols"].resize((unsigned int)mControlCables.size()-1);
-   for (int i=0; i<mControlCables.size()-1; ++i)
-   {
-      std::string controlName = "";
-      if (mControlCables[i]->GetTarget())
-         controlName = mControlCables[i]->GetTarget()->Path();
-      moduleInfo["uicontrols"][i] = controlName;
-   }
-}
-
 void Selector::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   const Json::Value& controls = moduleInfo["uicontrols"];
-   
-   for (int i=0; i<controls.size(); ++i)
-   {
-      std::string controlPath = controls[i].asString();
-      IUIControl* control = nullptr;
-      if (!controlPath.empty())
-         control = TheSynth->FindUIControl(controlPath);
-      PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
-      AddPatchCableSource(cable);
-      cable->SetTarget(control);
-      mControlCables.push_back(cable);
-   }
-   
-   //add extra cable
-   PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
-   AddPatchCableSource(cable);
-   mControlCables.push_back(cable);
-   
-   SyncList();
-   
+   mModuleSaveData.LoadInt("num_items", moduleInfo, 2, 1, 99, K(isTextField));
+
+   if (!moduleInfo["uicontrols"].isNull()) //handling for older revision loading
+      mModuleSaveData.SetInt("num_items", (int)moduleInfo["uicontrols"].size());
+
    SetUpFromSaveData();
 }
 
 void Selector::SetUpFromSaveData()
 {
+   int numItems = mModuleSaveData.GetInt("num_items");
+   int oldNumItems = (int)mControlCables.size();
+   if (numItems > oldNumItems)
+   {
+      for (int i = oldNumItems; i < numItems; ++i)
+      {
+         PatchCableSource* cable = new PatchCableSource(this, kConnectionType_ValueSetter);
+         AddPatchCableSource(cable);
+         mControlCables.push_back(cable);
+      }
+   }
+   else if (numItems < oldNumItems)
+   {
+      for (int i = oldNumItems - 1; i >= numItems; --i)
+      {
+         RemovePatchCableSource(mControlCables[i]);
+      }
+      mControlCables.resize(numItems);
+   }
+
+   SyncList();
 }

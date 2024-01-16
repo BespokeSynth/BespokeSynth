@@ -31,11 +31,7 @@
 #include "UIControlMacros.h"
 
 UnstablePitch::UnstablePitch()
-   : mPerlin(.2f, .1f, 0)
-   , mModulation(false)
-   , mVoiceRoundRobin(0)
 {
-
    for (int voice = 0; voice < kNumVoices; ++voice)
       mModulation.GetPitchBend(voice)->CreateBuffer();
 }
@@ -71,7 +67,7 @@ void UnstablePitch::DrawModule()
       return;
 
    ofPushStyle();
-   ofRectangle rect(3, 3, mWidth-6, 34);
+   ofRectangle rect(3, 3, mWidth - 6, 34);
    const int kGridSize = 30;
    ofFill();
    for (int col = 0; col < kGridSize; ++col)
@@ -93,7 +89,7 @@ void UnstablePitch::DrawModule()
          for (int i = 0; i < gBufferSize; ++i)
          {
             float sample = ofClamp(mModulation.GetPitchBend(voice)->GetBufferValue(i) * 5, -1, 1);
-            ofVertex((i*rect.width) / gBufferSize + rect.x, rect.y + (-sample * .5f + .5f) * rect.height);
+            ofVertex((i * rect.width) / gBufferSize + rect.x, rect.y + (-sample * .5f + .5f) * rect.height);
          }
          ofEndShape();
       }
@@ -144,7 +140,7 @@ void UnstablePitch::PlayNote(double time, int pitch, int velocity, int voiceIdx,
 
       mIsVoiceUsed[voiceIdx] = velocity > 0;
       mPitchToVoice[pitch] = (velocity > 0) ? voiceIdx : -1;
-   
+
       mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
       modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
    }
@@ -172,11 +168,11 @@ void UnstablePitch::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetPitchBend(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void UnstablePitch::CheckboxUpdated(Checkbox* checkbox)
+void UnstablePitch::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -199,5 +195,3 @@ void UnstablePitch::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-
-

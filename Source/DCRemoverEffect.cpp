@@ -28,11 +28,9 @@
 
 DCRemoverEffect::DCRemoverEffect()
 {
-   SetEnabled(true);
-   
-   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
    {
-      mBiquad[i].SetFilterParams(10, sqrt(2)/2);
+      mBiquad[i].SetFilterParams(10, sqrt(2) / 2);
       mBiquad[i].SetFilterType(kFilterType_Highpass);
       mBiquad[i].UpdateFilterCoeff();
    }
@@ -45,13 +43,13 @@ DCRemoverEffect::~DCRemoverEffect()
 void DCRemoverEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    PROFILER(DCRemoverEffect);
-   
+
    if (!mEnabled)
       return;
-   
+
    float bufferSize = buffer->BufferSize();
-   
-   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+
+   for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       mBiquad[ch].Filter(buffer->GetChannel(ch), bufferSize);
 }
 
@@ -72,7 +70,7 @@ void DCRemoverEffect::GetModuleDimensions(float& width, float& height)
    height = 0;
 }
 
-void DCRemoverEffect::CheckboxUpdated(Checkbox* checkbox)
+void DCRemoverEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

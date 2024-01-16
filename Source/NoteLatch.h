@@ -36,23 +36,30 @@ class NoteLatch : public NoteEffectBase, public IDrawableModule
 public:
    NoteLatch();
    static IDrawableModule* Create() { return new NoteLatch(); }
-   
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 0; }
-   bool Enabled() const override { return mEnabled; }
-   
-   bool mNoteState[128];
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 90;
+      height = 0;
+   }
+
+   bool mNoteState[128]{};
 };

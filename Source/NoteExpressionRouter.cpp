@@ -36,32 +36,32 @@ NoteExpressionRouter::NoteExpressionRouter()
    mSymbolTable.add_variable("p", mSTNote);
    mSymbolTable.add_variable("v", mSTVelocity);
 
-   for (auto i=0; i<kMaxDestinations; ++i)
+   for (auto i = 0; i < kMaxDestinations; ++i)
    {
       mExpressions[i].register_symbol_table(mSymbolTable);
       auto p = exprtk::parser<float>();
-      p.compile( "1", mExpressions[i]);
+      p.compile("1", mExpressions[i]);
    }
 }
 
 void NoteExpressionRouter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   for (int i=0; i<kMaxDestinations; ++i)
+   for (int i = 0; i < kMaxDestinations; ++i)
    {
-      TEXTENTRY(mExpressionWidget[i],("expression"+ofToString(i)).c_str(),30, mExpressionText[i]);
+      TEXTENTRY(mExpressionWidget[i], ("expression" + ofToString(i)).c_str(), 30, mExpressionText[i]);
       mDestinationCables[i] = new AdditionalNoteCable();
       mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1,0));
+      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
       AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
       ofRectangle rect = mExpressionWidget[i]->GetRect(true);
-      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height/2);
+      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
    }
-   ENDUIBLOCK(mWidth,mHeight);
+   ENDUIBLOCK(mWidth, mHeight);
    mWidth += 20;
-   
+
    GetPatchCableSource()->SetEnabled(false);
 }
 
@@ -69,8 +69,8 @@ void NoteExpressionRouter::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   for (int i=0; i<kMaxDestinations; ++i)
+
+   for (int i = 0; i < kMaxDestinations; ++i)
       mExpressionWidget[i]->Draw();
 }
 
@@ -78,7 +78,7 @@ void NoteExpressionRouter::PlayNote(double time, int pitch, int velocity, int vo
 {
    mSTNote = pitch;
    mSTVelocity = velocity;
-   for (auto i=0; i<kMaxDestinations; ++i)
+   for (auto i = 0; i < kMaxDestinations; ++i)
    {
       auto rt = mExpressions[i].value();
       if (rt != 0)
@@ -104,23 +104,22 @@ void NoteExpressionRouter::SetUpFromSaveData()
 
 void NoteExpressionRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
 }
 
-void NoteExpressionRouter::TextEntryComplete(TextEntry *entry) {
+void NoteExpressionRouter::TextEntryComplete(TextEntry* entry)
+{
    if (strlen(entry->GetText()) == 0)
       return;
 
-   for (auto i=0; i<kMaxDestinations; ++i)
+   for (auto i = 0; i < kMaxDestinations; ++i)
    {
       if (entry == mExpressionWidget[i])
       {
          auto p = exprtk::parser<float>();
-         if (!p.compile( entry->GetText(), mExpressions[i]))
+         if (!p.compile(entry->GetText(), mExpressions[i]))
          {
             ofLog() << "Error parsing expression '" << entry->GetText() << "' " << p.error();
          }
       }
    }
-
 }

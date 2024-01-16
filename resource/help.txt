@@ -1,32 +1,38 @@
 
-navigation
+Navigation
    * space bar + move mouse to pan, or right-click drag in empty space
    * space bar + mousewheel/trackpad-scroll to zoom, or scroll in empty space
    * if you get lost, press ~ to bring up the console, type "home", and press enter to reset to the initial position and zoom
    * if you have enabled the minimap in the settings, you can click on the minimap to directly go to a location
-      -at the bottom of the mimimap you can click on 9 bookmark buttons
+      -at the bottom of the minimap you can click on 9 bookmark buttons
       -hold shift while clicking will store your current location into that bookmark button
       -use shift+[num] to go to the specified bookmark
 
 
-creating modules
+Creating Modules
    * drag items out of the top bar menus
        OR
+   * right-click and select from the popup menu
+       OR
+   * right-click and start typing the name of the module you want, then drag it out of the popup menu
+       OR
    * hold the first letter of a module and drag them out of the popup menu
+       OR
+   * drag a cable into space and spawn a connecting module from the popup
    * to delete a module, lasso select + backspace OR use the triangle menu and choose "delete module"
    * to duplicate a module, hold alt/option and drag from the title bar
 
 
-patching
+Patching
    * drag the circle from the bottom of a module to the target OR click the circle then click the target to patch
    * drag a cable and press backspace to unpatch
    * hold shift while grabbing a patch cable circle to split
    * hold shift while releasing a patch cable on a target to insert
-   * drag a module by the title bar and touch its circle to another module, or the mouse pointer to another module's circle,
+   * while holding shift, drag a module by the title bar and touch its circle to another module, or the mouse pointer to another module's circle,
        to quick patch
 
 
-ui controls
+UI Controls
    * click or drag a slider to adjust its value
    * hold shift to fine-tune
    * while hovered:
@@ -42,15 +48,17 @@ ui controls
            the modulation max
    * hold ctrl/command and click the lower or upper half of a slider to adjust that slider's minimum or maximum value, to
        give it increased or reduced range   (warning! increasing range can lead to unpredictable behavior in some cases)
+   * press tab to cycle through controls on a module
+   * press ctrl/command+arrows to navigate around controls on a module
 
 
-saving
+Saving
    * "write audio" button: write the last 30 minutes of audio to the /data/recordings folder, perfect for making sure you don't
        miss any cool moments
    * "save state" button: save the current layout to a file. shortcut: ctrl-s
    * "load state" button: load previously saved layouts. shortcut: ctrl-l
 
-key commands
+Key Commands
    * ctrl/command-'s': save
    * ctrl/command-'l': load
    * shift-'p': pause audio processing. this will stop all audio output. press shift-'p' again to resume

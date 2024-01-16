@@ -30,10 +30,9 @@
 
 GridControlTarget::GridControlTarget(IGridControllerListener* owner, const char* name, int x, int y)
 : mOwner(owner)
-, mGridController(nullptr)
 {
    SetName(name);
-   SetPosition(x,y);
+   SetPosition(x, y);
    dynamic_cast<IDrawableModule*>(owner)->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
 }
@@ -41,16 +40,16 @@ GridControlTarget::GridControlTarget(IGridControllerListener* owner, const char*
 void GridControlTarget::Render()
 {
    ofPushStyle();
-   
+
    ofNoFill();
    ofSetLineWidth(2);
-   ofSetColor(200,200,200,gModuleDrawAlpha);
-   ofCircle(mX+6,mY+8,5);
-   
+   ofSetColor(200, 200, 200, gModuleDrawAlpha);
+   ofCircle(mX + 6, mY + 8, 5);
+
    DrawGridIcon(mX + 15, mY + 2);
-   
+
    DrawPatchCableHover();
-   
+
    ofPopStyle();
 }
 
@@ -58,13 +57,13 @@ void GridControlTarget::Render()
 void GridControlTarget::DrawGridIcon(float x, float y)
 {
    ofPushStyle();
-   
+
    ofSetLineWidth(1);
    float gridSize = 12;
    ofRect(x, y, gridSize, gridSize, 0);
-   ofRect(x+gridSize/3, y, gridSize/3, 12, 0);
-   ofRect(x, y+gridSize/3, 12, gridSize/3, 0);
-   
+   ofRect(x + gridSize / 3, y, gridSize / 3, 12, 0);
+   ofRect(x, y + gridSize / 3, 12, gridSize / 3, 0);
+
    ofPopStyle();
 }
 
@@ -99,25 +98,16 @@ void GridControlTarget::LoadState(FileStreamIn& in, bool shouldSetValue)
 //----------------
 
 GridControllerMidi::GridControllerMidi()
-: mMessageType(kMidiMessage_Note)
-, mMidiController(nullptr)
-, mControllerPage(0)
-, mRows(8)
-, mCols(8)
-, mOwner(nullptr)
 {
-   std::memset(mControls, 0, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
-   std::memset(mInput, 0, sizeof(float)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
-   std::memset(mLights, 0, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
 }
 
 void GridControllerMidi::OnControllerPageSelected()
 {
    mOwner->OnControllerPageSelected();
-   
-   for (int i=0; i<mCols; ++i)
+
+   for (int i = 0; i < mCols; ++i)
    {
-      for (int j=0; j<mRows; ++j)
+      for (int j = 0; j < mRows; ++j)
       {
          SetLightDirect(i, j, mLights[i][j], K(force));
       }
@@ -129,9 +119,9 @@ void GridControllerMidi::OnInput(int control, float velocity)
    int x;
    int y;
    bool found = false;
-   for (x=0;x<mCols;++x)
+   for (x = 0; x < mCols; ++x)
    {
-      for (y=0;y<mRows;++y)
+      for (y = 0; y < mRows; ++y)
       {
          if (mControls[x][y] == control)
          {
@@ -142,11 +132,11 @@ void GridControllerMidi::OnInput(int control, float velocity)
       if (found)
          break;
    }
-   
+
    if (found)
    {
       mInput[x][y] = velocity;
-      
+
       if (mOwner)
          mOwner->OnGridButton(x, y, velocity, this);
    }
@@ -154,9 +144,9 @@ void GridControllerMidi::OnInput(int control, float velocity)
 
 bool GridControllerMidi::HasInput() const
 {
-   for (int i=0; i<mCols; ++i)
+   for (int i = 0; i < mCols; ++i)
    {
-      for (int j=0; j<mRows; ++j)
+      for (int j = 0; j < mRows; ++j)
       {
          if (mInput[i][j] > 0)
          {
@@ -164,7 +154,7 @@ bool GridControllerMidi::HasInput() const
          }
       }
    }
-   
+
    return false;
 }
 
@@ -172,17 +162,17 @@ void GridControllerMidi::SetLight(int x, int y, GridColor color, bool force)
 {
    if (x >= mCols || y >= mRows)
       return;
-   
+
    int colorIdx = (int)color;
    int rawColor = 0;
    if (mColors.size())
    {
-      if (colorIdx >= mColors.size())  //we don't have this many colors
+      if (colorIdx >= mColors.size()) //we don't have this many colors
       {
          while (colorIdx >= mColors.size())
             colorIdx -= 2; //move back by two to retain bright/dimness
          if (colorIdx <= 0)
-            colorIdx = 1;  //never set a non-off light to "off"
+            colorIdx = 1; //never set a non-off light to "off"
       }
       rawColor = mColors[colorIdx];
    }
@@ -190,7 +180,7 @@ void GridControllerMidi::SetLight(int x, int y, GridColor color, bool force)
    {
       rawColor = colorIdx > 0 ? 127 : 0;
    }
-   
+
    SetLightDirect(x, y, rawColor, force);
 }
 
@@ -211,11 +201,11 @@ void GridControllerMidi::SetLightDirect(int x, int y, int color, bool force)
 
 void GridControllerMidi::ResetLights()
 {
-   for (int i=0; i<mCols; ++i)
+   for (int i = 0; i < mCols; ++i)
    {
-      for (int j=0; j<mRows; ++j)
+      for (int j = 0; j < mRows; ++j)
       {
-         SetLight(i,j,kGridColorOff);
+         SetLight(i, j, kGridColorOff);
       }
    }
 }
@@ -224,22 +214,22 @@ void GridControllerMidi::SetUp(GridLayout* layout, int page, MidiController* con
 {
    mRows = layout->mRows;
    mCols = layout->mCols;
-   for (unsigned int row=0; row<mRows; ++row)
+   for (unsigned int row = 0; row < mRows; ++row)
    {
-      for (unsigned int col=0; col<mCols; ++col)
-      {  
+      for (unsigned int col = 0; col < mCols; ++col)
+      {
          int index = col + row * mCols;
          mControls[col][row] = layout->mControls[index];
       }
    }
-   
+
    mColors = layout->mColors;
-   
+
    mMessageType = layout->mType;
-   
+
    mMidiController = controller;
    mControllerPage = page;
-   
+
    OnControllerPageSelected();
 }
 

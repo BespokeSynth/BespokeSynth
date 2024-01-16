@@ -38,20 +38,7 @@
 #endif
 
 LinnstrumentControl::LinnstrumentControl()
-: mControllerIndex(-1)
-, mControllerList(nullptr)
-, mDevice(this)
-, mDecayMs(500)
-, mDecaySlider(nullptr)
-, mRequestedOctaveTime(0)
-, mBlackout(false)
-, mBlackoutCheckbox(nullptr)
-, mLightOctaves(false)
-, mLightOctavesCheckbox(nullptr)
-, mLinnstrumentOctave(5)
-, mGuitarLines(false)
-, mGuitarLinesCheckbox(nullptr)
-, mControlPlayedLights(true)
+: mDevice(this)
 {
    TheScale->AddListener(this);
 
@@ -67,8 +54,8 @@ LinnstrumentControl::~LinnstrumentControl()
 void LinnstrumentControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mControllerList = new DropdownList(this,"controller",5,5,&mControllerIndex);
-   mDecaySlider = new FloatSlider(this,"decay",mControllerList,kAnchor_Below,100,15,&mDecayMs,0,2000);
+   mControllerList = new DropdownList(this, "controller", 5, 5, &mControllerIndex);
+   mDecaySlider = new FloatSlider(this, "decay", mControllerList, kAnchor_Below, 100, 15, &mDecayMs, 0, 2000);
    mBlackoutCheckbox = new Checkbox(this, "blackout", mDecaySlider, kAnchor_Below, &mBlackout);
    mLightOctavesCheckbox = new Checkbox(this, "octaves", mBlackoutCheckbox, kAnchor_Below, &mLightOctaves);
    mGuitarLinesCheckbox = new Checkbox(this, "guitar lines", mBlackoutCheckbox, kAnchor_Right, &mGuitarLines);
@@ -77,18 +64,18 @@ void LinnstrumentControl::CreateUIControls()
 void LinnstrumentControl::Init()
 {
    IDrawableModule::Init();
-   
+
    InitController();
 }
 
 void LinnstrumentControl::Poll()
 {
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
       mNoteAge[i].Update(i, this);
-   
+
    if (gTime - mRequestedOctaveTime > 2000)
    {
-      SendNRPN(299, 36);   //request left split octave
+      SendNRPN(299, 36); //request left split octave
       mRequestedOctaveTime = gTime;
    }
 }
@@ -96,9 +83,9 @@ void LinnstrumentControl::Poll()
 void LinnstrumentControl::InitController()
 {
    BuildControllerList();
-   
+
    const std::vector<std::string>& devices = mDevice.GetPortList(false);
-   for (int i=0; i<devices.size(); ++i)
+   for (int i = 0; i < devices.size(); ++i)
    {
       if (strstr(devices[i].c_str(), "LinnStrument") != nullptr)
       {
@@ -115,7 +102,7 @@ void LinnstrumentControl::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mControllerList->Draw();
    mDecaySlider->Draw();
    mBlackoutCheckbox->Draw();
@@ -127,7 +114,7 @@ void LinnstrumentControl::BuildControllerList()
 {
    mControllerList->Clear();
    const std::vector<std::string>& devices = mDevice.GetPortList(false);
-   for (int i=0; i<devices.size(); ++i)
+   for (int i = 0; i < devices.size(); ++i)
       mControllerList->AddLabel(devices[i].c_str(), i);
 }
 
@@ -139,11 +126,11 @@ void LinnstrumentControl::OnScaleChanged()
 void LinnstrumentControl::UpdateScaleDisplay()
 {
    //SendScaleInfo();
-   
-   for (int y=0; y<kRows; ++y)
+
+   for (int y = 0; y < kRows; ++y)
    {
-      mDevice.SendCC(21, y);  //only set row once, to cut down on messages
-      for (int x=0; x<kCols; ++x)
+      mDevice.SendCC(21, y); //only set row once, to cut down on messages
+      for (int x = 0; x < kCols; ++x)
       {
          SetGridColor(x, y, GetDesiredGridColor(x, y), true);
       }
@@ -169,7 +156,7 @@ LinnstrumentControl::LinnstrumentColor LinnstrumentControl::GetDesiredGridColor(
 {
    if (mBlackout)
       return kLinnColor_Black;
-   
+
    if (mGuitarLines)
    {
       if (x % 2 == 1)
@@ -200,10 +187,10 @@ LinnstrumentControl::LinnstrumentColor LinnstrumentControl::GetDesiredGridColor(
          colors[1] = kLinnColor_Green;
          colors[2] = kLinnColor_Cyan;
          colors[3] = kLinnColor_Blue;
-         
-         int horizontalIndex = x/2;
-         int verticalIndex = (7-y)/2;
-         
+
+         int horizontalIndex = x / 2;
+         int verticalIndex = (7 - y) / 2;
+
          return colors[(horizontalIndex + verticalIndex) % 4];
       }
       else
@@ -211,8 +198,8 @@ LinnstrumentControl::LinnstrumentColor LinnstrumentControl::GetDesiredGridColor(
          return kLinnColor_Black;
       }
    }
-   
-   int pitch = GridToPitch(x,y);
+
+   int pitch = GridToPitch(x, y);
    if (TheScale->IsRoot(pitch))
       return kLinnColor_Green;
    if (TheScale->IsInPentatonic(pitch))
@@ -229,9 +216,9 @@ int LinnstrumentControl::GridToPitch(int x, int y)
 
 void LinnstrumentControl::SetPitchColor(int pitch, LinnstrumentColor color)
 {
-   for (int y=0; y<kRows; ++y)
+   for (int y = 0; y < kRows; ++y)
    {
-      for (int x=0; x<kCols; ++x)
+      for (int x = 0; x < kCols; ++x)
       {
          if (GridToPitch(x, y) == pitch)
             SetGridColor(x, y, (color == kLinnColor_Off) ? GetDesiredGridColor(x, y) : color);
@@ -276,7 +263,7 @@ void LinnstrumentControl::SendScaleInfo()
    225    0-1     Global Accent Note Light A# (0: Off, 1: On)
    226    0-1     Global Accent Note Light B (0: Off, 1: On)
    */
-   
+
    const unsigned char setMainNoteBase = 203;
    const unsigned char setAccentNoteBase = 215;
    if (TheScale->GetPitchesPerOctave() == 12) //linnstrument only works with 12-tet
@@ -286,21 +273,21 @@ void LinnstrumentControl::SendScaleInfo()
          //set main note
          int number = setMainNoteBase + pitch;
          SendNRPN(number, TheScale->IsInScale(pitch));
-         
+
 #if BESPOKE_WINDOWS
          _sleep(10);
 #else
          usleep(10000);
 #endif
-         
+
          //set accent note
          number = setAccentNoteBase + pitch;
          SendNRPN(number, TheScale->IsRoot(pitch));
-         
+
 #if BESPOKE_WINDOWS
          _sleep(10);
 #else
-         usleep(10000);         
+         usleep(10000);
 #endif
       }
    }
@@ -323,7 +310,7 @@ void LinnstrumentControl::PlayNote(double time, int pitch, int velocity, int voi
       voiceIdx = 0;
 
    mModulators[voiceIdx] = modulation;
-   
+
    if (pitch >= 0 && pitch < 128)
    {
       mNoteAge[pitch].mTime = velocity > 0 ? -1 : time;
@@ -350,16 +337,16 @@ void LinnstrumentControl::OnMidiControl(MidiControl& control)
    if (control.mControl == 38)
    {
       mLastReceivedNRPNValueLSB = control.mValue;
-      
+
       int nrpnParam = mLastReceivedNRPNParamMSB << 7 | mLastReceivedNRPNParamLSB;
       int nrpnValue = mLastReceivedNRPNValueMSB << 7 | mLastReceivedNRPNValueLSB;
-      
+
       if (nrpnParam == 36)
          mLinnstrumentOctave = nrpnValue;
    }
 }
 
-void LinnstrumentControl::DropdownUpdated(DropdownList* list, int oldVal)
+void LinnstrumentControl::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mControllerList)
    {
@@ -373,7 +360,7 @@ void LinnstrumentControl::DropdownClicked(DropdownList* list)
    BuildControllerList();
 }
 
-void LinnstrumentControl::CheckboxUpdated(Checkbox* checkbox)
+void LinnstrumentControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mBlackoutCheckbox)
    {
@@ -381,7 +368,7 @@ void LinnstrumentControl::CheckboxUpdated(Checkbox* checkbox)
          mGuitarLines = false;
       UpdateScaleDisplay();
    }
-   
+
    if (checkbox == mGuitarLinesCheckbox)
    {
       if (mGuitarLines)
@@ -404,7 +391,7 @@ void LinnstrumentControl::NoteAge::Update(int pitch, LinnstrumentControl* linnst
 {
    if (!linnstrument->mControlPlayedLights)
       return;
-   
+
    float age = gTime - mTime;
    LinnstrumentColor newColor;
    if (mTime < 0 || age < 0)
@@ -417,22 +404,22 @@ void LinnstrumentControl::NoteAge::Update(int pitch, LinnstrumentControl* linnst
       newColor = kLinnColor_Blue;
    else
       newColor = kLinnColor_Off;
-   
+
    if (mVoiceIndex != -1 && linnstrument->mModulators[mVoiceIndex].pitchBend)
    {
       float bendRounded = round(linnstrument->mModulators[mVoiceIndex].pitchBend->GetValue(0));
       pitch += (int)bendRounded;
    }
-   
+
    if (newColor != mColor || pitch != mOutputPitch)
    {
-      for (int i=-2; i<=2; ++i)
+      for (int i = -2; i <= 2; ++i)
       {
          if (i != 0 && !linnstrument->mLightOctaves)
             continue;
-         
+
          LinnstrumentColor color = newColor;
-         
+
          if (i != 0)
          {
             if (mTime < 0 || age < 0)
@@ -440,7 +427,7 @@ void LinnstrumentControl::NoteAge::Update(int pitch, LinnstrumentControl* linnst
             else
                color = kLinnColor_Off;
          }
-         
+
          if (pitch != mOutputPitch)
             linnstrument->SetPitchColor(mOutputPitch + i * TheScale->GetPitchesPerOctave(), kLinnColor_Off);
          linnstrument->SetPitchColor(pitch + i * TheScale->GetPitchesPerOctave(), color);

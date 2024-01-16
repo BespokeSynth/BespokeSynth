@@ -36,37 +36,39 @@ class Selector : public IDrawableModule, public IRadioButtonListener, public INo
 {
 public:
    Selector();
-   ~Selector();
+   ~Selector() override;
    static IDrawableModule* Create() { return new Selector(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   
+
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    void SyncList();
-   void SetIndex(int index);
-   
-   RadioButton* mSelector;
-   int mCurrentValue;
-   
+   void SetIndex(int index, double time);
+
+   RadioButton* mSelector{ nullptr };
+   int mCurrentValue{ 0 };
+
    std::vector<PatchCableSource*> mControlCables;
 };
 

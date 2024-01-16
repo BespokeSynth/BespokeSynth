@@ -45,8 +45,10 @@ public:
    LooperGranulator();
    virtual ~LooperGranulator();
    static IDrawableModule* Create() { return new LooperGranulator(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
-   
    void CreateUIControls() override;
 
    void ProcessFrame(double time, float bufferOffset, float* output);
@@ -55,10 +57,10 @@ public:
    bool ShouldFreeze() { return mOn && mFreeze; }
    void OnCommit();
 
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -67,29 +69,30 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
 
-   float mWidth;
-   float mHeight;
-   PatchCableSource* mLooperCable;
-   Looper* mLooper;
-   bool mOn;
-   Checkbox* mOnCheckbox;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   PatchCableSource* mLooperCable{ nullptr };
+   Looper* mLooper{ nullptr };
+   bool mOn{ false };
+   Checkbox* mOnCheckbox{ nullptr };
    Granulator mGranulator;
-   FloatSlider* mGranOverlap;
-   FloatSlider* mGranSpeed;
-   FloatSlider* mGranLengthMs;
-   float mDummyPos;
-   FloatSlider* mPosSlider;
-   bool mFreeze;
-   Checkbox* mFreezeCheckbox;
-   FloatSlider* mGranPosRandomize;
-   FloatSlider* mGranSpeedRandomize;
-   FloatSlider* mGranSpacingRandomize;
-   Checkbox* mGranOctaveCheckbox;
-   FloatSlider* mGranWidthSlider;
+   FloatSlider* mGranOverlap{ nullptr };
+   FloatSlider* mGranSpeed{ nullptr };
+   FloatSlider* mGranLengthMs{ nullptr };
+   float mDummyPos{ 0 };
+   FloatSlider* mPosSlider{ nullptr };
+   bool mFreeze{ false };
+   Checkbox* mFreezeCheckbox{ nullptr };
+   FloatSlider* mGranPosRandomize{ nullptr };
+   FloatSlider* mGranSpeedRandomize{ nullptr };
+   FloatSlider* mGranSpacingRandomize{ nullptr };
+   Checkbox* mGranOctaveCheckbox{ nullptr };
+   FloatSlider* mGranWidthSlider{ nullptr };
 };

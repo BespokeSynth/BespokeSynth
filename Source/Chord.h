@@ -44,12 +44,16 @@ struct Chord
 {
    Chord() {}
    Chord(std::string name);
-   Chord(int pitch, ChordType type, int inversion = 0) : mRootPitch(pitch), mType(type), mInversion(inversion) {}
-   
-   int mRootPitch;
-   ChordType mType;
-   int mInversion;
-   
+   Chord(int pitch, ChordType type, int inversion = 0)
+   : mRootPitch(pitch)
+   , mType(type)
+   , mInversion(inversion)
+   {}
+
+   int mRootPitch{ 0 };
+   ChordType mType{ kChord_Unknown };
+   int mInversion{ 0 };
+
    std::string Name(bool withDegree, bool withAccidentals, ScalePitches* scale = nullptr);
    void SetFromDegreeAndScale(int degree, const ScalePitches& scale, int inversion = 0);
 };

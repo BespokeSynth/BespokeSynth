@@ -36,46 +36,62 @@ struct CurvePoint
 {
 public:
    CurvePoint() {}
-   CurvePoint(float time, float value) : mTime(time), mValue(value) {}
-   float mTime;
-   float mValue;
+   CurvePoint(float time, float value)
+   : mTime(time)
+   , mValue(value)
+   {}
+   float mTime{ 0 };
+   float mValue{ 0 };
 };
 
 class Curve : public IClickable
 {
 public:
-   Curve();
+   Curve(float defaultValue);
    void AddPoint(CurvePoint point);
-   void AddPointAtEnd(CurvePoint point);  //only use this if you are sure that there are no points already added at an earlier time
+   void AddPointAtEnd(CurvePoint point); //only use this if you are sure that there are no points already added at an earlier time
    float Evaluate(float time, bool holdEndForLoop = false);
    void Render() override;
-   void SetExtents(float start, float end) { mStart = start; mEnd = end; }
+   void SetExtents(float start, float end)
+   {
+      mStart = start;
+      mEnd = end;
+   }
    void SetColor(ofColor color) { mColor = color; }
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+   void SetDimensions(float width, float height)
+   {
+      mWidth = width;
+      mHeight = height;
+   }
    void Clear();
    int GetNumPoints() const { return mNumCurvePoints; }
    CurvePoint* GetPoint(int index);
-   
+
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
-   
+
 protected:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
 private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
    int FindIndexForTime(float time);
-   std::array<CurvePoint,5000> mPoints;
-   int mNumCurvePoints;
-   float mWidth;
-   float mHeight;
-   float mStart;
-   float mEnd;
-   ofColor mColor;
-   int mLastEvalIndex;
+   std::array<CurvePoint, 5000> mPoints;
+   int mNumCurvePoints{ 0 };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   float mStart{ 0 };
+   float mEnd{ 1 };
+   ofColor mColor{ ofColor::white };
+   int mLastEvalIndex{ 0 };
+   float mDefaultValue{ 0 };
 };
 
 #endif /* defined(__Bespoke__Curve__) */

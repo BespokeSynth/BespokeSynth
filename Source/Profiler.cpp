@@ -35,8 +35,9 @@
 Profiler::Cost Profiler::sCosts[];
 bool Profiler::sEnableProfiler = false;
 
-namespace {
-   static inline uint64_t rdtscp( uint32_t & aux )
+namespace
+{
+   static inline uint64_t rdtscp(uint32_t& aux)
    {
 #if BESPOKE_WINDOWS
       unsigned __int64 i;
@@ -53,11 +54,10 @@ namespace {
 }
 
 Profiler::Profiler(const char* name, uint32_t hash)
-: mIndex(-1)
 {
    if (sEnableProfiler)
    {
-      for (int i=0; i<PROFILER_MAX_TRACK; ++i)
+      for (int i = 0; i < PROFILER_MAX_TRACK; ++i)
       {
          if (sCosts[i].mHash == hash)
          {
@@ -72,7 +72,7 @@ Profiler::Profiler(const char* name, uint32_t hash)
             break;
          }
       }
-      
+
       uint32_t aux;
       mTimerStart = rdtscp(aux);
 
@@ -88,11 +88,11 @@ Profiler::~Profiler()
    {
       uint32_t aux;
       sCosts[mIndex].mFrameCost += rdtscp(aux) - mTimerStart;
-      
+
       //struct timespec t;
       //clock_gettime(CLOCK_MONOTONIC, &t);
       //unsigned long long timerEnd = t.tv_sec * 1000000000 + t.tv_nsec;
-   
+
       //sCosts[mIndex].mFrameCost += timerEnd - mTimerStart;
    }
 }
@@ -101,7 +101,7 @@ Profiler::~Profiler()
 void Profiler::PrintCounters()
 {
    //bool printedBreak = false;
-   for (int i=0; i<PROFILER_MAX_TRACK; ++i)
+   for (int i = 0; i < PROFILER_MAX_TRACK; ++i)
    {
       if (sCosts[i].mName[0] == 0)
          break;
@@ -123,30 +123,30 @@ void Profiler::Draw()
 {
    if (!sEnableProfiler)
       return;
-   
+
    ofPushMatrix();
-   ofTranslate(30,70);
+   ofTranslate(30, 70);
    ofPushStyle();
    ofFill();
-   ofSetColor(0,0,0,140);
+   ofSetColor(0, 0, 0, 140);
    //ofRect(-5,-15,600,sCosts.size()*15+10);
    long entireFrameUs = GetSafeFrameLengthNanoseconds();
-   for (int i=0; i<PROFILER_MAX_TRACK; ++i)
+   for (int i = 0; i < PROFILER_MAX_TRACK; ++i)
    {
       if (sCosts[i].mName[0] == 0)
          break;
       const Cost& cost = sCosts[i];
       long maxCost = cost.MaxCost();
-      
-      ofSetColor(255,255,255);
-      gFont.DrawString(std::string(sCosts[i].mName)+": "+ofToString(maxCost/1000), 15, 0, 0);
-      
+
+      ofSetColor(255, 255, 255);
+      gFont.DrawString(std::string(sCosts[i].mName) + ": " + ofToString(maxCost / 1000), 15, 0, 0);
+
       if (maxCost > entireFrameUs)
-         ofSetColor(255,0,0);
+         ofSetColor(255, 0, 0);
       else
-         ofSetColor(0,255,0);
-      ofRect(250, -10,(float)maxCost / entireFrameUs * (ofGetWidth() - 300) * .1f, 10);
-      
+         ofSetColor(0, 255, 0);
+      ofRect(250, -10, (float)maxCost / entireFrameUs * (ofGetWidth() - 300) * .1f, 10);
+
       ofTranslate(0, 15);
    }
    ofPopStyle();
@@ -165,8 +165,8 @@ long Profiler::GetSafeFrameLengthNanoseconds()
 void Profiler::ToggleProfiler()
 {
    sEnableProfiler = !sEnableProfiler;
-   
-   for (int i=0; i<PROFILER_MAX_TRACK; ++i)
+
+   for (int i = 0; i < PROFILER_MAX_TRACK; ++i)
       sCosts[i].mName[0] = 0;
 }
 
@@ -182,7 +182,7 @@ void Profiler::Cost::EndFrame()
 unsigned long long Profiler::Cost::MaxCost() const
 {
    unsigned long long maxCost = 0;
-   for (int i=0; i<PROFILER_HISTORY_LENGTH; ++i)
+   for (int i = 0; i < PROFILER_HISTORY_LENGTH; ++i)
       maxCost = MAX(maxCost, mHistory[i]);
    return maxCost;
 }

@@ -31,8 +31,7 @@
 #include "ChannelBuffer.h"
 
 SampleVoice::SampleVoice(IDrawableModule* owner)
-: mPos(0)
-, mOwner(owner)
+: mOwner(owner)
 {
 }
 
@@ -53,25 +52,25 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
        mVoiceParams->mSampleData == nullptr ||
        mVoiceParams->mSampleLength == 0)
       return false;
-   
+
    float volSq = mVoiceParams->mVol * mVoiceParams->mVol;
-   
-   for (int pos=0; pos<out->BufferSize(); ++pos)
+
+   for (int pos = 0; pos < out->BufferSize(); ++pos)
    {
       if (mOwner)
          mOwner->ComputeSliders(pos);
-      
+
       if (mPos <= mVoiceParams->mSampleLength || mVoiceParams->mLoop)
       {
          float freq = TheScale->PitchToFreq(GetPitch(pos));
          float speed;
          if (mVoiceParams->mDetectedFreq != -1)
-            speed = freq/mVoiceParams->mDetectedFreq;
+            speed = freq / mVoiceParams->mDetectedFreq;
          else
-            speed = freq/TheScale->PitchToFreq(TheScale->ScaleRoot()+48);
-         
+            speed = freq / TheScale->PitchToFreq(TheScale->ScaleRoot() + 48);
+
          float sample = GetInterpolatedSample(mPos, mVoiceParams->mSampleData, mVoiceParams->mSampleLength) * mAdsr.Value(time) * volSq;
-         
+
          if (out->NumActiveChannels() == 1)
          {
             out->GetChannel(0)[pos] += sample;
@@ -81,13 +80,13 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
             out->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
             out->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
          }
-         
+
          mPos += speed;
       }
-      
+
       time += gInvSampleRateMs;
    }
-   
+
    return true;
 }
 

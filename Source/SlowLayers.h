@@ -42,36 +42,40 @@ public:
    SlowLayers();
    virtual ~SlowLayers();
    static IDrawableModule* Create() { return new SlowLayers(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void Clear();
    int NumBars() { return mNumBars; }
    void SetNumBars(int numBars);
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IAudioProcessor
    InputMode GetInputMode() override { return kInputMode_Mono; }
-   
+
    bool CheckNeedsDraw() override { return true; }
 
-   void ButtonClicked(ClickButton* button) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
 
    int LoopLength() const;
 
@@ -80,16 +84,16 @@ private:
    static const int BUFFER_W = 155;
    static const int BUFFER_H = 93;
 
-   float* mBuffer;
-   float mLoopPos;
-   int mNumBars;
-   float mVol;
-   float mFeedIn;
-   float mSmoothedVol;
-   FloatSlider* mVolSlider;
-   ClickButton* mClearButton;
-   DropdownList* mNumBarsSelector;
-   FloatSlider* mFeedInSlider;
+   float* mBuffer{ nullptr };
+   float mLoopPos{ 0 };
+   int mNumBars{ 1 };
+   float mVol{ 1 };
+   float mFeedIn{ 1 };
+   float mSmoothedVol{ 1 };
+   FloatSlider* mVolSlider{ nullptr };
+   ClickButton* mClearButton{ nullptr };
+   DropdownList* mNumBarsSelector{ nullptr };
+   FloatSlider* mFeedInSlider{ nullptr };
 };
 
 #endif /* defined(__Bespoke__SlowLayers__) */

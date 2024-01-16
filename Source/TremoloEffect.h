@@ -37,10 +37,10 @@ class TremoloEffect : public IAudioEffect, public IDropdownListener, public IFlo
 {
 public:
    TremoloEffect();
-   
+
    static IAudioEffect* Create() { return new TremoloEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -50,36 +50,41 @@ public:
    std::string GetType() override { return "tremolo"; }
 
    //IDropdownListener
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
-   float mAmount;
-   FloatSlider* mAmountSlider;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   
+   float mAmount{ 0 };
+   FloatSlider* mAmountSlider{ nullptr };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+
    LFO mLFO;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   OscillatorType mOscType;
-   DropdownList* mOscSelector;
-   FloatSlider* mDutySlider;
-   float mDuty;
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   OscillatorType mOscType{ OscillatorType::kOsc_Square };
+   DropdownList* mOscSelector{ nullptr };
+   FloatSlider* mDutySlider{ nullptr };
+   float mDuty{ .5 };
    static const int kAntiPopWindowSize = 300;
-   float mWindow[kAntiPopWindowSize];
-   int mWindowPos;
-   float mWidth;
-   float mHeight;
+   float mWindow[kAntiPopWindowSize]{};
+   int mWindowPos{ 0 };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
 
 
 #endif /* defined(__modularSynth__TremoloEffect__) */
-

@@ -34,7 +34,7 @@
 struct DropdownListElement
 {
    std::string mLabel;
-   int mValue;
+   int mValue{ 0 };
 };
 
 class DropdownList;
@@ -44,7 +44,7 @@ class IDropdownListener
 public:
    virtual ~IDropdownListener() {}
    virtual void DropdownClicked(DropdownList* list) {}
-   virtual void DropdownUpdated(DropdownList* list, int oldVal) = 0;
+   virtual void DropdownUpdated(DropdownList* list, int oldVal, double time) = 0;
 };
 
 class DropdownListModal : public IDrawableModule, public IButtonListener
@@ -56,10 +56,18 @@ public:
 
    void SetUpModal();
    void DrawModule() override;
-   void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
+   void SetDimensions(int w, int h)
+   {
+      mWidth = w;
+      mHeight = h;
+   }
    bool HasTitleBar() const override { return false; }
-   
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
    bool MouseMoved(float x, float y) override;
@@ -69,19 +77,25 @@ public:
    void SetShowPagingControls(bool show);
    void SetIsScrolling(bool scrolling) { mIsScrolling = scrolling; }
 
-   void ButtonClicked(ClickButton* button) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    int mWidth{ 1 };
    int mHeight{ 1 };
    int mColumnWidth{ 1 };
-   float mMouseX;
-   float mMouseY;
+   float mMouseX{ -1 };
+   float mMouseY{ -1 };
    DropdownList* mOwner;
    ClickButton* mPagePrevButton{ nullptr };
    ClickButton* mPageNextButton{ nullptr };
    bool mIsScrolling{ false };
+};
+
+enum class DropdownDisplayStyle
+{
+   kNormal,
+   kHamburger
 };
 
 class DropdownList : public IUIControl
@@ -91,32 +105,45 @@ public:
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
    void AddLabel(std::string label, int value);
    void RemoveLabel(int value);
+   void SetLabel(std::string label, int value);
    std::string GetLabel(int val) const;
+   void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    void DrawDropdown(int w, int h, bool isScrolling);
    bool DropdownClickedAt(int x, int y);
-   void SetIndex(int i, bool forceUpdate = false);
+   void SetIndex(int i, double time, bool forceUpdate);
    void Clear();
    void SetVar(int* var) { mVar = var; }
    EnumMap GetEnumMap();
-   void SetUnknownItemString(std::string str) { mUnknownItemString = str; CalculateWidth(); }
+   void SetUnknownItemString(std::string str)
+   {
+      mUnknownItemString = str;
+      CalculateWidth();
+   }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
-   void SetWidth(int width) { mWidth = width; }
+   void SetWidth(int width);
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
    void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
-   void SetMaxPerColumn(int max) { mMaxPerColumn = max; CalculateWidth(); }
+   void SetMaxPerColumn(int max)
+   {
+      mMaxPerColumn = max;
+      CalculateWidth();
+   }
    int GetItemIndexAt(int x, int y);
    DropdownListElement GetElement(int index) { return mElements[index]; }
    DropdownListModal* GetModalDropdown() { return &mModalList; }
    float GetMaxItemWidth() const { return mMaxItemWidth; }
    void ChangePage(int direction);
+   void AddSeparator(int index) { mSeparators.push_back(index); }
+   void ClearSeparators() { mSeparators.clear(); }
+   void CopyContentsTo(DropdownList* list) const;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
@@ -126,42 +153,44 @@ public:
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
-   
+
    void GetDimensions(float& width, float& height) override;
 
    static constexpr int kItemSpacing = 15;
    static constexpr int kPageBarSpacing = 20;
-   
+
 protected:
-   ~DropdownList();   //protected so that it can't be created on the stack
+   ~DropdownList(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    void CalcSliderVal();
    int FindItemIndex(float val) const;
-   void SetValue(int value, bool forceUpdate);
    void CalculateWidth();
    ofVec2f GetModalListPosition() const;
 
-   int mWidth;
-   int mHeight;
-   int mMaxItemWidth;
-   int mMaxPerColumn;
-   int mDisplayColumns;
-   int mTotalColumns;
-   int mCurrentPagedColumn;
-   std::vector<DropdownListElement> mElements;
+   int mWidth{ 35 };
+   int mHeight{ DropdownList::kItemSpacing };
+   int mMaxItemWidth{ 20 };
+   int mMaxPerColumn{ 40 };
+   int mDisplayColumns{ 1 };
+   int mTotalColumns{ 1 };
+   int mCurrentPagedColumn{ 0 };
+   std::vector<DropdownListElement> mElements{};
    int* mVar;
    DropdownListModal mModalList;
-   IDropdownListener* mOwner;
-   std::string mUnknownItemString;
-   bool mDrawLabel;
-   float mLabelSize;
-   float mSliderVal;
-   int mLastSetValue;
-   bool mAutoCalculateWidth;
-   bool mDrawTriangle;
-   double mLastScrolledTime;
+   bool mDropdownIsOpen{ false };
+   IDropdownListener* mOwner{ nullptr };
+   std::string mUnknownItemString{ "-----" };
+   bool mDrawLabel{ false };
+   float mLabelSize{ 0 };
+   float mSliderVal{ 0 };
+   int mLastSetValue{ 0 };
+   bool mAutoCalculateWidth{ false };
+   bool mDrawTriangle{ true };
+   double mLastScrolledTime{ -9999 };
+   std::vector<int> mSeparators;
+   DropdownDisplayStyle mDisplayStyle{ DropdownDisplayStyle::kNormal };
 };
 
 #endif /* defined(__modularSynth__DropdownList__) */

@@ -37,8 +37,10 @@ class NoteRatchet : public NoteEffectBase, public IDrawableModule, public IDropd
 public:
    NoteRatchet();
    static IDrawableModule* Create() { return new NoteRatchet(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
-   
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -46,22 +48,29 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
-   float mWidth;
-   float mHeight;
-   NoteInterval mRatchetDuration;
-   DropdownList* mRatchetDurationSelector;
-   NoteInterval mRatchetSubdivision;
-   DropdownList* mRatchetSubdivisionSelector;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+   NoteInterval mRatchetDuration{ NoteInterval::kInterval_8n };
+   DropdownList* mRatchetDurationSelector{ nullptr };
+   NoteInterval mRatchetSubdivision{ NoteInterval::kInterval_32n };
+   DropdownList* mRatchetSubdivisionSelector{ nullptr };
+   bool mSkipFirst{ false };
+   Checkbox* mSkipFirstCheckbox{ nullptr };
 };

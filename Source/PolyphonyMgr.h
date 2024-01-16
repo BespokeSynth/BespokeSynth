@@ -50,12 +50,11 @@ enum VoiceType
 
 struct VoiceInfo
 {
-   VoiceInfo() : mPitch(-1), mNoteOn(false) {}
-   
-   float mPitch;
-   IMidiVoice* mVoice;
-   double mTime;
-   bool mNoteOn;
+   float mPitch{ -1 };
+   IMidiVoice* mVoice{ nullptr };
+   double mTime{ 0 };
+   bool mNoteOn{ false };
+   float mActivity{ 0 };
 };
 
 class PolyphonyMgr
@@ -63,28 +62,29 @@ class PolyphonyMgr
 public:
    PolyphonyMgr(IDrawableModule* owner);
    ~PolyphonyMgr();
-   
+
    void Init(VoiceType type,
              IVoiceParams* mVoiceParams);
-   
+
    void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
-   void Stop(double time, int pitch);
+   void Stop(double time, int pitch, int voiceIdx);
    void Process(double time, ChannelBuffer* out, int bufferSize);
    void DrawDebug(float x, float y);
    void SetVoiceLimit(int limit) { mVoiceLimit = limit; }
    void KillAll();
    void SetOversampling(int oversampling) { mOversampling = oversampling; }
+
 private:
    VoiceInfo mVoices[kNumVoices];
-   bool mAllowStealing;
-   int mLastVoice;
-   ChannelBuffer mFadeOutBuffer;
-   ChannelBuffer mFadeOutWorkBuffer;
-   float mWorkBuffer[2048];
-   int mFadeOutBufferPos;
+   bool mAllowStealing{ true };
+   int mLastVoice{ -1 };
+   ChannelBuffer mFadeOutBuffer{ kVoiceFadeSamples };
+   ChannelBuffer mFadeOutWorkBuffer{ kVoiceFadeSamples };
+   float mWorkBuffer[2048]{};
+   int mFadeOutBufferPos{ 0 };
    IDrawableModule* mOwner;
-   int mVoiceLimit;
-   int mOversampling;
+   int mVoiceLimit{ kNumVoices };
+   int mOversampling{ 1 };
 };
 
 #endif /* defined(__additiveSynth__PolyphonyMgr__) */

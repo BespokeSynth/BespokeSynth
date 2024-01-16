@@ -32,23 +32,17 @@
 #include "UIControlMacros.h"
 
 NoteRangeFilter::NoteRangeFilter()
-: mMinPitch(24)
-, mMinPitchSlider(nullptr)
-, mMaxPitch(36)
-, mMaxPitchSlider(nullptr)
-, mWrap(false)
 {
-   SetEnabled(true);
 }
 
 void NoteRangeFilter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   INTSLIDER(mMinPitchSlider,"min",&mMinPitch,0,127);
-   INTSLIDER(mMaxPitchSlider,"max",&mMaxPitch,0,127);
-   CHECKBOX(mWrapCheckbox,"wrap",&mWrap);
+   INTSLIDER(mMinPitchSlider, "min", &mMinPitch, 0, 127);
+   INTSLIDER(mMaxPitchSlider, "max", &mMaxPitch, 0, 127);
+   CHECKBOX(mWrapCheckbox, "wrap", &mWrap);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -57,22 +51,22 @@ void NoteRangeFilter::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMinPitchSlider->Draw();
    mMaxPitchSlider->Draw();
    mWrapCheckbox->Draw();
 }
 
-void NoteRangeFilter::CheckboxUpdated(Checkbox* checkbox)
+void NoteRangeFilter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
-void NoteRangeFilter::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoteRangeFilter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mMinPitchSlider || slider == mMaxPitchSlider)
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
 }
 
 void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -87,7 +81,7 @@ void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceId
       while (pitch > mMaxPitch)
          pitch -= length;
    }
-   
+
    if (!mEnabled || (pitch >= mMinPitch && pitch <= mMaxPitch))
    {
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
@@ -97,7 +91,7 @@ void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceId
 void NoteRangeFilter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

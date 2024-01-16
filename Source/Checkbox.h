@@ -42,13 +42,13 @@ public:
    void SetDisplayText(bool display);
    void UseCircleLook(ofColor color);
    void DisableCircleLook() { mUseCircleLook = false; }
-   
+
    bool MouseMoved(float x, float y) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
    float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value) override;
+   void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return 2; }
@@ -60,28 +60,32 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
    void SetBoxSize(float size) { mHeight = size; }
-   
+
    bool CheckNeedsDraw() override;
-   
+
 protected:
-   ~Checkbox();   //protected so that it can't be created on the stack
+   ~Checkbox(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void OnClicked(float x, float y, bool right) override;
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void CalcSliderVal();
    void UpdateWidth();
 
-   float mWidth;
-   float mHeight;
-   bool* mVar;
-   IDrawableModule* mOwner;
-   bool mLastDisplayedValue;
-   bool mDisplayText;
-   bool mUseCircleLook;
+   float mWidth{ 15 };
+   float mHeight{ 15 };
+   bool* mVar{ nullptr };
+   IDrawableModule* mOwner{ nullptr };
+   bool mLastDisplayedValue{ false };
+   bool mDisplayText{ true };
+   bool mUseCircleLook{ false };
    ofColor mCustomColor;
-   float mSliderVal;
-   bool mLastSetValue;
+   float mSliderVal{ 0 };
+   bool mLastSetValue{ false };
 };
 
 #endif /* defined(__modularSynth__Checkbox__) */

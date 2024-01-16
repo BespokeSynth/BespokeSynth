@@ -36,18 +36,23 @@ class KDataArray
 {
 public:
    KDataArray() {}
-   KDataArray(uint8_t val) { mData.assign(&val, &val+1); }
-   KDataArray(uint16_t val) { mData.assign(((uint8_t*)&val), ((uint8_t*)&val)+2); }
-   KDataArray(uint32_t messageId) { mData.assign(((uint8_t*)&messageId), ((uint8_t*)&messageId)+4); }
-   KDataArray(std::string input) { mData.assign(input.c_str(), input.c_str()+input.length()+1); }
+   KDataArray(uint8_t val) { mData.assign(&val, &val + 1); }
+   KDataArray(uint16_t val) { mData.assign(((uint8_t*)&val), ((uint8_t*)&val) + 2); }
+   KDataArray(uint32_t messageId) { mData.assign(((uint8_t*)&messageId), ((uint8_t*)&messageId) + 4); }
+   KDataArray(std::string input) { mData.assign(input.c_str(), input.c_str() + input.length() + 1); }
    uint8_t* data() { return mData.data(); }
    void resize(size_t size) { mData.resize(size); }
    size_t size() const { return mData.size(); }
    bool empty() const { return mData.empty(); }
    const uint8_t& operator[](size_t i) const { return mData[i]; }
    uint8_t& operator[](size_t i) { return mData[i]; }
-   KDataArray operator+(const KDataArray& b) { mData.insert(mData.end(), b.mData.begin(), b.mData.end()); return *this; }
+   KDataArray operator+(const KDataArray& b)
+   {
+      mData.insert(mData.end(), b.mData.begin(), b.mData.end());
+      return *this;
+   }
    void operator+=(const KDataArray& b) { mData.insert(mData.end(), b.mData.begin(), b.mData.end()); }
+
 private:
    std::vector<uint8_t> mData;
 };
@@ -90,12 +95,12 @@ public:
    static KDataArray LettersToData(std::string letters);
    static uint16_t CharToSegments(char input);
    KDataArray CreateMessage(std::string type);
-   
+
    bool IsReady() const { return mState == kState_Focused; }
    void SetListener(IKontrolListener* listener) { mListener = listener; }
    void SetDisplay(const uint16_t sliders[72], std::string display);
    void SetKeyLights(ofColor keys[61]);
-   
+
 private:
    void SendMessage(std::string portName, KDataArray data);
    void CreateSender(const char* portName);
@@ -108,15 +113,15 @@ private:
    void OutputData(const KDataArray& a);
    void OutputRawData(const uint8_t* data, size_t length);
    void OutputRawData2(const uint8_t* data, size_t length); //circumvents Output() being disabled
-   
+
    enum State
    {
       kState_Initialization,
       kState_InitializeSerial,
       kState_Initialized,
       kState_Focused
-   }mState;
-   
+   } mState;
+
    std::string mSerialNumber;
    std::string mRequestPort;
    std::string mNotificationPort;
@@ -124,8 +129,8 @@ private:
    std::string mNotificationSerialPort;
    std::vector<ReplyEntry> mReplies;
    std::list<QueuedMessage> mMessageQueue;
-   std::map<std::string,ListenPort> mListenPorts;
-   std::map<std::string,SendPort> mSendPorts;
+   std::map<std::string, ListenPort> mListenPorts;
+   std::map<std::string, SendPort> mSendPorts;
    ofMutex mMessageQueueMutex;
    IKontrolListener* mListener;
 };

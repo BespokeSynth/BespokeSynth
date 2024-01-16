@@ -17,8 +17,9 @@ public:
 class PSMoveMgr
 {
 public:
-   PSMoveMgr() : mListener(NULL) {}
-   
+   PSMoveMgr()
+   {}
+
    void Setup();
    void Update();
    void Exit();
@@ -31,15 +32,15 @@ public:
    void GetAccel(int id, ofVec3f& accel);
    bool IsButtonDown(int id, PSMove_Button button);
    float GetBattery(int id);
-   
+
    void SetListener(PSMoveListener* listener) { mListener = listener; }
-   
+
 private:
    _PSMove* SetUpMove(int id);
    void SendButtonMessage(int id, std::string button, int val);
 
-   _PSMove* mMove[MAX_NUM_PS_MOVES];
-   int mButtons[MAX_NUM_PS_MOVES];
-   
-   PSMoveListener* mListener;
+   _PSMove* mMove[MAX_NUM_PS_MOVES]{};
+   int mButtons[MAX_NUM_PS_MOVES]{};
+
+   PSMoveListener* mListener{ nullptr };
 };

@@ -31,17 +31,6 @@
 #include "UIControlMacros.h"
 
 Arpeggiator::Arpeggiator()
-: mInterval(kInterval_16n)
-, mArpIndex(-1)
-, mArpString()
-, mLastPitch(-1)
-, mIntervalSelector(nullptr)
-, mArpStep(1)
-, mArpPingPongDirection(1)
-, mArpStepSlider(nullptr)
-, mCurrentOctaveOffset(0)
-, mOctaveRepeats(1)
-, mOctaveRepeatsSlider(nullptr)
 {
    TheScale->AddListener(this);
 }
@@ -58,11 +47,11 @@ void Arpeggiator::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK(3, 20, 140);
-   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval),50);
-   INTSLIDER(mArpStepSlider,"step",&mArpStep,-3,3);
-   INTSLIDER(mOctaveRepeatsSlider,"octaves",&mOctaveRepeats,1,4);
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 50);
+   INTSLIDER(mArpStepSlider, "step", &mArpStep, -3, 3);
+   INTSLIDER(mOctaveRepeatsSlider, "octaves", &mOctaveRepeats, 1, 4);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -86,20 +75,20 @@ void Arpeggiator::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   ofSetColor(255,255,255,gModuleDrawAlpha);
-   
+   ofSetColor(255, 255, 255, gModuleDrawAlpha);
+
    mIntervalSelector->Draw();
    mArpStepSlider->Draw();
    mOctaveRepeatsSlider->Draw();
-   
-   ofSetColor(200,200,200,gModuleDrawAlpha);
+
+   ofSetColor(200, 200, 200, gModuleDrawAlpha);
    std::string chord;
-   for (int i=0; i<mChord.size(); ++i)
+   for (int i = 0; i < mChord.size(); ++i)
       chord += GetArpNoteDisplay(mChord[i].pitch) + " ";
-   DrawTextNormal(chord,5,16);
-   ofSetColor(0,255,0,gModuleDrawAlpha);
+   DrawTextNormal(chord, 5, 16);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha);
    std::string pad;
-   for (int i=0; i<mChord.size(); ++i)
+   for (int i = 0; i < mChord.size(); ++i)
    {
       if (i != mArpIndex)
       {
@@ -108,7 +97,7 @@ void Arpeggiator::DrawModule()
       else
       {
          float w = gFont.GetStringWidth(pad, 15);
-         DrawTextNormal(GetArpNoteDisplay(mChord[i].pitch),5+w+pad.length()/5.0f,16);
+         DrawTextNormal(GetArpNoteDisplay(mChord[i].pitch), 5 + w + pad.length() / 5.0f, 16);
          break;
       }
    }
@@ -126,9 +115,9 @@ std::string Arpeggiator::GetArpNoteDisplay(int pitch)
    return NoteName(pitch, false, true);
 }
 
-void Arpeggiator::OnClicked(int x, int y, bool right)
+void Arpeggiator::OnClicked(float x, float y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
+   IDrawableModule::OnClicked(x, y, right);
 }
 
 void Arpeggiator::MouseReleased()
@@ -138,11 +127,11 @@ void Arpeggiator::MouseReleased()
 
 bool Arpeggiator::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
+   IDrawableModule::MouseMoved(x, y);
    return false;
 }
 
-void Arpeggiator::CheckboxUpdated(Checkbox* checkbox)
+void Arpeggiator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -150,7 +139,7 @@ void Arpeggiator::CheckboxUpdated(Checkbox* checkbox)
       mChord.clear();
       mChordMutex.unlock();
 
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
    }
 }
 
@@ -161,14 +150,14 @@ void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (velocity > 0 && !mInputNotes[pitch])
    {
       mChordMutex.lock();
-      mChord.push_back(ArpNote(pitch,velocity, voiceIdx, modulation));
+      mChord.push_back(ArpNote(pitch, velocity, voiceIdx, modulation));
       mChordMutex.unlock();
    }
-   
+
    if (velocity == 0 && mInputNotes[pitch])
    {
       mChordMutex.lock();
@@ -218,7 +207,7 @@ void Arpeggiator::OnTimeEvent(double time)
    }
    else //pingpong
    {
-      assert (mArpPingPongDirection == 1 || mArpPingPongDirection == -1);
+      assert(mArpPingPongDirection == 1 || mArpPingPongDirection == -1);
       mArpIndex += mArpPingPongDirection;
       if (mChord.size() >= 2)
       {
@@ -235,7 +224,7 @@ void Arpeggiator::OnTimeEvent(double time)
       }
       else
       {
-         mArpIndex = ofClamp(mArpIndex,0,mChord.size()-1);
+         mArpIndex = ofClamp(mArpIndex, 0, mChord.size() - 1);
       }
    }
 
@@ -248,17 +237,17 @@ void Arpeggiator::OnTimeEvent(double time)
    {
       ArpNote current = mChord[mArpIndex];
       int outPitch = current.pitch;
-         
+
       outPitch += mCurrentOctaveOffset * TheScale->GetPitchesPerOctave();
 
-      
-      if (mLastPitch == outPitch)   //same note, play noteoff first
+
+      if (mLastPitch == outPitch) //same note, play noteoff first
       {
          PlayNoteOutput(time, mLastPitch, 0, -1);
          offPitch = -1;
       }
       float pressure = current.modulation.pressure ? current.modulation.pressure->GetValue(0) : 0;
-      PlayNoteOutput(time, outPitch, ofClamp(current.vel+127*pressure,0,127), current.voiceIdx, current.modulation);
+      PlayNoteOutput(time, outPitch, ofClamp(current.vel + 127 * pressure, 0, 127), current.voiceIdx, current.modulation);
       mLastPitch = outPitch;
    }
    if (offPitch != -1)
@@ -270,23 +259,23 @@ void Arpeggiator::OnTimeEvent(double time)
 }
 
 void Arpeggiator::UpdateInterval()
-{   
+{
    TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
    if (transportListenerInfo != nullptr)
       transportListenerInfo->mInterval = mInterval;
 }
 
-void Arpeggiator::ButtonClicked(ClickButton* button)
+void Arpeggiator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void Arpeggiator::DropdownUpdated(DropdownList* list, int oldVal)
+void Arpeggiator::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mIntervalSelector)
       UpdateInterval();
 }
 
-void Arpeggiator::IntSliderUpdated(IntSlider* slider, int oldVal)
+void Arpeggiator::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mArpStepSlider)
    {
@@ -308,4 +297,3 @@ void Arpeggiator::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

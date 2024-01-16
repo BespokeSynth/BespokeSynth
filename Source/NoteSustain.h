@@ -37,39 +37,54 @@ public:
    NoteSustain();
    ~NoteSustain();
    static IDrawableModule* Create() { return new NoteSustain(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
-   void SetEnabled(bool enabled) override { mEnabled = enabled; mNoteOutput.Flush(gTime); }
-   
+
+   void SetEnabled(bool enabled) override
+   {
+      mEnabled = enabled;
+      mNoteOutput.Flush(NextBufferTime(false));
+   }
+
    void OnTransportAdvanced(float amount) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 110; height = 22; }
-   bool Enabled() const override { return mEnabled; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 110;
+      height = 22;
+   }
+
    struct QueuedNoteOff
    {
-      QueuedNoteOff(double time, double pitch, double voiceIdx) : mTime(time), mPitch(pitch), mVoiceIdx(voiceIdx) {}
-      double mTime;
-      int mPitch;
-      int mVoiceIdx;
+      QueuedNoteOff(double time, double pitch, double voiceIdx)
+      : mTime(time)
+      , mPitch(pitch)
+      , mVoiceIdx(voiceIdx)
+      {}
+      double mTime{ 0 };
+      int mPitch{ 0 };
+      int mVoiceIdx{ -1 };
    };
-   
-   float mSustain;
-   FloatSlider* mSustainSlider;
+
+   float mSustain{ .25 };
+   FloatSlider* mSustainSlider{ nullptr };
    std::list<QueuedNoteOff> mNoteOffs;
 };
 

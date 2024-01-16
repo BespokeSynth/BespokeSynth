@@ -35,7 +35,10 @@
 
 struct MatchingScale
 {
-   MatchingScale(int root, std::string type) : mRoot(root), mType(type) {}
+   MatchingScale(int root, std::string type)
+   : mRoot(root)
+   , mType(type)
+   {}
    int mRoot;
    std::string mType;
 };
@@ -45,37 +48,42 @@ class ScaleDetect : public NoteEffectBase, public IDrawableModule, public IButto
 public:
    ScaleDetect();
    static IDrawableModule* Create() { return new ScaleDetect(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+   bool IsEnabled() const override { return true; }
+
 private:
    bool ScaleSatisfied(int root, std::string type);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 140; height = 36; }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 140;
+      height = 36;
+   }
 
-   std::array<bool,128> mPitchOn{false};
-   ClickButton* mResetButton;
-   int mLastPitch;
-   bool mDoDetect;
-   bool mNeedsUpdate;
-   
-   DropdownList* mMatchesDropdown;
-   int mSelectedMatch;
+   std::array<bool, 128> mPitchOn{ false };
+   ClickButton* mResetButton{ nullptr };
+   int mLastPitch{ 0 };
+   bool mDoDetect{ true };
+   bool mNeedsUpdate{ false };
+
+   DropdownList* mMatchesDropdown{ nullptr };
+   int mSelectedMatch{ 0 };
 };
 
 #endif /* defined(__modularSynth__ScaleDetect__) */
-

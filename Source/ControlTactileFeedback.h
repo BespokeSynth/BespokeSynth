@@ -38,38 +38,43 @@ public:
    ControlTactileFeedback();
    ~ControlTactileFeedback();
    static IDrawableModule* Create() { return new ControlTactileFeedback(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   
-   void CheckboxUpdated(Checkbox* checkbox) override {}
-   
+
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& width, float& height) override { width=80; height=60; }
-   
-   float mPhase;
-   float mPhaseInc;
-   
-   
-   
-   float mVolume;
-   FloatSlider* mVolumeSlider;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 80;
+      height = 60;
+   }
+
+   float mPhase{ 0 };
+   float mPhaseInc{ 0 };
+
+
+   float mVolume{ .5 };
+   FloatSlider* mVolumeSlider{ nullptr };
 };
 
 
 #endif /* defined(__modularSynth__ControlTactileFeedback__) */
-

@@ -41,54 +41,61 @@ public:
    NoteChainNode();
    virtual ~NoteChainNode();
    static IDrawableModule* Create() { return new NoteChainNode(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return true; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void OnTimeEvent(double time) override;
    void OnTransportAdvanced(float amount) override;
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void ButtonClicked(ClickButton* button) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w=110; h=76; }
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 110;
+      h = 76;
+   }
+
    void TriggerNote(double time);
-   
-   ClickButton* mTriggerButton;
-   TextEntry* mPitchEntry;
-   FloatSlider* mVelocitySlider;
-   FloatSlider* mDurationSlider;
-   DropdownList* mNextSelector;
-   int mPitch;
-   float mVelocity;
-   float mDuration;
-   float mDurationMs;
-   NoteInterval mNextInterval;
-   float mNext;
-   double mStartTime;
-   bool mNoteOn;
-   bool mWaitingToTrigger;
-   bool mQueueTrigger;
-   PatchCableSource* mNextNodeCable;
+
+   ClickButton* mTriggerButton{ nullptr };
+   TextEntry* mPitchEntry{ nullptr };
+   FloatSlider* mVelocitySlider{ nullptr };
+   FloatSlider* mDurationSlider{ nullptr };
+   DropdownList* mNextSelector{ nullptr };
+   int mPitch{ 48 };
+   float mVelocity{ 1 };
+   float mDuration{ .25 };
+   float mDurationMs{ 50 };
+   NoteInterval mNextInterval{ NoteInterval::kInterval_8n };
+   float mNext{ 0 };
+   double mStartTime{ 0 };
+   bool mNoteOn{ false };
+   bool mWaitingToTrigger{ false };
+   bool mQueueTrigger{ false };
+   PatchCableSource* mNextNodeCable{ nullptr };
 };
 
 #endif /* defined(__Bespoke__NoteChainNode__) */

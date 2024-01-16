@@ -41,32 +41,34 @@ class ModuleSaveData
 public:
    ModuleSaveData();
    ~ModuleSaveData();
-   
+
    void Save(ofxJSONElement& moduleInfo);
-   
+
    void SetInt(std::string prop, int val);
    void SetInt(std::string prop, int val, int min, int max, bool isTextField);
    void SetFloat(std::string prop, float val);
    void SetFloat(std::string prop, float val, float min, float max, bool isTextField);
    void SetBool(std::string prop, bool val);
    void SetString(std::string prop, std::string val);
-   
+
    void SetExtents(std::string prop, float min, float max);
-   
+
    bool HasProperty(std::string prop);
    int GetInt(std::string prop);
    float GetFloat(std::string prop);
    bool GetBool(std::string prop);
    std::string GetString(std::string prop);
-   template <class T> T GetEnum(std::string prop) { return (T)GetInt(prop); }
-   
-   int LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue = 0, int min=0, int max=10, bool isTextField = false);
+   template <class T>
+   T GetEnum(std::string prop) { return (T)GetInt(prop); }
+
+   int LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue = 0, int min = 0, int max = 10, bool isTextField = false);
    int LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, IntSlider* slider, bool isTextField = false);
-   float LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue = 0, float min=0, float max=1, bool isTextField = false);
-   float LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue , FloatSlider* slider, bool isTextField = false);
+   float LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue = 0, float min = 0, float max = 1, bool isTextField = false);
+   float LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue, FloatSlider* slider, bool isTextField = false);
    bool LoadBool(std::string prop, const ofxJSONElement& moduleInfo, bool defaultValue = false);
    std::string LoadString(std::string prop, const ofxJSONElement& moduleInfo, std::string defaultValue = "", FillDropdownFn fillFn = nullptr);
-   template <class T> T LoadEnum(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, IUIControl* list = nullptr, EnumMap* map = nullptr)
+   template <class T>
+   T LoadEnum(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, IUIControl* list = nullptr, EnumMap* map = nullptr)
    {
       if (list)
          SetEnumMapFromList(prop, list);
@@ -74,9 +76,9 @@ public:
          SetEnumMap(prop, map);
       return (T)LoadInt(prop, moduleInfo, defaultValue);
    }
-   
+
    void UpdatePropertyMax(std::string prop, float max);
-   
+
    enum Type
    {
       kInt,
@@ -84,33 +86,35 @@ public:
       kBool,
       kString
    };
-   
+
    struct SaveVal
    {
-      explicit SaveVal(std::string prop) : mProperty(std::move(prop)), mString(), mMin(0), mMax(10), mIsTextField(false), mFillDropdownFn(nullptr) {}
-      
+      explicit SaveVal(std::string prop)
+      : mProperty(std::move(prop))
+      {}
+
       std::string mProperty;
-      Type mType;
-      int mInt;
-      float mFloat;
-      bool mBool;
-      char mString[MAX_TEXTENTRY_LENGTH];
-      float mMin;
-      float mMax;
-      bool mIsTextField;
+      Type mType{ kInt };
+      int mInt{ 0 };
+      float mFloat{ 0 };
+      bool mBool{ false };
+      char mString[MAX_TEXTENTRY_LENGTH]{};
+      float mMin{ 0 };
+      float mMax{ 10 };
+      bool mIsTextField{ false };
       EnumMap mEnumValues;
-      FillDropdownFn mFillDropdownFn;
+      FillDropdownFn mFillDropdownFn{ nullptr };
    };
-   
+
    std::list<SaveVal*>& GetSavedValues() { return mValues; }
 
    //generally these are only used internally, needed to expose them for a special case
    void SetEnumMapFromList(std::string prop, IUIControl* list);
    void SetEnumMap(std::string prop, EnumMap* map);
-   
+
 private:
    SaveVal* GetVal(std::string prop);
-   
+
    std::list<SaveVal*> mValues;
 };
 

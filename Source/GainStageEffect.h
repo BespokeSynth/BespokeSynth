@@ -35,8 +35,8 @@ class GainStageEffect : public IAudioEffect, public IFloatSliderListener
 public:
    GainStageEffect();
    static IAudioEffect* Create() { return new GainStageEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -44,15 +44,20 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    std::string GetType() override { return "gainstage"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=120; height=20; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mGain;
-   FloatSlider* mGainSlider;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 20;
+   }
+
+   float mGain{ 1 };
+   FloatSlider* mGainSlider{ nullptr };
 };

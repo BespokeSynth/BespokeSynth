@@ -32,37 +32,39 @@
 #define PROFILER_HISTORY_LENGTH 500
 #define PROFILER_MAX_TRACK 100
 
-#define PROFILER(profile_id) static uint32_t profile_id ## _hash = JenkinsHash(#profile_id); Profiler profilerScopeHolder(#profile_id, profile_id ## _hash)
+#define PROFILER(profile_id)                                     \
+   static uint32_t profile_id##_hash = JenkinsHash(#profile_id); \
+   Profiler profilerScopeHolder(#profile_id, profile_id##_hash)
 
 class Profiler
 {
 public:
    Profiler(const char* name, uint32_t hash);
    ~Profiler();
-   
+
    static void PrintCounters();
    static void Draw();
-   
+
    static void ToggleProfiler();
-   
+
 private:
    static long GetSafeFrameLengthNanoseconds();
-   
+
    struct Cost
    {
       void EndFrame();
       unsigned long long MaxCost() const;
-      
+
       std::string mName;
-      uint32_t mHash{0};
-      unsigned long long mFrameCost{0};
+      uint32_t mHash{ 0 };
+      unsigned long long mFrameCost{ 0 };
       unsigned long long mHistory[PROFILER_HISTORY_LENGTH]{};
-      int mHistoryIdx{0};
+      int mHistoryIdx{ 0 };
    };
-   
-   unsigned long long mTimerStart;
-   int mIndex;
-   
+
+   unsigned long long mTimerStart{ 0 };
+   int mIndex{ -1 };
+
    static Cost sCosts[PROFILER_MAX_TRACK];
    static bool sEnableProfiler;
 };

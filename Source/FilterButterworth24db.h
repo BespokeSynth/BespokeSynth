@@ -36,13 +36,13 @@ public:
    void CopyCoeffFrom(CFilterButterworth24db& other);
    float Run(float input);
    void Clear();
-   
+
 private:
-   float t0, t1, t2, t3;
-   float coef0, coef1, coef2, coef3;
-   float history1, history2, history3, history4;
-   float gain;
-   float min_cutoff, max_cutoff;
+   float t0{ 0 }, t1{ 0 }, t2{ 0 }, t3{ 0 };
+   float coef0{ 0 }, coef1{ 0 }, coef2{ 0 }, coef3{ 0 };
+   float history1{ 0 }, history2{ 0 }, history3{ 0 }, history4{ 0 };
+   float gain{ 0 };
+   float min_cutoff{ 0 }, max_cutoff{ 0 };
 };
 
 #endif /* defined(__Bespoke__FilterButterworth24db__) */

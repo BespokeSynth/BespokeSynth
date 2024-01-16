@@ -42,35 +42,41 @@ public:
    NoteHumanizer();
    ~NoteHumanizer();
    static IDrawableModule* Create() { return new NoteHumanizer(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
-private:   
+
+   bool IsEnabled() const override { return mEnabled; }
+
+private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 108; height = 40; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mTime;
-   FloatSlider* mTimeSlider;
-   float mVelocity;
-   FloatSlider* mVelocitySlider;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 108;
+      height = 40;
+   }
 
-   std::array<float, 128> mLastDelayMs;
+   float mTime{ 33 };
+   FloatSlider* mTimeSlider{ nullptr };
+   float mVelocity{ .1 };
+   FloatSlider* mVelocitySlider{ nullptr };
+
+   std::array<float, 128> mLastDelayMs{};
 };
 
 
-#endif  // NOTEHUMANIZER_H_INCLUDED
+#endif // NOTEHUMANIZER_H_INCLUDED

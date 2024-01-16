@@ -31,9 +31,6 @@
 #include "UIControlMacros.h"
 
 UnstableModWheel::UnstableModWheel()
-   : mPerlin(.2f, .1f, 0)
-   , mModulation(false)
-   , mVoiceRoundRobin(0)
 {
 
    for (int voice = 0; voice < kNumVoices; ++voice)
@@ -93,7 +90,7 @@ void UnstableModWheel::DrawModule()
          for (int i = 0; i < gBufferSize; ++i)
          {
             float sample = ofClamp(mModulation.GetModWheel(voice)->GetBufferValue(i), -1, 1);
-            ofVertex((i*rect.width) / gBufferSize + rect.x, rect.y + (1 - sample) * rect.height);
+            ofVertex((i * rect.width) / gBufferSize + rect.x, rect.y + (1 - sample) * rect.height);
          }
          ofEndShape();
       }
@@ -172,11 +169,11 @@ void UnstableModWheel::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetModWheel(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
-void UnstableModWheel::CheckboxUpdated(Checkbox* checkbox)
+void UnstableModWheel::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {

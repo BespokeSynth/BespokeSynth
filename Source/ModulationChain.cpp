@@ -25,13 +25,9 @@
 
 #include "ModulationChain.h"
 
-ModulationChain::ModulationChain()
-: mLFOAmount(0)
-, mPrev(nullptr)
-, mSidechain(nullptr)
-, mMultiplyIn(nullptr)
-, mBuffer(nullptr)
+ModulationChain::ModulationChain(float initialValue)
 {
+   mRamp.SetValue(initialValue);
    mLFO.SetMode(kLFOMode_Oscillator);
 }
 
@@ -51,7 +47,7 @@ float ModulationChain::GetValue(int samplesIn) const
 
 float ModulationChain::GetIndividualValue(int samplesIn) const
 {
-   double time = gTime + gInvSampleRateMs*samplesIn;
+   double time = gTime + gInvSampleRateMs * samplesIn;
    float value;
    if (mRamp.HasValue(time))
       value = mRamp.Value(time);
@@ -66,7 +62,7 @@ float ModulationChain::GetIndividualValue(int samplesIn) const
 
 void ModulationChain::SetValue(float value)
 {
-   mRamp.Start(gTime, value, gTime + gInvSampleRateMs*gBufferSize);
+   mRamp.Start(gTime, value, gTime + gInvSampleRateMs * gBufferSize);
 }
 
 void ModulationChain::RampValue(double time, float from, float to, double length)
@@ -110,7 +106,7 @@ void ModulationChain::FillBuffer(float* buffer)
 
 float ModulationChain::GetBufferValue(int sampleIdx)
 {
-   if (mBuffer != nullptr && sampleIdx >=0 && sampleIdx < gBufferSize)
+   if (mBuffer != nullptr && sampleIdx >= 0 && sampleIdx < gBufferSize)
       return mBuffer[sampleIdx];
    return 0;
 }
@@ -118,10 +114,10 @@ float ModulationChain::GetBufferValue(int sampleIdx)
 Modulations::Modulations(bool isGlobalEffect)
 {
    mVoiceModulations.resize(kNumVoices);
-   
+
    if (isGlobalEffect)
    {
-      for (int i=0; i<kNumVoices; ++i)
+      for (int i = 0; i < kNumVoices; ++i)
       {
          mVoiceModulations[i].mPitchBend.SetSidechain(&mGlobalModulation.mPitchBend);
          mVoiceModulations[i].mModWheel.SetSidechain(&mGlobalModulation.mModWheel);

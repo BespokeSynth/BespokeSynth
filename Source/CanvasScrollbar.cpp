@@ -30,10 +30,8 @@
 #include "ModularSynth.h"
 
 CanvasScrollbar::CanvasScrollbar(Canvas* canvas, std::string name, Style style)
-   : mClick(false)
-   , mStyle(style)
-   , mAutoHide(true)
-   , mCanvas(canvas)
+: mStyle(style)
+, mCanvas(canvas)
 {
    SetName(name.c_str());
    SetParent(canvas->GetModuleParent());
@@ -52,7 +50,7 @@ void CanvasScrollbar::Render()
       SetPosition(canvasRect.getMaxX(), canvasRect.y);
       SetDimensions(10, canvasRect.height);
    }
-   
+
    if (mAutoHide && GetBarStart() == 0)
    {
       if (mStyle == Style::kHorizontal && GetBarEnd() == mWidth)
@@ -96,7 +94,7 @@ float CanvasScrollbar::GetBarEnd() const
    return 1;
 }
 
-void CanvasScrollbar::OnClicked(int x, int y, bool right)
+void CanvasScrollbar::OnClicked(float x, float y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
@@ -132,17 +130,15 @@ bool CanvasScrollbar::MouseMoved(float x, float y)
    return false;
 }
 
-bool CanvasScrollbar::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool CanvasScrollbar::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }
 
 void CanvasScrollbar::SaveState(FileStreamOut& out)
 {
-
 }
 
 void CanvasScrollbar::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
-
 }

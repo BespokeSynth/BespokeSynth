@@ -39,37 +39,44 @@ public:
    FeedbackModule();
    virtual ~FeedbackModule();
    static IDrawableModule* Create() { return new FeedbackModule(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=115; h=125; }
-   bool Enabled() const override { return mEnabled; }
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 115;
+      h = 125;
+   }
+
    DelayEffect mDelay;
-   
-   IAudioReceiver* mFeedbackTarget;
-   PatchCableSource* mFeedbackTargetCable;
+
+   IAudioReceiver* mFeedbackTarget{ nullptr };
+   PatchCableSource* mFeedbackTargetCable{ nullptr };
    RollingBuffer mFeedbackVizBuffer;
-   float mSignalLimit;
+   float mSignalLimit{ 1 };
    double mGainScale[ChannelBuffer::kMaxNumChannels];
-   FloatSlider* mSignalLimitSlider;
+   FloatSlider* mSignalLimitSlider{ nullptr };
 };
 
 #endif /* defined(__Bespoke__FeedbackModule__) */

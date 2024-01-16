@@ -44,22 +44,24 @@ public:
    bool AlwaysOnTop() override { return true; };
    void GetDimensions(float& width, float& height) override;
    void GetDimensionsMinimap(float& width, float& height);
+
 private:
    bool IsSingleton() const override { return true; };
    bool HasTitleBar() const override { return false; };
-   void ComputeBoundingBox(ofRectangle & rect);
-   ofRectangle CoordsToMinimap(ofRectangle & boundingBox, ofRectangle & source);
-   void DrawModulesOnMinimap(ofRectangle & boundingBox);
-   void RectUnion(ofRectangle & target, ofRectangle & unionRect);
-   void OnClicked(int x, int y, bool right) override;
+   bool IsSaveable() override { return false; }
+   void ComputeBoundingBox(ofRectangle& rect);
+   ofRectangle CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& source);
+   void DrawModulesOnMinimap(ofRectangle& boundingBox);
+   void RectUnion(ofRectangle& target, ofRectangle& unionRect);
+   void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   ofVec2f CoordsToViewport(ofRectangle & boundingBox, float x, float y);
+   ofVec2f CoordsToViewport(ofRectangle& boundingBox, float x, float y);
    void ForcePosition();
 
-   bool mClick;
-   UIGrid* mGrid;
-   GridCell mHoveredBookmarkPos;
+   bool mClick{ false };
+   UIGrid* mGrid{ nullptr };
+   GridCell mHoveredBookmarkPos{ -1, -1 };
 };
 
 #endif /* defined(__Bespoke__Minimap__) */

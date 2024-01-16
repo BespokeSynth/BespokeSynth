@@ -33,8 +33,6 @@
 #include "ModulationChain.h"
 
 PitchToCV::PitchToCV()
-: mPitch(0)
-, mPitchBend(nullptr)
 {
 }
 
@@ -48,7 +46,7 @@ void PitchToCV::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
-   
+
    mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 }
@@ -57,7 +55,7 @@ void PitchToCV::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMinSlider->Draw();
    mMaxSlider->Draw();
 }
@@ -79,28 +77,18 @@ void PitchToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 float PitchToCV::Value(int samplesIn)
 {
    float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
-   return ofMap(mPitch+bend,0,127,GetMin(),GetMax(),K(clamped));
+   return ofMap(mPitch + bend, 0, 127, GetMin(), GetMax(), K(clamped));
 }
 
 void PitchToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;
 }
 
 void PitchToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
    SetUpFromSaveData();
 }
 
 void PitchToCV::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

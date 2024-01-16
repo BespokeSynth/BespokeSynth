@@ -46,79 +46,74 @@ static const double DC_OFFSET = 1.0E-25;
 //-------------------------------------------------------------
 class EnvelopeDetector
 {
-	public:
-		EnvelopeDetector(
-                       double ms = 1.0
-                       );
-		virtual ~EnvelopeDetector() {}
+public:
+   EnvelopeDetector(double ms = 1.0);
+   virtual ~EnvelopeDetector() {}
 
-		// time constant
-		virtual void   setTc( double ms );
-		virtual double getTc( void ) const { return ms_; }
+   // time constant
+   virtual void setTc(double ms);
+   virtual double getTc(void) const { return ms_; }
 
-		// runtime function
-		void run( double in, double &state ) {
-			state = in + coef_ * ( state - in );
-		}
+   // runtime function
+   void run(double in, double& state)
+   {
+      state = in + coef_ * (state - in);
+   }
 
-	protected:
+protected:
+   double ms_{ 1 }; // time constant in ms
+   double coef_{ 0 }; // runtime coefficient
+   virtual void setCoef(void); // coef calculation
 
-		double ms_;				// time constant in ms
-		double coef_;			// runtime coefficient
-		virtual void setCoef( void );	// coef calculation
+}; // end SimpleComp class
 
-	};	// end SimpleComp class
+//-------------------------------------------------------------
+// attack/release envelope
+//-------------------------------------------------------------
+class AttRelEnvelope
+{
+public:
+   AttRelEnvelope(double att_ms = 10.0, double rel_ms = 100.0);
+   virtual ~AttRelEnvelope() {}
 
-	//-------------------------------------------------------------
-	// attack/release envelope
-	//-------------------------------------------------------------
-	class AttRelEnvelope
-	{
-	public:
-		AttRelEnvelope(
-                     double att_ms = 10.0
-                     , double rel_ms = 100.0
-                     );
-		virtual ~AttRelEnvelope() {}
+   // attack time constant
+   virtual void setAttack(double ms);
+   virtual double getAttack(void) const { return att_.getTc(); }
 
-		// attack time constant
-		virtual void   setAttack( double ms );
-		virtual double getAttack( void ) const { return att_.getTc(); }
+   // release time constant
+   virtual void setRelease(double ms);
+   virtual double getRelease(void) const { return rel_.getTc(); }
 
-		// release time constant
-		virtual void   setRelease( double ms );
-		virtual double getRelease( void ) const { return rel_.getTc(); }
+   // runtime function
+   void run(double in, double& state)
+   {
 
-		// runtime function
-		void run( double in, double &state ) {
-
-			/* assumes that:
+      /* assumes that:
           * positive delta = attack
           * negative delta = release
           * good for linear & log values
           */
 
-			if ( in > state )
-				att_.run( in, state );	// attack
-			else
-				rel_.run( in, state );	// release
-		}
-      
-	private:
-      
-		EnvelopeDetector att_;
-		EnvelopeDetector rel_;
-		
-};	// end AttRelEnvelope class
+      if (in > state)
+         att_.run(in, state); // attack
+      else
+         rel_.run(in, state); // release
+   }
+
+private:
+   EnvelopeDetector att_;
+   EnvelopeDetector rel_;
+
+}; // end AttRelEnvelope class
 
 class Compressor : public IAudioEffect, public IFloatSliderListener
 {
 public:
    Compressor();
-   
+
    static IAudioEffect* Create() { return new Compressor(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -126,42 +121,48 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    std::string GetType() override { return "compressor"; }
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=mWidth; height=mHeight; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
-   float mMix;
-   float mThreshold;
-   float mRatio;
-   float mAttack;
-   float mRelease;
-   float mLookahead;
-   float mOutputAdjust;
-   FloatSlider* mMixSlider;
-   FloatSlider* mThresholdSlider;
-   FloatSlider* mRatioSlider;
-   FloatSlider* mAttackSlider;
-   FloatSlider* mReleaseSlider;
-   FloatSlider* mLookaheadSlider;
-   FloatSlider* mOutputAdjustSlider;
-   
-   double mCurrentInputDb;
-   double mOutputGain;
-   float mWidth;
-   float mHeight;
+   float mMix{ 1 };
+   float mDrive{ 1 };
+   float mThreshold{ -24 };
+   float mRatio{ 4 };
+   float mAttack{ .1 };
+   float mRelease{ 100 };
+   float mLookahead{ 3 };
+   float mOutputAdjust{ 1 };
+   FloatSlider* mMixSlider{ nullptr };
+   FloatSlider* mDriveSlider{ nullptr };
+   FloatSlider* mThresholdSlider{ nullptr };
+   FloatSlider* mRatioSlider{ nullptr };
+   FloatSlider* mAttackSlider{ nullptr };
+   FloatSlider* mReleaseSlider{ nullptr };
+   FloatSlider* mLookaheadSlider{ nullptr };
+   FloatSlider* mOutputAdjustSlider{ nullptr };
+
+   double mCurrentInputDb{ 0 };
+   double mOutputGain{ 1 };
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
    // runtime variables
-   double envdB_;			// over-threshold envelope (dB)
+   double envdB_{ DC_OFFSET }; // over-threshold envelope (dB)
 
    AttRelEnvelope mEnv;
-   
+
    RollingBuffer mDelayBuffer;
 };
 
 #endif /* defined(__modularSynth__Compressor__) */
-

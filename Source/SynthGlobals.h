@@ -26,9 +26,10 @@
 #pragma once
 
 #if __clang__
- #pragma clang diagnostic ignored "-Wreorder"
+#pragma clang diagnostic ignored "-Wreorder"
 #endif
 
+#include "Xoshiro256ss.h"
 #include "OpenFrameworksPort.h"
 #include <map>
 #include <list>
@@ -43,45 +44,47 @@
 //#define BESPOKE_DEBUG_ALLOCATIONS
 
 #ifdef BESPOKE_DEBUG_ALLOCATIONS
-void* operator new(std::size_t size, const char *file, int line) throw(std::bad_alloc);
-void* operator new[](std::size_t size, const char *file, int line) throw(std::bad_alloc);
-#define DEBUG_NEW new(__FILE__, __LINE__)
+void* operator new(std::size_t size, const char* file, int line) throw(std::bad_alloc);
+void* operator new[](std::size_t size, const char* file, int line) throw(std::bad_alloc);
+#define DEBUG_NEW new (__FILE__, __LINE__)
 #else
 #define DEBUG_NEW new
 #endif
 #define new DEBUG_NEW
 
+#define BESPOKE_SUPPRESS_NIGHTLY_LABEL 0
+
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
-#define MAX_BUFFER_SIZE 30*gSampleRate
+#define MAX_BUFFER_SIZE 30 * gSampleRate
 #define MAX_TEXTENTRY_LENGTH 1024
 
 #ifndef M_PI
 #define M_PI PI
 #endif
 
-#define FPI       3.14159265358979323846f
-#define FTWO_PI   6.28318530717958647693f
+#define FPI 3.14159265358979323846f
+#define FTWO_PI 6.28318530717958647693f
 
 #define USE_VECTOR_OPS
 
 //bool labeling technique that I stole from Ableton
 #define K(x) true
-#define L(x,y) y
+#define L(x, y) y
 
 //avoid "unused variable" warnings
-#define UNUSED(x) ((void) x)
+#define UNUSED(x) ((void)x)
 
 class IUIControl;
 class IDrawableModule;
 class RollingBuffer;
 class ChannelBuffer;
 
-typedef std::map<std::string,int> EnumMap;
+typedef std::map<std::string, int> EnumMap;
 
-const int kWorkBufferSize = 1024*8; //larger than the audio buffer size would ever be (even oversampled)
+const int kWorkBufferSize = 1024 * 8; //larger than the audio buffer size would ever be (even oversampled)
 
 const int kNumVoices = 16;
 
@@ -92,7 +95,6 @@ extern double gSampleRateMs;
 extern double gInvSampleRateMs;
 extern double gBufferSizeMs;
 extern double gNyquistLimit;
-extern float gDefaultTempo;
 extern bool gPrintMidiInput;
 extern double gTime;
 extern IUIControl* gBindToUIControl;
@@ -102,7 +104,7 @@ extern RetinaTrueTypeFont gFontFixedWidth;
 extern float gModuleDrawAlpha;
 extern float gNullBuffer[kWorkBufferSize];
 extern float gZeroBuffer[kWorkBufferSize];
-extern float gWorkBuffer[kWorkBufferSize];  //scratch buffer for doing work in
+extern float gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;
 extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;
@@ -111,8 +113,10 @@ extern float gControlTactileFeedback;
 extern float gDrawScale;
 extern bool gShowDevModules;
 extern float gCornerRoundness;
+
 extern std::random_device gRandomDevice;
-extern std::mt19937 gRandom;
+
+extern bespoke::core::Xoshiro256ss gRandom;
 extern std::uniform_real_distribution<float> gRandom01;
 extern std::uniform_real_distribution<float> gRandomBipolarDist;
 
@@ -137,40 +141,53 @@ enum KeyModifiers
    kModifier_Command = 8
 };
 
-class LoadingJSONException : public std::exception {};
+class LoadingJSONException : public std::exception
+{
+};
 class UnknownModuleException : public std::exception
 {
 public:
    UnknownModuleException(std::string searchName)
-   : mSearchName(searchName) {}
+   : mSearchName(searchName)
+   {}
    ~UnknownModuleException() throw() {}
    std::string mSearchName;
 };
-class UnknownEffectTypeException : public std::exception {};
-class BadUIControlPathException : public std::exception {};
-class UnknownUIControlException : public std::exception {};
-class WrongModuleTypeException : public std::exception {};
-class LoadStateException : public std::exception {};
+class UnknownEffectTypeException : public std::exception
+{
+};
+class BadUIControlPathException : public std::exception
+{
+};
+class UnknownUIControlException : public std::exception
+{
+};
+class WrongModuleTypeException : public std::exception
+{
+};
+class LoadStateException : public std::exception
+{
+};
 
 void SynthInit();
 void LoadGlobalResources();
 
 void SetGlobalSampleRateAndBufferSize(int rate, int size);
 std::string GetBuildInfoString();
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
+void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
+void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
 void Add(float* buff1, const float* buff2, int bufferSize);
 void Subtract(float* buff1, const float* buff2, int bufferSize);
 void Mult(float* buff, float val, int bufferSize);
 void Mult(float* buff1, const float* buff2, int bufferSize);
 void Clear(float* buffer, int bufferSize);
 void BufferCopy(float* dst, const float* src, int bufferSize);
-std::string NoteName(int pitch, bool flat=false, bool includeOctave = false);
+std::string NoteName(int pitch, bool flat = false, bool includeOctave = false);
 int PitchFromNoteName(std::string noteName);
 float Interp(float a, float start, float end);
 double GetPhaseInc(float freq);
-void FloatWrap(float& num, float space);
-void FloatWrap(double& num, float space);
+float FloatWrap(float num, float space);
+double DoubleWrap(double num, float space);
 void DrawTextNormal(std::string text, int x, int y, float size = 15);
 void DrawTextRightJustify(std::string text, int x, int y, float size = 15);
 void DrawTextBold(std::string text, int x, int y, float size = 15);
@@ -203,10 +220,21 @@ float GetLeftPanGain(float pan);
 float GetRightPanGain(float pan);
 void DrawFallbackText(const char* text, float posX, float posY);
 bool EvaluateExpression(std::string expression, float currentValue, float& output);
+double NextBufferTime(bool includeLookahead);
+bool IsAudioThread();
 
 inline static float RandomSample()
 {
    return gRandomBipolarDist(gRandom);
+}
+
+inline static int DeterministicRandom(int seed, int index)
+{
+   uint64_t x = seed + ((uint64_t)index << 32);
+   x = (x ^ (x >> 30)) * (0xbf58476d1ce4e5b9);
+   x = (x ^ (x >> 27)) * (0x94d049bb133111eb);
+   x = x ^ (x >> 31);
+   return (int)x;
 }
 
 inline static std::string GetPathSeparator()
@@ -232,7 +260,7 @@ inline static void Assert(bool condition)
 #endif
 
 template <class T>
-void RemoveFromVector(T element, std::vector<T>& vec, bool fail=false)
+void RemoveFromVector(T element, std::vector<T>& vec, bool fail = false)
 {
    auto toRemove = std::find(vec.begin(), vec.end(), element);
    if (fail && toRemove == vec.end())
@@ -255,8 +283,14 @@ bool ListContains(T element, const std::list<T>& lis)
 
 struct Vec2i
 {
-   Vec2i() : x(0), y(0) {}
-   Vec2i(int _x, int _y) : x(_x), y(_y) {}
+   Vec2i()
+   : x(0)
+   , y(0)
+   {}
+   Vec2i(int _x, int _y)
+   : x(_x)
+   , y(_y)
+   {}
    int x;
    int y;
 };
@@ -264,9 +298,11 @@ struct Vec2i
 class ofLog
 {
 public:
-   ofLog() : mSendToBespokeConsole(true) {}
+   ofLog()
+   : mSendToBespokeConsole(true)
+   {}
    ~ofLog();
-   
+
    template <class T>
    ofLog& operator<<(const T& value)
    {
@@ -279,6 +315,7 @@ public:
       mSendToBespokeConsole = false;
       return *this;
    }
+
 private:
    std::string mMessage;
    bool mSendToBespokeConsole;

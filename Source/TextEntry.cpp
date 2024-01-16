@@ -29,6 +29,7 @@
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
 #include "FileStream.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -91,23 +92,12 @@ void TextEntry::Construct(ITextEntryListener* owner, const char* name, int x, in
 {
    mCharWidth = charWidth;
    mListener = owner;
-   mCaretBlink = true;
-   mCaretBlinkTimer = 0;
-   mNextTextEntry = nullptr;
-   mPreviousTextEntry = nullptr;
-   mInErrorMode = false;
-   mDrawLabel = false;
-   mFlexibleWidth = false;
-   mHovered = false;
-   mRequireEnterToAccept = false;
-   mCaretPosition = 0;
-   mCaretPosition2 = 0;
-   
+
    UpdateDisplayString();
-   
+
    SetName(name);
    mLabelSize = gFont.GetStringWidth(name, 15) + 3;
-   SetPosition(x,y);
+   SetPosition(x, y);
    assert(owner);
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(owner);
    if (module)
@@ -129,45 +119,45 @@ void TextEntry::Delete()
 void TextEntry::Render()
 {
    ofPushStyle();
-   
+
    ofSetLineWidth(.5f);
-   
+
    float xOffset = 0;
    if (mDrawLabel)
    {
-      DrawTextNormal(Name(), mX, mY+12);
+      DrawTextNormal(Name(), mX, mY + 12);
       xOffset = mLabelSize;
    }
-   
+
    bool isCurrent = IKeyboardFocusListener::GetActiveKeyboardFocus() == this;
-   
-   ofColor color(255,255,255);
+
+   ofColor color(255, 255, 255);
    if (!isCurrent && mInErrorMode)
-      color.set(200,100,100);
+      color.set(200, 100, 100);
 
    if (!isCurrent)
       UpdateDisplayString();
-   
-   float w,h;
-   GetDimensions(w,h);
+
+   float w, h;
+   GetDimensions(w, h);
    if (isCurrent)
    {
-      ofSetColor(color,gModuleDrawAlpha * .1f);
+      ofSetColor(color, gModuleDrawAlpha * .1f);
       ofFill();
-      ofRect(mX + xOffset,mY,w - xOffset,h);
+      ofRect(mX + xOffset, mY, w - xOffset, h);
    }
-   ofSetColor(color,gModuleDrawAlpha);
+   ofSetColor(color, gModuleDrawAlpha);
    ofNoFill();
-   ofRect(mX + xOffset,mY,w - xOffset,h);
+   ofRect(mX + xOffset, mY, w - xOffset, h);
 
-   gFontFixedWidth.DrawString(mString, 14, mX+2+xOffset, mY+12);
-   
+   gFontFixedWidth.DrawString(mString, 14, mX + 2 + xOffset, mY + 12);
+
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
    {
       if (mCaretBlink)
       {
-         int caretX = mX+2+xOffset;
-         int caretY = mY+1;
+         int caretX = mX + 2 + xOffset;
+         int caretY = mY + 1;
          if (mCaretPosition > 0)
          {
             char beforeCaret[MAX_TEXTENTRY_LENGTH];
@@ -185,16 +175,16 @@ void TextEntry::Render()
          mCaretBlink = !mCaretBlink;
       }
    }
-   
+
    if (mCaretPosition != mCaretPosition2 && isCurrent)
    {
       ofPushStyle();
       ofFill();
       ofSetColor(255, 255, 255, 90);
 
-      int selStartX = mX+2+xOffset;
-      int selEndX = mX+2+xOffset;
-      int selY = mY+1;
+      int selStartX = mX + 2 + xOffset;
+      int selEndX = mX + 2 + xOffset;
+      int selY = mY + 1;
 
       //
       int start = MIN(mCaretPosition, mCaretPosition2);
@@ -224,36 +214,35 @@ void TextEntry::Render()
    }*/
 
    ofPopStyle();
-   
+
    DrawHover(mX + xOffset, mY, w - xOffset, h);
 }
 
 void TextEntry::GetDimensions(float& width, float& height)
 {
    if (mFlexibleWidth)
-      width = MAX(30.0f,gFontFixedWidth.GetStringWidth(mString, 14) + 4);
+      width = MAX(30.0f, gFontFixedWidth.GetStringWidth(mString, 14) + 4);
    else
       width = mCharWidth * 9;
-   
+
    if (mDrawLabel)
       width += mLabelSize;
-   
+
    height = 15;
 }
 
-void TextEntry::OnClicked(int x, int y, bool right)
+void TextEntry::OnClicked(float x, float y, bool right)
 {
    if (right)
       return;
-   
+
    float xOffset = 2;
    if (mDrawLabel)
       xOffset += mLabelSize;
-   
+
    if (sKeyboardFocusBeforeClick != this)
    {
-      mCaretPosition = 0;
-      mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+      SelectAll();
    }
    else
    {
@@ -265,7 +254,7 @@ void TextEntry::OnClicked(int x, int y, bool right)
       int lastSubstrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 14);
       for (int i = (int)checkLength - 1; i >= 0; --i)
       {
-         caretCheck[i] = 0;   //shorten string by one
+         caretCheck[i] = 0; //shorten string by one
 
          int substrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 14);
          //ofLog() << x << " " << i << " " << (xOffset + substrWidth);
@@ -280,7 +269,7 @@ void TextEntry::OnClicked(int x, int y, bool right)
 
       mCaretPosition2 = mCaretPosition;
    }
-   
+
    MakeActiveTextEntry(false);
 }
 
@@ -307,6 +296,11 @@ void TextEntry::RemoveSelectedText()
    MoveCaret(caretStart, false);
 }
 
+void TextEntry::SelectAll()
+{
+   mCaretPosition = 0;
+   mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+}
 
 void TextEntry::OnKeyPressed(int key, bool isRepeat)
 {
@@ -325,19 +319,23 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
 
       AcceptEntry(false);
       IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
-      
+
       if (pendingNewEntry)
+      {
          pendingNewEntry->MakeActiveTextEntry(true);
+         pendingNewEntry->SelectAll();
+      }
    }
    else if (key == juce::KeyPress::backspaceKey)
    {
       int len = (int)strlen(mString);
-      if (mCaretPosition != mCaretPosition2) 
+      if (mCaretPosition != mCaretPosition2)
       {
          RemoveSelectedText();
-      } else if (mCaretPosition > 0)
+      }
+      else if (mCaretPosition > 0)
       {
-         for (int i=mCaretPosition-1; i<len; ++i)
+         for (int i = mCaretPosition - 1; i < len; ++i)
             mString[i] = mString[i + 1];
          --mCaretPosition;
          --mCaretPosition2;
@@ -346,10 +344,11 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    else if (key == juce::KeyPress::deleteKey)
    {
       int len = (int)strlen(mString);
-      if (mCaretPosition != mCaretPosition2) 
+      if (mCaretPosition != mCaretPosition2)
       {
          RemoveSelectedText();
-      } else 
+      }
+      else
       {
          for (int i = mCaretPosition; i < len; ++i)
             mString[i] = mString[i + 1];
@@ -368,7 +367,6 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
          MoveCaret(MIN(mCaretPosition, mCaretPosition2));
       else if (mCaretPosition > 0)
          MoveCaret(mCaretPosition - 1);
-      
    }
    else if (key == OF_KEY_RIGHT)
    {
@@ -426,10 +424,13 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       if (mCaretPosition != mCaretPosition2)
          RemoveSelectedText();
       juce::String clipboard = TheSynth->GetTextFromClipboard();
-      
+
       std::string newString = mString;
       strcpy(mString, (newString.substr(0, mCaretPosition) + clipboard.toStdString() + newString.substr(mCaretPosition)).c_str());
-      MoveCaret(mCaretPosition + clipboard.length());
+      if (UserPrefs.immediate_paste.Get())
+         AcceptEntry(true);
+      else
+         MoveCaret(mCaretPosition + clipboard.length());
    }
    else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
    {
@@ -438,17 +439,15 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
          int caretStart = MIN(mCaretPosition, mCaretPosition2);
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
          std::string tmpString(mString);
-         TheSynth->CopyTextToClipboard(tmpString.substr(caretStart,caretEnd-caretStart));
-         
+         TheSynth->CopyTextToClipboard(tmpString.substr(caretStart, caretEnd - caretStart));
+
          if (toupper(key) == 'X')
             RemoveSelectedText();
       }
    }
    else if (toupper(key) == 'A' && GetKeyModifiers() == kModifier_Command)
    {
-      int len = (int)strlen(mString);
-      mCaretPosition = 0;
-      mCaretPosition2 = len;
+      SelectAll();
    }
    else if (key == juce::KeyPress::homeKey)
    {
@@ -461,7 +460,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    else if (key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key))
    {
       if (mCaretPosition != mCaretPosition2)
-          RemoveSelectedText();
+         RemoveSelectedText();
       AddCharacter((char)key);
    }
 }
@@ -471,10 +470,10 @@ void TextEntry::AddCharacter(char c)
    if (AllowCharacter(c))
    {
       int len = (int)strlen(mString);
-      if (/*len < mCharWidth && */len < MAX_TEXTENTRY_LENGTH-1)
+      if (/*len < mCharWidth && */ len < MAX_TEXTENTRY_LENGTH - 1)
       {
-         for (int i=len; i>mCaretPosition; --i)
-            mString[i] = mString[i-1];
+         for (int i = len; i > mCaretPosition; --i)
+            mString[i] = mString[i - 1];
          mString[mCaretPosition] = c;
          mString[len + 1] = '\0';
          ++mCaretPosition;
@@ -502,7 +501,17 @@ void TextEntry::ClearInput()
    mCaretPosition2 = 0;
 }
 
-void TextEntry::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+void TextEntry::SetText(std::string text)
+{
+   if (mVarCString)
+      StringCopy(mVarCString, text.c_str(), MAX_TEXTENTRY_LENGTH);
+   if (mVarString)
+      *mVarString = text;
+   mCaretPosition = 0;
+   mCaretPosition2 = 0;
+}
+
+void TextEntry::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    if (mType == kTextEntry_Int)
    {
@@ -545,11 +554,30 @@ float TextEntry::GetMidiValue() const
    return 0;
 }
 
-void TextEntry::SetValue(float value)
+void TextEntry::GetRange(float& min, float& max)
 {
    if (mType == kTextEntry_Int)
    {
-      *mVarInt = value;
+      min = mIntMin;
+      max = mIntMax;
+   }
+   else if (mType == kTextEntry_Float)
+   {
+      min = mFloatMin;
+      max = mFloatMax;
+   }
+   else
+   {
+      min = 0;
+      max = 1;
+   }
+}
+
+void TextEntry::SetValue(float value, double time, bool forceUpdate /*= false*/)
+{
+   if (mType == kTextEntry_Int)
+   {
+      *mVarInt = std::round(value);
       UpdateDisplayString();
    }
 
@@ -558,6 +586,17 @@ void TextEntry::SetValue(float value)
       *mVarFloat = value;
       UpdateDisplayString();
    }
+}
+
+float TextEntry::GetValue() const
+{
+   if (mType == kTextEntry_Int)
+      return *mVarInt;
+
+   if (mType == kTextEntry_Float)
+      return *mVarFloat;
+
+   return 0;
 }
 
 int TextEntry::GetNumValues()
@@ -581,7 +620,7 @@ void TextEntry::AcceptEntry(bool pressedEnter)
       CancelEntry();
       return;
    }
-   
+
    if (mVarCString)
       StringCopy(mVarCString, mString, MAX_TEXTENTRY_LENGTH);
    if (mVarString)
@@ -596,7 +635,7 @@ void TextEntry::AcceptEntry(bool pressedEnter)
       *mVarFloat = ofClamp(ofToFloat(mString), mFloatMin, mFloatMax);
       StringCopy(mString, ofToString(*mVarFloat).c_str(), MAX_TEXTENTRY_LENGTH);
    }
-   
+
    if (mListener)
       mListener->TextEntryComplete(this);
 }
@@ -607,7 +646,7 @@ void TextEntry::CancelEntry()
       mListener->TextEntryCancelled(this);
 }
 
-void TextEntry::MoveCaret(int pos, bool allowSelection) 
+void TextEntry::MoveCaret(int pos, bool allowSelection)
 {
    mCaretPosition = pos;
    if (!allowSelection || !(GetKeyModifiers() & kModifier_Shift))
@@ -673,7 +712,7 @@ namespace
 void TextEntry::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
-   
+
    out << std::string(mString);
 }
 
@@ -681,8 +720,8 @@ void TextEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
-   
+   LoadStateValidate(rev <= kSaveStateRev);
+
    std::string var;
    in >> var;
    if (shouldSetValue)

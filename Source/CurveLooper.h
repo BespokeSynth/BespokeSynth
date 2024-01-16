@@ -42,55 +42,57 @@ public:
    CurveLooper();
    ~CurveLooper();
    static IDrawableModule* Create() { return new CurveLooper(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
-   IUIControl* GetUIControl() const { return mUIControl; }
-   
+
    void OnTransportAdvanced(float amount) override;
-   
+
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    float GetPlaybackPosition();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   
-   IUIControl* mUIControl;
-   int mLength;
-   DropdownList* mLengthSelector;
-   PatchCableSource* mControlCable;
-   float mWidth;
-   float mHeight;
-   EnvelopeControl mEnvelopeControl;
+
+   std::array<IUIControl*, 16> mUIControls{ nullptr };
+   int mLength{ 1 };
+   DropdownList* mLengthSelector{ nullptr };
+   PatchCableSource* mControlCable{ nullptr };
+   float mWidth{ 200 };
+   float mHeight{ 120 };
+   EnvelopeControl mEnvelopeControl{ ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30) };
    ::ADSR mAdsr;
-   ClickButton* mRandomizeButton;
+   ClickButton* mRandomizeButton{ nullptr };
 };
 
 #endif /* defined(__Bespoke__CurveLooper__) */

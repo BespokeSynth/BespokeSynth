@@ -33,8 +33,10 @@
 class Oscillator
 {
 public:
-   Oscillator(OscillatorType type) : mType(type), mPulseWidth(.5f), mShuffle(0), mSoften(0) {}
-   
+   Oscillator(OscillatorType type)
+   : mType(type)
+   {}
+
    OscillatorType GetType() const { return mType; }
    void SetType(OscillatorType type) { mType = type; }
    float Value(float phase) const;
@@ -43,14 +45,15 @@ public:
    float GetShuffle() const { return mShuffle; }
    void SetShuffle(float shuffle) { mShuffle = MIN(shuffle, .999f); }
    float GetSoften() const { return mSoften; }
-   void SetSoften(float soften) { mSoften = ofClamp(soften,0,1); }
-   OscillatorType mType;
+   void SetSoften(float soften) { mSoften = ofClamp(soften, 0, 1); }
+   OscillatorType mType{ OscillatorType::kOsc_Sin };
+
 private:
    float SawSample(float phase) const;
-   
-   float mPulseWidth;
-   float mShuffle;
-   float mSoften;
+
+   float mPulseWidth{ .5 };
+   float mShuffle{ 0 };
+   float mSoften{ 0 };
 };
 
 #endif /* defined(__Bespoke__Oscillator__) */

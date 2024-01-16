@@ -40,30 +40,17 @@
 
 struct LFOSettings
 {
-   LFOSettings()
-   : mInterval(kInterval_1n)
-   , mLFOOffset(0)
-   , mBias(0)
-   , mSpread(0)
-   , mSoften(0)
-   , mShuffle(0)
-   , mFreeRate(1)
-   , mLength(1)
-   , mLowResMode(false)
-   {
-   }
-   
-   NoteInterval mInterval;
-   OscillatorType mOscType;
-   float mLFOOffset;
-   float mBias;
-   float mSpread;
-   float mSoften;
-   float mShuffle;
-   float mFreeRate;
-   float mLength;
-   bool mLowResMode;
-   
+   NoteInterval mInterval{ kInterval_1n };
+   OscillatorType mOscType{ kOsc_Sin };
+   float mLFOOffset{ 0 };
+   float mBias{ 0 };
+   float mSpread{ 0 };
+   float mSoften{ 0 };
+   float mShuffle{ 0 };
+   float mFreeRate{ 1 };
+   float mLength{ 1 };
+   bool mLowResMode{ false };
+
    void SaveState(FileStreamOut& out) const;
    void LoadState(FileStreamIn& in);
 };
@@ -73,6 +60,9 @@ class FloatSliderLFOControl : public IDrawableModule, public IRadioButtonListene
 public:
    FloatSliderLFOControl();
    static IDrawableModule* Create() { return new FloatSliderLFOControl(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
    void Delete() { delete this; }
    void DrawModule() override;
 
@@ -81,14 +71,13 @@ public:
    LFOSettings* GetLFOSettings() { return &mLFOSettings; }
    void SetEnabled(bool enabled) override {} //don't use this one
    void SetLFOEnabled(bool enabled);
-   bool IsEnabled() const { return mEnabled; }
+   bool IsEnabled() const override { return mEnabled; }
    void SetRate(NoteInterval rate);
    void UpdateFromSettings();
    void SetOwner(FloatSlider* owner);
-   FloatSlider* GetOwner() { return mTarget; }
-   bool Enabled() const override { return mEnabled; }
+   FloatSlider* GetOwner() { return mTargets[0].mSliderTarget; }
    bool HasTitleBar() const override { return mPinned; }
-   
+
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    bool IsPinned() const { return mPinned; }
@@ -96,23 +85,28 @@ public:
    bool InLowResMode() const { return mLFOSettings.mLowResMode; }
    bool HasSpecialDelete() const override { return true; }
    void DoSpecialDelete() override;
-   
+   bool DrawToPush2Screen() override;
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool InitializeWithZeroRange() const override { return true; }
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -125,26 +119,26 @@ private:
    float GetLFOValue(int samplesIn = 0, float forcePhase = -1);
    float GetTargetMin() const;
    float GetTargetMax() const;
-   
+
    LFOSettings mLFOSettings;
 
    LFO mLFO;
-   DropdownList* mIntervalSelector;
-   DropdownList* mOscSelector;
-   FloatSlider* mOffsetSlider;
-   FloatSlider* mBiasSlider;
-   FloatSlider* mSpreadSlider;
-   FloatSlider* mSoftenSlider;
-   FloatSlider* mShuffleSlider;
-   FloatSlider* mFreeRateSlider;
-   FloatSlider* mLengthSlider;
-   ClickButton* mPinButton;
-   Checkbox* mEnableLFOCheckbox;
-   Checkbox* mLowResModeCheckbox;
-   float mWidth;
-   float mHeight;
+   DropdownList* mIntervalSelector{ nullptr };
+   DropdownList* mOscSelector{ nullptr };
+   FloatSlider* mOffsetSlider{ nullptr };
+   FloatSlider* mBiasSlider{ nullptr };
+   FloatSlider* mSpreadSlider{ nullptr };
+   FloatSlider* mSoftenSlider{ nullptr };
+   FloatSlider* mShuffleSlider{ nullptr };
+   FloatSlider* mFreeRateSlider{ nullptr };
+   FloatSlider* mLengthSlider{ nullptr };
+   ClickButton* mPinButton{ nullptr };
+   Checkbox* mEnableLFOCheckbox{ nullptr };
+   Checkbox* mLowResModeCheckbox{ nullptr };
+   float mWidth{ 100 };
+   float mHeight{ 20 };
 
-   bool mPinned;
+   bool mPinned{ false };
 };
 
 class LFOPool
@@ -153,6 +147,7 @@ public:
    static void Init();
    static void Shutdown();
    static FloatSliderLFOControl* GetLFO(FloatSlider* owner);
+
 private:
 #define LFO_POOL_SIZE 256
    static FloatSliderLFOControl* sLFOPool[LFO_POOL_SIZE];
@@ -161,4 +156,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__FloatSliderLFOControl__) */
-

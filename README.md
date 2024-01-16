@@ -3,11 +3,15 @@
 # Bespoke Synth
 A software modular synth that I've been building for myself since 2011, and now you can use it!
 
-You can find the most recent builds for Mac/Windows/Linux at http://bespokesynth.com, or in the [Releases](https://github.com/awwbees/BespokeSynth/releases) section on GitHub.
+[Nightly Build](https://github.com/BespokeSynth/BespokeSynth/releases/tag/Nightly) (updated every commit)
+
+You can find the most recent builds for Mac/Windows/Linux at http://bespokesynth.com, or in the [Releases](https://github.com/BespokeSynth/BespokeSynth/releases) section on GitHub.
 
 Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to discuss with the community.
 
-<a href='https://ko-fi.com/awwbees' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' />
+## Documentation
+* [Official documentation](https://www.bespokesynth.com/docs/)
+* [Searchable, community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki)
 
 ## Screenshot
 ![screenshot](screenshot-1.png)
@@ -21,10 +25,14 @@ Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to dis
 
 ### Features
 * live-patchable environment, so you can build while the music is playing
-* VST hosting
+* VST, VST3, LV2 hosting
 * Python livecoding
-* MIDI controller mapping
+* MIDI & OSC controller mapping
 * Works on Windows, Mac, and Linux
+
+### License
+
+[GNU GPL v3](LICENSE)
 
 ### Releases
 Sign up here to receive an email whenever I put out a new release: http://bespokesynth.substack.com/
@@ -49,6 +57,7 @@ There are a few useful options to the *first* cmake command which many folks cho
 * `-DBESPOKE_VST2_SDK_LOCATION=/path/to/sdk` will activate VST2 hosting support in your built 
 copy of Bespoke if you have access to the VST SDK
 * `-DBESPOKE_ASIO_SDK_LOCATION=/path/to/sdk` (windows only) will activate ASIO support on windows in your built copy of Bespoke if you have access to the ASIO SDK
+* `-DBESPOKE_SPACEMOUSE_SDK_LOCATION=/path/to/sdk` (windows only) will activate SpaceMouse canvas navigation support on windows in your built copy of Bespoke if you have access to the SpaceMouse SDK
 * `-DBESPOKE_PYTHON_ROOT=/...` will override the automatically detected python root. In some cases with M1 mac builds in homebrew this is useful.
 * `-DCMAKE_BUILD_TYPE=Debug` will produce a build with debug information available
 * `-A x64` (windows only) will force visual studio to build for 64 bit architectures, in the event this is not your default
@@ -71,4 +80,3 @@ To be able to build you will need a few things, depending on your OS
 * On MacOS: install xcode; install xcode command line tools with `xcode-select --install` and install cmake with `brew install cmake` if you use homebrew or from cmake.org if not
 * On Linux you probably already have everything (gcc, git, etc...), but you will need to install required packages. The full list we
 install on a fresh ubuntu 20 box are listed in the azure-pipelines.yml
-

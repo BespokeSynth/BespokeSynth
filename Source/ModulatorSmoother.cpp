@@ -32,10 +32,6 @@
 #include "MathUtils.h"
 
 ModulatorSmoother::ModulatorSmoother()
-: mInput(0)
-, mSmooth(.1f)
-, mInputSlider(nullptr)
-, mSmoothSlider(nullptr)
 {
 }
 
@@ -49,11 +45,11 @@ void ModulatorSmoother::Init()
 void ModulatorSmoother::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mInputSlider = new FloatSlider(this, "input", 3, 2, 100, 15, &mInput, 0, 1);
    mSmoothSlider = new FloatSlider(this, "smooth", mInputSlider, kAnchor_Below, 100, 15, &mSmooth, 0, 1);
    mSmoothSlider->SetMode(FloatSlider::kSquare);
-   
+
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
@@ -68,7 +64,7 @@ void ModulatorSmoother::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mInputSlider->Draw();
    mSmoothSlider->Draw();
 }
@@ -76,18 +72,18 @@ void ModulatorSmoother::DrawModule()
 void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
-   
-   if (mTarget)
+
+   if (GetSliderTarget() && fromUserClick)
    {
-      mInput = mTarget->GetValue();
-      mInputSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mInputSlider->SetMode(mTarget->GetMode());
+      mInput = GetSliderTarget()->GetValue();
+      mInputSlider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
+      mInputSlider->SetMode(GetSliderTarget()->GetMode());
    }
 }
 
 void ModulatorSmoother::OnTransportAdvanced(float amount)
 {
-   mRamp.Start(gTime, mInput, gTime+(amount * TheTransport->MsPerBar() * (mSmooth*300)));
+   mRamp.Start(gTime, mInput, gTime + (amount * TheTransport->MsPerBar() * (mSmooth * 300)));
 }
 
 float ModulatorSmoother::Value(int samplesIn)
@@ -98,23 +94,13 @@ float ModulatorSmoother::Value(int samplesIn)
 
 void ModulatorSmoother::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-   
-   std::string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;
 }
 
 void ModulatorSmoother::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
    SetUpFromSaveData();
 }
 
 void ModulatorSmoother::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

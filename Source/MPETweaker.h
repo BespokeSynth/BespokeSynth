@@ -39,41 +39,49 @@ public:
    MPETweaker();
    virtual ~MPETweaker();
    static IDrawableModule* Create() { return new MPETweaker(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mWidth;
-   float mHeight;
-   
-   float mPitchBendMultiplier;
-   FloatSlider* mPitchBendMultiplierSlider;
-   float mPitchBendOffset;
-   FloatSlider* mPitchBendOffsetSlider;
-   float mPressureMultiplier;
-   FloatSlider* mPressureMultiplierSlider;
-   float mPressureOffset;
-   FloatSlider* mPressureOffsetSlider;
-   float mModWheelMultiplier;
-   FloatSlider* mModWheelMultiplierSlider;
-   float mModWheelOffset;
-   FloatSlider* mModWheelOffsetSlider;
-   
-   Modulations mModulationMult;
-   Modulations mModulationOffset;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
+
+   float mPitchBendMultiplier{ 1 };
+   FloatSlider* mPitchBendMultiplierSlider{ nullptr };
+   float mPitchBendOffset{ 0 };
+   FloatSlider* mPitchBendOffsetSlider{ nullptr };
+   float mPressureMultiplier{ 1 };
+   FloatSlider* mPressureMultiplierSlider{ nullptr };
+   float mPressureOffset{ 0 };
+   FloatSlider* mPressureOffsetSlider{ nullptr };
+   float mModWheelMultiplier{ 1 };
+   FloatSlider* mModWheelMultiplierSlider{ nullptr };
+   float mModWheelOffset{ 0 };
+   FloatSlider* mModWheelOffsetSlider{ nullptr };
+
+   Modulations mModulationMult{ true };
+   Modulations mModulationOffset{ true };
 };

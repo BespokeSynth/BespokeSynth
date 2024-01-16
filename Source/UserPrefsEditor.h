@@ -41,6 +41,9 @@ public:
    UserPrefsEditor();
    ~UserPrefsEditor();
    static IDrawableModule* Create() { return new UserPrefsEditor(); }
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
@@ -51,23 +54,28 @@ public:
    void Show();
    void CreatePrefsFileIfNonexistent();
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void ButtonClicked(ClickButton* button) override;
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
    bool IsSaveable() override { return false; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
    void UpdateDropdowns(std::vector<DropdownList*> toUpdate);
    void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);
@@ -76,10 +84,10 @@ private:
    void Save();
 
    UserPrefCategory mCategory{ UserPrefCategory::General };
-   RadioButton* mCategorySelector;
-   ClickButton* mSaveButton;
-   ClickButton* mCancelButton;
+   RadioButton* mCategorySelector{ nullptr };
+   ClickButton* mSaveButton{ nullptr };
+   ClickButton* mCancelButton{ nullptr };
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 1150 };
+   float mHeight{ 50 };
 };

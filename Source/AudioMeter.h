@@ -38,31 +38,38 @@ public:
    AudioMeter();
    virtual ~AudioMeter();
    static IDrawableModule* Create() { return new AudioMeter(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=120; h=22; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mLevel;
-   float mMaxLevel;
-   FloatSlider* mLevelSlider;
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 120;
+      h = 22;
+   }
+
+   float mLevel{ 0 };
+   float mMaxLevel{ 1 };
+   FloatSlider* mLevelSlider{ nullptr };
    PeakTracker mPeakTracker;
-   float* mAnalysisBuffer;
+   float* mAnalysisBuffer{ nullptr };
 };
 
 #endif /* defined(__Bespoke__AudioMeter__) */

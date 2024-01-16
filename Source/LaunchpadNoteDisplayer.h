@@ -38,26 +38,31 @@ class LaunchpadNoteDisplayer : public NoteEffectBase, public IDrawableModule
 public:
    LaunchpadNoteDisplayer();
    static IDrawableModule* Create() { return new LaunchpadNoteDisplayer(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
 
    void SetLaunchpad(LaunchpadKeyboard* launchpad) { mLaunchpad = launchpad; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 80; height = 0; }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 80;
+      height = 0;
+   }
 
-   LaunchpadKeyboard* mLaunchpad;
+   LaunchpadKeyboard* mLaunchpad{ nullptr };
 };
 
 #endif /* defined(__modularSynth__LaunchpadNoteDisplayer__) */

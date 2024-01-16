@@ -42,46 +42,52 @@ public:
    Rewriter();
    virtual ~Rewriter();
    static IDrawableModule* Create() { return new Rewriter(); }
-   
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
 
-   void Go();
-   
+   void Go(double time);
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IAudioSource
    void Process(double time) override;
 
    //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   
+   void ButtonClicked(ClickButton* button, double time) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
-   bool Enabled() const override { return mEnabled; }
-   
-   float mWidth;
-   float mHeight;
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
 
-   double mStartRecordTime;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
-   ClickButton* mRewriteButton;
-   ClickButton* mStartRecordTimeButton;
+   double mStartRecordTime{ -1 };
+
+   ClickButton* mRewriteButton{ nullptr };
+   ClickButton* mStartRecordTimeButton{ nullptr };
 
    RollingBuffer mRecordBuffer;
-   Looper* mConnectedLooper;
-   
-   PatchCableSource* mLooperCable;
+   Looper* mConnectedLooper{ nullptr };
+
+   PatchCableSource* mLooperCable{ nullptr };
 };
 
 
 #endif /* defined(__modularSynth__Rewriter__) */
-

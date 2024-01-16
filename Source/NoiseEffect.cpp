@@ -28,20 +28,14 @@
 #include "Profiler.h"
 
 NoiseEffect::NoiseEffect()
-: mAmount(0)
-, mWidth(10)
-, mSampleCounter(0)
-, mRandom(0)
-, mAmountSlider(nullptr)
-, mWidthSlider(nullptr)
 {
 }
 
 void NoiseEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mAmountSlider = new FloatSlider(this,"amount",5,20,110,15,&mAmount,0,1);
-   mWidthSlider = new IntSlider(this,"width",5,37,110,15,&mWidth,1,100);
+   mAmountSlider = new FloatSlider(this, "amount", 5, 20, 110, 15, &mAmount, 0, 1);
+   mWidthSlider = new IntSlider(this, "width", 5, 37, 110, 15, &mWidth, 1, 100);
 }
 
 void NoiseEffect::ProcessAudio(double time, ChannelBuffer* buffer)
@@ -50,12 +44,12 @@ void NoiseEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
    if (!mEnabled)
       return;
-   
+
    float bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
-   for (int i=0; i<bufferSize; ++i)
+   for (int i = 0; i < bufferSize; ++i)
    {
       if (mSampleCounter < mWidth - 1)
       {
@@ -63,18 +57,18 @@ void NoiseEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       }
       else
       {
-         mRandom = ofRandom(mAmount) + (1-mAmount);
+         mRandom = ofRandom(mAmount) + (1 - mAmount);
          mSampleCounter = 0;
       }
-      
-      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+
+      for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
          buffer->GetChannel(ch)[i] *= mRandom;
    }
 }
 
 void NoiseEffect::DrawModule()
 {
-   
+
    mWidthSlider->Draw();
    mAmountSlider->Draw();
 }
@@ -86,15 +80,14 @@ float NoiseEffect::GetEffectAmount()
    return mAmount;
 }
 
-void NoiseEffect::CheckboxUpdated(Checkbox *checkbox)
+void NoiseEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void NoiseEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+void NoiseEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void NoiseEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoiseEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
-

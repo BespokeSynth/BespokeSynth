@@ -29,33 +29,10 @@
 #include "ModularSynth.h"
 
 PSMoveController::PSMoveController()
-: mConnectButton(nullptr)
-, mVibronomeOn(false)
-, mVibronomeCheckbox(nullptr)
-, mMetronomeLagOffset(50)
-, mOffsetSlider(nullptr)
-, mRoll(.5f)
-, mPitch(.5f)
-, mYaw(0)
-, mEnergy(0)
-, mPitchSlider(nullptr)
-, mYawSlider(nullptr)
-, mRollSlider(nullptr)
-, mEnergySlider(nullptr)
-, mBindPitch(nullptr)
-, mBindYaw(nullptr)
-, mBindRoll(nullptr)
-, mBindEnergy(nullptr)
-, mPitchUIControl(nullptr)
-, mYawUIControl(nullptr)
-, mRollUIControl(nullptr)
-, mEnergyUIControl(nullptr)
-, mPSButtonDown(false)
 {
    mMoveMgr.Setup();
 
    mVibration.SetValue(0);
-
 }
 
 void PSMoveController::Init()
@@ -68,17 +45,17 @@ void PSMoveController::Init()
 void PSMoveController::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mConnectButton = new ClickButton(this,"connect",5,35);
-   mVibronomeCheckbox = new Checkbox(this,"metronome",5,20,&mVibronomeOn);
-   mOffsetSlider = new FloatSlider(this,"offset",5,54,100,15,&mMetronomeLagOffset,-100,100);
-   mPitchSlider = new FloatSlider(this,"pitch",5,73,90,15,&mPitch,0,1);
-   mYawSlider = new FloatSlider(this,"yaw",5,89,90,15,&mYaw,0,1);
-   mRollSlider = new FloatSlider(this,"roll",5,105,90,15,&mRoll,0,1);
-   mEnergySlider = new FloatSlider(this,"energy",5,121,90,15,&mEnergy,0,1);
-   mBindPitch = new ClickButton(this,"bindp",100,73);
-   mBindYaw = new ClickButton(this,"bindy",100,89);
-   mBindRoll = new ClickButton(this,"bindr",100,105);
-   mBindEnergy = new ClickButton(this,"binde",100,121);
+   mConnectButton = new ClickButton(this, "connect", 5, 35);
+   mVibronomeCheckbox = new Checkbox(this, "metronome", 5, 20, &mVibronomeOn);
+   mOffsetSlider = new FloatSlider(this, "offset", 5, 54, 100, 15, &mMetronomeLagOffset, -100, 100);
+   mPitchSlider = new FloatSlider(this, "pitch", 5, 73, 90, 15, &mPitch, 0, 1);
+   mYawSlider = new FloatSlider(this, "yaw", 5, 89, 90, 15, &mYaw, 0, 1);
+   mRollSlider = new FloatSlider(this, "roll", 5, 105, 90, 15, &mRoll, 0, 1);
+   mEnergySlider = new FloatSlider(this, "energy", 5, 121, 90, 15, &mEnergy, 0, 1);
+   mBindPitch = new ClickButton(this, "bindp", 100, 73);
+   mBindYaw = new ClickButton(this, "bindy", 100, 89);
+   mBindRoll = new ClickButton(this, "bindr", 100, 105);
+   mBindEnergy = new ClickButton(this, "binde", 100, 121);
 }
 
 PSMoveController::~PSMoveController()
@@ -90,40 +67,40 @@ void PSMoveController::Poll()
 {
    if (!mEnabled)
       return;
-   
-   mMoveMgr.Update();
-   mMoveMgr.SetVibration(0,mVibration.Value(gTime));
 
-   ofVec3f gyros(0,0,0);
-   mMoveMgr.GetGyros(0,gyros);
-   
+   mMoveMgr.Update();
+   mMoveMgr.SetVibration(0, mVibration.Value(gTime));
+
+   ofVec3f gyros(0, 0, 0);
+   mMoveMgr.GetGyros(0, gyros);
+
    bool isButtonDown = false;
-   if (mMoveMgr.IsButtonDown(0,Btn_MOVE))
+   if (mMoveMgr.IsButtonDown(0, Btn_MOVE))
    {
-      mPitch = ofClamp(mPitch + gyros.x/50000,0,1);
+      mPitch = ofClamp(mPitch + gyros.x / 50000, 0, 1);
       if (mPitchUIControl)
-         mPitchUIControl->SetFromMidiCC(mPitch);
+         mPitchUIControl->SetFromMidiCC(mPitch, NextBufferTime(false), false);
       isButtonDown = true;
    }
-   if (mMoveMgr.IsButtonDown(0,Btn_SQUARE))
+   if (mMoveMgr.IsButtonDown(0, Btn_SQUARE))
    {
-      mYaw = ofClamp(mYaw - gyros.z/50000,0,1);
+      mYaw = ofClamp(mYaw - gyros.z / 50000, 0, 1);
       if (mYawUIControl)
-         mYawUIControl->SetFromMidiCC(mYaw);
+         mYawUIControl->SetFromMidiCC(mYaw, NextBufferTime(false), false);
       isButtonDown = true;
    }
-   if (mMoveMgr.IsButtonDown(0,Btn_T))
+   if (mMoveMgr.IsButtonDown(0, Btn_T))
    {
-      mRoll = ofClamp(mRoll + gyros.y/80000,0,1);
+      mRoll = ofClamp(mRoll + gyros.y / 80000, 0, 1);
       if (mRollUIControl)
-         mRollUIControl->SetFromMidiCC(mRoll);
+         mRollUIControl->SetFromMidiCC(mRoll, NextBufferTime(false), false);
       isButtonDown = true;
    }
    if (isButtonDown)
-      mMoveMgr.SetColor(0,mRoll,mYaw,mPitch);
+      mMoveMgr.SetColor(0, mRoll, mYaw, mPitch);
    else
-      mMoveMgr.SetColor(0,0,0,0);
-   
+      mMoveMgr.SetColor(0, 0, 0, 0);
+
    if (mMoveMgr.IsButtonDown(0, Btn_PS))
    {
       if (!mPSButtonDown)
@@ -137,11 +114,11 @@ void PSMoveController::Poll()
       mPSButtonDown = false;
    }
 
-   ofVec3f accel(0,0,0);
-   mMoveMgr.GetAccel(0,accel);
-   mEnergy = ofClamp(accel.length()/5000 - .8f,0,1);
+   ofVec3f accel(0, 0, 0);
+   mMoveMgr.GetAccel(0, accel);
+   mEnergy = ofClamp(accel.length() / 5000 - .8f, 0, 1);
    if (mEnergyUIControl)
-      mEnergyUIControl->SetFromMidiCC(mEnergy);
+      mEnergyUIControl->SetFromMidiCC(mEnergy, NextBufferTime(false), false);
 }
 
 void PSMoveController::Exit()
@@ -165,16 +142,16 @@ void PSMoveController::DrawModule()
    mBindYaw->Draw();
    mBindRoll->Draw();
    mBindEnergy->Draw();
-   
 
-   DrawTextNormal("b: "+ofToString(mMoveMgr.GetBattery(0),1), 80, 14);
+
+   DrawTextNormal("b: " + ofToString(mMoveMgr.GetBattery(0), 1), 80, 14);
 }
 
-void PSMoveController::CheckboxUpdated(Checkbox* checkbox)
+void PSMoveController::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void PSMoveController::ButtonClicked(ClickButton* button)
+void PSMoveController::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mConnectButton)
       mMoveMgr.AddMoves();
@@ -207,12 +184,12 @@ void PSMoveController::OnTimeEvent(double time)
       float length = 100;
       if (TheTransport->GetQuantized(time, mTransportListenerInfo) == 0)
          length = 200;
-      mVibration.Start(1,0,length);
+      mVibration.Start(1, 0, length);
       mMoveMgr.SetVibration(0, 1);
    }
 }
 
-void PSMoveController::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PSMoveController::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    if (slider == mOffsetSlider)
    {
@@ -227,10 +204,10 @@ void PSMoveController::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void PSMoveController::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("pitchcontrol",moduleInfo);
-   mModuleSaveData.LoadString("yawcontrol",moduleInfo);
-   mModuleSaveData.LoadString("rollcontrol",moduleInfo);
-   mModuleSaveData.LoadString("energycontrol",moduleInfo);
+   mModuleSaveData.LoadString("pitchcontrol", moduleInfo);
+   mModuleSaveData.LoadString("yawcontrol", moduleInfo);
+   mModuleSaveData.LoadString("rollcontrol", moduleInfo);
+   mModuleSaveData.LoadString("energycontrol", moduleInfo);
 
    SetUpFromSaveData();
 }

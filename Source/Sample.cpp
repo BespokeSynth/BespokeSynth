@@ -33,19 +33,7 @@
 #include "juce_audio_formats/juce_audio_formats.h"
 
 Sample::Sample()
-: mData(0)
-, mNumSamples(0)
-, mStartTime(0)
-, mOffset(FLT_MAX)
-, mRate(1)
-, mStopPoint(-1)
-, mLooping(false)
-, mNumBars(-1)
-, mVolume(1)
-, mReader(nullptr)
-, mSamplesLeftToRead(0)
 {
-   mName[0] = 0;
 }
 
 Sample::~Sample()
@@ -57,12 +45,12 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
    mReadPath = path;
    ofStringReplace(mReadPath, GetPathSeparator(), "/");
    std::vector<std::string> tokens = ofSplitString(mReadPath, "/");
-   mName = tokens[tokens.size()-1];
-   
+   mName = tokens[tokens.size() - 1];
+
    juce::File file(ofToDataPath(mReadPath));
    delete mReader;
    mReader = TheSynth->GetAudioFormatManager().createReaderFor(file);
-   
+
    if (mReader != nullptr)
    {
       mData.Resize((int)mReader->lengthInSamples);
@@ -74,11 +62,12 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
 
       mNumSamples = (int)mReader->lengthInSamples;
       mOffset = mNumSamples;
-      mSampleRateRatio = float(mReader->sampleRate) / gSampleRate;
-      
+      mOriginalSampleRate = mReader->sampleRate;
+      mSampleRateRatio = float(mOriginalSampleRate) / gSampleRate;
+
       mReadBuffer = std::make_unique<juce::AudioSampleBuffer>();
       mReadBuffer->setSize(mReader->numChannels, mNumSamples);
-      
+
       if (readType == ReadType::Sync)
       {
          mReader->read(mReadBuffer.get(), 0, mNumSamples, 0, true, true);
@@ -96,7 +85,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
    {
       TheSynth->LogEvent("failed to load sample " + file.getFullPathName().toStdString(), kLogEventType_Error);
    }
-   
+
    return false;
 }
 
@@ -104,10 +93,10 @@ void Sample::FinishRead()
 {
    if (mData.NumActiveChannels() == 1 && mReadBuffer->getNumChannels() > 1)
    {
-      BufferCopy(mData.GetChannel(0), mReadBuffer->getReadPointer(0), mReadBuffer->getNumSamples());  //put first channel in
+      BufferCopy(mData.GetChannel(0), mReadBuffer->getReadPointer(0), mReadBuffer->getNumSamples()); //put first channel in
       for (int ch = 1; ch < mReadBuffer->getNumChannels(); ++ch)
          Add(mData.GetChannel(0), mReadBuffer->getReadPointer(ch), mReadBuffer->getNumSamples()); //add the other channels
-      Mult(mData.GetChannel(0), 1.0f / mReadBuffer->getNumChannels(), mReadBuffer->getNumSamples());   //normalize volume
+      Mult(mData.GetChannel(0), 1.0f / mReadBuffer->getNumChannels(), mReadBuffer->getNumSamples()); //normalize volume
    }
    else
    {
@@ -146,7 +135,7 @@ void Sample::Create(ChannelBuffer* data)
    int length = data->BufferSize();
    mData.Resize(length);
    mData.SetNumActiveChannels(channels);
-   for (int ch=0; ch<channels; ++ch)
+   for (int ch = 0; ch < channels; ++ch)
       BufferCopy(mData.GetChannel(ch), data->GetChannel(ch), length);
    Setup(length);
 }
@@ -156,6 +145,7 @@ void Sample::Setup(int length)
    mNumSamples = length;
    mRate = 1;
    mOffset = length;
+   mOriginalSampleRate = gSampleRate;
    mSampleRateRatio = 1;
    mStopPoint = -1;
    mName = "newsample";
@@ -170,16 +160,16 @@ bool Sample::Write(const char* path /*=nullptr*/)
 }
 
 //static
-bool Sample::WriteDataToFile(const std::string& path, float **data, int numSamples, int channels)
+bool Sample::WriteDataToFile(const std::string& path, float** data, int numSamples, int channels)
 {
    auto wavFormat = std::make_unique<juce::WavAudioFormat>();
    juce::File outputFile(ofToDataPath(path));
    outputFile.create();
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
-   bool b1{false};
+   bool b1{ false };
    auto writer = std::unique_ptr<juce::AudioFormatWriter>(
-       wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, 16, b1, 0));
+   wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, 16, b1, 0));
    writer->writeFromFloatArrays(data, channels, numSamples);
 
    return true;
@@ -190,7 +180,7 @@ bool Sample::WriteDataToFile(const std::string& path, ChannelBuffer* data, int n
 {
    int numChannels = data->NumActiveChannels();
    float** channelData = new float*[numChannels];
-   for (int ch=0; ch<numChannels; ++ch)
+   for (int ch = 0; ch < numChannels; ++ch)
       channelData[ch] = data->GetChannel(ch);
    bool ret = WriteDataToFile(path, channelData, numSamples, numChannels);
    delete[] channelData;
@@ -213,55 +203,55 @@ void Sample::Play(double startTime, float rate /*=1*/, int offset /*=0*/, int st
 bool Sample::ConsumeData(double time, ChannelBuffer* out, int size, bool replace)
 {
    assert(size <= out->BufferSize());
-   
+
    mPlayMutex.lock();
    float end = mNumSamples;
    if (mStopPoint != -1)
       end = mStopPoint;
-   
+
    if (mLooping && mOffset >= mNumSamples)
       mOffset -= mNumSamples;
-   
+
    if (mOffset >= end || mOffset != mOffset)
    {
       mPlayMutex.unlock();
       return false;
    }
-   
+
    LockDataMutex(true);
-   for (int i=0; i<size; ++i)
+   for (int i = 0; i < size; ++i)
    {
       if (time < mStartTime)
       {
          if (replace)
          {
-            for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+            for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
                out->GetChannel(ch)[i] = 0;
          }
       }
       else
       {
-         for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+         for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
          {
-            int dataChannel = MIN(ch, mData.NumActiveChannels()-1);
-            
+            int dataChannel = MIN(ch, mData.NumActiveChannels() - 1);
+
             float sample = 0;
             if (mOffset < end || mLooping)
                sample = GetInterpolatedSample(mOffset, mData.GetChannel(dataChannel), mNumSamples) * mVolume;
-            
+
             if (replace)
                out->GetChannel(ch)[i] = sample;
             else
                out->GetChannel(ch)[i] += sample;
          }
-         
+
          mOffset += mRate * mSampleRateRatio;
       }
       time += gInvSampleRateMs;
    }
    LockDataMutex(false);
    mPlayMutex.unlock();
-   
+
    return true;
 }
 
@@ -317,6 +307,7 @@ void Sample::CopyFrom(Sample* sample)
    mNumBars = sample->mNumBars;
    mLooping = sample->mLooping;
    mRate = sample->mRate;
+   mOriginalSampleRate = sample->mOriginalSampleRate;
    mSampleRateRatio = sample->mSampleRateRatio;
    mStopPoint = sample->mStopPoint;
    mName = sample->mName;
@@ -325,20 +316,20 @@ void Sample::CopyFrom(Sample* sample)
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void Sample::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
-   
+
    out << mNumSamples;
    if (mNumSamples > 0)
       mData.Save(out, mNumSamples);
    out << mNumBars;
    out << mLooping;
    out << mRate;
-   out << mSampleRateRatio;
+   out << mOriginalSampleRate;
    out << mStopPoint;
    out << mName;
    out << mReadPath;
@@ -348,7 +339,7 @@ void Sample::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   
+
    in >> mNumSamples;
    if (mNumSamples > 0)
    {
@@ -367,7 +358,16 @@ void Sample::LoadState(FileStreamIn& in)
    in >> mNumBars;
    in >> mLooping;
    in >> mRate;
-   in >> mSampleRateRatio;
+   if (rev == 0)
+   {
+      in >> mSampleRateRatio;
+      mOriginalSampleRate = gSampleRate * mSampleRateRatio;
+   }
+   else
+   {
+      in >> mOriginalSampleRate;
+      mSampleRateRatio = float(mOriginalSampleRate) / gSampleRate;
+   }
    in >> mStopPoint;
    in >> mName;
    in >> mReadPath;

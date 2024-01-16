@@ -32,10 +32,6 @@
 #include "Profiler.h"
 
 PulseDelayer::PulseDelayer()
-: mDelay(.25f)
-, mDelaySlider(nullptr)
-, mConsumeIndex(0)
-, mAppendIndex(0)
 {
 }
 
@@ -54,17 +50,17 @@ PulseDelayer::~PulseDelayer()
 void PulseDelayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mDelaySlider = new FloatSlider(this,"delay",4,4,100,15,&mDelay,0,1,4);
+
+   mDelaySlider = new FloatSlider(this, "delay", 4, 4, 100, 15, &mDelay, 0, 1, 4);
 }
 
 void PulseDelayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mDelaySlider->Draw();
-   
+
    float t = (gTime - mLastPulseTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
    if (t > 0 && t < 1)
    {
@@ -72,13 +68,13 @@ void PulseDelayer::DrawModule()
       ofNoFill();
       ofCircle(54, 11, 10);
       ofFill();
-      ofSetColor(255,255,255,gModuleDrawAlpha);
+      ofSetColor(255, 255, 255, gModuleDrawAlpha);
       ofCircle(54 + sin(t * TWO_PI) * 10, 11 - cos(t * TWO_PI) * 10, 2);
       ofPopStyle();
    }
 }
 
-void PulseDelayer::CheckboxUpdated(Checkbox* checkbox)
+void PulseDelayer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (!mEnabled)
       mConsumeIndex = mAppendIndex; //effectively clears the queue
@@ -87,13 +83,13 @@ void PulseDelayer::CheckboxUpdated(Checkbox* checkbox)
 void PulseDelayer::OnTransportAdvanced(float amount)
 {
    PROFILER(PulseDelayer);
-   
+
    ComputeSliders(0);
-   
+
    int end = mAppendIndex;
    if (mAppendIndex < mConsumeIndex)
       end += kQueueSize;
-   for (int i=mConsumeIndex; i<end; ++i)
+   for (int i = mConsumeIndex; i < end; ++i)
    {
       const PulseInfo& info = mInputPulses[i % kQueueSize];
       if (gTime + TheTransport->GetEventLookaheadMs() >= info.mTriggerTime)
@@ -108,10 +104,10 @@ void PulseDelayer::OnPulse(double time, float velocity, int flags)
 {
    if (!mEnabled)
       return;
-   
+
    if (velocity > 0)
       mLastPulseTime = time;
-   
+
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
       PulseInfo info;
@@ -123,14 +119,14 @@ void PulseDelayer::OnPulse(double time, float velocity, int flags)
    }
 }
 
-void PulseDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void PulseDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
 void PulseDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

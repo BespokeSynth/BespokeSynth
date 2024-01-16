@@ -28,9 +28,6 @@
 #include "PatchCableSource.h"
 
 ComboGridController::ComboGridController()
-: mRows(0)
-, mCols(0)
-, mOwner(nullptr)
 {
    assert(false);
 }
@@ -43,7 +40,7 @@ void ComboGridController::CreateUIControls()
 void ComboGridController::Init()
 {
    IDrawableModule::Init();
-   
+
    InitializeCombo();
 }
 
@@ -51,13 +48,13 @@ void ComboGridController::InitializeCombo()
 {
    //for (int i=0; i<mGrids.size(); ++i)
    //   mGrids[i]->SetTarget(this);
-   
+
    mCols = 0;
    mRows = 0;
    mArrangement = mModuleSaveData.GetEnum<Arrangements>("arrangement");
    if (mArrangement == kHorizontal)
    {
-      for (int i=0; i<mGrids.size(); ++i)
+      for (int i = 0; i < mGrids.size(); ++i)
       {
          mCols += mGrids[i]->NumCols();
          mRows = MAX(mRows, mGrids[i]->NumRows());
@@ -65,7 +62,7 @@ void ComboGridController::InitializeCombo()
    }
    else if (mArrangement == kVertical)
    {
-      for (int i=0; i<mGrids.size(); ++i)
+      for (int i = 0; i < mGrids.size(); ++i)
       {
          mCols = MAX(mCols, mGrids[i]->NumCols());
          mRows += mGrids[i]->NumRows();
@@ -87,7 +84,7 @@ void ComboGridController::OnGridButton(int x, int y, float velocity, IGridContro
 {
    if (mArrangement == kHorizontal)
    {
-      for (int i=0; i<mGrids.size(); ++i)
+      for (int i = 0; i < mGrids.size(); ++i)
       {
          if (mGrids[i] == grid)
             break;
@@ -96,7 +93,7 @@ void ComboGridController::OnGridButton(int x, int y, float velocity, IGridContro
    }
    else if (mArrangement == kVertical)
    {
-      for (int i=0; i<mGrids.size(); ++i)
+      for (int i = 0; i < mGrids.size(); ++i)
       {
          if (mGrids[i] == grid)
             break;
@@ -107,7 +104,7 @@ void ComboGridController::OnGridButton(int x, int y, float velocity, IGridContro
    {
       assert(false); //TODO(Ryan) implement
    }
-   
+
    for (auto cable : GetPatchCableSource()->GetPatchCables())
    {
       auto* listener = dynamic_cast<IGridControllerListener*>(cable->GetTarget());
@@ -120,7 +117,7 @@ void ComboGridController::OnGridButton(int x, int y, float velocity, IGridContro
 
 bool ComboGridController::HasInput() const
 {
-   for (int i=0; i<mGrids.size(); ++i)
+   for (int i = 0; i < mGrids.size(); ++i)
    {
       if (mGrids[i]->HasInput())
          return true;
@@ -132,7 +129,7 @@ void ComboGridController::SetLight(int x, int y, GridColor color, bool force)
 {
    if (mArrangement == kHorizontal)
    {
-      for (int i=0; i<mGrids.size(); ++i)
+      for (int i = 0; i < mGrids.size(); ++i)
       {
          if (x < mGrids[i]->NumCols())
          {
@@ -144,7 +141,7 @@ void ComboGridController::SetLight(int x, int y, GridColor color, bool force)
    }
    else if (mArrangement == kVertical)
    {
-      for (int i=0; i<mGrids.size(); ++i)
+      for (int i = 0; i < mGrids.size(); ++i)
       {
          if (y < mGrids[i]->NumRows())
          {
@@ -167,11 +164,11 @@ void ComboGridController::SetLightDirect(int x, int y, int color, bool force)
 
 void ComboGridController::ResetLights()
 {
-   for (int i=0; i<mCols; ++i)
+   for (int i = 0; i < mCols; ++i)
    {
-      for (int j=0; j<mRows; ++j)
+      for (int j = 0; j < mRows; ++j)
       {
-         SetLight(i,j,kGridColorOff);
+         SetLight(i, j, kGridColorOff);
       }
    }
 }
@@ -196,21 +193,20 @@ void ComboGridController::LoadLayout(const ofxJSONElement& moduleInfo)
    map["square"] = kSquare;
    mModuleSaveData.LoadEnum<Arrangements>("arrangement", moduleInfo, kHorizontal, nullptr, &map);
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
 void ComboGridController::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
    std::string grids = "";
-   for (int i=0; i<mGrids.size(); ++i)
+   for (int i = 0; i < mGrids.size(); ++i)
    {
       IDrawableModule* grid = dynamic_cast<IDrawableModule*>(mGrids[i]);
       if (grid)
       {
          grids += grid->Name();
-         if (i < mGrids.size()-1)
+         if (i < mGrids.size() - 1)
             grids += ",";
       }
    }
@@ -224,14 +220,14 @@ void ComboGridController::SetUpFromSaveData()
    mGrids.clear();
    if (grids != "")
    {
-      for (int i=0; i<gridVec.size(); ++i)
+      for (int i = 0; i < gridVec.size(); ++i)
          mGrids.push_back(dynamic_cast<IGridController*>(TheSynth->FindModule(gridVec[i])));
    }
-   
+
    //for (int i=0; i<mGrids.size(); ++i)
    //   mGrids[i]->SetTarget(this);
-   
+
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   
+
    InitializeCombo();
 }

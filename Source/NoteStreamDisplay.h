@@ -37,47 +37,52 @@ public:
    NoteStreamDisplay();
    static IDrawableModule* Create() { return new NoteStreamDisplay(); }
    void CreateUIControls() override;
-   
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return true; }
+   static bool AcceptsPulses() { return false; }
+
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
-   void ButtonClicked(ClickButton* button) override;
-   
+
+   void ButtonClicked(ClickButton* button, double time) override;
+
    bool HasDebugDraw() const override { return true; }
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return true; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool IsElementActive(int index) const;
    float GetYPos(int pitch, float noteHeight) const;
-   
+
    struct NoteStreamElement
    {
-      int pitch;
-      int velocity;
-      double timeOn;
-      double timeOff;
+      int pitch{ 0 };
+      int velocity{ 0 };
+      double timeOn{ -1 };
+      double timeOff{ -1 };
    };
-   
+
    static const int kNoteStreamCapacity = 100;
    NoteStreamElement mNoteStream[kNoteStreamCapacity];
-   float mWidth;
-   float mHeight;
-   float mDurationMs;
-   int mPitchMin;
-   int mPitchMax;
-   ClickButton* mResetButton;
-   std::string mDebugLines;
+   float mWidth{ 400 };
+   float mHeight{ 200 };
+   float mDurationMs{ 2000 };
+   int mPitchMin{ 127 };
+   int mPitchMax{ 0 };
+   ClickButton* mResetButton{ nullptr };
 };

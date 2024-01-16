@@ -38,28 +38,32 @@ public:
    SampleCapturer();
    virtual ~SampleCapturer();
    static IDrawableModule* Create() { return new SampleCapturer(); }
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
-   
    void CreateUIControls() override;
 
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   void ButtonClicked(ClickButton* button) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 0; }
+
+   bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override;
-   bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
+   void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
 
@@ -68,22 +72,20 @@ private:
    {
       SampleElement()
       : mBuffer(gSampleRate * kMaxSampleLengthSeconds)
-      , mRecordingLength(0)
-      , mPlaybackPos(-1)
       {
       }
 
       ChannelBuffer mBuffer;
-      int mRecordingLength;
-      int mPlaybackPos;
+      int mRecordingLength{ 0 };
+      int mPlaybackPos{ -1 };
    };
    std::array<SampleElement, 10> mSamples;
-   int mCurrentSampleIndex;
-   bool mWantRecord;
-   Checkbox* mWantRecordCheckbox;
-   bool mIsRecording;
-   ClickButton* mDeleteButton;
-   ClickButton* mSaveButton;
-   ClickButton* mPlayButton;
-   bool mIsDragging;
+   int mCurrentSampleIndex{ 0 };
+   bool mWantRecord{ false };
+   Checkbox* mWantRecordCheckbox{ nullptr };
+   bool mIsRecording{ false };
+   ClickButton* mDeleteButton{ nullptr };
+   ClickButton* mSaveButton{ nullptr };
+   ClickButton* mPlayButton{ nullptr };
+   bool mIsDragging{ false };
 };

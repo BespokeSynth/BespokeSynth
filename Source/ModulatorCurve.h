@@ -39,44 +39,52 @@ public:
    ModulatorCurve();
    virtual ~ModulatorCurve();
    static IDrawableModule* Create() { return new ModulatorCurve(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   
-   FloatSlider* GetTarget() { return mTarget; }
-   
+
+   FloatSlider* GetTarget() { return GetSliderTarget(); }
+
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
+
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-   
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=106; h=121; }
-   bool Enabled() const override { return mEnabled; }
-   
-   void OnClicked(int x, int y, bool right) override;
-   
-   float mInput;
-   EnvelopeControl mEnvelopeControl;
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 106;
+      h = 121;
+   }
+
+   void OnClicked(float x, float y, bool right) override;
+
+   float mInput{ 0 };
+   EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100) };
    ::ADSR mAdsr;
-   
-   FloatSlider* mInputSlider;
+
+   FloatSlider* mInputSlider{ nullptr };
 };

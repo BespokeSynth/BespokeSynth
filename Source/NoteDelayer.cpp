@@ -30,10 +30,6 @@
 #include "Profiler.h"
 
 NoteDelayer::NoteDelayer()
-: mDelay(.25f)
-, mDelaySlider(nullptr)
-, mConsumeIndex(0)
-, mAppendIndex(0)
 {
 }
 
@@ -52,17 +48,17 @@ NoteDelayer::~NoteDelayer()
 void NoteDelayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mDelaySlider = new FloatSlider(this,"delay",4,4,100,15,&mDelay,0,1,4);
+
+   mDelaySlider = new FloatSlider(this, "delay", 4, 4, 100, 15, &mDelay, 0, 1, 4);
 }
 
 void NoteDelayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mDelaySlider->Draw();
-   
+
    float t = (gTime - mLastNoteOnTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
    if (t > 0 && t < 1)
    {
@@ -70,17 +66,17 @@ void NoteDelayer::DrawModule()
       ofNoFill();
       ofCircle(54, 11, 10);
       ofFill();
-      ofSetColor(255,255,255,gModuleDrawAlpha);
+      ofSetColor(255, 255, 255, gModuleDrawAlpha);
       ofCircle(54 + sin(t * TWO_PI) * 10, 11 - cos(t * TWO_PI) * 10, 2);
       ofPopStyle();
    }
 }
 
-void NoteDelayer::CheckboxUpdated(Checkbox *checkbox)
+void NoteDelayer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(time);
       mAppendIndex = 0;
       mConsumeIndex = 0;
    }
@@ -89,16 +85,16 @@ void NoteDelayer::CheckboxUpdated(Checkbox *checkbox)
 void NoteDelayer::OnTransportAdvanced(float amount)
 {
    PROFILER(NoteDelayer);
-   
+
    ComputeSliders(0);
-   
+
    int end = mAppendIndex;
    if (mAppendIndex < mConsumeIndex)
       end += kQueueSize;
-   for (int i=mConsumeIndex; i<end; ++i)
+   for (int i = mConsumeIndex; i < end; ++i)
    {
       const NoteInfo& info = mInputNotes[i % kQueueSize];
-      if (gTime + gBufferSizeMs >= info.mTriggerTime)
+      if (NextBufferTime(true) >= info.mTriggerTime)
       {
          PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
          mConsumeIndex = (mConsumeIndex + 1) % kQueueSize;
@@ -109,11 +105,14 @@ void NoteDelayer::OnTransportAdvanced(float amount)
 void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
+   {
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation); // Passthrough notes.
       return;
-   
+   }
+
    if (velocity > 0)
       mLastNoteOnTime = time;
-   
+
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
       NoteInfo info;
@@ -126,14 +125,14 @@ void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 }
 
-void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
 
 void NoteDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

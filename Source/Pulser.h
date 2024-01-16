@@ -44,37 +44,40 @@ public:
    Pulser();
    virtual ~Pulser();
    static IDrawableModule* Create() { return new Pulser(); }
-   
-   
+   static bool AcceptsAudio() { return false; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
-   void ButtonClicked(ClickButton* button) override;
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void DropdownUpdated(DropdownList* list, int oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
+   void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   
+
    float GetOffset();
-   
+
    enum TimeMode
    {
       kTimeMode_Step,
@@ -86,28 +89,27 @@ private:
       kTimeMode_Align,
       kTimeMode_Reset
    };
-   
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   
-   TimeMode mTimeMode;
-   DropdownList* mTimeModeSelector;
-   
-   bool mRandomStep;
-   Checkbox* mRandomStepCheckbox;
-   
-   bool mWaitingForDownbeat;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   
-   FloatSlider* mFreeTimeSlider;
-   float mFreeTimeStep;
-   float mFreeTimeCounter;
-   int mResetLength;
-   IntSlider* mResetLengthSlider;
-   int mCustomDivisor;
-   IntSlider* mCustomDivisorSlider;
 
-   TransportListenerInfo* mTransportListenerInfo;
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+
+   TimeMode mTimeMode{ TimeMode::kTimeMode_Step };
+   DropdownList* mTimeModeSelector{ nullptr };
+
+   bool mRandomStep{ false };
+   Checkbox* mRandomStepCheckbox{ nullptr };
+
+   bool mWaitingForDownbeat{ false };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+
+   FloatSlider* mFreeTimeSlider{ nullptr };
+   float mFreeTimeStep{ 30 };
+   float mFreeTimeCounter{ 0 };
+   int mResetLength{ 8 };
+   IntSlider* mResetLengthSlider{ nullptr };
+   int mCustomDivisor{ 8 };
+   IntSlider* mCustomDivisorSlider{ nullptr };
+
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-

@@ -48,3 +48,6 @@ from __future__ import annotations
    def connect_osc_input(port):
       pass
 
+   def send_cc(control, value, output_index = 0):
+      pass
+

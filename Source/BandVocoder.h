@@ -44,71 +44,77 @@ public:
    BandVocoder();
    virtual ~BandVocoder();
    static IDrawableModule* Create() { return new BandVocoder(); }
-   
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
+
    void CreateUIControls() override;
-   
+
    void SetCarrierBuffer(float* carrier, int bufferSize) override;
-   
+
    //IAudioReceiver
    InputMode GetInputMode() override { return kInputMode_Mono; }
-   
+
    //IAudioSource
    void Process(double time) override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
+   bool IsEnabled() const override { return mEnabled; }
+
 private:
-   
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=215; h=130; }
-   bool Enabled() const override { return mEnabled; }
-   
-   void CalcFilters();
-   
-   float* mCarrierInputBuffer;
-   
-   float* mWorkBuffer;
-   float* mOutBuffer;
-   
-   float mInputPreamp;
-   float mCarrierPreamp;
-   float mVolume;
-   FloatSlider* mInputSlider;
-   FloatSlider* mCarrierSlider;
-   FloatSlider* mVolumeSlider;
-   float mDryWet;
-   FloatSlider* mDryWetSlider;
-   float mQ;
-   FloatSlider* mQSlider;
-   IntSlider* mNumBandsSlider;
-   int mNumBands;
-   float mFreqBase;
-   float mFreqRange;
-   FloatSlider* mFBaseSlider;
-   FloatSlider* mFRangeSlider;
-   float mRingTime;
-   FloatSlider* mRingTimeSlider;
-   float mMaxBand;
-   FloatSlider* mMaxBandSlider;
-   float mSpacingStyle;
-   FloatSlider* mSpacingStyleSlider;
-   
-   BiquadFilter mBiquadCarrier[VOCODER_MAX_BANDS];
-   BiquadFilter mBiquadOut[VOCODER_MAX_BANDS];
-   PeakTracker mPeaks[VOCODER_MAX_BANDS];
-   PeakTracker mOutputPeaks[VOCODER_MAX_BANDS];
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 215;
+      h = 130;
+   }
 
-   bool mCarrierDataSet;
+   void CalcFilters();
+
+   float* mCarrierInputBuffer{ nullptr };
+
+   float* mWorkBuffer{ nullptr };
+   float* mOutBuffer{ nullptr };
+
+   float mInputPreamp{ 1 };
+   float mCarrierPreamp{ 1 };
+   float mVolume{ 1 };
+   FloatSlider* mInputSlider{ nullptr };
+   FloatSlider* mCarrierSlider{ nullptr };
+   FloatSlider* mVolumeSlider{ nullptr };
+   float mDryWet{ 1 };
+   FloatSlider* mDryWetSlider{ nullptr };
+   float mQ{ 40 };
+   FloatSlider* mQSlider{ nullptr };
+   IntSlider* mNumBandsSlider{ nullptr };
+   int mNumBands{ 40 };
+   float mFreqBase{ 200 };
+   float mFreqRange{ 6000 };
+   FloatSlider* mFBaseSlider{ nullptr };
+   FloatSlider* mFRangeSlider{ nullptr };
+   float mRingTime{ .03 };
+   FloatSlider* mRingTimeSlider{ nullptr };
+   float mMaxBand{ 1 };
+   FloatSlider* mMaxBandSlider{ nullptr };
+   float mSpacingStyle{ 0 };
+   FloatSlider* mSpacingStyleSlider{ nullptr };
+
+   BiquadFilter mBiquadCarrier[VOCODER_MAX_BANDS]{};
+   BiquadFilter mBiquadOut[VOCODER_MAX_BANDS]{};
+   PeakTracker mPeaks[VOCODER_MAX_BANDS]{};
+   PeakTracker mOutputPeaks[VOCODER_MAX_BANDS]{};
+
+   bool mCarrierDataSet{ false };
 };
 
 
 #endif /* defined(__modularSynth__BandVocoder__) */
-

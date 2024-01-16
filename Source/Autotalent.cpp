@@ -34,60 +34,6 @@
 
 Autotalent::Autotalent()
 : IAudioProcessor(gBufferSize)
-, mTune(440)
-, mFixed(0)
-, mPull(0)
-, mAmount(1)
-, mSmooth(0)
-, mShift(0)
-, mScwarp(0)
-, mLfoamp(0)
-, mLforate(0)
-, mLfoshape(0)
-, mLfosymm(0)
-, mLfoquant(false)
-, mFcorr(false)
-, mFwarp(0)
-, mMix(1)
-, mA(0)
-, mBb(0)
-, mB(0)
-, mC(0)
-, mDb(0)
-, mD(0)
-, mEb(0)
-, mE(0)
-, mF(0)
-, mGb(0)
-, mG(0)
-, mAb(0)
-, mASelector(nullptr)
-, mBbSelector(nullptr)
-, mBSelector(nullptr)
-, mCSelector(nullptr)
-, mDbSelector(nullptr)
-, mDSelector(nullptr)
-, mEbSelector(nullptr)
-, mESelector(nullptr)
-, mFSelector(nullptr)
-, mGbSelector(nullptr)
-, mGSelector(nullptr)
-, mAbSelector(nullptr)
-, mAmountSlider(nullptr)
-, mSmoothSlider(nullptr)
-, mShiftSlider(nullptr)
-, mScwarpSlider(nullptr)
-, mLfoampSlider(nullptr)
-, mLforateSlider(nullptr)
-, mLfoshapeSlider(nullptr)
-, mLfosymmSlider(nullptr)
-, mLfoquantCheckbox(nullptr)
-, mFcorrCheckbox(nullptr)
-, mFwarpSlider(nullptr)
-, mMixSlider(nullptr)
-, mSetFromScaleButton(nullptr)
-, mPitch(0)
-, mConfidence(0)
 {
    mWorkingBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mWorkingBuffer, GetBuffer()->BufferSize());
@@ -97,11 +43,12 @@ Autotalent::Autotalent()
    mcbsize = 2048;
    mcorrsize = mcbsize / 2 + 1;
 
-   mpmax = 1/(float)70;  // max and min periods (ms)
-   mpmin = 1/(float)700; // eventually may want to bring these out as sliders
+   mpmax = 1 / (float)70; // max and min periods (ms)
+   mpmin = 1 / (float)700; // eventually may want to bring these out as sliders
 
    mnmax = (unsigned long)(gSampleRate * mpmax);
-   if (mnmax > mcorrsize) {
+   if (mnmax > mcorrsize)
+   {
       mnmax = mcorrsize;
    }
    mnmin = (unsigned long)(gSampleRate * mpmin);
@@ -117,8 +64,8 @@ Autotalent::Autotalent()
 
    // Initialize formant corrector
    mford = 7; // should be sufficient to capture formants
-   mfalph = pow(0.001f, (float) 80 / (gSampleRate));
-   mflamb = -(0.8517*sqrt(atan(0.06583*gSampleRate))-0.1916); // or about -0.88 @ 44.1kHz
+   mfalph = pow(0.001f, (float)80 / (gSampleRate));
+   mflamb = -(0.8517 * sqrt(atan(0.06583 * gSampleRate)) - 0.1916); // or about -0.88 @ 44.1kHz
    mfk = (float*)calloc(mford, sizeof(float));
    mfb = (float*)calloc(mford, sizeof(float));
    mfc = (float*)calloc(mford, sizeof(float));
@@ -128,9 +75,10 @@ Autotalent::Autotalent()
    mfsmooth = (float*)calloc(mford, sizeof(float));
    mfhp = 0;
    mflp = 0;
-   mflpa = pow(0.001f, (float) 10 / (gSampleRate));
-   mfbuff = (float**) malloc((mford)*sizeof(float*));
-   for (int ti=0; ti<mford; ti++) {
+   mflpa = pow(0.001f, (float)10 / (gSampleRate));
+   mfbuff = (float**)malloc((mford) * sizeof(float*));
+   for (int ti = 0; ti < mford; ti++)
+   {
       mfbuff[ti] = (float*)calloc(mcbsize, sizeof(float));
    }
    mftvec = (float*)calloc(mford, sizeof(float));
@@ -139,14 +87,16 @@ Autotalent::Autotalent()
 
    // Standard raised cosine window, max height at N/2
    mhannwindow = (float*)calloc(mcbsize, sizeof(float));
-   for (int ti=0; ti<mcbsize; ti++) {
-      mhannwindow[ti] = -0.5*cos(2*PI*ti/mcbsize) + 0.5;
+   for (int ti = 0; ti < mcbsize; ti++)
+   {
+      mhannwindow[ti] = -0.5 * cos(2 * PI * ti / mcbsize) + 0.5;
    }
 
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mcbwindow = (float*)calloc(mcbsize, sizeof(float));
-   for (int ti=0; ti<(mcbsize / 2); ti++) {
-      mcbwindow[ti+mcbsize/4] = -0.5*cos(4*PI*ti/(mcbsize - 1)) + 0.5;
+   for (int ti = 0; ti < (mcbsize / 2); ti++)
+   {
+      mcbwindow[ti + mcbsize / 4] = -0.5 * cos(4 * PI * ti / (mcbsize - 1)) + 0.5;
    }
 
    mnoverlap = 4;
@@ -160,21 +110,26 @@ Autotalent::Autotalent()
 
    // ---- Calculate autocorrelation of window ----
    macwinv = (float*)calloc(mcbsize, sizeof(float));
-   for (int ti=0; ti<mcbsize; ti++) {
+   for (int ti = 0; ti < mcbsize; ti++)
+   {
       mffttime[ti] = mcbwindow[ti];
    }
    mFFT->Forward(mcbwindow, mfftfreqre, mfftfreqim);
-   for (int ti=0; ti<mcorrsize; ti++) {
-      mfftfreqre[ti] = (mfftfreqre[ti])*(mfftfreqre[ti]) + (mfftfreqim[ti])*(mfftfreqim[ti]);
+   for (int ti = 0; ti < mcorrsize; ti++)
+   {
+      mfftfreqre[ti] = (mfftfreqre[ti]) * (mfftfreqre[ti]) + (mfftfreqim[ti]) * (mfftfreqim[ti]);
       mfftfreqim[ti] = 0;
    }
    mFFT->Inverse(mfftfreqre, mfftfreqim, mffttime);
-   for (long ti=1; ti<mcbsize; ti++) {
-      macwinv[ti] = mffttime[ti]/mffttime[0];
-      if (macwinv[ti] > 0.000001) {
-         macwinv[ti] = (float)1/macwinv[ti];
+   for (long ti = 1; ti < mcbsize; ti++)
+   {
+      macwinv[ti] = mffttime[ti] / mffttime[0];
+      if (macwinv[ti] > 0.000001)
+      {
+         macwinv[ti] = (float)1 / macwinv[ti];
       }
-      else {
+      else
+      {
          macwinv[ti] = 0;
       }
    }
@@ -186,11 +141,11 @@ Autotalent::Autotalent()
    mptarget = 0;
    msptarget = 0;
 
-   mvthresh = 0.7;  //  The voiced confidence (unbiased peak) threshold level
+   mvthresh = 0.7; //  The voiced confidence (unbiased peak) threshold level
 
    // Pitch shifter initialization
    mphprdd = 0.01; // Default period
-   minphinc = (float)1/(mphprdd * gSampleRate);
+   minphinc = (float)1 / (mphprdd * gSampleRate);
    mphincfact = 1;
    mphasein = 0;
    mphaseout = 0;
@@ -201,76 +156,76 @@ Autotalent::Autotalent()
 void Autotalent::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mASelector = new RadioButton(this,"A",4,40,&mA);
-   mBbSelector = new RadioButton(this,"Bb",24,40,&mBb);
-   mBSelector = new RadioButton(this,"B",44,40,&mB);
-   mCSelector = new RadioButton(this,"C",64,40,&mC);
-   mDbSelector = new RadioButton(this,"Db",84,40,&mDb);
-   mDSelector = new RadioButton(this,"D",104,40,&mD);
-   mEbSelector = new RadioButton(this,"Eb",124,40,&mEb);
-   mESelector = new RadioButton(this,"E",144,40,&mE);
-   mFSelector = new RadioButton(this,"F",164,40,&mF);
-   mGbSelector = new RadioButton(this,"Gb",184,40,&mGb);
-   mGSelector = new RadioButton(this,"G",204,40,&mG);
-   mAbSelector = new RadioButton(this,"Ab",224,40,&mAb);
-   mAmountSlider = new FloatSlider(this,"amount",4,100,150,15,&mAmount,0,1);
-   mSmoothSlider = new FloatSlider(this,"smooth",4,120,150,15,&mSmooth,0,.8f);
-   mShiftSlider = new IntSlider(this,"shift",4,140,150,15,&mShift,-6,6);
-   mScwarpSlider = new IntSlider(this,"scwarp",4,160,150,15,&mScwarp,-3,3);
-   mLfoampSlider = new FloatSlider(this,"lfoamp",4,180,150,15,&mLfoamp,0,1);
-   mLforateSlider = new FloatSlider(this,"lforate",4,200,150,15,&mLforate,0,20);
-   mLfoshapeSlider = new IntSlider(this,"lfoshape",4,220,150,15,&mLfoshape,-1,1);
-   mLfosymmSlider = new FloatSlider(this,"lfosymm",4,240,150,15,&mLfosymm,0,1);
-   mLfoquantCheckbox = new Checkbox(this,"lfoquant",4,260,&mLfoquant);
-   mFcorrCheckbox = new Checkbox(this,"formant correct",4,280,&mFcorr);
-   mFwarpSlider = new FloatSlider(this,"fwarp",4,300,150,15,&mFwarp,-5,5);
-   mMixSlider = new FloatSlider(this,"mix",4,320,150,15,&mMix,0,1);
-   mSetFromScaleButton = new ClickButton(this,"set from scale",4,340);
-   
+   mASelector = new RadioButton(this, "A", 4, 40, &mA);
+   mBbSelector = new RadioButton(this, "Bb", 24, 40, &mBb);
+   mBSelector = new RadioButton(this, "B", 44, 40, &mB);
+   mCSelector = new RadioButton(this, "C", 64, 40, &mC);
+   mDbSelector = new RadioButton(this, "Db", 84, 40, &mDb);
+   mDSelector = new RadioButton(this, "D", 104, 40, &mD);
+   mEbSelector = new RadioButton(this, "Eb", 124, 40, &mEb);
+   mESelector = new RadioButton(this, "E", 144, 40, &mE);
+   mFSelector = new RadioButton(this, "F", 164, 40, &mF);
+   mGbSelector = new RadioButton(this, "Gb", 184, 40, &mGb);
+   mGSelector = new RadioButton(this, "G", 204, 40, &mG);
+   mAbSelector = new RadioButton(this, "Ab", 224, 40, &mAb);
+   mAmountSlider = new FloatSlider(this, "amount", 4, 100, 150, 15, &mAmount, 0, 1);
+   mSmoothSlider = new FloatSlider(this, "smooth", 4, 120, 150, 15, &mSmooth, 0, .8f);
+   mShiftSlider = new IntSlider(this, "shift", 4, 140, 150, 15, &mShift, -6, 6);
+   mScwarpSlider = new IntSlider(this, "scwarp", 4, 160, 150, 15, &mScwarp, -3, 3);
+   mLfoampSlider = new FloatSlider(this, "lfoamp", 4, 180, 150, 15, &mLfoamp, 0, 1);
+   mLforateSlider = new FloatSlider(this, "lforate", 4, 200, 150, 15, &mLforate, 0, 20);
+   mLfoshapeSlider = new IntSlider(this, "lfoshape", 4, 220, 150, 15, &mLfoshape, -1, 1);
+   mLfosymmSlider = new FloatSlider(this, "lfosymm", 4, 240, 150, 15, &mLfosymm, 0, 1);
+   mLfoquantCheckbox = new Checkbox(this, "lfoquant", 4, 260, &mLfoquant);
+   mFcorrCheckbox = new Checkbox(this, "formant correct", 4, 280, &mFcorr);
+   mFwarpSlider = new FloatSlider(this, "fwarp", 4, 300, 150, 15, &mFwarp, -5, 5);
+   mMixSlider = new FloatSlider(this, "mix", 4, 320, 150, 15, &mMix, 0, 1);
+   mSetFromScaleButton = new ClickButton(this, "set from scale", 4, 340);
+
    mASelector->AddLabel("A ", 1);
    mASelector->AddLabel(" ", 0);
    mASelector->AddLabel("-", -1);
-   
+
    mBbSelector->AddLabel("Bb", 1);
    mBbSelector->AddLabel(" ", 0);
    mBbSelector->AddLabel("-", -1);
-   
+
    mBSelector->AddLabel("B ", 1);
    mBSelector->AddLabel(" ", 0);
    mBSelector->AddLabel("-", -1);
-   
+
    mCSelector->AddLabel("C ", 1);
    mCSelector->AddLabel(" ", 0);
    mCSelector->AddLabel("-", -1);
-   
+
    mDbSelector->AddLabel("Db", 1);
    mDbSelector->AddLabel(" ", 0);
    mDbSelector->AddLabel("-", -1);
-   
+
    mDSelector->AddLabel("D ", 1);
    mDSelector->AddLabel(" ", 0);
    mDSelector->AddLabel("-", -1);
-   
+
    mEbSelector->AddLabel("Eb", 1);
    mEbSelector->AddLabel(" ", 0);
    mEbSelector->AddLabel("-", -1);
-   
+
    mESelector->AddLabel("E ", 1);
    mESelector->AddLabel(" ", 0);
    mESelector->AddLabel("-", -1);
-   
+
    mFSelector->AddLabel("F ", 1);
    mFSelector->AddLabel(" ", 0);
    mFSelector->AddLabel("-", -1);
-   
+
    mGbSelector->AddLabel("Gb", 1);
    mGbSelector->AddLabel(" ", 0);
    mGbSelector->AddLabel("-", -1);
-   
+
    mGSelector->AddLabel("G ", 1);
    mGSelector->AddLabel(" ", 0);
    mGSelector->AddLabel("-", -1);
-   
+
    mAbSelector->AddLabel("Ab", 1);
    mAbSelector->AddLabel(" ", 0);
    mAbSelector->AddLabel("-", -1);
@@ -296,7 +251,8 @@ Autotalent::~Autotalent()
    free(mfrc);
    free(mfsmooth);
    free(mfsig);
-   for (int ti=0; ti<mford; ti++) {
+   for (int ti = 0; ti < mford; ti++)
+   {
       free(mfbuff[ti]);
    }
    free(mfbuff);
@@ -386,9 +342,9 @@ void Autotalent::Process(double time)
    // Some logic for the semitone->scale and scale->semitone conversion
    // If no notes are selected as being in the scale, instead snap to all notes
    ti2 = 0;
-   for (ti=0; ti<12; ti++)
+   for (ti = 0; ti < 12; ti++)
    {
-      if (iNotes[ti]>=0)
+      if (iNotes[ti] >= 0)
       {
          iPitch2Note[ti] = (int)ti2;
          iNote2Pitch[ti2] = (int)ti;
@@ -400,14 +356,14 @@ void Autotalent::Process(double time)
       }
    }
    numNotes = (int)ti2;
-   while (ti2<12)
+   while (ti2 < 12)
    {
       iNote2Pitch[ti2] = -1;
       ti2 = ti2 + 1;
    }
-   if (numNotes==0)
+   if (numNotes == 0)
    {
-      for (ti=0; ti<12; ti++)
+      for (ti = 0; ti < 12; ti++)
       {
          iNotes[ti] = 1;
          iPitch2Note[ti] = (int)ti;
@@ -415,15 +371,15 @@ void Autotalent::Process(double time)
       }
       numNotes = 12;
    }
-   iScwarp = (iScwarp + numNotes*5)%numNotes;
+   iScwarp = (iScwarp + numNotes * 5) % numNotes;
 
    ford = mford;
    falph = mfalph;
    foma = (float)1 - falph;
    flpa = mflpa;
    flamb = mflamb;
-   tf = pow((float)2,mFwarp/2)*(1+flamb)/(1-flamb);
-   frlamb = (tf - 1)/(tf + 1);
+   tf = pow((float)2, mFwarp / 2) * (1 + flamb) / (1 - flamb);
+   frlamb = (tf - 1) / (tf + 1);
 
    maref = (float)mTune;
 
@@ -443,7 +399,7 @@ void Autotalent::Process(double time)
    for (int lSampleIndex = 0; lSampleIndex < bufferSize; lSampleIndex++)
    {
       // load data into circular buffer
-      tf = (float) *(pfInput++);
+      tf = (float)*(pfInput++);
       ti4 = mcbiwr;
       mcbi[ti4] = tf;
 
@@ -456,20 +412,20 @@ void Autotalent::Process(double time)
          fa = tf - mfhp; // highpass pre-emphasis filter
          mfhp = tf;
          fb = fa;
-         for (ti=0; ti<ford; ti++)
+         for (ti = 0; ti < ford; ti++)
          {
-            mfsig[ti] = fa*fa*foma + mfsig[ti]*falph;
-            fc = (fb-mfc[ti])*flamb + mfb[ti];
+            mfsig[ti] = fa * fa * foma + mfsig[ti] * falph;
+            fc = (fb - mfc[ti]) * flamb + mfb[ti];
             mfc[ti] = fc;
             mfb[ti] = fb;
-            fk = fa*fc*foma + mfk[ti]*falph;
+            fk = fa * fc * foma + mfk[ti] * falph;
             mfk[ti] = fk;
-            tf = fk/(mfsig[ti] + 0.000001);
-            tf = tf*foma + mfsmooth[ti]*falph;
+            tf = fk / (mfsig[ti] + 0.000001);
+            tf = tf * foma + mfsmooth[ti] * falph;
             mfsmooth[ti] = tf;
             mfbuff[ti][ti4] = tf;
-            fb = fc - tf*fa;
-            fa = fa - tf*fc;
+            fb = fc - tf * fa;
+            fa = fa - tf * fc;
          }
          mcbf[ti4] = fa;
          // Now hopefully the formants are reduced
@@ -494,15 +450,15 @@ void Autotalent::Process(double time)
       // ********************
 
       // Every N/noverlap samples, run pitch estimation / manipulation code
-      if ((mcbiwr)%(N/mnoverlap) == 0)
+      if ((mcbiwr) % (N / mnoverlap) == 0)
       {
          // ---- Obtain autocovariance ----
 
          // Window and fill FFT buffer
          ti2 = mcbiwr;
-         for (ti=0; ti<N; ti++)
+         for (ti = 0; ti < N; ti++)
          {
-            mffttime[ti] = (float)(mcbi[(ti2-ti+N)%N]*mcbwindow[ti]);
+            mffttime[ti] = (float)(mcbi[(ti2 - ti + N) % N] * mcbwindow[ti]);
          }
 
          // Calculate FFT
@@ -513,9 +469,9 @@ void Autotalent::Process(double time)
          mfftfreqim[0] = 0;
 
          // Take magnitude squared
-         for (ti=1; ti<Nf; ti++)
+         for (ti = 1; ti < Nf; ti++)
          {
-            mfftfreqre[ti] = (mfftfreqre[ti])*(mfftfreqre[ti]) + (mfftfreqim[ti])*(mfftfreqim[ti]);
+            mfftfreqre[ti] = (mfftfreqre[ti]) * (mfftfreqre[ti]) + (mfftfreqim[ti]) * (mfftfreqim[ti]);
             mfftfreqim[ti] = 0;
          }
 
@@ -523,8 +479,8 @@ void Autotalent::Process(double time)
          mFFT->Inverse(mfftfreqre, mfftfreqim, mffttime);
 
          // Normalize
-         tf = (float)1/mffttime[0];
-         for (ti=1; ti<N; ti++)
+         tf = (float)1 / mffttime[0];
+         for (ti = 1; ti < N; ti++)
          {
             mffttime[ti] = mffttime[ti] * tf;
          }
@@ -541,47 +497,47 @@ void Autotalent::Process(double time)
          //   Confidence is determined by the corresponding unbiased height
          tf2 = 0;
          pperiod = mpmin;
-         for (ti=mnmin; ti<mnmax; ti++)
+         for (ti = mnmin; ti < mnmax; ti++)
          {
-            ti2 = ti-1;
-            ti3 = ti+1;
-            if (ti2<0)
+            ti2 = ti - 1;
+            ti3 = ti + 1;
+            if (ti2 < 0)
             {
                ti2 = 0;
             }
-            if (ti3>Nf)
+            if (ti3 > Nf)
             {
                ti3 = Nf;
             }
             tf = mffttime[ti];
 
-            if (tf>mffttime[ti2] && tf>=mffttime[ti3] && tf>tf2)
+            if (tf > mffttime[ti2] && tf >= mffttime[ti3] && tf > tf2)
             {
                tf2 = tf;
                ti4 = ti;
             }
          }
-         if (tf2>0)
+         if (tf2 > 0)
          {
-            conf = tf2*macwinv[ti4];
-            if (ti4>0 && ti4<Nf)
+            conf = tf2 * macwinv[ti4];
+            if (ti4 > 0 && ti4 < Nf)
             {
                // Find the center of mass in the vicinity of the detected peak
-               tf = mffttime[ti4-1]*(ti4-1);
-               tf = tf + mffttime[ti4]*(ti4);
-               tf = tf + mffttime[ti4+1]*(ti4+1);
-               tf = tf/(mffttime[ti4-1] + mffttime[ti4] + mffttime[ti4+1]);
-               pperiod = tf/fs;
+               tf = mffttime[ti4 - 1] * (ti4 - 1);
+               tf = tf + mffttime[ti4] * (ti4);
+               tf = tf + mffttime[ti4 + 1] * (ti4 + 1);
+               tf = tf / (mffttime[ti4 - 1] + mffttime[ti4] + mffttime[ti4 + 1]);
+               pperiod = tf / fs;
             }
             else
             {
-               pperiod = (float)ti4/fs;
+               pperiod = (float)ti4 / fs;
             }
          }
 
          // Convert to semitones
-         tf = (float) -12*log10((float)maref*pperiod)*L2SC;
-         if (conf>=mvthresh)
+         tf = (float)-12 * log10((float)maref * pperiod) * L2SC;
+         if (conf >= mvthresh)
          {
             inpitch = tf;
             minpitch = tf; // update pitch only if voiced
@@ -599,15 +555,15 @@ void Autotalent::Process(double time)
          outpitch = inpitch;
 
          // Pull to fixed pitch
-         outpitch = (1-mPull)*outpitch + mPull*mFixed;
+         outpitch = (1 - mPull) * outpitch + mPull * mFixed;
 
          // -- Convert from semitones to scale notes --
-         ti = (int)(outpitch/12 + 32) - 32; // octave
-         tf = outpitch - ti*12; // semitone in octave
+         ti = (int)(outpitch / 12 + 32) - 32; // octave
+         tf = outpitch - ti * 12; // semitone in octave
          ti2 = (int)tf;
          ti3 = ti2 + 1;
          // a little bit of pitch correction logic, since it's a convenient place for it
-         if (iNotes[ti2%12]<0 || iNotes[ti3%12]<0) // if between 2 notes that are more than a semitone apart
+         if (iNotes[ti2 % 12] < 0 || iNotes[ti3 % 12] < 0) // if between 2 notes that are more than a semitone apart
          {
             lowersnap = 1;
             uppersnap = 1;
@@ -616,155 +572,163 @@ void Autotalent::Process(double time)
          {
             lowersnap = 0;
             uppersnap = 0;
-            if (iNotes[ti2%12]==1) // if specified by user
+            if (iNotes[ti2 % 12] == 1) // if specified by user
             {
                lowersnap = 1;
             }
-            if (iNotes[ti3%12]==1) // if specified by user
+            if (iNotes[ti3 % 12] == 1) // if specified by user
             {
                uppersnap = 1;
             }
          }
          // (back to the semitone->scale conversion)
          // finding next lower pitch in scale
-         while (iNotes[(ti2+12)%12]<0)
+         while (iNotes[(ti2 + 12) % 12] < 0)
          {
             ti2 = ti2 - 1;
          }
          // finding next higher pitch in scale
-         while (iNotes[ti3%12]<0)
+         while (iNotes[ti3 % 12] < 0)
          {
             ti3 = ti3 + 1;
          }
-         tf = (tf-ti2)/(ti3-ti2) + iPitch2Note[(ti2+12)%12];
-         if (ti2<0)
+         tf = (tf - ti2) / (ti3 - ti2) + iPitch2Note[(ti2 + 12) % 12];
+         if (ti2 < 0)
          {
             tf = tf - numNotes;
          }
-         outpitch = tf + numNotes*ti;
+         outpitch = tf + numNotes * ti;
          // -- Done converting to scale notes --
 
          // The actual pitch correction
-         ti = (int)(outpitch+128) - 128;
+         ti = (int)(outpitch + 128) - 128;
          tf = outpitch - ti - 0.5;
-         ti2 = ti3-ti2;
-         if (ti2>2)
+         ti2 = ti3 - ti2;
+         if (ti2 > 2)
          { // if more than 2 semitones apart, put a 2-semitone-like transition halfway between
-            tf2 = (float)ti2/2;
+            tf2 = (float)ti2 / 2;
          }
          else
          {
             tf2 = (float)1;
          }
-         if (mSmooth<0.001)
+         if (mSmooth < 0.001)
          {
-            tf2 = tf*tf2/0.001;
+            tf2 = tf * tf2 / 0.001;
          }
          else
          {
-            tf2 = tf*tf2/mSmooth;
+            tf2 = tf * tf2 / mSmooth;
          }
-         if (tf2<-0.5) tf2 = -0.5;
-         if (tf2>0.5) tf2 = 0.5;
-         tf2 = 0.5*sin(PI*tf2) + 0.5; // jumping between notes using horizontally-scaled sine segment
+         if (tf2 < -0.5)
+            tf2 = -0.5;
+         if (tf2 > 0.5)
+            tf2 = 0.5;
+         tf2 = 0.5 * sin(PI * tf2) + 0.5; // jumping between notes using horizontally-scaled sine segment
          tf2 = tf2 + ti;
-         if ( (tf<0.5 && lowersnap) || (tf>=0.5 && uppersnap) )
+         if ((tf < 0.5 && lowersnap) || (tf >= 0.5 && uppersnap))
          {
-            outpitch = mAmount*tf2 + ((float)1-mAmount)*outpitch;
+            outpitch = mAmount * tf2 + ((float)1 - mAmount) * outpitch;
          }
 
          // Add in pitch shift
          outpitch = outpitch + mShift;
 
          // LFO logic
-         tf = mLforate*N/(mnoverlap*fs);
-         if (tf>1) tf=1;
+         tf = mLforate * N / (mnoverlap * fs);
+         if (tf > 1)
+            tf = 1;
          mlfophase = mlfophase + tf;
-         if (mlfophase>1) mlfophase = mlfophase-1;
+         if (mlfophase > 1)
+            mlfophase = mlfophase - 1;
          lfoval = mlfophase;
-         tf = (mLfosymm + 1)/2;
-         if (tf<=0 || tf>=1)
+         tf = (mLfosymm + 1) / 2;
+         if (tf <= 0 || tf >= 1)
          {
-            if (tf<=0) lfoval = 1-lfoval;
+            if (tf <= 0)
+               lfoval = 1 - lfoval;
          }
          else
          {
-            if (lfoval<=tf)
+            if (lfoval <= tf)
             {
-               lfoval = lfoval/tf;
+               lfoval = lfoval / tf;
             }
             else
             {
-               lfoval = 1 - (lfoval-tf)/(1-tf);
+               lfoval = 1 - (lfoval - tf) / (1 - tf);
             }
          }
-         if (mLfoshape>=0)
+         if (mLfoshape >= 0)
          {
             // linear combination of cos and line
-            lfoval = (0.5 - 0.5*cos(lfoval*PI))*mLfoshape + lfoval*(1-mLfoshape);
-            lfoval = mLfoamp*(lfoval*2 - 1);
+            lfoval = (0.5 - 0.5 * cos(lfoval * PI)) * mLfoshape + lfoval * (1 - mLfoshape);
+            lfoval = mLfoamp * (lfoval * 2 - 1);
          }
          else
          {
             // smoosh the sine horizontally until it's squarish
             tf = 1 + mLfoshape;
-            if (tf<0.001)
+            if (tf < 0.001)
             {
-               lfoval = (lfoval - 0.5)*2/0.001;
+               lfoval = (lfoval - 0.5) * 2 / 0.001;
             }
             else
             {
-               lfoval = (lfoval - 0.5)*2/tf;
+               lfoval = (lfoval - 0.5) * 2 / tf;
             }
-            if (lfoval>1) lfoval = 1;
-            if (lfoval<-1) lfoval = -1;
-            lfoval = mLfoamp*sin(lfoval*PI*0.5);
+            if (lfoval > 1)
+               lfoval = 1;
+            if (lfoval < -1)
+               lfoval = -1;
+            lfoval = mLfoamp * sin(lfoval * PI * 0.5);
          }
          // add in quantized LFO
          if (mLfoquant)
          {
-            outpitch = outpitch + (int)(numNotes*lfoval + numNotes + 0.5) - numNotes;
+            outpitch = outpitch + (int)(numNotes * lfoval + numNotes + 0.5) - numNotes;
          }
 
 
          // Convert back from scale notes to semitones
          outpitch = outpitch + iScwarp; // output scale rotate implemented here
-         ti = (int)(outpitch/numNotes + 32) - 32;
-         tf = outpitch - ti*numNotes;
+         ti = (int)(outpitch / numNotes + 32) - 32;
+         tf = outpitch - ti * numNotes;
          ti2 = (int)tf;
          ti3 = ti2 + 1;
-         outpitch = iNote2Pitch[ti3%numNotes] - iNote2Pitch[ti2];
-         if (ti3>=numNotes)
+         outpitch = iNote2Pitch[ti3 % numNotes] - iNote2Pitch[ti2];
+         if (ti3 >= numNotes)
          {
             outpitch = outpitch + 12;
          }
-         outpitch = outpitch*(tf - ti2) + iNote2Pitch[ti2];
-         outpitch = outpitch + 12*ti;
+         outpitch = outpitch * (tf - ti2) + iNote2Pitch[ti2];
+         outpitch = outpitch + 12 * ti;
          outpitch = outpitch - (iNote2Pitch[iScwarp] - iNote2Pitch[0]); //more scale rotation here
 
          // add in unquantized LFO
          if (!mLfoquant)
          {
-            outpitch = outpitch + lfoval*2;
+            outpitch = outpitch + lfoval * 2;
          }
 
 
-         if (outpitch<-36) outpitch = -48;
-         if (outpitch>24) outpitch = 24;
+         if (outpitch < -36)
+            outpitch = -48;
+         if (outpitch > 24)
+            outpitch = 24;
 
          moutpitch = outpitch;
 
          //  ---- END Modify pitch in all kinds of ways! ----
 
          // Compute variables for pitch shifter that depend on pitch
-         minphinc = maref*Pow2(inpitch/12)/fs;
-         moutphinc = maref*Pow2(outpitch/12)/fs;
-         mphincfact = moutphinc/minphinc;
+         minphinc = maref * Pow2(inpitch / 12) / fs;
+         moutphinc = maref * Pow2(outpitch / 12) / fs;
+         mphincfact = moutphinc / minphinc;
       }
       // ************************
       // * END Low-Rate Section *
       // ************************
-
 
 
       // *****************
@@ -780,46 +744,47 @@ void Autotalent::Process(double time)
       if (mphasein >= 1)
       {
          mphasein = mphasein - 1;
-         ti2 = mcbiwr - N/2;
-         for (ti=-N/2; ti<N/2; ti++)
+         ti2 = mcbiwr - N / 2;
+         for (ti = -N / 2; ti < N / 2; ti++)
          {
-            mfrag[(ti+N)%N] = mcbf[(ti + ti2 + N)%N];
+            mfrag[(ti + N) % N] = mcbf[(ti + ti2 + N) % N];
          }
       }
 
       //   When output phase resets, put a snippet N/2 samples in the future
       if (mphaseout >= 1)
       {
-         mfragsize = mfragsize*2;
+         mfragsize = mfragsize * 2;
          if (mfragsize > N)
          {
             mfragsize = N;
          }
          mphaseout = mphaseout - 1;
-         ti2 = mcbord + N/2;
+         ti2 = mcbord + N / 2;
          ti3 = (long int)(((float)mfragsize) / mphincfact);
-         if (ti3>=N/2)
+         if (ti3 >= N / 2)
          {
-            ti3 = N/2 - 1;
+            ti3 = N / 2 - 1;
          }
-         for (ti=-ti3/2; ti<(ti3/2); ti++) {
-            tf = mhannwindow[(long int)N/2 + ti*(long int)N/ti3];
+         for (ti = -ti3 / 2; ti < (ti3 / 2); ti++)
+         {
+            tf = mhannwindow[(long int)N / 2 + ti * (long int)N / ti3];
             // 3rd degree polynomial interpolator - based on eqns from Hal Chamberlin's book
-            indd = mphincfact*ti;
+            indd = mphincfact * ti;
             ind1 = (int)indd;
-            ind2 = ind1+1;
-            ind3 = ind1+2;
-            ind0 = ind1-1;
-            val0 = mfrag[(ind0+N)%N];
-            val1 = mfrag[(ind1+N)%N];
-            val2 = mfrag[(ind2+N)%N];
-            val3 = mfrag[(ind3+N)%N];
+            ind2 = ind1 + 1;
+            ind3 = ind1 + 2;
+            ind0 = ind1 - 1;
+            val0 = mfrag[(ind0 + N) % N];
+            val1 = mfrag[(ind1 + N) % N];
+            val2 = mfrag[(ind2 + N) % N];
+            val3 = mfrag[(ind3 + N) % N];
             vald = 0;
             vald = vald - (float)0.166666666667 * val0 * (indd - ind1) * (indd - ind2) * (indd - ind3);
             vald = vald + (float)0.5 * val1 * (indd - ind0) * (indd - ind2) * (indd - ind3);
             vald = vald - (float)0.5 * val2 * (indd - ind0) * (indd - ind1) * (indd - ind3);
             vald = vald + (float)0.166666666667 * val3 * (indd - ind0) * (indd - ind1) * (indd - ind2);
-            mcbo[(ti + ti2 + N)%N] = mcbo[(ti + ti2 + N)%N] + vald*tf;
+            mcbo[(ti + ti2 + N) % N] = mcbo[(ti + ti2 + N) % N] + vald * tf;
          }
          mfragsize = 0;
       }
@@ -830,7 +795,8 @@ void Autotalent::Process(double time)
 
       mcbo[mcbord] = 0; // erase for next cycle
       mcbord++; // increment read pointer
-      if (mcbord >= N) {
+      if (mcbord >= N)
+      {
          mcbord = 0;
       }
 
@@ -838,8 +804,9 @@ void Autotalent::Process(double time)
       // * END Pitch Shifter *
       // *********************
 
-      ti4 = (mcbiwr + 2)%N;
-      if (mFcorr) {
+      ti4 = (mcbiwr + 2) % N;
+      if (mFcorr)
+      {
          // The second part of the formant corrector
          // This is a post-filter that re-applies the formants, designed
          //   to result in the exact original signal when no pitch
@@ -850,77 +817,87 @@ void Autotalent::Process(double time)
          tf2 = tf;
          fa = 0;
          fb = fa;
-         for (ti=0; ti<ford; ti++) {
-            fc = (fb-mfrc[ti])*frlamb + mfrb[ti];
+         for (ti = 0; ti < ford; ti++)
+         {
+            fc = (fb - mfrc[ti]) * frlamb + mfrb[ti];
             tf = mfbuff[ti][ti4];
-            fb = fc - tf*fa;
-            mftvec[ti] = tf*fc;
+            fb = fc - tf * fa;
+            mftvec[ti] = tf * fc;
             fa = fa - mftvec[ti];
          }
          tf = -fa;
-         for (ti=ford-1; ti>=0; ti--) {
+         for (ti = ford - 1; ti >= 0; ti--)
+         {
             tf = tf + mftvec[ti];
          }
          f0resp = tf;
          //  second time: compute 1-response
          fa = 1;
          fb = fa;
-         for (ti=0; ti<ford; ti++) {
-            fc = (fb-mfrc[ti])*frlamb + mfrb[ti];
+         for (ti = 0; ti < ford; ti++)
+         {
+            fc = (fb - mfrc[ti]) * frlamb + mfrb[ti];
             tf = mfbuff[ti][ti4];
-            fb = fc - tf*fa;
-            mftvec[ti] = tf*fc;
+            fb = fc - tf * fa;
+            mftvec[ti] = tf * fc;
             fa = fa - mftvec[ti];
          }
          tf = -fa;
-         for (ti=ford-1; ti>=0; ti--) {
+         for (ti = ford - 1; ti >= 0; ti--)
+         {
             tf = tf + mftvec[ti];
          }
          f1resp = tf;
          //  now solve equations for output, based on 0-response and 1-response
-         tf = (float)2*tf2;
+         tf = (float)2 * tf2;
          tf2 = tf;
          tf = ((float)1 - f1resp + f0resp);
-         if (tf!=0) {
+         if (tf != 0)
+         {
             tf2 = (tf2 + f0resp) / tf;
          }
-         else {
+         else
+         {
             tf2 = 0;
          }
          //  third time: update delay registers
          fa = tf2;
          fb = fa;
-         for (ti=0; ti<ford; ti++) {
-            fc = (fb-mfrc[ti])*frlamb + mfrb[ti];
+         for (ti = 0; ti < ford; ti++)
+         {
+            fc = (fb - mfrc[ti]) * frlamb + mfrb[ti];
             mfrc[ti] = fc;
             mfrb[ti] = fb;
             tf = mfbuff[ti][ti4];
-            fb = fc - tf*fa;
-            fa = fa - tf*fc;
+            fb = fc - tf * fa;
+            fa = fa - tf * fc;
          }
          tf = tf2;
-         tf = tf + flpa*mflp;  // lowpass post-emphasis filter
+         tf = tf + flpa * mflp; // lowpass post-emphasis filter
          mflp = tf;
          // Bring up the gain slowly when formant correction goes from disabled
          // to enabled, while things stabilize.
-         if (mfmute>0.5) {
-            tf = tf*(mfmute - 0.5)*2;
+         if (mfmute > 0.5)
+         {
+            tf = tf * (mfmute - 0.5) * 2;
          }
-         else {
+         else
+         {
             tf = 0;
          }
          tf2 = mfmutealph;
-         mfmute = (1-tf2) + tf2*mfmute;
+         mfmute = (1 - tf2) + tf2 * mfmute;
          // now tf is signal output
          // ...and we're done messing with formants
       }
-      else {
+      else
+      {
          mfmute = 0;
       }
-      
+
       // Write audio to output of plugin
       // Mix (blend between original (delayed) =0 and processed =1)
-      *(pfOutput++) = mMix*tf + (1-mMix)*mcbi[ti4];
+      *(pfOutput++) = mMix * tf + (1 - mMix) * mcbi[ti4];
    }
 
    Add(target->GetBuffer()->GetChannel(0), mWorkingBuffer, bufferSize);
@@ -928,16 +905,16 @@ void Autotalent::Process(double time)
    GetVizBuffer()->WriteChunk(mWorkingBuffer, bufferSize, 0);
 
    GetBuffer()->Reset();
-   
+
    // Tell the host the algorithm latency
-   mLatency = (N-1);
+   mLatency = (N - 1);
 }
 
 void Autotalent::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mASelector->Draw();
    mBbSelector->Draw();
    mBSelector->Draw();
@@ -965,28 +942,30 @@ void Autotalent::DrawModule()
    mSetFromScaleButton->Draw();
 
    float pitch = mPitch;
-   while (pitch > 12) pitch -= 12;
-   while (pitch < 0) pitch += 12;
-   float x = ofMap(pitch,0,12,4,244);
-   ofSetColor(255,0,255);
-   ofLine(x,90,x,90-ofMap(mConfidence,0,1,0,50));
+   while (pitch > 12)
+      pitch -= 12;
+   while (pitch < 0)
+      pitch += 12;
+   float x = ofMap(pitch, 0, 12, 4, 244);
+   ofSetColor(255, 0, 255);
+   ofLine(x, 90, x, 90 - ofMap(mConfidence, 0, 1, 0, 50));
 }
 
-void Autotalent::ButtonClicked(ClickButton* button)
+void Autotalent::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSetFromScaleButton)
    {
-      mA  = TheScale->MakeDiatonic(69) == 69 ? 1 : -1;
+      mA = TheScale->MakeDiatonic(69) == 69 ? 1 : -1;
       mBb = TheScale->MakeDiatonic(70) == 70 ? 1 : -1;
-      mB  = TheScale->MakeDiatonic(71) == 71 ? 1 : -1;
-      mC  = TheScale->MakeDiatonic(72) == 72 ? 1 : -1;
+      mB = TheScale->MakeDiatonic(71) == 71 ? 1 : -1;
+      mC = TheScale->MakeDiatonic(72) == 72 ? 1 : -1;
       mDb = TheScale->MakeDiatonic(73) == 73 ? 1 : -1;
-      mD  = TheScale->MakeDiatonic(74) == 74 ? 1 : -1;
+      mD = TheScale->MakeDiatonic(74) == 74 ? 1 : -1;
       mEb = TheScale->MakeDiatonic(75) == 75 ? 1 : -1;
-      mE  = TheScale->MakeDiatonic(76) == 76 ? 1 : -1;
-      mF  = TheScale->MakeDiatonic(77) == 77 ? 1 : -1;
+      mE = TheScale->MakeDiatonic(76) == 76 ? 1 : -1;
+      mF = TheScale->MakeDiatonic(77) == 77 ? 1 : -1;
       mGb = TheScale->MakeDiatonic(78) == 78 ? 1 : -1;
-      mG  = TheScale->MakeDiatonic(79) == 79 ? 1 : -1;
+      mG = TheScale->MakeDiatonic(79) == 79 ? 1 : -1;
       mAb = TheScale->MakeDiatonic(80) == 80 ? 1 : -1;
       UpdateShiftSlider();
    }
@@ -1054,5 +1033,3 @@ void Autotalent::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
-
-
