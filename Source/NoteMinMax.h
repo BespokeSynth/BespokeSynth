@@ -25,7 +25,8 @@
   ==============================================================================
 */
 
-#pragma once
+#ifndef __Bespoke__NoteMinMax__
+#define __Bespoke__NoteMinMax__
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -61,3 +62,5 @@ private:
    std::array<int, 128> mVoiceIdxPlaying{ 0 };
    ModulationParameters mModulationParametersPlaying[128];
 };
+
+#endif /* defined(__Bespoke__NoteMinMax__) */
