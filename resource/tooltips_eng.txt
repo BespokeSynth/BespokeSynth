@@ -2059,4 +2059,4 @@ dotsequencer~polyphonic note sequencer with adjustable note length and velocity.
 ~dotgrid~the dot grid
 
 
-noteminmax~finds the lowest and highest notes out ones played at the same time
+noteminmax~finds lowest and highest notes among ones played at the same time
