@@ -37,7 +37,7 @@ class NoteMinMax : public INoteReceiver, public INoteSource, public IDrawableMod
 public:
    NoteMinMax();
    static IDrawableModule* Create() { return new NoteMinMax(); }
-
+   static bool AcceptsNotes() { return true; }
 
    void CreateUIControls() override;
 
