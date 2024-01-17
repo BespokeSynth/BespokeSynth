@@ -46,9 +46,10 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   virtual void SetUpFromSaveData() override;
-   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+   void SaveLayout(ofxJSONElement& moduleInfo) override;
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;

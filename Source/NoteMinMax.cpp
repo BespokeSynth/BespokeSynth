@@ -137,6 +137,10 @@ void NoteMinMax::SendCC(int control, int value, int voiceIdx)
    SendCCOutput(control, value, voiceIdx);
 }
 
+void NoteMinMax::SaveLayout(ofxJSONElement& moduleInfo)
+{
+}
+
 void NoteMinMax::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();
@@ -144,9 +148,4 @@ void NoteMinMax::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void NoteMinMax::SetUpFromSaveData()
 {
-}
-
-void NoteMinMax::SaveLayout(ofxJSONElement& moduleInfo)
-{
-   IDrawableModule::SaveLayout(moduleInfo);
 }
