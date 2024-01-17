@@ -40,15 +40,11 @@ void NoteMinMax::CreateUIControls()
 
    mDestinationCables[0] = new AdditionalNoteCable();
    mDestinationCables[0]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-   mDestinationCables[0]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
    AddPatchCableSource(mDestinationCables[0]->GetPatchCableSource());
-   mDestinationCables[0]->GetPatchCableSource()->SetManualPosition(35, 10);
 
    mDestinationCables[1] = new AdditionalNoteCable();
    mDestinationCables[1]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-   mDestinationCables[1]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
    AddPatchCableSource(mDestinationCables[1]->GetPatchCableSource());
-   mDestinationCables[1]->GetPatchCableSource()->SetManualPosition(35, 25);
 
    GetPatchCableSource()->SetEnabled(false);
 }
@@ -60,6 +56,9 @@ void NoteMinMax::DrawModule()
 
    DrawTextNormal("min", 3, 15);
    DrawTextNormal("max", 3, 30);
+
+   mDestinationCables[0]->GetPatchCableSource()->SetManualPosition(35, 10);
+   mDestinationCables[1]->GetPatchCableSource()->SetManualPosition(35, 25);
 }
 
 void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
