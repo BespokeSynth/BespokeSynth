@@ -70,7 +70,7 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       int maxNotePlaying = -1;
       for (int i = 0; i < 128; ++i)
       {
-         if (mNotePlaying[i])
+         if (mVelocityPlaying[i])
          {
             if (minNotePlaying == -1)
                minNotePlaying = i;
@@ -79,7 +79,6 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       }
 
       // Store the note
-      mNotePlaying[pitch] = true;
       mVelocityPlaying[pitch] = velocity;
       mVoiceIdxPlaying[pitch] = voiceIdx;
       mModulationParametersPlaying[pitch] = modulation;
@@ -98,7 +97,6 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       }
    } else { // played note is stopped
       // Unset the note
-      mNotePlaying[pitch] = false;
       mVelocityPlaying[pitch] = velocity;
       mVoiceIdxPlaying[pitch] = voiceIdx;
       mModulationParametersPlaying[pitch] = modulation;
@@ -108,7 +106,7 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       int maxNotePlaying = -1;
       for (int i = 0; i < 128; ++i)
       {
-         if (mNotePlaying[i])
+         if (mVelocityPlaying[i])
          {
             if (minNotePlaying == -1)
                minNotePlaying = i;

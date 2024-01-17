@@ -58,7 +58,6 @@ private:
 
    AdditionalNoteCable* mDestinationCables[2];
 
-   std::array<bool, 128> mNotePlaying{ false };
    std::array<int, 128> mVelocityPlaying{ 0 };
    std::array<int, 128> mVoiceIdxPlaying{ 0 };
    ModulationParameters mModulationParametersPlaying[128];
