@@ -95,7 +95,9 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
             mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, 0, -1);
          mDestinationCables[1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
-   } else { // played note is stopped
+   }
+   else
+   { // played note is stopped
       // Unset the note
       mVelocityPlaying[pitch] = velocity;
       mVoiceIdxPlaying[pitch] = voiceIdx;
