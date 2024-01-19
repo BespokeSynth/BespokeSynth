@@ -33,7 +33,7 @@
 class PatchCableSource;
 class IUIControl;
 
-class PitchToValue : public IDrawableModule, public INoteReceiver, public IModulator
+class PitchToValue : public IDrawableModule, public INoteReceiver
 {
 public:
    PitchToValue();
@@ -49,16 +49,10 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   //IModulator
-   float Value(int samplesIn = 0) override;
-   bool Active() const override { return mEnabled; }
-   bool CanAdjustRange() const override { return false; }
-
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
-   void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
 private:
@@ -71,7 +65,8 @@ private:
    }
    bool IsEnabled() const override { return mEnabled; }
 
-   int mValue;
+   PatchCableSource* mControlCable{ nullptr };
+   std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
 };
 
 #endif /* defined(__Bespoke__PitchToValue__) */
