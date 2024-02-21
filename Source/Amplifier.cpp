@@ -66,10 +66,13 @@ void Amplifier::Process(double time)
             gWorkBuffer[i] = getBufferChannelCh[i] * mGain;
          }
          Add(out->GetChannel(ch), gWorkBuffer, GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), ch);
       }
       else
+      {
          Add(out->GetChannel(ch), getBufferChannelCh, GetBuffer()->BufferSize());
-      GetVizBuffer()->WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), ch);
+         GetVizBuffer()->WriteChunk(getBufferChannelCh, GetBuffer()->BufferSize(), ch);
+      }
    }
 
    GetBuffer()->Reset();
