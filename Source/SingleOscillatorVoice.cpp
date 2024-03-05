@@ -56,19 +56,18 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
 
    bool mono = (out->NumActiveChannels() == 1);
 
-   float syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
-
    float pitch;
    float freq;
    float vol;
+   float syncPhaseInc;
 
    if (mVoiceParams->mLiteCPUMode)
-      DoParameterUpdate(0, pitch, freq, vol);
+      DoParameterUpdate(0, pitch, freq, vol, syncPhaseInc);
 
    for (int pos = 0; pos < out->BufferSize(); ++pos)
    {
       if (!mVoiceParams->mLiteCPUMode)
-         DoParameterUpdate(pos, pitch, freq, vol);
+         DoParameterUpdate(pos, pitch, freq, vol, syncPhaseInc);
 
       float adsrVal = mAdsr.Value(time);
 
@@ -102,7 +101,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
 
          {
             //PROFILER(SingleOscillatorVoice_GetOscValue);
-            if (mVoiceParams->mSync)
+            if (mVoiceParams->mSyncMode != Oscillator::SyncMode::None)
                sample = mOscData[u].mOsc.Value(mOscData[u].mSyncPhase) * adsrVal * vol;
             else
                sample = mOscData[u].mOsc.Value(mOscData[u].mPhase + mVoiceParams->mPhaseOffset * (1 + (float(u) / mVoiceParams->mUnison))) * adsrVal * vol;
@@ -169,7 +168,8 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
 void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
                                               float& pitch,
                                               float& freq,
-                                              float& vol)
+                                              float& vol,
+                                              float& syncPhaseInc)
 {
    if (mOwner)
       mOwner->ComputeSliders(samplesIn);
@@ -177,6 +177,12 @@ void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
    pitch = GetPitch(samplesIn);
    freq = TheScale->PitchToFreq(pitch) * mVoiceParams->mMult;
    vol = mVoiceParams->mVol * .4f / mVoiceParams->mUnison;
+   if (mVoiceParams->mSyncMode == Oscillator::SyncMode::Frequency)
+      syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
+   else if (mVoiceParams->mSyncMode == Oscillator::SyncMode::Ratio)
+      syncPhaseInc = GetPhaseInc(freq * mVoiceParams->mSyncRatio);
+   else
+      syncPhaseInc = 0;
 
    for (int u = 0; u < mVoiceParams->mUnison && u < kMaxUnison; ++u)
    {

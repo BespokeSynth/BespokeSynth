@@ -40,8 +40,9 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mAdsr.Set(10, 0, 1, 10);
    mVoiceParams.mVol = .25f;
    mVoiceParams.mPulseWidth = .5f;
-   mVoiceParams.mSync = false;
+   mVoiceParams.mSyncMode = Oscillator::SyncMode::None;
    mVoiceParams.mSyncFreq = 200;
+   mVoiceParams.mSyncRatio = 1;
    mVoiceParams.mMult = 1;
    mVoiceParams.mOscType = kOsc_Square;
    mVoiceParams.mDetune = 0;
@@ -93,10 +94,12 @@ void SingleOscillator::CreateUIControls()
    FLOATSLIDER(mShuffleSlider, "shuffle", &mVoiceParams.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider, "soften", &mVoiceParams.mSoften, 0, 1);
    FLOATSLIDER(mPhaseOffsetSlider, "phase", &mVoiceParams.mPhaseOffset, 0, TWO_PI);
-   CHECKBOX(mSyncCheckbox, "sync", &mVoiceParams.mSync);
+   DROPDOWN(mSyncModeSelector, "syncmode", (int*)(&mVoiceParams.mSyncMode), 60);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_PUSHSLIDERWIDTH(47);
    FLOATSLIDER(mSyncFreqSlider, "syncf", &mVoiceParams.mSyncFreq, 10, 999.9f);
+   UIBLOCK_SHIFTLEFT();
+   FLOATSLIDER(mSyncRatioSlider, "syncratio", &mVoiceParams.mSyncRatio, .1f, 10.0f);
    UIBLOCK_NEWLINE();
    UIBLOCK_POPSLIDERWIDTH();
    ENDUIBLOCK(width, height);
@@ -121,7 +124,13 @@ void SingleOscillator::CreateUIControls()
    mOscSelector->AddLabel("-saw", kOsc_NegSaw);
    mOscSelector->AddLabel("noise", kOsc_Random);
 
+   mSyncModeSelector->AddLabel("no sync", (int)Oscillator::SyncMode::None);
+   mSyncModeSelector->AddLabel("ratio", (int)Oscillator::SyncMode::Ratio);
+   mSyncModeSelector->AddLabel("freq", (int)Oscillator::SyncMode::Frequency);
+
    mSyncFreqSlider->SetShowName(false);
+   mSyncRatioSlider->SetShowName(false);
+   mSyncRatioSlider->SetMode(FloatSlider::kSquare);
 
    mFilterCutoffMaxSlider->SetMaxValueDisplay("none");
 
@@ -225,11 +234,15 @@ void SingleOscillator::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mSyncFreqSlider->SetShowing(mVoiceParams.mSyncMode == Oscillator::SyncMode::Frequency);
+   mSyncRatioSlider->SetShowing(mVoiceParams.mSyncMode == Oscillator::SyncMode::Ratio);
+
    mVolSlider->Draw();
    mPhaseOffsetSlider->Draw();
    mPulseWidthSlider->Draw();
-   mSyncCheckbox->Draw();
+   mSyncModeSelector->Draw();
    mSyncFreqSlider->Draw();
+   mSyncRatioSlider->Draw();
    mOscSelector->Draw();
    mDetuneSlider->Draw();
    mUnisonSlider->Draw();
@@ -276,10 +289,13 @@ void SingleOscillator::DrawModule()
       {
          float phase = i / width * FTWO_PI;
          phase += gTime * .005f;
-         if (mVoiceParams.mSync)
+         if (mVoiceParams.mSyncMode != Oscillator::SyncMode::None)
          {
             phase = FloatWrap(phase, FTWO_PI);
-            phase *= mVoiceParams.mSyncFreq / 200;
+            if (mVoiceParams.mSyncMode == Oscillator::SyncMode::Frequency)
+               phase *= mVoiceParams.mSyncFreq / 200;
+            if (mVoiceParams.mSyncMode == Oscillator::SyncMode::Ratio)
+               phase *= mVoiceParams.mSyncRatio;
          }
          if (mDrawOsc.GetShuffle() > 0)
             phase *= 2;
@@ -381,4 +397,39 @@ void SingleOscillator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
       mPolyMgr.KillAll();
+}
+
+void SingleOscillator::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+}
+
+void SingleOscillator::LoadState(FileStreamIn& in, int rev)
+{
+   mLoadRev = rev;
+
+   IDrawableModule::LoadState(in, rev);
+}
+
+bool SingleOscillator::LoadOldControl(FileStreamIn& in, std::string& oldName)
+{
+   if (mLoadRev < 1)
+   {
+      if (oldName == "sync")
+      {
+         //load checkbox
+         int checkboxRev;
+         in >> checkboxRev;
+         float checkboxVal;
+         in >> checkboxVal;
+         if (checkboxVal > 0)
+            mVoiceParams.mSyncMode = Oscillator::SyncMode::Frequency;
+         else
+            mVoiceParams.mSyncMode = Oscillator::SyncMode::None;
+         return true;
+      }
+   }
+   return false;
 }
