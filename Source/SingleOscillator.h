@@ -76,6 +76,11 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
+
    bool IsEnabled() const override { return mEnabled; }
 
 private:
@@ -102,8 +107,9 @@ private:
    int mMult{ 1 };
    DropdownList* mMultSelector{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
-   Checkbox* mSyncCheckbox{ nullptr };
+   DropdownList* mSyncModeSelector{ nullptr };
    FloatSlider* mSyncFreqSlider{ nullptr };
+   FloatSlider* mSyncRatioSlider{ nullptr };
    FloatSlider* mDetuneSlider{ nullptr };
    IntSlider* mUnisonSlider{ nullptr };
    FloatSlider* mUnisonWidthSlider{ nullptr };
@@ -120,6 +126,8 @@ private:
    ChannelBuffer mWriteBuffer;
 
    Oscillator mDrawOsc{ OscillatorType::kOsc_Square };
+
+   int mLoadRev{ -1 };
 
    struct DebugLine
    {

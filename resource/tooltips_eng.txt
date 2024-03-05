@@ -1167,8 +1167,9 @@ signalgenerator~basic oscillator signal. send a note into it to set the frequenc
 ~pw~pulse width (or shape for non-square waves)
 ~slider~slider to interpolate between last two input pitches
 ~ramp~amount of time to ramp to input frequency
-~sync~turns on "sync" mode, to reset the phase at syncf's frequency
-~syncf~frequency to reset the phase, when "sync" is enabled
+~syncmode~turns on sync mode, to reset the phase at a specified frequency
+~syncratio~ratio of oscillator frequency to reset the phase, when "syncmode" is set to "ratio"
+~syncf~frequency to reset the phase, when "syncmode" is set to "freq"
 ~soften~soften edges of square and saw waveforms
 ~shuffle~stretches and squeezes every other cycle of the waveform
 ~mult~multiplier for frequency
@@ -1272,8 +1273,9 @@ oscillator~polyphonic enveloped oscillator. modulations (with MPE support): modw
 ~shuffle~stretches and squeezes every other cycle of the waveform
 ~soften~soften edges of square and saw waveforms
 ~phase~phase offset of oscillator, and phase offset between unison voices. useful to patch into with a very fast modulator, to achieve phase modulation.
-~sync~turns on "sync" mode, to reset the phase at syncf's frequency
-~syncf~frequency to reset the phase, when "sync" is enabled
+~syncmode~turns on sync mode, to reset the phase at a specified frequency
+~syncratio~ratio of oscillator frequency to reset the phase, when "syncmode" is set to "ratio"
+~syncf~frequency to reset the phase, when "syncmode" is set to "freq"
 ~env~[none]
 ~envA~volume envelope attack
 ~envD~volume envelope decay

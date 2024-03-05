@@ -37,6 +37,13 @@ public:
    : mType(type)
    {}
 
+   enum class SyncMode
+   {
+      None,
+      Ratio,
+      Frequency
+   };
+
    OscillatorType GetType() const { return mType; }
    void SetType(OscillatorType type) { mType = type; }
    float Value(float phase) const;

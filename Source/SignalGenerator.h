@@ -72,6 +72,11 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
+
    bool IsEnabled() const override { return mEnabled; }
 
 private:
@@ -100,10 +105,12 @@ private:
    FloatSlider* mShuffleSlider{ nullptr };
    int mMult{ 1 };
    DropdownList* mMultSelector{ nullptr };
-   bool mSync{ false };
-   Checkbox* mSyncCheckbox{ nullptr };
+   Oscillator::SyncMode mSyncMode{ Oscillator::SyncMode::None };
+   DropdownList* mSyncModeSelector{ nullptr };
    float mSyncFreq{ 200 };
    FloatSlider* mSyncFreqSlider{ nullptr };
+   float mSyncRatio{ 1 };
+   FloatSlider* mSyncRatioSlider{ nullptr };
    float mDetune{ 0 };
    FloatSlider* mDetuneSlider{ nullptr };
    EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
@@ -127,6 +134,8 @@ private:
    double mResetPhaseAtMs{ -9999 };
 
    float* mWriteBuffer{ nullptr };
+
+   int mLoadRev{ -1 };
 };
 
 #endif /* defined(__Bespoke__SignalGenerator__) */
