@@ -1366,3 +1366,13 @@ bool IDrawableModule::IsSpawningOnTheFly(const ofxJSONElement& moduleInfo)
       return false;
    return moduleInfo["onthefly"].asBool();
 }
+
+PatchCableSource* IDrawableModule::GetPatchCableSource(int index)
+{
+   if (index == 0)
+   {
+      if (mMainPatchCableSource != nullptr || mPatchCableSources.empty())
+         return mMainPatchCableSource;
+   }
+   return mPatchCableSources[index];
+}
