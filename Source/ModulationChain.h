@@ -73,7 +73,7 @@ struct ModulationParameters
    float pan{ 0 };
 
    static constexpr float kDefaultPitchBend{ 0 };
-   static constexpr float kDefaultModWheel{ .5f };
+   static constexpr float kDefaultModWheel{ 0 };
    static constexpr float kDefaultPressure{ .5f };
 };
 
