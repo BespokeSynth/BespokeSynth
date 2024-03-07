@@ -549,10 +549,16 @@ void IDrawableModule::DrawConnection(IClickable* target)
 
 void IDrawableModule::SetTarget(IClickable* target)
 {
-   if (mMainPatchCableSource != nullptr)
-      mMainPatchCableSource->SetTarget(target);
-   else if (!mPatchCableSources.empty())
-      mPatchCableSources[0]->SetTarget(target);
+   PatchCableSource* source = mMainPatchCableSource;
+   size_t idx = 0;
+   while (source == nullptr || !source->Enabled()) {
+      // Find first patch cable in the list that's enabled.
+      if (!(idx < mPatchCableSources.size()))
+         return;
+
+      source = mPatchCableSources[idx++];
+   }
+   source->SetTarget(target);
 }
 
 void IDrawableModule::SetUpPatchCables(std::string targets)
