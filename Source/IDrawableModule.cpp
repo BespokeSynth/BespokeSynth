@@ -551,7 +551,8 @@ void IDrawableModule::SetTarget(IClickable* target)
 {
    PatchCableSource* source = mMainPatchCableSource;
    size_t idx = 0;
-   while (source == nullptr || !source->Enabled()) {
+   while (source == nullptr || !source->Enabled())
+   {
       // Find first patch cable in the list that's enabled.
       if (!(idx < mPatchCableSources.size()))
          return;
