@@ -84,6 +84,13 @@ SpaceMouseMessageWindow::Impl::Impl(ModularSynth& theSynth)
 , mIsPanningOrZooming(false)
 , mIsTwisting(false)
 {
+   for (int i = 0; i < juce::JUCEApplication::getCommandLineParameterArray().size(); ++i)
+   {
+      juce::String element = juce::JUCEApplication::getCommandLineParameterArray()[i];
+      if (element == "-nospacemouse")
+         return;
+   }
+
    sInstance = this;
 
    juce::String className("JUCE_");
