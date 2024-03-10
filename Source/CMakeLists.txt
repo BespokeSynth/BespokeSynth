@@ -799,6 +799,10 @@ if (APPLE)
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
 
+    IF (MINGW)
+        target_link_libraries(BespokeSynth PRIVATE iphlpapi)
+    endif()
+
     if (BESPOKE_ASIO_SDK_LOCATION)
         message( STATUS "Including ASIO from ${BESPOKE_ASIO_SDK_LOCATION}")
         target_compile_definitions(BespokeSynth PRIVATE JUCE_ASIO=1)
