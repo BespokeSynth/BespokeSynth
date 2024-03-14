@@ -137,7 +137,7 @@ public:
       mTypeName = type;
       mModuleCategory = category;
    }
-   void SetTarget(IClickable* target);
+   void SetTarget(IClickable* target, bool skipDisabledCableSource = false);
    void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
    void RemovePatchCableSource(PatchCableSource* source);
@@ -189,13 +189,7 @@ public:
    virtual bool DrawToPush2Screen() { return false; }
 
    //IPatchable
-   PatchCableSource* GetPatchCableSource(int index = 0) override
-   {
-      if (index == 0 && (mMainPatchCableSource != nullptr || mPatchCableSources.empty()))
-         return mMainPatchCableSource;
-      else
-         return mPatchCableSources[index];
-   }
+   PatchCableSource* GetPatchCableSource(int index = 0) override;
    std::vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
 
    static void FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly = false);
@@ -260,7 +254,6 @@ private:
 
    ofMutex mSliderMutex;
 
-   PatchCableSource* mMainPatchCableSource{ nullptr };
    std::vector<PatchCableSource*> mPatchCableSources;
 };
 

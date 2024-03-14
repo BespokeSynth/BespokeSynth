@@ -85,8 +85,7 @@ void IDrawableModule::CreateUIControls()
       type = kConnectionType_Pulse;
    if (type != kConnectionType_Special)
    {
-      mMainPatchCableSource = new PatchCableSource(this, type);
-      mPatchCableSources.push_back(mMainPatchCableSource);
+      mPatchCableSources.push_back(new PatchCableSource(this, type));
    }
 
    GetMinimizedWidth(); //update cached width
@@ -547,21 +546,22 @@ void IDrawableModule::DrawConnection(IClickable* target)
    ofPopMatrix();
 }
 
-void IDrawableModule::SetTarget(IClickable* target)
+void IDrawableModule::SetTarget(IClickable* target, bool skipDisabledCableSource /* = false */)
 {
-   if (mMainPatchCableSource != nullptr)
-      mMainPatchCableSource->SetTarget(target);
-   else if (!mPatchCableSources.empty())
-      mPatchCableSources[0]->SetTarget(target);
+   if (mPatchCableSources.empty())
+      return;
+   for (const auto cableSource : mPatchCableSources)
+      if (!skipDisabledCableSource || (skipDisabledCableSource && cableSource->Enabled()))
+         cableSource->SetTarget(target);
 }
 
 void IDrawableModule::SetUpPatchCables(std::string targets)
 {
-   assert(mMainPatchCableSource != nullptr);
+   assert(!mPatchCableSources.empty());
    std::vector<std::string> targetVec = ofSplitString(targets, ",");
    if (targetVec.empty() || targets == "")
    {
-      mMainPatchCableSource->Clear();
+      mPatchCableSources[0]->Clear();
    }
    else
    {
@@ -569,7 +569,7 @@ void IDrawableModule::SetUpPatchCables(std::string targets)
       {
          IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
          if (target)
-            mMainPatchCableSource->AddPatchCable(target);
+            mPatchCableSources[0]->AddPatchCable(target);
       }
    }
 }
@@ -954,6 +954,13 @@ PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
    cable.plug.y = plugY;
 
    return cable;
+}
+
+PatchCableSource* IDrawableModule::GetPatchCableSource(int index)
+{
+   if (!mPatchCableSources.empty() && index < mPatchCableSources.size())
+      return mPatchCableSources[index];
+   return nullptr;
 }
 
 void IDrawableModule::FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly /*= false*/)

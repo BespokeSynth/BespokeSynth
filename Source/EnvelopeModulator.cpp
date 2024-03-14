@@ -39,7 +39,8 @@ void EnvelopeModulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   GetPatchCableSource()->SetEnabled(false);
+   // Remove the note patch cable source
+   RemovePatchCableSource(GetPatchCableSource());
 
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
@@ -172,7 +173,24 @@ void EnvelopeModulator::SaveState(FileStreamOut& out)
 
 void EnvelopeModulator::LoadState(FileStreamIn& in, int rev)
 {
+   if (rev < 1)
+   {
+      // Temporary additional cable source
+      mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
+      mTargetCable->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCable);
+   }
+
    IDrawableModule::LoadState(in, rev);
+
+   if (rev < 1)
+   {
+      const auto target = GetPatchCableSource(1)->GetTarget();
+      if (target != nullptr)
+         GetPatchCableSource()->SetTarget(target);
+      RemovePatchCableSource(GetPatchCableSource(1));
+      mTargetCable = GetPatchCableSource();
+   }
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)
       in >> rev;
