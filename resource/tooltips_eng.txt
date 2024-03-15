@@ -2008,6 +2008,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 
 songbuilder~large-scale organizer to arrange settings into scenes and then sequence them. this is bespoke's "song mode"
 ~use sequencer~show scene sequencer
+~reset transport~reset tranport when switching scenes
 ~activate first scene on stop~when stopping, activate the first scene. it is recommended that you use the first scene as an "off" scene, and have it disable all song elements.
 ~play~play the sequence
 ~stop~stop the sequence

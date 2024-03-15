@@ -199,6 +199,8 @@ private:
 
    bool mUseSequencer{ false };
    Checkbox* mUseSequencerCheckbox{ nullptr };
+   bool mResetOnSceneChange{ false };
+   Checkbox* mResetOnSceneChangeCheckbox{ nullptr };
    bool mActivateFirstSceneOnStop{ true };
    Checkbox* mActivateFirstSceneOnStopCheckbox{ nullptr };
    NoteInterval mChangeQuantizeInterval{ NoteInterval::kInterval_1n };
