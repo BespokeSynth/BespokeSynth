@@ -42,6 +42,7 @@ public:
    static bool AcceptsAudio() { return true; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return false; }
+   bool ShouldSuppressAutomaticOutputCable() override { return true; }
 
    void CreateUIControls() override;
 

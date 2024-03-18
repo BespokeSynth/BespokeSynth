@@ -727,16 +727,16 @@ PYBIND11_EMBEDDED_MODULE(module, m)
          IClickable* target = TheSynth->FindModule(targetPath);
          if (target == nullptr)
             target = TheSynth->FindUIControl(targetPath);
-         module.SetTarget(target, true);
+         module.SetTarget(target);
       })
       .def("set_target", [](IDrawableModule& module, int cableSourceIndex, std::string targetPath)
       {
          IClickable* target = TheSynth->FindModule(targetPath);
          if (target == nullptr)
             target = TheSynth->FindUIControl(targetPath);
-         const auto cable_source = module.GetPatchCableSource(cableSourceIndex);
-         if (cable_source)
-            cable_source->SetTarget(target);
+         const auto cableSource = module.GetPatchCableSource(cableSourceIndex);
+         if (cableSource)
+            cableSource->SetTarget(target);
       })
       .def("get_target", [](IDrawableModule& module)
       {

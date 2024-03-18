@@ -54,8 +54,6 @@ void AudioLevelToCV::CreateUIControls()
    FloatSliderUpdated(mAttackSlider, 0, gTime);
    FloatSliderUpdated(mReleaseSlider, 0, gTime);
 
-   RemovePatchCableSource(GetPatchCableSource());
-
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);

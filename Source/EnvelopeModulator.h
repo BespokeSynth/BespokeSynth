@@ -48,6 +48,7 @@ public:
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return true; }
+   bool ShouldSuppressAutomaticOutputCable() override { return true; }
    void Delete() { delete this; }
    void DrawModule() override;
 

@@ -39,9 +39,6 @@ void EnvelopeModulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   // Remove the note patch cable source
-   RemovePatchCableSource(GetPatchCableSource());
-
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
