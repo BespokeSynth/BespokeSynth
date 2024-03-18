@@ -19,7 +19,7 @@
 //  EuclideanSequencer.h
 //  Bespoke
 //
-//  Created by Jack van Klaren on 2/2/24.
+//  Created by Jack van Klaren on Mar 17 2024.
 //  Based on CircleSequencer by Ryan Challinor
 //
 //
@@ -62,8 +62,6 @@ private:
    EuclideanSequencer* mOwner{ nullptr };
    int mIndex{ 0 };
    std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mSteps{};
-   //   bool mOn{ false };
-   //   Checkbox* mOnCheckbox{ nullptr };
    int mLength{ 4 };
    IntSlider* mLengthSlider{ nullptr };
    int mOnset{ 4 };

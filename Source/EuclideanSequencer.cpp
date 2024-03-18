@@ -197,12 +197,39 @@ EuclideanSequencerRing::EuclideanSequencerRing(EuclideanSequencer* owner, int in
 void EuclideanSequencerRing::CreateUIControls()
 {
    int y = mIndex * 20 + 20;
-   //mOnCheckbox = new Checkbox(mOwner, "on", 220, y, &mOn);
+
+   switch (mIndex)
+   {
+      case 0:
+         mLength = 4;
+         mOnset = 4;
+         mRotation = 0;
+         break;
+      case 1:
+         mLength = 12;
+         mOnset = 2;
+         mRotation = 3;
+         break;
+      case 2:
+         mLength = 8;
+         mOnset = 4;
+         mRotation = 1;
+         break;
+      case 3:
+         mLength = 10;
+         mOnset = 2;
+         mRotation = 2;
+         break;
+   }
+
    mLengthSlider = new IntSlider(mOwner, ("steps" + ofToString(mIndex)).c_str(), 220, y, 90, 15, &mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
    mOnsetSlider = new IntSlider(mOwner, ("onsets" + ofToString(mIndex)).c_str(), 315, y, 90, 15, &mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
    mRotationSlider = new IntSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), 410, y, 90, 15, &mRotation, -8, 8);
    mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 505, y, 90, 15, &mOffset, -.25f, .25f, 2);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), 600, y, 4, &mPitch, 0, 127);
+
+   // Calculate Euclidean steps
+   IntSliderUpdated(mLengthSlider, 0, 0);
 }
 
 void EuclideanSequencerRing::Draw()
@@ -212,16 +239,44 @@ void EuclideanSequencerRing::Draw()
    switch (mIndex)
    {
       case 0:
-         ofSetColor(255, 150, 150);
+         if (mLength == 0 || mOnset == 0)
+         {
+            ofSetColor(150, 100, 100);
+         }
+         else
+         {
+            ofSetColor(255, 150, 150);
+         }
          break;
       case 1:
-         ofSetColor(255, 255, 150);
+         if (mLength == 0 || mOnset == 0)
+         {
+            ofSetColor(150, 150, 100);
+         }
+         else
+         {
+            ofSetColor(255, 255, 150);
+         }
          break;
       case 2:
-         ofSetColor(150, 255, 255);
+         if (mLength == 0 || mOnset == 0)
+         {
+            ofSetColor(100, 150, 150);
+         }
+         else
+         {
+            ofSetColor(150, 255, 255);
+         }
          break;
       case 3:
-         ofSetColor(150, 150, 255);
+         if (mLength == 0 || mOnset == 0)
+         {
+            ofSetColor(100, 100, 150);
+         }
+         else
+         {
+            ofSetColor(150, 150, 255);
+         }
          break;
    }
 
@@ -251,7 +306,6 @@ void EuclideanSequencerRing::Draw()
       }
    }
    ofPopStyle();
-   //   mOnCheckbox->Draw();
    mLengthSlider->Draw();
    mOnsetSlider->Draw();
    mRotationSlider->Draw();
