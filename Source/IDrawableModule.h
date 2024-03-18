@@ -162,6 +162,7 @@ public:
    bool CanReceiveAudio() { return mCanReceiveAudio; }
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
+   virtual bool ShouldSuppressAutomaticOutputCable() { return false; }
 
    virtual void CheckboxUpdated(Checkbox* checkbox, double time) {}
 

@@ -83,10 +83,10 @@ void IDrawableModule::CreateUIControls()
       type = kConnectionType_Grid;
    else if (dynamic_cast<IPulseSource*>(this))
       type = kConnectionType_Pulse;
-   if (type != kConnectionType_Special)
+
+   if (type != kConnectionType_Special && !ShouldSuppressAutomaticOutputCable())
    {
-      mMainPatchCableSource = new PatchCableSource(this, type);
-      mPatchCableSources.push_back(mMainPatchCableSource);
+      mPatchCableSources.push_back(new PatchCableSource(this, type));
    }
 
    GetMinimizedWidth(); //update cached width
