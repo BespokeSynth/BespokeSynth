@@ -2086,3 +2086,11 @@ dotsequencer~polyphonic note sequencer with adjustable note length and velocity.
 ~clear~clear the contents of the dot grid
 ~dotgrid~the dot grid
 
+
+euclideansequencer~euclidean sequencer displays a loop as a circle. the notes are calculated using the euclidean rhythm algorithm.
+~steps*~number of steps in this ring
+~onsets*~number of onsets in this ring
+~rotation*~rotation of this ring
+~offset*~timing offset for this ring
+~note*~pitch to use for this ring
+
