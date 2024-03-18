@@ -549,19 +549,18 @@ void IDrawableModule::DrawConnection(IClickable* target)
 
 void IDrawableModule::SetTarget(IClickable* target)
 {
-   if (mMainPatchCableSource != nullptr)
-      mMainPatchCableSource->SetTarget(target);
-   else if (!mPatchCableSources.empty())
+   if (!mPatchCableSources.empty())
       mPatchCableSources[0]->SetTarget(target);
 }
 
 void IDrawableModule::SetUpPatchCables(std::string targets)
 {
-   assert(mMainPatchCableSource != nullptr);
+   PatchCableSource* source = GetPatchCableSource();
+   assert(source != nullptr);
    std::vector<std::string> targetVec = ofSplitString(targets, ",");
    if (targetVec.empty() || targets == "")
    {
-      mMainPatchCableSource->Clear();
+      source->Clear();
    }
    else
    {
@@ -569,7 +568,7 @@ void IDrawableModule::SetUpPatchCables(std::string targets)
       {
          IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
          if (target)
-            mMainPatchCableSource->AddPatchCable(target);
+            source->AddPatchCable(target);
       }
    }
 }

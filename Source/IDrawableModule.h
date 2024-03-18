@@ -192,10 +192,9 @@ public:
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index = 0) override
    {
-      if (index == 0 && (mMainPatchCableSource != nullptr || mPatchCableSources.empty()))
-         return mMainPatchCableSource;
-      else
+      if (index < mPatchCableSources.size())
          return mPatchCableSources[index];
+      return nullptr;
    }
    std::vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
 
@@ -261,7 +260,6 @@ private:
 
    ofMutex mSliderMutex;
 
-   PatchCableSource* mMainPatchCableSource{ nullptr };
    std::vector<PatchCableSource*> mPatchCableSources;
 };
 
