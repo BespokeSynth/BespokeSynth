@@ -87,8 +87,6 @@ void SongBuilder::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mActivateFirstSceneOnStopCheckbox, "activate first scene on stop", &mActivateFirstSceneOnStop);
    UIBLOCK_NEWLINE();
-   CHECKBOX(mResetOnSceneChangeCheckbox, "reset transport", &mResetOnSceneChange);
-   UIBLOCK_NEWLINE();
    BUTTON_STYLE(mPlaySequenceButton, "play", ButtonDisplayStyle::kPlay);
    UIBLOCK_SHIFTRIGHT();
    BUTTON_STYLE(mStopSequenceButton, "stop", ButtonDisplayStyle::kStop);
@@ -153,8 +151,6 @@ void SongBuilder::DrawModule()
    mActivateFirstSceneOnStopCheckbox->SetShowing(ShowSongSequencer());
    mActivateFirstSceneOnStopCheckbox->SetPosition(gridStartX, 3);
    mActivateFirstSceneOnStopCheckbox->Draw();
-   mResetOnSceneChangeCheckbox->SetShowing(ShowSongSequencer());
-   mResetOnSceneChangeCheckbox->Draw();
    mChangeQuantizeSelector->SetPosition(gridStartX, kGridStartY + kTargetTabHeightTop - 29);
    mChangeQuantizeSelector->Draw();
    mAddTargetButton->SetPosition(gridStartX + kSceneTabWidth - 22, kGridStartY + 8);
@@ -832,6 +828,8 @@ void SongBuilder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadBool("reset_transport_every_sequencer_scene", moduleInfo, true);
+
    if (IsSpawningOnTheFly(moduleInfo))
    {
       mScenes.push_back(new SongScene("off"));
@@ -852,6 +850,7 @@ void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void SongBuilder::SetUpFromSaveData()
 {
+   mResetOnSceneChange = mModuleSaveData.GetBool("reset_transport_every_sequencer_scene");
 }
 
 void SongBuilder::SaveState(FileStreamOut& out)
