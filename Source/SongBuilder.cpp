@@ -318,7 +318,8 @@ void SongBuilder::OnTimeEvent(double time)
          else
          {
             SetActiveSceneById(time, mSequencerSceneId[mSequenceStepIndex]);
-            mWantResetClock = true;
+            if (mResetOnSceneChange)
+               mWantResetClock = true;
          }
       }
    }
@@ -827,6 +828,8 @@ void SongBuilder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadBool("reset_transport_every_sequencer_scene", moduleInfo, true);
+
    if (IsSpawningOnTheFly(moduleInfo))
    {
       mScenes.push_back(new SongScene("off"));
@@ -847,6 +850,7 @@ void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void SongBuilder::SetUpFromSaveData()
 {
+   mResetOnSceneChange = mModuleSaveData.GetBool("reset_transport_every_sequencer_scene");
 }
 
 void SongBuilder::SaveState(FileStreamOut& out)
