@@ -15,6 +15,7 @@ option(BESPOKE_DEVENDORED_SYSTEM_JUCE "Use system libraries when using system in
 option(BESPOKE_SYSTEM_PYBIND11 "Use a system installation of pybind11" OFF)
 option(BESPOKE_SYSTEM_JSONCPP "Use system-wide installation of jsoncpp" OFF)
 option(BESPOKE_SYSTEM_TUNING_LIBRARY "Use system installation of tuning-library" OFF)
+option(BESPOKE_SYSTEM_ABLETONLINK "Use system installation of abletonlink" OFF)
 option(BESPOKE_USE_ASAN "Build with ASAN" OFF)
 
 # Global CMake options
