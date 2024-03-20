@@ -1913,6 +1913,18 @@
       "description" : "looping sequence of notes at an interval. pair with a \"pulser\" module for more interesting step control. hold \"shift\" to adjust step length.",
       "type" : "instruments"
    },
+   "notesetvoice" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "route" : "the notesetvoice's destination module"
+      },
+      "description" : "allows you to set the Voice Index on a note, which when combined with Use Voice As Channel on a VST plugin allows you to route a note to a specific MIDI channel",
+      "type" : "note effects"
+   },   
    "notesinger" : 
    {
       "canReceiveAudio" : true,

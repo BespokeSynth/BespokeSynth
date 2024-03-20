@@ -417,6 +417,8 @@ target_sources(BespokeSynth PRIVATE
     NoteRatchet.h
     NoteRouter.cpp
     NoteRouter.h
+    NoteSetVoice.cpp
+    NoteSetVoice.h
     NoteSinger.cpp
     NoteSinger.h
     NoteSorter.cpp

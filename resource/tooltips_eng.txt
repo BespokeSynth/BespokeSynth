@@ -550,6 +550,11 @@ notetable~map a pitch (starting from zero) to a scale pitch
 
 
 
+notesetvoice~set a specific Voice channel index for a note
+~Voice Index~current set voice channel index
+
+
+
 notelooper~note loop recorder with overdubbing and replacement functionality
 ~write~should input should be recorded?
 ~del/mute~if "write" is enabled, erase notes as the playhead passes over them. otherwise, just mute them.
