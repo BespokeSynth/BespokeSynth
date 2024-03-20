@@ -38,7 +38,7 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> VSTPlayhead::getPosition() con
 
    loopPoint.ppqStart = 0;
    loopPoint.ppqEnd = 480;
-   
+
    if (posTM)
    {
       loopPoint.ppqEnd *= posTM->denominator;

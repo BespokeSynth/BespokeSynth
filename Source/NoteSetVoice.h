@@ -66,7 +66,7 @@ private:
 
    float mWidth{ 90 };
    float mHeight{ 20 };
-   
+
    int mVoiceIdx{ 0 };
    IntSlider* mVoiceSlider{ nullptr };
 };
