@@ -49,30 +49,28 @@ void SignalClamp::Process(double time)
 {
    PROFILER(SignalClamp);
 
-   if (!mEnabled)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
 
    ComputeSliders(0);
    SyncBuffers();
 
-   IAudioReceiver* target = GetTarget();
+   int bufferSize = GetBuffer()->BufferSize();
 
-   if (target)
+   ChannelBuffer* out = target->GetBuffer();
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
-      int bufferSize = GetBuffer()->BufferSize();
-
-      ChannelBuffer* out = target->GetBuffer();
-      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-      {
-         float* buffer = GetBuffer()->GetChannel(ch);
+      float* buffer = GetBuffer()->GetChannel(ch);
+      if (mEnabled)
          for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
             buffer[i] = ofClamp(buffer[i], mMin, mMax);
          }
-         Add(out->GetChannel(ch), buffer, bufferSize);
-         GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
-      }
+      Add(out->GetChannel(ch), buffer, bufferSize);
+      GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
    }
 
    GetBuffer()->Reset();

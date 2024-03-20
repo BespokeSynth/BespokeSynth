@@ -67,8 +67,6 @@ void FeedbackModule::Process(double time)
 {
    PROFILER(FeedbackModule);
 
-   if (!mEnabled)
-      return;
 
    ComputeSliders(0);
    SyncBuffers();
@@ -76,15 +74,16 @@ void FeedbackModule::Process(double time)
    int bufferSize = GetBuffer()->BufferSize();
    IAudioReceiver* target = GetTarget();
 
-   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+   if (target)
    {
-      if (target)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
          Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
-
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
+      }
    }
 
-   if (mFeedbackTarget)
+   if (mFeedbackTarget && mEnabled)
    {
       mFeedbackTarget->GetBuffer()->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
       mFeedbackVizBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());

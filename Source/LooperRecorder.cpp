@@ -133,11 +133,25 @@ void LooperRecorder::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (!mEnabled || target == nullptr)
+   if (target == nullptr)
       return;
 
-   ComputeSliders(0);
    SyncBuffers();
+
+   if (!mEnabled)
+   {
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Reset();
+
+      return;
+   }
+
+   ComputeSliders(0);
    mWriteBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
 

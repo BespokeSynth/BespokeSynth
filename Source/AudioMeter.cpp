@@ -48,25 +48,31 @@ void AudioMeter::Process(double time)
 {
    PROFILER(AudioMeter);
 
-   if (!mEnabled)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
 
-   ComputeSliders(0);
    SyncBuffers();
 
-   Clear(mAnalysisBuffer, gBufferSize);
-
-   IAudioReceiver* target = GetTarget();
-   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+   if (mEnabled)
    {
-      if (target)
-         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-      Add(mAnalysisBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      ComputeSliders(0);
+
+      Clear(mAnalysisBuffer, gBufferSize);
+
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+         Add(mAnalysisBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+
+      mPeakTracker.Process(mAnalysisBuffer, gBufferSize);
+      mLevel = sqrtf(mPeakTracker.GetPeak());
    }
 
-   mPeakTracker.Process(mAnalysisBuffer, gBufferSize);
-   mLevel = sqrtf(mPeakTracker.GetPeak());
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+   {
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+   }
 
    GetBuffer()->Reset();
 }

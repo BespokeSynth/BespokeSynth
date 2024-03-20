@@ -226,6 +226,8 @@ void KarplusStrong::SetUpFromSaveData()
    int voiceLimit = mModuleSaveData.GetInt("voicelimit");
    if (voiceLimit > 0)
       mPolyMgr.SetVoiceLimit(voiceLimit);
+   else
+      mPolyMgr.SetVoiceLimit(kNumVoices);
 
    bool mono = mModuleSaveData.GetBool("mono");
    mWriteBuffer.SetNumActiveChannels(mono ? 1 : 2);

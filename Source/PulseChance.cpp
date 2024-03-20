@@ -102,6 +102,12 @@ void PulseChance::OnPulse(double time, float velocity, int flags)
 {
    ComputeSliders(0);
 
+   if (!mEnabled)
+   {
+      DispatchPulse(GetPatchCableSource(), time, velocity, flags);
+      return;
+   }
+
    if (flags & kPulseFlag_Reset)
       mRandomIndex = 0;
 

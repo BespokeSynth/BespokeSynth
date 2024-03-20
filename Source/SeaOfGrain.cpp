@@ -108,8 +108,22 @@ void SeaOfGrain::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (!mEnabled || target == nullptr || (mSample == nullptr && !mHasRecordedInput) || mLoading)
+   if (target == nullptr || (mSample == nullptr && !mHasRecordedInput) || mLoading)
       return;
+
+   if (!mEnabled)
+   {
+      SyncBuffers();
+
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Reset();
+      return;
+   }
 
    ComputeSliders(0);
    int numChannels = 2;

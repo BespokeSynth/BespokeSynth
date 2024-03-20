@@ -64,11 +64,28 @@ void AudioSend::Process(double time)
 {
    PROFILER(AudioSend);
 
-   if (!mEnabled)
+   IAudioReceiver* target0 = GetTarget(0);
+   IAudioReceiver* target1 = GetTarget(1);
+
+   if (target0 == nullptr && target1 == nullptr)
       return;
 
-   ComputeSliders(0);
    SyncBuffers();
+
+   if (!mEnabled)
+   {
+      if (target0)
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+         {
+            Add(target0->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+            GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+         }
+
+      GetBuffer()->Reset();
+      return;
+   }
+
+   ComputeSliders(0);
    mVizBuffer2.SetNumChannels(GetBuffer()->NumActiveChannels());
 
    float* amountBuffer = gWorkBuffer;
@@ -80,7 +97,6 @@ void AudioSend::Process(double time)
       dryAmountBuffer[i] = 1 - mAmount;
    }
 
-   IAudioReceiver* target0 = GetTarget(0);
    if (target0)
    {
       gWorkChannelBuffer.CopyFrom(GetBuffer(), GetBuffer()->BufferSize());
@@ -94,7 +110,6 @@ void AudioSend::Process(double time)
       }
    }
 
-   IAudioReceiver* target1 = GetTarget(1);
    if (target1)
    {
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)

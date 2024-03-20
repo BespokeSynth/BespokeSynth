@@ -209,8 +209,23 @@ void Looper::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (!mEnabled || target == nullptr)
+   if (target == nullptr)
       return;
+
+   if (!mEnabled)
+   {
+      SyncBuffers();
+
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Reset();
+
+      return;
+   }
 
    ComputeSliders(0);
    int numChannels = MAX(GetBuffer()->NumActiveChannels(), mBuffer->NumActiveChannels());
@@ -334,8 +349,6 @@ void Looper::Process(double time)
          output[ch] = mSwitchAndRamp.Process(ch, output[ch] * volSq);
 
          mWorkBuffer.GetChannel(ch)[i] = output[ch] * mMuteRamp.Value(time);
-
-         GetVizBuffer()->Write(mWorkBuffer.GetChannel(ch)[i] + GetBuffer()->GetChannel(ch)[i], ch);
       }
 
       time += gInvSampleRateMs;
@@ -355,6 +368,7 @@ void Looper::Process(double time)
       if (mPassthrough || mWriteInput)
          Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
       Add(target->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
+      GetVizBuffer()->WriteChunk(target->GetBuffer()->GetChannel(ch), bufferSize, ch);
    }
 
    GetBuffer()->Reset();

@@ -39,7 +39,7 @@ void ModulationVisualizer::DrawModule()
       return;
 
    int y = 15;
-   DrawTextNormal("global:" + mGlobalModulation.GetInfoString(), 3, y);
+   DrawTextNormal("global: " + mGlobalModulation.GetInfoString(), 3, y);
    y += 15;
 
    for (int i = 0; i < kNumVoices; ++i)
@@ -89,5 +89,12 @@ std::string ModulationVisualizer::VizVoice::GetInfoString()
       info += "mod:" + ofToString(mModulators.modWheel->GetValue(0), 2) + "  ";
    if (mModulators.pressure)
       info += "pressure:" + ofToString(mModulators.pressure->GetValue(0), 2) + "  ";
+   info += "pan:" + ofToString(mModulators.pan, 2) + "  ";
    return info;
+}
+
+void ModulationVisualizer::Resize(float w, float h)
+{
+   mWidth = w;
+   mHeight = h;
 }
