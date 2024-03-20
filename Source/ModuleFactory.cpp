@@ -262,6 +262,7 @@
 #include "PitchToValue.h"
 #include "RhythmSequencer.h"
 #include "DotSequencer.h"
+#include "NoteMinMax.h"
 
 #include <juce_core/juce_core.h>
 
@@ -471,6 +472,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PitchToValue, pitchtovalue, kModuleCategory_Modulator);
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
+   REGISTER(NoteMinMax, noteminmax, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
