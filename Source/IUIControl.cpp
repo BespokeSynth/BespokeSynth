@@ -135,7 +135,8 @@ void IUIControl::DrawHover(float x, float y, float w, float h)
 void IUIControl::DrawPatchCableHover()
 {
    if (PatchCable::sActivePatchCable &&
-       (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator ||
+       (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Pulse ||
+        PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_ValueSetter ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Grid) &&
