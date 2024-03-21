@@ -243,6 +243,8 @@ target_sources(BespokeSynth PRIVATE
     KeyboardDisplay.h
     Kicker.cpp
     Kicker.h
+    LabelDisplay.cpp
+    LabelDisplay.h
     LFO.cpp
     LFO.h
     LFOController.cpp

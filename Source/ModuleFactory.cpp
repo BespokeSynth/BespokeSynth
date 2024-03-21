@@ -262,6 +262,7 @@
 #include "PitchToValue.h"
 #include "RhythmSequencer.h"
 #include "DotSequencer.h"
+#include "LabelDisplay.h"
 
 #include <juce_core/juce_core.h>
 
@@ -329,6 +330,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteFlusher, noteflusher, kModuleCategory_Note);
    REGISTER(NoteCanvas, notecanvas, kModuleCategory_Instrument);
    REGISTER(CommentDisplay, comment, kModuleCategory_Other);
+   REGISTER(LabelDisplay, label, kModuleCategory_Other);
    REGISTER(StutterControl, stutter, kModuleCategory_Audio);
    REGISTER(CircleSequencer, circlesequencer, kModuleCategory_Instrument);
    REGISTER(MidiOutputModule, midioutput, kModuleCategory_Note);
