@@ -2088,6 +2088,11 @@ dotsequencer~polyphonic note sequencer with adjustable note length and velocity.
 
 
 euclideansequencer~euclidean sequencer displays a loop as a circle. the notes are calculated using the euclidean rhythm algorithm.
+~random~randomize all steps, onsets and rotation in all rings
+~steps~randomize steps in all rings
+~onsets~randomize onsets in all rings
+~rotation~randomize rotation in all rings
+~random*~randomize steps, onsets and rotation in this ring
 ~steps*~number of steps in this ring
 ~onsets*~number of onsets in this ring
 ~rotation*~rotation of this ring

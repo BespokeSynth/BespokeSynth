@@ -37,6 +37,7 @@
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 #include "TextEntry.h"
+#include "ClickButton.h"
 
 class EuclideanSequencer;
 
@@ -48,6 +49,7 @@ public:
    EuclideanSequencerRing(EuclideanSequencer* owner, int index);
    void Draw();
    void OnClicked(float x, float y, bool right);
+   void Randomize(bool steps, bool onsets, bool rotation);
    void MouseReleased();
    void MouseMoved(float x, float y);
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time);
@@ -82,7 +84,7 @@ private:
    std::string GetEuclideanRhythm(int pulses, int steps, int rotation);
 };
 
-class EuclideanSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITextEntryListener
+class EuclideanSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITextEntryListener, public IButtonListener
 {
 public:
    EuclideanSequencer();
@@ -109,6 +111,7 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
@@ -123,10 +126,19 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 660;
+      width = 655;
       height = 200;
    }
    void OnClicked(float x, float y, bool right) override;
+   ClickButton* mRandomizeButton{ nullptr };
+   ClickButton* mRndLengthButton{ nullptr };
+   ClickButton* mRndOnsetsButton{ nullptr };
+   ClickButton* mRndRotationButton{ nullptr };
+   ClickButton* mRnd0Button{ nullptr };
+   ClickButton* mRnd1Button{ nullptr };
+   ClickButton* mRnd2Button{ nullptr };
+   ClickButton* mRnd3Button{ nullptr };
+   void Randomize(bool steps, bool onsets, bool rotation);
 
    std::vector<EuclideanSequencerRing*> mEuclideanSequencerRings;
 };
