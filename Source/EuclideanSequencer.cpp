@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 #include "DrumPlayer.h"
+#include "PatchCableSource.h"
 
 #define _X86_ // required for debugapi
 #include "debugapi.h"
@@ -227,6 +228,12 @@ void EuclideanSequencerRing::CreateUIControls()
    mRotationSlider = new IntSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), 410, y, 90, 15, &mRotation, -8, 8);
    mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 505, y, 90, 15, &mOffset, -.25f, .25f, 2);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), 600, y, 4, &mPitch, 0, 127);
+
+   mDestinationCable = new AdditionalNoteCable();
+   mDestinationCable->SetPatchCableSource(new PatchCableSource(mOwner, kConnectionType_Note));
+   mDestinationCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+   mOwner->AddPatchCableSource(mDestinationCable->GetPatchCableSource());
+   mDestinationCable->GetPatchCableSource()->SetManualPosition(648, y + 7);
 
    // Calculate Euclidean steps
    IntSliderUpdated(mLengthSlider, 0, 0);
@@ -458,6 +465,9 @@ void EuclideanSequencerRing::OnTransportAdvanced(float amount)
       const double time = NextBufferTime(true) - remainderMs;
       mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
       mOwner->PlayNoteOutput(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0, -1);
+
+      mDestinationCable->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
+      mDestinationCable->PlayNoteOutput(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0, -1);
    }
 }
 
