@@ -59,7 +59,11 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mSoften = 0;
    mVoiceParams.mLiteCPUMode = false;
 
-   mPolyMgr.Init([](IDrawableModule* owner){ return std::unique_ptr<IMidiVoice>(new SingleOscillatorVoice(owner)); }, &mVoiceParams);
+   mPolyMgr.Init([](IDrawableModule* owner)
+                 {
+                    return std::unique_ptr<IMidiVoice>(new SingleOscillatorVoice(owner));
+                 },
+                 &mVoiceParams);
 }
 
 namespace

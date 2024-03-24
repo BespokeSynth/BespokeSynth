@@ -35,7 +35,11 @@ KarplusStrong::KarplusStrong()
 , mNoteInputBuffer(this)
 , mWriteBuffer(gBufferSize)
 {
-   mPolyMgr.Init([](IDrawableModule* owner){ return std::unique_ptr<IMidiVoice>(new KarplusStrongVoice(owner)); }, &mVoiceParams);
+   mPolyMgr.Init([](IDrawableModule* owner)
+                 {
+                    return std::unique_ptr<IMidiVoice>(new KarplusStrongVoice(owner));
+                 },
+                 &mVoiceParams);
 
    AddChild(&mBiquad);
    mBiquad.SetPosition(150, 15);

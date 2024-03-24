@@ -50,7 +50,11 @@ Sampler::Sampler()
    mVoiceParams.mDetectedFreq = -1;
    mVoiceParams.mLoop = false;
 
-   mPolyMgr.Init([](IDrawableModule* owner){ return std::unique_ptr<IMidiVoice>(new SampleVoice(owner)); }, &mVoiceParams);
+   mPolyMgr.Init([](IDrawableModule* owner)
+                 {
+                    return std::unique_ptr<IMidiVoice>(new SampleVoice(owner));
+                 },
+                 &mVoiceParams);
 
    //mWriteBuffer.SetNumActiveChannels(2);
 }

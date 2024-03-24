@@ -64,7 +64,11 @@ FMSynth::FMSynth()
    mVoiceParams.mPhaseOffset2 = 0;
    mVoiceParams.mVol = 1.f;
 
-   mPolyMgr.Init([](IDrawableModule* owner){ return std::unique_ptr<IMidiVoice>(new FMVoice(owner)); }, &mVoiceParams);
+   mPolyMgr.Init([](IDrawableModule* owner)
+                 {
+                    return std::unique_ptr<IMidiVoice>(new FMVoice(owner));
+                 },
+                 &mVoiceParams);
 }
 
 void FMSynth::CreateUIControls()
