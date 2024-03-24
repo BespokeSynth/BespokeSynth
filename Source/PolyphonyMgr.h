@@ -26,8 +26,7 @@
 #ifndef __additiveSynth__PolyphonyMgr__
 #define __additiveSynth__PolyphonyMgr__
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
+#include <memory>
 #include "SynthGlobals.h"
 #include "ChannelBuffer.h"
 
@@ -51,7 +50,7 @@ enum VoiceType
 struct VoiceInfo
 {
    float mPitch{ -1 };
-   IMidiVoice* mVoice{ nullptr };
+   std::unique_ptr<IMidiVoice> mVoice{ nullptr };
    double mTime{ 0 };
    bool mNoteOn{ false };
    float mActivity{ 0 };
@@ -61,7 +60,6 @@ class PolyphonyMgr
 {
 public:
    PolyphonyMgr(IDrawableModule* owner);
-   ~PolyphonyMgr();
 
    void Init(VoiceType type,
              IVoiceParams* mVoiceParams);

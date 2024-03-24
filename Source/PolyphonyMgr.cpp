@@ -39,12 +39,6 @@ PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
 {
 }
 
-PolyphonyMgr::~PolyphonyMgr()
-{
-   for (int i = 0; i < kNumVoices; ++i)
-      delete mVoices[i].mVoice;
-}
-
 void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
 {
    if (type == kVoiceType_FM)
@@ -127,13 +121,13 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       }
    }
 
-   IMidiVoice* voice = mVoices[voiceIdx].mVoice;
-   assert(voice);
-   if (!voice->IsDone(time) && (!preserveVoice || modulation.pan != voice->GetPan()))
+   assert(mVoices[voiceIdx].mVoice);
+   IMidiVoice& voice = *mVoices[voiceIdx].mVoice;
+   if (!voice.IsDone(time) && (!preserveVoice || modulation.pan != voice.GetPan()))
    {
       //ofLog() << "fading stolen voice " << voiceIdx << " at " << time;
       mFadeOutWorkBuffer.Clear();
-      voice->Process(time, &mFadeOutWorkBuffer, mOversampling);
+      voice.Process(time, &mFadeOutWorkBuffer, mOversampling);
       for (int i = 0; i < kVoiceFadeSamples; ++i)
       {
          float fade = 1 - (float(i) / kVoiceFadeSamples);
@@ -142,11 +136,11 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       }
    }
    if (!preserveVoice)
-      voice->ClearVoice();
-   voice->SetPitch(pitch);
-   voice->SetModulators(modulation);
-   voice->Start(time, amount);
-   voice->SetPan(modulation.pan);
+      voice.ClearVoice();
+   voice.SetPitch(pitch);
+   voice.SetModulators(modulation);
+   voice.Start(time, amount);
+   voice.SetPan(modulation.pan);
    mLastVoice = voiceIdx;
 
    mVoices[voiceIdx].mPitch = pitch;
