@@ -25,10 +25,6 @@
 
 #include "PolyphonyMgr.h"
 #include "IMidiVoice.h"
-#include "FMVoice.h"
-#include "KarplusStrongVoice.h"
-#include "SingleOscillatorVoice.h"
-#include "SampleVoice.h"
 #include "SynthGlobals.h"
 #include "Profiler.h"
 
@@ -39,43 +35,12 @@ PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
 {
 }
 
-void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
+void PolyphonyMgr::Init(VoiceConstructor type, IVoiceParams* params)
 {
-   if (type == kVoiceType_FM)
+   for (int i = 0; i < kNumVoices; ++i)
    {
-      for (int i = 0; i < kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new FMVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else if (type == kVoiceType_Karplus)
-   {
-      for (int i = 0; i < kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new KarplusStrongVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else if (type == kVoiceType_SingleOscillator)
-   {
-      for (int i = 0; i < kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new SingleOscillatorVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else if (type == kVoiceType_Sampler)
-   {
-      for (int i = 0; i < kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new SampleVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else
-   {
-      assert(false); //unsupported voice type
+      mVoices[i].mVoice = type(mOwner);
+      mVoices[i].mVoice->SetVoiceParams(params);
    }
 }
 

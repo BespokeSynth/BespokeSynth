@@ -24,7 +24,6 @@
 //
 
 #include "KarplusStrong.h"
-#include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "IAudioReceiver.h"
 #include "ModularSynth.h"
@@ -36,7 +35,7 @@ KarplusStrong::KarplusStrong()
 , mNoteInputBuffer(this)
 , mWriteBuffer(gBufferSize)
 {
-   mPolyMgr.Init(kVoiceType_Karplus, &mVoiceParams);
+   mPolyMgr.Init([](IDrawableModule* owner){ return std::unique_ptr<IMidiVoice>(new KarplusStrongVoice(owner)); }, &mVoiceParams);
 
    AddChild(&mBiquad);
    mBiquad.SetPosition(150, 15);

@@ -39,14 +39,6 @@ class IVoiceParams;
 class IDrawableModule;
 struct ModulationParameters;
 
-enum VoiceType
-{
-   kVoiceType_Karplus,
-   kVoiceType_FM,
-   kVoiceType_SingleOscillator,
-   kVoiceType_Sampler
-};
-
 struct VoiceInfo
 {
    float mPitch{ -1 };
@@ -56,12 +48,14 @@ struct VoiceInfo
    float mActivity{ 0 };
 };
 
+using VoiceConstructor = std::unique_ptr<IMidiVoice> (*)(IDrawableModule* owner);
+
 class PolyphonyMgr
 {
 public:
    PolyphonyMgr(IDrawableModule* owner);
 
-   void Init(VoiceType type,
+   void Init(VoiceConstructor type,
              IVoiceParams* mVoiceParams);
 
    void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
