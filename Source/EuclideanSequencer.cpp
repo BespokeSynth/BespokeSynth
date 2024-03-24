@@ -529,7 +529,7 @@ void EuclideanSequencerRing::OnTransportAdvanced(float amount)
    const int oldMeasure = TheTransport->GetMeasure(NextBufferTime(true) - gBufferSizeMs);
    const int newMeasure = TheTransport->GetMeasure(NextBufferTime(true));
 
-   if ((oldMeasure != newMeasure || oldStep != newStep) && mSteps[newStep] > 0)
+   if (oldStep != newStep && mSteps[newStep] > 0)
    {
       const double time = NextBufferTime(true) - remainderMs;
       mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
