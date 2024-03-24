@@ -75,7 +75,7 @@ private:
    int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
    AdditionalNoteCable* mDestinationCable;
-
+   
 
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
@@ -126,7 +126,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 655;
+      width = 650;
       height = 200;
    }
    void OnClicked(float x, float y, bool right) override;

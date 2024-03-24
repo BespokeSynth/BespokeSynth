@@ -66,32 +66,19 @@ void EuclideanSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   float x, y, newX;
-   newX = 220;
-   mRandomizeButton = new ClickButton(this, "random", newX, 4);
-   mRandomizeButton->GetDimensions(x, y);
-   newX += x + 5;
-   mRndLengthButton = new ClickButton(this, "steps", newX, 4);
-   mRndLengthButton->GetDimensions(x, y);
-   newX += x + 5;
-   mRndOnsetsButton = new ClickButton(this, "onsets", newX, 4);
-   mRndOnsetsButton->GetDimensions(x, y);
-   newX += x + 5;
-   mRndRotationButton = new ClickButton(this, "rotation", newX, 4);
-   mRndRotationButton->GetDimensions(x, y);
-   newX += x + 5;
-   mRnd0Button = new ClickButton(this, "random0", newX, 4);
-   mRnd0Button->GetDimensions(x, y);
-   newX += x + 5;
-   mRnd1Button = new ClickButton(this, "random1", newX, 4);
-   mRnd1Button->GetDimensions(x, y);
-   newX += x + 5;
-   mRnd2Button = new ClickButton(this, "random2", newX, 4);
-   mRnd2Button->GetDimensions(x, y);
-   newX += x + 5;
-   mRnd3Button = new ClickButton(this, "random3", newX, 4);
-   mRnd3Button->GetDimensions(x, y);
-   newX += x + 5;
+   float x = 210;
+   float y = 65;
+   mRnd0Button = new ClickButton(this, "random0", 0 * 95 + 210, y);
+   mRnd1Button = new ClickButton(this, "random1", 1 * 95 + 210, y);
+   mRnd2Button = new ClickButton(this, "random2", 2 * 95 + 210, y);
+   mRnd3Button = new ClickButton(this, "random3", 3 * 95 + 210, y);
+
+   x = 595;
+   mRandomizeButton = new ClickButton(this, "random", x, y);
+   y = 90;
+   mRndLengthButton = new ClickButton(this, "steps", x, y);
+   mRndOnsetsButton = new ClickButton(this, "onsets", x, y + 20);
+   mRndRotationButton = new ClickButton(this, "rotation", x, y + 40);
 
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
       mEuclideanSequencerRings[i]->CreateUIControls();
@@ -135,6 +122,15 @@ void EuclideanSequencer::DrawModule()
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
       mEuclideanSequencerRings[i]->Draw();
 
+   // Grey lines around circle sliders
+   ofPushStyle();
+   ofSetColor(128, 128, 128);
+   ofSetLineWidth(.1f);
+   ofLine(210, 85, 590, 85);
+   ofLine(590, 85, 590, 165);
+   ofPopStyle();
+   
+   // Rotating tranposrt line
    ofPushStyle();
    ofSetColor(ofColor::lime);
    float pos = TheTransport->GetMeasurePos(gTime);
@@ -260,7 +256,8 @@ EuclideanSequencerRing::EuclideanSequencerRing(EuclideanSequencer* owner, int in
 
 void EuclideanSequencerRing::CreateUIControls()
 {
-   int y = mIndex * 20 + 62;
+   int x = mIndex * 95 + 210;
+   int y = 90;
 
    switch (mIndex)
    {
@@ -286,17 +283,17 @@ void EuclideanSequencerRing::CreateUIControls()
          break;
    }
 
-   mLengthSlider = new IntSlider(mOwner, ("steps" + ofToString(mIndex)).c_str(), 220, y, 90, 15, &mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
-   mOnsetSlider = new IntSlider(mOwner, ("onsets" + ofToString(mIndex)).c_str(), 315, y, 90, 15, &mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
-   mRotationSlider = new IntSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), 410, y, 90, 15, &mRotation, -8, 8);
-   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 505, y, 90, 15, &mOffset, -.25f, .25f, 2);
-   mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), 600, y, 4, &mPitch, 0, 127);
+   mLengthSlider = new IntSlider(mOwner, ("steps" + ofToString(mIndex)).c_str(), x, y, 90, 15, &mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
+   mOnsetSlider = new IntSlider(mOwner, ("onsets" + ofToString(mIndex)).c_str(), x, y + 20, 90, 15, &mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
+   mRotationSlider = new IntSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), x, y + 40, 90, 15, &mRotation, -8, 8);
+   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), x, y + 60, 90, 15, &mOffset, -.25f, .25f, 2);
+   mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), x, y + 80, 4, &mPitch, 0, 127);
 
    mDestinationCable = new AdditionalNoteCable();
    mDestinationCable->SetPatchCableSource(new PatchCableSource(mOwner, kConnectionType_Note));
-   mDestinationCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+   mDestinationCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
    mOwner->AddPatchCableSource(mDestinationCable->GetPatchCableSource());
-   mDestinationCable->GetPatchCableSource()->SetManualPosition(648, y + 7);
+   mDestinationCable->GetPatchCableSource()->SetManualPosition(x + 50, y + 105);
 
    // Calculate Euclidean steps
    IntSliderUpdated(mLengthSlider, 0, 0);
@@ -305,7 +302,12 @@ void EuclideanSequencerRing::CreateUIControls()
 void EuclideanSequencerRing::Draw()
 {
    ofPushStyle();
+   ofSetColor(128, 128, 128);
+   int x = mIndex * 95 + 210;
+   DrawTextNormal(NoteName(mPitch, false, true), mIndex * 95 + 210 + 60, 182);
+   ofPopStyle();
 
+   ofPushStyle();
    switch (mIndex)
    {
       case 0:
