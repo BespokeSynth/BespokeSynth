@@ -27,7 +27,6 @@
 #define additiveSynth_IMidiVoice_h
 
 #include "ModulationChain.h"
-#include "Profiler.h"
 
 class IVoiceParams;
 
