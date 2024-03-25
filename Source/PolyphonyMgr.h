@@ -72,7 +72,6 @@ private:
    int mLastVoice{ -1 };
    ChannelBuffer mFadeOutBuffer{ kVoiceFadeSamples };
    ChannelBuffer mFadeOutWorkBuffer{ kVoiceFadeSamples };
-   float mWorkBuffer[2048]{};
    int mFadeOutBufferPos{ 0 };
    IDrawableModule* mOwner;
    int mVoiceLimit{ kNumVoices };
