@@ -54,6 +54,7 @@ public:
    void MouseMoved(float x, float y);
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time);
    void CreateUIControls();
+   void InitPreset(int preset);
    void OnTransportAdvanced(float amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);

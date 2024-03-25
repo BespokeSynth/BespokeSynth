@@ -80,8 +80,12 @@ void EuclideanSequencer::CreateUIControls()
    mRndOnsetsButton = new ClickButton(this, "onsets", x, y + 20);
    mRndRotationButton = new ClickButton(this, "rotation", x, y + 40);
 
+   int aPreset = (int)ofRandom(0, 1.9); // select a random default preset
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
+   {
       mEuclideanSequencerRings[i]->CreateUIControls();
+      mEuclideanSequencerRings[i]->InitPreset(aPreset);
+   }
 }
 
 EuclideanSequencer::~EuclideanSequencer()
@@ -259,30 +263,6 @@ void EuclideanSequencerRing::CreateUIControls()
    int x = mIndex * 95 + 210;
    int y = 90;
 
-   switch (mIndex)
-   {
-      case 0:
-         mLength = 4;
-         mOnset = 4;
-         mRotation = 0;
-         break;
-      case 1:
-         mLength = 12;
-         mOnset = 2;
-         mRotation = 3;
-         break;
-      case 2:
-         mLength = 8;
-         mOnset = 4;
-         mRotation = 1;
-         break;
-      case 3:
-         mLength = 10;
-         mOnset = 2;
-         mRotation = 2;
-         break;
-   }
-
    mLengthSlider = new IntSlider(mOwner, ("steps" + ofToString(mIndex)).c_str(), x, y, 90, 15, &mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
    mOnsetSlider = new IntSlider(mOwner, ("onsets" + ofToString(mIndex)).c_str(), x, y + 20, 90, 15, &mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
    mRotationSlider = new IntSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), x, y + 40, 90, 15, &mRotation, -8, 8);
@@ -297,6 +277,37 @@ void EuclideanSequencerRing::CreateUIControls()
 
    // Calculate Euclidean steps
    IntSliderUpdated(mLengthSlider, 0, 0);
+}
+
+void EuclideanSequencerRing::InitPreset(int preset)
+{
+   const int kPresetCount = 2;
+   int defaultPresets[kPresetCount][4][4] = {
+      {
+      { 4, 4, 0, 0 },
+      { 12, 2, 3, 1 },
+      { 8, 4, 1, 2 },
+      { 10, 2, 2, 3 },
+      },
+      {
+      { 16, 4, 1, 60 },
+      { 8, 6, 0, 64 },
+      { 16, 2, 3, 67 },
+      { 8, 2, 5, 72 },
+      }
+   };
+
+   preset = MIN(preset, kPresetCount - 1);
+   preset = MAX(preset, 0);
+   mLengthSlider->SetValue(defaultPresets[preset][mIndex][0], gTime, true);
+   mOnsetSlider->SetValue(defaultPresets[preset][mIndex][1], gTime, true);
+   mRotationSlider->SetValue(defaultPresets[preset][mIndex][2], gTime, true);
+   mNoteSelector->SetValue(defaultPresets[preset][mIndex][3], gTime, true);
+
+//   mLength = defaultPresets[preset][mIndex][0];
+//   mOnset = defaultPresets[preset][mIndex][1];
+//   mRotation = defaultPresets[preset][mIndex][2];
+//   mPitch = defaultPresets[preset][mIndex][3];
 }
 
 void EuclideanSequencerRing::Draw()
