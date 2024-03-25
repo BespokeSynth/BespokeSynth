@@ -49,12 +49,13 @@ public:
    EuclideanSequencerRing(EuclideanSequencer* owner, int index);
    void Draw();
    void OnClicked(float x, float y, bool right);
-   void Randomize(bool steps, bool onsets, bool rotation);
+   void Randomize(bool steps, bool onsets, bool rotation, bool offset);
    void MouseReleased();
    void MouseMoved(float x, float y);
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time);
    void CreateUIControls();
    void InitPreset(int preset);
+   void Clear();
    void OnTransportAdvanced(float amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
@@ -135,11 +136,13 @@ private:
    ClickButton* mRndLengthButton{ nullptr };
    ClickButton* mRndOnsetsButton{ nullptr };
    ClickButton* mRndRotationButton{ nullptr };
+   ClickButton* mRndOffsetButton{ nullptr };
    ClickButton* mRnd0Button{ nullptr };
    ClickButton* mRnd1Button{ nullptr };
    ClickButton* mRnd2Button{ nullptr };
    ClickButton* mRnd3Button{ nullptr };
-   void Randomize(bool steps, bool onsets, bool rotation);
+   void Randomize(bool steps, bool onsets, bool rotation, bool offset);
+   ClickButton* mClearButton{ nullptr };
 
    std::vector<EuclideanSequencerRing*> mEuclideanSequencerRings;
 };

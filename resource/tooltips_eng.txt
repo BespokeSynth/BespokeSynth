@@ -2098,4 +2098,4 @@ euclideansequencer~euclidean sequencer displays a loop as a circle. the notes ar
 ~rotation*~rotation of this ring
 ~offset*~timing offset for this ring
 ~note*~pitch to use for this ring
-
+~clear~clear all steps, onsets, rotation and offset in all rings

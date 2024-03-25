@@ -76,6 +76,7 @@ void EuclideanSequencer::CreateUIControls()
    mRndLengthButton = new ClickButton(this, "steps", x, y);
    mRndOnsetsButton = new ClickButton(this, "onsets", x, y + 20);
    mRndRotationButton = new ClickButton(this, "rotation", x, y + 40);
+   mRndOffsetButton = new ClickButton(this, "offset", x, y + 60);
 
    int aPreset = (int)ofRandom(0, 1.9); // select a random default preset
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
@@ -83,6 +84,10 @@ void EuclideanSequencer::CreateUIControls()
       mEuclideanSequencerRings[i]->CreateUIControls();
       mEuclideanSequencerRings[i]->InitPreset(aPreset);
    }
+
+   x = 595;
+   y = 45;
+   mClearButton = new ClickButton(this, "clear", x, y);
 }
 
 EuclideanSequencer::~EuclideanSequencer()
@@ -115,10 +120,12 @@ void EuclideanSequencer::DrawModule()
    mRndLengthButton->Draw();
    mRndOnsetsButton->Draw();
    mRndRotationButton->Draw();
+   mRndOffsetButton->Draw();
    mRnd0Button->Draw();
    mRnd1Button->Draw();
    mRnd2Button->Draw();
    mRnd3Button->Draw();
+   mClearButton->Draw();
    
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
       mEuclideanSequencerRings[i]->Draw();
@@ -183,27 +190,34 @@ void EuclideanSequencer::DropdownUpdated(DropdownList* list, int oldVal, double 
 void EuclideanSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mRandomizeButton)
-      Randomize(true, true, true);
+      Randomize(true, true, true, true);
    if (button == mRndLengthButton)
-      Randomize(true, false, false);
+      Randomize(true, false, false, false);
    if (button == mRndOnsetsButton)
-      Randomize(false, true, false);
+      Randomize(false, true, false, false);
    if (button == mRndRotationButton)
-      Randomize(false, false, true);
+      Randomize(false, false, true, false);
+   if (button == mRndOffsetButton)
+      Randomize(false, false, false, true);
    if (button == mRnd0Button)
-      mEuclideanSequencerRings[0]->Randomize(true, true, true);
+      mEuclideanSequencerRings[0]->Randomize(true, true, true, true);
    if (button == mRnd1Button)
-      mEuclideanSequencerRings[1]->Randomize(true, true, true);
+      mEuclideanSequencerRings[1]->Randomize(true, true, true, true);
    if (button == mRnd2Button)
-      mEuclideanSequencerRings[2]->Randomize(true, true, true);
+      mEuclideanSequencerRings[2]->Randomize(true, true, true, true);
    if (button == mRnd3Button)
-      mEuclideanSequencerRings[3]->Randomize(true, true, true);
+      mEuclideanSequencerRings[3]->Randomize(true, true, true, true);
+   if (button == mClearButton)
+   {
+      for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
+         mEuclideanSequencerRings[i]->Clear();
+   }
 }
 
-void EuclideanSequencer::Randomize(bool steps, bool onsets, bool rotation)
+void EuclideanSequencer::Randomize(bool steps, bool onsets, bool rotation, bool offset)
 {
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
-      mEuclideanSequencerRings[i]->Randomize(steps, onsets, rotation);
+      mEuclideanSequencerRings[i]->Randomize(steps, onsets, rotation, offset);
 }
 
 void EuclideanSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -305,6 +319,15 @@ void EuclideanSequencerRing::InitPreset(int preset)
 //   mOnset = defaultPresets[preset][mIndex][1];
 //   mRotation = defaultPresets[preset][mIndex][2];
 //   mPitch = defaultPresets[preset][mIndex][3];
+}
+
+void EuclideanSequencerRing::Clear()
+{
+   mLengthSlider->SetValue(0, gTime, true);
+   mOnsetSlider->SetValue(0, gTime, true);
+   mRotationSlider->SetValue(0, gTime, true);
+   mOffsetSlider->SetValue(0, gTime, true);
+   mNoteSelector->SetValue(mIndex, gTime, true);
 }
 
 void EuclideanSequencerRing::Draw()
@@ -550,7 +573,7 @@ void EuclideanSequencerRing::LoadState(FileStreamIn& in)
       in >> mSteps[i];
 }
 
-void EuclideanSequencerRing::Randomize(bool steps, bool onsets, bool rotation)
+void EuclideanSequencerRing::Randomize(bool steps, bool onsets, bool rotation, bool offset)
 {
    if (steps)
       mLength = (int)ofRandom(2, EUCLIDEAN_SEQUENCER_MAX_STEPS);
@@ -558,10 +581,21 @@ void EuclideanSequencerRing::Randomize(bool steps, bool onsets, bool rotation)
       mOnset = (int)ofRandom(2, mLength < 10 ? mLength : mLength / 2);  // if a lot of steps: divide / 2
    if (rotation)
       mRotation = (int)ofRandom(0, 4); // randomize only positive rotations, max 4
-
+   if (offset)
+   {
+      if (mIndex == 0)
+      {
+         mOffset = ofRandom(-0.04, 0.04); // randomize offset a little bit for index 0
+      }
+      else
+      {
+         mOffset = ofRandom(-0.20, 0.20); // randomize offset more for other indexes
+      }
+   }
    mLengthSlider->SetValue(mLength, gTime, true);
    mOnsetSlider->SetValue(mOnset, gTime, true);
    mRotationSlider->SetValue(mRotation, gTime, true);
+   mOffsetSlider->SetValue(mOffset, gTime, true);
 }
 
 std::string EuclideanSequencerRing::GetEuclideanRhythm(int pulses, int steps, int rotation)
