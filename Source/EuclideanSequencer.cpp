@@ -31,9 +31,6 @@
 #include "DrumPlayer.h"
 #include "PatchCableSource.h"
 
-#define _X86_ // required for debugapi
-#include "debugapi.h"
-
 namespace
 {
    ofVec2f PolToCar(float pos, float radius)
@@ -459,12 +456,6 @@ void EuclideanSequencerRing::IntSliderUpdated(IntSlider* slider, int oldVal, dou
 
    if (slider == mLengthSlider || slider == mOnsetSlider)
    {
-      //      char s[256];
-      //      sprintf(s, "mIndex: %d Slider: %s oldVal: %d\n", mIndex, slider->Name(), oldVal);
-      //      OutputDebugStringA(s);
-      //      sprintf(s, "mLengthSlider.GetValue: %f mOnsetSlider.GetValue: %f\n", mLengthSlider->GetValue(), mOnsetSlider->GetValue());
-      //      OutputDebugStringA(s);
-
       mLength = static_cast<int>(mLengthSlider->GetValue());
       mOnset = static_cast<int>(mOnsetSlider->GetValue());
       mRotation = static_cast<int>(mRotationSlider->GetValue());
@@ -480,7 +471,6 @@ void EuclideanSequencerRing::IntSliderUpdated(IntSlider* slider, int oldVal, dou
 
       // Get Euclidean Rhythm, returns a string of 1's and 0's
       std::string sEuclid = GetEuclideanRhythm(mOnset, mLength, mRotation);
-      //      OutputDebugStringA(sEuclid.c_str());
 
       // Fill mSteps
       for (int i = 0; i < mLength; i++)
@@ -509,18 +499,12 @@ void EuclideanSequencerRing::IntSliderUpdated(IntSlider* slider, int oldVal, dou
       int newVal = static_cast<int>(mRotationSlider->GetValue());
       int rotOffset = (newVal - oldVal) % mLength;
 
-      //      char s[256];
-      //      sprintf(s, "mIndex: %d Slider: %s oldVal: %d newVal: %d rotOffset: %d\n", mIndex, slider->Name(), oldVal, newVal, rotOffset);
-      //      OutputDebugStringA(s);
-
       // Save current mSteps
       mTempSteps = mSteps;
 
       // Fill mSteps with old data using rotOffset
       for (int i = 0; i < mLength; i++)
       {
-         //         sprintf(s, "i: %d rotOffset: %d mLength: %d val: %d\n", i, rotOffset, mLength, (i + rotOffset + mLength) % mLength);
-         //         OutputDebugStringA(s);
          mSteps[i] = mTempSteps[(i + rotOffset + mLength) % mLength]; // + mLength to avoid negative mod results
       }
    }
