@@ -755,6 +755,10 @@ vocoder~frequency band-based vocoder. this must be paired with a "vocodercarrier
 ~ring~how long it should take the bands to "cool down"
 
 
+voicesetter~set a specific Voice channel index for a note
+~voice index~current set voice channel index
+
+
 
 takerecorder~[abandoned module, possibly broken]
 ~start~[todo]

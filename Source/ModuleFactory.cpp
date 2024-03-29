@@ -262,6 +262,7 @@
 #include "PitchToValue.h"
 #include "RhythmSequencer.h"
 #include "DotSequencer.h"
+#include "VoiceSetter.h"
 #include "LabelDisplay.h"
 
 #include <juce_core/juce_core.h>
@@ -473,6 +474,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PitchToValue, pitchtovalue, kModuleCategory_Modulator);
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
+   REGISTER(VoiceSetter, voicesetter, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

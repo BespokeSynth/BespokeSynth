@@ -703,6 +703,8 @@ target_sources(BespokeSynth PRIVATE
     Vocoder.h
     VocoderCarrierInput.cpp
     VocoderCarrierInput.h
+    VoiceSetter.cpp
+    VoiceSetter.h
     VolcaBeatsControl.cpp
     VolcaBeatsControl.h
     WaveformViewer.cpp
