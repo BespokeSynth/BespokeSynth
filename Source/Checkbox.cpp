@@ -221,7 +221,7 @@ bool Checkbox::CheckNeedsDraw()
 
 void Checkbox::OnPulse(double time, float velocity, int flags)
 {
-   OnClicked(0, 0, false);
+   SetValue(*mVar ? 0 : 1, time, false);
 }
 
 namespace

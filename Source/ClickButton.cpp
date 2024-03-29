@@ -192,7 +192,7 @@ bool ClickButton::CanBeTargetedBy(PatchCableSource* source) const
 void ClickButton::OnPulse(double time, float velocity, int flags)
 {
    if (velocity > 0)
-      DoClick(NextBufferTime(false));
+      DoClick(time);
 }
 
 void ClickButton::OnClicked(float x, float y, bool right)
