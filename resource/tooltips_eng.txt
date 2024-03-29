@@ -209,6 +209,7 @@ pulser~send pulse messages at an interval
 ~random~tell pulsed modules to randomize their position
 ~reset~length of sequence before sending reset pulse
 ~div~measure division, when using "div" as the interval
+~restart~restart timer on "free" counter
 
 
 
