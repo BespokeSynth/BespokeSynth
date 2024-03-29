@@ -29,6 +29,8 @@
 
 #include <cstring>
 
+#include "PatchCableSource.h"
+
 ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)
 : mOwner(owner)
 , mDisplayStyle(displayStyle)
@@ -178,6 +180,19 @@ void ClickButton::Render()
 bool ClickButton::ButtonLit() const
 {
    return mClickTime + 200 > gTime;
+}
+
+bool ClickButton::CanBeTargetedBy(PatchCableSource* source) const
+{
+   if (source->GetConnectionType() == kConnectionType_Pulse)
+      return true;
+   return IUIControl::CanBeTargetedBy(source);
+}
+
+void ClickButton::OnPulse(double time, float velocity, int flags)
+{
+   if (velocity > 0)
+      DoClick(time);
 }
 
 void ClickButton::OnClicked(float x, float y, bool right)
