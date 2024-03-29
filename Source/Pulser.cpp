@@ -54,6 +54,7 @@ void Pulser::CreateUIControls()
    mRandomStepCheckbox = new Checkbox(this, "random", mOffsetSlider, kAnchor_Below, &mRandomStep);
    mResetLengthSlider = new IntSlider(this, "reset", mRandomStepCheckbox, kAnchor_Below, 113, 15, &mResetLength, 1, 16);
    mCustomDivisorSlider = new IntSlider(this, "div", mRandomStepCheckbox, kAnchor_Right, 52, 15, &mCustomDivisor, 1, 32);
+   mRestartFreeTimeButton = new ClickButton(this, "restart", mRandomStepCheckbox, kAnchor_Right);
 
    mIntervalSelector->AddLabel("16", kInterval_16);
    mIntervalSelector->AddLabel("8", kInterval_8);
@@ -85,6 +86,7 @@ void Pulser::CreateUIControls()
    mFreeTimeSlider->SetMode(FloatSlider::kSquare);
 
    mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
+   mRestartFreeTimeButton->SetShowing(mTimeMode == kTimeMode_Free);
 }
 
 Pulser::~Pulser()
@@ -100,14 +102,15 @@ void Pulser::DrawModule()
 
    ofSetColor(255, 255, 255, gModuleDrawAlpha);
 
-   mIntervalSelector->Draw();
    mTimeModeSelector->Draw();
+   mIntervalSelector->Draw();
    mFreeTimeSlider->Draw();
    mOffsetSlider->Draw();
    mRandomStepCheckbox->Draw();
    mResetLengthSlider->Draw();
-   mCustomDivisorSlider->SetShowing(mInterval == kInterval_CustomDivisor);
+   mCustomDivisorSlider->SetShowing(mIntervalSelector->IsShowing() && mInterval == kInterval_CustomDivisor);
    mCustomDivisorSlider->Draw();
+   mRestartFreeTimeButton->Draw();
 }
 
 void Pulser::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -116,6 +119,7 @@ void Pulser::CheckboxUpdated(Checkbox* checkbox, double time)
    {
       if (mEnabled && (mTimeMode == kTimeMode_Downbeat || mTimeMode == kTimeMode_Downbeat2 || mTimeMode == kTimeMode_Downbeat4))
          mWaitingForDownbeat = true;
+      mFreeTimeCounter = mFreeTimeStep;
    }
 }
 
@@ -200,6 +204,8 @@ void Pulser::GetModuleDimensions(float& width, float& height)
 
 void Pulser::ButtonClicked(ClickButton* button, double time)
 {
+   if (button == mRestartFreeTimeButton)
+      mFreeTimeCounter = mFreeTimeStep;
 }
 
 float Pulser::GetOffset()
@@ -236,10 +242,12 @@ void Pulser::DropdownUpdated(DropdownList* list, int oldVal, double time)
    {
       mIntervalSelector->SetShowing(mTimeMode != kTimeMode_Free);
       mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
+      mRestartFreeTimeButton->SetShowing(mTimeMode == kTimeMode_Free);
 
-      if (mTimeMode == kTimeMode_Free && mInterval < kInterval_None)
+      if (mTimeMode == kTimeMode_Free)
       {
-         mFreeTimeStep = TheTransport->GetDuration(mInterval);
+         if (mInterval < kInterval_None)
+            mFreeTimeStep = TheTransport->GetDuration(mInterval);
          TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
          if (transportListenerInfo != nullptr)
             transportListenerInfo->mInterval = kInterval_None;
