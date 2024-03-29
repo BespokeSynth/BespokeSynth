@@ -747,7 +747,7 @@ vocoder~frequency band-based vocoder. this must be paired with a "vocodercarrier
 
 
 voicesetter~set a specific Voice channel index for a note
-~Voice Index~current set voice channel index
+~voice index~current set voice channel index
 
 
 
