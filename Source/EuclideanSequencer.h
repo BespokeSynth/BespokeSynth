@@ -38,6 +38,8 @@
 #include "INoteSource.h"
 #include "TextEntry.h"
 #include "ClickButton.h"
+#include "Scale.h"
+
 
 class EuclideanSequencer;
 
@@ -49,7 +51,12 @@ public:
    EuclideanSequencerRing(EuclideanSequencer* owner, int index);
    void Draw();
    void OnClicked(float x, float y, bool right);
-   void Randomize(bool steps, bool onsets, bool rotation, bool offset);
+   void SetSteps(int steps);
+   int GetSteps();
+   void SetOnsets(int onsets);
+   void SetRotation(int rotation);
+   void SetOffset(float offset);
+   void SetPitch(int pitch);
    void MouseReleased();
    void MouseMoved(float x, float y);
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time);
@@ -101,6 +108,10 @@ public:
 
    void SetEnabled(bool on) override { mEnabled = on; }
 
+    //IDrawableModule
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
@@ -128,21 +139,60 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 650;
-      height = 200;
+      width = mWidth;
+      height = mHeight;
    }
+   float mWidth{ 785 }; // was 650 = random buttons visible
+   float mHeight{ 200 };
+   const float mWidthMin = 590;
+   const float mWidthMax = 785;
    void OnClicked(float x, float y, bool right) override;
    ClickButton* mRandomizeButton{ nullptr };
    ClickButton* mRndLengthButton{ nullptr };
    ClickButton* mRndOnsetsButton{ nullptr };
    ClickButton* mRndRotationButton{ nullptr };
    ClickButton* mRndOffsetButton{ nullptr };
+   ClickButton* mRndNoteButton{ nullptr };
    ClickButton* mRnd0Button{ nullptr };
    ClickButton* mRnd1Button{ nullptr };
    ClickButton* mRnd2Button{ nullptr };
    ClickButton* mRnd3Button{ nullptr };
-   void Randomize(bool steps, bool onsets, bool rotation, bool offset);
    ClickButton* mClearButton{ nullptr };
+
+   int mRotation{ 0 };
+   IntSlider* mRotationSlider{ nullptr };
+   float mOffset{ 0 };
+   FloatSlider* mOffsetSlider{ nullptr };
+
+   float mRndLengthChance{ 0.5f };
+   FloatSlider* mRndLengthChanceSlider{ nullptr };
+   int mRndLengthMax{ 24 };
+   IntSlider* mRndLengthMaxSlider{ nullptr };
+   float mRndOnsetChance{ 0.5f };
+   FloatSlider* mRndOnsetChanceSlider{ nullptr };
+   int mRndOnsetMax{ 12 };
+   IntSlider* mRndOnsetMaxSlider{ nullptr };
+   float mRndRotationChance{ 0.5f };
+   FloatSlider* mRndRotationChanceSlider{ nullptr };
+   int mRndRotationMax{ 4 };
+   IntSlider* mRndRotationMaxSlider{ nullptr };
+   float mRndOffsetChance{ 0.0f };
+   FloatSlider* mRndOffsetChanceSlider{ nullptr };
+   float mRndOffsetMax{ 0.0f };
+   FloatSlider* mRndOffsetMaxSlider{ nullptr };
+   float mRndNoteChance{ 0.5f };
+   FloatSlider* mRndNoteChanceSlider{ nullptr };
+   int mRndOctaveLo{ 2 };
+   int mRndOctaveHi{ 4 };
+   IntSlider* mRndOctaveLoSlider{ nullptr };
+   IntSlider* mRndOctaveHiSlider{ nullptr };
+
+   void RandomizeLength(int ringIndex);
+   void RandomizeOnset(int ringIndex);
+   void RandomizeRotation(int ringIndex);
+   void RandomizeOffset(int ringIndex);
+   void RandomizeNote(int ringIndex);
+
 
    std::vector<EuclideanSequencerRing*> mEuclideanSequencerRings;
 };
