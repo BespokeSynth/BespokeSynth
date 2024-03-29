@@ -35,7 +35,7 @@
 Beats::Beats()
 : mWriteBuffer(gBufferSize)
 {
-
+   mBeatColumns.resize(1);
    for (size_t i = 0; i < mBeatColumns.size(); ++i)
       mBeatColumns[i] = new BeatColumn(this, (int)i);
 }
@@ -236,7 +236,15 @@ void Beats::LoadState(FileStreamIn& in, int rev)
 
    int numColumns;
    in >> numColumns;
-   LoadStateValidate(numColumns == (int)mBeatColumns.size());
+   if (numColumns != (int)mBeatColumns.size())
+   {
+      mBeatColumns.resize(numColumns);
+      for (size_t i = 0; i < mBeatColumns.size(); ++i)
+      {
+         mBeatColumns[i] = new BeatColumn(this, (int)i);
+         mBeatColumns[i]->CreateUIControls();
+      }
+   }
    for (size_t i = 0; i < mBeatColumns.size(); ++i)
       mBeatColumns[i]->LoadState(in);
 }
@@ -399,14 +407,18 @@ void BeatColumn::Draw(int x, int y)
 
 void BeatColumn::CreateUIControls()
 {
+   std::string suffix = "";
+   if (mOwner->GetNumColumns() > 1)
+      suffix = ofToString(mIndex);
+
    int controlWidth = BEAT_COLUMN_WIDTH - 6;
-   mVolumeSlider = new FloatSlider(mOwner, ("volume" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mVolume, 0, 1.5f, 2);
-   mFilterSlider = new FloatSlider(mOwner, ("filter" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mFilter, -1, 1, 2);
-   mPanSlider = new FloatSlider(mOwner, ("pan" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mPan, -1, 1, 2);
-   mDoubleTimeCheckbox = new Checkbox(mOwner, ("double" + ofToString(mIndex)).c_str(), 0, 0, &mDoubleTime);
-   mNumBarsSlider = new IntSlider(mOwner, ("bars" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mNumBars, 1, 8);
-   mSelector = new RadioButton(mOwner, ("selector" + ofToString(mIndex)).c_str(), 0, 0, &mSampleIndex);
-   mDeleteButton = new ClickButton(mOwner, ("delete " + ofToString(mIndex)).c_str(), 0, 0);
+   mVolumeSlider = new FloatSlider(mOwner, ("volume" + suffix).c_str(), 0, 0, controlWidth, 15, &mVolume, 0, 1.5f, 2);
+   mFilterSlider = new FloatSlider(mOwner, ("filter" + suffix).c_str(), 0, 0, controlWidth, 15, &mFilter, -1, 1, 2);
+   mPanSlider = new FloatSlider(mOwner, ("pan" + suffix).c_str(), 0, 0, controlWidth, 15, &mPan, -1, 1, 2);
+   mDoubleTimeCheckbox = new Checkbox(mOwner, ("double" + suffix).c_str(), 0, 0, &mDoubleTime);
+   mNumBarsSlider = new IntSlider(mOwner, ("bars" + suffix).c_str(), 0, 0, controlWidth, 15, &mNumBars, 1, 8);
+   mSelector = new RadioButton(mOwner, ("selector" + suffix).c_str(), 0, 0, &mSampleIndex);
+   mDeleteButton = new ClickButton(mOwner, ("delete " + suffix).c_str(), 0, 0);
 
    mSelector->SetForcedWidth(controlWidth);
    mSelector->AddLabel("none", -1);
@@ -438,6 +450,11 @@ void BeatColumn::ButtonClicked(ClickButton* button, double time)
          mSamples.erase(mSamples.begin() + mSampleIndex);
          mSelector->RemoveLabel(mSampleIndex);
          mSampleIndex = -1;
+
+         mSelector->Clear();
+         mSelector->AddLabel("none", -1);
+         for (int i = 0; i < (int)mSamples.size(); ++i)
+            mSelector->AddLabel(mSamples[i]->Name().c_str(), i);
       }
    }
 }
