@@ -535,6 +535,8 @@ target_sources(BespokeSynth PRIVATE
     PulseGate.h
     PulseHocket.cpp
     PulseHocket.h
+    PulseRouter.cpp
+    PulseRouter.h
     PulseSequence.cpp
     PulseSequence.h
     PulseTrain.cpp
