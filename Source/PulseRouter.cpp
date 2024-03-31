@@ -79,15 +79,13 @@ void PulseRouter::OnPulse(double time, float velocity, int flags)
    {
       if (IsIndexActive(i))
       {
-         DispatchPulse(mDestinationCables[i],time,velocity,flags);
-        
+         DispatchPulse(mDestinationCables[i], time, velocity, flags);
       }
    }
 }
 
 void PulseRouter::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
-  
 }
 
 void PulseRouter::Poll()
