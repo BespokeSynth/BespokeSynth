@@ -282,12 +282,16 @@ void EuclideanSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
 
+   mModuleSaveData.LoadBool("shortnotes", moduleInfo, false);
+
    SetUpFromSaveData();
 }
 
 void EuclideanSequencer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+
+   mPlayShortNotes = mModuleSaveData.GetBool("shortnotes");
 }
 
 void EuclideanSequencer::SaveState(FileStreamOut& out)
@@ -751,10 +755,24 @@ void EuclideanSequencerRing::OnTransportAdvanced(float amount)
    {
       const double time = NextBufferTime(true) - remainderMs;
       mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
-      mOwner->PlayNoteOutput(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0, -1);
+      if (mOwner->PlayShortNotes())
+      {
+         mOwner->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
+      }
+      else
+      {
+         mOwner->PlayNoteOutput(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0, -1);
+      }
 
       mDestinationCable->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
-      mDestinationCable->PlayNoteOutput(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0, -1);
+      if (mOwner->PlayShortNotes())
+      {
+         mDestinationCable->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
+      }
+      else
+      {
+         mDestinationCable->PlayNoteOutput(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0, -1);
+      }
    }
 }
 

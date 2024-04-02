@@ -134,6 +134,8 @@ public:
 
    bool IsEnabled() const override { return mEnabled; }
 
+   bool PlayShortNotes() const { return mPlayShortNotes; }
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -147,6 +149,10 @@ private:
    const float mWidthMin = 590;
    const float mWidthMax = 785;
    void OnClicked(float x, float y, bool right) override;
+
+   // ModuleSaveData
+   bool mPlayShortNotes{ false };
+
    ClickButton* mRandomizeButton{ nullptr };
    ClickButton* mRndLengthButton{ nullptr };
    ClickButton* mRndOnsetsButton{ nullptr };
