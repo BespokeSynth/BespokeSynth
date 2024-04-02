@@ -155,23 +155,24 @@ FileStreamIn& FileStreamIn::operator>>(double& var)
 
 FileStreamIn& FileStreamIn::operator>>(std::string& var)
 {
-   uint64_t len;
+   uint64_t len64;
    if (s32BitMode)
    {
       uint32_t len32;
       mStream->read(&len32, sizeof(len32));
-      len = len32;
+      len64 = len32;
    }
    else
    {
-      mStream->read(&len, sizeof(len));
+      mStream->read(&len64, sizeof(len64));
    }
 
    if (TheSynth->IsLoadingModule())
-      LoadStateValidate(len < sMaxStringLength); //probably garbage beyond this point
+      LoadStateValidate(len64 < sMaxStringLength); //probably garbage beyond this point
    else
-      assert(len < sMaxStringLength); //probably garbage beyond this point
+      assert(len64 < sMaxStringLength); //probably garbage beyond this point
 
+   size_t len = len64;
    var.resize(len);
    mStream->read(var.data(), len);
    return *this;
