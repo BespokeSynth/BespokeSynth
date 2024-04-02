@@ -29,11 +29,21 @@
 //static
 bool FileStreamIn::s32BitMode = false;
 
+static std::unique_ptr<juce::FileOutputStream> MakeFileOutStream(const std::string& path) {
+   auto stream = std::make_unique<juce::FileOutputStream>(juce::File{ path });
+   stream->setPosition(0);
+   stream->truncate();
+   return stream;
+}
+
 FileStreamOut::FileStreamOut(const std::string& file)
-: mStream(std::make_unique<juce::FileOutputStream>(juce::File{ file }))
+: mStream(MakeFileOutStream(file))
 {
-   mStream->setPosition(0);
-   mStream->truncate();
+}
+
+FileStreamOut::FileStreamOut(juce::MemoryBlock& block, bool appendToExistingBlockContent)
+: mStream(std::make_unique<juce::MemoryOutputStream>(block, appendToExistingBlockContent))
+{
 }
 
 FileStreamOut::~FileStreamOut()
@@ -43,6 +53,11 @@ FileStreamOut::~FileStreamOut()
 
 FileStreamIn::FileStreamIn(const std::string& file)
 : mStream(std::make_unique<juce::FileInputStream>(juce::File{ file }))
+{
+}
+
+FileStreamIn::FileStreamIn(const juce::MemoryBlock& block)
+: mStream(std::make_unique<juce::MemoryInputStream>(block, false))
 {
 }
 
@@ -196,5 +211,8 @@ int FileStreamIn::GetFilePosition() const
 
 bool FileStreamIn::OpenedOk() const
 {
-   return mStream->openedOk();
+   if (auto* file = dynamic_cast<juce::FileInputStream*>(mStream.get()))
+      return file->openedOk();
+
+   return true;
 }
