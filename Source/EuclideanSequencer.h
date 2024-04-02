@@ -83,7 +83,7 @@ private:
    FloatSlider* mOffsetSlider{ nullptr };
    int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
-   AdditionalNoteCable* mDestinationCable;
+   AdditionalNoteCable* mDestinationCable{ nullptr };
    
 
    int mCurrentlyClickedStepIdx{ -1 };
