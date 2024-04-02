@@ -67,16 +67,16 @@ void EuclideanSequencer::CreateUIControls()
    int y = 5;
    int xcolumn = 115;
    mRndLengthChanceSlider = new FloatSlider(this, "step chance", 0 * xcolumn + x, y, 110, 15, &mRndLengthChance, 0.00f, 1.00f, 2);
-   mRndLengthMaxSlider = new IntSlider(this, "step max", 0 * xcolumn + x, y + 20, 110, 15, &mRndLengthMax, 0, 32);
+   mRndLengthMaxSlider = new FloatSlider(this, "step max", 0 * xcolumn + x, y + 20, 110, 15, &mRndLengthMax, 0, 32, 0);
    mRndOnsetChanceSlider = new FloatSlider(this, "onset chance", 1 * xcolumn + x, y, 110, 15, &mRndOnsetChance, 0.00f, 1.00f, 2);
-   mRndOnsetMaxSlider = new IntSlider(this, "onset max", 1 * xcolumn + x, y + 20, 110, 15, &mRndOnsetMax, 0, 32);
+   mRndOnsetMaxSlider = new FloatSlider(this, "onset max", 1 * xcolumn + x, y + 20, 110, 15, &mRndOnsetMax, 0, 32, 0);
    mRndRotationChanceSlider = new FloatSlider(this, "rot chance", 2 * xcolumn + x, y, 110, 15, &mRndRotationChance, 0.00f, 1.00f, 2);
-   mRndRotationMaxSlider = new IntSlider(this, "rot max", 2 * xcolumn + x, y + 20, 110, 15, &mRndRotationMax, 0, 32);
+   mRndRotationMaxSlider = new FloatSlider(this, "rot max", 2 * xcolumn + x, y + 20, 110, 15, &mRndRotationMax, 0, 32, 0);
    mRndOffsetChanceSlider = new FloatSlider(this, "offs chance", 3 * xcolumn + x, y, 110, 15, &mRndOffsetChance, 0.00f, 1.00f, 2);
    mRndOffsetMaxSlider = new FloatSlider(this, "offs max", 3 * xcolumn + x, y + 20, 110, 15, &mRndOffsetMax, 0.00f, 0.25f, 2);
    mRndNoteChanceSlider = new FloatSlider(this, "note chance", 4 * xcolumn + x, y, 110, 15, &mRndNoteChance, 0.00f, 1.00f, 2);
-   mRndOctaveLoSlider = new IntSlider(this, "oct lo", 4 * xcolumn + x, y + 20, 55, 15, &mRndOctaveLo, 0, 5);
-   mRndOctaveHiSlider = new IntSlider(this, "oct hi", 4 * xcolumn + x + 55, y + 20, 55, 15, &mRndOctaveHi, 0, 5);
+   mRndOctaveLoSlider = new FloatSlider(this, "oct lo", 4 * xcolumn + x, y + 20, 55, 15, &mRndOctaveLo, 0.00f, 5.00f, 0);
+   mRndOctaveHiSlider = new FloatSlider(this, "oct hi", 4 * xcolumn + x + 55, y + 20, 55, 15, &mRndOctaveHi, 0.00f, 5.00f, 0);
    
 
    x = 210;
@@ -211,10 +211,6 @@ void EuclideanSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-}
-
-void EuclideanSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
-{
    // Check if Lo > Hi or Hi < Lo
    if (slider == mRndOctaveLoSlider)
       if (mRndOctaveLo > mRndOctaveHi)
@@ -226,10 +222,14 @@ void EuclideanSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double 
       if (mRndOctaveHi < mRndOctaveLo)
          mRndOctaveHi = mRndOctaveLo;
    }
-
+ 
    // Handle slider updates of all ring sliders
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
-      mEuclideanSequencerRings[i]->IntSliderUpdated(slider, oldVal, time);
+      mEuclideanSequencerRings[i]->FloatSliderUpdated(slider, oldVal, time);
+}
+
+void EuclideanSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
+{
 }
 
 void EuclideanSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
@@ -463,9 +463,9 @@ void EuclideanSequencerRing::CreateUIControls()
    int x = mIndex * 95 + 210;
    int y = 90;
 
-   mLengthSlider = new IntSlider(mOwner, ("steps" + ofToString(mIndex)).c_str(), x, y, 90, 15, &mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
-   mOnsetSlider = new IntSlider(mOwner, ("onsets" + ofToString(mIndex)).c_str(), x, y + 20, 90, 15, &mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
-   mRotationSlider = new IntSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), x, y + 40, 90, 15, &mRotation, -8, 8);
+   mLengthSlider = new FloatSlider(mOwner, ("steps" + ofToString(mIndex)).c_str(), x, y, 90, 15, &mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
+   mOnsetSlider = new FloatSlider(mOwner, ("onsets" + ofToString(mIndex)).c_str(), x, y + 20, 90, 15, &mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
+   mRotationSlider = new FloatSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), x, y + 40, 90, 15, &mRotation, -8, 8, 0);
    mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), x, y + 60, 90, 15, &mOffset, -.25f, .25f, 2);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), x, y + 80, 4, &mPitch, 0, 127);
 
@@ -476,7 +476,7 @@ void EuclideanSequencerRing::CreateUIControls()
    mDestinationCable->GetPatchCableSource()->SetManualPosition(x + 50, y + 105);
 
    // Calculate Euclidean steps
-   IntSliderUpdated(mLengthSlider, 0, 0);
+   FloatSliderUpdated(mLengthSlider, 0, 0);
 }
 
 void EuclideanSequencerRing::InitPreset(int preset)
@@ -608,7 +608,7 @@ int EuclideanSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
    }
    ofVec2f polar = CarToPol(x - 100, y - 100);
    float pos = FloatWrap(polar.x + mOffset, 1);
-   int idx = int(pos * mLength + .5f) % mLength;
+   int idx = int(pos * mLength + .5f) % (int)mLength;
 
    ofVec2f stepPos = PolToCar(float(idx) / mLength - mOffset, GetRadius());
    if (ofDistSquared(x, y, stepPos.x + 100, stepPos.y + 100) < 7 * 7)
@@ -658,7 +658,7 @@ void EuclideanSequencerRing::MouseMoved(float x, float y)
    }
 }
 
-void EuclideanSequencerRing::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
+void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    bool forceUpdate{ false };
 
@@ -672,8 +672,8 @@ void EuclideanSequencerRing::IntSliderUpdated(IntSlider* slider, int oldVal, dou
          return;   // and avoid divide by zero later for: % mLength    
 
       std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mTempSteps{};
-      int newVal = (int)(mRotationSlider->GetValue());
-      int rotOffset = (newVal - oldVal) % mLength;
+      float newVal = (mRotationSlider->GetValue());
+      int rotOffset = (int)(newVal - oldVal) % (int)mLength;
 
       if (rotOffset == 0)
       {
@@ -694,7 +694,7 @@ void EuclideanSequencerRing::IntSliderUpdated(IntSlider* slider, int oldVal, dou
          // Fill mSteps with old data using rotOffset
          for (int i = 0; i < mLength; i++)
          {
-            mSteps[i] = mTempSteps[(i + rotOffset + mLength) % mLength]; // + mLength to avoid negative mod results
+            mSteps[i] = mTempSteps[(int)(i + rotOffset + mLength) % (int)mLength]; // + mLength to avoid negative mod results
          }
       
       }
