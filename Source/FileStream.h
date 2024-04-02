@@ -40,7 +40,9 @@ namespace juce
 class FileStreamOut
 {
 public:
-   explicit FileStreamOut(std::unique_ptr<juce::OutputStream> stream) : mStream(std::move(stream)) {}
+   explicit FileStreamOut(std::unique_ptr<juce::OutputStream> stream)
+   : mStream(std::move(stream))
+   {}
    explicit FileStreamOut(const std::string& file);
    explicit FileStreamOut(juce::MemoryBlock& block, bool appendToExistingBlockContent = true);
    FileStreamOut(const char*) = delete; // Hint: UTF-8 encoded std::string required
@@ -63,7 +65,9 @@ private:
 class FileStreamIn
 {
 public:
-   explicit FileStreamIn(std::unique_ptr<juce::InputStream> stream) : mStream(std::move(stream)) {}
+   explicit FileStreamIn(std::unique_ptr<juce::InputStream> stream)
+   : mStream(std::move(stream))
+   {}
    explicit FileStreamIn(const std::string& file);
    explicit FileStreamIn(const juce::MemoryBlock& block);
    FileStreamIn(const char*) = delete; // Hint: UTF-8 encoded std::string required

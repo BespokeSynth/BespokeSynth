@@ -29,7 +29,8 @@
 //static
 bool FileStreamIn::s32BitMode = false;
 
-static std::unique_ptr<juce::FileOutputStream> MakeFileOutStream(const std::string& path) {
+static std::unique_ptr<juce::FileOutputStream> MakeFileOutStream(const std::string& path)
+{
    auto stream = std::make_unique<juce::FileOutputStream>(juce::File{ path });
    stream->setPosition(0);
    stream->truncate();
