@@ -95,16 +95,26 @@ void KeyboardDisplay::OnClicked(float x, float y, bool right)
                if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
                {
                   int pitch = i + RootKey();
+
+                  float kOffsetVal;
+                  
+                  if (isBlackKey)
+                     kOffsetVal = mHeight/2.2f;
+                  else
+                     kOffsetVal = mHeight;
+                  
+                  int noteVelocity = std::min(127, int(floor((y + (kOffsetVal) * 0.25f) / (kOffsetVal)*127)));
+                  
                   if (mPlayingMousePitch == -1 || !mLatch)
                   {
-                     PlayNote(time, pitch, 127);
+                     PlayNote(time, pitch, noteVelocity);
                      mPlayingMousePitch = pitch;
                   }
                   else
                   {
                      bool newNote = (mPlayingMousePitch != pitch);
                      if (newNote)
-                        PlayNote(time, pitch, 127);
+                        PlayNote(time, pitch, noteVelocity);
                      PlayNote(time, mPlayingMousePitch, 0);
                      mPlayingMousePitch = newNote ? pitch : -1;
                   }
