@@ -103,7 +103,7 @@ void KeyboardDisplay::OnClicked(float x, float y, bool right)
                   else
                      kOffsetVal = mHeight;
 
-                  int noteVelocity = std::min(127, int(floor((y + (kOffsetVal) * 0.25f) / (kOffsetVal) * 127)));
+                  int noteVelocity = std::min(127, int(floor((y + kOffsetVal * 0.25f) / kOffsetVal * 127)));
 
                   if (mPlayingMousePitch == -1 || !mLatch)
                   {
