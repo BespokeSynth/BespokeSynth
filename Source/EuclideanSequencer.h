@@ -44,6 +44,8 @@
 class EuclideanSequencer;
 
 #define EUCLIDEAN_SEQUENCER_MAX_STEPS 32
+#define EUCLIDEAN_ROTATION_MIN -16
+#define EUCLIDEAN_ROTATION_MAX 16
 
 class EuclideanSequencerRing
 {

@@ -67,11 +67,11 @@ void EuclideanSequencer::CreateUIControls()
    int y = 5;
    int xcolumn = 115;
    mRndLengthChanceSlider = new FloatSlider(this, "step chance", 0 * xcolumn + x, y, 110, 15, &mRndLengthChance, 0.00f, 1.00f, 2);
-   mRndLengthMaxSlider = new FloatSlider(this, "step max", 0 * xcolumn + x, y + 20, 110, 15, &mRndLengthMax, 0, 32, 0);
+   mRndLengthMaxSlider = new FloatSlider(this, "step max", 0 * xcolumn + x, y + 20, 110, 15, &mRndLengthMax, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mRndOnsetChanceSlider = new FloatSlider(this, "onset chance", 1 * xcolumn + x, y, 110, 15, &mRndOnsetChance, 0.00f, 1.00f, 2);
-   mRndOnsetMaxSlider = new FloatSlider(this, "onset max", 1 * xcolumn + x, y + 20, 110, 15, &mRndOnsetMax, 0, 32, 0);
+   mRndOnsetMaxSlider = new FloatSlider(this, "onset max", 1 * xcolumn + x, y + 20, 110, 15, &mRndOnsetMax, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mRndRotationChanceSlider = new FloatSlider(this, "rot chance", 2 * xcolumn + x, y, 110, 15, &mRndRotationChance, 0.00f, 1.00f, 2);
-   mRndRotationMaxSlider = new FloatSlider(this, "rot max", 2 * xcolumn + x, y + 20, 110, 15, &mRndRotationMax, 0, 32, 0);
+   mRndRotationMaxSlider = new FloatSlider(this, "rot max", 2 * xcolumn + x, y + 20, 110, 15, &mRndRotationMax, EUCLIDEAN_ROTATION_MIN, EUCLIDEAN_ROTATION_MAX, 0);
    mRndOffsetChanceSlider = new FloatSlider(this, "offs chance", 3 * xcolumn + x, y, 110, 15, &mRndOffsetChance, 0.00f, 1.00f, 2);
    mRndOffsetMaxSlider = new FloatSlider(this, "offs max", 3 * xcolumn + x, y + 20, 110, 15, &mRndOffsetMax, 0.00f, 0.25f, 2);
    mRndNoteChanceSlider = new FloatSlider(this, "note chance", 4 * xcolumn + x, y, 110, 15, &mRndNoteChance, 0.00f, 1.00f, 2);
@@ -468,7 +468,7 @@ void EuclideanSequencerRing::CreateUIControls()
 
    mLengthSlider = new FloatSlider(mOwner, ("steps" + ofToString(mIndex)).c_str(), x, y, 90, 15, &mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mOnsetSlider = new FloatSlider(mOwner, ("onsets" + ofToString(mIndex)).c_str(), x, y + 20, 90, 15, &mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
-   mRotationSlider = new FloatSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), x, y + 40, 90, 15, &mRotation, -8, 8, 0);
+   mRotationSlider = new FloatSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), x, y + 40, 90, 15, &mRotation, EUCLIDEAN_ROTATION_MIN, EUCLIDEAN_ROTATION_MAX, 0);
    mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), x, y + 60, 90, 15, &mOffset, -.25f, .25f, 2);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), x, y + 80, 4, &mPitch, 0, 127);
 
@@ -670,13 +670,16 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
       // Do not generate a new GetEuclideanRhythm, but rotate mSteps
       // This way, manually modified onsets will remain
 
+      // check min and max value to handle manual slider value edits
+      mRotation = MAX(mRotation, EUCLIDEAN_ROTATION_MIN);
+      mRotation = MIN(mRotation, EUCLIDEAN_ROTATION_MAX);
+
       // Nothing to rotate, return
       if (mLength == 0 || mOnset == 0)
          return;   // and avoid divide by zero later for: % mLength    
 
       std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mTempSteps{};
-      float newVal = (mRotationSlider->GetValue());
-      int rotOffset = (int)(newVal - oldVal) % (int)mLength;
+      int rotOffset = (int)(mRotation - oldVal) % (int)mLength;
 
       if (rotOffset == 0)
       {
@@ -705,9 +708,14 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
 
    if (slider == mLengthSlider || slider == mOnsetSlider || forceUpdate)
    {
-      mLength = static_cast<int>(mLengthSlider->GetValue());
-      mOnset = static_cast<int>(mOnsetSlider->GetValue());
-      mRotation = static_cast<int>(mRotationSlider->GetValue());
+//      mLength = static_cast<int>(mLengthSlider->GetValue());
+//      mOnset = static_cast<int>(mOnsetSlider->GetValue());
+//      mRotation = static_cast<int>(mRotationSlider->GetValue());
+      // check min and max value to handle manual slider value edits
+      mLength = MAX(mLength, 0);
+      mLength = MIN(mLength, EUCLIDEAN_SEQUENCER_MAX_STEPS);
+      mOnset = MAX(mOnset, 0);
+      mOnset = MIN(mOnset, EUCLIDEAN_SEQUENCER_MAX_STEPS);
 
       // Clear all steps
       mSteps.fill(0);
