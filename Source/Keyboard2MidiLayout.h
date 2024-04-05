@@ -19,4 +19,3 @@ class Keyboard2MidiLayout
 public:
    static Keyboard2MidiResponse GetPitchForComputerKey(int key, int octave);
 };
-

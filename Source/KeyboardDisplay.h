@@ -33,7 +33,7 @@
 
 #include <unordered_map>
 
-class KeyboardDisplay : public NoteEffectBase, public HoverSelectModule 
+class KeyboardDisplay : public NoteEffectBase, public HoverSelectModule
 {
 public:
    KeyboardDisplay();
@@ -57,8 +57,8 @@ public:
    void MouseReleased() override;
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
-   
-   
+
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
@@ -86,21 +86,21 @@ private:
 
    int RootKey() const;
    int NumKeys() const;
-   
+
    float mWidth{ 500 };
    float mHeight{ 110 };
    int mRootOctave{ 3 };
    int mNumOctaves{ 3 };
-   int mForceNumOctaves {0};
+   int mForceNumOctaves{ 0 };
    int mPlayingMousePitch{ -1 };
    bool mTypingInput{ false };
    bool mLatch{ false };
    bool mShowScale{ false };
-   bool mHideLabels {false};
+   bool mHideLabels{ false };
    int mMidPress = 0;
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
-   std::unordered_map<int,int> mKeyPressRegister{};
+   std::unordered_map<int, int> mKeyPressRegister{};
 };
 
 #endif /* defined(__Bespoke__KeyboardDisplay__) */

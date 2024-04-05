@@ -112,7 +112,7 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
 {
    if (!enableKeyboardInput && !IsShowing())
       return;
-   
+
    IDrawableModule::KeyPressed(key, isRepeat);
 
    if (!IsShowing())

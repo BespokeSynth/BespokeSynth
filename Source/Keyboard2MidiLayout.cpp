@@ -5,12 +5,12 @@
 
 /*Returns the pitch of a computer key char, according to the user selected layout.
  * May return -1 pitch for no matching key or the 'ignored' layout. 
- */ 
+ */
 Keyboard2MidiResponse Keyboard2MidiLayout::GetPitchForComputerKey(int key, int octave)
 {
    Keyboard2MidiLayoutType ly = static_cast<Keyboard2MidiLayoutType>(UserPrefs.keyboard_2_midi_layout.GetIndex());
    int idx = -1;
-   
+
    switch (ly)
    {
       case Keyboard2MidiLayoutType::Ableton:
@@ -21,59 +21,60 @@ Keyboard2MidiResponse Keyboard2MidiLayout::GetPitchForComputerKey(int key, int o
                break;
             case 'w':
                idx = 1;
-            break;
+               break;
             case 's':
                idx = 2;
-            break;
+               break;
             case 'e':
                idx = 3;
-            break;
+               break;
             case 'd':
                idx = 4;
-            break;
+               break;
             case 'f':
                idx = 5;
-            break;
+               break;
             case 't':
                idx = 6;
-            break;
+               break;
             case 'g':
                idx = 7;
-            break;
+               break;
             case 'y':
                idx = 8;
-            break;
+               break;
             case 'h':
                idx = 9;
-            break;
+               break;
             case 'u':
                idx = 10;
-            break;
+               break;
             case 'j':
                idx = 11;
-            break;
+               break;
             case 'k':
                idx = 12;
-            break;
+               break;
             case 'o':
                idx = 13;
-            break;
+               break;
             case 'l':
                idx = 14;
-            break;
+               break;
             case 'p':
                idx = 15;
-            break;
+               break;
             case ';':
                idx = 16;
-            break;
+               break;
             case 'z':
                octave--;
-            break;
+               break;
             case 'x':
                octave++;
                break;
-            default: idx = -1;
+            default:
+               idx = -1;
                break;
          }
          break;
@@ -83,80 +84,80 @@ Keyboard2MidiResponse Keyboard2MidiLayout::GetPitchForComputerKey(int key, int o
             //Oct #1
             case 'z':
                idx = 0;
-            break;
+               break;
             case 's':
                idx = 1;
-            break;
+               break;
             case 'x':
                idx = 2;
-            break;
+               break;
             case 'd':
                idx = 3;
-            break;
+               break;
             case 'c':
                idx = 4;
-            break;
+               break;
             case 'v':
                idx = 5;
-            break;
+               break;
             case 'g':
                idx = 6;
-            break;
+               break;
             case 'b':
                idx = 7;
-            break;
+               break;
             case 'h':
                idx = 8;
-            break;
+               break;
             case 'n':
                idx = 9;
-            break;
+               break;
             case 'j':
                idx = 10;
-            break;
+               break;
             case 'm':
                idx = 11;
-            break;
+               break;
             //Oct #2
             case 'q':
                idx = 12;
-            break;
+               break;
             case '2':
                idx = 13;
-            break;
+               break;
             case 'w':
                idx = 14;
-            break;
+               break;
             case '3':
                idx = 15;
-            break;
+               break;
             case 'e':
                idx = 16;
-            break;
+               break;
             case 'r':
                idx = 17;
-            break;
+               break;
             case '5':
                idx = 18;
-            break;
+               break;
             case 't':
                idx = 19;
-            break;
+               break;
             case '6':
                idx = 20;
-            break;
+               break;
             case 'y':
                idx = 21;
-            break;
+               break;
             case '7':
                idx = 22;
-            break;
+               break;
             case 'u':
                idx = 23;
-            break;
+               break;
             case 'i':
                idx = 24;
-            break; //Trimmed so the layout fully supports 2 octaves +1
+               break; //Trimmed so the layout fully supports 2 octaves +1
             /*
             case '9':
                idx = 25;
@@ -173,26 +174,26 @@ Keyboard2MidiResponse Keyboard2MidiLayout::GetPitchForComputerKey(int key, int o
             //Oct Control
             case ',':
                octave--;
-            break;
+               break;
             case '.':
                octave++;
-            break;
-            default: idx = -1;
-            break;
+               break;
+            default:
+               idx = -1;
+               break;
          }
          break;
       case Keyboard2MidiLayoutType::Ignore:
-         return {idx,octave};
+         return { idx, octave };
    }
 
-   if (octave>9)
+   if (octave > 9)
       octave = 9;
-   if (octave<0)
+   if (octave < 0)
       octave = 0;
-   
-   if (idx != -1)
-      return {octave * 12 + idx,octave};
-   
-   return {idx,octave};
-}
 
+   if (idx != -1)
+      return { octave * 12 + idx, octave };
+
+   return { idx, octave };
+}

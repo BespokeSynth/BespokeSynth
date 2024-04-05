@@ -442,7 +442,6 @@ void IDrawableModule::Render()
          source->DrawSource();
       }
    }
-   
 }
 
 void IDrawableModule::RenderUnclipped()
