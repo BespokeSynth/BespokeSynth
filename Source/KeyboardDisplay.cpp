@@ -205,11 +205,16 @@ void KeyboardDisplay::Resize(float w, float h)
    mWidth = w;
    mHeight = h;
 
+   RefreshOctaveCount();
+}
+
+void KeyboardDisplay::RefreshOctaveCount()
+{
    if (mForceNumOctaves == 0)
    {
-      float ratio = w / h;
+      float ratio = mWidth / mHeight;
 
-      float baseRatioForOneElement = 230.0f / 150.0f;
+      constexpr float baseRatioForOneElement = 250.0f / 180.0f;
 
       int elements = static_cast<int>(ratio / baseRatioForOneElement);
 
@@ -400,11 +405,8 @@ void KeyboardDisplay::SetUpFromSaveData()
    mShowScale = mModuleSaveData.GetBool("show_scale");
    mHideLabels = mModuleSaveData.GetBool("hide_labels");
 
-   if (mForceNumOctaves != 0)
-   {
-      KeyboardDisplay::Resize(mWidth,mHeight+mTitleBarHeight);
-   }
-  
+   if (mForceNumOctaves)
+      RefreshOctaveCount();
 }
 
 void KeyboardDisplay::SaveState(FileStreamOut& out)
@@ -415,6 +417,8 @@ void KeyboardDisplay::SaveState(FileStreamOut& out)
 
    out << mWidth;
    out << mHeight;
+   out << mNumOctaves;
+   out << mRootOctave;
 }
 
 void KeyboardDisplay::LoadState(FileStreamIn& in, int rev)
@@ -430,4 +434,6 @@ void KeyboardDisplay::LoadState(FileStreamIn& in, int rev)
 
    in >> mWidth;
    in >> mHeight;
+   in >> mNumOctaves;
+   in >> mRootOctave;
 }

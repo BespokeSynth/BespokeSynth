@@ -78,6 +78,7 @@ private:
    void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
+   void RefreshOctaveCount();
 
    void DrawKeyboard(int x, int y, int w, int h);
    void SetPitchColor(int pitch);
