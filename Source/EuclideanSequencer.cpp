@@ -445,7 +445,29 @@ void EuclideanSequencer::RandomizeNote(int ringIndex)
             int noteFrom = numPitchesInScale * (mRndOctaveLo + 2) + TheScale->GetScaleDegree();
             // hi - lo + 1 = range, plus noteFrom
             int noteTo = numPitchesInScale * (mRndOctaveHi - mRndOctaveLo + 1) + noteFrom;
-            mEuclideanSequencerRings[i]->SetPitch(TheScale->GetPitchFromTone(ofRandom(noteFrom, noteTo)));
+
+            // Try 5 times to generate a unique random pitch. This prevents stuck notes on some synths
+            float newPitch;
+            bool isUnique;
+            int attempts = 0;
+            do
+            {
+               isUnique = true;
+               newPitch = TheScale->GetPitchFromTone(ofRandom(noteFrom, noteTo));
+               for (int j = 0; j < mEuclideanSequencerRings.size(); ++j)
+               {
+                  if (mEuclideanSequencerRings[j]->GetPitch() == newPitch && j != i)
+                  {
+                     isUnique = false;
+                     break;
+                  }
+               }
+               attempts++;
+            } while (!isUnique && attempts < 5);
+            if (isUnique)
+            {
+               mEuclideanSequencerRings[i]->SetPitch(newPitch);
+            }
          }
       }
 }
@@ -830,6 +852,11 @@ void EuclideanSequencerRing::SetPitch(int pitch)
 {
    mPitch = pitch;
    mNoteSelector->SetValue(pitch, gTime, true);
+}
+
+int EuclideanSequencerRing::GetPitch()
+{
+   return mPitch;
 }
 
 std::string EuclideanSequencerRing::GetEuclideanRhythm(int pulses, int steps, int rotation)

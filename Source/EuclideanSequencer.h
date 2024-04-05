@@ -59,6 +59,7 @@ public:
    void SetRotation(int rotation);
    void SetOffset(float offset);
    void SetPitch(int pitch);
+   int GetPitch();
    void MouseReleased();
    void MouseMoved(float x, float y);
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time);
