@@ -2,6 +2,7 @@
 
 
 #include "QuickSpawnMenu.h"
+#include "UserPrefs.h"
 
 void HoverSelectModule::DrawHoverSelect()
 {
@@ -38,7 +39,7 @@ bool HoverSelectModule::MouseMoved(float x, float y)
    {
       if (!hovered && !TheQuickSpawnMenu->IsShowing())
       {
-         if (!IsEnabled())
+         if (!IsEnabled() || UserPrefs.keyboard_2_midi_layout.GetIndex() == 2)
             return IDrawableModule::MouseMoved(x, y);
          hovered = true;
          OnHoverEnter();
