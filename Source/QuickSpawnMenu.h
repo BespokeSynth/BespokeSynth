@@ -40,7 +40,7 @@ public:
    void GetDimensions(float& width, float& height) override;
    bool HasTitleBar() const override { return false; }
    bool IsSaveable() override { return false; }
-
+   
    void UpdateLocation();
 
    PatchCableSource* mTempConnectionCable{ nullptr };
@@ -51,7 +51,7 @@ class QuickSpawnMenu : public IDrawableModule
 public:
    QuickSpawnMenu();
    virtual ~QuickSpawnMenu();
-
+   inline static bool enableKeyboardInput = true;
    void Init() override;
    void DrawModule() override;
    void DrawModuleUnclipped() override;

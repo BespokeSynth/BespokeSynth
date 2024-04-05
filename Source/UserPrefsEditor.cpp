@@ -26,6 +26,8 @@
 */
 
 #include "UserPrefsEditor.h"
+
+#include "Keyboard2MidiLayout.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
@@ -71,11 +73,23 @@ void UserPrefsEditor::CreateUIControls()
    UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("show quickspawn", (int)CableDropBehavior::ShowQuickspawn);
    UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("do nothing", (int)CableDropBehavior::DoNothing);
    UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("disconnect", (int)CableDropBehavior::DisconnectCable);
+
    for (int i = 0; i < UserPrefs.cable_drop_behavior.GetDropdown()->GetNumValues(); ++i)
    {
       if (UserPrefs.cable_drop_behavior.GetDropdown()->GetElement(i).mLabel == UserPrefs.cable_drop_behavior.Get())
          UserPrefs.cable_drop_behavior.GetIndex() = i;
    }
+   
+   UserPrefs.keyboard_2_midi_layout.GetDropdown()->AddLabel("Ableton",(int)Keyboard2MidiLayoutType::Ableton);
+   UserPrefs.keyboard_2_midi_layout.GetDropdown()->AddLabel("Fruity",(int)Keyboard2MidiLayoutType::Fruity);
+   UserPrefs.keyboard_2_midi_layout.GetDropdown()->AddLabel("ignore",(int)Keyboard2MidiLayoutType::Ignore);
+
+   for (int i = 0; i < UserPrefs.keyboard_2_midi_layout.GetDropdown()->GetNumValues(); ++i)
+   {
+      if (UserPrefs.keyboard_2_midi_layout.GetDropdown()->GetElement(i).mLabel == UserPrefs.keyboard_2_midi_layout.Get())
+         UserPrefs.keyboard_2_midi_layout.GetIndex() = i;
+   }
+   
 }
 
 void UserPrefsEditor::Show()
