@@ -317,6 +317,8 @@ void VSTPlugin::AddExtraOutputCable()
 {
    AdditionalNoteCable* NewAdditionalCable = new AdditionalNoteCable();
    RollingBuffer* NewBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS * gSampleRate);
+   NewBuffer->SetNumChannels(2);
+
    PatchCableSource* NewCableSource = new PatchCableSource(this, kConnectionType_Audio);
 
    NewCableSource->SetOverrideVizBuffer(NewBuffer);
@@ -967,9 +969,7 @@ void VSTPlugin::Process(double time)
                 AllChannelsBuffer->GetChannel(sourceChannel),
                 AllChannelsBuffer->BufferSize());
 
-            continue;
-
-            CurrentVizBuffer->WriteChunk(targetBuffer->GetChannel(sourceChannel), targetBuffer->BufferSize(), 0);
+            CurrentVizBuffer->WriteChunk(targetBuffer->GetChannel(sourceStereoChannel), targetBuffer->BufferSize(), 0);
          }
       }
    }
