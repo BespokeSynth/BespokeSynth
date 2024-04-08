@@ -317,8 +317,6 @@ void VSTPlugin::AddExtraOutputCable()
 {
    AdditionalNoteCable* NewAdditionalCable = new AdditionalNoteCable();
    RollingBuffer* NewBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS * gSampleRate);
-   NewBuffer->SetNumChannels(2);
-
    PatchCableSource* NewCableSource = new PatchCableSource(this, kConnectionType_Audio);
 
    NewCableSource->SetOverrideVizBuffer(NewBuffer);
@@ -803,6 +801,12 @@ void VSTPlugin::Process(double time)
       RecreateUIOutputCables();
    }
    
+   // For now, force all additional outputs to be stereo.
+   for (PatchCableSource* CurrentSouce : mAdditionalOutCableSources)
+   {
+      CurrentSouce->GetAudioReceiver()->GetBuffer()->SetNumActiveChannels(2);
+   }
+
    int inputChannels = MAX(2, mNumInputChannels);
    int outputChannels = MAX(2, mNumOutputChannels);
    ChannelBuffer* AllChannelsBuffer = GetBuffer();
@@ -815,7 +819,7 @@ void VSTPlugin::Process(double time)
     * buffer even though we don't read it.
     * 
     * Before processing audio in the VST we copy the Bespoke inputs into a juce buffer, the buffer needs enough mono channels to cover inputs and outputs
-    * So 2 inputs and 4 outputs means we need 4 channels total (the first two for inputs will be overwritten with the outputs)
+    * So 2 inputs and 4 outputs means we need 4 channels total (the first two for inputs will be overwritten with the outputs
     */
    int juceBufferChannelCount = MAX(MAX(inputChannels * mNumInBuses, outputChannels * mNumOutBuses), 2); // how much to allocate in the juce::AudioBuffer
 
@@ -932,25 +936,17 @@ void VSTPlugin::Process(double time)
        * output the full buffer set from copying that onto the output.
        * (Ahem: Surge 1.9)
        */
-      int nSingleChannelsToCopy = MIN(AllChannelsBuffer->NumActiveChannels(), buffer.getNumChannels());
-      for (int sourceChannel = 0; sourceChannel < nSingleChannelsToCopy && sourceChannel < (kSafetyMaxStereoChannels * 2); ++sourceChannel)
+      int nStereoChannelsToCopy = MIN(AllChannelsBuffer->NumActiveChannels(), buffer.getNumChannels());
+      for (int sourceChannel = 0; sourceChannel < nStereoChannelsToCopy && sourceChannel < kSafetyMaxStereoChannels; ++sourceChannel)
       {
          int sourceStereoChannel = sourceChannel % 2;
          int stereoIndex = floor(sourceChannel / 2);
-         
-         IAudioReceiver* CurrentTargetAudioReceiver;
-         RollingBuffer* CurrentVizBuffer;
+         IAudioReceiver* CurrentTarget = target;
+         RollingBuffer* CurrentVizBuffer = GetVizBuffer();
 
-         if (stereoIndex == 0)
+         if (stereoIndex > 0)
          {
-            // Default behaviour for single output VST plugins, use the IAudioSource defined target and default VizBuffer
-            CurrentTargetAudioReceiver = target;
-            CurrentVizBuffer = GetVizBuffer();
-         }
-         else
-         {
-            // This is a multi out VST, we need to use the additional Vis Buffer and set the target to the node this pat
-            CurrentTargetAudioReceiver = mAdditionalOutCables[stereoIndex - 1]->GetPatchCableSource()->GetAudioReceiver();
+            CurrentTarget = mAdditionalOutCables[stereoIndex - 1]->GetPatchCableSource()->GetAudioReceiver();
             CurrentVizBuffer = mAdditionalVizBuffers[stereoIndex - 1];
          }
 
@@ -962,22 +958,18 @@ void VSTPlugin::Process(double time)
          }
          
          // Copy the outputs from the single buffer into our multiple output buffers
-         if (CurrentTargetAudioReceiver)
+         if (CurrentTarget)
          {
-            ChannelBuffer* targetBuffer = CurrentTargetAudioReceiver->GetBuffer();
-            targetBuffer->SetNumActiveChannels(2);
+            ChannelBuffer* targetBuffer = CurrentTarget->GetBuffer();
 
-            float* Destination = targetBuffer->GetChannel(sourceStereoChannel);
-            float* Source = AllChannelsBuffer->GetChannel(sourceChannel);
-            
-            // Add the samples to the destination Audio Receiver buffer
             Add(
-                Destination,
-                Source,
+                targetBuffer->GetChannel(sourceStereoChannel),
+                AllChannelsBuffer->GetChannel(sourceChannel),
                 AllChannelsBuffer->BufferSize());
 
-            // Also write the samples to the Visualizer Buffer for this cable output
-            CurrentVizBuffer->WriteChunk(Source, targetBuffer->BufferSize(), sourceStereoChannel);
+            continue;
+
+            CurrentVizBuffer->WriteChunk(targetBuffer->GetChannel(sourceChannel), targetBuffer->BufferSize(), 0);
          }
       }
    }
