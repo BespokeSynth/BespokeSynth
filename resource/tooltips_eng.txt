@@ -166,6 +166,15 @@ comment~a box to display some text, to explain a section of a patch
 
 
 
+label~A module to display a label, helpful in marking what is where in large patches
+~showcontrols~Hide and show the controls to modify the label
+~label~The label that will be displayed
+~size~The font size of the label
+~font~The font of the label
+~color~The color of the label
+
+
+
 clockout~sends out clock pulses to synchronize external midi devices
 ~device~device to target
 ~send start~send a signal to reset the gear to the start of its sequence
@@ -209,6 +218,7 @@ pulser~send pulse messages at an interval
 ~random~tell pulsed modules to randomize their position
 ~reset~length of sequence before sending reset pulse
 ~div~measure division, when using "div" as the interval
+~restart~restart timer on "free" counter
 
 
 
@@ -744,6 +754,10 @@ vocoder~frequency band-based vocoder. this must be paired with a "vocodercarrier
 ~f range~frequency range to highest band
 ~q~resonance of the bands
 ~ring~how long it should take the bands to "cool down"
+
+
+voicesetter~set a specific Voice channel index for a note
+~voice index~current set voice channel index
 
 
 
