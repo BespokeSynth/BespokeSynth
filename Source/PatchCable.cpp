@@ -514,7 +514,7 @@ IClickable* PatchCable::GetDropTarget()
    {
       PatchCablePos cable = GetPatchCablePos();
       IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
-      if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
+      if (potentialTarget && (GetConnectionType() == kConnectionType_Pulse || GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
       {
          IClickable* potentialUIControl = nullptr;
 

@@ -507,9 +507,9 @@ void TitleBar::DrawModuleUnclipped()
          ofVec2f pos(50, ofGetHeight() / GetOwningContainer()->GetDrawScale() - 100);
          const float kWidth = 600;
          const float kHeight = 70;
-         ofSetColor(80, 80, 80);
+         ofSetColor(80, 80, 80, 150);
          ofRect(pos.x, pos.y, kWidth, kHeight);
-         ofSetColor(120, 120, 120);
+         ofSetColor(120, 120, 120, 150);
          ofRect(pos.x, pos.y, kWidth * drawControl->GetMidiValue(), kHeight);
          ofSetColor(255, 255, 255);
          DrawTextBold(displayString, pos.x + 20, pos.y + 50, 40);

@@ -471,6 +471,18 @@ void IDrawableModule::DrawPatchCables(bool parentMinimized, bool inFront)
       if (PatchCable::sActivePatchCable != nullptr)
          isHeld = (PatchCable::sActivePatchCable->GetOwner() == source);
       bool shouldDrawInFront = isHeld || (type != kConnectionType_Note && type != kConnectionType_Pulse && type != kConnectionType_Audio);
+      if (type == kConnectionType_Pulse)
+      {
+         for (auto const cable : source->GetPatchCables())
+         {
+            if (cable->GetTarget() != nullptr &&
+                dynamic_cast<IUIControl*>(cable->GetTarget()) != nullptr)
+            {
+               shouldDrawInFront = true;
+               break;
+            }
+         }
+      }
       if ((inFront && !shouldDrawInFront) || (!inFront && shouldDrawInFront))
          continue;
 

@@ -30,12 +30,11 @@ void VoiceSetter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mVoiceSlider = new IntSlider(this, "Voice Index", 5, 2, 80, 15, &mVoiceIdx, 0, kMaxJuceMidiChannels - 1);
+   mVoiceSlider = new IntSlider(this, "voice index", 5, 2, 80, 15, &mVoiceIdx, 0, kNumVoices - 1);
 }
 
 void VoiceSetter::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
 
@@ -65,10 +64,4 @@ void VoiceSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 void VoiceSetter::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-}
-
-void VoiceSetter::Resize(float w, float h)
-{
-   mWidth = w;
-   mHeight = h;
 }
