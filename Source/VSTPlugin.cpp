@@ -312,16 +312,52 @@ VSTPlugin::VSTPlugin()
    mPluginName = "no plugin loaded";
 }
 
+
+void VSTPlugin::AddExtraOutputCable()
+{
+   AdditionalNoteCable* NewAdditionalCable = new AdditionalNoteCable();
+   RollingBuffer* NewBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS * gSampleRate);
+   PatchCableSource* NewCableSource = new PatchCableSource(this, kConnectionType_Audio);
+
+   NewCableSource->SetOverrideVizBuffer(NewBuffer);
+   NewAdditionalCable->SetPatchCableSource(NewCableSource);
+   AddPatchCableSource(NewCableSource);
+
+   mAdditionalOutCables.push_back(NewAdditionalCable);
+   mAdditionalVizBuffers.push_back(NewBuffer);
+   mAdditionalOutCableSources.push_back(NewCableSource);
+
+   mModuleSaveData.SetInt("numAdditionalStereoOutputs", mAdditionalOutCables.size());
+}
+
+void VSTPlugin::RemoveExtraOutputCable()
+{
+   int IndexToRemove = mAdditionalOutCables.size() - 1;
+
+   mAdditionalOutCables.pop_back();
+   mAdditionalVizBuffers.pop_back();
+   PatchCableSource* SourceToRemove = mAdditionalOutCableSources[IndexToRemove];
+   RemovePatchCableSource(SourceToRemove);
+   mAdditionalOutCableSources.pop_back();
+
+   mModuleSaveData.SetInt("numAdditionalStereoOutputs", mAdditionalOutCables.size());
+}
+
 void VSTPlugin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+
+   RecreateUIOutputCables();
+
    mVolSlider = new FloatSlider(this, "vol", 3, 3, 80, 15, &mVol, 0, 4);
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
    mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 110);
    mSavePresetFileButton = new ClickButton(this, "save as", -1, -1);
    mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 38, &mShowParameterIndex, 160);
    mPanicButton = new ClickButton(this, "panic", 166, 38);
-
+   mAddExtraOutputButton = new ClickButton(this, "+", 86, 56);
+   mRemoveExtraOutputButton = new ClickButton(this, " - ", 105, 56);
+   
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
 
@@ -331,13 +367,36 @@ void VSTPlugin::CreateUIControls()
    AddPatchCableSource(mMidiOutCable->GetPatchCableSource());
    mMidiOutCable->GetPatchCableSource()->SetManualPosition(206 - 10, 10);
 
-
    if (mPlugin)
    {
       CreateParameterSliders();
    }
 
    //const auto* editor = mPlugin->createEditor();
+}
+
+void VSTPlugin::RecreateUIOutputCables()
+{
+   int NumCables = mAdditionalOutCables.size() + 1;
+   int UIWidth = 208;
+   int DesiredGap = 15;
+   int IconWidth = 5;
+   int CableFullUIWidth = (DesiredGap + IconWidth);
+   int StartPos = (UIWidth / 2) - ((NumCables - 1) * ((CableFullUIWidth / 2)) + (IconWidth / 2));
+
+   GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
+   GetPatchCableSource()->SetManualPosition(StartPos, 79); // 93, very middle, next one is way off?
+
+   for (int CableCount = 0; CableCount < NumCables - 1; CableCount++)
+   {
+      int NewOffset = StartPos + ((CableCount + 1) * CableFullUIWidth);
+
+      PatchCableSource* NewSource = mAdditionalOutCableSources[CableCount];
+      NewSource->SetManualSide(PatchCableSource::Side::kBottom);
+      NewSource->SetManualPosition(NewOffset, 79);
+   }
+
+   GetBuffer()->SetMaxAllowedChannels(NumCables);
 }
 
 VSTPlugin::~VSTPlugin()
@@ -727,25 +786,55 @@ void VSTPlugin::Process(double time)
 
    PROFILER(VSTPlugin);
 
+   if (mWantsAddExtraOutput || mWantsRemoveExtraOutput)
+   {
+      auto layouts = mPlugin->getBusesLayout();
+
+      if (mWantsAddExtraOutput && ((mAdditionalOutCables.size() < (maxStereoOutputChannels - 1))))
+      {
+         AddExtraOutputCable();
+      }
+      else if (mWantsRemoveExtraOutput)
+      {
+         RemoveExtraOutputCable();
+      }
+
+      mWantsAddExtraOutput = false;
+      mWantsRemoveExtraOutput = false;
+
+      RecreateUIOutputCables();
+   }
+   
+   // For now, force all additional outputs to be stereo.
+   for (PatchCableSource* CurrentSouce : mAdditionalOutCableSources)
+   {
+      CurrentSouce->GetAudioReceiver()->GetBuffer()->SetNumActiveChannels(2);
+   }
+
    int inputChannels = MAX(2, mNumInputChannels);
    int outputChannels = MAX(2, mNumOutputChannels);
-   GetBuffer()->SetNumActiveChannels(inputChannels);
+   ChannelBuffer* AllChannelsBuffer = GetBuffer();
+
+   AllChannelsBuffer->SetNumActiveChannels(inputChannels);
    SyncBuffers();
 
    /*
     * Multi-out VSTs which can't disable those outputs will expect *something* in the
     * buffer even though we don't read it.
+    * 
+    * Before processing audio in the VST we copy the Bespoke inputs into a juce buffer, the buffer needs enough mono channels to cover inputs and outputs
+    * So 2 inputs and 4 outputs means we need 4 channels total (the first two for inputs will be overwritten with the outputs
     */
-   int bufferChannels = MAX(MAX(inputChannels * mNumInBuses, outputChannels * mNumOutBuses), 2); // how much to allocate in the juce::AudioBuffer
+   int juceBufferChannelCount = MAX(MAX(inputChannels * mNumInBuses, outputChannels * mNumOutBuses), 2); // how much to allocate in the juce::AudioBuffer
 
-   const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
+   const int kSafetyMaxStereoChannels = VSTPlugin::maxStereoOutputChannels; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
 
    int bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
-   juce::AudioBuffer<float> buffer(bufferChannels, bufferSize);
-   for (int i = 0; i < inputChannels && i < kSafetyMaxChannels; ++i)
-      buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i, GetBuffer()->NumActiveChannels() - 1)), GetBuffer()->BufferSize());
+   juce::AudioBuffer<float> buffer(juceBufferChannelCount, bufferSize);
+   for (int i = 0; i < inputChannels && i < kSafetyMaxStereoChannels; ++i)
+      buffer.copyFrom(i, 0, AllChannelsBuffer->GetChannel(MIN(i, GetBuffer()->NumActiveChannels() - 1)), AllChannelsBuffer->BufferSize());
 
    IAudioReceiver* target = GetTarget();
 
@@ -838,24 +927,54 @@ void VSTPlugin::Process(double time)
       }
       mVSTMutex.unlock();
 
-      GetBuffer()->Clear();
+      AllChannelsBuffer->Clear();
+
+      int numChannels = 2 + (mAdditionalOutCableSources.size() * 2);
+
+      AllChannelsBuffer->SetNumActiveChannels(numChannels);
+      AllChannelsBuffer->SetMaxAllowedChannels(numChannels);
+
       /*
        * Until we support multi output we end up with this requirement that
        * the output is at most stereo. This stops mis-behaving plugins which
        * output the full buffer set from copying that onto the output.
        * (Ahem: Surge 1.9)
        */
-      int nChannelsToCopy = MIN(2, buffer.getNumChannels());
-      for (int ch = 0; ch < nChannelsToCopy && ch < kSafetyMaxChannels; ++ch)
+      int nStereoChannelsToCopy = MIN(AllChannelsBuffer->NumActiveChannels(), buffer.getNumChannels());
+      for (int sourceChannel = 0; sourceChannel < nStereoChannelsToCopy && sourceChannel < kSafetyMaxStereoChannels; ++sourceChannel)
       {
-         int outputChannel = MIN(ch, GetBuffer()->NumActiveChannels() - 1);
-         for (int sampleIndex = 0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
+         int sourceStereoChannel = sourceChannel % 2;
+         int stereoIndex = floor(sourceChannel / 2);
+         IAudioReceiver* CurrentTarget = target;
+         RollingBuffer* CurrentVizBuffer = GetVizBuffer();
+
+         if (stereoIndex > 0)
          {
-            GetBuffer()->GetChannel(outputChannel)[sampleIndex] += buffer.getSample(ch, sampleIndex) * mVol;
+            CurrentTarget = mAdditionalOutCables[stereoIndex - 1]->GetPatchCableSource()->GetAudioReceiver();
+            CurrentVizBuffer = mAdditionalVizBuffers[stereoIndex - 1];
          }
-         if (target)
-            Add(target->GetBuffer()->GetChannel(outputChannel), GetBuffer()->GetChannel(outputChannel), bufferSize);
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(outputChannel), bufferSize, outputChannel);
+
+         // Copy the output from juce into our own buffer
+         int numMonoSamples = buffer.getNumSamples();
+         for (int sampleIndex = 0; sampleIndex < numMonoSamples; ++sampleIndex)
+         {
+            AllChannelsBuffer->GetChannel(sourceChannel)[sampleIndex] += buffer.getSample(sourceChannel, sampleIndex) * mVol;
+         }
+         
+         // Copy the outputs from the single buffer into our multiple output buffers
+         if (CurrentTarget)
+         {
+            ChannelBuffer* targetBuffer = CurrentTarget->GetBuffer();
+
+            Add(
+                targetBuffer->GetChannel(sourceStereoChannel),
+                AllChannelsBuffer->GetChannel(sourceChannel),
+                AllChannelsBuffer->BufferSize());
+
+            continue;
+
+            CurrentVizBuffer->WriteChunk(targetBuffer->GetChannel(sourceChannel), targetBuffer->BufferSize(), 0);
+         }
       }
    }
    else
@@ -864,12 +983,15 @@ void VSTPlugin::Process(double time)
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (target)
-            Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+            Add(
+                target->GetBuffer()->GetChannel(ch), 
+                AllChannelsBuffer->GetChannel(ch), 
+                AllChannelsBuffer->BufferSize());
+         GetVizBuffer()->WriteChunk(AllChannelsBuffer->GetChannel(ch), AllChannelsBuffer->BufferSize(), ch);
       }
    }
 
-   GetBuffer()->Clear();
+   AllChannelsBuffer->Clear();
 }
 
 void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -970,11 +1092,18 @@ void VSTPlugin::DrawModule()
    mSavePresetFileButton->Draw();
    mOpenEditorButton->Draw();
    mPanicButton->Draw();
+   mAddExtraOutputButton->Draw();
+   mRemoveExtraOutputButton->Draw();
    mShowParameterDropdown->Draw();
 
    ofPushStyle();
    ofSetColor(IDrawableModule::GetColor(kModuleCategory_Note));
    DrawTextRightJustify("midi out:", 206 - 18, 14);
+   ofPopStyle();
+
+   ofPushStyle();
+   ofSetColor(ofColor::lime);
+   DrawTextNormal("extra outputs:", 3, 68);
    ofPopStyle();
 
    if (mDisplayMode == kDisplayMode_Sliders)
@@ -1011,13 +1140,13 @@ void VSTPlugin::GetModuleDimensions(float& width, float& height)
       else
       {*/
       width = 206;
-      height = 40;
+      height = 58;
       //}
    }
    else
    {
       width = 206;
-      height = 58;
+      height = 76;
       for (auto slider : mParameterSliders)
       {
          if (slider.mSlider && slider.mShowing)
@@ -1084,6 +1213,16 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
    if (button == mPanicButton)
    {
       mWantsPanic = true;
+   }
+
+   if (button == mAddExtraOutputButton)
+   {
+      mWantsAddExtraOutput = true;
+   }
+
+   if (button == mRemoveExtraOutputButton)
+   {
+      mWantsRemoveExtraOutput = true;
    }
 
    if (button == mSavePresetFileButton && mPlugin != nullptr)
@@ -1200,6 +1339,7 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("usevoiceaschannel", moduleInfo, false);
    mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 1, 96, K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)", moduleInfo, 1, 0, 127, K(isTextField));
+   mModuleSaveData.LoadInt("numAdditionalStereoOutputs", moduleInfo, 0, 0, VSTPlugin::maxStereoOutputChannels, false);
 
    mModuleSaveData.LoadBool("preset_file_sets_params", moduleInfo, true);
 
@@ -1239,6 +1379,14 @@ void VSTPlugin::SetUpFromSaveData()
    SetVST(pluginDesc);
 
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+
+   // Add VST output pins
+   int numAdditionalStereoOutputs = mModuleSaveData.GetInt("numAdditionalStereoOutputs");
+   for (int newOutputCount = 0; newOutputCount < numAdditionalStereoOutputs; newOutputCount ++)
+   {
+      AddExtraOutputCable();
+   }
+   RecreateUIOutputCables();
 
    mChannel = mModuleSaveData.GetInt("channel");
    mUseVoiceAsChannel = mModuleSaveData.GetBool("usevoiceaschannel");
