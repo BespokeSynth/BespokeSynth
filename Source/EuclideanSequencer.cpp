@@ -627,15 +627,17 @@ void EuclideanSequencerRing::Draw()
 
 int EuclideanSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
 {
-   if (mLength == 0)
+   // use tempLength to avoid div by zero: mLength may change after check == 0
+   int tempLength = (int)mLength;
+   if (tempLength == 0)
    {
       return -1;
    }
    ofVec2f polar = CarToPol(x - 100, y - 100);
    float pos = FloatWrap(polar.x + mOffset, 1);
-   int idx = int(pos * mLength + .5f) % (int)mLength;
+   int idx = int(pos * mLength + .5f) % tempLength;
 
-   ofVec2f stepPos = PolToCar(float(idx) / mLength - mOffset, GetRadius());
+   ofVec2f stepPos = PolToCar(float(idx) / tempLength - mOffset, GetRadius());
    if (ofDistSquared(x, y, stepPos.x + 100, stepPos.y + 100) < 7 * 7)
    {
       radiusOut = polar.y;
@@ -696,12 +698,13 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
       mRotation = MAX(mRotation, EUCLIDEAN_ROTATION_MIN);
       mRotation = MIN(mRotation, EUCLIDEAN_ROTATION_MAX);
 
+      int tempLength = (int)mLength;
       // Nothing to rotate, return
-      if (mLength == 0 || mOnset == 0)
-         return;   // and avoid divide by zero later for: % mLength    
+      if (tempLength == 0 || mOnset == 0)
+         return;   // use tempLength to avoid divide by zero later for: % mLength    
 
       std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mTempSteps{};
-      int rotOffset = (int)(mRotation - oldVal) % (int)mLength;
+      int rotOffset = (int)(mRotation - oldVal) % tempLength;
 
       if (rotOffset == 0)
       {
@@ -720,9 +723,9 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
          mTempSteps = mSteps;
 
          // Fill mSteps with old data using rotOffset
-         for (int i = 0; i < mLength; i++)
+         for (int i = 0; i < tempLength; i++)
          {
-            mSteps[i] = mTempSteps[(int)(i + rotOffset + mLength) % (int)mLength]; // + mLength to avoid negative mod results
+            mSteps[i] = mTempSteps[(int)(i + rotOffset + tempLength) % tempLength]; // + tempLength to avoid negative mod results
          }
       
       }
@@ -866,7 +869,7 @@ std::string EuclideanSequencerRing::GetEuclideanRhythm(int pulses, int steps, in
    bool hasPulse = false; // check if vector has a pulse
 
    // return rhythm filled with '0'
-   if (pulses == 0)
+   if (pulses == 0 || steps == 0)
    {
       return std::string(rhythm.begin(), rhythm.end());
    }
