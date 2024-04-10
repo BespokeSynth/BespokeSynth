@@ -596,9 +596,9 @@ void EuclideanSequencerRing::Draw()
    ofNoFill();
    ofCircle(100, 100, GetRadius());
    ofFill();
-   for (int i = 0; i < mLength; ++i)
+   for (int i = 0; i < (int)mLength; ++i)
    {
-      float pos = float(i) / mLength - mOffset;
+      float pos = float(i) / (int)mLength - mOffset;
       ofVec2f p1 = PolToCar(pos, GetRadius() - 3);
       ofVec2f p2 = PolToCar(pos, GetRadius() + 3);
       ofLine(p1.x + 100, p1.y + 100, p2.x + 100, p2.y + 100);
