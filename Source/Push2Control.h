@@ -38,6 +38,7 @@ class NVGLUframebuffer;
 class IUIControl;
 class IPush2GridController;
 class Snapshots;
+class ControlRecorder;
 
 class Push2Control : public IDrawableModule, public MidiDeviceListener, public IDropdownListener
 {
@@ -142,6 +143,7 @@ private:
 
    IDrawableModule* mDisplayModule{ nullptr };
    Snapshots* mDisplayModuleSnapshots{ nullptr };
+   ControlRecorder* mCurrentControlRecorder{ nullptr };
    std::vector<IUIControl*> mSliderControls;
    std::vector<IUIControl*> mButtonControls;
    std::vector<IUIControl*> mDisplayedControls;
@@ -170,7 +172,8 @@ private:
    std::vector<IUIControl*> mSpawnModuleControls;
    bool mNewButtonHeld{ false };
    bool mDeleteButtonHeld{ false };
-   bool mModulationButtonHeld{ false };
+   bool mLFOButtonHeld{ false };
+   bool mAutomateButtonHeld{ false };
    bool mAddModuleBookmarkButtonHeld{ false };
    std::array<bool, 128> mNoteHeldState;
    IDrawableModule* mHeldModule{ nullptr };

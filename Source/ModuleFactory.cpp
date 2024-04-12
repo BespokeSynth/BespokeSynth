@@ -264,6 +264,7 @@
 #include "DotSequencer.h"
 #include "VoiceSetter.h"
 #include "LabelDisplay.h"
+#include "ControlRecorder.h"
 
 #include <juce_core/juce_core.h>
 

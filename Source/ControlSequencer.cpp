@@ -61,9 +61,11 @@ void ControlSequencer::CreateUIControls()
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomize, "random");
+   UIBLOCK_NEWLINE();
+   CHECKBOX(mRecordCheckbox, "record", &mRecord);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, 25, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1, this);
+   mGrid = new UIGrid("uigrid", 5, height + 3, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1, this);
 
    UIBLOCK(15, height + 5);
    for (size_t i = 0; i < mStepSliders.size(); ++i)
@@ -135,7 +137,10 @@ void ControlSequencer::Step(double time, int pulseFlags)
 
    mGrid->SetHighlightCol(time, mStep);
 
-   if (mEnabled)
+   if (mRecord && mTargets[0] != nullptr)
+      mGrid->SetVal(mStep, 0, mTargets[0]->GetMidiValue());
+
+   if (mEnabled && !mRecord)
    {
       mControlCable->AddHistoryEvent(time, true);
       mControlCable->AddHistoryEvent(time + 15, false);
@@ -181,6 +186,10 @@ void ControlSequencer::DrawModule()
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
    mRandomize->Draw();
+   mRecordCheckbox->Draw();
+
+   DrawTextNormal("length: " + ofToString((TheTransport->GetDuration(mInterval) * mLength) / TheTransport->MsPerBar(), 2) + " measures",
+                  mRecordCheckbox->GetRect(K(local)).getMaxX() + 5, mRecordCheckbox->GetRect(K(local)).getMinY() + 12);
 
    int currentHover = mGrid->CurrentHover();
    if (!mSliderMode && currentHover != -1 && GetUIControl())
@@ -321,7 +330,7 @@ void ControlSequencer::ButtonClicked(ClickButton* button, double time)
 namespace
 {
    const float extraW = 10;
-   const float extraH = 30;
+   const float extraH = 47;
 }
 
 void ControlSequencer::GetModuleDimensions(float& width, float& height)
