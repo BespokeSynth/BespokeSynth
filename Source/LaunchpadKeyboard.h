@@ -94,6 +94,7 @@ private:
    enum LaunchpadLayout
    {
       kChromatic,
+      kMajorThirds,
       kDiatonic,
       kChordIndividual,
       kChord,

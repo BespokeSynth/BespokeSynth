@@ -143,6 +143,7 @@ void LaunchpadKeyboard::CreateUIControls()
 
    mLayoutDropdown->AddLabel("chromatic", kChromatic);
    mLayoutDropdown->AddLabel("diatonic", kDiatonic);
+   mLayoutDropdown->AddLabel("major thirds", kMajorThirds);
    mLayoutDropdown->AddLabel("chord indiv", kChordIndividual);
    mLayoutDropdown->AddLabel("chord", kChord);
    mLayoutDropdown->AddLabel("guitar", kGuitar);
@@ -496,6 +497,21 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
          }
       }
       return mRootNote + x + 5 * y + TheScale->GetPitchesPerOctave() * mOctave;
+   }
+   if (mLayout == kMajorThirds)
+   {
+      if (mArrangementMode == kFive)
+      {
+         if (x < 3)
+         {
+            return GridToPitchChordSection(x, y);
+         }
+         else
+         {
+            x -= 3;
+         }
+      }
+      return mRootNote + x + 4 * y + TheScale->GetPitchesPerOctave() * mOctave;
    }
    if (mLayout == kGuitar)
    {
