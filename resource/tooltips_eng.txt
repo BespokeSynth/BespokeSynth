@@ -1632,7 +1632,8 @@ pitchdive~use pitchbend to settle into an input pitch from a starting offset
 pitchbender~add pitch bend to notes
 ~bend~bend amount, in semitones
 
-
+pulserouter~allows you to control where pulses are routed to using a UI control. to add destinations to the list, patch them as a target
+~route~the pulserouter's destination module
 
 notewrap~wrap an input pitch to stay within a desired range
 ~min~bottom of pitch range
