@@ -89,6 +89,7 @@ private:
    bool mTypingInput{ false };
    bool mLatch{ false };
    bool mShowScale{ false };
+   bool mGetVelocityFromClickHeight{ false };
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
 };
