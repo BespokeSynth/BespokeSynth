@@ -241,8 +241,8 @@ target_sources(BespokeSynth PRIVATE
     KarplusStrong.h
     KarplusStrongVoice.cpp
     KarplusStrongVoice.h
-	Keyboard2MidiLayout.cpp
-	Keyboard2MidiLayout.h
+    Keyboard2MidiLayout.cpp
+    Keyboard2MidiLayout.h
     KeyboardDisplay.cpp
     KeyboardDisplay.h
     Kicker.cpp
