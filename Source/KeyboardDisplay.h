@@ -96,6 +96,7 @@ private:
    bool mTypingInput{ false };
    bool mLatch{ false };
    bool mShowScale{ false };
+   bool mGetVelocityFromClickHeight{ false };
    bool mHideLabels{ false };
    int mMidPress = 0;
    std::array<float, 128> mLastOnTime{};

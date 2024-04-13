@@ -129,16 +129,35 @@ void KeyboardDisplay::OnClicked(float x, float y, bool right)
                if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
                {
                   int pitch = i + RootKey();
+
+                  float minVelocityY;
+                  float maxVelocityY;
+
+                  if (isBlackKey)
+                  {
+                     minVelocityY = 0;
+                     maxVelocityY = (mHeight / 2) * .9f;
+                  }
+                  else
+                  {
+                     minVelocityY = mHeight / 2;
+                     maxVelocityY = mHeight * .9f;
+                  }
+
+                  int noteVelocity = 127;
+                  if (mGetVelocityFromClickHeight)
+                     noteVelocity = (int)ofMap(y, minVelocityY, maxVelocityY, 20, 127, K(clamp));
+
                   if (mPlayingMousePitch == -1 || !mLatch)
                   {
-                     PlayNote(time, pitch, 127);
+                     PlayNote(time, pitch, noteVelocity);
                      mPlayingMousePitch = pitch;
                   }
                   else
                   {
                      bool newNote = (mPlayingMousePitch != pitch);
                      if (newNote)
-                        PlayNote(time, pitch, 127);
+                        PlayNote(time, pitch, noteVelocity);
                      PlayNote(time, mPlayingMousePitch, 0);
                      mPlayingMousePitch = newNote ? pitch : -1;
                   }
@@ -393,6 +412,7 @@ void KeyboardDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("latch", moduleInfo, false);
    mModuleSaveData.LoadBool("show_scale", moduleInfo, false);
    mModuleSaveData.LoadBool("hide_labels", moduleInfo, false);
+   mModuleSaveData.LoadBool("get_velocity_from_click_height", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -404,7 +424,8 @@ void KeyboardDisplay::SetUpFromSaveData()
    mLatch = mModuleSaveData.GetBool("latch");
    mShowScale = mModuleSaveData.GetBool("show_scale");
    mHideLabels = mModuleSaveData.GetBool("hide_labels");
-
+   mGetVelocityFromClickHeight = mModuleSaveData.GetBool("get_velocity_from_click_height");
+  
    if (mForceNumOctaves)
       RefreshOctaveCount();
 }
