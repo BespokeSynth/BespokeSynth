@@ -436,11 +436,21 @@ curve~remap an input over its range with a curve. double-click on the curve to a
 
 
 
+controlrecorder~record and play back changes made to a control
+~record~should we be recording input? playback starts after the recording is complete
+~quantize~should we quantize playback to a specified rhythmic interval?
+~length~the interval to quantize to
+~speed~speed up or slow down playback
+~clear~clear the recording
+
+
+
 controlsequencer~modulate a control step-wise at an interval
 ~interval~rate to advance
 ~length~length of the sequence
 ~random~randomize sequence values
 ~step *~value for this step
+~record~record targeted value to steps
 
 
 

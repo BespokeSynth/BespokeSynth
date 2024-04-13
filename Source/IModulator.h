@@ -47,6 +47,7 @@ public:
    void Poll() override;
    float GetRecentChange() const;
    void OnRemovedFrom(IUIControl* control);
+   int GetNumTargets() const;
 
 protected:
    void InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode);

@@ -104,6 +104,8 @@ target_sources(BespokeSynth PRIVATE
     CommentDisplay.h
     Compressor.cpp
     Compressor.h
+    ControlRecorder.cpp
+    ControlRecorder.h
     ControlSequencer.cpp
     ControlSequencer.h
     ControlTactileFeedback.cpp
