@@ -96,14 +96,23 @@ void KeyboardDisplay::OnClicked(float x, float y, bool right)
                {
                   int pitch = i + RootKey();
 
-                  float kOffsetVal;
+                  float minVelocityY;
+                  float maxVelocityY;
 
                   if (isBlackKey)
-                     kOffsetVal = mHeight / 2.2f;
+                  {
+                     minVelocityY = 0;
+                     maxVelocityY = (mHeight / 2) * .9f;
+                  }
                   else
-                     kOffsetVal = mHeight;
+                  {
+                     minVelocityY = mHeight / 2;
+                     maxVelocityY = mHeight * .9f;
+                  }
 
-                  int noteVelocity = std::min(127, int(floor((y + kOffsetVal * 0.25f) / kOffsetVal * 127)));
+                  int noteVelocity = 127;
+                  if (mGetVelocityFromClickHeight)
+                     noteVelocity = (int)ofMap(y, minVelocityY, maxVelocityY, 20, 127, K(clamp));
 
                   if (mPlayingMousePitch == -1 || !mLatch)
                   {
@@ -320,6 +329,7 @@ void KeyboardDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("typing_control", moduleInfo, false);
    mModuleSaveData.LoadBool("latch", moduleInfo, false);
    mModuleSaveData.LoadBool("show_scale", moduleInfo, false);
+   mModuleSaveData.LoadBool("get_velocity_from_click_height", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -332,6 +342,7 @@ void KeyboardDisplay::SetUpFromSaveData()
    mTypingInput = mModuleSaveData.GetBool("typing_control");
    mLatch = mModuleSaveData.GetBool("latch");
    mShowScale = mModuleSaveData.GetBool("show_scale");
+   mGetVelocityFromClickHeight = mModuleSaveData.GetBool("get_velocity_from_click_height");
 }
 
 void KeyboardDisplay::SaveState(FileStreamOut& out)
