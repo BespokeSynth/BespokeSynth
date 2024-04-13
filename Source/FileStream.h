@@ -33,14 +33,18 @@
 
 namespace juce
 {
-   class FileInputStream;
-   class FileOutputStream;
+   class InputStream;
+   class OutputStream;
 }
 
 class FileStreamOut
 {
 public:
+   explicit FileStreamOut(std::unique_ptr<juce::OutputStream> stream)
+   : mStream(std::move(stream))
+   {}
    explicit FileStreamOut(const std::string& file);
+   explicit FileStreamOut(juce::MemoryBlock& block, bool appendToExistingBlockContent = true);
    FileStreamOut(const char*) = delete; // Hint: UTF-8 encoded std::string required
    ~FileStreamOut();
    FileStreamOut& operator<<(const int& var);
@@ -55,13 +59,17 @@ public:
    juce::int64 GetSize() const;
 
 private:
-   std::unique_ptr<juce::FileOutputStream> mStream;
+   std::unique_ptr<juce::OutputStream> mStream;
 };
 
 class FileStreamIn
 {
 public:
+   explicit FileStreamIn(std::unique_ptr<juce::InputStream> stream)
+   : mStream(std::move(stream))
+   {}
    explicit FileStreamIn(const std::string& file);
+   explicit FileStreamIn(const juce::MemoryBlock& block);
    FileStreamIn(const char*) = delete; // Hint: UTF-8 encoded std::string required
    ~FileStreamIn();
    FileStreamIn& operator>>(int& var);
@@ -81,7 +89,7 @@ public:
    static const int sMaxStringLength = 999999; //the primary thing that might hit this limit is the json layout file (one user has had a file that exceeded a length of 100000)
 
 private:
-   std::unique_ptr<juce::FileInputStream> mStream;
+   std::unique_ptr<juce::InputStream> mStream;
 };
 
 #endif /* defined(__Bespoke__FileStream__) */
