@@ -267,6 +267,8 @@
 
 #include <juce_core/juce_core.h>
 
+#include "PulseRouter.h"
+
 #define REGISTER(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, false, class ::AcceptsAudio(), class ::AcceptsNotes(), class ::AcceptsPulses());
 #define REGISTER_HIDDEN(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, true, false, class ::AcceptsAudio(), class ::AcceptsNotes(), class ::AcceptsPulses());
 #define REGISTER_EXPERIMENTAL(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, true, class ::AcceptsAudio(), class ::AcceptsNotes(), class ::AcceptsPulses());
@@ -341,6 +343,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ControlSequencer, controlsequencer, kModuleCategory_Modulator);
    REGISTER(PitchSetter, pitchsetter, kModuleCategory_Note);
    REGISTER(NoteFilter, notefilter, kModuleCategory_Note);
+   REGISTER(PulseRouter, pulserouter, kModuleCategory_Pulse);
    REGISTER(RandomNoteGenerator, randomnote, kModuleCategory_Instrument);
    REGISTER(NoteToFreq, notetofreq, kModuleCategory_Modulator);
    REGISTER(MacroSlider, macroslider, kModuleCategory_Modulator);
