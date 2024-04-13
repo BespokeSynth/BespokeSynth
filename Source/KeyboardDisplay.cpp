@@ -425,7 +425,7 @@ void KeyboardDisplay::SetUpFromSaveData()
    mShowScale = mModuleSaveData.GetBool("show_scale");
    mHideLabels = mModuleSaveData.GetBool("hide_labels");
    mGetVelocityFromClickHeight = mModuleSaveData.GetBool("get_velocity_from_click_height");
-  
+
    if (mForceNumOctaves)
       RefreshOctaveCount();
 }
