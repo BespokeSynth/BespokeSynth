@@ -27,8 +27,6 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 
-#include <cstring>
-
 #include "Slider.h"
 #include "UIControlMacros.h"
 
@@ -110,9 +108,9 @@ void LabelDisplay::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void LabelDisplay::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (list == mLabelFontDropdown)
+   if (list == mLabelFontDropdown && mLabelFontIndex >= 0 && mLabelFontIndex < mFonts.size())
       mLabelFont = mFonts[mLabelFontIndex].font;
-   else if (list == mLabelColorDropdown)
+   else if (list == mLabelColorDropdown && mLabelColorIndex >= 0 && mLabelColorIndex < mColors.size())
       mLabelColor = mColors[mLabelColorIndex].color;
 }
 
