@@ -72,13 +72,6 @@ public:
             return a.mDecorator < b.mDecorator;
          return a.mLabel < b.mLabel;
       }
-
-      static bool CompareLength(Spawnable a, Spawnable b)
-      {
-         if (a.mLabel.length() == b.mLabel.length())
-            return a.mDecorator.length() < b.mDecorator.length();
-         return a.mLabel.length() < b.mLabel.length();
-      }
    };
 
    struct ModuleInfo
