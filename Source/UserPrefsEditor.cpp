@@ -27,11 +27,11 @@
 
 #include "UserPrefsEditor.h"
 
-#include "Keyboard2MidiLayout.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
 #include "PatchCable.h"
+#include "QwertyToPitchMapping.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -80,14 +80,13 @@ void UserPrefsEditor::CreateUIControls()
          UserPrefs.cable_drop_behavior.GetIndex() = i;
    }
 
-   UserPrefs.keyboard_2_midi_layout.GetDropdown()->AddLabel("Ableton", (int)Keyboard2MidiLayoutType::Ableton);
-   UserPrefs.keyboard_2_midi_layout.GetDropdown()->AddLabel("Fruity", (int)Keyboard2MidiLayoutType::Fruity);
-   UserPrefs.keyboard_2_midi_layout.GetDropdown()->AddLabel("ignore", (int)Keyboard2MidiLayoutType::Ignore);
+   UserPrefs.qwerty_to_pitch_mode.GetDropdown()->AddLabel("Ableton", (int)QwertyToPitchMappingMode::Ableton);
+   UserPrefs.qwerty_to_pitch_mode.GetDropdown()->AddLabel("Fruity", (int)QwertyToPitchMappingMode::Fruity);
 
-   for (int i = 0; i < UserPrefs.keyboard_2_midi_layout.GetDropdown()->GetNumValues(); ++i)
+   for (int i = 0; i < UserPrefs.qwerty_to_pitch_mode.GetDropdown()->GetNumValues(); ++i)
    {
-      if (UserPrefs.keyboard_2_midi_layout.GetDropdown()->GetElement(i).mLabel == UserPrefs.keyboard_2_midi_layout.Get())
-         UserPrefs.keyboard_2_midi_layout.GetIndex() = i;
+      if (UserPrefs.qwerty_to_pitch_mode.GetDropdown()->GetElement(i).mLabel == UserPrefs.qwerty_to_pitch_mode.Get())
+         UserPrefs.qwerty_to_pitch_mode.GetIndex() = i;
    }
 }
 

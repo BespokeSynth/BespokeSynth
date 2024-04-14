@@ -26,23 +26,16 @@
 #ifndef __Bespoke__KeyboardDisplay__
 #define __Bespoke__KeyboardDisplay__
 
-#include "HoverSelectModule.h"
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
 
-
 #include <unordered_map>
 
-class KeyboardDisplay : public NoteEffectBase, public HoverSelectModule
+class KeyboardDisplay : public IDrawableModule, public NoteEffectBase, public IKeyboardFocusListener
 {
 public:
    KeyboardDisplay();
    static IDrawableModule* Create() { return new KeyboardDisplay(); }
-   void OnHoverEnter() override;
-   void OnHoverExit() override;
-   void OnSelect() override;
-   void OnDeselect() override;
-   void Exit() override;
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
@@ -55,9 +48,11 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void MouseReleased() override;
-   void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
 
+   //IKeyboardFocusListener
+   void OnKeyPressed(int key, bool isRepeat) override;
+   bool ShouldConsumeKey(int key) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -93,12 +88,11 @@ private:
    int mNumOctaves{ 3 };
    int mForceNumOctaves{ 0 };
    int mPlayingMousePitch{ -1 };
-   bool mTypingInput{ false };
+   bool mAllowHoverTypingInput{ true };
    bool mLatch{ false };
    bool mShowScale{ false };
    bool mGetVelocityFromClickHeight{ false };
    bool mHideLabels{ false };
-   int mMidPress = 0;
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
    std::unordered_map<int, int> mKeyPressRegister{};

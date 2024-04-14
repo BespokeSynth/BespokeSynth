@@ -28,7 +28,7 @@
 #include "Scale.h"
 #include "ModuleContainer.h"
 #include "FileStream.h"
-#include "Keyboard2MidiLayout.h"
+#include "QwertyToPitchMapping.h"
 #include "ModularSynth.h"
 #include "QuickSpawnMenu.h"
 
@@ -44,31 +44,6 @@ KeyboardDisplay::KeyboardDisplay()
       mLastOnTime[i] = 0;
       mLastOffTime[i] = 0;
    }
-   KeyboardDisplay::OnHoverEnter();
-}
-void KeyboardDisplay::OnHoverEnter()
-{
-   mTypingInput = true;
-   QuickSpawnMenu::enableKeyboardInput = false;
-}
-void KeyboardDisplay::OnHoverExit()
-{
-   if (mMidPress <= 0)
-   {
-      mTypingInput = false;
-      QuickSpawnMenu::enableKeyboardInput = true;
-   }
-}
-void KeyboardDisplay::OnSelect()
-{
-}
-void KeyboardDisplay::OnDeselect()
-{
-}
-void KeyboardDisplay::Exit()
-{
-   QuickSpawnMenu::enableKeyboardInput = true;
-   IDrawableModule::Exit();
 }
 
 void KeyboardDisplay::CreateUIControls()
@@ -87,8 +62,6 @@ void KeyboardDisplay::DrawModule()
       return;
 
    DrawKeyboard(0, kKeyboardYOffset, mWidth, mHeight - kKeyboardYOffset);
-
-   DrawHoverSelect();
 }
 
 void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -332,76 +305,55 @@ ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& i
    }
 }
 
-void KeyboardDisplay::KeyPressed(int key, bool isRepeat)
+bool KeyboardDisplay::ShouldConsumeKey(int key)
 {
-   IDrawableModule::KeyPressed(key, isRepeat);
-   //kPress++;
-   //TheSynth->LogEvent("Press:"+std::to_string(debugKPress)+" Release:"+std::to_string(debugKReles),kLogEventType_Verbose);
-
-
-   if (mTypingInput && mEnabled && !isRepeat)
+   if (mEnabled && gHoveredModule == this && mAllowHoverTypingInput)
    {
-      double time = NextBufferTime(false);
-      Keyboard2MidiResponse res = Keyboard2MidiLayout::GetPitchForComputerKey(key, mRootOctave);
+      key = KeyToLower(key);
+      QwertyToPitchResponse res = QwertyToPitchMapping::GetPitchForComputerKey(key);
+      if (res.mOctaveShift != 0)
+         return true;
+      if (res.mPitch != -1)
+         return true;
+   }
+   return false;
+}
 
-      int pitch = res.pitch;
-      if (mRootOctave != res.newOctave)
+void KeyboardDisplay::OnKeyPressed(int key, bool isRepeat)
+{
+   if (mEnabled && !isRepeat && gHoveredModule == this && mAllowHoverTypingInput)
+   {
+      key = KeyToLower(key);
+      QwertyToPitchResponse res = QwertyToPitchMapping::GetPitchForComputerKey(key);
+
+      if (res.mOctaveShift != 0)
       {
-         mRootOctave = res.newOctave;
-         if (mRootOctave + mNumOctaves > 9) //Ensure that we can't go into octaves where it begins to break...
-            mRootOctave = 10 - mNumOctaves;
-         return;
+         int newRootOctave = mRootOctave + res.mOctaveShift;
+         if (newRootOctave > 0 && newRootOctave + mNumOctaves <= 12)
+            mRootOctave = newRootOctave;
       }
-      if (pitch != -1)
+      if (res.mPitch != -1)
       {
-         //mMidPress++;
+         int pitch = res.mPitch + mRootOctave * 12;
          mKeyPressRegister[key] = pitch;
-         PlayNote(time, pitch, 127);
+         PlayNote(NextBufferTime(false), pitch, 127);
       }
    }
-
-   /*
-   else if (!mTypingInput && mMidPress > 0)
-   {
-      mMidPress = 0;
-      //Since KeyRelease events can get eaten in this situation, flush the notes to prevent stucks.
-      for (int i = 0; i < 127; i++)
-      {
-         double time = NextBufferTime(false);
-         mNoteOutput.Flush(time);
-         for (int i = 0; i < 127; ++i)
-            PlayNote(time, i, 0);
-      }
-   }*/
 }
 
 void KeyboardDisplay::KeyReleased(int key)
 {
-   //kReles++;
-   //TheSynth->LogEvent("Press:"+std::to_string(debugKPress)+" Release:"+std::to_string(debugKReles),kLogEventType_Verbose);
+   IDrawableModule::KeyReleased(key);
 
-   //If no KeyRelease arrives, we can get a "stuck" note.
-   if (true)
+   key = KeyToLower(key);
+   auto it = mKeyPressRegister.find(key);
+   if (it != mKeyPressRegister.end())
    {
-      double time = NextBufferTime(false);
-      int pitch;
-
-      auto it = mKeyPressRegister.find(key);
-      if (it != mKeyPressRegister.end())
-         pitch = it->second; // Key found, use the found value
-      else
-         pitch = -1; // Key not found, use default value
+      int pitch = it->second;
 
       mKeyPressRegister.erase(key);
       if (pitch != -1)
-      {
-         PlayNote(time, pitch, 0);
-         if (!hovered)
-         {
-            mTypingInput = false;
-            QuickSpawnMenu::enableKeyboardInput = true;
-         }
-      }
+         PlayNote(NextBufferTime(false), pitch, 0);
    }
 }
 
@@ -413,6 +365,7 @@ void KeyboardDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("show_scale", moduleInfo, false);
    mModuleSaveData.LoadBool("hide_labels", moduleInfo, false);
    mModuleSaveData.LoadBool("get_velocity_from_click_height", moduleInfo, true);
+   mModuleSaveData.LoadBool("allow_hover_typing_input", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -425,6 +378,7 @@ void KeyboardDisplay::SetUpFromSaveData()
    mShowScale = mModuleSaveData.GetBool("show_scale");
    mHideLabels = mModuleSaveData.GetBool("hide_labels");
    mGetVelocityFromClickHeight = mModuleSaveData.GetBool("get_velocity_from_click_height");
+   mAllowHoverTypingInput = mModuleSaveData.GetBool("allow_hover_typing_input");
 
    if (mForceNumOctaves)
       RefreshOctaveCount();

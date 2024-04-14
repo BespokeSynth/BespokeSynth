@@ -201,8 +201,6 @@ target_sources(BespokeSynth PRIVATE
     GroupControl.h
     HelpDisplay.cpp
     HelpDisplay.h
-    HoverSelectModule.cpp
-    HoverSelectModule.h
     IAudioEffect.h
     IAudioPoller.h
     IAudioProcessor.cpp
@@ -241,8 +239,8 @@ target_sources(BespokeSynth PRIVATE
     KarplusStrong.h
     KarplusStrongVoice.cpp
     KarplusStrongVoice.h
-    Keyboard2MidiLayout.cpp
-    Keyboard2MidiLayout.h
+    QwertyToPitchMapping.cpp
+    QwertyToPitchMapping.h
     KeyboardDisplay.cpp
     KeyboardDisplay.h
     Kicker.cpp

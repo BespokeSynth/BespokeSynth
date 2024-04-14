@@ -51,7 +51,6 @@ class QuickSpawnMenu : public IDrawableModule
 public:
    QuickSpawnMenu();
    virtual ~QuickSpawnMenu();
-   inline static bool enableKeyboardInput = true;
    void Init() override;
    void DrawModule() override;
    void DrawModuleUnclipped() override;
