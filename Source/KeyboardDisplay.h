@@ -42,7 +42,7 @@ public:
 
    void CreateUIControls() override;
 
-   void SetEnabled(bool enabled) override;
+   void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -53,6 +53,8 @@ public:
    //IKeyboardFocusListener
    void OnKeyPressed(int key, bool isRepeat) override;
    bool ShouldConsumeKey(int key) override;
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;

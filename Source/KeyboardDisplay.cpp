@@ -30,7 +30,6 @@
 #include "FileStream.h"
 #include "QwertyToPitchMapping.h"
 #include "ModularSynth.h"
-#include "QuickSpawnMenu.h"
 
 namespace
 {
@@ -49,11 +48,6 @@ KeyboardDisplay::KeyboardDisplay()
 void KeyboardDisplay::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-}
-void KeyboardDisplay::SetEnabled(bool enabled)
-{
-   //Todo, figure out a way to flush out pressed notes during this step.
-   mEnabled = enabled;
 }
 
 void KeyboardDisplay::DrawModule()
@@ -252,13 +246,14 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
 
    int oct = mRootOctave;
    if (keySpace > 16 && h > 34 && !mHideLabels)
+   {
       for (int i = 0; i < NumKeys(); i += 7)
       {
          ofSetColor(108, 37, 62, 255);
          DrawTextNormal("C" + std::to_string(oct), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 14);
          oct++;
       }
-
+   }
 
    ofPushStyle();
    ofFill();
@@ -354,6 +349,23 @@ void KeyboardDisplay::KeyReleased(int key)
       mKeyPressRegister.erase(key);
       if (pitch != -1)
          PlayNote(NextBufferTime(false), pitch, 0);
+   }
+}
+
+void KeyboardDisplay::CheckboxUpdated(Checkbox* checkbox, double time)
+{
+   if (checkbox == mEnabledCheckbox)
+   {
+      if (!mEnabled)
+      {
+         mNoteOutput.Flush(NextBufferTime(false));
+         mKeyPressRegister.clear();
+         for (int i = 0; i < 128; ++i)
+         {
+            mLastOnTime[i] = 0;
+            mLastOffTime[i] = 0;
+         }
+      }
    }
 }
 

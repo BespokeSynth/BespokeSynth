@@ -51,6 +51,7 @@ class QuickSpawnMenu : public IDrawableModule
 public:
    QuickSpawnMenu();
    virtual ~QuickSpawnMenu();
+
    void Init() override;
    void DrawModule() override;
    void DrawModuleUnclipped() override;

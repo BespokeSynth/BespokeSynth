@@ -26,7 +26,6 @@
 */
 
 #include "UserPrefsEditor.h"
-
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
