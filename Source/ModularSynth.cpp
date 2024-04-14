@@ -983,9 +983,30 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    if (!isRepeat)
       mHideTooltipsUntilMouseMove = true;
 
-   if (gHoveredUIControl &&
-       IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr &&
-       !isRepeat)
+   if (key == OF_KEY_ESC && PatchCable::sActivePatchCable != nullptr)
+   {
+      PatchCable::sActivePatchCable->Release();
+      return;
+   }
+
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() != nullptr &&
+       IKeyboardFocusListener::GetActiveKeyboardFocus()->ShouldConsumeKey(key)) //active text entry captures all input
+   {
+      IKeyboardFocusListener::GetActiveKeyboardFocus()->OnKeyPressed(key, isRepeat);
+      return;
+   }
+
+   if (gHoveredModule != nullptr)
+   {
+      IKeyboardFocusListener* focus = dynamic_cast<IKeyboardFocusListener*>(gHoveredModule);
+      if (focus && focus->ShouldConsumeKey(key))
+      {
+         focus->OnKeyPressed(key, isRepeat);
+         return;
+      }
+   }
+
+   if (gHoveredUIControl && !isRepeat)
    {
       if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
       {
@@ -1026,18 +1047,6 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          gHoveredUIControl->AttemptTextInput();
       }
-   }
-
-   if (key == OF_KEY_ESC && PatchCable::sActivePatchCable != nullptr)
-   {
-      PatchCable::sActivePatchCable->Release();
-      return;
-   }
-
-   if (IKeyboardFocusListener::GetActiveKeyboardFocus()) //active text entry captures all input
-   {
-      IKeyboardFocusListener::GetActiveKeyboardFocus()->OnKeyPressed(key, isRepeat);
-      return;
    }
 
    key = KeyToLower(key); //now convert to lowercase because everything else just cares about keys as buttons (unmodified by shift)

@@ -241,6 +241,8 @@ target_sources(BespokeSynth PRIVATE
     KarplusStrong.h
     KarplusStrongVoice.cpp
     KarplusStrongVoice.h
+    QwertyToPitchMapping.cpp
+    QwertyToPitchMapping.h
     KeyboardDisplay.cpp
     KeyboardDisplay.h
     Kicker.cpp
