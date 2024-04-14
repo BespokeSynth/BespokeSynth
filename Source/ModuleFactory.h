@@ -68,16 +68,11 @@ public:
 
       static bool CompareAlphabetical(Spawnable a, Spawnable b)
       {
-         if (a.mLabel == b.mLabel)
+         juce::String aLower = juce::String(a.mLabel).toLowerCase();
+         juce::String bLower = juce::String(b.mLabel).toLowerCase();
+         if (aLower == bLower)
             return a.mDecorator < b.mDecorator;
-         return a.mLabel < b.mLabel;
-      }
-
-      static bool CompareLength(Spawnable a, Spawnable b)
-      {
-         if (a.mLabel.length() == b.mLabel.length())
-            return a.mDecorator.length() < b.mDecorator.length();
-         return a.mLabel.length() < b.mLabel.length();
+         return aLower < bLower;
       }
    };
 
