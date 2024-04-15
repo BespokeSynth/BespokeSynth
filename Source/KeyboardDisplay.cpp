@@ -302,7 +302,7 @@ ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& i
 
 bool KeyboardDisplay::ShouldConsumeKey(int key)
 {
-   if (mEnabled && gHoveredModule == this && mAllowHoverTypingInput)
+   if (mEnabled && mAllowHoverTypingInput)
    {
       key = KeyToLower(key);
       QwertyToPitchResponse res = QwertyToPitchMapping::GetPitchForComputerKey(key);
@@ -316,7 +316,7 @@ bool KeyboardDisplay::ShouldConsumeKey(int key)
 
 void KeyboardDisplay::OnKeyPressed(int key, bool isRepeat)
 {
-   if (mEnabled && !isRepeat && gHoveredModule == this && mAllowHoverTypingInput)
+   if (mEnabled && !isRepeat && mAllowHoverTypingInput)
    {
       key = KeyToLower(key);
       QwertyToPitchResponse res = QwertyToPitchMapping::GetPitchForComputerKey(key);

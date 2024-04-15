@@ -149,6 +149,8 @@ void IDrawableModule::Init()
          continue; //stuff in module containers was already initialized
       mChildren[i]->Init();
    }
+
+   mKeyboardFocusListener = dynamic_cast<IKeyboardFocusListener*>(this);
 }
 
 void IDrawableModule::BasePoll()
@@ -278,6 +280,30 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       {
          enableToggleOffset = TitleBarHeight();
          mEnabledCheckbox->Draw();
+      }
+
+      if (mKeyboardFocusListener != nullptr && mKeyboardFocusListener->CanTakeFocus())
+      {
+         if ((gHoveredModule == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr) ||
+             IKeyboardFocusListener::GetActiveKeyboardFocus() == mKeyboardFocusListener)
+            ofSetColor(255, 255, 255, gModuleDrawAlpha);
+         else
+            ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
+         float squareSize = titleBarHeight / 2 - 1;
+         ofRect(w - 25, -titleBarHeight + 1, squareSize, squareSize, 1);
+         ofRect(w - 25, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+         ofRect(w - 25 - squareSize - 1, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+         ofRect(w - 25 + squareSize + 1, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+
+         if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mKeyboardFocusListener)
+         {
+            ofPushStyle();
+            ofSetLineWidth(.5f);
+            ofNoFill();
+            ofRect(w - 25 - squareSize - 2 - 1, -titleBarHeight,
+                   2 + squareSize + 1 + squareSize + 1 + squareSize + 2, titleBarHeight, 2);
+            ofPopStyle();
+         }
       }
 
       if (IsSaveable() && !Minimized())
@@ -647,13 +673,19 @@ void IDrawableModule::OnClicked(float x, float y, bool right)
          mWasMinimizeAreaClicked = true;
          return;
       }
-      else if (!Minimized() && IsSaveable() &&
-               x > w - 10)
+      else if (!Minimized() && IsSaveable())
       {
-         if (TheSaveDataPanel->GetModule() == this)
-            TheSaveDataPanel->SetModule(nullptr);
-         else
-            TheSaveDataPanel->SetModule(this);
+         if (x > w - 10)
+         {
+            if (TheSaveDataPanel->GetModule() == this)
+               TheSaveDataPanel->SetModule(nullptr);
+            else
+               TheSaveDataPanel->SetModule(this);
+         }
+         else if (x > w - 30 && mKeyboardFocusListener != nullptr && mKeyboardFocusListener->CanTakeFocus())
+         {
+            IKeyboardFocusListener::SetActiveKeyboardFocus(mKeyboardFocusListener);
+         }
       }
    }
 
