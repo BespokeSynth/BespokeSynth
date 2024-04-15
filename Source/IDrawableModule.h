@@ -257,6 +257,7 @@ private:
    bool mCanReceiveAudio{ false };
    bool mCanReceiveNotes{ false };
    bool mCanReceivePulses{ false };
+   IKeyboardFocusListener* mKeyboardFocusListener{ nullptr };
 
    ofMutex mSliderMutex;
 

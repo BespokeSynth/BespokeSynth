@@ -125,6 +125,7 @@ public:
 
    virtual void OnKeyPressed(int key, bool isRepeat) = 0;
    virtual bool ShouldConsumeKey(int key) { return true; }
+   virtual bool CanTakeFocus() { return true; }
 
    static IKeyboardFocusListener* sKeyboardFocusBeforeClick;
 

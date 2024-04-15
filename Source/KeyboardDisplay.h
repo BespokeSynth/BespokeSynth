@@ -53,6 +53,7 @@ public:
    //IKeyboardFocusListener
    void OnKeyPressed(int key, bool isRepeat) override;
    bool ShouldConsumeKey(int key) override;
+   bool CanTakeFocus() override { return mAllowHoverTypingInput; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
