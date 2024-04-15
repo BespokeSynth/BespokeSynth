@@ -421,6 +421,9 @@ void KeyboardDisplay::LoadState(FileStreamIn& in, int rev)
 
    in >> mWidth;
    in >> mHeight;
-   in >> mNumOctaves;
-   in >> mRootOctave;
+   if (rev >= 2)
+   {
+      in >> mNumOctaves;
+      in >> mRootOctave;
+   }
 }
