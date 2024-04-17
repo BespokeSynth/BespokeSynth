@@ -553,6 +553,8 @@ target_sources(BespokeSynth PRIVATE
     Push2Control.h
     QuickSpawnMenu.cpp
     QuickSpawnMenu.h
+    QwertyController.cpp
+    QwertyController.h
     RadioButton.cpp
     RadioButton.h
     RadioSequencer.cpp

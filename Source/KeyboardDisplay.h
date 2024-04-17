@@ -28,7 +28,6 @@
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
-
 #include <unordered_map>
 
 class KeyboardDisplay : public IDrawableModule, public NoteEffectBase, public IKeyboardFocusListener

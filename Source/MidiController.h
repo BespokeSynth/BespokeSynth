@@ -258,7 +258,7 @@ struct GridLayout
 
 #define NUM_LAYOUT_CONTROLS 128 + 128 + 128 + 1 + 1 //128 notes, 128 ccs, 128 program change, 1 pitch bend, 1 dummy
 
-class MidiController : public MidiDeviceListener, public IDrawableModule, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public IAudioPoller, public ITextEntryListener, public INoteSource
+class MidiController : public MidiDeviceListener, public IDrawableModule, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public IAudioPoller, public ITextEntryListener, public INoteSource, public IKeyboardFocusListener
 {
 public:
    MidiController();
@@ -307,6 +307,7 @@ public:
    void Poll() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void Exit() override;
+   void KeyReleased(int key) override;
 
    //MidiDeviceListener
    void OnMidiNote(MidiNote& note) override;
@@ -317,6 +318,11 @@ public:
    void OnMidi(const juce::MidiMessage& message) override;
 
    void OnTransportAdvanced(float amount) override;
+
+   //IKeyboardFocusListener
+   void OnKeyPressed(int key, bool isRepeat) override;
+   bool ShouldConsumeKey(int key) override;
+   bool CanTakeFocus() override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
