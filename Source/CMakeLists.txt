@@ -104,6 +104,8 @@ target_sources(BespokeSynth PRIVATE
     CommentDisplay.h
     Compressor.cpp
     Compressor.h
+    ControlRecorder.cpp
+    ControlRecorder.h
     ControlSequencer.cpp
     ControlSequencer.h
     ControlTactileFeedback.cpp
@@ -239,10 +241,14 @@ target_sources(BespokeSynth PRIVATE
     KarplusStrong.h
     KarplusStrongVoice.cpp
     KarplusStrongVoice.h
+    QwertyToPitchMapping.cpp
+    QwertyToPitchMapping.h
     KeyboardDisplay.cpp
     KeyboardDisplay.h
     Kicker.cpp
     Kicker.h
+    LabelDisplay.cpp
+    LabelDisplay.h
     LFO.cpp
     LFO.h
     LFOController.cpp
@@ -533,6 +539,8 @@ target_sources(BespokeSynth PRIVATE
     PulseGate.h
     PulseHocket.cpp
     PulseHocket.h
+    PulseRouter.cpp
+    PulseRouter.h
     PulseSequence.cpp
     PulseSequence.h
     PulseTrain.cpp
@@ -545,6 +553,8 @@ target_sources(BespokeSynth PRIVATE
     Push2Control.h
     QuickSpawnMenu.cpp
     QuickSpawnMenu.h
+    QwertyController.cpp
+    QwertyController.h
     RadioButton.cpp
     RadioButton.h
     RadioSequencer.cpp
@@ -701,6 +711,8 @@ target_sources(BespokeSynth PRIVATE
     Vocoder.h
     VocoderCarrierInput.cpp
     VocoderCarrierInput.h
+    VoiceSetter.cpp
+    VoiceSetter.h
     VolcaBeatsControl.cpp
     VolcaBeatsControl.h
     WaveformViewer.cpp
@@ -798,6 +810,10 @@ if (APPLE)
     endif()
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
+
+    IF (MINGW)
+        target_link_libraries(BespokeSynth PRIVATE iphlpapi)
+    endif()
 
     if (BESPOKE_ASIO_SDK_LOCATION)
         message( STATUS "Including ASIO from ${BESPOKE_ASIO_SDK_LOCATION}")

@@ -43,8 +43,9 @@ public:
    ::ADSR mAdsr{ 10, 0, 1, 10 };
    float mVol{ .25 };
    float mPulseWidth{ .5 };
-   bool mSync{ false };
+   Oscillator::SyncMode mSyncMode{ Oscillator::SyncMode::None };
    float mSyncFreq{ 200 };
+   float mSyncRatio{ 1 };
    float mMult{ 1 };
    OscillatorType mOscType{ OscillatorType::kOsc_Square };
    float mDetune{ 0 };
@@ -87,7 +88,8 @@ private:
    void DoParameterUpdate(int samplesIn,
                           float& pitch,
                           float& freq,
-                          float& vol);
+                          float& vol,
+                          float& syncPhaseInc);
 
    struct OscData
    {

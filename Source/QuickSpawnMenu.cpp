@@ -256,10 +256,21 @@ void QuickSpawnMenu::UpdateDisplay()
       {
          mElements.clear();
          const auto& elements = TheSynth->GetModuleFactory()->GetSpawnableModules(mSearchString.toStdString(), true);
+         int exactMatches = 0;
          for (size_t i = 0; i < elements.size(); ++i)
          {
             if (MatchesFilter(elements[i]))
-               mElements.push_back(elements[i]);
+            {
+               if (juce::String(elements[i].mLabel).startsWith(mSearchString))
+               {
+                  mElements.insert(mElements.begin() + exactMatches, elements[i]);
+                  ++exactMatches;
+               }
+               else
+               {
+                  mElements.push_back(elements[i]);
+               }
+            }
          }
       }
       else

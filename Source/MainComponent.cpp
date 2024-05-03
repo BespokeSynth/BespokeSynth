@@ -323,7 +323,8 @@ public:
          }
       }
 
-      startTimerHz(60);
+      UserPrefs.LastTargetFramerate = UserPrefs.target_framerate.Get();
+      startTimerHz(UserPrefs.target_framerate.Get());
    }
 
    void shutdown() override
@@ -343,6 +344,13 @@ public:
          return;
 
       mSynth.LockRender(true);
+
+      if (UserPrefs.LastTargetFramerate != UserPrefs.target_framerate.Get())
+      {
+         stopTimer();
+         UserPrefs.LastTargetFramerate = UserPrefs.target_framerate.Get();
+         startTimerHz(UserPrefs.target_framerate.Get());
+      }
 
       juce::Point<int> mouse = Desktop::getMousePosition();
       mouse -= mScreenPosition;

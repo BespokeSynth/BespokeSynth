@@ -262,8 +262,13 @@
 #include "PitchToValue.h"
 #include "RhythmSequencer.h"
 #include "DotSequencer.h"
+#include "VoiceSetter.h"
+#include "LabelDisplay.h"
+#include "ControlRecorder.h"
 
 #include <juce_core/juce_core.h>
+
+#include "PulseRouter.h"
 
 #define REGISTER(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, false, class ::AcceptsAudio(), class ::AcceptsNotes(), class ::AcceptsPulses());
 #define REGISTER_HIDDEN(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, true, false, class ::AcceptsAudio(), class ::AcceptsNotes(), class ::AcceptsPulses());
@@ -329,6 +334,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteFlusher, noteflusher, kModuleCategory_Note);
    REGISTER(NoteCanvas, notecanvas, kModuleCategory_Instrument);
    REGISTER(CommentDisplay, comment, kModuleCategory_Other);
+   REGISTER(LabelDisplay, label, kModuleCategory_Other);
    REGISTER(StutterControl, stutter, kModuleCategory_Audio);
    REGISTER(CircleSequencer, circlesequencer, kModuleCategory_Instrument);
    REGISTER(MidiOutputModule, midioutput, kModuleCategory_Note);
@@ -338,6 +344,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ControlSequencer, controlsequencer, kModuleCategory_Modulator);
    REGISTER(PitchSetter, pitchsetter, kModuleCategory_Note);
    REGISTER(NoteFilter, notefilter, kModuleCategory_Note);
+   REGISTER(PulseRouter, pulserouter, kModuleCategory_Pulse);
    REGISTER(RandomNoteGenerator, randomnote, kModuleCategory_Instrument);
    REGISTER(NoteToFreq, notetofreq, kModuleCategory_Modulator);
    REGISTER(MacroSlider, macroslider, kModuleCategory_Modulator);
@@ -471,6 +478,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PitchToValue, pitchtovalue, kModuleCategory_Modulator);
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
+   REGISTER(VoiceSetter, voicesetter, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
@@ -676,10 +684,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
          modules.push_back(preset);
    }
 
-   if (continuousString)
-      sort(modules.begin(), modules.end(), Spawnable::CompareLength);
-   else
-      sort(modules.begin(), modules.end(), Spawnable::CompareAlphabetical);
+   sort(modules.begin(), modules.end(), Spawnable::CompareAlphabetical);
 
    std::vector<ModuleFactory::Spawnable> ret;
    for (size_t i = 0; i < modules.size(); ++i)

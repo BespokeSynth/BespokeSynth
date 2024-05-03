@@ -392,6 +392,8 @@ void FubbleModule::MouseReleased()
             quantizeIntervalSteps = 1;
          float quantizedLength = quantizeResolution * quantizeIntervalSteps;
          mLength = quantizedLength;
+         mAxisH.mCurve.SetExtents(0, mLength);
+         mAxisV.mCurve.SetExtents(0, mLength);
       }
       mRecordStartOffset = fmod(mRecordStartOffset, mLength);
    }

@@ -49,24 +49,6 @@ enum TextEntryType
    kTextEntry_Float
 };
 
-class IKeyboardFocusListener
-{
-public:
-   virtual ~IKeyboardFocusListener() {}
-   static void SetActiveKeyboardFocus(IKeyboardFocusListener* focus) { sCurrentKeyboardFocus = focus; }
-   static IKeyboardFocusListener* GetActiveKeyboardFocus() { return sCurrentKeyboardFocus; }
-   static void ClearActiveKeyboardFocus(bool notifyListeners);
-
-   virtual void OnKeyPressed(int key, bool isRepeat) = 0;
-
-   static IKeyboardFocusListener* sKeyboardFocusBeforeClick;
-
-private:
-   virtual void AcceptEntry(bool pressedEnter) {}
-   virtual void CancelEntry() {}
-   static IKeyboardFocusListener* sCurrentKeyboardFocus;
-};
-
 class TextEntry : public IUIControl, public IKeyboardFocusListener
 {
 public:

@@ -1,0 +1,35 @@
+{
+   "outchannel" : 1,
+   "groups" : [
+      {
+         "rows": 1,
+         "cols": 4,
+         "position" : [ 20, 10 ],
+         "dimensions" : [15, 15],
+         "spacing" : [40, 20],
+         "controls" : [36,48,60,72],
+         "messageType" : "note",
+         "drawType" : "button"
+      },
+      {
+         "rows": 1,
+         "cols": 8,
+         "position" : [ 10, 30 ],
+         "dimensions" : [13, 55],
+         "spacing" : [20, 0],
+         "controls" : [34,35,36,37,38,39,40,41],
+         "messageType" : "control",
+         "drawType" : "slider"
+      },
+      {
+         "rows": 2,
+         "cols": 4,
+         "position" : [ 20, 100 ],
+         "dimensions" : [15, 15],
+         "spacing" : [40, 20],
+         "controls" : [42,43,44,45,46,47,48,49],
+         "messageType" : "control",
+         "drawType" : "knob"
+      }
+   ]
+}

@@ -1034,10 +1034,21 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       return;
    }
 
-   if (IKeyboardFocusListener::GetActiveKeyboardFocus()) //active text entry captures all input
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() != nullptr &&
+       IKeyboardFocusListener::GetActiveKeyboardFocus()->ShouldConsumeKey(key)) //active text entry captures all input
    {
       IKeyboardFocusListener::GetActiveKeyboardFocus()->OnKeyPressed(key, isRepeat);
       return;
+   }
+
+   if (gHoveredModule != nullptr)
+   {
+      IKeyboardFocusListener* focus = dynamic_cast<IKeyboardFocusListener*>(gHoveredModule);
+      if (focus && focus->ShouldConsumeKey(key))
+      {
+         focus->OnKeyPressed(key, isRepeat);
+         return;
+      }
    }
 
    key = KeyToLower(key); //now convert to lowercase because everything else just cares about keys as buttons (unmodified by shift)
@@ -2712,8 +2723,9 @@ void ModularSynth::LogEvent(std::string event, LogEventType type)
 
 IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
 {
+   juce::MemoryBlock block;
    {
-      FileStreamOut out(ofToDataPath("tmp"));
+      FileStreamOut out(block);
       module->SaveState(out);
    }
 
@@ -2733,7 +2745,7 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    newModule->SetName(module->Name()); //temporarily rename to the same as what we duplicated, so we can load state properly
 
    {
-      FileStreamIn in(ofToDataPath("tmp"));
+      FileStreamIn in(block);
       mIsLoadingModule = true;
       mIsDuplicatingModule = true;
       newModule->LoadState(in, newModule->LoadModuleSaveStateRev(in));
@@ -3245,6 +3257,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
    {
       std::string presetFilePath = ofToDataPath("presets/" + spawnable.mPresetModuleType + "/" + spawnable.mLabel);
       ModuleSaveDataPanel::LoadPreset(module, presetFilePath);
+      module->SetName(GetUniqueName(juce::String(spawnable.mLabel).replace(".preset", "").toStdString(), modules).c_str());
    }
 
    return module;

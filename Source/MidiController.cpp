@@ -38,6 +38,7 @@
 #include "MidiCapturer.h"
 #include "ScriptModule.h"
 #include "Push2Control.h"
+#include "QwertyController.h"
 
 using namespace juce;
 
@@ -599,9 +600,17 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             if (value > 0 || mUseNegativeEdge)
             {
                if (connection->mIncrementAmount != 0)
-                  uicontrol->Increment(connection->mIncrementAmount);
+               {
+                  const float midpoint = 64.0f / 127.0f;
+                  if (value > midpoint)
+                     uicontrol->Increment(connection->mIncrementAmount);
+                  else
+                     uicontrol->Increment(-connection->mIncrementAmount);
+               }
                else
+               {
                   uicontrol->SetValue(connection->mValue, NextBufferTime(false), K(forceUpdate));
+               }
                uicontrol->StartBeacon();
             }
          }
@@ -656,6 +665,37 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
 
    for (auto* script : mScriptListeners)
       script->MidiReceived(messageType, control, value, channel);
+}
+
+void MidiController::OnKeyPressed(int key, bool isRepeat)
+{
+   if (mEnabled && !isRepeat)
+   {
+      QwertyController* qwerty = dynamic_cast<QwertyController*>(mNonstandardController);
+      if (qwerty != nullptr)
+         qwerty->OnKeyPressed(KeyToLower(key));
+   }
+}
+
+void MidiController::KeyReleased(int key)
+{
+   if (mDeviceIn == "keyboard")
+   {
+      QwertyController* qwerty = dynamic_cast<QwertyController*>(mNonstandardController);
+      if (qwerty != nullptr)
+         qwerty->OnKeyReleased(KeyToLower(key));
+   }
+}
+
+bool MidiController::ShouldConsumeKey(int key)
+{
+   return (gHoveredUIControl == nullptr || gHoveredUIControl->GetModuleParent() != this) &&
+          key != 32; //32 = space bar, which is used for panning the canvas
+}
+
+bool MidiController::CanTakeFocus()
+{
+   return mDeviceIn == "keyboard";
 }
 
 void MidiController::AddScriptListener(ScriptModule* script)
@@ -1730,7 +1770,11 @@ void MidiController::LoadControllerLayout(std::string filename)
                   }
                }
 
-               if (drawType == kDrawType_Button && rows * cols >= 8) //we're a button grid
+               bool noGrid = false;
+               if (!mLayoutData["groups"][group]["no_grid"].isNull())
+                  noGrid = mLayoutData["groups"][group]["no_grid"].asBool();
+
+               if (!noGrid && drawType == kDrawType_Button && rows * cols >= 8) //we're a button grid
                {
                   GridLayout* grid = new GridLayout();
                   grid->mRows = rows;
@@ -2104,6 +2148,7 @@ std::vector<std::string> MidiController::GetAvailableInputDevices()
          devices.push_back(d.name.toStdString());
    }
 
+   devices.push_back("keyboard");
    devices.push_back("monome");
    devices.push_back("osccontroller");
 
@@ -2123,6 +2168,7 @@ std::vector<std::string> MidiController::GetAvailableOutputDevices()
    for (auto& d : MidiOutput::getDevices())
       devices.push_back(d.toStdString());
 
+   devices.push_back("keyboard");
    devices.push_back("monome");
    devices.push_back("osccontroller");
 
@@ -2176,6 +2222,14 @@ void MidiController::ConnectDevice()
 
       //Xbox360Controller* xbox = new Xbox360Controller(this);
       //mNonstandardController = xbox;
+   }
+   else if (mDeviceIn == "keyboard")
+   {
+      if (dynamic_cast<Monome*>(mNonstandardController) == nullptr)
+      {
+         QwertyController* qwerty = new QwertyController(this);
+         mNonstandardController = qwerty;
+      }
    }
    else if (mDeviceIn == "monome")
    {

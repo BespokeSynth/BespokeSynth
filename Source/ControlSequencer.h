@@ -125,6 +125,8 @@ private:
    int mStep{ 0 };
    bool mSliderMode{ true };
    std::array<FloatSlider*, 32> mStepSliders{};
+   bool mRecord{ false };
+   Checkbox* mRecordCheckbox{ nullptr };
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

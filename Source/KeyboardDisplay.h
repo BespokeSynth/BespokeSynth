@@ -20,7 +20,7 @@
 //  Bespoke
 //
 //  Created by Ryan Challinor on 5/12/16.
-//
+//  Tweaked by ArkyonVeil on April/2024
 //
 
 #ifndef __Bespoke__KeyboardDisplay__
@@ -28,8 +28,9 @@
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
+#include <unordered_map>
 
-class KeyboardDisplay : public NoteEffectBase, public IDrawableModule
+class KeyboardDisplay : public IDrawableModule, public NoteEffectBase, public IKeyboardFocusListener
 {
 public:
    KeyboardDisplay();
@@ -46,14 +47,20 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void MouseReleased() override;
-   void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
+
+   //IKeyboardFocusListener
+   void OnKeyPressed(int key, bool isRepeat) override;
+   bool ShouldConsumeKey(int key) override;
+   bool CanTakeFocus() override { return mAllowHoverTypingInput; }
+
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -67,11 +74,8 @@ private:
    }
    void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override
-   {
-      mWidth = w;
-      mHeight = h;
-   }
+   void Resize(float w, float h) override;
+   void RefreshOctaveCount();
 
    void DrawKeyboard(int x, int y, int w, int h);
    void SetPitchColor(int pitch);
@@ -79,18 +83,21 @@ private:
 
    int RootKey() const;
    int NumKeys() const;
-   int GetPitchForTypingKey(int key) const;
 
    float mWidth{ 500 };
    float mHeight{ 110 };
    int mRootOctave{ 3 };
    int mNumOctaves{ 3 };
+   int mForceNumOctaves{ 0 };
    int mPlayingMousePitch{ -1 };
-   bool mTypingInput{ false };
+   bool mAllowHoverTypingInput{ true };
    bool mLatch{ false };
    bool mShowScale{ false };
+   bool mGetVelocityFromClickHeight{ false };
+   bool mHideLabels{ false };
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
+   std::unordered_map<int, int> mKeyPressRegister{};
 };
 
 #endif /* defined(__Bespoke__KeyboardDisplay__) */

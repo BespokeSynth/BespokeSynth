@@ -48,6 +48,7 @@ public:
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return true; }
+   bool ShouldSuppressAutomaticOutputCable() override { return true; }
    void Delete() { delete this; }
    void DrawModule() override;
 
@@ -85,7 +86,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 0; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    void OnClicked(float x, float y, bool right) override;
