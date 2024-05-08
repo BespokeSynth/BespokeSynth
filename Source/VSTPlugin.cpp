@@ -563,7 +563,7 @@ void VSTPlugin::Poll()
       if (numParameters <= kMaxParametersInDropdown) // update the dropdown in this case
       {
          mShowParameterDropdown->Clear();
-         for (int i=0; i<numParameters; ++i)
+         for (int i = 0; i < numParameters; ++i)
          {
             mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
             mParameterSliders[i].mInSelectorList = true;
