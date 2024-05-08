@@ -533,7 +533,7 @@ void VSTPlugin::CreateParameterSliders()
       else
          mParameterSliders[i].mID = "param_" + ofToString(parameters[i]->getParameterIndex());
       mParameterSliders[i].mShowing = false;
-      if (numParameters <= 30) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
+      if (numParameters <= kMaxParametersInDropdown) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
          mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
          mParameterSliders[i].mInSelectorList = true;
@@ -558,6 +558,16 @@ void VSTPlugin::Poll()
          mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
          if (mParameterSliders[i].mSlider != nullptr)
             mParameterSliders[i].mSlider->SetOverrideDisplayName(mParameterSliders[i].mDisplayName);
+      }
+
+      if (numParameters <= kMaxParametersInDropdown) // update the dropdown in this case
+      {
+         mShowParameterDropdown->Clear();
+         for (int i = 0; i < numParameters; ++i)
+         {
+            mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
+            mParameterSliders[i].mInSelectorList = true;
+         }
       }
    }
    if (mDisplayMode == kDisplayMode_Sliders)
