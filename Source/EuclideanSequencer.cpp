@@ -242,15 +242,15 @@ void EuclideanSequencer::ButtonClicked(ClickButton* button, double time)
    if (button == mRandomizeButton)
       randomizeAll = true;
    if (button == mRndLengthButton || randomizeAll)
-      RandomizeLength(0);
+      RandomizeLength(-1);
    if (button == mRndOnsetsButton || randomizeAll)
-      RandomizeOnset(0);
+      RandomizeOnset(-1);
    if (button == mRndRotationButton || randomizeAll)
-      RandomizeRotation(0);
+      RandomizeRotation(-1);
    if (button == mRndOffsetButton || randomizeAll)
-      RandomizeOffset(0);
+      RandomizeOffset(-1);
    if (button == mRndNoteButton || randomizeAll)
-      RandomizeNote(0);
+      RandomizeNote(-1);
 
    int ringIndex{ -1 };
    if (button == mRnd0Button)
@@ -337,7 +337,7 @@ void EuclideanSequencer::RandomizeLength(int ringIndex)
    int iFrom{ 0 };
    int iTo{ (int)mEuclideanSequencerRings.size() };
    // Check if only 1 ring is updated
-   if (ringIndex > 0 && ringIndex < mEuclideanSequencerRings.size())
+   if (ringIndex >= 0 && ringIndex < mEuclideanSequencerRings.size())
    {
       iFrom = ringIndex;
       iTo = ringIndex + 1;
@@ -353,7 +353,7 @@ void EuclideanSequencer::RandomizeOnset(int ringIndex)
    int iFrom{ 0 };
    int iTo{ (int)mEuclideanSequencerRings.size() };
    // Check if only 1 ring is updated
-   if (ringIndex > 0 && ringIndex < mEuclideanSequencerRings.size())
+   if (ringIndex >= 0 && ringIndex < mEuclideanSequencerRings.size())
    {
       iFrom = ringIndex;
       iTo = ringIndex + 1;
@@ -377,7 +377,7 @@ void EuclideanSequencer::RandomizeRotation(int ringIndex)
    int iFrom{ 0 };
    int iTo{ (int)mEuclideanSequencerRings.size() };
    // Check if only 1 ring is updated
-   if (ringIndex > 0 && ringIndex < mEuclideanSequencerRings.size())
+   if (ringIndex >= 0 && ringIndex < mEuclideanSequencerRings.size())
    {
       iFrom = ringIndex;
       iTo = ringIndex + 1;
@@ -399,7 +399,7 @@ void EuclideanSequencer::RandomizeOffset(int ringIndex)
    int iFrom{ 0 };
    int iTo{ (int)mEuclideanSequencerRings.size() };
    // Check if only 1 ring is updated
-   if (ringIndex > 0 && ringIndex < mEuclideanSequencerRings.size())
+   if (ringIndex >= 0 && ringIndex < mEuclideanSequencerRings.size())
    {
       iFrom = ringIndex;
       iTo = ringIndex + 1;
@@ -423,7 +423,7 @@ void EuclideanSequencer::RandomizeNote(int ringIndex)
    int iTo{ (int)mEuclideanSequencerRings.size() };
 
    // Check if only 1 ring is updated
-   if (ringIndex > 0 && ringIndex < mEuclideanSequencerRings.size())
+   if (ringIndex >= 0 && ringIndex < mEuclideanSequencerRings.size())
    {
       iFrom = ringIndex;
       iTo = ringIndex + 1;
