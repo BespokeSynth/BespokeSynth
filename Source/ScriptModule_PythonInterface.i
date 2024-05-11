@@ -765,6 +765,10 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       {
          module.SetName(name.c_str());
       })
+      .def("get_name", [](IDrawableModule& module)
+      {
+         return module.Name();
+      })
       .def("delete", [](IDrawableModule& module)
       {
          module.GetOwningContainer()->DeleteModule(&module, !K(fail));
