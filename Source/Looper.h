@@ -62,7 +62,7 @@ public:
 
    void SetRecorder(LooperRecorder* recorder);
    void Clear();
-   void Commit(RollingBuffer* commitBuffer = nullptr);
+   void Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float offsetMs);
    void Fill(ChannelBuffer* buffer, int length);
    void ResampleForSpeed(float speed);
    int GetNumBars() const { return mNumBars; }
@@ -156,7 +156,6 @@ private:
    ChannelBuffer mWorkBuffer;
    int mLoopLength{ -1 };
    float mLoopPos{ 0 };
-   RollingBuffer* mRecordBuffer{ nullptr };
    int mNumBars{ 1 };
    ClickButton* mClearButton{ nullptr };
    DropdownList* mNumBarsSelector{ nullptr };
@@ -189,6 +188,7 @@ private:
    ClickButton* mUndoButton{ nullptr };
    bool mWantUndo{ false };
    bool mReplaceOnCommit{ false };
+   float mCommitMsOffset{ 0 };
    float mLoopPosOffset{ 0 };
    FloatSlider* mLoopPosOffsetSlider{ nullptr };
    ClickButton* mWriteOffsetButton{ nullptr };
