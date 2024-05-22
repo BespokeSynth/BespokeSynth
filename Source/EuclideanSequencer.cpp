@@ -737,8 +737,10 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
 //      mOnset = static_cast<int>(mOnsetSlider->GetValue());
 //      mRotation = static_cast<int>(mRotationSlider->GetValue());
       // check min and max value to handle manual slider value edits
+      mLength = (int)mLength;
       mLength = MAX(mLength, 0);
       mLength = MIN(mLength, EUCLIDEAN_SEQUENCER_MAX_STEPS);
+      mOnset = (int)mOnset;
       mOnset = MAX(mOnset, 0);
       mOnset = MIN(mOnset, EUCLIDEAN_SEQUENCER_MAX_STEPS);
 
