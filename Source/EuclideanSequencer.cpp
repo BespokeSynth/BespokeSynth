@@ -98,7 +98,7 @@ void EuclideanSequencer::CreateUIControls()
    mRndOffsetButton = new ClickButton(this, "offset", x, y + 60);
    mRndNoteButton = new ClickButton(this, "note", x, y + 80);
 
-   int aPreset = (int)ofRandom(0, 1.9); // select a random default preset
+   int aPreset = (int)ofRandom(0, 3.9); // select a random default preset between 0 and 3
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
    {
       mEuclideanSequencerRings[i]->CreateUIControls();
@@ -506,7 +506,8 @@ void EuclideanSequencerRing::CreateUIControls()
 
 void EuclideanSequencerRing::InitPreset(int preset)
 {
-   const int kPresetCount = 2;
+   const int kPresetCount = 4;
+   // 4 lines for 4 circles, values: mLength, mOnset, mRotation, mNote
    int defaultPresets[kPresetCount][4][4] = {
       {
       { 4, 4, 0, 0 },
@@ -519,6 +520,18 @@ void EuclideanSequencerRing::InitPreset(int preset)
       { 8, 6, 0, 64 },
       { 16, 2, 3, 67 },
       { 8, 2, 5, 72 },
+      },
+      {
+      { 16, 6, 0, 0 },
+      { 16, 7, 3, 1 },
+      { 8, 4, 1, 2 },
+      { 10, 2, 2, 3 },
+      },
+      {
+      { 20, 4, 0, 81 },
+      { 11, 3, 2, 86 },
+      { 16, 2, -2, 89 },
+      { 17, 2, -1, 91 },
       }
    };
 
