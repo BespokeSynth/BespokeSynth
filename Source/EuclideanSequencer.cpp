@@ -777,7 +777,7 @@ void EuclideanSequencerRing::OnTransportAdvanced(float amount)
    PROFILER(EuclideanSequencerRing);
 
    TransportListenerInfo info(nullptr, kInterval_CustomDivisor, OffsetInfo(mOffset, false), false);
-   info.mCustomDivisor = mLength;
+   info.mCustomDivisor = mLength + (mLength == 1); // +1 if mLength(Steps) == 1: fixes not playing onset 1 when mLength = 1: force oldStep <> newStep
 
    double remainderMs;
    const int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
