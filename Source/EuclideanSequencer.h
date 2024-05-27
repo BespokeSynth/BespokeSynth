@@ -87,7 +87,7 @@ private:
    int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
    AdditionalNoteCable* mDestinationCable{ nullptr };
-   
+
 
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
@@ -111,7 +111,7 @@ public:
 
    void SetEnabled(bool on) override { mEnabled = on; }
 
-    //IDrawableModule
+   //IDrawableModule
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
 

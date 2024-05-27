@@ -81,7 +81,7 @@ void EuclideanSequencer::CreateUIControls()
    mRndNoteChanceSlider = new FloatSlider(this, "note chance", 4 * xcolumn + x, y, 110, 15, &mRndNoteChance, 0.00f, 1.00f, 2);
    mRndOctaveLoSlider = new FloatSlider(this, "oct lo", 4 * xcolumn + x, y + 20, 55, 15, &mRndOctaveLo, 0.00f, 5.00f, 0);
    mRndOctaveHiSlider = new FloatSlider(this, "oct hi", 4 * xcolumn + x + 55, y + 20, 55, 15, &mRndOctaveHi, 0.00f, 5.00f, 0);
-   
+
 
    x = 210;
    y = 65;
@@ -181,7 +181,7 @@ void EuclideanSequencer::DrawModule()
    ofLine(210, 85, 590, 85);
    ofLine(590, 85, 590, 185);
    ofPopStyle();
-   
+
    // Rotating tranposrt line
    ofPushStyle();
    ofSetColor(ofColor::lime);
@@ -221,7 +221,7 @@ void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, d
 {
    // Check if Lo > Hi or Hi < Lo
    if (slider == mRndLengthLoSlider)
-    {
+   {
       mRndLengthLo = (int)mRndLengthLo;
       if (mRndLengthLo > mRndLengthHi)
          mRndLengthLo = mRndLengthHi;
@@ -278,7 +278,7 @@ void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, d
       if (mRndOctaveHi < mRndOctaveLo)
          mRndOctaveHi = mRndOctaveLo;
    }
- 
+
    // Handle slider updates of all ring sliders
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
       mEuclideanSequencerRings[i]->FloatSliderUpdated(slider, oldVal, time);
@@ -318,7 +318,7 @@ void EuclideanSequencer::ButtonClicked(ClickButton* button, double time)
    if (button == mRnd3Button)
       ringIndex = 3;
 
-   if (ringIndex != -1)  // update 1 ring only
+   if (ringIndex != -1) // update 1 ring only
    {
       RandomizeLength(ringIndex);
       RandomizeOnset(ringIndex);
@@ -466,14 +466,14 @@ void EuclideanSequencer::RandomizeRotation(int ringIndex)
    }
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
-       if (ofRandom(1) < mRndRotationChance)
-       {
-           // Limit max rotation to current Steps
-           int maxRotation = mEuclideanSequencerRings[i]->GetSteps();
-           maxRotation = MIN(mRndRotationHi, maxRotation);
-           
-           mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(mRndRotationLo, maxRotation + 0.9f));
-       }
+      if (ofRandom(1) < mRndRotationChance)
+      {
+         // Limit max rotation to current Steps
+         int maxRotation = mEuclideanSequencerRings[i]->GetSteps();
+         maxRotation = MIN(mRndRotationHi, maxRotation);
+
+         mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(mRndRotationLo, maxRotation + 0.9f));
+      }
 }
 
 void EuclideanSequencer::RandomizeOffset(int ringIndex)
@@ -553,8 +553,6 @@ void EuclideanSequencer::RandomizeNote(int ringIndex)
          }
       }
 }
-
-
 
 
 EuclideanSequencerRing::EuclideanSequencerRing(EuclideanSequencer* owner, int index)
@@ -796,20 +794,20 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
       int tempLength = (int)mLength;
       // Nothing to rotate, return
       if (tempLength == 0 || mOnset == 0)
-         return;   // use tempLength to avoid divide by zero later for: % mLength    
+         return; // use tempLength to avoid divide by zero later for: % mLength
 
       std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mTempSteps{};
       int rotOffset = (int)(mRotation - oldVal) % tempLength;
 
       if (rotOffset == 0)
       {
-      // This is a strange situation:
-      // IntSliderUpdated event was triggered for mRotationSlider,
-      // but no difference between newVal and oldVal.
-      // This occurs when Randomize button is used to update the Rotation
-      // So force a full recalculation:
+         // This is a strange situation:
+         // IntSliderUpdated event was triggered for mRotationSlider,
+         // but no difference between newVal and oldVal.
+         // This occurs when Randomize button is used to update the Rotation
+         // So force a full recalculation:
 
-        forceUpdate = true;
+         forceUpdate = true;
       }
       else
       {
@@ -822,15 +820,14 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
          {
             mSteps[i] = mTempSteps[(int)(i + rotOffset + tempLength) % tempLength]; // + tempLength to avoid negative mod results
          }
-      
       }
    }
 
    if (slider == mLengthSlider || slider == mOnsetSlider || forceUpdate)
    {
-//      mLength = static_cast<int>(mLengthSlider->GetValue());
-//      mOnset = static_cast<int>(mOnsetSlider->GetValue());
-//      mRotation = static_cast<int>(mRotationSlider->GetValue());
+      //      mLength = static_cast<int>(mLengthSlider->GetValue());
+      //      mOnset = static_cast<int>(mOnsetSlider->GetValue());
+      //      mRotation = static_cast<int>(mRotationSlider->GetValue());
       // check min and max value to handle manual slider value edits
       mLength = (int)mLength;
       mLength = MAX(mLength, 0);
@@ -974,7 +971,7 @@ std::string EuclideanSequencerRing::GetEuclideanRhythm(int pulses, int steps, in
    // Fill Euclidean rhythm with steps using the Euclidean music algorithm based on
    // Computer Music Design Team
    // https://web.archive.org/web/20190322182835/https:/computermusicdesign.com/simplest-euclidean-rhythm-algorithm-explained
-   // and 
+   // and
    // Boogie Automaticland - bohara2000
    // https://web.archive.org/web/20240329220927/https://gist.github.com/bohara2000/c1fb0076c72f786597ae0daa0a194f1f
    //
