@@ -384,7 +384,7 @@ void EuclideanSequencer::RandomizeRotation(int ringIndex)
    }
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
-       if (ofRandom(1) < mRndOnsetChance)
+       if (ofRandom(1) < mRndRotationChance)
        {
            // Limit max rotation to current Steps
            int maxRotation = mEuclideanSequencerRings[i]->GetSteps();
@@ -406,7 +406,7 @@ void EuclideanSequencer::RandomizeOffset(int ringIndex)
    }
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
-      if (ofRandom(1) < mRndOnsetChance)
+      if (ofRandom(1) < mRndOffsetChance)
          if (i == 0)
          {
             mEuclideanSequencerRings[i]->SetOffset(ofRandom(0, MIN(0.04, mRndOffsetMax)));
