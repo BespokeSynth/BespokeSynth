@@ -67,13 +67,17 @@ void EuclideanSequencer::CreateUIControls()
    int y = 5;
    int xcolumn = 115;
    mRndLengthChanceSlider = new FloatSlider(this, "step chance", 0 * xcolumn + x, y, 110, 15, &mRndLengthChance, 0.00f, 1.00f, 2);
-   mRndLengthMaxSlider = new FloatSlider(this, "step max", 0 * xcolumn + x, y + 20, 110, 15, &mRndLengthMax, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
+   mRndLengthLoSlider = new FloatSlider(this, "stp lo", 0 * xcolumn + x, y + 20, 55, 15, &mRndLengthLo, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
+   mRndLengthHiSlider = new FloatSlider(this, "stp hi", 0 * xcolumn + x + 55, y + 20, 55, 15, &mRndLengthHi, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mRndOnsetChanceSlider = new FloatSlider(this, "onset chance", 1 * xcolumn + x, y, 110, 15, &mRndOnsetChance, 0.00f, 1.00f, 2);
-   mRndOnsetMaxSlider = new FloatSlider(this, "onset max", 1 * xcolumn + x, y + 20, 110, 15, &mRndOnsetMax, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
+   mRndOnsetLoSlider = new FloatSlider(this, "ons lo", 1 * xcolumn + x, y + 20, 55, 15, &mRndOnsetLo, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
+   mRndOnsetHiSlider = new FloatSlider(this, "ons hi", 1 * xcolumn + x + 55, y + 20, 55, 15, &mRndOnsetHi, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mRndRotationChanceSlider = new FloatSlider(this, "rot chance", 2 * xcolumn + x, y, 110, 15, &mRndRotationChance, 0.00f, 1.00f, 2);
-   mRndRotationMaxSlider = new FloatSlider(this, "rot max", 2 * xcolumn + x, y + 20, 110, 15, &mRndRotationMax, EUCLIDEAN_ROTATION_MIN, EUCLIDEAN_ROTATION_MAX, 0);
-   mRndOffsetChanceSlider = new FloatSlider(this, "offs chance", 3 * xcolumn + x, y, 110, 15, &mRndOffsetChance, 0.00f, 1.00f, 2);
-   mRndOffsetMaxSlider = new FloatSlider(this, "offs max", 3 * xcolumn + x, y + 20, 110, 15, &mRndOffsetMax, 0.00f, 0.25f, 2);
+   mRndRotationLoSlider = new FloatSlider(this, "rot lo", 2 * xcolumn + x, y + 20, 55, 15, &mRndRotationLo, EUCLIDEAN_ROTATION_MIN, EUCLIDEAN_ROTATION_MAX, 0);
+   mRndRotationHiSlider = new FloatSlider(this, "rot hi", 2 * xcolumn + x + 55, y + 20, 55, 15, &mRndRotationHi, EUCLIDEAN_ROTATION_MIN, EUCLIDEAN_ROTATION_MAX, 0);
+   mRndOffsetChanceSlider = new FloatSlider(this, "offset chance", 3 * xcolumn + x, y, 110, 15, &mRndOffsetChance, 0.00f, 1.00f, 2);
+   mRndOffsetLoSlider = new FloatSlider(this, "o lo", 3 * xcolumn + x, y + 20, 55, 15, &mRndOffsetLo, -0.25f, 0.25f, 2);
+   mRndOffsetHiSlider = new FloatSlider(this, "o hi", 3 * xcolumn + x + 55, y + 20, 55, 15, &mRndOffsetHi, -0.25f, 0.25f, 2);
    mRndNoteChanceSlider = new FloatSlider(this, "note chance", 4 * xcolumn + x, y, 110, 15, &mRndNoteChance, 0.00f, 1.00f, 2);
    mRndOctaveLoSlider = new FloatSlider(this, "oct lo", 4 * xcolumn + x, y + 20, 55, 15, &mRndOctaveLo, 0.00f, 5.00f, 0);
    mRndOctaveHiSlider = new FloatSlider(this, "oct hi", 4 * xcolumn + x + 55, y + 20, 55, 15, &mRndOctaveHi, 0.00f, 5.00f, 0);
@@ -152,13 +156,17 @@ void EuclideanSequencer::DrawModule()
    mClearButton->Draw();
 
    mRndLengthChanceSlider->Draw();
-   mRndLengthMaxSlider->Draw();
+   mRndLengthLoSlider->Draw();
+   mRndLengthHiSlider->Draw();
    mRndOnsetChanceSlider->Draw();
-   mRndOnsetMaxSlider->Draw();
+   mRndOnsetLoSlider->Draw();
+   mRndOnsetHiSlider->Draw();
    mRndRotationChanceSlider->Draw();
-   mRndRotationMaxSlider->Draw();
+   mRndRotationLoSlider->Draw();
+   mRndRotationHiSlider->Draw();
    mRndOffsetChanceSlider->Draw();
-   mRndOffsetMaxSlider->Draw();
+   mRndOffsetLoSlider->Draw();
+   mRndOffsetHiSlider->Draw();
    mRndNoteChanceSlider->Draw();
    mRndOctaveLoSlider->Draw();
    mRndOctaveHiSlider->Draw();
@@ -212,13 +220,61 @@ void EuclideanSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    // Check if Lo > Hi or Hi < Lo
+   if (slider == mRndLengthLoSlider)
+    {
+      mRndLengthLo = (int)mRndLengthLo;
+      if (mRndLengthLo > mRndLengthHi)
+         mRndLengthLo = mRndLengthHi;
+   }
+   if (slider == mRndLengthHiSlider)
+   {
+      mRndLengthHi = (int)mRndLengthHi;
+      if (mRndLengthHi < mRndLengthLo)
+         mRndLengthHi = mRndLengthLo;
+   }
+   if (slider == mRndOnsetLoSlider)
+   {
+      mRndOnsetLo = (int)mRndOnsetLo;
+      if (mRndOnsetLo > mRndOnsetHi)
+         mRndOnsetLo = mRndOnsetHi;
+   }
+   if (slider == mRndOnsetHiSlider)
+   {
+      mRndOnsetHi = (int)mRndOnsetHi;
+      if (mRndOnsetHi < mRndOnsetLo)
+         mRndOnsetHi = mRndOnsetLo;
+   }
+   if (slider == mRndRotationLoSlider)
+   {
+      mRndRotationLo = (int)mRndRotationLo;
+      if (mRndRotationLo > mRndRotationHi)
+         mRndRotationLo = mRndRotationHi;
+   }
+   if (slider == mRndRotationHiSlider)
+   {
+      mRndRotationHi = (int)mRndRotationHi;
+      if (mRndRotationHi < mRndRotationLo)
+         mRndRotationHi = mRndRotationLo;
+   }
+   if (slider == mRndOffsetLoSlider)
+   {
+      if (mRndOffsetLo > mRndOffsetHi)
+         mRndOffsetLo = mRndOffsetHi;
+   }
+   if (slider == mRndOffsetHiSlider)
+   {
+      if (mRndOffsetHi < mRndOffsetLo)
+         mRndOffsetHi = mRndOffsetLo;
+   }
    if (slider == mRndOctaveLoSlider)
+   {
+      mRndOctaveLo = (int)mRndOctaveLo;
       if (mRndOctaveLo > mRndOctaveHi)
          mRndOctaveLo = mRndOctaveHi;
-   {
    }
    if (slider == mRndOctaveHiSlider)
    {
+      mRndOctaveHi = (int)mRndOctaveHi;
       if (mRndOctaveHi < mRndOctaveLo)
          mRndOctaveHi = mRndOctaveLo;
    }
@@ -345,7 +401,7 @@ void EuclideanSequencer::RandomizeLength(int ringIndex)
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
       if (ofRandom(1) < mRndLengthChance)
-         mEuclideanSequencerRings[i]->SetSteps((int)ofRandom(1, mRndLengthMax + 0.9f));
+         mEuclideanSequencerRings[i]->SetSteps((int)ofRandom(mRndLengthLo, mRndLengthHi + 0.9f));
 }
 
 void EuclideanSequencer::RandomizeOnset(int ringIndex)
@@ -361,15 +417,7 @@ void EuclideanSequencer::RandomizeOnset(int ringIndex)
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
       if (ofRandom(1) < mRndOnsetChance)
-      {
-         // Limit max onsets to current Steps
-         int maxOnsets = mEuclideanSequencerRings[i]->GetSteps();
-         // Lower max onsets if large number of Steps
-         if (maxOnsets >= 12)
-            maxOnsets = maxOnsets / 2;
-         maxOnsets = MIN(mRndOnsetMax, maxOnsets);
-         mEuclideanSequencerRings[i]->SetOnsets((int)ofRandom(1, maxOnsets +0.9f));
-      }
+         mEuclideanSequencerRings[i]->SetOnsets((int)ofRandom(mRndOnsetLo, mRndOnsetHi + 0.9f));
 }
 
 void EuclideanSequencer::RandomizeRotation(int ringIndex)
@@ -388,9 +436,9 @@ void EuclideanSequencer::RandomizeRotation(int ringIndex)
        {
            // Limit max rotation to current Steps
            int maxRotation = mEuclideanSequencerRings[i]->GetSteps();
-           maxRotation = MIN(mRndRotationMax, maxRotation);
+           maxRotation = MIN(mRndRotationHi, maxRotation);
            
-           mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(0, maxRotation + 0.9f));
+           mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(mRndRotationLo, maxRotation + 0.9f));
        }
 }
 
@@ -409,11 +457,11 @@ void EuclideanSequencer::RandomizeOffset(int ringIndex)
       if (ofRandom(1) < mRndOffsetChance)
          if (i == 0)
          {
-            mEuclideanSequencerRings[i]->SetOffset(ofRandom(0, MIN(0.04, mRndOffsetMax)));
+            mEuclideanSequencerRings[i]->SetOffset(ofRandom(0, MIN(0.04, mRndOffsetHi)));
          }
          else
          {
-            mEuclideanSequencerRings[i]->SetOffset(ofRandom(0, mRndOffsetMax));
+            mEuclideanSequencerRings[i]->SetOffset(ofRandom(mRndOffsetLo, mRndOffsetHi));
          };
 }
 
