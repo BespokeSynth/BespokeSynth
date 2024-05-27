@@ -364,6 +364,21 @@ void EuclideanSequencer::SaveState(FileStreamOut& out)
    out << (int)mEuclideanSequencerRings.size();
    for (size_t i = 0; i < mEuclideanSequencerRings.size(); ++i)
       mEuclideanSequencerRings[i]->SaveState(out);
+   out << mRndLengthChance;
+   out << mRndLengthLo;
+   out << mRndLengthHi;
+   out << mRndOnsetChance;
+   out << mRndOnsetLo;
+   out << mRndOnsetHi;
+   out << mRndRotationChance;
+   out << mRndRotationLo;
+   out << mRndRotationHi;
+   out << mRndOffsetChance;
+   out << mRndOffsetLo;
+   out << mRndOffsetHi;
+   out << mRndNoteChance;
+   out << mRndOctaveLo;
+   out << mRndOctaveHi;
 }
 
 void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
@@ -386,6 +401,25 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
    in >> numRings;
    for (size_t i = 0; i < mEuclideanSequencerRings.size() && i < numRings; ++i)
       mEuclideanSequencerRings[i]->LoadState(in);
+
+   if (rev >= 2)
+   {
+      in >> mRndLengthChance;
+      in >> mRndLengthLo;
+      in >> mRndLengthHi;
+      in >> mRndOnsetChance;
+      in >> mRndOnsetLo;
+      in >> mRndOnsetHi;
+      in >> mRndRotationChance;
+      in >> mRndRotationLo;
+      in >> mRndRotationHi;
+      in >> mRndOffsetChance;
+      in >> mRndOffsetLo;
+      in >> mRndOffsetHi;
+      in >> mRndNoteChance;
+      in >> mRndOctaveLo;
+      in >> mRndOctaveHi;
+   }
 }
 
 void EuclideanSequencer::RandomizeLength(int ringIndex)
