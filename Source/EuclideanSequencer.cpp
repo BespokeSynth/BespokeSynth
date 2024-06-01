@@ -336,8 +336,6 @@ void EuclideanSequencer::ButtonClicked(ClickButton* button, double time)
 
 void EuclideanSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-
    mModuleSaveData.LoadBool("shortnotes", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -345,8 +343,6 @@ void EuclideanSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void EuclideanSequencer::SetUpFromSaveData()
 {
-   SetUpPatchCables(mModuleSaveData.GetString("target"));
-
    mPlayShortNotes = mModuleSaveData.GetBool("shortnotes");
 }
 
