@@ -46,6 +46,7 @@ class EuclideanSequencer;
 #define EUCLIDEAN_SEQUENCER_MAX_STEPS 32
 #define EUCLIDEAN_ROTATION_MIN -16
 #define EUCLIDEAN_ROTATION_MAX 16
+#define EUCLIDEAN_INITIALSTATE_MAX 4
 
 class EuclideanSequencerRing
 {
@@ -64,7 +65,7 @@ public:
    void MouseMoved(float x, float y);
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time);
    void CreateUIControls();
-   void InitPreset(int preset);
+   void InitialState(int state);
    void Clear();
    void OnTransportAdvanced(float amount);
    void SaveState(FileStreamOut& out);

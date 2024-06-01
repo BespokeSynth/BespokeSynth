@@ -102,11 +102,11 @@ void EuclideanSequencer::CreateUIControls()
    mRndOffsetButton = new ClickButton(this, "offset", x, y + 60);
    mRndNoteButton = new ClickButton(this, "note", x, y + 80);
 
-   int aPreset = (int)ofRandom(0, 3.9); // select a random default preset between 0 and 3
+   int aInitState = (int)ofRandom(0, EUCLIDEAN_INITIALSTATE_MAX - 0.01); // select a random default state between 0 and max-1
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
    {
       mEuclideanSequencerRings[i]->CreateUIControls();
-      mEuclideanSequencerRings[i]->InitPreset(aPreset);
+      mEuclideanSequencerRings[i]->InitialState(aInitState);
    }
 }
 
@@ -584,11 +584,10 @@ void EuclideanSequencerRing::CreateUIControls()
    FloatSliderUpdated(mLengthSlider, 0, 0);
 }
 
-void EuclideanSequencerRing::InitPreset(int preset)
+void EuclideanSequencerRing::InitialState(int state)
 {
-   const int kPresetCount = 4;
    // 4 lines for 4 circles, values: mLength, mOnset, mRotation, mNote
-   int defaultPresets[kPresetCount][4][4] = {
+   int defaultStates[EUCLIDEAN_INITIALSTATE_MAX][4][4] = {
       {
       { 4, 4, 0, 0 },
       { 12, 2, 3, 1 },
@@ -615,12 +614,12 @@ void EuclideanSequencerRing::InitPreset(int preset)
       }
    };
 
-   preset = MIN(preset, kPresetCount - 1);
-   preset = MAX(preset, 0);
-   mLengthSlider->SetValue(defaultPresets[preset][mIndex][0], gTime, true);
-   mOnsetSlider->SetValue(defaultPresets[preset][mIndex][1], gTime, true);
-   mRotationSlider->SetValue(defaultPresets[preset][mIndex][2], gTime, true);
-   mNoteSelector->SetValue(defaultPresets[preset][mIndex][3], gTime, true);
+   state = MIN(state, EUCLIDEAN_INITIALSTATE_MAX - 1);
+   state = MAX(state, 0);
+   mLengthSlider->SetValue(defaultStates[state][mIndex][0], gTime, true);
+   mOnsetSlider->SetValue(defaultStates[state][mIndex][1], gTime, true);
+   mRotationSlider->SetValue(defaultStates[state][mIndex][2], gTime, true);
+   mNoteSelector->SetValue(defaultStates[state][mIndex][3], gTime, true);
 }
 
 void EuclideanSequencerRing::Clear()
