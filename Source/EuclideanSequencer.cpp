@@ -268,13 +268,13 @@ void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, d
    }
    if (slider == mRndOctaveLoSlider)
    {
-      mRndOctaveLo = (int)mRndOctaveLo;
+      // no rounding to int to avoid stuck values when using mousewheel
       if (mRndOctaveLo > mRndOctaveHi)
          mRndOctaveLo = mRndOctaveHi;
    }
    if (slider == mRndOctaveHiSlider)
    {
-      mRndOctaveHi = (int)mRndOctaveHi;
+      // no rounding to int to avoid stuck values when using mousewheel
       if (mRndOctaveHi < mRndOctaveLo)
          mRndOctaveHi = mRndOctaveLo;
    }
@@ -511,12 +511,12 @@ void EuclideanSequencer::RandomizeNote(int ringIndex)
       if (ofRandom(1) < mRndNoteChance)
       {
          // 0 = 0 1 2 3
-         if (mRndOctaveLo == 0 && mRndOctaveHi == 0)
+         if ((int)mRndOctaveLo == 0 && (int)mRndOctaveHi == 0)
          {
             for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
                mEuclideanSequencerRings[i]->SetPitch(i);
          }
-         else if (mRndOctaveLo >= 1.0 && mRndOctaveHi < 6.0)
+         else
          {
             int numPitchesInScale = TheScale->NumTonesInScale();
             // +2 to return octave 1
