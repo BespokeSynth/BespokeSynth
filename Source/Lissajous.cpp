@@ -49,9 +49,6 @@ void Lissajous::Process(double time)
 {
    PROFILER(Lissajous);
 
-   if (!mEnabled)
-      return;
-
    SyncBuffers();
 
    int bufferSize = GetBuffer()->BufferSize();
@@ -65,16 +62,19 @@ void Lissajous::Process(double time)
       }
    }
 
-   mOnlyHasOneChannel = (GetBuffer()->NumActiveChannels() == 1);
-   int secondChannel = mOnlyHasOneChannel ? 0 : 1;
+   if (mEnabled)
+   {
+      mOnlyHasOneChannel = (GetBuffer()->NumActiveChannels() == 1);
+      int secondChannel = mOnlyHasOneChannel ? 0 : 1;
 
-   for (int i = 0; i < bufferSize; ++i)
-      mLissajousPoints[(mOffset + i) % NUM_LISSAJOUS_POINTS].set(GetBuffer()->GetChannel(0)[i], GetBuffer()->GetChannel(secondChannel)[i]);
+      for (int i = 0; i < bufferSize; ++i)
+         mLissajousPoints[(mOffset + i) % NUM_LISSAJOUS_POINTS].set(GetBuffer()->GetChannel(0)[i], GetBuffer()->GetChannel(secondChannel)[i]);
+
+      mOffset += bufferSize;
+      mOffset %= NUM_LISSAJOUS_POINTS;
+   }
 
    GetBuffer()->Reset();
-
-   mOffset += bufferSize;
-   mOffset %= NUM_LISSAJOUS_POINTS;
 }
 
 void Lissajous::DrawModule()
@@ -83,6 +83,9 @@ void Lissajous::DrawModule()
       return;
 
    mScaleSlider->Draw();
+
+   if (!mEnabled)
+      return;
 
    ofPushStyle();
    ofPushMatrix();

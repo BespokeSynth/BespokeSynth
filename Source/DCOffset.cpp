@@ -48,26 +48,24 @@ void DCOffset::Process(double time)
 {
    PROFILER(DCOffset);
 
-   if (!mEnabled)
-      return;
-
-   ComputeSliders(0);
-   SyncBuffers();
-
    IAudioReceiver* target = GetTarget();
    if (target)
    {
+      ComputeSliders(0);
+      SyncBuffers();
+
       int bufferSize = GetBuffer()->BufferSize();
 
       ChannelBuffer* out = target->GetBuffer();
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          float* buffer = GetBuffer()->GetChannel(ch);
-         for (int i = 0; i < bufferSize; ++i)
-         {
-            ComputeSliders(i);
-            buffer[i] += mOffset;
-         }
+         if (mEnabled)
+            for (int i = 0; i < bufferSize; ++i)
+            {
+               ComputeSliders(i);
+               buffer[i] += mOffset;
+            }
          Add(out->GetChannel(ch), buffer, bufferSize);
          GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
       }

@@ -94,53 +94,62 @@ void Waveshaper::Process(double time)
 {
    PROFILER(Waveshaper);
 
-   if (!mEnabled)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
 
    SyncBuffers();
 
+   if (!mEnabled)
+   {
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Reset();
+      return;
+   }
+
    float max = 0;
    float min = 0;
 
-   IAudioReceiver* target = GetTarget();
+   int bufferSize = GetBuffer()->BufferSize();
 
-   if (target)
+   ChannelBuffer* out = target->GetBuffer();
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
-      int bufferSize = GetBuffer()->BufferSize();
-
-      ChannelBuffer* out = target->GetBuffer();
-      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      float* buffer = GetBuffer()->GetChannel(ch);
+      if (mExpressionValid)
       {
-         float* buffer = GetBuffer()->GetChannel(ch);
-         if (mExpressionValid)
+         for (int i = 0; i < bufferSize; ++i)
          {
-            for (int i = 0; i < bufferSize; ++i)
-            {
-               ComputeSliders(i);
-               mExpressionInput = buffer[i] * mRescale;
+            ComputeSliders(i);
+            mExpressionInput = buffer[i] * mRescale;
 
-               mHistPre1 = mBiquadState[ch].mHistPre1;
-               mHistPre2 = mBiquadState[ch].mHistPre2;
-               mHistPost1 = mBiquadState[ch].mHistPost1;
-               mHistPost2 = mBiquadState[ch].mHistPost2;
+            mHistPre1 = mBiquadState[ch].mHistPre1;
+            mHistPre2 = mBiquadState[ch].mHistPre2;
+            mHistPost1 = mBiquadState[ch].mHistPost1;
+            mHistPost2 = mBiquadState[ch].mHistPost2;
 
-               if (mExpressionInput > max)
-                  max = mExpressionInput;
-               if (mExpressionInput < min)
-                  min = mExpressionInput;
+            if (mExpressionInput > max)
+               max = mExpressionInput;
+            if (mExpressionInput < min)
+               min = mExpressionInput;
 
-               mT = (gTime + i * gInvSampleRateMs) * .001;
-               buffer[i] = mExpression.value() / mRescale;
+            mT = (gTime + i * gInvSampleRateMs) * .001;
+            buffer[i] = mExpression.value() / mRescale;
 
-               mBiquadState[ch].mHistPre2 = mBiquadState[ch].mHistPre1;
-               mBiquadState[ch].mHistPre1 = mExpressionInput;
-               mBiquadState[ch].mHistPost2 = mBiquadState[ch].mHistPost1;
-               mBiquadState[ch].mHistPost1 = ofClamp(buffer[i], -1, 1); //keep feedback from spiraling out of control
-            }
+            mBiquadState[ch].mHistPre2 = mBiquadState[ch].mHistPre1;
+            mBiquadState[ch].mHistPre1 = mExpressionInput;
+            mBiquadState[ch].mHistPost2 = mBiquadState[ch].mHistPost1;
+            mBiquadState[ch].mHistPost1 = ofClamp(buffer[i], -1, 1); //keep feedback from spiraling out of control
          }
-         Add(out->GetChannel(ch), buffer, bufferSize);
-         GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
       }
+      Add(out->GetChannel(ch), buffer, bufferSize);
+      GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
    }
 
    mSmoothMax = max > mSmoothMax ? max : ofLerp(mSmoothMax, max, .01f);
