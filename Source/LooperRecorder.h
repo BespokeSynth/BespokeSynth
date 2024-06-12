@@ -66,24 +66,19 @@ public:
    Looper* GetCopySource() { return mCopySource; }
    int IncreaseCommitCount() { return ++mCommitCount; }
    void RemoveLooper(Looper* looper);
-   void SetHeadphonesTarget(IAudioReceiver* target) { mHeadphonesTarget = target; }
-   void SetOutputTarget(IAudioReceiver* target) { mOutputTarget = target; }
    void ResetSpeed();
-   float GetCommitDelay() { return mCommitDelay; }
    RollingBuffer* GetRecordBuffer() { return &mRecordBuffer; }
    Looper* GetNextCommitTarget() { return (mNextCommitTargetIndex < (int)mLoopers.size()) ? mLoopers[mNextCommitTargetIndex] : nullptr; }
 
    void StartFreeRecord(double time);
    void EndFreeRecord(double time);
    void CancelFreeRecord();
-   bool InFreeRecord() { return mFreeRecording; }
 
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IDrawableModule
-   void KeyPressed(int key, bool isRepeat) override;
    void Poll() override;
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -102,7 +97,6 @@ public:
    bool HasDebugDraw() const override { return true; }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
@@ -117,19 +111,18 @@ private:
    void SnapToClosestPitch();
    void Resample(bool setKey);
    void DrawCircleHash(ofVec2f center, float progress, float width, float innerRadius, float outerRadius);
-   void SyncCablesToLoopers();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
+   void GetModuleDimensions(float& width, float& height) override;
+
+   static constexpr int kMaxLoopers = 8;
+
    float mWidth{ 235 };
    float mHeight{ 126 };
    RollingBuffer mRecordBuffer;
-   std::vector<Looper*> mLoopers;
+   std::array<Looper*, kMaxLoopers> mLoopers{ nullptr };
+   int mNumLoopers{ 4 };
    int mNumBars{ 1 };
    DropdownList* mNumBarsSelector{ nullptr };
    float mSpeed{ 1 };
@@ -150,13 +143,11 @@ private:
    ClickButton* mShiftDownbeatButton{ nullptr };
    ClickButton* mOrigSpeedButton{ nullptr };
    ClickButton* mSnapPitchButton{ nullptr };
-   IAudioReceiver* mHeadphonesTarget{ nullptr };
-   IAudioReceiver* mOutputTarget{ nullptr };
    float mCommitDelay{ 0 };
    FloatSlider* mCommitDelaySlider{ nullptr };
    ChannelBuffer mWriteBuffer;
    Looper* mCommitToLooper{ nullptr };
-   std::vector<PatchCableSource*> mLooperPatchCables;
+   std::array<PatchCableSource*, kMaxLoopers> mLooperPatchCables{ nullptr };
    ClickButton* mCommit1BarButton{ nullptr };
    ClickButton* mCommit2BarsButton{ nullptr };
    ClickButton* mCommit4BarsButton{ nullptr };
@@ -166,6 +157,11 @@ private:
    Checkbox* mAutoAdvanceThroughLoopersCheckbox{ nullptr };
    bool mAutoAdvanceThroughLoopers{ false };
    bool mTemporarilySilenceAfterCommit{ false };
+   std::array<Checkbox*, kMaxLoopers> mWriteForLooperCheckbox{ nullptr };
+   std::array<bool, kMaxLoopers> mWriteForLooper{ false };
+   std::array<double, kMaxLoopers> mStartRecordMeasureTime{ 0 };
+   float mLatencyFixMs{ 0 };
+   FloatSlider* mLatencyFixMsSlider{ nullptr };
 
    bool mFreeRecording{ false };
    Checkbox* mFreeRecordingCheckbox{ nullptr };

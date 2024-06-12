@@ -897,6 +897,7 @@ looperrecorder~command center to manage recording into multiple loopers, and all
 ~snap to pitch~snap tempo to nearest value that matches a key
 ~resample~resample all connected loopers to new tempo
 ~resample & set key~snap tempo to nearest value that matches a key (based upon the current key and the tempo change), resample all connected loopers to that new tempo, and change global scale to the new key
+~write*~writes to this looper, with a loop length matching the nearest power of 2 (1, 2, 4, 8, etc) of how long this checkbox was enabled
 
 
 
