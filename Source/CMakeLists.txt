@@ -150,6 +150,8 @@ target_sources(BespokeSynth PRIVATE
     EnvelopeEditor.h
     EnvelopeModulator.cpp
     EnvelopeModulator.h
+    EuclideanSequencer.cpp
+    EuclideanSequencer.h
     EventCanvas.cpp
     EventCanvas.h
     FFT.cpp

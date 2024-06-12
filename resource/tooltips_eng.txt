@@ -2087,3 +2087,29 @@ dotsequencer~polyphonic note sequencer with adjustable note length and velocity.
 ~clear~clear the contents of the dot grid
 ~dotgrid~the dot grid
 
+
+euclideansequencer~euclidean sequencer displays a loop as a circle. the notes are calculated using the euclidean rhythm algorithm.
+~random~randomize all steps, onsets and rotation in all rings
+~random*~randomize steps, onsets and rotation in this ring
+~steps~randomize steps in all rings
+~step chance~what is the chance a step gets changed
+~stp*~in what range are steps created
+~onset chance~what is the chance that an onset gets changed
+~ons *~in what range are onsets created
+~rot chance~what is the chance that rotation gets changed
+~rot lo~in what range is rotation created
+~rot hi~in what range is rotation created
+~offset chance~what is the chance that an offset gets changed
+~o *~in what range is offset created
+~note chance~what is the chance a note gets changed
+~oct*~in what octave range are notes created
+~steps*~number of steps in this ring
+~onsets~randomize onsets in all rings
+~onsets*~number of onsets in this ring
+~rotation~randomize rotation in all rings
+~rotation*~rotation of this ring
+~offset~randomize offset in all rings
+~offset*~timing offset for this ring
+~note~randomize notes in all rings
+~note*~pitch to use for this ring
+~clear~clear all steps, onsets, rotation and offset in all rings

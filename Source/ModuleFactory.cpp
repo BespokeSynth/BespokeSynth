@@ -265,6 +265,7 @@
 #include "VoiceSetter.h"
 #include "LabelDisplay.h"
 #include "ControlRecorder.h"
+#include "EuclideanSequencer.h"
 
 #include <juce_core/juce_core.h>
 
@@ -480,6 +481,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
    REGISTER(VoiceSetter, voicesetter, kModuleCategory_Note);
    REGISTER(ControlRecorder, controlrecorder, kModuleCategory_Modulator);
+   REGISTER(EuclideanSequencer, euclideansequencer, kModuleCategory_Instrument);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
