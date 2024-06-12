@@ -24,8 +24,7 @@
 //
 //
 
-#ifndef __Bespoke__EuclideanSequencer__
-#define __Bespoke__EuclideanSequencer__
+#pragma once
 
 #include <iostream>
 #include "Transport.h"
@@ -169,8 +168,6 @@ private:
    ClickButton* mRnd3Button{ nullptr };
    ClickButton* mClearButton{ nullptr };
 
-   float mRotation{ 0 };
-   FloatSlider* mRotationSlider{ nullptr };
    float mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
 
@@ -194,9 +191,9 @@ private:
    FloatSlider* mRndRotationHiSlider{ nullptr };
    float mRndOffsetChance{ 0.0f };
    FloatSlider* mRndOffsetChanceSlider{ nullptr };
-   float mRndOffsetLo{ 0.0f };
+   float mRndOffsetLo{ -0.1f };
    FloatSlider* mRndOffsetLoSlider{ nullptr };
-   float mRndOffsetHi{ 0.0f };
+   float mRndOffsetHi{ 0.1f };
    FloatSlider* mRndOffsetHiSlider{ nullptr };
    float mRndNoteChance{ 0.5f };
    FloatSlider* mRndNoteChanceSlider{ nullptr };
@@ -209,10 +206,8 @@ private:
    void RandomizeOnset(int ringIndex);
    void RandomizeRotation(int ringIndex);
    void RandomizeOffset(int ringIndex);
-   void RandomizeNote(int ringIndex);
+   void RandomizeNote(int ringIndex, bool force);
 
 
    std::vector<EuclideanSequencerRing*> mEuclideanSequencerRings;
 };
-
-#endif /* defined(__Bespoke__EuclideanSequencer__) */

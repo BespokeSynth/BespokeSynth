@@ -47,7 +47,6 @@ namespace
 
 EuclideanSequencer::EuclideanSequencer()
 {
-
    for (int i = 0; i < 4; ++i)
       mEuclideanSequencerRings.push_back(new EuclideanSequencerRing(this, i));
 }
@@ -82,7 +81,6 @@ void EuclideanSequencer::CreateUIControls()
    mRndOctaveLoSlider = new FloatSlider(this, "oct lo", 4 * xcolumn + x, y + 20, 55, 15, &mRndOctaveLo, 0.00f, 5.00f, 0);
    mRndOctaveHiSlider = new FloatSlider(this, "oct hi", 4 * xcolumn + x + 55, y + 20, 55, 15, &mRndOctaveHi, 0.00f, 5.00f, 0);
 
-
    x = 210;
    y = 65;
    xcolumn = 95;
@@ -107,6 +105,7 @@ void EuclideanSequencer::CreateUIControls()
    {
       mEuclideanSequencerRings[i]->CreateUIControls();
       mEuclideanSequencerRings[i]->InitialState(aInitState);
+      RandomizeNote(i, true);
    }
 }
 
@@ -306,7 +305,7 @@ void EuclideanSequencer::ButtonClicked(ClickButton* button, double time)
    if (button == mRndOffsetButton || randomizeAll)
       RandomizeOffset(-1);
    if (button == mRndNoteButton || randomizeAll)
-      RandomizeNote(-1);
+      RandomizeNote(-1, false);
 
    int ringIndex{ -1 };
    if (button == mRnd0Button)
@@ -324,7 +323,7 @@ void EuclideanSequencer::ButtonClicked(ClickButton* button, double time)
       RandomizeOnset(ringIndex);
       RandomizeRotation(ringIndex);
       RandomizeOffset(ringIndex);
-      RandomizeNote(ringIndex);
+      RandomizeNote(ringIndex, false);
    }
 
    if (button == mClearButton)
@@ -430,8 +429,10 @@ void EuclideanSequencer::RandomizeLength(int ringIndex)
    }
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
+   {
       if (ofRandom(1) < mRndLengthChance)
          mEuclideanSequencerRings[i]->SetSteps((int)ofRandom(mRndLengthLo, mRndLengthHi + 0.9f));
+   }
 }
 
 void EuclideanSequencer::RandomizeOnset(int ringIndex)
@@ -446,8 +447,10 @@ void EuclideanSequencer::RandomizeOnset(int ringIndex)
    }
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
+   {
       if (ofRandom(1) < mRndOnsetChance)
          mEuclideanSequencerRings[i]->SetOnsets((int)ofRandom(mRndOnsetLo, mRndOnsetHi + 0.9f));
+   }
 }
 
 void EuclideanSequencer::RandomizeRotation(int ringIndex)
@@ -462,6 +465,7 @@ void EuclideanSequencer::RandomizeRotation(int ringIndex)
    }
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
+   {
       if (ofRandom(1) < mRndRotationChance)
       {
          // Limit max rotation to current Steps
@@ -470,6 +474,7 @@ void EuclideanSequencer::RandomizeRotation(int ringIndex)
 
          mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(mRndRotationLo, maxRotation + 0.9f));
       }
+   }
 }
 
 void EuclideanSequencer::RandomizeOffset(int ringIndex)
@@ -484,18 +489,18 @@ void EuclideanSequencer::RandomizeOffset(int ringIndex)
    }
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
+   {
       if (ofRandom(1) < mRndOffsetChance)
+      {
          if (i == 0)
-         {
             mEuclideanSequencerRings[i]->SetOffset(ofRandom(0, MIN(0.04, mRndOffsetHi)));
-         }
          else
-         {
             mEuclideanSequencerRings[i]->SetOffset(ofRandom(mRndOffsetLo, mRndOffsetHi));
-         };
+      }
+   }
 }
 
-void EuclideanSequencer::RandomizeNote(int ringIndex)
+void EuclideanSequencer::RandomizeNote(int ringIndex, bool force)
 {
    int iFrom{ 0 };
    int iTo{ (int)mEuclideanSequencerRings.size() };
@@ -508,13 +513,14 @@ void EuclideanSequencer::RandomizeNote(int ringIndex)
    }
    // Update all rings or only 1 ring, depending on iFrom and iTo
    for (int i = iFrom; i < iTo; ++i)
-      if (ofRandom(1) < mRndNoteChance)
+   {
+      if (ofRandom(1) < mRndNoteChance || force)
       {
          // 0 = 0 1 2 3
          if ((int)mRndOctaveLo == 0 && (int)mRndOctaveHi == 0)
          {
-            for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
-               mEuclideanSequencerRings[i]->SetPitch(i);
+            for (int j = 0; j < mEuclideanSequencerRings.size(); ++j)
+               mEuclideanSequencerRings[j]->SetPitch(i);
          }
          else
          {
@@ -548,6 +554,7 @@ void EuclideanSequencer::RandomizeNote(int ringIndex)
             }
          }
       }
+   }
 }
 
 
@@ -583,30 +590,30 @@ void EuclideanSequencerRing::CreateUIControls()
 void EuclideanSequencerRing::InitialState(int state)
 {
    // 4 lines for 4 circles, values: mLength, mOnset, mRotation, mNote
-   int defaultStates[EUCLIDEAN_INITIALSTATE_MAX][4][4] = {
+   int defaultStates[EUCLIDEAN_INITIALSTATE_MAX][4][3] = {
       {
-      { 4, 4, 0, 0 },
-      { 12, 2, 3, 1 },
-      { 8, 4, 1, 2 },
-      { 10, 2, 2, 3 },
+      { 4, 4, 0 },
+      { 12, 2, 3 },
+      { 8, 4, 1 },
+      { 10, 2, 2 },
       },
       {
-      { 16, 4, 1, 60 },
-      { 8, 6, 0, 64 },
-      { 16, 2, 3, 67 },
-      { 8, 2, 5, 72 },
+      { 16, 4, 1 },
+      { 8, 6, 0 },
+      { 16, 2, 3 },
+      { 8, 2, 5 },
       },
       {
-      { 16, 6, 0, 0 },
-      { 16, 7, 3, 1 },
-      { 8, 4, 1, 2 },
-      { 10, 2, 2, 3 },
+      { 16, 6, 0 },
+      { 16, 7, 3 },
+      { 8, 4, 1 },
+      { 10, 2, 2 },
       },
       {
-      { 20, 4, 0, 81 },
-      { 11, 3, 2, 86 },
-      { 16, 2, -2, 89 },
-      { 17, 2, -1, 91 },
+      { 20, 4, 0 },
+      { 11, 3, 2 },
+      { 16, 2, -2 },
+      { 17, 2, -1 },
       }
    };
 
@@ -615,7 +622,6 @@ void EuclideanSequencerRing::InitialState(int state)
    mLengthSlider->SetValue(defaultStates[state][mIndex][0], gTime, true);
    mOnsetSlider->SetValue(defaultStates[state][mIndex][1], gTime, true);
    mRotationSlider->SetValue(defaultStates[state][mIndex][2], gTime, true);
-   mNoteSelector->SetValue(defaultStates[state][mIndex][3], gTime, true);
 }
 
 void EuclideanSequencerRing::Clear()
@@ -631,7 +637,6 @@ void EuclideanSequencerRing::Draw()
 {
    ofPushStyle();
    ofSetColor(128, 128, 128);
-   int x = mIndex * 95 + 210;
    DrawTextNormal(NoteName(mPitch, false, true), mIndex * 95 + 210 + 60, 182);
    ofPopStyle();
 
@@ -824,12 +829,10 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
       //      mOnset = static_cast<int>(mOnsetSlider->GetValue());
       //      mRotation = static_cast<int>(mRotationSlider->GetValue());
       // check min and max value to handle manual slider value edits
-      mLength = (int)mLength;
-      mLength = MAX(mLength, 0);
-      mLength = MIN(mLength, EUCLIDEAN_SEQUENCER_MAX_STEPS);
-      mOnset = (int)mOnset;
-      mOnset = MAX(mOnset, 0);
-      mOnset = MIN(mOnset, EUCLIDEAN_SEQUENCER_MAX_STEPS);
+      mLength = CLAMP(mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
+      mOnset = CLAMP(mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS);
+
+      mOnsetSlider->SetExtents(0, (int)mLength);
 
       // Clear all steps
       mSteps.fill(0);
