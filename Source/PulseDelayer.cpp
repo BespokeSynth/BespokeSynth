@@ -103,7 +103,10 @@ void PulseDelayer::OnTransportAdvanced(float amount)
 void PulseDelayer::OnPulse(double time, float velocity, int flags)
 {
    if (!mEnabled)
+   {
+      DispatchPulse(GetPatchCableSource(), time, velocity, flags);
       return;
+   }
 
    if (velocity > 0)
       mLastPulseTime = time;

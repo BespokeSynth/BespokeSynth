@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component type="desktop">
+  <id>com.bespokesynth.BespokeSynth</id>
+  <name>BespokeSynth</name>
+  <summary>A modular DAW for Linux</summary>
+  <developer_name>BespokeSynth Developers</developer_name>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <update_contact>_hub_AT_figuiere_net_</update_contact>
+  <description>
+    <p>Bespoke is a software modular synthesizer. It contains a bunch
+    of modules, which you can connect together to create sounds.</p>
+    <p>Bespoke is like a DAW* in some ways, but with less of a focus
+    on a global timeline. Instead, it has a design more optimized for
+    jamming and exploration.</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main window</caption>
+      <image type="source">https://github.com/BespokeSynth/BespokeSynth/raw/v1.1.0/screenshot-1.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://www.bespokesynth.com/</url>
+  <url type="bugtracker">https://github.com/BespokeSynth/BespokeSynth/issues</url>
+  <content_rating type="oars-1.1"/>
+  <launchable type="desktop-id">BespokeSynth.desktop</launchable>
+  <releases>
+    <release version="1.2.1" date="2023-09-16">
+      <url>https://github.com/BespokeSynth/BespokeSynth/releases/tag/v1.2.1</url>
+      <description>
+        <p>
+          Some older bespoke patches (including several of the included
+          example files!) weren't loading
+        </p>
+      </description>
+    </release>
+    <release version="1.2.0" date="2023-07-13">
+      <url>https://github.com/BespokeSynth/BespokeSynth/releases/tag/v1.2.0</url>
+      <description>
+        <p>New modules:</p>
+        <ul>
+          <li>clockin/clockout: sync bespoke tempo to other devices
+          via midi clock</li>
+          <li>abletonlink: sync bespoke's tempo to ableton
+          link-enabled apps</li>
+          <li>songbuilder: pattern control interface to help you turn
+          loops into songs (similar to a tracker's pattern sequencer,
+          but bespokified)</li>
+          <li>timelinecontrol: take control of bespoke's timeline
+          position</li>
+          <li>buffershuffler: a new stutter-like tool for slicing up
+          live audio on a grid</li>
+          <li>...plus a bunch of other utility modules</li>
+        </ul>
+        <p>Other cool stuff:</p>
+        <ul>
+          <li>added right-click quickspawn menu system to improve
+          module spawning workflow</li>
+          <li>added "drag cable into space" spawn system to speed up
+          patch building workflow</li>
+          <li>many significant additions to push 2 controller
+          integration</li>
+          <li>renamed presets module to snapshots module, and reframed
+          it to be more useful as a performance/sequencing tool</li>
+          <li>added a bunch of OSC support</li>
+          <li>added looping deterministic modes to notechance,
+          notehocket, and other randomization-driven modules</li>
+        </ul>
+        <p>Also, fixed a bunch of bugs and crashes.</p>
+      </description>
+    </release>
+    <release version="1.1.0" date="2021-11-16" />
+  </releases>
+</component>

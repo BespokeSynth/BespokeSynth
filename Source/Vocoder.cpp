@@ -77,11 +77,24 @@ void Vocoder::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (target == nullptr || !mEnabled)
+   if (target == nullptr)
       return;
 
-   ComputeSliders(0);
    SyncBuffers();
+
+   if (!mEnabled)
+   {
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Reset();
+      return;
+   }
+
+   ComputeSliders(0);
 
    float inputPreampSq = mInputPreamp * mInputPreamp;
    float carrierPreampSq = mCarrierPreamp * mCarrierPreamp;

@@ -201,6 +201,7 @@ private:
    DisplayMode mDisplayMode{ DisplayMode::kDisplayMode_Sliders };
    int mShowParameterIndex{ -1 };
    DropdownList* mShowParameterDropdown{ nullptr };
+   static constexpr int kMaxParametersInDropdown{ 30 };
    int mTemporarilyDisplayedParamIndex{ -1 };
 
    /*
