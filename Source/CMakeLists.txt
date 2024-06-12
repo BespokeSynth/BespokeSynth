@@ -844,6 +844,7 @@ else ()
     install(TARGETS BespokeSynth DESTINATION bin)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/resource DESTINATION share/BespokeSynth)
     install(FILES ${CMAKE_SOURCE_DIR}/scripts/installer_linux/BespokeSynth.desktop DESTINATION share/applications)
+    install(FILES ${CMAKE_SOURCE_DIR}/scripts/installer_linux/com.bespokesynth.BespokeSynth.metainfo.xml DESTINATION share/metainfo)
     install(FILES ${CMAKE_SOURCE_DIR}/bespoke_icon.png DESTINATION share/icons/hicolor/512x512/apps)
 endif ()
 

@@ -1250,6 +1250,11 @@ void ModularSynth::MouseMoved(int intX, int intY)
       {
          newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
          newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+         if (GetKeyModifiers() & kModifier_Shift) // Snap to center of the module
+         {
+            newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
+            newY -= std::fmod(mMoveModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+         }
       }
 
       mMoveModule->Move(newX - oldX, newY - oldY);
@@ -1434,6 +1439,11 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       {
          newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
          newY = round((newY - mLastClickedModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mLastClickedModule->TitleBarHeight();
+         if (GetKeyModifiers() & kModifier_Shift) // Snap to center of the module
+         {
+            newX -= std::fmod(mLastClickedModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
+            newY -= std::fmod(mLastClickedModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+         }
       }
 
       float adjustedDragX = newX - oldX;
@@ -1454,6 +1464,11 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       {
          newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
          newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+         if (GetKeyModifiers() & kModifier_Shift) // Snap to center of the module
+         {
+            newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
+            newY -= std::fmod(mMoveModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+         }
       }
 
       mMoveModule->Move(newX - oldX, newY - oldY);

@@ -59,88 +59,100 @@ void SampleCapturer::Process(double time)
 {
    PROFILER(SampleCapturer);
 
-   if (!mEnabled)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
 
    SyncBuffers();
-   int bufferSize = GetBuffer()->BufferSize();
-   IAudioReceiver* target = GetTarget();
 
-   if (target)
+   if (!mEnabled)
    {
-      ChannelBuffer* out = target->GetBuffer();
-      gWorkChannelBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
-         Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-         BufferCopy(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
 
-      for (int i = 0; i < bufferSize; ++i)
+      GetBuffer()->Reset();
+
+      return;
+   }
+
+   int bufferSize = GetBuffer()->BufferSize();
+
+   ChannelBuffer* out = target->GetBuffer();
+   gWorkChannelBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+   {
+      Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      BufferCopy(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+   }
+
+   for (int i = 0; i < bufferSize; ++i)
+   {
+      if (mWantRecord)
       {
-         if (mWantRecord)
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
          {
-            for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+            if (mIsRecording || GetBuffer()->GetChannel(ch)[i] != 0)
             {
-               if (mIsRecording || GetBuffer()->GetChannel(ch)[i] != 0)
+               auto& sample = mSamples[mCurrentSampleIndex];
+               if (!mIsRecording)
                {
-                  auto& sample = mSamples[mCurrentSampleIndex];
-                  if (!mIsRecording)
-                  {
-                     mIsRecording = true;
-                     sample.mBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
-                     sample.mBuffer.Clear();
-                  }
-
-                  sample.mBuffer.GetChannel(ch)[sample.mRecordingLength] = GetBuffer()->GetChannel(ch)[i];
+                  mIsRecording = true;
+                  sample.mBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+                  sample.mBuffer.Clear();
                }
-            }
 
-            if (mIsRecording)
-            {
-               ++mSamples[mCurrentSampleIndex].mRecordingLength;
-               if (mSamples[mCurrentSampleIndex].mRecordingLength >= mSamples[mCurrentSampleIndex].mBuffer.BufferSize())
-               {
-                  mIsRecording = false;
-                  mWantRecord = false;
-                  mCurrentSampleIndex = (mCurrentSampleIndex + 1) % mSamples.size();
-               }
+               sample.mBuffer.GetChannel(ch)[sample.mRecordingLength] = GetBuffer()->GetChannel(ch)[i];
             }
          }
-         else
+
+         if (mIsRecording)
          {
-            if (mIsRecording)
+            ++mSamples[mCurrentSampleIndex].mRecordingLength;
+            if (mSamples[mCurrentSampleIndex].mRecordingLength >= mSamples[mCurrentSampleIndex].mBuffer.BufferSize())
             {
                mIsRecording = false;
+               mWantRecord = false;
                mCurrentSampleIndex = (mCurrentSampleIndex + 1) % mSamples.size();
             }
          }
       }
-
-      for (size_t sample = 0; sample < mSamples.size(); ++sample)
+      else
       {
-         if (mSamples[sample].mPlaybackPos >= 0)
+         if (mIsRecording)
          {
-            for (int i = 0; i < bufferSize; ++i)
+            mIsRecording = false;
+            mCurrentSampleIndex = (mCurrentSampleIndex + 1) % mSamples.size();
+         }
+      }
+   }
+
+   for (size_t sample = 0; sample < mSamples.size(); ++sample)
+   {
+      if (mSamples[sample].mPlaybackPos >= 0)
+      {
+         for (int i = 0; i < bufferSize; ++i)
+         {
+            for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
             {
-               for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-               {
-                  out->GetChannel(ch)[i] += mSamples[sample].mBuffer.GetChannel(ch)[mSamples[sample].mPlaybackPos];
-                  gWorkChannelBuffer.GetChannel(ch)[i] += mSamples[sample].mBuffer.GetChannel(ch)[mSamples[sample].mPlaybackPos];
-               }
-               ++mSamples[sample].mPlaybackPos;
-               if (mSamples[sample].mPlaybackPos >= mSamples[sample].mRecordingLength)
-               {
-                  mSamples[sample].mPlaybackPos = -1;
-                  break;
-               }
+               out->GetChannel(ch)[i] += mSamples[sample].mBuffer.GetChannel(ch)[mSamples[sample].mPlaybackPos];
+               gWorkChannelBuffer.GetChannel(ch)[i] += mSamples[sample].mBuffer.GetChannel(ch)[mSamples[sample].mPlaybackPos];
+            }
+            ++mSamples[sample].mPlaybackPos;
+            if (mSamples[sample].mPlaybackPos >= mSamples[sample].mRecordingLength)
+            {
+               mSamples[sample].mPlaybackPos = -1;
+               break;
             }
          }
       }
-
-      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-         GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize(), ch);
    }
+
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize(), ch);
 
    GetBuffer()->Reset();
 }

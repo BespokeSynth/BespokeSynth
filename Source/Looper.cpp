@@ -86,9 +86,9 @@ void Looper::CreateUIControls()
    mSaveButton = new ClickButton(this, "save", -1, -1);
    mSwapButton = new ClickButton(this, "swap", 137, 81);
    mCopyButton = new ClickButton(this, "copy", 140, 65);
-   mDoubleSpeedButton = new ClickButton(this, "2x", 153, 19);
-   mHalveSpeedButton = new ClickButton(this, ".5x", 149, 34);
-   mExtendButton = new ClickButton(this, "extend", 127, 49);
+   mDoubleSpeedButton = new ClickButton(this, "2x", 127, 19);
+   mHalveSpeedButton = new ClickButton(this, ".5x", 149, 19);
+   mExtendButton = new ClickButton(this, "extend", 127, 34);
    mLoopPosOffsetSlider = new FloatSlider(this, "offset", -1, -1, 130, 15, &mLoopPosOffset, 0, mLoopLength);
    mWriteOffsetButton = new ClickButton(this, "apply", -1, -1);
    mScratchSpeedSlider = new FloatSlider(this, "scrspd", -1, -1, 130, 15, &mScratchSpeed, -2, 2);
@@ -161,14 +161,7 @@ void Looper::SetRecorder(LooperRecorder* recorder)
 {
    mRecorder = recorder;
    if (recorder)
-   {
-      mRecordBuffer = recorder->GetRecordBuffer();
-      GetBuffer()->SetNumActiveChannels(mRecordBuffer->NumChannels());
-   }
-   else
-   {
-      mRecordBuffer = nullptr;
-   }
+      GetBuffer()->SetNumActiveChannels(recorder->GetRecordBuffer()->NumChannels());
 }
 
 ChannelBuffer* Looper::GetLoopBuffer(int& loopLength)
@@ -209,8 +202,23 @@ void Looper::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (!mEnabled || target == nullptr)
+   if (target == nullptr)
       return;
+
+   if (!mEnabled)
+   {
+      SyncBuffers();
+
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Reset();
+
+      return;
+   }
 
    ComputeSliders(0);
    int numChannels = MAX(GetBuffer()->NumActiveChannels(), mBuffer->NumActiveChannels());
@@ -335,7 +343,10 @@ void Looper::Process(double time)
 
          mWorkBuffer.GetChannel(ch)[i] = output[ch] * mMuteRamp.Value(time);
 
-         GetVizBuffer()->Write(mWorkBuffer.GetChannel(ch)[i] + GetBuffer()->GetChannel(ch)[i], ch);
+         if (mPassthrough)
+            GetVizBuffer()->Write(mWorkBuffer.GetChannel(ch)[i] + GetBuffer()->GetChannel(ch)[i], ch);
+         else
+            GetVizBuffer()->Write(mWorkBuffer.GetChannel(ch)[i], ch);
       }
 
       time += gInvSampleRateMs;
@@ -352,9 +363,10 @@ void Looper::Process(double time)
 
    for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
    {
-      if (mPassthrough || mWriteInput)
+      if (mPassthrough)
          Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
       Add(target->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
+      GetVizBuffer()->WriteChunk(target->GetBuffer()->GetChannel(ch), bufferSize, ch);
    }
 
    GetBuffer()->Reset();
@@ -400,14 +412,12 @@ void Looper::DoCommit(double time)
 
    {
       PROFILER(LooperDoCommit_commit);
-      int commitSamplesBack = 0;
-      if (mRecorder != nullptr)
-         commitSamplesBack = mRecorder->GetCommitDelay() * TheTransport->MsPerBar() / gInvSampleRateMs;
+      int commitSamplesBack = mCommitMsOffset / gInvSampleRateMs;
       int commitLength = mLoopLength + LOOPER_COMMIT_FADE_SAMPLES;
       for (int i = 0; i < commitLength; ++i)
       {
          int idx = i - LOOPER_COMMIT_FADE_SAMPLES;
-         int pos = int(mLoopPos + (idx * GetPlaybackSpeed()) + (mLoopLength - commitSamplesBack)) % mLoopLength;
+         int pos = int(mLoopPos + (idx * GetPlaybackSpeed()) + mLoopLength) % mLoopLength;
          float fade = 1;
          if (idx < 0)
             fade = float(LOOPER_COMMIT_FADE_SAMPLES + idx) / LOOPER_COMMIT_FADE_SAMPLES;
@@ -416,7 +426,7 @@ void Looper::DoCommit(double time)
 
          for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
          {
-            mBuffer->GetChannel(ch)[pos] += mCommitBuffer->GetSample(ofClamp(commitLength - i + commitSamplesBack, 0, MAX_BUFFER_SIZE - 1), ch) * fade;
+            mBuffer->GetChannel(ch)[pos] += mCommitBuffer->GetSample(ofClamp(commitLength - i - commitSamplesBack, 0, MAX_BUFFER_SIZE - 1), ch) * fade;
          }
       }
    }
@@ -954,7 +964,7 @@ void Looper::CopyBuffer(Looper* sourceLooper)
    mNumBars = sourceLooper->mNumBars;
 }
 
-void Looper::Commit(RollingBuffer* commitBuffer /* = nullptr */)
+void Looper::Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float offsetMs)
 {
    if (mRecorder)
    {
@@ -975,16 +985,9 @@ void Looper::Commit(RollingBuffer* commitBuffer /* = nullptr */)
    if (mGranulator)
       mGranulator->OnCommit();
 
-   if (commitBuffer) //specified buffer
-   {
-      mCommitBuffer = commitBuffer;
-      mReplaceOnCommit = true;
-   }
-   else //default buffer
-   {
-      mCommitBuffer = mRecordBuffer;
-      mReplaceOnCommit = false;
-   }
+   mCommitBuffer = commitBuffer;
+   mReplaceOnCommit = replaceOnCommit;
+   mCommitMsOffset = offsetMs;
 }
 
 void Looper::SetMute(double time, bool mute)

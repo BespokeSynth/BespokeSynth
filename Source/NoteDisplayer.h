@@ -60,9 +60,10 @@ private:
 
    void DrawNoteName(int pitch, float y) const;
 
-   float mWidth{ 110 };
+   float mWidth{ 160 };
    float mHeight{ 60 };
    int mVelocities[128]{};
+   int mVoiceIds[128]{};
 };
 
 #endif /* defined(__Bespoke__NoteDisplayer__) */

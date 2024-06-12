@@ -480,6 +480,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
    REGISTER(VoiceSetter, voicesetter, kModuleCategory_Note);
+   REGISTER(ControlRecorder, controlrecorder, kModuleCategory_Modulator);
    REGISTER(EuclideanSequencer, euclideansequencer, kModuleCategory_Instrument);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);

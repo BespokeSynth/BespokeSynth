@@ -69,10 +69,13 @@ void PulseFlag::OnPulse(double time, float velocity, int flags)
 {
    ComputeSliders(0);
 
-   if (mReplaceFlags)
-      flags = 0;
+   if (mEnabled)
+   {
+      if (mReplaceFlags)
+         flags = 0;
 
-   flags |= mFlagValue;
+      flags |= mFlagValue;
+   }
 
    DispatchPulse(GetPatchCableSource(), time, velocity, flags);
 }
