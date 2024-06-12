@@ -182,21 +182,13 @@ namespace VSTLookup
 
    juce::String cutOffIdHash(juce::String inputString)
    {
-
-      // Split the string based on '-'
       juce::StringArray parts;
       parts.addTokens(inputString, "-", "");
 
-      // Check if there are at least two parts
       if (parts.size() >= 2)
       {
-         // Remove the second part from the right
          parts.remove(parts.size() - 2);
-
-         // Join the remaining parts back into a string
          juce::String result = parts.joinIntoString("-");
-
-         // Output the result
          return result;
       }
       return inputString;
