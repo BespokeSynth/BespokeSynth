@@ -409,7 +409,7 @@ void ModularSynth::Poll()
    }
 
    bool shiftPressed = (GetKeyModifiers() == kModifier_Shift);
-   if (shiftPressed && !mIsShiftPressed)
+   if (shiftPressed && !mIsShiftPressed && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr)
    {
       double timeBetweenPresses = gTime - mLastShiftPressTime;
       if (timeBetweenPresses < 400)
@@ -1211,12 +1211,19 @@ void ModularSynth::MouseMoved(int intX, int intY)
       mZoomer.CancelMovement();
 
       if (UserPrefs.wrap_mouse_on_pan.Get() &&
-          (intX < 0 || intY < 0 || intX >= ofGetWidth() || intY >= ofGetHeight()))
+          (intX <= 0 || intY <= 0 || intX >= ofGetWidth() || intY >= ofGetHeight()))
       {
          int wrappedX = (intX + (int)ofGetWidth()) % (int)ofGetWidth();
          int wrappedY = (intY + (int)ofGetHeight()) % (int)ofGetHeight();
+
+         if (intX == 0 && wrappedX == 0)
+            wrappedX = ofGetWidth() - 1;
+         if (intY == 0 && wrappedY == 0)
+            wrappedY = ofGetHeight() - 1;
+
          Desktop::setMousePosition(juce::Point<int>(wrappedX + mMainComponent->getScreenX(),
                                                     wrappedY + mMainComponent->getScreenY()));
+
          intX = wrappedX;
          intY = wrappedY;
       }

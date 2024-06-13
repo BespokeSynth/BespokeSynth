@@ -572,7 +572,8 @@ bool IsKeyHeld(int key, int modifiers)
 {
    return IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr &&
           KeyPress::isKeyCurrentlyDown(key) &&
-          GetKeyModifiers() == modifiers;
+          GetKeyModifiers() == modifiers &&
+          TheSynth->GetMainComponent()->hasKeyboardFocus(true);
 }
 
 int KeyToLower(int key)
