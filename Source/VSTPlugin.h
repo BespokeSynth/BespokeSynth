@@ -148,6 +148,7 @@ private:
    juce::MidiBuffer mFutureMidiBuffer;
    juce::CriticalSection mMidiInputLock;
    std::atomic<bool> mRescanParameterNames{ false };
+   juce::String cutOffIdHash(juce::String);
    int mNumInputChannels{ 2 };
    int mNumOutputChannels{ 2 };
 

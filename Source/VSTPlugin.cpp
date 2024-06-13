@@ -180,12 +180,37 @@ namespace VSTLookup
       return "";
    }
 
+   juce::String cutOffIdHash(juce::String inputString)
+   {
+      juce::StringArray parts;
+      parts.addTokens(inputString, "-", "");
+
+      if (parts.size() >= 2)
+      {
+         parts.remove(parts.size() - 2);
+         juce::String result = parts.joinIntoString("-");
+         return result;
+      }
+      return inputString;
+   }
+
    bool GetPluginDesc(juce::PluginDescription& desc, juce::String pluginId)
    {
       auto types = TheSynth->GetKnownPluginList().getTypes();
+      auto cutId = cutOffIdHash(pluginId);
+
       for (int i = 0; i < types.size(); ++i)
       {
          if (types[i].createIdentifierString() == pluginId)
+         {
+            desc = types[i];
+            return true;
+         }
+      }
+
+      for (int i = 0; i < types.size(); ++i)
+      {
+         if (cutOffIdHash(types[i].createIdentifierString()) == cutId)
          {
             desc = types[i];
             return true;
