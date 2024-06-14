@@ -250,7 +250,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       for (int i = 0; i < NumKeys(); i += 7)
       {
          ofSetColor(108, 37, 62, 255);
-         DrawTextNormal("C" + std::to_string(oct), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 14);
+         DrawTextNormal("C" + std::to_string(oct), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 12);
          oct++;
       }
    }

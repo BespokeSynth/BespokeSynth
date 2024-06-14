@@ -269,7 +269,7 @@ void ADSRDisplay::Render()
             ofRect(0, 0, mWidth, 10);
             ofRect(ofMap(mMaxTime, 10, 10000, 0, mWidth - 3, K(clamp)), 0, 3, 10);
             ofSetColor(255, 255, 255, .8f * gModuleDrawAlpha);
-            DrawTextNormal(ofToString(mMaxTime, 0) + " ms", 3, 8, 10);
+            DrawTextNormal(ofToString(mMaxTime, 0) + " ms", 3, 8, 8);
             break;
          case kAdjustAttackAR:
             ofRect(0, 0, mWidth * .5f, mHeight);

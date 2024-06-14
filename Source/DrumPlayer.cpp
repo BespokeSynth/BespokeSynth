@@ -839,7 +839,7 @@ void DrumPlayer::DrawModule()
             }
 
             ofSetColor(255, 255, 255, gModuleDrawAlpha);
-            gFont.DrawStringWrap(mDrumHits[sampleIdx].mSample.Name(), 12, i * 70 + 5, j * 70 + 10, 60);
+            gFont.DrawStringWrap(mDrumHits[sampleIdx].mSample.Name(), 10, i * 70 + 5, j * 70 + 10, 60);
          }
       }
       ofPopStyle();

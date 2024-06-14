@@ -464,7 +464,7 @@ void LaunchpadKeyboard::DrawModuleUnclipped()
       DrawTextNormal(mDebugDisplayText, 0, 90);
 
       for (int i = 0; i < 128; ++i)
-         DrawTextNormal(ofToString(i) + " " + ofToString(mCurrentNotes[i]), 180 + (i / 24) * 20, (i % 24) * 9, 8);
+         DrawTextNormal(ofToString(i) + " " + ofToString(mCurrentNotes[i]), 180 + (i / 24) * 20, (i % 24) * 9, 6);
    }
 }
 

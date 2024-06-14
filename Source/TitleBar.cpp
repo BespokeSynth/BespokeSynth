@@ -342,16 +342,16 @@ void TitleBar::DrawModule()
    ofPushStyle();
    if (gHoveredModule == this && mLeftCornerHovered)
       ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, .7f, .9f)));
-   DrawTextBold("bespoke", 2, 28, 36);
+   DrawTextBold("bespoke", 2, 28, 34);
 #if BESPOKE_NIGHTLY && !BESPOKE_SUPPRESS_NIGHTLY_LABEL
-   DrawTextNormal("nightly", 90, 35, 10);
+   DrawTextNormal("nightly", 90, 35, 8);
 #endif
 #if DEBUG
    ofFill();
    ofSetColor(0, 0, 0, 180);
    ofRect(13, 12, 90, 17);
    ofSetColor(255, 0, 0);
-   DrawTextBold("debug build", 17, 25, 19);
+   DrawTextBold("debug build", 17, 25, 17);
 #endif
    ofPopStyle();
 
@@ -439,7 +439,7 @@ void TitleBar::DrawModuleUnclipped()
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 50 + titleBarHeight;
-      gFontBold.DrawString("please close plugin manager to continue", 50, x, y);
+      gFontBold.DrawString("please close plugin manager to continue", 48, x, y);
       ofPopStyle();
       return;
    }
@@ -453,7 +453,7 @@ void TitleBar::DrawModuleUnclipped()
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 40 + titleBarHeight;
-      gFontBold.DrawString(mDisplayMessage, 50, x, y);
+      gFontBold.DrawString(mDisplayMessage, 48, x, y);
       ofPopStyle();
    }
 
@@ -465,7 +465,7 @@ void TitleBar::DrawModuleUnclipped()
       ofPushStyle();
       ofSetColor(255, 255, 255);
       std::string text = "click ? to view help and toggle tooltips";
-      float size = 28;
+      float size = 26;
       float titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       ofRectangle helpButtonRect = mDisplayHelpButton->GetRect(true);
@@ -512,7 +512,7 @@ void TitleBar::DrawModuleUnclipped()
          ofSetColor(120, 120, 120, 150);
          ofRect(pos.x, pos.y, kWidth * drawControl->GetMidiValue(), kHeight);
          ofSetColor(255, 255, 255);
-         DrawTextBold(displayString, pos.x + 20, pos.y + 50, 40);
+         DrawTextBold(displayString, pos.x + 20, pos.y + 50, 38);
          ofPopStyle();
       }
    }

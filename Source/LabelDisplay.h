@@ -68,7 +68,7 @@ private:
 
    char mLabel[MAX_TEXTENTRY_LENGTH]{ "Label" };
    TextEntry* mLabelEntry{ nullptr };
-   int mLabelSize{ 42 };
+   int mLabelSize{ 40 };
    IntSlider* mLabelSizeSlider{ nullptr };
 
    RetinaTrueTypeFont mLabelFont{ gFont };

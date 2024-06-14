@@ -146,7 +146,7 @@ void GridModule::DrawModule()
    for (int i = 0; i < mGrid->GetRows() && i < (int)mLabels.size(); ++i)
    {
       ofVec2f pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
-      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 12);
+      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 10);
       DrawTextNormal(mLabels[i], 2, pos.y - (scale / 8), scale);
    }
    ofPopStyle();

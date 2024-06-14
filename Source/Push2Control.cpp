@@ -510,7 +510,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
          ofRect(1, 1, ableton::Push2DisplayBitmap::kWidth - 2, ableton::Push2DisplayBitmap::kHeight - 2);
 
          ofSetColor(0, 0, 0);
-         DrawTextBold(stateInfo, 10, 147, 20);
+         DrawTextBold(stateInfo, 10, 147, 18);
 
          ofPopStyle();
       }
@@ -530,14 +530,14 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
             ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleCategory(moduleTypeToSpawn)));
             text = "\ntap grid to spawn " + moduleTypeToSpawn;
          }
-         DrawTextBold(text, 5, 80, 20);
+         DrawTextBold(text, 5, 80, 18);
 
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other));
          ofNoFill();
 
          ofTranslate(-kColumnSpacing * mModuleViewOffsetSmoothed, 0);
 
-         nvgFontSize(sVG, 16);
+         nvgFontSize(sVG, 12);
          DrawControls(mButtonControls, false, 60);
          DrawControls(mSliderControls, true, 20);
       }
@@ -1103,9 +1103,9 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
       if (adsr == nullptr)
       {
          if (mDisplayModule == this)
-            DrawTextBold(juce::String(controls[i]->Path()).replace("~", "\n").toRawUTF8(), kColumnSpacing * i + 3, yPos - 12, 10);
+            DrawTextBold(juce::String(controls[i]->Path()).replace("~", "\n").toRawUTF8(), kColumnSpacing * i + 3, yPos - 12, 8);
          else
-            DrawTextBold(controls[i]->Name(), kColumnSpacing * i + 3, yPos - 5, 16);
+            DrawTextBold(controls[i]->Name(), kColumnSpacing * i + 3, yPos - 5, 14);
       }
       controls[i]->Render();
       ofPopStyle();
