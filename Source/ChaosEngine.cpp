@@ -252,10 +252,10 @@ void ChaosEngine::DrawModule()
 
    if (!mHideBeat)
       gFont.DrawString(ofToString(beat), 42, 10, 50);
-   gFont.DrawString(ofToString(TheTransport->GetTimeSigTop()) + "/" + ofToString(TheTransport->GetTimeSigBottom()), 42, 90, 50);
-   gFont.DrawString(ofToString(TheTransport->GetTempo(), 0) + "bpm", 42, 230, 50);
+   gFont.DrawString(ofToString(TheTransport->GetTimeSigTop()) + "/" + ofToString(TheTransport->GetTimeSigBottom()), 40, 90, 50);
+   gFont.DrawString(ofToString(TheTransport->GetTempo(), 0) + "bpm", 420, 230, 50);
 
-   gFont.DrawString(NoteName(TheScale->ScaleRoot()) + " " + TheScale->GetType(), 42, 10, 100);
+   gFont.DrawString(NoteName(TheScale->ScaleRoot()) + " " + TheScale->GetType(), 40, 10, 100);
 
    DrawKeyboard(10, 150);
    DrawGuitar(10, 285);
@@ -280,7 +280,7 @@ void ChaosEngine::DrawModule()
       Chord displayChord;
       displayChord.SetFromDegreeAndScale(mChordProgression[i].mDegree, scale);
       displayChord.mInversion = mChordProgression[i].mInversion;
-      gFont.DrawString(displayChord.Name(true, false, &scale), 48, x, y);
+      gFont.DrawString(displayChord.Name(true, false, &scale), 46, x, y);
 
       std::string accidentalList;
       for (int j = 0; j < mChordProgression[i].mAccidentals.size(); ++j)

@@ -66,9 +66,9 @@ void LabelDisplay::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    INTSLIDER(mLabelSizeSlider, "size", &mLabelSize, 25, 500);
    UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mLabelFontDropdown, "font", &mLabelFontIndex, 60);
+   DROPDOWN(mLabelFontDropdown, "font", &mLabelFontIndex, 90);
    UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mLabelColorDropdown, "color", &mLabelColorIndex, 60);
+   DROPDOWN(mLabelColorDropdown, "color", &mLabelColorIndex, 72);
    ENDUIBLOCK(mWidth, mHeight);
 
    for (int i = 0; i < mFonts.size(); i++)

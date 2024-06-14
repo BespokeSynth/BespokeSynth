@@ -42,13 +42,13 @@ void PanicButton::OnClicked(float x, float y, bool right)
 
 void PanicButton::DrawModule()
 {
-   gFont.DrawString("If anything goes horribly awry, click this\nand the party will be restored", 15, 5, 12);
+   gFont.DrawString("If anything goes horribly awry, click this\nand the party will be restored", 13, 5, 12);
 
    ofPushStyle();
    ofFill();
    ofSetColor(70, 0, 0);
    ofRect(10, 40, 270, 80);
    ofSetColor(255, 0, 0);
-   gFont.DrawString("PANIC", 108, 15, 115);
+   gFont.DrawString("PANIC", 106, 15, 115);
    ofPopStyle();
 }

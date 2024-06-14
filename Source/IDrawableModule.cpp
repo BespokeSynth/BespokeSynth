@@ -353,7 +353,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    if (HasTitleBar())
    {
       ofSetColor(color * (1 - GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
-      DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 16);
+      DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 14);
    }
 
    bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
@@ -853,7 +853,7 @@ float IDrawableModule::GetMinimizedWidth()
    if (titleLabel != mLastTitleLabel)
    {
       mLastTitleLabel = titleLabel;
-      mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 16);
+      mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 14);
    }
    float width = mTitleLabelWidth;
    width += 10; //padding

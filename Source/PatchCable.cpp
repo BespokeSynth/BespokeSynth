@@ -400,7 +400,7 @@ void PatchCable::Render()
             ofSetColor(255, 255, 0);
             ofCircle(cable.plug.x, cable.plug.y, 6);
             ofSetColor(0, 0, 0);
-            DrawTextBold("!", cable.plug.x - 2, cable.plug.y + 5, 17);
+            DrawTextBold("!", cable.plug.x - 2, cable.plug.y + 5, 15);
          }
       }
       else

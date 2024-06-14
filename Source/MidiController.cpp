@@ -936,13 +936,13 @@ void MidiController::DrawModule()
       else
          ofSetColor(255, 0, 0, 255 * (1 - (gTime - mLastActivityTime) / 200));
       ofFill();
-      ofRect(30 + gFont.GetStringWidth(Name(), 15), -11, 10, 10);
+      ofRect(30 + gFont.GetStringWidth(Name(), 13), -11, 10, 10);
       ofPopStyle();
    }
 
    if (!mIsConnected)
    {
-      float xStart = 30 + gFont.GetStringWidth(Name(), 15);
+      float xStart = 30 + gFont.GetStringWidth(Name(), 13);
       float yStart = -11;
 
       ofPushStyle();
@@ -1179,7 +1179,7 @@ void MidiController::DrawModule()
       ofPopStyle();
 
       if (mLayoutLoadError != "")
-         gFont.DrawStringWrap(mLayoutLoadError, 15, 3, kLayoutControlsY + 160, 235);
+         gFont.DrawStringWrap(mLayoutLoadError, 13, 3, kLayoutControlsY + 160, 235);
 
       if (mHighlightedLayoutElement != -1)
       {

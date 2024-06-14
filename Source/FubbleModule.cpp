@@ -309,7 +309,7 @@ void FubbleModule::DrawModuleUnclipped()
    if (Minimized() || IsVisible() == false)
       return;
 
-   DrawTextNormal("(concept by @_ojack_)", 60, -3, 11);
+   DrawTextNormal("(concept by @_ojack_)", 60, -3, 9);
 }
 
 ofRectangle FubbleModule::GetFubbleRect()

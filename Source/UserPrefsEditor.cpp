@@ -307,7 +307,7 @@ void UserPrefsEditor::DrawModule()
       ofRectangle rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
       ofPushStyle();
       ofSetColor(ofColor::white);
-      DrawTextNormal("note: " + UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) + " uses the same audio device for output and input", rect.x, rect.getMaxY() + 14, 13);
+      DrawTextNormal("note: " + UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) + " uses the same audio device for output and input", rect.x, rect.getMaxY() + 14, 11);
       ofPopStyle();
    }
 
@@ -355,7 +355,7 @@ void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofCo
       ofRectangle rect = control->GetRect(true);
       ofPushStyle();
       ofSetColor(color);
-      DrawTextNormal(text, rect.getMaxX() + offsetX, rect.getMaxY() - 3, 13);
+      DrawTextNormal(text, rect.getMaxX() + offsetX, rect.getMaxY() - 3, 11);
       ofPopStyle();
    }
 }

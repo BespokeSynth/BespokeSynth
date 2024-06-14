@@ -72,7 +72,7 @@ void SampleBrowser::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   float fontSize = 15;
+   float fontSize = 13;
    float stringWidth = gFont.GetStringWidth(mCurrentDirectory.toStdString(), fontSize);
    float moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);

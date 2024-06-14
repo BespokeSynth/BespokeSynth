@@ -513,7 +513,7 @@ void ModularSynth::Draw(void* vg)
       DrawFallbackText(("bespoke " + GetBuildInfoString()).c_str(), 100, 50);
 
       if (gFont.IsLoaded())
-         DrawTextNormal(mFatalError, 100, 100, 20);
+         DrawTextNormal(mFatalError, 100, 100, 18);
       else
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
@@ -532,14 +532,14 @@ void ModularSynth::Draw(void* vg)
    if (gTime == 1 && mFatalError == "")
    {
       std::string loading("Bespoke is initializing audio...");
-      DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 30) / 2, ofGetHeight() / 2 - 6, 30);
+      DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 28) / 2, ofGetHeight() / 2 - 6, 28);
       return;
    }
 
    if (!mInitialized && mFatalError == "")
    {
       std::string loading("Bespoke is loading...");
-      DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 30) / 2, ofGetHeight() / 2 - 6, 30);
+      DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 28) / 2, ofGetHeight() / 2 - 6, 28);
       return;
    }
 
@@ -786,7 +786,7 @@ void ModularSynth::Draw(void* vg)
 
       float maxWidth = 300;
 
-      float fontSize = 15;
+      float fontSize = 13;
       nvgFontFaceId(gNanoVG, gFont.GetFontHandle());
       nvgFontSize(gNanoVG, fontSize);
       float bounds[4];
@@ -934,7 +934,7 @@ void ModularSynth::DrawConsole()
             ofSetColor(255, 255, 0);
          else
             ofSetColor(255, 255, 255);
-         gFontFixedWidth.DrawString(it->text, 15, 10, consoleY);
+         gFontFixedWidth.DrawString(it->text, 13, 10, consoleY);
          std::vector<std::string> lines = ofSplitString(it->text, "\n");
          ofPopStyle();
          consoleY += 15 * lines.size();
@@ -947,7 +947,7 @@ void ModularSynth::DrawConsole()
          ofSetColor(255, 0, 0);
          for (auto it = mErrors.begin(); it != mErrors.end(); ++it)
          {
-            gFontFixedWidth.DrawString(*it, 15, 600, consoleY);
+            gFontFixedWidth.DrawString(*it, 13, 600, consoleY);
             std::vector<std::string> lines = ofSplitString(*it, "\n");
             consoleY += 15 * lines.size();
          }

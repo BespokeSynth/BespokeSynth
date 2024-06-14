@@ -471,9 +471,9 @@ void QuickSpawnMenu::DrawModule()
 void QuickSpawnMenu::DrawModuleUnclipped()
 {
    if (mMenuMode == MenuMode::SingleLetter)
-      DrawTextBold(mHeldKeys.toStdString(), 3, -2, 17);
+      DrawTextBold(mHeldKeys.toStdString(), 3, -2, 15);
    if (mMenuMode == MenuMode::Search)
-      DrawTextBold(mSearchString.toStdString(), 3, -2, 17);
+      DrawTextBold(mSearchString.toStdString(), 3, -2, 15);
 }
 
 bool QuickSpawnMenu::MouseMoved(float x, float y)

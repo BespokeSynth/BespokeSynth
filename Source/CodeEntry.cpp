@@ -1337,8 +1337,8 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement& vdict)
 {
    auto fs = vdict.get("font-size", 14);
    auto fsi = fs.asInt();
-   if (fsi > 2 && fsi < 200)
-      mFontSize = fsi;
+   if (fsi > 4 && fsi < 200)
+      mFontSize = fsi - 2;
 
    auto fromRGB = [vdict](const std::string& key, ofColor& onto)
    {

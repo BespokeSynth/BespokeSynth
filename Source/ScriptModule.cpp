@@ -358,7 +358,7 @@ void ScriptModule::DrawModule()
       float y = buttonRect.getCenter().y;
       ofCircle(x, y, 6);
       ofSetColor(0, 0, 0);
-      DrawTextBold("!", x - 2, y + 5, 17);
+      DrawTextBold("!", x - 2, y + 5, 15);
       ofPopStyle();
 
       if (mShowJediWarning)

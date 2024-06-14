@@ -1143,7 +1143,7 @@ void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
       for (; cursor + kSliceSize < (int)text.size(); cursor += kSliceSize)
          displayString += text.substr(cursor, kSliceSize) + "\n";
       displayString += text.substr(cursor, (int)text.size() - cursor);
-      DrawTextNormal(displayString, x + 2, y + 9, 9);
+      DrawTextNormal(displayString, x + 2, y + 9, 7);
       ofPopMatrix();
    }
    float bottomY = y + kTargetTabHeightTop + kSpacingY + numRows * (kRowHeight + kSpacingY);
