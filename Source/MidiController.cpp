@@ -1771,7 +1771,7 @@ void MidiController::LoadControllerLayout(std::string filename)
                ofVec2f spacing;
                spacing.x = (mLayoutData["groups"][group]["spacing"])[0u].asDouble();
                spacing.y = (mLayoutData["groups"][group]["spacing"])[1u].asDouble();
-               MidiMessageType messageType;
+               MidiMessageType messageType = kMidiMessage_Control;
                if (mLayoutData["groups"][group]["messageType"] == "control")
                   messageType = kMidiMessage_Control;
                if (mLayoutData["groups"][group]["messageType"] == "note")
