@@ -133,7 +133,7 @@ struct UIControlConnection
       UIControlConnection* connection = new UIControlConnection(mUIOwner);
       connection->mMessageType = mMessageType;
       connection->mControl = mControl;
-      connection->mUIControl = mUIControl;
+      connection->SetUIControl(mUIControl);
       connection->mType = mType;
       connection->mValue = mValue;
       connection->mLastControlValue = mLastControlValue;
@@ -148,11 +148,13 @@ struct UIControlConnection
       connection->mChannel = mChannel;
       connection->mPage = mPage;
       connection->mPageless = mPageless;
+      connection->m14BitMode = m14BitMode;
       return connection;
    }
 
    void SetNext(UIControlConnection* next);
 
+   void SetUIControl(IUIControl* control);
    void SetUIControl(std::string path);
    void CreateUIControls(int index);
    void Poll();
@@ -179,6 +181,7 @@ struct UIControlConnection
    int mPage{ 0 };
    bool mPageless{ false };
    std::string mShouldRetryForUIControlAt{ "" };
+   bool m14BitMode{ false };
 
    static bool sDrawCables;
 
@@ -199,6 +202,7 @@ struct UIControlConnection
    TextEntry* mMidiOnEntry{ nullptr };
    Checkbox* mScaleOutputCheckbox{ nullptr };
    Checkbox* mBlinkCheckbox{ nullptr };
+   Checkbox* m14BitModeCheckbox{ nullptr };
    TextEntry* mIncrementalEntry{ nullptr };
    Checkbox* mTwoWayCheckbox{ nullptr };
    DropdownList* mFeedbackDropdown{ nullptr };
@@ -219,7 +223,7 @@ struct ControlLayoutElement
 {
    ControlLayoutElement()
    {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, bool is14Bit, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
 
    bool mActive{ false };
    MidiMessageType mType{ MidiMessageType::kMidiMessage_Control };
@@ -231,6 +235,7 @@ struct ControlLayoutElement
    int mOffVal{ 0 };
    int mOnVal{ 127 };
    bool mScaleOutput{ true };
+   bool m14BitMode{ false };
    ControlType mConnectionType{ ControlType::kControlType_Slider };
 
    PatchCableSource* mControlCable{ nullptr };
@@ -334,6 +339,7 @@ public:
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    void OnCableGrabbed(PatchCableSource* cableSource) override;
+   void SendControllerInfoString(int control, int type, std::string str);
 
    ControlLayoutElement& GetLayoutControl(int control, MidiMessageType type);
 

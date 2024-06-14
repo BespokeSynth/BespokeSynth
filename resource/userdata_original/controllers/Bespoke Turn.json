@@ -1,0 +1,92 @@
+{
+   "groups" : [
+      {
+         "rows": 2,
+         "cols": 4,
+         "position" : [ 25, 0 ],
+         "dimensions" : [25, 25],
+         "spacing" : [30, 100],
+         "controls" : [32,33,34,35,36,37,38,39],
+         "messageType" : "control",
+         "drawType" : "knob",
+         "incremental" : true,
+         "14bit" : true
+      },
+      {
+        "rows": 2,
+        "cols": 2,
+        "position" : [ 0, 35 ],
+        "dimensions" : [28, 28],
+        "spacing" : [140, 30],
+        "controls" : [64,66,65,67],
+        "messageType" : "cc",
+        "drawType" : "button"
+      },
+      {
+         "rows": 2,
+         "cols": 4,
+         "position" : [ 225, 0 ],
+         "dimensions" : [25, 25],
+         "spacing" : [30, 100],
+         "controls" : [40,41,42,43,44,45,46,47],
+         "messageType" : "control",
+         "drawType" : "knob",
+         "incremental" : true,
+         "14bit" : true
+      },
+      {
+         "rows": 2,
+         "cols": 2,
+         "position" : [ 200, 35 ],
+         "dimensions" : [28, 28],
+         "spacing" : [140, 30],
+         "controls" : [68,70,69,71],
+         "messageType" : "cc",
+         "drawType" : "button"
+      },
+      {
+         "rows": 2,
+         "cols": 4,
+         "position" : [ 25, 150 ],
+         "dimensions" : [25, 25],
+         "spacing" : [30, 100],
+         "controls" : [48,49,50,51,52,53,54,55],
+         "messageType" : "control",
+         "drawType" : "knob",
+         "incremental" : true,
+         "14bit" : true
+      },
+      {
+         "rows": 2,
+         "cols": 2,
+         "position" : [ 0, 185 ],
+         "dimensions" : [28, 28],
+         "spacing" : [140, 30],
+         "controls" : [72,74,73,75],
+         "messageType" : "cc",
+         "drawType" : "button"
+      },
+      {
+         "rows": 2,
+         "cols": 4,
+         "position" : [ 225, 150 ],
+         "dimensions" : [25, 25],
+         "spacing" : [30, 100],
+         "controls" : [56,57,58,59,60,61,62,63],
+         "messageType" : "control",
+         "drawType" : "knob",
+         "incremental" : true,
+         "14bit" : true
+      },
+      {
+         "rows": 2,
+         "cols": 2,
+         "position" : [ 200, 185 ],
+         "dimensions" : [28, 28],
+         "spacing" : [140, 30],
+         "controls" : [76,78,77,79],
+         "messageType" : "cc",
+         "drawType" : "button"
+      }
+   ]
+}

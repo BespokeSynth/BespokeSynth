@@ -652,6 +652,7 @@ midicontroller~get midi input from external devices. to get a nice display in th
 ~twoway~should we send feedback to the controller? (to control the LEDs associated with the button/knob)
 ~feedback~which cc or note should we send the feedback to?
 ~pageless~should this connection work across all pages of the midicontroller?
+~14bit~is this a 14-bit midi control, with this control as the LSB and the control 32 less than this as the MSB?
 ~ x ~delete this connection
 ~copy~duplicate this connection
 ~layout~which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.
