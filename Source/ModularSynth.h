@@ -388,6 +388,7 @@ private:
    bool mWantReloadInitialLayout{ false };
    std::string mCurrentSaveStatePath;
    std::string mStartupSaveStateFile;
+   bool mCurrentSaveStateIsTemplate{ false };
 
    Sample* mHeldSample{ nullptr };
 
