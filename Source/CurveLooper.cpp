@@ -244,6 +244,7 @@ void CurveLooper::SetUpFromSaveData()
 {
    mWidth = mModuleSaveData.GetInt("width");
    mHeight = mModuleSaveData.GetInt("height");
+   Resize(mWidth, mHeight);
 }
 
 void CurveLooper::SaveState(FileStreamOut& out)
