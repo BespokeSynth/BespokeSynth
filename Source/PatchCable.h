@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PatchCable__
-#define __Bespoke__PatchCable__
+#pragma once
 
 #include "IClickable.h"
 
@@ -119,5 +118,3 @@ private:
    bool mHoveringOnSource{ false };
    int mSourceIndex{ 0 };
 };
-
-#endif /* defined(__Bespoke__PatchCable__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__VSTPlugin__
-#define __Bespoke__VSTPlugin__
+#pragma once
 
 #include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
@@ -212,5 +211,3 @@ private:
 
    bool mWantOpenVstWindow{ false };
 };
-
-#endif /* defined(__Bespoke__VSTPlugin__) */

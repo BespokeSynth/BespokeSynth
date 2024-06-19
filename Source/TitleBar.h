@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__TitleBar__
-#define __Bespoke__TitleBar__
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -191,5 +190,3 @@ private:
 };
 
 extern TitleBar* TheTitleBar;
-
-#endif /* defined(__Bespoke__TitleBar__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Producer__
-#define __modularSynth__Producer__
+#pragma once
 
 #include <iostream>
 #include <iostream>
@@ -132,6 +131,3 @@ private:
    std::list<int> mSkipMeasures;
    ClickButton* mRestartButton{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__Producer__) */

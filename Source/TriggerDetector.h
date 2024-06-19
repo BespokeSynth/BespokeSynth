@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__TriggerDetector__
-#define __modularSynth__TriggerDetector__
+#pragma once
 
 #include <iostream>
 #include "RollingBuffer.h"
@@ -48,5 +47,3 @@ private:
    RollingBuffer mHistory;
    float mAvg{ 0 };
 };
-
-#endif /* defined(__modularSynth__TriggerDetector__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__PeakTracker__
-#define __modularSynth__PeakTracker__
+#pragma once
 
 #include <iostream>
 
@@ -44,5 +43,3 @@ private:
    float mLimit{ -1 };
    double mHitLimitTime{ -9999 };
 };
-
-#endif /* defined(__modularSynth__PeakTracker__) */

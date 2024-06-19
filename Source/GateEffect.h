@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__GateEffect__
-#define __modularSynth__GateEffect__
+#pragma once
 
 #include <iostream>
 #include "IAudioEffect.h"
@@ -73,5 +72,3 @@ private:
    float mEnvelope{ 0 };
    float mPeak{ 0 };
 };
-
-#endif /* defined(__modularSynth__GateEffect__) */

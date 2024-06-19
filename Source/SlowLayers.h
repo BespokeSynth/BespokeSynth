@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__SlowLayers__
-#define __Bespoke__SlowLayers__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -95,5 +94,3 @@ private:
    DropdownList* mNumBarsSelector{ nullptr };
    FloatSlider* mFeedInSlider{ nullptr };
 };
-
-#endif /* defined(__Bespoke__SlowLayers__) */

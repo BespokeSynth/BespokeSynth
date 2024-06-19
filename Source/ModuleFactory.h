@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__ModuleFactory__
-#define __modularSynth__ModuleFactory__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -109,5 +108,3 @@ private:
 
    std::map<std::string, ModuleInfo> mFactoryMap;
 };
-
-#endif /* defined(__modularSynth__ModuleFactory__) */

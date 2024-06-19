@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__SingleOscillatorVoice__
-#define __modularSynth__SingleOscillatorVoice__
+#pragma once
 
 #include <iostream>
 #include "OpenFrameworksPort.h"
@@ -110,5 +109,3 @@ private:
 
    IDrawableModule* mOwner;
 };
-
-#endif /* defined(__modularSynth__SingleOscillatorVoice__) */

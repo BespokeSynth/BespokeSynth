@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__DistortionEffect__
-#define __modularSynth__DistortionEffect__
+#pragma once
 
 #include <iostream>
 #include "IAudioEffect.h"
@@ -92,5 +91,3 @@ private:
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels]{};
    PeakTracker mPeakTracker[ChannelBuffer::kMaxNumChannels]{};
 };
-
-#endif /* defined(__modularSynth__DistortionEffect__) */

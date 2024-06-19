@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Looper__
-#define __modularSynth__Looper__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -246,6 +245,3 @@ private:
 
    SwitchAndRamp mSwitchAndRamp;
 };
-
-
-#endif /* defined(__modularSynth__Looper__) */

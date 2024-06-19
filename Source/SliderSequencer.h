@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__SliderSequencer__
-#define __Bespoke__SliderSequencer__
+#pragma once
 
 #include <iostream>
 
@@ -105,6 +104,3 @@ private:
    int mDivision{ 1 };
    IntSlider* mDivisionSlider{ nullptr };
 };
-
-
-#endif /* defined(__Bespoke__SliderSequencer__) */

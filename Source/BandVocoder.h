@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__BandVocoder__
-#define __modularSynth__BandVocoder__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -115,6 +114,3 @@ private:
 
    bool mCarrierDataSet{ false };
 };
-
-
-#endif /* defined(__modularSynth__BandVocoder__) */

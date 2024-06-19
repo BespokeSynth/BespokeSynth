@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__AudioMeter__
-#define __Bespoke__AudioMeter__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -71,5 +70,3 @@ private:
    PeakTracker mPeakTracker;
    float* mAnalysisBuffer{ nullptr };
 };
-
-#endif /* defined(__Bespoke__AudioMeter__) */

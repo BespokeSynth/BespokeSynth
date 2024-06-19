@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__ChaosEngine__
-#define __modularSynth__ChaosEngine__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -182,5 +181,3 @@ private:
    bool mHideBeat{ false };
    Checkbox* mHideBeatCheckbox{ nullptr };
 };
-
-#endif /* defined(__modularSynth__ChaosEngine__) */

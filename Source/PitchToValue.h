@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PitchToValue__
-#define __Bespoke__PitchToValue__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -73,5 +72,3 @@ private:
 
    int mValue;
 };
-
-#endif /* defined(__Bespoke__PitchToValue__) */

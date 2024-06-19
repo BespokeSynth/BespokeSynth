@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PatchCableSource__
-#define __Bespoke__PatchCableSource__
+#pragma once
 
 #include "PatchCable.h"
 #include "IClickable.h"
@@ -216,5 +215,3 @@ private:
    bool mParentMinimized{ false };
    IDrawableModule* mLastSeenAutopatchableModule{ nullptr };
 };
-
-#endif /* defined(__Bespoke__PatchCableSource__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ScaleDegree__
-#define __Bespoke__ScaleDegree__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
@@ -84,5 +83,3 @@ private:
    Checkbox* mDiatonicCheckbox{ nullptr };
    bool mDiatonic{ true };
 };
-
-#endif /* defined(__Bespoke__ScaleDegree__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__BiquadFilterEffect__
-#define __modularSynth__BiquadFilterEffect__
+#pragma once
 
 #include <iostream>
 #include "IAudioEffect.h"
@@ -90,5 +89,3 @@ private:
 
    bool mCoefficientsHaveChanged{ true };
 };
-
-#endif /* defined(__modularSynth__BiquadFilterEffect__) */

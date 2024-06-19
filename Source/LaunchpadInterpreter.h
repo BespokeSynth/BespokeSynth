@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__LaunchpadInterpreter__
-#define __modularSynth__LaunchpadInterpreter__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 
@@ -77,5 +76,3 @@ private:
    MidiController* mController{ nullptr };
    int mControllerPage{ 0 };
 };
-
-#endif /* defined(__modularSynth__LaunchpadInterpreter__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__PitchDetector__
-#define __modularSynth__PitchDetector__
+#pragma once
 
 #include <iostream>
 
@@ -76,5 +75,3 @@ private:
    int mptarget; // Pitch target, between 0 and 11
    float msptarget; // Smoothed pitch target
 };
-
-#endif /* defined(__modularSynth__PitchDetector__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__FollowingSong__
-#define __Bespoke__FollowingSong__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -87,6 +86,3 @@ private:
    bool mMute{ false };
    Checkbox* mMuteCheckbox{ nullptr };
 };
-
-
-#endif /* defined(__Bespoke__FollowingSong__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Muter__
-#define __modularSynth__Muter__
+#pragma once
 
 #include <iostream>
 #include "IAudioEffect.h"
@@ -70,6 +69,3 @@ private:
    float mRampTimeMs{ 3 };
    FloatSlider* mRampTimeSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__Muter__) */

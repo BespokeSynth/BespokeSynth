@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Ramp__
-#define __modularSynth__Ramp__
+#pragma once
 
 #include <iostream>
 #include <array>
@@ -53,5 +52,3 @@ private:
    std::array<RampData, 10> mRampDatas;
    int mRampDataPointer{ 0 };
 };
-
-#endif /* defined(__modularSynth__Ramp__) */

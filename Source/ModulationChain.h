@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ModulationChain__
-#define __Bespoke__ModulationChain__
+#pragma once
 
 #include "Ramp.h"
 #include "LFO.h"
@@ -96,5 +95,3 @@ private:
    ModulationCollection mGlobalModulation;
    std::vector<ModulationCollection> mVoiceModulations;
 };
-
-#endif /* defined(__Bespoke__ModulationChain__) */

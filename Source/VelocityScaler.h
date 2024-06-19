@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__VelocityScaler__
-#define __Bespoke__VelocityScaler__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
@@ -67,6 +66,3 @@ private:
    float mScale{ 1 };
    FloatSlider* mScaleSlider{ nullptr };
 };
-
-
-#endif /* defined(__Bespoke__VelocityScaler__) */

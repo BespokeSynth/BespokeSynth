@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__SeaOfGrain__
-#define __Bespoke__SeaOfGrain__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -177,5 +176,3 @@ private:
    DropdownList* mKeyboardNumPitchesSelector{ nullptr };
    int mKeyboardNumPitches{ 24 };
 };
-
-#endif /* defined(__Bespoke__SeaOfGrain__) */

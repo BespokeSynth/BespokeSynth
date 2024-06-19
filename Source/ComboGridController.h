@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ComboGridController__
-#define __Bespoke__ComboGridController__
+#pragma once
 
 #include "GridController.h"
 
@@ -82,5 +81,3 @@ private:
    Arrangements mArrangement{ Arrangements::kHorizontal };
    IGridControllerListener* mOwner{ nullptr };
 };
-
-#endif /* defined(__Bespoke__ComboGridController__) */

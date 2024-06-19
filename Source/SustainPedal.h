@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__SustainPedal__
-#define __Bespoke__SustainPedal__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -65,5 +64,3 @@ private:
    bool mSustain{ false };
    Checkbox* mSustainCheckbox{ nullptr };
 };
-
-#endif /* defined(__Bespoke__SustainPedal__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__FMVoice__
-#define __modularSynth__FMVoice__
+#pragma once
 
 #include <iostream>
 #include "OpenFrameworksPort.h"
@@ -79,5 +78,3 @@ private:
    FMVoiceParams* mVoiceParams{ nullptr };
    IDrawableModule* mOwner;
 };
-
-#endif /* defined(__modularSynth__FMVoice__) */

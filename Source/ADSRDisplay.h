@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__ADSRDisplay__
-#define __modularSynth__ADSRDisplay__
+#pragma once
 
 #include <iostream>
 #include "IUIControl.h"
@@ -127,6 +126,3 @@ private:
    std::array<double, 10> mDrawTimeHistory{};
    int mDrawTimeHistoryIndex{ 0 };
 };
-
-
-#endif /* defined(__modularSynth__ADSRDisplay__) */

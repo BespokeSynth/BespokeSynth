@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Autotalent__
-#define __modularSynth__Autotalent__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -217,5 +216,3 @@ private:
    float mfmute;
    float mfmutealph;
 };
-
-#endif /* defined(__modularSynth__Autotalent__) */

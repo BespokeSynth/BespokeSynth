@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__CommentDisplay__
-#define __Bespoke__CommentDisplay__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -59,6 +58,3 @@ private:
    char mComment[MAX_TEXTENTRY_LENGTH]{};
    TextEntry* mCommentEntry{ nullptr };
 };
-
-
-#endif /* defined(__Bespoke__CommentDisplay__) */

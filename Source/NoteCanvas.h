@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__NoteCanvas__
-#define __Bespoke__NoteCanvas__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "INoteSource.h"
@@ -136,5 +135,3 @@ private:
 
    std::vector<ModulationParameters> mVoiceModulations;
 };
-
-#endif /* defined(__Bespoke__NoteCanvas__) */

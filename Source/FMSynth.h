@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__FMSynth__
-#define __modularSynth__FMSynth__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -107,5 +106,3 @@ private:
 
    ChannelBuffer mWriteBuffer;
 };
-
-#endif /* defined(__modularSynth__FMSynth__) */

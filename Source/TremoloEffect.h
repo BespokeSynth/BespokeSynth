@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__TremoloEffect__
-#define __modularSynth__TremoloEffect__
+#pragma once
 
 #include <iostream>
 #include "IAudioEffect.h"
@@ -85,6 +84,3 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
 };
-
-
-#endif /* defined(__modularSynth__TremoloEffect__) */

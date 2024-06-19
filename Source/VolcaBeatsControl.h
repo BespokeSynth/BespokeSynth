@@ -25,8 +25,7 @@
   ==============================================================================
 */
 
-#ifndef VOLCABEATSCONTROL_H_INCLUDED
-#define VOLCABEATSCONTROL_H_INCLUDED
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -94,6 +93,3 @@ private:
    float mLevels[10]{};
    FloatSlider* mLevelSliders[10]{ nullptr };
 };
-
-
-#endif // VOLCABEATSCONTROL_H_INCLUDED

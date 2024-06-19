@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PitchChorus__
-#define __Bespoke__PitchChorus__
+#pragma once
 
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
@@ -90,6 +89,3 @@ private:
    bool mPassthrough;
    Checkbox* mPassthroughCheckbox;
 };
-
-
-#endif /* defined(__Bespoke__PitchChorus__) */

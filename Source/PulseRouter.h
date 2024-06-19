@@ -26,8 +26,7 @@ bespoke synth, a software modular synthesizer
 */
 
 
-#ifndef __modularSynth__PulseRouter__
-#define __modularSynth__PulseRouter__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -77,5 +76,3 @@ private:
    bool mRadioButtonMode{ false };
    bool mOnlyShowActiveCables{ false };
 };
-
-#endif /* defined(__modularSynth__PulseRouter__) */

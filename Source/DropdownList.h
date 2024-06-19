@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__DropdownList__
-#define __modularSynth__DropdownList__
+#pragma once
 
 #include <iostream>
 #include "IUIControl.h"
@@ -192,5 +191,3 @@ private:
    std::vector<int> mSeparators;
    DropdownDisplayStyle mDisplayStyle{ DropdownDisplayStyle::kNormal };
 };
-
-#endif /* defined(__modularSynth__DropdownList__) */

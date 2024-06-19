@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Compressor__
-#define __modularSynth__Compressor__
+#pragma once
 
 #include <iostream>
 #include "IAudioEffect.h"
@@ -164,5 +163,3 @@ private:
 
    RollingBuffer mDelayBuffer;
 };
-
-#endif /* defined(__modularSynth__Compressor__) */

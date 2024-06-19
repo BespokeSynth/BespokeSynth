@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Chord__
-#define __modularSynth__Chord__
+#pragma once
 
 #include <iostream>
 #include "OpenFrameworksPort.h"
@@ -57,6 +56,3 @@ struct Chord
    std::string Name(bool withDegree, bool withAccidentals, ScalePitches* scale = nullptr);
    void SetFromDegreeAndScale(int degree, const ScalePitches& scale, int inversion = 0);
 };
-
-
-#endif /* defined(__modularSynth__Chord__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__RadioButton__
-#define __modularSynth__RadioButton__
+#pragma once
 
 #include "IUIControl.h"
 
@@ -116,5 +115,3 @@ private:
    int mLastSetValue{ 0 };
    int mForcedWidth{ -1 };
 };
-
-#endif /* defined(__modularSynth__RadioButton__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ControlSequencer__
-#define __Bespoke__ControlSequencer__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -130,5 +129,3 @@ private:
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-
-#endif /* defined(__Bespoke__ControlSequencer__) */

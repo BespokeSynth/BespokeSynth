@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__NoteSinger__
-#define __modularSynth__NoteSinger__
+#pragma once
 
 #include <iostream>
 #include "IAudioReceiver.h"
@@ -103,6 +102,3 @@ private:
    BiquadFilter mBands[NOTESINGER_MAX_BUCKETS];
    PeakTracker mPeaks[NOTESINGER_MAX_BUCKETS];
 };
-
-
-#endif /* defined(__modularSynth__NoteSinger__) */

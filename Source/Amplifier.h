@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Amplifier__
-#define __modularSynth__Amplifier__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -68,6 +67,3 @@ private:
    float mGain{ 1 };
    FloatSlider* mGainSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__Amplifier__) */

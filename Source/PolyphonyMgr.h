@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __additiveSynth__PolyphonyMgr__
-#define __additiveSynth__PolyphonyMgr__
+#pragma once
 
 #include <iostream>
 #include "OpenFrameworksPort.h"
@@ -86,5 +85,3 @@ private:
    int mVoiceLimit{ kNumVoices };
    int mOversampling{ 1 };
 };
-
-#endif /* defined(__additiveSynth__PolyphonyMgr__) */

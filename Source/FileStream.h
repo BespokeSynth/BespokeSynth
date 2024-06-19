@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__FileStream__
-#define __Bespoke__FileStream__
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -91,5 +90,3 @@ public:
 private:
    std::unique_ptr<juce::InputStream> mStream;
 };
-
-#endif /* defined(__Bespoke__FileStream__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__NoteSustain__
-#define __Bespoke__NoteSustain__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
@@ -87,6 +86,3 @@ private:
    FloatSlider* mSustainSlider{ nullptr };
    std::list<QueuedNoteOff> mNoteOffs;
 };
-
-
-#endif /* defined(__Bespoke__NoteSustain__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__NamedMutex__
-#define __modularSynth__NamedMutex__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 
@@ -49,5 +48,3 @@ public:
 private:
    NamedMutex* mMutex;
 };
-
-#endif /* defined(__modularSynth__NamedMutex__) */

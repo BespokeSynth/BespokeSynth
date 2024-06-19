@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__KarplusStrong__
-#define __modularSynth__KarplusStrong__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -103,6 +102,3 @@ private:
 
    ChannelBuffer mWriteBuffer;
 };
-
-
-#endif /* defined(__modularSynth__KarplusStrong__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__SingleOscillator__
-#define __modularSynth__SingleOscillator__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -138,6 +137,3 @@ private:
    std::array<DebugLine, 20> mDebugLines;
    int mDebugLinesPos{ 0 };
 };
-
-
-#endif /* defined(__modularSynth__SingleOscillator__) */

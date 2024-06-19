@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __additiveSynth__EnvOscillator__
-#define __additiveSynth__EnvOscillator__
+#pragma once
 
 #include <iostream>
 #include "SynthGlobals.h"
@@ -57,5 +56,3 @@ private:
    ::ADSR mAdsr;
    float mPulseWidth{ .5 };
 };
-
-#endif /* defined(__additiveSynth__EnvOscillator__) */

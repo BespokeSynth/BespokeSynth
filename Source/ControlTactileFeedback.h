@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__ControlTactileFeedback__
-#define __modularSynth__ControlTactileFeedback__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -75,6 +74,3 @@ private:
    float mVolume{ .5 };
    FloatSlider* mVolumeSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__ControlTactileFeedback__) */

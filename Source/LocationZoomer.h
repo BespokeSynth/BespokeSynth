@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__LocationZoomer__
-#define __Bespoke__LocationZoomer__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "ofxJSONElement.h"
@@ -65,5 +64,3 @@ private:
 
    bool mInVanityPanningMode{ false };
 };
-
-#endif /* defined(__Bespoke__LocationZoomer__) */

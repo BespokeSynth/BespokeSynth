@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__EQEffect__
-#define __Bespoke__EQEffect__
+#pragma once
 
 #include "IAudioEffect.h"
 #include "DropdownList.h"
@@ -87,5 +86,3 @@ private:
    UIGrid* mMultiSlider{ nullptr };
    ClickButton* mEvenButton{ nullptr };
 };
-
-#endif /* defined(__Bespoke__EQEffect__) */

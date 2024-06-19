@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__FeedbackModule__
-#define __Bespoke__FeedbackModule__
+#pragma once
 
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
@@ -78,5 +77,3 @@ private:
    double mGainScale[ChannelBuffer::kMaxNumChannels];
    FloatSlider* mSignalLimitSlider{ nullptr };
 };
-
-#endif /* defined(__Bespoke__FeedbackModule__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Monome__
-#define __modularSynth__Monome__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "MidiDevice.h"
@@ -115,5 +114,3 @@ private:
 
    std::vector<LightInfo> mLights;
 };
-
-#endif /* defined(__modularSynth__Monome__) */

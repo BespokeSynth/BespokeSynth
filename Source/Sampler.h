@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Sampler__
-#define __modularSynth__Sampler__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -115,6 +114,3 @@ private:
    PitchDetector mPitchDetector;
    bool mWantDetectPitch{ false };
 };
-
-
-#endif /* defined(__modularSynth__Sampler__) */

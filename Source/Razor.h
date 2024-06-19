@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Razor__
-#define __modularSynth__Razor__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -143,5 +142,3 @@ private:
    float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH + 1]{};
    int mHistoryPtr{ 0 };
 };
-
-#endif /* defined(__modularSynth__Razor__) */

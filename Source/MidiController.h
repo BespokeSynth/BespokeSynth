@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__MidiController__
-#define __modularSynth__MidiController__
+#pragma once
 
 #include <iostream>
 #include "MidiDevice.h"
@@ -463,5 +462,3 @@ private:
 
    ofMutex mQueuedMessageMutex;
 };
-
-#endif /* defined(__modularSynth__MidiController__) */

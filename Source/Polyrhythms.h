@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Polyrhythms__
-#define __modularSynth__Polyrhythms__
+#pragma once
 
 #include <iostream>
 #include "Transport.h"
@@ -109,5 +108,3 @@ private:
    float mHeight;
    std::array<RhythmLine*, 8> mRhythmLines;
 };
-
-#endif /* defined(__modularSynth__Polyrhythms__) */

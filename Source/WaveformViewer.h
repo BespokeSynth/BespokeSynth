@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__WaveformViewer__
-#define __modularSynth__WaveformViewer__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -102,5 +101,3 @@ private:
    IntSlider* mLengthSamplesSlider{ nullptr };
    FloatSlider* mDrawGainSlider{ nullptr };
 };
-
-#endif /* defined(__modularSynth__WaveformViewer__) */

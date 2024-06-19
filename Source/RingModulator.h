@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__RingModulator__
-#define __modularSynth__RingModulator__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -93,6 +92,3 @@ private:
    float mGlideTime{ 0 };
    FloatSlider* mGlideSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__RingModulator__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Capo__
-#define __modularSynth__Capo__
+#pragma once
 
 #include <iostream>
 
@@ -87,6 +86,3 @@ private:
    Checkbox* mDiatonicCheckbox{ nullptr };
    bool mDiatonic{ false };
 };
-
-
-#endif /* defined(__modularSynth__Capo__) */

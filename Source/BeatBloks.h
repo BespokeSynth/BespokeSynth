@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__BeatBloks__
-#define __modularSynth__BeatBloks__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -204,5 +203,3 @@ private:
 
    int mLastRemovedRemixBlokIdx{ -1 };
 };
-
-#endif /* defined(__modularSynth__BeatBloks__) */

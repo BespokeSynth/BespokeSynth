@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__SignalGenerator__
-#define __Bespoke__SignalGenerator__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -137,5 +136,3 @@ private:
 
    int mLoadRev{ -1 };
 };
-
-#endif /* defined(__Bespoke__SignalGenerator__) */

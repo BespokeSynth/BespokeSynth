@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef modularSynth_IDrawableModule_h
-#define modularSynth_IDrawableModule_h
+#pragma once
 
 #include "IClickable.h"
 #include "IPollable.h"
@@ -263,5 +262,3 @@ private:
 
    std::vector<PatchCableSource*> mPatchCableSources;
 };
-
-#endif

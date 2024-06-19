@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__FilterButterworth24db__
-#define __Bespoke__FilterButterworth24db__
+#pragma once
 
 class CFilterButterworth24db
 {
@@ -44,5 +43,3 @@ private:
    float gain{ 0 };
    float min_cutoff{ 0 }, max_cutoff{ 0 };
 };
-
-#endif /* defined(__Bespoke__FilterButterworth24db__) */

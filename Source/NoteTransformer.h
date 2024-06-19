@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__NoteTransformer__
-#define __modularSynth__NoteTransformer__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -69,6 +68,3 @@ private:
    double mLastTimeTonePlayed[7]{};
    int mLastNoteOnForPitch[128];
 };
-
-
-#endif /* defined(__modularSynth__NoteTransformer__) */

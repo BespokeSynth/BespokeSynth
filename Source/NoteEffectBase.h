@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef Bespoke_NoteEffectBase_h
-#define Bespoke_NoteEffectBase_h
+#pragma once
 
 #include "INoteReceiver.h"
 #include "INoteSource.h"
@@ -41,5 +40,3 @@ public:
       SendCCOutput(control, value, voiceIdx);
    }
 };
-
-#endif
