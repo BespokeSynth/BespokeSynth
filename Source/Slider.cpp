@@ -61,14 +61,15 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, IUICont
 
 FloatSlider::~FloatSlider()
 {
-   if (mIsSmoothing)
-      TheTransport->RemoveAudioPoller(this);
+   TheTransport->RemoveAudioPoller(this);
 }
 
 void FloatSlider::Init()
 {
    if (mVar)
       mOriginalValue = *mVar;
+
+   TheTransport->AddAudioPoller(this);
 }
 
 FloatSliderLFOControl* FloatSlider::AcquireLFO()
@@ -104,9 +105,6 @@ void FloatSlider::SetModulator(IModulator* modulator)
 
 void FloatSlider::Render()
 {
-   if (mLastComputeTime + .1f < gTime)
-      Compute();
-
    float normalWidth = mWidth;
    float normalHeight = mHeight;
 
@@ -424,16 +422,12 @@ void FloatSlider::SmoothUpdated()
 {
    if (mSmooth > 0 && !mIsSmoothing)
    {
-      TheTransport->AddAudioPoller(this);
       mSmoothTarget = *mVar;
       mRamp.SetValue(mSmoothTarget);
       mIsSmoothing = true;
    }
    else if (mSmooth <= 0 && mIsSmoothing)
-   {
-      TheTransport->RemoveAudioPoller(this);
       mIsSmoothing = false;
-   }
 }
 
 void FloatSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
@@ -727,7 +721,11 @@ void FloatSlider::TextEntryCancelled(TextEntry* entry)
 
 void FloatSlider::OnTransportAdvanced(float amount)
 {
-   mRamp.Start(gTime, mSmoothTarget, gTime + (amount * TheTransport->MsPerBar() * (mSmooth * 300)));
+   if (mLastComputeTime + .1f < gTime)
+      Compute();
+
+   if (mIsSmoothing)
+      mRamp.Start(gTime, mSmoothTarget, gTime + (amount * TheTransport->MsPerBar() * (mSmooth * 300)));
 }
 
 namespace
@@ -801,9 +799,6 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       in >> mSmooth;
       in >> mSmoothTarget;
       in >> mIsSmoothing;
-
-      if (mIsSmoothing)
-         TheTransport->AddAudioPoller(this);
    }
 
    if (rev >= 4)
