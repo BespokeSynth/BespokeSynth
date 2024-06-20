@@ -2815,7 +2815,7 @@ void ModularSynth::SaveLayoutAsPopup()
 
 void ModularSynth::SaveCurrentState()
 {
-   if (mCurrentSaveStatePath.empty() || mCurrentSaveStateIsTemplate)
+   if (mCurrentSaveStatePath.empty() || IsCurrentSaveStateATemplate())
    {
       SaveStatePopup();
       return;
@@ -2839,7 +2839,7 @@ void ModularSynth::SaveStatePopup()
    String savestateDirPath = ofToDataPath("savestate/");
    String templateName = "";
    String date = ofGetTimestampString("%Y-%m-%d_%H-%M");
-   if (mCurrentSaveStateIsTemplate)
+   if (IsCurrentSaveStateATemplate())
       templateName = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString() + "_";
 
    targetFile = File(savestateDirPath + templateName + date + ".bsk");
@@ -2952,8 +2952,6 @@ void ModularSynth::LoadState(std::string file)
 
    mCurrentSaveStatePath = file;
    File savePath(mCurrentSaveStatePath);
-   if (savePath.getFileExtension().toStdString() == ".bskt")
-      mCurrentSaveStateIsTemplate = true;
    std::string filename = savePath.getFileName().toStdString();
    mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
 
@@ -2963,6 +2961,14 @@ void ModularSynth::LoadState(std::string file)
    mIsLoadingState = false;
    LockRender(false);
    mAudioThreadMutex.Unlock();
+}
+
+bool ModularSynth::IsCurrentSaveStateATemplate() const
+{
+   if (mCurrentSaveStatePath == "")
+      return false;
+   File savePath(mCurrentSaveStatePath);
+   return savePath.getFileExtension().toStdString() == ".bskt";
 }
 
 IAudioReceiver* ModularSynth::FindAudioReceiver(std::string name, bool fail)

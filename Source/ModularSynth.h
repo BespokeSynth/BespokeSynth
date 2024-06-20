@@ -306,6 +306,7 @@ private:
    void FindCircularDependencies();
    bool FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom);
    void ClearCircularDependencyMarkers();
+   bool IsCurrentSaveStateATemplate() const;
 
    void ReadClipboardTextFromSystem();
 
@@ -388,7 +389,6 @@ private:
    bool mWantReloadInitialLayout{ false };
    std::string mCurrentSaveStatePath;
    std::string mStartupSaveStateFile;
-   bool mCurrentSaveStateIsTemplate{ false };
 
    Sample* mHeldSample{ nullptr };
 
