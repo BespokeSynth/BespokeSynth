@@ -519,8 +519,7 @@ void EuclideanSequencer::RandomizeNote(int ringIndex, bool force)
          // 0 = 0 1 2 3
          if ((int)mRndOctaveLo == 0 && (int)mRndOctaveHi == 0)
          {
-            for (int j = 0; j < mEuclideanSequencerRings.size(); ++j)
-               mEuclideanSequencerRings[j]->SetPitch(i);
+            mEuclideanSequencerRings[i]->SetPitch(i);
          }
          else
          {
