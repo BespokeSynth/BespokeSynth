@@ -2815,7 +2815,7 @@ void ModularSynth::SaveLayoutAsPopup()
 
 void ModularSynth::SaveCurrentState()
 {
-   if (mCurrentSaveStatePath.empty())
+   if (mCurrentSaveStatePath.empty() || IsCurrentSaveStateATemplate())
    {
       SaveStatePopup();
       return;
@@ -2835,7 +2835,16 @@ juce::Component* ModularSynth::GetFileChooserParent() const
 
 void ModularSynth::SaveStatePopup()
 {
-   FileChooser chooser("Save current state as...", File(ofToDataPath(ofGetTimestampString("savestate/%Y-%m-%d_%H-%M.bsk"))), "*.bsk", true, false, GetFileChooserParent());
+   File targetFile;
+   String savestateDirPath = ofToDataPath("savestate/");
+   String templateName = "";
+   String date = ofGetTimestampString("%Y-%m-%d_%H-%M");
+   if (IsCurrentSaveStateATemplate())
+      templateName = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString() + "_";
+
+   targetFile = File(savestateDirPath + templateName + date + ".bsk");
+
+   FileChooser chooser("Save current state as...", targetFile, "*.bsk", true, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveState(chooser.getResult().getFullPathName().toStdString(), false);
 }
@@ -2847,7 +2856,7 @@ void ModularSynth::LoadStatePopup()
 
 void ModularSynth::LoadStatePopupImp()
 {
-   FileChooser chooser("Load state", File(ofToDataPath("savestate")), "*.bsk", true, false, GetFileChooserParent());
+   FileChooser chooser("Load state", File(ofToDataPath("savestate")), "*.bsk;*.bskt", true, false, GetFileChooserParent());
    if (chooser.browseForFileToOpen())
       LoadState(chooser.getResult().getFullPathName().toStdString());
 }
@@ -2942,7 +2951,8 @@ void ModularSynth::LoadState(std::string file)
    FileStreamIn::s32BitMode = false;
 
    mCurrentSaveStatePath = file;
-   std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
+   File savePath(mCurrentSaveStatePath);
+   std::string filename = savePath.getFileName().toStdString();
    mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
 
    mAudioThreadMutex.Lock("LoadState()");
@@ -2951,6 +2961,14 @@ void ModularSynth::LoadState(std::string file)
    mIsLoadingState = false;
    LockRender(false);
    mAudioThreadMutex.Unlock();
+}
+
+bool ModularSynth::IsCurrentSaveStateATemplate() const
+{
+   if (mCurrentSaveStatePath == "")
+      return false;
+   File savePath(mCurrentSaveStatePath);
+   return savePath.getFileExtension().toStdString() == ".bskt";
 }
 
 IAudioReceiver* ModularSynth::FindAudioReceiver(std::string name, bool fail)

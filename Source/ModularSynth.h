@@ -306,6 +306,7 @@ private:
    void FindCircularDependencies();
    bool FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom);
    void ClearCircularDependencyMarkers();
+   bool IsCurrentSaveStateATemplate() const;
 
    void ReadClipboardTextFromSystem();
 

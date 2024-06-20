@@ -316,7 +316,7 @@ public:
       for (int i = 0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
       {
          juce::String argument = JUCEApplication::getCommandLineParameterArray()[i];
-         if (argument.endsWith(".bsk"))
+         if (argument.endsWith(".bsk") || argument.endsWith(".bskt"))
          {
             mSynth.SetStartupSaveStateFile(argument.toStdString());
             break;
