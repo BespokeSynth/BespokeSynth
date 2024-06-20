@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Arpeggiator__
-#define __modularSynth__Arpeggiator__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -133,5 +132,3 @@ private:
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-
-#endif /* defined(__modularSynth__Arpeggiator__) */

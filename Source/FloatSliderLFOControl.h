@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__FloatSliderLFOControl__
-#define __modularSynth__FloatSliderLFOControl__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -154,5 +153,3 @@ private:
    static int sNextLFOIndex;
    static bool sInitialized;
 };
-
-#endif /* defined(__modularSynth__FloatSliderLFOControl__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef additiveSynth_IAudioEffect_h
-#define additiveSynth_IAudioEffect_h
+#pragma once
 
 #include "IDrawableModule.h"
 #include "ChannelBuffer.h"
@@ -42,5 +41,3 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override {}
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override {}
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MAINCOMPONENT_H_INCLUDED
-#define MAINCOMPONENT_H_INCLUDED
+#pragma once
 
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_audio_formats/juce_audio_formats.h"
@@ -604,6 +603,3 @@ void SetStartupSaveStateFile(const juce::String& bskFilePath, Component* compone
    else
       mainComponent->SetStartupSaveStateFile(bskFilePath);
 }
-
-
-#endif // MAINCOMPONENT_H_INCLUDED

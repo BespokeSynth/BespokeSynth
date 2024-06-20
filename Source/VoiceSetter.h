@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__VoiceSetter__
-#define __Bespoke__VoiceSetter__
+#pragma once
 
 #include "NoteEffectBase.h"
 
@@ -65,5 +64,3 @@ private:
    int mVoiceIdx{ 0 };
    IntSlider* mVoiceSlider{ nullptr };
 };
-
-#endif /* defined(__Bespoke__VoiceSetter__) */

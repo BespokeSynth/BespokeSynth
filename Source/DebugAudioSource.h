@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__DebugAudioSource__
-#define __Bespoke__DebugAudioSource__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -67,5 +66,3 @@ private:
       height = 60;
    }
 };
-
-#endif /* defined(__Bespoke__DebugAudioSource__) */

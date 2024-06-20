@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Stutter__
-#define __modularSynth__Stutter__
+#pragma once
 
 #include <iostream>
 
@@ -126,6 +125,3 @@ private:
    bool mFadeStutter{ false };
    Checkbox* mFadeCheckbox{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__Stutter__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Checkbox__
-#define __modularSynth__Checkbox__
+#pragma once
 
 #include <iostream>
 #include "IUIControl.h"
@@ -93,5 +92,3 @@ private:
    float mSliderVal{ 0 };
    bool mLastSetValue{ false };
 };
-
-#endif /* defined(__modularSynth__Checkbox__) */

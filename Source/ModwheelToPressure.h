@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ModwheelToPressure__
-#define __Bespoke__ModwheelToPressure__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
@@ -59,5 +58,3 @@ private:
       height = 0;
    }
 };
-
-#endif /* defined(__Bespoke__ModwheelToPressure__) */

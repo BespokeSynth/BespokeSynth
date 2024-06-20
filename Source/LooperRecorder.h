@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__LooperRecorder__
-#define __modularSynth__LooperRecorder__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -177,6 +176,3 @@ private:
    RecorderMode mRecorderMode{ RecorderMode::kRecorderMode_Record };
    DropdownList* mModeSelector{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__LooperRecorder__) */

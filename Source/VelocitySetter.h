@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__VelocitySetter__
-#define __modularSynth__VelocitySetter__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -70,6 +69,3 @@ private:
    float mRandomness{ 0 };
    FloatSlider* mRandomnessSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__VelocitySetter__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Neighborhooder__
-#define __modularSynth__Neighborhooder__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -70,5 +69,3 @@ private:
    IntSlider* mMinSlider{ nullptr };
    IntSlider* mRangeSlider{ nullptr };
 };
-
-#endif /* defined(__modularSynth__Neighborhooder__) */

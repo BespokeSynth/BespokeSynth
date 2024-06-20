@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ModulationVisualizer__
-#define __Bespoke__ModulationVisualizer__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
@@ -72,5 +71,3 @@ private:
    VizVoice mGlobalModulation;
    std::vector<VizVoice> mVoices;
 };
-
-#endif /* defined(__Bespoke__ModulationVisualizer__) */

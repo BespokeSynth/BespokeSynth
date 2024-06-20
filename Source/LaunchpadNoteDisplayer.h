@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__LaunchpadNoteDisplayer__
-#define __modularSynth__LaunchpadNoteDisplayer__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -64,5 +63,3 @@ private:
 
    LaunchpadKeyboard* mLaunchpad{ nullptr };
 };
-
-#endif /* defined(__modularSynth__LaunchpadNoteDisplayer__) */

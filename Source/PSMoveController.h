@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__PSMoveController__
-#define __modularSynth__PSMoveController__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -110,5 +109,3 @@ private:
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-
-#endif /* defined(__modularSynth__PSMoveController__) */

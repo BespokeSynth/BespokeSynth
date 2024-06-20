@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__LinkwitzRileyFilter__
-#define __Bespoke__LinkwitzRileyFilter__
+#pragma once
 
 #include <iostream>
 
@@ -120,5 +119,3 @@ mHigh->ProcessSample(high, mid, high);
 When I sum the low mid and high back together, I can’t discern any signal loss once I bypass the splitter…
 The only bad thing I’ve noticed is that changing the low freq real time is unstable. There are probably ways around this…
 Good luck!*/
-
-#endif /* defined(__Bespoke__LinkwitzRileyFilter__) */

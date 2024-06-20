@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__GroupControl__
-#define __Bespoke__GroupControl__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "Checkbox.h"
@@ -64,5 +63,3 @@ private:
 
    std::vector<PatchCableSource*> mControlCables;
 };
-
-#endif /* defined(__Bespoke__GroupControl__) */

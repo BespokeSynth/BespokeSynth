@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__Pressure__
-#define __Bespoke__Pressure__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
@@ -75,5 +74,3 @@ private:
 
    Modulations mModulation{ true };
 };
-
-#endif /* defined(__Bespoke__Pressure__) */

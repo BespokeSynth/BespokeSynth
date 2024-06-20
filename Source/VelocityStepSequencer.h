@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__VelocityStepSequencer__
-#define __Bespoke__VelocityStepSequencer__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -108,5 +107,3 @@ private:
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-
-#endif /* defined(__Bespoke__VelocityStepSequencer__) */

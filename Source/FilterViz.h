@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__FilterViz__
-#define __Bespoke__FilterViz__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -74,5 +73,3 @@ private:
    bool mNeedUpdate{ true };
    std::vector<IAudioEffect*> mFilters;
 };
-
-#endif /* defined(__Bespoke__FilterViz__) */

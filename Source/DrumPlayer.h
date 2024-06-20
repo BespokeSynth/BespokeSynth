@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__DrumPlayer__
-#define __modularSynth__DrumPlayer__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -289,5 +288,3 @@ private:
 
    std::array<DrumHit, NUM_DRUM_HITS> mDrumHits;
 };
-
-#endif /* defined(__modularSynth__DrumPlayer__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__NoiseEffect__
-#define __modularSynth__NoiseEffect__
+#pragma once
 
 #include <iostream>
 #include "IAudioEffect.h"
@@ -72,5 +71,3 @@ private:
    FloatSlider* mAmountSlider{ nullptr };
    IntSlider* mWidthSlider{ nullptr };
 };
-
-#endif /* defined(__modularSynth__NoiseEffect__) */

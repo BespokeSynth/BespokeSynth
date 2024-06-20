@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__ClickButton__
-#define __modularSynth__ClickButton__
+#pragma once
 
 #include "IPulseReceiver.h"
 #include "IUIControl.h"
@@ -109,5 +108,3 @@ private:
    IButtonListener* mOwner{ nullptr };
    ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };
 };
-
-#endif /* defined(__modularSynth__ClickButton__) */

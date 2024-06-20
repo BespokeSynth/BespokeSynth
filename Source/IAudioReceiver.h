@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef modularSynth_IAudioReceiver_h
-#define modularSynth_IAudioReceiver_h
+#pragma once
 
 #include "ChannelBuffer.h"
 
@@ -50,5 +49,3 @@ protected:
 private:
    ChannelBuffer mInputBuffer;
 };
-
-#endif

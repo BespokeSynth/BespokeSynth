@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__RandomNoteGenerator__
-#define __Bespoke__RandomNoteGenerator__
+#pragma once
 
 #include <stdio.h>
 #include "IDrawableModule.h"
@@ -84,5 +83,3 @@ private:
    IntSlider* mSkipSlider{ nullptr };
    int mSkipCount{ 0 };
 };
-
-#endif /* defined(__Bespoke__RandomNoteGenerator__) */

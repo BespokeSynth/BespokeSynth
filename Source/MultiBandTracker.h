@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__MultiBandTracker__
-#define __modularSynth__MultiBandTracker__
+#pragma once
 
 #include <iostream>
 #include "OpenFrameworksPort.h"
@@ -52,5 +51,3 @@ private:
    float* mWorkBuffer{ nullptr };
    ofMutex mMutex;
 };
-
-#endif /* defined(__modularSynth__MultiBandTracker__) */

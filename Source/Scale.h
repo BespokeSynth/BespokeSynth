@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Scale__
-#define __modularSynth__Scale__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "DropdownList.h"
@@ -217,5 +216,3 @@ private:
 };
 
 extern Scale* TheScale;
-
-#endif /* defined(__modularSynth__Scale__) */

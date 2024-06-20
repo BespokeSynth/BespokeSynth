@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__LaunchpadKeyboard__
-#define __modularSynth__LaunchpadKeyboard__
+#pragma once
 
 #include <iostream>
 #include "Scale.h"
@@ -161,5 +160,3 @@ private:
    Checkbox* mPreserveChordRootCheckbox{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
 };
-
-#endif /* defined(__modularSynth__LaunchpadKeyboard__) */

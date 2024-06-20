@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ModwheelToVibrato__
-#define __Bespoke__ModwheelToVibrato__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
@@ -74,6 +73,3 @@ private:
 
    Modulations mModulation{ true };
 };
-
-
-#endif /* defined(__Bespoke__ModwheelToVibrato__) */

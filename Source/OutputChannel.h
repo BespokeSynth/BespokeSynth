@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__OutputChannel__
-#define __modularSynth__OutputChannel__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -83,5 +82,3 @@ private:
 
    std::array<LevelMeter, 2> mLevelMeters;
 };
-
-#endif /* defined(__modularSynth__OutputChannel__) */

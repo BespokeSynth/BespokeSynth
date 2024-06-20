@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Kicker__
-#define __modularSynth__Kicker__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -67,5 +66,3 @@ private:
 
    DrumPlayer* mDrumPlayer{ nullptr };
 };
-
-#endif /* defined(__modularSynth__Kicker__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__FormantFilter__
-#define __Bespoke__FormantFilter__
+#pragma once
 
 #include "IAudioEffect.h"
 #include "DropdownList.h"
@@ -116,5 +115,3 @@ private:
    std::vector<Formants> mFormants;
    float* mOutputBuffer{ nullptr };
 };
-
-#endif /* defined(__Bespoke__FormantFilter__) */

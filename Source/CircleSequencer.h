@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__CircleSequencer__
-#define __Bespoke__CircleSequencer__
+#pragma once
 
 #include <iostream>
 #include "Transport.h"
@@ -118,5 +117,3 @@ private:
 
    std::vector<CircleSequencerRing*> mCircleSequencerRings;
 };
-
-#endif /* defined(__Bespoke__CircleSequencer__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__NoteDisplayer__
-#define __Bespoke__NoteDisplayer__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
@@ -65,5 +64,3 @@ private:
    int mVelocities[128]{};
    int mVoiceIds[128]{};
 };
-
-#endif /* defined(__Bespoke__NoteDisplayer__) */

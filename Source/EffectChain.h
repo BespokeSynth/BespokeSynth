@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__EffectChain__
-#define __modularSynth__EffectChain__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -127,5 +126,3 @@ private:
 
    ofMutex mEffectMutex;
 };
-
-#endif /* defined(__modularSynth__EffectChain__) */

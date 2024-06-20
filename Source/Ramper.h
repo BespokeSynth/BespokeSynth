@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__Ramper__
-#define __Bespoke__Ramper__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
@@ -93,5 +92,3 @@ private:
    float mStartValue{ 0 };
    bool mRamping{ false };
 };
-
-#endif /* defined(__Bespoke__Ramper__) */

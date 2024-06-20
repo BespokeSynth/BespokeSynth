@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__CurveLooper__
-#define __Bespoke__CurveLooper__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
@@ -94,5 +93,3 @@ private:
    ::ADSR mAdsr;
    ClickButton* mRandomizeButton{ nullptr };
 };
-
-#endif /* defined(__Bespoke__CurveLooper__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __additiveSynth__MidiDevice__
-#define __additiveSynth__MidiDevice__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "ModularSynth.h"
@@ -127,5 +126,3 @@ private:
    int mOutputChannel{ 1 };
    bool mIsInputEnabled{ false };
 };
-
-#endif /* defined(__additiveSynth__MidiDevice__) */

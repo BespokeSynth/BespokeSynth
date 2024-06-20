@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__SampleFinder__
-#define __modularSynth__SampleFinder__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -118,5 +117,3 @@ private:
    bool mReverse{ false };
    Checkbox* mReverseCheckbox{ nullptr };
 };
-
-#endif /* defined(__modularSynth__SampleFinder__) */

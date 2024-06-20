@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__FourOnTheFloor__
-#define __modularSynth__FourOnTheFloor__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -70,5 +69,3 @@ private:
    bool mTwoOnTheFloor{ false };
    Checkbox* mTwoOnTheFloorCheckbox{ nullptr };
 };
-
-#endif /* defined(__modularSynth__FourOnTheFloor__) */

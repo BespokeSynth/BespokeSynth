@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__TextEntry__
-#define __modularSynth__TextEntry__
+#pragma once
 
 #include <iostream>
 #include <climits>
@@ -132,5 +131,3 @@ private:
    bool mHovered{ false };
    bool mRequireEnterToAccept{ false };
 };
-
-#endif /* defined(__modularSynth__TextEntry__) */

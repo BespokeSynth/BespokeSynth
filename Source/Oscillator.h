@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__Oscillator__
-#define __Bespoke__Oscillator__
+#pragma once
 
 #include <iostream>
 #include "SynthGlobals.h"
@@ -62,5 +61,3 @@ private:
    float mShuffle{ 0 };
    float mSoften{ 0 };
 };
-
-#endif /* defined(__Bespoke__Oscillator__) */

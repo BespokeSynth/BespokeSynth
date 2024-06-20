@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__LabelDisplay__
-#define __Bespoke__LabelDisplay__
+#pragma once
 
 #include <iostream>
 #include <utility>
@@ -103,6 +102,3 @@ private:
    };
    std::vector<LabelColor> mColors{};
 };
-
-
-#endif /* defined(__Bespoke__LabelDisplay__) */

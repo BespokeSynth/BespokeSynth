@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__SamplerGrid__
-#define __Bespoke__SamplerGrid__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -151,5 +150,3 @@ private:
 
    UIGrid* mGrid{ nullptr };
 };
-
-#endif /* defined(__Bespoke__SamplerGrid__) */

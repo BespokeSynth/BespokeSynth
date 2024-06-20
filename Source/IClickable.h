@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__IClickable__
-#define __modularSynth__IClickable__
+#pragma once
 
 #include "SynthGlobals.h"
 
@@ -134,5 +133,3 @@ private:
    virtual void CancelEntry() {}
    static IKeyboardFocusListener* sCurrentKeyboardFocus;
 };
-
-#endif /* defined(__modularSynth__IClickable__) */

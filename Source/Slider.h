@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Slider__
-#define __modularSynth__Slider__
+#pragma once
 
 #include <iostream>
 #include <limits>
@@ -301,5 +300,3 @@ private:
    TextEntry* mMinEntry;
    TextEntry* mMaxEntry;
 };
-
-#endif /* defined(__modularSynth__Slider__) */

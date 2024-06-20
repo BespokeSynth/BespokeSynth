@@ -23,8 +23,7 @@
 //  Tweaked by ArkyonVeil on April/2024
 //
 
-#ifndef __Bespoke__KeyboardDisplay__
-#define __Bespoke__KeyboardDisplay__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
@@ -99,5 +98,3 @@ private:
    std::array<float, 128> mLastOffTime{};
    std::unordered_map<int, int> mKeyPressRegister{};
 };
-
-#endif /* defined(__Bespoke__KeyboardDisplay__) */

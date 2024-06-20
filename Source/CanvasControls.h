@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__CanvasControls__
-#define __Bespoke__CanvasControls__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "TextEntry.h"
@@ -83,5 +82,3 @@ private:
    int mDummyInt{ 0 };
    DropdownList* mDragModeSelector{ nullptr };
 };
-
-#endif /* defined(__Bespoke__CanvasControls__) */

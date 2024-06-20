@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ClipArranger__
-#define __Bespoke__ClipArranger__
+#pragma once
 
 #include <iostream>
 #include "IAudioReceiver.h"
@@ -107,5 +106,3 @@ private:
    int mLastMouseY{ -1 };
    NamedMutex mMutex;
 };
-
-#endif /* defined(__Bespoke__ClipArranger__) */

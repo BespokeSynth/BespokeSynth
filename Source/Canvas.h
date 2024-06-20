@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__Canvas__
-#define __Bespoke__Canvas__
+#pragma once
 
 #include <iostream>
 #include "IUIControl.h"
@@ -191,5 +190,3 @@ private:
 
    friend CanvasControls;
 };
-
-#endif /* defined(__Bespoke__Canvas__) */

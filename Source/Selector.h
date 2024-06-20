@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__Selector__
-#define __Bespoke__Selector__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "RadioButton.h"
@@ -71,6 +70,3 @@ private:
 
    std::vector<PatchCableSource*> mControlCables;
 };
-
-
-#endif /* defined(__Bespoke__Selector__) */

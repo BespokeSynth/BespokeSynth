@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__ModuleSaveDataPanel__
-#define __modularSynth__ModuleSaveDataPanel__
+#pragma once
 
 #include <iostream>
 #include "IDrawableModule.h"
@@ -104,5 +103,3 @@ private:
    bool mPresetFileUpdateQueued{ false };
    std::vector<std::string> mPresetFilePaths;
 };
-
-#endif /* defined(__modularSynth__ModuleSaveDataPanel__) */

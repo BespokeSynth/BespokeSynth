@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef modularSynth_INoteReceiver_h
-#define modularSynth_INoteReceiver_h
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "ModulationChain.h"
@@ -66,5 +65,3 @@ private:
    NoteInputElement mBuffer[kBufferSize];
    INoteReceiver* mReceiver{ nullptr };
 };
-
-#endif

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__FreqDomainBoilerplate__
-#define __modularSynth__FreqDomainBoilerplate__
+#pragma once
 
 #include <iostream>
 #include "IAudioProcessor.h"
@@ -95,6 +94,3 @@ private:
    float mPhaseOffset{ 0 };
    FloatSlider* mPhaseOffsetSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__FreqDomainBoilerplate__) */

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PitchShiftEffect__
-#define __Bespoke__PitchShiftEffect__
+#pragma once
 
 #include <iostream>
 #include "IAudioEffect.h"
@@ -66,6 +65,3 @@ private:
    RadioButton* mRatioSelector{ nullptr };
    PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
 };
-
-
-#endif /* defined(__Bespoke__PitchShiftEffect__) */

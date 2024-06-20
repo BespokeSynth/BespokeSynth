@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ButterworthFilterEffect__
-#define __Bespoke__ButterworthFilterEffect__
+#pragma once
 
 #include "IAudioEffect.h"
 #include "DropdownList.h"
@@ -88,5 +87,3 @@ private:
 
    bool mCoefficientsHaveChanged{ true };
 };
-
-#endif /* defined(__Bespoke__ButterworthFilterEffect__) */

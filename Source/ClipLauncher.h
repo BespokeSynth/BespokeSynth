@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ClipLauncher__
-#define __Bespoke__ClipLauncher__
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -109,5 +108,3 @@ private:
    JumpBlender mJumpBlender;
    ofMutex mSampleMutex;
 };
-
-#endif /* defined(__Bespoke__ClipLauncher__) */

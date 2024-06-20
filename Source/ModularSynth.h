@@ -1,5 +1,4 @@
-#ifndef _MODULAR_SYNTH
-#define _MODULAR_SYNTH
+#pragma once
 
 #undef LoadString //undo some junk from a windows define
 
@@ -448,5 +447,3 @@ private:
 };
 
 extern ModularSynth* TheSynth;
-
-#endif

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__OscController__
-#define __Bespoke__OscController__
+#pragma once
 
 #include <iostream>
 #include "MidiDevice.h"
@@ -83,5 +82,3 @@ private:
 
    std::vector<OscMap> mOscMap;
 };
-
-#endif /* defined(__Bespoke__OscController__) */
