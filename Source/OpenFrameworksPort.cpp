@@ -17,11 +17,11 @@
 **/
 /*
  ==============================================================================
- 
+
  OpenFrameworksPort.cpp
  Created: 30 May 2016 9:13:01pm
  Author:  Ryan Challinor
- 
+
  ==============================================================================
  */
 
@@ -69,7 +69,8 @@ std::string ofToDataPath(const std::string& path)
 
    static const auto sDataDir = []
    {
-      auto dataDir = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+      auto defaultDataDir = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+      auto dataDir = juce::SystemStats::getEnvironmentVariable("BESPOKE_DATA_DIR", defaultDataDir).toStdString();
 #if BESPOKE_WINDOWS
       std::replace(begin(dataDir), end(dataDir), '\\', '/');
 #endif
