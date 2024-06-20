@@ -1,0 +1,8 @@
+[*]
+insert_final_newline = false
+charset = utf-8
+
+# c, cpp, h, hpp files and .i
+[*.{i,{c,h}{,pp}}]
+indent_style = space
+indent_size = 3
