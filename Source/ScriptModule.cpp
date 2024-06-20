@@ -895,6 +895,20 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
    RunCode(gTime, "on_osc(\"" + messageString + "\")");
 }
 
+void ScriptModule::SysExReceived(const uint8 * data, int data_size)
+{
+   // Avoid code injection by preventing the sysex payload to be interpreted as Python
+   // - convert the sysex payload to hex
+   // - use bytes.fromhex in Python to parse it
+   std::ostringstream ss;
+   ss << std::setfill('0') << std::setw(2) << std::hex;
+   for (size_t i = 0; i < data_size; i++)
+      ss << (int)data[i];
+   mMidiMessageQueueMutex.lock();
+   mMidiMessageQueue.push_back("on_sysex(bytes.fromhex('" + ss.str() + "'))");
+   mMidiMessageQueueMutex.unlock();
+}
+
 void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
 {
    mMidiMessageQueueMutex.lock();
