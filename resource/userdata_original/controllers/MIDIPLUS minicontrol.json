@@ -1,0 +1,100 @@
+{
+    "channelfilter": 1,
+    "groups" : [
+
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 0, 46 ],
+            "dimensions" : [60, 20],
+            "spacing" : [30],
+            "controls" : [7],
+            "messageType" : "control",
+            "drawType" : "slider"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 0, 72 ],
+            "dimensions" : [28, 50],
+            "spacing" : [30],
+            "messageType" : "pitchbend",
+            "drawType" : "slider"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 32, 72 ],
+            "dimensions" : [28, 50],
+            "spacing" : [30],
+            "controls" : [1],
+            "messageType" : "control",
+            "drawType" : "slider"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 0, 0 ],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 0],
+            "controls" : [12],
+            "messageType" : "control",
+            "drawType" : "knob"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 30, 0 ],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 0],
+            "controls" : [13],
+            "messageType" : "control",
+            "drawType" : "knob"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 60, 0 ],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 0],
+            "controls" : [14],
+            "messageType" : "control",
+            "drawType" : "knob"
+        },
+        {
+            "rows": 1,
+            "cols": 1,
+            "position" : [ 90, 0 ],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 0],
+            "controls" : [15],
+            "messageType" : "control",
+            "drawType" : "knob"
+        },
+
+       {
+          "rows": 1,
+          "cols": 8,
+          "position" : [ 130, 0 ],
+          "dimensions" : [28, 28],
+          "spacing" : [32, 30],
+          "controls" : [ 30, 31, 32, 33, 34, 35, 36, 37 ],
+          "colors" : [ 0, 127],
+          "messageType" : "control",
+          "drawType" : "button"
+       },
+       {
+        "rows": 1,
+        "cols": 32,
+        "position" : [ 65, 45 ],
+        "dimensions" : [14, 84],
+        "spacing" : [16, 30],
+        "controls" : [
+            41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72
+          ],
+        "colors" : [ 0, 127],
+        "messageType" : "note",
+        "drawType" : "button"
+     }
+    ]
+ }
