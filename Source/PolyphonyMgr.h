@@ -25,8 +25,7 @@
 
 #pragma once
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
+#include <memory>
 #include "SynthGlobals.h"
 #include "ChannelBuffer.h"
 
@@ -39,30 +38,23 @@ class IVoiceParams;
 class IDrawableModule;
 struct ModulationParameters;
 
-enum VoiceType
-{
-   kVoiceType_Karplus,
-   kVoiceType_FM,
-   kVoiceType_SingleOscillator,
-   kVoiceType_Sampler
-};
-
 struct VoiceInfo
 {
    float mPitch{ -1 };
-   IMidiVoice* mVoice{ nullptr };
+   std::unique_ptr<IMidiVoice> mVoice{ nullptr };
    double mTime{ 0 };
    bool mNoteOn{ false };
    float mActivity{ 0 };
 };
 
+using VoiceConstructor = std::unique_ptr<IMidiVoice> (*)(IDrawableModule* owner);
+
 class PolyphonyMgr
 {
 public:
    PolyphonyMgr(IDrawableModule* owner);
-   ~PolyphonyMgr();
 
-   void Init(VoiceType type,
+   void Init(VoiceConstructor type,
              IVoiceParams* mVoiceParams);
 
    void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
@@ -79,7 +71,6 @@ private:
    int mLastVoice{ -1 };
    ChannelBuffer mFadeOutBuffer{ kVoiceFadeSamples };
    ChannelBuffer mFadeOutWorkBuffer{ kVoiceFadeSamples };
-   float mWorkBuffer[2048]{};
    int mFadeOutBufferPos{ 0 };
    IDrawableModule* mOwner;
    int mVoiceLimit{ kNumVoices };

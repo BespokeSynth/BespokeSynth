@@ -25,10 +25,6 @@
 
 #include "PolyphonyMgr.h"
 #include "IMidiVoice.h"
-#include "FMVoice.h"
-#include "KarplusStrongVoice.h"
-#include "SingleOscillatorVoice.h"
-#include "SampleVoice.h"
 #include "SynthGlobals.h"
 #include "Profiler.h"
 
@@ -39,49 +35,12 @@ PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
 {
 }
 
-PolyphonyMgr::~PolyphonyMgr()
+void PolyphonyMgr::Init(VoiceConstructor type, IVoiceParams* params)
 {
    for (int i = 0; i < kNumVoices; ++i)
-      delete mVoices[i].mVoice;
-}
-
-void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
-{
-   if (type == kVoiceType_FM)
    {
-      for (int i = 0; i < kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new FMVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else if (type == kVoiceType_Karplus)
-   {
-      for (int i = 0; i < kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new KarplusStrongVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else if (type == kVoiceType_SingleOscillator)
-   {
-      for (int i = 0; i < kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new SingleOscillatorVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else if (type == kVoiceType_Sampler)
-   {
-      for (int i = 0; i < kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new SampleVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else
-   {
-      assert(false); //unsupported voice type
+      mVoices[i].mVoice = type(mOwner);
+      mVoices[i].mVoice->SetVoiceParams(params);
    }
 }
 
@@ -127,13 +86,13 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       }
    }
 
-   IMidiVoice* voice = mVoices[voiceIdx].mVoice;
-   assert(voice);
-   if (!voice->IsDone(time) && (!preserveVoice || modulation.pan != voice->GetPan()))
+   assert(mVoices[voiceIdx].mVoice);
+   IMidiVoice& voice = *mVoices[voiceIdx].mVoice;
+   if (!voice.IsDone(time) && (!preserveVoice || modulation.pan != voice.GetPan()))
    {
       //ofLog() << "fading stolen voice " << voiceIdx << " at " << time;
       mFadeOutWorkBuffer.Clear();
-      voice->Process(time, &mFadeOutWorkBuffer, mOversampling);
+      voice.Process(time, &mFadeOutWorkBuffer, mOversampling);
       for (int i = 0; i < kVoiceFadeSamples; ++i)
       {
          float fade = 1 - (float(i) / kVoiceFadeSamples);
@@ -142,11 +101,11 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       }
    }
    if (!preserveVoice)
-      voice->ClearVoice();
-   voice->SetPitch(pitch);
-   voice->SetModulators(modulation);
-   voice->Start(time, amount);
-   voice->SetPan(modulation.pan);
+      voice.ClearVoice();
+   voice.SetPitch(pitch);
+   voice.SetModulators(modulation);
+   voice.Start(time, amount);
+   voice.SetPan(modulation.pan);
    mLastVoice = voiceIdx;
 
    mVoices[voiceIdx].mPitch = pitch;

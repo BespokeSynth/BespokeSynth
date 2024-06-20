@@ -26,7 +26,6 @@
 #pragma once
 
 #include "ModulationChain.h"
-#include "Profiler.h"
 
 class IVoiceParams;
 
