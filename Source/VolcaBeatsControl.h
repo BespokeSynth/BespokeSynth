@@ -30,10 +30,8 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "INoteSource.h"
 #include "Slider.h"
-#include "Transport.h"
 
 class VolcaBeatsControl : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener
 {

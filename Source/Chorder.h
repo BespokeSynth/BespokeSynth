@@ -83,7 +83,6 @@ private:
 
    void PlayChorderNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
    void CheckLeftovers();
-   void SyncChord();
 
    UIGrid* mChordGrid{ nullptr };
    int mVelocity{ 0 };

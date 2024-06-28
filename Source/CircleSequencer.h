@@ -28,8 +28,6 @@
 #include <iostream>
 #include "Transport.h"
 #include "UIGrid.h"
-#include "Checkbox.h"
-#include "UIGrid.h"
 #include "Slider.h"
 #include "DropdownList.h"
 #include "IDrawableModule.h"

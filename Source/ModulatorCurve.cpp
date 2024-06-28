@@ -29,7 +29,6 @@
 #include "Profiler.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "MathUtils.h"
 
 namespace
 {
@@ -87,7 +86,7 @@ float ModulatorCurve::Value(int samplesIn)
    ComputeSliders(samplesIn);
    ADSR::EventInfo adsrEvent(0, kAdsrTime);
    float val = ofClamp(mAdsr.Value(mInput * kAdsrTime, &adsrEvent), 0, 1);
-   if (val != val)
+   if (std::isnan(val))
       val = 0;
    return ofLerp(GetMin(), GetMax(), val);
 }

@@ -32,10 +32,6 @@
 #include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
 using namespace juce;
-#include <VersionInfo.h>
-
-//#include <chrono>
-#include <time.h>
 
 #include "OpenFrameworksPort.h"
 #include "nanovg/nanovg.h"
@@ -377,16 +373,12 @@ float ofRandom(float max)
 
 float ofRandom(float x, float y)
 {
-   float high = 0;
-   float low = 0;
-   float randNum = 0;
    // if there is no range, return the value
    if (x == y)
       return x; // float == ?, wise? epsilon?
-   high = MAX(x, y);
-   low = MIN(x, y);
-   randNum = low + ((high - low) * gRandom01(gRandom));
-   return randNum;
+   const float high = MAX(x, y);
+   const float low = MIN(x, y);
+   return low + ((high - low) * gRandom01(gRandom));
 }
 
 void ofSetCircleResolution(float res)
@@ -696,6 +688,7 @@ void ofColor::setHsb(int hue, int saturation, int brightness)
       float tv = ((1.f - saturationNorm * (1.f - hueSixRemainder)) * brightness);
       switch (hueSixCategory)
       {
+         default:
          case 0:
          case 6: // r
             r = brightness;

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include "Canvas.h"
 #include "Curve.h"
 #include "ModulationChain.h"
 

@@ -33,7 +33,6 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 #include "Rewriter.h"
-#include "FillSaveDropdown.h"
 #include "LooperGranulator.h"
 
 float Looper::mBeatwheelPosRight = 0;
@@ -809,16 +808,16 @@ void Looper::DrawBeatwheel()
    ofSetColor(255, 0, 0, gModuleDrawAlpha);
    if (mBeatwheelDepthRight > 0 && mBeatwheelPosRight >= 0)
    {
-      float radians = mBeatwheelPosRight * TWO_PI;
-      float sinR = sin(radians);
-      float cosR = cos(radians);
+      radians = mBeatwheelPosRight * TWO_PI;
+      sinR = sin(radians);
+      cosR = cos(radians);
       ofLine(centerX + sinR * outerRad * .9f, centerY - cosR * outerRad * .9f, centerX + sinR * outerRad, centerY - cosR * outerRad);
    }
    if (mBeatwheelDepthLeft > 0 && mBeatwheelPosLeft >= 0)
    {
-      float radians = mBeatwheelPosLeft * TWO_PI;
-      float sinR = sin(radians);
-      float cosR = cos(radians);
+      radians = mBeatwheelPosLeft * TWO_PI;
+      sinR = sin(radians);
+      cosR = cos(radians);
       ofLine(centerX + sinR * outerRad * .9f, centerY - cosR * outerRad * .9f, centerX + sinR * outerRad, centerY - cosR * outerRad);
    }
 
@@ -828,9 +827,9 @@ void Looper::DrawBeatwheel()
       ofSetColor(150, 150, 150, gModuleDrawAlpha);
       for (int i = 0; i < numSlices; ++i)
       {
-         float radians = (i * TWO_PI) / numSlices;
-         float sinR = sin(radians);
-         float cosR = cos(radians);
+         radians = (i * TWO_PI) / numSlices;
+         sinR = sin(radians);
+         cosR = cos(radians);
          ofLine(centerX + sinR * waveformCenter, centerY - cosR * waveformCenter, centerX + sinR * outerRad, centerY - cosR * outerRad);
       }
    }

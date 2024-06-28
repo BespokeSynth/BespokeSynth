@@ -29,7 +29,6 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ClickButton.h"
-#include "RollingBuffer.h"
 #include "Checkbox.h"
 #include "IAudioProcessor.h"
 #include "ModuleContainer.h"

@@ -25,9 +25,7 @@
 
 #pragma once
 
-#include <iostream>
 #include <memory>
-#include <algorithm>
 #include "IDrawableModule.h"
 #include "DropdownList.h"
 #include "ClickButton.h"

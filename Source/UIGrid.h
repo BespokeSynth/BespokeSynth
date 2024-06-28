@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IUIControl.h"
 #include "SynthGlobals.h"
 

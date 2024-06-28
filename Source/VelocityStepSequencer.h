@@ -31,11 +31,9 @@
 #include "Transport.h"
 #include "Checkbox.h"
 #include "DropdownList.h"
-#include "TextEntry.h"
 #include "ClickButton.h"
 #include "Slider.h"
 #include "MidiController.h"
-#include "INoteReceiver.h"
 
 #define VSS_MAX_STEPS 8
 #define VSS_RANGE 127

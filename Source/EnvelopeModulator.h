@@ -34,7 +34,6 @@
 #include "DropdownList.h"
 #include "ADSR.h"
 #include "ADSRDisplay.h"
-#include "EnvelopeEditor.h"
 #include "NoteEffectBase.h"
 #include "IModulator.h"
 #include "IPulseReceiver.h"

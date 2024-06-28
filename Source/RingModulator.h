@@ -30,7 +30,6 @@
 #include "IDrawableModule.h"
 #include "ClickButton.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "EnvOscillator.h"
 #include "Ramp.h"
 #include "INoteReceiver.h"

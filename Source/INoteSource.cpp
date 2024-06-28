@@ -25,7 +25,6 @@
 
 #include "INoteSource.h"
 #include "SynthGlobals.h"
-#include "IDrawableModule.h"
 #include "ModularSynth.h"
 #include "Scale.h"
 #include "PatchCableSource.h"

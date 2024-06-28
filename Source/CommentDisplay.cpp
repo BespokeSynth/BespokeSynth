@@ -40,7 +40,7 @@ CommentDisplay::~CommentDisplay()
 void CommentDisplay::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mCommentEntry = new TextEntry(this, "comment", 2, 2, MAX_TEXTENTRY_LENGTH - 1, mComment);
+   mCommentEntry = new TextEntry(this, "comment", 2, 2, MAX_TEXTENTRY_LENGTH - 1, &mComment);
    mCommentEntry->SetFlexibleWidth(true);
 }
 
@@ -72,7 +72,7 @@ void CommentDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void CommentDisplay::SetUpFromSaveData()
 {
-   strcpy(mComment, mModuleSaveData.GetString("comment").c_str());
+   mComment = mModuleSaveData.GetString("comment");
 }
 
 void CommentDisplay::SaveLayout(ofxJSONElement& moduleInfo)

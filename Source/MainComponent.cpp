@@ -233,8 +233,7 @@ public:
          preferredSetupOptions.inputDeviceName = inputDevice;
 
 #ifdef JUCE_WINDOWS
-      HRESULT hr;
-      hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+      CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
 
       int inputChannels = UserPrefs.max_input_channels.Get();

@@ -682,6 +682,9 @@ void EuclideanSequencerRing::Draw()
             ofSetColor(150, 150, 255);
          }
          break;
+      default:
+         ofSetColor(255, 255, 255);
+         break;
    }
 
    ofSetCircleResolution(40);
@@ -871,8 +874,6 @@ void EuclideanSequencerRing::OnTransportAdvanced(float amount)
    double remainderMs;
    const int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
    const int newStep = TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs);
-   const int oldMeasure = TheTransport->GetMeasure(NextBufferTime(true) - gBufferSizeMs);
-   const int newMeasure = TheTransport->GetMeasure(NextBufferTime(true));
 
    if (oldStep != newStep && mSteps[newStep] > 0)
    {

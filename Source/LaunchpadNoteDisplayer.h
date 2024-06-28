@@ -28,7 +28,6 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "TextEntry.h"
 
 class LaunchpadKeyboard;
 

@@ -27,8 +27,6 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 
-#include <string.h>
-
 using namespace juce;
 
 MidiDevice::MidiDevice(MidiDeviceListener* listener)
@@ -39,7 +37,7 @@ MidiDevice::MidiDevice(MidiDeviceListener* listener)
 MidiDevice::~MidiDevice()
 {
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
-   deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
+   deviceManager.removeMidiInputDeviceCallback(mDeviceNameIn, this);
    if (mMidiOut.get())
       mMidiOut->stopBackgroundThread();
 }
@@ -51,10 +49,10 @@ bool MidiDevice::ConnectInput(const char* name)
    mDeviceNameIn = name;
 
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
-   deviceManager.setMidiInputEnabled(mDeviceNameIn, true);
-   deviceManager.addMidiInputCallback(mDeviceNameIn, this);
+   deviceManager.setMidiInputDeviceEnabled(mDeviceNameIn, true);
+   deviceManager.addMidiInputDeviceCallback(mDeviceNameIn, this);
 
-   mIsInputEnabled = deviceManager.isMidiInputEnabled(mDeviceNameIn);
+   mIsInputEnabled = deviceManager.isMidiInputDeviceEnabled(mDeviceNameIn);
 
    TheSynth->AddMidiDevice(this); //TODO(Ryan) need better place for this, but constructor is too early
 
@@ -63,7 +61,7 @@ bool MidiDevice::ConnectInput(const char* name)
 
 void MidiDevice::ConnectInput(int index)
 {
-   ConnectInput(MidiInput::getDevices()[index].toRawUTF8());
+   ConnectInput(MidiInput::getAvailableDevices()[index].identifier.toRawUTF8());
 }
 
 bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
@@ -71,10 +69,10 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
    DisconnectOutput();
 
    bool found = false;
-   StringArray devices = MidiOutput::getDevices();
+   auto devices = MidiOutput::getAvailableDevices();
    for (int i = 0; i < devices.size(); ++i)
    {
-      if (devices[i] == name)
+      if (devices[i].identifier == name)
       {
          found = ConnectOutput(i, channel);
          break;
@@ -93,7 +91,7 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
 bool MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 {
    mMidiOut.reset();
-   mMidiOut = MidiOutput::openDevice(index);
+   mMidiOut = MidiOutput::openDevice(MidiOutput::getAvailableDevices()[index].identifier);
    if (mMidiOut)
    {
       mMidiOut->startBackgroundThread();
@@ -110,8 +108,8 @@ bool MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 void MidiDevice::DisconnectInput()
 {
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
-   deviceManager.setMidiInputEnabled(mDeviceNameIn, false);
-   deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
+   deviceManager.setMidiInputDeviceEnabled(mDeviceNameIn, false);
+   deviceManager.removeMidiInputDeviceCallback(mDeviceNameIn, this);
 }
 
 void MidiDevice::DisconnectOutput()
@@ -157,15 +155,13 @@ std::vector<std::string> MidiDevice::GetPortList(bool forInput)
 
    if (forInput)
    {
-      const StringArray input = MidiInput::getDevices();
-      for (int i = 0; i < input.size(); ++i)
-         portList.push_back(input[i].toStdString());
+      for (auto& device : MidiInput::getAvailableDevices())
+         portList.push_back(device.identifier.toStdString());
    }
    else
    {
-      const StringArray output = MidiOutput::getDevices();
-      for (int i = 0; i < output.size(); ++i)
-         portList.push_back(output[i].toStdString());
+      for (auto& device : MidiOutput::getAvailableDevices())
+         portList.push_back(device.identifier.toStdString());
    }
 
    return portList;
