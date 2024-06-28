@@ -179,11 +179,6 @@ void ComboGridController::GetModuleDimensions(float& w, float& h)
    h = 0;
 }
 
-void ComboGridController::SetTarget(IClickable* target)
-{
-   GetPatchCableSource()->SetTarget(target);
-}
-
 void ComboGridController::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("grids", moduleInfo);

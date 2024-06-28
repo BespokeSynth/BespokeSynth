@@ -26,14 +26,12 @@
 #include "DrumSynth.h"
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
-#include "Transport.h"
 #include "ModularSynth.h"
 #include "MidiController.h"
 #include "Profiler.h"
 #include "UIControlMacros.h"
 #include "IAudioReceiver.h"
 #include "ADSRDisplay.h"
-#include "UIControlMacros.h"
 
 #define DRUMSYNTH_NO_CUTOFF 10000
 
@@ -114,8 +112,8 @@ void DrumSynth::Process(double time)
             //assume power-of-two
             while (hitOversampling > 1)
             {
-               for (int i = 0; i < hitBufferSize; ++i)
-                  gWorkBuffer[i] = (gWorkBuffer[i * 2] + gWorkBuffer[i * 2 + 1]) / 2;
+               for (int j = 0; j < hitBufferSize; ++j)
+                  gWorkBuffer[j] = (gWorkBuffer[j * 2] + gWorkBuffer[j * 2 + 1]) / 2;
                hitOversampling /= 2;
                hitBufferSize /= 2;
             }

@@ -111,8 +111,6 @@ void ADSRDisplay::Render()
 
       ofBeginShape();
       ofVertex(0, mHeight);
-      float lastX = 0;
-      float lastY = mHeight;
       for (float i = 0; i < mWidth; i += (.25f / gDrawScale))
       {
          float time = i / mWidth * mMaxTime;
@@ -126,8 +124,8 @@ void ADSRDisplay::Render()
           mAdjustMode == kAdjustRelease ||
           mAdjustMode == kAdjustReleaseAR)
       {
-         float startTime;
-         float endTime;
+         float startTime{ 0 };
+         float endTime{ 999 };
 
          if (mAdjustMode == kAdjustAttack || mAdjustMode == kAdjustAttackAR)
          {

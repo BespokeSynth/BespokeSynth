@@ -29,7 +29,6 @@
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
-#include "TextEntry.h"
 
 class DrumPlayer;
 

@@ -46,29 +46,18 @@ void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool notifyListeners)
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var)
 : mVarCString(var)
-, mVarString(nullptr)
-, mVarInt(nullptr)
-, mVarFloat(nullptr)
-, mType(kTextEntry_Text)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, std::string* var)
-: mVarCString(nullptr)
-, mVarString(var)
-, mVarInt(nullptr)
-, mVarFloat(nullptr)
-, mType(kTextEntry_Text)
+: mVarString(var)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max)
-: mVarCString(nullptr)
-, mVarString(nullptr)
-, mVarInt(var)
-, mVarFloat(nullptr)
+: mVarInt(var)
 , mType(kTextEntry_Int)
 , mIntMin(min)
 , mIntMax(max)
@@ -77,10 +66,7 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max)
-: mVarCString(nullptr)
-, mVarString(nullptr)
-, mVarInt(nullptr)
-, mVarFloat(var)
+: mVarFloat(var)
 , mType(kTextEntry_Float)
 , mFloatMin(min)
 , mFloatMax(max)
@@ -111,8 +97,8 @@ TextEntry::~TextEntry()
 
 void TextEntry::Delete()
 {
-   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
-      IKeyboardFocusListener::ClearActiveKeyboardFocus(false);
+   if (GetActiveKeyboardFocus() == this)
+      ClearActiveKeyboardFocus(false);
    delete this;
 }
 
@@ -161,7 +147,7 @@ void TextEntry::Render()
          if (mCaretPosition > 0)
          {
             char beforeCaret[MAX_TEXTENTRY_LENGTH];
-            strncpy(beforeCaret, mString, mCaretPosition);
+            strncpy_s(beforeCaret, mCaretPosition, mString, mCaretPosition);
             beforeCaret[mCaretPosition] = 0;
             caretX += gFontFixedWidth.GetStringWidth(beforeCaret, 12);
          }
@@ -189,13 +175,13 @@ void TextEntry::Render()
       //
       int start = MIN(mCaretPosition, mCaretPosition2);
       char selectionTmp[MAX_TEXTENTRY_LENGTH];
-      strncpy(selectionTmp, mString, start);
+      strncpy_s(selectionTmp, start, mString, start);
       selectionTmp[start] = 0;
       selStartX += gFontFixedWidth.GetStringWidth(selectionTmp, 12);
 
       //
       int end = MAX(mCaretPosition, mCaretPosition2);
-      strncpy(selectionTmp, mString, end);
+      strncpy_s(selectionTmp, end, mString, end);
       selectionTmp[end] = 0;
       selEndX += gFontFixedWidth.GetStringWidth(selectionTmp, 12);
 
@@ -250,7 +236,7 @@ void TextEntry::OnClicked(float x, float y, bool right)
 
       char caretCheck[MAX_TEXTENTRY_LENGTH];
       size_t checkLength = strnlen(mString, MAX_TEXTENTRY_LENGTH);
-      strncpy(caretCheck, mString, checkLength);
+      strncpy_s(caretCheck, checkLength, mString, checkLength);
       int lastSubstrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 12);
       for (int i = (int)checkLength - 1; i >= 0; --i)
       {
@@ -292,7 +278,7 @@ void TextEntry::RemoveSelectedText()
    int caretStart = MAX(0, MIN(mCaretPosition, mCaretPosition2));
    int caretEnd = MIN(strlen(mString), MAX(mCaretPosition, mCaretPosition2));
    std::string newString = mString;
-   strcpy(mString, (newString.substr(0, caretStart) + newString.substr(caretEnd)).c_str());
+   strcpy_s(mString, MAX_TEXTENTRY_LENGTH, (newString.substr(0, caretStart) + newString.substr(caretEnd)).c_str());
    MoveCaret(caretStart, false);
 }
 
@@ -426,7 +412,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       juce::String clipboard = TheSynth->GetTextFromClipboard();
 
       std::string newString = mString;
-      strcpy(mString, (newString.substr(0, mCaretPosition) + clipboard.toStdString() + newString.substr(mCaretPosition)).c_str());
+      strcpy_s(mString, MAX_TEXTENTRY_LENGTH, (newString.substr(0, mCaretPosition) + clipboard.toStdString() + newString.substr(mCaretPosition)).c_str());
       if (UserPrefs.immediate_paste.Get())
          AcceptEntry(true);
       else
@@ -625,7 +611,7 @@ void TextEntry::AcceptEntry(bool pressedEnter)
       StringCopy(mVarCString, mString, MAX_TEXTENTRY_LENGTH);
    if (mVarString)
       *mVarString = mString;
-   if (mVarInt && mString[0] != 0)
+   if (mVarInt && std::strlen(mString) > 0)
    {
       *mVarInt = ofClamp(ofToInt(mString), mIntMin, mIntMax);
       StringCopy(mString, ofToString(*mVarInt).c_str(), MAX_TEXTENTRY_LENGTH);

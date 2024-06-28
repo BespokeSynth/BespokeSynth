@@ -300,10 +300,7 @@ void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double ti
          //slice the loop into the nearest power of 2 and loop new steps from there
          int oldLengthPow2 = std::max(1, MathUtils::HighestPow2(oldVal));
          for (int i = oldVal; i < mLength; ++i)
-         {
-            int loopedFrom = i % oldLengthPow2;
             mGrid->SetVal(i, 0, mGrid->GetVal(i % oldLengthPow2, 0));
-         }
       }
    }
 }

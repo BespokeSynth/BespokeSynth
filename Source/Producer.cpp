@@ -24,7 +24,6 @@
 //
 
 #include "Producer.h"
-#include "Producer.h"
 #include "IAudioReceiver.h"
 #include "Sample.h"
 #include "SynthGlobals.h"

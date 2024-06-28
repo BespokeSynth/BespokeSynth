@@ -28,8 +28,6 @@
 #include "Scale.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
-#include "VelocityStepSequencer.h"
-#include "LaunchpadInterpreter.h"
 #include "FillSaveDropdown.h"
 #include "MidiController.h"
 

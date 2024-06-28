@@ -27,9 +27,7 @@
 
 #include "IAudioEffect.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "Slider.h"
-#include "Transport.h"
 #include "FilterButterworth24db.h"
 
 class ButterworthFilterEffect : public IAudioEffect, public IDropdownListener, public IFloatSliderListener

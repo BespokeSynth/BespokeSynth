@@ -171,9 +171,9 @@ void RadioButton::Render()
 
       if (active)
       {
-         float h, s, b;
-         color.getHsb(h, s, b);
-         color.setHsb(42, s, b);
+         float color_h, color_s, color_b;
+         color.getHsb(color_h, color_s, color_b);
+         color.setHsb(42, color_s, color_b);
          textColor.set(255, 255, 0, gModuleDrawAlpha);
       }
 

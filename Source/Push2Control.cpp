@@ -1179,7 +1179,6 @@ void Push2Control::Poll()
          if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
          {
             IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn(mSpawnLists.GetDropdowns()[i]->GetList()->GetValue());
-            ofRectangle rect = module->GetRect();
             module->SetPosition(newModulePos.x, newModulePos.y);
             mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1, gTime);
             mScreenDisplayMode = ScreenDisplayMode::kNormal;

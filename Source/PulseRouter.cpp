@@ -60,17 +60,14 @@ void PulseRouter::DrawModule()
 
 void PulseRouter::SetSelectedMask(int mask)
 {
-   int oldMask = mRouteMask;
    mRouteMask = mask;
-   //RadioButtonUpdated(mRouteSelector, oldMask, NextBufferTime(false));
 }
 
 bool PulseRouter::IsIndexActive(int idx) const
 {
    if (mRadioButtonMode)
       return mRouteMask == idx;
-   else
-      return mRouteMask & (1 << idx);
+   return mRouteMask & (1 << idx);
 }
 
 void PulseRouter::OnPulse(double time, float velocity, int flags)

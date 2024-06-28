@@ -29,9 +29,7 @@
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "ModulationChain.h"
-#include "Transport.h"
 #include "PerlinNoise.h"
 
 struct UnstablePerlinModulation

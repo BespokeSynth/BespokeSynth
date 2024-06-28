@@ -24,7 +24,6 @@
 //
 
 #include "NoteCanvas.h"
-#include "IAudioSource.h"
 #include "SynthGlobals.h"
 #include "DrumPlayer.h"
 #include "ModularSynth.h"
@@ -32,7 +31,6 @@
 #include "Scale.h"
 #include "CanvasElement.h"
 #include "Profiler.h"
-#include "PolyphonyMgr.h"
 #include "CanvasTimeline.h"
 #include "CanvasScrollbar.h"
 

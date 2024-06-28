@@ -91,8 +91,8 @@ void SlowLayers::Process(double time)
       mBuffer[offset % loopLengthInSamples] += GetBuffer()->GetChannel(0)[i] * mFeedIn;
 
       float output = (1 - mFeedIn) * GetBuffer()->GetChannel(0)[i];
-      for (int i = 0; i < layers; ++i)
-         output += GetInterpolatedSample(offset / float(1 << i), mBuffer, loopLengthInSamples);
+      for (int j = 0; j < layers; ++j)
+         output += GetInterpolatedSample(offset / float(1 << j), mBuffer, loopLengthInSamples);
 
       output *= volSq;
 

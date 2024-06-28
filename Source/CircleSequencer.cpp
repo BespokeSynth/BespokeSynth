@@ -213,6 +213,9 @@ void CircleSequencerRing::Draw()
       case 3:
          ofSetColor(150, 150, 255);
          break;
+      default:
+         ofSetColor(255, 255, 255);
+         break;
    }
 
    ofSetCircleResolution(40);

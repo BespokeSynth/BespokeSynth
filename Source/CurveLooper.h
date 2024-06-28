@@ -30,7 +30,6 @@
 #include "Checkbox.h"
 #include "Transport.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "EnvelopeEditor.h"
 
 class PatchCableSource;
