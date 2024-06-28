@@ -30,7 +30,6 @@
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "ClickButton.h"
 
 class SignalClamp : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
 {

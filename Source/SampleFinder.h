@@ -27,13 +27,11 @@
 
 #include <iostream>
 #include "IAudioSource.h"
-#include "EnvOscillator.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Transport.h"
 #include "ClickButton.h"
 #include "SampleDrawer.h"
 

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "Ramp.h"
 
 #define JUMP_BLEND_SAMPLES 100

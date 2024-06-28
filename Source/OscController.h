@@ -25,10 +25,8 @@
 
 #pragma once
 
-#include <iostream>
 #include "MidiDevice.h"
 #include "INonstandardController.h"
-#include "ofxJSONElement.h"
 
 #include "juce_osc/juce_osc.h"
 

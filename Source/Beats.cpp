@@ -75,7 +75,6 @@ void Beats::Process(double time)
    mWriteBuffer.SetNumActiveChannels(numChannels);
 
    int bufferSize = target->GetBuffer()->BufferSize();
-   float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();

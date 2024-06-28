@@ -30,7 +30,6 @@
 #include "IAudioProcessor.h"
 #include "EnvOscillator.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 #include "DropdownList.h"
 #include "ClickButton.h"

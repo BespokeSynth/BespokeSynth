@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-#include "Ramp.h"
 #include "BiquadFilter.h"
 #include "ChannelBuffer.h"
 

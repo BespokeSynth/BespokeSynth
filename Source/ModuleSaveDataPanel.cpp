@@ -130,8 +130,8 @@ void ModuleSaveDataPanel::ReloadSaveData()
             {
                DropdownList* dropdown = new DropdownList(this, "", x, y, &(save->mInt));
                control = dropdown;
-               for (auto iter = save->mEnumValues.begin(); iter != save->mEnumValues.end(); ++iter)
-                  dropdown->AddLabel(iter->first.c_str(), iter->second);
+               for (auto value_iter = save->mEnumValues.begin(); value_iter != save->mEnumValues.end(); ++value_iter)
+                  dropdown->AddLabel(value_iter->first.c_str(), value_iter->second);
             }
             else if (save->mIsTextField)
             {

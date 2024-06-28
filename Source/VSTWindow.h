@@ -55,9 +55,6 @@ public:
 
    static VSTWindow* CreateVSTWindow(VSTPlugin* vst, WindowFormatType);
 
-   static void closeCurrentlyOpenWindowsFor(const juce::uint32 nodeId);
-   static void closeAllCurrentlyOpenWindows();
-
    void moved() override;
    void closeButtonPressed() override;
 

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include "OpenFrameworksPort.h"
 #include "ModularSynth.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"

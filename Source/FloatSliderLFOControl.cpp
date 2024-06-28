@@ -273,6 +273,7 @@ void FloatSliderLFOControl::RandomizeSettings()
       case 5: mLFOSettings.mInterval = kInterval_8n; break;
       case 6: mLFOSettings.mInterval = kInterval_8nt; break;
       case 7:
+      default:
          mLFOSettings.mInterval = kInterval_Free;
          mLFOSettings.mFreeRate = ofRandom(.1f, 20);
          break;
@@ -552,12 +553,10 @@ void LFOSettings::SaveState(FileStreamOut& out) const
 void LFOSettings::LoadState(FileStreamIn& in)
 {
    int rev = 0;
-   bool isDataRevved = false;
    int temp;
    in >> temp;
    if (temp == kFixNonRevvedData) //hack to fix data that I didn't revision
    {
-      isDataRevved = true;
       in >> rev;
       LoadStateValidate(rev <= kSaveStateRev);
       in >> temp;

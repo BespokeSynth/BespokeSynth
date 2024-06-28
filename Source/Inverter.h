@@ -30,8 +30,6 @@
 #include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
-#include "Slider.h"
-#include "ClickButton.h"
 
 class Inverter : public IAudioProcessor, public IDrawableModule
 {

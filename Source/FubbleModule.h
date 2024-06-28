@@ -33,7 +33,6 @@
 #include "Transport.h"
 #include "DropdownList.h"
 #include "Curve.h"
-#include "Checkbox.h"
 #include "IModulator.h"
 #include "Slider.h"
 #include "PerlinNoise.h"

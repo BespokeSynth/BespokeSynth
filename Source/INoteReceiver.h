@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include "OpenFrameworksPort.h"
 #include "ModulationChain.h"
 
 namespace juce

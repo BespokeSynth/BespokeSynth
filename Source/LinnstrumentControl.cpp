@@ -27,15 +27,15 @@
 
 #include "LinnstrumentControl.h"
 #include "SynthGlobals.h"
-#include "IAudioSource.h"
 #include "ModularSynth.h"
-#include "FillSaveDropdown.h"
 #include "ModulationChain.h"
 #include "PolyphonyMgr.h"
 #include "MidiController.h"
-#if BESPOKE_LINUX | BESPOKE_MAC
-#include <unistd.h>
-#endif
+#include "ableton/Link.hpp"
+#include <chrono>
+#include <thread>
+
+using namespace std::chrono_literals;
 
 LinnstrumentControl::LinnstrumentControl()
 : mDevice(this)
@@ -274,21 +274,13 @@ void LinnstrumentControl::SendScaleInfo()
          int number = setMainNoteBase + pitch;
          SendNRPN(number, TheScale->IsInScale(pitch));
 
-#if BESPOKE_WINDOWS
-         _sleep(10);
-#else
-         usleep(10000);
-#endif
+         std::this_thread::sleep_for(10ms);
 
          //set accent note
          number = setAccentNoteBase + pitch;
          SendNRPN(number, TheScale->IsRoot(pitch));
 
-#if BESPOKE_WINDOWS
-         _sleep(10);
-#else
-         usleep(10000);
-#endif
+         std::this_thread::sleep_for(10ms);
       }
    }
 }

@@ -28,7 +28,6 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 
 class Neighborhooder : public NoteEffectBase, public IDrawableModule, public IIntSliderListener

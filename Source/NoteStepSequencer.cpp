@@ -27,7 +27,6 @@
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
-#include "NoteStepSequencer.h"
 #include "LaunchpadInterpreter.h"
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
@@ -1221,6 +1220,7 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
          {
             switch (gRandom() % 5)
             {
+               default:
                case 0:
                   mTones[i] = 0;
                   break;

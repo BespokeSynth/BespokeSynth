@@ -27,12 +27,9 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "ClickButton.h"
-#include "RollingBuffer.h"
 
 class TakeRecorder : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener
 {

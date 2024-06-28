@@ -32,10 +32,7 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
-#include "EnvOscillator.h"
 #include "Ramp.h"
-#include "ClickButton.h"
 #include "VSTPlayhead.h"
 #include "VSTWindow.h"
 

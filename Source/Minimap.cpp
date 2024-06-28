@@ -172,7 +172,6 @@ void Minimap::DrawModule()
    float width;
    float height;
    ofRectangle boundingBox;
-   ofRectangle boundingBoxMM;
    ofRectangle viewport = TheSynth->GetDrawRect();
    ForcePosition();
    ComputeBoundingBox(boundingBox);

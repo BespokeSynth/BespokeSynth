@@ -29,7 +29,6 @@
 #include "IAudioSource.h"
 #include "PolyphonyMgr.h"
 #include "SingleOscillatorVoice.h"
-#include "ADSR.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"

@@ -110,7 +110,7 @@ private:
    IntSlider* mRowOffsetSlider{ nullptr };
    ClickButton* mDoubleButton{ nullptr };
 
-   DotGrid* mDotGrid;
+   DotGrid* mDotGrid{ nullptr };
 
    struct PlayingDot
    {

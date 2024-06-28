@@ -84,7 +84,7 @@ void GroupControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    for (auto& mControlCable : mControlCables)
    {
-      IUIControl* uicontrol = nullptr;
+      IUIControl* uicontrol{ nullptr };
       for (auto& cable : mControlCable->GetPatchCables())
       {
          if (cable->GetTarget())

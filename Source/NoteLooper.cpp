@@ -24,7 +24,6 @@
 //
 
 #include "NoteLooper.h"
-#include "IAudioSource.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "MidiController.h"

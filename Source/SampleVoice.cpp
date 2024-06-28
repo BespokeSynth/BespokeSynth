@@ -24,7 +24,6 @@
 //
 
 #include "SampleVoice.h"
-#include "EnvOscillator.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "Profiler.h"

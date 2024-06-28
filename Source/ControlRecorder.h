@@ -33,10 +33,8 @@
 #include "Transport.h"
 #include "DropdownList.h"
 #include "Curve.h"
-#include "Checkbox.h"
 #include "IModulator.h"
 #include "Slider.h"
-#include "PerlinNoise.h"
 
 class PatchCableSource;
 
@@ -88,7 +86,6 @@ public:
 private:
    float GetPlaybackTime(double time);
    void RecordPoint();
-   bool IsHovered();
    void Clear();
 
    //IDrawableModule

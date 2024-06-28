@@ -32,7 +32,6 @@
 #include "Slider.h"
 #include "IModulator.h"
 #include "Transport.h"
-#include "Ramp.h"
 
 class PatchCableSource;
 

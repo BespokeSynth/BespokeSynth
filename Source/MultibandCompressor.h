@@ -29,7 +29,6 @@
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "ClickButton.h"
 #include "RollingBuffer.h"
 #include "LinkwitzRileyFilter.h"
 #include "PeakTracker.h"

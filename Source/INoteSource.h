@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include "OpenFrameworksPort.h"
 #include "INoteReceiver.h"
 #include "IPatchable.h"
 

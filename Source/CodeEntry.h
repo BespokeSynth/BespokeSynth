@@ -29,7 +29,6 @@
 
 #include "IUIControl.h"
 #include "SynthGlobals.h"
-#include "TextEntry.h"
 
 class ICodeEntryListener
 {

@@ -55,6 +55,6 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
 
-   char mComment[MAX_TEXTENTRY_LENGTH]{};
+   std::string mComment{};
    TextEntry* mCommentEntry{ nullptr };
 };

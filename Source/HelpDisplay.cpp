@@ -598,12 +598,12 @@ void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, std::str
    juce::gl::glPixelStorei(juce::gl::GL_PACK_ALIGNMENT, oldAlignment);
 
    juce::Image image(juce::Image::RGB, width, height, true);
-   for (int x = 0; x < width; ++x)
+   for (int ix = 0; ix < width; ++ix)
    {
-      for (int y = 0; y < height; ++y)
+      for (int iy = 0; iy < height; ++iy)
       {
-         int pos = (x + (height - 1 - y) * width) * 3;
-         image.setPixelAt(x, y, juce::Colour(pixels[pos], pixels[pos + 1], pixels[pos + 2]));
+         int pos = (ix + (height - 1 - iy) * width) * 3;
+         image.setPixelAt(ix, iy, juce::Colour(pixels[pos], pixels[pos + 1], pixels[pos + 2]));
       }
    }
 

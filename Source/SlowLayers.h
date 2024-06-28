@@ -33,7 +33,6 @@
 #include "RadioButton.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 
 class SlowLayers : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener
 {

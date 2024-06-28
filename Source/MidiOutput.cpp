@@ -25,7 +25,6 @@
 
 #include "MidiOutput.h"
 #include "SynthGlobals.h"
-#include "IAudioSource.h"
 #include "ModularSynth.h"
 #include "FillSaveDropdown.h"
 #include "ModulationChain.h"

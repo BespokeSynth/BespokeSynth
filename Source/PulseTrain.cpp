@@ -154,16 +154,16 @@ void PulseTrain::Step(double time, float velocity, int flags)
    {
       float v = mVels[mStep] * velocity;
 
-      int flags = 0;
+      int new_flags = 0;
       if (mResetOnStart && mStep == 0)
-         flags = kPulseFlag_Reset;
+         new_flags = kPulseFlag_Reset;
 
       if (v > 0)
       {
-         DispatchPulse(GetPatchCableSource(), time, v, flags);
+         DispatchPulse(GetPatchCableSource(), time, v, new_flags);
 
          if (mStep < kIndividualStepCables)
-            DispatchPulse(mStepCables[mStep], time, v, flags);
+            DispatchPulse(mStepCables[mStep], time, v, new_flags);
       }
    }
 

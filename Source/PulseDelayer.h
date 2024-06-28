@@ -80,7 +80,7 @@ private:
    float mDelay{ .25 };
    FloatSlider* mDelaySlider{ nullptr };
 
-   float mLastPulseTime;
+   float mLastPulseTime{ 0 };
 
    static const int kQueueSize = 50;
    PulseInfo mInputPulses[kQueueSize]{};
