@@ -243,8 +243,6 @@ target_sources(BespokeSynth PRIVATE
     KarplusStrong.h
     KarplusStrongVoice.cpp
     KarplusStrongVoice.h
-    QwertyToPitchMapping.cpp
-    QwertyToPitchMapping.h
     KeyboardDisplay.cpp
     KeyboardDisplay.h
     Kicker.cpp
@@ -557,6 +555,8 @@ target_sources(BespokeSynth PRIVATE
     QuickSpawnMenu.h
     QwertyController.cpp
     QwertyController.h
+    QwertyToPitchMapping.cpp
+    QwertyToPitchMapping.h
     RadioButton.cpp
     RadioButton.h
     RadioSequencer.cpp
@@ -599,6 +599,8 @@ target_sources(BespokeSynth PRIVATE
     Sampler.h
     SamplerGrid.cpp
     SamplerGrid.h
+    SaveStateLoader.cpp
+    SaveStateLoader.h
     Scale.cpp
     Scale.h
     ScaleDegree.cpp
