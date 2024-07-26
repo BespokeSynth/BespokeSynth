@@ -186,6 +186,7 @@ struct UIControlConnection
 
    //state
    int mLastControlValue{ -1 };
+   std::string mLastDisplayValue{ "" };
    double mLastActivityTime{ -9999 };
    MidiController* mUIOwner{ nullptr };
 
@@ -339,6 +340,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    void OnCableGrabbed(PatchCableSource* cableSource) override;
    void SendControllerInfoString(int control, int type, std::string str);
+   bool ShouldSendControllerInfoStrings() const { return mShouldSendControllerInfoStrings; }
 
    ControlLayoutElement& GetLayoutControl(int control, MidiMessageType type);
 
@@ -432,6 +434,7 @@ private:
    TextEntry* mOscInPortEntry{ nullptr };
    int mMonomeDeviceIndex{ -1 };
    DropdownList* mMonomeDeviceDropdown{ nullptr };
+   bool mShouldSendControllerInfoStrings{ false };
 
    int mControllerIndex{ -1 };
    double mLastActivityTime{ -9999 };
