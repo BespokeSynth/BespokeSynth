@@ -1456,6 +1456,7 @@ drumplayer~sample player intended for drum playback
 ~quantize~quantize input to this interval
 ~repeat~if quantizing, should held notes repeat at that interval?
 ~full vel~always play drum hits at full velocity
+~single voice~only play a single drum hit at once, choking all others out (as if they all shared the same linkid)
 ~vol *~volume of sample 
 ~speed *~speed of sample
 ~pan *~stereo pan position of sample
@@ -2114,3 +2115,7 @@ euclideansequencer~euclidean sequencer displays a loop as a circle. the notes ar
 ~note~randomize notes in all rings
 ~note*~pitch to use for this ring
 ~clear~clear all steps, onsets, rotation and offset in all rings
+
+
+savestateloader~loads other savestate files (and unloads the current savestate). the number of buttons can be adjusted in the triangle menu.
+~load *~loads specified savestate file. shift-click to choose a new file.
