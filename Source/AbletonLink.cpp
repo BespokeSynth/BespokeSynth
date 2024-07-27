@@ -104,7 +104,6 @@ void AbletonLink::OnTransportAdvanced(float amount)
       if (deviceManager.getCurrentAudioDevice() != nullptr)
       {
          auto sampleRate = deviceManager.getCurrentAudioDevice()->getCurrentSampleRate();
-         auto outputLatencySamples = deviceManager.getCurrentAudioDevice()->getOutputLatencyInSamples();
          auto bufferSize = deviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples();
 
          const auto hostTimeUs = sHostTimeFilter.sampleTimeToHostTime(mSampleTime);

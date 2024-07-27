@@ -30,7 +30,6 @@
 #include "Scale.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "UIControlMacros.h"
 
 NoteSorter::NoteSorter()
 {

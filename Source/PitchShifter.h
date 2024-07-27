@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "FFT.h"
 #include "RollingBuffer.h"
 

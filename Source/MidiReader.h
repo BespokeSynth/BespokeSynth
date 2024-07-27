@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include "OpenFrameworksPort.h"
-
 //TODO_PORT(Ryan) make this work
 
 class MidiReader

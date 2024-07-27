@@ -25,10 +25,8 @@
 
 #pragma once
 
-#include <stdio.h>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 
 class PitchSetter : public NoteEffectBase, public IDrawableModule, public IIntSliderListener

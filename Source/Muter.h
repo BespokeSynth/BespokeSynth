@@ -27,7 +27,6 @@
 
 #include <iostream>
 #include "IAudioEffect.h"
-#include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "Ramp.h"
 #include "Slider.h"

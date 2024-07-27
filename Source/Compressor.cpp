@@ -201,7 +201,7 @@ void EnvelopeDetector::setTc(double ms)
 }
 
 //-------------------------------------------------------------
-void EnvelopeDetector::setCoef(void)
+void EnvelopeDetector::setCoef()
 {
    coef_ = exp(-1000.0 / (ms_ * gSampleRate));
 }

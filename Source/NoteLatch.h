@@ -28,8 +28,6 @@
 #pragma once
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
-#include "TextEntry.h"
 
 class NoteLatch : public NoteEffectBase, public IDrawableModule
 {

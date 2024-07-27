@@ -82,7 +82,7 @@ void VelocityCurve::PlayNote(double time, int pitch, int velocity, int voiceIdx,
          ComputeSliders(0);
          ADSR::EventInfo adsrEvent(0, kAdsrTime);
          float val = ofClamp(mAdsr.Value(velocity / 127.0f * kAdsrTime, &adsrEvent), 0, 1);
-         if (val != val)
+         if (std::isnan(val))
             val = 0;
          velocity = val * 127;
          if (velocity <= 0)

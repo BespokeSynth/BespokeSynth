@@ -25,10 +25,8 @@
 
 #pragma once
 
-#include "OpenFrameworksPort.h"
 #include "MidiDevice.h"
 #include "INonstandardController.h"
-#include "Oscillator.h"
 
 #include "juce_osc/juce_osc.h"
 

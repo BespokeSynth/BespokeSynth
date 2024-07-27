@@ -51,7 +51,7 @@ void BiquadFilter::SetFilterParams(double f, double q)
 
 void BiquadFilter::UpdateFilterCoeff()
 {
-   if (mF <= 0 || mF != mF)
+   if (mF <= 0 || std::isnan(mF))
    {
       mA0 = 1;
       mA1 = 0;

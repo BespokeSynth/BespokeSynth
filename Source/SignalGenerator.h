@@ -31,7 +31,6 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "EnvOscillator.h"
 #include "Ramp.h"
 #include "IPulseReceiver.h"

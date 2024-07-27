@@ -50,8 +50,6 @@ public:
    bool HasInput() const override;
    bool IsConnected() const override { return true; }
 
-   void SetTarget(IClickable* target);
-
    void OnControllerPageSelected() override {}
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 

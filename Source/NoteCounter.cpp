@@ -26,7 +26,6 @@
 */
 
 #include "NoteCounter.h"
-#include "IAudioSource.h"
 #include "SynthGlobals.h"
 #include "DrumPlayer.h"
 #include "ModularSynth.h"

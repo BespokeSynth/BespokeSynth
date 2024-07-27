@@ -28,7 +28,6 @@
 #include "Scale.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "Transport.h"
 
 MacroSlider::MacroSlider()
 {

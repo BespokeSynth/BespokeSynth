@@ -26,7 +26,6 @@
 #include "CanvasControls.h"
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
-#include "Profiler.h"
 #include "ModularSynth.h"
 #include "Canvas.h"
 #include "CanvasElement.h"

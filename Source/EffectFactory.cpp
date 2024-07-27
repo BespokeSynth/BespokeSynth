@@ -43,7 +43,6 @@
 #include "EQEffect.h"
 //#include "AudioUnitEffect.h"
 #include "PitchShiftEffect.h"
-#include "FormantFilterEffect.h"
 #include "ButterworthFilterEffect.h"
 #include "GainStageEffect.h"
 

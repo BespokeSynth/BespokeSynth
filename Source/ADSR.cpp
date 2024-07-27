@@ -28,7 +28,6 @@
 #include "MathUtils.h"
 #include "FileStream.h"
 #include "SynthGlobals.h"
-#include "Profiler.h"
 
 void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
 {
@@ -99,11 +98,6 @@ void ::ADSR::Stop(double time, bool warn /*= true*/)
 
    e->mStopBlendFromValue = Value(time);
 
-   /*if (time - mStartTime < 10)
-   {
-      ofLog() << "**********************short adsr: " << (time - mStartTime);
-   }*/
-
    if (time <= e->mStartTime)
    {
       if (warn)
@@ -151,11 +145,6 @@ float ::ADSR::Value(double time) const
 
 float ::ADSR::Value(double time, const EventInfo* e) const
 {
-   //if (mStartTime < 0)
-   //   return 0;
-
-   //PROFILER(ADSR_Value);
-
    float stageStartValue;
    double stageStartTime;
    int stage = GetStage(time, stageStartTime, e);

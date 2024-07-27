@@ -29,7 +29,6 @@
 #include "Profiler.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "MathUtils.h"
 
 ModulatorSmoother::ModulatorSmoother()
 {

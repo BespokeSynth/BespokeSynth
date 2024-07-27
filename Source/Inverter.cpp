@@ -47,7 +47,6 @@ void Inverter::Process(double time)
 {
    PROFILER(Inverter);
 
-   ComputeSliders(0);
    SyncBuffers();
 
    IAudioReceiver* target = GetTarget();

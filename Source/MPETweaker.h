@@ -30,7 +30,6 @@
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "ModulationChain.h"
 
 class MPETweaker : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener

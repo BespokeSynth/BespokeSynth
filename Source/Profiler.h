@@ -26,7 +26,6 @@
 #pragma once
 
 #include "OpenFrameworksPort.h"
-#include "SynthGlobals.h"
 
 #define PROFILER_HISTORY_LENGTH 500
 #define PROFILER_MAX_TRACK 100

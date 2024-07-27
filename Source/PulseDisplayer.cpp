@@ -27,7 +27,6 @@
 
 #include "PulseDisplayer.h"
 #include "SynthGlobals.h"
-#include "UIControlMacros.h"
 #include "Transport.h"
 
 PulseDisplayer::PulseDisplayer()

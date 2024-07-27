@@ -28,7 +28,6 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 
 class VelocitySetter : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener

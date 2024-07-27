@@ -84,52 +84,49 @@ void KeyboardDisplay::OnClicked(float x, float y, bool right)
       return;
 
    double time = NextBufferTime(false);
-   for (int i = 0; i < NumKeys(); ++i)
+   for (int pass = 0; pass < 2; ++pass)
    {
-      for (int pass = 0; pass < 2; ++pass)
+      for (int i = 0; i < NumKeys(); ++i)
       {
-         for (int i = 0; i < NumKeys(); ++i)
+         bool isBlackKey;
+         if (GetKeyboardKeyRect(i + RootKey(), mWidth, mHeight - kKeyboardYOffset, isBlackKey).contains(x, y - kKeyboardYOffset))
          {
-            bool isBlackKey;
-            if (GetKeyboardKeyRect(i + RootKey(), mWidth, mHeight - kKeyboardYOffset, isBlackKey).contains(x, y - kKeyboardYOffset))
+            if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
             {
-               if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
+               int pitch = i + RootKey();
+
+               float minVelocityY;
+               float maxVelocityY;
+
+               if (isBlackKey)
                {
-                  int pitch = i + RootKey();
-
-                  float minVelocityY;
-                  float maxVelocityY;
-
-                  if (isBlackKey)
-                  {
-                     minVelocityY = 0;
-                     maxVelocityY = (mHeight / 2) * .9f;
-                  }
-                  else
-                  {
-                     minVelocityY = mHeight / 2;
-                     maxVelocityY = mHeight * .9f;
-                  }
-
-                  int noteVelocity = 127;
-                  if (mGetVelocityFromClickHeight)
-                     noteVelocity = (int)ofMap(y, minVelocityY, maxVelocityY, 20, 127, K(clamp));
-
-                  if (mPlayingMousePitch == -1 || !mLatch)
-                  {
-                     PlayNote(time, pitch, noteVelocity);
-                     mPlayingMousePitch = pitch;
-                  }
-                  else
-                  {
-                     bool newNote = (mPlayingMousePitch != pitch);
-                     if (newNote)
-                        PlayNote(time, pitch, noteVelocity);
-                     PlayNote(time, mPlayingMousePitch, 0);
-                     mPlayingMousePitch = newNote ? pitch : -1;
-                  }
-                  return;
+                  minVelocityY = 0;
+                  maxVelocityY = (mHeight / 2) * .9f;
                }
+               else
+               {
+                  minVelocityY = mHeight / 2;
+                  maxVelocityY = mHeight * .9f;
+               }
+
+               int noteVelocity = 127;
+               if (mGetVelocityFromClickHeight)
+                  noteVelocity = (int)ofMap(y, minVelocityY, maxVelocityY, 20, 127, K(clamp));
+
+               if (mPlayingMousePitch == -1 || !mLatch)
+               {
+                  PlayNote(time, pitch, noteVelocity);
+                  mPlayingMousePitch = pitch;
+               }
+               else
+               {
+                  bool newNote = (mPlayingMousePitch != pitch);
+                  if (newNote)
+                     PlayNote(time, pitch, noteVelocity);
+                  PlayNote(time, mPlayingMousePitch, 0);
+                  mPlayingMousePitch = newNote ? pitch : -1;
+               }
+               return;
             }
          }
       }

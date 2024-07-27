@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "OpenFrameworksPort.h"
 #include "IMidiVoice.h"
 #include "IVoiceParams.h"

@@ -31,7 +31,6 @@
 #include "ModularSynth.h"
 #include "Sample.h"
 #include "Profiler.h"
-#include "EnvOscillator.h"
 #include "Scale.h"
 
 Sampler::Sampler()

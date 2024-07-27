@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <iostream>
-#include <fstream>
 #include <json/json.h>
 #include "OpenFrameworksPort.h"
 
@@ -28,13 +26,4 @@ public:
    bool open(std::string filename);
    bool save(std::string filename, bool pretty = false);
    std::string getRawString(bool pretty = true);
-
-
-   // static
-   static std::string decodeURL(std::string& str);
-   /*static string decodeEntities(string& str) {
-      char dest[ str.length() ];
-      decode_html_entities_utf8(dest, str.c_str());
-      return string( dest );
-   }*/
 };

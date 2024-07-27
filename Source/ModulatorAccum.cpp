@@ -30,7 +30,6 @@
 #include "Profiler.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "MathUtils.h"
 #include "UIControlMacros.h"
 
 ModulatorAccum::ModulatorAccum()

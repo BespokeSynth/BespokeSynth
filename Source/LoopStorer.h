@@ -32,7 +32,6 @@
 #include "DropdownList.h"
 #include "Transport.h"
 #include "ClickButton.h"
-#include "Transport.h"
 #include "OpenFrameworksPort.h"
 
 class Sample;

@@ -1,6 +1,5 @@
 #include "ModularSynth.h"
 #include "IAudioSource.h"
-#include "IAudioEffect.h"
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
@@ -20,7 +19,6 @@
 #include "fenv.h"
 #include <stdlib.h>
 #include "GridController.h"
-#include "PerformanceTimer.h"
 #include "FileStream.h"
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
@@ -1373,7 +1371,6 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
 
-   ofVec2f drag = ofVec2f(x, y) - mLastMouseDragPos;
    mLastMouseDragPos = ofVec2f(x, y);
 
    if (button == 3)
@@ -1418,9 +1415,9 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
 
    if (mGroupSelectContext != nullptr)
    {
-      float x = GetMouseX(mGroupSelectContext);
-      float y = GetMouseY(mGroupSelectContext);
-      ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, x), MIN(mClickStartY, y)), ofPoint(MAX(mClickStartX, x), MAX(mClickStartY, y)));
+      const float gx = GetMouseX(mGroupSelectContext);
+      const float gy = GetMouseY(mGroupSelectContext);
+      ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, gx), MIN(mClickStartY, gy)), ofPoint(MAX(mClickStartX, gx), MAX(mClickStartY, gy)));
       if (rect.width > 10 || rect.height > 10)
       {
          mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules);

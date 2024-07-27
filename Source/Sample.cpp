@@ -212,7 +212,7 @@ bool Sample::ConsumeData(double time, ChannelBuffer* out, int size, bool replace
    if (mLooping && mOffset >= mNumSamples)
       mOffset -= mNumSamples;
 
-   if (mOffset >= end || mOffset != mOffset)
+   if (mOffset >= end || std::isnan(mOffset))
    {
       mPlayMutex.unlock();
       return false;

@@ -36,7 +36,6 @@
 #include <vector>
 #include <algorithm>
 #include <array>
-#include <math.h>
 #include <cctype>
 #include <random>
 #include <float.h>

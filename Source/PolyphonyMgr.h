@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "ChannelBuffer.h"
 

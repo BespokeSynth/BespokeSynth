@@ -405,7 +405,6 @@ void VSTPlugin::GetVSTFileDesc(std::string vstName, juce::PluginDescription& des
          juce::String thisVstName = juce::String(types[i].fileOrIdentifier).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
          if (thisVstName == desiredVstName)
          {
-            found = true;
             desc = types[i];
             break;
          }

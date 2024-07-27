@@ -28,7 +28,6 @@
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 
 class WhiteKeys : public NoteEffectBase, public IDrawableModule
 {

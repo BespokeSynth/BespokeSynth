@@ -27,9 +27,10 @@
 
 #pragma once
 
-#include "SynthGlobals.h"
 #include <numeric>
 #include <set>
+#include <string>
+#include <vector>
 
 class ChordDatabase
 {
