@@ -37,12 +37,8 @@
 #undef ssize_t
 #endif
 
-#include "leathers/push"
-#include "leathers/unused-value"
-#include "leathers/range-loop-analysis"
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
-#include "leathers/pop"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
