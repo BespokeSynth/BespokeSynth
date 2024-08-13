@@ -147,7 +147,7 @@ void TextEntry::Render()
          if (mCaretPosition > 0)
          {
             char beforeCaret[MAX_TEXTENTRY_LENGTH];
-            strncpy_s(beforeCaret, mCaretPosition, mString, mCaretPosition);
+            strncpy(beforeCaret, mString, mCaretPosition);
             beforeCaret[mCaretPosition] = 0;
             caretX += gFontFixedWidth.GetStringWidth(beforeCaret, 12);
          }
@@ -175,13 +175,13 @@ void TextEntry::Render()
       //
       int start = MIN(mCaretPosition, mCaretPosition2);
       char selectionTmp[MAX_TEXTENTRY_LENGTH];
-      strncpy_s(selectionTmp, start, mString, start);
+      strncpy(selectionTmp, mString, start);
       selectionTmp[start] = 0;
       selStartX += gFontFixedWidth.GetStringWidth(selectionTmp, 12);
 
       //
       int end = MAX(mCaretPosition, mCaretPosition2);
-      strncpy_s(selectionTmp, end, mString, end);
+      strncpy(selectionTmp, mString, end);
       selectionTmp[end] = 0;
       selEndX += gFontFixedWidth.GetStringWidth(selectionTmp, 12);
 
@@ -236,7 +236,7 @@ void TextEntry::OnClicked(float x, float y, bool right)
 
       char caretCheck[MAX_TEXTENTRY_LENGTH];
       size_t checkLength = strnlen(mString, MAX_TEXTENTRY_LENGTH);
-      strncpy_s(caretCheck, checkLength, mString, checkLength);
+      strncpy(caretCheck, mString, checkLength);
       int lastSubstrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 12);
       for (int i = (int)checkLength - 1; i >= 0; --i)
       {
@@ -611,7 +611,7 @@ void TextEntry::AcceptEntry(bool pressedEnter)
       StringCopy(mVarCString, mString, MAX_TEXTENTRY_LENGTH);
    if (mVarString)
       *mVarString = mString;
-   if (mVarInt && std::strlen(mString) > 0)
+   if (mVarInt && mString[0] != 0)
    {
       *mVarInt = ofClamp(ofToInt(mString), mIntMin, mIntMax);
       StringCopy(mString, ofToString(*mVarInt).c_str(), MAX_TEXTENTRY_LENGTH);

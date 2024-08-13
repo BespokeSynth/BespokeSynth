@@ -31,7 +31,6 @@
 #include "ModulationChain.h"
 #include "PolyphonyMgr.h"
 #include "MidiController.h"
-#include "ableton/Link.hpp"
 #include <chrono>
 #include <thread>
 
