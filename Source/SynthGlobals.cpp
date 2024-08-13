@@ -549,7 +549,7 @@ void StringCopy(char* dest, const char* source, int destLength)
 {
    if (dest == source)
       return;
-   strncpy_s(dest, destLength, source, destLength);
+   strncpy(dest, source, destLength);
    dest[destLength - 1] = 0;
 }
 

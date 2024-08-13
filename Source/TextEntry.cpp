@@ -278,7 +278,7 @@ void TextEntry::RemoveSelectedText()
    int caretStart = MAX(0, MIN(mCaretPosition, mCaretPosition2));
    int caretEnd = MIN(strlen(mString), MAX(mCaretPosition, mCaretPosition2));
    std::string newString = mString;
-   strcpy_s(mString, MAX_TEXTENTRY_LENGTH, (newString.substr(0, caretStart) + newString.substr(caretEnd)).c_str());
+   strcpy(mString, (newString.substr(0, caretStart) + newString.substr(caretEnd)).c_str());
    MoveCaret(caretStart, false);
 }
 
@@ -412,7 +412,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       juce::String clipboard = TheSynth->GetTextFromClipboard();
 
       std::string newString = mString;
-      strcpy_s(mString, MAX_TEXTENTRY_LENGTH, (newString.substr(0, mCaretPosition) + clipboard.toStdString() + newString.substr(mCaretPosition)).c_str());
+      strcpy(mString, (newString.substr(0, mCaretPosition) + clipboard.toStdString() + newString.substr(mCaretPosition)).c_str());
       if (UserPrefs.immediate_paste.Get())
          AcceptEntry(true);
       else
