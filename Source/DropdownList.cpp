@@ -222,9 +222,9 @@ void DropdownList::Render()
 
       ofPushStyle();
       ofFill();
-      color = IDrawableModule::GetColor(GetModuleParent()->GetModuleCategory());
-      color.a = 80;
-      ofSetColor(color);
+      ofColor categoryColor = IDrawableModule::GetColor(GetModuleParent()->GetModuleCategory());
+      categoryColor.a = 80;
+      ofSetColor(categoryColor);
       ofRect(mX, mY, pw, mHeight);
       ofPopStyle();
    }

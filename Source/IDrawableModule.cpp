@@ -117,7 +117,7 @@ void IDrawableModule::Init()
    assert(mCanReceivePulses == (dynamic_cast<IPulseReceiver*>(this) != nullptr));
 
    bool wasEnabled = IsEnabled();
-   bool showEnableToggle{ false };
+   bool showEnableToggle = false;
    SetEnabled(!wasEnabled);
    if (IsEnabled() == wasEnabled) //nothing changed
       showEnableToggle = false; //so don't show toggle, this module doesn't support it
@@ -429,6 +429,7 @@ void IDrawableModule::Render()
    {
       ofSetColor(GetColor(kModuleCategory_Pulse));
       ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    ofPopStyle();
 

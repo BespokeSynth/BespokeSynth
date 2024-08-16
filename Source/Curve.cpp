@@ -97,7 +97,7 @@ float Curve::Evaluate(float time, bool holdEndForLoop)
             return mPoints[0].mValue;
       }
 
-      int beforeIndex{ 0 };
+      int beforeIndex = 0;
       int quickCheckIndex = mLastEvalIndex;
       if (quickCheckIndex < mNumCurvePoints &&
           mPoints[quickCheckIndex].mTime < time &&

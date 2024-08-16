@@ -124,8 +124,8 @@ void ADSRDisplay::Render()
           mAdjustMode == kAdjustRelease ||
           mAdjustMode == kAdjustReleaseAR)
       {
-         float startTime{ 0 };
-         float endTime{ 999 };
+         float startTime = 0;
+         float endTime = 999;
 
          if (mAdjustMode == kAdjustAttack || mAdjustMode == kAdjustAttackAR)
          {

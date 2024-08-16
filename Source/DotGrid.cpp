@@ -145,9 +145,9 @@ void DotGrid::Render()
             {
                if (mDragBehavior == DragBehavior::Velocity)
                {
-                  data = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
+                  DotData& currentHoverData = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
                   ofSetColor(0, 255, 0);
-                  DrawTextNormal(ofToString(data.mVelocity, 2), GetX(i), GetY(j), 8.0f);
+                  DrawTextNormal(ofToString(currentHoverData.mVelocity, 2), GetX(i), GetY(j), 8.0f);
                }
             }
             else

@@ -115,8 +115,8 @@ void GridControllerMidi::OnControllerPageSelected()
 
 void GridControllerMidi::OnInput(int control, float velocity)
 {
-   int x{ 0 };
-   int y{ 0 };
+   int x = 0;
+   int y = 0;
    bool found = false;
    for (x = 0; x < mCols; ++x)
    {

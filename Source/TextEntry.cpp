@@ -97,8 +97,8 @@ TextEntry::~TextEntry()
 
 void TextEntry::Delete()
 {
-   if (GetActiveKeyboardFocus() == this)
-      ClearActiveKeyboardFocus(false);
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
+      IKeyboardFocusListener::ClearActiveKeyboardFocus(false);
    delete this;
 }
 
