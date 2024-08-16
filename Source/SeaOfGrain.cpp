@@ -57,7 +57,6 @@ void SeaOfGrain::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mLoadButton = new ClickButton(this, "load", 5, 3);
    mRecordInputCheckbox = new Checkbox(this, "record", 50, 3, &mRecordInput);
-   mDisplayCheckbox = new Checkbox(this, "display", 105, 3, &mShouldDisplay);
    mVolumeSlider = new FloatSlider(this, "volume", 5, 20, 150, 15, &mVolume, 0, 2);
    mDisplayOffsetSlider = new FloatSlider(this, "offset", 5, 40, 150, 15, &mDisplayOffset, 0, 10);
    mDisplayLengthSlider = new FloatSlider(this, "display length", 5, 60, 150, 15, &mDisplayLength, 1, 10);
@@ -164,7 +163,6 @@ void SeaOfGrain::DrawModule()
 
    mLoadButton->Draw();
    mRecordInputCheckbox->Draw();
-   mDisplayCheckbox->Draw();
    mVolumeSlider->Draw();
    mDisplayOffsetSlider->Draw();
    mDisplayLengthSlider->Draw();
@@ -200,8 +198,7 @@ void SeaOfGrain::DrawModule()
       {
          mSample->LockDataMutex(true);
          DrawAudioBuffer(mBufferW, mBufferH, mSample->Data(), mDisplayStartSamples, mDisplayEndSamples, 0);
-         if (mShouldDisplay)
-            DrawTextNormal(std::string(mSample->Name()), 5, 10);
+         DrawTextNormal(std::string(mSample->Name()), 5, 10);
          mSample->LockDataMutex(false);
       }
 
