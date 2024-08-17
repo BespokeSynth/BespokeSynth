@@ -166,6 +166,8 @@ private:
    int mSelectedHitIdx{ 0 };
    bool mMonoOutput{ false };
    Checkbox* mMonoCheckbox{ nullptr };
+   bool mSingleVoice{ false };
+   Checkbox* mSingleVoiceCheckbox{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
    NoteInputBuffer mNoteInputBuffer{ nullptr };
    bool mNeedSetup{ true };

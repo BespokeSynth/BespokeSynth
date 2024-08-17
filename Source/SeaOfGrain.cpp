@@ -198,6 +198,7 @@ void SeaOfGrain::DrawModule()
       {
          mSample->LockDataMutex(true);
          DrawAudioBuffer(mBufferW, mBufferH, mSample->Data(), mDisplayStartSamples, mDisplayEndSamples, 0);
+         DrawTextNormal(std::string(mSample->Name()), 5, 10);
          mSample->LockDataMutex(false);
       }
 

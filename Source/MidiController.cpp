@@ -861,9 +861,18 @@ void MidiController::Poll()
          if (connection->mFeedbackControl == -2) // "none"
             continue;
 
+         bool shouldUpdateOutput = false;
+
          int curValue = int(uicontrol->GetMidiValue() * 127);
-         if (curValue != connection->mLastControlValue ||
-             (connection->mBlink && lastBlink != mBlink))
+         if (curValue != connection->mLastControlValue)
+            shouldUpdateOutput = true;
+         if (connection->mBlink && lastBlink != mBlink)
+            shouldUpdateOutput = true;
+         if (mShouldSendControllerInfoStrings &&
+             uicontrol->GetDisplayValue(uicontrol->GetValue()) != connection->mLastDisplayValue)
+            shouldUpdateOutput = true;
+
+         if (shouldUpdateOutput)
          {
             if (connection->mType == kControlType_Toggle)
             {
@@ -937,11 +946,13 @@ void MidiController::Poll()
             }
             connection->mLastControlValue = curValue;
 
-            if (connection->mType != kControlType_SetValue &&
-                connection->mType != kControlType_SetValueOnRelease &&
-                std::string(mDevice.Name()) == "Bespoke Turn")
+            if (mShouldSendControllerInfoStrings &&
+                connection->mType != kControlType_SetValue &&
+                connection->mType != kControlType_SetValueOnRelease)
             {
-               SendControllerInfoString(control, 1, uicontrol->GetDisplayValue(uicontrol->GetValue()));
+               std::string displayValue = uicontrol->GetDisplayValue(uicontrol->GetValue());
+               SendControllerInfoString(control, 1, displayValue);
+               connection->mLastDisplayValue = displayValue;
             }
          }
       }
@@ -1532,7 +1543,7 @@ void MidiController::ResyncControllerState()
 
             if (connection->mUIControl != nullptr)
             {
-               if (std::string(GetDeviceOut()) == "Bespoke Turn")
+               if (mShouldSendControllerInfoStrings)
                {
                   SendControllerInfoString(mLayoutControls[i].mControl, 0, connection->mUIControl->Path());
                   if (connection->mType == kControlType_SetValue ||
@@ -2065,7 +2076,7 @@ void MidiController::TextEntryComplete(TextEntry* entry)
          connection->SetUIControl(connection->mUIControlPathInput);
       if (entry == connection->mValueEntry)
       {
-         if (std::string(GetDeviceOut()) == "Bespoke Turn")
+         if (mShouldSendControllerInfoStrings)
          {
             if (connection->mType == kControlType_SetValue ||
                 connection->mType == kControlType_SetValueOnRelease)
@@ -2340,6 +2351,11 @@ void MidiController::ConnectDevice()
       mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
    }
 
+   if (mDeviceOut == "Bespoke Turn")
+      mShouldSendControllerInfoStrings = true;
+   else
+      mShouldSendControllerInfoStrings = false;
+
    if (mNonstandardController != nullptr)
       mNonstandardController->SetLayoutData(mLayoutData);
 
@@ -2448,34 +2464,17 @@ void MidiController::SendControllerInfoString(int control, int type, std::string
    //ofLog() << "sending string: " << str;
 
    // byte 1: relevant cc
-   // next bit: type (0: control name, 1: control value)
-   // following bits: packed string
-
-   std::vector<bool> bits;
-   bits.push_back(0);
-   bits.push_back(type);
-   for (int i = 0; i < str.length(); ++i)
-   {
-      for (int j = 0; j < 8; ++j)
-      {
-         if (bits.size() % 8 == 0)
-            bits.push_back(0); //always have highest bit in byte clear
-         bits.push_back(str[i] >> (7 - j) & 1);
-      }
-   }
-
-   int bitsToPad = 8 - bits.size() % 8;
-   for (int i = 0; i < bitsToPad; ++i)
-      bits.push_back(0);
+   // byte 2: type (0: control name, 1: control value) (other relevant data could go into this byte in the future)
+   // following bytes: string
 
    std::string toSend;
-   toSend.push_back(control);
-   for (int i = 0; i < bits.size() / 8; ++i)
+   toSend.push_back((char)control);
+   toSend.push_back((char)type);
+   for (int i = 0; i < str.length(); ++i)
    {
-      int byte = 0;
-      for (int j = 0; j < 8; ++j)
-         byte += bits[i * 8 + j] << (7 - j);
-      toSend.push_back(byte);
+      char ch = str[i];
+      if (ch < 127)
+         toSend.push_back(ch);
    }
 
    SendSysEx(0, toSend);
@@ -2609,7 +2608,7 @@ void UIControlConnection::SetUIControl(IUIControl* control)
 
    if (mUIControl != nullptr)
    {
-      if (std::string(mUIOwner->GetDeviceOut()) == "Bespoke Turn")
+      if (mUIOwner->ShouldSendControllerInfoStrings())
       {
          mUIOwner->SendControllerInfoString(mControl, 0, mUIControl->Path());
          if (mType == kControlType_SetValue ||
