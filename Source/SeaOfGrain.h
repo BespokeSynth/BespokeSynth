@@ -162,6 +162,7 @@ private:
    bool mRecordInput{ false };
    Checkbox* mRecordInputCheckbox{ nullptr };
    bool mHasRecordedInput{ false };
+
    float mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    bool mLoading{ false };
