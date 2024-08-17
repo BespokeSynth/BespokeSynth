@@ -31,12 +31,10 @@
 #include "ModuleFactory.h"
 
 #include "LaunchpadKeyboard.h"
-#include "Scale.h"
 #include "DrumPlayer.h"
 #include "EffectChain.h"
 #include "LooperRecorder.h"
 #include "Chorder.h"
-#include "Transport.h"
 #include "Arpeggiator.h"
 #include "Razor.h"
 #include "Monophonify.h"
@@ -51,7 +49,6 @@
 #include "ScaleDetect.h"
 #include "KarplusStrong.h"
 #include "WhiteKeys.h"
-#include "Kicker.h"
 #include "RingModulator.h"
 #include "Neighborhooder.h"
 #include "Polyrhythms.h"
@@ -86,7 +83,6 @@
 //#include "Eigenharp.h"
 #include "Beats.h"
 #include "Sampler.h"
-#include "NoteTransformer.h"
 #include "SliderSequencer.h"
 #include "MultibandCompressor.h"
 #include "ControllingSong.h"
@@ -597,7 +593,6 @@ namespace
          end = name.indexOfChar(' ');
       if (end == -1)
          end = name.length() - 1;
-      bool showModule = true;
       for (size_t j = 1; j < heldKeys.length(); ++j)
       {
          stringPos = name.substring(stringPos + 1, end + 1).indexOfChar(heldKeys[j]);

@@ -1404,7 +1404,6 @@ void MidiController::OnClicked(float x, float y, bool right)
 
    if (mMappingDisplayMode == kLayout)
    {
-      bool selected = false;
       for (int i = 0; i < NUM_LAYOUT_CONTROLS; ++i)
       {
          ControlLayoutElement& control = mLayoutControls[i];
@@ -1414,13 +1413,10 @@ void MidiController::OnClicked(float x, float y, bool right)
             if (controlRect.contains(x, y))
             {
                mHighlightedLayoutElement = i;
-               selected = true;
                break;
             }
          }
       }
-      //if (!selected)
-      //   mHighlightedLayoutElement = -1;
    }
 }
 
@@ -2828,12 +2824,10 @@ void UIControlConnection::DrawList(int index)
    int x = 12;
    int y = 52 + 20 * index;
 
-   IUIControl* lastControl = nullptr;
    for (auto iter = mEditorControls.begin(); iter != mEditorControls.end(); ++iter)
    {
       (*iter)->SetPosition(x, y);
       (*iter)->Draw();
-      lastControl = *iter;
 
       x += (*iter)->GetRect().width + 3;
       if (*iter == mUIControlPathEntry)
@@ -2855,33 +2849,6 @@ void UIControlConnection::DrawList(int index)
       ofRect(1, y + 3, 10, 10);
       ofPopStyle();
    }
-
-   /*if (mUIControlPathEntry == IKeyboardFocusListener::GetActiveKeyboardFocus() || TheSynth->InMidiMapMode())
-   {
-      IUIControl* uiControl = GetUIControl();
-      if (uiControl)
-      {
-         int parentX,parentY;
-         mUIControlPathEntry->GetParent()->GetPosition(parentX,parentY);
-         ofPushMatrix();
-         ofTranslate(-parentX, -parentY);
-         ofPushStyle();
-         if (mUIControlPathEntry == IKeyboardFocusListener::GetActiveKeyboardFocus())
-            ofSetLineWidth(3);
-         else
-            ofSetLineWidth(1);
-         ofSetColor(255,255,255,200);
-         int pathX,pathY,pathW,pathH;
-         int targetX,targetY,targetW,targetH;
-         mUIControlPathEntry->GetPosition(pathX, pathY);
-         mUIControlPathEntry->GetDimensions(pathW, pathH);
-         uiControl->GetPosition(targetX, targetY);
-         uiControl->GetDimensions(targetW, targetH);
-         ofLine(pathX+pathW,pathY+pathH/2,targetX+targetW/2,targetY+targetH/2);
-         ofPopStyle();
-         ofPopMatrix();
-      }
-   }*/
 }
 
 void UIControlConnection::DrawLayout()

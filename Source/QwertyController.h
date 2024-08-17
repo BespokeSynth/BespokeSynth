@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "MidiDevice.h"
 #include "INonstandardController.h"
 
@@ -35,7 +34,6 @@ public:
    QwertyController(MidiDeviceListener* listener);
    ~QwertyController();
 
-   void Connect();
    void OnKeyPressed(int key);
    void OnKeyReleased(int key);
 

@@ -30,7 +30,6 @@
 #include "PatchCableSource.h"
 #include "SynthGlobals.h"
 #include "UIControlMacros.h"
-#include <algorithm>
 
 ValueStream::ValueStream()
 {

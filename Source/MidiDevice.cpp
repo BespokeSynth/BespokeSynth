@@ -27,8 +27,6 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 
-#include <string.h>
-
 using namespace juce;
 
 MidiDevice::MidiDevice(MidiDeviceListener* listener)

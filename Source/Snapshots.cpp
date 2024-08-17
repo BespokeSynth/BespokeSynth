@@ -769,7 +769,6 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       int snapshotSize;
       in >> snapshotSize;
       mSnapshotCollection[i].mSnapshots.resize(snapshotSize);
-      int j = 0;
       for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
          in >> snapshotData.mControlPath;

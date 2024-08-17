@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
 #include "IAudioEffect.h"
 
 typedef IAudioEffect* (*CreateEffectFn)(void);

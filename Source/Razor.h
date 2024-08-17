@@ -127,7 +127,7 @@ private:
    bool mManualControl{ false };
    Checkbox* mManualControlCheckbox{ nullptr };
    FloatSlider* mAmpSliders[NUM_AMP_SLIDERS]{ nullptr };
-   FloatSlider* mDetuneSliders[NUM_AMP_SLIDERS];
+   FloatSlider* mDetuneSliders[NUM_AMP_SLIDERS]{ nullptr };
    ClickButton* mResetDetuneButton{ nullptr };
 
    float mA{ 1 };

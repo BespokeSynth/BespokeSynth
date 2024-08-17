@@ -46,29 +46,18 @@ void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool notifyListeners)
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var)
 : mVarCString(var)
-, mVarString(nullptr)
-, mVarInt(nullptr)
-, mVarFloat(nullptr)
-, mType(kTextEntry_Text)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, std::string* var)
-: mVarCString(nullptr)
-, mVarString(var)
-, mVarInt(nullptr)
-, mVarFloat(nullptr)
-, mType(kTextEntry_Text)
+: mVarString(var)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max)
-: mVarCString(nullptr)
-, mVarString(nullptr)
-, mVarInt(var)
-, mVarFloat(nullptr)
+: mVarInt(var)
 , mType(kTextEntry_Int)
 , mIntMin(min)
 , mIntMax(max)
@@ -77,10 +66,7 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max)
-: mVarCString(nullptr)
-, mVarString(nullptr)
-, mVarInt(nullptr)
-, mVarFloat(var)
+: mVarFloat(var)
 , mType(kTextEntry_Float)
 , mFloatMin(min)
 , mFloatMax(max)

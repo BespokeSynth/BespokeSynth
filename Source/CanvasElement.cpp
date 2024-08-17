@@ -29,7 +29,6 @@
 #include "Slider.h"
 #include "CanvasControls.h"
 #include "TextEntry.h"
-#include "PatchCableSource.h"
 #include "ModularSynth.h"
 #include "EventCanvas.h"
 #include "SampleCanvas.h"
@@ -177,7 +176,7 @@ float CanvasElement::GetStart() const
 
 void CanvasElement::SetStart(float start, bool preserveLength)
 {
-   float end;
+   float end = 0;
    if (!preserveLength)
       end = GetEnd();
    start *= mCanvas->GetNumCols();

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 
 #include "juce_core/juce_core.h"

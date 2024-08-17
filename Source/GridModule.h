@@ -30,8 +30,6 @@
 #include <iostream>
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
-#include "Slider.h"
-#include "DropdownList.h"
 #include "Checkbox.h"
 #include "MidiDevice.h"
 #include "GridController.h"

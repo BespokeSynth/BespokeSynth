@@ -27,7 +27,6 @@
 
 #include <iostream>
 #include <limits>
-#include "IUIControl.h"
 #include "TextEntry.h"
 #include "Ramp.h"
 #include "IAudioPoller.h"

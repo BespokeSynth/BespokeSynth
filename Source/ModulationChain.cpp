@@ -40,7 +40,7 @@ float ModulationChain::GetValue(int samplesIn) const
       value += mSidechain->GetIndividualValue(samplesIn);
    if (mPrev)
       value += mPrev->GetValue(samplesIn);
-   if (value != value)
+   if (std::isnan(value))
       return 0;
    return value;
 }

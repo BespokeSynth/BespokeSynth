@@ -25,7 +25,6 @@
 
 #include "Profiler.h"
 #include "SynthGlobals.h"
-#include <time.h>
 #if BESPOKE_WINDOWS
 #include <intrin.h>
 #else
@@ -39,6 +38,7 @@ namespace
 {
    static inline uint64_t rdtscp(uint32_t& aux)
    {
+      //@TODO(Noxy): Why is windows treated differently here? Doesn't std::chrono::high_resolution_clock::now work on windows?
 #if BESPOKE_WINDOWS
       unsigned __int64 i;
       unsigned int ui;

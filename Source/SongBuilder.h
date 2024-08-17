@@ -87,7 +87,6 @@ private:
    void PostRepatch(PatchCableSource* cable, bool fromUserClick) override;
    bool ShouldSavePatchCableSources() const override { return false; }
 
-   void OnStep(double time, float velocity, int flags);
    void SetActiveScene(double time, int newScene);
    void SetActiveSceneById(double time, int newSceneId);
    void DuplicateScene(int sceneIndex);

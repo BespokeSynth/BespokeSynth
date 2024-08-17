@@ -29,7 +29,6 @@
 #include "IAudioSource.h"
 #include "INoteSource.h"
 #include "IAudioReceiver.h"
-#include "INoteReceiver.h"
 #include "GridController.h"
 #include "RollingBuffer.h"
 #include "TextEntry.h"
@@ -174,7 +173,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       if (buffer && length > 0)
       {
          float step = width > 0 ? kStepSize : -kStepSize;
-         float samplesPerStep = length / width * step;
+         samplesPerStep = length / width * step;
 
          ofSetColor(color);
 
@@ -295,6 +294,7 @@ std::string NoteName(int pitch, bool flat, bool includeOctave)
    std::string ret = "x";
    switch (pitch)
    {
+      default:
       case 0:
          ret = "C";
          break;
@@ -467,6 +467,7 @@ std::string GetRomanNumeralForDegree(int degree)
    std::string roman;
    switch ((degree + 700) % 7)
    {
+      default:
       case 0: roman = "I"; break;
       case 1: roman = "II"; break;
       case 2: roman = "III"; break;

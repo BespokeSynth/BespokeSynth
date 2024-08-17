@@ -31,7 +31,6 @@
 #include "GridController.h"
 #include "IPulseReceiver.h"
 #include "AudioSend.h"
-#include "MacroSlider.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 

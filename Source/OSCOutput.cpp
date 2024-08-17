@@ -35,8 +35,7 @@ OSCOutput::OSCOutput()
    for (int i = 0; i < OSC_OUTPUT_MAX_PARAMS; ++i)
    {
       mParams[i] = 0;
-      mLabels[i] = new char[MAX_TEXTENTRY_LENGTH];
-      strcpy(mLabels[i], ("slider" + ofToString(i)).c_str());
+      mLabels[i] = "slider" + ofToString(i);
    }
 }
 
@@ -64,12 +63,12 @@ void OSCOutput::CreateUIControls()
    for (int i = 0; i < 8; ++i)
    {
       TextEntry* labelEntry;
-      TEXTENTRY(labelEntry, ("label" + ofToString(i)).c_str(), 10, mLabels[i]);
+      TEXTENTRY(labelEntry, ("label" + ofToString(i)).c_str(), 10, &mLabels[i]);
       mLabelEntry.push_back(labelEntry);
       UIBLOCK_SHIFTRIGHT();
 
       FloatSlider* oscSlider;
-      FLOATSLIDER(oscSlider, mLabels[i], &mParams[i], 0, 1);
+      FLOATSLIDER(oscSlider, mLabels[i].c_str(), &mParams[i], 0, 1);
       mSliders.push_back(oscSlider);
       UIBLOCK_NEWLINE();
    }
@@ -144,10 +143,8 @@ void OSCOutput::GetModuleDimensions(float& w, float& h)
 
 void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   char address[120];
-   address[0] = 0;
-   strcat(address, "/bespoke/");
-   strcat(address, slider->Name());
+   juce::String address = "/bespoke/";
+   address += slider->Name();
    juce::OSCMessage msg(address);
    msg.addFloat32(slider->GetValue());
    mOscOut.send(msg);
@@ -162,7 +159,7 @@ void OSCOutput::TextEntryComplete(TextEntry* entry)
       {
          auto sliderIter = mSliders.begin();
          advance(sliderIter, i);
-         (*sliderIter)->SetName(mLabels[i]);
+         (*sliderIter)->SetName(mLabels[i].c_str());
       }
       ++i;
    }
