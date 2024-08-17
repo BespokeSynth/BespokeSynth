@@ -2232,8 +2232,8 @@ std::vector<std::string> MidiController::GetAvailableOutputDevices()
       return sCachedOutputDevices;
 
    std::vector<std::string> devices;
-   for (auto& d : MidiOutput::getAvailableDevices())
-      devices.push_back(d.identifier.toStdString());
+   for (auto& d : MidiOutput::getDevices())
+      devices.push_back(d.toStdString());
 
    devices.push_back("keyboard");
    devices.push_back("monome");
@@ -2277,15 +2277,7 @@ void MidiController::ConnectDevice()
 
    std::string deviceInName = mControllerList->GetLabel(mControllerIndex);
    std::string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").toStdString();
-   bool hasOutput = false;
-   for (const auto& device : MidiOutput::getAvailableDevices())
-   {
-      if (device.identifier.toStdString() == deviceOutName)
-      {
-         hasOutput = true;
-         break;
-      }
-   }
+   bool hasOutput = MidiOutput::getDevices().contains(String(deviceOutName));
    mDeviceIn = deviceInName;
    mDeviceOut = hasOutput ? deviceOutName : "";
    mModuleSaveData.SetString("devicein", mDeviceIn);
