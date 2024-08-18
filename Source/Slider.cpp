@@ -102,11 +102,14 @@ void FloatSlider::SetModulator(IModulator* modulator)
    }
 }
 
-void FloatSlider::Render()
+void FloatSlider::Poll()
 {
    if (mLastComputeTime + .1f < gTime)
       Compute();
+}
 
+void FloatSlider::Render()
+{
    float normalWidth = mWidth;
    float normalHeight = mHeight;
 
