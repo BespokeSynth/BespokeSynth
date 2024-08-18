@@ -120,6 +120,7 @@ public:
    void Double() override;
    void Halve() override;
    void ResetToOriginal() override;
+   void Poll() override;
    void Increment(float amount) override;
 
    float PosToVal(float pos, bool ignoreSmooth) const;
