@@ -116,6 +116,8 @@ target_sources(BespokeSynth PRIVATE
     Curve.h
     CurveLooper.cpp
     CurveLooper.h
+    DataProvider.cpp
+    DataProvider.h
     DCOffset.cpp
     DCOffset.h
     DCRemoverEffect.cpp

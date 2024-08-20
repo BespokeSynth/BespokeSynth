@@ -294,6 +294,12 @@ float ofToFloat(const std::string& floatString)
    return str.getFloatValue();
 }
 
+double ofToDouble(const std::string& doubleString)
+{
+   const String str(doubleString);
+   return str.getDoubleValue();
+}
+
 int ofHexToInt(const std::string& hexString)
 {
    String str(hexString);

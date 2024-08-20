@@ -263,6 +263,7 @@
 #include "ControlRecorder.h"
 #include "EuclideanSequencer.h"
 #include "SaveStateLoader.h"
+#include "DataProvider.h"
 
 #include <juce_core/juce_core.h>
 
@@ -480,6 +481,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ControlRecorder, controlrecorder, kModuleCategory_Modulator);
    REGISTER(EuclideanSequencer, euclideansequencer, kModuleCategory_Instrument);
    REGISTER(SaveStateLoader, savestateloader, kModuleCategory_Other);
+   REGISTER(DataProvider, dataprovider, kModuleCategory_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
