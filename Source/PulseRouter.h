@@ -28,7 +28,6 @@ bespoke synth, a software modular synthesizer
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 #include "RadioButton.h"

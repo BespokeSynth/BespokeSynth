@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <memory>
 
 #include "IDrawableModule.h"

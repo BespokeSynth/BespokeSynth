@@ -26,7 +26,6 @@
 */
 
 #pragma once
-#include <iostream>
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"

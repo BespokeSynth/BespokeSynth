@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "Sample.h"
 #include "ClickButton.h"

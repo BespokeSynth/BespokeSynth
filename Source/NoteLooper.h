@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "Transport.h"
 #include "Checkbox.h"

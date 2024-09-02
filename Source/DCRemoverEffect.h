@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <stdio.h>
-#include <iostream>
 #include "IAudioEffect.h"
 #include "BiquadFilter.h"
 

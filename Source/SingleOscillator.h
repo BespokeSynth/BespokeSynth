@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "PolyphonyMgr.h"
 #include "SingleOscillatorVoice.h"

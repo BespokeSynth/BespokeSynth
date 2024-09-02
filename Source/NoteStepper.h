@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 #include "Slider.h"
