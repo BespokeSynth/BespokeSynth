@@ -254,13 +254,13 @@ inline std::string ofToString(const T& value, int precision)
 template <class T>
 inline bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
 {
-   if (std::is_same_v<T, float> && isnan<T>(epsilon))
+   if (std::is_same_v<T, float> && std::isnan<T>(epsilon))
       epsilon = 0.0001f;
-   else if (std::is_same_v<T, double> && isnan<T>(epsilon))
+   else if (std::is_same_v<T, double> && std::isnan<T>(epsilon))
       epsilon = 0.0000000000001;
-   else if (std::is_same_v<T, long double> && isnan<T>(epsilon))
+   else if (std::is_same_v<T, long double> && std::isnan<T>(epsilon))
       epsilon = 0.00000000000000000000000001L;
-   return fabs(a - b) < epsilon;
+   return std::fabs(a - b) < epsilon;
 }
 
 //inline bool ofAlmostEquel(const double& a, const double& b, const double epsilon = 0.000000001)
