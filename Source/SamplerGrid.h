@@ -73,14 +73,14 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
@@ -127,7 +127,7 @@ private:
    bool mPassthrough{ true };
    Checkbox* mPassthroughCheckbox{ nullptr };
 
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
    bool mEditMode{ false };
    Checkbox* mEditCheckbox{ nullptr };

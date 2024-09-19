@@ -48,7 +48,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -64,8 +64,8 @@ private:
       h = 40;
    }
 
-   float mMin{ -1 };
+   double mMin{ -1 };
    FloatSlider* mMinSlider{ nullptr };
-   float mMax{ 1 };
+   double mMax{ 1 };
    FloatSlider* mMaxSlider{ nullptr };
 };

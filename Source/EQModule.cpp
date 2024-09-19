@@ -438,7 +438,7 @@ void EQModule::KeyPressed(int key, bool isRepeat)
    }
 }
 
-void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EQModule::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (auto& filter : mFilters)
    {

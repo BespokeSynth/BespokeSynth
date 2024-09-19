@@ -48,7 +48,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
@@ -67,8 +67,8 @@ private:
       height = 35;
    }
 
-   float mStrum{ 0 };
-   float mLastStrumPos{ 0 };
+   double mStrum{ 0 };
+   double mLastStrumPos{ 0 };
    FloatSlider* mStrumSlider{ nullptr };
    std::list<int> mNotes;
 };

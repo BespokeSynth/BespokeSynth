@@ -104,7 +104,7 @@ void Chorder::DrawModule()
    mInversionDropdown->Draw();
 }
 
-void Chorder::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void Chorder::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (!mDiatonic)
       return; //TODO(Ryan)

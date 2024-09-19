@@ -55,7 +55,7 @@ public:
    IUIControl* GetUIControl() const { return mTargets.size() == 0 ? nullptr : mTargets[0]; }
 
    //IGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //IDrawableModule
    void Poll() override;
@@ -79,7 +79,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
 

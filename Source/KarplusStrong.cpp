@@ -189,7 +189,7 @@ void KarplusStrong::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

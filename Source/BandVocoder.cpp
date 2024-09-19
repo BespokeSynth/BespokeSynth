@@ -110,9 +110,9 @@ void BandVocoder::Process(double time)
 
    ComputeSliders(0);
 
-   float inputPreampSq = mInputPreamp * mInputPreamp;
-   float carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
-   float volSq = mVolume * mVolume;
+   double inputPreampSq = mInputPreamp * mInputPreamp;
+   double carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
+   double volSq = mVolume * mVolume;
 
    int bufferSize = GetBuffer()->BufferSize();
 
@@ -127,7 +127,7 @@ void BandVocoder::Process(double time)
       BufferCopy(mWorkBuffer, GetBuffer()->GetChannel(0), bufferSize);
       mBiquadCarrier[i].Filter(mWorkBuffer, bufferSize);
 
-      float oldPeak = mPeaks[i].GetPeak();
+      double oldPeak = mPeaks[i].GetPeak();
 
       //calculate modulator band level
       mPeaks[i].Process(mWorkBuffer, bufferSize);
@@ -181,18 +181,18 @@ void BandVocoder::DrawModule()
    float w, h;
    GetModuleDimensions(w, h);
 
-   auto PosForFreq = [](float freq)
+   auto PosForFreq = [](double freq)
    {
       return log2(freq / 20) / 10;
    };
    ofSetColor(0, 255, 0);
    for (int i = 0; i < mNumBands; ++i)
    {
-      float x = PosForFreq(mBiquadCarrier[i].mF) * w;
+      double x = PosForFreq(mBiquadCarrier[i].mF) * w;
       ofLine(x, h, x, h - mPeaks[i].GetPeak() * 200);
    }
 
-   auto FreqForPos = [](float pos)
+   auto FreqForPos = [](double pos)
    {
       return 20.0 * std::pow(2.0, pos * 10);
    };
@@ -204,10 +204,10 @@ void BandVocoder::DrawModule()
       const int kPixelStep = 1;
       for (int x = 0; x < w + kPixelStep; x += kPixelStep)
       {
-         float freq = FreqForPos(x / w);
+         double freq = FreqForPos(x / w);
          if (freq < gSampleRate / 2)
          {
-            float response = mBiquadCarrier[i].GetMagnitudeResponseAt(freq);
+            double response = mBiquadCarrier[i].GetMagnitudeResponseAt(freq);
             ofVertex(x, (.5f - .666f * log10(response)) * h);
          }
       }
@@ -228,11 +228,11 @@ void BandVocoder::CalcFilters()
    for (int i = 0; i < mNumBands; ++i)
    {
       float a = float(i) / (mNumBands - 1);
-      float freqMax = ofClamp(mFreqBase + mFreqRange, 0, gSampleRate / 2);
-      float fExp = mFreqBase * powf(freqMax / mFreqBase, a);
-      float fLin = ofLerp(mFreqBase, freqMax, a);
-      float fBass = ofLerp(mFreqBase, freqMax, a * a * a * a);
-      float f;
+      double freqMax = ofClamp(mFreqBase + mFreqRange, 0, gSampleRate / 2);
+      double fExp = mFreqBase * pow(freqMax / mFreqBase, a);
+      double fLin = ofLerp(mFreqBase, freqMax, a);
+      double fBass = ofLerp(mFreqBase, freqMax, a * a * a * a);
+      double f;
       if (mSpacingStyle >= 0)
          f = ofLerp(fExp, fLin, mSpacingStyle);
       else
@@ -265,7 +265,7 @@ void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
    }
 }
 
-void BandVocoder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BandVocoder::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mFBaseSlider || slider == mFRangeSlider || slider == mQSlider || slider == mSpacingStyleSlider)
    {

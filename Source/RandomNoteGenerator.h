@@ -51,7 +51,7 @@ public:
    void OnTimeEvent(double time) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
@@ -71,13 +71,13 @@ private:
 
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
-   float mProbability{ .5 };
+   double mProbability{ .5 };
    FloatSlider* mProbabilitySlider{ nullptr };
    int mPitch{ 36 };
    IntSlider* mPitchSlider{ nullptr };
-   float mVelocity{ .8 };
+   double mVelocity{ .8 };
    FloatSlider* mVelocitySlider{ nullptr };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mSkip{ 1 };
    IntSlider* mSkipSlider{ nullptr };

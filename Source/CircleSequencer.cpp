@@ -127,7 +127,7 @@ void CircleSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void CircleSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void CircleSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

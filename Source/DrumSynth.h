@@ -71,7 +71,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -93,13 +93,13 @@ private:
       EnvOscillator mNoise{ OscillatorType::kOsc_Random };
       ::ADSR mFreqAdsr;
       ::ADSR mFilterAdsr;
-      float mFreqMax{ 150 };
-      float mFreqMin{ 10 };
-      float mVol{ 0 };
-      float mVolNoise{ 0 };
-      float mCutoffMax{ DRUMSYNTH_NO_CUTOFF };
-      float mCutoffMin{ 10 };
-      float mQ{ float(sqrt(2)) / 2 };
+      double mFreqMax{ 150 };
+      double mFreqMin{ 10 };
+      double mVol{ 0 };
+      double mVolNoise{ 0 };
+      double mCutoffMax{ DRUMSYNTH_NO_CUTOFF };
+      double mCutoffMin{ 10 };
+      double mQ{ sqrt(2) / 2 };
    };
 
    struct IndividualOutput;
@@ -173,7 +173,7 @@ private:
    std::array<DrumSynthHit*, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mHits;
    std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity{};
 
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolSlider{ nullptr };
    bool mUseIndividualOuts{ false };
    bool mMonoOutput{ false };

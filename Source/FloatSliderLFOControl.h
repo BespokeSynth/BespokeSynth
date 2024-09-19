@@ -41,13 +41,13 @@ struct LFOSettings
 {
    NoteInterval mInterval{ kInterval_1n };
    OscillatorType mOscType{ kOsc_Sin };
-   float mLFOOffset{ 0 };
-   float mBias{ 0 };
-   float mSpread{ 0 };
-   float mSoften{ 0 };
-   float mShuffle{ 0 };
-   float mFreeRate{ 1 };
-   float mLength{ 1 };
+   double mLFOOffset{ 0 };
+   double mBias{ 0 };
+   double mSpread{ 0 };
+   double mSoften{ 0 };
+   double mShuffle{ 0 };
+   double mFreeRate{ 1 };
+   double mLength{ 1 };
    bool mLowResMode{ false };
 
    void SaveState(FileStreamOut& out) const;
@@ -87,7 +87,7 @@ public:
    bool DrawToPush2Screen() override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool InitializeWithZeroRange() const override { return true; }
 
@@ -96,7 +96,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 

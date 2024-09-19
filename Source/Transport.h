@@ -108,8 +108,8 @@ public:
    void CreateUIControls() override;
    void Poll() override;
 
-   float GetTempo() { return mTempo; }
-   void SetTempo(float tempo) { mTempo = tempo; }
+   double GetTempo() { return mTempo; }
+   void SetTempo(double tempo) { mTempo = tempo; }
    void SetTimeSignature(int top, int bottom)
    {
       mTimeSigTop = top;
@@ -117,8 +117,8 @@ public:
    }
    int GetTimeSigTop() { return mTimeSigTop; }
    int GetTimeSigBottom() { return mTimeSigBottom; }
-   void SetSwing(float swing) { mSwing = swing; }
-   float GetSwing() { return mSwing; }
+   void SetSwing(double swing) { mSwing = swing; }
+   double GetSwing() { return mSwing; }
    double MsPerBar() const { return 60.0 / mTempo * 1000 * mTimeSigTop * 4.0 / mTimeSigBottom; }
    void Advance(double ms);
    TransportListenerInfo* AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
@@ -168,7 +168,7 @@ public:
    bool IsSingleton() const override { return true; }
 
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
@@ -201,12 +201,12 @@ private:
       height = 100;
    }
 
-   float mTempo{ 120 };
+   double mTempo{ 120 };
    int mTimeSigTop{ 4 };
    int mTimeSigBottom{ 4 };
    double mMeasureTime{ 0 };
    int mSwingInterval{ 8 };
-   float mSwing{ .5 };
+   double mSwing{ .5 };
    FloatSlider* mSwingSlider{ nullptr };
    ClickButton* mResetButton{ nullptr };
    ClickButton* mPlayPauseButton{ nullptr };

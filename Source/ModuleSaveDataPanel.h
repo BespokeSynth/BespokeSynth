@@ -61,7 +61,7 @@ public:
    void ReloadSaveData();
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
    void DropdownClicked(DropdownList* list) override;

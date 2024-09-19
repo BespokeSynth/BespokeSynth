@@ -57,7 +57,7 @@ public:
    //IButtonListener
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -85,19 +85,19 @@ private:
    RollingBuffer mRollingInputBuffer;
    RollingBuffer mRollingOutputBuffer;
 
-   float mInputPreamp{ 1 };
-   float mValue1{ 1 };
-   float mVolume{ 1 };
+   double mInputPreamp{ 1 };
+   double mValue1{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mInputSlider{ nullptr };
    FloatSlider* mValue1Slider{ nullptr };
    FloatSlider* mVolumeSlider{ nullptr };
-   float mDryWet{ 1 };
+   double mDryWet{ 1 };
    FloatSlider* mDryWetSlider{ nullptr };
-   float mValue2{ 1 };
+   double mValue2{ 1 };
    FloatSlider* mValue2Slider{ nullptr };
-   float mValue3{ 0 };
+   double mValue3{ 0 };
    FloatSlider* mValue3Slider{ nullptr };
-   float mPhaseOffset{ 0 };
+   double mPhaseOffset{ 0 };
    FloatSlider* mPhaseOffsetSlider{ nullptr };
 
    float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH + 1]{};

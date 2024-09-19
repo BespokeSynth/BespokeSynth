@@ -259,7 +259,7 @@ void NoteTable::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void NoteTable::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void NoteTable::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
 }
 

@@ -199,7 +199,7 @@ void MultitapDelay::GetModuleDimensions(float& width, float& height)
    height = mBufferY + mBufferH + 10 + 100 * mNumTaps;
 }
 
-void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -330,16 +330,16 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
 {
    if (mGain > 0)
    {
-      float delaySamps = mDelayMs / gInvSampleRateMs;
-      delaySamps = ofClamp(delaySamps - offset, 0.1f, mOwner->mDelayBuffer.Size() - 2);
+      double delaySamps = mDelayMs / gInvSampleRateMs;
+      delaySamps = ofClamp(delaySamps - offset, 0.1, mOwner->mDelayBuffer.Size() - 2);
 
       int sampsAgoA = int(delaySamps);
       int sampsAgoB = sampsAgoA + 1;
 
       float sample = mOwner->mDelayBuffer.GetSample(sampsAgoA, ch);
       float nextSample = mOwner->mDelayBuffer.GetSample(sampsAgoB, ch);
-      float a = delaySamps - sampsAgoA;
-      float delayedSample = (1 - a) * sample + a * nextSample; //interpolate
+      double a = delaySamps - sampsAgoA;
+      double delayedSample = (1 - a) * sample + a * nextSample; //interpolate
 
       float outputSample = delayedSample * mGain;
       mTapBuffer.GetChannel(ch)[offset] = outputSample;

@@ -84,7 +84,7 @@ void NoteVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mVibratoSlider)
       mModulation.GetPitchBend(-1)->SetLFO(mVibratoInterval, mVibratoAmount);

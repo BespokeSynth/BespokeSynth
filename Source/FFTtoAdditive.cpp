@@ -55,7 +55,7 @@ FFTtoAdditive::FFTtoAdditive()
    mPhaseInc = new float[numPartials];
    for (int i = 0; i < numPartials; ++i)
    {
-      float freq = i / float(fftFreqDomainSize) * (gNyquistLimit / 2);
+      double freq = i / double(fftFreqDomainSize) * (gNyquistLimit / 2);
       mPhaseInc[i] = GetPhaseInc(freq);
    }
 

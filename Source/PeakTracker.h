@@ -29,15 +29,15 @@ class PeakTracker
 {
 public:
    void Process(float* buffer, int bufferSize);
-   float GetPeak() const { return mPeak; }
-   void SetDecayTime(float time) { mDecayTime = time; }
-   void SetLimit(float limit) { mLimit = limit; }
+   double GetPeak() const { return mPeak; }
+   void SetDecayTime(double time) { mDecayTime = time; }
+   void SetLimit(double limit) { mLimit = limit; }
    void Reset() { mPeak = 0; }
    double GetLastHitLimitTime() const { return mHitLimitTime; }
 
 private:
-   float mPeak{ 0 };
-   float mDecayTime{ .01 };
-   float mLimit{ -1 };
+   double mPeak{ 0 };
+   double mDecayTime{ .01 };
+   double mLimit{ -1 };
    double mHitLimitTime{ -9999 };
 };

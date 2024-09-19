@@ -88,7 +88,7 @@ void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    {
       ComputeSliders(0);
 
-      float durationMs = mSustain / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      const double durationMs = mSustain / (static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
 
       bool found = false;
       for (auto& queued : mNoteOffs)
@@ -107,7 +107,7 @@ void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 }
 
-void NoteSustain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteSustain::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

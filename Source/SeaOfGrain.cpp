@@ -85,7 +85,7 @@ void SeaOfGrain::CreateUIControls()
       mManualVoices[i].mSpeedSlider = new FloatSlider(this, ("speed " + ofToString(i + 1)).c_str(), mManualVoices[i].mOverlapSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mSpeed, -3, 3);
       mManualVoices[i].mLengthMsSlider = new FloatSlider(this, ("len ms " + ofToString(i + 1)).c_str(), mManualVoices[i].mSpeedSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mGrainLengthMs, 1, 1000);
       mManualVoices[i].mPosRandomizeSlider = new FloatSlider(this, ("pos r " + ofToString(i + 1)).c_str(), mManualVoices[i].mLengthMsSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mPosRandomizeMs, 0, 200);
-      mManualVoices[i].mSpeedRandomizeSlider = new FloatSlider(this, ("speed r " + ofToString(i + 1)).c_str(), mManualVoices[i].mPosRandomizeSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mSpeedRandomize, 0, .3f);
+      mManualVoices[i].mSpeedRandomizeSlider = new FloatSlider(this, ("speed r " + ofToString(i + 1)).c_str(), mManualVoices[i].mPosRandomizeSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mSpeedRandomize, 0, .3);
       mManualVoices[i].mSpacingRandomizeSlider = new FloatSlider(this, ("spacing r " + ofToString(i + 1)).c_str(), mManualVoices[i].mSpeedRandomizeSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mSpacingRandomize, 0, 1);
       mManualVoices[i].mOctaveCheckbox = new Checkbox(this, ("octaves " + ofToString(i + 1)).c_str(), mManualVoices[i].mSpacingRandomizeSlider, kAnchor_Below, &mManualVoices[i].mGranulator.mOctaves);
       mManualVoices[i].mWidthSlider = new FloatSlider(this, ("width " + ofToString(i + 1)).c_str(), mManualVoices[i].mOctaveCheckbox, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mWidth, 0, 1);
@@ -289,7 +289,7 @@ void SeaOfGrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 
 void SeaOfGrain::UpdateSample()
 {
-   float sampleLengthSeconds = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRate;
+   double sampleLengthSeconds = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRate;
    mDisplayLength = MIN(mDisplayLength, MIN(10, sampleLengthSeconds));
    mDisplayLengthSlider->SetExtents(0, sampleLengthSeconds);
    UpdateDisplaySamples();
@@ -297,7 +297,7 @@ void SeaOfGrain::UpdateSample()
 
 void SeaOfGrain::UpdateDisplaySamples()
 {
-   float ratio = 1;
+   double ratio = 1;
    if (!mHasRecordedInput)
       ratio = mSample->GetSampleRateRatio();
    mDisplayStartSamples = mDisplayOffset * gSampleRate * ratio;
@@ -361,7 +361,7 @@ void SeaOfGrain::GetModuleDimensions(float& width, float& height)
    height = mBufferY + mBufferH + 202;
 }
 
-void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mDisplayOffsetSlider || slider == mDisplayLengthSlider)
       UpdateDisplaySamples();
@@ -515,8 +515,8 @@ void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize
    if (mGain > 0 && mOwner->GetSourceBuffer()->BufferSize() > 0)
    {
       double time = gTime;
-      float panLeft = GetLeftPanGain(mPan);
-      float panRight = GetRightPanGain(mPan);
+      double panLeft = GetLeftPanGain(mPan);
+      double panRight = GetRightPanGain(mPan);
       for (int i = 0; i < bufferSize; ++i)
       {
          float outSample[ChannelBuffer::kMaxNumChannels];

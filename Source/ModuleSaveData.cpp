@@ -97,14 +97,14 @@ void ModuleSaveData::SetInt(std::string prop, int val, int min, int max, bool is
    save->mIsTextField = isTextField;
 }
 
-void ModuleSaveData::SetFloat(std::string prop, float val)
+void ModuleSaveData::SetFloat(std::string prop, double val)
 {
    SaveVal* save = GetVal(prop);
    assert(save && save->mType == kFloat);
    save->mFloat = val;
 }
 
-void ModuleSaveData::SetFloat(std::string prop, float val, float min, float max, bool isTextField)
+void ModuleSaveData::SetFloat(std::string prop, double val, double min, double max, bool isTextField)
 {
    SaveVal* save = GetVal(prop);
    assert(save);
@@ -157,7 +157,7 @@ int ModuleSaveData::GetInt(std::string prop)
    return save->mInt;
 }
 
-float ModuleSaveData::GetFloat(std::string prop)
+double ModuleSaveData::GetFloat(std::string prop)
 {
    const SaveVal* save = GetVal(prop);
    assert(save);
@@ -206,9 +206,9 @@ int ModuleSaveData::LoadInt(std::string prop, const ofxJSONElement& moduleInfo, 
    return LoadInt(prop, moduleInfo, defaultValue, min, max, isTextField);
 }
 
-float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue, float min, float max, bool isTextField)
+double ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, double defaultValue, double min, double max, bool isTextField)
 {
-   float val = defaultValue;
+   double val = defaultValue;
    try
    {
       if (!moduleInfo[prop].isNull())
@@ -222,10 +222,10 @@ float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleIn
    return val;
 }
 
-float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue, FloatSlider* slider, bool isTextField)
+double ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, double defaultValue, FloatSlider* slider, bool isTextField)
 {
-   float min = 0;
-   float max = 1;
+   double min = 0;
+   double max = 1;
    if (slider)
       slider->GetRange(min, max);
    return LoadFloat(prop, moduleInfo, defaultValue, min, max, isTextField);
@@ -266,7 +266,7 @@ std::string ModuleSaveData::LoadString(std::string prop, const ofxJSONElement& m
    return val;
 }
 
-void ModuleSaveData::UpdatePropertyMax(std::string prop, float max)
+void ModuleSaveData::UpdatePropertyMax(std::string prop, double max)
 {
    if (HasProperty(prop))
    {

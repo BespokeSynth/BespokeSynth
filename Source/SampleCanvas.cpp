@@ -247,7 +247,7 @@ void SampleCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

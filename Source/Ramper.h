@@ -59,7 +59,7 @@ public:
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -86,8 +86,8 @@ private:
    PatchCableSource* mControlCable{ nullptr };
    ClickButton* mTriggerButton{ nullptr };
    FloatSlider* mTargetValueSlider{ nullptr };
-   float mTargetValue{ 0 };
-   float mStartMeasure{ 0 };
-   float mStartValue{ 0 };
+   double mTargetValue{ 0 };
+   double mStartMeasure{ 0 };
+   double mStartValue{ 0 };
    bool mRamping{ false };
 };

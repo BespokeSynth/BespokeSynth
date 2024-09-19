@@ -66,7 +66,7 @@ void PitchToValue::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    }
 }
 
-float PitchToValue::Value(int samplesIn)
+double PitchToValue::Value(int samplesIn)
 {
    return mValue;
 }

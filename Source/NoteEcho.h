@@ -46,7 +46,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -66,7 +66,7 @@ private:
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
 
    static const int kMaxDestinations = 5;
-   std::array<float, kMaxDestinations> mDelay;
+   std::array<double, kMaxDestinations> mDelay;
    std::array<FloatSlider*, kMaxDestinations> mDelaySlider{};
    std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables{};
    float mWidth{ 200 };

@@ -65,7 +65,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    //IFloatSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
@@ -95,10 +95,10 @@ private:
       void Process(float* sampleOut, int offset, int ch);
       void Draw(float w, float h);
 
-      float mDelayMs{ 100 };
-      float mGain{ 0 };
-      float mFeedback{ 0 };
-      float mPan{ 0 };
+      double mDelayMs{ 100 };
+      double mGain{ 0 };
+      double mFeedback{ 0 };
+      double mPan{ 0 };
 
       MultitapDelay* mOwner{ nullptr };
 
@@ -132,8 +132,8 @@ private:
 
    ChannelBuffer mWriteBuffer;
    FloatSlider* mDryAmountSlider{ nullptr };
-   float mDryAmount{ 1 };
+   double mDryAmount{ 1 };
    FloatSlider* mDisplayLengthSlider{ nullptr };
-   float mDisplayLength{ 10 };
+   double mDisplayLength{ 10 };
    RollingBuffer mDelayBuffer;
 };

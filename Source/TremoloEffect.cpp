@@ -71,7 +71,7 @@ void TremoloEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
@@ -111,7 +111,7 @@ void TremoloEffect::DrawModule()
    ofPopStyle();
 }
 
-float TremoloEffect::GetEffectAmount()
+double TremoloEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -130,7 +130,7 @@ void TremoloEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void TremoloEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void TremoloEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mOffsetSlider)
       mLFO.SetOffset(mOffset);

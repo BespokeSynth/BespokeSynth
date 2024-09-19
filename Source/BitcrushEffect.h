@@ -43,12 +43,12 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "bitcrush"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -61,8 +61,8 @@ private:
       height = mHeight;
    }
 
-   float mCrush{ 1 };
-   float mDownsample{ 1 };
+   double mCrush{ 1 };
+   double mDownsample{ 1 };
    int mSampleCounter[ChannelBuffer::kMaxNumChannels]{};
    float mHeldDownsample[ChannelBuffer::kMaxNumChannels]{};
    FloatSlider* mCrushSlider{ nullptr };

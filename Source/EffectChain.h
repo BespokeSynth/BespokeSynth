@@ -67,7 +67,7 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName) override;
@@ -103,14 +103,14 @@ private:
    std::vector<IAudioEffect*> mEffects{};
    ChannelBuffer mDryBuffer;
    std::vector<EffectControls> mEffectControls;
-   std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels{};
+   std::array<double, MAX_EFFECTS_IN_CHAIN> mDryWetLevels{};
 
    double mSwapTime{ -1 };
    int mSwapFromIdx{ -1 };
    int mSwapToIdx{ -1 };
    ofVec2f mSwapFromPos;
    ofVec2f mSwapToPos;
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
    int mNumFXWide{ 3 };
    bool mInitialized{ false };

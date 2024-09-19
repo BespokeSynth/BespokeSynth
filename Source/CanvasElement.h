@@ -60,8 +60,8 @@ public:
    virtual CanvasElement* CreateDuplicate() const = 0;
 
    virtual void CheckboxUpdated(std::string label, bool value, double time);
-   virtual void FloatSliderUpdated(std::string label, float oldVal, float newVal, double time);
-   virtual void IntSliderUpdated(std::string label, int oldVal, float newVal, double time);
+   virtual void FloatSliderUpdated(std::string label, double oldVal, double newVal, double time);
+   virtual void IntSliderUpdated(std::string label, int oldVal, double newVal, double time);
    virtual void ButtonClicked(std::string label, double time);
 
    virtual void SaveState(FileStreamOut& out);
@@ -69,8 +69,8 @@ public:
 
    int mRow;
    int mCol;
-   float mOffset;
-   float mLength;
+   double mOffset;
+   double mLength;
 
 protected:
    virtual void DrawContents(bool clamp, bool wrapped, ofVec2f offset) = 0;
@@ -110,7 +110,7 @@ public:
 private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
 
-   float mVelocity{ .8 };
+   double mVelocity{ .8 };
    FloatSlider* mElementOffsetSlider{ nullptr };
    FloatSlider* mElementLengthSlider{ nullptr };
    IntSlider* mElementRowSlider{ nullptr };
@@ -135,7 +135,7 @@ public:
    static CanvasElement* Create(Canvas* canvas, int col, int row) { return new SampleCanvasElement(canvas, col, row, 0, 1); }
    void SetSample(Sample* sample);
    Sample* GetSample() const { return mSample; }
-   float GetVolume() const { return mVolume; }
+   double GetVolume() const { return mVolume; }
    bool IsMuted() const { return mMute; }
 
    CanvasElement* CreateDuplicate() const override;
@@ -151,7 +151,7 @@ private:
 
    Sample* mSample{ nullptr };
    FloatSlider* mElementOffsetSlider{ nullptr };
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
    bool mMute{ false };
    Checkbox* mMuteCheckbox{ nullptr };
@@ -183,7 +183,7 @@ private:
    void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
 
    IUIControl* mUIControl{ nullptr };
-   float mValue{ 0 };
+   double mValue{ 0 };
    TextEntry* mValueEntry{ nullptr };
    EventCanvas* mEventCanvas{ nullptr };
    bool mIsCheckbox{ false };

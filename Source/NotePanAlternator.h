@@ -48,7 +48,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -65,8 +65,8 @@ private:
    }
 
    bool mFlip{ false };
-   float mPanOne{ -1 };
+   double mPanOne{ -1 };
    FloatSlider* mPanOneSlider{ nullptr };
-   float mPanTwo{ 1 };
+   double mPanTwo{ 1 };
    FloatSlider* mPanTwoSlider{ nullptr };
 };

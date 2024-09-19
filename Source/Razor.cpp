@@ -54,13 +54,13 @@ void Razor::CreateUIControls()
    mNumPartialsSlider = new IntSlider(this, "partials", 5, 40, 320, 15, &mUseNumPartials, 1, NUM_PARTIALS);
    mBumpAmpSlider = new FloatSlider(this, "bump freq 1", 5, 60, 320, 15, &mBumps[0].mFreq, 0, 10000);
    mBumpAmpAmtSlider = new FloatSlider(this, "amt 1", 5, 80, 320, 15, &mBumps[0].mAmt, -1, 1);
-   mBumpAmpDecaySlider = new FloatSlider(this, "decay 1", 5, 100, 320, 15, &mBumps[0].mDecay, 0.00001f, .01f, 4);
+   mBumpAmpDecaySlider = new FloatSlider(this, "decay 1", 5, 100, 320, 15, &mBumps[0].mDecay, 0.00001, .01, 4);
    mBumpAmpSlider2 = new FloatSlider(this, "bump freq 2", 330, 60, 320, 15, &mBumps[1].mFreq, 0, 10000);
    mBumpAmpAmtSlider2 = new FloatSlider(this, "amt 2", 330, 80, 320, 15, &mBumps[1].mAmt, -1, 1);
-   mBumpAmpDecaySlider2 = new FloatSlider(this, "decay 2", 330, 100, 320, 15, &mBumps[1].mDecay, 0.00001f, .01f, 4);
+   mBumpAmpDecaySlider2 = new FloatSlider(this, "decay 2", 330, 100, 320, 15, &mBumps[1].mDecay, 0.00001, .01, 4);
    mBumpAmpSlider3 = new FloatSlider(this, "bump freq 3", 660, 60, 320, 15, &mBumps[2].mFreq, 0, 10000);
    mBumpAmpAmtSlider3 = new FloatSlider(this, "amt 3", 660, 80, 320, 15, &mBumps[2].mAmt, -1, 1);
-   mBumpAmpDecaySlider3 = new FloatSlider(this, "decay 3", 660, 100, 320, 15, &mBumps[2].mDecay, 0.00001f, .01f, 4);
+   mBumpAmpDecaySlider3 = new FloatSlider(this, "decay 3", 660, 100, 320, 15, &mBumps[2].mDecay, 0.00001, .01, 4);
    mASlider = new FloatSlider(this, "A", 450, 342, 80, 15, &mA, 1, 1000);
    mDSlider = new FloatSlider(this, "D", 450, 358, 80, 15, &mD, 1, 1000);
    mSSlider = new FloatSlider(this, "S", 450, 374, 80, 15, &mS, 0, 1);
@@ -74,7 +74,7 @@ void Razor::CreateUIControls()
    for (int i = 0; i < NUM_AMP_SLIDERS; ++i)
    {
       mAmpSliders[i] = new FloatSlider(this, ("amp" + ofToString(i)).c_str(), 4, 160 + i * 16, 200, 15, &mAmp[i], -1, 1);
-      mDetuneSliders[i] = new FloatSlider(this, ("detune" + ofToString(i)).c_str(), 210, 160 + i * 16, 200, 15, &mDetune[i], .98f, 1.02f);
+      mDetuneSliders[i] = new FloatSlider(this, ("detune" + ofToString(i)).c_str(), 210, 160 + i * 16, 200, 15, &mDetune[i], .98, 1.02);
    }
 
    mResetDetuneButton = new ClickButton(this, "reset detune", 210, 145);
@@ -360,7 +360,7 @@ void Razor::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Razor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Razor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

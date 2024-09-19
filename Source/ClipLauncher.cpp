@@ -214,7 +214,7 @@ void ClipLauncher::GetModuleDimensions(float& width, float& height)
    height = 180;
 }
 
-void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

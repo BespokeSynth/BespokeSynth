@@ -55,7 +55,7 @@ void LocationZoomer::Update()
       else //ease out
          ease = -1 * mCurrentProgress * (mCurrentProgress - 2);
       gDrawScale = ofLerp(mStart.mZoomLevel, mDestination.mZoomLevel, ease);
-      ofVec2f offset;
+      ofVec2d offset;
       offset.x = ofLerp(mStart.mOffset.x, mDestination.mOffset.x, ease);
       offset.y = ofLerp(mStart.mOffset.y, mDestination.mOffset.y, ease);
       TheSynth->SetDrawOffset(offset);
@@ -125,25 +125,25 @@ void LocationZoomer::PickNewVanityPanningDestination()
    std::vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
 
-   ofVec2f allModulesCenter;
+   ofVec2d allModulesCenter;
    for (int i = 0; i < (int)modules.size(); ++i)
    {
       if (modules[i]->IsShowing() && !modules[i]->Minimized())
       {
-         ofVec2f modulePos = modules[i]->GetRect().getCenter();
+         ofVec2d modulePos = modules[i]->GetRectDouble().getCenter();
          allModulesCenter += modulePos / (int)modules.size();
       }
    }
 
    const int kRandomChoices = 3;
-   ofVec2f randomModulesCenter;
+   ofVec2d randomModulesCenter;
    int attempts = 0;
    for (int i = 0; i < kRandomChoices; ++i)
    {
       int choice = gRandom() % ((int)modules.size());
       if (modules[choice]->IsShowing() && !modules[choice]->Minimized())
       {
-         ofVec2f modulePos = modules[choice]->GetRect().getCenter();
+         ofVec2d modulePos = modules[choice]->GetRectDouble().getCenter();
          randomModulesCenter += modulePos / kRandomChoices;
       }
       else
@@ -156,15 +156,15 @@ void LocationZoomer::PickNewVanityPanningDestination()
          break;
    }
 
-   ofVec2f center = allModulesCenter * .5f + randomModulesCenter * .5f;
+   ofVec2d center = allModulesCenter * .5 + randomModulesCenter * .5;
 
-   float newScale = ofRandom(1, 1.5f) * UserPrefs.zoom.Get();
+   float newScale = ofRandom(1.f, 1.5f) * UserPrefs.zoom.Get();
 
    mStart.mZoomLevel = gDrawScale;
    mStart.mOffset = TheSynth->GetDrawOffset();
 
    mDestination.mZoomLevel = newScale;
-   mDestination.mOffset = (center * -1) + ofVec2f(ofGetWidth(), ofGetHeight()) / newScale * .5f;
+   mDestination.mOffset = (center * -1) + ofVec2d(ofGetWidth(), ofGetHeight()) / newScale * .5;
 
    mCurrentProgress = 0;
    mSpeed = ofRandom(.03f, .1f);

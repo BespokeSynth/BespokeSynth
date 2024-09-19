@@ -43,7 +43,7 @@ namespace
       return exp(dB * DB_2_LOG);
    }
 
-   const float kMaxLookaheadMs = 50;
+   const double kMaxLookaheadMs = 50;
 }
 
 Compressor::Compressor()
@@ -56,12 +56,12 @@ void Compressor::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
    FLOATSLIDER(mMixSlider, "mix", &mMix, 0, 1);
-   FLOATSLIDER(mDriveSlider, "drive", &mDrive, .01f, 2);
+   FLOATSLIDER(mDriveSlider, "drive", &mDrive, .01, 2);
    FLOATSLIDER(mThresholdSlider, "threshold", &mThreshold, -70, 0);
    FLOATSLIDER(mRatioSlider, "ratio", &mRatio, 1, 40);
    UIBLOCK_NEWCOLUMN();
-   FLOATSLIDER(mAttackSlider, "attack", &mAttack, .1f, kMaxLookaheadMs);
-   FLOATSLIDER(mReleaseSlider, "release", &mRelease, .1f, 500);
+   FLOATSLIDER(mAttackSlider, "attack", &mAttack, .1, kMaxLookaheadMs);
+   FLOATSLIDER(mReleaseSlider, "release", &mRelease, .1, 500);
    FLOATSLIDER(mLookaheadSlider, "lookahead", &mLookahead, 0, kMaxLookaheadMs);
    FLOATSLIDER(mOutputAdjustSlider, "output", &mOutputAdjust, 0, 2);
    ENDUIBLOCK(mWidth, mHeight);
@@ -174,7 +174,7 @@ void Compressor::CheckboxUpdated(Checkbox* checkbox, double time)
       envdB_ = DC_OFFSET; //reset state
 }
 
-void Compressor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Compressor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAttackSlider)
       mEnv.setAttack(MAX(.1f, mAttack));

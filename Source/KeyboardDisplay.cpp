@@ -255,7 +255,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPushStyle();
    ofFill();
    ofSetLineWidth(2);
-   for (int pitch = RootKey(); pitch < RootKey() + NumKeys(); ++pitch)
+   for (int pitch = RootKey(); pitch < RootKey() + NumKeys() && pitch < 128; ++pitch)
    {
       if (gTime >= mLastOnTime[pitch] && (gTime <= mLastOffTime[pitch] || mLastOffTime[pitch] < mLastOnTime[pitch]))
       {

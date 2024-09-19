@@ -150,7 +150,7 @@ void AbletonLink::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void AbletonLink::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void AbletonLink::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

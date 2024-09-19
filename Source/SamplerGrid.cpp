@@ -186,7 +186,7 @@ void SamplerGrid::InitGrid()
    mGrid->SetGrid(mCols, mRows);
 }
 
-void SamplerGrid::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void SamplerGrid::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    OnGridButton(col, row, value, nullptr);
 }
@@ -443,7 +443,7 @@ void SamplerGrid::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void SamplerGrid::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SamplerGrid::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

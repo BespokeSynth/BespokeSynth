@@ -108,7 +108,7 @@ void MPESmoother::OnTransportAdvanced(float amount)
    }
 }
 
-void MPESmoother::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MPESmoother::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

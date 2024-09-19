@@ -35,10 +35,10 @@
 #include "Rewriter.h"
 #include "LooperGranulator.h"
 
-float Looper::mBeatwheelPosRight = 0;
-float Looper::mBeatwheelDepthRight = 0;
-float Looper::mBeatwheelPosLeft = 0;
-float Looper::mBeatwheelDepthLeft = 0;
+double Looper::mBeatwheelPosRight = 0;
+double Looper::mBeatwheelDepthRight = 0;
+double Looper::mBeatwheelPosLeft = 0;
+double Looper::mBeatwheelDepthLeft = 0;
 bool Looper::mBeatwheelSingleMeasure = 0;
 
 namespace
@@ -1104,7 +1104,7 @@ void Looper::ButtonClicked(ClickButton* button, double time)
       ResampleForSpeed(GetPlaybackSpeed());
 }
 
-void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Looper::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mScratchSpeedSlider)
    {

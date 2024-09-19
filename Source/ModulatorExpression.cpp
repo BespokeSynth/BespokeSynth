@@ -86,7 +86,7 @@ ModulatorExpression::~ModulatorExpression()
 {
 }
 
-float ModulatorExpression::Value(int samplesIn)
+double ModulatorExpression::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    if (mExpressionValid)
@@ -114,7 +114,7 @@ void ModulatorExpression::PostRepatch(PatchCableSource* cableSource, bool fromUs
 void ModulatorExpression::TextEntryComplete(TextEntry* entry)
 {
    mExpressionValid = false;
-   exprtk::parser<float> parser;
+   exprtk::parser<double> parser;
    mExpressionValid = parser.compile(mEntryString, mExpression);
    if (mExpressionValid)
       parser.compile(mEntryString, mExpressionDraw);
@@ -147,12 +147,12 @@ void ModulatorExpression::DrawModule()
       ofSetColor(0, 255, 0, gModuleDrawAlpha);
       ofNoFill();
       ofBeginShape();
-      float drawMinOutput = mLastDrawMinOutput;
-      float drawMaxOutput = mLastDrawMaxOutput;
+      double drawMinOutput = mLastDrawMinOutput;
+      double drawMaxOutput = mLastDrawMaxOutput;
       for (int i = 0; i <= kGraphWidth; ++i)
       {
          mExpressionInputDraw = ofMap(i, 0, kGraphWidth, mExpressionInputSlider->GetMin(), mExpressionInputSlider->GetMax());
-         float output = mExpressionDraw.value();
+         double output = mExpressionDraw.value();
          ofVertex(i + kGraphX, ofMap(output, drawMinOutput, drawMaxOutput, kGraphHeight, 0) + kGraphY);
 
          if (i == 0)

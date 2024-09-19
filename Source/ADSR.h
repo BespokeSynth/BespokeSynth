@@ -40,9 +40,9 @@ class ADSR
 public:
    struct Stage
    {
-      float target{ 0 };
-      float time{ 1 };
-      float curve{ 0 };
+      double target{ 0 };
+      double time{ 1 };
+      double curve{ 0 };
    };
 
    struct EventInfo
@@ -51,7 +51,7 @@ public:
       EventInfo(double startTime, double stopTime)
       {
          mStartBlendFromValue = 0;
-         mStopBlendFromValue = std::numeric_limits<float>::max();
+         mStopBlendFromValue = std::numeric_limits<double>::max();
          mMult = 1;
          mStartTime = startTime;
          mStopTime = stopTime;
@@ -64,27 +64,27 @@ public:
          mStartTime = -10000;
          mStopTime = -10000;
       }
-      float mStartBlendFromValue{ 0 };
-      float mStopBlendFromValue{ 0 };
-      float mMult{ 1 };
+      double mStartBlendFromValue{ 0 };
+      double mStopBlendFromValue{ 0 };
+      double mMult{ 1 };
       double mStartTime{ -10000 };
       double mStopTime{ -10000 };
    };
 
-   ADSR(float a, float d, float s, float r)
+   ADSR(double a, double d, double s, double r)
    {
       Set(a, d, s, r);
    }
    ADSR()
    : ADSR(1, 1, 1, 1)
    {}
-   void Start(double time, float target, float timeScale = 1);
-   void Start(double time, float target, float a, float d, float s, float r, float timeScale = 1);
-   void Start(double time, float target, const ADSR& adsr, float timeScale = 1);
+   void Start(double time, double target, double timeScale = 1);
+   void Start(double time, double target, double a, double d, double s, double r, double timeScale = 1);
+   void Start(double time, double target, const ADSR& adsr, double timeScale = 1);
    void Stop(double time, bool warn = true);
-   float Value(double time) const;
-   float Value(double time, const EventInfo* event) const;
-   void Set(float a, float d, float s, float r, float h = -1);
+   double Value(double time) const;
+   double Value(double time, const EventInfo* event) const;
+   void Set(double a, double d, double s, double r, double h = -1);
    void Set(const ADSR& other);
    void Clear()
    {
@@ -93,12 +93,12 @@ public:
          e.Reset();
       }
    }
-   void SetMaxSustain(float max) { mMaxSustain = max; }
+   void SetMaxSustain(double max) { mMaxSustain = max; }
    void SetSustainStage(int stage) { mSustainStage = stage; }
    bool IsDone(double time) const;
    bool IsStandardADSR() const { return mNumStages == 3 && mSustainStage == 1; }
-   float GetStartTime(double time) const { return GetEventConst(time)->mStartTime; }
-   float GetStopTime(double time) const { return GetEventConst(time)->mStopTime; }
+   double GetStartTime(double time) const { return GetEventConst(time)->mStartTime; }
+   double GetStopTime(double time) const { return GetEventConst(time)->mStopTime; }
 
    int GetNumStages() const { return mNumStages; }
    void SetNumStages(int num) { mNumStages = CLAMP(num, 1, MAX_ADSR_STAGES); }
@@ -106,13 +106,13 @@ public:
    int GetStage(double time, double& stageStartTimeOut) const;
    int GetStage(double time, double& stageStartTimeOut, const EventInfo* e) const;
 
-   float GetTimeScale() const { return mTimeScale; }
+   double GetTimeScale() const { return mTimeScale; }
 
-   float& GetA() { return mStages[0].time; }
-   float& GetD() { return mStages[1].time; }
-   float& GetS() { return mStages[1].target; }
-   float& GetR() { return mStages[2].time; }
-   float& GetMaxSustain() { return mMaxSustain; }
+   double& GetA() { return mStages[0].time; }
+   double& GetD() { return mStages[1].time; }
+   double& GetS() { return mStages[1].target; }
+   double& GetR() { return mStages[2].time; }
+   double& GetMaxSustain() { return mMaxSustain; }
    int& GetSustainStage() { return mSustainStage; }
    bool& GetHasSustainStage() { return mHasSustainStage; }
    bool& GetFreeReleaseLevel() { return mFreeReleaseLevel; }
@@ -123,15 +123,15 @@ public:
 private:
    EventInfo* GetEvent(double time);
    const EventInfo* GetEventConst(double time) const;
-   float GetStageTimeScale(int stage) const;
+   double GetStageTimeScale(int stage) const;
 
    std::array<EventInfo, 5> mEvents;
    int mNextEventPointer{ 0 };
    int mSustainStage{ 0 };
-   float mMaxSustain{ -1 };
+   double mMaxSustain{ -1 };
    Stage mStages[MAX_ADSR_STAGES];
    int mNumStages{ 0 };
    bool mHasSustainStage{ false };
    bool mFreeReleaseLevel{ false };
-   float mTimeScale{ 1 };
+   double mTimeScale{ 1 };
 };

@@ -41,5 +41,6 @@ namespace MathUtils
    ofVec2f ScaleVec(ofVec2f a, ofVec2f b);
    ofVec2f Normal(ofVec2f v);
    float Curve(float t, float curve);
+   double Curve(double t, double curve);
    int HighestPow2(int n);
 };

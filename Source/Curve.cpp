@@ -27,7 +27,7 @@
 #include "FileStream.h"
 #include <algorithm>
 
-Curve::Curve(float defaultValue)
+Curve::Curve(double defaultValue)
 : mDefaultValue(defaultValue)
 {
 }
@@ -62,7 +62,7 @@ void Curve::AddPointAtEnd(CurvePoint point)
    ++mNumCurvePoints;
 }
 
-int Curve::FindIndexForTime(float time)
+int Curve::FindIndexForTime(double time)
 {
    int max = mNumCurvePoints - 1;
    int left = 0;
@@ -83,9 +83,9 @@ int Curve::FindIndexForTime(float time)
    return -1;
 }
 
-float Curve::Evaluate(float time, bool holdEndForLoop)
+double Curve::Evaluate(double time, bool holdEndForLoop)
 {
-   float retVal = mDefaultValue;
+   double retVal = mDefaultValue;
 
    if (mNumCurvePoints > 0)
    {
@@ -136,7 +136,7 @@ void Curve::Render()
    ofBeginShape();
    for (int i = 0; i < mWidth; ++i)
    {
-      float val = Evaluate(ofMap(float(i) / mWidth, 0, 1, mStart, mEnd));
+      double val = Evaluate(ofMap(static_cast<double>(i) / mWidth, 0, 1, mStart, mEnd));
 
       if (i > 0)
       {
@@ -177,7 +177,7 @@ bool Curve::MouseScrolled(float x, float y, float scrollX, float scrollY, bool i
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void Curve::SaveState(FileStreamOut& out)
@@ -197,5 +197,15 @@ void Curve::LoadState(FileStreamIn& in)
 
    in >> mNumCurvePoints;
    for (int i = 0; i < mNumCurvePoints; ++i)
-      in >> mPoints[i].mTime >> mPoints[i].mValue;
+   {
+      if (rev < 2)
+      {
+         float a, b;
+         in >> a >> b;
+         mPoints[i].mTime = a;
+         mPoints[i].mValue = b;
+      }
+      else
+         in >> mPoints[i].mTime >> mPoints[i].mValue;
+   }
 }

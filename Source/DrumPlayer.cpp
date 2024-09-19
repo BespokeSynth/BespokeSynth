@@ -110,7 +110,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
 #undef UIBLOCK_OWNER
 #define UIBLOCK_OWNER owner //change owner
    FLOATSLIDER_DIGITS(mVolSlider, ("vol " + ofToString(index)).c_str(), &mVol, 0, 2, 2);
-   FLOATSLIDER_DIGITS(mSpeedSlider, ("speed " + ofToString(index)).c_str(), &mSpeed, .2f, 3, 2);
+   FLOATSLIDER_DIGITS(mSpeedSlider, ("speed " + ofToString(index)).c_str(), &mSpeed, .2, 3, 2);
    FLOATSLIDER(mPanSlider, ("pan " + ofToString(index)).c_str(), &mPan, -1, 1);
    INTSLIDER(mWidenSlider, ("widen " + ofToString(index)).c_str(), &mWiden, -150, 150);
    FLOATSLIDER(mStartOffsetSlider, ("start " + ofToString(index)).c_str(), &mStartOffset, 0, 1);
@@ -284,7 +284,7 @@ void DrumPlayer::Process(double time)
 
    int bufferSize = gBufferSize;
 
-   float volSq = mVolume * mVolume * .5f;
+   double volSq = mVolume * mVolume * .5;
 
    mOutputBuffer.Clear();
 
@@ -348,7 +348,7 @@ void DrumPlayer::DrumHit::StartPlayhead(double time, float startOffsetPercent, f
          mPlayheads[i].mCutOffTime = -1;
          mPlayheads[i].mOffset = startOffsetPercent * mSample.LengthInSamples();
          mPlayheads[i].mEnvelopeTime = 0;
-         mPlayheads[i].mEnvelopeScale = ofLerp(.2f, 1, velocity);
+         mPlayheads[i].mEnvelopeScale = ofLerp(.2, 1, velocity);
          mPlayheads[i].mSpeedTweak = ofRandom(1 - mOwner->mSpeedRandomization, 1 + mOwner->mSpeedRandomization);
       }
       else
@@ -362,12 +362,12 @@ void DrumPlayer::DrumHit::StopLinked(double time)
 {
    for (size_t i = 0; i < mPlayheads.size(); ++i)
    {
-      if (mPlayheads[i].mCutOffTime == -1)
+      if (ofAlmostEquel(mPlayheads[i].mCutOffTime, -1.0))
          mPlayheads[i].mCutOffTime = time;
    }
 }
 
-float DrumPlayer::DrumHit::GetPlayProgress(double time)
+double DrumPlayer::DrumHit::GetPlayProgress(double time)
 {
    int playheadIdx = -1;
    double startTime = -1;
@@ -380,21 +380,21 @@ float DrumPlayer::DrumHit::GetPlayProgress(double time)
       }
    }
 
-   if (startTime != -1 && mSample.Data() != nullptr)
+   if (!ofAlmostEquel(startTime, -1.0) && mSample.Data() != nullptr)
       return mPlayheads[playheadIdx].mOffset / mSample.LengthInSamples();
    return 1;
 }
 
-bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize)
+bool DrumPlayer::DrumHit::Process(double time, double speed, double vol, ChannelBuffer* out, int bufferSize)
 {
    ChannelBuffer* sampleData = mSample.Data();
    speed *= mSpeed;
 
    for (int i = 0; i < bufferSize; ++i)
    {
-      float sampleSpeed = speed;
+      double sampleSpeed = speed;
       if (mPitchBend != nullptr)
-         sampleSpeed *= ofMap(mPitchBend->GetValue(i), -.5f, .5f, 0, 2);
+         sampleSpeed *= ofMap(mPitchBend->GetValue(i), -.5, .5, 0, 2);
 
       for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
          gWorkBuffer[ch] = 0;
@@ -413,7 +413,7 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
 
                if (mPlayheads[playhead].mCutOffTime != -1 && time > mPlayheads[playhead].mCutOffTime)
                {
-                  float fade = ofMap(time - mPlayheads[playhead].mCutOffTime, 0, .25f, 1, 0, K(clamp));
+                  double fade = ofMap(time - mPlayheads[playhead].mCutOffTime, 0, .25, 1, 0, K(clamp));
                   sample *= fade;
                   if (fade == 0)
                      mPlayheads[playhead].mStartTime = -1;
@@ -899,7 +899,7 @@ void DrumPlayer::OnControllerPageSelected()
 
 void DrumPlayer::DrumHit::DrawUIControls()
 {
-   float displayLength = mSample.LengthInSamples();
+   double displayLength = mSample.LengthInSamples();
    if (mUseEnvelope)
       displayLength = MIN(mEnvelopeLength * gSampleRateMs, displayLength);
    ofPushMatrix();
@@ -1070,7 +1070,7 @@ void DrumPlayer::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAuditionSlider)
    {
@@ -1286,8 +1286,18 @@ void DrumPlayer::LoadState(FileStreamIn& in, int rev)
    {
       mDrumHits[i].mSample.LoadState(in);
       in >> mDrumHits[i].mLinkId;
-      in >> mDrumHits[i].mVol;
-      in >> mDrumHits[i].mSpeed;
+      if (rev < 2)
+      {
+         float a, b;
+         in >> a >> b;
+         mDrumHits[i].mVol = a;
+         mDrumHits[i].mSpeed = b;
+      }
+      else
+      {
+         in >> mDrumHits[i].mVol;
+         in >> mDrumHits[i].mSpeed;
+      }
       if (rev >= 1)
       {
          in >> mDrumHits[i].mHitCategory;

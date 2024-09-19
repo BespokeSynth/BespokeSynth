@@ -122,12 +122,12 @@ void AudioLevelToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
    OnModulatorRepatch();
 }
 
-float AudioLevelToCV::Value(int samplesIn)
+double AudioLevelToCV::Value(int samplesIn)
 {
    return ofMap(mModulationBuffer[samplesIn], 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
-void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAttackSlider)
       mAttackFactor = powf(.01f, 1.0f / (mAttack * gSampleRateMs));

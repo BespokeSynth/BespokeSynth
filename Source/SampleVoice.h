@@ -36,7 +36,7 @@ class SampleVoiceParams : public IVoiceParams
 {
 public:
    ::ADSR mAdsr{ 10, 0, 1, 10 };
-   float mVol{ 1 };
+   double mVol{ 1 };
    float* mSampleData{ nullptr };
    int mSampleLength{ 0 };
    float mDetectedFreq{ -1 };

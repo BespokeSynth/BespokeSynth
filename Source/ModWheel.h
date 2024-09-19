@@ -51,7 +51,7 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -68,7 +68,7 @@ private:
       height = 22;
    }
 
-   float mModWheel{ 0 };
+   double mModWheel{ 0 };
    FloatSlider* mModWheelSlider{ nullptr };
 
    Modulations mModulation{ true };

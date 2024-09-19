@@ -60,7 +60,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -78,16 +78,16 @@ private:
 
    ChannelBuffer mDryBuffer;
 
-   float mFreq{ 220 };
-   float mDryWet{ 1 };
-   float mVolume{ 1 };
+   double mFreq{ 220 };
+   double mDryWet{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mFreqSlider{ nullptr };
    FloatSlider* mDryWetSlider{ nullptr };
    FloatSlider* mVolumeSlider{ nullptr };
 
    EnvOscillator mModOsc{ kOsc_Sin };
-   float mPhase{ 0 };
+   double mPhase{ 0 };
    Ramp mFreqRamp;
-   float mGlideTime{ 0 };
+   double mGlideTime{ 0 };
    FloatSlider* mGlideSlider{ nullptr };
 };

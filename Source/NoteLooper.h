@@ -66,7 +66,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener

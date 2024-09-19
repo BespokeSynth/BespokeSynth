@@ -88,7 +88,7 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -159,7 +159,7 @@ private:
    std::array<Checkbox*, kMaxLoopers> mWriteForLooperCheckbox{ nullptr };
    std::array<bool, kMaxLoopers> mWriteForLooper{ false };
    std::array<double, kMaxLoopers> mStartRecordMeasureTime{ 0 };
-   float mLatencyFixMs{ 0 };
+   double mLatencyFixMs{ 0 };
    FloatSlider* mLatencyFixMsSlider{ nullptr };
 
    bool mFreeRecording{ false };

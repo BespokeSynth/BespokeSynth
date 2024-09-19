@@ -692,7 +692,7 @@ void NoteCanvas::ButtonClicked(ClickButton* button, double time)
       SaveMidi();
 }
 
-void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

@@ -63,6 +63,7 @@ public:
    }
    ofVec2f GetDimensions();
    ofRectangle GetRect(bool local = false);
+   ofRectangle_d GetRectDouble(bool local = false);
    void SetName(const char* name)
    {
       if (mName != name)

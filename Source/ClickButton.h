@@ -73,13 +73,13 @@ public:
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   float GetValue() const override { return GetMidiValue(); }
-   float GetMidiValue() const override;
-   std::string GetDisplayValue(float val) const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override { return GetMidiValue(); }
+   double GetMidiValue() const override;
+   std::string GetDisplayValue(double val) const override;
    int GetNumValues() override { return 2; }
-   void Increment(float amount) override;
+   void Increment(double amount) override;
    void GetDimensions(float& width, float& height) override
    {
       width = mWidth;

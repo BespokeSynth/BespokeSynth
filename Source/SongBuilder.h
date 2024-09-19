@@ -75,7 +75,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -140,7 +140,7 @@ private:
       void CleanUp();
       void UpdateDropdownContents(ControlTarget* target);
 
-      float mFloatValue{ 0 };
+      double mFloatValue{ 0 };
       TextEntry* mValueEntry{ nullptr };
       bool mBoolValue{ false };
       Checkbox* mCheckbox{ nullptr };

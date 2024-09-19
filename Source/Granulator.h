@@ -63,14 +63,14 @@ public:
    void ClearGrains();
    void SetLiveMode(bool live) { mLiveMode = live; }
 
-   float mSpeed{ 1 };
-   float mGrainLengthMs{ 60 };
-   float mGrainOverlap{ 10 };
-   float mPosRandomizeMs{ 5 };
-   float mSpeedRandomize{ 0 };
-   float mSpacingRandomize{ 1 };
+   double mSpeed{ 1 };
+   double mGrainLengthMs{ 60 };
+   double mGrainOverlap{ 10 };
+   double mPosRandomizeMs{ 5 };
+   double mSpeedRandomize{ 0 };
+   double mSpacingRandomize{ 1 };
    bool mOctaves{ false };
-   float mWidth{ 1 };
+   double mWidth{ 1 };
 
 private:
    void SpawnGrain(double time, double offset, float width);

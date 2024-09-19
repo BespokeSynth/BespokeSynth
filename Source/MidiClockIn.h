@@ -104,7 +104,7 @@ public:
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -144,7 +144,7 @@ private:
    DropdownList* mDeviceList{ nullptr };
    TempoRoundMode mTempoRoundMode{ TempoRoundMode::kWhole };
    DropdownList* mTempoRoundModeList{ nullptr };
-   float mStartOffsetMs{ 0 };
+   double mStartOffsetMs{ 0 };
    FloatSlider* mStartOffsetMsSlider{ nullptr };
    int mSmoothAmount{ kMaxHistory / 2 };
    IntSlider* mSmoothAmountSlider{ nullptr };

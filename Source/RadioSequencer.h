@@ -54,7 +54,7 @@ public:
    void CreateUIControls() override;
 
    //IGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //IDrawableModule
    void Init() override;

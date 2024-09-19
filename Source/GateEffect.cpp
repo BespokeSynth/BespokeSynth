@@ -108,6 +108,6 @@ void GateEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void GateEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void GateEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }

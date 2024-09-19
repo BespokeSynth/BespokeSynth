@@ -168,7 +168,7 @@ void UnstablePressure::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetPressure(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstablePressure::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void UnstablePressure::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

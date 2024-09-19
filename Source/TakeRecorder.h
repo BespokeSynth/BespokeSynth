@@ -50,7 +50,7 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -67,6 +67,6 @@ private:
       h = 22;
    }
 
-   float mStartSeconds{ 0 };
+   double mStartSeconds{ 0 };
    FloatSlider* mStartSecondsSlider{ nullptr };
 };

@@ -63,7 +63,7 @@ public:
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -86,7 +86,7 @@ private:
 
    Sample* mSample{ nullptr };
 
-   float mVolume{ .6 };
+   double mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    float* mWriteBuffer{ nullptr };
    bool mPlay{ false };
@@ -102,7 +102,7 @@ private:
    IntSlider* mClipEndSlider{ nullptr };
    float mZoomStart{ 0 };
    float mZoomEnd{ 1 };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };

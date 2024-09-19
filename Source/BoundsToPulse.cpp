@@ -71,7 +71,7 @@ void BoundsToPulse::DrawModule()
    mMaxCable->SetManualPosition(100, 30);
 }
 
-void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (!mEnabled)
       return;

@@ -60,110 +60,132 @@ struct ofColor
    }
 };
 
-struct ofVec2f
+template <typename T>
+struct ofVec2
 {
-   ofVec2f()
+   ofVec2()
    {}
-   ofVec2f(float _x, float _y)
+   ofVec2(T _x, T _y)
    : x(_x)
    , y(_y)
    {}
-   void set(float _x, float _y)
+   void set(T _x, T _y)
    {
       x = _x;
       y = _y;
    }
-   ofVec2f operator-(const ofVec2f& other)
+   ofVec2 operator-(const ofVec2& other)
    {
-      return ofVec2f(x - other.x, y - other.y);
+      return ofVec2(x - other.x, y - other.y);
    }
-   ofVec2f operator+(const ofVec2f& other)
+   ofVec2 operator+(const ofVec2& other)
    {
-      return ofVec2f(x + other.x, y + other.y);
+      return ofVec2(x + other.x, y + other.y);
    }
-   float lengthSquared() const
-   {
-      return x * x + y * y;
-   }
-   float distanceSquared() const
+   T lengthSquared() const
    {
       return x * x + y * y;
    }
-   float distanceSquared(ofVec2f other) const
+   T distanceSquared() const
+   {
+      return x * x + y * y;
+   }
+   T distanceSquared(ofVec2 other) const
    {
       return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y);
    }
-   float dot(const ofVec2f& vec) const
+   T dot(const ofVec2& vec) const
    {
       return x * vec.x + y * vec.y;
    }
-   ofVec2f operator*(float f)
+   ofVec2 operator*(T f)
    {
-      return ofVec2f(x * f, y * f);
+      return ofVec2(x * f, y * f);
    }
-   ofVec2f operator/(float f)
+   ofVec2 operator/(T f)
    {
-      return ofVec2f(x / f, y / f);
+      return ofVec2(x / f, y / f);
    }
-   ofVec2f& operator-=(const ofVec2f& other)
+   //template <typename TCast>
+   //operator ofVec2<TCast>()
+   //{
+   //   return ofVec2<TCast>(x , y );
+   //}
+   ofVec2& operator-=(const ofVec2& other)
    {
       x -= other.x;
       y -= other.y;
       return *this;
    }
-   ofVec2f& operator+=(const ofVec2f& other)
+   ofVec2& operator+=(const ofVec2& other)
    {
       x += other.x;
       y += other.y;
       return *this;
    }
-   float x{ 0 };
-   float y{ 0 };
+   T x{ 0 };
+   T y{ 0 };
 };
 
-struct ofVec3f
+typedef ofVec2<float> ofVec2f;
+typedef ofVec2<double> ofVec2d;
+
+template <class T>
+struct ofVec3
 {
-   ofVec3f()
+   ofVec3()
    {}
-   ofVec3f(float _x, float _y, float _z)
+   ofVec3(T _x, T _y, T _z)
    : x(_x)
    , y(_y)
    , z(_z)
    {}
-   float length() const
+   T length() const
    {
       return sqrt(x * x + y * y + z * z);
    }
-   float x{ 0 };
-   float y{ 0 };
-   float z{ 0 };
+   T x{ 0 };
+   T y{ 0 };
+   T z{ 0 };
 };
 
-struct ofRectangle
+typedef ofVec3<float> ofVec3f;
+typedef ofVec3<double> ofVec3d;
+
+template <class T>
+struct ofRectangle_t
 {
-   ofRectangle()
+   ofRectangle_t()
    {}
-   ofRectangle(float _x, float _y, float _w, float _h)
+   ofRectangle_t(T _x, T _y, T _w, T _h)
    : x(_x)
    , y(_y)
    , width(_w)
    , height(_h)
    {
    }
-   ofRectangle(ofVec2f p1, ofVec2f p2)
+   ofRectangle_t(ofVec2<T> p1, ofVec2<T> p2)
    {
       set(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
    }
-   void set(float _x, float _y, float _w, float _h)
+   void set(T _x, T _y, T _w, T _h)
    {
       x = _x;
       y = _y;
       width = _w;
       height = _h;
    }
-   bool intersects(const ofRectangle& other) const;
-   bool contains(float x, float y) const;
-   ofRectangle& grow(float amount)
+   bool intersects(const ofRectangle_t& other) const
+   {
+      return (getMinX() < other.getMaxX() && getMaxX() > other.getMinX() &&
+              getMinY() < other.getMaxY() && getMaxY() > other.getMinY());
+   }
+   bool contains(T testX, T testY) const
+   {
+      return testX > getMinX() && testY > getMinY() &&
+             testX < getMaxX() && testY < getMaxY();
+   }
+   ofRectangle_t& grow(T amount)
    {
       x -= amount;
       y -= amount;
@@ -171,16 +193,31 @@ struct ofRectangle
       height += amount * 2;
       return *this;
    }
-   float getMinX() const;
-   float getMaxX() const;
-   float getMinY() const;
-   float getMaxY() const;
-   ofVec2f getCenter() const { return ofVec2f(x + width * .5f, y + height * .5f); }
-   float x{ 0 };
-   float y{ 0 };
-   float width{ 100 };
-   float height{ 100 };
+   T getMinX() const
+   {
+      return std::min(x, x + width); // - width
+   }
+   T getMaxX() const
+   {
+      return std::max(x, x + width); // - width
+   }
+   T getMinY() const
+   {
+      return std::min(y, y + height); // - height
+   }
+   T getMaxY() const
+   {
+      return std::max(y, y + height); // - height
+   }
+   ofVec2<T> getCenter() const { return ofVec2<T>(x + width * .5, y + height * .5); }
+   T x{ 0 };
+   T y{ 0 };
+   T width{ 100 };
+   T height{ 100 };
 };
+
+typedef ofRectangle_t<float> ofRectangle;
+typedef ofRectangle_t<double> ofRectangle_d;
 
 using ofMutex = std::recursive_mutex;
 
@@ -214,8 +251,25 @@ inline std::string ofToString(const T& value, int precision)
    return out.str();
 }
 
-#define PI 3.14159265358979323846
-#define TWO_PI 6.28318530717958647693
+template <class T>
+inline bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
+{
+   if (std::is_same_v<T, float> && isnan<T>(epsilon))
+      epsilon = 0.0001f;
+   else if (std::is_same_v<T, double> && isnan<T>(epsilon))
+      epsilon = 0.0000000000001;
+   else if (std::is_same_v<T, long double> && isnan<T>(epsilon))
+      epsilon = 0.00000000000000000000000001L;
+   return fabs(a - b) < epsilon;
+}
+
+//inline bool ofAlmostEquel(const double& a, const double& b, const double epsilon = 0.000000001)
+//{
+//   return fabs(a - b) < epsilon;
+//}
+
+#define PI 3.14159265358979323846264338327
+#define TWO_PI 6.28318530717958647692528676654
 
 class RetinaTrueTypeFont
 {
@@ -260,10 +314,11 @@ void ofNoFill();
 void ofCircle(float x, float y, float radius);
 void ofRect(float x, float y, float width, float height, float cornerRadius = 3);
 void ofRect(const ofRectangle& rect, float cornerRadius = 3);
-float ofClamp(float val, float a, float b);
+double ofClamp(double val, double a, double b);
 float ofGetLastFrameTime();
 int ofToInt(const std::string& intString);
 float ofToFloat(const std::string& floatString);
+double ofToDouble(const std::string& doubleString);
 int ofHexToInt(const std::string& hexString);
 void ofLine(float x1, float y1, float x2, float y2);
 void ofLine(ofVec2f v1, ofVec2f v2);
@@ -272,15 +327,15 @@ void ofBeginShape();
 void ofEndShape(bool close = false);
 void ofVertex(float x, float y, float z = 0);
 void ofVertex(ofVec2f point);
-float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEnd, bool clamp = false);
-float ofRandom(float max);
-float ofRandom(float x, float y);
+double ofMap(double val, double fromStart, double fromEnd, double toStart, double toEnd, bool clamp = false);
+double ofRandom(double max);
+double ofRandom(double x, double y);
 void ofSetCircleResolution(float res);
 unsigned long long ofGetSystemTimeNanos();
 float ofGetWidth();
 float ofGetHeight();
 float ofGetFrameRate();
-float ofLerp(float start, float stop, float amt);
+double ofLerp(double start, double stop, double amt);
 float ofDistSquared(float x1, float y1, float x2, float y2);
 std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty = false, bool trim = false);
 bool ofIsStringInString(const std::string& haystack, const std::string& needle);

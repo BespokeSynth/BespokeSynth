@@ -71,11 +71,11 @@ public:
 private:
    RadioButton* mSelector{ nullptr };
    int mSampleIndex{ -1 };
-   float mVolume{ 0 };
+   double mVolume{ 0 };
    FloatSlider* mVolumeSlider{ nullptr };
    BeatData mBeatData;
    int mIndex{ 0 };
-   float mFilter{ 0 };
+   double mFilter{ 0 };
    FloatSlider* mFilterSlider{ nullptr };
    std::array<BiquadFilter, 2> mLowpass;
    std::array<BiquadFilter, 2> mHighpass;
@@ -86,7 +86,7 @@ private:
    int mNumBars{ 4 };
    IntSlider* mNumBarsSlider{ nullptr };
    std::vector<Sample*> mSamples;
-   float mPan{ 0 };
+   double mPan{ 0 };
    FloatSlider* mPanSlider{ nullptr };
    ClickButton* mDeleteButton{ nullptr };
 };
@@ -117,7 +117,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;

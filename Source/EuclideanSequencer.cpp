@@ -100,7 +100,7 @@ void EuclideanSequencer::CreateUIControls()
    mRndOffsetButton = new ClickButton(this, "offset", x, y + 60);
    mRndNoteButton = new ClickButton(this, "note", x, y + 80);
 
-   int aInitState = (int)ofRandom(0, EUCLIDEAN_INITIALSTATE_MAX - 0.01); // select a random default state between 0 and max-1
+   int aInitState = (int)ofRandom(0., EUCLIDEAN_INITIALSTATE_MAX - 0.01); // select a random default state between 0 and max-1
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
    {
       mEuclideanSequencerRings[i]->CreateUIControls();
@@ -184,7 +184,7 @@ void EuclideanSequencer::DrawModule()
    // Rotating tranposrt line
    ofPushStyle();
    ofSetColor(ofColor::lime);
-   float pos = TheTransport->GetMeasurePos(gTime);
+   double pos = TheTransport->GetMeasurePos(gTime);
    ofVec2f end = PolToCar(pos, 100);
    ofLine(100, 100, 100 + end.x, 100 + end.y);
    ofPopStyle();
@@ -216,7 +216,7 @@ void EuclideanSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    // Check if Lo > Hi or Hi < Lo
    if (slider == mRndLengthLoSlider)
@@ -399,21 +399,44 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
 
    if (rev >= 2)
    {
-      in >> mRndLengthChance;
-      in >> mRndLengthLo;
-      in >> mRndLengthHi;
-      in >> mRndOnsetChance;
-      in >> mRndOnsetLo;
-      in >> mRndOnsetHi;
-      in >> mRndRotationChance;
-      in >> mRndRotationLo;
-      in >> mRndRotationHi;
-      in >> mRndOffsetChance;
-      in >> mRndOffsetLo;
-      in >> mRndOffsetHi;
-      in >> mRndNoteChance;
-      in >> mRndOctaveLo;
-      in >> mRndOctaveHi;
+      if (rev < 3)
+      {
+         float a, b, c, d, e, f, g, h, i, j, k, l, m, n, o;
+         in >> a >> b >> c >> d >> e >> f >> g >> h >> i >> j >> k >> l >> m >> n >> o;
+         mRndLengthChance = a;
+         mRndLengthLo = b;
+         mRndLengthHi = c;
+         mRndOnsetChance = d;
+         mRndOnsetLo = e;
+         mRndOnsetHi = f;
+         mRndRotationChance = g;
+         mRndRotationLo = h;
+         mRndRotationHi = i;
+         mRndOffsetChance = j;
+         mRndOffsetLo = k;
+         mRndOffsetHi = l;
+         mRndNoteChance = m;
+         mRndOctaveLo = n;
+         mRndOctaveHi = o;
+      }
+      else
+      {
+         in >> mRndLengthChance;
+         in >> mRndLengthLo;
+         in >> mRndLengthHi;
+         in >> mRndOnsetChance;
+         in >> mRndOnsetLo;
+         in >> mRndOnsetHi;
+         in >> mRndRotationChance;
+         in >> mRndRotationLo;
+         in >> mRndRotationHi;
+         in >> mRndOffsetChance;
+         in >> mRndOffsetLo;
+         in >> mRndOffsetHi;
+         in >> mRndNoteChance;
+         in >> mRndOctaveLo;
+         in >> mRndOctaveHi;
+      }
    }
 }
 
@@ -472,7 +495,7 @@ void EuclideanSequencer::RandomizeRotation(int ringIndex)
          int maxRotation = mEuclideanSequencerRings[i]->GetSteps();
          maxRotation = MIN(mRndRotationHi, maxRotation);
 
-         mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(mRndRotationLo, maxRotation + 0.9f));
+         mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(mRndRotationLo, maxRotation + 0.9));
       }
    }
 }
@@ -493,7 +516,7 @@ void EuclideanSequencer::RandomizeOffset(int ringIndex)
       if (ofRandom(1) < mRndOffsetChance)
       {
          if (i == 0)
-            mEuclideanSequencerRings[i]->SetOffset(ofRandom(0, MIN(0.04, mRndOffsetHi)));
+            mEuclideanSequencerRings[i]->SetOffset(ofRandom(0., MIN(0.04, mRndOffsetHi)));
          else
             mEuclideanSequencerRings[i]->SetOffset(ofRandom(mRndOffsetLo, mRndOffsetHi));
       }
@@ -780,7 +803,7 @@ void EuclideanSequencerRing::MouseMoved(float x, float y)
    }
 }
 
-void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    bool forceUpdate{ false };
 

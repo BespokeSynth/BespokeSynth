@@ -49,20 +49,20 @@ public:
    virtual void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }
-   virtual void SetFromMidiCC(float slider, double time, bool setViaModulator) = 0;
-   virtual float GetValueForMidiCC(float slider) const { return 0; }
-   virtual void SetValue(float value, double time, bool forceUpdate = false) = 0;
-   virtual void SetValueDirect(float value, double time) { SetValue(value, time); } //override if you need special control here
-   virtual float GetValue() const { return 0; }
-   virtual float GetMidiValue() const { return 0; }
+   virtual void SetFromMidiCC(double slider, double time, bool setViaModulator) = 0;
+   virtual double GetValueForMidiCC(double slider) const { return 0; }
+   virtual void SetValue(double value, double time, bool forceUpdate = false) = 0;
+   virtual void SetValueDirect(double value, double time) { SetValue(value, time); } //override if you need special control here
+   virtual double GetValue() const { return 0; }
+   virtual double GetMidiValue() const { return 0; }
    virtual int GetNumValues() { return 0; } //the number of distinct values that you can have for this control, zero indicates infinite (like a float slider)
-   virtual std::string GetDisplayValue(float val) const { return "unimplemented"; }
+   virtual std::string GetDisplayValue(double val) const { return "unimplemented"; }
    virtual void Init() {}
    virtual void Poll() {}
    virtual void KeyPressed(int key, bool isRepeat) {}
    void StartBeacon() override;
    bool IsPreset();
-   virtual void GetRange(float& min, float& max)
+   virtual void GetRange(double& min, double& max)
    {
       min = 0;
       max = 1;
@@ -77,7 +77,7 @@ public:
    virtual void Double() {}
    virtual void Halve() {}
    virtual void ResetToOriginal() {}
-   virtual void Increment(float amount) {}
+   virtual void Increment(double amount) {}
    void SetCableTargetable(bool targetable) { mCableTargetable = targetable; }
    bool GetCableTargetable() const { return mCableTargetable; }
    void SetNoHover(bool noHover) { mNoHover = noHover; }
@@ -93,8 +93,8 @@ public:
    virtual bool IsMouseDown() const { return false; }
    virtual bool IsTextEntry() const { return false; }
    virtual bool ModulatorUsesLiteralValue() const { return false; }
-   virtual float GetModulationRangeMin() const { return 0; }
-   virtual float GetModulationRangeMax() const { return 1; }
+   virtual double GetModulationRangeMin() const { return 0; }
+   virtual double GetModulationRangeMax() const { return 1; }
    virtual bool ShouldSerializeForSnapshot() const { return false; }
 
    static void SetNewManualHoverViaTab(int direction);

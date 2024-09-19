@@ -42,9 +42,9 @@ public:
 
    void SetVol(float vol) { mVol = vol; }
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
-   float GetMaxTime() const { return mMaxTime; }
-   float& GetMaxTime() { return mMaxTime; }
-   void SetMaxTime(float maxTime);
+   double GetMaxTime() const { return mMaxTime; }
+   double& GetMaxTime() { return mMaxTime; }
+   void SetMaxTime(double maxTime);
    void SetADSR(::ADSR* adsr);
    ::ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
@@ -65,8 +65,8 @@ public:
    FloatSlider* GetRSlider() { return mRSlider; }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -108,7 +108,7 @@ private:
    float mWidth;
    float mHeight;
    float mVol{ 1 };
-   float mMaxTime{ 1000 };
+   double mMaxTime{ 1000 };
    bool mClick{ false };
    ::ADSR* mAdsr;
    ofVec2f mClickStart;

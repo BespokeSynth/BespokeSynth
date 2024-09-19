@@ -263,7 +263,7 @@ void Stutter::OnTimeEvent(double time)
 {
    if (mEnabled)
    {
-      if (mAutoStutter && TheTransport->GetMeasurePos(time) > .001f) //don't auto-stutter downbeat
+      if (mAutoStutter && TheTransport->GetMeasurePos(time) > .001) //don't auto-stutter downbeat
       {
          if (gRandom() % 4 == 0)
          {

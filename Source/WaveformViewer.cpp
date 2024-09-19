@@ -86,7 +86,7 @@ void WaveformViewer::Process(double time)
       for (int i = 0; i < bufferSize; ++i)
          mAudioView[(i + mBufferVizOffset[!mDoubleBufferFlip]) % lengthSamples][!mDoubleBufferFlip] = gWorkBuffer[i];
 
-      float vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
+      double vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
       mVizPhase[!mDoubleBufferFlip] += vizPhaseInc * bufferSize;
       while (mVizPhase[!mDoubleBufferFlip] > FTWO_PI)
       {
@@ -137,17 +137,17 @@ void WaveformViewer::DrawModule()
    float w, h;
    GetDimensions(w, h);
    int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
-   float vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
-   float phaseStart = (FTWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
-   float end = lengthSamples - (FTWO_PI / vizPhaseInc);
+   double vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
+   double phaseStart = (TWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
+   double end = lengthSamples - (TWO_PI / vizPhaseInc);
 
    if (mDrawWaveform)
    {
       ofBeginShape();
       for (int i = phaseStart; i < lengthSamples; i++)
       {
-         float x = ofMap(i - phaseStart, 0, end, 0, w, true);
-         float samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
+         double x = ofMap(i - phaseStart, 0, end, 0, w, true);
+         double samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
          samp *= mDrawGain;
          if (x < w)
             ofVertex(x, h / 2 - samp * (h / 2));
@@ -161,11 +161,11 @@ void WaveformViewer::DrawModule()
       ofSetLineWidth(1);
       for (int i = phaseStart; i < lengthSamples; i++)
       {
-         float a = float(i - phaseStart) / end;
+         double a = double(i - phaseStart) / end;
          if (a < 1)
          {
-            float rad = a * MIN(w, h) / 2;
-            float samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
+            double rad = a * MIN(w, h) / 2;
+            double samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
             if (samp > 0)
                ofSetColor(245, 58, 135, ofMap(samp * mDrawGain / 10, 0, 1, 0, 255, true));
             else
@@ -189,7 +189,7 @@ void WaveformViewer::PlayNote(double time, int pitch, int velocity, int voiceIdx
 {
    if (velocity > 0)
    {
-      float floatPitch = pitch;
+      double floatPitch = pitch;
       if (modulation.pitchBend != nullptr)
          floatPitch += modulation.pitchBend->GetValue(0);
       mDisplayFreq = TheScale->PitchToFreq(floatPitch);

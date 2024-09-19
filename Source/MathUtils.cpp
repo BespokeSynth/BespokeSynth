@@ -73,6 +73,11 @@ namespace MathUtils
       return powf(t, expf(-2 * curve));
    }
 
+   double Curve(double t, double curve)
+   {
+      return pow(t, exp(-2 * curve));
+   }
+
    int HighestPow2(int n)
    {
       int res = 0;

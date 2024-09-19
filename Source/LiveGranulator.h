@@ -52,13 +52,13 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "granulator"; }
 
    void OnTimeEvent(double time) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
@@ -84,12 +84,12 @@ private:
    FloatSlider* mGranSpeedRandomize{ nullptr };
    FloatSlider* mGranSpacingRandomize{ nullptr };
    Checkbox* mGranOctaveCheckbox{ nullptr };
-   float mDry{ 0 };
+   double mDry{ 0 };
    FloatSlider* mDrySlider{ nullptr };
    bool mFreeze{ false };
    Checkbox* mFreezeCheckbox{ nullptr };
    int mFreezeExtraSamples{ 0 };
-   float mPos{ 0 };
+   double mPos{ 0 };
    FloatSlider* mPosSlider{ nullptr };
    NoteInterval mAutoCaptureInterval{ NoteInterval::kInterval_None };
    DropdownList* mAutoCaptureDropdown{ nullptr };

@@ -71,7 +71,7 @@ void PitchDive::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void PitchDive::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PitchDive::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

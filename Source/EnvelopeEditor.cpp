@@ -396,7 +396,7 @@ void EnvelopeEditor::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    static bool dummyBool;
-   static float dummyFloat;
+   static double dummyFloat;
 
    UIBLOCK(3, 3, 130);
    FLOATSLIDER(mADSRViewLengthSlider, "view length", &dummyFloat, 10, 10000);
@@ -597,7 +597,7 @@ void EnvelopeEditor::Pin()
    }
 }
 
-void EnvelopeEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EnvelopeEditor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mADSRViewLengthSlider)
    {

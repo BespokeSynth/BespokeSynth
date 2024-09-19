@@ -190,7 +190,7 @@ void Beats::GetModuleDimensions(float& width, float& height)
       height = MAX(height, 132 + 15 * (mBeatColumns[i]->GetNumSamples() + 1));
 }
 
-void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Beats::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -289,7 +289,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
    Sample* beat = mBeatData.mBeat;
    if (beat && mSampleIndex != -1)
    {
-      float volSq = mVolume * mVolume * .25f;
+      double volSq = mVolume * mVolume * .25;
 
       float speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
       if (mDoubleTime)
@@ -305,7 +305,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
 
          for (int ch = 0; ch < numChannels; ++ch)
          {
-            float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
+            double panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
             double channelTime = time;
             for (int i = 0; i < bufferSize; ++i)
             {
@@ -411,7 +411,7 @@ void BeatColumn::CreateUIControls()
       suffix = ofToString(mIndex);
 
    int controlWidth = BEAT_COLUMN_WIDTH - 6;
-   mVolumeSlider = new FloatSlider(mOwner, ("volume" + suffix).c_str(), 0, 0, controlWidth, 15, &mVolume, 0, 1.5f, 2);
+   mVolumeSlider = new FloatSlider(mOwner, ("volume" + suffix).c_str(), 0, 0, controlWidth, 15, &mVolume, 0, 1.5, 2);
    mFilterSlider = new FloatSlider(mOwner, ("filter" + suffix).c_str(), 0, 0, controlWidth, 15, &mFilter, -1, 1, 2);
    mPanSlider = new FloatSlider(mOwner, ("pan" + suffix).c_str(), 0, 0, controlWidth, 15, &mPan, -1, 1, 2);
    mDoubleTimeCheckbox = new Checkbox(mOwner, ("double" + suffix).c_str(), 0, 0, &mDoubleTime);

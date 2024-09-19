@@ -57,7 +57,7 @@ public:
    void Poll() override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
 
    bool IsEnabled() const override { return true; }
@@ -72,7 +72,7 @@ private:
    }
 
    int dummy{ 0 };
-   float dummy2{ 0 };
+   double dummy2{ 0 };
    DropdownList* mIntervalSelector{ nullptr };
    DropdownList* mOscSelector{ nullptr };
    FloatSlider* mMinSlider{ nullptr };

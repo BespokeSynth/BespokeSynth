@@ -77,7 +77,7 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
 
@@ -87,7 +87,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
-   int GetModuleSaveStateRev() const override { return 3; }
+   int GetModuleSaveStateRev() const override { return 4; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 
@@ -115,7 +115,7 @@ private:
    struct Snapshot
    {
       Snapshot() {}
-      Snapshot(std::string path, float val)
+      Snapshot(std::string path, double val)
       : mControlPath(path)
       , mValue(val)
       {}
@@ -127,7 +127,7 @@ private:
                 mHasLFO == other.mHasLFO;
       }
       std::string mControlPath;
-      float mValue{ 0 };
+      double mValue{ 0 };
       bool mHasLFO{ false };
       LFOSettings mLFOSettings;
       int mGridCols{ 0 };
@@ -156,9 +156,9 @@ private:
    std::vector<IDrawableModule*> mSnapshotModules{};
    std::vector<IUIControl*> mSnapshotControls{};
    bool mBlending{ false };
-   float mBlendTime{ 0 };
+   double mBlendTime{ 0 };
    FloatSlider* mBlendTimeSlider{ nullptr };
-   float mBlendProgress{ 0 };
+   double mBlendProgress{ 0 };
    std::vector<ControlRamp> mBlendRamps;
    ofMutex mRampMutex;
    int mCurrentSnapshot{ 0 };

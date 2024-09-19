@@ -145,7 +145,7 @@ void FilterViz::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void FilterViz::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FilterViz::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

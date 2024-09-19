@@ -103,9 +103,9 @@ void AudioToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    OnModulatorRepatch();
 }
 
-float AudioToCV::Value(int samplesIn)
+double AudioToCV::Value(int samplesIn)
 {
-   return ofMap(mModulationBuffer[samplesIn] / 2 + .5f, 0, 1, GetMin(), GetMax(), K(clamp));
+   return ofMap(mModulationBuffer[samplesIn] / 2 + .5, 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
 void AudioToCV::SaveLayout(ofxJSONElement& moduleInfo)

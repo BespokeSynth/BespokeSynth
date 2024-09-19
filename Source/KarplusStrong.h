@@ -58,7 +58,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    bool HasDebugDraw() const override { return true; }
@@ -83,7 +83,7 @@ private:
    KarplusStrongVoiceParams mVoiceParams;
    FloatSlider* mFilterSlider{ nullptr };
    FloatSlider* mFeedbackSlider{ nullptr };
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolSlider{ nullptr };
    DropdownList* mSourceDropdown{ nullptr };
    Checkbox* mInvertCheckbox{ nullptr };

@@ -100,7 +100,7 @@ public:
    void OnMidiControl(MidiControl& control) override;
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -118,7 +118,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -162,7 +162,7 @@ private:
 
    int mTones[NSS_MAX_STEPS]{};
    int mVels[NSS_MAX_STEPS]{};
-   float mNoteLengths[NSS_MAX_STEPS]{};
+   double mNoteLengths[NSS_MAX_STEPS]{};
 
    NoteInterval mInterval{ NoteInterval::kInterval_8n };
    int mArpIndex{ -1 };
@@ -200,12 +200,12 @@ private:
    ClickButton* mRandomizePitchButton{ nullptr };
    ClickButton* mRandomizeLengthButton{ nullptr };
    ClickButton* mRandomizeVelocityButton{ nullptr };
-   float mRandomizePitchChance{ 1 };
+   double mRandomizePitchChance{ 1 };
    int mRandomizePitchVariety{ 4 };
-   float mRandomizeLengthChance{ 1 };
-   float mRandomizeLengthRange{ 1 };
-   float mRandomizeVelocityChance{ 1 };
-   float mRandomizeVelocityDensity{ .6 };
+   double mRandomizeLengthChance{ 1 };
+   double mRandomizeLengthRange{ 1 };
+   double mRandomizeVelocityChance{ 1 };
+   double mRandomizeVelocityDensity{ .6 };
    FloatSlider* mRandomizePitchChanceSlider{ nullptr };
    IntSlider* mRandomizePitchVarietySlider{ nullptr };
    FloatSlider* mRandomizeLengthChanceSlider{ nullptr };

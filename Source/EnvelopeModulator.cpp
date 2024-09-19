@@ -121,7 +121,7 @@ bool EnvelopeModulator::MouseMoved(float x, float y)
    return false;
 }
 
-float EnvelopeModulator::Value(int samplesIn /*= 0*/)
+double EnvelopeModulator::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
    if (GetSliderTarget())
@@ -142,7 +142,7 @@ void EnvelopeModulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

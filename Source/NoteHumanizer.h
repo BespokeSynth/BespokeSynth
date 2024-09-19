@@ -51,7 +51,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -67,9 +67,9 @@ private:
       height = 40;
    }
 
-   float mTime{ 33 };
+   double mTime{ 33 };
    FloatSlider* mTimeSlider{ nullptr };
-   float mVelocity{ .1 };
+   double mVelocity{ .1 };
    FloatSlider* mVelocitySlider{ nullptr };
 
    std::array<float, 128> mLastDelayMs{};

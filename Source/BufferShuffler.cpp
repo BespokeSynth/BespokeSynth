@@ -538,7 +538,7 @@ void BufferShuffler::LoadState(FileStreamIn& in, int rev)
       ChannelBuffer readBuffer(savedLength);
       readBuffer.Load(in, savedLength, ChannelBuffer::LoadMode::kAnyBufferSize);
 
-      float sampleRateRatio = (float)gSampleRate / savedSampleRate;
+      const double sampleRateRatio = static_cast<double>(gSampleRate) / savedSampleRate;
       int adjustedLength = savedLength * sampleRateRatio;
       mInputBuffer.SetNumActiveChannels(savedChannelCount);
       for (int ch = 0; ch < savedChannelCount; ++ch)

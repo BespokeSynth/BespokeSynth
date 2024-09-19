@@ -85,16 +85,16 @@ void ModulatorAccum::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 
 void ModulatorAccum::OnTransportAdvanced(float amount)
 {
-   float dt = amount * TheTransport->MsPerBar();
-   float newValue = ofClamp(mValue + mVelocity / 1000 * (GetMax() - GetMin()) * dt, GetMin(), GetMax());
+   const double dt = amount * TheTransport->MsPerBar();
+   const double newValue = ofClamp(mValue + mVelocity / 1000 * (GetMax() - GetMin()) * dt, GetMin(), GetMax());
    mValue = newValue;
 }
 
-float ModulatorAccum::Value(int samplesIn)
+double ModulatorAccum::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   float dt = samplesIn / gSampleRate;
-   float value = ofClamp(mValue + mVelocity / 1000 * (GetMax() - GetMin()) * dt, GetMin(), GetMax());
+   const double dt = samplesIn / gSampleRate;
+   const double value = ofClamp(mValue + mVelocity / 1000 * (GetMax() - GetMin()) * dt, GetMin(), GetMax());
    return value;
 }
 

@@ -146,8 +146,8 @@ void MultibandCompressor::CalcFilters()
 {
    for (int i = 0; i < mNumBands; ++i)
    {
-      float a = float(i) / mNumBands;
-      float f = mFreqMin * powf(mFreqMax / mFreqMin, a);
+      const double a = static_cast<double>(i) / mNumBands;
+      const double f = mFreqMin * pow(mFreqMax / mFreqMin, a);
 
       mFilters[i].SetCrossoverFreq(f);
    }
@@ -161,7 +161,7 @@ void MultibandCompressor::IntSliderUpdated(IntSlider* slider, int oldVal, double
    }
 }
 
-void MultibandCompressor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MultibandCompressor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mFMinSlider || slider == mFMaxSlider)
    {

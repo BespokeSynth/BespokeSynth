@@ -101,7 +101,7 @@ void VinylTempoControl::PostRepatch(PatchCableSource* cableSource, bool fromUser
    OnModulatorRepatch();
 }
 
-float VinylTempoControl::Value(int samplesIn)
+double VinylTempoControl::Value(int samplesIn)
 {
    //return mModulationBuffer[samplesIn];
    return mSpeed;

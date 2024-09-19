@@ -82,7 +82,7 @@ public:
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -125,7 +125,7 @@ private:
    static const int kCols = 25;
    std::array<LinnstrumentColor, kRows * kCols> mGridColorState;
    std::array<NoteAge, 128> mNoteAge;
-   float mDecayMs{ 500 };
+   double mDecayMs{ 500 };
    FloatSlider* mDecaySlider{ nullptr };
    bool mBlackout{ false };
    Checkbox* mBlackoutCheckbox{ nullptr };

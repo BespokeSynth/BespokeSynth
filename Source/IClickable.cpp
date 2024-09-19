@@ -118,6 +118,14 @@ ofRectangle IClickable::GetRect(bool local /*=false*/)
    return ofRectangle(x, y, w, h);
 }
 
+ofRectangle_d IClickable::GetRectDouble(bool local /*=false*/)
+{
+   float x, y, w, h;
+   GetPosition(x, y, local);
+   GetDimensions(w, h);
+   return { x, y, w, h };
+}
+
 IClickable* IClickable::GetRootParent()
 {
    IClickable* parent = this;

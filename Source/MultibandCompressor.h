@@ -54,7 +54,7 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -76,17 +76,17 @@ private:
    float* mWorkBuffer{ nullptr };
    float* mOutBuffer{ nullptr };
 
-   float mDryWet{ 1 };
+   double mDryWet{ 1 };
    FloatSlider* mDryWetSlider{ nullptr };
    IntSlider* mNumBandsSlider{ nullptr };
    int mNumBands{ 4 };
-   float mFreqMin{ 150 };
-   float mFreqMax{ 7500 };
+   double mFreqMin{ 150 };
+   double mFreqMax{ 7500 };
    FloatSlider* mFMinSlider{ nullptr };
    FloatSlider* mFMaxSlider{ nullptr };
-   float mRingTime{ .01 };
+   double mRingTime{ .01 };
    FloatSlider* mRingTimeSlider{ nullptr };
-   float mMaxBand{ .3 };
+   double mMaxBand{ .3 };
    FloatSlider* mMaxBandSlider{ nullptr };
 
    CLinkwitzRiley_4thOrder mFilters[COMPRESSOR_MAX_BANDS];

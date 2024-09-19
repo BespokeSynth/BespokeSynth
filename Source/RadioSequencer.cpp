@@ -247,7 +247,7 @@ bool RadioSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-void RadioSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void RadioSequencer::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mGrid)
    {

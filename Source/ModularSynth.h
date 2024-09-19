@@ -161,8 +161,8 @@ public:
    float GetMouseY(ModuleContainer* context, float rawY = FLT_MAX);
    void SetMousePosition(ModuleContainer* context, float x, float y);
    bool IsMouseButtonHeld(int button) const;
-   ofVec2f& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
-   void SetDrawOffset(ofVec2f offset) { mModuleContainer.SetDrawOffset(offset); }
+   ofVec2d& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
+   void SetDrawOffset(ofVec2d offset) { mModuleContainer.SetDrawOffset(offset); }
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
    void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
    double GetPixelRatio() const { return mPixelRatio; }
@@ -174,8 +174,8 @@ public:
    bool ShouldShowGridSnap() const;
    bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
 
-   void ZoomView(float zoomAmount, bool fromMouse);
-   void SetZoomLevel(float zoomLevel);
+   void ZoomView(double zoomAmount, bool fromMouse);
+   void SetZoomLevel(double zoomLevel);
    void PanView(float x, float y);
    void PanTo(float x, float y);
    void SetRawSpaceMouseTwist(float twist, bool isUsing)
@@ -279,13 +279,13 @@ public:
    void SetFatalError(std::string error);
 
    static bool sShouldAutosave;
-   static float sBackgroundLissajousR;
-   static float sBackgroundLissajousG;
-   static float sBackgroundLissajousB;
-   static float sBackgroundR;
-   static float sBackgroundG;
-   static float sBackgroundB;
-   static float sCableAlpha;
+   static double sBackgroundLissajousR;
+   static double sBackgroundLissajousG;
+   static double sBackgroundLissajousB;
+   static double sBackgroundR;
+   static double sBackgroundG;
+   static double sBackgroundB;
+   static double sCableAlpha;
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
@@ -323,7 +323,7 @@ private:
    int mMoveModuleOffsetY{ 0 };
    bool mMoveModuleCanStickToCursor{ false }; //if the most current mMoveModule can stick to the cursor if you release the mouse button before moving it
 
-   ofVec2f mLastMoveMouseScreenPos;
+   ofVec2d mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
    bool mIsMousePanning{ false };
    std::array<bool, 5> mIsMouseButtonHeld{ false };

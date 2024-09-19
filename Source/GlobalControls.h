@@ -44,7 +44,7 @@ public:
    void CreateUIControls() override;
    void Poll() override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -77,6 +77,6 @@ private:
 
    float mWidth{ 200 };
    float mHeight{ 20 };
-   float mMouseScrollX{ 0 };
-   float mMouseScrollY{ 0 };
+   double mMouseScrollX{ 0 };
+   double mMouseScrollY{ 0 };
 };

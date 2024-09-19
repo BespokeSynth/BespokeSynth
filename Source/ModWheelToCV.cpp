@@ -73,9 +73,9 @@ void ModWheelToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    }
 }
 
-float ModWheelToCV::Value(int samplesIn)
+double ModWheelToCV::Value(int samplesIn)
 {
-   float modWheel = mModWheel ? mModWheel->GetValue(samplesIn) : ModulationParameters::kDefaultModWheel;
+   double modWheel = mModWheel ? mModWheel->GetValue(samplesIn) : ModulationParameters::kDefaultModWheel;
    return ofMap(modWheel, 0, 1, GetMin(), GetMax(), K(clamped));
 }
 

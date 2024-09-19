@@ -51,7 +51,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
@@ -71,7 +71,7 @@ private:
 
    NoteInterval mVibratoInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
-   float mVibratoAmount{ 0 };
+   double mVibratoAmount{ 0 };
    FloatSlider* mVibratoSlider{ nullptr };
 
    Modulations mModulation{ true };

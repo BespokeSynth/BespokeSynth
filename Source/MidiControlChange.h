@@ -50,7 +50,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -71,7 +71,7 @@ private:
    float mHeight{ 20 };
    int mControl{ 0 };
    TextEntry* mControlEntry{ nullptr };
-   float mValue{ 0 };
+   double mValue{ 0 };
    FloatSlider* mValueSlider{ nullptr };
    bool mResendDuplicateValue{ false };
 };

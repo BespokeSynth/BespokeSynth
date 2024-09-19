@@ -150,7 +150,7 @@ void FollowingSong::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void FollowingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FollowingSong::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

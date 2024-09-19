@@ -78,7 +78,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //IGridController
    void SetGridControllerOwner(IGridControllerListener* owner) override { mGridControllerOwner = owner; }

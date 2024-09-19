@@ -65,7 +65,7 @@ public:
    ChannelBuffer* Data() { return &mData; }
    double GetPlayPosition() const { return mOffset; }
    void SetPlayPosition(double sample) { mOffset = sample; }
-   float GetSampleRateRatio() const { return mSampleRateRatio; }
+   double GetSampleRateRatio() const { return mSampleRateRatio; }
    void Reset() { mOffset = mNumSamples; }
    void SetStopPoint(int stopPoint) { mStopPoint = stopPoint; }
    void ClearStopPoint() { mStopPoint = -1; }
@@ -102,7 +102,7 @@ private:
    double mOffset{ std::numeric_limits<double>::max() };
    float mRate{ 1 };
    int mOriginalSampleRate{ gSampleRate };
-   float mSampleRateRatio{ 1 };
+   double mSampleRateRatio{ 1 };
    int mStopPoint{ -1 };
    std::string mName{ "" };
    std::string mReadPath{ "" };

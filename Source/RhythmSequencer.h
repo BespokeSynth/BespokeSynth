@@ -71,7 +71,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -112,7 +112,7 @@ private:
    {
       StepAction mAction{ StepAction::On };
       DropdownList* mActionSelector{ nullptr };
-      float mVel{ 1.0f };
+      double mVel{ 1.0 };
       FloatSlider* mVelSlider{ nullptr };
       int mOctave{ 0 };
       IntSlider* mOctaveSlider{ nullptr };

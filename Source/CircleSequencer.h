@@ -61,7 +61,7 @@ private:
    CircleSequencer* mOwner{ nullptr };
    int mIndex{ 0 };
    std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
@@ -91,7 +91,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 

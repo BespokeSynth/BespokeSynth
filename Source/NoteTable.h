@@ -69,7 +69,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -87,7 +87,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -132,8 +132,8 @@ private:
    int mRowOffset{ 0 };
 
    ClickButton* mRandomizePitchButton{ nullptr };
-   float mRandomizePitchChance{ 1 };
-   float mRandomizePitchRange{ 1 };
+   double mRandomizePitchChance{ 1 };
+   double mRandomizePitchRange{ 1 };
    FloatSlider* mRandomizePitchChanceSlider{ nullptr };
    FloatSlider* mRandomizePitchRangeSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };

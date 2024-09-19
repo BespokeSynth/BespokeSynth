@@ -167,12 +167,12 @@ struct UIControlConnection
    IUIControl* mUIControl{ nullptr };
    ControlType mType{ ControlType::kControlType_Slider };
    MidiMessageType mMessageType{ MidiMessageType::kMidiMessage_Control };
-   float mValue{ 0 };
+   double mValue{ 0 };
    int mMidiOnValue{ 127 };
    int mMidiOffValue{ 0 };
    bool mScaleOutput{ false };
    bool mBlink{ false };
-   float mIncrementAmount{ 0 };
+   double mIncrementAmount{ 0 };
    bool mTwoWay{ true };
    int mFeedbackControl{ -1 };
    SpecialControlBinding mSpecialBinding{ SpecialControlBinding::kSpecialBinding_None };

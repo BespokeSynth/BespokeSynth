@@ -72,7 +72,7 @@ void ModWheel::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void ModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ModWheel::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mModWheelSlider)
       mModulation.GetModWheel(-1)->SetValue(mModWheel);

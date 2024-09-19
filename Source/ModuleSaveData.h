@@ -45,8 +45,8 @@ public:
 
    void SetInt(std::string prop, int val);
    void SetInt(std::string prop, int val, int min, int max, bool isTextField);
-   void SetFloat(std::string prop, float val);
-   void SetFloat(std::string prop, float val, float min, float max, bool isTextField);
+   void SetFloat(std::string prop, double val);
+   void SetFloat(std::string prop, double val, double min, double max, bool isTextField);
    void SetBool(std::string prop, bool val);
    void SetString(std::string prop, std::string val);
 
@@ -54,7 +54,7 @@ public:
 
    bool HasProperty(std::string prop);
    int GetInt(std::string prop);
-   float GetFloat(std::string prop);
+   double GetFloat(std::string prop);
    bool GetBool(std::string prop);
    std::string GetString(std::string prop);
    template <class T>
@@ -62,8 +62,8 @@ public:
 
    int LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue = 0, int min = 0, int max = 10, bool isTextField = false);
    int LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, IntSlider* slider, bool isTextField = false);
-   float LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue = 0, float min = 0, float max = 1, bool isTextField = false);
-   float LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue, FloatSlider* slider, bool isTextField = false);
+   double LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, double defaultValue = 0, double min = 0, double max = 1, bool isTextField = false);
+   double LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, double defaultValue, FloatSlider* slider, bool isTextField = false);
    bool LoadBool(std::string prop, const ofxJSONElement& moduleInfo, bool defaultValue = false);
    std::string LoadString(std::string prop, const ofxJSONElement& moduleInfo, std::string defaultValue = "", FillDropdownFn fillFn = nullptr);
    template <class T>
@@ -76,7 +76,7 @@ public:
       return (T)LoadInt(prop, moduleInfo, defaultValue);
    }
 
-   void UpdatePropertyMax(std::string prop, float max);
+   void UpdatePropertyMax(std::string prop, double max);
 
    enum Type
    {
@@ -95,11 +95,11 @@ public:
       std::string mProperty;
       Type mType{ kInt };
       int mInt{ 0 };
-      float mFloat{ 0 };
+      double mFloat{ 0 };
       bool mBool{ false };
       char mString[MAX_TEXTENTRY_LENGTH]{};
-      float mMin{ 0 };
-      float mMax{ 10 };
+      double mMin{ 0 };
+      double mMax{ 10 };
       bool mIsTextField{ false };
       EnumMap mEnumValues;
       FillDropdownFn mFillDropdownFn{ nullptr };

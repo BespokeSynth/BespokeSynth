@@ -72,7 +72,7 @@ void PitchToSpeed::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    }
 }
 
-float PitchToSpeed::Value(int samplesIn)
+double PitchToSpeed::Value(int samplesIn)
 {
    float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
    return TheScale->PitchToFreq(mPitch + bend) / mReferenceFreq;

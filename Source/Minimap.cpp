@@ -259,7 +259,7 @@ void Minimap::OnClicked(float x, float y, bool right)
       ofRectangle viewport = TheSynth->GetDrawRect();
       ComputeBoundingBox(boundingBox);
       ofVec2f viewportCoords = CoordsToViewport(boundingBox, x, y);
-      TheSynth->SetDrawOffset(ofVec2f(-viewportCoords.x + viewport.width / 2, -viewportCoords.y + viewport.height / 2));
+      TheSynth->SetDrawOffset(ofVec2d(-viewportCoords.x + viewport.width / 2, -viewportCoords.y + viewport.height / 2));
       mClick = true;
    }
 }
@@ -277,7 +277,7 @@ bool Minimap::MouseMoved(float x, float y)
       ofRectangle viewport = TheSynth->GetDrawRect();
       ComputeBoundingBox(boundingBox);
       ofVec2f viewportCoords = CoordsToViewport(boundingBox, x, y);
-      TheSynth->SetDrawOffset(ofVec2f(-viewportCoords.x + viewport.width / 2, -viewportCoords.y + viewport.height / 2));
+      TheSynth->SetDrawOffset(ofVec2d(-viewportCoords.x + viewport.width / 2, -viewportCoords.y + viewport.height / 2));
    }
    mGrid->NotifyMouseMoved(x, y);
 

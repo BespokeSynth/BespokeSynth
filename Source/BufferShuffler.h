@@ -73,7 +73,7 @@ public:
    void UpdateGridControllerLights(bool force);
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void DropdownUpdated(DropdownList* dropdown, int oldVal, double time) override {}
 
@@ -130,7 +130,7 @@ private:
    Checkbox* mFreezeInputCheckbox{ nullptr };
    PlaybackStyle mPlaybackStyle{ PlaybackStyle::Normal };
    DropdownList* mPlaybackStyleDropdown{ nullptr };
-   float mFourTet{ 0 };
+   double mFourTet{ 0 };
    FloatSlider* mFourTetSlider{ nullptr };
    int mFourTetSlices{ 4 };
    DropdownList* mFourTetSlicesDropdown{ nullptr };

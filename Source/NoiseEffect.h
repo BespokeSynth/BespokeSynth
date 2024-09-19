@@ -43,7 +43,7 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "noisify"; }
 
 
@@ -51,7 +51,7 @@ public:
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -64,7 +64,7 @@ private:
       height = 60;
    }
 
-   float mAmount{ 0 };
+   double mAmount{ 0 };
    int mWidth{ 10 };
    int mSampleCounter{ 0 };
    float mRandom{ 0 };

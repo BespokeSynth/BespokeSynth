@@ -97,8 +97,8 @@ public:
    ofVec2f GetCellPosition(int col, int row);
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool ShouldSerializeForSnapshot() const override { return true; }

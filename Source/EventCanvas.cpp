@@ -361,7 +361,7 @@ void EventCanvas::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void EventCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EventCanvas::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

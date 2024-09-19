@@ -57,7 +57,7 @@ public:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
 
@@ -82,9 +82,9 @@ private:
    int mBufferVizOffset[2]{};
    float mVizPhase[2]{};
 
-   float mDisplayFreq{ 220 };
+   double mDisplayFreq{ 220 };
    int mLengthSamples{ 2048 };
-   float mDrawGain{ 2 };
+   double mDrawGain{ 2 };
    bool mPhaseAlign{ true };
    float mWidth{ 600 };
    float mHeight{ 150 };

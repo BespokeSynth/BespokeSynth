@@ -40,14 +40,14 @@ public:
    ::ADSR mHarmRatioADSRParams;
    ::ADSR mModIdxADSRParams2;
    ::ADSR mHarmRatioADSRParams2;
-   float mModIdx{ 0 };
+   double mModIdx{ 0 };
    float mHarmRatio{ 1 };
-   float mModIdx2{ 0 };
+   double mModIdx2{ 0 };
    float mHarmRatio2{ 1 };
-   float mVol{ 1 };
-   float mPhaseOffset0{ 0 };
-   float mPhaseOffset1{ 0 };
-   float mPhaseOffset2{ 0 };
+   double mVol{ 1 };
+   double mPhaseOffset0{ 0 };
+   double mPhaseOffset1{ 0 };
+   double mPhaseOffset2{ 0 };
 };
 
 class FMVoice : public IMidiVoice

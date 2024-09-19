@@ -75,7 +75,7 @@ void VelocityToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    }
 }
 
-float VelocityToCV::Value(int samplesIn)
+double VelocityToCV::Value(int samplesIn)
 {
    return ofMap(mVelocity, 0, 127, GetMin(), GetMax(), K(clamped));
 }

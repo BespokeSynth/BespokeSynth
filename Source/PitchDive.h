@@ -47,7 +47,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -64,9 +64,9 @@ private:
       height = 40;
    }
 
-   float mStart;
+   double mStart;
    FloatSlider* mStartSlider;
-   float mTime;
+   double mTime;
    FloatSlider* mTimeSlider;
 
    Modulations mModulation;

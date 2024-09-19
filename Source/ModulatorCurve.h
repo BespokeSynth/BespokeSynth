@@ -50,7 +50,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
    FloatSlider* GetTarget() { return GetSliderTarget(); }
@@ -59,7 +59,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -82,7 +82,7 @@ private:
 
    void OnClicked(float x, float y, bool right) override;
 
-   float mInput{ 0 };
+   double mInput{ 0 };
    EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100) };
    ::ADSR mAdsr;
 

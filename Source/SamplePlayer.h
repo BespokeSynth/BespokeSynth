@@ -78,16 +78,16 @@ public:
       mHeight = ofClamp(height, 125, 9999);
    }
 
-   void SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed);
+   void SetCuePoint(int pitch, double startSeconds, double lengthSeconds, double speed);
    void FillData(std::vector<float> data);
    ChannelBuffer* GetCueSampleData(int cueIndex);
-   float GetLengthInSeconds() const;
+   double GetLengthInSeconds() const;
 
    void oscMessageReceived(const juce::OSCMessage& msg) override;
    void oscBundleReceived(const juce::OSCBundle& bundle) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -100,7 +100,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    bool IsEnabled() const override { return mEnabled; }
@@ -109,7 +109,7 @@ private:
    void UpdateSample(Sample* sample, bool ownsSample);
    float GetPlayPositionForMouse(float mouseX) const;
    float GetSecondsForMouse(float mouseX) const;
-   void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed, bool& stopOnNoteOff) const;
+   void GetPlayInfoForPitch(int pitch, double& startSeconds, double& lengthSeconds, double& speed, bool& stopOnNoteOff) const;
    void DownloadYoutube(std::string url, std::string titles);
    void SearchYoutube(std::string searchTerm);
    void LoadFile();
@@ -141,11 +141,11 @@ private:
    Sample* mSample{ nullptr };
    bool mOwnsSample{ true };
 
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
-   float mSpeed{ 1 };
-   float mPlaySpeed{ 1 };
-   float mCuePointSpeed{ 1 };
+   double mSpeed{ 1 };
+   double mPlaySpeed{ 1 };
+   double mCuePointSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mPlayButton{ nullptr };
    ClickButton* mPauseButton{ nullptr };
@@ -178,9 +178,9 @@ private:
 
    struct SampleCuePoint
    {
-      float startSeconds{ 0 };
-      float lengthSeconds{ 0 };
-      float speed{ 1 };
+      double startSeconds{ 0 };
+      double lengthSeconds{ 0 };
+      double speed{ 1 };
       bool stopOnNoteOff{ false };
    };
    std::vector<SampleCuePoint> mSampleCuePoints{ 128 };

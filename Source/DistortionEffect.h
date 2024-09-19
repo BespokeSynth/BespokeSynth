@@ -43,16 +43,16 @@ public:
 
    void CreateUIControls() override;
 
-   void SetClip(float amount);
+   void SetClip(double amount);
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "distortion"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    bool IsEnabled() const override { return mEnabled; }
@@ -77,10 +77,10 @@ private:
    float mHeight{ 20 };
 
    DistortionType mType{ DistortionType::kClean };
-   float mClip{ 1 };
-   float mGain{ 1 };
-   float mPreamp{ 1 };
-   float mFuzzAmount{ 0 };
+   double mClip{ 1 };
+   double mGain{ 1 };
+   double mPreamp{ 1 };
+   double mFuzzAmount{ 0 };
    bool mRemoveInputDC{ true };
 
    DropdownList* mTypeDropdown{ nullptr };

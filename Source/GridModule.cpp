@@ -84,7 +84,7 @@ void GridModule::OnControllerPageSelected()
    UpdateLights();
 }
 
-void GridModule::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void GridModule::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    OnGridButton(col, row, value, nullptr);
 }

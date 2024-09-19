@@ -48,7 +48,7 @@ public:
    std::string GetType() override { return "muter"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    bool IsEnabled() const override { return true; }
 
@@ -65,6 +65,6 @@ private:
 
    Checkbox* mPassCheckbox{ nullptr };
    Ramp mRamp;
-   float mRampTimeMs{ 3 };
+   double mRampTimeMs{ 3 };
    FloatSlider* mRampTimeSlider{ nullptr };
 };

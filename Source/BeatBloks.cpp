@@ -937,7 +937,7 @@ void BeatBloks::GetModuleDimensions(float& width, float& height)
    height = mRemixBufferY + mBufferH + 45;
 }
 
-void BeatBloks::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BeatBloks::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {

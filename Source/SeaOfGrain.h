@@ -72,7 +72,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    //IFloatSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
@@ -130,9 +130,9 @@ private:
       void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
 
-      float mGain{ 0 };
-      float mPosition{ 0 };
-      float mPan{ 0 };
+      double mGain{ 0 };
+      double mPosition{ 0 };
+      double mPan{ 0 };
 
       Granulator mGranulator;
       SeaOfGrain* mOwner{ nullptr };
@@ -163,13 +163,13 @@ private:
    Checkbox* mRecordInputCheckbox{ nullptr };
    bool mHasRecordedInput{ false };
 
-   float mVolume{ .6 };
+   double mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    bool mLoading{ false };
    FloatSlider* mDisplayOffsetSlider{ nullptr };
-   float mDisplayOffset{ 0 };
+   double mDisplayOffset{ 0 };
    FloatSlider* mDisplayLengthSlider{ nullptr };
-   float mDisplayLength{ 10 };
+   double mDisplayLength{ 10 };
    int mDisplayStartSamples{ 0 };
    int mDisplayEndSamples{ 0 };
    DropdownList* mKeyboardBasePitchSelector{ nullptr };

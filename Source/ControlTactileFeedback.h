@@ -51,7 +51,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -68,9 +68,9 @@ private:
    }
 
    float mPhase{ 0 };
-   float mPhaseInc{ 0 };
+   double mPhaseInc{ 0 };
 
 
-   float mVolume{ .5 };
+   double mVolume{ .5 };
    FloatSlider* mVolumeSlider{ nullptr };
 };

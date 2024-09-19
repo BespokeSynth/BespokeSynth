@@ -37,25 +37,25 @@ class IModulator : public IPollable
 public:
    IModulator();
    virtual ~IModulator();
-   virtual float Value(int samplesIn = 0) = 0;
+   virtual double Value(int samplesIn = 0) = 0;
    virtual bool Active() const = 0;
    virtual bool CanAdjustRange() const { return true; }
    virtual bool InitializeWithZeroRange() const { return false; }
-   float& GetMin() { return mTargets[0].mSliderTarget ? mTargets[0].mSliderTarget->GetModulatorMin() : mDummyMin; }
-   float& GetMax() { return mTargets[0].mSliderTarget ? mTargets[0].mSliderTarget->GetModulatorMax() : mDummyMax; }
+   double& GetMin() { return mTargets[0].mSliderTarget ? mTargets[0].mSliderTarget->GetModulatorMin() : mDummyMin; }
+   double& GetMax() { return mTargets[0].mSliderTarget ? mTargets[0].mSliderTarget->GetModulatorMax() : mDummyMax; }
    void OnModulatorRepatch();
    void Poll() override;
-   float GetRecentChange() const;
+   double GetRecentChange() const;
    void OnRemovedFrom(IUIControl* control);
    int GetNumTargets() const;
 
 protected:
-   void InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode);
+   void InitializeRange(double currentValue, double min, double max, FloatSlider::Mode sliderMode);
 
    FloatSlider* GetSliderTarget() const { return mTargets[0].mSliderTarget; }
 
-   float mDummyMin{ 0 };
-   float mDummyMax{ 1 };
+   double mDummyMin{ 0 };
+   double mDummyMax{ 1 };
 
    struct Target
    {
@@ -69,6 +69,6 @@ protected:
    FloatSlider* mMinSlider{ nullptr };
    FloatSlider* mMaxSlider{ nullptr };
    std::array<Target, 10> mTargets;
-   float mLastPollValue{ 0 };
-   float mSmoothedValue{ 0 };
+   double mLastPollValue{ 0 };
+   double mSmoothedValue{ 0 };
 };

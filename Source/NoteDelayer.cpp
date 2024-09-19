@@ -59,7 +59,7 @@ void NoteDelayer::DrawModule()
 
    mDelaySlider->Draw();
 
-   float t = (gTime - mLastNoteOnTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
+   double t = (gTime - mLastNoteOnTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
    if (t > 0 && t < 1)
    {
       ofPushStyle();
@@ -125,7 +125,7 @@ void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 }
 
-void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

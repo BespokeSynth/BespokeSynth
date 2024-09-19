@@ -59,7 +59,7 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -86,7 +86,7 @@ private:
    FloatSlider* mGranOverlap{ nullptr };
    FloatSlider* mGranSpeed{ nullptr };
    FloatSlider* mGranLengthMs{ nullptr };
-   float mDummyPos{ 0 };
+   double mDummyPos{ 0 };
    FloatSlider* mPosSlider{ nullptr };
    bool mFreeze{ false };
    Checkbox* mFreezeCheckbox{ nullptr };

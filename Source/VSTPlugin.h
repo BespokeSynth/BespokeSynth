@@ -87,7 +87,7 @@ public:
 
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
@@ -123,7 +123,7 @@ private:
    void audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details) override;
    void audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex) override;
 
-   float mVol{ 1 };
+   double mVol{ 1 };
    FloatSlider* mVolSlider{ nullptr };
    int mPresetFileIndex{ -1 };
    DropdownList* mPresetFileSelector{ nullptr };
@@ -154,7 +154,7 @@ private:
    struct ParameterSlider
    {
       VSTPlugin* mOwner{ nullptr };
-      float mValue{ 0 };
+      double mValue{ 0 };
       FloatSlider* mSlider{ nullptr };
       juce::AudioProcessorParameter* mParameter{ nullptr };
       bool mShowing{ false };

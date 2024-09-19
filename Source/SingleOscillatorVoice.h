@@ -39,27 +39,27 @@ class OscillatorVoiceParams : public IVoiceParams
 {
 public:
    ::ADSR mAdsr{ 10, 0, 1, 10 };
-   float mVol{ .25 };
-   float mPulseWidth{ .5 };
+   double mVol{ .25 };
+   double mPulseWidth{ .5 };
    Oscillator::SyncMode mSyncMode{ Oscillator::SyncMode::None };
-   float mSyncFreq{ 200 };
-   float mSyncRatio{ 1 };
-   float mMult{ 1 };
+   double mSyncFreq{ 200 };
+   double mSyncRatio{ 1 };
+   double mMult{ 1 };
    OscillatorType mOscType{ OscillatorType::kOsc_Square };
-   float mDetune{ 0 };
-   float mShuffle{ 0 };
-   float mPhaseOffset{ 0 };
+   double mDetune{ 0 };
+   double mShuffle{ 0 };
+   double mPhaseOffset{ 0 };
    int mUnison{ 1 };
-   float mUnisonWidth{ 0 };
-   float mSoften{ 0 };
+   double mUnisonWidth{ 0 };
+   double mSoften{ 0 };
 
-   float mFilterCutoffMax{ SINGLEOSCILLATOR_NO_CUTOFF };
-   float mFilterCutoffMin{ 10 };
-   float mFilterQ{ float(sqrt(2) / 2) };
+   double mFilterCutoffMax{ SINGLEOSCILLATOR_NO_CUTOFF };
+   double mFilterCutoffMin{ 10 };
+   double mFilterQ{ sqrt(2) / 2 };
    ::ADSR mFilterAdsr{ 1, 0, 1, 1000 };
 
-   float mVelToVolume{ .5 };
-   float mVelToEnvelope{ 0 };
+   double mVelToVolume{ .5 };
+   double mVelToEnvelope{ 0 };
 
    bool mLiteCPUMode{ false };
 };
@@ -78,24 +78,24 @@ public:
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
 
-   static float GetADSRScale(float velocity, float velToEnvelope);
+   static double GetADSRScale(float velocity, double velToEnvelope);
 
    static const int kMaxUnison = 8;
 
 private:
    void DoParameterUpdate(int samplesIn,
-                          float& pitch,
-                          float& freq,
-                          float& vol,
-                          float& syncPhaseInc);
+                          double& pitch,
+                          double& freq,
+                          double& vol,
+                          double& syncPhaseInc);
 
    struct OscData
    {
-      float mPhase{ 0 };
-      float mSyncPhase{ 0 };
+      double mPhase{ 0 };
+      double mSyncPhase{ 0 };
       Oscillator mOsc{ kOsc_Square };
-      float mDetuneFactor{ 0 };
-      float mCurrentPhaseInc{ 0 };
+      double mDetuneFactor{ 0 };
+      double mCurrentPhaseInc{ 0 };
    };
    OscData mOscData[kMaxUnison];
    ::ADSR mAdsr;

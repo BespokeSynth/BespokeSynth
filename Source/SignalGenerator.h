@@ -63,7 +63,7 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
@@ -93,26 +93,26 @@ private:
    void SetType(OscillatorType type);
    void SetFreqMode(FreqMode mode);
 
-   float mVol{ 0 };
+   double mVol{ 0 };
    FloatSlider* mVolSlider{ nullptr };
    OscillatorType mOscType{ OscillatorType::kOsc_Sin };
    DropdownList* mOscSelector{ nullptr };
-   float mPulseWidth{ .5 };
+   double mPulseWidth{ .5 };
    FloatSlider* mPulseWidthSlider{ nullptr };
-   float mShuffle{ 0 };
+   double mShuffle{ 0 };
    FloatSlider* mShuffleSlider{ nullptr };
    int mMult{ 1 };
    DropdownList* mMultSelector{ nullptr };
    Oscillator::SyncMode mSyncMode{ Oscillator::SyncMode::None };
    DropdownList* mSyncModeSelector{ nullptr };
-   float mSyncFreq{ 200 };
+   double mSyncFreq{ 200 };
    FloatSlider* mSyncFreqSlider{ nullptr };
-   float mSyncRatio{ 1 };
+   double mSyncRatio{ 1 };
    FloatSlider* mSyncRatioSlider{ nullptr };
-   float mDetune{ 0 };
+   double mDetune{ 0 };
    FloatSlider* mDetuneSlider{ nullptr };
    EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
-   float mFreq{ 220 };
+   double mFreq{ 220 };
    FloatSlider* mFreqSlider{ nullptr };
    float mPhase{ 0 };
    float mSyncPhase{ 0 };
@@ -120,14 +120,14 @@ private:
    DropdownList* mFreqModeSelector{ nullptr };
    float mFreqSliderStart{ 220 };
    float mFreqSliderEnd{ 220 };
-   float mFreqSliderAmount{ 0 };
+   double mFreqSliderAmount{ 0 };
    FloatSlider* mFreqSliderAmountSlider{ nullptr };
    Ramp mFreqRamp;
-   float mFreqRampTime{ 200 };
+   double mFreqRampTime{ 200 };
    FloatSlider* mFreqRampTimeSlider{ nullptr };
-   float mSoften{ 0 };
+   double mSoften{ 0 };
    FloatSlider* mSoftenSlider{ nullptr };
-   float mPhaseOffset{ 0 };
+   double mPhaseOffset{ 0 };
    FloatSlider* mPhaseOffsetSlider{ nullptr };
    double mResetPhaseAtMs{ -9999 };
 

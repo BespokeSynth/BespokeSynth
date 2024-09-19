@@ -66,7 +66,7 @@ void NoteToFreq::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-float NoteToFreq::Value(int samplesIn)
+double NoteToFreq::Value(int samplesIn)
 {
    float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
    return TheScale->PitchToFreq(mPitch + bend);

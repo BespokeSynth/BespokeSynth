@@ -46,12 +46,12 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "pumper"; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
@@ -78,10 +78,10 @@ private:
    ::ADSR mAdsr;
    NoteInterval mInterval{ NoteInterval::kInterval_4n };
    DropdownList* mIntervalSelector{ nullptr };
-   float mLastValue{ 0 };
-   float mAmount{ 0 };
-   float mLength{ 0 };
-   float mAttack{ 0 };
+   double mLastValue{ 0 };
+   double mAmount{ 0 };
+   double mLength{ 0 };
+   double mAttack{ 0 };
 
    float mWidth{ 200 };
    float mHeight{ 20 };

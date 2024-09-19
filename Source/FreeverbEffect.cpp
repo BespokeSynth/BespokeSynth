@@ -61,7 +61,7 @@ void FreeverbEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   int bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
@@ -104,7 +104,7 @@ void FreeverbEffect::GetModuleDimensions(float& width, float& height)
    }
 }
 
-float FreeverbEffect::GetEffectAmount()
+double FreeverbEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -115,7 +115,7 @@ void FreeverbEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void FreeverbEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FreeverbEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mRoomSizeSlider)
    {

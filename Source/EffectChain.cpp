@@ -98,7 +98,7 @@ void EffectChain::AddEffect(std::string type, std::string desiredName, bool onTh
    mEffectMutex.unlock();
    AddChild(effect);
 
-   float* dryWet = &(mDryWetLevels[mEffects.size() - 1]);
+   double* dryWet = &(mDryWetLevels[mEffects.size() - 1]);
    *dryWet = 1;
 
    EffectControls controls;
@@ -162,8 +162,7 @@ void EffectChain::Process(double time)
    {
       float* buffer = GetBuffer()->GetChannel(ch);
       float volSq = mVolume * mVolume;
-      for (int i = 0; i < bufferSize; ++i)
-         buffer[i] *= volSq;
+      Mult(buffer, volSq, bufferSize);
       Add(target->GetBuffer()->GetChannel(ch), buffer, bufferSize);
       GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
    }
@@ -441,7 +440,7 @@ void EffectChain::MoveEffect(int fromIndex, int direction)
       mEffects[fromIndex] = swap;
       mEffectMutex.unlock();
 
-      float level = mDryWetLevels[newIndex];
+      double level = mDryWetLevels[newIndex];
       mDryWetLevels[newIndex] = mDryWetLevels[fromIndex];
       mDryWetLevels[fromIndex] = level;
 
@@ -501,7 +500,7 @@ void EffectChain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EffectChain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EffectChain::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

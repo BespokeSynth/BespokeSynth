@@ -138,7 +138,7 @@ void BiquadFilterEffect::DrawModule()
    ofEndShape(false);
 }
 
-float BiquadFilterEffect::GetEffectAmount()
+double BiquadFilterEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -222,7 +222,7 @@ void BiquadFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mFSlider || slider == mQSlider || slider == mGSlider)
       mCoefficientsHaveChanged = true;

@@ -85,7 +85,7 @@ void ModulatorSmoother::OnTransportAdvanced(float amount)
    mRamp.Start(gTime, mInput, gTime + (amount * TheTransport->MsPerBar() * (mSmooth * 300)));
 }
 
-float ModulatorSmoother::Value(int samplesIn)
+double ModulatorSmoother::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    return ofClamp(mRamp.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax());

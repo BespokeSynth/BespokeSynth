@@ -73,7 +73,7 @@ void NoiseEffect::DrawModule()
    mAmountSlider->Draw();
 }
 
-float NoiseEffect::GetEffectAmount()
+double NoiseEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -88,6 +88,6 @@ void NoiseEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void NoiseEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoiseEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
