@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Transport.h"

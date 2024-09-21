@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "MidiDevice.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"

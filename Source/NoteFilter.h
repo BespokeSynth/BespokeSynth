@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <stdio.h>
 #include "NoteEffectBase.h"
 
 class NoteFilter : public NoteEffectBase, public IDrawableModule

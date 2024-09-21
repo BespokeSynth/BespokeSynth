@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <limits>
 #include "TextEntry.h"
 #include "Ramp.h"
