@@ -2119,3 +2119,10 @@ euclideansequencer~euclidean sequencer displays a loop as a circle. the notes ar
 
 savestateloader~loads other savestate files (and unloads the current savestate). the number of buttons can be adjusted in the triangle menu.
 ~load *~loads specified savestate file. shift-click to choose a new file.
+
+
+dataprovider~provides modulation values normally not easily accessible.
+~type~the type of value to provide
+~interval~the interval to measure
+~realtime~if enabled this module will work on the audio thread which is more accurate but also more resource intense
+~set~click here to send the value (or, send a pulse to this module for the same result)
