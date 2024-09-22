@@ -38,6 +38,8 @@ target_sources(BespokeSynth PRIVATE
     AudioRouter.h
     AudioSend.cpp
     AudioSend.h
+    AudioSplitter.cpp
+    AudioSplitter.h
     AudioToCV.cpp
     AudioToCV.h
     AudioToPulse.cpp
