@@ -4,9 +4,8 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+
 ## [unreleased] - ####-##-##
-
-
 
 ### Added
 
@@ -54,7 +53,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Show the sample filename in the `seaofgrain` module
 - Allow for snapping to the center of the module while holding `shift` as well as `control` as opposed to only the top left corner
 - Minor rendering optimization when the modules `lissajous`, `spectrum` and `waveformviewer` are disabled/bypassed
-- Changed the following modules to use a bypass mechanism when disabled: `gain`, `audiometer`, `fftvocoder`, `dcoffset`, `feedback`, `inverter`, lissajous`, `looper`, `looperrecorder`, `multitapdelay`, `pulsechance`, `pulsedelayer`, `pulseflag`, `samplecapturer`, `samplergrid`, `seaofgrains`, `send`, `spectrum`, `signalclamp`, `vocoder`, `waveformviewer` and `waveshaper`
+- Changed the following modules to use a bypass mechanism when disabled: `gain`, `audiometer`, `fftvocoder`, `dcoffset`, `feedback`, `inverter`, `lissajous`, `looper`, `looperrecorder`, `multitapdelay`, `pulsechance`, `pulsedelayer`, `pulseflag`, `samplecapturer`, `samplergrid`, `seaofgrains`, `send`, `spectrum`, `signalclamp`, `vocoder`, `waveformviewer` and `waveshaper`
 - Made `spectrum` and `waveformviewer` function when not connected
 - Made it possible to use a PC keyboard as a midicontroller input
 - Made it possible to lock keyboard focus to the `keyboarddisplay` module (and other future keyboard takeover modules)
