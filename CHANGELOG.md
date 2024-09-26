@@ -68,7 +68,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Made it possible to set the target using scripts for the modules: `audiotocv`, `envelope`, `leveltocv`, and `vinylcontrol`
 - Made it possible for `snapshots` to target grids and canvases
 - Added the ability to manually lay out the module grid view using push2, so you can curate the modules you want quick access to
-- Added a second grid view to `notesequencer` and notetable modules
+- Added a second grid view to `notesequencer` and `notetable` modules
 - Don't include input audio when in "input*" mode in `karplusstrong`, so you only hear the feedback
 
 
