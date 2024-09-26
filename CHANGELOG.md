@@ -4,6 +4,113 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [unreleased] - ####-##-##
+
+
+
+### Added
+
+- Added `dataprovider` module
+- Added support for command line options
+- Added `savestateloader` module, for loading into another savestate file
+- Added controller layouts for the M-Audio Oxygen Pro 49
+- Added environment variable for setting bespoke data dir
+- Added support for template projects (.bskt)
+- Added 14-bit midi CC support, and added integration for custom "bespoke turn" controller
+- Added `euclideansequencer` module
+- Added a new loop capture method to `looperrecorder`, so you can start recording/stop recording and it rounds to the nearest number of bars
+- Added voiceId to the `notedisplayer`
+- Added "pan" to `modulationvisualizer` and made the module resizable
+- Added `get_name` python method to get the name of modules
+- Added automatic octave rescaling to the `keyboarddisplay` module
+- Added hover based keyboard capture to the `keyboarddisplay` module
+- Added octave labels to the `keyboarddisplay` module
+- Added the ability yo jump octaves via keyboard keybinds to the `keyboarddisplay` module
+- Added an option in the settings to hide labels to the `keyboarddisplay` module
+- Added another option that enforces a fixed number of octaves regardless of the keyboard size to the `keyboarddisplay` module
+- Added `controlrecorder` module
+- Added major thirds layout to the `launchpadkeyboard` module
+- Added mouse click based velocity support to the `keyboarddisplay` module
+- Added the ability for the user to configure their target refresh rate
+- Added `pulserouter` module
+- Added `voicesetter` module
+- Added controller layout for music thing modular m0 controller
+- Added a `label` module
+- Added a new `set_target` script method with an additional `cableSourceIndex` parameter
+- Added a checkbox to toggle the resetting of the transport on `songbuilder` scene change
+- Added the ability to disable spacemouse control from the command line
+- Added a mode to `oscillator` and `signalgenerator` sync to allow the frequency to be a ratio
+- Added a system for saving module presets, and spawning them from quickspawn
+- Added `pitchtovalue` module
+- Added `dotsequencer` module, a polyphonic note sequencer
+- Added `rhythmsequencer` note effect
+- Added controller definition for Code 25 USB MIDI
+- Added previewing to `samplebrowser`
+- Added sync pulse support to `m185sequencer`
+
+
+### Changed
+
+- Show the sample filename in the `seaofgrain` module
+- Allow for snapping to the center of the module while holding `shift` as well as `control` as opposed to only the top left corner
+- Minor rendering optimization when the modules `lissajous`, `spectrum` and `waveformviewer` are disabled/bypassed
+- Changed the following modules to use a bypass mechanism when disabled: `gain`, `audiometer`, `fftvocoder`, `dcoffset`, `feedback`, `inverter`, lissajous`, `looper`, `looperrecorder`, `multitapdelay`, `pulsechance`, `pulsedelayer`, `pulseflag`, `samplecapturer`, `samplergrid`, `seaofgrains`, `send`, `spectrum`, `signalclamp`, `vocoder`, `waveformviewer` and `waveshaper`
+- Made `spectrum` and `waveformviewer` function when not connected
+- Made it possible to use a PC keyboard as a midicontroller input
+- Made it possible to lock keyboard focus to the `keyboarddisplay` module (and other future keyboard takeover modules)
+- Updated quickspawn search sorting to prefer things that start with what's been typed so far
+- Made it possible for pulse cables to directly connect to buttons and checkboxes
+- Made the `pulser` "free" mode timer restartable
+- Made `pulsesequence` step default to aligning to global transport, like other similar devices
+- Adjusted transparency of midi slider interaction popup
+- Made spawned presets use the filename as their default name
+- Made it possible for rotary encoders to use "set" mode to increment and decrement in the `midicontroller` module
+- Changed `beats` module to only use a single column
+- Made it possible to set the target using scripts for the modules: `audiotocv`, `envelope`, `leveltocv`, and `vinylcontrol`
+- Made it possible for `snapshots` to target grids and canvases
+- Added the ability to manually lay out the module grid view using push2, so you can curate the modules you want quick access to
+- Added a second grid view to `notesequencer` and notetable modules
+- Don't include input audio when in "input*" mode in `karplusstrong`, so you only hear the feedback
+
+
+### Fixed
+
+- Fixed a crash on switch from "Jump" to "Switch" mode in the `songbuilder` module
+- Fixed an issue where some offscreen sliders wouldn't compute their modulation
+- Fixed `circlesequencer` playnote issues when using offsets
+- Simplify bespoke turn string communication, and fix issue where value string wasn't updating frequently enough
+- Fix a crash when the interval in the `curvelooper` is forcibly set to 0
+- Set `curvelooper` size on load
+- Random note buttons would set all notes to 3 when random octave range is 0-0. Now notes map to drumnotes 0-3 again if octave range is 0-0
+- Fixed an issue where holding space when bespoke isn't focused would cause mouse movements to pan the canvas
+- Fixed an issue where mouse wrap wouldn't pan on the 0 side if the window is fully maximized
+- Don't use file path hash for plugins lookup
+- When the `valuesetter` is disabled also don't allow sending updates when the button is pressed
+- Fixed a minor bug related to visualization of cables after a gain module
+- Fixed a bug that inhibited removing the voicelimit in the `oscillator`, `fmsynth` and `karplusstrong` modules
+- Fixed a bug in the `ringmodulator` module where it would not compute the sliders for every sample correctly
+- Fixed a bug with the visualization of the output cable on a `looper`
+- Refresh the parameter dropdown list on ParamInfo change so that plugins with less than 30 params and changing params work correctly
+- Fixed a crash when setting the values of dropdown menus out of bounds on the `label` module
+- Fixed `pitchtovalue` not accepting notes
+- Made `dotsequencer` contents savable in `snapshots`
+- Propagate keypress in `eq` module so that cables can be deleted with the key commands
+- Fixed an issue where `notecanvas` did not import correctly for most tempos
+- Fixed a vstplugin assert when adjusting preset dropdown from push2
+- Fixed an issue with `snapshot` cable sources overlapping each other when multiple modules are connected
+- Made monome grid refresh lights when reconnected
+- Fixed a crash caused by a `snapshot` module being in a weird state
+- Use temp file to make sure save files don't get corrupted if a crash ever happens mid-save
+- Fixed an issue where a step is skipped after reset when the first step has no pulses in the `m185sequencer` module
+- Fixed an issue where cables within prefabs can't be grabbed when `push2control` is being used
+
+
+### Removed
+
+- Removed the enable/bypass checkbox on the `splitter`
+- Removed hidden main patchcablesource from the modules: `audiotocv`, `envelope`, `leveltocv`, and `vinylcontrol`
+
+
 ## [1.2.1] - 2023-09-16
 
 ### Added
@@ -48,7 +155,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added a setting that allows changing the behavior of pasting onto UI controls
 - Added drum pad mode to `gridkeyboard`
 - Added `buffershuffler` module for slicing live input
-- Added Push 2 integrations to many modules.
+- Added Push 2 integrations to many modules
 - Added option to keep VST preset from resetting exposed param sliders
 - Added polyphony to `notetable`
 - Added interface to allow better control over storing/deleting snapshots via `midicontroller`
@@ -123,12 +230,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Changed how grid controllers edit drumsequencer, making it more responsive
 - Feedback is now given when `write audio` completes
 - Made the room size slider non linear in the `freeverb` effect
-- Allow the `freeverb` roomsize value to go to `1` since this also works perfectly without feedback.
+- Allow the `freeverb` roomsize value to go to `1` since this also works perfectly without feedback
 - When doing a "set" from the midicontroller, always force a value update
 - Massive RAM savings by changing how global record buffer saves
-- Sort the file list in the vstplugin's preset dropdown.
+- Sort the file list in the vstplugin's preset dropdown
 - Renamed `presets` to `snapshots`, to better reflect what the module does
-- Allow the OSC control messages to work in percentage mode.
+- Allow the OSC control messages to work in percentage mode
 - Select all text when tabbing through text entries 
 - Make dropdowns close if you click the dropdown again
 - If the current savestate filename is known use it in the prefix for multitrack recorder bounces
@@ -188,19 +295,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed crash when clicking `scale`'s "load SCL" or "load KBM" buttons via a `midicontroller`
 - Fixed issue where opening a plugin with a modal popup will endlessly spam the popup
 - Fixed a bug where `LFO` and `EnvelopeEditor` modules would not restore their minimized state
-- Fixed a bug where the `midioutput` would not correctly handle the UseVoiceAsChannel setting for modulation.
+- Fixed a bug where the `midioutput` would not correctly handle the UseVoiceAsChannel setting for modulation
 - Fixed a bug where the ramper would never reach its target value
 - Fixed push2control not saving bookmarks and favorites 
 - Fixed that prefabs (or containers) were saving twice
 - Fixed EnvelopeEditor modulation when minimized
 - Hard limit the number of `effectchain` modules instead of a crashing
-- Made the `effectchain` effect controls untargetable by modulation cables since this crashes when modules are deleted.
+- Made the `effectchain` effect controls untargetable by modulation cables since this crashes when modules are deleted
 - Fixed cables not moving to the correct location when a module that has direct children is minimized
 - Fixed notecreator not disabling correctly
 - Remove cables targeting controls on a deleting module
 - Fixed the `circlesequencer` not triggering a note when a circle is set to `1`
 - Made file extensions mostly case insensitive on all platforms
-- Refresh the file list in a `vstplugin` so that MIDI/OSC and other modulation work on load.
+- Refresh the file list in a `vstplugin` so that MIDI/OSC and other modulation work on load
 - Fixed a bug where note off's would turn off all notes with the same pitch even when specific voice id's were used
 - Don't light up `notefilter` when velocity 0 is received 
 - Fixed issues clicking cables inside `prefab`s
@@ -320,7 +427,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Allow `*.bsk` files to be opened directly, or dropped onto the app window
 - Added `NoteExpression` Router
 - Show `effectchain` effects in "audio effects" dropdown on title bar
-- Added support for SCL, oddsound and KBM.
+- Added support for SCL, oddsound and KBM
 - Added script styles to the `script` module
 
 ### Changed
@@ -349,12 +456,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Rename "reset layout" to "new patch" and add a confirmation popup
 - Changes to dropdownlist and quickspawn to handle massive VST collections
 - Using a more precise "center" value for endless encoders
-- VST manager window with scanning as a sub process (prevents crashing Bespoke while scanning).
+- VST manager window with scanning as a sub process (prevents crashing Bespoke while scanning)
 - Limit slider value entry to min and max range of the slider
 - Make "delete" function as "backspace" everywhere that it makes sense
 - "Chording" for quickspawn menu if you hold multiple keys, it will narrow down the quickspawn list
 - Build a hard limiter into the output module, and worn users more explicitly when they're clipping
-- VST Bus management (better handling of plugins that have more channels).
+- VST Bus management (better handling of plugins that have more channels)
 - Various improvements to the sample player user experience
 
 ### Fixed
