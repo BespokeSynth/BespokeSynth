@@ -1527,7 +1527,7 @@ void MidiController::GetModuleDimensions(float& width, float& height)
 
 void MidiController::ResyncControllerState()
 {
-   if (mControllerPage >= 0 && mControllerPage < mListeners.size())
+   if (mEnabled && mControllerPage >= 0 && mControllerPage < mListeners.size())
    {
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
          (*i)->ControllerPageSelected();
@@ -1558,7 +1558,7 @@ void MidiController::ResyncControllerState()
    }
    for (auto* grid : mGrids)
    {
-      if (grid->mGridControlTarget[mControllerPage] != nullptr)
+      if (mEnabled && grid->mGridControlTarget[mControllerPage] != nullptr)
       {
          //reset target
          GridControlTarget* target = grid->mGridControlTarget[mControllerPage];
@@ -1570,11 +1570,15 @@ void MidiController::ResyncControllerState()
          grid->mGridCable->ClearPatchCables();
       }
    }
-   HighlightPageControls(mControllerPage);
 
-   for (auto i = mConnections.begin(); i != mConnections.end(); ++i)
+   if (mEnabled)
    {
-      (*i)->mLastControlValue = -1;
+      HighlightPageControls(mControllerPage);
+
+      for (auto i = mConnections.begin(); i != mConnections.end(); ++i)
+      {
+         (*i)->mLastControlValue = -1;
+      }
    }
 }
 
@@ -1947,6 +1951,16 @@ void MidiController::OnDeviceChanged()
 
 void MidiController::CheckboxUpdated(Checkbox* checkbox, double time)
 {
+   if (checkbox == GetEnabledCheckbox())
+   {
+      if (!mEnabled)
+      {
+         SetEntirePageToZero(mControllerPage);
+      }
+      ResyncControllerState();
+      return;
+   }
+
    for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)
    {
       UIControlConnection* connection = *iter;
@@ -2117,7 +2131,7 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 {
    for (auto* grid : mGrids)
    {
-      if (cableSource == grid->mGridCable)
+      if (mEnabled && cableSource == grid->mGridCable)
       {
          grid->mGridControlTarget[mControllerPage] = dynamic_cast<GridControlTarget*>(cableSource->GetTarget());
          if (grid->mGridControlTarget[mControllerPage])
