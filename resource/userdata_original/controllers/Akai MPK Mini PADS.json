@@ -1,0 +1,22 @@
+{
+    "channelfilter": 10,
+    "groups" : [
+       {
+          "rows": 4,
+          "cols": 4,
+          "position" : [ 0, 0 ],
+          "dimensions" : [28, 28],
+          "spacing" : [32, 30],
+          "controls" : [
+			  48, 49, 50, 51,
+			  44, 45, 46, 47,
+			  40, 41, 42, 43,
+			  36, 37, 38, 39
+		  ],
+          "colors" : [ 0, 127],
+          "messageType" : "note",
+          "drawType" : "button"
+       }
+    ]
+ }
+ 
