@@ -128,7 +128,7 @@ void SeaOfGrain::Process(double time)
    ComputeSliders(0);
    int numChannels = 2;
    SyncBuffers(numChannels);
-   mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
+   mRecordBuffer.SetNumChannels(numChannels);
 
    int bufferSize = target->GetBuffer()->BufferSize();
    ChannelBuffer* out = target->GetBuffer();
