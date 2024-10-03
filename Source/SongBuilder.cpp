@@ -293,6 +293,7 @@ void SongBuilder::OnTimeEvent(double time)
 
    if (mQueuedScene != -1 &&
        (mChangeQuantizeInterval == kInterval_None ||
+        mChangeQuantizeInterval == kInterval_Free ||
         TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset) % (int)TheTransport->GetMeasureFraction(mChangeQuantizeInterval) == 0))
    {
       SetActiveScene(time, mQueuedScene);

@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "RollingBuffer.h"

@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "UIGrid.h"
 #include "Checkbox.h"

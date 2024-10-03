@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <utility>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"

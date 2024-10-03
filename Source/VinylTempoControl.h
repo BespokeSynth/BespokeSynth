@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "IAudioProcessor.h"
 #include "IModulator.h"

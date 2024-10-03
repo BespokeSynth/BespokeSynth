@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "SynthGlobals.h"
 
 // Variables for FFT routine

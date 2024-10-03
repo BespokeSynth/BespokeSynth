@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioEffect.h"
 #include "Slider.h"
 #include "PitchShifter.h"

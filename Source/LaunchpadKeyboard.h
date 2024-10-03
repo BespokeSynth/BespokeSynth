@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "Scale.h"
 #include "Checkbox.h"
 #include "Slider.h"

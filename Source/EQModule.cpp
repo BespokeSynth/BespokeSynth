@@ -31,6 +31,8 @@
 #include "UIControlMacros.h"
 #include "Checkbox.h"
 
+#include "juce_core/juce_core.h"
+
 EQModule::EQModule()
 : IAudioProcessor(gBufferSize)
 , mFFT(kNumFFTBins)

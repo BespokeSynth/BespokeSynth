@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-
 #include "Transport.h"
 #include "Checkbox.h"
 #include "Slider.h"

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
 #include "KarplusStrongVoice.h"

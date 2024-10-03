@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "PSMoveMgr.h"
 #include "Checkbox.h"

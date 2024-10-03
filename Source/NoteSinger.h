@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioReceiver.h"
 #include "INoteSource.h"
 #include "Slider.h"
