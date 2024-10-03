@@ -39,7 +39,7 @@
 
 #define MIDI_PITCH_BEND_CONTROL_NUM 999
 #define MIDI_PAGE_WIDTH 1000
-#define MAX_MIDI_PAGES 10
+#define MAX_MIDI_PAGES 32
 
 enum MidiMessageType
 {
