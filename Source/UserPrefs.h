@@ -182,7 +182,7 @@ private:
 class UserPrefTextEntryFloat : public UserPref
 {
 public:
-   UserPrefTextEntryFloat(std::string name, float defaultValue, float min, float max, int digits, UserPrefCategory category)
+   UserPrefTextEntryFloat(std::string name, double defaultValue, double min, double max, int digits, UserPrefCategory category)
    : mValue(defaultValue)
    , mDefault(defaultValue)
    , mMin(min)
@@ -197,17 +197,17 @@ public:
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
    TextEntry* GetTextEntry() { return mTextEntry; }
-   float& Get() { return mValue; }
-   float GetDefault() { return mDefault; }
+   double& Get() { return mValue; }
+   double GetDefault() { return mDefault; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
 
 private:
-   float mValue{ 0 };
-   float mDefault{ 0 };
+   double mValue{ 0 };
+   double mDefault{ 0 };
    TextEntry* mTextEntry{ nullptr };
-   float mMin{ 0 };
-   float mMax{ 1 };
+   double mMin{ 0 };
+   double mMax{ 1 };
    int mDigits{ 5 };
 };
 
@@ -239,7 +239,7 @@ private:
 class UserPrefFloat : public UserPref
 {
 public:
-   UserPrefFloat(std::string name, float defaultValue, float min, float max, UserPrefCategory category)
+   UserPrefFloat(std::string name, double defaultValue, double min, double max, UserPrefCategory category)
    : mValue(defaultValue)
    , mDefault(defaultValue)
    , mMin(min)
@@ -253,17 +253,17 @@ public:
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
    FloatSlider* GetSlider() { return mSlider; }
-   float& Get() { return mValue; }
-   float GetDefault() { return mDefault; }
+   double& Get() { return mValue; }
+   double GetDefault() { return mDefault; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
 
 private:
-   float mValue{ 0 };
-   float mDefault{ 0 };
+   double mValue{ 0 };
+   double mDefault{ 0 };
    FloatSlider* mSlider{ nullptr };
-   float mMin{ 0 };
-   float mMax{ 1 };
+   double mMin{ 0 };
+   double mMax{ 1 };
 };
 
 namespace
@@ -301,8 +301,8 @@ public:
    UserPrefBool set_manual_window_position{ "set_manual_window_position", false, UserPrefCategory::General };
    UserPrefTextEntryInt position_x{ "position_x", 200, -10000, 10000, 5, UserPrefCategory::General };
    UserPrefTextEntryInt position_y{ "position_y", 200, -10000, 10000, 5, UserPrefCategory::General };
-   UserPrefFloat zoom{ "zoom", 1.3f, .25f, 2, UserPrefCategory::General };
-   UserPrefFloat ui_scale{ "ui_scale", 1.3f, .25f, 2, UserPrefCategory::General };
+   UserPrefFloat zoom{ "zoom", 1.3, .25, 2, UserPrefCategory::General };
+   UserPrefFloat ui_scale{ "ui_scale", 1.3, .25, 2, UserPrefCategory::General };
    UserPrefDropdownString cable_drop_behavior{ "cable_drop_behavior", "show quickspawn", 150, UserPrefCategory::General };
    UserPrefDropdownString qwerty_to_pitch_mode{ "qwerty_to_pitch_mode", "Ableton", 150, UserPrefCategory::General };
    UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::General };
@@ -322,15 +322,15 @@ public:
    UserPrefString plugin_preference_order{ "plugin_preference_order", "VST3;VST;AudioUnit;LV2", 70, UserPrefCategory::General };
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
-   UserPrefFloat cable_alpha{ "cable_alpha", 1, 0.05f, 1, UserPrefCategory::Graphics };
+   UserPrefFloat cable_alpha{ "cable_alpha", 1, 0.05, 1, UserPrefCategory::Graphics };
    UserPrefBool fade_cable_middle{ "fade_cable_middle", true, UserPrefCategory::Graphics };
-   UserPrefFloat cable_quality{ "cable_quality", 1, .1f, 3, UserPrefCategory::Graphics };
-   UserPrefFloat lissajous_r{ "lissajous_r", 0.408f, 0, 1, UserPrefCategory::Graphics };
-   UserPrefFloat lissajous_g{ "lissajous_g", 0.245f, 0, 1, UserPrefCategory::Graphics };
-   UserPrefFloat lissajous_b{ "lissajous_b", 0.418f, 0, 1, UserPrefCategory::Graphics };
-   UserPrefFloat background_r{ "background_r", 0.09f, 0, 1, UserPrefCategory::Graphics };
-   UserPrefFloat background_g{ "background_g", 0.09f, 0, 1, UserPrefCategory::Graphics };
-   UserPrefFloat background_b{ "background_b", 0.09f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat cable_quality{ "cable_quality", 1, .1, 3, UserPrefCategory::Graphics };
+   UserPrefFloat lissajous_r{ "lissajous_r", 0.408, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat lissajous_g{ "lissajous_g", 0.245, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat lissajous_b{ "lissajous_b", 0.418, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat background_r{ "background_r", 0.09, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat background_g{ "background_g", 0.09, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat background_b{ "background_b", 0.09, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat target_framerate{ "target_framerate", 60, 30, 144, UserPrefCategory::Graphics };
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
    UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };

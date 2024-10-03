@@ -42,7 +42,7 @@ void Lissajous::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mScaleSlider = new FloatSlider(this, "scale", 0, 0, 100, 15, &mScale, .5f, 4);
+   mScaleSlider = new FloatSlider(this, "scale", 0, 0, 100, 15, &mScale, .5, 4);
 }
 
 void Lissajous::Process(double time)

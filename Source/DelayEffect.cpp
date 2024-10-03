@@ -147,14 +147,14 @@ void DelayEffect::DrawModule()
    mInvertCheckbox->Draw();
 }
 
-float DelayEffect::GetEffectAmount()
+double DelayEffect::GetEffectAmount()
 {
    if (!mEnabled || !mAcceptInput)
       return 0;
    return mFeedback;
 }
 
-void DelayEffect::SetDelay(float delay)
+void DelayEffect::SetDelay(double delay)
 {
    mDelay = delay;
    mDelayRamp.Start(gTime, mDelay, gTime + 10);
@@ -209,7 +209,7 @@ void DelayEffect::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void DelayEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void DelayEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mDelaySlider)
    {

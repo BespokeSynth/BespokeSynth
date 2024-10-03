@@ -83,7 +83,7 @@ void BitcrushEffect::DrawModule()
    mCrushSlider->Draw();
 }
 
-float BitcrushEffect::GetEffectAmount()
+double BitcrushEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -98,6 +98,6 @@ void BitcrushEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time
 {
 }
 
-void BitcrushEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BitcrushEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }

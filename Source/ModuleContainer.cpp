@@ -255,7 +255,7 @@ IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
    return nullptr;
 }
 
-ofVec2f ModuleContainer::GetDrawOffset()
+ofVec2d ModuleContainer::GetDrawOffset()
 {
    if (mOwner != nullptr && mOwner->GetOwningContainer() != nullptr)
       return mDrawOffset + mOwner->GetOwningContainer()->GetDrawOffset();

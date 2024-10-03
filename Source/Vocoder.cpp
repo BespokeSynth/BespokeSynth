@@ -33,7 +33,7 @@ Vocoder::Vocoder()
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[VOCODER_WINDOW_SIZE];
    for (int i = 0; i < VOCODER_WINDOW_SIZE; ++i)
-      mWindower[i] = -.5 * cos(FTWO_PI * i / VOCODER_WINDOW_SIZE) + .5;
+      mWindower[i] = -.5 * cos(TWO_PI * i / VOCODER_WINDOW_SIZE) + .5;
 
    mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
@@ -96,9 +96,9 @@ void Vocoder::Process(double time)
 
    ComputeSliders(0);
 
-   float inputPreampSq = mInputPreamp * mInputPreamp;
-   float carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
-   float volSq = mVolume * mVolume;
+   double inputPreampSq = mInputPreamp * mInputPreamp;
+   double carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
+   double volSq = mVolume * mVolume;
 
    int bufferSize = GetBuffer()->BufferSize();
 
@@ -153,26 +153,26 @@ void Vocoder::Process(double time)
 
    for (int i = 0; i < FFT_FREQDOMAIN_SIZE; ++i)
    {
-      float real = mFFTData.mRealValues[i];
-      float imag = mFFTData.mImaginaryValues[i];
+      double real = mFFTData.mRealValues[i];
+      double imag = mFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      float amp = 2. * sqrtf(real * real + imag * imag);
+      double amp = 2. * sqrt(real * real + imag * imag);
       //float phase = atan2(imag,real);
 
-      float carrierReal = mCarrierFFTData.mRealValues[i];
-      float carrierImag = mCarrierFFTData.mImaginaryValues[i];
+      double carrierReal = mCarrierFFTData.mRealValues[i];
+      double carrierImag = mCarrierFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      float carrierAmp = 2. * sqrtf(carrierReal * carrierReal + carrierImag * carrierImag);
-      float carrierPhase = atan2(carrierImag, carrierReal);
+      double carrierAmp = 2. * sqrt(carrierReal * carrierReal + carrierImag * carrierImag);
+      double carrierPhase = atan2(carrierImag, carrierReal);
 
       amp *= carrierAmp;
-      float phase = carrierPhase;
+      double phase = carrierPhase;
 
-      phase += ofRandom(mWhisper * FTWO_PI);
+      phase += ofRandom(mWhisper * TWO_PI);
       mPhaseOffsetSlider->Compute();
-      phase = FloatWrap(phase + mPhaseOffset, FTWO_PI);
+      phase = DoubleWrap(phase + mPhaseOffset, TWO_PI);
 
       if (i < mCut) //cut out superbass
          amp = 0;

@@ -74,9 +74,9 @@ void PitchToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    }
 }
 
-float PitchToCV::Value(int samplesIn)
+double PitchToCV::Value(int samplesIn)
 {
-   float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
+   double bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
    return ofMap(mPitch + bend, 0, 127, GetMin(), GetMax(), K(clamped));
 }
 

@@ -859,7 +859,7 @@ void LooperRecorder::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void LooperRecorder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void LooperRecorder::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

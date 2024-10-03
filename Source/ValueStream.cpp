@@ -52,7 +52,7 @@ void ValueStream::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .4f, 5);
+   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .4, 5);
    ENDUIBLOCK0();
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mControlCable);

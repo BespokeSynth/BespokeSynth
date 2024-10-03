@@ -51,7 +51,7 @@ private:
    struct Location
    {
       float mZoomLevel{ 1 };
-      ofVec2f mOffset{ 0, 0 };
+      ofVec2d mOffset{ 0, 0 };
    };
 
    Location mLoadLocation{};

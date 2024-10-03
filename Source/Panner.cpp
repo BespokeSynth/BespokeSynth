@@ -131,7 +131,7 @@ void Panner::DrawModule()
    GetRightPanGain(mPan);
 }
 
-void Panner::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Panner::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

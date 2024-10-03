@@ -109,15 +109,15 @@ extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;
 extern IUIControl* gHotBindUIControl[10];
 extern float gControlTactileFeedback;
-extern float gDrawScale;
+extern double gDrawScale;
 extern bool gShowDevModules;
-extern float gCornerRoundness;
+extern double gCornerRoundness;
 
 extern std::random_device gRandomDevice;
 
 extern bespoke::core::Xoshiro256ss gRandom;
-extern std::uniform_real_distribution<float> gRandom01;
-extern std::uniform_real_distribution<float> gRandomBipolarDist;
+extern std::uniform_real_distribution<double> gRandom01;
+extern std::uniform_real_distribution<double> gRandomBipolarDist;
 
 enum OscillatorType
 {
@@ -184,9 +184,10 @@ void BufferCopy(float* dst, const float* src, int bufferSize);
 std::string NoteName(int pitch, bool flat = false, bool includeOctave = false);
 int PitchFromNoteName(std::string noteName);
 float Interp(float a, float start, float end);
-double GetPhaseInc(float freq);
+double Interp(double a, double start, double end);
+double GetPhaseInc(double freq);
 float FloatWrap(float num, float space);
-double DoubleWrap(double num, float space);
+double DoubleWrap(double num, double space);
 void DrawTextNormal(std::string text, int x, int y, float size = 13);
 void DrawTextRightJustify(std::string text, int x, int y, float size = 13);
 void DrawTextBold(std::string text, int x, int y, float size = 13);
@@ -202,10 +203,10 @@ void StringCopy(char* dest, const char* source, int destLength);
 int GetKeyModifiers();
 bool IsKeyHeld(int key, int modifiers = kModifier_None);
 int KeyToLower(int key);
-float EaseIn(float start, float end, float a);
-float EaseOut(float start, float end, float a);
-float Bias(float value, float bias);
-float Pow2(float in);
+double EaseIn(double start, double end, double a);
+double EaseOut(double start, double end, double a);
+double Bias(double value, double bias);
+double Pow2(double in);
 void PrintCallstack();
 bool IsInUnitBox(ofVec2f pos);
 std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existing);
@@ -215,10 +216,10 @@ void DumpUnfreedMemory();
 float DistSqToLine(ofVec2f point, ofVec2f a, ofVec2f b);
 uint32_t JenkinsHash(const char* key);
 void LoadStateValidate(bool assertion);
-float GetLeftPanGain(float pan);
-float GetRightPanGain(float pan);
+double GetLeftPanGain(double pan);
+double GetRightPanGain(double pan);
 void DrawFallbackText(const char* text, float posX, float posY);
-bool EvaluateExpression(std::string expression, float currentValue, float& output);
+bool EvaluateExpression(std::string expression, double currentValue, double& output);
 double NextBufferTime(bool includeLookahead);
 bool IsAudioThread();
 

@@ -169,7 +169,7 @@ void UnstableModWheel::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetModWheel(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

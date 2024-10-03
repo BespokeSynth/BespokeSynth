@@ -54,7 +54,7 @@ public:
    void CreateUIControls();
    void OnTimeEvent(double time) override;
    void PlayStep(double time, int step);
-   void SetOffset(float offset);
+   void SetOffset(double offset);
    void UpdateTimeListener();
    void Draw(float x, float y);
    int GetRowPitch() const { return mRowPitch; }
@@ -63,7 +63,7 @@ private:
    UIGrid* mGrid{ nullptr };
    int mRow{ 0 };
    StepSequencer* mSeq{ nullptr };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
 
    struct PlayedStep
    {
@@ -83,13 +83,13 @@ public:
    ~NoteRepeat();
    void OnTimeEvent(double time) override;
    void SetInterval(NoteInterval interval);
-   void SetOffset(float offset);
+   void SetOffset(double offset);
 
 private:
    int mRow{ 0 };
    StepSequencer* mSeq{ nullptr };
    NoteInterval mInterval{ NoteInterval::kInterval_None };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
 };
 
 class StepSequencerNoteFlusher : public ITimeListener
@@ -167,7 +167,7 @@ public:
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
@@ -224,16 +224,15 @@ private:
    };
 
    UIGrid* mGrid{ nullptr };
-   float mStrength{ 1 };
+   double mStrength{ 1 };
    FloatSlider* mStrengthSlider{ nullptr };
    int mGridYOff{ 0 };
    ClickButton* mClearButton{ nullptr };
-   int mColorOffset{ 3 };
    DropdownList* mGridYOffDropdown{ nullptr };
    std::array<StepSequencerRow*, NUM_STEPSEQ_ROWS> mRows{};
    bool mAdjustOffsets{ false };
    Checkbox* mAdjustOffsetsCheckbox{ nullptr };
-   std::array<float, NUM_STEPSEQ_ROWS> mOffsets{};
+   std::array<double, NUM_STEPSEQ_ROWS> mOffsets{};
    std::array<FloatSlider*, NUM_STEPSEQ_ROWS> mOffsetSlider{};
    std::array<ClickButton*, NUM_STEPSEQ_ROWS> mRandomizeRowButton{};
    std::map<int, int> mPadPressures{};
@@ -259,9 +258,9 @@ private:
    NoteInputMode mNoteInputMode{ NoteInputMode::PlayStepIndex };
    bool mHasExternalPulseSource{ false };
    bool mPush2Connected{ false };
-   float mRandomizationAmount{ 1 };
+   double mRandomizationAmount{ 1 };
    FloatSlider* mRandomizationAmountSlider{ nullptr };
-   float mRandomizationDensity{ .25 };
+   double mRandomizationDensity{ .25 };
    FloatSlider* mRandomizationDensitySlider{ nullptr };
    ClickButton* mRandomizeButton{ nullptr };
 

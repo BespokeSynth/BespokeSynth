@@ -236,7 +236,7 @@ void FMSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
       UpdateHarmonicRatio();
 }
 
-void FMSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FMSynth::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mHarmSlider || slider == mHarmSlider2)
       UpdateHarmonicRatio();

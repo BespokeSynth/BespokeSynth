@@ -212,7 +212,7 @@ void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PulseTrain::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -225,7 +225,7 @@ void PulseTrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
    }
 }
 
-void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mVelocityGrid)
    {

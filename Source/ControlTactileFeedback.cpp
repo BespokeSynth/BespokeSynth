@@ -31,7 +31,7 @@
 
 ControlTactileFeedback::ControlTactileFeedback()
 {
-   mPhaseInc = GetPhaseInc(50);
+   mPhaseInc = GetPhaseInc(50.);
 }
 
 void ControlTactileFeedback::CreateUIControls()

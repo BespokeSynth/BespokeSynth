@@ -171,7 +171,7 @@ void Scale::Init()
    SetRandomRootAndScale();
 }
 
-float Scale::PitchToFreq(float pitch)
+double Scale::PitchToFreq(double pitch)
 {
    if (mIntonation == kIntonation_SclFile)
    {
@@ -233,13 +233,13 @@ float Scale::PitchToFreq(float pitch)
          {
             referencePitch += mPitchesPerOctave;
          } while (referencePitch < mReferencePitch && abs(referencePitch - mReferencePitch) > mPitchesPerOctave);
-         float referenceFreq = Pow2((referencePitch - mReferencePitch) / mPitchesPerOctave) * mReferenceFreq;
+         auto referenceFreq = Pow2((referencePitch - mReferencePitch) / mPitchesPerOctave) * mReferenceFreq;
 
          int intPitch = (int)pitch;
-         float remainder = pitch - intPitch;
-         float ratio1 = GetTuningTableRatio(intPitch - referencePitch);
-         float ratio2 = GetTuningTableRatio((intPitch + 1) - referencePitch);
-         float freq = MAX(ofLerp(ratio1, ratio2, remainder), .001f) * referenceFreq;
+         double remainder = pitch - intPitch;
+         double ratio1 = GetTuningTableRatio(intPitch - referencePitch);
+         double ratio2 = GetTuningTableRatio((intPitch + 1) - referencePitch);
+         double freq = MAX(ofLerp(ratio1, ratio2, remainder), .001) * referenceFreq;
          return freq;
 
          break;
@@ -251,7 +251,7 @@ float Scale::PitchToFreq(float pitch)
    return 0;
 }
 
-float Scale::FreqToPitch(float freq)
+double Scale::FreqToPitch(double freq)
 {
    //TODO(Ryan) always use equal for now
    //switch (mIntonation)
@@ -708,7 +708,7 @@ void Scale::UpdateTuningTable()
    }
 }
 
-float Scale::GetTuningTableRatio(int semitonesFromCenter)
+double Scale::GetTuningTableRatio(int semitonesFromCenter) const
 {
    return mTuningTable[CLAMP(128 + semitonesFromCenter, 0, 255)];
 }
@@ -723,7 +723,7 @@ void Scale::DropdownUpdated(DropdownList* list, int oldVal, double time)
       UpdateTuningTable();
 }
 
-void Scale::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Scale::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

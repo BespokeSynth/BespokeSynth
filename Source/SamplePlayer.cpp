@@ -123,7 +123,7 @@ void SamplePlayer::CreateUIControls()
    mGrabHoveredClipButton->SetShowing(false);
 
    for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
-      mCuePointSelector->AddLabel(ofToString(i).c_str(), i);
+      mCuePointSelector->AddLabel(ofToString(i), i);
 
    AddChild(&mRecordGate);
    mRecordGate.SetPosition(mRecordAsClipsCheckbox->GetRect().getMaxX() + 3, -1);
@@ -332,9 +332,9 @@ void SamplePlayer::Process(double time)
       int bufferSize = target->GetBuffer()->BufferSize();
       assert(bufferSize == gBufferSize);
 
-      float volSq = mVolume * mVolume;
+      double volSq = mVolume * mVolume;
 
-      const float kBlendSpeed = 1;
+      const double kBlendSpeed = 1;
       if (mOscWheelGrabbed)
       {
          mPlaySpeed = ofLerp(mPlaySpeed, mOscWheelSpeed, kBlendSpeed);
@@ -417,7 +417,7 @@ void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float spee
 {
    if (mSample != nullptr)
    {
-      float startSeconds, lengthSeconds, speed;
+      double startSeconds, lengthSeconds, speed;
       GetPlayInfoForPitch(index, startSeconds, lengthSeconds, speed, mStopOnNoteOff);
       mSample->SetPlayPosition((startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
       mCuePointSpeed = speed * speedMult;
@@ -496,7 +496,7 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    Sample* oldSamplePtr = mSample;
    bool ownedOldSample = mOwnsSample;
 
-   float lengthSeconds = sample->LengthInSamples() / (gSampleRate * sample->GetSampleRateRatio());
+   double lengthSeconds = sample->LengthInSamples() / (gSampleRate * sample->GetSampleRateRatio());
    mCuePointStartSlider->SetExtents(0, lengthSeconds);
    mCuePointLengthSlider->SetExtents(0, lengthSeconds);
 
@@ -808,7 +808,7 @@ void SamplePlayer::OnClicked(float x, float y, bool right)
 
 ChannelBuffer* SamplePlayer::GetCueSampleData(int cueIndex)
 {
-   float startSeconds, lengthSeconds, speed;
+   double startSeconds, lengthSeconds, speed;
    bool stopOnNoteOff;
    GetPlayInfoForPitch(cueIndex, startSeconds, lengthSeconds, speed, stopOnNoteOff);
    if (lengthSeconds <= 0)
@@ -913,7 +913,7 @@ float SamplePlayer::GetSecondsForMouse(float mouseX) const
    return ofMap(mouseX, 5, mWidth - 5, GetZoomStartSeconds(), GetZoomEndSeconds(), true);
 }
 
-void SamplePlayer::GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed, bool& stopOnNoteOff) const
+void SamplePlayer::GetPlayInfoForPitch(int pitch, double& startSeconds, double& lengthSeconds, double& speed, bool& stopOnNoteOff) const
 {
    if (pitch >= 0 && pitch < mSampleCuePoints.size())
    {
@@ -931,7 +931,7 @@ void SamplePlayer::GetPlayInfoForPitch(int pitch, float& startSeconds, float& le
    }
 }
 
-void SamplePlayer::SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed)
+void SamplePlayer::SetCuePoint(int pitch, double startSeconds, double lengthSeconds, double speed)
 {
    if (pitch < mSampleCuePoints.size())
    {
@@ -1185,7 +1185,7 @@ void SamplePlayer::DrawModule()
    }
 }
 
-float SamplePlayer::GetLengthInSeconds() const
+double SamplePlayer::GetLengthInSeconds() const
 {
    if (mSample != nullptr)
       return mSample->LengthInSamples() / (gSampleRate * mSample->GetSampleRateRatio());
@@ -1376,7 +1376,7 @@ void SamplePlayer::GetModuleDimensions(float& width, float& height)
    height = mHeight;
 }
 
-void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -1451,9 +1451,20 @@ void SamplePlayer::LoadState(FileStreamIn& in, int rev)
       mSampleCuePoints.resize(size);
       for (size_t i = 0; i < size; ++i)
       {
-         in >> mSampleCuePoints[i].startSeconds;
-         in >> mSampleCuePoints[i].lengthSeconds;
-         in >> mSampleCuePoints[i].speed;
+         if (rev < 3)
+         {
+            float a, b, c;
+            in >> a >> b >> c;
+            mSampleCuePoints[i].startSeconds = a;
+            mSampleCuePoints[i].lengthSeconds = b;
+            mSampleCuePoints[i].speed = c;
+         }
+         else
+         {
+            in >> mSampleCuePoints[i].startSeconds;
+            in >> mSampleCuePoints[i].lengthSeconds;
+            in >> mSampleCuePoints[i].speed;
+         }
          if (rev >= 2)
             in >> mSampleCuePoints[i].stopOnNoteOff;
       }

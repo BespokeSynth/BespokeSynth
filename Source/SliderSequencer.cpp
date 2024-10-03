@@ -124,7 +124,7 @@ void SliderSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SliderSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SliderSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

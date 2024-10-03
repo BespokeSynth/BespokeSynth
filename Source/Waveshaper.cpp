@@ -113,8 +113,8 @@ void Waveshaper::Process(double time)
       return;
    }
 
-   float max = 0;
-   float min = 0;
+   double max = 0;
+   double min = 0;
 
    int bufferSize = GetBuffer()->BufferSize();
 
@@ -160,7 +160,7 @@ void Waveshaper::Process(double time)
 
 void Waveshaper::TextEntryComplete(TextEntry* entry)
 {
-   exprtk::parser<float> parser;
+   exprtk::parser<double> parser;
    mExpressionValid = parser.compile(mEntryString, mExpression);
    if (mExpressionValid)
       parser.compile(mEntryString, mExpressionDraw);

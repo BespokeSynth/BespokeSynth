@@ -234,7 +234,7 @@ void DrumSynth::GetModuleDimensions(float& width, float& height)
    height = 2 + kPadYOffset + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;
 }
 
-void DrumSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void DrumSynth::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -389,16 +389,16 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize, i
 
    for (size_t i = 0; i < bufferSize; ++i)
    {
-      float freq = ofLerp(mData.mFreqMin, mData.mFreqMax, mData.mFreqAdsr.Value(time));
+      double freq = ofLerp(mData.mFreqMin, mData.mFreqMax, mData.mFreqAdsr.Value(time));
       if (mData.mCutoffMax != DRUMSYNTH_NO_CUTOFF)
       {
          mFilter.SetSampleRate(sampleRate);
          mFilter.SetFilterParams(ofLerp(mData.mCutoffMin, mData.mCutoffMax, mData.mFilterAdsr.Value(time)), mData.mQ);
       }
-      float phaseInc = GetPhaseInc(freq) / oversampling;
+      double phaseInc = GetPhaseInc(freq) / oversampling;
 
       float sample = mData.mTone.Audio(time, mPhase) * mData.mVol * mData.mVol;
-      float noise = mData.mNoise.Audio(time, mPhase);
+      double noise = mData.mNoise.Audio(time, mPhase);
       noise *= noise * (noise > 0 ? 1 : -1); //square but keep sign
       sample += noise * mData.mVolNoise * mData.mVolNoise;
       if (mData.mCutoffMax != DRUMSYNTH_NO_CUTOFF)

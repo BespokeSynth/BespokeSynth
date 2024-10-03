@@ -225,7 +225,7 @@ bool ClickButton::MouseMoved(float x, float y)
    return false;
 }
 
-void ClickButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void ClickButton::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    if (slider > 0)
       DoClick(time);
@@ -233,7 +233,7 @@ void ClickButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
       MouseReleased();
 }
 
-void ClickButton::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void ClickButton::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    if (value > 0)
       DoClick(time);
@@ -241,21 +241,21 @@ void ClickButton::SetValue(float value, double time, bool forceUpdate /*= false*
       MouseReleased();
 }
 
-float ClickButton::GetMidiValue() const
+double ClickButton::GetMidiValue() const
 {
    if (ButtonLit())
       return 1;
    return 0;
 }
 
-std::string ClickButton::GetDisplayValue(float val) const
+std::string ClickButton::GetDisplayValue(double val) const
 {
    if (val > 0)
       return "click";
    return "_";
 }
 
-void ClickButton::Increment(float amount)
+void ClickButton::Increment(double amount)
 {
    DoClick(NextBufferTime(false));
 }

@@ -74,7 +74,7 @@ void NoteEcho::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
 
    for (int i = 0; i < kMaxDestinations; ++i)
    {
-      double delayMs = mDelay[i] / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      const double delayMs = mDelay[i] / (static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       SendNoteToIndex(i, time + delayMs, pitch, velocity, voiceIdx, modulation);
    }
 }

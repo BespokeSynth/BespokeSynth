@@ -71,12 +71,12 @@ void NoteHumanizer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
       return;
    }
 
-   float delayMs;
+   double delayMs;
    int outputVelocity;
    if (velocity > 0)
    {
-      delayMs = ofRandom(0, mTime);
-      outputVelocity = ofClamp((velocity / 127.0f * ofRandom(1 - mVelocity, 1 + mVelocity)) * 127, 1, 127);
+      delayMs = ofRandom(0., mTime);
+      outputVelocity = ofClamp((velocity / 127.0 * ofRandom(1 - mVelocity, 1 + mVelocity)) * 127, 1, 127);
       mLastDelayMs[pitch] = delayMs;
    }
    else
@@ -87,7 +87,7 @@ void NoteHumanizer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    PlayNoteOutput(time + delayMs, pitch, outputVelocity, voiceIdx, modulation);
 }
 
-void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

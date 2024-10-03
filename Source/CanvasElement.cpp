@@ -274,7 +274,7 @@ void CanvasElement::CheckboxUpdated(std::string label, bool value, double time)
    }
 }
 
-void CanvasElement::FloatSliderUpdated(std::string label, float oldVal, float newVal, double time)
+void CanvasElement::FloatSliderUpdated(std::string label, double oldVal, double newVal, double time)
 {
    for (auto* control : mUIControls)
    {
@@ -283,7 +283,7 @@ void CanvasElement::FloatSliderUpdated(std::string label, float oldVal, float ne
    }
 }
 
-void CanvasElement::IntSliderUpdated(std::string label, int oldVal, float newVal, double time)
+void CanvasElement::IntSliderUpdated(std::string label, int oldVal, double newVal, double time)
 {
    for (auto* control : mUIControls)
    {
@@ -298,7 +298,7 @@ void CanvasElement::ButtonClicked(std::string label, double time)
 
 namespace
 {
-   const int kCESaveStateRev = 1;
+   const int kCESaveStateRev = 2;
 }
 
 void CanvasElement::SaveState(FileStreamOut& out)
@@ -320,8 +320,18 @@ void CanvasElement::LoadState(FileStreamIn& in)
       in >> mRow;
       in >> mCol;
    }
-   in >> mOffset;
-   in >> mLength;
+   if (rev < 2)
+   {
+      float a, b;
+      in >> a >> b;
+      mOffset = a;
+      mLength = b;
+   }
+   else
+   {
+      in >> mOffset;
+      in >> mLength;
+   }
 }
 
 ////////////////////
@@ -442,7 +452,14 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
    in >> rev;
    LoadStateValidate(rev <= kNCESaveStateRev);
 
-   in >> mVelocity;
+   if (rev < 1)
+   {
+      float a;
+      in >> a;
+      mVelocity = a;
+   }
+   else
+      in >> mVelocity;
 }
 
 /////////////////////
@@ -568,7 +585,7 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
 
 namespace
 {
-   const int kSCESaveStateRev = 2;
+   const int kSCESaveStateRev = 3;
 }
 
 void SampleCanvasElement::SaveState(FileStreamOut& out)
@@ -606,7 +623,14 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
       in >> dummy;
       in >> dummy;
    }
-   in >> mVolume;
+   if (rev < 3)
+   {
+      float a;
+      in >> a;
+      mVolume = a;
+   }
+   else
+      in >> mVolume;
    if (rev == 0)
    {
       bool dummy;
@@ -727,7 +751,7 @@ float EventCanvasElement::GetEnd() const
 
 namespace
 {
-   const int kECESaveStateRev = 1;
+   const int kECESaveStateRev = 2;
 }
 
 void EventCanvasElement::SaveState(FileStreamOut& out)
@@ -747,7 +771,14 @@ void EventCanvasElement::LoadState(FileStreamIn& in)
    in >> rev;
    LoadStateValidate(rev <= kECESaveStateRev);
 
-   in >> mValue;
+   if (rev < 2)
+   {
+      float a;
+      in >> a;
+      mValue = a;
+   }
+   else
+      in >> mValue;
    if (rev < 1)
    {
       std::string dummy;

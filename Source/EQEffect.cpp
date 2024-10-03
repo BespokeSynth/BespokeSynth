@@ -106,14 +106,14 @@ bool EQEffect::MouseMoved(float x, float y)
    return false;
 }
 
-float EQEffect::GetEffectAmount()
+double EQEffect::GetEffectAmount()
 {
    if (mEnabled)
    {
-      float amount = 0;
+      double amount = 0;
       for (int i = 0; i < mNumFilters; ++i)
       {
-         amount += fabsf(mMultiSlider->GetVal(i, 0) - .5f);
+         amount += fabs(mMultiSlider->GetVal(i, 0) - .5);
       }
       return amount;
    }
@@ -169,7 +169,7 @@ void EQEffect::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void EQEffect::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void EQEffect::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    for (int ch = 0; ch < ChannelBuffer::kMaxNumChannels; ++ch)
    {

@@ -259,7 +259,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
          // Move viewport to centered on the module
          float w, h;
          TheTitleBar->GetDimensions(w, h);
-         TheSynth->SetDrawOffset(ofVec2f(-module_rect.x + ofGetWidth() / gDrawScale / 2 - module_rect.width / 2, -module_rect.y + ofGetHeight() / gDrawScale / 2 - (module_rect.height - h / 2) / 2));
+         TheSynth->SetDrawOffset(ofVec2d(-module_rect.x + ofGetWidth() / gDrawScale / 2 - module_rect.width / 2, -module_rect.y + ofGetHeight() / gDrawScale / 2 - (module_rect.height - h / 2) / 2));
       }
 
       return;

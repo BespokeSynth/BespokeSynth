@@ -74,7 +74,7 @@ void RhythmSequencer::CreateUIControls()
       xOffset += 10;
       DROPDOWN(mStepData[i].mActionSelector, ("action " + ofToString(i + 1)).c_str(), (int*)(&(mStepData[i].mAction)), 60);
       UIBLOCK_SHIFTRIGHT();
-      FLOATSLIDER_DIGITS(mStepData[i].mVelSlider, ("vel " + ofToString(i + 1)).c_str(), &(mStepData[i].mVel), 1.0f / 127.0f, 1.0f, 2);
+      FLOATSLIDER_DIGITS(mStepData[i].mVelSlider, ("vel " + ofToString(i + 1)).c_str(), &(mStepData[i].mVel), 1.0 / 127.0, 1.0, 2);
       UIBLOCK_SHIFTRIGHT();
       INTSLIDER(mStepData[i].mOctaveSlider, ("octave " + ofToString(i + 1)).c_str(), &(mStepData[i].mOctave), -3, 3);
       UIBLOCK_SHIFTRIGHT();

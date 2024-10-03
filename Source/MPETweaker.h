@@ -48,7 +48,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -68,17 +68,17 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
 
-   float mPitchBendMultiplier{ 1 };
+   double mPitchBendMultiplier{ 1 };
    FloatSlider* mPitchBendMultiplierSlider{ nullptr };
-   float mPitchBendOffset{ 0 };
+   double mPitchBendOffset{ 0 };
    FloatSlider* mPitchBendOffsetSlider{ nullptr };
-   float mPressureMultiplier{ 1 };
+   double mPressureMultiplier{ 1 };
    FloatSlider* mPressureMultiplierSlider{ nullptr };
-   float mPressureOffset{ 0 };
+   double mPressureOffset{ 0 };
    FloatSlider* mPressureOffsetSlider{ nullptr };
-   float mModWheelMultiplier{ 1 };
+   double mModWheelMultiplier{ 1 };
    FloatSlider* mModWheelMultiplierSlider{ nullptr };
-   float mModWheelOffset{ 0 };
+   double mModWheelOffset{ 0 };
    FloatSlider* mModWheelOffsetSlider{ nullptr };
 
    Modulations mModulationMult{ true };

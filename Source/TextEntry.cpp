@@ -65,7 +65,7 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
    Construct(owner, name, x, y, charWidth);
 }
 
-TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max)
+TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, double* var, double min, double max)
 : mVarFloat(var)
 , mType(kTextEntry_Float)
 , mFloatMin(min)
@@ -497,7 +497,7 @@ void TextEntry::SetText(std::string text)
    mCaretPosition2 = 0;
 }
 
-void TextEntry::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void TextEntry::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    if (mType == kTextEntry_Int)
    {
@@ -512,7 +512,7 @@ void TextEntry::SetFromMidiCC(float slider, double time, bool setViaModulator)
    }
 }
 
-float TextEntry::GetValueForMidiCC(float slider) const
+double TextEntry::GetValueForMidiCC(double slider) const
 {
    if (mType == kTextEntry_Int)
    {
@@ -529,7 +529,7 @@ float TextEntry::GetValueForMidiCC(float slider) const
    return 0;
 }
 
-float TextEntry::GetMidiValue() const
+double TextEntry::GetMidiValue() const
 {
    if (mType == kTextEntry_Int)
       return ofMap(*mVarInt, mIntMin, mIntMax, 0, 1);
@@ -540,7 +540,7 @@ float TextEntry::GetMidiValue() const
    return 0;
 }
 
-void TextEntry::GetRange(float& min, float& max)
+void TextEntry::GetRange(double& min, double& max)
 {
    if (mType == kTextEntry_Int)
    {
@@ -559,7 +559,7 @@ void TextEntry::GetRange(float& min, float& max)
    }
 }
 
-void TextEntry::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void TextEntry::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    if (mType == kTextEntry_Int)
    {
@@ -574,7 +574,7 @@ void TextEntry::SetValue(float value, double time, bool forceUpdate /*= false*/)
    }
 }
 
-float TextEntry::GetValue() const
+double TextEntry::GetValue() const
 {
    if (mType == kTextEntry_Int)
       return *mVarInt;
@@ -592,9 +592,9 @@ int TextEntry::GetNumValues()
    return 0;
 }
 
-std::string TextEntry::GetDisplayValue(float val) const
+std::string TextEntry::GetDisplayValue(double val) const
 {
-   if (mType == kTextEntry_Int || mType == kTextEntry_Float)
+   if (mType == TextEntryType::kTextEntry_Int || mType == TextEntryType::kTextEntry_Float)
       return ofToString(val);
    return mString;
 }
@@ -618,7 +618,7 @@ void TextEntry::AcceptEntry(bool pressedEnter)
    }
    if (mVarFloat && mString[0] != 0)
    {
-      *mVarFloat = ofClamp(ofToFloat(mString), mFloatMin, mFloatMax);
+      *mVarFloat = ofClamp(ofToDouble(mString), mFloatMin, mFloatMax);
       StringCopy(mString, ofToString(*mVarFloat).c_str(), MAX_TEXTENTRY_LENGTH);
    }
 
@@ -652,11 +652,11 @@ bool TextEntry::AllowCharacter(char c)
    return false;
 }
 
-void TextEntry::Increment(float amount)
+void TextEntry::Increment(double amount)
 {
    if (mType == kTextEntry_Float)
    {
-      float newVal = *mVarFloat + amount;
+      const double newVal = *mVarFloat + amount;
       if (newVal >= mFloatMin && newVal <= mFloatMax)
       {
          *mVarFloat = newVal;
@@ -666,7 +666,7 @@ void TextEntry::Increment(float amount)
    }
    else if (mType == kTextEntry_Int)
    {
-      int newVal = *mVarInt + (int)amount;
+      const int newVal = *mVarInt + (int)amount;
       if (newVal >= mIntMin && newVal <= mIntMax)
       {
          *mVarInt = newVal;

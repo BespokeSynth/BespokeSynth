@@ -99,7 +99,7 @@ void FreqDelay::DrawModule()
    mDryWetSlider->Draw();
 }
 
-void FreqDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FreqDelay::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

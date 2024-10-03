@@ -57,7 +57,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void TextEntryComplete(TextEntry* entry) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -78,7 +78,7 @@ private:
 
    PatchCableSource* mControlCable{ nullptr };
    std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
-   float mValue{ 0 };
+   double mValue{ 0 };
    TextEntry* mValueEntry{ nullptr };
    FloatSlider* mValueSlider{ nullptr };
    ClickButton* mButton{ nullptr };

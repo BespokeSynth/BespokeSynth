@@ -129,7 +129,7 @@ void ControlSequencer::Step(double time, int pulseFlags)
    if (pulseFlags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int numMeasures = ceil(float(length) / stepsPerMeasure);
+      int numMeasures = ceil(double(length) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
       int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % length;
       mStep = step;
@@ -196,7 +196,7 @@ void ControlSequencer::DrawModule()
    {
       ofPushStyle();
       ofSetColor(ofColor::grey);
-      float val = mGrid->GetVal(currentHover % mGrid->GetCols(), currentHover / mGrid->GetCols());
+      double val = mGrid->GetVal(currentHover % mGrid->GetCols(), currentHover / mGrid->GetCols());
       DrawTextNormal(GetUIControl()->GetDisplayValue(GetUIControl()->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y + 12);
       ofPopStyle();
    }
@@ -213,7 +213,7 @@ void ControlSequencer::DrawModule()
 
          if (showing && GetUIControl())
          {
-            float val = mGrid->GetVal(i, 0);
+            double val = mGrid->GetVal(i, 0);
 
             DrawTextNormal(GetUIControl()->GetDisplayValue(GetUIControl()->GetValueForMidiCC(val)), rect.getMaxX() + 5, rect.y + 12);
          }
@@ -254,7 +254,7 @@ bool ControlSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mGrid)
    {
@@ -263,7 +263,7 @@ void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, 
       {
          for (int i = 0; i < mGrid->GetCols(); ++i)
          {
-            float val = mGrid->GetVal(i, 0);
+            double val = mGrid->GetVal(i, 0);
             val = int((val * (numValues - 1)) + .5f) / float(numValues - 1); //quantize to match the number of allowed values
             mGrid->SetVal(i, 0, val);
          }

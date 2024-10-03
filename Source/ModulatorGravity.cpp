@@ -81,15 +81,15 @@ void ModulatorGravity::PostRepatch(PatchCableSource* cableSource, bool fromUserC
 
 void ModulatorGravity::OnTransportAdvanced(float amount)
 {
-   float dt = amount * TheTransport->MsPerBar();
-   float newVelocity = mVelocity + mGravity / 100000 * dt;
+   double dt = amount * TheTransport->MsPerBar();
+   double newVelocity = mVelocity + mGravity / 100000 * dt;
    newVelocity -= newVelocity * mDrag * dt;
-   float newValue = ofClamp(mValue + newVelocity * dt, 0, 1);
+   double newValue = ofClamp(mValue + newVelocity * dt, 0, 1);
    mVelocity = (newValue - mValue) / dt;
    mValue = newValue;
 }
 
-float ModulatorGravity::Value(int samplesIn)
+double ModulatorGravity::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    //return ofClamp(mRamp.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax());

@@ -68,7 +68,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -76,7 +76,7 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 3; }
+   int GetModuleSaveStateRev() const override { return 4; }
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -84,7 +84,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float GetPlaybackTime(double time);
+   double GetPlaybackTime(double time);
    ofRectangle GetFubbleRect();
    ofVec2f GetFubbleMouseCoord();
    void RecordPoint();
@@ -113,7 +113,7 @@ private:
       PatchCableSource* GetCableSource() const { return mTargetCable; }
 
       //IModulator
-      virtual float Value(int samplesIn = 0) override;
+      virtual double Value(int samplesIn = 0) override;
       virtual bool Active() const override { return mOwner->IsEnabled() && (mHasRecorded || mOwner->mIsRightClicking); }
 
       FubbleModule* mOwner{ nullptr };
@@ -124,12 +124,12 @@ private:
 
    FubbleAxis mAxisH;
    FubbleAxis mAxisV;
-   float mLength{ 0 };
+   double mLength{ 0 };
    bool mQuantizeLength{ false };
    Checkbox* mQuantizeLengthCheckbox{ nullptr };
    NoteInterval mQuantizeInterval{ NoteInterval::kInterval_4n };
    DropdownList* mQuantizeLengthSelector{ nullptr };
-   float mSpeed{ 1 };
+   double mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
    float mWidth{ 220 };
@@ -140,11 +140,11 @@ private:
    float mMouseX{ 0 };
    float mMouseY{ 0 };
    PerlinNoise mNoise;
-   float mPerlinStrength{ 0 };
+   double mPerlinStrength{ 0 };
    FloatSlider* mPerlinStrengthSlider{ nullptr };
-   float mPerlinScale{ 1 };
+   double mPerlinScale{ 1 };
    FloatSlider* mPerlinScaleSlider{ nullptr };
-   float mPerlinSpeed{ 1 };
+   double mPerlinSpeed{ 1 };
    FloatSlider* mPerlinSpeedSlider{ nullptr };
    int mPerlinSeed{ 0 };
    ClickButton* mUpdatePerlinSeedButton{ nullptr };

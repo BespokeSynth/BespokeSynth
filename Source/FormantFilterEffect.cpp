@@ -108,7 +108,7 @@ void FormantFilterEffect::DrawModule()
    mASlider->Draw();
 }
 
-float FormantFilterEffect::GetEffectAmount()
+double FormantFilterEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -165,7 +165,7 @@ void FormantFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void FormantFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FormantFilterEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (!mRescaling)
    {

@@ -124,9 +124,9 @@ void FubbleModule::Poll()
    }
 }
 
-float FubbleModule::GetPlaybackTime(double time)
+double FubbleModule::GetPlaybackTime(double time)
 {
-   float measureTime = TheTransport->GetMeasureTime(time) - mRecordStartOffset;
+   double measureTime = TheTransport->GetMeasureTime(time) - mRecordStartOffset;
    if (!mQuantizeLength)
       measureTime *= mSpeed;
 
@@ -549,17 +549,24 @@ void FubbleModule::LoadState(FileStreamIn& in, int rev)
 
    if (rev >= 3)
    {
-      in >> mLength;
+      if (rev < 4)
+      {
+         float a;
+         in >> a;
+         mLength = a;
+      }
+      else
+         in >> mLength;
       mAxisH.mCurve.SetExtents(0, mLength);
       mAxisV.mCurve.SetExtents(0, mLength);
       in >> mRecordStartOffset;
    }
 }
 
-float FubbleModule::FubbleAxis::Value(int samplesIn)
+double FubbleModule::FubbleAxis::Value(int samplesIn)
 {
-   float playbackTime = mOwner->GetPlaybackTime(gTime + samplesIn * gInvSampleRateMs);
-   float val;
+   double playbackTime = mOwner->GetPlaybackTime(gTime + samplesIn * gInvSampleRateMs);
+   double val;
    if (mOwner->mIsDrawing || mOwner->mIsRightClicking)
       val = mIsHorizontal ? mOwner->GetFubbleMouseCoord().x : mOwner->GetFubbleMouseCoord().y;
    else

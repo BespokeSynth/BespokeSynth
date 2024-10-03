@@ -61,7 +61,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return IsEnabled() && mHasRecorded && !mRecord; }
    bool CanAdjustRange() const override { return false; }
 
@@ -71,7 +71,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -79,12 +79,12 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float GetPlaybackTime(double time);
+   double GetPlaybackTime(double time);
    void RecordPoint();
    void Clear();
 
@@ -94,12 +94,12 @@ private:
 
    Curve mCurve{ 0 };
    bool mHasRecorded{ false };
-   float mLength{ 0 };
+   double mLength{ 0 };
    bool mQuantizeLength{ true };
    Checkbox* mQuantizeLengthCheckbox{ nullptr };
    NoteInterval mQuantizeInterval{ NoteInterval::kInterval_1n };
    DropdownList* mQuantizeLengthSelector{ nullptr };
-   float mSpeed{ 1 };
+   double mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
    float mDisplayStartY{ 0 };

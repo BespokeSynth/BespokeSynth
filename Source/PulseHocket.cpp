@@ -112,13 +112,13 @@ void PulseHocket::OnPulse(double time, float velocity, int flags)
    if (flags & kPulseFlag_Reset)
       mRandomIndex = 0;
 
-   float totalWeight = 0;
+   double totalWeight = 0;
    for (int i = 0; i < mNumDestinations; ++i)
       totalWeight += mWeight[i];
-   float random;
+   double random;
    if (mDeterministic)
    {
-      random = ((abs(DeterministicRandom(mSeed, mRandomIndex)) % 10000) / 10000.0f) * totalWeight;
+      random = ((abs(DeterministicRandom(mSeed, mRandomIndex)) % 10000) / 10000) * totalWeight;
       ++mRandomIndex;
    }
    else

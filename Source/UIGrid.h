@@ -37,7 +37,7 @@ class UIGridListener
 {
 public:
    virtual ~UIGridListener() {}
-   virtual void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) = 0;
+   virtual void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) = 0;
 };
 
 struct GridCell
@@ -62,8 +62,8 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
-   float& GetVal(int col, int row);
-   void SetVal(int col, int row, float val, bool notifyListener = true);
+   double& GetVal(int col, int row);
+   void SetVal(int col, int row, double val, bool notifyListener = true);
    void SetHighlightCol(double time, int col);
    int GetHighlightCol(double time) const;
    void SetMajorColSize(int size) { mMajorCol = size; }
@@ -71,7 +71,7 @@ public:
    void SetSingleColumnMode(bool set) { mSingleColumn = set; }
    void Clear();
    void SetFlip(bool flip) { mFlip = flip; }
-   void SetStrength(float strength) { mStrength = strength; }
+   void SetStrength(double strength) { mStrength = strength; }
    int CurrentHover() { return mCurrentHover; }
    void SetListener(UIGridListener* listener) { mListener = listener; }
    void SetDrawOffset(int row, float amount) { mDrawOffset[row] = amount; }
@@ -86,10 +86,10 @@ public:
    void SetRequireShiftForMultislider(bool set) { mRequireShiftForMultislider = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
    void SetMomentary(bool momentary) { mMomentary = momentary; }
-   const std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS>& GetData() const { return mData; }
-   void SetData(std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS>& data) { mData = data; }
+   const std::array<double, MAX_GRID_COLS * MAX_GRID_ROWS>& GetData() const { return mData; }
+   void SetData(std::array<double, MAX_GRID_COLS * MAX_GRID_ROWS>& data) { mData = data; }
    void SetClickValueSubdivisions(int subdivisions) { mClickSubdivisions = subdivisions; }
-   float GetSubdividedValue(float position) const;
+   double GetSubdividedValue(double position) const;
    bool GetNoHover() const override { return true; }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
 
@@ -106,8 +106,8 @@ public:
    ofVec2f GetCellPosition(int col, int row);
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
 
@@ -126,8 +126,8 @@ private:
    }
 
    int GetDataIndex(int col, int row) { return col + row * MAX_GRID_COLS; }
-   float GetX(int col, int row) const;
-   float GetY(int row) const;
+   double GetX(int col, int row) const;
+   double GetY(int row) const;
    bool CanAdjustMultislider() const;
 
    struct HighlightColBuffer
@@ -141,19 +141,19 @@ private:
    int mRows{ 0 };
    int mCols{ 0 };
    bool mClick{ false };
-   float mHoldVal;
+   double mHoldVal;
    int mHoldCol{ 0 };
    int mHoldRow{ 0 };
    bool mLastClickWasClear{ false };
-   std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
+   std::array<double, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
    std::array<HighlightColBuffer, 10> mHighlightColBuffer{};
    int mNextHighlightColPointer{ 0 };
    int mMajorCol{ -1 };
    bool mSingleColumn{ false };
    bool mFlip{ false };
-   float mStrength{ 1 };
+   double mStrength{ 1 };
    int mCurrentHover{ -1 };
-   float mCurrentHoverAmount{ 1 };
+   double mCurrentHoverAmount{ 1 };
    UIGridListener* mListener{ nullptr };
    std::array<float, MAX_GRID_ROWS> mDrawOffset{};
    GridMode mGridMode{ GridMode::kNormal };

@@ -777,7 +777,7 @@ void LaunchpadKeyboard::IntSliderUpdated(IntSlider* slider, int oldVal, double t
    }
 }
 
-void LaunchpadKeyboard::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void LaunchpadKeyboard::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

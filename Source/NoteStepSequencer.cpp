@@ -109,7 +109,7 @@ void NoteStepSequencer::CreateUIControls()
       mVelocitySliders[i] = new IntSlider(this, ("vel" + ofToString(i)).c_str(), -1, -1, 30, 15, &mVels[i], 0, 127);
       mVelocitySliders[i]->SetShowName(false);
       mVelocitySliders[i]->SetShowing(false);
-      mLengthSliders[i] = new FloatSlider(this, ("len" + ofToString(i)).c_str(), -1, -1, 30, 15, &mNoteLengths[i], 0.01f, 1, 1);
+      mLengthSliders[i] = new FloatSlider(this, ("len" + ofToString(i)).c_str(), -1, -1, 30, 15, &mNoteLengths[i], 0.01, 1, 1);
       mLengthSliders[i]->SetShowName(false);
       mLengthSliders[i]->SetShowing(false);
    }
@@ -422,7 +422,7 @@ void NoteStepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mGrid)
    {
@@ -431,7 +431,7 @@ void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value,
          bool colHasPitch = false;
          for (int j = 0; j < mGrid->GetRows(); ++j)
          {
-            float val = mGrid->GetVal(i, j);
+            double val = mGrid->GetVal(i, j);
             if (val > 0)
             {
                mTones[i] = j;
@@ -688,7 +688,7 @@ bool NoteStepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type
 
    if (type == kMidiMessage_PitchBend)
    {
-      float val = midiValue / MidiDevice::kPitchBendMax;
+      double val = midiValue / MidiDevice::kPitchBendMax;
       if (mPush2HeldStep != -1)
       {
          mVels[mPush2HeldStep] = int(val * 127);
@@ -756,7 +756,7 @@ void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
             }
             else if (y == 7)
             {
-               float displayLength = 0;
+               double displayLength = 0;
                if (mPush2LengthHeld && mPush2HeldStep == -1)
                   displayLength = mQueuedPush2Length;
                else if (mVels[displayStep] > 0)
@@ -1100,7 +1100,7 @@ void NoteStepSequencer::ShiftSteps(int amount)
 {
    int newTones[NSS_MAX_STEPS];
    int newVels[NSS_MAX_STEPS];
-   float newLengths[NSS_MAX_STEPS];
+   double newLengths[NSS_MAX_STEPS];
    memcpy(newTones, mTones, NSS_MAX_STEPS * sizeof(int));
    memcpy(newVels, mVels, NSS_MAX_STEPS * sizeof(int));
    memcpy(newLengths, mNoteLengths, NSS_MAX_STEPS * sizeof(float));
@@ -1319,7 +1319,7 @@ void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double t
    }
 }
 
-void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {

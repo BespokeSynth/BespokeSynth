@@ -65,7 +65,7 @@ void MacroSlider::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void MacroSlider::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MacroSlider::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -139,7 +139,7 @@ void MacroSlider::Mapping::UpdateControl()
    OnModulatorRepatch();
 }
 
-float MacroSlider::Mapping::Value(int samplesIn)
+double MacroSlider::Mapping::Value(int samplesIn)
 {
    mOwner->ComputeSliders(samplesIn);
    return ofMap(mOwner->GetValue(), 0, 1, GetMin(), GetMax(), K(clamp));

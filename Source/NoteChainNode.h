@@ -60,7 +60,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -85,11 +85,11 @@ private:
    FloatSlider* mDurationSlider{ nullptr };
    DropdownList* mNextSelector{ nullptr };
    int mPitch{ 48 };
-   float mVelocity{ 1 };
-   float mDuration{ .25 };
-   float mDurationMs{ 50 };
+   double mVelocity{ 1 };
+   double mDuration{ .25 };
+   double mDurationMs{ 50 };
    NoteInterval mNextInterval{ NoteInterval::kInterval_8n };
-   float mNext{ 0 };
+   double mNext{ 0 };
    double mStartTime{ 0 };
    bool mNoteOn{ false };
    bool mWaitingToTrigger{ false };

@@ -35,23 +35,23 @@ struct CurvePoint
 {
 public:
    CurvePoint() {}
-   CurvePoint(float time, float value)
+   CurvePoint(double time, double value)
    : mTime(time)
    , mValue(value)
    {}
-   float mTime{ 0 };
-   float mValue{ 0 };
+   double mTime{ 0 };
+   double mValue{ 0 };
 };
 
 class Curve : public IClickable
 {
 public:
-   Curve(float defaultValue);
+   Curve(double defaultValue);
    void AddPoint(CurvePoint point);
    void AddPointAtEnd(CurvePoint point); //only use this if you are sure that there are no points already added at an earlier time
-   float Evaluate(float time, bool holdEndForLoop = false);
+   double Evaluate(double time, bool holdEndForLoop = false);
    void Render() override;
-   void SetExtents(float start, float end)
+   void SetExtents(double start, double end)
    {
       mStart = start;
       mEnd = end;
@@ -81,14 +81,14 @@ protected:
 
 private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
-   int FindIndexForTime(float time);
+   int FindIndexForTime(double time);
    std::array<CurvePoint, 5000> mPoints;
    int mNumCurvePoints{ 0 };
    float mWidth{ 200 };
    float mHeight{ 20 };
-   float mStart{ 0 };
-   float mEnd{ 1 };
+   double mStart{ 0 };
+   double mEnd{ 1 };
    ofColor mColor{ ofColor::white };
    int mLastEvalIndex{ 0 };
-   float mDefaultValue{ 0 };
+   double mDefaultValue{ 0 };
 };

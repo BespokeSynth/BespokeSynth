@@ -163,10 +163,10 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    }
 }
 
-void DistortionEffect::SetClip(float amount)
+void DistortionEffect::SetClip(double amount)
 {
    mClip = amount;
-   mGain = 1 / pow(amount, 3);
+   mGain = 1. / pow(amount, 3);
 }
 
 void DistortionEffect::GetModuleDimensions(float& width, float& height)
@@ -187,7 +187,7 @@ void DistortionEffect::DrawModule()
    mFuzzAmountSlider->Draw();
 }
 
-float DistortionEffect::GetEffectAmount()
+double DistortionEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -203,7 +203,7 @@ void DistortionEffect::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void DistortionEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void DistortionEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mClipSlider)
       SetClip(mClip);

@@ -112,7 +112,7 @@ void IModulator::Poll()
    {
       mLastPollValue = Value();
       const float kBlendRate = -9.65784f;
-      float blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
+      double blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
       mSmoothedValue = mSmoothedValue * blend + mLastPollValue * (1 - blend);
       for (int i = 0; i < (int)mTargets.size(); ++i)
       {
@@ -127,7 +127,7 @@ void IModulator::Poll()
    }
 }
 
-float IModulator::GetRecentChange() const
+double IModulator::GetRecentChange() const
 {
    return mLastPollValue - mSmoothedValue;
 }
@@ -152,7 +152,7 @@ void IModulator::OnRemovedFrom(IUIControl* control)
    OnModulatorRepatch();
 }
 
-void IModulator::InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode)
+void IModulator::InitializeRange(double currentValue, double min, double max, FloatSlider::Mode sliderMode)
 {
    if (!TheSynth->IsLoadingState())
    {

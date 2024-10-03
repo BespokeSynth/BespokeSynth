@@ -50,7 +50,7 @@ public:
 
    void Process(double time) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -72,9 +72,9 @@ private:
 
    FloatSlider* mThresholdSlider{ nullptr };
    FloatSlider* mReleaseSlider{ nullptr };
-   float mPeak{ 0 };
-   float mEnvelope{ 0 };
-   float mThreshold{ 0.5 };
-   float mRelease{ 150 };
-   float mReleaseFactor{ 0.99 };
+   double mPeak{ 0 };
+   double mEnvelope{ 0 };
+   double mThreshold{ 0.5 };
+   double mRelease{ 150 };
+   double mReleaseFactor{ 0.99 };
 };

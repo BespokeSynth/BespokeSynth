@@ -92,7 +92,7 @@ void Granulator::SpawnGrain(double time, double offset, float width)
    float vol = 1;
    if (mOctaves)
    {
-      int random = gRandom() % 5;
+      auto random = gRandom() % 5;
       if (random == 2) //fewer high-pitched ones
       {
          speedMult *= 1.5f;

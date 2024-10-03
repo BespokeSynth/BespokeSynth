@@ -189,7 +189,7 @@ void PSMoveController::OnTimeEvent(double time)
    }
 }
 
-void PSMoveController::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PSMoveController::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mOffsetSlider)
    {

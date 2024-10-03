@@ -1056,7 +1056,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (int i = 0; i < mParameterSliders.size(); ++i)
    {

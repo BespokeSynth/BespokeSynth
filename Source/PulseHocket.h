@@ -49,7 +49,7 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
    void ButtonClicked(ClickButton* button, double time) override;
 
@@ -72,7 +72,7 @@ private:
 
    static const int kMaxDestinations = 16;
    int mNumDestinations{ 5 };
-   float mWeight[kMaxDestinations]{};
+   double mWeight[kMaxDestinations]{};
    FloatSlider* mWeightSlider[kMaxDestinations]{};
    std::vector<PatchCableSource*> mDestinationCables;
    float mWidth{ 200 };

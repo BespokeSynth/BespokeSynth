@@ -54,7 +54,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -82,7 +82,7 @@ private:
       int mVoiceIdx{ -1 };
    };
 
-   float mSustain{ .25 };
+   double mSustain{ .25 };
    FloatSlider* mSustainSlider{ nullptr };
    std::list<QueuedNoteOff> mNoteOffs;
 };

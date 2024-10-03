@@ -94,8 +94,8 @@ void Pumper::ProcessAudio(double time, ChannelBuffer* buffer)
 
    for (int i = 0; i < bufferSize; ++i)
    {
-      float adsrValue = mAdsr.Value((intervalPos + i * gInvSampleRateMs / TheTransport->GetDuration(mInterval)) * kAdsrTime, &adsrEvent);
-      float value = mLastValue * .99f + adsrValue * .01f;
+      double adsrValue = mAdsr.Value((intervalPos + i * gInvSampleRateMs / TheTransport->GetDuration(mInterval)) * kAdsrTime, &adsrEvent);
+      double value = mLastValue * .99 + adsrValue * .01;
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
          buffer->GetChannel(ch)[i] *= value;
       mLastValue = value;
@@ -131,21 +131,21 @@ void Pumper::DrawModule()
    adsrEvent.mStartBlendFromValue = 1;
    for (int i = 0; i < mWidth; i++)
    {
-      float x = i;
-      float y = mAdsr.Value(float(i) / mWidth * kAdsrTime, &adsrEvent) * mHeight;
+      double x = i;
+      double y = mAdsr.Value(static_cast<double>(i) / mWidth * kAdsrTime, &adsrEvent) * mHeight;
       ofVertex(x, mHeight - y);
    }
    ofEndShape(false);
 
    ofSetColor(255, 255, 255, 100);
    {
-      float x = GetIntervalPos(gTime) * mWidth;
+      double x = GetIntervalPos(gTime) * mWidth;
       ofLine(x, 0, x, mHeight);
    }
    ofPopStyle();
 }
 
-float Pumper::GetEffectAmount()
+double Pumper::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -156,7 +156,7 @@ void Pumper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Pumper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Pumper::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAmountSlider)
    {

@@ -49,7 +49,7 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
    void ButtonClicked(ClickButton* button, double time) override;
 
@@ -65,10 +65,10 @@ private:
 
    void Reseed();
 
-   float mChance{ 1 };
+   double mChance{ 1 };
    FloatSlider* mChanceSlider{ nullptr };
-   float mLastRejectTime{ 0 };
-   float mLastAcceptTime{ 0 };
+   double mLastRejectTime{ 0 };
+   double mLastAcceptTime{ 0 };
    bool mDeterministic{ false };
    Checkbox* mDeterministicCheckbox{ nullptr };
    int mSeed{ 0 };

@@ -57,7 +57,7 @@ void StutterControl::CreateUIControls()
    mStutterCheckboxes[kDotted8th] = new Checkbox(this, "dotted eighth", mStutterCheckboxes[kDoubleSpeed], kAnchor_Below, &mStutter[kDotted8th]);
    mStutterCheckboxes[kQuarterTriplets] = new Checkbox(this, "triplets", mStutterCheckboxes[kDotted8th], kAnchor_Below, &mStutter[kQuarterTriplets]);
    mStutterCheckboxes[kFree] = new Checkbox(this, "free", mStutterCheckboxes[kQuarterTriplets], kAnchor_Below, &mStutter[kFree]);
-   mFreeLengthSlider = new FloatSlider(this, "free length", mStutterCheckboxes[kFree], kAnchor_Below, 102, 15, &mStutterProcessor.mFreeStutterLength, .005f, .25f);
+   mFreeLengthSlider = new FloatSlider(this, "free length", mStutterCheckboxes[kFree], kAnchor_Below, 102, 15, &mStutterProcessor.mFreeStutterLength, .005, .25);
    mFreeSpeedSlider = new FloatSlider(this, "free speed", mFreeLengthSlider, kAnchor_Below, 102, 15, &mStutterProcessor.mFreeStutterSpeed, 0, 2);
 }
 
@@ -222,7 +222,7 @@ void StutterControl::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void StutterControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void StutterControl::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

@@ -154,7 +154,7 @@ bool Checkbox::MouseMoved(float x, float y)
    return false;
 }
 
-void Checkbox::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void Checkbox::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
    mSliderVal = slider;
@@ -167,12 +167,12 @@ void Checkbox::SetFromMidiCC(float slider, double time, bool setViaModulator)
    }
 }
 
-float Checkbox::GetValueForMidiCC(float slider) const
+double Checkbox::GetValueForMidiCC(double slider) const
 {
    return slider > .5f ? 1 : 0;
 }
 
-void Checkbox::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void Checkbox::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    bool on = value > 0.5f;
    if (*mVar != on || forceUpdate)
@@ -183,22 +183,22 @@ void Checkbox::SetValue(float value, double time, bool forceUpdate /*= false*/)
    }
 }
 
-float Checkbox::GetMidiValue() const
+double Checkbox::GetMidiValue() const
 {
    return mSliderVal;
 }
 
-float Checkbox::GetValue() const
+double Checkbox::GetValue() const
 {
    return *mVar;
 }
 
-std::string Checkbox::GetDisplayValue(float val) const
+std::string Checkbox::GetDisplayValue(double val) const
 {
    return val > 0 ? "on" : "off";
 }
 
-void Checkbox::Increment(float amount)
+void Checkbox::Increment(double amount)
 {
    *mVar = !*mVar;
    CalcSliderVal();

@@ -77,7 +77,7 @@ void SingleOscillator::CreateUIControls()
    UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
    UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth, 36, &mVoiceParams.mAdsr));
    FLOATSLIDER(mVolSlider, "vol", &mVoiceParams.mVol, 0, 1);
-   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mVoiceParams.mDetune, -.05f, .05f, 3);
+   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mVoiceParams.mDetune, -.05, .05, 3);
    INTSLIDER(mUnisonSlider, "unison", &mVoiceParams.mUnison, 1, SingleOscillatorVoice::kMaxUnison);
    FLOATSLIDER(mUnisonWidthSlider, "width", &mVoiceParams.mUnisonWidth, 0, 1);
    CHECKBOX(mLiteCPUModeCheckbox, "lite cpu", &mVoiceParams.mLiteCPUMode);
@@ -90,16 +90,16 @@ void SingleOscillator::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mMultSelector, "mult", &mMult, kColumnWidth / 2 - 3);
    UIBLOCK_NEWLINE();
-   FLOATSLIDER_DIGITS(mPulseWidthSlider, "pw", &mVoiceParams.mPulseWidth, 0.01f, .99f, 2);
+   FLOATSLIDER_DIGITS(mPulseWidthSlider, "pw", &mVoiceParams.mPulseWidth, 0.01, .99, 2);
    FLOATSLIDER(mShuffleSlider, "shuffle", &mVoiceParams.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider, "soften", &mVoiceParams.mSoften, 0, 1);
    FLOATSLIDER(mPhaseOffsetSlider, "phase", &mVoiceParams.mPhaseOffset, 0, TWO_PI);
    DROPDOWN(mSyncModeSelector, "syncmode", (int*)(&mVoiceParams.mSyncMode), 60);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_PUSHSLIDERWIDTH(47);
-   FLOATSLIDER(mSyncFreqSlider, "syncf", &mVoiceParams.mSyncFreq, 10, 999.9f);
+   FLOATSLIDER(mSyncFreqSlider, "syncf", &mVoiceParams.mSyncFreq, 10, 999.9);
    UIBLOCK_SHIFTLEFT();
-   FLOATSLIDER(mSyncRatioSlider, "syncratio", &mVoiceParams.mSyncRatio, .1f, 10.0f);
+   FLOATSLIDER(mSyncRatioSlider, "syncratio", &mVoiceParams.mSyncRatio, .1, 10.0);
    UIBLOCK_NEWLINE();
    UIBLOCK_POPSLIDERWIDTH();
    ENDUIBLOCK(width, height);
@@ -200,8 +200,8 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
 
    if (velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
-      float adsrScale = SingleOscillatorVoice::GetADSRScale(velocity / 127.0f, mVoiceParams.mVelToEnvelope);
+      mPolyMgr.Start(time, pitch, velocity / 127.0, voiceIdx, modulation);
+      double adsrScale = SingleOscillatorVoice::GetADSRScale(velocity / 127.0, mVoiceParams.mVelToEnvelope);
       mVoiceParams.mAdsr.Start(time, 1, adsrScale); //for visualization
       mVoiceParams.mFilterAdsr.Start(time, 1, adsrScale); //for visualization
    }
@@ -285,13 +285,13 @@ void SingleOscillator::DrawModule()
 
       ofBeginShape();
 
-      for (float i = 0; i < width; i += (.25f / gDrawScale))
+      for (double i = 0; i < width; i += (.25 / gDrawScale))
       {
-         float phase = i / width * FTWO_PI;
-         phase += gTime * .005f;
+         double phase = i / width * TWO_PI;
+         phase += gTime * .005;
          if (mVoiceParams.mSyncMode != Oscillator::SyncMode::None)
          {
-            phase = FloatWrap(phase, FTWO_PI);
+            phase = DoubleWrap(phase, TWO_PI);
             if (mVoiceParams.mSyncMode == Oscillator::SyncMode::Frequency)
                phase *= mVoiceParams.mSyncFreq / 200;
             if (mVoiceParams.mSyncMode == Oscillator::SyncMode::Ratio)
@@ -300,7 +300,7 @@ void SingleOscillator::DrawModule()
          if (mDrawOsc.GetShuffle() > 0)
             phase *= 2;
          mDrawOsc.SetSoften(mVoiceParams.mSoften);
-         float value = mDrawOsc.Value(phase);
+         double value = mDrawOsc.Value(phase);
          ofVertex(i + x, ofMap(value, -1, 1, 0, height) + y);
       }
       ofEndShape(false);
@@ -310,7 +310,7 @@ void SingleOscillator::DrawModule()
    DrawTextRightJustify("wave", kGap + kColumnWidth - 11, 15);
    DrawTextRightJustify("volume", (kGap + kColumnWidth) * 2 - 11, 15);
    ofPushStyle();
-   if (mVoiceParams.mFilterCutoffMax == SINGLEOSCILLATOR_NO_CUTOFF)
+   if (ofAlmostEquel(mVoiceParams.mFilterCutoffMax, static_cast<double>(SINGLEOSCILLATOR_NO_CUTOFF)))
       ofSetColor(100, 100, 100);
    DrawTextRightJustify("filter", (kGap + kColumnWidth) * 3 - 11, 15);
    ofPopStyle();
@@ -371,9 +371,9 @@ void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal, double ti
       if (mMult > 0)
          mVoiceParams.mMult = mMult;
       else if (mMult == -1) //-1 is special case for 1.5
-         mVoiceParams.mMult = 1.5f;
+         mVoiceParams.mMult = 1.5;
       else //other negative numbers mean 1/-x
-         mVoiceParams.mMult = -1.0f / mMult;
+         mVoiceParams.mMult = -1.0 / mMult;
    }
    if (list == mOscSelector)
       mDrawOsc.SetType(mVoiceParams.mOscType);
@@ -383,7 +383,7 @@ void SingleOscillator::RadioButtonUpdated(RadioButton* list, int oldVal, double 
 {
 }
 
-void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mShuffleSlider)
       mDrawOsc.SetShuffle(mVoiceParams.mShuffle);

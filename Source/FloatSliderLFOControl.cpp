@@ -275,7 +275,7 @@ void FloatSliderLFOControl::RandomizeSettings()
       case 7:
       default:
          mLFOSettings.mInterval = kInterval_Free;
-         mLFOSettings.mFreeRate = ofRandom(.1f, 20);
+         mLFOSettings.mFreeRate = ofRandom(.1, 20.);
          break;
    }
    UpdateFromSettings();
@@ -298,7 +298,7 @@ void FloatSliderLFOControl::Load(LFOSettings settings)
    mEnabled = true;
 }
 
-float FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
+double FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
    return GetLFOValue(samplesIn);
@@ -306,7 +306,7 @@ float FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
 
 float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase /*= -1*/)
 {
-   float val = mLFO.Value(samplesIn, forcePhase);
+   double val = mLFO.Value(samplesIn, forcePhase);
    if (mLFOSettings.mSpread > 0)
       val = val * (1 - mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
    return ofClamp(Interp(val, GetMin(), GetMax()), GetTargetMin(), GetTargetMax());
@@ -408,7 +408,7 @@ void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal, doub
    }
 }
 
-void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mOffsetSlider)
       mLFO.SetOffset(mLFOSettings.mLFOOffset);
@@ -529,7 +529,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
 
 namespace
 {
-   const int kSaveStateRev = 5;
+   const int kSaveStateRev = 6;
    const int kFixNonRevvedData = 999;
 }
 
@@ -564,19 +564,66 @@ void LFOSettings::LoadState(FileStreamIn& in)
    mInterval = (NoteInterval)temp;
    in >> temp;
    mOscType = (OscillatorType)temp;
-   in >> mLFOOffset;
-   in >> mBias;
+   if (rev < 6)
+   {
+      float a, b;
+      in >> a >> b;
+      mLFOOffset = a;
+      mBias = b;
+   }
+   else
+   {
+      in >> mLFOOffset;
+      in >> mBias;
+   }
    if (rev >= 1)
-      in >> mSpread;
+   {
+      if (rev < 6)
+      {
+         float a;
+         in >> a;
+         mSpread = a;
+      }
+      else
+         in >> mSpread;
+   }
    if (rev >= 2)
    {
-      in >> mSoften;
-      in >> mShuffle;
+      if (rev < 6)
+      {
+         float a, b;
+         in >> a >> b;
+         mSoften = a;
+         mShuffle = b;
+      }
+      else
+      {
+         in >> mSoften;
+         in >> mShuffle;
+      }
    }
    if (rev >= 3)
-      in >> mFreeRate;
+   {
+      if (rev < 6)
+      {
+         float a;
+         in >> a;
+         mFreeRate = a;
+      }
+      else
+         in >> mFreeRate;
+   }
    if (rev >= 4)
-      in >> mLength;
+   {
+      if (rev < 6)
+      {
+         float a;
+         in >> a;
+         mLength = a;
+      }
+      else
+         in >> mLength;
+   }
    if (rev >= 5)
       in >> mLowResMode;
 }

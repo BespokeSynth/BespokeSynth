@@ -51,17 +51,17 @@ public:
    KarplusStrongVoiceParams()
    {
    }
-   float mFilter{ 1 };
-   float mFeedback{ .98 };
+   double mFilter{ 1 };
+   double mFeedback{ .98 };
    KarplusStrongSourceType mSourceType{ KarplusStrongSourceType::kSourceTypeMix };
    bool mInvert{ false };
-   float mExciterFreq{ 100 };
-   float mExciterAttack{ 1 };
-   float mExciterDecay{ 3 };
-   float mExcitation{ 0 };
-   float mPitchTone{ 0 };
-   float mVelToVolume{ .5 };
-   float mVelToEnvelope{ .5 };
+   double mExciterFreq{ 100 };
+   double mExciterAttack{ 1 };
+   double mExciterDecay{ 3 };
+   double mExcitation{ 0 };
+   double mPitchTone{ 0 };
+   double mVelToVolume{ .5 };
+   double mVelToEnvelope{ .5 };
    bool mLiteCPUMode{ false };
 };
 

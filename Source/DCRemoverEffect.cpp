@@ -57,7 +57,7 @@ void DCRemoverEffect::DrawModule()
 {
 }
 
-float DCRemoverEffect::GetEffectAmount()
+double DCRemoverEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;

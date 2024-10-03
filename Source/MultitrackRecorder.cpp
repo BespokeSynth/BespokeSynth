@@ -447,7 +447,7 @@ void MultitrackRecorderTrack::Clear()
    mRecordingLength = 0;
 }
 
-void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

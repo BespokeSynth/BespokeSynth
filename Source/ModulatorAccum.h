@@ -53,7 +53,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
    //IAudioPoller
@@ -62,7 +62,7 @@ public:
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -81,8 +81,8 @@ private:
 
    float mWidth{ 200 };
    float mHeight{ 20 };
-   float mValue{ 0 };
-   float mVelocity{ 0 };
+   double mValue{ 0 };
+   double mVelocity{ 0 };
 
    FloatSlider* mValueSlider{ nullptr };
    FloatSlider* mVelocitySlider{ nullptr };

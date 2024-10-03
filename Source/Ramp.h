@@ -30,19 +30,19 @@
 class Ramp
 {
 public:
-   void Start(double curTime, float end, double endTime);
-   void Start(double curTime, float start, float end, double endTime);
-   void SetValue(float val);
+   void Start(double curTime, double end, double endTime);
+   void Start(double curTime, double start, double end, double endTime);
+   void SetValue(double val);
    bool HasValue(double time) const;
-   float Value(double time) const;
-   float Target(double time) const { return GetCurrentRampData(time)->mEndValue; }
+   double Value(double time) const;
+   double Target(double time) const { return GetCurrentRampData(time)->mEndValue; }
 
 private:
    struct RampData
    {
       double mStartTime{ -1 };
-      float mStartValue{ 0 };
-      float mEndValue{ 1 };
+      double mStartValue{ 0 };
+      double mEndValue{ 1 };
       double mEndTime{ -1 };
    };
 

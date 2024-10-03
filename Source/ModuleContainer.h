@@ -49,9 +49,9 @@ public:
    void Clear();
    void Exit();
    ofVec2f GetOwnerPosition() const;
-   ofVec2f GetDrawOffset();
-   ofVec2f& GetDrawOffsetRef() { return mDrawOffset; }
-   void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
+   ofVec2d GetDrawOffset();
+   ofVec2d& GetDrawOffsetRef() { return mDrawOffset; }
+   void SetDrawOffset(ofVec2d offset) { mDrawOffset = offset; }
    float GetDrawScale() const;
    void SetDrawScale(float scale) { mDrawScale = scale; }
 
@@ -96,6 +96,6 @@ private:
    std::vector<IDrawableModule*> mModules;
    IDrawableModule* mOwner{ nullptr };
 
-   ofVec2f mDrawOffset;
+   ofVec2d mDrawOffset;
    float mDrawScale{ 1 };
 };

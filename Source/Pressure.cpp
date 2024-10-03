@@ -72,7 +72,7 @@ void Pressure::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void Pressure::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Pressure::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mPressureSlider)
       mModulation.GetPressure(-1)->SetValue(mPressure);

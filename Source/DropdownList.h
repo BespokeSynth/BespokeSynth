@@ -139,15 +139,15 @@ public:
    void CopyContentsTo(DropdownList* list) const;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   float GetValue() const override;
-   float GetMidiValue() const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override;
+   double GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
-   std::string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(double val) const override;
    bool InvertScrollDirection() override { return true; }
-   void Increment(float amount) override;
+   void Increment(double amount) override;
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;

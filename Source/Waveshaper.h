@@ -51,7 +51,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    //ITextEntryListener
    void TextEntryComplete(TextEntry* entry) override;
@@ -66,43 +66,43 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override;
 
-   float mRescale{ 1 };
+   double mRescale{ 1 };
    FloatSlider* mRescaleSlider{ nullptr };
-   float mA{ 0 };
+   double mA{ 0 };
    FloatSlider* mASlider{ nullptr };
-   float mB{ 0 };
+   double mB{ 0 };
    FloatSlider* mBSlider{ nullptr };
-   float mC{ 0 };
+   double mC{ 0 };
    FloatSlider* mCSlider{ nullptr };
-   float mD{ 0 };
+   double mD{ 0 };
    FloatSlider* mDSlider{ nullptr };
-   float mE{ 0 };
+   double mE{ 0 };
    FloatSlider* mESlider{ nullptr };
 
    std::string mEntryString{ "x" };
    TextEntry* mTextEntry{ nullptr };
-   exprtk::symbol_table<float> mSymbolTable;
-   exprtk::expression<float> mExpression;
-   exprtk::symbol_table<float> mSymbolTableDraw;
-   exprtk::expression<float> mExpressionDraw;
+   exprtk::symbol_table<double> mSymbolTable;
+   exprtk::expression<double> mExpression;
+   exprtk::symbol_table<double> mSymbolTableDraw;
+   exprtk::expression<double> mExpressionDraw;
 
-   float mExpressionInput{ 0 };
-   float mHistPre1{ 0 };
-   float mHistPre2{ 0 };
-   float mHistPost1{ 0 };
-   float mHistPost2{ 0 };
-   float mExpressionInputDraw{ 0 };
-   float mT{ 0 };
+   double mExpressionInput{ 0 };
+   double mHistPre1{ 0 };
+   double mHistPre2{ 0 };
+   double mHistPost1{ 0 };
+   double mHistPost2{ 0 };
+   double mExpressionInputDraw{ 0 };
+   double mT{ 0 };
    bool mExpressionValid{ false };
-   float mSmoothMax{ 0 };
-   float mSmoothMin{ 0 };
+   double mSmoothMax{ 0 };
+   double mSmoothMin{ 0 };
 
    struct BiquadState
    {
-      float mHistPre1{ 0 };
-      float mHistPre2{ 0 };
-      float mHistPost1{ 0 };
-      float mHistPost2{ 0 };
+      double mHistPre1{ 0 };
+      double mHistPre2{ 0 };
+      double mHistPost1{ 0 };
+      double mHistPost2{ 0 };
    };
 
    BiquadState mBiquadState[ChannelBuffer::kMaxNumChannels];

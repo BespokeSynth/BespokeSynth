@@ -103,11 +103,11 @@ void ButterworthFilterEffect::DrawModule()
    mQSlider->Draw();
 }
 
-float ButterworthFilterEffect::GetEffectAmount()
+double ButterworthFilterEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp(1 - (mF / (mFSlider->GetMax() * .75f)), 0, 1);
+   return ofClamp(1 - (mF / (mFSlider->GetMax() * .75)), 0, 1);
 }
 
 void ButterworthFilterEffect::ResetFilter()
@@ -128,7 +128,7 @@ void ButterworthFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void ButterworthFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ButterworthFilterEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mFSlider || slider == mQSlider)
       mCoefficientsHaveChanged = true;

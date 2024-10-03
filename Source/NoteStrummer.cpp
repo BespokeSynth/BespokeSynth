@@ -59,11 +59,11 @@ void NoteStrummer::DrawModule()
 
    mStrumSlider->Draw();
 
-   int numNotes = (int)mNotes.size();
+   const int numNotes = static_cast<int>(mNotes.size());
    int i = 0;
-   for (auto pitch : mNotes)
+   for (const auto pitch : mNotes)
    {
-      float pos = float(i + .5f) / numNotes;
+      const double pos = static_cast<double>(i + .5f) / numNotes;
       DrawTextNormal(NoteName(pitch), mStrumSlider->GetPosition(true).x + pos * mStrumSlider->IClickable::GetDimensions().x, mStrumSlider->GetPosition(true).y + mStrumSlider->IClickable::GetDimensions().y + 12);
       ++i;
    }
@@ -93,12 +93,12 @@ void NoteStrummer::OnTransportAdvanced(float amount)
       int index = 0;
       for (auto pitch : mNotes)
       {
-         float pos = float(index + .5f) / numNotes;
-         float change = mStrum - mLastStrumPos;
-         float offset = pos - mLastStrumPos;
-         bool wraparound = fabsf(change) > .99f;
+         double pos = double(index + .5) / numNotes;
+         double change = mStrum - mLastStrumPos;
+         double offset = pos - mLastStrumPos;
+         bool wraparound = fabs(change) > .99;
          if (change * offset > 0 && //same direction
-             fabsf(offset) <= fabsf(change) &&
+             fabs(offset) <= fabs(change) &&
              !wraparound)
             PlayNoteOutput(gTime + i * gInvSampleRateMs, pitch, 127);
          ++index;
@@ -107,7 +107,7 @@ void NoteStrummer::OnTransportAdvanced(float amount)
    }
 }
 
-void NoteStrummer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteStrummer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

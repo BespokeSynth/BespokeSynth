@@ -34,7 +34,7 @@
 
 struct UnstablePerlinModulation
 {
-   UnstablePerlinModulation(float amount, float warble, float noise)
+   UnstablePerlinModulation(double amount, double warble, double noise)
    : mPerlinAmount(amount)
    , mPerlinWarble(warble)
    , mPerlinNoise(noise)
@@ -43,12 +43,12 @@ struct UnstablePerlinModulation
    }
 
    PerlinNoise mNoise;
-   float mPerlinAmount;
-   float mPerlinWarble;
-   float mPerlinNoise;
+   double mPerlinAmount;
+   double mPerlinWarble;
+   double mPerlinNoise;
    int mPerlinSeed;
 
-   float GetValue(double time, float travel, float offset)
+   double GetValue(double time, double travel, double offset)
    {
       return mNoise.noise(travel * ofClamp(mPerlinWarble * 10, 0, 1), offset + time * mPerlinNoise / 5, time * mPerlinWarble / 100 + mPerlinSeed);
    }
@@ -74,7 +74,7 @@ public:
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

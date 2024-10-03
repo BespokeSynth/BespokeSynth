@@ -87,8 +87,8 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   float mFreeStutterLength{ .1 };
-   float mFreeStutterSpeed{ 1 };
+   double mFreeStutterLength{ .1 };
+   double mFreeStutterSpeed{ 1 };
 
 private:
    void DoCapture();

@@ -58,7 +58,7 @@ void Snapshots::CreateUIControls()
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
       ofColor color = IDrawableModule::GetColor(kModuleCategory_Other);
-      color.a *= .3f;
+      color.a *= .3;
       mModuleCable->SetColor(color);
       mModuleCable->SetManualPosition(10, 10);
       mModuleCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
@@ -69,7 +69,7 @@ void Snapshots::CreateUIControls()
    {
       mUIControlCable = new PatchCableSource(this, kConnectionType_UIControl);
       ofColor color = IDrawableModule::GetColor(kModuleCategory_Modulator);
-      color.a *= .3f;
+      color.a *= .3;
       mUIControlCable->SetColor(color);
       mUIControlCable->SetManualPosition(25, 10);
       mUIControlCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
@@ -213,9 +213,9 @@ void Snapshots::UpdateGridValues()
    assert(mSnapshotCollection.size() >= size_t(mGrid->GetRows()) * mGrid->GetCols());
    for (int i = 0; i < mGrid->GetRows() * mGrid->GetCols(); ++i)
    {
-      float val = 0;
+      double val = 0;
       if (mSnapshotCollection[i].mSnapshots.empty() == false)
-         val = .5f;
+         val = .5;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
 }
@@ -772,7 +772,14 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
          in >> snapshotData.mControlPath;
-         in >> snapshotData.mValue;
+         if (rev < 4)
+         {
+            float a;
+            in >> a;
+            snapshotData.mValue = a;
+         }
+         else
+            in >> snapshotData.mValue;
          in >> snapshotData.mHasLFO;
          snapshotData.mLFOSettings.LoadState(in);
          in >> snapshotData.mGridCols;

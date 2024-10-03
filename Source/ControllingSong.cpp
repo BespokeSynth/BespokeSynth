@@ -280,7 +280,7 @@ void ControllingSong::IntSliderUpdated(IntSlider* slider, int oldVal, double tim
    }
 }
 
-void ControllingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ControllingSong::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

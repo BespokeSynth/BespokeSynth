@@ -315,7 +315,7 @@ void NoteLooper::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void NoteLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteLooper::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

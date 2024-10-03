@@ -56,7 +56,7 @@ void VelocitySetter::PlayNote(double time, int pitch, int velocity, int voiceIdx
 {
    ComputeSliders(0);
 
-   float random = ofRandom(1 - mRandomness, 1);
+   double random = ofRandom(1 - mRandomness, 1.0);
 
    if (mEnabled && velocity != 0)
    {

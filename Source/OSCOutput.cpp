@@ -141,7 +141,7 @@ void OSCOutput::GetModuleDimensions(float& w, float& h)
    h = mHeight;
 }
 
-void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void OSCOutput::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    juce::String address = "/bespoke/";
    address += slider->Name();

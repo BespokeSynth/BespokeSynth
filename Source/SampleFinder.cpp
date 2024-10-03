@@ -85,14 +85,14 @@ void SampleFinder::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   float volSq = mVolume * mVolume;
+   double volSq = mVolume * mVolume;
 
    float speed = GetSpeed();
 
    //TODO(Ryan) multichannel
    const float* data = mSample->Data()->GetChannel(0);
    int numSamples = mSample->LengthInSamples();
-   float sampleRateRatio = mSample->GetSampleRateRatio();
+   double sampleRateRatio = mSample->GetSampleRateRatio();
 
    mPlayhead = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % mNumBars);
    if (mReverse)
@@ -296,7 +296,7 @@ void SampleFinder::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void SampleFinder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SampleFinder::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

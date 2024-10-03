@@ -214,7 +214,7 @@ void Producer::DoWrite()
          }
       }
 
-      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%Y-%m-%d_%H-%M.wav").c_str(), &toWrite, pos);
+      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%Y-%m-%d_%H-%M.wav"), &toWrite, pos);
       mClipStart = 0;
       mClipEnd = mSample->LengthInSamples();
       mOffset = 0;
@@ -380,7 +380,7 @@ void Producer::GetModuleDimensions(float& width, float& height)
    height = 430;
 }
 
-void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Producer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {

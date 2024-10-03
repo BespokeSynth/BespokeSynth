@@ -51,7 +51,7 @@ void SignalGenerator::CreateUIControls()
    DROPDOWN(mOscSelector, "osc", (int*)(&mOscType), 50);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_PUSHSLIDERWIDTH(60);
-   FLOATSLIDER(mPulseWidthSlider, "pw", &mPulseWidth, 0.01f, .99f);
+   FLOATSLIDER(mPulseWidthSlider, "pw", &mPulseWidth, 0.01, .99);
    UIBLOCK_NEWLINE();
    UIBLOCK_PUSHSLIDERWIDTH(80);
    FLOATSLIDER(mFreqSliderAmountSlider, "slider", &mFreqSliderAmount, 0, 1);
@@ -72,15 +72,15 @@ void SignalGenerator::CreateUIControls()
    DROPDOWN(mSyncModeSelector, "syncmode", (int*)(&mSyncMode), 60);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_PUSHSLIDERWIDTH(60);
-   FLOATSLIDER(mSyncFreqSlider, "syncf", &mSyncFreq, 10, 999.9f);
+   FLOATSLIDER(mSyncFreqSlider, "syncf", &mSyncFreq, 10, 999.9);
    UIBLOCK_SHIFTLEFT();
-   FLOATSLIDER(mSyncRatioSlider, "syncratio", &mSyncRatio, .1f, 10.0f);
+   FLOATSLIDER(mSyncRatioSlider, "syncratio", &mSyncRatio, .1, 10.0);
    UIBLOCK_NEWLINE();
    UIBLOCK_PUSHSLIDERWIDTH(80);
    FLOATSLIDER(mVolSlider, "vol", &mVol, 0, 1);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(8);
-   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mDetune, -.05f, .05f, 3);
+   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mDetune, -.05, .05, 3);
    ENDUIBLOCK0();
 
    mSyncModeSelector->AddLabel("no sync", (int)Oscillator::SyncMode::None);
@@ -331,7 +331,7 @@ void SignalGenerator::DropdownUpdated(DropdownList* list, int oldVal, double tim
       SetFreqMode(mFreqMode);
 }
 
-void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mPulseWidthSlider)
       mOsc.SetPulseWidth(mPulseWidth);

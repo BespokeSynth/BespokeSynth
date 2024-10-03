@@ -43,7 +43,7 @@ public:
    void CreateUIControls() override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
    void ButtonClicked(ClickButton* button, double time) override;
@@ -68,7 +68,7 @@ private:
    float mWidth{ 400 };
    int mNumMeasures{ 32 };
    TextEntry* mNumMeasuresEntry{ nullptr };
-   float mTime{ 0 };
+   double mTime{ 0 };
    FloatSlider* mTimeSlider{ nullptr };
    ClickButton* mResetButton{ nullptr };
    bool mLoop{ false };

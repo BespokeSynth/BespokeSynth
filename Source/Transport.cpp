@@ -693,7 +693,7 @@ void Transport::OnDrumEvent(NoteInterval drumEvent)
    }
 }
 
-void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Transport::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

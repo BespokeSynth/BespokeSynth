@@ -50,7 +50,7 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    //IDrawableModule
    void Init() override;
@@ -82,8 +82,8 @@ private:
    PatchCableSource* mControlCable{ nullptr };
    float mWidth{ 200 };
    float mHeight{ 120 };
-   float mSpeed{ 1 };
+   double mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
-   std::array<float, 100000> mValues{};
+   std::array<double, 100000> mValues{};
    int mValueDisplayPointer{ 0 };
 };

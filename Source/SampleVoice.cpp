@@ -52,7 +52,7 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
        mVoiceParams->mSampleLength == 0)
       return false;
 
-   float volSq = mVoiceParams->mVol * mVoiceParams->mVol;
+   double volSq = mVoiceParams->mVol * mVoiceParams->mVol;
 
    for (int pos = 0; pos < out->BufferSize(); ++pos)
    {

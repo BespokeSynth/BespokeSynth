@@ -282,8 +282,8 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
             if (press)
             {
                mHeldButtons.push_back(HeldButton(gridPos.x, gridPos.y));
-               float val = mGrid->GetVal(gridPos.x, gridPos.y);
-               if (val != mStrength)
+               double val = mGrid->GetVal(gridPos.x, gridPos.y);
+               if (!ofAlmostEquel(val, mStrength))
                   mGrid->SetVal(gridPos.x, gridPos.y, mStrength);
                else
                   mGrid->SetVal(gridPos.x, gridPos.y, 0);
@@ -312,7 +312,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
       {
          for (auto iter : mHeldButtons)
          {
-            float strength = (8 - y) / 8.0f;
+            double strength = (8 - y) / 8.0;
             mGrid->SetVal(iter.mCol, iter.mRow, strength);
          }
          UpdateVelocityLights();
@@ -338,7 +338,7 @@ int StepSequencer::GetStep(int step, int pitch)
 
 void StepSequencer::SetStep(int step, int pitch, int velocity)
 {
-   mGrid->SetVal(step, pitch, ofClamp(velocity / 127.0f, 0, 1));
+   mGrid->SetVal(step, pitch, ofClamp(velocity / 127.0, 0, 1));
    UpdateLights();
 }
 
@@ -556,7 +556,7 @@ bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, in
 
    if (type == kMidiMessage_PitchBend)
    {
-      float val = midiValue / MidiDevice::kPitchBendMax;
+      double val = midiValue / MidiDevice::kPitchBendMax;
       mGridYOffDropdown->SetFromMidiCC(val, gTime, true);
 
       return true;
@@ -766,7 +766,7 @@ void StepSequencer::RandomizeRow(int row)
    {
       if (ofRandom(1) < mRandomizationAmount)
       {
-         float value = 0;
+         double value = 0;
          if (ofRandom(1) < mRandomizationDensity)
             value = ofRandom(1);
          mGrid->SetVal(col, row, value);
@@ -780,7 +780,7 @@ void StepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void StepSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mStrengthSlider)
    {
@@ -795,7 +795,7 @@ void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double
    {
       if (slider == mOffsetSlider[i])
       {
-         float offset = -mOffsets[i] / 32; //up to 1/32nd late or early
+         double offset = -mOffsets[i] / 32; //up to 1/32nd late or early
          mRows[i]->SetOffset(offset);
          mNoteRepeats[i]->SetOffset(offset);
          mGrid->SetDrawOffset(i, mOffsets[i] / 2);
@@ -840,7 +840,7 @@ void StepSequencer::ButtonClicked(ClickButton* button, double time)
       {
          int start = (shift == 1) ? mGrid->GetCols() - 1 : 0;
          int end = (shift == 1) ? 0 : mGrid->GetCols() - 1;
-         float startVal = mGrid->GetVal(start, row);
+         double startVal = mGrid->GetVal(start, row);
          for (int col = start; col != end; col -= shift)
             mGrid->SetVal(col, row, mGrid->GetVal(col - shift, row));
          mGrid->SetVal(end, row, startVal);
@@ -1016,14 +1016,14 @@ void StepSequencerRow::OnTimeEvent(double time)
    if (mSeq->IsEnabled() == false || mSeq->HasExternalPulseSource())
       return;
 
-   float offsetMs = mOffset * TheTransport->MsPerBar();
+   double offsetMs = mOffset * TheTransport->MsPerBar();
    int step = mSeq->GetStepNum(time + offsetMs);
    PlayStep(time, step);
 }
 
 void StepSequencerRow::PlayStep(double time, int step)
 {
-   float val = mGrid->GetVal(step, mRow);
+   double val = mGrid->GetVal(step, mRow);
    if (val > 0 && mSeq->IsMetaStepActive(time, step, mRow))
    {
       mSeq->PlayStepNote(time, mRowPitch, val * val);
@@ -1033,7 +1033,7 @@ void StepSequencerRow::PlayStep(double time, int step)
    }
 }
 
-void StepSequencerRow::SetOffset(float offset)
+void StepSequencerRow::SetOffset(double offset)
 {
    mOffset = offset;
    UpdateTimeListener();
@@ -1120,7 +1120,7 @@ void NoteRepeat::SetInterval(NoteInterval interval)
    }
 }
 
-void NoteRepeat::SetOffset(float offset)
+void NoteRepeat::SetOffset(double offset)
 {
    mOffset = offset;
    TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
@@ -1134,7 +1134,7 @@ void NoteRepeat::SetOffset(float offset)
 StepSequencerNoteFlusher::StepSequencerNoteFlusher(StepSequencer* seq)
 : mSeq(seq)
 {
-   TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(.01f, false), true);
+   TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(.01, false), true);
 }
 
 StepSequencerNoteFlusher::~StepSequencerNoteFlusher()
@@ -1148,7 +1148,7 @@ void StepSequencerNoteFlusher::SetInterval(NoteInterval interval)
    if (transportListenerInfo != nullptr)
    {
       transportListenerInfo->mInterval = interval;
-      transportListenerInfo->mOffsetInfo = OffsetInfo(.01f, false);
+      transportListenerInfo->mOffsetInfo = OffsetInfo(.01, false);
    }
 }
 
