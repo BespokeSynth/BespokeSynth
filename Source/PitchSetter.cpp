@@ -30,6 +30,7 @@
 
 PitchSetter::PitchSetter()
 {
+   mNotes.fill(-1);
 }
 
 void PitchSetter::CreateUIControls()
@@ -50,13 +51,19 @@ void PitchSetter::DrawModule()
 void PitchSetter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
+   {
       mNoteOutput.Flush(time);
+      mNotes.fill(-1);
+   }
 }
 
 void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
-   if (slider == mPitchSlider)
+   if (slider == mPitchSlider && mFlushOnChange)
+   {
       mNoteOutput.Flush(time);
+      mNotes.fill(-1);
+   }
 }
 
 void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -64,19 +71,27 @@ void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    ComputeSliders(0);
 
    if (mEnabled)
-      PlayNoteOutput(time, mPitch, velocity, voiceIdx, modulation);
+   {
+      if (velocity == 0 && mNotes[pitch] > -1)
+         PlayNoteOutput(time, mNotes[pitch], velocity, voiceIdx, modulation);
+      else
+      {
+         mNotes[pitch] = mPitch;
+         PlayNoteOutput(time, mPitch, velocity, voiceIdx, modulation);
+      }
+   }
    else
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void PitchSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("flush_notes_on_change", moduleInfo, false);
 
    SetUpFromSaveData();
 }
 
 void PitchSetter::SetUpFromSaveData()
 {
-   SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mFlushOnChange = mModuleSaveData.GetBool("flush_notes_on_change");
 }

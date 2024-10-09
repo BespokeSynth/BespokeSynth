@@ -63,5 +63,7 @@ private:
    }
 
    int mPitch{ 36 };
+   bool mFlushOnChange{ false };
+   std::array<int, 128> mNotes;
    IntSlider* mPitchSlider{ nullptr };
 };
