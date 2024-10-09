@@ -35,7 +35,7 @@
 
 class CircleSequencer;
 
-#define CIRCLE_SEQUENCER_MAX_STEPS 10
+#define CIRCLE_SEQUENCER_MAX_STEPS 32
 
 class CircleSequencerRing
 {
