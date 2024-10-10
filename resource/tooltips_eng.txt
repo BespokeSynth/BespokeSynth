@@ -205,6 +205,9 @@ pulsetrain~defines a list of pulses to execute, once pulsed
 pulsesequence~defines a looping sequence of pulses
 ~length~length of the sequence
 ~interval~length of each step within the sequence
+~ - ~advance the sequence backwards
+~+~advance the sequence forward
+~pulse~when enabled will send out pulses as per sequence when advancing with the buttons
 ~<~shift sequence to the left
 ~>~shift sequence to the right
 
