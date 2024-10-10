@@ -372,8 +372,9 @@ void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal, double ti
          mVoiceParams.mMult = mMult;
       else if (mMult == -1) //-1 is special case for 1.5
          mVoiceParams.mMult = 1.5f;
-      else //other negative numbers mean 1/-x
+      else if (mMult < 0) //other negative numbers mean 1/-x
          mVoiceParams.mMult = -1.0f / mMult;
+      // If (mMult == 0) we ignore it; It can become 0 through modulation or the snapshots blending.
    }
    if (list == mOscSelector)
       mDrawOsc.SetType(mVoiceParams.mOscType);

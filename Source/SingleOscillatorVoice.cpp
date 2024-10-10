@@ -82,9 +82,12 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
          {
             //PROFILER(SingleOscillatorVoice_UpdatePhase);
             mOscData[u].mPhase += mOscData[u].mCurrentPhaseInc;
-            if (mOscData[u].mPhase == INFINITY)
+            if (std::isinf(mOscData[u].mPhase))
             {
                ofLog() << "Infinite phase. phaseInc:" + ofToString(mOscData[u].mCurrentPhaseInc) + " detune:" + ofToString(mVoiceParams->mDetune) + " freq:" + ofToString(freq) + " pitch:" + ofToString(pitch) + " getpitch:" + ofToString(GetPitch(pos));
+               // Reset to 0 because letting this propagate causes NaN's
+               mOscData[u].mPhase = 0;
+               mOscData[u].mCurrentPhaseInc = 0;
             }
             else
             {
@@ -95,6 +98,12 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
                }
             }
             mOscData[u].mSyncPhase += syncPhaseInc;
+         }
+         if (std::isinf(mOscData[u].mSyncPhase))
+         {
+            // Reset to 0 because letting this propagate causes NaN's
+            mOscData[u].mSyncPhase = 0;
+            syncPhaseInc = 0;
          }
 
          float sample;
