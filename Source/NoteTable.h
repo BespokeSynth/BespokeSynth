@@ -137,7 +137,7 @@ private:
    FloatSlider* mRandomizePitchRangeSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
 
-   static constexpr int kMaxLength = 32;
+   static constexpr int kMaxLength = 128;
 
    std::array<double, kMaxLength> mLastColumnPlayTime{};
    std::array<bool[128], kMaxLength> mLastColumnNoteOnPitches{};
