@@ -40,7 +40,7 @@ Sign up here to receive an email whenever I put out a new release: http://bespok
 ### Building
 
 Building Bespoke from source is easy and fun! The basic cmake prescription gives you a completed
-executable which is ready to run on your system in many cases.
+executable which is ready to run on your system in many cases. If your system does not have `cmake` installed already you must do so.
 
 ```shell
 git clone https://github.com/BespokeSynth/BespokeSynth   # replace this with your fork if you forked
@@ -80,3 +80,4 @@ To be able to build you will need a few things, depending on your OS
 * On MacOS: install xcode; install xcode command line tools with `xcode-select --install` and install cmake with `brew install cmake` if you use homebrew or from cmake.org if not
 * On Linux you probably already have everything (gcc, git, etc...), but you will need to install required packages. The full list we
 install on a fresh ubuntu 20 box are listed in the azure-pipelines.yml
+  * Some distributions may have slightly different package names like for instance Debian bookworm: You need to replace `alsa` and `alsa-tools` with `alsa-utils`
