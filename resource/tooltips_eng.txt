@@ -2001,7 +2001,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~ui_scale~scale of UI layer (title bar, quickspawn menu, etc)
 ~cable_drop_behavior~what should be behavior be when you drag a cable and drop it into empty space?
 ~qwerty_to_pitch_mode~some modules can hear computer keyboard keys and automatically translate them to MIDI notes. This setting defines how your keyboard is interpreted based on other DAWs with a similar feature. \nAbleton:\noctave#1: A->L\ndown octave: Z\nup octave: X\n\nFruity:\noctave#1: Z->M\noctave#2: Q->I\ndown octave: ,\nup octave: .
-~grid_snap_size~grid size to use when snapping module position (hold alt/option while dragging a module)
+~grid_snap_size~grid size to use when snapping module position (hold command on mac or control everywhere else while dragging a module)
 ~scroll_multiplier_vertical~adjustment to vertical mouse/trackpad scroll speed
 ~scroll_multiplier_horizontal~adjustment to horizontal mouse/trackpad scroll speed
 ~autosave~should autosave be enabled on startup
