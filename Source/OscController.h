@@ -23,13 +23,10 @@
 //
 //
 
-#ifndef __Bespoke__OscController__
-#define __Bespoke__OscController__
+#pragma once
 
-#include <iostream>
 #include "MidiDevice.h"
 #include "INonstandardController.h"
-#include "ofxJSONElement.h"
 
 #include "juce_osc/juce_osc.h"
 
@@ -83,5 +80,3 @@ private:
 
    std::vector<OscMap> mOscMap;
 };
-
-#endif /* defined(__Bespoke__OscController__) */

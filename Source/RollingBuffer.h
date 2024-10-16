@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__RollingBuffer__
-#define __modularSynth__RollingBuffer__
+#pragma once
 
-#include <iostream>
 #include "FileStream.h"
 #include "ChannelBuffer.h"
 
@@ -55,5 +53,3 @@ private:
    int mOffsetToNow[ChannelBuffer::kMaxNumChannels]{};
    ChannelBuffer mBuffer;
 };
-
-#endif /* defined(__modularSynth__RollingBuffer__) */

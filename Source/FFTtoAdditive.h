@@ -23,17 +23,13 @@
 //
 //
 
-#ifndef __modularSynth__FFTtoAdditive__
-#define __modularSynth__FFTtoAdditive__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "FFT.h"
 #include "RollingBuffer.h"
 #include "Slider.h"
-#include "GateEffect.h"
 #include "BiquadFilterEffect.h"
 
 #define VIZ_WIDTH 1000
@@ -107,5 +103,3 @@ private:
    int mHistoryPtr{ 0 };
    float* mPhaseInc{ nullptr };
 };
-
-#endif /* defined(__modularSynth__FFTtoAdditive__) */

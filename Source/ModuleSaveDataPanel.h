@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__ModuleSaveDataPanel__
-#define __modularSynth__ModuleSaveDataPanel__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "Slider.h"
@@ -54,6 +52,7 @@ public:
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }
+   void Poll() override;
 
    void SetModule(IDrawableModule* module);
    IDrawableModule* GetModule() { return mSaveModule; }
@@ -72,9 +71,12 @@ public:
 
    bool IsEnabled() const override { return true; }
 
+   static void LoadPreset(IDrawableModule* module, std::string presetFilePath);
+
 private:
    void ApplyChanges();
    void FillDropdownList(DropdownList* list, ModuleSaveData::SaveVal* save);
+   void RefreshPresetFiles();
 
    //IDrawableModule
    void DrawModule() override;
@@ -82,6 +84,8 @@ private:
 
    IDrawableModule* mSaveModule{ nullptr };
    TextEntry* mNameEntry{ nullptr };
+   DropdownList* mPresetFileSelector{ nullptr };
+   ClickButton* mSavePresetAsButton{ nullptr };
    std::vector<IUIControl*> mSaveDataControls;
    std::vector<std::string> mLabels;
    ClickButton* mApplyButton{ nullptr };
@@ -94,6 +98,7 @@ private:
    int mHeight{ 100 };
    float mAppearAmount{ 0 };
    float mAlignmentX{ 100 };
+   int mPresetFileIndex{ 0 };
+   bool mPresetFileUpdateQueued{ false };
+   std::vector<std::string> mPresetFilePaths;
 };
-
-#endif /* defined(__modularSynth__ModuleSaveDataPanel__) */

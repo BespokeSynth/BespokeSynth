@@ -30,6 +30,7 @@
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
 #include "PatchCable.h"
+#include "QwertyToPitchMapping.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -71,15 +72,27 @@ void UserPrefsEditor::CreateUIControls()
    UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("show quickspawn", (int)CableDropBehavior::ShowQuickspawn);
    UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("do nothing", (int)CableDropBehavior::DoNothing);
    UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("disconnect", (int)CableDropBehavior::DisconnectCable);
+
    for (int i = 0; i < UserPrefs.cable_drop_behavior.GetDropdown()->GetNumValues(); ++i)
    {
       if (UserPrefs.cable_drop_behavior.GetDropdown()->GetElement(i).mLabel == UserPrefs.cable_drop_behavior.Get())
          UserPrefs.cable_drop_behavior.GetIndex() = i;
    }
+
+   UserPrefs.qwerty_to_pitch_mode.GetDropdown()->AddLabel("Ableton", (int)QwertyToPitchMappingMode::Ableton);
+   UserPrefs.qwerty_to_pitch_mode.GetDropdown()->AddLabel("Fruity", (int)QwertyToPitchMappingMode::Fruity);
+
+   for (int i = 0; i < UserPrefs.qwerty_to_pitch_mode.GetDropdown()->GetNumValues(); ++i)
+   {
+      if (UserPrefs.qwerty_to_pitch_mode.GetDropdown()->GetElement(i).mLabel == UserPrefs.qwerty_to_pitch_mode.Get())
+         UserPrefs.qwerty_to_pitch_mode.GetIndex() = i;
+   }
 }
 
 void UserPrefsEditor::Show()
 {
+   SetPosition(100 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().x, 250 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().y);
+
    UpdateDropdowns({});
    SetShowing(true);
 
@@ -294,7 +307,7 @@ void UserPrefsEditor::DrawModule()
       ofRectangle rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
       ofPushStyle();
       ofSetColor(ofColor::white);
-      DrawTextNormal("note: " + UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) + " uses the same audio device for output and input", rect.x, rect.getMaxY() + 14, 13);
+      DrawTextNormal("note: " + UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) + " uses the same audio device for output and input", rect.x, rect.getMaxY() + 14, 11);
       ofPopStyle();
    }
 
@@ -342,7 +355,7 @@ void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofCo
       ofRectangle rect = control->GetRect(true);
       ofPushStyle();
       ofSetColor(color);
-      DrawTextNormal(text, rect.getMaxX() + offsetX, rect.getMaxY() - 3, 13);
+      DrawTextNormal(text, rect.getMaxX() + offsetX, rect.getMaxY() - 3, 11);
       ofPopStyle();
    }
 }
@@ -424,6 +437,8 @@ void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, doub
          ModularSynth::sBackgroundG = UserPrefs.background_g.Get();
          ModularSynth::sBackgroundB = UserPrefs.background_b.Get();
       }
+      if (slider == UserPrefs.cable_alpha.GetSlider())
+         ModularSynth::sCableAlpha = UserPrefs.cable_alpha.Get();
    }
 }
 

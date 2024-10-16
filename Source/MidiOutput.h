@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__MidiOutput__
-#define __Bespoke__MidiOutput__
+#pragma once
 
-#include <iostream>
 #include "MidiDevice.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -95,5 +93,3 @@ private:
 
    std::vector<ChannelModulations> mChannelModulations;
 };
-
-#endif /* defined(__Bespoke__MidiOutput__) */

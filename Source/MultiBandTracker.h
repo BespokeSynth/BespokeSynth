@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__MultiBandTracker__
-#define __modularSynth__MultiBandTracker__
+#pragma once
 
-#include <iostream>
 #include "OpenFrameworksPort.h"
 #include "LinkwitzRileyFilter.h"
 #include "PeakTracker.h"
@@ -52,5 +50,3 @@ private:
    float* mWorkBuffer{ nullptr };
    ofMutex mMutex;
 };
-
-#endif /* defined(__modularSynth__MultiBandTracker__) */

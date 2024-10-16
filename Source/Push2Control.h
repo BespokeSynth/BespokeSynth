@@ -38,6 +38,7 @@ class NVGLUframebuffer;
 class IUIControl;
 class IPush2GridController;
 class Snapshots;
+class ControlRecorder;
 
 class Push2Control : public IDrawableModule, public MidiDeviceListener, public IDropdownListener
 {
@@ -52,6 +53,7 @@ public:
    void CreateUIControls() override;
    void Poll() override;
    void Exit() override;
+   void KeyPressed(int key, bool isRepeat) override;
 
    void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true);
@@ -72,6 +74,9 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
+   int GetGridControllerOption1Control() const;
+   int GetGridControllerOption2Control() const;
+
    static bool sDrawingPush2Display;
    static NVGcontext* sVG;
    static NVGLUframebuffer* sFB;
@@ -88,7 +93,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override
    {
       width = mWidth;
-      height = mHeight;
+      height = mHeight + (mShowManualGrid ? 98 : 0);
    }
    void OnClicked(float x, float y, bool right) override;
 
@@ -123,6 +128,7 @@ private:
    int GetNumDisplayPixels() const;
    bool AllowRepatch() const;
    void UpdateRoutingModules();
+   void SetGridControlInterface(IPush2GridController* controller, IDrawableModule* module);
 
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
@@ -137,6 +143,7 @@ private:
 
    IDrawableModule* mDisplayModule{ nullptr };
    Snapshots* mDisplayModuleSnapshots{ nullptr };
+   ControlRecorder* mCurrentControlRecorder{ nullptr };
    std::vector<IUIControl*> mSliderControls;
    std::vector<IUIControl*> mButtonControls;
    std::vector<IUIControl*> mDisplayedControls;
@@ -147,14 +154,26 @@ private:
    std::vector<IDrawableModule*> mModules;
    float mModuleListOffset{ 0 };
    float mModuleListOffsetSmoothed{ 0 };
-   IDrawableModule* mModuleGrid[8 * 8];
+   std::array<IDrawableModule*, 8 * 8> mModuleGrid;
+   std::array<PatchCableSource*, 8 * 8> mModuleGridManualCables;
    ofRectangle mModuleGridRect;
 
+   enum class ModuleGridLayoutStyle
+   {
+      Automatic,
+      Manual
+   };
+
+   ModuleGridLayoutStyle mModuleGridLayoutStyle{ ModuleGridLayoutStyle::Automatic };
+   DropdownList* mModuleGridLayoutStyleDropdown{ nullptr };
+   bool mShowManualGrid{ false };
+   Checkbox* mShowManualGridCheckbox{ nullptr };
    std::vector<IUIControl*> mFavoriteControls;
    std::vector<IUIControl*> mSpawnModuleControls;
    bool mNewButtonHeld{ false };
    bool mDeleteButtonHeld{ false };
-   bool mModulationButtonHeld{ false };
+   bool mLFOButtonHeld{ false };
+   bool mAutomateButtonHeld{ false };
    bool mAddModuleBookmarkButtonHeld{ false };
    std::array<bool, 128> mNoteHeldState;
    IDrawableModule* mHeldModule{ nullptr };

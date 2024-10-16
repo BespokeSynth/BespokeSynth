@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__TimerDisplay__
-#define __Bespoke__TimerDisplay__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "ClickButton.h"
@@ -59,5 +57,3 @@ private:
    double mStartTime{ 0 };
    ClickButton* mResetButton{ nullptr };
 };
-
-#endif /* defined(__Bespoke__TimerDisplay__) */

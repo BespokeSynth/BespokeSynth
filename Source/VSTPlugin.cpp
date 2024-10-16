@@ -180,12 +180,37 @@ namespace VSTLookup
       return "";
    }
 
+   juce::String cutOffIdHash(juce::String inputString)
+   {
+      juce::StringArray parts;
+      parts.addTokens(inputString, "-", "");
+
+      if (parts.size() >= 2)
+      {
+         parts.remove(parts.size() - 2);
+         juce::String result = parts.joinIntoString("-");
+         return result;
+      }
+      return inputString;
+   }
+
    bool GetPluginDesc(juce::PluginDescription& desc, juce::String pluginId)
    {
       auto types = TheSynth->GetKnownPluginList().getTypes();
+      auto cutId = cutOffIdHash(pluginId);
+
       for (int i = 0; i < types.size(); ++i)
       {
          if (types[i].createIdentifierString() == pluginId)
+         {
+            desc = types[i];
+            return true;
+         }
+      }
+
+      for (int i = 0; i < types.size(); ++i)
+      {
+         if (cutOffIdHash(types[i].createIdentifierString()) == cutId)
          {
             desc = types[i];
             return true;
@@ -380,7 +405,6 @@ void VSTPlugin::GetVSTFileDesc(std::string vstName, juce::PluginDescription& des
          juce::String thisVstName = juce::String(types[i].fileOrIdentifier).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
          if (thisVstName == desiredVstName)
          {
-            found = true;
             desc = types[i];
             break;
          }
@@ -533,7 +557,7 @@ void VSTPlugin::CreateParameterSliders()
       else
          mParameterSliders[i].mID = "param_" + ofToString(parameters[i]->getParameterIndex());
       mParameterSliders[i].mShowing = false;
-      if (numParameters <= 30) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
+      if (numParameters <= kMaxParametersInDropdown) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
          mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
          mParameterSliders[i].mInSelectorList = true;
@@ -558,6 +582,16 @@ void VSTPlugin::Poll()
          mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
          if (mParameterSliders[i].mSlider != nullptr)
             mParameterSliders[i].mSlider->SetOverrideDisplayName(mParameterSliders[i].mDisplayName);
+      }
+
+      if (numParameters <= kMaxParametersInDropdown) // update the dropdown in this case
+      {
+         mShowParameterDropdown->Clear();
+         for (int i = 0; i < numParameters; ++i)
+         {
+            mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
+            mParameterSliders[i].mInSelectorList = true;
+         }
       }
    }
    if (mDisplayMode == kDisplayMode_Sliders)
@@ -596,6 +630,61 @@ void VSTPlugin::Poll()
 
          //if (mWindow->GetNSViewComponent())
          //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
+      }
+   }
+
+   if (mPresetFileUpdateQueued)
+   {
+      mPresetFileUpdateQueued = false;
+      if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
+      {
+         File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
+
+         if (!resourceFile.existsAsFile())
+         {
+            DBG("File doesn't exist ...");
+            return;
+         }
+
+         std::unique_ptr<FileInputStream> input(resourceFile.createInputStream());
+
+         if (!input->openedOk())
+         {
+            DBG("Failed to open file");
+            return;
+         }
+
+         int rev = input->readInt();
+
+         int64 vstStateSize = input->readInt64();
+         char* vstState = new char[vstStateSize];
+         input->read(vstState, vstStateSize);
+         mPlugin->setStateInformation(vstState, vstStateSize);
+
+         int64 vstProgramStateSize = input->readInt64();
+         if (vstProgramStateSize > 0)
+         {
+            char* vstProgramState = new char[vstProgramStateSize];
+            input->read(vstProgramState, vstProgramStateSize);
+            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+         }
+
+         if (rev >= 2 && mModuleSaveData.GetBool("preset_file_sets_params"))
+         {
+            int numParamsShowing = input->readInt();
+            for (auto& param : mParameterSliders)
+               param.mShowing = false;
+            for (int i = 0; i < numParamsShowing; ++i)
+            {
+               int index = input->readInt();
+               if (index < mParameterSliders.size())
+               {
+                  mParameterSliders[index].mShowing = true;
+                  if (mParameterSliders[index].mSlider == nullptr)
+                     mParameterSliders[index].MakeSlider();
+               }
+            }
+         }
       }
    }
 }
@@ -954,58 +1043,7 @@ std::vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
 void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mPresetFileSelector)
-   {
-      if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
-      {
-         File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
-
-         if (!resourceFile.existsAsFile())
-         {
-            DBG("File doesn't exist ...");
-            return;
-         }
-
-         std::unique_ptr<FileInputStream> input(resourceFile.createInputStream());
-
-         if (!input->openedOk())
-         {
-            DBG("Failed to open file");
-            return;
-         }
-
-         int rev = input->readInt();
-
-         int64 vstStateSize = input->readInt64();
-         char* vstState = new char[vstStateSize];
-         input->read(vstState, vstStateSize);
-         mPlugin->setStateInformation(vstState, vstStateSize);
-
-         int64 vstProgramStateSize = input->readInt64();
-         if (vstProgramStateSize > 0)
-         {
-            char* vstProgramState = new char[vstProgramStateSize];
-            input->read(vstProgramState, vstProgramStateSize);
-            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
-         }
-
-         if (rev >= 2 && mModuleSaveData.GetBool("preset_file_sets_params"))
-         {
-            int numParamsShowing = input->readInt();
-            for (auto& param : mParameterSliders)
-               param.mShowing = false;
-            for (int i = 0; i < numParamsShowing; ++i)
-            {
-               int index = input->readInt();
-               if (index < mParameterSliders.size())
-               {
-                  mParameterSliders[index].mShowing = true;
-                  if (mParameterSliders[index].mSlider == nullptr)
-                     mParameterSliders[index].MakeSlider();
-               }
-            }
-         }
-      }
-   }
+      mPresetFileUpdateQueued = true;
 
    if (list == mShowParameterDropdown)
    {

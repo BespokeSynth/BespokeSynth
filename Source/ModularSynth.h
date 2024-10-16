@@ -1,5 +1,4 @@
-#ifndef _MODULAR_SYNTH
-#define _MODULAR_SYNTH
+#pragma once
 
 #undef LoadString //undo some junk from a windows define
 
@@ -102,10 +101,10 @@ public:
    void AddExtraPoller(IPollable* poller);
    void RemoveExtraPoller(IPollable* poller);
 
-   void AudioOut(float** output, int bufferSize, int nChannels);
-   void AudioIn(const float** input, int bufferSize, int nChannels);
+   void AudioOut(float* const* output, int bufferSize, int nChannels);
+   void AudioIn(const float* const* input, int bufferSize, int nChannels);
 
-   void OnConsoleInput();
+   void OnConsoleInput(std::string command = "");
    void ClearConsoleInput();
 
    bool IsReady();
@@ -286,6 +285,7 @@ public:
    static float sBackgroundR;
    static float sBackgroundG;
    static float sBackgroundB;
+   static float sCableAlpha;
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
@@ -305,6 +305,7 @@ private:
    void FindCircularDependencies();
    bool FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom);
    void ClearCircularDependencyMarkers();
+   bool IsCurrentSaveStateATemplate() const;
 
    void ReadClipboardTextFromSystem();
 
@@ -446,5 +447,3 @@ private:
 };
 
 extern ModularSynth* TheSynth;
-
-#endif

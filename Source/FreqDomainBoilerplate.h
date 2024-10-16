@@ -23,17 +23,13 @@
 //
 //
 
-#ifndef __modularSynth__FreqDomainBoilerplate__
-#define __modularSynth__FreqDomainBoilerplate__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "FFT.h"
 #include "RollingBuffer.h"
 #include "Slider.h"
-#include "GateEffect.h"
 #include "BiquadFilterEffect.h"
 
 class FreqDomainBoilerplate : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
@@ -95,6 +91,3 @@ private:
    float mPhaseOffset{ 0 };
    FloatSlider* mPhaseOffsetSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__FreqDomainBoilerplate__) */

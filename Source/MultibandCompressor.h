@@ -23,14 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__MultibandCompressor__
-#define __Bespoke__MultibandCompressor__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "ClickButton.h"
 #include "RollingBuffer.h"
 #include "LinkwitzRileyFilter.h"
 #include "PeakTracker.h"
@@ -94,5 +91,3 @@ private:
    CLinkwitzRiley_4thOrder mFilters[COMPRESSOR_MAX_BANDS];
    PeakTracker mPeaks[COMPRESSOR_MAX_BANDS];
 };
-
-#endif /* defined(__Bespoke__MultibandCompressor__) */

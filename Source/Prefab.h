@@ -25,8 +25,7 @@
   ==============================================================================
 */
 
-#ifndef PREFAB_H_INCLUDED
-#define PREFAB_H_INCLUDED
+#pragma once
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
@@ -54,6 +53,7 @@ public:
    bool ShouldClipContents() override { return false; }
 
    void ButtonClicked(ClickButton* button, double time) override;
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -84,7 +84,6 @@ private:
    bool CanAddDropModules();
    bool IsAddableModule(IDrawableModule* module);
    bool IsMouseHovered();
-   void CheckboxUpdated(Checkbox* checkbox, double time);
 
    void SavePrefab(std::string savePath);
    void UpdatePrefabName(std::string path);
@@ -96,6 +95,3 @@ private:
    ModuleContainer mModuleContainer;
    std::string mPrefabName{ "" };
 };
-
-
-#endif // PREFAB_H_INCLUDED

@@ -28,7 +28,6 @@
 #include "Slider.h"
 #include "ofxJSONElement.h"
 #include "PatchCableSource.h"
-#include "Canvas.h"
 #include "juce_core/juce_core.h"
 
 std::vector<IUIControl*> Snapshots::sSnapshotHighlightControls;
@@ -351,19 +350,12 @@ void Snapshots::SetSnapshot(int idx, double time)
             if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
                textEntry->SetText(i->mString);
 
-            Canvas* canvas = dynamic_cast<Canvas*>(control);
-            if (canvas && !i->mString.empty())
+            if (control->ShouldSerializeForSnapshot() && !i->mString.empty())
             {
-               std::string tempFileName = ofToDataPath("tmpread" + ofToString(this));
-               juce::MemoryOutputStream outputStream;
-               juce::Base64::convertFromBase64(outputStream, i->mString);
-               {
-                  FileStreamOut out(tempFileName);
-                  out.WriteGeneric(outputStream.getData(), outputStream.getDataSize());
-               }
-               FileStreamIn in(tempFileName);
-               canvas->LoadState(in, true);
-               juce::File(tempFileName).deleteFile();
+               juce::MemoryBlock outputStream;
+               outputStream.fromBase64Encoding(i->mString);
+               FileStreamIn in(outputStream);
+               control->LoadState(in, true);
             }
          }
          else
@@ -740,11 +732,21 @@ void Snapshots::SaveState(FileStreamOut& out)
 
    out << (int)mSnapshotModules.size();
    for (auto module : mSnapshotModules)
-      out << module->Path();
+   {
+      if (module != nullptr && !module->IsDeleted())
+         out << module->Path();
+      else
+         out << std::string("");
+   }
 
    out << (int)mSnapshotControls.size();
    for (auto control : mSnapshotControls)
-      out << control->Path();
+   {
+      if (control != nullptr && !control->GetModuleParent()->IsDeleted())
+         out << control->Path();
+      else
+         out << std::string("");
+   }
 
    out << mCurrentSnapshot;
 }
@@ -767,7 +769,6 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       int snapshotSize;
       in >> snapshotSize;
       mSnapshotCollection[i].mSnapshots.resize(snapshotSize);
-      int j = 0;
       for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
          in >> snapshotData.mControlPath;
@@ -804,22 +805,28 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
    for (int i = 0; i < size; ++i)
    {
       in >> path;
-      IDrawableModule* module = TheSynth->FindModule(path);
-      if (module)
+      if (path != "")
       {
-         mSnapshotModules.push_back(module);
-         mModuleCable->AddPatchCable(module);
+         IDrawableModule* module = TheSynth->FindModule(path);
+         if (module)
+         {
+            mSnapshotModules.push_back(module);
+            mModuleCable->AddPatchCable(module);
+         }
       }
    }
    in >> size;
    for (int i = 0; i < size; ++i)
    {
       in >> path;
-      IUIControl* control = TheSynth->FindUIControl(path);
-      if (control)
+      if (path != "")
       {
-         mSnapshotControls.push_back(control);
-         mUIControlCable->AddPatchCable(control);
+         IUIControl* control = TheSynth->FindUIControl(path);
+         if (control)
+         {
+            mSnapshotControls.push_back(control);
+            mUIControlCable->AddPatchCable(control);
+         }
       }
    }
 
@@ -913,21 +920,13 @@ Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
    if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
       mString = textEntry->GetText();
 
-   Canvas* canvas = dynamic_cast<Canvas*>(control);
-   if (canvas)
+   if (control->ShouldSerializeForSnapshot())
    {
-      std::string tempFileName = ofToDataPath("tmpsave" + ofToString(this));
-      juce::int64 size;
+      juce::MemoryBlock tempBlock;
       {
-         FileStreamOut out(tempFileName);
-         canvas->SaveState(out);
-         size = out.GetSize();
+         FileStreamOut out(tempBlock);
+         control->SaveState(out);
       }
-      FileStreamIn in(tempFileName);
-      char* data = new char[size];
-      in.ReadGeneric(data, size);
-      mString = juce::Base64::toBase64(data, size).toStdString();
-      delete[] data;
-      juce::File(tempFileName).deleteFile();
+      mString = tempBlock.toBase64Encoding().toStdString();
    }
 }

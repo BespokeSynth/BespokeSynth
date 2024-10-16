@@ -256,10 +256,21 @@ void QuickSpawnMenu::UpdateDisplay()
       {
          mElements.clear();
          const auto& elements = TheSynth->GetModuleFactory()->GetSpawnableModules(mSearchString.toStdString(), true);
+         int exactMatches = 0;
          for (size_t i = 0; i < elements.size(); ++i)
          {
             if (MatchesFilter(elements[i]))
-               mElements.push_back(elements[i]);
+            {
+               if (juce::String(elements[i].mLabel).startsWith(mSearchString))
+               {
+                  mElements.insert(mElements.begin() + exactMatches, elements[i]);
+                  ++exactMatches;
+               }
+               else
+               {
+                  mElements.push_back(elements[i]);
+               }
+            }
          }
       }
       else
@@ -296,7 +307,12 @@ bool QuickSpawnMenu::MatchesFilter(const ModuleFactory::Spawnable& spawnable) co
    bool inputMatches = false;
    bool outputMatches = false;
 
-   ModuleFactory::ModuleInfo info = TheSynth->GetModuleFactory()->GetModuleInfo(spawnable.mLabel);
+   ModuleFactory::ModuleInfo info;
+
+   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Preset)
+      info = TheSynth->GetModuleFactory()->GetModuleInfo(spawnable.mPresetModuleType);
+   else
+      info = TheSynth->GetModuleFactory()->GetModuleInfo(spawnable.mLabel);
 
    if (mFilterForCable->GetConnectionType() == kConnectionType_Note)
    {
@@ -455,9 +471,9 @@ void QuickSpawnMenu::DrawModule()
 void QuickSpawnMenu::DrawModuleUnclipped()
 {
    if (mMenuMode == MenuMode::SingleLetter)
-      DrawTextBold(mHeldKeys.toStdString(), 3, -2, 17);
+      DrawTextBold(mHeldKeys.toStdString(), 3, -2, 15);
    if (mMenuMode == MenuMode::Search)
-      DrawTextBold(mSearchString.toStdString(), 3, -2, 17);
+      DrawTextBold(mSearchString.toStdString(), 3, -2, 15);
 }
 
 bool QuickSpawnMenu::MouseMoved(float x, float y)

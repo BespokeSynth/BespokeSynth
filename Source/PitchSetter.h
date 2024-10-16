@@ -23,13 +23,10 @@
 //
 //
 
-#ifndef __Bespoke__PitchAssigner__
-#define __Bespoke__PitchAssigner__
+#pragma once
 
-#include <stdio.h>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 
 class PitchSetter : public NoteEffectBase, public IDrawableModule, public IIntSliderListener
@@ -68,5 +65,3 @@ private:
    int mPitch{ 36 };
    IntSlider* mPitchSlider{ nullptr };
 };
-
-#endif /* defined(__Bespoke__PitchAssigner__) */

@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__SlowLayers__
-#define __Bespoke__SlowLayers__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "RollingBuffer.h"
@@ -34,7 +32,6 @@
 #include "RadioButton.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 
 class SlowLayers : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener
 {
@@ -95,5 +92,3 @@ private:
    DropdownList* mNumBarsSelector{ nullptr };
    FloatSlider* mFeedInSlider{ nullptr };
 };
-
-#endif /* defined(__Bespoke__SlowLayers__) */

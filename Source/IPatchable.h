@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef Bespoke_IPatchable_h
-#define Bespoke_IPatchable_h
+#pragma once
 
 class PatchCableSource;
 
@@ -37,5 +36,3 @@ public:
    virtual void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) {}
    virtual void OnCableGrabbed(PatchCableSource* cableSource) {}
 };
-
-#endif

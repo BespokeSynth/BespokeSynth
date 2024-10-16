@@ -23,24 +23,25 @@
 //
 //
 
-#ifndef __Bespoke__FileStream__
-#define __Bespoke__FileStream__
+#pragma once
 
 #include <cstdint>
 #include <memory>
 #include <string>
-#include "juce_core/juce_core.h"
 
 namespace juce
 {
-   class FileInputStream;
-   class FileOutputStream;
+   class InputStream;
+   class OutputStream;
+   class MemoryBlock;
 }
 
 class FileStreamOut
 {
 public:
    explicit FileStreamOut(const std::string& file);
+   explicit FileStreamOut(juce::MemoryBlock& block, bool appendToExistingBlockContent = true);
+   explicit FileStreamOut(std::unique_ptr<juce::OutputStream>&& stream);
    FileStreamOut(const char*) = delete; // Hint: UTF-8 encoded std::string required
    ~FileStreamOut();
    FileStreamOut& operator<<(const int& var);
@@ -52,16 +53,18 @@ public:
    FileStreamOut& operator<<(const char& var);
    void Write(const float* buffer, int size);
    void WriteGeneric(const void* buffer, int size);
-   juce::int64 GetSize() const;
+   std::int64_t GetSize() const;
 
 private:
-   std::unique_ptr<juce::FileOutputStream> mStream;
+   std::unique_ptr<juce::OutputStream> mStream;
 };
 
 class FileStreamIn
 {
 public:
    explicit FileStreamIn(const std::string& file);
+   explicit FileStreamIn(const juce::MemoryBlock& block);
+   explicit FileStreamIn(std::unique_ptr<juce::InputStream>&& stream);
    FileStreamIn(const char*) = delete; // Hint: UTF-8 encoded std::string required
    ~FileStreamIn();
    FileStreamIn& operator>>(int& var);
@@ -81,7 +84,5 @@ public:
    static const int sMaxStringLength = 999999; //the primary thing that might hit this limit is the json layout file (one user has had a file that exceeded a length of 100000)
 
 private:
-   std::unique_ptr<juce::FileInputStream> mStream;
+   std::unique_ptr<juce::InputStream> mStream;
 };
-
-#endif /* defined(__Bespoke__FileStream__) */

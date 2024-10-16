@@ -29,7 +29,6 @@
 #include "INoteSource.h"
 #include "INoteReceiver.h"
 #include "IAudioReceiver.h"
-#include "IAudioSource.h"
 #include "IAudioEffect.h"
 #include "IUIControl.h"
 #include "Slider.h"
@@ -40,13 +39,13 @@
 #include "ModuleSaveDataPanel.h"
 #include "GridController.h"
 #include "ControlSequencer.h"
-#include "Snapshots.h"
 #include "PatchCableSource.h"
 #include "nanovg/nanovg.h"
 #include "IPulseReceiver.h"
 #include "Push2Control.h"
 #include "UIGrid.h"
 #include "UserPrefs.h"
+#include "Prefab.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
@@ -82,10 +81,10 @@ void IDrawableModule::CreateUIControls()
       type = kConnectionType_Grid;
    else if (dynamic_cast<IPulseSource*>(this))
       type = kConnectionType_Pulse;
-   if (type != kConnectionType_Special)
+
+   if (type != kConnectionType_Special && !ShouldSuppressAutomaticOutputCable())
    {
-      mMainPatchCableSource = new PatchCableSource(this, type);
-      mPatchCableSources.push_back(mMainPatchCableSource);
+      mPatchCableSources.push_back(new PatchCableSource(this, type));
    }
 
    GetMinimizedWidth(); //update cached width
@@ -109,6 +108,10 @@ void IDrawableModule::Init()
    mCanReceiveNotes = moduleInfo.mCanReceiveNotes;
    mCanReceivePulses = moduleInfo.mCanReceivePulses;
 
+   // if you hit these asserts, it means that, for example, your module's
+   // AcceptsPulses() returns false, but it inherits IPulseReceiver.
+   // the fix is to make AcceptsPulses() (or the appropriate method) match the
+   // list of inherited classes.
    assert(mCanReceiveAudio == (dynamic_cast<IAudioReceiver*>(this) != nullptr));
    assert(mCanReceiveNotes == (dynamic_cast<INoteReceiver*>(this) != nullptr));
    assert(mCanReceivePulses == (dynamic_cast<IPulseReceiver*>(this) != nullptr));
@@ -144,6 +147,8 @@ void IDrawableModule::Init()
          continue; //stuff in module containers was already initialized
       mChildren[i]->Init();
    }
+
+   mKeyboardFocusListener = dynamic_cast<IKeyboardFocusListener*>(this);
 }
 
 void IDrawableModule::BasePoll()
@@ -234,10 +239,13 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    ofFill();
+   float backgroundAlpha = IsEnabled() ? 180 : 120;
+   if (dynamic_cast<Prefab*>(this) != nullptr)
+      backgroundAlpha = 60;
    if (IsEnabled())
-      ofSetColor(color.r * (.25f + highlight), color.g * (.25f + highlight), color.b * (.25f + highlight), 210);
+      ofSetColor(color.r * (.25f + highlight), color.g * (.25f + highlight), color.b * (.25f + highlight), backgroundAlpha);
    else
-      ofSetColor(color.r * .2f, color.g * .2f, color.b * .2f, 120);
+      ofSetColor(color.r * .2f, color.g * .2f, color.b * .2f, backgroundAlpha);
    //gModuleShader.begin();
    const float kHighlightGrowAmount = 40;
    ofRect(0 - highlight * kHighlightGrowAmount, -titleBarHeight - highlight * kHighlightGrowAmount,
@@ -272,6 +280,30 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          mEnabledCheckbox->Draw();
       }
 
+      if (mKeyboardFocusListener != nullptr && mKeyboardFocusListener->CanTakeFocus())
+      {
+         if ((gHoveredModule == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr) ||
+             IKeyboardFocusListener::GetActiveKeyboardFocus() == mKeyboardFocusListener)
+            ofSetColor(255, 255, 255, gModuleDrawAlpha);
+         else
+            ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
+         float squareSize = titleBarHeight / 2 - 1;
+         ofRect(w - 25, -titleBarHeight + 1, squareSize, squareSize, 1);
+         ofRect(w - 25, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+         ofRect(w - 25 - squareSize - 1, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+         ofRect(w - 25 + squareSize + 1, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+
+         if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mKeyboardFocusListener)
+         {
+            ofPushStyle();
+            ofSetLineWidth(.5f);
+            ofNoFill();
+            ofRect(w - 25 - squareSize - 2 - 1, -titleBarHeight,
+                   2 + squareSize + 1 + squareSize + 1 + squareSize + 2, titleBarHeight, 2);
+            ofPopStyle();
+         }
+      }
+
       if (IsSaveable() && !Minimized())
       {
          ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
@@ -296,8 +328,8 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    {
       float fadeRoundness = 100;
       float fadeLength = w / 3;
-      const float kFadeStrength = .75f;
-      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2f, color.g * .2f, color.b * .2f, 255 * kFadeStrength), nvgRGBA(0, 0, 0, 0));
+      const float kFadeStrength = .9f;
+      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2f, color.g * .2f, color.b * .2f, backgroundAlpha * kFadeStrength), nvgRGBA(0, 0, 0, 0));
       nvgBeginPath(gNanoVG);
       nvgRect(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight);
       nvgFillPaint(gNanoVG, shadowPaint);
@@ -319,7 +351,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    if (HasTitleBar())
    {
       ofSetColor(color * (1 - GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
-      DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 16);
+      DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 14);
    }
 
    bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
@@ -426,10 +458,13 @@ void IDrawableModule::Render()
    ofPopMatrix();
    ofPopStyle();
 
-   for (auto source : mPatchCableSources)
+   if (!Push2Control::sDrawingPush2Display)
    {
-      source->UpdatePosition(false);
-      source->DrawSource();
+      for (auto source : mPatchCableSources)
+      {
+         source->UpdatePosition(false);
+         source->DrawSource();
+      }
    }
 }
 
@@ -451,10 +486,30 @@ void IDrawableModule::RenderUnclipped()
    ofPopStyle();
 }
 
-void IDrawableModule::DrawPatchCables(bool parentMinimized)
+void IDrawableModule::DrawPatchCables(bool parentMinimized, bool inFront)
 {
    for (auto source : mPatchCableSources)
    {
+      ConnectionType type = source->GetConnectionType();
+      bool isHeld = false;
+      if (PatchCable::sActivePatchCable != nullptr)
+         isHeld = (PatchCable::sActivePatchCable->GetOwner() == source);
+      bool shouldDrawInFront = isHeld || (type != kConnectionType_Note && type != kConnectionType_Pulse && type != kConnectionType_Audio);
+      if (type == kConnectionType_Pulse)
+      {
+         for (auto const cable : source->GetPatchCables())
+         {
+            if (cable->GetTarget() != nullptr &&
+                dynamic_cast<IUIControl*>(cable->GetTarget()) != nullptr)
+            {
+               shouldDrawInFront = true;
+               break;
+            }
+         }
+      }
+      if ((inFront && !shouldDrawInFront) || (!inFront && shouldDrawInFront))
+         continue;
+
       source->UpdatePosition(parentMinimized);
       source->DrawCables(parentMinimized);
    }
@@ -530,19 +585,18 @@ void IDrawableModule::DrawConnection(IClickable* target)
 
 void IDrawableModule::SetTarget(IClickable* target)
 {
-   if (mMainPatchCableSource != nullptr)
-      mMainPatchCableSource->SetTarget(target);
-   else if (!mPatchCableSources.empty())
+   if (!mPatchCableSources.empty())
       mPatchCableSources[0]->SetTarget(target);
 }
 
 void IDrawableModule::SetUpPatchCables(std::string targets)
 {
-   assert(mMainPatchCableSource != nullptr);
+   PatchCableSource* source = GetPatchCableSource();
+   assert(source != nullptr);
    std::vector<std::string> targetVec = ofSplitString(targets, ",");
    if (targetVec.empty() || targets == "")
    {
-      mMainPatchCableSource->Clear();
+      source->Clear();
    }
    else
    {
@@ -550,7 +604,7 @@ void IDrawableModule::SetUpPatchCables(std::string targets)
       {
          IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
          if (target)
-            mMainPatchCableSource->AddPatchCable(target);
+            source->AddPatchCable(target);
       }
    }
 }
@@ -617,13 +671,19 @@ void IDrawableModule::OnClicked(float x, float y, bool right)
          mWasMinimizeAreaClicked = true;
          return;
       }
-      else if (!Minimized() && IsSaveable() &&
-               x > w - 10)
+      else if (!Minimized() && IsSaveable())
       {
-         if (TheSaveDataPanel->GetModule() == this)
-            TheSaveDataPanel->SetModule(nullptr);
-         else
-            TheSaveDataPanel->SetModule(this);
+         if (x > w - 10)
+         {
+            if (TheSaveDataPanel->GetModule() == this)
+               TheSaveDataPanel->SetModule(nullptr);
+            else
+               TheSaveDataPanel->SetModule(this);
+         }
+         else if (x > w - 30 && mKeyboardFocusListener != nullptr && mKeyboardFocusListener->CanTakeFocus())
+         {
+            IKeyboardFocusListener::SetActiveKeyboardFocus(mKeyboardFocusListener);
+         }
       }
    }
 
@@ -791,7 +851,7 @@ float IDrawableModule::GetMinimizedWidth()
    if (titleLabel != mLastTitleLabel)
    {
       mLastTitleLabel = titleLabel;
-      mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 16);
+      mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 14);
    }
    float width = mTitleLabelWidth;
    width += 10; //padding

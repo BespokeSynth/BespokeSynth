@@ -9,8 +9,9 @@ You can find the most recent builds for Mac/Windows/Linux at http://bespokesynth
 
 Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to discuss with the community.
 
-## Searchable Documentation
-Find searchable, community-written documentation here! https://bespokesynth.github.io/BespokeSynthDocs/
+## Documentation
+* [Official documentation](https://www.bespokesynth.com/docs/)
+* [Searchable, community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki)
 
 ## Screenshot
 ![screenshot](screenshot-1.png)

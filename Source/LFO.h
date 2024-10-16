@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__LFO__
-#define __modularSynth__LFO__
+#pragma once
 
-#include <iostream>
 #include "SynthGlobals.h"
 #include "Transport.h"
 #include "Oscillator.h"
@@ -76,5 +74,3 @@ private:
 
    static PerlinNoise sPerlinNoise;
 };
-
-#endif /* defined(__modularSynth__LFO__) */

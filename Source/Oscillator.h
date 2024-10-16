@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__Oscillator__
-#define __Bespoke__Oscillator__
+#pragma once
 
-#include <iostream>
 #include "SynthGlobals.h"
 #include "ADSR.h"
 
@@ -36,6 +34,13 @@ public:
    Oscillator(OscillatorType type)
    : mType(type)
    {}
+
+   enum class SyncMode
+   {
+      None,
+      Ratio,
+      Frequency
+   };
 
    OscillatorType GetType() const { return mType; }
    void SetType(OscillatorType type) { mType = type; }
@@ -55,5 +60,3 @@ private:
    float mShuffle{ 0 };
    float mSoften{ 0 };
 };
-
-#endif /* defined(__Bespoke__Oscillator__) */

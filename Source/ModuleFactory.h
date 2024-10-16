@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__ModuleFactory__
-#define __modularSynth__ModuleFactory__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 
 #include "juce_core/juce_core.h"
@@ -46,7 +44,8 @@ public:
       EffectChain,
       Prefab,
       Plugin,
-      MidiController
+      MidiController,
+      Preset
    };
 
    struct Spawnable
@@ -54,6 +53,7 @@ public:
       SpawnMethod mSpawnMethod{ SpawnMethod::Module };
       std::string mLabel{ "" };
       std::string mDecorator{ "" };
+      std::string mPresetModuleType{ "" };
       juce::PluginDescription mPluginDesc{};
 
       static std::string GetPluginLabel(juce::PluginDescription pluginDesc)
@@ -66,16 +66,11 @@ public:
 
       static bool CompareAlphabetical(Spawnable a, Spawnable b)
       {
-         if (a.mLabel == b.mLabel)
+         juce::String aLower = juce::String(a.mLabel).toLowerCase();
+         juce::String bLower = juce::String(b.mLabel).toLowerCase();
+         if (aLower == bLower)
             return a.mDecorator < b.mDecorator;
-         return a.mLabel < b.mLabel;
-      }
-
-      static bool CompareLength(Spawnable a, Spawnable b)
-      {
-         if (a.mLabel.length() == b.mLabel.length())
-            return a.mDecorator.length() < b.mDecorator.length();
-         return a.mLabel.length() < b.mLabel.length();
+         return aLower < bLower;
       }
    };
 
@@ -99,6 +94,7 @@ public:
    ModuleInfo GetModuleInfo(std::string typeName);
    bool IsExperimental(std::string typeName);
    static void GetPrefabs(std::vector<Spawnable>& prefabs);
+   static void GetPresets(std::vector<Spawnable>& presets);
    static std::string FixUpTypeName(std::string typeName);
 
    static constexpr const char* kPluginSuffix = "[plugin]";
@@ -111,5 +107,3 @@ private:
 
    std::map<std::string, ModuleInfo> mFactoryMap;
 };
-
-#endif /* defined(__modularSynth__ModuleFactory__) */

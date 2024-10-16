@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__LFOController__
-#define __modularSynth__LFOController__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "DropdownList.h"
 #include "Slider.h"
@@ -85,5 +83,3 @@ private:
    FloatSlider* mSlider{ nullptr };
    FloatSliderLFOControl* mLFO{ nullptr };
 };
-
-#endif /* defined(__modularSynth__LFOController__) */

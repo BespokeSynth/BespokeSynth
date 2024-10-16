@@ -36,7 +36,6 @@
 #include <vector>
 #include <algorithm>
 #include <array>
-#include <math.h>
 #include <cctype>
 #include <random>
 #include <float.h>
@@ -188,10 +187,10 @@ float Interp(float a, float start, float end);
 double GetPhaseInc(float freq);
 float FloatWrap(float num, float space);
 double DoubleWrap(double num, float space);
-void DrawTextNormal(std::string text, int x, int y, float size = 15);
-void DrawTextRightJustify(std::string text, int x, int y, float size = 15);
-void DrawTextBold(std::string text, int x, int y, float size = 15);
-float GetStringWidth(std::string text, float size = 15);
+void DrawTextNormal(std::string text, int x, int y, float size = 13);
+void DrawTextRightJustify(std::string text, int x, int y, float size = 13);
+void DrawTextBold(std::string text, int x, int y, float size = 13);
+float GetStringWidth(std::string text, float size = 13);
 void AssertIfDenormal(float input);
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize);
 float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, float channelBlend);

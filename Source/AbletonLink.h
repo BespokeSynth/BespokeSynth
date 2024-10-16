@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <memory>
 
 #include "IDrawableModule.h"
@@ -70,12 +69,12 @@ private:
       height = mHeight;
    }
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
    float mOffsetMs{ 0 };
-   FloatSlider* mOffsetMsSlider;
-   ClickButton* mResetButton;
+   FloatSlider* mOffsetMsSlider{ nullptr };
+   ClickButton* mResetButton{ nullptr };
 
    std::unique_ptr<ableton::Link> mLink;
    double mTempo{ 120 };

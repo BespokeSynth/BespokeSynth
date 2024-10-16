@@ -23,15 +23,13 @@
 //
 //
 
-#ifndef __Bespoke__CurveLooper__
-#define __Bespoke__CurveLooper__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
 #include "Checkbox.h"
 #include "Transport.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "EnvelopeEditor.h"
 
 class PatchCableSource;
@@ -94,5 +92,3 @@ private:
    ::ADSR mAdsr;
    ClickButton* mRandomizeButton{ nullptr };
 };
-
-#endif /* defined(__Bespoke__CurveLooper__) */

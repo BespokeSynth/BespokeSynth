@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __additiveSynth__MidiDevice__
-#define __additiveSynth__MidiDevice__
+#pragma once
 
-#include "OpenFrameworksPort.h"
 #include "ModularSynth.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
@@ -98,7 +96,7 @@ public:
    bool Reconnect();
    bool IsInputConnected(bool immediate);
 
-   const char* Name() { return mIsInputEnabled ? mDeviceNameIn.toRawUTF8() : mDeviceNameOut.toRawUTF8(); }
+   const char* Name() { return mIsInputEnabled ? mDeviceInInfo.name.toRawUTF8() : mDeviceOutInfo.name.toRawUTF8(); }
 
    std::vector<std::string> GetPortList(bool forInput);
 
@@ -119,13 +117,11 @@ public:
 private:
    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
 
-   juce::String mDeviceNameIn;
-   juce::String mDeviceNameOut;
+   juce::MidiDeviceInfo mDeviceInInfo;
+   juce::MidiDeviceInfo mDeviceOutInfo;
 
    std::unique_ptr<juce::MidiOutput> mMidiOut{ nullptr };
    MidiDeviceListener* mListener{ nullptr };
    int mOutputChannel{ 1 };
    bool mIsInputEnabled{ false };
 };
-
-#endif /* defined(__additiveSynth__MidiDevice__) */

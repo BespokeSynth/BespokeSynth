@@ -28,8 +28,6 @@
 #include "ModuleContainer.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "FloatSliderLFOControl.h"
-#include "ModuleSaveDataPanel.h"
 #include "TitleBar.h"
 #include "PerformanceTimer.h"
 #include "SynthGlobals.h"
@@ -59,7 +57,15 @@ void ModuleContainer::GetAllModules(std::vector<IDrawableModule*>& out)
    }
 }
 
-void ModuleContainer::Draw()
+void ModuleContainer::DrawContents()
+{
+   DrawPatchCables(!K(parentMinimized), !K(inFront));
+   DrawModules();
+   DrawPatchCables(!K(parentMinimized), K(inFront));
+   DrawUnclipped();
+}
+
+void ModuleContainer::DrawModules()
 {
    for (int i = (int)mModules.size() - 1; i >= 0; --i)
    {
@@ -95,16 +101,16 @@ void ModuleContainer::PostRender()
       mModules[i]->PostRender();
 }
 
-void ModuleContainer::DrawPatchCables(bool parentMinimized)
+void ModuleContainer::DrawPatchCables(bool parentMinimized, bool inFront)
 {
    if (mOwner != nullptr && mOwner->Minimized())
       parentMinimized = true;
 
    for (int i = (int)mModules.size() - 1; i >= 0; --i)
    {
-      mModules[i]->DrawPatchCables(parentMinimized);
+      mModules[i]->DrawPatchCables(parentMinimized, inFront);
       if (mModules[i]->GetContainer())
-         mModules[i]->GetContainer()->DrawPatchCables(parentMinimized);
+         mModules[i]->GetContainer()->DrawPatchCables(parentMinimized, inFront);
    }
 }
 

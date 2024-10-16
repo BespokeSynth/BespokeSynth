@@ -23,11 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__SampleVoice__
-#define __modularSynth__SampleVoice__
+#pragma once
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
 #include "IMidiVoice.h"
 #include "IVoiceParams.h"
 #include "ADSR.h"
@@ -66,5 +63,3 @@ private:
    float mPos{ 0 };
    IDrawableModule* mOwner{ nullptr };
 };
-
-#endif /* defined(__modularSynth__SampleVoice__) */

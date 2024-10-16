@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__ControllingSong__
-#define __Bespoke__ControllingSong__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
@@ -113,5 +111,3 @@ private:
    std::vector<int> mShuffleList{};
    std::vector<FollowingSong*> mFollowSongs{};
 };
-
-#endif /* defined(__Bespoke__ControllingSong__) */

@@ -31,7 +31,6 @@
 #include "GridController.h"
 #include "IPulseReceiver.h"
 #include "AudioSend.h"
-#include "MacroSlider.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -43,6 +42,7 @@ namespace
 }
 
 bool PatchCableSource::sAllowInsert = true;
+bool PatchCableSource::sIsLoadingModulePreset = false;
 
 PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 : mOwner(owner)
@@ -345,7 +345,7 @@ void PatchCableSource::Render()
          }
       }
 
-      if (mHoverIndex != -1)
+      if (mHoverIndex != -1 && mDefaultPatchBehavior != kDefaultPatchBehavior_Add)
       {
          if (mSide == Side::kBottom)
             cableY += kPatchCableSpacing;
@@ -374,7 +374,7 @@ ofVec2f PatchCableSource::GetCableStart(int index) const
    float cableX = mX;
    float cableY = mY;
 
-   if (mHoverIndex != -1)
+   if (mHoverIndex != -1 && mDefaultPatchBehavior != kDefaultPatchBehavior_Add)
    {
       if (mSide == Side::kBottom)
          cableY += kPatchCableSpacing * index;
@@ -493,10 +493,16 @@ bool PatchCableSource::MouseMoved(float x, float y)
 
 void PatchCableSource::MouseReleased()
 {
+   mValidTargets.clear();
    std::vector<PatchCable*> cables = mPatchCables; //copy, since list might get modified here
-   FindValidTargets();
    for (auto cable : cables)
-      cable->MouseReleased();
+   {
+      if (cable->IsDragging())
+      {
+         FindValidTargets();
+         cable->MouseReleased();
+      }
+   }
 }
 
 bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* = false */)
@@ -578,6 +584,9 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
       if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceClickRadius * kPatchCableSourceClickRadius)
          return i;
 
+      if (mDefaultPatchBehavior == kDefaultPatchBehavior_Add)
+         break;
+
       if (mSide == Side::kBottom)
          cableY += kPatchCableSpacing;
       else if (mSide == Side::kLeft)
@@ -617,19 +626,24 @@ void PatchCableSource::FindValidTargets()
    TheSynth->GetAllModules(allModules);
    for (auto module : allModules)
    {
-      if ((mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
+      if (module == mOwner)
+         continue;
+      if ((mType == kConnectionType_Pulse || mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
       {
          for (auto uicontrol : module->GetUIControls())
          {
             if (uicontrol->IsShowing() &&
                 (uicontrol->GetShouldSaveState() || dynamic_cast<ClickButton*>(uicontrol) != nullptr) &&
-                uicontrol->CanBeTargetedBy(this) &&
-                (!uicontrol->GetNoHover() || mType == kConnectionType_Grid))
+                uicontrol->CanBeTargetedBy(this))
                mValidTargets.push_back(uicontrol);
          }
+         for (auto uigrid : module->GetUIGrids())
+         {
+            if (uigrid->IsShowing() &&
+                uigrid->CanBeTargetedBy(this))
+               mValidTargets.push_back(uigrid);
+         }
       }
-      if (module == mOwner)
-         continue;
       if (module == mOwner->GetParent())
          continue;
       if (mTypeFilter.empty() == false && !VectorContains(module->GetTypeName(), mTypeFilter))
@@ -734,7 +748,12 @@ void PatchCableSource::SaveState(FileStreamOut& out)
 
 void PatchCableSource::LoadState(FileStreamIn& in)
 {
-   ClearPatchCables();
+   bool doDummyLoad = false;
+   if (sIsLoadingModulePreset)
+      doDummyLoad = true;
+
+   if (!doDummyLoad)
+      ClearPatchCables();
 
    int size;
    in >> size;
@@ -743,27 +762,32 @@ void PatchCableSource::LoadState(FileStreamIn& in)
    {
       std::string path;
       in >> path;
-      IClickable* target = TheSynth->FindModule(path, false);
-      if (target == nullptr)
+
+      if (!doDummyLoad)
       {
-         try
+         IClickable* target = TheSynth->FindModule(path, false);
+         if (target == nullptr)
          {
-            target = TheSynth->FindUIControl(path);
+            try
+            {
+               target = TheSynth->FindUIControl(path);
+            }
+            catch (UnknownUIControlException& e)
+            {
+            }
          }
-         catch (UnknownUIControlException& e)
-         {
-         }
+
+         if (TheSynth->IsDuplicatingModule() && mType == kConnectionType_Modulator)
+            target = nullptr; //TODO(Ryan) make it so that when you're duplicating a group, modulators preserve connections to the new copies of controls within that group
+
+         mPatchCables.push_back(new PatchCable(this));
+         assert(i == (int)mPatchCables.size() - 1);
+         SetPatchCableTarget(mPatchCables[i], target, false);
       }
-
-      if (TheSynth->IsDuplicatingModule() && mType == kConnectionType_Modulator)
-         target = nullptr; //TODO(Ryan) make it so that when you're duplicating a group, modulators preserve connections to the new copies of controls within that group
-
-      mPatchCables.push_back(new PatchCable(this));
-      assert(i == (int)mPatchCables.size() - 1);
-      SetPatchCableTarget(mPatchCables[i], target, false);
    }
 
-   mOwner->PostRepatch(this, false);
+   if (!doDummyLoad)
+      mOwner->PostRepatch(this, false);
 }
 
 void NoteHistory::AddEvent(double time, bool on, int data)

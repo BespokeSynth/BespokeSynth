@@ -31,6 +31,8 @@
 #include "UIControlMacros.h"
 #include "Checkbox.h"
 
+#include "juce_core/juce_core.h"
+
 EQModule::EQModule()
 : IAudioProcessor(gBufferSize)
 , mFFT(kNumFFTBins)
@@ -415,6 +417,7 @@ bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, boo
 
 void EQModule::KeyPressed(int key, bool isRepeat)
 {
+   IDrawableModule::KeyPressed(key, isRepeat);
    if (mHoveredFilterHandleIndex != -1)
    {
       auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;

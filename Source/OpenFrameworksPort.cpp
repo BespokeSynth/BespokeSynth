@@ -17,11 +17,11 @@
 **/
 /*
  ==============================================================================
- 
+
  OpenFrameworksPort.cpp
  Created: 30 May 2016 9:13:01pm
  Author:  Ryan Challinor
- 
+
  ==============================================================================
  */
 
@@ -33,9 +33,6 @@
 using namespace juce::gl;
 using namespace juce;
 #include <VersionInfo.h>
-
-//#include <chrono>
-#include <time.h>
 
 #include "OpenFrameworksPort.h"
 #include "nanovg/nanovg.h"
@@ -69,7 +66,8 @@ std::string ofToDataPath(const std::string& path)
 
    static const auto sDataDir = []
    {
-      auto dataDir = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+      auto defaultDataDir = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+      auto dataDir = juce::SystemStats::getEnvironmentVariable("BESPOKE_DATA_DIR", defaultDataDir).toStdString();
 #if BESPOKE_WINDOWS
       std::replace(begin(dataDir), end(dataDir), '\\', '/');
 #endif
@@ -296,6 +294,12 @@ float ofToFloat(const std::string& floatString)
    return str.getFloatValue();
 }
 
+double ofToDouble(const std::string& doubleString)
+{
+   const String str(doubleString);
+   return str.getDoubleValue();
+}
+
 int ofHexToInt(const std::string& hexString)
 {
    String str(hexString);
@@ -376,16 +380,12 @@ float ofRandom(float max)
 
 float ofRandom(float x, float y)
 {
-   float high = 0;
-   float low = 0;
-   float randNum = 0;
    // if there is no range, return the value
    if (x == y)
       return x; // float == ?, wise? epsilon?
-   high = MAX(x, y);
-   low = MIN(x, y);
-   randNum = low + ((high - low) * gRandom01(gRandom));
-   return randNum;
+   const float high = MAX(x, y);
+   const float low = MIN(x, y);
+   return low + ((high - low) * gRandom01(gRandom));
 }
 
 void ofSetCircleResolution(float res)
@@ -695,6 +695,7 @@ void ofColor::setHsb(int hue, int saturation, int brightness)
       float tv = ((1.f - saturationNorm * (1.f - hueSixRemainder)) * brightness);
       switch (hueSixCategory)
       {
+         default:
          case 0:
          case 6: // r
             r = brightness;

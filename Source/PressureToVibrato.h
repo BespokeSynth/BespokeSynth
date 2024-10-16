@@ -23,13 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__PressureToVibrato__
-#define __Bespoke__PressureToVibrato__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "ModulationChain.h"
 #include "DropdownList.h"
 
@@ -74,5 +72,3 @@ private:
 
    Modulations mModulation{ true };
 };
-
-#endif /* defined(__Bespoke__PressureToVibrato__) */

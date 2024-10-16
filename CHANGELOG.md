@@ -2,8 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [1.2.1] - 2023-09-16
+
+### Added
+
+- Added total duration to songbuilder sequencer
+- Added corner radius setting to the globalcontrols module
+- Added the ability to execute "console" commands directly from OSC using the `/bespoke/console` address
+- Added buffershuffler features: fourtet effect and ability to only play when triggered
+- Added new "cable_alpha" option in settings and in the `globalcontrols` module that allows you to reduce cables opacity to nearly invisible
+- Added an option to wrap mouse around when panning canvas
+
+
+### Changed
+
+- Made `valuesetter` force value updates
+- Adjusted transport minimum tempo to 20 to sidestep weird issues when tempo is lower
+- Allow toggling enabling state of prefabs, this will attempt to toggle the enabled state of all modules contained within
+- Note cables have been made less thick
+- Audio, note, and pulse cables now draw behind modules
+- Changed how settings menu is positioned so it always spawns on-screen
+- Adjusted background color alpha of `prefab` to make it less imposing-looking
+- Changed how pulse width parameter affects sawtooth wave
+
+
+### Fixed
+
+- Fixed an issue where savestates with `effectchain` modules saved prior to the 2022-11-25 build would not load
+- Fixed an issues with the absence of modulation using incorrect defaults
+- Fixed NaN when adjusting slider with out-of-range value
+- Fixed velocity not working in drumplayer
+- Fixed an issue where effectchain mix sliders couldn't be targeted by modulators
+- Fixed a bug in the cosine window of the granulators that caused clicky noises at the end of grains
+- Fixed a deadlock by upgrading JUCE that was causing startup hangs on MacOS 13
+
 
 ## [1.2.0] - 2023-07-13
 
@@ -380,6 +414,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Commit log diffs
 
-[unreleased]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.1.0...main
+[unreleased]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.1...main
+[1.2.1]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/BespokeSynth/BespokeSynth/tree/v1.0.0

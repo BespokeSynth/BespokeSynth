@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __additiveSynth__BitcrushEffect__
-#define __additiveSynth__BitcrushEffect__
+#pragma once
 
-#include <iostream>
 #include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
@@ -72,5 +70,3 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
 };
-
-#endif /* defined(__additiveSynth__BitcrushEffect__) */

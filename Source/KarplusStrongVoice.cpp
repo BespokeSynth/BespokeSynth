@@ -125,14 +125,14 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       if (samplesAgo < mBuffer.Size())
       {
          //interpolated delay
-         int pos = int(samplesAgo);
+         int delay_pos = int(samplesAgo);
          int posNext = int(samplesAgo) + 1;
-         if (pos < mBuffer.Size())
+         if (delay_pos < mBuffer.Size())
          {
-            float sample = pos < 0 ? 0 : mBuffer.GetSample(pos, 0);
+            float delay_sample = delay_pos < 0 ? 0 : mBuffer.GetSample(delay_pos, 0);
             float nextSample = posNext >= mBuffer.Size() ? 0 : mBuffer.GetSample(posNext, 0);
-            float a = samplesAgo - pos;
-            feedbackSample = (1 - a) * sample + a * nextSample; //interpolate
+            float a = samplesAgo - delay_pos;
+            feedbackSample = (1 - a) * delay_sample + a * nextSample; //interpolate
             JUCE_UNDENORMALISE(feedbackSample);
          }
       }
@@ -142,19 +142,25 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       float feedback = mFilteredSample * sqrtf(mVoiceParams->mFeedback + GetPressure(pos) * .02f) * mMuteRamp.Value(time);
       if (mVoiceParams->mInvert)
          feedback *= -1;
-      sample += feedback;
+
+      float sampleForFeedbackBuffer = sample + feedback;
+      float outputSample;
+      if (mVoiceParams->mSourceType == kSourceTypeInputNoEnvelope)
+         outputSample = feedback; //don't include dry input in the output
+      else
+         outputSample = sampleForFeedbackBuffer;
       JUCE_UNDENORMALISE(sample);
 
-      mBuffer.Write(sample, 0);
+      mBuffer.Write(sampleForFeedbackBuffer, 0);
 
       if (channels == 1)
       {
-         destBuffer->GetChannel(0)[pos] += sample;
+         destBuffer->GetChannel(0)[pos] += outputSample;
       }
       else
       {
-         destBuffer->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
-         destBuffer->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
+         destBuffer->GetChannel(0)[pos] += outputSample * GetLeftPanGain(GetPan());
+         destBuffer->GetChannel(1)[pos] += outputSample * GetRightPanGain(GetPan());
       }
 
       time += sampleIncrementMs;

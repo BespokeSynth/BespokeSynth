@@ -106,6 +106,8 @@ target_sources(BespokeSynth PRIVATE
     CommentDisplay.h
     Compressor.cpp
     Compressor.h
+    ControlRecorder.cpp
+    ControlRecorder.h
     ControlSequencer.cpp
     ControlSequencer.h
     ControlTactileFeedback.cpp
@@ -116,6 +118,8 @@ target_sources(BespokeSynth PRIVATE
     Curve.h
     CurveLooper.cpp
     CurveLooper.h
+    DataProvider.cpp
+    DataProvider.h
     DCOffset.cpp
     DCOffset.h
     DCRemoverEffect.cpp
@@ -126,6 +130,10 @@ target_sources(BespokeSynth PRIVATE
     DelayEffect.h
     DistortionEffect.cpp
     DistortionEffect.h
+    DotGrid.cpp
+    DotGrid.h
+    DotSequencer.cpp
+    DotSequencer.h
     DropdownList.cpp
     DropdownList.h
     DrumPlayer.cpp
@@ -146,6 +154,8 @@ target_sources(BespokeSynth PRIVATE
     EnvelopeEditor.h
     EnvelopeModulator.cpp
     EnvelopeModulator.h
+    EuclideanSequencer.cpp
+    EuclideanSequencer.h
     EventCanvas.cpp
     EventCanvas.h
     FFT.cpp
@@ -241,6 +251,8 @@ target_sources(BespokeSynth PRIVATE
     KeyboardDisplay.h
     Kicker.cpp
     Kicker.h
+    LabelDisplay.cpp
+    LabelDisplay.h
     LFO.cpp
     LFO.h
     LFOController.cpp
@@ -493,6 +505,8 @@ target_sources(BespokeSynth PRIVATE
     PitchToCV.h
     PitchToSpeed.cpp
     PitchToSpeed.h
+    PitchToValue.cpp
+    PitchToValue.h
     PlaySequencer.cpp
     PlaySequencer.h
     PolyphonyMgr.cpp
@@ -529,6 +543,8 @@ target_sources(BespokeSynth PRIVATE
     PulseGate.h
     PulseHocket.cpp
     PulseHocket.h
+    PulseRouter.cpp
+    PulseRouter.h
     PulseSequence.cpp
     PulseSequence.h
     PulseTrain.cpp
@@ -541,6 +557,10 @@ target_sources(BespokeSynth PRIVATE
     Push2Control.h
     QuickSpawnMenu.cpp
     QuickSpawnMenu.h
+    QwertyController.cpp
+    QwertyController.h
+    QwertyToPitchMapping.cpp
+    QwertyToPitchMapping.h
     RadioButton.cpp
     RadioButton.h
     RadioSequencer.cpp
@@ -555,6 +575,8 @@ target_sources(BespokeSynth PRIVATE
     Razor.h
     Rewriter.cpp
     Rewriter.h
+    RhythmSequencer.cpp
+    RhythmSequencer.h
     RingModulator.cpp
     RingModulator.h
     RollingBuffer.cpp
@@ -581,6 +603,8 @@ target_sources(BespokeSynth PRIVATE
     Sampler.h
     SamplerGrid.cpp
     SamplerGrid.h
+    SaveStateLoader.cpp
+    SaveStateLoader.h
     Scale.cpp
     Scale.h
     ScaleDegree.cpp
@@ -695,6 +719,8 @@ target_sources(BespokeSynth PRIVATE
     Vocoder.h
     VocoderCarrierInput.cpp
     VocoderCarrierInput.h
+    VoiceSetter.cpp
+    VoiceSetter.h
     VolcaBeatsControl.cpp
     VolcaBeatsControl.h
     WaveformViewer.cpp
@@ -793,6 +819,10 @@ if (APPLE)
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
 
+    IF (MINGW)
+        target_link_libraries(BespokeSynth PRIVATE iphlpapi)
+    endif()
+
     if (BESPOKE_ASIO_SDK_LOCATION)
         message( STATUS "Including ASIO from ${BESPOKE_ASIO_SDK_LOCATION}")
         target_compile_definitions(BespokeSynth PRIVATE JUCE_ASIO=1)
@@ -820,6 +850,7 @@ else ()
     install(TARGETS BespokeSynth DESTINATION bin)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/resource DESTINATION share/BespokeSynth)
     install(FILES ${CMAKE_SOURCE_DIR}/scripts/installer_linux/BespokeSynth.desktop DESTINATION share/applications)
+    install(FILES ${CMAKE_SOURCE_DIR}/scripts/installer_linux/com.bespokesynth.BespokeSynth.metainfo.xml DESTINATION share/metainfo)
     install(FILES ${CMAKE_SOURCE_DIR}/bespoke_icon.png DESTINATION share/icons/hicolor/512x512/apps)
 endif ()
 

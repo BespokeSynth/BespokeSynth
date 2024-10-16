@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__Canvas__
-#define __Bespoke__Canvas__
+#pragma once
 
-#include <iostream>
 #include "IUIControl.h"
 #include "CanvasElement.h"
 
@@ -137,6 +135,8 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool GetNoHover() const override { return true; }
+   bool CanBeTargetedBy(PatchCableSource* source) const override;
+   bool ShouldSerializeForSnapshot() const override { return true; }
 
    float mViewStart{ 0 };
    float mViewEnd;
@@ -189,5 +189,3 @@ private:
 
    friend CanvasControls;
 };
-
-#endif /* defined(__Bespoke__Canvas__) */

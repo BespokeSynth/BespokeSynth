@@ -23,14 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__ButterworthFilterEffect__
-#define __Bespoke__ButterworthFilterEffect__
+#pragma once
 
 #include "IAudioEffect.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "Slider.h"
-#include "Transport.h"
 #include "FilterButterworth24db.h"
 
 class ButterworthFilterEffect : public IAudioEffect, public IDropdownListener, public IFloatSliderListener
@@ -88,5 +85,3 @@ private:
 
    bool mCoefficientsHaveChanged{ true };
 };
-
-#endif /* defined(__Bespoke__ButterworthFilterEffect__) */

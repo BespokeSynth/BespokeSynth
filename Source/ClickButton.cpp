@@ -29,6 +29,8 @@
 
 #include <cstring>
 
+#include "PatchCableSource.h"
+
 ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)
 : mOwner(owner)
 , mDisplayStyle(displayStyle)
@@ -54,9 +56,14 @@ ClickButton::~ClickButton()
 void ClickButton::SetLabel(const char* label)
 {
    SetName(label);
+   UpdateWidth();
+}
+
+void ClickButton::UpdateWidth()
+{
    if (mDisplayStyle == ButtonDisplayStyle::kText || mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
    {
-      mWidth = GetStringWidth(label) + 3 + .25f * strnlen(label, 50);
+      mWidth = GetStringWidth(GetDisplayName()) + 3 + .25f * strnlen(GetDisplayName().c_str(), 50);
       if (mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
          mWidth += 20;
    }
@@ -86,7 +93,7 @@ void ClickButton::Render()
    if (mDisplayStyle == ButtonDisplayStyle::kText)
    {
       ofSetColor(textColor);
-      DrawTextNormal(Name(), mX + 2, mY + 12);
+      DrawTextNormal(GetDisplayName(), mX + 2, mY + 12);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kPlay)
    {
@@ -126,7 +133,7 @@ void ClickButton::Render()
          float x = mX + 4 + i * 3;
          ofLine(x, mY + 7 - height / 2, x, mY + 7 + height / 2);
       }
-      DrawTextNormal(Name(), mX + 22, mY + 12);
+      DrawTextNormal(GetDisplayName(), mX + 22, mY + 12);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
    {
@@ -134,7 +141,7 @@ void ClickButton::Render()
       ofFill();
       ofRect(mX + 2, mY + 2, 7, 5, 2);
       ofRect(mX + 2, mY + 4, 16, 9, 2);
-      DrawTextNormal(Name(), mX + 22, mY + 12);
+      DrawTextNormal(GetDisplayName(), mX + 22, mY + 12);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kArrowRight)
    {
@@ -178,6 +185,19 @@ void ClickButton::Render()
 bool ClickButton::ButtonLit() const
 {
    return mClickTime + 200 > gTime;
+}
+
+bool ClickButton::CanBeTargetedBy(PatchCableSource* source) const
+{
+   if (source->GetConnectionType() == kConnectionType_Pulse)
+      return true;
+   return IUIControl::CanBeTargetedBy(source);
+}
+
+void ClickButton::OnPulse(double time, float velocity, int flags)
+{
+   if (velocity > 0)
+      DoClick(time);
 }
 
 void ClickButton::OnClicked(float x, float y, bool right)

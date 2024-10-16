@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Grid__
-#define __modularSynth__Grid__
+#pragma once
 
-#include <iostream>
 #include "IUIControl.h"
 #include "SynthGlobals.h"
 
@@ -93,6 +91,7 @@ public:
    void SetClickValueSubdivisions(int subdivisions) { mClickSubdivisions = subdivisions; }
    float GetSubdividedValue(float position) const;
    bool GetNoHover() const override { return true; }
+   bool CanBeTargetedBy(PatchCableSource* source) const override;
 
    enum GridMode
    {
@@ -164,5 +163,3 @@ private:
    bool mMomentary{ false };
    int mClickSubdivisions{ 1 };
 };
-
-#endif /* defined(__modularSynth__Grid__) */

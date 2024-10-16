@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__FFT__
-#define __modularSynth__FFT__
+#pragma once
 
-#include <iostream>
 #include "SynthGlobals.h"
 
 // Variables for FFT routine
@@ -82,6 +80,3 @@ void mayer_realfft(int n, REAL* real);
 void mayer_realifft(int n, REAL* real);
 
 #endif
-
-
-#endif /* defined(__modularSynth__FFT__) */

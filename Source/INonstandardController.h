@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef Bespoke_INonstandardController_h
-#define Bespoke_INonstandardController_h
+#pragma once
 
 #include "MidiController.h"
 
@@ -43,5 +42,3 @@ public:
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in) = 0;
 };
-
-#endif

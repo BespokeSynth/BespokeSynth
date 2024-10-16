@@ -27,11 +27,8 @@
 
 #pragma once
 
-#include <iostream>
-
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 #include "TextEntry.h"
 

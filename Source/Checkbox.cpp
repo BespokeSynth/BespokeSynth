@@ -27,6 +27,7 @@
 #include "IDrawableModule.h"
 #include "SynthGlobals.h"
 #include "FileStream.h"
+#include "PatchCable.h"
 
 Checkbox::Checkbox(IDrawableModule* owner, const char* label, int x, int y, bool* var)
 : mVar(var)
@@ -203,12 +204,24 @@ void Checkbox::Increment(float amount)
    CalcSliderVal();
 }
 
+bool Checkbox::CanBeTargetedBy(PatchCableSource* source) const
+{
+   if (source->GetConnectionType() == kConnectionType_Pulse)
+      return true;
+   return IUIControl::CanBeTargetedBy(source);
+}
+
 bool Checkbox::CheckNeedsDraw()
 {
    if (IUIControl::CheckNeedsDraw())
       return true;
 
    return *mVar != mLastDisplayedValue;
+}
+
+void Checkbox::OnPulse(double time, float velocity, int flags)
+{
+   SetValue(*mVar ? 0 : 1, time, false);
 }
 
 namespace

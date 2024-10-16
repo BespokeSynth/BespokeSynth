@@ -26,14 +26,32 @@
 #include "FileStream.h"
 #include "ModularSynth.h"
 
+#include "juce_core/juce_core.h"
+
 //static
 bool FileStreamIn::s32BitMode = false;
 
-FileStreamOut::FileStreamOut(const std::string& file)
-: mStream(std::make_unique<juce::FileOutputStream>(juce::File{ file }))
+static std::unique_ptr<juce::FileOutputStream> MakeFileOutStream(const std::string& path)
 {
-   mStream->setPosition(0);
-   mStream->truncate();
+   auto stream = std::make_unique<juce::FileOutputStream>(juce::File{ path });
+   stream->setPosition(0);
+   stream->truncate();
+   return stream;
+}
+
+FileStreamOut::FileStreamOut(const std::string& file)
+: mStream(MakeFileOutStream(file))
+{
+}
+
+FileStreamOut::FileStreamOut(juce::MemoryBlock& block, bool appendToExistingBlockContent)
+: mStream(std::make_unique<juce::MemoryOutputStream>(block, appendToExistingBlockContent))
+{
+}
+
+FileStreamOut::FileStreamOut(std::unique_ptr<juce::OutputStream>&& stream)
+: mStream(std::move(stream))
+{
 }
 
 FileStreamOut::~FileStreamOut()
@@ -43,6 +61,16 @@ FileStreamOut::~FileStreamOut()
 
 FileStreamIn::FileStreamIn(const std::string& file)
 : mStream(std::make_unique<juce::FileInputStream>(juce::File{ file }))
+{
+}
+
+FileStreamIn::FileStreamIn(const juce::MemoryBlock& block)
+: mStream(std::make_unique<juce::MemoryInputStream>(block, false))
+{
+}
+
+FileStreamIn::FileStreamIn(std::unique_ptr<juce::InputStream>&& stream)
+: mStream(std::move(stream))
 {
 }
 
@@ -102,7 +130,7 @@ void FileStreamOut::WriteGeneric(const void* buffer, int size)
    mStream->write(buffer, size);
 }
 
-juce::int64 FileStreamOut::GetSize() const
+std::int64_t FileStreamOut::GetSize() const
 {
    return mStream->getPosition();
 }
@@ -139,23 +167,24 @@ FileStreamIn& FileStreamIn::operator>>(double& var)
 
 FileStreamIn& FileStreamIn::operator>>(std::string& var)
 {
-   uint64_t len;
+   uint64_t len64;
    if (s32BitMode)
    {
       uint32_t len32;
       mStream->read(&len32, sizeof(len32));
-      len = len32;
+      len64 = len32;
    }
    else
    {
-      mStream->read(&len, sizeof(len));
+      mStream->read(&len64, sizeof(len64));
    }
 
    if (TheSynth->IsLoadingModule())
-      LoadStateValidate(len < sMaxStringLength); //probably garbage beyond this point
+      LoadStateValidate(len64 < sMaxStringLength); //probably garbage beyond this point
    else
-      assert(len < sMaxStringLength); //probably garbage beyond this point
+      assert(len64 < sMaxStringLength); //probably garbage beyond this point
 
+   size_t len = len64;
    var.resize(len);
    mStream->read(var.data(), len);
    return *this;
@@ -196,5 +225,8 @@ int FileStreamIn::GetFilePosition() const
 
 bool FileStreamIn::OpenedOk() const
 {
-   return mStream->openedOk();
+   if (auto* file = dynamic_cast<juce::FileInputStream*>(mStream.get()))
+      return file->openedOk();
+
+   return true;
 }

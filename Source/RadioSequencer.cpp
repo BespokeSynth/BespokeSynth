@@ -33,7 +33,7 @@
 
 RadioSequencer::RadioSequencer()
 {
-   mTransportPriority = 0;
+   mTransportPriority = ITimeListener::kTransportPriorityEarly;
 }
 
 void RadioSequencer::Init()
@@ -323,7 +323,6 @@ void RadioSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time
          int oldLengthPow2 = std::max(1, MathUtils::HighestPow2(oldVal));
          for (int i = oldVal; i < mLength; ++i)
          {
-            int loopedFrom = i % oldLengthPow2;
             for (int row = 0; row < mGrid->GetRows(); ++row)
                mGrid->SetVal(i, row, mGrid->GetVal(i % oldLengthPow2, row));
          }

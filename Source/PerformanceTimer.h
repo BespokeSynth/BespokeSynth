@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PerformanceTimer__
-#define __Bespoke__PerformanceTimer__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 
@@ -63,5 +62,3 @@ private:
 
    std::vector<Cost> mCostTable;
 };
-
-#endif /* defined(__Bespoke__PerformanceTimer__) */

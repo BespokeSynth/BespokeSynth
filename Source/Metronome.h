@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Metronome__
-#define __modularSynth__Metronome__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "EnvOscillator.h"
 #include "IDrawableModule.h"
@@ -85,5 +83,3 @@ private:
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-
-#endif /* defined(__modularSynth__Metronome__) */

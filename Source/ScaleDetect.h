@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__ScaleDetect__
-#define __modularSynth__ScaleDetect__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "ClickButton.h"
@@ -85,5 +83,3 @@ private:
    DropdownList* mMatchesDropdown{ nullptr };
    int mSelectedMatch{ 0 };
 };
-
-#endif /* defined(__modularSynth__ScaleDetect__) */

@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__DelayEffect__
-#define __modularSynth__DelayEffect__
+#pragma once
 
-#include <iostream>
 #include "IAudioEffect.h"
 #include "RollingBuffer.h"
 #include "Slider.h"
@@ -106,5 +104,3 @@ private:
 
    bool mFeedbackModuleMode{ false }; //special mode when this delay effect is being used in a FeedbackModule
 };
-
-#endif /* defined(__modularSynth__DelayEffect__) */

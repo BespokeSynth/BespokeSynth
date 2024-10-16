@@ -29,7 +29,6 @@
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
-#include "PatchCableSource.h"
 #include "ModulationChain.h"
 
 NoteToPulse::NoteToPulse()

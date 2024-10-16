@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PatchCableSource__
-#define __Bespoke__PatchCableSource__
+#pragma once
 
 #include "PatchCable.h"
 #include "IClickable.h"
@@ -160,11 +159,13 @@ public:
       height = 10;
    }
    void KeyPressed(int key, bool isRepeat);
+   bool IsHovered() const { return mHoverIndex != -1; }
 
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
    static bool sAllowInsert;
+   static bool sIsLoadingModulePreset;
 
 protected:
    void OnClicked(float x, float y, bool right) override;
@@ -214,5 +215,3 @@ private:
    bool mParentMinimized{ false };
    IDrawableModule* mLastSeenAutopatchableModule{ nullptr };
 };
-
-#endif /* defined(__Bespoke__PatchCableSource__) */

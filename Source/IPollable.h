@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef modularSynth_IPollable_h
-#define modularSynth_IPollable_h
+#pragma once
 
 class IPollable
 {
@@ -32,5 +31,3 @@ public:
    virtual ~IPollable() {}
    virtual void Poll() {}
 };
-
-#endif

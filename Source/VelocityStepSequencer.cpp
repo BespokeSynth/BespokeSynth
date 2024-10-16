@@ -28,8 +28,6 @@
 #include "Scale.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
-#include "VelocityStepSequencer.h"
-#include "LaunchpadInterpreter.h"
 #include "FillSaveDropdown.h"
 #include "MidiController.h"
 
@@ -176,7 +174,6 @@ void VelocityStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, doub
 void VelocityStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("chord_progression_mode", moduleInfo);
    mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
 
    SetUpFromSaveData();

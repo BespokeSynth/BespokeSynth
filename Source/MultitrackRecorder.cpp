@@ -83,7 +83,7 @@ void MultitrackRecorder::DrawModule()
 
    mHeight = posY;
 
-   mModuleContainer.Draw();
+   mModuleContainer.DrawModules();
 }
 
 void MultitrackRecorder::AddTrack()

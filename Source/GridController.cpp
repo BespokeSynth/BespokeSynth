@@ -25,7 +25,6 @@
 
 #include "GridController.h"
 #include "ModularSynth.h"
-#include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
 
 GridControlTarget::GridControlTarget(IGridControllerListener* owner, const char* name, int x, int y)
@@ -116,8 +115,8 @@ void GridControllerMidi::OnControllerPageSelected()
 
 void GridControllerMidi::OnInput(int control, float velocity)
 {
-   int x;
-   int y;
+   int x = 0;
+   int y = 0;
    bool found = false;
    for (x = 0; x < mCols; ++x)
    {

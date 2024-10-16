@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__EventCanvas__
-#define __Bespoke__EventCanvas__
+#pragma once
 
 #include "Transport.h"
 #include "Checkbox.h"
@@ -116,5 +115,3 @@ private:
    const int kMaxEventRows = 256;
    std::vector<ControlConnection> mRowConnections;
 };
-
-#endif /* defined(__Bespoke__EventCanvas__) */

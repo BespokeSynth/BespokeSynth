@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__AudioRouter__
-#define __modularSynth__AudioRouter__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "RadioButton.h"
@@ -77,6 +75,3 @@ private:
    int mLastProcessedRouteIndex{ 0 };
    bool mOnlyShowActiveCable{ false };
 };
-
-
-#endif /* defined(__modularSynth__AudioRouter__) */

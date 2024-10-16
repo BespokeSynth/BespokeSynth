@@ -25,7 +25,6 @@
 
 #include "LaunchpadKeyboard.h"
 #include "SynthGlobals.h"
-#include "IAudioSource.h"
 #include "Scale.h"
 #include "ModularSynth.h"
 #include "Chorder.h"
@@ -143,6 +142,7 @@ void LaunchpadKeyboard::CreateUIControls()
 
    mLayoutDropdown->AddLabel("chromatic", kChromatic);
    mLayoutDropdown->AddLabel("diatonic", kDiatonic);
+   mLayoutDropdown->AddLabel("major thirds", kMajorThirds);
    mLayoutDropdown->AddLabel("chord indiv", kChordIndividual);
    mLayoutDropdown->AddLabel("chord", kChord);
    mLayoutDropdown->AddLabel("guitar", kGuitar);
@@ -281,20 +281,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
    }
 
    if (mDisplayer == nullptr) //we don't have a displayer, handle it ourselves
-   {
       UpdateLights();
-
-      int lowestPitch = -1;
-      for (int i = 0; i < 128; ++i)
-      {
-         if (mCurrentNotes[i] > 0)
-         {
-            lowestPitch = i;
-            break;
-         }
-      }
-      lowestPitch -= TheScale->GetPitchesPerOctave();
-   }
 }
 
 void LaunchpadKeyboard::PressedNoteFor(int x, int y, int velocity)
@@ -463,7 +450,7 @@ void LaunchpadKeyboard::DrawModuleUnclipped()
       DrawTextNormal(mDebugDisplayText, 0, 90);
 
       for (int i = 0; i < 128; ++i)
-         DrawTextNormal(ofToString(i) + " " + ofToString(mCurrentNotes[i]), 180 + (i / 24) * 20, (i % 24) * 9, 8);
+         DrawTextNormal(ofToString(i) + " " + ofToString(mCurrentNotes[i]), 180 + (i / 24) * 20, (i % 24) * 9, 6);
    }
 }
 
@@ -496,6 +483,21 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
          }
       }
       return mRootNote + x + 5 * y + TheScale->GetPitchesPerOctave() * mOctave;
+   }
+   if (mLayout == kMajorThirds)
+   {
+      if (mArrangementMode == kFive)
+      {
+         if (x < 3)
+         {
+            return GridToPitchChordSection(x, y);
+         }
+         else
+         {
+            x -= 3;
+         }
+      }
+      return mRootNote + x + 4 * y + TheScale->GetPitchesPerOctave() * mOctave;
    }
    if (mLayout == kGuitar)
    {
@@ -636,28 +638,11 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
    int pitch = GridToPitch(x, y);
    bool inScale = TheScale->MakeDiatonic(pitch) == pitch;
    bool isRoot = pitch % TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot();
-   bool isHeld = false;
-   bool isSameOctave = false;
+   bool isHeld = GetHeldVelocity(GridToPitch(x, y)) > 0;
    bool isInPentatonic = pitch >= 0 && TheScale->IsInPentatonic(pitch);
    bool isChordButton = pitch != INVALID_PITCH && pitch < 0;
    bool isPressedChordButton = isChordButton && IsChordButtonPressed(pitch);
    bool isChorderEnabled = mChorder && mChorder->IsEnabled();
-
-   if (mLayout == kChord)
-   {
-      isHeld = GetHeldVelocity(GridToPitch(x, y)) > 0;
-      isSameOctave = false;
-   }
-   else
-   {
-      isHeld = GetHeldVelocity(GridToPitch(x, y)) > 0;
-      for (int i = 0; i < 128; ++i)
-      {
-         if (i % TheScale->GetPitchesPerOctave() == pitch % TheScale->GetPitchesPerOctave() &&
-             GetHeldVelocity(i) > 0)
-            isSameOctave = true;
-      }
-   }
 
    GridColor color;
    if (pitch == INVALID_PITCH)
@@ -701,10 +686,6 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
    {
       color = kGridColor1Bright;
    }
-   /*else if (isSameOctave)
-   {
-      color = kGridColor3Dim;
-   }*/
    else if (mLayout == kDrum || mLayout == kAllPads)
    {
       color = kGridColor3Bright;

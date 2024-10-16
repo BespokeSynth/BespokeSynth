@@ -35,32 +35,14 @@ if [[ ! -z $MAC_SIGNING_CERT ]]; then
   codesign --force -s "$MAC_SIGNING_CERT" --timestamp "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg"
   echo "checking codesign"
   codesign -vvv "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg"
-  # if I have xcode 13
-  # xcrun notarytool submit "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg" --apple-id ${MAC_SIGNING_ID} --team-id ${MAC_SIGNING_TEAM} --password ${MAC_SIGNING_1UPW} --wait
+  echo "running notarytool"
+  xcrun notarytool submit "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg" \
+                          --apple-id ${MAC_SIGNING_ID} \
+                          --team-id ${MAC_SIGNING_TEAM} \
+                          --password ${MAC_SIGNING_1UPW} \
+                          --wait
 
-  # but if i dont
-  ruuid=$(xcrun altool --notarize-app --primary-bundle-id "com.ryanchallinor.bespokesynth" \
-              --username ${MAC_SIGNING_ID} --password ${MAC_SIGNING_1UPW} -t osx \
-              --file "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg" 2>&1 | tee altool.out \
-             | awk '/RequestUUID/ { print $NF; }')
-  echo "REQUEST UID : $ruuid"
-
-  if [[ $ruuid == "" ]]; then
-        echo "could not upload for notarization"
-        cat altool.out
-        exit 1
-  fi
-
-  request_status="in progress"
-  while [[ "$request_status" == "in progress" ]]; do
-      echo -n "waiting... "
-      sleep 10
-      request_status=$(xcrun altool --notarization-info "$ruuid" \
-                                      --username "${MAC_SIGNING_ID}" \
-                                      --password "${MAC_SIGNING_1UPW}" 2>&1 \
-                         | awk -F ': ' '/Status:/ { print $2; }' )
-      echo "$request_status"
-  done
+  echo "running stapler"
   xcrun stapler staple "${TARGET_DIR}/${OUTPUT_BASE_FILENAME}.dmg"
 fi
 

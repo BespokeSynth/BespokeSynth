@@ -23,14 +23,11 @@
 //
 //
 
-#ifndef __modularSynth__SingleOscillator__
-#define __modularSynth__SingleOscillator__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "PolyphonyMgr.h"
 #include "SingleOscillatorVoice.h"
-#include "ADSR.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
@@ -76,6 +73,11 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
+
    bool IsEnabled() const override { return mEnabled; }
 
 private:
@@ -102,8 +104,9 @@ private:
    int mMult{ 1 };
    DropdownList* mMultSelector{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
-   Checkbox* mSyncCheckbox{ nullptr };
+   DropdownList* mSyncModeSelector{ nullptr };
    FloatSlider* mSyncFreqSlider{ nullptr };
+   FloatSlider* mSyncRatioSlider{ nullptr };
    FloatSlider* mDetuneSlider{ nullptr };
    IntSlider* mUnisonSlider{ nullptr };
    FloatSlider* mUnisonWidthSlider{ nullptr };
@@ -121,6 +124,8 @@ private:
 
    Oscillator mDrawOsc{ OscillatorType::kOsc_Square };
 
+   int mLoadRev{ -1 };
+
    struct DebugLine
    {
       std::string text;
@@ -130,6 +135,3 @@ private:
    std::array<DebugLine, 20> mDebugLines;
    int mDebugLinesPos{ 0 };
 };
-
-
-#endif /* defined(__modularSynth__SingleOscillator__) */

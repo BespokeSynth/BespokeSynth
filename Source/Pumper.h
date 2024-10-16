@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Pumper__
-#define __modularSynth__Pumper__
+#pragma once
 
-#include <iostream>
 #include "IAudioEffect.h"
 #include "Checkbox.h"
 #include "Slider.h"
@@ -87,5 +85,3 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
 };
-
-#endif /* defined(__modularSynth__Pumper__) */

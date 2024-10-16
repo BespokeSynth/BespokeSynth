@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__PitchShifter__
-#define __Bespoke__PitchShifter__
+#pragma once
 
-#include <iostream>
 #include "FFT.h"
 #include "RollingBuffer.h"
 
@@ -77,5 +75,3 @@ private:
    long gRover{ false };
    long gInit{ false };
 };
-
-#endif /* defined(__Bespoke__PitchShifter__) */

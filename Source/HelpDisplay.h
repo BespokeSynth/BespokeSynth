@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__HelpDisplay__
-#define __Bespoke__HelpDisplay__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "RadioButton.h"
@@ -117,5 +116,3 @@ private:
    ScreenshotState mScreenshotState{ ScreenshotState::None };
    int mScreenshotCountdown{ 0 };
 };
-
-#endif /* defined(__Bespoke__HelpDisplay__) */

@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__NoteOctaver__
-#define __modularSynth__NoteOctaver__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
@@ -83,6 +81,3 @@ private:
    Checkbox* mRetriggerCheckbox{ nullptr };
    bool mRetrigger{ false };
 };
-
-
-#endif /* defined(__modularSynth__NoteOctaver__) */

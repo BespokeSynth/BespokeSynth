@@ -23,14 +23,11 @@
 //
 //
 
-#ifndef __modularSynth__FMSynth__
-#define __modularSynth__FMSynth__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "PolyphonyMgr.h"
 #include "FMVoice.h"
-#include "ADSR.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
@@ -107,5 +104,3 @@ private:
 
    ChannelBuffer mWriteBuffer;
 };
-
-#endif /* defined(__modularSynth__FMSynth__) */

@@ -23,13 +23,10 @@
 //
 //
 
-#ifndef __modularSynth__VelocitySetter__
-#define __modularSynth__VelocitySetter__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 
 class VelocitySetter : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener
@@ -70,6 +67,3 @@ private:
    float mRandomness{ 0 };
    FloatSlider* mRandomnessSlider{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__VelocitySetter__) */

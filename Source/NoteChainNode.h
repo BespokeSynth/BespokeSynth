@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__NoteChainNode__
-#define __Bespoke__NoteChainNode__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "INoteSource.h"
@@ -97,5 +96,3 @@ private:
    bool mQueueTrigger{ false };
    PatchCableSource* mNextNodeCable{ nullptr };
 };
-
-#endif /* defined(__Bespoke__NoteChainNode__) */

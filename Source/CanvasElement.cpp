@@ -29,7 +29,6 @@
 #include "Slider.h"
 #include "CanvasControls.h"
 #include "TextEntry.h"
-#include "PatchCableSource.h"
 #include "ModularSynth.h"
 #include "EventCanvas.h"
 #include "SampleCanvas.h"
@@ -177,7 +176,7 @@ float CanvasElement::GetStart() const
 
 void CanvasElement::SetStart(float start, bool preserveLength)
 {
-   float end;
+   float end = 0;
    if (!preserveLength)
       end = GetEnd();
    start *= mCanvas->GetNumCols();
@@ -552,7 +551,7 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
       float lengthOriginalSpeed = lengthMs / TheTransport->GetDuration(sampleCanvas->GetInterval());
       float speed = lengthOriginalSpeed / mLength;
       ofSetColor(255, 255, 255);
-      DrawTextBold(ofToString(speed, 2), rect.x + 3, rect.y + 10, 12);
+      DrawTextBold(ofToString(speed, 2), rect.x + 3, rect.y + 10, 10);
    }
 
    if (mMute)

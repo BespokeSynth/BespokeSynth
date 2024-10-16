@@ -23,12 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Stutter__
-#define __modularSynth__Stutter__
+#pragma once
 
-#include <iostream>
-
-#include "IAudioEffect.h"
 #include "MidiDevice.h"
 #include "RollingBuffer.h"
 #include "Checkbox.h"
@@ -36,7 +32,6 @@
 #include "Transport.h"
 #include "Slider.h"
 #include "JumpBlender.h"
-#include "ofxJSONElement.h"
 
 #define STUTTER_BLEND_WRAPAROUND_SAMPLES 100
 #define STUTTER_START_BLEND_MS 3
@@ -126,6 +121,3 @@ private:
    bool mFadeStutter{ false };
    Checkbox* mFadeCheckbox{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__Stutter__) */

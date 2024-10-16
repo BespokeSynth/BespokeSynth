@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__NoteToMs__
-#define __Bespoke__NoteToMs__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -76,5 +75,3 @@ private:
    float mPitch{ 0 };
    ModulationChain* mPitchBend{ nullptr };
 };
-
-#endif /* defined(__Bespoke__NoteToMs__) */

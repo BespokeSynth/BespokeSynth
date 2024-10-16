@@ -23,14 +23,11 @@
 //
 //
 
-#ifndef __modularSynth__Sampler__
-#define __modularSynth__Sampler__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
 #include "SampleVoice.h"
-#include "ADSR.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
@@ -115,6 +112,3 @@ private:
    PitchDetector mPitchDetector;
    bool mWantDetectPitch{ false };
 };
-
-
-#endif /* defined(__modularSynth__Sampler__) */

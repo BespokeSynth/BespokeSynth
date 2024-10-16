@@ -27,7 +27,6 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "ChaosEngine.h"
-#include "FillSaveDropdown.h"
 
 Transport* TheTransport = nullptr;
 
@@ -720,6 +719,14 @@ void Transport::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void Transport::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
+}
+
+//static
+bool Transport::IsTripletInterval(NoteInterval interval)
+{
+   if (interval == kInterval_2nt || interval == kInterval_4nt || interval == kInterval_8nt || interval == kInterval_16nt || interval == kInterval_32nt)
+      return true;
+   return false;
 }
 
 void Transport::LoadLayout(const ofxJSONElement& moduleInfo)

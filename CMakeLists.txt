@@ -29,7 +29,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif ()
 
-project(BespokeSynth VERSION 1.2.0 LANGUAGES C CXX ASM)
+project(BespokeSynth VERSION 1.2.1 LANGUAGES C CXX ASM)
 
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 math(EXPR BESPOKE_BITNESS "${CMAKE_SIZEOF_VOID_P} * 8" OUTPUT_FORMAT DECIMAL)
@@ -94,6 +94,12 @@ else()
     pkg_search_module(ogg REQUIRED ogg)
     pkg_search_module(vorbis REQUIRED vorbis vorbisenc vorbisfile)
   endif()
+endif()
+
+if(BESPOKE_SYSTEM_JSONCPP)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(JSONCPP REQUIRED jsoncpp)
+    include_directories(${JSONCPP_INCLUDE_DIRS})
 endif()
 
 if (BESPOKE_VST2_SDK_LOCATION)

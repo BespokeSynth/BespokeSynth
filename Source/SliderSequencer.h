@@ -23,10 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__SliderSequencer__
-#define __Bespoke__SliderSequencer__
-
-#include <iostream>
+#pragma once
 
 #include "Transport.h"
 #include "Checkbox.h"
@@ -105,6 +102,3 @@ private:
    int mDivision{ 1 };
    IntSlider* mDivisionSlider{ nullptr };
 };
-
-
-#endif /* defined(__Bespoke__SliderSequencer__) */

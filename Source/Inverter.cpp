@@ -47,10 +47,6 @@ void Inverter::Process(double time)
 {
    PROFILER(Inverter);
 
-   if (!mEnabled)
-      return;
-
-   ComputeSliders(0);
    SyncBuffers();
 
    IAudioReceiver* target = GetTarget();
@@ -60,7 +56,8 @@ void Inverter::Process(double time)
       ChannelBuffer* out = target->GetBuffer();
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
-         Mult(GetBuffer()->GetChannel(ch), -1, out->BufferSize());
+         if (mEnabled)
+            Mult(GetBuffer()->GetChannel(ch), -1, out->BufferSize());
          Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }

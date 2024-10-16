@@ -25,8 +25,7 @@
   ==============================================================================
 */
 
-#ifndef MODULECONTAINER_H_INCLUDED
-#define MODULECONTAINER_H_INCLUDED
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "IDrawableModule.h"
@@ -41,8 +40,9 @@ public:
 
    void SetOwner(IDrawableModule* owner) { mOwner = owner; }
    IDrawableModule* GetOwner() const { return mOwner; }
-   void Draw();
-   void DrawPatchCables(bool parentMinimized);
+   void DrawContents();
+   void DrawModules();
+   void DrawPatchCables(bool parentMinimized, bool inFront);
    void DrawUnclipped();
    void PostRender();
    void Poll();
@@ -99,5 +99,3 @@ private:
    ofVec2f mDrawOffset;
    float mDrawScale{ 1 };
 };
-
-#endif // MODULECONTAINER_H_INCLUDED

@@ -6,10 +6,8 @@
 //
 //
 
-#ifndef __modularSynth__M185Sequencer__
-#define __modularSynth__M185Sequencer__
+#pragma once
 
-#include <iostream>
 #include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -70,6 +68,7 @@ private:
 
    void StepBy(double time, float velocity, int flags);
    void ResetStep();
+   void FindNextStep();
 
    enum GateType
    {
@@ -97,6 +96,7 @@ private:
    std::array<Step, NUM_M185SEQUENCER_STEPS> mSteps;
    float mWidth{ 0 }, mHeight{ 0 };
    bool mHasExternalPulseSource{ false };
+   TransportListenerInfo* mTransportListenerInfo{ nullptr };
 
    // Going through 0..(mSteps.size() - 1)
    int mStepIdx{ 0 };
@@ -113,5 +113,3 @@ private:
 
    ClickButton* mResetStepButton{ nullptr };
 };
-
-#endif /* defined(__modularSynth__M185Sequencer__) */

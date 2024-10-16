@@ -23,20 +23,16 @@
 //
 //
 
-#ifndef __Bespoke__VelocityStepSequencer__
-#define __Bespoke__VelocityStepSequencer__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Transport.h"
 #include "Checkbox.h"
 #include "DropdownList.h"
-#include "TextEntry.h"
 #include "ClickButton.h"
 #include "Slider.h"
 #include "MidiController.h"
-#include "INoteReceiver.h"
 
 #define VSS_MAX_STEPS 8
 #define VSS_RANGE 127
@@ -108,5 +104,3 @@ private:
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-
-#endif /* defined(__Bespoke__VelocityStepSequencer__) */

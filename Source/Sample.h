@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Sample__
-#define __modularSynth__Sample__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "ChannelBuffer.h"
@@ -117,5 +116,3 @@ private:
    std::unique_ptr<juce::AudioSampleBuffer> mReadBuffer;
    int mSamplesLeftToRead{ 0 };
 };
-
-#endif /* defined(__modularSynth__Sample__) */

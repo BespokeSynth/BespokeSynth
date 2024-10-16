@@ -23,13 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__NoteVibrato__
-#define __Bespoke__NoteVibrato__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "ModulationChain.h"
 #include "DropdownList.h"
 #include "Transport.h"
@@ -78,5 +76,3 @@ private:
 
    Modulations mModulation{ true };
 };
-
-#endif /* defined(__Bespoke__NoteVibrato__) */

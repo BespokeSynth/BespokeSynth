@@ -26,7 +26,7 @@
 */
 
 #pragma once
-#include <iostream>
+
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "Slider.h"
@@ -72,6 +72,8 @@ private:
    FloatSlider* mBackgroundRSlider{ nullptr };
    FloatSlider* mBackgroundGSlider{ nullptr };
    FloatSlider* mBackgroundBSlider{ nullptr };
+   FloatSlider* mCornerRadiusSlider{ nullptr };
+   FloatSlider* mCableAlphaSlider{ nullptr };
 
    float mWidth{ 200 };
    float mHeight{ 20 };

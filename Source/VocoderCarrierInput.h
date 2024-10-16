@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__VocoderCarrierInput__
-#define __modularSynth__VocoderCarrierInput__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 
@@ -72,6 +70,3 @@ private:
    VocoderBase* mVocoder{ nullptr };
    IAudioReceiver* mVocoderTarget{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__VocoderCarrierInput__) */

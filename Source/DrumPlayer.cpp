@@ -30,7 +30,6 @@
 #include "ModularSynth.h"
 #include "MidiController.h"
 #include "Profiler.h"
-#include "FillSaveDropdown.h"
 #include "UIControlMacros.h"
 #include "SamplePlayer.h"
 
@@ -76,9 +75,10 @@ void DrumPlayer::CreateUIControls()
    mMonoCheckbox = new Checkbox(this, "mono", mVolSlider, kAnchor_Right_Padded, &mMonoOutput);
    mShuffleButton = new ClickButton(this, "shuffle", 140, 34);
    mGridControlTarget = new GridControlTarget(this, "grid", 4, 50);
-   mQuantizeIntervalSelector = new DropdownList(this, "quantize", 200, 4, (int*)(&mQuantizeInterval));
-   mNoteRepeatCheckbox = new Checkbox(this, "repeat", 200, 22, &mNoteRepeat);
-   mFullVelocityCheckbox = new Checkbox(this, "full vel", 200, 40, &mFullVelocity);
+   mQuantizeIntervalSelector = new DropdownList(this, "quantize", 200, 2, (int*)(&mQuantizeInterval));
+   mNoteRepeatCheckbox = new Checkbox(this, "repeat", mQuantizeIntervalSelector, kAnchor_Below, &mNoteRepeat);
+   mFullVelocityCheckbox = new Checkbox(this, "full vel", mNoteRepeatCheckbox, kAnchor_Below, &mFullVelocity);
+   mSingleVoiceCheckbox = new Checkbox(this, "single voice", mFullVelocityCheckbox, kAnchor_Below, &mSingleVoice);
 
    mKitSelector->SetShowing(false); //TODO(Ryan) replace "kits" concept with a better form of serialization
 
@@ -499,7 +499,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       {
          //reset all linked drum hits
          int playingId = mDrumHits[pitch].mLinkId;
-         if (playingId != -1)
+         if (playingId != -1 || mSingleVoice)
          {
             for (int i = 0; i < NUM_DRUM_HITS; ++i)
             {
@@ -812,6 +812,7 @@ void DrumPlayer::DrawModule()
       mQuantizeIntervalSelector->Draw();
       mNoteRepeatCheckbox->Draw();
       mFullVelocityCheckbox->Draw();
+      mSingleVoiceCheckbox->Draw();
 
       ofPushMatrix();
       ofPushStyle();
@@ -839,7 +840,7 @@ void DrumPlayer::DrawModule()
             }
 
             ofSetColor(255, 255, 255, gModuleDrawAlpha);
-            gFont.DrawStringWrap(mDrumHits[sampleIdx].mSample.Name(), 12, i * 70 + 5, j * 70 + 10, 60);
+            gFont.DrawStringWrap(mDrumHits[sampleIdx].mSample.Name(), 10, i * 70 + 5, j * 70 + 10, 60);
          }
       }
       ofPopStyle();

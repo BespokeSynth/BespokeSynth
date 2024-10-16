@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ComboGridController__
-#define __Bespoke__ComboGridController__
+#pragma once
 
 #include "GridController.h"
 
@@ -50,8 +49,6 @@ public:
    int NumRows() override { return mRows; }
    bool HasInput() const override;
    bool IsConnected() const override { return true; }
-
-   void SetTarget(IClickable* target);
 
    void OnControllerPageSelected() override {}
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
@@ -82,5 +79,3 @@ private:
    Arrangements mArrangement{ Arrangements::kHorizontal };
    IGridControllerListener* mOwner{ nullptr };
 };
-
-#endif /* defined(__Bespoke__ComboGridController__) */

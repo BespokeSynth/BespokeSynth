@@ -150,32 +150,11 @@ void PatchCable::Render()
    ofPushStyle();
    ofNoFill();
 
-   IClickable* dropTarget = GetDropTarget();
-   if (dropTarget)
-   {
-      ofPushStyle();
-
-      ofSetColor(255, 255, 255, 100);
-      ofSetLineWidth(.5f);
-      ofFill();
-      ofRectangle rect = dropTarget->GetRect();
-
-      IDrawableModule* dropTargetModule = dynamic_cast<IDrawableModule*>(dropTarget);
-      if (dropTargetModule && dropTargetModule->HasTitleBar())
-      {
-         rect.y -= IDrawableModule::TitleBarHeight();
-         rect.height += IDrawableModule::TitleBarHeight();
-      }
-
-      ofRect(rect);
-
-      ofPopStyle();
-   }
-
    ConnectionType type = mOwner->GetConnectionType();
    ofColor lineColor = mOwner->GetColor();
    if (mHoveringOnSource && sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())
       lineColor = ofColor::lerp(lineColor, ofColor::white, .5f);
+   lineColor.a *= ModularSynth::sCableAlpha;
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a *= lineAlpha;
 
@@ -234,7 +213,7 @@ void PatchCable::Render()
             {
                float delta = ofClamp(modulator->GetRecentChange() / range, -1, 1);
                ofColor color = ofColor::lerp(ofColor::blue, ofColor::red, delta * .5f + .5f);
-               color.a = abs(1 - ((1 - delta) * (1 - delta))) * 150;
+               color.a = abs(1 - ((1 - delta) * (1 - delta))) * 150 * UserPrefs.cable_alpha.Get();
                ofSetColor(color);
                ofSetLineWidth(3);
 
@@ -278,7 +257,7 @@ void PatchCable::Render()
                float clampedElapsed = MIN(elapsed, 1);
                if (event.mOn)
                {
-                  ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
+                  ofSetLineWidth(lineWidth * (2 + ofClamp(1 - elapsed * .7f, 0, 1) * 3 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
 
                   for (int half = 0; half < 2; ++half)
                   {
@@ -370,7 +349,7 @@ void PatchCable::Render()
                {
                   ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                   float sample = vizBuff->GetSample((i / wireLength * numSamples), ch);
-                  if (isnan(sample))
+                  if (std::isnan(sample))
                   {
                      ofSetColor(ofColor(255, 0, 0));
                      sample = 0;
@@ -421,7 +400,7 @@ void PatchCable::Render()
             ofSetColor(255, 255, 0);
             ofCircle(cable.plug.x, cable.plug.y, 6);
             ofSetColor(0, 0, 0);
-            DrawTextBold("!", cable.plug.x - 2, cable.plug.y + 5, 17);
+            DrawTextBold("!", cable.plug.x - 2, cable.plug.y + 5, 15);
          }
       }
       else
@@ -535,23 +514,40 @@ IClickable* PatchCable::GetDropTarget()
    {
       PatchCablePos cable = GetPatchCablePos();
       IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
-      if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
+      if (potentialTarget && (GetConnectionType() == kConnectionType_Pulse || GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
       {
+         IClickable* potentialUIControl = nullptr;
+
          const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
          for (auto uicontrol : uicontrols)
          {
             if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
                continue;
 
-            float x, y, w, h;
-            uicontrol->GetPosition(x, y);
-            uicontrol->GetDimensions(w, h);
-            if (cable.end.x >= x && cable.end.y >= y && cable.end.x < x + w && cable.end.y < y + h)
+            ofRectangle rect = uicontrol->GetRect();
+            if (rect.contains(cable.end.x, cable.end.y))
             {
-               potentialTarget = uicontrol;
+               potentialUIControl = uicontrol;
                break;
             }
          }
+
+         const auto& grids = (static_cast<IDrawableModule*>(potentialTarget))->GetUIGrids();
+         for (auto grid : grids)
+         {
+            if (grid->IsShowing() == false || !IsValidTarget(grid))
+               continue;
+
+            ofRectangle rect = grid->GetRect();
+            if (rect.contains(cable.end.x, cable.end.y))
+            {
+               potentialUIControl = grid;
+               break;
+            }
+         }
+
+         if (potentialUIControl != nullptr)
+            potentialTarget = potentialUIControl;
       }
       if (mOwner->IsValidTarget(potentialTarget))
          return potentialTarget;

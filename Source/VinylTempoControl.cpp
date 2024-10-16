@@ -48,8 +48,6 @@ void VinylTempoControl::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mUseVinylControlCheckbox = new Checkbox(this, "control", 4, 2, &mUseVinylControl);
 
-   GetPatchCableSource()->SetEnabled(false);
-
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
@@ -134,6 +132,39 @@ void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void VinylTempoControl::SetUpFromSaveData()
 {
+}
+
+void VinylTempoControl::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+}
+
+void VinylTempoControl::LoadState(FileStreamIn& in, int rev)
+{
+   if (rev < 1)
+   {
+      // Temporary additional cable source
+      mTargetCable = new PatchCableSource(this, kConnectionType_Audio);
+      mTargetCable->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCable);
+   }
+
+   IDrawableModule::LoadState(in, rev);
+
+   if (rev < 1)
+   {
+      auto target = GetPatchCableSource(1)->GetTarget();
+      if (target != nullptr)
+         GetPatchCableSource()->SetTarget(target);
+      RemovePatchCableSource(GetPatchCableSource(1));
+      mTargetCable = GetPatchCableSource();
+   }
+
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -31,6 +31,7 @@
 #include "Profiler.h"
 #include "Scale.h"
 #include "FloatSliderLFOControl.h"
+#include "UIControlMacros.h"
 
 SignalGenerator::SignalGenerator()
 {
@@ -42,22 +43,55 @@ SignalGenerator::SignalGenerator()
 void SignalGenerator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mFreqSlider = new FloatSlider(this, "freq", 5, 2, 170, 15, &mFreq, 1, 4000);
-   mFreqModeSelector = new DropdownList(this, "freq mode", 5, 21, (int*)(&mFreqMode));
-   mOscSelector = new DropdownList(this, "osc", 60, 21, (int*)(&mOscType));
-   mPulseWidthSlider = new FloatSlider(this, "pw", 107, 21, 68, 15, &mPulseWidth, 0.01f, .99f);
-   mFreqSliderAmountSlider = new FloatSlider(this, "slider", mFreqModeSelector, kAnchor_Below, 80, 15, &mFreqSliderAmount, 0, 1);
-   mFreqRampTimeSlider = new FloatSlider(this, "ramp", mFreqModeSelector, kAnchor_Below, 80, 15, &mFreqRampTime, 0, 1000);
-   mSyncCheckbox = new Checkbox(this, "sync", mFreqSliderAmountSlider, kAnchor_Right, &mSync);
-   mSyncFreqSlider = new FloatSlider(this, "syncf", mSyncCheckbox, kAnchor_Right, 40, 15, &mSyncFreq, 10, 999.9f);
-   mSoftenSlider = new FloatSlider(this, "soften", mFreqSliderAmountSlider, kAnchor_Below, 80, 15, &mSoften, 0, 1);
-   mShuffleSlider = new FloatSlider(this, "shuffle", mSyncCheckbox, kAnchor_Below, 80, 15, &mShuffle, 0, 1);
-   mMultSelector = new DropdownList(this, "mult", mSoftenSlider, kAnchor_Below, &mMult);
-   mPhaseOffsetSlider = new FloatSlider(this, "phase", mShuffleSlider, kAnchor_Below, 80, 15, &mPhaseOffset, 0, 1, 3);
-   mVolSlider = new FloatSlider(this, "vol", mMultSelector, kAnchor_Below, 80, 15, &mVol, 0, 1);
-   mDetuneSlider = new FloatSlider(this, "detune", mPhaseOffsetSlider, kAnchor_Below, 80, 15, &mDetune, -.05f, .05f, 3);
+   UIBLOCK0();
+   UIBLOCK_PUSHSLIDERWIDTH(171);
+   FLOATSLIDER(mFreqSlider, "freq", &mFreq, 1, 4000);
+   DROPDOWN(mFreqModeSelector, "freq mode", (int*)(&mFreqMode), 55);
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mOscSelector, "osc", (int*)(&mOscType), 50);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_PUSHSLIDERWIDTH(60);
+   FLOATSLIDER(mPulseWidthSlider, "pw", &mPulseWidth, 0.01f, .99f);
+   UIBLOCK_NEWLINE();
+   UIBLOCK_PUSHSLIDERWIDTH(80);
+   FLOATSLIDER(mFreqSliderAmountSlider, "slider", &mFreqSliderAmount, 0, 1);
+   UIBLOCK_SHIFTLEFT();
+   FLOATSLIDER(mFreqRampTimeSlider, "ramp", &mFreqRampTime, 0, 1000);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(8);
+   FLOATSLIDER(mShuffleSlider, "shuffle", &mShuffle, 0, 1);
+   UIBLOCK_NEWLINE();
+   FLOATSLIDER(mSoftenSlider, "soften", &mSoften, 0, 1);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(8);
+   FLOATSLIDER_DIGITS(mPhaseOffsetSlider, "phase", &mPhaseOffset, 0, 1, 3);
+   UIBLOCK_NEWLINE();
+   DROPDOWN(mMultSelector, "mult", &mMult, 40);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(5);
+   DROPDOWN(mSyncModeSelector, "syncmode", (int*)(&mSyncMode), 60);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_PUSHSLIDERWIDTH(60);
+   FLOATSLIDER(mSyncFreqSlider, "syncf", &mSyncFreq, 10, 999.9f);
+   UIBLOCK_SHIFTLEFT();
+   FLOATSLIDER(mSyncRatioSlider, "syncratio", &mSyncRatio, .1f, 10.0f);
+   UIBLOCK_NEWLINE();
+   UIBLOCK_PUSHSLIDERWIDTH(80);
+   FLOATSLIDER(mVolSlider, "vol", &mVol, 0, 1);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(8);
+   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mDetune, -.05f, .05f, 3);
+   ENDUIBLOCK0();
+
+   mSyncModeSelector->AddLabel("no sync", (int)Oscillator::SyncMode::None);
+   mSyncModeSelector->AddLabel("ratio", (int)Oscillator::SyncMode::Ratio);
+   mSyncModeSelector->AddLabel("freq", (int)Oscillator::SyncMode::Frequency);
 
    mSyncFreqSlider->SetShowName(false);
+   mSyncRatioSlider->SetShowName(false);
+   mSyncRatioSlider->SetMode(FloatSlider::kSquare);
+   mSyncFreqSlider->PositionTo(mSyncModeSelector, kAnchor_Right);
+   mSyncRatioSlider->PositionTo(mSyncModeSelector, kAnchor_Right);
 
    SetFreqMode(kFreqMode_Instant);
 
@@ -113,7 +147,6 @@ void SignalGenerator::Process(double time)
    assert(bufferSize == gBufferSize);
 
    Clear(mWriteBuffer, gBufferSize);
-   float syncPhaseInc = GetPhaseInc(mSyncFreq);
    for (int pos = 0; pos < bufferSize; ++pos)
    {
       ComputeSliders(pos);
@@ -136,7 +169,14 @@ void SignalGenerator::Process(double time)
       float mult = mMult;
       if (mult < 0)
          mult = -1.0f / mult;
-      float phaseInc = GetPhaseInc(mFreq * exp2(mDetune) * mult);
+      float outputFreq = mFreq * exp2(mDetune) * mult;
+      float phaseInc = GetPhaseInc(outputFreq);
+
+      float syncPhaseInc = 0;
+      if (mSyncMode == Oscillator::SyncMode::Frequency)
+         syncPhaseInc = GetPhaseInc(mSyncFreq);
+      else if (mSyncMode == Oscillator::SyncMode::Ratio)
+         syncPhaseInc = GetPhaseInc(outputFreq * mSyncRatio);
 
       mPhase += phaseInc;
       if (mPhase == INFINITY)
@@ -153,7 +193,7 @@ void SignalGenerator::Process(double time)
       }
       mSyncPhase += syncPhaseInc;
 
-      if (mSync)
+      if (mSyncMode != Oscillator::SyncMode::None)
          mWriteBuffer[pos] += mOsc.Audio(time, mSyncPhase) * volSq;
       else
          mWriteBuffer[pos] += mOsc.Audio(time, mPhase + mPhaseOffset * FTWO_PI) * volSq;
@@ -208,16 +248,19 @@ void SignalGenerator::SetEnabled(bool enabled)
 
 void SignalGenerator::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
+
+   mSyncFreqSlider->SetShowing(mSyncMode == Oscillator::SyncMode::Frequency);
+   mSyncRatioSlider->SetShowing(mSyncMode == Oscillator::SyncMode::Ratio);
 
    mVolSlider->Draw();
    mPulseWidthSlider->Draw();
    mShuffleSlider->Draw();
    mMultSelector->Draw();
-   mSyncCheckbox->Draw();
+   mSyncModeSelector->Draw();
    mSyncFreqSlider->Draw();
+   mSyncRatioSlider->Draw();
    mOscSelector->Draw();
    mDetuneSlider->Draw();
    mFreqSlider->Draw();
@@ -309,4 +352,39 @@ void SignalGenerator::IntSliderUpdated(IntSlider* slider, int oldVal, double tim
 
 void SignalGenerator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
+}
+
+void SignalGenerator::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+}
+
+void SignalGenerator::LoadState(FileStreamIn& in, int rev)
+{
+   mLoadRev = rev;
+
+   IDrawableModule::LoadState(in, rev);
+}
+
+bool SignalGenerator::LoadOldControl(FileStreamIn& in, std::string& oldName)
+{
+   if (mLoadRev < 1)
+   {
+      if (oldName == "sync")
+      {
+         //load checkbox
+         int checkboxRev;
+         in >> checkboxRev;
+         float checkboxVal;
+         in >> checkboxVal;
+         if (checkboxVal > 0)
+            mSyncMode = Oscillator::SyncMode::Frequency;
+         else
+            mSyncMode = Oscillator::SyncMode::None;
+         return true;
+      }
+   }
+   return false;
 }

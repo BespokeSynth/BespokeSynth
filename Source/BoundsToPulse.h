@@ -21,21 +21,14 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioReceiver.h"
 #include "INoteSource.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "IDrawableModule.h"
 #include "RadioButton.h"
-#include "ClickButton.h"
-#include "INoteReceiver.h"
-#include "Transport.h"
 #include "BiquadFilter.h"
-#include "PeakTracker.h"
 #include "Scale.h"
 #include "IAudioSource.h"
-#include "EnvOscillator.h"
 #include "IPulseReceiver.h"
 #include "IAudioPoller.h"
 

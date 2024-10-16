@@ -24,7 +24,6 @@
 //
 
 #include "NoteCanvas.h"
-#include "IAudioSource.h"
 #include "SynthGlobals.h"
 #include "DrumPlayer.h"
 #include "ModularSynth.h"
@@ -32,7 +31,6 @@
 #include "Scale.h"
 #include "CanvasElement.h"
 #include "Profiler.h"
-#include "PolyphonyMgr.h"
 #include "CanvasTimeline.h"
 #include "CanvasScrollbar.h"
 
@@ -357,7 +355,7 @@ void NoteCanvas::DrawModule()
       int pitch = 127 - mCanvas->GetRowOffset() - i;
       float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
       float y = mCanvas->GetPosition(true).y + i * boxHeight;
-      float scale = MIN(boxHeight, 20);
+      float scale = MIN(boxHeight - 2, 18);
       DrawTextNormal(NoteName(pitch, false, true) + "(" + ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale / 8) + boxHeight, scale);
    }
    ofPopStyle();
@@ -580,6 +578,7 @@ void NoteCanvas::LoadMidi()
       if (midifile.readFrom(inputStream))
       {
          midifile.convertTimestampTicksToSeconds();
+         int ticksPerQuarterNote = midifile.getTimeFormat();
          int trackToGet = 0;
          if (midifile.getNumTracks() > 1)
             trackToGet = mLoadMidiTrack;
@@ -591,8 +590,8 @@ void NoteCanvas::LoadMidi()
             {
                int note = noteEvent->message.getNoteNumber();
                int veloc = noteEvent->message.getVelocity() * 1.27;
-               double start = (noteEvent->message.getTimeStamp() / 2);
-               double end = (noteEvent->noteOffObject->message.getTimeStamp() / 2);
+               double start = noteEvent->message.getTimeStamp() / ticksPerQuarterNote / TheTransport->CountInStandardMeasure(kInterval_4n);
+               double end = noteEvent->noteOffObject->message.getTimeStamp() / ticksPerQuarterNote / TheTransport->CountInStandardMeasure(kInterval_4n);
                double length = end - start;
                AddNote(start, note, veloc, length, -1, ModulationParameters());
             }
@@ -614,13 +613,13 @@ void NoteCanvas::LoadMidi()
 void NoteCanvas::SaveMidi()
 {
    using namespace juce;
-   constexpr static int tppq = 96;
+   constexpr static int ticksPerQuarterNote = 960;
 
    FileChooser chooser("Save midi", File(ofToDataPath("midi")), "*.mid", true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
    {
       MidiFile midifile;
-      midifile.setTicksPerQuarterNote(tppq);
+      midifile.setTicksPerQuarterNote(ticksPerQuarterNote);
       MidiMessageSequence track1;
       MidiMessage trackTimeSig = MidiMessage::timeSignatureMetaEvent(TheTransport->GetTimeSigTop(), TheTransport->GetTimeSigBottom());
       track1.addEvent(trackTimeSig);
@@ -628,13 +627,13 @@ void NoteCanvas::SaveMidi()
       {
          NoteCanvasElement* noteOnElement = static_cast<NoteCanvasElement*>(element);
          int noteNumber = mCanvas->GetNumRows() - noteOnElement->mRow - 1;
-         float noteStart = (element->mCol + element->mOffset) * tppq *
+         float noteStart = (element->mCol + element->mOffset) * ticksPerQuarterNote *
                            +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
          float velocity = noteOnElement->GetVelocity();
          MidiMessage messageOn = MidiMessage::noteOn(1, noteNumber, velocity);
          messageOn.setTimeStamp(noteStart);
          track1.addEvent(messageOn);
-         float noteEnd = (element->mCol + element->mOffset + element->mLength) * tppq *
+         float noteEnd = (element->mCol + element->mOffset + element->mLength) * ticksPerQuarterNote *
                          +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
          MidiMessage messageOff = MidiMessage::noteOff(1, noteNumber, velocity);
          messageOff.setTimeStamp(noteEnd);

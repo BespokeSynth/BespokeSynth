@@ -54,6 +54,8 @@ void GlobalControls::CreateUIControls()
    FLOATSLIDER(mBackgroundRSlider, "background r", &ModularSynth::sBackgroundR, 0, 1);
    FLOATSLIDER(mBackgroundGSlider, "background g", &ModularSynth::sBackgroundG, 0, 1);
    FLOATSLIDER(mBackgroundBSlider, "background b", &ModularSynth::sBackgroundB, 0, 1);
+   FLOATSLIDER(mCornerRadiusSlider, "corner radius", &gCornerRoundness, 0, 2);
+   FLOATSLIDER(mCableAlphaSlider, "cable alpha", &ModularSynth::sCableAlpha, 0.05, 1);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -78,6 +80,8 @@ void GlobalControls::DrawModule()
    mBackgroundRSlider->Draw();
    mBackgroundGSlider->Draw();
    mBackgroundBSlider->Draw();
+   mCornerRadiusSlider->Draw();
+   mCableAlphaSlider->Draw();
 }
 
 void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

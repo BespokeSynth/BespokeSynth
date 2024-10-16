@@ -23,15 +23,13 @@
 //
 //
 
-#ifndef __Bespoke__Ramper__
-#define __Bespoke__Ramper__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
 #include "Checkbox.h"
 #include "Transport.h"
 #include "DropdownList.h"
-#include "ClickButton.h"
 #include "Slider.h"
 #include "IPulseReceiver.h"
 
@@ -93,5 +91,3 @@ private:
    float mStartValue{ 0 };
    bool mRamping{ false };
 };
-
-#endif /* defined(__Bespoke__Ramper__) */

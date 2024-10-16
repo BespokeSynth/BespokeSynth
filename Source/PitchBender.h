@@ -23,13 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__PitchBender__
-#define __Bespoke__PitchBender__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "ModulationChain.h"
 #include "Transport.h"
 
@@ -77,5 +75,3 @@ private:
 
    Modulations mModulation;
 };
-
-#endif /* defined(__Bespoke__PitchBender__) */

@@ -25,13 +25,10 @@
 
 #pragma once
 
-#include <iostream>
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Transport.h"
-#include "Checkbox.h"
 #include "DropdownList.h"
-#include "TextEntry.h"
 #include "ClickButton.h"
 #include "INoteSource.h"
 #include "Slider.h"
@@ -239,4 +236,11 @@ private:
    bool mGridSyncQueued{ false };
    bool mPush2VelocityHeld{ false };
    bool mPush2LengthHeld{ false };
+
+   enum class Push2GridDisplayMode
+   {
+      PerStep,
+      GridView
+   };
+   Push2GridDisplayMode mPush2GridDisplayMode{ Push2GridDisplayMode::PerStep };
 };
