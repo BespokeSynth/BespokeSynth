@@ -34,12 +34,12 @@ void Minimap::GetDimensions(float& width, float& height)
    if (ofGetWidth() > ofGetHeight())
    {
       width = kMaxLength;
-      height = (kMaxLength / ratio) + kBookmarkSize;
+      height = floor(kMaxLength / ratio) + kBookmarkSize;
    }
    else
    {
       height = kMaxLength;
-      width = (kMaxLength * ratio) + kBookmarkSize;
+      width = floor(kMaxLength * ratio) + kBookmarkSize;
    }
 }
 
@@ -301,6 +301,6 @@ void Minimap::ForcePosition()
    float width, height, scale;
    scale = 1 / TheSynth->GetUIScale();
    GetDimensions(width, height);
-   mX = (ofGetWidth() * scale) - (width + kMarginRight);
+   mX = floor((ofGetWidth() * scale) - (width + kMarginRight));
    mY = kMarginTop;
 }
