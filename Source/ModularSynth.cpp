@@ -345,8 +345,8 @@ void ModularSynth::Poll()
    {
       for (auto p : mExtraPollers)
          p->Poll();
-      mModuleContainer.Poll();
       mUILayerModuleContainer.Poll();
+      mModuleContainer.Poll();
    }
 
    if (mShowLoadStatePopup)
@@ -1128,8 +1128,8 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       gHotBindUIControl[num] = gHoveredUIControl;
    }
 
-   mModuleContainer.KeyPressed(key, isRepeat);
    mUILayerModuleContainer.KeyPressed(key, isRepeat);
+   mModuleContainer.KeyPressed(key, isRepeat);
 
    //if (key == '/' && !isRepeat)
    //   ofToggleFullscreen();
@@ -1162,8 +1162,8 @@ void ModularSynth::KeyReleased(int key)
    //if (key == 'c')
    //   mouseReleased(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 0);
 
-   mModuleContainer.KeyReleased(key);
    mUILayerModuleContainer.KeyReleased(key);
+   mModuleContainer.KeyReleased(key);
 }
 
 float ModularSynth::GetMouseX(ModuleContainer* context, float rawX /*= FLT_MAX*/)
@@ -1336,13 +1336,13 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
    if (changed)
    {
-      float x = GetMouseX(&mModuleContainer);
-      float y = GetMouseY(&mModuleContainer);
-      mModuleContainer.MouseMoved(x, y);
-
-      x = GetMouseX(&mUILayerModuleContainer);
-      y = GetMouseY(&mUILayerModuleContainer);
+      float x = GetMouseX(&mUILayerModuleContainer);
+      float y = GetMouseY(&mUILayerModuleContainer);
       mUILayerModuleContainer.MouseMoved(x, y);
+
+      x = GetMouseX(&mModuleContainer);
+      y = GetMouseY(&mModuleContainer);
+      mModuleContainer.MouseMoved(x, y);
    }
 
    if (gHoveredUIControl && changed)
@@ -1977,8 +1977,8 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
       }
    }
 
-   mModuleContainer.MouseReleased();
    mUILayerModuleContainer.MouseReleased();
+   mModuleContainer.MouseReleased();
 
    if (mHeldSample)
    {
