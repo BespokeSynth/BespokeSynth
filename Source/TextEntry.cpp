@@ -340,7 +340,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
             mString[i] = mString[i + 1];
       }
    }
-   else if (key == OF_KEY_ESC)
+   else if (key == OF_KEY_ESC || key == '`')
    {
       IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
       mCaretPosition2 = mCaretPosition;
