@@ -161,6 +161,7 @@ void TitleBar::CreateUIControls()
 
    mDisplayHelpButton = new ClickButton(this, " ? ", 380, 1);
    mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
+   mHomeButton = new ClickButton(this, "home", 330, 1);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
    mSaveLayoutButton = new ClickButton(this, "save layout", 280, 19);
 
@@ -423,8 +424,10 @@ void TitleBar::DrawModule()
    DrawTextRightJustify(stats, ofGetWidth() / GetOwningContainer()->GetDrawScale() - 5, 33);
    mDisplayHelpButton->SetPosition(ofGetWidth() / GetOwningContainer()->GetDrawScale() - 20, 4);
    mDisplayHelpButton->Draw();
-   mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - 55, 4);
+   mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - mDisplayUserPrefsEditorButton->GetRect().width - 5, 4);
    mDisplayUserPrefsEditorButton->Draw();
+   mHomeButton->SetPosition(mDisplayUserPrefsEditorButton->GetPosition(true).x - mHomeButton->GetRect().width - 5, 4);
+   mHomeButton->Draw();
    mEventLookaheadCheckbox->Draw();
    mShouldAutosaveCheckbox->Draw();
 }
@@ -602,6 +605,8 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDisplayUserPrefsEditorButton)
       TheSynth->GetUserPrefsEditor()->Show();
+   if (button == mHomeButton)
+      TheSynth->GetLocationZoomer()->GoHome();
    if (button == mResetLayoutButton)
    {
       auto buttonRect = mResetLayoutButton->GetRect();

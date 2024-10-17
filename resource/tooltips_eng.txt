@@ -1894,6 +1894,7 @@ titlebar~
 ~write audio~write the last 30 minutes of audio to your specified recordings_path
 ~ ? ~show help
 ~settings~adjust preferences, saved as userprefs.json
+~home~Moves the viewport to the "home" position, useful if you lost where you are in your savestate
 ~load layout~[none]
 ~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
 ~autosave~every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.
