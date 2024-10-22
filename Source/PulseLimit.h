@@ -26,6 +26,7 @@
 */
 
 #pragma once
+#include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
 #include "Slider.h"
@@ -48,6 +49,7 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -61,6 +63,6 @@ private:
 
    int mLimit{ 0 };
    int mCount{ 0 };
-   IntSlider* mChanceSlider{ nullptr };
+   IntSlider* mLimitSlider{ nullptr };
    ClickButton* mResetButton{ nullptr };
 };

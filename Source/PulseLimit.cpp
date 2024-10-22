@@ -55,6 +55,10 @@ void PulseLimit::DrawModule()
       return;
 }
 
+void PulseLimit::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
+{
+}
+
 void PulseLimit::OnPulse(double time, float velocity, int flags)
 {
    ComputeSliders(0);
@@ -78,7 +82,7 @@ void PulseLimit::ButtonClicked(ClickButton* button, double time)
 void PulseLimit::GetModuleDimensions(float& width, float& height)
 {
    width = 118;
-   height = mDeterministic ? 61 : 38;
+   height = 38;
 }
 
 void PulseLimit::LoadLayout(const ofxJSONElement& moduleInfo)
