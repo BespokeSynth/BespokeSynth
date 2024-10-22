@@ -160,7 +160,7 @@ void PulseSequence::Step(double time, float velocity, int flags)
    else if (flags & kPulseFlag_Random)
       mStep = gRandom() % mLength;
 
-   if (flags & kPulseFlag_SyncToTransport)
+   if (!mHasExternalPulseSource || (flags & kPulseFlag_SyncToTransport))
    {
       mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mLength);
    }

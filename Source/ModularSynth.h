@@ -1,5 +1,4 @@
-#ifndef _MODULAR_SYNTH
-#define _MODULAR_SYNTH
+#pragma once
 
 #undef LoadString //undo some junk from a windows define
 
@@ -306,6 +305,7 @@ private:
    void FindCircularDependencies();
    bool FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom);
    void ClearCircularDependencyMarkers();
+   bool IsCurrentSaveStateATemplate() const;
 
    void ReadClipboardTextFromSystem();
 
@@ -447,5 +447,3 @@ private:
 };
 
 extern ModularSynth* TheSynth;
-
-#endif

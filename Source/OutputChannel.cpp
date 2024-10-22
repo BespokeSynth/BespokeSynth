@@ -175,7 +175,7 @@ void OutputChannel::DrawModule()
       {
          ofPushStyle();
          ofSetColor(ofColor::red);
-         DrawTextBold("clipped", kPaddingOutside + 10, 20 + i * (kBarHeight + 2) + 8, 12.0f);
+         DrawTextBold("clipped", kPaddingOutside + 10, 20 + i * (kBarHeight + 2) + 8, 10.0f);
          ofPopStyle();
       }
    }

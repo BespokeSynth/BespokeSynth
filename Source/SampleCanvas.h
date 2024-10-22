@@ -23,13 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__SampleCanvas__
-#define __Bespoke__SampleCanvas__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "IAudioSource.h"
 #include "Transport.h"
-#include "Checkbox.h"
 #include "Canvas.h"
 #include "Slider.h"
 #include "DropdownList.h"
@@ -98,5 +96,3 @@ private:
    NoteInterval mInterval{ NoteInterval::kInterval_1n };
    DropdownList* mIntervalSelector{ nullptr };
 };
-
-#endif /* defined(__Bespoke__SampleCanvas__) */

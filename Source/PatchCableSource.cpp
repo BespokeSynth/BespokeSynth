@@ -31,7 +31,6 @@
 #include "GridController.h"
 #include "IPulseReceiver.h"
 #include "AudioSend.h"
-#include "MacroSlider.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -629,7 +628,7 @@ void PatchCableSource::FindValidTargets()
    {
       if (module == mOwner)
          continue;
-      if ((mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
+      if ((mType == kConnectionType_Pulse || mType == kConnectionType_Modulator || mType == kConnectionType_ValueSetter || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
       {
          for (auto uicontrol : module->GetUIControls())
          {

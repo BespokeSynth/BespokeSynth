@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__FreqDelay__
-#define __modularSynth__FreqDelay__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -74,5 +72,3 @@ private:
 
    DelayEffect mDelayEffect;
 };
-
-#endif /* defined(__modularSynth__FreqDelay__) */

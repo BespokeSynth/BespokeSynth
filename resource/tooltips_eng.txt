@@ -166,6 +166,15 @@ comment~a box to display some text, to explain a section of a patch
 
 
 
+label~A module to display a label, helpful in marking what is where in large patches
+~showcontrols~Hide and show the controls to modify the label
+~label~The label that will be displayed
+~size~The font size of the label
+~font~The font of the label
+~color~The color of the label
+
+
+
 clockout~sends out clock pulses to synchronize external midi devices
 ~device~device to target
 ~send start~send a signal to reset the gear to the start of its sequence
@@ -209,6 +218,7 @@ pulser~send pulse messages at an interval
 ~random~tell pulsed modules to randomize their position
 ~reset~length of sequence before sending reset pulse
 ~div~measure division, when using "div" as the interval
+~restart~restart timer on "free" counter
 
 
 
@@ -426,11 +436,21 @@ curve~remap an input over its range with a curve. double-click on the curve to a
 
 
 
+controlrecorder~record and play back changes made to a control
+~record~should we be recording input? playback starts after the recording is complete
+~quantize~should we quantize playback to a specified rhythmic interval?
+~length~the interval to quantize to
+~speed~speed up or slow down playback
+~clear~clear the recording
+
+
+
 controlsequencer~modulate a control step-wise at an interval
 ~interval~rate to advance
 ~length~length of the sequence
 ~random~randomize sequence values
 ~step *~value for this step
+~record~record targeted value to steps
 
 
 
@@ -632,6 +652,7 @@ midicontroller~get midi input from external devices. to get a nice display in th
 ~twoway~should we send feedback to the controller? (to control the LEDs associated with the button/knob)
 ~feedback~which cc or note should we send the feedback to?
 ~pageless~should this connection work across all pages of the midicontroller?
+~14bit~is this a 14-bit midi control, with this control as the LSB and the control 32 less than this as the MSB?
 ~ x ~delete this connection
 ~copy~duplicate this connection
 ~layout~which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.
@@ -744,6 +765,10 @@ vocoder~frequency band-based vocoder. this must be paired with a "vocodercarrier
 ~f range~frequency range to highest band
 ~q~resonance of the bands
 ~ring~how long it should take the bands to "cool down"
+
+
+voicesetter~set a specific Voice channel index for a note
+~voice index~current set voice channel index
 
 
 
@@ -873,6 +898,7 @@ looperrecorder~command center to manage recording into multiple loopers, and all
 ~snap to pitch~snap tempo to nearest value that matches a key
 ~resample~resample all connected loopers to new tempo
 ~resample & set key~snap tempo to nearest value that matches a key (based upon the current key and the tempo change), resample all connected loopers to that new tempo, and change global scale to the new key
+~write*~writes to this looper, with a loop length matching the nearest power of 2 (1, 2, 4, 8, etc) of how long this checkbox was enabled
 
 
 
@@ -1167,8 +1193,9 @@ signalgenerator~basic oscillator signal. send a note into it to set the frequenc
 ~pw~pulse width (or shape for non-square waves)
 ~slider~slider to interpolate between last two input pitches
 ~ramp~amount of time to ramp to input frequency
-~sync~turns on "sync" mode, to reset the phase at syncf's frequency
-~syncf~frequency to reset the phase, when "sync" is enabled
+~syncmode~turns on sync mode, to reset the phase at a specified frequency
+~syncratio~ratio of oscillator frequency to reset the phase, when "syncmode" is set to "ratio"
+~syncf~frequency to reset the phase, when "syncmode" is set to "freq"
 ~soften~soften edges of square and saw waveforms
 ~shuffle~stretches and squeezes every other cycle of the waveform
 ~mult~multiplier for frequency
@@ -1272,8 +1299,9 @@ oscillator~polyphonic enveloped oscillator. modulations (with MPE support): modw
 ~shuffle~stretches and squeezes every other cycle of the waveform
 ~soften~soften edges of square and saw waveforms
 ~phase~phase offset of oscillator, and phase offset between unison voices. useful to patch into with a very fast modulator, to achieve phase modulation.
-~sync~turns on "sync" mode, to reset the phase at syncf's frequency
-~syncf~frequency to reset the phase, when "sync" is enabled
+~syncmode~turns on sync mode, to reset the phase at a specified frequency
+~syncratio~ratio of oscillator frequency to reset the phase, when "syncmode" is set to "ratio"
+~syncf~frequency to reset the phase, when "syncmode" is set to "freq"
 ~env~[none]
 ~envA~volume envelope attack
 ~envD~volume envelope decay
@@ -1428,6 +1456,7 @@ drumplayer~sample player intended for drum playback
 ~quantize~quantize input to this interval
 ~repeat~if quantizing, should held notes repeat at that interval?
 ~full vel~always play drum hits at full velocity
+~single voice~only play a single drum hit at once, choking all others out (as if they all shared the same linkid)
 ~vol *~volume of sample 
 ~speed *~speed of sample
 ~pan *~stereo pan position of sample
@@ -1616,7 +1645,8 @@ pitchdive~use pitchbend to settle into an input pitch from a starting offset
 pitchbender~add pitch bend to notes
 ~bend~bend amount, in semitones
 
-
+pulserouter~allows you to control where pulses are routed to using a UI control. to add destinations to the list, patch them as a target
+~route~the pulserouter's destination module
 
 notewrap~wrap an input pitch to stay within a desired range
 ~min~bottom of pitch range
@@ -1970,6 +2000,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~zoom~desired canvas zoom level on startup
 ~ui_scale~scale of UI layer (title bar, quickspawn menu, etc)
 ~cable_drop_behavior~what should be behavior be when you drag a cable and drop it into empty space?
+~qwerty_to_pitch_mode~some modules can hear computer keyboard keys and automatically translate them to MIDI notes. This setting defines how your keyboard is interpreted based on other DAWs with a similar feature. \nAbleton:\noctave#1: A->L\ndown octave: Z\nup octave: X\n\nFruity:\noctave#1: Z->M\noctave#2: Q->I\ndown octave: ,\nup octave: .
 ~grid_snap_size~grid size to use when snapping module position (hold alt/option while dragging a module)
 ~scroll_multiplier_vertical~adjustment to vertical mouse/trackpad scroll speed
 ~scroll_multiplier_horizontal~adjustment to horizontal mouse/trackpad scroll speed
@@ -2057,6 +2088,44 @@ dotsequencer~polyphonic note sequencer with adjustable note length and velocity.
 ~row offset~amount to offset the mapping of row to pitch
 ~clear~clear the contents of the dot grid
 ~dotgrid~the dot grid
+
+
+euclideansequencer~euclidean sequencer displays a loop as a circle. the notes are calculated using the euclidean rhythm algorithm.
+~random~randomize all steps, onsets and rotation in all rings
+~random*~randomize steps, onsets and rotation in this ring
+~steps~randomize steps in all rings
+~step chance~what is the chance a step gets changed
+~stp*~in what range are steps created
+~onset chance~what is the chance that an onset gets changed
+~ons *~in what range are onsets created
+~rot chance~what is the chance that rotation gets changed
+~rot lo~in what range is rotation created
+~rot hi~in what range is rotation created
+~offset chance~what is the chance that an offset gets changed
+~o *~in what range is offset created
+~note chance~what is the chance a note gets changed
+~oct*~in what octave range are notes created
+~steps*~number of steps in this ring
+~onsets~randomize onsets in all rings
+~onsets*~number of onsets in this ring
+~rotation~randomize rotation in all rings
+~rotation*~rotation of this ring
+~offset~randomize offset in all rings
+~offset*~timing offset for this ring
+~note~randomize notes in all rings
+~note*~pitch to use for this ring
+~clear~clear all steps, onsets, rotation and offset in all rings
+
+
+savestateloader~loads other savestate files (and unloads the current savestate). the number of buttons can be adjusted in the triangle menu.
+~load *~loads specified savestate file. shift-click to choose a new file.
+
+
+dataprovider~provides modulation values normally not easily accessible.
+~type~the type of value to provide
+~interval~the interval to measure
+~realtime~if enabled this module will work on the audio thread which is more accurate but also more resource intense
+~set~click here to send the value (or, send a pulse to this module for the same result)
 
 
 noteminmax~finds lowest and highest notes among ones played at the same time

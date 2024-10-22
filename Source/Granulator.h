@@ -23,11 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Granulator__
-#define __modularSynth__Granulator__
+#pragma once
 
-#include <iostream>
-#include "Ramp.h"
 #include "BiquadFilter.h"
 #include "ChannelBuffer.h"
 
@@ -84,5 +81,3 @@ private:
    bool mLiveMode{ false };
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};
 };
-
-#endif /* defined(__modularSynth__Granulator__) */

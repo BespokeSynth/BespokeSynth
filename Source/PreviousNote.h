@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PreviousNote__
-#define __Bespoke__PreviousNote__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
@@ -60,5 +59,3 @@ private:
    int mPitch{ -1 };
    int mVelocity{ 0 };
 };
-
-#endif /* defined(__Bespoke__PreviousNote__) */

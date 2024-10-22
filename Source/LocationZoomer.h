@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__LocationZoomer__
-#define __Bespoke__LocationZoomer__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "ofxJSONElement.h"
@@ -51,19 +50,17 @@ private:
 
    struct Location
    {
-      float mZoomLevel;
-      ofVec2f mOffset;
+      float mZoomLevel{ 1 };
+      ofVec2f mOffset{ 0, 0 };
    };
 
-   Location mLoadLocation;
-   std::map<int, Location> mLocations;
-   Location mStart;
-   Location mDestination;
+   Location mLoadLocation{};
+   std::map<int, Location> mLocations{};
+   Location mStart{};
+   Location mDestination{};
    float mCurrentProgress{ 1 };
    float mSpeed{ 2 };
-   Location mHome;
+   Location mHome{};
 
    bool mInVanityPanningMode{ false };
 };
-
-#endif /* defined(__Bespoke__LocationZoomer__) */

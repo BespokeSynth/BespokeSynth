@@ -48,6 +48,7 @@ using namespace juce::gl;
 #include "ADSRDisplay.h"
 #include "Looper.h"
 #include "NoteLooper.h"
+#include "ControlRecorder.h"
 #include "push2/JuceToPush2DisplayBridge.h"
 #include "push2/Push2-Bitmap.h"
 
@@ -479,8 +480,12 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
          stateInfo = "tap control to add favorite...";
       else if (mDeleteButtonHeld)
          stateInfo = "tap control to remove favorite...";
-      else if (mModulationButtonHeld)
+      else if (mLFOButtonHeld)
          stateInfo = "tap a control to add/edit LFO...";
+      else if (mAutomateButtonHeld && mCurrentControlRecorder == nullptr)
+         stateInfo = "move a control to record automation...";
+      else if (mAutomateButtonHeld && mCurrentControlRecorder != nullptr)
+         stateInfo = "recording automation, length = " + ofToString(mCurrentControlRecorder->GetLength(), 2);
       else if (mAddModuleBookmarkButtonHeld && mDisplayModule != nullptr)
          stateInfo = "tap a button in the column below this button to bookmark the \"" + std::string(mDisplayModule->Name()) + "\" module...";
       else if (mInMidiControllerBindMode)
@@ -505,7 +510,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
          ofRect(1, 1, ableton::Push2DisplayBitmap::kWidth - 2, ableton::Push2DisplayBitmap::kHeight - 2);
 
          ofSetColor(0, 0, 0);
-         DrawTextBold(stateInfo, 10, 147, 20);
+         DrawTextBold(stateInfo, 10, 147, 18);
 
          ofPopStyle();
       }
@@ -525,14 +530,14 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
             ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleCategory(moduleTypeToSpawn)));
             text = "\ntap grid to spawn " + moduleTypeToSpawn;
          }
-         DrawTextBold(text, 5, 80, 20);
+         DrawTextBold(text, 5, 80, 18);
 
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other));
          ofNoFill();
 
          ofTranslate(-kColumnSpacing * mModuleViewOffsetSmoothed, 0);
 
-         nvgFontSize(sVG, 16);
+         nvgFontSize(sVG, 12);
          DrawControls(mButtonControls, false, 60);
          DrawControls(mSliderControls, true, 20);
       }
@@ -620,7 +625,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    SetLed(kMidiMessage_Control, kDoubleLoopButton, mDisplayModule != nullptr && (mDisplayModule->GetTypeName() == "looper" || mDisplayModule->GetTypeName() == "notelooper") ? 127 : 0);
    SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
-   SetLed(kMidiMessage_Control, kAutomateButton, GetPadColorForType(kModuleCategory_Modulator, true), mModulationButtonHeld ? 0 : -1);
+   SetLed(kMidiMessage_Control, kFixedLengthButton, 127, mLFOButtonHeld ? 0 : -1);
+   SetLed(kMidiMessage_Control, kAutomateButton, GetPadColorForType(kModuleCategory_Modulator, true), mAutomateButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kMasterButton, 127, mAddModuleBookmarkButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kAddDeviceButton, 127, mScreenDisplayMode == ScreenDisplayMode::kAddModule ? 0 : -1);
    SetLed(kMidiMessage_Control, kAddTrackButton, mDisplayModule != nullptr ? 127 : 0, mAddTrackHeld ? 0 : -1);
@@ -1097,9 +1103,9 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
       if (adsr == nullptr)
       {
          if (mDisplayModule == this)
-            DrawTextBold(juce::String(controls[i]->Path()).replace("~", "\n").toRawUTF8(), kColumnSpacing * i + 3, yPos - 12, 10);
+            DrawTextBold(juce::String(controls[i]->Path()).replace("~", "\n").toRawUTF8(), kColumnSpacing * i + 3, yPos - 12, 8);
          else
-            DrawTextBold(controls[i]->Name(), kColumnSpacing * i + 3, yPos - 5, 16);
+            DrawTextBold(controls[i]->Name(), kColumnSpacing * i + 3, yPos - 5, 14);
       }
       controls[i]->Render();
       ofPopStyle();
@@ -1173,7 +1179,6 @@ void Push2Control::Poll()
          if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
          {
             IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn(mSpawnLists.GetDropdowns()[i]->GetList()->GetValue());
-            ofRectangle rect = module->GetRect();
             module->SetPosition(newModulePos.x, newModulePos.y);
             mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1, gTime);
             mScreenDisplayMode = ScreenDisplayMode::kNormal;
@@ -1414,7 +1419,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
                {
                   RemoveFavoriteControl(mSliderControls[controlIndex]);
                }
-               else if (mModulationButtonHeld)
+               else if (mLFOButtonHeld)
                {
                   FloatSlider* slider = dynamic_cast<FloatSlider*>(mSliderControls[controlIndex]);
                   if (slider != nullptr)
@@ -1424,6 +1429,34 @@ void Push2Control::OnMidiNote(MidiNote& note)
                      if (!hadLFO)
                         lfo->SetLFOEnabled(true);
                      SetDisplayModule(lfo, true);
+                  }
+               }
+               else if (mAutomateButtonHeld)
+               {
+                  if (mSliderControls[controlIndex] != nullptr && mCurrentControlRecorder == nullptr)
+                  {
+                     std::vector<IDrawableModule*> modules;
+                     TheSynth->GetAllModules(modules);
+                     for (auto* searchModule : modules)
+                     {
+                        ControlRecorder* controlRecorderModule = dynamic_cast<ControlRecorder*>(searchModule);
+                        if (controlRecorderModule != nullptr)
+                        {
+                           if (controlRecorderModule->GetPatchCableSource()->GetTarget() == mSliderControls[controlIndex])
+                              mCurrentControlRecorder = controlRecorderModule;
+                        }
+                     }
+
+                     if (mCurrentControlRecorder == nullptr) //couldn't find one, so make one
+                     {
+                        ModuleFactory::Spawnable spawnable;
+                        spawnable.mLabel = "controlrecorder";
+                        mCurrentControlRecorder = dynamic_cast<ControlRecorder*>(TheSynth->SpawnModuleOnTheFly(spawnable, mSliderControls[controlIndex]->GetRect().getMaxX() + 40, mSliderControls[controlIndex]->GetPosition().y));
+                        mCurrentControlRecorder->SetTarget(mSliderControls[controlIndex]);
+                     }
+
+                     mCurrentControlRecorder->SetEnabled(true);
+                     mCurrentControlRecorder->SetRecording(true);
                   }
                }
                else if (mInMidiControllerBindMode)
@@ -1705,9 +1738,19 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       mDeleteButtonHeld = control.mValue > 0;
    }
+   else if (control.mControl == kFixedLengthButton)
+   {
+      mLFOButtonHeld = control.mValue > 0;
+   }
    else if (control.mControl == kAutomateButton)
    {
-      mModulationButtonHeld = control.mValue > 0;
+      mAutomateButtonHeld = control.mValue > 0;
+
+      if (!mAutomateButtonHeld && mCurrentControlRecorder != nullptr)
+      {
+         mCurrentControlRecorder->SetRecording(false);
+         mCurrentControlRecorder = nullptr;
+      }
    }
    else if (control.mControl == kMasterButton)
    {

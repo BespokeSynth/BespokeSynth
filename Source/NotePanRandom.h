@@ -28,7 +28,6 @@
 #pragma once
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "INoteSource.h"
 #include "Slider.h"
 

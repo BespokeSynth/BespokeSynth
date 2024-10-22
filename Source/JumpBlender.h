@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__JumpBlender__
-#define __modularSynth__JumpBlender__
+#pragma once
 
-#include <iostream>
 #include "Ramp.h"
 
 #define JUMP_BLEND_SAMPLES 100
@@ -45,5 +43,3 @@ private:
    float mSamples[JUMP_BLEND_SAMPLES]{};
    int mBlendSample{ 0 };
 };
-
-#endif /* defined(__modularSynth__JumpBlender__) */

@@ -23,11 +23,9 @@
 //
 //
 
-#ifndef __modularSynth__Profiler__
-#define __modularSynth__Profiler__
+#pragma once
 
 #include "OpenFrameworksPort.h"
-#include "SynthGlobals.h"
 
 #define PROFILER_HISTORY_LENGTH 500
 #define PROFILER_MAX_TRACK 100
@@ -68,5 +66,3 @@ private:
    static Cost sCosts[PROFILER_MAX_TRACK];
    static bool sEnableProfiler;
 };
-
-#endif /* defined(__modularSynth__Profiler__) */

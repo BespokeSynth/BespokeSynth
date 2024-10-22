@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__ModuleSaveData__
-#define __modularSynth__ModuleSaveData__
+#pragma once
 
 #include "TextEntry.h"
 
@@ -117,5 +116,3 @@ private:
 
    std::list<SaveVal*> mValues;
 };
-
-#endif /* defined(__modularSynth__ModuleSaveData__) */

@@ -65,45 +65,48 @@ void SpectralDisplay::Process(double time)
 {
    PROFILER(SpectralDisplay);
 
-   ComputeSliders(0);
-
-   if (!mEnabled)
-      return;
-
    SyncBuffers();
 
-   IAudioReceiver* target = GetTarget();
-
-   if (target)
+   if (mEnabled)
    {
-      ChannelBuffer* out = target->GetBuffer();
+      ComputeSliders(0);
+
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (ch == 0)
             BufferCopy(gWorkBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
          else
             Add(gWorkBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      }
+
+      mRollingInputBuffer.WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), 0);
+
+      //copy rolling input buffer into working buffer and window it
+      mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, kNumFFTBins, 0, 0);
+      Mult(mFFTData.mTimeDomain, mWindower, kNumFFTBins);
+
+      mFFT.Forward(mFFTData.mTimeDomain,
+                   mFFTData.mRealValues,
+                   mFFTData.mImaginaryValues);
+   }
+
+   IAudioReceiver* target = GetTarget();
+   if (target)
+   {
+      ChannelBuffer* out = target->GetBuffer();
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
          Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
    }
-
-   mRollingInputBuffer.WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), 0);
-
-   //copy rolling input buffer into working buffer and window it
-   mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, kNumFFTBins, 0, 0);
-   Mult(mFFTData.mTimeDomain, mWindower, kNumFFTBins);
-
-   mFFT.Forward(mFFTData.mTimeDomain,
-                mFFTData.mRealValues,
-                mFFTData.mImaginaryValues);
 
    GetBuffer()->Reset();
 }
 
 void SpectralDisplay::DrawModule()
 {
-   if (Minimized() || IsVisible() == false)
+   if (Minimized() || IsVisible() == false || !mEnabled)
       return;
 
    ofPushStyle();

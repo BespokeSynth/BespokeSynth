@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__Lissajous__
-#define __Bespoke__Lissajous__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
@@ -79,6 +77,3 @@ private:
    bool mAutocorrelationMode{ true };
    bool mOnlyHasOneChannel{ true };
 };
-
-
-#endif /* defined(__Bespoke__Lissajous__) */

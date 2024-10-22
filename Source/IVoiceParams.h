@@ -23,13 +23,10 @@
 //
 //
 
-#ifndef modularSynth_IVoiceParams_h
-#define modularSynth_IVoiceParams_h
+#pragma once
 
 class IVoiceParams
 {
 public:
    virtual ~IVoiceParams() {}
 };
-
-#endif

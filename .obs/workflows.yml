@@ -3,3 +3,5 @@ workflow:
     - trigger_services:
          project: home:bespokesynth
          package: bespokesynth-nightly
+  filters:
+         event: push

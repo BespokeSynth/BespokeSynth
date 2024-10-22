@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Monophonify__
-#define __modularSynth__Monophonify__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
@@ -89,6 +87,3 @@ private:
    FloatSlider* mGlideSlider{ nullptr };
    ModulationChain mPitchBend{ ModulationParameters::kDefaultPitchBend };
 };
-
-
-#endif /* defined(__modularSynth__Monophonify__) */

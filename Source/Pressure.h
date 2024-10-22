@@ -23,13 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__Pressure__
-#define __Bespoke__Pressure__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "ModulationChain.h"
 #include "Transport.h"
 
@@ -75,5 +73,3 @@ private:
 
    Modulations mModulation{ true };
 };
-
-#endif /* defined(__Bespoke__Pressure__) */

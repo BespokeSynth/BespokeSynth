@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__VSTWindow__
-#define __Bespoke__VSTWindow__
+#pragma once
 
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -55,9 +54,6 @@ public:
    void ShowWindow();
 
    static VSTWindow* CreateVSTWindow(VSTPlugin* vst, WindowFormatType);
-
-   static void closeCurrentlyOpenWindowsFor(const juce::uint32 nodeId);
-   static void closeAllCurrentlyOpenWindows();
 
    void moved() override;
    void closeButtonPressed() override;
@@ -176,5 +172,3 @@ private:
 
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProgramAudioProcessorEditor)
 };
-
-#endif /* defined(__Bespoke__VSTWindow__) */

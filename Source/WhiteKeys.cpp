@@ -57,6 +57,7 @@ void WhiteKeys::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    int degree = -1;
    switch (pitch % TheScale->GetPitchesPerOctave())
    {
+      default:
       case 0: degree = 0; break;
       case 2: degree = 1; break;
       case 4: degree = 2; break;

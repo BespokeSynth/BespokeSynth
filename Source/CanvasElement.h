@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__CanvasElement__
-#define __Bespoke__CanvasElement__
+#pragma once
 
-#include "Canvas.h"
 #include "Curve.h"
 #include "ModulationChain.h"
 
@@ -191,5 +189,3 @@ private:
    bool mIsCheckbox{ false };
    bool mIsButton{ false };
 };
-
-#endif /* defined(__Bespoke__CanvasElement__) */

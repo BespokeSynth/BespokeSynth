@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Grid__
-#define __modularSynth__Grid__
+#pragma once
 
-#include <iostream>
 #include "IUIControl.h"
 #include "SynthGlobals.h"
 
@@ -165,5 +163,3 @@ private:
    bool mMomentary{ false };
    int mClickSubdivisions{ 1 };
 };
-
-#endif /* defined(__modularSynth__Grid__) */

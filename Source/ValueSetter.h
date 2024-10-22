@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ValueSetter__
-#define __Bespoke__ValueSetter__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
@@ -88,5 +87,3 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
 };
-
-#endif /* defined(__Bespoke__ValueSetter__) */

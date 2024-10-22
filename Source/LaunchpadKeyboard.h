@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__LaunchpadKeyboard__
-#define __modularSynth__LaunchpadKeyboard__
+#pragma once
 
-#include <iostream>
 #include "Scale.h"
 #include "Checkbox.h"
 #include "Slider.h"
@@ -94,6 +92,7 @@ private:
    enum LaunchpadLayout
    {
       kChromatic,
+      kMajorThirds,
       kDiatonic,
       kChordIndividual,
       kChord,
@@ -160,5 +159,3 @@ private:
    Checkbox* mPreserveChordRootCheckbox{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
 };
-
-#endif /* defined(__modularSynth__LaunchpadKeyboard__) */

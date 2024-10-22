@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__VinylTempoControl__
-#define __Bespoke__VinylTempoControl__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "IAudioProcessor.h"
 #include "IModulator.h"
@@ -66,6 +64,7 @@ public:
    static bool AcceptsAudio() { return true; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return false; }
+   bool ShouldSuppressAutomaticOutputCable() override { return true; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void CreateUIControls() override;
@@ -84,6 +83,9 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -105,5 +107,3 @@ private:
    //float* mModulationBuffer;
    float mSpeed{ 1 };
 };
-
-#endif /* defined(__Bespoke__VinylTempoControl__) */

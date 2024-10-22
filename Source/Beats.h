@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Beats__
-#define __modularSynth__Beats__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "EnvOscillator.h"
 #include "IDrawableModule.h"
@@ -105,6 +103,7 @@ public:
    void CreateUIControls() override;
 
    void Init() override;
+   int GetNumColumns() const { return (int)mBeatColumns.size(); }
 
    //IAudioSource
    void Process(double time) override;
@@ -132,7 +131,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -142,8 +141,6 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    ChannelBuffer mWriteBuffer;
-   std::array<BeatColumn*, 4> mBeatColumns;
+   std::vector<BeatColumn*> mBeatColumns;
    int mHighlightColumn{ -1 };
 };
-
-#endif /* defined(__modularSynth__Beats__) */

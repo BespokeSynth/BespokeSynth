@@ -25,16 +25,13 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "Sample.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "ClickButton.h"
-#include "Transport.h"
 #include "EnvOscillator.h"
 #include "ADSR.h"
 #include "RadioButton.h"

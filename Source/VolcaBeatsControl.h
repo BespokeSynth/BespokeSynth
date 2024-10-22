@@ -25,16 +25,12 @@
   ==============================================================================
 */
 
-#ifndef VOLCABEATSCONTROL_H_INCLUDED
-#define VOLCABEATSCONTROL_H_INCLUDED
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "INoteSource.h"
 #include "Slider.h"
-#include "Transport.h"
 
 class VolcaBeatsControl : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener
 {
@@ -94,6 +90,3 @@ private:
    float mLevels[10]{};
    FloatSlider* mLevelSliders[10]{ nullptr };
 };
-
-
-#endif // VOLCABEATSCONTROL_H_INCLUDED

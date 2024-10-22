@@ -23,13 +23,10 @@
 //
 //
 
-#ifndef __Bespoke__GridController__
-#define __Bespoke__GridController__
+#pragma once
 
 #include "IUIControl.h"
 #include "MidiController.h"
-#include "UIGrid.h"
-#include "INoteSource.h"
 
 #define MAX_GRIDCONTROLLER_ROWS 512
 #define MAX_GRIDCONTROLLER_COLS 512
@@ -144,5 +141,3 @@ private:
    int mControllerPage{ 0 };
    IGridControllerListener* mOwner{ nullptr };
 };
-
-#endif /* defined(__Bespoke__GridController__) */

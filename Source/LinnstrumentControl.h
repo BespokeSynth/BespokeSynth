@@ -27,12 +27,10 @@
 
 #pragma once
 
-#include <iostream>
 #include "MidiDevice.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
 #include "DropdownList.h"
-#include "Transport.h"
 #include "Scale.h"
 #include "ModulationChain.h"
 #include "Slider.h"

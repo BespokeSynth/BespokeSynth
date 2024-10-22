@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__NoteRouter__
-#define __modularSynth__NoteRouter__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
@@ -74,5 +72,3 @@ private:
    bool mRadioButtonMode{ false };
    bool mOnlyShowActiveCables{ false };
 };
-
-#endif /* defined(__modularSynth__NoteRouter__) */

@@ -1,6 +1,3 @@
-#ifndef MAINCOMPONENT_H_INCLUDED
-#define MAINCOMPONENT_H_INCLUDED
-
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_opengl/juce_opengl.h"
@@ -234,8 +231,7 @@ public:
          preferredSetupOptions.inputDeviceName = inputDevice;
 
 #ifdef JUCE_WINDOWS
-      HRESULT hr;
-      hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+      CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
 
       int inputChannels = UserPrefs.max_input_channels.Get();
@@ -316,14 +312,15 @@ public:
       for (int i = 0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
       {
          juce::String argument = JUCEApplication::getCommandLineParameterArray()[i];
-         if (argument.endsWith(".bsk"))
+         if (argument.endsWith(".bsk") || argument.endsWith(".bskt"))
          {
             mSynth.SetStartupSaveStateFile(argument.toStdString());
             break;
          }
       }
 
-      startTimerHz(60);
+      UserPrefs.LastTargetFramerate = UserPrefs.target_framerate.Get();
+      startTimerHz(UserPrefs.target_framerate.Get());
    }
 
    void shutdown() override
@@ -343,6 +340,13 @@ public:
          return;
 
       mSynth.LockRender(true);
+
+      if (UserPrefs.LastTargetFramerate != UserPrefs.target_framerate.Get())
+      {
+         stopTimer();
+         UserPrefs.LastTargetFramerate = UserPrefs.target_framerate.Get();
+         startTimerHz(UserPrefs.target_framerate.Get());
+      }
 
       juce::Point<int> mouse = Desktop::getMousePosition();
       mouse -= mScreenPosition;
@@ -596,6 +600,3 @@ void SetStartupSaveStateFile(const juce::String& bskFilePath, Component* compone
    else
       mainComponent->SetStartupSaveStateFile(bskFilePath);
 }
-
-
-#endif // MAINCOMPONENT_H_INCLUDED

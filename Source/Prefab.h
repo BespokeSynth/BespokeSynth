@@ -25,8 +25,7 @@
   ==============================================================================
 */
 
-#ifndef PREFAB_H_INCLUDED
-#define PREFAB_H_INCLUDED
+#pragma once
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
@@ -96,6 +95,3 @@ private:
    ModuleContainer mModuleContainer;
    std::string mPrefabName{ "" };
 };
-
-
-#endif // PREFAB_H_INCLUDED

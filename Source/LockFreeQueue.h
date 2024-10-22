@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef LOCKFREEQUEUE_H_INCLUDED
-#define LOCKFREEQUEUE_H_INCLUDED
+#pragma once
 
 /**
  * A simple single producer & consumer lock free queue, based on Herb Sutter's code:
@@ -88,6 +87,3 @@ private:
    Node* first{ nullptr };
    Atomic<Node*> divider, last;
 };
-
-
-#endif // LOCKFREEQUEUE_H_INCLUDED

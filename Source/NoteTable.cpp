@@ -27,10 +27,6 @@
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
-#include "NoteTable.h"
-#include "LaunchpadInterpreter.h"
-#include "Profiler.h"
-#include "FillSaveDropdown.h"
 #include "UIControlMacros.h"
 #include "PatchCableSource.h"
 #include "MathUtils.h"
@@ -137,7 +133,7 @@ void NoteTable::DrawModule()
    for (int i = 0; i < mGrid->GetRows(); ++i)
    {
       ofVec2f pos = mGrid->GetCellPosition(0, i - 1) + mGrid->GetPosition(true);
-      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 20);
+      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 18);
       DrawTextNormal(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x + 4, pos.y - (scale / 8), scale);
    }
    ofPopStyle();
@@ -172,8 +168,7 @@ void NoteTable::DrawModule()
    mGrid->GetPosition(gridX, gridY, true);
    gridW = mGrid->GetWidth();
    gridH = mGrid->GetHeight();
-   float boxHeight = (float(gridH) / mNoteRange);
-   float boxWidth = (float(gridW) / mGrid->GetCols());
+   float boxHeight = float(gridH) / mNoteRange;
 
    for (int i = 0; i < mNoteRange; ++i)
    {
@@ -217,7 +212,6 @@ void NoteTable::DrawModule()
       }
    }
 
-   float controlYPos = gridY + gridH;
    float moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
    for (int i = 0; i < kMaxLength; ++i)
@@ -445,7 +439,7 @@ void NoteTable::RandomizePitches(bool fifths)
          {
             switch (gRandom() % 5)
             {
-               case 0:
+               default:
                   SetColumnRow(i, 0);
                   break;
                case 1:

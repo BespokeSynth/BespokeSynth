@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__MacroSlider__
-#define __Bespoke__MacroSlider__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "Slider.h"
@@ -94,5 +93,3 @@ private:
    float mValue{ 0 };
    std::vector<Mapping*> mMappings;
 };
-
-#endif /* defined(__Bespoke__MacroSlider__) */

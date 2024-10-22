@@ -23,13 +23,10 @@
 //
 //
 
-#ifndef __modularSynth__NoteTransformer__
-#define __modularSynth__NoteTransformer__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "Slider.h"
 
 class NoteTransformer : public NoteEffectBase, public IDrawableModule, public IIntSliderListener
@@ -69,6 +66,3 @@ private:
    double mLastTimeTonePlayed[7]{};
    int mLastNoteOnForPitch[128];
 };
-
-
-#endif /* defined(__modularSynth__NoteTransformer__) */

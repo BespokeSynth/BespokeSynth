@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__ControlSequencer__
-#define __Bespoke__ControlSequencer__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "UIGrid.h"
 #include "ClickButton.h"
@@ -125,8 +123,8 @@ private:
    int mStep{ 0 };
    bool mSliderMode{ true };
    std::array<FloatSlider*, 32> mStepSliders{};
+   bool mRecord{ false };
+   Checkbox* mRecordCheckbox{ nullptr };
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-
-#endif /* defined(__Bespoke__ControlSequencer__) */

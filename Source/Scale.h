@@ -23,16 +23,12 @@
 //
 //
 
-#ifndef __modularSynth__Scale__
-#define __modularSynth__Scale__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "DropdownList.h"
 #include "LFO.h"
-#include "Ramp.h"
-#include "Checkbox.h"
 #include "Chord.h"
-#include "TextEntry.h"
 #include "ChordDatabase.h"
 #include <atomic>
 
@@ -217,5 +213,3 @@ private:
 };
 
 extern Scale* TheScale;
-
-#endif /* defined(__modularSynth__Scale__) */

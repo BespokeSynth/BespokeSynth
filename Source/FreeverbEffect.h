@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__FreeverbEffect__
-#define __Bespoke__FreeverbEffect__
+#pragma once
 
-#include <iostream>
 #include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
@@ -73,5 +71,3 @@ private:
    FloatSlider* mDrySlider{ nullptr };
    FloatSlider* mWidthSlider{ nullptr };
 };
-
-#endif /* defined(__Bespoke__FreeverbEffect__) */

@@ -111,8 +111,6 @@ void ADSRDisplay::Render()
 
       ofBeginShape();
       ofVertex(0, mHeight);
-      float lastX = 0;
-      float lastY = mHeight;
       for (float i = 0; i < mWidth; i += (.25f / gDrawScale))
       {
          float time = i / mWidth * mMaxTime;
@@ -126,8 +124,8 @@ void ADSRDisplay::Render()
           mAdjustMode == kAdjustRelease ||
           mAdjustMode == kAdjustReleaseAR)
       {
-         float startTime;
-         float endTime;
+         float startTime = 0;
+         float endTime = 999;
 
          if (mAdjustMode == kAdjustAttack || mAdjustMode == kAdjustAttackAR)
          {
@@ -269,7 +267,7 @@ void ADSRDisplay::Render()
             ofRect(0, 0, mWidth, 10);
             ofRect(ofMap(mMaxTime, 10, 10000, 0, mWidth - 3, K(clamp)), 0, 3, 10);
             ofSetColor(255, 255, 255, .8f * gModuleDrawAlpha);
-            DrawTextNormal(ofToString(mMaxTime, 0) + " ms", 3, 8, 10);
+            DrawTextNormal(ofToString(mMaxTime, 0) + " ms", 3, 8, 8);
             break;
          case kAdjustAttackAR:
             ofRect(0, 0, mWidth * .5f, mHeight);

@@ -349,7 +349,7 @@ void PatchCable::Render()
                {
                   ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                   float sample = vizBuff->GetSample((i / wireLength * numSamples), ch);
-                  if (isnan(sample))
+                  if (std::isnan(sample))
                   {
                      ofSetColor(ofColor(255, 0, 0));
                      sample = 0;
@@ -400,7 +400,7 @@ void PatchCable::Render()
             ofSetColor(255, 255, 0);
             ofCircle(cable.plug.x, cable.plug.y, 6);
             ofSetColor(0, 0, 0);
-            DrawTextBold("!", cable.plug.x - 2, cable.plug.y + 5, 17);
+            DrawTextBold("!", cable.plug.x - 2, cable.plug.y + 5, 15);
          }
       }
       else
@@ -514,7 +514,7 @@ IClickable* PatchCable::GetDropTarget()
    {
       PatchCablePos cable = GetPatchCablePos();
       IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
-      if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
+      if (potentialTarget && (GetConnectionType() == kConnectionType_Pulse || GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
       {
          IClickable* potentialUIControl = nullptr;
 

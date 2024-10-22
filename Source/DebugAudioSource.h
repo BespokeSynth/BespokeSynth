@@ -23,14 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__DebugAudioSource__
-#define __Bespoke__DebugAudioSource__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "EnvOscillator.h"
 #include "IDrawableModule.h"
-#include "Transport.h"
 #include "Checkbox.h"
 #include "Slider.h"
 
@@ -67,5 +64,3 @@ private:
       height = 60;
    }
 };
-
-#endif /* defined(__Bespoke__DebugAudioSource__) */

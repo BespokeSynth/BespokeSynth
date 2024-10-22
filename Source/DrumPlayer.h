@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__DrumPlayer__
-#define __modularSynth__DrumPlayer__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "Sample.h"
 #include "INoteReceiver.h"
@@ -167,6 +165,8 @@ private:
    int mSelectedHitIdx{ 0 };
    bool mMonoOutput{ false };
    Checkbox* mMonoCheckbox{ nullptr };
+   bool mSingleVoice{ false };
+   Checkbox* mSingleVoiceCheckbox{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
    NoteInputBuffer mNoteInputBuffer{ nullptr };
    bool mNeedSetup{ true };
@@ -289,5 +289,3 @@ private:
 
    std::array<DrumHit, NUM_DRUM_HITS> mDrumHits;
 };
-
-#endif /* defined(__modularSynth__DrumPlayer__) */

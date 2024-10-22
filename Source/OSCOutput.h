@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "TextEntry.h"
@@ -75,7 +74,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
 
-   char* mLabels[OSC_OUTPUT_MAX_PARAMS];
+   std::string mLabels[OSC_OUTPUT_MAX_PARAMS];
    std::list<TextEntry*> mLabelEntry{};
    float mParams[OSC_OUTPUT_MAX_PARAMS];
    std::list<FloatSlider*> mSliders{};

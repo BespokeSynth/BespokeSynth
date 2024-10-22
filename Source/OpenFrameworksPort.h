@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <assert.h>
@@ -264,6 +263,7 @@ float ofClamp(float val, float a, float b);
 float ofGetLastFrameTime();
 int ofToInt(const std::string& intString);
 float ofToFloat(const std::string& floatString);
+double ofToDouble(const std::string& doubleString);
 int ofHexToInt(const std::string& hexString);
 void ofLine(float x1, float y1, float x2, float y2);
 void ofLine(ofVec2f v1, ofVec2f v2);

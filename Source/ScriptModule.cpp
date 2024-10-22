@@ -358,7 +358,7 @@ void ScriptModule::DrawModule()
       float y = buttonRect.getCenter().y;
       ofCircle(x, y, 6);
       ofSetColor(0, 0, 0);
-      DrawTextBold("!", x - 2, y + 5, 17);
+      DrawTextBold("!", x - 2, y + 5, 15);
       ofPopStyle();
 
       if (mShowJediWarning)
@@ -1202,15 +1202,8 @@ void ScriptModule::RunCode(double time, std::string code)
 
    try
    {
-      //ofLog() << "****";
-      //ofLog() << (string)py::str(mPythonGlobals);
-
       FixUpCode(code);
-      //ofLog() << code;
       py::exec(code, py::globals());
-
-      //ofLog() << "&&&&";
-      //ofLog() << (string)py::str(mPythonGlobals);
 
       mCodeEntry->SetError(false);
       mLastError = "";
@@ -1249,43 +1242,10 @@ void ScriptModule::RunCode(double time, std::string code)
 
                lineNumber = realLineNumber;
             }
-            catch (std::exception const& e)
+            catch (std::exception)
             {
             }
          }
-         //PyErr_NormalizeException(&e.type().ptr(),&e.value().ptr(),&e.trace().ptr());
-
-         /*char *msg, *file, *text;
-         int line, offset;
-
-         int res = PyArg_ParseTuple(e.value().ptr(),"s(siis)",&msg,&file,&line,&offset,&text);
-
-         //ofLog() << e.value().
-         
-         if (res > 0)
-         {
-            PyObject* line_no = PyObject_GetAttrString(e.value().ptr(),"lineno");
-            PyObject* line_no_str = PyObject_Str(line_no);
-            PyObject* line_no_unicode = PyUnicode_AsEncodedString(line_no_str,"utf-8", "Error");
-            char *actual_line_no = PyBytes_AsString(line_no_unicode);  // Line number
-            ofLog() << actual_line_no;
-         }*/
-
-         /*PyTracebackObject* trace = (PyTracebackObject*)e.trace().ptr();
-         if (trace != nullptr)
-         {
-            while (trace->tb_next)
-               trace = trace->tb_next;
-            PyFrameObject* frame = trace->tb_frame;
-            while (frame)
-            {
-               if (frame->f_back != nullptr)
-                  lineNumber += PyFrame_GetLineNumber(frame);
-               if (frame->f_back == nullptr)
-                  lineNumber -= PyFrame_GetLineNumber(frame);  //take away root frame? not sure.
-               frame = frame->f_back;
-            }
-         }*/
       }
 
       sMostRecentLineExecutedModule->mCodeEntry->SetError(true, lineNumber);
@@ -1613,7 +1573,6 @@ juce::String ScriptModule::GetScriptChecksum() const
 void ScriptModule::RecordScriptAsTrusted()
 {
    juce::File trusted_python_scripts = File(ofToDataPath("internal/trusted_python_scripts"));
-   bool isScriptTrusted = false;
    if (!trusted_python_scripts.existsAsFile())
       trusted_python_scripts.create();
    trusted_python_scripts.appendText("\n" + GetScriptChecksum());
@@ -1638,7 +1597,7 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 
          if (mText[i] != "")
          {
-            ofVec2f linePos = codeEntry->GetLinePos(i, K(end));
+            linePos = codeEntry->GetLinePos(i, K(end));
             DrawTextNormal(mText[i], linePos.x + 10, linePos.y + 15);
          }
       }

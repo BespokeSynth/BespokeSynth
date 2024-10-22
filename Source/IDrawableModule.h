@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef modularSynth_IDrawableModule_h
-#define modularSynth_IDrawableModule_h
+#pragma once
 
 #include "IClickable.h"
 #include "IPollable.h"
@@ -162,6 +161,7 @@ public:
    bool CanReceiveAudio() { return mCanReceiveAudio; }
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
+   virtual bool ShouldSuppressAutomaticOutputCable() { return false; }
 
    virtual void CheckboxUpdated(Checkbox* checkbox, double time) {}
 
@@ -191,10 +191,9 @@ public:
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index = 0) override
    {
-      if (index == 0 && (mMainPatchCableSource != nullptr || mPatchCableSources.empty()))
-         return mMainPatchCableSource;
-      else
+      if (index < mPatchCableSources.size())
          return mPatchCableSources[index];
+      return nullptr;
    }
    std::vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
 
@@ -257,11 +256,9 @@ private:
    bool mCanReceiveAudio{ false };
    bool mCanReceiveNotes{ false };
    bool mCanReceivePulses{ false };
+   IKeyboardFocusListener* mKeyboardFocusListener{ nullptr };
 
    ofMutex mSliderMutex;
 
-   PatchCableSource* mMainPatchCableSource{ nullptr };
    std::vector<PatchCableSource*> mPatchCableSources;
 };
-
-#endif

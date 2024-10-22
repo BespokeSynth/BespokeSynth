@@ -32,7 +32,6 @@
 #include "ModularSynth.h"
 #include "ChaosEngine.h"
 #include "Profiler.h"
-#include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
 #include "UIControlMacros.h"
 
@@ -69,12 +68,12 @@ void LooperRecorder::CreateUIControls()
    //BUTTON(mHalfShiftButton, "half"); UIBLOCK_NEWLINE();
    //BUTTON(mShiftDownbeatButton, "downbeat");
    UIBLOCK_SHIFTDOWN();
+   UIBLOCK_SHIFTDOWN();
    INTSLIDER(mNextCommitTargetSlider, "target", &mNextCommitTargetIndex, 0, 3);
    CHECKBOX(mAutoAdvanceThroughLoopersCheckbox, "auto-advance", &mAutoAdvanceThroughLoopers);
    UIBLOCK_NEWCOLUMN();
    UIBLOCK_PUSHSLIDERWIDTH(80);
    DROPDOWN(mModeSelector, "mode", ((int*)(&mRecorderMode)), 60);
-   //FLOATSLIDER(mCommitDelaySlider, "delay", &mCommitDelay, 0, 1);
    BUTTON(mClearOverdubButton, "clear");
    CHECKBOX(mFreeRecordingCheckbox, "free rec", &mFreeRecording);
    BUTTON(mCancelFreeRecordButton, "cancel free rec");
@@ -88,10 +87,22 @@ void LooperRecorder::CreateUIControls()
    BUTTON(mSnapPitchButton, "snap to pitch");
    BUTTON(mResampleButton, "resample");
    BUTTON(mResampAndSetButton, "resample & set key");
+   UIBLOCK_PUSHSLIDERWIDTH(120);
+   FLOATSLIDER(mLatencyFixMsSlider, "latency fix ms", &mLatencyFixMs, 0, 200);
    ENDUIBLOCK(width, height);
 
    mWidth = MAX(mWidth, width);
    mHeight = MAX(mHeight, height);
+
+   UIBLOCK(kBufferSegmentWidth * 4 + 110, kBufferHeight + 22);
+   for (int i = 0; i < (int)mWriteForLooperCheckbox.size(); ++i)
+   {
+      CHECKBOX(mWriteForLooperCheckbox[i], ("write" + ofToString(i)).c_str(), &mWriteForLooper[i]);
+   }
+   ENDUIBLOCK(width, height);
+   width += 12;
+
+   mWidth = MAX(mWidth, width);
 
    mNumBarsSelector->AddLabel(" 1 ", 1);
    mNumBarsSelector->AddLabel(" 2 ", 2);
@@ -114,7 +125,18 @@ void LooperRecorder::CreateUIControls()
    mCommit8BarsButton->SetDisplayText(false);
    mCommit8BarsButton->SetDimensions(kBufferSegmentWidth * 4, kBufferHeight);
 
-   SyncCablesToLoopers();
+   for (int i = 0; i < kMaxLoopers; ++i)
+   {
+      mLooperPatchCables[i] = new PatchCableSource(this, kConnectionType_Special);
+      mLooperPatchCables[i]->AddTypeFilter("looper");
+      ofRectangle rect = mWriteForLooperCheckbox[i]->GetRect(K(local));
+      mLooperPatchCables[i]->SetManualPosition(rect.getMaxX() + 5, rect.getCenter().y);
+      mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+      ofColor color = mLooperPatchCables[i]->GetColor();
+      color.a *= .3f;
+      mLooperPatchCables[i]->SetColor(color);
+      AddPatchCableSource(mLooperPatchCables[i]);
+   }
 }
 
 LooperRecorder::~LooperRecorder()
@@ -133,11 +155,25 @@ void LooperRecorder::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (!mEnabled || target == nullptr)
+   if (target == nullptr)
       return;
 
-   ComputeSliders(0);
    SyncBuffers();
+
+   if (!mEnabled)
+   {
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Reset();
+
+      return;
+   }
+
+   ComputeSliders(0);
    mWriteBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
 
@@ -147,7 +183,7 @@ void LooperRecorder::Process(double time)
    {
       SyncLoopLengths();
       mCommitToLooper->SetNumBars(mNumBars);
-      mCommitToLooper->Commit();
+      mCommitToLooper->Commit(&mRecordBuffer, false, mLatencyFixMs);
 
       mRecorderMode = kRecorderMode_Record;
       if (mTemporarilySilenceAfterCommit)
@@ -224,46 +260,10 @@ void LooperRecorder::DrawCircleHash(ofVec2f center, float progress, float width,
           outerRadius * sinTheta + center.x, outerRadius * -cosTheta + center.y);
 }
 
-void LooperRecorder::SyncCablesToLoopers()
+void LooperRecorder::GetModuleDimensions(float& width, float& height)
 {
-   int numLoopers = MAX(4, (int)mLoopers.size());
-
-   if (!mLoopers.empty() && mLoopers[mLoopers.size() - 1] != nullptr)
-      ++numLoopers; //add an extra cable for an additional looper
-
-   if (numLoopers == mLooperPatchCables.size())
-      return; //nothing to do
-
-   if (numLoopers > mLooperPatchCables.size())
-   {
-      int oldSize = (int)mLooperPatchCables.size();
-      mLooperPatchCables.resize(numLoopers);
-      for (int i = 0; i < oldSize; ++i)
-      {
-         mLooperPatchCables[i]->SetTarget(mLoopers[i]);
-      }
-      for (int i = oldSize; i < mLooperPatchCables.size(); ++i)
-      {
-         mLooperPatchCables[i] = new PatchCableSource(this, kConnectionType_Special);
-         mLooperPatchCables[i]->AddTypeFilter("looper");
-         Looper* looper = nullptr;
-         if (i < mLoopers.size())
-            looper = mLoopers[i];
-         mLooperPatchCables[i]->SetTarget(looper);
-         mLooperPatchCables[i]->SetManualPosition(160 + i * 12, 120);
-         mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
-         ofColor color = mLooperPatchCables[i]->GetColor();
-         color.a *= .3f;
-         mLooperPatchCables[i]->SetColor(color);
-         AddPatchCableSource(mLooperPatchCables[i]);
-      }
-   }
-   else
-   {
-      for (int i = numLoopers; i < mLooperPatchCables.size(); ++i)
-         RemovePatchCableSource(mLooperPatchCables[i]);
-      mLooperPatchCables.resize(numLoopers);
-   }
+   width = mWidth;
+   height = MAX(mHeight, mWriteForLooperCheckbox[mNumLoopers - 1]->GetRect(K(local)).getMaxY() + 3);
 }
 
 void LooperRecorder::PreRepatch(PatchCableSource* cableSource)
@@ -283,31 +283,49 @@ void LooperRecorder::PreRepatch(PatchCableSource* cableSource)
 
 void LooperRecorder::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   mLoopers.resize(mLooperPatchCables.size());
-   int maxLooperIndex = 0;
    for (int i = 0; i < mLoopers.size(); ++i)
    {
       if (cableSource == mLooperPatchCables[i])
       {
          mLoopers[i] = dynamic_cast<Looper*>(mLooperPatchCables[i]->GetTarget());
          if (mLoopers[i])
-         {
             mLoopers[i]->SetRecorder(this);
-            maxLooperIndex = i;
-         }
       }
    }
-
-   if (maxLooperIndex > 0)
-      mNextCommitTargetSlider->SetExtents(0, maxLooperIndex);
-
-   SyncCablesToLoopers();
 }
 
 void LooperRecorder::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+
+   for (int i = 0; i < kMaxLoopers; ++i)
+   {
+      mWriteForLooperCheckbox[i]->SetShowing(i < mNumLoopers);
+      mLooperPatchCables[i]->SetShowing(i < mNumLoopers);
+   }
+
+   ofPushStyle();
+   ofFill();
+   ofColor color = GetColor(kModuleCategory_Audio);
+   ofSetColor(color.r, color.g, color.b, 50);
+   float x = kBufferSegmentWidth * 4 + 3;
+   float y = 70;
+   float w, h;
+   GetModuleDimensions(w, h);
+   ofRect(x, y, w - x - 3, h - y - 3);
+   ofPopStyle();
+
+   DrawTextNormal("loopers:", kBufferSegmentWidth * 4 + 6, 82);
+   if (mNextCommitTargetIndex < (int)mLooperPatchCables.size())
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255);
+      ofVec2f cablePos = mLooperPatchCables[mNextCommitTargetIndex]->GetPosition();
+      cablePos -= GetPosition();
+      ofCircle(cablePos.x, cablePos.y, 5);
+      ofPopStyle();
+   }
 
    mResampleButton->Draw();
    mResampAndSetButton->Draw();
@@ -321,11 +339,14 @@ void LooperRecorder::DrawModule()
    mNumBarsSelector->Draw();
    mOrigSpeedButton->Draw();
    mSnapPitchButton->Draw();
-   //mCommitDelaySlider->Draw();
    mFreeRecordingCheckbox->Draw();
    mCancelFreeRecordButton->Draw();
+   mLatencyFixMsSlider->Draw();
    mNextCommitTargetSlider->Draw();
    mAutoAdvanceThroughLoopersCheckbox->Draw();
+
+   for (int i = 0; i < (int)mWriteForLooperCheckbox.size(); ++i)
+      mWriteForLooperCheckbox[i]->Draw();
 
    if (mSpeed != 1)
    {
@@ -379,8 +400,8 @@ void LooperRecorder::DrawModule()
    ofSetColor(0, 0, 0, 20);
    for (int i = 1; i < 4; ++i)
    {
-      float x = 3 + i * kBufferSegmentWidth;
-      ofLine(x, 3, x, 3 + kBufferHeight);
+      const float bx = 3 + i * kBufferSegmentWidth;
+      ofLine(bx, 3, bx, 3 + kBufferHeight);
    }
    ofPopStyle();
 
@@ -396,17 +417,6 @@ void LooperRecorder::DrawModule()
 
    if (mDrawDebug)
       mRecordBuffer.Draw(0, 162, 800, 100);
-
-   DrawTextNormal("loopers:", 155, 112);
-   if (mNextCommitTargetIndex < (int)mLooperPatchCables.size())
-   {
-      ofPushStyle();
-      ofSetColor(255, 255, 255);
-      ofVec2f cablePos = mLooperPatchCables[mNextCommitTargetIndex]->GetPosition();
-      cablePos -= GetPosition();
-      ofCircle(cablePos.x, cablePos.y, 5);
-      ofPopStyle();
-   }
 }
 
 void LooperRecorder::RemoveLooper(Looper* looper)
@@ -434,30 +444,6 @@ void LooperRecorder::SnapToClosestPitch()
    float desiredFreq = TheScale->PitchToFreq(desiredPitch);
 
    TheTransport->SetTempo(TheTransport->GetTempo() * desiredFreq / currentFreq);
-}
-
-void LooperRecorder::KeyPressed(int key, bool isRepeat)
-{
-   IDrawableModule::KeyPressed(key, isRepeat);
-   if (GetKeyModifiers() == (kModifier_Command | kModifier_Shift))
-   {
-      if (key >= '1' && key <= '4')
-      {
-         int looper = key - '1';
-         if (looper < mLoopers.size())
-            Commit(mLoopers[key - '1']);
-      }
-      if (key >= '5' && key <= '8')
-      {
-         int idx = key - '5';
-         SetNumBars(powf(2, idx));
-      }
-   }
-
-   if (key == 'k') //resample and set key
-      Resample(true);
-   if (key == 'l') //resample (without setting key)
-      Resample(false);
 }
 
 void LooperRecorder::Resample(bool setKey)
@@ -827,6 +813,50 @@ void LooperRecorder::CheckboxUpdated(Checkbox* checkbox, double time)
       else
          EndFreeRecord(time);
    }
+
+   for (int i = 0; i < (int)mWriteForLooperCheckbox.size(); ++i)
+   {
+      if (checkbox == mWriteForLooperCheckbox[i])
+      {
+         if (mWriteForLooper[i])
+         {
+            bool isWriteInProgress = false;
+            for (int j = 0; j < mNumLoopers; ++j)
+            {
+               if (j != i && mWriteForLooper[j])
+                  isWriteInProgress = true;
+            }
+
+            if (isWriteInProgress)
+            {
+               // cancel all
+               for (int j = 0; j < mNumLoopers; ++j)
+                  mWriteForLooper[j] = false;
+            }
+            else
+            {
+               mStartRecordMeasureTime[i] = TheTransport->GetMeasureTime(gTime);
+            }
+         }
+         else
+         {
+            double currentMeasureTime = TheTransport->GetMeasureTime(gTime);
+            double lengthInMeasures = currentMeasureTime - mStartRecordMeasureTime[i];
+            int numBars = 1;
+            if (lengthInMeasures < 1.5f)
+               numBars = 1;
+            else if (lengthInMeasures < 3.0f)
+               numBars = 2;
+            else if (lengthInMeasures < 6.0f)
+               numBars = 4;
+            else
+               numBars = 8;
+
+            mNumBars = numBars;
+            Commit(mLoopers[i]);
+         }
+      }
+   }
 }
 
 void LooperRecorder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
@@ -856,38 +886,16 @@ void LooperRecorder::Poll()
 void LooperRecorder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadString("headphonestarget", moduleInfo, "", FillDropdown<IAudioReceiver*>);
-   mModuleSaveData.LoadString("outputtarget", moduleInfo, "", FillDropdown<IAudioReceiver*>);
+   mModuleSaveData.LoadInt("num_loopers", moduleInfo, 4, 1, kMaxLoopers);
    mModuleSaveData.LoadBool("temp_silence_after_commit", moduleInfo, false);
 
-   if (!moduleInfo["loopers"].isNull())
-   {
-      mLoopers.resize(moduleInfo["loopers"].size());
-      for (int i = 0; i < moduleInfo["loopers"].size(); ++i)
-         mLoopers[i] = dynamic_cast<Looper*>(TheSynth->FindModule(moduleInfo["loopers"][i].asString()));
-      SyncCablesToLoopers();
-   }
-
    SetUpFromSaveData();
-}
-
-void LooperRecorder::SaveLayout(ofxJSONElement& moduleInfo)
-{
-   moduleInfo["loopers"].resize((unsigned int)mLoopers.size());
-   for (int i = 0; i < mLoopers.size(); ++i)
-   {
-      std::string name;
-      if (mLoopers[i])
-         name = mLoopers[i]->Name();
-      moduleInfo["loopers"][i] = name;
-   }
 }
 
 void LooperRecorder::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   SetHeadphonesTarget(TheSynth->FindAudioReceiver(mModuleSaveData.GetString("headphonestarget")));
-   SetOutputTarget(TheSynth->FindAudioReceiver(mModuleSaveData.GetString("outputtarget")));
+   mNumLoopers = mModuleSaveData.GetInt("num_loopers");
    mTemporarilySilenceAfterCommit = mModuleSaveData.GetBool("temp_silence_after_commit");
 }
 

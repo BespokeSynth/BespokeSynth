@@ -6,10 +6,8 @@
 //
 //
 
-#ifndef __modularSynth__M185Sequencer__
-#define __modularSynth__M185Sequencer__
+#pragma once
 
-#include <iostream>
 #include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -115,5 +113,3 @@ private:
 
    ClickButton* mResetStepButton{ nullptr };
 };
-
-#endif /* defined(__modularSynth__M185Sequencer__) */

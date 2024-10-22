@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__SampleDrawer__
-#define __Bespoke__SampleDrawer__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 
@@ -63,5 +62,3 @@ private:
    float mWidth{ 1 };
    float mHeight{ 1 };
 };
-
-#endif /* defined(__Bespoke__SampleDrawer__) */

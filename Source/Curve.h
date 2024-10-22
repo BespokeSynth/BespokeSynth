@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__Curve__
-#define __Bespoke__Curve__
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "IClickable.h"
@@ -93,5 +92,3 @@ private:
    int mLastEvalIndex{ 0 };
    float mDefaultValue{ 0 };
 };
-
-#endif /* defined(__Bespoke__Curve__) */

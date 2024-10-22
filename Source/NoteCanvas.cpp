@@ -24,7 +24,6 @@
 //
 
 #include "NoteCanvas.h"
-#include "IAudioSource.h"
 #include "SynthGlobals.h"
 #include "DrumPlayer.h"
 #include "ModularSynth.h"
@@ -32,7 +31,6 @@
 #include "Scale.h"
 #include "CanvasElement.h"
 #include "Profiler.h"
-#include "PolyphonyMgr.h"
 #include "CanvasTimeline.h"
 #include "CanvasScrollbar.h"
 
@@ -357,7 +355,7 @@ void NoteCanvas::DrawModule()
       int pitch = 127 - mCanvas->GetRowOffset() - i;
       float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
       float y = mCanvas->GetPosition(true).y + i * boxHeight;
-      float scale = MIN(boxHeight, 20);
+      float scale = MIN(boxHeight - 2, 18);
       DrawTextNormal(NoteName(pitch, false, true) + "(" + ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale / 8) + boxHeight, scale);
    }
    ofPopStyle();

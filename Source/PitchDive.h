@@ -23,13 +23,11 @@
 //
 //
 
-#ifndef __Bespoke__PitchDive__
-#define __Bespoke__PitchDive__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "Checkbox.h"
 #include "ModulationChain.h"
 #include "Transport.h"
 
@@ -73,5 +71,3 @@ private:
 
    Modulations mModulation;
 };
-
-#endif /* defined(__Bespoke__PitchDive__) */

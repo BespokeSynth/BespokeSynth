@@ -23,13 +23,9 @@
 //
 //
 
-#ifndef __modularSynth__Polyrhythms__
-#define __modularSynth__Polyrhythms__
+#pragma once
 
-#include <iostream>
 #include "Transport.h"
-#include "UIGrid.h"
-#include "Checkbox.h"
 #include "UIGrid.h"
 #include "Slider.h"
 #include "DropdownList.h"
@@ -109,5 +105,3 @@ private:
    float mHeight;
    std::array<RhythmLine*, 8> mRhythmLines;
 };
-
-#endif /* defined(__modularSynth__Polyrhythms__) */

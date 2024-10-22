@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__PanicButton__
-#define __Bespoke__PanicButton__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 
@@ -52,5 +50,3 @@ private:
    }
    void OnClicked(float x, float y, bool right) override;
 };
-
-#endif /* defined(__Bespoke__PanicButton__) */

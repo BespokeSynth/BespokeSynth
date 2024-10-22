@@ -293,6 +293,7 @@ void SongBuilder::OnTimeEvent(double time)
 
    if (mQueuedScene != -1 &&
        (mChangeQuantizeInterval == kInterval_None ||
+        mChangeQuantizeInterval == kInterval_Free ||
         TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset) % (int)TheTransport->GetMeasureFraction(mChangeQuantizeInterval) == 0))
    {
       SetActiveScene(time, mQueuedScene);
@@ -318,7 +319,8 @@ void SongBuilder::OnTimeEvent(double time)
          else
          {
             SetActiveSceneById(time, mSequencerSceneId[mSequenceStepIndex]);
-            mWantResetClock = true;
+            if (mResetOnSceneChange)
+               mWantResetClock = true;
          }
       }
    }
@@ -827,6 +829,8 @@ void SongBuilder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadBool("reset_transport_every_sequencer_scene", moduleInfo, true);
+
    if (IsSpawningOnTheFly(moduleInfo))
    {
       mScenes.push_back(new SongScene("off"));
@@ -847,6 +851,7 @@ void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void SongBuilder::SetUpFromSaveData()
 {
+   mResetOnSceneChange = mModuleSaveData.GetBool("reset_transport_every_sequencer_scene");
 }
 
 void SongBuilder::SaveState(FileStreamOut& out)
@@ -1139,7 +1144,7 @@ void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
       for (; cursor + kSliceSize < (int)text.size(); cursor += kSliceSize)
          displayString += text.substr(cursor, kSliceSize) + "\n";
       displayString += text.substr(cursor, (int)text.size() - cursor);
-      DrawTextNormal(displayString, x + 2, y + 9, 9);
+      DrawTextNormal(displayString, x + 2, y + 9, 7);
       ofPopMatrix();
    }
    float bottomY = y + kTargetTabHeightTop + kSpacingY + numRows * (kRowHeight + kSpacingY);

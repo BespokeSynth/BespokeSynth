@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__StepSequencer__
-#define __modularSynth__StepSequencer__
+#pragma once
 
-#include <iostream>
 #include "Transport.h"
 #include "Checkbox.h"
 #include "UIGrid.h"
@@ -269,6 +267,3 @@ private:
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__StepSequencer__) */

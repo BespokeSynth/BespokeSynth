@@ -25,7 +25,6 @@
 
 #include "MidiClockIn.h"
 #include "SynthGlobals.h"
-#include "IAudioSource.h"
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
 #include "Transport.h"

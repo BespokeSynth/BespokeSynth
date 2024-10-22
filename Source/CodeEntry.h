@@ -29,7 +29,6 @@
 
 #include "IUIControl.h"
 #include "SynthGlobals.h"
-#include "TextEntry.h"
 
 class ICodeEntryListener
 {
@@ -207,5 +206,5 @@ private:
    ofColor jediParamsHighlight{ 230, 230, 255 };
    ofColor unknownColor = ofColor::white;
 
-   float mFontSize{ 14 };
+   float mFontSize{ 12 };
 };

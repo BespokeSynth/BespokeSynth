@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__NoteGate__
-#define __Bespoke__NoteGate__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
@@ -60,6 +59,3 @@ private:
    Checkbox* mGateCheckbox{ nullptr };
    std::array<NoteInputElement, 128> mActiveNotes{ false };
 };
-
-
-#endif /* defined(__Bespoke__NoteGate__) */

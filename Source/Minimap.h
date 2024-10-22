@@ -25,9 +25,6 @@
 
 #pragma once
 
-#ifndef __Bespoke__Minimap__
-#define __Bespoke__Minimap__
-
 #include "IDrawableModule.h"
 #include "UIGrid.h"
 
@@ -63,5 +60,3 @@ private:
    UIGrid* mGrid{ nullptr };
    GridCell mHoveredBookmarkPos{ -1, -1 };
 };
-
-#endif /* defined(__Bespoke__Minimap__) */

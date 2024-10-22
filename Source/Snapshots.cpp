@@ -352,16 +352,10 @@ void Snapshots::SetSnapshot(int idx, double time)
 
             if (control->ShouldSerializeForSnapshot() && !i->mString.empty())
             {
-               std::string tempFileName = ofToDataPath("tmpread" + ofToString(this));
-               juce::MemoryOutputStream outputStream;
-               juce::Base64::convertFromBase64(outputStream, i->mString);
-               {
-                  FileStreamOut out(tempFileName);
-                  out.WriteGeneric(outputStream.getData(), outputStream.getDataSize());
-               }
-               FileStreamIn in(tempFileName);
+               juce::MemoryBlock outputStream;
+               outputStream.fromBase64Encoding(i->mString);
+               FileStreamIn in(outputStream);
                control->LoadState(in, true);
-               juce::File(tempFileName).deleteFile();
             }
          }
          else
@@ -775,7 +769,6 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       int snapshotSize;
       in >> snapshotSize;
       mSnapshotCollection[i].mSnapshots.resize(snapshotSize);
-      int j = 0;
       for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
          in >> snapshotData.mControlPath;
@@ -929,18 +922,11 @@ Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
 
    if (control->ShouldSerializeForSnapshot())
    {
-      std::string tempFileName = ofToDataPath("tmpsave" + ofToString(this));
-      juce::int64 size;
+      juce::MemoryBlock tempBlock;
       {
-         FileStreamOut out(tempFileName);
+         FileStreamOut out(tempBlock);
          control->SaveState(out);
-         size = out.GetSize();
       }
-      FileStreamIn in(tempFileName);
-      char* data = new char[size];
-      in.ReadGeneric(data, size);
-      mString = juce::Base64::toBase64(data, size).toStdString();
-      delete[] data;
-      juce::File(tempFileName).deleteFile();
+      mString = tempBlock.toBase64Encoding().toStdString();
    }
 }

@@ -29,7 +29,6 @@
 #include "IAudioSource.h"
 #include "INoteSource.h"
 #include "IAudioReceiver.h"
-#include "INoteReceiver.h"
 #include "GridController.h"
 #include "RollingBuffer.h"
 #include "TextEntry.h"
@@ -174,7 +173,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       if (buffer && length > 0)
       {
          float step = width > 0 ? kStepSize : -kStepSize;
-         float samplesPerStep = length / width * step;
+         samplesPerStep = length / width * step;
 
          ofSetColor(color);
 
@@ -222,26 +221,26 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    ofPopStyle();
 }
 
-void Add(float* buff1, const float* buff2, int bufferSize)
+void Add(float* dst, const float* src, int bufferSize)
 {
 #ifdef USE_VECTOR_OPS
-   FloatVectorOperations::add(buff1, buff2, bufferSize);
+   FloatVectorOperations::add(dst, src, bufferSize);
 #else
    for (int i = 0; i < bufferSize; ++i)
    {
-      buff1[i] += buff2[i];
+      dst[i] += src[i];
    }
 #endif
 }
 
-void Subtract(float* buff1, const float* buff2, int bufferSize)
+void Subtract(float* dst, const float* src, int bufferSize)
 {
 #ifdef USE_VECTOR_OPS
-   FloatVectorOperations::subtract(buff1, buff2, bufferSize);
+   FloatVectorOperations::subtract(dst, src, bufferSize);
 #else
    for (int i = 0; i < bufferSize; ++i)
    {
-      buff1[i] -= buff2[i];
+      dst[i] -= src[i];
    }
 #endif
 }
@@ -258,14 +257,14 @@ void Mult(float* buff, float val, int bufferSize)
 #endif
 }
 
-void Mult(float* buff1, const float* buff2, int bufferSize)
+void Mult(float* dst, const float* src, int bufferSize)
 {
 #ifdef USE_VECTOR_OPS
-   FloatVectorOperations::multiply(buff1, buff2, bufferSize);
+   FloatVectorOperations::multiply(dst, src, bufferSize);
 #else
    for (int i = 0; i < bufferSize; ++i)
    {
-      buff1[i] *= buff2[i];
+      dst[i] *= src[i];
    }
 #endif
 }
@@ -295,6 +294,7 @@ std::string NoteName(int pitch, bool flat, bool includeOctave)
    std::string ret = "x";
    switch (pitch)
    {
+      default:
       case 0:
          ret = "C";
          break;
@@ -467,6 +467,7 @@ std::string GetRomanNumeralForDegree(int degree)
    std::string roman;
    switch ((degree + 700) % 7)
    {
+      default:
       case 0: roman = "I"; break;
       case 1: roman = "II"; break;
       case 2: roman = "III"; break;
@@ -572,7 +573,8 @@ bool IsKeyHeld(int key, int modifiers)
 {
    return IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr &&
           KeyPress::isKeyCurrentlyDown(key) &&
-          GetKeyModifiers() == modifiers;
+          GetKeyModifiers() == modifiers &&
+          TheSynth->GetMainComponent()->hasKeyboardFocus(true);
 }
 
 int KeyToLower(int key)
