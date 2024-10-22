@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__PitchToValue__
-#define __Bespoke__PitchToValue__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -68,5 +67,3 @@ private:
    PatchCableSource* mControlCable{ nullptr };
    std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
 };
-
-#endif /* defined(__Bespoke__PitchToValue__) */

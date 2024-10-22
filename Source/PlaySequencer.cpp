@@ -237,11 +237,12 @@ void PlaySequencer::OnTimeEvent(double time)
 
       if (mLanes[i].mInputVelocity > 0)
       {
-         float velMult = 1;
+         float velMult;
          switch (GetVelocityLevel())
          {
             case 1: velMult = mVelocityLight; break;
             case 2: velMult = mVelocityMed; break;
+            default:
             case 3: velMult = mVelocityFull; break;
          }
          playVelocity = mLanes[i].mInputVelocity * velMult;

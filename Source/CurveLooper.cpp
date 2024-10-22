@@ -106,7 +106,9 @@ void CurveLooper::OnTransportAdvanced(float amount)
 
 float CurveLooper::GetPlaybackPosition()
 {
-   if (mLength < 0)
+   if (mLength == 0)
+      mLength = 1;
+   else if (mLength < 0)
    {
       float ret = TheTransport->GetMeasurePos(gTime) * (-mLength);
       return FloatWrap(ret, 1);
@@ -244,6 +246,7 @@ void CurveLooper::SetUpFromSaveData()
 {
    mWidth = mModuleSaveData.GetInt("width");
    mHeight = mModuleSaveData.GetInt("height");
+   Resize(mWidth, mHeight);
 }
 
 void CurveLooper::SaveState(FileStreamOut& out)

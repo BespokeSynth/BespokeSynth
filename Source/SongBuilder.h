@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <iostream>
 #include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -87,7 +86,6 @@ private:
    void PostRepatch(PatchCableSource* cable, bool fromUserClick) override;
    bool ShouldSavePatchCableSources() const override { return false; }
 
-   void OnStep(double time, float velocity, int flags);
    void SetActiveScene(double time, int newScene);
    void SetActiveSceneById(double time, int newSceneId);
    void DuplicateScene(int sceneIndex);
@@ -199,6 +197,7 @@ private:
 
    bool mUseSequencer{ false };
    Checkbox* mUseSequencerCheckbox{ nullptr };
+   bool mResetOnSceneChange{ true };
    bool mActivateFirstSceneOnStop{ true };
    Checkbox* mActivateFirstSceneOnStopCheckbox{ nullptr };
    NoteInterval mChangeQuantizeInterval{ NoteInterval::kInterval_1n };

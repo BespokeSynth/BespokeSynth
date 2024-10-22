@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__SamplerGrid__
-#define __Bespoke__SamplerGrid__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
@@ -151,5 +149,3 @@ private:
 
    UIGrid* mGrid{ nullptr };
 };
-
-#endif /* defined(__Bespoke__SamplerGrid__) */

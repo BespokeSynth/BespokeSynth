@@ -23,14 +23,11 @@
 //
 //
 
-#ifndef __modularSynth__Kicker__
-#define __modularSynth__Kicker__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
-#include "TextEntry.h"
 
 class DrumPlayer;
 
@@ -67,5 +64,3 @@ private:
 
    DrumPlayer* mDrumPlayer{ nullptr };
 };
-
-#endif /* defined(__modularSynth__Kicker__) */

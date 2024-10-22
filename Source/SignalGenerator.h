@@ -23,16 +23,13 @@
 //
 //
 
-#ifndef __Bespoke__SignalGenerator__
-#define __Bespoke__SignalGenerator__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "EnvOscillator.h"
 #include "Ramp.h"
 #include "IPulseReceiver.h"
@@ -72,6 +69,11 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
+
    bool IsEnabled() const override { return mEnabled; }
 
 private:
@@ -100,10 +102,12 @@ private:
    FloatSlider* mShuffleSlider{ nullptr };
    int mMult{ 1 };
    DropdownList* mMultSelector{ nullptr };
-   bool mSync{ false };
-   Checkbox* mSyncCheckbox{ nullptr };
+   Oscillator::SyncMode mSyncMode{ Oscillator::SyncMode::None };
+   DropdownList* mSyncModeSelector{ nullptr };
    float mSyncFreq{ 200 };
    FloatSlider* mSyncFreqSlider{ nullptr };
+   float mSyncRatio{ 1 };
+   FloatSlider* mSyncRatioSlider{ nullptr };
    float mDetune{ 0 };
    FloatSlider* mDetuneSlider{ nullptr };
    EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
@@ -127,6 +131,6 @@ private:
    double mResetPhaseAtMs{ -9999 };
 
    float* mWriteBuffer{ nullptr };
-};
 
-#endif /* defined(__Bespoke__SignalGenerator__) */
+   int mLoadRev{ -1 };
+};

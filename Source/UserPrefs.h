@@ -287,9 +287,9 @@ public:
 
    static std::string ToStringLeadingZeroes(int number);
 
+   float LastTargetFramerate;
    ofxJSONElement mUserPrefsFile;
    std::vector<UserPref*> mUserPrefs;
-
    UserPrefDropdownString devicetype{ "devicetype", "auto", 200, UserPrefCategory::General };
    UserPrefDropdownString audio_output_device{ "audio_output_device", "auto", 350, UserPrefCategory::General };
    UserPrefDropdownString audio_input_device{ "audio_input_device", "none", 350, UserPrefCategory::General };
@@ -304,6 +304,7 @@ public:
    UserPrefFloat zoom{ "zoom", 1.3f, .25f, 2, UserPrefCategory::General };
    UserPrefFloat ui_scale{ "ui_scale", 1.3f, .25f, 2, UserPrefCategory::General };
    UserPrefDropdownString cable_drop_behavior{ "cable_drop_behavior", "show quickspawn", 150, UserPrefCategory::General };
+   UserPrefDropdownString qwerty_to_pitch_mode{ "qwerty_to_pitch_mode", "Ableton", 150, UserPrefCategory::General };
    UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::General };
    UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2, UserPrefCategory::General };
    UserPrefFloat scroll_multiplier_horizontal{ "scroll_multiplier_horizontal", 1, -2, 2, UserPrefCategory::General };
@@ -330,6 +331,7 @@ public:
    UserPrefFloat background_r{ "background_r", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat background_g{ "background_g", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat background_b{ "background_b", 0.09f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat target_framerate{ "target_framerate", 60, 30, 144, UserPrefCategory::Graphics };
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
    UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };

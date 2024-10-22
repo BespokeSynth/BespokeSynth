@@ -23,12 +23,10 @@
 //
 //
 
-#ifndef __Bespoke__NoteDelayer__
-#define __Bespoke__NoteDelayer__
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "INoteSource.h"
 #include "Slider.h"
 #include "Transport.h"
@@ -88,5 +86,3 @@ private:
    int mConsumeIndex{ 0 };
    int mAppendIndex{ 0 };
 };
-
-#endif /* defined(__Bespoke__NoteDelayer__) */

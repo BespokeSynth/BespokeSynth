@@ -25,13 +25,11 @@
 
 #pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Transport.h"
 #include "Checkbox.h"
 #include "DropdownList.h"
-#include "TextEntry.h"
 #include "ClickButton.h"
 #include "Slider.h"
 #include "INoteReceiver.h"

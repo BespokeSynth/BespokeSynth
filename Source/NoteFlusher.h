@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__NoteFlusher__
-#define __Bespoke__NoteFlusher__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "ClickButton.h"
@@ -60,6 +58,3 @@ private:
 
    ClickButton* mFlushButton{ nullptr };
 };
-
-
-#endif /* defined(__Bespoke__NoteFlusher__) */

@@ -102,11 +102,14 @@ void FloatSlider::SetModulator(IModulator* modulator)
    }
 }
 
-void FloatSlider::Render()
+void FloatSlider::Poll()
 {
    if (mLastComputeTime + .1f < gTime)
       Compute();
+}
 
+void FloatSlider::Render()
+{
    float normalWidth = mWidth;
    float normalHeight = mHeight;
 
@@ -188,11 +191,11 @@ void FloatSlider::Render()
    DrawHover(mX, mY, mWidth, mHeight);
 
    std::string display;
-   float textSize = 15;
+   float textSize = 13;
    if (showSmoothAdjustmentUI)
    {
       display = "smooth: " + ofToString(mSmooth, 3);
-      textSize = 11;
+      textSize = 9;
    }
    else
    {
@@ -258,12 +261,12 @@ void FloatSlider::Render()
 
       ofPushMatrix();
       ofClipWindow(mX, mY, mWidth * .4f, mHeight, true);
-      DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 12);
+      DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 10);
       ofPopMatrix();
 
       ofPushMatrix();
       ofClipWindow(mX + mWidth * .6f, mY, mWidth * .4f, mHeight, true);
-      DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
+      DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 10);
       ofPopMatrix();
 
       ofPopStyle();
@@ -1009,8 +1012,8 @@ void IntSlider::Render()
       ofSetColor(255, 255, 255);
       ofRect(mX, mY, mWidth * .4f, mHeight);
       ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
-      DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 12);
-      DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
+      DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 10);
+      DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 10);
       ofPopStyle();
    }
 

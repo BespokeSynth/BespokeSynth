@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef modularSynth_INoteSource_h
-#define modularSynth_INoteSource_h
+#pragma once
 
-#include "OpenFrameworksPort.h"
 #include "INoteReceiver.h"
 #include "IPatchable.h"
 
@@ -92,5 +90,3 @@ public:
 private:
    PatchCableSource* mCable{ nullptr };
 };
-
-#endif

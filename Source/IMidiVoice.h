@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef additiveSynth_IMidiVoice_h
-#define additiveSynth_IMidiVoice_h
+#pragma once
 
 #include "ModulationChain.h"
 #include "Profiler.h"
@@ -64,5 +63,3 @@ private:
    float mPan{ 0 };
    ModulationParameters mModulators;
 };
-
-#endif

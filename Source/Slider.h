@@ -23,12 +23,9 @@
 //
 //
 
-#ifndef __modularSynth__Slider__
-#define __modularSynth__Slider__
+#pragma once
 
-#include <iostream>
 #include <limits>
-#include "IUIControl.h"
 #include "TextEntry.h"
 #include "Ramp.h"
 #include "IAudioPoller.h"
@@ -122,6 +119,7 @@ public:
    void Double() override;
    void Halve() override;
    void ResetToOriginal() override;
+   void Poll() override;
    void Increment(float amount) override;
 
    float PosToVal(float pos, bool ignoreSmooth) const;
@@ -301,5 +299,3 @@ private:
    TextEntry* mMinEntry;
    TextEntry* mMaxEntry;
 };
-
-#endif /* defined(__modularSynth__Slider__) */

@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__MidiController__
-#define __modularSynth__MidiController__
+#pragma once
 
-#include <iostream>
 #include "MidiDevice.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
@@ -133,7 +131,7 @@ struct UIControlConnection
       UIControlConnection* connection = new UIControlConnection(mUIOwner);
       connection->mMessageType = mMessageType;
       connection->mControl = mControl;
-      connection->mUIControl = mUIControl;
+      connection->SetUIControl(mUIControl);
       connection->mType = mType;
       connection->mValue = mValue;
       connection->mLastControlValue = mLastControlValue;
@@ -148,11 +146,13 @@ struct UIControlConnection
       connection->mChannel = mChannel;
       connection->mPage = mPage;
       connection->mPageless = mPageless;
+      connection->m14BitMode = m14BitMode;
       return connection;
    }
 
    void SetNext(UIControlConnection* next);
 
+   void SetUIControl(IUIControl* control);
    void SetUIControl(std::string path);
    void CreateUIControls(int index);
    void Poll();
@@ -179,11 +179,13 @@ struct UIControlConnection
    int mPage{ 0 };
    bool mPageless{ false };
    std::string mShouldRetryForUIControlAt{ "" };
+   bool m14BitMode{ false };
 
    static bool sDrawCables;
 
    //state
    int mLastControlValue{ -1 };
+   std::string mLastDisplayValue{ "" };
    double mLastActivityTime{ -9999 };
    MidiController* mUIOwner{ nullptr };
 
@@ -199,6 +201,7 @@ struct UIControlConnection
    TextEntry* mMidiOnEntry{ nullptr };
    Checkbox* mScaleOutputCheckbox{ nullptr };
    Checkbox* mBlinkCheckbox{ nullptr };
+   Checkbox* m14BitModeCheckbox{ nullptr };
    TextEntry* mIncrementalEntry{ nullptr };
    Checkbox* mTwoWayCheckbox{ nullptr };
    DropdownList* mFeedbackDropdown{ nullptr };
@@ -219,7 +222,7 @@ struct ControlLayoutElement
 {
    ControlLayoutElement()
    {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, bool is14Bit, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
 
    bool mActive{ false };
    MidiMessageType mType{ MidiMessageType::kMidiMessage_Control };
@@ -231,6 +234,7 @@ struct ControlLayoutElement
    int mOffVal{ 0 };
    int mOnVal{ 127 };
    bool mScaleOutput{ true };
+   bool m14BitMode{ false };
    ControlType mConnectionType{ ControlType::kControlType_Slider };
 
    PatchCableSource* mControlCable{ nullptr };
@@ -258,7 +262,7 @@ struct GridLayout
 
 #define NUM_LAYOUT_CONTROLS 128 + 128 + 128 + 1 + 1 //128 notes, 128 ccs, 128 program change, 1 pitch bend, 1 dummy
 
-class MidiController : public MidiDeviceListener, public IDrawableModule, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public IAudioPoller, public ITextEntryListener, public INoteSource
+class MidiController : public MidiDeviceListener, public IDrawableModule, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public IAudioPoller, public ITextEntryListener, public INoteSource, public IKeyboardFocusListener
 {
 public:
    MidiController();
@@ -307,6 +311,7 @@ public:
    void Poll() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void Exit() override;
+   void KeyReleased(int key) override;
 
    //MidiDeviceListener
    void OnMidiNote(MidiNote& note) override;
@@ -318,6 +323,11 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
+   //IKeyboardFocusListener
+   void OnKeyPressed(int key, bool isRepeat) override;
+   bool ShouldConsumeKey(int key) override;
+   bool CanTakeFocus() override;
+
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -328,6 +338,8 @@ public:
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    void OnCableGrabbed(PatchCableSource* cableSource) override;
+   void SendControllerInfoString(int control, int type, std::string str);
+   bool ShouldSendControllerInfoStrings() const { return mShouldSendControllerInfoStrings; }
 
    ControlLayoutElement& GetLayoutControl(int control, MidiMessageType type);
 
@@ -421,6 +433,7 @@ private:
    TextEntry* mOscInPortEntry{ nullptr };
    int mMonomeDeviceIndex{ -1 };
    DropdownList* mMonomeDeviceDropdown{ nullptr };
+   bool mShouldSendControllerInfoStrings{ false };
 
    int mControllerIndex{ -1 };
    double mLastActivityTime{ -9999 };
@@ -451,5 +464,3 @@ private:
 
    ofMutex mQueuedMessageMutex;
 };
-
-#endif /* defined(__modularSynth__MidiController__) */

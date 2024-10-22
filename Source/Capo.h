@@ -23,10 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__Capo__
-#define __modularSynth__Capo__
-
-#include <iostream>
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
@@ -87,6 +84,3 @@ private:
    Checkbox* mDiatonicCheckbox{ nullptr };
    bool mDiatonic{ false };
 };
-
-
-#endif /* defined(__modularSynth__Capo__) */

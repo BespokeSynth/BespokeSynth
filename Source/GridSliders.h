@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "DropdownList.h"

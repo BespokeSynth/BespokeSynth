@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__LiveGranulator__
-#define __modularSynth__LiveGranulator__
+#pragma once
 
-#include <iostream>
 #include "IAudioEffect.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
@@ -100,5 +98,3 @@ private:
    float mHeight{ 20 };
    float mBufferX{ 0 };
 };
-
-#endif /* defined(__modularSynth__LiveGranulator__) */

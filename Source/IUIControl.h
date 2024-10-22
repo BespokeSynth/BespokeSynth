@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef modularSynth_IUIControl_h
-#define modularSynth_IUIControl_h
+#pragma once
 
 #include "IClickable.h"
 #include "SynthGlobals.h"
@@ -118,5 +117,3 @@ protected:
    static IUIControl* sLastHoveredUIControl;
    static bool sLastUIHoverWasSetManually;
 };
-
-#endif

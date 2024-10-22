@@ -1,0 +1,78 @@
+{
+   "groups" : [
+      {
+         "rows": 1,
+         "cols": 13,
+         "position" : [ 0, 0 ],
+         "dimensions" : [28, 28],
+         "spacing" : [30, 30],
+         "controls" : [96,49,50,51,52,53,54,55,56,57,48,45,61],
+         "messageType" : "note",
+         "drawType" : "button",
+         "no_grid" : true
+      },
+      {
+         "rows": 1,
+         "cols": 1,
+         "position" : [ 390, 0 ],
+         "dimensions" : [40, 28],
+         "spacing" : [30, 30],
+         "controls" : [127],
+         "messageType" : "note",
+         "drawType" : "button"
+      },
+      {
+         "rows": 1,
+         "cols": 1,
+         "position" : [ 0, 30 ],
+         "dimensions" : [40, 28],
+         "spacing" : [30, 30],
+         "controls" : [9],
+         "messageType" : "note",
+         "drawType" : "button"
+      },
+      {
+         "rows": 1,
+         "cols": 13,
+         "position" : [ 40, 30 ],
+         "dimensions" : [28, 28],
+         "spacing" : [30, 30],
+         "controls" : [113,119,101,114,116,121,117,105,111,112,91,93,92],
+         "messageType" : "note",
+         "drawType" : "button",
+         "no_grid" : true
+      },
+      {
+         "rows": 1,
+         "cols": 11,
+         "position" : [ 45, 60 ],
+         "dimensions" : [28, 28],
+         "spacing" : [30, 30],
+         "controls" : [97,115,100,102,103,104,106,107,108,59,39],
+         "messageType" : "note",
+         "drawType" : "button",
+         "no_grid" : true
+      },
+      {
+         "rows": 1,
+         "cols": 1,
+         "position" : [ 375, 60 ],
+         "dimensions" : [40, 28],
+         "spacing" : [30, 30],
+         "controls" : [13],
+         "messageType" : "note",
+         "drawType" : "button"
+      },
+      {
+         "rows": 1,
+         "cols": 10,
+         "position" : [ 50, 90 ],
+         "dimensions" : [28, 28],
+         "spacing" : [30, 30],
+         "controls" : [122,120,99,118,98,110,109,44,46,47],
+         "messageType" : "note",
+         "drawType" : "button",
+         "no_grid" : true
+      }
+   ]
+}

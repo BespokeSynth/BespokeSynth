@@ -29,7 +29,6 @@
 #include "INoteSource.h"
 #include "INoteReceiver.h"
 #include "IAudioReceiver.h"
-#include "IAudioSource.h"
 #include "IAudioEffect.h"
 #include "IUIControl.h"
 #include "Slider.h"
@@ -40,7 +39,6 @@
 #include "ModuleSaveDataPanel.h"
 #include "GridController.h"
 #include "ControlSequencer.h"
-#include "Snapshots.h"
 #include "PatchCableSource.h"
 #include "nanovg/nanovg.h"
 #include "IPulseReceiver.h"
@@ -83,10 +81,10 @@ void IDrawableModule::CreateUIControls()
       type = kConnectionType_Grid;
    else if (dynamic_cast<IPulseSource*>(this))
       type = kConnectionType_Pulse;
-   if (type != kConnectionType_Special)
+
+   if (type != kConnectionType_Special && !ShouldSuppressAutomaticOutputCable())
    {
-      mMainPatchCableSource = new PatchCableSource(this, type);
-      mPatchCableSources.push_back(mMainPatchCableSource);
+      mPatchCableSources.push_back(new PatchCableSource(this, type));
    }
 
    GetMinimizedWidth(); //update cached width
@@ -149,6 +147,8 @@ void IDrawableModule::Init()
          continue; //stuff in module containers was already initialized
       mChildren[i]->Init();
    }
+
+   mKeyboardFocusListener = dynamic_cast<IKeyboardFocusListener*>(this);
 }
 
 void IDrawableModule::BasePoll()
@@ -280,6 +280,30 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          mEnabledCheckbox->Draw();
       }
 
+      if (mKeyboardFocusListener != nullptr && mKeyboardFocusListener->CanTakeFocus())
+      {
+         if ((gHoveredModule == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr) ||
+             IKeyboardFocusListener::GetActiveKeyboardFocus() == mKeyboardFocusListener)
+            ofSetColor(255, 255, 255, gModuleDrawAlpha);
+         else
+            ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
+         float squareSize = titleBarHeight / 2 - 1;
+         ofRect(w - 25, -titleBarHeight + 1, squareSize, squareSize, 1);
+         ofRect(w - 25, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+         ofRect(w - 25 - squareSize - 1, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+         ofRect(w - 25 + squareSize + 1, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
+
+         if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mKeyboardFocusListener)
+         {
+            ofPushStyle();
+            ofSetLineWidth(.5f);
+            ofNoFill();
+            ofRect(w - 25 - squareSize - 2 - 1, -titleBarHeight,
+                   2 + squareSize + 1 + squareSize + 1 + squareSize + 2, titleBarHeight, 2);
+            ofPopStyle();
+         }
+      }
+
       if (IsSaveable() && !Minimized())
       {
          ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
@@ -327,7 +351,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    if (HasTitleBar())
    {
       ofSetColor(color * (1 - GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
-      DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 16);
+      DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 14);
    }
 
    bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
@@ -471,6 +495,18 @@ void IDrawableModule::DrawPatchCables(bool parentMinimized, bool inFront)
       if (PatchCable::sActivePatchCable != nullptr)
          isHeld = (PatchCable::sActivePatchCable->GetOwner() == source);
       bool shouldDrawInFront = isHeld || (type != kConnectionType_Note && type != kConnectionType_Pulse && type != kConnectionType_Audio);
+      if (type == kConnectionType_Pulse)
+      {
+         for (auto const cable : source->GetPatchCables())
+         {
+            if (cable->GetTarget() != nullptr &&
+                dynamic_cast<IUIControl*>(cable->GetTarget()) != nullptr)
+            {
+               shouldDrawInFront = true;
+               break;
+            }
+         }
+      }
       if ((inFront && !shouldDrawInFront) || (!inFront && shouldDrawInFront))
          continue;
 
@@ -549,19 +585,18 @@ void IDrawableModule::DrawConnection(IClickable* target)
 
 void IDrawableModule::SetTarget(IClickable* target)
 {
-   if (mMainPatchCableSource != nullptr)
-      mMainPatchCableSource->SetTarget(target);
-   else if (!mPatchCableSources.empty())
+   if (!mPatchCableSources.empty())
       mPatchCableSources[0]->SetTarget(target);
 }
 
 void IDrawableModule::SetUpPatchCables(std::string targets)
 {
-   assert(mMainPatchCableSource != nullptr);
+   PatchCableSource* source = GetPatchCableSource();
+   assert(source != nullptr);
    std::vector<std::string> targetVec = ofSplitString(targets, ",");
    if (targetVec.empty() || targets == "")
    {
-      mMainPatchCableSource->Clear();
+      source->Clear();
    }
    else
    {
@@ -569,7 +604,7 @@ void IDrawableModule::SetUpPatchCables(std::string targets)
       {
          IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
          if (target)
-            mMainPatchCableSource->AddPatchCable(target);
+            source->AddPatchCable(target);
       }
    }
 }
@@ -636,13 +671,19 @@ void IDrawableModule::OnClicked(float x, float y, bool right)
          mWasMinimizeAreaClicked = true;
          return;
       }
-      else if (!Minimized() && IsSaveable() &&
-               x > w - 10)
+      else if (!Minimized() && IsSaveable())
       {
-         if (TheSaveDataPanel->GetModule() == this)
-            TheSaveDataPanel->SetModule(nullptr);
-         else
-            TheSaveDataPanel->SetModule(this);
+         if (x > w - 10)
+         {
+            if (TheSaveDataPanel->GetModule() == this)
+               TheSaveDataPanel->SetModule(nullptr);
+            else
+               TheSaveDataPanel->SetModule(this);
+         }
+         else if (x > w - 30 && mKeyboardFocusListener != nullptr && mKeyboardFocusListener->CanTakeFocus())
+         {
+            IKeyboardFocusListener::SetActiveKeyboardFocus(mKeyboardFocusListener);
+         }
       }
    }
 
@@ -810,7 +851,7 @@ float IDrawableModule::GetMinimizedWidth()
    if (titleLabel != mLastTitleLabel)
    {
       mLastTitleLabel = titleLabel;
-      mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 16);
+      mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 14);
    }
    float width = mTitleLabelWidth;
    width += 10; //padding

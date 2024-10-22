@@ -135,7 +135,7 @@ void DotSequencer::DrawModule()
          ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
       }
 
-      float scale = std::min(mDotGrid->IClickable::GetDimensions().y / mDotGrid->GetRows(), 12.0f);
+      float scale = std::min(mDotGrid->IClickable::GetDimensions().y / mDotGrid->GetRows() - 2, 10.0f);
       DrawTextRightJustify(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x - 3, pos.y - ysize * .5f + (scale / 2), scale);
    }
    ofPopStyle();

@@ -24,7 +24,6 @@
 //
 
 #include "StepSequencer.h"
-#include "IAudioSource.h"
 #include "SynthGlobals.h"
 #include "DrumPlayer.h"
 #include "ModularSynth.h"
@@ -366,7 +365,6 @@ Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
    if (!HasGridController())
       return Vec2i(0, 0);
 
-   int rows = GetGridControllerRows();
    int cols = GetGridControllerCols();
 
    int numChunks = GetNumControllerChunks();

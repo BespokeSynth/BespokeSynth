@@ -44,8 +44,6 @@ void AudioToCV::CreateUIControls()
    mMinSlider = new FloatSlider(this, "min", mGainSlider, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 
-   GetPatchCableSource()->SetEnabled(false);
-
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
@@ -121,4 +119,37 @@ void AudioToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void AudioToCV::SetUpFromSaveData()
 {
+}
+
+void AudioToCV::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+}
+
+void AudioToCV::LoadState(FileStreamIn& in, int rev)
+{
+   if (rev < 1)
+   {
+      // Temporary additional cable source
+      mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
+      mTargetCable->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCable);
+   }
+
+   IDrawableModule::LoadState(in, rev);
+
+   if (rev < 1)
+   {
+      const auto target = GetPatchCableSource(1)->GetTarget();
+      if (target != nullptr)
+         GetPatchCableSource()->SetTarget(target);
+      RemovePatchCableSource(GetPatchCableSource(1));
+      mTargetCable = GetPatchCableSource();
+   }
+
+   if (ModularSynth::sLoadingFileSaveStateRev < 423)
+      in >> rev;
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 }

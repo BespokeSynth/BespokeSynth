@@ -25,13 +25,10 @@
   ==============================================================================
 */
 
-#ifndef NOTEHUMANIZER_H_INCLUDED
-#define NOTEHUMANIZER_H_INCLUDED
-
+#pragma once
 
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "INoteSource.h"
 #include "Slider.h"
 #include "Transport.h"
@@ -77,6 +74,3 @@ private:
 
    std::array<float, 128> mLastDelayMs{};
 };
-
-
-#endif // NOTEHUMANIZER_H_INCLUDED

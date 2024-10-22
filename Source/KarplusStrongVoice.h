@@ -23,11 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__KarplusStrongVoice__
-#define __modularSynth__KarplusStrongVoice__
+#pragma once
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
 #include "IMidiVoice.h"
 #include "IVoiceParams.h"
 #include "ADSR.h"
@@ -103,5 +100,3 @@ private:
    IDrawableModule* mOwner{ nullptr };
    KarplusStrong* mKarplusStrongModule{ nullptr };
 };
-
-#endif /* defined(__modularSynth__KarplusStrongVoice__) */

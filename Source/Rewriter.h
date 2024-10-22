@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Rewriter__
-#define __modularSynth__Rewriter__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "ClickButton.h"
@@ -88,6 +86,3 @@ private:
 
    PatchCableSource* mLooperCable{ nullptr };
 };
-
-
-#endif /* defined(__modularSynth__Rewriter__) */

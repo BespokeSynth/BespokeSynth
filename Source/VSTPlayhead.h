@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__VSTPlayhead__
-#define __Bespoke__VSTPlayhead__
+#pragma once
 
 #include "juce_audio_basics/juce_audio_basics.h"
 
@@ -33,6 +32,3 @@ class VSTPlayhead : public juce::AudioPlayHead
 public:
    juce::Optional<AudioPlayHead::PositionInfo> getPosition() const override;
 };
-
-
-#endif /* defined(__Bespoke__VSTPlayhead__) */

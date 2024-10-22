@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ModulationVisualizer__
-#define __Bespoke__ModulationVisualizer__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
@@ -40,13 +39,14 @@ public:
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
 
-   void SetEnabled(bool enabled) override { mEnabled = enabled; }
-
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -55,8 +55,8 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 300;
-      height = 100;
+      width = mWidth;
+      height = mHeight;
    }
 
    struct VizVoice
@@ -66,8 +66,8 @@ private:
       ModulationParameters mModulators;
    };
 
+   float mWidth{ 350 };
+   float mHeight{ 100 };
    VizVoice mGlobalModulation;
    std::vector<VizVoice> mVoices;
 };
-
-#endif /* defined(__Bespoke__ModulationVisualizer__) */

@@ -72,7 +72,7 @@ void RingModulator::Process(double time)
 
       for (int i = 0; i < bufferSize; ++i)
       {
-         ComputeSliders(0);
+         ComputeSliders(i);
 
          for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
             GetBuffer()->GetChannel(ch)[i] *= mModOsc.Audio(time, mPhase);

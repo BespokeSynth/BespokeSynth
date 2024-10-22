@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Razor__
-#define __modularSynth__Razor__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "INoteReceiver.h"
 #include "ADSR.h"
@@ -128,7 +126,7 @@ private:
    bool mManualControl{ false };
    Checkbox* mManualControlCheckbox{ nullptr };
    FloatSlider* mAmpSliders[NUM_AMP_SLIDERS]{ nullptr };
-   FloatSlider* mDetuneSliders[NUM_AMP_SLIDERS];
+   FloatSlider* mDetuneSliders[NUM_AMP_SLIDERS]{ nullptr };
    ClickButton* mResetDetuneButton{ nullptr };
 
    float mA{ 1 };
@@ -143,5 +141,3 @@ private:
    float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH + 1]{};
    int mHistoryPtr{ 0 };
 };
-
-#endif /* defined(__modularSynth__Razor__) */

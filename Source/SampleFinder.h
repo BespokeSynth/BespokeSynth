@@ -23,18 +23,14 @@
 //
 //
 
-#ifndef __modularSynth__SampleFinder__
-#define __modularSynth__SampleFinder__
+#pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
-#include "EnvOscillator.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Transport.h"
 #include "ClickButton.h"
 #include "SampleDrawer.h"
 
@@ -118,5 +114,3 @@ private:
    bool mReverse{ false };
    Checkbox* mReverseCheckbox{ nullptr };
 };
-
-#endif /* defined(__modularSynth__SampleFinder__) */

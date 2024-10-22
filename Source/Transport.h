@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__Transport__
-#define __modularSynth__Transport__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ClickButton.h"
@@ -234,5 +232,3 @@ private:
 };
 
 extern Transport* TheTransport;
-
-#endif /* defined(__modularSynth__Transport__) */

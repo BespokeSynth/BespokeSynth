@@ -23,11 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__DCRemoverEffect__
-#define __Bespoke__DCRemoverEffect__
+#pragma once
 
-#include <stdio.h>
-#include <iostream>
 #include "IAudioEffect.h"
 #include "BiquadFilter.h"
 
@@ -57,5 +54,3 @@ private:
 
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};
 };
-
-#endif /* defined(__Bespoke__DCRemoverEffect__) */

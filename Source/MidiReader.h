@@ -23,10 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__MidiReader__
-#define __Bespoke__MidiReader__
-
-#include "OpenFrameworksPort.h"
+#pragma once
 
 //TODO_PORT(Ryan) make this work
 
@@ -47,5 +44,3 @@ private:
    //MIDISequencer* mSequencer;
    int mBeatOffset{ 0 };
 };
-
-#endif /* defined(__Bespoke__MidiReader__) */

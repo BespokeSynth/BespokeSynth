@@ -26,15 +26,13 @@
 */
 
 #pragma once
-#include <iostream>
+
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ClickButton.h"
 #include "RollingBuffer.h"
 #include "Ramp.h"
-#include "Checkbox.h"
-#include "PatchCableSource.h"
 
 class Panner : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IButtonListener, public IIntSliderListener
 {

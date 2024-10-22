@@ -1,0 +1,66 @@
+{
+    "channelfilter": 1,
+    "groups" : [
+        {
+            "rows": 1,
+            "cols": 9,
+            "position" : [0, 0],
+            "dimensions" : [28, 40],
+            "spacing" : [30, 30],
+            "controls" : [12, 13, 14, 15, 16, 17, 18, 19, 41],
+            "colors" : [0, 127],
+            "messageType" : "control",
+            "drawType" : "slider"
+        },
+        {
+            "rows": 2,
+            "cols": 3,
+            "position" : [180, 60],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 30],
+            "controls" : [
+                115, 116, 114,
+                117, 118, 119
+            ],
+            "colors" : [0, 127],
+            "messageType" : "control",
+            "drawType" : "button"
+        },
+        {
+            "rows": 1,
+            "cols": 8,
+            "position" : [300, 0],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 30],
+            "controls" : [22, 23, 24, 25, 26, 27, 28, 29],
+            "colors" : [0, 127],
+            "messageType" : "control",
+            "drawType" : "knob"
+        },
+        {
+            "rows": 2,
+            "cols": 8,
+            "position" : [300, 40],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 30],
+            "controls" : [
+                40, 41, 42, 43, 48, 49, 50, 51,
+                36, 37, 38, 39, 44, 45, 46, 47
+            ],
+            "colors" : [0, 127],
+            "messageType" : "note",
+            "drawType" : "button"
+        },
+        {
+            "rows": 2,
+            "cols": 1,
+            "position" : [560, 40],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 30],
+            "controls" : [107, 108],
+            "colors" : [0, 127],
+            "messageType" : "control",
+            "drawType" : "button"
+        }
+    ]
+}

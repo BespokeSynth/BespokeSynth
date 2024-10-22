@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__VSTPlugin__
-#define __Bespoke__VSTPlugin__
+#pragma once
 
 #include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
@@ -33,10 +32,7 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
-#include "EnvOscillator.h"
 #include "Ramp.h"
-#include "ClickButton.h"
 #include "VSTPlayhead.h"
 #include "VSTWindow.h"
 
@@ -148,6 +144,7 @@ private:
    juce::MidiBuffer mFutureMidiBuffer;
    juce::CriticalSection mMidiInputLock;
    std::atomic<bool> mRescanParameterNames{ false };
+   juce::String cutOffIdHash(juce::String);
    int mNumInputChannels{ 2 };
    int mNumOutputChannels{ 2 };
 
@@ -201,6 +198,7 @@ private:
    DisplayMode mDisplayMode{ DisplayMode::kDisplayMode_Sliders };
    int mShowParameterIndex{ -1 };
    DropdownList* mShowParameterDropdown{ nullptr };
+   static constexpr int kMaxParametersInDropdown{ 30 };
    int mTemporarilyDisplayedParamIndex{ -1 };
 
    /*
@@ -210,5 +208,3 @@ private:
 
    bool mWantOpenVstWindow{ false };
 };
-
-#endif /* defined(__Bespoke__VSTPlugin__) */

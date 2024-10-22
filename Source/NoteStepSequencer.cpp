@@ -27,7 +27,6 @@
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
-#include "NoteStepSequencer.h"
 #include "LaunchpadInterpreter.h"
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
@@ -240,7 +239,7 @@ void NoteStepSequencer::DrawModule()
    for (int i = 0; i < mGrid->GetRows(); ++i)
    {
       ofVec2f pos = mGrid->GetCellPosition(0, i - 1) + mGrid->GetPosition(true);
-      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 20);
+      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 18);
       DrawTextNormal(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x + 1, pos.y - (scale / 8), scale);
    }
    ofPopStyle();
@@ -1221,6 +1220,7 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
          {
             switch (gRandom() % 5)
             {
+               default:
                case 0:
                   mTones[i] = 0;
                   break;

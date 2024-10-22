@@ -69,6 +69,6 @@ void TimerDisplay::DrawModule()
 
    ofPushStyle();
    ofSetColor(255, 255, 255);
-   gFont.DrawString(zeroPadMins + ofToString(mins) + ":" + zeroPadSecs + ofToString(secs), 54, 15, 36);
+   gFont.DrawString(zeroPadMins + ofToString(mins) + ":" + zeroPadSecs + ofToString(secs), 52, 15, 36);
    ofPopStyle();
 }

@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__NoteCreator__
-#define __Bespoke__NoteCreator__
+#pragma once
 
 #include "IDrawableModule.h"
 #include "INoteSource.h"
@@ -86,5 +85,3 @@ protected:
    bool mNoteOn{ false };
    int mVoiceIndex{ -1 };
 };
-
-#endif /* defined(__Bespoke__NoteCreator__) */

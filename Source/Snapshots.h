@@ -26,13 +26,11 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "UIGrid.h"
 #include "ClickButton.h"
 #include "Checkbox.h"
 #include "FloatSliderLFOControl.h"
-#include "Transport.h"
 #include "Slider.h"
 #include "Ramp.h"
 #include "INoteReceiver.h"
@@ -171,11 +169,11 @@ private:
    TextEntry* mSnapshotLabelEntry{ nullptr };
    std::string mSnapshotLabel;
    int mLoadRev{ -1 };
-   ClickButton* mClearButton;
+   ClickButton* mClearButton{ nullptr };
    bool mStoreMode{ false };
-   Checkbox* mStoreCheckbox;
+   Checkbox* mStoreCheckbox{ nullptr };
    bool mDeleteMode{ false };
-   Checkbox* mDeleteCheckbox;
+   Checkbox* mDeleteCheckbox{ nullptr };
    bool mAutoStoreOnSwitch{ false };
-   Checkbox* mAutoStoreOnSwitchCheckbox;
+   Checkbox* mAutoStoreOnSwitchCheckbox{ nullptr };
 };

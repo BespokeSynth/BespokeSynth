@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__SeaOfGrain__
-#define __Bespoke__SeaOfGrain__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "EnvOscillator.h"
 #include "IDrawableModule.h"
@@ -163,6 +161,7 @@ private:
    bool mRecordInput{ false };
    Checkbox* mRecordInputCheckbox{ nullptr };
    bool mHasRecordedInput{ false };
+
    float mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    bool mLoading{ false };
@@ -177,5 +176,3 @@ private:
    DropdownList* mKeyboardNumPitchesSelector{ nullptr };
    int mKeyboardNumPitches{ 24 };
 };
-
-#endif /* defined(__Bespoke__SeaOfGrain__) */

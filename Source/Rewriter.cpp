@@ -193,7 +193,7 @@ void Rewriter::Go(double time)
       }
 
       mConnectedLooper->SetNumBars(mConnectedLooper->GetRecorderNumBars());
-      mConnectedLooper->Commit(&mRecordBuffer);
+      mConnectedLooper->Commit(&mRecordBuffer, true, 0);
       AudioSend* connectedSend = dynamic_cast<AudioSend*>(mConnectedLooper->GetTarget());
       if (connectedSend)
          connectedSend->SetSend(1, true);

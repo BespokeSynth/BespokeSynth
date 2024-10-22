@@ -23,15 +23,11 @@
 //
 //
 
-#ifndef __modularSynth__BiquadFilterEffect__
-#define __modularSynth__BiquadFilterEffect__
+#pragma once
 
-#include <iostream>
 #include "IAudioEffect.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "Slider.h"
-#include "Transport.h"
 #include "BiquadFilter.h"
 #include "RadioButton.h"
 
@@ -90,5 +86,3 @@ private:
 
    bool mCoefficientsHaveChanged{ true };
 };
-
-#endif /* defined(__modularSynth__BiquadFilterEffect__) */

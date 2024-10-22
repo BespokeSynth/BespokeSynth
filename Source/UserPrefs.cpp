@@ -40,9 +40,73 @@ void RegisterUserPref(UserPref* pref)
    UserPrefs.mUserPrefs.push_back(pref);
 }
 
+// Helper function to convert string to appropriate type and set the JSON value
+void setValueFromString(Json::Value& element, const std::string& value)
+{
+   switch (element.type())
+   {
+      case Json::nullValue:
+         ofLog() << "Cannot update null value.";
+         break;
+      case Json::intValue:
+         element = std::stoi(value);
+         break;
+      case Json::uintValue:
+         element = static_cast<unsigned int>(std::stoul(value));
+         break;
+      case Json::realValue:
+         element = std::stod(value);
+         break;
+      case Json::stringValue:
+         element = value;
+         break;
+      case Json::booleanValue:
+         if (value == "true" || value == "1")
+         {
+            element = true;
+         }
+         else if (value == "false" || value == "0")
+         {
+            element = false;
+         }
+         else
+         {
+            ofLog() << "Invalid boolean value.";
+         }
+         break;
+      case Json::arrayValue:
+      case Json::objectValue:
+         ofLog() << "Cannot update array or object value with a single command-line parameter.";
+         break;
+      default:
+         ofLog() << "Unsupported JSON value type.";
+         break;
+   }
+}
+
 void UserPrefsHolder::Init()
 {
    mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
+
+   // Look for overrides in command line options
+   for (int i = 0; i < juce::JUCEApplication::getCommandLineParameterArray().size(); ++i)
+   {
+      juce::String argument = juce::JUCEApplication::getCommandLineParameterArray()[i];
+      if (argument == "-o" || argument == "--option")
+      {
+         juce::String argJsonOption = juce::JUCEApplication::getCommandLineParameterArray()[i + 1];
+         auto value = juce::JUCEApplication::getCommandLineParameterArray()[i + 2].toStdString();
+         auto& element = mUserPrefsFile[argJsonOption.toStdString()];
+         try
+         {
+            setValueFromString(element, value);
+         }
+         catch (std::invalid_argument)
+         {
+            ofLog() << "Failed to convert argument " << value << " to the desired type";
+         }
+      }
+   }
 
    for (auto* pref : mUserPrefs)
       pref->Init();

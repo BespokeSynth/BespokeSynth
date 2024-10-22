@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "Transport.h"
 #include "Checkbox.h"
@@ -110,6 +109,7 @@ private:
    IntSlider* mResetLengthSlider{ nullptr };
    int mCustomDivisor{ 8 };
    IntSlider* mCustomDivisorSlider{ nullptr };
+   ClickButton* mRestartFreeTimeButton{ nullptr };
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

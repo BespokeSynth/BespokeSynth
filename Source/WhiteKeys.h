@@ -23,13 +23,10 @@
 //
 //
 
-#ifndef __modularSynth__WhiteKeys__
-#define __modularSynth__WhiteKeys__
+#pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 
 class WhiteKeys : public NoteEffectBase, public IDrawableModule
 {
@@ -61,5 +58,3 @@ private:
       height = 0;
    }
 };
-
-#endif /* defined(__modularSynth__WhiteKeys__) */

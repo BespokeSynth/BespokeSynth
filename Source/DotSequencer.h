@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -110,7 +109,7 @@ private:
    IntSlider* mRowOffsetSlider{ nullptr };
    ClickButton* mDoubleButton{ nullptr };
 
-   DotGrid* mDotGrid;
+   DotGrid* mDotGrid{ nullptr };
 
    struct PlayingDot
    {

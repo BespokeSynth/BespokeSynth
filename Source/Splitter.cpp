@@ -60,9 +60,6 @@ void Splitter::Process(double time)
 {
    PROFILER(Splitter);
 
-   if (!mEnabled)
-      return;
-
    IAudioReceiver* target0 = GetTarget(0);
    if (target0)
    {

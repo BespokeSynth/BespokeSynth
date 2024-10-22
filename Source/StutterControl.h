@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__StutterControl__
-#define __Bespoke__StutterControl__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "Checkbox.h"
@@ -111,5 +109,3 @@ private:
    FloatSlider* mFreeSpeedSlider{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
 };
-
-#endif /* defined(__Bespoke__StutterControl__) */

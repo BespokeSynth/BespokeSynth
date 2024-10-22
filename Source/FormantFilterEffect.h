@@ -23,14 +23,12 @@
 //
 //
 
-#ifndef __Bespoke__FormantFilter__
-#define __Bespoke__FormantFilter__
+#pragma once
 
 #include "IAudioEffect.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "Slider.h"
-#include "Transport.h"
 #include "BiquadFilter.h"
 #include "RadioButton.h"
 
@@ -79,7 +77,6 @@ private:
 #define NUM_FORMANT_BANDS 3
    BiquadFilter mBiquads[NUM_FORMANT_BANDS];
    float* mDryBuffer{ nullptr };
-   int mDryBufferSize;
    float mEE{ 1 };
    float mOO{ 0 };
    float mI{ 0 };
@@ -116,5 +113,3 @@ private:
    std::vector<Formants> mFormants;
    float* mOutputBuffer{ nullptr };
 };
-
-#endif /* defined(__Bespoke__FormantFilter__) */

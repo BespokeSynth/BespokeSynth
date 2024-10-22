@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__LoopStorer__
-#define __Bespoke__LoopStorer__
+#pragma once
 
 #include "EnvOscillator.h"
 #include "IDrawableModule.h"
@@ -33,7 +32,6 @@
 #include "DropdownList.h"
 #include "Transport.h"
 #include "ClickButton.h"
-#include "Transport.h"
 #include "OpenFrameworksPort.h"
 
 class Sample;
@@ -121,5 +119,3 @@ private:
 
    PatchCableSource* mLooperCable{ nullptr };
 };
-
-#endif /* defined(__Bespoke__LoopStorer__) */

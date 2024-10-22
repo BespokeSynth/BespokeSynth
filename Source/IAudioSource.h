@@ -23,8 +23,7 @@
 //
 //
 
-#ifndef modularSynth_IAudioSource_h
-#define modularSynth_IAudioSource_h
+#pragma once
 
 #include "RollingBuffer.h"
 #include "SynthGlobals.h"
@@ -52,5 +51,3 @@ protected:
 private:
    RollingBuffer mVizBuffer;
 };
-
-#endif

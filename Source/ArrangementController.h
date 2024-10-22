@@ -23,10 +23,7 @@
 //
 //
 
-#ifndef __Bespoke__ArrangementController__
-#define __Bespoke__ArrangementController__
-
-#include <iostream>
+#pragma once
 
 class ArrangementController
 {
@@ -35,5 +32,3 @@ public:
    static bool mPlay;
    static int mSampleLength;
 };
-
-#endif /* defined(__Bespoke__ArrangementController__) */

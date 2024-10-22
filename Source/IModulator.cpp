@@ -188,3 +188,14 @@ void IModulator::InitializeRange(float currentValue, float min, float max, Float
    if (mMaxSlider)
       mMaxSlider->SetVar(&GetMax());
 }
+
+int IModulator::GetNumTargets() const
+{
+   int ret = 0;
+   for (int i = 0; i < (int)mTargets.size(); ++i)
+   {
+      if (mTargets[i].mUIControlTarget != nullptr)
+         ++ret;
+   }
+   return ret;
+}

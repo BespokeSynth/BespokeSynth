@@ -25,8 +25,7 @@
   ==============================================================================
 */
 
-#ifndef MODULECONTAINER_H_INCLUDED
-#define MODULECONTAINER_H_INCLUDED
+#pragma once
 
 #include "OpenFrameworksPort.h"
 #include "IDrawableModule.h"
@@ -100,5 +99,3 @@ private:
    ofVec2f mDrawOffset;
    float mDrawScale{ 1 };
 };
-
-#endif // MODULECONTAINER_H_INCLUDED

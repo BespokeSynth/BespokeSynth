@@ -23,11 +23,9 @@
 //
 //
 
-#ifndef __Bespoke__TimelineControl__
-#define __Bespoke__TimelineControl__
+#pragma once
 
 #include "IDrawableModule.h"
-#include "OpenFrameworksPort.h"
 #include "Slider.h"
 #include "TextEntry.h"
 #include "ClickButton.h"
@@ -82,5 +80,3 @@ private:
    bool mDock{ false };
    Checkbox* mDockCheckbox{ nullptr };
 };
-
-#endif /* defined(__Bespoke__TimelineControl__) */

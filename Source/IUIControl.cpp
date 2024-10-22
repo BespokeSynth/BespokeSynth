@@ -29,7 +29,6 @@
 #include "ModularSynth.h"
 #include "PatchCable.h"
 #include "Push2Control.h"
-#include "TextEntry.h"
 
 //static
 IUIControl* IUIControl::sLastHoveredUIControl = nullptr;
@@ -135,7 +134,8 @@ void IUIControl::DrawHover(float x, float y, float w, float h)
 void IUIControl::DrawPatchCableHover()
 {
    if (PatchCable::sActivePatchCable &&
-       (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator ||
+       (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Pulse ||
+        PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_ValueSetter ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl ||
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Grid) &&
@@ -201,7 +201,6 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
    color.setHsb(h, s * .4f, ofLerp(b, 0, .6f));
    if (IsPreset())
    {
-      float h, s, b;
       color.getHsb(h, s, b);
       color.setHsb(85, s, b);
       textColor.set(0, 255, 0, gModuleDrawAlpha);

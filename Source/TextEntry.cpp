@@ -46,29 +46,18 @@ void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool notifyListeners)
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var)
 : mVarCString(var)
-, mVarString(nullptr)
-, mVarInt(nullptr)
-, mVarFloat(nullptr)
-, mType(kTextEntry_Text)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, std::string* var)
-: mVarCString(nullptr)
-, mVarString(var)
-, mVarInt(nullptr)
-, mVarFloat(nullptr)
-, mType(kTextEntry_Text)
+: mVarString(var)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max)
-: mVarCString(nullptr)
-, mVarString(nullptr)
-, mVarInt(var)
-, mVarFloat(nullptr)
+: mVarInt(var)
 , mType(kTextEntry_Int)
 , mIntMin(min)
 , mIntMax(max)
@@ -77,10 +66,7 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max)
-: mVarCString(nullptr)
-, mVarString(nullptr)
-, mVarInt(nullptr)
-, mVarFloat(var)
+: mVarFloat(var)
 , mType(kTextEntry_Float)
 , mFloatMin(min)
 , mFloatMax(max)
@@ -96,7 +82,7 @@ void TextEntry::Construct(ITextEntryListener* owner, const char* name, int x, in
    UpdateDisplayString();
 
    SetName(name);
-   mLabelSize = gFont.GetStringWidth(name, 15) + 3;
+   mLabelSize = gFont.GetStringWidth(name, 13) + 3;
    SetPosition(x, y);
    assert(owner);
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(owner);
@@ -150,7 +136,7 @@ void TextEntry::Render()
    ofNoFill();
    ofRect(mX + xOffset, mY, w - xOffset, h);
 
-   gFontFixedWidth.DrawString(mString, 14, mX + 2 + xOffset, mY + 12);
+   gFontFixedWidth.DrawString(mString, 12, mX + 2 + xOffset, mY + 12);
 
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
    {
@@ -163,7 +149,7 @@ void TextEntry::Render()
             char beforeCaret[MAX_TEXTENTRY_LENGTH];
             strncpy(beforeCaret, mString, mCaretPosition);
             beforeCaret[mCaretPosition] = 0;
-            caretX += gFontFixedWidth.GetStringWidth(beforeCaret, 14);
+            caretX += gFontFixedWidth.GetStringWidth(beforeCaret, 12);
          }
          ofFill();
          ofRect(caretX, caretY, 1, 12, L(corner, 1));
@@ -191,13 +177,13 @@ void TextEntry::Render()
       char selectionTmp[MAX_TEXTENTRY_LENGTH];
       strncpy(selectionTmp, mString, start);
       selectionTmp[start] = 0;
-      selStartX += gFontFixedWidth.GetStringWidth(selectionTmp, 14);
+      selStartX += gFontFixedWidth.GetStringWidth(selectionTmp, 12);
 
       //
       int end = MAX(mCaretPosition, mCaretPosition2);
       strncpy(selectionTmp, mString, end);
       selectionTmp[end] = 0;
-      selEndX += gFontFixedWidth.GetStringWidth(selectionTmp, 14);
+      selEndX += gFontFixedWidth.GetStringWidth(selectionTmp, 12);
 
       ofRect(selStartX, selY, selEndX - selStartX, 12, 0);
 
@@ -208,7 +194,7 @@ void TextEntry::Render()
    {
       ofSetColor(100, 100, 100, .8f*gModuleDrawAlpha);
       ofFill();
-      ofRect(mX+xOffset,mY-12,GetStringWidth(Name()),12);
+      ofRect(mX+xOffset,mY-12,GetStringWidth(Name()),10);
       ofSetColor(255, 255, 255, gModuleDrawAlpha);
       DrawTextNormal(Name(), mX+xOffset, mY);
    }*/
@@ -221,7 +207,7 @@ void TextEntry::Render()
 void TextEntry::GetDimensions(float& width, float& height)
 {
    if (mFlexibleWidth)
-      width = MAX(30.0f, gFontFixedWidth.GetStringWidth(mString, 14) + 4);
+      width = MAX(30.0f, gFontFixedWidth.GetStringWidth(mString, 12) + 4);
    else
       width = mCharWidth * 9;
 
@@ -251,12 +237,12 @@ void TextEntry::OnClicked(float x, float y, bool right)
       char caretCheck[MAX_TEXTENTRY_LENGTH];
       size_t checkLength = strnlen(mString, MAX_TEXTENTRY_LENGTH);
       strncpy(caretCheck, mString, checkLength);
-      int lastSubstrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 14);
+      int lastSubstrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 12);
       for (int i = (int)checkLength - 1; i >= 0; --i)
       {
          caretCheck[i] = 0; //shorten string by one
 
-         int substrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 14);
+         int substrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 12);
          //ofLog() << x << " " << i << " " << (xOffset + substrWidth);
          if (x > xOffset + ((substrWidth + lastSubstrWidth) * .5f))
          {

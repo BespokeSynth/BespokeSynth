@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__ModuleFactory__
-#define __modularSynth__ModuleFactory__
+#pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 
 #include "juce_core/juce_core.h"
@@ -68,16 +66,11 @@ public:
 
       static bool CompareAlphabetical(Spawnable a, Spawnable b)
       {
-         if (a.mLabel == b.mLabel)
+         juce::String aLower = juce::String(a.mLabel).toLowerCase();
+         juce::String bLower = juce::String(b.mLabel).toLowerCase();
+         if (aLower == bLower)
             return a.mDecorator < b.mDecorator;
-         return a.mLabel < b.mLabel;
-      }
-
-      static bool CompareLength(Spawnable a, Spawnable b)
-      {
-         if (a.mLabel.length() == b.mLabel.length())
-            return a.mDecorator.length() < b.mDecorator.length();
-         return a.mLabel.length() < b.mLabel.length();
+         return aLower < bLower;
       }
    };
 
@@ -114,5 +107,3 @@ private:
 
    std::map<std::string, ModuleInfo> mFactoryMap;
 };
-
-#endif /* defined(__modularSynth__ModuleFactory__) */

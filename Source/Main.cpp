@@ -1,16 +1,17 @@
 /*
  ==============================================================================
- 
+
  This file was auto-generated!
- 
+
  It contains the basic startup code for a Juce application.
- 
+
  ==============================================================================
  */
 
 #include "juce_gui_basics/juce_gui_basics.h"
 #include <memory>
 #include "VSTScanner.h"
+#include "SynthGlobals.h"
 
 #include "VersionInfo.h"
 
@@ -39,6 +40,50 @@ public:
    //==============================================================================
    void initialise(const String& commandLine) override
    {
+      // Parse command line arguments that should cause us to exit
+      auto cliArgv = JUCEApplication::getCommandLineParameterArray();
+      for (int i = 0; i < cliArgv.size(); ++i)
+      {
+         bool should_exit = false;
+         juce::String argument = cliArgv[i];
+         if (argument == "-h" || argument == "--help")
+         {
+            std::cout << "A modular DAW for Mac, Windows, and Linux.\n"
+                      << "\n"
+                      << "Usage: BespokeSynth [OPTIONS] [path].json [path].bsk(t)\n"
+                      << "\n"
+                      << "Arguments:\n"
+                      << "  [path].bsk(t)   the project file to open (must end in .bsk or .bskt)\n"
+                      << "  [path].json     path to userprefs.json (must end in .json)\n"
+                      << "\n"
+                      << "Options:\n"
+                      << "  -o, --option <option> <value>   Temporarily override settings in preferences file\n"
+                      << "  -h, --help                      Print help\n"
+                      << "  -v, --version                   Print version\n"
+                      << std::flush;
+            should_exit = true;
+         }
+         else if (argument == "-v" || argument == "--version")
+         {
+            std::cout << "bespoke synth " << GetBuildInfoString() << std::endl;
+            should_exit = true;
+         }
+         else if (argument == "-o" || argument == "--option")
+         {
+            if ((cliArgv[i + 1].isEmpty()) || (cliArgv[i + 2].isEmpty()))
+            {
+               CliErrorExpectedOpt(argument);
+               should_exit = true;
+            }
+         }
+
+         if (should_exit == true)
+         {
+            JUCEApplicationBase::quit();
+            return;
+         }
+      }
+
       auto scannerSubprocess = std::make_unique<PluginScannerSubprocess>();
 
       if (scannerSubprocess->initialiseFromCommandLine(commandLine, kScanProcessUID))
@@ -56,6 +101,14 @@ public:
 
       appProperties = std::make_unique<juce::ApplicationProperties>();
       appProperties->setStorageParameters(options);
+   }
+
+   // Prints an error for arguments that expected an argument but were not given one
+   void CliErrorExpectedOpt(String argument)
+   {
+      std::cout << "Error: value is required for '" << argument << "' but none was supplied"
+                << "\n\nFor more information, try '--help'"
+                << std::endl;
    }
 
    void shutdown() override

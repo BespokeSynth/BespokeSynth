@@ -23,15 +23,15 @@
 //
 //
 
-#ifndef __modularSynth__Checkbox__
-#define __modularSynth__Checkbox__
+#pragma once
 
-#include <iostream>
 #include "IUIControl.h"
+#include "IPulseReceiver.h"
+#include "PatchCableSource.h"
 
 class Checkbox;
 
-class Checkbox : public IUIControl
+class Checkbox : public IUIControl, public IPulseReceiver
 {
 public:
    Checkbox(IDrawableModule* owner, const char* label, int x, int y, bool* var);
@@ -60,8 +60,12 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
    void SetBoxSize(float size) { mHeight = size; }
+   bool CanBeTargetedBy(PatchCableSource* source) const override;
 
    bool CheckNeedsDraw() override;
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
 
 protected:
    ~Checkbox(); //protected so that it can't be created on the stack
@@ -87,5 +91,3 @@ private:
    float mSliderVal{ 0 };
    bool mLastSetValue{ false };
 };
-
-#endif /* defined(__modularSynth__Checkbox__) */

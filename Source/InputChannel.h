@@ -23,10 +23,8 @@
 //
 //
 
-#ifndef __modularSynth__InputChannel__
-#define __modularSynth__InputChannel__
+#pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "DropdownList.h"
@@ -70,5 +68,3 @@ private:
    int mChannelSelectionIndex{ 0 };
    int mStereoSelectionOffset{ 0 };
 };
-
-#endif /* defined(__modularSynth__InputChannel__) */

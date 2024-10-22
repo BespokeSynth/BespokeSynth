@@ -309,7 +309,7 @@ void FubbleModule::DrawModuleUnclipped()
    if (Minimized() || IsVisible() == false)
       return;
 
-   DrawTextNormal("(concept by @_ojack_)", 60, -3, 11);
+   DrawTextNormal("(concept by @_ojack_)", 60, -3, 9);
 }
 
 ofRectangle FubbleModule::GetFubbleRect()
@@ -392,6 +392,8 @@ void FubbleModule::MouseReleased()
             quantizeIntervalSteps = 1;
          float quantizedLength = quantizeResolution * quantizeIntervalSteps;
          mLength = quantizedLength;
+         mAxisH.mCurve.SetExtents(0, mLength);
+         mAxisV.mCurve.SetExtents(0, mLength);
       }
       mRecordStartOffset = fmod(mRecordStartOffset, mLength);
    }

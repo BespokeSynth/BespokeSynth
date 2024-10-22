@@ -23,11 +23,8 @@
 //
 //
 
-#ifndef __Bespoke__EffectFactory__
-#define __Bespoke__EffectFactory__
+#pragma once
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
 #include "IAudioEffect.h"
 
 typedef IAudioEffect* (*CreateEffectFn)(void);
@@ -43,5 +40,3 @@ private:
    void Register(std::string type, CreateEffectFn creator);
    std::map<std::string, CreateEffectFn> mFactoryMap;
 };
-
-#endif /* defined(__Bespoke__EffectFactory__) */
