@@ -2126,3 +2126,8 @@ dataprovider~provides modulation values normally not easily accessible.
 ~interval~the interval to measure
 ~realtime~if enabled this module will work on the audio thread which is more accurate but also more resource intense
 ~set~click here to send the value (or, send a pulse to this module for the same result)
+
+
+pulselimit~limit the number of pulses allowed to pass through
+~reset the counter of seen pulses
+~limit number of pulses to pass through
