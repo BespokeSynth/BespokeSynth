@@ -43,20 +43,21 @@ void PulseLimit::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
+   IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   BUTTON(mResetButton, "reset");
-   INTSLIDER(mLimitSlider, "limit", &mLimit, 1, 127);
-   ENDUIBLOCK0();
+   UICONTROL_CUSTOM(mLimitEntry, new TextEntry(UICONTROL_BASICS("limit"), 7, &mLimit, 0, 99999); mLimitEntry->DrawLabel(false););
+   UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mResetButton, new ClickButton(UICONTROL_BASICS("reset")));
+   ENDUIBLOCK(mWidth, mHeight);
 }
 
 void PulseLimit::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-}
 
-void PulseLimit::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
-{
+   mLimitEntry->Draw();
+   mResetButton->Draw();
 }
 
 void PulseLimit::OnPulse(double time, float velocity, int flags)
@@ -79,12 +80,6 @@ void PulseLimit::OnPulse(double time, float velocity, int flags)
 void PulseLimit::ButtonClicked(ClickButton* button, double time)
 {
    mCount = 0;
-}
-
-void PulseLimit::GetModuleDimensions(float& width, float& height)
-{
-   width = 118;
-   height = 38;
 }
 
 void PulseLimit::LoadLayout(const ofxJSONElement& moduleInfo)

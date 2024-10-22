@@ -29,9 +29,9 @@
 #include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "IPulseReceiver.h"
-#include "Slider.h"
+#include "TextEntry.h"
 
-class PulseLimit : public IDrawableModule, public IPulseSource, public IPulseReceiver, public IIntSliderListener, public IButtonListener
+class PulseLimit : public IDrawableModule, public IPulseSource, public IPulseReceiver, public ITextEntryListener, public IButtonListener
 {
 public:
    PulseLimit();
@@ -48,8 +48,8 @@ public:
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
 
+   void TextEntryComplete(TextEntry* entry) override {}
    void ButtonClicked(ClickButton* button, double time) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -59,10 +59,16 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(float& width, float& height) override {
+      width = mWidth;
+      height = mHeight;
+   }
 
    int mLimit{ 0 };
    int mCount{ 0 };
-   IntSlider* mLimitSlider{ nullptr };
+   TextEntry* mLimitEntry{ nullptr };
    ClickButton* mResetButton{ nullptr };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };
