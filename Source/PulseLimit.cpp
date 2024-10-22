@@ -69,9 +69,11 @@ void PulseLimit::OnPulse(double time, float velocity, int flags)
       return;
    }
 
-   mCount++;
    if (mCount < mLimit)
+   {
       DispatchPulse(GetPatchCableSource(), time, velocity, flags);
+      mCount++;
+   }
 }
 
 void PulseLimit::ButtonClicked(ClickButton* button, double time)
