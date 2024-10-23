@@ -89,6 +89,9 @@ public:
       if (!animate)
          mMinimizeAnimation = minimized ? 1 : 0;
    }
+   void TogglePinned();
+   void SetPinned(bool pinned);
+   bool Pinned() const { return mPinned; }
    virtual void KeyPressed(int key, bool isRepeat);
    virtual void KeyReleased(int key);
    void DrawConnection(IClickable* target);
@@ -233,6 +236,7 @@ private:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
    virtual void SetUpFromSaveData() {}
    virtual bool ShouldSavePatchCableSources() const { return true; }
+   void ForcePosition();
 
    std::vector<IUIControl*> mUIControls;
    std::vector<IDrawableModule*> mChildren;
@@ -244,6 +248,8 @@ private:
    ModuleContainer* mOwningContainer{ nullptr };
 
    bool mMinimized{ false };
+   bool mPinned{ false };
+   ofVec2f mPinnedPosition{ 0, 0 };
    bool mWasMinimizeAreaClicked{ false };
    float mMinimizeAnimation{ 0 };
    bool mUIControlsCreated{ false };

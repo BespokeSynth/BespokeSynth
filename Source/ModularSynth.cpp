@@ -1063,6 +1063,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       ADSRDisplay::ToggleDisplayMode();
    }
 
+   if (key == KeyPress::F3Key && !isRepeat)
+   {
+      if (gHoveredModule && mGroupSelectedModules.empty())
+         gHoveredModule->TogglePinned();
+   }
+
    if (key == '`' && !isRepeat)
    {
       if (GetKeyModifiers() == kModifier_Shift)
@@ -1420,7 +1426,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, gx), MIN(mClickStartY, gy)), ofPoint(MAX(mClickStartX, gx), MAX(mClickStartY, gy)));
       if (rect.width > 10 || rect.height > 10)
       {
-         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules);
+         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules, true);
          if (mGroupSelectedModules.size() > 0)
          {
             for (int i = (int)mGroupSelectedModules.size() - 1; i >= 0; --i) //do this backwards to preserve existing order
