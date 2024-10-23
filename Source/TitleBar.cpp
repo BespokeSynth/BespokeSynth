@@ -63,7 +63,6 @@ void SpawnList::SetList(std::vector<ModuleFactory::Spawnable> spawnables)
 {
    if (mSpawnList == nullptr)
       mSpawnList = new DropdownList(mOwner, mLabel.c_str(), mPos.x, mPos.y, &mSpawnIndex);
-   mSpawnList->SetNoHover(true);
 
    mSpawnList->Clear();
    mSpawnList->SetUnknownItemString(mLabel);
