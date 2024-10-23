@@ -25,13 +25,13 @@
   ==============================================================================
 */
 
+#include "ModularSynth.h"
 #include "PulseLimit.h"
 #include "SynthGlobals.h"
-#include "UIControlMacros.h"
 #include "Transport.h"
+#include "UIControlMacros.h"
 
 PulseLimit::PulseLimit()
-: mCount(0)
 {
 }
 
@@ -92,4 +92,20 @@ void PulseLimit::LoadLayout(const ofxJSONElement& moduleInfo)
 void PulseLimit::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+}
+
+void PulseLimit::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+
+   out << mCount;
+}
+
+void PulseLimit::LoadState(FileStreamIn& in, int rev)
+{
+   IDrawableModule::LoadState(in, rev);
+
+   in >> mCount;
 }
