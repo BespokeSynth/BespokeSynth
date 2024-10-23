@@ -2130,3 +2130,6 @@ dataprovider~provides modulation values normally not easily accessible.
 ~interval~the interval to measure
 ~realtime~if enabled this module will work on the audio thread which is more accurate but also more resource intense
 ~set~click here to send the value (or, send a pulse to this module for the same result)
+
+
+noteminmax~finds lowest and highest notes among ones played at the same time
