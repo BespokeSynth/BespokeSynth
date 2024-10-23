@@ -66,7 +66,7 @@ MidiController::MidiController()
 void MidiController::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mControllerList = new DropdownList(this, "controller", 3, 2, &mControllerIndex, 157);
+   mControllerList = new DropdownList(this, "controller", 3, 2, &mControllerIndex, 165);
    mMappingDisplayModeSelector = new RadioButton(this, "mappingdisplay", mControllerList, kAnchor_Below, (int*)&mMappingDisplayMode, kRadioHorizontal);
    mBindCheckbox = new Checkbox(this, "bind (hold shift)", mMappingDisplayModeSelector, kAnchor_Below, &mBindMode);
    mPageSelector = new DropdownList(this, "page", mBindCheckbox, kAnchor_Right, &mControllerPage);
@@ -1248,12 +1248,12 @@ void MidiController::DrawModule()
       if (mIsConnected)
       {
          ofSetColor(ofColor::green);
-         DrawTextNormal("connected", 165, 13);
+         DrawTextNormal("connected", 173, 13);
       }
       else
       {
          ofSetColor(ofColor::red);
-         DrawTextNormal("not connected", 165, 13);
+         DrawTextNormal("not connected", 173, 13);
       }
       ofPopStyle();
 
@@ -1520,7 +1520,7 @@ void MidiController::GetModuleDimensions(float& width, float& height)
    }
    else
    {
-      width = 163;
+      width = 171;
       height = 54;
    }
 }

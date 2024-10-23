@@ -445,6 +445,7 @@ void MultitrackRecorderTrack::Clear()
       delete recordChunk;
    mRecordChunks.clear();
    mRecordingLength = 0;
+   MultitrackRecorderTrack::Poll();
 }
 
 void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

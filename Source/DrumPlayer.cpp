@@ -795,6 +795,10 @@ void DrumPlayer::DrawModule()
    mEditCheckbox->Draw();
    mGridControlTarget->Draw();
 
+   mMonoCheckbox->SetShowing(mEditMode);
+   mAuditionSlider->SetShowing(mEditMode);
+   mShuffleButton->SetShowing(mEditMode);
+
    if (mEditMode)
    {
       ofPushStyle();
