@@ -320,7 +320,12 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
    {
       const double time = NextBufferTime(true) - remainderMs;
       mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
-      mOwner->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
+      NoteInterval interval = kInterval_16n;
+      if (mLength > 10 && mLength < 24)
+         interval = kInterval_32n;
+      else if (mLength >= 24)
+         interval = kInterval_64n;
+      mOwner->PlayNoteOutput(time + TheTransport->GetDuration(interval), mPitch, 0, -1);
    }
 }
 
