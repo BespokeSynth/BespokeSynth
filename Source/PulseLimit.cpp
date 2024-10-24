@@ -43,7 +43,6 @@ void PulseLimit::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   IDrawableModule::CreateUIControls();
    UIBLOCK0();
    UICONTROL_CUSTOM(mLimitEntry, new TextEntry(UICONTROL_BASICS("limit"), 7, &mLimit, 0, 99999); mLimitEntry->DrawLabel(false););
    UIBLOCK_SHIFTRIGHT();
