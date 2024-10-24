@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Add `pulselimit` module
 - Added the ability to pin modules with F3 so they stay in view
 - Added a "home" button to move the viewport home in case you get lost
 - Added various controller layouts
@@ -53,6 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Made the `pulsetrain`'s first pulse in sync with the transport instead of whenever the activating pulse comes in
 - Made `pulsetrain` resizable
 - Increased the limit of the `pulsetrain` to 128
 - Added the advancement buttons back to the `pulsesequencer`
@@ -87,6 +89,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed a bug where all canvas like modules wouldn't save and load note modulations
 - Don't render the finished step in the `pulsetrain` module
 - Fixed a crash in the `pulsesequencer` when going beyond the maximum length
 - Fixed a bug where the shift buttons on the `pulsesequencer` weren't shifting
