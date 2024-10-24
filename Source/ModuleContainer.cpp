@@ -269,12 +269,12 @@ float ModuleContainer::GetDrawScale() const
    return mDrawScale;
 }
 
-void ModuleContainer::GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output)
+void ModuleContainer::GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output, bool ignorePinned /* = false */)
 {
    output.clear();
    for (int i = 0; i < mModules.size(); ++i)
    {
-      if (mModules[i]->IsWithinRect(rect) && mModules[i] != TheQuickSpawnMenu && mModules[i]->IsShowing())
+      if (mModules[i]->IsWithinRect(rect) && mModules[i] != TheQuickSpawnMenu && mModules[i]->IsShowing() && (ignorePinned && !mModules[i]->Pinned()))
          output.push_back(mModules[i]);
    }
 }

@@ -83,7 +83,7 @@ class ChannelBuffer;
 
 typedef std::map<std::string, int> EnumMap;
 
-const int kWorkBufferSize = 1024 * 8; //larger than the audio buffer size would ever be (even oversampled)
+const int kWorkBufferSize = 8192 * 16 * 2; //larger than the audio buffer size would ever be (even oversampled). Noxy: This needs to be twice as large as the largest possible buffersize (Largest I've seen on my system is 8192) multiplied by the largest possible oversampling times two. Why two? Well effectchains use this buffer twice consecutive for the drywet mixing. Obviously this should become a smart buffer so we can dynamically increase the size when it is needed but that is for later. For now this increase should fix it ... mostly.
 
 const int kNumVoices = 16;
 

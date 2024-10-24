@@ -449,8 +449,8 @@ void SongBuilder::PostRepatch(PatchCableSource* cable, bool fromUserClick)
             mTargets.erase(mTargets.begin() + targetIndex);
          }
       }
-
-      mTargets[targetIndex]->mHadTarget = (mTargets[targetIndex]->GetTarget() != nullptr);
+      if (!mTargets.empty() && mTargets.size() > targetIndex)
+         mTargets[targetIndex]->mHadTarget = (mTargets[targetIndex]->GetTarget() != nullptr);
    }
 }
 
