@@ -133,7 +133,6 @@ void PulseTrain::OnTimeEvent(double time)
 void PulseTrain::OnPulse(double time, float velocity, int flags)
 {
    mStep = 0;
-   Step(time, velocity, kPulseFlag_Reset);
 }
 
 void PulseTrain::Step(double time, float velocity, int flags)
@@ -141,14 +140,12 @@ void PulseTrain::Step(double time, float velocity, int flags)
    if (!mEnabled)
       return;
 
-   bool isReset = (flags & kPulseFlag_Reset);
-   if (mStep >= mLength && !isReset)
-      return;
-
-   ++mStep;
-
+   const bool isReset = (flags & kPulseFlag_Reset);
    if (isReset)
       mStep = 0;
+
+   if (mStep >= mLength)
+      return;
 
    if (mStep < mLength)
    {
@@ -171,6 +168,8 @@ void PulseTrain::Step(double time, float velocity, int flags)
       mVelocityGrid->SetHighlightCol(time, mStep);
    else
       mVelocityGrid->SetHighlightCol(time, -1);
+
+   ++mStep;
 }
 
 void PulseTrain::GetModuleDimensions(float& width, float& height)
