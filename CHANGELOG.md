@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added the ability to pin modules with F3 so they stay in view
+- Added a "home" button to move the viewport home in case you get lost
+- Added various controller layouts
 - Added `dataprovider` module
 - Added support for command line options
 - Added `savestateloader` module, for loading into another savestate file
@@ -50,6 +53,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Made `pulsetrain` resizable
+- Increased the limit of the `pulsetrain` to 128
+- Added the advancement buttons back to the `pulsesequencer`
+- Increased the maximum length from 32 to 128 in the `pulsesequencer`
+- Made the `pulsesequencer` re-sizable
+- Made it so the `pitchsetter` does not flush the notes when the pitch slider was changed but tries to preserve polyphony as much as possible instead
+- Increase midi pages to 32 from 10
+- Allow a single `notetable` module to span the entire note range
+- Make the key that opens the console also close the console
+- Made the `circlesequencer` support up to 32nd notes
 - Show the sample filename in the `seaofgrain` module
 - Allow for snapping to the center of the module while holding `shift` as well as `control` as opposed to only the top left corner
 - Minor rendering optimization when the modules `lissajous`, `spectrum` and `waveformviewer` are disabled/bypassed
@@ -74,11 +87,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Don't render the finished step in the `pulsetrain` module
+- Fixed a crash in the `pulsesequencer` when going beyond the maximum length
+- Fixed a bug where the shift buttons on the `pulsesequencer` weren't shifting
+- Fixed a bug in the `drumsequencer` when the numrows triangle menu option was set lower than a previously saved snapshot causing "disabled" rows to still send notes
+- Fixed the default for modwheel
+- Increased internal work buffer size so we don't read and write beyond this when using oversampling and large buffersizes
+- Hidden the `drumplayer` controls better when not in editmode and having single outputs
+- Fixed a crash in the `songbuilder` module when a new connection cable was canceled
+- Changed the order of input handling in module containers so that the menu UI is handled first
+- Resolved an issue in the `oscillator` module that would cause the module to continuously propagate NaN values
+- Forced a poll to properly rebuild the buffers when the `multitrackrecorder` is cleared
+- Correctly set the number of channels within `seaofgrain` so that mono input is processed correctly
+- Made the minimap less blurry with certain aspect ratios
+- Rewrote `pitchtovalue` through valuesetter in order to set verbatim values for drop-down lists
 - Fixed a crash on switch from "Jump" to "Switch" mode in the `songbuilder` module
 - Fixed an issue where some offscreen sliders wouldn't compute their modulation
 - Fixed `circlesequencer` playnote issues when using offsets
 - Simplify bespoke turn string communication, and fix issue where value string wasn't updating frequently enough
-- Fix a crash when the interval in the `curvelooper` is forcibly set to 0
+- Fixed a crash when the interval in the `curvelooper` is forcibly set to 0
 - Set `curvelooper` size on load
 - Random note buttons would set all notes to 3 when random octave range is 0-0. Now notes map to drumnotes 0-3 again if octave range is 0-0
 - Fixed an issue where holding space when bespoke isn't focused would cause mouse movements to pan the canvas
