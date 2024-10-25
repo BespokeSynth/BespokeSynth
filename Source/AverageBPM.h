@@ -26,12 +26,13 @@
 #pragma once
 
 #include "IDrawableModule.h"
-#include "INoteReceiver.h"
 #include "IModulator.h"
+#include "INoteReceiver.h"
+#include "IPulseReceiver.h"
 
 class PatchCableSource;
 
-class AverageBPM : public IDrawableModule, public INoteReceiver, public IModulator
+class AverageBPM : public IDrawableModule, public INoteReceiver, public IPulseReceiver, public IModulator
 {
 public:
    AverageBPM();
@@ -45,9 +46,9 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+   void OnPulse(double time, float velocity, int flags) override;
 
    //IModulator
    float Value(int samplesIn = 0) override;

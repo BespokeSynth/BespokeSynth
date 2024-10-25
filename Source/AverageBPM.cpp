@@ -68,6 +68,17 @@ void AverageBPM::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
+void SamplePlayer::OnPulse(double time, float velocity, int flags)
+{
+   if (mEnabled && velocity > 0)
+   {
+      mLastBeatTime = time;
+      if (!mCount)
+		 mFirstBeatTime = time;
+	  mCount++;
+   }
+}
+
 float AverageBPM::Value(int samplesIn)
 {
    if (mCount < 2)
