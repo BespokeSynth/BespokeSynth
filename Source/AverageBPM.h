@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "IModulator.h"
 #include "INoteReceiver.h"
@@ -32,7 +33,7 @@
 
 class PatchCableSource;
 
-class AverageBPM : public IDrawableModule, public INoteReceiver, public IPulseReceiver, public IModulator
+class AverageBPM : public IDrawableModule, public INoteReceiver, public IPulseReceiver, public IButtonListener, public IModulator
 {
 public:
    AverageBPM();
@@ -43,6 +44,8 @@ public:
    static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
+
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
@@ -73,6 +76,7 @@ private:
       height = mHeight;
    }
 
+   ClickButton* mReset{ nullptr };
    int mCount{ 0 };
    float mFirstBeatTime{ 0 };
    float mLastBeatTime{ 0 };

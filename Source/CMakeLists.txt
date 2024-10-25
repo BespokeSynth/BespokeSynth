@@ -48,6 +48,8 @@ target_sources(BespokeSynth PRIVATE
     AudioToPulse.h
     Autotalent.cpp
     Autotalent.h
+    AverageBPM.cpp
+    AverageBPM.h
     BandVocoder.cpp
     BandVocoder.h
     BeatBloks.cpp

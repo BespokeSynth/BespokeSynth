@@ -27,8 +27,9 @@
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
-#include "PatchCableSource.h"
 #include "ModulationChain.h"
+#include "PatchCableSource.h"
+#include "UIControlMacros.h"
 
 AverageBPM::AverageBPM()
 {
@@ -41,6 +42,10 @@ AverageBPM::~AverageBPM()
 void AverageBPM::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+   UIBLOCK0();
+   BUTTON(mReset, "reset");
+   ENDUIBLOCK(mWidth, mHeight);
+
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
@@ -85,6 +90,13 @@ float AverageBPM::Value(int samplesIn)
 	  return 0;
 
    return (mLastBeatTime - mFirstBeatTime) / (mCount - 1);
+}
+
+void AverageBPM::ButtonClicked(ClickButton* button, double time)
+{
+   mCount = 0;
+   mFirstBeatTime = 0;
+   mLastBeatTime = 0;
 }
 
 void AverageBPM::SaveLayout(ofxJSONElement& moduleInfo)
