@@ -89,7 +89,7 @@ float AverageBPM::Value(int samplesIn)
    if (mCount < 2)
 	  return 0;
 
-   return (mLastBeatTime - mFirstBeatTime) / (mCount - 1);
+   return (mCount - 1) / ((mLastBeatTime - mFirstBeatTime) / 60 / 1000) * 4;
 }
 
 void AverageBPM::ButtonClicked(ClickButton* button, double time)
