@@ -69,11 +69,14 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 110;
-      height = 0;
+      width = mWidth;
+      height = mHeight;
    }
 
    int mCount{ 0 };
    float mFirstBeatTime{ 0 };
    float mLastBeatTime{ 0 };
+
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 };

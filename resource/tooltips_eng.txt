@@ -2135,3 +2135,6 @@ dataprovider~provides modulation values normally not easily accessible.
 pulselimit~limit the number of pulses allowed to pass through
 ~reset the counter of seen pulses
 ~limit number of pulses to pass through
+
+
+averagebpm~detect the BPM from input notes or pulses
