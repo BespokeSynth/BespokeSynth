@@ -42,6 +42,7 @@ AverageBPM::~AverageBPM()
 void AverageBPM::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+
    UIBLOCK0();
    BUTTON(mReset, "reset");
    ENDUIBLOCK(mWidth, mHeight);
@@ -55,6 +56,8 @@ void AverageBPM::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+
+   mReset->Draw();
 }
 
 void AverageBPM::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
