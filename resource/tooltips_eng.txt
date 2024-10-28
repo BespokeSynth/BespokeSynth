@@ -205,6 +205,9 @@ pulsetrain~defines a list of pulses to execute, once pulsed
 pulsesequence~defines a looping sequence of pulses
 ~length~length of the sequence
 ~interval~length of each step within the sequence
+~ - ~advance the sequence backwards
+~+~advance the sequence forward
+~pulse~when enabled will send out pulses as per sequence when advancing with the buttons
 ~<~shift sequence to the left
 ~>~shift sequence to the right
 
@@ -1894,6 +1897,7 @@ titlebar~
 ~write audio~write the last 30 minutes of audio to your specified recordings_path
 ~ ? ~show help
 ~settings~adjust preferences, saved as userprefs.json
+~home~Moves the viewport to the "home" position, useful if you lost where you are in your savestate
 ~load layout~[none]
 ~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
 ~autosave~every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.
@@ -2001,7 +2005,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~ui_scale~scale of UI layer (title bar, quickspawn menu, etc)
 ~cable_drop_behavior~what should be behavior be when you drag a cable and drop it into empty space?
 ~qwerty_to_pitch_mode~some modules can hear computer keyboard keys and automatically translate them to MIDI notes. This setting defines how your keyboard is interpreted based on other DAWs with a similar feature. \nAbleton:\noctave#1: A->L\ndown octave: Z\nup octave: X\n\nFruity:\noctave#1: Z->M\noctave#2: Q->I\ndown octave: ,\nup octave: .
-~grid_snap_size~grid size to use when snapping module position (hold alt/option while dragging a module)
+~grid_snap_size~grid size to use when snapping module position (hold command on mac or control everywhere else while dragging a module)
 ~scroll_multiplier_vertical~adjustment to vertical mouse/trackpad scroll speed
 ~scroll_multiplier_horizontal~adjustment to horizontal mouse/trackpad scroll speed
 ~autosave~should autosave be enabled on startup
@@ -2126,6 +2130,11 @@ dataprovider~provides modulation values normally not easily accessible.
 ~interval~the interval to measure
 ~realtime~if enabled this module will work on the audio thread which is more accurate but also more resource intense
 ~set~click here to send the value (or, send a pulse to this module for the same result)
+
+
+pulselimit~limit the number of pulses allowed to pass through
+~reset the counter of seen pulses
+~limit number of pulses to pass through
 
 
 noteminmax~finds lowest and highest notes among ones played at the same time

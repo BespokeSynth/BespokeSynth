@@ -1,6 +1,10 @@
 include(cmake/lib.cmake)
 include(cmake/versiontools.cmake)
-include(../libs/ableton-link/AbletonLinkConfig.cmake)
+if(BESPOKE_SYSTEM_ABLETONLINK)
+    find_package(AbletonLink NAMES AbletonLink ableton-link link REQUIRED)
+else()
+    include(../libs/ableton-link/AbletonLinkConfig.cmake)
+endif()
 
 juce_add_gui_app(BespokeSynth
     PRODUCT_NAME BespokeSynth
@@ -543,6 +547,8 @@ target_sources(BespokeSynth PRIVATE
     PulseGate.h
     PulseHocket.cpp
     PulseHocket.h
+    PulseLimit.cpp
+    PulseLimit.h
     PulseRouter.cpp
     PulseRouter.h
     PulseSequence.cpp

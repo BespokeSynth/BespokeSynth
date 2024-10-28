@@ -422,7 +422,7 @@ void NoteCanvasElement::WriteModulation(float pos, float pitchBend, float modWhe
 
 namespace
 {
-   const int kNCESaveStateRev = 0;
+   const int kNCESaveStateRev = 1;
 }
 
 void NoteCanvasElement::SaveState(FileStreamOut& out)
@@ -432,6 +432,11 @@ void NoteCanvasElement::SaveState(FileStreamOut& out)
    out << kNCESaveStateRev;
 
    out << mVelocity;
+
+   mPitchBendCurve.SaveState(out);
+   mModWheelCurve.SaveState(out);
+   mPressureCurve.SaveState(out);
+   mPanCurve.SaveState(out);
 }
 
 void NoteCanvasElement::LoadState(FileStreamIn& in)
@@ -443,6 +448,14 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
    LoadStateValidate(rev <= kNCESaveStateRev);
 
    in >> mVelocity;
+
+   if (kNCESaveStateRev > 0)
+   {
+      mPitchBendCurve.LoadState(in);
+      mModWheelCurve.LoadState(in);
+      mPressureCurve.LoadState(in);
+      mPanCurve.LoadState(in);
+   }
 }
 
 /////////////////////

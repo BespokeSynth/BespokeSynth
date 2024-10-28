@@ -345,8 +345,8 @@ void ModularSynth::Poll()
    {
       for (auto p : mExtraPollers)
          p->Poll();
-      mModuleContainer.Poll();
       mUILayerModuleContainer.Poll();
+      mModuleContainer.Poll();
    }
 
    if (mShowLoadStatePopup)
@@ -1063,6 +1063,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       ADSRDisplay::ToggleDisplayMode();
    }
 
+   if (key == KeyPress::F3Key && !isRepeat)
+   {
+      if (gHoveredModule && mGroupSelectedModules.empty())
+         gHoveredModule->TogglePinned();
+   }
+
    if (key == '`' && !isRepeat)
    {
       if (GetKeyModifiers() == kModifier_Shift)
@@ -1128,8 +1134,8 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       gHotBindUIControl[num] = gHoveredUIControl;
    }
 
-   mModuleContainer.KeyPressed(key, isRepeat);
    mUILayerModuleContainer.KeyPressed(key, isRepeat);
+   mModuleContainer.KeyPressed(key, isRepeat);
 
    //if (key == '/' && !isRepeat)
    //   ofToggleFullscreen();
@@ -1162,8 +1168,8 @@ void ModularSynth::KeyReleased(int key)
    //if (key == 'c')
    //   mouseReleased(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 0);
 
-   mModuleContainer.KeyReleased(key);
    mUILayerModuleContainer.KeyReleased(key);
+   mModuleContainer.KeyReleased(key);
 }
 
 float ModularSynth::GetMouseX(ModuleContainer* context, float rawX /*= FLT_MAX*/)
@@ -1336,13 +1342,13 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
    if (changed)
    {
-      float x = GetMouseX(&mModuleContainer);
-      float y = GetMouseY(&mModuleContainer);
-      mModuleContainer.MouseMoved(x, y);
-
-      x = GetMouseX(&mUILayerModuleContainer);
-      y = GetMouseY(&mUILayerModuleContainer);
+      float x = GetMouseX(&mUILayerModuleContainer);
+      float y = GetMouseY(&mUILayerModuleContainer);
       mUILayerModuleContainer.MouseMoved(x, y);
+
+      x = GetMouseX(&mModuleContainer);
+      y = GetMouseY(&mModuleContainer);
+      mModuleContainer.MouseMoved(x, y);
    }
 
    if (gHoveredUIControl && changed)
@@ -1420,7 +1426,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, gx), MIN(mClickStartY, gy)), ofPoint(MAX(mClickStartX, gx), MAX(mClickStartY, gy)));
       if (rect.width > 10 || rect.height > 10)
       {
-         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules);
+         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules, true);
          if (mGroupSelectedModules.size() > 0)
          {
             for (int i = (int)mGroupSelectedModules.size() - 1; i >= 0; --i) //do this backwards to preserve existing order
@@ -1977,8 +1983,8 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
       }
    }
 
-   mModuleContainer.MouseReleased();
    mUILayerModuleContainer.MouseReleased();
+   mModuleContainer.MouseReleased();
 
    if (mHeldSample)
    {

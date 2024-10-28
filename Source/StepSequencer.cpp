@@ -750,7 +750,7 @@ int StepSequencer::GetMetaStep(double time)
 
 bool StepSequencer::IsMetaStepActive(double time, int col, int row)
 {
-   return mMetaStepMasks[GetMetaStepMaskIndex(col, row)] & (1 << GetMetaStep(time));
+   return mMetaStepMasks[GetMetaStepMaskIndex(col, row)] & (1 << GetMetaStep(time)) && row < mNumRows;
 }
 
 bool StepSequencer::HasGridController()
