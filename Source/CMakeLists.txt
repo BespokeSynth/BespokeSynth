@@ -736,6 +736,7 @@ target_sources(BespokeSynth PRIVATE
     WindowCloseListener.h
     ofxJSONElement.cpp
     ofxJSONElement.h
+    TapTempo.cpp
     )
 
 if(BESPOKE_NIGHTLY)
@@ -936,3 +937,4 @@ add_custom_command(TARGET code-quality-pipeline-checks
   COMMAND git ls-files -- ${CLANG_FORMAT_GLOBS} | xargs clang-format --dry-run --Werror
   )
 # }}}
+

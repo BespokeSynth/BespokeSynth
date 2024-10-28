@@ -91,6 +91,7 @@
 #include "SustainPedal.h"
 #include "MultitrackRecorder.h"
 //#include "MidiPlayer.h"
+#include "TapTempo.h"
 #include "SamplerGrid.h"
 #include "SignalGenerator.h"
 #include "Lissajous.h"
@@ -290,7 +291,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ScaleDetect, scaledetect, kModuleCategory_Note);
    REGISTER(KarplusStrong, karplusstrong, kModuleCategory_Synth);
    REGISTER(WhiteKeys, whitekeys, kModuleCategory_Note);
-   //REGISTER(Kicker, kicker, kModuleCategory_Note);
+   REGISTER(TapTempo, taptempo, kModuleCategory_Other);
    REGISTER(RingModulator, ringmodulator, kModuleCategory_Audio);
    REGISTER(Neighborhooder, notewrap, kModuleCategory_Note);
    REGISTER(Polyrhythms, polyrhythms, kModuleCategory_Instrument);
