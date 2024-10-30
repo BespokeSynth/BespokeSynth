@@ -60,7 +60,7 @@ private:
    }
    bool IsEnabled() const override { return true; }
 
-   AdditionalNoteCable* mDestinationCables[2];
+   AdditionalNoteCable* mPatchCableSource2{ nullptr };
 
    std::array<int, 128> mVelocityPlaying{ 0 };
    std::array<int, 128> mVoiceIdxPlaying{ 0 };

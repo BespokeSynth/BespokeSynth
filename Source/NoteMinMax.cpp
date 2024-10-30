@@ -38,27 +38,22 @@ void NoteMinMax::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mDestinationCables[0] = new AdditionalNoteCable();
-   mDestinationCables[0]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-   AddPatchCableSource(mDestinationCables[0]->GetPatchCableSource());
+   float w, h;
+   GetDimensions(w, h);
+   GetPatchCableSource()->SetManualPosition(w / 2 - 15, h + 3);
+   GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
 
-   mDestinationCables[1] = new AdditionalNoteCable();
-   mDestinationCables[1]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-   AddPatchCableSource(mDestinationCables[1]->GetPatchCableSource());
-
-   GetPatchCableSource()->SetEnabled(false);
+   mPatchCableSource2 = new AdditionalNoteCable();
+   mPatchCableSource2->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+   mPatchCableSource2->GetPatchCableSource()->SetManualPosition(w / 2 + 15, h + 3);
+   mPatchCableSource2->GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
+   this->AddPatchCableSource(mPatchCableSource2->GetPatchCableSource());
 }
 
 void NoteMinMax::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-
-   DrawTextNormal("min", 3, 15);
-   DrawTextNormal("max", 3, 30);
-
-   mDestinationCables[0]->GetPatchCableSource()->SetManualPosition(35, 10);
-   mDestinationCables[1]->GetPatchCableSource()->SetManualPosition(35, 25);
 }
 
 void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -86,14 +81,14 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       if (minNotePlaying == -1 || minNotePlaying > pitch)
       {
          if (minNotePlaying != -1)
-            mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, 0, -1);
-         mDestinationCables[0]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+            PlayNoteOutput(time, minNotePlaying, 0, -1);
+         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
       if (maxNotePlaying == -1 || maxNotePlaying < pitch)
       {
          if (maxNotePlaying != -1)
-            mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, 0, -1);
-         mDestinationCables[1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+            mPatchCableSource2->PlayNoteOutput(time, maxNotePlaying, 0, -1);
+         mPatchCableSource2->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
    }
    else
@@ -118,15 +113,15 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 
       if (minNotePlaying == -1 || minNotePlaying > pitch)
       {
-         mDestinationCables[0]->PlayNoteOutput(time, pitch, 0, -1);
+         PlayNoteOutput(time, pitch, 0, -1);
          if (minNotePlaying != -1)
-            mDestinationCables[0]->PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[pitch]);
+            PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[pitch]);
       }
       if (maxNotePlaying == -1 || maxNotePlaying < pitch)
       {
-         mDestinationCables[1]->PlayNoteOutput(time, pitch, 0, -1);
+         mPatchCableSource2->PlayNoteOutput(time, pitch, 0, -1);
          if (maxNotePlaying != -1)
-            mDestinationCables[1]->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[pitch]);
+            mPatchCableSource2->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[pitch]);
       }
    }
 }
