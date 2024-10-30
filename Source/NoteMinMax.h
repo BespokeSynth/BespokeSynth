@@ -56,7 +56,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override
    {
       width = 90;
-      height = 40;
+      height = 0;
    }
    bool IsEnabled() const override { return true; }
 
