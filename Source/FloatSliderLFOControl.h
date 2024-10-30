@@ -73,7 +73,7 @@ public:
    void SetRate(NoteInterval rate);
    void UpdateFromSettings();
    void SetOwner(FloatSlider* owner);
-   FloatSlider* GetOwner() { return mTargets[0].mSliderTarget; }
+   FloatSlider* GetOwner() { return !mTargets.empty() ? mTargets[0].mSliderTarget : nullptr; }
    bool HasTitleBar() const override { return mPinned; }
 
    bool IsSaveable() override { return mPinned; }
