@@ -81,13 +81,13 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       if (minNotePlaying == -1 || minNotePlaying > pitch)
       {
          if (minNotePlaying != -1)
-            PlayNoteOutput(time, minNotePlaying, 0, -1);
+            PlayNoteOutput(time, minNotePlaying, 0, mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[minNotePlaying]);
          PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
       if (maxNotePlaying == -1 || maxNotePlaying < pitch)
       {
          if (maxNotePlaying != -1)
-            mPatchCableSource2->PlayNoteOutput(time, maxNotePlaying, 0, -1);
+            mPatchCableSource2->PlayNoteOutput(time, maxNotePlaying, 0, mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[maxNotePlaying]);
          mPatchCableSource2->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
    }
@@ -113,13 +113,13 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 
       if (minNotePlaying == -1 || minNotePlaying > pitch)
       {
-         PlayNoteOutput(time, pitch, 0, -1);
+         PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
          if (minNotePlaying != -1)
             PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[pitch]);
       }
       if (maxNotePlaying == -1 || maxNotePlaying < pitch)
       {
-         mPatchCableSource2->PlayNoteOutput(time, pitch, 0, -1);
+         mPatchCableSource2->PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
          if (maxNotePlaying != -1)
             mPatchCableSource2->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[pitch]);
       }
