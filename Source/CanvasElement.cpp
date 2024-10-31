@@ -449,7 +449,7 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
 
    in >> mVelocity;
 
-   if (kNCESaveStateRev > 0)
+   if (rev > 0)
    {
       mPitchBendCurve.LoadState(in);
       mModWheelCurve.LoadState(in);
