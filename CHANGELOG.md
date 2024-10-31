@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Add `pulselimit` module
+- Added `pulselimit` module
 - Added the ability to pin modules with F3 so they stay in view
 - Added a "home" button to move the viewport home in case you get lost
 - Added various controller layouts
@@ -54,6 +54,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Allowed displaying the full note range in the `keyboarddisplay` module
+- Don't smooth delay time when there's a modulator controlling delay, to allow for interesting LFO-driven delay effects
 - Made the `pulsetrain`'s first pulse in sync with the transport instead of whenever the activating pulse comes in
 - Made `pulsetrain` resizable
 - Increased the limit of the `pulsetrain` to 128
@@ -89,6 +91,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed a crash in keyboarddisplay module when notes greater than 127 in value where drawn
+- Fixed the octave note text being off by 2 octaves in the `keyboarddisplay` module
+- Fixed a bug where the lowest octave displayed in the `keyboarddisplay` module wasn't the lowest possible
+- Fixed a bug where the `keyboarddisplay` module was using float instead of double for time calculations
+- Fixed an issue where some old savestates couldn't be loaded due to an issue in the past where the saving of the names of submodules of the effectchain module weren't saving their name
+- Enhanced `midicontroller` deviceOutName creation to handle midi devicenames having " In " and " Out "
+- Don't display the help text when a savestate is loaded through the command line arguments
 - Fixed a bug where all canvas like modules wouldn't save and load note modulations
 - Don't render the finished step in the `pulsetrain` module
 - Fixed a crash in the `pulsesequencer` when going beyond the maximum length
