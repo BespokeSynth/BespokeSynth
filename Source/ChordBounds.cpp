@@ -18,23 +18,23 @@
 /*
   ==============================================================================
 
-    NoteMinMax.cpp
+    ChordBounds.cpp
     Created: 4 Jan 2024 5:31:53pm
     Author:  Andrius Merkys
 
   ==============================================================================
 */
 
-#include "NoteMinMax.h"
+#include "ChordBounds.h"
 #include "OpenFrameworksPort.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 
-NoteMinMax::NoteMinMax()
+ChordBounds::ChordBounds()
 {
 }
 
-void NoteMinMax::CreateUIControls()
+void ChordBounds::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
@@ -50,13 +50,13 @@ void NoteMinMax::CreateUIControls()
    this->AddPatchCableSource(mPatchCableSource2->GetPatchCableSource());
 }
 
-void NoteMinMax::DrawModule()
+void ChordBounds::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
 }
 
-void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ChordBounds::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0) // New note playing
    {
@@ -126,20 +126,20 @@ void NoteMinMax::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-void NoteMinMax::SendCC(int control, int value, int voiceIdx)
+void ChordBounds::SendCC(int control, int value, int voiceIdx)
 {
    SendCCOutput(control, value, voiceIdx);
 }
 
-void NoteMinMax::SaveLayout(ofxJSONElement& moduleInfo)
+void ChordBounds::SaveLayout(ofxJSONElement& moduleInfo)
 {
 }
 
-void NoteMinMax::LoadLayout(const ofxJSONElement& moduleInfo)
+void ChordBounds::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();
 }
 
-void NoteMinMax::SetUpFromSaveData()
+void ChordBounds::SetUpFromSaveData()
 {
 }

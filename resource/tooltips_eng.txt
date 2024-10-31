@@ -2137,4 +2137,4 @@ pulselimit~limit the number of pulses allowed to pass through
 ~limit number of pulses to pass through
 
 
-noteminmax~finds lowest and highest notes among ones played at the same time
+chordbounds~finds lowest and highest notes among ones played at the same time

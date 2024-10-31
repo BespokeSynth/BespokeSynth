@@ -18,26 +18,26 @@
 /*
   ==============================================================================
 
-    NoteMinMax.h
+    ChordBounds.h
     Created: 4 Jan 2024 5:31:53pm
     Author:  Andrius Merkys
 
   ==============================================================================
 */
 
-#ifndef __Bespoke__NoteMinMax__
-#define __Bespoke__NoteMinMax__
+#ifndef __Bespoke__ChordBounds__
+#define __Bespoke__ChordBounds__
 
 #include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 
-class NoteMinMax : public INoteReceiver, public INoteSource, public IDrawableModule
+class ChordBounds : public INoteReceiver, public INoteSource, public IDrawableModule
 {
 public:
-   NoteMinMax();
-   static IDrawableModule* Create() { return new NoteMinMax(); }
+   ChordBounds();
+   static IDrawableModule* Create() { return new ChordBounds(); }
    static bool AcceptsNotes() { return true; }
 
    void CreateUIControls() override;
@@ -67,4 +67,4 @@ private:
    ModulationParameters mModulationParametersPlaying[128];
 };
 
-#endif /* defined(__Bespoke__NoteMinMax__) */
+#endif /* defined(__Bespoke__ChordBounds__) */
