@@ -2135,3 +2135,6 @@ dataprovider~provides modulation values normally not easily accessible.
 pulselimit~limit the number of pulses allowed to pass through
 ~reset the counter of seen pulses
 ~limit number of pulses to pass through
+
+
+chordbounds~finds lowest and highest notes among ones played at the same time

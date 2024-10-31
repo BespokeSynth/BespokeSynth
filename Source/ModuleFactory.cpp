@@ -265,6 +265,7 @@
 #include "SaveStateLoader.h"
 #include "DataProvider.h"
 #include "PulseLimit.h"
+#include "ChordBounds.h"
 
 #include <juce_core/juce_core.h>
 
@@ -484,6 +485,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(SaveStateLoader, savestateloader, kModuleCategory_Other);
    REGISTER(DataProvider, dataprovider, kModuleCategory_Modulator);
    REGISTER(PulseLimit, pulselimit, kModuleCategory_Pulse);
+   REGISTER(ChordBounds, chordbounds, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
