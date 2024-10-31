@@ -201,16 +201,16 @@ void KeyboardDisplay::RefreshOctaveCount()
 
       int elements = static_cast<int>(ratio / baseRatioForOneElement);
 
-      elements = std::clamp(elements, 1, 10);
+      elements = std::clamp(elements, 1, 11);
 
-      if (mRootOctave + elements > 9) //Ensure that we can't go into octaves where it begins to break...
-         mRootOctave = 10 - mNumOctaves;
+      if (mRootOctave + elements > 10) //Ensure that we can't go into octaves where it begins to break...
+         mRootOctave = 11 - mNumOctaves;
       mNumOctaves = elements;
    }
    else
    {
       mNumOctaves = mForceNumOctaves;
-      mRootOctave = 10 - mNumOctaves;
+      mRootOctave = 11 - mNumOctaves;
    }
 }
 
@@ -224,6 +224,8 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    {
       for (int i = 0; i < NumKeys(); ++i)
       {
+         if (i + RootKey() > 127)
+            break;
          bool isBlackKey;
          ofRectangle key = GetKeyboardKeyRect(i + RootKey(), w, h, isBlackKey);
 
@@ -247,7 +249,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       for (int i = 0; i < NumKeys(); i += 7)
       {
          ofSetColor(108, 37, 62, 255);
-         DrawTextNormal("C" + std::to_string(oct), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 12);
+         DrawTextNormal(NoteName(oct * 12, false, true), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 12);
          oct++;
       }
    }
@@ -255,7 +257,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPushStyle();
    ofFill();
    ofSetLineWidth(2);
-   for (int pitch = RootKey(); pitch < RootKey() + NumKeys(); ++pitch)
+   for (int pitch = RootKey(); pitch < MIN(RootKey() + NumKeys(), mLastOnTime.size()); ++pitch)
    {
       if (gTime >= mLastOnTime[pitch] && (gTime <= mLastOffTime[pitch] || mLastOffTime[pitch] < mLastOnTime[pitch]))
       {
@@ -321,7 +323,7 @@ void KeyboardDisplay::OnKeyPressed(int key, bool isRepeat)
       if (res.mOctaveShift != 0)
       {
          int newRootOctave = mRootOctave + res.mOctaveShift;
-         if (newRootOctave > 0 && newRootOctave + mNumOctaves <= 12)
+         if (newRootOctave >= 0 && newRootOctave + mNumOctaves < 12)
             mRootOctave = newRootOctave;
       }
       if (res.mPitch != -1)

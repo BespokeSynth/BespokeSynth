@@ -94,7 +94,7 @@ private:
    bool mShowScale{ false };
    bool mGetVelocityFromClickHeight{ false };
    bool mHideLabels{ false };
-   std::array<float, 128> mLastOnTime{};
-   std::array<float, 128> mLastOffTime{};
+   std::array<double, 128> mLastOnTime{};
+   std::array<double, 128> mLastOffTime{};
    std::unordered_map<int, int> mKeyPressRegister{};
 };
