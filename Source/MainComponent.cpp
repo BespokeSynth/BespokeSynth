@@ -315,6 +315,7 @@ public:
          if (argument.endsWith(".bsk") || argument.endsWith(".bskt"))
          {
             mSynth.SetStartupSaveStateFile(argument.toStdString());
+            TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup, a user who uses the command line arguments likely doesn't need it
             break;
          }
       }
