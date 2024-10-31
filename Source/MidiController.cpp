@@ -2287,7 +2287,7 @@ void MidiController::ConnectDevice()
    ResyncControllerState();
 
    std::string deviceInName = mControllerList->GetLabel(mControllerIndex);
-   std::string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").toStdString();
+   std::string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").replace(" In ", " Out ").toStdString();
    bool hasOutput = false;
    for (const auto& device : MidiOutput::getAvailableDevices())
    {
