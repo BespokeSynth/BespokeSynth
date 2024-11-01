@@ -80,15 +80,13 @@ void ChordBounds::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 
       if (minNotePlaying == -1 || minNotePlaying > pitch)
       {
-         if (minNotePlaying != -1)
-            PlayNoteOutput(time, minNotePlaying, 0, mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[minNotePlaying]);
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         mNoteOutput.Flush(time);
+         PlayNoteOutput(NextBufferTime(false), pitch, velocity, voiceIdx, modulation);
       }
       if (maxNotePlaying == -1 || maxNotePlaying < pitch)
       {
-         if (maxNotePlaying != -1)
-            mPatchCableSource2->PlayNoteOutput(time, maxNotePlaying, 0, mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[maxNotePlaying]);
-         mPatchCableSource2->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         mPatchCableSource2->Flush(time);
+         mPatchCableSource2->PlayNoteOutput(NextBufferTime(false), pitch, velocity, voiceIdx, modulation);
       }
    }
    else
@@ -113,15 +111,15 @@ void ChordBounds::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 
       if (minNotePlaying == -1 || minNotePlaying > pitch)
       {
-         PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+         mNoteOutput.Flush(time);
          if (minNotePlaying != -1)
-            PlayNoteOutput(time, minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[pitch]);
+            PlayNoteOutput(NextBufferTime(false), minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[pitch]);
       }
       if (maxNotePlaying == -1 || maxNotePlaying < pitch)
       {
-         mPatchCableSource2->PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+         mPatchCableSource2->Flush(time);
          if (maxNotePlaying != -1)
-            mPatchCableSource2->PlayNoteOutput(time, maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[pitch]);
+            mPatchCableSource2->PlayNoteOutput(NextBufferTime(false), maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[pitch]);
       }
    }
 }
