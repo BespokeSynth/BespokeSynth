@@ -25,6 +25,7 @@
 
 #include "RollingBuffer.h"
 #include "SynthGlobals.h"
+#include "UserPrefs.h"
 
 RollingBuffer::RollingBuffer(int sizeInSamples)
 : mBuffer(sizeInSamples)
@@ -170,6 +171,8 @@ void RollingBuffer::LoadState(FileStreamIn& in)
    int savedSize = Size();
    if (rev >= 3)
       in >> savedSize;
+   if (rev < 3 && UserPrefs.oversampling.Get() > 1)
+      savedSize = savedSize / UserPrefs.oversampling.Get();
    mBuffer.SetNumActiveChannels(channels);
    for (int i = 0; i < channels; ++i)
    {
