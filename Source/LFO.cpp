@@ -66,8 +66,10 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) c
 
 float LFO::TransformPhase(float phase) const
 {
-   if (mLength != 1)
+   if (mLength != 1 && mLength > 0)
       phase = int(phase) + ofClamp((phase - int(phase)) / mLength, 0, 1);
+   else if (mLength != 1)
+      phase = 0;
    return phase;
 }
 
@@ -80,7 +82,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
 
    float phase = CalculatePhase(samplesIn);
 
-   if (forcePhase != -1)
+   if (forcePhase != -1 && !std::isnan(forcePhase))
       phase = forcePhase;
 
    phase *= FTWO_PI;
@@ -104,7 +106,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
       nonstandardOsc = true;
 
       double perlinPos = gTime + gInvSampleRateMs * samplesIn;
-      if (forcePhase != -1)
+      if (forcePhase != -1 && !std::isnan(forcePhase))
          perlinPos += forcePhase * 1000;
       double perlinPhase = perlinPos * mFreeRate / 1000.0f;
       sample = sPerlinNoise.noise(perlinPhase, mPerlinSeed, -perlinPhase);

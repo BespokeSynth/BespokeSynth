@@ -26,6 +26,9 @@
 #pragma once
 
 #include <cmath>
+#include <limits>
+
+#include "OpenFrameworksPort.h"
 
 enum FilterType
 {
@@ -85,8 +88,10 @@ private:
 
 inline float BiquadFilter::Filter(float in)
 {
-   double out = in * mA0 + mZ1;
+   double out = ofClamp(in * mA0 + mZ1, std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
    mZ1 = in * mA1 + mZ2 - mB1 * out;
    mZ2 = in * mA2 - mB2 * out;
+   if (std::isnan(out) || std::isinf(out))
+      Clear();
    return out;
 }
