@@ -85,6 +85,8 @@ private:
 
 inline float BiquadFilter::Filter(float in)
 {
+   if (std::isnan(in))
+      return 0;
    double out = in * mA0 + mZ1;
    mZ1 = in * mA1 + mZ2 - mB1 * out;
    mZ2 = in * mA2 - mB2 * out;
