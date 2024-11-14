@@ -197,7 +197,7 @@ float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize
 void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float sample);
 std::string GetRomanNumeralForDegree(int degree);
 void UpdateTarget(IDrawableModule* module);
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r = .2f, float g = .7f, float b = .2f);
+void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r = .2f, float g = .7f, float b = .2f, bool autocorrelationMode = true);
 void StringCopy(char* dest, const char* source, int destLength);
 int GetKeyModifiers();
 bool IsKeyHeld(int key, int modifiers = kModifier_None);
