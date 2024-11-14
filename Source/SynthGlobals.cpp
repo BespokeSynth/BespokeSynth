@@ -519,7 +519,7 @@ void UpdateTarget(IDrawableModule* module)
    }
 }
 
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b)
+void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b, bool autocorrelationMode /* = true */)
 {
    ofPushStyle();
    ofSetLineWidth(1.5f);
@@ -535,7 +535,11 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
    for (int i = 100; i < numPoints; ++i)
    {
       float vx = x + w / 2 + buffer->GetSample(i, 0) * .8f * MIN(w, h);
-      float vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+      float vy;
+      if (autocorrelationMode)
+         vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+      else
+         vy = y + h / 2 + buffer->GetSample(i, secondChannel) * .8f * MIN(w, h);
       //float alpha = 1 - (i/float(numPoints));
       //ofSetColor(r*255,g*255,b*255,alpha*alpha*255);
       ofVertex(vx, vy);

@@ -525,7 +525,7 @@ void ModularSynth::Draw(void* vg)
    }
 
    if (UserPrefs.draw_background_lissajous.Get())
-      DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
+      DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB, UserPrefs.background_lissajous_autocorrelate.Get());
 
    if (gTime == 1 && mFatalError == "")
    {
