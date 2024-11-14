@@ -331,7 +331,10 @@ void Snapshots::SetSnapshot(int idx, double time)
                if (i->mHasLFO)
                   slider->AcquireLFO()->Load(i->mLFOSettings);
                else
+               {
                   slider->DisableLFO();
+                  control->SetValueDirect(i->mValue, time); // Set the value again because a already active LFO can change this.
+               }
             }
 
             UIGrid* grid = dynamic_cast<UIGrid*>(control);

@@ -47,6 +47,8 @@ struct LFOSettings
    float mShuffle{ 0 };
    float mFreeRate{ 1 };
    float mLength{ 1 };
+   float mMinValue{ 0 };
+   float mMaxValue{ 1 };
    bool mLowResMode{ false };
 
    void SaveState(FileStreamOut& out) const;
