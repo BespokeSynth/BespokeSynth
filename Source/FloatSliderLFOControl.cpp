@@ -295,6 +295,8 @@ void FloatSliderLFOControl::Load(LFOSettings settings)
 {
    mLFOSettings = settings;
    UpdateFromSettings();
+   mMaxSlider->SetValue(settings.mMaxValue, gTime, true);
+   mMinSlider->SetValue(settings.mMinValue, gTime, true);
    mEnabled = true;
 }
 
@@ -422,6 +424,10 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
       mLFO.SetFreeRate(mLFOSettings.mFreeRate);
    if (slider == mLengthSlider)
       mLFO.SetLength(mLFOSettings.mLength);
+   if (slider == mMinSlider)
+      mLFOSettings.mMinValue = mMinSlider->GetValue();
+   if (slider == mMaxSlider)
+      mLFOSettings.mMaxValue = mMaxSlider->GetValue();
 }
 
 void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -529,7 +535,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
 
 namespace
 {
-   const int kSaveStateRev = 5;
+   const int kSaveStateRev = 6;
    const int kFixNonRevvedData = 999;
 }
 
@@ -548,6 +554,8 @@ void LFOSettings::SaveState(FileStreamOut& out) const
    out << mFreeRate;
    out << mLength;
    out << mLowResMode;
+   out << mMinValue;
+   out << mMaxValue;
 }
 
 void LFOSettings::LoadState(FileStreamIn& in)
@@ -579,4 +587,9 @@ void LFOSettings::LoadState(FileStreamIn& in)
       in >> mLength;
    if (rev >= 5)
       in >> mLowResMode;
+   if (rev >= 6)
+   {
+      in >> mMinValue;
+      in >> mMaxValue;
+   }
 }
