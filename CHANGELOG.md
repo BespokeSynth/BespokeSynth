@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Add option to turn off auto correlation on the background Lissajous
 - Added `pulselimit` module
 - Added the ability to pin modules with F3 so they stay in view
 - Added a "home" button to move the viewport home in case you get lost
@@ -91,6 +92,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed LFO's not properly being recorded and set when using the snapshots module
+- Several fixes to the biquad filter to better handle NaN values
+- Fixed a bug where the LFO would output NaN values when the length was set to zero
+- Fixed a bug when loading old savestates when oversampling was set to anything larger than 1
 - Fixed a crash in keyboarddisplay module when notes greater than 127 in value where drawn
 - Fixed the octave note text being off by 2 octaves in the `keyboarddisplay` module
 - Fixed a bug where the lowest octave displayed in the `keyboarddisplay` module wasn't the lowest possible
