@@ -49,7 +49,7 @@ script~Scripting con python para livecoding de notas y control de módulos
 radiosequencer~secuenciador de un valor a la vez. Conéctalo a la casilla "enabled" en varios módulos para activar uno a la vez. Funciona bien en conjunción con el módulo "groupcontrol".
 ~interval~intervalo de avance
 ~length~longitud de la secuencia
-~grid~Conecta un módulo grid aqui desde un módulo “midicontroller
+~grid~Conecta un módulo grid aqui desde un módulo "midicontroller
 
 
 
@@ -60,7 +60,7 @@ snapshots~guarda y recupera sets de valores.Conecta el círculo gris de los mód
 ~random~añade aleatoriedad al los controles conectados
 
 
-prefab~crea una colección de módulos que pueden cargarse desde el menú “prefabs”. Arrastra y suelta aquí tus módulos para añadirlos al Prefabricado. Arrastra el cable gris a cualquier módulo que quieras eliminar del prefab
+prefab~crea una colección de módulos que pueden cargarse desde el menú "prefabs". Arrastra y suelta aquí tus módulos para añadirlos al Prefabricado. Arrastra el cable gris a cualquier módulo que quieras eliminar del prefab
 ~save~lo guarda como archivo.pfb 
 ~load~carga un .pfb
 ~disband~limpia todos los módulos del prefab
@@ -98,12 +98,12 @@ loopergranulator~úsalo con un módulo "looper" para tocar el contenido mediante
 ~width~ancho estéreo del grano
 
 
-groupcontrol~conecta varias casillas “checkbox”, y las controla todas desde una casilla
+groupcontrol~conecta varias casillas "checkbox", y las controla todas desde una casilla
 ~group enabled~controla las casillas activas
 
 
 
-grid~rejilla genérica, para ser usada por el módulo “script”,para asistir en la escritura de scripts que usan controladores basados en matriz/rejilla.
+grid~rejilla genérica, para ser usada por el módulo "script",para asistir en la escritura de scripts que usan controladores basados en matriz/rejilla.
 ~grid~conecta una rejilla aquí,desde un módulo "midicontroller" 
 ~momentary~deberían los clicks ser tratados como momentáneos?
 
@@ -127,7 +127,7 @@ eventcanvas~programa valores en el tiempo
 ~measures~longitud del bucle
 ~interval~rejilla para encajar los eventos
 ~record~graba los valores conectados mientras cambian 
-~canvas~lienzo de eventos. controles de lienzo:\n-shift-click para añadir evento\n-mantén shift y arrastra un evento para duplicarlo\n-manten alt para arrastrar un evento sin ajustar a la rejilla\n-manten ctrl mientras arrastras para ajustar a un intervalo\n-mantén shift and haz scroll para zoom\n-manten alt y  agarra un espacio vacío para moverte por el lienzo\n-manten ctrl y agarrate en un espacio vacío para hacer zoom en el lienzo
+~canvas~lienzo de eventos. controles de lienzo:\n-shift-click para añadir evento\n-mantén shift y arrastra un evento para duplicarlo\n-manten alt para arrastrar un evento sin ajustar a la rejilla\n-mantén ctrl mientras arrastras para ajustar a un intervalo\n-mantén shift and haz scroll para zoom\n-manten alt y  agarra un espacio vacío para moverte por el lienzo\n-manten ctrl y agarrate en un espacio vacío para hacer zoom en el lienzo
 ~timeline~controla los puntos de bucle(loop)
 ~delete~borra elementos seleccionados
 ~view rows~número de filas visibles
@@ -158,7 +158,7 @@ pulsesequence~define una secuencia en bucle de pulsos
 
 pulser~envía mensajes de pulso a intervalos
 ~interval~velocidad del intervalo
-~timemode~cuando enviar pulsos “downbeat”, o modo “free” para pulsos no encajados en sincronización de transporte.
+~timemode~cuando enviar pulsos "downbeat", o modo "free" para pulsos no encajados en sincronización de transporte.
 ~t~intervalo del pulso en milisegundos
 ~offset~retardo de pulso, en fracciones de medida
 ~random~dile a los módulos pulsados que tomen una posición aleatoria
@@ -419,7 +419,7 @@ polyrhythms~secuencias de looping con pistas de diferentes divisiones
 
 
 playsequencer~secuenciador de percusiones que te permite grabar , hacer pasos en overdub , inspirado por pulsar-23 drum machine
-~grid~conecta una rejilla aquí desde un modulo “midicontroller”
+~grid~conecta una rejilla aquí desde un modulo "midicontroller"
 ~interval~el tamaño de cada paso 
 ~measures~el tamaño del loop
 ~write~si la entrada actual debería ser escrita a la secuencia . esto también eliminará pasos si mute/delete está activado para esta fila
@@ -436,12 +436,12 @@ notesinger~devuelve una nota basándose en un tono detectado
 
 
 
-notesequencer~un bucle de secuencias de notas a un intervalo . emparéjalo con un “pulser” para un control por pasos más interesante. Mantén"shift" apretado para ajustar el tamaño del paso
+notesequencer~un bucle de secuencias de notas a un intervalo . emparéjalo con un "pulser" para un control por pasos más interesante. Mantén"shift" apretado para ajustar el tamaño del paso
 ~interval~duración de la nota
 ~pitch~añade tonos aleatorios en la secuencia . Mantén"shift" apretado para limitar la aleatoriedad solo a tónicas y quintas
 ~len~aleatoriedad de la longitud de cada nota por paso
 ~vel~aleatoriedad de la velocity de cada nota por paso
-~length~longitud de la secuencia de abajo debería tocar.El tamaño de la rejilla general puede ser cambiada ajustando “gridsteps” en el menú triangular
+~length~longitud de la secuencia de abajo debería tocar.El tamaño de la rejilla general puede ser cambiada ajustando "gridsteps" en el menú triangular
 ~<~desplaza la secuencia a la izquierda the sequence to the left
 ~>~desplaza la secuencia a la derecha
 ~clear~borra todos los pasos
@@ -531,7 +531,7 @@ notecanvas~looping note roll
 
 
 
-midicontroller~obtiene entrada midi de dispositivos externos. para tener una buena vista en la vista “layout”, crea un archivo .json con el mismo nombre de tu controlador para configurar la plantilla de tu controlador, ponlo en tu carpeta “data/controllers”. Mira los otros ejemplos en esa carpeta para más ejemplos.
+midicontroller~obtiene entrada midi de dispositivos externos. para tener una buena vista en la vista "layout", crea un archivo .json con el mismo nombre de tu controlador para configurar la plantilla de tu controlador, ponlo en tu carpeta "data/controllers". Mira los otros ejemplos en esa carpeta para más ejemplos.
 ~controller~el dispositivo midi a utilizar
 ~mappingdisplay~que vista de mapping ver
 ~bind (mantén shift)~cuando esto es activado , puedes mapear una entrada midi a un control UI posando el mouse sobre un control UI , manteniendo shift, y usando el control deseado como entrada
@@ -542,13 +542,13 @@ midicontroller~obtiene entrada midi de dispositivos externos. para tener una bue
 ~control~nota o control al que referirse 
 ~channel~a qué canal se presta atención 
 ~path~ruta de control que debe ser afectada
-~controltype~como este control debería modificar el destino.\n -slider: establece el valor interpolando entre “midi off” y “midi on” a el valor del slider\n -set: establece el valor directamente cuando el botón es presionado\n -release:establece el valor directamente cuando este botón es soltado\n -toggle: conmuta el control entre on/off cuando el botón es pulsado\n -direct: establece el control a el valor literal de la entrada midi
+~controltype~como este control debería modificar el destino.\n -slider: establece el valor interpolando entre "midi off" y "midi on" a el valor del slider\n -set: establece el valor directamente cuando el botón es presionado\n -release:establece el valor directamente cuando este botón es soltado\n -toggle: conmuta el control entre on/off cuando el botón es pulsado\n -direct: establece el control a el valor literal de la entrada midi
 ~value~el valor a establecer
 ~midi off~el extremo inferior del rango midi. manda este valor cuando el valor de control al destino es off. Si "scale" es activado, esto controla también el valor del extremo inferior del rango del slider, y puedes establecer midi off para ser mayor que midi on para invertir la dirección de un slider
 ~midi on~el extremo superior del rango midi . manda este valor cuando el valor de control al destino es on. Si "scale" es activado, esto controla también el valor del extremo superior del rango del slider,y puedes establecer midi off para ser mayor que midi on para invertir la dirección de un slider
-~scale~¿ debería ser la salida de este midi slider escalada entre “midi off” y “midi on”?
+~scale~¿ debería ser la salida de este midi slider escalada entre "midi off" y "midi on"?
 ~blink~cuando el control de destino está activo , manda mensajes alternos de note on/off ,para parpadear un led
-~increment~cuando "controltype" está en "set" o "release", el control destinado es incrementado por esta cantidad (y el campo “value”, es ignorado).Cuando "controltype" es "slider", el control destinado es cambiado por esta cantidad en la dirección que el control fue cambiado (esto es práctico para encoders infinitos)
+~increment~cuando "controltype" está en "set" o "release", el control destinado es incrementado por esta cantidad (y el campo "value", es ignorado).Cuando "controltype" es "slider", el control destinado es cambiado por esta cantidad en la dirección que el control fue cambiado (esto es práctico para encoders infinitos)
 ~twoway~¿ deberíamos mandar feedback al controlador ? (para controlar los LEDs asociados con el botón/perilla )
 ~feedback~¿ Hacia qué cc o nota deberíamos mandar el feedback ?
 ~pageless~¿ debería esta conexión funcionar en todas las páginas del midicontroller?
@@ -570,7 +570,7 @@ gridkeyboard~teclado de tipo rejilla, destinado principalmente para controladore
 ~arrangement~¿ qué estilo de layout deberíamos utilizar?
 ~ch.latch~latch del botón de acordes
 ~p.root~para chorder, haz que las tónicas toquen siempre
-~grid~conecta una rejilla aquí desde un “midicontroller”
+~grid~conecta una rejilla aquí desde un "midicontroller"
 
 
 
@@ -593,9 +593,9 @@ drumsequencer~secuenciador de pasos diseñado para percusiones.mantén shift mie
 ~column~columna actual, usado para visualizar pasos en un controlador midi
 ~<~desplaza un patrón entero pattern un paso atrás
 ~>~desplaza un patrón entero pattern un paso adelante
-~grid~conecta una rejilla aquí para un módulo “midicontroller”
-~velocity~conecta una rejilla aquí para un módulo “midicontroller” para controlar la velocity 
-~metastep~conecta una rejilla aquí para un módulo “midicontroller” para controlarel “meta setp”". me olvidé de qué hace esto . oops.
+~grid~conecta una rejilla aquí para un módulo "midicontroller"
+~velocity~conecta una rejilla aquí para un módulo "midicontroller" para controlar la velocity 
+~metastep~conecta una rejilla aquí para un módulo "midicontroller" para controlarel "meta setp". me olvidé de qué hace esto . oops.
 ~rowpitch*~el tono de salida de esta file
 ~offset*~desplaza fila adelante/atrás en el tiempo. intenta hacer tus cajas un poco antes. tus platos un poco más retrasados , etc.
 ~randomize~aplica aleatoriedad a la secuencia
@@ -614,7 +614,7 @@ multitrackrecorder~graba varias pistas de audio sincronizadas , grabalas al disc
 ~add track~añade una pista adicional
 ~clear~borra el audio en las pistas
 
-multitrackrecordertrack~una pista en un grabador multipista “multitrackrecorder”
+multitrackrecordertrack~una pista en un grabador multipista "multitrackrecorder"
 ~ X ~borra esta pista
 
 
@@ -669,7 +669,7 @@ takerecorder~[abandonado, roto ]
 
 
 stutter~captura la entrada y aplica "stutter"
-~grid~conecta una rejilla aquí desde un módulo “midicontroller”
+~grid~conecta una rejilla aquí desde un módulo "midicontroller"
 ~half note~ stutter a blancas
 ~quarter~stutter a negras
 ~8th~ stutter a corcheas
@@ -719,7 +719,7 @@ samplergrid~graba entrada en los pads, y tocalos de vuelta.concebido para ser us
 ~duplicate~cuando es activado , duplica el recuadro de la rejilla tocado por último 
 ~start~comienzo de muestra
 ~end~fin de muestra
-~grid~conecta una rejilla aquí desde un módulo “midicontroller”
+~grid~conecta una rejilla aquí desde un módulo "midicontroller"
 
 
 
@@ -811,9 +811,9 @@ looper~graba bucles de la entrada de audio. úsalo junto a un  "looperrecorder" 
 ~offset~cantidad de offset del cabezal del looper con respecto a la posición del transporte
 ~set~desplaza los contenidos del looper en modo de que el offset actual esté en el comienzo del buffer
 ~scrspd~velocidad de reproducción, usado con "scr" está activo. modula rápidamente para un efecto tipo vinilo de scratching.
-~scr~permite al loop ser “escracheado” ajustando "scrspd"
-~fourtet~usa un truco de texturas que vi una vez a four tet ilustrar en un video: trocea el audio en pedazos, y por cada pedazo ponlo a velocidad doble seguido por un playback invertido a velocidad doble. este slider ajusta la mezcla entre audio original y audio “fortetificato”.
-~fourtetslices~tamaño del pedazo para usar para el efecto “fourtet”
+~scr~permite al loop ser "escracheado" ajustando "scrspd"
+~fourtet~usa un truco de texturas que vi una vez a four tet ilustrar en un video: trocea el audio en pedazos, y por cada pedazo ponlo a velocidad doble seguido por un playback invertido a velocidad doble. este slider ajusta la mezcla entre audio original y audio "fortetificato".
+~fourtetslices~tamaño del pedazo para usar para el efecto "fourtet"
 ~beatwheel on~[none]
 ~beatwheel pos right~[none]
 ~beatwheel depth right~[none]
@@ -850,7 +850,7 @@ fftvocoder~vocoder basado en FFT
 ~carrier~ganancia de la señal carrier
 ~volume~ganancia de salida
 ~dry/wet~¿ qué proporción de la señal original vs la señal con efecto dejar pasar ? 
-~fric thresh~detección de sensibilidad “fricativa”, para intercambiar entre usar el la señal de carrier y ruido blanco para el vocoding
+~fric thresh~detección de sensibilidad "fricativa", para intercambiar entre usar el la señal de carrier y ruido blanco para el vocoding
 ~whisper~¿qué proporción de las fases de los parciales del carrier signal deberían recibir aleatoriedad ? , lo que afecta a como the susurrante la salida del sonido es
 ~phase off~¿ cuánto deberíamos compensar la fase los parciales de la señal carrier ? 
 ~cut~¿ cuántos parcials bajos eliminar ? 
@@ -902,7 +902,7 @@ bitcrush~reduce la resolución y la frecuencia de muestreo para efectos lo-fi
 
 
 
-butterworth~filtro usando la fórmula “butterworth”
+butterworth~filtro usando la fórmula "butterworth"
 ~F~frecuencia de corte
 ~Q~resonancia
 
@@ -1009,7 +1009,7 @@ pitchshift~desplaza el tono de una señal
 
 
 
-pumper~bombea el volumen de una señal de forma rítmica,  para emular un efecto ” sidechain bombeante" 
+pumper~bombea el volumen de una señal de forma rítmica,  para emular un efecto " sidechain bombeante" 
 ~amount~cantidad de reducción de volumen
 ~length~longitud del bombeo
 ~curve~como vuelve el volumen
@@ -1078,8 +1078,8 @@ signalgenerator~oscilador básico.manda una nota hacia el set frequency, y manda
 ~pw~ancho del pulso (o forma, para formas no rectangulares)
 ~slider~slider para interpolar entre las 2 últimas notas 
 ~ramp~cantidad de tiempo para trepar a la frecuencia de entrada
-~sync~activa modo  "sync”, para reiniciar la fase en syncf frequency
-~syncf~frecuencia para reiniciar la fase , cuando “sync” está activado
+~sync~activa modo  "sync", para reiniciar la fase en syncf frequency
+~syncf~frecuencia para reiniciar la fase , cuando "sync" está activado
 ~soften~suaviza los bordes de los cuadrados y dientes de sierra 
 ~shuffle~estira y aprieta cada otro ciclo de la forma de onda
 ~mult~multiplicador de frecuencia
@@ -1182,9 +1182,9 @@ oscillator~oscilador polifónico . modulaciones  (con soporte para  MPE ): modwh
 ~pw~ancho de pulso (o forma para ondas no cuadradas)
 ~shuffle~estira y aprieta cada otro ciclo de la forma de onda
 ~soften~suaviza los bordes de los cuadrados y dientes de sierra 
-~phase~offset de fase del oscilador, y la fase entre las voces en unísono . útil para “patchear “ con un modulador muy rápido , para obtener modulación de fase.
-~sync~activa modo  "sync”, para reiniciar la fase en syncf frequency
-~syncf~frecuencia para reiniciar la fase , cuando “sync” está activado
+~phase~offset de fase del oscilador, y la fase entre las voces en unísono . útil para "patchear " con un modulador muy rápido , para obtener modulación de fase.
+~sync~activa modo  "sync", para reiniciar la fase en syncf frequency
+~syncf~frecuencia para reiniciar la fase , cuando "sync" está activado
 ~env~[none]
 ~envA~volumen de ataque
 ~envD~volumen de decay
@@ -1469,7 +1469,7 @@ pressuretomodwheel~toma modulación de la entrada midi pressure y lo cambia a mo
 
 
 pressure~añade modulación pressure a los tonos
-~pressure~cantidad de “presión” pressure 
+~pressure~cantidad de "presión" pressure 
 
 
 
@@ -1555,13 +1555,13 @@ notepanrandom~establece el paneo de una nota a valores aleatorios ,para sintetiz
 
 
 notepanner~establece el paneo de una nota, para sintetizadores internos que soportan notas con información de paneo
-~pan~posición pan, .5 es centro
+~pan~posición pan,.5 es centro
 
 
 
 notepanalternator~establece el paneo de una nota, alternando entre dos valores , para sintetizadores internos que soportan notas con información de paneo
-~one~pan position, .5 es centro 
-~two~pan position, .5 es centro
+~one~pan position,.5 es centro 
+~two~pan position,.5 es centro
 
 
 
@@ -1728,7 +1728,7 @@ titlebar~
 ~save~guardar estado actual como archivo .bsk , para restaurarlo después
 ~save as~guarda el estado actual como un nuevo archivo .bsk
 ~new patch~resetea el layout especificado en  "layout" en el archivo userprefs.json
-~write audio~graba los últimos 30 minutos de audio a el directorio de grabaciones especificado “recordings_path”
+~write audio~graba los últimos 30 minutos de audio a el directorio de grabaciones especificado "recordings_path"
 ~ ? ~muestra ayuda
 ~settings~ajuste de preferencias, guardadas como userprefs.json
 ~load layout~[none]
@@ -1786,7 +1786,7 @@ m185sequencer~secuenciador que usa el paradigma único del m185 o intellijel met
 
 
 
-notestepper~devuelve notas mediante un “round robin” de cables de patch, para crear variedad secuencial to create sequential variety
+notestepper~devuelve notas mediante un "round robin" de cables de patch, para crear variedad secuencial to create sequential variety
 ~length~duración de la secuencia
 ~reset~resetea al inicio de la secuencia
 
@@ -1803,7 +1803,7 @@ scale~controla la escala global usada por varios módulos
 ~intonation~qué método utilizar para afinar la escala
 ~PPO~notas por octava
 ~tet~de cuántos semitonos se compone una octava
-~tuning~qué frecuencia definida “note” representa?
+~tuning~qué frecuencia definida "note" representa?
 ~note~el tono que corresponde con la frecuencia definida en "tuning"
 
 
@@ -1817,3 +1817,12 @@ gain~ajusta el volumen del audio de una señal
 ~gain~cantidad de ajuste de la señal. un valor de 1 no causará cambios en la señal.
 
 
+
+taptempo~módulo para establecer el tempo con pulsaciones
+~tap~presione para establecer el tempo
+~indicator~muestra el número de pulsaciones para calcular el tempo
+~bpm~tempo en golpes por minuto
+
+
+
+TempoFollower: Módulo para seguimiento automático del tempo de la señal de entrada. Analiza los intervalos entre pulsos y ajusta el tempo en tiempo real.

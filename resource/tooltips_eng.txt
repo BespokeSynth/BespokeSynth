@@ -2135,3 +2135,9 @@ dataprovider~provides modulation values normally not easily accessible.
 pulselimit~limit the number of pulses allowed to pass through
 ~reset the counter of seen pulses
 ~limit number of pulses to pass through
+
+
+taptempo~module for setting tempo with taps
+~tap~tap 4 times to set the tempo
+~indicator~shows the number of taps to calculate the tempo
+~bpm~tempo in beats per minute

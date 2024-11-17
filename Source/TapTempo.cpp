@@ -2,87 +2,191 @@
 #include "PatchCableSource.h"
 #include "UIControlMacros.h"
 
-
 TapTempo::TapTempo()
-    : lastTapTime(0)
-    , isFirstTap(true)
-    , currentTempo(120)
-    , maxIntervals(4)
-    , minInterval(0.2)
-    , maxInterval(2.0)
 {
-    // Инициализация
+}
+
+void TapTempo::Init()
+{
+    IDrawableModule::Init();
+    TheTransport->AddListener(this, kInterval_32n, {0, 0}, true);
 }
 
 TapTempo::~TapTempo()
 {
-    // Очистка
+    TheTransport->RemoveListener(this);
 }
 
 void TapTempo::CreateUIControls()
 {
-    IDrawableModule::CreateUIControls(); // Вызов базового метода
-    mTapButton = new ClickButton(this, "tap", 0, 0, ButtonDisplayStyle::kText);
+    IDrawableModule::CreateUIControls();
+    float width, height;
+    GetModuleDimensions(width, height);
+    
+    mTapButton = new ClickButton(this, "tap", width/2 - 2, 18, ButtonDisplayStyle::kText);
+    mTapButton->SetDimensions(width/2, 20);
+    mTapButton->SetName("tap");
+    AddUIControl(mTapButton);
+    
+    mJustFollowCheckbox = new Checkbox(this, "just follow", 5, 5, &mJustFollowMode);
+    mJustFollowCheckbox->SetName("just_follow");
+    AddUIControl(mJustFollowCheckbox);
+}
+
+void TapTempo::ProcessTap(double currentTime)
+{
+    mJustFollowMode = mJustFollowCheckbox->GetValue();
+    
+    if (mJustFollowMode)
+    {
+        if (tapCount > 0)
+        {
+            double interval = currentTime - lastTapTime;
+            if (interval > 0 && interval <= MAX_INTERVAL)
+            {
+                float tempo = 60.0f / static_cast<float>(interval);
+                if (tempo >= MIN_BPM && tempo <= MAX_BPM)
+                {
+                    TheTransport->SetTempo(tempo);
+                }
+            }
+        }
+        lastTapTime = currentTime;
+        tapCount = 1;
+        return;
+    }
+    
+    if (tapCount == 0)
+    {
+        lastTapTime = currentTime;
+        tapCount = 1;
+        return;
+    }
+    
+    double interval = currentTime - lastTapTime;
+    
+    if (interval > RESET_TIMEOUT)
+    {
+        ResetTapSequence();
+        lastTapTime = currentTime;
+        tapCount = 1;
+        return;
+    }
+    
+    if (!IsValidInterval(interval))
+    {
+        ResetTapSequence();
+        return;
+    }
+    
+    intervals.push_back(interval);
+    while (intervals.size() > REQUIRED_TAPS - 1)
+        intervals.pop_front();
+        
+    lastTapTime = currentTime;
+    tapCount++;
+    
+    if (tapCount == REQUIRED_TAPS)
+    {
+        float tempo = CalculateAverageTempo();
+        if (tempo >= MIN_BPM && tempo <= MAX_BPM)
+        {
+            double avgInterval = 60.0 / tempo;
+            pendingTempoTime = currentTime + avgInterval;
+            isWaitingForTempo = true;
+        }
+    }
+    else if (tapCount > REQUIRED_TAPS)
+    {
+    }
+}
+
+bool TapTempo::IsValidInterval(double interval) const
+{
+    return interval >= MIN_INTERVAL && interval <= MAX_INTERVAL;
+}
+
+float TapTempo::CalculateAverageTempo() const
+{
+    if (intervals.empty())
+        return TheTransport->GetTempo();
+        
+    double avgInterval = 0.0;
+    for (double interval : intervals)
+        avgInterval += interval;
+    avgInterval /= intervals.size();
+    
+    return 60.0f / static_cast<float>(avgInterval);
+}
+
+void TapTempo::ResetTapSequence()
+{
+    tapCount = 0;
+    intervals.clear();
+    isWaitingForTempo = false;
+    pendingTempoTime = 0.0;
+}
+
+void TapTempo::OnTimeEvent(double time)
+{
+    if (tapCount > 0 && (time - lastTapTime) > RESET_TIMEOUT)
+    {
+        ResetTapSequence();
+    }
+    
+    if (isWaitingForTempo && time >= pendingTempoTime)
+    {
+        float tempo = CalculateAverageTempo();
+        if (tempo >= MIN_BPM && tempo <= MAX_BPM)
+        {
+            TheTransport->SetTempo(tempo);
+        }
+        ResetTapSequence();
+    }
 }
 
 void TapTempo::DrawModule()
 {
-    // Реализация отрисовки
-    mTapButton->Draw();
-
-    // задать обработчик событий для кнопки
-    mTapButton->SetCableTargetable(true);
-}
-
-void TapTempo::ProcessTap()
-{
-    // Используем текущее время в секундах
-    double currentTime = TheTransport->GetMeasureTime(gTime) / (TheTransport->GetTempo() / 60.0f);
-
-    if (isFirstTap) {
-        isFirstTap = false;
-        lastTapTime = currentTime;
+    if (Minimized() || IsVisible() == false)
         return;
-    }
 
-    double timeDifference = currentTime - lastTapTime;
+    mTapButton->Draw();
     
-    // Проверяем, находится ли интервал в допустимом диапазоне
-    if (timeDifference >= minInterval && timeDifference <= maxInterval) {
-        // Добавляем ноый интервал
-        intervals.push_back(timeDifference);
-        
-        // Удаляем старый интервал, если превышен максимальный размер
-        if (intervals.size() > maxIntervals) {
-            intervals.erase(intervals.begin());
-        }
-        
-        // Вычисляем среднее значение интервалов
-        float averageInterval = 0;
-        for (float interval : intervals) {
-            averageInterval += interval;
-        }
-        averageInterval /= intervals.size();
-        
-        // Вычисляем новый темп (BPM = 60/interval)
-        currentTempo = 60.0f / averageInterval;
-        
-        TheTransport->SetTempo(currentTempo);
-    }
-    else if (timeDifference > maxInterval) {
-        // Сброс при слишком большом интервале
-        intervals.clear();
-        isFirstTap = true;
+    float width, height;
+    GetModuleDimensions(width, height);
+    
+    const float indicatorWidth = 10;
+    const float indicatorHeight = 10;
+    const float spacing = 5;
+    const float startX = width/2 - ((indicatorWidth * REQUIRED_TAPS + spacing * (REQUIRED_TAPS-1)) / 2);
+    const float y = 5;
+    
+    ofPushStyle();
+    
+    for (int i = 0; i < REQUIRED_TAPS; ++i)
+    {
+        if (isWaitingForTempo)
+            ofSetColor(135, 135, 135, 150);
+        else if (i < tapCount)
+            ofSetColor(0, 135, 0, 150);
+        else
+            ofSetColor(0, 135, 0, 30);
+            
+        ofFill();
+        ofRect(startX + i * (indicatorWidth + spacing), y, indicatorWidth, indicatorHeight);
     }
     
-    lastTapTime = currentTime;
+    ofPopStyle();
+    
+    std::string tempoDisplay = (tapCount == 0) ? "-" : 
+                              ofToString(static_cast<int>(TheTransport->GetTempo()));
+    DrawTextNormal(tempoDisplay, 5, 30);
 }
-
 
 void TapTempo::ButtonClicked(ClickButton* button, double time)
 {
-   if (button == mTapButton)
-   {
-      ProcessTap();
-   }
+    if (button == mTapButton)
+    {
+        ProcessTap(time);
+    }
 }
