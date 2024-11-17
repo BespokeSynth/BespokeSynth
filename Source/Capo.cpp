@@ -111,7 +111,7 @@ void Capo::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
          if (mInputNotes[pitch].mOn)
          {
             PlayNoteOutput(time + .01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
-            mInputNotes[pitch].mOutputPitch = pitch + mCapo;
+            mInputNotes[pitch].mOutputPitch = TransformPitch(pitch);
             PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          }
       }
