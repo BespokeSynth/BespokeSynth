@@ -71,8 +71,8 @@ void TapTempo::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
    {
       mLastBeatTime = time;
       if (!mCount)
-		 mFirstBeatTime = time;
-	  mCount++;
+         mFirstBeatTime = time;
+      mCount++;
    }
 }
 
@@ -82,15 +82,15 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
    {
       mLastBeatTime = time;
       if (!mCount)
-		 mFirstBeatTime = time;
-	  mCount++;
+         mFirstBeatTime = time;
+      mCount++;
    }
 }
 
 float TapTempo::Value(int samplesIn)
 {
    if (mCount < 2)
-	  return 0;
+      return 0;
 
    return (mCount - 1) / ((mLastBeatTime - mFirstBeatTime) / 60 / 1000) * 4;
 }
