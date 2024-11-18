@@ -48,8 +48,6 @@ target_sources(BespokeSynth PRIVATE
     AudioToPulse.h
     Autotalent.cpp
     Autotalent.h
-    AverageBPM.cpp
-    AverageBPM.h
     BandVocoder.cpp
     BandVocoder.h
     BeatBloks.cpp
@@ -664,6 +662,8 @@ target_sources(BespokeSynth PRIVATE
     SynthGlobals.h
     TakeRecorder.cpp
     TakeRecorder.h
+    TapTempo.cpp
+    TapTempo.h
     TextEntry.cpp
     TextEntry.h
     TimelineControl.cpp

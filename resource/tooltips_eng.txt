@@ -2137,5 +2137,5 @@ pulselimit~limit the number of pulses allowed to pass through
 ~limit number of pulses to pass through
 
 
-averagebpm~detect the BPM from input notes or pulses
+taptempo~detect the BPM from input notes or pulses
 ~reset reset the module

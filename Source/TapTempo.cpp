@@ -16,14 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  AverageBPM.cpp
+//  TapTempo.cpp
 //  Bespoke
 //
 //  Created by Andrius Merkys on 10/25/24.
 //
 //
 
-#include "AverageBPM.h"
+#include "TapTempo.h"
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
@@ -31,15 +31,15 @@
 #include "PatchCableSource.h"
 #include "UIControlMacros.h"
 
-AverageBPM::AverageBPM()
+TapTempo::TapTempo()
 {
 }
 
-AverageBPM::~AverageBPM()
+TapTempo::~TapTempo()
 {
 }
 
-void AverageBPM::CreateUIControls()
+void TapTempo::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
@@ -52,7 +52,7 @@ void AverageBPM::CreateUIControls()
    AddPatchCableSource(mTargetCable);
 }
 
-void AverageBPM::DrawModule()
+void TapTempo::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
@@ -60,12 +60,12 @@ void AverageBPM::DrawModule()
    mReset->Draw();
 }
 
-void AverageBPM::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
+void TapTempo::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }
 
-void AverageBPM::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void TapTempo::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled && velocity > 0)
    {
@@ -76,7 +76,7 @@ void AverageBPM::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-void AverageBPM::OnPulse(double time, float velocity, int flags)
+void TapTempo::OnPulse(double time, float velocity, int flags)
 {
    if (mEnabled && velocity > 0)
    {
@@ -87,7 +87,7 @@ void AverageBPM::OnPulse(double time, float velocity, int flags)
    }
 }
 
-float AverageBPM::Value(int samplesIn)
+float TapTempo::Value(int samplesIn)
 {
    if (mCount < 2)
 	  return 0;
@@ -95,22 +95,22 @@ float AverageBPM::Value(int samplesIn)
    return (mCount - 1) / ((mLastBeatTime - mFirstBeatTime) / 60 / 1000) * 4;
 }
 
-void AverageBPM::ButtonClicked(ClickButton* button, double time)
+void TapTempo::ButtonClicked(ClickButton* button, double time)
 {
    mCount = 0;
    mFirstBeatTime = 0;
    mLastBeatTime = 0;
 }
 
-void AverageBPM::SaveLayout(ofxJSONElement& moduleInfo)
+void TapTempo::SaveLayout(ofxJSONElement& moduleInfo)
 {
 }
 
-void AverageBPM::LoadLayout(const ofxJSONElement& moduleInfo)
+void TapTempo::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();
 }
 
-void AverageBPM::SetUpFromSaveData()
+void TapTempo::SetUpFromSaveData()
 {
 }

@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  AverageBPM.h
+//  TapTempo.h
 //  Bespoke
 //
 //  Created by Andrius Merkys on 10/25/24.
@@ -33,12 +33,12 @@
 
 class PatchCableSource;
 
-class AverageBPM : public IDrawableModule, public INoteReceiver, public IPulseReceiver, public IButtonListener, public IModulator
+class TapTempo : public IDrawableModule, public INoteReceiver, public IPulseReceiver, public IButtonListener, public IModulator
 {
 public:
-   AverageBPM();
-   virtual ~AverageBPM();
-   static IDrawableModule* Create() { return new AverageBPM(); }
+   TapTempo();
+   virtual ~TapTempo();
+   static IDrawableModule* Create() { return new TapTempo(); }
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return true; }
