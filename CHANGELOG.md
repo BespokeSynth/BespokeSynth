@@ -9,19 +9,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Add option to turn off auto correlation on the background Lissajous
-- Added `pulselimit` module
+- Added the `audiosplitter` module
+- Added an option to turn off auto correlation on the background Lissajous
+- Added the `pulselimit` module
 - Added the ability to pin modules with F3 so they stay in view
 - Added a "home" button to move the viewport home in case you get lost
 - Added various controller layouts
-- Added `dataprovider` module
+- Added the `dataprovider` module
 - Added support for command line options
-- Added `savestateloader` module, for loading into another savestate file
+- Added the `savestateloader` module, for loading into another savestate file
 - Added controller layouts for the M-Audio Oxygen Pro 49
 - Added environment variable for setting bespoke data dir
 - Added support for template projects (.bskt)
 - Added 14-bit midi CC support, and added integration for custom "bespoke turn" controller
-- Added `euclideansequencer` module
+- Added the `euclideansequencer` module
 - Added a new loop capture method to `looperrecorder`, so you can start recording/stop recording and it rounds to the nearest number of bars
 - Added voiceId to the `notedisplayer`
 - Added "pan" to `modulationvisualizer` and made the module resizable
@@ -32,22 +33,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added the ability yo jump octaves via keyboard keybinds to the `keyboarddisplay` module
 - Added an option in the settings to hide labels to the `keyboarddisplay` module
 - Added another option that enforces a fixed number of octaves regardless of the keyboard size to the `keyboarddisplay` module
-- Added `controlrecorder` module
+- Added the `controlrecorder` module
 - Added major thirds layout to the `launchpadkeyboard` module
 - Added mouse click based velocity support to the `keyboarddisplay` module
 - Added the ability for the user to configure their target refresh rate
-- Added `pulserouter` module
-- Added `voicesetter` module
+- Added the `pulserouter` module
+- Added the `voicesetter` module
 - Added controller layout for music thing modular m0 controller
-- Added a `label` module
+- Added the `label` module
 - Added a new `set_target` script method with an additional `cableSourceIndex` parameter
 - Added a checkbox to toggle the resetting of the transport on `songbuilder` scene change
 - Added the ability to disable spacemouse control from the command line
 - Added a mode to `oscillator` and `signalgenerator` sync to allow the frequency to be a ratio
 - Added a system for saving module presets, and spawning them from quickspawn
-- Added `pitchtovalue` module
-- Added `dotsequencer` module, a polyphonic note sequencer
-- Added `rhythmsequencer` note effect
+- Added the `pitchtovalue` module
+- Added the `dotsequencer` module, a polyphonic note sequencer
+- Added the `rhythmsequencer` note effect
 - Added controller definition for Code 25 USB MIDI
 - Added previewing to `samplebrowser`
 - Added sync pulse support to `m185sequencer`
@@ -55,6 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Added a stop button when the sample is playing in the `samplebrowser` module
 - Allowed displaying the full note range in the `keyboarddisplay` module
 - Don't smooth delay time when there's a modulator controlling delay, to allow for interesting LFO-driven delay effects
 - Made the `pulsetrain`'s first pulse in sync with the transport instead of whenever the activating pulse comes in
@@ -92,6 +94,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed an issue where long sample names prevented you from clicking the play button in the `samplebrowser` module
+- Fixed `capo` not working properly when adjusting held notes while in diatonic mode
 - Fixed LFO's not properly being recorded and set when using the snapshots module
 - Several fixes to the biquad filter to better handle NaN values
 - Fixed a bug where the LFO would output NaN values when the length was set to zero
