@@ -70,24 +70,24 @@ void TapTempo::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 
 void TapTempo::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled && velocity > 0)
-   {
-      mLastBeatTime = time;
-      if (!mCount)
-         mFirstBeatTime = time;
-      mCount++;
-   }
+   if (!mEnabled || !velocity)
+      return;
+
+   mLastBeatTime = time;
+   if (!mCount)
+      mFirstBeatTime = time;
+   mCount++;
 }
 
 void TapTempo::OnPulse(double time, float velocity, int flags)
 {
-   if (mEnabled && velocity > 0)
-   {
-      mLastBeatTime = time;
-      if (!mCount)
-         mFirstBeatTime = time;
-      mCount++;
-   }
+   if (!mEnabled || !velocity)
+      return;
+
+   mLastBeatTime = time;
+   if (!mCount)
+      mFirstBeatTime = time;
+   mCount++;
 }
 
 void TapTempo::TextEntryComplete(TextEntry* entry)
