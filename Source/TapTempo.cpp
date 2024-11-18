@@ -44,7 +44,7 @@ void TapTempo::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   UICONTROL_CUSTOM(mWindowEntry, new TextEntry(UICONTROL_BASICS("window"), 7, &mLimit, 1, 99999); mLimitEntry->DrawLabel(false););
+   UICONTROL_CUSTOM(mWindowEntry, new TextEntry(UICONTROL_BASICS("window"), 7, &mWindow, 1, 99999); mWindowEntry->DrawLabel(false););
    UIBLOCK_SHIFTRIGHT();
    UICONTROL_CUSTOM(mResetButton, new ClickButton(UICONTROL_BASICS("reset")));
    ENDUIBLOCK(mWidth, mHeight);

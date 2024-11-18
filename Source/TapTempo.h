@@ -81,6 +81,7 @@ private:
    TextEntry* mWindowEntry{ nullptr };
    ClickButton* mReset{ nullptr };
    int mCount{ 0 };
+   int mWindow{ 0 };
    float mFirstBeatTime{ 0 };
    float mLastBeatTime{ 0 };
 
