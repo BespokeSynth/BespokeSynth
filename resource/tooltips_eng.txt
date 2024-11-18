@@ -2138,4 +2138,5 @@ pulselimit~limit the number of pulses allowed to pass through
 
 
 taptempo~detect the BPM from input notes or pulses
-~reset reset the module
+~reset~reset the module
+~window~size of averaging window in notes and pulses

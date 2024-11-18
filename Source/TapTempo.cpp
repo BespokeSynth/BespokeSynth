@@ -44,7 +44,9 @@ void TapTempo::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   BUTTON(mReset, "reset");
+   UICONTROL_CUSTOM(mWindowEntry, new TextEntry(UICONTROL_BASICS("window"), 7, &mLimit, 1, 99999); mLimitEntry->DrawLabel(false););
+   UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mResetButton, new ClickButton(UICONTROL_BASICS("reset")));
    ENDUIBLOCK(mWidth, mHeight);
 
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
@@ -57,6 +59,7 @@ void TapTempo::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mWindowEntry->Draw();
    mReset->Draw();
 }
 
@@ -85,6 +88,11 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
          mFirstBeatTime = time;
       mCount++;
    }
+}
+
+void PulseLimit::ButtonClicked(ClickButton* button, double time)
+{
+   mCount = 0;
 }
 
 float TapTempo::Value(int samplesIn)
