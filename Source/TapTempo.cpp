@@ -90,9 +90,8 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
    }
 }
 
-void PulseLimit::ButtonClicked(ClickButton* button, double time)
-{
-   mCount = 0;
+void TapTempo::TextEntryComplete(TextEntry* entry)
+{ // TODO: Resize the array here
 }
 
 float TapTempo::Value(int samplesIn)

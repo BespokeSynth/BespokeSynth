@@ -46,7 +46,7 @@ public:
 
    void CreateUIControls() override;
 
-   void TextEntryComplete(TextEntry* entry) override {}
+   void TextEntryComplete(TextEntry* entry) override;
    void ButtonClicked(ClickButton* button, double time) override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
