@@ -105,7 +105,21 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
 }
 
 void TapTempo::TextEntryComplete(TextEntry* entry)
-{ // TODO: Resize the array here
+{
+   if (mWindow == mBeats.size())
+      return;
+
+   std::array<float, mWindow> mBeatsNew;
+   if (mWindow > mBeats.size())
+   {
+      for (int i = 0; i < mBeats.size(); i++)
+         mBeatsNew[i] = mBeats[i];
+   }
+   else
+   {
+      // TODO: Properly downsize
+   }
+   mBeats = mBeatsNew;
 }
 
 float TapTempo::Value(int samplesIn)
