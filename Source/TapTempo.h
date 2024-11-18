@@ -80,10 +80,10 @@ private:
 
    TextEntry* mWindowEntry{ nullptr };
    ClickButton* mReset{ nullptr };
+
    int mCount{ 0 };
-   int mWindow{ 0 };
-   float mFirstBeatTime{ 0 };
-   float mLastBeatTime{ 0 };
+   int mWindow{ 4 };
+   std::array<float, mWindow> mBeats;
 
    float mWidth{ 200 };
    float mHeight{ 20 };
