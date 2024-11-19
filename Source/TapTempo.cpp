@@ -97,6 +97,8 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
 void TapTempo::TextEntryComplete(TextEntry* entry)
 {
    mBeats.resize(mWindow);
+   if (mCount > mWindow)
+      mCount = mWindow;
 }
 
 float TapTempo::Value(int samplesIn)
