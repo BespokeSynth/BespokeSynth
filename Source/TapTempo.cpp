@@ -60,7 +60,7 @@ void TapTempo::DrawModule()
       return;
 
    mWindowEntry->Draw();
-   mReset->Draw();
+   mResetButton->Draw();
 }
 
 void TapTempo::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
