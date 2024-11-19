@@ -73,17 +73,12 @@ void TapTempo::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
    if (!mEnabled || !velocity)
       return;
 
+   for (int i = mBeats.size()-1; i > 0; i--)
+      mBeats[i] = mBeats[i-1];
+   mBeats[0] = time;
+
    if (mCount < mWindow)
-   {
-      mBeats[mCount] = time;
       mCount++;
-   }
-   else
-   {
-      for (int i = 0; i < mWindow - 1; i++)
-         mBeats[i] = mBeats[i+1];
-      mBeats[mWindow-1] = time;
-   }
 }
 
 void TapTempo::OnPulse(double time, float velocity, int flags)
@@ -91,35 +86,17 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
    if (!mEnabled || !velocity)
       return;
 
+   for (int i = mBeats.size()-1; i > 0; i--)
+      mBeats[i] = mBeats[i-1];
+   mBeats[0] = time;
+
    if (mCount < mWindow)
-   {
-      mBeats[mCount] = time;
       mCount++;
-   }
-   else
-   {
-      for (int i = 0; i < mWindow - 1; i++)
-         mBeats[i] = mBeats[i+1];
-      mBeats[mWindow-1] = time;
-   }
 }
 
 void TapTempo::TextEntryComplete(TextEntry* entry)
 {
-   if (mWindow == mBeats.size())
-      return;
-
-   std::array<float, mWindow> mBeatsNew;
-   if (mWindow > mBeats.size())
-   {
-      for (int i = 0; i < mBeats.size(); i++)
-         mBeatsNew[i] = mBeats[i];
-   }
-   else
-   {
-      // TODO: Properly downsize
-   }
-   mBeats = mBeatsNew;
+   mBeats.resize(mWindow);
 }
 
 float TapTempo::Value(int samplesIn)

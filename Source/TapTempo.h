@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "IModulator.h"
@@ -83,7 +85,7 @@ private:
 
    int mCount{ 0 };
    int mWindow{ 4 };
-   std::array<float, mWindow> mBeats;
+   std::vector<float> mBeats(mWindow);
 
    float mWidth{ 200 };
    float mHeight{ 20 };
