@@ -85,7 +85,7 @@ private:
 
    int mCount{ 0 };
    int mWindow{ 4 };
-   std::vector<float> mBeats = { 0, 0, 0, 0 };
+   std::vector<double> mBeats = { 0, 0, 0, 0 };
 
    float mWidth{ 200 };
    float mHeight{ 20 };
