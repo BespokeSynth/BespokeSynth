@@ -1,7 +1,7 @@
 <!-- omit in toc -->
 # Contributing to Bespoke Synth
 
-First off, thanks for taking the time to contribute! ❤️
+First off all, thank you for taking the time to contribute! ❤️
 
 All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them. Please make sure to read the relevant section before making your contribution. It will make it a lot easier for us maintainers and smooth out the experience for all involved. The community looks forward to your contributions. 🎉
 
@@ -10,7 +10,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 > - Express about it on your favorite social media outlet
 > - Refer this project in your project's readme
 > - Mention the project at local meetups and tell your friends/colleagues
-> - Share [the Bespoke Discord](https://discord.gg/YdTMkvvpZZ)
+> - Share the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ)
 
 
 <!-- omit in toc -->
@@ -21,9 +21,10 @@ All types of contributions are encouraged and valued. See the [Table of Contents
   - [I Want To Contribute](#i-want-to-contribute)
   - [Reporting Bugs](#reporting-bugs)
   - [Suggesting Enhancements](#suggesting-enhancements)
-  - [Your First Code Contribution](#your-first-code-contribution)
+  - [Code Contribution](#code-contributing)
     - [Setting up your environment](#setting-up-your-environment)
     - [Building](#building)
+    - [Submitting your code](#submitting-your-code)
   - [Improving The Documentation](#improving-the-documentation)
 - [Style guides](#style-guides)
   - [Commit Messages](#commit-messages)
@@ -32,8 +33,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the
-[Bespoke Synth Code of Conduct](https://github.com/BespokeSynth/BespokeSynth/blob//CODE_OF_CONDUCT.md).
+This project and everyone participating in it is governed by the [Bespoke Synth Code of Conduct](https://github.com/BespokeSynth/BespokeSynth/blob//CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior on [our discord](https://discord.gg/YdTMkvvpZZ) to the moderators or to <bespokesynth@gmail.com>.
 
 
@@ -58,7 +58,9 @@ We will then take care of the issue as soon as posssible.
 > ### Legal Notice <!-- omit in toc -->
 > When contributing to this project, you must agree that you have authored 100% of the content, that you have the necessary rights to the content and that the content you contribute may be provided under the project licence.
 
+
 ### Reporting Bugs
+
 
 <!-- omit in toc -->
 #### Before Submitting a Bug Report
@@ -76,6 +78,7 @@ We ask you to investigate carefully, collect information and describe the issue 
   - System information and settings like Audio hardware and software, samplerate, buffer size and related.
   - Can you reliably reproduce the issue? And can you also reproduce it with older versions?
 
+
 <!-- omit in toc -->
 #### How Do I Submit a Good Bug Report?
 
@@ -92,12 +95,13 @@ Once it's filed:
 
 - The project team will label the issue accordingly.
 - A team member will try to reproduce the issue with your provided steps. If there are no reproduction steps or no obvious way to reproduce the issue, the team will ask you for those steps and mark the issue as `need more info`. Bugs with the `need more info` tag will not be addressed until they are reproduced.
-- If the team is able to reproduce the issue, they likely will mention this in the issue, as well as possibly add other tags (such as the size or priority), and the issue will be left to be [resolved by someone](#your-first-code-contribution).
+- If the team is able to reproduce the issue, they likely will mention this in the issue, as well as possibly add other tags (such as the size or priority), and the issue will be left to be [resolved by a code contributer](#code-contributing).
 
 
 ### Suggesting Enhancements
 
 This section guides you through submitting an enhancement suggestion for Bespoke Synth, **including completely new features and minor improvements to existing functionality**. Following these guidelines will help maintainers and the community to understand your suggestion and find related suggestions.
+
 
 <!-- omit in toc -->
 #### Before Submitting an Enhancement
@@ -105,8 +109,9 @@ This section guides you through submitting an enhancement suggestion for Bespoke
 - Make sure that you are using the latest version.
 - Read the [documentation](https://www.bespokesynth.com/docs/index.html) and the [community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki) carefully and find out if the functionality is already covered, maybe by an individual configuration.
 - Perform a [search](https://github.com/BespokeSynth/BespokeSynth/issues) to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
-- Check on [our Discord](https://discord.gg/YdTMkvvpZZ) to see if the feature already exists or to discuss it.
+- Check on [our Discord](https://discord.gg/YdTMkvvpZZ) to see if the feature already exists or to discuss it. There is the #feature-request channel to ask or discuss enhancements.
 - Find out whether your idea fits with the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature.
+
 
 <!-- omit in toc -->
 #### How Do I Submit a Good Enhancement Suggestion?
@@ -120,7 +125,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/Bespok
 - **Explain why this enhancement would be useful** to most Bespoke Synth users. You may also want to point out the other projects that solved it better and which could serve as inspiration.
 
 
-### Your First Code Contribution
+### Code Contributing
 
 
 #### Setting up your environment
@@ -165,6 +170,13 @@ There are a few useful options to the *first* cmake command which many folks cho
 The directory name `ignore/build` is arbitrary. Bespoke is set up to `.gitignore` everything in the `ignore` directory but you can use any directory name you want for a build or have multiple builds also.
 
 
+#### Submitting your code
+
+We make use of [Pull Requests on github](https://github.com/BespokeSynth/BespokeSynth/compare) to review and merge your contribution with the `main` branch.
+
+We use the `Squash and merge` method which means you can make as many commits to your pull request as you desire and the final merge will have the creator of the pull request as author of the singular merged commit.
+
+
 ### Improving The Documentation
 
 You can directly contribute and help write the [Community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki).
@@ -173,13 +185,9 @@ For improving the main [documentation](https://www.bespokesynth.com/docs/index.h
 
 
 ## Style guides
-### Commit Messages
-<!-- TODO
 
--->
+We use Clang format to to keep the code formatting in check. Almost all IDE's support the `.clang-format` file but some may need an extension or change in settings to make use of it.
 
-## Join The Project Team
-<!-- TODO -->
 
 <!-- omit in toc -->
 ## Attribution
