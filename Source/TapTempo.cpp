@@ -73,8 +73,8 @@ void TapTempo::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
    if (!mEnabled || !velocity)
       return;
 
-   for (int i = mBeats.size()-1; i > 0; i--)
-      mBeats[i] = mBeats[i-1];
+   for (int i = mBeats.size() - 1; i > 0; i--)
+      mBeats[i] = mBeats[i - 1];
    mBeats[0] = time;
 
    if (mCount < mWindow)
@@ -86,8 +86,8 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
    if (!mEnabled || !velocity)
       return;
 
-   for (int i = mBeats.size()-1; i > 0; i--)
-      mBeats[i] = mBeats[i-1];
+   for (int i = mBeats.size() - 1; i > 0; i--)
+      mBeats[i] = mBeats[i - 1];
    mBeats[0] = time;
 
    if (mCount < mWindow)
