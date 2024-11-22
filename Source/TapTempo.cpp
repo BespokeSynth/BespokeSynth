@@ -106,7 +106,7 @@ float TapTempo::Value(int samplesIn)
    if (mCount < mWindow)
       return 0;
 
-   return (mCount - 1) / ((mBeats.front() - mBeats.back()) / 60 / 1000) * TheTransport->GetTimeSigTop();
+   return (mCount - 1) / ((mBeats.front() - mBeats.back()) / 60 / 1000) * 4 * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
 }
 
 void TapTempo::ButtonClicked(ClickButton* button, double time)
