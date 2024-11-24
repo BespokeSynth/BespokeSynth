@@ -930,10 +930,11 @@ void VSTPlugin::Process(double time)
          if (CurrentTargetAudioReceiver)
          {
             ChannelBuffer* targetBuffer = CurrentTargetAudioReceiver->GetBuffer();
+            targetBuffer->SetNumActiveChannels(2);
 
             float* Destination = targetBuffer->GetChannel(sourceStereoChannel);
             float* Source = AllChannelsBuffer->GetChannel(sourceChannel);
-
+            
             // Add the samples to the destination Audio Receiver buffer
             Add(
                 Destination,
