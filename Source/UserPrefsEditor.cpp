@@ -339,6 +339,7 @@ void UserPrefsEditor::DrawModule()
 
    DrawRightLabel(UserPrefs.zoom.GetControl(), "(currently: " + ofToString(gDrawScale) + ")", ofColor::white);
    DrawRightLabel(UserPrefs.recordings_path.GetControl(), "(default: " + UserPrefs.recordings_path.GetDefault() + ")", ofColor::white);
+   DrawRightLabel(UserPrefs.samples_path.GetControl(), "(default: " + UserPrefs.samples_path.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.tooltips.GetControl(), "(default: " + UserPrefs.tooltips.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.layout.GetControl(), "(default: " + UserPrefs.layout.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.youtube_dl_path.GetControl(), "(default: " + UserPrefs.youtube_dl_path.GetDefault() + ")", ofColor::white);

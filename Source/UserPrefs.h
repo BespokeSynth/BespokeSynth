@@ -348,6 +348,7 @@ public:
    };
 
    UserPrefString recordings_path{ "recordings_path", "recordings/", 70, UserPrefCategory::Paths };
+   UserPrefString samples_path{ "samples_path", "samples/", 70, UserPrefCategory::Paths };
    UserPrefString tooltips{ "tooltips", "tooltips_eng.txt", 70, UserPrefCategory::Paths };
    UserPrefString layout{ "layout", "layouts/blank.json", 70, UserPrefCategory::Paths };
    UserPrefString youtube_dl_path{ "youtube_dl_path", kDefaultYoutubeDlPath, 70, UserPrefCategory::Paths };

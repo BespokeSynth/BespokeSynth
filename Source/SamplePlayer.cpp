@@ -746,7 +746,7 @@ void SamplePlayer::LoadFile()
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
-   FileChooser chooser("Load sample", File(ofToDataPath("samples")),
+   FileChooser chooser("Load sample", File(ofToSamplePath("")),
                        file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
@@ -761,7 +761,7 @@ void SamplePlayer::LoadFile()
 
 void SamplePlayer::SaveFile()
 {
-   FileChooser chooser("Save sample", File(ofToDataPath("samples")),
+   FileChooser chooser("Save sample", File(ofToSamplePath("")),
                        "*.wav", true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
    {
