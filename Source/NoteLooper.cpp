@@ -392,7 +392,7 @@ void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 void NoteLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("allow_lookahead", moduleInfo, false);
+   mModuleSaveData.LoadBool("allow_lookahead", moduleInfo, true);
 
    SetUpFromSaveData();
 }
