@@ -310,7 +310,7 @@ void SeaOfGrain::LoadFile()
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
-   FileChooser chooser("Load sample", File(ofToDataPath("samples")),
+   FileChooser chooser("Load sample", File(ofToSamplePath("")),
                        file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {

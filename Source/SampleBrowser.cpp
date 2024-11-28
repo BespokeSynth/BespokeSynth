@@ -38,7 +38,7 @@ using namespace juce;
 
 SampleBrowser::SampleBrowser()
 {
-   mCurrentDirectory = ofToDataPath("samples");
+   mCurrentDirectory = ofToSamplePath("");
 }
 
 SampleBrowser::~SampleBrowser()
@@ -232,7 +232,7 @@ void SampleBrowser::SetDirectory(String dirPath)
 
       mDirectoryListing.add("..");
 
-      File dir(ofToDataPath(dirPath.toStdString()));
+      File dir(ofToSamplePath(dirPath.toStdString()));
       for (auto file : dir.findChildFiles(File::findFilesAndDirectories | File::ignoreHiddenFiles, false))
       {
          bool include = false;

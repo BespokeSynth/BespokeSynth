@@ -29,6 +29,7 @@
 #include <windows.h>
 #endif
 
+#include "UserPrefs.h"
 #include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
 using namespace juce;
@@ -58,6 +59,24 @@ ofColor ofColor::clear(0, 0, 0, 0);
 
 NVGcontext* gNanoVG = nullptr;
 NVGcontext* gFontBoundsNanoVG = nullptr;
+
+std::string ofToSamplePath(const std::string& path)
+{
+   auto result = ofToDataPath(path);
+
+   auto samplesPath = UserPrefs.samples_path.Get();
+   if (samplesPath.empty())
+      samplesPath = "samples/";
+   if (juce::File::isAbsolutePath(samplesPath))
+      result = samplesPath;
+   else
+      result += samplesPath;
+
+#if BESPOKE_WINDOWS
+   std::replace(begin(result), end(result), '\\', '/');
+#endif
+   return result;
+}
 
 std::string ofToDataPath(const std::string& path)
 {
