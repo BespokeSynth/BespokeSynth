@@ -254,6 +254,9 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
       if (!connection["midi_off_value"].isNull())
          controlConnection->mMidiOffValue = connection["midi_off_value"].asInt();
 
+      if (!connection["scale"].isNull())
+         controlConnection->mScaleOutput = connection["scale"].asBool();
+
       if (!connection["blink"].isNull())
          controlConnection->mBlink = connection["blink"].asBool();
 
@@ -2541,6 +2544,8 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
          mConnectionsJson[i]["midi_off_value"] = connection->mMidiOffValue;
       if (connection->mMidiOnValue != 127)
          mConnectionsJson[i]["midi_on_value"] = connection->mMidiOnValue;
+      if (connection->mScaleOutput)
+         mConnectionsJson[i]["scale"] = true;
       if (connection->mBlink)
          mConnectionsJson[i]["blink"] = true;
       if (connection->mIncrementAmount != 0)
@@ -2811,6 +2816,7 @@ void UIControlConnection::PreDraw()
 
    mControlEntry->SetShowing(mMessageType != kMidiMessage_PitchBend);
    mValueEntry->SetShowing((mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease) && mIncrementAmount == 0);
+   m14BitModeCheckbox->SetShowing(mMessageType == kMidiMessage_Control && mControl >= 32);
    mIncrementalEntry->SetShowing(mType == kControlType_Slider || mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease);
 }
 
