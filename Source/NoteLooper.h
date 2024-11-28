@@ -117,7 +117,7 @@ private:
    Canvas* mCanvas{ nullptr };
    ClickButton* mClearButton{ nullptr };
    int mVoiceRoundRobin{ kNumVoices - 1 };
-   bool mAllowLookahead{ false };
+   bool mAllowLookahead{ true };
 
    std::array<ModulationParameters, kNumVoices + 1> mVoiceModulations{};
    std::array<int, kNumVoices> mVoiceMap{};
