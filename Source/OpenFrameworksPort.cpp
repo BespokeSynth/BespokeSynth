@@ -62,11 +62,15 @@ NVGcontext* gFontBoundsNanoVG = nullptr;
 
 std::string ofToSamplePath(const std::string& path)
 {
+   if (!path.empty() && (path[0] == '.' || juce::File::isAbsolutePath(path)))
+      return path;
+
    auto result = ofToDataPath(path);
 
    auto samplesPath = UserPrefs.samples_path.Get();
    if (samplesPath.empty())
       samplesPath = "samples/";
+
    if (juce::File::isAbsolutePath(samplesPath))
       result = samplesPath;
    else
@@ -75,7 +79,10 @@ std::string ofToSamplePath(const std::string& path)
 #if BESPOKE_WINDOWS
    std::replace(begin(result), end(result), '\\', '/');
 #endif
-   return result;
+   if (result.back() != '/')
+      result += '/';
+
+   return result + path;
 }
 
 std::string ofToDataPath(const std::string& path)
