@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added the ability to set a separate samples path
+- Added Akai LPD8 midi mapping
 - Added the `audiosplitter` module
 - Added an option to turn off auto correlation on the background Lissajous
 - Added the `pulselimit` module
@@ -30,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added automatic octave rescaling to the `keyboarddisplay` module
 - Added hover based keyboard capture to the `keyboarddisplay` module
 - Added octave labels to the `keyboarddisplay` module
-- Added the ability yo jump octaves via keyboard keybinds to the `keyboarddisplay` module
+- Added the ability to jump octaves via keyboard keybinds to the `keyboarddisplay` module
 - Added an option in the settings to hide labels to the `keyboarddisplay` module
 - Added another option that enforces a fixed number of octaves regardless of the keyboard size to the `keyboarddisplay` module
 - Added the `controlrecorder` module
@@ -56,6 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Changed AllowLookahead default to on in the `notelooper` module
 - Added a stop button when the sample is playing in the `samplebrowser` module
 - Allowed displaying the full note range in the `keyboarddisplay` module
 - Don't smooth delay time when there's a modulator controlling delay, to allow for interesting LFO-driven delay effects
@@ -64,7 +67,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Increased the limit of the `pulsetrain` to 128
 - Added the advancement buttons back to the `pulsesequencer`
 - Increased the maximum length from 32 to 128 in the `pulsesequencer`
-- Made the `pulsesequencer` re-sizable
+- Made the `pulsesequencer` resizable
 - Made it so the `pitchsetter` does not flush the notes when the pitch slider was changed but tries to preserve polyphony as much as possible instead
 - Increase midi pages to 32 from 10
 - Allow a single `notetable` module to span the entire note range
@@ -75,7 +78,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Minor rendering optimization when the modules `lissajous`, `spectrum` and `waveformviewer` are disabled/bypassed
 - Changed the following modules to use a bypass mechanism when disabled: `gain`, `audiometer`, `fftvocoder`, `dcoffset`, `feedback`, `inverter`, `lissajous`, `looper`, `looperrecorder`, `multitapdelay`, `pulsechance`, `pulsedelayer`, `pulseflag`, `samplecapturer`, `samplergrid`, `seaofgrains`, `send`, `spectrum`, `signalclamp`, `vocoder`, `waveformviewer` and `waveshaper`
 - Made `spectrum` and `waveformviewer` function when not connected
-- Made it possible to use a PC keyboard as a midicontroller input
+- Made it possible to use a PC keyboard as a `midicontroller` input
 - Made it possible to lock keyboard focus to the `keyboarddisplay` module (and other future keyboard takeover modules)
 - Updated quickspawn search sorting to prefer things that start with what's been typed so far
 - Made it possible for pulse cables to directly connect to buttons and checkboxes
@@ -94,18 +97,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed a bug where singleton modules could be added to `prefab`'s which caused all kinds of visual duplication and incorrect behavior
+- Fixed a bug where the `scale` values in the `midicontroller` weren't being saved
 - Fixed an issue where long sample names prevented you from clicking the play button in the `samplebrowser` module
 - Fixed `capo` not working properly when adjusting held notes while in diatonic mode
 - Fixed LFO's not properly being recorded and set when using the snapshots module
 - Several fixes to the biquad filter to better handle NaN values
 - Fixed a bug where the LFO would output NaN values when the length was set to zero
 - Fixed a bug when loading old savestates when oversampling was set to anything larger than 1
-- Fixed a crash in keyboarddisplay module when notes greater than 127 in value where drawn
+- Fixed a crash in `keyboarddisplay` module when notes greater than 127 in value where drawn
 - Fixed the octave note text being off by 2 octaves in the `keyboarddisplay` module
 - Fixed a bug where the lowest octave displayed in the `keyboarddisplay` module wasn't the lowest possible
 - Fixed a bug where the `keyboarddisplay` module was using float instead of double for time calculations
 - Fixed an issue where some old savestates couldn't be loaded due to an issue in the past where the saving of the names of submodules of the effectchain module weren't saving their name
-- Enhanced `midicontroller` deviceOutName creation to handle midi devicenames having " In " and " Out "
+- Enhanced `midicontroller` deviceOutName creation to handle midi device names having " In " and " Out "
 - Don't display the help text when a savestate is loaded through the command line arguments
 - Fixed a bug where all canvas like modules wouldn't save and load note modulations
 - Don't render the finished step in the `pulsetrain` module
@@ -113,8 +118,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed a bug where the shift buttons on the `pulsesequencer` weren't shifting
 - Fixed a bug in the `drumsequencer` when the numrows triangle menu option was set lower than a previously saved snapshot causing "disabled" rows to still send notes
 - Fixed the default for modwheel
-- Increased internal work buffer size so we don't read and write beyond this when using oversampling and large buffersizes
-- Hidden the `drumplayer` controls better when not in editmode and having single outputs
+- Increased internal work buffer size so we don't read and write beyond this when using oversampling and large buffer sizes
+- Hidden the `drumplayer` controls better when not in edit mode and having single outputs
 - Fixed a crash in the `songbuilder` module when a new connection cable was canceled
 - Changed the order of input handling in module containers so that the menu UI is handled first
 - Resolved an issue in the `oscillator` module that would cause the module to continuously propagate NaN values
@@ -128,7 +133,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Simplify bespoke turn string communication, and fix issue where value string wasn't updating frequently enough
 - Fixed a crash when the interval in the `curvelooper` is forcibly set to 0
 - Set `curvelooper` size on load
-- Random note buttons would set all notes to 3 when random octave range is 0-0. Now notes map to drumnotes 0-3 again if octave range is 0-0
+- Random note buttons would set all notes to 3 when the random octave range is 0-0. Now notes map to drum notes 0-3 again if octave range is 0-0
 - Fixed an issue where holding space when bespoke isn't focused would cause mouse movements to pan the canvas
 - Fixed an issue where mouse wrap wouldn't pan on the 0 side if the window is fully maximized
 - Don't use file path hash for plugins lookup
@@ -163,9 +168,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Added total duration to songbuilder sequencer
-- Added corner radius setting to the globalcontrols module
+- Added corner radius setting to the `globalcontrols` module
 - Added the ability to execute "console" commands directly from OSC using the `/bespoke/console` address
-- Added buffershuffler features: fourtet effect and ability to only play when triggered
+- Added `buffershuffler` features: fourtet effect and ability to only play when triggered
 - Added new "cable_alpha" option in settings and in the `globalcontrols` module that allows you to reduce cables opacity to nearly invisible
 - Added an option to wrap mouse around when panning canvas
 
@@ -188,7 +193,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed an issues with the absence of modulation using incorrect defaults
 - Fixed NaN when adjusting slider with out-of-range value
 - Fixed velocity not working in drumplayer
-- Fixed an issue where effectchain mix sliders couldn't be targeted by modulators
+- Fixed an issue where `effectchain` mix sliders couldn't be targeted by modulators
 - Fixed a bug in the cosine window of the granulators that caused clicky noises at the end of grains
 - Fixed a deadlock by upgrading JUCE that was causing startup hangs on MacOS 13
 
@@ -227,10 +232,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Warn about and visualize circular dependencies amongst audio modules
 - Added triangle menu option to hide inactive cables for `udiorouter`and `oterouter`
 - Added ability to release a cable into empty space to display the quickspawn menu
-- Make timelinecontrol a real module
+- Make `timelinecontrol` a real module
 - Added `songbuilder` module
 - Added timestamps to all control updates for sample-accurate actions
-- Added "diatonic" checkboxes to capo and scaledegree
+- Added "diatonic" checkboxes to `capo` and `scaledegree`
 - Added num_rows option to `radiosequencer`
 - Added retrigger option to `noteoctaver`
 - Added `boundstopulse` module
@@ -240,8 +245,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added ability to remove samples from `beats` module
 - Added `portamento` glide mode
 - Added modes to allow `radiosequencer` to run slower
-- Added deterministic modes to notechance and pulsechance
-- Added option for hockets to be repeatably random
+- Added deterministic modes to notechance and `pulsechance`
+- Added option for hockets to be repeatedly random
 - Added aesthetic touch to cables, to fade them out in the middle
 - Added a setting that allows the disabling of the module highlights when they receive an event
 - Added `velocitycurve` module
@@ -264,7 +269,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Don't clear `looperrecorder` input buffer when committing to a `looper`
 - Made canvas contents snapshottable across all modules with canvases
-- Emproved midi clockin smoothness by switching to "delay-locked loop" setup
+- Improved midi `clockin` smoothness by switching to "delay-locked loop" setup
 - Made the `transport` increase/decrease buttons jump to integer tempos, as a convenience to hit an exact integer tempo
 - Allow disabling of `output` limiter
 - In the `tranpsort` module made nudge finer-grained, and made reset start a stopped transport
@@ -272,13 +277,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Make `looperrecorder` not temporarily silence after committing a loop, added a triangle menu checkbox to bring the old behavior back
 - Listen to midi clock start/stop/reset messages, make start also resume playback
 - Improved the `chorddisplayer` module
-- Allow the scrollwheel to adjust the Q slider while hovering over a dot in the `eq` module
+- Allow the scroll wheel to adjust the Q slider while hovering over a dot in the `eq` module
 - Make it possible to enable/disable the `quantizer` module
-- Changed how grid controllers edit drumsequencer, making it more responsive
+- Changed how grid controllers edit `drumsequencer`, making it more responsive
 - Feedback is now given when `write audio` completes
 - Made the room size slider non linear in the `freeverb` effect
 - Allow the `freeverb` roomsize value to go to `1` since this also works perfectly without feedback
-- When doing a "set" from the midicontroller, always force a value update
+- When doing a "set" from the `midicontroller`, always force a value update
 - Massive RAM savings by changing how global record buffer saves
 - Sort the file list in the vstplugin's preset dropdown
 - Renamed `presets` to `snapshots`, to better reflect what the module does
@@ -289,7 +294,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Allowed changing the number of filter options in the notesorter module
 - Made playsequencer resizable and fixed a grid size bug
 - When hovering over an ADSR control, highlight the part of the curve that dragging would adjust
-- Made the pulsebutton send pulses a sample later so that things like the `notecreator` work with it
+- Made the `pulsebutton` send pulses a sample later so that things like the `notecreator` work with it
 - Make notedisplayer re-sizable
 - Patch cables that carry NaN values are made visible and colored red
 - Make ctrl-C copy hovered UI control value to clipboard
@@ -299,14 +304,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Don't enforce `looper` target when it's associated with a `looperrecorder`
 - Change default zoom level and ui scale of bespoke to 1.3
 - Tweak that allows scripts to set modulator targets
-- Change up notesequencer grid to make it easier to vary note length
+- Change up `notesequencer` grid to make it easier to vary note length
 - Allow modulators to directly connect to multiple UI controls, no macroslider necessary
 - Queue all non-audio thread notes
 - Make modulators send non-normalized values to non-floatslider controls
 - Make ? help display scrollable
 - Don't display duplicate plugins user has in different formats
 - Added an option to have `velocitytocv` output 0 when a note is released
-- Make notecounter module have deterministic random setting
+- Make `notecounter` module have deterministic random setting
 - Improve scrolling on quickspawn menu
 - Don't allow two modules to have the same name
 - Distinguish "value setter"-style modulators from the continuous ones
@@ -389,14 +394,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed saved samples playing back at the wrong speed when loading in other sample rates
 - Fixed global oversampling issues
 - Fixed syntax highlighting issue where comments not drawing in script
-- Fixed basiceqs grid, which wasn't accepting clicks
-- Fixed bug where midicontroller grid cables couldn't be connected 
+- Fixed basiceqs grid, which was not accepting clicks
+- Fixed bug where `midicontroller` grid cables couldn't be connected 
 - Handle param rename events from plugins
 - Fixed deadlock when loading VCV Rack plugin and opening GUI
 - Fixed modulator range not being set when attaching a modulator to a non-floatslider control
 - Fixed modulator range not loading properly from a savestate
 - Fixed issue with script-driven notes playing later than desired
-- Fixed issue where radiosequencer steps can't be turned off via grid
+- Fixed issue where `radiosequencer` steps can't be turned off via grid
 - Fixed simple issue where key repeat wasn't being respected in quickspawn
 - Make preset changes happen in main thread (to avoid audio thread hitch)
 - Eliminate off-by-a-pixel discrepancies between mouse hover & mouse click
@@ -409,7 +414,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed crash when spawning `basiceq` effect
 - Fixed issue where directly spawning `effectchain` effects from quickspawn was giving the `effectchain` the name of the effect
 - Fixed crash when spawning `oscoutput`
-- Fixed groupcontrol loading improperly
+- Fixed `groupcontrol` loading improperly
 - Fixed freeverb width range
 - Various fixes to the `LFO` module
 - Fixed the next and previous sample buttons in the `sampleplayer` pads on windows
@@ -428,7 +433,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed `m185sequencer` playing notes when all lengths are zero
 - Fixed relative paths being busted when using `presets` within `prefab`s
 - Fixed crash when clicking "add" on `midicontroller` in list mode in certain scenario
-- Improve midicontroller infinite encoder support 
+- Improve `midicontroller` infinite encoder support 
 
 
 ### Removed
