@@ -64,6 +64,10 @@ if(BESPOKE_NIGHTLY)
     message(STATUS "Nightly build")
 endif()
 
+if(BESPOKE_WERROR)
+    add_compile_options(-Werror)
+endif()
+
 if(BESPOKE_PORTABLE)
     message(STATUS "Portable build enabled")
     if(MINGW)
