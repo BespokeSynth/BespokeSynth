@@ -66,15 +66,13 @@ radiosequencer~sequence to only enable one value at a time. patch it to the "ena
 
 
 
-snapshots~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
+snapshots~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a snapshot to that square, and click on a grid square to load that snapshot. alt/option-click to delete a snapshot, and ctrl/command-click to rename a snapshot.
 ~blend~length of time in milliseconds over which to blend snapshot values
 ~snapshot~jump to a snapshot
 ~random~randomize connected controls
 ~add~snapshot the currently connected controls to the next available snapshot slot
-~clear~clear all snapshots
 ~store~when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)
 ~delete~when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)
-~auto-store on switch~when switching to a new slot, automatically store state in the current slot
 ~snapshot label~assign a label to this snapshot
 
 

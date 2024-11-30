@@ -53,7 +53,7 @@ public:
    //IDrawableModule
    void Init() override;
    void Poll() override;
-   bool IsResizable() const override { return true; }
+   bool IsResizable() const override { return mDisplayMode == DisplayMode::Grid; }
    void Resize(float w, float h) override;
 
    bool HasSnapshot(int index) const;
@@ -81,12 +81,11 @@ public:
    void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
-   int GetModuleSaveStateRev() const override { return 3; }
+   int GetModuleSaveStateRev() const override { return 4; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 
@@ -103,6 +102,8 @@ private:
    bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
    void RandomizeControl(IUIControl* control);
+   void UpdateListGrid();
+   void ResizeSnapshotCollection(int size);
 
    //IDrawableModule
    void DrawModule() override;
@@ -110,6 +111,12 @@ private:
    void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
+
+   enum class DisplayMode
+   {
+      Grid,
+      List
+   };
 
    struct Snapshot
    {
@@ -167,13 +174,15 @@ private:
    int mQueuedSnapshotIndex{ -1 };
    bool mAllowSetOnAudioThread{ false };
    TextEntry* mSnapshotLabelEntry{ nullptr };
-   std::string mSnapshotLabel;
+   std::string mSnapshotLabel{};
    int mLoadRev{ -1 };
-   ClickButton* mClearButton{ nullptr };
    bool mStoreMode{ false };
    Checkbox* mStoreCheckbox{ nullptr };
    bool mDeleteMode{ false };
    Checkbox* mDeleteCheckbox{ nullptr };
    bool mAutoStoreOnSwitch{ false };
-   Checkbox* mAutoStoreOnSwitchCheckbox{ nullptr };
+   DisplayMode mDisplayMode{ DisplayMode::List };
+   int mSnapshotRenameIndex{ -1 };
+   float mOldWidth{ 0 };
+   float mOldHeight{ 0 };
 };
