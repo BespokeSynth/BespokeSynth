@@ -23,9 +23,9 @@ bespoke_buildtime_version_info(BespokeSynth)
 
 if(BESPOKE_WERROR)
     if(MSVC)
-        target_compile_options(${target_name} PRIVATE /WX)
+        target_compile_options(BespokeSynth PRIVATE /WX)
     else()
-        target_compile_options(${target_name} PRIVATE -Werror)
+        target_compile_options(BespokeSynth PRIVATE -Werror)
     endif()
 endif()
 
