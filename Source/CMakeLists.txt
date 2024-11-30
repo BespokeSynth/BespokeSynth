@@ -21,6 +21,14 @@ juce_add_gui_app(BespokeSynth
 
 bespoke_buildtime_version_info(BespokeSynth)
 
+if(BESPOKE_WERROR)
+    if(MSVC)
+        target_compile_options(${target_name} PRIVATE /WX)
+    else()
+        target_compile_options(${target_name} PRIVATE -Werror)
+    endif()
+endif()
+
 target_sources(BespokeSynth PRIVATE
     ADSR.cpp
     ADSR.h
@@ -110,6 +118,8 @@ target_sources(BespokeSynth PRIVATE
     CommentDisplay.h
     Compressor.cpp
     Compressor.h
+    ControlInterface.cpp
+    ControlInterface.h
     ControlRecorder.cpp
     ControlRecorder.h
     ControlSequencer.cpp
@@ -497,6 +507,8 @@ target_sources(BespokeSynth PRIVATE
     PitchDive.h
     PitchPanner.cpp
     PitchPanner.h
+    PitchQuantizer.cpp
+    PitchQuantizer.h
     PitchRemap.cpp
     PitchRemap.h
     PitchSetter.cpp

@@ -64,12 +64,6 @@ if(BESPOKE_NIGHTLY)
     message(STATUS "Nightly build")
 endif()
 
-if(BESPOKE_WERROR)
-    if(CMAKE_COMPILER_IS_GNUCXX)
-        add_compile_options(-Werror)
-    endif(CMAKE_COMPILER_IS_GNUCXX)
-endif()
-
 if(BESPOKE_PORTABLE)
     message(STATUS "Portable build enabled")
     if(MINGW)
