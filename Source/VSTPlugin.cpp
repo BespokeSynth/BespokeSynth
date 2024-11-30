@@ -576,7 +576,7 @@ void VSTPlugin::Poll()
       mRescanParameterNames = false;
       const auto& parameters = mPlugin->getParameters();
 
-      int numParameters = MIN(mParameterSliders.size(), parameters.size());
+      int numParameters = MIN((int)mParameterSliders.size(), (int)parameters.size());
       for (int i = 0; i < numParameters; ++i)
       {
          mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
@@ -658,15 +658,17 @@ void VSTPlugin::Poll()
 
          int64 vstStateSize = input->readInt64();
          char* vstState = new char[vstStateSize];
-         input->read(vstState, vstStateSize);
-         mPlugin->setStateInformation(vstState, vstStateSize);
+         //TODO(Ryan) is vstStateSize ever bigger than an int, so we shouldn't cast away the int64-ness?
+         input->read(vstState, (int)vstStateSize);
+         mPlugin->setStateInformation(vstState, (int)vstStateSize);
 
          int64 vstProgramStateSize = input->readInt64();
          if (vstProgramStateSize > 0)
          {
             char* vstProgramState = new char[vstProgramStateSize];
-            input->read(vstProgramState, vstProgramStateSize);
-            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+            //TODO(Ryan) is vstProgramStateSize ever bigger than an int, so we shouldn't cast away the int64-ness?
+            input->read(vstProgramState, (int)vstProgramStateSize);
+            mPlugin->setCurrentProgramStateInformation(vstProgramState, (int)vstProgramStateSize);
          }
 
          if (rev >= 2 && mModuleSaveData.GetBool("preset_file_sets_params"))
