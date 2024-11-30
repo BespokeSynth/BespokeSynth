@@ -704,7 +704,7 @@ void Snapshots::ButtonClicked(ClickButton* button, double time)
          {
             StoreSnapshot(i, true);
             mCurrentSnapshot = i;
-            if(mDisplayMode == DisplayMode::List)
+            if (mDisplayMode == DisplayMode::List)
                UpdateListGrid();
             if (mDisplayMode == DisplayMode::Grid)
                UpdateGridValues();

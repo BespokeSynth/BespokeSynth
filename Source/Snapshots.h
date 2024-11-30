@@ -174,7 +174,7 @@ private:
    int mQueuedSnapshotIndex{ -1 };
    bool mAllowSetOnAudioThread{ false };
    TextEntry* mSnapshotLabelEntry{ nullptr };
-   std::string mSnapshotLabel{ };
+   std::string mSnapshotLabel{};
    int mLoadRev{ -1 };
    bool mStoreMode{ false };
    Checkbox* mStoreCheckbox{ nullptr };
