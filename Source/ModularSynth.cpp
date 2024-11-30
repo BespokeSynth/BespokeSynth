@@ -428,6 +428,9 @@ void ModularSynth::Poll()
       mArrangeDependenciesWhenLoadCompletes = false;
    }
 
+   if (gHoveredUIControl != nullptr && gHoveredUIControl->IsShowing() == false)
+      gHoveredUIControl = nullptr;
+
    ++sFrameCount;
 }
 
