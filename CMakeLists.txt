@@ -65,7 +65,9 @@ if(BESPOKE_NIGHTLY)
 endif()
 
 if(BESPOKE_WERROR)
-    add_compile_options(-Werror)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        add_compile_options(-Werror)
+    endif(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 if(BESPOKE_PORTABLE)
