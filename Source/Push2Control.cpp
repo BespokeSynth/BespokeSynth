@@ -877,7 +877,7 @@ void Push2Control::DrawDisplayModuleControls()
 
       ofPushStyle();
       ofSetLineWidth(.5f);
-      int length = MAX(mButtonControls.size(), mSliderControls.size());
+      int length = MAX((int)mButtonControls.size(), (int)mSliderControls.size());
       if (length > 8)
       {
          ofRectangle bar(ableton::Push2DisplayBitmap::kWidth * kPixelRatio - 100, 3, 80, 10);

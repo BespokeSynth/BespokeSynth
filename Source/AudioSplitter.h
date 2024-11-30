@@ -49,7 +49,7 @@ public:
    //IAudioSource
    void Process(double time) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   int GetNumTargets() override { return mDestinationCables.size(); }
+   int GetNumTargets() override { return (int)mDestinationCables.size(); }
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

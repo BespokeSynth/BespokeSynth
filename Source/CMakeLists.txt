@@ -21,10 +21,13 @@ juce_add_gui_app(BespokeSynth
 
 bespoke_buildtime_version_info(BespokeSynth)
 
-if(BESPOKE_WERROR)
-    if(MSVC)
+if(MSVC)
+    if(BESPOKE_WERROR)
         target_compile_options(BespokeSynth PRIVATE /WX)
-    else()
+    endif()
+else()
+    target_compile_options(BespokeSynth PRIVATE -Wshorten-64-to-32)
+    if(BESPOKE_WERROR)
         target_compile_options(BespokeSynth PRIVATE -Werror)
     endif()
 endif()

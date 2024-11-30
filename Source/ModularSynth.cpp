@@ -3355,7 +3355,7 @@ void ModularSynth::SaveOutput()
    bool b1{ false };
    auto writer = std::unique_ptr<juce::AudioFormatWriter>(wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, 16, b1, 0));
 
-   long long samplesRemaining = mRecordingLength;
+   int samplesRemaining = mRecordingLength;
    const int chunkSize = 256;
    float leftChannel[chunkSize];
    float rightChannel[chunkSize];

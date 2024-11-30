@@ -863,7 +863,7 @@ bool SamplePlayer::MouseMoved(float x, float y)
          // find cue point closest to but not exceeding the cursor position
          int bestCuePointIndex = -1;
          float bestCuePointStart = 0.;
-         for (size_t i = 0; i < mSampleCuePoints.size(); ++i)
+         for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
          {
             float startSeconds = mSampleCuePoints[i].startSeconds;
             float lengthSeconds = mSampleCuePoints[i].lengthSeconds;
