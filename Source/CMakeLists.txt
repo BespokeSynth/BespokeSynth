@@ -118,8 +118,6 @@ target_sources(BespokeSynth PRIVATE
     CommentDisplay.h
     Compressor.cpp
     Compressor.h
-    ControlInterface.cpp
-    ControlInterface.h
     ControlRecorder.cpp
     ControlRecorder.h
     ControlSequencer.cpp
@@ -507,8 +505,6 @@ target_sources(BespokeSynth PRIVATE
     PitchDive.h
     PitchPanner.cpp
     PitchPanner.h
-    PitchQuantizer.cpp
-    PitchQuantizer.h
     PitchRemap.cpp
     PitchRemap.h
     PitchSetter.cpp
