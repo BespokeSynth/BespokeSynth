@@ -256,7 +256,7 @@ void MidiDevice::SendSysEx(std::string data)
 {
    if (mMidiOut)
    {
-      mMidiOut->sendMessageNow(MidiMessage::createSysExMessage(data.c_str(), data.length()));
+      mMidiOut->sendMessageNow(MidiMessage::createSysExMessage(data.c_str(), (int)data.length()));
    }
 }
 

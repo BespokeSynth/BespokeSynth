@@ -21,6 +21,19 @@ juce_add_gui_app(BespokeSynth
 
 bespoke_buildtime_version_info(BespokeSynth)
 
+if(MSVC)
+    if(BESPOKE_WERROR)
+        target_compile_options(BespokeSynth PRIVATE /WX)
+    endif()
+else()
+    if (APPLE)
+        target_compile_options(BespokeSynth PRIVATE -Wshorten-64-to-32)
+    endif()
+    if(BESPOKE_WERROR)
+        target_compile_options(BespokeSynth PRIVATE -Werror)
+    endif()
+endif()
+
 target_sources(BespokeSynth PRIVATE
     ADSR.cpp
     ADSR.h

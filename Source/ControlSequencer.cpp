@@ -68,7 +68,7 @@ void ControlSequencer::CreateUIControls()
    mGrid = new UIGrid("uigrid", 5, height + 3, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1, this);
 
    UIBLOCK(15, height + 5);
-   for (size_t i = 0; i < mStepSliders.size(); ++i)
+   for (int i = 0; i < (int)mStepSliders.size(); ++i)
    {
       FLOATSLIDER(mStepSliders[i], ("step " + ofToString(i)).c_str(), &mGrid->GetVal(i, 0), 0, 1);
    }
@@ -201,7 +201,7 @@ void ControlSequencer::DrawModule()
       ofPopStyle();
    }
 
-   for (size_t i = 0; i < mStepSliders.size(); ++i)
+   for (int i = 0; i < (int)mStepSliders.size(); ++i)
    {
       if (mSliderMode)
       {

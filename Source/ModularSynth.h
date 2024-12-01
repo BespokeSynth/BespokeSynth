@@ -350,7 +350,7 @@ private:
    UserPrefsEditor* mUserPrefsEditor{ nullptr };
 
    RollingBuffer* mGlobalRecordBuffer{ nullptr };
-   long long mRecordingLength{ 0 };
+   int mRecordingLength{ 0 };
 
    struct LogEventItem
    {

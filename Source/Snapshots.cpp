@@ -696,7 +696,7 @@ void Snapshots::ButtonClicked(ClickButton* button, double time)
 
    if (button == mAddButton)
    {
-      for (size_t i = 0; i < mSnapshotCollection.size() + 1; ++i)
+      for (int i = 0; i < (int)mSnapshotCollection.size() + 1; ++i)
       {
          if (i == mSnapshotCollection.size()) //we didn't find any
             ResizeSnapshotCollection(i + 1);
@@ -809,7 +809,7 @@ void Snapshots::SetUpFromSaveData()
 
 void Snapshots::UpdateListGrid()
 {
-   int numSnapshots = mSnapshotCollection.size();
+   int numSnapshots = (int)mSnapshotCollection.size();
    mGrid->SetGrid(1, numSnapshots);
    mGrid->SetDimensions(kListModeGridWidth, kListRowHeight * numSnapshots);
    UpdateGridValues();

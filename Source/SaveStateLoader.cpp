@@ -64,7 +64,7 @@ void SaveStateLoader::DrawModule()
 
 void SaveStateLoader::Poll()
 {
-   for (size_t i = 0; i < mLoadButtons.size(); ++i)
+   for (int i = 0; i < (int)mLoadButtons.size(); ++i)
    {
       if (mLoadButtons[i].mShouldShowSelectDialog)
       {
@@ -103,7 +103,7 @@ bool SaveStateLoader::HasValidFile(int index) const
 
 void SaveStateLoader::ButtonClicked(ClickButton* button, double time)
 {
-   for (size_t i = 0; i < mLoadButtons.size(); ++i)
+   for (int i = 0; i < (int)mLoadButtons.size(); ++i)
    {
       if (button == mLoadButtons[i].mButton)
       {
@@ -144,7 +144,7 @@ void SaveStateLoader::SaveState(FileStreamOut& out)
    IDrawableModule::SaveState(out);
 
    out << (int)mLoadButtons.size();
-   for (size_t i = 0; i < mLoadButtons.size(); ++i)
+   for (int i = 0; i < (int)mLoadButtons.size(); ++i)
       out << mLoadButtons[i].mFilePath;
 }
 
@@ -154,7 +154,7 @@ void SaveStateLoader::LoadState(FileStreamIn& in, int rev)
 
    int count;
    in >> count;
-   for (size_t i = 0; i < mLoadButtons.size() && i < count; ++i)
+   for (int i = 0; i < (int)mLoadButtons.size() && i < count; ++i)
    {
       in >> mLoadButtons[i].mFilePath;
       UpdateButtonLabel(i);

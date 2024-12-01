@@ -84,7 +84,7 @@ void SampleBrowser::DrawModule()
 
    for (size_t i = 0; i < mButtons.size(); ++i)
       mButtons[i]->Draw();
-   for (size_t i = 0; i < mPlayButtons.size(); ++i)
+   for (int i = 0; i < (int)mPlayButtons.size(); ++i)
    {
       mPlayButtons[i]->SetDisplayStyle(IsSamplePlaying(i) ? ButtonDisplayStyle::kStop : ButtonDisplayStyle::kPlay);
       mPlayButtons[i]->Draw();
