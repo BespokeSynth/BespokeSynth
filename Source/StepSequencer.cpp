@@ -935,12 +935,16 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
       switch (mVelocityType)
       {
          case StepVelocityType::Normal:
-            mStrength = mStepVelocityLevels[(int)StepVelocityType::Normal]; break;
+            mStrength = mStepVelocityLevels[(int)StepVelocityType::Normal];
+            break;
          case StepVelocityType::Accent:
-            mStrength = mStepVelocityLevels[(int)StepVelocityType::Accent]; break;
+            mStrength = mStepVelocityLevels[(int)StepVelocityType::Accent];
+            break;
          case StepVelocityType::Ghost:
-            mStrength = mStepVelocityLevels[(int)StepVelocityType::Ghost]; break;
-         default: break;
+            mStrength = mStepVelocityLevels[(int)StepVelocityType::Ghost];
+            break;
+         default:
+            break;
       }
       mGrid->SetStrength(mStrength);
    }
