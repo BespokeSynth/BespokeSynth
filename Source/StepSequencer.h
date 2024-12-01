@@ -223,9 +223,27 @@ private:
       RepeatHeld
    };
 
+   enum class StepVelocityEntryMode
+   {
+      Dropdown,
+      Slider
+   };
+
+   enum class StepVelocityType
+   {
+      Ghost = 0,
+      Normal = 1,
+      Accent = 2,
+      NumVelocityLevels = 3
+   };
+
    UIGrid* mGrid{ nullptr };
    float mStrength{ 0.8f };
    FloatSlider* mStrengthSlider{ nullptr };
+   StepVelocityType mVelocityType{ StepVelocityType::Normal };
+   DropdownList* mVelocityTypeDropdown{ nullptr };
+   StepVelocityEntryMode mStepVelocityEntryMode{ StepVelocityEntryMode::Dropdown };
+   std::array<float, (int)StepVelocityType::NumVelocityLevels> mStepVelocityLevels{};
    int mGridYOff{ 0 };
    ClickButton* mClearButton{ nullptr };
    int mColorOffset{ 3 };
