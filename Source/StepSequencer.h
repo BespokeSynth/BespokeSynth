@@ -224,7 +224,7 @@ private:
    };
 
    UIGrid* mGrid{ nullptr };
-   float mStrength{ 1 };
+   float mStrength{ 0.8f };
    FloatSlider* mStrengthSlider{ nullptr };
    int mGridYOff{ 0 };
    ClickButton* mClearButton{ nullptr };

@@ -98,7 +98,8 @@ public:
       kNormal,
       kMultislider,
       kHorislider,
-      kMultisliderBipolar
+      kMultisliderBipolar,
+      kMultisliderGrow
    };
    void SetGridMode(GridMode mode) { mGridMode = mode; }
 

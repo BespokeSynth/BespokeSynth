@@ -76,6 +76,7 @@ void UIGrid::Render()
       {
          float x = GetX(i, j);
          float y = GetY(j);
+         bool drawDragLevels = false;
 
          float data = mData[GetDataIndex(i, j)];
          if (data)
@@ -106,7 +107,19 @@ void UIGrid::Render()
                float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
                ofRect(x, y + ysize * (.5f - sliderFillAmount / 2), xsize, ysize * sliderFillAmount);
+               drawDragLevels = true;
+            }
+            else if (mGridMode == kMultisliderGrow)
+            {
+               float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
+               ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
+               ofVec2f center(x + xsize * 0.5f, y + ysize * 0.5f);
+               ofRect(center.x - (sliderFillAmount * xsize * 0.5f), center.y - (sliderFillAmount * ysize * 0.5f), sliderFillAmount * xsize, sliderFillAmount * ysize);
+               drawDragLevels = true;
+            }
 
+            if (drawDragLevels)
+            {
                if (mClick && mHoldVal != 0 && CanAdjustMultislider())
                {
                   if (j == mHoldRow)
@@ -258,7 +271,7 @@ void UIGrid::OnClicked(float x, float y, bool right)
    int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
    float oldValue = mData[dataIndex];
 
-   if (mGridMode == kMultislider || mGridMode == kMultisliderBipolar)
+   if (mGridMode == kMultislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow)
    {
       if (CanAdjustMultislider())
       {
@@ -398,11 +411,7 @@ bool UIGrid::MouseMoved(float x, float y)
       int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
       float oldValue = mData[dataIndex];
 
-      if (mGridMode == kMultislider && mHoldVal != 0 && CanAdjustMultislider())
-      {
-         mData[dataIndex] = clickHeight;
-      }
-      else if (mGridMode == kMultisliderBipolar && mHoldVal != 0 && CanAdjustMultislider())
+      if ((mGridMode == kMultislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow) && mHoldVal != 0 && CanAdjustMultislider())
       {
          mData[dataIndex] = clickHeight;
       }
@@ -450,7 +459,7 @@ bool UIGrid::MouseMoved(float x, float y)
 
 bool UIGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar)
+   if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow)
    {
       bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
