@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added a new dropdown mode for setting step velocity in the `drumsequencer` module
+- Added new "list" mode to the `snapshots` module, and make that the default mode
 - Added the ability to set a separate samples path
 - Added Akai LPD8 midi mapping
 - Added the `audiosplitter` module
@@ -58,6 +60,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Made hovering over a placed step and pressing up or down, cycle between normal, accent, and ghost notes in the `drumsequencer` module
+- Tweaked appearance of `drumsequencer` grid and change default step velocity to 80%
 - Changed AllowLookahead default to on in the `notelooper` module
 - Added a stop button when the sample is playing in the `samplebrowser` module
 - Allowed displaying the full note range in the `keyboarddisplay` module
