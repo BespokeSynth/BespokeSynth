@@ -25,7 +25,9 @@
 
 #pragma once
 
+#include "IPulseReceiver.h"
 #include "IUIControl.h"
+#include "PatchCableSource.h"
 
 struct RadioButtonElement
 {
@@ -49,7 +51,7 @@ public:
    virtual void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) = 0;
 };
 
-class RadioButton : public IUIControl
+class RadioButton : public IUIControl, public IPulseReceiver
 {
 public:
    RadioButton(IRadioButtonListener* owner, const char* name, int x, int y, int* var, RadioDirection direction = kRadioVertical);
@@ -83,6 +85,7 @@ public:
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
+   bool CanBeTargetedBy(PatchCableSource* source) const override;
 
    void GetDimensions(float& width, float& height) override
    {
@@ -91,6 +94,9 @@ public:
    }
 
    ofVec2f GetOptionPosition(int optionIndex);
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
 
 protected:
    ~RadioButton(); //protected so that it can't be created on the stack
