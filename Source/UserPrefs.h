@@ -312,6 +312,8 @@ public:
    UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
+   UserPrefFloat minimap_margin{ "minimap_margin", 10, 0, 50, UserPrefCategory::General };
+   UserPrefDropdownString minimap_corner{ "minimap_corner", "Top right", 150, UserPrefCategory::General };
    UserPrefBool immediate_paste{ "immediate_paste", false, UserPrefCategory::General };
    UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 30, 1, 120, 5, UserPrefCategory::General };
 #if !BESPOKE_LINUX
@@ -336,8 +338,7 @@ public:
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
    UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };
-   UserPrefTextEntryFloat mouse_offset_y
-   {
+   UserPrefTextEntryFloat mouse_offset_y{
       "mouse_offset_y",
 #if BESPOKE_MAC
       -4,
