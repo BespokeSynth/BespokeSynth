@@ -99,6 +99,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
+   float GetSampleRateRatio() const;
    ChannelBuffer* GetSourceBuffer();
    float GetSourceStartSample();
    float GetSourceEndSample();
