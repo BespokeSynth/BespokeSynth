@@ -240,7 +240,7 @@ ofVec2f RadioButton::GetOptionPosition(int optionIndex)
 
 void RadioButton::OnPulse(double time, float velocity, int flags)
 {
-   int length = mElements.size();
+   int length = static_cast<int>(mElements.size());
    if (length <= 0)
       length = 1;
 
@@ -255,7 +255,7 @@ void RadioButton::OnPulse(double time, float velocity, int flags)
       if (flags & kPulseFlag_Reset)
          *mVar = 0;
       else if (flags & kPulseFlag_Random)
-         *mVar = gRandom();
+         *mVar = static_cast<int>(gRandom());
       else
          *mVar = *mVar + direction;
       return;
