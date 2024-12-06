@@ -32,7 +32,7 @@
 #include "Slider.h"
 #include "ClickButton.h"
 #include "TextEntry.h"
-#include "exprtk/exprtk.hpp"
+#include "exprtk.hpp"
 
 class Waveshaper : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public ITextEntryListener
 {
