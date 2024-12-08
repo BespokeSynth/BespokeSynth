@@ -1829,3 +1829,10 @@ output~çıkış kanalına (hoparlörlerinize ya da ses kartınıza) ses gönder
 
 gain~ses sinyalinin ses düzeyini ayarlar
 ~gain~sinyalin ayarlanma miktarı. 1 değeri sinyalde değişikliğe neden olmaz.
+
+
+
+taptempo~tempo'yu vuruşlarla ayarlamak için modül
+~tap~tempo'yu ayarlamak için 4 kere vurun
+~indicator~tempo'yu hesaplamak için vuruş sayısını gösterir
+~bpm~tempo vuruşlar/dakika cinsinden

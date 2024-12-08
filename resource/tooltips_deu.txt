@@ -1829,3 +1829,10 @@ output~Audio hierher leiten, um es an einen Ausgangskanal zu senden (Ihre Lautsp
 
 gain~Regelt die Lautstärke des Audiosignals
 ~gain~Betrag zur Anpassung des Signals. Ein Wert von 1 bewirkt keine Veränderung des Signals.
+
+
+
+taptempo~Modul für das Tempo mit Taps einstellen
+~tap~Tap 4 times to set the tempo
+~indicator~shows the number of taps to calculate the tempo
+~bpm~tempo in beats per minute
