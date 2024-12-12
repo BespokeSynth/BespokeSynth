@@ -9,8 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added settings for `minimap` margin and corner
 - Added a new dropdown mode for setting step velocity in the `drumsequencer` module
-- Added new "list" mode to the `snapshots` module, and make that the default mode
+- Added a new "list" mode to the `snapshots` module, and make that the default mode
 - Added the ability to set a separate samples path
 - Added Akai LPD8 midi mapping
 - Added the `audiosplitter` module
@@ -60,6 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Made it so you can target RadioButton's with pulse cables
 - Made hovering over a placed step and pressing up or down, cycle between normal, accent, and ghost notes in the `drumsequencer` module
 - Tweaked appearance of `drumsequencer` grid and change default step velocity to 80%
 - Changed AllowLookahead default to on in the `notelooper` module
@@ -101,6 +103,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed several bugs in the rendering of child modules in the `minimap`
+- Fixed a bug where the `minimap` could be obscured by the titlebar menu
+- Fixed an issues related to saving a `seaofgrain` at one sample rate and loading it at another sample rate
 - Fixed a bug where singleton modules could be added to `prefab`'s which caused all kinds of visual duplication and incorrect behavior
 - Fixed a bug where the `scale` values in the `midicontroller` weren't being saved
 - Fixed an issue where long sample names prevented you from clicking the play button in the `samplebrowser` module
