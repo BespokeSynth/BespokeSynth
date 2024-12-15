@@ -895,7 +895,7 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
    RunCode(gTime, "on_osc(\"" + messageString + "\")");
 }
 
-void ScriptModule::SysExReceived(const uint8 * data, int data_size)
+void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
 {
    // Avoid code injection by preventing the sysex payload to be interpreted as Python
    // - convert the sysex payload to hex
