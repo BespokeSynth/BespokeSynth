@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added level meters to `gain` and `audiometer` modules
 - Added settings for `minimap` margin and corner
 - Added a new dropdown mode for setting step velocity in the `drumsequencer` module
 - Added a new "list" mode to the `snapshots` module, and make that the default mode
