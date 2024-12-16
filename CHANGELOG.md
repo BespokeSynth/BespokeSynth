@@ -62,6 +62,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Changed the behavior, with regards to velocity, of the `notesequencer` and `dotsequencer` to be in line with the `drumsequencer`
 - Made it so you can target RadioButton's with pulse cables
 - Made hovering over a placed step and pressing up or down, cycle between normal, accent, and ghost notes in the `drumsequencer` module
 - Tweaked appearance of `drumsequencer` grid and change default step velocity to 80%
