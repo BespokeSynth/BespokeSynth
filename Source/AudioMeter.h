@@ -29,6 +29,7 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "PeakTracker.h"
+#include "LevelMeterDisplay.h"
 
 class AudioMeter : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
 {
@@ -60,7 +61,7 @@ private:
    void GetModuleDimensions(float& w, float& h) override
    {
       w = 120;
-      h = 22;
+      h = 40;
    }
 
    float mLevel{ 0 };
@@ -68,4 +69,6 @@ private:
    FloatSlider* mLevelSlider{ nullptr };
    PeakTracker mPeakTracker;
    float* mAnalysisBuffer{ nullptr };
+   int mNumChannels{ 1 };
+   LevelMeterDisplay mLevelMeterDisplay{};
 };

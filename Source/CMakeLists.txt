@@ -280,6 +280,8 @@ target_sources(BespokeSynth PRIVATE
     LaunchpadKeyboard.h
     LaunchpadNoteDisplayer.cpp
     LaunchpadNoteDisplayer.h
+    LevelMeterDisplay.cpp
+    LevelMeterDisplay.h
     LinkwitzRileyFilter.cpp
     LinkwitzRileyFilter.h
     LinnstrumentControl.cpp
