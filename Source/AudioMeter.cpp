@@ -55,6 +55,8 @@ void AudioMeter::Process(double time)
 
    SyncBuffers();
 
+   mNumChannels = GetBuffer()->NumActiveChannels();
+
    if (mEnabled)
    {
       ComputeSliders(0);
@@ -62,7 +64,10 @@ void AudioMeter::Process(double time)
       Clear(mAnalysisBuffer, gBufferSize);
 
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
          Add(mAnalysisBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         mLevelMeterDisplay.Process(ch, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      }
 
       mPeakTracker.Process(mAnalysisBuffer, gBufferSize);
       mLevel = sqrtf(mPeakTracker.GetPeak());
@@ -83,6 +88,8 @@ void AudioMeter::DrawModule()
       return;
 
    mLevelSlider->Draw();
+
+   mLevelMeterDisplay.Draw(3, 20, 114, 18, mNumChannels);
 }
 
 void AudioMeter::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -98,4 +105,5 @@ void AudioMeter::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    mMaxLevel = mModuleSaveData.GetFloat("maxlevel");
    mLevelSlider->SetExtents(0, mMaxLevel);
+   mLevelMeterDisplay.SetLimit(mMaxLevel);
 }

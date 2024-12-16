@@ -1,6 +1,6 @@
 /**
     bespoke synth, a software modular synthesizer
-    Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
+    Copyright (C) 2024 Ryan Challinor (contact: awwbees@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,29 +16,34 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  PeakTracker.h
-//  modularSynth
+//  LevelMeterDisplay.h
+//  BespokeSynth
 //
-//  Created by Ryan Challinor on 1/4/14.
+//  Created by Ryan Challinor on 12/15/24.
 //
 //
 
 #pragma once
 
-class PeakTracker
+#include "ChannelBuffer.h"
+#include "PeakTracker.h"
+
+class LevelMeterDisplay
 {
 public:
-   void Process(float* buffer, int bufferSize);
-   float GetPeak() const { return mPeak; }
-   void SetDecayTime(float time) { mDecayTime = time; }
-   void SetLimit(float limit) { mLimit = limit; }
-   float GetLimit() const { return mLimit; }
-   void Reset() { mPeak = 0; }
-   double GetLastHitLimitTime() const { return mHitLimitTime; }
+   LevelMeterDisplay();
+   virtual ~LevelMeterDisplay();
+
+   void Process(int channel, float* buffer, int bufferSize);
+   void Draw(float x, float y, float width, float height, int numChannels);
+   void SetLimit(float limit);
 
 private:
-   float mPeak{ 0 };
-   float mDecayTime{ .01 };
-   float mLimit{ -1 };
-   double mHitLimitTime{ -9999 };
+   struct LevelMeter
+   {
+      PeakTracker mPeakTracker;
+      PeakTracker mPeakTrackerSlow;
+   };
+
+   std::array<LevelMeter, ChannelBuffer::kMaxNumChannels> mLevelMeters;
 };

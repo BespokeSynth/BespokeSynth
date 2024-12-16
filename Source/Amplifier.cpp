@@ -54,6 +54,8 @@ void Amplifier::Process(double time)
    SyncBuffers();
    int bufferSize = GetBuffer()->BufferSize();
 
+   mNumChannels = GetBuffer()->NumActiveChannels();
+
    ChannelBuffer* out = target->GetBuffer();
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
@@ -65,11 +67,18 @@ void Amplifier::Process(double time)
             ComputeSliders(i);
             gWorkBuffer[i] = getBufferChannelCh[i] * mGain;
          }
+
+         if (mShowLevelMeter)
+            mLevelMeterDisplay.Process(ch, gWorkBuffer, bufferSize);
+
          Add(out->GetChannel(ch), gWorkBuffer, GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), ch);
       }
       else
       {
+         if (mShowLevelMeter)
+            mLevelMeterDisplay.Process(ch, getBufferChannelCh, bufferSize);
+
          Add(out->GetChannel(ch), getBufferChannelCh, GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(getBufferChannelCh, GetBuffer()->BufferSize(), ch);
       }
@@ -83,12 +92,31 @@ void Amplifier::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   if (mShowLevelMeter)
+   {
+      if (mNumChannels == 1)
+      {
+         mLevelMeterDisplay.Draw(3, 20, 114, 8, mNumChannels);
+         mHeight = 30;
+      }
+      else
+      {
+         mLevelMeterDisplay.Draw(3, 20, 114, 18, mNumChannels);
+         mHeight = 40;
+      }
+   }
+   else
+   {
+      mHeight = 22;
+   }
+
    mGainSlider->Draw();
 }
 
 void Amplifier::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("show_level_meter", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -96,4 +124,5 @@ void Amplifier::LoadLayout(const ofxJSONElement& moduleInfo)
 void Amplifier::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   mShowLevelMeter = mModuleSaveData.GetBool("show_level_meter");
 }
