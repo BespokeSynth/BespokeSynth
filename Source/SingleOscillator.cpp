@@ -54,7 +54,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mPhaseOffset = 0;
    mVoiceParams.mUnison = 1;
    mVoiceParams.mUnisonWidth = 0;
-   mVoiceParams.mVelToVolume = .5f;
+   mVoiceParams.mVelToVolume = 1.0f;
    mVoiceParams.mVelToEnvelope = 0;
    mVoiceParams.mSoften = 0;
    mVoiceParams.mLiteCPUMode = false;

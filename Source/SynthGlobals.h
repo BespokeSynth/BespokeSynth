@@ -140,6 +140,15 @@ enum KeyModifiers
    kModifier_Command = 8
 };
 
+enum class StepVelocityType
+{
+   Ghost = 0,
+   Normal = 1,
+   Accent = 2,
+   NumVelocityLevels = 3
+};
+extern std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
+
 class LoadingJSONException : public std::exception
 {
 };

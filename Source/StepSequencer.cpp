@@ -44,9 +44,7 @@ StepSequencer::StepSequencer()
    for (int i = 0; i < META_STEP_MAX * NUM_STEPSEQ_ROWS; ++i)
       mMetaStepMasks[i] = 0xff;
 
-   mStepVelocityLevels[(int)StepVelocityType::Ghost] = 0.4f;
-   mStepVelocityLevels[(int)StepVelocityType::Normal] = 0.8f;
-   mStepVelocityLevels[(int)StepVelocityType::Accent] = 1.0f;
+   mStrength = gStepVelocityLevels[(int)StepVelocityType::Normal];
 }
 
 void StepSequencer::Init()
@@ -935,13 +933,13 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
       switch (mVelocityType)
       {
          case StepVelocityType::Normal:
-            mStrength = mStepVelocityLevels[(int)StepVelocityType::Normal];
+            mStrength = gStepVelocityLevels[(int)StepVelocityType::Normal];
             break;
          case StepVelocityType::Accent:
-            mStrength = mStepVelocityLevels[(int)StepVelocityType::Accent];
+            mStrength = gStepVelocityLevels[(int)StepVelocityType::Accent];
             break;
          case StepVelocityType::Ghost:
-            mStrength = mStepVelocityLevels[(int)StepVelocityType::Ghost];
+            mStrength = gStepVelocityLevels[(int)StepVelocityType::Ghost];
             break;
          default:
             break;
@@ -970,11 +968,11 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
          {
             if (key == OF_KEY_UP)
             {
-               for (int i = 0; i < (int)mStepVelocityLevels.size(); ++i)
+               for (int i = 0; i < (int)gStepVelocityLevels.size(); ++i)
                {
-                  if (velocity < mStepVelocityLevels[i])
+                  if (velocity < gStepVelocityLevels[i])
                   {
-                     mGrid->SetVal(cell.mCol, cell.mRow, mStepVelocityLevels[i]);
+                     mGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
                      break;
                   }
                }
@@ -982,11 +980,11 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
 
             if (key == OF_KEY_DOWN)
             {
-               for (int i = (int)mStepVelocityLevels.size() - 1; i >= 0; --i)
+               for (int i = (int)gStepVelocityLevels.size() - 1; i >= 0; --i)
                {
-                  if (velocity > mStepVelocityLevels[i])
+                  if (velocity > gStepVelocityLevels[i])
                   {
-                     mGrid->SetVal(cell.mCol, cell.mRow, mStepVelocityLevels[i]);
+                     mGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
                      break;
                   }
                }

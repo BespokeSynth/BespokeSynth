@@ -133,8 +133,9 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
-   void UpdateGridControllerLights(bool force);
+   void KeyPressed(int key, bool isRepeat) override;
 
+   void UpdateGridControllerLights(bool force);
    int ButtonToStep(int button);
    int StepToButton(int step);
    void SyncGridToSeq();

@@ -76,6 +76,7 @@ float gControlTactileFeedback = 0;
 float gDrawScale = 1;
 bool gShowDevModules = false;
 float gCornerRoundness = 1;
+std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
 
 std::random_device gRandomDevice;
 bespoke::core::Xoshiro256ss gRandom(gRandomDevice);
@@ -94,6 +95,10 @@ void SynthInit()
    TheSynth->GetAudioFormatManager().registerBasicFormats();
 
    assert(kNumVoices <= 16); //assumption that we don't have more voices than midi channels
+
+   gStepVelocityLevels[(int)StepVelocityType::Ghost] = 0.4f;
+   gStepVelocityLevels[(int)StepVelocityType::Normal] = 0.8f;
+   gStepVelocityLevels[(int)StepVelocityType::Accent] = 1.0f;
 }
 
 void LoadGlobalResources()
