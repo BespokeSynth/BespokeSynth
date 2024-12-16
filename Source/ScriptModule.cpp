@@ -634,7 +634,9 @@ void ScriptModule::Poll()
       if (mLoadedScriptFiletime < scriptFile.getLastModificationTime())
       {
          std::unique_ptr<FileInputStream> input(scriptFile.createInputStream());
-         mCodeEntry->SetText(input->readString().toStdString());
+         std::string text = input->readString().toStdString();
+         ofStringReplace(text, "\r", "");
+         mCodeEntry->SetText(text);
          mCodeEntry->Publish();
          ExecuteCode();
          mLoadedScriptFiletime = scriptFile.getLastModificationTime();
@@ -988,7 +990,9 @@ void ScriptModule::ButtonClicked(ClickButton* button, double time)
 
          mLoadedScriptFiletime = resourceFile.getLastModificationTime();
 
-         mCodeEntry->SetText(input->readString().toStdString());
+         std::string text = input->readString().toStdString();
+         ofStringReplace(text, "\r", "");
+         mCodeEntry->SetText(text);
       }
    }
 
