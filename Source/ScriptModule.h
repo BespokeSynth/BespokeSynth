@@ -71,6 +71,7 @@ public:
    double GetScheduledTime(double delayMeasureTime);
    void SetNumNoteOutputs(int num);
    void ConnectOscInput(int port);
+   void SysExReceived(const uint8_t* data, int data_size);
    void MidiReceived(MidiMessageType messageType, int control, float value, int channel);
    void OnModuleReferenceBound(IDrawableModule* target);
    void SetContext();

@@ -482,8 +482,13 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 void MidiController::OnMidi(const MidiMessage& message)
 {
-   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !message.isSysEx()))
+   int is_sysex = message.isSysEx();
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !is_sysex))
       return;
+   if (mEnabled && mSendSysex && is_sysex)
+      for (auto* script : mScriptListeners)
+         script->SysExReceived(message.getSysExData(), message.getSysExDataSize());
+
    mNoteOutput.SendMidi(message);
 }
 
@@ -2415,6 +2420,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, true);
    mModuleSaveData.LoadBool("resend_feedback_on_release", moduleInfo, false);
    mModuleSaveData.LoadBool("show_activity_ui_overlay", moduleInfo, true);
+   mModuleSaveData.LoadBool("send_sysex", moduleInfo, false);
 
    mConnectionsJson = moduleInfo["connections"];
 
@@ -2447,6 +2453,7 @@ void MidiController::SetUpFromSaveData()
    mSendTwoWayOnChange = mModuleSaveData.GetBool("twoway_on_change");
    mResendFeedbackOnRelease = mModuleSaveData.GetBool("resend_feedback_on_release");
    mShowActivityUIOverlay = mModuleSaveData.GetBool("show_activity_ui_overlay");
+   mSendSysex = mModuleSaveData.GetBool("send_sysex");
 
    BuildControllerList();
 
