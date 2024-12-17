@@ -32,7 +32,7 @@
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 #include "TextEntry.h"
-#include "exprtk/exprtk.hpp"
+#include "exprtk.hpp"
 
 class NoteExpressionRouter : public INoteReceiver, public INoteSource, public IDrawableModule, public ITextEntryListener
 {
