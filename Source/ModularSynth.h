@@ -383,6 +383,7 @@ private:
    bool mLastClickWasEmptySpace{ false };
    bool mIsShiftPressed{ false };
    double mLastShiftPressTime{ -9999 };
+   ofVec2f mLastShiftPressMousePos{};
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout{ false };
