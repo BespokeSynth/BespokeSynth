@@ -342,6 +342,8 @@ void RhythmSequencer::DropdownUpdated(DropdownList* list, int oldVal, double tim
 
 void RhythmSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
+   if (slider == mLengthSlider)
+      mLength = MIN(mLength, kMaxSteps);
 }
 
 void RhythmSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
