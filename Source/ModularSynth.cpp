@@ -410,7 +410,8 @@ void ModularSynth::Poll()
    if (shiftPressed && !mIsShiftPressed && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr)
    {
       double timeBetweenPresses = gTime - mLastShiftPressTime;
-      if (timeBetweenPresses < 400)
+      float mouseMoveBetweenPressesSq = (mMousePos - mLastShiftPressMousePos).distanceSquared();
+      if (timeBetweenPresses < 400 && mouseMoveBetweenPressesSq < 3 * 3)
       {
          ToggleQuickSpawn();
          mLastShiftPressTime = -9999; //clear timer
@@ -418,6 +419,7 @@ void ModularSynth::Poll()
       else
       {
          mLastShiftPressTime = gTime;
+         mLastShiftPressMousePos = mMousePos;
       }
    }
    mIsShiftPressed = shiftPressed;
