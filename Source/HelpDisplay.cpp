@@ -474,9 +474,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoModuleScreenshotsButton)
    {
-      /*mScreenshotsToProcess.push_back("sampleplayer");
-      mScreenshotsToProcess.push_back("drumplayer");
-      mScreenshotsToProcess.push_back("notesequencer");*/
+      gDrawScale = 1.0f;
 
       std::vector<ModuleCategory> moduleTypes = {
          kModuleCategory_Note,
@@ -502,6 +500,11 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          spawnable.mSpawnMethod = ModuleFactory::SpawnMethod::EffectChain;
          mScreenshotsToProcess.push_back(spawnable);
       }
+
+      /*mScreenshotsToProcess.clear();
+      mScreenshotsToProcess.push_back(TheSynth->GetModuleFactory()->GetSpawnableModules("sampleplayer", true)[0]);
+      mScreenshotsToProcess.push_back(TheSynth->GetModuleFactory()->GetSpawnableModules("drumplayer", true)[0]);
+      mScreenshotsToProcess.push_back(TheSynth->GetModuleFactory()->GetSpawnableModules("notesequencer", true)[0]);*/
 
       mScreenshotState = ScreenshotState::WaitingForSpawn;
    }

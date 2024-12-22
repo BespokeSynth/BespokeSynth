@@ -17,7 +17,9 @@
                <li>
                   <label for="instruments" class="title">instruments</label>
                   <a href="#circlesequencer">circlesequencer</a>
+                  <a href="#dotsequencer">dotsequencer</a>
                   <a href="#drumsequencer">drumsequencer</a>
+                  <a href="#euclideansequencer">euclideansequencer</a>
                   <a href="#fouronthefloor">fouronthefloor</a>
                   <a href="#gridkeyboard">gridkeyboard</a>
                   <a href="#keyboarddisplay">keyboarddisplay</a>
@@ -88,6 +90,7 @@
                   <a href="#pressuretovibrato">pressuretovibrato</a>
                   <a href="#previousnote">previousnote</a>
                   <a href="#quantizer">quantizer</a>
+                  <a href="#rhythmsequencer">rhythmsequencer</a>
                   <a href="#scaledegree">scaledegree</a>
                   <a href="#scaledetect">scaledetect</a>
                   <a href="#sustainpedal">sustainpedal</a>
@@ -101,6 +104,7 @@
                   <a href="#velocitystepsequencer">velocitystepsequencer</a>
                   <a href="#velocitytochance">velocitytochance</a>
                   <a href="#vibrato">vibrato</a>
+                  <a href="#voicesetter">voicesetter</a>
                   <a href="#volcabeatscontrol">volcabeatscontrol</a>
                   <a href="#whitekeys">whitekeys</a>
                </li>
@@ -125,6 +129,7 @@
                   <label for="audioeffects" class="title">audio effects</label>
                   <a href="#audiometer">audiometer</a>
                   <a href="#audiorouter">audiorouter</a>
+                  <a href="#audiosplitter">audiosplitter</a>
                   <a href="#buffershuffler">buffershuffler</a>
                   <a href="#dcoffset">dcoffset</a>
                   <a href="#effectchain">effectchain</a>
@@ -161,9 +166,11 @@
                   <a href="#add">add</a>
                   <a href="#addcentered">addcentered</a>
                   <a href="#audiotocv">audiotocv</a>
+                  <a href="#controlrecorder">controlrecorder</a>
                   <a href="#controlsequencer">controlsequencer</a>
                   <a href="#curve">curve</a>
                   <a href="#curvelooper">curvelooper</a>
+                  <a href="#dataprovider">dataprovider</a>
                   <a href="#envelope">envelope</a>
                   <a href="#expression">expression</a>
                   <a href="#fubble">fubble</a>
@@ -178,6 +185,7 @@
                   <a href="#notetoms">notetoms</a>
                   <a href="#pitchtocv">pitchtocv</a>
                   <a href="#pitchtospeed">pitchtospeed</a>
+                  <a href="#pitchtovalue">pitchtovalue</a>
                   <a href="#pressuretocv">pressuretocv</a>
                   <a href="#ramper">ramper</a>
                   <a href="#smoother">smoother</a>
@@ -199,7 +207,9 @@
                   <a href="#pulseflag">pulseflag</a>
                   <a href="#pulsegate">pulsegate</a>
                   <a href="#pulsehocket">pulsehocket</a>
+                  <a href="#pulselimit">pulselimit</a>
                   <a href="#pulser">pulser</a>
+                  <a href="#pulserouter">pulserouter</a>
                   <a href="#pulsesequence">pulsesequence</a>
                   <a href="#pulsetrain">pulsetrain</a>
                </li>
@@ -235,6 +245,7 @@
                   <a href="#globalcontrols">globalcontrols</a>
                   <a href="#grid">grid</a>
                   <a href="#groupcontrol">groupcontrol</a>
+                  <a href="#label">label</a>
                   <a href="#loopergranulator">loopergranulator</a>
                   <a href="#multitrackrecorder">multitrackrecorder</a>
                   <a href="#notetoggle">notetoggle</a>
@@ -243,6 +254,7 @@
                   <a href="#push2control">push2control</a>
                   <a href="#radiosequencer">radiosequencer</a>
                   <a href="#samplebrowser">samplebrowser</a>
+                  <a href="#savestateloader">savestateloader</a>
                   <a href="#scale">scale</a>
                   <a href="#script">script</a>
                   <a href="#scriptstatus">scriptstatus</a>
@@ -274,7 +286,7 @@ Navigation
    * space bar + mousewheel/trackpad-scroll to zoom, or scroll in empty space
    * if you get lost, press ~ to bring up the console, type "home", and press enter to reset to the initial position and zoom
    * if you have enabled the minimap in the settings, you can click on the minimap to directly go to a location
-      -at the bottom of the mimimap you can click on 9 bookmark buttons
+      -at the bottom of the minimap you can click on 9 bookmark buttons
       -hold shift while clicking will store your current location into that bookmark button
       -use shift+[num] to go to the specified bookmark
 
@@ -333,6 +345,8 @@ Key Commands
    * ctrl/command-'l': load
    * shift-'p': pause audio processing. this will stop all audio output. press shift-'p' again to resume
    * F2: toggle displaying all ADSR controls as sliders
+   * F3: pins or unpin a module so that it stays where it is regardless of the viewports position.
+         only works when not group selecting modules.
 
          </p>
          <h2>instruments</h2>
@@ -343,12 +357,26 @@ Key Commands
          <span style="display:inline-block;margin-left:50px;">
          polyrhythmic sequencer that displays a loop as a circle<br/><br/><b>length*</b>: number of steps in this ring<br/><b>note*</b>: pitch to use for this ring<br/><b>offset*</b>: timing offset for this ring<br/></br></br></br></br>
       </span>
+         <a name=dotsequencer></a></br>
+         <b>dotsequencer</b></br>
+         <img src="screenshots/dotsequencer.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         polyphonic note sequencer with adjustable note length and velocity. click and drag horizontally to adjust length. click and drag vertically to adjust the velocity. hover and use the arrow keys to move dots. hover and use the mouse wheel to tweak dot lengths.<br/><br/><b>clear</b>: clear the contents of the dot grid<br/><b>cols</b>: number of columns<br/><b>dotgrid</b>: the dot grid<br/><b>double</b>: double the length of this sequence<br/><b>interval</b>: rate to play notes at<br/><b>notemode</b>: which set of pitches should the rows represent?<br/><b>octave</b>: octave of the bottom pitch of this sequence<br/><b>row offset</b>: amount to offset the mapping of row to pitch<br/><b>rows</b>: number of rows<br/></br></br></br></br>
+      </span>
          <a name=drumsequencer></a></br>
          <b>drumsequencer</b></br>
          <img src="screenshots/drumsequencer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.<br/><br/><b>r lock*</b>: lock this row so it doesn't get randomized<br/><b>repeat</b>: repeat input notes at this rate<br/><b>offsets</b>: show "offsets" sliders<br/><b>column</b>: current column, to use for visualizing the step on a midi controller<br/><b>randomize</b>: randomize the sequence<br/><b>clear</b>: clear sequence<br/><b>measures</b>: length of the sequence in measures<br/><b>metastep</b>: patch a grid in here from a "midicontroller" module to control the "meta step". I forget what this does. oops.<br/><b>r den</b>: density of the randomizer output. the higher this is, the busier the random output will be.<br/><b>r amt</b>: the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.<br/><b>step</b>: length of each step<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>yoff</b>: vertical offset for grid controller's view of the pattern<br/><b>velocity</b>: patch a grid in here from a "midicontroller" module to control the velocity<br/><b>rowpitch*</b>: output pitch for this row<br/><b>vel</b>: velocity to use when setting a step<br/><b>random*</b>: randomize this row<br/><b><</b>: shift whole pattern one step earlier<br/><b>offset*</b>: shift row forward/backward in time. try making your snares a little early, your hats a little late, etc.<br/><b>></b>: shift whole pattern one step later<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+         step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity, or hover over a step and press the up and down arrow keys to adjust velocity.<br/><br/><b><</b>: shift whole pattern one step earlier<br/><b>></b>: shift whole pattern one step later<br/><b>clear</b>: clear sequence<br/><b>column</b>: current column, to use for visualizing the step on a midi controller<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>measures</b>: length of the sequence in measures<br/><b>metastep</b>: patch a grid in here from a "midicontroller" module to control the "meta step". I forget what this does. oops.<br/><b>offset*</b>: shift row forward/backward in time. try making your snares a little early, your hats a little late, etc.<br/><b>offsets</b>: show "offsets" sliders<br/><b>r amt</b>: the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.<br/><b>r den</b>: density of the randomizer output. the higher this is, the busier the random output will be.<br/><b>r lock*</b>: lock this row so it doesn't get randomized<br/><b>random*</b>: randomize this row<br/><b>randomize</b>: randomize the sequence<br/><b>repeat</b>: repeat input notes at this rate<br/><b>rowpitch*</b>: output pitch for this row<br/><b>step</b>: length of each step<br/><b>vel</b>: velocity to use when setting a step<br/><b>velocity</b>: patch a grid in here from a "midicontroller" module to control the velocity<br/><b>velocitytype</b>: velocity to use when setting a step<br/><b>yoff</b>: vertical offset for grid controller's view of the pattern<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+      </span>
+         <a name=euclideansequencer></a></br>
+         <b>euclideansequencer</b></br>
+         <img src="screenshots/euclideansequencer.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         euclidean sequencer displays a loop as a circle. the notes are calculated using the euclidean rhythm algorithm.<br/><br/><b>clear</b>: clear all steps, onsets, rotation and offset in all rings<br/><b>note</b>: randomize notes in all rings<br/><b>note chance</b>: what is the chance a note gets changed<br/><b>note*</b>: pitch to use for this ring<br/><b>o *</b>: in what range is offset created<br/><b>oct*</b>: in what octave range are notes created<br/><b>offset</b>: randomize offset in all rings<br/><b>offset chance</b>: what is the chance that an offset gets changed<br/><b>offset*</b>: timing offset for this ring<br/><b>ons *</b>: in what range are onsets created<br/><b>onset chance</b>: what is the chance that an onset gets changed<br/><b>onsets</b>: randomize onsets in all rings<br/><b>onsets*</b>: number of onsets in this ring<br/><b>random</b>: randomize all steps, onsets and rotation in all rings<br/><b>random*</b>: randomize steps, onsets and rotation in this ring<br/><b>rot chance</b>: what is the chance that rotation gets changed<br/><b>rot hi</b>: in what range is rotation created<br/><b>rot lo</b>: in what range is rotation created<br/><b>rotation</b>: randomize rotation in all rings<br/><b>rotation*</b>: rotation of this ring<br/><b>step chance</b>: what is the chance a step gets changed<br/><b>steps</b>: randomize steps in all rings<br/><b>steps*</b>: number of steps in this ring<br/><b>stp*</b>: in what range are steps created<br/></br></br></br></br>
       </span>
          <a name=fouronthefloor></a></br>
          <b>fouronthefloor</b></br>
@@ -362,7 +390,7 @@ Key Commands
          <img src="screenshots/gridkeyboard.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         grid-based keyboard, intended primarily for 64-pad grid controllers<br/><br/><b>layout</b>: keyboard style<br/><b>p.root</b>: for chorder, make root note always play<br/><b>arrangement</b>: what style of layout should we use?<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>octave</b>: base octave<br/><b>latch</b>: latch key presses, so you press once to play a note, and press again to release a note<br/><b>ch.latch</b>: latch chord button presses<br/></br></br></br></br>
+         grid-based keyboard, intended primarily for 64-pad grid controllers<br/><br/><b>arrangement</b>: what style of layout should we use?<br/><b>ch.latch</b>: latch chord button presses<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>latch</b>: latch key presses, so you press once to play a note, and press again to release a note<br/><b>layout</b>: keyboard style<br/><b>octave</b>: base octave<br/><b>p.root</b>: for chorder, make root note always play<br/></br></br></br></br>
       </span>
          <a name=keyboarddisplay></a></br>
          <b>keyboarddisplay</b></br>
@@ -376,68 +404,68 @@ Key Commands
          <img src="screenshots/m185sequencer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sequencer using the unique paradigm of the m185 or intellijel metropolis<br/><br/><b>gate*</b>: behavior for each row: "repeat" plays every step, "once" plays just the first step, "hold" holds across all steps, "rest" plays no steps<br/><b>pitch*</b>: pitch to use for this row<br/><b>interval</b>: interval per step<br/><b>pulses*</b>: number of steps this row should last<br/><b>reset step</b>: resets counter to first step<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         sequencer using the unique paradigm of the m185 or intellijel metropolis<br/><br/><b>gate*</b>: behavior for each row: "repeat" plays every step, "once" plays just the first step, "hold" holds across all steps, "rest" plays no steps<br/><b>interval</b>: interval per step<br/><b>pitch*</b>: pitch to use for this row<br/><b>pulses*</b>: number of steps this row should last<br/><b>reset step</b>: resets counter to first step<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=midicontroller></a></br>
          <b>midicontroller</b></br>
          <img src="screenshots/midicontroller.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         get midi input from external devices. to get a nice display in the "layout" view, create a .json file with the same name as your controller to describe your controller's layout, and place it in your "data/controllers" directory. look at the other files in that directory for examples.<br/><br/><b>control</b>: pitch or control to refer to<br/><b>feedback</b>: which cc or note should we send the feedback to?<br/><b>blink</b>: when the targeted control is enabled, send alternating on/off messages, to blink the associated LED<br/><b>controltype</b>: how this control should modify the target.
+         get midi input from external devices. to get a nice display in the "layout" view, create a .json file with the same name as your controller to describe your controller's layout, and place it in your "data/controllers" directory. look at the other files in that directory for examples.<br/><br/><b> x </b>: delete this connection<br/><b>14bit</b>: is this a 14-bit midi control, with this control as the LSB and the control 32 less than this as the MSB?<br/><b>add</b>: add a mapping manually<br/><b>bind (hold shift)</b>: when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift, and then using desired midi input<br/><b>blink</b>: when the targeted control is enabled, send alternating on/off messages, to blink the associated LED<br/><b>channel</b>: which channel to pay attention to<br/><b>control</b>: pitch or control to refer to<br/><b>controller</b>: midi device to use<br/><b>controltype</b>: how this control should modify the target.
  -slider: set the value interpolated between "midi off" and "midi on" to the slider's value
  -set: set the specified value directly when this button is pressed
  -release: set the specified value directly when this button is released
  -toggle: toggle the control's value to on/off when this button is pressed
- -direct: set the control to the literal midi input value<br/><b>increment</b>: when "controltype" is "set" or "release", the targeted control is incremented by this amount (and the "value" field is ignored). when "controltype" is "slider", the targeted control is changed by this amount in the direction the control was changed (this setting is useful for "infinite encoders")<br/><b>scale</b>: should the output of this midi slider be scaled between "midi off" and "midi on"?<br/><b>layout</b>: which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.<br/><b>messagetype</b>: type of midi message<br/><b>add</b>: add a mapping manually<br/><b>midi on</b>: the upper end of the midi range. send this value when the targeted control is on. if "scale" is enabled, this also controls the upper end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.<br/><b>osc input port</b>: port to use for osccontroller input<br/><b>channel</b>: which channel to pay attention to<br/><b>midi off</b>: the lower end of the midi range. send this value when the targeted control is off. if "scale" is enabled, this also controls the lower end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.<br/><b>pageless</b>: should this connection work across all pages of the midicontroller?<br/><b>path</b>: path to the control that should be affected. you can also enter "hover" here, to affect whichever control the mouse is hovering over.<br/><b>bind (hold shift)</b>: when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift, and then using desired midi input<br/><b>copy</b>: duplicate this connection<br/><b>monome</b>: which monome should we use?<br/><b>mappingdisplay</b>: which mapping view to see<br/><b> x </b>: delete this connection<br/><b>controller</b>: midi device to use<br/><b>value</b>: the value to set<br/><b>twoway</b>: should we send feedback to the controller? (to control the LEDs associated with the button/knob)<br/><b>page</b>: select which page of midi controls to use. each page acts like an independent midi controller, so you can use pages to allow one midi controller to switch between controlling many things<br/></br></br></br></br>
+ -direct: set the control to the literal midi input value<br/><b>copy</b>: duplicate this connection<br/><b>feedback</b>: which cc or note should we send the feedback to?<br/><b>increment</b>: when "controltype" is "set" or "release", the targeted control is incremented by this amount (and the "value" field is ignored). when "controltype" is "slider", the targeted control is changed by this amount in the direction the control was changed (this setting is useful for "infinite encoders")<br/><b>layout</b>: which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.<br/><b>mappingdisplay</b>: which mapping view to see<br/><b>messagetype</b>: type of midi message<br/><b>midi off</b>: the lower end of the midi range. send this value when the targeted control is off. if "scale" is enabled, this also controls the lower end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.<br/><b>midi on</b>: the upper end of the midi range. send this value when the targeted control is on. if "scale" is enabled, this also controls the upper end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.<br/><b>monome</b>: which monome should we use?<br/><b>osc input port</b>: port to use for osccontroller input<br/><b>page</b>: select which page of midi controls to use. each page acts like an independent midi controller, so you can use pages to allow one midi controller to switch between controlling many things<br/><b>pageless</b>: should this connection work across all pages of the midicontroller?<br/><b>path</b>: path to the control that should be affected. you can also enter "hover" here, to affect whichever control the mouse is hovering over.<br/><b>scale</b>: should the output of this midi slider be scaled between "midi off" and "midi on"?<br/><b>twoway</b>: should we send feedback to the controller? (to control the LEDs associated with the button/knob)<br/><b>value</b>: the value to set<br/></br></br></br></br>
       </span>
          <a name=notecanvas></a></br>
          <b>notecanvas</b></br>
          <img src="screenshots/notecanvas.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         looping note roll<br/><br/><b>scrollv</b>: vertical scrollbar<br/><b>canvas</b>: canvas of notes. canvas controls:
+         looping note roll<br/><br/><b>canvas</b>: canvas of notes. canvas controls:
 -shift-click to add a note
 -hold shift and drag a note to duplicate
 -hold alt to drag a note without snapping
 -hold ctrl while dragging to snap to an interval
 -hold shift and scroll to zoom
 -hold alt and grab empty space to move slide the canvas view
--hold ctrl and grab empty space to zoom the canvas view<br/><b>measures</b>: loop length<br/><b>drag mode</b>: direction that elements can be dragged<br/><b>view rows</b>: number of visible rows<br/><b>loadtrack</b>: which track number to import when using "load midi"<br/><b>timeline</b>: control loop points<br/><b>clear</b>: delete all elements<br/><b>interval</b>: interval to quantize to<br/><b>play</b>: play notes on canvas<br/><b>quantize</b>: quantize selected notes to interval<br/><b>save midi</b>: export canvas contents to a midi file<br/><b>load midi</b>: import canvas contents from a midi file<br/><b>rec</b>: record input notes to canvas<br/><b>show chord intervals</b>: show brackets to indicate chord relationships<br/><b>free rec</b>: enable record mode, and extend canvas if we reach the end<br/><b>scrollh</b>: horizontal scrollbar<br/><b>delete</b>: delete highlighted elements<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+-hold ctrl and grab empty space to zoom the canvas view<br/><b>clear</b>: delete all elements<br/><b>delete</b>: delete highlighted elements<br/><b>drag mode</b>: direction that elements can be dragged<br/><b>free rec</b>: enable record mode, and extend canvas if we reach the end<br/><b>interval</b>: interval to quantize to<br/><b>load midi</b>: import canvas contents from a midi file<br/><b>loadtrack</b>: which track number to import when using "load midi"<br/><b>measures</b>: loop length<br/><b>play</b>: play notes on canvas<br/><b>quantize</b>: quantize selected notes to interval<br/><b>rec</b>: record input notes to canvas<br/><b>save midi</b>: export canvas contents to a midi file<br/><b>scrollh</b>: horizontal scrollbar<br/><b>scrollv</b>: vertical scrollbar<br/><b>show chord intervals</b>: show brackets to indicate chord relationships<br/><b>timeline</b>: control loop points<br/><b>view rows</b>: number of visible rows<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notechain></a></br>
          <b>notechain</b></br>
          <img src="screenshots/notechain.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         trigger a note, followed by a pulse to trigger another note after a delay<br/><br/><b>duration</b>: duration of note, in measures<br/><b>trigger</b>: play note for this chain node<br/><b>pitch</b>: pitch to play<br/><b>velocity</b>: velocity for note<br/><b>next</b>: interval until sending pulse<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         trigger a note, followed by a pulse to trigger another note after a delay<br/><br/><b>duration</b>: duration of note, in measures<br/><b>next</b>: interval until sending pulse<br/><b>pitch</b>: pitch to play<br/><b>trigger</b>: play note for this chain node<br/><b>velocity</b>: velocity for note<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=notecounter></a></br>
          <b>notecounter</b></br>
          <img src="screenshots/notecounter.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         advance through pitches sequentially. useful for driving the "notesequencer" or "drumsequencer" modules.<br/><br/><b>interval</b>: rate to advance<br/><b>random</b>: output random pitches within the range, rather than sequential<br/><b>sync</b>: if the output pitch should be synchronized to the global transport<br/><b>start</b>: pitch at the start of the sequence<br/><b>length</b>: length of the sequence<br/><b>div</b>: measure division, when using "div" as the interval<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         advance through pitches sequentially. useful for driving the "notesequencer" or "drumsequencer" modules.<br/><br/><b>*</b>: generate a new random seed<br/><b><</b>: go to previous seed<br/><b>></b>: go to next seed<br/><b>beat length</b>: length over which the random sequence should deterministically repeat<br/><b>div</b>: measure division, when using "div" as the interval<br/><b>interval</b>: rate to advance<br/><b>length</b>: length of the sequence<br/><b>random</b>: output random pitches within the range, rather than sequential<br/><b>seed</b>: number that determines the random sequence<br/><b>start</b>: pitch at the start of the sequence<br/><b>sync</b>: if the output pitch should be synchronized to the global transport<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=notecreator></a></br>
          <b>notecreator</b></br>
          <img src="screenshots/notecreator.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         create a one-off note<br/><br/><b>duration</b>: note length when "trigger" button is used<br/><b>on</b>: turn on to start note, turn off to end note<br/><b>trigger</b>: press to trigger note for specified duration<br/><b>velocity</b>: note velocity<br/><b>pitch</b>: output note pitch<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         create a one-off note<br/><br/><b>duration</b>: note length when "trigger" button is used<br/><b>on</b>: turn on to start note, turn off to end note<br/><b>pitch</b>: output note pitch<br/><b>trigger</b>: press to trigger note for specified duration<br/><b>velocity</b>: note velocity<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=notelooper></a></br>
          <b>notelooper</b></br>
          <img src="screenshots/notelooper.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         note loop recorder with overdubbing and replacement functionality<br/><br/><b>canvas</b>: canvas of recorded notes<br/><b>load*</b>: restore pattern<br/><b>clear</b>: clear pattern<br/><b>del/mute</b>: if "write" is enabled, erase notes as the playhead passes over them. otherwise, just mute them.<br/><b>write</b>: should input should be recorded?<br/><b>store*</b>: save pattern<br/><b>num bars</b>: set loop length in measures<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         note loop recorder with overdubbing and replacement functionality<br/><br/><b>canvas</b>: canvas of recorded notes<br/><b>clear</b>: clear pattern<br/><b>del/mute</b>: if "write" is enabled, erase notes as the playhead passes over them. otherwise, just mute them.<br/><b>load*</b>: restore pattern<br/><b>num bars</b>: set loop length in measures<br/><b>store*</b>: save pattern<br/><b>write</b>: should input should be recorded?<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notesequencer></a></br>
          <b>notesequencer</b></br>
          <img src="screenshots/notesequencer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         looping sequence of notes at an interval. pair with a "pulser" module for more interesting step control. hold "shift" to adjust step length.<br/><br/><b>len*</b>: length for this column<br/><b>random</b>: randomize pitch, length, and velocity of all steps.<br/><b>y offset</b>: y offset of attached grid controller<br/><b>pitch</b>: randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.<br/><b>rand vel density</b>: when clicking the random velocity button, what are the chances that a step should have a note?<br/><b>x offset</b>: x offset of attached grid controller<br/><b>rand pitch chance</b>: when clicking the random pitch button, what is the chance that a step gets changed?<br/><b>rand vel chance</b>: when clicking the random velocity button, what is the chance that a step gets changed?<br/><b>tone*</b>: pitch for this column<br/><b>rand len range</b>: when clicking the random length button, how much will the length change?<br/><b>rand len chance</b>: when clicking the random length button, what is the chance that a step gets changed?<br/><b>vel</b>: randomize the velocity of each step's note.<br/><b><</b>: shift the sequence to the left<br/><b>></b>: shift the sequence to the right<br/><b>vel*</b>: velocity for this column<br/><b>len</b>: randomize the length of each step's note.<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>loop reset</b>: when sequence loops, reset to here instead. send a "downbeat"-style message from a pulser to restart the sequence from the first step.<br/><b>octave</b>: octave of the bottom pitch of this sequence<br/><b>notemode</b>: which set of pitches should the rows represent?<br/><b>clear</b>: clear all steps<br/><b>interval</b>: note length<br/><b>rand pitch variety</b>: how many different random pitches should we generate?<br/><b>length</b>: length that the sequence below should play. the overall grid length can be changed by adjusting "gridsteps" in the triangle menu.<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+         looping sequence of notes at an interval. pair with a "pulser" module for more interesting step control. hold "shift" to adjust step length.<br/><br/><b><</b>: shift the sequence to the left<br/><b>></b>: shift the sequence to the right<br/><b>clear</b>: clear all steps<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>interval</b>: note length<br/><b>len</b>: randomize the length of each step's note.<br/><b>len*</b>: length for this column<br/><b>length</b>: length that the sequence below should play. the overall grid length can be changed by adjusting "gridsteps" in the triangle menu.<br/><b>loop reset</b>: when sequence loops, reset to here instead. send a "downbeat"-style message from a pulser to restart the sequence from the first step.<br/><b>notemode</b>: which set of pitches should the rows represent?<br/><b>octave</b>: octave of the bottom pitch of this sequence<br/><b>pitch</b>: randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.<br/><b>rand len chance</b>: when clicking the random length button, what is the chance that a step gets changed?<br/><b>rand len range</b>: when clicking the random length button, how much will the length change?<br/><b>rand pitch chance</b>: when clicking the random pitch button, what is the chance that a step gets changed?<br/><b>rand pitch variety</b>: how many different random pitches should we generate?<br/><b>rand vel chance</b>: when clicking the random velocity button, what is the chance that a step gets changed?<br/><b>rand vel density</b>: when clicking the random velocity button, what are the chances that a step should have a note?<br/><b>random</b>: randomize pitch, length, and velocity of all steps.<br/><b>tone*</b>: pitch for this column<br/><b>vel</b>: randomize the velocity of each step's note.<br/><b>vel*</b>: velocity for this column<br/><b>x offset</b>: x offset of attached grid controller<br/><b>y offset</b>: y offset of attached grid controller<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notesinger></a></br>
          <b>notesinger</b></br>
@@ -451,7 +479,7 @@ Key Commands
          <img src="screenshots/playsequencer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         drum sequencer that allows you to punch in to record and overdub steps, inspired by the pulsar-23 drum machine<br/><br/><b>load*</b>: load the sequence stored in this slot<br/><b>link columns</b>: if the mute/delete control should be shared across the entire column<br/><b>interval</b>: the step size<br/><b>measures</b>: the loop length<br/><b>write</b>: if the current input should be written to the sequence. this will also delete steps if mute/delete is enabled for this row<br/><b>note repeat</b>: if held notes should repeat every step<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>mute/delete*</b>: if write is disabled, mute this row. if write is enabled, clear the steps as the playhead passes them<br/><b>store*</b>: store the current sequence to this slot<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         drum sequencer that allows you to punch in to record and overdub steps, inspired by the pulsar-23 drum machine<br/><br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>interval</b>: the step size<br/><b>link columns</b>: if the mute/delete control should be shared across the entire column<br/><b>load*</b>: load the sequence stored in this slot<br/><b>measures</b>: the loop length<br/><b>mute/delete*</b>: if write is disabled, mute this row. if write is enabled, clear the steps as the playhead passes them<br/><b>note repeat</b>: if held notes should repeat every step<br/><b>store*</b>: store the current sequence to this slot<br/><b>write</b>: if the current input should be written to the sequence. this will also delete steps if mute/delete is enabled for this row<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=polyrhythms></a></br>
          <b>polyrhythms</b></br>
@@ -465,14 +493,14 @@ Key Commands
          <img src="screenshots/randomnote.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         play a note at a given interval with a random chance<br/><br/><b>probability</b>: the chance that a note will play each interval<br/><b>skip</b>: after a note plays, don't play a note the next n-1 times that it would have played<br/><b>interval</b>: the note length<br/><b>offset</b>: the amount of time to offset playback within the interval<br/><b>pitch</b>: the pitch to use<br/><b>velocity</b>: the velocity to use<br/></br></br></br></br>
+         play a note at a given interval with a random chance<br/><br/><b>interval</b>: the note length<br/><b>offset</b>: the amount of time to offset playback within the interval<br/><b>pitch</b>: the pitch to use<br/><b>probability</b>: the chance that a note will play each interval<br/><b>skip</b>: after a note plays, don't play a note the next n-1 times that it would have played<br/><b>velocity</b>: the velocity to use<br/></br></br></br></br>
       </span>
          <a name=slidersequencer></a></br>
          <b>slidersequencer</b></br>
          <img src="screenshots/slidersequencer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         trigger notes along a continuous timeline<br/><br/><b>division</b>: rate to progress<br/><b>note*</b>: pitch for this element<br/><b>playing*</b>: is this element playing?<br/><b>vel*</b>: velocity of this element<br/><b>time*</b>: time to trigger this element<br/></br></br></br></br>
+         trigger notes along a continuous timeline<br/><br/><b>division</b>: rate to progress<br/><b>note*</b>: pitch for this element<br/><b>playing*</b>: is this element playing?<br/><b>time*</b>: time to trigger this element<br/><b>vel*</b>: velocity of this element<br/></br></br></br></br>
       </span>
          <h2>note effects</h2>
          <a name=arpeggiator></a></br>
@@ -480,14 +508,14 @@ Key Commands
          <img src="screenshots/arpeggiator.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         arpeggiates held notes. there are several vestigial features in this module that should be cleaned up.<br/><br/><b>step</b>: direction and distance to step through arpeggiation. a value of zero is "pingpong".<br/><b>interval</b>: arpeggiation rate<br/><b>octaves</b>: how many octaves to step through<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         arpeggiates held notes. there are several vestigial features in this module that should be cleaned up.<br/><br/><b>interval</b>: arpeggiation rate<br/><b>octaves</b>: how many octaves to step through<br/><b>step</b>: direction and distance to step through arpeggiation. a value of zero is "pingpong".<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=capo></a></br>
          <b>capo</b></br>
          <img src="screenshots/capo.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         shifts incoming notes by semitones<br/><br/><b>capo</b>: number of semitones to shift<br/><b>retrigger</b>: immediately replay current notes when changing the capo amount<br/><b>diatonic</b>: should we keep transposed notes in the scale?<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         shifts incoming notes by semitones<br/><br/><b>capo</b>: number of semitones to shift<br/><b>diatonic</b>: should we keep transposed notes in the scale?<br/><b>retrigger</b>: immediately replay current notes when changing the capo amount<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=chorddisplayer></a></br>
          <b>chorddisplayer</b></br>
@@ -501,7 +529,7 @@ Key Commands
          <img src="screenshots/chorder.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         takes an incoming pitch and plays additional notes to form chords<br/><br/><b>inversion</b>: inversion presets<br/><b>chord</b>: chord presets<br/><b>diatonic</b>: should the grid be chromatic, or locked to the scale only?<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         takes an incoming pitch and plays additional notes to form chords<br/><br/><b>chord</b>: chord presets<br/><b>diatonic</b>: should the grid be chromatic, or locked to the scale only?<br/><b>inversion</b>: inversion presets<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=chordholder></a></br>
          <b>chordholder</b></br>
@@ -557,28 +585,28 @@ Key Commands
          <img src="screenshots/modwheeltovibrato.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         convert note mod wheel input rhythmic pitch bend<br/><br/><b>vibrato</b>: amount of pitch bend<br/><b>vibinterval</b>: rate of vibrato<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         convert note mod wheel input rhythmic pitch bend<br/><br/><b>vibinterval</b>: rate of vibrato<br/><b>vibrato</b>: amount of pitch bend<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=mpesmoother></a></br>
          <b>mpesmoother</b></br>
          <img src="screenshots/mpesmoother.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         smooth out MPE parameters<br/><br/><b>modwheel</b>: amount to smooth incoming modwheel<br/><b>pressure</b>: amount to smooth incoming pressure<br/><b>pitch</b>: amount to smooth incoming pitchbend<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         smooth out MPE parameters<br/><br/><b>modwheel</b>: amount to smooth incoming modwheel<br/><b>pitch</b>: amount to smooth incoming pitchbend<br/><b>pressure</b>: amount to smooth incoming pressure<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=mpetweaker></a></br>
          <b>mpetweaker</b></br>
          <img src="screenshots/mpetweaker.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         adjust incoming MPE modulation values<br/><br/><b>pressure mult</b>: amount to multiply incoming pressure<br/><b>modwheel offset</b>: amount to offset incoming modwheel<br/><b>pitchbend mult</b>: amount to multiply incoming pitchbend<br/><b>pitchbend offset</b>: amount to offset incoming pitchbend<br/><b>modwheel mult</b>: amount to multiply incoming modwheel<br/><b>pressure offset</b>: amount to offset incoming pressure<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         adjust incoming MPE modulation values<br/><br/><b>modwheel mult</b>: amount to multiply incoming modwheel<br/><b>modwheel offset</b>: amount to offset incoming modwheel<br/><b>pitchbend mult</b>: amount to multiply incoming pitchbend<br/><b>pitchbend offset</b>: amount to offset incoming pitchbend<br/><b>pressure mult</b>: amount to multiply incoming pressure<br/><b>pressure offset</b>: amount to offset incoming pressure<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notechance></a></br>
          <b>notechance</b></br>
          <img src="screenshots/notechance.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         randomly allow notes through<br/><br/><b>*</b>: generate a new random seed<br/><b>beat length</b>: restart the deterministic random sequence at this interval<br/><b>deterministic</b>: allow for randomness to be repeated over an interval<br/><b>chance</b>: probability that a note is allowed<br/><b>seed</b>: number that determines the random sequence<br/><b><</b>: go to next seed<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         randomly allow notes through<br/><br/><b>*</b>: generate a new random seed<br/><b><</b>: go to previous seed<br/><b>></b>: go to next seed<br/><b>beat length</b>: restart the deterministic random sequence at this interval<br/><b>chance</b>: probability that a note is allowed<br/><b>deterministic</b>: allow for randomness to be repeated over an interval<br/><b>seed</b>: number that determines the random sequence<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notedelayer></a></br>
          <b>notedelayer</b></br>
@@ -642,14 +670,14 @@ Key Commands
          <img src="screenshots/notehocket.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sends notes to random destinations<br/><br/><b>weight *</b>: chance that note goes to this destination<br/><b>*</b>: generate a new random seed<br/><b>seed</b>: number that determines the random sequence<br/><b><</b>: go to next seed<br/><b>beat length</b>: restart the deterministic random sequence at this interval<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         sends notes to random destinations<br/><br/><b>*</b>: generate a new random seed<br/><b><</b>: go to previous seed<br/><b>></b>: go to next seed<br/><b>beat length</b>: restart the deterministic random sequence at this interval<br/><b>seed</b>: number that determines the random sequence<br/><b>weight *</b>: chance that note goes to this destination<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notehumanizer></a></br>
          <b>notehumanizer</b></br>
          <img src="screenshots/notehumanizer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         add randomness to timing and velocity<br/><br/><b>velocity</b>: amount of velocity randomness<br/><b>time</b>: amount of timing randomness, in milliseconds.<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         add randomness to timing and velocity<br/><br/><b>time</b>: amount of timing randomness, in milliseconds.<br/><b>velocity</b>: amount of velocity randomness<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notelatch></a></br>
          <b>notelatch</b></br>
@@ -663,14 +691,14 @@ Key Commands
          <img src="screenshots/noteoctaver.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         transpose a note by octaves<br/><br/><b>retrigger</b>: immediately replay current notes when changing the transpose amount<br/><b>octave</b>: number of octaves to raise or lower<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         transpose a note by octaves<br/><br/><b>octave</b>: number of octaves to raise or lower<br/><b>retrigger</b>: immediately replay current notes when changing the transpose amount<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notepanalternator></a></br>
          <b>notepanalternator</b></br>
          <img src="screenshots/notepanalternator.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sets a note's pan, alternating between two values, for the internal synths that support panned notes<br/><br/><b>two</b>: pan position, .5 is centered<br/><b>one</b>: pan position, .5 is centered<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         sets a note's pan, alternating between two values, for the internal synths that support panned notes<br/><br/><b>one</b>: pan position, .5 is centered<br/><b>two</b>: pan position, .5 is centered<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notepanner></a></br>
          <b>notepanner</b></br>
@@ -684,14 +712,14 @@ Key Commands
          <img src="screenshots/notepanrandom.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sets a note's pan to random values, for the internal synths that support panned notes<br/><br/><b>spread</b>: amount of randomness<br/><b>center</b>: center pan position<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         sets a note's pan to random values, for the internal synths that support panned notes<br/><br/><b>center</b>: center pan position<br/><b>spread</b>: amount of randomness<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=noterangefilter></a></br>
          <b>noterangefilter</b></br>
          <img src="screenshots/noterangefilter.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         only allows notes through within a certain pitch range<br/><br/><b>wrap</b>: instead of rejecting notes outside of this range, should we wrap them to the range instead?<br/><b>max</b>: maximum pitch allowed<br/><b>min</b>: minimum pitch allowed<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         only allows notes through within a certain pitch range<br/><br/><b>max</b>: maximum pitch allowed<br/><b>min</b>: minimum pitch allowed<br/><b>wrap</b>: instead of rejecting notes outside of this range, should we wrap them to the range instead?<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=noteratchet></a></br>
          <b>noteratchet</b></br>
@@ -719,7 +747,7 @@ Key Commands
          <img src="screenshots/notestepper.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         output notes through a round robin of patch cables, to create sequential variety<br/><br/><b>reset</b>: reset to the start<br/><b>length</b>: length of the sequence<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         output notes through a round robin of patch cables, to create sequential variety<br/><br/><b>length</b>: length of the sequence<br/><b>reset</b>: reset to the start<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notestream></a></br>
          <b>notestream</b></br>
@@ -740,14 +768,14 @@ Key Commands
          <img src="screenshots/notetable.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         map a pitch (starting from zero) to a scale pitch<br/><br/><b>x offset</b>: x offset of attached grid controller<br/><b>rand pitch chance</b>: when clicking the random pitch button, what is the chance that a step gets changed?<br/><b>clear</b>: clear grid<br/><b>y offset</b>: y offset of attached grid controller<br/><b>tone*</b>: pitch for this column<br/><b>rand pitch range</b>: when clicking the random pitch button, how far will the pitch change?<br/><b>length</b>: the number of pitches<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>octave</b>: octave of the bottom pitch of this sequence<br/><b>random pitch</b>: randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.<br/><b>notemode</b>: which set of pitches should the rows represent?<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         map a pitch (starting from zero) to a scale pitch<br/><br/><b>clear</b>: clear grid<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>length</b>: the number of pitches<br/><b>notemode</b>: which set of pitches should the rows represent?<br/><b>octave</b>: octave of the bottom pitch of this sequence<br/><b>rand pitch chance</b>: when clicking the random pitch button, what is the chance that a step gets changed?<br/><b>rand pitch range</b>: when clicking the random pitch button, how far will the pitch change?<br/><b>random pitch</b>: randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.<br/><b>tone*</b>: pitch for this column<br/><b>x offset</b>: x offset of attached grid controller<br/><b>y offset</b>: y offset of attached grid controller<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=notewrap></a></br>
          <b>notewrap</b></br>
          <img src="screenshots/notewrap.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         wrap an input pitch to stay within a desired range<br/><br/><b>range</b>: number of semitones before wrapping back down to min pitch<br/><b>min</b>: bottom of pitch range<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         wrap an input pitch to stay within a desired range<br/><br/><b>min</b>: bottom of pitch range<br/><b>range</b>: number of semitones before wrapping back down to min pitch<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=pitchbender></a></br>
          <b>pitchbender</b></br>
@@ -768,14 +796,14 @@ Key Commands
          <img src="screenshots/pitchpanner.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         add pan modulation to notes based upon input pitch, so low pitches are panned in one direction and high pitches are panned in another<br/><br/><b>right</b>: pitch that represents full right pan<br/><b>left</b>: pitch that represents full left pan<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         add pan modulation to notes based upon input pitch, so low pitches are panned in one direction and high pitches are panned in another<br/><br/><b>left</b>: pitch that represents full left pan<br/><b>right</b>: pitch that represents full right pan<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=pitchremap></a></br>
          <b>pitchremap</b></br>
          <img src="screenshots/pitchremap.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         remap input pitches to different output pitches<br/><br/><b>to*</b>: desired pitch<br/><b>from*</b>: pitch to change<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         remap input pitches to different output pitches<br/><br/><b>from*</b>: pitch to change<br/><b>to*</b>: desired pitch<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=pitchsetter></a></br>
          <b>pitchsetter</b></br>
@@ -789,9 +817,9 @@ Key Commands
          <img src="screenshots/portamento.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         only allows one note to play at a time, and uses pitch bend to glide between notes<br/><br/><b>mode</b>: always: always glide to new notes
+         only allows one note to play at a time, and uses pitch bend to glide between notes<br/><br/><b>glide</b>: time to glide, in milliseconds<br/><b>mode</b>: always: always glide to new notes
 retrigger held: bend to notes if the prior note is held, and retrigger
-bend held: bend to notes if the prior note is held, without retriggering<br/><b>glide</b>: time to glide, in milliseconds<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+bend held: bend to notes if the prior note is held, without retriggering<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=pressure></a></br>
          <b>pressure</b></br>
@@ -812,7 +840,7 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <img src="screenshots/pressuretovibrato.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         takes midi pressure modulation input and changes it to vibrato, using pitch bend<br/><br/><b>vibrato</b>: amount of vibrato<br/><b>vibinterval</b>: vibrato speed<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         takes midi pressure modulation input and changes it to vibrato, using pitch bend<br/><br/><b>vibinterval</b>: vibrato speed<br/><b>vibrato</b>: amount of vibrato<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=previousnote></a></br>
          <b>previousnote</b></br>
@@ -828,12 +856,19 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <span style="display:inline-block;margin-left:50px;">
          delay inputs until the next quantization interval<br/><br/><b>quantize</b>: the quantization interval<br/><b>repeat</b>: when holding a note, should we repeat it every interval?<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
+         <a name=rhythmsequencer></a></br>
+         <b>rhythmsequencer</b></br>
+         <img src="screenshots/rhythmsequencer.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         repeats held input notes, to turn a sustained note into a rhythm<br/><br/><b>action *</b>: action for this step. on = play note, hold = sustain note, off = no note<br/><b>degree *</b>: scale degree offset for this step<br/><b>interval</b>: rate to play notes at<br/><b>len act</b>: length of the action column<br/><b>len deg</b>: length of the scale degree offset column<br/><b>len oct</b>: length of the octave offset column<br/><b>len vel</b>: length of the velocity column<br/><b>length</b>: length of the sequence<br/><b>link lengths</b>: should there be one global length, or a length for each column?<br/><b>octave *</b>: octave offset for this step<br/><b>vel *</b>: velocity for this step<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+      </span>
          <a name=scaledegree></a></br>
          <b>scaledegree</b></br>
          <img src="screenshots/scaledegree.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         transpose input based on current scale<br/><br/><b>retrigger</b>: immediately replay current notes when changing the transpose amount<br/><b>diatonic</b>: should we keep transposed notes in the scale?<br/><b>degree</b>: amount to transpose<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         transpose input based on current scale<br/><br/><b>degree</b>: amount to transpose<br/><b>diatonic</b>: should we keep transposed notes in the scale?<br/><b>retrigger</b>: immediately replay current notes when changing the transpose amount<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=scaledetect></a></br>
          <b>scaledetect</b></br>
@@ -854,7 +889,7 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <img src="screenshots/transposefrom.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         transpose input from a specified root to the root of the current scale. the primary usage of this would be to allow you to play a keyboard in C, but it gets transposed to the current scale.<br/><br/><b>root</b>: root to transpose from<br/><b>retrigger</b>: immediately replay current notes when changing the transpose root or the scale<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         transpose input from a specified root to the root of the current scale. the primary usage of this would be to allow you to play a keyboard in C, but it gets transposed to the current scale.<br/><br/><b>retrigger</b>: immediately replay current notes when changing the transpose root or the scale<br/><b>root</b>: root to transpose from<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=unstablemodwheel></a></br>
          <b>unstablemodwheel</b></br>
@@ -903,21 +938,28 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <img src="screenshots/velocitystepsequencer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         adjusts the velocity of incoming notes based upon a sequence<br/><br/><b>downbeat</b>: should we reset the sequence every downbeat?<br/><b>interval</b>: speed to advance sequence<br/><b>vel*</b>: velocity for this step<br/><b>len</b>: length of sequence<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         adjusts the velocity of incoming notes based upon a sequence<br/><br/><b>downbeat</b>: should we reset the sequence every downbeat?<br/><b>interval</b>: speed to advance sequence<br/><b>len</b>: length of sequence<br/><b>vel*</b>: velocity for this step<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=velocitytochance></a></br>
          <b>velocitytochance</b></br>
          <img src="screenshots/velocitytochance.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         use a note's velocity to determine the chance that the note plays<br/><br/><b>*</b>: generate a new random seed<br/><b>seed</b>: number that determines the random sequence<br/><b><</b>: go to next seed<br/><b>beat length</b>: restart the deterministic random sequence at this interval<br/><b>full velocity</b>: set velocity to full for notes that pass through<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         use a note's velocity to determine the chance that the note plays<br/><br/><b>*</b>: generate a new random seed<br/><b><</b>: go to previous seed<br/><b>></b>: go to next seed<br/><b>beat length</b>: restart the deterministic random sequence at this interval<br/><b>full velocity</b>: set velocity to full for notes that pass through<br/><b>seed</b>: number that determines the random sequence<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=vibrato></a></br>
          <b>vibrato</b></br>
          <img src="screenshots/vibrato.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         add rhythmic oscillating pitch bend to notes<br/><br/><b>vibrato</b>: amount of pitch bend to add<br/><b>vibinterval</b>: speed of pitch bend oscillation<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         add rhythmic oscillating pitch bend to notes<br/><br/><b>vibinterval</b>: speed of pitch bend oscillation<br/><b>vibrato</b>: amount of pitch bend to add<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+      </span>
+         <a name=voicesetter></a></br>
+         <b>voicesetter</b></br>
+         <img src="screenshots/voicesetter.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         set a specific Voice channel index for a note<br/><br/><b>voice index</b>: current set voice channel index<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=volcabeatscontrol></a></br>
          <b>volcabeatscontrol</b></br>
@@ -939,35 +981,35 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <img src="screenshots/beats.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         multi-loop player, for mixing sample layers together<br/><br/><b>double*</b>: enable this to play at double speed<br/><b>delete *</b>: remove the current sample from the list<br/><b>filter*</b>: layer filter. negative values bring in a low pass, positive values bring in a high pass.<br/><b>selector*</b>: which sample should we play in this slot? drag samples onto here to add them to this slot.<br/><b>pan*</b>: layer panorama<br/><b>volume*</b>: layer volume<br/><b>bars*</b>: how many measures long are the samples in this slot?<br/></br></br></br></br>
+         multi-loop player, for mixing sample layers together<br/><br/><b>bars*</b>: how many measures long are the samples in this slot?<br/><b>delete *</b>: remove the current sample from the list<br/><b>double*</b>: enable this to play at double speed<br/><b>filter*</b>: layer filter. negative values bring in a low pass, positive values bring in a high pass.<br/><b>pan*</b>: layer panorama<br/><b>selector*</b>: which sample should we play in this slot? drag samples onto here to add them to this slot.<br/><b>volume*</b>: layer volume<br/></br></br></br></br>
       </span>
          <a name=drumplayer></a></br>
          <b>drumplayer</b></br>
          <img src="screenshots/drumplayer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sample player intended for drum playback<br/><br/><b>shuffle</b>: random is samples, speeds, and pans<br/><b>hitcategory*</b>: folder to choose from, when clicking the "random" button. these folders are found in the data/drums/hits/ directory<br/><b>speed rnd</b>: global sample speed randomization amount<br/><b>test *</b>: play this sample<br/><b>quantize</b>: quantize input to this interval<br/><b>start *</b>: start offset percentage of sample<br/><b>speed</b>: global sample speed multiplier<br/><b>envelopedisplay *D</b>: envelope decay<br/><b>aud</b>: scroll to audition samples in the current pad's head category, or a directory last dropped onto a pad<br/><b>envelopedisplay *A</b>: envelope attack<br/><b>vol *</b>: volume of sample <br/><b>vol</b>: the output volume<br/><b>view ms *</b>: envelope view length in milliseconds<br/><b>envelopedisplay *R</b>: envelope release<br/><b>envelopedisplay *S</b>: envelope sustain<br/><b>random *</b>: choose a random sample from the selected hitcategory<br/><b>repeat</b>: if quantizing, should held notes repeat at that interval?<br/><b>widen *</b>: stereo delay of sample to create width<br/><b>grab *</b>: grab this sample<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>next *</b>: choose the next sample from the selected hitcategory<br/><b>envelope *</b>: should we apply a volume envelope to the sample?<br/><b>linkid *</b>: if linkid is not -1, silence any other sample with a matching linkid (useful for linking open and closed hats)<br/><b>edit</b>: show pads for editing<br/><b>mono</b>: force output to mono<br/><b>pan *</b>: stereo pan position of sample<br/><b>speed *</b>: speed of sample<br/><b>single out *</b>: should the sample have its own individual output?<br/><b>prev *</b>: choose the previous sample from the selected hitcategory<br/><b>full vel</b>: always play drum hits at full velocity<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         sample player intended for drum playback<br/><br/><b>aud</b>: scroll to audition samples in the current pad's head category, or a directory last dropped onto a pad<br/><b>edit</b>: show pads for editing<br/><b>envelope *</b>: should we apply a volume envelope to the sample?<br/><b>envelopedisplay *A</b>: envelope attack<br/><b>envelopedisplay *D</b>: envelope decay<br/><b>envelopedisplay *R</b>: envelope release<br/><b>envelopedisplay *S</b>: envelope sustain<br/><b>full vel</b>: always play drum hits at full velocity<br/><b>grab *</b>: grab this sample<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>hitcategory*</b>: folder to choose from, when clicking the "random" button. these folders are found in the data/drums/hits/ directory<br/><b>linkid *</b>: if linkid is not -1, silence any other sample with a matching linkid (useful for linking open and closed hats)<br/><b>mono</b>: force output to mono<br/><b>next *</b>: choose the next sample from the selected hitcategory<br/><b>pan *</b>: stereo pan position of sample<br/><b>prev *</b>: choose the previous sample from the selected hitcategory<br/><b>quantize</b>: quantize input to this interval<br/><b>random *</b>: choose a random sample from the selected hitcategory<br/><b>repeat</b>: if quantizing, should held notes repeat at that interval?<br/><b>shuffle</b>: random is samples, speeds, and pans<br/><b>single out *</b>: should the sample have its own individual output?<br/><b>single voice</b>: only play a single drum hit at once, choking all others out (as if they all shared the same linkid)<br/><b>speed</b>: global sample speed multiplier<br/><b>speed *</b>: speed of sample<br/><b>speed rnd</b>: global sample speed randomization amount<br/><b>start *</b>: start offset percentage of sample<br/><b>test *</b>: play this sample<br/><b>view ms *</b>: envelope view length in milliseconds<br/><b>vol</b>: the output volume<br/><b>vol *</b>: volume of sample <br/><b>widen *</b>: stereo delay of sample to create width<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=drumsynth></a></br>
          <b>drumsynth</b></br>
          <img src="screenshots/drumsynth.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         oscillator+noise drum synth<br/><br/><b>vol</b>: the output volume<br/><b>type*</b>: oscillator type<br/><b>cutoffmax*</b>: filter start cutoff frequency<br/><b>q*</b>: filter resonance<br/><b>freqmin*</b>: oscillator end frequency<br/><b>freqmax*</b>: oscillator start frequency<br/><b>oversampling</b>: oversampling amount. increases sound quality, but also increases cpu usage.<br/><b>vol*</b>: oscillator volume<br/><b>edit</b>: display parameters for each hit<br/><b>cutoffmin*</b>: filter end cutoff frequency<br/><b>noise*</b>: noise volume<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         oscillator+noise drum synth<br/><br/><b>cutoffmax*</b>: filter start cutoff frequency<br/><b>cutoffmin*</b>: filter end cutoff frequency<br/><b>edit</b>: display parameters for each hit<br/><b>freqmax*</b>: oscillator start frequency<br/><b>freqmin*</b>: oscillator end frequency<br/><b>noise*</b>: noise volume<br/><b>oversampling</b>: oversampling amount. increases sound quality, but also increases cpu usage.<br/><b>q*</b>: filter resonance<br/><b>type*</b>: oscillator type<br/><b>vol</b>: the output volume<br/><b>vol*</b>: oscillator volume<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=fmsynth></a></br>
          <b>fmsynth</b></br>
          <img src="screenshots/fmsynth.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         polyphonic fm synthesis<br/><br/><b>harmratio</b>: harmonic ratio of first-order modulator to input pitch<br/><b>vol</b>: the output volume<br/><b>tweak</b>: multiplier to harmonic ratio for first-order modulator<br/><b>tweak2</b>: multiplier to harmonic ratio for second-order modulator<br/><b>mod2</b>: amount to modulate second-order modulator<br/><b>mod</b>: amount to modulate first-order modulator<br/><b>harmratio2</b>: harmonic ratio of second-order modulator to input pitch<br/><b>phase1</b>: phase offset for first-order modulator<br/><b>phase0</b>: phase offset for base oscillator<br/><b>phase2</b>: phase offset for second-order modulator<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         polyphonic fm synthesis<br/><br/><b>harmratio</b>: harmonic ratio of first-order modulator to input pitch<br/><b>harmratio2</b>: harmonic ratio of second-order modulator to input pitch<br/><b>mod</b>: amount to modulate first-order modulator<br/><b>mod2</b>: amount to modulate second-order modulator<br/><b>phase0</b>: phase offset for base oscillator<br/><b>phase1</b>: phase offset for first-order modulator<br/><b>phase2</b>: phase offset for second-order modulator<br/><b>tweak</b>: multiplier to harmonic ratio for first-order modulator<br/><b>tweak2</b>: multiplier to harmonic ratio for second-order modulator<br/><b>vol</b>: the output volume<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=karplusstrong></a></br>
          <b>karplusstrong</b></br>
          <img src="screenshots/karplusstrong.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         polyphonic plucked string physical modeling synth<br/><br/><b>x freq</b>: frequency of excitation audio<br/><b>vel2vol</b>: how much velocity should affect voice volume<br/><b>feedback</b>: amount of feedback for resonance<br/><b>vol</b>: output volume<br/><b>invert</b>: should the feedback invert?<br/><b>x att</b>: fade in time for excitation audio<br/><b>filter</b>: amount to filter resonance<br/><b>pitchtone</b>: adjust how pitch influences filter amount. a value of zero gives even filtering across the entire pitch range, higher values filter high pitches less, low values filter low pitches less.<br/><b>x dec</b>: fade out time for excitation audio<br/><b>source type</b>: audio to use for excitation<br/><b>lite cpu</b>: only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.<br/><b>vel2env</b>: how much velocity should affect excitation attack time<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         polyphonic plucked string physical modeling synth<br/><br/><b>feedback</b>: amount of feedback for resonance<br/><b>filter</b>: amount to filter resonance<br/><b>invert</b>: should the feedback invert?<br/><b>lite cpu</b>: only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.<br/><b>pitchtone</b>: adjust how pitch influences filter amount. a value of zero gives even filtering across the entire pitch range, higher values filter high pitches less, low values filter low pitches less.<br/><b>source type</b>: audio to use for excitation<br/><b>vel2env</b>: how much velocity should affect excitation attack time<br/><b>vel2vol</b>: how much velocity should affect voice volume<br/><b>vol</b>: output volume<br/><b>x att</b>: fade in time for excitation audio<br/><b>x dec</b>: fade out time for excitation audio<br/><b>x freq</b>: frequency of excitation audio<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=metronome></a></br>
          <b>metronome</b></br>
@@ -981,48 +1023,48 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <img src="screenshots/oscillator.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         polyphonic enveloped oscillator. modulations (with MPE support): modwheel closes filter further (if filter is enabled), pressure decreases detune amount<br/><br/><b>unison</b>: how many oscillators to play for one note<br/><b>envfilterA</b>: filter envelope attack<br/><b>shuffle</b>: stretches and squeezes every other cycle of the waveform<br/><b>envfilterD</b>: filter envelope decay<br/><b>envS</b>: volume envelope sustain<br/><b>envR</b>: volume envelope release<br/><b>sync</b>: turns on "sync" mode, to reset the phase at syncf's frequency<br/><b>soften</b>: soften edges of square and saw waveforms<br/><b>envfilterS</b>: filter envelope sustain<br/><b>envfilterR</b>: filter envelope release<br/><b>osc</b>: oscillator type<br/><b>envA</b>: volume envelope attack<br/><b>envD</b>: volume envelope decay<br/><b>vel2vol</b>: how much should the input velocity affect the output volume?<br/><b>pw</b>: pulse width (or shape for non-square waves)<br/><b>width</b>: controls how voices are panned with unison is greater than 1<br/><b>vol</b>: this oscillator's volume<br/><b>syncf</b>: frequency to reset the phase, when "sync" is enabled<br/><b>lite cpu</b>: only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.<br/><b>fmax</b>: frequency cutoff of lowpass filter at the max of the envelope. set this slider to the max to disable the filter<br/><b>phase</b>: phase offset of oscillator, and phase offset between unison voices. useful to patch into with a very fast modulator, to achieve phase modulation.<br/><b>vel2env</b>: how much should the input velocity affect the speed of the volume and filter envelopes?<br/><b>mult</b>: multiply frequency of incoming pitch<br/><b>adsr len</b>: view length of ADSR controls<br/><b>q</b>: resonance of lowpass filter<br/><b>detune</b>: when unison is 1, detunes oscillator by this amount. when unison is 2, one oscillator is tuned normally and the other is detuned by this amount. when unison is >2, oscillators are randomly detuned within this range.<br/><b>fmin</b>: frequency cutoff of lowpass filter at the min of the envelope<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         polyphonic enveloped oscillator. modulations (with MPE support): modwheel closes filter further (if filter is enabled), pressure decreases detune amount<br/><br/><b>adsr len</b>: view length of ADSR controls<br/><b>detune</b>: when unison is 1, detunes oscillator by this amount. when unison is 2, one oscillator is tuned normally and the other is detuned by this amount. when unison is >2, oscillators are randomly detuned within this range.<br/><b>envA</b>: volume envelope attack<br/><b>envD</b>: volume envelope decay<br/><b>envR</b>: volume envelope release<br/><b>envS</b>: volume envelope sustain<br/><b>envfilterA</b>: filter envelope attack<br/><b>envfilterD</b>: filter envelope decay<br/><b>envfilterR</b>: filter envelope release<br/><b>envfilterS</b>: filter envelope sustain<br/><b>fmax</b>: frequency cutoff of lowpass filter at the max of the envelope. set this slider to the max to disable the filter<br/><b>fmin</b>: frequency cutoff of lowpass filter at the min of the envelope<br/><b>lite cpu</b>: only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.<br/><b>mult</b>: multiply frequency of incoming pitch<br/><b>osc</b>: oscillator type<br/><b>phase</b>: phase offset of oscillator, and phase offset between unison voices. useful to patch into with a very fast modulator, to achieve phase modulation.<br/><b>pw</b>: pulse width (or shape for non-square waves)<br/><b>q</b>: resonance of lowpass filter<br/><b>shuffle</b>: stretches and squeezes every other cycle of the waveform<br/><b>soften</b>: soften edges of square and saw waveforms<br/><b>syncf</b>: frequency to reset the phase, when "syncmode" is set to "freq"<br/><b>syncmode</b>: turns on sync mode, to reset the phase at a specified frequency<br/><b>syncratio</b>: ratio of oscillator frequency to reset the phase, when "syncmode" is set to "ratio"<br/><b>unison</b>: how many oscillators to play for one note<br/><b>vel2env</b>: how much should the input velocity affect the speed of the volume and filter envelopes?<br/><b>vel2vol</b>: how much should the input velocity affect the output volume?<br/><b>vol</b>: this oscillator's volume<br/><b>width</b>: controls how voices are panned with unison is greater than 1<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=samplecanvas></a></br>
          <b>samplecanvas</b></br>
          <img src="screenshots/samplecanvas.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sample arranging view<br/><br/><b>scrollv</b>: vertical scrollbar<br/><b>canvas</b>: canvas of samples. drag and drop samples onto here. canvas controls:
+         sample arranging view<br/><br/><b>canvas</b>: canvas of samples. drag and drop samples onto here. canvas controls:
 -hold shift and drag a sample to duplicate
 -hold alt to drag a sample without snapping
 -hold ctrl while dragging to snap to an interval
 -hold shift and scroll to zoom
 -hold alt and grab empty space to move slide the canvas view
--hold ctrl and grab empty space to zoom the canvas view<br/><b>interval</b>: grid subdivision interval<br/><b>drag mode</b>: direction that elements can be dragged<br/><b>timeline</b>: control loop points<br/><b>clear</b>: delete all elements<br/><b>measures</b>: length of canvas in measures<br/><b>view rows</b>: number of visible rows<br/><b>scrollh</b>: horizontal scrollbar<br/><b>delete</b>: delete highlighted elements<br/></br></br></br></br>
+-hold ctrl and grab empty space to zoom the canvas view<br/><b>clear</b>: delete all elements<br/><b>delete</b>: delete highlighted elements<br/><b>drag mode</b>: direction that elements can be dragged<br/><b>interval</b>: grid subdivision interval<br/><b>measures</b>: length of canvas in measures<br/><b>scrollh</b>: horizontal scrollbar<br/><b>scrollv</b>: vertical scrollbar<br/><b>timeline</b>: control loop points<br/><b>view rows</b>: number of visible rows<br/></br></br></br></br>
       </span>
          <a name=sampleplayer></a></br>
          <b>sampleplayer</b></br>
          <img src="screenshots/sampleplayer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sample playback with triggerable cue points, clip extraction, and youtube search/download functionality. resize this module larger to access additional features. if you have a youtube URL in your clipboard, a button will appear to allow you to download the audio.<br/><br/><b>load</b>: show a file chooser to load a sample<br/><b>trim</b>: discard all audio outside the current zoom range<br/><b>select played</b>: when true, any cue point played via incoming notes will become the current cue<br/><b>cue len</b>: length in seconds of the current cue. a value of zero will play to the end of the sample.<br/><b>append to rec</b>: when recording, append to the previous recording, rather than clearing the sample first<br/><b>cue start</b>: start point in seconds of the current cue<br/><b>play cue</b>: play the current cue<br/><b>threshold</b>: volume threshold to open up the gate for recording<br/><b>speed</b>: current playback speed<br/><b>pause</b>: pause playing and leave playhead where it is<br/><b>cue stop</b>: stop playing this cue if a note-off is received<br/><b>attack</b>: speed at which gate blends open<br/><b>4</b>: auto-slice 4 slices<br/><b>8</b>: auto-slice 8 slices<br/><b>save</b>: save this sample to a file<br/><b>playhovered</b>: play this cue<br/><b>play</b>: start playing from the current playhead<br/><b>click sets cue</b>: when true, clicking on the waveform will set the start position of the current cue<br/><b>stop</b>: stop playing and reset playhead<br/><b>volume</b>: output gain<br/><b>searchresult*</b>: click to download this youtube search result. downloading long videos may take a while.<br/><b>record as clips</b>: when recording, only record when there is enough input to open the gate, and mark up each recorded segment with cue points<br/><b>grabhovered</b>: grab a sample of this cue to drop onto another module<br/><b>cuepoint</b>: sets the current cue to edit<br/><b>yt:</b>: search youtube for this string<br/><b>16</b>: auto-slice 16 slices<br/><b>32</b>: auto-slice 32 slices<br/><b>youtube</b>: download the audio of the youtube URL currently on your clipboard<br/><b>record</b>: record audio input into our sample buffer. clears the current sample.<br/><b>cue speed</b>: playback speed of the current cue<br/><b>release</b>: speed at which gate blends closed<br/><b>show grid</b>: show a quarter note grid (when zoomed in far enough)<br/><b>loop</b>: wrap playhead to beginning when it reaches end<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         sample playback with triggerable cue points, clip extraction, and youtube search/download functionality. resize this module larger to access additional features. if you have a youtube URL in your clipboard, a button will appear to allow you to download the audio.<br/><br/><b>16</b>: auto-slice 16 slices<br/><b>32</b>: auto-slice 32 slices<br/><b>4</b>: auto-slice 4 slices<br/><b>8</b>: auto-slice 8 slices<br/><b>append to rec</b>: when recording, append to the previous recording, rather than clearing the sample first<br/><b>attack</b>: speed at which gate blends open<br/><b>click sets cue</b>: when true, clicking on the waveform will set the start position of the current cue<br/><b>cue len</b>: length in seconds of the current cue. a value of zero will play to the end of the sample.<br/><b>cue speed</b>: playback speed of the current cue<br/><b>cue start</b>: start point in seconds of the current cue<br/><b>cue stop</b>: stop playing this cue if a note-off is received<br/><b>cuepoint</b>: sets the current cue to edit<br/><b>grabhovered</b>: grab a sample of this cue to drop onto another module<br/><b>load</b>: show a file chooser to load a sample<br/><b>loop</b>: wrap playhead to beginning when it reaches end<br/><b>pause</b>: pause playing and leave playhead where it is<br/><b>play</b>: start playing from the current playhead<br/><b>play cue</b>: play the current cue<br/><b>playhovered</b>: play this cue<br/><b>record</b>: record audio input into our sample buffer. clears the current sample.<br/><b>record as clips</b>: when recording, only record when there is enough input to open the gate, and mark up each recorded segment with cue points<br/><b>release</b>: speed at which gate blends closed<br/><b>save</b>: save this sample to a file<br/><b>searchresult*</b>: click to download this youtube search result. downloading long videos may take a while.<br/><b>select played</b>: when true, any cue point played via incoming notes will become the current cue<br/><b>show grid</b>: show a quarter note grid (when zoomed in far enough)<br/><b>speed</b>: current playback speed<br/><b>stop</b>: stop playing and reset playhead<br/><b>threshold</b>: volume threshold to open up the gate for recording<br/><b>trim</b>: discard all audio outside the current zoom range<br/><b>volume</b>: output gain<br/><b>youtube</b>: download the audio of the youtube URL currently on your clipboard<br/><b>yt:</b>: search youtube for this string<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=sampler></a></br>
          <b>sampler</b></br>
          <img src="screenshots/sampler.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         very basic polyphonic pitched sample player and recorder. send audio in, and use note input to play the recorded audio.<br/><br/><b>envS</b>: volume envelope sustain<br/><b>envR</b>: volume envelope release<br/><b>pitch</b>: should we attempt pitch-correct the audio?<br/><b>vol</b>: output volume<br/><b>thresh</b>: when recording is enabled, exceed this threshold with input audio to begin recording<br/><b>env</b>: volume envelope<br/><b>passthrough</b>: should input audio pass through as we're recording?<br/><b>rec</b>: enable to clear the current recording, and record new audio once the input threshold is reached<br/><b>envA</b>: volume envelope attack<br/><b>envD</b>: volume envelope decay<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         very basic polyphonic pitched sample player and recorder. send audio in, and use note input to play the recorded audio.<br/><br/><b>env</b>: volume envelope<br/><b>envA</b>: volume envelope attack<br/><b>envD</b>: volume envelope decay<br/><b>envR</b>: volume envelope release<br/><b>envS</b>: volume envelope sustain<br/><b>passthrough</b>: should input audio pass through as we're recording?<br/><b>pitch</b>: should we attempt pitch-correct the audio?<br/><b>rec</b>: enable to clear the current recording, and record new audio once the input threshold is reached<br/><b>thresh</b>: when recording is enabled, exceed this threshold with input audio to begin recording<br/><b>vol</b>: output volume<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=seaofgrain></a></br>
          <b>seaofgrain</b></br>
          <img src="screenshots/seaofgrain.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         granular synth, playable with sliders or MPE input<br/><br/><b>load</b>: load a sample file<br/><b>pos r *</b>: randomization of grain start point<br/><b>pos *</b>: position of this voice within the sample<br/><b>speed r *</b>: randomization of grain speed<br/><b>pan *</b>: stereo panorama of grain placement<br/><b>offset</b>: where to start view of the sample<br/><b>speed *</b>: speed of grain playback<br/><b>keyboard num pitches</b>: amount of pitches to assign across the sample<br/><b>volume</b>: output volume<br/><b>len ms *</b>: length of each grain in milliseconds<br/><b>overlap *</b>: number of overlapping grains<br/><b>spacing r*</b>: randomization of time between grains<br/><b>display length</b>: amount of sample to view<br/><b>gain *</b>: volume of this voice<br/><b>keyboard base pitch</b>: midi pitch that represents the start of the sample<br/><b>octaves *</b>: should we add octaves and fifths?<br/><b>width *</b>: stereo width of grain placement<br/><b>record</b>: record input as the granular buffer, to use seaofgrain a live granular delay<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         granular synth, playable with sliders or MPE input<br/><br/><b>display length</b>: amount of sample to view<br/><b>gain *</b>: volume of this voice<br/><b>keyboard base pitch</b>: midi pitch that represents the start of the sample<br/><b>keyboard num pitches</b>: amount of pitches to assign across the sample<br/><b>len ms *</b>: length of each grain in milliseconds<br/><b>load</b>: load a sample file<br/><b>octaves *</b>: should we add octaves and fifths?<br/><b>offset</b>: where to start view of the sample<br/><b>overlap *</b>: number of overlapping grains<br/><b>pan *</b>: stereo panorama of grain placement<br/><b>pos *</b>: position of this voice within the sample<br/><b>pos r *</b>: randomization of grain start point<br/><b>record</b>: record input as the granular buffer, to use seaofgrain a live granular delay<br/><b>spacing r*</b>: randomization of time between grains<br/><b>speed *</b>: speed of grain playback<br/><b>speed r *</b>: randomization of grain speed<br/><b>volume</b>: output volume<br/><b>width *</b>: stereo width of grain placement<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=signalgenerator></a></br>
          <b>signalgenerator</b></br>
          <img src="screenshots/signalgenerator.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         basic oscillator signal. send a note into it to set the frequency, and send a pulse to reset the phase.<br/><br/><b>syncf</b>: frequency to reset the phase, when "sync" is enabled<br/><b>shuffle</b>: stretches and squeezes every other cycle of the waveform<br/><b>pw</b>: pulse width (or shape for non-square waves)<br/><b>slider</b>: slider to interpolate between last two input pitches<br/><b>vol</b>: output volume<br/><b>ramp</b>: amount of time to ramp to input frequency<br/><b>sync</b>: turns on "sync" mode, to reset the phase at syncf's frequency<br/><b>freq mode</b>: what mode should we use for input notes? "instant" changes to the input note's frequency instantly, "ramp" ramps to the frequency over time, and "slider" allows you to use a slider to interpolate between the last two input notes<br/><b>soften</b>: soften edges of square and saw waveforms<br/><b>detune</b>: amount to detune from specified frequency<br/><b>phase</b>: phase offset<br/><b>freq</b>: signal frequency<br/><b>osc</b>: oscillator type<br/><b>mult</b>: multiplier for frequency<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+         basic oscillator signal. send a note into it to set the frequency, and send a pulse to reset the phase.<br/><br/><b>detune</b>: amount to detune from specified frequency<br/><b>freq</b>: signal frequency<br/><b>freq mode</b>: what mode should we use for input notes? "instant" changes to the input note's frequency instantly, "ramp" ramps to the frequency over time, and "slider" allows you to use a slider to interpolate between the last two input notes<br/><b>mult</b>: multiplier for frequency<br/><b>osc</b>: oscillator type<br/><b>phase</b>: phase offset<br/><b>pw</b>: pulse width (or shape for non-square waves)<br/><b>ramp</b>: amount of time to ramp to input frequency<br/><b>shuffle</b>: stretches and squeezes every other cycle of the waveform<br/><b>slider</b>: slider to interpolate between last two input pitches<br/><b>soften</b>: soften edges of square and saw waveforms<br/><b>syncf</b>: frequency to reset the phase, when "syncmode" is set to "freq"<br/><b>syncmode</b>: turns on sync mode, to reset the phase at a specified frequency<br/><b>syncratio</b>: ratio of oscillator frequency to reset the phase, when "syncmode" is set to "ratio"<br/><b>vol</b>: output volume<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <h2>audio effects</h2>
          <a name=audiometer></a></br>
@@ -1039,12 +1081,19 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <span style="display:inline-block;margin-left:50px;">
          selector for switching where audio is routed to. connect to targets to add them to the list.<br/><br/><b>route</b>: audio destination<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
+         <a name=audiosplitter></a></br>
+         <b>audiosplitter</b></br>
+         <img src="screenshots/audiosplitter.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         send an audio signal to multiple destinations<br/><br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+      </span>
          <a name=buffershuffler></a></br>
          <b>buffershuffler</b></br>
          <img src="screenshots/buffershuffler.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         use notes to play back slices of a constantly-recording live input buffer. input notes trigger slices, with the pitch mapping to slice index. you can also click with a mouse to trigger slices.<br/><br/><b>freeze input</b>: retain the current buffer, without writing in new input<br/><b>playback style</b>: how to play clicked slices. or, with input notes, velocity range determines playback style.<br/><b>interval</b>: slice size<br/><b>num bars</b>: number of bars to capture<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         use notes to play back slices of a constantly-recording live input buffer. input notes trigger slices, with the pitch mapping to slice index. you can also click with a mouse to trigger slices.<br/><br/><b>fourtet</b>: use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this "fourtetified" audio.<br/><b>fourtetslices</b>: chunk size to use for "fourtet" effect<br/><b>freeze input</b>: retain the current buffer, without writing in new input<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>interval</b>: slice size<br/><b>num bars</b>: number of bars to capture<br/><b>playback style</b>: how to play clicked slices. or, with input notes, velocity range determines playback style.<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=dcoffset></a></br>
          <b>dcoffset</b></br>
@@ -1058,14 +1107,14 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <img src="screenshots/effectchain.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         container to hold a list of effects, applied in series. the effects can be easily reordered with the < and > buttons, and deleted with the x button. hold shift to expose a x button for all effects.<br/><br/><b>spawn</b>: spawn the currently highlighted effect<br/><b>volume</b>: output gain<br/><b>effect</b>: select which effect to add<br/><b>exit effect</b>: on push2, back effect control out to the main effectchain controls<br/><b>mix*</b>: wet/dry slider for this effect<br/><b>x</b>: delete this effect<br/><b><</b>: move this effect to earlier in the chain<br/><b>></b>: move this effect to later in the chain<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         container to hold a list of effects, applied in series. the effects can be easily reordered with the < and > buttons, and deleted with the x button. hold shift to expose a x button for all effects.<br/><br/><b><</b>: move this effect to earlier in the chain<br/><b>></b>: move this effect to later in the chain<br/><b>effect</b>: select which effect to add<br/><b>exit effect</b>: on push2, back effect control out to the main effectchain controls<br/><b>mix*</b>: wet/dry slider for this effect<br/><b>spawn</b>: spawn the currently highlighted effect<br/><b>volume</b>: output gain<br/><b>x</b>: delete this effect<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=eq></a></br>
          <b>eq</b></br>
          <img src="screenshots/eq.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         multi-band equalizer, to adjust output levels at frequency ranges<br/><br/><b>q*</b>: resonance for this band<br/><b>f*</b>: frequency cutoff for this band<br/><b>enabled*</b>: enable this band?<br/><b>g*</b>: gain for this band<br/><b>type*</b>: what type of filter should this band use<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         multi-band equalizer, to adjust output levels at frequency ranges<br/><br/><b>enabled*</b>: enable this band?<br/><b>f*</b>: frequency cutoff for this band<br/><b>g*</b>: gain for this band<br/><b>q*</b>: resonance for this band<br/><b>type*</b>: what type of filter should this band use<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=feedback></a></br>
          <b>feedback</b></br>
@@ -1079,7 +1128,7 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <img src="screenshots/fftvocoder.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         FFT-based vocoder<br/><br/><b>cut</b>: how many bass partials to remove<br/><b>phase off</b>: how much we should offset the phase of the carrier signal's partials<br/><b>whisper</b>: how much the carrier signal partial's phases should be randomized, which affects how whispery the output sound is<br/><b>dry/wet</b>: how much original input vs vocoded signal to output<br/><b>volume</b>: output gain<br/><b>fric thresh</b>: fricative detection sensitivity, to switch between using the carrier signal and white noise for vocoding<br/><b>carrier</b>: carrier signal gain<br/><b>input</b>: input signal gain<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         FFT-based vocoder<br/><br/><b>carrier</b>: carrier signal gain<br/><b>cut</b>: how many bass partials to remove<br/><b>dry/wet</b>: how much original input vs vocoded signal to output<br/><b>fric thresh</b>: fricative detection sensitivity, to switch between using the carrier signal and white noise for vocoding<br/><b>input</b>: input signal gain<br/><b>phase off</b>: how much we should offset the phase of the carrier signal's partials<br/><b>volume</b>: output gain<br/><b>whisper</b>: how much the carrier signal partial's phases should be randomized, which affects how whispery the output sound is<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=freqdelay></a></br>
          <b>freqdelay</b></br>
@@ -1121,14 +1170,14 @@ bend held: bend to notes if the prior note is held, without retriggering<br/><b>
          <img src="screenshots/looper.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         loop input audio. use with a "looperrecorder" for full functionality.<br/><br/><b>fourtet</b>: use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this "fourtetified" audio.<br/><b>.5x</b>: make loop play at half speed<br/><b>mute</b>: silence this looper<br/><b>passthrough</b>: should we pass incoming audio through to the output? turn off to mute incoming audio.<br/><b>pitch</b>: amount to pitch shift looper output<br/><b>apply</b>: shift the contents of the looper so the current offset is the start of the buffer<br/><b>scr</b>: allow loop to be scratched by adjusting "scrspd"<br/><b>decay</b>: amount to lower volume each loop<br/><b>write</b>: write input audio to loop buffer<br/><b>swap</b>: swap the contents of this looper and with another. click this button on two loopers to swap them.<br/><b>save</b>: save this loop to a wav file<br/><b> m </b>: take the contents of this looper and merge it into another. click this button on the merge source, then on the merge target.<br/><b>extend</b>: make loop twice as long<br/><b>capture</b>: when the next loop begins, record input for the duration of the loop<br/><b>auto</b>: should pitch shift auto-adjust as the transport tempo adjusts?<br/><b>undo</b>: undo last loop commit<br/><b>offset</b>: amount to offset looper's playhead from transport position<br/><b>copy</b>: take the contents of this looper and copy it onto another. click this button on the copy source, then on the copy target.<br/><b>num bars</b>: loop length in measures<br/><b>resample for tempo</b>: this button appears when the current global tempo no longer matches the tempo that the buffer was recorded at. click this to resample the buffer to match the new tempo.<br/><b>volume</b>: output volume<br/><b>b</b>: bake current volume into waveform<br/><b>clear</b>: clear the loop audio<br/><b>2x</b>: make loop play at double speed<br/><b>scrspd</b>: playback speed, used with "scr" is enabled. modulate quickly for a vinyl-like scratching effect.<br/><b>fourtetslices</b>: chunk size to use for "fourtet" effect<br/><b>commit</b>: commit the current looperrecorder buffer to this loop<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         loop input audio. use with a "looperrecorder" for full functionality.<br/><br/><b> m </b>: take the contents of this looper and merge it into another. click this button on the merge source, then on the merge target.<br/><b>.5x</b>: make loop play at half speed<br/><b>2x</b>: make loop play at double speed<br/><b>apply</b>: shift the contents of the looper so the current offset is the start of the buffer<br/><b>auto</b>: should pitch shift auto-adjust as the transport tempo adjusts?<br/><b>b</b>: bake current volume into waveform<br/><b>capture</b>: when the next loop begins, record input for the duration of the loop<br/><b>clear</b>: clear the loop audio<br/><b>commit</b>: commit the current looperrecorder buffer to this loop<br/><b>copy</b>: take the contents of this looper and copy it onto another. click this button on the copy source, then on the copy target.<br/><b>decay</b>: amount to lower volume each loop<br/><b>extend</b>: make loop twice as long<br/><b>fourtet</b>: use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this "fourtetified" audio.<br/><b>fourtetslices</b>: chunk size to use for "fourtet" effect<br/><b>mute</b>: silence this looper<br/><b>num bars</b>: loop length in measures<br/><b>offset</b>: amount to offset looper's playhead from transport position<br/><b>passthrough</b>: should we pass incoming audio through to the output? turn off to mute incoming audio.<br/><b>pitch</b>: amount to pitch shift looper output<br/><b>resample for tempo</b>: this button appears when the current global tempo no longer matches the tempo that the buffer was recorded at. click this to resample the buffer to match the new tempo.<br/><b>save</b>: save this loop to a wav file<br/><b>scr</b>: allow loop to be scratched by adjusting "scrspd"<br/><b>scrspd</b>: playback speed, used with "scr" is enabled. modulate quickly for a vinyl-like scratching effect.<br/><b>swap</b>: swap the contents of this looper and with another. click this button on two loopers to swap them.<br/><b>undo</b>: undo last loop commit<br/><b>volume</b>: output volume<br/><b>write</b>: write input audio to loop buffer<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=looperrecorder></a></br>
          <b>looperrecorder</b></br>
          <img src="screenshots/looperrecorder.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         command center to manage recording into multiple loopers, and allow retroactive loop capture (i.e., always-on recording)<br/><br/><b>orig speed</b>: reset looper to tempo that loops were recorded at<br/><b>target</b>: looper to commit audio to when using the on-buffer capture buttons to the left<br/><b>2xtempo</b>: double global transport tempo, while keeping connected loopers sounding the same<br/><b>cancel free rec</b>: if "free rec" is enabled, cancel recording without setting the loop length<br/><b>clear</b>: clear the recorded buffer<br/><b>snap to pitch</b>: snap tempo to nearest value that matches a key<br/><b>1</b>: capture the last measure to the currently-targeted looper<br/><b>length</b>: length in measures to use when connected loopers use the "commit" button<br/><b>2</b>: capture the last 2 measures to the currently-targeted looper<br/><b>free rec</b>: enable to start recording a loop with no predetermined length. disable to end recording, adjust global transport to match the loop length, and switch the recorder's mode to "loop"<br/><b>4</b>: capture the last 4 measures to the currently-targeted looper<br/><b>resample</b>: resample all connected loopers to new tempo<br/><b>.5tempo</b>: halve global transport tempo, while keeping connected loopers sounding the same<br/><b>resample & set key</b>: snap tempo to nearest value that matches a key (based upon the current key and the tempo change), resample all connected loopers to that new tempo, and change global scale to the new key<br/><b>8</b>: capture the last 8 measures to the currently-targeted looper<br/><b>auto-advance</b>: automatically advance to the next looper when committing<br/><b>mode</b>: recorder mode: use "record" to record input and allow it to be committed to buffers when you're ready to loop, use "overdub" to record input and play the loop at our specified length, and use "loop" to play the current loop without adding input<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         command center to manage recording into multiple loopers, and allow retroactive loop capture (i.e., always-on recording)<br/><br/><b>.5tempo</b>: halve global transport tempo, while keeping connected loopers sounding the same<br/><b>1</b>: capture the last measure to the currently-targeted looper<br/><b>2</b>: capture the last 2 measures to the currently-targeted looper<br/><b>2xtempo</b>: double global transport tempo, while keeping connected loopers sounding the same<br/><b>4</b>: capture the last 4 measures to the currently-targeted looper<br/><b>8</b>: capture the last 8 measures to the currently-targeted looper<br/><b>auto-advance</b>: automatically advance to the next looper when committing<br/><b>cancel free rec</b>: if "free rec" is enabled, cancel recording without setting the loop length<br/><b>clear</b>: clear the recorded buffer<br/><b>free rec</b>: enable to start recording a loop with no predetermined length. disable to end recording, adjust global transport to match the loop length, and switch the recorder's mode to "loop"<br/><b>length</b>: length in measures to use when connected loopers use the "commit" button<br/><b>mode</b>: recorder mode: use "record" to record input and allow it to be committed to buffers when you're ready to loop, use "overdub" to record input and play the loop at our specified length, and use "loop" to play the current loop without adding input<br/><b>orig speed</b>: reset looper to tempo that loops were recorded at<br/><b>resample</b>: resample all connected loopers to new tempo<br/><b>resample & set key</b>: snap tempo to nearest value that matches a key (based upon the current key and the tempo change), resample all connected loopers to that new tempo, and change global scale to the new key<br/><b>snap to pitch</b>: snap tempo to nearest value that matches a key<br/><b>target</b>: looper to commit audio to when using the on-buffer capture buttons to the left<br/><b>write*</b>: writes to this looper, with a loop length matching the nearest power of 2 (1, 2, 4, 8, etc) of how long this checkbox was enabled<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=looperrewriter></a></br>
          <b>looperrewriter</b></br>
@@ -1144,7 +1193,7 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/multitapdelay.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         delay with multiple tap points<br/><br/><b>dry</b>: how much dry signal to allow through<br/><b>pan *</b>: stereo pan for this tap<br/><b>delay *</b>: tap delay time, in milliseconds<br/><b>display length</b>: length of buffer display, in seconds<br/><b>feedback *</b>: how much delayed audio from this tap should feed back in to the input<br/><b>gain *</b>: tap delay amount<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         delay with multiple tap points<br/><br/><b>delay *</b>: tap delay time, in milliseconds<br/><b>display length</b>: length of buffer display, in seconds<br/><b>dry</b>: how much dry signal to allow through<br/><b>feedback *</b>: how much delayed audio from this tap should feed back in to the input<br/><b>gain *</b>: tap delay amount<br/><b>pan *</b>: stereo pan for this tap<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=output></a></br>
          <b>output</b></br>
@@ -1158,21 +1207,21 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/panner.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         pan audio left and right. also, converts a mono input to a stereo output.<br/><br/><b>widen</b>: delay a channel by this many samples. results in a pan-like effect where the sound seems to come from from a direction.<br/><b>pan</b>: amount to send signal to the left and right channels. a value of 0 is centered.<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         pan audio left and right. also, converts a mono input to a stereo output.<br/><br/><b>pan</b>: amount to send signal to the left and right channels. a value of 0 is centered.<br/><b>widen</b>: delay a channel by this many samples. results in a pan-like effect where the sound seems to come from from a direction.<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=ringmodulator></a></br>
          <b>ringmodulator</b></br>
          <img src="screenshots/ringmodulator.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         modulate a signal's amplitude at a frequency<br/><br/><b>volume</b>: volume output<br/><b>freq</b>: frequency to use. can also be set by patching a note input into this module.<br/><b>dry/wet</b>: how much of the original audio to use vs modulated audio<br/><b>glide</b>: how long an input note should take to glide to the desired frequency<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         modulate a signal's amplitude at a frequency<br/><br/><b>dry/wet</b>: how much of the original audio to use vs modulated audio<br/><b>freq</b>: frequency to use. can also be set by patching a note input into this module.<br/><b>glide</b>: how long an input note should take to glide to the desired frequency<br/><b>volume</b>: volume output<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=samplergrid></a></br>
          <b>samplergrid</b></br>
          <img src="screenshots/samplergrid.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         record input onto pads, and play back the pads. intended to be used with an 64-pad grid controller.<br/><br/><b>vol</b>: the output volume<br/><b>end</b>: sample end<br/><b>edit</b>: enable controls to adjust recorded sample for last pressed grid square<br/><b>passthrough</b>: should the incoming audio pass through to the output?<br/><b>clear</b>: when enabled, clears any pressed grid squares<br/><b>start</b>: sample start<br/><b>duplicate</b>: what enabled, duplicates last pressed sample onto any pressed grid squares<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         record input onto pads, and play back the pads. intended to be used with an 64-pad grid controller.<br/><br/><b>clear</b>: when enabled, clears any pressed grid squares<br/><b>duplicate</b>: what enabled, duplicates last pressed sample onto any pressed grid squares<br/><b>edit</b>: enable controls to adjust recorded sample for last pressed grid square<br/><b>end</b>: sample end<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>passthrough</b>: should the incoming audio pass through to the output?<br/><b>start</b>: sample start<br/><b>vol</b>: the output volume<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=send></a></br>
          <b>send</b></br>
@@ -1207,14 +1256,14 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/stutter.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         captures and stutters input<br/><br/><b>free length</b>: length in seconds for "free" stutter mode<br/><b>reverse</b>: reversed half note stutter<br/><b>half speed</b>: stutter at half speed, low pitched<br/><b>ramp in</b>: stutter with speed climbing up from zero to one<br/><b>triplets</b>: stutter on a triplet interval<br/><b>32nd</b>: 32nd note stutter<br/><b>64th</b>: 64th note stutter<br/><b>tumble up</b>: accelerating stutter<br/><b>half note</b>: half note stutter<br/><b>tumble down</b>: decelerating stutter<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>free</b>: stutter with the settings specified by the following sliders<br/><b>dotted eighth</b>: stutter on a dotted eighth interval<br/><b>free speed</b>: rate for "free" stutter mode<br/><b>double speed</b>: stutter at double speed, high pitched<br/><b>quarter</b>: quarter note stutter<br/><b>ramp out</b>: stutter with speed quickly falling to zero<br/><b>16th</b>: 16th note stutter<br/><b>8th</b>: 8th note stutter<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         captures and stutters input<br/><br/><b>16th</b>: 16th note stutter<br/><b>32nd</b>: 32nd note stutter<br/><b>64th</b>: 64th note stutter<br/><b>8th</b>: 8th note stutter<br/><b>dotted eighth</b>: stutter on a dotted eighth interval<br/><b>double speed</b>: stutter at double speed, high pitched<br/><b>free</b>: stutter with the settings specified by the following sliders<br/><b>free length</b>: length in seconds for "free" stutter mode<br/><b>free speed</b>: rate for "free" stutter mode<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>half note</b>: half note stutter<br/><b>half speed</b>: stutter at half speed, low pitched<br/><b>quarter</b>: quarter note stutter<br/><b>ramp in</b>: stutter with speed climbing up from zero to one<br/><b>ramp out</b>: stutter with speed quickly falling to zero<br/><b>reverse</b>: reversed half note stutter<br/><b>triplets</b>: stutter on a triplet interval<br/><b>tumble down</b>: decelerating stutter<br/><b>tumble up</b>: accelerating stutter<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=vocoder></a></br>
          <b>vocoder</b></br>
          <img src="screenshots/vocoder.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         frequency band-based vocoder. this must be paired with a "vocodercarrier" module. voice should be routed into this module, and a synth should be patched into the vocodercarrier.<br/><br/><b>volume</b>: output gain<br/><b>max band</b>: volume limit for each frequency band<br/><b>bands</b>: how many frequency bands to use<br/><b>spacing</b>: how frequency bands should be spaced<br/><b>f base</b>: frequency for lowest band<br/><b>q</b>: resonance of the bands<br/><b>mix</b>: how much original input vs vocoded signal to output<br/><b>carrier</b>: carrier signal gain<br/><b>f range</b>: frequency range to highest band<br/><b>input</b>: input signal gain<br/><b>ring</b>: how long it should take the bands to "cool down"<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         frequency band-based vocoder. this must be paired with a "vocodercarrier" module. voice should be routed into this module, and a synth should be patched into the vocodercarrier.<br/><br/><b>bands</b>: how many frequency bands to use<br/><b>carrier</b>: carrier signal gain<br/><b>f base</b>: frequency for lowest band<br/><b>f range</b>: frequency range to highest band<br/><b>input</b>: input signal gain<br/><b>max band</b>: volume limit for each frequency band<br/><b>mix</b>: how much original input vs vocoded signal to output<br/><b>q</b>: resonance of the bands<br/><b>ring</b>: how long it should take the bands to "cool down"<br/><b>spacing</b>: how frequency bands should be spaced<br/><b>volume</b>: output gain<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=vocodercarrier></a></br>
          <b>vocodercarrier</b></br>
@@ -1228,14 +1277,14 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/waveformviewer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         waveform display<br/><br/><b>length</b>: number of samples to capture<br/><b>draw gain</b>: adjust waveform display scale<br/><b>freq</b>: frequency to sync display to. gets automatically set if you patch a note input into this module<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
+         waveform display<br/><br/><b>draw gain</b>: adjust waveform display scale<br/><b>freq</b>: frequency to sync display to. gets automatically set if you patch a note input into this module<br/><b>length</b>: number of samples to capture<br/><br/>accepts: <font color=orange>notes</font> <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=waveshaper></a></br>
          <b>waveshaper</b></br>
          <img src="screenshots/waveshaper.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         waveshaping with expressions<br/><br/><b>a</b>: variable to use in expressions<br/><b>c</b>: variable to use in expressions<br/><b>b</b>: variable to use in expressions<br/><b>e</b>: variable to use in expressions<br/><b>d</b>: variable to use in expressions<br/><b>rescale</b>: rescales input before feeding it into expression<br/><b>y=</b>: waveshaping expression. try something like "x+sin(x*pi*a)". available variables: a,b,c,d,e = the sliders below. t = time. x1,x2,y1,y2 = biquad state storage.<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         waveshaping with expressions<br/><br/><b>a</b>: variable to use in expressions<br/><b>b</b>: variable to use in expressions<br/><b>c</b>: variable to use in expressions<br/><b>d</b>: variable to use in expressions<br/><b>e</b>: variable to use in expressions<br/><b>rescale</b>: rescales input before feeding it into expression<br/><b>y=</b>: waveshaping expression. try something like "x+sin(x*pi*a)". available variables: a,b,c,d,e = the sliders below. t = time. x1,x2,y1,y2 = biquad state storage.<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <h2>modulators</h2>
          <a name=accum></a></br>
@@ -1243,7 +1292,7 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/accum.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         accumulate a value over time<br/><br/><b>velocity</b>: amount to accumulate<br/><b>value</b>: output value<br/></br></br></br></br>
+         accumulate a value over time<br/><br/><b>value</b>: output value<br/><b>velocity</b>: amount to accumulate<br/></br></br></br></br>
       </span>
          <a name=add></a></br>
          <b>add</b></br>
@@ -1264,14 +1313,21 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/audiotocv.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         use an audio signal to modulate a control. allow for audio-rate modulation, to achieve effects such as FM.<br/><br/><b>max</b>: maximum output value<br/><b>gain</b>: multiply incoming audio<br/><b>min</b>: minimum output value<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         use an audio signal to modulate a control. allow for audio-rate modulation, to achieve effects such as FM.<br/><br/><b>gain</b>: multiply incoming audio<br/><b>max</b>: maximum output value<br/><b>min</b>: minimum output value<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+      </span>
+         <a name=controlrecorder></a></br>
+         <b>controlrecorder</b></br>
+         <img src="screenshots/controlrecorder.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         record and play back changes made to a control<br/><br/><b>clear</b>: clear the recording<br/><b>length</b>: the interval to quantize to<br/><b>quantize</b>: should we quantize playback to a specified rhythmic interval?<br/><b>record</b>: should we be recording input? playback starts after the recording is complete<br/><b>speed</b>: speed up or slow down playback<br/></br></br></br></br>
       </span>
          <a name=controlsequencer></a></br>
          <b>controlsequencer</b></br>
          <img src="screenshots/controlsequencer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         modulate a control step-wise at an interval<br/><br/><b>random</b>: randomize sequence values<br/><b>length</b>: length of the sequence<br/><b>interval</b>: rate to advance<br/><b>step *</b>: value for this step<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+         modulate a control step-wise at an interval<br/><br/><b>interval</b>: rate to advance<br/><b>length</b>: length of the sequence<br/><b>random</b>: randomize sequence values<br/><b>record</b>: record targeted value to steps<br/><b>step *</b>: value for this step<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=curve></a></br>
          <b>curve</b></br>
@@ -1287,33 +1343,40 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <span style="display:inline-block;margin-left:50px;">
          modulate a value over time with a looping curve<br/><br/><b>length</b>: length of the loop<br/><b>randomize</b>: create a random curve<br/></br></br></br></br>
       </span>
+         <a name=dataprovider></a></br>
+         <b>dataprovider</b></br>
+         <img src="screenshots/dataprovider.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         provides modulation values normally not easily accessible.<br/><br/><b>interval</b>: the interval to measure<br/><b>realtime</b>: if enabled this module will work on the audio thread which is more accurate but also more resource intense<br/><b>set</b>: click here to send the value (or, send a pulse to this module for the same result)<br/><b>type</b>: the type of value to provide<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+      </span>
          <a name=envelope></a></br>
          <b>envelope</b></br>
          <img src="screenshots/envelope.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         modulate a value with a triggered envelope<br/><br/><b>has sustain</b>: should this envelope have a sustain stage?<br/><b>adsrD</b>: envelope decay<br/><b>adsrA</b>: envelope attack<br/><b>use velocity</b>: should envelope output be scaled by input velocity?<br/><b>max sustain</b>: what's the maximum length of the sustain, in milliseconds? a value of -1 indicates no maximum<br/><b>sustain stage</b>: which step of the envelope should have the sustain?<br/><b>high</b>: output high value<br/><b>length</b>: length of envelope display<br/><b>low</b>: output low value<br/><b>adsrS</b>: envelope sustain<br/><b>adsrR</b>: envelope release<br/><b>adsr</b>: envelope view<br/><b>advanced</b>: switch to advanced envelope editor (allows for a more complicated envelope than just an ADSR). double-click on an advanced envelope line to add stages, right click on points to remove them, drag on lines to bend them.<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+         modulate a value with a triggered envelope<br/><br/><b>adsr</b>: envelope view<br/><b>adsrA</b>: envelope attack<br/><b>adsrD</b>: envelope decay<br/><b>adsrR</b>: envelope release<br/><b>adsrS</b>: envelope sustain<br/><b>advanced</b>: switch to advanced envelope editor (allows for a more complicated envelope than just an ADSR). double-click on an advanced envelope line to add stages, right click on points to remove them, drag on lines to bend them.<br/><b>has sustain</b>: should this envelope have a sustain stage?<br/><b>high</b>: output high value<br/><b>length</b>: length of envelope display<br/><b>low</b>: output low value<br/><b>max sustain</b>: what's the maximum length of the sustain, in milliseconds? a value of -1 indicates no maximum<br/><b>sustain stage</b>: which step of the envelope should have the sustain?<br/><b>use velocity</b>: should envelope output be scaled by input velocity?<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=expression></a></br>
          <b>expression</b></br>
          <img src="screenshots/expression.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         shape modulation with a text-based mathematical expression<br/><br/><b>a</b>: variable to use in expressions<br/><b>c</b>: variable to use in expressions<br/><b>b</b>: variable to use in expressions<br/><b>e</b>: variable to use in expressions<br/><b>d</b>: variable to use in expressions<br/><b>y=</b>: expression to modify input. try something like "x+sin(x*pi*a)". available variables: a,b,c,d,e = the sliders below. t = time.<br/><b>input</b>: input to use as x variable<br/></br></br></br></br>
+         shape modulation with a text-based mathematical expression<br/><br/><b>a</b>: variable to use in expressions<br/><b>b</b>: variable to use in expressions<br/><b>c</b>: variable to use in expressions<br/><b>d</b>: variable to use in expressions<br/><b>e</b>: variable to use in expressions<br/><b>input</b>: input to use as x variable<br/><b>y=</b>: expression to modify input. try something like "x+sin(x*pi*a)". available variables: a,b,c,d,e = the sliders below. t = time.<br/></br></br></br></br>
       </span>
          <a name=fubble></a></br>
          <b>fubble</b></br>
          <img src="screenshots/fubble.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         draw on an X/Y pad and replay the drawing to modulate values. based on a concept proposed by olivia jack<br/><br/><b>mutate amount</b>: amount to affect drawing by perlin noise field<br/><b>mutate warp</b>: scale of perlin noise field<br/><b>speed</b>: speed up or slow down playback<br/><b>clear</b>: clear the drawing<br/><b>quantize</b>: should we quantize playback to a specified rhythmic interval?<br/><b>length</b>: the interval to quantize to<br/><b>mutate noise</b>: rate to move through perlin noise field<br/><b>reseed</b>: jump to a different location in the perlin noise field<br/></br></br></br></br>
+         draw on an X/Y pad and replay the drawing to modulate values. based on a concept proposed by olivia jack<br/><br/><b>clear</b>: clear the drawing<br/><b>length</b>: the interval to quantize to<br/><b>mutate amount</b>: amount to affect drawing by perlin noise field<br/><b>mutate noise</b>: rate to move through perlin noise field<br/><b>mutate warp</b>: scale of perlin noise field<br/><b>quantize</b>: should we quantize playback to a specified rhythmic interval?<br/><b>reseed</b>: jump to a different location in the perlin noise field<br/><b>speed</b>: speed up or slow down playback<br/></br></br></br></br>
       </span>
          <a name=gravity></a></br>
          <b>gravity</b></br>
          <img src="screenshots/gravity.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         make a modulation value rise and fall with physics<br/><br/><b>kick amt</b>: the amount of upward force to apply when kicking<br/><b>drag</b>: the resistance force to apply opposite the velocity<br/><b>gravity</b>: the gravitational force to apply downwards<br/><b>kick</b>: click to apply kick force (or, pulse this module for the same result)<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         make a modulation value rise and fall with physics<br/><br/><b>drag</b>: the resistance force to apply opposite the velocity<br/><b>gravity</b>: the gravitational force to apply downwards<br/><b>kick</b>: click to apply kick force (or, pulse this module for the same result)<br/><b>kick amt</b>: the amount of upward force to apply when kicking<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=gridsliders></a></br>
          <b>gridsliders</b></br>
@@ -1327,21 +1390,21 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/leveltocv.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         output a modulation value based on the level of incoming audio<br/><br/><b>release</b>: decay from the input level at this rate<br/><b>max</b>: output when level is one<br/><b>attack</b>: rise to the input level at this rate<br/><b>gain</b>: multiply the input audio by this value<br/><b>min</b>: output when level is zero<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         output a modulation value based on the level of incoming audio<br/><br/><b>attack</b>: rise to the input level at this rate<br/><b>gain</b>: multiply the input audio by this value<br/><b>max</b>: output when level is one<br/><b>min</b>: output when level is zero<br/><b>release</b>: decay from the input level at this rate<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=lfo></a></br>
          <b>lfo</b></br>
          <img src="screenshots/lfo.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         modulates a slider with a low-frequency oscillator<br/><br/><b>enable</b>: turn on/off modulation<br/><b>shuffle</b>: adjust the waveoform to have a fast and slow cycle<br/><b>pin</b>: make LFO window remain visible<br/><b>interval</b>: length of oscillation period<br/><b>soften</b>: smooth out the hard edges of square and saw waveforms<br/><b>high</b>: output value at waveform's high point<br/><b>free rate</b>: rate of oscillator running in non-clock-synced time<br/><b>length</b>: proportion of time that should be spent on the waveform cycle<br/><b>bias</b>: bias the waveform towards the low or high point<br/><b>low</b>: output value at waveform's low point<br/><b>offset</b>: phase offset, to make oscillation earlier/later<br/><b>lite cpu</b>: only recalculate some parameters once per buffer, to reduce CPU load. can sound worse in some scenarios, especially with rapid modulation.<br/><b>osc</b>: type of oscillation waveform<br/><b>spread</b>: spread the waveform out to be closer to the low and high points<br/></br></br></br></br>
+         modulates a slider with a low-frequency oscillator<br/><br/><b>bias</b>: bias the waveform towards the low or high point<br/><b>enable</b>: turn on/off modulation<br/><b>free rate</b>: rate of oscillator running in non-clock-synced time<br/><b>high</b>: output value at waveform's high point<br/><b>interval</b>: length of oscillation period<br/><b>length</b>: proportion of time that should be spent on the waveform cycle<br/><b>lite cpu</b>: only recalculate some parameters once per buffer, to reduce CPU load. can sound worse in some scenarios, especially with rapid modulation.<br/><b>low</b>: output value at waveform's low point<br/><b>offset</b>: phase offset, to make oscillation earlier/later<br/><b>osc</b>: type of oscillation waveform<br/><b>pin</b>: make LFO window remain visible<br/><b>shuffle</b>: adjust the waveoform to have a fast and slow cycle<br/><b>soften</b>: smooth out the hard edges of square and saw waveforms<br/><b>spread</b>: spread the waveform out to be closer to the low and high points<br/></br></br></br></br>
       </span>
          <a name=macroslider></a></br>
          <b>macroslider</b></br>
          <img src="screenshots/macroslider.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         take a value and send scaled versions of that value to multiple destinations<br/><br/><b>start*</b>: the output value at the bottom of the input's range<br/><b>input</b>: the input value. intended to be a modulation patch target.<br/><b>end*</b>: the output value at the top of the input's range<br/></br></br></br></br>
+         take a value and send scaled versions of that value to multiple destinations<br/><br/><b>end*</b>: the output value at the top of the input's range<br/><b>input</b>: the input value. intended to be a modulation patch target.<br/><b>start*</b>: the output value at the bottom of the input's range<br/></br></br></br></br>
       </span>
          <a name=modwheeltocv></a></br>
          <b>modwheeltocv</b></br>
@@ -1385,6 +1448,13 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <span style="display:inline-block;margin-left:50px;">
          convert an input pitch to a speed ratio. you could use this to control a sample's playback speed and make it playable with a keyboard.<br/><br/><b>ref freq</b>: the output is the input frequency divided by this number<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
+         <a name=pitchtovalue></a></br>
+         <b>pitchtovalue</b></br>
+         <img src="screenshots/pitchtovalue.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         output midi pitch value<br/><br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+      </span>
          <a name=pressuretocv></a></br>
          <b>pressuretocv</b></br>
          <img src="screenshots/pressuretocv.png">
@@ -1397,7 +1467,7 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/ramper.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         blend a control to a specified value over a specified time<br/><br/><b>start</b>: begin blending (or, send a pulse to this module for the same result)<br/><b>length</b>: length of time to blend over<br/><b>target</b>: the value to arrive at when the ramp is over<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         blend a control to a specified value over a specified time<br/><br/><b>length</b>: length of time to blend over<br/><b>start</b>: begin blending (or, send a pulse to this module for the same result)<br/><b>target</b>: the value to arrive at when the ramp is over<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=smoother></a></br>
          <b>smoother</b></br>
@@ -1418,14 +1488,14 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/valuesetter.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         set a specified value on a targeted control<br/><br/><b>slider</b>: value to set<br/><b>set</b>: click here to send the value (or, send a pulse to this module for the same result)<br/><b>value</b>: value to set<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         set a specified value on a targeted control<br/><br/><b>set</b>: click here to send the value (or, send a pulse to this module for the same result)<br/><b>slider</b>: value to set<br/><b>value</b>: value to set<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=velocitytocv></a></br>
          <b>velocitytocv</b></br>
          <img src="screenshots/velocitytocv.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         take a note's velocity and convert it to a modulation value<br/><br/><b>max</b>: output for velocity 127<br/><b>0 at note off</b>: output zero when note is released<br/><b>min</b>: output for velocity 0<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         take a note's velocity and convert it to a modulation value<br/><br/><b>0 at note off</b>: output zero when note is released<br/><b>max</b>: output for velocity 127<br/><b>min</b>: output for velocity 0<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=vinylcontrol></a></br>
          <b>vinylcontrol</b></br>
@@ -1468,7 +1538,7 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/pulsechance.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         randomly allow pulses through, based on chance<br/><br/><b>deterministic</b>: allow for randomness to be repeated over an interval<br/><b>chance</b>: chance that pulses are allowed through<br/><b>*</b>: generate a new random seed<br/><b>seed</b>: number that determines the random sequence. send reset pulses to restart the deterministic random sequence.<br/><b><</b>: go to next seed<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         randomly allow pulses through, based on chance<br/><br/><b>*</b>: generate a new random seed<br/><b><</b>: go to previous seed<br/><b>></b>: go to next seed<br/><b>chance</b>: chance that pulses are allowed through<br/><b>deterministic</b>: allow for randomness to be repeated over an interval<br/><b>seed</b>: number that determines the random sequence. send reset pulses to restart the deterministic random sequence.<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=pulsedelayer></a></br>
          <b>pulsedelayer</b></br>
@@ -1503,28 +1573,42 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/pulsehocket.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sends pulses to randomized destinations<br/><br/><b>weight *</b>: chance that pulse goes to this destination<br/><b>*</b>: generate a new random seed<br/><b>seed</b>: number that determines the random sequence. send reset pulses to restart the deterministic random sequence.<br/><b><</b>: go to next seed<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         sends pulses to randomized destinations<br/><br/><b>*</b>: generate a new random seed<br/><b><</b>: go to previous seed<br/><b>></b>: go to next seed<br/><b>seed</b>: number that determines the random sequence. send reset pulses to restart the deterministic random sequence.<br/><b>weight *</b>: chance that pulse goes to this destination<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+      </span>
+         <a name=pulselimit></a></br>
+         <b>pulselimit</b></br>
+         <img src="screenshots/pulselimit.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         limit the number of pulses allowed to pass through<br/><br/><b>limit</b>: limit number of pulses to pass through<br/><b>reset</b>: reset the counter of seen pulses<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=pulser></a></br>
          <b>pulser</b></br>
          <img src="screenshots/pulser.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         send pulse messages at an interval<br/><br/><b>reset</b>: length of sequence before sending reset pulse<br/><b>interval</b>: rate to send pulses<br/><b>random</b>: tell pulsed modules to randomize their position<br/><b>t</b>: pulse interval in milliseconds<br/><b>offset</b>: pulse time offset, in fractions of the interval<br/><b>div</b>: measure division, when using "div" as the interval<br/><b>timemode</b>: when to send downbeat pulses, or set to "free" for pulses not locked to the transport<br/></br></br></br></br>
+         send pulse messages at an interval<br/><br/><b>div</b>: measure division, when using "div" as the interval<br/><b>interval</b>: rate to send pulses<br/><b>offset</b>: pulse time offset, in fractions of the interval<br/><b>random</b>: tell pulsed modules to randomize their position<br/><b>reset</b>: length of sequence before sending reset pulse<br/><b>restart</b>: restart timer on "free" counter<br/><b>t</b>: pulse interval in milliseconds<br/><b>timemode</b>: when to send downbeat pulses, or set to "free" for pulses not locked to the transport<br/></br></br></br></br>
+      </span>
+         <a name=pulserouter></a></br>
+         <b>pulserouter</b></br>
+         <img src="screenshots/pulserouter.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         allows you to control where pulses are routed to using a UI control. to add destinations to the list, patch them as a target<br/><br/><b>route</b>: the pulserouter's destination module<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=pulsesequence></a></br>
          <b>pulsesequence</b></br>
          <img src="screenshots/pulsesequence.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         defines a looping sequence of pulses<br/><br/><b>length</b>: length of the sequence<br/><b>interval</b>: length of each step within the sequence<br/><b><</b>: shift sequence to the left<br/><b>></b>: shift sequence to the right<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         defines a looping sequence of pulses<br/><br/><b> - </b>: advance the sequence backwards<br/><b>+</b>: advance the sequence forward<br/><b><</b>: shift sequence to the left<br/><b>></b>: shift sequence to the right<br/><b>interval</b>: length of each step within the sequence<br/><b>length</b>: length of the sequence<br/><b>pulse</b>: when enabled will send out pulses as per sequence when advancing with the buttons<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <a name=pulsetrain></a></br>
          <b>pulsetrain</b></br>
          <img src="screenshots/pulsetrain.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         defines a list of pulses to execute, once pulsed<br/><br/><b>length</b>: length of the sequence<br/><b>interval</b>: length of each step within the sequence<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
+         defines a list of pulses to execute, once pulsed<br/><br/><b>interval</b>: length of each step within the sequence<br/><b>length</b>: length of the sequence<br/><br/>accepts: <font color=yellow>pulses</font> <br/></br></br></br></br>
       </span>
          <h2>effect chain</h2>
          <a name=basiceq></a></br>
@@ -1539,7 +1623,7 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/biquad.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         filter using biquad formula<br/><br/><b>Q</b>: resonance<br/><b>type</b>: filter type<br/><b>G</b>: gain<br/><b>F</b>: frequency cutoff<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         filter using biquad formula<br/><br/><b>F</b>: frequency cutoff<br/><b>G</b>: gain<br/><b>Q</b>: resonance<br/><b>type</b>: filter type<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=bitcrush></a></br>
          <b>bitcrush</b></br>
@@ -1553,14 +1637,14 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/butterworth.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         filter using the butterworth formula<br/><br/><b>Q</b>: resonance<br/><b>F</b>: frequency cutoff<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         filter using the butterworth formula<br/><br/><b>F</b>: frequency cutoff<br/><b>Q</b>: resonance<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=compressor></a></br>
          <b>compressor</b></br>
          <img src="screenshots/compressor.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         try to keep volume at a certain level<br/><br/><b>ratio</b>: how much gain reduction to apply when the single passes the threshold<br/><b>lookahead</b>: how much time to "look ahead" to adjust the compression envelope. this necessarily introduces a delay into your output, which could be compensated for by running sequencers slightly early.<br/><b>drive</b>: rescale input to affect how much compression affects it<br/><b>mix</b>: amount of compression. lower this value for a "parallel compression" effect. you should use this mix slider instead of the effectchain's mix slider, to compensate for lookahead.<br/><b>attack</b>: speed to apply gain reduction<br/><b>threshold</b>: threshold where gain should start to be reduced<br/><b>release</b>: speed to remove gain reduction<br/><b>output</b>: makeup gain, to increase volume<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         try to keep volume at a certain level<br/><br/><b>attack</b>: speed to apply gain reduction<br/><b>drive</b>: rescale input to affect how much compression affects it<br/><b>lookahead</b>: how much time to "look ahead" to adjust the compression envelope. this necessarily introduces a delay into your output, which could be compensated for by running sequencers slightly early.<br/><b>mix</b>: amount of compression. lower this value for a "parallel compression" effect. you should use this mix slider instead of the effectchain's mix slider, to compensate for lookahead.<br/><b>output</b>: makeup gain, to increase volume<br/><b>ratio</b>: how much gain reduction to apply when the single passes the threshold<br/><b>release</b>: speed to remove gain reduction<br/><b>threshold</b>: threshold where gain should start to be reduced<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=dcremover></a></br>
          <b>dcremover</b></br>
@@ -1574,21 +1658,21 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/delay.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         echoing delay<br/><br/><b>dry</b>: should the dry signal pass through, or just the delayed signal?<br/><b>short</b>: shortcut to shrink the range of the delay slider, to allow for audible-rate delays and comb filter sounds<br/><b>feedback</b>: should the output audio feed back into the delay?<br/><b>invert</b>: should the delayed audio have its signal inverted? this can give a different sound, and also cancel out DC offset to prevent it from accumulating with feedback.<br/><b>interval</b>: sets delay length to a musical duration<br/><b>delay</b>: delay in milliseconds<br/><b>amount</b>: amount of delay that returns<br/><b>input</b>: should we accept input into the delay?<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         echoing delay<br/><br/><b>amount</b>: amount of delay that returns<br/><b>delay</b>: delay in milliseconds<br/><b>dry</b>: should the dry signal pass through, or just the delayed signal?<br/><b>feedback</b>: should the output audio feed back into the delay?<br/><b>input</b>: should we accept input into the delay?<br/><b>interval</b>: sets delay length to a musical duration<br/><b>invert</b>: should the delayed audio have its signal inverted? this can give a different sound, and also cancel out DC offset to prevent it from accumulating with feedback.<br/><b>short</b>: shortcut to shrink the range of the delay slider, to allow for audible-rate delays and comb filter sounds<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=distortion></a></br>
          <b>distortion</b></br>
          <img src="screenshots/distortion.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         waveshaping distortion<br/><br/><b>preamp</b>: signal gain before feeding into distortion<br/><b>fuzz</b>: push input signal off-center to distort asymmetrically<br/><b>type</b>: style of distortion to apply<br/><b>clip</b>: cutoff point of distortion, lower values result in more extreme distortion<br/><b>center input</b>: remove dc offset from input signal to distort in a more controlled way<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         waveshaping distortion<br/><br/><b>center input</b>: remove dc offset from input signal to distort in a more controlled way<br/><b>clip</b>: cutoff point of distortion, lower values result in more extreme distortion<br/><b>fuzz</b>: push input signal off-center to distort asymmetrically<br/><b>preamp</b>: signal gain before feeding into distortion<br/><b>type</b>: style of distortion to apply<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=freeverb></a></br>
          <b>freeverb</b></br>
          <img src="screenshots/freeverb.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         reverb using the "freeverb" algorithm<br/><br/><b>dry</b>: amount of untouched signal<br/><b>room size</b>: controls the length of the reverb, a higher value means longer reverb<br/><b>damp</b>: high frequency attenuation; a value of zero means all frequencies decay at the same rate, while higher settings will result in a faster decay of the high frequency range<br/><b>width</b>: stereo width of reverb<br/><b>wet</b>: amount of reverb signal<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         reverb using the "freeverb" algorithm<br/><br/><b>damp</b>: high frequency attenuation; a value of zero means all frequencies decay at the same rate, while higher settings will result in a faster decay of the high frequency range<br/><b>dry</b>: amount of untouched signal<br/><b>room size</b>: controls the length of the reverb, a higher value means longer reverb<br/><b>wet</b>: amount of reverb signal<br/><b>width</b>: stereo width of reverb<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=gainstage></a></br>
          <b>gainstage</b></br>
@@ -1602,14 +1686,14 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/gate.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         only allow signal in when it's above a certain threshold. useful to eliminate line noise, or just as an effect.<br/><br/><b>release</b>: speed at which gate blends closed<br/><b>threshold</b>: volume threshold to open up the gate<br/><b>attack</b>: speed at which gate blends open<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         only allow signal in when it's above a certain threshold. useful to eliminate line noise, or just as an effect.<br/><br/><b>attack</b>: speed at which gate blends open<br/><b>release</b>: speed at which gate blends closed<br/><b>threshold</b>: volume threshold to open up the gate<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=granulator></a></br>
          <b>granulator</b></br>
          <img src="screenshots/granulator.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         granulate live input<br/><br/><b>dry</b>: amount of dry signal to allow through<br/><b>spd r</b>: randomization of grain speed<br/><b>g oct</b>: should we add octaves and fifths?<br/><b>pos r</b>: randomization of grain start point<br/><b>pos</b>: playback position within the buffer<br/><b>autocapture</b>: freeze input at this interval<br/><b>spa r</b>: randomization of time between grains<br/><b>width</b>: stereo width of grain placement<br/><b>overlap</b>: number of overlapping grains<br/><b>frz</b>: freeze the current recorded buffer<br/><b>speed</b>: speed of grain playback<br/><b>len ms</b>: length of each grain in milliseconds<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         granulate live input<br/><br/><b>autocapture</b>: freeze input at this interval<br/><b>dry</b>: amount of dry signal to allow through<br/><b>frz</b>: freeze the current recorded buffer<br/><b>g oct</b>: should we add octaves and fifths?<br/><b>len ms</b>: length of each grain in milliseconds<br/><b>overlap</b>: number of overlapping grains<br/><b>pos</b>: playback position within the buffer<br/><b>pos r</b>: randomization of grain start point<br/><b>spa r</b>: randomization of time between grains<br/><b>spd r</b>: randomization of grain speed<br/><b>speed</b>: speed of grain playback<br/><b>width</b>: stereo width of grain placement<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=muter></a></br>
          <b>muter</b></br>
@@ -1623,28 +1707,28 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/noisify.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         multiply input signal by white noise<br/><br/><b>width</b>: how frequently a new noise sample should be chosen<br/><b>amount</b>: amount of noise to apply<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         multiply input signal by white noise<br/><br/><b>amount</b>: amount of noise to apply<br/><b>width</b>: how frequently a new noise sample should be chosen<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=pitchshift></a></br>
          <b>pitchshift</b></br>
          <img src="screenshots/pitchshift.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         shifts a signal's pitch<br/><br/><b>ratioselector</b>: shortcuts to useful pitch ratios<br/><b>ratio</b>: amount to pitchshift by (a value of 1 indicates no shift)<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         shifts a signal's pitch<br/><br/><b>ratio</b>: amount to pitchshift by (a value of 1 indicates no shift)<br/><b>ratioselector</b>: shortcuts to useful pitch ratios<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=pumper></a></br>
          <b>pumper</b></br>
          <img src="screenshots/pumper.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         dip the volume of a signal rhythmically, to emulate a "pumping sidechain" effect<br/><br/><b>length</b>: length of pump<br/><b>amount</b>: amount to lower volume<br/><b>interval</b>: the rate to pump<br/><b>curve</b>: how the volume returns<br/><b>attack</b>: how sharply the volume drops<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         dip the volume of a signal rhythmically, to emulate a "pumping sidechain" effect<br/><br/><b>amount</b>: amount to lower volume<br/><b>attack</b>: how sharply the volume drops<br/><b>curve</b>: how the volume returns<br/><b>interval</b>: the rate to pump<br/><b>length</b>: length of pump<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <a name=tremolo></a></br>
          <b>tremolo</b></br>
          <img src="screenshots/tremolo.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         modulate signal's volume rhythmically<br/><br/><b>duty</b>: pulse width of LFO<br/><b>amount</b>: amount to lower volume<br/><b>interval</b>: speed of LFO<br/><b>osc</b>: LFO oscillator type<br/><b>offset</b>: offsets LFO phase<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
+         modulate signal's volume rhythmically<br/><br/><b>amount</b>: amount to lower volume<br/><b>duty</b>: pulse width of LFO<br/><b>interval</b>: speed of LFO<br/><b>offset</b>: offsets LFO phase<br/><b>osc</b>: LFO oscillator type<br/><br/>accepts: <font color=cyan>audio</font> <br/></br></br></br></br>
       </span>
          <h2>other</h2>
          <a name=abletonlink></a></br>
@@ -1652,21 +1736,21 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/abletonlink.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         synchronizes transport with software and devices that support ableton link<br/><br/><b>reset next downbeat</b>: resets measure count on the next downbeat, to help synchronize to desired phase in session<br/><b>offset ms</b>: offset in milliseconds to tweak synchronization<br/></br></br></br></br>
+         synchronizes transport with software and devices that support ableton link<br/><br/><b>offset ms</b>: offset in milliseconds to tweak synchronization<br/><b>reset next downbeat</b>: resets measure count on the next downbeat, to help synchronize to desired phase in session<br/></br></br></br></br>
       </span>
          <a name=clockin></a></br>
          <b>clockin</b></br>
          <img src="screenshots/clockin.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         reads in clock pulses from external midi devices to control bespoke's transport<br/><br/><b>device</b>: device to receive from<br/><b>rounding</b>: precision to round incoming tempo data<br/><b>start offset ms</b>: offset in milliseconds to tweak synchronization between bespoke and gear<br/><b>smoothing</b>: how much to smooth incoming tempo<br/></br></br></br></br>
+         reads in clock pulses from external midi devices to control bespoke's transport<br/><br/><b>device</b>: device to receive from<br/><b>rounding</b>: precision to round incoming tempo data<br/><b>smoothing</b>: how much to smooth incoming tempo<br/><b>start offset ms</b>: offset in milliseconds to tweak synchronization between bespoke and gear<br/></br></br></br></br>
       </span>
          <a name=clockout></a></br>
          <b>clockout</b></br>
          <img src="screenshots/clockout.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sends out clock pulses to synchronize external midi devices<br/><br/><b>device</b>: device to target<br/><b>send start</b>: send a signal to reset the gear to the start of its sequence<br/><b>multiplier</b>: tempo multiplier for how the gear should respond to the signals<br/></br></br></br></br>
+         sends out clock pulses to synchronize external midi devices<br/><br/><b>device</b>: device to target<br/><b>multiplier</b>: tempo multiplier for how the gear should respond to the signals<br/><b>send start</b>: send a signal to reset the gear to the start of its sequence<br/></br></br></br></br>
       </span>
          <a name=comment></a></br>
          <b>comment</b></br>
@@ -1687,14 +1771,14 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
 -hold ctrl while dragging to snap to an interval
 -hold shift and scroll to zoom
 -hold alt and grab empty space to move slide the canvas view
--hold ctrl and grab empty space to zoom the canvas view<br/><b>interval</b>: grid for snapping events to<br/><b>drag mode</b>: direction that elements can be dragged<br/><b>record</b>: record connected values as they change<br/><b>timeline</b>: control loop points<br/><b>clear</b>: delete all elements<br/><b>measures</b>: length of loop<br/><b>quantize</b>: quantizes events to grid<br/><b>view rows</b>: number of visible rows<br/><b>scrollh</b>: horizontal scrollbar<br/><b>delete</b>: delete highlighted elements<br/></br></br></br></br>
+-hold ctrl and grab empty space to zoom the canvas view<br/><b>clear</b>: delete all elements<br/><b>delete</b>: delete highlighted elements<br/><b>drag mode</b>: direction that elements can be dragged<br/><b>interval</b>: grid for snapping events to<br/><b>measures</b>: length of loop<br/><b>quantize</b>: quantizes events to grid<br/><b>record</b>: record connected values as they change<br/><b>scrollh</b>: horizontal scrollbar<br/><b>timeline</b>: control loop points<br/><b>view rows</b>: number of visible rows<br/></br></br></br></br>
       </span>
          <a name=globalcontrols></a></br>
          <b>globalcontrols</b></br>
          <img src="screenshots/globalcontrols.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         interface controls, intended to allow you to use midi controllers to navigate the canvas. controlling these sliders directly with the mouse is not recommended.<br/><br/><b>background r</b>: amount of red in background color<br/><b>scroll x</b>: emulate horizontal mouse scrolling<br/><b>lissajous g</b>: amount of green in background lissajous curve<br/><b>lissajous b</b>: amount of blue in background lissajous curve<br/><b>scroll y</b>: emulate vertical mouse scrolling<br/><b>zoom</b>: zoom level<br/><b>background b</b>: amount of blue in background color<br/><b>x pos</b>: horizontal panning position<br/><b>background g</b>: amount of green in background color<br/><b>lissajous r</b>: amount of red in background lissajous curve<br/><b>y pos</b>: vertical panning position<br/></br></br></br></br>
+         interface controls, intended to allow you to use midi controllers to navigate the canvas. controlling these sliders directly with the mouse is not recommended.<br/><br/><b>background b</b>: amount of blue in background color<br/><b>background g</b>: amount of green in background color<br/><b>background r</b>: amount of red in background color<br/><b>cable alpha</b>: opacity of the cables<br/><b>corner radius</b>: how round bespoke's rectangles are<br/><b>lissajous b</b>: amount of blue in background lissajous curve<br/><b>lissajous g</b>: amount of green in background lissajous curve<br/><b>lissajous r</b>: amount of red in background lissajous curve<br/><b>scroll x</b>: emulate horizontal mouse scrolling<br/><b>scroll y</b>: emulate vertical mouse scrolling<br/><b>x pos</b>: horizontal panning position<br/><b>y pos</b>: vertical panning position<br/><b>zoom</b>: zoom level<br/></br></br></br></br>
       </span>
          <a name=grid></a></br>
          <b>grid</b></br>
@@ -1710,19 +1794,26 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <span style="display:inline-block;margin-left:50px;">
          connect to several checkboxes, and control them all with one checkbox<br/><br/><b>group enabled</b>: controls the connected checkboxes<br/></br></br></br></br>
       </span>
+         <a name=label></a></br>
+         <b>label</b></br>
+         <img src="screenshots/label.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         A module to display a label, helpful in marking what is where in large patches<br/><br/><b>color</b>: The color of the label<br/><b>font</b>: The font of the label<br/><b>label</b>: The label that will be displayed<br/><b>showcontrols</b>: Hide and show the controls to modify the label<br/><b>size</b>: The font size of the label<br/></br></br></br></br>
+      </span>
          <a name=loopergranulator></a></br>
          <b>loopergranulator</b></br>
          <img src="screenshots/loopergranulator.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         use with a "looper" module to play the contents with granular synthesis<br/><br/><b>spacing rand</b>: randomization of time between grains<br/><b>on</b>: use granular synthesis for looper playback<br/><b>octaves</b>: should we add octaves and fifths?<br/><b>speed rand</b>: randomization of grain speed<br/><b>overlap</b>: number of overlapping grains<br/><b>freeze</b>: stop advancing looper time<br/><b>width</b>: stereo width of grain placement<br/><b>loop pos</b>: playback position within loop<br/><b>pos rand</b>: randomization of grain start point<br/><b>speed</b>: speed of grain playback<br/><b>len ms</b>: length of each grain in milliseconds<br/></br></br></br></br>
+         use with a "looper" module to play the contents with granular synthesis<br/><br/><b>freeze</b>: stop advancing looper time<br/><b>len ms</b>: length of each grain in milliseconds<br/><b>loop pos</b>: playback position within loop<br/><b>octaves</b>: should we add octaves and fifths?<br/><b>on</b>: use granular synthesis for looper playback<br/><b>overlap</b>: number of overlapping grains<br/><b>pos rand</b>: randomization of grain start point<br/><b>spacing rand</b>: randomization of time between grains<br/><b>speed</b>: speed of grain playback<br/><b>speed rand</b>: randomization of grain speed<br/><b>width</b>: stereo width of grain placement<br/></br></br></br></br>
       </span>
          <a name=multitrackrecorder></a></br>
          <b>multitrackrecorder</b></br>
          <img src="screenshots/multitrackrecorder.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         record several synchronized tracks of audio, to write to disk for mixing in an external DAW<br/><br/><b>add track</b>: add an additional track<br/><b>clear</b>: clear the audio in the tracks<br/><b>bounce</b>: write the tracks to your recordings directory<br/><b>record</b>: record input to the tracks<br/></br></br></br></br>
+         record several synchronized tracks of audio, to write to disk for mixing in an external DAW<br/><br/><b>add track</b>: add an additional track<br/><b>bounce</b>: write the tracks to your recordings directory<br/><b>clear</b>: clear the audio in the tracks<br/><b>record</b>: record input to the tracks<br/></br></br></br></br>
       </span>
          <a name=notetoggle></a></br>
          <b>notetoggle</b></br>
@@ -1736,14 +1827,14 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/oscoutput.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         send OSC messages when slider values change or when notes are received<br/><br/><b>note out address</b>: label to send input notes. the message will be sent in the format /bespoke/[label] [pitch] [velocity]<br/><b>slider*</b>: sends a value to the address. try patching a modulator into this, such as a leveltocv module to send audio levels.<br/><b>label*</b>: label to send slider value. the message will be sent in the format /bespoke/[label] [value]<br/><b>osc out address</b>: destination to send OSC messages to<br/><b>osc out port</b>: port to send OSC messages to<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         send OSC messages when slider values change or when notes are received<br/><br/><b>label*</b>: label to send slider value. the message will be sent in the format /bespoke/[label] [value]<br/><b>note out address</b>: label to send input notes. the message will be sent in the format /bespoke/[label] [pitch] [velocity]<br/><b>osc out address</b>: destination to send OSC messages to<br/><b>osc out port</b>: port to send OSC messages to<br/><b>slider*</b>: sends a value to the address. try patching a modulator into this, such as a leveltocv module to send audio levels.<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=prefab></a></br>
          <b>prefab</b></br>
          <img src="screenshots/prefab.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         create a collection of modules that can be loaded from the "prefabs" menu. drag and drop modules onto here to add them to the prefab. drag the grey cable to any modules you want to remove from the prefab.<br/><br/><b>load</b>: load a .pfb<br/><b>save</b>: save as a .pfb file<br/><b>disband</b>: free all modules from this prefab<br/></br></br></br></br>
+         create a collection of modules that can be loaded from the "prefabs" menu. drag and drop modules onto here to add them to the prefab. drag the grey cable to any modules you want to remove from the prefab.<br/><br/><b>disband</b>: free all modules from this prefab<br/><b>load</b>: load a .pfb<br/><b>save</b>: save as a .pfb file<br/></br></br></br></br>
       </span>
          <a name=push2control></a></br>
          <b>push2control</b></br>
@@ -1757,28 +1848,35 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/radiosequencer.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         sequence to only enable one value at a time. patch it to the "enabled" checkbox on several modules to only enable one module at a time. works well in conjunction with "groupcontrol" module.<br/><br/><b>length</b>: length of sequence<br/><b>interval</b>: rate to advance<br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+         sequence to only enable one value at a time. patch it to the "enabled" checkbox on several modules to only enable one module at a time. works well in conjunction with "groupcontrol" module.<br/><br/><b>grid</b>: patch a grid in here from a "midicontroller" module<br/><b>interval</b>: rate to advance<br/><b>length</b>: length of sequence<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=samplebrowser></a></br>
          <b>samplebrowser</b></br>
          <img src="screenshots/samplebrowser.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         browse your system for samples. drag samples from here to your desired targets (sampleplayer, drumplayer, seaofgrain, etc)<br/><br/><b> > </b>: next page<br/><b> < </b>: previous page<br/></br></br></br></br>
+         browse your system for samples. drag samples from here to your desired targets (sampleplayer, drumplayer, seaofgrain, etc)<br/><br/><b> < </b>: previous page<br/><b> > </b>: next page<br/></br></br></br></br>
+      </span>
+         <a name=savestateloader></a></br>
+         <b>savestateloader</b></br>
+         <img src="screenshots/savestateloader.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         loads other savestate files (and unloads the current savestate). the number of buttons can be adjusted in the triangle menu.<br/><br/><b>load *</b>: loads specified savestate file. shift-click to choose a new file.<br/></br></br></br></br>
       </span>
          <a name=scale></a></br>
          <b>scale</b></br>
          <img src="screenshots/scale.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         controls the global scale used by various modules<br/><br/><b>scale</b>: which set of notes to use<br/><b>tuning</b>: what frequency does the pitch defined in "note" represent?<br/><b>load KBM</b>: load KBM file to determine keyboard mapping<br/><b>PPO</b>: pitches per octave<br/><b>note</b>: the pitch that maps to the frequency defined in "tuning"<br/><b>load SCL</b>: load SCL file to determine scale<br/><b>intonation</b>: which method to use to tune the scale<br/><b>root</b>: root note of the scale<br/></br></br></br></br>
+         controls the global scale used by various modules<br/><br/><b>PPO</b>: pitches per octave<br/><b>intonation</b>: which method to use to tune the scale<br/><b>load KBM</b>: load KBM file to determine keyboard mapping<br/><b>load SCL</b>: load SCL file to determine scale<br/><b>note</b>: the pitch that maps to the frequency defined in "tuning"<br/><b>root</b>: root note of the scale<br/><b>scale</b>: which set of notes to use<br/><b>tuning</b>: what frequency does the pitch defined in "note" represent?<br/></br></br></br></br>
       </span>
          <a name=script></a></br>
          <b>script</b></br>
          <img src="screenshots/script.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         python scripting for livecoding notes and module control<br/><br/><b>a</b>: variable for the script to use, can be modulation by other sources. access via me.get("a")<br/><b>load</b>: load selected script<br/><b>c</b>: variable for the script to use, can be modulation by other sources. access via me.get("c")<br/><b>b</b>: variable for the script to use, can be modulation by other sources. access via me.get("b")<br/><b>run</b>: click here to execute the code, or press ctrl-R<br/><b>d</b>: variable for the script to use, can be modulation by other sources. access via me.get("d")<br/><b>stop</b>: cancel any events scheduled by this script<br/><b>style</b>: choose a text theme, from script_styles.json<br/><b>code</b>: write code here. press ctrl-R to execute the code, or ctrl-shift-R to just execute the current block.<br/><b>save as</b>: save the current script<br/><b>loadscript</b>: choose a script from here, then press "load"<br/><b>?</b>: show scripting reference<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+         python scripting for livecoding notes and module control<br/><br/><b>?</b>: show scripting reference<br/><b>a</b>: variable for the script to use, can be modulation by other sources. access via me.get("a")<br/><b>b</b>: variable for the script to use, can be modulation by other sources. access via me.get("b")<br/><b>c</b>: variable for the script to use, can be modulation by other sources. access via me.get("c")<br/><b>code</b>: write code here. press ctrl-R to execute the code, or ctrl-shift-R to just execute the current block.<br/><b>d</b>: variable for the script to use, can be modulation by other sources. access via me.get("d")<br/><b>load</b>: load selected script<br/><b>loadscript</b>: choose a script from here, then press "load"<br/><b>run</b>: click here to execute the code, or press ctrl-R<br/><b>save as</b>: save the current script<br/><b>stop</b>: cancel any events scheduled by this script<br/><b>style</b>: choose a text theme, from script_styles.json<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=scriptstatus></a></br>
          <b>scriptstatus</b></br>
@@ -1799,21 +1897,21 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/snapshots.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.<br/><br/><b>snapshot label</b>: assign a label to this snapshot<br/><b>auto-store on switch</b>: when switching to a new slot, automatically store state in the current slot<br/><b>clear</b>: clear all snapshots<br/><b>random</b>: randomize connected controls<br/><b>add</b>: snapshot the currently connected controls to the next available snapshot slot<br/><b>snapshot</b>: jump to a snapshot<br/><b>blend</b>: length of time in milliseconds over which to blend snapshot values<br/><b>store</b>: when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)<br/><b>delete</b>: when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
+         save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a snapshot to that square, and click on a grid square to load that snapshot. alt/option-click to delete a snapshot, and ctrl/command-click to rename a snapshot.<br/><br/><b>add</b>: snapshot the currently connected controls to the next available snapshot slot<br/><b>blend</b>: length of time in milliseconds over which to blend snapshot values<br/><b>delete</b>: when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)<br/><b>random</b>: randomize connected controls<br/><b>snapshot</b>: jump to a snapshot<br/><b>snapshot label</b>: assign a label to this snapshot<br/><b>store</b>: when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)<br/><br/>accepts: <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=songbuilder></a></br>
          <b>songbuilder</b></br>
          <img src="screenshots/songbuilder.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         large-scale organizer to arrange settings into scenes and then sequence them. this is bespoke's "song mode"<br/><br/><b>move left</b>: move this target left in the scene<br/><b>play from*</b>: play sequence from this step<br/><b>add target</b>: add a targeted control for scenes to affect<br/><b>stop</b>: stop the sequence<br/><b>activate first scene on stop</b>: when stopping, activate the first scene. it is recommended that you use the first scene as an "off" scene, and have it disable all song elements.<br/><b>pause</b>: hold the sequence on the current scene<br/><b>loop end</b>: loop step index that the loop ends<br/><b>move right</b>: move this target right in the scene<br/><b>value*</b>: value to use for target in this scene<br/><b>context*</b>: options for this scene<br/><b>scene*</b>: name of scene for this step<br/><b>type</b>: change the control display type for this target<br/><b>bars*</b>: length in bars that this scene should play for<br/><b>checkbox*</b>: value to use for target in this scene<br/><b>loop start</b>: loop step index to start the loop on<br/><b>name*</b>: name of this scene<br/><b>dropdown*</b>: value to use for target in this scene<br/><b>change quantize</b>: when a change should happen after pressing the play button on a scene. "switch" changes immediately, and "jump" changes immediately and also resets the global transport.<br/><b>play</b>: play the sequence<br/><b>contextmenu*</b>: options for this step<br/><b>go*</b>: play this scene<br/><b>use sequencer</b>: show scene sequencer<br/><b>loop</b>: enable a loop within the sequence<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
+         large-scale organizer to arrange settings into scenes and then sequence them. this is bespoke's "song mode"<br/><br/><b>activate first scene on stop</b>: when stopping, activate the first scene. it is recommended that you use the first scene as an "off" scene, and have it disable all song elements.<br/><b>add target</b>: add a targeted control for scenes to affect<br/><b>bars*</b>: length in bars that this scene should play for<br/><b>change quantize</b>: when a change should happen after pressing the play button on a scene. "switch" changes immediately, and "jump" changes immediately and also resets the global transport.<br/><b>checkbox*</b>: value to use for target in this scene<br/><b>color*</b>: color to theme this target<br/><b>context*</b>: options for this scene<br/><b>contextmenu*</b>: options for this step<br/><b>dropdown*</b>: value to use for target in this scene<br/><b>go*</b>: play this scene<br/><b>loop</b>: enable a loop within the sequence<br/><b>loop end</b>: loop step index that the loop ends<br/><b>loop start</b>: loop step index to start the loop on<br/><b>move left</b>: move this target left in the scene<br/><b>move right</b>: move this target right in the scene<br/><b>name*</b>: name of this scene<br/><b>pause</b>: hold the sequence on the current scene<br/><b>play</b>: play the sequence<br/><b>play from*</b>: play sequence from this step<br/><b>scene*</b>: name of scene for this step<br/><b>stop</b>: stop the sequence<br/><b>type</b>: change the control display type for this target<br/><b>use sequencer</b>: show scene sequencer<br/><b>value*</b>: value to use for target in this scene<br/><br/>accepts: <font color=yellow>pulses</font> <font color=orange>notes</font> <br/></br></br></br></br>
       </span>
          <a name=timelinecontrol></a></br>
          <b>timelinecontrol</b></br>
          <img src="screenshots/timelinecontrol.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         control global transport position<br/><br/><b>reset</b>: reset to beginning<br/><b>loop end</b>: measure end of loop<br/><b>loop start</b>: measure start of loop<br/><b>dock</b>: should we dock this module to the UI layer?<br/><b>length</b>: length of timeline display, in measures<br/><b>measure</b>: current position. click to jump around.<br/><b>loop</b>: should we have a looping section?<br/></br></br></br></br>
+         control global transport position<br/><br/><b>dock</b>: should we dock this module to the UI layer?<br/><b>length</b>: length of timeline display, in measures<br/><b>loop</b>: should we have a looping section?<br/><b>loop end</b>: measure end of loop<br/><b>loop start</b>: measure start of loop<br/><b>measure</b>: current position. click to jump around.<br/><b>reset</b>: reset to beginning<br/></br></br></br></br>
       </span>
          <a name=timerdisplay></a></br>
          <b>timerdisplay</b></br>
@@ -1827,7 +1925,7 @@ the ideal way to use this module is to hook the "looper" directly up to a "send"
          <img src="screenshots/transport.png">
          </br>
          <span style="display:inline-block;margin-left:50px;">
-         controls tempo and current time position<br/><br/><b>reset</b>: reset timeline to zero<br/><b> + </b>: increase tempo by one<br/><b> - </b>: decrease tempo by one<br/><b> < </b>: nudge current time backward<br/><b>tempo</b>: global tempo, in beats per minute<br/><b>swing</b>: where the halfway point of musical time within the swing interval should fall. a value of .5 represents no swing.<br/><b>timesigtop</b>: time signature top value<br/><b>timesigbottom</b>: time signature bottom value<br/><b>swing interval</b>: interval over which to apply swing<br/><b>play/pause</b>: stop all audio processing (shift-p)<br/><b> > </b>: nudge current time forward<br/></br></br></br></br>
+         controls tempo and current time position<br/><br/><b> + </b>: increase tempo by one<br/><b> - </b>: decrease tempo by one<br/><b> < </b>: nudge current time backward<br/><b> > </b>: nudge current time forward<br/><b>play/pause</b>: stop all audio processing (shift-p)<br/><b>reset</b>: reset timeline to zero<br/><b>swing</b>: where the halfway point of musical time within the swing interval should fall. a value of .5 represents no swing.<br/><b>swing interval</b>: interval over which to apply swing<br/><b>tempo</b>: global tempo, in beats per minute<br/><b>timesigbottom</b>: time signature bottom value<br/><b>timesigtop</b>: time signature top value<br/></br></br></br></br>
       </span>
          <a name=valuestream></a></br>
          <b>valuestream</b></br>
