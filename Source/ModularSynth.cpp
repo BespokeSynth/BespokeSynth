@@ -1554,23 +1554,26 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       return;
    }
 
-   if (gHoveredUIControl != nullptr &&
-       gHoveredUIControl->GetModuleParent() && !gHoveredUIControl->GetModuleParent()->IsDeleted() && !gHoveredUIControl->GetModuleParent()->IsHoveringOverResizeHandle() &&
+   IDrawableModule* hoveredUIControlModuleParent = nullptr;
+   if (gHoveredUIControl != nullptr)
+      hoveredUIControlModuleParent = gHoveredUIControl->GetModuleParent();
+
+   if (hoveredUIControlModuleParent != nullptr && !hoveredUIControlModuleParent->IsDeleted() && !hoveredUIControlModuleParent->IsHoveringOverResizeHandle() &&
        !IUIControl::WasLastHoverSetManually() &&
        mGroupSelectedModules.empty() &&
        mQuickSpawn->IsShowing() == false &&
-       (GetTopModalFocusItem() == nullptr || gHoveredUIControl->GetModuleParent() == GetTopModalFocusItem()))
+       (GetTopModalFocusItem() == nullptr || hoveredUIControlModuleParent == GetTopModalFocusItem()))
    {
       //if we have a hovered UI control, clamp clicks within its rect and direct them straight to it
-      ofVec2f controlClickPos(GetMouseX(gHoveredUIControl->GetModuleParent()->GetOwningContainer()), GetMouseY(gHoveredUIControl->GetModuleParent()->GetOwningContainer()));
+      ofVec2f controlClickPos(GetMouseX(hoveredUIControlModuleParent->GetOwningContainer()), GetMouseY(hoveredUIControlModuleParent->GetOwningContainer()));
       controlClickPos -= gHoveredUIControl->GetParent()->GetPosition();
 
       ofRectangle controlRect = gHoveredUIControl->GetRect(K(local));
       controlClickPos.x = std::clamp(controlClickPos.x, controlRect.getMinX(), controlRect.getMaxX());
       controlClickPos.y = std::clamp(controlClickPos.y, controlRect.getMinY(), controlRect.getMaxY());
 
-      if (gHoveredUIControl->GetModuleParent() != TheTitleBar)
-         mLastClickedModule = gHoveredUIControl->GetModuleParent();
+      if (hoveredUIControlModuleParent != TheTitleBar)
+         mLastClickedModule = hoveredUIControlModuleParent;
 
       gHoveredUIControl->TestClick(controlClickPos.x, controlClickPos.y, rightButton);
    }
