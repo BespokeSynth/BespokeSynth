@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added a callback for sysex messages in scripts
 - Added level meters to `gain` and `audiometer` modules
 - Added settings for `minimap` margin and corner
 - Added a new dropdown mode for setting step velocity in the `drumsequencer` module
@@ -62,6 +63,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Updated ExprTk to 0.0.3
 - Changed the behavior, with regards to velocity, of the `notesequencer` and `dotsequencer` to be in line with the `drumsequencer`
 - Made it so you can target RadioButton's with pulse cables
 - Made hovering over a placed step and pressing up or down, cycle between normal, accent, and ghost notes in the `drumsequencer` module
@@ -105,6 +107,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed `rhythmsequencer` crash when trying to set length above 8
+- Prevent quickspawn menu from popping up if you move the mouse between pressing shift twice
+- Fix parsing of Python script files in CR+LF format
 - Fixed several bugs in the rendering of child modules in the `minimap`
 - Fixed a bug where the `minimap` could be obscured by the titlebar menu
 - Fixed an issues related to saving a `seaofgrain` at one sample rate and loading it at another sample rate
