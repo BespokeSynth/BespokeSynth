@@ -67,7 +67,7 @@ def on_sysex(data):
     #1:   .. .. .. .. .. B4 B3 B2
     
     #valueB = extract_bits(bytes_data[0], 6, 2) | (extract_bits(bytes_data[1], 0, 3) << 2)
-    #me.output(f"valueB: {aval}")
+    #me.output(f"valueB: {valueB}")
 
 
 #on_midi events will be received as well, so this has to be defined as well
