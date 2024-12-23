@@ -10,6 +10,7 @@ script module inputs:
    on_grid_button(col, row, velocity): called by grid input
    on_osc(message): called by external osc source, after registering with me.connect_osc_input(port)
    on_midi(messageType, control, value, channel): called by midicontroller, after registering with add_script_listener(me.me())
+   on_sysex(data): called by midicontroller when send_sysex option is set, after registering with add_script_listener(me.me())
 
 
 globals:
