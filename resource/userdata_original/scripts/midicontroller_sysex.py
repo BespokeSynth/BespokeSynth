@@ -46,10 +46,16 @@ def on_sysex(data):
     if data[1] != deviceID:             #Check Device ID
         me.output(f"Sysex device ID not equal to expected device ID ({deviceID}): {data[1]}")
         return
+    
+    #Parsing of this vendor specific sysex starts here
+    
     if data_length != sysexDataLen:     #Check sysex data length
         me.output(f"Sysex data length invalid ({sysexDataLen}): {data_length}")
         return
-    
+
+    # in this sysex example, data[2] contains the patch_number
+    patch_number =  data[2:]
+
     #sysex data is send as nibbles in bytes
     #parse sysex data here, or convert to bytes first:      
     nibbles = data[3:]
@@ -66,9 +72,13 @@ def on_sysex(data):
     #0:   B1 B0 .. .. .. .. .. ..
     #1:   .. .. .. .. .. B4 B3 B2
     
-    #valueB = extract_bits(bytes_data[0], 6, 2) | (extract_bits(bytes_data[1], 0, 3) << 2)
-    #me.output(f"valueB: {valueB}")
+    valueB = extract_bits(bytes_data[0], 6, 2) | (extract_bits(bytes_data[1], 0, 3) << 2)
+    me.output(f"valueB: {valueB}")
 
+#Example of sysex data
+data = [0x01, 0x05, 0x00, 0x08, 0x08, 0x0, 0x00, 0x0, 0x00, 0x00, 0x00, 0x00, 0x02, 0x07, 0x09, 0x00, 0x00, 0x06, 0x06, 0x07, 0x04, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x03, 0x00, 0x08, 0x07, 0x04, 0x01, 0x04, 0x02]  # Sample data
+#Manually call function to trigger example
+on_sysex(data)
 
 #on_midi events will be received as well, so this has to be defined as well
 def on_midi(messageType, control, value, channel):
