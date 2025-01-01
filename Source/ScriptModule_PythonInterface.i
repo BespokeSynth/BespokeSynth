@@ -508,7 +508,11 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       .def("resync_controller_state", [](MidiController& midicontroller)
       {
          midicontroller.ResyncControllerState();
-      });
+      })
+      .def("set_catchcontrol", [](MidiController& midicontroller, int control, float value)
+      {
+         midicontroller.OnCatchControl(control, value);
+      }, "control"_a, "value"_a = 0);
 }
 
 PYBIND11_EMBEDDED_MODULE(linnstrument, m)
