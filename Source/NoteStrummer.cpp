@@ -69,16 +69,16 @@ void NoteStrummer::DrawModule()
    }
 }
 
-void NoteStrummer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteStrummer::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mNotes.push_back(pitch);
+      mNotes.push_back(note.pitch);
    }
    else
    {
-      PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
-      mNotes.remove(pitch);
+      PlayNoteOutput(note.MakeNoteOff());
+      mNotes.remove(note.pitch);
    }
 }
 
@@ -100,7 +100,7 @@ void NoteStrummer::OnTransportAdvanced(float amount)
          if (change * offset > 0 && //same direction
              fabsf(offset) <= fabsf(change) &&
              !wraparound)
-            PlayNoteOutput(gTime + i * gInvSampleRateMs, pitch, 127);
+            PlayNoteOutput(NoteMessage(gTime + i * gInvSampleRateMs, pitch, 127));
          ++index;
       }
       mLastStrumPos = mStrum;

@@ -88,15 +88,15 @@ void NoteRatchet::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void NoteRatchet::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteRatchet::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       double subdivisionMs = TheTransport->GetDuration(mRatchetSubdivision);
       int repetitions = TheTransport->CountInStandardMeasure(mRatchetSubdivision) / TheTransport->CountInStandardMeasure(mRatchetDuration);
@@ -105,8 +105,12 @@ void NoteRatchet::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
          startIndex = 1;
       for (int i = startIndex; i < repetitions; ++i)
       {
-         PlayNoteOutput(time + subdivisionMs * i, pitch, velocity, voiceIdx, modulation);
-         PlayNoteOutput(time + subdivisionMs * (i + 1), pitch, 0, voiceIdx, modulation);
+         NoteMessage newNote = note.MakeClone();
+         newNote.time = note.time + subdivisionMs * i;
+         NoteMessage newNoteOff = newNote.MakeNoteOff();
+         newNoteOff.time = note.time + subdivisionMs * (i + 1);
+         PlayNoteOutput(newNote);
+         PlayNoteOutput(newNoteOff);
       }
    }
 }

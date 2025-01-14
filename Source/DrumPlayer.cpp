@@ -478,44 +478,44 @@ int DrumPlayer::GetIndividualOutputIndex(int hitIndex)
    return -1;
 }
 
-void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void DrumPlayer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time))
+   if (!NoteInputBuffer::IsTimeWithinFrame(note.time))
    {
-      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      mNoteInputBuffer.QueueNote(note);
       return;
    }
 
-   if (velocity > 0 && mFullVelocity)
-      velocity = 127;
+   if (note.velocity > 0 && mFullVelocity)
+      note.velocity = 127;
 
-   pitch %= 24;
-   if (pitch >= 0 && pitch < NUM_DRUM_HITS)
+   note.pitch %= 24;
+   if (note.pitch >= 0 && note.pitch < NUM_DRUM_HITS)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
          //reset all linked drum hits
-         int playingId = mDrumHits[pitch].mLinkId;
+         int playingId = mDrumHits[note.pitch].mLinkId;
          if (playingId != -1 || mSingleVoice)
          {
             for (int i = 0; i < NUM_DRUM_HITS; ++i)
             {
-               if (i != pitch && mDrumHits[i].mLinkId == playingId)
-                  mDrumHits[i].StopLinked(time);
+               if (i != note.pitch && mDrumHits[i].mLinkId == playingId)
+                  mDrumHits[i].StopLinked(note.time);
             }
          }
 
          //play this one
-         mDrumHits[pitch].mVelocity = velocity / 127.0f;
-         mDrumHits[pitch].mPanInput = modulation.pan;
-         mDrumHits[pitch].mPitchBend = modulation.pitchBend;
-         float startOffsetPercent = mDrumHits[pitch].mStartOffset;
-         if (modulation.modWheel != nullptr)
-            startOffsetPercent += MAX((modulation.modWheel->GetValue(0) - ModulationParameters::kDefaultModWheel) * 2, 0);
-         mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity / 127.0f);
+         mDrumHits[note.pitch].mVelocity = note.velocity / 127.0f;
+         mDrumHits[note.pitch].mPanInput = note.modulation.pan;
+         mDrumHits[note.pitch].mPitchBend = note.modulation.pitchBend;
+         float startOffsetPercent = mDrumHits[note.pitch].mStartOffset;
+         if (note.modulation.modWheel != nullptr)
+            startOffsetPercent += MAX((note.modulation.modWheel->GetValue(0) - ModulationParameters::kDefaultModWheel) * 2, 0);
+         mDrumHits[note.pitch].StartPlayhead(note.time, startOffsetPercent, note.velocity / 127.0f);
       }
    }
 }
@@ -755,7 +755,7 @@ void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* gri
    {
       if (velocity > 0 && mQuantizeInterval == kInterval_None)
       {
-         PlayNote(NextBufferTime(false), sampleIdx, velocity * 127);
+         PlayNote(NoteMessage(NextBufferTime(false), sampleIdx, velocity * 127));
       }
       else
       {
@@ -776,7 +776,7 @@ void DrumPlayer::OnTimeEvent(double time)
    {
       if (mDrumHits[i].mButtonHeldVelocity > 0)
       {
-         PlayNote(time, i, mDrumHits[i].mButtonHeldVelocity);
+         PlayNote(NoteMessage(time, i, mDrumHits[i].mButtonHeldVelocity));
          if (!mNoteRepeat)
             mDrumHits[i].mButtonHeldVelocity = 0;
       }
@@ -1163,7 +1163,7 @@ void DrumPlayer::ButtonClicked(ClickButton* button, double time)
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       if (button == mDrumHits[i].mTestButton)
-         PlayNote(time, i, 127);
+         PlayNote(NoteMessage(time, i, 127));
       if (button == mDrumHits[i].mRandomButton)
          mDrumHits[i].LoadRandomSample();
       if (button == mDrumHits[i].mGrabSampleButton)

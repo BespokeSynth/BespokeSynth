@@ -45,7 +45,7 @@ public:
    void Resize(float w, float h) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
 

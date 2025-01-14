@@ -166,13 +166,13 @@ void ControlSequencer::OnTimeEvent(double time)
       Step(time, 0);
 }
 
-void ControlSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ControlSequencer::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       mHasExternalPulseSource = true;
-      mStep = pitch % std::max(1, mLength);
-      Step(time, kPulseFlag_Repeat);
+      mStep = note.pitch % std::max(1, mLength);
+      Step(note.time, kPulseFlag_Repeat);
    }
 }
 

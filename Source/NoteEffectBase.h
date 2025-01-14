@@ -31,9 +31,9 @@
 class NoteEffectBase : public INoteReceiver, public INoteSource
 {
 public:
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override
+   void PlayNote(NoteMessage note) override
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
    }
    void SendCC(int control, int value, int voiceIdx = -1) override
    {

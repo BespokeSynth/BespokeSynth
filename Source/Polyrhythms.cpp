@@ -80,7 +80,7 @@ void Polyrhythms::OnTransportAdvanced(float amount)
       int newStep = TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs);
       float val = mRhythmLines[i]->mGrid->GetVal(newStep, 0);
       if (newStep != oldStep && val > 0)
-         PlayNoteOutput(time - remainderMs, mRhythmLines[i]->mPitch, val * 127, -1);
+         PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLines[i]->mPitch, val * 127));
 
       mRhythmLines[i]->mGrid->SetHighlightCol(time, newStep);
    }

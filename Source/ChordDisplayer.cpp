@@ -72,9 +72,9 @@ void ChordDisplayer::DrawModule()
    }
 }
 
-void ChordDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ChordDisplayer::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void ChordDisplayer::GetModuleDimensions(float& width, float& height)

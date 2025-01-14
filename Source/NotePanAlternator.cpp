@@ -57,15 +57,15 @@ void NotePanAlternator::DrawModule()
    ofPopStyle();
 }
 
-void NotePanAlternator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NotePanAlternator::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
-      modulation.pan = mFlip ? mPanTwo : mPanOne;
+      note.modulation.pan = mFlip ? mPanTwo : mPanOne;
       mFlip = !mFlip;
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void NotePanAlternator::LoadLayout(const ofxJSONElement& moduleInfo)

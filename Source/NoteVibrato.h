@@ -49,7 +49,7 @@ public:
    void OnTransportAdvanced(float amount) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;

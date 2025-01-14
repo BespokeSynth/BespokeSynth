@@ -55,7 +55,7 @@ void ChordHolder::Stop(double time)
    {
       if (mNotePlaying[i] && !mNoteInputHeld[i])
       {
-         PlayNoteOutput(time, i, 0, -1);
+         PlayNoteOutput(NoteMessage(time, i, 0));
          mNotePlaying[i] = false;
       }
    }
@@ -83,11 +83,11 @@ void ChordHolder::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ChordHolder::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
          bool anyInputNotesHeld = false;
          for (int i = 0; i < 128; ++i)
@@ -102,7 +102,7 @@ void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
             {
                if (mNotePlaying[i])
                {
-                  PlayNoteOutput(time, i, 0, -1);
+                  PlayNoteOutput(NoteMessage(note.time, i, 0));
                   mNotePlaying[i] = false;
                }
             }
@@ -110,16 +110,16 @@ void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 
          if (!mOnlyPlayWhenPulsed)
          {
-            if (!mNotePlaying[pitch]) //don't replay already-sustained notes
-               PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-            mNotePlaying[pitch] = true;
+            if (!mNotePlaying[note.pitch]) //don't replay already-sustained notes
+               PlayNoteOutput(note);
+            mNotePlaying[note.pitch] = true;
 
             //stop playing any voices in the chord that aren't being held anymore
             for (int i = 0; i < 128; ++i)
             {
-               if (i != pitch && mNotePlaying[i] && !mNoteInputHeld[i])
+               if (i != note.pitch && mNotePlaying[i] && !mNoteInputHeld[i])
                {
-                  PlayNoteOutput(time, i, 0, -1);
+                  PlayNoteOutput(NoteMessage(note.time, i, 0));
                   mNotePlaying[i] = false;
                }
             }
@@ -128,10 +128,10 @@ void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
    else
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
    }
 
-   mNoteInputHeld[pitch] = velocity > 0;
+   mNoteInputHeld[note.pitch] = note.velocity > 0;
 }
 
 void ChordHolder::OnPulse(double time, float velocity, int flags)
@@ -140,13 +140,13 @@ void ChordHolder::OnPulse(double time, float velocity, int flags)
    {
       if (mNotePlaying[i])
       {
-         PlayNoteOutput(time, i, 0, -1);
+         PlayNoteOutput(NoteMessage(time, i, 0));
          mNotePlaying[i] = false;
       }
 
       if (mNoteInputHeld[i])
       {
-         PlayNoteOutput(time, i, velocity * 127, -1);
+         PlayNoteOutput(NoteMessage(time, i, velocity * 127));
          mNotePlaying[i] = true;
       }
    }

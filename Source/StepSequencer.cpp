@@ -722,14 +722,14 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
 
 void StepSequencer::PlayStepNote(double time, int note, float val)
 {
-   mNoteOutput.PlayNote(time, note, val * 127);
+   mNoteOutput.PlayNote(NoteMessage(time, note, val * 127));
 }
 
-void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void StepSequencer::PlayNote(NoteMessage note)
 {
    if (mNoteInputMode == NoteInputMode::PlayStepIndex)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
          if (!mHasExternalPulseSource)
          {
@@ -739,16 +739,16 @@ void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
                mOffsets[i] = 0;
          }
 
-         mCurrentColumn = pitch % GetNumSteps(mStepInterval, mNumMeasures);
-         Step(time, velocity / 127.0f, kPulseFlag_Repeat);
+         mCurrentColumn = note.pitch % GetNumSteps(mStepInterval, mNumMeasures);
+         Step(note.time, note.velocity / 127.0f, kPulseFlag_Repeat);
       }
    }
    else
    {
       if (mRepeatRate == kInterval_None)
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         PlayNoteOutput(note);
       else
-         mPadPressures[pitch] = velocity;
+         mPadPressures[note.pitch] = note.velocity;
    }
 }
 

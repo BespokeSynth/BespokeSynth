@@ -107,9 +107,9 @@ void MidiCapturer::SendMidi(const juce::MidiMessage& message)
    mRingBufferPos = (mRingBufferPos + 1) % kRingBufferLength;
 }
 
-void MidiCapturer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void MidiCapturer::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void MidiCapturer::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -63,14 +63,14 @@ void PitchToValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    }
 }
 
-void PitchToValue::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchToValue::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
       for (size_t i = 0; i < mTargets.size(); ++i)
       {
          if (mTargets[i] != nullptr)
-            mTargets[i]->SetValue(pitch, time);
+            mTargets[i]->SetValue(note.pitch, note.time);
       }
    }
 }

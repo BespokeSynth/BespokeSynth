@@ -69,7 +69,7 @@ public:
    void OnTransportAdvanced(float amount) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendMidi(const juce::MidiMessage& message) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

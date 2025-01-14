@@ -66,22 +66,24 @@ void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
    }
 }
 
-void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchSetter::PlayNote(NoteMessage note)
 {
    ComputeSliders(0);
 
    if (mEnabled)
    {
-      if (velocity == 0 && mNotes[pitch] > -1)
-         PlayNoteOutput(time, mNotes[pitch], velocity, voiceIdx, modulation);
+      if (note.velocity == 0 && mNotes[note.pitch] > -1)
+      {
+         note.pitch = mNotes[note.pitch];
+      }
       else
       {
-         mNotes[pitch] = mPitch;
-         PlayNoteOutput(time, mPitch, velocity, voiceIdx, modulation);
+         mNotes[note.pitch] = mPitch;
+         note.pitch = mPitch;
       }
    }
-   else
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+
+   PlayNoteOutput(note);
 }
 
 void PitchSetter::LoadLayout(const ofxJSONElement& moduleInfo)

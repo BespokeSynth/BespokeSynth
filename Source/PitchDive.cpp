@@ -57,18 +57,18 @@ void PitchDive::DrawModule()
    mTimeSlider->Draw();
 }
 
-void PitchDive::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchDive::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0 && mStart != 0 && mTime != 0)
+   if (mEnabled && note.velocity > 0 && mStart != 0 && mTime != 0)
    {
       ComputeSliders(0);
-      auto* pitchBend = mModulation.GetPitchBend(voiceIdx);
-      pitchBend->RampValue(time, mStart, 0, mTime);
-      pitchBend->AppendTo(modulation.pitchBend);
-      modulation.pitchBend = pitchBend;
+      auto* pitchBend = mModulation.GetPitchBend(note.voiceIdx);
+      pitchBend->RampValue(note.time, mStart, 0, mTime);
+      pitchBend->AppendTo(note.modulation.pitchBend);
+      note.modulation.pitchBend = pitchBend;
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void PitchDive::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

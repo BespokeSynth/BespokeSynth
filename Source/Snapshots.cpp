@@ -340,16 +340,16 @@ bool Snapshots::MouseMoved(float x, float y)
    return false;
 }
 
-void Snapshots::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Snapshots::PlayNote(NoteMessage note)
 {
-   if (velocity > 0 && pitch < (int)mSnapshotCollection.size())
+   if (note.velocity > 0 && note.pitch < (int)mSnapshotCollection.size())
    {
       if (mStoreMode)
-         StoreSnapshot(pitch, true);
+         StoreSnapshot(note.pitch, true);
       else if (mDeleteMode)
-         DeleteSnapshot(pitch);
+         DeleteSnapshot(note.pitch);
       else
-         SetSnapshot(pitch, time);
+         SetSnapshot(note.pitch, note.time);
 
       UpdateGridValues();
    }

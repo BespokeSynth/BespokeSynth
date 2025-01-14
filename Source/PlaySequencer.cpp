@@ -195,21 +195,21 @@ void PlaySequencer::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void PlaySequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PlaySequencer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
-   if (pitch < mLanes.size())
+   if (note.pitch < mLanes.size())
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
-         mLanes[pitch].mInputVelocity = velocity;
+         mLanes[note.pitch].mInputVelocity = note.velocity;
       }
       else
       {
          if (mNoteRepeat)
-            mLanes[pitch].mInputVelocity = 0;
+            mLanes[note.pitch].mInputVelocity = 0;
       }
    }
 }
@@ -254,7 +254,7 @@ void PlaySequencer::OnTimeEvent(double time)
 
       if (playVelocity > 0 && mLanes[i].mIsPlaying == false)
       {
-         PlayNoteOutput(time, i, playVelocity);
+         PlayNoteOutput(NoteMessage(time, i, playVelocity));
          mLanes[i].mIsPlaying = true;
       }
 
@@ -262,7 +262,7 @@ void PlaySequencer::OnTimeEvent(double time)
       {
          if (mLanes[i].mIsPlaying && playVelocity == 0)
          {
-            PlayNoteOutput(time, i, 0);
+            PlayNoteOutput(NoteMessage(time, i, 0));
             mLanes[i].mIsPlaying = false;
          }
       }
@@ -280,7 +280,7 @@ void PlaySequencer::NoteOffScheduler::OnTimeEvent(double time)
    {
       if (mOwner->mLanes[i].mIsPlaying)
       {
-         mOwner->PlayNoteOutput(time, i, 0);
+         mOwner->PlayNoteOutput(NoteMessage(time, i, 0));
          mOwner->mLanes[i].mIsPlaying = false;
       }
    }

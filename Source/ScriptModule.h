@@ -92,7 +92,7 @@ public:
    void OnCodeUpdated() override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    //OSCReceiver
    void oscMessageReceived(const juce::OSCMessage& msg) override;
@@ -135,7 +135,7 @@ private:
    std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
    void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
-   void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+   void SendNoteToIndex(int index, NoteMessage note);
    std::string GetThisName();
    std::string GetIndentation(std::string line);
    std::string GetMethodPrefix();
