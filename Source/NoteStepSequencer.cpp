@@ -827,7 +827,7 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
    {
       if (NextBufferTime(true) > mLastNoteEndTime)
       {
-         PlayNoteOutput(mLastNoteEndTime, mLastPitch, 0);
+         PlayNoteOutput(NoteMessage(mLastNoteEndTime, mLastPitch, 0));
          if (mShowStepControls && mLastStepIndex < (int)mStepCables.size() && mLastStepIndex != -1)
             SendNoteToCable(mLastStepIndex, mLastNoteEndTime, mLastPitch, 0);
          mAlreadyDidNoteOff = true;
@@ -919,7 +919,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 
       if (mLastPitch == outPitch && !mAlreadyDidNoteOff) //same note, play noteoff first
       {
-         PlayNoteOutput(time, mLastPitch, 0, -1);
+         PlayNoteOutput(NoteMessage(time, mLastPitch, 0));
          if (mShowStepControls && mLastStepIndex < (int)mStepCables.size() && mLastStepIndex != -1)
             SendNoteToCable(mLastStepIndex, time, mLastPitch, 0);
          mAlreadyDidNoteOff = true;
@@ -927,7 +927,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
       }
       if (mVels[mArpIndex] > 1)
       {
-         PlayNoteOutput(time, outPitch, mVels[mArpIndex] * velocity, -1);
+         PlayNoteOutput(NoteMessage(time, outPitch, mVels[mArpIndex] * velocity));
          if (mShowStepControls && mArpIndex < (int)mStepCables.size())
             SendNoteToCable(mArpIndex, time, outPitch, mVels[mArpIndex] * velocity);
          mLastPitch = outPitch;
@@ -941,7 +941,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 
    if (offPitch != -1)
    {
-      PlayNoteOutput(time, offPitch, 0, -1);
+      PlayNoteOutput(NoteMessage(time, offPitch, 0));
       if (mShowStepControls && offStep < (int)mStepCables.size())
          SendNoteToCable(offStep, time, offPitch, 0);
       if (offPitch == mLastPitch)
@@ -959,7 +959,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 
 void NoteStepSequencer::SendNoteToCable(int index, double time, int pitch, int velocity)
 {
-   mStepCables[index]->PlayNoteOutput(time, pitch, velocity);
+   mStepCables[index]->PlayNoteOutput(NoteMessage(time, pitch, velocity));
 }
 
 void NoteStepSequencer::UpdateLights()
@@ -1086,13 +1086,13 @@ void NoteStepSequencer::OnMidiControl(MidiControl& control)
    }
 }
 
-void NoteStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteStepSequencer::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       mHasExternalPulseSource = true;
-      mArpIndex = pitch % mLength;
-      Step(time, velocity / 127.0f, kPulseFlag_Repeat);
+      mArpIndex = note.pitch % mLength;
+      Step(note.time, note.velocity / 127.0f, kPulseFlag_Repeat);
    }
 }
 

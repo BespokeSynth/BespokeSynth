@@ -131,7 +131,7 @@ void Chorder::AddTone(int tone, float velocity)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(NextBufferTime(false), outPitch, mVelocity * velocity, -1, ModulationParameters());
+         PlayChorderNote(NoteMessage(NextBufferTime(false), outPitch, mVelocity * velocity));
       }
    }
 }
@@ -147,7 +147,7 @@ void Chorder::RemoveTone(int tone)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(NextBufferTime(false), outPitch, 0, -1, ModulationParameters());
+         PlayChorderNote(NoteMessage(NextBufferTime(false), outPitch, 0));
       }
    }
 }
@@ -212,21 +212,21 @@ void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal, double time)
    }
 }
 
-void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Chorder::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   bool noteOn = velocity > 0;
-   if (mInputNotes[pitch] == noteOn)
+   bool noteOn = note.velocity > 0;
+   if (mInputNotes[note.pitch] == noteOn)
       return;
-   mInputNotes[pitch] = noteOn;
+   mInputNotes[note.pitch] = noteOn;
 
-   if (velocity > 0)
-      mVelocity = velocity;
+   if (note.velocity > 0)
+      mVelocity = note.velocity;
 
    int idx = 0;
    // iterate rows from bottom to top to go from lowest to highest note
@@ -239,26 +239,26 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
          if (val > 0)
          {
             int gridPosition = col + (mChordGrid->GetRows() / 2 - row) * mChordGrid->GetCols();
-            int voice = (voiceIdx == -1) ? -1 : (voiceIdx + idx) % 16;
+            int voice = (note.voiceIdx == -1) ? -1 : (note.voiceIdx + idx) % 16;
             int outPitch;
 
             if (!mDiatonic)
             {
-               outPitch = pitch + gridPosition;
+               outPitch = note.pitch + gridPosition;
             }
             else if (gridPosition % TheScale->NumTonesInScale() == 0) //if this is the pressed note or an octave of it
             {
                //play the pressed note (might not be in scale, so play it directly)
                int octave = gridPosition / TheScale->NumTonesInScale();
-               outPitch = pitch + TheScale->GetPitchesPerOctave() * octave;
+               outPitch = note.pitch + TheScale->GetPitchesPerOctave() * octave;
             }
             else
             {
-               int tone = gridPosition + TheScale->GetToneFromPitch(pitch);
+               int tone = gridPosition + TheScale->GetToneFromPitch(note.pitch);
                outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(tone));
             }
 
-            PlayChorderNote(time, outPitch, velocity * val * val, voice, modulation);
+            PlayChorderNote(NoteMessage(note.time, outPitch, note.velocity * val * val, voice, note.modulation));
 
             ++idx;
          }
@@ -267,25 +267,25 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    CheckLeftovers();
 }
 
-void Chorder::PlayChorderNote(double time, int pitch, int velocity, int voice /*=-1*/, ModulationParameters modulation)
+void Chorder::PlayChorderNote(NoteMessage note)
 {
-   assert(velocity >= 0);
+   assert(note.velocity >= 0);
 
-   if (pitch < 0 || pitch >= TOTAL_NUM_NOTES)
+   if (note.pitch < 0 || note.pitch >= TOTAL_NUM_NOTES)
       return;
 
-   bool wasOn = mHeldCount[pitch] > 0;
+   bool wasOn = mHeldCount[note.pitch] > 0;
 
-   if (velocity > 0)
-      ++mHeldCount[pitch];
+   if (note.velocity > 0)
+      ++mHeldCount[note.pitch];
 
-   if (velocity == 0 && mHeldCount[pitch] > 0)
-      --mHeldCount[pitch];
+   if (note.velocity == 0 && mHeldCount[note.pitch] > 0)
+      --mHeldCount[note.pitch];
 
-   if (mHeldCount[pitch] > 0 && !wasOn)
-      PlayNoteOutput(time, pitch, velocity, voice, modulation);
-   if (mHeldCount[pitch] == 0 && wasOn)
-      PlayNoteOutput(time, pitch, 0, voice, modulation);
+   if (mHeldCount[note.pitch] > 0 && !wasOn)
+      PlayNoteOutput(note);
+   if (mHeldCount[note.pitch] == 0 && wasOn)
+      PlayNoteOutput(note.MakeNoteOff());
 
    //ofLog() << ofToString(pitch) + " " + ofToString(velocity) + ": " + ofToString(mHeldCount[pitch]) + " " + ofToString(voice);
 }
@@ -309,7 +309,7 @@ void Chorder::CheckLeftovers()
          if (mHeldCount[i] > 0)
          {
             ofLog() << "Somehow there are still notes in the count! Clearing";
-            PlayNoteOutput(gTime, i, 0, -1);
+            PlayNoteOutput(NoteMessage(gTime, i, 0));
             mHeldCount[i] = 0;
          }
       }

@@ -88,23 +88,23 @@ void PitchChorus::Process(double time)
    GetBuffer()->Reset();
 }
 
-void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchChorus::PlayNote(NoteMessage note)
 {
    for (int i = 0; i < kNumShifters; ++i)
    {
-      if (velocity > 0 && mShifters[i].mOn == false)
+      if (note.velocity > 0 && mShifters[i].mOn == false)
       {
-         float ratio = TheScale->PitchToFreq(pitch) / TheScale->PitchToFreq(60);
+         float ratio = TheScale->PitchToFreq(note.pitch) / TheScale->PitchToFreq(60);
          mShifters[i].mOn = true;
          mShifters[i].mShifter.SetRatio(ratio);
-         mShifters[i].mPitch = pitch;
-         mShifters[i].mRamp.Start(time, 1, time + 100);
+         mShifters[i].mPitch = note.pitch;
+         mShifters[i].mRamp.Start(note.time, 1, note.time + 100);
          break;
       }
-      if (velocity == 0 && mShifters[i].mOn == true && mShifters[i].mPitch == pitch)
+      if (note.velocity == 0 && mShifters[i].mOn == true && mShifters[i].mPitch == note.pitch)
       {
          mShifters[i].mOn = false;
-         mShifters[i].mRamp.Start(time, 0, time + 100);
+         mShifters[i].mRamp.Start(note.time, 0, note.time + 100);
          break;
       }
    }

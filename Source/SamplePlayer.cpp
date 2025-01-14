@@ -384,26 +384,26 @@ void SamplePlayer::Process(double time)
    GetBuffer()->Reset();
 }
 
-void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
+void SamplePlayer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
    if (mSelectPlayedCuePoint)
-      mRecentPlayedCuePoint = pitch;
+      mRecentPlayedCuePoint = note.pitch;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget() && mSample)
+   if (!NoteInputBuffer::IsTimeWithinFrame(note.time) && GetTarget() && mSample)
    {
-      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      mNoteInputBuffer.QueueNote(note);
       return;
    }
 
-   if (velocity > 0 && mSample != nullptr)
-      PlayCuePoint(time, pitch, velocity, modulation.pitchBend ? exp2(modulation.pitchBend->GetValue(0)) : 1, (modulation.modWheel ? modulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel) - ModulationParameters::kDefaultModWheel);
+   if (note.velocity > 0 && mSample != nullptr)
+      PlayCuePoint(note.time, note.pitch, note.velocity, note.modulation.pitchBend ? exp2(note.modulation.pitchBend->GetValue(0)) : 1, (note.modulation.modWheel ? note.modulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel) - ModulationParameters::kDefaultModWheel);
 
-   if (velocity == 0 && mStopOnNoteOff)
+   if (note.velocity == 0 && mStopOnNoteOff)
    {
-      mAdsr.Stop(time);
+      mAdsr.Stop(note.time);
    }
 }
 

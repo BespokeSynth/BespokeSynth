@@ -82,24 +82,24 @@ void MPETweaker::DrawModule()
    mModWheelOffsetSlider->Draw();
 }
 
-void MPETweaker::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void MPETweaker::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      mModulationMult.GetPitchBend(voiceIdx)->MultiplyIn(modulation.pitchBend);
-      mModulationOffset.GetPitchBend(voiceIdx)->AppendTo(mModulationMult.GetPitchBend(voiceIdx));
-      modulation.pitchBend = mModulationOffset.GetPitchBend(voiceIdx);
+      mModulationMult.GetPitchBend(note.voiceIdx)->MultiplyIn(note.modulation.pitchBend);
+      mModulationOffset.GetPitchBend(note.voiceIdx)->AppendTo(mModulationMult.GetPitchBend(note.voiceIdx));
+      note.modulation.pitchBend = mModulationOffset.GetPitchBend(note.voiceIdx);
 
-      mModulationMult.GetPressure(voiceIdx)->MultiplyIn(modulation.pressure);
-      mModulationOffset.GetPressure(voiceIdx)->AppendTo(mModulationMult.GetPressure(voiceIdx));
-      modulation.pressure = mModulationOffset.GetPressure(voiceIdx);
+      mModulationMult.GetPressure(note.voiceIdx)->MultiplyIn(note.modulation.pressure);
+      mModulationOffset.GetPressure(note.voiceIdx)->AppendTo(mModulationMult.GetPressure(note.voiceIdx));
+      note.modulation.pressure = mModulationOffset.GetPressure(note.voiceIdx);
 
-      mModulationMult.GetModWheel(voiceIdx)->MultiplyIn(modulation.modWheel);
-      mModulationOffset.GetModWheel(voiceIdx)->AppendTo(mModulationMult.GetModWheel(voiceIdx));
-      modulation.modWheel = mModulationOffset.GetModWheel(voiceIdx);
+      mModulationMult.GetModWheel(note.voiceIdx)->MultiplyIn(note.modulation.modWheel);
+      mModulationOffset.GetModWheel(note.voiceIdx)->AppendTo(mModulationMult.GetModWheel(note.voiceIdx));
+      note.modulation.modWheel = mModulationOffset.GetModWheel(note.voiceIdx);
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void MPETweaker::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

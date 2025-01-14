@@ -45,8 +45,8 @@ void NoteInputBuffer::Process(double time)
       if (mBuffer[i].time != -1 && mBuffer[i].velocity == 0 &&
           IsTimeWithinFrame(mBuffer[i].time))
       {
-         NoteInputElement& element = mBuffer[i];
-         mReceiver->PlayNote(element.time, element.pitch, element.velocity, element.voiceIdx, element.modulation);
+         NoteMessage& element = mBuffer[i];
+         mReceiver->PlayNote(element);
          mBuffer[i].time = -1;
       }
    }
@@ -57,25 +57,25 @@ void NoteInputBuffer::Process(double time)
       if (mBuffer[i].time != -1 && mBuffer[i].velocity != 0 &&
           IsTimeWithinFrame(mBuffer[i].time))
       {
-         NoteInputElement& element = mBuffer[i];
-         mReceiver->PlayNote(element.time, element.pitch, element.velocity, element.voiceIdx, element.modulation);
+         NoteMessage& element = mBuffer[i];
+         mReceiver->PlayNote(element);
          mBuffer[i].time = -1;
       }
    }
 }
 
-void NoteInputBuffer::QueueNote(double time, int pitch, float velocity, int voiceIdx, ModulationParameters modulation)
+void NoteInputBuffer::QueueNote(NoteMessage note)
 {
    for (int i = 0; i < kBufferSize; ++i)
    {
       if (mBuffer[i].time == -1)
       {
-         mBuffer[i].time = time;
-         NoteInputElement& element = mBuffer[i];
-         element.pitch = pitch;
-         element.velocity = velocity;
-         element.voiceIdx = voiceIdx;
-         element.modulation = modulation;
+         mBuffer[i].time = note.time;
+         NoteMessage& element = mBuffer[i];
+         element.pitch = note.pitch;
+         element.velocity = note.velocity;
+         element.voiceIdx = note.voiceIdx;
+         element.modulation = note.modulation;
          break;
       }
    }

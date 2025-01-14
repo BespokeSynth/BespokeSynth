@@ -77,41 +77,42 @@ void PitchRemap::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void PitchRemap::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchRemap::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (pitch >= 0 && pitch < 128)
+   if (note.pitch >= 0 && note.pitch < 128)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
-         mInputNotes[pitch].mOn = true;
-         mInputNotes[pitch].mVelocity = velocity;
-         mInputNotes[pitch].mVoiceIdx = voiceIdx;
+         mInputNotes[note.pitch].mOn = true;
+         mInputNotes[note.pitch].mVelocity = note.velocity;
+         mInputNotes[note.pitch].mVoiceIdx = note.voiceIdx;
       }
       else
       {
-         mInputNotes[pitch].mOn = false;
+         mInputNotes[note.pitch].mOn = false;
       }
    }
 
    bool remapped = false;
    for (size_t i = 0; i < mRemaps.size(); ++i)
    {
-      if (pitch == mRemaps[i].mFromPitch)
+      if (note.pitch == mRemaps[i].mFromPitch)
       {
-         PlayNoteOutput(time, mRemaps[i].mToPitch, velocity, voiceIdx, modulation);
+         note.pitch = mRemaps[i].mToPitch;
+         PlayNoteOutput(note);
          remapped = true;
          break;
       }
    }
 
    if (!remapped)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
 }
 
 void PitchRemap::TextEntryComplete(TextEntry* entry)

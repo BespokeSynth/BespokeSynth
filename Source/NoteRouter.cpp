@@ -75,13 +75,13 @@ bool NoteRouter::IsIndexActive(int idx) const
       return mRouteMask & (1 << idx);
 }
 
-void NoteRouter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteRouter::PlayNote(NoteMessage note)
 {
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
       if (IsIndexActive(i))
       {
-         mDestinationCables[i]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         mDestinationCables[i]->PlayNoteOutput(note);
       }
    }
 }

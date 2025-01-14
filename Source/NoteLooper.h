@@ -58,7 +58,7 @@ public:
    void SetNumMeasures(int numMeasures);
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;

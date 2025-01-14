@@ -85,107 +85,107 @@ void VolcaBeatsControl::DrawModule()
       mLevelSliders[i]->Draw();
 }
 
-void VolcaBeatsControl::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VolcaBeatsControl::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (pitch < 10)
+   if (note.pitch < 10)
    {
-      mLevelSliders[pitch]->Compute();
-      velocity *= mLevels[pitch];
+      mLevelSliders[note.pitch]->Compute();
+      note.velocity *= mLevels[note.pitch];
    }
 
-   switch (pitch)
+   switch (note.pitch)
    {
       case 0: //kick
-         pitch = 36;
-         if (velocity > 0)
-            SendCC(40, velocity);
+         note.pitch = 36;
+         if (note.velocity > 0)
+            SendCC(40, note.velocity);
          break;
       case 1: //snare
-         pitch = 38;
-         if (velocity > 0)
-            SendCC(41, velocity);
+         note.pitch = 38;
+         if (note.velocity > 0)
+            SendCC(41, note.velocity);
          break;
       case 2: //closed
-         pitch = 42;
-         if (velocity > 0)
+         note.pitch = 42;
+         if (note.velocity > 0)
          {
-            SendCC(44, velocity);
+            SendCC(44, note.velocity);
             mClosedHatDecaySlider->Compute();
             mHatGrainSlider->Compute();
          }
          break;
       case 3: //ride
-         pitch = 67;
-         if (velocity > 0)
+         note.pitch = 67;
+         if (note.velocity > 0)
          {
-            SendCC(48, velocity);
+            SendCC(48, note.velocity);
             mAgogoSpeedSlider->Compute();
          }
          break;
       case 4: //clap
-         pitch = 39;
-         if (velocity > 0)
+         note.pitch = 39;
+         if (note.velocity > 0)
          {
-            SendCC(46, velocity);
+            SendCC(46, note.velocity);
             mClapSpeedSlider->Compute();
          }
          break;
       case 5: //crash
-         pitch = 49;
-         if (velocity > 0)
+         note.pitch = 49;
+         if (note.velocity > 0)
          {
-            SendCC(49, velocity);
+            SendCC(49, note.velocity);
             mCrashSpeedSlider->Compute();
          }
          break;
       case 6: //open
-         pitch = 46;
-         if (velocity > 0)
+         note.pitch = 46;
+         if (note.velocity > 0)
          {
-            SendCC(45, velocity);
+            SendCC(45, note.velocity);
             mOpenHatDecaySlider->Compute();
             mHatGrainSlider->Compute();
          }
          break;
       case 7: //stick
-         pitch = 75;
-         if (velocity > 0)
+         note.pitch = 75;
+         if (note.velocity > 0)
          {
-            SendCC(47, velocity);
+            SendCC(47, note.velocity);
             mClaveSpeedSlider->Compute();
          }
          break;
       case 8: //floor
-         pitch = 43;
-         if (velocity > 0)
+         note.pitch = 43;
+         if (note.velocity > 0)
          {
-            SendCC(42, velocity);
+            SendCC(42, note.velocity);
             mTomDecaySlider->Compute();
          }
          break;
       case 9: //low
-         pitch = 50;
-         if (velocity > 0)
+         note.pitch = 50;
+         if (note.velocity > 0)
          {
-            SendCC(43, velocity);
+            SendCC(43, note.velocity);
             mTomDecaySlider->Compute();
          }
          break;
       default:
-         pitch = -1;
+         note.pitch = -1;
    }
 
    mStutterTimeSlider->Compute();
    mStutterDepthSlider->Compute();
 
-   if (pitch != -1)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   if (note.pitch != -1)
+      PlayNoteOutput(note);
 }
 
 void VolcaBeatsControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

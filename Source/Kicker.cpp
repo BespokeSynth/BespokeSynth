@@ -47,13 +47,13 @@ void Kicker::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void Kicker::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Kicker::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 
    if (mEnabled && mDrumPlayer)
    {
-      mDrumPlayer->PlayNote(time, 3, velocity);
+      mDrumPlayer->PlayNote(NoteMessage(note.time, 3, note.velocity));
    }
 }
 

@@ -821,11 +821,11 @@ void VSTPlugin::Process(double time)
                auto tMidi = time + (*midiIt).samplePosition * gInvSampleRateMs;
                if (msg.isNoteOn())
                {
-                  mMidiOutCable->PlayNoteOutput(tMidi, msg.getNoteNumber(), msg.getVelocity());
+                  mMidiOutCable->PlayNoteOutput(NoteMessage(tMidi, msg.getNoteNumber(), msg.getVelocity()));
                }
                else if (msg.isNoteOff())
                {
-                  mMidiOutCable->PlayNoteOutput(tMidi, msg.getNoteNumber(), 0);
+                  mMidiOutCable->PlayNoteOutput(NoteMessage(tMidi, msg.getNoteNumber(), 0));
                }
                else if (msg.isController())
                {
@@ -873,7 +873,7 @@ void VSTPlugin::Process(double time)
    GetBuffer()->Clear();
 }
 
-void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VSTPlugin::PlayNote(NoteMessage note)
 {
    if (!mPluginReady || mPlugin == nullptr)
       return;
@@ -881,34 +881,34 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    if (!mEnabled)
       return;
 
-   if (pitch < 0 || pitch > 127)
+   if (note.pitch < 0 || note.pitch > 127)
       return;
 
-   int channel = voiceIdx + 1;
-   if (voiceIdx == -1)
+   int channel = note.voiceIdx + 1;
+   if (note.voiceIdx == -1)
       channel = 1;
 
    const juce::ScopedLock lock(mMidiInputLock);
 
-   int sampleNumber = (time - gTime) * gSampleRateMs;
+   int sampleNumber = (note.time - gTime) * gSampleRateMs;
    //ofLog() << sampleNumber;
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mMidiBuffer.addEvent(juce::MidiMessage::noteOn(mUseVoiceAsChannel ? channel : mChannel, pitch, (uint8)velocity), sampleNumber);
+      mMidiBuffer.addEvent(juce::MidiMessage::noteOn(mUseVoiceAsChannel ? channel : mChannel, note.pitch, (uint8)note.velocity), sampleNumber);
       //ofLog() << "+ vst note on: " << (mUseVoiceAsChannel ? channel : mChannel) << " " << pitch << " " << (uint8)velocity;
    }
    else
    {
-      mMidiBuffer.addEvent(juce::MidiMessage::noteOff(mUseVoiceAsChannel ? channel : mChannel, pitch), sampleNumber);
+      mMidiBuffer.addEvent(juce::MidiMessage::noteOff(mUseVoiceAsChannel ? channel : mChannel, note.pitch), sampleNumber);
       //ofLog() << "- vst note off: " << (mUseVoiceAsChannel ? channel : mChannel) << " " << pitch;
    }
 
-   int modIdx = voiceIdx;
-   if (voiceIdx == -1)
+   int modIdx = note.voiceIdx;
+   if (note.voiceIdx == -1)
       modIdx = kGlobalModulationIdx;
 
-   mChannelModulations[modIdx].mModulation = modulation;
+   mChannelModulations[modIdx].mModulation = note.modulation;
 }
 
 void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)

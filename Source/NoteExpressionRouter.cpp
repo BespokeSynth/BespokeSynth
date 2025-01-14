@@ -74,16 +74,16 @@ void NoteExpressionRouter::DrawModule()
       mExpressionWidget[i]->Draw();
 }
 
-void NoteExpressionRouter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteExpressionRouter::PlayNote(NoteMessage note)
 {
-   mSTNote = pitch;
-   mSTVelocity = velocity;
+   mSTNote = note.pitch;
+   mSTVelocity = note.velocity;
    for (auto i = 0; i < kMaxDestinations; ++i)
    {
       auto rt = mExpressions[i].value();
       if (rt != 0)
       {
-         mDestinationCables[i]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         mDestinationCables[i]->PlayNoteOutput(note);
       }
    }
 }

@@ -63,28 +63,31 @@ void NoteHumanizer::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void NoteHumanizer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteHumanizer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
    float delayMs;
    int outputVelocity;
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       delayMs = ofRandom(0, mTime);
-      outputVelocity = ofClamp((velocity / 127.0f * ofRandom(1 - mVelocity, 1 + mVelocity)) * 127, 1, 127);
-      mLastDelayMs[pitch] = delayMs;
+      outputVelocity = ofClamp((note.velocity / 127.0f * ofRandom(1 - mVelocity, 1 + mVelocity)) * 127, 1, 127);
+      mLastDelayMs[note.pitch] = delayMs;
    }
    else
    {
-      delayMs = mLastDelayMs[pitch];
+      delayMs = mLastDelayMs[note.pitch];
       outputVelocity = 0;
    }
-   PlayNoteOutput(time + delayMs, pitch, outputVelocity, voiceIdx, modulation);
+
+   note.time += delayMs;
+   note.velocity = outputVelocity;
+   PlayNoteOutput(note);
 }
 
 void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

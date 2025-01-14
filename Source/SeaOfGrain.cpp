@@ -379,20 +379,20 @@ void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void SeaOfGrain::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void SeaOfGrain::PlayNote(NoteMessage note)
 {
-   if (voiceIdx == -1 || voiceIdx >= kNumMPEVoices)
+   if (note.voiceIdx == -1 || note.voiceIdx >= kNumMPEVoices)
       return;
 
-   if (velocity > 0)
-      mMPEVoices[voiceIdx].mADSR.Start(time, 1);
+   if (note.velocity > 0)
+      mMPEVoices[note.voiceIdx].mADSR.Start(note.time, 1);
    else
-      mMPEVoices[voiceIdx].mADSR.Stop(time);
-   mMPEVoices[voiceIdx].mPitch = pitch;
-   mMPEVoices[voiceIdx].mPlay = 0;
-   mMPEVoices[voiceIdx].mPitchBend = modulation.pitchBend;
-   mMPEVoices[voiceIdx].mPressure = modulation.pressure;
-   mMPEVoices[voiceIdx].mModWheel = modulation.modWheel;
+      mMPEVoices[note.voiceIdx].mADSR.Stop(note.time);
+   mMPEVoices[note.voiceIdx].mPitch = note.pitch;
+   mMPEVoices[note.voiceIdx].mPlay = 0;
+   mMPEVoices[note.voiceIdx].mPitchBend = note.modulation.pitchBend;
+   mMPEVoices[note.voiceIdx].mPressure = note.modulation.pressure;
+   mMPEVoices[note.voiceIdx].mModWheel = note.modulation.modWheel;
 }
 
 void SeaOfGrain::LoadLayout(const ofxJSONElement& moduleInfo)

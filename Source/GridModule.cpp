@@ -103,9 +103,9 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
    UpdateLights();
 }
 
-void GridModule::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void GridModule::PlayNote(NoteMessage note)
 {
-   OnGridButton(pitch % GetCols(), ((pitch / GetCols()) % GetRows()), velocity / 127.0f, nullptr);
+   OnGridButton(note.pitch % GetCols(), ((note.pitch / GetCols()) % GetRows()), note.velocity / 127.0f, nullptr);
 }
 
 void GridModule::UpdateLights()

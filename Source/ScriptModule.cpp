@@ -836,23 +836,23 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
       modulation.pitchBend = &mPitchBends[intPitch];
       modulation.pitchBend->SetValue(pitch - intPitch);
    }
-   SendNoteToIndex(noteOutputIndex, time, intPitch, (int)velocity, -1, modulation);
+   SendNoteToIndex(noteOutputIndex, NoteMessage(time, intPitch, (int)velocity, -1, modulation));
 
    if (velocity > 0)
       mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan, 1));
 }
 
-void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ScriptModule::SendNoteToIndex(int index, NoteMessage note)
 {
    if (index == 0)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
+      PlayNoteOutput(note, true);
       return;
    }
 
    if (index - 1 < (int)mExtraNoteOutputs.size())
    {
-      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
+      mExtraNoteOutputs[index - 1]->PlayNoteOutput(note, true);
    }
 }
 
@@ -1122,15 +1122,15 @@ void ScriptModule::OnPulse(double time, float velocity, int flags)
 }
 
 //INoteReceiver
-void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
+void ScriptModule::PlayNote(NoteMessage note)
 {
    for (size_t i = 0; i < mPendingNoteInput.size(); ++i)
    {
       if (mPendingNoteInput[i].time == -1)
       {
-         mPendingNoteInput[i].time = time;
-         mPendingNoteInput[i].pitch = pitch;
-         mPendingNoteInput[i].velocity = velocity;
+         mPendingNoteInput[i].time = note.time;
+         mPendingNoteInput[i].pitch = note.pitch;
+         mPendingNoteInput[i].velocity = note.velocity;
          break;
       }
    }

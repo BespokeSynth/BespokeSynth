@@ -187,35 +187,35 @@ void SingleOscillator::Process(double time)
    }
 }
 
-void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void SingleOscillator::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget())
+   if (!NoteInputBuffer::IsTimeWithinFrame(note.time) && GetTarget())
    {
-      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      mNoteInputBuffer.QueueNote(note);
       return;
    }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
-      float adsrScale = SingleOscillatorVoice::GetADSRScale(velocity / 127.0f, mVoiceParams.mVelToEnvelope);
-      mVoiceParams.mAdsr.Start(time, 1, adsrScale); //for visualization
-      mVoiceParams.mFilterAdsr.Start(time, 1, adsrScale); //for visualization
+      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      float adsrScale = SingleOscillatorVoice::GetADSRScale(note.velocity / 127.0f, mVoiceParams.mVelToEnvelope);
+      mVoiceParams.mAdsr.Start(note.time, 1, adsrScale); //for visualization
+      mVoiceParams.mFilterAdsr.Start(note.time, 1, adsrScale); //for visualization
    }
    else
    {
-      mPolyMgr.Stop(time, pitch, voiceIdx);
-      mVoiceParams.mAdsr.Stop(time, false); //for visualization
-      mVoiceParams.mFilterAdsr.Stop(time, false); //for visualization
+      mPolyMgr.Stop(note.time, note.pitch, note.voiceIdx);
+      mVoiceParams.mAdsr.Stop(note.time, false); //for visualization
+      mVoiceParams.mFilterAdsr.Stop(note.time, false); //for visualization
    }
 
    if (mDrawDebug)
    {
-      mDebugLines[mDebugLinesPos].text = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
-      if (velocity > 0)
+      mDebugLines[mDebugLinesPos].text = "PlayNote(" + ofToString(note.time / 1000) + ", " + ofToString(note.pitch) + ", " + ofToString(note.velocity) + ", " + ofToString(note.voiceIdx) + ")";
+      if (note.velocity > 0)
          mDebugLines[mDebugLinesPos].color = ofColor::lime;
       else
          mDebugLines[mDebugLinesPos].color = ofColor::red;

@@ -54,12 +54,12 @@ void PitchPanner::DrawModule()
    mPitchRightSlider->Draw();
 }
 
-void PitchPanner::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchPanner::PlayNote(NoteMessage note)
 {
    if (mEnabled)
-      modulation.pan = ofMap(pitch, mPitchLeft, mPitchRight, -1, 1);
+      note.modulation.pan = ofMap(note.pitch, mPitchLeft, mPitchRight, -1, 1);
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void PitchPanner::LoadLayout(const ofxJSONElement& moduleInfo)

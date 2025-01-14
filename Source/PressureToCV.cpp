@@ -65,11 +65,11 @@ void PressureToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    OnModulatorRepatch();
 }
 
-void PressureToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PressureToCV::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
-      mPressure = modulation.pressure;
+      mPressure = note.modulation.pressure;
    }
 }
 

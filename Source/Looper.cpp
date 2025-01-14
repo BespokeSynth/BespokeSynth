@@ -1252,14 +1252,14 @@ void Looper::Rewrite()
    mWantRewrite = true;
 }
 
-void Looper::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Looper::PlayNote(NoteMessage note)
 {
    //jump around in loop
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      float measurePos = fmod(pitch / 16.0f, mNumBars);
+      float measurePos = fmod(note.pitch / 16.0f, mNumBars);
       float sampsPerBar = TheTransport->MsPerBar() / 1000.0f * gSampleRate;
-      mLoopPosOffset = (measurePos - fmod(TheTransport->GetMeasureTime(time), mNumBars)) * sampsPerBar;
+      mLoopPosOffset = (measurePos - fmod(TheTransport->GetMeasureTime(note.time), mNumBars)) * sampsPerBar;
       if (mLoopPosOffset < 0)
          mLoopPosOffset += mLoopLength;
       mLoopPosOffsetSlider->DisableLFO();
