@@ -35,6 +35,7 @@
 #include "PatchCableSource.h"
 #include "DropdownList.h"
 #include "IModulator.h"
+#include "IPulseReceiver.h"
 
 struct LFOSettings
 {
@@ -47,20 +48,22 @@ struct LFOSettings
    double mShuffle{ 0 };
    double mFreeRate{ 1 };
    double mLength{ 1 };
+   double mMinValue{ 0 };
+   double mMaxValue{ 1 };
    bool mLowResMode{ false };
 
    void SaveState(FileStreamOut& out) const;
    void LoadState(FileStreamIn& in);
 };
 
-class FloatSliderLFOControl : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IModulator
+class FloatSliderLFOControl : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IModulator, public IPulseReceiver
 {
 public:
    FloatSliderLFOControl();
    static IDrawableModule* Create() { return new FloatSliderLFOControl(); }
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return false; }
-   static bool AcceptsPulses() { return false; }
+   static bool AcceptsPulses() { return true; }
    void Delete() { delete this; }
    void DrawModule() override;
 
@@ -89,6 +92,9 @@ public:
    double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool InitializeWithZeroRange() const override { return true; }
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

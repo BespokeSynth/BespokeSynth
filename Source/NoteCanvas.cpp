@@ -101,30 +101,30 @@ NoteCanvas::~NoteCanvas()
    TheTransport->RemoveAudioPoller(this);
 }
 
-void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteCanvas::PlayNote(NoteMessage note)
 {
-   mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
+   mNoteOutput.PlayNote(note);
 
    if (!mEnabled || !mRecord)
       return;
 
-   if (mInputNotes[pitch]) //handle note-offs or retriggers
+   if (mInputNotes[note.pitch]) //handle note-offs or retriggers
    {
-      double endPos = GetCurPos(time);
-      if (mInputNotes[pitch]->GetStart() > endPos)
+      double endPos = GetCurPos(note.time);
+      if (mInputNotes[note.pitch]->GetStart() > endPos)
          endPos += 1; //wrap
-      mInputNotes[pitch]->SetEnd(endPos);
-      mInputNotes[pitch] = nullptr;
+      mInputNotes[note.pitch]->SetEnd(endPos);
+      mInputNotes[note.pitch] = nullptr;
    }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       if (mFreeRecord && mFreeRecordStartMeasure == -1)
-         mFreeRecordStartMeasure = TheTransport->GetMeasure(time);
+         mFreeRecordStartMeasure = TheTransport->GetMeasure(note.time);
 
-      double measurePos = GetCurPos(time) * mNumMeasures;
-      NoteCanvasElement* element = AddNote(measurePos, pitch, velocity, 1 / mCanvas->GetNumCols(), voiceIdx, modulation);
-      mInputNotes[pitch] = element;
+      double measurePos = GetCurPos(note.time) * mNumMeasures;
+      NoteCanvasElement* element = AddNote(measurePos, note.pitch, note.velocity, 1 / mCanvas->GetNumCols(), note.voiceIdx, note.modulation);
+      mInputNotes[note.pitch] = element;
       mCanvas->SetRowOffset(element->mRow - mCanvas->GetNumVisibleRows() / 2);
    }
 }
@@ -201,7 +201,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
             double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
             if (time < gTime)
                time = gTime;
-            mNoteOutput.PlayNote(time, pitch, 0, mCurrentNotes[pitch]->GetVoiceIdx());
+            mNoteOutput.PlayNote(NoteMessage(time, pitch, 0, mCurrentNotes[pitch]->GetVoiceIdx()));
             mCurrentNotes[pitch] = nullptr;
          }
       }
@@ -217,7 +217,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          if (time > gTime)
          {
             mCurrentNotes[pitch] = note;
-            mNoteOutput.PlayNote(time, pitch, note->GetVelocity() * 127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan()));
+            mNoteOutput.PlayNote(NoteMessage(time, pitch, note->GetVelocity() * 127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan())));
          }
       }
 

@@ -67,7 +67,7 @@ public:
 
    void OnTransportAdvanced(float amount) override;
 
-   void CheckboxUpdated(Checkbox* checkbox, double time);
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

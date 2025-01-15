@@ -67,7 +67,7 @@ public:
    int GetNumTargets() override { return mUseIndividualOuts ? (int)mHits.size() + 1 : 1; }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;

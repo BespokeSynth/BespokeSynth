@@ -89,7 +89,7 @@ void RandomNoteGenerator::OnTimeEvent(double time)
    {
       mSkipCount = 0;
       if (mProbability >= ofRandom(1))
-         PlayNoteOutput(time, mPitch, mVelocity * 127, -1);
+         PlayNoteOutput(NoteMessage(time, mPitch, mVelocity * 127));
    }
 }
 

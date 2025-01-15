@@ -128,21 +128,21 @@ void KarplusStrong::Process(double time)
    GetBuffer()->Reset();
 }
 
-void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void KarplusStrong::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget())
+   if (!NoteInputBuffer::IsTimeWithinFrame(note.time) && GetTarget())
    {
-      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      mNoteInputBuffer.QueueNote(note);
       return;
    }
 
-   if (velocity > 0)
-      mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
+   if (note.velocity > 0)
+      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
    else
-      mPolyMgr.Stop(time, pitch, voiceIdx);
+      mPolyMgr.Stop(note.time, note.pitch, note.voiceIdx);
 }
 
 void KarplusStrong::SetEnabled(bool enabled)

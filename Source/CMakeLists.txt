@@ -1,6 +1,10 @@
 include(cmake/lib.cmake)
 include(cmake/versiontools.cmake)
-include(../libs/ableton-link/AbletonLinkConfig.cmake)
+if(BESPOKE_SYSTEM_ABLETONLINK)
+    find_package(AbletonLink NAMES AbletonLink ableton-link link REQUIRED)
+else()
+    include(../libs/ableton-link/AbletonLinkConfig.cmake)
+endif()
 
 juce_add_gui_app(BespokeSynth
     PRODUCT_NAME BespokeSynth
@@ -16,6 +20,19 @@ juce_add_gui_app(BespokeSynth
     )
 
 bespoke_buildtime_version_info(BespokeSynth)
+
+if(MSVC)
+    if(BESPOKE_WERROR)
+        target_compile_options(BespokeSynth PRIVATE /WX)
+    endif()
+else()
+    if (APPLE)
+        target_compile_options(BespokeSynth PRIVATE -Wshorten-64-to-32)
+    endif()
+    if(BESPOKE_WERROR)
+        target_compile_options(BespokeSynth PRIVATE -Werror)
+    endif()
+endif()
 
 target_sources(BespokeSynth PRIVATE
     ADSR.cpp
@@ -38,6 +55,8 @@ target_sources(BespokeSynth PRIVATE
     AudioRouter.h
     AudioSend.cpp
     AudioSend.h
+    AudioSplitter.cpp
+    AudioSplitter.h
     AudioToCV.cpp
     AudioToCV.h
     AudioToPulse.cpp
@@ -261,6 +280,8 @@ target_sources(BespokeSynth PRIVATE
     LaunchpadKeyboard.h
     LaunchpadNoteDisplayer.cpp
     LaunchpadNoteDisplayer.h
+    LevelMeterDisplay.cpp
+    LevelMeterDisplay.h
     LinkwitzRileyFilter.cpp
     LinkwitzRileyFilter.h
     LinnstrumentControl.cpp
@@ -541,6 +562,8 @@ target_sources(BespokeSynth PRIVATE
     PulseGate.h
     PulseHocket.cpp
     PulseHocket.h
+    PulseLimit.cpp
+    PulseLimit.h
     PulseRouter.cpp
     PulseRouter.h
     PulseSequence.cpp
@@ -853,7 +876,7 @@ else ()
 endif ()
 
 target_link_libraries(BespokeSynth PRIVATE
-    bespoke::exprtk
+    exprtk::exprtk
     bespoke::freeverb
     $<IF:$<STREQUAL:${BESPOKE_SYSTEM_JSONCPP},OFF>,bespoke::json,jsoncpp>
     bespoke::leathers

@@ -971,21 +971,21 @@ void BeatBloks::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void BeatBloks::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void BeatBloks::PlayNote(NoteMessage note)
 {
    if (mSample)
    {
       mPlay = false;
-      if (pitch == 16)
+      if (note.pitch == 16)
       {
          mSample->Reset();
       }
-      else if (pitch >= 0 && pitch < 16 && velocity > 0)
+      else if (note.pitch >= 0 && note.pitch < 16 && note.velocity > 0)
       {
-         int slice = (pitch / 8) * 8 + 7 - (pitch % 8);
+         int slice = (note.pitch / 8) * 8 + 7 - (note.pitch % 8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = (barLength / 4) * slice + mClipStart;
-         mSample->Play(time, 1, position);
+         mSample->Play(note.time, 1, position);
       }
    }
 }

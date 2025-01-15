@@ -15,6 +15,7 @@ option(BESPOKE_DEVENDORED_SYSTEM_JUCE "Use system libraries when using system in
 option(BESPOKE_SYSTEM_PYBIND11 "Use a system installation of pybind11" OFF)
 option(BESPOKE_SYSTEM_JSONCPP "Use system-wide installation of jsoncpp" OFF)
 option(BESPOKE_SYSTEM_TUNING_LIBRARY "Use system installation of tuning-library" OFF)
+option(BESPOKE_SYSTEM_ABLETONLINK "Use system installation of abletonlink" OFF)
 option(BESPOKE_USE_ASAN "Build with ASAN" OFF)
 
 # Global CMake options
@@ -23,13 +24,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT BespokeSynth)
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.13 CACHE STRING "Minimum macOS version")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif ()
 
-project(BespokeSynth VERSION 1.2.1 LANGUAGES C CXX ASM)
+project(BespokeSynth VERSION 1.3.0 LANGUAGES C CXX ASM)
 
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 math(EXPR BESPOKE_BITNESS "${CMAKE_SIZEOF_VOID_P} * 8" OUTPUT_FORMAT DECIMAL)

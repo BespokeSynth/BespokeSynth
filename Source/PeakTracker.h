@@ -32,6 +32,7 @@ public:
    double GetPeak() const { return mPeak; }
    void SetDecayTime(double time) { mDecayTime = time; }
    void SetLimit(double limit) { mLimit = limit; }
+   double GetLimit() const { return mLimit; }
    void Reset() { mPeak = 0; }
    double GetLastHitLimitTime() const { return mHitLimitTime; }
 

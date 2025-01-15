@@ -32,7 +32,7 @@
 #include "Slider.h"
 #include "ClickButton.h"
 #include "TextEntry.h"
-#include "exprtk/exprtk.hpp"
+#include "exprtk.hpp"
 
 class ModulatorExpression : public IDrawableModule, public IFloatSliderListener, public ITextEntryListener, public IModulator
 {

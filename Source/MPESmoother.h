@@ -48,7 +48,7 @@ public:
    void Init() override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void OnTransportAdvanced(float amount) override;
 

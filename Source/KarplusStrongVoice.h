@@ -60,7 +60,7 @@ public:
    double mExciterDecay{ 3 };
    double mExcitation{ 0 };
    double mPitchTone{ 0 };
-   double mVelToVolume{ .5 };
+   double mVelToVolume{ 1.0 };
    double mVelToEnvelope{ .5 };
    bool mLiteCPUMode{ false };
 };

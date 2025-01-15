@@ -560,7 +560,7 @@ void FloatSlider::MatchExtents(FloatSlider* slider)
 void FloatSlider::DisableLFO()
 {
    if (mLFOControl)
-      mLFOControl->SetEnabled(false);
+      mLFOControl->SetLFOEnabled(false);
 }
 
 double FloatSlider::GetValue() const

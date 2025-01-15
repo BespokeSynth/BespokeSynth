@@ -134,7 +134,7 @@ public:
    int GetRowPitch(int row) const { return mRows[row]->GetRowPitch(); }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
@@ -223,9 +223,18 @@ private:
       RepeatHeld
    };
 
+   enum class StepVelocityEntryMode
+   {
+      Dropdown,
+      Slider
+   };
+
    UIGrid* mGrid{ nullptr };
-   double mStrength{ 1 };
+   double mStrength{ .8 };
    FloatSlider* mStrengthSlider{ nullptr };
+   StepVelocityType mVelocityType{ StepVelocityType::Normal };
+   DropdownList* mVelocityTypeDropdown{ nullptr };
+   StepVelocityEntryMode mStepVelocityEntryMode{ StepVelocityEntryMode::Dropdown };
    int mGridYOff{ 0 };
    ClickButton* mClearButton{ nullptr };
    DropdownList* mGridYOffDropdown{ nullptr };

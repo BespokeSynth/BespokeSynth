@@ -36,7 +36,7 @@
 #include "PatchCableSource.h"
 #include "ChannelBuffer.h"
 #include "IPulseReceiver.h"
-#include "exprtk/exprtk.hpp"
+#include "exprtk.hpp"
 #include "UserPrefs.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
@@ -76,6 +76,7 @@ float gControlTactileFeedback = 0;
 double gDrawScale = 1;
 bool gShowDevModules = false;
 double gCornerRoundness = 1;
+std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
 
 std::random_device gRandomDevice;
 bespoke::core::Xoshiro256ss gRandom(gRandomDevice);
@@ -94,6 +95,10 @@ void SynthInit()
    TheSynth->GetAudioFormatManager().registerBasicFormats();
 
    assert(kNumVoices <= 16); //assumption that we don't have more voices than midi channels
+
+   gStepVelocityLevels[(int)StepVelocityType::Ghost] = 0.4f;
+   gStepVelocityLevels[(int)StepVelocityType::Normal] = 0.8f;
+   gStepVelocityLevels[(int)StepVelocityType::Accent] = 1.0f;
 }
 
 void LoadGlobalResources()
@@ -524,7 +529,7 @@ void UpdateTarget(IDrawableModule* module)
    }
 }
 
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b)
+void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b, bool autocorrelationMode /* = true */)
 {
    ofPushStyle();
    ofSetLineWidth(1.5f);
@@ -540,7 +545,11 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
    for (int i = 100; i < numPoints; ++i)
    {
       float vx = x + w / 2 + buffer->GetSample(i, 0) * .8f * MIN(w, h);
-      float vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+      float vy;
+      if (autocorrelationMode)
+         vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+      else
+         vy = y + h / 2 + buffer->GetSample(i, secondChannel) * .8f * MIN(w, h);
       //float alpha = 1 - (i/float(numPoints));
       //ofSetColor(r*255,g*255,b*255,alpha*alpha*255);
       ofVertex(vx, vy);

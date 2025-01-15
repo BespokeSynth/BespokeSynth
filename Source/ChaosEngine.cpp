@@ -166,7 +166,7 @@ void ChaosEngine::UpdateProgression(int beat)
       std::vector<int> pitches = GetCurrentChordPitches();
       for (int i = 0; i < pitches.size(); ++i)
       {
-         PlayNoteOutput(gTime, pitches[i], 127, -1);
+         PlayNoteOutput(NoteMessage(gTime, pitches[i], 127));
       }
    }
 }

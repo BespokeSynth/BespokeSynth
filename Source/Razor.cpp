@@ -135,33 +135,33 @@ void Razor::Process(double time)
    }
 }
 
-void Razor::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Razor::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      float amount = velocity / 127.0f;
+      float amount = note.velocity / 127.0f;
 
-      mPitch = pitch;
+      mPitch = note.pitch;
       for (int i = 1; i <= NUM_PARTIALS; ++i)
       {
-         mAdsr[i - 1].Start(time, amount,
+         mAdsr[i - 1].Start(note.time, amount,
                             mA,
                             mD,
                             mS,
                             mR);
       }
 
-      mPitchBend = modulation.pitchBend;
-      mModWheel = modulation.modWheel;
-      mPressure = modulation.pressure;
+      mPitchBend = note.modulation.pitchBend;
+      mModWheel = note.modulation.modWheel;
+      mPressure = note.modulation.pressure;
    }
-   else if (mPitch == pitch)
+   else if (mPitch == note.pitch)
    {
       for (int i = 0; i < NUM_PARTIALS; ++i)
-         mAdsr[i].Stop(time);
+         mAdsr[i].Stop(note.time);
    }
 }
 

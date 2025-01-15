@@ -205,21 +205,21 @@ void SignalGenerator::Process(double time)
    Add(out, mWriteBuffer, bufferSize);
 }
 
-void SignalGenerator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void SignalGenerator::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       if (mFreqMode == kFreqMode_Instant)
       {
-         mFreq = TheScale->PitchToFreq(pitch);
+         mFreq = TheScale->PitchToFreq(note.pitch);
       }
       else if (mFreqMode == kFreqMode_Ramp)
       {
-         mFreqRamp.Start(time, TheScale->PitchToFreq(pitch), time + mFreqRampTime);
+         mFreqRamp.Start(note.time, TheScale->PitchToFreq(note.pitch), note.time + mFreqRampTime);
       }
       else if (mFreqMode == kFreqMode_Slider)
       {
-         float freq = TheScale->PitchToFreq(pitch);
+         float freq = TheScale->PitchToFreq(note.pitch);
          if (freq >= mFreq)
          {
             mFreqSliderAmount = 0;

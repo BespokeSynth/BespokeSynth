@@ -169,6 +169,7 @@ private:
    DropdownList* mLoadLayoutDropdown{ nullptr };
    ClickButton* mDisplayHelpButton{ nullptr };
    ClickButton* mDisplayUserPrefsEditorButton{ nullptr };
+   ClickButton* mHomeButton{ nullptr };
    Checkbox* mEventLookaheadCheckbox{ nullptr };
    int mLoadLayoutIndex{ -1 };
    Checkbox* mShouldAutosaveCheckbox{ nullptr };

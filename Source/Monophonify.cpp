@@ -57,25 +57,25 @@ void Monophonify::DrawModule()
    mGlideSlider->Draw();
 }
 
-void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Monophonify::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (pitch < 0 || pitch >= 128)
+   if (note.pitch < 0 || note.pitch >= 128)
       return;
 
-   mPitchBend.AppendTo(modulation.pitchBend);
-   modulation.pitchBend = &mPitchBend;
+   mPitchBend.AppendTo(note.modulation.pitchBend);
+   note.modulation.pitchBend = &mPitchBend;
 
-   voiceIdx = mVoiceIdx;
+   note.voiceIdx = mVoiceIdx;
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mLastVelocity = velocity;
+      mLastVelocity = note.velocity;
 
       int currentlyHeldPitch = GetMostRecentCurrentlyHeldPitch();
 
@@ -84,14 +84,14 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
          if (mPortamentoMode == PortamentoMode::kBendHeld)
          {
             //just bend to the new note
-            mPitchBend.RampValue(time, mPitchBend.GetIndividualValue(0), pitch - mInitialPitch, mGlideTime);
+            mPitchBend.RampValue(note.time, mPitchBend.GetIndividualValue(0), note.pitch - mInitialPitch, mGlideTime);
          }
          else
          {
             //trigger new note and bend
-            mPitchBend.RampValue(time, currentlyHeldPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-            PlayNoteOutput(time, currentlyHeldPitch, 0, -1, modulation);
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+            mPitchBend.RampValue(note.time, currentlyHeldPitch - note.pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+            PlayNoteOutput(NoteMessage(note.time, currentlyHeldPitch, 0, -1, note.modulation));
+            PlayNoteOutput(note);
          }
       }
       else
@@ -99,25 +99,25 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
          if (mPortamentoMode == PortamentoMode::kAlways && mLastPlayedPitch != -1)
          {
             //bend to new note
-            mPitchBend.RampValue(time, mLastPlayedPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+            mPitchBend.RampValue(note.time, mLastPlayedPitch - note.pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
          }
          else
          {
             //reset pitch bend
-            mPitchBend.RampValue(time, 0, 0, 0);
+            mPitchBend.RampValue(note.time, 0, 0, 0);
          }
 
-         mInitialPitch = pitch;
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         mInitialPitch = note.pitch;
+         PlayNoteOutput(note);
       }
-      mLastPlayedPitch = pitch;
-      mHeldNotes[pitch] = time;
+      mLastPlayedPitch = note.pitch;
+      mHeldNotes[note.pitch] = note.time;
    }
    else
    {
-      bool wasCurrNote = (pitch == GetMostRecentCurrentlyHeldPitch());
+      bool wasCurrNote = (note.pitch == GetMostRecentCurrentlyHeldPitch());
 
-      mHeldNotes[pitch] = -1;
+      mHeldNotes[note.pitch] = -1;
 
       if (wasCurrNote)
       {
@@ -128,13 +128,13 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
             if (mPortamentoMode == PortamentoMode::kBendHeld)
             {
                //bend back to old note
-               mPitchBend.RampValue(time, mPitchBend.GetIndividualValue(0), returnToPitch - mInitialPitch, mGlideTime);
+               mPitchBend.RampValue(note.time, mPitchBend.GetIndividualValue(0), returnToPitch - mInitialPitch, mGlideTime);
             }
             else
             {
                //bend back to old note and retrigger
-               mPitchBend.RampValue(time, pitch - returnToPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-               PlayNoteOutput(time, returnToPitch, mLastVelocity, voiceIdx, modulation);
+               mPitchBend.RampValue(note.time, note.pitch - returnToPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+               PlayNoteOutput(NoteMessage(note.time, returnToPitch, mLastVelocity, note.voiceIdx, note.modulation));
             }
          }
          else
@@ -142,12 +142,12 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
             if (mPortamentoMode == PortamentoMode::kBendHeld)
             {
                //stop pitch that we started with
-               PlayNoteOutput(time, mInitialPitch, 0, voiceIdx, modulation);
+               PlayNoteOutput(NoteMessage(note.time, mInitialPitch, 0, note.voiceIdx, note.modulation));
             }
             else
             {
                //stop released pitch
-               PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+               PlayNoteOutput(note.MakeNoteOff());
             }
          }
       }

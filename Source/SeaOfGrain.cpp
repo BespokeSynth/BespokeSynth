@@ -128,7 +128,7 @@ void SeaOfGrain::Process(double time)
    ComputeSliders(0);
    int numChannels = 2;
    SyncBuffers(numChannels);
-   mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
+   mRecordBuffer.SetNumChannels(numChannels);
 
    int bufferSize = target->GetBuffer()->BufferSize();
    ChannelBuffer* out = target->GetBuffer();
@@ -221,6 +221,14 @@ void SeaOfGrain::DrawModule()
    }
 }
 
+float SeaOfGrain::GetSampleRateRatio() const
+{
+   if (mHasRecordedInput)
+      return 1.0f;
+   else
+      return mSample->GetSampleRateRatio();
+}
+
 ChannelBuffer* SeaOfGrain::GetSourceBuffer()
 {
    if (mHasRecordedInput)
@@ -310,7 +318,7 @@ void SeaOfGrain::LoadFile()
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
-   FileChooser chooser("Load sample", File(ofToDataPath("samples")),
+   FileChooser chooser("Load sample", File(ofToSamplePath("")),
                        file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
@@ -371,20 +379,20 @@ void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void SeaOfGrain::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void SeaOfGrain::PlayNote(NoteMessage note)
 {
-   if (voiceIdx == -1 || voiceIdx >= kNumMPEVoices)
+   if (note.voiceIdx == -1 || note.voiceIdx >= kNumMPEVoices)
       return;
 
-   if (velocity > 0)
-      mMPEVoices[voiceIdx].mADSR.Start(time, 1);
+   if (note.velocity > 0)
+      mMPEVoices[note.voiceIdx].mADSR.Start(note.time, 1);
    else
-      mMPEVoices[voiceIdx].mADSR.Stop(time);
-   mMPEVoices[voiceIdx].mPitch = pitch;
-   mMPEVoices[voiceIdx].mPlay = 0;
-   mMPEVoices[voiceIdx].mPitchBend = modulation.pitchBend;
-   mMPEVoices[voiceIdx].mPressure = modulation.pressure;
-   mMPEVoices[voiceIdx].mModWheel = modulation.modWheel;
+      mMPEVoices[note.voiceIdx].mADSR.Stop(note.time);
+   mMPEVoices[note.voiceIdx].mPitch = note.pitch;
+   mMPEVoices[note.voiceIdx].mPlay = 0;
+   mMPEVoices[note.voiceIdx].mPitchBend = note.modulation.pitchBend;
+   mMPEVoices[note.voiceIdx].mPressure = note.modulation.pressure;
+   mMPEVoices[note.voiceIdx].mModWheel = note.modulation.modWheel;
 }
 
 void SeaOfGrain::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -446,6 +454,7 @@ void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize)
    if (!mADSR.IsDone(gTime) && mOwner->GetSourceBuffer()->BufferSize() > 0)
    {
       double time = gTime;
+      float speed = mOwner->GetSampleRateRatio();
       for (int i = 0; i < bufferSize; ++i)
       {
          float pitchBend = mPitchBend ? mPitchBend->GetValue(i) : ModulationParameters::kDefaultPitchBend;
@@ -464,7 +473,7 @@ void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize)
          float outSample[ChannelBuffer::kMaxNumChannels];
          Clear(outSample, ChannelBuffer::kMaxNumChannels);
          float pos = (mPitch + pitchBend + MIN(.125f, mPlay) - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches;
-         mGranulator.ProcessFrame(time, mOwner->GetSourceBuffer(), mOwner->GetSourceBuffer()->BufferSize(), ofLerp(mOwner->GetSourceStartSample(), mOwner->GetSourceEndSample(), pos) + mOwner->GetSourceBufferOffset(), outSample);
+         mGranulator.ProcessFrame(time, mOwner->GetSourceBuffer(), mOwner->GetSourceBuffer()->BufferSize(), ofLerp(mOwner->GetSourceStartSample(), mOwner->GetSourceEndSample(), pos) + mOwner->GetSourceBufferOffset(), speed, outSample);
          for (int ch = 0; ch < output->NumActiveChannels(); ++ch)
             output->GetChannel(ch)[i] += outSample[ch] * sqrtf(mGain) * mADSR.Value(time);
 
@@ -517,11 +526,12 @@ void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize
       double time = gTime;
       double panLeft = GetLeftPanGain(mPan);
       double panRight = GetRightPanGain(mPan);
+      float speed = mOwner->GetSampleRateRatio();
       for (int i = 0; i < bufferSize; ++i)
       {
          float outSample[ChannelBuffer::kMaxNumChannels];
          Clear(outSample, ChannelBuffer::kMaxNumChannels);
-         mGranulator.ProcessFrame(time, mOwner->GetSourceBuffer(), mOwner->GetSourceBuffer()->BufferSize(), ofLerp(mOwner->GetSourceStartSample(), mOwner->GetSourceEndSample(), mPosition) + mOwner->GetSourceBufferOffset(), outSample);
+         mGranulator.ProcessFrame(time, mOwner->GetSourceBuffer(), mOwner->GetSourceBuffer()->BufferSize(), ofLerp(mOwner->GetSourceStartSample(), mOwner->GetSourceEndSample(), mPosition) + mOwner->GetSourceBufferOffset(), speed, outSample);
          for (int ch = 0; ch < output->NumActiveChannels(); ++ch)
             output->GetChannel(ch)[i] += outSample[ch] * mGain * (ch == 0 ? panLeft : panRight);
          time += gInvSampleRateMs;

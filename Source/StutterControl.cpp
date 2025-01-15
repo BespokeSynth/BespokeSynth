@@ -242,11 +242,11 @@ void StutterControl::OnGridButton(int x, int y, float velocity, IGridController*
    }
 }
 
-void StutterControl::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void StutterControl::PlayNote(NoteMessage note)
 {
-   int index = pitch % kNumStutterTypes;
-   mStutter[index] = velocity > 0;
-   SendStutter(time, GetStutter((StutterType)index), mStutter[index]);
+   int index = note.pitch % kNumStutterTypes;
+   mStutter[index] = note.velocity > 0;
+   SendStutter(note.time, GetStutter((StutterType)index), mStutter[index]);
 }
 
 void StutterControl::UpdateGridLights()

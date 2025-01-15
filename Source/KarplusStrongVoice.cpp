@@ -211,7 +211,7 @@ void KarplusStrongVoice::DoParameterUpdate(int samplesIn,
 
 void KarplusStrongVoice::Start(double time, float target)
 {
-   float volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target);
+   float volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target * target);
    float envScale = SingleOscillatorVoice::GetADSRScale(target, -mVoiceParams->mVelToEnvelope);
 
    mOscPhase = FPI / 2; //magic number that seems to keep things DC centered ok

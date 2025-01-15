@@ -43,7 +43,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void MouseReleased() override;
    void KeyReleased(int key) override;
@@ -94,7 +94,7 @@ private:
    bool mShowScale{ false };
    bool mGetVelocityFromClickHeight{ false };
    bool mHideLabels{ false };
-   std::array<float, 128> mLastOnTime{};
-   std::array<float, 128> mLastOffTime{};
+   std::array<double, 128> mLastOnTime{};
+   std::array<double, 128> mLastOffTime{};
    std::unordered_map<int, int> mKeyPressRegister{};
 };

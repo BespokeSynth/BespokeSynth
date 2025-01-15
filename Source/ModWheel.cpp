@@ -56,15 +56,15 @@ void ModWheel::DrawModule()
    mModWheelSlider->Draw();
 }
 
-void ModWheel::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ModWheel::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      mModulation.GetModWheel(voiceIdx)->AppendTo(modulation.modWheel);
-      modulation.modWheel = mModulation.GetModWheel(voiceIdx);
+      mModulation.GetModWheel(note.voiceIdx)->AppendTo(note.modulation.modWheel);
+      note.modulation.modWheel = mModulation.GetModWheel(note.voiceIdx);
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void ModWheel::OnTransportAdvanced(float amount)

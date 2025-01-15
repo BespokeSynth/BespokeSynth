@@ -58,7 +58,7 @@ public:
    double mFilterQ{ sqrt(2) / 2 };
    ::ADSR mFilterAdsr{ 1, 0, 1, 1000 };
 
-   double mVelToVolume{ .5 };
+   double mVelToVolume{ 1.0 };
    double mVelToEnvelope{ 0 };
 
    bool mLiteCPUMode{ false };

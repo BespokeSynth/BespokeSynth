@@ -28,6 +28,7 @@
 #include "DrumPlayer.h"
 #include "ModularSynth.h"
 #include "MidiController.h"
+#include "UIControlMacros.h"
 
 namespace
 {
@@ -42,6 +43,8 @@ StepSequencer::StepSequencer()
    mMetaStepMasks = new juce::uint32[META_STEP_MAX * NUM_STEPSEQ_ROWS];
    for (int i = 0; i < META_STEP_MAX * NUM_STEPSEQ_ROWS; ++i)
       mMetaStepMasks[i] = 0xff;
+
+   mStrength = gStepVelocityLevels[(int)StepVelocityType::Normal];
 }
 
 void StepSequencer::Init()
@@ -55,22 +58,47 @@ void StepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid("uigrid", 40, 45, 250, 150, 16, NUM_STEPSEQ_ROWS, this);
-   mStrengthSlider = new FloatSlider(this, "vel", 87, 22, 70, 15, &mStrength, 0, 1, 2);
-   mRandomizeButton = new ClickButton(this, "randomize", 160, 22);
-   mRandomizationDensitySlider = new FloatSlider(this, "r den", mRandomizeButton, kAnchor_Right, 65, 15, &mRandomizationDensity, 0, 1, 2);
-   mRandomizationAmountSlider = new FloatSlider(this, "r amt", mRandomizationDensitySlider, kAnchor_Right, 65, 15, &mRandomizationAmount, 0, 1, 2);
-   mNumMeasuresSlider = new IntSlider(this, "measures", 5, 22, 80, 15, &mNumMeasures, 1, 4);
-   mClearButton = new ClickButton(this, "clear", 5, 4);
-   mGridYOffDropdown = new DropdownList(this, "yoff", 295, 4, &mGridYOff);
-   mAdjustOffsetsCheckbox = new Checkbox(this, "offsets", 175, 4, &mAdjustOffsets);
-   mRepeatRateDropdown = new DropdownList(this, "repeat", 155, 22, (int*)(&mRepeatRate));
-   mStepIntervalDropdown = new DropdownList(this, "step", 133, 4, (int*)(&mStepInterval));
+   mGrid->SetStrength(mStrength);
+
+   UIBLOCK0();
+   UIBLOCK_PUSHSLIDERWIDTH(70);
+   DROPDOWN(mStepIntervalDropdown, "step", (int*)(&mStepInterval), 40);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mShiftLeftButton, "<");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mShiftRightButton, ">");
+   UIBLOCK_SHIFTRIGHT();
+   INTSLIDER(mNumMeasuresSlider, "measures", &mNumMeasures, 1, 4);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(3);
+   BUTTON(mClearButton, "clear");
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(3);
+   CHECKBOX(mAdjustOffsetsCheckbox, "offsets", &mAdjustOffsets);
+   UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mGridYOffDropdown, "yoff", &mGridYOff, 20);
+   UIBLOCK_NEWLINE();
+   DROPDOWN(mVelocityTypeDropdown, "velocitytype", (int*)(&mVelocityType), 60);
+   UIBLOCK_SHIFTLEFT();
+   FLOATSLIDER_DIGITS(mStrengthSlider, "vel", &mStrength, 0, 1, 2);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(3);
+   BUTTON(mRandomizeButton, "randomize");
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER_DIGITS(mRandomizationDensitySlider, "r den", &mRandomizationDensity, 0, 1, 2);
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER_DIGITS(mRandomizationAmountSlider, "r amt", &mRandomizationAmount, 0, 1, 2);
+   UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mVelocityGridController, new GridControlTarget(UICONTROL_BASICS("velocity")));
+   UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mMetaStepGridController, new GridControlTarget(UICONTROL_BASICS("metastep")));
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mRepeatRateDropdown, "repeat", (int*)(&mRepeatRate), 60);
+   ENDUIBLOCK0();
+
    mCurrentColumnSlider = new IntSlider(this, "column", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 100, 15, &mCurrentColumn, 0, 15);
-   mShiftLeftButton = new ClickButton(this, "<", 80, 4);
-   mShiftRightButton = new ClickButton(this, ">", 100, 4);
-   mGridControlTarget = new GridControlTarget(this, "grid", 240, 4);
-   mVelocityGridController = new GridControlTarget(this, "velocity", 240, 16);
-   mMetaStepGridController = new GridControlTarget(this, "metastep", 240, 28);
 
    mGrid->SetMajorColSize(4);
    mGrid->SetFlip(true);
@@ -80,6 +108,10 @@ void StepSequencer::CreateUIControls()
    mGridYOffDropdown->AddLabel("2", 2);
    mGridYOffDropdown->AddLabel("3", 3);
 
+   mVelocityTypeDropdown->AddLabel("ghost", (int)StepVelocityType::Ghost);
+   mVelocityTypeDropdown->AddLabel("normal", (int)StepVelocityType::Normal);
+   mVelocityTypeDropdown->AddLabel("accent", (int)StepVelocityType::Accent);
+
    mVelocityGridController->SetShowing(false);
    mMetaStepGridController->SetShowing(false);
 
@@ -88,7 +120,7 @@ void StepSequencer::CreateUIControls()
       mRows[i] = new StepSequencerRow(this, mGrid, i);
       mRows[i]->CreateUIControls();
       mOffsets[i] = 0;
-      mOffsetSlider[i] = new FloatSlider(this, ("offset" + ofToString(i)).c_str(), 230, 185 - i * 9.4f, 90, 9, &mOffsets[i], -1, 1);
+      mOffsetSlider[i] = new FloatSlider(this, ("offset" + ofToString(i)).c_str(), 230, 185 - i * 9.4f, 90, 15, &mOffsets[i], -1, 1);
       mRandomizeRowButton[i] = new ClickButton(this, ("random" + ofToString(i)).c_str(), mGridYOffDropdown->GetRect().getMaxX() + 4 + i * 60, 3);
       mNoteRepeats[i] = new NoteRepeat(this, i);
    }
@@ -396,9 +428,12 @@ void StepSequencer::DrawModule()
    mAdjustOffsetsCheckbox->SetShowing(!mHasExternalPulseSource);
    mCurrentColumnSlider->SetExtents(0, GetNumSteps(mStepInterval, mNumMeasures));
    mRepeatRateDropdown->SetShowing(mNoteInputMode == NoteInputMode::RepeatHeld);
+   mStrengthSlider->SetShowing(mStepVelocityEntryMode == StepVelocityEntryMode::Slider);
+   mVelocityTypeDropdown->SetShowing(mStepVelocityEntryMode == StepVelocityEntryMode::Dropdown);
 
    mGrid->Draw();
    mStrengthSlider->Draw();
+   mVelocityTypeDropdown->Draw();
    mNumMeasuresSlider->Draw();
    mClearButton->Draw();
    mAdjustOffsetsCheckbox->Draw();
@@ -687,14 +722,14 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
 
 void StepSequencer::PlayStepNote(double time, int note, float val)
 {
-   mNoteOutput.PlayNote(time, note, val * 127);
+   mNoteOutput.PlayNote(NoteMessage(time, note, val * 127));
 }
 
-void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void StepSequencer::PlayNote(NoteMessage note)
 {
    if (mNoteInputMode == NoteInputMode::PlayStepIndex)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
          if (!mHasExternalPulseSource)
          {
@@ -704,16 +739,16 @@ void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
                mOffsets[i] = 0;
          }
 
-         mCurrentColumn = pitch % GetNumSteps(mStepInterval, mNumMeasures);
-         Step(time, velocity / 127.0f, kPulseFlag_Repeat);
+         mCurrentColumn = note.pitch % GetNumSteps(mStepInterval, mNumMeasures);
+         Step(note.time, note.velocity / 127.0f, kPulseFlag_Repeat);
       }
    }
    else
    {
       if (mRepeatRate == kInterval_None)
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         PlayNoteOutput(note);
       else
-         mPadPressures[pitch] = velocity;
+         mPadPressures[note.pitch] = note.velocity;
    }
 }
 
@@ -750,7 +785,7 @@ int StepSequencer::GetMetaStep(double time)
 
 bool StepSequencer::IsMetaStepActive(double time, int col, int row)
 {
-   return mMetaStepMasks[GetMetaStepMaskIndex(col, row)] & (1 << GetMetaStep(time));
+   return mMetaStepMasks[GetMetaStepMaskIndex(col, row)] & (1 << GetMetaStep(time)) && row < mNumRows;
 }
 
 bool StepSequencer::HasGridController()
@@ -893,6 +928,24 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
       for (int i = 0; i < NUM_STEPSEQ_ROWS; ++i)
          mRows[i]->UpdateTimeListener();
    }
+   if (list == mVelocityTypeDropdown)
+   {
+      switch (mVelocityType)
+      {
+         case StepVelocityType::Normal:
+            mStrength = gStepVelocityLevels[(int)StepVelocityType::Normal];
+            break;
+         case StepVelocityType::Accent:
+            mStrength = gStepVelocityLevels[(int)StepVelocityType::Accent];
+            break;
+         case StepVelocityType::Ghost:
+            mStrength = gStepVelocityLevels[(int)StepVelocityType::Ghost];
+            break;
+         default:
+            break;
+      }
+      mGrid->SetStrength(mStrength);
+   }
 }
 
 void StepSequencer::KeyPressed(int key, bool isRepeat)
@@ -900,11 +953,44 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
    IDrawableModule::KeyPressed(key, isRepeat);
 
    ofVec2f mousePos(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
-   if (key >= '1' && key <= '8' && mGrid->GetRect().contains(mousePos.x, mousePos.y))
+   if (mGrid->GetRect().contains(mousePos.x, mousePos.y))
    {
-      int metaStep = key - '1';
       auto cell = mGrid->GetGridCellAt(mousePos.x - mGrid->GetPosition().x, mousePos.y - mGrid->GetPosition().y);
-      mMetaStepMasks[GetMetaStepMaskIndex(cell.mCol, cell.mRow)] ^= (1 << metaStep);
+      if (key >= '1' && key <= '8')
+      {
+         int metaStep = key - '1';
+         mMetaStepMasks[GetMetaStepMaskIndex(cell.mCol, cell.mRow)] ^= (1 << metaStep);
+      }
+      if (key == OF_KEY_UP || key == OF_KEY_DOWN)
+      {
+         float velocity = mGrid->GetVal(cell.mCol, cell.mRow);
+         if (velocity > 0)
+         {
+            if (key == OF_KEY_UP)
+            {
+               for (int i = 0; i < (int)gStepVelocityLevels.size(); ++i)
+               {
+                  if (velocity < gStepVelocityLevels[i])
+                  {
+                     mGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
+                     break;
+                  }
+               }
+            }
+
+            if (key == OF_KEY_DOWN)
+            {
+               for (int i = (int)gStepVelocityLevels.size() - 1; i >= 0; --i)
+               {
+                  if (velocity > gStepVelocityLevels[i])
+                  {
+                     mGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
+                     break;
+                  }
+               }
+            }
+         }
+      }
    }
 }
 
@@ -924,6 +1010,11 @@ void StepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    noteInputModeMap["repeat held"] = (int)NoteInputMode::RepeatHeld;
    mModuleSaveData.LoadEnum<NoteInputMode>("note_input_mode", moduleInfo, (int)NoteInputMode::PlayStepIndex, nullptr, &noteInputModeMap);
 
+   EnumMap velEntryModeMap;
+   velEntryModeMap["dropdown"] = (int)StepVelocityEntryMode::Dropdown;
+   velEntryModeMap["slider"] = (int)StepVelocityEntryMode::Slider;
+   mModuleSaveData.LoadEnum<StepVelocityEntryMode>("velocity_entry_mode", moduleInfo, (int)StepVelocityEntryMode::Dropdown, nullptr, &velEntryModeMap);
+
    SetUpFromSaveData();
 }
 
@@ -934,11 +1025,12 @@ void StepSequencer::SetUpFromSaveData()
    mGrid->SetGrid(GetNumSteps(mStepInterval, mNumMeasures), mNumRows);
 
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
-   mGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderBipolar : UIGrid::kNormal);
+   mGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderGrow : UIGrid::kNormal);
    mGrid->SetRestrictDragToRow(multisliderMode);
    mGrid->SetRequireShiftForMultislider(true);
 
    mNoteInputMode = mModuleSaveData.GetEnum<NoteInputMode>("note_input_mode");
+   mStepVelocityEntryMode = mModuleSaveData.GetEnum<StepVelocityEntryMode>("velocity_entry_mode");
 
    if (mNoteInputMode == NoteInputMode::RepeatHeld)
       mHasExternalPulseSource = false;

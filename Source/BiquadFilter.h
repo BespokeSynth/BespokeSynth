@@ -27,6 +27,8 @@
 
 #include <cmath>
 
+#include "OpenFrameworksPort.h"
+
 enum FilterType
 {
    kFilterType_Off,
@@ -88,5 +90,7 @@ inline float BiquadFilter::Filter(float in)
    double out = in * mA0 + mZ1;
    mZ1 = in * mA1 + mZ2 - mB1 * out;
    mZ2 = in * mA2 - mB2 * out;
+   if (std::isnan(out) || std::isinf(out))
+      Clear();
    return out;
 }

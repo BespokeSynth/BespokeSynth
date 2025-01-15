@@ -67,11 +67,11 @@ void VelocityToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    OnModulatorRepatch();
 }
 
-void VelocityToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VelocityToCV::PlayNote(NoteMessage note)
 {
-   if (mEnabled && (mPassZero || velocity > 0))
+   if (mEnabled && (mPassZero || note.velocity > 0))
    {
-      mVelocity = velocity;
+      mVelocity = note.velocity;
    }
 }
 

@@ -312,6 +312,8 @@ public:
    UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
+   UserPrefFloat minimap_margin{ "minimap_margin", 10, 0, 50, UserPrefCategory::General };
+   UserPrefDropdownString minimap_corner{ "minimap_corner", "Top right", 150, UserPrefCategory::General };
    UserPrefBool immediate_paste{ "immediate_paste", false, UserPrefCategory::General };
    UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 30, 1, 120, 5, UserPrefCategory::General };
 #if !BESPOKE_LINUX
@@ -322,6 +324,7 @@ public:
    UserPrefString plugin_preference_order{ "plugin_preference_order", "VST3;VST;AudioUnit;LV2", 70, UserPrefCategory::General };
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
+   UserPrefBool background_lissajous_autocorrelate{ "background_lissajous_autocorrelate", true, UserPrefCategory::Graphics };
    UserPrefFloat cable_alpha{ "cable_alpha", 1, 0.05, 1, UserPrefCategory::Graphics };
    UserPrefBool fade_cable_middle{ "fade_cable_middle", true, UserPrefCategory::Graphics };
    UserPrefFloat cable_quality{ "cable_quality", 1, .1, 3, UserPrefCategory::Graphics };
@@ -347,6 +350,7 @@ public:
    };
 
    UserPrefString recordings_path{ "recordings_path", "recordings/", 70, UserPrefCategory::Paths };
+   UserPrefString samples_path{ "samples_path", "samples/", 70, UserPrefCategory::Paths };
    UserPrefString tooltips{ "tooltips", "tooltips_eng.txt", 70, UserPrefCategory::Paths };
    UserPrefString layout{ "layout", "layouts/blank.json", 70, UserPrefCategory::Paths };
    UserPrefString youtube_dl_path{ "youtube_dl_path", kDefaultYoutubeDlPath, 70, UserPrefCategory::Paths };

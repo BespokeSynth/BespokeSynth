@@ -201,13 +201,13 @@ void RadioSequencer::OnTimeEvent(double time)
       Step(time, 0);
 }
 
-void RadioSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void RadioSequencer::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       mHasExternalPulseSource = true;
-      mStep = pitch % std::max(1, mLength);
-      Step(time, kPulseFlag_Repeat);
+      mStep = note.pitch % std::max(1, mLength);
+      Step(note.time, kPulseFlag_Repeat);
    }
 }
 

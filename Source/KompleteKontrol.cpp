@@ -135,9 +135,9 @@ void KompleteKontrol::PostRepatch(PatchCableSource* cableSource, bool fromUserCl
    }
 }
 
-void KompleteKontrol::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void KompleteKontrol::PlayNote(NoteMessage note)
 {
-   mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
+   mNoteOutput.PlayNote(note);
 
    mNeedKeysUpdate = true;
 }

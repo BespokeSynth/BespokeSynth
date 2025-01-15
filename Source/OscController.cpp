@@ -211,7 +211,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
             return;
          float pitch = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
          float velocity = msg[1].isFloat32() ? msg[1].getFloat32() : msg[1].getInt32();
-         selected_note_receiver->PlayNote(gTime, pitch, velocity);
+         selected_note_receiver->PlayNote(NoteMessage(gTime, pitch, velocity));
       }
       else if (subcommand == "pulse")
       {

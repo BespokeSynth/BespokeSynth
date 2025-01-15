@@ -292,6 +292,7 @@ private:
 
 typedef ofVec2f ofPoint;
 
+std::string ofToSamplePath(const std::string& path);
 std::string ofToDataPath(const std::string& path);
 std::string ofToFactoryPath(const std::string& path);
 std::string ofToResourcePath(const std::string& path);

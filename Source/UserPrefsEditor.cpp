@@ -87,6 +87,18 @@ void UserPrefsEditor::CreateUIControls()
       if (UserPrefs.qwerty_to_pitch_mode.GetDropdown()->GetElement(i).mLabel == UserPrefs.qwerty_to_pitch_mode.Get())
          UserPrefs.qwerty_to_pitch_mode.GetIndex() = i;
    }
+
+   UserPrefs.minimap_corner.GetIndex() = 0;
+   UserPrefs.minimap_corner.GetDropdown()->AddLabel("Top right", (int)MinimapCorner::TopRight);
+   UserPrefs.minimap_corner.GetDropdown()->AddLabel("Top left", (int)MinimapCorner::TopLeft);
+   UserPrefs.minimap_corner.GetDropdown()->AddLabel("Bottom right", (int)MinimapCorner::BottomRight);
+   UserPrefs.minimap_corner.GetDropdown()->AddLabel("Bottom left", (int)MinimapCorner::BottomLeft);
+
+   for (int i = 0; i < UserPrefs.minimap_corner.GetDropdown()->GetNumValues(); ++i)
+   {
+      if (UserPrefs.minimap_corner.GetDropdown()->GetElement(i).mLabel == UserPrefs.minimap_corner.Get())
+         UserPrefs.minimap_corner.GetIndex() = i;
+   }
 }
 
 void UserPrefsEditor::Show()
@@ -339,6 +351,7 @@ void UserPrefsEditor::DrawModule()
 
    DrawRightLabel(UserPrefs.zoom.GetControl(), "(currently: " + ofToString(gDrawScale) + ")", ofColor::white);
    DrawRightLabel(UserPrefs.recordings_path.GetControl(), "(default: " + UserPrefs.recordings_path.GetDefault() + ")", ofColor::white);
+   DrawRightLabel(UserPrefs.samples_path.GetControl(), "(default: " + UserPrefs.samples_path.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.tooltips.GetControl(), "(default: " + UserPrefs.tooltips.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.layout.GetControl(), "(default: " + UserPrefs.layout.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.youtube_dl_path.GetControl(), "(default: " + UserPrefs.youtube_dl_path.GetDefault() + ")", ofColor::white);

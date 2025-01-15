@@ -161,6 +161,7 @@
 #include "VolcaBeatsControl.h"
 #include "RadioSequencer.h"
 #include "TakeRecorder.h"
+#include "AudioSplitter.h"
 #include "Splitter.h"
 #include "Panner.h"
 #include "SamplePlayer.h"
@@ -264,6 +265,7 @@
 #include "EuclideanSequencer.h"
 #include "SaveStateLoader.h"
 #include "DataProvider.h"
+#include "PulseLimit.h"
 
 #include <juce_core/juce_core.h>
 
@@ -376,6 +378,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteHumanizer, notehumanizer, kModuleCategory_Note);
    REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleCategory_Note);
    REGISTER(RadioSequencer, radiosequencer, kModuleCategory_Other);
+   REGISTER(AudioSplitter, audiosplitter, kModuleCategory_Audio);
    REGISTER(Splitter, splitter, kModuleCategory_Audio);
    REGISTER(Panner, panner, kModuleCategory_Audio);
    REGISTER(SamplePlayer, sampleplayer, kModuleCategory_Synth);
@@ -482,6 +485,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(EuclideanSequencer, euclideansequencer, kModuleCategory_Instrument);
    REGISTER(SaveStateLoader, savestateloader, kModuleCategory_Other);
    REGISTER(DataProvider, dataprovider, kModuleCategory_Modulator);
+   REGISTER(PulseLimit, pulselimit, kModuleCategory_Pulse);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

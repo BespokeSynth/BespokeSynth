@@ -207,9 +207,9 @@ void MultitapDelay::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void MultitapDelay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void MultitapDelay::PlayNote(NoteMessage note)
 {
-   if (voiceIdx == -1 || voiceIdx >= kNumMPETaps)
+   if (note.voiceIdx == -1 || note.voiceIdx >= kNumMPETaps)
       return;
 
    /*if (velocity > 0)

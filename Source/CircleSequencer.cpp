@@ -319,8 +319,13 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
    if (oldStep != newStep && mSteps[newStep] > 0)
    {
       const double time = NextBufferTime(true) - remainderMs;
-      mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
-      mOwner->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
+      mOwner->PlayNoteOutput(NoteMessage(time, mPitch, mSteps[newStep] * 127));
+      NoteInterval interval = kInterval_16n;
+      if (mLength > 10 && mLength < 24)
+         interval = kInterval_32n;
+      else if (mLength >= 24)
+         interval = kInterval_64n;
+      mOwner->PlayNoteOutput(NoteMessage(time + TheTransport->GetDuration(interval), mPitch, 0));
    }
 }
 

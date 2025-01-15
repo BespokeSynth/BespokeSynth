@@ -71,7 +71,7 @@ public:
    void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IGridControllerListener
@@ -104,7 +104,7 @@ private:
    void OnClicked(float x, float y, bool right) override;
    void UpdateGridControllerLights(bool force);
 
-   void PlayColumn(double time, int column, int velocity, int voiceIdx, ModulationParameters modulation);
+   void PlayColumn(NoteMessage note);
    float ExtraWidth() const;
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
@@ -137,7 +137,7 @@ private:
    FloatSlider* mRandomizePitchRangeSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
 
-   static constexpr int kMaxLength = 32;
+   static constexpr int kMaxLength = 128;
 
    std::array<double, kMaxLength> mLastColumnPlayTime{};
    std::array<bool[128], kMaxLength> mLastColumnNoteOnPitches{};

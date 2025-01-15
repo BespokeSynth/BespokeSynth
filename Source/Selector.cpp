@@ -72,11 +72,11 @@ void Selector::SyncList()
    }
 }
 
-void Selector::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Selector::PlayNote(NoteMessage note)
 {
    int range = (int)mControlCables.size() - 1;
-   if (velocity > 0 && range > 0)
-      SetIndex(pitch % range, time);
+   if (note.velocity > 0 && range > 0)
+      SetIndex(note.pitch % range, note.time);
 }
 
 void Selector::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)

@@ -62,15 +62,15 @@ void PitchBender::DrawModule()
    mBendSlider->Draw();
 }
 
-void PitchBender::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchBender::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
-      modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
+      mModulation.GetPitchBend(note.voiceIdx)->AppendTo(note.modulation.pitchBend);
+      note.modulation.pitchBend = mModulation.GetPitchBend(note.voiceIdx);
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void PitchBender::OnTransportAdvanced(float amount)

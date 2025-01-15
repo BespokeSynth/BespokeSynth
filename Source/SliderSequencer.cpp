@@ -89,8 +89,8 @@ void SliderSequencer::OnTransportAdvanced(float amount)
       {
          double remainder = DoubleWrap(current - mSliderLines[i]->mPoint, 1);
          double remainderMs = TheTransport->MsPerBar() * remainder;
-         PlayNoteOutput(time - remainderMs, mSliderLines[i]->mPitch, mSliderLines[i]->mVelocity * 127, -1);
-         PlayNoteOutput(time - remainderMs + TheTransport->GetDuration(kInterval_16n), mSliderLines[i]->mPitch, 0, -1);
+         PlayNoteOutput(NoteMessage(time - remainderMs, mSliderLines[i]->mPitch, mSliderLines[i]->mVelocity * 127));
+         PlayNoteOutput(NoteMessage(time - remainderMs + TheTransport->GetDuration(kInterval_16n), mSliderLines[i]->mPitch, 0));
          mSliderLines[i]->mPlayTime = time;
       }
 

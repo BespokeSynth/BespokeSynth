@@ -634,7 +634,9 @@ void ScriptModule::Poll()
       if (mLoadedScriptFiletime < scriptFile.getLastModificationTime())
       {
          std::unique_ptr<FileInputStream> input(scriptFile.createInputStream());
-         mCodeEntry->SetText(input->readString().toStdString());
+         std::string text = input->readString().toStdString();
+         ofStringReplace(text, "\r", "");
+         mCodeEntry->SetText(text);
          mCodeEntry->Publish();
          ExecuteCode();
          mLoadedScriptFiletime = scriptFile.getLastModificationTime();
@@ -834,23 +836,23 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
       modulation.pitchBend = &mPitchBends[intPitch];
       modulation.pitchBend->SetValue(pitch - intPitch);
    }
-   SendNoteToIndex(noteOutputIndex, time, intPitch, (int)velocity, -1, modulation);
+   SendNoteToIndex(noteOutputIndex, NoteMessage(time, intPitch, (int)velocity, -1, modulation));
 
    if (velocity > 0)
       mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan, 1));
 }
 
-void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ScriptModule::SendNoteToIndex(int index, NoteMessage note)
 {
    if (index == 0)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
+      PlayNoteOutput(note, true);
       return;
    }
 
    if (index - 1 < (int)mExtraNoteOutputs.size())
    {
-      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
+      mExtraNoteOutputs[index - 1]->PlayNoteOutput(note, true);
    }
 }
 
@@ -893,6 +895,19 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
    }
 
    RunCode(gTime, "on_osc(\"" + messageString + "\")");
+}
+
+void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
+{
+   // Avoid code injection by preventing the sysex payload to be interpreted as Python
+   // - convert the sysex payload to hex
+   // - use bytes.fromhex in Python to parse it
+   std::ostringstream ss;
+   for (size_t i = 0; i < data_size; i++)
+      ss << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(data[i]);
+   mMidiMessageQueueMutex.lock();
+   mMidiMessageQueue.push_back("on_sysex(bytes.fromhex('" + ss.str() + "'))");
+   mMidiMessageQueueMutex.unlock();
 }
 
 void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
@@ -988,7 +1003,9 @@ void ScriptModule::ButtonClicked(ClickButton* button, double time)
 
          mLoadedScriptFiletime = resourceFile.getLastModificationTime();
 
-         mCodeEntry->SetText(input->readString().toStdString());
+         std::string text = input->readString().toStdString();
+         ofStringReplace(text, "\r", "");
+         mCodeEntry->SetText(text);
       }
    }
 
@@ -1105,15 +1122,15 @@ void ScriptModule::OnPulse(double time, float velocity, int flags)
 }
 
 //INoteReceiver
-void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
+void ScriptModule::PlayNote(NoteMessage note)
 {
    for (size_t i = 0; i < mPendingNoteInput.size(); ++i)
    {
       if (mPendingNoteInput[i].time == -1)
       {
-         mPendingNoteInput[i].time = time;
-         mPendingNoteInput[i].pitch = pitch;
-         mPendingNoteInput[i].velocity = velocity;
+         mPendingNoteInput[i].time = note.time;
+         mPendingNoteInput[i].pitch = note.pitch;
+         mPendingNoteInput[i].velocity = note.velocity;
          break;
       }
    }

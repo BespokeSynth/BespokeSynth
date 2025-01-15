@@ -102,7 +102,7 @@ public:
    void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IGridControllerListener
@@ -133,8 +133,9 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
-   void UpdateGridControllerLights(bool force);
+   void KeyPressed(int key, bool isRepeat) override;
 
+   void UpdateGridControllerLights(bool force);
    int ButtonToStep(int button);
    int StepToButton(int step);
    void SyncGridToSeq();

@@ -135,26 +135,26 @@ void Sampler::Process(double time)
    GetBuffer()->Reset();
 }
 
-void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Sampler::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget())
+   if (!NoteInputBuffer::IsTimeWithinFrame(note.time) && GetTarget())
    {
-      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      mNoteInputBuffer.QueueNote(note);
       return;
    }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
-      mVoiceParams.mAdsr.Start(time, 1); //for visualization
+      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      mVoiceParams.mAdsr.Start(note.time, 1); //for visualization
    }
    else
    {
-      mPolyMgr.Stop(time, pitch, voiceIdx);
-      mVoiceParams.mAdsr.Stop(time); //for visualization
+      mPolyMgr.Stop(note.time, note.pitch, note.voiceIdx);
+      mVoiceParams.mAdsr.Stop(note.time); //for visualization
    }
 }
 

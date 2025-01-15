@@ -69,31 +69,36 @@ void NoteTransformer::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteTransformer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (velocity == 0) //note off the one we played for this pitch, in case the transformer changed it while the note was held
+   if (note.velocity == 0) //note off the one we played for this pitch, in case the transformer changed it while the note was held
    {
-      if (mLastNoteOnForPitch[pitch] != -1)
-         PlayNoteOutput(time, mLastNoteOnForPitch[pitch], 0, voiceIdx);
+      if (mLastNoteOnForPitch[note.pitch] != -1)
+      {
+         NoteMessage noteOff = note.MakeNoteOff();
+         note.pitch = mLastNoteOnForPitch[note.pitch];
+         PlayNoteOutput(noteOff);
+      }
       return;
    }
 
-   int tone = TheScale->GetToneFromPitch(pitch);
-   if (velocity > 0)
-      mLastTimeTonePlayed[tone % 7] = time;
-   int pitchOffset = pitch - TheScale->GetPitchFromTone(tone);
+   int tone = TheScale->GetToneFromPitch(note.pitch);
+   if (note.velocity > 0)
+      mLastTimeTonePlayed[tone % 7] = note.time;
+   int pitchOffset = note.pitch - TheScale->GetPitchFromTone(tone);
 
    tone += mToneMod[tone % TheScale->NumTonesInScale()];
 
    int outPitch = TheScale->GetPitchFromTone(tone) + pitchOffset;
-   PlayNoteOutput(time, outPitch, velocity, voiceIdx, modulation);
-   mLastNoteOnForPitch[pitch] = outPitch;
+   note.pitch = outPitch;
+   PlayNoteOutput(note);
+   mLastNoteOnForPitch[note.pitch] = outPitch;
 }
 
 void NoteTransformer::LoadLayout(const ofxJSONElement& moduleInfo)

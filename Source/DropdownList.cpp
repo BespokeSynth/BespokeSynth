@@ -457,6 +457,43 @@ double DropdownList::GetValueForMidiCC(double slider) const
    return mElements[index].mValue;
 }
 
+bool DropdownList::CanBeTargetedBy(PatchCableSource* source) const
+{
+   if (source->GetConnectionType() == kConnectionType_Pulse)
+      return true;
+   return IUIControl::CanBeTargetedBy(source);
+}
+
+void DropdownList::OnPulse(double time, float velocity, int flags)
+{
+   int length = static_cast<int>(mElements.size());
+   if (length <= 0)
+      length = 1;
+   int direction = 1;
+   if (flags & kPulseFlag_Backward)
+      direction = -1;
+   if (flags & kPulseFlag_Repeat)
+      direction = 0;
+
+   int newindex = 0;
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      if (mElements[i].mValue == *mVar)
+      {
+         newindex = i;
+         break;
+      }
+   }
+   newindex = (newindex + direction + length) % length;
+   if (flags & kPulseFlag_Reset)
+      newindex = 0;
+   else if (flags & kPulseFlag_Random)
+      newindex = gRandom() % length;
+   if (newindex >= mElements.size() || newindex < 0)
+      newindex = 0;
+   SetIndex(newindex, time, K(forceUpdate));
+}
+
 void DropdownList::SetIndex(int i, double time, bool forceUpdate)
 {
    if (mElements.empty())

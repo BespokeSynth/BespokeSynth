@@ -121,7 +121,7 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          float sample[ChannelBuffer::kMaxNumChannels];
          Clear(sample, ChannelBuffer::kMaxNumChannels);
-         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0) - mFreezeExtraSamples - 1 + mPos, sample);
+         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0) - mFreezeExtraSamples - 1 + mPos, 1.0f, sample);
          for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
             buffer->GetChannel(ch)[i] = mDry * buffer->GetChannel(ch)[i] + sample[ch];
       }

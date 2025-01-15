@@ -75,7 +75,7 @@ public:
    std::string GetReadPath() const { return mReadPath; }
    static bool WriteDataToFile(const std::string& path, float** data, int numSamples, int channels = 1);
    static bool WriteDataToFile(const std::string& path, ChannelBuffer* data, int numSamples);
-   bool IsPlaying() { return mOffset < mNumSamples; }
+   bool IsPlaying() const { return mOffset < mNumSamples; }
    void LockDataMutex(bool lock) { lock ? mDataMutex.lock() : mDataMutex.unlock(); }
    void Create(int length);
    void Create(ChannelBuffer* data);

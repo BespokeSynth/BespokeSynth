@@ -66,7 +66,7 @@ MidiController::MidiController()
 void MidiController::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mControllerList = new DropdownList(this, "controller", 3, 2, &mControllerIndex, 157);
+   mControllerList = new DropdownList(this, "controller", 3, 2, &mControllerIndex, 165);
    mMappingDisplayModeSelector = new RadioButton(this, "mappingdisplay", mControllerList, kAnchor_Below, (int*)&mMappingDisplayMode, kRadioHorizontal);
    mBindCheckbox = new Checkbox(this, "bind (hold shift)", mMappingDisplayModeSelector, kAnchor_Below, &mBindMode);
    mPageSelector = new DropdownList(this, "page", mBindCheckbox, kAnchor_Right, &mControllerPage);
@@ -254,6 +254,9 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
       if (!connection["midi_off_value"].isNull())
          controlConnection->mMidiOffValue = connection["midi_off_value"].asInt();
 
+      if (!connection["scale"].isNull())
+         controlConnection->mScaleOutput = connection["scale"].asBool();
+
       if (!connection["blink"].isNull())
          controlConnection->mBlink = connection["blink"].asBool();
 
@@ -331,7 +334,7 @@ void MidiController::OnTransportAdvanced(float amount)
             playTime += .01; //hack to handle note on/off in the same frame
       }
       lastPlayTime = playTime;
-      PlayNoteOutput(playTime, note->mPitch + mNoteOffset, MIN(127, note->mVelocity * mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0));
+      PlayNoteOutput(NoteMessage(playTime, note->mPitch + mNoteOffset, MIN(127, note->mVelocity * mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0)));
 
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
          (*i)->OnMidiNote(*note);
@@ -479,8 +482,13 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 void MidiController::OnMidi(const MidiMessage& message)
 {
-   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !message.isSysEx()))
+   int is_sysex = message.isSysEx();
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !is_sysex))
       return;
+   if (mEnabled && mSendSysex && is_sysex)
+      for (auto* script : mScriptListeners)
+         script->SysExReceived(message.getSysExData(), message.getSysExDataSize());
+
    mNoteOutput.SendMidi(message);
 }
 
@@ -1248,12 +1256,12 @@ void MidiController::DrawModule()
       if (mIsConnected)
       {
          ofSetColor(ofColor::green);
-         DrawTextNormal("connected", 165, 13);
+         DrawTextNormal("connected", 173, 13);
       }
       else
       {
          ofSetColor(ofColor::red);
-         DrawTextNormal("not connected", 165, 13);
+         DrawTextNormal("not connected", 173, 13);
       }
       ofPopStyle();
 
@@ -1520,7 +1528,7 @@ void MidiController::GetModuleDimensions(float& width, float& height)
    }
    else
    {
-      width = 163;
+      width = 171;
       height = 54;
    }
 }
@@ -2287,7 +2295,7 @@ void MidiController::ConnectDevice()
    ResyncControllerState();
 
    std::string deviceInName = mControllerList->GetLabel(mControllerIndex);
-   std::string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").toStdString();
+   std::string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").replace(" In ", " Out ").toStdString();
    bool hasOutput = false;
    for (const auto& device : MidiOutput::getAvailableDevices())
    {
@@ -2412,6 +2420,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, true);
    mModuleSaveData.LoadBool("resend_feedback_on_release", moduleInfo, false);
    mModuleSaveData.LoadBool("show_activity_ui_overlay", moduleInfo, true);
+   mModuleSaveData.LoadBool("send_sysex", moduleInfo, false);
 
    mConnectionsJson = moduleInfo["connections"];
 
@@ -2444,6 +2453,7 @@ void MidiController::SetUpFromSaveData()
    mSendTwoWayOnChange = mModuleSaveData.GetBool("twoway_on_change");
    mResendFeedbackOnRelease = mModuleSaveData.GetBool("resend_feedback_on_release");
    mShowActivityUIOverlay = mModuleSaveData.GetBool("show_activity_ui_overlay");
+   mSendSysex = mModuleSaveData.GetBool("send_sysex");
 
    BuildControllerList();
 
@@ -2541,6 +2551,8 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
          mConnectionsJson[i]["midi_off_value"] = connection->mMidiOffValue;
       if (connection->mMidiOnValue != 127)
          mConnectionsJson[i]["midi_on_value"] = connection->mMidiOnValue;
+      if (connection->mScaleOutput)
+         mConnectionsJson[i]["scale"] = true;
       if (connection->mBlink)
          mConnectionsJson[i]["blink"] = true;
       if (connection->mIncrementAmount != 0)
@@ -2811,6 +2823,7 @@ void UIControlConnection::PreDraw()
 
    mControlEntry->SetShowing(mMessageType != kMidiMessage_PitchBend);
    mValueEntry->SetShowing((mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease) && mIncrementAmount == 0);
+   m14BitModeCheckbox->SetShowing(mMessageType == kMidiMessage_Control && mControl >= 32);
    mIncrementalEntry->SetShowing(mType == kControlType_Slider || mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease);
 }
 

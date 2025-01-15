@@ -57,12 +57,12 @@ void NoteToMs::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    OnModulatorRepatch();
 }
 
-void NoteToMs::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteToMs::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
-      mPitch = pitch;
-      mPitchBend = modulation.pitchBend;
+      mPitch = note.pitch;
+      mPitchBend = note.modulation.pitchBend;
    }
 }
 

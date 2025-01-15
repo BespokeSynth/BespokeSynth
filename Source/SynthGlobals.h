@@ -83,7 +83,7 @@ class ChannelBuffer;
 
 typedef std::map<std::string, int> EnumMap;
 
-const int kWorkBufferSize = 1024 * 8; //larger than the audio buffer size would ever be (even oversampled)
+const int kWorkBufferSize = 8192 * 16 * 2; //larger than the audio buffer size would ever be (even oversampled). Noxy: This needs to be twice as large as the largest possible buffersize (Largest I've seen on my system is 8192) multiplied by the largest possible oversampling times two. Why two? Well effectchains use this buffer twice consecutive for the drywet mixing. Obviously this should become a smart buffer so we can dynamically increase the size when it is needed but that is for later. For now this increase should fix it ... mostly.
 
 const int kNumVoices = 16;
 
@@ -139,6 +139,15 @@ enum KeyModifiers
    kModifier_Control = 4,
    kModifier_Command = 8
 };
+
+enum class StepVelocityType
+{
+   Ghost = 0,
+   Normal = 1,
+   Accent = 2,
+   NumVelocityLevels = 3
+};
+extern std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
 
 class LoadingJSONException : public std::exception
 {
@@ -198,7 +207,7 @@ float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize
 void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float sample);
 std::string GetRomanNumeralForDegree(int degree);
 void UpdateTarget(IDrawableModule* module);
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r = .2f, float g = .7f, float b = .2f);
+void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r = .2f, float g = .7f, float b = .2f, bool autocorrelationMode = true);
 void StringCopy(char* dest, const char* source, int destLength);
 int GetKeyModifiers();
 bool IsKeyHeld(int key, int modifiers = kModifier_None);

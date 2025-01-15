@@ -114,22 +114,22 @@ void NoteChance::DrawModule()
    }
 }
 
-void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteChance::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
       ComputeSliders(0);
 
    float random;
    if (mDeterministic)
    {
       const int kStepResolution = 128;
-      uint64_t step = int(TheTransport->GetMeasureTime(time) * kStepResolution);
+      uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
       int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
       random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0f);
    }
@@ -139,15 +139,15 @@ void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 
    bool accept = random <= mChance;
-   if (accept || velocity == 0)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   if (accept || note.velocity == 0)
+      PlayNoteOutput(note);
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       if (accept)
-         mLastAcceptTime = time;
+         mLastAcceptTime = note.time;
       else
-         mLastRejectTime = time;
+         mLastRejectTime = note.time;
    }
 }
 

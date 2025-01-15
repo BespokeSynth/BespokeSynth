@@ -126,7 +126,7 @@ void NoteChainNode::TriggerNote(double time)
       mStartTime = time;
       mDurationMs = mDuration / (static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       mNext = TheTransport->GetDuration(mNextInterval);
-      PlayNoteOutput(time, mPitch, mVelocity * 127);
+      PlayNoteOutput(NoteMessage(time, mPitch, mVelocity * 127));
    }
 }
 

@@ -54,14 +54,14 @@ void Granulator::Reset()
    }
 }
 
-void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float* output)
+void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float speed, float* output)
 {
    if (time + gInvSampleRateMs >= mNextGrainSpawnMs)
    {
       double startFromMs = mNextGrainSpawnMs;
       if (startFromMs < time - 1000) //must have recently started processing, reset
          startFromMs = time;
-      SpawnGrain(mNextGrainSpawnMs, offset, buffer->NumActiveChannels() == 2 ? mWidth : 0);
+      SpawnGrain(mNextGrainSpawnMs, offset, buffer->NumActiveChannels() == 2 ? mWidth : 0, speed);
       mNextGrainSpawnMs = startFromMs + mGrainLengthMs * 1 / mGrainOverlap * ofRandom(1 - mSpacingRandomize / 2, 1 + mSpacingRandomize / 2);
    }
 
@@ -76,11 +76,11 @@ void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLeng
    }
 }
 
-void Granulator::SpawnGrain(double time, double offset, float width)
+void Granulator::SpawnGrain(double time, double offset, float width, float speed)
 {
    if (mLiveMode)
    {
-      float speedMult = 1 + mSpeedRandomize;
+      float speedMult = speed + mSpeedRandomize;
       if (mOctaves)
          speedMult *= 1.5f;
       float extraSpeed = MAX(0, speedMult * mSpeed - 1);
@@ -88,7 +88,7 @@ void Granulator::SpawnGrain(double time, double offset, float width)
       float extraSamples = extraMs / gInvSampleRateMs;
       offset -= extraSamples;
    }
-   float speedMult = 1 + ofRandom(-mSpeedRandomize, mSpeedRandomize);
+   float speedMult = speed + ofRandom(-mSpeedRandomize, mSpeedRandomize);
    float vol = 1;
    if (mOctaves)
    {

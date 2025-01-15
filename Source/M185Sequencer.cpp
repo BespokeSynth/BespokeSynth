@@ -168,18 +168,18 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
 
       if (stopPrevNote && mLastPitch >= 0)
       {
-         PlayNoteOutput(time, mLastPitch, 0, -1);
+         PlayNoteOutput(NoteMessage(time, mLastPitch, 0));
          mLastPitch = -1;
       }
       if (playNextNote)
       {
-         PlayNoteOutput(time, mSteps[mStepIdx].mPitch, velocity * 127, -1);
+         PlayNoteOutput(NoteMessage(time, mSteps[mStepIdx].mPitch, velocity * 127));
          mLastPitch = mSteps[mStepIdx].mPitch;
       }
    }
    else if (mLastPitch >= 0)
    {
-      PlayNoteOutput(time, mLastPitch, 0, -1);
+      PlayNoteOutput(NoteMessage(time, mLastPitch, 0));
       mLastPitch = -1;
    }
 

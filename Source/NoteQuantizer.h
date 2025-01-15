@@ -48,7 +48,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void OnTimeEvent(double time) override;
@@ -71,11 +71,9 @@ private:
 
    struct InputInfo
    {
-      int velocity{ 0 };
-      int voiceIdx{ -1 };
+      NoteMessage note;
       bool held{ false };
       bool hasPlayedYet{ false };
-      ModulationParameters modulation;
    };
 
    bool mNoteRepeat{ false };

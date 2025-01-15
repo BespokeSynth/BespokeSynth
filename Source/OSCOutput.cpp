@@ -100,16 +100,16 @@ void OSCOutput::DrawModule()
    mNoteOutLabelEntry->Draw();
 }
 
-void OSCOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void OSCOutput::PlayNote(NoteMessage note)
 {
    if (mNoteOutLabel.size() > 0)
    {
       juce::OSCMessage msg(("/bespoke/" + mNoteOutLabel).c_str());
-      float pitchOut = pitch;
-      if (modulation.pitchBend != nullptr)
-         pitchOut += modulation.pitchBend->GetValue(0);
+      float pitchOut = note.pitch;
+      if (note.modulation.pitchBend != nullptr)
+         pitchOut += note.modulation.pitchBend->GetValue(0);
       msg.addFloat32(pitchOut);
-      msg.addFloat32(velocity);
+      msg.addFloat32(note.velocity);
       mOscOut.send(msg);
    }
 }

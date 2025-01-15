@@ -155,12 +155,12 @@ void DrumSynth::Process(double time)
    }
 }
 
-void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void DrumSynth::PlayNote(NoteMessage note)
 {
-   if (pitch >= 0 && pitch < mHits.size())
+   if (note.pitch >= 0 && note.pitch < mHits.size())
    {
-      if (velocity > 0)
-         mHits[pitch]->Play(time, velocity / 127.0f);
+      if (note.velocity > 0)
+         mHits[note.pitch]->Play(note.time, note.velocity / 127.0f);
    }
 }
 

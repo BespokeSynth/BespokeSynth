@@ -117,12 +117,12 @@ void RingModulator::DrawModule()
    mGlideSlider->Draw();
 }
 
-void RingModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void RingModulator::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      float freq = TheScale->PitchToFreq(pitch);
-      mFreqRamp.Start(time, freq, time + mGlideTime);
+      float freq = TheScale->PitchToFreq(note.pitch);
+      mFreqRamp.Start(note.time, freq, note.time + mGlideTime);
       mFreq = freq;
    }
 }

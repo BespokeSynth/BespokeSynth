@@ -110,11 +110,11 @@ float NoteStreamDisplay::GetYPos(int pitch, float noteHeight) const
    return ofMap(pitch, mPitchMin, mPitchMax + 1, mHeight - noteHeight, -noteHeight);
 }
 
-void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteStreamDisplay::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       bool inserted = false;
       double oldest = -1;
@@ -123,9 +123,9 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
       {
          if (!IsElementActive(i))
          {
-            mNoteStream[i].pitch = pitch;
-            mNoteStream[i].velocity = velocity;
-            mNoteStream[i].timeOn = time;
+            mNoteStream[i].pitch = note.pitch;
+            mNoteStream[i].velocity = note.velocity;
+            mNoteStream[i].timeOn = note.time;
             mNoteStream[i].timeOff = -1;
 
             inserted = true;
@@ -143,30 +143,30 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
 
       if (!inserted && oldestIndex != -1)
       {
-         mNoteStream[oldestIndex].pitch = pitch;
-         mNoteStream[oldestIndex].velocity = velocity;
-         mNoteStream[oldestIndex].timeOn = time;
+         mNoteStream[oldestIndex].pitch = note.pitch;
+         mNoteStream[oldestIndex].velocity = note.velocity;
+         mNoteStream[oldestIndex].timeOn = note.time;
          mNoteStream[oldestIndex].timeOff = -1;
       }
 
-      if (pitch < mPitchMin)
-         mPitchMin = pitch;
-      if (pitch > mPitchMax)
-         mPitchMax = pitch;
+      if (note.pitch < mPitchMin)
+         mPitchMin = note.pitch;
+      if (note.pitch > mPitchMax)
+         mPitchMax = note.pitch;
    }
    else
    {
       for (int i = 0; i < kNoteStreamCapacity; ++i)
       {
-         if (mNoteStream[i].pitch == pitch &&
+         if (mNoteStream[i].pitch == note.pitch &&
              mNoteStream[i].timeOff == -1 &&
-             mNoteStream[i].timeOn < time)
-            mNoteStream[i].timeOff = time;
+             mNoteStream[i].timeOn < note.time)
+            mNoteStream[i].timeOff = note.time;
       }
    }
 
    if (mDrawDebug)
-      AddDebugLine("PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")", 35);
+      AddDebugLine("PlayNote(" + ofToString(note.time / 1000) + ", " + ofToString(note.pitch) + ", " + ofToString(note.velocity) + ", " + ofToString(note.voiceIdx) + ")", 35);
 }
 
 bool NoteStreamDisplay::IsElementActive(int index) const
