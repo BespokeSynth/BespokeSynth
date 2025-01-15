@@ -52,7 +52,7 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) c
    {
       float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
 
-      float phase = TheTransport->GetMeasureTime(gTime + samplesIn * gInvSampleRateMs) / period + (1 - mPhaseOffset) + 1; //+1 so we can have negative samplesIn
+      float phase = TheTransport->GetMeasureTime(gTime + samplesIn * gInvSampleRateMs) / period + (1 - mPhaseOffset - mAdjustOffset) + 10; //+10 so we can have negative samplesIn
 
       phase -= int(phase) / 2 * 2; //using 2 allows for shuffle to work
 
@@ -204,4 +204,11 @@ void LFO::OnTransportAdvanced(float amount)
             OnTimeEvent(gTime);
       }
    }
+}
+
+void LFO::ResetPhase(double time)
+{
+   mFreePhase = 1 - mPhaseOffset;
+   mAdjustOffset = 0;
+   mAdjustOffset = CalculatePhase() + mPhaseOffset;
 }

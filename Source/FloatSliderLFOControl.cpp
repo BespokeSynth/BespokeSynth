@@ -57,8 +57,6 @@ void FloatSliderLFOControl::CreateUIControls()
    DROPDOWN(mOscSelector, "osc", reinterpret_cast<int*>(&mLFOSettings.mOscType), 47);
    UIBLOCK_NEWLINE();
    FLOATSLIDER(mOffsetSlider, "offset", &mLFOSettings.mLFOOffset, 0, 1);
-   UIBLOCK_SHIFTUP();
-   FLOATSLIDER(mFreeRateSlider, "free rate", &mLFOSettings.mFreeRate, 0, 20);
    FLOATSLIDER(mMinSlider, "low", &mDummyMin, 0, 1);
    FLOATSLIDER(mMaxSlider, "high", &mDummyMax, 0, 1);
    FLOATSLIDER(mSpreadSlider, "spread", &mLFOSettings.mSpread, 0, 1);
@@ -66,6 +64,7 @@ void FloatSliderLFOControl::CreateUIControls()
    FLOATSLIDER(mLengthSlider, "length", &mLFOSettings.mLength, 0, 1);
    FLOATSLIDER(mShuffleSlider, "shuffle", &mLFOSettings.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider, "soften", &mLFOSettings.mSoften, 0, 1);
+   FLOATSLIDER(mFreeRateSlider, "free rate", &mLFOSettings.mFreeRate, 0, 20);
    CHECKBOX(mLowResModeCheckbox, "lite cpu", &mLFOSettings.mLowResMode);
    ENDUIBLOCK(mWidth, mHeight);
 
@@ -332,6 +331,11 @@ float FloatSliderLFOControl::GetTargetMax() const
    return 1;
 }
 
+void FloatSliderLFOControl::OnPulse(double time, float velocity, int flags)
+{
+   mLFO.ResetPhase(time);
+}
+
 void FloatSliderLFOControl::UpdateFromSettings()
 {
    mLFO.SetPeriod(mLFOSettings.mInterval);
@@ -349,13 +353,13 @@ void FloatSliderLFOControl::UpdateVisibleControls()
    bool isDrunk = mLFO.GetOsc()->GetType() == kOsc_Drunk;
    bool isRandom = mLFO.GetOsc()->GetType() == kOsc_Random;
    bool showFreeRate = mLFOSettings.mInterval == kInterval_Free || isPerlin;
-   mOffsetSlider->SetShowing(!showFreeRate && !isDrunk && !isRandom);
-   mFreeRateSlider->SetShowing(showFreeRate);
+   mOffsetSlider->SetShowing(!isDrunk && !isRandom);
    mIntervalSelector->SetShowing(!isPerlin);
    mShuffleSlider->SetShowing(!isPerlin && !isDrunk && !isRandom);
    mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square || mLFO.GetOsc()->GetType() == kOsc_NegSaw || isRandom);
    mSpreadSlider->SetShowing(mLFO.GetOsc()->GetType() != kOsc_Square);
    mLengthSlider->SetShowing(!isPerlin && !isDrunk && !isRandom);
+   mFreeRateSlider->SetShowing(showFreeRate);
 }
 
 void FloatSliderLFOControl::SetRate(NoteInterval rate)
@@ -499,8 +503,8 @@ void LFOPool::Init()
    {
       sLFOPool[i] = new FloatSliderLFOControl();
       sLFOPool[i]->CreateUIControls();
-      sLFOPool[i]->Init();
       sLFOPool[i]->SetTypeName("lfo", kModuleCategory_Modulator);
+      sLFOPool[i]->Init();
       sLFOPool[i]->SetLFOEnabled(false);
    }
    sInitialized = true;
