@@ -921,7 +921,7 @@ void MidiController::Poll()
             else if (connection->mType == kControlType_SetValue)
             {
                float realValue = uicontrol->GetValue();
-               bool valuesAreEqual = fabsf(realValue - connection->mValue) < .0001f;
+               bool valuesAreEqual = std::abs(realValue - connection->mValue) < .0001;
                int outVal = 0;
                if ((!uicontrol->IsBitmask() && valuesAreEqual) ||
                    (uicontrol->IsBitmask() && ((int)realValue & (1 << (int)connection->mValue))))
