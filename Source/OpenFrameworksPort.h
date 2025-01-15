@@ -108,7 +108,7 @@ struct ofVec2
    template <typename TCast>
    operator ofVec2<TCast>()
    {
-      return ofVec2<TCast>(x , y );
+      return ofVec2<TCast>(x, y);
    }
    ofVec2& operator-=(const ofVec2& other)
    {
