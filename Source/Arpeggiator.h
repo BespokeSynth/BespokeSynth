@@ -108,8 +108,8 @@ private:
    };
    std::vector<ArpNote> mChord;
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 100 };
+   float mHeight{ 20 };
 
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    int mLastPitch{ -1 };

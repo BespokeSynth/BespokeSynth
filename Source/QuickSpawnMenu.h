@@ -117,7 +117,7 @@ private:
    juce::String mSearchString;
    float mScrollOffset{ 0 };
    PatchCable* mFilterForCable{ nullptr };
-   QuickSpawnFollower* mMainContainerFollower;
+   QuickSpawnFollower* mMainContainerFollower{ nullptr };
 };
 
 extern QuickSpawnMenu* TheQuickSpawnMenu;

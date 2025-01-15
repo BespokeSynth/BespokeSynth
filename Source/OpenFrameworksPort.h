@@ -105,11 +105,11 @@ struct ofVec2
    {
       return ofVec2(x / f, y / f);
    }
-   //template <typename TCast>
-   //operator ofVec2<TCast>()
-   //{
-   //   return ofVec2<TCast>(x , y );
-   //}
+   template <typename TCast>
+   operator ofVec2<TCast>()
+   {
+      return ofVec2<TCast>(x , y );
+   }
    ofVec2& operator-=(const ofVec2& other)
    {
       x -= other.x;
