@@ -268,7 +268,7 @@ jobs:
     dependsOn: Build
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     pool:
-      vmImage: 'macos-12'
+      vmImage: 'macos-14'
 
     steps:
     - checkout: self
