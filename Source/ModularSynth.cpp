@@ -265,7 +265,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    sCableAlpha = UserPrefs.cable_alpha.Get();
 
    Time time = Time::getCurrentTime();
-   if (fabsf(sBackgroundR - UserPrefs.background_r.GetDefault()) < .001f && fabsf(sBackgroundG - UserPrefs.background_g.GetDefault()) < .001f && fabsf(sBackgroundB - UserPrefs.background_b.GetDefault()) < .001f && time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)
+   if (std::abs(sBackgroundR - UserPrefs.background_r.GetDefault()) < .001 && std::abs(sBackgroundG - UserPrefs.background_g.GetDefault()) < .001 && std::abs(sBackgroundB - UserPrefs.background_b.GetDefault()) < .001 && time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)
    {
       sBackgroundLissajousR = 0.722f;
       sBackgroundLissajousG = 0.328f;

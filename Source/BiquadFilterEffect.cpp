@@ -149,7 +149,7 @@ double BiquadFilterEffect::GetEffectAmount()
    if (mBiquad[0].mType == kFilterType_Bandpass)
       return ofClamp(.3f + (mBiquad[0].mQ / mQSlider->GetMax()), 0, 1);
    if (mBiquad[0].mType == kFilterType_Peak)
-      return ofClamp(fabsf(mBiquad[0].mDbGain / 96), 0, 1);
+      return ofClamp(std::abs(mBiquad[0].mDbGain / 96), 0, 1);
    return 0;
 }
 
