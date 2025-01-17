@@ -68,7 +68,7 @@ We will then take care of the issue as soon as posssible.
 We ask you to investigate carefully, collect information and describe the issue in detail in your report. Please complete the following steps in advance to help us fix any potential bug as fast as possible.
 
 - Make sure that you are using the latest version.
-- Determine if your bug is really a bug and not an error on your side e.g. using incompatible environment components/versions (Make sure that you have read the [documentation](https://www.bespokesynth.com/docs/index.html and the [community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki)). If you are looking for support, you might want to check [this section](#i-have-a-question)).
+- Determine if your bug is really a bug and not an error on your side e.g. using incompatible environment components/versions (Make sure that you have read the [documentation](https://www.bespokesynth.com/docs/index.html) and the [community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki). If you are looking for support, you might want to check [this section](#i-have-a-question)).
 - To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/BespokeSynth/BespokeSynth/issues?q=label%3Abug).
 - Also make sure to search [our Discord](https://discord.gg/YdTMkvvpZZ) to see if other users have discussed the issue.
 - Collect information about the bug:
