@@ -80,7 +80,7 @@ void PulseDelayer::CheckboxUpdated(Checkbox* checkbox, double time)
       mConsumeIndex = mAppendIndex; //effectively clears the queue
 }
 
-void PulseDelayer::OnTransportAdvanced(float amount)
+void PulseDelayer::OnTransportAdvanced(double amount)
 {
    PROFILER(PulseDelayer);
 

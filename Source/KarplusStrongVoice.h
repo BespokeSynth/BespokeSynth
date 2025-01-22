@@ -72,7 +72,7 @@ public:
    ~KarplusStrongVoice();
 
    // IMidiVoice
-   void Start(double time, float amount) override;
+   void Start(double time, double target) override;
    void Stop(double time) override;
    void ClearVoice() override;
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
@@ -81,14 +81,9 @@ public:
 
 private:
    void DoParameterUpdate(int samplesIn,
-                          int oversampling,
-                          float& pitch,
-                          float& freq,
-                          float& filterRate,
-                          float& filterLerp,
-                          float& oscPhaseInc);
+                          int oversampling, double & pitch, double & freq, double & filterRate, double & filterLerp, double & oscPhaseInc);
 
-   float mOscPhase{ 0 };
+   double mOscPhase{ 0 };
    EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
    ::ADSR mEnv;
    KarplusStrongVoiceParams* mVoiceParams{ nullptr };

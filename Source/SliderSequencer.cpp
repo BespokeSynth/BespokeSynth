@@ -68,7 +68,7 @@ double SliderSequencer::MeasurePos(double time)
    return pos;
 }
 
-void SliderSequencer::OnTransportAdvanced(float amount)
+void SliderSequencer::OnTransportAdvanced(double amount)
 {
    PROFILER(SliderSequencer);
 

@@ -35,7 +35,7 @@
 NoteEcho::NoteEcho()
 {
    for (int i = 0; i < kMaxDestinations; ++i)
-      mDelay[i] = i * .125f;
+      mDelay[i] = i * .125;
 }
 
 void NoteEcho::CreateUIControls()

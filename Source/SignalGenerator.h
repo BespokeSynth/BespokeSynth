@@ -48,7 +48,7 @@ public:
 
    void CreateUIControls() override;
 
-   void SetVol(float vol) { mVol = vol; }
+   void SetVol(double vol) { mVol = vol; }
 
    //IAudioSource
    void Process(double time) override;

@@ -71,14 +71,14 @@ public:
    ~SingleOscillatorVoice();
 
    // IMidiVoice
-   void Start(double time, float amount) override;
+   void Start(double time, double target) override;
    void Stop(double time) override;
    void ClearVoice() override;
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
 
-   static double GetADSRScale(float velocity, double velToEnvelope);
+   static double GetADSRScale(double velocity, double velToEnvelope);
 
    static const int kMaxUnison = 8;
 

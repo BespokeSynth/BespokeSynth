@@ -35,7 +35,7 @@ class Granulator;
 class Grain
 {
 public:
-   void Spawn(Granulator* owner, double time, double pos, float speedMult, float lengthInMs, float vol, float width);
+   void Spawn(Granulator* owner, double time, double pos, double speedMult, double lengthInMs, double vol, double width);
    void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output);
    void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength);
    void Clear() { mVol = 0; }
@@ -43,13 +43,13 @@ public:
 private:
    double GetWindow(double time);
    double mPos{ 0 };
-   float mSpeedMult{ 1 };
+   double mSpeedMult{ 1 };
    double mStartTime{ 0 };
    double mEndTime{ 1 };
    double mStartToEnd{ 1 }, mStartToEndInv{ 1 };
-   float mVol{ 0 };
-   float mStereoPosition{ 0 };
-   float mDrawPos{ .5 };
+   double mVol{ 0 };
+   double mStereoPosition{ 0 };
+   double mDrawPos{ .5 };
    Granulator* mOwner{ nullptr };
 };
 
@@ -73,7 +73,7 @@ public:
    double mWidth{ 1 };
 
 private:
-   void SpawnGrain(double time, double offset, float width, float speed);
+   void SpawnGrain(double time, double offset, double width, double speed);
 
    double mNextGrainSpawnMs{ 0 };
    int mNextGrainIdx{ 0 };

@@ -50,7 +50,7 @@ private:
 
    struct Location
    {
-      float mZoomLevel{ 1 };
+      double mZoomLevel{ 1 };
       ofVec2d mOffset{ 0, 0 };
    };
 
@@ -58,8 +58,8 @@ private:
    std::map<int, Location> mLocations{};
    Location mStart{};
    Location mDestination{};
-   float mCurrentProgress{ 1 };
-   float mSpeed{ 2 };
+   double mCurrentProgress{ 1 };
+   double mSpeed{ 2 };
    Location mHome{};
 
    bool mInVanityPanningMode{ false };

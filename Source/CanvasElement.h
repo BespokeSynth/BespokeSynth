@@ -42,17 +42,17 @@ class EventCanvas;
 class CanvasElement
 {
 public:
-   CanvasElement(Canvas* canvas, int col, int row, float offset, float length);
+   CanvasElement(Canvas* canvas, int col, int row, double offset, double length);
    virtual ~CanvasElement() {}
    void Draw(ofVec2f offset);
    void DrawOffscreen();
    void SetHighlight(bool highlight) { mHighlighted = highlight; }
    bool GetHighlighted() const { return mHighlighted; }
    ofRectangle GetRect(bool clamp, bool wrapped, ofVec2f offset = ofVec2f(0, 0)) const;
-   float GetStart() const;
-   void SetStart(float start, bool preserveLength);
-   virtual float GetEnd() const;
-   void SetEnd(float end);
+   double GetStart() const;
+   void SetStart(double start, bool preserveLength);
+   virtual double GetEnd() const;
+   void SetEnd(double end);
    std::vector<IUIControl*>& GetUIControls() { return mUIControls; }
    void MoveElementByDrag(ofVec2f dragOffset);
 
@@ -76,10 +76,10 @@ protected:
    virtual void DrawContents(bool clamp, bool wrapped, ofVec2f offset) = 0;
    void DrawElement(bool clamp, bool wrapped, ofVec2f offset);
    void AddElementUIControl(IUIControl* control);
-   void GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, float& newOffset) const;
+   void GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, double & newOffset) const;
    ofRectangle GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const;
-   float GetStart(int col, float offset) const;
-   float GetEnd(int col, float offset, float length) const;
+   double GetStart(int col, double offset) const;
+   double GetEnd(int col, double offset, double length) const;
 
    Canvas* mCanvas{ nullptr };
    bool mHighlighted{ false };
@@ -174,7 +174,7 @@ public:
    void TriggerEnd(double time);
 
    bool IsResizable() const override { return mIsCheckbox; }
-   float GetEnd() const override;
+   double GetEnd() const override;
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;

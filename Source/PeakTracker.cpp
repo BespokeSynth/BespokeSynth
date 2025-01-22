@@ -34,7 +34,7 @@ void PeakTracker::Process(float* buffer, int bufferSize)
    for (int j = 0; j < bufferSize; ++j)
    {
       double scalar = pow(0.5, 1.0 / (mDecayTime * gSampleRate));
-      double input = fabsf(buffer[j]);
+      double input = std::abs(buffer[j]);
 
       if (input >= mPeak)
       {

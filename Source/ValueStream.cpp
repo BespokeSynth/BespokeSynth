@@ -62,7 +62,7 @@ void ValueStream::Poll()
 {
 }
 
-void ValueStream::OnTransportAdvanced(float amount)
+void ValueStream::OnTransportAdvanced(double amount)
 {
    if (mUIControl && mEnabled)
    {
@@ -88,11 +88,11 @@ void ValueStream::DrawModule()
       ofBeginShape();
       for (int i = 0; i < mWidth; ++i)
       {
-         float x = mWidth - i;
+         double x = mWidth - i;
          int samplesAgo = int(i / (mSpeed / 200)) + 1;
          if (samplesAgo < mValues.size())
          {
-            float y = ofMap(mValues[(mValueDisplayPointer - samplesAgo + mValues.size()) % mValues.size()], mFloatSlider->GetMin(), mFloatSlider->GetMax(), mHeight - 10, 10);
+            double y = ofMap(mValues[(mValueDisplayPointer - samplesAgo + mValues.size()) % mValues.size()], mFloatSlider->GetMin(), mFloatSlider->GetMax(), mHeight - 10, 10);
             ofVertex(x, y);
          }
       }

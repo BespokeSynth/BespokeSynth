@@ -66,7 +66,7 @@ public:
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
 
-   void SetVol(float vol) { mVol = vol; }
+   void SetVol(double vol) { mVol = vol; }
 
    void Poll() override;
    void Exit() override;

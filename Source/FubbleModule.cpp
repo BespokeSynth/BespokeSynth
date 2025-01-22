@@ -52,7 +52,7 @@ void FubbleModule::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mQuantizeLengthSelector, "length", (int*)(&mQuantizeInterval), 60);
    UIBLOCK_SHIFTLEFT();
-   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .1f, 10);
+   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .1, 10);
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mClearButton, "clear");
    ENDUIBLOCK0();

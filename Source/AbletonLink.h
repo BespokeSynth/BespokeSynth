@@ -51,7 +51,7 @@ public:
    void CreateUIControls() override;
    void Poll() override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 

@@ -38,7 +38,7 @@ void BiquadFilterEffect::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mTypeSelector = new RadioButton(this, "type", 4, 52, (int*)(&mBiquad[0].mType), kRadioHorizontal);
    mFSlider = new FloatSlider(this, "F", 4, 4, 80, 15, &mBiquad[0].mF, 10, 4000);
-   mQSlider = new FloatSlider(this, "Q", 4, 20, 80, 15, &mBiquad[0].mQ, .1f, 18, 3);
+   mQSlider = new FloatSlider(this, "Q", 4, 20, 80, 15, &mBiquad[0].mQ, .1, 18, 3);
    mGSlider = new FloatSlider(this, "G", 4, 36, 80, 15, &mBiquad[0].mDbGain, -96, 96, 1);
 
    mTypeSelector->AddLabel("lp", kFilterType_Lowpass);
@@ -75,8 +75,8 @@ void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       mCoefficientsHaveChanged = true; //force filters for other channels to get updated
    mDryBuffer.SetNumActiveChannels(buffer->NumActiveChannels());
 
-   const float fadeOutStart = mFSlider->GetMax() * .75f;
-   const float fadeOutEnd = mFSlider->GetMax();
+   const double fadeOutStart = mFSlider->GetMax() * .75;
+   const double fadeOutEnd = mFSlider->GetMax();
    bool fadeOut = mBiquad[0].mF > fadeOutStart && mBiquad[0].mType == kFilterType_Lowpass;
    if (fadeOut)
       mDryBuffer.CopyFrom(buffer);
@@ -99,7 +99,7 @@ void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    {
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
-         float dryness = ofMap(mBiquad[0].mF, fadeOutStart, fadeOutEnd, 0, 1);
+         double dryness = ofMap(mBiquad[0].mF, fadeOutStart, fadeOutEnd, 0, 1);
          Mult(buffer->GetChannel(ch), 1 - dryness, bufferSize);
          Mult(mDryBuffer.GetChannel(ch), dryness, bufferSize);
          Add(buffer->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);

@@ -107,13 +107,13 @@ private:
 
    float mWidth;
    float mHeight;
-   float mVol{ 1 };
+   double mVol{ 1 };
    double mMaxTime{ 1000 };
    bool mClick{ false };
    ::ADSR* mAdsr;
    ofVec2f mClickStart;
    ::ADSR mClickAdsr;
-   float mClickLength{ 1000 };
+   double mClickLength{ 1000 };
    bool mHighlighted{ false };
    FloatSlider* mASlider{ nullptr };
    FloatSlider* mDSlider{ nullptr };

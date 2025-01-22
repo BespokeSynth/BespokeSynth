@@ -82,7 +82,7 @@ void NoteStrummer::PlayNote(NoteMessage note)
    }
 }
 
-void NoteStrummer::OnTransportAdvanced(float amount)
+void NoteStrummer::OnTransportAdvanced(double amount)
 {
    int numNotes = (int)mNotes.size();
 

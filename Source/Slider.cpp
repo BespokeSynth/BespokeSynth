@@ -104,7 +104,7 @@ void FloatSlider::SetModulator(IModulator* modulator)
 
 void FloatSlider::Poll()
 {
-   if (mLastComputeTime + .1f < gTime)
+   if (mLastComputeTime + .1 < gTime)
       Compute();
 }
 
@@ -728,7 +728,7 @@ void FloatSlider::TextEntryCancelled(TextEntry* entry)
    }
 }
 
-void FloatSlider::OnTransportAdvanced(float amount)
+void FloatSlider::OnTransportAdvanced(double amount)
 {
    mRamp.Start(gTime, mSmoothTarget, gTime + (amount * TheTransport->MsPerBar() * (mSmooth * 300)));
 }

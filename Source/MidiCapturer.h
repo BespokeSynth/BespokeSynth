@@ -66,7 +66,7 @@ public:
    void AddDummyController(MidiCapturerDummyController* controller);
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;

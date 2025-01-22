@@ -73,7 +73,7 @@ public:
    void SetEnabled(bool on) override { mEnabled = on; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;

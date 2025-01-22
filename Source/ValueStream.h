@@ -48,7 +48,7 @@ public:
 
    IUIControl* GetUIControl() const { return mUIControl; }
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 

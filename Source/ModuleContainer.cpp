@@ -262,7 +262,7 @@ ofVec2d ModuleContainer::GetDrawOffset()
    return mDrawOffset;
 }
 
-float ModuleContainer::GetDrawScale() const
+double ModuleContainer::GetDrawScale() const
 {
    if (mOwner != nullptr && mOwner->GetOwningContainer() != nullptr)
       return mDrawScale * mOwner->GetOwningContainer()->GetDrawScale();

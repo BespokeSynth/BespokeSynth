@@ -91,9 +91,9 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
             }
             else
             {
-               while (mOscData[u].mPhase > FTWO_PI * 2)
+               while (mOscData[u].mPhase > TWO_PI * 2)
                {
-                  mOscData[u].mPhase -= FTWO_PI * 2;
+                  mOscData[u].mPhase -= TWO_PI * 2;
                   mOscData[u].mSyncPhase = 0;
                }
             }
@@ -185,7 +185,7 @@ void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
 
    pitch = GetPitch(samplesIn);
    freq = TheScale->PitchToFreq(pitch) * mVoiceParams->mMult;
-   vol = mVoiceParams->mVol * .4f / mVoiceParams->mUnison;
+   vol = mVoiceParams->mVol * .4 / mVoiceParams->mUnison;
    if (mVoiceParams->mSyncMode == Oscillator::SyncMode::Frequency)
       syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
    else if (mVoiceParams->mSyncMode == Oscillator::SyncMode::Ratio)
@@ -201,14 +201,14 @@ void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
 }
 
 //static
-double SingleOscillatorVoice::GetADSRScale(float velocity, double velToEnvelope)
+double SingleOscillatorVoice::GetADSRScale(double velocity, double velToEnvelope)
 {
    if (velToEnvelope > 0)
       return ofLerp((1 - velToEnvelope), 1, velocity);
    return ofClamp(ofLerp(1, 1 + velToEnvelope, velocity), 0.001, 1);
 }
 
-void SingleOscillatorVoice::Start(double time, float target)
+void SingleOscillatorVoice::Start(double time, double target)
 {
    double volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target);
    double adsrScale = GetADSRScale(target, mVoiceParams->mVelToEnvelope);

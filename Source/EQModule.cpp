@@ -49,14 +49,14 @@ EQModule::EQModule()
 
    assert(mFilters.size() == 8);
    auto types = new FilterType[8]{ kFilterType_LowShelf, kFilterType_Peak, kFilterType_Peak, kFilterType_HighShelf, kFilterType_Peak, kFilterType_Peak, kFilterType_Peak, kFilterType_Peak };
-   auto cutoffs = new float[8]{ 30, 200, 1000, 5000, 100, 10000, 5000, 18000 };
+   auto cutoffs = new double[8]{ 30, 200, 1000, 5000, 100, 10000, 5000, 18000 };
    for (size_t i = 0; i < mFilters.size(); ++i)
    {
       auto& filter = mFilters[i];
       filter.mEnabled = i < 4;
       for (auto& biquad : filter.mFilter)
       {
-         biquad.SetFilterParams(cutoffs[i], sqrtf(2) / 2);
+         biquad.SetFilterParams(cutoffs[i], std::sqrt(2) / 2);
          biquad.SetFilterType(types[i]);
       }
       filter.mNeedToCalculateCoefficients = true;
@@ -76,7 +76,7 @@ void EQModule::CreateUIControls()
       DROPDOWN(filter.mTypeSelector, ("type" + ofToString(i)).c_str(), (int*)(&filter.mFilter[0].mType), 45);
       FLOATSLIDER(filter.mFSlider, ("f" + ofToString(i)).c_str(), &filter.mFilter[0].mF, 20, 20000);
       FLOATSLIDER(filter.mGSlider, ("g" + ofToString(i)).c_str(), &filter.mFilter[0].mDbGain, -15, 15);
-      FLOATSLIDER_DIGITS(filter.mQSlider, ("q" + ofToString(i)).c_str(), &filter.mFilter[0].mQ, .1f, 18, 3);
+      FLOATSLIDER_DIGITS(filter.mQSlider, ("q" + ofToString(i)).c_str(), &filter.mFilter[0].mQ, .1, 18, 3);
       UIBLOCK_NEWCOLUMN();
 
       filter.mTypeSelector->AddLabel("lp", kFilterType_Lowpass);

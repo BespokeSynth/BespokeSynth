@@ -75,12 +75,12 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
    mDelayBuffer.SetNumChannels(buffer->NumActiveChannels());
 
    if (mInterval != kInterval_None)
    {
-      mDelay = TheTransport->GetDuration(mInterval) + .1f; //+1 to avoid perfect sample collision
+      mDelay = TheTransport->GetDuration(mInterval) + .1; //+1 to avoid perfect sample collision
       mDelayRamp.Start(time, mDelay, time + 10);
    }
 
@@ -91,7 +91,7 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
       ComputeSliders(i);
 
-      float delay;
+      double delay;
       if (mDelaySlider->GetModulator() != nullptr)
          delay = MAX(mDelay, GetMinDelayMs());
       else
@@ -100,7 +100,7 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       float delaySamps = delay / gInvSampleRateMs;
       if (mFeedbackModuleMode)
          delaySamps -= gBufferSize;
-      delaySamps = ofClamp(delaySamps, 0.1f, DELAY_BUFFER_SIZE - 2);
+      delaySamps = ofClamp(delaySamps, 0.1, DELAY_BUFFER_SIZE - 2);
 
       int sampsAgoA = int(delaySamps);
       int sampsAgoB = sampsAgoA + 1;
@@ -188,11 +188,11 @@ void DelayEffect::SetFeedbackModuleMode()
    mHeight -= 17;
 }
 
-float DelayEffect::GetMinDelayMs() const
+double DelayEffect::GetMinDelayMs() const
 {
    if (mFeedbackModuleMode)
       return (gBufferSize + 1) * gInvSampleRateMs;
-   return .1f;
+   return .1;
 }
 
 void DelayEffect::SetEnabled(bool enabled)

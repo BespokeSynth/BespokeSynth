@@ -47,13 +47,13 @@ void LooperGranulator::CreateUIControls()
 
    UIBLOCK(3, 3, 120);
    CHECKBOX(mOnCheckbox, "on", &mOn);
-   FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5f, MAX_GRAINS);
+   FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5, MAX_GRAINS);
    FLOATSLIDER(mGranSpeed, "speed", &mGranulator.mSpeed, -3, 3);
    FLOATSLIDER(mGranLengthMs, "len ms", &mGranulator.mGrainLengthMs, 1, 1000);
    FLOATSLIDER(mPosSlider, "loop pos", &mDummyPos, 0, 1);
    CHECKBOX(mFreezeCheckbox, "freeze", &mFreeze);
    FLOATSLIDER(mGranPosRandomize, "pos rand", &mGranulator.mPosRandomizeMs, 0, 200);
-   FLOATSLIDER(mGranSpeedRandomize, "speed rand", &mGranulator.mSpeedRandomize, 0, .3f);
+   FLOATSLIDER(mGranSpeedRandomize, "speed rand", &mGranulator.mSpeedRandomize, 0, .3);
    FLOATSLIDER(mGranSpacingRandomize, "spacing rand", &mGranulator.mSpacingRandomize, 0, 1);
    CHECKBOX(mGranOctaveCheckbox, "octaves", &mGranulator.mOctaves);
    FLOATSLIDER(mGranWidthSlider, "width", &mGranulator.mWidth, 0, 1);

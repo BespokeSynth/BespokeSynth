@@ -36,30 +36,31 @@ public:
    IMidiVoice() {}
    virtual ~IMidiVoice() {}
    virtual void ClearVoice() = 0;
-   void SetPitch(float pitch) { mPitch = ofClamp(pitch, 0, 127); }
+   void SetPitch(double pitch) { mPitch = ofClamp(pitch, 0, 127); }
    void SetModulators(ModulationParameters modulators) { mModulators = modulators; }
-   virtual void Start(double time, float amount) = 0;
+   virtual void Start(double time, double target) = 0;
    virtual void Stop(double time) = 0;
    virtual bool Process(double time, ChannelBuffer* out, int oversampling) = 0;
    virtual bool IsDone(double time) = 0;
    virtual void SetVoiceParams(IVoiceParams* params) = 0;
-   void SetPan(float pan)
+   void SetPan(double pan)
    {
       assert(pan >= -1 && pan <= 1);
       mPan = pan;
    }
-   float GetPan() const
+
+   double GetPan() const
    {
       assert(mPan >= -1 && mPan <= 1);
       return mPan;
    }
 
-   float GetPitch(int samplesIn) { return mPitch + (mModulators.pitchBend ? mModulators.pitchBend->GetValue(samplesIn) : ModulationParameters::kDefaultPitchBend); }
-   float GetModWheel(int samplesIn) { return mModulators.modWheel ? mModulators.modWheel->GetValue(samplesIn) : ModulationParameters::kDefaultModWheel; }
-   float GetPressure(int samplesIn) { return mModulators.pressure ? mModulators.pressure->GetValue(samplesIn) : ModulationParameters::kDefaultPressure; }
+   double GetPitch(int samplesIn) { return mPitch + (mModulators.pitchBend ? mModulators.pitchBend->GetValue(samplesIn) : ModulationParameters::kDefaultPitchBend); }
+   double GetModWheel(int samplesIn) { return mModulators.modWheel ? mModulators.modWheel->GetValue(samplesIn) : ModulationParameters::kDefaultModWheel; }
+   double GetPressure(int samplesIn) { return mModulators.pressure ? mModulators.pressure->GetValue(samplesIn) : ModulationParameters::kDefaultPressure; }
 
 private:
-   float mPitch{ 0 };
-   float mPan{ 0 };
+   double mPitch{ 0 };
+   double mPan{ 0 };
    ModulationParameters mModulators;
 };

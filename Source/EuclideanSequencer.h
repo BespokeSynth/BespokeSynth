@@ -63,7 +63,7 @@ public:
    void CreateUIControls();
    void InitialState(int state);
    void Clear();
-   void OnTransportAdvanced(float amount);
+   void OnTransportAdvanced(double amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
@@ -113,7 +113,7 @@ public:
    void Resize(float w, float h) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IClickable
    void MouseReleased() override;

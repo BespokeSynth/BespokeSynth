@@ -321,7 +321,7 @@ public:
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
    void OnMidi(const juce::MidiMessage& message) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IKeyboardFocusListener
    void OnKeyPressed(int key, bool isRepeat) override;

@@ -67,13 +67,13 @@ void UnstablePitch::DrawModule()
       return;
 
    ofPushStyle();
-   ofRectangle rect(3, 3, mWidth - 6, 34);
+   ofRectangle_d rect(3, 3, mWidth - 6, 34);
    const int kGridSize = 30;
    ofFill();
    for (int col = 0; col < kGridSize; ++col)
    {
-      float x = rect.x + col * (rect.width / kGridSize);
-      float y = rect.y;
+      double x = rect.x + col * (rect.width / kGridSize);
+      double y = rect.y;
       double val = mPerlin.GetValue(gTime, x / rect.width * 10, 0) * ofClamp(mPerlin.mPerlinAmount * 5, 0, 1);
       ofSetColor(val * 255, 0, val * 255);
       ofRect(x, y, (rect.width / kGridSize) + .5f, rect.height + .5f, 0);
@@ -149,7 +149,7 @@ void UnstablePitch::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void UnstablePitch::OnTransportAdvanced(float amount)
+void UnstablePitch::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 

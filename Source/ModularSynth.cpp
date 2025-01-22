@@ -1177,12 +1177,12 @@ void ModularSynth::KeyReleased(int key)
    mModuleContainer.KeyReleased(key);
 }
 
-float ModularSynth::GetMouseX(ModuleContainer* context, float rawX /*= FLT_MAX*/)
+double ModularSynth::GetMouseX(ModuleContainer* context, double rawX /*= std::numeric_limits<double>::max() */)
 {
    return ((rawX == FLT_MAX ? mMousePos.x : rawX) + UserPrefs.mouse_offset_x.Get()) / context->GetDrawScale() - context->GetDrawOffset().x;
 }
 
-float ModularSynth::GetMouseY(ModuleContainer* context, float rawY /*= FLT_MAX*/)
+double ModularSynth::GetMouseY(ModuleContainer* context, double rawY /*= std::numeric_limits<double>::max() */)
 {
    return ((rawY == FLT_MAX ? mMousePos.y : rawY) + UserPrefs.mouse_offset_y.Get()) / context->GetDrawScale() - context->GetDrawOffset().y;
 }
@@ -1209,7 +1209,7 @@ bool ModularSynth::ShouldShowGridSnap() const
 
 void ModularSynth::MouseMoved(int intX, int intY)
 {
-   bool changed = (mMousePos.x != intX || mMousePos.y != intY);
+   bool changed = (!ofAlmostEquel(mMousePos.x, intX) || !ofAlmostEquel(mMousePos.y, intY));
 
    mMousePos.x = intX;
    mMousePos.y = intY;

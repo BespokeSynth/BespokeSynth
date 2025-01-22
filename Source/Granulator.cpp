@@ -76,31 +76,31 @@ void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLeng
    }
 }
 
-void Granulator::SpawnGrain(double time, double offset, float width, float speed)
+void Granulator::SpawnGrain(double time, double offset, double width, double speed)
 {
    if (mLiveMode)
    {
-      float speedMult = speed + mSpeedRandomize;
+      double speedMult = speed + mSpeedRandomize;
       if (mOctaves)
-         speedMult *= 1.5f;
-      float extraSpeed = MAX(0, speedMult * mSpeed - 1);
-      float extraMs = mGrainLengthMs * extraSpeed + mPosRandomizeMs;
-      float extraSamples = extraMs / gInvSampleRateMs;
+         speedMult *= 1.5;
+      double extraSpeed = MAX(0, speedMult * mSpeed - 1);
+      double extraMs = mGrainLengthMs * extraSpeed + mPosRandomizeMs;
+      double extraSamples = extraMs / gInvSampleRateMs;
       offset -= extraSamples;
    }
-   float speedMult = speed + ofRandom(-mSpeedRandomize, mSpeedRandomize);
-   float vol = 1;
+   double speedMult = speed + ofRandom(-mSpeedRandomize, mSpeedRandomize);
+   double vol = 1;
    if (mOctaves)
    {
       auto random = gRandom() % 5;
       if (random == 2) //fewer high-pitched ones
       {
-         speedMult *= 1.5f;
-         vol = .5f;
+         speedMult *= 1.5;
+         vol = .5;
       }
       else if (random == 3 || random == 4)
       {
-         speedMult *= .75f;
+         speedMult *= .75;
       }
    }
    offset += ofRandom(-mPosRandomizeMs, mPosRandomizeMs) / gInvSampleRateMs;
@@ -121,7 +121,7 @@ void Granulator::ClearGrains()
       mGrains[i].Clear();
 }
 
-void Grain::Spawn(Granulator* owner, double time, double pos, float speedMult, float lengthInMs, float vol, float width)
+void Grain::Spawn(Granulator* owner, double time, double pos, double speedMult, double lengthInMs, double vol, double width)
 {
    mOwner = owner;
    mPos = pos;
@@ -150,7 +150,7 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
       float window = GetWindow(time);
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
-         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0.f, 1.f));
+         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0., 1.));
          output[ch] += sample * window * mVol * (1 + (ch == 0 ? mStereoPosition : -mStereoPosition));
       }
    }

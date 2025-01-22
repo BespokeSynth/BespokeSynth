@@ -118,7 +118,7 @@ void PulseTrain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void PulseTrain::OnTransportAdvanced(float amount)
+void PulseTrain::OnTransportAdvanced(double amount)
 {
    PROFILER(PulseTrain);
 

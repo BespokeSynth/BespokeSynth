@@ -43,13 +43,13 @@ public:
 
    void Process(float* left, float* right, int numSamples);
 
-   float GetPitch() { return mPitch; }
+   double GetPitch() { return mPitch; }
    bool GetStopped() { return mHasSignal == false; } //@TODO(Noxy): There is no way for mHasSignal to go true so GetStopped() (which is used in other places) is always true.
 
 private:
    int mSampleRate;
 
-   float mPitch{ 0 };
+   double mPitch{ 0 };
    bool mHasSignal{ false };
 
    timecoder mTimecoder;
@@ -102,8 +102,8 @@ private:
 
    bool mUseVinylControl{ false };
    Checkbox* mUseVinylControlCheckbox{ nullptr };
-   float mReferencePitch{ 1 };
+   double mReferencePitch{ 1 };
    VinylProcessor mVinylProcessor;
    //float* mModulationBuffer;
-   float mSpeed{ 1 };
+   double mSpeed{ 1 };
 };

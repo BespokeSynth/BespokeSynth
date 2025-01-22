@@ -46,7 +46,7 @@ public:
 
    void CreateUIControls() override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IDrawableModule
    void Init() override;
@@ -73,7 +73,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float GetPlaybackPosition();
+   double GetPlaybackPosition();
 
    //IDrawableModule
    void DrawModule() override;

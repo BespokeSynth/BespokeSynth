@@ -38,8 +38,8 @@ NoteStepSequencer::NoteStepSequencer()
 {
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {
-      mVels[i] = ofRandom(1) < .5f ? gStepVelocityLevels[(int)StepVelocityType::Normal] * 127 : 0;
-      mNoteLengths[i] = ofRandom(1) < .5f ? .5f : 1;
+      mVels[i] = ofRandom(1) < .5 ? gStepVelocityLevels[(int)StepVelocityType::Normal] * 127 : 0;
+      mNoteLengths[i] = ofRandom(1) < .5 ? .5 : 1;
    }
 
    RandomizePitches(false);
@@ -817,7 +817,7 @@ void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
    push2->SetLed(kMidiMessage_Control, push2->GetGridControllerOption1Control(), 127);
 }
 
-void NoteStepSequencer::OnTransportAdvanced(float amount)
+void NoteStepSequencer::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteStepSequencer);
 

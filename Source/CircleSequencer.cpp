@@ -29,20 +29,6 @@
 #include "Profiler.h"
 #include "DrumPlayer.h"
 
-namespace
-{
-   ofVec2f PolToCar(float pos, float radius)
-   {
-      return ofVec2f(radius * sin(pos * TWO_PI), radius * -cos(pos * TWO_PI));
-   }
-
-   ofVec2f CarToPol(float x, float y)
-   {
-      float pos = FloatWrap(atan2(x, -y) / TWO_PI, 1);
-      return ofVec2f(pos, sqrtf(x * x + y * y));
-   }
-}
-
 CircleSequencer::CircleSequencer()
 {
 
@@ -72,7 +58,7 @@ CircleSequencer::~CircleSequencer()
       delete mCircleSequencerRings[i];
 }
 
-void CircleSequencer::OnTransportAdvanced(float amount)
+void CircleSequencer::OnTransportAdvanced(double amount)
 {
    PROFILER(CircleSequencer);
 
@@ -96,7 +82,7 @@ void CircleSequencer::DrawModule()
    ofPushStyle();
    ofSetColor(ofColor::lime);
    float pos = TheTransport->GetMeasurePos(gTime);
-   ofVec2f end = PolToCar(pos, 100);
+   ofVec2f end = ofPolToCar(pos, 100);
    ofLine(100, 100, 100 + end.x, 100 + end.y);
    ofPopStyle();
 }
@@ -225,10 +211,10 @@ void CircleSequencerRing::Draw()
    for (int i = 0; i < mLength; ++i)
    {
       float pos = float(i) / mLength - mOffset;
-      ofVec2f p1 = PolToCar(pos, GetRadius() - 3);
-      ofVec2f p2 = PolToCar(pos, GetRadius() + 3);
+      ofVec2f p1 = ofPolToCar(pos, GetRadius() - 3);
+      ofVec2f p2 = ofPolToCar(pos, GetRadius() + 3);
       ofLine(p1.x + 100, p1.y + 100, p2.x + 100, p2.y + 100);
-      ofVec2f point = PolToCar(pos, GetRadius());
+      ofVec2f point = ofPolToCar(pos, GetRadius());
 
       if (mSteps[i] > 0)
          ofCircle(100 + point.x, 100 + point.y, 3 + 6 * mSteps[i]);
@@ -251,11 +237,11 @@ void CircleSequencerRing::Draw()
 
 int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
 {
-   ofVec2f polar = CarToPol(x - 100, y - 100);
+   ofVec2f polar = ofCarToPol(x - 100, y - 100);
    float pos = FloatWrap(polar.x + mOffset, 1);
    int idx = int(pos * mLength + .5f) % mLength;
 
-   ofVec2f stepPos = PolToCar(float(idx) / mLength - mOffset, GetRadius());
+   ofVec2f stepPos = ofPolToCar(float(idx) / mLength - mOffset, GetRadius());
    if (ofDistSquared(x, y, stepPos.x + 100, stepPos.y + 100) < 7 * 7)
    {
       radiusOut = polar.y;
@@ -289,7 +275,7 @@ void CircleSequencerRing::MouseMoved(float x, float y)
 {
    if (mCurrentlyClickedStepIdx != -1)
    {
-      ofVec2f polar = CarToPol(x - 100, y - 100);
+      ofVec2f polar = ofCarToPol(x - 100, y - 100);
       float change = (polar.y - mLastMouseRadius) / 50.0f;
 
       mSteps[mCurrentlyClickedStepIdx] = ofClamp(mSteps[mCurrentlyClickedStepIdx] + change, 0, 1);
@@ -303,7 +289,7 @@ void CircleSequencerRing::MouseMoved(float x, float y)
    }
 }
 
-void CircleSequencerRing::OnTransportAdvanced(float amount)
+void CircleSequencerRing::OnTransportAdvanced(double amount)
 {
    PROFILER(CircleSequencerRing);
 

@@ -46,8 +46,8 @@ void MultibandCompressor::CreateUIControls()
    mNumBandsSlider = new IntSlider(this, "bands", 110, 29, 100, 15, &mNumBands, 1, COMPRESSOR_MAX_BANDS);
    mFMinSlider = new FloatSlider(this, "fmin", 110, 47, 100, 15, &mFreqMin, 70, 400);
    mFMaxSlider = new FloatSlider(this, "fmax", 110, 65, 100, 15, &mFreqMax, 300, gSampleRate / 2 - 1);
-   mRingTimeSlider = new FloatSlider(this, "ring", 110, 101, 100, 15, &mRingTime, .0001f, .1f, 4);
-   mMaxBandSlider = new FloatSlider(this, "max band", 5, 101, 100, 15, &mMaxBand, 0.001f, 1);
+   mRingTimeSlider = new FloatSlider(this, "ring", 110, 101, 100, 15, &mRingTime, .0001, .1, 4);
+   mMaxBandSlider = new FloatSlider(this, "max band", 5, 101, 100, 15, &mMaxBand, 0.001, 1);
 }
 
 MultibandCompressor::~MultibandCompressor()

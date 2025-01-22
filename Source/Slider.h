@@ -88,7 +88,7 @@ public:
    bool ModulatorUsesLiteralValue() const override { return true; }
    double GetModulationRangeMin() const override { return mMin; }
    double GetModulationRangeMax() const override { return mMax; }
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void Init() override;
 

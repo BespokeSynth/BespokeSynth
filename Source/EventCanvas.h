@@ -57,7 +57,7 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CanvasUpdated(Canvas* canvas) override;
 

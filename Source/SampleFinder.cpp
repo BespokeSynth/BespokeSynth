@@ -51,7 +51,7 @@ void SampleFinder::CreateUIControls()
    mClipStartSlider = new IntSlider(this, "start", 5, 395, 900, 15, &mClipStart, 0, gSampleRate * 200);
    mClipEndSlider = new IntSlider(this, "end", 5, 410, 900, 15, &mClipEnd, 0, gSampleRate * 200);
    mNumBarsSlider = new IntSlider(this, "num bars", 215, 3, 220, 15, &mNumBars, 1, 16);
-   mOffsetSlider = new FloatSlider(this, "offset", 215, 20, 110, 15, &mOffset, gSampleRate * -.5f, gSampleRate * .5f, 4);
+   mOffsetSlider = new FloatSlider(this, "offset", 215, 20, 110, 15, &mOffset, gSampleRate * -.5, gSampleRate * .5, 4);
    mWriteButton = new ClickButton(this, "write", 600, 50);
    mDoubleLengthButton = new ClickButton(this, "double", 600, 10);
    mHalveLengthButton = new ClickButton(this, "halve", 600, 28);
@@ -328,7 +328,7 @@ void SampleFinder::PlayNote(NoteMessage note)
          int slice = (note.pitch / 8) * 8 + 7 - (note.pitch % 8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = -mOffset * barLength + (barLength / 4) * slice + mClipStart;
-         mSample->Play(note.time, 1, position);
+         mSample->Play(note.time, 1, position, -1);
       }
    }
 }

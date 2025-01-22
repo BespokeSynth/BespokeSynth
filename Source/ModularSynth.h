@@ -155,10 +155,10 @@ public:
    Sample* GetHeldSample() const { return mHeldSample; }
    void ClearHeldSample();
 
-   float GetRawMouseX() { return mMousePos.x; }
-   float GetRawMouseY() { return mMousePos.y; }
-   float GetMouseX(ModuleContainer* context, float rawX = FLT_MAX);
-   float GetMouseY(ModuleContainer* context, float rawY = FLT_MAX);
+   double GetRawMouseX() { return mMousePos.x; }
+   double GetRawMouseY() { return mMousePos.y; }
+   double GetMouseX(ModuleContainer* context, double rawX = std::numeric_limits<double>::max());
+   double GetMouseY(ModuleContainer* context, double rawY = std::numeric_limits<double>::max());
    void SetMousePosition(ModuleContainer* context, float x, float y);
    bool IsMouseButtonHeld(int button) const;
    ofVec2d& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
@@ -168,7 +168,7 @@ public:
    double GetPixelRatio() const { return mPixelRatio; }
    long GetFrameCount() { return mFrameCount; }
    void SetUIScale(float scale) { mUILayerModuleContainer.SetDrawScale(scale); }
-   float GetUIScale() { return mUILayerModuleContainer.GetDrawScale(); }
+   double GetUIScale() { return mUILayerModuleContainer.GetDrawScale(); }
    ModuleContainer* GetRootContainer() { return &mModuleContainer; }
    ModuleContainer* GetUIContainer() { return &mUILayerModuleContainer; }
    bool ShouldShowGridSnap() const;
@@ -232,8 +232,8 @@ public:
          mRenderLock.unlock();
       }
    }
-   void UpdateFrameRate(float fps) { mFrameRate = fps; }
-   float GetFrameRate() const { return mFrameRate; }
+   void UpdateFrameRate(double fps) { mFrameRate = fps; }
+   double GetFrameRate() const { return mFrameRate; }
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
@@ -383,7 +383,7 @@ private:
    bool mLastClickWasEmptySpace{ false };
    bool mIsShiftPressed{ false };
    double mLastShiftPressTime{ -9999 };
-   ofVec2f mLastShiftPressMousePos{};
+   ofVec2d mLastShiftPressMousePos{};
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout{ false };
@@ -411,7 +411,7 @@ private:
    ofMutex mKeyInputMutex;
    std::vector<std::pair<int, bool> > mQueuedKeyInput;
 
-   ofVec2f mMousePos;
+   ofVec2d mMousePos;
    std::string mNextDrawTooltip;
    bool mHideTooltipsUntilMouseMove{ false };
 
@@ -421,7 +421,7 @@ private:
    juce::OpenGLContext* mOpenGLContext{ nullptr };
 
    std::recursive_mutex mRenderLock;
-   float mFrameRate{ 0 };
+   double mFrameRate{ 0 };
    long mFrameCount{ 0 };
 
    ModuleContainer mModuleContainer;

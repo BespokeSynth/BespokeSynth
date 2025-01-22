@@ -105,7 +105,7 @@ EventCanvas::~EventCanvas()
    TheTransport->RemoveAudioPoller(this);
 }
 
-void EventCanvas::OnTransportAdvanced(float amount)
+void EventCanvas::OnTransportAdvanced(double amount)
 {
    PROFILER(EventCanvas);
 

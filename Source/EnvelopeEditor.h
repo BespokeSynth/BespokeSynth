@@ -53,12 +53,12 @@ public:
 
 private:
    void AddVertex(float x, float y);
-   float GetPreSustainTime();
-   float GetReleaseTime();
-   float GetTimeForX(float x);
-   float GetValueForY(float y);
-   float GetXForTime(float time);
-   float GetYForValue(float value);
+   double GetPreSustainTime();
+   double GetReleaseTime();
+   double GetTimeForX(double x);
+   double GetValueForY(double y);
+   double GetXForTime(double time);
+   double GetYForValue(double value);
 
    ofVec2f mPosition;
    ofVec2f mDimensions;
@@ -66,7 +66,7 @@ private:
    ::ADSR mClickAdsr;
    bool mClick{ false };
    ofVec2f mClickStart;
-   float mViewLength{ 2000 };
+   double mViewLength{ 2000 };
    int mHighlightPoint{ -1 };
    int mHighlightCurve{ -1 };
    double mLastClickTime{ 0 };

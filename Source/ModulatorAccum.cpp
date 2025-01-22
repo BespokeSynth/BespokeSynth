@@ -83,7 +83,7 @@ void ModulatorAccum::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
    }
 }
 
-void ModulatorAccum::OnTransportAdvanced(float amount)
+void ModulatorAccum::OnTransportAdvanced(double amount)
 {
    const double dt = amount * TheTransport->MsPerBar();
    const double newValue = ofClamp(mValue + mVelocity / 1000 * (GetMax() - GetMin()) * dt, GetMin(), GetMax());

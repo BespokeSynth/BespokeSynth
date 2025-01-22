@@ -51,7 +51,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;

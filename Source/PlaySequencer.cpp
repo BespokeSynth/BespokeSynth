@@ -41,7 +41,7 @@ void PlaySequencer::Init()
    IDrawableModule::Init();
 
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
-   TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false), false);
+   TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5, false), false);
 }
 
 void PlaySequencer::CreateUIControls()

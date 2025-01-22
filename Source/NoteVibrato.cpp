@@ -68,7 +68,7 @@ void NoteVibrato::DrawModule()
    mIntervalSelector->Draw();
 }
 
-void NoteVibrato::OnTransportAdvanced(float amount)
+void NoteVibrato::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 }

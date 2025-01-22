@@ -52,7 +52,7 @@ public:
    ofVec2d GetDrawOffset();
    ofVec2d& GetDrawOffsetRef() { return mDrawOffset; }
    void SetDrawOffset(ofVec2d offset) { mDrawOffset = offset; }
-   float GetDrawScale() const;
+   double GetDrawScale() const;
    void SetDrawScale(float scale) { mDrawScale = scale; }
 
    void KeyPressed(int key, bool isRepeat);
@@ -97,5 +97,5 @@ private:
    IDrawableModule* mOwner{ nullptr };
 
    ofVec2d mDrawOffset;
-   float mDrawScale{ 1 };
+   double mDrawScale{ 1 };
 };

@@ -46,7 +46,7 @@ public:
    void MouseReleased();
    void MouseMoved(float x, float y);
    void CreateUIControls();
-   void OnTransportAdvanced(float amount);
+   void OnTransportAdvanced(double amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
@@ -83,7 +83,7 @@ public:
    void SetEnabled(bool on) override { mEnabled = on; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IClickable
    void MouseReleased() override;

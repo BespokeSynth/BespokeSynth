@@ -64,8 +64,8 @@ void DrumPlayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this, "vol", 4, 2, 100, 15, &mVolume, 0, 2);
-   mSpeedSlider = new FloatSlider(this, "speed", 4, 18, 100, 15, &mSpeed, 0.2f, 3);
-   mSpeedRandomizationSlider = new FloatSlider(this, "speed rnd", 4, 34, 100, 15, &mSpeedRandomization, 0, .2f);
+   mSpeedSlider = new FloatSlider(this, "speed", 4, 18, 100, 15, &mSpeed, 0.2, 3);
+   mSpeedRandomizationSlider = new FloatSlider(this, "speed rnd", 4, 34, 100, 15, &mSpeedRandomization, 0, .2);
    mKitSelector = new DropdownList(this, "kit", 4, 50, &mLoadedKit);
    mEditCheckbox = new Checkbox(this, "edit", 73, 52, &mEditMode);
    //mSaveButton = new ClickButton(this,"save current",200,22);

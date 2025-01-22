@@ -82,7 +82,7 @@ void NoteDelayer::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void NoteDelayer::OnTransportAdvanced(float amount)
+void NoteDelayer::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteDelayer);
 
@@ -116,7 +116,7 @@ void NoteDelayer::PlayNote(NoteMessage note)
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
       mInputNotes[mAppendIndex] = note;
-      mInputNotes[mAppendIndex].time += mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      mInputNotes[mAppendIndex].time += mDelay / (static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;
    }
 }

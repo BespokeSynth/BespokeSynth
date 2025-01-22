@@ -61,8 +61,8 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
       if (mPos <= mVoiceParams->mSampleLength || mVoiceParams->mLoop)
       {
-         float freq = TheScale->PitchToFreq(GetPitch(pos));
-         float speed;
+         double freq = TheScale->PitchToFreq(GetPitch(pos));
+         double speed;
          if (mVoiceParams->mDetectedFreq != -1)
             speed = freq / mVoiceParams->mDetectedFreq;
          else
@@ -89,7 +89,7 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
    return true;
 }
 
-void SampleVoice::Start(double time, float target)
+void SampleVoice::Start(double time, double target)
 {
    mPos = 0;
    mAdsr.Start(time, target, mVoiceParams->mAdsr);

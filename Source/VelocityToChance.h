@@ -69,8 +69,8 @@ private:
    bool mFullVelocity{ true };
    Checkbox* mFullVelocityCheckbox{ nullptr };
 
-   float mLastRejectTime{ 0 };
-   float mLastAcceptTime{ 0 };
+   double mLastRejectTime{ 0 };
+   double mLastAcceptTime{ 0 };
    bool mDeterministic{ false };
    int mLength{ 4 };
    IntSlider* mLengthSlider{ nullptr };

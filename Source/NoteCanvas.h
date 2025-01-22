@@ -69,7 +69,7 @@ public:
     */
    void FitNotes();
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CanvasUpdated(Canvas* canvas) override;
 

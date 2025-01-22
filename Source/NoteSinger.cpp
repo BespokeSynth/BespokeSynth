@@ -58,7 +58,7 @@ NoteSinger::~NoteSinger()
    TheScale->RemoveListener(this);
 }
 
-void NoteSinger::OnTransportAdvanced(float amount)
+void NoteSinger::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteSinger);
 

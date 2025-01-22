@@ -52,7 +52,7 @@ public:
    void CreateUIControls() override;
 
    void SetType(OscillatorType type) { mVoiceParams.mOscType = type; }
-   void SetDetune(float detune) { mVoiceParams.mDetune = detune; }
+   void SetDetune(double detune) { mVoiceParams.mDetune = detune; }
 
    //IAudioSource
    void Process(double time) override;

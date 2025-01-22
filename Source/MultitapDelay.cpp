@@ -54,7 +54,7 @@ void MultitapDelay::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mDryAmountSlider = new FloatSlider(this, "dry", 5, 10, 150, 15, &mDryAmount, 0, 1);
-   mDisplayLengthSlider = new FloatSlider(this, "display length", mDryAmountSlider, kAnchor_Below, 150, 15, &mDisplayLength, .1f, mDelayBuffer.Size() / gSampleRate);
+   mDisplayLengthSlider = new FloatSlider(this, "display length", mDryAmountSlider, kAnchor_Below, 150, 15, &mDisplayLength, .1, mDelayBuffer.Size() / gSampleRate);
    mDisplayLength = mDisplayLengthSlider->GetMax();
 
    for (int i = 0; i < mNumTaps; ++i)

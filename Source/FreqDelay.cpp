@@ -83,8 +83,8 @@ void FreqDelay::PlayNote(NoteMessage note)
 {
    if (note.velocity > 0)
    {
-      float freq = TheScale->PitchToFreq(note.pitch);
-      float ms = 1000 / freq;
+      double freq = TheScale->PitchToFreq(note.pitch);
+      double ms = 1000 / freq;
       mDelayEffect.SetDelay(ms);
    }
 }

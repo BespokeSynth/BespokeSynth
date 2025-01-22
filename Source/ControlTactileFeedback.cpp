@@ -58,20 +58,20 @@ void ControlTactileFeedback::Process(double time)
 
    for (int i = 0; i < bufferSize; ++i)
    {
-      float sample = (mPhase / FTWO_PI * 2 - 1) * gControlTactileFeedback * mVolume;
+      float sample = (mPhase / TWO_PI * 2 - 1) * gControlTactileFeedback * mVolume;
       out[i] += sample;
       GetVizBuffer()->Write(sample, 0);
 
       mPhase += mPhaseInc;
-      while (mPhase > FTWO_PI)
+      while (mPhase > TWO_PI)
       {
-         mPhase -= FTWO_PI;
+         mPhase -= TWO_PI;
       }
 
-      const float decayTime = .005f;
-      float decay = powf(0.5f, 1.0f / (decayTime * gSampleRate));
+      const double decayTime = .005;
+      double decay = std::pow(0.5, 1.0 / (decayTime * gSampleRate));
       gControlTactileFeedback *= decay;
-      if (gControlTactileFeedback <= FLT_EPSILON)
+      if (ofAlmostEquel(gControlTactileFeedback, 0.0))
          gControlTactileFeedback = 0;
 
       time += gInvSampleRateMs;

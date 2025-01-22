@@ -73,8 +73,8 @@ private:
       kMiddle
    };
 
-   void DrawTriangle(float posX, int direction);
-   float GetQuantizedForX(float posX, HoverMode clampSide);
+   void DrawTriangle(double posX, int direction);
+   double GetQuantizedForX(double posX, HoverMode clampSide);
 
    float mWidth{ 200 };
    float mHeight{ 20 };

@@ -53,7 +53,7 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    void OnTimeEvent(double time) override;
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 

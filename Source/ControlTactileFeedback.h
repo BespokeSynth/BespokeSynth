@@ -66,7 +66,7 @@ private:
       height = 60;
    }
 
-   float mPhase{ 0 };
+   double mPhase{ 0 };
    double mPhaseInc{ 0 };
 
 

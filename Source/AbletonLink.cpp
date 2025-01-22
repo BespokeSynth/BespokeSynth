@@ -88,7 +88,7 @@ void AbletonLink::Poll()
 {
 }
 
-void AbletonLink::OnTransportAdvanced(float amount)
+void AbletonLink::OnTransportAdvanced(double amount)
 {
    if (mEnabled && mLink.get() != nullptr)
    {
@@ -120,7 +120,7 @@ void AbletonLink::OnTransportAdvanced(float amount)
          double measureTime = mLastReceivedBeat / quantum;
          double localMeasureTime = TheTransport->GetMeasureTime(gTime);
          double difference = measureTime - localMeasureTime;
-         if (abs(difference) > .01f)
+         if (abs(difference) > .01)
          {
             //too far off, correct
             TheTransport->SetMeasureTime(measureTime);

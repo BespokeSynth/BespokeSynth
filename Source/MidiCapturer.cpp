@@ -81,7 +81,7 @@ void MidiCapturer::DrawModule()
       return;
 }
 
-void MidiCapturer::OnTransportAdvanced(float amount)
+void MidiCapturer::OnTransportAdvanced(double amount)
 {
    while (mMessages[mPlayhead].getTimeStamp() > 0 &&
           mMessages[mPlayhead].getTimeStamp() < TheTransport->GetMeasureTime(gTime) - 1)

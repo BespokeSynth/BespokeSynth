@@ -51,12 +51,12 @@ public:
 
    void SetGrid(int cols, int rows) { mGrid->SetGrid(cols, rows); }
    void SetLabel(int row, std::string label);
-   void Set(int col, int row, float value)
+   void Set(int col, int row, double value)
    {
       mGrid->SetVal(col, row, value, !K(notifyListener));
       UpdateLights();
    }
-   float Get(int col, int row) { return mGrid->GetVal(col, row); }
+   double Get(int col, int row) { return mGrid->GetVal(col, row); }
    void HighlightCell(int col, int row, double time, double duration, int colorIndex);
    void SetDivision(int steps) { return mGrid->SetMajorColSize(steps); }
    int GetCols() const { return mGrid->GetCols(); }

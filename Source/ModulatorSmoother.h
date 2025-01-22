@@ -57,7 +57,7 @@ public:
    bool CanAdjustRange() const override { return false; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 

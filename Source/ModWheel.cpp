@@ -67,7 +67,7 @@ void ModWheel::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void ModWheel::OnTransportAdvanced(float amount)
+void ModWheel::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 }

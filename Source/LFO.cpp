@@ -41,20 +41,20 @@ LFO::~LFO()
    TheTransport->RemoveAudioPoller(this);
 }
 
-float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) const
+double LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) const
 {
-   float ret;
+   double ret;
    if (mPeriod == kInterval_Free)
    {
-      ret = mFreePhase + float(samplesIn) / gSampleRate * mFreeRate;
+      ret = mFreePhase + static_cast<double>(samplesIn) / gSampleRate * mFreeRate;
    }
    else
    {
-      float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
+      double period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
 
-      float phase = TheTransport->GetMeasureTime(gTime + samplesIn * gInvSampleRateMs) / period + (1 - mPhaseOffset - mAdjustOffset) + 10; //+10 so we can have negative samplesIn
+      double phase = TheTransport->GetMeasureTime(gTime + samplesIn * gInvSampleRateMs) / period + (1 - mPhaseOffset - mAdjustOffset) + 10; //+10 so we can have negative samplesIn
 
-      phase -= int(phase) / 2 * 2; //using 2 allows for shuffle to work
+      phase -= static_cast<int>(phase) / 2 * 2; //using 2 allows for shuffle to work
 
       ret = phase;
    }
@@ -64,25 +64,25 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) c
    return ret;
 }
 
-float LFO::TransformPhase(float phase) const
+double LFO::TransformPhase(double phase) const
 {
    if (mLength != 1 && mLength > 0)
       phase = int(phase) + ofClamp((phase - int(phase)) / mLength, 0, 1);
-   else if (mLength != 1)
+   else if (!ofAlmostEquel(mLength, 1.0))
       phase = 0;
    return phase;
 }
 
-float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
+double LFO::Value(int samplesIn /*= 0*/, double forcePhase /*= -1*/) const
 {
    //PROFILER(LFO_Value);
 
    if (mPeriod == kInterval_None) //no oscillator
       return mMode == kLFOMode_Envelope ? 1 : 0;
 
-   float phase = CalculatePhase(samplesIn);
+   double phase = CalculatePhase(samplesIn, true);
 
-   if (forcePhase != -1 && !std::isnan(forcePhase))
+   if (!ofAlmostEquel(forcePhase, -1.0) && !std::isnan(forcePhase))
       phase = forcePhase;
 
    phase *= FTWO_PI;
@@ -94,7 +94,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
    if (mOsc.GetType() == kOsc_Random)
    {
       nonstandardOsc = true;
-      sample = pow(mRandom.Value(gTime + samplesIn * gInvSampleRateMs), powf((1 - mOsc.GetPulseWidth()) * 2, 2));
+      sample = std::pow(mRandom.Value(gTime + samplesIn * gInvSampleRateMs), std::pow((1 - mOsc.GetPulseWidth()) * 2, 2));
    }
    else if (mOsc.GetType() == kOsc_Drunk)
    {
@@ -106,9 +106,9 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
       nonstandardOsc = true;
 
       double perlinPos = gTime + gInvSampleRateMs * samplesIn;
-      if (forcePhase != -1 && !std::isnan(forcePhase))
+      if (!ofAlmostEquel(forcePhase, -1.0) && !std::isnan(forcePhase))
          perlinPos += forcePhase * 1000;
-      double perlinPhase = perlinPos * mFreeRate / 1000.0f;
+      double perlinPhase = perlinPos * mFreeRate / 1000.0;
       sample = sPerlinNoise.noise(perlinPhase, mPerlinSeed, -perlinPhase);
    }
    else
@@ -120,7 +120,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
 
    if (nonstandardOsc)
    {
-      if (mOsc.GetPulseWidth() != .5f)
+      if (!ofAlmostEquel(mOsc.GetPulseWidth(), .5))
          sample = Bias(sample, mOsc.GetPulseWidth());
 
       if (mMode == kLFOMode_Oscillator) //rescale to -1 1
@@ -133,7 +133,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
 void LFO::SetPeriod(NoteInterval interval)
 {
    if (interval == kInterval_Free)
-      mFreePhase = CalculatePhase();
+      mFreePhase = CalculatePhase(0, true);
 
    mPeriod = interval;
    if (mOsc.GetType() == kOsc_Random)
@@ -169,17 +169,17 @@ void LFO::SetType(OscillatorType type)
 
 void LFO::OnTimeEvent(double time)
 {
-   if (mOsc.GetSoften() == 0)
+   if (ofAlmostEquel(mOsc.GetSoften(), 0.0))
       mRandom.SetValue(ofRandom(1));
    else
       mRandom.Start(time, ofRandom(1), time + mOsc.GetSoften() * 30);
 }
 
-void LFO::OnTransportAdvanced(float amount)
+void LFO::OnTransportAdvanced(double amount)
 {
    if (mOsc.GetType() == kOsc_Drunk)
    {
-      float distance = 0;
+      double distance = 0;
       if (mPeriod == kInterval_Free)
       {
          distance = mFreeRate / 40;
@@ -188,7 +188,7 @@ void LFO::OnTransportAdvanced(float amount)
       {
          distance = TheTransport->GetDuration(kInterval_64n) / TheTransport->GetDuration(mPeriod);
       }
-      float drunk = ofRandom(-distance, distance);
+      double drunk = ofRandom(-distance, distance);
       if (mDrunk + drunk > 1 || mDrunk + drunk < 0)
          drunk *= -1;
       mDrunk = ofClamp(mDrunk + drunk, 0, 1);
@@ -210,5 +210,5 @@ void LFO::ResetPhase(double time)
 {
    mFreePhase = 1 - mPhaseOffset;
    mAdjustOffset = 0;
-   mAdjustOffset = CalculatePhase() + mPhaseOffset;
+   mAdjustOffset = CalculatePhase(0, true) + mPhaseOffset;
 }

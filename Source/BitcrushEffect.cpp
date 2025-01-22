@@ -87,7 +87,7 @@ double BitcrushEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp((mCrush - 1) / 24.0f + ((int)mDownsample - 1) / 40.0f, 0, 1);
+   return ofClamp((mCrush - 1) / 24.0 + (static_cast<int>(mDownsample) - 1) / 40.0, 0, 1);
 }
 
 void BitcrushEffect::CheckboxUpdated(Checkbox* checkbox, double time)

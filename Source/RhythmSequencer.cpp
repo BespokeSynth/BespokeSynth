@@ -41,7 +41,7 @@ void RhythmSequencer::Init()
 {
    IDrawableModule::Init();
 
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1, true), false);
 }
 
 void RhythmSequencer::CreateUIControls()

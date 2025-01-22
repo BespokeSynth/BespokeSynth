@@ -302,10 +302,21 @@ double ofClamp(double val, double a, double b)
    return val;
 }
 
-float ofGetLastFrameTime()
+ofVec2d ofPolToCar(double pos, double radius)
+{
+   return { radius * sin(pos * TWO_PI), radius * -cos(pos * TWO_PI) };
+}
+
+ofVec2d ofCarToPol(double x, double y)
+{
+   double pos = DoubleWrap(atan2(x, -y) / TWO_PI, 1);
+   return { pos, sqrt(x * x + y * y) };
+}
+
+double ofGetLastFrameTime()
 {
    /*TODO_PORT(Ryan)*/
-   return .01666f;
+   return .01666;
 }
 
 int ofToInt(const std::string& intString)
@@ -466,7 +477,7 @@ float ofGetHeight()
    return TheSynth->GetMainComponent()->getHeight();
 }
 
-float ofGetFrameRate()
+double ofGetFrameRate()
 {
    return TheSynth->GetFrameRate();
 }

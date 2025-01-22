@@ -58,7 +58,7 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;

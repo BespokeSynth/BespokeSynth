@@ -71,8 +71,8 @@ private:
       height = mHeight;
    }
 
-   float GetBarStart() const;
-   float GetBarEnd() const;
+   double GetBarStart() const;
+   double GetBarEnd() const;
 
    float mWidth{ 200 };
    float mHeight{ 20 };

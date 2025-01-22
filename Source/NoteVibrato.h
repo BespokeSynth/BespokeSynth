@@ -46,7 +46,7 @@ public:
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;

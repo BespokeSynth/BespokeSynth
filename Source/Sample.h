@@ -56,8 +56,8 @@ public:
    bool Read(const char* path, bool mono = false, ReadType readType = ReadType::Sync);
    bool Write(const char* path = nullptr); //no path = use read filename
    bool ConsumeData(double time, ChannelBuffer* out, int size, bool replace);
-   void Play(double time, float rate, int offset, int stopPoint = -1);
-   void SetRate(float rate) { mRate = rate; }
+   void Play(double time, double rate, int offset, int stopPoint = -1);
+   void SetRate(double rate) { mRate = rate; }
    std::string Name() const { return mName; }
    void SetName(std::string name) { mName = name; }
    int LengthInSamples() const { return mNumSamples; }
@@ -82,10 +82,10 @@ public:
    void SetLooping(bool looping) { mLooping = looping; }
    void SetNumBars(int numBars) { mNumBars = numBars; }
    int GetNumBars() const { return mNumBars; }
-   void SetVolume(float vol) { mVolume = vol; }
+   void SetVolume(double vol) { mVolume = vol; }
    void CopyFrom(Sample* sample);
    bool IsSampleLoading() { return mSamplesLeftToRead > 0; }
-   float GetSampleLoadProgress() { return (mNumSamples > 0) ? (1 - (float(mSamplesLeftToRead) / mNumSamples)) : 1; }
+   float GetSampleLoadProgress() { return (mNumSamples > 0) ? (1 - (static_cast<double>(mSamplesLeftToRead) / mNumSamples)) : 1; }
 
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
@@ -100,7 +100,7 @@ private:
    int mNumSamples{ 0 };
    double mStartTime{ 0 };
    double mOffset{ std::numeric_limits<double>::max() };
-   float mRate{ 1 };
+   double mRate{ 1 };
    int mOriginalSampleRate{ gSampleRate };
    double mSampleRateRatio{ 1 };
    int mStopPoint{ -1 };
@@ -110,7 +110,7 @@ private:
    ofMutex mPlayMutex;
    bool mLooping{ false };
    int mNumBars{ -1 };
-   float mVolume{ 1 };
+   double mVolume{ 1 };
 
    juce::AudioFormatReader* mReader{};
    std::unique_ptr<juce::AudioSampleBuffer> mReadBuffer;

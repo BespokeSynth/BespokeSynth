@@ -98,7 +98,7 @@ void NoteHocket::DrawModule()
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
-      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
+      double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
       const float kPipSize = 3;
       float moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);

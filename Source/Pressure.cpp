@@ -67,7 +67,7 @@ void Pressure::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void Pressure::OnTransportAdvanced(float amount)
+void Pressure::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 }

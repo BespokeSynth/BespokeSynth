@@ -68,7 +68,7 @@ void NoteToFreq::PlayNote(NoteMessage note)
 
 double NoteToFreq::Value(int samplesIn)
 {
-   float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
+   double bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
    return TheScale->PitchToFreq(mPitch + bend);
 }
 

@@ -147,11 +147,7 @@ void Razor::PlayNote(NoteMessage note)
       mPitch = note.pitch;
       for (int i = 1; i <= NUM_PARTIALS; ++i)
       {
-         mAdsr[i - 1].Start(note.time, amount,
-                            mA,
-                            mD,
-                            mS,
-                            mR);
+         mAdsr[i - 1].Start(note.time, amount);
       }
 
       mPitchBend = note.modulation.pitchBend;

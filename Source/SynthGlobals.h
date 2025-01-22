@@ -100,7 +100,7 @@ extern IUIControl* gBindToUIControl;
 extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;
 extern RetinaTrueTypeFont gFontFixedWidth;
-extern float gModuleDrawAlpha;
+extern double gModuleDrawAlpha;
 extern float gNullBuffer[kWorkBufferSize];
 extern float gZeroBuffer[kWorkBufferSize];
 extern float gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
@@ -108,7 +108,7 @@ extern ChannelBuffer gWorkChannelBuffer;
 extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;
 extern IUIControl* gHotBindUIControl[10];
-extern float gControlTactileFeedback;
+extern double gControlTactileFeedback;
 extern double gDrawScale;
 extern bool gShowDevModules;
 extern double gCornerRoundness;
@@ -147,7 +147,7 @@ enum class StepVelocityType
    Accent = 2,
    NumVelocityLevels = 3
 };
-extern std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
+extern std::array<double, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
 
 class LoadingJSONException : public std::exception
 {

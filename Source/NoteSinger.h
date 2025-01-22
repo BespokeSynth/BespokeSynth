@@ -55,7 +55,7 @@ public:
    InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IScaleListener
    void OnScaleChanged() override;

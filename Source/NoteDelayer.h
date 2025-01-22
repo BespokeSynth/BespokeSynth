@@ -49,7 +49,7 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;

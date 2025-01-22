@@ -53,7 +53,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;

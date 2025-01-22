@@ -134,7 +134,7 @@ void PulseSequence::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void PulseSequence::OnTransportAdvanced(float amount)
+void PulseSequence::OnTransportAdvanced(double amount)
 {
    PROFILER(PulseSequence);
 

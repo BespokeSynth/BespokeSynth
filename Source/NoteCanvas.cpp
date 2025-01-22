@@ -141,7 +141,7 @@ bool NoteCanvas::FreeRecordParityMatched()
    return currentMeasureParity == recordStartMeasureParity;
 }
 
-void NoteCanvas::OnTransportAdvanced(float amount)
+void NoteCanvas::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteCanvas);
 

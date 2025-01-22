@@ -64,7 +64,7 @@ public:
    void StoreSnapshot(int idx, bool setAsCurrent);
    void DeleteSnapshot(int idx);
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;

@@ -149,7 +149,7 @@ void SampleBrowser::ButtonClicked(ClickButton* button, double time)
                      mSampleMutex.lock();
                      mPlayingSample.SetName(clicked.toStdString().c_str());
                      mPlayingSample.Read(clicked.toStdString().c_str());
-                     mPlayingSample.Play(NextBufferTime(false), 1, 0);
+                     mPlayingSample.Play(NextBufferTime(false), 1, 0, -1);
                      mSampleMutex.unlock();
                   }
                }

@@ -38,8 +38,8 @@ SingleOscillator::SingleOscillator()
 , mWriteBuffer(gBufferSize)
 {
    mVoiceParams.mAdsr.Set(10, 0, 1, 10);
-   mVoiceParams.mVol = .25f;
-   mVoiceParams.mPulseWidth = .5f;
+   mVoiceParams.mVol = .25;
+   mVoiceParams.mPulseWidth = .5;
    mVoiceParams.mSyncMode = Oscillator::SyncMode::None;
    mVoiceParams.mSyncFreq = 200;
    mVoiceParams.mSyncRatio = 1;
@@ -54,7 +54,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mPhaseOffset = 0;
    mVoiceParams.mUnison = 1;
    mVoiceParams.mUnisonWidth = 0;
-   mVoiceParams.mVelToVolume = 1.0f;
+   mVoiceParams.mVelToVolume = 1.0;
    mVoiceParams.mVelToEnvelope = 0;
    mVoiceParams.mSoften = 0;
    mVoiceParams.mLiteCPUMode = false;

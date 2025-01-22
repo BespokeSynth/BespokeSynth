@@ -34,7 +34,7 @@ FloatSliderLFOControl::FloatSliderLFOControl()
    mLFOSettings.mInterval = kInterval_1n;
    mLFOSettings.mOscType = kOsc_Sin;
    mLFOSettings.mLFOOffset = 0;
-   mLFOSettings.mBias = .5f;
+   mLFOSettings.mBias = .5;
    mLFOSettings.mSpread = 0;
    mLFOSettings.mSoften = 0;
    mLFOSettings.mShuffle = 0;

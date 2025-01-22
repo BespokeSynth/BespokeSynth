@@ -475,7 +475,7 @@ void Snapshots::RandomizeControl(IUIControl* control)
    control->SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
 }
 
-void Snapshots::OnTransportAdvanced(float amount)
+void Snapshots::OnTransportAdvanced(double amount)
 {
    if (mBlending)
    {

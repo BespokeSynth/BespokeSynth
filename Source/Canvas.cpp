@@ -31,7 +31,7 @@
 #include "PatchCableSource.h"
 #include "Snapshots.h"
 
-Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator)
+Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, double length, int rows, int cols, CreateCanvasElementFn elementCreator)
 : mWidth(w)
 , mHeight(h)
 , mLength(length)
@@ -82,7 +82,7 @@ void Canvas::Render()
 
    for (int i = 0; i < GetNumCols(); ++i)
    {
-      float pos = ofMap(float(i) / GetNumCols(), mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
+      double pos = ofMap(static_cast<double>(i) / GetNumCols(), mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
       if (pos >= 0 && pos < GetWidth())
       {
          ofPushStyle();
@@ -276,9 +276,9 @@ void Canvas::OnClicked(float x, float y, bool right)
       mListener->CanvasUpdated(this);
 }
 
-float Canvas::QuantizeToGrid(float input) const
+double Canvas::QuantizeToGrid(double input) const
 {
-   float col = int(input * GetNumCols() + .5f);
+   double col = int(input * GetNumCols() + .5f);
    return col / GetNumCols();
 }
 
@@ -305,7 +305,7 @@ bool Canvas::MouseMoved(float x, float y)
          {
             if (element->GetHighlighted())
             {
-               float start = element->GetStart() + startDelta;
+               double start = element->GetStart() + startDelta;
                if (quantize)
                   start = QuantizeToGrid(start);
                element->SetStart(start, false);

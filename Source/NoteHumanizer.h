@@ -72,5 +72,5 @@ private:
    double mVelocity{ .1 };
    FloatSlider* mVelocitySlider{ nullptr };
 
-   std::array<float, 128> mLastDelayMs{};
+   std::array<double, 128> mLastDelayMs{};
 };

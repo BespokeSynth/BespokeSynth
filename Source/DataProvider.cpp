@@ -196,7 +196,7 @@ void DataProvider::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void DataProvider::OnTransportAdvanced(float amount)
+void DataProvider::OnTransportAdvanced(double amount)
 {
    Go(gTime);
 }

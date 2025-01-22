@@ -72,7 +72,7 @@ void Ramper::CreateUIControls()
    mLengthSelector->AddLabel("64n", kInterval_64n);
 }
 
-void Ramper::OnTransportAdvanced(float amount)
+void Ramper::OnTransportAdvanced(double amount)
 {
    if (!mEnabled)
       mRamping = false;

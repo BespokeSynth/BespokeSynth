@@ -40,7 +40,7 @@ void NoteSustain::Init()
 void NoteSustain::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mSustainSlider = new FloatSlider(this, "duration", 5, 2, 100, 15, &mSustain, 0.01f, 4, 4);
+   mSustainSlider = new FloatSlider(this, "duration", 5, 2, 100, 15, &mSustain, 0.01, 4, 4);
    mSustainSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -57,7 +57,7 @@ void NoteSustain::DrawModule()
    mSustainSlider->Draw();
 }
 
-void NoteSustain::OnTransportAdvanced(float amount)
+void NoteSustain::OnTransportAdvanced(double amount)
 {
    for (auto iter = mNoteOffs.begin(); iter != mNoteOffs.end();)
    {

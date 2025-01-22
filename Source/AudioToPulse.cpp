@@ -47,7 +47,7 @@ void AudioToPulse::CreateUIControls()
 
    UIBLOCK0();
    FLOATSLIDER(mThresholdSlider, "threshold", &mThreshold, 0, 1);
-   FLOATSLIDER(mReleaseSlider, "release", &mRelease, .01f, 1000);
+   FLOATSLIDER(mReleaseSlider, "release", &mRelease, .01, 1000);
    ENDUIBLOCK(mWidth, mHeight);
 
    mThresholdSlider->SetMode(FloatSlider::kSquare);

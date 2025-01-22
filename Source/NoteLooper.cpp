@@ -135,7 +135,7 @@ double NoteLooper::GetCurPos(double time) const
    return ((TheTransport->GetMeasure(time) % mNumMeasures) + TheTransport->GetMeasurePos(time)) / mNumMeasures;
 }
 
-void NoteLooper::OnTransportAdvanced(float amount)
+void NoteLooper::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteLooper);
 

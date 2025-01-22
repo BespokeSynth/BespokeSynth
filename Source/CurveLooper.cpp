@@ -42,10 +42,10 @@ CurveLooper::CurveLooper()
    mAdsr.GetFreeReleaseLevel() = true;
    mAdsr.SetNumStages(2);
    mAdsr.GetHasSustainStage() = false;
-   mAdsr.GetStageData(0).target = .5f;
-   mAdsr.GetStageData(0).time = kAdsrTime * .1f;
-   mAdsr.GetStageData(1).target = .5f;
-   mAdsr.GetStageData(1).time = kAdsrTime * .8f;
+   mAdsr.GetStageData(0).target = .5;
+   mAdsr.GetStageData(0).time = kAdsrTime * .1;
+   mAdsr.GetStageData(1).target = .5;
+   mAdsr.GetStageData(1).time = kAdsrTime * .8;
 }
 
 void CurveLooper::Init()
@@ -90,7 +90,7 @@ void CurveLooper::Poll()
 {
 }
 
-void CurveLooper::OnTransportAdvanced(float amount)
+void CurveLooper::OnTransportAdvanced(double amount)
 {
    if (mEnabled)
    {
@@ -104,14 +104,14 @@ void CurveLooper::OnTransportAdvanced(float amount)
    }
 }
 
-float CurveLooper::GetPlaybackPosition()
+double CurveLooper::GetPlaybackPosition()
 {
    if (mLength == 0)
       mLength = 1;
    else if (mLength < 0)
    {
-      float ret = TheTransport->GetMeasurePos(gTime) * (-mLength);
-      return FloatWrap(ret, 1);
+      double ret = TheTransport->GetMeasurePos(gTime) * (-mLength);
+      return DoubleWrap(ret, 1);
    }
    return (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % mLength) / mLength;
 }

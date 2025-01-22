@@ -49,7 +49,7 @@ void ModulatorGravity::CreateUIControls()
    UIBLOCK0();
    FLOATSLIDER(mGravitySlider, "gravity", &mGravity, -1, 1);
    FLOATSLIDER(mKickAmountSlider, "kick amt", &mKickAmount, -5, 5);
-   FLOATSLIDER(mDragSlider, "drag", &mDrag, 0, .01f);
+   FLOATSLIDER(mDragSlider, "drag", &mDrag, 0, .01);
    BUTTON(mKickButton, "kick");
    ENDUIBLOCK(mWidth, mHeight);
 
@@ -79,7 +79,7 @@ void ModulatorGravity::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    OnModulatorRepatch();
 }
 
-void ModulatorGravity::OnTransportAdvanced(float amount)
+void ModulatorGravity::OnTransportAdvanced(double amount)
 {
    double dt = amount * TheTransport->MsPerBar();
    double newVelocity = mVelocity + mGravity / 100000 * dt;
@@ -107,7 +107,7 @@ void ModulatorGravity::ButtonClicked(ClickButton* button, double time)
       Kick(1);
 }
 
-void ModulatorGravity::Kick(float strength)
+void ModulatorGravity::Kick(double strength)
 {
    mVelocity += mKickAmount / 1000 * strength;
 }

@@ -76,7 +76,7 @@ void CanvasScrollbar::Render()
    ofPopMatrix();
 }
 
-float CanvasScrollbar::GetBarStart() const
+double CanvasScrollbar::GetBarStart() const
 {
    if (mStyle == Style::kHorizontal)
       return mCanvas->mViewStart / mCanvas->GetLength() * mWidth;
@@ -85,7 +85,7 @@ float CanvasScrollbar::GetBarStart() const
    return 0;
 }
 
-float CanvasScrollbar::GetBarEnd() const
+double CanvasScrollbar::GetBarEnd() const
 {
    if (mStyle == Style::kHorizontal)
       return mCanvas->mViewEnd / mCanvas->GetLength() * mWidth;

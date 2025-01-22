@@ -57,7 +57,7 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -99,7 +99,7 @@ private:
    static const int kMaxSteps = 128;
    float mWidth{ 254 };
    float mHeight{ 58 };
-   float mVels[kMaxSteps]{};
+   double mVels[kMaxSteps]{};
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
    int mStep{ 9999 };

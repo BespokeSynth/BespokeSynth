@@ -39,7 +39,7 @@ public:
    double mVol{ 1 };
    float* mSampleData{ nullptr };
    int mSampleLength{ 0 };
-   float mDetectedFreq{ -1 };
+   double mDetectedFreq{ -1 };
    bool mLoop{ false };
 };
 
@@ -50,7 +50,7 @@ public:
    ~SampleVoice();
 
    // IMidiVoice
-   void Start(double time, float amount) override;
+   void Start(double time, double target) override;
    void Stop(double time) override;
    void ClearVoice() override;
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
@@ -60,6 +60,6 @@ public:
 private:
    ::ADSR mAdsr;
    SampleVoiceParams* mVoiceParams{};
-   float mPos{ 0 };
+   double mPos{ 0 };
    IDrawableModule* mOwner{ nullptr };
 };

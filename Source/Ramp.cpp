@@ -28,7 +28,7 @@
 
 void Ramp::Start(double curTime, double end, double endTime)
 {
-   float startValue = Value(curTime);
+   double startValue = Value(curTime);
    Start(curTime, startValue, end, endTime);
 }
 

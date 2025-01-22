@@ -42,7 +42,7 @@ Sampler::Sampler()
    mSampleData = new float[MAX_SAMPLER_LENGTH]; //store up to 2 seconds
    Clear(mSampleData, MAX_SAMPLER_LENGTH);
 
-   mVoiceParams.mVol = .5f;
+   mVoiceParams.mVol = .5;
    mVoiceParams.mAdsr.Set(10, 0, 1, 10);
    mVoiceParams.mSampleData = mSampleData;
    mVoiceParams.mSampleLength = 0;

@@ -55,18 +55,18 @@ void BandVocoder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   FLOATSLIDER(mInputSlider, "input", &mInputPreamp, 0.1f, 2);
-   FLOATSLIDER(mCarrierSlider, "carrier", &mCarrierPreamp, .1f, 2);
-   FLOATSLIDER(mVolumeSlider, "volume", &mVolume, .1f, 2);
+   FLOATSLIDER(mInputSlider, "input", &mInputPreamp, 0.1, 2);
+   FLOATSLIDER(mCarrierSlider, "carrier", &mCarrierPreamp, .1, 2);
+   FLOATSLIDER(mVolumeSlider, "volume", &mVolume, .1, 2);
    FLOATSLIDER(mDryWetSlider, "mix", &mDryWet, 0, 1);
-   FLOATSLIDER(mMaxBandSlider, "max band", &mMaxBand, 0.001f, 1);
+   FLOATSLIDER(mMaxBandSlider, "max band", &mMaxBand, 0.001, 1);
    FLOATSLIDER(mSpacingStyleSlider, "spacing", &mSpacingStyle, -1, 1);
    UIBLOCK_NEWCOLUMN();
    INTSLIDER(mNumBandsSlider, "bands", &mNumBands, 2, VOCODER_MAX_BANDS);
    FLOATSLIDER(mFBaseSlider, "f base", &mFreqBase, 20, 300);
    FLOATSLIDER(mFRangeSlider, "f range", &mFreqRange, 0, gSampleRate / 2 - 1000);
    FLOATSLIDER_DIGITS(mQSlider, "q", &mQ, 20, 80, 3);
-   FLOATSLIDER_DIGITS(mRingTimeSlider, "ring", &mRingTime, .0001f, .1f, 4);
+   FLOATSLIDER_DIGITS(mRingTimeSlider, "ring", &mRingTime, .0001, .1, 4);
    ENDUIBLOCK0();
 
    mFRangeSlider->SetMode(FloatSlider::kSquare);

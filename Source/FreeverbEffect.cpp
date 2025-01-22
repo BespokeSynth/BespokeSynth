@@ -46,7 +46,7 @@ FreeverbEffect::~FreeverbEffect()
 void FreeverbEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRoomSizeSlider = new FloatSlider(this, "room size", 5, 4, 95, 15, &mRoomSize, .1f, 1, 3);
+   mRoomSizeSlider = new FloatSlider(this, "room size", 5, 4, 95, 15, &mRoomSize, .1, 1, 3);
    mRoomSizeSlider->SetMode(FloatSlider::Mode::kBezier);
    mDampSlider = new FloatSlider(this, "damp", 5, 20, 95, 15, &mDamp, 0, 100);
    mWetSlider = new FloatSlider(this, "wet", 5, 36, 95, 15, &mWet, 0, 1);

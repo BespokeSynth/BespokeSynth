@@ -424,7 +424,7 @@ void Producer::PlayNote(NoteMessage note)
          int slice = (note.pitch / 8) * 8 + 7 - (note.pitch % 8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = -mOffset * barLength + (barLength / 4) * slice + mClipStart;
-         mSample->Play(note.time, 1, position);
+         mSample->Play(note.time, 1, position, -1);
       }
    }
 }

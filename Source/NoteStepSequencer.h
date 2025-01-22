@@ -83,7 +83,7 @@ public:
    void UpdatePush2Leds(Push2Control* push2) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;

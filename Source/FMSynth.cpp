@@ -62,7 +62,7 @@ FMSynth::FMSynth()
    mVoiceParams.mHarmRatio2 = 1;
    mVoiceParams.mModIdx2 = 0;
    mVoiceParams.mPhaseOffset2 = 0;
-   mVoiceParams.mVol = 1.f;
+   mVoiceParams.mVol = 1.0;
 
    mPolyMgr.Init(kVoiceType_FM, &mVoiceParams);
 }
@@ -78,13 +78,13 @@ void FMSynth::CreateUIControls()
    mAdsrDisplayMod2 = new ADSRDisplay(this, "adsrmod2", 94, 127, 80, 40, &mVoiceParams.mModIdxADSRParams2);
    mHarmRatioBaseDropdown = new DropdownList(this, "harmratio", mAdsrDisplayHarm, kAnchor_Below, &mHarmRatioBase);
    mHarmRatioBaseDropdown2 = new DropdownList(this, "harmratio2", mAdsrDisplayHarm2, kAnchor_Below, &mHarmRatioBase2);
-   mHarmSlider = new FloatSlider(this, "tweak", mHarmRatioBaseDropdown, kAnchor_Below, 80, 15, &mHarmRatioTweak, .5f, 2, 3);
+   mHarmSlider = new FloatSlider(this, "tweak", mHarmRatioBaseDropdown, kAnchor_Below, 80, 15, &mHarmRatioTweak, .5, 2, 3);
    mModSlider = new FloatSlider(this, "mod", mAdsrDisplayMod, kAnchor_Below, 80, 15, &mVoiceParams.mModIdx, 0, 20);
-   mHarmSlider2 = new FloatSlider(this, "tweak2", mHarmRatioBaseDropdown2, kAnchor_Below, 80, 15, &mHarmRatioTweak2, .5f, 2, 3);
+   mHarmSlider2 = new FloatSlider(this, "tweak2", mHarmRatioBaseDropdown2, kAnchor_Below, 80, 15, &mHarmRatioTweak2, .5, 2, 3);
    mModSlider2 = new FloatSlider(this, "mod2", mAdsrDisplayMod2, kAnchor_Below, 80, 15, &mVoiceParams.mModIdx2, 0, 20);
-   mPhaseOffsetSlider0 = new FloatSlider(this, "phase0", mVolSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset0, 0, FTWO_PI);
-   mPhaseOffsetSlider1 = new FloatSlider(this, "phase1", mModSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset1, 0, FTWO_PI);
-   mPhaseOffsetSlider2 = new FloatSlider(this, "phase2", mModSlider2, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset2, 0, FTWO_PI);
+   mPhaseOffsetSlider0 = new FloatSlider(this, "phase0", mVolSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset0, 0, TWO_PI);
+   mPhaseOffsetSlider1 = new FloatSlider(this, "phase1", mModSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset1, 0, TWO_PI);
+   mPhaseOffsetSlider2 = new FloatSlider(this, "phase2", mModSlider2, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset2, 0, TWO_PI);
 
    mHarmRatioBaseDropdown->AddLabel(".125", -8);
    mHarmRatioBaseDropdown->AddLabel(".2", -5);

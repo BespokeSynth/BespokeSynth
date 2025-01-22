@@ -94,7 +94,7 @@ void MPESmoother::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void MPESmoother::OnTransportAdvanced(float amount)
+void MPESmoother::OnTransportAdvanced(double amount)
 {
    const float kSmoothTime = 100;
    for (int i = 0; i < kNumVoices; ++i)

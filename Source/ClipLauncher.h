@@ -89,7 +89,7 @@ private:
 
       Sample* mSample{ nullptr };
       int mNumBars{ 1 };
-      float mVolume{ 1 };
+      double mVolume{ 1 };
       Checkbox* mGrabCheckbox{ nullptr };
       Checkbox* mPlayCheckbox{ nullptr };
       ClipLauncher* mClipLauncher{ nullptr };

@@ -76,7 +76,7 @@ private:
    }
    void DrawModule() override;
 
-   float GetMinDelayMs() const;
+   double GetMinDelayMs() const;
 
    double mDelay{ 500 };
    double mFeedback{ 0 };

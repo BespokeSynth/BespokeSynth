@@ -111,10 +111,10 @@ void PulseChance::OnPulse(double time, float velocity, int flags)
    if (flags & kPulseFlag_Reset)
       mRandomIndex = 0;
 
-   float random;
+   double random;
    if (mDeterministic)
    {
-      random = ((abs(DeterministicRandom(mSeed, mRandomIndex)) % 10000) / 10000.0f);
+      random = ((abs(DeterministicRandom(mSeed, mRandomIndex)) % 10000) / 10000.0);
       ++mRandomIndex;
    }
    else

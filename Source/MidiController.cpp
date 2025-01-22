@@ -304,7 +304,7 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
    }
 }
 
-void MidiController::OnTransportAdvanced(float amount)
+void MidiController::OnTransportAdvanced(double amount)
 {
    PROFILER(MidiController);
 

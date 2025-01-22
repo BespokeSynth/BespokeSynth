@@ -37,21 +37,20 @@ public:
    {}
 
    void SetType(OscillatorType type) { mOsc.SetType(type); }
-   void SetADSR(float a, float d, float s, float r) { mAdsr.Set(a, d, s, r); }
-   void Start(double time, float target) { mAdsr.Start(time, target); }
-   void Start(double time, float target, float a, float d, float s, float r) { mAdsr.Start(time, target, a, d, s, r); }
-   void Start(double time, float target, ::ADSR adsr)
+   void SetADSR(double a, double d, double s, double r) { mAdsr.Set(a, d, s, r); }
+   void Start(double time, double target) { mAdsr.Start(time, target); }
+   void Start(double time, double target, double a, double d, double s, double r) { mAdsr.Start(time, target); }
+   void Start(double time, double target, ::ADSR adsr)
    {
       mAdsr.Set(adsr);
       mAdsr.Start(time, target);
    }
    void Stop(double time) { mAdsr.Stop(time); }
-   float Audio(double time, float phase);
+   double Audio(double time, double phase);
    ::ADSR* GetADSR() { return &mAdsr; }
-   void SetPulseWidth(float width) { mOsc.SetPulseWidth(width); }
+   void SetPulseWidth(double width) { mOsc.SetPulseWidth(width); }
    Oscillator mOsc{ OscillatorType::kOsc_Sin };
 
 private:
    ::ADSR mAdsr;
-   float mPulseWidth{ .5 };
 };

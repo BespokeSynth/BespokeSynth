@@ -35,7 +35,7 @@ public:
    MultiBandTracker();
    ~MultiBandTracker();
 
-   void SetRange(float minFreq, float maxFreq);
+   void SetRange(double minFreq, double maxFreq);
    void SetNumBands(int numBands);
    void Process(float* buffer, int bufferSize);
    float GetBand(int idx);
@@ -45,8 +45,8 @@ private:
    std::vector<CLinkwitzRiley_4thOrder> mBands;
    std::vector<PeakTracker> mPeaks;
    int mNumBands{ 8 };
-   float mMinFreq{ 150 };
-   float mMaxFreq{ 15000 };
+   double mMinFreq{ 150 };
+   double mMaxFreq{ 15000 };
    float* mWorkBuffer{ nullptr };
    ofMutex mMutex;
 };

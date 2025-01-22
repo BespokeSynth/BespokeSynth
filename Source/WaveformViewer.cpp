@@ -48,7 +48,7 @@ void WaveformViewer::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mDisplayFreqEntry = new TextEntry(this, "freq", 3, 3, 10, &mDisplayFreq, 1, 10000);
    mLengthSamplesSlider = new IntSlider(this, "length", mDisplayFreqEntry, kAnchor_Below, 100, 15, &mLengthSamples, 1024, BUFFER_VIZ_SIZE);
-   mDrawGainSlider = new FloatSlider(this, "draw gain", mLengthSamplesSlider, kAnchor_Below, 100, 15, &mDrawGain, .1f, 5);
+   mDrawGainSlider = new FloatSlider(this, "draw gain", mLengthSamplesSlider, kAnchor_Below, 100, 15, &mDrawGain, .1, 5);
    mDisplayFreqEntry->DrawLabel(true);
    /*mHueNote = new FloatSlider(this,"note",5,0,100,15,&IDrawableModule::sHueNote,0,255);
    mHueAudio = new FloatSlider(this,"audio",5,15,100,15,&IDrawableModule::sHueAudio,0,255);

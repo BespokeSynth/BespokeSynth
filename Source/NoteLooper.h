@@ -61,7 +61,7 @@ public:
    void PlayNote(NoteMessage note) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener

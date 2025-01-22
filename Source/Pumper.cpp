@@ -37,12 +37,12 @@ Pumper::Pumper()
 {
    mAdsr.SetNumStages(2);
 
-   mAdsr.GetStageData(0).time = kAdsrTime * .05f;
-   mAdsr.GetStageData(0).target = .25f;
+   mAdsr.GetStageData(0).time = kAdsrTime * .05;
+   mAdsr.GetStageData(0).target = .25;
    mAdsr.GetStageData(0).curve = 0;
-   mAdsr.GetStageData(1).time = kAdsrTime * .3f;
+   mAdsr.GetStageData(1).time = kAdsrTime * .3;
    mAdsr.GetStageData(1).target = 1;
-   mAdsr.GetStageData(1).curve = -0.5f;
+   mAdsr.GetStageData(1).curve = -0.5;
 
    SyncToAdsr();
 }

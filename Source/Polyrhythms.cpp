@@ -59,7 +59,7 @@ Polyrhythms::~Polyrhythms()
       delete mRhythmLines[i];
 }
 
-void Polyrhythms::OnTransportAdvanced(float amount)
+void Polyrhythms::OnTransportAdvanced(double amount)
 {
    PROFILER(Polyrhythms);
 

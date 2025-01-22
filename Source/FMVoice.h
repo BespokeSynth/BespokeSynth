@@ -41,9 +41,9 @@ public:
    ::ADSR mModIdxADSRParams2;
    ::ADSR mHarmRatioADSRParams2;
    double mModIdx{ 0 };
-   float mHarmRatio{ 1 };
+   double mHarmRatio{ 1 };
    double mModIdx2{ 0 };
-   float mHarmRatio2{ 1 };
+   double mHarmRatio2{ 1 };
    double mVol{ 1 };
    double mPhaseOffset0{ 0 };
    double mPhaseOffset1{ 0 };
@@ -57,7 +57,7 @@ public:
    ~FMVoice();
 
    // IMidiVoice
-   void Start(double time, float amount) override;
+   void Start(double time, double amount) override;
    void Stop(double time) override;
    void ClearVoice() override;
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
@@ -65,12 +65,12 @@ public:
    bool IsDone(double time) override;
 
 private:
-   float mOscPhase{ 0 };
+   double mOscPhase{ 0 };
    EnvOscillator mOsc{ kOsc_Sin };
-   float mHarmPhase{ 0 };
+   double mHarmPhase{ 0 };
    EnvOscillator mHarm{ kOsc_Sin };
    ::ADSR mModIdx;
-   float mHarmPhase2{ 0 };
+   double mHarmPhase2{ 0 };
    EnvOscillator mHarm2{ kOsc_Sin };
    ::ADSR mModIdx2;
    FMVoiceParams* mVoiceParams{ nullptr };

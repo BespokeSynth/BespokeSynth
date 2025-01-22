@@ -33,7 +33,7 @@
 #include "EventCanvas.h"
 #include "SampleCanvas.h"
 
-CanvasElement::CanvasElement(Canvas* canvas, int col, int row, float offset, float length)
+CanvasElement::CanvasElement(Canvas* canvas, int col, int row, double offset, double length)
 : mCanvas(canvas)
 , mOffset(offset)
 , mLength(length)
@@ -159,50 +159,50 @@ void CanvasElement::DrawOffscreen()
    ofPopStyle();
 }
 
-float CanvasElement::GetStart(int col, float offset) const
+double CanvasElement::GetStart(int col, double offset) const
 {
    return (col + offset) / mCanvas->GetNumCols();
 }
 
-float CanvasElement::GetEnd(int col, float offset, float length) const
+double CanvasElement::GetEnd(int col, double offset, double length) const
 {
    return (col + offset + length) / mCanvas->GetNumCols();
 }
 
-float CanvasElement::GetStart() const
+double CanvasElement::GetStart() const
 {
    return GetStart(mCol, mOffset);
 }
 
-void CanvasElement::SetStart(float start, bool preserveLength)
+void CanvasElement::SetStart(double start, bool preserveLength)
 {
-   float end = 0;
+   double end = 0;
    if (!preserveLength)
       end = GetEnd();
    start *= mCanvas->GetNumCols();
-   mCol = int(start + .5f);
+   mCol = std::lround(start);
    mOffset = start - mCol;
    if (!preserveLength)
       SetEnd(end);
 }
 
-float CanvasElement::GetEnd() const
+double CanvasElement::GetEnd() const
 {
    return GetEnd(mCol, mOffset, mLength);
 }
 
-void CanvasElement::SetEnd(float end)
+void CanvasElement::SetEnd(double end)
 {
    mLength = end * mCanvas->GetNumCols() - mCol - mOffset;
 }
 
 ofRectangle CanvasElement::GetRect(bool clamp, bool wrapped, ofVec2f offset) const
 {
-   float wrapOffset = wrapped ? -1 : 0;
-   float start = ofMap(GetStart() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
-   float end = ofMap(GetEnd() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
-   float y = (float(mRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
-   float height = float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
+   double wrapOffset = wrapped ? -1 : 0;
+   double start = ofMap(GetStart() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
+   double end = ofMap(GetEnd() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
+   double y = static_cast<double>(mRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows() * mCanvas->GetHeight();
+   double height = static_cast<double>(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
 
    return ofRectangle(start + offset.x, y + offset.y, end - start, height);
 }
@@ -211,32 +211,32 @@ ofRectangle CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVec2
 {
    int newRow;
    int newCol;
-   float newOffset;
+   double newOffset;
    GetDragDestinationData(dragOffset, newRow, newCol, newOffset);
 
-   float wrapOffset = wrapped ? -1 : 0;
-   float start = ofMap(GetStart(newCol, newOffset) + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
-   float end = ofMap(GetEnd(newCol, newOffset, mLength) + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
-   float y = (float(newRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
-   float height = float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
+   double wrapOffset = wrapped ? -1 : 0;
+   double start = ofMap(GetStart(newCol, newOffset) + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
+   double end = ofMap(GetEnd(newCol, newOffset, mLength) + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
+   double y = (float(newRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
+   double height = float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
 
    return ofRectangle(start, y, end - start, height);
 }
 
-void CanvasElement::GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, float& newOffset) const
+void CanvasElement::GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, double& newOffset) const
 {
    dragOffset.x *= mCanvas->mViewEnd - mCanvas->mViewStart;
 
-   float colDrag = (dragOffset.x / mCanvas->GetWidth()) * mCanvas->GetNumCols() / mCanvas->GetLength();
-   float rowDrag = (dragOffset.y / mCanvas->GetHeight()) * mCanvas->GetNumVisibleRows();
+   double colDrag = (dragOffset.x / mCanvas->GetWidth()) * mCanvas->GetNumCols() / mCanvas->GetLength();
+   double rowDrag = (dragOffset.y / mCanvas->GetHeight()) * mCanvas->GetNumVisibleRows();
 
    newCol = mCol;
    if (mCanvas->GetDragMode() & Canvas::kDragHorizontal)
-      newCol = ofClamp(int(mCol + colDrag + .5f), 0, mCanvas->GetNumCols() - 1);
+      newCol = ofClamp(int(mCol + colDrag + .5), 0, mCanvas->GetNumCols() - 1);
 
    newRow = mRow;
    if (mCanvas->GetDragMode() & Canvas::kDragVertical)
-      newRow = ofClamp(int(mRow + rowDrag + .5f), 0, mCanvas->GetNumRows() - 1);
+      newRow = ofClamp(int(mRow + rowDrag + .5), 0, mCanvas->GetNumRows() - 1);
 
    newOffset = mOffset;
    if (GetKeyModifiers() & kModifier_Alt) //non-snapped drag
@@ -249,7 +249,7 @@ void CanvasElement::MoveElementByDrag(ofVec2f dragOffset)
 {
    int newRow;
    int newCol;
-   float newOffset;
+   double newOffset;
    GetDragDestinationData(dragOffset, newRow, newCol, newOffset);
 
    mRow = newRow;
@@ -752,7 +752,7 @@ void EventCanvasElement::TriggerEnd(double time)
       mUIControl->SetValue(0, time);
 }
 
-float EventCanvasElement::GetEnd() const
+double EventCanvasElement::GetEnd() const
 {
    if (mIsCheckbox) //normal resizable element
       return CanvasElement::GetEnd();

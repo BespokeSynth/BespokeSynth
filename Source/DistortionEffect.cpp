@@ -39,7 +39,7 @@ DistortionEffect::DistortionEffect()
       mDCRemover[i].SetFilterType(kFilterType_Highpass);
       mDCRemover[i].UpdateFilterCoeff();
 
-      mPeakTracker[i].SetDecayTime(.1f);
+      mPeakTracker[i].SetDecayTime(.1);
    }
 }
 
@@ -48,7 +48,7 @@ void DistortionEffect::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
    DROPDOWN(mTypeDropdown, "type", (int*)(&mType), 50);
-   FLOATSLIDER(mClipSlider, "clip", &mClip, 0.001f, 1);
+   FLOATSLIDER(mClipSlider, "clip", &mClip, 0.001, 1);
    FLOATSLIDER(mPreampSlider, "preamp", &mPreamp, 1, 10);
    FLOATSLIDER(mFuzzAmountSlider, "fuzz", &mFuzzAmount, -1, 1);
    CHECKBOX(mRemoveInputDCCheckbox, "center input", &mRemoveInputDC);

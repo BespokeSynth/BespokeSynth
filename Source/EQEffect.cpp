@@ -36,7 +36,7 @@ EQEffect::EQEffect()
       for (int i = 0; i < NUM_EQ_FILTERS; ++i)
       {
          mBanks[ch].mBiquad[i].SetFilterType(kFilterType_Peak);
-         mBanks[ch].mBiquad[i].SetFilterParams(40 * powf(2.2f, i), .1f);
+         mBanks[ch].mBiquad[i].SetFilterParams(40 * std::pow(2.2, i), .1);
       }
    }
 }
@@ -49,7 +49,7 @@ void EQEffect::CreateUIControls()
 
    mMultiSlider->SetGridMode(UIGrid::kMultislider);
    for (int i = 0; i < NUM_EQ_FILTERS; ++i)
-      mMultiSlider->SetVal(i, 0, .5f);
+      mMultiSlider->SetVal(i, 0, .5);
    mMultiSlider->SetListener(this);
 }
 

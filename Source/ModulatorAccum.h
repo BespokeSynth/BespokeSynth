@@ -57,7 +57,7 @@ public:
    bool Active() const override { return mEnabled; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 

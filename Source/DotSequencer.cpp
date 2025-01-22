@@ -200,7 +200,7 @@ void DotSequencer::OnStep(double time, float velocity, int flags)
    }
 }
 
-void DotSequencer::OnTransportAdvanced(float amount)
+void DotSequencer::OnTransportAdvanced(double amount)
 {
    for (int i = 0; i < (int)mPlayingDots.size(); ++i)
    {

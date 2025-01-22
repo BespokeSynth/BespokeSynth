@@ -253,6 +253,7 @@ inline std::string ofToString(const T& value, int precision)
 template <class T>
 inline bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
 {
+   // Chosen a different value for epsilon compared to std::numeric_limits<T>::epsilon() so that floating point values around 100000 still work correctly since the "vanilla" epsilon is based around a value of 1.
    if (std::is_same_v<T, float> && std::isnan(epsilon))
       epsilon = 0.0001f;
    else if (std::is_same_v<T, double> && std::isnan(epsilon))
@@ -262,10 +263,11 @@ inline bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limit
    return std::fabs(a - b) < epsilon;
 }
 
-//inline bool ofAlmostEquel(const double& a, const double& b, const double epsilon = 0.000000001)
-//{
-//   return fabs(a - b) < epsilon;
-//}
+template <class T, class U>
+inline bool ofAlmostEquel(const T& a, U& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
+{
+   return ofAlmostEquel(a, static_cast<T>(b), epsilon);
+}
 
 #define PI 3.14159265358979323846264338327
 #define TWO_PI 6.28318530717958647692528676654
@@ -315,7 +317,9 @@ void ofCircle(float x, float y, float radius);
 void ofRect(float x, float y, float width, float height, float cornerRadius = 3);
 void ofRect(const ofRectangle& rect, float cornerRadius = 3);
 double ofClamp(double val, double a, double b);
-float ofGetLastFrameTime();
+ofVec2d ofPolToCar(double pos, double radius);
+ofVec2d ofCarToPol(double x, double y);
+double ofGetLastFrameTime();
 int ofToInt(const std::string& intString);
 float ofToFloat(const std::string& floatString);
 double ofToDouble(const std::string& doubleString);
@@ -334,7 +338,7 @@ void ofSetCircleResolution(float res);
 unsigned long long ofGetSystemTimeNanos();
 float ofGetWidth();
 float ofGetHeight();
-float ofGetFrameRate();
+double ofGetFrameRate();
 double ofLerp(double start, double stop, double amt);
 float ofDistSquared(float x1, float y1, float x2, float y2);
 std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty = false, bool trim = false);

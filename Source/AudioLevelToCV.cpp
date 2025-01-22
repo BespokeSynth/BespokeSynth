@@ -41,8 +41,8 @@ void AudioLevelToCV::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mGainSlider = new FloatSlider(this, "gain", 3, 2, 100, 15, &mGain, 1, 100);
-   mAttackSlider = new FloatSlider(this, "attack", mGainSlider, kAnchor_Below, 100, 15, &mAttack, .01f, 1000);
-   mReleaseSlider = new FloatSlider(this, "release", mAttackSlider, kAnchor_Below, 100, 15, &mRelease, .01f, 1000);
+   mAttackSlider = new FloatSlider(this, "attack", mGainSlider, kAnchor_Below, 100, 15, &mAttack, .01, 1000);
+   mReleaseSlider = new FloatSlider(this, "release", mAttackSlider, kAnchor_Below, 100, 15, &mRelease, .01, 1000);
    mMinSlider = new FloatSlider(this, "min", mReleaseSlider, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 

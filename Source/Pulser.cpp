@@ -123,7 +123,7 @@ void Pulser::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Pulser::OnTransportAdvanced(float amount)
+void Pulser::OnTransportAdvanced(double amount)
 {
    PROFILER(Pulser);
 

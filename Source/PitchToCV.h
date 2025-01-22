@@ -75,6 +75,6 @@ private:
       height = 17 * 2 + 2;
    }
 
-   float mPitch{ 0 };
+   double mPitch{ 0 };
    ModulationChain* mPitchBend{ nullptr };
 };

@@ -60,7 +60,7 @@ public:
    bool Active() const override { return mEnabled; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 
@@ -77,7 +77,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   void Kick(float strength);
+   void Kick(double strength);
 
    //IDrawableModule
    void DrawModule() override;

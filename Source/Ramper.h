@@ -52,7 +52,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;

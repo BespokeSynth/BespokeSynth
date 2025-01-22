@@ -55,7 +55,7 @@ void Transport::CreateUIControls()
    mTempoSlider = new FloatSlider(this, "tempo", 5, 4, 93, 15, &mTempo, 20, 225);
    mIncreaseTempoButton = new ClickButton(this, " + ", 118, 4);
    mDecreaseTempoButton = new ClickButton(this, " - ", 101, 4);
-   mSwingSlider = new FloatSlider(this, "swing", 5, 22, 93, 15, &mSwing, .5f, .7f);
+   mSwingSlider = new FloatSlider(this, "swing", 5, 22, 93, 15, &mSwing, .5, .7);
    mSwingIntervalDropdown = new DropdownList(this, "swing interval", 101, 22, &mSwingInterval);
    mTimeSigTopDropdown = new DropdownList(this, "timesigtop", 101, 42, &mTimeSigTop);
    mTimeSigBottomDropdown = new DropdownList(this, "timesigbottom", 101, 60, &mTimeSigBottom);

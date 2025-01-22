@@ -75,7 +75,7 @@ public:
    };
 
 public:
-   Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator);
+   Canvas(IDrawableModule* parent, int x, int y, int w, int h, double length, int rows, int cols, CreateCanvasElementFn elementCreator);
    ~Canvas();
 
    void Render() override;
@@ -92,7 +92,7 @@ public:
    float GetWidth() const { return mWidth; }
    float GetHeight() const { return mHeight; }
    void SetLength(float length) { mLength = length; }
-   float GetLength() const { return mLength; }
+   double GetLength() const { return mLength; }
    void SetNumRows(int rows) { mNumRows = rows; }
    void SetNumCols(int cols) { mNumCols = cols; }
    int GetNumRows() const { return mNumRows; }
@@ -138,10 +138,10 @@ public:
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    bool ShouldSerializeForSnapshot() const override { return true; }
 
-   float mViewStart{ 0 };
-   float mViewEnd;
-   float mLoopStart{ 0 };
-   float mLoopEnd;
+   double mViewStart{ 0 };
+   double mViewEnd;
+   double mLoopStart{ 0 };
+   double mLoopEnd;
 
 private:
    void OnClicked(float x, float y, bool right) override;
@@ -152,18 +152,18 @@ private:
    }
 
    bool IsOnElement(CanvasElement* element, float x, float y) const;
-   float QuantizeToGrid(float input) const;
+   double QuantizeToGrid(double input) const;
 
    bool mClick{ false };
    CanvasElement* mClickedElement{ nullptr };
    ofVec2f mClickedElementStartMousePos;
    float mWidth;
    float mHeight;
-   float mLength;
+   double mLength;
    ICanvasListener* mListener{ nullptr };
    std::vector<CanvasElement*> mElements;
    CanvasControls* mControls{ nullptr };
-   float mCursorPos{ -1 };
+   double mCursorPos{ -1 };
    CreateCanvasElementFn mElementCreator;
    int mRowOffset{ 0 };
    bool mWrap{ false };
@@ -179,7 +179,7 @@ private:
    HighlightEnd mDragEnd{ HighlightEnd::kHighlightEnd_None };
    int mMajorColumnInterval{ -1 };
    bool mHasDuplicatedThisDrag{ false };
-   float mScrollVerticalPartial{ 0 };
+   double mScrollVerticalPartial{ 0 };
    std::array<ofColor, 128> mRowColors;
 
    int mNumRows;

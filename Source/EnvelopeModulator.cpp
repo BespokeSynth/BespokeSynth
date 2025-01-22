@@ -83,13 +83,13 @@ void EnvelopeModulator::PlayNote(NoteMessage note)
    }
    else if (note.velocity > 0)
    {
-      mAdsr.Start(note.time, mUseVelocity ? note.velocity / 127.0f : 1);
+      mAdsr.Start(note.time, mUseVelocity ? note.velocity / 127.0 : 1);
    }
 }
 
 void EnvelopeModulator::OnPulse(double time, float velocity, int flags)
 {
-   mAdsr.Start(time, mUseVelocity ? velocity / 127.0f : 1);
+   mAdsr.Start(time, mUseVelocity ? velocity / 127.0 : 1);
 }
 
 void EnvelopeModulator::GetModuleDimensions(float& width, float& height)

@@ -54,7 +54,7 @@ void BoundsToPulse::CreateUIControls()
    AddPatchCableSource(mMaxCable);
 }
 
-void BoundsToPulse::OnTransportAdvanced(float amount)
+void BoundsToPulse::OnTransportAdvanced(double amount)
 {
    for (int i = 0; i < gBufferSize; ++i)
       ComputeSliders(i);

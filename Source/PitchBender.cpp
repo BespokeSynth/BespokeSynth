@@ -73,7 +73,7 @@ void PitchBender::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void PitchBender::OnTransportAdvanced(float amount)
+void PitchBender::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 }

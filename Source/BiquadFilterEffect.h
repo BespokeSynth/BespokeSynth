@@ -45,7 +45,7 @@ public:
    void Init() override;
 
    void SetFilterType(FilterType type) { mBiquad[0].SetFilterType(type); }
-   void SetFilterParams(float f, float q) { mBiquad[0].SetFilterParams(f, q); }
+   void SetFilterParams(double f, double q) { mBiquad[0].SetFilterParams(f, q); }
    void Clear();
 
    //IAudioEffect
