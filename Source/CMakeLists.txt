@@ -41,6 +41,8 @@ target_sources(BespokeSynth PRIVATE
     ADSRDisplay.h
     AbletonLink.cpp
     AbletonLink.h
+    Acciaccatura.cpp
+    Acciaccatura.h
     Amplifier.cpp
     Amplifier.h
     Arpeggiator.cpp
