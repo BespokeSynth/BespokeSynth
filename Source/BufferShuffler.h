@@ -96,7 +96,7 @@ private:
    }
    void OnClicked(float x, float y, bool right) override;
    bool DrawToPush2Screen() override;
-   float GetFourTetPosition(double time);
+   double GetFourTetPosition(double time);
 
    enum class PlaybackStyle
    {
@@ -114,7 +114,7 @@ private:
    void DrawBuffer(float x, float y, float w, float h);
    void PlayOneShot(int slice);
    int GetNumSlices();
-   float GetSlicePlaybackRate() const;
+   double GetSlicePlaybackRate() const;
    PlaybackStyle VelocityToPlaybackStyle(int velocity) const;
 
    ChannelBuffer mInputBuffer;
@@ -135,13 +135,13 @@ private:
    DropdownList* mFourTetSlicesDropdown{ nullptr };
    int mQueuedSlice{ -1 };
    PlaybackStyle mQueuedPlaybackStyle{ PlaybackStyle::None };
-   float mPlaybackSampleIndex{ -1 };
+   double mPlaybackSampleIndex{ -1 };
    double mPlaybackSampleStartTime{ -1 };
    double mPlaybackSampleStopTime{ -1 };
    GridControlTarget* mGridControlTarget{ nullptr };
    bool mUseVelocitySpeedControl{ false };
    bool mOnlyPlayWhenTriggered{ false };
-   float mFourTetSampleIndex{ 0 };
+   double mFourTetSampleIndex{ 0 };
 
    SwitchAndRamp mSwitchAndRamp;
 };

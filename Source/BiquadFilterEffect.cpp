@@ -128,11 +128,11 @@ void BiquadFilterEffect::DrawModule()
    const int kPixelStep = 1;
    for (int x = 0; x < w + kPixelStep; x += kPixelStep)
    {
-      float freq = FreqForPos(x / w);
-      if (freq < gSampleRate / 2)
+      double freq = FreqForPos(x / w);
+      if (freq < gSampleRate / 2.0)
       {
-         float response = mBiquad[0].GetMagnitudeResponseAt(freq);
-         ofVertex(x, (.5f - .666f * log10(response)) * h);
+         double response = mBiquad[0].GetMagnitudeResponseAt(freq);
+         ofVertex(x, (.5 - .666 * log10(response)) * h);
       }
    }
    ofEndShape(false);
@@ -143,11 +143,11 @@ double BiquadFilterEffect::GetEffectAmount()
    if (!mEnabled)
       return 0;
    if (mBiquad[0].mType == kFilterType_Lowpass)
-      return ofClamp(1 - (mBiquad[0].mF / (mFSlider->GetMax() * .75f)), 0, 1);
+      return ofClamp(1 - (mBiquad[0].mF / (mFSlider->GetMax() * .75)), 0, 1);
    if (mBiquad[0].mType == kFilterType_Highpass)
-      return ofClamp(mBiquad[0].mF / (mFSlider->GetMax() * .75f), 0, 1);
+      return ofClamp(mBiquad[0].mF / (mFSlider->GetMax() * .75), 0, 1);
    if (mBiquad[0].mType == kFilterType_Bandpass)
-      return ofClamp(.3f + (mBiquad[0].mQ / mQSlider->GetMax()), 0, 1);
+      return ofClamp(.3 + (mBiquad[0].mQ / mQSlider->GetMax()), 0, 1);
    if (mBiquad[0].mType == kFilterType_Peak)
       return ofClamp(std::abs(mBiquad[0].mDbGain / 96), 0, 1);
    return 0;
@@ -207,7 +207,7 @@ bool BiquadFilterEffect::MouseMoved(float x, float y)
       x += thisx;
       y += thisy;
       mFSlider->SetValue(x * 2 + 150, NextBufferTime(false));
-      mQSlider->SetValue(y / 100.0f, NextBufferTime(false));
+      mQSlider->SetValue(y / 100.0, NextBufferTime(false));
    }
 
    return false;

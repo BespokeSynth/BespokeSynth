@@ -40,7 +40,7 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   void SetVol(float vol) { mVol = vol; }
+   void SetVol(double vol) { mVol = vol; }
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
    double GetMaxTime() const { return mMaxTime; }
    double& GetMaxTime() { return mMaxTime; }
@@ -103,7 +103,7 @@ private:
    }
 
    void UpdateSliderVisibility();
-   ofVec2f GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent);
+   ofVec2d GetDrawPoint(double time, const ADSR::EventInfo& adsrEvent);
 
    float mWidth;
    float mHeight;

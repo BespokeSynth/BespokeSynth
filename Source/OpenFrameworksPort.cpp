@@ -398,17 +398,6 @@ void ofVertex(ofVec2f point)
    ofVertex(point.x, point.y);
 }
 
-double ofMap(double val, double fromStart, double fromEnd, double toStart, double toEnd, bool clamp)
-{
-   double ret;
-   if (fromEnd - fromStart != 0)
-      ret = ((val - fromStart) / (fromEnd - fromStart)) * (toEnd - toStart) + toStart;
-   else
-      ret = toEnd;
-   if (clamp)
-      ret = ofClamp(ret, MIN(toStart, toEnd), MAX(toStart, toEnd));
-   return ret;
-}
 
 double ofRandom(double max)
 {
@@ -480,16 +469,6 @@ float ofGetHeight()
 double ofGetFrameRate()
 {
    return TheSynth->GetFrameRate();
-}
-
-double ofLerp(double start, double stop, double amt)
-{
-   return start + (stop - start) * amt;
-}
-
-float ofDistSquared(float x1, float y1, float x2, float y2)
-{
-   return ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty, bool trim)

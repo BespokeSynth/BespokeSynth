@@ -82,9 +82,9 @@ private:
    FloatSlider* mGainSlider{ nullptr };
    FloatSlider* mAttackSlider{ nullptr };
    FloatSlider* mReleaseSlider{ nullptr };
-   float mVal{ 0 };
+   double mVal{ 0 };
    double mAttack{ 10 };
    double mRelease{ 10 };
-   float mAttackFactor{ .99 };
-   float mReleaseFactor{ .99 };
+   double mAttackFactor{ .99 };
+   double mReleaseFactor{ .99 };
 };

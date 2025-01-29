@@ -137,7 +137,7 @@ void BufferShuffler::Process(double time)
                mInputBuffer.GetChannel(ch)[writePosition] = GetBuffer()->GetChannel(ch)[i];
 
             float outputSample = mOnlyPlayWhenTriggered ? 0 : GetBuffer()->GetChannel(ch)[i];
-            if (mPlaybackSampleIndex != -1)
+            if (!ofAlmostEquel(mPlaybackSampleIndex, -1))
             {
                outputSample = GetInterpolatedSample(mPlaybackSampleIndex, mInputBuffer.GetChannel(ch), GetLengthInSamples());
             }
@@ -149,7 +149,7 @@ void BufferShuffler::Process(double time)
 
             if (mFourTet > 0)
             {
-               float readPosition = GetFourTetPosition(time);
+               double readPosition = GetFourTetPosition(time);
                if (ch == 0)
                {
                   if (abs(readPosition - mFourTetSampleIndex) > 1000)
@@ -167,7 +167,7 @@ void BufferShuffler::Process(double time)
                   mFourTetSampleIndex = readPosition;
                }
 
-               float fourTetSample = GetInterpolatedSample(readPosition, mInputBuffer.GetChannel(ch), GetLengthInSamples());
+               double fourTetSample = GetInterpolatedSample(readPosition, mInputBuffer.GetChannel(ch), GetLengthInSamples());
                outputSample = ofLerp(outputSample, fourTetSample, mFourTet);
             }
 
@@ -175,7 +175,7 @@ void BufferShuffler::Process(double time)
          }
 
          if (mPlaybackSampleIndex != -1)
-            mPlaybackSampleIndex = FloatWrap(mPlaybackSampleIndex + GetSlicePlaybackRate(), GetLengthInSamples());
+            mPlaybackSampleIndex = DoubleWrap(mPlaybackSampleIndex + GetSlicePlaybackRate(), GetLengthInSamples());
 
          writePosition = (writePosition + 1) % GetLengthInSamples();
 
@@ -192,22 +192,22 @@ void BufferShuffler::Process(double time)
    GetBuffer()->Reset();
 }
 
-float BufferShuffler::GetFourTetPosition(double time)
+double BufferShuffler::GetFourTetPosition(double time)
 {
-   float measurePos = TheTransport->GetMeasurePos(time);
+   double measurePos = TheTransport->GetMeasurePos(time);
    measurePos += TheTransport->GetMeasure(time) % mNumBars;
    measurePos /= mNumBars;
    int numSlices = mFourTetSlices * 2 * mNumBars;
    measurePos *= numSlices;
-   int slice = (int)measurePos;
-   float sliceProgress = measurePos - slice;
-   float offset;
+   int slice = static_cast<int>(measurePos);
+   double sliceProgress = measurePos - slice;
+   double offset;
    if (slice % 2 == 0)
-      offset = (sliceProgress + slice / 2) * (GetLengthInSamples() / float(numSlices) * 2);
+      offset = (sliceProgress + slice / 2) * (GetLengthInSamples() / static_cast<double>(numSlices) * 2);
    else
-      offset = (1 - sliceProgress + slice / 2) * (GetLengthInSamples() / float(numSlices) * 2);
+      offset = (1 - sliceProgress + slice / 2) * (GetLengthInSamples() / static_cast<double>(numSlices) * 2);
 
-   return FloatWrap(offset, GetLengthInSamples());
+   return DoubleWrap(offset, GetLengthInSamples());
 }
 
 void BufferShuffler::DrawModule()
@@ -314,7 +314,7 @@ void BufferShuffler::PlayOneShot(int slice)
    TheTransport->GetQuantized(currentTime, &timeInfo, &remainderMs);
    double timeUntilNextInterval = sliceSizeMs - remainderMs;
    mPlaybackSampleStartTime = currentTime + timeUntilNextInterval;
-   mPlaybackSampleStopTime = mPlaybackSampleStartTime + sliceSizeMs / abs(GetSlicePlaybackRate());
+   mPlaybackSampleStopTime = mPlaybackSampleStartTime + sliceSizeMs / std::abs(GetSlicePlaybackRate());
 }
 
 int BufferShuffler::GetWritePositionInSamples(double time)
@@ -343,7 +343,7 @@ BufferShuffler::PlaybackStyle BufferShuffler::VelocityToPlaybackStyle(int veloci
       return PlaybackStyle::HalfReverse;
 }
 
-float BufferShuffler::GetSlicePlaybackRate() const
+double BufferShuffler::GetSlicePlaybackRate() const
 {
    switch (mPlaybackStyle)
    {
@@ -352,13 +352,13 @@ float BufferShuffler::GetSlicePlaybackRate() const
       case PlaybackStyle::Double:
          return 2;
       case PlaybackStyle::Half:
-         return .5f;
+         return .5;
       case PlaybackStyle::Reverse:
          return -1;
       case PlaybackStyle::DoubleReverse:
          return -2;
       case PlaybackStyle::HalfReverse:
-         return -.5f;
+         return -.5;
       default:
          return 1;
    }

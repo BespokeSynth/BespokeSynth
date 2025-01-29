@@ -69,12 +69,12 @@ void AudioToPulse::DrawModule()
 
    ofPushStyle();
    ofFill();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4);
    ofRectangle rect = mThresholdSlider->GetRect(true);
    rect.width *= ofClamp(sqrt(mPeak), 0, 1);
    rect.height *= .5f;
    ofRect(rect);
-   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4f);
+   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4);
    rect = mThresholdSlider->GetRect(true);
    rect.width *= ofClamp(mEnvelope, 0, 1);
    rect.height *= .5f;
@@ -93,7 +93,7 @@ void AudioToPulse::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   const float kAttackTimeMs = 1;
+   const double kAttackTimeMs = 1;
 
    assert(GetBuffer()->BufferSize());
    Clear(gWorkBuffer, gBufferSize);
@@ -103,8 +103,8 @@ void AudioToPulse::Process(double time)
    for (int i = 0; i < gBufferSize; ++i)
    {
       const double decayTime = .01;
-      double scalar = pow(0.5, 1.0 / (decayTime * gSampleRate));
-      double input = abs(gWorkBuffer[i]);
+      double scalar = std::pow(0.5, 1.0 / (decayTime * gSampleRate));
+      double input = std::abs(gWorkBuffer[i]);
 
       if (input >= mPeak)
       {

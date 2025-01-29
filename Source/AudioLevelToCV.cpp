@@ -130,9 +130,9 @@ double AudioLevelToCV::Value(int samplesIn)
 void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAttackSlider)
-      mAttackFactor = powf(.01f, 1.0f / (mAttack * gSampleRateMs));
+      mAttackFactor = std::pow(.01, 1.0 / (mAttack * gSampleRateMs));
    if (slider == mReleaseSlider)
-      mReleaseFactor = powf(.01f, 1.0f / (mRelease * gSampleRateMs));
+      mReleaseFactor = std::pow(.01, 1.0 / (mRelease * gSampleRateMs));
 }
 
 void AudioLevelToCV::SaveLayout(ofxJSONElement& moduleInfo)

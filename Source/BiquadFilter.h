@@ -64,9 +64,9 @@ public:
    void CopyCoeffFrom(BiquadFilter& other);
    bool UsesGain() { return mType == kFilterType_Peak || mType == kFilterType_HighShelf || mType == kFilterType_LowShelf; }
    bool UsesQ() { return true; } // return mType == kFilterType_Lowpass || mType == kFilterType_Highpass || mType == kFilterType_Bandpass || mType == kFilterType_Notch || mType == kFilterType_Peak; }
-   float GetMagnitudeResponseAt(float f);
+   double GetMagnitudeResponseAt(double f);
 
-   float Filter(float sample);
+   double Filter(double sample);
    void Filter(float* buffer, int bufferSize);
 
    double mF{ 4000 };
@@ -85,7 +85,7 @@ private:
    double mSampleRate;
 };
 
-inline float BiquadFilter::Filter(float in)
+inline double BiquadFilter::Filter(double in)
 {
    double out = in * mA0 + mZ1;
    mZ1 = in * mA1 + mZ2 - mB1 * out;

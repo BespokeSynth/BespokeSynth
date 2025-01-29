@@ -235,7 +235,7 @@ void BiquadFilter::CopyCoeffFrom(BiquadFilter& other)
    mB2 = other.mB2;
 }
 
-float BiquadFilter::GetMagnitudeResponseAt(float f)
+double BiquadFilter::GetMagnitudeResponseAt(double f)
 {
    auto const piw0 = (f / mSampleRate) * M_PI * 2;
    auto const cosw = std::cos(piw0);

@@ -208,7 +208,7 @@ void BandVocoder::DrawModule()
          if (freq < gSampleRate / 2)
          {
             double response = mBiquadCarrier[i].GetMagnitudeResponseAt(freq);
-            ofVertex(x, (.5f - .666f * log10(response)) * h);
+            ofVertex(x, (.5 - .666 * log10(response)) * h);
          }
       }
       ofEndShape(false);
@@ -227,8 +227,8 @@ void BandVocoder::CalcFilters()
 {
    for (int i = 0; i < mNumBands; ++i)
    {
-      float a = float(i) / (mNumBands - 1);
-      double freqMax = ofClamp(mFreqBase + mFreqRange, 0, gSampleRate / 2);
+      double a = static_cast<double>(i) / (mNumBands - 1);
+      double freqMax = ofClamp(mFreqBase + mFreqRange, 0, gSampleRate / 2.0);
       double fExp = mFreqBase * pow(freqMax / mFreqBase, a);
       double fLin = ofLerp(mFreqBase, freqMax, a);
       double fBass = ofLerp(mFreqBase, freqMax, a * a * a * a);

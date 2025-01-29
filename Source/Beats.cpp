@@ -255,8 +255,8 @@ void BeatData::LoadBeat(Sample* sample)
 
 void BeatData::RecalcPos(double time, bool doubleTime, int numBars)
 {
-   float measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
-   float pos = ofMap(measurePos / numBars, 0, 1, 0, mBeat->LengthInSamples(), true);
+   double measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
+   double pos = ofMap(measurePos / numBars, 0, 1, 0, mBeat->LengthInSamples(), true);
    if (doubleTime)
    {
       pos *= 2;
@@ -291,7 +291,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
    {
       double volSq = mVolume * mVolume * .25;
 
-      float speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
+      double speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
       if (mDoubleTime)
          speed *= 2;
       mBeatData.RecalcPos(time, mDoubleTime, mNumBars);
@@ -309,23 +309,23 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
             double channelTime = time;
             for (int i = 0; i < bufferSize; ++i)
             {
-               float filter = mFilterRamp.Value(channelTime);
+               double filter = mFilterRamp.Value(channelTime);
 
-               mLowpass[ch].SetFilterParams(ofMap(sqrtf(ofClamp(-filter, 0, 1)), 0, 1, 6000, 80), sqrt(2) / 2);
-               mHighpass[ch].SetFilterParams(ofMap(ofClamp(filter, 0, 1), 0, 1, 10, 6000), sqrt(2) / 2);
+               mLowpass[ch].SetFilterParams(ofMap(std::sqrt(ofClamp(-filter, 0, 1)), 0, 1, 6000, 80), std::sqrt(2) / 2);
+               mHighpass[ch].SetFilterParams(ofMap(ofClamp(filter, 0, 1), 0, 1, 10, 6000), std::sqrt(2) / 2);
 
-               const float crossfade = .1f;
-               float normalAmount = ofClamp(1 - fabsf(filter / crossfade), 0, 1);
-               float lowAmount = ofClamp(-filter / crossfade, 0, 1);
-               float highAmount = ofClamp(filter / crossfade, 0, 1);
+               const double crossfade = .1;
+               double normalAmount = ofClamp(1 - std::abs(filter / crossfade), 0, 1);
+               double lowAmount = ofClamp(-filter / crossfade, 0, 1);
+               double highAmount = ofClamp(filter / crossfade, 0, 1);
 
                int sampleChannel = ch;
                if (beat->NumChannels() == 1)
                   sampleChannel = 0;
-               float normal = gWorkChannelBuffer.GetChannel(sampleChannel)[i];
-               float lowPassed = mLowpass[ch].Filter(normal);
-               float highPassed = mHighpass[ch].Filter(normal);
-               float sample = normal * normalAmount + lowPassed * lowAmount + highPassed * highAmount;
+               double normal = gWorkChannelBuffer.GetChannel(sampleChannel)[i];
+               double lowPassed = mLowpass[ch].Filter(normal);
+               double highPassed = mHighpass[ch].Filter(normal);
+               double sample = normal * normalAmount + lowPassed * lowAmount + highPassed * highAmount;
 
                sample *= volSq * panGain;
                buffer->GetChannel(ch)[i] += sample;

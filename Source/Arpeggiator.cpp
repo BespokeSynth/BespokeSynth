@@ -249,7 +249,7 @@ void Arpeggiator::OnTimeEvent(double time)
          PlayNoteOutput(NoteMessage(time, mLastPitch, 0));
          offPitch = -1;
       }
-      float pressure = current.modulation.pressure ? current.modulation.pressure->GetValue(0) : 0;
+      double pressure = current.modulation.pressure ? current.modulation.pressure->GetValue(0) : 0;
       PlayNoteOutput(NoteMessage(time, outPitch, ofClamp(current.vel + 127 * pressure, 0, 127), current.voiceIdx, current.modulation));
       mLastPitch = outPitch;
    }

@@ -98,14 +98,14 @@ private:
 
    struct Blok
    {
-      Blok(float startTime, float duration, float confidence)
+      Blok(double startTime, double duration, double confidence)
       : mStartTime(startTime)
       , mDuration(duration)
       , mConfidence(confidence)
       {}
-      float mStartTime;
-      float mDuration;
-      float mConfidence;
+      double mStartTime;
+      double mDuration;
+      double mConfidence;
       BlokType mType{ BlokType::kBlok_Bar };
    };
 
@@ -124,8 +124,8 @@ private:
    void UpdateZoomExtents();
    void ResetRead();
    void ReadEchonestLine(const char* line);
-   float StartTime(const Blok& blok);
-   float GetInsertPosition(int& insertIndex);
+   double StartTime(const Blok& blok);
+   double GetInsertPosition(int& insertIndex);
    void PlaceHeldBlok();
    Blok* RemoveBlokAt(int x);
 
@@ -157,7 +157,7 @@ private:
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    ClickButton* mWriteButton{ nullptr };
-   float mPlayheadRemainder{ 0 };
+   double mPlayheadRemainder{ 0 };
    int mPlayheadWhole{ 0 };
    bool mWantWrite{ false };
    ClickButton* mDoubleLengthButton{ nullptr };
@@ -172,20 +172,20 @@ private:
    DropdownList* mDrawBlokTypeDropdown{ nullptr };
    bool mLoading{ false };
    Blok* mHeldBlok{ nullptr };
-   float mMouseX{ 0 };
-   float mMouseY{ 0 };
-   float mGrabOffsetX{ 0 };
-   float mGrabOffsetY{ 0 };
+   double mMouseX{ 0 };
+   double mMouseY{ 0 };
+   double mGrabOffsetX{ 0 };
+   double mGrabOffsetY{ 0 };
    ClickButton* mGetLuckyButton{ nullptr };
    ClickButton* mLoseYourselfButton{ nullptr };
 
-   float mRemixPlayhead{ 0 };
+   double mRemixPlayhead{ 0 };
    bool mPlayRemix{ false };
    Checkbox* mPlayRemixCheckbox{ nullptr };
    std::list<Blok*> mRemixBloks;
    JumpBlender mRemixJumpBlender;
    Blok* mLastPlayedRemixBlok{ nullptr };
-   float mLastLookupPlayhead{ 0 };
+   double mLastLookupPlayhead{ 0 };
    ClickButton* mClearRemixButton{ nullptr };
    double mRemixZoomStart{ 0 };
    FloatSlider* mRemixZoomStartSlider{ nullptr };
@@ -194,7 +194,7 @@ private:
    bool mBlockMultiPlaceEngaged{ false };
 
    bool mPlayBlokPreview{ false };
-   float mBlokPreviewPlayhead{ 0 };
+   double mBlokPreviewPlayhead{ 0 };
    Ramp mBlokPreviewRamp;
 
    bool mDrawSources{ false };

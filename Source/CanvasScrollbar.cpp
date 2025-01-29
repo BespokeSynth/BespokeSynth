@@ -51,11 +51,11 @@ void CanvasScrollbar::Render()
       SetDimensions(10, canvasRect.height);
    }
 
-   if (mAutoHide && GetBarStart() == 0)
+   if (mAutoHide && ofAlmostEquel(GetBarStart(), 0))
    {
-      if (mStyle == Style::kHorizontal && GetBarEnd() == mWidth)
+      if (mStyle == Style::kHorizontal && ofAlmostEquel(GetBarEnd(), mWidth))
          return;
-      if (mStyle == Style::kVertical && GetBarEnd() == mHeight)
+      if (mStyle == Style::kVertical && ofAlmostEquel(GetBarEnd(), mHeight))
          return;
    }
 
@@ -119,12 +119,12 @@ bool CanvasScrollbar::MouseMoved(float x, float y)
       mDragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
       if (mStyle == Style::kHorizontal)
       {
-         float viewLength = mCanvas->mViewEnd - mCanvas->mViewStart;
+         double viewLength = mCanvas->mViewEnd - mCanvas->mViewStart;
          mCanvas->mViewStart = ofClamp((x - mScrollBarOffset) / mWidth * mCanvas->GetLength(), 0, mCanvas->GetLength() - viewLength);
          mCanvas->mViewEnd = mCanvas->mViewStart + viewLength;
       }
       if (mStyle == Style::kVertical)
-         mCanvas->SetRowOffset(ofClamp(int(ofMap(y - mScrollBarOffset, 0, mHeight, 0, mCanvas->GetNumRows()) + .5f), 0, mCanvas->GetNumRows() - mCanvas->GetNumVisibleRows()));
+         mCanvas->SetRowOffset(ofClamp(int(ofMap(y - mScrollBarOffset, 0, mHeight, 0, mCanvas->GetNumRows()) + .5), 0, mCanvas->GetNumRows() - mCanvas->GetNumVisibleRows()));
    }
 
    return false;

@@ -175,7 +175,7 @@ void ADSRDisplay::Render()
       }
 
       ofPushStyle();
-      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
+      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5);
       float x = drawTime / mMaxTime * mWidth;
       float y = (1 - mAdsr->Value(drawTime, &adsrEvent) * mVol) * mHeight;
       if (drawTime >= timeBeforeSustain && drawTime <= releaseTime)
@@ -298,12 +298,12 @@ void ADSRDisplay::Render()
    }
 }
 
-ofVec2f ADSRDisplay::GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent)
+ofVec2d ADSRDisplay::GetDrawPoint(double time, const ADSR::EventInfo& adsrEvent)
 {
-   float value = mAdsr->Value(time, &adsrEvent) * mVol;
-   float x = time / mMaxTime * mWidth;
-   float y = mHeight * (1 - value);
-   return ofVec2f(x, y);
+   double value = mAdsr->Value(time, &adsrEvent) * mVol;
+   double x = time / mMaxTime * mWidth;
+   double y = mHeight * (1 - value);
+   return ofVec2d(x, y);
 }
 
 void ADSRDisplay::SetMaxTime(double maxTime)
@@ -498,7 +498,7 @@ bool ADSRDisplay::MouseMoved(float x, float y)
    {
       if (mAdsr == nullptr)
          return false;
-      float mousePosSq = (x - mClickStart.x) / mWidth;
+      double mousePosSq = (x - mClickStart.x) / mWidth;
       if (mousePosSq > 0)
          mousePosSq *= mousePosSq;
       switch (mAdjustMode)
@@ -511,27 +511,27 @@ bool ADSRDisplay::MouseMoved(float x, float y)
          case kAdjustAttack:
          case kAdjustAttackAR:
          {
-            float a = ofClamp(mClickAdsr.GetA() + mousePosSq * mMaxTime * .1, 1, mMaxTime);
+            double a = ofClamp(mClickAdsr.GetA() + mousePosSq * mMaxTime * .1, 1, mMaxTime);
             mAdsr->GetA() = a;
             break;
          }
          case kAdjustDecaySustain:
          {
-            float d = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
+            double d = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
             mAdsr->GetD() = d;
-            float s = ofClamp(mClickAdsr.GetS() + (mClickStart.y - y) / mHeight, 0, 1);
+            double s = ofClamp(mClickAdsr.GetS() + (mClickStart.y - y) / mHeight, 0, 1);
             mAdsr->GetS() = s;
             break;
          }
          case kAdjustRelease:
          {
-            float r = ofClamp(mClickAdsr.GetR() + mousePosSq * mMaxTime, 1, mMaxTime);
+            double r = ofClamp(mClickAdsr.GetR() + mousePosSq * mMaxTime, 1, mMaxTime);
             mAdsr->GetR() = r;
             break;
          }
          case kAdjustReleaseAR:
          {
-            float r = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
+            double r = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
             mAdsr->GetD() = r;
             break;
          }

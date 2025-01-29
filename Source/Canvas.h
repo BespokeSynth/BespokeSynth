@@ -91,7 +91,7 @@ public:
    }
    float GetWidth() const { return mWidth; }
    float GetHeight() const { return mHeight; }
-   void SetLength(float length) { mLength = length; }
+   void SetLength(double length) { mLength = length; }
    double GetLength() const { return mLength; }
    void SetNumRows(int rows) { mNumRows = rows; }
    void SetNumCols(int cols) { mNumCols = cols; }
@@ -105,11 +105,11 @@ public:
    void SetControls(CanvasControls* controls) { mControls = controls; }
    CanvasControls* GetControls() { return mControls; }
    std::vector<CanvasElement*>& GetElements() { return mElements; }
-   void FillElementsAt(float pos, std::vector<CanvasElement*>& elements) const;
-   void EraseElementsAt(float pos);
-   CanvasElement* GetElementAt(float pos, int row);
-   void SetCursorPos(float pos) { mCursorPos = pos; }
-   float GetCursorPos() const { return mCursorPos; }
+   void FillElementsAt(double pos, std::vector<CanvasElement*>& elements) const;
+   void EraseElementsAt(double pos);
+   CanvasElement* GetElementAt(double pos, int row);
+   void SetCursorPos(double pos) { mCursorPos = pos; }
+   double GetCursorPos() const { return mCursorPos; }
    CanvasElement* CreateElement(int col, int row) { return mElementCreator(this, col, row); }
    CanvasCoord GetCoordAt(int x, int y);
    void SetNumVisibleRows(int rows) { mNumVisibleRows = rows; }

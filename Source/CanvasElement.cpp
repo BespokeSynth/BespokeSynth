@@ -324,8 +324,8 @@ void CanvasElement::LoadState(FileStreamIn& in)
    {
       float a, b;
       in >> a >> b;
-      mOffset = a;
-      mLength = b;
+      mOffset = static_cast<double>(a);
+      mLength = static_cast<double>(b);
    }
    else
    {
@@ -336,7 +336,7 @@ void CanvasElement::LoadState(FileStreamIn& in)
 
 ////////////////////
 
-NoteCanvasElement::NoteCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
+NoteCanvasElement::NoteCanvasElement(Canvas* canvas, int col, int row, double offset, double length)
 : CanvasElement(canvas, col, row, offset, length)
 {
    if (canvas != nullptr && canvas->GetControls())
@@ -374,7 +374,7 @@ void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    rect.y += (fullHeight - rect.height) * .5f;
    if (rect.width > 0)
    {
-      ofSetColorGradient(ofColor::white, ofColor(210, 210, 210), ofVec2f(ofLerp(rect.getMinX(), rect.getMaxX(), .5f), rect.y), ofVec2f(rect.getMaxX(), rect.y));
+      ofSetColorGradient(ofColor::white, ofColor(210, 210, 210), ofVec2f(ofLerp(rect.getMinX(), rect.getMaxX(), .5), rect.y), ofVec2f(rect.getMaxX(), rect.y));
       ofRect(rect, 0);
    }
 
@@ -410,20 +410,20 @@ void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    ofPopStyle();
 }
 
-void NoteCanvasElement::UpdateModulation(float pos)
+void NoteCanvasElement::UpdateModulation(double pos)
 {
-   float curveTime = (pos - GetStart()) * mCanvas->GetLength();
-   curveTime = FloatWrap(curveTime, mCanvas->GetLength());
+   double curveTime = (pos - GetStart()) * mCanvas->GetLength();
+   curveTime = DoubleWrap(curveTime, mCanvas->GetLength());
    mPitchBend.SetValue(mPitchBendCurve.Evaluate(curveTime));
    mModWheel.SetValue(mModWheelCurve.Evaluate(curveTime));
    mPressure.SetValue(mPressureCurve.Evaluate(curveTime));
    mPan = mPanCurve.Evaluate(curveTime);
 }
 
-void NoteCanvasElement::WriteModulation(float pos, float pitchBend, float modWheel, float pressure, float pan)
+void NoteCanvasElement::WriteModulation(double pos, double pitchBend, double modWheel, double pressure, double pan)
 {
-   float curveTime = (pos - GetStart()) * mCanvas->GetLength();
-   curveTime = FloatWrap(curveTime, mCanvas->GetLength());
+   double curveTime = (pos - GetStart()) * mCanvas->GetLength();
+   curveTime = DoubleWrap(curveTime, mCanvas->GetLength());
    mPitchBendCurve.AddPoint(CurvePoint(curveTime, pitchBend));
    mModWheelCurve.AddPoint(CurvePoint(curveTime, modWheel));
    mPressureCurve.AddPoint(CurvePoint(curveTime, pressure));
@@ -461,7 +461,7 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
    {
       float a;
       in >> a;
-      mVelocity = a;
+      mVelocity = static_cast<double>(a);
    }
    else
       in >> mVelocity;
@@ -477,7 +477,7 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
 
 /////////////////////
 
-SampleCanvasElement::SampleCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
+SampleCanvasElement::SampleCanvasElement(Canvas* canvas, int col, int row, double offset, double length)
 : CanvasElement(canvas, col, row, offset, length)
 {
    mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()), "offset", 0, 0, 100, 15, &mOffset, -1, 1);
@@ -532,7 +532,7 @@ void SampleCanvasElement::ButtonClicked(std::string label, double time)
       element->mSample->Create(secondHalf);
       element->mVolume = mVolume;
       element->mMute = mMute;
-      element->SetStart((GetStart() + GetEnd()) * .5f, false);
+      element->SetStart((GetStart() + GetEnd()) * .5, false);
       mCanvas->AddElement(element);
 
       mSample->Create(firstHalf);
@@ -543,8 +543,8 @@ void SampleCanvasElement::ButtonClicked(std::string label, double time)
       SampleCanvas* sampleCanvas = dynamic_cast<SampleCanvas*>(mCanvas->GetParent());
       if (sampleCanvas != nullptr)
       {
-         float lengthMs = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRateMs;
-         float lengthOriginalSpeed = lengthMs / TheTransport->GetDuration(sampleCanvas->GetInterval());
+         double lengthMs = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRateMs;
+         double lengthOriginalSpeed = lengthMs / TheTransport->GetDuration(sampleCanvas->GetInterval());
          mLength = lengthOriginalSpeed;
       }
    }
@@ -640,7 +640,7 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
    {
       float a;
       in >> a;
-      mVolume = a;
+      mVolume = static_cast<double>(a);
    }
    else
       in >> mVolume;
@@ -655,8 +655,8 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
 
 /////////////////////
 
-EventCanvasElement::EventCanvasElement(Canvas* canvas, int col, int row, float offset)
-: CanvasElement(canvas, col, row, offset, .5f)
+EventCanvasElement::EventCanvasElement(Canvas* canvas, int col, int row, double offset)
+: CanvasElement(canvas, col, row, offset, .5)
 {
    mValueEntry = new TextEntry(dynamic_cast<ITextEntryListener*>(canvas->GetControls()), "value", 60, 2, 7, &mValue, -99999, 99999);
    AddElementUIControl(mValueEntry);
@@ -757,8 +757,8 @@ double EventCanvasElement::GetEnd() const
    if (mIsCheckbox) //normal resizable element
       return CanvasElement::GetEnd();
 
-   float size = 4;
-   float span = mCanvas->mViewEnd - mCanvas->mViewStart;
+   double size = 4;
+   double span = mCanvas->mViewEnd - mCanvas->mViewStart;
    return GetStart() + size * span / mCanvas->GetWidth();
 }
 
@@ -788,7 +788,7 @@ void EventCanvasElement::LoadState(FileStreamIn& in)
    {
       float a;
       in >> a;
-      mValue = a;
+      mValue = static_cast<double>(a);
    }
    else
       in >> mValue;

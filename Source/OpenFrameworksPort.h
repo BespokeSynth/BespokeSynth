@@ -151,6 +151,13 @@ struct ofVec3
 typedef ofVec3<float> ofVec3f;
 typedef ofVec3<double> ofVec3d;
 
+#ifdef min // #Blame minwindef.h
+#undef min
+#endif
+#ifdef max // #Blame minwindef.h
+#undef max
+#endif
+
 template <class T>
 struct ofRectangle_t
 {
@@ -251,7 +258,7 @@ inline std::string ofToString(const T& value, int precision)
 }
 
 template <class T>
-inline bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
+bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
 {
    // Chosen a different value for epsilon compared to std::numeric_limits<T>::epsilon() so that floating point values around 100000 still work correctly since the "vanilla" epsilon is based around a value of 1.
    if (std::is_same_v<T, float> && std::isnan(epsilon))
@@ -264,7 +271,7 @@ inline bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limit
 }
 
 template <class T, class U>
-inline bool ofAlmostEquel(const T& a, U& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
+bool ofAlmostEquel(const T& a, const U& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
 {
    return ofAlmostEquel(a, static_cast<T>(b), epsilon);
 }
@@ -316,7 +323,17 @@ void ofNoFill();
 void ofCircle(float x, float y, float radius);
 void ofRect(float x, float y, float width, float height, float cornerRadius = 3);
 void ofRect(const ofRectangle& rect, float cornerRadius = 3);
-double ofClamp(double val, double a, double b);
+
+template <class T, class U, class V>
+T ofClamp(const T val, const U a, const V b)
+{
+   if (val < a)
+      return a;
+   if (val > b)
+      return b;
+   return val;
+}
+
 ofVec2d ofPolToCar(double pos, double radius);
 ofVec2d ofCarToPol(double x, double y);
 double ofGetLastFrameTime();
@@ -331,7 +348,26 @@ void ofBeginShape();
 void ofEndShape(bool close = false);
 void ofVertex(float x, float y, float z = 0);
 void ofVertex(ofVec2f point);
-double ofMap(double val, double fromStart, double fromEnd, double toStart, double toEnd, bool clamp = false);
+
+template <class T>
+T ofMap(T val, T fromStart, T fromEnd, T toStart, T toEnd, bool clamp = false)
+{
+   T ret;
+   if (fromEnd - fromStart != 0)
+      ret = ((val - fromStart) / (fromEnd - fromStart)) * (toEnd - toStart) + toStart;
+   else
+      ret = toEnd;
+   if (clamp)
+      ret = ofClamp(ret, MIN(toStart, toEnd), MAX(toStart, toEnd));
+   return ret;
+}
+
+template <class T, class T1, class T2, class T3, class T4>
+T ofMap(T val, T1 fromStart, T2 fromEnd, T3 toStart, T4 toEnd, bool clamp = false)
+{
+   return ofMap(val, static_cast<T>(fromStart), static_cast<T>(fromEnd), static_cast<T>(toStart), static_cast<T>(toEnd), clamp);
+}
+
 double ofRandom(double max);
 double ofRandom(double x, double y);
 void ofSetCircleResolution(float res);
@@ -339,8 +375,29 @@ unsigned long long ofGetSystemTimeNanos();
 float ofGetWidth();
 float ofGetHeight();
 double ofGetFrameRate();
-double ofLerp(double start, double stop, double amt);
-float ofDistSquared(float x1, float y1, float x2, float y2);
+
+template <class T>
+T ofLerp(T start, T stop, T amt)
+{
+   return start + (stop - start) * amt;
+}
+template <class T, class T1, class T2>
+T ofLerp(T start, T1 stop, T2 amt)
+{
+   return ofLerp(start, static_cast<T>(stop), static_cast<T>(amt));
+}
+
+template <class T>
+T ofDistSquared(T x1, T y1, T x2, T y2)
+{
+   return ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+template <class T, class T1, class T2, class T3>
+T ofDistSquared(T x1, T1 y1, T2 x2, T3 y2)
+{
+   return ofDistSquared(x1, static_cast<T>(y1), static_cast<T>(x2), static_cast<T>(y2));
+}
+
 std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty = false, bool trim = false);
 bool ofIsStringInString(const std::string& haystack, const std::string& needle);
 void ofScale(float x, float y, float z);
