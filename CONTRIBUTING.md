@@ -50,13 +50,13 @@ If you then still feel the need to ask a question and need clarification, we rec
 - Provide project, platform and plugin versions.
 - Provide a savestate to reproduce the issue, when applicable.
 
-We will then take care of the issue as soon as posssible.
+We will then take care of the issue as soon as possible.
 
 
 ## I Want To Contribute
 
 > ### Legal Notice <!-- omit in toc -->
-> When contributing to this project, you must agree that you have authored 100% of the content, that you have the necessary rights to the content and that the content you contribute may be provided under the project licence.
+> When contributing to this project, you must agree that you have authored 100% of the content, that you have the necessary rights to the content and that the content you contribute may be provided under the project license.
 
 
 ### Reporting Bugs
@@ -68,7 +68,7 @@ We will then take care of the issue as soon as posssible.
 We ask you to investigate carefully, collect information and describe the issue in detail in your report. Please complete the following steps in advance to help us fix any potential bug as fast as possible.
 
 - Make sure that you are using the latest version.
-- Determine if your bug is really a bug and not an error on your side e.g. using incompatible environment components/versions (Make sure that you have read the [documentation](https://www.bespokesynth.com/docs/index.html and the [community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki)). If you are looking for support, you might want to check [this section](#i-have-a-question)).
+- Determine if your bug is really a bug and not an error on your side e.g. using incompatible environment components/versions (Make sure that you have read the [documentation](https://www.bespokesynth.com/docs/index.html) and the [community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki). If you are looking for support, you might want to check [this section](#i-have-a-question)).
 - To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/BespokeSynth/BespokeSynth/issues?q=label%3Abug).
 - Also make sure to search [our Discord](https://discord.gg/YdTMkvvpZZ) to see if other users have discussed the issue.
 - Collect information about the bug:
@@ -95,7 +95,7 @@ Once it's filed:
 
 - The project team will label the issue accordingly.
 - A team member will try to reproduce the issue with your provided steps. If there are no reproduction steps or no obvious way to reproduce the issue, the team will ask you for those steps and mark the issue as `need more info`. Bugs with the `need more info` tag will not be addressed until they are reproduced.
-- If the team is able to reproduce the issue, they likely will mention this in the issue, as well as possibly add other tags (such as the size or priority), and the issue will be left to be [resolved by a code contributer](#code-contributing).
+- If the team is able to reproduce the issue, they likely will mention this in the issue, as well as possibly add other tags (such as the size or priority), and the issue will be left to be [resolved by a code contributor](#code-contributing).
 
 
 ### Suggesting Enhancements
