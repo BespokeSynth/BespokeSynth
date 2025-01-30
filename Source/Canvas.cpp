@@ -298,7 +298,7 @@ bool Canvas::MouseMoved(float x, float y)
       ofVec2f scaled = RescaleForZoom(x, y);
       if (mDragEnd == kHighlightEnd_Start)
       {
-         double  oldStart = mClickedElement->GetStart();
+         double oldStart = mClickedElement->GetStart();
          double newStart = scaled.x / GetWidth() / mLength;
          double startDelta = newStart - oldStart;
          for (auto* element : mElements)

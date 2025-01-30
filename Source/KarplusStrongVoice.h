@@ -81,7 +81,7 @@ public:
 
 private:
    void DoParameterUpdate(int samplesIn,
-                          int oversampling, double & pitch, double & freq, double & filterRate, double & filterLerp, double & oscPhaseInc);
+                          int oversampling, double& pitch, double& freq, double& filterRate, double& filterLerp, double& oscPhaseInc);
 
    double mOscPhase{ 0 };
    EnvOscillator mOsc{ OscillatorType::kOsc_Sin };

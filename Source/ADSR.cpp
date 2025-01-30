@@ -256,7 +256,7 @@ void ::ADSR::LoadState(FileStreamIn& in)
    {
       float a;
       in >> a;
-      mMaxSustain = a;
+      mMaxSustain = static_cast<double>(a);
    }
    else
       in >> mMaxSustain;
@@ -274,9 +274,9 @@ void ::ADSR::LoadState(FileStreamIn& in)
          in >> a;
          in >> b;
          in >> c;
-         mStages[i].curve = a;
-         mStages[i].target = b;
-         mStages[i].time = c;
+         mStages[i].curve = static_cast<double>(a);
+         mStages[i].target = static_cast<double>(b);
+         mStages[i].time = static_cast<double>(c);
       }
       else
       {
@@ -292,7 +292,7 @@ void ::ADSR::LoadState(FileStreamIn& in)
       {
          float a;
          in >> a;
-         mTimeScale = a;
+         mTimeScale = static_cast<double>(a);
       }
       else
          in >> mTimeScale;

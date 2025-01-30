@@ -176,8 +176,8 @@ void ADSRDisplay::Render()
 
       ofPushStyle();
       ofSetColor(0, 255, 0, gModuleDrawAlpha * .5);
-      float x = drawTime / mMaxTime * mWidth;
-      float y = (1 - mAdsr->Value(drawTime, &adsrEvent) * mVol) * mHeight;
+      double x = drawTime / mMaxTime * mWidth;
+      double y = (1 - mAdsr->Value(drawTime, &adsrEvent) * mVol) * mHeight;
       if (drawTime >= timeBeforeSustain && drawTime <= releaseTime)
       {
          ofSetLineWidth(1.5f);
@@ -203,8 +203,8 @@ void ADSRDisplay::Render()
          //int indexPast = (indexLeading - 1 + (int)mDrawTimeHistory.size()) % (int)mDrawTimeHistory.size();
          double timeLeading = mDrawTimeHistory[indexLeading];
          //double timePast = mDrawTimeHistory[indexPast];
-         float xLeading = timeLeading / mMaxTime * mWidth;
-         float yLeading = (1 - mAdsr->Value(timeLeading, &adsrEvent) * mVol) * mHeight;
+         double xLeading = timeLeading / mMaxTime * mWidth;
+         double yLeading = (1 - mAdsr->Value(timeLeading, &adsrEvent) * mVol) * mHeight;
          //float xPast = timePast / mMaxTime * mWidth;
          //float yPast = (1 - mAdsr->Value(timePast, &adsrEvent) * mVol) * mHeight;
 
