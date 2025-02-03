@@ -286,6 +286,7 @@ private:
    bool mMouseDown;
    int mOriginalValue;
    IIntSliderListener* mOwner;
+   int mFineRefX{ -999 };
 
    int mLastDisplayedValue;
    int mLastSetValue;
