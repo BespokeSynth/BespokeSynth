@@ -85,7 +85,7 @@ void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
    }
 }
 
-void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation)
+int PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation)
 {
    assert(voiceIdx < kNumVoices);
 
@@ -123,7 +123,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       }
       else
       {
-         return;
+         return voiceIdx;
       }
    }
 
@@ -152,6 +152,8 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    mVoices[voiceIdx].mPitch = pitch;
    mVoices[voiceIdx].mTime = time;
    mVoices[voiceIdx].mNoteOn = true;
+
+   return voiceIdx;
 }
 
 void PolyphonyMgr::Stop(double time, int pitch, int voiceIdx)

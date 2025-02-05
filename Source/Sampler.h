@@ -35,12 +35,13 @@
 #include "ADSRDisplay.h"
 #include "Checkbox.h"
 #include "PitchDetector.h"
+#include "TextEntry.h"
+#include "ClickButton.h"
+#include "Sample.h"
 
 class ofxJSONElement;
 
-#define MAX_SAMPLER_LENGTH 2 * 48000
-
-class Sampler : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener
+class Sampler : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    Sampler();
@@ -73,22 +74,35 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void TextEntryComplete(TextEntry* entry) override {}
+   void ButtonClicked(ClickButton* button, double time) override;
+
+   bool HasDebugDraw() const override { return true; }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    void StopRecording();
-   float DetectSampleFrequency();
+   float DetectSamplePitch();
+   void UpdateForNewSample();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void DrawModuleUnclipped() override;
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   float mWidth{ 100 };
+   float mHeight{ 100 };
 
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
@@ -97,18 +111,33 @@ private:
    ADSRDisplay* mADSRDisplay{ nullptr };
    double mThresh{ .2 };
    FloatSlider* mThreshSlider{ nullptr };
+   IntSlider* mStartSlider{ nullptr };
+   IntSlider* mStopSlider{ nullptr };
+   bool mSustainLoop{ false };
+   Checkbox* mSustainLoopCheckbox{ nullptr };
+   IntSlider* mSustainLoopStartSlider{ nullptr };
+   IntSlider* mSustainLoopEndSlider{ nullptr };
 
-   float* mSampleData{ nullptr };
+   Sample mSample{};
    int mRecordPos{ 0 };
    bool mRecording{ false };
    Checkbox* mRecordCheckbox{ nullptr };
-   bool mPitchCorrect{ false };
-   Checkbox* mPitchCorrectCheckbox{ nullptr };
+   ClickButton* mDetectPitchButton{ nullptr };
    bool mPassthrough{ false };
    Checkbox* mPassthroughCheckbox{ nullptr };
+   TextEntry* mSamplePitchEntry{ nullptr };
+   int mMostRecentVoiceIdx{ -1 };
 
    ChannelBuffer mWriteBuffer;
 
    PitchDetector mPitchDetector;
-   bool mWantDetectPitch{ false };
+
+   struct DebugLine
+   {
+      std::string text;
+      ofColor color;
+   };
+
+   std::array<DebugLine, 20> mDebugLines;
+   int mDebugLinesPos{ 0 };
 };
