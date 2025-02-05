@@ -499,8 +499,8 @@ void BeatBloks::OnClicked(float x, float y, bool right)
       y -= mBufferY;
       if (y < MEASURE_ZONE_HEIGHT) //clicked measure
       {
-         float zoomPos = x / mBufferW;
-         float pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
+         double zoomPos = x / mBufferW;
+         double pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
          for (int i = 0; i < mBars.size(); ++i)
          {
             if (StartTime(mBars[i]) < pos && pos < StartTime(mBars[i]) + mBars[i].mDuration)
@@ -509,8 +509,8 @@ void BeatBloks::OnClicked(float x, float y, bool right)
       }
       else if (y > mBufferH - BEAT_ZONE_HEIGHT) //clicked beat
       {
-         float zoomPos = x / mBufferW;
-         float pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
+         double zoomPos = x / mBufferW;
+         double pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
          for (int i = 0; i < mBeats.size(); ++i)
          {
             if (StartTime(mBeats[i]) < pos && pos < StartTime(mBeats[i]) + mBeats[i].mDuration)
@@ -519,8 +519,8 @@ void BeatBloks::OnClicked(float x, float y, bool right)
       }
       else //clicked tatum
       {
-         float zoomPos = x / mBufferW;
-         float pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
+         double zoomPos = x / mBufferW;
+         double pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
          for (int i = 0; i < mTatums.size(); ++i)
          {
             if (StartTime(mTatums[i]) < pos && pos < StartTime(mTatums[i]) + mTatums[i].mDuration)
@@ -537,7 +537,7 @@ void BeatBloks::OnClicked(float x, float y, bool right)
          }
          else
          {
-            float pos = ofMap(StartTime(*mHeldBlok), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
+            double pos = ofMap(StartTime(*mHeldBlok), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
             mGrabOffsetX = x - mBufferW * pos;
 
             mGrabOffsetY = y;

@@ -66,7 +66,16 @@ public:
    bool UsesQ() { return true; } // return mType == kFilterType_Lowpass || mType == kFilterType_Highpass || mType == kFilterType_Bandpass || mType == kFilterType_Notch || mType == kFilterType_Peak; }
    double GetMagnitudeResponseAt(double f);
 
-   double Filter(double sample);
+  template <class T>
+   T Filter(T in)
+   {
+      T out = in * mA0 + mZ1;
+      mZ1 = in * mA1 + mZ2 - mB1 * out;
+      mZ2 = in * mA2 - mB2 * out;
+      if (std::isnan(out) || std::isinf(out))
+         Clear();
+      return out;
+   }
    void Filter(float* buffer, int bufferSize);
 
    double mF{ 4000 };
@@ -84,13 +93,3 @@ private:
    double mZ2{ 0 };
    double mSampleRate;
 };
-
-inline double BiquadFilter::Filter(double in)
-{
-   double out = in * mA0 + mZ1;
-   mZ1 = in * mA1 + mZ2 - mB1 * out;
-   mZ2 = in * mA2 - mB2 * out;
-   if (std::isnan(out) || std::isinf(out))
-      Clear();
-   return out;
-}
