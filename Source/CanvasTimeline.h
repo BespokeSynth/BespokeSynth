@@ -79,8 +79,8 @@ private:
    float mWidth{ 200 };
    float mHeight{ 20 };
    bool mClick{ false };
-   ofVec2f mClickMousePos;
-   ofVec2f mDragOffset;
+   ofVec2d mClickMousePos;
+   ofVec2d mDragOffset;
    HoverMode mHoverMode{ HoverMode::kNone };
 
    Canvas* mCanvas{ nullptr };

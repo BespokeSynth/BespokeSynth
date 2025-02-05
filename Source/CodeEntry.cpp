@@ -304,7 +304,7 @@ void CodeEntry::Render()
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255, 0, 0, gModuleDrawAlpha * .5f);
+      ofSetColor(255, 0, 0, gModuleDrawAlpha * .5);
       ofRect(mX, mErrorLine * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight, L(corner, 2));
       ofFill();
    }
@@ -314,7 +314,7 @@ void CodeEntry::Render()
 
    if (hasUnpublishedCode)
    {
-      ofSetColor(color, gModuleDrawAlpha * .05f);
+      ofSetColor(color, gModuleDrawAlpha * .05);
       gFontFixedWidth.DrawString(mPublishedString, mFontSize, mX + 2 - mScroll.x, mY + mCharHeight - mScroll.y);
    }
 
@@ -530,11 +530,11 @@ void CodeEntry::DrawSyntaxHighlight(std::string input, ofColor color, std::vecto
    std::string filtered = FilterText(input, mapping, filter1, filter2);
    ofSetColor(color, gModuleDrawAlpha);
 
-   float shake = (1 - ofClamp((gTime - mLastPublishTime) / 150, 0, 1)) * 3.0f;
+   double shake = (1 - ofClamp((gTime - mLastPublishTime) / 150, 0, 1)) * 3.0;
    if (TheSynth->IsAudioPaused())
       shake = 0;
-   float offsetX = ofRandom(-shake, shake);
-   float offsetY = ofRandom(-shake, shake);
+   double offsetX = ofRandom(-shake, shake);
+   double offsetY = ofRandom(-shake, shake);
 
    gFontFixedWidth.DrawString(filtered, mFontSize, mX + 2 - mScroll.x + offsetX, mY + mCharHeight - mScroll.y + offsetY);
 }

@@ -260,13 +260,17 @@ inline std::string ofToString(const T& value, int precision)
 template <class T>
 bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limits<T>::quiet_NaN())
 {
+   if (std::is_integral_v<T>) // In case someone uses this to compare integral values
+      return a == b;
    // Chosen a different value for epsilon compared to std::numeric_limits<T>::epsilon() so that floating point values around 100000 still work correctly since the "vanilla" epsilon is based around a value of 1.
    if (std::is_same_v<T, float> && std::isnan(epsilon))
-      epsilon = 0.0001f;
+      epsilon = 0.001f;
    else if (std::is_same_v<T, double> && std::isnan(epsilon))
-      epsilon = 0.0000000000001;
+      epsilon = 0.00000000001;
    else if (std::is_same_v<T, long double> && std::isnan(epsilon))
       epsilon = 0.00000000000000000000000001L;
+   if (std::isnan(epsilon)) // float128 or some such? std::float128_t is C++23 and we haven't switched to c++20 yet. But instead of returning something definitely incorrect we use the types epsilon instead.
+      epsilon = std::numeric_limits<T>::epsilon();
    return std::fabs(a - b) < epsilon;
 }
 
@@ -368,8 +372,10 @@ T ofMap(T val, T1 fromStart, T2 fromEnd, T3 toStart, T4 toEnd, bool clamp = fals
    return ofMap(val, static_cast<T>(fromStart), static_cast<T>(fromEnd), static_cast<T>(toStart), static_cast<T>(toEnd), clamp);
 }
 
-double ofRandom(double max);
-double ofRandom(double x, double y);
+template <class T>
+T ofRandom(T max);
+template <class T>
+T ofRandom(T x, T y);
 void ofSetCircleResolution(float res);
 unsigned long long ofGetSystemTimeNanos();
 float ofGetWidth();

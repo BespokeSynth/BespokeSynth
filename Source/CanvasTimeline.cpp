@@ -119,7 +119,7 @@ void CanvasTimeline::DrawTriangle(double posX, int direction)
 double CanvasTimeline::GetQuantizedForX(double posX, HoverMode clampSide)
 {
    double pos = ((posX / mWidth) * (mCanvas->mViewEnd - mCanvas->mViewStart)) + mCanvas->mViewStart;
-   int measure = CLAMP(int(pos + .5f), 0, mCanvas->GetLength());
+   int measure = CLAMP(std::round(pos), 0.0, mCanvas->GetLength());
    if (clampSide == HoverMode::kStart)
    {
       if (measure >= mCanvas->mLoopEnd)

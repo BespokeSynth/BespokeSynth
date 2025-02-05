@@ -46,7 +46,7 @@ public:
 
    void CreateUIControls() override;
 
-   void AddTone(int tone, float velocity = 1);
+   void AddTone(int tone, double velocity = 1);
    void RemoveTone(int tone);
 
    //INoteReceiver

@@ -81,7 +81,7 @@ void CircleSequencer::DrawModule()
 
    ofPushStyle();
    ofSetColor(ofColor::lime);
-   float pos = TheTransport->GetMeasurePos(gTime);
+   double pos = TheTransport->GetMeasurePos(gTime);
    ofVec2f end = ofPolToCar(pos, 100);
    ofLine(100, 100, 100 + end.x, 100 + end.y);
    ofPopStyle();
@@ -175,7 +175,7 @@ void CircleSequencerRing::CreateUIControls()
    int y = mIndex * 20 + 20;
    mLengthSelector = new DropdownList(mOwner, ("length" + ofToString(mIndex)).c_str(), 220, y, &mLength);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), 260, y, 4, &mPitch, 0, 127);
-   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 300, y, 90, 15, &mOffset, -.25f, .25f, 2);
+   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 300, y, 90, 15, &mOffset, -.25, .25, 2);
 
    for (int i = 0; i < CIRCLE_SEQUENCER_MAX_STEPS; ++i)
       mLengthSelector->AddLabel(ofToString(i + 1).c_str(), i + 1);
@@ -210,7 +210,7 @@ void CircleSequencerRing::Draw()
    ofFill();
    for (int i = 0; i < mLength; ++i)
    {
-      float pos = float(i) / mLength - mOffset;
+      double pos = static_cast<double>(i) / mLength - mOffset;
       ofVec2f p1 = ofPolToCar(pos, GetRadius() - 3);
       ofVec2f p2 = ofPolToCar(pos, GetRadius() + 3);
       ofLine(p1.x + 100, p1.y + 100, p2.x + 100, p2.y + 100);

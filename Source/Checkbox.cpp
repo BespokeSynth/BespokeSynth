@@ -158,7 +158,7 @@ void Checkbox::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
    mSliderVal = slider;
-   bool on = GetValueForMidiCC(slider) > 0.5f;
+   bool on = GetValueForMidiCC(slider) > 0.5;
    if (*mVar != on)
    {
       *mVar = on;
@@ -169,12 +169,12 @@ void Checkbox::SetFromMidiCC(double slider, double time, bool setViaModulator)
 
 double Checkbox::GetValueForMidiCC(double slider) const
 {
-   return slider > .5f ? 1 : 0;
+   return slider > .5 ? 1 : 0;
 }
 
 void Checkbox::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
-   bool on = value > 0.5f;
+   bool on = value > 0.5;
    if (*mVar != on || forceUpdate)
    {
       *mVar = on;
@@ -226,14 +226,14 @@ void Checkbox::OnPulse(double time, float velocity, int flags)
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void Checkbox::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
 
-   out << (float)*mVar;
+   out << static_cast<double>(*mVar);
 }
 
 void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -242,8 +242,18 @@ void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
 
-   float var;
-   in >> var;
-   if (shouldSetValue)
-      SetValueDirect(var, gTime);
+   if (rev < 1)
+   {
+      float var;
+      in >> var;
+      if (shouldSetValue)
+         SetValueDirect(var, gTime);
+   }
+   else
+   {
+      double var;
+      in >> var;
+      if (shouldSetValue)
+         SetValueDirect(var, gTime);
+   }
 }

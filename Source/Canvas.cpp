@@ -515,7 +515,7 @@ bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool 
          SetRowOffset(GetRowOffset() + scrollWhole);
       }
 
-      float slideX = (mViewEnd - mViewStart) * -scrollX / 50;
+      double slideX = (mViewEnd - mViewStart) * -scrollX / 50;
       if (slideX > 0)
          slideX = MIN(slideX, mLength - mViewEnd);
       if (slideX < 0)

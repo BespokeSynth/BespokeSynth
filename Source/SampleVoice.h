@@ -38,7 +38,7 @@ public:
    ::ADSR mAdsr{ 1, 0, 1, 10 };
    double mVol{ 1 };
    Sample* mSample{ nullptr };
-   float mSamplePitch{ 48 };
+   double mSamplePitch{ 48 };
    int mStartSample{ 0 };
    int mStopSample{ -1 };
    int mSustainLoopStart{ -1 };
@@ -51,7 +51,7 @@ public:
    SampleVoice(IDrawableModule* owner = nullptr);
    ~SampleVoice();
 
-   float GetSamplePosition() const { return mPos; }
+   double GetSamplePosition() const { return mPos; }
 
    // IMidiVoice
    void Start(double time, double target) override;

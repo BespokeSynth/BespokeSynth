@@ -88,6 +88,6 @@ private:
    bool mDisplayText{ true };
    bool mUseCircleLook{ false };
    ofColor mCustomColor;
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    bool mLastSetValue{ false };
 };

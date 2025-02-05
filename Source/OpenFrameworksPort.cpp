@@ -398,13 +398,14 @@ void ofVertex(ofVec2f point)
    ofVertex(point.x, point.y);
 }
 
-
-double ofRandom(double max)
+template <class T>
+T ofRandom(T max)
 {
    return max * gRandom01(gRandom);
 }
 
-double ofRandom(double x, double y)
+template <class T>
+T ofRandom(T x, T y)
 {
    // if there is no range, return the value
    if (ofAlmostEquel(x, y))

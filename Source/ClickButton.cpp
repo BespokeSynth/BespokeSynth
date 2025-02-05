@@ -80,7 +80,7 @@ void ClickButton::Render()
    IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
    ofRect(mX + 1, mY + 1, w, h);
    DrawBeacon(mX + w / 2, mY + h / 2);
    double press = ofClamp((1 - (gTime - mClickTime) / 200), 0, 1);
