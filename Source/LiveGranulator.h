@@ -73,7 +73,7 @@ private:
       h = mHeight;
    }
 
-   float mBufferLength;
+   double mBufferLength;
    RollingBuffer mBuffer;
    Granulator mGranulator;
    FloatSlider* mGranOverlap{ nullptr };

@@ -263,7 +263,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    bool dimModule = TheSynth->ShouldDimModule(this);
 
    if (dimModule)
-      gModuleDrawAlpha *= .2f;
+      gModuleDrawAlpha *= .2;
 
    float enableToggleOffset = 0;
    if (HasTitleBar())

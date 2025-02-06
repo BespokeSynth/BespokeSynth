@@ -89,7 +89,7 @@ void GridModule::GridUpdated(UIGrid* grid, int col, int row, double value, doubl
    OnGridButton(col, row, value, nullptr);
 }
 
-void GridModule::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void GridModule::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (y < GetRows() && x < GetCols())
    {
@@ -105,7 +105,7 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
 
 void GridModule::PlayNote(NoteMessage note)
 {
-   OnGridButton(note.pitch % GetCols(), ((note.pitch / GetCols()) % GetRows()), note.velocity / 127.0f, nullptr);
+   OnGridButton(note.pitch % GetCols(), ((note.pitch / GetCols()) % GetRows()), note.velocity / 127.0, nullptr);
 }
 
 void GridModule::UpdateLights()
@@ -140,7 +140,7 @@ void GridModule::DrawModule()
    mGridControlTarget->Draw();
 
    ofPushStyle();
-   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
+   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
    for (int i = 0; i < mGrid->GetRows() && i < (int)mLabels.size(); ++i)
    {
       ofVec2f pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);

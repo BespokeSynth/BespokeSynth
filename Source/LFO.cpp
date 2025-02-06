@@ -85,9 +85,9 @@ double LFO::Value(int samplesIn /*= 0*/, double forcePhase /*= -1*/) const
    if (!ofAlmostEquel(forcePhase, -1.0) && !std::isnan(forcePhase))
       phase = forcePhase;
 
-   phase *= FTWO_PI;
+   phase *= TWO_PI;
 
-   float sample;
+   double sample;
    bool nonstandardOsc = false;
 
    //use sample-and-hold value
@@ -115,7 +115,7 @@ double LFO::Value(int samplesIn /*= 0*/, double forcePhase /*= -1*/) const
    {
       sample = mOsc.Value(phase);
       if (mMode == kLFOMode_Envelope) //rescale to 0 1
-         sample = sample * .5f + .5f;
+         sample = sample * .5 + .5;
    }
 
    if (nonstandardOsc)
@@ -124,7 +124,7 @@ double LFO::Value(int samplesIn /*= 0*/, double forcePhase /*= -1*/) const
          sample = Bias(sample, mOsc.GetPulseWidth());
 
       if (mMode == kLFOMode_Oscillator) //rescale to -1 1
-         sample = (sample - .5f * 2);
+         sample = (sample - .5 * 2);
    }
 
    return sample;

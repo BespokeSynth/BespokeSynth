@@ -158,7 +158,7 @@ void EQEffect::ButtonClicked(ClickButton* button, double time)
       {
          for (int i = 0; i < NUM_EQ_FILTERS; ++i)
          {
-            mMultiSlider->SetVal(i, 0, .5f);
+            mMultiSlider->SetVal(i, 0, .5);
             mBanks[ch].mBiquad[i].mDbGain = 0;
             if (ch == 0)
                mBanks[0].mBiquad[i].UpdateFilterCoeff();

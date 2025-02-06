@@ -54,7 +54,7 @@ public:
    int GetSteps();
    void SetOnsets(int onsets);
    void SetRotation(int rotation);
-   void SetOffset(float offset);
+   void SetOffset(double offset);
    void SetPitch(int pitch);
    int GetPitch();
    void MouseReleased();
@@ -68,11 +68,11 @@ public:
    void LoadState(FileStreamIn& in);
 
 private:
-   float GetRadius() { return 90 - mIndex * 15; }
-   int GetStepIndex(int x, int y, float& radiusOut);
+   double GetRadius() { return 90.0 - mIndex * 15; }
+   int GetStepIndex(int x, int y, double & radiusOut);
    EuclideanSequencer* mOwner{ nullptr };
    int mIndex{ 0 };
-   std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mSteps{};
+   std::array<double, EUCLIDEAN_SEQUENCER_MAX_STEPS> mSteps{};
    double mLength{ 4 };
    FloatSlider* mLengthSlider{ nullptr };
    double mOnset{ 4 };
@@ -88,7 +88,7 @@ private:
 
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
-   float mLastMouseRadius{ -1 };
+   double mLastMouseRadius{ -1 };
 
    std::string GetEuclideanRhythm(int pulses, int steps, int rotation);
 };
@@ -168,31 +168,31 @@ private:
    float mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
 
-   double mRndLengthChance{ 0.5f };
+   double mRndLengthChance{ 0.5 };
    FloatSlider* mRndLengthChanceSlider{ nullptr };
    double mRndLengthLo{ 1 };
    FloatSlider* mRndLengthLoSlider{ nullptr };
    double mRndLengthHi{ 24 };
    FloatSlider* mRndLengthHiSlider{ nullptr };
-   double mRndOnsetChance{ 0.5f };
+   double mRndOnsetChance{ 0.5 };
    FloatSlider* mRndOnsetChanceSlider{ nullptr };
    double mRndOnsetLo{ 1 };
    FloatSlider* mRndOnsetLoSlider{ nullptr };
    double mRndOnsetHi{ 12 };
    FloatSlider* mRndOnsetHiSlider{ nullptr };
-   double mRndRotationChance{ 0.5f };
+   double mRndRotationChance{ 0.5 };
    FloatSlider* mRndRotationChanceSlider{ nullptr };
    double mRndRotationLo{ 0 };
    FloatSlider* mRndRotationLoSlider{ nullptr };
    double mRndRotationHi{ 4 };
    FloatSlider* mRndRotationHiSlider{ nullptr };
-   double mRndOffsetChance{ 0.0f };
+   double mRndOffsetChance{ 0.0 };
    FloatSlider* mRndOffsetChanceSlider{ nullptr };
-   double mRndOffsetLo{ -0.1f };
+   double mRndOffsetLo{ -0.1 };
    FloatSlider* mRndOffsetLoSlider{ nullptr };
-   double mRndOffsetHi{ 0.1f };
+   double mRndOffsetHi{ 0.1 };
    FloatSlider* mRndOffsetHiSlider{ nullptr };
-   double mRndNoteChance{ 0.5f };
+   double mRndNoteChance{ 0.5 };
    FloatSlider* mRndNoteChanceSlider{ nullptr };
    double mRndOctaveLo{ 2 };
    FloatSlider* mRndOctaveLoSlider{ nullptr };

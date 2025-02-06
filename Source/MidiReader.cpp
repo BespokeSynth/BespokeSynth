@@ -67,7 +67,7 @@ void MidiReader::Read(const char* midiFileName)
    mSequencer = new MIDISequencer(&mTracks);*/
 }
 
-float MidiReader::GetTempo(double ms)
+double MidiReader::GetTempo(double ms)
 {
    /*if (mSequencer)
    {
@@ -89,9 +89,10 @@ int MidiReader::GetBeat(double ms)
    return 0;
 }
 
-void MidiReader::GetMeasurePos(double ms, int& measure, float& measurePos)
+void MidiReader::GetMeasurePos(double ms, int& measure, double& measurePos)
 {
-   /*if (mSequencer)
+   /*
+   if (mSequencer)
    {
       mSequencer->GoToTimeMs(ms);
       
@@ -102,7 +103,7 @@ void MidiReader::GetMeasurePos(double ms, int& measure, float& measurePos)
       double bpm = mSequencer->GetCurrentTempo();
       double bpms = bpm / 60 / 1000;
       double beatProgress = bpms * msIn;
-      measurePos = float((beat + beatProgress) / 4.0f);
+      measurePos = static_cast<double>((beat + beatProgress) / 4.0);
    }
    else
    {

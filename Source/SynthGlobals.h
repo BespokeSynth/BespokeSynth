@@ -238,7 +238,7 @@ bool EvaluateExpression(std::string expression, double currentValue, double& out
 double NextBufferTime(bool includeLookahead);
 bool IsAudioThread();
 
-inline static float RandomSample()
+static double RandomSample()
 {
    return gRandomBipolarDist(gRandom);
 }

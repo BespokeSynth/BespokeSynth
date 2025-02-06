@@ -104,18 +104,18 @@ void FubbleModule::Poll()
          {
             CurvePoint* pointH = mAxisH.mCurve.GetPoint(i);
             CurvePoint* pointV = mAxisV.mCurve.GetPoint(i);
-            float deltaH = ofMap(GetPerlinNoiseValue(perlinTime, pointH->mValue, pointV->mValue, true), 0, 1, -mPerlinStrength, mPerlinStrength) * .003f;
-            float deltaV = ofMap(GetPerlinNoiseValue(perlinTime, pointH->mValue, pointV->mValue, false), 0, 1, -mPerlinStrength, mPerlinStrength) * .003f;
+            double deltaH = ofMap(GetPerlinNoiseValue(perlinTime, pointH->mValue, pointV->mValue, true), 0, 1, -mPerlinStrength, mPerlinStrength) * .003;
+            double deltaV = ofMap(GetPerlinNoiseValue(perlinTime, pointH->mValue, pointV->mValue, false), 0, 1, -mPerlinStrength, mPerlinStrength) * .003;
 
             //try to keep in bounds
             if (pointH->mValue < 0)
-               deltaH -= pointH->mValue * .1f;
+               deltaH -= pointH->mValue * .1;
             if (pointH->mValue > 1)
-               deltaH -= (pointH->mValue - 1) * .1f;
+               deltaH -= (pointH->mValue - 1) * .1;
             if (pointV->mValue < 0)
-               deltaV -= pointV->mValue * .1f;
+               deltaV -= pointV->mValue * .1;
             if (pointV->mValue > 1)
-               deltaV -= (pointV->mValue - 1) * .1f;
+               deltaV -= (pointV->mValue - 1) * .1;
 
             pointH->mValue += deltaH;
             pointV->mValue += deltaV;
@@ -183,10 +183,10 @@ void FubbleModule::DrawModule()
    ofSetColor(GetColor(kModuleCategory_Modulator));
    ofPushMatrix();
    if (mAxisH.GetCableSource()->GetTarget())
-      DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), rect.width * .4f, rect.height - 2);
-   ofRotate(-PI * .5f);
+      DrawTextNormal(mAxisH.GetCableSource()->GetTarget()->Name(), rect.width * .4, rect.height - 2);
+   ofRotate(-PI * .5);
    if (mAxisV.GetCableSource()->GetTarget())
-      DrawTextNormal(mAxisV.GetCableSource()->GetTarget()->Name(), -rect.height * .6f, rect.width - 2);
+      DrawTextNormal(mAxisV.GetCableSource()->GetTarget()->Name(), -rect.height * .6, rect.width - 2);
    ofPopMatrix();
 
    //draw curve
@@ -196,10 +196,10 @@ void FubbleModule::DrawModule()
    ofSetColor(220, 220, 220);
    ofNoFill();
    ofBeginShape();
-   for (float t = 0; t < mLength; t += .01f)
+   for (double t = 0; t < mLength; t += .01)
    {
-      float x = mAxisH.mCurve.Evaluate(t) * rect.width;
-      float y = (1 - mAxisV.mCurve.Evaluate(t)) * rect.height;
+      double x = mAxisH.mCurve.Evaluate(t) * rect.width;
+      double y = (1 - mAxisV.mCurve.Evaluate(t)) * rect.height;
 
       ofVertex(x, y);
    }
@@ -223,9 +223,9 @@ void FubbleModule::DrawModule()
    ofSetColor(255, 255, 255);
    if (mAxisH.mHasRecorded)
    {
-      float time = mIsDrawing ? mRecordStartOffset : GetPlaybackTime(gTime);
-      float currentX = mAxisH.mCurve.Evaluate(time, true) * rect.width;
-      float currentY = (1 - mAxisV.mCurve.Evaluate(time, true)) * rect.height;
+      double time = mIsDrawing ? mRecordStartOffset : GetPlaybackTime(gTime);
+      double currentX = mAxisH.mCurve.Evaluate(time, true) * rect.width;
+      double currentY = (1 - mAxisV.mCurve.Evaluate(time, true)) * rect.height;
       ofCircle(currentX, currentY, 4);
    }
 
@@ -264,13 +264,13 @@ void FubbleModule::DrawModule()
 
    if (mLength > 0)
    {
-      float playbackTime = GetPlaybackTime(gTime);
-      float lineX = ofLerp(10, mWidth - 20, playbackTime / mLength);
+      double playbackTime = GetPlaybackTime(gTime);
+      double lineX = ofLerp(10.0, mWidth - 20, playbackTime / mLength);
       ofLine(lineX, mHeight - (kTimelineSectionHeight + kBottomControlHeight), lineX, mHeight - (kBottomControlHeight));
    }
 
-   float rightAlign = mWidth - 5;
-   float leftAlign = 5;
+   double rightAlign = mWidth - 5;
+   double leftAlign = 5;
    if (mAxisH.GetCableSource()->GetTarget() && mAxisH.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
       mAxisH.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
@@ -294,14 +294,14 @@ void FubbleModule::DrawModule()
    }
 }
 
-float FubbleModule::GetPerlinNoiseValue(double time, float x, float y, bool horizontal)
+double FubbleModule::GetPerlinNoiseValue(double time, double x, double y, bool horizontal)
 {
-   float perlinScale = mPerlinScale * 2.0f;
-   float perlinSpeed = mPerlinSpeed * .002f;
+   double perlinScale = mPerlinScale * 2.0;
+   double perlinSpeed = mPerlinSpeed * .002;
    if (horizontal)
       return mNoise.noise(x * perlinScale, y * perlinScale, time * perlinSpeed + mPerlinSeed);
    else
-      return mNoise.noise(y * perlinScale * .997f, x * perlinScale * .984f, time * 1.011f * perlinSpeed + 420 + mPerlinSeed);
+      return mNoise.noise(y * perlinScale * .997, x * perlinScale * .984, time * 1.011 * perlinSpeed + 420 + mPerlinSeed);
 }
 
 void FubbleModule::DrawModuleUnclipped()
@@ -364,7 +364,7 @@ bool FubbleModule::IsHovered()
 
 void FubbleModule::RecordPoint()
 {
-   float time = TheTransport->GetMeasureTime(gTime) - mRecordStartOffset;
+   double time = TheTransport->GetMeasureTime(gTime) - mRecordStartOffset;
    auto coord = GetFubbleMouseCoord();
    mAxisH.mCurve.AddPointAtEnd(CurvePoint(time, coord.x));
    mAxisV.mCurve.AddPointAtEnd(CurvePoint(time, coord.y));
@@ -386,11 +386,11 @@ void FubbleModule::MouseReleased()
       mIsDrawing = false;
       if (mQuantizeLength)
       {
-         float quantizeResolution = TheTransport->GetMeasureFraction(mQuantizeInterval);
+         double quantizeResolution = TheTransport->GetMeasureFraction(mQuantizeInterval);
          int quantizeIntervalSteps = juce::roundToInt(mLength / quantizeResolution);
          if (quantizeIntervalSteps <= 0)
             quantizeIntervalSteps = 1;
-         float quantizedLength = quantizeResolution * quantizeIntervalSteps;
+         double quantizedLength = quantizeResolution * quantizeIntervalSteps;
          mLength = quantizedLength;
          mAxisH.mCurve.SetExtents(0, mLength);
          mAxisV.mCurve.SetExtents(0, mLength);
@@ -553,7 +553,7 @@ void FubbleModule::LoadState(FileStreamIn& in, int rev)
       {
          float a;
          in >> a;
-         mLength = a;
+         mLength = static_cast<double>(a);
       }
       else
          in >> mLength;

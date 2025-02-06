@@ -114,25 +114,25 @@ void DotSequencer::DrawModule()
 
       if (RowToPitch(i) % TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot() % TheScale->GetPitchesPerOctave())
       {
-         ofSetColor(0, 255, 0, gModuleDrawAlpha * .05f);
+         ofSetColor(0, 255, 0, gModuleDrawAlpha * .05);
          ofLine(lineAcrossStart, lineAcrossEnd);
-         ofSetColor(0, 255, 0, gModuleDrawAlpha * .8f);
+         ofSetColor(0, 255, 0, gModuleDrawAlpha * .8);
       }
       else if (TheScale->GetPitchesPerOctave() == 12 && RowToPitch(i) % TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot() + 7) % TheScale->GetPitchesPerOctave())
       {
-         ofSetColor(200, 150, 0, gModuleDrawAlpha * .05f);
+         ofSetColor(200, 150, 0, gModuleDrawAlpha * .05);
          ofLine(lineAcrossStart, lineAcrossEnd);
-         ofSetColor(200, 150, 0, gModuleDrawAlpha * .8f);
+         ofSetColor(200, 150, 0, gModuleDrawAlpha * .8);
       }
       else if (mNoteMode == NoteMode::Chromatic && TheScale->IsInScale(RowToPitch(i)))
       {
-         ofSetColor(175, 100, 0, gModuleDrawAlpha * .05f);
+         ofSetColor(175, 100, 0, gModuleDrawAlpha * .05);
          ofLine(lineAcrossStart, lineAcrossEnd);
-         ofSetColor(175, 100, 0, gModuleDrawAlpha * .8f);
+         ofSetColor(175, 100, 0, gModuleDrawAlpha * .8);
       }
       else
       {
-         ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
+         ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
       }
 
       float scale = std::min(mDotGrid->IClickable::GetDimensions().y / mDotGrid->GetRows() - 2, 10.0f);
@@ -215,7 +215,7 @@ void DotSequencer::OnTransportAdvanced(double amount)
          }
          else
          {
-            double noteEnd = mPlayingDots[i].mPlayedTime + TheTransport->GetDuration(mInterval) * std::max(.5f, data.mLength);
+            double noteEnd = mPlayingDots[i].mPlayedTime + TheTransport->GetDuration(mInterval) * std::max(.5, data.mLength);
             if (noteEnd < NextBufferTime(K(includeLookahead)))
                noteOffTime = noteEnd;
          }

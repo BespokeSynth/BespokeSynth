@@ -161,14 +161,14 @@ void FloatSliderLFOControl::DrawModule()
    ofSetLineWidth(1);
 
    ofBeginShape();
-   for (float i = 0; i < width; i += (.25f / gDrawScale))
+   for (float i = 0; i < width; i += (.25 / gDrawScale))
    {
-      float phase = i / width;
+      double phase = i / width;
       if (mLFO.GetOsc()->GetShuffle() > 0)
          phase *= 2;
       if (mLFO.GetOsc()->GetType() != kOsc_Perlin)
          phase += 1 - mLFOSettings.mLFOOffset;
-      float value = GetLFOValue(0, mLFO.TransformPhase(phase));
+      double value = GetLFOValue(0, mLFO.TransformPhase(phase));
       ofVertex(i + x, ofMap(value, GetTargetMax(), GetTargetMin(), 0, height) + y);
    }
    ofEndShape(false);
@@ -302,18 +302,18 @@ void FloatSliderLFOControl::Load(LFOSettings settings)
 double FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
-   return GetLFOValue(samplesIn);
+   return GetLFOValue(samplesIn, -1);
 }
 
-float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase /*= -1*/)
+double FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, double forcePhase /*= -1*/)
 {
    double val = mLFO.Value(samplesIn, forcePhase);
    if (mLFOSettings.mSpread > 0)
-      val = val * (1 - mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
+      val = val * (1 - mLFOSettings.mSpread) + (-std::cos(val * FPI) + 1) * .5 * mLFOSettings.mSpread;
    return ofClamp(Interp(val, GetMin(), GetMax()), GetTargetMin(), GetTargetMax());
 }
 
-float FloatSliderLFOControl::GetTargetMin() const
+double FloatSliderLFOControl::GetTargetMin() const
 {
    if (GetSliderTarget() != nullptr)
       return GetSliderTarget()->GetMin();
@@ -322,7 +322,7 @@ float FloatSliderLFOControl::GetTargetMin() const
    return 0;
 }
 
-float FloatSliderLFOControl::GetTargetMax() const
+double FloatSliderLFOControl::GetTargetMax() const
 {
    if (GetSliderTarget() != nullptr)
       return GetSliderTarget()->GetMax();
@@ -539,7 +539,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
 
 namespace
 {
-   const int kSaveStateRev = 6;
+   const int kSaveStateRev = 7;
    const int kFixNonRevvedData = 999;
 }
 
@@ -576,12 +576,12 @@ void LFOSettings::LoadState(FileStreamIn& in)
    mInterval = (NoteInterval)temp;
    in >> temp;
    mOscType = (OscillatorType)temp;
-   if (rev < 6)
+   if (rev < 7)
    {
       float a, b;
       in >> a >> b;
-      mLFOOffset = a;
-      mBias = b;
+      mLFOOffset = static_cast<double>(a);
+      mBias = static_cast<double>(b);
    }
    else
    {
@@ -590,23 +590,23 @@ void LFOSettings::LoadState(FileStreamIn& in)
    }
    if (rev >= 1)
    {
-      if (rev < 6)
+      if (rev < 7)
       {
          float a;
          in >> a;
-         mSpread = a;
+         mSpread = static_cast<double>(a);
       }
       else
          in >> mSpread;
    }
    if (rev >= 2)
    {
-      if (rev < 6)
+      if (rev < 7)
       {
          float a, b;
          in >> a >> b;
-         mSoften = a;
-         mShuffle = b;
+         mSoften = static_cast<double>(a);
+         mShuffle = static_cast<double>(b);
       }
       else
       {
@@ -616,22 +616,22 @@ void LFOSettings::LoadState(FileStreamIn& in)
    }
    if (rev >= 3)
    {
-      if (rev < 6)
+      if (rev < 7)
       {
          float a;
          in >> a;
-         mFreeRate = a;
+         mFreeRate = static_cast<double>(a);
       }
       else
          in >> mFreeRate;
    }
    if (rev >= 4)
    {
-      if (rev < 6)
+      if (rev < 7)
       {
          float a;
          in >> a;
-         mLength = a;
+         mLength = static_cast<double>(a);
       }
       else
          in >> mLength;
@@ -640,7 +640,17 @@ void LFOSettings::LoadState(FileStreamIn& in)
       in >> mLowResMode;
    if (rev >= 6)
    {
-      in >> mMinValue;
-      in >> mMaxValue;
+      if (rev < 7)
+      {
+         float a, b;
+         in >> a >> b;
+         mMinValue = static_cast<double>(a);
+         mMaxValue = static_cast<double>(b);
+      }
+      else
+      {
+         in >> mMinValue;
+         in >> mMaxValue;
+      }
    }
 }

@@ -44,7 +44,7 @@ public:
    void MouseMoved(float x, float y);
    void MouseReleased();
    void Draw();
-   void SetViewLength(float length) { mViewLength = length; }
+   void SetViewLength(double length) { mViewLength = length; }
    ofVec2f GetPosition() const { return mPosition; }
    ofVec2f GetDimensions() const { return mDimensions; }
    void SetPosition(ofVec2f pos) { mPosition = pos; }

@@ -56,8 +56,8 @@ public:
    struct DotData
    {
       bool mOn;
-      float mVelocity;
-      float mLength;
+      double mVelocity;
+      double mLength;
       double mLastPlayTime; //unserialized
    };
 

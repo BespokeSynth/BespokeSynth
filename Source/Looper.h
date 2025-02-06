@@ -62,7 +62,7 @@ public:
    void Clear();
    void Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float offsetMs);
    void Fill(ChannelBuffer* buffer, int length);
-   void ResampleForSpeed(float speed);
+   void ResampleForSpeed(double speed);
    int GetNumBars() const { return mNumBars; }
    int GetRecorderNumBars() const;
    void SetNumBars(int numBars);
@@ -142,7 +142,7 @@ private:
    void ProcessBeatwheel(double time, int sampleIdx);
    int GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar);
    void DrawBeatwheel();
-   float GetActualLoopPos(int samplesIn) const;
+   double GetActualLoopPos(int samplesIn) const;
    int GetBeatwheelDepthLevel() const;
 
    //IDrawableModule
@@ -158,9 +158,9 @@ private:
    ClickButton* mClearButton{ nullptr };
    DropdownList* mNumBarsSelector{ nullptr };
    double mVol{ 1 };
-   float mSmoothedVol{ 1 };
+   double mSmoothedVol{ 1 };
    FloatSlider* mVolSlider{ nullptr };
-   float mSpeed{ 1 };
+   double mSpeed{ 1 };
    LooperRecorder* mRecorder{ nullptr };
    ClickButton* mMergeButton{ nullptr };
    ClickButton* mSwapButton{ nullptr };
@@ -215,7 +215,7 @@ private:
    bool mCaptureQueued{ false };
    Ramp mWriteInputRamp;
    float mLastInputSample[ChannelBuffer::kMaxNumChannels];
-   float mBufferTempo{ -1 };
+   double mBufferTempo{ -1 };
    ClickButton* mResampleButton{ nullptr };
 
    //beatwheel

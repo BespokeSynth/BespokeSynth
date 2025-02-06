@@ -160,7 +160,7 @@ void DrumSynth::PlayNote(NoteMessage note)
    if (note.pitch >= 0 && note.pitch < mHits.size())
    {
       if (note.velocity > 0)
-         mHits[note.pitch]->Play(note.time, note.velocity / 127.0f);
+         mHits[note.pitch]->Play(note.time, note.velocity / 127.0);
    }
 }
 
@@ -202,7 +202,7 @@ void DrumSynth::DrawModule()
       if (mHits[i]->Level() > 0)
       {
          ofFill();
-         ofSetColor(200, 100, 0, gModuleDrawAlpha * sqrtf(mHits[i]->Level()));
+         ofSetColor(200, 100, 0, gModuleDrawAlpha * sqrt(mHits[i]->Level()));
          ofRect(mHits[i]->mX, mHits[i]->mY, DRUMSYNTH_PAD_WIDTH, DRUMSYNTH_PAD_HEIGHT);
       }
       ofSetColor(200, 100, 0, gModuleDrawAlpha);
@@ -369,9 +369,9 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
    mFilterCutoffMaxSlider->SetMaxValueDisplay("none");
 }
 
-void DrumSynth::DrumSynthHit::Play(double time, float velocity)
+void DrumSynth::DrumSynthHit::Play(double time, double velocity)
 {
-   float envelopeScale = ofLerp(.2f, 1, velocity);
+   double envelopeScale = ofLerp(.2, 1, velocity);
    mData.mFreqAdsr.Start(time, 1, envelopeScale);
    mData.mFilterAdsr.Start(time, 1, envelopeScale);
    mData.mTone.GetADSR()->Start(time, velocity, envelopeScale);

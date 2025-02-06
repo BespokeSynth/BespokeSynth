@@ -110,13 +110,13 @@ private:
       ~DrumSynthHit();
 
       void CreateUIControls();
-      void Play(double time, float velocity);
+      void Play(double time, double velocity);
       void Process(double time, float* out, int bufferSize, int oversampling, double sampleRate, double sampleIncrementMs);
-      float Level() { return mLevel.GetPeak(); }
+      double Level() { return mLevel.GetPeak(); }
       void Draw();
 
       DrumSynthHitSerialData mData;
-      float mPhase{ 0 };
+      double mPhase{ 0 };
       ADSRDisplay* mToneAdsrDisplay{ nullptr };
       ADSRDisplay* mFreqAdsrDisplay{ nullptr };
       ADSRDisplay* mNoiseAdsrDisplay{ nullptr };

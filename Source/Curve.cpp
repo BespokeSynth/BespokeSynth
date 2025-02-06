@@ -202,8 +202,8 @@ void Curve::LoadState(FileStreamIn& in)
       {
          float a, b;
          in >> a >> b;
-         mPoints[i].mTime = a;
-         mPoints[i].mValue = b;
+         mPoints[i].mTime = static_cast<double>(a);
+         mPoints[i].mValue = static_cast<double>(b);
       }
       else
          in >> mPoints[i].mTime >> mPoints[i].mValue;

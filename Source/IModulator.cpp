@@ -111,7 +111,7 @@ void IModulator::Poll()
    if (Active())
    {
       mLastPollValue = Value();
-      const float kBlendRate = -9.65784f;
+      const double kBlendRate = -9.65784;
       double blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
       mSmoothedValue = mSmoothedValue * blend + mLastPollValue * (1 - blend);
       for (int i = 0; i < (int)mTargets.size(); ++i)

@@ -78,11 +78,11 @@ private:
    static const int kBinIgnore = 2;
    static const int kDrawYOffset = 100;
 
-   float FreqForBin(int bin) { return (float(bin) / kNumFFTBins) * gSampleRate; };
-   float PosForFreq(float freq) { return log2(freq / 20) / 10; };
-   float FreqForPos(float pos) { return 20.0 * std::pow(2.0, pos * 10); };
-   float PosForGain(float gain) { return .5f - gain / 30.0f; };
-   float GainForPos(float pos) { return (.5f - pos) * 30; }
+   double FreqForBin(int bin) { return (static_cast<double>(bin) / kNumFFTBins) * gSampleRate; }
+   double PosForFreq(double freq) { return log2(freq / 20) / 10; };
+   double FreqForPos(double pos) { return 20.0 * std::pow(2.0, pos * 10); }
+   double PosForGain(double gain) { return .5 - gain / 30.0; }
+   double GainForPos(double pos) { return (.5 - pos) * 30; }
 
    float mWidth{ 825 };
    float mHeight{ 255 };

@@ -158,7 +158,7 @@ void LocationZoomer::PickNewVanityPanningDestination()
 
    ofVec2d center = allModulesCenter * .5 + randomModulesCenter * .5;
 
-   float newScale = ofRandom(1.f, 1.5f) * UserPrefs.zoom.Get();
+   double newScale = ofRandom(1., 1.5) * UserPrefs.zoom.Get();
 
    mStart.mZoomLevel = gDrawScale;
    mStart.mOffset = TheSynth->GetDrawOffset();
@@ -167,7 +167,7 @@ void LocationZoomer::PickNewVanityPanningDestination()
    mDestination.mOffset = (center * -1) + ofVec2d(ofGetWidth(), ofGetHeight()) / newScale * .5;
 
    mCurrentProgress = 0;
-   mSpeed = ofRandom(.03f, .1f);
+   mSpeed = ofRandom(.03, .1);
 }
 
 ofxJSONElement LocationZoomer::GetSaveData()
@@ -205,5 +205,5 @@ void LocationZoomer::LoadFromSaveData(const ofxJSONElement& saveData)
       }
    }
    MoveToLocation(-1);
-   mCurrentProgress = .999f;
+   mCurrentProgress = .999;
 }

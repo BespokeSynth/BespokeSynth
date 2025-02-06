@@ -74,8 +74,8 @@ void FreqDomainBoilerplate::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   float inputPreampSq = mInputPreamp * mInputPreamp;
-   float volSq = mVolume * mVolume;
+   double inputPreampSq = mInputPreamp * mInputPreamp;
+   double volSq = mVolume * mVolume;
 
    int bufferSize = GetBuffer()->BufferSize();
 
@@ -96,7 +96,7 @@ void FreqDomainBoilerplate::Process(double time)
       float imag = mFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      float amp = 2. * sqrtf(real * real + imag * imag);
+      float amp = 2.f * sqrtf(real * real + imag * imag);
       float phase = atan2(imag, real);
 
       phase = FloatWrap(phase + mPhaseOffset, FTWO_PI);

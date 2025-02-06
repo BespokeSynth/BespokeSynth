@@ -50,7 +50,7 @@ FFTtoAdditive::FFTtoAdditive()
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[fftWindowSize];
    for (int i = 0; i < fftWindowSize; ++i)
-      mWindower[i] = -.5 * cos(FTWO_PI * i / fftWindowSize) + .5;
+      mWindower[i] = -.5f * cos(FTWO_PI * i / fftWindowSize) + .5f;
 
    mPhaseInc = new float[numPartials];
    for (int i = 0; i < numPartials; ++i)
@@ -96,7 +96,7 @@ void FFTtoAdditive::Process(double time)
    SyncBuffers();
 
    float inputPreampSq = mInputPreamp * mInputPreamp;
-   float volSq = mVolume * mVolume;
+   double volSq = mVolume * mVolume;
 
    int bufferSize = GetBuffer()->BufferSize();
 
@@ -117,7 +117,7 @@ void FFTtoAdditive::Process(double time)
       float imag = mFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      float amp = 2. * sqrtf(real * real + imag * imag);
+      float amp = 2.f * sqrtf(real * real + imag * imag);
       float phase = atan2(imag, real);
 
       mFFTData.mRealValues[i] = amp / (fftWindowSize / 2);
@@ -130,8 +130,8 @@ void FFTtoAdditive::Process(double time)
       float write = 0;
       for (int j = 1; j < numPartials; ++j)
       {
-         float phase = ((mFFTData.mImaginaryValues[j + 1] + i * mPhaseInc[j]) / FTWO_PI) * 512;
-         float sample = SinSample(phase) * mFFTData.mRealValues[j + 1] * volSq * .4f;
+         double phase = ((mFFTData.mImaginaryValues[j + 1] + i * mPhaseInc[j]) / FTWO_PI) * 512;
+         float sample = SinSample(phase) * mFFTData.mRealValues[j + 1] * volSq * .4;
          write += sample;
       }
 
@@ -145,13 +145,13 @@ void FFTtoAdditive::Process(double time)
    GetBuffer()->Reset();
 }
 
-float FFTtoAdditive::SinSample(float phase)
+double FFTtoAdditive::SinSample(double phase)
 {
-   int intPhase = int(phase) % 512;
+   int intPhase = static_cast<int>(phase) % 512;
    if (intPhase < 0)
       intPhase += 512;
-   float remainder = phase - int(phase);
-   float retVal = ((1 - remainder) * sineBuffer[intPhase] + remainder * sineBuffer[1 + intPhase]);
+   const double remainder = phase - static_cast<int>(phase);
+   const double retVal = (1 - remainder) * sineBuffer[intPhase] + remainder * sineBuffer[1 + intPhase];
    return retVal;
 }
 

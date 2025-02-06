@@ -279,7 +279,7 @@ void ControlRecorder::LoadState(FileStreamIn& in, int rev)
    {
       float a;
       in >> a;
-      mLength = a;
+      mLength = static_cast<double>(a);
    }
    else
       in >> mLength;
@@ -288,7 +288,7 @@ void ControlRecorder::LoadState(FileStreamIn& in, int rev)
    {
       float a;
       in >> a;
-      mRecordStartOffset = a;
+      mRecordStartOffset = static_cast<double>(a);
    }
    else
       in >> mRecordStartOffset;

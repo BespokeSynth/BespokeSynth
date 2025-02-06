@@ -127,11 +127,11 @@ void EventCanvas::OnTransportAdvanced(double amount)
 
    for (auto* canvasElement : mCanvas->GetElements())
    {
-      float elementStart = canvasElement->GetStart();
+      double elementStart = canvasElement->GetStart();
       bool startPassed = (lookaheadPos >= elementStart && mPreviousPosition < elementStart);
-      float elementEnd = canvasElement->GetEnd();
+      double elementEnd = canvasElement->GetEnd();
       if (elementEnd > mCanvas->GetLength())
-         elementEnd = FloatWrap(elementEnd, mCanvas->GetLength());
+         elementEnd = DoubleWrap(elementEnd, mCanvas->GetLength());
       bool endPassed = (lookaheadPos >= elementEnd && mPreviousPosition < elementEnd);
       if (startPassed || endPassed)
       {
@@ -161,12 +161,12 @@ void EventCanvas::OnTransportAdvanced(double amount)
    {
       if (mRowConnections[i].mUIControl)
       {
-         float value = mRowConnections[i].mUIControl->GetValue();
+         double value = mRowConnections[i].mUIControl->GetValue();
 
          if (mRecord && mRowConnections[i].mLastValue != value)
          {
-            float colPos = lookaheadPos * mCanvas->GetNumCols();
-            int col = int(colPos + .5f);
+            double colPos = lookaheadPos * mCanvas->GetNumCols();
+            int col = int(colPos + .5);
             EventCanvasElement* element = new EventCanvasElement(mCanvas, col, i, colPos - col);
             element->SetUIControl(mRowConnections[i].mUIControl);
             element->SetValue(value);
@@ -180,7 +180,7 @@ void EventCanvas::OnTransportAdvanced(double amount)
    mPreviousPosition = lookaheadPos;
 }
 
-double EventCanvas::GetTriggerTime(double lookaheadTime, double lookaheadPos, float eventPos)
+double EventCanvas::GetTriggerTime(double lookaheadTime, double lookaheadPos, double eventPos)
 {
    double cursorAdvanceSinceEvent = lookaheadPos - eventPos;
    if (cursorAdvanceSinceEvent < 0)
@@ -333,7 +333,7 @@ void EventCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mPreviousPosition = mPosition + .001f;
+      mPreviousPosition = mPosition + .001;
    }
 }
 
@@ -354,7 +354,7 @@ void EventCanvas::ButtonClicked(ClickButton* button, double time)
       {
          if (anyHighlighted == false || element->GetHighlighted())
          {
-            element->mCol = int(element->mCol + element->mOffset + .5f) % mCanvas->GetNumCols();
+            element->mCol = int(element->mCol + element->mOffset + .5) % mCanvas->GetNumCols();
             element->mOffset = 0;
          }
       }

@@ -137,7 +137,7 @@ private:
    double mDrive{ 1 };
    double mThreshold{ -24 };
    double mRatio{ 4 };
-   double mAttack{ .1f };
+   double mAttack{ .1 };
    double mRelease{ 100 };
    double mLookahead{ 3 };
    double mOutputAdjust{ 1 };

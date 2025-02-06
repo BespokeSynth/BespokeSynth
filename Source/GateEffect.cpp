@@ -93,9 +93,9 @@ void GateEffect::DrawModule()
 
    ofPushStyle();
    ofFill();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4f);
-   ofRect(5, 2, 110 * sqrtf(mPeak), 7);
-   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4);
+   ofRect(5, 2, 110 * std::sqrt(mPeak), 7);
+   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4);
    ofRect(5, 9, 110 * mEnvelope, 7);
    ofPopStyle();
 }

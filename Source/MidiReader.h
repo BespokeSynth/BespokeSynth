@@ -33,9 +33,9 @@ public:
    MidiReader();
    virtual ~MidiReader();
    void Read(const char* midiFileName);
-   float GetTempo(double ms);
+   double GetTempo(double ms);
    int GetBeat(double ms);
-   void GetMeasurePos(double ms, int& measure, float& measurePos);
+   void GetMeasurePos(double ms, int& measure, double& measurePos);
    void SetBeatOffset(int beatOffset) { mBeatOffset = beatOffset; }
    //MIDISequencer* GetSequencer() { return mSequencer; }
 

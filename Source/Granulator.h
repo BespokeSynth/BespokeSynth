@@ -57,7 +57,7 @@ class Granulator
 {
 public:
    Granulator();
-   void ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float speed, float* output);
+   void ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, double speed, float* output);
    void Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength);
    void Reset();
    void ClearGrains();

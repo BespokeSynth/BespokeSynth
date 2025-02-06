@@ -88,7 +88,7 @@ private:
 
    void UpdateNumColumns();
    void SyncControlCablesToCanvas();
-   double GetTriggerTime(double lookaheadTime, double lookaheadPos, float eventPos);
+   double GetTriggerTime(double lookaheadTime, double lookaheadPos, double eventPos);
 
    Canvas* mCanvas{ nullptr };
    CanvasControls* mCanvasControls{ nullptr };
@@ -109,7 +109,7 @@ private:
    struct ControlConnection
    {
       IUIControl* mUIControl{ nullptr };
-      float mLastValue{ 0 };
+      double mLastValue{ 0 };
    };
 
    const int kMaxEventRows = 256;

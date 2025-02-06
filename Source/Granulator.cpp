@@ -54,7 +54,7 @@ void Granulator::Reset()
    }
 }
 
-void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float speed, float* output)
+void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, double speed, float* output)
 {
    if (time + gInvSampleRateMs >= mNextGrainSpawnMs)
    {
@@ -71,7 +71,7 @@ void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLeng
    for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
    {
       if (mGrainOverlap > 4)
-         output[ch] *= ofMap(mGrainOverlap, MAX_GRAINS, 4, .5f, 1); //lower volume on dense granulation, starting at 4 overlap
+         output[ch] *= ofMap(mGrainOverlap, MAX_GRAINS, 4, .5, 1); //lower volume on dense granulation, starting at 4 overlap
       output[ch] = mBiquad[ch].Filter(output[ch]);
    }
 }
@@ -147,10 +147,10 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
    if (time >= mStartTime && time <= mEndTime && mVol != 0)
    {
       mPos += mSpeedMult * mOwner->mSpeed;
-      float window = GetWindow(time);
+      auto window = GetWindow(time);
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
-         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0., 1.));
+         auto sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0., 1.));
          output[ch] += sample * window * mVol * (1 + (ch == 0 ? mStereoPosition : -mStereoPosition));
       }
    }
@@ -158,12 +158,12 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
 
 void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength)
 {
-   float a = fmod((mPos - bufferStart), bufferLength) / viewLength;
+   double a = std::fmod((mPos - bufferStart), bufferLength) / viewLength;
    if (a < 0 || a > 1)
       return;
    ofPushStyle();
    ofFill();
-   float alpha = GetWindow(std::clamp(gTime, mStartTime, mEndTime));
+   double alpha = GetWindow(std::clamp(gTime, mStartTime, mEndTime));
    ofSetColor(255, 0, 0, alpha * 255);
    ofCircle(x + a * w, y + mDrawPos * h, MAX(3, h / MAX_GRAINS / 2));
    ofPopStyle();

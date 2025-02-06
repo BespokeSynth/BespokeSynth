@@ -49,7 +49,7 @@ public:
    void CreateUIControls() override;
 
    void LoadSample(const char* file);
-   void SetPlaybackInfo(bool play, int position, float speed, float volume);
+   void SetPlaybackInfo(bool play, int position, double speed, double volume);
 
    //IAudioSource
    void Process(double time) override;
@@ -80,7 +80,7 @@ private:
    bool mLoadingSong{ true };
 
    Sample mSample;
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    bool mPlay{ false };
    bool mMute{ false };
    Checkbox* mMuteCheckbox{ nullptr };

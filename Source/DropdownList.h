@@ -188,7 +188,7 @@ private:
    std::string mUnknownItemString{ "-----" };
    bool mDrawLabel{ false };
    float mLabelSize{ 0 };
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    int mLastSetValue{ 0 };
    bool mAutoCalculateWidth{ false };
    bool mDrawTriangle{ true };

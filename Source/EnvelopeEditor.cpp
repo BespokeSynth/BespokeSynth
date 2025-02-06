@@ -149,7 +149,7 @@ void EnvelopeControl::Draw()
       }
 
       ofSetLineWidth(1);
-      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
+      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5);
       double drawTime = 0;
       if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
          drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, GetReleaseTime());
@@ -251,7 +251,7 @@ void EnvelopeControl::MouseMoved(float x, float y)
       ADSR::EventInfo adsrEvent(0, GetReleaseTime());
 
       mHighlightPoint = -1;
-      float time = 0;
+      double time = 0;
       for (int i = 0; i < mAdsr->GetNumStages(); ++i)
       {
          if (mAdsr->GetHasSustainStage() && i == mAdsr->GetSustainStage() + 1)
@@ -262,10 +262,10 @@ void EnvelopeControl::MouseMoved(float x, float y)
          if (i == mAdsr->GetNumStages() - 1)
             time += 0;
 
-         float value = mAdsr->Value(time, &adsrEvent);
+         double value = mAdsr->Value(time, &adsrEvent);
 
-         float pointX = GetXForTime(time);
-         float pointY = GetYForValue(value);
+         double pointX = GetXForTime(time);
+         double pointY = GetYForValue(value);
 
          if (fabsf(x - pointX) < 4 && fabsf(y - pointY) < 4)
          {
@@ -276,10 +276,10 @@ void EnvelopeControl::MouseMoved(float x, float y)
 
       if (mHighlightPoint == -1)
       {
-         float highlightTime = GetTimeForX(x);
-         float valueForY = GetValueForY(y);
+         double highlightTime = GetTimeForX(x);
+         double valueForY = GetValueForY(y);
          double stageStartTime;
-         if (abs(mAdsr->Value(highlightTime, &adsrEvent) - valueForY) < .1f)
+         if (abs(mAdsr->Value(highlightTime, &adsrEvent) - valueForY) < .1)
          {
             mHighlightCurve = mAdsr->GetStage(highlightTime, stageStartTime, &adsrEvent);
             if (mAdsr->GetHasSustainStage() && mHighlightCurve == mAdsr->GetSustainStage() && highlightTime > GetPreSustainTime())
@@ -300,25 +300,25 @@ void EnvelopeControl::MouseMoved(float x, float y)
          ::ADSR::Stage& stage = mAdsr->GetStageData(mHighlightPoint);
          ::ADSR::Stage& originalStage = mClickAdsr.GetStageData(mHighlightPoint);
 
-         float maxLength = 10000;
+         double maxLength = 10000;
          if (mFixedLengthMode)
          {
             if (mHighlightPoint < mAdsr->GetNumStages() - 1)
                maxLength = stage.time + mAdsr->GetStageData(mHighlightPoint + 1).time - 1;
             else if (mHighlightPoint == mAdsr->GetNumStages() - 1)
             {
-               float time = 0;
+               double time = 0;
                for (int i = 0; i < mAdsr->GetNumStages() - 1; ++i)
                   time += mAdsr->GetStageData(i).time;
                maxLength = mViewLength - time - 1;
             }
          }
 
-         stage.time = ofClamp(originalStage.time + (x - mClickStart.x) / mDimensions.x * mViewLength, 0.001f, maxLength);
+         stage.time = ofClamp(originalStage.time + (x - mClickStart.x) / mDimensions.x * mViewLength, 0.001, maxLength);
 
          if (mFixedLengthMode && mHighlightPoint < mAdsr->GetNumStages() - 1)
          {
-            float timeAdjustment = stage.time - originalStage.time;
+            double timeAdjustment = stage.time - originalStage.time;
             mAdsr->GetStageData(mHighlightPoint + 1).time = mClickAdsr.GetStageData(mHighlightPoint + 1).time - timeAdjustment;
          }
 
@@ -363,7 +363,7 @@ double EnvelopeControl::GetReleaseTime()
    if (mAdsr != nullptr && mAdsr->GetMaxSustain() > 0)
       return GetPreSustainTime() + mAdsr->GetMaxSustain();
    else
-      return GetPreSustainTime() + mViewLength * .2f;
+      return GetPreSustainTime() + mViewLength * .2;
 }
 
 double EnvelopeControl::GetTimeForX(double x)

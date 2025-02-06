@@ -231,7 +231,7 @@ void StutterControl::OnControllerPageSelected()
    UpdateGridLights();
 }
 
-void StutterControl::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void StutterControl::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    int index = x + y * grid->NumCols();
    double time = NextBufferTime(false);

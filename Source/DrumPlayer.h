@@ -218,7 +218,7 @@ private:
          double mOffset{ 0 };
          double mEnvelopeTime{ 0 };
          double mEnvelopeScale{ 1 };
-         float mSpeedTweak{ 1 };
+         double mSpeedTweak{ 1 };
       };
 
       DrumHit()
@@ -236,7 +236,7 @@ private:
       void LoadNextSample(int direction);
       void LoadSample(std::string path);
       void GrabSample();
-      void StartPlayhead(double time, float startOffsetPercent, float velocity);
+      void StartPlayhead(double time, double startOffsetPercent, double velocity);
       void StopLinked(double time);
       double GetPlayProgress(double time);
 
@@ -244,7 +244,7 @@ private:
       int mLinkId{ -1 };
       double mVol{ 1 };
       double mSpeed{ 1 };
-      float mVelocity{ 1 };
+      double mVelocity{ 1 };
       double mPanInput{ 0 };
       double mStartOffset{ 0 };
       ModulationChain* mPitchBend{ nullptr };

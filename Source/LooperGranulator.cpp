@@ -95,13 +95,13 @@ void LooperGranulator::DrawOverlay(ofRectangle bufferRect, int loopLength)
       mGranulator.Draw(bufferRect.x, bufferRect.y, bufferRect.width, bufferRect.height, 0, loopLength, loopLength);
 }
 
-void LooperGranulator::ProcessFrame(double time, float bufferOffset, float* output)
+void LooperGranulator::ProcessFrame(double time, double bufferOffset, float* output)
 {
    if (mLooper != nullptr)
    {
       int bufferLength;
       auto* buffer = mLooper->GetLoopBuffer(bufferLength);
-      mGranulator.ProcessFrame(time, buffer, bufferLength, bufferOffset, 1.0f, output);
+      mGranulator.ProcessFrame(time, buffer, bufferLength, bufferOffset, 1.0, output);
    }
 }
 

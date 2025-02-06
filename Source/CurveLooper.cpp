@@ -199,16 +199,16 @@ void CurveLooper::ButtonClicked(ClickButton* button, double time)
    if (button == mRandomizeButton)
    {
       mAdsr.SetNumStages(gRandom() % 6 + 2);
-      std::vector<float> times;
+      std::vector<double> times;
       for (int i = 0; i < mAdsr.GetNumStages(); ++i)
          times.push_back(ofRandom(1, kAdsrTime - 1));
       std::sort(times.begin(), times.end());
-      float timeElapsed = 0;
+      double timeElapsed = 0;
       for (int i = 0; i < mAdsr.GetNumStages(); ++i)
       {
          mAdsr.GetStageData(i).time = times[i] - timeElapsed;
          mAdsr.GetStageData(i).target = ofRandom(0, 1);
-         float val = ofRandom(-1, 1);
+         double val = ofRandom(-1, 1);
          mAdsr.GetStageData(i).curve = val * val * (val > 0 ? 1 : -1);
          timeElapsed += mAdsr.GetStageData(i).time;
       }

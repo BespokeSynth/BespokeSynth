@@ -51,7 +51,7 @@ public:
 
    void CreateUIControls() override;
 
-   void ProcessFrame(double time, float bufferOffset, float* output);
+   void ProcessFrame(double time, double bufferOffset, float* output);
    void DrawOverlay(ofRectangle bufferRect, int loopLength);
    bool IsActive() { return mOn; }
    bool ShouldFreeze() { return mOn && mFreeze; }

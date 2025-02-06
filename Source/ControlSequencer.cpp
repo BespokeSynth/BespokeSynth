@@ -264,7 +264,7 @@ void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, double value,
          for (int i = 0; i < mGrid->GetCols(); ++i)
          {
             double val = mGrid->GetVal(i, 0);
-            val = int((val * (numValues - 1)) + .5f) / float(numValues - 1); //quantize to match the number of allowed values
+            val = std::round(val * (numValues - 1)) / static_cast<double>(numValues - 1); //quantize to match the number of allowed values
             mGrid->SetVal(i, 0, val);
          }
       }

@@ -86,7 +86,7 @@ void DotGrid::Render()
    if (GetHighlightCol(gTime) != -1)
    {
       ofFill();
-      ofSetColor(255, 255, 255, gModuleDrawAlpha * .2f);
+      ofSetColor(255, 255, 255, gModuleDrawAlpha * .2);
       ofRect(GetX(GetHighlightCol(gTime)), 0, xsize, mHeight);
    }
 
@@ -122,7 +122,7 @@ void DotGrid::Render()
          DotData& data = mData[GetDataIndex(i, j)];
          if (data.mOn)
          {
-            float bump = ofClamp((data.mLastPlayTime + 250.0f - gTime) / 250.0f, 0, 1);
+            float bump = ofClamp((data.mLastPlayTime + 250.0 - gTime) / 250.0, 0, 1);
             float radius = ofLerp(.65f, 1.0f, bump);
 
             //white outer ring

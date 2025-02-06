@@ -337,7 +337,7 @@ void DrumPlayer::Process(double time)
    }
 }
 
-void DrumPlayer::DrumHit::StartPlayhead(double time, float startOffsetPercent, float velocity)
+void DrumPlayer::DrumHit::StartPlayhead(double time, double startOffsetPercent, double velocity)
 {
    mCurrentPlayheadIndex = (mCurrentPlayheadIndex + 1) % mPlayheads.size();
    for (size_t i = 0; i < mPlayheads.size(); ++i)
@@ -509,13 +509,13 @@ void DrumPlayer::PlayNote(NoteMessage note)
          }
 
          //play this one
-         mDrumHits[note.pitch].mVelocity = note.velocity / 127.0f;
+         mDrumHits[note.pitch].mVelocity = note.velocity / 127.0;
          mDrumHits[note.pitch].mPanInput = note.modulation.pan;
          mDrumHits[note.pitch].mPitchBend = note.modulation.pitchBend;
-         float startOffsetPercent = mDrumHits[note.pitch].mStartOffset;
+         double startOffsetPercent = mDrumHits[note.pitch].mStartOffset;
          if (note.modulation.modWheel != nullptr)
             startOffsetPercent += MAX((note.modulation.modWheel->GetValue(0) - ModulationParameters::kDefaultModWheel) * 2, 0);
-         mDrumHits[note.pitch].StartPlayhead(note.time, startOffsetPercent, note.velocity / 127.0f);
+         mDrumHits[note.pitch].StartPlayhead(note.time, startOffsetPercent, note.velocity / 127.0);
       }
    }
 }
@@ -831,7 +831,7 @@ void DrumPlayer::DrawModule()
             ofNoFill();
             ofRect(i * 70, j * 70, 70, 70);
 
-            float alpha = sqrt(1 - mDrumHits[sampleIdx].GetPlayProgress(gTime));
+            double alpha = sqrt(1 - mDrumHits[sampleIdx].GetPlayProgress(gTime));
             ofSetColor(200, 100, 0, gModuleDrawAlpha * alpha);
             ofFill();
             ofRect(i * 70, j * 70, 70, 70);
@@ -885,7 +885,7 @@ void DrumPlayer::UpdateLights()
             sample = &(mDrumHits[sampleIdx].mSample);
          if (mGridControlTarget->GetGridController())
          {
-            if (mDrumHits[sampleIdx].GetPlayProgress(gTime) < .75f)
+            if (mDrumHits[sampleIdx].GetPlayProgress(gTime) < .75)
                mGridControlTarget->GetGridController()->SetLight(x, y, kGridColor3Bright);
             else if (sample)
                mGridControlTarget->GetGridController()->SetLight(x, y, kGridColor3Dim);
@@ -1051,9 +1051,9 @@ void DrumPlayer::ShuffleKit()
    for (int j = 0; j < NUM_DRUM_HITS; ++j)
    {
       mDrumHits[j].LoadRandomSample();
-      mDrumHits[j].mVol *= ofRandom(.9f, 1.1f);
-      mDrumHits[j].mSpeed *= ofRandom(.9f, 1.1f);
-      mDrumHits[j].mPan = ofRandom(-1.0f, 1.0f);
+      mDrumHits[j].mVol *= ofRandom(.9, 1.1);
+      mDrumHits[j].mSpeed *= ofRandom(.9, 1.1);
+      mDrumHits[j].mPan = ofRandom(-1.0, 1.0);
    }
 }
 
@@ -1294,8 +1294,8 @@ void DrumPlayer::LoadState(FileStreamIn& in, int rev)
       {
          float a, b;
          in >> a >> b;
-         mDrumHits[i].mVol = a;
-         mDrumHits[i].mSpeed = b;
+         mDrumHits[i].mVol = static_cast<double>(a);
+         mDrumHits[i].mSpeed = static_cast<double>(b);
       }
       else
       {

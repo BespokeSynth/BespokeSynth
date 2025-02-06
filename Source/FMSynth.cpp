@@ -158,7 +158,7 @@ void FMSynth::PlayNote(NoteMessage note)
 
    if (note.velocity > 0)
    {
-      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0, note.voiceIdx, note.modulation);
       mVoiceParams.mOscADSRParams.Start(note.time, 1); //for visualization
    }
    else
@@ -218,13 +218,13 @@ void FMSynth::DrawModuleUnclipped()
 void FMSynth::UpdateHarmonicRatio()
 {
    if (mHarmRatioBase < 0)
-      mVoiceParams.mHarmRatio = 1.0f / (-mHarmRatioBase);
+      mVoiceParams.mHarmRatio = 1.0 / (-mHarmRatioBase);
    else
       mVoiceParams.mHarmRatio = mHarmRatioBase;
    mVoiceParams.mHarmRatio *= mHarmRatioTweak;
 
    if (mHarmRatioBase2 < 0)
-      mVoiceParams.mHarmRatio2 = 1.0f / (-mHarmRatioBase2);
+      mVoiceParams.mHarmRatio2 = 1.0 / (-mHarmRatioBase2);
    else
       mVoiceParams.mHarmRatio2 = mHarmRatioBase2;
    mVoiceParams.mHarmRatio2 *= mHarmRatioTweak2;

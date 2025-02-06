@@ -63,7 +63,7 @@ public:
    void Init(VoiceType type,
              IVoiceParams* mVoiceParams);
 
-   int Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
+   int Start(double time, int pitch, double amount, int voiceIdx, ModulationParameters modulation);
    void Stop(double time, int pitch, int voiceIdx);
    void Process(double time, ChannelBuffer* out, int bufferSize);
    void DrawDebug(float x, float y);

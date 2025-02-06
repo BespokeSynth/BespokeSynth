@@ -88,9 +88,8 @@ private:
    ::ADSR mEnv;
    KarplusStrongVoiceParams* mVoiceParams{ nullptr };
    RollingBuffer mBuffer;
-   float mFilteredSample{ 0 };
+   double mFilteredSample{ 0 };
    Ramp mMuteRamp;
-   float mLastBufferSample{ 0 };
    bool mActive{ false };
    IDrawableModule* mOwner{ nullptr };
    KarplusStrong* mKarplusStrongModule{ nullptr };

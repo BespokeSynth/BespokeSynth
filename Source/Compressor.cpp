@@ -177,9 +177,9 @@ void Compressor::CheckboxUpdated(Checkbox* checkbox, double time)
 void Compressor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAttackSlider)
-      mEnv.setAttack(MAX(.1f, mAttack));
+      mEnv.setAttack(MAX(.1, mAttack));
    if (slider == mReleaseSlider)
-      mEnv.setRelease(MAX(.1f, mRelease));
+      mEnv.setRelease(MAX(.1, mRelease));
 }
 
 //-------------------------------------------------------------

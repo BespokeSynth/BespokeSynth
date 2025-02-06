@@ -50,7 +50,7 @@ class IGridControllerListener
 public:
    virtual ~IGridControllerListener() {}
    virtual void OnControllerPageSelected() = 0;
-   virtual void OnGridButton(int x, int y, float velocity, IGridController* grid) = 0;
+   virtual void OnGridButton(int x, int y, double velocity, IGridController* grid) = 0;
 };
 
 class IGridController

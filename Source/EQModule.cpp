@@ -281,8 +281,8 @@ void EQModule::DrawModule()
    }
    for (int x = 0; x < w + kPixelStep; x += kPixelStep)
    {
-      float response = 1;
-      float freq = FreqForPos(x / w);
+      double response = 1;
+      double freq = FreqForPos(x / w);
       if (freq < gSampleRate / 2)
       {
          int responseGraphIndex = x / kPixelStep;
@@ -300,7 +300,7 @@ void EQModule::DrawModule()
          {
             response = mFrequencyResponse[responseGraphIndex];
          }
-         ofVertex(x, (.5f - .666f * log10(response)) * h + kDrawYOffset);
+         ofVertex(x, (.5 - .666 * log10(response)) * h + kDrawYOffset);
       }
    }
    ofEndShape(false);
@@ -311,8 +311,8 @@ void EQModule::DrawModule()
       auto& filter = mFilters[i];
       if (filter.mEnabled)
       {
-         float x = PosForFreq(filter.mFilter[0].mF) * w;
-         float y = PosForGain(filter.mFilter[0].mDbGain) * h + kDrawYOffset;
+         double x = PosForFreq(filter.mFilter[0].mF) * w;
+         double y = PosForGain(filter.mFilter[0].mDbGain) * h + kDrawYOffset;
          ofFill();
          ofSetColor(255, 210, 0);
          ofCircle(x, y, 8);
@@ -401,7 +401,7 @@ bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, boo
    if (mHoveredFilterHandleIndex != -1)
    {
       auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
-      float add = (2 * scrollY) / MAX(qSlider->GetModulatorMax() / qSlider->GetValue(), 0.1);
+      double add = (2 * scrollY) / MAX(qSlider->GetModulatorMax() / qSlider->GetValue(), 0.1);
       if (GetKeyModifiers() & kModifier_Command)
       {
          add *= 4;
@@ -499,7 +499,7 @@ void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, mWidth, 50, 2000, K(isTextField));
    mModuleSaveData.LoadInt("height", moduleInfo, mHeight, 50, 2000, K(isTextField));
-   mModuleSaveData.LoadFloat("draw_gain", moduleInfo, 1, .1f, 4, K(isTextField));
+   mModuleSaveData.LoadFloat("draw_gain", moduleInfo, 1, .1, 4, K(isTextField));
    mModuleSaveData.LoadBool("lite_cpu_modulation", moduleInfo, true);
 
    SetUpFromSaveData();

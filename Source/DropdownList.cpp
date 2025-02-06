@@ -175,7 +175,7 @@ void DropdownList::Render()
       DrawBeacon(mX + mWidth / 2 + xOffset, mY + mHeight / 2);
 
       ofFill();
-      ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+      ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
       ofRect(mX + 1 + xOffset, mY + 1, w - xOffset, h);
       ofSetColor(color);
       ofRect(mX + xOffset, mY, w - xOffset, h);
@@ -552,7 +552,7 @@ void DropdownList::CalcSliderVal()
 {
    int itemIndex = FindItemIndex(*mVar);
 
-   mSliderVal = ofMap(itemIndex + .5f, 0, mElements.size(), 0, 1);
+   mSliderVal = ofMap(itemIndex + .5, 0, mElements.size(), 0, 1);
 
    mLastSetValue = *mVar;
 }

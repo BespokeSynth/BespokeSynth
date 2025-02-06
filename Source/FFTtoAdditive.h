@@ -66,7 +66,7 @@ public:
 
 private:
    void DrawViz();
-   float SinSample(float phase);
+   double SinSample(double phase);
 
    //IDrawableModule
    void DrawModule() override;

@@ -87,7 +87,7 @@ void EnvelopeModulator::PlayNote(NoteMessage note)
    }
 }
 
-void EnvelopeModulator::OnPulse(double time, float velocity, int flags)
+void EnvelopeModulator::OnPulse(double time, double velocity, int flags)
 {
    mAdsr.Start(time, mUseVelocity ? velocity / 127.0 : 1);
 }

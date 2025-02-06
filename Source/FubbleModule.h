@@ -90,7 +90,7 @@ private:
    void RecordPoint();
    bool IsHovered();
    void Clear();
-   float GetPerlinNoiseValue(double time, float x, float y, bool horizontal);
+   double GetPerlinNoiseValue(double time, double x, double y, bool horizontal);
    void UpdatePerlinSeed() { mPerlinSeed = gRandom() % 1000; }
 
    //IDrawableModule

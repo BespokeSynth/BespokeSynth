@@ -125,26 +125,26 @@ void FormantFilterEffect::UpdateFilters()
 {
    assert(NUM_FORMANT_BANDS == 3);
 
-   float total = 0;
+   double total = 0;
    for (int i = 0; i < mSliders.size(); ++i)
       total += mSliders[i]->GetValue();
 
    if (total == 0)
       return;
 
-   std::vector<float> formant;
+   std::vector<double> formant;
    formant.resize(NUM_FORMANT_BANDS);
    formant.assign(NUM_FORMANT_BANDS, 0);
 
    assert(mSliders.size() == mFormants.size());
    for (int i = 0; i < mSliders.size(); ++i)
    {
-      float weight = mSliders[i]->GetValue() / total;
+      double weight = mSliders[i]->GetValue() / total;
       for (int j = 0; j < NUM_FORMANT_BANDS; ++j)
          formant[j] += mFormants[i].mFreqs[j] * mFormants[i].mGains[j] * weight;
    }
 
-   const float bandwidth = 100;
+   const double bandwidth = 100;
    for (int i = 0; i < NUM_FORMANT_BANDS; ++i)
       mBiquads[i].SetFilterParams(formant[i], formant[i] / (bandwidth / 2));
 }

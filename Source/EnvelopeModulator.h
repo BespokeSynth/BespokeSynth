@@ -62,7 +62,7 @@ public:
    void Resize(float w, float h) override;
 
    void PlayNote(NoteMessage note) override;
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IModulator
    double Value(int samplesIn = 0) override;

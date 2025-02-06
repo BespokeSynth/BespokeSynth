@@ -54,7 +54,7 @@ void FollowingSong::LoadSample(const char* file)
    mLoadingSong = false;
 }
 
-void FollowingSong::SetPlaybackInfo(bool play, int position, float speed, float volume)
+void FollowingSong::SetPlaybackInfo(bool play, int position, double speed, double volume)
 {
    mPlay = play;
    mSample.SetRate(speed);
@@ -77,7 +77,7 @@ void FollowingSong::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   float volSq = mVolume * mVolume * .5f;
+   double volSq = mVolume * mVolume * .5;
 
    if (!mLoadingSong && mPlay)
    {
