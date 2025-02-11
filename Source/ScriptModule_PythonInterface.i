@@ -213,6 +213,18 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          return 0.0f;
       })
       ///example: pulsewidth = me.get("oscillator~pulsewidth")
+      .def("get_path_prefix", [](ScriptModule& module)
+      {
+         std::string path = module.Path();
+         if (ofIsStringInString(path, "~"))
+         {
+            return path.substr(0, path.find('~') + 1);
+         }
+         else 
+         {
+            return std::string("");
+         }
+      })
       .def("adjust", [](ScriptModule& module, std::string path, float amount)
       {
          IUIControl* control = module.GetUIControl(path);
