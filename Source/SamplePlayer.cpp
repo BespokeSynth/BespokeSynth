@@ -295,14 +295,14 @@ void SamplePlayer::Process(double time)
          {
             if (mRecordAsClipsCueIndex < (int)mSampleCuePoints.size())
             {
-               SetCuePoint(mRecordAsClipsCueIndex, float(mRecordingLength) / gSampleRate, 0, 1);
+               SetCuePoint(mRecordAsClipsCueIndex, static_cast<double>(mRecordingLength) / gSampleRate, 0, 1);
             }
          }
 
          if (!gateIsOpen && gateWasOpen)
          {
             if (mRecordAsClipsCueIndex < (int)mSampleCuePoints.size())
-               mSampleCuePoints[mRecordAsClipsCueIndex].lengthSeconds = (float(mRecordingLength) / gSampleRate) - mSampleCuePoints[mRecordAsClipsCueIndex].startSeconds;
+               mSampleCuePoints[mRecordAsClipsCueIndex].lengthSeconds = (static_cast<double>(mRecordingLength) / gSampleRate) - mSampleCuePoints[mRecordAsClipsCueIndex].startSeconds;
             mRecordingLength += 200; //add silence gap
             ++mRecordAsClipsCueIndex;
          }
@@ -407,13 +407,13 @@ void SamplePlayer::PlayNote(NoteMessage note)
    }
 }
 
-void SamplePlayer::OnPulse(double time, float velocity, int flags)
+void SamplePlayer::OnPulse(double time, double velocity, int flags)
 {
    if (mSample != nullptr)
       PlayCuePoint(time, -1, velocity * 127, 1, 0);
 }
 
-void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds)
+void SamplePlayer::PlayCuePoint(double time, int index, int velocity, double speedMult, double startOffsetSeconds)
 {
    if (mSample != nullptr)
    {
@@ -423,7 +423,7 @@ void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float spee
       mCuePointSpeed = speed * speedMult;
       mPlay = true;
       mAdsr.Clear();
-      mAdsr.Start(time, velocity / 127.0f);
+      mAdsr.Start(time, velocity / 127.0);
       if (lengthSeconds > 0)
          mAdsr.Stop(time + lengthSeconds * 1000 / speed);
       mSwitchAndRamp.StartSwitch();
@@ -457,7 +457,7 @@ void SamplePlayer::UpdateActiveCuePoint()
 
 void SamplePlayer::AutoSlice(int slices)
 {
-   float sliceLengthSeconds = GetLengthInSeconds() / slices;
+   double sliceLengthSeconds = GetLengthInSeconds() / slices;
    for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
    {
       if (i < slices)
@@ -831,7 +831,7 @@ ChannelBuffer* SamplePlayer::GetCueSampleData(int cueIndex)
    {
       for (int i = 0; i < lengthSamplesDest; ++i)
       {
-         float offset = i * speed * mSample->GetSampleRateRatio();
+         double offset = i * speed * mSample->GetSampleRateRatio();
          data->GetChannel(ch)[i] = GetInterpolatedSample(offset, mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
       }
    }
@@ -858,15 +858,15 @@ bool SamplePlayer::MouseMoved(float x, float y)
       mHoveredCuePointIndex = -1;
       if (y > 60 && y < mHeight - 20 && mSample != nullptr)
       {
-         float seconds = GetSecondsForMouse(x);
+         double seconds = GetSecondsForMouse(x);
 
          // find cue point closest to but not exceeding the cursor position
          int bestCuePointIndex = -1;
-         float bestCuePointStart = 0.;
+         double bestCuePointStart = 0.;
          for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
          {
-            float startSeconds = mSampleCuePoints[i].startSeconds;
-            float lengthSeconds = mSampleCuePoints[i].lengthSeconds;
+            double startSeconds = mSampleCuePoints[i].startSeconds;
+            double lengthSeconds = mSampleCuePoints[i].lengthSeconds;
 
             if (lengthSeconds > 0.)
             {
@@ -891,7 +891,7 @@ bool SamplePlayer::MouseMoved(float x, float y)
    return true;
 }
 
-void SamplePlayer::SetCuePointForX(float mouseX)
+void SamplePlayer::SetCuePointForX(double mouseX)
 {
    mSampleCuePoints[mActiveCuePointIndex].startSeconds = GetPlayPositionForMouse(mouseX) / (gSampleRate * mSample->GetSampleRateRatio());
    mSampleCuePoints[mActiveCuePointIndex].speed = 1;
@@ -903,12 +903,12 @@ void SamplePlayer::MouseReleased()
    mScrubbingSample = false;
 }
 
-float SamplePlayer::GetPlayPositionForMouse(float mouseX) const
+double SamplePlayer::GetPlayPositionForMouse(double mouseX) const
 {
    return ofMap(mouseX, 5, mWidth - 5, GetZoomStartSample(), GetZoomEndSample(), true);
 }
 
-float SamplePlayer::GetSecondsForMouse(float mouseX) const
+double SamplePlayer::GetSecondsForMouse(double mouseX) const
 {
    return ofMap(mouseX, 5, mWidth - 5, GetZoomStartSeconds(), GetZoomEndSeconds(), true);
 }
@@ -1019,15 +1019,15 @@ void SamplePlayer::DrawModule()
    else if (mRunningProcess != nullptr || (mSample && mSample->IsSampleLoading()))
    {
       const int kNumDots = 8;
-      const float kCircleRadius = 20;
-      const float kDotRadius = 3;
-      const float kSpinSpeed = .003f;
+      const double kCircleRadius = 20;
+      const double kDotRadius = 3;
+      const double kSpinSpeed = .003;
       ofPushStyle();
       ofFill();
       for (int i = 0; i < kNumDots; ++i)
       {
-         float theta = float(i) / kNumDots * M_PI * 2 + gTime * kSpinSpeed;
-         ofCircle(cos(theta) * kCircleRadius + (mWidth - 10) * .5f, sin(theta) * kCircleRadius + (mHeight - 65) * .5f, kDotRadius);
+         double theta = static_cast<double>(i) / kNumDots * M_PI * 2 + gTime * kSpinSpeed;
+         ofCircle(cos(theta) * kCircleRadius + (mWidth - 10) * .5, sin(theta) * kCircleRadius + (mHeight - 65) * .5, kDotRadius);
       }
       ofPopStyle();
 
@@ -1078,26 +1078,26 @@ void SamplePlayer::DrawModule()
 
       if (playPosition >= 0)
       {
-         float x = ofMap(playPosition, GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
+         double x = ofMap(playPosition, GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
          DrawTextNormal(ofToString(playPosition / (gSampleRate * mSample->GetSampleRateRatio()), 1), x + 2, mHeight - 65, 9);
       }
 
       if (mShowGrid)
       {
-         float lengthSeconds = GetZoomEndSeconds() - GetZoomStartSeconds();
-         float lengthBeats = TheTransport->GetTempo() * (lengthSeconds / 60) / mSampleCuePoints[mActiveCuePointIndex].speed;
+         double lengthSeconds = GetZoomEndSeconds() - GetZoomStartSeconds();
+         double lengthBeats = TheTransport->GetTempo() * (lengthSeconds / 60) / mSampleCuePoints[mActiveCuePointIndex].speed;
          if (lengthBeats < 30)
          {
-            float alpha = ofMap(lengthBeats, 30, 28, 0, 200, true);
+            double alpha = ofMap(lengthBeats, 30, 28, 0, 200, true);
             ofSetColor(0, 255, 255, alpha);
-            float secondsPerBeat = 60 / (TheTransport->GetTempo() / mSampleCuePoints[mActiveCuePointIndex].speed);
-            float offset = mSampleCuePoints[mActiveCuePointIndex].startSeconds;
-            float firstBeat = ceil((GetZoomStartSeconds() - offset) / secondsPerBeat);
-            float firstBeatSeconds = firstBeat * secondsPerBeat + offset;
+            double secondsPerBeat = 60 / (TheTransport->GetTempo() / mSampleCuePoints[mActiveCuePointIndex].speed);
+            double offset = mSampleCuePoints[mActiveCuePointIndex].startSeconds;
+            double firstBeat = ceil((GetZoomStartSeconds() - offset) / secondsPerBeat);
+            double firstBeatSeconds = firstBeat * secondsPerBeat + offset;
             for (int i = 0; i < ceil(lengthBeats); ++i)
             {
-               float second = firstBeatSeconds + i * secondsPerBeat;
-               float x = ofMap(second, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+               double second = firstBeatSeconds + i * secondsPerBeat;
+               double x = ofMap(second, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
                ofLine(x, 0, x, mHeight - 65);
             }
          }
@@ -1124,8 +1124,8 @@ void SamplePlayer::DrawModule()
       {
          if (mSampleCuePoints[i].lengthSeconds > 0 || mSampleCuePoints[i].startSeconds > 0)
          {
-            float x = ofMap(mSampleCuePoints[i].startSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
-            float xEnd = ofMap(mSampleCuePoints[i].startSeconds + mSampleCuePoints[i].lengthSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+            double x = ofMap(mSampleCuePoints[i].startSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+            double xEnd = ofMap(mSampleCuePoints[i].startSeconds + mSampleCuePoints[i].lengthSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
             ofSetColor(0, 0, 0, 100);
             ofRect(x, 0, MAX((xEnd - x), 10), 10);
             ofRect(x, 0, 15, 10);
@@ -1161,8 +1161,8 @@ void SamplePlayer::DrawModule()
 
    if (mHoveredCuePointIndex != -1 && mSample && mSample->LengthInSamples() > 0 && !mRecord)
    {
-      float x = ofMap(mSampleCuePoints[mHoveredCuePointIndex].startSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
-      float xEnd = ofMap(mSampleCuePoints[mHoveredCuePointIndex].startSeconds + mSampleCuePoints[mHoveredCuePointIndex].lengthSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+      double x = ofMap(mSampleCuePoints[mHoveredCuePointIndex].startSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+      double xEnd = ofMap(mSampleCuePoints[mHoveredCuePointIndex].startSeconds + mSampleCuePoints[mHoveredCuePointIndex].lengthSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
       if (xEnd - x > 45)
       {
          mPlayHoveredClipButton->SetPosition(x + 5, 72);
@@ -1213,7 +1213,7 @@ int SamplePlayer::GetZoomEndSample() const
    return (int)ofClamp(GetZoomStartSample() + mSample->LengthInSamples() / mZoomLevel, 1, mSample->LengthInSamples());
 }
 
-float SamplePlayer::GetZoomStartSeconds() const
+double SamplePlayer::GetZoomStartSeconds() const
 {
    if (mDoRecording)
       return 0;
@@ -1222,10 +1222,10 @@ float SamplePlayer::GetZoomStartSeconds() const
    return GetZoomStartSample() / (gSampleRate * mSample->GetSampleRateRatio());
 }
 
-float SamplePlayer::GetZoomEndSeconds() const
+double SamplePlayer::GetZoomEndSeconds() const
 {
    if (mDoRecording)
-      return float(GetZoomEndSample()) / gSampleRate;
+      return static_cast<double>(GetZoomEndSample()) / gSampleRate;
    if (mSample == nullptr)
       return 1;
    return GetZoomEndSample() / (gSampleRate * mSample->GetSampleRateRatio());
@@ -1455,9 +1455,9 @@ void SamplePlayer::LoadState(FileStreamIn& in, int rev)
          {
             float a, b, c;
             in >> a >> b >> c;
-            mSampleCuePoints[i].startSeconds = a;
-            mSampleCuePoints[i].lengthSeconds = b;
-            mSampleCuePoints[i].speed = c;
+            mSampleCuePoints[i].startSeconds = static_cast<double>(a);
+            mSampleCuePoints[i].lengthSeconds = static_cast<double>(b);
+            mSampleCuePoints[i].speed = static_cast<double>(c);
          }
          else
          {

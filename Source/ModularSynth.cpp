@@ -267,9 +267,9 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    Time time = Time::getCurrentTime();
    if (std::abs(sBackgroundR - UserPrefs.background_r.GetDefault()) < .001 && std::abs(sBackgroundG - UserPrefs.background_g.GetDefault()) < .001 && std::abs(sBackgroundB - UserPrefs.background_b.GetDefault()) < .001 && time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)
    {
-      sBackgroundLissajousR = 0.722f;
-      sBackgroundLissajousG = 0.328f;
-      sBackgroundLissajousB = 0.0f;
+      sBackgroundLissajousR = 0.722;
+      sBackgroundLissajousG = 0.328;
+      sBackgroundLissajousB = 0.0;
    }
 
    ResetLayout();
@@ -486,13 +486,13 @@ void ModularSynth::SetZoomLevel(double zoomLevel)
    mHideTooltipsUntilMouseMove = true;
 }
 
-void ModularSynth::PanView(float x, float y)
+void ModularSynth::PanView(double x, double y)
 {
    GetDrawOffset() += ofVec2d(x, y) / gDrawScale;
    mHideTooltipsUntilMouseMove = true;
 }
 
-void ModularSynth::PanTo(float x, float y)
+void ModularSynth::PanTo(double x, double y)
 {
    SetDrawOffset(ofVec2d(ofGetWidth() / gDrawScale / 2 - x, ofGetHeight() / gDrawScale / 2 - y));
    mHideTooltipsUntilMouseMove = true;
@@ -994,7 +994,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          if (GetKeyModifiers() != kModifier_Command)
          {
-            float inc;
+            double inc;
             if (key == OF_KEY_LEFT)
                inc = -1;
             else if (key == OF_KEY_RIGHT)
@@ -1005,7 +1005,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
             else
                inc = 1;
             if (GetKeyModifiers() & kModifier_Shift)
-               inc *= .01f;
+               inc *= .01;
             gHoveredUIControl->Increment(inc);
          }
       }
@@ -1472,13 +1472,13 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    {
       float oldX, oldY;
       mMoveModule->GetPosition(oldX, oldY);
-      float newX = x + mMoveModuleOffsetX;
-      float newY = y + mMoveModuleOffsetY;
+      double newX = x + mMoveModuleOffsetX;
+      double newY = y + mMoveModuleOffsetY;
 
       if (ShouldShowGridSnap())
       {
          newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
-         newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+         newY = round((newY - IDrawableModule::TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + IDrawableModule::TitleBarHeight();
          if (GetKeyModifiers() & kModifier_Shift) // Snap to center of the module
          {
             newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
@@ -1728,7 +1728,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       {
          if (isSmoothScroll) //slow this down into steps if you're using a smooth trackpad
          {
-            if (fabs(yScroll) < .1) //need more than a miniscule change
+            if (std::abs(yScroll) < .1) //need more than a miniscule change
                return;
             static double sLastSmoothScrollTimeMs = -999;
             if (sLastSmoothScrollTimeMs + 100 > gTime)
@@ -3102,7 +3102,7 @@ void ModularSynth::OnConsoleInput(std::string command /* = "" */)
       {
          if (tokens.size() >= 2)
          {
-            float tempo = atof(tokens[1].c_str());
+            double tempo = atof(tokens[1].c_str());
             if (tempo > 0)
                TheTransport->SetTempo(tempo);
          }

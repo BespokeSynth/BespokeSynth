@@ -65,7 +65,7 @@ public:
    bool CheckNeedsDraw() override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
 protected:
    ~Checkbox(); //protected so that it can't be created on the stack

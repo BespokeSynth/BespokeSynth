@@ -139,7 +139,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;

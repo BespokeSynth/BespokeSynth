@@ -54,7 +54,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IAudioPoller
    void OnTransportAdvanced(double amount) override;
@@ -94,7 +94,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
-   void Step(double time, float velocity, int flags);
+   void Step(double time, double velocity, int flags);
 
    static const int kMaxSteps = 128;
    float mWidth{ 254 };

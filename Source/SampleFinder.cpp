@@ -87,7 +87,7 @@ void SampleFinder::Process(double time)
 
    double volSq = mVolume * mVolume;
 
-   float speed = GetSpeed();
+   double speed = GetSpeed();
 
    //TODO(Ryan) multichannel
    const float* data = mSample->Data()->GetChannel(0);
@@ -204,9 +204,9 @@ void SampleFinder::FilesDropped(std::vector<std::string> files, int x, int y)
    UpdateZoomExtents();
 }
 
-float SampleFinder::GetSpeed()
+double SampleFinder::GetSpeed()
 {
-   return float(mClipEnd - mClipStart) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars * (mReverse ? -1 : 1);
+   return static_cast<double>(mClipEnd - mClipStart) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars * (mReverse ? -1 : 1);
 }
 
 void SampleFinder::DropdownClicked(DropdownList* list)

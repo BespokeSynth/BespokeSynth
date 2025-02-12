@@ -386,7 +386,7 @@ void MidiController::OnMidiNote(MidiNote& note)
       mModulation.GetPitchBend(voiceIdx)->SetValue(0);
    }
 
-   MidiReceived(kMidiMessage_Note, note.mPitch, note.mVelocity / 127.0f, note.mVelocity, note.mChannel);
+   MidiReceived(kMidiMessage_Note, note.mPitch, note.mVelocity / 127.0, note.mVelocity, note.mChannel);
 
    mQueuedMessageMutex.lock();
    mQueuedNotes.push_back(note);
@@ -411,10 +411,10 @@ void MidiController::OnMidiControl(MidiControl& control)
       //if (mModwheelCC == 74) //MPE
       //   mModulation.GetModWheel(voiceIdx)->SetValue((control.mValue-63) / 127.0f * 2);
       //else
-      mModulation.GetModWheel(voiceIdx)->SetValue(control.mValue / 127.0f);
+      mModulation.GetModWheel(voiceIdx)->SetValue(control.mValue / 127.0);
    }
 
-   MidiReceived(kMidiMessage_Control, control.mControl, control.mValue / 127.0f, control.mValue, control.mChannel);
+   MidiReceived(kMidiMessage_Control, control.mControl, control.mValue / 127.0, control.mValue, control.mChannel);
 
    mQueuedMessageMutex.lock();
    mQueuedControls.push_back(control);
@@ -434,7 +434,7 @@ void MidiController::OnMidiPressure(MidiPressure& pressure)
    if (mUseChannelAsVoice)
       voiceIdx = pressure.mChannel - 1;
 
-   mModulation.GetPressure(voiceIdx)->SetValue(pressure.mPressure / 127.0f);
+   mModulation.GetPressure(voiceIdx)->SetValue(pressure.mPressure / 127.0);
 
    mNoteOutput.SendPressure(pressure.mPitch, pressure.mPressure);
 }
@@ -461,7 +461,7 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
    int voiceIdx = -1;
 
-   float amount = (pitchBend.mValue - 8192.0f) / (8192.0f / mPitchBendRange);
+   double amount = (pitchBend.mValue - 8192.0) / (8192.0 / mPitchBendRange);
 
    if (mUseChannelAsVoice)
       voiceIdx = pitchBend.mChannel - 1;
@@ -470,7 +470,7 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
    mModulation.GetPitchBend(voiceIdx)->SetValue(amount);
 
-   MidiReceived(kMidiMessage_PitchBend, MIDI_PITCH_BEND_CONTROL_NUM, pitchBend.mValue / 16383.0f, pitchBend.mValue, pitchBend.mChannel); //16383 = max pitch bend
+   MidiReceived(kMidiMessage_PitchBend, MIDI_PITCH_BEND_CONTROL_NUM, pitchBend.mValue / 16383.0, pitchBend.mValue, pitchBend.mChannel); //16383 = max pitch bend
 
    mQueuedMessageMutex.lock();
    mQueuedPitchBends.push_back(pitchBend);
@@ -492,7 +492,7 @@ void MidiController::OnMidi(const MidiMessage& message)
    mNoteOutput.SendMidi(message);
 }
 
-void MidiController::MidiReceived(MidiMessageType messageType, int control, float value, int rawValue, int channel)
+void MidiController::MidiReceived(MidiMessageType messageType, int control, double value, int rawValue, int channel)
 {
    assert(mEnabled);
 
@@ -573,16 +573,16 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
           (connection->mPageless || connection->mPage == mControllerPage) &&
           (connection->mChannel == -1 || connection->mChannel == channel))
       {
-         float controlValueRange = 127.0f;
+         double controlValueRange = 127.0;
          if (connection->m14BitMode &&
              messageType == kMidiMessage_Control &&
              control - 32 >= 0) //in 14-bit mode, the most sigificant bit comes from the control 32 higher, so this control must be at least 32
          {
-            controlValueRange = 16383.0f;
+            controlValueRange = 16383.0;
 
-            float mostSignificantBitValue = GetLayoutControl(control - 32, kMidiMessage_Control).mLastValue;
-            int MSB = mostSignificantBitValue * 127.0f;
-            int LSB = value * 127.0f;
+            double mostSignificantBitValue = GetLayoutControl(control - 32, kMidiMessage_Control).mLastValue;
+            int MSB = mostSignificantBitValue * 127.0;
+            int LSB = value * 127.0;
             int combined = (MSB << 7) + LSB;
             value = combined / controlValueRange;
          }
@@ -605,17 +605,17 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
          {
             if (connection->mIncrementAmount != 0)
             {
-               float curValue = uicontrol->GetMidiValue();
-               float increment = connection->mIncrementAmount / 100;
+               double curValue = uicontrol->GetMidiValue();
+               double increment = connection->mIncrementAmount / 100;
                if (GetKeyModifiers() & kModifier_Shift)
                   increment /= 50;
-               const float midpoint = ceil(controlValueRange / 2) / controlValueRange;
-               if (value != midpoint)
+               const double midpoint = ceil(controlValueRange / 2) / controlValueRange;
+               if (!ofAlmostEquel(value, midpoint))
                {
-                  float change = (value - midpoint);
-                  //float sign = change > 0 ? 1 : -1;
-                  //change = sign * sqrtf(fabsf(change)); //make response fall off for bigger changes
-                  curValue += (increment * 127.0f) * change;
+                  double change = (value - midpoint);
+                  //double sign = change > 0 ? 1 : -1;
+                  //change = sign * std::sqrt(std::abs(change)); //make response fall off for bigger changes
+                  curValue += (increment * 127.0) * change;
                   uicontrol->SetFromMidiCC(curValue, NextBufferTime(false), false);
                }
             }
@@ -633,7 +633,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
          {
             if (value > 0)
             {
-               float val = uicontrol->GetMidiValue();
+               double val = uicontrol->GetMidiValue();
                uicontrol->SetValue(val == 0, NextBufferTime(false));
                uicontrol->StartBeacon();
             }
@@ -644,7 +644,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             {
                if (connection->mIncrementAmount != 0)
                {
-                  const float midpoint = ceil(controlValueRange / 2) / controlValueRange;
+                  const double midpoint = ceil(controlValueRange / 2) / controlValueRange;
                   if (value > midpoint)
                      uicontrol->Increment(connection->mIncrementAmount);
                   else
@@ -920,7 +920,7 @@ void MidiController::Poll()
             }
             else if (connection->mType == kControlType_SetValue)
             {
-               float realValue = uicontrol->GetValue();
+               double realValue = uicontrol->GetValue();
                bool valuesAreEqual = std::abs(realValue - connection->mValue) < .0001;
                int outVal = 0;
                if ((!uicontrol->IsBitmask() && valuesAreEqual) ||
@@ -1162,7 +1162,7 @@ void MidiController::DrawModule()
                if (control.mLastActivityTime > 0)
                   ofSetColor(IDrawableModule::GetColor(GetModuleCategory()), gModuleDrawAlpha);
                else
-                  ofSetColor(IDrawableModule::GetColor(GetModuleCategory()), gModuleDrawAlpha * .3f);
+                  ofSetColor(IDrawableModule::GetColor(GetModuleCategory()), gModuleDrawAlpha * .3);
             }
 
             if (control.mDrawType == kDrawType_Button)
@@ -1235,7 +1235,7 @@ void MidiController::DrawModule()
 
       ofPushStyle();
       ofFill();
-      ofSetColor(50, 50, 50, gModuleDrawAlpha * .5f);
+      ofSetColor(50, 50, 50, gModuleDrawAlpha * .5);
       ofRect(kLayoutControlsX, kLayoutControlsY, 235, 140);
       ofPopStyle();
 
@@ -2689,9 +2689,9 @@ void UIControlConnection::CreateUIControls(int index)
    mUIControlPathEntry = new TextEntry(mUIOwner, "path", -1, -1, 25, mUIControlPathInput);
    mUIControlPathEntry->PositionTo(mChannelDropdown, kAnchor_Right);
    mControlTypeDropdown = new DropdownList(mUIOwner, "controltype", mUIControlPathEntry, kAnchor_Right, ((int*)&mType), 55);
-   mValueEntry = new TextEntry(mUIOwner, "value", -1, -1, 5, &mValue, -FLT_MAX, FLT_MAX);
+   mValueEntry = new TextEntry(mUIOwner, "value", -1, -1, 5, &mValue, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
    mValueEntry->PositionTo(mControlTypeDropdown, kAnchor_Right);
-   mIncrementalEntry = new TextEntry(mUIOwner, "increment", -1, -1, 4, &mIncrementAmount, -FLT_MAX, FLT_MAX);
+   mIncrementalEntry = new TextEntry(mUIOwner, "increment", -1, -1, 4, &mIncrementAmount, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
    mIncrementalEntry->PositionTo(mValueEntry, kAnchor_Right);
    mTwoWayCheckbox = new Checkbox(mUIOwner, "twoway", mIncrementalEntry, kAnchor_Right, &mTwoWay);
    mFeedbackDropdown = new DropdownList(mUIOwner, "feedback", mTwoWayCheckbox, kAnchor_Right, &mFeedbackControl, 40);

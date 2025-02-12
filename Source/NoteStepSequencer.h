@@ -65,8 +65,8 @@ public:
 
    int RowToPitch(int row);
    int PitchToRow(int pitch);
-   void SetStep(int index, int step, int velocity, float length);
-   void SetPitch(int index, int pitch, int velocity, float length);
+   void SetStep(int index, int step, int velocity, double length);
+   void SetPitch(int index, int pitch, int velocity, double length);
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
@@ -89,7 +89,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IScaleListener
    void OnScaleChanged() override;
@@ -148,7 +148,7 @@ private:
    void RandomizePitches(bool fifths);
    void RandomizeVelocities();
    void RandomizeLengths();
-   void Step(double time, float velocity, int pulseFlags);
+   void Step(double time, double velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
 
@@ -172,7 +172,7 @@ private:
    UIGrid* mVelocityGrid{ nullptr };
    int mLastPitch{ -1 };
    int mLastStepIndex{ -1 };
-   float mLastNoteLength{ 1 };
+   double mLastNoteLength{ 1 };
    double mLastNoteEndTime{ 0 };
    bool mAlreadyDidNoteOff{ false };
    int mOctave{ 3 };
@@ -233,7 +233,7 @@ private:
    double mPush2ButtonPressTime{ -1 };
    int mQueuedPush2Tone{ -1 };
    int mQueuedPush2Vel{ 127 };
-   float mQueuedPush2Length{ 1 };
+   double mQueuedPush2Length{ 1 };
    bool mGridSyncQueued{ false };
    bool mPush2VelocityHeld{ false };
    bool mPush2LengthHeld{ false };

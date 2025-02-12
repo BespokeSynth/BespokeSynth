@@ -208,12 +208,12 @@ void PatchCable::Render()
          IModulator* modulator = mOwner->GetModulatorOwner();
          if (modulator != nullptr)
          {
-            float range = abs(modulator->GetMax() - modulator->GetMin());
-            if (range > .00001f)
+            double range = std::abs(modulator->GetMax() - modulator->GetMin());
+            if (range > .00001)
             {
-               float delta = ofClamp(modulator->GetRecentChange() / range, -1, 1);
-               ofColor color = ofColor::lerp(ofColor::blue, ofColor::red, delta * .5f + .5f);
-               color.a = abs(1 - ((1 - delta) * (1 - delta))) * 150 * UserPrefs.cable_alpha.Get();
+               double delta = ofClamp(modulator->GetRecentChange() / range, -1, 1);
+               ofColor color = ofColor::lerp(ofColor::blue, ofColor::red, delta * .5 + .5f);
+               color.a = std::abs(1 - ((1 - delta) * (1 - delta))) * 150.0 * UserPrefs.cable_alpha.Get();
                ofSetColor(color);
                ofSetLineWidth(3);
 
@@ -257,7 +257,7 @@ void PatchCable::Render()
                float clampedElapsed = MIN(elapsed, 1);
                if (event.mOn)
                {
-                  ofSetLineWidth(lineWidth * (2 + ofClamp(1 - elapsed * .7f, 0, 1) * 3 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
+                  ofSetLineWidth(lineWidth * (2 + ofClamp(1 - elapsed * .7f, 0, 1) * 3 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3));
 
                   for (int half = 0; half < 2; ++half)
                   {

@@ -47,7 +47,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}

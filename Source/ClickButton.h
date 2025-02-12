@@ -93,7 +93,7 @@ public:
    bool CanBeTargetedBy(PatchCableSource* source) const override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
 protected:
    ~ClickButton(); //protected so that it can't be created on the stack

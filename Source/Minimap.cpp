@@ -9,9 +9,9 @@
 
 namespace
 {
-   const float kMaxLength = 150;
-   const float kBookmarkSize = 15;
-   const float kNumBookmarks = 9;
+   const double kMaxLength = 150;
+   const double kBookmarkSize = 15;
+   const double kNumBookmarks = 9;
 }
 
 Minimap::Minimap()
@@ -30,9 +30,9 @@ void Minimap::CreateUIControls()
 
 void Minimap::GetDimensions(float& width, float& height)
 {
-   float windowWidth = ofGetWidth();
-   float windowHeight = ofGetHeight();
-   float ratio = windowWidth / windowHeight;
+   double windowWidth = ofGetWidth();
+   double windowHeight = ofGetHeight();
+   double ratio = windowWidth / windowHeight;
 
    if (ofGetWidth() > ofGetHeight())
    {
@@ -203,9 +203,9 @@ void Minimap::DrawModule()
 
    for (int i = 0; i < mGrid->GetCols() * mGrid->GetRows(); ++i)
    {
-      float val = 0.0f;
+      double val = 0.0;
       if (TheSynth->GetLocationZoomer()->HasLocation(i + '1'))
-         val = .5f;
+         val = .5;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
 

@@ -122,9 +122,9 @@ private:
    bool mUseMedVelocity{ false };
    bool mClearLane{ false };
    bool mSustain{ false };
-   float mVelocityFull{ 1 };
-   float mVelocityMed{ .5 };
-   float mVelocityLight{ .25 };
+   double mVelocityFull{ 1 };
+   double mVelocityMed{ .5 };
+   double mVelocityLight{ .25 };
 
    DropdownList* mIntervalSelector{ nullptr };
    Checkbox* mWriteCheckbox{ nullptr };

@@ -194,7 +194,7 @@ bool ClickButton::CanBeTargetedBy(PatchCableSource* source) const
    return IUIControl::CanBeTargetedBy(source);
 }
 
-void ClickButton::OnPulse(double time, float velocity, int flags)
+void ClickButton::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0)
       DoClick(time);

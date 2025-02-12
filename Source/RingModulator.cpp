@@ -121,7 +121,7 @@ void RingModulator::PlayNote(NoteMessage note)
 {
    if (note.velocity > 0)
    {
-      float freq = TheScale->PitchToFreq(note.pitch);
+      double freq = TheScale->PitchToFreq(note.pitch);
       mFreqRamp.Start(note.time, freq, note.time + mGlideTime);
       mFreq = freq;
    }

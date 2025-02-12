@@ -89,7 +89,7 @@ void M185Sequencer::DrawModule()
    for (int i = 0; i < mSteps.size(); i++)
    {
       ofFill();
-      ofSetColor(0, i == mLastPlayedStepIdx ? 255 : 0, 0, gModuleDrawAlpha * .4f);
+      ofSetColor(0, i == mLastPlayedStepIdx ? 255 : 0, 0, gModuleDrawAlpha * .4);
       ofRect(mSteps[i].xPos,
              mSteps[i].yPos,
              10, 10);

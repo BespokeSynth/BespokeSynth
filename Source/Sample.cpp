@@ -205,7 +205,7 @@ bool Sample::ConsumeData(double time, ChannelBuffer* out, int size, bool replace
    assert(size <= out->BufferSize());
 
    mPlayMutex.lock();
-   float end = mNumSamples;
+   double end = mNumSamples;
    if (mStopPoint != -1)
       end = mStopPoint;
 
@@ -364,7 +364,7 @@ void Sample::LoadState(FileStreamIn& in)
       {
          float a;
          in >> a;
-         mSampleRateRatio = a;
+         mSampleRateRatio = static_cast<double>(a);
       }
       else
          in >> mSampleRateRatio;

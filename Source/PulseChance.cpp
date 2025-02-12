@@ -98,7 +98,7 @@ void PulseChance::DrawModule()
    mNextSeedButton->Draw();
 }
 
-void PulseChance::OnPulse(double time, float velocity, int flags)
+void PulseChance::OnPulse(double time, double velocity, int flags)
 {
    ComputeSliders(0);
 

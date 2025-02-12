@@ -89,7 +89,7 @@ private:
       h = 420;
    }
 
-   float mVol{ .05 };
+   double mVol{ .05 };
    float mPhase{ 0 };
    ::ADSR mAdsr[NUM_PARTIALS]{};
    double mAmp[NUM_PARTIALS]{};

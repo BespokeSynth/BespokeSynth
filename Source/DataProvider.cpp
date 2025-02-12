@@ -186,7 +186,7 @@ void DataProvider::OnTimeEvent(double time)
 {
 }
 
-void DataProvider::OnPulse(double time, float velocity, int flags)
+void DataProvider::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0 && mEnabled && !mRealtime)
       Go(time);

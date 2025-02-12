@@ -96,7 +96,7 @@ public:
    ofVec2f GetOptionPosition(int optionIndex);
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
 protected:
    ~RadioButton(); //protected so that it can't be created on the stack
@@ -117,7 +117,7 @@ private:
    IRadioButtonListener* mOwner;
    bool mMultiSelect{ false }; //makes this... not a radio button. mVar becomes a bitmask
    RadioDirection mDirection;
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    int mLastSetValue{ 0 };
    int mForcedWidth{ -1 };
 };

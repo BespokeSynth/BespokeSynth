@@ -95,7 +95,7 @@ void Metronome::OnTimeEvent(double time)
    else
    {
       mPhaseInc = GetPhaseInc(440);
-      mOsc.Start(gTime, .8f, 0, 50, 0, 0);
+      mOsc.Start(gTime, .8, 0, 50, 0, 0);
    }
 }
 

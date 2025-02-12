@@ -130,16 +130,16 @@ void NoteHocket::PlayNote(NoteMessage note)
    {
       ComputeSliders(0);
 
-      float totalWeight = 0;
+      double totalWeight = 0;
       for (int i = 0; i < mNumDestinations; ++i)
          totalWeight += mWeight[i];
-      float random;
+      double random;
       if (mDeterministic)
       {
          const int kStepResolution = 128;
          uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
          int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
-         random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0f) * totalWeight;
+         random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0) * totalWeight;
       }
       else
       {

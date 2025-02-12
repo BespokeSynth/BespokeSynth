@@ -752,7 +752,7 @@ void StepSequencer::PlayNote(NoteMessage note)
    }
 }
 
-void StepSequencer::OnPulse(double time, float velocity, int flags)
+void StepSequencer::OnPulse(double time, double velocity, int flags)
 {
    if (!mHasExternalPulseSource)
    {

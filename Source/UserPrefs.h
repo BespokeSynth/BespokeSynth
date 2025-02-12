@@ -287,7 +287,7 @@ public:
 
    static std::string ToStringLeadingZeroes(int number);
 
-   float LastTargetFramerate;
+   double LastTargetFramerate;
    ofxJSONElement mUserPrefsFile;
    std::vector<UserPref*> mUserPrefs;
    UserPrefDropdownString devicetype{ "devicetype", "auto", 200, UserPrefCategory::General };

@@ -53,7 +53,7 @@ public:
    ofVec2d& GetDrawOffsetRef() { return mDrawOffset; }
    void SetDrawOffset(ofVec2d offset) { mDrawOffset = offset; }
    double GetDrawScale() const;
-   void SetDrawScale(float scale) { mDrawScale = scale; }
+   void SetDrawScale(double scale) { mDrawScale = scale; }
 
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);

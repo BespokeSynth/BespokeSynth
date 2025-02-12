@@ -52,7 +52,7 @@ public:
    template <class T>
    void SetEnum(std::string prop, T val) { SetInt(prop, (int)val); }
 
-   void SetExtents(std::string prop, float min, float max);
+   void SetExtents(std::string prop, double min, double max);
 
    bool HasProperty(std::string prop);
    int GetInt(std::string prop);

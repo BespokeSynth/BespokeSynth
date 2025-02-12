@@ -251,11 +251,11 @@ void LooperRecorder::Process(double time)
    GetBuffer()->Reset();
 }
 
-void LooperRecorder::DrawCircleHash(ofVec2f center, float progress, float width, float innerRadius, float outerRadius)
+void LooperRecorder::DrawCircleHash(ofVec2d center, double progress, float width, double innerRadius, double outerRadius)
 {
    ofSetLineWidth(width);
-   float sinTheta = sin(progress * TWO_PI);
-   float cosTheta = cos(progress * TWO_PI);
+   double sinTheta = sin(progress * TWO_PI);
+   double cosTheta = cos(progress * TWO_PI);
    ofLine(innerRadius * sinTheta + center.x, innerRadius * -cosTheta + center.y,
           outerRadius * sinTheta + center.x, outerRadius * -cosTheta + center.y);
 }
@@ -428,20 +428,20 @@ void LooperRecorder::RemoveLooper(Looper* looper)
    }
 }
 
-float LooperRecorder::AdjustedRootForSpeed()
+double LooperRecorder::AdjustedRootForSpeed()
 {
-   float rootFreq = TheScale->PitchToFreq(TheScale->ScaleRoot() + 24);
+   double rootFreq = TheScale->PitchToFreq(TheScale->ScaleRoot() + 24);
    rootFreq *= mSpeed;
    return TheScale->FreqToPitch(rootFreq);
 }
 
 void LooperRecorder::SnapToClosestPitch()
 {
-   float currentPitch = AdjustedRootForSpeed();
-   float desiredPitch = int(currentPitch + .5f);
+   double currentPitch = AdjustedRootForSpeed();
+   double desiredPitch = int(currentPitch + .5);
 
-   float currentFreq = TheScale->PitchToFreq(currentPitch);
-   float desiredFreq = TheScale->PitchToFreq(desiredPitch);
+   double currentFreq = TheScale->PitchToFreq(currentPitch);
+   double desiredFreq = TheScale->PitchToFreq(desiredPitch);
 
    TheTransport->SetTempo(TheTransport->GetTempo() * desiredFreq / currentFreq);
 }
@@ -451,7 +451,7 @@ void LooperRecorder::Resample(bool setKey)
    if (setKey)
    {
       SnapToClosestPitch();
-      TheScale->SetRoot(int(AdjustedRootForSpeed() + .5f));
+      TheScale->SetRoot(int(AdjustedRootForSpeed() + .5));
    }
 
    SyncLoopLengths();
@@ -459,12 +459,12 @@ void LooperRecorder::Resample(bool setKey)
 
 void LooperRecorder::UpdateSpeed()
 {
-   float newSpeed = TheTransport->GetTempo() / mBaseTempo;
-   if (mSpeed != newSpeed)
+   double newSpeed = TheTransport->GetTempo() / mBaseTempo;
+   if (!ofAlmostEquel(mSpeed, newSpeed))
    {
       mSpeed = newSpeed;
-      if (mSpeed == 0)
-         mSpeed = .001f;
+      if (ofAlmostEquel(mSpeed, 0))
+         mSpeed = .001;
    }
 }
 
@@ -561,9 +561,9 @@ void LooperRecorder::EndFreeRecord(double time)
    if (!mFreeRecording)
       return;
 
-   float recordedTime = time - mStartFreeRecordTime;
+   double recordedTime = time - mStartFreeRecordTime;
    int beats = mNumBars * TheTransport->GetTimeSigTop();
-   float minutes = recordedTime / 1000.0f / 60.0f;
+   double minutes = recordedTime / 1000.0 / 60.0;
    TheTransport->SetTempo(beats / minutes);
    TheTransport->SetDownbeat();
    mRecorderMode = kRecorderMode_Loop;
@@ -683,7 +683,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button, double time)
       }
       TheTransport->SetTempo(TheTransport->GetTempo() * 2);
       mBaseTempo = TheTransport->GetTempo();
-      float pos = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % 8);
+      double pos = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % 8);
       int count = TheTransport->GetMeasure(time) - int(pos);
       pos *= 2;
       count += int(pos);
@@ -705,7 +705,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button, double time)
       }
       TheTransport->SetTempo(TheTransport->GetTempo() / 2);
       mBaseTempo = TheTransport->GetTempo();
-      float pos = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % 8);
+      double pos = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % 8);
       int count = TheTransport->GetMeasure(time) - int(pos);
       pos /= 2;
       count += int(pos);
@@ -738,10 +738,10 @@ void LooperRecorder::ButtonClicked(ClickButton* button, double time)
          if (mLoopers[i])
             mLoopers[i]->HalfShift();
       }
-      int newMeasure = int(TheTransport->GetMeasure(time) + TheTransport->GetMeasurePos(time) - .5f);
+      int newMeasure = int(TheTransport->GetMeasure(time) + TheTransport->GetMeasurePos(time) - .5);
       if (newMeasure < 0)
          newMeasure = 7;
-      float newMeasurePos = FloatWrap(TheTransport->GetMeasurePos(time) - .5f, 1);
+      double newMeasurePos = DoubleWrap(TheTransport->GetMeasurePos(time) - .5, 1);
       TheTransport->SetMeasureTime(newMeasure + newMeasurePos);
    }
 
@@ -843,11 +843,11 @@ void LooperRecorder::CheckboxUpdated(Checkbox* checkbox, double time)
             double currentMeasureTime = TheTransport->GetMeasureTime(gTime);
             double lengthInMeasures = currentMeasureTime - mStartRecordMeasureTime[i];
             int numBars = 1;
-            if (lengthInMeasures < 1.5f)
+            if (lengthInMeasures < 1.5)
                numBars = 1;
-            else if (lengthInMeasures < 3.0f)
+            else if (lengthInMeasures < 3.0)
                numBars = 2;
-            else if (lengthInMeasures < 6.0f)
+            else if (lengthInMeasures < 6.0)
                numBars = 4;
             else
                numBars = 8;

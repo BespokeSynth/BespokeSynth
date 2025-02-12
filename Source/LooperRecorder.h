@@ -105,10 +105,10 @@ public:
 private:
    void SyncLoopLengths();
    void UpdateSpeed();
-   float AdjustedRootForSpeed();
+   double AdjustedRootForSpeed();
    void SnapToClosestPitch();
    void Resample(bool setKey);
-   void DrawCircleHash(ofVec2f center, float progress, float width, float innerRadius, float outerRadius);
+   void DrawCircleHash(ofVec2d center, double progress, float width, double innerRadius, double outerRadius);
 
    //IDrawableModule
    void DrawModule() override;
@@ -123,8 +123,8 @@ private:
    int mNumLoopers{ 4 };
    int mNumBars{ 1 };
    DropdownList* mNumBarsSelector{ nullptr };
-   float mSpeed{ 1 };
-   float mBaseTempo{ 120 };
+   double mSpeed{ 1 };
+   double mBaseTempo{ 120 };
    ClickButton* mResampleButton{ nullptr };
    ClickButton* mResampAndSetButton{ nullptr };
    Looper* mMergeSource{ nullptr };
@@ -141,7 +141,7 @@ private:
    ClickButton* mShiftDownbeatButton{ nullptr };
    ClickButton* mOrigSpeedButton{ nullptr };
    ClickButton* mSnapPitchButton{ nullptr };
-   float mCommitDelay{ 0 };
+   double mCommitDelay{ 0 };
    FloatSlider* mCommitDelaySlider{ nullptr };
    ChannelBuffer mWriteBuffer;
    Looper* mCommitToLooper{ nullptr };

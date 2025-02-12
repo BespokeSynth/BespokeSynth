@@ -92,7 +92,7 @@ void SampleCanvas::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
 
-   float canvasPos = GetCurPos(time);
+   double canvasPos = GetCurPos(time);
 
    mCanvas->SetCursorPos(canvasPos);
 
@@ -106,17 +106,14 @@ void SampleCanvas::Process(double time)
    {
       SampleCanvasElement* element = static_cast<SampleCanvasElement*>(elements[elemIdx]);
       Sample* clip = element->GetSample();
-      float vol = element->GetVolume();
+      double vol = element->GetVolume();
       if (clip == nullptr || element->IsMuted())
          continue;
 
       for (int i = 0; i < bufferSize; ++i)
       {
-         float sampleIndex = 0;
-
-         float pos = GetCurPos(time + i * gInvSampleRateMs);
-
-         sampleIndex = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
+         double pos = GetCurPos(time + i * gInvSampleRateMs);
+         double sampleIndex = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
 
          if (sampleIndex >= 0 && sampleIndex < clip->LengthInSamples())
          {

@@ -164,7 +164,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       {
          if (msg[0].isFloat32() || msg[0].isInt32())
          {
-            float new_value = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+            double new_value = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
             DropdownList* dropdown = dynamic_cast<DropdownList*>(control);
             if (is_percentage)
                control->SetFromMidiCC(new_value, gTime, false);
@@ -244,16 +244,16 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       else if (subcommand == "focus")
       {
          ofRectangle module_rect = selected_module->GetRect();
-         float zoom = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         double zoom = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
          if (zoom >= 0.1)
             gDrawScale = ofClamp(zoom, 0.1, 8);
-         else if (fabs(zoom) < 0.1) // Close to 0
+         else if (std::abs(zoom) < 0.1) // Close to 0
          {
             //calculate zoom to view the entire module
-            float margin = 60;
-            float w_ratio = ofGetWidth() / (module_rect.width + margin);
-            float h_ratio = ofGetHeight() / (module_rect.height + margin);
-            float ratio = (w_ratio < h_ratio) ? w_ratio : h_ratio;
+            double margin = 60;
+            double w_ratio = ofGetWidth() / (module_rect.width + margin);
+            double h_ratio = ofGetHeight() / (module_rect.height + margin);
+            double ratio = (w_ratio < h_ratio) ? w_ratio : h_ratio;
             gDrawScale = ofClamp(ratio, 0.1, 8);
          }
          // Move viewport to centered on the module

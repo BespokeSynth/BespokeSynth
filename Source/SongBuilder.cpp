@@ -341,7 +341,7 @@ void SongBuilder::OnTimeEvent(double time)
    }
 }
 
-void SongBuilder::OnPulse(double time, float velocity, int flags)
+void SongBuilder::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0 && mCurrentScene < (int)mScenes.size() - 1)
       SetActiveScene(time, mCurrentScene + 1);

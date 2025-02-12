@@ -236,7 +236,7 @@ void SignalGenerator::PlayNote(NoteMessage note)
    }
 }
 
-void SignalGenerator::OnPulse(double time, float velocity, int flags)
+void SignalGenerator::OnPulse(double time, double velocity, int flags)
 {
    mResetPhaseAtMs = time;
 }

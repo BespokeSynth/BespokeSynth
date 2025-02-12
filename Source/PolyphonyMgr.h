@@ -47,11 +47,11 @@ enum VoiceType
 
 struct VoiceInfo
 {
-   float mPitch{ -1 };
+   double mPitch{ -1 };
    IMidiVoice* mVoice{ nullptr };
    double mTime{ 0 };
    bool mNoteOn{ false };
-   float mActivity{ 0 };
+   double mActivity{ 0 };
 };
 
 class PolyphonyMgr

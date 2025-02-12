@@ -66,7 +66,7 @@ void Razor::CreateUIControls()
    mSSlider = new FloatSlider(this, "S", 450, 374, 80, 15, &mS, 0, 1);
    mRSlider = new FloatSlider(this, "R", 450, 390, 80, 15, &mR, 1, 1000);
    mHarmonicSelectorSlider = new IntSlider(this, "harmonics", 5, 120, 160, 15, &mHarmonicSelector, -1, 10);
-   mPowFalloffSlider = new FloatSlider(this, "pow falloff", 170, 120, 160, 15, &mPowFalloff, .1f, 2);
+   mPowFalloffSlider = new FloatSlider(this, "pow falloff", 170, 120, 160, 15, &mPowFalloff, .1, 2);
    mNegHarmonicsSlider = new IntSlider(this, "neg harmonics", 335, 120, 160, 15, &mNegHarmonics, 1, 10);
    mHarshnessCutSlider = new FloatSlider(this, "harshness cut", 500, 120, 160, 15, &mHarshnessCut, 0, 20000);
    mManualControlCheckbox = new Checkbox(this, "manual control", 4, 145, &mManualControl);
@@ -108,7 +108,7 @@ void Razor::Process(double time)
 
    for (int i = 0; i < bufferSize; ++i)
    {
-      float freq = TheScale->PitchToFreq(mPitch + (mPitchBend ? mPitchBend->GetValue(i) : 0));
+      double freq = TheScale->PitchToFreq(mPitch + (mPitchBend ? mPitchBend->GetValue(i) : 0));
 
       int oscNyquistLimitIdx = int(gNyquistLimit / freq);
 
@@ -142,7 +142,7 @@ void Razor::PlayNote(NoteMessage note)
 
    if (note.velocity > 0)
    {
-      float amount = note.velocity / 127.0f;
+      double amount = note.velocity / 127.0;
 
       mPitch = note.pitch;
       for (int i = 1; i <= NUM_PARTIALS; ++i)
@@ -203,12 +203,12 @@ void Razor::DrawViz()
    ofPushStyle();
 
    int zeroHeight = 240;
-   float baseFreq = TheScale->PitchToFreq(mPitch);
+   double baseFreq = TheScale->PitchToFreq(mPitch);
    int oscNyquistLimitIdx = int(gNyquistLimit / baseFreq);
 
    for (int i = 1; i < RAZOR_HISTORY - 1; ++i)
    {
-      float age = 1 - float(i) / RAZOR_HISTORY;
+      double age = 1 - double(i) / RAZOR_HISTORY;
       ofSetColor(0, 200 * age, 255 * age);
       for (int x = 0; x < VIZ_WIDTH; ++x)
       {
@@ -304,7 +304,7 @@ bool IsPow2(int n)
 
 void Razor::CalcAmp()
 {
-   float baseFreq = TheScale->PitchToFreq(mPitch);
+   double baseFreq = TheScale->PitchToFreq(mPitch);
    int oscNyquistLimitIdx = int(gNyquistLimit / baseFreq);
 
    std::memset(mAmp, 0, sizeof(float) * NUM_PARTIALS);
@@ -315,15 +315,15 @@ void Razor::CalcAmp()
           mHarmonicSelector == 1 ||
           (mHarmonicSelector > 0 && i % mHarmonicSelector == 1))
       {
-         float freq = baseFreq * i;
+         double freq = baseFreq * i;
 
-         mAmp[i - 1] = 1.0f / powf(i, mPowFalloff);
+         mAmp[i - 1] = 1.0 / std::pow(i, mPowFalloff);
 
          for (int j = 0; j < NUM_BUMPS; ++j)
          {
-            float freqDist = fabs(mBumps[j].mFreq - freq);
-            float dist = PI / 2 - freqDist * mBumps[j].mDecay;
-            float bumpAmt = mBumps[j].mAmt * (MIN(1, (tanh(dist) + 1) / 2)); // * ofRandom(1);
+            double freqDist = std::abs(mBumps[j].mFreq - freq);
+            double dist = PI / 2 - freqDist * mBumps[j].mDecay;
+            double bumpAmt = mBumps[j].mAmt * (MIN(1, (tanh(dist) + 1) / 2)); // * ofRandom(1);
             mAmp[i - 1] += bumpAmt;
          }
 
@@ -332,7 +332,7 @@ void Razor::CalcAmp()
 
          if (mHarshnessCut > 0)
          {
-            float cutPoint = gNyquistLimit - mHarshnessCut;
+            double cutPoint = gNyquistLimit - mHarshnessCut;
             if (freq > cutPoint)
                mAmp[i - 1] *= 1 - ((freq - cutPoint) / mHarshnessCut);
          }

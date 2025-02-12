@@ -331,7 +331,7 @@ double FloatSliderLFOControl::GetTargetMax() const
    return 1;
 }
 
-void FloatSliderLFOControl::OnPulse(double time, float velocity, int flags)
+void FloatSliderLFOControl::OnPulse(double time, double velocity, int flags)
 {
    mLFO.ResetPhase(time);
 }

@@ -55,7 +55,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IAudioPoller
    void OnTransportAdvanced(double amount) override;
@@ -105,7 +105,7 @@ private:
    static const int kMaxSteps = 128;
    float mWidth{ 254 };
    float mHeight{ 58 };
-   float mVels[kMaxSteps]{};
+   double mVels[kMaxSteps]{};
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
    int mStep{ 0 };

@@ -116,7 +116,7 @@ void PSMoveController::Poll()
 
    ofVec3f accel(0, 0, 0);
    mMoveMgr.GetAccel(0, accel);
-   mEnergy = ofClamp(accel.length() / 5000 - .8f, 0, 1);
+   mEnergy = ofClamp(accel.length() / 5000 - .8, 0, 1);
    if (mEnergyUIControl)
       mEnergyUIControl->SetFromMidiCC(mEnergy, NextBufferTime(false), false);
 }
@@ -181,7 +181,7 @@ void PSMoveController::OnTimeEvent(double time)
 {
    if (mVibronomeOn)
    {
-      float length = 100;
+      double length = 100;
       if (TheTransport->GetQuantized(time, mTransportListenerInfo) == 0)
          length = 200;
       mVibration.Start(1, 0, length);

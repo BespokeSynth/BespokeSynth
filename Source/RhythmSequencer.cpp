@@ -227,7 +227,7 @@ void RhythmSequencer::PlayNote(NoteMessage note)
       mInputPitches[note.pitch] = note.velocity > 0;
 }
 
-void RhythmSequencer::OnPulse(double time, float velocity, int flags)
+void RhythmSequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
 
@@ -281,7 +281,7 @@ void RhythmSequencer::Step(double time, float velocity, int pulseFlags)
             int tone = TheScale->GetToneFromPitch(pitch) + mStepData[mArpIndexDegree].mDegree;
             int adjustedPitch = TheScale->GetPitchFromTone(tone) + mStepData[mArpIndexOctave].mOctave * 12;
             if (adjustedPitch >= 0 && adjustedPitch < 128)
-               mNoteOutput.PlayNote(NoteMessage(time, adjustedPitch, mStepData[mArpIndexVel].mVel * velocity * 127.0f));
+               mNoteOutput.PlayNote(NoteMessage(time, adjustedPitch, mStepData[mArpIndexVel].mVel * velocity * 127.0));
          }
       }
    }
@@ -335,7 +335,7 @@ void RhythmSequencer::DropdownUpdated(DropdownList* list, int oldVal, double tim
       if (transportListenerInfo != nullptr)
       {
          transportListenerInfo->mInterval = mInterval;
-         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1f, true);
+         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1, true);
       }
    }
 }

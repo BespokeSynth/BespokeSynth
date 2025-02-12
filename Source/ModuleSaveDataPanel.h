@@ -96,8 +96,8 @@ private:
    std::map<DropdownList*, ModuleSaveData::SaveVal*> mStringDropdowns;
 
    int mHeight{ 100 };
-   float mAppearAmount{ 0 };
-   float mAlignmentX{ 100 };
+   double mAppearAmount{ 0 };
+   double mAlignmentX{ 100 };
    int mPresetFileIndex{ 0 };
    bool mPresetFileUpdateQueued{ false };
    std::vector<std::string> mPresetFilePaths;

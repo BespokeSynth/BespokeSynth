@@ -219,7 +219,7 @@ bool Checkbox::CheckNeedsDraw()
    return *mVar != mLastDisplayedValue;
 }
 
-void Checkbox::OnPulse(double time, float velocity, int flags)
+void Checkbox::OnPulse(double time, double velocity, int flags)
 {
    SetValue(*mVar ? 0 : 1, time, false);
 }

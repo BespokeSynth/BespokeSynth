@@ -164,7 +164,7 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoubleLengthButton)
    {
-      float newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
+      double newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
       if (newEnd < mSample->LengthInSamples())
       {
          mClipEnd = newEnd;
@@ -175,7 +175,7 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    {
       if (mNumBars % 2 == 0)
       {
-         float newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
+         double newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
          mClipEnd = newEnd;
          mNumBars /= 2;
       }
@@ -184,8 +184,8 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    {
       if (mClipStart < mClipEnd)
       {
-         float samplesPerMeasure = mClipEnd - mClipStart;
-         float secondsPerMeasure = samplesPerMeasure / gSampleRate;
+         double samplesPerMeasure = mClipEnd - mClipStart;
+         double secondsPerMeasure = samplesPerMeasure / gSampleRate;
          mTempo = 1 / secondsPerMeasure * 4 * 60 * mNumBars;
          mStartOffset = ((mClipStart / samplesPerMeasure) - int(mClipStart / samplesPerMeasure)) * samplesPerMeasure;
       }

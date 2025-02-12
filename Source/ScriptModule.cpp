@@ -316,7 +316,7 @@ void ScriptModule::DrawModule()
       if (mPrintDisplay[i].time == -1)
          continue;
 
-      float fadeMs = 500;
+      double fadeMs = 500;
       if (gTime - mPrintDisplay[i].time >= 0 && gTime - mPrintDisplay[i].time < fadeMs)
       {
          ofSetColor(ofColor::white, 255 * (1 - (gTime - mPrintDisplay[i].time) / fadeMs));
@@ -334,7 +334,7 @@ void ScriptModule::DrawModule()
       if (mUIControlModifications[i].time == -1)
          continue;
 
-      float fadeMs = 500;
+      double fadeMs = 500;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Modulator), 255 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
@@ -417,7 +417,7 @@ void ScriptModule::DrawModuleUnclipped()
       if (mUIControlModifications[i].time == -1)
          continue;
 
-      float fadeMs = 200;
+      double fadeMs = 200;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Modulator), 100 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
@@ -493,10 +493,10 @@ void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofCo
    ofVec2f linePos = mCodeEntry->GetLinePos(lineNum, false);
    linePos.x += 11;
    linePos.y += 10;
-   float t = (gTime - startTime) / (endTime - startTime);
+   double t = (gTime - startTime) / (endTime - startTime);
    if (t > 0 && t < 1)
    {
-      const float kRadius = 5;
+      const double kRadius = 5;
       ofPushStyle();
       if (filled)
          ofSetColor(color);
@@ -790,7 +790,7 @@ IUIControl* ScriptModule::GetUIControl(std::string path)
    return control;
 }
 
-void ScriptModule::AdjustUIControl(IUIControl* control, float value, double time, int lineNum)
+void ScriptModule::AdjustUIControl(IUIControl* control, double value, double time, int lineNum)
 {
    control->SetValue(value, time);
 
@@ -910,7 +910,7 @@ void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
    mMidiMessageQueueMutex.unlock();
 }
 
-void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
+void ScriptModule::MidiReceived(MidiMessageType messageType, int control, double value, int channel)
 {
    mMidiMessageQueueMutex.lock();
    mMidiMessageQueue.push_back("on_midi(" + ofToString((int)messageType) + ", " + ofToString(control) + ", " + ofToString(value) + ", " + ofToString(channel) + ")");
@@ -1109,7 +1109,7 @@ void ScriptModule::OnCodeUpdated()
    }
 }
 
-void ScriptModule::OnPulse(double time, float velocity, int flags)
+void ScriptModule::OnPulse(double time, double velocity, int flags)
 {
    for (size_t i = 0; i < mScheduledPulseTimes.size(); ++i)
    {

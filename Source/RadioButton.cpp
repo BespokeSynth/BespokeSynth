@@ -153,7 +153,7 @@ void RadioButton::Render()
    float w, h;
    GetDimensions(w, h);
    ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
    ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofPushMatrix();
    ofClipWindow(mX, mY, mWidth, mHeight, true);
@@ -238,7 +238,7 @@ ofVec2f RadioButton::GetOptionPosition(int optionIndex)
       return ofVec2f(x + float(mWidth) / GetNumValues() * (optionIndex + .5f), y + mHeight);
 }
 
-void RadioButton::OnPulse(double time, float velocity, int flags)
+void RadioButton::OnPulse(double time, double velocity, int flags)
 {
    int length = static_cast<int>(mElements.size());
    if (length <= 0)

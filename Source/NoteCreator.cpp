@@ -71,7 +71,7 @@ void NoteCreator::DrawModule()
    mDurationSlider->Draw();
 }
 
-void NoteCreator::OnPulse(double time, float velocity, int flags)
+void NoteCreator::OnPulse(double time, double velocity, int flags)
 {
    TriggerNote(time, velocity * mVelocity);
 }

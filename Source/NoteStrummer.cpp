@@ -63,7 +63,7 @@ void NoteStrummer::DrawModule()
    int i = 0;
    for (const auto pitch : mNotes)
    {
-      const double pos = static_cast<double>(i + .5f) / numNotes;
+      const double pos = (i + .5) / numNotes;
       DrawTextNormal(NoteName(pitch), mStrumSlider->GetPosition(true).x + pos * mStrumSlider->IClickable::GetDimensions().x, mStrumSlider->GetPosition(true).y + mStrumSlider->IClickable::GetDimensions().y + 12);
       ++i;
    }

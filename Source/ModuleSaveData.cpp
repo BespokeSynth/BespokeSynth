@@ -131,7 +131,7 @@ void ModuleSaveData::SetString(std::string prop, std::string val)
    StringCopy(save->mString, val.c_str(), MAX_TEXTENTRY_LENGTH);
 }
 
-void ModuleSaveData::SetExtents(std::string prop, float min, float max)
+void ModuleSaveData::SetExtents(std::string prop, double min, double max)
 {
    SaveVal* save = GetVal(prop);
    assert(save);

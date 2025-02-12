@@ -153,7 +153,7 @@ void ControlSequencer::Step(double time, int pulseFlags)
    }
 }
 
-void ControlSequencer::OnPulse(double time, float velocity, int flags)
+void ControlSequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
 

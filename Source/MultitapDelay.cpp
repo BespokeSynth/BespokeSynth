@@ -336,8 +336,8 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
       int sampsAgoA = int(delaySamps);
       int sampsAgoB = sampsAgoA + 1;
 
-      float sample = mOwner->mDelayBuffer.GetSample(sampsAgoA, ch);
-      float nextSample = mOwner->mDelayBuffer.GetSample(sampsAgoB, ch);
+      double sample = mOwner->mDelayBuffer.GetSample(sampsAgoA, ch);
+      double nextSample = mOwner->mDelayBuffer.GetSample(sampsAgoB, ch);
       double a = delaySamps - sampsAgoA;
       double delayedSample = (1 - a) * sample + a * nextSample; //interpolate
 
@@ -345,7 +345,7 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
       mTapBuffer.GetChannel(ch)[offset] = outputSample;
 
       *sampleOut += outputSample;
-      float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
+      double panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
       mOwner->mDelayBuffer.Accum(gBufferSize - offset, outputSample * mFeedback * panGain, ch);
    }
 }

@@ -127,12 +127,12 @@ void NoteSinger::OnScaleChanged()
    for (int i = 0; i < mNumBuckets; ++i)
    {
       int pitch = GetPitchForBucket(i);
-      float f = TheScale->PitchToFreq(pitch);
+      double f = TheScale->PitchToFreq(pitch);
 
       mBands[i].SetFilterType(kFilterType_Bandpass);
       mBands[i].SetFilterParams(f, 40 + mNumBuckets * 2 - i * 2);
 
-      mPeaks[i].SetDecayTime(.05f);
+      mPeaks[i].SetDecayTime(.05);
    }
 }
 

@@ -69,7 +69,7 @@ void PulseDisplayer::DrawModule()
    ofPopStyle();
 }
 
-void PulseDisplayer::OnPulse(double time, float velocity, int flags)
+void PulseDisplayer::OnPulse(double time, double velocity, int flags)
 {
    mLastReceivedFlags = flags;
    mLastReceivedFlagTime = gTime;

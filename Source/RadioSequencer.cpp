@@ -188,7 +188,7 @@ void RadioSequencer::Step(double time, int pulseFlags)
    UpdateGridLights();
 }
 
-void RadioSequencer::OnPulse(double time, float velocity, int flags)
+void RadioSequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
 

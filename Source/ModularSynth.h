@@ -176,8 +176,8 @@ public:
 
    void ZoomView(double zoomAmount, bool fromMouse);
    void SetZoomLevel(double zoomLevel);
-   void PanView(float x, float y);
-   void PanTo(float x, float y);
+   void PanView(double x, double y);
+   void PanTo(double x, double y);
    void SetRawSpaceMouseTwist(float twist, bool isUsing)
    {
       mSpaceMouseInfo.mTwist = twist;

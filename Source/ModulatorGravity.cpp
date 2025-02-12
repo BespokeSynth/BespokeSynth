@@ -96,7 +96,7 @@ double ModulatorGravity::Value(int samplesIn)
    return ofLerp(GetMin(), GetMax(), mValue); //TODO(integrate over samples)
 }
 
-void ModulatorGravity::OnPulse(double time, float velocity, int flags)
+void ModulatorGravity::OnPulse(double time, double velocity, int flags)
 {
    Kick(velocity);
 }

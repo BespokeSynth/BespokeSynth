@@ -100,7 +100,7 @@ void PulseDelayer::OnTransportAdvanced(double amount)
    }
 }
 
-void PulseDelayer::OnPulse(double time, float velocity, int flags)
+void PulseDelayer::OnPulse(double time, double velocity, int flags)
 {
    if (!mEnabled)
    {

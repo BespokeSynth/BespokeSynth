@@ -114,7 +114,7 @@ public:
 private:
    void InitDevice();
    void BuildDeviceList();
-   float GetRoundedTempo();
+   double GetRoundedTempo();
 
    //IDrawableModule
    void DrawModule() override;

@@ -464,7 +464,7 @@ bool DropdownList::CanBeTargetedBy(PatchCableSource* source) const
    return IUIControl::CanBeTargetedBy(source);
 }
 
-void DropdownList::OnPulse(double time, float velocity, int flags)
+void DropdownList::OnPulse(double time, double velocity, int flags)
 {
    int length = static_cast<int>(mElements.size());
    if (length <= 0)

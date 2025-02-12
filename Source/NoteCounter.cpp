@@ -206,7 +206,7 @@ void NoteCounter::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
-void NoteCounter::OnPulse(double time, float velocity, int flags)
+void NoteCounter::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
 

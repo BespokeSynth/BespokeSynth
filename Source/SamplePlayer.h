@@ -61,7 +61,7 @@ public:
 
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IAudioSource
    void Process(double time) override;
@@ -106,8 +106,8 @@ public:
 
 private:
    void UpdateSample(Sample* sample, bool ownsSample);
-   float GetPlayPositionForMouse(float mouseX) const;
-   float GetSecondsForMouse(float mouseX) const;
+   double GetPlayPositionForMouse(double mouseX) const;
+   double GetSecondsForMouse(double mouseX) const;
    void GetPlayInfoForPitch(int pitch, double& startSeconds, double& lengthSeconds, double& speed, bool& stopOnNoteOff) const;
    void DownloadYoutube(std::string url, std::string titles);
    void SearchYoutube(std::string searchTerm);
@@ -115,13 +115,13 @@ private:
    void SaveFile();
    void OnYoutubeSearchComplete(std::string searchTerm, double searchStartTime);
    void OnYoutubeDownloadComplete(std::string filename, std::string title);
-   void SetCuePointForX(float mouseX);
+   void SetCuePointForX(double mouseX);
    int GetZoomStartSample() const;
    int GetZoomEndSample() const;
-   float GetZoomStartSeconds() const;
-   float GetZoomEndSeconds() const;
+   double GetZoomStartSeconds() const;
+   double GetZoomEndSeconds() const;
    void UpdateActiveCuePoint();
-   void PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds);
+   void PlayCuePoint(double time, int index, int velocity, double speedMult, double startOffsetSeconds);
    void RunProcess(const juce::StringArray& args);
    void AutoSlice(int slices);
    void StopRecording();
@@ -162,13 +162,13 @@ private:
    ClickButton* mLoadFileButton{ nullptr };
    ClickButton* mSaveFileButton{ nullptr };
    bool mIsLoadingSample{ false };
-   float mZoomLevel{ 1 };
-   float mZoomOffset{ 0 };
+   double mZoomLevel{ 1 };
+   double mZoomOffset{ 0 };
    ClickButton* mTrimToZoomButton{ nullptr };
 
    bool mOscWheelGrabbed{ false };
-   float mOscWheelPos{ 0 };
-   float mOscWheelSpeed{ 0 };
+   double mOscWheelPos{ 0 };
+   double mOscWheelSpeed{ 0 };
 
    ChannelBuffer mDrawBuffer{ 0 };
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
 bespoke synth, a software modular synthesizer
     Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
 
@@ -70,7 +70,7 @@ bool PulseRouter::IsIndexActive(int idx) const
    return mRouteMask & (1 << idx);
 }
 
-void PulseRouter::OnPulse(double time, float velocity, int flags)
+void PulseRouter::OnPulse(double time, double velocity, int flags)
 {
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {

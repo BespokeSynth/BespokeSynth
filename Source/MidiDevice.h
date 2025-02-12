@@ -34,7 +34,7 @@ struct MidiNote
    const char* mDeviceName;
    double mTimestampMs{ 0 };
    int mPitch{ 0 };
-   float mVelocity{ 0 }; //0-127
+   double mVelocity{ 0 }; //0-127
    int mChannel{ -1 };
 };
 
@@ -42,7 +42,7 @@ struct MidiControl
 {
    const char* mDeviceName;
    int mControl{ 0 };
-   float mValue{ 0 };
+   double mValue{ 0 };
    int mChannel{ -1 };
 };
 
@@ -56,7 +56,7 @@ struct MidiProgramChange
 struct MidiPitchBend
 {
    const char* mDeviceName;
-   float mValue{ 0 };
+   double mValue{ 0 };
    int mChannel{ -1 };
 };
 
@@ -64,7 +64,7 @@ struct MidiPressure
 {
    const char* mDeviceName;
    int mPitch{ 0 };
-   float mPressure{ 0 };
+   double mPressure{ 0 };
    int mChannel{ -1 };
 };
 
@@ -111,8 +111,8 @@ public:
 
    static void SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const juce::MidiMessage& message);
 
-   static constexpr float kPitchBendCenter{ 8192.0f };
-   static constexpr float kPitchBendMax{ 16320.0f };
+   static constexpr double kPitchBendCenter{ 8192.0 };
+   static constexpr double kPitchBendMax{ 16320.0 };
 
 private:
    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;

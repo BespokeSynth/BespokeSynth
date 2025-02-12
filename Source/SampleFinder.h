@@ -77,7 +77,7 @@ private:
    void UpdateSample();
    void DoWrite();
    void UpdateZoomExtents();
-   float GetSpeed();
+   double GetSpeed();
 
    //IDrawableModule
    void DrawModule() override;

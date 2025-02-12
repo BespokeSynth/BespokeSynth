@@ -72,7 +72,7 @@ public:
    void SetNumNoteOutputs(int num);
    void ConnectOscInput(int port);
    void SysExReceived(const uint8_t* data, int data_size);
-   void MidiReceived(MidiMessageType messageType, int control, float value, int channel);
+   void MidiReceived(MidiMessageType messageType, int control, double value, int channel);
    void OnModuleReferenceBound(IDrawableModule* target);
    void SetContext();
    void ClearContext();
@@ -80,7 +80,7 @@ public:
 
    void RunCode(double time, std::string code);
 
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, double oldValue, double time) override {}
    void DropdownClicked(DropdownList* list) override;
@@ -131,7 +131,7 @@ public:
 
 private:
    void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
-   void AdjustUIControl(IUIControl* control, float value, double time, int lineNum);
+   void AdjustUIControl(IUIControl* control, double value, double time, int lineNum);
    std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
    void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
@@ -248,7 +248,7 @@ private:
    {
       double time{ 0 };
       ofVec2f position;
-      float value{ 0 };
+      double value{ 0 };
       int lineNum{ -1 };
    };
    std::array<UIControlModificationDisplay, 10> mUIControlModifications;

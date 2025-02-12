@@ -178,14 +178,14 @@ void Rewriter::Go(double time)
    {
       if (mStartRecordTime != -1)
       {
-         float recordedMs = time - mStartRecordTime;
-         float numBarsCurrentTempo = recordedMs / TheTransport->MsPerBar();
-         int numBars = int(numBarsCurrentTempo + .5f);
+         double recordedMs = time - mStartRecordTime;
+         double numBarsCurrentTempo = recordedMs / TheTransport->MsPerBar();
+         int numBars = std::round(numBarsCurrentTempo);
          numBars = MAX(1, int(Pow2(floor(log2(numBars))))); //find closest power of 2
 
          int beats = numBars * TheTransport->GetTimeSigTop();
-         float minutes = recordedMs / 1000.0f / 60.0f;
-         float bpm = beats / minutes;
+         double minutes = recordedMs / 1000.0 / 60.0;
+         double bpm = beats / minutes;
          TheTransport->SetTempo(bpm);
          TheTransport->SetDownbeat();
          mConnectedLooper->SetNumBars(numBars);

@@ -124,7 +124,7 @@ void NoteTable::DrawModule()
    mGrid->Draw();
 
    ofPushStyle();
-   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
+   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
    for (int i = 0; i < mGrid->GetCols(); ++i)
    {
       ofVec2f pos = mGrid->GetCellPosition(i, mGrid->GetRows() - 1) + mGrid->GetPosition(true);
@@ -187,10 +187,10 @@ void NoteTable::DrawModule()
 
    for (int i = 0; i < mGrid->GetCols(); ++i)
    {
-      const float kPlayHighlightDurationMs = 250;
+      const double kPlayHighlightDurationMs = 250;
       if (mLastColumnPlayTime[i] != -1)
       {
-         float fade = ofClamp(1 - (gTime - mLastColumnPlayTime[i]) / kPlayHighlightDurationMs, 0, 1);
+         double fade = ofClamp(1 - (gTime - mLastColumnPlayTime[i]) / kPlayHighlightDurationMs, 0, 1);
          ofPushStyle();
          ofFill();
          ofSetColor(ofColor::white, ofLerp(20, 80, fade));
@@ -471,10 +471,10 @@ void NoteTable::RandomizePitches(bool fifths)
                if (mGrid->GetVal(i, j) > 0)
                   row = j;
             }
-            float minValue = MAX(0, row - mNoteRange * mRandomizePitchRange);
-            float maxValue = MIN(mNoteRange, row + mNoteRange * mRandomizePitchRange);
+            double minValue = MAX(0, row - mNoteRange * mRandomizePitchRange);
+            double maxValue = MIN(mNoteRange, row + mNoteRange * mRandomizePitchRange);
             if (minValue != maxValue)
-               SetColumnRow(i, ofClamp(int(ofRandom(minValue, maxValue) + .5f), 0, mNoteRange - 1));
+               SetColumnRow(i, ofClamp(std::round(ofRandom(minValue, maxValue)), 0, mNoteRange - 1));
          }
       }
    }

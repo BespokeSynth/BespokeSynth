@@ -158,7 +158,7 @@ void Ramper::Go(double time)
    }
 }
 
-void Ramper::OnPulse(double time, float velocity, int flags)
+void Ramper::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0 && mEnabled)
       Go(time);

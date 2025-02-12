@@ -112,7 +112,7 @@ void NoteChainNode::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 {
 }
 
-void NoteChainNode::OnPulse(double time, float velocity, int flags)
+void NoteChainNode::OnPulse(double time, double velocity, int flags)
 {
    TriggerNote(time);
 }

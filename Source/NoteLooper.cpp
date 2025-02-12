@@ -203,7 +203,7 @@ void NoteLooper::OnTransportAdvanced(double amount)
    {
       if (mInputNotes[pitch])
       {
-         float endPos = curPos;
+         double endPos = curPos;
          if (mInputNotes[pitch]->GetStart() > endPos)
             endPos += 1; //wrap
          mInputNotes[pitch]->SetEnd(endPos);
@@ -211,9 +211,9 @@ void NoteLooper::OnTransportAdvanced(double amount)
          int modIdx = mInputNotes[pitch]->GetVoiceIdx();
          if (modIdx == -1)
             modIdx = kNumVoices;
-         float bend = ModulationParameters::kDefaultPitchBend;
-         float mod = ModulationParameters::kDefaultModWheel;
-         float pressure = ModulationParameters::kDefaultPressure;
+         double bend = ModulationParameters::kDefaultPitchBend;
+         double mod = ModulationParameters::kDefaultModWheel;
+         double pressure = ModulationParameters::kDefaultPressure;
          if (mVoiceModulations[modIdx].pitchBend)
             bend = mVoiceModulations[modIdx].pitchBend->GetValue(0);
          if (mVoiceModulations[modIdx].modWheel)
@@ -264,12 +264,12 @@ void NoteLooper::PlayNote(NoteMessage note)
 NoteCanvasElement* NoteLooper::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx /*=-1*/, ModulationParameters modulation /* = ModulationParameters()*/)
 {
    double canvasPos = measurePos / mNumMeasures * mCanvas->GetNumCols();
-   int col = int(canvasPos + .5f); //round off
+   int col = std::round(canvasPos); //round off
    int row = mCanvas->GetNumRows() - pitch - 1;
    NoteCanvasElement* element = static_cast<NoteCanvasElement*>(mCanvas->CreateElement(col, row));
    element->mOffset = canvasPos - element->mCol; //the rounded off part
    element->mLength = length / mNumMeasures * mCanvas->GetNumCols();
-   element->SetVelocity(velocity / 127.0f);
+   element->SetVelocity(velocity / 127.0);
    element->SetVoiceIdx(voiceIdx);
    int modIdx = voiceIdx;
    if (modIdx == -1)

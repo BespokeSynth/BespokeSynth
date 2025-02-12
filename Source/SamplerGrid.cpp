@@ -261,7 +261,7 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
 
 void SamplerGrid::PlayNote(NoteMessage note)
 {
-   OnGridButton(note.pitch % mCols, (note.pitch / mCols) % mRows, note.velocity / 127.0f, nullptr);
+   OnGridButton(note.pitch % mCols, (note.pitch / mCols) % mRows, note.velocity / 127.0, nullptr);
 }
 
 void SamplerGrid::SetEditSample(SamplerGrid::GridSample* sample)

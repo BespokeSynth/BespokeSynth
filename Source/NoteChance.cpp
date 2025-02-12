@@ -125,7 +125,7 @@ void NoteChance::PlayNote(NoteMessage note)
    if (note.velocity > 0)
       ComputeSliders(0);
 
-   float random;
+   double random;
    if (mDeterministic)
    {
       const int kStepResolution = 128;
@@ -135,7 +135,7 @@ void NoteChance::PlayNote(NoteMessage note)
    }
    else
    {
-      random = ofRandom(1);
+      random = ofRandom(1.0);
    }
 
    bool accept = random <= mChance;

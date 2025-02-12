@@ -96,7 +96,7 @@ void MPESmoother::PlayNote(NoteMessage note)
 
 void MPESmoother::OnTransportAdvanced(double amount)
 {
-   const float kSmoothTime = 100;
+   const double kSmoothTime = 100;
    for (int i = 0; i < kNumVoices; ++i)
    {
       if (mModulationInput[i].pitchBend != nullptr)
