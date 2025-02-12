@@ -194,9 +194,36 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       }, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
       .def("set", [](ScriptModule& module, std::string path, float value)
       {
-         IUIControl* control = module.GetUIControl(path);
-         if (control != nullptr)
+         IUIControl* control = nullptr;
+
+         // Check if path is not empty and the first character is '#'
+         if (!path.empty() && path[0] == '#') {
+            // Remove the '#' from the path
+            path = path.substr(1);
+         }
+         else
+         {
+            // check if running in prefab
+            std::string script_path = module.Path();
+            std::string prefix = "";
+            if (ofIsStringInString(script_path, "~"))
+               prefix = script_path.substr(0, script_path.find('~') + 1);
+            // if prefix: update prefab module
+            if (!prefix.empty())
+            {
+               control = module.GetUIControl(prefix + path);
+               if (control != nullptr)
+               {
+                  module.ScheduleUIControlValue(control, value, 0);
+                  return;
+               }
+            }
+         }
+         // find module on main screen
+         control = module.GetUIControl(path);
+         if (control != nullptr) {
             module.ScheduleUIControlValue(control, value, 0);
+         }
       })
       ///example: me.set("oscillator~pw", .2)
       .def("schedule_set", [](ScriptModule& module, float delay, std::string path, float value)
@@ -205,26 +232,38 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          if (control != nullptr)
             module.ScheduleUIControlValue(control, value, delay);
       })
-      .def("get", [](ScriptModule& module, std::string path)
+      .def("get", [](ScriptModule& module, std::string path) -> float
       {
-         IUIControl* control = module.GetUIControl(path);
-         if (control != nullptr)
-            return control->GetValue();
-         return 0.0f;
+         IUIControl* control = nullptr;
+         // check if path is not empty and first char is '#'
+         if (!path.empty() && path[0] == '#')
+         {
+            // remove '#' from the path
+            path = path.substr(1);
+         }
+         else
+         {
+            // check if running in prefab
+            std::string script_path = module.Path();
+            std::string prefix = "";
+            if (ofIsStringInString(script_path, "~"))
+               prefix = script_path.substr(0, script_path.find('~') + 1);
+            // if prefix: find prefab module
+            if (!prefix.empty())
+            {
+               control = module.GetUIControl(prefix + path);
+               if (control != nullptr) 
+                  return control->GetValue();    
+               // if no match, continue below and try again
+            }
+          }
+          // find module on main screen
+          control = module.GetUIControl(path);
+          if (control != nullptr)
+              return control->GetValue();
+          return 0.0f;
       })
       ///example: pulsewidth = me.get("oscillator~pulsewidth")
-      .def("get_path_prefix", [](ScriptModule& module)
-      {
-         std::string path = module.Path();
-         if (ofIsStringInString(path, "~"))
-         {
-            return path.substr(0, path.find('~') + 1);
-         }
-         else 
-         {
-            return std::string("");
-         }
-      })
       .def("adjust", [](ScriptModule& module, std::string path, float amount)
       {
          IUIControl* control = module.GetUIControl(path);
