@@ -54,6 +54,8 @@ script-relative:
    me.schedule_set(delay, path, value)
    me.get(path)
       example: pulsewidth = me.get("oscillator~pulsewidth")
+   me.get_path_prefix(): returns prefix if script is run in prefab (example: prefab~), or return empty string if run on main screen
+      example: active = me.get(me.get_path_prefix() + 'notesequencer~enabled')
    me.adjust(path, amount)
    me.highlight_line(lineNum, scriptModuleIndex)
    me.output(obj)
