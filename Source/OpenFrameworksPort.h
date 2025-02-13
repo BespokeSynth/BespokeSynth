@@ -333,9 +333,9 @@ template <class T, class U, class V>
 T ofClamp(const T val, const U a, const V b)
 {
    if (val < a)
-      return a;
+      return static_cast<T>(a);
    if (val > b)
-      return b;
+      return static_cast<T>(b);
    return val;
 }
 
