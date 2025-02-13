@@ -782,10 +782,27 @@ void ScriptModule::PrintText(std::string text)
 IUIControl* ScriptModule::GetUIControl(std::string path)
 {
    IUIControl* control;
-   if (ofIsStringInString(path, "~"))
-      control = TheSynth->FindUIControl(path);
-   else
-      control = TheSynth->FindUIControl(Path() + "~" + path);
+   std::string prefix = "";
+
+   if (path == "")
+      return nullptr;
+
+   //if path[0] == '$', skip prefix calculation
+   if (path[0] != '$')
+   {
+      //if path has two ~ chars: path is prefab full path: skip prefix calculation
+      if (std::count(path.begin(), path.end(), '~') < 2)
+      {
+         prefix = Path();
+         if (ofIsStringInString(prefix, "~"))
+            //script is in prefab: create prefix up to last ~ (also handles nested prefabs)
+            prefix = prefix.substr(0, prefix.rfind('~') + 1);
+         else
+            prefix = "";
+      }
+   }
+
+   control = TheSynth->FindUIControl(prefix + path);
 
    return control;
 }
