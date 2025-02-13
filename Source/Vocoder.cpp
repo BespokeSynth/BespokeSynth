@@ -234,7 +234,7 @@ void Vocoder::DrawModule()
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255, 0, 0, gModuleDrawAlpha * .4f);
+      ofSetColor(255, 0, 0, gModuleDrawAlpha * .4);
       ofRect(5, 101, 100, 14);
       ofPopStyle();
       mFricDetected = false;

@@ -364,7 +364,7 @@ double BufferShuffler::GetSlicePlaybackRate() const
    }
 }
 
-bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -439,7 +439,7 @@ void BufferShuffler::OnControllerPageSelected()
    UpdateGridControllerLights(true);
 }
 
-void BufferShuffler::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void BufferShuffler::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (velocity > 0)
    {

@@ -130,7 +130,7 @@ public:
    bool IsEnabled() const override { return true; }
 
 private:
-   void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
+   void PlayNote(double time, double pitch, double velocity, double pan, int noteOutputIndex, int lineNum);
    void AdjustUIControl(IUIControl* control, double value, double time, int lineNum);
    std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
@@ -201,9 +201,9 @@ private:
    {
       double startTime{ 0 };
       double time{ 0 };
-      float pitch{ 0 };
-      float velocity{ 0 };
-      float pan{ .5 };
+      double pitch{ 0 };
+      double velocity{ 0 };
+      double pan{ .5 };
       int noteOutputIndex{ -1 };
       int lineNum{ -1 };
    };
@@ -223,7 +223,7 @@ private:
       double startTime{ 0 };
       double time{ 0 };
       IUIControl* control{ nullptr };
-      float value{ 0 };
+      double value{ 0 };
       int lineNum{ -1 };
    };
    std::array<ScheduledUIControlValue, 50> mScheduledUIControlValue;

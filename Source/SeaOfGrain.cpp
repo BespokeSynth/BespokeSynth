@@ -221,10 +221,10 @@ void SeaOfGrain::DrawModule()
    }
 }
 
-float SeaOfGrain::GetSampleRateRatio() const
+double SeaOfGrain::GetSampleRateRatio() const
 {
    if (mHasRecordedInput)
-      return 1.0f;
+      return 1.0;
    else
       return mSample->GetSampleRateRatio();
 }
@@ -237,7 +237,7 @@ ChannelBuffer* SeaOfGrain::GetSourceBuffer()
       return mSample->Data();
 }
 
-float SeaOfGrain::GetSourceStartSample()
+double SeaOfGrain::GetSourceStartSample()
 {
    if (mHasRecordedInput)
       return -mDisplayLength * gSampleRate;
@@ -245,7 +245,7 @@ float SeaOfGrain::GetSourceStartSample()
       return mDisplayStartSamples;
 }
 
-float SeaOfGrain::GetSourceEndSample()
+double SeaOfGrain::GetSourceEndSample()
 {
    if (mHasRecordedInput)
       return 0;
@@ -253,7 +253,7 @@ float SeaOfGrain::GetSourceEndSample()
       return mDisplayEndSamples;
 }
 
-float SeaOfGrain::GetSourceBufferOffset()
+double SeaOfGrain::GetSourceBufferOffset()
 {
    if (mHasRecordedInput)
       return mRecordBuffer.GetRawBufferOffset(0);
@@ -454,31 +454,31 @@ void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize)
    if (!mADSR.IsDone(gTime) && mOwner->GetSourceBuffer()->BufferSize() > 0)
    {
       double time = gTime;
-      float speed = mOwner->GetSampleRateRatio();
+      double speed = mOwner->GetSampleRateRatio();
       for (int i = 0; i < bufferSize; ++i)
       {
-         float pitchBend = mPitchBend ? mPitchBend->GetValue(i) : ModulationParameters::kDefaultPitchBend;
-         float pressure = mPressure ? mPressure->GetValue(i) : ModulationParameters::kDefaultPressure;
-         float modwheel = mModWheel ? mModWheel->GetValue(i) : ModulationParameters::kDefaultModWheel;
+         double pitchBend = mPitchBend ? mPitchBend->GetValue(i) : ModulationParameters::kDefaultPitchBend;
+         double pressure = mPressure ? mPressure->GetValue(i) : ModulationParameters::kDefaultPressure;
+         double modwheel = mModWheel ? mModWheel->GetValue(i) : ModulationParameters::kDefaultModWheel;
          if (pressure > 0)
          {
             mGranulator.mGrainOverlap = ofMap(pressure * pressure, 0, 1, 3, MAX_GRAINS);
-            mGranulator.mPosRandomizeMs = ofMap(pressure * pressure, 0, 1, 100, .03f);
+            mGranulator.mPosRandomizeMs = ofMap(pressure * pressure, 0, 1, 100, .03);
          }
          mGranulator.mGrainLengthMs = ofMap(modwheel, -1, 1, 10, 700);
 
-         float blend = .0005f;
+         double blend = .0005;
          mGain = mGain * (1 - blend) + pressure * blend;
 
          float outSample[ChannelBuffer::kMaxNumChannels];
          Clear(outSample, ChannelBuffer::kMaxNumChannels);
-         float pos = (mPitch + pitchBend + MIN(.125f, mPlay) - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches;
+         double pos = (mPitch + pitchBend + MIN(.125, mPlay) - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches;
          mGranulator.ProcessFrame(time, mOwner->GetSourceBuffer(), mOwner->GetSourceBuffer()->BufferSize(), ofLerp(mOwner->GetSourceStartSample(), mOwner->GetSourceEndSample(), pos) + mOwner->GetSourceBufferOffset(), speed, outSample);
          for (int ch = 0; ch < output->NumActiveChannels(); ++ch)
-            output->GetChannel(ch)[i] += outSample[ch] * sqrtf(mGain) * mADSR.Value(time);
+            output->GetChannel(ch)[i] += outSample[ch] * std::sqrt(mGain) * mADSR.Value(time);
 
          time += gInvSampleRateMs;
-         mPlay += .001f;
+         mPlay += .001;
       }
    }
    else
@@ -493,13 +493,13 @@ void SeaOfGrain::GrainMPEVoice::Draw(float w, float h)
    {
       if (mPitch - mOwner->mKeyboardBasePitch >= 0 && mPitch - mOwner->mKeyboardBasePitch < mOwner->mKeyboardNumPitches)
       {
-         float pitchBend = mPitchBend ? mPitchBend->GetValue(0) : 0;
-         float pressure = mPressure ? mPressure->GetValue(0) : 0;
+         double pitchBend = mPitchBend ? mPitchBend->GetValue(0) : 0;
+         double pressure = mPressure ? mPressure->GetValue(0) : 0;
 
          ofPushStyle();
          ofFill();
-         float keyX = (mPitch - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches * w;
-         float keyXTop = keyX + pitchBend * w / mOwner->mKeyboardNumPitches;
+         double keyX = (mPitch - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches * w;
+         double keyXTop = keyX + pitchBend * w / mOwner->mKeyboardNumPitches;
          ofBeginShape();
          ofVertex(keyX, h);
          ofVertex(keyXTop, h - pressure * h);
@@ -526,7 +526,7 @@ void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize
       double time = gTime;
       double panLeft = GetLeftPanGain(mPan);
       double panRight = GetRightPanGain(mPan);
-      float speed = mOwner->GetSampleRateRatio();
+      double speed = mOwner->GetSampleRateRatio();
       for (int i = 0; i < bufferSize; ++i)
       {
          float outSample[ChannelBuffer::kMaxNumChannels];

@@ -182,7 +182,7 @@ void StepSequencer::Poll()
 
 namespace
 {
-   const float kMidwayVelocity = .75f;
+   const double kMidwayVelocity = .75;
 }
 
 void StepSequencer::UpdateLights(bool force /*=false*/)
@@ -296,7 +296,7 @@ void StepSequencer::OnControllerPageSelected()
    UpdateLights(true);
 }
 
-void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void StepSequencer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (mPush2Connected || grid == mGridControlTarget->GetGridController())
    {
@@ -573,7 +573,7 @@ bool StepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    mPush2Connected = true;
 
@@ -671,7 +671,7 @@ void StepSequencer::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
-void StepSequencer::Step(double time, float velocity, int pulseFlags)
+void StepSequencer::Step(double time, double velocity, int pulseFlags)
 {
    if (!mIsSetUp)
       return;
@@ -740,7 +740,7 @@ void StepSequencer::PlayNote(NoteMessage note)
          }
 
          mCurrentColumn = note.pitch % GetNumSteps(mStepInterval, mNumMeasures);
-         Step(note.time, note.velocity / 127.0f, kPulseFlag_Repeat);
+         Step(note.time, note.velocity / 127.0, kPulseFlag_Repeat);
       }
    }
    else
@@ -963,7 +963,7 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
       }
       if (key == OF_KEY_UP || key == OF_KEY_DOWN)
       {
-         float velocity = mGrid->GetVal(cell.mCol, cell.mRow);
+         double velocity = mGrid->GetVal(cell.mCol, cell.mRow);
          if (velocity > 0)
          {
             if (key == OF_KEY_UP)
@@ -1154,7 +1154,7 @@ void StepSequencerRow::Draw(float x, float y)
    if (!showTextEntry)
       DrawTextRightJustify(ofToString(mRowPitch), x - 7, y + 10);
 
-   const float kPlayHighlightDurationMs = 250;
+   const double kPlayHighlightDurationMs = 250;
    for (size_t i = 0; i < mPlayedSteps.size(); ++i)
    {
       if (mPlayedSteps[i].time != -1)
@@ -1163,7 +1163,7 @@ void StepSequencerRow::Draw(float x, float y)
          {
             if (gTime - mPlayedSteps[i].time > 0)
             {
-               float fade = (1 - (gTime - mPlayedSteps[i].time) / kPlayHighlightDurationMs);
+               double fade = (1 - (gTime - mPlayedSteps[i].time) / kPlayHighlightDurationMs);
                ofPushStyle();
                ofSetLineWidth(3 * fade);
                ofVec2f pos = mGrid->GetCellPosition(mPlayedSteps[i].step, mRow) + mGrid->GetPosition(true);

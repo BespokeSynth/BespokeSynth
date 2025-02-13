@@ -164,7 +164,7 @@ void VelocityStepSequencer::DropdownUpdated(DropdownList* list, int oldVal, doub
       if (transportListenerInfo != nullptr)
       {
          transportListenerInfo->mInterval = mInterval;
-         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1f, true);
+         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1, true);
       }
    }
 }

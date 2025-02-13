@@ -128,7 +128,7 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m)
          {
             return NoteName(pitch);
          });
-   m.def("pitch_to_freq", [](float pitch)
+   m.def("pitch_to_freq", [](double pitch)
          {
             return TheScale->PitchToFreq(pitch);
          });
@@ -339,7 +339,7 @@ PYBIND11_EMBEDDED_MODULE(grid, m)
    py::return_value_policy::reference);
    ///example: g = grid.get("grid")  #assuming there's a grid called "grid" somewhere in the layout
    py::class_<GridModule, IDrawableModule>(m, "grid")
-   .def("set", [](GridModule& grid, int col, int row, float value)
+   .def("set", [](GridModule& grid, int col, int row, double value)
         {
            grid.Set(col, row, value);
         })
@@ -441,7 +441,7 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
       {
          player.FillData(data);
       })
-      .def("play_cue", [](SamplePlayer& player, int cue, float speedMult, float startOffsetSeconds)
+   .def("play_cue", [](SamplePlayer& player, int cue, double speedMult, double startOffsetSeconds)
       {
          ScriptModule* scriptModule = ScriptModule::sMostRecentLineExecutedModule;
          double time = scriptModule->GetScheduledTime(0);

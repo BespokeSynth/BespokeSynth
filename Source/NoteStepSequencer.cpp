@@ -533,7 +533,7 @@ void NoteStepSequencer::GetPush2Layout(int& sequenceRows, int& pitchCols, int& p
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteStepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool NoteStepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {
@@ -1153,7 +1153,7 @@ void NoteStepSequencer::OnControllerPageSelected()
    UpdateGridControllerLights(true);
 }
 
-void NoteStepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void NoteStepSequencer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    int col = x + mGridControlOffsetX;
    int row = y - mGridControlOffsetY;

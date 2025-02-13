@@ -8,11 +8,17 @@
 #include <list>
 #include <cmath>
 #include <mutex>
+#include <random>
+
+#include "Xoshiro256ss.h"
 
 class NVGcontext;
 
 extern NVGcontext* gNanoVG;
 extern NVGcontext* gFontBoundsNanoVG;
+
+extern bespoke::core::Xoshiro256ss gRandom;
+extern std::uniform_real_distribution<double> gRandom01;
 
 struct ofColor
 {
@@ -373,9 +379,22 @@ T ofMap(T val, T1 fromStart, T2 fromEnd, T3 toStart, T4 toEnd, bool clamp = fals
 }
 
 template <class T>
-T ofRandom(T max);
+T ofRandom(T max)
+{
+   return max * gRandom01(gRandom);
+}
+
 template <class T>
-T ofRandom(T x, T y);
+T ofRandom(T x, T y)
+{
+   // if there is no range, return the value
+   if (ofAlmostEquel(x, y))
+      return x;
+   const double high = MAX(x, y);
+   const double low = MIN(x, y);
+   return low + ((high - low) * gRandom01(gRandom));
+}
+
 void ofSetCircleResolution(float res);
 unsigned long long ofGetSystemTimeNanos();
 float ofGetWidth();

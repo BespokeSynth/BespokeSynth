@@ -161,7 +161,7 @@ LaunchpadKeyboard::~LaunchpadKeyboard()
    TheTransport->RemoveListener(this);
 }
 
-void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void LaunchpadKeyboard::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    bool bOn = velocity > 0;
    int pitch = GridToPitch(x, y);
@@ -368,7 +368,7 @@ void LaunchpadKeyboard::OnTimeEvent(double time)
 {
 }
 
-bool LaunchpadKeyboard::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool LaunchpadKeyboard::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note && controlIndex >= 36 && controlIndex <= 99)
    {

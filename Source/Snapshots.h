@@ -71,7 +71,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
@@ -138,7 +138,7 @@ private:
       LFOSettings mLFOSettings;
       int mGridCols{ 0 };
       int mGridRows{ 0 };
-      std::vector<float> mGridContents{};
+      std::vector<double> mGridContents{};
       std::string mString;
    };
 

@@ -70,7 +70,7 @@ void OutputChannel::Process(double time)
          if (mLimit > std::numeric_limits<float>::epsilon())
          {
             for (int i = 0; i < gBufferSize; ++i)
-               TheSynth->GetOutputBuffer(channel)[i] += std::clamp(getBufferGetChannel0[i], -mLimit, mLimit);
+               TheSynth->GetOutputBuffer(channel)[i] += ofClamp(getBufferGetChannel0[i], -mLimit, mLimit);
          }
          else
          {

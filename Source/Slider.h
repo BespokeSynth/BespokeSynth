@@ -289,7 +289,7 @@ private:
 
    int mLastDisplayedValue{ 0 };
    int mLastSetValue{ 0 };
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    bool mShowName{ true };
 
    TextEntry* mIntEntry{ nullptr };

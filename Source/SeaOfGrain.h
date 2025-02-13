@@ -99,11 +99,11 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
-   float GetSampleRateRatio() const;
+   double GetSampleRateRatio() const;
    ChannelBuffer* GetSourceBuffer();
-   float GetSourceStartSample();
-   float GetSourceEndSample();
-   float GetSourceBufferOffset();
+   double GetSourceStartSample();
+   double GetSourceEndSample();
+   double GetSourceBufferOffset();
 
    struct GrainMPEVoice
    {
@@ -111,13 +111,13 @@ private:
       void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
 
-      float mPlay{ 0 };
-      float mPitch{ 0 };
+      double mPlay{ 0 };
+      double mPitch{ 0 };
       ModulationChain* mPitchBend{ nullptr };
       ModulationChain* mPressure{ nullptr };
       ModulationChain* mModWheel{ nullptr };
 
-      float mGain{ 0 };
+      double mGain{ 0 };
 
       ::ADSR mADSR{ 100, 0, 1, 100 };
       Granulator mGranulator;

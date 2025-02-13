@@ -108,7 +108,7 @@ void GridSliders::OnControllerPageSelected()
 {
 }
 
-void GridSliders::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void GridSliders::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (velocity > 0)
    {

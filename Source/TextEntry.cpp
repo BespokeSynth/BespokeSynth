@@ -128,7 +128,7 @@ void TextEntry::Render()
    GetDimensions(w, h);
    if (isCurrent)
    {
-      ofSetColor(color, gModuleDrawAlpha * .1f);
+      ofSetColor(color, gModuleDrawAlpha * .1);
       ofFill();
       ofRect(mX + xOffset, mY, w - xOffset, h);
    }
@@ -155,9 +155,9 @@ void TextEntry::Render()
          ofRect(caretX, caretY, 1, 12, L(corner, 1));
       }
       mCaretBlinkTimer += ofGetLastFrameTime();
-      if (mCaretBlinkTimer > .3f)
+      if (mCaretBlinkTimer > .3)
       {
-         mCaretBlinkTimer -= .3f;
+         mCaretBlinkTimer -= .3;
          mCaretBlink = !mCaretBlink;
       }
    }

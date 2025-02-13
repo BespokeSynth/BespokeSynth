@@ -807,7 +807,7 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, double oldV
       if (tempLength == 0 || mOnset == 0)
          return; // use tempLength to avoid divide by zero later for: % mLength
 
-      std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mTempSteps{};
+      std::array<double, EUCLIDEAN_SEQUENCER_MAX_STEPS> mTempSteps{};
       int rotOffset = (int)(mRotation - oldVal) % tempLength;
 
       if (rotOffset == 0)

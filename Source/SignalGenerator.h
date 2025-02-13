@@ -113,12 +113,12 @@ private:
    EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
    double mFreq{ 220 };
    FloatSlider* mFreqSlider{ nullptr };
-   float mPhase{ 0 };
-   float mSyncPhase{ 0 };
+   double mPhase{ 0 };
+   double mSyncPhase{ 0 };
    FreqMode mFreqMode{ FreqMode::kFreqMode_Instant };
    DropdownList* mFreqModeSelector{ nullptr };
-   float mFreqSliderStart{ 220 };
-   float mFreqSliderEnd{ 220 };
+   double mFreqSliderStart{ 220 };
+   double mFreqSliderEnd{ 220 };
    double mFreqSliderAmount{ 0 };
    FloatSlider* mFreqSliderAmountSlider{ nullptr };
    Ramp mFreqRamp;

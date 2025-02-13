@@ -809,7 +809,7 @@ void ScriptModule::AdjustUIControl(IUIControl* control, double value, double tim
    }
 }
 
-void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum)
+void ScriptModule::PlayNote(double time, double pitch, double velocity, double pan, int noteOutputIndex, int lineNum)
 {
    if (velocity > 0)
    {
@@ -828,7 +828,7 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
    }
 
    //ofLog() << "ScriptModule::PlayNote() " << velocity << " " << time;
-   int intPitch = int(pitch + .5f);
+   int intPitch = static_cast<int>(pitch + .5);
    ModulationParameters modulation;
    modulation.pan = pan;
    if (pitch - intPitch != 0)
@@ -1601,8 +1601,8 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
    ofFill();
    for (int i = 0; i < (int)mText.size(); ++i)
    {
-      float alpha = style == 0 ? 200 : 150;
-      float fadeMs = style == 0 ? 200 : 150;
+      double alpha = style == 0 ? 200 : 150;
+      double fadeMs = style == 0 ? 200 : 150;
       if (gTime - mTimes[i] > 0 && gTime - mTimes[i] < fadeMs)
       {
          ofSetColor(color, alpha * (1 - (gTime - mTimes[i]) / fadeMs));

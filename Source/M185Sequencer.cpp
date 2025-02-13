@@ -114,7 +114,7 @@ void M185Sequencer::OnTimeEvent(double time)
    StepBy(time, 1, 0);
 }
 
-void M185Sequencer::OnPulse(double time, float velocity, int flags)
+void M185Sequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
    StepBy(time, velocity, flags);

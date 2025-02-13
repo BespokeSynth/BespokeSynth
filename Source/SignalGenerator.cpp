@@ -157,7 +157,7 @@ void SignalGenerator::Process(double time)
          mResetPhaseAtMs = -9999;
       }
 
-      float volSq = mVol * mVol;
+      double volSq = mVol * mVol;
 
       if (mFreqMode == kFreqMode_Root)
          mFreq = TheScale->PitchToFreq(TheScale->ScaleRoot() + 24);
@@ -166,28 +166,28 @@ void SignalGenerator::Process(double time)
       else if (mFreqMode == kFreqMode_Slider)
          mFreq = ofLerp(mFreqSliderStart, mFreqSliderEnd, mFreqSliderAmount);
 
-      float mult = mMult;
+      double mult = mMult;
       if (mult < 0)
-         mult = -1.0f / mult;
-      float outputFreq = mFreq * exp2(mDetune) * mult;
-      float phaseInc = GetPhaseInc(outputFreq);
+         mult = -1.0 / mult;
+      double outputFreq = mFreq * exp2(mDetune) * mult;
+      double phaseInc = GetPhaseInc(outputFreq);
 
-      float syncPhaseInc = 0;
+      double syncPhaseInc = 0;
       if (mSyncMode == Oscillator::SyncMode::Frequency)
          syncPhaseInc = GetPhaseInc(mSyncFreq);
       else if (mSyncMode == Oscillator::SyncMode::Ratio)
          syncPhaseInc = GetPhaseInc(outputFreq * mSyncRatio);
 
       mPhase += phaseInc;
-      if (mPhase == INFINITY)
+      if (ofAlmostEquel(mPhase, std::numeric_limits<double>::infinity()))
       {
          ofLog() << "Infinite phase.";
       }
       else
       {
-         while (mPhase > FTWO_PI * 2)
+         while (mPhase > TWO_PI * 2)
          {
-            mPhase -= FTWO_PI * 2;
+            mPhase -= TWO_PI * 2;
             mSyncPhase = 0;
          }
       }
@@ -196,7 +196,7 @@ void SignalGenerator::Process(double time)
       if (mSyncMode != Oscillator::SyncMode::None)
          mWriteBuffer[pos] += mOsc.Audio(time, mSyncPhase) * volSq;
       else
-         mWriteBuffer[pos] += mOsc.Audio(time, mPhase + mPhaseOffset * FTWO_PI) * volSq;
+         mWriteBuffer[pos] += mOsc.Audio(time, mPhase + mPhaseOffset * TWO_PI) * volSq;
 
       time += gInvSampleRateMs;
    }
@@ -219,7 +219,7 @@ void SignalGenerator::PlayNote(NoteMessage note)
       }
       else if (mFreqMode == kFreqMode_Slider)
       {
-         float freq = TheScale->PitchToFreq(note.pitch);
+         double freq = TheScale->PitchToFreq(note.pitch);
          if (freq >= mFreq)
          {
             mFreqSliderAmount = 0;

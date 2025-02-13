@@ -201,7 +201,7 @@ void SingleOscillator::PlayNote(NoteMessage note)
    if (note.velocity > 0)
    {
       mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0, note.voiceIdx, note.modulation);
-      float adsrScale = SingleOscillatorVoice::GetADSRScale(note.velocity / 127.0, mVoiceParams.mVelToEnvelope);
+      double adsrScale = SingleOscillatorVoice::GetADSRScale(note.velocity / 127.0, mVoiceParams.mVelToEnvelope);
       mVoiceParams.mAdsr.Start(note.time, 1, adsrScale); //for visualization
       mVoiceParams.mFilterAdsr.Start(note.time, 1, adsrScale); //for visualization
    }

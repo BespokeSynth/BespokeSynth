@@ -280,7 +280,7 @@ bool DotGrid::MouseMoved(float x, float y)
          if (mDragBehavior == DragBehavior::Velocity)
          {
             int dataIndex = GetDataIndex(mHoldCell.mCol, mHoldCell.mRow);
-            mData[dataIndex].mVelocity = std::clamp(mData[dataIndex].mVelocity - (y - mLastDragPosition.y) * .01f, 0.0f, 1.0f);
+            mData[dataIndex].mVelocity = std::clamp(mData[dataIndex].mVelocity - (y - mLastDragPosition.y) * .01, 0.0, 1.0);
          }
       }
 
@@ -306,7 +306,7 @@ bool DotGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool
    {
       DotData& data = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
       if (data.mOn)
-         data.mLength = std::max(data.mLength + scrollY * .1f, 0.0f);
+         data.mLength = std::max(data.mLength + scrollY * .1, 0.0);
    }
 
    return false;

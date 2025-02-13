@@ -43,12 +43,12 @@ class PatchCableSource;
 struct StutterParams
 {
    StutterParams() {}
-   StutterParams(NoteInterval _interval, float _speed)
+   StutterParams(NoteInterval _interval, double _speed)
    : interval(_interval)
    , speedStart(_speed)
    , speedEnd(_speed)
    {}
-   StutterParams(NoteInterval _interval, float _speedStart, float _speedEnd, float _speedBlendTime)
+   StutterParams(NoteInterval _interval, double _speedStart, double _speedEnd, double _speedBlendTime)
    : interval(_interval)
    , speedStart(_speedStart)
    , speedEnd(_speedEnd)
@@ -57,15 +57,15 @@ struct StutterParams
    bool operator==(const StutterParams& other) const
    {
       return interval == other.interval &&
-             speedStart == other.speedStart &&
-             speedEnd == other.speedEnd &&
-             speedBlendTime == other.speedBlendTime;
+             ofAlmostEquel(speedStart, other.speedStart) &&
+             ofAlmostEquel(speedEnd, other.speedEnd) &&
+             ofAlmostEquel(speedBlendTime, other.speedBlendTime);
    }
 
    NoteInterval interval{ NoteInterval::kInterval_16n };
-   float speedStart{ 1 };
-   float speedEnd{ 1 };
-   float speedBlendTime{ 0 };
+   double speedStart{ 1 };
+   double speedEnd{ 1 };
+   double speedBlendTime{ 0 };
 };
 
 class Stutter : public ITimeListener

@@ -587,7 +587,7 @@ void Snapshots::DeleteSnapshot(int idx)
    }
 }
 
-bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -890,7 +890,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
          {
             float a;
             in >> a;
-            snapshotData.mValue = a;
+            snapshotData.mValue = static_cast<double>(a);
          }
          else
             in >> snapshotData.mValue;
@@ -909,7 +909,16 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
          }
          snapshotData.mGridContents.resize(size_t(snapshotData.mGridCols) * snapshotData.mGridRows);
          for (int k = 0; k < snapshotData.mGridCols * snapshotData.mGridRows; ++k)
-            in >> snapshotData.mGridContents[k];
+         {
+            if (rev < 4)
+            {
+               float a;
+               in >> a;
+               snapshotData.mGridContents[k] = static_cast<double>(a);
+            }
+            else
+               in >> snapshotData.mGridContents[k];
+         }
          in >> snapshotData.mString;
       }
       in >> mSnapshotCollection[i].mLabel;

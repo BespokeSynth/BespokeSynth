@@ -128,7 +128,7 @@ void FloatSlider::Render()
    IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
    ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofSetColor(color);
    ofRect(mX, mY, mWidth, mHeight);
@@ -141,24 +141,24 @@ void FloatSlider::Render()
       ofPushStyle();
       ofSetColor(255, 255, 0, gModuleDrawAlpha);
       double val = ofClamp(mSmoothTarget, mMin, mMax);
-      float screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
+      double screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
       ofSetLineWidth(1);
       ofFill();
       ofCircle(screenPos, mY + mHeight / 2, 3);
       ofPopStyle();
    }
 
-   float screenPos;
+   double screenPos;
    if (mModulator && mModulator->Active() && !showSmoothAdjustmentUI)
    {
       screenPos = mX + 1 + (mWidth - 2) * ValToPos(*mVar, true);
       double lfomax = ofClamp(mModulator->GetMax(), mMin, mMax);
-      float screenPosMax = mX + 1 + (mWidth - 2) * ValToPos(lfomax, true);
+      double screenPosMax = mX + 1 + (mWidth - 2) * ValToPos(lfomax, true);
       double lfomin = ofClamp(mModulator->GetMin(), mMin, mMax);
-      float screenPosMin = mX + 1 + (mWidth - 2) * ValToPos(lfomin, true);
+      double screenPosMin = mX + 1 + (mWidth - 2) * ValToPos(lfomin, true);
 
       ofPushStyle();
-      ofSetColor(0, 200, 0, gModuleDrawAlpha * .5f);
+      ofSetColor(0, 200, 0, gModuleDrawAlpha * .5);
       ofFill();
       ofRect(screenPosMin, mY, screenPos - screenPosMin, mHeight, 1); //lfo bar
       ofPopStyle();
@@ -179,7 +179,7 @@ void FloatSlider::Render()
          ofSetColor(30, 30, 30, gModuleDrawAlpha);
       if (showSmoothAdjustmentUI)
          ofSetColor(255, 255, 0, gModuleDrawAlpha);
-      float val = ofClamp(*mVar, mMin, mMax);
+      double val = ofClamp(*mVar, mMin, mMax);
       screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
       ofSetLineWidth(2);
       ofLine(screenPos, mY + 1, screenPos, mY + mHeight - 1); //value bar
@@ -191,7 +191,7 @@ void FloatSlider::Render()
    DrawHover(mX, mY, mWidth, mHeight);
 
    std::string display;
-   float textSize = 13;
+   double textSize = 13;
    if (showSmoothAdjustmentUI)
    {
       display = "smooth: " + ofToString(mSmooth, 3);
@@ -320,7 +320,7 @@ void FloatSlider::OnClicked(float x, float y, bool right)
       {
          if (mMaxEntry != nullptr)
             mMaxEntry->Delete();
-         mMaxEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMax, -FLT_MAX, FLT_MAX);
+         mMaxEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMax, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
          mMaxEntry->MakeActiveTextEntry(true);
       }
       else
@@ -328,7 +328,7 @@ void FloatSlider::OnClicked(float x, float y, bool right)
          if (mMinEntry != nullptr)
             mMinEntry->Delete();
          //mMinEntry = new TextEntry(this, "", mX, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
-         mMinEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
+         mMinEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMin, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
          mMinEntry->MakeActiveTextEntry(true);
       }
 
@@ -364,14 +364,14 @@ bool FloatSlider::MouseMoved(float x, float y)
 void FloatSlider::SetValueForMouse(float x, float y)
 {
    double* var = GetModifyValue();
-   float fX = x;
+   double fX = x;
    if (GetKeyModifiers() & kModifier_Shift)
    {
       if (mFineRefX == -999)
       {
          mFineRefX = x;
       }
-      float precision = mShowDigits != -1 ? 100 : 10;
+      double precision = mShowDigits != -1 ? 100 : 10;
       fX = mFineRefX + (fX - mFineRefX) / precision;
    }
    else
@@ -410,7 +410,7 @@ void FloatSlider::SetValueForMouse(float x, float y)
 
    if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
    {
-      double move = (y - mRefY) * -.003f;
+      double move = (y - mRefY) * -.003;
       double change = move * (mMax - mMin);
       mModulator->GetMin() = ofClamp(mModulator->GetMin() + change, mMin, mModulator->GetMax());
       mRefY = y;
@@ -808,8 +808,8 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       {
          float a, b;
          in >> a >> b;
-         mModulatorMin = a;
-         mModulatorMax = b;
+         mModulatorMin = static_cast<double>(a);
+         mModulatorMax = static_cast<double>(b);
       }
       else
       {
@@ -824,8 +824,8 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       {
          float a, b;
          in >> a >> b;
-         mSmooth = a;
-         mSmoothTarget = b;
+         mSmooth = static_cast<double>(a);
+         mSmoothTarget = static_cast<double>(b);
       }
       else
       {
@@ -844,8 +844,8 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       {
          float a, b;
          in >> a >> b;
-         mMin = a;
-         mMax = b;
+         mMin = static_cast<double>(a);
+         mMax = static_cast<double>(b);
       }
       else
       {
@@ -950,7 +950,7 @@ void IntSlider::Render()
    IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
    ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofSetColor(color);
    ofRect(mX, mY, mWidth, mHeight);
@@ -1264,7 +1264,7 @@ void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    {
       float a;
       in >> a;
-      var = a;
+      var = static_cast<double>(a);
    }
    else
       in >> var;

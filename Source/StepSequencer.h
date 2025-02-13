@@ -146,7 +146,7 @@ public:
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
@@ -157,7 +157,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    bool IsMetaStepActive(double time, int col, int row);
@@ -200,7 +200,7 @@ private:
    int GetMetaStep(double time);
    int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX - 1) + row * META_STEP_MAX; }
    GridColor GetGridColor(int x, int y);
-   void Step(double time, float velocity, int pulseFlags);
+   void Step(double time, double velocity, int pulseFlags);
    bool HasGridController();
    int GetGridControllerRows();
    int GetGridControllerCols();

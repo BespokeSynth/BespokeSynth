@@ -576,7 +576,7 @@ void LooperRecorder::CancelFreeRecord()
    mStartFreeRecordTime = 0;
 }
 
-bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {

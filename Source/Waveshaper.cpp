@@ -48,7 +48,7 @@ void Waveshaper::CreateUIControls()
    mTextEntry = new TextEntry(this, "y=", 2, 2, MAX_TEXTENTRY_LENGTH - 1, &mEntryString);
    mTextEntry->SetFlexibleWidth(true);
    mTextEntry->DrawLabel(true);
-   mRescaleSlider = new FloatSlider(this, "rescale", mTextEntry, kAnchor_Below, 110, 15, &mRescale, .1f, 10);
+   mRescaleSlider = new FloatSlider(this, "rescale", mTextEntry, kAnchor_Below, 110, 15, &mRescale, .1, 10);
    mASlider = new FloatSlider(this, "a", mRescaleSlider, kAnchor_Below, 110, 15, &mA, -10, 10, 4);
    mBSlider = new FloatSlider(this, "b", mASlider, kAnchor_Below, 110, 15, &mB, -10, 10, 4);
    mCSlider = new FloatSlider(this, "c", mBSlider, kAnchor_Below, 110, 15, &mC, -10, 10, 4);

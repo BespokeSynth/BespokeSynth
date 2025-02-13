@@ -94,7 +94,7 @@ void RadioSequencer::OnControllerPageSelected()
    UpdateGridLights();
 }
 
-void RadioSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void RadioSequencer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (velocity > 0)
    {

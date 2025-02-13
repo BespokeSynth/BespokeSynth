@@ -248,7 +248,7 @@ void SongBuilder::DrawModule()
 
          ofSetColor(0, 255, 0, 100);
          ofRectangle lengthEntryRect = mSequencerStepLengthEntry[mSequenceStepIndex]->GetRect(K(local));
-         float progress = MIN(TheTransport->GetMeasureTime(gTime) / mSequencerStepLength[mSequenceStepIndex], 1.0f);
+         double progress = MIN(TheTransport->GetMeasureTime(gTime) / mSequencerStepLength[mSequenceStepIndex], 1.0);
          lengthEntryRect.width *= progress;
          ofRect(lengthEntryRect);
       }
@@ -472,7 +472,7 @@ void SongBuilder::PlaySequence(double time, int startIndex)
    }
 }
 
-bool SongBuilder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool SongBuilder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -925,7 +925,7 @@ void SongBuilder::LoadState(FileStreamIn& in, int rev)
          {
             float a;
             in >> a;
-            mScenes[i]->mValues[j]->mFloatValue = a;
+            mScenes[i]->mValues[j]->mFloatValue = static_cast<double>(a);
          }
          else
             in >> mScenes[i]->mValues[j]->mFloatValue;

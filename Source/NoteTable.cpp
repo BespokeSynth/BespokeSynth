@@ -411,7 +411,7 @@ void NoteTable::OnControllerPageSelected()
    UpdateGridControllerLights(true);
 }
 
-void NoteTable::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void NoteTable::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    int col = x + mGridControlOffsetX;
    int row = y - mGridControlOffsetY;
@@ -496,7 +496,7 @@ void NoteTable::GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {

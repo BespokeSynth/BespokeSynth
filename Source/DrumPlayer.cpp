@@ -520,7 +520,7 @@ void DrumPlayer::PlayNote(NoteMessage note)
    }
 }
 
-bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -748,7 +748,7 @@ void DrumPlayer::OnClicked(float x, float y, bool right)
    }
 }
 
-void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void DrumPlayer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    int sampleIdx = GetAssociatedSampleIndex(x, y);
    if (sampleIdx >= 0)

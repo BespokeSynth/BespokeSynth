@@ -393,7 +393,7 @@ void PlaySequencer::OnControllerPageSelected()
    UpdateLights();
 }
 
-void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void PlaySequencer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (grid == mGridControlTarget->GetGridController())
    {

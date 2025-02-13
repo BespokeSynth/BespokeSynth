@@ -82,9 +82,9 @@ void VinylTempoControl::Process(double time)
 
       if (mUseVinylControl)
       {
-         float speed = mVinylProcessor.GetPitch() / mReferencePitch;
-         if (speed == 0 || mVinylProcessor.GetStopped())
-            speed = .0001f;
+         double speed = mVinylProcessor.GetPitch() / mReferencePitch;
+         if (ofAlmostEquel(speed, 0) || mVinylProcessor.GetStopped())
+            speed = .0001;
          mSpeed = speed;
       }
       else

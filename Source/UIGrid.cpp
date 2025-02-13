@@ -111,10 +111,10 @@ void UIGrid::Render()
             }
             else if (mGridMode == kMultisliderGrow)
             {
-               float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
+               double fadeAmount = ofClamp(ofLerp(.5, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
-               ofVec2f center(x + xsize * 0.5f, y + ysize * 0.5f);
-               ofRect(center.x - (sliderFillAmount * xsize * 0.5f), center.y - (sliderFillAmount * ysize * 0.5f), sliderFillAmount * xsize, sliderFillAmount * ysize);
+               ofVec2f center(x + xsize * 0.5, y + ysize * 0.5);
+               ofRect(center.x - (sliderFillAmount * xsize * 0.5), center.y - (sliderFillAmount * ysize * 0.5), sliderFillAmount * xsize, sliderFillAmount * ysize);
                drawDragLevels = true;
             }
 
@@ -471,7 +471,7 @@ bool UIGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool 
          if (!mSingleColumn || data > 0)
          {
             double oldValue = data;
-            data = ofClamp(data + scrollY / 100, FLT_EPSILON, 1);
+            data = ofClamp(data + scrollY / 100, std::numeric_limits<double>::epsilon(), 1);
             if (mListener)
                mListener->GridUpdated(this, cell.mCol, cell.mRow, data, oldValue);
          }
@@ -605,7 +605,7 @@ void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
          {
             float a;
             in >> a;
-            mData[dataIndex] = a;
+            mData[dataIndex] = static_cast<double>(a);
          }
          else
             in >> mData[dataIndex];

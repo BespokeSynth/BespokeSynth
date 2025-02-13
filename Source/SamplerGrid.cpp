@@ -191,7 +191,7 @@ void SamplerGrid::GridUpdated(UIGrid* grid, int col, int row, double value, doub
    OnGridButton(col, row, value, nullptr);
 }
 
-void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void SamplerGrid::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    bool bOn = velocity > 0;
    if (y < mRows && x < mCols)

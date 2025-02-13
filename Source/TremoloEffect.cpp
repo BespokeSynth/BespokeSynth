@@ -82,7 +82,7 @@ void TremoloEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          //smooth out LFO a bit to avoid pops with square/saw LFOs
          mWindow[mWindowPos] = mLFO.Value(i + kAntiPopWindowSize / 2, -1);
          mWindowPos = (mWindowPos + 1) % kAntiPopWindowSize;
-         float lfoVal = 0;
+         double lfoVal = 0;
          for (int j = 0; j < kAntiPopWindowSize; ++j)
             lfoVal += mWindow[j];
          lfoVal /= kAntiPopWindowSize;
@@ -105,7 +105,7 @@ void TremoloEffect::DrawModule()
    mDutySlider->Draw();
 
    ofPushStyle();
-   ofSetColor(0, 200, 0, gModuleDrawAlpha * .3f);
+   ofSetColor(0, 200, 0, gModuleDrawAlpha * .3);
    ofFill();
    ofRect(5, 4, mLFO.Value(0, -1) * 85 * mAmount, 14);
    ofPopStyle();
