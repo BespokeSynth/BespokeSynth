@@ -288,7 +288,7 @@ void RadioButton::SetIndex(int i, double time)
    if (mElements.empty())
       return;
 
-   i = ofClamp(i, 0, mElements.size() - 1);
+   i = ofClamp(i, 0, static_cast<int>(mElements.size() - 1));
    int oldVal = *mVar;
    if (mMultiSelect)
       *mVar ^= 1 << mElements[i].mValue;
