@@ -109,7 +109,7 @@ double VinylTempoControl::Value(int samplesIn)
 
 bool VinylTempoControl::CanStartVinylControl()
 {
-   return !mVinylProcessor.GetStopped() && fabsf(mVinylProcessor.GetPitch()) > .001f;
+   return !mVinylProcessor.GetStopped() && std::abs(mVinylProcessor.GetPitch()) > .001;
 }
 
 void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox, double time)

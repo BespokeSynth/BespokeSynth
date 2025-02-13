@@ -66,7 +66,7 @@ public:
    bool UsesQ() { return true; } // return mType == kFilterType_Lowpass || mType == kFilterType_Highpass || mType == kFilterType_Bandpass || mType == kFilterType_Notch || mType == kFilterType_Peak; }
    double GetMagnitudeResponseAt(double f);
 
-  template <class T>
+   template <class T>
    T Filter(T in)
    {
       T out = in * mA0 + mZ1;

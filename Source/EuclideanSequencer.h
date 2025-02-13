@@ -69,7 +69,7 @@ public:
 
 private:
    double GetRadius() { return 90.0 - mIndex * 15; }
-   int GetStepIndex(int x, int y, double & radiusOut);
+   int GetStepIndex(int x, int y, double& radiusOut);
    EuclideanSequencer* mOwner{ nullptr };
    int mIndex{ 0 };
    std::array<double, EUCLIDEAN_SEQUENCER_MAX_STEPS> mSteps{};

@@ -10,15 +10,10 @@
 #include <mutex>
 #include <random>
 
-#include "Xoshiro256ss.h"
-
 class NVGcontext;
 
 extern NVGcontext* gNanoVG;
 extern NVGcontext* gFontBoundsNanoVG;
-
-extern bespoke::core::Xoshiro256ss gRandom;
-extern std::uniform_real_distribution<double> gRandom01;
 
 struct ofColor
 {
@@ -275,7 +270,7 @@ bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limits<T>::q
       epsilon = 0.00000000001;
    else if (std::is_same_v<T, long double> && std::isnan(epsilon))
       epsilon = 0.00000000000000000000000001L;
-   if (std::isnan(epsilon)) // float128 or some such? std::float128_t is C++23 and we haven't switched to c++20 yet. But instead of returning something definitely incorrect we use the types epsilon instead.
+   if (epsilon == std::numeric_limits<T>::quiet_NaN()) // float128 or some such? std::float128_t is C++23 and we haven't switched to c++20 yet. But instead of returning something definitely incorrect we use the types epsilon instead.
       epsilon = std::numeric_limits<T>::epsilon();
    return std::fabs(a - b) < epsilon;
 }
@@ -378,23 +373,8 @@ T ofMap(T val, T1 fromStart, T2 fromEnd, T3 toStart, T4 toEnd, bool clamp = fals
    return ofMap(val, static_cast<T>(fromStart), static_cast<T>(fromEnd), static_cast<T>(toStart), static_cast<T>(toEnd), clamp);
 }
 
-template <class T>
-T ofRandom(T max)
-{
-   return max * gRandom01(gRandom);
-}
-
-template <class T>
-T ofRandom(T x, T y)
-{
-   // if there is no range, return the value
-   if (ofAlmostEquel(x, y))
-      return x;
-   const double high = MAX(x, y);
-   const double low = MIN(x, y);
-   return low + ((high - low) * gRandom01(gRandom));
-}
-
+double ofRandom(double max);
+double ofRandom(double x, double y);
 void ofSetCircleResolution(float res);
 unsigned long long ofGetSystemTimeNanos();
 float ofGetWidth();

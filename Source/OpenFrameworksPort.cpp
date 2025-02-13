@@ -398,6 +398,21 @@ void ofVertex(ofVec2f point)
    ofVertex(point.x, point.y);
 }
 
+double ofRandom(double max)
+{
+   return max * gRandom01(gRandom);
+}
+
+double ofRandom(double x, double y)
+{
+   // if there is no range, return the value
+   if (ofAlmostEquel(x, y))
+      return x;
+   const double high = MAX(x, y);
+   const double low = MIN(x, y);
+   return low + ((high - low) * gRandom01(gRandom));
+}
+
 void ofSetCircleResolution(float res)
 {
 }

@@ -628,13 +628,13 @@ void NoteCanvas::SaveMidi()
          NoteCanvasElement* noteOnElement = static_cast<NoteCanvasElement*>(element);
          int noteNumber = mCanvas->GetNumRows() - noteOnElement->mRow - 1;
          double noteStart = (element->mCol + element->mOffset) * ticksPerQuarterNote *
-                           +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
+                            +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
          float velocity = noteOnElement->GetVelocity();
          MidiMessage messageOn = MidiMessage::noteOn(1, noteNumber, velocity);
          messageOn.setTimeStamp(noteStart);
          track1.addEvent(messageOn);
          double noteEnd = (element->mCol + element->mOffset + element->mLength) * ticksPerQuarterNote *
-                         +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
+                          +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
          MidiMessage messageOff = MidiMessage::noteOff(1, noteNumber, velocity);
          messageOff.setTimeStamp(noteEnd);
          track1.addEvent(messageOff);
