@@ -272,7 +272,7 @@ bool ofAlmostEquel(const T& a, const T& b, T epsilon = std::numeric_limits<T>::q
       epsilon = 0.00000000000000000000000001L;
    if (epsilon == std::numeric_limits<T>::quiet_NaN()) // float128 or some such? std::float128_t is C++23 and we haven't switched to c++20 yet. But instead of returning something definitely incorrect we use the types epsilon instead.
       epsilon = std::numeric_limits<T>::epsilon();
-   return std::fabs(a - b) < epsilon;
+   return std::abs(a - b) < epsilon;
 }
 
 template <class T, class U>

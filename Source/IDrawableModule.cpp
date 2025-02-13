@@ -1071,8 +1071,8 @@ void IDrawableModule::FindClosestSides(float xThis, float yThis, float wThis, fl
          float distSq = vDiff.lengthSquared();
          if (distSq < closest &&
              //i/2 == j/2 &&   //only connect horizontal-horizontal, vertical-vertical
-             //((i/2 == 0 && fabs(vDiff.x) > 10) ||
-             // (i/2 == 1 && fabs(vDiff.y) > 10)
+             //((i/2 == 0 && std::abs(vDiff.x) > 10) ||
+             // (i/2 == 1 && std::abs(vDiff.y) > 10)
              //) &&
              vDiff.dot(vDirs[i]) > 0 &&
              vDiff.dot(vDirs[j]) < 0)

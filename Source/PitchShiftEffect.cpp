@@ -97,7 +97,7 @@ double PitchShiftEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp(fabs((mRatio - 1) * 10), 0, 1);
+   return ofClamp(std::abs((mRatio - 1) * 10), 0, 1);
 }
 
 void PitchShiftEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)

@@ -94,7 +94,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
 
       float input = 0;
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
-         input = MAX(input, fabsf(buffer->GetChannel(ch)[i]));
+         input = MAX(input, std::abs(buffer->GetChannel(ch)[i]));
       input *= mDrive;
 
       /* if desired, one could use another EnvelopeDetector to smooth

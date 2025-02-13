@@ -1278,19 +1278,19 @@ void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
 
 bool SamplePlayer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   if (fabs(scrollX) > fabsf(scrollY))
+   if (std::abs(scrollX) > std::abs(scrollY))
       scrollY = 0;
    else
       scrollX = 0;
 
    //horizontal scroll
-   mZoomOffset = ofClamp(mZoomOffset + scrollX * .005f, 0, 1);
+   mZoomOffset = ofClamp(mZoomOffset + scrollX * .005, 0, 1);
 
    //zoom scroll
-   float oldZoomLevel = mZoomLevel;
-   mZoomLevel = ofClamp(mZoomLevel + scrollY * .2f, 1, 40);
-   float zoomAmount = (mZoomLevel - oldZoomLevel) / oldZoomLevel; //find actual adjusted amount
-   float zoomCenter = ofMap(x, 5, mWidth - 10, 0, 1, true) / oldZoomLevel;
+   double oldZoomLevel = mZoomLevel;
+   mZoomLevel = ofClamp(mZoomLevel + scrollY * .2, 1, 40);
+   double zoomAmount = (mZoomLevel - oldZoomLevel) / oldZoomLevel; //find actual adjusted amount
+   double zoomCenter = ofMap(x, 5, mWidth - 10, 0, 1, true) / oldZoomLevel;
    mZoomOffset += zoomCenter * zoomAmount;
    if (mZoomLevel == 1)
       mZoomOffset = 0;

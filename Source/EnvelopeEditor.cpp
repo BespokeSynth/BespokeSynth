@@ -267,7 +267,7 @@ void EnvelopeControl::MouseMoved(float x, float y)
          double pointX = GetXForTime(time);
          double pointY = GetYForValue(value);
 
-         if (fabsf(x - pointX) < 4 && fabsf(y - pointY) < 4)
+         if (std::abs(x - pointX) < 4 && std::abs(y - pointY) < 4)
          {
             mHighlightPoint = i;
             mHighlightCurve = -1;

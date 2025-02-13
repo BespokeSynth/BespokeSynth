@@ -1207,7 +1207,7 @@ bool CodeEntry::MouseMoved(float x, float y)
 
 bool CodeEntry::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   if (fabs(scrollX) > fabsf(scrollY))
+   if (std::abs(scrollX) > std::abs(scrollY))
       scrollY = 0;
    else
       scrollX = 0;

@@ -113,7 +113,7 @@ double EQEffect::GetEffectAmount()
       double amount = 0;
       for (int i = 0; i < mNumFilters; ++i)
       {
-         amount += fabs(mMultiSlider->GetVal(i, 0) - .5);
+         amount += std::abs(mMultiSlider->GetVal(i, 0) - .5);
       }
       return amount;
    }

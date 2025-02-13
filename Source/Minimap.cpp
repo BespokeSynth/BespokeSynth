@@ -166,13 +166,13 @@ void Minimap::RectUnion(ofRectangle& target, ofRectangle& unionRect)
    if (target.x > unionRect.x)
    {
       target.x = unionRect.x;
-      target.width = fabs(x2) - target.x;
+      target.width = std::abs(x2) - target.x;
    }
 
    if (target.y > unionRect.y)
    {
       target.y = unionRect.y;
-      target.height = fabs(y2) - target.y;
+      target.height = std::abs(y2) - target.y;
    }
 
    if (target.getMaxX() < unionRect.getMaxX())
@@ -185,8 +185,8 @@ void Minimap::RectUnion(ofRectangle& target, ofRectangle& unionRect)
       y2 = unionRect.getMaxY();
    }
 
-   target.width = fabs(x2) - target.x;
-   target.height = fabs(y2) - target.y;
+   target.width = std::abs(x2) - target.x;
+   target.height = std::abs(y2) - target.y;
 }
 
 void Minimap::DrawModule()

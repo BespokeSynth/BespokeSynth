@@ -62,7 +62,7 @@ void BiquadFilter::UpdateFilterCoeff()
    }
 
    double norm;
-   double V = pow(10, fabs(mDbGain) / 20.0);
+   double V = pow(10, std::abs(mDbGain) / 20.0);
    double K = tan(M_PI * ofClamp(mF / mSampleRate, 0, 0.499999));
    switch (mType)
    {

@@ -96,9 +96,9 @@ void NoteStrummer::OnTransportAdvanced(double amount)
          double pos = double(index + .5) / numNotes;
          double change = mStrum - mLastStrumPos;
          double offset = pos - mLastStrumPos;
-         bool wraparound = fabs(change) > .99;
+         bool wraparound = std::abs(change) > .99;
          if (change * offset > 0 && //same direction
-             fabs(offset) <= fabs(change) &&
+             std::abs(offset) <= std::abs(change) &&
              !wraparound)
             PlayNoteOutput(NoteMessage(gTime + i * gInvSampleRateMs, pitch, 127));
          ++index;

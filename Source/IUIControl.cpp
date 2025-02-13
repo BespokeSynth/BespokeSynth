@@ -271,10 +271,10 @@ namespace
       if (dot > 0)
       {
          ofVec2f perpendicularDirection(direction.y, direction.x);
-         float minExtentA = fabsf(rectA.getMinX() * perpendicularDirection.x + rectA.getMinY() * perpendicularDirection.y);
-         float maxExtentA = fabsf(rectA.getMaxX() * perpendicularDirection.x + rectA.getMaxY() * perpendicularDirection.y);
-         float minExtentB = fabsf(rectB.getMinX() * perpendicularDirection.x + rectB.getMinY() * perpendicularDirection.y);
-         float maxExtentB = fabsf(rectB.getMaxX() * perpendicularDirection.x + rectB.getMaxY() * perpendicularDirection.y);
+         float minExtentA = std::abs(rectA.getMinX() * perpendicularDirection.x + rectA.getMinY() * perpendicularDirection.y);
+         float maxExtentA = std::abs(rectA.getMaxX() * perpendicularDirection.x + rectA.getMaxY() * perpendicularDirection.y);
+         float minExtentB = std::abs(rectB.getMinX() * perpendicularDirection.x + rectB.getMinY() * perpendicularDirection.y);
+         float maxExtentB = std::abs(rectB.getMaxX() * perpendicularDirection.x + rectB.getMaxY() * perpendicularDirection.y);
          if (minExtentA <= maxExtentB && maxExtentA >= minExtentB) //overlap, score based upon closest in the specified direction
             score = 1 / direction.dot(toRect) + 1000; //bonus points so that overlapping ones win
          else //no overlap,but still in the requested direction. score based upon overall distance

@@ -196,7 +196,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
                   sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
                if (bufferSize > 0)
                   sampleIdx %= bufferSize;
-               mag = MAX(mag, fabsf(buffer[sampleIdx]));
+               mag = MAX(mag, std::abs(buffer[sampleIdx]));
             }
             mag = pow(mag, .25f);
             mag *= height / 2 * vol;
@@ -427,7 +427,7 @@ float GetStringWidth(std::string text, float size)
 
 void AssertIfDenormal(float input)
 {
-   assert(input == 0 || input != input || fabsf(input) > std::numeric_limits<float>::min());
+   assert(input == 0 || input != input || std::abs(input) > std::numeric_limits<float>::min());
 }
 
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)

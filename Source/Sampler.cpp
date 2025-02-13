@@ -107,7 +107,7 @@ void Sampler::Process(double time)
       for (int i = 0; i < gBufferSize; ++i)
       {
          //if we've already started recording, or if it's a new recording and there's sound
-         if (mRecordPos > 0 || fabs(GetBuffer()->GetChannel(0)[i]) > mThresh)
+         if (mRecordPos > 0 || std::abs(GetBuffer()->GetChannel(0)[i]) > mThresh)
          {
             mSample.Data()->GetChannel(0)[mRecordPos] = GetBuffer()->GetChannel(0)[i];
             if (mPassthrough)

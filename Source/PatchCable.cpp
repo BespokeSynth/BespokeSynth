@@ -356,7 +356,7 @@ void PatchCable::Render()
                   }
                   else
                   {
-                     sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
+                     sample = sqrtf(std::abs(sample)) * (sample < 0 ? -1 : 1);
                      sample = ofClamp(sample, -1.0f, 1.0f);
                   }
                   ofVec2f sampleOffsetDir = MathUtils::BezierPerpendicular(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);

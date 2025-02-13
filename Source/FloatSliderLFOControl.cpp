@@ -212,7 +212,7 @@ bool FloatSliderLFOControl::DrawToPush2Screen()
       ofPushStyle();
       ofSetColor(0, 200, 0);
       ofFill();
-      if (fabs(screenPos - screenPosMin) > 1)
+      if (std::abs(screenPos - screenPosMin) > 1)
          ofRect(screenPosMin, rect.y, screenPos - screenPosMin, rect.height, 1); //lfo bar
       ofPopStyle();
 

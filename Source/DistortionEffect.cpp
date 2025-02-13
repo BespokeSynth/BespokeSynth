@@ -138,7 +138,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
             else if (sample >= -.08905f)
                sample = -6.153f * sample * sample + 3.9375f * sample;
             else if (sample >= -1)
-               sample = -.75f * (1 - powf(1 - (fabsf(sample) - .032847f), 12) + .333f * (fabsf(sample) - .032847f)) + .01f;
+               sample = -.75f * (1 - powf(1 - (std::abs(sample) - .032847f), 12) + .333f * (std::abs(sample) - .032847f)) + .01f;
             else
                sample = -.9818f;
             buffer->GetChannel(ch)[i] = sample / mGain;
