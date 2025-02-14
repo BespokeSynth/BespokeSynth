@@ -41,64 +41,65 @@ IModulator::~IModulator()
 
 void IModulator::OnModulatorRepatch()
 {
-   bool wasEmpty = (mTargets[0].mUIControlTarget == nullptr);
-
-   for (size_t i = 0; i < mTargets.size(); ++i)
+   // Removed or changed connection
+   if (mTargetCable != nullptr && mTargetCable->GetPatchCables().size() <= mTargets.size())
    {
-      IUIControl* newTarget = nullptr;
-      if (mTargetCable != nullptr && i < mTargetCable->GetPatchCables().size())
-         newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[i]->GetTarget());
-      if (newTarget != mTargets[i].mUIControlTarget)
+      for (auto iter = mTargets.begin(); iter != mTargets.end(); ++iter)
       {
-         if (mTargets[i].mSliderTarget != nullptr && mTargets[i].mSliderTarget->GetModulator() == this)
-            mTargets[i].mSliderTarget->SetModulator(nullptr); //clear old target's pointer to this
-
-         if (i + 1 < mTargets.size() && newTarget == mTargets[i + 1].mUIControlTarget) //one got deleted, shift the rest down
+         bool found = false;
+         for (auto& cableTarget : mTargetCable->GetPatchCables())
          {
-            for (; i < mTargets.size(); ++i)
+            if (iter->mUIControlTarget == cableTarget->GetTarget())
             {
-               if (i + 1 < mTargets.size())
-               {
-                  mTargets[i].mUIControlTarget = mTargets[i + 1].mUIControlTarget;
-                  mTargets[i].mSliderTarget = mTargets[i + 1].mSliderTarget;
-               }
-               else
-               {
-                  mTargets[i].mUIControlTarget = nullptr;
-                  mTargets[i].mSliderTarget = nullptr;
-               }
+               found = true;
+               break;
             }
+         }
+         if (!found) // removed
+         {
+            if (iter->mSliderTarget && iter->mSliderTarget->GetModulator() == this)
+               iter->mSliderTarget->SetModulator(nullptr, false);
+            mTargets.erase(iter);
             break;
          }
+      }
+   }
 
-         mTargets[i].mUIControlTarget = newTarget;
-         mTargets[i].mSliderTarget = dynamic_cast<FloatSlider*>(mTargets[i].mUIControlTarget);
+   const bool wasEmpty = mTargets.empty();
 
-         if (newTarget != nullptr)
+   // Connection added
+   if (mTargetCable != nullptr && mTargetCable->GetPatchCables().size() > mTargets.size())
+   {
+      IUIControl* newTarget = nullptr;
+      const auto newIndex = mTargetCable->GetPatchCables().size() - 1;
+      newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[newIndex]->GetTarget());
+      if (newTarget != nullptr)
+      {
+         mTargets.emplace_back(newTarget, dynamic_cast<FloatSlider*>(newTarget));
+         if (mTargets[newIndex].mSliderTarget != nullptr)
          {
-            if (mTargets[i].mSliderTarget != nullptr)
-            {
-               mTargets[i].mSliderTarget->SetModulator(this);
-               if (wasEmpty)
-                  InitializeRange(mTargets[i].mSliderTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), mTargets[i].mSliderTarget->GetMode());
-            }
-            else
-            {
-               if (wasEmpty)
-                  InitializeRange(mTargets[i].mUIControlTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), FloatSlider::kNormal);
-            }
+            mTargets[newIndex].mSliderTarget->SetModulator(this);
+            if (wasEmpty)
+               InitializeRange(mTargets[newIndex].mSliderTarget->GetValue(), mTargets[newIndex].mUIControlTarget->GetModulationRangeMin(), mTargets[newIndex].mUIControlTarget->GetModulationRangeMax(), mTargets[newIndex].mSliderTarget->GetMode());
          }
          else
          {
-            if (i == 0)
-            {
-               if (mMinSlider)
-                  mMinSlider->SetVar(&mDummyMin);
-               if (mMaxSlider)
-                  mMaxSlider->SetVar(&mDummyMax);
-            }
+            if (wasEmpty)
+               InitializeRange(mTargets[newIndex].mUIControlTarget->GetValue(), mTargets[newIndex].mUIControlTarget->GetModulationRangeMin(), mTargets[newIndex].mUIControlTarget->GetModulationRangeMax(), FloatSlider::kNormal);
          }
       }
+      else
+      {
+      }
+   }
+
+   // Clear(ed)
+   if (mTargets.empty())
+   {
+      if (mMinSlider)
+         mMinSlider->SetVar(&mDummyMin);
+      if (mMaxSlider)
+         mMaxSlider->SetVar(&mDummyMax);
    }
 
    TheSynth->RemoveExtraPoller(this);
@@ -132,7 +133,7 @@ float IModulator::GetRecentChange() const
    return mLastPollValue - mSmoothedValue;
 }
 
-void IModulator::OnRemovedFrom(IUIControl* control)
+void IModulator::OnRemovedFrom(IUIControl* control, bool shouldCallRepatch /* = true */)
 {
    if (mTargetCable)
    {
@@ -149,7 +150,8 @@ void IModulator::OnRemovedFrom(IUIControl* control)
          }
       }
    }
-   OnModulatorRepatch();
+   if (shouldCallRepatch)
+      OnModulatorRepatch();
 }
 
 void IModulator::InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode)
