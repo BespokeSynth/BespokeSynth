@@ -180,7 +180,7 @@ void CanvasElement::SetStart(double start, bool preserveLength)
    if (!preserveLength)
       end = GetEnd();
    start *= mCanvas->GetNumCols();
-   mCol = std::lround(start);
+   mCol = std::round(start);
    mOffset = start - mCol;
    if (!preserveLength)
       SetEnd(end);
