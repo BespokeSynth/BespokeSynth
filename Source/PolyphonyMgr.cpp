@@ -85,7 +85,7 @@ void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
    }
 }
 
-int PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation)
+int PolyphonyMgr::Start(double time, int pitch, double amount, int voiceIdx, ModulationParameters modulation)
 {
    assert(voiceIdx < kNumVoices);
 

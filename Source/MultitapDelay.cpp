@@ -54,7 +54,7 @@ void MultitapDelay::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mDryAmountSlider = new FloatSlider(this, "dry", 5, 10, 150, 15, &mDryAmount, 0, 1);
-   mDisplayLengthSlider = new FloatSlider(this, "display length", mDryAmountSlider, kAnchor_Below, 150, 15, &mDisplayLength, .1f, mDelayBuffer.Size() / gSampleRate);
+   mDisplayLengthSlider = new FloatSlider(this, "display length", mDryAmountSlider, kAnchor_Below, 150, 15, &mDisplayLength, .1, mDelayBuffer.Size() / gSampleRate);
    mDisplayLength = mDisplayLengthSlider->GetMax();
 
    for (int i = 0; i < mNumTaps; ++i)
@@ -199,7 +199,7 @@ void MultitapDelay::GetModuleDimensions(float& width, float& height)
    height = mBufferY + mBufferH + 10 + 100 * mNumTaps;
 }
 
-void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -330,22 +330,22 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
 {
    if (mGain > 0)
    {
-      float delaySamps = mDelayMs / gInvSampleRateMs;
-      delaySamps = ofClamp(delaySamps - offset, 0.1f, mOwner->mDelayBuffer.Size() - 2);
+      double delaySamps = mDelayMs / gInvSampleRateMs;
+      delaySamps = ofClamp(delaySamps - offset, 0.1, mOwner->mDelayBuffer.Size() - 2);
 
       int sampsAgoA = int(delaySamps);
       int sampsAgoB = sampsAgoA + 1;
 
-      float sample = mOwner->mDelayBuffer.GetSample(sampsAgoA, ch);
-      float nextSample = mOwner->mDelayBuffer.GetSample(sampsAgoB, ch);
-      float a = delaySamps - sampsAgoA;
-      float delayedSample = (1 - a) * sample + a * nextSample; //interpolate
+      double sample = mOwner->mDelayBuffer.GetSample(sampsAgoA, ch);
+      double nextSample = mOwner->mDelayBuffer.GetSample(sampsAgoB, ch);
+      double a = delaySamps - sampsAgoA;
+      double delayedSample = (1 - a) * sample + a * nextSample; //interpolate
 
       float outputSample = delayedSample * mGain;
       mTapBuffer.GetChannel(ch)[offset] = outputSample;
 
       *sampleOut += outputSample;
-      float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
+      double panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
       mOwner->mDelayBuffer.Accum(gBufferSize - offset, outputSample * mFeedback * panGain, ch);
    }
 }

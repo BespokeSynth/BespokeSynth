@@ -69,6 +69,12 @@ void* operator new[](std::size_t size, const char* file, int line) throw(std::ba
 
 #define USE_VECTOR_OPS
 
+#ifdef BESPOKE_BUFFERTYPE_DOUBLE //@todo(Noxy) Actually make use of this in the many places
+#define BESPOKE_BUFFERTYPE double
+#else
+#define BESPOKE_BUFFERTYPE float
+#endif
+
 //bool labeling technique that I stole from Ableton
 #define K(x) true
 #define L(x, y) y
@@ -100,24 +106,24 @@ extern IUIControl* gBindToUIControl;
 extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;
 extern RetinaTrueTypeFont gFontFixedWidth;
-extern float gModuleDrawAlpha;
-extern float gNullBuffer[kWorkBufferSize];
-extern float gZeroBuffer[kWorkBufferSize];
-extern float gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
+extern double gModuleDrawAlpha;
+extern BESPOKE_BUFFERTYPE gNullBuffer[kWorkBufferSize];
+extern BESPOKE_BUFFERTYPE gZeroBuffer[kWorkBufferSize];
+extern BESPOKE_BUFFERTYPE gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;
 extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;
 extern IUIControl* gHotBindUIControl[10];
-extern float gControlTactileFeedback;
-extern float gDrawScale;
+extern double gControlTactileFeedback;
+extern double gDrawScale;
 extern bool gShowDevModules;
-extern float gCornerRoundness;
+extern double gCornerRoundness;
 
 extern std::random_device gRandomDevice;
 
 extern bespoke::core::Xoshiro256ss gRandom;
-extern std::uniform_real_distribution<float> gRandom01;
-extern std::uniform_real_distribution<float> gRandomBipolarDist;
+extern std::uniform_real_distribution<double> gRandom01;
+extern std::uniform_real_distribution<double> gRandomBipolarDist;
 
 enum OscillatorType
 {
@@ -147,7 +153,7 @@ enum class StepVelocityType
    Accent = 2,
    NumVelocityLevels = 3
 };
-extern std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
+extern std::array<double, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
 
 class LoadingJSONException : public std::exception
 {
@@ -193,9 +199,10 @@ void BufferCopy(float* dst, const float* src, int bufferSize);
 std::string NoteName(int pitch, bool flat = false, bool includeOctave = false);
 int PitchFromNoteName(std::string noteName);
 float Interp(float a, float start, float end);
-double GetPhaseInc(float freq);
+double Interp(double a, double start, double end);
+double GetPhaseInc(double freq);
 float FloatWrap(float num, float space);
-double DoubleWrap(double num, float space);
+double DoubleWrap(double num, double space);
 void DrawTextNormal(std::string text, int x, int y, float size = 13);
 void DrawTextRightJustify(std::string text, int x, int y, float size = 13);
 void DrawTextBold(std::string text, int x, int y, float size = 13);
@@ -211,10 +218,10 @@ void StringCopy(char* dest, const char* source, int destLength);
 int GetKeyModifiers();
 bool IsKeyHeld(int key, int modifiers = kModifier_None);
 int KeyToLower(int key);
-float EaseIn(float start, float end, float a);
-float EaseOut(float start, float end, float a);
-float Bias(float value, float bias);
-float Pow2(float in);
+double EaseIn(double start, double end, double a);
+double EaseOut(double start, double end, double a);
+double Bias(double value, double bias);
+double Pow2(double in);
 void PrintCallstack();
 bool IsInUnitBox(ofVec2f pos);
 std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existing);
@@ -224,14 +231,14 @@ void DumpUnfreedMemory();
 float DistSqToLine(ofVec2f point, ofVec2f a, ofVec2f b);
 uint32_t JenkinsHash(const char* key);
 void LoadStateValidate(bool assertion);
-float GetLeftPanGain(float pan);
-float GetRightPanGain(float pan);
+double GetLeftPanGain(double pan);
+double GetRightPanGain(double pan);
 void DrawFallbackText(const char* text, float posX, float posY);
-bool EvaluateExpression(std::string expression, float currentValue, float& output);
+bool EvaluateExpression(std::string expression, double currentValue, double& output);
 double NextBufferTime(bool includeLookahead);
 bool IsAudioThread();
 
-inline static float RandomSample()
+static double RandomSample()
 {
    return gRandomBipolarDist(gRandom);
 }

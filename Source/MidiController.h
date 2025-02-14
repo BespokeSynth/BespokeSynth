@@ -166,12 +166,12 @@ struct UIControlConnection
    IUIControl* mUIControl{ nullptr };
    ControlType mType{ ControlType::kControlType_Slider };
    MidiMessageType mMessageType{ MidiMessageType::kMidiMessage_Control };
-   float mValue{ 0 };
+   double mValue{ 0 };
    int mMidiOnValue{ 127 };
    int mMidiOffValue{ 0 };
    bool mScaleOutput{ false };
    bool mBlink{ false };
-   float mIncrementAmount{ 0 };
+   double mIncrementAmount{ 0 };
    bool mTwoWay{ true };
    int mFeedbackControl{ -1 };
    SpecialControlBinding mSpecialBinding{ SpecialControlBinding::kSpecialBinding_None };
@@ -230,7 +230,7 @@ struct ControlLayoutElement
    ofVec2f mPosition;
    ofVec2f mDimensions;
    ControlDrawType mDrawType{ ControlDrawType::kDrawType_Slider };
-   float mIncrementAmount{ 0 };
+   double mIncrementAmount{ 0 };
    int mOffVal{ 0 };
    int mOnVal{ 127 };
    bool mScaleOutput{ true };
@@ -239,8 +239,8 @@ struct ControlLayoutElement
 
    PatchCableSource* mControlCable{ nullptr };
 
-   float mLastValue{ 0 };
-   float mLastActivityTime{ -9999 };
+   double mLastValue{ 0 };
+   double mLastActivityTime{ -9999 };
 };
 
 struct GridLayout
@@ -321,7 +321,7 @@ public:
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
    void OnMidi(const juce::MidiMessage& message) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IKeyboardFocusListener
    void OnKeyPressed(int key, bool isRepeat) override;
@@ -376,7 +376,7 @@ private:
    bool MouseMoved(float x, float y) override;
 
    void ConnectDevice();
-   void MidiReceived(MidiMessageType messageType, int control, float scaledValue, int rawValue, int channel);
+   void MidiReceived(MidiMessageType messageType, int control, double value, int rawValue, int channel);
    void RemoveConnection(int control, MidiMessageType messageType, int channel, int page);
    int GetNumConnectionsOnPage(int page);
    void SetEntirePageToZero(int page);
@@ -392,14 +392,14 @@ private:
 
    const std::string kDefaultLayout = "default";
 
-   float mVelocityMult{ 1 };
+   double mVelocityMult{ 1 };
    bool mUseChannelAsVoice{ false };
-   float mCurrentPitchBend{ 0 };
+   double mCurrentPitchBend{ 0 };
    int mNoteOffset{ 0 };
-   float mPitchBendRange{ 2 };
+   double mPitchBendRange{ 2 };
    int mModwheelCC{ 1 }; // or 74 in Multidimensional Polyphonic Expression (MPE) spec
-   float mModWheelOffset{ 0 };
-   float mPressureOffset{ 0 };
+   double mModWheelOffset{ 0 };
+   double mPressureOffset{ 0 };
 
    Modulations mModulation{ true };
 

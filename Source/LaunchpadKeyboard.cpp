@@ -161,7 +161,7 @@ LaunchpadKeyboard::~LaunchpadKeyboard()
    TheTransport->RemoveListener(this);
 }
 
-void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void LaunchpadKeyboard::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    bool bOn = velocity > 0;
    int pitch = GridToPitch(x, y);
@@ -307,7 +307,7 @@ void LaunchpadKeyboard::PlayKeyboardNote(double time, int pitch, int velocity)
    if (mEnabled || velocity == 0)
    {
       if (velocity == 0)
-         time += .001f; //TODO(Ryan) gross hack. need to handle the case better of receiving a note-on followed by a note-off for one pitch at the exact same time. right now it causes stuck notes.
+         time += .001; //TODO(Ryan) gross hack. need to handle the case better of receiving a note-on followed by a note-off for one pitch at the exact same time. right now it causes stuck notes.
       PlayNoteOutput(NoteMessage(time, pitch, velocity));
    }
 
@@ -368,7 +368,7 @@ void LaunchpadKeyboard::OnTimeEvent(double time)
 {
 }
 
-bool LaunchpadKeyboard::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool LaunchpadKeyboard::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note && controlIndex >= 36 && controlIndex <= 99)
    {
@@ -777,7 +777,7 @@ void LaunchpadKeyboard::IntSliderUpdated(IntSlider* slider, int oldVal, double t
    }
 }
 
-void LaunchpadKeyboard::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void LaunchpadKeyboard::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

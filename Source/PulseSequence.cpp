@@ -134,7 +134,7 @@ void PulseSequence::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void PulseSequence::OnTransportAdvanced(float amount)
+void PulseSequence::OnTransportAdvanced(double amount)
 {
    PROFILER(PulseSequence);
 
@@ -147,7 +147,7 @@ void PulseSequence::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
-void PulseSequence::OnPulse(double time, float velocity, int flags)
+void PulseSequence::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
    Step(time, velocity, flags);
@@ -247,7 +247,7 @@ void PulseSequence::ButtonClicked(ClickButton* button, double time)
       {
          const int start = (shift == 1) ? mVelocityGrid->GetCols() - 1 : 0;
          const int end = (shift == 1) ? 0 : mVelocityGrid->GetCols() - 1;
-         const float startVal = mVelocityGrid->GetVal(start, row);
+         const double startVal = mVelocityGrid->GetVal(start, row);
          for (int col = start; col != end; col -= shift)
             mVelocityGrid->SetVal(col, row, mVelocityGrid->GetVal(col - shift, row));
          mVelocityGrid->SetVal(end, row, startVal);
@@ -265,7 +265,7 @@ void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PulseSequence::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -279,7 +279,7 @@ void PulseSequence::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
    }
 }
 
-void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mVelocityGrid)
    {

@@ -63,7 +63,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
       mNumSamples = (int)mReader->lengthInSamples;
       mOffset = mNumSamples;
       mOriginalSampleRate = mReader->sampleRate;
-      mSampleRateRatio = float(mOriginalSampleRate) / gSampleRate;
+      mSampleRateRatio = static_cast<double>(mOriginalSampleRate) / gSampleRate;
 
       mReadBuffer = std::make_unique<juce::AudioSampleBuffer>();
       mReadBuffer->setSize(mReader->numChannels, mNumSamples);
@@ -187,7 +187,7 @@ bool Sample::WriteDataToFile(const std::string& path, ChannelBuffer* data, int n
    return ret;
 }
 
-void Sample::Play(double startTime, float rate /*=1*/, int offset /*=0*/, int stopPoint /*=-1*/)
+void Sample::Play(double startTime, double rate, int offset /*=0*/, int stopPoint /*=-1*/)
 {
    mPlayMutex.lock();
    mStartTime = startTime;
@@ -205,7 +205,7 @@ bool Sample::ConsumeData(double time, ChannelBuffer* out, int size, bool replace
    assert(size <= out->BufferSize());
 
    mPlayMutex.lock();
-   float end = mNumSamples;
+   double end = mNumSamples;
    if (mStopPoint != -1)
       end = mStopPoint;
 
@@ -316,7 +316,7 @@ void Sample::CopyFrom(Sample* sample)
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void Sample::SaveState(FileStreamOut& out)
@@ -360,13 +360,20 @@ void Sample::LoadState(FileStreamIn& in)
    in >> mRate;
    if (rev == 0)
    {
-      in >> mSampleRateRatio;
+      if (rev < 2)
+      {
+         float a;
+         in >> a;
+         mSampleRateRatio = static_cast<double>(a);
+      }
+      else
+         in >> mSampleRateRatio;
       mOriginalSampleRate = gSampleRate * mSampleRateRatio;
    }
    else
    {
       in >> mOriginalSampleRate;
-      mSampleRateRatio = float(mOriginalSampleRate) / gSampleRate;
+      mSampleRateRatio = static_cast<double>(mOriginalSampleRate) / gSampleRate;
    }
    in >> mStopPoint;
    in >> mName;

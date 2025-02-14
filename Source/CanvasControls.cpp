@@ -137,7 +137,7 @@ void CanvasControls::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void CanvasControls::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void CanvasControls::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (auto* element : mCanvas->GetElements())
    {

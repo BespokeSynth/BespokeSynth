@@ -39,12 +39,12 @@ MultiBandTracker::~MultiBandTracker()
    delete[] mWorkBuffer;
 }
 
-void MultiBandTracker::SetRange(float minFreq, float maxFreq)
+void MultiBandTracker::SetRange(double minFreq, double maxFreq)
 {
    for (int i = 0; i < mNumBands; ++i)
    {
-      float a = float(i) / mNumBands;
-      float f = mMinFreq * powf(mMaxFreq / mMinFreq, a);
+      double a = static_cast<double>(i) / mNumBands;
+      double f = mMinFreq * std::pow(mMaxFreq / mMinFreq, a);
       mBands[i].SetCrossoverFreq(f);
    }
 }

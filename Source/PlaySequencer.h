@@ -66,7 +66,7 @@ public:
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -80,7 +80,7 @@ public:
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -122,9 +122,9 @@ private:
    bool mUseMedVelocity{ false };
    bool mClearLane{ false };
    bool mSustain{ false };
-   float mVelocityFull{ 1 };
-   float mVelocityMed{ .5 };
-   float mVelocityLight{ .25 };
+   double mVelocityFull{ 1 };
+   double mVelocityMed{ .5 };
+   double mVelocityLight{ .25 };
 
    DropdownList* mIntervalSelector{ nullptr };
    Checkbox* mWriteCheckbox{ nullptr };
@@ -150,7 +150,7 @@ private:
       ClickButton* mStoreButton{ nullptr };
       ClickButton* mLoadButton{ nullptr };
       float mNumMeasures{ 1 };
-      std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
+      std::array<double, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
       bool mHasSequence{ false };
    };
 

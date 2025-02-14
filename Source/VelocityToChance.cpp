@@ -120,20 +120,20 @@ void VelocityToChance::PlayNote(NoteMessage note)
       return;
    }
 
-   float random;
+   double random;
    if (mDeterministic)
    {
       const int kStepResolution = 128;
       uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
       int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
-      random = ((abs(DeterministicRandom(mSeed + note.pitch * 13, randomIndex)) % 10000) / 10000.0f);
+      random = ((abs(DeterministicRandom(mSeed + note.pitch * 13, randomIndex)) % 10000) / 10000.0);
    }
    else
    {
       random = ofRandom(1);
    }
 
-   bool accept = (random <= note.velocity / 127.0f);
+   bool accept = (random <= note.velocity / 127.0);
    if (accept)
    {
       if (mFullVelocity)

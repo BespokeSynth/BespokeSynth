@@ -485,7 +485,7 @@ void TitleBar::DrawModuleUnclipped()
 
    //midicontroller
    {
-      const float kDisplayMs = 500;
+      const double kDisplayMs = 500;
       std::string displayString;
 
       IUIControl* drawControl = nullptr;

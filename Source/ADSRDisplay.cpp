@@ -49,10 +49,10 @@ ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y,
    if (floatListener)
    {
       int sliderHeight = h / 4;
-      mASlider = new FloatSlider(floatListener, (std::string(name) + "A").c_str(), x, y, w, sliderHeight, &(mAdsr->GetA()), 0.001f, 1000);
-      mDSlider = new FloatSlider(floatListener, (std::string(name) + "D").c_str(), x, y + sliderHeight, w, sliderHeight, &(mAdsr->GetD()), 0.001f, 1000);
+      mASlider = new FloatSlider(floatListener, (std::string(name) + "A").c_str(), x, y, w, sliderHeight, &(mAdsr->GetA()), 0.001, 1000);
+      mDSlider = new FloatSlider(floatListener, (std::string(name) + "D").c_str(), x, y + sliderHeight, w, sliderHeight, &(mAdsr->GetD()), 0.001, 1000);
       mSSlider = new FloatSlider(floatListener, (std::string(name) + "S").c_str(), x, y + sliderHeight * 2, w, sliderHeight, &(mAdsr->GetS()), 0, 1);
-      mRSlider = new FloatSlider(floatListener, (std::string(name) + "R").c_str(), x, y + sliderHeight * 3, w, sliderHeight, &(mAdsr->GetR()), 0.001f, 1000);
+      mRSlider = new FloatSlider(floatListener, (std::string(name) + "R").c_str(), x, y + sliderHeight * 3, w, sliderHeight, &(mAdsr->GetR()), 0.001, 1000);
 
       mASlider->SetMode(FloatSlider::kSquare);
       mDSlider->SetMode(FloatSlider::kSquare);
@@ -94,8 +94,8 @@ void ADSRDisplay::Render()
       ofSetColor(245, 58, 0, gModuleDrawAlpha);
       ofSetLineWidth(1);
 
-      float timeBeforeSustain = mMaxTime;
-      float releaseTime = mMaxTime;
+      double timeBeforeSustain = mMaxTime;
+      double releaseTime = mMaxTime;
       if (mAdsr->GetMaxSustain() == -1 && mAdsr->GetHasSustainStage())
       {
          timeBeforeSustain = 0;
@@ -105,15 +105,15 @@ void ADSRDisplay::Render()
             if (i == mAdsr->GetSustainStage())
                break;
          }
-         releaseTime = timeBeforeSustain + mMaxTime * .2f;
+         releaseTime = timeBeforeSustain + mMaxTime * .2;
       }
       ADSR::EventInfo adsrEvent(0, releaseTime);
 
       ofBeginShape();
       ofVertex(0, mHeight);
-      for (float i = 0; i < mWidth; i += (.25f / gDrawScale))
+      for (float i = 0; i < mWidth; i += (.25 / gDrawScale))
       {
-         float time = i / mWidth * mMaxTime;
+         double time = i / mWidth * mMaxTime;
          ofVertex(GetDrawPoint(time, adsrEvent));
       }
       ofEndShape(false);
@@ -124,8 +124,8 @@ void ADSRDisplay::Render()
           mAdjustMode == kAdjustRelease ||
           mAdjustMode == kAdjustReleaseAR)
       {
-         float startTime = 0;
-         float endTime = 999;
+         double startTime = 0;
+         double endTime = 999;
 
          if (mAdjustMode == kAdjustAttack || mAdjustMode == kAdjustAttackAR)
          {
@@ -151,9 +151,9 @@ void ADSRDisplay::Render()
          ofSetColor(0, 255, 255);
          ofBeginShape();
          ofVertex(GetDrawPoint(startTime, adsrEvent));
-         for (float i = 0; i < mWidth; i += (.25f / gDrawScale))
+         for (double i = 0; i < mWidth; i += (.25 / gDrawScale))
          {
-            float time = i / mWidth * mMaxTime;
+            double time = i / mWidth * mMaxTime;
             if (time >= startTime && time <= endTime)
                ofVertex(GetDrawPoint(time, adsrEvent));
          }
@@ -161,7 +161,7 @@ void ADSRDisplay::Render()
          ofEndShape(false);
       }
 
-      float drawTime = 0;
+      double drawTime = 0;
       if (mOverrideDrawTime != -1)
       {
          drawTime = mOverrideDrawTime;
@@ -175,9 +175,9 @@ void ADSRDisplay::Render()
       }
 
       ofPushStyle();
-      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
-      float x = drawTime / mMaxTime * mWidth;
-      float y = (1 - mAdsr->Value(drawTime, &adsrEvent) * mVol) * mHeight;
+      ofSetColor(0, 255, 0, gModuleDrawAlpha * .5);
+      double x = drawTime / mMaxTime * mWidth;
+      double y = (1 - mAdsr->Value(drawTime, &adsrEvent) * mVol) * mHeight;
       if (drawTime >= timeBeforeSustain && drawTime <= releaseTime)
       {
          ofSetLineWidth(1.5f);
@@ -198,13 +198,13 @@ void ADSRDisplay::Render()
       for (size_t i = 0; i < mDrawTimeHistory.size() - 1; ++i)
       {
          ofFill();
-         ofSetColor(0, 255, 0, gModuleDrawAlpha * ofLerp(.3f, 0, float(i) / mDrawTimeHistory.size()));
+         ofSetColor(0, 255, 0, gModuleDrawAlpha * ofLerp(.3, 0, static_cast<double>(i) / mDrawTimeHistory.size()));
          int indexLeading = (mDrawTimeHistoryIndex - i + (int)mDrawTimeHistory.size()) % (int)mDrawTimeHistory.size();
          //int indexPast = (indexLeading - 1 + (int)mDrawTimeHistory.size()) % (int)mDrawTimeHistory.size();
          double timeLeading = mDrawTimeHistory[indexLeading];
          //double timePast = mDrawTimeHistory[indexPast];
-         float xLeading = timeLeading / mMaxTime * mWidth;
-         float yLeading = (1 - mAdsr->Value(timeLeading, &adsrEvent) * mVol) * mHeight;
+         double xLeading = timeLeading / mMaxTime * mWidth;
+         double yLeading = (1 - mAdsr->Value(timeLeading, &adsrEvent) * mVol) * mHeight;
          //float xPast = timePast / mMaxTime * mWidth;
          //float yPast = (1 - mAdsr->Value(timePast, &adsrEvent) * mVol) * mHeight;
 
@@ -298,15 +298,15 @@ void ADSRDisplay::Render()
    }
 }
 
-ofVec2f ADSRDisplay::GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent)
+ofVec2d ADSRDisplay::GetDrawPoint(double time, const ADSR::EventInfo& adsrEvent)
 {
-   float value = mAdsr->Value(time, &adsrEvent) * mVol;
-   float x = time / mMaxTime * mWidth;
-   float y = mHeight * (1 - value);
-   return ofVec2f(x, y);
+   double value = mAdsr->Value(time, &adsrEvent) * mVol;
+   double x = time / mMaxTime * mWidth;
+   double y = mHeight * (1 - value);
+   return ofVec2d(x, y);
 }
 
-void ADSRDisplay::SetMaxTime(float maxTime)
+void ADSRDisplay::SetMaxTime(double maxTime)
 {
    mMaxTime = maxTime;
    if (mASlider)
@@ -498,40 +498,40 @@ bool ADSRDisplay::MouseMoved(float x, float y)
    {
       if (mAdsr == nullptr)
          return false;
-      float mousePosSq = (x - mClickStart.x) / mWidth;
+      double mousePosSq = (x - mClickStart.x) / mWidth;
       if (mousePosSq > 0)
          mousePosSq *= mousePosSq;
       switch (mAdjustMode)
       {
          case kAdjustViewLength:
          {
-            mMaxTime = std::clamp(mClickLength + mousePosSq * 500, 10.0f, 10000.0f);
+            mMaxTime = std::clamp(mClickLength + mousePosSq * 500, 10.0, 10000.0);
             break;
          }
          case kAdjustAttack:
          case kAdjustAttackAR:
          {
-            float a = ofClamp(mClickAdsr.GetA() + mousePosSq * mMaxTime * .1f, 1, mMaxTime);
+            double a = ofClamp(mClickAdsr.GetA() + mousePosSq * mMaxTime * .1, 1, mMaxTime);
             mAdsr->GetA() = a;
             break;
          }
          case kAdjustDecaySustain:
          {
-            float d = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
+            double d = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
             mAdsr->GetD() = d;
-            float s = ofClamp(mClickAdsr.GetS() + (mClickStart.y - y) / mHeight, 0, 1);
+            double s = ofClamp(mClickAdsr.GetS() + (mClickStart.y - y) / mHeight, 0, 1);
             mAdsr->GetS() = s;
             break;
          }
          case kAdjustRelease:
          {
-            float r = ofClamp(mClickAdsr.GetR() + mousePosSq * mMaxTime, 1, mMaxTime);
+            double r = ofClamp(mClickAdsr.GetR() + mousePosSq * mMaxTime, 1, mMaxTime);
             mAdsr->GetR() = r;
             break;
          }
          case kAdjustReleaseAR:
          {
-            float r = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
+            double r = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
             mAdsr->GetD() = r;
             break;
          }

@@ -51,7 +51,7 @@ public:
    bool IsConnected() const override { return true; }
 
    void OnControllerPageSelected() override {}
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;

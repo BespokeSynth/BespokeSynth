@@ -134,7 +134,7 @@ void TimelineControl::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void TimelineControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void TimelineControl::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mTimeSlider)
    {

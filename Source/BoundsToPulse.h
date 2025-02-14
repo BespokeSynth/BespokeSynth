@@ -47,9 +47,9 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    float GetValue() const { return mValue; }
    FloatSlider* GetSlider() { return mSlider; }
@@ -63,7 +63,7 @@ private:
    }
 
    FloatSlider* mSlider;
-   float mValue;
+   double mValue;
 
    PatchCableSource* mMinCable{};
    PatchCableSource* mMaxCable{};

@@ -120,7 +120,7 @@ public:
    virtual void FilesDropped(std::vector<std::string> files, int x, int y) {}
    virtual std::string GetTitleLabel() const { return Name(); }
    virtual bool HasTitleBar() const { return true; }
-   static float TitleBarHeight() { return mTitleBarHeight; }
+   static double TitleBarHeight() { return mTitleBarHeight; }
    static ofColor GetColor(ModuleCategory type);
    virtual void SetEnabled(bool enabled) {}
    virtual bool IsEnabled() const { return true; }

@@ -73,7 +73,7 @@ public:
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -108,8 +108,8 @@ private:
    };
    std::vector<ArpNote> mChord;
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 100 };
+   float mHeight{ 20 };
 
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    int mLastPitch{ -1 };

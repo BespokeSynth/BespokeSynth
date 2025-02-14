@@ -41,7 +41,7 @@ void PlaySequencer::Init()
    IDrawableModule::Init();
 
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
-   TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false), false);
+   TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5, false), false);
 }
 
 void PlaySequencer::CreateUIControls()
@@ -225,7 +225,7 @@ void PlaySequencer::OnTimeEvent(double time)
 
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
-      float gridVal = mGrid->GetVal(step, i);
+      double gridVal = mGrid->GetVal(step, i);
       int playVelocity = (int)(gridVal * 127);
 
       if (mLanes[i].mMuteOrErase)
@@ -237,7 +237,7 @@ void PlaySequencer::OnTimeEvent(double time)
 
       if (mLanes[i].mInputVelocity > 0)
       {
-         float velMult;
+         double velMult;
          switch (GetVelocityLevel())
          {
             case 1: velMult = mVelocityLight; break;
@@ -247,7 +247,7 @@ void PlaySequencer::OnTimeEvent(double time)
          }
          playVelocity = mLanes[i].mInputVelocity * velMult;
          if (mWrite)
-            mGrid->SetVal(step, i, playVelocity / 127.0f);
+            mGrid->SetVal(step, i, playVelocity / 127.0);
          if (!mNoteRepeat)
             mLanes[i].mInputVelocity = 0;
       }
@@ -307,7 +307,7 @@ void PlaySequencer::UpdateInterval()
    if (noteOffListenerInfo != nullptr)
    {
       noteOffListenerInfo->mInterval = mInterval;
-      noteOffListenerInfo->mOffsetInfo = OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false);
+      noteOffListenerInfo->mOffsetInfo = OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5, false);
    }
 
    UpdateNumMeasures(mNumMeasures);
@@ -393,7 +393,7 @@ void PlaySequencer::OnControllerPageSelected()
    UpdateLights();
 }
 
-void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void PlaySequencer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (grid == mGridControlTarget->GetGridController())
    {
@@ -573,8 +573,8 @@ void PlaySequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("sustain", moduleInfo, false);
    mModuleSaveData.LoadFloat("velocity_full", moduleInfo, 1, 0, 1, K(isTextField));
-   mModuleSaveData.LoadFloat("velocity_med", moduleInfo, .5f, 0, 1, K(isTextField));
-   mModuleSaveData.LoadFloat("velocity_light", moduleInfo, .25f, 0, 1, K(isTextField));
+   mModuleSaveData.LoadFloat("velocity_med", moduleInfo, .5, 0, 1, K(isTextField));
+   mModuleSaveData.LoadFloat("velocity_light", moduleInfo, .25, 0, 1, K(isTextField));
 
    SetUpFromSaveData();
 }

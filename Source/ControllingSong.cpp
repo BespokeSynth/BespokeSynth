@@ -155,7 +155,7 @@ void ControllingSong::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   float volSq = mVolume * mVolume * .5f;
+   float volSq = mVolume * mVolume * .5;
 
    mSample.SetRate(mSpeed);
 
@@ -173,7 +173,7 @@ void ControllingSong::Process(double time)
       {
          TheTransport->SetTempo(MIN(200, mMidiReader.GetTempo(ms)) * mSpeed);
          int measure;
-         float measurePos;
+         double measurePos;
          mMidiReader.GetMeasurePos(ms, measure, measurePos);
          TheTransport->SetMeasureTime(measure + measurePos);
       }
@@ -280,7 +280,7 @@ void ControllingSong::IntSliderUpdated(IntSlider* slider, int oldVal, double tim
    }
 }
 
-void ControllingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ControllingSong::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

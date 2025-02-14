@@ -46,14 +46,14 @@ public:
    bool MouseMoved(float x, float y) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   float GetValue() const override;
-   float GetMidiValue() const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override;
+   double GetMidiValue() const override;
    int GetNumValues() override { return 2; }
-   std::string GetDisplayValue(float val) const override;
-   void Increment(float amount) override;
+   std::string GetDisplayValue(double val) const override;
+   void Increment(double amount) override;
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -65,7 +65,7 @@ public:
    bool CheckNeedsDraw() override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
 protected:
    ~Checkbox(); //protected so that it can't be created on the stack
@@ -88,6 +88,6 @@ private:
    bool mDisplayText{ true };
    bool mUseCircleLook{ false };
    ofColor mCustomColor;
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    bool mLastSetValue{ false };
 };

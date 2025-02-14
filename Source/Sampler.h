@@ -71,7 +71,7 @@ public:
    bool CanDropSample() const override { return true; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
@@ -109,7 +109,7 @@ private:
    SampleVoiceParams mVoiceParams;
    FloatSlider* mVolSlider{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
-   float mThresh{ .2 };
+   double mThresh{ .2 };
    FloatSlider* mThreshSlider{ nullptr };
    IntSlider* mStartSlider{ nullptr };
    IntSlider* mStopSlider{ nullptr };

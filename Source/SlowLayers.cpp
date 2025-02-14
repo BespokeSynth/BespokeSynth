@@ -80,9 +80,9 @@ void SlowLayers::Process(double time)
    int layers = 4;
    for (int i = 0; i < bufferSize; ++i)
    {
-      float smooth = .001f;
+      double smooth = .001;
       mSmoothedVol = mSmoothedVol * (1 - smooth) + mVol * smooth;
-      float volSq = mSmoothedVol * mSmoothedVol;
+      double volSq = mSmoothedVol * mSmoothedVol;
 
       double measurePos = TheTransport->GetMeasureTime(time);
       measurePos = DoubleWrap(measurePos, 1 << layers * mNumBars);
@@ -92,7 +92,7 @@ void SlowLayers::Process(double time)
 
       float output = (1 - mFeedIn) * GetBuffer()->GetChannel(0)[i];
       for (int j = 0; j < layers; ++j)
-         output += GetInterpolatedSample(offset / float(1 << j), mBuffer, loopLengthInSamples);
+         output += GetInterpolatedSample(offset / double(1 << j), mBuffer, loopLengthInSamples);
 
       output *= volSq;
 
@@ -161,7 +161,7 @@ void SlowLayers::ButtonClicked(ClickButton* button, double time)
       ::Clear(mBuffer, MAX_BUFFER_SIZE);
 }
 
-void SlowLayers::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SlowLayers::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

@@ -94,7 +94,7 @@ void RadioSequencer::OnControllerPageSelected()
    UpdateGridLights();
 }
 
-void RadioSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void RadioSequencer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (velocity > 0)
    {
@@ -188,7 +188,7 @@ void RadioSequencer::Step(double time, int pulseFlags)
    UpdateGridLights();
 }
 
-void RadioSequencer::OnPulse(double time, float velocity, int flags)
+void RadioSequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
 
@@ -247,7 +247,7 @@ bool RadioSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-void RadioSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void RadioSequencer::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mGrid)
    {

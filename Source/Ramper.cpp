@@ -72,16 +72,16 @@ void Ramper::CreateUIControls()
    mLengthSelector->AddLabel("64n", kInterval_64n);
 }
 
-void Ramper::OnTransportAdvanced(float amount)
+void Ramper::OnTransportAdvanced(double amount)
 {
    if (!mEnabled)
       mRamping = false;
    if (mRamping)
    {
-      float curMeasure = TheTransport->GetMeasure(gTime) + TheTransport->GetMeasurePos(gTime);
-      float measureProgress = curMeasure - mStartMeasure;
-      float length = TheTransport->GetDuration(mLength) / TheTransport->MsPerBar();
-      float progress = measureProgress / length;
+      double curMeasure = TheTransport->GetMeasure(gTime) + TheTransport->GetMeasurePos(gTime);
+      double measureProgress = curMeasure - mStartMeasure;
+      double length = TheTransport->GetDuration(mLength) / TheTransport->MsPerBar();
+      double progress = measureProgress / length;
       if (progress >= 0 && progress < 1)
       {
          for (auto* control : mUIControls)
@@ -158,7 +158,7 @@ void Ramper::Go(double time)
    }
 }
 
-void Ramper::OnPulse(double time, float velocity, int flags)
+void Ramper::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0 && mEnabled)
       Go(time);

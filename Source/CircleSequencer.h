@@ -46,7 +46,7 @@ public:
    void MouseReleased();
    void MouseMoved(float x, float y);
    void CreateUIControls();
-   void OnTransportAdvanced(float amount);
+   void OnTransportAdvanced(double amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
@@ -60,7 +60,7 @@ private:
    CircleSequencer* mOwner{ nullptr };
    int mIndex{ 0 };
    std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
@@ -83,14 +83,14 @@ public:
    void SetEnabled(bool on) override { mEnabled = on; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 

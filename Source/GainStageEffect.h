@@ -45,7 +45,7 @@ public:
    std::string GetType() override { return "gainstage"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -58,6 +58,6 @@ private:
       height = 20;
    }
 
-   float mGain{ 1 };
+   double mGain{ 1 };
    FloatSlider* mGainSlider{ nullptr };
 };

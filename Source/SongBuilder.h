@@ -52,7 +52,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -60,7 +60,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
    bool DrawToPush2Screen() override;
 
@@ -74,7 +74,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -139,7 +139,7 @@ private:
       void CleanUp();
       void UpdateDropdownContents(ControlTarget* target);
 
-      float mFloatValue{ 0 };
+      double mFloatValue{ 0 };
       TextEntry* mValueEntry{ nullptr };
       bool mBoolValue{ false };
       Checkbox* mCheckbox{ nullptr };

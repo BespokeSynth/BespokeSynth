@@ -93,7 +93,7 @@ void MidiClockOut::BuildDeviceList()
       mDeviceList->AddLabel(devices[i].c_str(), i);
 }
 
-void MidiClockOut::OnTransportAdvanced(float amount)
+void MidiClockOut::OnTransportAdvanced(double amount)
 {
    if (mEnabled)
    {

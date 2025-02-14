@@ -49,14 +49,14 @@ EQModule::EQModule()
 
    assert(mFilters.size() == 8);
    auto types = new FilterType[8]{ kFilterType_LowShelf, kFilterType_Peak, kFilterType_Peak, kFilterType_HighShelf, kFilterType_Peak, kFilterType_Peak, kFilterType_Peak, kFilterType_Peak };
-   auto cutoffs = new float[8]{ 30, 200, 1000, 5000, 100, 10000, 5000, 18000 };
+   auto cutoffs = new double[8]{ 30, 200, 1000, 5000, 100, 10000, 5000, 18000 };
    for (size_t i = 0; i < mFilters.size(); ++i)
    {
       auto& filter = mFilters[i];
       filter.mEnabled = i < 4;
       for (auto& biquad : filter.mFilter)
       {
-         biquad.SetFilterParams(cutoffs[i], sqrtf(2) / 2);
+         biquad.SetFilterParams(cutoffs[i], std::sqrt(2) / 2);
          biquad.SetFilterType(types[i]);
       }
       filter.mNeedToCalculateCoefficients = true;
@@ -76,7 +76,7 @@ void EQModule::CreateUIControls()
       DROPDOWN(filter.mTypeSelector, ("type" + ofToString(i)).c_str(), (int*)(&filter.mFilter[0].mType), 45);
       FLOATSLIDER(filter.mFSlider, ("f" + ofToString(i)).c_str(), &filter.mFilter[0].mF, 20, 20000);
       FLOATSLIDER(filter.mGSlider, ("g" + ofToString(i)).c_str(), &filter.mFilter[0].mDbGain, -15, 15);
-      FLOATSLIDER_DIGITS(filter.mQSlider, ("q" + ofToString(i)).c_str(), &filter.mFilter[0].mQ, .1f, 18, 3);
+      FLOATSLIDER_DIGITS(filter.mQSlider, ("q" + ofToString(i)).c_str(), &filter.mFilter[0].mQ, .1, 18, 3);
       UIBLOCK_NEWCOLUMN();
 
       filter.mTypeSelector->AddLabel("lp", kFilterType_Lowpass);
@@ -243,7 +243,7 @@ void EQModule::DrawModule()
    {
       float freq = FreqForBin(i);
       float x = PosForFreq(freq) * w;
-      float samp = ofClamp(sqrtf(fabsf(mFFTData.mRealValues[i]) / end) * 3 * mDrawGain, 0, 1);
+      float samp = ofClamp(sqrtf(std::abs(mFFTData.mRealValues[i]) / end) * 3 * mDrawGain, 0, 1);
       float y = (1 - samp) * h + kDrawYOffset;
       if (int(x) != lastX)
          ofVertex(x, y);
@@ -281,8 +281,8 @@ void EQModule::DrawModule()
    }
    for (int x = 0; x < w + kPixelStep; x += kPixelStep)
    {
-      float response = 1;
-      float freq = FreqForPos(x / w);
+      double response = 1;
+      double freq = FreqForPos(x / w);
       if (freq < gSampleRate / 2)
       {
          int responseGraphIndex = x / kPixelStep;
@@ -300,7 +300,7 @@ void EQModule::DrawModule()
          {
             response = mFrequencyResponse[responseGraphIndex];
          }
-         ofVertex(x, (.5f - .666f * log10(response)) * h + kDrawYOffset);
+         ofVertex(x, (.5 - .666 * log10(response)) * h + kDrawYOffset);
       }
    }
    ofEndShape(false);
@@ -311,8 +311,8 @@ void EQModule::DrawModule()
       auto& filter = mFilters[i];
       if (filter.mEnabled)
       {
-         float x = PosForFreq(filter.mFilter[0].mF) * w;
-         float y = PosForGain(filter.mFilter[0].mDbGain) * h + kDrawYOffset;
+         double x = PosForFreq(filter.mFilter[0].mF) * w;
+         double y = PosForGain(filter.mFilter[0].mDbGain) * h + kDrawYOffset;
          ofFill();
          ofSetColor(255, 210, 0);
          ofCircle(x, y, 8);
@@ -401,7 +401,7 @@ bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, boo
    if (mHoveredFilterHandleIndex != -1)
    {
       auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
-      float add = (2 * scrollY) / MAX(qSlider->GetModulatorMax() / qSlider->GetValue(), 0.1);
+      double add = (2 * scrollY) / MAX(qSlider->GetModulatorMax() / qSlider->GetValue(), 0.1);
       if (GetKeyModifiers() & kModifier_Command)
       {
          add *= 4;
@@ -440,7 +440,7 @@ void EQModule::KeyPressed(int key, bool isRepeat)
    }
 }
 
-void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EQModule::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (auto& filter : mFilters)
    {
@@ -499,7 +499,7 @@ void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, mWidth, 50, 2000, K(isTextField));
    mModuleSaveData.LoadInt("height", moduleInfo, mHeight, 50, 2000, K(isTextField));
-   mModuleSaveData.LoadFloat("draw_gain", moduleInfo, 1, .1f, 4, K(isTextField));
+   mModuleSaveData.LoadFloat("draw_gain", moduleInfo, 1, .1, 4, K(isTextField));
    mModuleSaveData.LoadBool("lite_cpu_modulation", moduleInfo, true);
 
    SetUpFromSaveData();

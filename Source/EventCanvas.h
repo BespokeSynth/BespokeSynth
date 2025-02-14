@@ -57,7 +57,7 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CanvasUpdated(Canvas* canvas) override;
 
@@ -66,7 +66,7 @@ public:
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -88,7 +88,7 @@ private:
 
    void UpdateNumColumns();
    void SyncControlCablesToCanvas();
-   double GetTriggerTime(double lookaheadTime, double lookaheadPos, float eventPos);
+   double GetTriggerTime(double lookaheadTime, double lookaheadPos, double eventPos);
 
    Canvas* mCanvas{ nullptr };
    CanvasControls* mCanvasControls{ nullptr };
@@ -109,7 +109,7 @@ private:
    struct ControlConnection
    {
       IUIControl* mUIControl{ nullptr };
-      float mLastValue{ 0 };
+      double mLastValue{ 0 };
    };
 
    const int kMaxEventRows = 256;

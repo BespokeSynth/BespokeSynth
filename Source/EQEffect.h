@@ -50,7 +50,7 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "basiceq"; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -58,7 +58,7 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    bool IsEnabled() const override { return mEnabled; }
 

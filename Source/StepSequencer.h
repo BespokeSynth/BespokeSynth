@@ -54,7 +54,7 @@ public:
    void CreateUIControls();
    void OnTimeEvent(double time) override;
    void PlayStep(double time, int step);
-   void SetOffset(float offset);
+   void SetOffset(double offset);
    void UpdateTimeListener();
    void Draw(float x, float y);
    int GetRowPitch() const { return mRowPitch; }
@@ -63,7 +63,7 @@ private:
    UIGrid* mGrid{ nullptr };
    int mRow{ 0 };
    StepSequencer* mSeq{ nullptr };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
 
    struct PlayedStep
    {
@@ -83,13 +83,13 @@ public:
    ~NoteRepeat();
    void OnTimeEvent(double time) override;
    void SetInterval(NoteInterval interval);
-   void SetOffset(float offset);
+   void SetOffset(double offset);
 
 private:
    int mRow{ 0 };
    StepSequencer* mSeq{ nullptr };
    NoteInterval mInterval{ NoteInterval::kInterval_None };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
 };
 
 class StepSequencerNoteFlusher : public ITimeListener
@@ -139,14 +139,14 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
@@ -157,7 +157,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    bool IsMetaStepActive(double time, int col, int row);
@@ -167,7 +167,7 @@ public:
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
@@ -200,7 +200,7 @@ private:
    int GetMetaStep(double time);
    int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX - 1) + row * META_STEP_MAX; }
    GridColor GetGridColor(int x, int y);
-   void Step(double time, float velocity, int pulseFlags);
+   void Step(double time, double velocity, int pulseFlags);
    bool HasGridController();
    int GetGridControllerRows();
    int GetGridControllerCols();
@@ -230,19 +230,18 @@ private:
    };
 
    UIGrid* mGrid{ nullptr };
-   float mStrength{ 0.8f };
+   double mStrength{ .8 };
    FloatSlider* mStrengthSlider{ nullptr };
    StepVelocityType mVelocityType{ StepVelocityType::Normal };
    DropdownList* mVelocityTypeDropdown{ nullptr };
    StepVelocityEntryMode mStepVelocityEntryMode{ StepVelocityEntryMode::Dropdown };
    int mGridYOff{ 0 };
    ClickButton* mClearButton{ nullptr };
-   int mColorOffset{ 3 };
    DropdownList* mGridYOffDropdown{ nullptr };
    std::array<StepSequencerRow*, NUM_STEPSEQ_ROWS> mRows{};
    bool mAdjustOffsets{ false };
    Checkbox* mAdjustOffsetsCheckbox{ nullptr };
-   std::array<float, NUM_STEPSEQ_ROWS> mOffsets{};
+   std::array<double, NUM_STEPSEQ_ROWS> mOffsets{};
    std::array<FloatSlider*, NUM_STEPSEQ_ROWS> mOffsetSlider{};
    std::array<ClickButton*, NUM_STEPSEQ_ROWS> mRandomizeRowButton{};
    std::map<int, int> mPadPressures{};
@@ -268,9 +267,9 @@ private:
    NoteInputMode mNoteInputMode{ NoteInputMode::PlayStepIndex };
    bool mHasExternalPulseSource{ false };
    bool mPush2Connected{ false };
-   float mRandomizationAmount{ 1 };
+   double mRandomizationAmount{ 1 };
    FloatSlider* mRandomizationAmountSlider{ nullptr };
-   float mRandomizationDensity{ .25 };
+   double mRandomizationDensity{ .25 };
    FloatSlider* mRandomizationDensitySlider{ nullptr };
    ClickButton* mRandomizeButton{ nullptr };
 

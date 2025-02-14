@@ -153,7 +153,7 @@ void RadioButton::Render()
    float w, h;
    GetDimensions(w, h);
    ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
    ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofPushMatrix();
    ofClipWindow(mX, mY, mWidth, mHeight, true);
@@ -238,7 +238,7 @@ ofVec2f RadioButton::GetOptionPosition(int optionIndex)
       return ofVec2f(x + float(mWidth) / GetNumValues() * (optionIndex + .5f), y + mHeight);
 }
 
-void RadioButton::OnPulse(double time, float velocity, int flags)
+void RadioButton::OnPulse(double time, double velocity, int flags)
 {
    int length = static_cast<int>(mElements.size());
    if (length <= 0)
@@ -302,7 +302,7 @@ void RadioButton::SetIndex(int i, double time)
    }
 }
 
-void RadioButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void RadioButton::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
    SetIndex(int(slider * mElements.size()), time);
@@ -310,7 +310,7 @@ void RadioButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
    mLastSetValue = *mVar;
 }
 
-float RadioButton::GetValueForMidiCC(float slider) const
+double RadioButton::GetValueForMidiCC(double slider) const
 {
    if (mElements.empty())
       return 0;
@@ -320,14 +320,14 @@ float RadioButton::GetValueForMidiCC(float slider) const
    return mElements[index].mValue;
 }
 
-void RadioButton::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void RadioButton::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    if (mMultiSelect)
       value = *mVar ^ (1 << (int)value);
    SetValueDirect(value, time, forceUpdate);
 }
 
-void RadioButton::SetValueDirect(float value, double time)
+void RadioButton::SetValueDirect(double value, double time)
 {
    SetValueDirect(value, time, false);
 }
@@ -345,12 +345,12 @@ void RadioButton::SetValueDirect(float value, double time, bool forceUpdate)
    }
 }
 
-float RadioButton::GetValue() const
+double RadioButton::GetValue() const
 {
    return *mVar;
 }
 
-float RadioButton::GetMidiValue() const
+double RadioButton::GetMidiValue() const
 {
    if (mMultiSelect)
       return GetValue();
@@ -358,7 +358,7 @@ float RadioButton::GetMidiValue() const
    return mSliderVal;
 }
 
-std::string RadioButton::GetDisplayValue(float val) const
+std::string RadioButton::GetDisplayValue(double val) const
 {
    if (mMultiSelect)
       return "multiselect";
@@ -377,7 +377,7 @@ std::string RadioButton::GetDisplayValue(float val) const
       return "-----";
 }
 
-void RadioButton::Increment(float amount)
+void RadioButton::Increment(double amount)
 {
    if (mMultiSelect)
       return;

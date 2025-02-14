@@ -71,7 +71,7 @@ void NoteCreator::DrawModule()
    mDurationSlider->Draw();
 }
 
-void NoteCreator::OnPulse(double time, float velocity, int flags)
+void NoteCreator::OnPulse(double time, double velocity, int flags)
 {
    TriggerNote(time, velocity * mVelocity);
 }
@@ -122,7 +122,7 @@ void NoteCreator::TextEntryComplete(TextEntry* entry)
       {
          double time = NextBufferTime(false);
          mNoteOutput.Flush(time);
-         PlayNoteOutput(NoteMessage(time + .1f, mPitch, mVelocity * 127, mVoiceIndex));
+         PlayNoteOutput(NoteMessage(time + .1, mPitch, mVelocity * 127, mVoiceIndex));
       }
    }
 }

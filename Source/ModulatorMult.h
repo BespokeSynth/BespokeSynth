@@ -48,14 +48,14 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
 
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -72,8 +72,8 @@ private:
       h = 17 * 2 + 4;
    }
 
-   float mValue1{ 0 };
-   float mValue2{ 0 };
+   double mValue1{ 0 };
+   double mValue2{ 0 };
 
    FloatSlider* mValue1Slider{ nullptr };
    FloatSlider* mValue2Slider{ nullptr };

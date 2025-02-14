@@ -175,7 +175,7 @@ void DropdownList::Render()
       DrawBeacon(mX + mWidth / 2 + xOffset, mY + mHeight / 2);
 
       ofFill();
-      ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+      ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
       ofRect(mX + 1 + xOffset, mY + 1, w - xOffset, h);
       ofSetColor(color);
       ofRect(mX + xOffset, mY, w - xOffset, h);
@@ -436,7 +436,7 @@ void DropdownList::Clear()
    mHeight = kItemSpacing;
 }
 
-void DropdownList::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void DropdownList::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
    SetIndex(int(slider * mElements.size()), time, false);
@@ -447,7 +447,7 @@ void DropdownList::SetFromMidiCC(float slider, double time, bool setViaModulator
       mLastScrolledTime = time; //don't do scrolling display if a modulator is changing our value
 }
 
-float DropdownList::GetValueForMidiCC(float slider) const
+double DropdownList::GetValueForMidiCC(double slider) const
 {
    if (mElements.empty())
       return 0;
@@ -464,7 +464,7 @@ bool DropdownList::CanBeTargetedBy(PatchCableSource* source) const
    return IUIControl::CanBeTargetedBy(source);
 }
 
-void DropdownList::OnPulse(double time, float velocity, int flags)
+void DropdownList::OnPulse(double time, double velocity, int flags)
 {
    int length = static_cast<int>(mElements.size());
    if (length <= 0)
@@ -504,7 +504,7 @@ void DropdownList::SetIndex(int i, double time, bool forceUpdate)
    SetValue(mElements[i].mValue, time, forceUpdate);
 }
 
-void DropdownList::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void DropdownList::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    int intValue = (int)value;
    if (intValue != *mVar || forceUpdate)
@@ -517,12 +517,12 @@ void DropdownList::SetValue(float value, double time, bool forceUpdate /*= false
    }
 }
 
-float DropdownList::GetValue() const
+double DropdownList::GetValue() const
 {
    return *mVar;
 }
 
-float DropdownList::GetMidiValue() const
+double DropdownList::GetMidiValue() const
 {
    return mSliderVal;
 }
@@ -538,7 +538,7 @@ int DropdownList::FindItemIndex(float val) const
    return -1;
 }
 
-std::string DropdownList::GetDisplayValue(float val) const
+std::string DropdownList::GetDisplayValue(double val) const
 {
    int itemIndex = FindItemIndex(val);
 
@@ -552,12 +552,12 @@ void DropdownList::CalcSliderVal()
 {
    int itemIndex = FindItemIndex(*mVar);
 
-   mSliderVal = ofMap(itemIndex + .5f, 0, mElements.size(), 0, 1);
+   mSliderVal = ofMap(itemIndex + .5, 0, mElements.size(), 0, 1);
 
    mLastSetValue = *mVar;
 }
 
-void DropdownList::Increment(float amount)
+void DropdownList::Increment(double amount)
 {
    int itemIndex = FindItemIndex(*mVar);
 

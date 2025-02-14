@@ -72,7 +72,7 @@ public:
    void SetNumNoteOutputs(int num);
    void ConnectOscInput(int port);
    void SysExReceived(const uint8_t* data, int data_size);
-   void MidiReceived(MidiMessageType messageType, int control, float value, int channel);
+   void MidiReceived(MidiMessageType messageType, int control, double value, int channel);
    void OnModuleReferenceBound(IDrawableModule* target);
    void SetContext();
    void ClearContext();
@@ -80,9 +80,9 @@ public:
 
    void RunCode(double time, std::string code);
 
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldValue, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldValue, double time) override {}
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldValue, double time) override;
 
@@ -130,8 +130,8 @@ public:
    bool IsEnabled() const override { return true; }
 
 private:
-   void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
-   void AdjustUIControl(IUIControl* control, float value, double time, int lineNum);
+   void PlayNote(double time, double pitch, double velocity, double pan, int noteOutputIndex, int lineNum);
+   void AdjustUIControl(IUIControl* control, double value, double time, int lineNum);
    std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
    void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
@@ -181,10 +181,10 @@ private:
    bool mHotloadScripts{ false };
    bool mDrawBoundModuleConnections{ true };
    static ofxJSONElement sStyleJSON;
-   float mA{ 0 };
-   float mB{ 0 };
-   float mC{ 0 };
-   float mD{ 0 };
+   double mA{ 0 };
+   double mB{ 0 };
+   double mC{ 0 };
+   double mD{ 0 };
 
    float mWidth{ 200 };
    float mHeight{ 20 };
@@ -201,9 +201,9 @@ private:
    {
       double startTime{ 0 };
       double time{ 0 };
-      float pitch{ 0 };
-      float velocity{ 0 };
-      float pan{ .5 };
+      double pitch{ 0 };
+      double velocity{ 0 };
+      double pan{ .5 };
       int noteOutputIndex{ -1 };
       int lineNum{ -1 };
    };
@@ -223,7 +223,7 @@ private:
       double startTime{ 0 };
       double time{ 0 };
       IUIControl* control{ nullptr };
-      float value{ 0 };
+      double value{ 0 };
       int lineNum{ -1 };
    };
    std::array<ScheduledUIControlValue, 50> mScheduledUIControlValue;
@@ -248,7 +248,7 @@ private:
    {
       double time{ 0 };
       ofVec2f position;
-      float value{ 0 };
+      double value{ 0 };
       int lineNum{ -1 };
    };
    std::array<UIControlModificationDisplay, 10> mUIControlModifications;

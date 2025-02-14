@@ -63,7 +63,7 @@ void Snapshots::CreateUIControls()
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
       ofColor color = IDrawableModule::GetColor(kModuleCategory_Other);
-      color.a *= .3f;
+      color.a *= .3;
       mModuleCable->SetColor(color);
       mModuleCable->SetManualPosition(10, 10);
       mModuleCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
@@ -74,7 +74,7 @@ void Snapshots::CreateUIControls()
    {
       mUIControlCable = new PatchCableSource(this, kConnectionType_UIControl);
       ofColor color = IDrawableModule::GetColor(kModuleCategory_Modulator);
-      color.a *= .3f;
+      color.a *= .3;
       mUIControlCable->SetColor(color);
       mUIControlCable->SetManualPosition(25, 10);
       mUIControlCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
@@ -268,10 +268,10 @@ void Snapshots::UpdateGridValues()
    mGrid->Clear();
    for (int i = 0; i < mGrid->GetRows() * mGrid->GetCols(); ++i)
    {
-      float val = 0;
+      double val = 0;
       if (i < mSnapshotCollection.size() &&
           mSnapshotCollection[i].mSnapshots.empty() == false)
-         val = .5f;
+         val = .5;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
 }
@@ -475,7 +475,7 @@ void Snapshots::RandomizeControl(IUIControl* control)
    control->SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
 }
 
-void Snapshots::OnTransportAdvanced(float amount)
+void Snapshots::OnTransportAdvanced(double amount)
 {
    if (mBlending)
    {
@@ -587,7 +587,7 @@ void Snapshots::DeleteSnapshot(int idx)
    }
 }
 
-bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -886,7 +886,14 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
          in >> snapshotData.mControlPath;
-         in >> snapshotData.mValue;
+         if (rev < 4)
+         {
+            float a;
+            in >> a;
+            snapshotData.mValue = static_cast<double>(a);
+         }
+         else
+            in >> snapshotData.mValue;
          in >> snapshotData.mHasLFO;
          snapshotData.mLFOSettings.LoadState(in);
          in >> snapshotData.mGridCols;
@@ -902,7 +909,16 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
          }
          snapshotData.mGridContents.resize(size_t(snapshotData.mGridCols) * snapshotData.mGridRows);
          for (int k = 0; k < snapshotData.mGridCols * snapshotData.mGridRows; ++k)
-            in >> snapshotData.mGridContents[k];
+         {
+            if (rev < 4)
+            {
+               float a;
+               in >> a;
+               snapshotData.mGridContents[k] = static_cast<double>(a);
+            }
+            else
+               in >> snapshotData.mGridContents[k];
+         }
          in >> snapshotData.mString;
       }
       in >> mSnapshotCollection[i].mLabel;

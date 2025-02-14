@@ -44,7 +44,7 @@ public:
    void MouseMoved(float x, float y);
    void MouseReleased();
    void Draw();
-   void SetViewLength(float length) { mViewLength = length; }
+   void SetViewLength(double length) { mViewLength = length; }
    ofVec2f GetPosition() const { return mPosition; }
    ofVec2f GetDimensions() const { return mDimensions; }
    void SetPosition(ofVec2f pos) { mPosition = pos; }
@@ -53,12 +53,12 @@ public:
 
 private:
    void AddVertex(float x, float y);
-   float GetPreSustainTime();
-   float GetReleaseTime();
-   float GetTimeForX(float x);
-   float GetValueForY(float y);
-   float GetXForTime(float time);
-   float GetYForValue(float value);
+   double GetPreSustainTime();
+   double GetReleaseTime();
+   double GetTimeForX(double x);
+   double GetValueForY(double y);
+   double GetXForTime(double time);
+   double GetYForValue(double value);
 
    ofVec2f mPosition;
    ofVec2f mDimensions;
@@ -66,7 +66,7 @@ private:
    ::ADSR mClickAdsr;
    bool mClick{ false };
    ofVec2f mClickStart;
-   float mViewLength{ 2000 };
+   double mViewLength{ 2000 };
    int mHighlightPoint{ -1 };
    int mHighlightCurve{ -1 };
    double mLastClickTime{ 0 };
@@ -102,7 +102,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 

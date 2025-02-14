@@ -48,7 +48,7 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
@@ -69,8 +69,8 @@ private:
    bool mFullVelocity{ true };
    Checkbox* mFullVelocityCheckbox{ nullptr };
 
-   float mLastRejectTime{ 0 };
-   float mLastAcceptTime{ 0 };
+   double mLastRejectTime{ 0 };
+   double mLastAcceptTime{ 0 };
    bool mDeterministic{ false };
    int mLength{ 4 };
    IntSlider* mLengthSlider{ nullptr };

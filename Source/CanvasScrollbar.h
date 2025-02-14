@@ -49,8 +49,8 @@ public:
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    void KeyPressed(int key, bool isRepeat) override {}
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -71,8 +71,8 @@ private:
       height = mHeight;
    }
 
-   float GetBarStart() const;
-   float GetBarEnd() const;
+   double GetBarStart() const;
+   double GetBarEnd() const;
 
    float mWidth{ 200 };
    float mHeight{ 20 };

@@ -76,7 +76,7 @@ void AudioRouter::Process(double time)
       if (doSwitchAndRamp)
          mSwitchAndRampIn[ch].Start(time, outputBuffer[0], 0, time + 100);
 
-      if (abs(mSwitchAndRampIn[ch].Value(time)) > .01f)
+      if (abs(mSwitchAndRampIn[ch].Value(time)) > .01)
       {
          BufferCopy(gWorkBuffer, outputBuffer, GetBuffer()->BufferSize());
          outputBuffer = gWorkBuffer;

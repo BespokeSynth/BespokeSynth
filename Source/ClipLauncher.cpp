@@ -76,7 +76,7 @@ void ClipLauncher::Process(double time)
    }
 
    Sample* sample = nullptr;
-   float volSq = 1;
+   double volSq = 1;
    if (sampleToPlay != -1)
    {
       mSampleMutex.lock();
@@ -85,7 +85,7 @@ void ClipLauncher::Process(double time)
       volSq = mVolume * mSamples[sampleToPlay].mVolume;
       volSq *= volSq;
 
-      float speed = sample->LengthInSamples() * gInvSampleRateMs / TheTransport->MsPerBar() / mSamples[sampleToPlay].mNumBars;
+      double speed = sample->LengthInSamples() * gInvSampleRateMs / TheTransport->MsPerBar() / mSamples[sampleToPlay].mNumBars;
       RecalcPos(time, sampleToPlay);
       sample->SetRate(speed);
    }
@@ -214,7 +214,7 @@ void ClipLauncher::GetModuleDimensions(float& width, float& height)
    height = 180;
 }
 
-void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

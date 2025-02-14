@@ -38,7 +38,7 @@ void BiquadFilterEffect::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mTypeSelector = new RadioButton(this, "type", 4, 52, (int*)(&mBiquad[0].mType), kRadioHorizontal);
    mFSlider = new FloatSlider(this, "F", 4, 4, 80, 15, &mBiquad[0].mF, 10, 4000);
-   mQSlider = new FloatSlider(this, "Q", 4, 20, 80, 15, &mBiquad[0].mQ, .1f, 18, 3);
+   mQSlider = new FloatSlider(this, "Q", 4, 20, 80, 15, &mBiquad[0].mQ, .1, 18, 3);
    mGSlider = new FloatSlider(this, "G", 4, 36, 80, 15, &mBiquad[0].mDbGain, -96, 96, 1);
 
    mTypeSelector->AddLabel("lp", kFilterType_Lowpass);
@@ -75,8 +75,8 @@ void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       mCoefficientsHaveChanged = true; //force filters for other channels to get updated
    mDryBuffer.SetNumActiveChannels(buffer->NumActiveChannels());
 
-   const float fadeOutStart = mFSlider->GetMax() * .75f;
-   const float fadeOutEnd = mFSlider->GetMax();
+   const double fadeOutStart = mFSlider->GetMax() * .75;
+   const double fadeOutEnd = mFSlider->GetMax();
    bool fadeOut = mBiquad[0].mF > fadeOutStart && mBiquad[0].mType == kFilterType_Lowpass;
    if (fadeOut)
       mDryBuffer.CopyFrom(buffer);
@@ -99,7 +99,7 @@ void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    {
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
-         float dryness = ofMap(mBiquad[0].mF, fadeOutStart, fadeOutEnd, 0, 1);
+         double dryness = ofMap(mBiquad[0].mF, fadeOutStart, fadeOutEnd, 0, 1);
          Mult(buffer->GetChannel(ch), 1 - dryness, bufferSize);
          Mult(mDryBuffer.GetChannel(ch), dryness, bufferSize);
          Add(buffer->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
@@ -128,28 +128,28 @@ void BiquadFilterEffect::DrawModule()
    const int kPixelStep = 1;
    for (int x = 0; x < w + kPixelStep; x += kPixelStep)
    {
-      float freq = FreqForPos(x / w);
-      if (freq < gSampleRate / 2)
+      double freq = FreqForPos(x / w);
+      if (freq < gSampleRate / 2.0)
       {
-         float response = mBiquad[0].GetMagnitudeResponseAt(freq);
-         ofVertex(x, (.5f - .666f * log10(response)) * h);
+         double response = mBiquad[0].GetMagnitudeResponseAt(freq);
+         ofVertex(x, (.5 - .666 * log10(response)) * h);
       }
    }
    ofEndShape(false);
 }
 
-float BiquadFilterEffect::GetEffectAmount()
+double BiquadFilterEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
    if (mBiquad[0].mType == kFilterType_Lowpass)
-      return ofClamp(1 - (mBiquad[0].mF / (mFSlider->GetMax() * .75f)), 0, 1);
+      return ofClamp(1 - (mBiquad[0].mF / (mFSlider->GetMax() * .75)), 0, 1);
    if (mBiquad[0].mType == kFilterType_Highpass)
-      return ofClamp(mBiquad[0].mF / (mFSlider->GetMax() * .75f), 0, 1);
+      return ofClamp(mBiquad[0].mF / (mFSlider->GetMax() * .75), 0, 1);
    if (mBiquad[0].mType == kFilterType_Bandpass)
-      return ofClamp(.3f + (mBiquad[0].mQ / mQSlider->GetMax()), 0, 1);
+      return ofClamp(.3 + (mBiquad[0].mQ / mQSlider->GetMax()), 0, 1);
    if (mBiquad[0].mType == kFilterType_Peak)
-      return ofClamp(fabsf(mBiquad[0].mDbGain / 96), 0, 1);
+      return ofClamp(std::abs(mBiquad[0].mDbGain / 96), 0, 1);
    return 0;
 }
 
@@ -207,7 +207,7 @@ bool BiquadFilterEffect::MouseMoved(float x, float y)
       x += thisx;
       y += thisy;
       mFSlider->SetValue(x * 2 + 150, NextBufferTime(false));
-      mQSlider->SetValue(y / 100.0f, NextBufferTime(false));
+      mQSlider->SetValue(y / 100.0, NextBufferTime(false));
    }
 
    return false;
@@ -222,7 +222,7 @@ void BiquadFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mFSlider || slider == mQSlider || slider == mGSlider)
       mCoefficientsHaveChanged = true;

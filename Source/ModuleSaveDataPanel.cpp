@@ -359,7 +359,7 @@ void ModuleSaveDataPanel::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void ModuleSaveDataPanel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ModuleSaveDataPanel::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

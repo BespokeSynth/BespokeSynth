@@ -1,4 +1,4 @@
-﻿/**
+/**
 bespoke synth, a software modular synthesizer
     Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
 
@@ -50,7 +50,7 @@ public:
    void SetSelectedMask(int mask);
 
    //INoteReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;

@@ -105,8 +105,8 @@ void NoteChance::DrawModule()
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
-      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
-      const float kPipSize = 3;
+      double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
+      const double kPipSize = 3;
       float moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);
       ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
@@ -125,7 +125,7 @@ void NoteChance::PlayNote(NoteMessage note)
    if (note.velocity > 0)
       ComputeSliders(0);
 
-   float random;
+   double random;
    if (mDeterministic)
    {
       const int kStepResolution = 128;
@@ -135,7 +135,7 @@ void NoteChance::PlayNote(NoteMessage note)
    }
    else
    {
-      random = ofRandom(1);
+      random = ofRandom(1.0);
    }
 
    bool accept = random <= mChance;

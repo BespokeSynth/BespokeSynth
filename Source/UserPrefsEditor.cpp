@@ -432,7 +432,7 @@ void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (!TheSynth->IsLoadingState())
    {

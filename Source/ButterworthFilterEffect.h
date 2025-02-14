@@ -48,12 +48,12 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "butterworth"; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& info) override;
    void SetUpFromSaveData() override;
@@ -72,9 +72,9 @@ private:
 
    void ResetFilter();
 
-   float mF{ 2000 };
+   double mF{ 2000 };
    FloatSlider* mFSlider{ nullptr };
-   float mQ{ 0 };
+   double mQ{ 0 };
    FloatSlider* mQSlider{ nullptr };
 
    float mWidth{ 200 };

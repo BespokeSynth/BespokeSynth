@@ -34,7 +34,7 @@ public:
    virtual ~IAudioEffect() {}
    virtual void ProcessAudio(double time, ChannelBuffer* buffer) = 0;
    void SetEnabled(bool enabled) override = 0;
-   virtual float GetEffectAmount() { return 0; }
+   virtual double GetEffectAmount() { return 0; }
    virtual std::string GetType() = 0;
    bool CanMinimize() override { return false; }
    bool IsSaveable() override { return false; }

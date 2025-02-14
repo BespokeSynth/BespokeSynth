@@ -164,7 +164,7 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoubleLengthButton)
    {
-      float newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
+      double newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
       if (newEnd < mSample->LengthInSamples())
       {
          mClipEnd = newEnd;
@@ -175,7 +175,7 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    {
       if (mNumBars % 2 == 0)
       {
-         float newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
+         double newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
          mClipEnd = newEnd;
          mNumBars /= 2;
       }
@@ -184,8 +184,8 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    {
       if (mClipStart < mClipEnd)
       {
-         float samplesPerMeasure = mClipEnd - mClipStart;
-         float secondsPerMeasure = samplesPerMeasure / gSampleRate;
+         double samplesPerMeasure = mClipEnd - mClipStart;
+         double secondsPerMeasure = samplesPerMeasure / gSampleRate;
          mTempo = 1 / secondsPerMeasure * 4 * 60 * mNumBars;
          mStartOffset = ((mClipStart / samplesPerMeasure) - int(mClipStart / samplesPerMeasure)) * samplesPerMeasure;
       }
@@ -214,7 +214,7 @@ void Producer::DoWrite()
          }
       }
 
-      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%Y-%m-%d_%H-%M.wav").c_str(), &toWrite, pos);
+      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%Y-%m-%d_%H-%M.wav"), &toWrite, pos);
       mClipStart = 0;
       mClipEnd = mSample->LengthInSamples();
       mOffset = 0;
@@ -380,7 +380,7 @@ void Producer::GetModuleDimensions(float& width, float& height)
    height = 430;
 }
 
-void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Producer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {
@@ -424,7 +424,7 @@ void Producer::PlayNote(NoteMessage note)
          int slice = (note.pitch / 8) * 8 + 7 - (note.pitch % 8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = -mOffset * barLength + (barLength / 4) * slice + mClipStart;
-         mSample->Play(note.time, 1, position);
+         mSample->Play(note.time, 1, position, -1);
       }
    }
 }

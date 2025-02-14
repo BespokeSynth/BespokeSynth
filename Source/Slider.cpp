@@ -33,7 +33,7 @@
 #include "IModulator.h"
 #include "Push2Control.h"
 
-FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits /* = -1 */)
+FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, double* var, double min, double max, int digits /* = -1 */)
 : mVar(var)
 , mWidth(w)
 , mHeight(h)
@@ -50,10 +50,10 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
    mLastComputeCacheTime = new double[gBufferSize];
-   mLastComputeCacheValue = new float[gBufferSize];
+   mLastComputeCacheValue = new double[gBufferSize];
 }
 
-FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, float* var, float min, float max, int digits /* = -1 */)
+FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, double* var, double min, double max, int digits /* = -1 */)
 : FloatSlider(owner, label, -1, -1, w, h, var, min, max, digits)
 {
    PositionTo(anchor, anchorDir);
@@ -104,7 +104,7 @@ void FloatSlider::SetModulator(IModulator* modulator)
 
 void FloatSlider::Poll()
 {
-   if (mLastComputeTime + .1f < gTime)
+   if (mLastComputeTime + .1 < gTime)
       Compute();
 }
 
@@ -128,7 +128,7 @@ void FloatSlider::Render()
    IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
    ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofSetColor(color);
    ofRect(mX, mY, mWidth, mHeight);
@@ -140,25 +140,25 @@ void FloatSlider::Render()
    {
       ofPushStyle();
       ofSetColor(255, 255, 0, gModuleDrawAlpha);
-      float val = ofClamp(mSmoothTarget, mMin, mMax);
-      float screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
+      double val = ofClamp(mSmoothTarget, mMin, mMax);
+      double screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
       ofSetLineWidth(1);
       ofFill();
       ofCircle(screenPos, mY + mHeight / 2, 3);
       ofPopStyle();
    }
 
-   float screenPos;
+   double screenPos;
    if (mModulator && mModulator->Active() && !showSmoothAdjustmentUI)
    {
       screenPos = mX + 1 + (mWidth - 2) * ValToPos(*mVar, true);
-      float lfomax = ofClamp(mModulator->GetMax(), mMin, mMax);
-      float screenPosMax = mX + 1 + (mWidth - 2) * ValToPos(lfomax, true);
-      float lfomin = ofClamp(mModulator->GetMin(), mMin, mMax);
-      float screenPosMin = mX + 1 + (mWidth - 2) * ValToPos(lfomin, true);
+      double lfomax = ofClamp(mModulator->GetMax(), mMin, mMax);
+      double screenPosMax = mX + 1 + (mWidth - 2) * ValToPos(lfomax, true);
+      double lfomin = ofClamp(mModulator->GetMin(), mMin, mMax);
+      double screenPosMin = mX + 1 + (mWidth - 2) * ValToPos(lfomin, true);
 
       ofPushStyle();
-      ofSetColor(0, 200, 0, gModuleDrawAlpha * .5f);
+      ofSetColor(0, 200, 0, gModuleDrawAlpha * .5);
       ofFill();
       ofRect(screenPosMin, mY, screenPos - screenPosMin, mHeight, 1); //lfo bar
       ofPopStyle();
@@ -179,7 +179,7 @@ void FloatSlider::Render()
          ofSetColor(30, 30, 30, gModuleDrawAlpha);
       if (showSmoothAdjustmentUI)
          ofSetColor(255, 255, 0, gModuleDrawAlpha);
-      float val = ofClamp(*mVar, mMin, mMax);
+      double val = ofClamp(*mVar, mMin, mMax);
       screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
       ofSetLineWidth(2);
       ofLine(screenPos, mY + 1, screenPos, mY + mHeight - 1); //value bar
@@ -191,7 +191,7 @@ void FloatSlider::Render()
    DrawHover(mX, mY, mWidth, mHeight);
 
    std::string display;
-   float textSize = 13;
+   double textSize = 13;
    if (showSmoothAdjustmentUI)
    {
       display = "smooth: " + ofToString(mSmooth, 3);
@@ -320,7 +320,7 @@ void FloatSlider::OnClicked(float x, float y, bool right)
       {
          if (mMaxEntry != nullptr)
             mMaxEntry->Delete();
-         mMaxEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMax, -FLT_MAX, FLT_MAX);
+         mMaxEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMax, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
          mMaxEntry->MakeActiveTextEntry(true);
       }
       else
@@ -328,14 +328,14 @@ void FloatSlider::OnClicked(float x, float y, bool right)
          if (mMinEntry != nullptr)
             mMinEntry->Delete();
          //mMinEntry = new TextEntry(this, "", mX, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
-         mMinEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
+         mMinEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMin, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
          mMinEntry->MakeActiveTextEntry(true);
       }
 
       return;
    }
 
-   mFineRefX = ofMap(ValToPos(*GetModifyValue(), false), 0.0f, 1.0f, mX + 1, mX + mWidth - 1, true) - mX;
+   mFineRefX = ofMap(ValToPos(*GetModifyValue(), false), 0.0, 1.0, mX + 1, mX + mWidth - 1, true) - mX;
    mRefY = y;
    SetValueForMouse(x, y);
    mMouseDown = true;
@@ -363,23 +363,23 @@ bool FloatSlider::MouseMoved(float x, float y)
 
 void FloatSlider::SetValueForMouse(float x, float y)
 {
-   float* var = GetModifyValue();
-   float fX = x;
+   double* var = GetModifyValue();
+   double fX = x;
    if (GetKeyModifiers() & kModifier_Shift)
    {
       if (mFineRefX == -999)
       {
          mFineRefX = x;
       }
-      float precision = mShowDigits != -1 ? 100 : 10;
+      double precision = mShowDigits != -1 ? 100 : 10;
       fX = mFineRefX + (fX - mFineRefX) / precision;
    }
    else
    {
       mFineRefX = -999;
    }
-   float oldVal = *var;
-   float pos = ofMap(fX + mX, mX + 1, mX + mWidth - 1, 0.0f, 1.0f);
+   double oldVal = *var;
+   double pos = ofMap(fX + mX, mX + 1, mX + mWidth - 1, 0.0, 1.0);
 
    if (AdjustSmooth())
    {
@@ -410,8 +410,8 @@ void FloatSlider::SetValueForMouse(float x, float y)
 
    if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
    {
-      float move = (y - mRefY) * -.003f;
-      float change = move * (mMax - mMin);
+      double move = (y - mRefY) * -.003;
+      double change = move * (mMax - mMin);
       mModulator->GetMin() = ofClamp(mModulator->GetMin() + change, mMin, mModulator->GetMax());
       mRefY = y;
    }
@@ -439,18 +439,18 @@ void FloatSlider::SmoothUpdated()
    }
 }
 
-void FloatSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void FloatSlider::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    SetValue(GetValueForMidiCC(slider), time);
 }
 
-float FloatSlider::GetValueForMidiCC(float slider) const
+double FloatSlider::GetValueForMidiCC(double slider) const
 {
    slider = ofClamp(slider, 0, 1);
    return PosToVal(slider, true);
 }
 
-float FloatSlider::PosToVal(float pos, bool ignoreSmooth) const
+double FloatSlider::PosToVal(double pos, bool ignoreSmooth) const
 {
    if (AdjustSmooth() && !ignoreSmooth)
    {
@@ -467,36 +467,36 @@ float FloatSlider::PosToVal(float pos, bool ignoreSmooth) const
    if (mMode == kNormal)
       return mMin + pos * (mMax - mMin);
    if (mMode == kLogarithmic)
-      return mMin * powf(mMax / mMin, pos);
+      return mMin * pow(mMax / mMin, pos);
    if (mMode == kSquare)
       return mMin + pos * pos * (mMax - mMin);
    if (mMode == kBezier)
    {
-      float y = pos * (pos * (pos * (mMax - mMin) + 3 * mMin - 3 * mBezierControl) - 3 * mMin + 3 * mBezierControl) + mMin;
+      double y = pos * (pos * (pos * (mMax - mMin) + 3 * mMin - 3 * mBezierControl) - 3 * mMin + 3 * mBezierControl) + mMin;
       return y;
    }
    assert(false);
    return 0;
 }
 
-float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
+double FloatSlider::ValToPos(double val, bool ignoreSmooth) const
 {
    val = ofClamp(val, mMin, mMax);
    if (AdjustSmooth() && (gHoveredUIControl == this || mSmooth > 0) && !ignoreSmooth)
-      return sqrtf(mSmooth);
+      return sqrt(mSmooth);
    if (mMode == kNormal)
       return (val - mMin) / (mMax - mMin);
    if (mMode == kLogarithmic)
       return log(val / mMin) / log(mMax / mMin);
    if (mMode == kSquare)
-      return sqrtf((val - mMin) / (mMax - mMin));
+      return sqrt((val - mMin) / (mMax - mMin));
    if (mMode == kBezier)
    {
-      float closest = 0;
-      float closestDist = FLT_MAX;
-      for (float pos = 0; pos < 1; pos += .001f)
+      double closest = 0;
+      double closestDist = FLT_MAX;
+      for (double pos = 0; pos < 1; pos += .001)
       {
-         float dist = fabsf(PosToVal(pos, true) - val);
+         double dist = abs(PosToVal(pos, true) - val);
          if (dist < closestDist)
          {
             closestDist = dist;
@@ -508,7 +508,7 @@ float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
    return 0;
 }
 
-void FloatSlider::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void FloatSlider::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    if (TheLFOController && TheLFOController->WantsBinding(this))
    {
@@ -516,8 +516,8 @@ void FloatSlider::SetValue(float value, double time, bool forceUpdate /*= false*
       return;
    }
 
-   float* var = GetModifyValue();
-   float oldVal = *var;
+   double* var = GetModifyValue();
+   double oldVal = *var;
    if (mRelative)
    {
       if (!mTouching || mRelativeOffset == -999)
@@ -563,12 +563,12 @@ void FloatSlider::DisableLFO()
       mLFOControl->SetLFOEnabled(false);
 }
 
-float FloatSlider::GetValue() const
+double FloatSlider::GetValue() const
 {
    return *mVar;
 }
 
-float FloatSlider::GetMidiValue() const
+double FloatSlider::GetMidiValue() const
 {
    if (mMin == mMax)
       return 0;
@@ -576,7 +576,7 @@ float FloatSlider::GetMidiValue() const
    return ValToPos(*mVar, true);
 }
 
-std::string FloatSlider::GetDisplayValue(float val) const
+std::string FloatSlider::GetDisplayValue(double val) const
 {
    if (val == mMin && mMinValueDisplay != "")
       return mMinValueDisplay;
@@ -593,7 +593,7 @@ std::string FloatSlider::GetDisplayValue(float val) const
    else if (mMax - mMin > 10)
       decDigits = 2;
 
-   float displayVar = val;
+   double displayVar = val;
    if (decDigits == 0) //round down if we're showing int value
       displayVar = (int)displayVar;
    return ofToString(displayVar, decDigits);
@@ -601,7 +601,7 @@ std::string FloatSlider::GetDisplayValue(float val) const
 
 void FloatSlider::DoCompute(int samplesIn /*= 0*/)
 {
-   if (mLastComputeTime == gTime && mLastComputeSamplesIn == samplesIn)
+   if (ofAlmostEquel(mLastComputeTime, gTime) && mLastComputeSamplesIn == samplesIn)
       return; //we've just calculated this, no need to do it again! earlying out avoids wasted work and circular modulation loops
 
    if (mLFOControl && mLFOControl->Active() && mLFOControl->InLowResMode() && samplesIn != 0)
@@ -610,10 +610,10 @@ void FloatSlider::DoCompute(int samplesIn /*= 0*/)
    mLastComputeTime = gTime;
    mLastComputeSamplesIn = samplesIn;
 
-   float oldVal = *mVar;
+   double oldVal = *mVar;
 
    const bool kUseCache = true;
-   if (kUseCache && IsAudioThread() && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
+   if (kUseCache && IsAudioThread() && samplesIn >= 0 && samplesIn < gBufferSize && ofAlmostEquel(mLastComputeCacheTime[samplesIn], gTime))
    {
       *mVar = mLastComputeCacheValue[samplesIn];
    }
@@ -630,18 +630,18 @@ void FloatSlider::DoCompute(int samplesIn /*= 0*/)
       if (mIsSmoothing)
          *mVar = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
 
-      if (IsAudioThread() && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] != gTime)
+      if (IsAudioThread() && samplesIn >= 0 && samplesIn < gBufferSize && !ofAlmostEquel(mLastComputeCacheTime[samplesIn], gTime))
       {
          mLastComputeCacheValue[samplesIn] = *mVar;
          mLastComputeCacheTime[samplesIn] = gTime;
       }
    }
 
-   if (oldVal != *mVar)
+   if (!ofAlmostEquel(oldVal, *mVar))
       mOwner->FloatSliderUpdated(this, oldVal, gTime + samplesIn * gInvSampleRateMs);
 }
 
-float* FloatSlider::GetModifyValue()
+double* FloatSlider::GetModifyValue()
 {
    if (!TheSynth->IsLoadingModule() && mModulator && mModulator->Active() && mModulator->CanAdjustRange())
       return &mModulator->GetMax();
@@ -652,21 +652,21 @@ float* FloatSlider::GetModifyValue()
 
 void FloatSlider::Double()
 {
-   float doubl = *GetModifyValue() * 2.0f;
+   double doubl = *GetModifyValue() * 2.0;
    if (doubl >= mMin && doubl <= mMax)
       SetValue(doubl, NextBufferTime(false));
 }
 
 void FloatSlider::Halve()
 {
-   float half = *GetModifyValue() * .5f;
+   double half = *GetModifyValue() * .5;
    if (half >= mMin && half <= mMax)
       SetValue(half, NextBufferTime(false));
 }
 
-void FloatSlider::Increment(float amount)
+void FloatSlider::Increment(double amount)
 {
-   float val = *GetModifyValue() + amount;
+   double val = *GetModifyValue() + amount;
    if (val >= mMin && val <= mMax)
       SetValue(val, NextBufferTime(false));
 }
@@ -681,7 +681,7 @@ bool FloatSlider::CheckNeedsDraw()
    if (IUIControl::CheckNeedsDraw())
       return true;
 
-   return *mVar != mLastDisplayedValue;
+   return !ofAlmostEquel(*mVar, mLastDisplayedValue);
 }
 
 bool FloatSlider::AttemptTextInput()
@@ -702,7 +702,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
       mFloatEntry->Delete();
       mFloatEntry = nullptr;
 
-      float evaluated = 0;
+      double evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
       if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
          SetValue(evaluated, NextBufferTime(false));
@@ -728,21 +728,21 @@ void FloatSlider::TextEntryCancelled(TextEntry* entry)
    }
 }
 
-void FloatSlider::OnTransportAdvanced(float amount)
+void FloatSlider::OnTransportAdvanced(double amount)
 {
    mRamp.Start(gTime, mSmoothTarget, gTime + (amount * TheTransport->MsPerBar() * (mSmooth * 300)));
 }
 
 namespace
 {
-   const int kFloatSliderSaveStateRev = 6;
+   const int kFloatSliderSaveStateRev = 7;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
 {
    out << kFloatSliderSaveStateRev;
 
-   out << (float)*mVar;
+   out << (double)*mVar;
 
    out << mModulatorMin;
    out << mModulatorMax;
@@ -766,9 +766,18 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    int rev;
    in >> rev;
 
-   float var;
-   in >> var;
-   mRamp.SetValue(var);
+   float var{ 0 };
+   double vard{ 0 };
+   if (rev < 7)
+   {
+      in >> var;
+      mRamp.SetValue(var);
+   }
+   else
+   {
+      in >> vard;
+      mRamp.SetValue(vard);
+   }
 
    if (rev < 5)
    {
@@ -795,14 +804,34 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 
    if (rev >= 2)
    {
-      in >> mModulatorMin;
-      in >> mModulatorMax;
+      if (rev < 7)
+      {
+         float a, b;
+         in >> a >> b;
+         mModulatorMin = static_cast<double>(a);
+         mModulatorMax = static_cast<double>(b);
+      }
+      else
+      {
+         in >> mModulatorMin;
+         in >> mModulatorMax;
+      }
    }
 
    if (rev >= 3)
    {
-      in >> mSmooth;
-      in >> mSmoothTarget;
+      if (rev < 7)
+      {
+         float a, b;
+         in >> a >> b;
+         mSmooth = static_cast<double>(a);
+         mSmoothTarget = static_cast<double>(b);
+      }
+      else
+      {
+         in >> mSmooth;
+         in >> mSmoothTarget;
+      }
       in >> mIsSmoothing;
 
       if (mIsSmoothing)
@@ -811,8 +840,18 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 
    if (rev >= 4)
    {
-      in >> mMin;
-      in >> mMax;
+      if (rev < 7)
+      {
+         float a, b;
+         in >> a >> b;
+         mMin = static_cast<double>(a);
+         mMax = static_cast<double>(b);
+      }
+      else
+      {
+         in >> mMin;
+         in >> mMax;
+      }
    }
 
    if (rev >= 6)
@@ -846,7 +885,12 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    }
 
    if (shouldSetValue && (mModulator == nullptr || !mModulator->Active()))
-      SetValueDirect(var, gTime);
+   {
+      if (rev < 7)
+         SetValueDirect(var, gTime);
+      else
+         SetValueDirect(vard, gTime);
+   }
 }
 
 IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y, int w, int h, int* var, int min, int max)
@@ -855,15 +899,7 @@ IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y,
 , mHeight(h)
 , mMin(min)
 , mMax(max)
-, mMouseDown(false)
 , mOwner(owner)
-, mOriginalValue(0)
-, mSliderVal(0)
-, mShowName(true)
-, mIntEntry(nullptr)
-, mAllowMinMaxAdjustment(true)
-, mMinEntry(nullptr)
-, mMaxEntry(nullptr)
 {
    assert(owner);
    SetName(label);
@@ -914,7 +950,7 @@ void IntSlider::Render()
    IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
    ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofSetColor(color);
    ofRect(mX, mY, mWidth, mHeight);
@@ -1024,7 +1060,7 @@ void IntSlider::Render()
 void IntSlider::CalcSliderVal()
 {
    mLastSetValue = *mVar;
-   mSliderVal = ofMap(*mVar, mMin, mMax, 0.0f, 1.0f, K(clamp));
+   mSliderVal = ofMap(*mVar, mMin, mMax, 0.0, 1.0, K(clamp));
 }
 
 void IntSlider::OnClicked(float x, float y, bool right)
@@ -1083,7 +1119,7 @@ void IntSlider::SetValueForMouse(float x, float y)
    }
 }
 
-void IntSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void IntSlider::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
    SetValue(GetValueForMidiCC(slider), time);
@@ -1091,13 +1127,13 @@ void IntSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
    mLastSetValue = *mVar;
 }
 
-float IntSlider::GetValueForMidiCC(float slider) const
+double IntSlider::GetValueForMidiCC(double slider) const
 {
    slider = ofClamp(slider, 0, 1);
    return (int)round(ofMap(slider, 0, 1, mMin, mMax));
 }
 
-void IntSlider::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void IntSlider::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    int oldVal = *mVar;
    *mVar = (int)round(ofClamp(value, mMin, mMax));
@@ -1109,17 +1145,17 @@ void IntSlider::SetValue(float value, double time, bool forceUpdate /*= false*/)
    }
 }
 
-float IntSlider::GetValue() const
+double IntSlider::GetValue() const
 {
    return *mVar;
 }
 
-float IntSlider::GetMidiValue() const
+double IntSlider::GetMidiValue() const
 {
    return mSliderVal;
 }
 
-std::string IntSlider::GetDisplayValue(float val) const
+std::string IntSlider::GetDisplayValue(double val) const
 {
    return ofToString(val, 0);
 }
@@ -1138,7 +1174,7 @@ void IntSlider::Halve()
       SetValue(half, NextBufferTime(false));
 }
 
-void IntSlider::Increment(float amount)
+void IntSlider::Increment(double amount)
 {
    int val = *mVar + (int)amount;
    if (val >= mMin && val <= mMax)
@@ -1176,7 +1212,7 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
       mIntEntry->Delete();
       mIntEntry = nullptr;
 
-      float evaluated = 0;
+      double evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
       int evaluatedInt = round(evaluated);
       if (expressionValid && ((evaluatedInt >= mMin && evaluatedInt <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
@@ -1205,14 +1241,14 @@ void IntSlider::TextEntryCancelled(TextEntry* entry)
 
 namespace
 {
-   const int kIntSliderSaveStateRev = 1;
+   const int kIntSliderSaveStateRev = 2;
 }
 
 void IntSlider::SaveState(FileStreamOut& out)
 {
    out << kIntSliderSaveStateRev;
 
-   out << (float)*mVar;
+   out << static_cast<double>(*mVar);
    out << mMin;
    out << mMax;
 }
@@ -1223,8 +1259,15 @@ void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev <= kIntSliderSaveStateRev);
 
-   float var;
-   in >> var;
+   double var;
+   if (rev < 2)
+   {
+      float a;
+      in >> a;
+      var = static_cast<double>(a);
+   }
+   else
+      in >> var;
 
    if (rev >= 1)
    {

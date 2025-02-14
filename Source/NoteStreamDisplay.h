@@ -67,7 +67,7 @@ private:
       h = mHeight;
    }
    bool IsElementActive(int index) const;
-   float GetYPos(int pitch, float noteHeight) const;
+   double GetYPos(int pitch, double noteHeight) const;
 
    struct NoteStreamElement
    {
@@ -81,7 +81,7 @@ private:
    NoteStreamElement mNoteStream[kNoteStreamCapacity];
    float mWidth{ 400 };
    float mHeight{ 200 };
-   float mDurationMs{ 2000 };
+   double mDurationMs{ 2000 };
    int mPitchMin{ 127 };
    int mPitchMax{ 0 };
    ClickButton* mResetButton{ nullptr };

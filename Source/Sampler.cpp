@@ -40,7 +40,7 @@ Sampler::Sampler()
 , mNoteInputBuffer(this)
 , mWriteBuffer(gBufferSize)
 {
-   mVoiceParams.mVol = .5f;
+   mVoiceParams.mVol = .5;
    mVoiceParams.mAdsr.Set(10, 0, 1, 10);
    mVoiceParams.mSample = &mSample;
    mVoiceParams.mSamplePitch = 48;
@@ -107,7 +107,7 @@ void Sampler::Process(double time)
       for (int i = 0; i < gBufferSize; ++i)
       {
          //if we've already started recording, or if it's a new recording and there's sound
-         if (mRecordPos > 0 || fabsf(GetBuffer()->GetChannel(0)[i]) > mThresh)
+         if (mRecordPos > 0 || std::abs(GetBuffer()->GetChannel(0)[i]) > mThresh)
          {
             mSample.Data()->GetChannel(0)[mRecordPos] = GetBuffer()->GetChannel(0)[i];
             if (mPassthrough)
@@ -293,7 +293,7 @@ void Sampler::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Sampler::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Sampler::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

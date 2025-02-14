@@ -1122,9 +1122,9 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
          DropdownList* dropdown = dynamic_cast<DropdownList*>(mSliderControls[i]);
          if (dropdown != nullptr)
          {
-            const float kCentering = 7;
-            float w = dropdown->GetMaxItemWidth();
-            float h = dropdown->GetNumValues() * DropdownList::kItemSpacing;
+            const double kCentering = 7;
+            double w = dropdown->GetMaxItemWidth();
+            double h = dropdown->GetNumValues() * DropdownList::kItemSpacing;
             ofPushMatrix();
             ofTranslate(kColumnSpacing * i + 3, yPos + kCentering - h * controls[i]->GetMidiValue());
             dropdown->DrawDropdown(w, h, true);
@@ -1608,18 +1608,18 @@ void Push2Control::OnMidiControl(MidiControl& control)
       bool justResetParameter = gTime - mLastResetTime < 1000;
       if (controlIndex < mSliderControls.size() && !justResetParameter)
       {
-         float currentNormalized = mSliderControls[controlIndex]->GetMidiValue();
-         float increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
-         increment *= mShiftHeld ? .0005f : .005f;
+         double currentNormalized = mSliderControls[controlIndex]->GetMidiValue();
+         double increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
+         increment *= mShiftHeld ? .0005 : .005;
 
          FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(mSliderControls[controlIndex]);
          if (floatSlider && floatSlider->GetModulator() && floatSlider->GetModulator()->Active() && floatSlider->GetModulator()->CanAdjustRange())
          {
             IModulator* modulator = floatSlider->GetModulator();
-            float min = floatSlider->GetMin();
-            float max = floatSlider->GetMax();
-            float modMin = ofMap(modulator->GetMin(), min, max, 0, 1);
-            float modMax = ofMap(modulator->GetMax(), min, max, 0, 1);
+            double min = floatSlider->GetMin();
+            double max = floatSlider->GetMax();
+            double modMin = ofMap(modulator->GetMin(), min, max, 0, 1);
+            double modMax = ofMap(modulator->GetMax(), min, max, 0, 1);
 
             modulator->GetMin() = ofMap(modMin - increment, 0, 1, min, max, K(clamp));
             modulator->GetMax() = ofMap(modMax + increment, 0, 1, min, max, K(clamp));
@@ -1656,8 +1656,8 @@ void Push2Control::OnMidiControl(MidiControl& control)
                }
                else
                {
-                  float current = mButtonControls[controlIndex]->GetMidiValue();
-                  float newValue = current > 0 ? 0 : 1;
+                  double current = mButtonControls[controlIndex]->GetMidiValue();
+                  double newValue = current > 0 ? 0 : 1;
                   if (dynamic_cast<ClickButton*>(mButtonControls[controlIndex]) != nullptr)
                      newValue = 1; //always "press" a button
 
@@ -2105,7 +2105,7 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
    }
 
    float value = pitchBend.mValue / MidiDevice::kPitchBendMax;
-   TheSynth->SetZoomLevel(pow(2, value * 2 - 1) + .1f);
+   TheSynth->SetZoomLevel(pow(2, value * 2 - 1) + .1);
 
    //ofLog() << "pitchbend " << pitchBend.mChannel << " " << pitchBend.mValue;
 }

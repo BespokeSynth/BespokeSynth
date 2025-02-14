@@ -48,12 +48,12 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "formant"; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& info) override;
@@ -77,12 +77,12 @@ private:
 #define NUM_FORMANT_BANDS 3
    BiquadFilter mBiquads[NUM_FORMANT_BANDS];
    float* mDryBuffer{ nullptr };
-   float mEE{ 1 };
-   float mOO{ 0 };
-   float mI{ 0 };
-   float mE{ 0 };
-   float mU{ 0 };
-   float mA{ 0 };
+   double mEE{ 1 };
+   double mOO{ 0 };
+   double mI{ 0 };
+   double mE{ 0 };
+   double mU{ 0 };
+   double mA{ 0 };
    FloatSlider* mEESlider{ nullptr };
    FloatSlider* mOOSlider{ nullptr };
    FloatSlider* mISlider{ nullptr };

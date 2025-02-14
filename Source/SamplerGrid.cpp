@@ -186,12 +186,12 @@ void SamplerGrid::InitGrid()
    mGrid->SetGrid(mCols, mRows);
 }
 
-void SamplerGrid::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void SamplerGrid::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    OnGridButton(col, row, value, nullptr);
 }
 
-void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void SamplerGrid::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    bool bOn = velocity > 0;
    if (y < mRows && x < mCols)
@@ -261,7 +261,7 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
 
 void SamplerGrid::PlayNote(NoteMessage note)
 {
-   OnGridButton(note.pitch % mCols, (note.pitch / mCols) % mRows, note.velocity / 127.0f, nullptr);
+   OnGridButton(note.pitch % mCols, (note.pitch / mCols) % mRows, note.velocity / 127.0, nullptr);
 }
 
 void SamplerGrid::SetEditSample(SamplerGrid::GridSample* sample)
@@ -443,7 +443,7 @@ void SamplerGrid::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void SamplerGrid::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SamplerGrid::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

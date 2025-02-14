@@ -36,7 +36,7 @@ EQEffect::EQEffect()
       for (int i = 0; i < NUM_EQ_FILTERS; ++i)
       {
          mBanks[ch].mBiquad[i].SetFilterType(kFilterType_Peak);
-         mBanks[ch].mBiquad[i].SetFilterParams(40 * powf(2.2f, i), .1f);
+         mBanks[ch].mBiquad[i].SetFilterParams(40 * std::pow(2.2, i), .1);
       }
    }
 }
@@ -49,7 +49,7 @@ void EQEffect::CreateUIControls()
 
    mMultiSlider->SetGridMode(UIGrid::kMultislider);
    for (int i = 0; i < NUM_EQ_FILTERS; ++i)
-      mMultiSlider->SetVal(i, 0, .5f);
+      mMultiSlider->SetVal(i, 0, .5);
    mMultiSlider->SetListener(this);
 }
 
@@ -106,14 +106,14 @@ bool EQEffect::MouseMoved(float x, float y)
    return false;
 }
 
-float EQEffect::GetEffectAmount()
+double EQEffect::GetEffectAmount()
 {
    if (mEnabled)
    {
-      float amount = 0;
+      double amount = 0;
       for (int i = 0; i < mNumFilters; ++i)
       {
-         amount += fabsf(mMultiSlider->GetVal(i, 0) - .5f);
+         amount += std::abs(mMultiSlider->GetVal(i, 0) - .5);
       }
       return amount;
    }
@@ -158,7 +158,7 @@ void EQEffect::ButtonClicked(ClickButton* button, double time)
       {
          for (int i = 0; i < NUM_EQ_FILTERS; ++i)
          {
-            mMultiSlider->SetVal(i, 0, .5f);
+            mMultiSlider->SetVal(i, 0, .5);
             mBanks[ch].mBiquad[i].mDbGain = 0;
             if (ch == 0)
                mBanks[0].mBiquad[i].UpdateFilterCoeff();
@@ -169,7 +169,7 @@ void EQEffect::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void EQEffect::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void EQEffect::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    for (int ch = 0; ch < ChannelBuffer::kMaxNumChannels; ++ch)
    {

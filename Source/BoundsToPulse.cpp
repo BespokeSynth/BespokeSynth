@@ -54,7 +54,7 @@ void BoundsToPulse::CreateUIControls()
    AddPatchCableSource(mMaxCable);
 }
 
-void BoundsToPulse::OnTransportAdvanced(float amount)
+void BoundsToPulse::OnTransportAdvanced(double amount)
 {
    for (int i = 0; i < gBufferSize; ++i)
       ComputeSliders(i);
@@ -71,7 +71,7 @@ void BoundsToPulse::DrawModule()
    mMaxCable->SetManualPosition(100, 30);
 }
 
-void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (!mEnabled)
       return;

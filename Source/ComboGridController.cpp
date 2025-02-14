@@ -80,7 +80,7 @@ void ComboGridController::DrawModule()
       return;
 }
 
-void ComboGridController::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void ComboGridController::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (mArrangement == kHorizontal)
    {

@@ -72,7 +72,7 @@ private:
    DropdownList* mChannelSelector{ nullptr };
    int mChannelSelectionIndex{ 0 };
    int mStereoSelectionOffset{ 0 };
-   float mLimit{ 1 };
+   double mLimit{ 1 };
 
    LevelMeterDisplay mLevelMeterDisplay;
 };

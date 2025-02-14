@@ -71,17 +71,17 @@ public:
    static int GetSpacing();
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   void SetValueDirect(float value, double time) override;
-   float GetValue() const override;
-   float GetMidiValue() const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   void SetValueDirect(double value, double time) override;
+   double GetValue() const override;
+   double GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
-   std::string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(double val) const override;
    bool IsBitmask() override { return mMultiSelect; }
    bool InvertScrollDirection() override { return mDirection == kRadioVertical; }
-   void Increment(float amount) override;
+   void Increment(double amount) override;
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -96,7 +96,7 @@ public:
    ofVec2f GetOptionPosition(int optionIndex);
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
 protected:
    ~RadioButton(); //protected so that it can't be created on the stack
@@ -117,7 +117,7 @@ private:
    IRadioButtonListener* mOwner;
    bool mMultiSelect{ false }; //makes this... not a radio button. mVar becomes a bitmask
    RadioDirection mDirection;
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    int mLastSetValue{ 0 };
    int mForcedWidth{ -1 };
 };

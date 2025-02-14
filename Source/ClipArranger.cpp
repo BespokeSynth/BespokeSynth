@@ -227,7 +227,7 @@ ClipArranger::Clip* ClipArranger::GetEmptyClip()
    return nullptr;
 }
 
-void ClipArranger::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ClipArranger::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

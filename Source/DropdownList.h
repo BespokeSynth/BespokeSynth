@@ -141,15 +141,15 @@ public:
    void CopyContentsTo(DropdownList* list) const;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   float GetValue() const override;
-   float GetMidiValue() const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override;
+   double GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
-   std::string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(double val) const override;
    bool InvertScrollDirection() override { return true; }
-   void Increment(float amount) override;
+   void Increment(double amount) override;
    void Poll() override;
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;
@@ -158,7 +158,7 @@ public:
    void GetDimensions(float& width, float& height) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    static constexpr int kItemSpacing = 15;
    static constexpr int kPageBarSpacing = 20;
@@ -188,7 +188,7 @@ private:
    std::string mUnknownItemString{ "-----" };
    bool mDrawLabel{ false };
    float mLabelSize{ 0 };
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    int mLastSetValue{ 0 };
    bool mAutoCalculateWidth{ false };
    bool mDrawTriangle{ true };

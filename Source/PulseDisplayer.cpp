@@ -47,7 +47,7 @@ void PulseDisplayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   float brightness = ofLerp(150, 255, 1 - ofClamp(gTime - mLastReceivedFlagTime, 0, 200) / 200.0f);
+   float brightness = ofLerp(150, 255, 1 - ofClamp(gTime - mLastReceivedFlagTime, 0, 200) / 200.0);
    ofPushStyle();
    ofSetColor(brightness, brightness, brightness);
    std::string output;
@@ -69,7 +69,7 @@ void PulseDisplayer::DrawModule()
    ofPopStyle();
 }
 
-void PulseDisplayer::OnPulse(double time, float velocity, int flags)
+void PulseDisplayer::OnPulse(double time, double velocity, int flags)
 {
    mLastReceivedFlags = flags;
    mLastReceivedFlagTime = gTime;

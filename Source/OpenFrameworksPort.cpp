@@ -293,7 +293,7 @@ void ofRect(const ofRectangle& rect, float cornerRadius /*=3*/)
    ofRect(rect.x, rect.y, rect.width, rect.height, cornerRadius);
 }
 
-float ofClamp(float val, float a, float b)
+double ofClamp(double val, double a, double b)
 {
    if (val < a)
       return a;
@@ -302,10 +302,21 @@ float ofClamp(float val, float a, float b)
    return val;
 }
 
-float ofGetLastFrameTime()
+ofVec2d ofPolToCar(double pos, double radius)
+{
+   return { radius * sin(pos * TWO_PI), radius * -cos(pos * TWO_PI) };
+}
+
+ofVec2d ofCarToPol(double x, double y)
+{
+   double pos = DoubleWrap(atan2(x, -y) / TWO_PI, 1);
+   return { pos, sqrt(x * x + y * y) };
+}
+
+double ofGetLastFrameTime()
 {
    /*TODO_PORT(Ryan)*/
-   return .01666f;
+   return .01666;
 }
 
 int ofToInt(const std::string& intString)
@@ -387,30 +398,18 @@ void ofVertex(ofVec2f point)
    ofVertex(point.x, point.y);
 }
 
-float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEnd, bool clamp)
-{
-   float ret;
-   if (fromEnd - fromStart != 0)
-      ret = ((val - fromStart) / (fromEnd - fromStart)) * (toEnd - toStart) + toStart;
-   else
-      ret = toEnd;
-   if (clamp)
-      ret = ofClamp(ret, MIN(toStart, toEnd), MAX(toStart, toEnd));
-   return ret;
-}
-
-float ofRandom(float max)
+double ofRandom(double max)
 {
    return max * gRandom01(gRandom);
 }
 
-float ofRandom(float x, float y)
+double ofRandom(double x, double y)
 {
    // if there is no range, return the value
-   if (x == y)
-      return x; // float == ?, wise? epsilon?
-   const float high = MAX(x, y);
-   const float low = MIN(x, y);
+   if (ofAlmostEquel(x, y))
+      return x;
+   const double high = MAX(x, y);
+   const double low = MIN(x, y);
    return low + ((high - low) * gRandom01(gRandom));
 }
 
@@ -466,19 +465,9 @@ float ofGetHeight()
    return TheSynth->GetMainComponent()->getHeight();
 }
 
-float ofGetFrameRate()
+double ofGetFrameRate()
 {
    return TheSynth->GetFrameRate();
-}
-
-float ofLerp(float start, float stop, float amt)
-{
-   return start + (stop - start) * amt;
-}
-
-float ofDistSquared(float x1, float y1, float x2, float y2)
-{
-   return ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty, bool trim)
@@ -576,38 +565,6 @@ void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
    ofVertex(x3, y3);
    ofVertex(x1, y1);
    ofEndShape();
-}
-
-float ofRectangle::getMinX() const
-{
-   return MIN(x, x + width); // - width
-}
-
-float ofRectangle::getMaxX() const
-{
-   return MAX(x, x + width); // - width
-}
-
-float ofRectangle::getMinY() const
-{
-   return MIN(y, y + height); // - height
-}
-
-float ofRectangle::getMaxY() const
-{
-   return MAX(y, y + height); // - height
-}
-
-bool ofRectangle::intersects(const ofRectangle& other) const
-{
-   return (getMinX() < other.getMaxX() && getMaxX() > other.getMinX() &&
-           getMinY() < other.getMaxY() && getMaxY() > other.getMinY());
-}
-
-bool ofRectangle::contains(float testX, float testY) const
-{
-   return testX > getMinX() && testY > getMinY() &&
-          testX < getMaxX() && testY < getMaxY();
 }
 
 void ofColor::setBrightness(int brightness)

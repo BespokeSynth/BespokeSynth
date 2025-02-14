@@ -598,8 +598,8 @@ void VSTPlugin::Poll()
    {
       for (int i = 0; i < mParameterSliders.size(); ++i)
       {
-         float value = mParameterSliders[i].mParameter->getValue();
-         if (mParameterSliders[i].mValue != value)
+         double value = mParameterSliders[i].mParameter->getValue();
+         if (!ofAlmostEquel(mParameterSliders[i].mValue, value))
             mParameterSliders[i].mValue = value;
       }
 
@@ -1058,7 +1058,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (int i = 0; i < mParameterSliders.size(); ++i)
    {

@@ -48,7 +48,7 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -64,6 +64,6 @@ private:
       height = 22;
    }
 
-   float mPan{ 0 };
+   double mPan{ 0 };
    FloatSlider* mPanSlider{ nullptr };
 };

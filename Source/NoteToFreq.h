@@ -50,7 +50,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
 
@@ -72,6 +72,6 @@ private:
       height = 0;
    }
 
-   float mPitch{ 0 };
+   double mPitch{ 0 };
    ModulationChain* mPitchBend{ nullptr };
 };

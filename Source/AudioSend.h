@@ -45,7 +45,7 @@ public:
 
    void CreateUIControls() override;
 
-   void SetSend(float amount, bool crossfade)
+   void SetSend(double amount, bool crossfade)
    {
       mAmount = amount;
       mCrossfade = crossfade;
@@ -56,7 +56,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    int GetNumTargets() override { return 2; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -74,7 +74,7 @@ private:
 
    bool mCrossfade{ false };
    Checkbox* mCrossfadeCheckbox{ nullptr };
-   float mAmount{ 0 };
+   double mAmount{ 0 };
    FloatSlider* mAmountSlider{ nullptr };
    RollingBuffer mVizBuffer2;
    PatchCableSource* mPatchCableSource2{ nullptr };

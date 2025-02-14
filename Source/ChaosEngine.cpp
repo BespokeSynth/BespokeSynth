@@ -105,9 +105,9 @@ void ChaosEngine::Poll()
 
          TheScale->SetRoot(gRandom() % TheScale->GetPitchesPerOctave());
          TheScale->SetRandomSeptatonicScale();
-         float bias = ofRandom(0, 1);
+         double bias = ofRandom(0, 1);
          bias *= bias;
-         TheTransport->SetTempo(ofMap(bias, 0.0f, 1.0f, 55.0f, 170.0f));
+         TheTransport->SetTempo(ofMap(bias, 0.0, 1.0, 55.0, 170.0));
       }
    }
 }
@@ -619,7 +619,7 @@ void ChaosEngine::GenerateRandomProgression()
       int degree = (gRandom() % 6) + 1;
       Chord chord;
       int rootPitch = TheScale->GetPitchFromTone(degree);
-      if (ofRandom(1) < .5f && (degree == 3 || degree == 4)) //chance we do a non-diatonic
+      if (ofRandom(1) < .5 && (degree == 3 || degree == 4)) //chance we do a non-diatonic
          chord = Chord(rootPitch, (gRandom() % 2) ? kChord_Maj : kChord_Min);
       else
          chord.SetFromDegreeAndScale(degree, TheScale->GetScalePitches());
@@ -628,7 +628,7 @@ void ChaosEngine::GenerateRandomProgression()
       TheScale->GetChordDegreeAndAccidentals(chord, degree, accidentals);
 
       int beats = beatsLeft;
-      if (ofRandom(1) < .2f) //small chance we do less than a bar
+      if (ofRandom(1) < .2) //small chance we do less than a bar
          beats = (gRandom() % beatsLeft) + 1;
 
       ProgressionChord progressionChord(degree, accidentals, beats);

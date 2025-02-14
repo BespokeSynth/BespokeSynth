@@ -109,7 +109,7 @@ private:
    struct Song
    {
       std::string mName;
-      float mTempo{ 120 };
+      double mTempo{ 120 };
       int mTimeSigTop{ 4 };
       int mTimeSigBottom{ 4 };
       int mScaleRoot{ 0 };

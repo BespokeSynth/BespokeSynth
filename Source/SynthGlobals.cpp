@@ -64,7 +64,7 @@ IUIControl* gBindToUIControl = nullptr;
 RetinaTrueTypeFont gFont;
 RetinaTrueTypeFont gFontBold;
 RetinaTrueTypeFont gFontFixedWidth;
-float gModuleDrawAlpha = 255;
+double gModuleDrawAlpha = 255;
 float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
 float gWorkBuffer[kWorkBufferSize];
@@ -72,16 +72,16 @@ ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
 IDrawableModule* gHoveredModule = nullptr;
 IUIControl* gHoveredUIControl = nullptr;
 IUIControl* gHotBindUIControl[10];
-float gControlTactileFeedback = 0;
-float gDrawScale = 1;
+double gControlTactileFeedback = 0;
+double gDrawScale = 1;
 bool gShowDevModules = false;
-float gCornerRoundness = 1;
-std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
+double gCornerRoundness = 1;
+std::array<double, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
 
 std::random_device gRandomDevice;
 bespoke::core::Xoshiro256ss gRandom(gRandomDevice);
-std::uniform_real_distribution<float> gRandom01(0.0f, 1.f);
-std::uniform_real_distribution<float> gRandomBipolarDist(-1.f, 1.f);
+std::uniform_real_distribution<double> gRandom01(0.0, 1.);
+std::uniform_real_distribution<double> gRandomBipolarDist(-1., 1.);
 
 void SynthInit()
 {
@@ -119,7 +119,7 @@ void SetGlobalSampleRateAndBufferSize(int rate, int size)
    gSampleRateMs = gSampleRate / 1000.0;
    gInvSampleRateMs = 1000.0 / gSampleRate;
    gBufferSizeMs = gBufferSize / gSampleRateMs;
-   gNyquistLimit = gSampleRate / 2.0f;
+   gNyquistLimit = gSampleRate / 2.0;
 }
 
 std::string GetBuildInfoString()
@@ -196,7 +196,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
                   sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
                if (bufferSize > 0)
                   sampleIdx %= bufferSize;
-               mag = MAX(mag, fabsf(buffer[sampleIdx]));
+               mag = MAX(mag, std::abs(buffer[sampleIdx]));
             }
             mag = pow(mag, .25f);
             mag *= height / 2 * vol;
@@ -379,7 +379,12 @@ float Interp(float a, float start, float end)
    return a * (end - start) + start;
 }
 
-double GetPhaseInc(float freq)
+double Interp(double a, double start, double end)
+{
+   return a * (end - start) + start;
+}
+
+double GetPhaseInc(double freq)
 {
    return freq * gTwoPiOverSampleRate;
 }
@@ -392,7 +397,7 @@ float FloatWrap(float num, float space)
    return num;
 }
 
-double DoubleWrap(double num, float space)
+double DoubleWrap(double num, double space)
 {
    if (space == 0)
       num = 0;
@@ -422,7 +427,7 @@ float GetStringWidth(std::string text, float size)
 
 void AssertIfDenormal(float input)
 {
-   assert(input == 0 || input != input || fabsf(input) > std::numeric_limits<float>::min());
+   assert(input == 0 || input != input || std::abs(input) > std::numeric_limits<float>::min());
 }
 
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
@@ -635,28 +640,28 @@ int KeyToLower(int key)
    return key;
 }
 
-float EaseIn(float start, float end, float a)
+double EaseIn(double start, double end, double a)
 {
    return (end - start) * a * a + start;
 }
 
-float EaseOut(float start, float end, float a)
+double EaseOut(double start, double end, double a)
 {
    return -(end - start) * a * (a - 2) + start;
 }
 
-float Bias(float value, float bias)
+double Bias(double value, double bias)
 {
    assert(bias >= 0 && bias <= 1);
-   const float kLog25 = log(25);
-   bias = .2f * expf(kLog25 * bias); //pow(25,bias)
+   const double kLog25 = log(25);
+   bias = .2 * exp(kLog25 * bias); //pow(25,bias)
    return pow(value, bias);
 }
 
-float Pow2(float in)
+double Pow2(double in)
 {
-   const float kLog2 = log(2);
-   return expf(kLog2 * in);
+   const double kLog2 = log(2);
+   return exp(kLog2 * in);
 }
 
 void PrintCallstack()
@@ -786,12 +791,12 @@ bool IsAudioThread()
    return std::this_thread::get_id() == ModularSynth::GetAudioThreadID();
 }
 
-float GetLeftPanGain(float pan)
+double GetLeftPanGain(double pan)
 {
    return 1 - ofClamp(pan, -1, 1);
 }
 
-float GetRightPanGain(float pan)
+double GetRightPanGain(double pan)
 {
    return ofClamp(pan, -1, 1) + 1;
 }
@@ -11479,10 +11484,10 @@ void DrawFallbackText(const char* text, float posX, float posY)
    }
 }
 
-bool EvaluateExpression(std::string expressionStr, float currentValue, float& output)
+bool EvaluateExpression(std::string expressionStr, double currentValue, double& output)
 {
-   exprtk::symbol_table<float> symbolTable;
-   exprtk::expression<float> expression;
+   exprtk::symbol_table<double> symbolTable;
+   exprtk::expression<double> expression;
    symbolTable.add_variable("current_value", currentValue);
    symbolTable.add_constants();
    expression.register_symbol_table(symbolTable);
@@ -11497,7 +11502,7 @@ bool EvaluateExpression(std::string expressionStr, float currentValue, float& ou
    if (input.startsWith("-="))
       input = input.replace("-=", "current_value-");
 
-   exprtk::parser<float> parser;
+   exprtk::parser<double> parser;
    bool expressionValid = parser.compile(input.toStdString(), expression);
    if (expressionValid)
    {

@@ -234,6 +234,6 @@ class IPush2GridController
 public:
    virtual ~IPush2GridController() {}
    virtual void OnPush2Connect() {}
-   virtual bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) = 0;
+   virtual bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) = 0;
    virtual void UpdatePush2Leds(Push2Control* push2) = 0;
 };

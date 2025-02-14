@@ -35,7 +35,7 @@
 NoteEcho::NoteEcho()
 {
    for (int i = 0; i < kMaxDestinations; ++i)
-      mDelay[i] = i * .125f;
+      mDelay[i] = i * .125;
 }
 
 void NoteEcho::CreateUIControls()
@@ -74,7 +74,7 @@ void NoteEcho::PlayNote(NoteMessage note)
 
    for (int i = 0; i < kMaxDestinations; ++i)
    {
-      double delayMs = mDelay[i] / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      const double delayMs = mDelay[i] / (static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       NoteMessage delayedNote = note.MakeClone();
       delayedNote.time += delayMs;
       SendNoteToIndex(i, delayedNote);

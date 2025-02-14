@@ -356,7 +356,7 @@ public:
       float width = getWidth();
       float height = getHeight();
 
-      static float kMotionTrails = .4f;
+      static double kMotionTrails = .4;
 
       ofVec3f bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
       glViewport(0, 0, width * mPixelRatio, height * mPixelRatio);
@@ -368,7 +368,7 @@ public:
 
       if (UserPrefs.motion_trails.Get() > 0)
       {
-         ofSetColor(bgColor.x * 255, bgColor.y * 255, bgColor.z * 255, (1 - (UserPrefs.motion_trails.Get() * kMotionTrails) * (ofGetFrameRate() / 60.0f)) * 255);
+         ofSetColor(bgColor.x * 255, bgColor.y * 255, bgColor.z * 255, (1 - (UserPrefs.motion_trails.Get() * kMotionTrails) * (ofGetFrameRate() / 60.0)) * 255);
          ofFill();
          ofRect(0, 0, width, height);
       }
@@ -393,7 +393,7 @@ public:
       const int64 kCalcFpsIntervalMs = 1000;
       if (time - mLastFpsUpdateTime >= kCalcFpsIntervalMs)
       {
-         mSynth.UpdateFrameRate(mFrameCountAccum / (kCalcFpsIntervalMs / 1000.0f));
+         mSynth.UpdateFrameRate(mFrameCountAccum / (kCalcFpsIntervalMs / 1000.0));
 
          mFrameCountAccum = 0;
          mLastFpsUpdateTime = time;

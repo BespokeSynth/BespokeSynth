@@ -118,7 +118,7 @@ void PulseTrain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void PulseTrain::OnTransportAdvanced(float amount)
+void PulseTrain::OnTransportAdvanced(double amount)
 {
    PROFILER(PulseTrain);
 
@@ -130,12 +130,12 @@ void PulseTrain::OnTimeEvent(double time)
    Step(time, 1, 0);
 }
 
-void PulseTrain::OnPulse(double time, float velocity, int flags)
+void PulseTrain::OnPulse(double time, double velocity, int flags)
 {
    mStep = 0;
 }
 
-void PulseTrain::Step(double time, float velocity, int flags)
+void PulseTrain::Step(double time, double velocity, int flags)
 {
    if (!mEnabled)
       return;
@@ -149,7 +149,7 @@ void PulseTrain::Step(double time, float velocity, int flags)
 
    if (mStep < mLength)
    {
-      float v = mVels[mStep] * velocity;
+      double v = mVels[mStep] * velocity;
 
       int new_flags = 0;
       if (mResetOnStart && mStep == 0)
@@ -221,7 +221,7 @@ void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PulseTrain::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -236,7 +236,7 @@ void PulseTrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
    }
 }
 
-void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mVelocityGrid)
    {

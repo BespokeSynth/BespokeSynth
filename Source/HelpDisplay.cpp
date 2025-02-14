@@ -474,7 +474,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoModuleScreenshotsButton)
    {
-      gDrawScale = 1.0f;
+      gDrawScale = 1.0;
 
       std::vector<ModuleCategory> moduleTypes = {
          kModuleCategory_Note,
@@ -585,7 +585,7 @@ void HelpDisplay::ScreenshotModule(IDrawableModule* module)
 
 void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, std::string filename)
 {
-   float scale = gDrawScale * TheSynth->GetPixelRatio();
+   double scale = gDrawScale * TheSynth->GetPixelRatio();
    x = (x + TheSynth->GetDrawOffset().x) * scale;
    y = (y + TheSynth->GetDrawOffset().y) * scale;
    width = width * scale;

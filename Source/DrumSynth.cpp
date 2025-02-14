@@ -48,7 +48,7 @@ DrumSynth::DrumSynth()
       int y = (1 - (i / DRUMSYNTH_PADS_HORIZONTAL)) * DRUMSYNTH_PAD_HEIGHT + kPadYOffset;
       mHits[i] = new DrumSynthHit(this, i, x, y);
       if (i == 0)
-         mHits[i]->mData.mVol = .5f;
+         mHits[i]->mData.mVol = .5;
    }
 }
 
@@ -160,7 +160,7 @@ void DrumSynth::PlayNote(NoteMessage note)
    if (note.pitch >= 0 && note.pitch < mHits.size())
    {
       if (note.velocity > 0)
-         mHits[note.pitch]->Play(note.time, note.velocity / 127.0f);
+         mHits[note.pitch]->Play(note.time, note.velocity / 127.0);
    }
 }
 
@@ -202,7 +202,7 @@ void DrumSynth::DrawModule()
       if (mHits[i]->Level() > 0)
       {
          ofFill();
-         ofSetColor(200, 100, 0, gModuleDrawAlpha * sqrtf(mHits[i]->Level()));
+         ofSetColor(200, 100, 0, gModuleDrawAlpha * sqrt(mHits[i]->Level()));
          ofRect(mHits[i]->mX, mHits[i]->mY, DRUMSYNTH_PAD_WIDTH, DRUMSYNTH_PAD_HEIGHT);
       }
       ofSetColor(200, 100, 0, gModuleDrawAlpha);
@@ -234,7 +234,7 @@ void DrumSynth::GetModuleDimensions(float& width, float& height)
    height = 2 + kPadYOffset + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;
 }
 
-void DrumSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void DrumSynth::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -369,9 +369,9 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
    mFilterCutoffMaxSlider->SetMaxValueDisplay("none");
 }
 
-void DrumSynth::DrumSynthHit::Play(double time, float velocity)
+void DrumSynth::DrumSynthHit::Play(double time, double velocity)
 {
-   float envelopeScale = ofLerp(.2f, 1, velocity);
+   double envelopeScale = ofLerp(.2, 1, velocity);
    mData.mFreqAdsr.Start(time, 1, envelopeScale);
    mData.mFilterAdsr.Start(time, 1, envelopeScale);
    mData.mTone.GetADSR()->Start(time, velocity, envelopeScale);
@@ -389,16 +389,16 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize, i
 
    for (size_t i = 0; i < bufferSize; ++i)
    {
-      float freq = ofLerp(mData.mFreqMin, mData.mFreqMax, mData.mFreqAdsr.Value(time));
+      double freq = ofLerp(mData.mFreqMin, mData.mFreqMax, mData.mFreqAdsr.Value(time));
       if (mData.mCutoffMax != DRUMSYNTH_NO_CUTOFF)
       {
          mFilter.SetSampleRate(sampleRate);
          mFilter.SetFilterParams(ofLerp(mData.mCutoffMin, mData.mCutoffMax, mData.mFilterAdsr.Value(time)), mData.mQ);
       }
-      float phaseInc = GetPhaseInc(freq) / oversampling;
+      double phaseInc = GetPhaseInc(freq) / oversampling;
 
       float sample = mData.mTone.Audio(time, mPhase) * mData.mVol * mData.mVol;
-      float noise = mData.mNoise.Audio(time, mPhase);
+      double noise = mData.mNoise.Audio(time, mPhase);
       noise *= noise * (noise > 0 ? 1 : -1); //square but keep sign
       sample += noise * mData.mVolNoise * mData.mVolNoise;
       if (mData.mCutoffMax != DRUMSYNTH_NO_CUTOFF)

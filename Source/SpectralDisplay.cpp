@@ -124,7 +124,7 @@ void SpectralDisplay::DrawModule()
    for (int i = kBinIgnore; i < end; i++)
    {
       float x = sqrtf(float(i - kBinIgnore) / (end - kBinIgnore - 1)) * w;
-      float samp = sqrtf(fabsf(mFFTData.mRealValues[i]) / end) * 3;
+      float samp = sqrtf(std::abs(mFFTData.mRealValues[i]) / end) * 3;
       float y = ofClamp(samp, 0, 1) * h;
       ofVertex(x, h - y);
 

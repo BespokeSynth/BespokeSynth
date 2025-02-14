@@ -86,7 +86,7 @@ void DotGrid::Render()
    if (GetHighlightCol(gTime) != -1)
    {
       ofFill();
-      ofSetColor(255, 255, 255, gModuleDrawAlpha * .2f);
+      ofSetColor(255, 255, 255, gModuleDrawAlpha * .2);
       ofRect(GetX(GetHighlightCol(gTime)), 0, xsize, mHeight);
    }
 
@@ -122,7 +122,7 @@ void DotGrid::Render()
          DotData& data = mData[GetDataIndex(i, j)];
          if (data.mOn)
          {
-            float bump = ofClamp((data.mLastPlayTime + 250.0f - gTime) / 250.0f, 0, 1);
+            float bump = ofClamp((data.mLastPlayTime + 250.0 - gTime) / 250.0, 0, 1);
             float radius = ofLerp(.65f, 1.0f, bump);
 
             //white outer ring
@@ -280,7 +280,7 @@ bool DotGrid::MouseMoved(float x, float y)
          if (mDragBehavior == DragBehavior::Velocity)
          {
             int dataIndex = GetDataIndex(mHoldCell.mCol, mHoldCell.mRow);
-            mData[dataIndex].mVelocity = std::clamp(mData[dataIndex].mVelocity - (y - mLastDragPosition.y) * .01f, 0.0f, 1.0f);
+            mData[dataIndex].mVelocity = std::clamp(mData[dataIndex].mVelocity - (y - mLastDragPosition.y) * .01, 0.0, 1.0);
          }
       }
 
@@ -306,7 +306,7 @@ bool DotGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool
    {
       DotData& data = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
       if (data.mOn)
-         data.mLength = std::max(data.mLength + scrollY * .1f, 0.0f);
+         data.mLength = std::max(data.mLength + scrollY * .1, 0.0);
    }
 
    return false;

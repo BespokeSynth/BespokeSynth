@@ -155,29 +155,29 @@ public:
    Sample* GetHeldSample() const { return mHeldSample; }
    void ClearHeldSample();
 
-   float GetRawMouseX() { return mMousePos.x; }
-   float GetRawMouseY() { return mMousePos.y; }
-   float GetMouseX(ModuleContainer* context, float rawX = FLT_MAX);
-   float GetMouseY(ModuleContainer* context, float rawY = FLT_MAX);
+   double GetRawMouseX() { return mMousePos.x; }
+   double GetRawMouseY() { return mMousePos.y; }
+   double GetMouseX(ModuleContainer* context, double rawX = std::numeric_limits<double>::max());
+   double GetMouseY(ModuleContainer* context, double rawY = std::numeric_limits<double>::max());
    void SetMousePosition(ModuleContainer* context, float x, float y);
    bool IsMouseButtonHeld(int button) const;
-   ofVec2f& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
-   void SetDrawOffset(ofVec2f offset) { mModuleContainer.SetDrawOffset(offset); }
+   ofVec2d& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
+   void SetDrawOffset(ofVec2d offset) { mModuleContainer.SetDrawOffset(offset); }
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
    void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
    double GetPixelRatio() const { return mPixelRatio; }
    long GetFrameCount() { return mFrameCount; }
    void SetUIScale(float scale) { mUILayerModuleContainer.SetDrawScale(scale); }
-   float GetUIScale() { return mUILayerModuleContainer.GetDrawScale(); }
+   double GetUIScale() { return mUILayerModuleContainer.GetDrawScale(); }
    ModuleContainer* GetRootContainer() { return &mModuleContainer; }
    ModuleContainer* GetUIContainer() { return &mUILayerModuleContainer; }
    bool ShouldShowGridSnap() const;
    bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
 
-   void ZoomView(float zoomAmount, bool fromMouse);
-   void SetZoomLevel(float zoomLevel);
-   void PanView(float x, float y);
-   void PanTo(float x, float y);
+   void ZoomView(double zoomAmount, bool fromMouse);
+   void SetZoomLevel(double zoomLevel);
+   void PanView(double x, double y);
+   void PanTo(double x, double y);
    void SetRawSpaceMouseTwist(float twist, bool isUsing)
    {
       mSpaceMouseInfo.mTwist = twist;
@@ -232,8 +232,8 @@ public:
          mRenderLock.unlock();
       }
    }
-   void UpdateFrameRate(float fps) { mFrameRate = fps; }
-   float GetFrameRate() const { return mFrameRate; }
+   void UpdateFrameRate(double fps) { mFrameRate = fps; }
+   double GetFrameRate() const { return mFrameRate; }
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
@@ -279,13 +279,13 @@ public:
    void SetFatalError(std::string error);
 
    static bool sShouldAutosave;
-   static float sBackgroundLissajousR;
-   static float sBackgroundLissajousG;
-   static float sBackgroundLissajousB;
-   static float sBackgroundR;
-   static float sBackgroundG;
-   static float sBackgroundB;
-   static float sCableAlpha;
+   static double sBackgroundLissajousR;
+   static double sBackgroundLissajousG;
+   static double sBackgroundLissajousB;
+   static double sBackgroundR;
+   static double sBackgroundG;
+   static double sBackgroundB;
+   static double sCableAlpha;
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
@@ -323,7 +323,7 @@ private:
    int mMoveModuleOffsetY{ 0 };
    bool mMoveModuleCanStickToCursor{ false }; //if the most current mMoveModule can stick to the cursor if you release the mouse button before moving it
 
-   ofVec2f mLastMoveMouseScreenPos;
+   ofVec2d mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
    bool mIsMousePanning{ false };
    std::array<bool, 5> mIsMouseButtonHeld{ false };
@@ -383,7 +383,7 @@ private:
    bool mLastClickWasEmptySpace{ false };
    bool mIsShiftPressed{ false };
    double mLastShiftPressTime{ -9999 };
-   ofVec2f mLastShiftPressMousePos{};
+   ofVec2d mLastShiftPressMousePos{};
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout{ false };
@@ -411,7 +411,7 @@ private:
    ofMutex mKeyInputMutex;
    std::vector<std::pair<int, bool> > mQueuedKeyInput;
 
-   ofVec2f mMousePos;
+   ofVec2d mMousePos;
    std::string mNextDrawTooltip;
    bool mHideTooltipsUntilMouseMove{ false };
 
@@ -421,7 +421,7 @@ private:
    juce::OpenGLContext* mOpenGLContext{ nullptr };
 
    std::recursive_mutex mRenderLock;
-   float mFrameRate{ 0 };
+   double mFrameRate{ 0 };
    long mFrameCount{ 0 };
 
    ModuleContainer mModuleContainer;

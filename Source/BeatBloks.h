@@ -72,7 +72,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    //IFloatSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
@@ -98,14 +98,14 @@ private:
 
    struct Blok
    {
-      Blok(float startTime, float duration, float confidence)
+      Blok(double startTime, double duration, double confidence)
       : mStartTime(startTime)
       , mDuration(duration)
       , mConfidence(confidence)
       {}
-      float mStartTime;
-      float mDuration;
-      float mConfidence;
+      double mStartTime;
+      double mDuration;
+      double mConfidence;
       BlokType mType{ BlokType::kBlok_Bar };
    };
 
@@ -124,8 +124,8 @@ private:
    void UpdateZoomExtents();
    void ResetRead();
    void ReadEchonestLine(const char* line);
-   float StartTime(const Blok& blok);
-   float GetInsertPosition(int& insertIndex);
+   double StartTime(const Blok& blok);
+   double GetInsertPosition(int& insertIndex);
    void PlaceHeldBlok();
    Blok* RemoveBlokAt(int x);
 
@@ -136,7 +136,7 @@ private:
 
    Sample* mSample{ nullptr };
 
-   float mVolume{ .6 };
+   double mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    float* mWriteBuffer;
    bool mPlay{ false };
@@ -144,20 +144,20 @@ private:
    bool mLoop{ true };
    Checkbox* mLoopCheckbox{ nullptr };
    int mMeasureEarly{ 0 };
-   float mClipStart{ 0 };
+   double mClipStart{ 0 };
    FloatSlider* mClipStartSlider{ nullptr };
-   float mClipEnd{ 1 };
+   double mClipEnd{ 1 };
    FloatSlider* mClipEndSlider{ nullptr };
-   float mZoomStart{ 0 };
+   double mZoomStart{ 0 };
    FloatSlider* mZoomStartSlider{ nullptr };
-   float mZoomEnd{ 1 };
+   double mZoomEnd{ 1 };
    FloatSlider* mZoomEndSlider{ nullptr };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    ClickButton* mWriteButton{ nullptr };
-   float mPlayheadRemainder{ 0 };
+   double mPlayheadRemainder{ 0 };
    int mPlayheadWhole{ 0 };
    bool mWantWrite{ false };
    ClickButton* mDoubleLengthButton{ nullptr };
@@ -172,29 +172,29 @@ private:
    DropdownList* mDrawBlokTypeDropdown{ nullptr };
    bool mLoading{ false };
    Blok* mHeldBlok{ nullptr };
-   float mMouseX{ 0 };
-   float mMouseY{ 0 };
-   float mGrabOffsetX{ 0 };
-   float mGrabOffsetY{ 0 };
+   double mMouseX{ 0 };
+   double mMouseY{ 0 };
+   double mGrabOffsetX{ 0 };
+   double mGrabOffsetY{ 0 };
    ClickButton* mGetLuckyButton{ nullptr };
    ClickButton* mLoseYourselfButton{ nullptr };
 
-   float mRemixPlayhead{ 0 };
+   double mRemixPlayhead{ 0 };
    bool mPlayRemix{ false };
    Checkbox* mPlayRemixCheckbox{ nullptr };
    std::list<Blok*> mRemixBloks;
    JumpBlender mRemixJumpBlender;
    Blok* mLastPlayedRemixBlok{ nullptr };
-   float mLastLookupPlayhead{ 0 };
+   double mLastLookupPlayhead{ 0 };
    ClickButton* mClearRemixButton{ nullptr };
-   float mRemixZoomStart{ 0 };
+   double mRemixZoomStart{ 0 };
    FloatSlider* mRemixZoomStartSlider{ nullptr };
-   float mRemixZoomEnd;
+   double mRemixZoomEnd;
    FloatSlider* mRemixZoomEndSlider{ nullptr };
    bool mBlockMultiPlaceEngaged{ false };
 
    bool mPlayBlokPreview{ false };
-   float mBlokPreviewPlayhead{ 0 };
+   double mBlokPreviewPlayhead{ 0 };
    Ramp mBlokPreviewRamp;
 
    bool mDrawSources{ false };
