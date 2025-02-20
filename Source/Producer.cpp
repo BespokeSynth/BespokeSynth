@@ -129,7 +129,7 @@ void Producer::Process(double time)
    GetVizBuffer()->WriteChunk(out, bufferSize, 0);
 }
 
-void Producer::FilesDropped(std::vector<std::string> files, int x, int y)
+void Producer::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mSample->Reset();
 
@@ -339,7 +339,7 @@ void Producer::DrawModule()
       mBiquad[i].Draw();
 }
 
-void Producer::OnClicked(float x, float y, bool right)
+void Producer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -374,7 +374,7 @@ void Producer::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Producer::GetModuleDimensions(float& width, float& height)
+void Producer::GetModuleDimensions(double& width, double& height)
 {
    width = 910;
    height = 430;

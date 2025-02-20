@@ -212,7 +212,7 @@ void M185Sequencer::ResetStep()
       FindNextStep();
 }
 
-void M185Sequencer::GetModuleDimensions(float& width, float& height)
+void M185Sequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

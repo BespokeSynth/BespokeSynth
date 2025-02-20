@@ -66,7 +66,7 @@ public:
    void SetForcedWidth(int width) { mForcedWidth = width; }
    void CopyContentsTo(DropdownList* list) const;
 
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    static int GetSpacing();
 
@@ -87,13 +87,13 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool CanBeTargetedBy(PatchCableSource* source) const override;
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   ofVec2f GetOptionPosition(int optionIndex);
+   ofVec2d GetOptionPosition(int optionIndex);
 
    //IPulseReceiver
    void OnPulse(double time, double velocity, int flags) override;
@@ -107,7 +107,7 @@ private:
    void UpdateDimensions();
    void SetValueDirect(float value, double time, bool forceUpdate);
 
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    int mWidth{ 15 };
    int mHeight{ 15 };

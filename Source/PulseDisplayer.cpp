@@ -77,7 +77,7 @@ void PulseDisplayer::OnPulse(double time, double velocity, int flags)
    DispatchPulse(GetPatchCableSource(), time, velocity, flags);
 }
 
-void PulseDisplayer::GetModuleDimensions(float& width, float& height)
+void PulseDisplayer::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

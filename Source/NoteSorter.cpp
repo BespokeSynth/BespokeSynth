@@ -49,7 +49,7 @@ void NoteSorter::DrawModule()
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
       mPitchEntry[i]->Draw();
-      ofRectangle rect = mPitchEntry[i]->GetRect(true);
+      ofRectangle_f rect = mPitchEntry[i]->GetRect(true);
       mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 15, rect.y + rect.height / 2);
    }
 }
@@ -89,7 +89,7 @@ void NoteSorter::TextEntryComplete(TextEntry* entry)
       mDestinationCables[i]->Flush(NextBufferTime(false));
 }
 
-void NoteSorter::GetModuleDimensions(float& width, float& height)
+void NoteSorter::GetModuleDimensions(double& width, double& height)
 {
    width = 80;
    height = 12 + (mDestinationCables.size() * 19);

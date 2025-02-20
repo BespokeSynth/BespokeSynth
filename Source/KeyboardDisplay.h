@@ -66,25 +66,25 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void RefreshOctaveCount();
 
    void DrawKeyboard(int x, int y, int w, int h);
    void SetPitchColor(int pitch);
-   ofRectangle GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;
+   ofRectangle_f GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;
 
    int RootKey() const;
    int NumKeys() const;
 
-   float mWidth{ 500 };
-   float mHeight{ 110 };
+   double mWidth{ 500 };
+   double mHeight{ 110 };
    int mRootOctave{ 3 };
    int mNumOctaves{ 3 };
    int mForceNumOctaves{ 0 };

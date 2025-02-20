@@ -227,8 +227,8 @@ struct ControlLayoutElement
    bool mActive{ false };
    MidiMessageType mType{ MidiMessageType::kMidiMessage_Control };
    int mControl{ 0 };
-   ofVec2f mPosition;
-   ofVec2f mDimensions;
+   ofVec2d mPosition;
+   ofVec2d mDimensions;
    ControlDrawType mDrawType{ ControlDrawType::kDrawType_Slider };
    double mIncrementAmount{ 0 };
    int mOffVal{ 0 };
@@ -250,8 +250,8 @@ struct GridLayout
 
    int mRows{ 1 };
    int mCols{ 8 };
-   ofVec2f mPosition;
-   ofVec2f mDimensions;
+   ofVec2d mPosition;
+   ofVec2d mDimensions;
    MidiMessageType mType{ kMidiMessage_Note };
    std::vector<int> mControls;
    std::vector<int> mColors;
@@ -371,9 +371,9 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
 
    void ConnectDevice();
    void MidiReceived(MidiMessageType messageType, int control, double value, int rawValue, int channel);

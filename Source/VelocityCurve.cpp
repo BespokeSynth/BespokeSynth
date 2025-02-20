@@ -93,7 +93,7 @@ void VelocityCurve::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void VelocityCurve::OnClicked(float x, float y, bool right)
+void VelocityCurve::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -107,7 +107,7 @@ void VelocityCurve::MouseReleased()
    mEnvelopeControl.MouseReleased();
 }
 
-bool VelocityCurve::MouseMoved(float x, float y)
+bool VelocityCurve::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 

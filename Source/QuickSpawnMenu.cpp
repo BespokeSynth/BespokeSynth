@@ -399,7 +399,7 @@ void QuickSpawnMenu::MouseReleased()
 {
 }
 
-bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool QuickSpawnMenu::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    const float kScrollSpeed = 5;
 
@@ -476,14 +476,14 @@ void QuickSpawnMenu::DrawModuleUnclipped()
       DrawTextBold(mSearchString.toStdString(), 3, -2, 15);
 }
 
-bool QuickSpawnMenu::MouseMoved(float x, float y)
+bool QuickSpawnMenu::MouseMoved(double x, double y)
 {
    mLastHoverX = x;
    mLastHoverY = y;
    return false;
 }
 
-void QuickSpawnMenu::OnClicked(float x, float y, bool right)
+void QuickSpawnMenu::OnClicked(double x, double y, bool right)
 {
    if (right)
    {
@@ -556,10 +556,10 @@ const ModuleFactory::Spawnable* QuickSpawnMenu::GetElementAt(int x, int y) const
    return nullptr;
 }
 
-void QuickSpawnFollower::GetDimensions(float& width, float& height)
+void QuickSpawnFollower::GetDimensions(double& width, double& height)
 {
    TheQuickSpawnMenu->GetDimensions(width, height);
-   float scaleFactor = UserPrefs.ui_scale.Get() / gDrawScale;
+   double scaleFactor = UserPrefs.ui_scale.Get() / gDrawScale;
    width *= scaleFactor;
    height *= scaleFactor;
 
@@ -569,9 +569,9 @@ void QuickSpawnFollower::GetDimensions(float& width, float& height)
 
 void QuickSpawnFollower::UpdateLocation()
 {
-   float x, y;
+   double x, y;
    TheQuickSpawnMenu->GetPosition(x, y);
-   float scaleFactor = UserPrefs.ui_scale.Get() / gDrawScale;
+   double scaleFactor = UserPrefs.ui_scale.Get() / gDrawScale;
    x *= scaleFactor;
    y *= scaleFactor;
    x -= TheSynth->GetDrawOffset().x;

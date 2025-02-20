@@ -123,7 +123,7 @@ void HelpDisplay::DrawModule()
          std::string typeName = mScreenshotsToProcess.begin()->mLabel;
          mScreenshotsToProcess.pop_front();
 
-         ofRectangle rect = mScreenshotModule->GetRect();
+         ofRectangle_f rect = mScreenshotModule->GetRect();
          rect.y -= IDrawableModule::TitleBarHeight();
          rect.height += IDrawableModule::TitleBarHeight();
          rect.grow(10);
@@ -158,13 +158,13 @@ void HelpDisplay::Poll()
    }
 }
 
-bool HelpDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool HelpDisplay::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mScrollOffsetY = ofClamp(mScrollOffsetY - scrollY * 10, 0, mMaxScrollAmount);
    return true;
 }
 
-void HelpDisplay::GetModuleDimensions(float& w, float& h)
+void HelpDisplay::GetModuleDimensions(double& w, double& h)
 {
    if (mScreenshotsToProcess.size() > 0)
    {

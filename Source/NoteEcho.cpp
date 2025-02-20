@@ -50,7 +50,7 @@ void NoteEcho::CreateUIControls()
       mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
       mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
       AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
-      ofRectangle rect = mDelaySlider[i]->GetRect(true);
+      ofRectangle_f rect = mDelaySlider[i]->GetRect(true);
       mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
    }
    ENDUIBLOCK(mWidth, mHeight);

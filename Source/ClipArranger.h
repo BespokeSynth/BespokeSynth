@@ -46,9 +46,9 @@ public:
    void Process(double time, float* left, float* right, int bufferSize);
 
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
 
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
@@ -62,12 +62,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
 
-   float MouseXToBufferPos(float mouseX);
-   int MouseXToSample(float mouseX);
-   float SampleToX(int sample);
+   double MouseXToBufferPos(double mouseX);
+   int MouseXToSample(double mouseX);
+   double SampleToX(int sample);
    bool IsMousePosWithinClip(int x, int y);
    void AddSample(Sample* sample, int x, int y);
 
@@ -97,8 +97,8 @@ private:
 
    Clip mClips[MAX_CLIPS];
 
-   float mBufferWidth{ 800 };
-   float mBufferHeight{ 80 };
+   double mBufferWidth{ 800 };
+   double mBufferHeight{ 80 };
    int mHighlightClip{ -1 };
    bool mMouseDown{ false };
    int mLastMouseX{ -1 };

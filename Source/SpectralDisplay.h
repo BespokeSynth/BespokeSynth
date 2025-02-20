@@ -50,7 +50,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -63,14 +63,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = mWidth;
       h = mHeight;
    }
 
-   float mWidth{ 400 };
-   float mHeight{ 100 };
+   double mWidth{ 400 };
+   double mHeight{ 100 };
 
    float* mWindower{ nullptr };
    float* mSmoother{ nullptr };

@@ -77,8 +77,8 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IDrawableModule
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
 
    //IGridControllerListener
@@ -134,8 +134,8 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
 
    ChannelBuffer mOutputBuffer;
@@ -197,7 +197,7 @@ private:
       }
       void UpdatePosition(int outputIndex)
       {
-         float w, h;
+         double w, h;
          mDrumPlayer->GetDimensions(w, h);
          mPatchCableSource->SetManualPosition(w, 7 + outputIndex * 12);
       }

@@ -111,7 +111,7 @@ void Ramper::DrawModule()
    mTargetValueSlider->Draw();
 }
 
-void Ramper::OnClicked(float x, float y, bool right)
+void Ramper::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -121,7 +121,7 @@ void Ramper::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool Ramper::MouseMoved(float x, float y)
+bool Ramper::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    return false;
@@ -170,7 +170,7 @@ void Ramper::ButtonClicked(ClickButton* button, double time)
       Go(time);
 }
 
-void Ramper::GetModuleDimensions(float& width, float& height)
+void Ramper::GetModuleDimensions(double& width, double& height)
 {
    width = 100;
    height = 38;

@@ -109,7 +109,7 @@ void GlobalControls::FloatSliderUpdated(FloatSlider* slider, double oldVal, doub
    }
 }
 
-void GlobalControls::GetModuleDimensions(float& w, float& h)
+void GlobalControls::GetModuleDimensions(double& w, double& h)
 {
    w = mWidth;
    h = mHeight;

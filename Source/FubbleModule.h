@@ -62,7 +62,7 @@ public:
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -85,7 +85,7 @@ public:
 
 private:
    double GetPlaybackTime(double time);
-   ofRectangle GetFubbleRect();
+   ofRectangle_f GetFubbleRect();
    ofVec2f GetFubbleMouseCoord();
    void RecordPoint();
    bool IsHovered();
@@ -96,9 +96,9 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
 
    struct FubbleAxis : public IModulator
@@ -132,8 +132,8 @@ private:
    double mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
-   float mWidth{ 220 };
-   float mHeight{ kTopControlHeight + 200 + kTimelineSectionHeight + kBottomControlHeight };
+   double mWidth{ 220 };
+   double mHeight{ kTopControlHeight + 200 + kTimelineSectionHeight + kBottomControlHeight };
    double mRecordStartOffset{ 0 };
    bool mIsDrawing{ false };
    bool mIsRightClicking{ false };

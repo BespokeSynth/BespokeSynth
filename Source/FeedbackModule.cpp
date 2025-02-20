@@ -54,7 +54,7 @@ void FeedbackModule::CreateUIControls()
    mDelay.CreateUIControls();
    mDelay.SetFeedbackModuleMode();
 
-   ofRectangle delayModuleRect = mDelay.GetRect(true);
+   ofRectangle_f delayModuleRect = mDelay.GetRect(true);
    mSignalLimitSlider = new FloatSlider(this, "limit", delayModuleRect.x, delayModuleRect.getMaxY() + 3, delayModuleRect.width, 15, &mSignalLimit, 0.01, 1);
    mSignalLimitSlider->SetMode(FloatSlider::kSquare);
 }

@@ -193,7 +193,7 @@ void NoteStreamDisplay::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void NoteStreamDisplay::Resize(float w, float h)
+void NoteStreamDisplay::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

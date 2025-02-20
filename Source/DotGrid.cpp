@@ -78,10 +78,10 @@ void DotGrid::Render()
    ofTranslate(mX, mY);
    ofPushStyle();
    ofSetLineWidth(.5f);
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   double xsize = mWidth / mCols;
+   double ysize = mHeight / mRows;
 
    if (GetHighlightCol(gTime) != -1)
    {
@@ -169,24 +169,24 @@ void DotGrid::Render()
    ofPopMatrix();
 }
 
-float DotGrid::GetX(int col) const
+double DotGrid::GetX(int col) const
 {
-   float xsize = float(mWidth) / mCols;
+   double xsize = static_cast<double>(mWidth) / mCols;
    return (col)*xsize;
 }
 
-float DotGrid::GetY(int row) const
+double DotGrid::GetY(int row) const
 {
-   float ysize = float(mHeight) / mRows;
+   double ysize = static_cast<double>(mHeight) / mRows;
    return mHeight - (row + 1) * ysize;
 }
 
-DotGrid::DotPosition DotGrid::GetGridCellAt(float x, float y, bool clamp /*= true*/)
+DotGrid::DotPosition DotGrid::GetGridCellAt(double x, double y, bool clamp /*= true*/)
 {
    y = (mHeight - 1) - y; //flip
 
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   double xsize = mWidth / mCols;
+   double ysize = mHeight / mRows;
 
    int col = x / xsize;
    int row = y / ysize;
@@ -200,9 +200,9 @@ DotGrid::DotPosition DotGrid::GetGridCellAt(float x, float y, bool clamp /*= tru
    return DotPosition(col, row);
 }
 
-ofVec2f DotGrid::GetCellPosition(int col, int row)
+ofVec2d DotGrid::GetCellPosition(int col, int row)
 {
-   return ofVec2f(GetX(col), GetY(row));
+   return { GetX(col), GetY(row) };
 }
 
 bool DotGrid::CanBeTargetedBy(PatchCableSource* source) const
@@ -210,7 +210,7 @@ bool DotGrid::CanBeTargetedBy(PatchCableSource* source) const
    return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
 }
 
-void DotGrid::OnClicked(float x, float y, bool right)
+void DotGrid::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -251,7 +251,7 @@ void DotGrid::MouseReleased()
    mMouseReleaseCanClear = false;
 }
 
-bool DotGrid::MouseMoved(float x, float y)
+bool DotGrid::MouseMoved(double x, double y)
 {
    bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
@@ -298,7 +298,7 @@ bool DotGrid::MouseMoved(float x, float y)
    return false;
 }
 
-bool DotGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool DotGrid::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 

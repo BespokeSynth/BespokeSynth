@@ -158,18 +158,18 @@ CurvePoint* Curve::GetPoint(int index)
    return &mPoints[index];
 }
 
-void Curve::OnClicked(float x, float y, bool right)
+void Curve::OnClicked(double x, double y, bool right)
 {
    ofLog() << "curve clicked";
 }
 
-bool Curve::MouseMoved(float x, float y)
+bool Curve::MouseMoved(double x, double y)
 {
    ofLog() << "curve mousemoved";
    return false;
 }
 
-bool Curve::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool Curve::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    ofLog() << "curve mousescrolled";
    return false;

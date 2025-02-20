@@ -115,13 +115,13 @@ void FloatSliderLFOControl::DrawModule()
 {
    /*if (!mPinned)
    {
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
 
       ofPushStyle();
       ofSetColor(0, 0, 0);
       ofFill();
-      ofSetLineWidth(.5f);
+      ofSetLineWidth(.5);
       ofRect(0, 0, w, h);
       ofNoFill();
       ofSetColor(255, 255, 255);
@@ -153,15 +153,15 @@ void FloatSliderLFOControl::DrawModule()
    int height = 35;
    int width = 90;
 
-   ofSetColor(100, 100, .8f * gModuleDrawAlpha);
-   ofSetLineWidth(.5f);
+   ofSetColor(100, 100, .8 * gModuleDrawAlpha);
+   ofSetLineWidth(.5);
    ofRect(x, y, width, height, 0);
 
    ofSetColor(245, 58, 0, gModuleDrawAlpha);
    ofSetLineWidth(1);
 
    ofBeginShape();
-   for (float i = 0; i < width; i += (.25 / gDrawScale))
+   for (double i = 0; i < width; i += (.25 / gDrawScale))
    {
       double phase = i / width;
       if (mLFO.GetOsc()->GetShuffle() > 0)
@@ -173,8 +173,8 @@ void FloatSliderLFOControl::DrawModule()
    }
    ofEndShape(false);
 
-   float currentPhase = mLFO.CalculatePhase(0, false);
-   float squeeze;
+   double currentPhase = mLFO.CalculatePhase(0, false);
+   double squeeze;
    if (mLFO.GetOsc()->GetShuffle() == 0)
    {
       squeeze = 1;
@@ -186,7 +186,7 @@ void FloatSliderLFOControl::DrawModule()
    }
    if (mLFO.GetOsc()->GetType() == kOsc_Perlin)
       currentPhase = 0;
-   float displayPhase = currentPhase;
+   double displayPhase = currentPhase;
    displayPhase -= 1 - mLFOSettings.mLFOOffset;
    if (displayPhase < 0)
       displayPhase += squeeze;
@@ -203,11 +203,11 @@ bool FloatSliderLFOControl::DrawToPush2Screen()
       ofSetColor(100, 100, 100);
       ofRect(rect);
 
-      float screenPos = rect.x + 1 + (rect.width - 2) * slider->ValToPos(slider->GetValue(), true);
-      float lfomax = ofClamp(GetMax(), slider->GetMin(), slider->GetMax());
-      float screenPosMax = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomax, true);
-      float lfomin = ofClamp(GetMin(), slider->GetMin(), slider->GetMax());
-      float screenPosMin = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomin, true);
+      double screenPos = rect.x + 1 + (rect.width - 2) * slider->ValToPos(slider->GetValue(), true);
+      double lfomax = ofClamp(GetMax(), slider->GetMin(), slider->GetMax());
+      double screenPosMax = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomax, true);
+      double lfomin = ofClamp(GetMin(), slider->GetMin(), slider->GetMax());
+      double screenPosMin = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomin, true);
 
       ofPushStyle();
       ofSetColor(0, 200, 0);

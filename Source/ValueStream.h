@@ -56,7 +56,7 @@ public:
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -75,13 +75,13 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    IUIControl* mUIControl{ nullptr };
    FloatSlider* mFloatSlider{ nullptr };
    PatchCableSource* mControlCable{ nullptr };
-   float mWidth{ 200 };
-   float mHeight{ 120 };
+   double mWidth{ 200 };
+   double mHeight{ 120 };
    double mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    std::array<double, 100000> mValues{};

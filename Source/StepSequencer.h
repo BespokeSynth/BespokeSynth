@@ -56,7 +56,7 @@ public:
    void PlayStep(double time, int step);
    void SetOffset(double offset);
    void UpdateTimeListener();
-   void Draw(float x, float y);
+   void Draw(double x, double y);
    int GetRowPitch() const { return mRowPitch; }
 
 private:
@@ -118,7 +118,7 @@ public:
 
    void Init() override;
    void Poll() override;
-   void PlayStepNote(double time, int note, float val);
+   void PlayStepNote(double time, int note, double val);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsEnabled() const override { return mEnabled; }
    int GetPadPressure(int row) { return mPadPressures[row]; }
@@ -150,11 +150,11 @@ public:
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //IPush2GridController
    bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
@@ -184,8 +184,8 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 

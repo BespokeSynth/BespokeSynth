@@ -54,7 +54,7 @@ public:
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return mDisplayMode == DisplayMode::Grid; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    bool HasSnapshot(int index) const;
    int GetCurrentSnapshot() const { return mCurrentSnapshot; }
@@ -108,9 +108,9 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
 
    enum class DisplayMode
    {

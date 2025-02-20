@@ -229,7 +229,7 @@ void EQModule::DrawModule()
    ofPushStyle();
    ofPushMatrix();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    h -= kDrawYOffset;
 
@@ -241,10 +241,10 @@ void EQModule::DrawModule()
    int lastX = -1;
    for (int i = kBinIgnore; i < end; i++)
    {
-      float freq = FreqForBin(i);
-      float x = PosForFreq(freq) * w;
-      float samp = ofClamp(sqrtf(std::abs(mFFTData.mRealValues[i]) / end) * 3 * mDrawGain, 0, 1);
-      float y = (1 - samp) * h + kDrawYOffset;
+      double freq = FreqForBin(i);
+      double x = PosForFreq(freq) * w;
+      double samp = ofClamp(std::sqrt(std::abs(mFFTData.mRealValues[i]) / end) * 3 * mDrawGain, 0, 1);
+      double y = (1 - samp) * h + kDrawYOffset;
       if (int(x) != lastX)
          ofVertex(x, y);
       lastX = int(x);
@@ -259,9 +259,9 @@ void EQModule::DrawModule()
    ofBeginShape();
    for (int i = kBinIgnore; i < end; i++)
    {
-      float freq = FreqForBin(i);
-      float x = PosForFreq(freq) * w;
-      float y = (1 - mSmoother[i - kBinIgnore]) * h + kDrawYOffset;
+      double freq = FreqForBin(i);
+      double x = PosForFreq(freq) * w;
+      double y = (1 - mSmoother[i - kBinIgnore]) * h + kDrawYOffset;
       if (int(x) != lastX)
          ofVertex(x, y);
       lastX = int(x);
@@ -345,7 +345,7 @@ bool EQModule::Filter::UpdateCoefficientsIfNecessary()
    return false;
 }
 
-void EQModule::OnClicked(float x, float y, bool right)
+void EQModule::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -360,11 +360,11 @@ void EQModule::MouseReleased()
    mDragging = false;
 }
 
-bool EQModule::MouseMoved(float x, float y)
+bool EQModule::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    h -= kDrawYOffset;
 
@@ -396,7 +396,7 @@ bool EQModule::MouseMoved(float x, float y)
    return false;
 }
 
-bool EQModule::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool EQModule::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (mHoveredFilterHandleIndex != -1)
    {
@@ -479,26 +479,26 @@ void EQModule::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void EQModule::GetModuleDimensions(float& w, float& h)
+void EQModule::GetModuleDimensions(double& w, double& h)
 {
    w = MAX(208, mWidth);
    h = MAX(150, mHeight);
 }
 
-void EQModule::Resize(float w, float h)
+void EQModule::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;
-   mModuleSaveData.SetInt("width", w);
-   mModuleSaveData.SetInt("height", h);
+   mModuleSaveData.SetFloat("width", w);
+   mModuleSaveData.SetFloat("height", h);
    mNeedToUpdateFrequencyResponseGraph = true;
 }
 
 void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("width", moduleInfo, mWidth, 50, 2000, K(isTextField));
-   mModuleSaveData.LoadInt("height", moduleInfo, mHeight, 50, 2000, K(isTextField));
+   mModuleSaveData.LoadFloat("width", moduleInfo, mWidth, 50, 2000, K(isTextField));
+   mModuleSaveData.LoadFloat("height", moduleInfo, mHeight, 50, 2000, K(isTextField));
    mModuleSaveData.LoadFloat("draw_gain", moduleInfo, 1, .1, 4, K(isTextField));
    mModuleSaveData.LoadBool("lite_cpu_modulation", moduleInfo, true);
 
@@ -514,8 +514,8 @@ void EQModule::SaveLayout(ofxJSONElement& moduleInfo)
 void EQModule::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   mWidth = mModuleSaveData.GetInt("width");
-   mHeight = mModuleSaveData.GetInt("height");
+   mWidth = mModuleSaveData.GetFloat("width");
+   mHeight = mModuleSaveData.GetFloat("height");
    mDrawGain = mModuleSaveData.GetFloat("draw_gain");
    mLiteCpuModulation = mModuleSaveData.GetBool("lite_cpu_modulation");
 }

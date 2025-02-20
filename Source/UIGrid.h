@@ -60,8 +60,8 @@ public:
    int GetCols() { return mCols; }
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    double& GetVal(int col, int row);
    void SetVal(int col, int row, double val, bool notifyListener = true);
    void SetHighlightCol(double time, int col);
@@ -74,14 +74,15 @@ public:
    void SetStrength(double strength) { mStrength = strength; }
    int CurrentHover() { return mCurrentHover; }
    void SetListener(UIGridListener* listener) { mListener = listener; }
-   void SetDrawOffset(int row, float amount) { mDrawOffset[row] = amount; }
-   void SetDimensions(float width, float height)
+   void SetDrawOffset(int row, double amount) { mDrawOffset[row] = amount; }
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;
    }
-   float GetWidth() const { return mWidth; }
-   float GetHeight() const { return mHeight; }
+
+   double GetWidth() const { return mWidth; }
+   double GetHeight() const { return mHeight; }
    void SetRestrictDragToRow(bool set) { mRestrictDragToRow = set; }
    void SetRequireShiftForMultislider(bool set) { mRequireShiftForMultislider = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
@@ -103,8 +104,8 @@ public:
    };
    void SetGridMode(GridMode mode) { mGridMode = mode; }
 
-   GridCell GetGridCellAt(float x, float y, float* clickHeight = nullptr, float* clickWidth = nullptr);
-   ofVec2f GetCellPosition(int col, int row);
+   GridCell GetGridCellAt(double x, double y, double* clickHeight = nullptr, double* clickWidth = nullptr);
+   ofVec2d GetCellPosition(int col, int row);
 
    //IUIControl
    void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
@@ -119,8 +120,8 @@ protected:
    ~UIGrid(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -137,8 +138,8 @@ private:
       int col{ -1 };
    };
 
-   float mWidth{ 200 };
-   float mHeight{ 200 };
+   double mWidth{ 200 };
+   double mHeight{ 200 };
    int mRows{ 0 };
    int mCols{ 0 };
    bool mClick{ false };
@@ -156,7 +157,7 @@ private:
    int mCurrentHover{ -1 };
    double mCurrentHoverAmount{ 1 };
    UIGridListener* mListener{ nullptr };
-   std::array<float, MAX_GRID_ROWS> mDrawOffset{};
+   std::array<double, MAX_GRID_ROWS> mDrawOffset{};
    GridMode mGridMode{ GridMode::kNormal };
    bool mRestrictDragToRow{ false };
    bool mRequireShiftForMultislider{ false };

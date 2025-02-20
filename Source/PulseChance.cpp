@@ -147,7 +147,7 @@ void PulseChance::ButtonClicked(ClickButton* button, double time)
       mSeed = (mSeed + 1) % 10000;
 }
 
-void PulseChance::GetModuleDimensions(float& width, float& height)
+void PulseChance::GetModuleDimensions(double& width, double& height)
 {
    width = 118;
    height = mDeterministic ? 61 : 38;

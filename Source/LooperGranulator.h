@@ -52,7 +52,7 @@ public:
    void CreateUIControls() override;
 
    void ProcessFrame(double time, double bufferOffset, float* output);
-   void DrawOverlay(ofRectangle bufferRect, int loopLength);
+   void DrawOverlay(ofRectangle_f bufferRect, int loopLength);
    bool IsActive() { return mOn; }
    bool ShouldFreeze() { return mOn && mFreeze; }
    void OnCommit();
@@ -74,10 +74,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
+   void GetModuleDimensions(double& w, double& h) override;
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    PatchCableSource* mLooperCable{ nullptr };
    Looper* mLooper{ nullptr };
    bool mOn{ false };

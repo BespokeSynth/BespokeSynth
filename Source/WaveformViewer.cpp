@@ -196,7 +196,7 @@ void WaveformViewer::PlayNote(NoteMessage note)
    }
 }
 
-void WaveformViewer::Resize(float w, float h)
+void WaveformViewer::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

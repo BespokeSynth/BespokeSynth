@@ -130,7 +130,7 @@ void Beats::DrawModule()
    }
 }
 
-void Beats::FilesDropped(std::vector<std::string> files, int x, int y)
+void Beats::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    for (auto file : files)
    {
@@ -142,7 +142,7 @@ void Beats::FilesDropped(std::vector<std::string> files, int x, int y)
    mHighlightColumn = -1;
 }
 
-void Beats::SampleDropped(int x, int y, Sample* sample)
+void Beats::SampleDropped(double x, double y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();
@@ -158,7 +158,7 @@ void Beats::SampleDropped(int x, int y, Sample* sample)
    mHighlightColumn = -1;
 }
 
-bool Beats::MouseMoved(float x, float y)
+bool Beats::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -182,7 +182,7 @@ void Beats::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void Beats::GetModuleDimensions(float& width, float& height)
+void Beats::GetModuleDimensions(double& width, double& height)
 {
    width = BEAT_COLUMN_WIDTH * (int)mBeatColumns.size();
    height = 0;

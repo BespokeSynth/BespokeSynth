@@ -38,7 +38,7 @@ CanvasTimeline::CanvasTimeline(Canvas* canvas, std::string name)
 
 void CanvasTimeline::Render()
 {
-   ofRectangle canvasRect = mCanvas->GetRect(true);
+   ofRectangle_f canvasRect = mCanvas->GetRect(true);
    SetPosition(canvasRect.x, canvasRect.y - 10);
    SetDimensions(canvasRect.width, 10);
 
@@ -133,7 +133,7 @@ double CanvasTimeline::GetQuantizedForX(double posX, HoverMode clampSide)
    return measure;
 }
 
-void CanvasTimeline::OnClicked(float x, float y, bool right)
+void CanvasTimeline::OnClicked(double x, double y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
@@ -169,7 +169,7 @@ void CanvasTimeline::MouseReleased()
    mClick = false;
 }
 
-bool CanvasTimeline::MouseMoved(float x, float y)
+bool CanvasTimeline::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
 
@@ -180,15 +180,15 @@ bool CanvasTimeline::MouseMoved(float x, float y)
       float startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
       float endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
 
-      ofRectangle betweenRect(startX, 0, endX - startX, mHeight);
+      ofRectangle_f betweenRect(startX, 0, endX - startX, mHeight);
       if (betweenRect.contains(x, y))
          mHoverMode = HoverMode::kMiddle;
 
-      ofRectangle loopStartRect(startX, 0, mHeight, mHeight);
+      ofRectangle_f loopStartRect(startX, 0, mHeight, mHeight);
       if (loopStartRect.contains(x, y))
          mHoverMode = HoverMode::kStart;
 
-      ofRectangle loopEndRect(endX - mHeight, 0, mHeight, mHeight);
+      ofRectangle_f loopEndRect(endX - mHeight, 0, mHeight, mHeight);
       if (loopEndRect.contains(x, y))
          mHoverMode = HoverMode::kEnd;
    }
@@ -200,7 +200,7 @@ bool CanvasTimeline::MouseMoved(float x, float y)
    return false;
 }
 
-bool CanvasTimeline::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool CanvasTimeline::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }

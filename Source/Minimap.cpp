@@ -28,7 +28,7 @@ void Minimap::CreateUIControls()
    mGrid = new UIGrid("uigrid", 0, 0, kMaxLength, kBookmarkSize, kNumBookmarks, 1, this);
 }
 
-void Minimap::GetDimensions(float& width, float& height)
+void Minimap::GetDimensions(double& width, double& height)
 {
    double windowWidth = ofGetWidth();
    double windowHeight = ofGetHeight();
@@ -59,7 +59,7 @@ void Minimap::GetDimensionsMinimap(float& width, float& height)
    }
 }
 
-void Minimap::ComputeBoundingBox(ofRectangle& rect)
+void Minimap::ComputeBoundingBox(ofRectangle_f& rect)
 {
    std::vector<IDrawableModule*> modules;
    TheSynth->GetRootContainer()->GetAllModules(modules);
@@ -78,7 +78,7 @@ void Minimap::ComputeBoundingBox(ofRectangle& rect)
       {
          continue;
       }
-      ofRectangle moduleRect = modules[i]->GetRect();
+      ofRectangle_f moduleRect = modules[i]->GetRect();
       RectUnion(rect, moduleRect);
    }
 
@@ -93,7 +93,7 @@ void Minimap::ComputeBoundingBox(ofRectangle& rect)
       rect.width = rect.height * minimapAspectRatio;
 }
 
-ofRectangle Minimap::CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& source)
+ofRectangle_f Minimap::CoordsToMinimap(ofRectangle_f& boundingBox, ofRectangle_f& source)
 {
    float width;
    float height;
@@ -107,7 +107,7 @@ ofRectangle Minimap::CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& sour
    return { x1, y1, x2 - x1, y2 - y1 };
 }
 
-ofVec2f Minimap::CoordsToViewport(ofRectangle& boundingBox, float x, float y)
+ofVec2f Minimap::CoordsToViewport(ofRectangle_f& boundingBox, float x, float y)
 {
    float width;
    float height;
@@ -119,7 +119,7 @@ ofVec2f Minimap::CoordsToViewport(ofRectangle& boundingBox, float x, float y)
    return { x1, y1 };
 }
 
-void Minimap::DrawModulesOnMinimap(ofRectangle& boundingBox)
+void Minimap::DrawModulesOnMinimap(ofRectangle_f& boundingBox)
 {
    std::vector<IDrawableModule*> modules;
    std::vector<IDrawableModule*> second_pass_modules;
@@ -148,9 +148,9 @@ void Minimap::DrawModulesOnMinimap(ofRectangle& boundingBox)
    ofPopStyle();
 }
 
-void Minimap::DrawModuleOnMinimap(ofRectangle& boundingBox, IDrawableModule* module)
+void Minimap::DrawModuleOnMinimap(ofRectangle_f& boundingBox, IDrawableModule* module)
 {
-   ofRectangle moduleRect = module->GetRect();
+   ofRectangle_f moduleRect = module->GetRect();
    ofColor moduleColor(IDrawableModule::GetColor(module->GetModuleCategory()));
    if (!module->GetChildren().empty())
       moduleColor.a = 127;
@@ -159,7 +159,7 @@ void Minimap::DrawModuleOnMinimap(ofRectangle& boundingBox, IDrawableModule* mod
    ofRect(CoordsToMinimap(boundingBox, moduleRect));
 }
 
-void Minimap::RectUnion(ofRectangle& target, ofRectangle& unionRect)
+void Minimap::RectUnion(ofRectangle_f& target, ofRectangle_f& unionRect)
 {
    float x2 = target.getMaxX();
    float y2 = target.getMaxY();
@@ -193,8 +193,8 @@ void Minimap::DrawModule()
 {
    float width;
    float height;
-   ofRectangle boundingBox;
-   ofRectangle viewport = TheSynth->GetDrawRect();
+   ofRectangle_f boundingBox;
+   ofRectangle_f viewport = TheSynth->GetDrawRect();
    ForcePosition();
    ComputeBoundingBox(boundingBox);
    GetDimensions(width, height);
@@ -262,11 +262,11 @@ void Minimap::DrawModule()
    }
 }
 
-void Minimap::OnClicked(float x, float y, bool right)
+void Minimap::OnClicked(double x, double y, bool right)
 {
    if (mGrid->TestClick(x, y, right, true))
    {
-      float gridX, gridY;
+      double gridX, gridY;
       mGrid->GetPosition(gridX, gridY, true);
       GridCell cell = mGrid->GetGridCellAt(x - gridX, y - gridY);
       int number = cell.mCol + cell.mRow + '1';
@@ -277,8 +277,8 @@ void Minimap::OnClicked(float x, float y, bool right)
    }
    else
    {
-      ofRectangle boundingBox;
-      ofRectangle viewport = TheSynth->GetDrawRect();
+      ofRectangle_f boundingBox;
+      ofRectangle_f viewport = TheSynth->GetDrawRect();
       ComputeBoundingBox(boundingBox);
       ofVec2f viewportCoords = CoordsToViewport(boundingBox, x, y);
       TheSynth->SetDrawOffset(ofVec2d(-viewportCoords.x + viewport.width / 2, -viewportCoords.y + viewport.height / 2));
@@ -291,12 +291,12 @@ void Minimap::MouseReleased()
    mClick = false;
 }
 
-bool Minimap::MouseMoved(float x, float y)
+bool Minimap::MouseMoved(double x, double y)
 {
    if (mClick)
    {
-      ofRectangle boundingBox;
-      ofRectangle viewport = TheSynth->GetDrawRect();
+      ofRectangle_f boundingBox;
+      ofRectangle_f viewport = TheSynth->GetDrawRect();
       ComputeBoundingBox(boundingBox);
       ofVec2f viewportCoords = CoordsToViewport(boundingBox, x, y);
       TheSynth->SetDrawOffset(ofVec2d(-viewportCoords.x + viewport.width / 2, -viewportCoords.y + viewport.height / 2));

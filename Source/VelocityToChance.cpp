@@ -99,7 +99,7 @@ void VelocityToChance::DrawModule()
 
    if (mDeterministic)
    {
-      ofRectangle lengthRect = mLengthSlider->GetRect(true);
+      ofRectangle_f lengthRect = mLengthSlider->GetRect(true);
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
@@ -169,7 +169,7 @@ void VelocityToChance::ButtonClicked(ClickButton* button, double time)
       mSeed = (mSeed + 1) % 10000;
 }
 
-void VelocityToChance::GetModuleDimensions(float& width, float& height)
+void VelocityToChance::GetModuleDimensions(double& width, double& height)
 {
    width = 118;
    height = mDeterministic ? 60 : 20;

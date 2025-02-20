@@ -72,7 +72,7 @@ public:
    void SetText(std::string text);
    void SelectAll();
 
-   void GetDimensions(float& width, float& height) override;
+   void GetDimensions(double& width, double& height) override;
 
    //IUIControl
    void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
@@ -102,8 +102,8 @@ private:
    void AcceptEntry(bool pressedEnter) override;
    void CancelEntry() override;
    void MoveCaret(int pos, bool allowSelection = true);
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
 
    int mCharWidth{ 3 };
    ITextEntryListener* mListener{ nullptr };

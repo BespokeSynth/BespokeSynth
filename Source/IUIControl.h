@@ -68,9 +68,9 @@ public:
       max = 1;
    }
    virtual bool IsBitmask() { return false; }
-   bool TestHover(int x, int y);
-   void CheckHover(int x, int y);
-   void DrawHover(float x, float y, float w, float h);
+   bool TestHover(double x, double y);
+   void CheckHover(double x, double y);
+   void DrawHover(double x, double y, double w, double h);
    void DrawPatchCableHover();
    virtual bool CanBeTargetedBy(PatchCableSource* source) const;
    virtual bool InvertScrollDirection() { return false; }

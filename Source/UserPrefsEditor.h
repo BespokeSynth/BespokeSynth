@@ -70,7 +70,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -87,6 +87,6 @@ private:
    ClickButton* mSaveButton{ nullptr };
    ClickButton* mCancelButton{ nullptr };
 
-   float mWidth{ 1150 };
-   float mHeight{ 50 };
+   double mWidth{ 1150 };
+   double mHeight{ 50 };
 };

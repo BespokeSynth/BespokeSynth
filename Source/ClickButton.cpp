@@ -73,7 +73,7 @@ void ClickButton::Render()
 {
    ofPushStyle();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofColor color, textColor;
@@ -119,8 +119,8 @@ void ClickButton::Render()
       ofSetColor(textColor);
       for (int i = 0; i < 5; ++i)
       {
-         float height = (i % 2 == 0) ? 6 : 10;
-         float x = mX + 4 + i * 3;
+         double height = (i % 2 == 0) ? 6 : 10;
+         double x = mX + 4 + i * 3;
          ofLine(x, mY + 7 - height / 2, x, mY + 7 + height / 2);
       }
    }
@@ -129,8 +129,8 @@ void ClickButton::Render()
       ofSetColor(textColor);
       for (int i = 0; i < 5; ++i)
       {
-         float height = (i % 2 == 0) ? 6 : 10;
-         float x = mX + 4 + i * 3;
+         double height = (i % 2 == 0) ? 6 : 10;
+         double x = mX + 4 + i * 3;
          ofLine(x, mY + 7 - height / 2, x, mY + 7 + height / 2);
       }
       DrawTextNormal(GetDisplayName(), mX + 22, mY + 12);
@@ -158,23 +158,23 @@ void ClickButton::Render()
    else if (mDisplayStyle == ButtonDisplayStyle::kPlus)
    {
       ofSetColor(textColor);
-      ofSetLineWidth(1.5f);
+      ofSetLineWidth(1.5);
       ofLine(mX + 10, mY + 3, mX + 10, mY + 12);
-      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofLine(mX + 6, mY + 7.5, mX + 14, mY + 7.5);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kMinus)
    {
       ofSetColor(textColor);
-      ofSetLineWidth(1.5f);
-      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofSetLineWidth(1.5);
+      ofLine(mX + 6, mY + 7.5, mX + 14, mY + 7.5);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kHamburger)
    {
       ofSetColor(textColor);
-      ofSetLineWidth(1.0f);
-      ofLine(mX + 6, mY + 4.5f, mX + 14, mY + 4.5f);
-      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
-      ofLine(mX + 6, mY + 10.5f, mX + 14, mY + 10.5f);
+      ofSetLineWidth(1.0);
+      ofLine(mX + 6, mY + 4.5, mX + 14, mY + 4.5);
+      ofLine(mX + 6, mY + 7.5, mX + 14, mY + 7.5);
+      ofLine(mX + 6, mY + 10.5, mX + 14, mY + 10.5);
    }
 
    ofPopStyle();
@@ -200,7 +200,7 @@ void ClickButton::OnPulse(double time, double velocity, int flags)
       DoClick(time);
 }
 
-void ClickButton::OnClicked(float x, float y, bool right)
+void ClickButton::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -219,7 +219,7 @@ void ClickButton::MouseReleased()
    mClickTime = 0;
 }
 
-bool ClickButton::MouseMoved(float x, float y)
+bool ClickButton::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    return false;

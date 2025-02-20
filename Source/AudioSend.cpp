@@ -44,7 +44,7 @@ void AudioSend::CreateUIControls()
    mAmountSlider = new FloatSlider(this, "amount", 3, 3, 80, 15, &mAmount, 0, 1, 2);
    mCrossfadeCheckbox = new Checkbox(this, "crossfade", mAmountSlider, kAnchor_Below, &mCrossfade);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    GetPatchCableSource()->SetManualPosition(w / 2 - 15, h + 3);
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);

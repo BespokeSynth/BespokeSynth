@@ -114,7 +114,7 @@ private:
    int mDefault{ 0 };
    int mIndex{ -1 };
    DropdownList* mDropdown{ nullptr };
-   float mWidth{ 100 };
+   double mWidth{ 100 };
 };
 
 class UserPrefDropdownString : public UserPref
@@ -144,7 +144,7 @@ private:
    std::string mDefault;
    int mIndex{ -1 };
    DropdownList* mDropdown{ nullptr };
-   float mWidth{ 100 };
+   double mWidth{ 100 };
 };
 
 class UserPrefTextEntryInt : public UserPref
@@ -338,8 +338,7 @@ public:
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
    UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };
-   UserPrefTextEntryFloat mouse_offset_y
-   {
+   UserPrefTextEntryFloat mouse_offset_y{
       "mouse_offset_y",
 #if BESPOKE_MAC
       -4,

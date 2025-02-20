@@ -149,7 +149,7 @@ void SpectralDisplay::DrawModule()
    ofPopStyle();
 }
 
-void SpectralDisplay::Resize(float w, float h)
+void SpectralDisplay::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

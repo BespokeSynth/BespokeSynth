@@ -112,12 +112,12 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    static constexpr int kMaxLoopers = 8;
 
-   float mWidth{ 235 };
-   float mHeight{ 126 };
+   double mWidth{ 235 };
+   double mHeight{ 126 };
    RollingBuffer mRecordBuffer;
    std::array<Looper*, kMaxLoopers> mLoopers{ nullptr };
    int mNumLoopers{ 4 };

@@ -52,7 +52,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    std::string mComment{};
    TextEntry* mCommentEntry{ nullptr };

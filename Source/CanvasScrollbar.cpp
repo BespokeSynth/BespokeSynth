@@ -39,7 +39,7 @@ CanvasScrollbar::CanvasScrollbar(Canvas* canvas, std::string name, Style style)
 
 void CanvasScrollbar::Render()
 {
-   ofRectangle canvasRect = mCanvas->GetRect(true);
+   ofRectangle_f canvasRect = mCanvas->GetRect(true);
    if (mStyle == Style::kHorizontal)
    {
       SetPosition(canvasRect.x, canvasRect.getMaxY());
@@ -63,7 +63,7 @@ void CanvasScrollbar::Render()
    ofTranslate(mX, mY);
    ofPushStyle();
    ofSetLineWidth(.5f);
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    ofFill();
    ofRect(0, 0, mWidth, mHeight);
@@ -94,7 +94,7 @@ double CanvasScrollbar::GetBarEnd() const
    return 1;
 }
 
-void CanvasScrollbar::OnClicked(float x, float y, bool right)
+void CanvasScrollbar::OnClicked(double x, double y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
@@ -110,7 +110,7 @@ void CanvasScrollbar::MouseReleased()
    mClick = false;
 }
 
-bool CanvasScrollbar::MouseMoved(float x, float y)
+bool CanvasScrollbar::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
 
@@ -130,7 +130,7 @@ bool CanvasScrollbar::MouseMoved(float x, float y)
    return false;
 }
 
-bool CanvasScrollbar::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool CanvasScrollbar::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }

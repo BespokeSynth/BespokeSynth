@@ -54,7 +54,7 @@ public:
    double GetEffectAmount() override;
    std::string GetType() override { return "biquad"; }
 
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -69,7 +69,7 @@ public:
 
 private:
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    void DrawModule() override;
 
    void ResetFilter();

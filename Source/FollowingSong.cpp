@@ -121,11 +121,11 @@ void FollowingSong::DrawModule()
    ofPopMatrix();
 
    ofPushStyle();
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    ofFill();
    ofSetColor(255, 255, 255, 50);
-   float beatWidth = w / 4;
+   double beatWidth = w / 4;
    ofRect(int(TheTransport->GetMeasurePos(gTime) * 4) * beatWidth, 0, beatWidth, h);
    ofPopStyle();
 }

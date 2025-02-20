@@ -42,10 +42,10 @@ struct ofColor
    int getBrightness() const;
    void setSaturation(int _sat);
    int getSaturation() const;
-   void getHsb(float& h, float& s, float& b) const;
+   void getHsb(double& h, double& s, double& b) const;
    void setHsb(int h, int s, int b);
    ofColor operator*(const ofColor& other);
-   ofColor operator*(float f);
+   ofColor operator*(double f);
    ofColor operator+(const ofColor& other);
    int r{ 0 };
    int g{ 0 };
@@ -223,8 +223,8 @@ struct ofRectangle_t
    T height{ 100 };
 };
 
-typedef ofRectangle_t<float> ofRectangle;
-typedef ofRectangle_t<double> ofRectangle_d;
+typedef ofRectangle_t<float> ofRectangle_f;
+typedef ofRectangle_t<double> ofRectangle;
 
 using ofMutex = std::recursive_mutex;
 
@@ -289,10 +289,10 @@ class RetinaTrueTypeFont
 public:
    RetinaTrueTypeFont() {}
    void LoadFont(std::string path);
-   void DrawString(std::string str, float size, float x, float y);
-   ofRectangle DrawStringWrap(std::string str, float size, float x, float y, float width);
-   float GetStringWidth(std::string str, float size);
-   float GetStringHeight(std::string str, float size);
+   void DrawString(std::string str, double size, double x, double y);
+   ofRectangle DrawStringWrap(std::string str, double size, double x, double y, double width);
+   double GetStringWidth(std::string str, double size);
+   double GetStringHeight(std::string str, double size);
    bool IsLoaded() { return mLoaded; }
    int GetFontHandle() const { return mFontHandle; }
    std::string GetFontPath() const { return mFontPath; }
@@ -304,7 +304,7 @@ private:
    std::string mFontPath;
 };
 
-typedef ofVec2f ofPoint;
+typedef ofVec2d ofPoint;
 
 std::string ofToSamplePath(const std::string& path);
 std::string ofToDataPath(const std::string& path);
@@ -314,20 +314,20 @@ void ofPushStyle();
 void ofPopStyle();
 void ofPushMatrix();
 void ofPopMatrix();
-void ofTranslate(float x, float y, float z = 0);
-void ofRotate(float radians);
-void ofClipWindow(float x, float y, float width, float height, bool intersectWithExisting);
+void ofTranslate(double x, double y, double z = 0);
+void ofRotate(double radians);
+void ofClipWindow(double x, double y, double width, double height, bool intersectWithExisting);
 void ofResetClipWindow();
-void ofSetColor(float r, float g, float b, float a = 255);
-void ofSetColor(float grey);
+void ofSetColor(double r, double g, double b, double a = 255);
+void ofSetColor(double grey);
 void ofSetColor(const ofColor& color);
-void ofSetColor(const ofColor& color, float a);
-void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2f gradientStart, ofVec2f gradientEnd);
+void ofSetColor(const ofColor& color, double a);
+void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2d gradientStart, ofVec2d gradientEnd);
 void ofFill();
 void ofNoFill();
-void ofCircle(float x, float y, float radius);
-void ofRect(float x, float y, float width, float height, float cornerRadius = 3);
-void ofRect(const ofRectangle& rect, float cornerRadius = 3);
+void ofCircle(double x, double y, double radius);
+void ofRect(double x, double y, double width, double height, double cornerRadius = 3);
+void ofRect(const ofRectangle& rect, double cornerRadius = 3);
 
 template <class T, class U, class V>
 T ofClamp(const T val, const U a, const V b)
@@ -346,13 +346,13 @@ int ofToInt(const std::string& intString);
 float ofToFloat(const std::string& floatString);
 double ofToDouble(const std::string& doubleString);
 int ofHexToInt(const std::string& hexString);
-void ofLine(float x1, float y1, float x2, float y2);
+void ofLine(double x1, double y1, double x2, double y2);
 void ofLine(ofVec2f v1, ofVec2f v2);
-void ofSetLineWidth(float width);
+void ofSetLineWidth(double width);
 void ofBeginShape();
 void ofEndShape(bool close = false);
-void ofVertex(float x, float y, float z = 0);
-void ofVertex(ofVec2f point);
+void ofVertex(double x, double y, double z = 0);
+void ofVertex(ofVec2d point);
 
 template <class T>
 T ofMap(T val, T fromStart, T fromEnd, T toStart, T toEnd, bool clamp = false)
@@ -375,10 +375,10 @@ T ofMap(T val, T1 fromStart, T2 fromEnd, T3 toStart, T4 toEnd, bool clamp = fals
 
 double ofRandom(double max);
 double ofRandom(double x, double y);
-void ofSetCircleResolution(float res);
+void ofSetCircleResolution(double res);
 unsigned long long ofGetSystemTimeNanos();
-float ofGetWidth();
-float ofGetHeight();
+double ofGetWidth();
+double ofGetHeight();
 double ofGetFrameRate();
 
 template <class T>
@@ -405,9 +405,9 @@ T ofDistSquared(T x1, T1 y1, T2 x2, T3 y2)
 
 std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty = false, bool trim = false);
 bool ofIsStringInString(const std::string& haystack, const std::string& needle);
-void ofScale(float x, float y, float z);
+void ofScale(double x, double y, double z);
 void ofExit();
 void ofToggleFullscreen();
 void ofStringReplace(std::string& str, std::string from, std::string to, bool firstOnly = false);
 std::string ofGetTimestampString(std::string in);
-void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3);
+void ofTriangle(double x1, double y1, double x2, double y2, double x3, double y3);

@@ -50,7 +50,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -69,7 +69,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = mWidth;
       h = mHeight;
@@ -85,8 +85,8 @@ private:
    int mLengthSamples{ 2048 };
    double mDrawGain{ 2 };
    bool mPhaseAlign{ true };
-   float mWidth{ 600 };
-   float mHeight{ 150 };
+   double mWidth{ 600 };
+   double mHeight{ 150 };
    bool mDrawWaveform{ true };
    bool mDrawCircle{ false };
 

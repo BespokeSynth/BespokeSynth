@@ -51,7 +51,7 @@ public:
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    bool DrawToPush2Screen() override;
 
    int GetNumMeasures() const { return mNumMeasures; }
@@ -88,7 +88,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -101,8 +101,8 @@ private:
       std::vector<CanvasElement*> mNotes;
    };
 
-   float mWidth{ 370 };
-   float mHeight{ 140 };
+   double mWidth{ 370 };
+   double mHeight{ 140 };
    int mMinRow{ 127 };
    int mMaxRow{ 0 };
    bool mWrite{ false };

@@ -257,13 +257,13 @@ int DotSequencer::RowToPitch(int row) const
    return row;
 }
 
-bool DotSequencer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool DotSequencer::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mDotGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
 }
 
-void DotSequencer::Resize(float w, float h)
+void DotSequencer::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;
@@ -273,7 +273,7 @@ void DotSequencer::Resize(float w, float h)
    mDotGrid->SetDimensions(w - 8 - gridPos.x, h - 5 - gridPos.y);
 }
 
-void DotSequencer::GetModuleDimensions(float& width, float& height)
+void DotSequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

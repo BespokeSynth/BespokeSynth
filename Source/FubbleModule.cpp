@@ -160,7 +160,7 @@ void FubbleModule::DrawModule()
    ofFill();
 
    ofPushMatrix();
-   ofRectangle rect = GetFubbleRect();
+   ofRectangle_f rect = GetFubbleRect();
    ofTranslate(rect.x, rect.y);
    ofRect(0, 0, rect.width, rect.height);
 
@@ -312,19 +312,19 @@ void FubbleModule::DrawModuleUnclipped()
    DrawTextNormal("(concept by @_ojack_)", 60, -3, 9);
 }
 
-ofRectangle FubbleModule::GetFubbleRect()
+ofRectangle_f FubbleModule::GetFubbleRect()
 {
-   return ofRectangle(10, kTopControlHeight, mWidth - 20, mHeight - (kTimelineSectionHeight + kBottomControlHeight + kTopControlHeight));
+   return ofRectangle_f(10, kTopControlHeight, mWidth - 20, mHeight - (kTimelineSectionHeight + kBottomControlHeight + kTopControlHeight));
 }
 
 ofVec2f FubbleModule::GetFubbleMouseCoord()
 {
-   ofRectangle fubbleRect = GetFubbleRect();
+   ofRectangle_f fubbleRect = GetFubbleRect();
    return ofVec2f(ofClamp((mMouseX - fubbleRect.x) / fubbleRect.width, 0, 1),
                   ofClamp(1 - ((mMouseY - fubbleRect.y) / fubbleRect.height), 0, 1));
 }
 
-void FubbleModule::OnClicked(float x, float y, bool right)
+void FubbleModule::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -399,7 +399,7 @@ void FubbleModule::MouseReleased()
    }
 }
 
-bool FubbleModule::MouseMoved(float x, float y)
+bool FubbleModule::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -453,13 +453,13 @@ void FubbleModule::ButtonClicked(ClickButton* button, double time)
       UpdatePerlinSeed();
 }
 
-void FubbleModule::GetModuleDimensions(float& width, float& height)
+void FubbleModule::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void FubbleModule::Resize(float w, float h)
+void FubbleModule::Resize(double w, double h)
 {
    w = MAX(w, 211);
    h = MAX(h, 180);

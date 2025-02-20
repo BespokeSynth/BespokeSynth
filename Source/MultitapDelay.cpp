@@ -174,7 +174,7 @@ void MultitapDelay::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void MultitapDelay::OnClicked(float x, float y, bool right)
+void MultitapDelay::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -184,7 +184,7 @@ void MultitapDelay::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool MultitapDelay::MouseMoved(float x, float y)
+bool MultitapDelay::MouseMoved(double x, double y)
 {
    return IDrawableModule::MouseMoved(x, y);
 }
@@ -193,7 +193,7 @@ void MultitapDelay::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void MultitapDelay::GetModuleDimensions(float& width, float& height)
+void MultitapDelay::GetModuleDimensions(double& width, double& height)
 {
    width = mBufferW + 10;
    height = mBufferY + mBufferH + 10 + 100 * mNumTaps;

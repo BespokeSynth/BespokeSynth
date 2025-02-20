@@ -120,7 +120,7 @@ void BiquadFilterEffect::DrawModule()
       return 20.0 * std::pow(2.0, pos * 10);
    };
 
-   float w, h;
+   double w, h;
    GetModuleDimensions(w, h);
    ofSetColor(52, 204, 235);
    ofSetLineWidth(1);
@@ -153,7 +153,7 @@ double BiquadFilterEffect::GetEffectAmount()
    return 0;
 }
 
-void BiquadFilterEffect::GetModuleDimensions(float& width, float& height)
+void BiquadFilterEffect::GetModuleDimensions(double& width, double& height)
 {
    width = 120;
    height = 69;
@@ -196,7 +196,7 @@ void BiquadFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal, doubl
    }
 }
 
-bool BiquadFilterEffect::MouseMoved(float x, float y)
+bool BiquadFilterEffect::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 

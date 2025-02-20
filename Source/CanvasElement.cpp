@@ -67,8 +67,8 @@ void CanvasElement::Draw(ofVec2f offset)
 
 void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2f offset)
 {
-   ofRectangle rect = GetRect(clamp, wrapped, offset);
-   ofRectangle fullRect = GetRect(false, wrapped, offset);
+   ofRectangle_f rect = GetRect(clamp, wrapped, offset);
+   ofRectangle_f fullRect = GetRect(false, wrapped, offset);
 
    if (rect.width < 0)
    {
@@ -126,7 +126,7 @@ void CanvasElement::DrawOffscreen()
    ofSetLineWidth(1);
    ofSetColor(255, 255, 255);
    {
-      ofRectangle rect = GetRect(K(clamp), !K(wrapped));
+      ofRectangle_f rect = GetRect(K(clamp), !K(wrapped));
       if (rect.y < 0)
       {
          rect.y = 0;
@@ -142,7 +142,7 @@ void CanvasElement::DrawOffscreen()
    }
    if (mCanvas->ShouldWrap() && GetEnd() > 1)
    {
-      ofRectangle rect = GetRect(K(clamp), K(wrapped));
+      ofRectangle_f rect = GetRect(K(clamp), K(wrapped));
       if (rect.y < 0)
       {
          rect.y = 0;
@@ -196,7 +196,7 @@ void CanvasElement::SetEnd(double end)
    mLength = end * mCanvas->GetNumCols() - mCol - mOffset;
 }
 
-ofRectangle CanvasElement::GetRect(bool clamp, bool wrapped, ofVec2f offset) const
+ofRectangle_f CanvasElement::GetRect(bool clamp, bool wrapped, ofVec2f offset) const
 {
    double wrapOffset = wrapped ? -1 : 0;
    double start = ofMap(GetStart() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
@@ -204,10 +204,10 @@ ofRectangle CanvasElement::GetRect(bool clamp, bool wrapped, ofVec2f offset) con
    double y = static_cast<double>(mRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows() * mCanvas->GetHeight();
    double height = static_cast<double>(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
 
-   return ofRectangle(start + offset.x, y + offset.y, end - start, height);
+   return ofRectangle_f(start + offset.x, y + offset.y, end - start, height);
 }
 
-ofRectangle CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const
+ofRectangle_f CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const
 {
    int newRow;
    int newCol;
@@ -220,7 +220,7 @@ ofRectangle CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVec2
    double y = (float(newRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
    double height = float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
 
-   return ofRectangle(start, y, end - start, height);
+   return ofRectangle_f(start, y, end - start, height);
 }
 
 void CanvasElement::GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, double& newOffset) const
@@ -368,7 +368,7 @@ void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    ofFill();
    //DrawTextNormal(ofToString(mVelocity), GetRect(true, false).x, GetRect(true, false).y);
 
-   ofRectangle rect = GetRect(clamp, wrapped, offset);
+   ofRectangle_f rect = GetRect(clamp, wrapped, offset);
    float fullHeight = rect.height;
    rect.height *= mVelocity;
    rect.y += (fullHeight - rect.height) * .5f;
@@ -381,7 +381,7 @@ void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    /*ofSetLineWidth(1.5f * gDrawScale);
       
    rect = GetRect(clamp, wrapped);
-   ofRectangle fullRect = GetRect(false, false);
+   ofRectangle_f fullRect = GetRect(false, false);
    if (wrapped)
       fullRect.x -= mCanvas->GetWidth();
    float length = (GetEnd()-GetStart()) * mCanvas->GetLength();
@@ -555,7 +555,7 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    if (wrapped)
       return;
 
-   ofRectangle rect = GetRect(false, false, offset);
+   ofRectangle_f rect = GetRect(false, false, offset);
 
    ofPushMatrix();
    ofTranslate(rect.x, rect.y);
@@ -703,7 +703,7 @@ void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    if (mIsCheckbox)
    {
       text = mUIControl->Name();
-      ofRectangle rect = GetRect(clamp, false, offset);
+      ofRectangle_f rect = GetRect(clamp, false, offset);
       ofSetColor(0, 0, 0);
       DrawTextNormal(text, rect.x + 4, rect.y + 11);
       ofSetColor(255, 255, 255);
@@ -715,7 +715,7 @@ void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
       text += ":";
       text += mUIControl->GetDisplayValue(mValue);
 
-      ofRectangle rect = GetRect(clamp, false, offset);
+      ofRectangle_f rect = GetRect(clamp, false, offset);
       ofSetColor(0, 0, 0);
       DrawTextNormal(text, rect.x + rect.width + 1, rect.y + 11);
       ofSetColor(255, 255, 255);

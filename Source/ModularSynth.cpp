@@ -16,8 +16,8 @@
 #include "Sample.h"
 #include "FloatSliderLFOControl.h"
 //#include <CoreServices/CoreServices.h>
-#include "fenv.h"
-#include <stdlib.h>
+#include <cfenv>
+#include <cstdlib>
 #include "GridController.h"
 #include "FileStream.h"
 #include "PatchCable.h"
@@ -44,6 +44,9 @@
 #include <windows.h>
 #include <dbghelp.h>
 #include <winbase.h>
+#endif
+#ifdef max
+#undef max
 #endif
 
 ModularSynth* TheSynth = nullptr;
@@ -557,19 +560,19 @@ void ModularSynth::Draw(void* vg)
    if (ShouldShowGridSnap())
    {
       ofPushStyle();
-      ofSetLineWidth(.5f);
+      ofSetLineWidth(.5);
       ofSetColor(255, 255, 255, 40);
-      float gridSnapSize = UserPrefs.grid_snap_size.Get();
+      double gridSnapSize = UserPrefs.grid_snap_size.Get();
       int gridLinesVertical = (int)ceil((ofGetWidth() / gDrawScale) / gridSnapSize);
       for (int i = 0; i < gridLinesVertical; ++i)
       {
-         float x = i * gridSnapSize - floor(GetDrawOffset().x / gridSnapSize) * gridSnapSize;
+         double x = i * gridSnapSize - floor(GetDrawOffset().x / gridSnapSize) * gridSnapSize;
          ofLine(x, -GetDrawOffset().y, x, -GetDrawOffset().y + ofGetHeight() / gDrawScale);
       }
       int gridLinesHorizontal = (int)ceil((ofGetHeight() / gDrawScale) / gridSnapSize);
       for (int i = 0; i < gridLinesHorizontal; ++i)
       {
-         float y = i * gridSnapSize - floor(GetDrawOffset().y / gridSnapSize) * gridSnapSize;
+         double y = i * gridSnapSize - floor(GetDrawOffset().y / gridSnapSize) * gridSnapSize;
          ofLine(-GetDrawOffset().x, y, -GetDrawOffset().x + ofGetWidth() / gDrawScale, y);
       }
       ofPopStyle();
@@ -590,7 +593,7 @@ void ModularSynth::Draw(void* vg)
       ofPushStyle();
 
       ofSetColor(255, 255, 255, 100);
-      ofSetLineWidth(.5f);
+      ofSetLineWidth(.5);
       ofFill();
       ofRectangle rect = dropTarget->GetRect();
 
@@ -608,7 +611,7 @@ void ModularSynth::Draw(void* vg)
 
    for (int i = 0; i < mLissajousDrawers.size(); ++i)
    {
-      float moduleX, moduleY;
+      double moduleX, moduleY;
       mLissajousDrawers[i]->GetPosition(moduleX, moduleY);
       IAudioSource* source = dynamic_cast<IAudioSource*>(mLissajousDrawers[i]);
       DrawLissajous(source->GetVizBuffer(), moduleX, moduleY - 240, 240, 240);
@@ -636,7 +639,7 @@ void ModularSynth::Draw(void* vg)
    if (mSoundStream.getTickCount() - mSoundStream.GetLastStarvationTick() < starvationDisplayTicks)
    {
       ofPushStyle();
-      ofSetColor(255,255,255, (1.0f-(float(mSoundStream.getTickCount() - mSoundStream.GetLastStarvationTick())/starvationDisplayTicks))*255);
+      ofSetColor(255,255,255, (1.0-(double(mSoundStream.getTickCount() - mSoundStream.GetLastStarvationTick())/starvationDisplayTicks))*255);
       DrawTextNormal("X", 5, 15);
       ofPopStyle();
    }*/
@@ -675,8 +678,8 @@ void ModularSynth::Draw(void* vg)
 
    ofPushMatrix();
    {
-      float uiScale = mUILayerModuleContainer.GetDrawScale();
-      if (uiScale < .01f)
+      double uiScale = mUILayerModuleContainer.GetDrawScale();
+      if (uiScale < .01)
       {
          //safety check in case anything ever makes the UI inaccessible
          LogEvent("correcting UI scale", kLogEventType_Error);
@@ -696,7 +699,7 @@ void ModularSynth::Draw(void* vg)
    for (auto* modal : mModalFocusItemStack)
    {
       ofPushMatrix();
-      float scale = modal->GetOwningContainer()->GetDrawScale();
+      double scale = modal->GetOwningContainer()->GetDrawScale();
       ofVec2d offset = modal->GetOwningContainer()->GetDrawOffset();
       ofScale(scale, scale, scale);
       ofTranslate(offset.x, offset.y);
@@ -706,7 +709,8 @@ void ModularSynth::Draw(void* vg)
 
    std::string tooltip = "";
    ModuleContainer* tooltipContainer = nullptr;
-   ofVec2f tooltipPos(FLT_MAX, FLT_MAX);
+
+   ofVec2d tooltipPos(std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
    if (mNextDrawTooltip != "")
    {
       tooltip = mNextDrawTooltip;
@@ -782,35 +786,35 @@ void ModularSynth::Draw(void* vg)
       }
 
       ofPushMatrix();
-      float scale = tooltipContainer->GetDrawScale();
+      auto scale = tooltipContainer->GetDrawScale();
       auto offset = tooltipContainer->GetDrawOffset();
       ofScale(scale, scale, scale);
       ofTranslate(offset.x, offset.y);
 
-      float maxWidth = 300;
+      double maxWidth = 300;
 
-      float fontSize = 13;
+      double fontSize = 13;
       nvgFontFaceId(gNanoVG, gFont.GetFontHandle());
       nvgFontSize(gNanoVG, fontSize);
       float bounds[4];
       nvgTextBoxBounds(gNanoVG, tooltipPos.x, tooltipPos.y, maxWidth, tooltip.c_str(), nullptr, bounds);
-      float padding = 3;
+      double padding = 3;
       ofRectangle rect(bounds[0] - padding, bounds[1] - padding, bounds[2] - bounds[0] + padding * 2, bounds[3] - bounds[1] + padding * 2);
 
-      float minX = 5 - offset.x;
-      float maxX = ofGetWidth() / scale - rect.width - 5 - offset.x;
-      float minY = 5 - offset.y;
-      float maxY = ofGetHeight() / scale - rect.height - 5 - offset.y;
+      double minX = 5 - offset.x;
+      double maxX = ofGetWidth() / scale - rect.width - 5 - offset.x;
+      double minY = 5 - offset.y;
+      double maxY = ofGetHeight() / scale - rect.height - 5 - offset.y;
 
-      float onscreenRectX = ofClamp(rect.x, minX, maxX);
+      double onscreenRectX = ofClamp(rect.x, minX, maxX);
       if (onscreenRectX < rect.x)
       {
          tooltipPos.y += 20;
          rect.y += 20;
       }
-      float onscreenRectY = ofClamp(rect.y, minY, maxY);
+      double onscreenRectY = ofClamp(rect.y, minY, maxY);
 
-      float tooltipBackgroundAlpha = 180;
+      double tooltipBackgroundAlpha = 180;
 
       ofFill();
       ofSetColor(50, 50, 50, tooltipBackgroundAlpha);
@@ -829,15 +833,15 @@ void ModularSynth::Draw(void* vg)
 
    ofPushStyle();
    ofNoFill();
-   float centerX = ofGetWidth() * .5f;
-   float centerY = ofGetHeight() * .5f;
+   double centerX = ofGetWidth() * .5f;
+   double centerY = ofGetHeight() * .5f;
    if (mSpaceMouseInfo.mTwist != 0)
    {
       if (mSpaceMouseInfo.mUsingTwist)
          ofSetColor(0, 255, 255, 100);
       else
          ofSetColor(0, 100, 255, 100);
-      ofSetLineWidth(1.5f);
+      ofSetLineWidth(1.5);
       ofCircle(centerX + sin(mSpaceMouseInfo.mTwist * M_PI) * 20, centerY + cos(mSpaceMouseInfo.mTwist * M_PI) * 20, 3);
       ofCircle(centerX + sin(mSpaceMouseInfo.mTwist * M_PI + M_PI) * 20, centerY + cos(mSpaceMouseInfo.mTwist * M_PI + M_PI) * 20, 3);
    }
@@ -884,7 +888,7 @@ void ModularSynth::DrawConsole()
       ofPopStyle();
    }*/
 
-   float consoleY = TheTitleBar->GetRect().height + 15;
+   double consoleY = TheTitleBar->GetRect().height + 15;
 
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
    {
@@ -906,7 +910,7 @@ void ModularSynth::DrawConsole()
    if (mHasCircularDependency)
    {
       ofPushStyle();
-      float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .5f, 1);
+      double pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .5f, 1);
       ofSetColor(255 * pulse, 255 * pulse, 0);
       DrawTextNormal("circular dependency detected", 0, consoleY + 20);
       ofPopStyle();
@@ -922,7 +926,7 @@ void ModularSynth::DrawConsole()
          ofPushStyle();
          ofSetColor(0, 0, 0, 150);
          ofFill();
-         float titleBarW, titleBarH;
+         double titleBarW, titleBarH;
          TheTitleBar->GetDimensions(titleBarW, titleBarH);
          ofRect(0, consoleY - 16, titleBarW, outputLines * 15 + 3);
          ofPopStyle();
@@ -1142,8 +1146,8 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    mUILayerModuleContainer.KeyPressed(key, isRepeat);
    mModuleContainer.KeyPressed(key, isRepeat);
 
-   //if (key == '/' && !isRepeat)
-   //   ofToggleFullscreen();
+   if (key == '/' && !isRepeat)
+      ofToggleFullscreen();
 
    if (key == 'p' && GetKeyModifiers() == kModifier_Shift && !isRepeat)
       mAudioPaused = !mAudioPaused;
@@ -1179,15 +1183,15 @@ void ModularSynth::KeyReleased(int key)
 
 double ModularSynth::GetMouseX(ModuleContainer* context, double rawX /*= std::numeric_limits<double>::max() */)
 {
-   return ((rawX == FLT_MAX ? mMousePos.x : rawX) + UserPrefs.mouse_offset_x.Get()) / context->GetDrawScale() - context->GetDrawOffset().x;
+   return ((ofAlmostEquel(rawX, std::numeric_limits<double>::max()) ? mMousePos.x : rawX) + UserPrefs.mouse_offset_x.Get()) / context->GetDrawScale() - context->GetDrawOffset().x;
 }
 
 double ModularSynth::GetMouseY(ModuleContainer* context, double rawY /*= std::numeric_limits<double>::max() */)
 {
-   return ((rawY == FLT_MAX ? mMousePos.y : rawY) + UserPrefs.mouse_offset_y.Get()) / context->GetDrawScale() - context->GetDrawOffset().y;
+   return ((ofAlmostEquel(rawY, std::numeric_limits<double>::max()) ? mMousePos.y : rawY) + UserPrefs.mouse_offset_y.Get()) / context->GetDrawScale() - context->GetDrawOffset().y;
 }
 
-void ModularSynth::SetMousePosition(ModuleContainer* context, float x, float y)
+void ModularSynth::SetMousePosition(ModuleContainer* context, double x, double y)
 {
    x = (x + context->GetDrawOffset().x) * context->GetDrawScale() - UserPrefs.mouse_offset_x.Get() + mMainComponent->getScreenX();
    y = (y + context->GetDrawOffset().y) * context->GetDrawScale() - UserPrefs.mouse_offset_y.Get() + mMainComponent->getScreenY();
@@ -1244,8 +1248,8 @@ void ModularSynth::MouseMoved(int intX, int intY)
    {
       for (auto* modal : mModalFocusItemStack)
       {
-         float x = GetMouseX(modal->GetOwningContainer());
-         float y = GetMouseY(modal->GetOwningContainer());
+         double x = GetMouseX(modal->GetOwningContainer());
+         double y = GetMouseY(modal->GetOwningContainer());
          modal->NotifyMouseMoved(x, y);
       }
 
@@ -1254,13 +1258,13 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
    if (mMoveModule)
    {
-      float x = GetMouseX(&mModuleContainer);
-      float y = GetMouseY(&mModuleContainer);
+      double x = GetMouseX(&mModuleContainer);
+      double y = GetMouseY(&mModuleContainer);
 
-      float oldX, oldY;
+      double oldX, oldY;
       mMoveModule->GetPosition(oldX, oldY);
-      float newX = x + mMoveModuleOffsetX;
-      float newY = y + mMoveModuleOffsetY;
+      double newX = x + mMoveModuleOffsetX;
+      double newY = y + mMoveModuleOffsetY;
 
       if (ShouldShowGridSnap())
       {
@@ -1347,8 +1351,8 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
    if (changed)
    {
-      float x = GetMouseX(&mUILayerModuleContainer);
-      float y = GetMouseY(&mUILayerModuleContainer);
+      double x = GetMouseX(&mUILayerModuleContainer);
+      double y = GetMouseY(&mUILayerModuleContainer);
       mUILayerModuleContainer.MouseMoved(x, y);
 
       x = GetMouseX(&mModuleContainer);
@@ -1360,14 +1364,14 @@ void ModularSynth::MouseMoved(int intX, int intY)
    {
       if (!gHoveredUIControl->IsMouseDown())
       {
-         float x = GetMouseX(gHoveredUIControl->GetModuleParent()->GetOwningContainer());
-         float y = GetMouseY(gHoveredUIControl->GetModuleParent()->GetOwningContainer());
+         double x = GetMouseX(gHoveredUIControl->GetModuleParent()->GetOwningContainer());
+         double y = GetMouseY(gHoveredUIControl->GetModuleParent()->GetOwningContainer());
 
-         float uiX, uiY;
+         double uiX, uiY;
          gHoveredUIControl->GetPosition(uiX, uiY);
-         float w, h;
+         double w, h;
          gHoveredUIControl->GetDimensions(w, h);
-         const float kHoverBreakDistance = 5;
+         const double kHoverBreakDistance = 5;
          if (x < uiX - kHoverBreakDistance || y < uiY - kHoverBreakDistance || x > uiX + w + kHoverBreakDistance || y > uiY + h + kHoverBreakDistance || //moved far enough away from ui control
              (y < gHoveredUIControl->GetModuleParent()->GetPosition().y && uiY > gHoveredUIControl->GetModuleParent()->GetPosition().y)) //hovering over title bar (and it's not the enable/disable checkbox)
             gHoveredUIControl = nullptr;
@@ -1379,8 +1383,8 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
 void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::MouseInputSource& source)
 {
-   float x = GetMouseX(&mModuleContainer);
-   float y = GetMouseY(&mModuleContainer);
+   double x = GetMouseX(&mModuleContainer);
+   double y = GetMouseY(&mModuleContainer);
 
    mLastMouseDragPos = ofVec2f(x, y);
 
@@ -1426,8 +1430,8 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
 
    if (mGroupSelectContext != nullptr)
    {
-      const float gx = GetMouseX(mGroupSelectContext);
-      const float gy = GetMouseY(mGroupSelectContext);
+      const double gx = GetMouseX(mGroupSelectContext);
+      const double gy = GetMouseY(mGroupSelectContext);
       ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, gx), MIN(mClickStartY, gy)), ofPoint(MAX(mClickStartX, gx), MAX(mClickStartY, gy)));
       if (rect.width > 10 || rect.height > 10)
       {
@@ -1445,10 +1449,10 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    }
    else if (mLastClickedModule)
    {
-      float oldX, oldY;
+      double oldX, oldY;
       mLastClickedModule->GetPosition(oldX, oldY);
-      float newX = x + mMoveModuleOffsetX;
-      float newY = y + mMoveModuleOffsetY;
+      double newX = x + mMoveModuleOffsetX;
+      double newY = y + mMoveModuleOffsetY;
 
       if (ShouldShowGridSnap())
       {
@@ -1461,8 +1465,8 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
          }
       }
 
-      float adjustedDragX = newX - oldX;
-      float adjustedDragY = newY - oldY;
+      double adjustedDragX = newX - oldX;
+      double adjustedDragY = newY - oldY;
 
       for (auto module : mGroupSelectedModules)
          module->Move(adjustedDragX, adjustedDragY);
@@ -1470,7 +1474,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
 
    if (mMoveModule)
    {
-      float oldX, oldY;
+      double oldX, oldY;
       mMoveModule->GetPosition(oldX, oldY);
       double newX = x + mMoveModuleOffsetX;
       double newY = y + mMoveModuleOffsetY;
@@ -1491,11 +1495,11 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
 
    if (mResizeModule)
    {
-      float moduleX, moduleY;
+      double moduleX, moduleY;
       mResizeModule->GetPosition(moduleX, moduleY);
-      float newWidth = x - moduleX;
-      float newHeight = y - moduleY;
-      ofVec2f minimumDimensions = mResizeModule->GetMinimumDimensions();
+      double newWidth = x - moduleX;
+      double newHeight = y - moduleY;
+      ofVec2d minimumDimensions = mResizeModule->GetMinimumDimensions();
       newWidth = MAX(newWidth, minimumDimensions.x);
       newHeight = MAX(newHeight, minimumDimensions.y);
       mResizeModule->Resize(newWidth, newHeight);
@@ -1515,10 +1519,10 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
       mIsMouseButtonHeld[button] = true;
 
-   float x = GetMouseX(&mModuleContainer);
-   float y = GetMouseY(&mModuleContainer);
+   double x = GetMouseX(&mModuleContainer);
+   double y = GetMouseY(&mModuleContainer);
 
-   mLastMouseDragPos = ofVec2f(x, y);
+   mLastMouseDragPos = ofVec2d(x, y);
    mGroupSelectContext = nullptr;
 
    IKeyboardFocusListener::sKeyboardFocusBeforeClick = IKeyboardFocusListener::GetActiveKeyboardFocus();
@@ -1565,7 +1569,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
        (GetTopModalFocusItem() == nullptr || hoveredUIControlModuleParent == GetTopModalFocusItem()))
    {
       //if we have a hovered UI control, clamp clicks within its rect and direct them straight to it
-      ofVec2f controlClickPos(GetMouseX(hoveredUIControlModuleParent->GetOwningContainer()), GetMouseY(hoveredUIControlModuleParent->GetOwningContainer()));
+      ofVec2d controlClickPos(GetMouseX(hoveredUIControlModuleParent->GetOwningContainer()), GetMouseY(hoveredUIControlModuleParent->GetOwningContainer()));
       controlClickPos -= gHoveredUIControl->GetParent()->GetPosition();
 
       ofRectangle controlRect = gHoveredUIControl->GetRect(K(local));
@@ -1581,8 +1585,8 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    {
       if (GetTopModalFocusItem())
       {
-         float modalX = GetMouseX(GetTopModalFocusItem()->GetOwningContainer());
-         float modalY = GetMouseY(GetTopModalFocusItem()->GetOwningContainer());
+         double modalX = GetMouseX(GetTopModalFocusItem()->GetOwningContainer());
+         double modalY = GetMouseY(GetTopModalFocusItem()->GetOwningContainer());
          bool clicked = GetTopModalFocusItem()->TestClick(modalX, modalY, rightButton);
          if (!clicked)
          {
@@ -1590,9 +1594,9 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
             if (lfo) //if it's an LFO, don't dismiss it if you're adjusting the slider
             {
                FloatSlider* slider = lfo->GetOwner();
-               float uiX, uiY;
+               double uiX, uiY;
                slider->GetPosition(uiX, uiY);
-               float w, h;
+               double w, h;
                slider->GetDimensions(w, h);
 
                if (x < uiX || y < uiY || x > uiX + w || y > uiY + h)
@@ -1707,7 +1711,7 @@ void ModularSynth::ToggleQuickSpawn()
    }
 }
 
-void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas)
+void ModularSynth::MouseScrolled(double xScroll, double yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas)
 {
    xScroll *= UserPrefs.scroll_multiplier_horizontal.Get();
    yScroll *= UserPrefs.scroll_multiplier_vertical.Get();
@@ -1752,7 +1756,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       ClickButton* clickButton = dynamic_cast<ClickButton*>(gHoveredUIControl);
       if (floatSlider || intSlider)
       {
-         float w, h;
+         double w, h;
          gHoveredUIControl->GetDimensions(w, h);
          movementScale = 200.0 / w;
       }
@@ -1796,7 +1800,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
    }
 }
 
-void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor, const juce::MouseInputSource& source)
+void ModularSynth::MouseMagnify(int intX, int intY, double scaleFactor, const juce::MouseInputSource& source)
 {
    mMousePos.x = intX;
    mMousePos.y = intY;
@@ -1874,8 +1878,8 @@ bool ModularSynth::IsModalFocusItem(IDrawableModule* item) const
 
 IDrawableModule* ModularSynth::GetModuleAtCursor(int offsetX /*=0*/, int offsetY /*=0*/)
 {
-   float x = GetMouseX(&mUILayerModuleContainer) + offsetX;
-   float y = GetMouseY(&mUILayerModuleContainer) + offsetY;
+   double x = GetMouseX(&mUILayerModuleContainer) + offsetX;
+   double y = GetMouseY(&mUILayerModuleContainer) + offsetY;
    IDrawableModule* uiLayerModule = mUILayerModuleContainer.GetModuleAt(x, y);
    if (uiLayerModule)
       return uiLayerModule;
@@ -1885,21 +1889,21 @@ IDrawableModule* ModularSynth::GetModuleAtCursor(int offsetX /*=0*/, int offsetY
    return mModuleContainer.GetModuleAt(x, y);
 }
 
-void ModularSynth::CheckClick(IDrawableModule* clickedModule, float x, float y, bool rightButton)
+void ModularSynth::CheckClick(IDrawableModule* clickedModule, double x, double y, bool rightButton)
 {
    if (clickedModule != TheTitleBar)
       MoveToFront(clickedModule);
 
    //check to see if we clicked in the move area
    ofRectangle moduleRect = clickedModule->GetRect();
-   float modulePosX = x - moduleRect.x;
-   float modulePosY = y - moduleRect.y;
+   double modulePosX = x - moduleRect.x;
+   double modulePosY = y - moduleRect.y;
 
    if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnabledCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
       SetMoveModule(clickedModule, moduleRect.x - x, moduleRect.y - y, false);
 
-   float parentX = 0;
-   float parentY = 0;
+   double parentX = 0;
+   double parentY = 0;
    if (clickedModule->GetParent())
       clickedModule->GetParent()->GetPosition(parentX, parentY);
 
@@ -1960,8 +1964,8 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
    if (button == 3)
       return;
 
-   float x = GetMouseX(&mModuleContainer);
-   float y = GetMouseY(&mModuleContainer);
+   double x = GetMouseX(&mModuleContainer);
+   double y = GetMouseY(&mModuleContainer);
 
    if (GetTopModalFocusItem())
    {
@@ -1999,7 +2003,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
       IDrawableModule* module = GetModuleAtCursor();
       if (module)
       {
-         float moduleX, moduleY;
+         double moduleX, moduleY;
          module->GetPosition(moduleX, moduleY);
          module->SampleDropped(x - moduleX, y - moduleY, GetHeldSample());
       }
@@ -2160,8 +2164,8 @@ void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int in
 {
    if (files.size() > 0)
    {
-      float x = GetMouseX(&mModuleContainer, intX);
-      float y = GetMouseY(&mModuleContainer, intY);
+      auto x = GetMouseX(&mModuleContainer, intX);
+      auto y = GetMouseY(&mModuleContainer, intY);
       IDrawableModule* target = GetModuleAtCursor();
 
       if (files.size() == 1 && juce::String(files[0]).endsWith(".bsk"))
@@ -2172,7 +2176,7 @@ void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int in
 
       if (target != nullptr)
       {
-         float moduleX, moduleY;
+         double moduleX, moduleY;
          target->GetPosition(moduleX, moduleY);
          x -= moduleX;
          y -= moduleY;
@@ -2479,7 +2483,7 @@ bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayo
       IDrawableModule* output2 = FindModule("output 2");
       if (output1 != nullptr && output1->GetPosition().y > ofGetHeight() / gDrawScale - 40)
       {
-         float offset = ofGetHeight() / gDrawScale - output1->GetPosition().y - 40;
+         double offset = ofGetHeight() / gDrawScale - output1->GetPosition().y - 40;
          if (gain != nullptr)
             gain->SetPosition(gain->GetPosition().x, gain->GetPosition().y + offset);
          if (splitter != nullptr)
@@ -2492,7 +2496,7 @@ bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayo
 
       if (output2 != nullptr && output2->GetPosition().x > ofGetWidth() / gDrawScale - 100)
       {
-         float offset = ofGetWidth() / gDrawScale - output2->GetPosition().x - 100;
+         double offset = ofGetWidth() / gDrawScale - output2->GetPosition().x - 100;
          if (gain != nullptr)
             gain->SetPosition(gain->GetPosition().x + offset, gain->GetPosition().y);
          if (splitter != nullptr)
@@ -2715,7 +2719,7 @@ void ModularSynth::GrabSample(ChannelBuffer* data, std::string name, bool window
          {
             for (int ch = 0; ch < mHeldSample->NumChannels(); ++ch)
             {
-               float fade = float(i) / fadeSamples;
+               double fade = static_cast<double>(i) / fadeSamples;
                mHeldSample->Data()->GetChannel(ch)[i] *= fade;
                mHeldSample->Data()->GetChannel(ch)[length - 1 - i] *= fade;
             }
@@ -3167,7 +3171,7 @@ void ModularSynth::OnConsoleInput(std::string command /* = "" */)
       else
       {
          ofLog() << "Creating: " << mConsoleText;
-         ofVec2f grabOffset(-40, 10);
+         ofVec2d grabOffset(-40, 10);
          ModuleFactory::Spawnable spawnable;
          spawnable.mLabel = mConsoleText;
          IDrawableModule* module = SpawnModuleOnTheFly(spawnable, GetMouseX(&mModuleContainer) + grabOffset.x, GetMouseY(&mModuleContainer) + grabOffset.y);
@@ -3212,7 +3216,7 @@ void ModularSynth::DoAutosave()
    SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk")), true);
 }
 
-IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spawnable, float x, float y, bool addToContainer, std::string name)
+IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spawnable, double x, double y, bool addToContainer, std::string name)
 {
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
@@ -3314,7 +3318,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
    return module;
 }
 
-void ModularSynth::SetMoveModule(IDrawableModule* module, float offsetX, float offsetY, bool canStickToCursor)
+void ModularSynth::SetMoveModule(IDrawableModule* module, double offsetX, double offsetY, bool canStickToCursor)
 {
    mMoveModule = module;
    mMoveModuleOffsetX = offsetX;

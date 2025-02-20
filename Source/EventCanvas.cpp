@@ -270,7 +270,7 @@ void EventCanvas::DrawModule()
    mIntervalSelector->Draw();
    mRecordCheckbox->Draw();
 
-   ofRectangle canvasRect = mCanvas->GetRect(true);
+   ofRectangle_f canvasRect = mCanvas->GetRect(true);
    for (int i = 0; i < mControlCables.size(); ++i)
    {
       if (mCanvas->IsRowVisible(i))
@@ -316,14 +316,14 @@ namespace
    const float extraH = 150;
 }
 
-void EventCanvas::Resize(float w, float h)
+void EventCanvas::Resize(double w, double h)
 {
    w = MAX(w - extraW, 390);
    h = MAX(h - extraH, 100);
    mCanvas->SetDimensions(w, h);
 }
 
-void EventCanvas::GetModuleDimensions(float& width, float& height)
+void EventCanvas::GetModuleDimensions(double& width, double& height)
 {
    width = mCanvas->GetWidth() + extraW;
    height = mCanvas->GetHeight() + extraH;

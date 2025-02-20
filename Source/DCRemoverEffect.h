@@ -49,7 +49,7 @@ public:
 
 private:
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    void DrawModule() override;
 
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};

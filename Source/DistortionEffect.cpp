@@ -169,7 +169,7 @@ void DistortionEffect::SetClip(double amount)
    mGain = 1. / pow(amount, 3);
 }
 
-void DistortionEffect::GetModuleDimensions(float& width, float& height)
+void DistortionEffect::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

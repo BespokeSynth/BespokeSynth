@@ -59,6 +59,6 @@ private:
    int mEndSample{ 0 };
    float mX{ 0 };
    float mY{ 0 };
-   float mWidth{ 1 };
-   float mHeight{ 1 };
+   double mWidth{ 1 };
+   double mHeight{ 1 };
 };

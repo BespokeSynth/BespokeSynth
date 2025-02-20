@@ -64,7 +64,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -76,8 +76,8 @@ private:
    FloatSlider* mAmountSlider{ nullptr };
    FloatSlider* mWarbleSlider{ nullptr };
    FloatSlider* mNoiseSlider{ nullptr };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    std::array<bool, kNumVoices> mIsVoiceUsed{ false };
    std::array<int, 128> mPitchToVoice{};
    int mVoiceRoundRobin{ 0 };

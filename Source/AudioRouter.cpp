@@ -129,9 +129,9 @@ void AudioRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void AudioRouter::GetModuleDimensions(float& width, float& height)
+void AudioRouter::GetModuleDimensions(double& width, double& height)
 {
-   float w, h;
+   double w, h;
    mRouteSelector->GetDimensions(w, h);
    width = 10 + w;
    height = 8 + h;

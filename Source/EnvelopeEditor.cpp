@@ -459,13 +459,13 @@ void EnvelopeEditor::DrawModule()
 {
    if (!mPinned)
    {
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
 
       ofPushStyle();
       ofSetColor(0, 0, 0);
       ofFill();
-      ofSetLineWidth(.5f);
+      ofSetLineWidth(.5);
       ofRect(0, 0, w, h);
       ofNoFill();
       ofSetColor(255, 255, 255);
@@ -504,16 +504,16 @@ void EnvelopeEditor::DrawModule()
       }
 
       //move release level checkbox below final stage control
-      ofVec2f pos = mStageControls[numStages - 1].mSustainCheckbox->GetPosition(K(local));
+      ofVec2d pos = mStageControls[numStages - 1].mSustainCheckbox->GetPosition(K(local));
       mFreeReleaseLevelCheckbox->SetPosition(pos.x, pos.y);
    }
 }
 
-void EnvelopeEditor::Resize(float w, float h)
+void EnvelopeEditor::Resize(double w, double h)
 {
    w = MAX(w, 250);
    h = MAX(h, 150);
-   mEnvelopeControl.SetDimensions(ofVec2f(w - 10, h - 105));
+   mEnvelopeControl.SetDimensions(ofVec2d(w - 10, h - 105));
 
    for (int i = 0; i < (int)mStageControls.size(); ++i)
    {
@@ -527,7 +527,7 @@ void EnvelopeEditor::Resize(float w, float h)
    mHeight = h;
 }
 
-void EnvelopeEditor::OnClicked(float x, float y, bool right)
+void EnvelopeEditor::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -541,7 +541,7 @@ void EnvelopeEditor::MouseReleased()
    mEnvelopeControl.MouseReleased();
 }
 
-bool EnvelopeEditor::MouseMoved(float x, float y)
+bool EnvelopeEditor::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 

@@ -212,35 +212,35 @@ double UIGrid::GetY(int row) const
       return row * ysize;
 }
 
-GridCell UIGrid::GetGridCellAt(float x, float y, float* clickHeight, float* clickWidth)
+GridCell UIGrid::GetGridCellAt(double x, double y, double* clickHeight, double* clickWidth)
 {
    if (mFlip)
       y = (mHeight - 1) - y;
 
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   const double xsize = mWidth / mCols;
+   const double ysize = mHeight / mRows;
 
    int col = ofClamp(x / xsize, 0, mCols - 1);
    int row = ofClamp(y / ysize, 0, mRows - 1);
 
    if (clickHeight)
    {
-      *clickHeight = ofClamp(1 - (y / ysize - ofClamp((int)(y / ysize), 0, mRows - 1)), 0, 1);
+      *clickHeight = ofClamp(1 - (y / ysize - ofClamp(static_cast<int>(y / ysize), 0, mRows - 1)), 0, 1);
       if (mFlip)
          *clickHeight = 1 - *clickHeight;
    }
 
    if (clickWidth)
    {
-      *clickWidth = ofClamp(x / xsize - ofClamp((int)(x / xsize), 0, mCols - 1), 0, 1);
+      *clickWidth = ofClamp(x / xsize - ofClamp(static_cast<int>(x / xsize), 0, mCols - 1), 0, 1);
    }
 
-   return GridCell(col, row);
+   return { col, row };
 }
 
-ofVec2f UIGrid::GetCellPosition(int col, int row)
+ofVec2d UIGrid::GetCellPosition(int col, int row)
 {
-   return ofVec2f(GetX(col, row), GetY(row));
+   return { GetX(col, row), GetY(row) };
 }
 
 bool UIGrid::CanAdjustMultislider() const
@@ -258,7 +258,7 @@ bool UIGrid::CanBeTargetedBy(PatchCableSource* source) const
    return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
 }
 
-void UIGrid::OnClicked(float x, float y, bool right)
+void UIGrid::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -266,7 +266,7 @@ void UIGrid::OnClicked(float x, float y, bool right)
    mClick = true;
    mLastClickWasClear = false;
 
-   float clickHeight, clickWidth;
+   double clickHeight, clickWidth;
    GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
    int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
    double oldValue = mData[dataIndex];
@@ -365,11 +365,11 @@ void UIGrid::MouseReleased()
    mClick = false;
 }
 
-bool UIGrid::MouseMoved(float x, float y)
+bool UIGrid::MouseMoved(double x, double y)
 {
    bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
-   float clickHeight, clickWidth;
+   double clickHeight, clickWidth;
    GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
 
    if (mClick && mRestrictDragToRow)
@@ -457,13 +457,13 @@ bool UIGrid::MouseMoved(float x, float y)
    return false;
 }
 
-bool UIGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool UIGrid::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow)
    {
       bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
-      float clickHeight, clickWidth;
+      double clickHeight, clickWidth;
       GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
       if (isMouseOver)
       {

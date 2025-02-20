@@ -227,7 +227,7 @@ void RadioSequencer::DrawModule()
    }
 }
 
-void RadioSequencer::OnClicked(float x, float y, bool right)
+void RadioSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -240,7 +240,7 @@ void RadioSequencer::MouseReleased()
    mGrid->MouseReleased();
 }
 
-bool RadioSequencer::MouseMoved(float x, float y)
+bool RadioSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
@@ -336,13 +336,13 @@ namespace
    const float extraH = 30;
 }
 
-void RadioSequencer::GetModuleDimensions(float& width, float& height)
+void RadioSequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH;
 }
 
-void RadioSequencer::Resize(float w, float h)
+void RadioSequencer::Resize(double w, double h)
 {
    w = MAX(w - extraW, 200);
    h = MAX(h - extraH, 170);

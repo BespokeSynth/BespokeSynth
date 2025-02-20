@@ -97,7 +97,7 @@ public:
    void SetOverrideVizBuffer(RollingBuffer* viz) { mOverrideVizBuffer = viz; }
    RollingBuffer* GetOverrideVizBuffer() const { return mOverrideVizBuffer; }
    void UpdatePosition(bool parentMinimized);
-   void SetManualPosition(int x, int y)
+   void SetManualPosition(double x, double y)
    {
       mManualPositionX = x;
       mManualPositionY = y;
@@ -150,10 +150,10 @@ public:
    void DrawSource();
    void DrawCables(bool parentMinimized);
    void Render() override;
-   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
-   bool MouseMoved(float x, float y) override;
+   bool TestClick(double x, double y, bool right, bool testOnly = false) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = 10;
       height = 10;
@@ -168,7 +168,7 @@ public:
    static bool sIsLoadingModulePreset;
 
 protected:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
 private:
    bool InAddCableMode() const;
@@ -183,8 +183,8 @@ private:
    IDrawableModule* mOwner{ nullptr };
    RollingBuffer* mOverrideVizBuffer{ nullptr };
    bool mAutomaticPositioning{ true };
-   int mManualPositionX{ 0 };
-   int mManualPositionY{ 0 };
+   double mManualPositionX{ 0 };
+   double mManualPositionY{ 0 };
    ofColor mColor;
    bool mEnabled{ true };
    bool mClickable{ true };

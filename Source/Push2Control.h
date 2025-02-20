@@ -90,12 +90,12 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void PostRender() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight + (mShowManualGrid ? 98 : 0);
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    bool Initialize();
    void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio);
@@ -120,7 +120,7 @@ private:
    bool IsIgnorableModule(IDrawableModule* module);
    std::vector<IDrawableModule*> SortModules(std::vector<IDrawableModule*> modules);
    void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
-   void DrawDisplayModuleRect(ofRectangle rect, float thickness);
+   void DrawDisplayModuleRect(ofRectangle_f rect, float thickness);
    std::string GetModuleTypeToSpawn();
    ModuleCategory GetModuleTypeForSpawnList(IUIControl* control);
    ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
@@ -138,8 +138,8 @@ private:
    int mFontHandle{ 0 };
    int mFontHandleBold{ 0 };
 
-   float mWidth{ 100 };
-   float mHeight{ 20 };
+   double mWidth{ 100 };
+   double mHeight{ 20 };
 
    IDrawableModule* mDisplayModule{ nullptr };
    Snapshots* mDisplayModuleSnapshots{ nullptr };
@@ -156,7 +156,7 @@ private:
    float mModuleListOffsetSmoothed{ 0 };
    std::array<IDrawableModule*, 8 * 8> mModuleGrid;
    std::array<PatchCableSource*, 8 * 8> mModuleGridManualCables;
-   ofRectangle mModuleGridRect;
+   ofRectangle_f mModuleGridRect;
 
    enum class ModuleGridLayoutStyle
    {

@@ -57,7 +57,7 @@ public:
       mEnd = end;
    }
    void SetColor(ofColor color) { mColor = color; }
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -75,17 +75,17 @@ public:
    void LoadState(FileStreamIn& in);
 
 protected:
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
 private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
    int FindIndexForTime(double time);
    std::array<CurvePoint, 5000> mPoints;
    int mNumCurvePoints{ 0 };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    double mStart{ 0 };
    double mEnd{ 1 };
    ofColor mColor{ ofColor::white };

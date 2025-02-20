@@ -173,7 +173,7 @@ void ComboGridController::ResetLights()
    }
 }
 
-void ComboGridController::GetModuleDimensions(float& w, float& h)
+void ComboGridController::GetModuleDimensions(double& w, double& h)
 {
    w = 0;
    h = 0;

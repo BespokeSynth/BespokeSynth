@@ -233,7 +233,7 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
    }
    else if (mOwner != nullptr)
    {
-      float x, y;
+      double x, y;
       mOwner->GetPosition(x, y);
       mX = mManualPositionX + x;
       mY = mManualPositionY + y;
@@ -458,7 +458,7 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
    }
 }
 
-bool PatchCableSource::MouseMoved(float x, float y)
+bool PatchCableSource::MouseMoved(double x, double y)
 {
    if (!Enabled())
       return false;
@@ -505,7 +505,7 @@ void PatchCableSource::MouseReleased()
    }
 }
 
-bool PatchCableSource::TestClick(float x, float y, bool right, bool testOnly /* = false */)
+bool PatchCableSource::TestClick(double x, double y, bool right, bool testOnly /* = false */)
 {
    if (!Enabled())
       return false;
@@ -603,7 +603,7 @@ bool PatchCableSource::Enabled() const
    return mEnabled;
 }
 
-void PatchCableSource::OnClicked(float x, float y, bool right)
+void PatchCableSource::OnClicked(double x, double y, bool right)
 {
 }
 

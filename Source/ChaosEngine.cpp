@@ -202,16 +202,16 @@ void ChaosEngine::DrawModule()
 
    ofPushStyle();
 
-   float fBeat = TheTransport->GetMeasurePos(gTime) * TheTransport->GetTimeSigTop() + 1;
+   double fBeat = TheTransport->GetMeasurePos(gTime) * TheTransport->GetTimeSigTop() + 1;
    int beat = int(fBeat);
    if (!mHideBeat)
    {
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
       ofFill();
-      float beatLeft = 1 - (fBeat - beat);
+      double beatLeft = 1 - (fBeat - beat);
       ofSetColor(255, 255, 255, 100 * beatLeft);
-      float beatWidth = w / TheTransport->GetTimeSigTop();
+      double beatWidth = w / TheTransport->GetTimeSigTop();
       ofRect((beat - 1) * beatWidth, 0, beatWidth, h);
       ofPopStyle();
    }
@@ -303,7 +303,7 @@ void ChaosEngine::DrawModule()
    ofPopStyle();
 }
 
-void ChaosEngine::OnClicked(float x, float y, bool right)
+void ChaosEngine::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -338,7 +338,7 @@ void ChaosEngine::OnClicked(float x, float y, bool right)
    }
 }
 
-ofRectangle ChaosEngine::GetKeyboardKeyRect(int pitch, bool& isBlackKey)
+ofRectangle_f ChaosEngine::GetKeyboardKeyRect(int pitch, bool& isBlackKey)
 {
    const float kbWidth = 200;
    const float kbHeight = 100;
@@ -350,13 +350,13 @@ ofRectangle ChaosEngine::GetKeyboardKeyRect(int pitch, bool& isBlackKey)
    {
       int whiteKey = (pitch + 1) / 2;
       isBlackKey = false;
-      return ofRectangle(offset + whiteKey * kbWidth / 8, 0, kbWidth / 8, kbHeight);
+      return ofRectangle_f(offset + whiteKey * kbWidth / 8, 0, kbWidth / 8, kbHeight);
    }
    else //black key
    {
       int blackKey = pitch / 2;
       isBlackKey = true;
-      return ofRectangle(offset + blackKey * kbWidth / 8 + kbWidth / 16 + kbWidth / 8 * .1f, 0, kbWidth / 8 * .8f, kbHeight / 2);
+      return ofRectangle_f(offset + blackKey * kbWidth / 8 + kbWidth / 16 + kbWidth / 8 * .1f, 0, kbWidth / 8 * .8f, kbHeight / 2);
    }
 }
 
@@ -374,7 +374,7 @@ void ChaosEngine::DrawKeyboard(float x, float y)
       for (int i = 0; i < kNumKeys; ++i)
       {
          bool isBlackKey;
-         ofRectangle key = GetKeyboardKeyRect(i, isBlackKey);
+         ofRectangle_f key = GetKeyboardKeyRect(i, isBlackKey);
 
          if ((pass == 0 && !isBlackKey) || (pass == 1 && isBlackKey))
          {
@@ -401,7 +401,7 @@ void ChaosEngine::DrawKeyboard(float x, float y)
       int pitch = chord[j] - 36;
       if (pitch < kNumKeys)
       {
-         ofRectangle key = GetKeyboardKeyRect(pitch, isBlackKey);
+         ofRectangle_f key = GetKeyboardKeyRect(pitch, isBlackKey);
          key.height /= 3;
          key.y += key.height * 2;
 

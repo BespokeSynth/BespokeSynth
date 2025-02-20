@@ -152,11 +152,11 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void Resize(double w, double h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -186,8 +186,8 @@ private:
    double mC{ 0 };
    double mD{ 0 };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    std::array<double, 20> mScheduledPulseTimes{};
    std::string mLastError;
    size_t mScriptModuleIndex;
@@ -322,21 +322,21 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
+   void GetModuleDimensions(double& w, double& h) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override
+   void Resize(double w, double h) override
    {
       mWidth = w;
       mHeight = h;
    }
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void LoadText();
 
    std::vector<std::string> mText;
    ClickButton* mCloseButton{ nullptr };
-   float mWidth{ 750 };
-   float mHeight{ 335 };
+   double mWidth{ 750 };
+   double mHeight{ 335 };
    ofVec2f mScrollOffset;
    float mMaxScrollAmount{ 0 };
 };
@@ -355,7 +355,7 @@ public:
    void CreateUIControls() override;
    void Poll() override;
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;

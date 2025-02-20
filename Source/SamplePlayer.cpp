@@ -474,14 +474,14 @@ void SamplePlayer::AutoSlice(int slices)
    }
 }
 
-void SamplePlayer::FilesDropped(std::vector<std::string> files, int x, int y)
+void SamplePlayer::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    Sample* sample = new Sample();
    sample->Read(files[0].c_str());
    UpdateSample(sample, true);
 }
 
-void SamplePlayer::SampleDropped(int x, int y, Sample* sample)
+void SamplePlayer::SampleDropped(double x, double y, Sample* sample)
 {
    if (TheSynth->MouseMovedSignificantlySincePressed()) //avoid problem of grabbing a clip via the clip grab button and immediately dropping it onto this sampleplayer by accident
    {
@@ -780,7 +780,7 @@ void SamplePlayer::FillData(std::vector<float> data)
    UpdateSample(sample, true);
 }
 
-void SamplePlayer::OnClicked(float x, float y, bool right)
+void SamplePlayer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -839,7 +839,7 @@ ChannelBuffer* SamplePlayer::GetCueSampleData(int cueIndex)
    return data;
 }
 
-bool SamplePlayer::MouseMoved(float x, float y)
+bool SamplePlayer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    if (mScrubbingSample && mSample != nullptr)
@@ -1276,7 +1276,7 @@ void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
    }
 }
 
-bool SamplePlayer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool SamplePlayer::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (std::abs(scrollX) > std::abs(scrollY))
       scrollY = 0;
@@ -1370,7 +1370,7 @@ void SamplePlayer::StopRecording()
    }
 }
 
-void SamplePlayer::GetModuleDimensions(float& width, float& height)
+void SamplePlayer::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

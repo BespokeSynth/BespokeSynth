@@ -76,7 +76,7 @@ public:
    void SetLoopBuffer(ChannelBuffer* buffer);
    void LockBufferMutex() { mBufferMutex.lock(); }
    void UnlockBufferMutex() { mBufferMutex.unlock(); }
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    double* GetLoopPosVar() { return &mLoopPos; }
    int GetLoopLength() { return mLoopLength; }
@@ -95,7 +95,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IDrawableModule
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
    bool DrawToPush2Screen() override;
 
    void MergeIn(Looper* otherLooper);
@@ -147,8 +147,8 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
 
    ChannelBuffer* mBuffer{ nullptr };
    ChannelBuffer mWorkBuffer;

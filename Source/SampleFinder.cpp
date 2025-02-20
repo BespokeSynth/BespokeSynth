@@ -168,7 +168,7 @@ void SampleFinder::DrawModule()
    }
 }
 
-bool SampleFinder::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool SampleFinder::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    ofVec2f bufferPos = ofVec2f(ofMap(x, 5, 5 + 900, 0, 1),
                                ofMap(y, 80, 80 + 310, 0, 1));
@@ -191,7 +191,7 @@ bool SampleFinder::MouseScrolled(float x, float y, float scrollX, float scrollY,
    return false;
 }
 
-void SampleFinder::FilesDropped(std::vector<std::string> files, int x, int y)
+void SampleFinder::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mSample->Reset();
 
@@ -282,7 +282,7 @@ void SampleFinder::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void SampleFinder::GetModuleDimensions(float& width, float& height)
+void SampleFinder::GetModuleDimensions(double& width, double& height)
 {
    if (mEditMode)
    {

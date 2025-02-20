@@ -37,7 +37,7 @@ class QuickSpawnFollower : public IDrawableModule
 public:
    void SetUp();
    void DrawModule() override {}
-   void GetDimensions(float& width, float& height) override;
+   void GetDimensions(double& width, double& height) override;
    bool HasTitleBar() const override { return false; }
    bool IsSaveable() override { return false; }
 
@@ -75,7 +75,7 @@ public:
    void MouseReleased() override;
 
    bool IsSingleton() const override { return true; }
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -91,9 +91,9 @@ private:
    void UpdatePosition();
    bool MatchesFilter(const ModuleFactory::Spawnable& spawnable) const;
 
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    enum class MenuMode
    {
@@ -103,8 +103,8 @@ private:
       Search
    };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    int mLastHoverX{ 0 };
    int mLastHoverY{ 0 };
    juce::String mHeldKeys;

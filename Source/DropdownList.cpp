@@ -157,12 +157,12 @@ void DropdownList::Render()
 {
    ofPushStyle();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofColor color, textColor;
    IUIControl::GetColors(color, textColor);
-   float xOffset = 0;
+   double xOffset = 0;
 
    if (mDisplayStyle == DropdownDisplayStyle::kNormal)
    {
@@ -322,7 +322,7 @@ void DropdownList::CopyContentsTo(DropdownList* list) const
       list->AddLabel(element.mLabel, element.mValue);
 }
 
-void DropdownList::GetDimensions(float& width, float& height)
+void DropdownList::GetDimensions(double& width, double& height)
 {
    width = mWidth;
    if (mDrawLabel)
@@ -359,7 +359,7 @@ namespace
    }
 }
 
-void DropdownList::OnClicked(float x, float y, bool right)
+void DropdownList::OnClicked(double x, double y, bool right)
 {
    if (right || mDropdownIsOpen)
       return;
@@ -409,7 +409,7 @@ int DropdownList::GetItemIndexAt(int x, int y)
    return y / kItemSpacing + x / mMaxItemWidth * mMaxPerColumn + indexOffset;
 }
 
-ofVec2f DropdownList::GetModalListPosition() const
+ofVec2d DropdownList::GetModalListPosition() const
 {
    float thisx, thisy;
    GetPosition(thisx, thisy);
@@ -418,7 +418,7 @@ ofVec2f DropdownList::GetModalListPosition() const
    return ofVec2f(thisx, thisy + kItemSpacing);
 }
 
-bool DropdownList::MouseMoved(float x, float y)
+bool DropdownList::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    return false;
@@ -654,7 +654,7 @@ std::string DropdownListModal::GetHoveredLabel()
    return "";
 }
 
-bool DropdownListModal::MouseMoved(float x, float y)
+bool DropdownListModal::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mMouseX = x;
@@ -662,7 +662,7 @@ bool DropdownListModal::MouseMoved(float x, float y)
    return false;
 }
 
-void DropdownListModal::OnClicked(float x, float y, bool right)
+void DropdownListModal::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 

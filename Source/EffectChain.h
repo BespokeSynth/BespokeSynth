@@ -80,7 +80,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    int GetRowHeight(int row) const;
@@ -88,7 +88,7 @@ private:
    void DeleteEffect(int index);
    void MoveEffect(int index, int direction);
    void UpdateReshuffledDryWetSliders();
-   ofVec2f GetEffectPos(int index) const;
+   ofVec2d GetEffectPos(int index) const;
 
    struct EffectControls
    {
@@ -107,8 +107,8 @@ private:
    double mSwapTime{ -1 };
    int mSwapFromIdx{ -1 };
    int mSwapToIdx{ -1 };
-   ofVec2f mSwapFromPos;
-   ofVec2f mSwapToPos;
+   ofVec2d mSwapFromPos;
+   ofVec2d mSwapToPos;
    double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
    int mNumFXWide{ 3 };

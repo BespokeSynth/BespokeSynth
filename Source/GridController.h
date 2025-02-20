@@ -95,12 +95,12 @@ public:
    bool GetNoHover() const override { return true; }
 
 private:
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = 30;
       height = 15;
    }
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    IGridControllerListener* mOwner{ nullptr };
    IGridController* mGridController{ nullptr };

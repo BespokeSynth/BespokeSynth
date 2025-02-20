@@ -471,7 +471,7 @@ void MultitrackRecorderTrack::SetUpFromSaveData()
 {
 }
 
-void MultitrackRecorderTrack::GetModuleDimensions(float& width, float& height)
+void MultitrackRecorderTrack::GetModuleDimensions(double& width, double& height)
 {
    if (mRecorder)
    {

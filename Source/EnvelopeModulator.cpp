@@ -92,19 +92,19 @@ void EnvelopeModulator::OnPulse(double time, double velocity, int flags)
    mAdsr.Start(time, mUseVelocity ? velocity / 127.0 : 1);
 }
 
-void EnvelopeModulator::GetModuleDimensions(float& width, float& height)
+void EnvelopeModulator::GetModuleDimensions(double& width, double& height)
 {
    width = 208;
    height = 73;
 }
 
-void EnvelopeModulator::Resize(float w, float h)
+void EnvelopeModulator::Resize(double w, double h)
 {
    mWidth = MAX(w, 250);
    mHeight = MAX(h, 102);
 }
 
-void EnvelopeModulator::OnClicked(float x, float y, bool right)
+void EnvelopeModulator::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -114,7 +114,7 @@ void EnvelopeModulator::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool EnvelopeModulator::MouseMoved(float x, float y)
+bool EnvelopeModulator::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 

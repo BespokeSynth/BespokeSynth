@@ -91,7 +91,7 @@ double ModulatorCurve::Value(int samplesIn)
    return ofLerp(GetMin(), GetMax(), val);
 }
 
-void ModulatorCurve::OnClicked(float x, float y, bool right)
+void ModulatorCurve::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -105,7 +105,7 @@ void ModulatorCurve::MouseReleased()
    mEnvelopeControl.MouseReleased();
 }
 
-bool ModulatorCurve::MouseMoved(float x, float y)
+bool ModulatorCurve::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 

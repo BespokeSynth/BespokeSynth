@@ -234,7 +234,7 @@ void ControlSequencer::DrawModule()
    }
 }
 
-void ControlSequencer::OnClicked(float x, float y, bool right)
+void ControlSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -247,7 +247,7 @@ void ControlSequencer::MouseReleased()
    mGrid->MouseReleased();
 }
 
-bool ControlSequencer::MouseMoved(float x, float y)
+bool ControlSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
@@ -330,7 +330,7 @@ namespace
    const float extraH = 47;
 }
 
-void ControlSequencer::GetModuleDimensions(float& width, float& height)
+void ControlSequencer::GetModuleDimensions(double& width, double& height)
 {
    if (mSliderMode)
    {
@@ -344,7 +344,7 @@ void ControlSequencer::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void ControlSequencer::Resize(float w, float h)
+void ControlSequencer::Resize(double w, double h)
 {
    w = MAX(w - extraW, 130);
    h = MAX(h - extraH, 40);

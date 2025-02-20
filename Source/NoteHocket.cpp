@@ -94,7 +94,7 @@ void NoteHocket::DrawModule()
 
    if (mDeterministic)
    {
-      ofRectangle lengthRect = mLengthSlider->GetRect(true);
+      ofRectangle_f lengthRect = mLengthSlider->GetRect(true);
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
@@ -213,7 +213,7 @@ void NoteHocket::SetUpFromSaveData()
          mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
          mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
          AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
-         ofRectangle rect = mWeightSlider[i]->GetRect(true);
+         ofRectangle_f rect = mWeightSlider[i]->GetRect(true);
          mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
       }
    }

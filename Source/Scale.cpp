@@ -441,7 +441,7 @@ void Scale::DrawModule()
    }
 }
 
-void Scale::GetModuleDimensions(float& width, float& height)
+void Scale::GetModuleDimensions(double& width, double& height)
 {
    width = 164;
    height = mIntonation == kIntonation_SclFile ? 109 : 62;

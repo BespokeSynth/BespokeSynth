@@ -196,7 +196,7 @@ void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
    }
 }
 
-void ScriptModule::OnClicked(float x, float y, bool right)
+void ScriptModule::OnClicked(double x, double y, bool right)
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
@@ -263,7 +263,7 @@ void ScriptModule::DrawModule()
       ofPushStyle();
       ofFill();
 
-      ofRectangle buttonRect = mTrustScriptButton->GetRect(K(local));
+      ofRectangle_f buttonRect = mTrustScriptButton->GetRect(K(local));
       ofSetColor(0, 255, 0, 80);
       ofRect(buttonRect);
 
@@ -351,7 +351,7 @@ void ScriptModule::DrawModule()
    if (CodeEntry::HasJediNotInstalledWarning())
    {
       ofPushStyle();
-      ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
+      ofRectangle_f buttonRect = mShowReferenceButton->GetRect(true);
       ofFill();
       ofSetColor(255, 255, 0);
       float x = buttonRect.getMaxX() + 10;
@@ -451,13 +451,13 @@ void ScriptModule::DrawModuleUnclipped()
          float codeY = mCodeEntry->GetPosition(true).y;
          float topY = ofClamp(linePos.y + 3, codeY, codeY + mCodeEntry->GetRect().height);
          float bottomY = ofClamp(linePos.y + 3 + mCodeEntry->GetCharHeight(), codeY, codeY + mCodeEntry->GetRect().height);
-         ofRectangle lineRect(linePos.x, topY, mCodeEntry->GetRect().width, bottomY - topY);
+         ofRectangle_f lineRect(linePos.x, topY, mCodeEntry->GetRect().width, bottomY - topY);
          ofRect(lineRect, L(corner, 0));
 
          ofSetLineWidth(2);
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other), 30);
          float startX, startY, endX, endY;
-         ofRectangle targetRect = mBoundModuleConnections[i].mTarget->GetRect();
+         ofRectangle_f targetRect = mBoundModuleConnections[i].mTarget->GetRect();
          FindClosestSides(lineRect.x, lineRect.y, lineRect.width, lineRect.height, targetRect.x - mX, targetRect.y - mY, targetRect.width, targetRect.height, startX, startY, endX, endY, K(sidesOnly));
          ofLine(startX, startY, endX, endY);
       }
@@ -472,11 +472,11 @@ void ScriptModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
       Transport::sDoEventLookahead = true; //scripts that output notes require lookahead to be able to schedule on time
 }
 
-bool ScriptModule::MouseMoved(float x, float y)
+bool ScriptModule::MouseMoved(double x, double y)
 {
    if (CodeEntry::HasJediNotInstalledWarning())
    {
-      ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
+      ofRectangle_f buttonRect = mShowReferenceButton->GetRect(true);
       float warningX = buttonRect.getMaxX() + 10;
       float warningY = buttonRect.getCenter().y;
       if (ofDistSquared(x, y, warningX, warningY) <= 6 * 6)
@@ -1434,13 +1434,13 @@ void ScriptModule::Reset()
       mPrintDisplay[i].time = -1;
 }
 
-void ScriptModule::GetModuleDimensions(float& w, float& h)
+void ScriptModule::GetModuleDimensions(double& w, double& h)
 {
    w = mWidth;
    h = mHeight;
 }
 
-void ScriptModule::Resize(float w, float h)
+void ScriptModule::Resize(double w, double h)
 {
    float entryW, entryH;
    mCodeEntry->GetDimensions(entryW, entryH);
@@ -1556,10 +1556,20 @@ void ScriptModule::LoadState(FileStreamIn& in, int rev)
       LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
-   float w, h;
-   in >> w;
-   in >> h;
-   Resize(w, h);
+   if (rev < 3)
+   {
+      float w, h;
+      in >> w;
+      in >> h;
+      Resize(w, h);
+   }
+   else
+   {
+      double w, h;
+      in >> w;
+      in >> h;
+      Resize(w, h);
+   }
 
    juce::String checksum = GetScriptChecksum();
    juce::File trusted_python_scripts = File(ofToDataPath("internal/trusted_python_scripts"));
@@ -1663,13 +1673,13 @@ void ScriptReferenceDisplay::DrawModule()
    }
 }
 
-bool ScriptReferenceDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool ScriptReferenceDisplay::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mScrollOffset.y = ofClamp(mScrollOffset.y - scrollY * 10, 0, mMaxScrollAmount);
    return true;
 }
 
-void ScriptReferenceDisplay::GetModuleDimensions(float& w, float& h)
+void ScriptReferenceDisplay::GetModuleDimensions(double& w, double& h)
 {
    w = mWidth;
    h = mHeight;

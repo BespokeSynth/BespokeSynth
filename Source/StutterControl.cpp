@@ -159,7 +159,7 @@ StutterControl::StutterType StutterControl::GetStutterFromKey(int key)
    return kNumStutterTypes;
 }
 
-void StutterControl::GetModuleDimensions(float& width, float& height)
+void StutterControl::GetModuleDimensions(double& width, double& height)
 {
    width = 175;
    height = 172;

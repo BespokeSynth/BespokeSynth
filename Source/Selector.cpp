@@ -114,7 +114,7 @@ namespace
    const float extraH = 6;
 }
 
-void Selector::GetModuleDimensions(float& width, float& height)
+void Selector::GetModuleDimensions(double& width, double& height)
 {
    width = mSelector->GetRect().width + extraW;
    height = mSelector->GetRect().height + extraH;

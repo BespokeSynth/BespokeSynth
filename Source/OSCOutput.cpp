@@ -135,7 +135,7 @@ void OSCOutput::SendString(std::string address, std::string val)
    mOscOut.send(msg);
 }
 
-void OSCOutput::GetModuleDimensions(float& w, float& h)
+void OSCOutput::GetModuleDimensions(double& w, double& h)
 {
    w = mWidth;
    h = mHeight;

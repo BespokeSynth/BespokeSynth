@@ -219,13 +219,13 @@ void ControlRecorder::ButtonClicked(ClickButton* button, double time)
       Clear();
 }
 
-void ControlRecorder::GetModuleDimensions(float& width, float& height)
+void ControlRecorder::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void ControlRecorder::Resize(float w, float h)
+void ControlRecorder::Resize(double w, double h)
 {
    w = MAX(w, 220);
    h = MAX(h, 100);

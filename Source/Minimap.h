@@ -47,22 +47,22 @@ public:
    void DrawModule() override;
 
    bool AlwaysOnTop() override { return true; };
-   void GetDimensions(float& width, float& height) override;
+   void GetDimensions(double& width, double& height) override;
    void GetDimensionsMinimap(float& width, float& height);
 
 private:
    bool IsSingleton() const override { return true; };
    bool HasTitleBar() const override { return false; };
    bool IsSaveable() override { return false; }
-   void ComputeBoundingBox(ofRectangle& rect);
-   ofRectangle CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& source);
-   void DrawModulesOnMinimap(ofRectangle& boundingBox);
-   void DrawModuleOnMinimap(ofRectangle& boundingBox, IDrawableModule* module);
-   void RectUnion(ofRectangle& target, ofRectangle& unionRect);
-   void OnClicked(float x, float y, bool right) override;
+   void ComputeBoundingBox(ofRectangle_f& rect);
+   ofRectangle_f CoordsToMinimap(ofRectangle_f& boundingBox, ofRectangle_f& source);
+   void DrawModulesOnMinimap(ofRectangle_f& boundingBox);
+   void DrawModuleOnMinimap(ofRectangle_f& boundingBox, IDrawableModule* module);
+   void RectUnion(ofRectangle_f& target, ofRectangle_f& unionRect);
+   void OnClicked(double x, double y, bool right) override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   ofVec2f CoordsToViewport(ofRectangle& boundingBox, float x, float y);
+   bool MouseMoved(double x, double y) override;
+   ofVec2f CoordsToViewport(ofRectangle_f& boundingBox, float x, float y);
    void ForcePosition();
 
    bool mClick{ false };

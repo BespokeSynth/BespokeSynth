@@ -118,7 +118,7 @@ void AudioSplitter::DrawModule()
    }
 }
 
-void AudioSplitter::GetModuleDimensions(float& w, float& h)
+void AudioSplitter::GetModuleDimensions(double& w, double& h)
 {
    w = MAX(80, 40 + (20 * mDestinationCables.size()));
    h = 5;

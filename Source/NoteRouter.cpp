@@ -127,7 +127,7 @@ void NoteRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void NoteRouter::GetModuleDimensions(float& width, float& height)
+void NoteRouter::GetModuleDimensions(double& width, double& height)
 {
    float w, h;
    mRouteSelector->GetDimensions(w, h);

@@ -708,7 +708,7 @@ void Looper::DrawModule()
    mCommitButton->Draw();
 
    if (mGranulator)
-      mGranulator->DrawOverlay(ofRectangle(4, 35, 155, 32), mLoopLength);
+      mGranulator->DrawOverlay(ofRectangle_f(4, 35, 155, 32), mLoopLength);
 
    if (mBeatwheel)
       DrawBeatwheel();
@@ -716,7 +716,7 @@ void Looper::DrawModule()
    if (mRecorder != nullptr && mRecorder->GetNextCommitTarget() == this)
    {
       ofPushStyle();
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
       ofSetColor(255, 255, 255, 200);
       ofSetLineWidth(3);
@@ -765,7 +765,7 @@ void Looper::DrawBeatwheel()
    }
 
    ofSetColor(0, 0, 0, gModuleDrawAlpha);
-   float subdivisions = 600;
+   double subdivisions = 600;
    int samplesPerPixel = loopLength / subdivisions;
 
    for (int i = 0; i < subdivisions; i++)
@@ -842,7 +842,7 @@ bool Looper::DrawToPush2Screen()
    ofPushMatrix();
 
    ofTranslate(60, 3);
-   float displayPos = GetActualLoopPos(0);
+   double displayPos = GetActualLoopPos(0);
    mBufferMutex.lock();
    DrawAudioBuffer(180, 74, mBuffer, 0, mLoopLength, displayPos, mVol);
    mBufferMutex.unlock();
@@ -1022,13 +1022,13 @@ void Looper::SampleDropped(int x, int y, Sample* sample)
    }
 }
 
-void Looper::GetModuleDimensions(float& width, float& height)
+void Looper::GetModuleDimensions(double& width, double& height)
 {
    width = kBufferX * 2 + kBufferWidth;
    height = 182;
 }
 
-void Looper::OnClicked(float x, float y, bool right)
+void Looper::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -1062,13 +1062,13 @@ void Looper::ButtonClicked(ClickButton* button, double time)
       mWantBakeVolume = true;
    if (button == mSaveButton)
    {
-      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%Y-%m-%d_%H-%M-%S.wav").c_str(), mBuffer, mLoopLength);
+      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%Y-%m-%d_%H-%M-%S.wav"), mBuffer, mLoopLength);
    }
    if (button == mCommitButton && mRecorder)
       mRecorder->Commit(this);
    if (button == mDoubleSpeedButton)
    {
-      if (mSpeed == 1)
+      if (ofAlmostEquel(mSpeed, 1))
       {
          HalveNumBars();
          mSpeed = 2;
@@ -1077,10 +1077,10 @@ void Looper::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mHalveSpeedButton)
    {
-      if (mSpeed == 1 && mLoopLength < MAX_BUFFER_SIZE / 2)
+      if (ofAlmostEquel(mSpeed, 1) && mLoopLength < MAX_BUFFER_SIZE / 2)
       {
          DoubleNumBars();
-         mSpeed = .5f;
+         mSpeed = .5;
          ResampleForSpeed(GetPlaybackSpeed());
       }
    }
@@ -1112,7 +1112,7 @@ void Looper::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
    }
    if (slider == mFourTetSlider)
    {
-      if (mFourTet == 0 && !TheSynth->IsLoadingState())
+      if (ofAlmostEquel(mFourTet, 0) && !TheSynth->IsLoadingState())
          mLoopPosOffset = 0;
    }
    if (slider == mVolSlider)

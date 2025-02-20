@@ -125,7 +125,7 @@ void NoteCounter::DrawModule()
 
    if (mDeterministic && mRandom)
    {
-      ofRectangle lengthRect = mDeterministicLengthSlider->GetRect(true);
+      ofRectangle_f lengthRect = mDeterministicLengthSlider->GetRect(true);
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
@@ -253,7 +253,7 @@ void NoteCounter::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void NoteCounter::GetModuleDimensions(float& width, float& height)
+void NoteCounter::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

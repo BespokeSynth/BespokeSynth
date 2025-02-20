@@ -78,7 +78,7 @@ void PlaySequencer::CreateUIControls()
    mGrid->SetRequireShiftForMultislider(true);
    mGrid->SetRestrictDragToRow(true);
 
-   ofRectangle gridRect = mGrid->GetRect(true);
+   ofRectangle_f gridRect = mGrid->GetRect(true);
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
       ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
@@ -131,7 +131,7 @@ void PlaySequencer::DrawModule()
          ofPushStyle();
          ofFill();
          ofSetColor(0, 255, 0, 80);
-         ofRectangle rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
+         ofRectangle_f rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
          ofRect(rect);
          ofPopStyle();
       }
@@ -146,7 +146,7 @@ void PlaySequencer::DrawModule()
    {
       if (mLanes[i].mMuteOrErase)
       {
-         ofRectangle gridRect = mGrid->GetRect(true);
+         ofRectangle_f gridRect = mGrid->GetRect(true);
          ofVec2f cellPos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
          ofRect(cellPos.x, cellPos.y + 1, gridRect.width, gridRect.height / mGrid->GetRows());
       }
@@ -154,7 +154,7 @@ void PlaySequencer::DrawModule()
    ofPopStyle();
 }
 
-void PlaySequencer::OnClicked(float x, float y, bool right)
+void PlaySequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -170,7 +170,7 @@ void PlaySequencer::MouseReleased()
    mGrid->MouseReleased();
 }
 
-bool PlaySequencer::MouseMoved(float x, float y)
+bool PlaySequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
@@ -542,19 +542,19 @@ namespace
    const float extraH = 100;
 }
 
-void PlaySequencer::GetModuleDimensions(float& width, float& height)
+void PlaySequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH;
 }
 
-void PlaySequencer::Resize(float w, float h)
+void PlaySequencer::Resize(double w, double h)
 {
    w = MAX(w - extraW, 219);
    h = MAX(h - extraH, 111);
    SetGridSize(w, h);
 
-   ofRectangle gridRect = mGrid->GetRect(true);
+   ofRectangle_f gridRect = mGrid->GetRect(true);
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
       ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);

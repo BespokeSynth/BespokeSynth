@@ -74,8 +74,8 @@ public:
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -94,8 +94,8 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
    void MouseReleased() override;
 
    void InitGrid();

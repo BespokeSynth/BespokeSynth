@@ -48,7 +48,7 @@ public:
    void DrawOffscreen();
    void SetHighlight(bool highlight) { mHighlighted = highlight; }
    bool GetHighlighted() const { return mHighlighted; }
-   ofRectangle GetRect(bool clamp, bool wrapped, ofVec2f offset = ofVec2f(0, 0)) const;
+   ofRectangle_f GetRect(bool clamp, bool wrapped, ofVec2f offset = ofVec2f(0, 0)) const;
    double GetStart() const;
    void SetStart(double start, bool preserveLength);
    virtual double GetEnd() const;
@@ -77,7 +77,7 @@ protected:
    void DrawElement(bool clamp, bool wrapped, ofVec2f offset);
    void AddElementUIControl(IUIControl* control);
    void GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, double& newOffset) const;
-   ofRectangle GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const;
+   ofRectangle_f GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const;
    double GetStart(int col, double offset) const;
    double GetEnd(int col, double offset, double length) const;
 

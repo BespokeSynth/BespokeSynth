@@ -68,7 +68,7 @@ void UnstableModWheel::DrawModule()
       return;
 
    ofPushStyle();
-   ofRectangle_d rect(3, 3, mWidth - 6, 34);
+   ofRectangle rect(3, 3, mWidth - 6, 34);
    const int kGridSize = 30;
    ofFill();
    for (int col = 0; col < kGridSize; ++col)

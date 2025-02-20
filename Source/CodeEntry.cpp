@@ -244,7 +244,7 @@ void CodeEntry::Render()
 
    ofSetLineWidth(.5f);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofClipWindow(mX, mY, w, h, true);
@@ -727,7 +727,7 @@ void CodeEntry::SetError(bool error, int errorLine)
    mErrorLine = errorLine;
 }
 
-void CodeEntry::OnClicked(float x, float y, bool right)
+void CodeEntry::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -1198,14 +1198,14 @@ void CodeEntry::MoveCaretToNextToken(bool backwards)
    MoveCaret(GetCaretPosition(MAX(0, coords.x + amount), coords.y));
 }
 
-bool CodeEntry::MouseMoved(float x, float y)
+bool CodeEntry::MouseMoved(double x, double y)
 {
    mHovered = TestHover(x, y);
    CheckHover(x, y);
    return false;
 }
 
-bool CodeEntry::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool CodeEntry::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (std::abs(scrollX) > std::abs(scrollY))
       scrollY = 0;

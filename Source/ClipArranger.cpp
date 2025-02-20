@@ -91,13 +91,13 @@ void ClipArranger::DrawModule()
    ofPopStyle();
 }
 
-void ClipArranger::GetModuleDimensions(float& w, float& h)
+void ClipArranger::GetModuleDimensions(double& w, double& h)
 {
    w = mBufferWidth + 100;
    h = 25 + mBufferHeight;
 }
 
-void ClipArranger::OnClicked(float x, float y, bool right)
+void ClipArranger::OnClicked(double x, double y, bool right)
 {
    mMouseDown = true;
 
@@ -140,7 +140,7 @@ void ClipArranger::MouseReleased()
    }
 }
 
-bool ClipArranger::MouseMoved(float x, float y)
+bool ClipArranger::MouseMoved(double x, double y)
 {
    mLastMouseX = x;
    mLastMouseY = y;
@@ -182,12 +182,12 @@ bool ClipArranger::MouseMoved(float x, float y)
 
 bool ClipArranger::IsMousePosWithinClip(int x, int y)
 {
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    return x >= 0 && x < w && y >= 0 && y < h;
 }
 
-void ClipArranger::FilesDropped(std::vector<std::string> files, int x, int y)
+void ClipArranger::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    Sample* sample = new Sample();
    sample->Read(files[0].c_str());
@@ -202,19 +202,19 @@ void ClipArranger::AddSample(Sample* sample, int x, int y)
    clip->mEndSample = MIN(clip->mStartSample + clip->mSample->LengthInSamples(), ArrangementController::mSampleLength);
 }
 
-float ClipArranger::MouseXToBufferPos(float mouseX)
+double ClipArranger::MouseXToBufferPos(double mouseX)
 {
    return (mouseX - BUFFER_MARGIN_X) / mBufferWidth;
 }
 
-int ClipArranger::MouseXToSample(float mouseX)
+int ClipArranger::MouseXToSample(double mouseX)
 {
    return MouseXToBufferPos(mouseX) * ArrangementController::mSampleLength;
 }
 
-float ClipArranger::SampleToX(int sample)
+double ClipArranger::SampleToX(int sample)
 {
-   return float(sample) / ArrangementController::mSampleLength * mBufferWidth + BUFFER_MARGIN_X;
+   return double(sample) / ArrangementController::mSampleLength * mBufferWidth + BUFFER_MARGIN_X;
 }
 
 ClipArranger::Clip* ClipArranger::GetEmptyClip()

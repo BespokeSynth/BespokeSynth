@@ -203,8 +203,8 @@ void SongBuilder::DrawModule()
       if (show && mLoopSequence && i == mSequenceLoopEndIndex && mSequenceLoopEndIndex >= mSequenceLoopStartIndex)
       {
          ofPushStyle();
-         ofRectangle upperRect = mSequencerSceneSelector[mSequenceLoopStartIndex]->GetRect(K(local));
-         ofRectangle lowerRect = mSequencerSceneSelector[mSequenceLoopEndIndex]->GetRect(K(local));
+         ofRectangle_f upperRect = mSequencerSceneSelector[mSequenceLoopStartIndex]->GetRect(K(local));
+         ofRectangle_f lowerRect = mSequencerSceneSelector[mSequenceLoopEndIndex]->GetRect(K(local));
          ofSetColor(150, 150, 150);
          ofSetLineWidth(1);
          ofLine(upperRect.getMinX() - 5, upperRect.getMinY(), lowerRect.getMinX() - 5, lowerRect.getMaxY());
@@ -217,7 +217,7 @@ void SongBuilder::DrawModule()
       {
          if (show && !sequenceComplete)
          {
-            ofRectangle rect = mSequencerStepLengthEntry[i]->GetRect(K(local));
+            ofRectangle_f rect = mSequencerStepLengthEntry[i]->GetRect(K(local));
             int sequenceLengthSeconds = int(sequenceLength * TheTransport->MsPerBar() / 1000);
             int sequenceLengthMinutes = sequenceLengthSeconds / 60;
             sequenceLengthSeconds %= 60;
@@ -243,11 +243,11 @@ void SongBuilder::DrawModule()
       if (!mSequenceStartQueued)
       {
          ofSetColor(0, 255, 0);
-         ofRectangle sceneEntryRect = mSequencerSceneSelector[mSequenceStepIndex]->GetRect(K(local));
+         ofRectangle_f sceneEntryRect = mSequencerSceneSelector[mSequenceStepIndex]->GetRect(K(local));
          ofRect(sceneEntryRect.getMinX() - 5, sceneEntryRect.getCenter().y - 2, 4, 4);
 
          ofSetColor(0, 255, 0, 100);
-         ofRectangle lengthEntryRect = mSequencerStepLengthEntry[mSequenceStepIndex]->GetRect(K(local));
+         ofRectangle_f lengthEntryRect = mSequencerStepLengthEntry[mSequenceStepIndex]->GetRect(K(local));
          double progress = MIN(TheTransport->GetMeasureTime(gTime) / mSequencerStepLength[mSequenceStepIndex], 1.0);
          lengthEntryRect.width *= progress;
          ofRect(lengthEntryRect);
@@ -256,13 +256,13 @@ void SongBuilder::DrawModule()
       if (mSequencePaused)
       {
          ofSetColor(0, 0, 255, 100);
-         ofRectangle pauseButtonRect = mPauseSequenceButton->GetRect(K(local));
+         ofRectangle_f pauseButtonRect = mPauseSequenceButton->GetRect(K(local));
          ofRect(pauseButtonRect);
       }
       else
       {
          ofSetColor(0, 255, 0, 100);
-         ofRectangle playButtonRect = mPlaySequenceButton->GetRect(K(local));
+         ofRectangle_f playButtonRect = mPlaySequenceButton->GetRect(K(local));
          ofRect(playButtonRect);
       }
 
@@ -401,7 +401,7 @@ void SongBuilder::RefreshSequencerDropdowns()
    }
 }
 
-void SongBuilder::GetModuleDimensions(float& width, float& height)
+void SongBuilder::GetModuleDimensions(double& width, double& height)
 {
    width = kLeftMarginX + kSceneTabWidth + (int)mTargets.size() * (kColumnWidth + kSpacingX) + 3;
    if (ShowSongSequencer())
@@ -414,7 +414,7 @@ void SongBuilder::GetModuleDimensions(float& width, float& height)
       {
          if (i == kMaxSequencerScenes - 1 || mSequencerSceneId[i] < 0) //end of sequence
          {
-            ofRectangle rect = mSequencerSceneSelector[i]->GetRect(K(local));
+            ofRectangle_f rect = mSequencerSceneSelector[i]->GetRect(K(local));
             if (rect.getMaxY() + 3 > height)
                height = rect.getMaxY() + 3;
             break;

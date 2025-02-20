@@ -249,21 +249,21 @@ void GridModule::Clear()
    UpdateLights();
 }
 
-void GridModule::GetModuleDimensions(float& width, float& height)
+void GridModule::GetModuleDimensions(double& width, double& height)
 {
-   ofRectangle rect = mGrid->GetRect(true);
+   ofRectangle_f rect = mGrid->GetRect(true);
    width = rect.x + rect.width + 2;
    height = rect.y + rect.height + 6;
 }
 
-void GridModule::Resize(float w, float h)
+void GridModule::Resize(double w, double h)
 {
    float curW, curH;
    GetModuleDimensions(curW, curH);
    mGrid->SetDimensions(mGrid->GetWidth() + w - curW, mGrid->GetHeight() + h - curH);
 }
 
-void GridModule::OnClicked(float x, float y, bool right)
+void GridModule::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -370,10 +370,20 @@ void GridModule::LoadState(FileStreamIn& in, int rev)
    if (rev >= 1)
    {
       mGrid->LoadState(in);
-      float w, h;
-      in >> w;
-      in >> h;
-      mGrid->SetDimensions(w, h);
+      if (rev < 5)
+      {
+         float w, h;
+         in >> w;
+         in >> h;
+         mGrid->SetDimensions(w, h);
+      }
+      else
+      {
+         double w, h;
+         in >> w;
+         in >> h;
+         mGrid->SetDimensions(w, h);
+      }
    }
 
    if (rev >= 2)

@@ -54,12 +54,12 @@ public:
    //IDrawableModule
    void Init() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -93,8 +93,8 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
 
    void SetGridSize(float w, float h);
    int GetStep(double time);
@@ -116,8 +116,8 @@ private:
    bool mWrite{ false };
    bool mNoteRepeat{ false };
    bool mLinkColumns{ false };
-   float mWidth{ 240 };
-   float mHeight{ 20 };
+   double mWidth{ 240 };
+   double mHeight{ 20 };
    bool mUseLightVelocity{ false };
    bool mUseMedVelocity{ false };
    bool mClearLane{ false };

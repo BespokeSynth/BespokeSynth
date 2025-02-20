@@ -204,7 +204,7 @@ void TextEntry::Render()
    DrawHover(mX + xOffset, mY, w - xOffset, h);
 }
 
-void TextEntry::GetDimensions(float& width, float& height)
+void TextEntry::GetDimensions(double& width, double& height)
 {
    if (mFlexibleWidth)
       width = MAX(30.0f, gFontFixedWidth.GetStringWidth(mString, 12) + 4);
@@ -217,7 +217,7 @@ void TextEntry::GetDimensions(float& width, float& height)
    height = 15;
 }
 
-void TextEntry::OnClicked(float x, float y, bool right)
+void TextEntry::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -683,7 +683,7 @@ void TextEntry::SetNextTextEntry(TextEntry* entry)
       entry->mPreviousTextEntry = this;
 }
 
-bool TextEntry::MouseMoved(float x, float y)
+bool TextEntry::MouseMoved(double x, double y)
 {
    mHovered = TestHover(x, y);
    CheckHover(x, y);

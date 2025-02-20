@@ -105,7 +105,7 @@ public:
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -139,8 +139,8 @@ private:
    ClickButton* mPinButton{ nullptr };
    Checkbox* mEnableLFOCheckbox{ nullptr };
    Checkbox* mLowResModeCheckbox{ nullptr };
-   float mWidth{ 100 };
-   float mHeight{ 20 };
+   double mWidth{ 100 };
+   double mHeight{ 20 };
 
    bool mPinned{ false };
 };

@@ -80,7 +80,7 @@ void NoteFilter::PlayNote(NoteMessage note)
    }
 }
 
-void NoteFilter::GetModuleDimensions(float& width, float& height)
+void NoteFilter::GetModuleDimensions(double& width, double& height)
 {
    width = 80;
    height = 3 + (mMaxPitch - mMinPitch + 1) * 18;

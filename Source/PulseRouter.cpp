@@ -108,7 +108,7 @@ void PulseRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void PulseRouter::GetModuleDimensions(float& width, float& height)
+void PulseRouter::GetModuleDimensions(double& width, double& height)
 {
    float w, h;
    mRouteSelector->GetDimensions(w, h);
@@ -137,7 +137,7 @@ void PulseRouter::SetUpFromSaveData()
          mRouteSelector->AddLabel("                      ", i);
          AddPatchCableSource(mDestinationCables[i]);
          mDestinationCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
-         ofRectangle rect = GetRect(true);
+         ofRectangle_f rect = GetRect(true);
          mDestinationCables[i]->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
       }
    }

@@ -140,7 +140,7 @@ double SampleCanvas::GetCurPos(double time) const
    return (((TheTransport->GetMeasure(time) % loopMeasures) + TheTransport->GetMeasurePos(time)) + mCanvas->mLoopStart) / mCanvas->GetLength();
 }
 
-void SampleCanvas::OnClicked(float x, float y, bool right)
+void SampleCanvas::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -166,27 +166,27 @@ namespace
    const float extraH = 163;
 }
 
-void SampleCanvas::Resize(float w, float h)
+void SampleCanvas::Resize(double w, double h)
 {
    w = MAX(w - extraW, 390);
    h = MAX(h - extraH, 40);
    mCanvas->SetDimensions(w, h);
 }
 
-void SampleCanvas::GetModuleDimensions(float& width, float& height)
+void SampleCanvas::GetModuleDimensions(double& width, double& height)
 {
    width = mCanvas->GetWidth() + extraW;
    height = mCanvas->GetHeight() + extraH;
 }
 
-void SampleCanvas::FilesDropped(std::vector<std::string> files, int x, int y)
+void SampleCanvas::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
    SampleDropped(x, y, &sample);
 }
 
-void SampleCanvas::SampleDropped(int x, int y, Sample* sample)
+void SampleCanvas::SampleDropped(double x, double y, Sample* sample)
 {
    CanvasCoord coord = mCanvas->GetCoordAt(x - mCanvas->GetPosition(true).x, y - mCanvas->GetPosition(true).y);
    coord.col = MAX(0, coord.col);

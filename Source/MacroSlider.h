@@ -66,7 +66,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 110;
       height = 25 + (int)mMappings.size() * kMappingSpacing;

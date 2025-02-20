@@ -129,7 +129,7 @@ void LooperRecorder::CreateUIControls()
    {
       mLooperPatchCables[i] = new PatchCableSource(this, kConnectionType_Special);
       mLooperPatchCables[i]->AddTypeFilter("looper");
-      ofRectangle rect = mWriteForLooperCheckbox[i]->GetRect(K(local));
+      ofRectangle_f rect = mWriteForLooperCheckbox[i]->GetRect(K(local));
       mLooperPatchCables[i]->SetManualPosition(rect.getMaxX() + 5, rect.getCenter().y);
       mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
       ofColor color = mLooperPatchCables[i]->GetColor();
@@ -260,7 +260,7 @@ void LooperRecorder::DrawCircleHash(ofVec2d center, double progress, float width
           outerRadius * sinTheta + center.x, outerRadius * -cosTheta + center.y);
 }
 
-void LooperRecorder::GetModuleDimensions(float& width, float& height)
+void LooperRecorder::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = MAX(mHeight, mWriteForLooperCheckbox[mNumLoopers - 1]->GetRect(K(local)).getMaxY() + 3);
@@ -309,9 +309,9 @@ void LooperRecorder::DrawModule()
    ofFill();
    ofColor color = GetColor(kModuleCategory_Audio);
    ofSetColor(color.r, color.g, color.b, 50);
-   float x = kBufferSegmentWidth * 4 + 3;
-   float y = 70;
-   float w, h;
+   double x = kBufferSegmentWidth * 4 + 3;
+   double y = 70;
+   double w, h;
    GetModuleDimensions(w, h);
    ofRect(x, y, w - x - 3, h - y - 3);
    ofPopStyle();
@@ -350,8 +350,8 @@ void LooperRecorder::DrawModule()
 
    if (mSpeed != 1)
    {
-      float rootPitch = AdjustedRootForSpeed();
-      int pitch = int(rootPitch + .5f);
+      double rootPitch = AdjustedRootForSpeed();
+      int pitch = std::round(rootPitch);
       int cents = (rootPitch - pitch) * 100;
 
       std::string speed = "speed " + ofToString(mSpeed, 2) + ", ";
@@ -400,19 +400,19 @@ void LooperRecorder::DrawModule()
    ofSetColor(0, 0, 0, 20);
    for (int i = 1; i < 4; ++i)
    {
-      const float bx = 3 + i * kBufferSegmentWidth;
+      const double bx = 3 + i * kBufferSegmentWidth;
       ofLine(bx, 3, bx, 3 + kBufferHeight);
    }
    ofPopStyle();
 
    /*ofPushStyle();
-   ofVec2f center(48,28);
-   float radius = 25;
+   ofVec2d center(48,28);
+   double radius = 25;
    ofSetColor(255,255,255,100*gModuleDrawAlpha);
-   DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % 8) / 8, 1, radius * .9f, radius);
-   DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % mNumBars) / mNumBars, 3, radius * .7f, radius);
+   DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % 8) / 8, 1, radius * .9, radius);
+   DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % mNumBars) / mNumBars, 3, radius * .7, radius);
    for (int i=0; i<mNumBars; ++i)
-      DrawCircleHash(center, float(i)/mNumBars, 1, radius * .8f, radius);
+      DrawCircleHash(center, static_cast<double>(i) / mNumBars, 1, radius * .8, radius);
    ofPopStyle();*/
 
    if (mDrawDebug)
@@ -438,7 +438,7 @@ double LooperRecorder::AdjustedRootForSpeed()
 void LooperRecorder::SnapToClosestPitch()
 {
    double currentPitch = AdjustedRootForSpeed();
-   double desiredPitch = int(currentPitch + .5);
+   double desiredPitch = std::round(currentPitch);
 
    double currentFreq = TheScale->PitchToFreq(currentPitch);
    double desiredFreq = TheScale->PitchToFreq(desiredPitch);
@@ -451,7 +451,7 @@ void LooperRecorder::Resample(bool setKey)
    if (setKey)
    {
       SnapToClosestPitch();
-      TheScale->SetRoot(int(AdjustedRootForSpeed() + .5));
+      TheScale->SetRoot(std::round(AdjustedRootForSpeed()));
    }
 
    SyncLoopLengths();

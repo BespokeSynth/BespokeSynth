@@ -260,7 +260,7 @@ void Sampler::UpdateForNewSample()
    mVoiceParams.mSustainLoopEnd = -1;
 }
 
-void Sampler::FilesDropped(std::vector<std::string> files, int x, int y)
+void Sampler::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mSample.LockDataMutex(true);
    mSample.Read(files[0].c_str());
@@ -268,7 +268,7 @@ void Sampler::FilesDropped(std::vector<std::string> files, int x, int y)
    UpdateForNewSample();
 }
 
-void Sampler::SampleDropped(int x, int y, Sample* sample)
+void Sampler::SampleDropped(double x, double y, Sample* sample)
 {
    mSample.LockDataMutex(true);
    mSample.CopyFrom(sample);

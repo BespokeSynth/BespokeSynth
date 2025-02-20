@@ -261,7 +261,7 @@ double SeaOfGrain::GetSourceBufferOffset()
       return 0;
 }
 
-void SeaOfGrain::FilesDropped(std::vector<std::string> files, int x, int y)
+void SeaOfGrain::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mLoading = true;
 
@@ -275,7 +275,7 @@ void SeaOfGrain::FilesDropped(std::vector<std::string> files, int x, int y)
    mLoading = false;
 }
 
-void SeaOfGrain::SampleDropped(int x, int y, Sample* sample)
+void SeaOfGrain::SampleDropped(double x, double y, Sample* sample)
 {
    mLoading = true;
 
@@ -336,7 +336,7 @@ void SeaOfGrain::ButtonClicked(ClickButton* button, double time)
       LoadFile();
 }
 
-void SeaOfGrain::OnClicked(float x, float y, bool right)
+void SeaOfGrain::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -346,7 +346,7 @@ void SeaOfGrain::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool SeaOfGrain::MouseMoved(float x, float y)
+bool SeaOfGrain::MouseMoved(double x, double y)
 {
    return IDrawableModule::MouseMoved(x, y);
 }
@@ -363,7 +363,7 @@ void SeaOfGrain::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void SeaOfGrain::GetModuleDimensions(float& width, float& height)
+void SeaOfGrain::GetModuleDimensions(double& width, double& height)
 {
    width = mBufferW + 10;
    height = mBufferY + mBufferH + 202;

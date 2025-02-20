@@ -244,7 +244,7 @@ void BeatBloks::Process(double time)
    GetVizBuffer()->WriteChunk(out, bufferSize, 0);
 }
 
-void BeatBloks::FilesDropped(std::vector<std::string> files, int x, int y)
+void BeatBloks::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mLoading = true;
 
@@ -483,7 +483,7 @@ void BeatBloks::UpdateZoomExtents()
    mClipEndSlider->SetExtents(mZoomStart, mZoomEnd);
 }
 
-void BeatBloks::OnClicked(float x, float y, bool right)
+void BeatBloks::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -623,7 +623,7 @@ void BeatBloks::MouseReleased()
       mHeldBlok = nullptr;
 }
 
-bool BeatBloks::MouseMoved(float x, float y)
+bool BeatBloks::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -931,7 +931,7 @@ void BeatBloks::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void BeatBloks::GetModuleDimensions(float& width, float& height)
+void BeatBloks::GetModuleDimensions(double& width, double& height)
 {
    width = 910;
    height = mRemixBufferY + mBufferH + 45;

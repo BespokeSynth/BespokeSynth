@@ -78,13 +78,13 @@ void AudioLevelToCV::DrawModule()
    ofPushStyle();
    ofSetColor(0, 255, 0, gModuleDrawAlpha);
    ofBeginShape();
-   float x, y;
-   float w, h;
+   double x, y;
+   double w, h;
    mGainSlider->GetPosition(x, y, K(local));
    mGainSlider->GetDimensions(w, h);
    for (int i = 0; i < gBufferSize; ++i)
    {
-      ofVertex(ofMap(mModulationBuffer[i], 0, 1, x, x + w, K(clamp)), ofMap(i, 0, gBufferSize, y, y + h), K(clamp));
+      ofVertex(ofMap(static_cast<double>(mModulationBuffer[i]), 0, 1, x, x + w, K(clamp)), ofMap(i, 0, gBufferSize, y, y + h), K(clamp));
    }
    ofEndShape();
    ofPopStyle();

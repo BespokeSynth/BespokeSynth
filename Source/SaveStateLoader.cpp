@@ -80,7 +80,7 @@ void SaveStateLoader::Poll()
    }
 }
 
-void SaveStateLoader::GetModuleDimensions(float& w, float& h)
+void SaveStateLoader::GetModuleDimensions(double& w, double& h)
 {
    w = 100;
    for (size_t i = 0; i < mLoadButtons.size(); ++i)

@@ -110,13 +110,13 @@ void ValueStream::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    mFloatSlider = dynamic_cast<FloatSlider*>(mUIControl);
 }
 
-void ValueStream::GetModuleDimensions(float& width, float& height)
+void ValueStream::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void ValueStream::Resize(float w, float h)
+void ValueStream::Resize(double w, double h)
 {
    mWidth = MAX(w, 200);
    mHeight = MAX(h, 120);

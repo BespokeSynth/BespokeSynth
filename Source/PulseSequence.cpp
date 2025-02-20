@@ -195,20 +195,20 @@ void PulseSequence::Step(double time, float velocity, int flags)
    mVelocityGrid->SetHighlightCol(time, mStep);
 }
 
-void PulseSequence::GetModuleDimensions(float& width, float& height)
+void PulseSequence::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void PulseSequence::OnClicked(float x, float y, bool right)
+void PulseSequence::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
    mVelocityGrid->TestClick(x, y, right);
 }
 
-void PulseSequence::Resize(float w, float h)
+void PulseSequence::Resize(double w, double h)
 {
    mWidth = MAX(w, 254);
    mHeight = MAX(h, 58);
@@ -221,14 +221,14 @@ void PulseSequence::MouseReleased()
    mVelocityGrid->MouseReleased();
 }
 
-bool PulseSequence::MouseMoved(float x, float y)
+bool PulseSequence::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mVelocityGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
-bool PulseSequence::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool PulseSequence::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;

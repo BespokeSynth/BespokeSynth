@@ -150,7 +150,7 @@ void RadioButton::Render()
 
    DrawBeacon(mX + mWidth / 2, mY + mHeight / 2);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
@@ -173,7 +173,7 @@ void RadioButton::Render()
 
       if (active)
       {
-         float color_h, color_s, color_b;
+         double color_h, color_s, color_b;
          color.getHsb(color_h, color_s, color_b);
          color.setHsb(42, color_s, color_b);
          textColor.set(255, 255, 0, gModuleDrawAlpha);
@@ -184,7 +184,7 @@ void RadioButton::Render()
          color.setBrightness(ofLerp(color.getBrightness(), 255, .3f));
       ofSetColor(color);
 
-      float x, y;
+      double x, y;
 
       if (mDirection == kRadioVertical)
       {
@@ -211,13 +211,13 @@ void RadioButton::Render()
    DrawHover(mX, mY, w, h);
 }
 
-bool RadioButton::MouseMoved(float x, float y)
+bool RadioButton::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    return false;
 }
 
-void RadioButton::OnClicked(float x, float y, bool right)
+void RadioButton::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -228,14 +228,14 @@ void RadioButton::OnClicked(float x, float y, bool right)
       SetIndex(int(x / mElementWidth), NextBufferTime(false));
 }
 
-ofVec2f RadioButton::GetOptionPosition(int optionIndex)
+ofVec2d RadioButton::GetOptionPosition(int optionIndex)
 {
-   float x, y;
+   double x, y;
    GetPosition(x, y, false);
    if (mDirection == kRadioVertical)
-      return ofVec2f(x + mWidth, y + float(mHeight) / GetNumValues() * (optionIndex + .5f));
+      return { x + mWidth, y + double(mHeight) / GetNumValues() * (optionIndex + .5) };
    else //kRadioHorizontal
-      return ofVec2f(x + float(mWidth) / GetNumValues() * (optionIndex + .5f), y + mHeight);
+      return { x + double(mWidth) / GetNumValues() * (optionIndex + .5), y + mHeight };
 }
 
 void RadioButton::OnPulse(double time, double velocity, int flags)

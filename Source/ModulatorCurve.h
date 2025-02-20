@@ -56,7 +56,7 @@ public:
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
@@ -74,13 +74,13 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 106;
       h = 121;
    }
 
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    double mInput{ 0 };
    EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100) };

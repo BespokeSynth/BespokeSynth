@@ -40,8 +40,8 @@ IDrawableModule* Prefab::sJustReleasedModule = nullptr;
 
 namespace
 {
-   const float paddingX = 10;
-   const float paddingY = 10;
+   const double paddingX = 10;
+   const double paddingY = 10;
 }
 
 Prefab::Prefab()
@@ -132,7 +132,7 @@ bool Prefab::IsAddableModule(IDrawableModule* module)
    return true;
 }
 
-void Prefab::OnClicked(float x, float y, bool right)
+void Prefab::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -201,9 +201,9 @@ void Prefab::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void Prefab::GetModuleDimensions(float& width, float& height)
+void Prefab::GetModuleDimensions(double& width, double& height)
 {
-   float x, y;
+   double x, y;
    GetPosition(x, y);
    width = 215;
    height = 40;

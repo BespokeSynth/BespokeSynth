@@ -50,17 +50,17 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    void Process(double time) override;
    NoteInterval GetInterval() const { return mInterval; }
 
    void CanvasUpdated(Canvas* canvas) override;
 
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -79,7 +79,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    void SetNumMeasures(int numMeasures);
    void UpdateNumColumns();

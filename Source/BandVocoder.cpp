@@ -178,7 +178,7 @@ void BandVocoder::DrawModule()
    mMaxBandSlider->Draw();
    mSpacingStyleSlider->Draw();
 
-   float w, h;
+   double w, h;
    GetModuleDimensions(w, h);
 
    auto PosForFreq = [](double freq)

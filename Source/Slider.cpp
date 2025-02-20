@@ -227,7 +227,7 @@ void FloatSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRectangle rect = mMaxEntry->GetRect(K(local));
+      ofRectangle_f rect = mMaxEntry->GetRect(K(local));
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
       ofSetColor(255, 255, 255);
@@ -239,7 +239,7 @@ void FloatSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRectangle rect = mMinEntry->GetRect(K(local));
+      ofRectangle_f rect = mMinEntry->GetRect(K(local));
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
       ofSetColor(255, 255, 255);
@@ -300,7 +300,7 @@ void FloatSlider::DisplayLFOControl()
    }
 }
 
-void FloatSlider::OnClicked(float x, float y, bool right)
+void FloatSlider::OnClicked(double x, double y, bool right)
 {
    if (right)
    {
@@ -353,7 +353,7 @@ void FloatSlider::MouseReleased()
       SetValue(0, NextBufferTime(false));
 }
 
-bool FloatSlider::MouseMoved(float x, float y)
+bool FloatSlider::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    if (mMouseDown)
@@ -1017,7 +1017,7 @@ void IntSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRectangle rect = mMaxEntry->GetRect(K(local));
+      ofRectangle_f rect = mMaxEntry->GetRect(K(local));
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
       ofSetColor(255, 255, 255);
@@ -1029,7 +1029,7 @@ void IntSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRectangle rect = mMinEntry->GetRect(K(local));
+      ofRectangle_f rect = mMinEntry->GetRect(K(local));
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
       ofSetColor(255, 255, 255);
@@ -1063,7 +1063,7 @@ void IntSlider::CalcSliderVal()
    mSliderVal = ofMap(*mVar, mMin, mMax, 0.0, 1.0, K(clamp));
 }
 
-void IntSlider::OnClicked(float x, float y, bool right)
+void IntSlider::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -1099,7 +1099,7 @@ void IntSlider::OnClicked(float x, float y, bool right)
    mMouseDown = true;
 }
 
-bool IntSlider::MouseMoved(float x, float y)
+bool IntSlider::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    if (mMouseDown)

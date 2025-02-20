@@ -243,7 +243,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       }
       else if (subcommand == "focus")
       {
-         ofRectangle module_rect = selected_module->GetRect();
+         ofRectangle_f module_rect = selected_module->GetRect();
          double zoom = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
          if (zoom >= 0.1)
             gDrawScale = ofClamp(zoom, 0.1, 8);

@@ -111,7 +111,7 @@ void ADSRDisplay::Render()
 
       ofBeginShape();
       ofVertex(0, mHeight);
-      for (float i = 0; i < mWidth; i += (.25 / gDrawScale))
+      for (double i = 0; i < mWidth; i += (.25 / gDrawScale))
       {
          double time = i / mWidth * mMaxTime;
          ofVertex(GetDrawPoint(time, adsrEvent));
@@ -180,7 +180,7 @@ void ADSRDisplay::Render()
       double y = (1 - mAdsr->Value(drawTime, &adsrEvent) * mVol) * mHeight;
       if (drawTime >= timeBeforeSustain && drawTime <= releaseTime)
       {
-         ofSetLineWidth(1.5f);
+         ofSetLineWidth(1.5);
          ofLine(drawTime / mMaxTime * mWidth, y, releaseTime / mMaxTime * mWidth, y);
       }
 
@@ -205,8 +205,8 @@ void ADSRDisplay::Render()
          //double timePast = mDrawTimeHistory[indexPast];
          double xLeading = timeLeading / mMaxTime * mWidth;
          double yLeading = (1 - mAdsr->Value(timeLeading, &adsrEvent) * mVol) * mHeight;
-         //float xPast = timePast / mMaxTime * mWidth;
-         //float yPast = (1 - mAdsr->Value(timePast, &adsrEvent) * mVol) * mHeight;
+         //double xPast = timePast / mMaxTime * mWidth;
+         //double yPast = (1 - mAdsr->Value(timePast, &adsrEvent) * mVol) * mHeight;
 
          if (xLeading <= mWidth)
             ofLine(xLeading, yLeading, xLeading, mHeight);
@@ -237,7 +237,7 @@ void ADSRDisplay::Render()
 
    if (mHighlighted)
    {
-      ofSetColor(255, 255, 0, .2f * gModuleDrawAlpha);
+      ofSetColor(255, 255, 0, .2 * gModuleDrawAlpha);
       ofRect(0, 0, mWidth, mHeight, 0);
    }
 
@@ -246,7 +246,7 @@ void ADSRDisplay::Render()
 
    if (sDisplayMode == kDisplayEnvelope)
    {
-      ofSetColor(0, 255, 255, .2f * gModuleDrawAlpha);
+      ofSetColor(0, 255, 255, .2 * gModuleDrawAlpha);
       switch (mAdjustMode)
       {
          case kAdjustAttack:
@@ -259,21 +259,21 @@ void ADSRDisplay::Render()
             ofRect(mWidth - 20, 0, 20, mHeight);
             break;
          case kAdjustEnvelopeEditor:
-            ofSetColor(255, 255, 255, .2f * gModuleDrawAlpha);
+            ofSetColor(255, 255, 255, .2 * gModuleDrawAlpha);
             ofRect(mWidth - 10, 0, 10, 10);
             break;
          case kAdjustViewLength:
-            ofSetColor(255, 255, 255, .2f * gModuleDrawAlpha);
+            ofSetColor(255, 255, 255, .2 * gModuleDrawAlpha);
             ofRect(0, 0, mWidth, 10);
             ofRect(ofMap(mMaxTime, 10, 10000, 0, mWidth - 3, K(clamp)), 0, 3, 10);
-            ofSetColor(255, 255, 255, .8f * gModuleDrawAlpha);
+            ofSetColor(255, 255, 255, .8 * gModuleDrawAlpha);
             DrawTextNormal(ofToString(mMaxTime, 0) + " ms", 3, 8, 8);
             break;
          case kAdjustAttackAR:
-            ofRect(0, 0, mWidth * .5f, mHeight);
+            ofRect(0, 0, mWidth * .5, mHeight);
             break;
          case kAdjustReleaseAR:
-            ofRect(mWidth * .5f, 0, mWidth * .5f, mHeight);
+            ofRect(mWidth * .5, 0, mWidth * .5, mHeight);
             break;
          default:
             break;
@@ -285,7 +285,7 @@ void ADSRDisplay::Render()
 
    if (mASlider)
    {
-      int sliderHeight = mHeight / 4;
+      double sliderHeight = mHeight / 4;
       mASlider->SetPosition(mX, mY);
       mDSlider->SetPosition(mX, mY + sliderHeight);
       mSSlider->SetPosition(mX, mY + sliderHeight * 2);
@@ -397,7 +397,7 @@ void ADSRDisplay::SpawnEnvelopeEditor()
    }
 }
 
-void ADSRDisplay::OnClicked(float x, float y, bool right)
+void ADSRDisplay::OnClicked(double x, double y, bool right)
 {
    if (mASlider != nullptr && mASlider->IsShowing())
    {
@@ -450,7 +450,7 @@ void ADSRDisplay::MouseReleased()
    mClick = false;
 }
 
-bool ADSRDisplay::MouseMoved(float x, float y)
+bool ADSRDisplay::MouseMoved(double x, double y)
 {
    if (!mClick)
    {

@@ -133,7 +133,7 @@ void CurveLooper::DrawModule()
    ofPopStyle();
 }
 
-void CurveLooper::OnClicked(float x, float y, bool right)
+void CurveLooper::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -147,7 +147,7 @@ void CurveLooper::MouseReleased()
    mEnvelopeControl.MouseReleased();
 }
 
-bool CurveLooper::MouseMoved(float x, float y)
+bool CurveLooper::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -215,13 +215,13 @@ void CurveLooper::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void CurveLooper::GetModuleDimensions(float& width, float& height)
+void CurveLooper::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void CurveLooper::Resize(float w, float h)
+void CurveLooper::Resize(double w, double h)
 {
    mWidth = MAX(w, 200);
    mHeight = MAX(h, 120);

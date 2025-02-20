@@ -90,7 +90,7 @@ void Chorder::DrawModule()
 
       if (addColor)
       {
-         ofRectangle rect = mChordGrid->GetRect(true);
+         ofRectangle_f rect = mChordGrid->GetRect(true);
          rect.width /= mChordGrid->GetCols();
          rect.x += i * rect.width;
          ofRect(rect);
@@ -152,7 +152,7 @@ void Chorder::RemoveTone(int tone)
    }
 }
 
-void Chorder::OnClicked(float x, float y, bool right)
+void Chorder::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -168,7 +168,7 @@ void Chorder::MouseReleased()
    mChordGrid->MouseReleased();
 }
 
-bool Chorder::MouseMoved(float x, float y)
+bool Chorder::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mChordGrid->NotifyMouseMoved(x, y);

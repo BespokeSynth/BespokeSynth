@@ -355,7 +355,7 @@ void SamplerGrid::DrawModule()
    }
 }
 
-void SamplerGrid::GetModuleDimensions(float& width, float& height)
+void SamplerGrid::GetModuleDimensions(double& width, double& height)
 {
    if (mEditMode)
    {
@@ -369,7 +369,7 @@ void SamplerGrid::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void SamplerGrid::OnClicked(float x, float y, bool right)
+void SamplerGrid::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -394,14 +394,14 @@ void SamplerGrid::MouseReleased()
    mGrid->MouseReleased();
 }
 
-void SamplerGrid::FilesDropped(std::vector<std::string> files, int x, int y)
+void SamplerGrid::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
    SampleDropped(x, y, &sample);
 }
 
-void SamplerGrid::SampleDropped(int x, int y, Sample* sample)
+void SamplerGrid::SampleDropped(double x, double y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();

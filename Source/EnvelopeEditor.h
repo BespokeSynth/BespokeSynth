@@ -45,10 +45,10 @@ public:
    void MouseReleased();
    void Draw();
    void SetViewLength(double length) { mViewLength = length; }
-   ofVec2f GetPosition() const { return mPosition; }
-   ofVec2f GetDimensions() const { return mDimensions; }
-   void SetPosition(ofVec2f pos) { mPosition = pos; }
-   void SetDimensions(ofVec2f dim) { mDimensions = dim; }
+   ofVec2d GetPosition() const { return mPosition; }
+   ofVec2d GetDimensions() const { return mDimensions; }
+   void SetPosition(ofVec2d pos) { mPosition = pos; }
+   void SetDimensions(ofVec2d dim) { mDimensions = dim; }
    void SetFixedLengthMode(bool fixed) { mFixedLengthMode = fixed; }
 
 private:
@@ -60,12 +60,12 @@ private:
    double GetXForTime(double time);
    double GetYForValue(double value);
 
-   ofVec2f mPosition;
-   ofVec2f mDimensions;
+   ofVec2d mPosition;
+   ofVec2d mDimensions;
    ::ADSR* mAdsr{ nullptr };
    ::ADSR mClickAdsr;
    bool mClick{ false };
-   ofVec2f mClickStart;
+   ofVec2d mClickStart;
    double mViewLength{ 2000 };
    int mHighlightPoint{ -1 };
    int mHighlightCurve{ -1 };
@@ -90,9 +90,9 @@ public:
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    bool IsPinned() const { return mPinned; }
    void SetADSRDisplay(ADSRDisplay* adsrDisplay);
@@ -106,7 +106,7 @@ public:
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -120,7 +120,7 @@ protected:
    ~EnvelopeEditor();
 
 private:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    void Pin();
 
    struct StageControls
@@ -134,8 +134,8 @@ private:
 
    EnvelopeControl mEnvelopeControl;
 
-   float mWidth{ 320 };
-   float mHeight{ 210 };
+   double mWidth{ 320 };
+   double mHeight{ 210 };
 
    ADSRDisplay* mADSRDisplay{ nullptr };
    ClickButton* mPinButton{ nullptr };

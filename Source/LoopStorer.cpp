@@ -206,7 +206,7 @@ void LoopStorer::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void LoopStorer::GetModuleDimensions(float& width, float& height)
+void LoopStorer::GetModuleDimensions(double& width, double& height)
 {
    width = 180;
    height = GetRowY((int)mSamples.size());

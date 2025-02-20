@@ -76,7 +76,7 @@ void KeyboardDisplay::PlayNote(NoteMessage note)
    }
 }
 
-void KeyboardDisplay::OnClicked(float x, float y, bool right)
+void KeyboardDisplay::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -183,7 +183,7 @@ void KeyboardDisplay::SetPitchColor(int pitch)
    }
 }
 
-void KeyboardDisplay::Resize(float w, float h)
+void KeyboardDisplay::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;
@@ -227,7 +227,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
          if (i + RootKey() > 127)
             break;
          bool isBlackKey;
-         ofRectangle key = GetKeyboardKeyRect(i + RootKey(), w, h, isBlackKey);
+         ofRectangle_f key = GetKeyboardKeyRect(i + RootKey(), w, h, isBlackKey);
 
          if ((pass == 0 && !isBlackKey) || (pass == 1 && isBlackKey))
          {
@@ -262,7 +262,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       if (gTime >= mLastOnTime[pitch] && (gTime <= mLastOffTime[pitch] || mLastOffTime[pitch] < mLastOnTime[pitch]))
       {
          bool isBlackKey;
-         ofRectangle key = GetKeyboardKeyRect(pitch, w, h, isBlackKey);
+         ofRectangle_f key = GetKeyboardKeyRect(pitch, w, h, isBlackKey);
          key.height /= 3;
          key.y += key.height * 2;
          ofSetColor(255, 255, 255, ofLerp(255, 150, ofClamp((gTime - mLastOnTime[pitch]) / 150.0, 0, 1)));
@@ -275,7 +275,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPopStyle();
 }
 
-ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const
+ofRectangle_f KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const
 {
    float extraKeyWidth = w / (mNumOctaves * 7 + 1);
    float octaveWidth = (w - extraKeyWidth) / mNumOctaves;
@@ -289,13 +289,13 @@ ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& i
    {
       int whiteKey = (pitch + 1) / 2;
       isBlackKey = false;
-      return ofRectangle(offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, h);
+      return ofRectangle_f(offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, h);
    }
    else //black key
    {
       int blackKey = pitch / 2;
       isBlackKey = true;
-      return ofRectangle(offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1f, 0, octaveWidth / 7 * .8f, h / 2);
+      return ofRectangle_f(offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1f, 0, octaveWidth / 7 * .8f, h / 2);
    }
 }
 

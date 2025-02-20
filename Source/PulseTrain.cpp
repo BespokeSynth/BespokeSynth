@@ -172,20 +172,20 @@ void PulseTrain::Step(double time, double velocity, int flags)
    ++mStep;
 }
 
-void PulseTrain::GetModuleDimensions(float& width, float& height)
+void PulseTrain::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void PulseTrain::OnClicked(float x, float y, bool right)
+void PulseTrain::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
    mVelocityGrid->TestClick(x, y, right);
 }
 
-void PulseTrain::Resize(float w, float h)
+void PulseTrain::Resize(double w, double h)
 {
    mWidth = MAX(w, 254);
    mHeight = MAX(h, 58);
@@ -198,14 +198,14 @@ void PulseTrain::MouseReleased()
    mVelocityGrid->MouseReleased();
 }
 
-bool PulseTrain::MouseMoved(float x, float y)
+bool PulseTrain::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mVelocityGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
-bool PulseTrain::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool PulseTrain::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;

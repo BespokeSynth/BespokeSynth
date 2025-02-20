@@ -45,7 +45,7 @@ void NoteLooper::Init()
 void NoteLooper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   float w, h;
+   double w, h;
    UIBLOCK(80);
    CHECKBOX(mWriteCheckbox, "write", &mWrite);
    CHECKBOX(mDeleteOrMuteCheckbox, "del/mute", &mDeleteOrMute);
@@ -92,7 +92,7 @@ void NoteLooper::DrawModule()
          ofPushStyle();
          ofFill();
          ofSetColor(0, 255, 0, 80);
-         ofRectangle rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
+         ofRectangle_f rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
          ofRect(rect);
          ofPopStyle();
       }
@@ -109,7 +109,7 @@ void NoteLooper::DrawModule()
 
 bool NoteLooper::DrawToPush2Screen()
 {
-   ofRectangle rect = mCanvas->GetRect(true);
+   ofRectangle_f rect = mCanvas->GetRect(true);
 
    mCanvas->SetPosition(125, 3);
    mCanvas->SetDimensions(600, 40);
@@ -123,7 +123,7 @@ bool NoteLooper::DrawToPush2Screen()
    return false;
 }
 
-void NoteLooper::Resize(float w, float h)
+void NoteLooper::Resize(double w, double h)
 {
    mWidth = MAX(w, 370);
    mHeight = MAX(h, 140);

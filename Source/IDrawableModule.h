@@ -58,9 +58,9 @@ enum ModuleCategory
 
 struct PatchCableOld
 {
-   ofVec2f start;
-   ofVec2f end;
-   ofVec2f plug;
+   ofVec2d start;
+   ofVec2d end;
+   ofVec2d plug;
 };
 
 class IDrawableModule : public IClickable, public IPollable, public virtual IPatchable
@@ -76,7 +76,7 @@ public:
    void Render() override;
    void RenderUnclipped();
    virtual void PostRender() {}
-   void DrawFrame(float width, float height, bool drawModule, float& titleBarHeight, float& highlight);
+   void DrawFrame(double width, double height, bool drawModule, double& titleBarHeight, double& highlight);
    void DrawPatchCables(bool parentMinimized, bool inFront);
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }
@@ -105,8 +105,8 @@ public:
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);
    IDrawableModule* FindChild(const std::string name, bool fail) const;
-   void GetDimensions(float& width, float& height) override;
-   virtual void GetModuleDimensions(float& width, float& height)
+   void GetDimensions(double& width, double& height) override;
+   virtual void GetModuleDimensions(double& width, double& height)
    {
       width = 10;
       height = 10;
@@ -117,7 +117,7 @@ public:
    bool Minimized() const { return mMinimizeAnimation > 0; }
    bool WasMinimizeAreaClicked() const { return mWasMinimizeAreaClicked; }
    virtual void MouseReleased() override;
-   virtual void FilesDropped(std::vector<std::string> files, int x, int y) {}
+   virtual void FilesDropped(std::vector<std::string> files, double x, double y) {}
    virtual std::string GetTitleLabel() const { return Name(); }
    virtual bool HasTitleBar() const { return true; }
    static double TitleBarHeight() { return mTitleBarHeight; }
@@ -125,14 +125,14 @@ public:
    virtual void SetEnabled(bool enabled) {}
    virtual bool IsEnabled() const { return true; }
    virtual bool CanMinimize() { return true; }
-   virtual void SampleDropped(int x, int y, Sample* sample) {}
+   virtual void SampleDropped(double x, double y, Sample* sample) {}
    virtual bool CanDropSample() const { return false; }
    void BasePoll(); //calls poll, using this to guarantee base poll is always called
-   bool IsWithinRect(const ofRectangle& rect);
+   bool IsWithinRect(const ofRectangle_f& rect);
    bool IsVisible();
    std::vector<IDrawableModule*> GetChildren() const { return mChildren; }
    virtual bool IsResizable() const { return false; }
-   virtual void Resize(float width, float height) { assert(false); }
+   virtual void Resize(double width, double height) { assert(false); }
    bool IsHoveringOverResizeHandle() const { return mHoveringOverResizeHandle; }
    void SetTypeName(std::string type, ModuleCategory category)
    {
@@ -143,7 +143,7 @@ public:
    void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
    void RemovePatchCableSource(PatchCableSource* source);
-   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
+   bool TestClick(double x, double y, bool right, bool testOnly = false) override;
    std::string GetTypeName() const { return mTypeName; }
    ModuleCategory GetModuleCategory() const { return mModuleCategory; }
    virtual bool IsSingleton() const { return false; }
@@ -200,14 +200,14 @@ public:
    }
    std::vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
 
-   static void FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly = false);
+   static void FindClosestSides(double xThis, double yThis, double wThis, double hThis, double xThat, double yThat, double wThat, double hThat, double& startX, double& startY, double& endX, double& endY, bool sidesOnly = false);
 
-   static float sHueNote;
-   static float sHueAudio;
-   static float sHueInstrument;
-   static float sHueNoteSource;
-   static float sSaturation;
-   static float sBrightness;
+   static double sHueNote;
+   static double sHueAudio;
+   static double sHueInstrument;
+   static double sHueNoteSource;
+   static double sSaturation;
+   static double sBrightness;
 
    bool mDrawDebug{ false };
 
@@ -215,8 +215,8 @@ public:
 
 protected:
    void Poll() override {}
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
 
    void AddDebugLine(std::string text, int maxLines);
 
@@ -230,7 +230,7 @@ private:
    virtual void PreDrawModule() {}
    virtual void DrawModule() = 0;
    virtual void DrawModuleUnclipped() {}
-   float GetMinimizedWidth();
+   double GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
    virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
@@ -249,13 +249,13 @@ private:
 
    bool mMinimized{ false };
    bool mPinned{ false };
-   ofVec2f mPinnedPosition{ 0, 0 };
+   ofVec2d mPinnedPosition{ 0, 0 };
    bool mWasMinimizeAreaClicked{ false };
-   float mMinimizeAnimation{ 0 };
+   double mMinimizeAnimation{ 0 };
    bool mUIControlsCreated{ false };
    bool mInitialized{ false };
    std::string mLastTitleLabel;
-   float mTitleLabelWidth{ 0 };
+   double mTitleLabelWidth{ 0 };
    bool mShouldDrawOutline{ true };
    bool mHoveringOverResizeHandle{ false };
    bool mDeleted{ false };

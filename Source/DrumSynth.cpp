@@ -164,7 +164,7 @@ void DrumSynth::PlayNote(NoteMessage note)
    }
 }
 
-void DrumSynth::OnClicked(float x, float y, bool right)
+void DrumSynth::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -228,7 +228,7 @@ int DrumSynth::GetAssociatedSampleIndex(int x, int y)
    return -1;
 }
 
-void DrumSynth::GetModuleDimensions(float& width, float& height)
+void DrumSynth::GetModuleDimensions(double& width, double& height)
 {
    width = 10 + MIN(mHits.size(), DRUMSYNTH_PADS_HORIZONTAL) * DRUMSYNTH_PAD_WIDTH;
    height = 2 + kPadYOffset + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;

@@ -446,14 +446,14 @@ namespace
    const float extraH = 163;
 }
 
-void NoteCanvas::Resize(float w, float h)
+void NoteCanvas::Resize(double w, double h)
 {
    w = MAX(w - extraW, 390);
    h = MAX(h - extraH, 40);
    mCanvas->SetDimensions(w, h);
 }
 
-void NoteCanvas::GetModuleDimensions(float& width, float& height)
+void NoteCanvas::GetModuleDimensions(double& width, double& height)
 {
    width = mCanvas->GetWidth() + extraW;
    height = mCanvas->GetHeight() + extraH;

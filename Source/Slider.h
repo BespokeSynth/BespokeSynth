@@ -48,7 +48,7 @@ public:
    FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, double* var, double min, double max, int digits = -1);
    void SetVar(double* var) { mVar = var; }
    void Render() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
    bool IsMouseDown() const override { return mMouseDown; }
    void SetExtents(double min, double max)
@@ -125,7 +125,7 @@ public:
    double PosToVal(double pos, bool ignoreSmooth) const;
    double ValToPos(double val, bool ignoreSmooth) const;
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -144,7 +144,7 @@ protected:
    ~FloatSlider(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    void SetValueForMouse(float x, float y);
    double* GetModifyValue();
    bool AdjustSmooth() const;
@@ -210,7 +210,7 @@ public:
    IntSlider(IIntSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, int* var, int min, int max);
    void SetVar(int* var) { mVar = var; }
    void Render() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override { mMouseDown = false; }
    bool IsMouseDown() const override { return mMouseDown; }
    int GetMin() const { return mMin; }
@@ -269,8 +269,8 @@ protected:
    ~IntSlider() override; //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;

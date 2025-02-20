@@ -622,7 +622,7 @@ void DrumPlayer::GetPush2OverrideControls(std::vector<IUIControl*>& controls) co
    }
 }
 
-void DrumPlayer::FilesDropped(std::vector<std::string> files, int x, int y)
+void DrumPlayer::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    x -= 5;
    y -= 70;
@@ -667,7 +667,7 @@ void DrumPlayer::FilesDropped(std::vector<std::string> files, int x, int y)
    }
 }
 
-void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
+void DrumPlayer::SampleDropped(double x, double y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();
@@ -720,7 +720,7 @@ void DrumPlayer::SetHitSample(int sampleIndex, Sample* sample)
    mDrumHits[sampleIndex].mEnvelopeLength = mDrumHits[sampleIndex].mSample.LengthInSamples() * gInvSampleRateMs;
 }
 
-void DrumPlayer::OnClicked(float x, float y, bool right)
+void DrumPlayer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -1057,7 +1057,7 @@ void DrumPlayer::ShuffleKit()
    }
 }
 
-void DrumPlayer::GetModuleDimensions(float& width, float& height)
+void DrumPlayer::GetModuleDimensions(double& width, double& height)
 {
    if (mEditMode)
    {

@@ -80,8 +80,8 @@ public:
 
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void Clear();
    void SetListener(ICanvasListener* listener) { mListener = listener; }
    void SetDimensions(int width, int height)
@@ -89,8 +89,9 @@ public:
       mWidth = width;
       mHeight = height;
    }
-   float GetWidth() const { return mWidth; }
-   float GetHeight() const { return mHeight; }
+
+   double GetWidth() const { return mWidth; }
+   double GetHeight() const { return mHeight; }
    void SetLength(double length) { mLength = length; }
    double GetLength() const { return mLength; }
    void SetNumRows(int rows) { mNumRows = rows; }
@@ -124,7 +125,7 @@ public:
    bool IsRowVisible(int row) const;
    void SetRowColor(int row, ofColor color);
    juce::MouseCursor GetMouseCursorType();
-   ofVec2f RescaleForZoom(float x, float y) const;
+   ofVec2d RescaleForZoom(double x, double y) const;
 
    //IUIControl
    void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
@@ -144,8 +145,8 @@ public:
    double mLoopEnd;
 
 private:
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -156,9 +157,9 @@ private:
 
    bool mClick{ false };
    CanvasElement* mClickedElement{ nullptr };
-   ofVec2f mClickedElementStartMousePos;
-   float mWidth;
-   float mHeight;
+   ofVec2d mClickedElementStartMousePos;
+   double mWidth;
+   double mHeight;
    double mLength;
    ICanvasListener* mListener{ nullptr };
    std::vector<CanvasElement*> mElements;
@@ -171,9 +172,9 @@ private:
    ofRectangle mDragSelectRect;
    bool mDragCanvasMoving{ false };
    bool mDragCanvasZooming{ false };
-   ofVec2f mDragCanvasStartMousePos;
-   ofVec2f mDragCanvasStartCanvasPos;
-   ofVec2f mDragZoomStartDimensions;
+   ofVec2d mDragCanvasStartMousePos;
+   ofVec2d mDragCanvasStartCanvasPos;
+   ofVec2d mDragZoomStartDimensions;
    HighlightEnd mHighlightEnd{ HighlightEnd::kHighlightEnd_None };
    CanvasElement* mHighlightEndElement{ nullptr };
    HighlightEnd mDragEnd{ HighlightEnd::kHighlightEnd_None };

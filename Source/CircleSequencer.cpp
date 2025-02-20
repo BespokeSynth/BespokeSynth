@@ -87,7 +87,7 @@ void CircleSequencer::DrawModule()
    ofPopStyle();
 }
 
-void CircleSequencer::OnClicked(float x, float y, bool right)
+void CircleSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mCircleSequencerRings.size(); ++i)
@@ -101,7 +101,7 @@ void CircleSequencer::MouseReleased()
       mCircleSequencerRings[i]->MouseReleased();
 }
 
-bool CircleSequencer::MouseMoved(float x, float y)
+bool CircleSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    for (int i = 0; i < mCircleSequencerRings.size(); ++i)

@@ -63,7 +63,7 @@ public:
    void UpdateWidth();
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    void SetDisplayText(bool display) { mDisplayStyle = ButtonDisplayStyle::kNoLabel; }
    void SetDisplayStyle(ButtonDisplayStyle style) { mDisplayStyle = style; }
    void SetDimensions(float width, float height)
@@ -80,7 +80,7 @@ public:
    std::string GetDisplayValue(double val) const override;
    int GetNumValues() override { return 2; }
    void Increment(double amount) override;
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -102,9 +102,9 @@ private:
    void DoClick(double time);
    bool ButtonLit() const;
 
-   void OnClicked(float x, float y, bool right) override;
-   float mWidth{ 20 };
-   float mHeight{ 15 };
+   void OnClicked(double x, double y, bool right) override;
+   double mWidth{ 20 };
+   double mHeight{ 15 };
    double mClickTime{ -9999 };
    IButtonListener* mOwner{ nullptr };
    ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };

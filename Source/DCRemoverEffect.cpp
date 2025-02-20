@@ -64,7 +64,7 @@ double DCRemoverEffect::GetEffectAmount()
    return 1;
 }
 
-void DCRemoverEffect::GetModuleDimensions(float& width, float& height)
+void DCRemoverEffect::GetModuleDimensions(double& width, double& height)
 {
    width = 30;
    height = 0;

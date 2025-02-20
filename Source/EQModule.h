@@ -52,7 +52,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -67,10 +67,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void KeyPressed(int key, bool isRepeat) override;
    void MouseReleased() override;
 
@@ -84,8 +84,8 @@ private:
    double PosForGain(double gain) { return .5 - gain / 30.0; }
    double GainForPos(double pos) { return (.5 - pos) * 30; }
 
-   float mWidth{ 825 };
-   float mHeight{ 255 };
+   double mWidth{ 825 };
+   double mHeight{ 255 };
 
    float* mWindower{ nullptr };
    float* mSmoother{ nullptr };
@@ -113,6 +113,6 @@ private:
    int mDragging{ false };
    std::array<float, 1024> mFrequencyResponse{};
    bool mNeedToUpdateFrequencyResponseGraph{ true };
-   float mDrawGain{ 1 };
+   double mDrawGain{ 1 };
    bool mLiteCpuModulation{ true };
 };

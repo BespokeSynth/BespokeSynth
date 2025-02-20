@@ -151,7 +151,7 @@ struct StyleStack
       {}
       bool fill;
       ofColor color;
-      float lineWidth;
+      double lineWidth;
    };
 
    StyleStack() { stack.push_front(Style()); }
@@ -187,17 +187,17 @@ void ofPopMatrix()
    nvgRestore(gNanoVG);
 }
 
-void ofTranslate(float x, float y, float z)
+void ofTranslate(double x, double y, double z)
 {
    nvgTranslate(gNanoVG, x, y);
 }
 
-void ofRotate(float radians)
+void ofRotate(double radians)
 {
    nvgRotate(gNanoVG, radians);
 }
 
-void ofClipWindow(float x, float y, float width, float height, bool intersectWithExisting)
+void ofClipWindow(double x, double y, double width, double height, bool intersectWithExisting)
 {
    if (intersectWithExisting)
       nvgIntersectScissor(gNanoVG, x, y, width, height);
@@ -210,7 +210,7 @@ void ofResetClipWindow()
    nvgResetScissor(gNanoVG);
 }
 
-void ofSetColor(float r, float g, float b, float a)
+void ofSetColor(double r, double g, double b, double a)
 {
    sStyleStack.GetStyle().color = ofColor(r, g, b, a);
    if (Push2Control::sDrawingPush2Display)
@@ -229,7 +229,7 @@ void ofSetColor(float r, float g, float b, float a)
    nvgFillPaint(gNanoVG, pattern);
 }
 
-void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2f gradientStart, ofVec2f gradientEnd)
+void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2d gradientStart, ofVec2d gradientEnd)
 {
    sStyleStack.GetStyle().color = colorA;
    if (Push2Control::sDrawingPush2Display)
@@ -243,7 +243,7 @@ void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2f gr
    nvgFillPaint(gNanoVG, pattern);
 }
 
-void ofSetColor(float grey)
+void ofSetColor(double grey)
 {
    ofSetColor(grey, grey, grey);
 }
@@ -253,7 +253,7 @@ void ofSetColor(const ofColor& color)
    ofSetColor(color.r, color.g, color.b, color.a);
 }
 
-void ofSetColor(const ofColor& color, float a)
+void ofSetColor(const ofColor& color, double a)
 {
    ofSetColor(color.r, color.g, color.b, a);
 }
@@ -268,7 +268,7 @@ void ofNoFill()
    sStyleStack.GetStyle().fill = false;
 }
 
-void ofCircle(float x, float y, float radius)
+void ofCircle(double x, double y, double radius)
 {
    nvgBeginPath(gNanoVG);
    nvgCircle(gNanoVG, x, y, radius);
@@ -278,7 +278,7 @@ void ofCircle(float x, float y, float radius)
       nvgStroke(gNanoVG);
 }
 
-void ofRect(float x, float y, float width, float height, float cornerRadius /*=3*/)
+void ofRect(double x, double y, double width, double height, double cornerRadius /*=3*/)
 {
    nvgBeginPath(gNanoVG);
    nvgRoundedRect(gNanoVG, x, y, width, height, cornerRadius * gCornerRoundness);
@@ -288,7 +288,7 @@ void ofRect(float x, float y, float width, float height, float cornerRadius /*=3
       nvgStroke(gNanoVG);
 }
 
-void ofRect(const ofRectangle& rect, float cornerRadius /*=3*/)
+void ofRect(const ofRectangle& rect, double cornerRadius /*=3*/)
 {
    ofRect(rect.x, rect.y, rect.width, rect.height, cornerRadius);
 }
@@ -343,7 +343,7 @@ int ofHexToInt(const std::string& hexString)
    return str.getHexValue32();
 }
 
-void ofLine(float x1, float y1, float x2, float y2)
+void ofLine(double x1, double y1, double x2, double y2)
 {
    nvgBeginPath(gNanoVG);
    nvgMoveTo(gNanoVG, x1, y1);
@@ -356,18 +356,18 @@ void ofLine(ofVec2f v1, ofVec2f v2)
    ofLine(v1.x, v1.y, v2.x, v2.y);
 }
 
-void ofSetLineWidth(float width)
+void ofSetLineWidth(double width)
 {
    sStyleStack.GetStyle().lineWidth = width;
 
-   const float kLineWidthAdjustAmount = 0.25f;
-   const float kLineWidthAdjustFactor = 1.5f;
+   constexpr double kLineWidthAdjustAmount = 0.25;
+   constexpr double kLineWidthAdjustFactor = 1.5;
    nvgStrokeWidth(gNanoVG, width * kLineWidthAdjustFactor + kLineWidthAdjustAmount);
 }
 
 namespace
 {
-   std::vector<ofVec2f> gShapePoints;
+   std::vector<ofVec2d> gShapePoints;
 }
 
 void ofBeginShape()
@@ -384,16 +384,16 @@ void ofEndShape(bool close)
       nvgStroke(gNanoVG);
 }
 
-void ofVertex(float x, float y, float z)
+void ofVertex(double x, double y, double z)
 {
    if (gShapePoints.empty())
       nvgMoveTo(gNanoVG, x, y);
    else
       nvgLineTo(gNanoVG, x, y);
-   gShapePoints.push_back(ofVec2f(x, y));
+   gShapePoints.emplace_back(x, y);
 }
 
-void ofVertex(ofVec2f point)
+void ofVertex(ofVec2d point)
 {
    ofVertex(point.x, point.y);
 }
@@ -413,7 +413,7 @@ double ofRandom(double x, double y)
    return low + ((high - low) * gRandom01(gRandom));
 }
 
-void ofSetCircleResolution(float res)
+void ofSetCircleResolution(double res)
 {
 }
 
@@ -455,12 +455,12 @@ unsigned long long ofGetSystemTimeNanos()
 }
 #endif
 
-float ofGetWidth()
+double ofGetWidth()
 {
    return TheSynth->GetMainComponent()->getWidth();
 }
 
-float ofGetHeight()
+double ofGetHeight()
 {
    return TheSynth->GetMainComponent()->getHeight();
 }
@@ -494,7 +494,7 @@ bool ofIsStringInString(const std::string& haystack, const std::string& needle)
    return (strstr(haystack.c_str(), needle.c_str()) != nullptr);
 }
 
-void ofScale(float x, float y, float z)
+void ofScale(double x, double y, double z)
 {
    nvgScale(gNanoVG, x, y);
 }
@@ -507,12 +507,15 @@ void ofExit()
 
 void ofToggleFullscreen()
 {
-#if !BESPOKE_WINDOWS
+   auto window = dynamic_cast<ResizableWindow*>(TheSynth->GetMainComponent()->getTopLevelComponent());
+   window->setFullScreen(true);
+
+   //#if !BESPOKE_WINDOWS
    if (Desktop::getInstance().getKioskModeComponent() == nullptr)
       Desktop::getInstance().setKioskModeComponent(TheSynth->GetMainComponent()->getTopLevelComponent(), false);
    else
       Desktop::getInstance().setKioskModeComponent(nullptr, false);
-#endif
+   //#endif
 }
 
 void ofStringReplace(std::string& input, std::string searchStr, std::string replaceStr, bool firstOnly /*= false*/)
@@ -557,7 +560,7 @@ std::string ofGetTimestampString(std::string in)
    return in;
 }
 
-void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
+void ofTriangle(double x1, double y1, double x2, double y2, double x3, double y3)
 {
    ofBeginShape();
    ofVertex(x1, y1);
@@ -569,14 +572,14 @@ void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 
 void ofColor::setBrightness(int brightness)
 {
-   float hue, saturation, oldBrightness;
+   double hue, saturation, oldBrightness;
    getHsb(hue, saturation, oldBrightness);
    setHsb(hue, saturation, brightness);
 }
 
 int ofColor::getBrightness() const
 {
-   float max = r;
+   int max = r;
    if (g > max)
    {
       max = g;
@@ -590,16 +593,16 @@ int ofColor::getBrightness() const
 
 void ofColor::setSaturation(int saturation)
 {
-   float hue, oldSaturation, brightness;
+   double hue, oldSaturation, brightness;
    getHsb(hue, oldSaturation, brightness);
    setHsb(hue, saturation, brightness);
 }
 
 int ofColor::getSaturation() const
 {
-   float max = getBrightness();
+   double max = getBrightness();
 
-   float min = r;
+   double min = r;
    if (g < min)
       min = g;
    if (b < min)
@@ -611,13 +614,13 @@ int ofColor::getSaturation() const
    return 255 * (max - min) / max;
 }
 
-void ofColor::getHsb(float& hue,
-                     float& saturation,
-                     float& brightness) const
+void ofColor::getHsb(double& hue,
+                     double& saturation,
+                     double& brightness) const
 {
-   float max = getBrightness();
+   double max = getBrightness();
 
-   float min = r;
+   double min = r;
    if (g < min)
    {
       min = g;
@@ -627,30 +630,30 @@ void ofColor::getHsb(float& hue,
       min = b;
    }
 
-   if (max == min)
+   if (ofAlmostEquel(max, min))
    { // grays
-      hue = 0.f;
-      saturation = 0.f;
+      hue = 0.;
+      saturation = 0.;
       brightness = max;
       return;
    }
 
-   float hueSixth;
-   if (r == max)
+   double hueSixth;
+   if (ofAlmostEquel(r, max))
    {
       hueSixth = (g - b) / (max - min);
-      if (hueSixth < 0.f)
-         hueSixth += 6.f;
+      if (hueSixth < 0.)
+         hueSixth += 6.;
    }
-   else if (g == max)
+   else if (ofAlmostEquel(g, max))
    {
-      hueSixth = 2.f + (b - r) / (max - min);
+      hueSixth = 2. + (b - r) / (max - min);
    }
    else
    {
-      hueSixth = 4.f + (r - g) / (max - min);
+      hueSixth = 4. + (r - g) / (max - min);
    }
-   hue = 255 * hueSixth / 6.f;
+   hue = 255 * hueSixth / 6.;
    saturation = 255 * (max - min) / max;
    brightness = max;
 }
@@ -669,13 +672,13 @@ void ofColor::setHsb(int hue, int saturation, int brightness)
    }
    else
    {
-      float hueSix = hue * 6.f / 255.0f;
-      float saturationNorm = saturation / 255.0f;
-      int hueSixCategory = (int)floorf(hueSix);
-      float hueSixRemainder = hueSix - hueSixCategory;
-      float pv = ((1.f - saturationNorm) * brightness);
-      float qv = ((1.f - saturationNorm * hueSixRemainder) * brightness);
-      float tv = ((1.f - saturationNorm * (1.f - hueSixRemainder)) * brightness);
+      double hueSix = hue * 6. / 255.0;
+      double saturationNorm = saturation / 255.0;
+      int hueSixCategory = static_cast<int>(floor(hueSix));
+      double hueSixRemainder = hueSix - hueSixCategory;
+      double pv = ((1. - saturationNorm) * brightness);
+      double qv = ((1. - saturationNorm * hueSixRemainder) * brightness);
+      double tv = ((1. - saturationNorm * (1. - hueSixRemainder)) * brightness);
       switch (hueSixCategory)
       {
          default:
@@ -716,10 +719,10 @@ void ofColor::setHsb(int hue, int saturation, int brightness)
 
 ofColor ofColor::operator*(const ofColor& other)
 {
-   return ofColor(r * other.r / 255.0f, g * other.g / 255.0f, b * other.b / 255.0f, a * other.a / 255.0f);
+   return ofColor(r * other.r / 255.0, g * other.g / 255.0, b * other.b / 255.0, a * other.a / 255.0);
 }
 
-ofColor ofColor::operator*(float f)
+ofColor ofColor::operator*(double f)
 {
    return ofColor(r * f, g * f, b * f, a * f);
 }
@@ -745,7 +748,7 @@ void RetinaTrueTypeFont::LoadFont(std::string path)
    }
 }
 
-void RetinaTrueTypeFont::DrawString(std::string str, float size, float x, float y)
+void RetinaTrueTypeFont::DrawString(std::string str, double size, double x, double y)
 {
    if (!mLoaded)
       return;
@@ -763,7 +766,7 @@ void RetinaTrueTypeFont::DrawString(std::string str, float size, float x, float 
       std::vector<std::string> lines = ofSplitString(str, "\n");
       float bounds[4];
       nvgTextBounds(gNanoVG, 0, 0, str.c_str(), nullptr, bounds);
-      float lineHeight = bounds[3] - bounds[1];
+      double lineHeight = bounds[3] - bounds[1];
       for (int i = 0; i < lines.size(); ++i)
       {
          nvgText(gNanoVG, x, y, lines[i].c_str(), nullptr);
@@ -772,10 +775,10 @@ void RetinaTrueTypeFont::DrawString(std::string str, float size, float x, float 
    }
 }
 
-ofRectangle RetinaTrueTypeFont::DrawStringWrap(std::string str, float size, float x, float y, float width)
+ofRectangle RetinaTrueTypeFont::DrawStringWrap(std::string str, double size, double x, double y, double width)
 {
    if (!mLoaded)
-      return ofRectangle();
+      return ofRectangle_f();
 
    TheSynth->LockRender(true);
    nvgFontFaceId(gNanoVG, mFontHandle);
@@ -783,12 +786,12 @@ ofRectangle RetinaTrueTypeFont::DrawStringWrap(std::string str, float size, floa
    nvgTextBox(gNanoVG, x, y, width, str.c_str(), nullptr);
    float bounds[4];
    nvgTextBoxBounds(gNanoVG, x, y, width, str.c_str(), nullptr, bounds);
-   ofRectangle rect(bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]);
+   ofRectangle_f rect(bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]);
    TheSynth->LockRender(false);
    return rect;
 }
 
-float RetinaTrueTypeFont::GetStringWidth(std::string str, float size)
+double RetinaTrueTypeFont::GetStringWidth(std::string str, double size)
 {
    if (!mLoaded)
       return str.size() * 12;
@@ -809,12 +812,12 @@ float RetinaTrueTypeFont::GetStringWidth(std::string str, float size)
    nvgFontFaceId(vg, handle);
    nvgFontSize(vg, size);
    float bounds[4];
-   float width = nvgTextBounds(vg, 0, 0, str.c_str(), nullptr, bounds);
+   double width = nvgTextBounds(vg, 0, 0, str.c_str(), nullptr, bounds);
 
    return width;
 }
 
-float RetinaTrueTypeFont::GetStringHeight(std::string str, float size)
+double RetinaTrueTypeFont::GetStringHeight(std::string str, double size)
 {
    if (!mLoaded)
       return str.size() * 12;
@@ -837,6 +840,6 @@ float RetinaTrueTypeFont::GetStringHeight(std::string str, float size)
    float bounds[4];
    nvgTextBounds(vg, 0, 0, str.c_str(), nullptr, bounds);
 
-   float lineHeight = bounds[3] - bounds[1];
+   double lineHeight = bounds[3] - bounds[1];
    return lineHeight;
 }

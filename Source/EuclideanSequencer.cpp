@@ -103,7 +103,7 @@ EuclideanSequencer::~EuclideanSequencer()
       delete mEuclideanSequencerRings[i];
 }
 
-void EuclideanSequencer::Resize(float w, float h)
+void EuclideanSequencer::Resize(double w, double h)
 {
    mWidth = MAX(w, mWidthMin); // limit minimum width
    mWidth = MIN(mWidth, mWidthMax); // limit maximum width
@@ -176,7 +176,7 @@ void EuclideanSequencer::DrawModule()
    ofPopStyle();
 }
 
-void EuclideanSequencer::OnClicked(float x, float y, bool right)
+void EuclideanSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
@@ -190,7 +190,7 @@ void EuclideanSequencer::MouseReleased()
       mEuclideanSequencerRings[i]->MouseReleased();
 }
 
-bool EuclideanSequencer::MouseMoved(float x, float y)
+bool EuclideanSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)

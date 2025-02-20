@@ -55,7 +55,7 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    void OnTransportAdvanced(double amount) override;
 
@@ -84,7 +84,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    void UpdateNumColumns();
    void SyncControlCablesToCanvas();

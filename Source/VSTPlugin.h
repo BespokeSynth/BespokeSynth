@@ -107,7 +107,7 @@ private:
    //IDrawableModule
    void PreDrawModule() override;
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    void LoadVST(juce::PluginDescription desc);
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
    void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);

@@ -61,8 +61,8 @@ void Canvas::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   ofSetLineWidth(.5f);
-   float w, h;
+   ofSetLineWidth(.5);
+   double w, h;
    GetDimensions(w, h);
    ofNoFill();
    ofRect(0, 0, mWidth, mHeight, 0);
@@ -70,7 +70,7 @@ void Canvas::Render()
 
    ofPushStyle();
    ofFill();
-   const float rowHeight = GetHeight() / GetNumVisibleRows();
+   const double rowHeight = GetHeight() / GetNumVisibleRows();
    for (int i = 0; i < GetNumVisibleRows(); ++i)
    {
       int row = mRowOffset + i;
@@ -100,9 +100,9 @@ void Canvas::Render()
                              mElements[i]->GetStart() <= mViewEnd / GetLength() && mElements[i]->GetEnd() >= mViewStart / GetLength();
       if (visibleOnCanvas)
       {
-         ofVec2f offset(0, 0);
+         ofVec2d offset(0, 0);
          if (mClick && mClickedElement != nullptr && mElements[i]->GetHighlighted() && mDragEnd == kHighlightEnd_None)
-            offset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
+            offset = (ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
          mElements[i]->Draw(offset);
       }
 
@@ -118,7 +118,7 @@ void Canvas::Render()
       ofPopStyle();
    }
 
-   float pos = ofMap(mCursorPos, mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
+   double pos = ofMap(mCursorPos, mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
    if (pos >= 0 && pos < GetWidth())
    {
       ofPushStyle();
@@ -198,9 +198,9 @@ void Canvas::SelectElements(std::vector<CanvasElement*> elements)
    }
 }
 
-ofVec2f Canvas::RescaleForZoom(float x, float y) const
+ofVec2d Canvas::RescaleForZoom(double x, double y) const
 {
-   return ofVec2f(ofMap(x / mWidth, 0, 1, mViewStart, mViewEnd) * mWidth, y);
+   return { ofMap(x / mWidth, 0, 1, mViewStart, mViewEnd) * mWidth, y };
 }
 
 bool Canvas::IsOnElement(CanvasElement* element, float x, float y) const
@@ -213,7 +213,7 @@ bool Canvas::IsRowVisible(int row) const
    return row >= mRowOffset && row < mRowOffset + GetNumVisibleRows();
 }
 
-void Canvas::OnClicked(float x, float y, bool right)
+void Canvas::OnClicked(double x, double y, bool right)
 {
    mClick = true;
    mHasDuplicatedThisDrag = false;
@@ -287,7 +287,7 @@ bool Canvas::CanBeTargetedBy(PatchCableSource* source) const
    return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
 }
 
-bool Canvas::MouseMoved(float x, float y)
+bool Canvas::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
 
@@ -359,7 +359,7 @@ bool Canvas::MouseMoved(float x, float y)
       {
          if (element->GetHighlighted())
          {
-            ofRectangle rect = element->GetRect(!K(clamp), !K(wrapped));
+            ofRectangle_f rect = element->GetRect(!K(clamp), !K(wrapped));
             double startX = rect.x;
             if (element->GetEnd() > 1 && mWrap)
                rect = element->GetRect(!K(clamp), K(wrapped));
@@ -475,7 +475,7 @@ void Canvas::MouseReleased()
    mDragCanvasZooming = false;
 }
 
-bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool Canvas::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (GetKeyModifiers() & kModifier_Alt)
    {

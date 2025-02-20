@@ -220,7 +220,7 @@ void Snapshots::DrawModule()
 
    if (mSnapshotRenameIndex != -1)
    {
-      ofRectangle rect = mSnapshotLabelEntry->GetRect(K(local));
+      ofRectangle_f rect = mSnapshotLabelEntry->GetRect(K(local));
       ofPushStyle();
       ofSetColor(ofColor(40, 40, 40));
       ofFill();
@@ -290,7 +290,7 @@ void Snapshots::AddSnapshotTarget(IDrawableModule* target)
    }
 }
 
-void Snapshots::OnClicked(float x, float y, bool right)
+void Snapshots::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -333,7 +333,7 @@ void Snapshots::OnClicked(float x, float y, bool right)
    }
 }
 
-bool Snapshots::MouseMoved(float x, float y)
+bool Snapshots::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
@@ -746,13 +746,13 @@ void Snapshots::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void Snapshots::GetModuleDimensions(float& width, float& height)
+void Snapshots::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH;
 }
 
-void Snapshots::Resize(float w, float h)
+void Snapshots::Resize(double w, double h)
 {
    SetGridSize(MAX(w - extraW, 137), MAX(h - extraH, gridSquareDimension));
 }

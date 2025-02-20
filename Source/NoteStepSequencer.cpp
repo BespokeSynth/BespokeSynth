@@ -260,7 +260,7 @@ void NoteStepSequencer::DrawModule()
       ofSetColor(255, 0, 0, 50);
       float squareh = float(mGrid->GetHeight()) / mNoteRange;
       float squarew = float(mGrid->GetWidth()) / mLength;
-      ofRectangle gridRect = mGrid->GetRect(K(local));
+      ofRectangle_f gridRect = mGrid->GetRect(K(local));
       ofRect(gridRect.x + squarew * mGridControlOffsetX,
              gridRect.y + gridRect.height - squareh * (mGridControlOffsetY + controllerRows),
              squarew * controllerCols,
@@ -379,7 +379,7 @@ void NoteStepSequencer::DrawModule()
    ofPopStyle();
 }
 
-void NoteStepSequencer::OnClicked(float x, float y, bool right)
+void NoteStepSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -394,7 +394,7 @@ void NoteStepSequencer::MouseReleased()
    mVelocityGrid->MouseReleased();
 }
 
-bool NoteStepSequencer::MouseMoved(float x, float y)
+bool NoteStepSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
@@ -402,7 +402,7 @@ bool NoteStepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool NoteStepSequencer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool NoteStepSequencer::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
@@ -1021,13 +1021,13 @@ float NoteStepSequencer::ExtraHeight() const
    return height;
 }
 
-void NoteStepSequencer::GetModuleDimensions(float& width, float& height)
+void NoteStepSequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + ExtraWidth();
    height = mGrid->GetHeight() + ExtraHeight();
 }
 
-void NoteStepSequencer::Resize(float w, float h)
+void NoteStepSequencer::Resize(double w, double h)
 {
    mGrid->SetDimensions(MAX(w - ExtraWidth(), 210), MAX(h - ExtraHeight(), 80));
    UpdateVelocityGridPos();
@@ -1369,7 +1369,7 @@ void NoteStepSequencer::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
 
-   ofVec2f mousePos(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
+   ofVec2d mousePos(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
    if (mGrid->GetRect().contains(mousePos.x, mousePos.y))
    {
       auto cell = mGrid->GetGridCellAt(mousePos.x - mGrid->GetPosition().x, mousePos.y - mGrid->GetPosition().y);

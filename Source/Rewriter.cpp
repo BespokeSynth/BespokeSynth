@@ -125,7 +125,7 @@ void Rewriter::DrawModule()
    if (mConnectedLooper)
    {
       int loopSamples = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate)) * mConnectedLooper->GetNumBars();
-      ofRectangle rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
+      ofRectangle_f rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
       float playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->GetNumBars()) / mConnectedLooper->GetNumBars();
       //mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height, loopSamples, L(channel,0), loopSamples * playhead);
       //mRecordBuffer.Draw(rect.x, rect.y, rect.width * playhead, rect.height, loopSamples * playhead, L(channel, 0));

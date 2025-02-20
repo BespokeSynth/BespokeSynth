@@ -46,7 +46,7 @@ public:
    void Poll() override;
    void CreateUIControls() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override
+   void Resize(double w, double h) override
    {
       mWidth = MAX(w, 245);
       mHeight = MAX(h, 85);
@@ -89,12 +89,12 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    bool DrawToPush2Screen() override;
    double GetFourTetPosition(double time);
 
@@ -119,8 +119,8 @@ private:
 
    ChannelBuffer mInputBuffer;
 
-   float mWidth{ 245 };
-   float mHeight{ 85 };
+   double mWidth{ 245 };
+   double mHeight{ 85 };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    NoteInterval mInterval{ kInterval_8n };

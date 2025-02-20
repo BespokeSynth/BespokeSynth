@@ -110,14 +110,14 @@ public:
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    //IAudioPoller
    void OnTransportAdvanced(double amount) override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
@@ -139,16 +139,16 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   float mWidth{ 785 }; // was 650 = random buttons visible
-   float mHeight{ 200 };
+   double mWidth{ 785 }; // was 650 = random buttons visible
+   double mHeight{ 200 };
    const float mWidthMin = 590;
    const float mWidthMax = 785;
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    // ModuleSaveData
    bool mPlayShortNotes{ false };

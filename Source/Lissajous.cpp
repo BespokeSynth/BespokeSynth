@@ -92,7 +92,7 @@ void Lissajous::DrawModule()
 
    ofSetLineWidth(2);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofBeginShape();
@@ -102,13 +102,13 @@ void Lissajous::DrawModule()
    ofSetColor(0, 255, 0, 30);
    for (int i = mOffset; i < NUM_LISSAJOUS_POINTS + mOffset - autocorrelationDelay; ++i)
    {
-      float x = w / 2 + mLissajousPoints[i % NUM_LISSAJOUS_POINTS].x * w * mScale;
-      float y;
+      double x = w / 2 + mLissajousPoints[i % NUM_LISSAJOUS_POINTS].x * w * mScale;
+      double y;
       if (mAutocorrelationMode || mOnlyHasOneChannel)
          y = h / 2 + mLissajousPoints[(i + autocorrelationDelay) % NUM_LISSAJOUS_POINTS].x * h * mScale;
       else
          y = h / 2 + mLissajousPoints[i % NUM_LISSAJOUS_POINTS].y * h * mScale;
-      //float alpha = (i-mOffset)/float(NUM_LISSAJOUS_POINTS-autocorrelationDelay);
+      //double alpha = (i-mOffset)/static_cast<double>(NUM_LISSAJOUS_POINTS - autocorrelationDelay);
       ofVertex(x, y);
    }
 
@@ -118,7 +118,7 @@ void Lissajous::DrawModule()
    ofPopStyle();
 }
 
-void Lissajous::Resize(float w, float h)
+void Lissajous::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

@@ -431,7 +431,7 @@ void ModuleSaveDataPanel::RefreshPresetFiles()
    }
 }
 
-void ModuleSaveDataPanel::GetModuleDimensions(float& width, float& height)
+void ModuleSaveDataPanel::GetModuleDimensions(double& width, double& height)
 {
    if (mShowing)
    {

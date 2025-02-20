@@ -316,7 +316,7 @@ void UserPrefsEditor::DrawModule()
 
    if (!selectedDeviceType->hasSeparateInputsAndOutputs() && mCategory == UserPrefCategory::General)
    {
-      ofRectangle rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
+      ofRectangle_f rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
       ofPushStyle();
       ofSetColor(ofColor::white);
       DrawTextNormal("note: " + UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) + " uses the same audio device for output and input", rect.x, rect.getMaxY() + 14, 11);
@@ -365,7 +365,7 @@ void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofCo
 {
    if (control->IsShowing())
    {
-      ofRectangle rect = control->GetRect(true);
+      ofRectangle_f rect = control->GetRect(true);
       ofPushStyle();
       ofSetColor(color);
       DrawTextNormal(text, rect.getMaxX() + offsetX, rect.getMaxY() - 3, 11);

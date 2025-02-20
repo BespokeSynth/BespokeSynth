@@ -96,7 +96,7 @@ void Arpeggiator::DrawModule()
       }
       else
       {
-         float w = gFont.GetStringWidth(pad, 13);
+         double w = gFont.GetStringWidth(pad, 13);
          DrawTextNormal(GetArpNoteDisplay(mChord[i].pitch), 6 + w, 16);
          break;
       }
@@ -115,7 +115,7 @@ std::string Arpeggiator::GetArpNoteDisplay(int pitch)
    return NoteName(pitch, false, true);
 }
 
-void Arpeggiator::OnClicked(float x, float y, bool right)
+void Arpeggiator::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -125,7 +125,7 @@ void Arpeggiator::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool Arpeggiator::MouseMoved(float x, float y)
+bool Arpeggiator::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    return false;

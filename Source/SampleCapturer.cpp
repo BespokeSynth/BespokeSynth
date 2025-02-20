@@ -226,13 +226,13 @@ void SampleCapturer::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void SampleCapturer::GetModuleDimensions(float& w, float& h)
+void SampleCapturer::GetModuleDimensions(double& w, double& h)
 {
    w = kBufferWidth + 60;
    h = (int)mSamples.size() * (kBufferHeight + kBufferSpacing) + kBufferStartY;
 }
 
-void SampleCapturer::OnClicked(float x, float y, bool right)
+void SampleCapturer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -265,7 +265,7 @@ void SampleCapturer::MouseReleased()
    mIsDragging = false;
 }
 
-bool SampleCapturer::MouseMoved(float x, float y)
+bool SampleCapturer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 

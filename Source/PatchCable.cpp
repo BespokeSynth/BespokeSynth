@@ -441,7 +441,7 @@ void PatchCable::Render()
    ofPopMatrix();
 }
 
-bool PatchCable::MouseMoved(float x, float y)
+bool PatchCable::MouseMoved(double x, double y)
 {
    x = TheSynth->GetMouseX(GetOwningModule()->GetOwningContainer());
    y = TheSynth->GetMouseY(GetOwningModule()->GetOwningContainer());
@@ -524,7 +524,7 @@ IClickable* PatchCable::GetDropTarget()
             if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
                continue;
 
-            ofRectangle rect = uicontrol->GetRect();
+            ofRectangle_f rect = uicontrol->GetRect();
             if (rect.contains(cable.end.x, cable.end.y))
             {
                potentialUIControl = uicontrol;
@@ -538,7 +538,7 @@ IClickable* PatchCable::GetDropTarget()
             if (grid->IsShowing() == false || !IsValidTarget(grid))
                continue;
 
-            ofRectangle rect = grid->GetRect();
+            ofRectangle_f rect = grid->GetRect();
             if (rect.contains(cable.end.x, cable.end.y))
             {
                potentialUIControl = grid;
@@ -556,7 +556,7 @@ IClickable* PatchCable::GetDropTarget()
    return nullptr;
 }
 
-bool PatchCable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
+bool PatchCable::TestClick(double x, double y, bool right, bool testOnly /* = false */)
 {
    if (mHovered && !right)
    {
@@ -567,7 +567,7 @@ bool PatchCable::TestClick(float x, float y, bool right, bool testOnly /* = fals
    return false;
 }
 
-void PatchCable::OnClicked(float x, float y, bool right)
+void PatchCable::OnClicked(double x, double y, bool right)
 {
 }
 

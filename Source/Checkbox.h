@@ -43,7 +43,7 @@ public:
    void UseCircleLook(ofColor color);
    void DisableCircleLook() { mUseCircleLook = false; }
 
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //IUIControl
    void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
@@ -71,8 +71,8 @@ protected:
    ~Checkbox(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -80,8 +80,8 @@ private:
    void CalcSliderVal();
    void UpdateWidth();
 
-   float mWidth{ 15 };
-   float mHeight{ 15 };
+   double mWidth{ 15 };
+   double mHeight{ 15 };
    bool* mVar{ nullptr };
    IDrawableModule* mOwner{ nullptr };
    bool mLastDisplayedValue{ false };

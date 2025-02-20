@@ -125,16 +125,16 @@ private:
    void UpdateProgression(int beat);
    void GenerateRandomProgression();
    std::vector<int> GetCurrentChordPitches();
-   ofRectangle GetKeyboardKeyRect(int pitch, bool& isBlackKey);
+   ofRectangle_f GetKeyboardKeyRect(int pitch, bool& isBlackKey);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 610;
       height = 700;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    ClickButton* mChaosButton{ nullptr };
    bool mTotalChaos{ false };

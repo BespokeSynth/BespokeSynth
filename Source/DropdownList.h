@@ -63,29 +63,29 @@ public:
    }
    bool HasTitleBar() const override { return false; }
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    std::string GetHoveredLabel();
-   float GetMouseX() { return mMouseX; }
-   float GetMouseY() { return mMouseY; }
+   double GetMouseX() { return mMouseX; }
+   double GetMouseY() { return mMouseY; }
    void SetShowPagingControls(bool show);
    void SetIsScrolling(bool scrolling) { mIsScrolling = scrolling; }
 
    void ButtonClicked(ClickButton* button, double time) override;
 
 private:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    int mWidth{ 1 };
    int mHeight{ 1 };
    int mColumnWidth{ 1 };
-   float mMouseX{ -1 };
-   float mMouseY{ -1 };
+   double mMouseX{ -1 };
+   double mMouseY{ -1 };
    DropdownList* mOwner;
    ClickButton* mPagePrevButton{ nullptr };
    ClickButton* mPageNextButton{ nullptr };
@@ -109,7 +109,7 @@ public:
    std::string GetLabel(int val) const;
    void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
    void DrawDropdown(int w, int h, bool isScrolling);
    bool DropdownClickedAt(int x, int y);
@@ -125,7 +125,7 @@ public:
    void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetWidth(int width);
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
-   void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
+   void GetPopupDimensions(double& width, double& height) { mModalList.GetDimensions(width, height); }
    void SetMaxPerColumn(int max)
    {
       mMaxPerColumn = max;
@@ -155,7 +155,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
 
-   void GetDimensions(float& width, float& height) override;
+   void GetDimensions(double& width, double& height) override;
 
    //IPulseReceiver
    void OnPulse(double time, double velocity, int flags) override;
@@ -167,14 +167,14 @@ protected:
    ~DropdownList(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    void CalcSliderVal();
    int FindItemIndex(float val) const;
    void CalculateWidth();
-   ofVec2f GetModalListPosition() const;
+   ofVec2d GetModalListPosition() const;
 
-   int mWidth{ 35 };
-   int mHeight{ DropdownList::kItemSpacing };
+   double mWidth{ 35 };
+   double mHeight{ DropdownList::kItemSpacing };
    int mMaxItemWidth{ 20 };
    int mMaxPerColumn{ 40 };
    int mDisplayColumns{ 1 };
@@ -187,7 +187,7 @@ private:
    IDropdownListener* mOwner{ nullptr };
    std::string mUnknownItemString{ "-----" };
    bool mDrawLabel{ false };
-   float mLabelSize{ 0 };
+   double mLabelSize{ 0 };
    double mSliderVal{ 0 };
    int mLastSetValue{ 0 };
    bool mAutoCalculateWidth{ false };

@@ -132,7 +132,7 @@ void Checkbox::Render()
    DrawHover(mX, mY, mWidth, mHeight);
 }
 
-void Checkbox::OnClicked(float x, float y, bool right)
+void Checkbox::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -148,7 +148,7 @@ void Checkbox::CalcSliderVal()
    mSliderVal = *mVar ? 1 : 0;
 }
 
-bool Checkbox::MouseMoved(float x, float y)
+bool Checkbox::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    return false;

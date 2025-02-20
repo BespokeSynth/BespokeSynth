@@ -149,7 +149,7 @@ void SlowLayers::SetNumBars(int numBars)
    mNumBars = numBars;
 }
 
-void SlowLayers::GetModuleDimensions(float& width, float& height)
+void SlowLayers::GetModuleDimensions(double& width, double& height)
 {
    width = 197;
    height = 155;

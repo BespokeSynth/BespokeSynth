@@ -89,7 +89,7 @@ void LooperGranulator::DrawModule()
    mGranWidthSlider->Draw();
 }
 
-void LooperGranulator::DrawOverlay(ofRectangle bufferRect, int loopLength)
+void LooperGranulator::DrawOverlay(ofRectangle_f bufferRect, int loopLength)
 {
    if (mOn)
       mGranulator.Draw(bufferRect.x, bufferRect.y, bufferRect.width, bufferRect.height, 0, loopLength, loopLength);
@@ -134,7 +134,7 @@ void LooperGranulator::DropdownUpdated(DropdownList* list, int oldVal, double ti
 {
 }
 
-void LooperGranulator::GetModuleDimensions(float& width, float& height)
+void LooperGranulator::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

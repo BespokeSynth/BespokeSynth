@@ -208,7 +208,7 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void ClipLauncher::GetModuleDimensions(float& width, float& height)
+void ClipLauncher::GetModuleDimensions(double& width, double& height)
 {
    width = 180;
    height = 180;

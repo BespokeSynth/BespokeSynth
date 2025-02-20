@@ -57,9 +57,9 @@ public:
 
    void CreateUIControls() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    bool IsResizable() const override { return false; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    void PlayNote(NoteMessage note) override;
    void OnPulse(double time, double velocity, int flags) override;
@@ -78,7 +78,7 @@ public:
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -88,10 +88,10 @@ public:
    int GetModuleSaveStateRev() const override { return 1; }
 
 private:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
-   float mWidth{ 250 };
-   float mHeight{ 122 };
+   double mWidth{ 250 };
+   double mHeight{ 122 };
 
    ADSRDisplay* mAdsrDisplay{ nullptr };
    ::ADSR mAdsr{ 10, 100, .5, 100 };

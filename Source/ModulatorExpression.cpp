@@ -194,7 +194,7 @@ void ModulatorExpression::DrawModule()
    mESlider->Draw();
 }
 
-void ModulatorExpression::GetModuleDimensions(float& w, float& h)
+void ModulatorExpression::GetModuleDimensions(double& w, double& h)
 {
    w = MAX(kGraphX + kGraphWidth + 2, 4 + mTextEntry->GetRect().width);
    h = kGraphY + kGraphHeight;

@@ -35,7 +35,7 @@ PanicButton::~PanicButton()
 {
 }
 
-void PanicButton::OnClicked(float x, float y, bool right)
+void PanicButton::OnClicked(double x, double y, bool right)
 {
    TheSynth->LoadLayout(ofToDataPath("daftpunk.json"));
 }

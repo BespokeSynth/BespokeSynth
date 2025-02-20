@@ -50,7 +50,7 @@ public:
 
    bool HasTitleBar() const override { return !mDock; }
    bool IsResizable() const override { return !mDock; }
-   void Resize(float width, float height) override;
+   void Resize(double width, double height) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -61,11 +61,11 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
+   void GetModuleDimensions(double& w, double& h) override;
 
    float GetSliderWidth() { return mWidth - 6; }
 
-   float mWidth{ 400 };
+   double mWidth{ 400 };
    int mNumMeasures{ 32 };
    TextEntry* mNumMeasuresEntry{ nullptr };
    double mTime{ 0 };

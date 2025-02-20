@@ -130,7 +130,7 @@ void LocationZoomer::PickNewVanityPanningDestination()
    {
       if (modules[i]->IsShowing() && !modules[i]->Minimized())
       {
-         ofVec2d modulePos = modules[i]->GetRectDouble().getCenter();
+         ofVec2d modulePos = modules[i]->GetRect().getCenter();
          allModulesCenter += modulePos / (int)modules.size();
       }
    }
@@ -143,7 +143,7 @@ void LocationZoomer::PickNewVanityPanningDestination()
       int choice = gRandom() % ((int)modules.size());
       if (modules[choice]->IsShowing() && !modules[choice]->Minimized())
       {
-         ofVec2d modulePos = modules[choice]->GetRectDouble().getCenter();
+         ofVec2d modulePos = modules[choice]->GetRect().getCenter();
          randomModulesCenter += modulePos / kRandomChoices;
       }
       else

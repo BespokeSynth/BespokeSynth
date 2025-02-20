@@ -57,7 +57,7 @@ public:
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IModulator
@@ -90,7 +90,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    Curve mCurve{ 0 };
    bool mHasRecorded{ false };
@@ -103,8 +103,8 @@ private:
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
    float mDisplayStartY{ 0 };
-   float mWidth{ 220 };
-   float mHeight{ 100 };
+   double mWidth{ 220 };
+   double mHeight{ 100 };
    double mRecordStartOffset{ 0 };
    Checkbox* mRecordCheckbox{ nullptr };
    bool mRecord{ false };

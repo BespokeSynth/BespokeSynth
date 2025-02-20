@@ -191,7 +191,7 @@ void EffectChain::DrawModule()
 
    for (int i = 0; i < mEffects.size(); ++i)
    {
-      ofVec2f pos = GetEffectPos(i);
+      ofVec2d pos = GetEffectPos(i);
 
       if (gTime < mSwapTime) //in swap animation
       {
@@ -209,7 +209,7 @@ void EffectChain::DrawModule()
       }
 
       mEffects[i]->SetPosition(pos.x, pos.y);
-      float w, h;
+      double w, h;
       mEffects[i]->GetDimensions(w, h);
       w = MAX(w, MIN_EFFECT_WIDTH);
 
@@ -233,7 +233,7 @@ void EffectChain::DrawModule()
    {
       mEffects[i]->Draw();
 
-      float x, y, w, h;
+      double x, y, w, h;
       mEffects[i]->GetPosition(x, y, true);
       mEffects[i]->GetDimensions(w, h);
       w = MAX(w, MIN_EFFECT_WIDTH);
@@ -256,7 +256,7 @@ void EffectChain::DrawModule()
       }
    }
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    mVolumeSlider->SetPosition(4, h - 17);
    mVolumeSlider->Draw();
@@ -273,12 +273,12 @@ int EffectChain::NumRows() const
 
 int EffectChain::GetRowHeight(int row) const
 {
-   float max = 0;
+   double max = 0;
    for (int i = 0; i < mEffects.size(); ++i)
    {
       if (i / mNumFXWide == row)
       {
-         float w, h;
+         double w, h;
          mEffects[i]->GetDimensions(w, h);
          h += IDrawableModule::TitleBarHeight();
          h += 20;
@@ -289,10 +289,10 @@ int EffectChain::GetRowHeight(int row) const
    return max;
 }
 
-ofVec2f EffectChain::GetEffectPos(int index) const
+ofVec2d EffectChain::GetEffectPos(int index) const
 {
-   float xPos = 10;
-   float yPos = 32;
+   double xPos = 10;
+   double yPos = 32;
    for (int i = 0; i < mEffects.size(); ++i)
    {
       if (i > 0 && i % mNumFXWide == 0) //newline
@@ -302,16 +302,16 @@ ofVec2f EffectChain::GetEffectPos(int index) const
       }
 
       if (i == index)
-         return ofVec2f(xPos, yPos);
+         return { xPos, yPos };
 
-      float w, h;
+      double w, h;
       mEffects[i]->GetDimensions(w, h);
       w = MAX(w, MIN_EFFECT_WIDTH);
 
       xPos += w + 20;
    }
 
-   return ofVec2f(xPos, yPos);
+   return { xPos, yPos };
 }
 
 void EffectChain::GetPush2OverrideControls(std::vector<IUIControl*>& controls) const
@@ -347,7 +347,7 @@ void EffectChain::GetPush2OverrideControls(std::vector<IUIControl*>& controls) c
    }
 }
 
-void EffectChain::GetModuleDimensions(float& width, float& height)
+void EffectChain::GetModuleDimensions(double& width, double& height)
 {
    int maxX = 100;
    if (mShowSpawnList)
@@ -355,7 +355,7 @@ void EffectChain::GetModuleDimensions(float& width, float& height)
    int maxY = 0;
    for (int i = 0; i < mEffects.size(); ++i)
    {
-      float x, y, w, h;
+      double x, y, w, h;
       mEffects[i]->GetPosition(x, y, true);
       mEffects[i]->GetDimensions(w, h);
       w = MAX(w, MIN_EFFECT_WIDTH);

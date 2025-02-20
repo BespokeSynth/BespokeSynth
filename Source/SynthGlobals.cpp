@@ -96,9 +96,9 @@ void SynthInit()
 
    assert(kNumVoices <= 16); //assumption that we don't have more voices than midi channels
 
-   gStepVelocityLevels[(int)StepVelocityType::Ghost] = 0.4f;
-   gStepVelocityLevels[(int)StepVelocityType::Normal] = 0.8f;
-   gStepVelocityLevels[(int)StepVelocityType::Accent] = 1.0f;
+   gStepVelocityLevels[(int)StepVelocityType::Ghost] = 0.4;
+   gStepVelocityLevels[(int)StepVelocityType::Normal] = 0.8;
+   gStepVelocityLevels[(int)StepVelocityType::Accent] = 1.0;
 }
 
 void LoadGlobalResources()
@@ -134,7 +134,7 @@ std::string GetBuildInfoString()
    juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")";
 }
 
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/)
+void DrawAudioBuffer(double width, double height, ChannelBuffer* buffer, double start, double end, double pos, double vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/)
 {
    ofPushMatrix();
    if (buffer != nullptr)
@@ -149,9 +149,9 @@ void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float sta
    ofPopMatrix();
 }
 
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, int bufferSize /*=-1*/)
+void DrawAudioBuffer(double width, double height, const float* buffer, double start, double end, double pos, double vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, int bufferSize /*=-1*/)
 {
-   vol = MAX(.1f, vol); //make sure we at least draw something if there is waveform data
+   vol = MAX(.1, vol); //make sure we at least draw something if there is waveform data
 
    ofPushStyle();
 
@@ -163,7 +163,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    else
       ofRect(width, 0, -width, height);
 
-   float length = end - 1 - start;
+   double length = end - 1 - start;
    if (length < 0)
       length = length + wraparoundFrom - wraparoundTo;
    if (length < 0)
@@ -171,20 +171,20 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
 
    if (length > 0)
    {
-      const float kStepSize = 3;
-      float samplesPerStep = length / abs(width) * kStepSize;
+      const double kStepSize = 3;
+      double samplesPerStep = length / std::abs(width) * kStepSize;
       start = start - (int(start) % MAX(1, int(samplesPerStep)));
 
       if (buffer && length > 0)
       {
-         float step = width > 0 ? kStepSize : -kStepSize;
+         double step = width > 0 ? kStepSize : -kStepSize;
          samplesPerStep = length / width * step;
 
          ofSetColor(color);
 
-         for (float i = 0; abs(i) < abs(width); i += step)
+         for (double i = 0; abs(i) < std::abs(width); i += step)
          {
-            float mag = 0;
+            double mag = 0;
             int position = i / width * length + start;
             //rms
             int j;
@@ -198,7 +198,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
                   sampleIdx %= bufferSize;
                mag = MAX(mag, std::abs(buffer[sampleIdx]));
             }
-            mag = pow(mag, .25f);
+            mag = std::pow(mag, .25);
             mag *= height / 2 * vol;
             if (mag > height / 2)
             {
@@ -209,12 +209,12 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
             {
                //ofSetColor(color);
             }
-            if (mag == 0)
-               mag = .1f;
+            if (ofAlmostEquel(mag, 0))
+               mag = .1;
             ofLine(i, height / 2 - mag, i, height / 2 + mag);
          }
 
-         if (pos != -1)
+         if (!ofAlmostEquel(pos, -1))
          {
             ofSetColor(0, 255, 0);
             int position = ofMap(pos, start, end, 0, width, true);
@@ -405,22 +405,22 @@ double DoubleWrap(double num, double space)
    return num;
 }
 
-void DrawTextNormal(std::string text, int x, int y, float size)
+void DrawTextNormal(std::string text, double x, double y, double size)
 {
    gFont.DrawString(text, size, x, y);
 }
 
-void DrawTextRightJustify(std::string text, int x, int y, float size)
+void DrawTextRightJustify(std::string text, double x, double y, double size)
 {
    gFont.DrawString(text, size, x - gFont.GetStringWidth(text, size), y);
 }
 
-void DrawTextBold(std::string text, int x, int y, float size)
+void DrawTextBold(std::string text, double x, double y, double size)
 {
    gFontBold.DrawString(text, size, x, y);
 }
 
-float GetStringWidth(std::string text, float size)
+double GetStringWidth(std::string text, double size)
 {
    return gFont.GetStringWidth(text, size);
 }
@@ -428,6 +428,10 @@ float GetStringWidth(std::string text, float size)
 void AssertIfDenormal(float input)
 {
    assert(input == 0 || input != input || std::abs(input) > std::numeric_limits<float>::min());
+}
+void AssertIfDenormal(double input)
+{
+   assert(input == 0 || input != input || std::abs(input) > std::numeric_limits<double>::min());
 }
 
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
@@ -529,10 +533,10 @@ void UpdateTarget(IDrawableModule* module)
    }
 }
 
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b, bool autocorrelationMode /* = true */)
+void DrawLissajous(RollingBuffer* buffer, double x, double y, double w, double h, double r, double g, double b, bool autocorrelationMode /* = true */)
 {
    ofPushStyle();
-   ofSetLineWidth(1.5f);
+   ofSetLineWidth(1.5);
 
    int secondChannel = 1;
    if (buffer->NumChannels() == 1)
@@ -541,16 +545,16 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
    ofSetColor(r * 255, g * 255, b * 255, 70);
    ofBeginShape();
    const int delaySamps = 90;
-   int numPoints = MIN(buffer->Size() - delaySamps - 1, .02f * gSampleRate);
+   int numPoints = MIN(buffer->Size() - delaySamps - 1, .02 * gSampleRate);
    for (int i = 100; i < numPoints; ++i)
    {
-      float vx = x + w / 2 + buffer->GetSample(i, 0) * .8f * MIN(w, h);
-      float vy;
+      double vx = x + w / 2 + buffer->GetSample(i, 0) * .8 * MIN(w, h);
+      double vy;
       if (autocorrelationMode)
-         vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+         vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8 * MIN(w, h);
       else
-         vy = y + h / 2 + buffer->GetSample(i, secondChannel) * .8f * MIN(w, h);
-      //float alpha = 1 - (i/float(numPoints));
+         vy = y + h / 2 + buffer->GetSample(i, secondChannel) * .8 * MIN(w, h);
+      //double alpha = 1 - (i/double(numPoints));
       //ofSetColor(r*255,g*255,b*255,alpha*alpha*255);
       ofVertex(vx, vy);
    }
@@ -742,18 +746,18 @@ std::string GetUniqueName(std::string name, std::vector<std::string> existing)
    return name;
 }
 
-float DistSqToLine(ofVec2f point, ofVec2f a, ofVec2f b)
+double DistSqToLine(ofVec2d point, ofVec2d a, ofVec2d b)
 {
-   float l2 = a.distanceSquared(b);
-   if (l2 == 0.0f)
+   double l2 = a.distanceSquared(b);
+   if (l2 == 0.0)
       return point.distanceSquared(a);
 
-   float t = ((point.x - b.x) * (a.x - b.x) + (point.y - b.y) * (a.y - b.y)) / l2;
-   if (t < 0.0f)
+   double t = ((point.x - b.x) * (a.x - b.x) + (point.y - b.y) * (a.y - b.y)) / l2;
+   if (t < 0.0)
       return point.distanceSquared(a);
-   if (t > 1.0f)
+   if (t > 1.0)
       return point.distanceSquared(b);
-   return point.distanceSquared(ofVec2f(b.x + t * (a.x - b.x), b.y + t * (a.y - b.y)));
+   return point.distanceSquared(ofVec2d(b.x + t * (a.x - b.x), b.y + t * (a.y - b.y)));
 }
 
 //Jenkins one-at-a-time hash
@@ -801,7 +805,7 @@ double GetRightPanGain(double pan)
    return ofClamp(pan, -1, 1) + 1;
 }
 
-void DrawFallbackText(const char* text, float posX, float posY)
+void DrawFallbackText(const char* text, double posX, double posY)
 {
    static int simplex[95][112] = {
       0,
@@ -11446,8 +11450,8 @@ void DrawFallbackText(const char* text, float posX, float posY)
       -1,
    };
 
-   float scale = .5f;
-   ofVec2f pen;
+   double scale = .5;
+   ofVec2d pen;
    pen.set(posX, posY);
 
    for (const auto* c = text; *c; ++c)
@@ -11465,22 +11469,22 @@ void DrawFallbackText(const char* text, float posX, float posY)
       const auto nvtcs = *it++;
       const auto spacing = *it++;
 
-      auto from = ofVec2f(-1, -1);
+      auto from = ofVec2d(-1, -1);
 
       for (size_t i = 0; i < nvtcs; ++i)
       {
          const auto x = *it++;
          const auto y = *it++;
 
-         const auto to = ofVec2f(x, y);
+         const auto to = ofVec2d(x, y);
 
-         if ((from.x != -1 || from.y != -1) && (to.x != -1 || to.y != -1))
+         if ((!ofAlmostEquel(from.x, -1) || !ofAlmostEquel(from.y, -1)) && (!ofAlmostEquel(to.x, -1) || !ofAlmostEquel(to.y, -1)))
             ofLine(pen.x + from.x * scale, pen.y - from.y * scale, pen.x + to.x * scale, pen.y - to.y * scale);
 
          from = to;
       }
 
-      pen += ofVec2f(spacing * scale, 0);
+      pen += ofVec2d(spacing * scale, 0);
    }
 }
 

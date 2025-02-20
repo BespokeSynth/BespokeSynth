@@ -80,7 +80,7 @@ void PulseFlag::OnPulse(double time, double velocity, int flags)
    DispatchPulse(GetPatchCableSource(), time, velocity, flags);
 }
 
-void PulseFlag::GetModuleDimensions(float& width, float& height)
+void PulseFlag::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

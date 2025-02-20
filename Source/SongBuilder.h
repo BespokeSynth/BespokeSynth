@@ -81,7 +81,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    bool IsResizable() const override { return false; }
    void PostRepatch(PatchCableSource* cable, bool fromUserClick) override;
    bool ShouldSavePatchCableSources() const override { return false; }

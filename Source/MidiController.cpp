@@ -1066,7 +1066,7 @@ void MidiController::DrawModule()
    }
    else
    {
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
 
       DrawTextNormal("last input: " + mLastInput, 60, h - 5);
@@ -1113,8 +1113,8 @@ void MidiController::DrawModule()
          ControlLayoutElement& control = mLayoutControls[i];
          if (control.mActive)
          {
-            ofVec2f center(control.mPosition.x + control.mDimensions.x / 2, control.mPosition.y + control.mDimensions.y / 2);
-            float uiControlValue = 0;
+            ofVec2d center(control.mPosition.x + control.mDimensions.x / 2, control.mPosition.y + control.mDimensions.y / 2);
+            double uiControlValue = 0;
 
             if (control.mControlCable)
             {
@@ -1175,7 +1175,7 @@ void MidiController::DrawModule()
 
                if (on)
                {
-                  float fadeAmount = ofClamp(ofLerp(.5f, 1, control.mLastValue), 0, 1);
+                  double fadeAmount = ofClamp(ofLerp(.5, 1, control.mLastValue), 0, 1);
                   ofPushStyle();
                   ofFill();
                   ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
@@ -1186,21 +1186,21 @@ void MidiController::DrawModule()
 
             if (control.mDrawType == kDrawType_Knob)
             {
-               float value = control.mLastValue;
+               double value = control.mLastValue;
                if (control.mIncrementAmount != 0)
                   value = uiControlValue;
 
                ofCircle(center.x, center.y, control.mDimensions.x / 2);
                ofPushStyle();
                ofSetColor(255, 255, 255, gModuleDrawAlpha);
-               float angle = ofLerp(.1f, .9f, value) * FTWO_PI;
-               ofLine(center.x, center.y, center.x - sinf(angle) * control.mDimensions.x / 2, center.y + cosf(angle) * control.mDimensions.x / 2);
+               double angle = ofLerp(.1, .9, value) * TWO_PI;
+               ofLine(center.x, center.y, center.x - std::sin(angle) * control.mDimensions.x / 2, center.y + std::cos(angle) * control.mDimensions.x / 2);
                ofPopStyle();
             }
 
             if (control.mDrawType == kDrawType_Slider)
             {
-               float value = control.mLastValue;
+               double value = control.mLastValue;
                if (control.mIncrementAmount != 0)
                   value = uiControlValue;
 
@@ -1265,7 +1265,7 @@ void MidiController::DrawModule()
       }
       ofPopStyle();
 
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
       mAddConnectionButton->SetPosition(mAddConnectionButton->GetPosition(true).x, h - 17);
       mAddConnectionButton->Draw();
@@ -1350,7 +1350,7 @@ void MidiController::DrawModuleUnclipped()
          pos.x += 18;
       }
 
-      float width = GetStringWidth(tooltip);
+      auto width = GetStringWidth(tooltip);
 
       ofFill();
       ofSetColor(50, 50, 50);
@@ -1403,7 +1403,7 @@ UIControlConnection* MidiController::GetConnectionForCableSource(const PatchCabl
    return nullptr;
 }
 
-void MidiController::OnClicked(float x, float y, bool right)
+void MidiController::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -1428,7 +1428,7 @@ void MidiController::OnClicked(float x, float y, bool right)
    }
 }
 
-bool MidiController::MouseMoved(float x, float y)
+bool MidiController::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -1514,7 +1514,7 @@ void MidiController::HighlightPageControls(int page)
    }
 }
 
-void MidiController::GetModuleDimensions(float& width, float& height)
+void MidiController::GetModuleDimensions(double& width, double& height)
 {
    if (mMappingDisplayMode == kList)
    {
@@ -2855,7 +2855,7 @@ void UIControlConnection::DrawList(int index)
          x += 13;
    }
 
-   ofRectangle rect = mUIControlPathEntry->GetRect(true);
+   ofRectangle_f rect = mUIControlPathEntry->GetRect(true);
    if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
       mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetManualPosition(rect.x + rect.width - 5, rect.y + rect.height / 2);
 

@@ -238,7 +238,7 @@ void Push2Control::DrawModuleUnclipped()
    }
 }
 
-void Push2Control::DrawDisplayModuleRect(ofRectangle rect, float thickness)
+void Push2Control::DrawDisplayModuleRect(ofRectangle_f rect, float thickness)
 {
    if (mDisplayModule->HasTitleBar())
    {
@@ -286,7 +286,7 @@ void Push2Control::KeyPressed(int key, bool isRepeat)
    }
 }
 
-void Push2Control::OnClicked(float x, float y, bool right)
+void Push2Control::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -880,7 +880,7 @@ void Push2Control::DrawDisplayModuleControls()
       int length = MAX((int)mButtonControls.size(), (int)mSliderControls.size());
       if (length > 8)
       {
-         ofRectangle bar(ableton::Push2DisplayBitmap::kWidth * kPixelRatio - 100, 3, 80, 10);
+         ofRectangle_f bar(ableton::Push2DisplayBitmap::kWidth * kPixelRatio - 100, 3, 80, 10);
          ofNoFill();
          ofSetColor(100, 100, 100);
          ofRect(bar);
@@ -920,7 +920,7 @@ void Push2Control::DrawLowerModuleSelector()
       float highlight;
       mModules[i]->DrawFrame(kColumnSpacing - 14, 80, true, titleBarHeight, highlight);
       if (mModules[i] == mDisplayModule)
-         DrawDisplayModuleRect(ofRectangle(0, 0, kColumnSpacing - 14, 80), 3);
+         DrawDisplayModuleRect(ofRectangle_f(0, 0, kColumnSpacing - 14, 80), 3);
       mModules[i]->SetPosition(x, y);
 
       if (i - round(mModuleListOffset) >= 0 && i - round(mModuleListOffset) < 8)
@@ -1079,7 +1079,7 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
 
       ADSRDisplay* adsr = dynamic_cast<ADSRDisplay*>(controls[i]);
 
-      ofRectangle originalRect = controls[i]->GetRect(true);
+      ofRectangle_f originalRect = controls[i]->GetRect(true);
       if (adsr != nullptr)
       {
          adsr->SetDimensions(80, 30);
@@ -1166,7 +1166,7 @@ void Push2Control::Poll()
       ofVec2f newModulePos;
       if (existingModule != nullptr)
       {
-         ofRectangle existingModuleRect = existingModule->GetRect();
+         ofRectangle_f existingModuleRect = existingModule->GetRect();
          newModulePos = ofVec2f(existingModuleRect.getMinX(), existingModuleRect.getMaxY() + 40);
       }
       else
@@ -2054,7 +2054,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
          }
          else if (mHeldKnobIndex == -1)
          {
-            ofRectangle rect = mDisplayModule->GetRect();
+            ofRectangle_f rect = mDisplayModule->GetRect();
             TheSynth->PanTo(rect.getCenter().x, rect.getCenter().y);
          }
          else

@@ -67,11 +67,11 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    bool IsResizable() const override { return true; }
-   void Resize(float width, float height) override
+   void Resize(double width, double height) override
    {
       mWidth = ofClamp(width, 210, 9999);
       mHeight = ofClamp(height, 125, 9999);
@@ -128,14 +128,14 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
-   float mWidth{ 608 };
-   float mHeight{ 150 };
+   double mWidth{ 608 };
+   double mHeight{ 150 };
 
    Sample* mSample{ nullptr };
    bool mOwnsSample{ true };

@@ -55,7 +55,7 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void KeyPressed(int key, bool isRepeat) override;
 
    void PlayNote(NoteMessage note) override;
@@ -92,7 +92,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    double GetCurPos(double time) const;
    void UpdateNumColumns();

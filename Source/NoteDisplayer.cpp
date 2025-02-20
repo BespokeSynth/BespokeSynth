@@ -70,7 +70,7 @@ void NoteDisplayer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-void NoteDisplayer::Resize(float w, float h)
+void NoteDisplayer::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

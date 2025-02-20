@@ -154,7 +154,7 @@ void NoteTable::DrawModule()
       ofSetColor(255, 0, 0, 50);
       float squareh = float(mGrid->GetHeight()) / mNoteRange;
       float squarew = float(mGrid->GetWidth()) / mLength;
-      ofRectangle gridRect = mGrid->GetRect(K(local));
+      ofRectangle_f gridRect = mGrid->GetRect(K(local));
       ofRect(gridRect.x + squarew * mGridControlOffsetX,
              gridRect.y + gridRect.height - squareh * (mGridControlOffsetY + controllerRows),
              squarew * controllerCols,
@@ -233,7 +233,7 @@ void NoteTable::DrawModule()
    ofPopStyle();
 }
 
-void NoteTable::OnClicked(float x, float y, bool right)
+void NoteTable::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -246,7 +246,7 @@ void NoteTable::MouseReleased()
    mGrid->MouseReleased();
 }
 
-bool NoteTable::MouseMoved(float x, float y)
+bool NoteTable::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
@@ -321,13 +321,13 @@ float NoteTable::ExtraHeight() const
    return height;
 }
 
-void NoteTable::GetModuleDimensions(float& width, float& height)
+void NoteTable::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + ExtraWidth();
    height = mGrid->GetHeight() + ExtraHeight();
 }
 
-void NoteTable::Resize(float w, float h)
+void NoteTable::Resize(double w, double h)
 {
    mGrid->SetDimensions(MAX(w - ExtraWidth(), 210), MAX(h - ExtraHeight(), 80));
 }

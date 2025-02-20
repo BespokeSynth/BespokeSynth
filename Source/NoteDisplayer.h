@@ -44,14 +44,14 @@ public:
    void SetUpFromSaveData() override;
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -59,8 +59,8 @@ private:
 
    void DrawNoteName(int pitch, float y) const;
 
-   float mWidth{ 160 };
-   float mHeight{ 60 };
+   double mWidth{ 160 };
+   double mHeight{ 60 };
    int mVelocities[128]{};
    int mVoiceIds[128]{};
 };

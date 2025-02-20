@@ -86,7 +86,7 @@ void EQEffect::DrawModule()
    mEvenButton->Draw();
 }
 
-void EQEffect::OnClicked(float x, float y, bool right)
+void EQEffect::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -99,7 +99,7 @@ void EQEffect::MouseReleased()
    mMultiSlider->MouseReleased();
 }
 
-bool EQEffect::MouseMoved(float x, float y)
+bool EQEffect::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mMultiSlider->NotifyMouseMoved(x, y);
@@ -120,7 +120,7 @@ double EQEffect::GetEffectAmount()
    return 0;
 }
 
-void EQEffect::GetModuleDimensions(float& width, float& height)
+void EQEffect::GetModuleDimensions(double& width, double& height)
 {
    width = 90;
    height = 80;

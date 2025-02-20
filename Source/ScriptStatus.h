@@ -58,14 +58,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override
+   void Resize(double w, double h) override
    {
       mWidth = w;
       mHeight = h;
@@ -76,6 +76,6 @@ private:
    std::string mStatus;
    double mNextUpdateTime{ 0 };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 };

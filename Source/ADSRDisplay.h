@@ -38,7 +38,7 @@ public:
    ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ::ADSR* adsr);
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void SetVol(double vol) { mVol = vol; }
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
@@ -49,7 +49,7 @@ public:
    ::ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
    void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
-   void SetDimensions(float w, float h)
+   void SetDimensions(double w, double h)
    {
       mWidth = w;
       mHeight = h;
@@ -95,8 +95,8 @@ private:
       kAdjustViewLength
    } mAdjustMode{ AdjustParam::kAdjustNone };
 
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -105,8 +105,8 @@ private:
    void UpdateSliderVisibility();
    ofVec2d GetDrawPoint(double time, const ADSR::EventInfo& adsrEvent);
 
-   float mWidth;
-   float mHeight;
+   double mWidth;
+   double mHeight;
    double mVol{ 1 };
    double mMaxTime{ 1000 };
    bool mClick{ false };
