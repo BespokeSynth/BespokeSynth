@@ -158,6 +158,14 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       }
       return paths;
    });
+   m.def("location_recall", [](char location)
+   {
+      TheSynth->GetLocationZoomer()->MoveToLocation(location);
+   });
+   m.def("location_store", [](char location)
+   {
+      TheSynth->GetLocationZoomer()->WriteCurrentLocation(location);
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)

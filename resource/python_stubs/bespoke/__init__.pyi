@@ -54,3 +54,9 @@ def random(seed, index):
 def get_modules():
    pass
 
+def location_recall(location):
+   pass
+
+def location_store(location):
+   pass
+
