@@ -781,28 +781,31 @@ void ScriptModule::PrintText(std::string text)
 
 IUIControl* ScriptModule::GetUIControl(std::string path)
 {
-   IUIControl* control;
-   std::string prefix = "";
-
    if (path == "")
       return nullptr;
 
-   //if path[0] == '$', skip prefix calculation
-   if (path[0] != '$')
-   {
-      //if path has two ~ chars: path is prefab full path: skip prefix calculation
-      if (std::count(path.begin(), path.end(), '~') < 2)
-      {
-         prefix = Path();
-         if (ofIsStringInString(prefix, "~"))
-            //script is in prefab: create prefix up to last ~ (also handles nested prefabs)
-            prefix = prefix.substr(0, prefix.rfind('~') + 1);
-         else
-            prefix = "";
-      }
-   }
+   std::string fullPath = path;
 
-   control = TheSynth->FindUIControl(prefix + path);
+   if (path[0] == '$')
+      //absolute path provided by the user
+      fullPath = path;
+   else if (std::count(path.begin(), path.end(), '~') >= 2)
+      //absolute path within a prefab
+      fullPath = path;
+   else if (ofIsStringInString(Path(), "~") && !ofIsStringInString(path, "~"))
+      //in a prefab, referencing a script variable
+      fullPath = Path() + "~" + path;
+   else if (!ofIsStringInString(Path(), "~") && ofIsStringInString(path, "~"))
+      //main screen, referencing a module
+      fullPath = path;
+   else if (ofIsStringInString(Path(), "~") && ofIsStringInString(path, "~"))
+      //in a prefab, referencing module in the current or nested prefab
+      fullPath = Path().substr(0, Path().rfind('~') + 1) + path;
+   else
+      //main screen, referencing a script variable
+      fullPath = Path() + "~" + path;
+
+   IUIControl* control = TheSynth->FindUIControl(fullPath);
 
    return control;
 }
