@@ -34,6 +34,10 @@ globals:
       optional: size=50, xPos = 150, yPos = 250, red = 1, green = 1, blue = 1
    bespoke.random(seed, index)
    bespoke.get_modules()
+   bespoke.location_recall(location): move to saved location (0-255). "1" - "9" match the minimap and function key shortcuts: SHIFT+"1" - "9"
+      example: bespoke.location_recall("1")
+      example: bespoke.location_recall(49)
+   bespoke.location_store(location)
 
 
 script-relative:
@@ -54,6 +58,8 @@ script-relative:
    me.schedule_set(delay, path, value)
    me.get(path)
       example: pulsewidth = me.get("oscillator~pulsewidth")
+   me.get_path_prefix(): returns prefix if script is run in prefab (example: prefab~), or return empty string if run on main screen
+      example: active = me.get(me.get_path_prefix() + 'notesequencer~enabled')
    me.adjust(path, amount)
    me.highlight_line(lineNum, scriptModuleIndex)
    me.output(obj)

@@ -781,11 +781,31 @@ void ScriptModule::PrintText(std::string text)
 
 IUIControl* ScriptModule::GetUIControl(std::string path)
 {
-   IUIControl* control;
-   if (ofIsStringInString(path, "~"))
-      control = TheSynth->FindUIControl(path);
+   if (path == "")
+      return nullptr;
+
+   std::string fullPath = path;
+
+   if (path[0] == '$')
+      //absolute path provided by the user
+      fullPath = path;
+   else if (std::count(path.begin(), path.end(), '~') >= 2)
+      //absolute path within a prefab
+      fullPath = path;
+   else if (ofIsStringInString(Path(), "~") && !ofIsStringInString(path, "~"))
+      //in a prefab, referencing a script variable
+      fullPath = Path() + "~" + path;
+   else if (!ofIsStringInString(Path(), "~") && ofIsStringInString(path, "~"))
+      //main screen, referencing a module
+      fullPath = path;
+   else if (ofIsStringInString(Path(), "~") && ofIsStringInString(path, "~"))
+      //in a prefab, referencing module in the current or nested prefab
+      fullPath = Path().substr(0, Path().rfind('~') + 1) + path;
    else
-      control = TheSynth->FindUIControl(Path() + "~" + path);
+      //main screen, referencing a script variable
+      fullPath = Path() + "~" + path;
+
+   IUIControl* control = TheSynth->FindUIControl(fullPath);
 
    return control;
 }
@@ -1288,6 +1308,7 @@ void ScriptModule::FixUpCode(std::string& code)
    ofStringReplace(code, "on_grid_button(", "on_grid_button__" + prefix + "(");
    ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
    ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
+   ofStringReplace(code, "on_sysex(", "on_sysex__" + prefix + "(");
    ofStringReplace(code, "this.", GetThisName() + ".");
    ofStringReplace(code, "me.", GetThisName() + ".");
 }

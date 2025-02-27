@@ -161,6 +161,14 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m)
             }
             return paths;
          });
+   m.def("location_recall", [](char location)
+         {
+            TheSynth->GetLocationZoomer()->MoveToLocation(location);
+         });
+   m.def("location_store", [](char location)
+         {
+            TheSynth->GetLocationZoomer()->WriteCurrentLocation(location);
+         });
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
@@ -172,22 +180,21 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
    },
    py::return_value_policy::reference);
    py::class_<ScriptModule, IDrawableModule>(m, "scriptmodule")
-   .def(
-   "play_note", [](ScriptModule& module, float pitch, float velocity, double length, float pan, int output_index)
-   {
-      module.PlayNoteFromScript(pitch, velocity, pan, output_index);
-      module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0, output_index);
-   },
-   "pitch"_a, "velocity"_a, "length"_a = 1.0 / 16.0, "pan"_a = 0, "output_index"_a = 0)
+   .def("play_note", [](ScriptModule& module, double pitch, double velocity, double length, double pan, int output_index)
+        {
+           module.PlayNoteFromScript(pitch, velocity, pan, output_index);
+           module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0, output_index);
+        },
+        "pitch"_a, "velocity"_a, "length"_a = 1.0 / 16.0, "pan"_a = 0, "output_index"_a = 0)
    ///example: me.play_note(60, 127, 1.0/8)
-   .def("schedule_note", [](ScriptModule& module, double delay, float pitch, float velocity, double length, float pan, int output_index)
+   .def("schedule_note", [](ScriptModule& module, double delay, double pitch, double velocity, double length, double pan, int output_index)
         {
            module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
            module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, output_index);
         },
         "delay"_a, "pitch"_a, "velocity"_a, "length"_a = 1.0 / 16.0, "pan"_a = 0, "output_index"_a = 0)
    ///example: me.schedule_note(1.0/4, 60, 127, 1.0/8)
-   .def("schedule_note_msg", [](ScriptModule& module, double delay, float pitch, float velocity, float pan, int output_index)
+   .def("schedule_note_msg", [](ScriptModule& module, double delay, double pitch, double velocity, double pan, int output_index)
         {
            module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
         },
@@ -197,19 +204,19 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
            module.ScheduleMethod(method, delay);
         })
    ///example: me.schedule_call(1.0/4, "dotask()")
-   .def("note_msg", [](ScriptModule& module, float pitch, float velocity, float pan, int output_index)
+   .def("note_msg", [](ScriptModule& module, double pitch, double velocity, double pan, int output_index)
         {
            module.PlayNoteFromScript(pitch, velocity, pan, output_index);
         },
         "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
-   .def("set", [](ScriptModule& module, std::string path, float value)
+   .def("set", [](ScriptModule& module, std::string path, double value)
         {
            IUIControl* control = module.GetUIControl(path);
            if (control != nullptr)
               module.ScheduleUIControlValue(control, value, 0);
         })
    ///example: me.set("oscillator~pw", .2)
-   .def("schedule_set", [](ScriptModule& module, double delay, std::string path, float value)
+   .def("schedule_set", [](ScriptModule& module, double delay, std::string path, double value)
         {
            IUIControl* control = module.GetUIControl(path);
            if (control != nullptr)
@@ -223,6 +230,18 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
            return 0.0;
         })
    ///example: pulsewidth = me.get("oscillator~pulsewidth")
+   .def("get_path_prefix", [](ScriptModule& module)
+        {
+           std::string path = module.Path();
+           if (ofIsStringInString(path, "~"))
+           {
+              return path.substr(0, path.rfind('~') + 1);
+           }
+           else
+           {
+              return std::string("");
+           }
+        })
    .def("adjust", [](ScriptModule& module, std::string path, double amount)
         {
            IUIControl* control = module.GetUIControl(path);
@@ -285,12 +304,12 @@ PYBIND11_EMBEDDED_MODULE(notesequencer, m)
    py::return_value_policy::reference);
    py::class_<NoteStepSequencer, IDrawableModule>(m, "notesequencer")
    .def(
-   "set_step", [](NoteStepSequencer& seq, int index, int row, int velocity, float length)
+   "set_step", [](NoteStepSequencer& seq, int index, int row, int velocity, double length)
    {
       seq.SetStep(index, row, velocity, length);
    },
    "step"_a, "row"_a, "velocity"_a = 127, "length"_a = 1.0)
-   .def("set_pitch", [](NoteStepSequencer& seq, int step, int pitch, int velocity, float length)
+   .def("set_pitch", [](NoteStepSequencer& seq, int step, int pitch, int velocity, double length)
         {
            seq.SetPitch(step, pitch, velocity, length);
         },
@@ -738,7 +757,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
    },
    py::return_value_policy::reference);
    m.def(
-   "create", [](std::string moduleType, float x, float y)
+   "create", [](std::string moduleType, double x, double y)
    {
       ModuleFactory::Spawnable spawnable;
       spawnable.mLabel = moduleType;
@@ -746,7 +765,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
    },
    py::return_value_policy::reference);
    py::class_<IDrawableModule>(m, "module")
-   .def("set_position", [](IDrawableModule& module, float x, float y)
+   .def("set_position", [](IDrawableModule& module, double x, double y)
         {
            module.SetPosition(x, y);
         })
