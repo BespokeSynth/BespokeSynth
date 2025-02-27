@@ -98,7 +98,7 @@ public:
    virtual bool ShouldSerializeForSnapshot() const { return false; }
 
    static void SetNewManualHoverViaTab(int direction);
-   static void SetNewManualHoverViaArrow(ofVec2f direction);
+   static void SetNewManualHoverViaArrow(ofVec2d direction);
    static bool WasLastHoverSetManually() { return sLastUIHoverWasSetManually; }
 
    static void DestroyCablesTargetingControls(std::vector<IUIControl*> controls);

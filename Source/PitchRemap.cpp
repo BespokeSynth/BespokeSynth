@@ -63,7 +63,7 @@ void PitchRemap::DrawModule()
    for (size_t i = 0; i < mRemaps.size(); ++i)
    {
       mRemaps[i].mFromPitchEntry->Draw();
-      ofRectangle_f rect = mRemaps[i].mFromPitchEntry->GetRect(true);
+      ofRectangle rect = mRemaps[i].mFromPitchEntry->GetRect(true);
       ofLine(rect.getMaxX() + 5, rect.getCenter().y, rect.getMaxX() + 20, rect.getCenter().y);
       ofLine(rect.getMaxX() + 15, rect.getCenter().y - 4, rect.getMaxX() + 20, rect.getCenter().y);
       ofLine(rect.getMaxX() + 15, rect.getCenter().y + 4, rect.getMaxX() + 20, rect.getCenter().y);

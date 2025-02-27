@@ -106,9 +106,9 @@ void TextEntry::Render()
 {
    ofPushStyle();
 
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
 
-   float xOffset = 0;
+   double xOffset = 0;
    if (mDrawLabel)
    {
       DrawTextNormal(Name(), mX, mY + 12);
@@ -124,7 +124,7 @@ void TextEntry::Render()
    if (!isCurrent)
       UpdateDisplayString();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    if (isCurrent)
    {
@@ -207,7 +207,7 @@ void TextEntry::Render()
 void TextEntry::GetDimensions(double& width, double& height)
 {
    if (mFlexibleWidth)
-      width = MAX(30.0f, gFontFixedWidth.GetStringWidth(mString, 12) + 4);
+      width = MAX(30.0, gFontFixedWidth.GetStringWidth(mString, 12) + 4);
    else
       width = mCharWidth * 9;
 
@@ -222,7 +222,7 @@ void TextEntry::OnClicked(double x, double y, bool right)
    if (right)
       return;
 
-   float xOffset = 2;
+   double xOffset = 2;
    if (mDrawLabel)
       xOffset += mLabelSize;
 

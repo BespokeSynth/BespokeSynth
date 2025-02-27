@@ -125,20 +125,20 @@ void NoteCounter::DrawModule()
 
    if (mDeterministic && mRandom)
    {
-      ofRectangle_f lengthRect = mDeterministicLengthSlider->GetRect(true);
+      ofRectangle lengthRect = mDeterministicLengthSlider->GetRect(true);
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
-      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mDeterministicLength, 1);
-      const float kPipSize = 3;
-      float moduleWidth, moduleHeight;
+      double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mDeterministicLength, 1);
+      const double kPipSize = 3;
+      double moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);
       ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
       ofPopStyle();
    }
 }
 
-void NoteCounter::Step(double time, float velocity, int pulseFlags)
+void NoteCounter::Step(double time, double velocity, int pulseFlags)
 {
    if (!mEnabled)
       return;
@@ -158,7 +158,7 @@ void NoteCounter::Step(double time, float velocity, int pulseFlags)
       if (pulseFlags & kPulseFlag_Align)
       {
          int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-         int numMeasures = ceil(float(mLength) / stepsPerMeasure);
+         int numMeasures = ceil(static_cast<double>(mLength) / stepsPerMeasure);
          int measure = TheTransport->GetMeasure(time) % numMeasures;
          int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
          mStep = step;

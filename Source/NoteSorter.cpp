@@ -49,7 +49,7 @@ void NoteSorter::DrawModule()
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
       mPitchEntry[i]->Draw();
-      ofRectangle_f rect = mPitchEntry[i]->GetRect(true);
+      ofRectangle rect = mPitchEntry[i]->GetRect(true);
       mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 15, rect.y + rect.height / 2);
    }
 }

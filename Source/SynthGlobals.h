@@ -224,7 +224,7 @@ double EaseOut(double start, double end, double a);
 double Bias(double value, double bias);
 double Pow2(double in);
 void PrintCallstack();
-bool IsInUnitBox(ofVec2f pos);
+bool IsInUnitBox(ofVec2d pos);
 std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existing);
 std::string GetUniqueName(std::string name, std::vector<std::string> existing);
 void SetMemoryTrackingEnabled(bool enabled);

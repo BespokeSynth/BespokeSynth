@@ -42,29 +42,29 @@ class CircleSequencerRing
 public:
    CircleSequencerRing(CircleSequencer* owner, int index);
    void Draw();
-   void OnClicked(float x, float y, bool right);
+   void OnClicked(double x, double y, bool right);
    void MouseReleased();
-   void MouseMoved(float x, float y);
+   void MouseMoved(double x, double y);
    void CreateUIControls();
    void OnTransportAdvanced(double amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
 private:
-   float GetRadius() { return 90 - mIndex * 15; }
-   int GetStepIndex(int x, int y, float& radiusOut);
+   double GetRadius() { return 90 - mIndex * 15; }
+   int GetStepIndex(int x, int y, double& radiusOut);
    int mLength{ 4 };
    DropdownList* mLengthSelector{ nullptr };
    int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
    CircleSequencer* mOwner{ nullptr };
    int mIndex{ 0 };
-   std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
+   std::array<double, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
    double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
-   float mLastMouseRadius{ -1 };
+   double mLastMouseRadius{ -1 };
 };
 
 class CircleSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener

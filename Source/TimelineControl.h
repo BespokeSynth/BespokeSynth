@@ -63,7 +63,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(double& w, double& h) override;
 
-   float GetSliderWidth() { return mWidth - 6; }
+   double GetSliderWidth() { return mWidth - 6; }
 
    double mWidth{ 400 };
    int mNumMeasures{ 32 };

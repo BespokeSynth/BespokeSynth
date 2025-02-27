@@ -275,11 +275,11 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void SetValueForMouse(float x, float y);
+   void SetValueForMouse(double x, double y);
    void CalcSliderVal();
 
-   int mWidth;
-   int mHeight;
+   double mWidth;
+   double mHeight;
    int* mVar;
    int mMin;
    int mMax;

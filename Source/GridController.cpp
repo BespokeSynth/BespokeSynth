@@ -53,12 +53,12 @@ void GridControlTarget::Render()
 }
 
 //static
-void GridControlTarget::DrawGridIcon(float x, float y)
+void GridControlTarget::DrawGridIcon(double x, double y)
 {
    ofPushStyle();
 
    ofSetLineWidth(1);
-   float gridSize = 12;
+   double gridSize = 12;
    ofRect(x, y, gridSize, gridSize, 0);
    ofRect(x + gridSize / 3, y, gridSize / 3, 12, 0);
    ofRect(x, y + gridSize / 3, 12, gridSize / 3, 0);

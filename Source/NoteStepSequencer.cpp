@@ -149,7 +149,7 @@ void NoteStepSequencer::CreateUIControls()
    {
       mStepCables[i] = new AdditionalNoteCable();
       mStepCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mStepCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+      mStepCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]->GetPatchCableSource());
    }
 }
@@ -238,8 +238,8 @@ void NoteStepSequencer::DrawModule()
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
    for (int i = 0; i < mGrid->GetRows(); ++i)
    {
-      ofVec2f pos = mGrid->GetCellPosition(0, i - 1) + mGrid->GetPosition(true);
-      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 18);
+      ofVec2d pos = mGrid->GetCellPosition(0, i - 1) + mGrid->GetPosition(true);
+      double scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 18);
       DrawTextNormal(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x + 1, pos.y - (scale / 8), scale);
    }
    ofPopStyle();
@@ -258,9 +258,9 @@ void NoteStepSequencer::DrawModule()
       ofNoFill();
       ofSetLineWidth(4);
       ofSetColor(255, 0, 0, 50);
-      float squareh = float(mGrid->GetHeight()) / mNoteRange;
-      float squarew = float(mGrid->GetWidth()) / mLength;
-      ofRectangle_f gridRect = mGrid->GetRect(K(local));
+      double squareh = mGrid->GetHeight() / mNoteRange;
+      double squarew = mGrid->GetWidth() / mLength;
+      ofRectangle gridRect = mGrid->GetRect(K(local));
       ofRect(gridRect.x + squarew * mGridControlOffsetX,
              gridRect.y + gridRect.height - squareh * (mGridControlOffsetY + controllerRows),
              squarew * controllerCols,
@@ -270,12 +270,12 @@ void NoteStepSequencer::DrawModule()
 
    ofPushStyle();
    ofFill();
-   float gridX, gridY, gridW, gridH;
+   double gridX, gridY, gridW, gridH;
    mGrid->GetPosition(gridX, gridY, true);
    gridW = mGrid->GetWidth();
    gridH = mGrid->GetHeight();
-   float boxHeight = (float(gridH) / mNoteRange);
-   float boxWidth = (float(gridW) / mGrid->GetCols());
+   double boxHeight = gridH / mNoteRange;
+   double boxWidth = gridW / mGrid->GetCols();
 
    for (int i = 0; i < mGrid->GetCols() - 1; ++i)
    {
@@ -283,8 +283,8 @@ void NoteStepSequencer::DrawModule()
       {
          ofSetColor(255, 255, 255, 255);
          ofFill();
-         float y = gridY + gridH - mTones[i] * boxHeight;
-         ofRect(gridX + boxWidth * i + 1, y - boxHeight + 1, boxWidth * 1.5f - 2, boxHeight - 2);
+         double y = gridY + gridH - mTones[i] * boxHeight;
+         ofRect(gridX + boxWidth * i + 1, y - boxHeight + 1, boxWidth * 1.5 - 2, boxHeight - 2);
       }
    }
 
@@ -299,7 +299,7 @@ void NoteStepSequencer::DrawModule()
       else
          continue;
 
-      float y = gridY + gridH - i * boxHeight;
+      double y = gridY + gridH - i * boxHeight;
       ofRect(gridX, y - boxHeight, gridW, boxHeight);
    }
 
@@ -316,9 +316,9 @@ void NoteStepSequencer::DrawModule()
                ofPushStyle();
                ofNoFill();
                ofSetLineWidth(3 * fade);
-               ofVec2f pos = mGrid->GetCellPosition(i, mTones[i]) + mGrid->GetPosition(true);
-               float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-               float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+               ofVec2d pos = mGrid->GetCellPosition(i, mTones[i]) + mGrid->GetPosition(true);
+               double xsize = mGrid->GetWidth() / mGrid->GetCols();
+               double ysize = mGrid->GetHeight() / mGrid->GetRows();
                ofSetColor(ofColor::white, fade * 255);
                ofRect(pos.x, pos.y, xsize, ysize);
                ofPopStyle();
@@ -331,8 +331,8 @@ void NoteStepSequencer::DrawModule()
       }
    }
 
-   float controlYPos = gridY + gridH + mVelocityGrid->GetHeight();
-   float moduleWidth, moduleHeight;
+   double controlYPos = gridY + gridH + mVelocityGrid->GetHeight();
+   double moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
    if (mLoopResetPointSlider->IsShowing())
       controlYPos += 19;
@@ -342,7 +342,7 @@ void NoteStepSequencer::DrawModule()
       {
          mToneDropdowns[i]->SetShowing(mShowStepControls);
          mToneDropdowns[i]->SetPosition(gridX + boxWidth * i, controlYPos);
-         mToneDropdowns[i]->SetWidth(std::min(boxWidth, 30.0f));
+         mToneDropdowns[i]->SetWidth(std::min(boxWidth, 30.0));
          mToneDropdowns[i]->Draw();
 
          mVelocitySliders[i]->SetShowing(mShowStepControls);
@@ -364,8 +364,8 @@ void NoteStepSequencer::DrawModule()
 
       if (i < mLength && mShowStepControls)
       {
-         ofVec2f pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
-         pos.x += mVelocityGrid->GetWidth() / float(mLength) * .5f;
+         ofVec2d pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
+         pos.x += mVelocityGrid->GetWidth() / static_cast<double>(mLength) * .5;
          pos.y = moduleHeight - 7;
          mStepCables[i]->GetPatchCableSource()->SetManualPosition(pos.x, pos.y);
          mStepCables[i]->GetPatchCableSource()->SetEnabled(true);
@@ -1006,14 +1006,14 @@ int NoteStepSequencer::StepToButton(int step)
    return step < 4 ? (step + 9) : (step + 21);
 }
 
-float NoteStepSequencer::ExtraWidth() const
+double NoteStepSequencer::ExtraWidth() const
 {
    return 10;
 }
 
-float NoteStepSequencer::ExtraHeight() const
+double NoteStepSequencer::ExtraHeight() const
 {
-   float height = 103;
+   double height = 103;
    if (mLoopResetPointSlider->IsShowing())
       height += 17;
    if (mShowStepControls)
@@ -1036,7 +1036,7 @@ void NoteStepSequencer::Resize(double w, double h)
 void NoteStepSequencer::UpdateVelocityGridPos()
 {
    mVelocityGrid->SetDimensions(mGrid->GetWidth(), 45);
-   float gridX, gridY;
+   double gridX, gridY;
    mGrid->GetPosition(gridX, gridY, true);
    mVelocityGrid->SetPosition(gridX, gridY + mGrid->GetHeight());
    mLoopResetPointSlider->PositionTo(mVelocityGrid, kAnchor_Below);
@@ -1292,7 +1292,7 @@ void NoteStepSequencer::RandomizeLengths()
    {
       if (ofRandom(1) <= mRandomizeLengthChance)
       {
-         float newLength = ofClamp(ofRandom(2), FLT_EPSILON, 1);
+         double newLength = ofClamp(ofRandom(2), std::numeric_limits<double>::max(), 1);
          mNoteLengths[i] = ofLerp(mNoteLengths[i], newLength, mRandomizeLengthRange);
       }
    }
@@ -1527,7 +1527,7 @@ void NoteStepSequencer::SaveState(FileStreamOut& out)
    mGrid->SaveState(out);
    mVelocityGrid->SaveState(out);
    out << mHasExternalPulseSource;
-   float width, height;
+   double width, height;
    GetModuleDimensions(width, height);
    out << width;
    out << height;
@@ -1549,9 +1549,19 @@ void NoteStepSequencer::LoadState(FileStreamIn& in, int rev)
       in >> mHasExternalPulseSource;
    if (rev >= 3)
    {
-      float width, height;
-      in >> width;
-      in >> height;
-      Resize(width, height);
+      if (rev < 4)
+      {
+         float width, height;
+         in >> width;
+         in >> height;
+         Resize(width, height);
+      }
+      else
+      {
+         double width, height;
+         in >> width;
+         in >> height;
+         Resize(width, height);
+      }
    }
 }

@@ -160,7 +160,7 @@ void IDrawableModule::BasePoll()
       mChildren[i]->BasePoll();
 }
 
-bool IDrawableModule::IsWithinRect(const ofRectangle_f& rect)
+bool IDrawableModule::IsWithinRect(const ofRectangle& rect)
 {
    double x, y;
    GetPosition(x, y);
@@ -171,7 +171,7 @@ bool IDrawableModule::IsWithinRect(const ofRectangle_f& rect)
    if (!HasTitleBar())
       titleBarHeight = 0;
 
-   return rect.intersects(ofRectangle_f(x, y - titleBarHeight, w, h + titleBarHeight));
+   return rect.intersects(ofRectangle(x, y - titleBarHeight, w, h + titleBarHeight));
 }
 
 bool IDrawableModule::IsVisible()
@@ -864,7 +864,7 @@ void IDrawableModule::GetDimensions(double& width, double& height)
       height = 1;
       return; //special case for repatch stub, let it be 1 pixel
    }
-   ofVec2f minimumDimensions = GetMinimumDimensions();
+   ofVec2d minimumDimensions = GetMinimumDimensions();
    moduleWidth = MAX(moduleWidth, minimumDimensions.x);
    moduleHeight = MAX(moduleHeight, minimumDimensions.y);
 
@@ -880,16 +880,16 @@ double IDrawableModule::GetMinimizedWidth()
       mLastTitleLabel = titleLabel;
       mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 14);
    }
-   float width = mTitleLabelWidth;
+   double width = mTitleLabelWidth;
    width += 10; //padding
    if (mEnabledCheckbox)
       width += TitleBarHeight();
    return MAX(width, 50);
 }
 
-ofVec2f IDrawableModule::GetMinimumDimensions()
+ofVec2d IDrawableModule::GetMinimumDimensions()
 {
-   return ofVec2f(GetMinimizedWidth() + 10, 10);
+   return { GetMinimizedWidth() + 10, 10 };
 }
 
 void IDrawableModule::KeyPressed(int key, bool isRepeat)

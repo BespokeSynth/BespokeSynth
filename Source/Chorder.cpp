@@ -90,7 +90,7 @@ void Chorder::DrawModule()
 
       if (addColor)
       {
-         ofRectangle_f rect = mChordGrid->GetRect(true);
+         ofRectangle rect = mChordGrid->GetRect(true);
          rect.width /= mChordGrid->GetCols();
          rect.x += i * rect.width;
          ofRect(rect);

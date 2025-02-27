@@ -38,7 +38,7 @@ CanvasTimeline::CanvasTimeline(Canvas* canvas, std::string name)
 
 void CanvasTimeline::Render()
 {
-   ofRectangle_f canvasRect = mCanvas->GetRect(true);
+   ofRectangle canvasRect = mCanvas->GetRect(true);
    SetPosition(canvasRect.x, canvasRect.y - 10);
    SetDimensions(canvasRect.width, 10);
 
@@ -177,24 +177,24 @@ bool CanvasTimeline::MouseMoved(double x, double y)
    {
       mHoverMode = HoverMode::kNone;
 
-      float startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
-      float endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+      double startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+      double endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
 
-      ofRectangle_f betweenRect(startX, 0, endX - startX, mHeight);
+      ofRectangle betweenRect(startX, 0, endX - startX, mHeight);
       if (betweenRect.contains(x, y))
          mHoverMode = HoverMode::kMiddle;
 
-      ofRectangle_f loopStartRect(startX, 0, mHeight, mHeight);
+      ofRectangle loopStartRect(startX, 0, mHeight, mHeight);
       if (loopStartRect.contains(x, y))
          mHoverMode = HoverMode::kStart;
 
-      ofRectangle_f loopEndRect(endX - mHeight, 0, mHeight, mHeight);
+      ofRectangle loopEndRect(endX - mHeight, 0, mHeight, mHeight);
       if (loopEndRect.contains(x, y))
          mHoverMode = HoverMode::kEnd;
    }
    else
    {
-      mDragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
+      mDragOffset = (ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
    }
 
    return false;

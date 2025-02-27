@@ -128,7 +128,7 @@ public:
    virtual void SampleDropped(double x, double y, Sample* sample) {}
    virtual bool CanDropSample() const { return false; }
    void BasePoll(); //calls poll, using this to guarantee base poll is always called
-   bool IsWithinRect(const ofRectangle_f& rect);
+   bool IsWithinRect(const ofRectangle& rect);
    bool IsVisible();
    std::vector<IDrawableModule*> GetChildren() const { return mChildren; }
    virtual bool IsResizable() const { return false; }
@@ -155,7 +155,7 @@ public:
    ModuleContainer* GetOwningContainer() const { return mOwningContainer; }
    virtual ModuleContainer* GetContainer() { return nullptr; }
    void SetShouldDrawOutline(bool should) { mShouldDrawOutline = should; }
-   ofVec2f GetMinimumDimensions();
+   ofVec2d GetMinimumDimensions();
    bool HasEnabledCheckbox() const { return mEnabledCheckbox != nullptr; }
    Checkbox* GetEnabledCheckbox() const { return mEnabledCheckbox; }
    void MarkAsDeleted() { mDeleted = true; }

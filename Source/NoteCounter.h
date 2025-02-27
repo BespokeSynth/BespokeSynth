@@ -80,7 +80,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(double& width, double& height) override;
 
-   void Step(double time, float velocity, int pulseFlags);
+   void Step(double time, double velocity, int pulseFlags);
    void Reseed();
    std::uint64_t GetRandom(double time, int seedOffset) const;
 

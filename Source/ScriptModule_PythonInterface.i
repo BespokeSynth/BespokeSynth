@@ -180,31 +180,28 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
    },
    "pitch"_a, "velocity"_a, "length"_a = 1.0 / 16.0, "pan"_a = 0, "output_index"_a = 0)
    ///example: me.play_note(60, 127, 1.0/8)
-   .def(
-   "schedule_note", [](ScriptModule& module, double delay, float pitch, float velocity, double length, float pan, int output_index)
-   {
-      module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
-      module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, output_index);
-   },
-   "delay"_a, "pitch"_a, "velocity"_a, "length"_a = 1.0 / 16.0, "pan"_a = 0, "output_index"_a = 0)
+   .def("schedule_note", [](ScriptModule& module, double delay, float pitch, float velocity, double length, float pan, int output_index)
+        {
+           module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
+           module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, output_index);
+        },
+        "delay"_a, "pitch"_a, "velocity"_a, "length"_a = 1.0 / 16.0, "pan"_a = 0, "output_index"_a = 0)
    ///example: me.schedule_note(1.0/4, 60, 127, 1.0/8)
-   .def(
-   "schedule_note_msg", [](ScriptModule& module, double delay, float pitch, float velocity, float pan, int output_index)
-   {
-      module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
-   },
-   "delay"_a, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
+   .def("schedule_note_msg", [](ScriptModule& module, double delay, float pitch, float velocity, float pan, int output_index)
+        {
+           module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
+        },
+        "delay"_a, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
    .def("schedule_call", [](ScriptModule& module, double delay, std::string method)
         {
            module.ScheduleMethod(method, delay);
         })
    ///example: me.schedule_call(1.0/4, "dotask()")
-   .def(
-   "note_msg", [](ScriptModule& module, float pitch, float velocity, float pan, int output_index)
-   {
-      module.PlayNoteFromScript(pitch, velocity, pan, output_index);
-   },
-   "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
+   .def("note_msg", [](ScriptModule& module, float pitch, float velocity, float pan, int output_index)
+        {
+           module.PlayNoteFromScript(pitch, velocity, pan, output_index);
+        },
+        "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
    .def("set", [](ScriptModule& module, std::string path, float value)
         {
            IUIControl* control = module.GetUIControl(path);
@@ -267,12 +264,11 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
         {
            module.ConnectOscInput(port);
         })
-   .def(
-   "send_cc", [](ScriptModule& module, int control, int value, int output_index)
-   {
-      module.SendCCFromScript(control, value, output_index);
-   },
-   "control"_a, "value"_a, "output_index"_a = 0);
+   .def("send_cc", [](ScriptModule& module, int control, int value, int output_index)
+        {
+           module.SendCCFromScript(control, value, output_index);
+        },
+        "control"_a, "value"_a, "output_index"_a = 0);
 }
 
 PYBIND11_EMBEDDED_MODULE(notesequencer, m)
@@ -294,12 +290,11 @@ PYBIND11_EMBEDDED_MODULE(notesequencer, m)
       seq.SetStep(index, row, velocity, length);
    },
    "step"_a, "row"_a, "velocity"_a = 127, "length"_a = 1.0)
-   .def(
-   "set_pitch", [](NoteStepSequencer& seq, int step, int pitch, int velocity, float length)
-   {
-      seq.SetPitch(step, pitch, velocity, length);
-   },
-   "step"_a, "pitch"_a, "velocity"_a = 127, "length"_a = 1.0);
+   .def("set_pitch", [](NoteStepSequencer& seq, int step, int pitch, int velocity, float length)
+        {
+           seq.SetPitch(step, pitch, velocity, length);
+        },
+        "step"_a, "pitch"_a, "velocity"_a = 127, "length"_a = 1.0);
 }
 
 PYBIND11_EMBEDDED_MODULE(drumsequencer, m)
@@ -359,14 +354,13 @@ PYBIND11_EMBEDDED_MODULE(grid, m)
         {
            grid.SetColor(colorIndex, ofColor(r * 255, g * 255, b * 255));
         })
-   .def(
-   "highlight_cell", [](GridModule& grid, int col, int row, double delay, double duration, int colorIndex)
-   {
-      double startTime = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay);
-      double endTime = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay + duration);
-      grid.HighlightCell(col, row, startTime, endTime - startTime, colorIndex);
-   },
-   "col"_a, "row"_a, "delay"_a, "duration"_a, "colorIndex"_a = 1)
+   .def("highlight_cell", [](GridModule& grid, int col, int row, double delay, double duration, int colorIndex)
+        {
+           double startTime = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay);
+           double endTime = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay + duration);
+           grid.HighlightCell(col, row, startTime, endTime - startTime, colorIndex);
+        },
+        "col"_a, "row"_a, "delay"_a, "duration"_a, "colorIndex"_a = 1)
    .def("set_division", [](GridModule& grid, int division)
         {
            grid.SetDivision(division);
@@ -433,29 +427,30 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
    },
    py::return_value_policy::reference);
    py::class_<SamplePlayer, IDrawableModule>(m, "sampleplayer")
-      .def("set_cue_point", [](SamplePlayer& player, int pitch, double startSeconds, double lengthSeconds, double speed)
-      {
-         player.SetCuePoint(pitch, startSeconds, lengthSeconds, speed);
-      })
-      .def("fill", [](SamplePlayer& player, std::vector<float> data)
-      {
-         player.FillData(data);
-      })
+   .def("set_cue_point", [](SamplePlayer& player, int pitch, double startSeconds, double lengthSeconds, double speed)
+        {
+           player.SetCuePoint(pitch, startSeconds, lengthSeconds, speed);
+        })
+   .def("fill", [](SamplePlayer& player, std::vector<float> data)
+        {
+           player.FillData(data);
+        })
    .def("play_cue", [](SamplePlayer& player, int cue, double speedMult, double startOffsetSeconds)
-      {
-         ScriptModule* scriptModule = ScriptModule::sMostRecentLineExecutedModule;
-         double time = scriptModule->GetScheduledTime(0);
-         ModulationParameters modulation;
-         modulation.pitchBend = scriptModule->GetPitchBend(cue);
-         modulation.pitchBend->SetValue(log2(speedMult));
-         modulation.modWheel = scriptModule->GetModWheel(cue);
-         modulation.modWheel->SetValue(startOffsetSeconds);
-         player.PlayNote(NoteMessage(time, cue, 127, -1, modulation));
-      }, "cue"_a, "speedMult"_a = 1, "startOffsetSeconds"_a = 0)
-      .def("get_length_seconds", [](SamplePlayer& player)
-      {
-         return player.GetLengthInSeconds();
-      });
+        {
+           ScriptModule* scriptModule = ScriptModule::sMostRecentLineExecutedModule;
+           double time = scriptModule->GetScheduledTime(0);
+           ModulationParameters modulation;
+           modulation.pitchBend = scriptModule->GetPitchBend(cue);
+           modulation.pitchBend->SetValue(log2(speedMult));
+           modulation.modWheel = scriptModule->GetModWheel(cue);
+           modulation.modWheel->SetValue(startOffsetSeconds);
+           player.PlayNote(NoteMessage(time, cue, 127, -1, modulation));
+        },
+        "cue"_a, "speedMult"_a = 1, "startOffsetSeconds"_a = 0)
+   .def("get_length_seconds", [](SamplePlayer& player)
+        {
+           return player.GetLengthInSeconds();
+        });
 }
 
 PYBIND11_EMBEDDED_MODULE(midicontroller, m)
@@ -510,42 +505,36 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
    },
    "messageType"_a, "control"_a, "controlPath"_a, "controlType"_a = kControlType_Default, "value"_a = 0, "channel"_a = -1, "page"_a = 0, "midi_off"_a = 0, "midi_on"_a = 127, "scale"_a = false, "blink"_a = false, "increment"_a = 0, "twoway"_a = true, "feedbackControl"_a = -1, "isPageless"_a = false)
    ///example: m.set_connection(m.Control, 32, "oscillator~pw"), or m.set_connection(m.Note, 10, "oscillator~osc", m.SetValue, 2)
-   .def(
-   "send_note", [](MidiController& midicontroller, int pitch, int velocity, bool forceNoteOn, int channel, int page)
-   {
-      midicontroller.SendNote(page, pitch, velocity, forceNoteOn, channel);
-   },
-   "pitch"_a, "velocity"_a, "forceNoteOn"_a = false, "channel"_a = -1, "page"_a = 0)
-   .def(
-   "send_cc", [](MidiController& midicontroller, int ctl, int value, int channel, int page)
-   {
-      midicontroller.SendCC(page, ctl, value, channel);
-   },
-   "ctl"_a, "value"_a, "channel"_a = -1, "page"_a = 0)
-   .def(
-   "send_program_change", [](MidiController& midicontroller, int program, int channel, int page)
-   {
-      midicontroller.SendProgramChange(page, program, channel);
-   },
-   "program"_a, "channel"_a = -1, "page"_a = 0)
-   .def(
-   "send_pitchbend", [](MidiController& midicontroller, int bend, int channel, int page)
-   {
-      midicontroller.SendPitchBend(page, bend, channel);
-   },
-   "bend"_a, "channel"_a = -1, "page"_a = 0)
-   .def(
-   "send_data", [](MidiController& midicontroller, int a, int b, int c, int page)
-   {
-      midicontroller.SendData(page, a, b, c);
-   },
-   "a"_a, "b"_a, "c"_a, "page"_a = 0)
-   .def(
-   "send_sysex", [](MidiController& midicontroller, std::string data, int page)
-   {
-      midicontroller.SendSysEx(page, data);
-   },
-   "data"_a, "page"_a = 0)
+   .def("send_note", [](MidiController& midicontroller, int pitch, int velocity, bool forceNoteOn, int channel, int page)
+        {
+           midicontroller.SendNote(page, pitch, velocity, forceNoteOn, channel);
+        },
+        "pitch"_a, "velocity"_a, "forceNoteOn"_a = false, "channel"_a = -1, "page"_a = 0)
+   .def("send_cc", [](MidiController& midicontroller, int ctl, int value, int channel, int page)
+        {
+           midicontroller.SendCC(page, ctl, value, channel);
+        },
+        "ctl"_a, "value"_a, "channel"_a = -1, "page"_a = 0)
+   .def("send_program_change", [](MidiController& midicontroller, int program, int channel, int page)
+        {
+           midicontroller.SendProgramChange(page, program, channel);
+        },
+        "program"_a, "channel"_a = -1, "page"_a = 0)
+   .def("send_pitchbend", [](MidiController& midicontroller, int bend, int channel, int page)
+        {
+           midicontroller.SendPitchBend(page, bend, channel);
+        },
+        "bend"_a, "channel"_a = -1, "page"_a = 0)
+   .def("send_data", [](MidiController& midicontroller, int a, int b, int c, int page)
+        {
+           midicontroller.SendData(page, a, b, c);
+        },
+        "a"_a, "b"_a, "c"_a, "page"_a = 0)
+   .def("send_sysex", [](MidiController& midicontroller, std::string data, int page)
+        {
+           midicontroller.SendSysEx(page, data);
+        },
+        "data"_a, "page"_a = 0)
    ///description: Sends a system exclusive message. The given data will be wrapped with header and tail bytes of 0xf0 and 0xf7. The example enables Programmer-Mode on a Launchpad X.
    ///example: m.send_sysex(bytes([0, 32, 41, 2, 12, 14, 1])
    .def("add_script_listener", [](MidiController& midicontroller, ScriptModule* script)
@@ -771,13 +760,13 @@ PYBIND11_EMBEDDED_MODULE(module, m)
         })
    .def("get_width", [](IDrawableModule& module)
         {
-           float w, h;
+           double w, h;
            module.GetDimensions(w, h);
            return w;
         })
    .def("get_height", [](IDrawableModule& module)
         {
-           float w, h;
+           double w, h;
            module.GetDimensions(w, h);
            return h;
         })

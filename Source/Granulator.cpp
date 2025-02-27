@@ -109,7 +109,7 @@ void Granulator::SpawnGrain(double time, double offset, double width, double spe
    mNextGrainIdx = (mNextGrainIdx + 1) % MAX_GRAINS;
 }
 
-void Granulator::Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength)
+void Granulator::Draw(double x, double y, double w, double h, int bufferStart, int viewLength, int bufferLength)
 {
    for (int i = 0; i < MAX_GRAINS; ++i)
       mGrains[i].DrawGrain(i, x, y, w, h, bufferStart, viewLength, bufferLength);
@@ -156,7 +156,7 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
    }
 }
 
-void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength)
+void Grain::DrawGrain(int idx, double x, double y, double w, double h, int bufferStart, int viewLength, int bufferLength)
 {
    double a = std::fmod((mPos - bufferStart), bufferLength) / viewLength;
    if (a < 0 || a > 1)

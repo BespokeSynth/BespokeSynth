@@ -160,7 +160,7 @@ void FubbleModule::DrawModule()
    ofFill();
 
    ofPushMatrix();
-   ofRectangle_f rect = GetFubbleRect();
+   ofRectangle rect = GetFubbleRect();
    ofTranslate(rect.x, rect.y);
    ofRect(0, 0, rect.width, rect.height);
 
@@ -274,23 +274,23 @@ void FubbleModule::DrawModule()
    if (mAxisH.GetCableSource()->GetTarget() && mAxisH.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
       mAxisH.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
-      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
+      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2d(-1, 0), PatchCableSource::Side::kLeft);
    }
    else
    {
       mAxisH.GetCableSource()->SetManualPosition(rightAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 13);
-      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+      mAxisH.GetCableSource()->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
    }
 
    if (mAxisV.GetCableSource()->GetTarget() && mAxisV.GetCableSource()->GetTarget()->GetRect().getCenter().x < GetRect().getCenter().x)
    {
       mAxisV.GetCableSource()->SetManualPosition(leftAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 38);
-      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
+      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2d(-1, 0), PatchCableSource::Side::kLeft);
    }
    else
    {
       mAxisV.GetCableSource()->SetManualPosition(rightAlign, mHeight - (kBottomControlHeight + kTimelineSectionHeight) + 38);
-      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+      mAxisV.GetCableSource()->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
    }
 }
 
@@ -312,16 +312,16 @@ void FubbleModule::DrawModuleUnclipped()
    DrawTextNormal("(concept by @_ojack_)", 60, -3, 9);
 }
 
-ofRectangle_f FubbleModule::GetFubbleRect()
+ofRectangle FubbleModule::GetFubbleRect()
 {
-   return ofRectangle_f(10, kTopControlHeight, mWidth - 20, mHeight - (kTimelineSectionHeight + kBottomControlHeight + kTopControlHeight));
+   return { 10, kTopControlHeight, mWidth - 20, mHeight - (kTimelineSectionHeight + kBottomControlHeight + kTopControlHeight) };
 }
 
-ofVec2f FubbleModule::GetFubbleMouseCoord()
+ofVec2d FubbleModule::GetFubbleMouseCoord()
 {
-   ofRectangle_f fubbleRect = GetFubbleRect();
-   return ofVec2f(ofClamp((mMouseX - fubbleRect.x) / fubbleRect.width, 0, 1),
-                  ofClamp(1 - ((mMouseY - fubbleRect.y) / fubbleRect.height), 0, 1));
+   ofRectangle fubbleRect = GetFubbleRect();
+   return { ofClamp((mMouseX - fubbleRect.x) / fubbleRect.width, 0, 1),
+            ofClamp(1 - ((mMouseY - fubbleRect.y) / fubbleRect.height), 0, 1) };
 }
 
 void FubbleModule::OnClicked(double x, double y, bool right)
@@ -424,7 +424,7 @@ void FubbleModule::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void FubbleModule::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   /*int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
+   /*int newSteps = int(mLength / 4.0 * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
    {
       if (newSteps > 0)

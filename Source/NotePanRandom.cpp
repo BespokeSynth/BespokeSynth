@@ -58,7 +58,7 @@ void NotePanRandom::DrawModule()
    {
       if (gTime - mPanHistoryDisplay[i].time > 0 && gTime - mPanHistoryDisplay[i].time < 200)
       {
-         ofRectangle_f sliderRect = mCenterSlider->GetRect(true);
+         ofRectangle sliderRect = mCenterSlider->GetRect(true);
          double t = mPanHistoryDisplay[i].pan / 2 + .5;
          ofPushStyle();
          ofSetColor(0, 255, 0, 255 * (1 - (gTime - mPanHistoryDisplay[i].time) / 200));

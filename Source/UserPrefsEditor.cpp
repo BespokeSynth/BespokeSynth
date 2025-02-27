@@ -316,7 +316,7 @@ void UserPrefsEditor::DrawModule()
 
    if (!selectedDeviceType->hasSeparateInputsAndOutputs() && mCategory == UserPrefCategory::General)
    {
-      ofRectangle_f rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
+      ofRectangle rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
       ofPushStyle();
       ofSetColor(ofColor::white);
       DrawTextNormal("note: " + UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) + " uses the same audio device for output and input", rect.x, rect.getMaxY() + 14, 11);
@@ -361,11 +361,11 @@ void UserPrefsEditor::DrawModule()
       DrawRightLabel(mCancelButton, "*requires restart before taking effect", ofColor::magenta, 4);
 }
 
-void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX)
+void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofColor color, double offsetX)
 {
    if (control->IsShowing())
    {
-      ofRectangle_f rect = control->GetRect(true);
+      ofRectangle rect = control->GetRect(true);
       ofPushStyle();
       ofSetColor(color);
       DrawTextNormal(text, rect.getMaxX() + offsetX, rect.getMaxY() - 3, 11);

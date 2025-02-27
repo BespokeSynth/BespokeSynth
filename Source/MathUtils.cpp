@@ -29,43 +29,45 @@
 
 namespace MathUtils
 {
-   float Bezier(float t, float p0, float p1, float p2, float p3)
+   double Bezier(double t, double p0, double p1, double p2, double p3)
    {
       return CUBE(1 - t) * p0 + 3 * SQUARE(1 - t) * t * p1 + 3 * (1 - t) * SQUARE(t) * p2 + CUBE(t) * p3;
    }
 
-   ofVec2f Bezier(float t, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3)
+   ofVec2d Bezier(double t, ofVec2d p0, ofVec2d p1, ofVec2d p2, ofVec2d p3)
    {
-      return ofVec2f(Bezier(t, p0.x, p1.x, p2.x, p3.x), Bezier(t, p0.y, p1.y, p2.y, p3.y));
+      return { Bezier(t, p0.x, p1.x, p2.x, p3.x), Bezier(t, p0.y, p1.y, p2.y, p3.y) };
 
       //below comments help visualize bezier
-      /*if (t < .333f)
-       return ofVec2f(ofLerp(p0.x,p1.x, t*3), ofLerp(p0.y,p1.y, t*3));
-       else if (t < .666f)
-       return ofVec2f(ofLerp(p1.x,p2.x,(t-.333f)*3), ofLerp(p1.y,p2.y,(t-.333f)*3));
-       else
-       return ofVec2f(ofLerp(p2.x,p3.x, (t-.666f)*3), ofLerp(p2.y,p3.y, (t-.666f)*3));*/
+      /*
+      if (t < .333)
+         return { ofLerp(p0.x, p1.x, t * 3), ofLerp(p0.y, p1.y, t * 3) };
+      else if (t < .666)
+         return { ofLerp(p1.x, p2.x, (t - .333) * 3), ofLerp(p1.y, p2.y, (t - .333) * 3) };
+      else
+         return { ofLerp(p2.x, p3.x, (t - .666) * 3), ofLerp(p2.y, p3.y, (t - .666) * 3) };
+      */
    }
 
-   float BezierDerivative(float t, float p0, float p1, float p2, float p3)
+   double BezierDerivative(double t, double p0, double p1, double p2, double p3)
    {
       return 3 * SQUARE(1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
    }
 
-   ofVec2f BezierPerpendicular(float t, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3)
+   ofVec2d BezierPerpendicular(double t, ofVec2d p0, ofVec2d p1, ofVec2d p2, ofVec2d p3)
    {
-      ofVec2f perp(-BezierDerivative(t, p0.y, p1.y, p2.y, p3.y), BezierDerivative(t, p0.x, p1.x, p2.x, p3.x));
+      ofVec2d perp(-BezierDerivative(t, p0.y, p1.y, p2.y, p3.y), BezierDerivative(t, p0.x, p1.x, p2.x, p3.x));
       return perp / sqrt(perp.lengthSquared());
    }
 
-   ofVec2f ScaleVec(ofVec2f a, ofVec2f b)
+   ofVec2d ScaleVec(ofVec2d a, ofVec2d b)
    {
-      return ofVec2f(a.x * b.x, a.y * b.y);
+      return { a.x * b.x, a.y * b.y };
    }
 
-   ofVec2f Normal(ofVec2f v)
+   ofVec2d Normal(ofVec2d v)
    {
-      return v / sqrtf(v.lengthSquared());
+      return v / sqrt(v.lengthSquared());
    }
 
    float Curve(float t, float curve)

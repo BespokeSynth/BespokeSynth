@@ -101,8 +101,8 @@ enum class DropdownDisplayStyle
 class DropdownList : public IUIControl, public IPulseReceiver
 {
 public:
-   DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
-   DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
+   DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, double width = -1);
+   DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, double width = -1);
    void AddLabel(std::string label, int value);
    void RemoveLabel(int value);
    void SetLabel(std::string label, int value);
@@ -111,7 +111,7 @@ public:
    void Render() override;
    bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
-   void DrawDropdown(int w, int h, bool isScrolling);
+   void DrawDropdown(double w, double h, bool isScrolling);
    bool DropdownClickedAt(int x, int y);
    void SetIndex(int i, double time, bool forceUpdate);
    void Clear();
@@ -123,7 +123,7 @@ public:
       CalculateWidth();
    }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
-   void SetWidth(int width);
+   void SetWidth(double width);
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
    void GetPopupDimensions(double& width, double& height) { mModalList.GetDimensions(width, height); }
    void SetMaxPerColumn(int max)
@@ -134,7 +134,7 @@ public:
    int GetItemIndexAt(int x, int y);
    DropdownListElement GetElement(int index) { return mElements[index]; }
    DropdownListModal* GetModalDropdown() { return &mModalList; }
-   float GetMaxItemWidth() const { return mMaxItemWidth; }
+   double GetMaxItemWidth() const { return mMaxItemWidth; }
    void ChangePage(int direction);
    void AddSeparator(int index) { mSeparators.push_back(index); }
    void ClearSeparators() { mSeparators.clear(); }

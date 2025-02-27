@@ -123,14 +123,15 @@ public:
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
-   void SetOverrideCableDir(ofVec2f dir, Side side)
+   void SetOverrideCableDir(ofVec2d dir, Side side)
    {
       mHasOverrideCableDir = true;
       mOverrideCableDir = dir;
       mManualSide = side;
    }
-   ofVec2f GetCableStart(int index) const;
-   ofVec2f GetCableStartDir(int index, ofVec2f dest) const;
+
+   ofVec2d GetCableStart(int index) const;
+   ofVec2d GetCableStartDir(int index, ofVec2d dest) const;
    void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
    IModulator* GetModulatorOwner() const { return mModulatorOwner; }
    void SetIsPartOfCircularDependency(bool set) { mIsPartOfCircularDependency = set; }
@@ -191,7 +192,7 @@ private:
    Side mSide{ Side::kNone };
    Side mManualSide{ Side::kNone };
    bool mHasOverrideCableDir{ false };
-   ofVec2f mOverrideCableDir;
+   ofVec2d mOverrideCableDir;
    bool mIsPartOfCircularDependency{ false };
 
    std::vector<INoteReceiver*> mNoteReceivers;

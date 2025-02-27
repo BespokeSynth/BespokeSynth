@@ -50,7 +50,7 @@ void PlaySequencer::CreateUIControls()
 
    mGridControlTarget = new GridControlTarget(this, "grid", mWidth - 50, 4);
 
-   float width, height;
+   double width, height;
    UIBLOCK0();
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 50);
    UIBLOCK_SHIFTRIGHT();
@@ -78,10 +78,10 @@ void PlaySequencer::CreateUIControls()
    mGrid->SetRequireShiftForMultislider(true);
    mGrid->SetRestrictDragToRow(true);
 
-   ofRectangle_f gridRect = mGrid->GetRect(true);
+   ofRectangle gridRect = mGrid->GetRect(true);
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
-      ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
+      ofVec2d cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
       mLanes[i].mMuteOrEraseCheckbox = new Checkbox(this, ("mute/delete" + ofToString(i)).c_str(), gridRect.getMaxX() + 3, cellPos.y + 1, &mLanes[i].mMuteOrErase);
       mLanes[i].mMuteOrEraseCheckbox->SetDisplayText(false);
       mLanes[i].mMuteOrEraseCheckbox->SetBoxSize(10);
@@ -131,7 +131,7 @@ void PlaySequencer::DrawModule()
          ofPushStyle();
          ofFill();
          ofSetColor(0, 255, 0, 80);
-         ofRectangle_f rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
+         ofRectangle rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
          ofRect(rect);
          ofPopStyle();
       }
@@ -146,8 +146,8 @@ void PlaySequencer::DrawModule()
    {
       if (mLanes[i].mMuteOrErase)
       {
-         ofRectangle_f gridRect = mGrid->GetRect(true);
-         ofVec2f cellPos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
+         ofRectangle gridRect = mGrid->GetRect(true);
+         ofVec2d cellPos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
          ofRect(cellPos.x, cellPos.y + 1, gridRect.width, gridRect.height / mGrid->GetRows());
       }
    }
@@ -538,8 +538,8 @@ void PlaySequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 namespace
 {
-   const float extraW = 25;
-   const float extraH = 100;
+   const double extraW = 25;
+   const double extraH = 100;
 }
 
 void PlaySequencer::GetModuleDimensions(double& width, double& height)
@@ -554,16 +554,16 @@ void PlaySequencer::Resize(double w, double h)
    h = MAX(h - extraH, 111);
    SetGridSize(w, h);
 
-   ofRectangle_f gridRect = mGrid->GetRect(true);
+   ofRectangle gridRect = mGrid->GetRect(true);
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
-      ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
+      ofVec2d cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
       mLanes[i].mMuteOrEraseCheckbox->SetPosition(gridRect.getMaxX() + 3, cellPos.y + 1);
       mLanes[i].mMuteOrEraseCheckbox->SetBoxSize(MAX(10, mGrid->GetHeight() / mLanes.size()));
    }
 }
 
-void PlaySequencer::SetGridSize(float w, float h)
+void PlaySequencer::SetGridSize(double w, double h)
 {
    mGrid->SetDimensions(w, h);
 }
@@ -631,6 +631,13 @@ void PlaySequencer::LoadState(FileStreamIn& in, int rev)
       in >> size;
       LoadStateValidate(size == (int)mSavedPatterns[i].mData.size());
       for (int j = 0; j < size; ++j)
-         in >> mSavedPatterns[i].mData[j];
+         if (rev < 1)
+         {
+            float a;
+            in >> a;
+            mSavedPatterns[i].mData[j] = static_cast<double>(a);
+         }
+         else
+            in >> mSavedPatterns[i].mData[j];
    }
 }

@@ -75,7 +75,7 @@ void Canvas::Render()
    {
       int row = mRowOffset + i;
       if (row >= 0 && row < mRowColors.size())
-         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1f), ofVec2f(0, i * rowHeight + rowHeight * 0.0f), ofVec2f(0, i * rowHeight + rowHeight));
+         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1f), ofVec2d(0, i * rowHeight + rowHeight * 0.0f), ofVec2d(0, i * rowHeight + rowHeight));
       ofRect(0, i * rowHeight, GetWidth(), rowHeight, 0);
    }
    ofPopStyle();
@@ -295,7 +295,7 @@ bool Canvas::MouseMoved(double x, double y)
 
    if (mDragEnd != kHighlightEnd_None)
    {
-      ofVec2f scaled = RescaleForZoom(x, y);
+      ofVec2d scaled = RescaleForZoom(x, y);
       if (mDragEnd == kHighlightEnd_Start)
       {
          double oldStart = mClickedElement->GetStart();
@@ -337,7 +337,7 @@ bool Canvas::MouseMoved(double x, double y)
       {
          if (mClickedElement != nullptr)
          {
-            ofVec2f dragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
+            ofVec2d dragOffset = (ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
 
             if (GetKeyModifiers() & kModifier_Shift && !mHasDuplicatedThisDrag && dragOffset.distanceSquared() > 9)
             {
@@ -359,7 +359,7 @@ bool Canvas::MouseMoved(double x, double y)
       {
          if (element->GetHighlighted())
          {
-            ofRectangle_f rect = element->GetRect(!K(clamp), !K(wrapped));
+            ofRectangle rect = element->GetRect(!K(clamp), !K(wrapped));
             double startX = rect.x;
             if (element->GetEnd() > 1 && mWrap)
                rect = element->GetRect(!K(clamp), K(wrapped));
@@ -393,8 +393,8 @@ bool Canvas::MouseMoved(double x, double y)
    if (mDragCanvasMoving && (GetKeyModifiers() & kModifier_Alt))
    {
 
-      ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
-      ofVec2f delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
+      ofVec2d mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
+      ofVec2d delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
 
       double viewLength = mViewEnd - mViewStart;
       double moveX = -delta.x / mWidth * viewLength;
@@ -411,8 +411,8 @@ bool Canvas::MouseMoved(double x, double y)
 
    if (mDragCanvasZooming && (GetKeyModifiers() & kModifier_Command))
    {
-      ofVec2f mousePos(x, y);
-      ofVec2f delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
+      ofVec2d mousePos(x, y);
+      ofVec2d delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
 
       {
          double originalViewLength = mDragZoomStartDimensions.x;
@@ -445,7 +445,7 @@ void Canvas::MouseReleased()
       for (auto* element : mElements)
       {
          if (element->GetHighlighted())
-            element->MoveElementByDrag((ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale);
+            element->MoveElementByDrag((ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale);
       }
 
       if (mListener)
@@ -485,9 +485,9 @@ bool Canvas::MouseScrolled(double x, double y, double scrollX, double scrollY, b
 
    if (GetKeyModifiers() & kModifier_Shift)
    {
-      float canvasX, canvasY;
+      double canvasX, canvasY;
       GetPosition(canvasX, canvasY, false);
-      ofVec2f canvasPos = ofVec2f(ofMap(x, canvasX, canvasX + GetWidth(), 0, 1),
+      ofVec2d canvasPos = ofVec2d(ofMap(x, canvasX, canvasX + GetWidth(), 0, 1),
                                   ofMap(y, canvasY, canvasY + GetHeight(), 0, 1));
       if (IsInUnitBox(canvasPos))
       {

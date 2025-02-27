@@ -94,13 +94,13 @@ void NoteHocket::DrawModule()
 
    if (mDeterministic)
    {
-      ofRectangle_f lengthRect = mLengthSlider->GetRect(true);
+      ofRectangle lengthRect = mLengthSlider->GetRect(true);
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
       double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
-      const float kPipSize = 3;
-      float moduleWidth, moduleHeight;
+      const double kPipSize = 3;
+      double moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);
       ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
       ofPopStyle();
@@ -109,12 +109,12 @@ void NoteHocket::DrawModule()
 
 void NoteHocket::AdjustHeight()
 {
-   float deterministicPad = 45;
+   double deterministicPad = 45;
 
    if (!mDeterministic)
       deterministicPad = 3;
 
-   float height = mNumDestinations * 17 + deterministicPad;
+   double height = mNumDestinations * 17 + deterministicPad;
    mLengthSlider->Move(0, height - mHeight);
    mSeedEntry->Move(0, height - mHeight);
    mPrevSeedButton->Move(0, height - mHeight);
@@ -211,9 +211,9 @@ void NoteHocket::SetUpFromSaveData()
       {
          mDestinationCables.push_back(new AdditionalNoteCable());
          mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-         mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+         mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
          AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
-         ofRectangle_f rect = mWeightSlider[i]->GetRect(true);
+         ofRectangle rect = mWeightSlider[i]->GetRect(true);
          mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
       }
    }

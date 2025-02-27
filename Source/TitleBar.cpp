@@ -80,7 +80,7 @@ void SpawnList::SetList(std::vector<ModuleFactory::Spawnable> spawnables)
 
 namespace
 {
-   ofVec2f kModuleGrabOffset(-40, 10);
+   ofVec2d kModuleGrabOffset(-40, 10);
 }
 
 void SpawnList::OnSelection(DropdownList* list)
@@ -506,7 +506,7 @@ void TitleBar::DrawModuleUnclipped()
       {
          ofPushStyle();
          ofFill();
-         ofVec2f pos(50, ofGetHeight() / GetOwningContainer()->GetDrawScale() - 100);
+         ofVec2d pos(50, ofGetHeight() / GetOwningContainer()->GetDrawScale() - 100);
          const double kWidth = 600;
          const double kHeight = 70;
          ofSetColor(80, 80, 80, 150);

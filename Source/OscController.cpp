@@ -209,8 +209,8 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
          auto selected_note_receiver = dynamic_cast<INoteReceiver*>(selected_module);
          if (!selected_note_receiver)
             return;
-         float pitch = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
-         float velocity = msg[1].isFloat32() ? msg[1].getFloat32() : msg[1].getInt32();
+         double pitch = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         double velocity = msg[1].isFloat32() ? msg[1].getFloat32() : msg[1].getInt32();
          selected_note_receiver->PlayNote(NoteMessage(gTime, pitch, velocity));
       }
       else if (subcommand == "pulse")
@@ -218,12 +218,12 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
          auto selected_pulse_receiver = dynamic_cast<IPulseReceiver*>(selected_module);
          if (!selected_pulse_receiver)
             return;
-         float velocity = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         double velocity = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
          selected_pulse_receiver->OnPulse(gTime, velocity, PulseFlags::kPulseFlag_None);
       }
       else if (subcommand == "minimize")
       {
-         float minimize = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         double minimize = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
          if (minimize == 0)
             selected_module->SetMinimized(false);
          else if (minimize == 1)
@@ -233,7 +233,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       }
       else if (subcommand == "enable")
       {
-         float enable = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
+         double enable = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
          if (enable == 0)
             selected_module->SetEnabled(false);
          else if (enable == 1)
@@ -243,7 +243,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       }
       else if (subcommand == "focus")
       {
-         ofRectangle_f module_rect = selected_module->GetRect();
+         ofRectangle module_rect = selected_module->GetRect();
          double zoom = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
          if (zoom >= 0.1)
             gDrawScale = ofClamp(zoom, 0.1, 8);
@@ -257,7 +257,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
             gDrawScale = ofClamp(ratio, 0.1, 8);
          }
          // Move viewport to centered on the module
-         float w, h;
+         double w, h;
          TheTitleBar->GetDimensions(w, h);
          TheSynth->SetDrawOffset(ofVec2d(-module_rect.x + ofGetWidth() / gDrawScale / 2 - module_rect.width / 2, -module_rect.y + ofGetHeight() / gDrawScale / 2 - (module_rect.height - h / 2) / 2));
       }

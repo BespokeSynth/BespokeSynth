@@ -48,7 +48,7 @@ public:
    void Poll();
    void Clear();
    void Exit();
-   ofVec2f GetOwnerPosition() const;
+   ofVec2d GetOwnerPosition() const;
    ofVec2d GetDrawOffset();
    ofVec2d& GetDrawOffsetRef() { return mDrawOffset; }
    void SetDrawOffset(ofVec2d offset) { mDrawOffset = offset; }
@@ -59,7 +59,7 @@ public:
    void KeyReleased(int key);
    void MouseMoved(float x, float y);
    void MouseReleased();
-   IDrawableModule* GetModuleAt(float x, float y);
+   IDrawableModule* GetModuleAt(double x, double y);
    void GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output, bool ignorePinned = false);
    void MoveToFront(IDrawableModule* module);
    void AddModule(IDrawableModule* module);

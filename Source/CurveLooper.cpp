@@ -225,7 +225,7 @@ void CurveLooper::Resize(double w, double h)
 {
    mWidth = MAX(w, 200);
    mHeight = MAX(h, 120);
-   mEnvelopeControl.SetDimensions(ofVec2f(mWidth - 10, mHeight - 30));
+   mEnvelopeControl.SetDimensions(ofVec2d(mWidth - 10, mHeight - 30));
 }
 
 void CurveLooper::SaveLayout(ofxJSONElement& moduleInfo)

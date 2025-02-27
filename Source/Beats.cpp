@@ -120,7 +120,7 @@ void Beats::DrawModule()
          ofPushStyle();
          ofFill();
          ofSetColor(255, 255, 255, 40);
-         float width, height;
+         double width, height;
          GetModuleDimensions(width, height);
          ofRect(i * BEAT_COLUMN_WIDTH + 1, 3, BEAT_COLUMN_WIDTH - 2, height - 6);
          ofPopStyle();

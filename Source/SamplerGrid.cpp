@@ -323,9 +323,9 @@ void SamplerGrid::DrawModule()
          int idx = GridToIdx(x, y);
          if (mGridSamples[idx].mHasSample)
          {
-            ofVec2f cellPos = mGrid->GetCellPosition(x, y);
-            ofVec2f gridSize = mGrid->IClickable::GetDimensions();
-            ofVec2f gridPos = mGrid->IClickable::GetPosition();
+            ofVec2d cellPos = mGrid->GetCellPosition(x, y);
+            ofVec2d gridSize = mGrid->IClickable::GetDimensions();
+            ofVec2d gridPos = mGrid->IClickable::GetPosition();
             ofRect(gridPos.x + cellPos.x, gridPos.y + cellPos.y, gridSize.x / mCols, gridSize.y / mCols);
          }
       }
@@ -343,8 +343,8 @@ void SamplerGrid::DrawModule()
          ofPushStyle();
          ofFill();
          ofSetColor(0, 0, 0, 80);
-         float clipStartAmount = float(mEditSample->mSampleStart) / mEditSample->mSampleLength;
-         float clipEndAmount = float(mEditSample->mSampleEnd) / mEditSample->mSampleLength;
+         double clipStartAmount = static_cast<double>(mEditSample->mSampleStart) / mEditSample->mSampleLength;
+         double clipEndAmount = static_cast<double>(mEditSample->mSampleEnd) / mEditSample->mSampleLength;
          ofRect(0, 0, mEditSampleWidth * clipStartAmount, mEditSampleHeight);
          ofRect(mEditSampleWidth * clipEndAmount, 0, mEditSampleWidth * (1 - clipEndAmount), mEditSampleHeight);
          ofPopStyle();

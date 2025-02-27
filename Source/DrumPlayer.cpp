@@ -862,7 +862,7 @@ void DrumPlayer::DrawModule()
          mDrumHits[mSelectedHitIdx].DrawUIControls();
    }
 
-   float moduleW, moduleH;
+   double moduleW, moduleH;
    GetDimensions(moduleW, moduleH);
    for (int i = 0; i < mIndividualOutputs.size(); ++i)
    {

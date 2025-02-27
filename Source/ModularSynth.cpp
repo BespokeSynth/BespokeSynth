@@ -455,7 +455,7 @@ void ModularSynth::DeleteAllModules()
    mConsoleListener = nullptr;
 }
 
-bool SortPointsByY(ofVec2f a, ofVec2f b)
+bool SortPointsByY(ofVec2d a, ofVec2d b)
 {
    return a.y < b.y;
 }
@@ -1108,15 +1108,15 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    {
       if (GetKeyModifiers() == kModifier_Command)
       {
-         ofVec2f dir;
+         ofVec2d dir;
          if (key == OF_KEY_LEFT)
-            dir = ofVec2f(-1, 0);
+            dir = ofVec2d(-1, 0);
          if (key == OF_KEY_RIGHT)
-            dir = ofVec2f(1, 0);
+            dir = ofVec2d(1, 0);
          if (key == OF_KEY_UP)
-            dir = ofVec2f(0, -1);
+            dir = ofVec2d(0, -1);
          if (key == OF_KEY_DOWN)
-            dir = ofVec2f(0, 1);
+            dir = ofVec2d(0, 1);
          IUIControl::SetNewManualHoverViaArrow(dir);
       }
    }
@@ -1386,7 +1386,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    double x = GetMouseX(&mModuleContainer);
    double y = GetMouseY(&mModuleContainer);
 
-   mLastMouseDragPos = ofVec2f(x, y);
+   mLastMouseDragPos = ofVec2d(x, y);
 
    if (button == 3)
       return;

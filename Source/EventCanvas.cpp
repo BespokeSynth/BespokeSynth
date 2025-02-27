@@ -251,8 +251,8 @@ void EventCanvas::DrawModule()
       color.a = 50;
       ofSetColor(color);
 
-      float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
-      float y = mCanvas->GetPosition(true).y + i * boxHeight;
+      double boxHeight = mCanvas->GetHeight() / mCanvas->GetNumVisibleRows();
+      double y = mCanvas->GetPosition(true).y + i * boxHeight;
       ofRect(mCanvas->GetPosition(true).x, y, mCanvas->GetWidth(), boxHeight);
    }
    ofPopStyle();
@@ -270,7 +270,7 @@ void EventCanvas::DrawModule()
    mIntervalSelector->Draw();
    mRecordCheckbox->Draw();
 
-   ofRectangle_f canvasRect = mCanvas->GetRect(true);
+   ofRectangle canvasRect = mCanvas->GetRect(true);
    for (int i = 0; i < mControlCables.size(); ++i)
    {
       if (mCanvas->IsRowVisible(i))
@@ -297,7 +297,7 @@ void EventCanvas::SyncControlCablesToCanvas()
       for (int i = oldSize; i < mControlCables.size(); ++i)
       {
          mControlCables[i] = new PatchCableSource(this, kConnectionType_UIControl);
-         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+         mControlCables[i]->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
          mControlCables[i]->SetColor(GetRowColor(i));
          AddPatchCableSource(mControlCables[i]);
       }
@@ -312,8 +312,8 @@ void EventCanvas::SyncControlCablesToCanvas()
 
 namespace
 {
-   const float extraW = 10;
-   const float extraH = 150;
+   const double extraW = 10;
+   const double extraH = 150;
 }
 
 void EventCanvas::Resize(double w, double h)

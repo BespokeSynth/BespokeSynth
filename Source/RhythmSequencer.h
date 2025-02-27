@@ -81,7 +81,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   void Step(double time, float velocity, int pulseFlags);
+   void Step(double time, double velocity, int pulseFlags);
    int GetArpIndex(double time, int current, int length, int pulseFlags);
    bool DoesStepHold(int index, int depth) const;
 

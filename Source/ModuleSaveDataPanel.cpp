@@ -37,7 +37,7 @@
 
 ModuleSaveDataPanel* TheSaveDataPanel = nullptr;
 
-const float kItemSpacing = 20;
+const double kItemSpacing = 20;
 
 ModuleSaveDataPanel::ModuleSaveDataPanel()
 {
@@ -271,7 +271,7 @@ void ModuleSaveDataPanel::UpdatePosition()
 {
    if (mSaveModule)
    {
-      float moduleX, moduleY, moduleW, moduleH;
+      double moduleX, moduleY, moduleW, moduleH;
       mSaveModule->GetPosition(moduleX, moduleY);
       mSaveModule->GetDimensions(moduleW, moduleH);
 

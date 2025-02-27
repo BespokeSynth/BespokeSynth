@@ -123,7 +123,7 @@ void HelpDisplay::DrawModule()
          std::string typeName = mScreenshotsToProcess.begin()->mLabel;
          mScreenshotsToProcess.pop_front();
 
-         ofRectangle_f rect = mScreenshotModule->GetRect();
+         ofRectangle rect = mScreenshotModule->GetRect();
          rect.y -= IDrawableModule::TitleBarHeight();
          rect.height += IDrawableModule::TitleBarHeight();
          rect.grow(10);

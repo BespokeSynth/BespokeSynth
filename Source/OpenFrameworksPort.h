@@ -54,7 +54,7 @@ struct ofColor
 
    static ofColor black, white, grey, red, green, yellow, blue, orange, purple, lime, magenta, cyan, clear;
 
-   static ofColor lerp(ofColor a, ofColor b, float t)
+   static ofColor lerp(ofColor a, ofColor b, double t)
    {
       return ofColor(int(a.r * (1 - t) + b.r * t), int(a.g * (1 - t) + b.g * t), int(a.b * (1 - t) + b.b * t), int(a.a * (1 - t) + b.a * t));
    }
@@ -223,7 +223,7 @@ struct ofRectangle_t
    T height{ 100 };
 };
 
-typedef ofRectangle_t<float> ofRectangle_f;
+typedef ofRectangle_t<float> ofRectangle_f; // Likely no longer used
 typedef ofRectangle_t<double> ofRectangle;
 
 using ofMutex = std::recursive_mutex;
@@ -347,7 +347,7 @@ float ofToFloat(const std::string& floatString);
 double ofToDouble(const std::string& doubleString);
 int ofHexToInt(const std::string& hexString);
 void ofLine(double x1, double y1, double x2, double y2);
-void ofLine(ofVec2f v1, ofVec2f v2);
+void ofLine(ofVec2d v1, ofVec2d v2);
 void ofSetLineWidth(double width);
 void ofBeginShape();
 void ofEndShape(bool close = false);

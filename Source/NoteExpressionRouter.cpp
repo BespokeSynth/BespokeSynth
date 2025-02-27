@@ -54,9 +54,9 @@ void NoteExpressionRouter::CreateUIControls()
       TEXTENTRY(mExpressionWidget[i], ("expression" + ofToString(i)).c_str(), 30, mExpressionText[i]);
       mDestinationCables[i] = new AdditionalNoteCable();
       mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
       AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
-      ofRectangle_f rect = mExpressionWidget[i]->GetRect(true);
+      ofRectangle rect = mExpressionWidget[i]->GetRect(true);
       mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
    }
    ENDUIBLOCK(mWidth, mHeight);

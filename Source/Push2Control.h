@@ -105,7 +105,7 @@ private:
    void DrawDisplayModuleControls();
    void DrawLowerModuleSelector();
    void DrawRoutingDisplay();
-   void DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos);
+   void DrawControls(std::vector<IUIControl*> controls, bool sliders, double yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
    void RemoveFavoriteControl(IUIControl* control);
@@ -120,7 +120,7 @@ private:
    bool IsIgnorableModule(IDrawableModule* module);
    std::vector<IDrawableModule*> SortModules(std::vector<IDrawableModule*> modules);
    void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
-   void DrawDisplayModuleRect(ofRectangle_f rect, float thickness);
+   void DrawDisplayModuleRect(ofRectangle rect, double thickness);
    std::string GetModuleTypeToSpawn();
    ModuleCategory GetModuleTypeForSpawnList(IUIControl* control);
    ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
@@ -133,7 +133,7 @@ private:
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
 
-   const float kColumnSpacing = 121;
+   const double kColumnSpacing = 121;
 
    int mFontHandle{ 0 };
    int mFontHandleBold{ 0 };
@@ -149,14 +149,14 @@ private:
    std::vector<IUIControl*> mDisplayedControls;
    bool mDisplayModuleIsShowingOverrideControls{ false };
    int mModuleViewOffset{ 0 };
-   float mModuleViewOffsetSmoothed{ 0 };
+   double mModuleViewOffsetSmoothed{ 0 };
 
    std::vector<IDrawableModule*> mModules;
-   float mModuleListOffset{ 0 };
-   float mModuleListOffsetSmoothed{ 0 };
+   double mModuleListOffset{ 0 };
+   double mModuleListOffsetSmoothed{ 0 };
    std::array<IDrawableModule*, 8 * 8> mModuleGrid;
    std::array<PatchCableSource*, 8 * 8> mModuleGridManualCables;
-   ofRectangle_f mModuleGridRect;
+   ofRectangle mModuleGridRect;
 
    enum class ModuleGridLayoutStyle
    {

@@ -351,7 +351,7 @@ void ofLine(double x1, double y1, double x2, double y2)
    nvgStroke(gNanoVG);
 }
 
-void ofLine(ofVec2f v1, ofVec2f v2)
+void ofLine(ofVec2d v1, ofVec2d v2)
 {
    ofLine(v1.x, v1.y, v2.x, v2.y);
 }
@@ -778,7 +778,7 @@ void RetinaTrueTypeFont::DrawString(std::string str, double size, double x, doub
 ofRectangle RetinaTrueTypeFont::DrawStringWrap(std::string str, double size, double x, double y, double width)
 {
    if (!mLoaded)
-      return ofRectangle_f();
+      return {};
 
    TheSynth->LockRender(true);
    nvgFontFaceId(gNanoVG, mFontHandle);
@@ -786,7 +786,7 @@ ofRectangle RetinaTrueTypeFont::DrawStringWrap(std::string str, double size, dou
    nvgTextBox(gNanoVG, x, y, width, str.c_str(), nullptr);
    float bounds[4];
    nvgTextBoxBounds(gNanoVG, x, y, width, str.c_str(), nullptr, bounds);
-   ofRectangle_f rect(bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]);
+   ofRectangle rect(bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]);
    TheSynth->LockRender(false);
    return rect;
 }

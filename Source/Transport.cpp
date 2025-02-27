@@ -219,7 +219,7 @@ void Transport::DrawModule()
    DrawTextNormal(display, 5, 52);
 
    ofPushStyle();
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    ofFill();
    ofSetColor(255, 255, 255, 50);
@@ -252,7 +252,7 @@ void Transport::DrawModule()
    ofBeginShape();
    for (int i = 0; i < w - 1; ++i)
    {
-      double pos = i / float(w - 1);
+      double pos = i / (w - 1);
       double swung = Swing(pos);
       ofVertex(i + 1, h - 1 - swung * (h - 1));
    }

@@ -59,7 +59,7 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
-   void SetBoxSize(float size) { mHeight = size; }
+   void SetBoxSize(double size) { mHeight = size; }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
 
    bool CheckNeedsDraw() override;

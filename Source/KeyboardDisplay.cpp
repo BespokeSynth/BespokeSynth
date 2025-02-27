@@ -227,7 +227,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
          if (i + RootKey() > 127)
             break;
          bool isBlackKey;
-         ofRectangle_f key = GetKeyboardKeyRect(i + RootKey(), w, h, isBlackKey);
+         ofRectangle key = GetKeyboardKeyRect(i + RootKey(), w, h, isBlackKey);
 
          if ((pass == 0 && !isBlackKey) || (pass == 1 && isBlackKey))
          {
@@ -241,7 +241,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       }
    }
 
-   float keySpace = (float)w / ((float)NumKeys() - mNumOctaves * 5);
+   double keySpace = static_cast<double>(w) / (static_cast<double>(NumKeys()) - mNumOctaves * 5);
 
    int oct = mRootOctave;
    if (keySpace > 16 && h > 34 && !mHideLabels)
@@ -262,7 +262,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       if (gTime >= mLastOnTime[pitch] && (gTime <= mLastOffTime[pitch] || mLastOffTime[pitch] < mLastOnTime[pitch]))
       {
          bool isBlackKey;
-         ofRectangle_f key = GetKeyboardKeyRect(pitch, w, h, isBlackKey);
+         ofRectangle key = GetKeyboardKeyRect(pitch, w, h, isBlackKey);
          key.height /= 3;
          key.y += key.height * 2;
          ofSetColor(255, 255, 255, ofLerp(255, 150, ofClamp((gTime - mLastOnTime[pitch]) / 150.0, 0, 1)));
@@ -275,27 +275,27 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPopStyle();
 }
 
-ofRectangle_f KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const
+ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const
 {
-   float extraKeyWidth = w / (mNumOctaves * 7 + 1);
-   float octaveWidth = (w - extraKeyWidth) / mNumOctaves;
+   double extraKeyWidth = w / (mNumOctaves * 7 + 1);
+   double octaveWidth = (w - extraKeyWidth) / mNumOctaves;
 
    pitch -= RootKey();
 
-   float offset = pitch / TheScale->GetPitchesPerOctave() * (octaveWidth);
+   double offset = pitch / TheScale->GetPitchesPerOctave() * (octaveWidth);
    pitch %= 12;
 
    if ((pitch <= 4 && pitch % 2 == 0) || (pitch >= 5 && pitch % 2 == 1)) //white key
    {
       int whiteKey = (pitch + 1) / 2;
       isBlackKey = false;
-      return ofRectangle_f(offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, h);
+      return { offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, static_cast<double>(h) };
    }
    else //black key
    {
       int blackKey = pitch / 2;
       isBlackKey = true;
-      return ofRectangle_f(offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1f, 0, octaveWidth / 7 * .8f, h / 2);
+      return { offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1, 0, octaveWidth / 7 * .8, static_cast<double>(h) / 2 };
    }
 }
 

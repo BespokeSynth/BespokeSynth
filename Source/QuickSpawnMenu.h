@@ -108,7 +108,7 @@ private:
    int mLastHoverX{ 0 };
    int mLastHoverY{ 0 };
    juce::String mHeldKeys;
-   ofVec2f mAppearAtMousePos;
+   ofVec2d mAppearAtMousePos;
    std::vector<ModuleFactory::Spawnable> mElements;
    std::vector<int> mCategoryIndices;
    int mHighlightIndex{ -1 };

@@ -66,7 +66,7 @@ public:
    int Start(double time, int pitch, double amount, int voiceIdx, ModulationParameters modulation);
    void Stop(double time, int pitch, int voiceIdx);
    void Process(double time, ChannelBuffer* out, int bufferSize);
-   void DrawDebug(float x, float y);
+   void DrawDebug(double x, double y);
    void SetVoiceLimit(int limit) { mVoiceLimit = limit; }
    void KillAll();
    void SetOversampling(int oversampling) { mOversampling = oversampling; }

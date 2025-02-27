@@ -106,7 +106,7 @@ private:
    struct ControlTarget
    {
       void CreateUIControls(SongBuilder* owner);
-      void Draw(float x, float y, int numRows);
+      void Draw(double x, double y, int numRows);
       void TargetControlUpdated();
       IUIControl* GetTarget() const;
       void CleanUp();
@@ -135,7 +135,7 @@ private:
    struct ControlValue
    {
       void CreateUIControls(SongBuilder* owner);
-      void Draw(float x, float y, int sceneIndex, ControlTarget* target);
+      void Draw(double x, double y, int sceneIndex, ControlTarget* target);
       void CleanUp();
       void UpdateDropdownContents(ControlTarget* target);
 
@@ -154,11 +154,11 @@ private:
       : mName(name)
       {}
       void CreateUIControls(SongBuilder* owner);
-      void Draw(SongBuilder* owner, float x, float y, int sceneIndex);
+      void Draw(SongBuilder* owner, double x, double y, int sceneIndex);
       void TargetControlUpdated(SongBuilder::ControlTarget* target, int targetIndex, bool wasManuallyPatched);
       void AddValue(SongBuilder* owner);
       void MoveValue(int index, int amount);
-      float GetWidth() const;
+      double GetWidth() const;
       void CleanUp();
 
       std::string mName{};

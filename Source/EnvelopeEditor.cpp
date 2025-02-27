@@ -34,10 +34,10 @@
 
 namespace
 {
-   float pointClickRadius = 4;
+   double pointClickRadius = 4;
 }
 
-EnvelopeControl::EnvelopeControl(ofVec2f position, ofVec2f dimensions)
+EnvelopeControl::EnvelopeControl(ofVec2d position, ofVec2d dimensions)
 : mPosition(position)
 , mDimensions(dimensions)
 {
@@ -47,9 +47,9 @@ void EnvelopeControl::Draw()
 {
    ofPushStyle();
 
-   ofSetColor(100, 100, .8f * gModuleDrawAlpha);
+   ofSetColor(100, 100, .8 * gModuleDrawAlpha);
 
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
    ofRect(mPosition.x, mPosition.y, mDimensions.x, mDimensions.y, 0);
 
    ofSetColor(245, 58, 0, gModuleDrawAlpha);
@@ -162,7 +162,7 @@ void EnvelopeControl::Draw()
    ofPopStyle();
 }
 
-void EnvelopeControl::OnClicked(float x, float y, bool right)
+void EnvelopeControl::OnClicked(double x, double y, bool right)
 {
    if (x > mPosition.x - pointClickRadius &&
        x < mPosition.x + mDimensions.x + pointClickRadius &&
@@ -203,9 +203,9 @@ void EnvelopeControl::OnClicked(float x, float y, bool right)
       }
       else if (gTime < mLastClickTime + 500 &&
                mHighlightCurve != -1 &&
-               (mClickStart - ofVec2f(x, y)).lengthSquared() < pointClickRadius * pointClickRadius)
+               (mClickStart - ofVec2d(x, y)).lengthSquared() < pointClickRadius * pointClickRadius)
       {
-         float clickTime = GetTimeForX(x);
+         double clickTime = GetTimeForX(x);
          if (clickTime > GetPreSustainTime())
             clickTime -= GetReleaseTime() - GetPreSustainTime();
 
@@ -215,7 +215,7 @@ void EnvelopeControl::OnClicked(float x, float y, bool right)
             mAdsr->GetStageData(i).target = mAdsr->GetStageData(i - 1).target;
             mAdsr->GetStageData(i).curve = mAdsr->GetStageData(i - 1).curve;
          }
-         float priorStageTimes = 0;
+         double priorStageTimes = 0;
          for (int i = 0; i < mHighlightCurve; ++i)
             priorStageTimes += mAdsr->GetStageData(i).time;
          mAdsr->GetStageData(mHighlightCurve).time = clickTime - priorStageTimes;
@@ -338,7 +338,7 @@ void EnvelopeControl::MouseMoved(float x, float y)
    }
 }
 
-void EnvelopeControl::AddVertex(float x, float y)
+void EnvelopeControl::AddVertex(double x, double y)
 {
    if (x >= mPosition.x && x <= mPosition.x + mDimensions.x)
       ofVertex(x, y);
@@ -387,7 +387,7 @@ double EnvelopeControl::GetYForValue(double value)
 }
 
 EnvelopeEditor::EnvelopeEditor()
-: mEnvelopeControl(ofVec2f(5, 25), ofVec2f(380, 200))
+: mEnvelopeControl(ofVec2d(5, 25), ofVec2d(380, 200))
 {
 }
 

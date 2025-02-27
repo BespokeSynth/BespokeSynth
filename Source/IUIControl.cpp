@@ -286,7 +286,7 @@ namespace
 }
 
 //static
-void IUIControl::SetNewManualHoverViaArrow(ofVec2f direction)
+void IUIControl::SetNewManualHoverViaArrow(ofVec2d direction)
 {
    if (gHoveredUIControl == nullptr)
    {

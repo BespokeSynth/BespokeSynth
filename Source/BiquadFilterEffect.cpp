@@ -202,7 +202,7 @@ bool BiquadFilterEffect::MouseMoved(double x, double y)
 
    if (mMouseControl)
    {
-      float thisx, thisy;
+      double thisx, thisy;
       GetPosition(thisx, thisy);
       x += thisx;
       y += thisy;

@@ -338,10 +338,10 @@ void ChaosEngine::OnClicked(double x, double y, bool right)
    }
 }
 
-ofRectangle_f ChaosEngine::GetKeyboardKeyRect(int pitch, bool& isBlackKey)
+ofRectangle ChaosEngine::GetKeyboardKeyRect(int pitch, bool& isBlackKey)
 {
-   const float kbWidth = 200;
-   const float kbHeight = 100;
+   const double kbWidth = 200;
+   const double kbHeight = 100;
 
    int offset = pitch / TheScale->GetPitchesPerOctave() * (kbWidth - kbWidth / 8);
    pitch %= 12;
@@ -350,13 +350,13 @@ ofRectangle_f ChaosEngine::GetKeyboardKeyRect(int pitch, bool& isBlackKey)
    {
       int whiteKey = (pitch + 1) / 2;
       isBlackKey = false;
-      return ofRectangle_f(offset + whiteKey * kbWidth / 8, 0, kbWidth / 8, kbHeight);
+      return { offset + whiteKey * kbWidth / 8, 0, kbWidth / 8, kbHeight };
    }
    else //black key
    {
       int blackKey = pitch / 2;
       isBlackKey = true;
-      return ofRectangle_f(offset + blackKey * kbWidth / 8 + kbWidth / 16 + kbWidth / 8 * .1f, 0, kbWidth / 8 * .8f, kbHeight / 2);
+      return { offset + blackKey * kbWidth / 8 + kbWidth / 16 + kbWidth / 8 * .1, 0, kbWidth / 8 * .8, kbHeight / 2 };
    }
 }
 
@@ -374,7 +374,7 @@ void ChaosEngine::DrawKeyboard(float x, float y)
       for (int i = 0; i < kNumKeys; ++i)
       {
          bool isBlackKey;
-         ofRectangle_f key = GetKeyboardKeyRect(i, isBlackKey);
+         ofRectangle key = GetKeyboardKeyRect(i, isBlackKey);
 
          if ((pass == 0 && !isBlackKey) || (pass == 1 && isBlackKey))
          {
@@ -394,14 +394,14 @@ void ChaosEngine::DrawKeyboard(float x, float y)
    ofSetLineWidth(2);
    std::vector<int> chord = GetCurrentChordPitches();
    sort(chord.begin(), chord.end());
-   ofVec2f lastNoteConnector;
+   ofVec2d lastNoteConnector;
    for (int j = 0; j < chord.size(); ++j)
    {
       bool isBlackKey;
       int pitch = chord[j] - 36;
       if (pitch < kNumKeys)
       {
-         ofRectangle_f key = GetKeyboardKeyRect(pitch, isBlackKey);
+         ofRectangle key = GetKeyboardKeyRect(pitch, isBlackKey);
          key.height /= 3;
          key.y += key.height * 2;
 
@@ -432,12 +432,12 @@ void ChaosEngine::DrawGuitar(float x, float y)
    ofPushStyle();
    ofPushMatrix();
    ofTranslate(x, y);
-   const float gtWidth = 570;
-   const float gtHeight = 150;
+   const double gtWidth = 570;
+   const double gtHeight = 150;
 
    const int numStrings = 6;
    const int numFrets = 13;
-   const float fretWidth = gtWidth / numFrets;
+   const double fretWidth = gtWidth / numFrets;
 
    ofSetCircleResolution(10);
    ofFill();
@@ -449,7 +449,7 @@ void ChaosEngine::DrawGuitar(float x, float y)
 
    for (int fret = 1; fret < numFrets; ++fret)
    {
-      float fretX = fret * fretWidth;
+      double fretX = fret * fretWidth;
 
       ofSetColor(200, 200, 200);
       ofLine(fretX, 0, fretX, gtHeight);
@@ -472,7 +472,7 @@ void ChaosEngine::DrawGuitar(float x, float y)
 
    for (int string = 0; string < numStrings; ++string)
    {
-      float stringY = gtHeight - string * gtHeight / (numStrings - 1);
+      double stringY = gtHeight - string * gtHeight / (numStrings - 1);
       ofSetColor(255, 255, 255);
       ofLine(0, stringY, gtWidth, stringY);
    }
@@ -481,11 +481,11 @@ void ChaosEngine::DrawGuitar(float x, float y)
 
    for (int string = 0; string < numStrings; ++string)
    {
-      float stringY = gtHeight - string * gtHeight / (numStrings - 1);
+      double stringY = gtHeight - string * gtHeight / (numStrings - 1);
 
       for (int fret = 0; fret < numFrets; ++fret)
       {
-         float fretX = fret * fretWidth;
+         double fretX = fret * fretWidth;
 
          int pitch = 16 + fret + string * 5; //16 to get to E-1
          if (string >= 5)
@@ -555,17 +555,17 @@ void ChaosEngine::ReadSongs()
    const ofxJSONElement& songs = root["songs"];
    mSongs.resize(songs.size());
    //TODO(Ryan) this is broken. but is it worth reviving?
-   /*for (int i=0; i<songs.size(); ++i)
+   /*for (int i = 0; i < songs.size(); ++i)
    {
       const ofxJSONElement& song = songs[i];
       mSongs[i].mName = song["name"].asString();
       mSongs[i].mTempo = song["tempo"].asDouble();
       mSongs[i].mTimeSigTop = song["timesig"][0u].asInt();
       mSongs[i].mTimeSigBottom = song["timesig"][1u].asInt();
-      
+
       std::string scaleRootName = song["scaleroot"].asString();
       int j;
-      for (j=0; j<12; ++j)
+      for (j = 0; j < 12; ++j)
       {
          if (scaleRootName == NoteName(j))
          {
@@ -574,26 +574,26 @@ void ChaosEngine::ReadSongs()
          }
       }
       assert(j != 12);
-      
+
       mSongs[i].mScaleType = song["scaletype"].asString();
-      
+
       ScalePitches scale;
       scale.SetRoot(mSongs[i].mScaleRoot);
       scale.SetScaleType(mSongs[i].mScaleType);
-      
+
       const ofxJSONElement& sections = song["sections"];
       mSongs[i].mSections.resize(sections.size());
-      for (j=0; j<sections.size(); ++j)
+      for (j = 0; j < sections.size(); ++j)
       {
          const ofxJSONElement& section = sections[j];
          mSongs[i].mSections[j].mName = section["name"].asString();
          mSongs[i].mSections[j].mChords.clear();
-         
-         for (int k=0; k<section["chords"].size(); ++k)
+
+         for (int k = 0; k < section["chords"].size(); ++k)
          {
             const ofxJSONElement& chordInfo = section["chords"][k];
-         
-            mSongs[i].mSections[j].mChords.push_back(ProgressionChord(chordInfo,scale));
+
+            mSongs[i].mSections[j].mChords.push_back(ProgressionChord(chordInfo, scale));
          }
       }
    }*/

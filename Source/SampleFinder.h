@@ -99,8 +99,8 @@ private:
    IntSlider* mClipStartSlider{ nullptr };
    int mClipEnd{ 1 };
    IntSlider* mClipEndSlider{ nullptr };
-   float mZoomStart{ 0 };
-   float mZoomEnd{ 1 };
+   double mZoomStart{ 0 };
+   double mZoomEnd{ 1 };
    double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mNumBars{ 1 };

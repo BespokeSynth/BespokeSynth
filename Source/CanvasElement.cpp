@@ -42,7 +42,7 @@ CanvasElement::CanvasElement(Canvas* canvas, int col, int row, double offset, do
 {
 }
 
-void CanvasElement::Draw(ofVec2f offset)
+void CanvasElement::Draw(ofVec2d offset)
 {
    if (offset.x == 0 && offset.y == 0)
    {
@@ -53,7 +53,7 @@ void CanvasElement::Draw(ofVec2f offset)
    else
    {
       ofPushStyle();
-      ofSetLineWidth(3.0f);
+      ofSetLineWidth(3.0);
       ofNoFill();
       ofSetColor(255, 255, 255, ofMap(sin(gTime / 500 * PI * 2), -1, 1, 40, 120));
       ofRect(GetRectAtDestination(K(clamp), !K(wrapped), offset), 0);
@@ -65,10 +65,10 @@ void CanvasElement::Draw(ofVec2f offset)
    }
 }
 
-void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2f offset)
+void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2d offset)
 {
-   ofRectangle_f rect = GetRect(clamp, wrapped, offset);
-   ofRectangle_f fullRect = GetRect(false, wrapped, offset);
+   ofRectangle rect = GetRect(clamp, wrapped, offset);
+   ofRectangle fullRect = GetRect(false, wrapped, offset);
 
    if (rect.width < 0)
    {
@@ -88,7 +88,7 @@ void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2f offset)
       ofPushStyle();
       ofNoFill();
       ofSetColor(255, 200, 0);
-      ofSetLineWidth(.75f);
+      ofSetLineWidth(.75);
 
       ofLine(rect.x, rect.y, rect.x + rect.width, rect.y);
       ofLine(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
@@ -98,7 +98,7 @@ void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2f offset)
          ofPushStyle();
          if (mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_Start && IsResizable())
          {
-            ofSetLineWidth(1.5f);
+            ofSetLineWidth(1.5);
             ofSetColor(255, 100, 100);
          }
          ofLine(rect.x, rect.y, rect.x, rect.y + rect.height);
@@ -109,7 +109,7 @@ void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2f offset)
          ofPushStyle();
          if (mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_End && IsResizable())
          {
-            ofSetLineWidth(1.5f);
+            ofSetLineWidth(1.5);
             ofSetColor(255, 100, 100);
          }
          ofLine(rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height);
@@ -126,7 +126,7 @@ void CanvasElement::DrawOffscreen()
    ofSetLineWidth(1);
    ofSetColor(255, 255, 255);
    {
-      ofRectangle_f rect = GetRect(K(clamp), !K(wrapped));
+      ofRectangle rect = GetRect(K(clamp), !K(wrapped));
       if (rect.y < 0)
       {
          rect.y = 0;
@@ -142,7 +142,7 @@ void CanvasElement::DrawOffscreen()
    }
    if (mCanvas->ShouldWrap() && GetEnd() > 1)
    {
-      ofRectangle_f rect = GetRect(K(clamp), K(wrapped));
+      ofRectangle rect = GetRect(K(clamp), K(wrapped));
       if (rect.y < 0)
       {
          rect.y = 0;
@@ -196,18 +196,18 @@ void CanvasElement::SetEnd(double end)
    mLength = end * mCanvas->GetNumCols() - mCol - mOffset;
 }
 
-ofRectangle_f CanvasElement::GetRect(bool clamp, bool wrapped, ofVec2f offset) const
+ofRectangle CanvasElement::GetRect(bool clamp, bool wrapped, ofVec2d offset) const
 {
    double wrapOffset = wrapped ? -1 : 0;
    double start = ofMap(GetStart() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
    double end = ofMap(GetEnd() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
    double y = static_cast<double>(mRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows() * mCanvas->GetHeight();
-   double height = static_cast<double>(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
+   double height = mCanvas->GetHeight() / mCanvas->GetNumVisibleRows();
 
-   return ofRectangle_f(start + offset.x, y + offset.y, end - start, height);
+   return { start + offset.x, y + offset.y, end - start, height };
 }
 
-ofRectangle_f CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const
+ofRectangle CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVec2d dragOffset) const
 {
    int newRow;
    int newCol;
@@ -217,13 +217,13 @@ ofRectangle_f CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVe
    double wrapOffset = wrapped ? -1 : 0;
    double start = ofMap(GetStart(newCol, newOffset) + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
    double end = ofMap(GetEnd(newCol, newOffset, mLength) + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
-   double y = (float(newRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
-   double height = float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
+   double y = (static_cast<double>(newRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
+   double height = mCanvas->GetHeight() / mCanvas->GetNumVisibleRows();
 
-   return ofRectangle_f(start, y, end - start, height);
+   return { start, y, end - start, height };
 }
 
-void CanvasElement::GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, double& newOffset) const
+void CanvasElement::GetDragDestinationData(ofVec2d dragOffset, int& newRow, int& newCol, double& newOffset) const
 {
    dragOffset.x *= mCanvas->mViewEnd - mCanvas->mViewStart;
 
@@ -245,7 +245,7 @@ void CanvasElement::GetDragDestinationData(ofVec2f dragOffset, int& newRow, int&
       newOffset = 0;
 }
 
-void CanvasElement::MoveElementByDrag(ofVec2f dragOffset)
+void CanvasElement::MoveElementByDrag(ofVec2d dragOffset)
 {
    int newRow;
    int newCol;
@@ -362,48 +362,48 @@ CanvasElement* NoteCanvasElement::CreateDuplicate() const
    return element;
 }
 
-void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
+void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2d offset)
 {
    ofPushStyle();
    ofFill();
    //DrawTextNormal(ofToString(mVelocity), GetRect(true, false).x, GetRect(true, false).y);
 
-   ofRectangle_f rect = GetRect(clamp, wrapped, offset);
-   float fullHeight = rect.height;
+   ofRectangle rect = GetRect(clamp, wrapped, offset);
+   double fullHeight = rect.height;
    rect.height *= mVelocity;
-   rect.y += (fullHeight - rect.height) * .5f;
+   rect.y += (fullHeight - rect.height) * .5;
    if (rect.width > 0)
    {
-      ofSetColorGradient(ofColor::white, ofColor(210, 210, 210), ofVec2f(ofLerp(rect.getMinX(), rect.getMaxX(), .5), rect.y), ofVec2f(rect.getMaxX(), rect.y));
+      ofSetColorGradient(ofColor::white, ofColor(210, 210, 210), ofVec2d(ofLerp(rect.getMinX(), rect.getMaxX(), .5), rect.y), ofVec2d(rect.getMaxX(), rect.y));
       ofRect(rect, 0);
    }
 
-   /*ofSetLineWidth(1.5f * gDrawScale);
-      
+   /*ofSetLineWidth(1.5 * gDrawScale);
+
    rect = GetRect(clamp, wrapped);
-   ofRectangle_f fullRect = GetRect(false, false);
+   ofRectangle fullRect = GetRect(false, false);
    if (wrapped)
       fullRect.x -= mCanvas->GetWidth();
-   float length = (GetEnd()-GetStart()) * mCanvas->GetLength();
-      
-   float start = (float(rect.x-fullRect.x)/fullRect.width);
-   float end = ((float(rect.x+rect.width)-(fullRect.x))/fullRect.width);
-      
-   mPitchBendCurve.SetPosition(rect.x, rect.y - rect.height/2);
+   double length = (GetEnd() - GetStart()) * mCanvas->GetLength();
+
+   double start = (rect.x - fullRect.x) / fullRect.width;
+   double end = (rect.x + rect.width - fullRect.x) / fullRect.width;
+
+   mPitchBendCurve.SetPosition(rect.x, rect.y - rect.height / 2);
    mPitchBendCurve.SetDimensions(rect.width, rect.height);
-   mPitchBendCurve.SetExtents(start*length, end*length);
+   mPitchBendCurve.SetExtents(start * length, end * length);
    mPitchBendCurve.SetColor(ofColor::red);
    mPitchBendCurve.Render();
-      
+
    mModWheelCurve.SetPosition(rect.x, rect.y);
    mModWheelCurve.SetDimensions(rect.width, rect.height);
-   mModWheelCurve.SetExtents(start*length, end*length);
+   mModWheelCurve.SetExtents(start * length, end * length);
    mModWheelCurve.SetColor(ofColor::green);
    mModWheelCurve.Render();
-      
+
    mPressureCurve.SetPosition(rect.x, rect.y);
    mPressureCurve.SetDimensions(rect.width, rect.height);
-   mPressureCurve.SetExtents(start*length, end*length);
+   mPressureCurve.SetExtents(start * length, end * length);
    mPressureCurve.SetColor(ofColor::blue);
    mPressureCurve.Render();*/
 
@@ -550,18 +550,18 @@ void SampleCanvasElement::ButtonClicked(std::string label, double time)
    }
 }
 
-void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
+void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2d offset)
 {
    if (wrapped)
       return;
 
-   ofRectangle_f rect = GetRect(false, false, offset);
+   ofRectangle rect = GetRect(false, false, offset);
 
    ofPushMatrix();
    ofTranslate(rect.x, rect.y);
    if (mSample)
    {
-      float width = rect.width;
+      double width = rect.width;
       DrawAudioBuffer(width, rect.height, mSample->Data(), 0, mSample->LengthInSamples(), -1);
    }
    else
@@ -577,9 +577,9 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    SampleCanvas* sampleCanvas = dynamic_cast<SampleCanvas*>(mCanvas->GetParent());
    if (sampleCanvas != nullptr && mSample != nullptr)
    {
-      float lengthMs = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRateMs;
-      float lengthOriginalSpeed = lengthMs / TheTransport->GetDuration(sampleCanvas->GetInterval());
-      float speed = lengthOriginalSpeed / mLength;
+      double lengthMs = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRateMs;
+      double lengthOriginalSpeed = lengthMs / TheTransport->GetDuration(sampleCanvas->GetInterval());
+      double speed = lengthOriginalSpeed / mLength;
       ofSetColor(255, 255, 255);
       DrawTextBold(ofToString(speed, 2), rect.x + 3, rect.y + 10, 10);
    }
@@ -687,7 +687,7 @@ CanvasElement* EventCanvasElement::CreateDuplicate() const
    return element;
 }
 
-void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
+void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2d offset)
 {
    if (wrapped)
       return;
@@ -703,7 +703,7 @@ void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    if (mIsCheckbox)
    {
       text = mUIControl->Name();
-      ofRectangle_f rect = GetRect(clamp, false, offset);
+      ofRectangle rect = GetRect(clamp, false, offset);
       ofSetColor(0, 0, 0);
       DrawTextNormal(text, rect.x + 4, rect.y + 11);
       ofSetColor(255, 255, 255);
@@ -715,7 +715,7 @@ void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
       text += ":";
       text += mUIControl->GetDisplayValue(mValue);
 
-      ofRectangle_f rect = GetRect(clamp, false, offset);
+      ofRectangle rect = GetRect(clamp, false, offset);
       ofSetColor(0, 0, 0);
       DrawTextNormal(text, rect.x + rect.width + 1, rect.y + 11);
       ofSetColor(255, 255, 255);

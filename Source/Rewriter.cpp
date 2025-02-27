@@ -61,7 +61,7 @@ void Rewriter::CreateUIControls()
    mLooperCable->SetManualPosition(mWidth - 10, 10);
    mLooperCable->AddTypeFilter("looper");
    ofColor color = mLooperCable->GetColor();
-   color.a *= .3f;
+   color.a *= .3;
    mLooperCable->SetColor(color);
    AddPatchCableSource(mLooperCable);
 }
@@ -116,17 +116,17 @@ void Rewriter::DrawModule()
    mRewriteButton->Draw();
    mStartRecordTimeButton->Draw();
 
-   if (mStartRecordTime != -1)
+   if (!ofAlmostEquel(mStartRecordTime, -1))
    {
-      ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)));
+      ofSetColor(255, 100, 0, 100 + 50 * (cos(TheTransport->GetMeasurePos(gTime) * 4 * TWO_PI)));
       ofRect(mStartRecordTimeButton->GetRect(true));
    }
 
    if (mConnectedLooper)
    {
       int loopSamples = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate)) * mConnectedLooper->GetNumBars();
-      ofRectangle_f rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
-      float playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->GetNumBars()) / mConnectedLooper->GetNumBars();
+      ofRectangle rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
+      double playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->GetNumBars()) / mConnectedLooper->GetNumBars();
       //mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height, loopSamples, L(channel,0), loopSamples * playhead);
       //mRecordBuffer.Draw(rect.x, rect.y, rect.width * playhead, rect.height, loopSamples * playhead, L(channel, 0));
 

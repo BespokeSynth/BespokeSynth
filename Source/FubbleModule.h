@@ -85,8 +85,8 @@ public:
 
 private:
    double GetPlaybackTime(double time);
-   ofRectangle_f GetFubbleRect();
-   ofVec2f GetFubbleMouseCoord();
+   ofRectangle GetFubbleRect();
+   ofVec2d GetFubbleMouseCoord();
    void RecordPoint();
    bool IsHovered();
    void Clear();
@@ -137,8 +137,8 @@ private:
    double mRecordStartOffset{ 0 };
    bool mIsDrawing{ false };
    bool mIsRightClicking{ false };
-   float mMouseX{ 0 };
-   float mMouseY{ 0 };
+   double mMouseX{ 0 };
+   double mMouseY{ 0 };
    PerlinNoise mNoise;
    double mPerlinStrength{ 0 };
    FloatSlider* mPerlinStrengthSlider{ nullptr };

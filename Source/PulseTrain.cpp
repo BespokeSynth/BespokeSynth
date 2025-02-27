@@ -75,7 +75,7 @@ void PulseTrain::CreateUIControls()
    for (int i = 0; i < kMaxSteps; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+      mStepCables[i]->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]);
    }
 }
@@ -101,8 +101,8 @@ void PulseTrain::DrawModule()
    {
       if (i < mLength)
       {
-         ofVec2f pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
-         pos.x += mVelocityGrid->GetWidth() / float(mLength) * .5f;
+         ofVec2d pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
+         pos.x += mVelocityGrid->GetWidth() / static_cast<double>(mLength) * .5;
          pos.y += mVelocityGrid->GetHeight() + 8;
          mStepCables[i]->SetManualPosition(pos.x, pos.y);
          mStepCables[i]->SetEnabled(true);

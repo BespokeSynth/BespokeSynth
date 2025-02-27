@@ -125,7 +125,7 @@ private:
    TextEntry* mPreviousTextEntry{ nullptr };
    bool mInErrorMode{ false };
    bool mDrawLabel{ false };
-   float mLabelSize{ 0 };
+   double mLabelSize{ 0 };
    bool mFlexibleWidth{ false };
    bool mHovered{ false };
    bool mRequireEnterToAccept{ false };

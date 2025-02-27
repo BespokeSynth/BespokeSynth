@@ -134,7 +134,7 @@ void WaveformViewer::DrawModule()
    ofSetColor(245, 58, 135);
    ofSetLineWidth(2);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
    double vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);

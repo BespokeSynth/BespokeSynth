@@ -65,7 +65,7 @@ void DotGrid::DrawGridCircle(int col, int row, float radiusPercent) const
    ofCircle(GetX(col) + xsize * .5f, GetY(row) + ysize * .5f, GetDotSize() * .5f * radiusPercent);
 }
 
-float DotGrid::GetDotSize() const
+double DotGrid::GetDotSize() const
 {
    float xsize = float(mWidth) / mCols;
    float ysize = float(mHeight) / mRows;

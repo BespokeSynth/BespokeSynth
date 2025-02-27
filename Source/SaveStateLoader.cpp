@@ -87,7 +87,7 @@ void SaveStateLoader::GetModuleDimensions(double& w, double& h)
    {
       if (i < mNumDisplayButtons)
       {
-         float buttonW, buttonH;
+         double buttonW, buttonH;
          mLoadButtons[i].mButton->GetDimensions(buttonW, buttonH);
          if (buttonW + 6 > w)
             w = buttonW + 6;

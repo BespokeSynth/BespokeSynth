@@ -82,7 +82,7 @@ void CircleSequencer::DrawModule()
    ofPushStyle();
    ofSetColor(ofColor::lime);
    double pos = TheTransport->GetMeasurePos(gTime);
-   ofVec2f end = ofPolToCar(pos, 100);
+   ofVec2d end = ofPolToCar(pos, 100);
    ofLine(100, 100, 100 + end.x, 100 + end.y);
    ofPopStyle();
 }
@@ -211,10 +211,10 @@ void CircleSequencerRing::Draw()
    for (int i = 0; i < mLength; ++i)
    {
       double pos = static_cast<double>(i) / mLength - mOffset;
-      ofVec2f p1 = ofPolToCar(pos, GetRadius() - 3);
-      ofVec2f p2 = ofPolToCar(pos, GetRadius() + 3);
+      ofVec2d p1 = ofPolToCar(pos, GetRadius() - 3);
+      ofVec2d p2 = ofPolToCar(pos, GetRadius() + 3);
       ofLine(p1.x + 100, p1.y + 100, p2.x + 100, p2.y + 100);
-      ofVec2f point = ofPolToCar(pos, GetRadius());
+      ofVec2d point = ofPolToCar(pos, GetRadius());
 
       if (mSteps[i] > 0)
          ofCircle(100 + point.x, 100 + point.y, 3 + 6 * mSteps[i]);
@@ -223,7 +223,7 @@ void CircleSequencerRing::Draw()
       {
          ofPushStyle();
          ofSetColor(255, 255, 255, 100);
-         ofSetLineWidth(.5f);
+         ofSetLineWidth(.5);
          ofNoFill();
          ofCircle(100 + point.x, 100 + point.y, 3 + 6);
          ofPopStyle();
@@ -235,13 +235,13 @@ void CircleSequencerRing::Draw()
    mOffsetSlider->Draw();
 }
 
-int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
+int CircleSequencerRing::GetStepIndex(int x, int y, double& radiusOut)
 {
-   ofVec2f polar = ofCarToPol(x - 100, y - 100);
-   float pos = FloatWrap(polar.x + mOffset, 1);
-   int idx = int(pos * mLength + .5f) % mLength;
+   ofVec2d polar = ofCarToPol(x - 100, y - 100);
+   double pos = DoubleWrap(polar.x + mOffset, 1);
+   int idx = int(pos * mLength + .5) % mLength;
 
-   ofVec2f stepPos = ofPolToCar(float(idx) / mLength - mOffset, GetRadius());
+   ofVec2d stepPos = ofPolToCar(static_cast<double>(idx) / mLength - mOffset, GetRadius());
    if (ofDistSquared(x, y, stepPos.x + 100, stepPos.y + 100) < 7 * 7)
    {
       radiusOut = polar.y;
@@ -251,7 +251,7 @@ int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
    return -1;
 }
 
-void CircleSequencerRing::OnClicked(float x, float y, bool right)
+void CircleSequencerRing::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -262,7 +262,7 @@ void CircleSequencerRing::OnClicked(float x, float y, bool right)
       if (mSteps[mCurrentlyClickedStepIdx])
          mSteps[mCurrentlyClickedStepIdx] = 0;
       else
-         mSteps[mCurrentlyClickedStepIdx] = .5f;
+         mSteps[mCurrentlyClickedStepIdx] = .5;
    }
 }
 
@@ -271,12 +271,12 @@ void CircleSequencerRing::MouseReleased()
    mCurrentlyClickedStepIdx = -1;
 }
 
-void CircleSequencerRing::MouseMoved(float x, float y)
+void CircleSequencerRing::MouseMoved(double x, double y)
 {
    if (mCurrentlyClickedStepIdx != -1)
    {
-      ofVec2f polar = ofCarToPol(x - 100, y - 100);
-      float change = (polar.y - mLastMouseRadius) / 50.0f;
+      ofVec2d polar = ofCarToPol(x - 100, y - 100);
+      double change = (polar.y - mLastMouseRadius) / 50.0;
 
       mSteps[mCurrentlyClickedStepIdx] = ofClamp(mSteps[mCurrentlyClickedStepIdx] + change, 0, 1);
 
@@ -284,7 +284,7 @@ void CircleSequencerRing::MouseMoved(float x, float y)
    }
    else
    {
-      float radius;
+      double radius;
       mHighlightStepIdx = GetStepIndex(x, y, radius);
    }
 }

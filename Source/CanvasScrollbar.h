@@ -42,7 +42,7 @@ public:
    CanvasScrollbar(Canvas* canvas, std::string name, Style style);
    ~CanvasScrollbar() {}
 
-   void SetDimensions(float width, float height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;
@@ -77,9 +77,9 @@ private:
    double mWidth{ 200 };
    double mHeight{ 20 };
    bool mClick{ false };
-   ofVec2f mClickMousePos;
-   ofVec2f mDragOffset;
-   float mScrollBarOffset{ 0 };
+   ofVec2d mClickMousePos;
+   ofVec2d mDragOffset;
+   double mScrollBarOffset{ 0 };
    Style mStyle{ Style::kHorizontal };
    bool mAutoHide{ true };
 

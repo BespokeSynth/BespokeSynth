@@ -104,8 +104,8 @@ private:
    std::list<ModuleFactory::Spawnable> mScreenshotsToProcess;
    IDrawableModule* mScreenshotModule{ nullptr };
 
-   float mScrollOffsetY{ 0 };
-   float mMaxScrollAmount{ 0 };
+   double mScrollOffsetY{ 0 };
+   double mMaxScrollAmount{ 0 };
 
    enum class ScreenshotState
    {

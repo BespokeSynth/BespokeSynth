@@ -708,7 +708,7 @@ void Looper::DrawModule()
    mCommitButton->Draw();
 
    if (mGranulator)
-      mGranulator->DrawOverlay(ofRectangle_f(4, 35, 155, 32), mLoopLength);
+      mGranulator->DrawOverlay(ofRectangle(4, 35, 155, 32), mLoopLength);
 
    if (mBeatwheel)
       DrawBeatwheel();
@@ -994,14 +994,14 @@ void Looper::SetMute(double time, bool mute)
    mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
 }
 
-void Looper::FilesDropped(std::vector<std::string> files, int x, int y)
+void Looper::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
    SampleDropped(x, y, &sample);
 }
 
-void Looper::SampleDropped(int x, int y, Sample* sample)
+void Looper::SampleDropped(double x, double y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();

@@ -61,7 +61,7 @@ private:
    int mSpawnIndex{ -1 };
    DropdownList* mSpawnList{ nullptr };
    IDropdownListener* mOwner{ nullptr };
-   ofVec2f mPos;
+   ofVec2d mPos;
    ModuleCategory mModuleCategory;
    bool mShowDecorators{ false };
 };

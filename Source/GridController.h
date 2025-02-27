@@ -75,7 +75,7 @@ public:
    virtual ~GridControlTarget() {}
 
    void Render() override;
-   static void DrawGridIcon(float x, float y);
+   static void DrawGridIcon(double x, double y);
 
    void SetGridController(IGridController* gridController)
    {

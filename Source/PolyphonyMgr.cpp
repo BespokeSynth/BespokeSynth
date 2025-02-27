@@ -223,7 +223,7 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    mFadeOutBufferPos += bufferSize;
 }
 
-void PolyphonyMgr::DrawDebug(float x, float y)
+void PolyphonyMgr::DrawDebug(double x, double y)
 {
    ofPushMatrix();
    ofPushStyle();

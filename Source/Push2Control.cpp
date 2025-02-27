@@ -187,7 +187,7 @@ void Push2Control::CreateUIControls()
    {
       mModuleGridManualCables[i] = new PatchCableSource(this, kConnectionType_Special);
       ofColor color = IDrawableModule::GetColor(kModuleCategory_Other);
-      color.a *= .3f;
+      color.a *= .3;
       mModuleGridManualCables[i]->SetColor(color);
       mModuleGridManualCables[i]->SetManualPosition((i % 8) * 12 + 8, (i / 8) * 12 + mHeight + 6);
       AddPatchCableSource(mModuleGridManualCables[i]);
@@ -230,7 +230,7 @@ void Push2Control::DrawModuleUnclipped()
    {
       ofPushMatrix();
       ofPushStyle();
-      ofVec2f pos = GetPosition();
+      ofVec2d pos = GetPosition();
       ofTranslate(-pos.x, -pos.y);
       DrawDisplayModuleRect(mDisplayModule->GetRect(), 3);
       ofPopMatrix();
@@ -238,7 +238,7 @@ void Push2Control::DrawModuleUnclipped()
    }
 }
 
-void Push2Control::DrawDisplayModuleRect(ofRectangle_f rect, float thickness)
+void Push2Control::DrawDisplayModuleRect(ofRectangle rect, double thickness)
 {
    if (mDisplayModule->HasTitleBar())
    {
@@ -463,8 +463,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
 
    SetModuleGridLights();
 
-   mModuleViewOffsetSmoothed = ofLerp(mModuleViewOffsetSmoothed, mModuleViewOffset, .3f);
-   mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3f);
+   mModuleViewOffsetSmoothed = ofLerp(mModuleViewOffsetSmoothed, mModuleViewOffset, .3);
+   mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3);
 
    if (mScreenDisplayMode == ScreenDisplayMode::kNormal || mScreenDisplayMode == ScreenDisplayMode::kMap)
    {
@@ -592,7 +592,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       ofRect(0, 0, ableton::Push2DisplayBitmap::kWidth * kPixelRatio, ableton::Push2DisplayBitmap::kHeight * kPixelRatio);
       ofPopStyle();
 
-      float screenScale = .2f;
+      double screenScale = .2;
       ofScale(screenScale * gDrawScale, screenScale * gDrawScale, screenScale * gDrawScale);
       ofTranslate(TheSynth->GetDrawOffset().x, TheSynth->GetDrawOffset().y);
       ofTranslate(1500 / gDrawScale, -100 / gDrawScale); //center on display
@@ -712,9 +712,9 @@ ofColor Push2Control::GetSpawnGridColor(int index, ModuleCategory moduleType) co
 
    ofColor color = IDrawableModule::GetColor(moduleType);
    if (bright)
-      color = color * .8f;
+      color = color * .8;
    else
-      color = color * .4f;
+      color = color * .4;
 
    return color;
 }
@@ -730,13 +730,13 @@ int Push2Control::GetSpawnGridPadColor(int index, ModuleCategory moduleType) con
 
 void Push2Control::SetModuleGridLights()
 {
-   float minX = 0;
-   float minY = 0;
-   float maxX = ofGetWidth();
-   float maxY = ofGetHeight();
+   double minX = 0;
+   double minY = 0;
+   double maxX = ofGetWidth();
+   double maxY = ofGetHeight();
    for (int i = 0; i < mModules.size(); ++i)
    {
-      ofVec2f pos = mModules[i]->GetPosition();
+      ofVec2d pos = mModules[i]->GetPosition();
       if (pos.x > maxX)
          maxX = pos.x;
       if (pos.y > maxY)
@@ -757,7 +757,7 @@ void Push2Control::SetModuleGridLights()
 
       for (int i = 0; i < mModules.size(); ++i)
       {
-         ofVec2f pos = mModules[i]->GetPosition();
+         ofVec2d pos = mModules[i]->GetPosition();
          int gridX = (pos.x - minX) / (maxX - minX) * 8;
          int gridY = (pos.y - minY) / (maxY - minY) * 8;
          while (gridX < 8 && gridY < 8)
@@ -843,12 +843,12 @@ void Push2Control::DrawDisplayModuleControls()
 
       //nvgFontSize(mVG, 16);
       //nvgText(mVG, 10, 10, mDisplayModule->Name(), nullptr);
-      float x;
-      float y;
+      double x;
+      double y;
       mDisplayModule->GetPosition(x, y, true);
       mDisplayModule->SetPosition(5 - kColumnSpacing * mModuleViewOffsetSmoothed, 15);
-      float titleBarHeight;
-      float highlight;
+      double titleBarHeight;
+      double highlight;
       mDisplayModule->DrawFrame(kColumnSpacing * MAX(1, MAX(mSliderControls.size(), mButtonControls.size())) - 14, 80, false, titleBarHeight, highlight);
       mDisplayModule->SetPosition(x, y);
 
@@ -876,18 +876,18 @@ void Push2Control::DrawDisplayModuleControls()
       ofPopStyle();
 
       ofPushStyle();
-      ofSetLineWidth(.5f);
+      ofSetLineWidth(.5);
       int length = MAX((int)mButtonControls.size(), (int)mSliderControls.size());
       if (length > 8)
       {
-         ofRectangle_f bar(ableton::Push2DisplayBitmap::kWidth * kPixelRatio - 100, 3, 80, 10);
+         ofRectangle bar(ableton::Push2DisplayBitmap::kWidth * kPixelRatio - 100, 3, 80, 10);
          ofNoFill();
          ofSetColor(100, 100, 100);
          ofRect(bar);
          ofFill();
          ofSetColor(255, 255, 255);
          bar.x += bar.width * mModuleViewOffsetSmoothed / length;
-         bar.width *= 8.0f / length;
+         bar.width *= 8.0 / length;
          ofRect(bar);
       }
       ofPopStyle();
@@ -912,15 +912,15 @@ void Push2Control::DrawLowerModuleSelector()
 
       ofClipWindow(kColumnSpacing * (i - mModuleListOffsetSmoothed), 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
-      float x;
-      float y;
+      double x;
+      double y;
       mModules[i]->GetPosition(x, y, true);
       mModules[i]->SetPosition(3 + kColumnSpacing * (i - mModuleListOffsetSmoothed), 120);
-      float titleBarHeight;
-      float highlight;
+      double titleBarHeight;
+      double highlight;
       mModules[i]->DrawFrame(kColumnSpacing - 14, 80, true, titleBarHeight, highlight);
       if (mModules[i] == mDisplayModule)
-         DrawDisplayModuleRect(ofRectangle_f(0, 0, kColumnSpacing - 14, 80), 3);
+         DrawDisplayModuleRect(ofRectangle(0, 0, kColumnSpacing - 14, 80), 3);
       mModules[i]->SetPosition(x, y);
 
       if (i - round(mModuleListOffset) >= 0 && i - round(mModuleListOffset) < 8)
@@ -944,16 +944,16 @@ void Push2Control::DrawRoutingDisplay()
       ofPushStyle();
 
       ofSetColor(mRoutingInputModules[i].mConnectionColor);
-      ofLine(kColumnSpacing * (i + .5f), 37, kColumnSpacing * .5f, 60);
+      ofLine(kColumnSpacing * (i + .5), 37, kColumnSpacing * .5, 60);
 
       ofClipWindow(kColumnSpacing * i, 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
-      float x;
-      float y;
+      double x;
+      double y;
       mRoutingInputModules[i].mModule->GetPosition(x, y, true);
       mRoutingInputModules[i].mModule->SetPosition(3 + kColumnSpacing * i, 12);
-      float titleBarHeight;
-      float highlight;
+      double titleBarHeight;
+      double highlight;
       mRoutingInputModules[i].mModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
       mRoutingInputModules[i].mModule->SetPosition(x, y);
 
@@ -970,16 +970,16 @@ void Push2Control::DrawRoutingDisplay()
       ofPushStyle();
 
       ofSetColor(mRoutingOutputModules[i].mConnectionColor);
-      ofLine(kColumnSpacing * .5f, 97, kColumnSpacing * (i + .5f), 120);
+      ofLine(kColumnSpacing * .5, 97, kColumnSpacing * (i + .5), 120);
 
       ofClipWindow(kColumnSpacing * i, 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
-      float x;
-      float y;
+      double x;
+      double y;
       mRoutingOutputModules[i].mModule->GetPosition(x, y, true);
       mRoutingOutputModules[i].mModule->SetPosition(3 + kColumnSpacing * i, 132);
-      float titleBarHeight;
-      float highlight;
+      double titleBarHeight;
+      double highlight;
       mRoutingOutputModules[i].mModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
       mRoutingOutputModules[i].mModule->SetPosition(x, y);
 
@@ -996,12 +996,12 @@ void Push2Control::DrawRoutingDisplay()
 
       ofClipWindow(0, 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
-      float x;
-      float y;
+      double x;
+      double y;
       mDisplayModule->GetPosition(x, y, true);
       mDisplayModule->SetPosition(3, 72);
-      float titleBarHeight;
-      float highlight;
+      double titleBarHeight;
+      double highlight;
       mDisplayModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
       mDisplayModule->SetPosition(x, y);
 
@@ -1070,7 +1070,7 @@ ModuleCategory Push2Control::GetModuleTypeForSpawnList(IUIControl* control)
    return moduleType;
 }
 
-void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos)
+void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders, double yPos)
 {
    for (int i = (int)controls.size() - 1; i >= 0; --i)
    {
@@ -1079,7 +1079,7 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
 
       ADSRDisplay* adsr = dynamic_cast<ADSRDisplay*>(controls[i]);
 
-      ofRectangle_f originalRect = controls[i]->GetRect(true);
+      ofRectangle originalRect = controls[i]->GetRect(true);
       if (adsr != nullptr)
       {
          adsr->SetDimensions(80, 30);
@@ -1163,15 +1163,15 @@ void Push2Control::Poll()
       int gridY = padNum / 8;
       int gridIndex = gridX + (7 - gridY) * 8;
       IDrawableModule* existingModule = mModuleGrid[gridIndex];
-      ofVec2f newModulePos;
+      ofVec2d newModulePos;
       if (existingModule != nullptr)
       {
-         ofRectangle_f existingModuleRect = existingModule->GetRect();
-         newModulePos = ofVec2f(existingModuleRect.getMinX(), existingModuleRect.getMaxY() + 40);
+         ofRectangle existingModuleRect = existingModule->GetRect();
+         newModulePos = ofVec2d(existingModuleRect.getMinX(), existingModuleRect.getMaxY() + 40);
       }
       else
       {
-         newModulePos = ofVec2f(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
+         newModulePos = ofVec2d(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
       }
 
       for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
@@ -1706,8 +1706,8 @@ void Push2Control::OnMidiControl(MidiControl& control)
    }
    else if (control.mControl == 15) //encoder next to above encoder
    {
-      float increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
-      increment *= .05f;
+      double increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
+      increment *= .05;
       mModuleListOffset += increment;
    }
    else if (control.mControl >= kBelowScreenButtonRow && control.mControl < kBelowScreenButtonRow + 8) //buttons below screen
@@ -1885,7 +1885,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       if (control.mValue > 0)
       {
-         ofVec2f direction;
+         ofVec2d direction;
          if (control.mControl == kUpButton)
             direction.y -= 1;
          if (control.mControl == kDownButton)
@@ -1897,7 +1897,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
 
          if (mShiftHeld && mDisplayModule)
          {
-            ofVec2f pos = mDisplayModule->GetPosition();
+            ofVec2d pos = mDisplayModule->GetPosition();
             pos += direction * 50;
             mDisplayModule->SetPosition(pos.x, pos.y);
          }
@@ -2054,7 +2054,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
          }
          else if (mHeldKnobIndex == -1)
          {
-            ofRectangle_f rect = mDisplayModule->GetRect();
+            ofRectangle rect = mDisplayModule->GetRect();
             TheSynth->PanTo(rect.getCenter().x, rect.getCenter().y);
          }
          else
@@ -2104,7 +2104,7 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
          return;
    }
 
-   float value = pitchBend.mValue / MidiDevice::kPitchBendMax;
+   double value = pitchBend.mValue / MidiDevice::kPitchBendMax;
    TheSynth->SetZoomLevel(pow(2, value * 2 - 1) + .1);
 
    //ofLog() << "pitchbend " << pitchBend.mChannel << " " << pitchBend.mValue;

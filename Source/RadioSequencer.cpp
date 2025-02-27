@@ -270,7 +270,7 @@ void RadioSequencer::SyncControlCablesToGrid()
       for (int i = oldSize; i < mControlCables.size(); ++i)
       {
          mControlCables[i] = new PatchCableSource(this, kConnectionType_ValueSetter);
-         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+         mControlCables[i]->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
          //mControlCables[i]->SetColor(GetRowColor(i));
          AddPatchCableSource(mControlCables[i]);
       }

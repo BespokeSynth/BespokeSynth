@@ -66,10 +66,10 @@ void UIGrid::Render()
    ofTranslate(mX, mY);
    ofPushStyle();
    ofSetLineWidth(.5f);
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
-   double xsize = double(mWidth) / mCols;
-   double ysize = double(mHeight) / mRows;
+   double xsize = mWidth / mCols;
+   double ysize = mHeight / mRows;
    for (int j = 0; j < mRows; ++j)
    {
       for (int i = 0; i < mCols; ++i)
@@ -95,7 +95,7 @@ void UIGrid::Render()
                ofRect(x + .5, y + .5 + (ysize * (1 - sliderFillAmount)), xsize - 1, ysize * sliderFillAmount - 1, 0);
                /*ofSetColor(255, 255, 255, gModuleDrawAlpha);
                ofNoFill();
-               ofRect(x+1,y+1,xsize-2,ysize-2, gCornerRoundness*.99f);*/
+               ofRect(x + 1, y + 1, xsize - 2, ysize - 2, gCornerRoundness * .99);*/
             }
             else if (mGridMode == kHorislider)
             {
@@ -113,7 +113,7 @@ void UIGrid::Render()
             {
                double fadeAmount = ofClamp(ofLerp(.5, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
-               ofVec2f center(x + xsize * 0.5, y + ysize * 0.5);
+               ofVec2d center(x + xsize * 0.5, y + ysize * 0.5);
                ofRect(center.x - (sliderFillAmount * xsize * 0.5), center.y - (sliderFillAmount * ysize * 0.5), sliderFillAmount * xsize, sliderFillAmount * ysize);
                drawDragLevels = true;
             }

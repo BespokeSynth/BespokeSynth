@@ -77,7 +77,7 @@ private:
    }
 
    void UpdateDropdowns(std::vector<DropdownList*> toUpdate);
-   void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);
+   void DrawRightLabel(IUIControl* control, std::string text, ofColor color, double offsetX = 12);
    void CleanUpSave(std::string& json);
    bool PrefRequiresRestart(UserPref* pref) const;
    void Save();

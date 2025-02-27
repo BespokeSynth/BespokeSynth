@@ -101,13 +101,13 @@ void NoteChance::DrawModule()
 
    if (mDeterministic)
    {
-      ofRectangle_f lengthRect = mLengthSlider->GetRect(true);
+      ofRectangle lengthRect = mLengthSlider->GetRect(true);
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
       double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
       const double kPipSize = 3;
-      float moduleWidth, moduleHeight;
+      double moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);
       ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
       ofPopStyle();

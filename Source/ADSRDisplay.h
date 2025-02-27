@@ -111,7 +111,7 @@ private:
    double mMaxTime{ 1000 };
    bool mClick{ false };
    ::ADSR* mAdsr;
-   ofVec2f mClickStart;
+   ofVec2d mClickStart;
    ::ADSR mClickAdsr;
    double mClickLength{ 1000 };
    bool mHighlighted{ false };

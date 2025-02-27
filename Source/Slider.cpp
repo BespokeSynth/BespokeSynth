@@ -227,7 +227,7 @@ void FloatSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRectangle_f rect = mMaxEntry->GetRect(K(local));
+      ofRectangle rect = mMaxEntry->GetRect(K(local));
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
       ofSetColor(255, 255, 255);
@@ -239,7 +239,7 @@ void FloatSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRectangle_f rect = mMinEntry->GetRect(K(local));
+      ofRectangle rect = mMinEntry->GetRect(K(local));
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
       ofSetColor(255, 255, 255);
@@ -252,20 +252,20 @@ void FloatSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRect(mX, mY, mWidth * .4f, mHeight);
-      ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
+      ofRect(mX, mY, mWidth * .4, mHeight);
+      ofRect(mX + mWidth * .6, mY, mWidth * .4, mHeight);
       ofNoFill();
       ofSetColor(255, 255, 255);
-      ofRect(mX, mY, mWidth * .4f, mHeight);
-      ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
+      ofRect(mX, mY, mWidth * .4, mHeight);
+      ofRect(mX + mWidth * .6, mY, mWidth * .4, mHeight);
 
       ofPushMatrix();
-      ofClipWindow(mX, mY, mWidth * .4f, mHeight, true);
+      ofClipWindow(mX, mY, mWidth * .4, mHeight, true);
       DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 10);
       ofPopMatrix();
 
       ofPushMatrix();
-      ofClipWindow(mX + mWidth * .6f, mY, mWidth * .4f, mHeight, true);
+      ofClipWindow(mX + mWidth * .6, mY, mWidth * .4, mHeight, true);
       DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 10);
       ofPopMatrix();
 
@@ -284,12 +284,12 @@ void FloatSlider::DisplayLFOControl()
       if (lfo->IsPinned())
          return;
 
-      float thisx, thisy;
+      double thisx, thisy;
       GetPosition(thisx, thisy);
 
       lfo->SetLFOEnabled(true);
 
-      float w, h;
+      double w, h;
       lfo->GetDimensions(w, h);
       lfo->SetPosition(thisx, thisy + 15);
       lfo->SetOwningContainer(GetModuleParent()->GetOwningContainer());
@@ -493,7 +493,7 @@ double FloatSlider::ValToPos(double val, bool ignoreSmooth) const
    if (mMode == kBezier)
    {
       double closest = 0;
-      double closestDist = FLT_MAX;
+      double closestDist = std::numeric_limits<double>::max();
       for (double pos = 0; pos < 1; pos += .001)
       {
          double dist = abs(PosToVal(pos, true) - val);
@@ -933,8 +933,8 @@ void IntSlider::Poll()
 
 void IntSlider::Render()
 {
-   float normalWidth = mWidth;
-   float normalHeight = mHeight;
+   double normalWidth = mWidth;
+   double normalHeight = mHeight;
 
    if (Push2Control::sDrawingPush2Display)
    {
@@ -962,7 +962,7 @@ void IntSlider::Render()
       ofSetColor(100, 100, 100, gModuleDrawAlpha);
       for (int i = mMin + 1; i < mMax; ++i)
       {
-         float x = mX + 1 + (mWidth - 2) * ((i - mMin) / float(mMax - mMin));
+         double x = mX + 1 + (mWidth - 2) * ((i - mMin) / static_cast<double>(mMax - mMin));
          ofLine(x, mY + 1, x, mY + mHeight - 1);
       }
       ofPopStyle();
@@ -973,14 +973,14 @@ void IntSlider::Render()
    ofSetLineWidth(2);
 
    ofSetColor(255, 100, 0);
-   float xposfloat = mX + 1 + (mWidth - 2) * mSliderVal;
+   double xposfloat = mX + 1 + (mWidth - 2) * mSliderVal;
    ofLine(xposfloat, mY + mHeight / 2 - 1, xposfloat, mY + mHeight / 2 + 1);
 
    if (*mVar >= mMin && *mVar <= mMax)
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
    else
       ofSetColor(30, 30, 30, gModuleDrawAlpha);
-   float xpos = mX + 1 + (mWidth - 2) * ((val - mMin) / float(mMax - mMin));
+   double xpos = mX + 1 + (mWidth - 2) * ((val - mMin) / double(mMax - mMin));
    ofLine(xpos, mY + 1, xpos, mY + mHeight - 1);
 
    ofPopStyle();
@@ -1017,7 +1017,7 @@ void IntSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRectangle_f rect = mMaxEntry->GetRect(K(local));
+      ofRectangle rect = mMaxEntry->GetRect(K(local));
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
       ofSetColor(255, 255, 255);
@@ -1029,7 +1029,7 @@ void IntSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRectangle_f rect = mMinEntry->GetRect(K(local));
+      ofRectangle rect = mMinEntry->GetRect(K(local));
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
       ofSetColor(255, 255, 255);
@@ -1042,12 +1042,12 @@ void IntSlider::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(120, 120, 120, 255);
-      ofRect(mX, mY, mWidth * .4f, mHeight);
-      ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
+      ofRect(mX, mY, mWidth * .4, mHeight);
+      ofRect(mX + mWidth * .6, mY, mWidth * .4, mHeight);
       ofNoFill();
       ofSetColor(255, 255, 255);
-      ofRect(mX, mY, mWidth * .4f, mHeight);
-      ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
+      ofRect(mX, mY, mWidth * .4, mHeight);
+      ofRect(mX + mWidth * .6, mY, mWidth * .4, mHeight);
       DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 10);
       DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 10);
       ofPopStyle();
@@ -1107,7 +1107,7 @@ bool IntSlider::MouseMoved(double x, double y)
    return mMouseDown;
 }
 
-void IntSlider::SetValueForMouse(float x, float y)
+void IntSlider::SetValueForMouse(double x, double y)
 {
    int oldVal = *mVar;
    *mVar = (int)round(ofMap(x + mX, mX + 1, mX + mWidth - 1, mMin, mMax));

@@ -71,14 +71,14 @@ void PatchCableSource::SetConnectionType(ConnectionType type)
    else if (mType == kConnectionType_ValueSetter)
    {
       mColor = IDrawableModule::GetColor(kModuleCategory_Modulator);
-      mColor.setSaturation(mColor.getSaturation() * .6f);
-      mColor.setBrightness(mColor.getBrightness() * .7f);
+      mColor.setSaturation(mColor.getSaturation() * .6);
+      mColor.setBrightness(mColor.getBrightness() * .7);
    }
    else if (mType == kConnectionType_Pulse)
       mColor = IDrawableModule::GetColor(kModuleCategory_Pulse);
    else
       mColor = IDrawableModule::GetColor(kModuleCategory_Other);
-   mColor.setBrightness(mColor.getBrightness() * .8f);
+   mColor.setBrightness(mColor.getBrightness() * .8);
 }
 
 PatchCable* PatchCableSource::AddPatchCable(IClickable* target)
@@ -158,7 +158,7 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
 {
    if (mOwner != nullptr && (mAutomaticPositioning || parentMinimized || mOwner->Minimized()))
    {
-      float x, y, w, h;
+      double x, y, w, h;
       mOwner->GetPosition(x, y);
       mOwner->GetDimensions(w, h);
 
@@ -170,7 +170,7 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
 
       if (mManualSide == Side::kNone || parentMinimized)
       {
-         ofVec2f centerOfMass;
+         ofVec2d centerOfMass;
          int count = 0;
          for (auto cable : mPatchCables)
          {
@@ -184,7 +184,7 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
                }
                else if (cable->GetTarget())
                {
-                  float targetX, targetY, targetW, targetH;
+                  double targetX, targetY, targetW, targetH;
                   cable->GetTarget()->GetPosition(targetX, targetY);
                   cable->GetTarget()->GetDimensions(targetW, targetH);
                   centerOfMass.x += targetX + targetW / 2;
@@ -369,7 +369,7 @@ ofColor PatchCableSource::GetColor() const
    return mColor;
 }
 
-ofVec2f PatchCableSource::GetCableStart(int index) const
+ofVec2d PatchCableSource::GetCableStart(int index) const
 {
    float cableX = mX;
    float cableY = mY;
@@ -384,10 +384,10 @@ ofVec2f PatchCableSource::GetCableStart(int index) const
          cableX += kPatchCableSpacing * index;
    }
 
-   return ofVec2f(cableX, cableY);
+   return { cableX, cableY };
 }
 
-ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
+ofVec2d PatchCableSource::GetCableStartDir(int index, ofVec2d dest) const
 {
    if (mHasOverrideCableDir)
    {
@@ -431,28 +431,28 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
          }
       }
 
-      ofVec2f ret(0, 0);
+      ofVec2d ret(0, 0);
       switch (dir)
       {
          case Direction::kDown:
-            ret = ofVec2f(0, 1);
+            ret = ofVec2d(0, 1);
             break;
          case Direction::kRight:
-            ret = ofVec2f(1, 0);
+            ret = ofVec2d(1, 0);
             break;
          case Direction::kLeft:
-            ret = ofVec2f(-1, 0);
+            ret = ofVec2d(-1, 0);
             break;
          case Direction::kUp:
-            ret = ofVec2f(0, -1);
+            ret = ofVec2d(0, -1);
             break;
          case Direction::kNone:
-            ret = ofVec2f(0, 0);
+            ret = ofVec2d(0, 0);
             break;
       }
 
       if (mHoverIndex == -1 && mPatchCables.size() > 1)
-         ret = ret * .5f; //soften if there are multiple cables
+         ret = ret * .5; //soften if there are multiple cables
 
       return ret;
    }
@@ -536,7 +536,7 @@ bool PatchCableSource::TestClick(double x, double y, bool right, bool testOnly /
             }
             else if (mType == kConnectionType_Audio)
             {
-               ofVec2f spawnOffset(-20, 10);
+               ofVec2d spawnOffset(-20, 10);
                ModuleFactory::Spawnable spawnable;
                spawnable.mLabel = "send";
                AudioSend* send = dynamic_cast<AudioSend*>(TheSynth->SpawnModuleOnTheFly(spawnable, x + spawnOffset.x, y + spawnOffset.y));

@@ -130,7 +130,7 @@ void MacroSlider::Mapping::CreateUIControls()
    mTargetCable = new PatchCableSource(mOwner, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    mTargetCable->SetManualPosition(110, 39 + mIndex * kMappingSpacing);
-   mTargetCable->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+   mTargetCable->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
    mOwner->AddPatchCableSource(mTargetCable);
 }
 
@@ -152,7 +152,7 @@ void MacroSlider::Mapping::Draw()
 
    if (GetSliderTarget())
    {
-      float x, y, w, h;
+      double x, y, w, h;
       mMinSlider->GetPosition(x, y, K(local));
       mMinSlider->GetDimensions(w, h);
 

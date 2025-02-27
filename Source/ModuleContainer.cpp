@@ -40,11 +40,11 @@ ModuleContainer::ModuleContainer()
 {
 }
 
-ofVec2f ModuleContainer::GetOwnerPosition() const
+ofVec2d ModuleContainer::GetOwnerPosition() const
 {
    if (mOwner)
       return mOwner->GetPosition();
-   return ofVec2f();
+   return {};
 }
 
 void ModuleContainer::GetAllModules(std::vector<IDrawableModule*>& out)
@@ -203,11 +203,11 @@ void ModuleContainer::MouseReleased()
    }
 }
 
-IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
+IDrawableModule* ModuleContainer::GetModuleAt(double x, double y)
 {
    if (mOwner != nullptr)
    {
-      float ownerX, ownerY;
+      double ownerX, ownerY;
       mOwner->GetPosition(ownerX, ownerY);
       x -= ownerX;
       y -= ownerY;
@@ -310,7 +310,7 @@ void ModuleContainer::AddModule(IDrawableModule* module)
 void ModuleContainer::TakeModule(IDrawableModule* module)
 {
    assert(module->GetOwningContainer()); //module must already be in a container
-   ofVec2f oldOwnerPos = module->GetOwningContainer()->GetOwnerPosition();
+   ofVec2d oldOwnerPos = module->GetOwningContainer()->GetOwnerPosition();
    if (module->GetOwningContainer()->mOwner)
       module->GetOwningContainer()->mOwner->RemoveChild(module);
    RemoveFromVector(module, module->GetOwningContainer()->mModules);
@@ -320,7 +320,7 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
    mModules.push_back(module);
    MoveToFront(module);
 
-   ofVec2f offset = oldOwnerPos - GetOwnerPosition();
+   ofVec2d offset = oldOwnerPos - GetOwnerPosition();
    module->SetPosition(module->GetPosition(true).x + offset.x,
                        module->GetPosition(true).y + offset.y);
    module->SetOwningContainer(this);

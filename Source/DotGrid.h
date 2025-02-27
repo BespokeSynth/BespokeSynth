@@ -80,7 +80,8 @@ public:
       mWidth = width;
       mHeight = height;
    }
-   float GetWidth() const { return mWidth; }
+
+   double GetWidth() const { return mWidth; }
    float GetHeight() const { return mHeight; }
    const std::array<DotData, kMaxCols * kMaxRows>& GetData() const { return mData; }
    void SetData(std::array<DotData, kMaxCols * kMaxRows>& data) { mData = data; }
@@ -88,7 +89,7 @@ public:
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    const DotData& GetDataAt(int col, int row) const;
    void OnPlayed(double time, int col, int row);
-   float GetDotSize() const;
+   double GetDotSize() const;
    int GetMaxColumns() const { return kMaxCols; }
    void CopyDot(DotPosition from, DotPosition to);
    bool IsValidPosition(DotPosition pos) const;

@@ -347,12 +347,12 @@ void MultitrackRecorderTrack::DrawModule()
 {
    mDeleteButton->Draw();
 
-   float width, height;
+   double width, height;
    GetModuleDimensions(width, height);
 
    ofPushMatrix();
    ofTranslate(5, 3);
-   float sampleWidth = width - 10;
+   double sampleWidth = width - 10;
 
    ofSetColor(255, 255, 255, 30);
    ofFill();
@@ -367,7 +367,7 @@ void MultitrackRecorderTrack::DrawModule()
 
    ofPushMatrix();
    int numChunks = mRecordingLength / kRecordingChunkSize + 1;
-   float chunkWidth = sampleWidth / numChunks;
+   double chunkWidth = sampleWidth / numChunks;
    for (int i = 0; i < numChunks; ++i)
    {
       if (i < (int)mRecordChunks.size())
@@ -475,7 +475,7 @@ void MultitrackRecorderTrack::GetModuleDimensions(double& width, double& height)
 {
    if (mRecorder)
    {
-      float parentWidth, parentHeight;
+      double parentWidth, parentHeight;
       mRecorder->GetDimensions(parentWidth, parentHeight);
 
       width = parentWidth - 15;

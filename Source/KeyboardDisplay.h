@@ -78,7 +78,7 @@ private:
 
    void DrawKeyboard(int x, int y, int w, int h);
    void SetPitchColor(int pitch);
-   ofRectangle_f GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;
+   ofRectangle GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;
 
    int RootKey() const;
    int NumKeys() const;

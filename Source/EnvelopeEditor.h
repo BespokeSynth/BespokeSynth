@@ -38,9 +38,9 @@
 class EnvelopeControl
 {
 public:
-   EnvelopeControl(ofVec2f position, ofVec2f dimensions);
+   EnvelopeControl(ofVec2d position, ofVec2d dimensions);
    void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
-   void OnClicked(float x, float y, bool right);
+   void OnClicked(double x, double y, bool right);
    void MouseMoved(float x, float y);
    void MouseReleased();
    void Draw();
@@ -52,7 +52,7 @@ public:
    void SetFixedLengthMode(bool fixed) { mFixedLengthMode = fixed; }
 
 private:
-   void AddVertex(float x, float y);
+   void AddVertex(double x, double y);
    double GetPreSustainTime();
    double GetReleaseTime();
    double GetTimeForX(double x);

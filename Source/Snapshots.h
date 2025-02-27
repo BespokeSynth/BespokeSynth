@@ -85,7 +85,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
-   int GetModuleSaveStateRev() const override { return 4; }
+   int GetModuleSaveStateRev() const override { return 5; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 
@@ -98,7 +98,7 @@ public:
 
 private:
    void UpdateGridValues();
-   void SetGridSize(float w, float h);
+   void SetGridSize(double w, double h);
    bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
    void RandomizeControl(IUIControl* control);

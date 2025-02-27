@@ -163,20 +163,20 @@ void RhythmSequencer::DrawModule()
    {
       if (mStepData[i].mAction == StepAction::On && i < mLengthAction)
       {
-         ofRectangle_f rect = mStepData[i].mActionSelector->GetRect(true);
+         ofRectangle rect = mStepData[i].mActionSelector->GetRect(true);
          ofCircle(rect.x - 6, rect.getCenter().y, 3);
       }
 
       if (DoesStepHold(i, 0) && i < mLengthAction)
       {
-         ofRectangle_f rect = mStepData[i].mActionSelector->GetRect(true);
+         ofRectangle rect = mStepData[i].mActionSelector->GetRect(true);
          ofLine(rect.x - 6, rect.getCenter().y + 1, rect.x - 6, rect.getCenter().y - 16);
       }
    }
 
    {
       ofSetColor(0, 0, 0, 100);
-      ofRectangle_f rect = mStepData[(mLinkLengths ? mLength : mLengthAction) - 1].mActionSelector->GetRect(true);
+      ofRectangle rect = mStepData[(mLinkLengths ? mLength : mLengthAction) - 1].mActionSelector->GetRect(true);
       ofRect(rect.x, rect.getMaxY(), rect.width, mHeight - rect.getMaxY());
       rect = mStepData[(mLinkLengths ? mLength : mLengthVel) - 1].mVelSlider->GetRect(true);
       ofRect(rect.x, rect.getMaxY(), rect.width, mHeight - rect.getMaxY());
@@ -240,7 +240,7 @@ void RhythmSequencer::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
-void RhythmSequencer::Step(double time, float velocity, int pulseFlags)
+void RhythmSequencer::Step(double time, double velocity, int pulseFlags)
 {
    if (!mEnabled)
       return;

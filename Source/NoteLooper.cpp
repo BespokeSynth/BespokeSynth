@@ -92,7 +92,7 @@ void NoteLooper::DrawModule()
          ofPushStyle();
          ofFill();
          ofSetColor(0, 255, 0, 80);
-         ofRectangle_f rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
+         ofRectangle rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
          ofRect(rect);
          ofPopStyle();
       }
@@ -109,7 +109,7 @@ void NoteLooper::DrawModule()
 
 bool NoteLooper::DrawToPush2Screen()
 {
-   ofRectangle_f rect = mCanvas->GetRect(true);
+   ofRectangle rect = mCanvas->GetRect(true);
 
    mCanvas->SetPosition(125, 3);
    mCanvas->SetDimensions(600, 40);

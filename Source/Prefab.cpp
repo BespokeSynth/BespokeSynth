@@ -75,7 +75,7 @@ std::string Prefab::GetTitleLabel() const
 
 void Prefab::Poll()
 {
-   float xMin, yMin;
+   double xMin, yMin;
    GetPosition(xMin, yMin);
    for (auto* module : mModuleContainer.GetModules())
    {

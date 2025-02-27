@@ -143,8 +143,8 @@ void GridModule::DrawModule()
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
    for (int i = 0; i < mGrid->GetRows() && i < (int)mLabels.size(); ++i)
    {
-      ofVec2f pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
-      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 10);
+      ofVec2d pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
+      double scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 10);
       DrawTextNormal(mLabels[i], 2, pos.y - (scale / 8), scale);
    }
    ofPopStyle();
@@ -158,9 +158,9 @@ void GridModule::DrawModule()
          Vec2i cell(i % kGridOverlayMaxDim, i / kGridOverlayMaxDim);
          if (cell.x < GetCols() && cell.y < GetRows())
          {
-            ofVec2f pos = mGrid->GetCellPosition(cell.x, cell.y) + mGrid->GetPosition(true);
-            float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-            float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+            ofVec2d pos = mGrid->GetCellPosition(cell.x, cell.y) + mGrid->GetPosition(true);
+            double xsize = mGrid->GetWidth() / mGrid->GetCols();
+            double ysize = mGrid->GetHeight() / mGrid->GetRows();
             ofSetColor(GetColor(mGridOverlay[i]));
             ofRect(pos.x + 3, pos.y + 3, xsize - 6, ysize - 6);
          }
@@ -178,9 +178,9 @@ void GridModule::DrawModule()
          {
             if (gTime - mHighlightCells[i].time > 0)
             {
-               ofVec2f pos = mGrid->GetCellPosition(mHighlightCells[i].position.x, mHighlightCells[i].position.y) + mGrid->GetPosition(true);
-               float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-               float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+               ofVec2d pos = mGrid->GetCellPosition(mHighlightCells[i].position.x, mHighlightCells[i].position.y) + mGrid->GetPosition(true);
+               double xsize = mGrid->GetWidth() / mGrid->GetCols();
+               double ysize = mGrid->GetHeight() / mGrid->GetRows();
                ofSetColor(mHighlightCells[i].color, (1 - (gTime - mHighlightCells[i].time) / mHighlightCells[i].duration) * 255);
                ofRect(pos.x, pos.y, xsize, ysize);
             }
@@ -251,14 +251,14 @@ void GridModule::Clear()
 
 void GridModule::GetModuleDimensions(double& width, double& height)
 {
-   ofRectangle_f rect = mGrid->GetRect(true);
+   ofRectangle rect = mGrid->GetRect(true);
    width = rect.x + rect.width + 2;
    height = rect.y + rect.height + 6;
 }
 
 void GridModule::Resize(double w, double h)
 {
-   float curW, curH;
+   double curW, curH;
    GetModuleDimensions(curW, curH);
    mGrid->SetDimensions(mGrid->GetWidth() + w - curW, mGrid->GetHeight() + h - curH);
 }

@@ -1334,7 +1334,7 @@ void MidiController::DrawModuleUnclipped()
    if (mHoveredLayoutElement != -1)
    {
       std::string tooltip;
-      ofVec2f pos;
+      ofVec2d pos;
       if (mHoveredLayoutElement < kHoveredLayoutElement_GridOffset)
       {
          tooltip = GetLayoutTooltip(mHoveredLayoutElement);
@@ -1777,13 +1777,13 @@ void MidiController::LoadControllerLayout(std::string filename)
             {
                int rows = mLayoutData["groups"][group]["rows"].asInt();
                int cols = mLayoutData["groups"][group]["cols"].asInt();
-               ofVec2f pos;
+               ofVec2d pos;
                pos.x = (mLayoutData["groups"][group]["position"])[0u].asDouble();
                pos.y = (mLayoutData["groups"][group]["position"])[1u].asDouble();
-               ofVec2f dim;
+               ofVec2d dim;
                dim.x = (mLayoutData["groups"][group]["dimensions"])[0u].asDouble();
                dim.y = (mLayoutData["groups"][group]["dimensions"])[1u].asDouble();
-               ofVec2f spacing;
+               ofVec2d spacing;
                spacing.x = (mLayoutData["groups"][group]["spacing"])[0u].asDouble();
                spacing.y = (mLayoutData["groups"][group]["spacing"])[1u].asDouble();
                MidiMessageType messageType = kMidiMessage_Control;
@@ -1802,7 +1802,7 @@ void MidiController::LoadControllerLayout(std::string filename)
                   drawType = kDrawType_Knob;
                if (mLayoutData["groups"][group]["drawType"] == "slider")
                   drawType = kDrawType_Slider;
-               float incrementAmount = 0;
+               double incrementAmount = 0;
                if (!mLayoutData["groups"][group]["incremental"].isNull())
                   incrementAmount = mLayoutData["groups"][group]["incremental"].asBool() ? 1 : 0;
                if (!mLayoutData["groups"][group]["increment_amount"].isNull())
@@ -2159,12 +2159,12 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
             if (radioButton && mLayoutControls[layoutControl].mDrawType == kDrawType_Button)
             {
                connection->mType = kControlType_SetValue;
-               float closestSq = FLT_MAX;
+               double closestSq = std::numeric_limits<double>::max();
                int closestIdx = 0;
-               ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
+               ofVec2d mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
                for (int i = 0; i < radioButton->GetNumValues(); ++i)
                {
-                  float distSq = (mousePos - radioButton->GetOptionPosition(i)).distanceSquared();
+                  double distSq = (mousePos - radioButton->GetOptionPosition(i)).distanceSquared();
                   if (distSq < closestSq)
                   {
                      closestSq = distSq;
@@ -2855,7 +2855,7 @@ void UIControlConnection::DrawList(int index)
          x += 13;
    }
 
-   ofRectangle_f rect = mUIControlPathEntry->GetRect(true);
+   ofRectangle rect = mUIControlPathEntry->GetRect(true);
    if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
       mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetManualPosition(rect.x + rect.width - 5, rect.y + rect.height / 2);
 
@@ -2941,7 +2941,7 @@ UIControlConnection::~UIControlConnection()
    mEditorControls.clear();
 }
 
-void ControlLayoutElement::Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, bool is14Bit, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h)
+void ControlLayoutElement::Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, double incrementAmount, bool is14Bit, int offVal, int onVal, bool scaleOutput, ControlType connectionType, double x, double y, double w, double h)
 {
    assert(incrementAmount == 0 || type == kMidiMessage_Control); //only control type can be incremental
 
@@ -2965,7 +2965,7 @@ void ControlLayoutElement::Setup(MidiController* owner, MidiMessageType type, in
       mControlCable = new PatchCableSource(owner, kConnectionType_UIControl);
       owner->AddPatchCableSource(mControlCable);
       ofColor color = mControlCable->GetColor();
-      color.a *= .25f;
+      color.a *= .25;
       mControlCable->SetColor(color);
    }
 }

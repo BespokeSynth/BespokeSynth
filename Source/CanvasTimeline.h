@@ -36,7 +36,7 @@ public:
    CanvasTimeline(Canvas* canvas, std::string name);
    ~CanvasTimeline() {}
 
-   void SetDimensions(float width, float height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;

@@ -162,7 +162,7 @@ void EuclideanSequencer::DrawModule()
    // Grey lines around circle sliders
    ofPushStyle();
    ofSetColor(128, 128, 128);
-   ofSetLineWidth(.1f);
+   ofSetLineWidth(.1);
    ofLine(210, 85, 590, 85);
    ofLine(590, 85, 590, 185);
    ofPopStyle();
@@ -171,7 +171,7 @@ void EuclideanSequencer::DrawModule()
    ofPushStyle();
    ofSetColor(ofColor::lime);
    double pos = TheTransport->GetMeasurePos(gTime);
-   ofVec2f end = ofPolToCar(pos, 100);
+   ofVec2d end = ofPolToCar(pos, 100);
    ofLine(100, 100, 100 + end.x, 100 + end.y);
    ofPopStyle();
 }
@@ -337,7 +337,7 @@ void EuclideanSequencer::SaveState(FileStreamOut& out)
 
    IDrawableModule::SaveState(out);
 
-   float width, height;
+   double width, height;
    GetModuleDimensions(width, height);
    out << width;
    out << height;
@@ -373,10 +373,20 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   float width, height;
-   in >> width;
-   in >> height;
-   Resize(width, height);
+   if (rev < 3)
+   {
+      float width, height;
+      in >> width;
+      in >> height;
+      Resize(width, height);
+   }
+   else
+   {
+      double width, height;
+      in >> width;
+      in >> height;
+      Resize(width, height);
+   }
 
    int numRings;
    in >> numRings;
@@ -587,7 +597,7 @@ void EuclideanSequencerRing::CreateUIControls()
 
    mDestinationCable = new AdditionalNoteCable();
    mDestinationCable->SetPatchCableSource(new PatchCableSource(mOwner, kConnectionType_Note));
-   mDestinationCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+   mDestinationCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
    mOwner->AddPatchCableSource(mDestinationCable->GetPatchCableSource());
    mDestinationCable->GetPatchCableSource()->SetManualPosition(x + 50, y + 105);
 
@@ -703,10 +713,10 @@ void EuclideanSequencerRing::Draw()
    for (int i = 0; i < (int)mLength; ++i)
    {
       double pos = static_cast<double>(i) / static_cast<int>(mLength) - mOffset;
-      ofVec2f p1 = ofPolToCar(pos, GetRadius() - 3);
-      ofVec2f p2 = ofPolToCar(pos, GetRadius() + 3);
+      ofVec2d p1 = ofPolToCar(pos, GetRadius() - 3);
+      ofVec2d p2 = ofPolToCar(pos, GetRadius() + 3);
       ofLine(p1.x + 100, p1.y + 100, p2.x + 100, p2.y + 100);
-      ofVec2f point = ofPolToCar(pos, GetRadius());
+      ofVec2d point = ofPolToCar(pos, GetRadius());
 
       if (mSteps[i] > 0)
          ofCircle(100 + point.x, 100 + point.y, 3 + 6 * mSteps[i]);
@@ -715,7 +725,7 @@ void EuclideanSequencerRing::Draw()
       {
          ofPushStyle();
          ofSetColor(255, 255, 255, 100);
-         ofSetLineWidth(.5f);
+         ofSetLineWidth(.5);
          ofNoFill();
          ofCircle(100 + point.x, 100 + point.y, 3 + 6);
          ofPopStyle();
@@ -751,7 +761,7 @@ int EuclideanSequencerRing::GetStepIndex(int x, int y, double& radiusOut)
    return -1;
 }
 
-void EuclideanSequencerRing::OnClicked(float x, float y, bool right)
+void EuclideanSequencerRing::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -771,7 +781,7 @@ void EuclideanSequencerRing::MouseReleased()
    mCurrentlyClickedStepIdx = -1;
 }
 
-void EuclideanSequencerRing::MouseMoved(float x, float y)
+void EuclideanSequencerRing::MouseMoved(double x, double y)
 {
    if (mCurrentlyClickedStepIdx != -1)
    {

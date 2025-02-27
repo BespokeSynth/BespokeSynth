@@ -39,7 +39,7 @@ CanvasScrollbar::CanvasScrollbar(Canvas* canvas, std::string name, Style style)
 
 void CanvasScrollbar::Render()
 {
-   ofRectangle_f canvasRect = mCanvas->GetRect(true);
+   ofRectangle canvasRect = mCanvas->GetRect(true);
    if (mStyle == Style::kHorizontal)
    {
       SetPosition(canvasRect.x, canvasRect.getMaxY());
@@ -62,7 +62,7 @@ void CanvasScrollbar::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
    double w, h;
    GetDimensions(w, h);
    ofFill();
@@ -116,7 +116,7 @@ bool CanvasScrollbar::MouseMoved(double x, double y)
 
    if (mClick)
    {
-      mDragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
+      mDragOffset = (ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
       if (mStyle == Style::kHorizontal)
       {
          double viewLength = mCanvas->mViewEnd - mCanvas->mViewStart;

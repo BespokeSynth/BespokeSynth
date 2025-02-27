@@ -117,7 +117,7 @@ void LaunchpadInterpreter::UpdateLights(std::vector<LightUpdate> lightUpdates, b
    }
 }
 
-void LaunchpadInterpreter::Draw(ofVec2f vPos)
+void LaunchpadInterpreter::Draw(ofVec2d vPos)
 {
 }
 

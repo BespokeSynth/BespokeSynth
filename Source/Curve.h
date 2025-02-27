@@ -62,7 +62,7 @@ public:
       width = mWidth;
       height = mHeight;
    }
-   void SetDimensions(float width, float height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;

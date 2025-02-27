@@ -49,7 +49,7 @@ class EuclideanSequencerRing
 public:
    EuclideanSequencerRing(EuclideanSequencer* owner, int index);
    void Draw();
-   void OnClicked(float x, float y, bool right);
+   void OnClicked(double x, double y, bool right);
    void SetSteps(int steps);
    int GetSteps();
    void SetOnsets(int onsets);
@@ -58,7 +58,7 @@ public:
    void SetPitch(int pitch);
    int GetPitch();
    void MouseReleased();
-   void MouseMoved(float x, float y);
+   void MouseMoved(double x, double y);
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time);
    void CreateUIControls();
    void InitialState(int state);

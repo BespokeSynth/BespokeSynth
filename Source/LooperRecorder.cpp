@@ -129,11 +129,11 @@ void LooperRecorder::CreateUIControls()
    {
       mLooperPatchCables[i] = new PatchCableSource(this, kConnectionType_Special);
       mLooperPatchCables[i]->AddTypeFilter("looper");
-      ofRectangle_f rect = mWriteForLooperCheckbox[i]->GetRect(K(local));
+      ofRectangle rect = mWriteForLooperCheckbox[i]->GetRect(K(local));
       mLooperPatchCables[i]->SetManualPosition(rect.getMaxX() + 5, rect.getCenter().y);
-      mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+      mLooperPatchCables[i]->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
       ofColor color = mLooperPatchCables[i]->GetColor();
-      color.a *= .3f;
+      color.a *= .3;
       mLooperPatchCables[i]->SetColor(color);
       AddPatchCableSource(mLooperPatchCables[i]);
    }
@@ -321,7 +321,7 @@ void LooperRecorder::DrawModule()
    {
       ofPushStyle();
       ofSetColor(255, 255, 255);
-      ofVec2f cablePos = mLooperPatchCables[mNextCommitTargetIndex]->GetPosition();
+      ofVec2d cablePos = mLooperPatchCables[mNextCommitTargetIndex]->GetPosition();
       cablePos -= GetPosition();
       ofCircle(cablePos.x, cablePos.y, 5);
       ofPopStyle();
@@ -348,7 +348,7 @@ void LooperRecorder::DrawModule()
    for (int i = 0; i < (int)mWriteForLooperCheckbox.size(); ++i)
       mWriteForLooperCheckbox[i]->Draw();
 
-   if (mSpeed != 1)
+   if (!ofAlmostEquel(mSpeed, 1))
    {
       double rootPitch = AdjustedRootForSpeed();
       int pitch = std::round(rootPitch);
@@ -406,14 +406,14 @@ void LooperRecorder::DrawModule()
    ofPopStyle();
 
    /*ofPushStyle();
-   ofVec2d center(48,28);
+   ofVec2d center(48, 28);
    double radius = 25;
-   ofSetColor(255,255,255,100*gModuleDrawAlpha);
+   ofSetColor(255, 255, 255, 100 * gModuleDrawAlpha);
    DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % 8) / 8, 1, radius * .9, radius);
    DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % mNumBars) / mNumBars, 3, radius * .7, radius);
-   for (int i=0; i<mNumBars; ++i)
+   for (int i = 0; i < mNumBars; ++i)
       DrawCircleHash(center, static_cast<double>(i) / mNumBars, 1, radius * .8, radius);
-   ofPopStyle();*/
+   ofPopStyle(); */
 
    if (mDrawDebug)
       mRecordBuffer.Draw(0, 162, 800, 100);

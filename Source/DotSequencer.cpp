@@ -104,13 +104,13 @@ void DotSequencer::DrawModule()
       return;
 
    ofPushStyle();
-   ofSetLineWidth(mDotGrid->GetDotSize() * .25f);
-   float ysize = mHeight / mDotGrid->GetRows();
+   ofSetLineWidth(mDotGrid->GetDotSize() * .25);
+   double ysize = mHeight / mDotGrid->GetRows();
    for (int i = 0; i < mDotGrid->GetRows(); ++i)
    {
-      ofVec2f pos = mDotGrid->GetCellPosition(0, i - 1) + mDotGrid->GetPosition(true);
-      ofVec2f lineAcrossStart(pos.x + 5, pos.y - ysize * .5f + 2);
-      ofVec2f lineAcrossEnd(pos.x + mDotGrid->GetWidth() - 10, pos.y - ysize * .5f + 2);
+      ofVec2d pos = mDotGrid->GetCellPosition(0, i - 1) + mDotGrid->GetPosition(true);
+      ofVec2d lineAcrossStart(pos.x + 5, pos.y - ysize * .5 + 2);
+      ofVec2d lineAcrossEnd(pos.x + mDotGrid->GetWidth() - 10, pos.y - ysize * .5 + 2);
 
       if (RowToPitch(i) % TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot() % TheScale->GetPitchesPerOctave())
       {
@@ -135,8 +135,8 @@ void DotSequencer::DrawModule()
          ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
       }
 
-      float scale = std::min(mDotGrid->IClickable::GetDimensions().y / mDotGrid->GetRows() - 2, 10.0f);
-      DrawTextRightJustify(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x - 3, pos.y - ysize * .5f + (scale / 2), scale);
+      double scale = std::min(mDotGrid->IClickable::GetDimensions().y / mDotGrid->GetRows() - 2, 10.0);
+      DrawTextRightJustify(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x - 3, pos.y - ysize * .5 + (scale / 2), scale);
    }
    ofPopStyle();
 
@@ -268,7 +268,7 @@ void DotSequencer::Resize(double w, double h)
    mWidth = w;
    mHeight = h;
 
-   ofVec2f gridPos = mDotGrid->GetPosition(K(local));
+   ofVec2d gridPos = mDotGrid->GetPosition(K(local));
 
    mDotGrid->SetDimensions(w - 8 - gridPos.x, h - 5 - gridPos.y);
 }

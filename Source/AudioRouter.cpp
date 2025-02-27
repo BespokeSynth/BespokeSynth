@@ -109,7 +109,7 @@ void AudioRouter::DrawModule()
 
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
-      ofVec2f pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
+      ofVec2d pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
       mDestinationCables[i]->SetManualPosition(pos.x + 10, pos.y + 4);
    }
 }

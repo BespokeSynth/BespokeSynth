@@ -59,11 +59,11 @@ public:
 
    void Poll() override;
 
-   void PlayNoteFromScript(float pitch, float velocity, float pan, int noteOutputIndex);
-   void PlayNoteFromScriptAfterDelay(float pitch, float velocity, double delayMeasureTime, float pan, int noteOutputIndex);
+   void PlayNoteFromScript(double pitch, double velocity, double pan, int noteOutputIndex);
+   void PlayNoteFromScriptAfterDelay(double pitch, double velocity, double delayMeasureTime, double pan, int noteOutputIndex);
    void SendCCFromScript(int control, int value, int noteOutputIndex);
    void ScheduleMethod(std::string method, double delayMeasureTime);
-   void ScheduleUIControlValue(IUIControl* control, float value, double delayMeasureTime);
+   void ScheduleUIControlValue(IUIControl* control, double value, double delayMeasureTime);
    void HighlightLine(int lineNum, int scriptModuleIndex);
    void PrintText(std::string text);
    IUIControl* GetUIControl(std::string path);
@@ -101,7 +101,7 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -110,11 +110,11 @@ public:
    static std::list<ScriptModule*> sScriptsRequestingInitExecution;
    static ScriptModule* sMostRecentLineExecutedModule;
    static ScriptModule* sPriorExecutedModule;
-   static float GetScriptMeasureTime();
-   static float GetTimeSigRatio();
+   static double GetScriptMeasureTime();
+   static double GetTimeSigRatio();
    static std::string sBackgroundTextString;
-   static float sBackgroundTextSize;
-   static ofVec2f sBackgroundTextPos;
+   static double sBackgroundTextSize;
+   static ofVec2d sBackgroundTextPos;
    static ofColor sBackgroundTextColor;
    static bool sPythonInitialized;
    static bool sHasPythonEverSuccessfullyInitialized;
@@ -134,7 +134,7 @@ private:
    void AdjustUIControl(IUIControl* control, double value, double time, int lineNum);
    std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
-   void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
+   void ScheduleNote(double time, double pitch, double velocity, double pan, int noteOutputIndex);
    void SendNoteToIndex(int index, NoteMessage note);
    std::string GetThisName();
    std::string GetIndentation(std::string line);
@@ -247,7 +247,7 @@ private:
    struct UIControlModificationDisplay
    {
       double time{ 0 };
-      ofVec2f position;
+      ofVec2d position;
       double value{ 0 };
       int lineNum{ -1 };
    };
@@ -337,7 +337,7 @@ private:
    ClickButton* mCloseButton{ nullptr };
    double mWidth{ 750 };
    double mHeight{ 335 };
-   ofVec2f mScrollOffset;
+   ofVec2d mScrollOffset;
    float mMaxScrollAmount{ 0 };
 };
 

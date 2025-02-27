@@ -81,7 +81,7 @@ void NoteTable::CreateUIControls()
    {
       mColumnCables[i] = new AdditionalNoteCable();
       mColumnCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mColumnCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+      mColumnCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mColumnCables[i]->GetPatchCableSource());
    }
 }
@@ -127,13 +127,13 @@ void NoteTable::DrawModule()
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
    for (int i = 0; i < mGrid->GetCols(); ++i)
    {
-      ofVec2f pos = mGrid->GetCellPosition(i, mGrid->GetRows() - 1) + mGrid->GetPosition(true);
+      ofVec2d pos = mGrid->GetCellPosition(i, mGrid->GetRows() - 1) + mGrid->GetPosition(true);
       DrawTextNormal(ofToString(i), pos.x + 1, pos.y - 7);
    }
    for (int i = 0; i < mGrid->GetRows(); ++i)
    {
-      ofVec2f pos = mGrid->GetCellPosition(0, i - 1) + mGrid->GetPosition(true);
-      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 18);
+      ofVec2d pos = mGrid->GetCellPosition(0, i - 1) + mGrid->GetPosition(true);
+      double scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 18);
       DrawTextNormal(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x + 4, pos.y - (scale / 8), scale);
    }
    ofPopStyle();
@@ -152,9 +152,9 @@ void NoteTable::DrawModule()
       ofNoFill();
       ofSetLineWidth(4);
       ofSetColor(255, 0, 0, 50);
-      float squareh = float(mGrid->GetHeight()) / mNoteRange;
-      float squarew = float(mGrid->GetWidth()) / mLength;
-      ofRectangle_f gridRect = mGrid->GetRect(K(local));
+      double squareh = mGrid->GetHeight() / mNoteRange;
+      double squarew = mGrid->GetWidth() / mLength;
+      ofRectangle gridRect = mGrid->GetRect(K(local));
       ofRect(gridRect.x + squarew * mGridControlOffsetX,
              gridRect.y + gridRect.height - squareh * (mGridControlOffsetY + controllerRows),
              squarew * controllerCols,
@@ -164,11 +164,11 @@ void NoteTable::DrawModule()
 
    ofPushStyle();
    ofFill();
-   float gridX, gridY, gridW, gridH;
+   double gridX, gridY, gridW, gridH;
    mGrid->GetPosition(gridX, gridY, true);
    gridW = mGrid->GetWidth();
    gridH = mGrid->GetHeight();
-   float boxHeight = float(gridH) / mNoteRange;
+   double boxHeight = gridH / mNoteRange;
 
    for (int i = 0; i < mNoteRange; ++i)
    {
@@ -181,7 +181,7 @@ void NoteTable::DrawModule()
       else
          continue;
 
-      float y = gridY + gridH - i * boxHeight;
+      double y = gridY + gridH - i * boxHeight;
       ofRect(gridX, y - boxHeight, gridW, boxHeight);
    }
 
@@ -201,9 +201,9 @@ void NoteTable::DrawModule()
          {
             if (mGrid->GetVal(i, row) > 0)
             {
-               ofVec2f pos = mGrid->GetCellPosition(i, row) + mGrid->GetPosition(true);
-               float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-               float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+               ofVec2d pos = mGrid->GetCellPosition(i, row) + mGrid->GetPosition(true);
+               double xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+               double ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
                ofSetColor(ofColor::white, fade * 255);
                ofRect(pos.x, pos.y, xsize, ysize);
             }
@@ -212,14 +212,14 @@ void NoteTable::DrawModule()
       }
    }
 
-   float moduleWidth, moduleHeight;
+   double moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
    for (int i = 0; i < kMaxLength; ++i)
    {
       if (i < mLength && mShowColumnCables)
       {
-         ofVec2f pos = mGrid->GetCellPosition(i, 0) + mGrid->GetPosition(true);
-         pos.x += mGrid->GetWidth() / float(mLength) * .5f;
+         ofVec2d pos = mGrid->GetCellPosition(i, 0) + mGrid->GetPosition(true);
+         pos.x += mGrid->GetWidth() / static_cast<double>(mLength) * .5;
          pos.y = moduleHeight - 7;
          mColumnCables[i]->GetPatchCableSource()->SetManualPosition(pos.x, pos.y);
          mColumnCables[i]->GetPatchCableSource()->SetEnabled(true);
@@ -308,14 +308,14 @@ int NoteTable::PitchToRow(int pitch)
    return -1;
 }
 
-float NoteTable::ExtraWidth() const
+double NoteTable::ExtraWidth() const
 {
    return 10;
 }
 
-float NoteTable::ExtraHeight() const
+double NoteTable::ExtraHeight() const
 {
-   float height = 77;
+   double height = 77;
    if (mShowColumnCables)
       height += 22;
    return height;

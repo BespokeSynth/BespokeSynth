@@ -208,7 +208,7 @@ void FMSynth::DrawModuleUnclipped()
 {
    if (mDrawDebug)
    {
-      float width, height;
+      double width, height;
       GetModuleDimensions(width, height);
       mPolyMgr.DrawDebug(width + 3, 0);
       DrawTextNormal(mDebugDisplayText, 0, height + 15);

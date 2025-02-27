@@ -41,7 +41,7 @@ namespace
 {
    const int kItemSpacing = 15;
    const int kRightClickShiftX = 11;
-   ofVec2f kModuleGrabOffset(-40, 10);
+   ofVec2d kModuleGrabOffset(-40, 10);
 }
 
 QuickSpawnMenu::QuickSpawnMenu()

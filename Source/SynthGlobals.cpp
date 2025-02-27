@@ -687,7 +687,7 @@ void PrintCallstack()
 #endif
 }
 
-bool IsInUnitBox(ofVec2f pos)
+bool IsInUnitBox(ofVec2d pos)
 {
    return pos.x >= 0 && pos.x < 1 && pos.y >= 0 && pos.y < 1;
 }

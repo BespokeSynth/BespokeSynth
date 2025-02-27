@@ -152,17 +152,17 @@ void Compressor::DrawModule()
 
    ofPushStyle();
    ofSetColor(0, 255, 0, gModuleDrawAlpha);
-   float x, y, w, h;
+   double x, y, w, h;
 
    mThresholdSlider->GetPosition(x, y, K(local));
    mThresholdSlider->GetDimensions(w, h);
-   float currentInputX = ofMap(mCurrentInputDb, mThresholdSlider->GetMin(), mThresholdSlider->GetMax(), x, x + w, K(clamp));
+   double currentInputX = ofMap(mCurrentInputDb, mThresholdSlider->GetMin(), mThresholdSlider->GetMax(), x, x + w, K(clamp));
    ofLine(currentInputX, y, currentInputX, y + h);
 
    mRatioSlider->GetPosition(x, y, K(local));
    mRatioSlider->GetDimensions(w, h);
-   float outputNormalized = ofClamp(mOutputGain / 10, 0, 1);
-   float currentOutputX = ofLerp(x, x + w, sqrtf(outputNormalized));
+   double outputNormalized = ofClamp(mOutputGain / 10, 0, 1);
+   double currentOutputX = ofLerp(x, x + w, sqrtf(outputNormalized));
    ofLine(currentOutputX, y, currentOutputX, y + h);
 
    ofPopStyle();

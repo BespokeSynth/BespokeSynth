@@ -44,17 +44,17 @@ class CanvasElement
 public:
    CanvasElement(Canvas* canvas, int col, int row, double offset, double length);
    virtual ~CanvasElement() {}
-   void Draw(ofVec2f offset);
+   void Draw(ofVec2d offset);
    void DrawOffscreen();
    void SetHighlight(bool highlight) { mHighlighted = highlight; }
    bool GetHighlighted() const { return mHighlighted; }
-   ofRectangle_f GetRect(bool clamp, bool wrapped, ofVec2f offset = ofVec2f(0, 0)) const;
+   ofRectangle GetRect(bool clamp, bool wrapped, ofVec2d offset = { 0, 0 }) const;
    double GetStart() const;
    void SetStart(double start, bool preserveLength);
    virtual double GetEnd() const;
    void SetEnd(double end);
    std::vector<IUIControl*>& GetUIControls() { return mUIControls; }
-   void MoveElementByDrag(ofVec2f dragOffset);
+   void MoveElementByDrag(ofVec2d dragOffset);
 
    virtual bool IsResizable() const { return true; }
    virtual CanvasElement* CreateDuplicate() const = 0;
@@ -73,11 +73,11 @@ public:
    double mLength;
 
 protected:
-   virtual void DrawContents(bool clamp, bool wrapped, ofVec2f offset) = 0;
-   void DrawElement(bool clamp, bool wrapped, ofVec2f offset);
+   virtual void DrawContents(bool clamp, bool wrapped, ofVec2d offset) = 0;
+   void DrawElement(bool clamp, bool wrapped, ofVec2d offset);
    void AddElementUIControl(IUIControl* control);
-   void GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, double& newOffset) const;
-   ofRectangle_f GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const;
+   void GetDragDestinationData(ofVec2d dragOffset, int& newRow, int& newCol, double& newOffset) const;
+   ofRectangle GetRectAtDestination(bool clamp, bool wrapped, ofVec2d dragOffset) const;
    double GetStart(int col, double offset) const;
    double GetEnd(int col, double offset, double length) const;
 
@@ -108,7 +108,7 @@ public:
    void LoadState(FileStreamIn& in) override;
 
 private:
-   void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
+   void DrawContents(bool clamp, bool wrapped, ofVec2d offset) override;
 
    double mVelocity{ .8 };
    FloatSlider* mElementOffsetSlider{ nullptr };
@@ -147,7 +147,7 @@ public:
    void LoadState(FileStreamIn& in) override;
 
 private:
-   void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
+   void DrawContents(bool clamp, bool wrapped, ofVec2d offset) override;
 
    Sample* mSample{ nullptr };
    FloatSlider* mElementOffsetSlider{ nullptr };
@@ -180,7 +180,7 @@ public:
    void LoadState(FileStreamIn& in) override;
 
 private:
-   void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
+   void DrawContents(bool clamp, bool wrapped, ofVec2d offset) override;
 
    IUIControl* mUIControl{ nullptr };
    double mValue{ 0 };

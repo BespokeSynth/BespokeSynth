@@ -86,7 +86,7 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 0; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -96,7 +96,7 @@ private:
    void GetModuleDimensions(double& w, double& h) override;
    void OnClicked(double x, double y, bool right) override;
 
-   void SetGridSize(float w, float h);
+   void SetGridSize(double w, double h);
    int GetStep(double time);
    void UpdateInterval();
    void UpdateNumMeasures(int oldNumMeasures);

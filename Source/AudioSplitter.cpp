@@ -114,7 +114,7 @@ void AudioSplitter::DrawModule()
    for (const auto cablesource : mDestinationCables)
    {
       cablesource->SetManualPosition(offset += 20, 12);
-      cablesource->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+      cablesource->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
    }
 }
 

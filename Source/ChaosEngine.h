@@ -125,7 +125,7 @@ private:
    void UpdateProgression(int beat);
    void GenerateRandomProgression();
    std::vector<int> GetCurrentChordPitches();
-   ofRectangle_f GetKeyboardKeyRect(int pitch, bool& isBlackKey);
+   ofRectangle GetKeyboardKeyRect(int pitch, bool& isBlackKey);
 
    //IDrawableModule
    void DrawModule() override;

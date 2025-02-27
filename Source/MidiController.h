@@ -222,7 +222,7 @@ struct ControlLayoutElement
 {
    ControlLayoutElement()
    {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, bool is14Bit, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, double incrementAmount, bool is14Bit, int offVal, int onVal, bool scaleOutput, ControlType connectionType, double x, double y, double w, double h);
 
    bool mActive{ false };
    MidiMessageType mType{ MidiMessageType::kMidiMessage_Control };

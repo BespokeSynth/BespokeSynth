@@ -105,8 +105,8 @@ private:
    void UpdateGridControllerLights(bool force);
 
    void PlayColumn(NoteMessage note);
-   float ExtraWidth() const;
-   float ExtraHeight() const;
+   double ExtraWidth() const;
+   double ExtraHeight() const;
    void RandomizePitches(bool fifths);
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
    void SetColumnRow(int column, int row);

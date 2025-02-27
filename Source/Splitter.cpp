@@ -40,7 +40,7 @@ void Splitter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    GetPatchCableSource()->SetManualPosition(w / 2 - 15, h + 3);
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);

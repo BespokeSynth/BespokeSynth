@@ -140,8 +140,8 @@ private:
 
    int mEditSampleX{ 2 };
    int mEditSampleY{ 95 };
-   float mEditSampleWidth{ 395 };
-   float mEditSampleHeight{ 200 };
+   double mEditSampleWidth{ 395 };
+   double mEditSampleHeight{ 200 };
    GridSample* mEditSample{ nullptr };
    IntSlider* mEditStartSlider{ nullptr };
    IntSlider* mEditEndSlider{ nullptr };

@@ -170,18 +170,18 @@ void SampleFinder::DrawModule()
 
 bool SampleFinder::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   ofVec2f bufferPos = ofVec2f(ofMap(x, 5, 5 + 900, 0, 1),
-                               ofMap(y, 80, 80 + 310, 0, 1));
+   auto bufferPos = ofVec2d(ofMap(x, 5, 5 + 900, 0, 1),
+                            ofMap(y, 80, 80 + 310, 0, 1));
    if (IsInUnitBox(bufferPos))
    {
-      float zoomCenter = ofLerp(mZoomStart, mZoomEnd, bufferPos.x);
-      float distFromStart = zoomCenter - mZoomStart;
-      float distFromEnd = zoomCenter - mZoomEnd;
+      double zoomCenter = ofLerp(mZoomStart, mZoomEnd, bufferPos.x);
+      double distFromStart = zoomCenter - mZoomStart;
+      double distFromEnd = zoomCenter - mZoomEnd;
 
       distFromStart *= 1 - scrollY / 100;
       distFromEnd *= 1 - scrollY / 100;
 
-      float slideX = (mZoomEnd - mZoomStart) * -scrollX / 300;
+      double slideX = (mZoomEnd - mZoomStart) * -scrollX / 300;
 
       mZoomStart = ofClamp(zoomCenter - distFromStart + slideX, 0, mSample->LengthInSamples());
       mZoomEnd = ofClamp(zoomCenter - distFromEnd + slideX, 0, mSample->LengthInSamples());

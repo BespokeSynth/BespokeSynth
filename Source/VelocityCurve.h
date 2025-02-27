@@ -69,7 +69,7 @@ private:
 
    void OnClicked(double x, double y, bool right) override;
 
-   EnvelopeControl mEnvelopeControl{ ofVec2f{ 3, 3 }, ofVec2f{ 100, 100 } };
+   EnvelopeControl mEnvelopeControl{ ofVec2d{ 3, 3 }, ofVec2d{ 100, 100 } };
    ::ADSR mAdsr;
    double mLastInputVelocity{ 0 };
    double mLastInputTime{ -9999 };
