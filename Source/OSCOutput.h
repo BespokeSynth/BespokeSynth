@@ -64,7 +64,7 @@ public:
    void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SetUpFromSaveData(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData(const ofxJSONElement& moduleInfo);
    void SaveLayout(ofxJSONElement& moduleInfo) override;
 
    bool IsEnabled() const override { return true; }
