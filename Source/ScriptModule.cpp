@@ -1498,10 +1498,10 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("hotload_script_files", moduleInfo, false);
    mModuleSaveData.LoadBool("draw_bound_module_connections", moduleInfo, true);
 
-   SetUpFromSaveData();
+   SetUpFromSaveData(moduleInfo);
 }
 
-void ScriptModule::SetUpFromSaveData()
+void ScriptModule::SetUpFromSaveData(ofxJSONElement& moduleInfo)
 {
    if (mModuleSaveData.GetBool("execute_on_init"))
    {
