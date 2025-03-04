@@ -193,8 +193,6 @@ void OSCOutput::SetUpFromSaveData(const ofxJSONElement& moduleInfo)
 
 void OSCOutput::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::SaveLayout(moduleInfo);
-
    for (int i=0; i < OSC_OUTPUT_MAX_PARAMS; ++i)
    {
       moduleInfo["oscoutput"]["controls"]["label"][i] = mLabels[i];
