@@ -178,8 +178,6 @@ void OSCOutput::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void OSCOutput::SetUpFromSaveData(const ofxJSONElement& moduleInfo)
 {
-   IDrawableModule::LoadLayout(moduleInfo);
-
    if (moduleInfo.isMember("oscoutput") &&
        moduleInfo["oscoutput"].isMember("controls") &&
        moduleInfo["oscoutput"]["controls"].isMember("label") &&
