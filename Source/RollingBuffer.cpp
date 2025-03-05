@@ -204,14 +204,14 @@ void RollingBuffer::LoadState(FileStreamIn& in)
       }
       else
       {
-         float sampleRateRatio = (float)savedSampleRate / gSampleRate;
+         double sampleRateRatio = (float)savedSampleRate / gSampleRate;
          mOffsetToNow[i] = int(mOffsetToNow[i] / sampleRateRatio);
          float* sampleLoader = new float[savedSize];
          in.Read(sampleLoader, savedSize);
          float* destinationBuffer = mBuffer.GetChannel(i);
          for (int j = 0; j < Size(); ++j)
          {
-            float pos = j * sampleRateRatio;
+            double pos = j * sampleRateRatio;
             int posA = MIN(int(pos), savedSize - 1);
             int posB = MIN(posA + 1, savedSize - 1);
             float alpha = pos - posA;

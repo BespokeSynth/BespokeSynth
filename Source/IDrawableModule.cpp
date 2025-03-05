@@ -1316,7 +1316,7 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
    if (baseRev > 2)
    {
       in >> mPinned;
-      if (baseRev > 3)
+      if (baseRev < 4)
       {
          float a, b;
          in >> a >> b;

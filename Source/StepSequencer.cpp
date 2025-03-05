@@ -1077,9 +1077,19 @@ void StepSequencer::LoadState(FileStreamIn& in, int rev)
       in >> mHasExternalPulseSource;
    if (rev >= 3)
    {
-      float gridWidth, gridHeight;
-      in >> gridWidth;
-      in >> gridHeight;
+      double gridWidth, gridHeight;
+      if (rev < 4)
+      {
+         float a, b;
+         in >> a >> b;
+         gridWidth = static_cast<double>(a);
+         gridHeight = static_cast<double>(b);
+      }
+      else
+      {
+         in >> gridWidth;
+         in >> gridHeight;
+      }
       mGrid->SetDimensions(gridWidth, gridHeight);
    }
 }

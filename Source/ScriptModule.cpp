@@ -1577,20 +1577,20 @@ void ScriptModule::LoadState(FileStreamIn& in, int rev)
       LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
+   double w, h;
    if (rev < 3)
    {
-      float w, h;
-      in >> w;
-      in >> h;
-      Resize(w, h);
+      float a, b;
+      in >> a >> b;
+      w = static_cast<double>(a);
+      h = static_cast<double>(b);
    }
    else
    {
-      double w, h;
       in >> w;
       in >> h;
-      Resize(w, h);
    }
+   Resize(w, h);
 
    juce::String checksum = GetScriptChecksum();
    juce::File trusted_python_scripts = File(ofToDataPath("internal/trusted_python_scripts"));

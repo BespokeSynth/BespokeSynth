@@ -971,22 +971,21 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
 
    if (rev >= 4)
    {
+      double w, h;
       if (rev < 5)
       {
-         float w, h;
-         in >> w;
-         in >> h;
-         if (mDisplayMode == DisplayMode::Grid)
-            SetGridSize(w, h);
+         float a, b;
+         in >> a >> b;
+         w = static_cast<double>(a);
+         h = static_cast<double>(b);
       }
       else
       {
-         double w, h;
          in >> w;
          in >> h;
-         if (mDisplayMode == DisplayMode::Grid)
-            SetGridSize(w, h);
       }
+      if (mDisplayMode == DisplayMode::Grid)
+         SetGridSize(w, h);
    }
    else
    {

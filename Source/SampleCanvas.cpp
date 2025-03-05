@@ -299,8 +299,18 @@ void SampleCanvas::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   float w, h;
-   in >> w;
-   in >> h;
+   double w, h;
+   if (rev < 2)
+   {
+      float a, b;
+      in >> a >> b;
+      w = static_cast<double>(a);
+      h = static_cast<double>(b);
+   }
+   else
+   {
+      in >> w;
+      in >> h;
+   }
    mCanvas->SetDimensions(w, h);
 }

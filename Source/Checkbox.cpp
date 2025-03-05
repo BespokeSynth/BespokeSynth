@@ -242,18 +242,15 @@ void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
 
+   double var;
    if (rev < 1)
    {
-      float var;
-      in >> var;
-      if (shouldSetValue)
-         SetValueDirect(var, gTime);
+      float a;
+      in >> a;
+      var = static_cast<double>(a);
    }
    else
-   {
-      double var;
       in >> var;
-      if (shouldSetValue)
-         SetValueDirect(var, gTime);
-   }
+   if (shouldSetValue)
+      SetValueDirect(var, gTime);
 }

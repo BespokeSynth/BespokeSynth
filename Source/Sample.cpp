@@ -357,7 +357,14 @@ void Sample::LoadState(FileStreamIn& in)
    }
    in >> mNumBars;
    in >> mLooping;
-   in >> mRate;
+   if (rev < 2)
+   {
+      float a;
+      in >> a;
+      mRate = static_cast<double>(a);
+   }
+   else
+      in >> mRate;
    if (rev == 0)
    {
       if (rev < 2)

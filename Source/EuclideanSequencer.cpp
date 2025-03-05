@@ -373,20 +373,20 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
+   double width, height;
    if (rev < 3)
    {
-      float width, height;
-      in >> width;
-      in >> height;
-      Resize(width, height);
+      float a, b;
+      in >> a >> b;
+      width = static_cast<double>(a);
+      height = static_cast<double>(b);
    }
    else
    {
-      double width, height;
       in >> width;
       in >> height;
-      Resize(width, height);
    }
+   Resize(width, height);
 
    int numRings;
    in >> numRings;
@@ -931,7 +931,14 @@ void EuclideanSequencerRing::LoadState(FileStreamIn& in)
    int numSteps;
    in >> numSteps;
    for (size_t i = 0; i < mSteps.size() && i < numSteps; ++i)
-      in >> mSteps[i];
+      if (this->mOwner->GetModuleSaveStateRev() < 3)
+      {
+         float a;
+         in >> a;
+         mSteps[i] = static_cast<double>(a);
+      }
+      else
+         in >> mSteps[i];
 }
 
 void EuclideanSequencerRing::SetSteps(int steps)

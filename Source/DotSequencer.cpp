@@ -362,8 +362,18 @@ void DotSequencer::LoadState(FileStreamIn& in, int rev)
    mInterval = (NoteInterval)interval;
 
    in >> mHasExternalPulseSource;
-   in >> mWidth;
-   in >> mHeight;
+   if (rev < 1)
+   {
+      float a, b;
+      in >> a >> b;
+      mWidth = static_cast<double>(a);
+      mHeight = static_cast<double>(b);
+   }
+   else
+   {
+      in >> mWidth;
+      in >> mHeight;
+   }
    Resize(mWidth, mHeight);
 
    mDotGrid->LoadState(in);

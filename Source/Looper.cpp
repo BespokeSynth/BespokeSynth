@@ -1301,7 +1301,16 @@ void Looper::LoadState(FileStreamIn& in, int rev)
 
    in >> mLoopLength;
    if (rev >= 1)
-      in >> mBufferTempo;
+   {
+      if (rev < 2)
+      {
+         float a;
+         in >> a;
+         mBufferTempo = static_cast<double>(a);
+      }
+      else
+         in >> mBufferTempo;
+   }
    int readLength;
    mBuffer->Load(in, readLength, ChannelBuffer::LoadMode::kAnyBufferSize);
    assert(mLoopLength == readLength);

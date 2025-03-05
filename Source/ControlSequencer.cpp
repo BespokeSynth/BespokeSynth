@@ -406,9 +406,19 @@ void ControlSequencer::LoadState(FileStreamIn& in, int rev)
 
    if (mLoadRev >= 1)
    {
-      float width, height;
-      in >> width;
-      in >> height;
+      double width, height;
+      if (rev < 4)
+      {
+         float a, b;
+         in >> a >> b;
+         width = static_cast<double>(a);
+         height = static_cast<double>(b);
+      }
+      else
+      {
+         in >> width;
+         in >> height;
+      }
       mGrid->SetDimensions(width, height);
    }
 

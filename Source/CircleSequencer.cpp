@@ -327,5 +327,12 @@ void CircleSequencerRing::LoadState(FileStreamIn& in)
    int numSteps;
    in >> numSteps;
    for (size_t i = 0; i < mSteps.size() && i < numSteps; ++i)
-      in >> mSteps[i];
+      if (this->mOwner->GetModuleSaveStateRev() < 2)
+      {
+         float a;
+         in >> a;
+         mSteps[i] = static_cast<double>(a);
+      }
+      else
+         in >> mSteps[i];
 }
