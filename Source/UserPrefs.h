@@ -338,13 +338,11 @@ public:
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
    UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };
-   UserPrefTextEntryFloat mouse_offset_y{ "mouse_offset_y",
 #if BESPOKE_MAC
-                                          -4,
+   UserPrefTextEntryFloat mouse_offset_y{ "mouse_offset_y", -4, -100, 100, 5, UserPrefCategory::Graphics };
 #else
-                                          0,
+   UserPrefTextEntryFloat mouse_offset_y{ "mouse_offset_y", 0, -100, 100, 5, UserPrefCategory::Graphics };
 #endif
-                                          -100, 100, 5, UserPrefCategory::Graphics };
 
    UserPrefString recordings_path{ "recordings_path", "recordings/", 70, UserPrefCategory::Paths };
    UserPrefString samples_path{ "samples_path", "samples/", 70, UserPrefCategory::Paths };
