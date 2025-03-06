@@ -67,8 +67,8 @@ void PatchCable::Render()
    PatchCablePos cable = GetPatchCablePos();
    mX = cable.start.x;
    mY = cable.start.y;
-   ofVec2d cableFadeOut = cable.start * .47 + cable.end * .53f;
-   ofVec2d cableFadeIn = cable.start * .53f + cable.end * .47f;
+   ofVec2d cableFadeOut = cable.start * .47 + cable.end * .53;
+   ofVec2d cableFadeIn = cable.start * .53 + cable.end * .47;
    double cableQuality = gDrawScale * UserPrefs.cable_quality.Get();
 
    double lineWidth = 1;
@@ -153,7 +153,7 @@ void PatchCable::Render()
    ConnectionType type = mOwner->GetConnectionType();
    ofColor lineColor = mOwner->GetColor();
    if (mHoveringOnSource && sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())
-      lineColor = ofColor::lerp(lineColor, ofColor::white, .5f);
+      lineColor = ofColor::lerp(lineColor, ofColor::white, .5);
    lineColor.a *= ModularSynth::sCableAlpha;
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a *= lineAlpha;
@@ -257,7 +257,7 @@ void PatchCable::Render()
                double clampedElapsed = MIN(elapsed, 1);
                if (event.mOn)
                {
-                  ofSetLineWidth(lineWidth * (2 + ofClamp(1 - elapsed * .7f, 0, 1) * 3 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3));
+                  ofSetLineWidth(lineWidth * (2 + ofClamp(1 - elapsed * .7, 0, 1) * 3 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3));
 
                   for (int half = 0; half < 2; ++half)
                   {
@@ -332,7 +332,7 @@ void PatchCable::Render()
                drawColor.set(lineColorAlphaed.r, lineColorAlphaed.g, lineColorAlphaed.b, lineColorAlphaed.a);
             else
                drawColor.set(lineColorAlphaed.g, lineColorAlphaed.r, lineColorAlphaed.b, lineColorAlphaed.a);
-            ofVec2d offset((ch - (vizBuff->NumChannels() - 1) * .5f) * 2 * dy, (ch - (vizBuff->NumChannels() - 1) * .5f) * 2 * -dx);
+            ofVec2d offset((ch - (vizBuff->NumChannels() - 1) * .5) * 2 * dy, (ch - (vizBuff->NumChannels() - 1) * .5) * 2 * -dx);
 
             for (int half = 0; half < 2; ++half)
             {

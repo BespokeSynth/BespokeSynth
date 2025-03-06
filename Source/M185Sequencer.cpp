@@ -120,7 +120,7 @@ void M185Sequencer::OnPulse(double time, double velocity, int flags)
    StepBy(time, velocity, flags);
 }
 
-void M185Sequencer::StepBy(double time, float velocity, int flags)
+void M185Sequencer::StepBy(double time, double velocity, int flags)
 {
    if (flags & kPulseFlag_Reset)
       ResetStep();

@@ -1065,7 +1065,7 @@ void NoteStepSequencer::OnMidiControl(MidiControl& control)
    if (control.mControl >= 21 && control.mControl <= 28)
    {
       int step = control.mControl - 21;
-      mTones[step] = MIN(control.mValue / 127.0f * mNoteRange, mNoteRange - 1);
+      mTones[step] = MIN(control.mValue / 127.0 * mNoteRange, mNoteRange - 1);
       SyncGridToSeq();
    }
 

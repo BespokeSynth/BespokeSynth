@@ -152,7 +152,7 @@ private:
       height = mHeight;
    }
 
-   bool IsOnElement(CanvasElement* element, float x, float y) const;
+   bool IsOnElement(CanvasElement* element, double x, double y) const;
    double QuantizeToGrid(double input) const;
 
    bool mClick{ false };

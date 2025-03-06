@@ -200,7 +200,7 @@ void IDrawableModule::DrawFrame(double w, double h, bool drawModule, double& tit
       {
          RollingBuffer* vizBuff = audioSource->GetVizBuffer();
          int numSamples = std::min(500, vizBuff->Size());
-         float sample;
+         double sample;
          double mag = 0;
          for (int ch = 0; ch < vizBuff->NumChannels(); ++ch)
          {
@@ -298,7 +298,7 @@ void IDrawableModule::DrawFrame(double w, double h, bool drawModule, double& tit
          if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mKeyboardFocusListener)
          {
             ofPushStyle();
-            ofSetLineWidth(.5f);
+            ofSetLineWidth(.5);
             ofNoFill();
             ofRect(w - 25 - squareSize - 2 - 1, -titleBarHeight,
                    2 + squareSize + 1 + squareSize + 1 + squareSize + 2, titleBarHeight, 2);
@@ -433,19 +433,19 @@ void IDrawableModule::Render()
    if (CanReceiveAudio())
    {
       ofSetColor(GetColor(kModuleCategory_Audio));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceiveNotes())
    {
       ofSetColor(GetColor(kModuleCategory_Note));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceivePulses())
    {
       ofSetColor(GetColor(kModuleCategory_Pulse));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    ofPopStyle();

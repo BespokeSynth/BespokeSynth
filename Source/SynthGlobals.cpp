@@ -283,6 +283,15 @@ void Clear(float* buffer, int bufferSize)
 #endif
 }
 
+void Clear(double* buffer, int bufferSize)
+{
+#ifdef USE_VECTOR_OPS
+   FloatVectorOperations::clear(buffer, bufferSize);
+#else
+   bzero(buffer, bufferSize * sizeof(double));
+#endif
+}
+
 void BufferCopy(float* dst, const float* src, int bufferSize)
 {
 #ifdef USE_VECTOR_OPS
@@ -434,21 +443,21 @@ void AssertIfDenormal(double input)
    assert(input == 0 || input != input || std::abs(input) > std::numeric_limits<double>::min());
 }
 
-float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
+double GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
 {
    offset = DoubleWrap(offset, bufferSize);
    int pos = int(offset);
    int posNext = int(offset + 1) % bufferSize;
 
-   float sample = buffer[pos];
-   float nextSample = buffer[posNext];
-   float a = offset - pos;
-   float output = (1 - a) * sample + a * nextSample; //interpolate
+   double sample = buffer[pos];
+   double nextSample = buffer[posNext];
+   double a = offset - pos;
+   double output = (1 - a) * sample + a * nextSample; //interpolate
 
    return output;
 }
 
-float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, float channelBlend)
+double GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, double channelBlend)
 {
    assert(channelBlend <= buffer->NumActiveChannels());
    assert(channelBlend >= 0);
@@ -471,7 +480,7 @@ void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float
    int pos = int(offset);
    int posNext = int(offset + 1) % bufferSize;
 
-   float a = offset - pos;
+   double a = offset - pos;
    buffer[pos] += (1 - a) * sample;
    buffer[posNext] += a * sample;
 }

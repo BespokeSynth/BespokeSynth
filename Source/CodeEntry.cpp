@@ -242,7 +242,7 @@ void CodeEntry::Render()
    ofPushStyle();
    ofPushMatrix();
 
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
 
    double w, h;
    GetDimensions(w, h);
@@ -289,7 +289,7 @@ void CodeEntry::Render()
    }
    else if (hasUnpublishedCode)
    {
-      float highlight = 1 - ofClamp(timeSincePublished / 150, 0, 1);
+      double highlight = 1 - ofClamp(timeSincePublished / 150, 0, 1);
       ofSetColor(ofLerp(170, 255, highlight), 255, ofLerp(170, 255, highlight), gModuleDrawAlpha);
       ofSetLineWidth(2 + highlight * 3);
    }
@@ -323,7 +323,7 @@ void CodeEntry::Render()
    std::string drawString = GetVisibleCode();
 
    ofPushStyle();
-   const float dim = .7f;
+   const double dim = .7;
    DrawSyntaxHighlight(drawString, stringColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 3, -1);
    DrawSyntaxHighlight(drawString, numberColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 2, -1);
    DrawSyntaxHighlight(drawString, name1Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 1, -1);
@@ -390,7 +390,7 @@ void CodeEntry::Render()
                begin = startCol;
             if (i == endLineNum)
                end = endCol;
-            ofRect(begin * mCharWidth + mX + 1.5f - mScroll.x, i * mCharHeight + mY + 3 - mScroll.y, (end - begin) * mCharWidth, mCharHeight, L(corner, 2));
+            ofRect(begin * mCharWidth + mX + 1.5 - mScroll.x, i * mCharHeight + mY + 3 - mScroll.y, (end - begin) * mCharWidth, mCharHeight, L(corner, 2));
          }
 
          ofPopStyle();
@@ -427,8 +427,8 @@ void CodeEntry::RenderOverlay()
       if (mAutocompletes[i].valid)
       {
          int charactersLeft = (int)mAutocompletes[i].autocompleteFull.length() - (int)mAutocompletes[i].autocompleteRest.length();
-         float x = caretPos.x - charactersLeft * mCharWidth;
-         float y = caretPos.y + mCharHeight * (i + 2) - 2;
+         double x = caretPos.x - charactersLeft * mCharWidth;
+         double y = caretPos.y + mCharHeight * (i + 2) - 2;
          if (i == mAutocompleteHighlightIndex)
             ofSetColor(jediIndexBg);
          else
@@ -476,8 +476,8 @@ void CodeEntry::RenderOverlay()
          }
          params += ")";
          highlightParamString += " ";
-         float x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
-         float y = caretPos.y + mCharHeight * (i + 1) - 2;
+         double x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
+         double y = caretPos.y + mCharHeight * (i + 1) - 2;
          ofSetColor(jediBg);
          ofRect(x, y - mCharHeight + 2, gFontFixedWidth.GetStringWidth(params, mFontSize), mCharHeight + 2);
          ofSetColor(jediParams);
@@ -1065,7 +1065,7 @@ void CodeEntry::AddCharacter(char c)
       s += c;
       AddString(s);
 
-      mAutocompleteUpdateTimer = .2f;
+      mAutocompleteUpdateTimer = .2;
    }
 }
 

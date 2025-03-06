@@ -202,8 +202,8 @@ void NoteTable::DrawModule()
             if (mGrid->GetVal(i, row) > 0)
             {
                ofVec2d pos = mGrid->GetCellPosition(i, row) + mGrid->GetPosition(true);
-               double xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-               double ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+               double xsize = mGrid->GetWidth() / mGrid->GetCols();
+               double ysize = mGrid->GetHeight() / mGrid->GetRows();
                ofSetColor(ofColor::white, fade * 255);
                ofRect(pos.x, pos.y, xsize, ysize);
             }

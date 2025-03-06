@@ -78,7 +78,7 @@ void Polyrhythms::OnTransportAdvanced(double amount)
       double remainderMs;
       int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
       int newStep = TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs);
-      float val = mRhythmLines[i]->mGrid->GetVal(newStep, 0);
+      double val = mRhythmLines[i]->mGrid->GetVal(newStep, 0);
       if (newStep != oldStep && val > 0)
          PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLines[i]->mPitch, val * 127));
 
@@ -230,7 +230,7 @@ void RhythmLine::Draw()
    mNoteSelector->Draw();
 }
 
-void RhythmLine::OnClicked(float x, float y, bool right)
+void RhythmLine::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -243,7 +243,7 @@ void RhythmLine::MouseReleased()
    mGrid->MouseReleased();
 }
 
-void RhythmLine::MouseMoved(float x, float y)
+void RhythmLine::MouseMoved(double x, double y)
 {
    mGrid->NotifyMouseMoved(x, y);
 }

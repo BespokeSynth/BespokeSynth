@@ -326,8 +326,8 @@ void ControlSequencer::ButtonClicked(ClickButton* button, double time)
 
 namespace
 {
-   const float extraW = 10;
-   const float extraH = 47;
+   const double extraW = 10;
+   const double extraH = 47;
 }
 
 void ControlSequencer::GetModuleDimensions(double& width, double& height)
@@ -351,7 +351,7 @@ void ControlSequencer::Resize(double w, double h)
    SetGridSize(w, h);
 }
 
-void ControlSequencer::SetGridSize(float w, float h)
+void ControlSequencer::SetGridSize(double w, double h)
 {
    mGrid->SetDimensions(w, h);
 }

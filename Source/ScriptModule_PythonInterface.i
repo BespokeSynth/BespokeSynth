@@ -68,19 +68,19 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m)
          });
    m.def("get_step", [](int subdivision)
          {
-            float subdivide = subdivision * ScriptModule::GetTimeSigRatio();
+            double subdivide = subdivision * ScriptModule::GetTimeSigRatio();
             return int(ScriptModule::GetScriptMeasureTime() * subdivide);
          });
    m.def("count_per_measure", [](int subdivision)
          {
-            float subdivide = subdivision * ScriptModule::GetTimeSigRatio();
+            double subdivide = subdivision * ScriptModule::GetTimeSigRatio();
             return int(subdivide);
          });
    m.def("time_until_subdivision", [](int subdivision)
          {
-            float subdivide = subdivision * ScriptModule::GetTimeSigRatio();
-            float measureTime = ScriptModule::GetScriptMeasureTime();
-            return ceil(measureTime * subdivide + .0001f) / subdivide - measureTime;
+            double subdivide = subdivision * ScriptModule::GetTimeSigRatio();
+            double measureTime = ScriptModule::GetScriptMeasureTime();
+            return ceil(measureTime * subdivide + .0001) / subdivide - measureTime;
          });
    ///example: me.schedule_call(bespoke.time_until_subdivision(1), "on_downbeat()")
    m.def("get_time_sig_ratio", []()
@@ -137,7 +137,7 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m)
             return TheTransport->GetTempo();
          });
    m.def(
-   "set_background_text", [](std::string str, float size, float xPos, float yPos, float red, float green, float blue)
+   "set_background_text", [](std::string str, double size, double xPos, double yPos, double red, double green, double blue)
    {
       ScriptModule::sBackgroundTextString = str;
       ScriptModule::sBackgroundTextSize = size;

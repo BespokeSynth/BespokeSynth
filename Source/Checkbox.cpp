@@ -111,7 +111,7 @@ void Checkbox::Render()
    }
    else
    {
-      ofSetColor(color.r, color.g, color.b, color.a * .2f);
+      ofSetColor(color.r, color.g, color.b, color.a * .2);
       ofRect(mX, mY + 1, mHeight - 3, mHeight - 3);
    }
 

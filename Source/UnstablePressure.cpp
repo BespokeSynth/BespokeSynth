@@ -88,7 +88,7 @@ void UnstablePressure::DrawModule()
          ofBeginShape();
          for (int i = 0; i < gBufferSize; ++i)
          {
-            float sample = ofClamp(mModulation.GetPressure(voice)->GetBufferValue(i), -1, 1);
+            double sample = ofClamp(mModulation.GetPressure(voice)->GetBufferValue(i), -1, 1);
             ofVertex((i * rect.width) / gBufferSize + rect.x, rect.y + (1 - sample) * rect.height);
          }
          ofEndShape();

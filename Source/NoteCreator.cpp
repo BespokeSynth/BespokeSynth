@@ -76,7 +76,7 @@ void NoteCreator::OnPulse(double time, double velocity, int flags)
    TriggerNote(time, velocity * mVelocity);
 }
 
-void NoteCreator::TriggerNote(double time, float velocity)
+void NoteCreator::TriggerNote(double time, double velocity)
 {
    if (!IsEnabled())
       return;

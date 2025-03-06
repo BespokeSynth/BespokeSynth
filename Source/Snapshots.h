@@ -183,6 +183,6 @@ private:
    bool mAutoStoreOnSwitch{ false };
    DisplayMode mDisplayMode{ DisplayMode::List };
    int mSnapshotRenameIndex{ -1 };
-   float mOldWidth{ 0 };
-   float mOldHeight{ 0 };
+   double mOldWidth{ 0 };
+   double mOldHeight{ 0 };
 };

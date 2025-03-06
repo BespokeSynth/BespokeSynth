@@ -360,7 +360,7 @@ ofRectangle ChaosEngine::GetKeyboardKeyRect(int pitch, bool& isBlackKey)
    }
 }
 
-void ChaosEngine::DrawKeyboard(float x, float y)
+void ChaosEngine::DrawKeyboard(double x, double y)
 {
    ofPushStyle();
    ofPushMatrix();
@@ -427,7 +427,7 @@ void ChaosEngine::DrawKeyboard(float x, float y)
    ofPopStyle();
 }
 
-void ChaosEngine::DrawGuitar(float x, float y)
+void ChaosEngine::DrawGuitar(double x, double y)
 {
    ofPushStyle();
    ofPushMatrix();
@@ -463,8 +463,8 @@ void ChaosEngine::DrawGuitar(float x, float y)
       if (fret == 12)
       {
          ofSetColor(255, 255, 255);
-         ofCircle(fretX + fretWidth / 2, gtHeight * .3f, 5);
-         ofCircle(fretX + fretWidth / 2, gtHeight * .7f, 5);
+         ofCircle(fretX + fretWidth / 2, gtHeight * .3, 5);
+         ofCircle(fretX + fretWidth / 2, gtHeight * .7, 5);
       }
    }
 

@@ -45,7 +45,7 @@ void LevelMeterDisplay::Process(int channel, float* buffer, int bufferSize)
    mLevelMeters[channel].mPeakTrackerSlow.Process(buffer, bufferSize);
 }
 
-void LevelMeterDisplay::Draw(float x, float y, float width, float height, int numChannels)
+void LevelMeterDisplay::Draw(double x, double y, double width, double height, int numChannels)
 {
    for (int i = 0; i < numChannels; ++i)
    {
@@ -54,8 +54,8 @@ void LevelMeterDisplay::Draw(float x, float y, float width, float height, int nu
       const int kNumSegments = 20;
       const int kPaddingBetween = 1;
       const int kPaddingVertical = 2;
-      float barHeight = (height - (kPaddingVertical * (numChannels - 1))) / numChannels;
-      float segmentWidth = width / kNumSegments;
+      double barHeight = (height - (kPaddingVertical * (numChannels - 1))) / numChannels;
+      double segmentWidth = width / kNumSegments;
       for (int j = 0; j < kNumSegments; ++j)
       {
          ofPushStyle();
@@ -71,9 +71,9 @@ void LevelMeterDisplay::Draw(float x, float y, float width, float height, int nu
          if (slowLevel > 0 && ofClamp(static_cast<int>(slowLevel * kNumSegments), 0, kNumSegments - 1) == j)
             ofSetColor(color);
          else if (level > 0 && level >= j / static_cast<double>(kNumSegments))
-            ofSetColor(color * .9f);
+            ofSetColor(color * .9);
          else
-            ofSetColor(color * .5f);
+            ofSetColor(color * .5);
          ofRect(x + segmentWidth * j, y + i * (barHeight + 2), segmentWidth - kPaddingBetween, barHeight, 0);
          ofPopStyle();
       }
@@ -82,7 +82,7 @@ void LevelMeterDisplay::Draw(float x, float y, float width, float height, int nu
       {
          ofPushStyle();
          ofSetColor(ofColor::red);
-         DrawTextBold("clipped", x + 10, y + i * (barHeight + 2) + 7, 10.0f);
+         DrawTextBold("clipped", x + 10, y + i * (barHeight + 2) + 7, 10.0);
          ofPopStyle();
       }
    }

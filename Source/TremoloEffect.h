@@ -78,7 +78,7 @@ private:
    FloatSlider* mDutySlider{ nullptr };
    double mDuty{ .5 };
    static const int kAntiPopWindowSize = 300;
-   float mWindow[kAntiPopWindowSize]{};
+   double mWindow[kAntiPopWindowSize]{};
    int mWindowPos{ 0 };
    double mWidth{ 200 };
    double mHeight{ 20 };

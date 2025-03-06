@@ -131,7 +131,7 @@ void NoteChance::PlayNote(NoteMessage note)
       const int kStepResolution = 128;
       uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
       int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
-      random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0f);
+      random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0);
    }
    else
    {

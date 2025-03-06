@@ -85,7 +85,7 @@ public:
    void SetVolume(double vol) { mVolume = vol; }
    void CopyFrom(Sample* sample);
    bool IsSampleLoading() { return mSamplesLeftToRead > 0; }
-   float GetSampleLoadProgress() { return (mNumSamples > 0) ? (1 - (static_cast<double>(mSamplesLeftToRead) / mNumSamples)) : 1; }
+   double GetSampleLoadProgress() { return (mNumSamples > 0) ? (1 - (static_cast<double>(mSamplesLeftToRead) / mNumSamples)) : 1; }
 
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);

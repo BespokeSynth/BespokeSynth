@@ -175,8 +175,8 @@ void ModulatorExpression::DrawModule()
       ofCircle(kGraphX + ofMap(mExpressionInputDraw, mExpressionInputSlider->GetMin(), mExpressionInputSlider->GetMax(), 0, kGraphWidth), ofMap(mExpressionDraw.value(), mLastDrawMinOutput, mLastDrawMaxOutput, kGraphHeight, 0) + kGraphY, 3);
       ofPopStyle();
 
-      DrawTextNormal(ofToString(drawMinOutput, 2), kGraphX + kGraphWidth * .35f, kGraphY + kGraphHeight - 1);
-      DrawTextNormal(ofToString(drawMaxOutput, 2), kGraphX + kGraphWidth * .35f, kGraphY + 12);
+      DrawTextNormal(ofToString(drawMinOutput, 2), kGraphX + kGraphWidth * .35, kGraphY + kGraphHeight - 1);
+      DrawTextNormal(ofToString(drawMaxOutput, 2), kGraphX + kGraphWidth * .35, kGraphY + 12);
       DrawTextNormal(ofToString(mExpressionInputSlider->GetMin()), kGraphX + 1, kGraphY + kGraphHeight / 2 + 6);
       DrawTextRightJustify(ofToString(mExpressionInputSlider->GetMax()), kGraphX + kGraphWidth - 1, kGraphY + kGraphHeight / 2 + 6);
 

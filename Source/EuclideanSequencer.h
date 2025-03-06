@@ -146,8 +146,8 @@ private:
    }
    double mWidth{ 785 }; // was 650 = random buttons visible
    double mHeight{ 200 };
-   const float mWidthMin = 590;
-   const float mWidthMax = 785;
+   const double mWidthMin = 590;
+   const double mWidthMax = 785;
    void OnClicked(double x, double y, bool right) override;
 
    // ModuleSaveData

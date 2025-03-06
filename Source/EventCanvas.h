@@ -93,13 +93,12 @@ private:
    Canvas* mCanvas{ nullptr };
    CanvasControls* mCanvasControls{ nullptr };
    CanvasScrollbar* mCanvasScrollbarHorizontal{ nullptr };
-   float mScrollPartial{ 0 };
    TextEntry* mNumMeasuresEntry{ nullptr };
    int mNumMeasures{ 1 };
    ClickButton* mQuantizeButton{ nullptr };
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
-   float mPosition{ 0 };
+   double mPosition{ 0 };
    std::vector<PatchCableSource*> mControlCables{};
    std::vector<ofColor> mRowColors{};
    bool mRecord{ false };

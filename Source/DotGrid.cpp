@@ -58,17 +58,17 @@ void DotGrid::Init(int x, int y, int w, int h, int cols, int rows, IClickable* p
    SetParent(parent);
 }
 
-void DotGrid::DrawGridCircle(int col, int row, float radiusPercent) const
+void DotGrid::DrawGridCircle(int col, int row, double radiusPercent) const
 {
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
-   ofCircle(GetX(col) + xsize * .5f, GetY(row) + ysize * .5f, GetDotSize() * .5f * radiusPercent);
+   const double xsize = static_cast<double>(mWidth) / mCols;
+   const double ysize = static_cast<double>(mHeight) / mRows;
+   ofCircle(GetX(col) + xsize * .5, GetY(row) + ysize * .5, GetDotSize() * .5 * radiusPercent);
 }
 
 double DotGrid::GetDotSize() const
 {
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   const double xsize = static_cast<double>(mWidth) / mCols;
+   const double ysize = static_cast<double>(mHeight) / mRows;
    return std::min(xsize, ysize);
 }
 
@@ -77,7 +77,7 @@ void DotGrid::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
    double w, h;
    GetDimensions(w, h);
    double xsize = mWidth / mCols;
@@ -112,7 +112,7 @@ void DotGrid::Render()
          {
             ofSetColor(100, 100, 100, gModuleDrawAlpha);
          }
-         DrawGridCircle(i, j, .3f);
+         DrawGridCircle(i, j, .3);
       }
    }
    for (int j = 0; j < mRows; ++j)
@@ -122,8 +122,8 @@ void DotGrid::Render()
          DotData& data = mData[GetDataIndex(i, j)];
          if (data.mOn)
          {
-            float bump = ofClamp((data.mLastPlayTime + 250.0 - gTime) / 250.0, 0, 1);
-            float radius = ofLerp(.65f, 1.0f, bump);
+            double bump = ofClamp((data.mLastPlayTime + 250.0 - gTime) / 250.0, 0, 1);
+            double radius = ofLerp(.65, 1.0, bump);
 
             //white outer ring
             ofFill();
@@ -137,10 +137,10 @@ void DotGrid::Render()
             ofFill();
             ofSetColor(255 * data.mVelocity, 255 * data.mVelocity, 255 * data.mVelocity);
             ofPushStyle();
-            ofSetLineWidth(GetDotSize() * radius * .23f);
-            ofLine(GetX(i) + xsize * .5f, GetY(j) + ysize * .5f, GetX(i) + xsize * .5f + xsize * data.mLength, GetY(j) + ysize * .5f);
+            ofSetLineWidth(GetDotSize() * radius * .23);
+            ofLine(GetX(i) + xsize * .5, GetY(j) + ysize * .5, GetX(i) + xsize * .5 + xsize * data.mLength, GetY(j) + ysize * .5);
             ofPopStyle();
-            DrawGridCircle(i, j, radius * .9f * data.mVelocity);
+            DrawGridCircle(i, j, radius * .9 * data.mVelocity);
          }
 
          if (mCurrentHover.mCol == i && mCurrentHover.mRow == j && gHoveredUIControl == nullptr)
@@ -151,14 +151,14 @@ void DotGrid::Render()
                {
                   DotData& currentHoverData = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
                   ofSetColor(0, 255, 0);
-                  DrawTextNormal(ofToString(currentHoverData.mVelocity, 2), GetX(i), GetY(j), 8.0f);
+                  DrawTextNormal(ofToString(currentHoverData.mVelocity, 2), GetX(i), GetY(j), 8.0);
                }
             }
             else
             {
                ofFill();
                ofSetColor(180, 180, 0, 160);
-               DrawGridCircle(i, j, .8f);
+               DrawGridCircle(i, j, .8);
             }
          }
       }

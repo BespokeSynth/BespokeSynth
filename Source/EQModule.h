@@ -111,7 +111,7 @@ private:
    std::array<Filter, 8> mFilters;
    int mHoveredFilterHandleIndex{ -1 };
    int mDragging{ false };
-   std::array<float, 1024> mFrequencyResponse{};
+   std::array<double, 1024> mFrequencyResponse{};
    bool mNeedToUpdateFrequencyResponseGraph{ true };
    double mDrawGain{ 1 };
    bool mLiteCpuModulation{ true };

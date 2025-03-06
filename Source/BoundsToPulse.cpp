@@ -82,13 +82,13 @@ void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, double oldVal, doubl
 
       if (mValue == slider->GetMin() && mValue < oldVal)
       {
-         DispatchPulse(GetPatchCableSource(), time, 1.f, 0);
-         DispatchPulse(mMinCable, time, 1.f, 0);
+         DispatchPulse(GetPatchCableSource(), time, 1., 0);
+         DispatchPulse(mMinCable, time, 1., 0);
       }
       else if (mValue == slider->GetMax() && oldVal < mValue)
       {
-         DispatchPulse(GetPatchCableSource(), time, 1.f, 0);
-         DispatchPulse(mMaxCable, time, 1.f, 0);
+         DispatchPulse(GetPatchCableSource(), time, 1., 0);
+         DispatchPulse(mMaxCable, time, 1., 0);
       }
    }
 }

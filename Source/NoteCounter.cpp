@@ -48,7 +48,7 @@ void NoteCounter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   float desiredWidth = 116;
+   double desiredWidth = 116;
 
    UIBLOCK(3, 3, desiredWidth - 6);
    DROPDOWN(mIntervalSelector, "interval", ((int*)(&mInterval)), 50);

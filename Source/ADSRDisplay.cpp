@@ -84,9 +84,9 @@ void ADSRDisplay::Render()
 
    ofTranslate(mX, mY);
 
-   ofSetColor(100, 100, 100, .8f * gModuleDrawAlpha);
+   ofSetColor(100, 100, 100, .8 * gModuleDrawAlpha);
 
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
    ofRect(0, 0, mWidth, mHeight, 0);
 
    if (mAdsr && sDisplayMode == kDisplayEnvelope)

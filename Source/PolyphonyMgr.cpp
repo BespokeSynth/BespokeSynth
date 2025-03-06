@@ -193,14 +193,14 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    mFadeOutBuffer.SetNumActiveChannels(out->NumActiveChannels());
    mFadeOutWorkBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
-   float debugRef = 0;
+   double debugRef = 0;
    for (int i = 0; i < mVoiceLimit; ++i)
    {
       if (mVoices[i].mPitch != -1)
       {
          mVoices[i].mVoice->Process(time, out, mOversampling);
 
-         float testSample = out->GetChannel(0)[0];
+         double testSample = out->GetChannel(0)[0];
          mVoices[i].mActivity = testSample - debugRef;
 
          if (!mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))

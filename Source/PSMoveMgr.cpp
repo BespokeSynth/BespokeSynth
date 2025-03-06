@@ -65,7 +65,7 @@ _PSMove* PSMoveMgr::SetUpMove(int id)
    return move;
 }
 
-void PSMoveMgr::GetGyros(int id, ofVec3f& gyros)
+void PSMoveMgr::GetGyros(int id, ofVec3d& gyros)
 {
    if (mMove[id])
    {
@@ -77,7 +77,7 @@ void PSMoveMgr::GetGyros(int id, ofVec3f& gyros)
    }
 }
 
-void PSMoveMgr::GetAccel(int id, ofVec3f& accel)
+void PSMoveMgr::GetAccel(int id, ofVec3d& accel)
 {
    if (mMove[id])
    {

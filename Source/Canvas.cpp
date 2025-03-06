@@ -75,7 +75,7 @@ void Canvas::Render()
    {
       int row = mRowOffset + i;
       if (row >= 0 && row < mRowColors.size())
-         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1f), ofVec2d(0, i * rowHeight + rowHeight * 0.0f), ofVec2d(0, i * rowHeight + rowHeight));
+         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1), ofVec2d(0, i * rowHeight + rowHeight * 0.0), ofVec2d(0, i * rowHeight + rowHeight));
       ofRect(0, i * rowHeight, GetWidth(), rowHeight, 0);
    }
    ofPopStyle();
@@ -203,7 +203,7 @@ ofVec2d Canvas::RescaleForZoom(double x, double y) const
    return { ofMap(x / mWidth, 0, 1, mViewStart, mViewEnd) * mWidth, y };
 }
 
-bool Canvas::IsOnElement(CanvasElement* element, float x, float y) const
+bool Canvas::IsOnElement(CanvasElement* element, double x, double y) const
 {
    return element->GetRect(true, false).contains(x, y) || (mWrap && element->GetRect(true, true).contains(x, y));
 }

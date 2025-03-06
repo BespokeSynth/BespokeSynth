@@ -232,7 +232,7 @@ void BufferShuffler::DrawModuleUnclipped()
       DrawTextNormal(mDebugDisplayText, 0, mHeight + 20);
 }
 
-void BufferShuffler::DrawBuffer(float x, float y, float w, float h)
+void BufferShuffler::DrawBuffer(double x, double y, double w, double h)
 {
    ofPushMatrix();
    ofTranslate(x, y);
@@ -242,18 +242,18 @@ void BufferShuffler::DrawBuffer(float x, float y, float w, float h)
    ofPushStyle();
    ofFill();
 
-   float writePosX = x + GetWritePositionInSamples(gTime) / (float)GetLengthInSamples() * w;
+   double writePosX = x + GetWritePositionInSamples(gTime) / static_cast<double>(GetLengthInSamples()) * w;
    ofSetColor(200, 200, 200);
    ofCircle(writePosX, y, 3);
    if (mPlaybackSampleIndex != -1)
    {
-      float playPosX = x + mPlaybackSampleIndex / (float)GetLengthInSamples() * w;
+      double playPosX = x + mPlaybackSampleIndex / static_cast<double>(GetLengthInSamples()) * w;
       ofSetColor(0, 255, 0);
       ofLine(playPosX, y, playPosX, y + h);
    }
    if (mFourTet > 0)
    {
-      float playPosX = x + mFourTetSampleIndex / (float)GetLengthInSamples() * w;
+      double playPosX = x + mFourTetSampleIndex / static_cast<double>(GetLengthInSamples()) * w;
       ofSetColor(0, 255, 0);
       ofLine(playPosX, y, playPosX, y + h);
    }
@@ -297,8 +297,8 @@ void BufferShuffler::OnClicked(double x, double y, bool right)
 
    if (!right && x >= 5 && x <= mWidth - 5 && y > 20)
    {
-      float bufferWidth = mWidth - 10;
-      float pos = (x - 5) / bufferWidth;
+      double bufferWidth = mWidth - 10;
+      double pos = (x - 5) / bufferWidth;
       int slice = int(pos * GetNumSlices());
       PlayOneShot(slice);
    }

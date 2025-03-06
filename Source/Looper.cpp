@@ -608,10 +608,10 @@ void Looper::ResampleForSpeed(double speed)
 
 namespace
 {
-   const float kBufferX = 3;
-   const float kBufferY = 3;
-   const float kBufferWidth = 170;
-   const float kBufferHeight = 93;
+   const double kBufferX = 3;
+   const double kBufferY = 3;
+   const double kBufferWidth = 170;
+   const double kBufferHeight = 93;
 }
 
 void Looper::DrawModule()
@@ -625,14 +625,14 @@ void Looper::DrawModule()
 
    assert(mLoopLength > 0);
 
-   float displayPos = GetActualLoopPos(0);
+   double displayPos = GetActualLoopPos(0);
    mBufferMutex.lock();
    DrawAudioBuffer(kBufferWidth, kBufferHeight, mBuffer, 0, mLoopLength, displayPos, mVol);
    mBufferMutex.unlock();
    ofSetColor(255, 255, 0, gModuleDrawAlpha);
    for (int i = 1; i < mNumBars; ++i)
    {
-      float x = kBufferWidth / mNumBars * i;
+      double x = kBufferWidth / mNumBars * i;
       ofLine(x, kBufferHeight / 2 - 5, x, kBufferHeight / 2 + 5);
    }
    ofSetColor(255, 255, 255, gModuleDrawAlpha);

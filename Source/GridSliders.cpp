@@ -190,7 +190,7 @@ void GridSliders::DropdownUpdated(DropdownList* list, int oldVal, double time)
 
 void GridSliders::GetModuleDimensions(double& width, double& height)
 {
-   float cablesWidth = 0;
+   double cablesWidth = 0;
    for (size_t i = 0; i < mControlCables.size(); ++i)
    {
       if (mControlCables[i]->IsShowing())

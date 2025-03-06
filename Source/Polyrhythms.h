@@ -40,9 +40,9 @@ class RhythmLine
 public:
    RhythmLine(Polyrhythms* owner, int index);
    void Draw();
-   void OnClicked(float x, float y, bool right);
+   void OnClicked(double x, double y, bool right);
    void MouseReleased();
-   void MouseMoved(float x, float y);
+   void MouseMoved(double x, double y);
    void CreateUIControls();
    void OnResize();
    void UpdateGrid();
@@ -102,6 +102,6 @@ private:
    void OnClicked(double x, double y, bool right) override;
 
    double mWidth{ 350 };
-   float mHeight;
+   double mHeight;
    std::array<RhythmLine*, 8> mRhythmLines;
 };

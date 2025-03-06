@@ -134,7 +134,7 @@ void MultibandCompressor::DrawModule()
    ofPushStyle();
    ofFill();
    ofSetColor(0, 255, 0);
-   const float width = 25;
+   const double width = 25;
    for (int i = 0; i < mNumBands; ++i)
    {
       ofRect(i * (width + 3), -mPeaks[i].GetPeak() * 200, width, mPeaks[i].GetPeak() * 200);

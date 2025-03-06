@@ -92,7 +92,7 @@ void SlowLayers::Process(double time)
 
       float output = (1 - mFeedIn) * GetBuffer()->GetChannel(0)[i];
       for (int j = 0; j < layers; ++j)
-         output += GetInterpolatedSample(offset / double(1 << j), mBuffer, loopLengthInSamples);
+         output += GetInterpolatedSample(offset / static_cast<double>(1 << j), mBuffer, loopLengthInSamples);
 
       output *= volSq;
 
@@ -126,7 +126,7 @@ void SlowLayers::DrawModule()
    ofSetColor(255, 255, 0, gModuleDrawAlpha);
    for (int i = 1; i < mNumBars; ++i)
    {
-      float x = BUFFER_W / mNumBars * i;
+      double x = BUFFER_W / mNumBars * i;
       ofLine(x, BUFFER_H / 2 - 5, x, BUFFER_H / 2 + 5);
    }
    ofSetColor(255, 255, 255, gModuleDrawAlpha);

@@ -275,7 +275,7 @@ void EventCanvas::DrawModule()
    {
       if (mCanvas->IsRowVisible(i))
       {
-         mControlCables[i]->SetManualPosition(GetRect().width, canvasRect.y + (canvasRect.height / mCanvas->GetNumVisibleRows()) * (i - mCanvas->GetRowOffset() + .5f));
+         mControlCables[i]->SetManualPosition(GetRect().width, canvasRect.y + (canvasRect.height / mCanvas->GetNumVisibleRows()) * (i - mCanvas->GetRowOffset() + .5));
          mControlCables[i]->SetEnabled(true);
       }
       else

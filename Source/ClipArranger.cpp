@@ -62,18 +62,18 @@ void ClipArranger::DrawModule()
    {
       if (mClips[i].mSample != nullptr)
       {
-         float xStart = SampleToX(mClips[i].mStartSample);
-         float xPos = xStart;
-         float xEnd = SampleToX(mClips[i].mEndSample);
-         float sampleWidth = SampleToX(mClips[i].mStartSample + mClips[i].mSample->LengthInSamples()) - xStart;
+         double xStart = SampleToX(mClips[i].mStartSample);
+         double xPos = xStart;
+         double xEnd = SampleToX(mClips[i].mEndSample);
+         double sampleWidth = SampleToX(mClips[i].mStartSample + mClips[i].mSample->LengthInSamples()) - xStart;
          for (; xPos < xEnd; xPos += sampleWidth)
          {
             ofPushMatrix();
             ofTranslate(xPos, BUFFER_MARGIN_Y);
-            float length = mClips[i].mSample->LengthInSamples();
+            double length = mClips[i].mSample->LengthInSamples();
             if (xPos + sampleWidth > xEnd)
             {
-               float newWidth = xEnd - xPos;
+               double newWidth = xEnd - xPos;
                length *= newWidth / sampleWidth;
                sampleWidth = newWidth;
             }

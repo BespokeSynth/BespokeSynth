@@ -32,10 +32,10 @@
 #include "Profiler.h"
 #include "ModulationChain.h"
 
-const float mBufferX = 5;
-const float mBufferY = 50;
-const float mBufferW = 800;
-const float mBufferH = 200;
+const double mBufferX = 5;
+const double mBufferY = 50;
+const double mBufferW = 800;
+const double mBufferH = 200;
 
 MultitapDelay::MultitapDelay()
 : IAudioProcessor(gBufferSize)
@@ -341,7 +341,7 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
       double a = delaySamps - sampsAgoA;
       double delayedSample = (1 - a) * sample + a * nextSample; //interpolate
 
-      float outputSample = delayedSample * mGain;
+      double outputSample = delayedSample * mGain;
       mTapBuffer.GetChannel(ch)[offset] = outputSample;
 
       *sampleOut += outputSample;
@@ -350,12 +350,12 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
    }
 }
 
-void MultitapDelay::DelayTap::Draw(float w, float h)
+void MultitapDelay::DelayTap::Draw(double w, double h)
 {
    ofPushStyle();
    ofFill();
-   float x = ofClamp(1 - (mDelayMs * gSampleRateMs) / (mOwner->mDisplayLength * gSampleRate), 0, 1) * w;
-   float y = h - mGain * h;
+   double x = ofClamp(1 - (mDelayMs * gSampleRateMs) / (mOwner->mDisplayLength * gSampleRate), 0, 1) * w;
+   double y = h - mGain * h;
    ofLine(x, y, x, h);
    ofRect(x - 5, y - 5, 10, 10);
    ofPopStyle();

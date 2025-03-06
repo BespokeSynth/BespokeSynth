@@ -223,7 +223,7 @@ void RadioSequencer::DrawModule()
 
    for (int i = 0; i < mControlCables.size(); ++i)
    {
-      mControlCables[i]->SetManualPosition(GetRect(true).width, mGrid->GetPosition(true).y + (mGrid->GetHeight() / mGrid->GetRows()) * (i + .5f));
+      mControlCables[i]->SetManualPosition(GetRect(true).width, mGrid->GetPosition(true).y + (mGrid->GetHeight() / mGrid->GetRows()) * (i + .5));
    }
 }
 
@@ -332,8 +332,8 @@ void RadioSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time
 
 namespace
 {
-   const float extraW = 10;
-   const float extraH = 30;
+   const double extraW = 10;
+   const double extraH = 30;
 }
 
 void RadioSequencer::GetModuleDimensions(double& width, double& height)
@@ -349,7 +349,7 @@ void RadioSequencer::Resize(double w, double h)
    SetGridSize(w, h);
 }
 
-void RadioSequencer::SetGridSize(float w, float h)
+void RadioSequencer::SetGridSize(double w, double h)
 {
    mGrid->SetDimensions(w, h);
 }

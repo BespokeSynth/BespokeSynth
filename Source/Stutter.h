@@ -76,7 +76,7 @@ public:
 
    void Init();
 
-   void DrawStutterBuffer(float x, float y, float width, float height);
+   void DrawStutterBuffer(double x, double y, double width, double height);
    void StartStutter(double time, StutterParams stutter);
    void EndStutter(double time, StutterParams stutter);
    void SetEnabled(double time, bool enabled);
@@ -95,7 +95,7 @@ private:
    float GetStutterSampleWithWraparoundBlend(int pos, int ch);
    void DoStutter(double time, StutterParams stutter);
    void StopStutter(double time);
-   float GetBufferReadPos(float stutterPos);
+   double GetBufferReadPos(double stutterPos);
 
    RollingBuffer mRecordBuffer;
    ChannelBuffer mStutterBuffer;
@@ -105,7 +105,7 @@ private:
    int mCaptureLength{ 1 };
    int mStutterLength{ 1 };
    Ramp mStutterSpeed;
-   float mStutterPos{ 0 };
+   double mStutterPos{ 0 };
    bool mAutoStutter{ false };
    Checkbox* mAutoCheckbox{ nullptr };
    Ramp mBlendRamp;

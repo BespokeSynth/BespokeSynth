@@ -126,7 +126,7 @@ void EnvelopeControl::Draw()
       ofEndShape(false);
 
       double time = 0;
-      ofSetLineWidth(.5f);
+      ofSetLineWidth(.5);
       for (int i = 0; i < mAdsr->GetNumStages(); ++i)
       {
          if (mAdsr->GetHasSustainStage() && i == mAdsr->GetSustainStage() + 1)
@@ -241,7 +241,7 @@ void EnvelopeControl::MouseReleased()
    mClick = false;
 }
 
-void EnvelopeControl::MouseMoved(float x, float y)
+void EnvelopeControl::MouseMoved(double x, double y)
 {
    if (mAdsr == nullptr)
       return;

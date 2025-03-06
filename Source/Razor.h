@@ -77,7 +77,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float SinSample(float phase); //phase 0-512
+   double SinSample(double phase); //phase 0-512
    void CalcAmp();
    void DrawViz();
 

@@ -244,7 +244,7 @@ void TextEntry::OnClicked(double x, double y, bool right)
 
          int substrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 12);
          //ofLog() << x << " " << i << " " << (xOffset + substrWidth);
-         if (x > xOffset + ((substrWidth + lastSubstrWidth) * .5f))
+         if (x > xOffset + ((substrWidth + lastSubstrWidth) * .5))
          {
             mCaretPosition = i + 1;
             break;

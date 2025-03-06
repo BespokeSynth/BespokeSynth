@@ -88,7 +88,7 @@ void FollowingSong::Process(double time)
       {
          for (int i = 0; i < bufferSize; ++i)
          {
-            float sample = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
+            double sample = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
             if (mMute)
                sample = 0;
             out[i] += sample;

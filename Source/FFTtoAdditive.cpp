@@ -95,7 +95,7 @@ void FFTtoAdditive::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   float inputPreampSq = mInputPreamp * mInputPreamp;
+   double inputPreampSq = mInputPreamp * mInputPreamp;
    double volSq = mVolume * mVolume;
 
    int bufferSize = GetBuffer()->BufferSize();
@@ -113,12 +113,12 @@ void FFTtoAdditive::Process(double time)
 
    for (int i = 0; i < fftFreqDomainSize; ++i)
    {
-      float real = mFFTData.mRealValues[i];
-      float imag = mFFTData.mImaginaryValues[i];
+      double real = mFFTData.mRealValues[i];
+      double imag = mFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      float amp = 2.f * sqrtf(real * real + imag * imag);
-      float phase = atan2(imag, real);
+      double amp = 2. * std::sqrt(real * real + imag * imag);
+      double phase = atan2(imag, real);
 
       mFFTData.mRealValues[i] = amp / (fftWindowSize / 2);
       mFFTData.mImaginaryValues[i] = phase;
@@ -127,11 +127,11 @@ void FFTtoAdditive::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    for (int i = 0; i < bufferSize; ++i)
    {
-      float write = 0;
+      double write = 0;
       for (int j = 1; j < numPartials; ++j)
       {
-         double phase = ((mFFTData.mImaginaryValues[j + 1] + i * mPhaseInc[j]) / FTWO_PI) * 512;
-         float sample = SinSample(phase) * mFFTData.mRealValues[j + 1] * volSq * .4;
+         double phase = ((mFFTData.mImaginaryValues[j + 1] + i * mPhaseInc[j]) / TWO_PI) * 512;
+         double sample = SinSample(phase) * mFFTData.mRealValues[j + 1] * volSq * .4;
          write += sample;
       }
 
@@ -181,7 +181,7 @@ void FFTtoAdditive::DrawViz()
 
    for (int i = 1; i < RAZOR_HISTORY - 1; ++i)
    {
-      float age = 1 - float(i) / RAZOR_HISTORY;
+      double age = 1 - static_cast<double>(i) / RAZOR_HISTORY;
       ofSetColor(0, 200 * age, 255 * age);
       for (int x = 0; x < VIZ_WIDTH; ++x)
       {
@@ -207,8 +207,8 @@ void FFTtoAdditive::DrawViz()
    std::memset(mPeakHistory[mHistoryPtr], 0, sizeof(float) * VIZ_WIDTH);
    for (int i = 1; i <= numPartials; ++i)
    {
-      float height = mFFTData.mRealValues[i - 1];
-      int intHeight = int(height * 100.0f);
+      double height = mFFTData.mRealValues[i - 1];
+      int intHeight = int(height * 100.0);
       if (intHeight == 0)
       {
          if (height > 0)

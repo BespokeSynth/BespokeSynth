@@ -57,7 +57,7 @@ public:
 
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
-   void MouseMoved(float x, float y);
+   void MouseMoved(double x, double y);
    void MouseReleased();
    IDrawableModule* GetModuleAt(double x, double y);
    void GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output, bool ignorePinned = false);

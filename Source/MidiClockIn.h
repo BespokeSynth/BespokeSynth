@@ -151,7 +151,7 @@ private:
 
    MidiDevice mDevice;
 
-   std::array<float, kMaxHistory> mTempoHistory;
+   std::array<double, kMaxHistory> mTempoHistory;
    int mTempoIdx{ -1 };
    double mLastTimestamp{ -1 };
    int mReceivedPulseCount{ 0 };

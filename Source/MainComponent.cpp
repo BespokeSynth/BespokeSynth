@@ -353,12 +353,12 @@ public:
       mouse -= mScreenPosition;
       mSynth.MouseMoved(mouse.x, mouse.y);
 
-      float width = getWidth();
-      float height = getHeight();
+      double width = getWidth();
+      double height = getHeight();
 
       static double kMotionTrails = .4;
 
-      ofVec3f bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
+      ofVec3d bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
       glViewport(0, 0, width * mPixelRatio, height * mPixelRatio);
       glClearColor(bgColor.x, bgColor.y, bgColor.z, 0);
       if (UserPrefs.motion_trails.Get() <= 0)
@@ -375,7 +375,7 @@ public:
 
       nvgLineCap(mVG, NVG_ROUND);
       nvgLineJoin(mVG, NVG_ROUND);
-      static float sSpacing = -.3f;
+      static double sSpacing = -.3;
       nvgTextLetterSpacing(mVG, sSpacing);
       nvgTextLetterSpacing(mFontBoundsVG, sSpacing);
 
@@ -445,11 +445,11 @@ private:
 
    void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& wheel) override
    {
-      float invert = 1;
+      double invert = 1;
       if (wheel.isReversed)
          invert = -1;
 
-      float scale = 6;
+      double scale = 6;
       if (wheel.isSmooth)
          scale = 30;
 

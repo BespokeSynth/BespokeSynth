@@ -33,7 +33,7 @@
 
 namespace
 {
-   const float kKeyboardYOffset = 0;
+   const double kKeyboardYOffset = 0;
 }
 
 KeyboardDisplay::KeyboardDisplay()
@@ -95,18 +95,18 @@ void KeyboardDisplay::OnClicked(double x, double y, bool right)
             {
                int pitch = i + RootKey();
 
-               float minVelocityY;
-               float maxVelocityY;
+               double minVelocityY;
+               double maxVelocityY;
 
                if (isBlackKey)
                {
                   minVelocityY = 0;
-                  maxVelocityY = (mHeight / 2) * .9f;
+                  maxVelocityY = (mHeight / 2) * .9;
                }
                else
                {
                   minVelocityY = mHeight / 2;
-                  maxVelocityY = mHeight * .9f;
+                  maxVelocityY = mHeight * .9;
                }
 
                int noteVelocity = 127;
@@ -249,7 +249,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       for (int i = 0; i < NumKeys(); i += 7)
       {
          ofSetColor(108, 37, 62, 255);
-         DrawTextNormal(NoteName(oct * 12, false, true), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 12);
+         DrawTextNormal(NoteName(oct * 12, false, true), keySpace * 0.5 - 6.5 + i * keySpace, h - 8, 12);
          oct++;
       }
    }

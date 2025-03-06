@@ -780,8 +780,8 @@ void Snapshots::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("auto_store_on_switch", moduleInfo, false);
 
    //for rev < 4
-   mOldWidth = moduleInfo["gridwidth"].asFloat();
-   mOldHeight = moduleInfo["gridheight"].asFloat();
+   mOldWidth = moduleInfo["gridwidth"].asDouble();
+   mOldHeight = moduleInfo["gridheight"].asDouble();
 
    SetUpFromSaveData();
 }

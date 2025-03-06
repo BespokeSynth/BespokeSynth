@@ -89,7 +89,7 @@ public:
 
 private:
    void StopRecording();
-   float DetectSamplePitch();
+   double DetectSamplePitch();
    void UpdateForNewSample();
 
    //IDrawableModule

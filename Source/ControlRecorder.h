@@ -102,7 +102,7 @@ private:
    double mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
-   float mDisplayStartY{ 0 };
+   double mDisplayStartY{ 0 };
    double mWidth{ 220 };
    double mHeight{ 100 };
    double mRecordStartOffset{ 0 };

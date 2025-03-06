@@ -64,15 +64,15 @@ SingleOscillator::SingleOscillator()
 
 namespace
 {
-   const float kColumnWidth = 90;
-   const float kGap = 5;
+   const double kColumnWidth = 90;
+   const double kGap = 5;
 }
 
 void SingleOscillator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   float width, height;
+   double width, height;
 
    UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
    UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth, 36, &mVoiceParams.mAdsr));
@@ -276,8 +276,8 @@ void SingleOscillator::DrawModule()
       int height = 36;
       int width = kColumnWidth;
 
-      ofSetColor(100, 100, .8f * gModuleDrawAlpha);
-      ofSetLineWidth(.5f);
+      ofSetColor(100, 100, .8 * gModuleDrawAlpha);
+      ofSetLineWidth(.5);
       ofRect(x, y, width, height, 0);
 
       ofSetColor(245, 58, 0, gModuleDrawAlpha);
@@ -321,7 +321,7 @@ void SingleOscillator::DrawModuleUnclipped()
    if (mDrawDebug)
    {
       mPolyMgr.DrawDebug(mWidth + 3, 0);
-      float y = mHeight + 15;
+      double y = mHeight + 15;
       for (size_t i = 0; i < mDebugLines.size(); ++i)
       {
          const DebugLine& line = mDebugLines[(mDebugLinesPos + i) % mDebugLines.size()];

@@ -192,7 +192,7 @@ StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
       case kTumbleDown:
          return StutterParams(kInterval_32n, 1, 0, 2000);
       case kHalfSpeed:
-         return StutterParams(kInterval_8n, .5f);
+         return StutterParams(kInterval_8n, .5);
       case kDoubleSpeed:
          return StutterParams(kInterval_8n, 2);
       case kDotted8th:

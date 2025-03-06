@@ -162,8 +162,8 @@ void SampleCanvas::CanvasUpdated(Canvas* canvas)
 
 namespace
 {
-   const float extraW = 20;
-   const float extraH = 163;
+   const double extraW = 20;
+   const double extraH = 163;
 }
 
 void SampleCanvas::Resize(double w, double h)

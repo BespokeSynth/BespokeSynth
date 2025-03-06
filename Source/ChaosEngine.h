@@ -118,8 +118,8 @@ private:
    };
 
    void SetPitchColor(int pitch);
-   void DrawKeyboard(float x, float y);
-   void DrawGuitar(float x, float y);
+   void DrawKeyboard(double x, double y);
+   void DrawGuitar(double x, double y);
    bool IsChordRoot(int pitch);
    void ReadSongs();
    void UpdateProgression(int beat);

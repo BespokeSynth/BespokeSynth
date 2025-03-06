@@ -378,10 +378,10 @@ bool QuickSpawnMenu::MatchesFilter(const ModuleFactory::Spawnable& spawnable) co
 
 void QuickSpawnMenu::UpdatePosition()
 {
-   float minX = 5;
-   float maxX = ofGetWidth() / GetOwningContainer()->GetDrawScale() - mWidth - 5;
-   float minY = TheTitleBar->GetRect().height + 5;
-   float maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
+   double minX = 5;
+   double maxX = ofGetWidth() / GetOwningContainer()->GetDrawScale() - mWidth - 5;
+   double minY = TheTitleBar->GetRect().height + 5;
+   double maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
 
    if (mMenuMode == MenuMode::SingleLetter)
    {
@@ -401,7 +401,7 @@ void QuickSpawnMenu::MouseReleased()
 
 bool QuickSpawnMenu::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   const float kScrollSpeed = 5;
+   const double kScrollSpeed = 5;
 
    if (isInvertedScroll)
       scrollY *= -1;
@@ -414,8 +414,8 @@ bool QuickSpawnMenu::MouseScrolled(double x, double y, double scrollX, double sc
          scrollY = kItemSpacing / kScrollSpeed;
    }
 
-   float newY = ofClamp(y - scrollY * kScrollSpeed, kItemSpacing / 2, mHeight - kItemSpacing / 2);
-   float changeAmount = newY - y;
+   double newY = ofClamp(y - scrollY * kScrollSpeed, kItemSpacing / 2, mHeight - kItemSpacing / 2);
+   double changeAmount = newY - y;
    mScrollOffset -= changeAmount;
    UpdatePosition();
 
@@ -425,7 +425,7 @@ bool QuickSpawnMenu::MouseScrolled(double x, double y, double scrollX, double sc
 void QuickSpawnMenu::MoveMouseToIndex(int index)
 {
    mHighlightIndex = index;
-   TheSynth->SetMousePosition(GetOwningContainer(), mX + 5, mY + (index + .5f) * kItemSpacing);
+   TheSynth->SetMousePosition(GetOwningContainer(), mX + 5, mY + (index + .5) * kItemSpacing);
 }
 
 void QuickSpawnMenu::DrawModule()
@@ -442,9 +442,9 @@ void QuickSpawnMenu::DrawModule()
    for (int i = 0; i < mElements.size(); ++i)
    {
       if (mMenuMode == MenuMode::ModuleCategories)
-         ofSetColor(IDrawableModule::GetColor(TheTitleBar->GetSpawnLists()[mCategoryIndices[i]]->GetCategory()) * (i == mHighlightIndex ? .7f : .5f), 255);
+         ofSetColor(IDrawableModule::GetColor(TheTitleBar->GetSpawnLists()[mCategoryIndices[i]]->GetCategory()) * (i == mHighlightIndex ? .7 : .5), 255);
       else
-         ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleCategory(mElements[i])) * (i == mHighlightIndex ? .7f : .5f), 255);
+         ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleCategory(mElements[i])) * (i == mHighlightIndex ? .7 : .5), 255);
       ofRect(0, i * kItemSpacing + 1, mWidth, kItemSpacing - 1);
       if (i == mHighlightIndex)
          ofSetColor(255, 255, 0);

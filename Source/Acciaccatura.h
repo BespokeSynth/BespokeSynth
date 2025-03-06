@@ -73,8 +73,8 @@ private:
       Chromatic
    };
 
-   float mWidth;
-   float mHeight;
+   double mWidth;
+   double mHeight;
 
    int mOffset{ -1 };
    IntSlider* mOffsetSlider{ nullptr };

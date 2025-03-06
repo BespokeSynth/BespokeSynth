@@ -100,7 +100,7 @@ private:
    void GetModuleDimensions(double& width, double& height) override;
    void OnClicked(double x, double y, bool right) override;
 
-   void Step(double time, float velocity, int flags);
+   void Step(double time, double velocity, int flags);
 
    static const int kMaxSteps = 128;
    double mWidth{ 254 };

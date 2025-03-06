@@ -361,7 +361,7 @@ void TitleBar::DrawModule()
    if (IKeyboardFocusListener::GetActiveKeyboardFocus())
       info += " (entering text)";
 
-   float pixelWidth = GetPixelWidth();
+   double pixelWidth = GetPixelWidth();
 
    DrawTextRightJustify(info, pixelWidth - 140, 32);
 
@@ -378,8 +378,8 @@ void TitleBar::DrawModule()
       mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
    mPlayPauseButton->Draw();
 
-   float startX = 400;
-   float startY = 2;
+   double startX = 400;
+   double startY = 2;
 
    if (pixelWidth < kDoubleHeightThreshold)
    {
@@ -387,8 +387,8 @@ void TitleBar::DrawModule()
       startY += 16 * 2 + 4;
    }
 
-   float x = startX;
-   float y = startY;
+   double x = startX;
+   double y = startY;
    for (auto* spawnList : mSpawnLists.GetDropdowns())
    {
       spawnList->SetPosition(x, y);
@@ -412,7 +412,7 @@ void TitleBar::DrawModule()
    }
    mModuleCategory = type;
 
-   float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
+   double usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
    std::string stats;
    stats += "fps:" + ofToString(ofGetFrameRate(), 0);
    stats += "  audio cpu:" + ofToString(usage * 100, 1);

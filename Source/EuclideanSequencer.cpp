@@ -872,7 +872,7 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, double oldV
       {
          if (sEuclid[i] == '1')
          {
-            mSteps[i] = .5f;
+            mSteps[i] = .5;
          }
          else
          {

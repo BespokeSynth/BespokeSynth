@@ -64,7 +64,7 @@ public:
 private:
    struct PulseInfo
    {
-      float mVelocity{ 0 };
+      double mVelocity{ 0 };
       int mFlags{ 0 };
       double mTriggerTime{ 0 };
    };

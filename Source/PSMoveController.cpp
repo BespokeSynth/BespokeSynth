@@ -71,7 +71,7 @@ void PSMoveController::Poll()
    mMoveMgr.Update();
    mMoveMgr.SetVibration(0, mVibration.Value(gTime));
 
-   ofVec3f gyros(0, 0, 0);
+   ofVec3d gyros(0, 0, 0);
    mMoveMgr.GetGyros(0, gyros);
 
    bool isButtonDown = false;
@@ -114,7 +114,7 @@ void PSMoveController::Poll()
       mPSButtonDown = false;
    }
 
-   ofVec3f accel(0, 0, 0);
+   ofVec3d accel(0, 0, 0);
    mMoveMgr.GetAccel(0, accel);
    mEnergy = ofClamp(accel.length() / 5000 - .8, 0, 1);
    if (mEnergyUIControl)

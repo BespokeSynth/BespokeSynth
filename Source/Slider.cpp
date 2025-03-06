@@ -361,7 +361,7 @@ bool FloatSlider::MouseMoved(double x, double y)
    return mMouseDown;
 }
 
-void FloatSlider::SetValueForMouse(float x, float y)
+void FloatSlider::SetValueForMouse(double x, double y)
 {
    double* var = GetModifyValue();
    double fX = x;

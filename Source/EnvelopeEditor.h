@@ -41,7 +41,7 @@ public:
    EnvelopeControl(ofVec2d position, ofVec2d dimensions);
    void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
    void OnClicked(double x, double y, bool right);
-   void MouseMoved(float x, float y);
+   void MouseMoved(double x, double y);
    void MouseReleased();
    void Draw();
    void SetViewLength(double length) { mViewLength = length; }

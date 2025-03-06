@@ -77,7 +77,7 @@ void NoteStreamDisplay::DrawModule()
             ofSetColor(0, ofMap(mNoteStream[i].velocity, 0, 127.0, 50, 200), 0);
             ofRect(xStart, yStart, xEnd - xStart, noteHeight, L(cornerRadius, 2));
 
-            ofSetColor(mNoteStream[i].velocity / 127.0f * 255, mNoteStream[i].velocity / 127.0f * 255, mNoteStream[i].velocity / 127.0f * 255);
+            ofSetColor(mNoteStream[i].velocity / 127.0 * 255, mNoteStream[i].velocity / 127.0 * 255, mNoteStream[i].velocity / 127.0 * 255);
             ofRect(xStart, yStart, 3, noteHeight, L(cornerRadius, 2));
 
             ofSetColor(0, 0, 0);

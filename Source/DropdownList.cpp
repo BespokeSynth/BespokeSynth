@@ -595,7 +595,7 @@ void DropdownList::LoadState(FileStreamIn& in, bool shouldSetValue)
       float var;
       in >> var;
       if (shouldSetValue)
-         SetValueDirect(var, gTime);
+         SetValueDirect(static_cast<double>(var), gTime);
    }
    else
    {

@@ -111,7 +111,7 @@ private:
 
    int mWidth{ 15 };
    int mHeight{ 15 };
-   float mElementWidth{ 8 };
+   double mElementWidth{ 8 };
    std::vector<RadioButtonElement> mElements;
    int* mVar;
    IRadioButtonListener* mOwner;

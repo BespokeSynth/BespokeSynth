@@ -153,7 +153,7 @@ void PulseSequence::OnPulse(double time, double velocity, int flags)
    Step(time, velocity, flags);
 }
 
-void PulseSequence::Step(double time, float velocity, int flags)
+void PulseSequence::Step(double time, double velocity, int flags)
 {
    if (!mEnabled)
       return;
@@ -182,7 +182,7 @@ void PulseSequence::Step(double time, float velocity, int flags)
       mStep = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
    }
 
-   float v = mVels[mStep] * velocity;
+   double v = mVels[mStep] * velocity;
 
    if (v > 0)
    {

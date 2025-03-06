@@ -353,9 +353,9 @@ void NoteCanvas::DrawModule()
    for (int i = 0; i < mCanvas->GetNumVisibleRows(); ++i)
    {
       int pitch = 127 - mCanvas->GetRowOffset() - i;
-      float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
-      float y = mCanvas->GetPosition(true).y + i * boxHeight;
-      float scale = MIN(boxHeight - 2, 18);
+      double boxHeight = mCanvas->GetHeight() / mCanvas->GetNumVisibleRows();
+      double y = mCanvas->GetPosition(true).y + i * boxHeight;
+      double scale = MIN(boxHeight - 2, 18);
       DrawTextNormal(NoteName(pitch, false, true) + "(" + ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale / 8) + boxHeight, scale);
    }
    ofPopStyle();
@@ -380,7 +380,7 @@ void NoteCanvas::DrawModule()
                   {
                      auto rect1 = e1->GetRect(true, false);
                      auto rect2 = e2->GetRect(true, false);
-                     float offset = 0;
+                     double offset = 0;
                      if (interval == 3)
                      {
                         ofSetColor(255, 0, 0, 50);
@@ -433,7 +433,7 @@ void NoteCanvas::DrawModule()
    if (mRecord)
    {
       ofPushStyle();
-      ofSetColor(205 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)), 0, 0);
+      ofSetColor(205 + 50 * (cos(TheTransport->GetMeasurePos(gTime) * 4 * TWO_PI)), 0, 0);
       ofSetLineWidth(4);
       ofRect(mCanvas->GetPosition(true).x, mCanvas->GetPosition(true).y, mCanvas->GetWidth(), mCanvas->GetHeight());
       ofPopStyle();
@@ -442,8 +442,8 @@ void NoteCanvas::DrawModule()
 
 namespace
 {
-   const float extraW = 20;
-   const float extraH = 163;
+   const double extraW = 20;
+   const double extraH = 163;
 }
 
 void NoteCanvas::Resize(double w, double h)

@@ -88,7 +88,7 @@ void UnstablePitch::DrawModule()
          ofBeginShape();
          for (int i = 0; i < gBufferSize; ++i)
          {
-            float sample = ofClamp(mModulation.GetPitchBend(voice)->GetBufferValue(i) * 5, -1, 1);
+            double sample = ofClamp(mModulation.GetPitchBend(voice)->GetBufferValue(i) * 5, -1, 1);
             ofVertex((i * rect.width) / gBufferSize + rect.x, rect.y + (-sample * .5 + .5) * rect.height);
          }
          ofEndShape();

@@ -93,7 +93,7 @@ private:
    {
       DelayTap();
       void Process(float* sampleOut, int offset, int ch);
-      void Draw(float w, float h);
+      void Draw(double w, double h);
 
       double mDelayMs{ 100 };
       double mGain{ 0 };

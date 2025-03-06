@@ -109,7 +109,7 @@ private:
    {
       GrainMPEVoice();
       void Process(ChannelBuffer* output, int bufferSize);
-      void Draw(float w, float h);
+      void Draw(double w, double h);
 
       double mPlay{ 0 };
       double mPitch{ 0 };
@@ -128,7 +128,7 @@ private:
    {
       GrainManualVoice();
       void Process(ChannelBuffer* output, int bufferSize);
-      void Draw(float w, float h);
+      void Draw(double w, double h);
 
       double mGain{ 0 };
       double mPosition{ 0 };

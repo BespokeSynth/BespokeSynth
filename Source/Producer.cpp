@@ -30,10 +30,10 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 
-const float mBufferX = 5;
-const float mBufferY = 80;
-const float mBufferW = 900;
-const float mBufferH = 300;
+const double mBufferX = 5;
+const double mBufferY = 80;
+const double mBufferW = 900;
+const double mBufferH = 300;
 
 Producer::Producer()
 {
@@ -283,7 +283,7 @@ void Producer::DrawModule()
       {
          if (GetMeasureSample(measure) >= mZoomStart)
          {
-            float pos = GetBufferPos(GetMeasureSample(measure));
+            double pos = GetBufferPos(GetMeasureSample(measure));
             ofSetColor(0, 0, 255);
             ofRect(pos * mBufferW, 0, 1, mBufferH);
 
@@ -300,20 +300,20 @@ void Producer::DrawModule()
        
        for (int i = 0; i < mNumBars; i++)
        {
-       float barSpacing = float(end-start)/mNumBars;
+       double barSpacing = double(end-start) / mNumBars;
        int x =  barSpacing * i + start;
        x += barSpacing * -mOffset;
-       ofSetColor(255,255,0);
+       ofSetColor(255, 255, 0);
        ofLine(x, 0, x, height);
        }
        
-       ofSetColor(255,0,0);
-       ofLine(start,0,start,height);
-       ofLine(end,0,end,height);
+       ofSetColor(255, 0, 0);
+       ofLine(start, 0, start, height);
+       ofLine(end, 0, end, height);
        
        ofSetColor(0,255,0);
        int position =  ofMap(pos, 0, length, 0, width, true);
-       ofLine(position,0,position,height);*/
+       ofLine(position, 0, position, height);*/
 
       ofPopStyle();
       ofPopMatrix();
@@ -350,8 +350,8 @@ void Producer::OnClicked(double x, double y, bool right)
    {
       if (IsKeyHeld('x'))
       {
-         float pos = (x - mBufferX) / mBufferW;
-         float sample = pos * (mZoomEnd - mZoomStart) + mZoomStart;
+         double pos = (x - mBufferX) / mBufferW;
+         double sample = pos * (mZoomEnd - mZoomStart) + mZoomStart;
          int measure = GetMeasureForSample(sample);
          if (IsSkipMeasure(measure))
             mSkipMeasures.remove(measure);

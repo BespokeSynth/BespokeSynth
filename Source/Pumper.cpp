@@ -121,7 +121,7 @@ void Pumper::DrawModule()
    ofPushStyle();
    ofSetColor(0, 200, 0, 50);
    ofFill();
-   ofRect(0, mHeight * .8f, mLastValue * mWidth, mHeight * .2f);
+   ofRect(0, mHeight * .8, mLastValue * mWidth, mHeight * .2);
    ofPopStyle();
 
    ofPushStyle();

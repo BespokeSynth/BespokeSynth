@@ -406,7 +406,7 @@ bool DrumPlayer::DrumHit::Process(double time, double speed, double vol, Channel
             for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
             {
                int dataChannel = MIN(ch, sampleData->NumActiveChannels() - 1);
-               float sample = GetInterpolatedSample(mPlayheads[playhead].mOffset, sampleData->GetChannel(dataChannel), mSample.LengthInSamples());
+               double sample = GetInterpolatedSample(mPlayheads[playhead].mOffset, sampleData->GetChannel(dataChannel), mSample.LengthInSamples());
                sample *= mVelocity * vol * mVol * mVol;
                if (mUseEnvelope)
                   sample *= mEnvelope.Value(mPlayheads[playhead].mEnvelopeTime);
@@ -429,8 +429,8 @@ bool DrumPlayer::DrumHit::Process(double time, double speed, double vol, Channel
       }
 
       int secondChannel = out->NumActiveChannels() == 1 ? 0 : 1;
-      float left = gWorkBuffer[0];
-      float right = gWorkBuffer[secondChannel];
+      double left = gWorkBuffer[0];
+      double right = gWorkBuffer[secondChannel];
 
       if (mPan + mPanInput != 0 && mOwner->mMonoOutput == false)
       {
@@ -532,7 +532,7 @@ bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int c
 
          if (x < 4 && y < 4)
          {
-            OnGridButton(x, 3 - y, midiValue / 127.0f, nullptr);
+            OnGridButton(x, 3 - y, midiValue / 127.0, nullptr);
          }
          else if (x < 4 && midiValue > 0)
          {
@@ -1094,7 +1094,7 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double t
             mDrumHits[mSelectedHitIdx].mSample.Read(file.c_str());
             LoadSampleUnlock();
             mDrumHits[mSelectedHitIdx].StartPlayhead(time, 0, 1);
-            mDrumHits[mSelectedHitIdx].mVelocity = .5f;
+            mDrumHits[mSelectedHitIdx].mVelocity = .5;
             mDrumHits[mSelectedHitIdx].mEnvelopeLength = mDrumHits[mSelectedHitIdx].mSample.LengthInSamples() * gInvSampleRateMs;
          }
       }

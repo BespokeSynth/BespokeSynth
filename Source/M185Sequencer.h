@@ -66,7 +66,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(double& width, double& height) override;
 
-   void StepBy(double time, float velocity, int flags);
+   void StepBy(double time, double velocity, int flags);
    void ResetStep();
    void FindNextStep();
 
@@ -86,7 +86,7 @@ private:
       int mPulseCount{ 0 };
       GateType mGate{ GateType::kGate_Repeat };
 
-      float xPos{ 0 }, yPos{ 0 };
+      double xPos{ 0 }, yPos{ 0 };
 
       IntSlider* mPitchSlider{ nullptr };
       IntSlider* mPulseCountSlider{ nullptr };

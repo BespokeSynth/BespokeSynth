@@ -115,7 +115,7 @@ private:
    MenuMode mMenuMode{ MenuMode::SingleLetter };
    int mSelectedCategoryIndex{ -1 };
    juce::String mSearchString;
-   float mScrollOffset{ 0 };
+   double mScrollOffset{ 0 };
    PatchCable* mFilterForCable{ nullptr };
    QuickSpawnFollower* mMainContainerFollower{ nullptr };
 };

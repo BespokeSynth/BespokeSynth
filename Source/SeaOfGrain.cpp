@@ -34,10 +34,10 @@
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
-const float mBufferX = 5;
-const float mBufferY = 100;
-const float mBufferW = 800;
-const float mBufferH = 200;
+const double mBufferX = 5;
+const double mBufferY = 100;
+const double mBufferW = 800;
+const double mBufferH = 200;
 
 SeaOfGrain::SeaOfGrain()
 : IAudioProcessor(gBufferSize)
@@ -207,7 +207,7 @@ void SeaOfGrain::DrawModule()
       for (int i = 0; i < mKeyboardNumPitches; ++i)
       {
          ofSetColor(i % 2 * 200, 200, 0);
-         ofRect(mBufferW * float(i) / mKeyboardNumPitches, mBufferH, mBufferW / mKeyboardNumPitches, 10);
+         ofRect(mBufferW * static_cast<double>(i) / mKeyboardNumPitches, mBufferH, mBufferW / mKeyboardNumPitches, 10);
       }
       ofPopStyle();
 
@@ -487,7 +487,7 @@ void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize)
    }
 }
 
-void SeaOfGrain::GrainMPEVoice::Draw(float w, float h)
+void SeaOfGrain::GrainMPEVoice::Draw(double w, double h)
 {
    if (!mADSR.IsDone(gTime))
    {
@@ -543,14 +543,14 @@ void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize
    }
 }
 
-void SeaOfGrain::GrainManualVoice::Draw(float w, float h)
+void SeaOfGrain::GrainManualVoice::Draw(double w, double h)
 {
    if (mGain > 0)
    {
       ofPushStyle();
       ofFill();
-      float x = mPosition * w;
-      float y = h - mGain * h;
+      double x = mPosition * w;
+      double y = h - mGain * h;
       ofLine(x, y, x, h);
       ofRect(x - 5, y - 5, 10, 10);
       ofPopStyle();

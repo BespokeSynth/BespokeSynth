@@ -63,7 +63,7 @@ void ClickButton::UpdateWidth()
 {
    if (mDisplayStyle == ButtonDisplayStyle::kText || mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
    {
-      mWidth = GetStringWidth(GetDisplayName()) + 3 + .25f * strnlen(GetDisplayName().c_str(), 50);
+      mWidth = GetStringWidth(GetDisplayName()) + 3 + .25 * strnlen(GetDisplayName().c_str(), 50);
       if (mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
          mWidth += 20;
    }

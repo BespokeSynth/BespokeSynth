@@ -96,5 +96,5 @@ private:
 
    double mWidth{ 200 };
    double mHeight{ 20 };
-   float mBufferX{ 0 };
+   double mBufferX{ 0 };
 };

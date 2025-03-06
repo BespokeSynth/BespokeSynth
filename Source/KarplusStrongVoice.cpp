@@ -102,7 +102,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       else
          mOsc.SetType(kOsc_Sin);
       mOscPhase += oscPhaseInc;
-      float sample = 0;
+      double sample = 0;
       double oscSample = mOsc.Audio(time, mOscPhase);
       double noiseSample = RandomSample();
       double pitchBlend = ofClamp((pitch - 40) / 60.0, 0, 1);

@@ -318,8 +318,8 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
 #undef UIBLOCK_OWNER
 #define UIBLOCK_OWNER mParent //change owner
 
-   float width, height;
-   float kColumnWidth = (DRUMSYNTH_PAD_WIDTH - 5 * 2 - 3) * .5f;
+   double width, height;
+   double kColumnWidth = (DRUMSYNTH_PAD_WIDTH - 5 * 2 - 3) * .5;
    UIBLOCK(mX + 5, mY + 15, kColumnWidth);
 
    UICONTROL_CUSTOM(mToneAdsrDisplay, new ADSRDisplay(UICONTROL_BASICS(("adsrtone" + ofToString(mIndex)).c_str()), kColumnWidth, 36, mData.mTone.GetADSR()));
@@ -333,14 +333,14 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
    UIBLOCK(mX + 5, height + 3);
    UICONTROL_CUSTOM(mToneType, new RadioButton(UICONTROL_BASICS(("type" + ofToString(mIndex)).c_str()), (int*)(&mData.mTone.mOsc.mType)));
    UIBLOCK_SHIFTX(30);
-   float freqAdsrWidth = DRUMSYNTH_PAD_WIDTH - 5 * 2 - 3 - 30;
+   double freqAdsrWidth = DRUMSYNTH_PAD_WIDTH - 5 * 2 - 3 - 30;
    UICONTROL_CUSTOM(mFreqAdsrDisplay, new ADSRDisplay(UICONTROL_BASICS(("adsrfreq" + ofToString(mIndex)).c_str()), freqAdsrWidth, 36, &mData.mFreqAdsr));
    UIBLOCK_PUSHSLIDERWIDTH(freqAdsrWidth);
    FLOATSLIDER(mFreqMaxSlider, ("freqmax" + ofToString(mIndex)).c_str(), &mData.mFreqMax, 0, 1600);
    FLOATSLIDER(mFreqMinSlider, ("freqmin" + ofToString(mIndex)).c_str(), &mData.mFreqMin, 0, 1600);
 
    UIBLOCK_NEWLINE();
-   float filterAdsrWidth = DRUMSYNTH_PAD_WIDTH - 5 * 2;
+   double filterAdsrWidth = DRUMSYNTH_PAD_WIDTH - 5 * 2;
    UICONTROL_CUSTOM(mFilterAdsrDisplay, new ADSRDisplay(UICONTROL_BASICS(("adsrfilter" + ofToString(mIndex)).c_str()), filterAdsrWidth, 36, &mData.mFilterAdsr));
    UIBLOCK_PUSHSLIDERWIDTH(filterAdsrWidth);
    FLOATSLIDER(mFilterCutoffMaxSlider, ("cutoffmax" + ofToString(mIndex)).c_str(), &mData.mCutoffMax, 10, DRUMSYNTH_NO_CUTOFF);

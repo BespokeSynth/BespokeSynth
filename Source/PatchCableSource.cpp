@@ -261,8 +261,8 @@ void PatchCableSource::Render()
 
    ofPushStyle();
 
-   float cableX = mX;
-   float cableY = mY;
+   double cableX = mX;
+   double cableY = mY;
    if (mOwner->GetOwningContainer() != nullptr)
    {
       cableX -= mOwner->GetOwningContainer()->GetOwnerPosition().x;
@@ -299,7 +299,7 @@ void PatchCableSource::Render()
       {
          ofSetLineWidth(0);
          ofColor color = GetColor();
-         float radius = kPatchCableSourceRadius;
+         double radius = kPatchCableSourceRadius;
          IDrawableModule* moveModule = TheSynth->GetMoveModule();
          if (GetKeyModifiers() == kModifier_Shift && moveModule != nullptr)
          {
@@ -311,8 +311,8 @@ void PatchCableSource::Render()
             if ((IsValidTarget(moveModule) && GetTarget() != moveModule) || (GetOwner() == moveModule && GetTarget() == nullptr))
             {
                //highlight autopatchable cable sources
-               float lerp = ofMap(sin(gTime / 600 * PI * 2), -1, 1, 0, 1);
-               color = ofColor::lerp(color, ofColor::white, lerp * .7f);
+               double lerp = ofMap(sin(gTime / 600 * PI * 2), -1, 1, 0, 1);
+               color = ofColor::lerp(color, ofColor::white, lerp * .7);
                radius = ofLerp(radius, kPatchCableSourceClickRadius, lerp);
             }
          }
@@ -363,7 +363,7 @@ ofColor PatchCableSource::GetColor() const
 {
    if (mIsPartOfCircularDependency)
    {
-      float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .5f, 1);
+      double pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .5f, 1);
       return ofColor(255 * pulse, 255 * pulse, 0);
    }
    return mColor;
@@ -371,8 +371,8 @@ ofColor PatchCableSource::GetColor() const
 
 ofVec2d PatchCableSource::GetCableStart(int index) const
 {
-   float cableX = mX;
-   float cableY = mY;
+   double cableX = mX;
+   double cableY = mY;
 
    if (mHoverIndex != -1 && mDefaultPatchBehavior != kDefaultPatchBehavior_Add)
    {

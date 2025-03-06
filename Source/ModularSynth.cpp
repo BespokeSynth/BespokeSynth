@@ -833,8 +833,8 @@ void ModularSynth::Draw(void* vg)
 
    ofPushStyle();
    ofNoFill();
-   double centerX = ofGetWidth() * .5f;
-   double centerY = ofGetHeight() * .5f;
+   double centerX = ofGetWidth() * .5;
+   double centerY = ofGetHeight() * .5;
    if (mSpaceMouseInfo.mTwist != 0)
    {
       if (mSpaceMouseInfo.mUsingTwist)

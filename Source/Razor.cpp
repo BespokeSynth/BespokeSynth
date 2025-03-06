@@ -263,10 +263,10 @@ void Razor::DrawViz()
    ofPopStyle();
 }
 
-float Razor::SinSample(float phase)
+double Razor::SinSample(double phase)
 {
    int intPhase = int(phase) % 512;
-   float remainder = phase - int(phase);
+   double remainder = phase - int(phase);
    return ((1 - remainder) * sineBuffer[intPhase] + remainder * sineBuffer[1 + intPhase]);
 }
 

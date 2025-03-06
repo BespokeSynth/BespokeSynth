@@ -65,7 +65,7 @@ void UIGrid::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
    double w, h;
    GetDimensions(w, h);
    double xsize = mWidth / mCols;

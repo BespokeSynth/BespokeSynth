@@ -145,7 +145,7 @@ protected:
 
 private:
    void OnClicked(double x, double y, bool right) override;
-   void SetValueForMouse(float x, float y);
+   void SetValueForMouse(double x, double y);
    double* GetModifyValue();
    bool AdjustSmooth() const;
    void SmoothUpdated();

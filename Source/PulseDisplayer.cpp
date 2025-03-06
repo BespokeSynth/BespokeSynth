@@ -47,7 +47,7 @@ void PulseDisplayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   float brightness = ofLerp(150, 255, 1 - ofClamp(gTime - mLastReceivedFlagTime, 0, 200) / 200.0);
+   double brightness = ofLerp(150, 255, 1 - ofClamp(gTime - mLastReceivedFlagTime, 0, 200) / 200.0);
    ofPushStyle();
    ofSetColor(brightness, brightness, brightness);
    std::string output;

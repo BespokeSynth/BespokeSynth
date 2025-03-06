@@ -73,8 +73,8 @@ void MultitrackRecorder::DrawModule()
    if (mStatusStringTime + 5000 > gTime)
       DrawTextNormal(mStatusString, 120, 33);
 
-   float posX = 5;
-   float posY = 42;
+   double posX = 5;
+   double posY = 42;
    for (auto* track : mTracks)
    {
       track->SetPosition(posX, posY);

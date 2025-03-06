@@ -57,7 +57,7 @@ private:
       height = mHeight;
    }
 
-   void DrawNoteName(int pitch, float y) const;
+   void DrawNoteName(int pitch, double y) const;
 
    double mWidth{ 160 };
    double mHeight{ 60 };

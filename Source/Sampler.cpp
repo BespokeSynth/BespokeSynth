@@ -152,7 +152,7 @@ void Sampler::PlayNote(NoteMessage note)
 
    if (note.velocity > 0)
    {
-      mMostRecentVoiceIdx = mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      mMostRecentVoiceIdx = mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0, note.voiceIdx, note.modulation);
       mVoiceParams.mAdsr.Start(note.time, 1); //for visualization
    }
    else
@@ -201,7 +201,7 @@ void Sampler::DrawModule()
 
    ofPushMatrix();
    ofTranslate(106, 3);
-   float pos = 0;
+   double pos = 0;
    if (mMostRecentVoiceIdx != -1)
    {
       auto& voiceInfo = mPolyMgr.GetVoiceInfo(mMostRecentVoiceIdx);
@@ -224,7 +224,7 @@ void Sampler::DrawModuleUnclipped()
    if (mDrawDebug)
    {
       mPolyMgr.DrawDebug(mWidth + 3, 0);
-      float y = mHeight + 15;
+      double y = mHeight + 15;
       for (size_t i = 0; i < mDebugLines.size(); ++i)
       {
          const DebugLine& line = mDebugLines[(mDebugLinesPos + i) % mDebugLines.size()];
@@ -241,9 +241,9 @@ void Sampler::StopRecording()
    mSample.SetStopPoint(mRecordPos);
 }
 
-float Sampler::DetectSamplePitch()
+double Sampler::DetectSamplePitch()
 {
-   float pitch = mPitchDetector.DetectPitch(mSample.Data()->GetChannel(0), mSample.LengthInSamples());
+   double pitch = mPitchDetector.DetectPitch(mSample.Data()->GetChannel(0), mSample.LengthInSamples());
    ofLog() << "Detected pitch: " << pitch;
    return pitch;
 }

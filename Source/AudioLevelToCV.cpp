@@ -106,7 +106,7 @@ void AudioLevelToCV::Process(double time)
       Add(gWorkBuffer, GetBuffer()->GetChannel(ch), gBufferSize);
    for (int i = 0; i < gBufferSize; ++i)
    {
-      float sample = std::abs(gWorkBuffer[i]);
+      double sample = std::abs(gWorkBuffer[i]);
       if (sample > mVal)
          mVal = mAttackFactor * (mVal - sample) + sample;
       else

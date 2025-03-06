@@ -111,7 +111,7 @@ private:
 
    int GetWritePositionInSamples(double time);
    int GetLengthInSamples();
-   void DrawBuffer(float x, float y, float w, float h);
+   void DrawBuffer(double x, double y, double w, double h);
    void PlayOneShot(int slice);
    int GetNumSlices();
    double GetSlicePlaybackRate() const;

@@ -127,13 +127,13 @@ public:
    bool IsConnected() const override { return mMidiController != nullptr; }
 
    void OnControllerPageSelected();
-   void OnInput(int control, float velocity);
+   void OnInput(int control, double velocity);
 
 private:
    unsigned int mRows{ 8 };
    unsigned int mCols{ 8 };
    int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
-   float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
+   double mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
    int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
    std::vector<int> mColors;
    MidiMessageType mMessageType{ MidiMessageType::kMidiMessage_Note };

@@ -113,9 +113,9 @@ void SampleFinder::Process(double time)
       int posNext = int(mPlayhead) + 1;
       if (pos < numSamples)
       {
-         float sample = pos < 0 ? 0 : data[pos];
-         float nextSample = posNext >= numSamples ? 0 : data[posNext];
-         float a = mPlayhead - pos;
+         double sample = pos < 0 ? 0 : data[pos];
+         double nextSample = posNext >= numSamples ? 0 : data[posNext];
+         double a = mPlayhead - pos;
          out[i] += ((1 - a) * sample + a * nextSample) * volSq; //interpolate
       }
       else

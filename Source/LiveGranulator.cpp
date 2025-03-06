@@ -47,8 +47,8 @@ void LiveGranulator::Init()
 
 namespace
 {
-   const float kBufferWidth = 80;
-   const float kBufferHeight = 65;
+   const double kBufferWidth = 80;
+   const double kBufferHeight = 65;
 }
 
 void LiveGranulator::CreateUIControls()

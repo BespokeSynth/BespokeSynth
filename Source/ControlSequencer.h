@@ -100,7 +100,7 @@ public:
 
 private:
    void Step(double time, int pulseFlags);
-   void SetGridSize(float w, float h);
+   void SetGridSize(double w, double h);
 
    //IDrawableModule
    void DrawModule() override;

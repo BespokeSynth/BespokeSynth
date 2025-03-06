@@ -45,8 +45,8 @@ LooperRecorder::LooperRecorder()
 
 namespace
 {
-   const float kBufferSegmentWidth = 30;
-   const float kBufferHeight = 50;
+   const double kBufferSegmentWidth = 30;
+   const double kBufferHeight = 50;
 }
 
 void LooperRecorder::CreateUIControls()
@@ -58,7 +58,7 @@ void LooperRecorder::CreateUIControls()
    mCommit4BarsButton = new ClickButton(this, "4", 3 + kBufferSegmentWidth, 3);
    mCommit8BarsButton = new ClickButton(this, "8", 3, 3);
 
-   float width, height;
+   double width, height;
 
    UIBLOCK(kBufferSegmentWidth * 4 + 6, 3, 60);
    DROPDOWN(mNumBarsSelector, "length", &mNumBars, 50);
@@ -251,7 +251,7 @@ void LooperRecorder::Process(double time)
    GetBuffer()->Reset();
 }
 
-void LooperRecorder::DrawCircleHash(ofVec2d center, double progress, float width, double innerRadius, double outerRadius)
+void LooperRecorder::DrawCircleHash(ofVec2d center, double progress, double width, double innerRadius, double outerRadius)
 {
    ofSetLineWidth(width);
    double sinTheta = sin(progress * TWO_PI);
@@ -670,7 +670,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button, double time)
    if (button == mResampAndSetButton)
    {
       SnapToClosestPitch();
-      TheScale->SetRoot(int(AdjustedRootForSpeed() + .5f));
+      TheScale->SetRoot(int(AdjustedRootForSpeed() + .5));
       SyncLoopLengths();
    }
 

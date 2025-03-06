@@ -1003,8 +1003,8 @@ void MidiController::DrawModule()
 
    if (!mIsConnected)
    {
-      float xStart = 30 + gFont.GetStringWidth(Name(), 13);
-      float yStart = -11;
+      double xStart = 30 + gFont.GetStringWidth(Name(), 13);
+      double yStart = -11;
 
       ofPushStyle();
       ofSetColor(ofColor::red);
@@ -1912,13 +1912,13 @@ void MidiController::LoadControllerLayout(std::string filename)
 
    if (useDefaultLayout)
    {
-      const float kSpacingX = 20;
-      const float kSpacingY = 20;
+      const double kSpacingX = 20;
+      const double kSpacingY = 20;
 
       for (int i = 0; i < 128; ++i)
       {
-         GetLayoutControl(i, kMidiMessage_Control).Setup(this, kMidiMessage_Control, i, kDrawType_Slider, 0, false, 0, 127, true, kControlType_Default, i % 8 * kSpacingX + kLayoutButtonsX + 9, i / 8 * kSpacingY + kLayoutButtonsY, kSpacingX * .666f, kSpacingY * .93f);
-         GetLayoutControl(i, kMidiMessage_Note).Setup(this, kMidiMessage_Note, i, kDrawType_Button, 0, false, 0, 127, true, kControlType_Default, i % 8 * kSpacingX + 8 * kSpacingX + kLayoutButtonsX + 15, i / 8 * kSpacingY + kLayoutButtonsY, kSpacingX * .93f, kSpacingY * .93f);
+         GetLayoutControl(i, kMidiMessage_Control).Setup(this, kMidiMessage_Control, i, kDrawType_Slider, 0, false, 0, 127, true, kControlType_Default, i % 8 * kSpacingX + kLayoutButtonsX + 9, i / 8 * kSpacingY + kLayoutButtonsY, kSpacingX * .666, kSpacingY * .93);
+         GetLayoutControl(i, kMidiMessage_Note).Setup(this, kMidiMessage_Note, i, kDrawType_Button, 0, false, 0, 127, true, kControlType_Default, i % 8 * kSpacingX + 8 * kSpacingX + kLayoutButtonsX + 15, i / 8 * kSpacingY + kLayoutButtonsY, kSpacingX * .93, kSpacingY * .93);
       }
 
       GetLayoutControl(0, kMidiMessage_PitchBend).Setup(this, kMidiMessage_PitchBend, 0, kDrawType_Slider, 0, false, 0, 127, true, kControlType_Default, kLayoutButtonsX + kSpacingX * 17, kLayoutButtonsY, 25, 100);

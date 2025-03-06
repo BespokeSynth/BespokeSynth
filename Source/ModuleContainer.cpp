@@ -173,7 +173,7 @@ void ModuleContainer::KeyReleased(int key)
    }
 }
 
-void ModuleContainer::MouseMoved(float x, float y)
+void ModuleContainer::MouseMoved(double x, double y)
 {
    if (mOwner != nullptr)
       return;

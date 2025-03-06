@@ -113,7 +113,7 @@ void GridControllerMidi::OnControllerPageSelected()
    }
 }
 
-void GridControllerMidi::OnInput(int control, float velocity)
+void GridControllerMidi::OnInput(int control, double velocity)
 {
    int x = 0;
    int y = 0;

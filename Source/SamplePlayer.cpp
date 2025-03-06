@@ -999,7 +999,7 @@ void SamplePlayer::DrawModule()
 
    ofPushMatrix();
    ofTranslate(5, 58);
-   float sampleWidth = mWidth - 10;
+   double sampleWidth = mWidth - 10;
    if (mDoRecording)
    {
       ofSetColor(255, 0, 0, 100);
@@ -1008,7 +1008,7 @@ void SamplePlayer::DrawModule()
       ofPushMatrix();
 
       int numChunks = mRecordingLength / kRecordingChunkSize + 1;
-      float chunkWidth = sampleWidth / numChunks;
+      double chunkWidth = sampleWidth / numChunks;
       for (int i = 0; i < numChunks; ++i)
       {
          DrawAudioBuffer(chunkWidth, mHeight - 65, mRecordChunks[i], 0, kRecordingChunkSize, -1);
@@ -1249,7 +1249,7 @@ void SamplePlayer::oscMessageReceived(const OSCMessage& msg)
    }
    else if (msg.getAddressPattern().toString() == "/wheel/x")
    {
-      float pos = msg[0].getFloat32();
+      double pos = msg[0].getFloat32();
       if (mOscWheelPos == FLT_MAX)
       {
          mOscWheelPos = pos;
@@ -1260,7 +1260,7 @@ void SamplePlayer::oscMessageReceived(const OSCMessage& msg)
    }
    else if (msg.getAddressPattern().toString() == "/Fader/x")
    {
-      float pos = msg[0].getFloat32();
+      double pos = msg[0].getFloat32();
       mSpeed = ofLerp(mSpeedSlider->GetMin(), mSpeedSlider->GetMax(), pos);
    }
 }

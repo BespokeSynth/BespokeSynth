@@ -75,14 +75,14 @@ public:
    void SetMajorColSize(int size) { mMajorCol = size; }
    int GetMajorColSize() const { return mMajorCol; }
    void Clear();
-   void SetDimensions(float width, float height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;
    }
 
    double GetWidth() const { return mWidth; }
-   float GetHeight() const { return mHeight; }
+   double GetHeight() const { return mHeight; }
    const std::array<DotData, kMaxCols * kMaxRows>& GetData() const { return mData; }
    void SetData(std::array<DotData, kMaxCols * kMaxRows>& data) { mData = data; }
    bool GetNoHover() const override { return true; }
@@ -122,7 +122,7 @@ private:
    int GetDataIndex(int col, int row) const { return col + row * kMaxCols; }
    double GetX(int col) const;
    double GetY(int row) const;
-   void DrawGridCircle(int col, int row, float radiusPercent) const;
+   void DrawGridCircle(int col, int row, double radiusPercent) const;
 
    struct HighlightColBuffer
    {

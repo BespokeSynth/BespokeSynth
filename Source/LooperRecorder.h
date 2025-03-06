@@ -108,7 +108,7 @@ private:
    double AdjustedRootForSpeed();
    void SnapToClosestPitch();
    void Resample(bool setKey);
-   void DrawCircleHash(ofVec2d center, double progress, float width, double innerRadius, double outerRadius);
+   void DrawCircleHash(ofVec2d center, double progress, double width, double innerRadius, double outerRadius);
 
    //IDrawableModule
    void DrawModule() override;

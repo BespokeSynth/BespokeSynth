@@ -60,7 +60,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 protected:
-   void TriggerNote(double time, float velocity);
+   void TriggerNote(double time, double velocity);
 
    //IDrawableModule
    void DrawModule() override;

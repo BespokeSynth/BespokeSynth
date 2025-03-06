@@ -27,7 +27,7 @@
 #include "Sample.h"
 #include "SynthGlobals.h"
 
-void SampleDrawer::Draw(int playPosition, float vol, ofColor color)
+void SampleDrawer::Draw(int playPosition, double vol, ofColor color)
 {
    ofPushMatrix();
    ofTranslate(mX, mY);

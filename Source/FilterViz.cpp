@@ -92,7 +92,7 @@ void FilterViz::DrawModule()
       for (int i = 0; i < FILTER_VIZ_BINS / 2 - 1; ++i)
       {
          double a = static_cast<double>(i) / (FILTER_VIZ_BINS / 2 - 1);
-         a = sqrtf(a);
+         a = sqrt(a);
          ofPoint point(a * w, h - (mFFTOutReal[i] / 12 * h));
          if (i != 0)
             ofLine(lastPoint, point);
@@ -106,7 +106,7 @@ void FilterViz::DrawModule()
       for (int i = 0; i < FILTER_VIZ_BINS / 2 - 1; ++i)
       {
          double a = static_cast<double>(i) / (FILTER_VIZ_BINS / 2 - 1);
-         a = sqrtf(a);
+         a = sqrt(a);
          ofPoint point(a * w, h / 2 - (mFFTOutImag[i] / (PI * 2) * h));
          if (i != 0)
             ofLine(lastPoint, point);
