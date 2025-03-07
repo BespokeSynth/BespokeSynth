@@ -361,6 +361,10 @@ void NoteTable::PlayColumn(NoteMessage note)
       {
          int outputPitch = RowToPitch(row);
 
+         // don't play notes > 127, and also to avoid bufferoverflow for mQueuedPitches and mPitchPlayTimes below
+         if (outputPitch > 127)
+            continue;
+
          if (mQueuedPitches[outputPitch])
          {
             mGrid->SetVal(column, row, 1);
