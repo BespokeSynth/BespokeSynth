@@ -223,3 +223,6 @@ import module
       m.set(path, value)
       m.get(path)
       m.adjust(path, amount)
+      m.set_focus(zoom)
+         description: zoom = 0: zoom module to full screen, zoom = 0.1 - 8: zoom to specified zoomlevel
+         example: ns = me.get("notesequencer"); ns.set_focus(2)
