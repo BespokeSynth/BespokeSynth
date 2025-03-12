@@ -48,7 +48,7 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -59,17 +59,17 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    int mControl{ 0 };
    TextEntry* mControlEntry{ nullptr };
-   float mValue{ 0 };
+   double mValue{ 0 };
    FloatSlider* mValueSlider{ nullptr };
    bool mResendDuplicateValue{ false };
 };

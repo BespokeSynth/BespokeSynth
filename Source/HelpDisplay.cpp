@@ -158,13 +158,13 @@ void HelpDisplay::Poll()
    }
 }
 
-bool HelpDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool HelpDisplay::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mScrollOffsetY = ofClamp(mScrollOffsetY - scrollY * 10, 0, mMaxScrollAmount);
    return true;
 }
 
-void HelpDisplay::GetModuleDimensions(float& w, float& h)
+void HelpDisplay::GetModuleDimensions(double& w, double& h)
 {
    if (mScreenshotsToProcess.size() > 0)
    {
@@ -474,7 +474,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoModuleScreenshotsButton)
    {
-      gDrawScale = 1.0f;
+      gDrawScale = 1.0;
 
       std::vector<ModuleCategory> moduleTypes = {
          kModuleCategory_Note,
@@ -585,7 +585,7 @@ void HelpDisplay::ScreenshotModule(IDrawableModule* module)
 
 void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, std::string filename)
 {
-   float scale = gDrawScale * TheSynth->GetPixelRatio();
+   double scale = gDrawScale * TheSynth->GetPixelRatio();
    x = (x + TheSynth->GetDrawOffset().x) * scale;
    y = (y + TheSynth->GetDrawOffset().y) * scale;
    width = width * scale;

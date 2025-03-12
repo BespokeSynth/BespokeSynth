@@ -65,6 +65,6 @@ void GainStageEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void GainStageEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void GainStageEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }

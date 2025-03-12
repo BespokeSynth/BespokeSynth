@@ -58,7 +58,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -68,8 +68,8 @@ private:
 
    static const int kMaxDestinations = 16;
    std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables{};
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    std::array<int, 128> mLastNoteDestinations{};
    int mCurrentDestinationIndex{ -1 };
    ClickButton* mResetButton{ nullptr };

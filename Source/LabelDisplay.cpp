@@ -96,7 +96,7 @@ void LabelDisplay::DrawModule()
    mLabelFont.DrawString(mLabel, mLabelSize, 2, (mLabelFont.GetStringHeight(mLabel, mLabelSize) / 1.25) + (mShowControls ? mHeight : 0));
 }
 
-void LabelDisplay::GetModuleDimensions(float& w, float& h)
+void LabelDisplay::GetModuleDimensions(double& w, double& h)
 {
    w = MAX((mShowControls ? mWidth : 0), mLabelFont.GetStringWidth(mLabel, mLabelSize) + 6);
    h = (mShowControls ? mHeight : 0) + (3 + mLabelFont.GetStringHeight(mLabel, mLabelSize)) * 1.05;

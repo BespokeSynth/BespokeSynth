@@ -48,18 +48,18 @@ public:
    void Poll();
    void Clear();
    void Exit();
-   ofVec2f GetOwnerPosition() const;
-   ofVec2f GetDrawOffset();
-   ofVec2f& GetDrawOffsetRef() { return mDrawOffset; }
-   void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
-   float GetDrawScale() const;
-   void SetDrawScale(float scale) { mDrawScale = scale; }
+   ofVec2d GetOwnerPosition() const;
+   ofVec2d GetDrawOffset();
+   ofVec2d& GetDrawOffsetRef() { return mDrawOffset; }
+   void SetDrawOffset(ofVec2d offset) { mDrawOffset = offset; }
+   double GetDrawScale() const;
+   void SetDrawScale(double scale) { mDrawScale = scale; }
 
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
-   void MouseMoved(float x, float y);
+   void MouseMoved(double x, double y);
    void MouseReleased();
-   IDrawableModule* GetModuleAt(float x, float y);
+   IDrawableModule* GetModuleAt(double x, double y);
    void GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output, bool ignorePinned = false);
    void MoveToFront(IDrawableModule* module);
    void AddModule(IDrawableModule* module);
@@ -96,6 +96,6 @@ private:
    std::vector<IDrawableModule*> mModules;
    IDrawableModule* mOwner{ nullptr };
 
-   ofVec2f mDrawOffset;
-   float mDrawScale{ 1 };
+   ofVec2d mDrawOffset;
+   double mDrawScale{ 1 };
 };

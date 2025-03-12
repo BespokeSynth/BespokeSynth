@@ -47,14 +47,14 @@ public:
    std::string GetType() override { return "muter"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 80;
       h = 38;
@@ -64,6 +64,6 @@ private:
 
    Checkbox* mPassCheckbox{ nullptr };
    Ramp mRamp;
-   float mRampTimeMs{ 3 };
+   double mRampTimeMs{ 3 };
    FloatSlider* mRampTimeSlider{ nullptr };
 };

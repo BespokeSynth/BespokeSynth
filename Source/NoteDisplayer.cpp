@@ -32,7 +32,7 @@ void NoteDisplayer::DrawModule()
       return;
 
    bool* notes = mNoteOutput.GetNotes();
-   float y = 14;
+   double y = 14;
    for (int i = 0; i < 128; ++i)
    {
       if (notes[i])
@@ -43,7 +43,7 @@ void NoteDisplayer::DrawModule()
    }
 }
 
-void NoteDisplayer::DrawNoteName(int pitch, float y) const
+void NoteDisplayer::DrawNoteName(int pitch, double y) const
 {
    DrawTextNormal(NoteName(pitch) + ofToString(pitch / 12 - 2) + " (" + ofToString(pitch) + ")" +
                   " vel:" + ofToString(mVelocities[pitch]) +
@@ -70,7 +70,7 @@ void NoteDisplayer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-void NoteDisplayer::Resize(float w, float h)
+void NoteDisplayer::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

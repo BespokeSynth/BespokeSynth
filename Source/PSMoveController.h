@@ -64,7 +64,7 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
    //IFloatSliderLIstener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -74,7 +74,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 152;
       height = 140;
@@ -85,12 +85,12 @@ private:
    bool mVibronomeOn{ false };
    Checkbox* mVibronomeCheckbox{ nullptr };
    ClickButton* mConnectButton{ nullptr };
-   float mMetronomeLagOffset{ 50 };
+   double mMetronomeLagOffset{ 50 };
    FloatSlider* mOffsetSlider{ nullptr };
-   float mRoll{ .5 };
-   float mPitch{ .5 };
-   float mYaw{ 0 };
-   float mEnergy{ 0 };
+   double mRoll{ .5 };
+   double mPitch{ .5 };
+   double mYaw{ 0 };
+   double mEnergy{ 0 };
    FloatSlider* mPitchSlider{ nullptr };
    FloatSlider* mYawSlider{ nullptr };
    FloatSlider* mRollSlider{ nullptr };

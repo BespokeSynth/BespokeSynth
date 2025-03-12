@@ -104,7 +104,7 @@ void Chorder::DrawModule()
    mInversionDropdown->Draw();
 }
 
-void Chorder::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void Chorder::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (!mDiatonic)
       return; //TODO(Ryan)
@@ -114,17 +114,17 @@ void Chorder::GridUpdated(UIGrid* grid, int col, int row, float value, float old
    {
       AddTone(tone, value * value);
    }
-   else if (value == 0 && oldValue > 0)
+   else if (ofAlmostEquel(value, 0) && oldValue > 0)
    {
       RemoveTone(tone);
    }
 }
 
-void Chorder::AddTone(int tone, float velocity)
+void Chorder::AddTone(int tone, double velocity)
 {
    mChordGrid->SetVal((tone + mChordGrid->GetCols() * 10) % mChordGrid->GetCols(),
                       mChordGrid->GetRows() - 1 - (tone + (mChordGrid->GetRows() / 2 * mChordGrid->GetCols())) / mChordGrid->GetCols(),
-                      sqrtf(velocity), !K(notifyListeners));
+                      std::sqrt(velocity), !K(notifyListeners));
    for (int i = 0; i < TOTAL_NUM_NOTES; ++i)
    {
       if (mInputNotes[i])
@@ -152,7 +152,7 @@ void Chorder::RemoveTone(int tone)
    }
 }
 
-void Chorder::OnClicked(float x, float y, bool right)
+void Chorder::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -168,7 +168,7 @@ void Chorder::MouseReleased()
    mChordGrid->MouseReleased();
 }
 
-bool Chorder::MouseMoved(float x, float y)
+bool Chorder::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mChordGrid->NotifyMouseMoved(x, y);
@@ -235,7 +235,7 @@ void Chorder::PlayNote(NoteMessage note)
    {
       for (int col = 0; col < mChordGrid->GetCols(); ++col)
       {
-         float val = mChordGrid->GetVal(col, row);
+         double val = mChordGrid->GetVal(col, row);
          if (val > 0)
          {
             int gridPosition = col + (mChordGrid->GetRows() / 2 - row) * mChordGrid->GetCols();

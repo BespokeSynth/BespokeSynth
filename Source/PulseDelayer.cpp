@@ -61,7 +61,7 @@ void PulseDelayer::DrawModule()
 
    mDelaySlider->Draw();
 
-   float t = (gTime - mLastPulseTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
+   double t = (gTime - mLastPulseTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
    if (t > 0 && t < 1)
    {
       ofPushStyle();
@@ -80,7 +80,7 @@ void PulseDelayer::CheckboxUpdated(Checkbox* checkbox, double time)
       mConsumeIndex = mAppendIndex; //effectively clears the queue
 }
 
-void PulseDelayer::OnTransportAdvanced(float amount)
+void PulseDelayer::OnTransportAdvanced(double amount)
 {
    PROFILER(PulseDelayer);
 
@@ -100,7 +100,7 @@ void PulseDelayer::OnTransportAdvanced(float amount)
    }
 }
 
-void PulseDelayer::OnPulse(double time, float velocity, int flags)
+void PulseDelayer::OnPulse(double time, double velocity, int flags)
 {
    if (!mEnabled)
    {
@@ -115,14 +115,14 @@ void PulseDelayer::OnPulse(double time, float velocity, int flags)
    {
       PulseInfo info;
       info.mVelocity = velocity;
-      info.mTriggerTime = time + mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      info.mTriggerTime = time + mDelay / (static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       info.mFlags = flags;
       mInputPulses[mAppendIndex] = info;
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;
    }
 }
 
-void PulseDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PulseDelayer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

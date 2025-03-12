@@ -57,14 +57,14 @@ void DCRemoverEffect::DrawModule()
 {
 }
 
-float DCRemoverEffect::GetEffectAmount()
+double DCRemoverEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
    return 1;
 }
 
-void DCRemoverEffect::GetModuleDimensions(float& width, float& height)
+void DCRemoverEffect::GetModuleDimensions(double& width, double& height)
 {
    width = 30;
    height = 0;

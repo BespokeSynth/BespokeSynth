@@ -108,7 +108,7 @@ void GridSliders::OnControllerPageSelected()
 {
 }
 
-void GridSliders::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void GridSliders::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (velocity > 0)
    {
@@ -128,7 +128,7 @@ void GridSliders::OnGridButton(int x, int y, float velocity, IGridController* gr
 
       if (sliderIndex < mControlCables.size() && mControlCables[sliderIndex]->GetTarget())
       {
-         float value = squareIndex / float(length - 1);
+         double value = squareIndex / static_cast<double>(length - 1);
          for (auto& cable : mControlCables[sliderIndex]->GetPatchCables())
             dynamic_cast<IUIControl*>(cable->GetTarget())->SetFromMidiCC(value, NextBufferTime(false), false);
       }
@@ -161,7 +161,7 @@ void GridSliders::DrawModule()
    }
 }
 
-void GridSliders::OnClicked(float x, float y, bool right)
+void GridSliders::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -171,7 +171,7 @@ void GridSliders::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool GridSliders::MouseMoved(float x, float y)
+bool GridSliders::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    return false;
@@ -188,9 +188,9 @@ void GridSliders::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void GridSliders::GetModuleDimensions(float& width, float& height)
+void GridSliders::GetModuleDimensions(double& width, double& height)
 {
-   float cablesWidth = 0;
+   double cablesWidth = 0;
    for (size_t i = 0; i < mControlCables.size(); ++i)
    {
       if (mControlCables[i]->IsShowing())

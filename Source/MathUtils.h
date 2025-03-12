@@ -34,12 +34,13 @@
 
 namespace MathUtils
 {
-   float Bezier(float t, float p0, float p1, float p2, float p3);
-   ofVec2f Bezier(float t, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3);
-   float BezierDerivative(float t, float p0, float p1, float p2, float p3);
-   ofVec2f BezierPerpendicular(float t, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3);
-   ofVec2f ScaleVec(ofVec2f a, ofVec2f b);
-   ofVec2f Normal(ofVec2f v);
+   double Bezier(double t, double p0, double p1, double p2, double p3);
+   ofVec2d Bezier(double t, ofVec2d p0, ofVec2d p1, ofVec2d p2, ofVec2d p3);
+   double BezierDerivative(double t, double p0, double p1, double p2, double p3);
+   ofVec2d BezierPerpendicular(double t, ofVec2d p0, ofVec2d p1, ofVec2d p2, ofVec2d p3);
+   ofVec2d ScaleVec(ofVec2d a, ofVec2d b);
+   ofVec2d Normal(ofVec2d v);
    float Curve(float t, float curve);
+   double Curve(double t, double curve);
    int HighestPow2(int n);
 };

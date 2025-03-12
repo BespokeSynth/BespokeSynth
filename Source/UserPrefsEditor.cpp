@@ -361,7 +361,7 @@ void UserPrefsEditor::DrawModule()
       DrawRightLabel(mCancelButton, "*requires restart before taking effect", ofColor::magenta, 4);
 }
 
-void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX)
+void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofColor color, double offsetX)
 {
    if (control->IsShowing())
    {
@@ -432,7 +432,7 @@ void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (!TheSynth->IsLoadingState())
    {

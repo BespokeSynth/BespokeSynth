@@ -66,8 +66,8 @@ void AudioToCV::DrawModule()
    ofPushStyle();
    ofSetColor(0, 255, 0, gModuleDrawAlpha);
    ofBeginShape();
-   float x, y;
-   float w, h;
+   double x, y;
+   double w, h;
    mGainSlider->GetPosition(x, y, K(local));
    mGainSlider->GetDimensions(w, h);
    for (int i = 0; i < gBufferSize; ++i)
@@ -103,9 +103,9 @@ void AudioToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    OnModulatorRepatch();
 }
 
-float AudioToCV::Value(int samplesIn)
+double AudioToCV::Value(int samplesIn)
 {
-   return ofMap(mModulationBuffer[samplesIn] / 2 + .5f, 0, 1, GetMin(), GetMax(), K(clamp));
+   return ofMap(mModulationBuffer[samplesIn] / 2 + .5, 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
 void AudioToCV::SaveLayout(ofxJSONElement& moduleInfo)

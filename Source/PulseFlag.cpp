@@ -65,7 +65,7 @@ void PulseFlag::DrawModule()
    mReplaceFlagsCheckbox->Draw();
 }
 
-void PulseFlag::OnPulse(double time, float velocity, int flags)
+void PulseFlag::OnPulse(double time, double velocity, int flags)
 {
    ComputeSliders(0);
 
@@ -80,7 +80,7 @@ void PulseFlag::OnPulse(double time, float velocity, int flags)
    DispatchPulse(GetPatchCableSource(), time, velocity, flags);
 }
 
-void PulseFlag::GetModuleDimensions(float& width, float& height)
+void PulseFlag::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

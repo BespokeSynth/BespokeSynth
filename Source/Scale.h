@@ -120,13 +120,13 @@ public:
    int NumTonesInScale() const { return mScale.NumTonesInScale(); }
    int GetPitchesPerOctave() const { return MAX(1, mPitchesPerOctave); }
 
-   float PitchToFreq(float pitch);
-   float FreqToPitch(float freq);
+   double PitchToFreq(double pitch);
+   double FreqToPitch(double freq);
 
    const ChordDatabase& GetChordDatabase() const { return mChordDatabase; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
@@ -155,14 +155,14 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    void NotifyListeners();
 
    void SetUpRootList();
    float RationalizeNumber(float input);
    void UpdateTuningTable();
-   float GetTuningTableRatio(int semitonesFromCenter);
+   double GetTuningTableRatio(int semitonesFromCenter) const;
    void SetRandomRootAndScale();
 
    enum IntonationMode
@@ -192,15 +192,15 @@ private:
    int mScaleIndex{ 0 };
 
    int mPitchesPerOctave{ 12 };
-   float mReferenceFreq{ 440 };
-   float mReferencePitch{ 69 };
+   double mReferenceFreq{ 440 };
+   double mReferencePitch{ 69 };
    TextEntry* mPitchesPerOctaveEntry{ nullptr };
    TextEntry* mReferenceFreqEntry{ nullptr };
    TextEntry* mReferencePitchEntry{ nullptr };
    IntonationMode mIntonation{ IntonationMode::kIntonation_Equal };
    DropdownList* mIntonationSelector{ nullptr };
 
-   std::array<float, 256> mTuningTable{};
+   std::array<double, 256> mTuningTable{};
 
    ChordDatabase mChordDatabase;
 

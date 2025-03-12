@@ -311,7 +311,7 @@ void Monome::oscMessageReceived(const juce::OSCMessage& msg)
 
       MidiNote note;
       note.mPitch = pos.x + pos.y * mMaxColumns;
-      note.mVelocity = val * 127.0f;
+      note.mVelocity = val * 127.0;
       note.mChannel = 0;
       note.mDeviceName = mPrefix.toUTF8();
       mListener->OnMidiNote(note);

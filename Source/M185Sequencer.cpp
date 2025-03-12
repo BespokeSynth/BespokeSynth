@@ -89,7 +89,7 @@ void M185Sequencer::DrawModule()
    for (int i = 0; i < mSteps.size(); i++)
    {
       ofFill();
-      ofSetColor(0, i == mLastPlayedStepIdx ? 255 : 0, 0, gModuleDrawAlpha * .4f);
+      ofSetColor(0, i == mLastPlayedStepIdx ? 255 : 0, 0, gModuleDrawAlpha * .4);
       ofRect(mSteps[i].xPos,
              mSteps[i].yPos,
              10, 10);
@@ -114,13 +114,13 @@ void M185Sequencer::OnTimeEvent(double time)
    StepBy(time, 1, 0);
 }
 
-void M185Sequencer::OnPulse(double time, float velocity, int flags)
+void M185Sequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
    StepBy(time, velocity, flags);
 }
 
-void M185Sequencer::StepBy(double time, float velocity, int flags)
+void M185Sequencer::StepBy(double time, double velocity, int flags)
 {
    if (flags & kPulseFlag_Reset)
       ResetStep();
@@ -212,7 +212,7 @@ void M185Sequencer::ResetStep()
       FindNextStep();
 }
 
-void M185Sequencer::GetModuleDimensions(float& width, float& height)
+void M185Sequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
