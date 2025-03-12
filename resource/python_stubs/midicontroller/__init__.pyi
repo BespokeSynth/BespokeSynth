@@ -41,3 +41,6 @@ class midicontroller:
    def resync_controller_state(this, ):
       pass
 
+   def set_catchcontrol(this, control, value):
+      pass
+
