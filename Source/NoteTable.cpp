@@ -344,7 +344,7 @@ void NoteTable::PlayColumn(NoteMessage note)
    if (note.velocity == 0)
    {
       mLastColumnPlayTime[column] = -1;
-      for (int i = 0; i < 128; ++i)
+      for (int i = 0; i < mLastColumnNoteOnPitches.size(); ++i)
       {
          if (mLastColumnNoteOnPitches[column][i])
          {
@@ -360,6 +360,10 @@ void NoteTable::PlayColumn(NoteMessage note)
       for (int row = 0; row < mGrid->GetRows(); ++row)
       {
          int outputPitch = RowToPitch(row);
+
+         // don't play notes > 127, and also to avoid bufferoverflow for mQueuedPitches and mPitchPlayTimes below
+         if (outputPitch >= mPitchPlayTimes.size() || outputPitch >= mQueuedPitches.size())
+            continue;
 
          if (mQueuedPitches[outputPitch])
          {
