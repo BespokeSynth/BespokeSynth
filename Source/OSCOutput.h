@@ -64,7 +64,7 @@ public:
    void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SetUpFromSaveData() override;
+   void SetUpFromSaveData(const ofxJSONElement& moduleInfo);
    void SaveLayout(ofxJSONElement& moduleInfo) override;
 
    bool IsEnabled() const override { return true; }
@@ -77,7 +77,7 @@ private:
    std::string mLabels[OSC_OUTPUT_MAX_PARAMS];
    std::list<TextEntry*> mLabelEntry{};
    float mParams[OSC_OUTPUT_MAX_PARAMS];
-   std::list<FloatSlider*> mSliders{};
+   std::vector<FloatSlider*> mSliders{};
 
    std::string mOscOutAddress{ "127.0.0.1" };
    TextEntry* mOscOutAddressEntry{ nullptr };

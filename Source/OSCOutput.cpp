@@ -173,13 +173,28 @@ void OSCOutput::TextEntryComplete(TextEntry* entry)
 
 void OSCOutput::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   SetUpFromSaveData();
+   SetUpFromSaveData(moduleInfo);
 }
 
-void OSCOutput::SetUpFromSaveData()
+void OSCOutput::SetUpFromSaveData(const ofxJSONElement& moduleInfo)
 {
+   if (moduleInfo.isMember("oscoutput") &&
+       moduleInfo["oscoutput"].isMember("controls") &&
+       moduleInfo["oscoutput"]["controls"].isMember("label") &&
+       moduleInfo["oscoutput"]["controls"]["label"].isArray())
+   {      
+      for (int i = 0; i < OSC_OUTPUT_MAX_PARAMS; i++)  
+      {
+         mLabels[i] = moduleInfo["oscoutput"]["controls"]["label"][i].asString();
+         mSliders[i]->setName(mLabels[i].c_str());
+      }
+   }
 }
 
 void OSCOutput::SaveLayout(ofxJSONElement& moduleInfo)
 {
+   for (int i=0; i < OSC_OUTPUT_MAX_PARAMS; ++i)
+   {
+      moduleInfo["oscoutput"]["controls"]["label"][i] = mLabels[i];
+   }
 }
