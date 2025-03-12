@@ -824,6 +824,25 @@ PYBIND11_EMBEDDED_MODULE(module, m)
             float value = ofClamp(control->GetValue() + amount, min, max);
             control->SetValue(value, ScriptModule::sMostRecentRunTime);
          }
+      })
+      .def("set_focus", [](IDrawableModule& module, float zoom)
+      {
+         ofRectangle module_rect = module.GetRect();
+         if (zoom >= 0.1)
+            gDrawScale = ofClamp(zoom, 0.1, 8);
+         else if (fabs(zoom) < 0.1) // Close to 0
+         {
+            //calculate zoom to view the entire module
+            float margin = 60;
+            float w_ratio = ofGetWidth() / (module_rect.width + margin);
+            float h_ratio = ofGetHeight() / (module_rect.height + margin);
+            float ratio = (w_ratio < h_ratio) ? w_ratio : h_ratio;
+            gDrawScale = ofClamp(ratio, 0.1, 8);
+         }
+         // Move viewport to centered on the module
+         float w, h;
+         TheTitleBar->GetDimensions(w, h);
+         TheSynth->SetDrawOffset(ofVec2f(-module_rect.x + ofGetWidth() / gDrawScale / 2 - module_rect.width / 2, -module_rect.y + ofGetHeight() / gDrawScale / 2 - (module_rect.height - h / 2) / 2));
       });
 }
 
