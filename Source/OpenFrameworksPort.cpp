@@ -578,6 +578,17 @@ void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
    ofEndShape();
 }
 
+//static
+ofRectangle ofRectangle::include(const ofRectangle& a, const ofRectangle& b)
+{
+   ofRectangle ret;
+   ret.x = MIN(a.getMinX(), b.getMinX());
+   ret.y = MIN(a.getMinY(), b.getMinY());
+   ret.width = MAX(a.getMaxX(), b.getMaxX()) - ret.x;
+   ret.height = MAX(a.getMaxY(), b.getMaxY()) - ret.y;
+   return ret;
+}
+
 float ofRectangle::getMinX() const
 {
    return MIN(x, x + width); // - width

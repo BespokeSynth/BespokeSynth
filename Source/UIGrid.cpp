@@ -32,7 +32,7 @@
 
 #include <cstring>
 
-UIGrid::UIGrid(std::string name, int x, int y, int w, int h, int cols, int rows, IClickable* parent)
+UIGrid::UIGrid(IClickable* parent, std::string name, int x, int y, int w, int h, int cols, int rows)
 : mWidth(w)
 , mHeight(h)
 {
@@ -114,7 +114,7 @@ void UIGrid::Render()
                float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
                ofVec2f center(x + xsize * 0.5f, y + ysize * 0.5f);
-               ofRect(center.x - (sliderFillAmount * xsize * 0.5f), center.y - (sliderFillAmount * ysize * 0.5f), sliderFillAmount * xsize, sliderFillAmount * ysize);
+               ofRect(center.x - (sliderFillAmount * sliderFillAmount * xsize * 0.5f), center.y - (sliderFillAmount * sliderFillAmount * ysize * 0.5f), sliderFillAmount * sliderFillAmount * xsize, sliderFillAmount * sliderFillAmount * ysize);
                drawDragLevels = true;
             }
 
@@ -255,7 +255,14 @@ float UIGrid::GetSubdividedValue(float position) const
 
 bool UIGrid::CanBeTargetedBy(PatchCableSource* source) const
 {
-   return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
+   if (source->GetConnectionType() == kConnectionType_UIControl)
+   {
+      if (mCanBeUIControlTarget)
+         return true;
+      if (dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr)
+         return true;
+   }
+   return false;
 }
 
 void UIGrid::OnClicked(float x, float y, bool right)
@@ -494,6 +501,13 @@ void UIGrid::Clear()
    mData.fill(0);
 }
 
+float UIGrid::GetVal(int col, int row) const
+{
+   col = ofClamp(col, 0, MAX_GRID_COLS - 1);
+   row = ofClamp(row, 0, MAX_GRID_ROWS - 1);
+   return mData[GetDataIndex(col, row)];
+}
+
 float& UIGrid::GetVal(int col, int row)
 {
    col = ofClamp(col, 0, MAX_GRID_COLS - 1);
@@ -544,6 +558,43 @@ int UIGrid::GetHighlightCol(double time) const
       }
    }
    return ret;
+}
+
+void UIGrid::SetFromMidiCC(float slider, double time, bool setViaModulator)
+{
+   SetValue(slider, time);
+}
+
+float UIGrid::GetValueForMidiCC(float slider) const
+{
+   return slider;
+}
+
+void UIGrid::SetValue(float value, double time, bool forceUpdate)
+{
+   if (mValueSetTargetCol >= 0 && mValueSetTargetRow < mCols && mValueSetTargetRow >= 0 && mValueSetTargetRow < mRows)
+   {
+      float currentValue = GetVal(mValueSetTargetCol, mValueSetTargetRow);
+      if (value != currentValue || forceUpdate)
+         SetVal(mValueSetTargetCol, mValueSetTargetRow, value);
+   }
+}
+
+float UIGrid::GetMidiValue() const
+{
+   return GetValue();
+}
+
+float UIGrid::GetValue() const
+{
+   if (mValueSetTargetCol >= 0 && mValueSetTargetRow < mCols && mValueSetTargetRow >= 0 && mValueSetTargetRow < mRows)
+      return GetVal(mValueSetTargetCol, mValueSetTargetRow);
+   return 0;
+}
+
+std::string UIGrid::GetDisplayValue(float val) const
+{
+   return ofToString(GetValue());
 }
 
 namespace

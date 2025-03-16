@@ -25,7 +25,7 @@ Minimap::~Minimap()
 void Minimap::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid("uigrid", 0, 0, kMaxLength, kBookmarkSize, kNumBookmarks, 1, this);
+   mGrid = new UIGrid(this, "uigrid", 0, 0, kMaxLength, kBookmarkSize, kNumBookmarks, 1);
 }
 
 void Minimap::GetDimensions(float& width, float& height)

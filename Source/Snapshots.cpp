@@ -51,7 +51,7 @@ Snapshots::~Snapshots()
 void Snapshots::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid("uigrid", 5, 38, kListModeGridWidth, kMinNumListRows * kListRowHeight, 1, kMinNumListRows, this);
+   mGrid = new UIGrid(this, "uigrid", 5, 38, kListModeGridWidth, kMinNumListRows * kListRowHeight, 1, kMinNumListRows);
    mBlendTimeSlider = new FloatSlider(this, "blend", 5, 20, 87, 15, &mBlendTime, 0, 5000);
    mCurrentSnapshotSelector = new DropdownList(this, "snapshot", 35, 3, &mCurrentSnapshot, 80);
    mRandomizeButton = new ClickButton(this, "random", mBlendTimeSlider, kAnchor_Right);
@@ -381,55 +381,54 @@ void Snapshots::SetSnapshot(int idx, double time)
 
    sSnapshotHighlightControls.clear();
    const SnapshotCollection& coll = mSnapshotCollection[idx];
-   for (std::list<Snapshot>::const_iterator i = coll.mSnapshots.begin();
-        i != coll.mSnapshots.end(); ++i)
+   for (const auto& snapshot : coll.mSnapshots)
    {
       auto context = IClickable::sPathLoadContext;
       IClickable::sPathLoadContext = GetParent() ? GetParent()->Path() + "~" : "";
-      IUIControl* control = TheSynth->FindUIControl(i->mControlPath);
+      IUIControl* control = TheSynth->FindUIControl(snapshot.mControlPath);
       IClickable::sPathLoadContext = context;
 
       if (control)
       {
          if (mBlendTime == 0 ||
-             i->mHasLFO ||
-             !i->mGridContents.empty() ||
-             !i->mString.empty())
+             snapshot.mHasLFO ||
+             !snapshot.mGridContents.empty() ||
+             !snapshot.mString.empty())
          {
-            control->SetValueDirect(i->mValue, time);
+            control->SetValueDirect(snapshot.mValue, time);
 
             FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
             if (slider)
             {
-               if (i->mHasLFO)
-                  slider->AcquireLFO()->Load(i->mLFOSettings);
+               if (snapshot.mHasLFO)
+                  slider->AcquireLFO()->Load(snapshot.mLFOSettings);
                else
                {
                   slider->DisableLFO();
-                  control->SetValueDirect(i->mValue, time); // Set the value again because a already active LFO can change this.
+                  control->SetValueDirect(snapshot.mValue, time); // Set the value again because a already active LFO can change this.
                }
             }
 
             UIGrid* grid = dynamic_cast<UIGrid*>(control);
             if (grid)
             {
-               for (int col = 0; col < i->mGridCols; ++col)
+               for (int col = 0; col < snapshot.mGridCols; ++col)
                {
-                  for (int row = 0; row < i->mGridRows; ++row)
+                  for (int row = 0; row < snapshot.mGridRows; ++row)
                   {
-                     grid->SetVal(col, row, i->mGridContents[size_t(col) + size_t(row) * i->mGridCols]);
+                     grid->SetVal(col, row, snapshot.mGridContents[size_t(col) + size_t(row) * snapshot.mGridCols]);
                   }
                }
             }
 
             TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
             if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
-               textEntry->SetText(i->mString);
+               textEntry->SetText(snapshot.mString);
 
-            if (control->ShouldSerializeForSnapshot() && !i->mString.empty())
+            if (control->ShouldSerializeForSnapshot() && !snapshot.mString.empty())
             {
                juce::MemoryBlock outputStream;
-               outputStream.fromBase64Encoding(i->mString);
+               outputStream.fromBase64Encoding(snapshot.mString);
                FileStreamIn in(outputStream);
                control->LoadState(in, true);
             }
@@ -438,11 +437,25 @@ void Snapshots::SetSnapshot(int idx, double time)
          {
             ControlRamp ramp;
             ramp.mUIControl = control;
-            ramp.mRamp.Start(0, control->GetValue(), i->mValue, mBlendTime);
+            ramp.mRamp.Start(0, control->GetValue(), snapshot.mValue, mBlendTime);
             mBlendRamps.push_back(ramp);
          }
 
          sSnapshotHighlightControls.push_back(control);
+      }
+   }
+
+   for (const auto& moduleData : coll.mModuleData)
+   {
+      IDrawableModule* module = TheSynth->FindModule(moduleData.mModulePath);
+      if (module != nullptr && module->ShouldSerializeForSnapshot() && !moduleData.mData.empty())
+      {
+         juce::MemoryBlock outputStream;
+         outputStream.fromBase64Encoding(moduleData.mData);
+         FileStreamIn in(outputStream);
+         int dataRev;
+         in >> dataRev;
+         module->LoadState(in, dataRev);
       }
    }
 
@@ -552,6 +565,7 @@ void Snapshots::StoreSnapshot(int idx, bool setAsCurrent)
 
    SnapshotCollection& coll = mSnapshotCollection[idx];
    coll.mSnapshots.clear();
+   coll.mModuleData.clear();
 
    for (int i = 0; i < mSnapshotControls.size(); ++i)
    {
@@ -566,6 +580,8 @@ void Snapshots::StoreSnapshot(int idx, bool setAsCurrent)
       }
       for (auto* grid : mSnapshotModules[i]->GetUIGrids())
          coll.mSnapshots.push_back(Snapshot(grid, this));
+      if (mSnapshotModules[i]->ShouldSerializeForSnapshot())
+         coll.mModuleData.push_back(SnapshotModuleData(mSnapshotModules[i]));
    }
 
    mSnapshotLabel = coll.mLabel;
@@ -1077,4 +1093,15 @@ Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
       }
       mString = tempBlock.toBase64Encoding().toStdString();
    }
+}
+
+Snapshots::SnapshotModuleData::SnapshotModuleData(IDrawableModule* module)
+{
+   mModulePath = module->Path();
+   juce::MemoryBlock tempBlock;
+   {
+      FileStreamOut out(tempBlock);
+      module->SaveState(out);
+   }
+   mData = tempBlock.toBase64Encoding().toStdString();
 }

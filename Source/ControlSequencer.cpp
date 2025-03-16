@@ -65,7 +65,7 @@ void ControlSequencer::CreateUIControls()
    CHECKBOX(mRecordCheckbox, "record", &mRecord);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, height + 3, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1, this);
+   mGrid = new UIGrid(this, "uigrid", 5, height + 3, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1);
 
    UIBLOCK(15, height + 5);
    for (int i = 0; i < (int)mStepSliders.size(); ++i)

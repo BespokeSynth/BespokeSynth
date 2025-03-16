@@ -65,6 +65,8 @@ target_sources(BespokeSynth PRIVATE
     AudioToPulse.h
     Autotalent.cpp
     Autotalent.h
+    BassLineSequencer.cpp
+    BassLineSequencer.h
     BandVocoder.cpp
     BandVocoder.h
     BeatBloks.cpp

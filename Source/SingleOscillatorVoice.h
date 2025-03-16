@@ -79,6 +79,7 @@ public:
    bool IsDone(double time) override;
 
    static float GetADSRScale(float velocity, float velToEnvelope);
+   static float GetADSRCurve(float velocity, float velToEnvelope);
 
    static const int kMaxUnison = 8;
 

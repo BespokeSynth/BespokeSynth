@@ -72,7 +72,7 @@ void PlaySequencer::CreateUIControls()
    }
    ENDUIBLOCK(width, height);
    ofLog() << "width: " << width << " height: " << height;
-   mGrid = new UIGrid("uigrid", 3, height + 3, mWidth - 16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size(), this);
+   mGrid = new UIGrid(this, "uigrid", 3, height + 3, mWidth - 16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size());
    mGrid->SetFlip(true);
    mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mGrid->SetRequireShiftForMultislider(true);

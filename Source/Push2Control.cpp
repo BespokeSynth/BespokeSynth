@@ -259,6 +259,8 @@ void Push2Control::PostRender()
 
 void Push2Control::KeyPressed(int key, bool isRepeat)
 {
+   IDrawableModule::KeyPressed(key, isRepeat);
+
    if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
    {
       for (int i = 0; i < (int)mModuleGridManualCables.size(); ++i)
