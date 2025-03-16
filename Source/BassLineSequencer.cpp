@@ -894,7 +894,7 @@ void BassLineSequencer::ButtonClicked(ClickButton* button, double time)
       for (int i = 0; i < mNoteRange; ++i)
          tones.add(i);
       for (int i = 0; i < (mNoteRange - mRandomVariety) && tones.size() > 1; ++i)
-         tones.remove((gRandom() % (tones.size() - 1)) + 1);  //always keep first entry (root note)
+         tones.remove((gRandom() % (tones.size() - 1)) + 1); //always keep first entry (root note)
 
       for (auto& step : mSteps)
       {
