@@ -44,7 +44,7 @@ StepSequencer::StepSequencer()
    for (int i = 0; i < META_STEP_MAX * NUM_STEPSEQ_ROWS; ++i)
       mMetaStepMasks[i] = 0xff;
 
-   mStrength = gStepVelocityLevels[(int)StepVelocityType::Normal];
+   mStrength = kVelocityNormal;
 }
 
 void StepSequencer::Init()
@@ -57,7 +57,7 @@ void StepSequencer::Init()
 void StepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid("uigrid", 40, 45, 250, 150, 16, NUM_STEPSEQ_ROWS, this);
+   mGrid = new UIGrid(this, "uigrid", 52, 45, 250, 150, 16, NUM_STEPSEQ_ROWS);
    mGrid->SetStrength(mStrength);
 
    UIBLOCK0();
@@ -78,7 +78,7 @@ void StepSequencer::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
    UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mGridYOffDropdown, "yoff", &mGridYOff, 20);
+   DROPDOWN(mGridYOffDropdown, "yoff", &mGridYOff, 30);
    UIBLOCK_NEWLINE();
    DROPDOWN(mVelocityTypeDropdown, "velocitytype", (int*)(&mVelocityType), 60);
    UIBLOCK_SHIFTLEFT();
@@ -180,11 +180,6 @@ void StepSequencer::Poll()
    }
 }
 
-namespace
-{
-   const float kMidwayVelocity = .75f;
-}
-
 void StepSequencer::UpdateLights(bool force /*=false*/)
 {
    if (!HasGridController() || mGridControlTarget->GetGridController() == nullptr)
@@ -213,8 +208,14 @@ void StepSequencer::UpdateLights(bool force /*=false*/)
 GridColor StepSequencer::GetGridColor(int x, int y)
 {
    Vec2i gridPos = ControllerToGrid(Vec2i(x, y));
-   bool cellOn = mGrid->GetVal(gridPos.x, gridPos.y) > 0;
-   bool cellBright = mGrid->GetVal(gridPos.x, gridPos.y) > kMidwayVelocity;
+
+   if (gridPos.x >= GetNumSteps(mStepInterval, mNumMeasures))
+      return kGridColorOff;
+
+   float val = mGrid->GetVal(gridPos.x, gridPos.y);
+   bool cellOn = val > 0;
+   bool cellDim = val > 0 && val <= kVelocityGhost;
+   bool cellBright = val > kVelocityNormal;
    bool colOn = (mGrid->GetHighlightCol(gTime) == gridPos.x) && mEnabled;
 
    GridColor color;
@@ -222,6 +223,8 @@ GridColor StepSequencer::GetGridColor(int x, int y)
    {
       if (cellBright)
          color = kGridColor3Bright;
+      else if (cellDim)
+         color = kGridColor1Dim;
       else if (cellOn)
          color = kGridColor3Dim;
       else
@@ -231,6 +234,8 @@ GridColor StepSequencer::GetGridColor(int x, int y)
    {
       if (cellBright)
          color = kGridColor1Bright;
+      else if (cellDim)
+         color = kGridColor3Dim;
       else if (cellOn)
          color = kGridColor1Dim;
       else
@@ -408,15 +413,25 @@ Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
 
 int StepSequencer::GetNumControllerChunks()
 {
-   if (!HasGridController())
-      return 1;
+   if (HasGridController())
+   {
+      if (mGridControllerMode == GridControllerMode::FitMultipleRows)
+      {
+         int rows = GetGridControllerRows();
+         int cols = GetGridControllerCols();
 
-   int rows = GetGridControllerRows();
-   int cols = GetGridControllerCols();
+         int numBreaks = int((mGrid->GetCols() / MAX(1.0f, cols)) + .5f);
+         int numChunks = int(mGrid->GetRows() / MAX(1.0f, (rows / MAX(1, numBreaks))) + .5f);
+         return numChunks;
+      }
 
-   int numBreaks = int((mGrid->GetCols() / MAX(1.0f, cols)) + .5f);
-   int numChunks = int(mGrid->GetRows() / MAX(1.0f, (rows / MAX(1, numBreaks))) + .5f);
-   return numChunks;
+      if (mGridControllerMode == GridControllerMode::SingleRow)
+      {
+         return mGrid->GetRows();
+      }
+   }
+
+   return 1;
 }
 
 void StepSequencer::DrawModule()
@@ -536,7 +551,7 @@ void StepSequencer::DrawRowLabel(const char* label, int row, int x, int y)
 
 void StepSequencer::GetModuleDimensions(float& width, float& height)
 {
-   width = mGrid->GetWidth() + 45;
+   width = mGrid->GetWidth() + 57;
    if (mAdjustOffsets)
       width += 100;
    height = mGrid->GetHeight() + 50;
@@ -964,29 +979,27 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
       if (key == OF_KEY_UP || key == OF_KEY_DOWN)
       {
          float velocity = mGrid->GetVal(cell.mCol, cell.mRow);
-         if (velocity > 0)
+
+         if (key == OF_KEY_UP)
          {
-            if (key == OF_KEY_UP)
+            for (int i = 0; i < (int)gStepVelocityLevels.size(); ++i)
             {
-               for (int i = 0; i < (int)gStepVelocityLevels.size(); ++i)
+               if (velocity < gStepVelocityLevels[i])
                {
-                  if (velocity < gStepVelocityLevels[i])
-                  {
-                     mGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
-                     break;
-                  }
+                  mGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
+                  break;
                }
             }
+         }
 
-            if (key == OF_KEY_DOWN)
+         if (key == OF_KEY_DOWN)
+         {
+            for (int i = (int)gStepVelocityLevels.size() - 1; i >= 0; --i)
             {
-               for (int i = (int)gStepVelocityLevels.size() - 1; i >= 0; --i)
+               if (velocity > gStepVelocityLevels[i])
                {
-                  if (velocity > gStepVelocityLevels[i])
-                  {
-                     mGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
-                     break;
-                  }
+                  mGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
+                  break;
                }
             }
          }
@@ -1015,6 +1028,11 @@ void StepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    velEntryModeMap["slider"] = (int)StepVelocityEntryMode::Slider;
    mModuleSaveData.LoadEnum<StepVelocityEntryMode>("velocity_entry_mode", moduleInfo, (int)StepVelocityEntryMode::Dropdown, nullptr, &velEntryModeMap);
 
+   EnumMap gridControllerModeMap;
+   gridControllerModeMap["fit multiple rows"] = (int)GridControllerMode::FitMultipleRows;
+   gridControllerModeMap["single row"] = (int)GridControllerMode::SingleRow;
+   mModuleSaveData.LoadEnum<GridControllerMode>("grid_controller_mode", moduleInfo, (int)GridControllerMode::FitMultipleRows, nullptr, &gridControllerModeMap);
+
    SetUpFromSaveData();
 }
 
@@ -1031,6 +1049,7 @@ void StepSequencer::SetUpFromSaveData()
 
    mNoteInputMode = mModuleSaveData.GetEnum<NoteInputMode>("note_input_mode");
    mStepVelocityEntryMode = mModuleSaveData.GetEnum<StepVelocityEntryMode>("velocity_entry_mode");
+   mGridControllerMode = mModuleSaveData.GetEnum<GridControllerMode>("grid_controller_mode");
 
    if (mNoteInputMode == NoteInputMode::RepeatHeld)
       mHasExternalPulseSource = false;
@@ -1101,6 +1120,8 @@ StepSequencerRow::~StepSequencerRow()
 void StepSequencerRow::CreateUIControls()
 {
    mRowPitchEntry = new TextEntry(mSeq, ("rowpitch" + ofToString(mRow)).c_str(), -1, -1, 3, &mRowPitch, 0, 127);
+   mPlayRowCheckbox = new Checkbox(mSeq, ("play" + ofToString(mRow)).c_str(), -1, -1, &mPlayRow);
+   mPlayRowCheckbox->SetDisplayText(false);
 }
 
 void StepSequencerRow::OnTimeEvent(double time)
@@ -1116,7 +1137,7 @@ void StepSequencerRow::OnTimeEvent(double time)
 void StepSequencerRow::PlayStep(double time, int step)
 {
    float val = mGrid->GetVal(step, mRow);
-   if (val > 0 && mSeq->IsMetaStepActive(time, step, mRow))
+   if (mPlayRow && val > 0 && mSeq->IsMetaStepActive(time, step, mRow))
    {
       mSeq->PlayStepNote(time, mRowPitch, val * val);
       mPlayedSteps[mPlayedStepsRoundRobin].step = step;
@@ -1150,6 +1171,10 @@ void StepSequencerRow::Draw(float x, float y)
    mRowPitchEntry->SetShowing(showTextEntry);
    mRowPitchEntry->SetPosition(x - 32, y);
    mRowPitchEntry->Draw();
+
+   mPlayRowCheckbox->SetShowing(showTextEntry);
+   mPlayRowCheckbox->SetPosition(x - 48, y);
+   mPlayRowCheckbox->Draw();
 
    if (!showTextEntry)
       DrawTextRightJustify(ofToString(mRowPitch), x - 7, y + 10);

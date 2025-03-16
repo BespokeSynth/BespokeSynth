@@ -67,7 +67,7 @@ void NoteTable::CreateUIControls()
    INTSLIDER(mGridControlOffsetYSlider, "y offset", &mGridControlOffsetY, 0, 16);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange, this);
+   mGrid = new UIGrid(this, "uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange);
 
    mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
    mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);

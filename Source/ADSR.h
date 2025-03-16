@@ -77,9 +77,9 @@ public:
    ADSR()
    : ADSR(1, 1, 1, 1)
    {}
-   void Start(double time, float target, float timeScale = 1);
-   void Start(double time, float target, float a, float d, float s, float r, float timeScale = 1);
-   void Start(double time, float target, const ADSR& adsr, float timeScale = 1);
+   void Start(double time, float target, float timeScale = 1, float curve = 0);
+   void Start(double time, float target, float a, float d, float s, float r, float timeScale = 1, float curve = 0);
+   void Start(double time, float target, const ADSR& adsr, float timeScale = 1, float curve = 0);
    void Stop(double time, bool warn = true);
    float Value(double time) const;
    float Value(double time, const EventInfo* event) const;
@@ -133,4 +133,5 @@ private:
    bool mHasSustainStage{ false };
    bool mFreeReleaseLevel{ false };
    float mTimeScale{ 1 };
+   float mCurve{ 0 };
 };

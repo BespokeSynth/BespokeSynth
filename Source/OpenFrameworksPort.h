@@ -170,6 +170,7 @@ struct ofRectangle
       height += amount * 2;
       return *this;
    }
+   static ofRectangle include(const ofRectangle& a, const ofRectangle& b);
    float getMinX() const;
    float getMaxX() const;
    float getMinY() const;
