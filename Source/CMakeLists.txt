@@ -367,6 +367,8 @@ target_sources(BespokeSynth PRIVATE
     ModulatorSmoother.h
     ModulatorSubtract.cpp
     ModulatorSubtract.h
+    ModulatorWander.cpp
+    ModulatorWander.h
     ModuleContainer.cpp
     ModuleContainer.h
     ModuleFactory.cpp

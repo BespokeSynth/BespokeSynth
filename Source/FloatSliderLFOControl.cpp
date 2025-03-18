@@ -153,7 +153,7 @@ void FloatSliderLFOControl::DrawModule()
    int height = 35;
    int width = 90;
 
-   ofSetColor(100, 100, .8f * gModuleDrawAlpha);
+   ofSetColor(100, 100, 204, .8f * gModuleDrawAlpha);
    ofSetLineWidth(.5f);
    ofRect(x, y, width, height, 0);
 
