@@ -1110,7 +1110,21 @@ bool IntSlider::MouseMoved(double x, double y)
 void IntSlider::SetValueForMouse(double x, double y)
 {
    int oldVal = *mVar;
-   *mVar = (int)round(ofMap(x + mX, mX + 1, mX + mWidth - 1, mMin, mMax));
+   float fX = x;
+   if (GetKeyModifiers() & kModifier_Shift)
+   {
+      if (mFineRefX == -999)
+      {
+         mFineRefX = x;
+      }
+      fX = mFineRefX + (fX - mFineRefX) / 10;
+   }
+   else
+   {
+      mFineRefX = -999;
+   }
+
+   *mVar = (int)round(ofMap(fX + mX, mX + 1, mX + mWidth - 1, mMin, mMax));
    *mVar = ofClamp(*mVar, mMin, mMax);
    if (oldVal != *mVar)
    {

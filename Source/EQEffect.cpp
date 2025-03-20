@@ -44,7 +44,7 @@ EQEffect::EQEffect()
 void EQEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mMultiSlider = new UIGrid("uigrid", 5, 25, 80, 50, NUM_EQ_FILTERS, 1, this);
+   mMultiSlider = new UIGrid(this, "uigrid", 5, 25, 80, 50, NUM_EQ_FILTERS, 1);
    mEvenButton = new ClickButton(this, "even", 5, 5);
 
    mMultiSlider->SetGridMode(UIGrid::kMultislider);

@@ -192,6 +192,15 @@ struct ofRectangle_t
       return testX > getMinX() && testY > getMinY() &&
              testX < getMaxX() && testY < getMaxY();
    }
+   static ofRectangle_t include(const ofRectangle_t& a, const ofRectangle_t& b)
+   {
+      ofRectangle_t ret;
+      ret.x = std::min(a.getMinX(), b.getMinX());
+      ret.y = std::min(a.getMinY(), b.getMinY());
+      ret.width = std::max(a.getMaxX(), b.getMaxX()) - ret.x;
+      ret.height = std::max(a.getMaxY(), b.getMaxY()) - ret.y;
+      return ret;
+   }
    ofRectangle_t& grow(T amount)
    {
       x -= amount;

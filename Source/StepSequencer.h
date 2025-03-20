@@ -74,6 +74,8 @@ private:
    int mPlayedStepsRoundRobin{ 0 };
    TextEntry* mRowPitchEntry{ nullptr };
    int mRowPitch{ 0 };
+   Checkbox* mPlayRowCheckbox{ nullptr };
+   bool mPlayRow{ true };
 };
 
 class NoteRepeat : public ITimeListener
@@ -229,8 +231,14 @@ private:
       Slider
    };
 
+   enum class GridControllerMode
+   {
+      FitMultipleRows,
+      SingleRow
+   };
+
    UIGrid* mGrid{ nullptr };
-   double mStrength{ .8 };
+   double mStrength{ kVelocityNormal };
    FloatSlider* mStrengthSlider{ nullptr };
    StepVelocityType mVelocityType{ StepVelocityType::Normal };
    DropdownList* mVelocityTypeDropdown{ nullptr };
@@ -272,6 +280,7 @@ private:
    double mRandomizationDensity{ .25 };
    FloatSlider* mRandomizationDensitySlider{ nullptr };
    ClickButton* mRandomizeButton{ nullptr };
+   GridControllerMode mGridControllerMode{ GridControllerMode::FitMultipleRows };
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

@@ -203,23 +203,37 @@ void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
 //static
 double SingleOscillatorVoice::GetADSRScale(double velocity, double velToEnvelope)
 {
-   if (velToEnvelope > 0)
-      return ofLerp((1 - velToEnvelope), 1, velocity);
+   if (velToEnvelope >= 0)
+      return ofLerp(ofClamp(1 - velToEnvelope, 0, 1), 1, velocity);
    return ofClamp(ofLerp(1, 1 + velToEnvelope, velocity), 0.001, 1);
+}
+
+//static
+double SingleOscillatorVoice::GetADSRCurve(double velocity, double velToEnvelope)
+{
+   if (velToEnvelope < -1)
+      return -(velToEnvelope + 1) * 0.25;
+   if (velToEnvelope > 1)
+      return -(velToEnvelope - 1) * 0.25;
+   return 0;
 }
 
 void SingleOscillatorVoice::Start(double time, double target)
 {
-   double volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target);
-   double adsrScale = GetADSRScale(target, mVoiceParams->mVelToEnvelope);
-   mAdsr.Start(time, volume, mVoiceParams->mAdsr, adsrScale);
+   if (mVoiceParams->mVelToVolume > 1)
+      target = pow(target, mVoiceParams->mVelToVolume);
+   double volume = ofLerp(MAX(0, 1 - mVoiceParams->mVelToVolume), MAX(1, mVoiceParams->mVelToVolume), target);
+   double cutoffScale = 1 + MAX(0, mVoiceParams->mVelToEnvelope - 1);
+   double adsrTimeScale = GetADSRScale(target, mVoiceParams->mVelToEnvelope);
+   double adsrCurve = GetADSRCurve(target, mVoiceParams->mVelToEnvelope);
+   mAdsr.Start(time, volume, mVoiceParams->mAdsr, 1, adsrCurve);
 
    if (mVoiceParams->mFilterCutoffMax != SINGLEOSCILLATOR_NO_CUTOFF)
    {
       mUseFilter = true;
       mFilterLeft.SetFilterType(kFilterType_Lowpass);
       mFilterRight.SetFilterType(kFilterType_Lowpass);
-      mFilterAdsr.Start(time, 1, mVoiceParams->mFilterAdsr, adsrScale);
+      mFilterAdsr.Start(time, cutoffScale, mVoiceParams->mFilterAdsr, adsrTimeScale, adsrCurve);
    }
    else
    {

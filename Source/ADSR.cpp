@@ -57,19 +57,19 @@ void ::ADSR::Set(const ADSR& other)
    mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
-void ::ADSR::Start(double time, double target, double a, double d, double s, double r, double timeScale /*=1*/)
+void ::ADSR::Start(double time, double target, double a, double d, double s, double r, double timeScale /*=1*/, double curve /*=0*/)
 {
    Set(a, d, s, r);
-   Start(time, target, timeScale);
+   Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, double target, const ADSR& adsr, double timeScale)
+void ::ADSR::Start(double time, double target, const ADSR& adsr, double timeScale /*=1*/, double curve /*=0*/)
 {
    Set(adsr);
-   Start(time, target, timeScale);
+   Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, double target, double timeScale /*=1*/)
+void ::ADSR::Start(double time, double target, double timeScale /*=1*/, double curve /*=0*/)
 {
    mEvents[mNextEventPointer].Reset();
    mEvents[mNextEventPointer].mStartBlendFromValue = Value(time);
@@ -77,6 +77,7 @@ void ::ADSR::Start(double time, double target, double timeScale /*=1*/)
    mEvents[mNextEventPointer].mMult = target;
    mNextEventPointer = (mNextEventPointer + 1) % mEvents.size();
    mTimeScale = timeScale;
+   mCurve = curve;
 
    if (mMaxSustain >= 0 && mHasSustainStage)
    {
@@ -164,8 +165,9 @@ double ::ADSR::Value(double time, const EventInfo* e) const
    double stageTimeScale = GetStageTimeScale(stage);
 
    double lerp = ofClamp((time - stageStartTime) / (mStages[stage].time * stageTimeScale), 0, 1);
-   if (mStages[stage].curve != 0)
-      lerp = MathUtils::Curve(lerp, mStages[stage].curve * ((stageStartValue < mStages[stage].target * e->mMult) ? 1 : -1));
+   double curve = mStages[stage].curve + mCurve;
+   if (!ofAlmostEquel(curve, 0))
+      lerp = MathUtils::Curve(lerp, curve * ((stageStartValue < mStages[stage].target * e->mMult) ? 1 : -1));
 
    return ofLerp(stageStartValue, mStages[stage].target * e->mMult, lerp);
 }

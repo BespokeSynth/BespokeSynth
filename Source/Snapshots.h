@@ -142,9 +142,17 @@ private:
       std::string mString;
    };
 
+   struct SnapshotModuleData
+   {
+      SnapshotModuleData(IDrawableModule* module);
+      std::string mModulePath;
+      std::string mData;
+   };
+
    struct SnapshotCollection
    {
       std::list<Snapshot> mSnapshots;
+      std::list<SnapshotModuleData> mModuleData;
       std::string mLabel;
    };
 

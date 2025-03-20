@@ -67,7 +67,7 @@ void NoteTable::CreateUIControls()
    INTSLIDER(mGridControlOffsetYSlider, "y offset", &mGridControlOffsetY, 0, 16);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange, this);
+   mGrid = new UIGrid(this, "uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange);
 
    mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
    mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);
@@ -344,7 +344,7 @@ void NoteTable::PlayColumn(NoteMessage note)
    if (note.velocity == 0)
    {
       mLastColumnPlayTime[column] = -1;
-      for (int i = 0; i < 128; ++i)
+      for (int i = 0; i < mLastColumnNoteOnPitches.size(); ++i)
       {
          if (mLastColumnNoteOnPitches[column][i])
          {
@@ -360,6 +360,10 @@ void NoteTable::PlayColumn(NoteMessage note)
       for (int row = 0; row < mGrid->GetRows(); ++row)
       {
          int outputPitch = RowToPitch(row);
+
+         // don't play notes > 127, and also to avoid bufferoverflow for mQueuedPitches and mPitchPlayTimes below
+         if (outputPitch >= mPitchPlayTimes.size() || outputPitch >= mQueuedPitches.size())
+            continue;
 
          if (mQueuedPitches[outputPitch])
          {

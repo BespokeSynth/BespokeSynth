@@ -42,7 +42,7 @@ SamplerGrid::SamplerGrid()
 void SamplerGrid::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid("uigrid", 2, 2, 90, 90, mCols, mRows, this);
+   mGrid = new UIGrid(this, "uigrid", 2, 2, 90, 90, mCols, mRows);
    mGrid->SetListener(this);
    mGrid->SetMomentary(true);
    mPassthroughCheckbox = new Checkbox(this, "passthrough", mGrid, kAnchor_Right, &mPassthrough);

@@ -266,7 +266,9 @@
 #include "SaveStateLoader.h"
 #include "DataProvider.h"
 #include "PulseLimit.h"
+#include "BassLineSequencer.h"
 #include "Acciaccatura.h"
+#include "ModulatorWander.h"
 
 #include <juce_core/juce_core.h>
 
@@ -487,7 +489,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(SaveStateLoader, savestateloader, kModuleCategory_Other);
    REGISTER(DataProvider, dataprovider, kModuleCategory_Modulator);
    REGISTER(PulseLimit, pulselimit, kModuleCategory_Pulse);
+   REGISTER(BassLineSequencer, basslinesequencer, kModuleCategory_Instrument);
    REGISTER(Acciaccatura, acciaccatura, kModuleCategory_Note);
+   REGISTER(ModulatorWander, wander, kModuleCategory_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

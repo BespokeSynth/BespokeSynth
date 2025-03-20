@@ -111,8 +111,8 @@ void SingleOscillator::CreateUIControls()
    FLOATSLIDER(mFilterCutoffMaxSlider, "fmax", &mVoiceParams.mFilterCutoffMax, 10, SINGLEOSCILLATOR_NO_CUTOFF);
    FLOATSLIDER(mFilterCutoffMinSlider, "fmin", &mVoiceParams.mFilterCutoffMin, 10, SINGLEOSCILLATOR_NO_CUTOFF);
    FLOATSLIDER_DIGITS(mFilterQSlider, "q", &mVoiceParams.mFilterQ, .1, 20, 3);
-   FLOATSLIDER(mVelToVolumeSlider, "vel2vol", &mVoiceParams.mVelToVolume, 0, 1);
-   FLOATSLIDER(mVelToEnvelopeSlider, "vel2env", &mVoiceParams.mVelToEnvelope, -1, 1);
+   FLOATSLIDER(mVelToVolumeSlider, "vel2vol", &mVoiceParams.mVelToVolume, 0, 2);
+   FLOATSLIDER(mVelToEnvelopeSlider, "vel2env", &mVoiceParams.mVelToEnvelope, -1, 2);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
    mHeight = MAX(height, mHeight);
@@ -201,9 +201,8 @@ void SingleOscillator::PlayNote(NoteMessage note)
    if (note.velocity > 0)
    {
       mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0, note.voiceIdx, note.modulation);
-      double adsrScale = SingleOscillatorVoice::GetADSRScale(note.velocity / 127.0, mVoiceParams.mVelToEnvelope);
-      mVoiceParams.mAdsr.Start(note.time, 1, adsrScale); //for visualization
-      mVoiceParams.mFilterAdsr.Start(note.time, 1, adsrScale); //for visualization
+      mVoiceParams.mAdsr.Start(note.time, 1); //for visualization
+      mVoiceParams.mFilterAdsr.Start(note.time, 1); //for visualization
    }
    else
    {

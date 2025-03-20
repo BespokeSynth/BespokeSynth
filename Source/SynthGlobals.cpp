@@ -96,9 +96,10 @@ void SynthInit()
 
    assert(kNumVoices <= 16); //assumption that we don't have more voices than midi channels
 
-   gStepVelocityLevels[(int)StepVelocityType::Ghost] = 0.4;
-   gStepVelocityLevels[(int)StepVelocityType::Normal] = 0.8;
-   gStepVelocityLevels[(int)StepVelocityType::Accent] = 1.0;
+   gStepVelocityLevels[(int)StepVelocityType::Off] = kVelocityOff;
+   gStepVelocityLevels[(int)StepVelocityType::Ghost] = kVelocityGhost;
+   gStepVelocityLevels[(int)StepVelocityType::Normal] = kVelocityNormal;
+   gStepVelocityLevels[(int)StepVelocityType::Accent] = kVelocityAccent;
 }
 
 void LoadGlobalResources()

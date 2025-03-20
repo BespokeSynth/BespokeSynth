@@ -53,7 +53,7 @@ struct GridCell
 class UIGrid : public IUIControl
 {
 public:
-   UIGrid(std::string name, int x, int y, int w, int h, int cols, int rows, IClickable* parent);
+   UIGrid(IClickable* parent, std::string name, int x, int y, int w, int h, int cols, int rows);
    void Init(int x, int y, int w, int h, int cols, int rows, IClickable* parent);
    void SetGrid(int cols, int rows);
    int GetRows() { return mRows; }
@@ -62,6 +62,7 @@ public:
    void MouseReleased() override;
    bool MouseMoved(double x, double y) override;
    bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   double GetVal(int col, int row) const;
    double& GetVal(int col, int row);
    void SetVal(int col, int row, double val, bool notifyListener = true);
    void SetHighlightCol(double time, int col);
@@ -93,6 +94,7 @@ public:
    double GetSubdividedValue(double position) const;
    bool GetNoHover() const override { return true; }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
+   void SetCanBeUIControlTarget(bool targetable) { mCanBeUIControlTarget = targetable; }
 
    enum GridMode
    {
@@ -108,9 +110,13 @@ public:
    ofVec2d GetCellPosition(int col, int row);
 
    //IUIControl
-   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
-   void SetValue(double value, double time, bool forceUpdate = false) override {}
-   bool IsSliderControl() override { return false; }
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override;
+   double GetMidiValue() const override;
+   std::string GetDisplayValue(double val) const override;
+   bool IsSliderControl() override { return true; }
    bool IsButtonControl() override { return false; }
 
    void SaveState(FileStreamOut& out) override;
@@ -127,7 +133,7 @@ private:
       height = mHeight;
    }
 
-   int GetDataIndex(int col, int row) { return col + row * MAX_GRID_COLS; }
+   int GetDataIndex(int col, int row) const { return col + row * MAX_GRID_COLS; }
    double GetX(int col, int row) const;
    double GetY(int row) const;
    bool CanAdjustMultislider() const;
@@ -164,4 +170,7 @@ private:
    bool mShouldDrawValue{ false };
    bool mMomentary{ false };
    int mClickSubdivisions{ 1 };
+   bool mCanBeUIControlTarget{ false };
+   int mValueSetTargetCol{ 0 };
+   int mValueSetTargetRow{ 0 };
 };

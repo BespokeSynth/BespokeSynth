@@ -286,6 +286,7 @@ private:
    bool mMouseDown{ false };
    int mOriginalValue{ 0 };
    IIntSliderListener* mOwner;
+   int mFineRefX{ -999 };
 
    int mLastDisplayedValue{ 0 };
    int mLastSetValue{ 0 };

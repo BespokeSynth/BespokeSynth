@@ -148,11 +148,16 @@ enum KeyModifiers
 
 enum class StepVelocityType
 {
-   Ghost = 0,
-   Normal = 1,
-   Accent = 2,
-   NumVelocityLevels = 3
+   Off = 0,
+   Ghost = 1,
+   Normal = 2,
+   Accent = 3,
+   NumVelocityLevels = 4
 };
+constexpr double kVelocityOff = 0.0;
+constexpr double kVelocityGhost = 0.4;
+constexpr double kVelocityNormal = 0.75;
+constexpr double kVelocityAccent = 1.0;
 extern std::array<double, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
 
 class LoadingJSONException : public std::exception

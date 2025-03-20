@@ -63,7 +63,16 @@ public:
 
    UIGrid* GetGrid() const { return mGrid; }
 
-   int RowToPitch(int row);
+   enum NoteMode
+   {
+      kNoteMode_Scale,
+      kNoteMode_Chromatic,
+      kNoteMode_Pentatonic,
+      kNoteMode_Fifths
+   };
+
+   static int RowToPitch(NoteMode noteMode, int row, int octave, int rowOffset);
+
    int PitchToRow(int pitch);
    void SetStep(int index, int step, int velocity, double length);
    void SetPitch(int index, int pitch, int velocity, double length);
@@ -151,14 +160,6 @@ private:
    void Step(double time, double velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
-
-   enum NoteMode
-   {
-      kNoteMode_Scale,
-      kNoteMode_Chromatic,
-      kNoteMode_Pentatonic,
-      kNoteMode_Fifths
-   };
 
    int mTones[NSS_MAX_STEPS]{};
    int mVels[NSS_MAX_STEPS]{};
