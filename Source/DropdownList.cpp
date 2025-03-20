@@ -406,7 +406,7 @@ int DropdownList::GetItemIndexAt(int x, int y)
          return -1;
       indexOffset = mCurrentPagedColumn * mMaxPerColumn;
    }
-   return y / kItemSpacing + x / mMaxItemWidth * mMaxPerColumn + indexOffset;
+   return y / kItemSpacing + x / (mMaxItemWidth * mMaxPerColumn + indexOffset);
 }
 
 ofVec2d DropdownList::GetModalListPosition() const

@@ -538,7 +538,7 @@ void BassLineSequencer::ResetStep()
 
 void BassLineSequencer::UpdateStepControls()
 {
-   for (int i = 0; i < (int)mStepControls.size(); ++i)
+   for (int i = 0; i < (int)mStepControls.size() - 1; ++i)
    {
       mStepControls[i].mTone = mSteps[i + mEditPage * mNumVisibleStepControls].mTone;
       mStepControls[i].mVelocity = mSteps[i + mEditPage * mNumVisibleStepControls].mVelocity;
