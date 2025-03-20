@@ -909,7 +909,7 @@ void MidiController::Poll()
                if (connection->mMidiOnValue != 127 ||
                    connection->mMidiOffValue != 0) //uses defined slider range for output
                {
-                  outVal = int((curValue / 127.0f) * (connection->mMidiOnValue - connection->mMidiOffValue) + connection->mMidiOffValue);
+                  outVal = int((curValue / 127.0) * (connection->mMidiOnValue - connection->mMidiOffValue) + connection->mMidiOffValue);
                }
                if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
@@ -1732,7 +1732,7 @@ void MidiController::LoadControllerLayout(std::string filename)
          }
          if (!mLayoutData["pitchbendrange"].isNull())
          {
-            SetPitchBendRange(mLayoutData["pitchbendrange"].asInt());
+            SetPitchBendRange(mLayoutData["pitchbendrange"].asDouble());
             mModuleSaveData.SetFloat("pitchbendrange", mPitchBendRange);
          }
          if (!mLayoutData["modwheelcc"].isNull())

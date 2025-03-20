@@ -83,7 +83,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   int bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
    mDelayBuffer.SetNumChannels(buffer->NumActiveChannels());
 
    for (int i = 0; i < bufferSize; ++i)

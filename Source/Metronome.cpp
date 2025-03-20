@@ -59,7 +59,7 @@ void Metronome::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 

@@ -549,7 +549,7 @@ void EuclideanSequencer::RandomizeNote(int ringIndex, bool force)
             int noteTo = numPitchesInScale * (mRndOctaveHi - mRndOctaveLo + 1) + noteFrom;
 
             // Try 5 times to generate a unique random pitch. This prevents stuck notes on some synths
-            float newPitch;
+            int newPitch;
             bool isUnique;
             int attempts = 0;
             do
@@ -888,7 +888,7 @@ void EuclideanSequencerRing::OnTransportAdvanced(double amount)
    PROFILER(EuclideanSequencerRing);
 
    TransportListenerInfo info(nullptr, kInterval_CustomDivisor, OffsetInfo(mOffset, false), false);
-   info.mCustomDivisor = mLength + (mLength == 1); // +1 if mLength(Steps) == 1: fixes not playing onset 1 when mLength = 1: force oldStep <> newStep
+   info.mCustomDivisor = mLength + ofAlmostEquel(mLength, 1); // +1 if mLength(Steps) == 1: fixes not playing onset 1 when mLength = 1: force oldStep <> newStep
 
    double remainderMs;
    const int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);

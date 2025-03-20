@@ -78,7 +78,7 @@ void SeaOfGrain::CreateUIControls()
 
    for (int i = 0; i < kNumManualVoices; ++i)
    {
-      float x = 10 + i * 130;
+      int x = 10 + i * 130;
       mManualVoices[i].mGainSlider = new FloatSlider(this, ("gain " + ofToString(i + 1)).c_str(), x, mBufferY + mBufferH + 12, 120, 15, &mManualVoices[i].mGain, 0, 1);
       mManualVoices[i].mPositionSlider = new FloatSlider(this, ("pos " + ofToString(i + 1)).c_str(), mManualVoices[i].mGainSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mPosition, 0, 1);
       mManualVoices[i].mOverlapSlider = new FloatSlider(this, ("overlap " + ofToString(i + 1)).c_str(), mManualVoices[i].mPositionSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mGrainOverlap, .25, MAX_GRAINS);
@@ -130,7 +130,7 @@ void SeaOfGrain::Process(double time)
    SyncBuffers(numChannels);
    mRecordBuffer.SetNumChannels(numChannels);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    ChannelBuffer* out = target->GetBuffer();
    assert(bufferSize == gBufferSize);
 

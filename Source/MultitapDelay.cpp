@@ -99,7 +99,7 @@ void MultitapDelay::Process(double time)
    for (int t = 0; t < mNumTaps; ++t)
       mTaps[t].mTapBuffer.SetNumActiveChannels(mWriteBuffer.NumActiveChannels());
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();

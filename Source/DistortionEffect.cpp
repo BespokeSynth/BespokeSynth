@@ -70,7 +70,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   double bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
    {

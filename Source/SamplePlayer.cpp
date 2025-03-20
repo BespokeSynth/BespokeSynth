@@ -329,7 +329,7 @@ void SamplePlayer::Process(double time)
       ComputeSliders(0);
       SyncBuffers(mSample->NumChannels());
 
-      int bufferSize = target->GetBuffer()->BufferSize();
+      auto bufferSize = target->GetBuffer()->BufferSize();
       assert(bufferSize == gBufferSize);
 
       double volSq = mVolume * mVolume;

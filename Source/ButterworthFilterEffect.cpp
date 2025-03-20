@@ -62,7 +62,7 @@ void ButterworthFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   double bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
    mDryBuffer.SetNumActiveChannels(buffer->NumActiveChannels());
 
    const double fadeOutStart = mFSlider->GetMax() * .75;

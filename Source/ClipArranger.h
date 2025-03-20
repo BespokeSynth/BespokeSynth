@@ -69,7 +69,7 @@ private:
    int MouseXToSample(double mouseX);
    double SampleToX(int sample);
    bool IsMousePosWithinClip(int x, int y);
-   void AddSample(Sample* sample, int x, int y);
+   void AddSample(Sample* sample, double x, double y);
 
    static const int MAX_CLIPS = 50;
    static const int BUFFER_MARGIN_X = 5;

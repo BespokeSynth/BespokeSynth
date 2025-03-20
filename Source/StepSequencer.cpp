@@ -245,7 +245,7 @@ void StepSequencer::UpdateVelocityLights()
    if (mVelocityGridController->GetGridController() == nullptr)
       return;
 
-   float stepVelocity = 0;
+   double stepVelocity = 0;
    if (mHeldButtons.size() > 0)
       stepVelocity = mGrid->GetVal(mHeldButtons.begin()->mCol, mHeldButtons.begin()->mRow);
 
@@ -254,7 +254,7 @@ void StepSequencer::UpdateVelocityLights()
       for (int y = 0; y < mVelocityGridController->GetGridController()->NumRows(); ++y)
       {
          GridColor color;
-         if (stepVelocity >= (8 - y) / 8.0f)
+         if (stepVelocity >= (8 - y) / 8.0)
             color = kGridColor2Bright;
          else
             color = kGridColorOff;
@@ -414,8 +414,8 @@ int StepSequencer::GetNumControllerChunks()
    int rows = GetGridControllerRows();
    int cols = GetGridControllerCols();
 
-   int numBreaks = int((mGrid->GetCols() / MAX(1.0f, cols)) + .5f);
-   int numChunks = int(mGrid->GetRows() / MAX(1.0f, (rows / MAX(1, numBreaks))) + .5f);
+   int numBreaks = int((mGrid->GetCols() / MAX(1.0, cols)) + .5);
+   int numChunks = int(mGrid->GetRows() / MAX(1.0, (rows / MAX(1, numBreaks))) + .5);
    return numChunks;
 }
 

@@ -51,7 +51,7 @@ void Lissajous::Process(double time)
 
    SyncBuffers();
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    IAudioReceiver* target = GetTarget();
    if (target)
    {

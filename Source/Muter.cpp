@@ -48,7 +48,7 @@ void Muter::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    PROFILER(Muter);
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    for (int i = 0; i < bufferSize; ++i)
    {

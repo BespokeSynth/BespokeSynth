@@ -177,7 +177,7 @@ void LooperRecorder::Process(double time)
    mWriteBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    if (mCommitToLooper)
    {

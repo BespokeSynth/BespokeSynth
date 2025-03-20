@@ -183,7 +183,7 @@ void GridControllerMidi::SetLight(int x, int y, GridColor color, bool force)
    SetLightDirect(x, y, rawColor, force);
 }
 
-void GridControllerMidi::SetLightDirect(int x, int y, int color, bool force)
+void GridControllerMidi::SetLightDirect(int x, int y, double color, bool force)
 {
    if (mLights[x][y] != color || force)
    {

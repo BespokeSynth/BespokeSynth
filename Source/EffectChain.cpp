@@ -126,7 +126,7 @@ void EffectChain::Process(double time)
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    if (mEnabled)
    {
@@ -349,10 +349,10 @@ void EffectChain::GetPush2OverrideControls(std::vector<IUIControl*>& controls) c
 
 void EffectChain::GetModuleDimensions(double& width, double& height)
 {
-   int maxX = 100;
+   double maxX = 100;
    if (mShowSpawnList)
       maxX += 100;
-   int maxY = 0;
+   double maxY = 0;
    for (int i = 0; i < mEffects.size(); ++i)
    {
       double x, y, w, h;

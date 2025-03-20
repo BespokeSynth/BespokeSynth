@@ -94,7 +94,7 @@ void Rewriter::Process(double time)
    SyncBuffers();
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {

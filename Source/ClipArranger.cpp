@@ -194,7 +194,7 @@ void ClipArranger::FilesDropped(std::vector<std::string> files, double x, double
    AddSample(sample, x, y);
 }
 
-void ClipArranger::AddSample(Sample* sample, int x, int y)
+void ClipArranger::AddSample(Sample* sample, double x, double y)
 {
    Clip* clip = GetEmptyClip();
    clip->mSample = sample;

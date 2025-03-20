@@ -79,7 +79,7 @@ void SampleCapturer::Process(double time)
       return;
    }
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    ChannelBuffer* out = target->GetBuffer();
    gWorkChannelBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());

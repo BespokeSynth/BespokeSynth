@@ -114,7 +114,7 @@ void BandVocoder::Process(double time)
    double carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
    double volSq = mVolume * mVolume;
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    Clear(mOutBuffer, bufferSize);
 

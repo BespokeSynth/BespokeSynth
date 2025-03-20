@@ -81,7 +81,7 @@ void SampleFinder::Process(double time)
       mWantWrite = false;
    }
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
@@ -229,7 +229,7 @@ void SampleFinder::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoubleLengthButton)
    {
-      float newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
+      double newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
       if (newEnd < mSample->LengthInSamples())
       {
          mClipEnd = newEnd;
@@ -240,7 +240,7 @@ void SampleFinder::ButtonClicked(ClickButton* button, double time)
    {
       if (mNumBars % 2 == 0)
       {
-         float newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
+         double newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
          mClipEnd = newEnd;
          mNumBars /= 2;
       }

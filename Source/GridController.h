@@ -59,7 +59,7 @@ public:
    virtual ~IGridController() {}
    virtual void SetGridControllerOwner(IGridControllerListener* owner) = 0;
    virtual void SetLight(int x, int y, GridColor color, bool force = false) = 0;
-   virtual void SetLightDirect(int x, int y, int color, bool force = false) = 0;
+   virtual void SetLightDirect(int x, int y, double color, bool force = false) = 0;
    virtual void ResetLights() = 0;
    virtual int NumCols() = 0;
    virtual int NumRows() = 0;
@@ -118,7 +118,7 @@ public:
    //IGridController
    void SetGridControllerOwner(IGridControllerListener* owner) override { mOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
-   void SetLightDirect(int x, int y, int color, bool force = false) override;
+   void SetLightDirect(int x, int y, double color, bool force = false) override;
    void ResetLights() override;
    int NumCols() override { return mCols; }
    int NumRows() override { return mRows; }

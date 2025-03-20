@@ -175,7 +175,7 @@ private:
 
    double mWidth{ 35 };
    double mHeight{ DropdownList::kItemSpacing };
-   int mMaxItemWidth{ 20 };
+   double mMaxItemWidth{ 20 };
    int mMaxPerColumn{ 40 };
    int mDisplayColumns{ 1 };
    int mTotalColumns{ 1 };

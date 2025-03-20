@@ -45,8 +45,8 @@ EventCanvas::EventCanvas()
 
    for (auto& color : mRowColors)
    {
-      color.setBrightness(color.getBrightness() * .8f);
-      color.setSaturation(color.getSaturation() * .7f);
+      color.setBrightness(color.getBrightness() * .8);
+      color.setSaturation(color.getSaturation() * .7);
    }
 
    mRowConnections.resize(kMaxEventRows);

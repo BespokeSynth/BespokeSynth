@@ -116,7 +116,7 @@ void Waveshaper::Process(double time)
    double max = 0;
    double min = 0;
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    ChannelBuffer* out = target->GetBuffer();
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)

@@ -43,7 +43,7 @@ public:
 
    void SetGridControllerOwner(IGridControllerListener* owner) override { mOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
-   void SetLightDirect(int x, int y, int color, bool force = false) override;
+   void SetLightDirect(int x, int y, double color, bool force = false) override;
    void ResetLights() override;
    int NumCols() override { return mCols; }
    int NumRows() override { return mRows; }

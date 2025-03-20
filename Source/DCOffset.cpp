@@ -54,7 +54,7 @@ void DCOffset::Process(double time)
       ComputeSliders(0);
       SyncBuffers();
 
-      int bufferSize = GetBuffer()->BufferSize();
+      auto bufferSize = GetBuffer()->BufferSize();
 
       ChannelBuffer* out = target->GetBuffer();
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)

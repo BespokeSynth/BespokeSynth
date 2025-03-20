@@ -34,7 +34,7 @@ struct MidiNote
    const char* mDeviceName;
    double mTimestampMs{ 0 };
    int mPitch{ 0 };
-   double mVelocity{ 0 }; //0-127
+   float mVelocity{ 0 }; //0-127
    int mChannel{ -1 };
 };
 
@@ -42,7 +42,7 @@ struct MidiControl
 {
    const char* mDeviceName;
    int mControl{ 0 };
-   double mValue{ 0 };
+   float mValue{ 0 };
    int mChannel{ -1 };
 };
 
@@ -56,7 +56,7 @@ struct MidiProgramChange
 struct MidiPitchBend
 {
    const char* mDeviceName;
-   double mValue{ 0 };
+   float mValue{ 0 };
    int mChannel{ -1 };
 };
 
@@ -64,7 +64,7 @@ struct MidiPressure
 {
    const char* mDeviceName;
    int mPitch{ 0 };
-   double mPressure{ 0 };
+   float mPressure{ 0 };
    int mChannel{ -1 };
 };
 

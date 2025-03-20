@@ -74,7 +74,7 @@ void WaveformViewer::Process(double time)
 
       int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
 
-      int bufferSize = GetBuffer()->BufferSize();
+      auto bufferSize = GetBuffer()->BufferSize();
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (ch == 0)

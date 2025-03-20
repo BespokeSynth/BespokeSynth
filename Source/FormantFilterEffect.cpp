@@ -80,7 +80,7 @@ void FormantFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 

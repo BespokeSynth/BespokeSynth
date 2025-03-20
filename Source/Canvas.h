@@ -84,7 +84,7 @@ public:
    bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void Clear();
    void SetListener(ICanvasListener* listener) { mListener = listener; }
-   void SetDimensions(int width, int height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;

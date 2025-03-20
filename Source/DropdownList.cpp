@@ -117,7 +117,7 @@ void DropdownList::CalculateWidth()
    mMaxItemWidth = mWidth;
    for (int i = 0; i < mElements.size(); ++i)
    {
-      int width = GetStringWidth(mElements[i].mLabel) + (mDrawTriangle ? 15 : 3);
+      double width = GetStringWidth(mElements[i].mLabel) + (mDrawTriangle ? 15 : 3);
       if (width > mMaxItemWidth)
          mMaxItemWidth = width;
    }

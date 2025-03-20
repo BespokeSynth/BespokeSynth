@@ -49,7 +49,7 @@ public:
    void CreateUIControls() override;
 
    void LoadSample(const char* file);
-   void SetPlaybackInfo(bool play, int position, double speed, double volume);
+   void SetPlaybackInfo(bool play, double position, double speed, double volume);
 
    //IAudioSource
    void Process(double time) override;

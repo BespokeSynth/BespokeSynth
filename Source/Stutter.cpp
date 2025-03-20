@@ -52,7 +52,7 @@ void Stutter::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    PROFILER(Stutter);
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    mRecordBuffer.SetNumChannels(buffer->NumActiveChannels());
    mStutterBuffer.SetNumActiveChannels(buffer->NumActiveChannels());

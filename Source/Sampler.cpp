@@ -98,7 +98,7 @@ void Sampler::Process(double time)
    SyncOutputBuffer(numChannels);
    mWriteBuffer.SetNumActiveChannels(numChannels);
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    mWriteBuffer.Clear();
 

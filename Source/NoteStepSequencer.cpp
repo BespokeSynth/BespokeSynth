@@ -807,8 +807,8 @@ void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
       displayVel = mQueuedPush2Vel;
    for (int i = 0; i < 16; ++i)
    {
-      int ledLow = ((i * 2) / 32.0f) < displayVel / 127.0f;
-      int ledHigh = ((i * 2 + 1) / 32.0f) < displayVel / 127.0f;
+      int ledLow = ((i * 2) / 32.0) < displayVel / 127.0;
+      int ledHigh = ((i * 2 + 1) / 32.0) < displayVel / 127.0;
       unsigned char c = ledLow + (ledHigh << 3);
       touchStripLights += c;
    }

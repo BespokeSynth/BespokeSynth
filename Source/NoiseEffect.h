@@ -66,7 +66,7 @@ private:
    double mAmount{ 0 };
    int mWidth{ 10 };
    int mSampleCounter{ 0 };
-   float mRandom{ 0 };
+   double mRandom{ 0 };
    FloatSlider* mAmountSlider{ nullptr };
    IntSlider* mWidthSlider{ nullptr };
 };

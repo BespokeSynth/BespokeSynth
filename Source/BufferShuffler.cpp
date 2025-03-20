@@ -95,7 +95,7 @@ void BufferShuffler::Process(double time)
    SyncBuffers();
    mInputBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
 
    if (mEnabled)
    {

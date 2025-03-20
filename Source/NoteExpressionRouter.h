@@ -71,9 +71,9 @@ private:
    double mHeight{ 20 };
 
 private:
-   exprtk::symbol_table<float> mSymbolTable;
-   float mSTNote{ 0 }, mSTVelocity{ 0 }; // bound to the symbol table
-   std::array<exprtk::expression<float>, kMaxDestinations> mExpressions;
+   exprtk::symbol_table<double> mSymbolTable;
+   double mSTNote{ 0 }, mSTVelocity{ 0 }; // bound to the symbol table
+   std::array<exprtk::expression<double>, kMaxDestinations> mExpressions;
    TextEntry* mExpressionWidget[kMaxDestinations]{ nullptr };
    char mExpressionText[kMaxDestinations][MAX_TEXTENTRY_LENGTH]{};
 };

@@ -77,7 +77,7 @@ void FreqDomainBoilerplate::Process(double time)
    double inputPreampSq = mInputPreamp * mInputPreamp;
    double volSq = mVolume * mVolume;
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
 

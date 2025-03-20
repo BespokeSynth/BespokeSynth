@@ -320,7 +320,7 @@ void Autotalent::Process(double time)
 
    float* pfInput = GetBuffer()->GetChannel(0);
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    Clear(mWorkingBuffer, GetBuffer()->BufferSize());
    float* pfOutput = mWorkingBuffer;

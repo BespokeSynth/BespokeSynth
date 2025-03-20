@@ -168,7 +168,7 @@ void SampleBrowser::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    gWorkChannelBuffer.Clear();

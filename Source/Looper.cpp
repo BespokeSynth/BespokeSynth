@@ -236,7 +236,7 @@ void Looper::Process(double time)
    if (mWantShiftDownbeat)
       DoShiftDownbeat();
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    double oldLoopPos = mLoopPos;
    int sampsPerBar = mLoopLength / mNumBars;

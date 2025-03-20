@@ -173,7 +173,7 @@ void SingleOscillator::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();

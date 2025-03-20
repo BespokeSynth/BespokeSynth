@@ -72,7 +72,7 @@ void SlowLayers::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
 
    int loopLengthInSamples = LoopLength();

@@ -157,7 +157,7 @@ void ComboGridController::SetLight(int x, int y, GridColor color, bool force)
    }
 }
 
-void ComboGridController::SetLightDirect(int x, int y, int color, bool force)
+void ComboGridController::SetLightDirect(int x, int y, double color, bool force)
 {
    assert(false); //TODO(Ryan) implement, maybe
 }

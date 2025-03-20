@@ -48,7 +48,7 @@ void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   double bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 

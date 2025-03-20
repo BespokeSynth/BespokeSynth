@@ -47,7 +47,7 @@ void DCRemoverEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       mBiquad[ch].Filter(buffer->GetChannel(ch), bufferSize);

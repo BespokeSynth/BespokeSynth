@@ -62,7 +62,7 @@ void FreqDelay::Process(double time)
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    mDryBuffer.CopyFrom(GetBuffer());
    mDelayEffect.ProcessAudio(time, GetBuffer());

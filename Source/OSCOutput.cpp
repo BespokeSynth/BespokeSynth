@@ -105,7 +105,7 @@ void OSCOutput::PlayNote(NoteMessage note)
    if (mNoteOutLabel.size() > 0)
    {
       juce::OSCMessage msg(("/bespoke/" + mNoteOutLabel).c_str());
-      float pitchOut = note.pitch;
+      double pitchOut = note.pitch;
       if (note.modulation.pitchBend != nullptr)
          pitchOut += note.modulation.pitchBend->GetValue(0);
       msg.addFloat32(pitchOut);

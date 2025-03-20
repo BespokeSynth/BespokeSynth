@@ -290,10 +290,10 @@ public:
    UIControlConnection* GetConnectionForCableSource(const PatchCableSource* source);
    void ResyncControllerState();
 
-   void SetVelocityMult(float mult) { mVelocityMult = mult; }
+   void SetVelocityMult(double mult) { mVelocityMult = mult; }
    void SetUseChannelAsVoice(bool use) { mUseChannelAsVoice = use; }
    void SetNoteOffset(int offset) { mNoteOffset = offset; }
-   void SetPitchBendRange(float range) { mPitchBendRange = range; }
+   void SetPitchBendRange(double range) { mPitchBendRange = range; }
 
    void SendNote(int page, int pitch, int velocity, bool forceNoteOn = false, int channel = -1);
    void SendCC(int page, int ctl, int value, int channel = -1);

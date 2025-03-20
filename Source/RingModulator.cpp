@@ -64,7 +64,7 @@ void RingModulator::Process(double time)
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
 
    if (mEnabled)
    {

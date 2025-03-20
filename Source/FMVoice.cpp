@@ -52,7 +52,7 @@ bool FMVoice::Process(double time, ChannelBuffer* out, int oversampling)
    if (IsDone(time))
       return false;
 
-   int bufferSize = out->BufferSize();
+   auto bufferSize = out->BufferSize();
    int channels = out->NumActiveChannels();
    double sampleIncrementMs = gInvSampleRateMs;
    ChannelBuffer* destBuffer = out;

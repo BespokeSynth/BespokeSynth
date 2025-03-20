@@ -287,7 +287,7 @@ void GridModule::SetLight(int x, int y, GridColor color, bool force)
    SetLightDirect(x, y, colorIdx, force);
 }
 
-void GridModule::SetLightDirect(int x, int y, int color, bool force)
+void GridModule::SetLightDirect(int x, int y, double color, bool force)
 {
    if (mGridControlTarget->GetGridController())
       mGridControlTarget->GetGridController()->SetLightDirect(x, y, color, force);

@@ -741,7 +741,7 @@ void VSTPlugin::Process(double time)
 
    const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    juce::AudioBuffer<float> buffer(bufferChannels, bufferSize);

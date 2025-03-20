@@ -114,7 +114,7 @@ void BeatBloks::Process(double time)
       mWantWrite = false;
    }
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 

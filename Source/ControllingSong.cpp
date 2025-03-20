@@ -151,11 +151,11 @@ void ControllingSong::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   float volSq = mVolume * mVolume * .5;
+   double volSq = mVolume * mVolume * .5;
 
    mSample.SetRate(mSpeed);
 
@@ -168,7 +168,7 @@ void ControllingSong::Process(double time)
    {
       mLoadSongMutex.lock();
 
-      double ms = mSample.GetPlayPosition() / mSample.GetSampleRateRatio() / double(gSampleRate) * 1000.0;
+      double ms = mSample.GetPlayPosition() / mSample.GetSampleRateRatio() / static_cast<double>(gSampleRate) * 1000.0;
       if (ms >= 0)
       {
          TheTransport->SetTempo(MIN(200, mMidiReader.GetTempo(ms)) * mSpeed);
@@ -253,11 +253,11 @@ void ControllingSong::ButtonClicked(ClickButton* button, double time)
       mNeedNewSong = true;
    if (button == mPhraseForwardButton || button == mPhraseBackButton)
    {
-      int position = mSample.GetPlayPosition();
-      int jumpAmount = TheTransport->GetDuration(kInterval_4) / gInvSampleRateMs * mSample.GetSampleRateRatio();
+      double position = mSample.GetPlayPosition();
+      double jumpAmount = TheTransport->GetDuration(kInterval_4) / gInvSampleRateMs * mSample.GetSampleRateRatio();
       if (button == mPhraseBackButton)
          jumpAmount *= -1;
-      int newPosition = position + jumpAmount;
+      double newPosition = position + jumpAmount;
       if (newPosition < 0)
          newPosition = 0;
       mSample.SetPlayPosition(newPosition);

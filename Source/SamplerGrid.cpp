@@ -100,7 +100,7 @@ void SamplerGrid::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    Clear(gWorkBuffer, gBufferSize);
 

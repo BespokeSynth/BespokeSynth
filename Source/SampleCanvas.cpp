@@ -96,7 +96,7 @@ void SampleCanvas::Process(double time)
 
    mCanvas->SetCursorPos(canvasPos);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    gWorkChannelBuffer.Clear();

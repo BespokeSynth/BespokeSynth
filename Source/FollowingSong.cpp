@@ -54,7 +54,7 @@ void FollowingSong::LoadSample(const char* file)
    mLoadingSong = false;
 }
 
-void FollowingSong::SetPlaybackInfo(bool play, int position, double speed, double volume)
+void FollowingSong::SetPlaybackInfo(bool play, double position, double speed, double volume)
 {
    mPlay = play;
    mSample.SetRate(speed);
@@ -73,7 +73,7 @@ void FollowingSong::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 

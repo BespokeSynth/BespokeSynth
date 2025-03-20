@@ -70,7 +70,7 @@ void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
    if (buffer->NumActiveChannels() != mDryBuffer.NumActiveChannels())
       mCoefficientsHaveChanged = true; //force filters for other channels to get updated
    mDryBuffer.SetNumActiveChannels(buffer->NumActiveChannels());
