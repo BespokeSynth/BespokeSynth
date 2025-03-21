@@ -48,10 +48,10 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -61,14 +61,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 200;
       height = 35;
    }
 
-   float mStrum{ 0 };
-   float mLastStrumPos{ 0 };
+   double mStrum{ 0 };
+   double mLastStrumPos{ 0 };
    FloatSlider* mStrumSlider{ nullptr };
    std::list<int> mNotes;
 };

@@ -44,17 +44,17 @@
 #define UIBLOCK2(A, B) UIBLOCK3(A, B, 100)
 #define UIBLOCK3(A, B, C)                  \
    {                                       \
-      float xPos = A;                      \
-      float yPos = B;                      \
-      float originalY = B;                 \
-      float sliderWidth = C;               \
-      float originalSliderWidth = C;       \
+      double xPos = A;                     \
+      double yPos = B;                     \
+      double originalY = B;                \
+      double sliderWidth = C;              \
+      double originalSliderWidth = C;      \
       IUIControl* lastUIControl = nullptr; \
-      float xMax = 0;                      \
-      float yMax = 0;                      \
-      float xOffset = 0;                   \
-      float savedX = 0;                    \
-      float savedY = 0;                    \
+      double xMax = 0;                     \
+      double yMax = 0;                     \
+      double xOffset = 0;                  \
+      double savedX = 0;                   \
+      double savedY = 0;                   \
       UNUSED(originalY);                   \
       UNUSED(originalSliderWidth);         \
       UNUSED(sliderWidth);                 \

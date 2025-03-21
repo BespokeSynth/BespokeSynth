@@ -49,9 +49,9 @@ public:
    void PlayNote(NoteMessage note) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -62,13 +62,13 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 120;
       height = 22;
    }
 
-   float mPressure{ 0 };
+   double mPressure{ 0 };
    FloatSlider* mPressureSlider{ nullptr };
 
    Modulations mModulation{ true };

@@ -53,7 +53,7 @@ public:
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -73,7 +73,7 @@ public:
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -83,12 +83,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    std::string GetArpNoteDisplay(int pitch);
    void UpdateInterval();
@@ -108,8 +108,8 @@ private:
    };
    std::vector<ArpNote> mChord;
 
-   float mWidth;
-   float mHeight;
+   double mWidth{ 100 };
+   double mHeight{ 20 };
 
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    int mLastPitch{ -1 };

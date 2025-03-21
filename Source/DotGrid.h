@@ -56,8 +56,8 @@ public:
    struct DotData
    {
       bool mOn;
-      float mVelocity;
-      float mLength;
+      double mVelocity;
+      double mLength;
       double mLastPlayTime; //unserialized
    };
 
@@ -68,37 +68,38 @@ public:
    int GetCols() { return mCols; }
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void SetHighlightCol(double time, int col);
    int GetHighlightCol(double time) const;
    void SetMajorColSize(int size) { mMajorCol = size; }
    int GetMajorColSize() const { return mMajorCol; }
    void Clear();
-   void SetDimensions(float width, float height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;
    }
-   float GetWidth() const { return mWidth; }
-   float GetHeight() const { return mHeight; }
+
+   double GetWidth() const { return mWidth; }
+   double GetHeight() const { return mHeight; }
    const std::array<DotData, kMaxCols * kMaxRows>& GetData() const { return mData; }
    void SetData(std::array<DotData, kMaxCols * kMaxRows>& data) { mData = data; }
    bool GetNoHover() const override { return true; }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    const DotData& GetDataAt(int col, int row) const;
    void OnPlayed(double time, int col, int row);
-   float GetDotSize() const;
+   double GetDotSize() const;
    int GetMaxColumns() const { return kMaxCols; }
    void CopyDot(DotPosition from, DotPosition to);
    bool IsValidPosition(DotPosition pos) const;
 
-   DotPosition GetGridCellAt(float x, float y, bool clamp = true);
-   ofVec2f GetCellPosition(int col, int row);
+   DotPosition GetGridCellAt(double x, double y, bool clamp = true);
+   ofVec2d GetCellPosition(int col, int row);
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool ShouldSerializeForSnapshot() const override { return true; }
@@ -110,8 +111,8 @@ protected:
    ~DotGrid(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -119,9 +120,9 @@ private:
    void KeyPressed(int key, bool repeat) override;
 
    int GetDataIndex(int col, int row) const { return col + row * kMaxCols; }
-   float GetX(int col) const;
-   float GetY(int row) const;
-   void DrawGridCircle(int col, int row, float radiusPercent) const;
+   double GetX(int col) const;
+   double GetY(int row) const;
+   void DrawGridCircle(int col, int row, double radiusPercent) const;
 
    struct HighlightColBuffer
    {
@@ -137,13 +138,13 @@ private:
    };
    DragBehavior mDragBehavior{ DragBehavior::Pending };
 
-   float mWidth{ 200 };
-   float mHeight{ 200 };
+   double mWidth{ 200 };
+   double mHeight{ 200 };
    int mRows{ 0 };
    int mCols{ 0 };
    bool mClick{ false };
    DotPosition mHoldCell{ -1, -1 };
-   ofVec2f mLastDragPosition{ -1, -1 };
+   ofVec2d mLastDragPosition{ -1, -1 };
    bool mMouseReleaseCanClear{ false };
    std::array<DotData, kMaxCols * kMaxRows> mData{};
    std::array<HighlightColBuffer, 10> mHighlightColBuffer{};

@@ -49,7 +49,7 @@ void BitcrushEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
@@ -83,11 +83,11 @@ void BitcrushEffect::DrawModule()
    mCrushSlider->Draw();
 }
 
-float BitcrushEffect::GetEffectAmount()
+double BitcrushEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp((mCrush - 1) / 24.0f + ((int)mDownsample - 1) / 40.0f, 0, 1);
+   return ofClamp((mCrush - 1) / 24.0 + (static_cast<int>(mDownsample) - 1) / 40.0, 0, 1);
 }
 
 void BitcrushEffect::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -98,6 +98,6 @@ void BitcrushEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time
 {
 }
 
-void BitcrushEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BitcrushEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }

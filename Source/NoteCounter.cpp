@@ -48,7 +48,7 @@ void NoteCounter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   float desiredWidth = 116;
+   double desiredWidth = 116;
 
    UIBLOCK(3, 3, desiredWidth - 6);
    DROPDOWN(mIntervalSelector, "interval", ((int*)(&mInterval)), 50);
@@ -129,16 +129,16 @@ void NoteCounter::DrawModule()
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
-      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mDeterministicLength, 1);
-      const float kPipSize = 3;
-      float moduleWidth, moduleHeight;
+      double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mDeterministicLength, 1);
+      const double kPipSize = 3;
+      double moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);
       ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
       ofPopStyle();
    }
 }
 
-void NoteCounter::Step(double time, float velocity, int pulseFlags)
+void NoteCounter::Step(double time, double velocity, int pulseFlags)
 {
    if (!mEnabled)
       return;
@@ -158,7 +158,7 @@ void NoteCounter::Step(double time, float velocity, int pulseFlags)
       if (pulseFlags & kPulseFlag_Align)
       {
          int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-         int numMeasures = ceil(float(mLength) / stepsPerMeasure);
+         int numMeasures = ceil(static_cast<double>(mLength) / stepsPerMeasure);
          int measure = TheTransport->GetMeasure(time) % numMeasures;
          int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
          mStep = step;
@@ -206,7 +206,7 @@ void NoteCounter::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
-void NoteCounter::OnPulse(double time, float velocity, int flags)
+void NoteCounter::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
 
@@ -253,7 +253,7 @@ void NoteCounter::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void NoteCounter::GetModuleDimensions(float& width, float& height)
+void NoteCounter::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

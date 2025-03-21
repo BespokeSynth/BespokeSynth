@@ -55,7 +55,7 @@ public:
    InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IScaleListener
    void OnScaleChanged() override;
@@ -66,7 +66,7 @@ public:
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
    //IButtonListener
@@ -80,7 +80,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 100;
       height = 50;

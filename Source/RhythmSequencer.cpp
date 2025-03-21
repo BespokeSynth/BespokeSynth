@@ -41,7 +41,7 @@ void RhythmSequencer::Init()
 {
    IDrawableModule::Init();
 
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1, true), false);
 }
 
 void RhythmSequencer::CreateUIControls()
@@ -74,7 +74,7 @@ void RhythmSequencer::CreateUIControls()
       xOffset += 10;
       DROPDOWN(mStepData[i].mActionSelector, ("action " + ofToString(i + 1)).c_str(), (int*)(&(mStepData[i].mAction)), 60);
       UIBLOCK_SHIFTRIGHT();
-      FLOATSLIDER_DIGITS(mStepData[i].mVelSlider, ("vel " + ofToString(i + 1)).c_str(), &(mStepData[i].mVel), 1.0f / 127.0f, 1.0f, 2);
+      FLOATSLIDER_DIGITS(mStepData[i].mVelSlider, ("vel " + ofToString(i + 1)).c_str(), &(mStepData[i].mVel), 1.0 / 127.0, 1.0, 2);
       UIBLOCK_SHIFTRIGHT();
       INTSLIDER(mStepData[i].mOctaveSlider, ("octave " + ofToString(i + 1)).c_str(), &(mStepData[i].mOctave), -3, 3);
       UIBLOCK_SHIFTRIGHT();
@@ -227,7 +227,7 @@ void RhythmSequencer::PlayNote(NoteMessage note)
       mInputPitches[note.pitch] = note.velocity > 0;
 }
 
-void RhythmSequencer::OnPulse(double time, float velocity, int flags)
+void RhythmSequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
 
@@ -240,7 +240,7 @@ void RhythmSequencer::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
-void RhythmSequencer::Step(double time, float velocity, int pulseFlags)
+void RhythmSequencer::Step(double time, double velocity, int pulseFlags)
 {
    if (!mEnabled)
       return;
@@ -281,7 +281,7 @@ void RhythmSequencer::Step(double time, float velocity, int pulseFlags)
             int tone = TheScale->GetToneFromPitch(pitch) + mStepData[mArpIndexDegree].mDegree;
             int adjustedPitch = TheScale->GetPitchFromTone(tone) + mStepData[mArpIndexOctave].mOctave * 12;
             if (adjustedPitch >= 0 && adjustedPitch < 128)
-               mNoteOutput.PlayNote(NoteMessage(time, adjustedPitch, mStepData[mArpIndexVel].mVel * velocity * 127.0f));
+               mNoteOutput.PlayNote(NoteMessage(time, adjustedPitch, mStepData[mArpIndexVel].mVel * velocity * 127.0));
          }
       }
    }
@@ -335,7 +335,7 @@ void RhythmSequencer::DropdownUpdated(DropdownList* list, int oldVal, double tim
       if (transportListenerInfo != nullptr)
       {
          transportListenerInfo->mInterval = mInterval;
-         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1f, true);
+         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1, true);
       }
    }
 }

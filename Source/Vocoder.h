@@ -59,7 +59,7 @@ public:
    void Process(double time) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -70,7 +70,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 235;
       h = 170;
@@ -89,20 +89,20 @@ private:
    RollingBuffer mRollingCarrierBuffer{ VOCODER_WINDOW_SIZE };
    FFTData mCarrierFFTData{ VOCODER_WINDOW_SIZE, FFT_FREQDOMAIN_SIZE };
 
-   float mInputPreamp{ 1 };
-   float mCarrierPreamp{ 1 };
-   float mVolume{ 1 };
+   double mInputPreamp{ 1 };
+   double mCarrierPreamp{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mInputSlider{ nullptr };
    FloatSlider* mCarrierSlider{ nullptr };
    FloatSlider* mVolumeSlider{ nullptr };
-   float mDryWet{ 1 };
+   double mDryWet{ 1 };
    FloatSlider* mDryWetSlider{ nullptr };
-   float mFricativeThresh{ .07 };
+   double mFricativeThresh{ .07 };
    FloatSlider* mFricativeSlider{ nullptr };
    bool mFricDetected{ false };
-   float mWhisper{ 0 };
+   double mWhisper{ 0 };
    FloatSlider* mWhisperSlider{ nullptr };
-   float mPhaseOffset{ 0 };
+   double mPhaseOffset{ 0 };
    FloatSlider* mPhaseOffsetSlider{ nullptr };
 
    int mCut{ 1 };

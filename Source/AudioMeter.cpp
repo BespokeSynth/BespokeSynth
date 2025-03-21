@@ -70,7 +70,7 @@ void AudioMeter::Process(double time)
       }
 
       mPeakTracker.Process(mAnalysisBuffer, gBufferSize);
-      mLevel = sqrtf(mPeakTracker.GetPeak());
+      mLevel = std::sqrt(mPeakTracker.GetPeak());
    }
 
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)

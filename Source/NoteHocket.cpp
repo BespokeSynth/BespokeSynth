@@ -98,9 +98,9 @@ void NoteHocket::DrawModule()
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
-      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
-      const float kPipSize = 3;
-      float moduleWidth, moduleHeight;
+      double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
+      const double kPipSize = 3;
+      double moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);
       ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
       ofPopStyle();
@@ -109,12 +109,12 @@ void NoteHocket::DrawModule()
 
 void NoteHocket::AdjustHeight()
 {
-   float deterministicPad = 45;
+   double deterministicPad = 45;
 
    if (!mDeterministic)
       deterministicPad = 3;
 
-   float height = mNumDestinations * 17 + deterministicPad;
+   double height = mNumDestinations * 17 + deterministicPad;
    mLengthSlider->Move(0, height - mHeight);
    mSeedEntry->Move(0, height - mHeight);
    mPrevSeedButton->Move(0, height - mHeight);
@@ -130,16 +130,16 @@ void NoteHocket::PlayNote(NoteMessage note)
    {
       ComputeSliders(0);
 
-      float totalWeight = 0;
+      double totalWeight = 0;
       for (int i = 0; i < mNumDestinations; ++i)
          totalWeight += mWeight[i];
-      float random;
+      double random;
       if (mDeterministic)
       {
          const int kStepResolution = 128;
          uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
          int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
-         random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0f) * totalWeight;
+         random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0) * totalWeight;
       }
       else
       {
@@ -211,7 +211,7 @@ void NoteHocket::SetUpFromSaveData()
       {
          mDestinationCables.push_back(new AdditionalNoteCable());
          mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-         mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+         mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
          AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
          ofRectangle rect = mWeightSlider[i]->GetRect(true);
          mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);

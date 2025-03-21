@@ -103,9 +103,9 @@ void VelocityToChance::DrawModule()
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
-      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
-      const float kPipSize = 3;
-      float moduleWidth, moduleHeight;
+      double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
+      const double kPipSize = 3;
+      double moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);
       ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
       ofPopStyle();
@@ -120,20 +120,20 @@ void VelocityToChance::PlayNote(NoteMessage note)
       return;
    }
 
-   float random;
+   double random;
    if (mDeterministic)
    {
       const int kStepResolution = 128;
       uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
       int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
-      random = ((abs(DeterministicRandom(mSeed + note.pitch * 13, randomIndex)) % 10000) / 10000.0f);
+      random = ((abs(DeterministicRandom(mSeed + note.pitch * 13, randomIndex)) % 10000) / 10000.0);
    }
    else
    {
       random = ofRandom(1);
    }
 
-   bool accept = (random <= note.velocity / 127.0f);
+   bool accept = (random <= note.velocity / 127.0);
    if (accept)
    {
       if (mFullVelocity)
@@ -169,7 +169,7 @@ void VelocityToChance::ButtonClicked(ClickButton* button, double time)
       mSeed = (mSeed + 1) % 10000;
 }
 
-void VelocityToChance::GetModuleDimensions(float& width, float& height)
+void VelocityToChance::GetModuleDimensions(double& width, double& height)
 {
    width = 118;
    height = mDeterministic ? 60 : 20;

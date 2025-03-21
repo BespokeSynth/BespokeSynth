@@ -48,7 +48,7 @@ void WaveformViewer::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mDisplayFreqEntry = new TextEntry(this, "freq", 3, 3, 10, &mDisplayFreq, 1, 10000);
    mLengthSamplesSlider = new IntSlider(this, "length", mDisplayFreqEntry, kAnchor_Below, 100, 15, &mLengthSamples, 1024, BUFFER_VIZ_SIZE);
-   mDrawGainSlider = new FloatSlider(this, "draw gain", mLengthSamplesSlider, kAnchor_Below, 100, 15, &mDrawGain, .1f, 5);
+   mDrawGainSlider = new FloatSlider(this, "draw gain", mLengthSamplesSlider, kAnchor_Below, 100, 15, &mDrawGain, .1, 5);
    mDisplayFreqEntry->DrawLabel(true);
    /*mHueNote = new FloatSlider(this,"note",5,0,100,15,&IDrawableModule::sHueNote,0,255);
    mHueAudio = new FloatSlider(this,"audio",5,15,100,15,&IDrawableModule::sHueAudio,0,255);
@@ -74,7 +74,7 @@ void WaveformViewer::Process(double time)
 
       int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
 
-      int bufferSize = GetBuffer()->BufferSize();
+      auto bufferSize = GetBuffer()->BufferSize();
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (ch == 0)
@@ -86,7 +86,7 @@ void WaveformViewer::Process(double time)
       for (int i = 0; i < bufferSize; ++i)
          mAudioView[(i + mBufferVizOffset[!mDoubleBufferFlip]) % lengthSamples][!mDoubleBufferFlip] = gWorkBuffer[i];
 
-      float vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
+      double vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
       mVizPhase[!mDoubleBufferFlip] += vizPhaseInc * bufferSize;
       while (mVizPhase[!mDoubleBufferFlip] > FTWO_PI)
       {
@@ -134,20 +134,20 @@ void WaveformViewer::DrawModule()
    ofSetColor(245, 58, 135);
    ofSetLineWidth(2);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
-   float vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
-   float phaseStart = (FTWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
-   float end = lengthSamples - (FTWO_PI / vizPhaseInc);
+   double vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
+   double phaseStart = (TWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
+   double end = lengthSamples - (TWO_PI / vizPhaseInc);
 
    if (mDrawWaveform)
    {
       ofBeginShape();
       for (int i = phaseStart; i < lengthSamples; i++)
       {
-         float x = ofMap(i - phaseStart, 0, end, 0, w, true);
-         float samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
+         double x = ofMap(i - phaseStart, 0, end, 0, w, true);
+         double samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
          samp *= mDrawGain;
          if (x < w)
             ofVertex(x, h / 2 - samp * (h / 2));
@@ -161,11 +161,11 @@ void WaveformViewer::DrawModule()
       ofSetLineWidth(1);
       for (int i = phaseStart; i < lengthSamples; i++)
       {
-         float a = float(i - phaseStart) / end;
+         double a = double(i - phaseStart) / end;
          if (a < 1)
          {
-            float rad = a * MIN(w, h) / 2;
-            float samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
+            double rad = a * MIN(w, h) / 2;
+            double samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
             if (samp > 0)
                ofSetColor(245, 58, 135, ofMap(samp * mDrawGain / 10, 0, 1, 0, 255, true));
             else
@@ -189,14 +189,14 @@ void WaveformViewer::PlayNote(NoteMessage note)
 {
    if (note.velocity > 0)
    {
-      float floatPitch = note.pitch;
+      double floatPitch = note.pitch;
       if (note.modulation.pitchBend != nullptr)
          floatPitch += note.modulation.pitchBend->GetValue(0);
       mDisplayFreq = TheScale->PitchToFreq(floatPitch);
    }
 }
 
-void WaveformViewer::Resize(float w, float h)
+void WaveformViewer::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

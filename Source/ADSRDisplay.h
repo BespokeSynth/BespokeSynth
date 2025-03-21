@@ -38,18 +38,18 @@ public:
    ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ::ADSR* adsr);
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
-   void SetVol(float vol) { mVol = vol; }
+   void SetVol(double vol) { mVol = vol; }
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
-   float GetMaxTime() const { return mMaxTime; }
-   float& GetMaxTime() { return mMaxTime; }
-   void SetMaxTime(float maxTime);
+   double GetMaxTime() const { return mMaxTime; }
+   double& GetMaxTime() { return mMaxTime; }
+   void SetMaxTime(double maxTime);
    void SetADSR(::ADSR* adsr);
    ::ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
    void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
-   void SetDimensions(float w, float h)
+   void SetDimensions(double w, double h)
    {
       mWidth = w;
       mHeight = h;
@@ -65,8 +65,8 @@ public:
    FloatSlider* GetRSlider() { return mRSlider; }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -95,25 +95,25 @@ private:
       kAdjustViewLength
    } mAdjustMode{ AdjustParam::kAdjustNone };
 
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
    void UpdateSliderVisibility();
-   ofVec2f GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent);
+   ofVec2d GetDrawPoint(double time, const ADSR::EventInfo& adsrEvent);
 
-   float mWidth;
-   float mHeight;
-   float mVol{ 1 };
-   float mMaxTime{ 1000 };
+   double mWidth;
+   double mHeight;
+   double mVol{ 1 };
+   double mMaxTime{ 1000 };
    bool mClick{ false };
    ::ADSR* mAdsr;
-   ofVec2f mClickStart;
+   ofVec2d mClickStart;
    ::ADSR mClickAdsr;
-   float mClickLength{ 1000 };
+   double mClickLength{ 1000 };
    bool mHighlighted{ false };
    FloatSlider* mASlider{ nullptr };
    FloatSlider* mDSlider{ nullptr };

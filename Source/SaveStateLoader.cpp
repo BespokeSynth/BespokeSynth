@@ -80,14 +80,14 @@ void SaveStateLoader::Poll()
    }
 }
 
-void SaveStateLoader::GetModuleDimensions(float& w, float& h)
+void SaveStateLoader::GetModuleDimensions(double& w, double& h)
 {
    w = 100;
    for (size_t i = 0; i < mLoadButtons.size(); ++i)
    {
       if (i < mNumDisplayButtons)
       {
-         float buttonW, buttonH;
+         double buttonW, buttonH;
          mLoadButtons[i].mButton->GetDimensions(buttonW, buttonH);
          if (buttonW + 6 > w)
             w = buttonW + 6;

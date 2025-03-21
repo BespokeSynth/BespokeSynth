@@ -72,7 +72,7 @@ void ModulatorSubtract::PostRepatch(PatchCableSource* cableSource, bool fromUser
    }
 }
 
-float ModulatorSubtract::Value(int samplesIn)
+double ModulatorSubtract::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    if (GetSliderTarget())

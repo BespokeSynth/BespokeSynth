@@ -50,7 +50,7 @@ public:
 
    void Process(double time) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -61,20 +61,20 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 
    FloatSlider* mThresholdSlider{ nullptr };
    FloatSlider* mReleaseSlider{ nullptr };
-   float mPeak{ 0 };
-   float mEnvelope{ 0 };
-   float mThreshold{ 0.5 };
-   float mRelease{ 150 };
-   float mReleaseFactor{ 0.99 };
+   double mPeak{ 0 };
+   double mEnvelope{ 0 };
+   double mThreshold{ 0.5 };
+   double mRelease{ 150 };
+   double mReleaseFactor{ 0.99 };
 };

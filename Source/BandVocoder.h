@@ -58,7 +58,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -69,7 +69,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 215;
       h = 130;
@@ -82,27 +82,27 @@ private:
    float* mWorkBuffer{ nullptr };
    float* mOutBuffer{ nullptr };
 
-   float mInputPreamp{ 1 };
-   float mCarrierPreamp{ 1 };
-   float mVolume{ 1 };
+   double mInputPreamp{ 1 };
+   double mCarrierPreamp{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mInputSlider{ nullptr };
    FloatSlider* mCarrierSlider{ nullptr };
    FloatSlider* mVolumeSlider{ nullptr };
-   float mDryWet{ 1 };
+   double mDryWet{ 1 };
    FloatSlider* mDryWetSlider{ nullptr };
-   float mQ{ 40 };
+   double mQ{ 40 };
    FloatSlider* mQSlider{ nullptr };
    IntSlider* mNumBandsSlider{ nullptr };
    int mNumBands{ 40 };
-   float mFreqBase{ 200 };
-   float mFreqRange{ 6000 };
+   double mFreqBase{ 200 };
+   double mFreqRange{ 6000 };
    FloatSlider* mFBaseSlider{ nullptr };
    FloatSlider* mFRangeSlider{ nullptr };
-   float mRingTime{ .03 };
+   double mRingTime{ .03 };
    FloatSlider* mRingTimeSlider{ nullptr };
-   float mMaxBand{ 1 };
+   double mMaxBand{ 1 };
    FloatSlider* mMaxBandSlider{ nullptr };
-   float mSpacingStyle{ 0 };
+   double mSpacingStyle{ 0 };
    FloatSlider* mSpacingStyleSlider{ nullptr };
 
    BiquadFilter mBiquadCarrier[VOCODER_MAX_BANDS]{};

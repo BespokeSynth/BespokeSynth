@@ -283,7 +283,7 @@ void UserPrefTextEntryFloat::Init()
    try
    {
       if (!UserPrefs.mUserPrefsFile[mName].isNull())
-         mValue = UserPrefs.mUserPrefsFile[mName].asFloat();
+         mValue = UserPrefs.mUserPrefsFile[mName].asDouble();
    }
    catch (Json::LogicError& e)
    {
@@ -310,8 +310,8 @@ void UserPrefTextEntryFloat::Save(int index, ofxJSONElement& prefsJson) //this n
 bool UserPrefTextEntryFloat::DiffersFromSavedValue() const
 {
    if (UserPrefs.mUserPrefsFile[mName].isNull())
-      return mValue != mDefault;
-   return mValue != UserPrefs.mUserPrefsFile[mName].asFloat();
+      return !ofAlmostEquel(mValue, mDefault);
+   return !ofAlmostEquel(mValue, UserPrefs.mUserPrefsFile[mName].asDouble());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -360,7 +360,7 @@ void UserPrefFloat::Init()
    try
    {
       if (!UserPrefs.mUserPrefsFile[mName].isNull())
-         mValue = UserPrefs.mUserPrefsFile[mName].asFloat();
+         mValue = UserPrefs.mUserPrefsFile[mName].asDouble();
    }
    catch (Json::LogicError& e)
    {
@@ -389,6 +389,6 @@ void UserPrefFloat::Save(int index, ofxJSONElement& prefsJson) //this numbering 
 bool UserPrefFloat::DiffersFromSavedValue() const
 {
    if (UserPrefs.mUserPrefsFile[mName].isNull())
-      return mValue != mDefault;
-   return mValue != UserPrefs.mUserPrefsFile[mName].asFloat();
+      return !ofAlmostEquel(mValue, mDefault);
+   return !ofAlmostEquel(mValue, UserPrefs.mUserPrefsFile[mName].asDouble());
 }
