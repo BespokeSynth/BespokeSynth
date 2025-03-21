@@ -132,7 +132,7 @@ void Beats::DrawModule()
 
 void Beats::FilesDropped(std::vector<std::string> files, double x, double y)
 {
-   for (auto file : files)
+   for (auto& file : files)
    {
       Sample* sample = new Sample();
       sample->Read(file.c_str());

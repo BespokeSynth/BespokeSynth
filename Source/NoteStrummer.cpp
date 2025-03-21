@@ -61,7 +61,7 @@ void NoteStrummer::DrawModule()
 
    const int numNotes = static_cast<int>(mNotes.size());
    int i = 0;
-   for (const auto pitch : mNotes)
+   for (auto& pitch : mNotes)
    {
       const double pos = (i + .5) / numNotes;
       DrawTextNormal(NoteName(pitch), mStrumSlider->GetPosition(true).x + pos * mStrumSlider->IClickable::GetDimensions().x, mStrumSlider->GetPosition(true).y + mStrumSlider->IClickable::GetDimensions().y + 12);
@@ -91,7 +91,7 @@ void NoteStrummer::OnTransportAdvanced(double amount)
       ComputeSliders(i);
 
       int index = 0;
-      for (auto pitch : mNotes)
+      for (auto& pitch : mNotes)
       {
          double pos = double(index + .5) / numNotes;
          double change = mStrum - mLastStrumPos;

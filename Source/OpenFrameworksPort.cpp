@@ -483,7 +483,7 @@ std::vector<std::string> ofSplitString(std::string str, std::string splitter, bo
       tokens.trim();
 
    std::vector<std::string> ret;
-   for (auto s : tokens)
+   for (auto& s : tokens)
       ret.push_back(s.toStdString());
 
    return ret;

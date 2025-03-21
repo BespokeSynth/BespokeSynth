@@ -400,10 +400,10 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Pulse,
          kModuleCategory_Other
       };
-      for (auto type : moduleTypes)
+      for (auto& type : moduleTypes)
       {
          const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
-         for (auto toSpawn : modules)
+         for (auto& toSpawn : modules)
             TheSynth->SpawnModuleOnTheFly(toSpawn, 0, 0);
       }
 
@@ -417,7 +417,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          {
             EffectChain* effectChain = dynamic_cast<EffectChain*>(topLevelModule);
             std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
-            for (std::string effect : effects)
+            for (auto& effect : effects)
                effectChain->AddEffect(effect, effect, !K(onTheFly));
          }
 
@@ -486,14 +486,14 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Pulse,
          kModuleCategory_Other
       };
-      for (auto type : moduleTypes)
+      for (auto& type : moduleTypes)
       {
          const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
-         for (auto toSpawn : modules)
+         for (auto& toSpawn : modules)
             mScreenshotsToProcess.push_back(toSpawn);
       }
 
-      for (auto effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
+      for (auto& effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
       {
          ModuleFactory::Spawnable spawnable;
          spawnable.mLabel = effect;
@@ -513,10 +513,10 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
       ofxJSONElement docs;
 
       LoadTooltips();
-      for (auto moduleType : sTooltips)
+      for (auto& moduleType : sTooltips)
       {
          docs[moduleType.module]["description"] = moduleType.tooltip;
-         for (auto control : moduleType.controlTooltips)
+         for (auto& control : moduleType.controlTooltips)
          {
             docs[moduleType.module]["controls"][control.controlName] = control.tooltip;
          }
@@ -541,10 +541,10 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Pulse,
          kModuleCategory_Other
       };
-      for (auto category : moduleCategories)
+      for (auto& category : moduleCategories)
       {
          const auto& modules = TheSynth->GetModuleFactory()->GetSpawnableModules(category);
-         for (auto toSpawn : modules)
+         for (auto& toSpawn : modules)
          {
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);
 
@@ -571,7 +571,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          }
       }
 
-      for (auto effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
+      for (auto& effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
          docs[effect]["type"] = "effect chain";
 
       docs.save(ofToDataPath("module_documentation.json"), true);
