@@ -347,7 +347,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
    {
       if (velocity > 0)
       {
-         for (auto iter : mHeldButtons)
+         for (auto& iter : mHeldButtons)
          {
             float strength = (8 - y) / 8.0f;
             mGrid->SetVal(iter.mCol, iter.mRow, strength);
@@ -359,7 +359,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
    {
       if (velocity > 0)
       {
-         for (auto iter : mHeldButtons)
+         for (auto& iter : mHeldButtons)
          {
             mMetaStepMasks[GetMetaStepMaskIndex(iter.mCol, iter.mRow)] ^= 1 << x;
          }
@@ -835,7 +835,7 @@ void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double
    if (slider == mStrengthSlider)
    {
       mGrid->SetStrength(mStrength);
-      for (auto iter : mHeldButtons)
+      for (auto& iter : mHeldButtons)
          mGrid->SetVal(iter.mCol, iter.mRow, mStrength);
 
       if (mHeldButtons.size() > 0)

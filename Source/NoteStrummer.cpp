@@ -61,7 +61,7 @@ void NoteStrummer::DrawModule()
 
    int numNotes = (int)mNotes.size();
    int i = 0;
-   for (auto pitch : mNotes)
+   for (auto& pitch : mNotes)
    {
       float pos = float(i + .5f) / numNotes;
       DrawTextNormal(NoteName(pitch), mStrumSlider->GetPosition(true).x + pos * mStrumSlider->IClickable::GetDimensions().x, mStrumSlider->GetPosition(true).y + mStrumSlider->IClickable::GetDimensions().y + 12);
@@ -91,7 +91,7 @@ void NoteStrummer::OnTransportAdvanced(float amount)
       ComputeSliders(i);
 
       int index = 0;
-      for (auto pitch : mNotes)
+      for (auto& pitch : mNotes)
       {
          float pos = float(index + .5f) / numNotes;
          float change = mStrum - mLastStrumPos;

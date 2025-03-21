@@ -150,7 +150,7 @@ void DrumPlayer::SetUpHitDirectories()
    File parentDirectory(ofToDataPath("drums"));
    Array<File> hitDirs;
    parentDirectory.findChildFiles(hitDirs, File::findDirectories, true);
-   for (auto dir : hitDirs)
+   for (auto& dir : hitDirs)
    {
       Array<File> filesInDir;
       dir.findChildFiles(filesInDir, File::findFiles, false);
@@ -162,7 +162,7 @@ void DrumPlayer::SetUpHitDirectories()
 void DrumPlayer::DrumHit::UpdateHitDirectoryDropdown()
 {
    mHitCategoryDropdown->Clear();
-   for (auto dir : sHitDirectories)
+   for (auto& dir : sHitDirectories)
       mHitCategoryDropdown->AddLabel(dir, mHitCategoryDropdown->GetNumValues());
    mHitCategoryIndex = -1;
    for (int i = 0; i < mHitCategoryDropdown->GetNumValues(); ++i)
@@ -1191,7 +1191,7 @@ void DrumPlayer::DrumHit::LoadRandomSample()
 {
    File dir(ofToDataPath("drums/" + mHitCategory));
    Array<File> files;
-   for (auto file : dir.findChildFiles(File::findFiles, false))
+   for (auto& file : dir.findChildFiles(File::findFiles, false))
    {
       if (file.getFileName()[0] != '.')
          files.add(file);
@@ -1209,7 +1209,7 @@ void DrumPlayer::DrumHit::LoadNextSample(int direction)
    int i = 0;
    auto dirContents = dir.findChildFiles(File::findFiles, false);
    dirContents.sort();
-   for (auto file : dirContents)
+   for (auto& file : dirContents)
    {
       if (file.getFileName()[0] != '.')
       {

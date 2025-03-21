@@ -58,7 +58,7 @@ void Chorder::CreateUIControls()
    mChordDropdown = new DropdownList(this, "chord", mDiatonicCheckbox, kAnchor_Right, &mChordIndex, 40);
    mInversionDropdown = new DropdownList(this, "inversion", mChordDropdown, kAnchor_Right, &mInversion, 30);
 
-   for (auto name : TheScale->GetChordDatabase().GetChordNames())
+   for (auto& name : TheScale->GetChordDatabase().GetChordNames())
       mChordDropdown->AddLabel(name, mChordDropdown->GetNumValues());
 
    mInversionDropdown->AddLabel("0", 0);
@@ -203,7 +203,7 @@ void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal, double time)
    {
       std::vector<int> chord = TheScale->GetChordDatabase().GetChord(mChordDropdown->GetLabel(mChordIndex), mInversion);
       mChordGrid->Clear();
-      for (int val : chord)
+      for (auto& val : chord)
       {
          int row = 2 - ((val + TheScale->GetPitchesPerOctave()) / TheScale->GetPitchesPerOctave());
          int col = (val + TheScale->GetPitchesPerOctave()) % TheScale->GetPitchesPerOctave();

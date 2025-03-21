@@ -1019,7 +1019,7 @@ void VSTPlugin::GetModuleDimensions(float& width, float& height)
    {
       width = 206;
       height = 58;
-      for (auto slider : mParameterSliders)
+      for (auto& slider : mParameterSliders)
       {
          if (slider.mSlider && slider.mShowing)
          {
@@ -1126,7 +1126,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
                   exposedParams.push_back(i);
             }
             output.writeInt((int)exposedParams.size());
-            for (int i : exposedParams)
+            for (auto& i : exposedParams)
                output.writeInt(i);
 
             output.flush(); // (called explicitly to force an fsync on posix)
@@ -1272,7 +1272,7 @@ void VSTPlugin::SaveState(FileStreamOut& out)
             exposedParams.push_back(i);
       }
       out << (int)exposedParams.size();
-      for (int i : exposedParams)
+      for (auto& i : exposedParams)
          out << i;
    }
    else

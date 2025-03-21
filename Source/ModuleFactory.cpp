@@ -570,7 +570,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleC
    if (moduleCategory == kModuleCategory_Audio)
    {
       std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
-      for (auto effect : effects)
+      for (auto& effect : effects)
       {
          ModuleFactory::Spawnable spawnable{};
          spawnable.mLabel = effect;
@@ -656,14 +656,14 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
 
    std::vector<Spawnable> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
-   for (auto prefab : prefabs)
+   for (auto& prefab : prefabs)
    {
       if (CheckHeldKeysMatch(prefab.mLabel, keys, continuousString) || keys[0] == ';')
          modules.push_back(prefab);
    }
 
    std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
-   for (auto midicontroller : midicontrollers)
+   for (auto& midicontroller : midicontrollers)
    {
       if (CheckHeldKeysMatch(midicontroller, keys, continuousString))
       {
@@ -676,7 +676,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
    }
 
    std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
-   for (auto effect : effects)
+   for (auto& effect : effects)
    {
       if (CheckHeldKeysMatch(effect, keys, continuousString))
       {
@@ -690,7 +690,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
 
    std::vector<Spawnable> presets;
    ModuleFactory::GetPresets(presets);
-   for (auto preset : presets)
+   for (auto& preset : presets)
    {
       if (CheckHeldKeysMatch(preset.mLabel, keys, continuousString) || keys[0] == ';')
          modules.push_back(preset);
@@ -756,7 +756,7 @@ void ModuleFactory::GetPrefabs(std::vector<ModuleFactory::Spawnable>& prefabs)
    File dir(ofToDataPath("prefabs"));
    Array<File> files;
    dir.findChildFiles(files, File::findFiles, false);
-   for (auto file : files)
+   for (auto& file : files)
    {
       if (file.getFileExtension() == ".pfb")
       {
@@ -776,7 +776,7 @@ void ModuleFactory::GetPresets(std::vector<ModuleFactory::Spawnable>& presets)
    File dir(ofToDataPath("presets"));
    Array<File> directories;
    dir.findChildFiles(directories, File::findDirectories, false);
-   for (auto moduleDir : directories)
+   for (auto& moduleDir : directories)
    {
       std::string moduleTypeName = moduleDir.getFileName().toStdString();
       Array<File> files;

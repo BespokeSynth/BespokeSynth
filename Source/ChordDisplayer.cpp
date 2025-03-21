@@ -54,7 +54,7 @@ void ChordDisplayer::DrawModule()
       {
          int drawY = 14;
          int drawHeight = 20;
-         for (std::string chordName : chordNames)
+         for (auto& chordName : chordNames)
          {
             DrawTextNormal(chordName, 4, drawY);
             drawY += drawHeight;
