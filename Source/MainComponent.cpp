@@ -533,7 +533,7 @@ private:
    void filesDropped(const StringArray& files, int x, int y) override
    {
       std::vector<std::string> strFiles;
-      for (auto file : files)
+      for (auto& file : files)
          strFiles.push_back(file.toStdString());
       mSynth.FilesDropped(strFiles, x, y);
    }

@@ -534,7 +534,7 @@ void Snapshots::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
                toRemove.push_back(snapshot);
          }
 
-         for (auto remove : toRemove)
+         for (auto& remove : toRemove)
             square.mSnapshots.remove(remove);
       }
    }

@@ -350,12 +350,12 @@ void GridModule::SaveState(FileStreamOut& out)
    out << mGrid->GetRows();
    out << mGrid->GetMajorColSize();
    out << (int)mLabels.size();
-   for (auto label : mLabels)
+   for (auto& label : mLabels)
       out << label;
    out << (int)mColors.size();
-   for (auto color : mColors)
+   for (auto& color : mColors)
       out << color.r << color.g << color.b;
-   for (auto overlay : mGridOverlay)
+   for (auto& overlay : mGridOverlay)
       out << overlay;
 }
 

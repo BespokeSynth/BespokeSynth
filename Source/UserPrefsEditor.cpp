@@ -61,7 +61,7 @@ void UserPrefsEditor::CreateUIControls()
    mCategorySelector->AddLabel("paths", (int)UserPrefCategory::Paths);
 
    std::array<int, 5> oversampleAmounts = { 1, 2, 4, 8, 16 };
-   for (int oversample : oversampleAmounts)
+   for (auto& oversample : oversampleAmounts)
    {
       UserPrefs.oversampling.GetDropdown()->AddLabel(ofToString(oversample), oversample);
       if (UserPrefs.oversampling.Get() == oversample)
@@ -158,7 +158,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.audio_output_device.GetDropdown()->AddLabel("none", -2);
       UserPrefs.audio_output_device.GetDropdown()->AddLabel("auto", -1);
       i = 0;
-      for (auto outputDevice : selectedDeviceType->getDeviceNames())
+      for (auto& outputDevice : selectedDeviceType->getDeviceNames())
       {
          UserPrefs.audio_output_device.GetDropdown()->AddLabel(outputDevice.toStdString(), i);
          if (deviceManager.getCurrentAudioDevice() != nullptr &&
@@ -187,7 +187,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.audio_input_device.GetDropdown()->AddLabel("none", -2);
       UserPrefs.audio_input_device.GetDropdown()->AddLabel("auto", -1);
       i = 0;
-      for (auto inputDevice : selectedDeviceType->getDeviceNames(true))
+      for (auto& inputDevice : selectedDeviceType->getDeviceNames(true))
       {
          UserPrefs.audio_input_device.GetDropdown()->AddLabel(inputDevice.toStdString(), i);
          if (deviceManager.getCurrentAudioDevice() != nullptr &&
@@ -239,7 +239,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.samplerate.GetIndex() = -1;
       UserPrefs.samplerate.GetDropdown()->Clear();
       i = 0;
-      for (auto rate : selectedDevice->getAvailableSampleRates())
+      for (auto& rate : selectedDevice->getAvailableSampleRates())
       {
          UserPrefs.samplerate.GetDropdown()->AddLabel(ofToString(rate), i);
          if (rate == gSampleRate / UserPrefs.oversampling.Get())
@@ -253,7 +253,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.buffersize.GetIndex() = -1;
       UserPrefs.buffersize.GetDropdown()->Clear();
       i = 0;
-      for (auto bufferSize : selectedDevice->getAvailableBufferSizes())
+      for (auto& bufferSize : selectedDevice->getAvailableBufferSizes())
       {
          UserPrefs.buffersize.GetDropdown()->AddLabel(ofToString(bufferSize), i);
          if (bufferSize == gBufferSize / UserPrefs.oversampling.Get())

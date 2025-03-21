@@ -91,10 +91,10 @@ void MidiController::CreateUIControls()
    mLayoutFileDropdown->AddLabel(kDefaultLayout, 0);
    File dir(ofToDataPath("controllers"));
    Array<File> files;
-   for (auto file : dir.findChildFiles(File::findFiles, false, "*.json"))
+   for (auto& file : dir.findChildFiles(File::findFiles, false, "*.json"))
       files.add(file);
    files.sort();
-   for (auto file : files)
+   for (auto& file : files)
       mLayoutFileDropdown->AddLabel(file.getFileName().toStdString(), mLayoutFileDropdown->GetNumValues());
 }
 

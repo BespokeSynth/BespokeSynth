@@ -233,7 +233,7 @@ void SampleBrowser::SetDirectory(String dirPath)
       mDirectoryListing.add("..");
 
       File dir(ofToSamplePath(dirPath.toStdString()));
-      for (auto file : dir.findChildFiles(File::findFilesAndDirectories | File::ignoreHiddenFiles, false))
+      for (auto& file : dir.findChildFiles(File::findFilesAndDirectories | File::ignoreHiddenFiles, false))
       {
          bool include = false;
          if (file.isDirectory())
@@ -259,7 +259,7 @@ void SampleBrowser::SetDirectory(String dirPath)
    {
       Array<File> roots;
       File::findFileSystemRoots(roots);
-      for (auto root : roots)
+      for (auto& root : roots)
          mDirectoryListing.add(root.getFullPathName());
    }
    SortDirectoryListing(mDirectoryListing);
