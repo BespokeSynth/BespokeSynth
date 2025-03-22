@@ -293,6 +293,7 @@ void SongBuilder::OnTimeEvent(double time)
 
    if (mQueuedScene != -1 &&
        (mChangeQuantizeInterval == kInterval_None ||
+        mChangeQuantizeInterval == kInterval_Free ||
         TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset) % (int)TheTransport->GetMeasureFraction(mChangeQuantizeInterval) == 0))
    {
       SetActiveScene(time, mQueuedScene);
@@ -346,10 +347,10 @@ void SongBuilder::OnPulse(double time, float velocity, int flags)
       SetActiveScene(time, mCurrentScene + 1);
 }
 
-void SongBuilder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void SongBuilder::PlayNote(NoteMessage note)
 {
-   if (velocity > 0 && pitch < (int)mScenes.size())
-      SetActiveScene(time, pitch);
+   if (note.velocity > 0 && note.pitch < (int)mScenes.size())
+      SetActiveScene(note.time, note.pitch);
 }
 
 void SongBuilder::SetActiveSceneById(double time, int newSceneId)
@@ -448,8 +449,8 @@ void SongBuilder::PostRepatch(PatchCableSource* cable, bool fromUserClick)
             mTargets.erase(mTargets.begin() + targetIndex);
          }
       }
-
-      mTargets[targetIndex]->mHadTarget = (mTargets[targetIndex]->GetTarget() != nullptr);
+      if (!mTargets.empty() && mTargets.size() > targetIndex)
+         mTargets[targetIndex]->mHadTarget = (mTargets[targetIndex]->GetTarget() != nullptr);
    }
 }
 

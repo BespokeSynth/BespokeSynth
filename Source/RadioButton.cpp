@@ -28,6 +28,8 @@
 #include "SynthGlobals.h"
 #include "FileStream.h"
 #include "DropdownList.h"
+#include "PatchCable.h"
+#include "Transport.h"
 
 const int radioSpacing = 15;
 
@@ -171,9 +173,9 @@ void RadioButton::Render()
 
       if (active)
       {
-         float h, s, b;
-         color.getHsb(h, s, b);
-         color.setHsb(42, s, b);
+         float color_h, color_s, color_b;
+         color.getHsb(color_h, color_s, color_b);
+         color.setHsb(42, color_s, color_b);
          textColor.set(255, 255, 0, gModuleDrawAlpha);
       }
 
@@ -234,6 +236,51 @@ ofVec2f RadioButton::GetOptionPosition(int optionIndex)
       return ofVec2f(x + mWidth, y + float(mHeight) / GetNumValues() * (optionIndex + .5f));
    else //kRadioHorizontal
       return ofVec2f(x + float(mWidth) / GetNumValues() * (optionIndex + .5f), y + mHeight);
+}
+
+void RadioButton::OnPulse(double time, float velocity, int flags)
+{
+   int length = static_cast<int>(mElements.size());
+   if (length <= 0)
+      length = 1;
+
+   int direction = 1;
+   if (flags & kPulseFlag_Backward)
+      direction = -1;
+   if (flags & kPulseFlag_Repeat)
+      direction = 0;
+
+   if (mMultiSelect)
+   {
+      if (flags & kPulseFlag_Reset)
+         *mVar = 0;
+      else if (flags & kPulseFlag_Random)
+         *mVar = static_cast<int>(gRandom());
+      else
+         *mVar = *mVar + direction;
+      return;
+   }
+
+   int newindex = 0;
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      if (mElements[i].mValue == *mVar)
+      {
+         newindex = i;
+         break;
+      }
+   }
+
+   newindex = (newindex + direction + length) % length;
+
+   if (flags & kPulseFlag_Reset)
+      newindex = 0;
+   else if (flags & kPulseFlag_Random)
+      newindex = gRandom() % length;
+
+   if (newindex >= mElements.size() || newindex < 0)
+      newindex = 0;
+   SetIndex(newindex, time);
 }
 
 void RadioButton::SetIndex(int i, double time)
@@ -403,4 +450,11 @@ void RadioButton::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> var;
    if (shouldSetValue)
       SetValueDirect(var, gTime);
+}
+
+bool RadioButton::CanBeTargetedBy(PatchCableSource* source) const
+{
+   if (source->GetConnectionType() == kConnectionType_Pulse)
+      return true;
+   return IUIControl::CanBeTargetedBy(source);
 }

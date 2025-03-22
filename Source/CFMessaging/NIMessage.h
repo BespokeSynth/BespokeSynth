@@ -26,7 +26,8 @@
 #ifndef CFMessaging_NIMessage_h
 #define CFMessaging_NIMessage_h
 
-#include <iostream>
+#include <cstdint>
+#include <string>
 
 typedef struct
 {

@@ -52,22 +52,16 @@ void VelocitySetter::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void VelocitySetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VelocitySetter::PlayNote(NoteMessage note)
 {
    ComputeSliders(0);
 
    float random = ofRandom(1 - mRandomness, 1);
 
-   if (mEnabled && velocity != 0)
-   {
-      PlayNoteOutput(time, pitch, int(mVelocity * 127 * random), voiceIdx, modulation);
-   }
-   else
-   {
-      PlayNoteOutput(time, pitch, int(velocity * random), voiceIdx, modulation);
-      if (velocity != 0)
-         mVelocity = velocity / 127.0f;
-   }
+   if (mEnabled && note.velocity != 0)
+      note.velocity = int(mVelocity * 127 * random);
+
+   PlayNoteOutput(note);
 }
 
 void VelocitySetter::LoadLayout(const ofxJSONElement& moduleInfo)

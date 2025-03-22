@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "TextEntry.h"
@@ -58,7 +57,7 @@ public:
    void SendString(std::string address, std::string val);
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
@@ -75,7 +74,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
 
-   char* mLabels[OSC_OUTPUT_MAX_PARAMS];
+   std::string mLabels[OSC_OUTPUT_MAX_PARAMS];
    std::list<TextEntry*> mLabelEntry{};
    float mParams[OSC_OUTPUT_MAX_PARAMS];
    std::list<FloatSlider*> mSliders{};

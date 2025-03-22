@@ -60,6 +60,7 @@ public:
    ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle = ButtonDisplayStyle::kText);
    ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection, ButtonDisplayStyle displayStyle = ButtonDisplayStyle::kText);
    void SetLabel(const char* label);
+   void UpdateWidth();
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;

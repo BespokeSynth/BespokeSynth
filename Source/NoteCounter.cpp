@@ -26,7 +26,6 @@
 */
 
 #include "NoteCounter.h"
-#include "IAudioSource.h"
 #include "SynthGlobals.h"
 #include "DrumPlayer.h"
 #include "ModularSynth.h"
@@ -168,9 +167,9 @@ void NoteCounter::Step(double time, float velocity, int pulseFlags)
 
    mNoteOutput.Flush(time);
    if (mRandom)
-      PlayNoteOutput(time, GetRandom(time, 0) % mLength + mStart, 127, -1);
+      PlayNoteOutput(NoteMessage(time, GetRandom(time, 0) % mLength + mStart, 127));
    else
-      PlayNoteOutput(time, mStep + mStart, 127, -1);
+      PlayNoteOutput(NoteMessage(time, mStep + mStart, 127));
 
    if (!sync)
    {

@@ -28,22 +28,20 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include "juce_core/juce_core.h"
 
 namespace juce
 {
    class InputStream;
    class OutputStream;
+   class MemoryBlock;
 }
 
 class FileStreamOut
 {
 public:
-   explicit FileStreamOut(std::unique_ptr<juce::OutputStream> stream)
-   : mStream(std::move(stream))
-   {}
    explicit FileStreamOut(const std::string& file);
    explicit FileStreamOut(juce::MemoryBlock& block, bool appendToExistingBlockContent = true);
+   explicit FileStreamOut(std::unique_ptr<juce::OutputStream>&& stream);
    FileStreamOut(const char*) = delete; // Hint: UTF-8 encoded std::string required
    ~FileStreamOut();
    FileStreamOut& operator<<(const int& var);
@@ -55,7 +53,7 @@ public:
    FileStreamOut& operator<<(const char& var);
    void Write(const float* buffer, int size);
    void WriteGeneric(const void* buffer, int size);
-   juce::int64 GetSize() const;
+   std::int64_t GetSize() const;
 
 private:
    std::unique_ptr<juce::OutputStream> mStream;
@@ -64,11 +62,9 @@ private:
 class FileStreamIn
 {
 public:
-   explicit FileStreamIn(std::unique_ptr<juce::InputStream> stream)
-   : mStream(std::move(stream))
-   {}
    explicit FileStreamIn(const std::string& file);
    explicit FileStreamIn(const juce::MemoryBlock& block);
+   explicit FileStreamIn(std::unique_ptr<juce::InputStream>&& stream);
    FileStreamIn(const char*) = delete; // Hint: UTF-8 encoded std::string required
    ~FileStreamIn();
    FileStreamIn& operator>>(int& var);

@@ -29,7 +29,6 @@
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
-#include "PatchCableSource.h"
 #include "ModulationChain.h"
 
 NoteToPulse::NoteToPulse()
@@ -51,10 +50,10 @@ void NoteToPulse::DrawModule()
       return;
 }
 
-void NoteToPulse::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteToPulse::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
-      DispatchPulse(GetPatchCableSource(), time, velocity / 127.0f, 0);
+   if (mEnabled && note.velocity > 0)
+      DispatchPulse(GetPatchCableSource(), note.time, note.velocity / 127.0f, 0);
 }
 
 void NoteToPulse::SaveLayout(ofxJSONElement& moduleInfo)

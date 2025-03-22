@@ -69,19 +69,19 @@ void NotePanRandom::DrawModule()
    }
 }
 
-void NotePanRandom::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NotePanRandom::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
       ComputeSliders(0);
-      modulation.pan = ofClamp(mCenter + ofRandom(-mSpread, mSpread), -1, 1);
+      note.modulation.pan = ofClamp(mCenter + ofRandom(-mSpread, mSpread), -1, 1);
 
-      mPanHistoryDisplay[mPanHistoryDisplayIndex].time = time;
-      mPanHistoryDisplay[mPanHistoryDisplayIndex].pan = modulation.pan;
+      mPanHistoryDisplay[mPanHistoryDisplayIndex].time = note.time;
+      mPanHistoryDisplay[mPanHistoryDisplayIndex].pan = note.modulation.pan;
       mPanHistoryDisplayIndex = (mPanHistoryDisplayIndex + 1) % kPanHistoryDisplaySize;
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void NotePanRandom::LoadLayout(const ofxJSONElement& moduleInfo)

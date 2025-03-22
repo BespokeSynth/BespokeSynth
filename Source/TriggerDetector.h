@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "RollingBuffer.h"
 
 class TriggerDetector

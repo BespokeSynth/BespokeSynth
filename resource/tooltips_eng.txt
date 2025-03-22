@@ -66,15 +66,13 @@ radiosequencer~sequence to only enable one value at a time. patch it to the "ena
 
 
 
-snapshots~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
+snapshots~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a snapshot to that square, and click on a grid square to load that snapshot. alt/option-click to delete a snapshot, and ctrl/command-click to rename a snapshot.
 ~blend~length of time in milliseconds over which to blend snapshot values
 ~snapshot~jump to a snapshot
 ~random~randomize connected controls
 ~add~snapshot the currently connected controls to the next available snapshot slot
-~clear~clear all snapshots
 ~store~when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)
 ~delete~when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)
-~auto-store on switch~when switching to a new slot, automatically store state in the current slot
 ~snapshot label~assign a label to this snapshot
 
 
@@ -141,7 +139,7 @@ globalcontrols~interface controls, intended to allow you to use midi controllers
 ~background r~amount of red in background color
 ~background g~amount of green in background color
 ~background b~amount of blue in background color
-~corner roundness~how round bespoke's rectangles are
+~corner radius~how round bespoke's rectangles are
 ~cable alpha~opacity of the cables
 
 
@@ -205,6 +203,9 @@ pulsetrain~defines a list of pulses to execute, once pulsed
 pulsesequence~defines a looping sequence of pulses
 ~length~length of the sequence
 ~interval~length of each step within the sequence
+~ - ~advance the sequence backwards
+~+~advance the sequence forward
+~pulse~when enabled will send out pulses as per sequence when advancing with the buttons
 ~<~shift sequence to the left
 ~>~shift sequence to the right
 
@@ -227,7 +228,7 @@ pulsehocket~sends pulses to randomized destinations
 ~seed~number that determines the random sequence. send reset pulses to restart the deterministic random sequence.
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 
@@ -257,7 +258,7 @@ pulsechance~randomly allow pulses through, based on chance
 ~seed~number that determines the random sequence. send reset pulses to restart the deterministic random sequence.
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 pulsebutton~trigger a pulse with a button press
@@ -597,6 +598,11 @@ notecounter~advance through pitches sequentially. useful for driving the "notese
 ~length~length of the sequence
 ~random~output random pitches within the range, rather than sequential
 ~div~measure division, when using "div" as the interval
+~beat length~length over which the random sequence should deterministically repeat
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~>~go to next seed
 
 
 
@@ -680,11 +686,12 @@ fouronthefloor~sends note 0 every beat, to trigger a kick drum
 
 
 
-drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.
+drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity, or hover over a step and press the up and down arrow keys to adjust velocity.
 ~vel~velocity to use when setting a step
 ~measures~length of the sequence in measures
 ~clear~clear sequence
 ~yoff~vertical offset for grid controller's view of the pattern
+~velocitytype~velocity to use when setting a step
 ~offsets~show "offsets" sliders
 ~repeat~repeat input notes at this rate
 ~step~length of each step
@@ -1456,6 +1463,7 @@ drumplayer~sample player intended for drum playback
 ~quantize~quantize input to this interval
 ~repeat~if quantizing, should held notes repeat at that interval?
 ~full vel~always play drum hits at full velocity
+~single voice~only play a single drum hit at once, choking all others out (as if they all shared the same linkid)
 ~vol *~volume of sample 
 ~speed *~speed of sample
 ~pan *~stereo pan position of sample
@@ -1521,7 +1529,7 @@ velocitytochance~use a note's velocity to determine the chance that the note pla
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 
@@ -1736,7 +1744,7 @@ notehocket~sends notes to random destinations
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 
@@ -1783,7 +1791,7 @@ notechance~randomly allow notes through
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 
@@ -1893,6 +1901,7 @@ titlebar~
 ~write audio~write the last 30 minutes of audio to your specified recordings_path
 ~ ? ~show help
 ~settings~adjust preferences, saved as userprefs.json
+~home~Moves the viewport to the "home" position, useful if you lost where you are in your savestate
 ~load layout~[none]
 ~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
 ~autosave~every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.
@@ -2000,7 +2009,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~ui_scale~scale of UI layer (title bar, quickspawn menu, etc)
 ~cable_drop_behavior~what should be behavior be when you drag a cable and drop it into empty space?
 ~qwerty_to_pitch_mode~some modules can hear computer keyboard keys and automatically translate them to MIDI notes. This setting defines how your keyboard is interpreted based on other DAWs with a similar feature. \nAbleton:\noctave#1: A->L\ndown octave: Z\nup octave: X\n\nFruity:\noctave#1: Z->M\noctave#2: Q->I\ndown octave: ,\nup octave: .
-~grid_snap_size~grid size to use when snapping module position (hold alt/option while dragging a module)
+~grid_snap_size~grid size to use when snapping module position (hold command on mac or control everywhere else while dragging a module)
 ~scroll_multiplier_vertical~adjustment to vertical mouse/trackpad scroll speed
 ~scroll_multiplier_horizontal~adjustment to horizontal mouse/trackpad scroll speed
 ~autosave~should autosave be enabled on startup
@@ -2086,6 +2095,7 @@ dotsequencer~polyphonic note sequencer with adjustable note length and velocity.
 ~octave~octave of the bottom pitch of this sequence
 ~row offset~amount to offset the mapping of row to pitch
 ~clear~clear the contents of the dot grid
+~double~double the length of this sequence
 ~dotgrid~the dot grid
 
 
@@ -2114,3 +2124,27 @@ euclideansequencer~euclidean sequencer displays a loop as a circle. the notes ar
 ~note~randomize notes in all rings
 ~note*~pitch to use for this ring
 ~clear~clear all steps, onsets, rotation and offset in all rings
+
+
+savestateloader~loads other savestate files (and unloads the current savestate). the number of buttons can be adjusted in the triangle menu.
+~load *~loads specified savestate file. shift-click to choose a new file.
+
+
+dataprovider~provides modulation values normally not easily accessible.
+~type~the type of value to provide
+~interval~the interval to measure
+~realtime~if enabled this module will work on the audio thread which is more accurate but also more resource intense
+~set~click here to send the value (or, send a pulse to this module for the same result)
+
+
+pulselimit~limit the number of pulses allowed to pass through
+~reset~reset the counter of seen pulses
+~limit~limit number of pulses to pass through
+
+audiosplitter~send an audio signal to multiple destinations
+
+acciaccatura~adds a quick grace note before playing the input pitch
+~offset~how far to offset initial pitch bend
+~notemode~should the offset be in scale steps, or chromatically in semitones?
+~hold ms~how long to hold offset pitch before transitioning to input pitch
+~glide ms~how long to spend bending between offset pitch and input pitch after hold ms

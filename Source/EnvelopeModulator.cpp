@@ -73,17 +73,17 @@ void EnvelopeModulator::Start(double time, const ::ADSR& adsr)
    mAdsr.Start(time, 1, adsr);
 }
 
-void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void EnvelopeModulator::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 
    if (mNoteOutput.HasHeldNotes() == false)
    {
-      mAdsr.Stop(time);
+      mAdsr.Stop(note.time);
    }
-   else if (velocity > 0)
+   else if (note.velocity > 0)
    {
-      mAdsr.Start(time, mUseVelocity ? velocity / 127.0f : 1);
+      mAdsr.Start(note.time, mUseVelocity ? note.velocity / 127.0f : 1);
    }
 }
 

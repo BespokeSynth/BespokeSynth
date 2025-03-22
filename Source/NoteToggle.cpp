@@ -60,10 +60,10 @@ void NoteToggle::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void NoteToggle::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteToggle::PlayNote(NoteMessage note)
 {
-   if (pitch >= 0 && pitch < 128)
-      mHeldPitches[pitch] = (velocity > 0);
+   if (note.pitch >= 0 && note.pitch < 128)
+      mHeldPitches[note.pitch] = (note.velocity > 0);
 
    bool hasHeldNotes = false;
    for (int i = 0; i < 128; ++i)
@@ -75,7 +75,7 @@ void NoteToggle::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    for (size_t i = 0; i < mTargets.size(); ++i)
    {
       if (mTargets[i] != nullptr)
-         mTargets[i]->SetValue(hasHeldNotes ? 1 : 0, time);
+         mTargets[i]->SetValue(hasHeldNotes ? 1 : 0, note.time);
    }
 }
 

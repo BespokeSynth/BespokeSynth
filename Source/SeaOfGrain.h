@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "EnvOscillator.h"
 #include "IDrawableModule.h"
@@ -52,7 +51,7 @@ public:
    void CreateUIControls() override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IAudioSource
@@ -100,6 +99,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
+   float GetSampleRateRatio() const;
    ChannelBuffer* GetSourceBuffer();
    float GetSourceStartSample();
    float GetSourceEndSample();
@@ -162,6 +162,7 @@ private:
    bool mRecordInput{ false };
    Checkbox* mRecordInputCheckbox{ nullptr };
    bool mHasRecordedInput{ false };
+
    float mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    bool mLoading{ false };

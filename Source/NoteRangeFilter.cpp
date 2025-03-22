@@ -69,22 +69,22 @@ void NoteRangeFilter::IntSliderUpdated(IntSlider* slider, int oldVal, double tim
       mNoteOutput.Flush(time);
 }
 
-void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteRangeFilter::PlayNote(NoteMessage note)
 {
    ComputeSliders(0);
 
    if (mWrap && mMaxPitch > mMinPitch)
    {
       int length = mMaxPitch - mMinPitch + 1;
-      while (pitch < mMinPitch)
-         pitch += length;
-      while (pitch > mMaxPitch)
-         pitch -= length;
+      while (note.pitch < mMinPitch)
+         note.pitch += length;
+      while (note.pitch > mMaxPitch)
+         note.pitch -= length;
    }
 
-   if (!mEnabled || (pitch >= mMinPitch && pitch <= mMaxPitch))
+   if (!mEnabled || (note.pitch >= mMinPitch && note.pitch <= mMaxPitch))
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
    }
 }
 

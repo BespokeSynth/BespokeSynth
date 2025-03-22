@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "SynthGlobals.h"
 #include "Transport.h"
 #include "Oscillator.h"
@@ -44,7 +43,11 @@ public:
    LFO();
    ~LFO();
    float Value(int samplesIn = 0, float forcePhase = -1) const;
-   void SetOffset(float offset) { mPhaseOffset = offset; }
+   void SetOffset(float offset)
+   {
+      mPhaseOffset = offset;
+      mAdjustOffset = 0;
+   }
    void SetPeriod(NoteInterval interval);
    void SetType(OscillatorType type);
    void SetPulseWidth(float width) { mOsc.SetPulseWidth(width); }
@@ -54,6 +57,7 @@ public:
    void SetFreeRate(float rate) { mFreeRate = rate; }
    void SetLength(float length) { mLength = length; }
    float TransformPhase(float phase) const;
+   void ResetPhase(double time);
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -72,6 +76,7 @@ private:
    float mFreeRate{ 1 };
    float mLength{ 1 };
    int mPerlinSeed{ 0 };
+   float mAdjustOffset{ 0 };
 
    static PerlinNoise sPerlinNoise;
 };

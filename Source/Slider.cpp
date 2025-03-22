@@ -102,11 +102,14 @@ void FloatSlider::SetModulator(IModulator* modulator)
    }
 }
 
-void FloatSlider::Render()
+void FloatSlider::Poll()
 {
    if (mLastComputeTime + .1f < gTime)
       Compute();
+}
 
+void FloatSlider::Render()
+{
    float normalWidth = mWidth;
    float normalHeight = mHeight;
 
@@ -557,7 +560,7 @@ void FloatSlider::MatchExtents(FloatSlider* slider)
 void FloatSlider::DisableLFO()
 {
    if (mLFOControl)
-      mLFOControl->SetEnabled(false);
+      mLFOControl->SetLFOEnabled(false);
 }
 
 float FloatSlider::GetValue() const
@@ -1071,7 +1074,21 @@ bool IntSlider::MouseMoved(float x, float y)
 void IntSlider::SetValueForMouse(float x, float y)
 {
    int oldVal = *mVar;
-   *mVar = (int)round(ofMap(x + mX, mX + 1, mX + mWidth - 1, mMin, mMax));
+   float fX = x;
+   if (GetKeyModifiers() & kModifier_Shift)
+   {
+      if (mFineRefX == -999)
+      {
+         mFineRefX = x;
+      }
+      fX = mFineRefX + (fX - mFineRefX) / 10;
+   }
+   else
+   {
+      mFineRefX = -999;
+   }
+
+   *mVar = (int)round(ofMap(fX + mX, mX + 1, mX + mWidth - 1, mMin, mMax));
    *mVar = ofClamp(*mVar, mMin, mMax);
    if (oldVal != *mVar)
    {

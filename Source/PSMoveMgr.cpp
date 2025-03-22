@@ -13,10 +13,6 @@ void PSMoveMgr::Setup()
 
 void PSMoveMgr::AddMoves()
 {
-   int numConnected;
-
-   numConnected = psmove_count_connected();
-
    for (int i = 0; i < MAX_NUM_PS_MOVES; ++i)
    {
       if (mMove[i] == NULL)
@@ -124,26 +120,6 @@ void PSMoveMgr::Update()
          while (res)
             res = psmove_poll(move); //poll until there's no new data, so we have the freshest
 
-         int x, y, z;
-         ofVec3f vec;
-         psmove_get_accelerometer(move, &x, &y, &z);
-         vec.x = x;
-         vec.y = y;
-         vec.z = z;
-         //TheMessenger->SendVectorMessage("/" + ofToString(i) + "/accel",vec);
-         psmove_get_gyroscope(move, &x, &y, &z);
-         vec.x = x;
-         vec.y = y;
-         vec.z = z;
-         //TheMessenger->SendVectorMessage("/" + ofToString(i) + "/gyro",vec);
-         //psmove_get_magnetometer(move, &x, &y, &z);
-         //vec.x = x; vec.y = y; vec.z = z;
-         //TheMessenger->SendVectorMessage("/magnetometer",vec);
-
-         //float trigger = psmove_get_trigger(move);
-         //string address = "/" + ofToString(i) + "/trigger";
-         //TheMessenger->SendFloatMessage(address, trigger);
-
          int currentButtons = psmove_get_buttons(move);
          int change = currentButtons ^ mButtons[i];
          int pressed = currentButtons & change;
@@ -185,23 +161,6 @@ void PSMoveMgr::Update()
             SendButtonMessage(i, "trigger", 1);
          if (Btn_T & released)
             SendButtonMessage(i, "trigger", 0);
-
-         {
-            //int battery = psmove_get_battery(move);
-            //float batteryLevel = ((float)battery - Batt_MIN) / (Batt_MAX - Batt_MIN);
-            //string address = "/" + ofToString(i) + "/battery";
-            //TheMessenger->SendFloatMessage(address,batteryLevel);
-         }
-
-         /*if (battery == Batt_CHARGING) {
-            printf("battery charging\n");
-         } else if (battery >= Batt_MIN && battery <= Batt_MAX) {
-            printf("battery level: %d / %d\n", battery, Batt_MAX);
-         } else {
-            printf("battery level: unknown (%x)\n", battery);
-         }
-         
-         printf("temperature: %d\n", psmove_get_temperature(move));*/
 
          psmove_update_leds(move);
       }

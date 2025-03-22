@@ -28,7 +28,6 @@ bespoke synth, a software modular synthesizer
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 #include "RadioButton.h"
@@ -68,7 +67,6 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    bool IsIndexActive(int idx) const;
-   void OnPulse();
 
    int mRouteMask{ 0 };
    RadioButton* mRouteSelector{ nullptr };

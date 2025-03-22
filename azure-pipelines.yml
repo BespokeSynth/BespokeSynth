@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         macOS-x64:
-          imageName: 'macos-12'
+          imageName: 'macos-14'
           isMac: True
           cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES='arm64;x86_64'\" -DBESPOKE_SIGN_AS='$(MAC_SIGNING_CERT)' -DBESPOKE_PYTHON_ROOT='/Library/Frameworks/Python.framework/Versions/3.10'"
           cmakeTarget: "BespokeSynth"
@@ -159,7 +159,7 @@ jobs:
       - bash: |
           set -e
           echo Building with BUILD_TYPE = $CMAKE_CONFIG and arguments = $(cmakeArguments)
-          cmake -Bbuild $(cmakeArguments) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True
+          cmake -Bbuild $(cmakeArguments) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True -DBESPOKE_WERROR=True
         displayName: all - configure with cmake for PR
         condition: eq(variables['Build.Reason'], 'PullRequest')
 
@@ -268,7 +268,7 @@ jobs:
     dependsOn: Build
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     pool:
-      vmImage: 'macos-12'
+      vmImage: 'macos-14'
 
     steps:
     - checkout: self

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
@@ -138,7 +137,7 @@ private:
    float mDrive{ 1 };
    float mThreshold{ -24 };
    float mRatio{ 4 };
-   float mAttack{ .1 };
+   float mAttack{ .1f };
    float mRelease{ 100 };
    float mLookahead{ 3 };
    float mOutputAdjust{ 1 };

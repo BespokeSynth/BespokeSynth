@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <stdio.h>
 #include "NoteEffectBase.h"
 
 class NoteFilter : public NoteEffectBase, public IDrawableModule
@@ -43,7 +42,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;

@@ -75,7 +75,6 @@ void Beats::Process(double time)
    mWriteBuffer.SetNumActiveChannels(numChannels);
 
    int bufferSize = target->GetBuffer()->BufferSize();
-   float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();
@@ -133,7 +132,7 @@ void Beats::DrawModule()
 
 void Beats::FilesDropped(std::vector<std::string> files, int x, int y)
 {
-   for (auto file : files)
+   for (auto& file : files)
    {
       Sample* sample = new Sample();
       sample->Read(file.c_str());

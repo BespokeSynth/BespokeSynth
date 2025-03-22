@@ -349,7 +349,7 @@ void PatchCable::Render()
                {
                   ofVec2f pos = MathUtils::Bezier(i / wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                   float sample = vizBuff->GetSample((i / wireLength * numSamples), ch);
-                  if (isnan(sample))
+                  if (std::isnan(sample))
                   {
                      ofSetColor(ofColor(255, 0, 0));
                      sample = 0;

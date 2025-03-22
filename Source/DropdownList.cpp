@@ -209,12 +209,12 @@ void DropdownList::Render()
    if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display)
    {
       const float kCentering = 7;
-      float w, h;
-      GetPopupDimensions(w, h);
+      float pw, ph;
+      GetPopupDimensions(pw, ph);
 
       mModalList.SetPosition(0, 0);
       ofPushMatrix();
-      ofTranslate(mX, mY + kCentering - h * mSliderVal);
+      ofTranslate(mX, mY + kCentering - ph * mSliderVal);
       mModalList.SetIsScrolling(true);
       mModalList.Render();
       mModalList.SetIsScrolling(false);
@@ -222,10 +222,10 @@ void DropdownList::Render()
 
       ofPushStyle();
       ofFill();
-      ofColor color = IDrawableModule::GetColor(GetModuleParent()->GetModuleCategory());
-      color.a = 80;
-      ofSetColor(color);
-      ofRect(mX, mY, w, mHeight);
+      ofColor categoryColor = IDrawableModule::GetColor(GetModuleParent()->GetModuleCategory());
+      categoryColor.a = 80;
+      ofSetColor(categoryColor);
+      ofRect(mX, mY, pw, mHeight);
       ofPopStyle();
    }
 }
@@ -374,7 +374,6 @@ void DropdownList::OnClicked(float x, float y, bool right)
    ofVec2f modalPos = GetModalListPosition();
    mModalList.SetOwningContainer(GetModuleParent()->GetOwningContainer());
 
-   float screenX = ToScreenPosX(modalPos.x, GetModuleParent());
    float screenY = (modalPos.y + GetModuleParent()->GetOwningContainer()->GetDrawOffset().y) * GetModuleParent()->GetOwningContainer()->GetDrawScale();
    float maxX = ofGetWidth() - 5;
    float maxY = ofGetHeight() - 5;
@@ -456,6 +455,43 @@ float DropdownList::GetValueForMidiCC(float slider) const
    int index = int(slider * mElements.size());
    index = ofClamp(index, 0, mElements.size() - 1);
    return mElements[index].mValue;
+}
+
+bool DropdownList::CanBeTargetedBy(PatchCableSource* source) const
+{
+   if (source->GetConnectionType() == kConnectionType_Pulse)
+      return true;
+   return IUIControl::CanBeTargetedBy(source);
+}
+
+void DropdownList::OnPulse(double time, float velocity, int flags)
+{
+   int length = static_cast<int>(mElements.size());
+   if (length <= 0)
+      length = 1;
+   int direction = 1;
+   if (flags & kPulseFlag_Backward)
+      direction = -1;
+   if (flags & kPulseFlag_Repeat)
+      direction = 0;
+
+   int newindex = 0;
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      if (mElements[i].mValue == *mVar)
+      {
+         newindex = i;
+         break;
+      }
+   }
+   newindex = (newindex + direction + length) % length;
+   if (flags & kPulseFlag_Reset)
+      newindex = 0;
+   else if (flags & kPulseFlag_Random)
+      newindex = gRandom() % length;
+   if (newindex >= mElements.size() || newindex < 0)
+      newindex = 0;
+   SetIndex(newindex, time, K(forceUpdate));
 }
 
 void DropdownList::SetIndex(int i, double time, bool forceUpdate)

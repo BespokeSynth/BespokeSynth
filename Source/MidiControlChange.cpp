@@ -52,9 +52,9 @@ void MidiControlChange::DrawModule()
    mValueSlider->Draw();
 }
 
-void MidiControlChange::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void MidiControlChange::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void MidiControlChange::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

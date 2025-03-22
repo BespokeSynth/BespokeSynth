@@ -29,7 +29,6 @@
 #include "IAudioSource.h"
 #include "INoteSource.h"
 #include "IAudioReceiver.h"
-#include "INoteReceiver.h"
 #include "GridController.h"
 #include "RollingBuffer.h"
 #include "TextEntry.h"
@@ -37,7 +36,7 @@
 #include "PatchCableSource.h"
 #include "ChannelBuffer.h"
 #include "IPulseReceiver.h"
-#include "exprtk/exprtk.hpp"
+#include "exprtk.hpp"
 #include "UserPrefs.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
@@ -77,6 +76,7 @@ float gControlTactileFeedback = 0;
 float gDrawScale = 1;
 bool gShowDevModules = false;
 float gCornerRoundness = 1;
+std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
 
 std::random_device gRandomDevice;
 bespoke::core::Xoshiro256ss gRandom(gRandomDevice);
@@ -95,6 +95,11 @@ void SynthInit()
    TheSynth->GetAudioFormatManager().registerBasicFormats();
 
    assert(kNumVoices <= 16); //assumption that we don't have more voices than midi channels
+
+   gStepVelocityLevels[(int)StepVelocityType::Off] = kVelocityOff;
+   gStepVelocityLevels[(int)StepVelocityType::Ghost] = kVelocityGhost;
+   gStepVelocityLevels[(int)StepVelocityType::Normal] = kVelocityNormal;
+   gStepVelocityLevels[(int)StepVelocityType::Accent] = kVelocityAccent;
 }
 
 void LoadGlobalResources()
@@ -174,7 +179,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       if (buffer && length > 0)
       {
          float step = width > 0 ? kStepSize : -kStepSize;
-         float samplesPerStep = length / width * step;
+         samplesPerStep = length / width * step;
 
          ofSetColor(color);
 
@@ -295,6 +300,7 @@ std::string NoteName(int pitch, bool flat, bool includeOctave)
    std::string ret = "x";
    switch (pitch)
    {
+      default:
       case 0:
          ret = "C";
          break;
@@ -467,6 +473,7 @@ std::string GetRomanNumeralForDegree(int degree)
    std::string roman;
    switch ((degree + 700) % 7)
    {
+      default:
       case 0: roman = "I"; break;
       case 1: roman = "II"; break;
       case 2: roman = "III"; break;
@@ -518,7 +525,7 @@ void UpdateTarget(IDrawableModule* module)
    }
 }
 
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b)
+void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b, bool autocorrelationMode /* = true */)
 {
    ofPushStyle();
    ofSetLineWidth(1.5f);
@@ -534,7 +541,11 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
    for (int i = 100; i < numPoints; ++i)
    {
       float vx = x + w / 2 + buffer->GetSample(i, 0) * .8f * MIN(w, h);
-      float vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+      float vy;
+      if (autocorrelationMode)
+         vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+      else
+         vy = y + h / 2 + buffer->GetSample(i, secondChannel) * .8f * MIN(w, h);
       //float alpha = 1 - (i/float(numPoints));
       //ofSetColor(r*255,g*255,b*255,alpha*alpha*255);
       ofVertex(vx, vy);

@@ -61,7 +61,7 @@ void RadioSequencer::CreateUIControls()
    UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, 25, mGridControlTarget->GetRect().getMaxX() - 6, 170, mLength, 8, this);
+   mGrid = new UIGrid(this, "uigrid", 5, 25, mGridControlTarget->GetRect().getMaxX() - 6, 170, mLength, 8);
    mGrid->SetHighlightCol(gTime, -1);
    mGrid->SetSingleColumnMode(true);
    mGrid->SetMajorColSize(4);
@@ -201,13 +201,13 @@ void RadioSequencer::OnTimeEvent(double time)
       Step(time, 0);
 }
 
-void RadioSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void RadioSequencer::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       mHasExternalPulseSource = true;
-      mStep = pitch % std::max(1, mLength);
-      Step(time, kPulseFlag_Repeat);
+      mStep = note.pitch % std::max(1, mLength);
+      Step(note.time, kPulseFlag_Repeat);
    }
 }
 
@@ -323,7 +323,6 @@ void RadioSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time
          int oldLengthPow2 = std::max(1, MathUtils::HighestPow2(oldVal));
          for (int i = oldVal; i < mLength; ++i)
          {
-            int loopedFrom = i % oldLengthPow2;
             for (int row = 0; row < mGrid->GetRows(); ++row)
                mGrid->SetVal(i, row, mGrid->GetVal(i % oldLengthPow2, row));
          }

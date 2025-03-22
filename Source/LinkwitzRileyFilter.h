@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-
 #include "SynthGlobals.h"
 
 class CLinkwitzRiley_4thOrder

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "Transport.h"
 #include "Checkbox.h"
@@ -59,7 +58,7 @@ public:
    void SetNumMeasures(int numMeasures);
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
@@ -118,7 +117,7 @@ private:
    Canvas* mCanvas{ nullptr };
    ClickButton* mClearButton{ nullptr };
    int mVoiceRoundRobin{ kNumVoices - 1 };
-   bool mAllowLookahead{ false };
+   bool mAllowLookahead{ true };
 
    std::array<ModulationParameters, kNumVoices + 1> mVoiceModulations{};
    std::array<int, kNumVoices> mVoiceMap{};

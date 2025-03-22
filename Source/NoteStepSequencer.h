@@ -25,13 +25,10 @@
 
 #pragma once
 
-#include <iostream>
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Transport.h"
-#include "Checkbox.h"
 #include "DropdownList.h"
-#include "TextEntry.h"
 #include "ClickButton.h"
 #include "INoteSource.h"
 #include "Slider.h"
@@ -66,7 +63,16 @@ public:
 
    UIGrid* GetGrid() const { return mGrid; }
 
-   int RowToPitch(int row);
+   enum NoteMode
+   {
+      kNoteMode_Scale,
+      kNoteMode_Chromatic,
+      kNoteMode_Pentatonic,
+      kNoteMode_Fifths
+   };
+
+   static int RowToPitch(NoteMode noteMode, int row, int octave, int rowOffset);
+
    int PitchToRow(int pitch);
    void SetStep(int index, int step, int velocity, float length);
    void SetPitch(int index, int pitch, int velocity, float length);
@@ -105,7 +111,7 @@ public:
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IGridControllerListener
@@ -136,8 +142,9 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
-   void UpdateGridControllerLights(bool force);
+   void KeyPressed(int key, bool isRepeat) override;
 
+   void UpdateGridControllerLights(bool force);
    int ButtonToStep(int button);
    int StepToButton(int step);
    void SyncGridToSeq();
@@ -153,14 +160,6 @@ private:
    void Step(double time, float velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
-
-   enum NoteMode
-   {
-      kNoteMode_Scale,
-      kNoteMode_Chromatic,
-      kNoteMode_Pentatonic,
-      kNoteMode_Fifths
-   };
 
    int mTones[NSS_MAX_STEPS]{};
    int mVels[NSS_MAX_STEPS]{};

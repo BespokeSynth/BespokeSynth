@@ -61,7 +61,7 @@ void UserPrefsEditor::CreateUIControls()
    mCategorySelector->AddLabel("paths", (int)UserPrefCategory::Paths);
 
    std::array<int, 5> oversampleAmounts = { 1, 2, 4, 8, 16 };
-   for (int oversample : oversampleAmounts)
+   for (auto& oversample : oversampleAmounts)
    {
       UserPrefs.oversampling.GetDropdown()->AddLabel(ofToString(oversample), oversample);
       if (UserPrefs.oversampling.Get() == oversample)
@@ -86,6 +86,18 @@ void UserPrefsEditor::CreateUIControls()
    {
       if (UserPrefs.qwerty_to_pitch_mode.GetDropdown()->GetElement(i).mLabel == UserPrefs.qwerty_to_pitch_mode.Get())
          UserPrefs.qwerty_to_pitch_mode.GetIndex() = i;
+   }
+
+   UserPrefs.minimap_corner.GetIndex() = 0;
+   UserPrefs.minimap_corner.GetDropdown()->AddLabel("Top right", (int)MinimapCorner::TopRight);
+   UserPrefs.minimap_corner.GetDropdown()->AddLabel("Top left", (int)MinimapCorner::TopLeft);
+   UserPrefs.minimap_corner.GetDropdown()->AddLabel("Bottom right", (int)MinimapCorner::BottomRight);
+   UserPrefs.minimap_corner.GetDropdown()->AddLabel("Bottom left", (int)MinimapCorner::BottomLeft);
+
+   for (int i = 0; i < UserPrefs.minimap_corner.GetDropdown()->GetNumValues(); ++i)
+   {
+      if (UserPrefs.minimap_corner.GetDropdown()->GetElement(i).mLabel == UserPrefs.minimap_corner.Get())
+         UserPrefs.minimap_corner.GetIndex() = i;
    }
 }
 
@@ -146,7 +158,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.audio_output_device.GetDropdown()->AddLabel("none", -2);
       UserPrefs.audio_output_device.GetDropdown()->AddLabel("auto", -1);
       i = 0;
-      for (auto outputDevice : selectedDeviceType->getDeviceNames())
+      for (auto& outputDevice : selectedDeviceType->getDeviceNames())
       {
          UserPrefs.audio_output_device.GetDropdown()->AddLabel(outputDevice.toStdString(), i);
          if (deviceManager.getCurrentAudioDevice() != nullptr &&
@@ -175,7 +187,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.audio_input_device.GetDropdown()->AddLabel("none", -2);
       UserPrefs.audio_input_device.GetDropdown()->AddLabel("auto", -1);
       i = 0;
-      for (auto inputDevice : selectedDeviceType->getDeviceNames(true))
+      for (auto& inputDevice : selectedDeviceType->getDeviceNames(true))
       {
          UserPrefs.audio_input_device.GetDropdown()->AddLabel(inputDevice.toStdString(), i);
          if (deviceManager.getCurrentAudioDevice() != nullptr &&
@@ -227,7 +239,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.samplerate.GetIndex() = -1;
       UserPrefs.samplerate.GetDropdown()->Clear();
       i = 0;
-      for (auto rate : selectedDevice->getAvailableSampleRates())
+      for (auto& rate : selectedDevice->getAvailableSampleRates())
       {
          UserPrefs.samplerate.GetDropdown()->AddLabel(ofToString(rate), i);
          if (rate == gSampleRate / UserPrefs.oversampling.Get())
@@ -241,7 +253,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.buffersize.GetIndex() = -1;
       UserPrefs.buffersize.GetDropdown()->Clear();
       i = 0;
-      for (auto bufferSize : selectedDevice->getAvailableBufferSizes())
+      for (auto& bufferSize : selectedDevice->getAvailableBufferSizes())
       {
          UserPrefs.buffersize.GetDropdown()->AddLabel(ofToString(bufferSize), i);
          if (bufferSize == gBufferSize / UserPrefs.oversampling.Get())
@@ -339,6 +351,7 @@ void UserPrefsEditor::DrawModule()
 
    DrawRightLabel(UserPrefs.zoom.GetControl(), "(currently: " + ofToString(gDrawScale) + ")", ofColor::white);
    DrawRightLabel(UserPrefs.recordings_path.GetControl(), "(default: " + UserPrefs.recordings_path.GetDefault() + ")", ofColor::white);
+   DrawRightLabel(UserPrefs.samples_path.GetControl(), "(default: " + UserPrefs.samples_path.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.tooltips.GetControl(), "(default: " + UserPrefs.tooltips.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.layout.GetControl(), "(default: " + UserPrefs.layout.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.youtube_dl_path.GetControl(), "(default: " + UserPrefs.youtube_dl_path.GetDefault() + ")", ofColor::white);

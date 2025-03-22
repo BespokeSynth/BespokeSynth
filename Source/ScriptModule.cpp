@@ -634,7 +634,9 @@ void ScriptModule::Poll()
       if (mLoadedScriptFiletime < scriptFile.getLastModificationTime())
       {
          std::unique_ptr<FileInputStream> input(scriptFile.createInputStream());
-         mCodeEntry->SetText(input->readString().toStdString());
+         std::string text = input->readString().toStdString();
+         ofStringReplace(text, "\r", "");
+         mCodeEntry->SetText(text);
          mCodeEntry->Publish();
          ExecuteCode();
          mLoadedScriptFiletime = scriptFile.getLastModificationTime();
@@ -779,11 +781,31 @@ void ScriptModule::PrintText(std::string text)
 
 IUIControl* ScriptModule::GetUIControl(std::string path)
 {
-   IUIControl* control;
-   if (ofIsStringInString(path, "~"))
-      control = TheSynth->FindUIControl(path);
+   if (path == "")
+      return nullptr;
+
+   std::string fullPath = path;
+
+   if (path[0] == '$')
+      //absolute path provided by the user
+      fullPath = path;
+   else if (std::count(path.begin(), path.end(), '~') >= 2)
+      //absolute path within a prefab
+      fullPath = path;
+   else if (ofIsStringInString(Path(), "~") && !ofIsStringInString(path, "~"))
+      //in a prefab, referencing a script variable
+      fullPath = Path() + "~" + path;
+   else if (!ofIsStringInString(Path(), "~") && ofIsStringInString(path, "~"))
+      //main screen, referencing a module
+      fullPath = path;
+   else if (ofIsStringInString(Path(), "~") && ofIsStringInString(path, "~"))
+      //in a prefab, referencing module in the current or nested prefab
+      fullPath = Path().substr(0, Path().rfind('~') + 1) + path;
    else
-      control = TheSynth->FindUIControl(Path() + "~" + path);
+      //main screen, referencing a script variable
+      fullPath = Path() + "~" + path;
+
+   IUIControl* control = TheSynth->FindUIControl(fullPath);
 
    return control;
 }
@@ -834,23 +856,23 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
       modulation.pitchBend = &mPitchBends[intPitch];
       modulation.pitchBend->SetValue(pitch - intPitch);
    }
-   SendNoteToIndex(noteOutputIndex, time, intPitch, (int)velocity, -1, modulation);
+   SendNoteToIndex(noteOutputIndex, NoteMessage(time, intPitch, (int)velocity, -1, modulation));
 
    if (velocity > 0)
       mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan, 1));
 }
 
-void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ScriptModule::SendNoteToIndex(int index, NoteMessage note)
 {
    if (index == 0)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
+      PlayNoteOutput(note, true);
       return;
    }
 
    if (index - 1 < (int)mExtraNoteOutputs.size())
    {
-      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
+      mExtraNoteOutputs[index - 1]->PlayNoteOutput(note, true);
    }
 }
 
@@ -893,6 +915,19 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
    }
 
    RunCode(gTime, "on_osc(\"" + messageString + "\")");
+}
+
+void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
+{
+   // Avoid code injection by preventing the sysex payload to be interpreted as Python
+   // - convert the sysex payload to hex
+   // - use bytes.fromhex in Python to parse it
+   std::ostringstream ss;
+   for (size_t i = 0; i < data_size; i++)
+      ss << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(data[i]);
+   mMidiMessageQueueMutex.lock();
+   mMidiMessageQueue.push_back("on_sysex(bytes.fromhex('" + ss.str() + "'))");
+   mMidiMessageQueueMutex.unlock();
 }
 
 void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
@@ -988,7 +1023,9 @@ void ScriptModule::ButtonClicked(ClickButton* button, double time)
 
          mLoadedScriptFiletime = resourceFile.getLastModificationTime();
 
-         mCodeEntry->SetText(input->readString().toStdString());
+         std::string text = input->readString().toStdString();
+         ofStringReplace(text, "\r", "");
+         mCodeEntry->SetText(text);
       }
    }
 
@@ -1105,15 +1142,15 @@ void ScriptModule::OnPulse(double time, float velocity, int flags)
 }
 
 //INoteReceiver
-void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
+void ScriptModule::PlayNote(NoteMessage note)
 {
    for (size_t i = 0; i < mPendingNoteInput.size(); ++i)
    {
       if (mPendingNoteInput[i].time == -1)
       {
-         mPendingNoteInput[i].time = time;
-         mPendingNoteInput[i].pitch = pitch;
-         mPendingNoteInput[i].velocity = velocity;
+         mPendingNoteInput[i].time = note.time;
+         mPendingNoteInput[i].pitch = note.pitch;
+         mPendingNoteInput[i].velocity = note.velocity;
          break;
       }
    }
@@ -1202,15 +1239,8 @@ void ScriptModule::RunCode(double time, std::string code)
 
    try
    {
-      //ofLog() << "****";
-      //ofLog() << (string)py::str(mPythonGlobals);
-
       FixUpCode(code);
-      //ofLog() << code;
       py::exec(code, py::globals());
-
-      //ofLog() << "&&&&";
-      //ofLog() << (string)py::str(mPythonGlobals);
 
       mCodeEntry->SetError(false);
       mLastError = "";
@@ -1249,43 +1279,10 @@ void ScriptModule::RunCode(double time, std::string code)
 
                lineNumber = realLineNumber;
             }
-            catch (std::exception const& e)
+            catch (std::exception)
             {
             }
          }
-         //PyErr_NormalizeException(&e.type().ptr(),&e.value().ptr(),&e.trace().ptr());
-
-         /*char *msg, *file, *text;
-         int line, offset;
-
-         int res = PyArg_ParseTuple(e.value().ptr(),"s(siis)",&msg,&file,&line,&offset,&text);
-
-         //ofLog() << e.value().
-         
-         if (res > 0)
-         {
-            PyObject* line_no = PyObject_GetAttrString(e.value().ptr(),"lineno");
-            PyObject* line_no_str = PyObject_Str(line_no);
-            PyObject* line_no_unicode = PyUnicode_AsEncodedString(line_no_str,"utf-8", "Error");
-            char *actual_line_no = PyBytes_AsString(line_no_unicode);  // Line number
-            ofLog() << actual_line_no;
-         }*/
-
-         /*PyTracebackObject* trace = (PyTracebackObject*)e.trace().ptr();
-         if (trace != nullptr)
-         {
-            while (trace->tb_next)
-               trace = trace->tb_next;
-            PyFrameObject* frame = trace->tb_frame;
-            while (frame)
-            {
-               if (frame->f_back != nullptr)
-                  lineNumber += PyFrame_GetLineNumber(frame);
-               if (frame->f_back == nullptr)
-                  lineNumber -= PyFrame_GetLineNumber(frame);  //take away root frame? not sure.
-               frame = frame->f_back;
-            }
-         }*/
       }
 
       sMostRecentLineExecutedModule->mCodeEntry->SetError(true, lineNumber);
@@ -1311,6 +1308,7 @@ void ScriptModule::FixUpCode(std::string& code)
    ofStringReplace(code, "on_grid_button(", "on_grid_button__" + prefix + "(");
    ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
    ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
+   ofStringReplace(code, "on_sysex(", "on_sysex__" + prefix + "(");
    ofStringReplace(code, "this.", GetThisName() + ".");
    ofStringReplace(code, "me.", GetThisName() + ".");
 }
@@ -1613,7 +1611,6 @@ juce::String ScriptModule::GetScriptChecksum() const
 void ScriptModule::RecordScriptAsTrusted()
 {
    juce::File trusted_python_scripts = File(ofToDataPath("internal/trusted_python_scripts"));
-   bool isScriptTrusted = false;
    if (!trusted_python_scripts.existsAsFile())
       trusted_python_scripts.create();
    trusted_python_scripts.appendText("\n" + GetScriptChecksum());
@@ -1638,7 +1635,7 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 
          if (mText[i] != "")
          {
-            ofVec2f linePos = codeEntry->GetLinePos(i, K(end));
+            linePos = codeEntry->GetLinePos(i, K(end));
             DrawTextNormal(mText[i], linePos.x + 10, linePos.y + 15);
          }
       }

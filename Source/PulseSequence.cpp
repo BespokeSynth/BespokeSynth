@@ -52,7 +52,7 @@ void PulseSequence::CreateUIControls()
    mLengthSlider = new IntSlider(this, "length", 3, 2, 96, 15, &mLength, 1, kMaxSteps);
    mIntervalSelector = new DropdownList(this, "interval", mLengthSlider, kAnchor_Right, (int*)(&mInterval));
 
-   mVelocityGrid = new UIGrid("uigrid", 3, 20, 174, 15, mLength, 1, this);
+   mVelocityGrid = new UIGrid(this, "uigrid", 3, 20, 248, 20, mLength, 1);
 
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -66,8 +66,11 @@ void PulseSequence::CreateUIControls()
    mIntervalSelector->AddLabel("64n", kInterval_64n);
    mIntervalSelector->AddLabel("none", kInterval_None);
 
-   mAdvanceBackwardButton = new ClickButton(this, "<", mIntervalSelector, kAnchor_Right);
-   mAdvanceForwardButton = new ClickButton(this, ">", mAdvanceBackwardButton, kAnchor_Right);
+   mAdvanceBackwardButton = new ClickButton(this, " - ", mIntervalSelector, kAnchor_Right);
+   mAdvanceForwardButton = new ClickButton(this, "+", mAdvanceBackwardButton, kAnchor_Right);
+   mPulseOnAdvanceCheckbox = new Checkbox(this, "pulse", mAdvanceForwardButton, kAnchor_Right, &mPulseOnAdvance);
+   mShiftLeftButton = new ClickButton(this, "<", mPulseOnAdvanceCheckbox, kAnchor_Right);
+   mShiftRightButton = new ClickButton(this, ">", mShiftLeftButton, kAnchor_Right);
 
    mVelocityGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mVelocityGrid->SetListener(this);
@@ -97,12 +100,18 @@ void PulseSequence::DrawModule()
    ofSetColor(255, 255, 255, gModuleDrawAlpha);
 
    mIntervalSelector->SetShowing(!mHasExternalPulseSource);
+   mAdvanceBackwardButton->SetShowing(mHasExternalPulseSource);
+   mAdvanceForwardButton->SetShowing(mHasExternalPulseSource);
+   mPulseOnAdvanceCheckbox->SetShowing(mHasExternalPulseSource);
 
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
    mVelocityGrid->Draw();
    mAdvanceBackwardButton->Draw();
    mAdvanceForwardButton->Draw();
+   mPulseOnAdvanceCheckbox->Draw();
+   mShiftLeftButton->Draw();
+   mShiftRightButton->Draw();
 
    for (int i = 0; i < kIndividualStepCables; ++i)
    {
@@ -188,8 +197,8 @@ void PulseSequence::Step(double time, float velocity, int flags)
 
 void PulseSequence::GetModuleDimensions(float& width, float& height)
 {
-   width = 180;
-   height = 52;
+   width = mWidth;
+   height = mHeight;
 }
 
 void PulseSequence::OnClicked(float x, float y, bool right)
@@ -197,6 +206,13 @@ void PulseSequence::OnClicked(float x, float y, bool right)
    IDrawableModule::OnClicked(x, y, right);
 
    mVelocityGrid->TestClick(x, y, right);
+}
+
+void PulseSequence::Resize(float w, float h)
+{
+   mWidth = MAX(w, 254);
+   mHeight = MAX(h, 58);
+   mVelocityGrid->SetDimensions(mWidth - 6, mHeight - 38);
 }
 
 void PulseSequence::MouseReleased()
@@ -221,9 +237,22 @@ bool PulseSequence::MouseScrolled(float x, float y, float scrollX, float scrollY
 void PulseSequence::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mAdvanceBackwardButton)
-      Step(time, 0, kPulseFlag_Backward);
+      Step(time, mPulseOnAdvance ? 1 : 0, kPulseFlag_Backward);
    if (button == mAdvanceForwardButton)
-      Step(time, 0, 0);
+      Step(time, mPulseOnAdvance ? 1 : 0, 0);
+   if (button == mShiftLeftButton || button == mShiftRightButton)
+   {
+      const int shift = (button == mShiftRightButton) ? 1 : -1;
+      for (int row = 0; row < mVelocityGrid->GetRows(); ++row)
+      {
+         const int start = (shift == 1) ? mVelocityGrid->GetCols() - 1 : 0;
+         const int end = (shift == 1) ? 0 : mVelocityGrid->GetCols() - 1;
+         const float startVal = mVelocityGrid->GetVal(start, row);
+         for (int col = start; col != end; col -= shift)
+            mVelocityGrid->SetVal(col, row, mVelocityGrid->GetVal(col - shift, row));
+         mVelocityGrid->SetVal(end, row, startVal);
+      }
+   }
 }
 
 void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal, double time)
@@ -244,6 +273,7 @@ void PulseSequence::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
+      mLength = MIN(mLength, kMaxSteps);
       mVelocityGrid->SetGrid(mLength, 1);
       GridUpdated(mVelocityGrid, 0, 0, 0, 0);
    }
@@ -285,11 +315,15 @@ void PulseSequence::LoadState(FileStreamIn& in, int rev)
 
 void PulseSequence::SaveLayout(ofxJSONElement& moduleInfo)
 {
+   moduleInfo["width"] = mWidth;
+   moduleInfo["height"] = mHeight;
 }
 
 void PulseSequence::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadInt("width", moduleInfo, 254, 254, 999999, K(isTextField));
+   mModuleSaveData.LoadInt("height", moduleInfo, 58, 58, 999999, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -297,4 +331,6 @@ void PulseSequence::LoadLayout(const ofxJSONElement& moduleInfo)
 void PulseSequence::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   PulseSequence::Resize(mModuleSaveData.GetInt("width"),
+                         mModuleSaveData.GetInt("height"));
 }

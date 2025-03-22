@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "RollingBuffer.h"
@@ -45,6 +44,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   bool CanMinimize() override { return false; }
 
    //IAudioSource
    void Process(double time) override;

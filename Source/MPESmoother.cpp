@@ -71,27 +71,27 @@ void MPESmoother::DrawModule()
    mModWheelSmoothSlider->Draw();
 }
 
-void MPESmoother::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void MPESmoother::PlayNote(NoteMessage note)
 {
-   if (mEnabled && voiceIdx >= 0 && voiceIdx < kNumVoices)
+   if (mEnabled && note.voiceIdx >= 0 && note.voiceIdx < kNumVoices)
    {
-      mModulationInput[voiceIdx].pitchBend = modulation.pitchBend;
-      if (velocity > 0 && modulation.pitchBend != nullptr)
-         mModulationOutput[voiceIdx].mPitchBend.SetValue(modulation.pitchBend->GetValue(0));
-      modulation.pitchBend = &mModulationOutput[voiceIdx].mPitchBend;
+      mModulationInput[note.voiceIdx].pitchBend = note.modulation.pitchBend;
+      if (note.velocity > 0 && note.modulation.pitchBend != nullptr)
+         mModulationOutput[note.voiceIdx].mPitchBend.SetValue(note.modulation.pitchBend->GetValue(0));
+      note.modulation.pitchBend = &mModulationOutput[note.voiceIdx].mPitchBend;
 
-      mModulationInput[voiceIdx].pressure = modulation.pressure;
-      if (velocity > 0 && modulation.pressure != nullptr)
-         mModulationOutput[voiceIdx].mPressure.SetValue(modulation.pressure->GetValue(0));
-      modulation.pressure = &mModulationOutput[voiceIdx].mPressure;
+      mModulationInput[note.voiceIdx].pressure = note.modulation.pressure;
+      if (note.velocity > 0 && note.modulation.pressure != nullptr)
+         mModulationOutput[note.voiceIdx].mPressure.SetValue(note.modulation.pressure->GetValue(0));
+      note.modulation.pressure = &mModulationOutput[note.voiceIdx].mPressure;
 
-      mModulationInput[voiceIdx].modWheel = modulation.modWheel;
-      if (velocity > 0 && modulation.modWheel != nullptr)
-         mModulationOutput[voiceIdx].mModWheel.SetValue(modulation.modWheel->GetValue(0));
-      modulation.modWheel = &mModulationOutput[voiceIdx].mModWheel;
+      mModulationInput[note.voiceIdx].modWheel = note.modulation.modWheel;
+      if (note.velocity > 0 && note.modulation.modWheel != nullptr)
+         mModulationOutput[note.voiceIdx].mModWheel.SetValue(note.modulation.modWheel->GetValue(0));
+      note.modulation.modWheel = &mModulationOutput[note.voiceIdx].mModWheel;
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void MPESmoother::OnTransportAdvanced(float amount)

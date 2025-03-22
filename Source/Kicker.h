@@ -25,11 +25,9 @@
 
 #pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
-#include "TextEntry.h"
 
 class DrumPlayer;
 
@@ -46,7 +44,7 @@ public:
    void SetDrumPlayer(DrumPlayer* drumPlayer) { mDrumPlayer = drumPlayer; }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 

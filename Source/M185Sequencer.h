@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"

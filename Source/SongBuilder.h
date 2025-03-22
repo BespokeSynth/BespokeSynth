@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <iostream>
 #include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
@@ -56,7 +55,7 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendPressure(int pitch, int pressure) override {}
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
@@ -87,7 +86,6 @@ private:
    void PostRepatch(PatchCableSource* cable, bool fromUserClick) override;
    bool ShouldSavePatchCableSources() const override { return false; }
 
-   void OnStep(double time, float velocity, int flags);
    void SetActiveScene(double time, int newScene);
    void SetActiveSceneById(double time, int newSceneId);
    void DuplicateScene(int sceneIndex);

@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
 #include "IMidiVoice.h"
 #include "IVoiceParams.h"
 #include "ADSR.h"
@@ -62,7 +60,7 @@ public:
    float mExciterDecay{ 3 };
    float mExcitation{ 0 };
    float mPitchTone{ 0 };
-   float mVelToVolume{ .5 };
+   float mVelToVolume{ 1.0 };
    float mVelToEnvelope{ .5 };
    bool mLiteCPUMode{ false };
 };

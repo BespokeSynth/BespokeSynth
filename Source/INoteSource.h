@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include "OpenFrameworksPort.h"
 #include "INoteReceiver.h"
 #include "IPatchable.h"
 
@@ -44,12 +43,12 @@ public:
    void Flush(double time);
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
    void SendMidi(const juce::MidiMessage& message) override;
 
-   void PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled);
+   void PlayNoteInternal(NoteMessage note, bool isFromMainThreadAndScheduled);
 
    void ResetStackDepth() { mStackDepth = 0; }
    bool* GetNotes() { return mNotes; }
@@ -70,7 +69,7 @@ public:
    : mNoteOutput(this)
    {}
    virtual ~INoteSource() {}
-   void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters(), bool isFromMainThreadAndScheduled = false);
+   void PlayNoteOutput(NoteMessage note, bool isFromMainThreadAndScheduled = false);
    void SendCCOutput(int control, int value, int voiceIdx = -1);
 
    //IPatchable

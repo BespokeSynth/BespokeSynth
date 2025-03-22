@@ -27,8 +27,6 @@
 
 #include "IUIControl.h"
 #include "MidiController.h"
-#include "UIGrid.h"
-#include "INoteSource.h"
 
 #define MAX_GRIDCONTROLLER_ROWS 512
 #define MAX_GRIDCONTROLLER_COLS 512

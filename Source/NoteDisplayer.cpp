@@ -51,11 +51,11 @@ void NoteDisplayer::DrawNoteName(int pitch, float y) const
                   4, y);
 }
 
-void NoteDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteDisplayer::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-   mVelocities[pitch] = velocity;
-   mVoiceIds[pitch] = voiceIdx;
+   PlayNoteOutput(note);
+   mVelocities[note.pitch] = note.velocity;
+   mVoiceIds[note.pitch] = note.voiceIdx;
 }
 
 void NoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)

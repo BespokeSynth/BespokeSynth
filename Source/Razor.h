@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "INoteReceiver.h"
 #include "ADSR.h"
@@ -64,7 +63,7 @@ public:
    void SetEnabled(bool enabled) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -127,7 +126,7 @@ private:
    bool mManualControl{ false };
    Checkbox* mManualControlCheckbox{ nullptr };
    FloatSlider* mAmpSliders[NUM_AMP_SLIDERS]{ nullptr };
-   FloatSlider* mDetuneSliders[NUM_AMP_SLIDERS];
+   FloatSlider* mDetuneSliders[NUM_AMP_SLIDERS]{ nullptr };
    ClickButton* mResetDetuneButton{ nullptr };
 
    float mA{ 1 };

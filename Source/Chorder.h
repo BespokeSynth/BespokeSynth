@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
@@ -51,7 +50,7 @@ public:
    void RemoveTone(int tone);
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
@@ -81,9 +80,8 @@ private:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   void PlayChorderNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+   void PlayChorderNote(NoteMessage note);
    void CheckLeftovers();
-   void SyncChord();
 
    UIGrid* mChordGrid{ nullptr };
    int mVelocity{ 0 };

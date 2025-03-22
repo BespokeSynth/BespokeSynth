@@ -59,29 +59,31 @@ void Capo::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Capo::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (pitch >= 0 && pitch < 128)
+   if (note.pitch >= 0 && note.pitch < 128)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
-         mInputNotes[pitch].mOn = true;
-         mInputNotes[pitch].mVelocity = velocity;
-         mInputNotes[pitch].mVoiceIdx = voiceIdx;
-         mInputNotes[pitch].mOutputPitch = TransformPitch(pitch);
+         mInputNotes[note.pitch].mOn = true;
+         mInputNotes[note.pitch].mVelocity = note.velocity;
+         mInputNotes[note.pitch].mVoiceIdx = note.voiceIdx;
+         mInputNotes[note.pitch].mOutputPitch = TransformPitch(note.pitch);
       }
       else
       {
-         mInputNotes[pitch].mOn = false;
+         mInputNotes[note.pitch].mOn = false;
       }
 
-      PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, velocity, mInputNotes[pitch].mVoiceIdx, modulation);
+      note.pitch = mInputNotes[note.pitch].mOutputPitch;
+      note.voiceIdx = mInputNotes[note.pitch].mVoiceIdx;
+      PlayNoteOutput(note);
    }
 }
 
@@ -110,9 +112,9 @@ void Capo::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
       {
          if (mInputNotes[pitch].mOn)
          {
-            PlayNoteOutput(time + .01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
-            mInputNotes[pitch].mOutputPitch = pitch + mCapo;
-            PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(NoteMessage(time + .01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx));
+            mInputNotes[pitch].mOutputPitch = TransformPitch(pitch);
+            PlayNoteOutput(NoteMessage(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx));
          }
       }
    }

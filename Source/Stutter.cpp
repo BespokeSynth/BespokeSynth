@@ -27,8 +27,6 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
-#include "FillSaveDropdown.h"
-#include "PatchCableSource.h"
 
 bool Stutter::sQuantize = true;
 int Stutter::sStutterSubdivide = 1;

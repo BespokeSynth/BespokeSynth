@@ -28,8 +28,6 @@
 #include "ModuleContainer.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "FloatSliderLFOControl.h"
-#include "ModuleSaveDataPanel.h"
 #include "TitleBar.h"
 #include "PerformanceTimer.h"
 #include "SynthGlobals.h"
@@ -271,12 +269,12 @@ float ModuleContainer::GetDrawScale() const
    return mDrawScale;
 }
 
-void ModuleContainer::GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output)
+void ModuleContainer::GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output, bool ignorePinned /* = false */)
 {
    output.clear();
    for (int i = 0; i < mModules.size(); ++i)
    {
-      if (mModules[i]->IsWithinRect(rect) && mModules[i] != TheQuickSpawnMenu && mModules[i]->IsShowing())
+      if (mModules[i]->IsWithinRect(rect) && mModules[i] != TheQuickSpawnMenu && mModules[i]->IsShowing() && (ignorePinned && !mModules[i]->Pinned()))
          output.push_back(mModules[i]);
    }
 }
@@ -435,7 +433,7 @@ IDrawableModule* ModuleContainer::FindModule(std::string name, bool fail)
          IDrawableModule* child = nullptr;
          try
          {
-            child = mModules[i]->FindChild(tokens[1].c_str(), fail);
+            child = mModules[i]->FindChild(tokens[1], fail);
          }
          catch (UnknownModuleException& e)
          {

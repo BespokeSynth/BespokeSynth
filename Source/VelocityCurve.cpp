@@ -70,27 +70,27 @@ void VelocityCurve::DrawModule()
    }
 }
 
-void VelocityCurve::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VelocityCurve::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
-         mLastInputVelocity = velocity;
-         mLastInputTime = time;
+         mLastInputVelocity = note.velocity;
+         mLastInputTime = note.time;
 
          ComputeSliders(0);
          ADSR::EventInfo adsrEvent(0, kAdsrTime);
-         float val = ofClamp(mAdsr.Value(velocity / 127.0f * kAdsrTime, &adsrEvent), 0, 1);
-         if (val != val)
+         float val = ofClamp(mAdsr.Value(note.velocity / 127.0f * kAdsrTime, &adsrEvent), 0, 1);
+         if (std::isnan(val))
             val = 0;
-         velocity = val * 127;
-         if (velocity <= 0)
-            velocity = 1;
+         note.velocity = val * 127;
+         if (note.velocity <= 0)
+            note.velocity = 1;
       }
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void VelocityCurve::OnClicked(float x, float y, bool right)

@@ -215,16 +215,16 @@ void RhythmSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void RhythmSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void RhythmSequencer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (pitch >= 0 && pitch < 128)
-      mInputPitches[pitch] = velocity > 0;
+   if (note.pitch >= 0 && note.pitch < 128)
+      mInputPitches[note.pitch] = note.velocity > 0;
 }
 
 void RhythmSequencer::OnPulse(double time, float velocity, int flags)
@@ -271,7 +271,7 @@ void RhythmSequencer::Step(double time, float velocity, int pulseFlags)
       for (int pitch = 0; pitch < 128; ++pitch)
       {
          if (outputNotes[pitch] && mStepData[mArpIndexAction].mAction != StepAction::Hold)
-            mNoteOutput.PlayNote(time, pitch, 0);
+            mNoteOutput.PlayNote(NoteMessage(time, pitch, 0));
       }
 
       for (int pitch = 0; pitch < 128; ++pitch)
@@ -281,7 +281,7 @@ void RhythmSequencer::Step(double time, float velocity, int pulseFlags)
             int tone = TheScale->GetToneFromPitch(pitch) + mStepData[mArpIndexDegree].mDegree;
             int adjustedPitch = TheScale->GetPitchFromTone(tone) + mStepData[mArpIndexOctave].mOctave * 12;
             if (adjustedPitch >= 0 && adjustedPitch < 128)
-               mNoteOutput.PlayNote(time, adjustedPitch, mStepData[mArpIndexVel].mVel * velocity * 127.0f);
+               mNoteOutput.PlayNote(NoteMessage(time, adjustedPitch, mStepData[mArpIndexVel].mVel * velocity * 127.0f));
          }
       }
    }
@@ -342,6 +342,8 @@ void RhythmSequencer::DropdownUpdated(DropdownList* list, int oldVal, double tim
 
 void RhythmSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
+   if (slider == mLengthSlider)
+      mLength = MIN(mLength, kMaxSteps);
 }
 
 void RhythmSequencer::LoadLayout(const ofxJSONElement& moduleInfo)

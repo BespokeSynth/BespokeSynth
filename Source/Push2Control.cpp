@@ -259,6 +259,8 @@ void Push2Control::PostRender()
 
 void Push2Control::KeyPressed(int key, bool isRepeat)
 {
+   IDrawableModule::KeyPressed(key, isRepeat);
+
    if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
    {
       for (int i = 0; i < (int)mModuleGridManualCables.size(); ++i)
@@ -877,7 +879,7 @@ void Push2Control::DrawDisplayModuleControls()
 
       ofPushStyle();
       ofSetLineWidth(.5f);
-      int length = MAX(mButtonControls.size(), mSliderControls.size());
+      int length = MAX((int)mButtonControls.size(), (int)mSliderControls.size());
       if (length > 8)
       {
          ofRectangle bar(ableton::Push2DisplayBitmap::kWidth * kPixelRatio - 100, 3, 80, 10);
@@ -1179,7 +1181,6 @@ void Push2Control::Poll()
          if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
          {
             IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn(mSpawnLists.GetDropdowns()[i]->GetList()->GetValue());
-            ofRectangle rect = module->GetRect();
             module->SetPosition(newModulePos.x, newModulePos.y);
             mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1, gTime);
             mScreenDisplayMode = ScreenDisplayMode::kNormal;

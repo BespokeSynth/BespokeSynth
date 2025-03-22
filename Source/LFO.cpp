@@ -52,7 +52,7 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) c
    {
       float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
 
-      float phase = TheTransport->GetMeasureTime(gTime + samplesIn * gInvSampleRateMs) / period + (1 - mPhaseOffset) + 1; //+1 so we can have negative samplesIn
+      float phase = TheTransport->GetMeasureTime(gTime + samplesIn * gInvSampleRateMs) / period + (1 - mPhaseOffset - mAdjustOffset) + 10; //+10 so we can have negative samplesIn
 
       phase -= int(phase) / 2 * 2; //using 2 allows for shuffle to work
 
@@ -66,8 +66,10 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) c
 
 float LFO::TransformPhase(float phase) const
 {
-   if (mLength != 1)
+   if (mLength != 1 && mLength > 0)
       phase = int(phase) + ofClamp((phase - int(phase)) / mLength, 0, 1);
+   else if (mLength != 1)
+      phase = 0;
    return phase;
 }
 
@@ -80,7 +82,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
 
    float phase = CalculatePhase(samplesIn);
 
-   if (forcePhase != -1)
+   if (forcePhase != -1 && !std::isnan(forcePhase))
       phase = forcePhase;
 
    phase *= FTWO_PI;
@@ -104,7 +106,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
       nonstandardOsc = true;
 
       double perlinPos = gTime + gInvSampleRateMs * samplesIn;
-      if (forcePhase != -1)
+      if (forcePhase != -1 && !std::isnan(forcePhase))
          perlinPos += forcePhase * 1000;
       double perlinPhase = perlinPos * mFreeRate / 1000.0f;
       sample = sPerlinNoise.noise(perlinPhase, mPerlinSeed, -perlinPhase);
@@ -202,4 +204,11 @@ void LFO::OnTransportAdvanced(float amount)
             OnTimeEvent(gTime);
       }
    }
+}
+
+void LFO::ResetPhase(double time)
+{
+   mFreePhase = 1 - mPhaseOffset;
+   mAdjustOffset = 0;
+   mAdjustOffset = CalculatePhase() + mPhaseOffset;
 }

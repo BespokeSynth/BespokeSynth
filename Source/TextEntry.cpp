@@ -46,29 +46,18 @@ void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool notifyListeners)
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var)
 : mVarCString(var)
-, mVarString(nullptr)
-, mVarInt(nullptr)
-, mVarFloat(nullptr)
-, mType(kTextEntry_Text)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, std::string* var)
-: mVarCString(nullptr)
-, mVarString(var)
-, mVarInt(nullptr)
-, mVarFloat(nullptr)
-, mType(kTextEntry_Text)
+: mVarString(var)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max)
-: mVarCString(nullptr)
-, mVarString(nullptr)
-, mVarInt(var)
-, mVarFloat(nullptr)
+: mVarInt(var)
 , mType(kTextEntry_Int)
 , mIntMin(min)
 , mIntMax(max)
@@ -77,10 +66,7 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max)
-: mVarCString(nullptr)
-, mVarString(nullptr)
-, mVarInt(nullptr)
-, mVarFloat(var)
+: mVarFloat(var)
 , mType(kTextEntry_Float)
 , mFloatMin(min)
 , mFloatMax(max)
@@ -290,7 +276,7 @@ void TextEntry::MakeActiveTextEntry(bool setCaretToEnd)
 void TextEntry::RemoveSelectedText()
 {
    int caretStart = MAX(0, MIN(mCaretPosition, mCaretPosition2));
-   int caretEnd = MIN(strlen(mString), MAX(mCaretPosition, mCaretPosition2));
+   int caretEnd = MIN((int)strlen(mString), MAX(mCaretPosition, mCaretPosition2));
    std::string newString = mString;
    strcpy(mString, (newString.substr(0, caretStart) + newString.substr(caretEnd)).c_str());
    MoveCaret(caretStart, false);
@@ -299,7 +285,7 @@ void TextEntry::RemoveSelectedText()
 void TextEntry::SelectAll()
 {
    mCaretPosition = 0;
-   mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+   mCaretPosition2 = (int)strnlen(mString, MAX_TEXTENTRY_LENGTH);
 }
 
 void TextEntry::OnKeyPressed(int key, bool isRepeat)
@@ -354,7 +340,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
             mString[i] = mString[i + 1];
       }
    }
-   else if (key == OF_KEY_ESC)
+   else if (key == OF_KEY_ESC || key == '`')
    {
       IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
       mCaretPosition2 = mCaretPosition;

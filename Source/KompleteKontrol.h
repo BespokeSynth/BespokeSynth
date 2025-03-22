@@ -26,7 +26,6 @@
 #ifndef __Bespoke__KompleteKontrol__
 #define __Bespoke__KompleteKontrol__
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "Checkbox.h"
@@ -56,7 +55,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    //IScaleListener
    void OnScaleChanged() override;

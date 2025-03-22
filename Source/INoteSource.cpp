@@ -25,30 +25,29 @@
 
 #include "INoteSource.h"
 #include "SynthGlobals.h"
-#include "IDrawableModule.h"
 #include "ModularSynth.h"
 #include "Scale.h"
 #include "PatchCableSource.h"
 #include "Profiler.h"
 #include "NoteOutputQueue.h"
 
-void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteOutput::PlayNote(NoteMessage note)
 {
    ResetStackDepth();
-   PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation, false);
+   PlayNoteInternal(note, false);
 }
 
-void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled)
+void NoteOutput::PlayNoteInternal(NoteMessage note, bool isFromMainThreadAndScheduled)
 {
    if (!IsAudioThread())
    {
       if (!isFromMainThreadAndScheduled) //if we specifically scheduled this ahead of time, there's no need to make adjustments. otherwise, account for immediately requesting a note from the non-audio thread
       {
-         time += TheTransport->GetEventLookaheadMs();
-         if (velocity == 0)
-            time += gBufferSizeMs; //1 buffer later, to make sure notes get cleared
+         note.time += TheTransport->GetEventLookaheadMs();
+         if (note.velocity == 0)
+            note.time += gBufferSizeMs; //1 buffer later, to make sure notes get cleared
       }
-      TheSynth->GetNoteOutputQueue()->QueuePlayNote(this, time, pitch, velocity, voiceIdx, modulation);
+      TheSynth->GetNoteOutputQueue()->QueuePlayNote(this, note);
       return;
    }
 
@@ -60,23 +59,23 @@ void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voic
    }
    ++mStackDepth;
 
-   if (pitch >= 0 && pitch <= 127)
+   if (note.pitch >= 0 && note.pitch <= 127)
    {
       for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
-         noteReceiver->PlayNote(time, pitch, velocity, voiceIdx, modulation);
+         noteReceiver->PlayNote(note);
 
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
-         mNoteOnTimes[pitch] = time;
-         mNotes[pitch] = true;
+         mNoteOnTimes[note.pitch] = note.time;
+         mNotes[note.pitch] = true;
       }
       else
       {
-         if (time > mNoteOnTimes[pitch])
-            mNotes[pitch] = false;
+         if (note.time > mNoteOnTimes[note.pitch])
+            mNotes[note.pitch] = false;
       }
 
-      mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, HasHeldNotes());
+      mNoteSource->GetPatchCableSource()->AddHistoryEvent(note.time, HasHeldNotes());
    }
 }
 
@@ -135,8 +134,8 @@ void NoteOutput::Flush(double time)
       {
          for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
          {
-            noteReceiver->PlayNote(time, i, 0);
-            noteReceiver->PlayNote(time + Transport::sEventEarlyMs, i, 0);
+            noteReceiver->PlayNote(NoteMessage(time, i, 0));
+            noteReceiver->PlayNote(NoteMessage(time + Transport::sEventEarlyMs, i, 0));
          }
          flushed = true;
          mNotes[i] = false;
@@ -147,17 +146,17 @@ void NoteOutput::Flush(double time)
       mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, false);
 }
 
-void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation, bool isFromMainThreadAndScheduled)
+void INoteSource::PlayNoteOutput(NoteMessage note, bool isFromMainThreadAndScheduled)
 {
    PROFILER(INoteSourcePlayOutput);
 
-   if (time < gTime && velocity > 0)
-      ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time / 1000) << " < " << ofToString(gTime / 1000);
+   if (note.time < gTime && note.velocity > 0)
+      ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(note.time / 1000) << " < " << ofToString(gTime / 1000);
 
    if (!mInNoteOutput)
       mNoteOutput.ResetStackDepth();
    mInNoteOutput = true;
-   mNoteOutput.PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation, isFromMainThreadAndScheduled);
+   mNoteOutput.PlayNoteInternal(note, isFromMainThreadAndScheduled);
    mInNoteOutput = false;
 }
 

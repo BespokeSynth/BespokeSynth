@@ -34,7 +34,6 @@
 #include "DropdownList.h"
 #include "ADSR.h"
 #include "ADSRDisplay.h"
-#include "EnvelopeEditor.h"
 #include "NoteEffectBase.h"
 #include "IModulator.h"
 #include "IPulseReceiver.h"
@@ -62,7 +61,7 @@ public:
    bool IsResizable() const override { return false; }
    void Resize(float w, float h) override;
 
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void OnPulse(double time, float velocity, int flags) override;
 
    //IModulator

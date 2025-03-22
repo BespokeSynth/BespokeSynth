@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
@@ -49,7 +48,7 @@ public:
    void SetSelectedMask(int mask);
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;

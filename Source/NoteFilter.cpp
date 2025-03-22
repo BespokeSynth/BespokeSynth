@@ -62,21 +62,21 @@ void NoteFilter::DrawModule()
    }
 }
 
-void NoteFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteFilter::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      if (pitch >= 0 && pitch < 128)
+      if (note.pitch >= 0 && note.pitch < 128)
       {
-         if (velocity > 0)
-            mLastPlayTime[pitch] = time;
-         if ((pitch >= mMinPitch && pitch <= mMaxPitch && mGate[pitch]) || velocity == 0)
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         if (note.velocity > 0)
+            mLastPlayTime[note.pitch] = note.time;
+         if ((note.pitch >= mMinPitch && note.pitch <= mMaxPitch && mGate[note.pitch]) || note.velocity == 0)
+            PlayNoteOutput(note);
       }
    }
    else
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
    }
 }
 

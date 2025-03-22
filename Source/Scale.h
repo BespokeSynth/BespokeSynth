@@ -28,10 +28,7 @@
 #include "IDrawableModule.h"
 #include "DropdownList.h"
 #include "LFO.h"
-#include "Ramp.h"
-#include "Checkbox.h"
 #include "Chord.h"
-#include "TextEntry.h"
 #include "ChordDatabase.h"
 #include <atomic>
 
