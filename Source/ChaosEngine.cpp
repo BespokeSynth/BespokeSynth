@@ -166,7 +166,7 @@ void ChaosEngine::UpdateProgression(int beat)
       std::vector<int> pitches = GetCurrentChordPitches();
       for (int i = 0; i < pitches.size(); ++i)
       {
-         PlayNoteOutput(gTime, pitches[i], 127, -1);
+         PlayNoteOutput(NoteMessage(gTime, pitches[i], 127));
       }
    }
 }
@@ -245,8 +245,8 @@ void ChaosEngine::DrawModule()
       std::vector<Accidental> accidentals;
       TheScale->GetChordDegreeAndAccidentals(mInputChords[i], degree, accidentals);
       std::string accidentalList;
-      for (int i = 0; i < accidentals.size(); ++i)
-         accidentalList += ofToString(accidentals[i].mPitch) + (accidentals[i].mDirection == 1 ? "#" : "b") + " ";
+      for (int j = 0; j < accidentals.size(); ++j)
+         accidentalList += ofToString(accidentals[j].mPitch) + (accidentals[j].mDirection == 1 ? "#" : "b") + " ";
       DrawTextNormal(mInputChords[i].Name(true, true), 400, 75 + i * 15);
    }
 

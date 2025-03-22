@@ -127,16 +127,20 @@ void DotGrid::Render()
 
             //white outer ring
             ofFill();
+            ofSetColor(0, 0, 0);
+            DrawGridCircle(i, j, radius);
+            ofNoFill();
             ofSetColor(255, 255, 255);
             DrawGridCircle(i, j, radius);
 
             //line + center circle
-            ofSetColor(255 * data.mVelocity, 255 * data.mVelocity, 255 * data.mVelocity, gModuleDrawAlpha);
+            ofFill();
+            ofSetColor(255 * data.mVelocity, 255 * data.mVelocity, 255 * data.mVelocity);
             ofPushStyle();
             ofSetLineWidth(GetDotSize() * radius * .23f);
             ofLine(GetX(i) + xsize * .5f, GetY(j) + ysize * .5f, GetX(i) + xsize * .5f + xsize * data.mLength, GetY(j) + ysize * .5f);
             ofPopStyle();
-            DrawGridCircle(i, j, radius * .9f);
+            DrawGridCircle(i, j, radius * .9f * data.mVelocity);
          }
 
          if (mCurrentHover.mCol == i && mCurrentHover.mRow == j && gHoveredUIControl == nullptr)
@@ -145,9 +149,9 @@ void DotGrid::Render()
             {
                if (mDragBehavior == DragBehavior::Velocity)
                {
-                  DotData& data = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
+                  DotData& currentHoverData = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
                   ofSetColor(0, 255, 0);
-                  DrawTextNormal(ofToString(data.mVelocity, 2), GetX(i), GetY(j), 8.0f);
+                  DrawTextNormal(ofToString(currentHoverData.mVelocity, 2), GetX(i), GetY(j), 8.0f);
                }
             }
             else
@@ -223,7 +227,7 @@ void DotGrid::OnClicked(float x, float y, bool right)
    else
    {
       mData[dataIndex].mOn = true;
-      mData[dataIndex].mVelocity = 1;
+      mData[dataIndex].mVelocity = gStepVelocityLevels[(int)StepVelocityType::Normal];
       mData[dataIndex].mLength = 0;
       mMouseReleaseCanClear = false;
    }
@@ -317,22 +321,51 @@ void DotGrid::KeyPressed(int key, bool repeat)
          DotData& data = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
          if (data.mOn)
          {
-            int dirX = 0;
-            int dirY = 0;
-            if (key == OF_KEY_RIGHT)
-               dirX = 1;
-            if (key == OF_KEY_LEFT)
-               dirX = -1;
-            if (key == OF_KEY_UP)
-               dirY = 1;
-            if (key == OF_KEY_DOWN)
-               dirY = -1;
-            DotPosition newPos(mCurrentHover.mCol + dirX, mCurrentHover.mRow + dirY);
-            if (newPos.mCol >= 0 && newPos.mCol < mCols && newPos.mRow >= 0 && newPos.mRow < mRows)
+            if (GetKeyModifiers() == kModifier_Shift)
             {
-               mData[GetDataIndex(newPos.mCol, newPos.mRow)] = data;
-               data.mOn = false;
-               mCurrentHover = newPos;
+               if (key == OF_KEY_UP)
+               {
+                  for (int i = 0; i < (int)gStepVelocityLevels.size(); ++i)
+                  {
+                     if (data.mVelocity < gStepVelocityLevels[i])
+                     {
+                        data.mVelocity = gStepVelocityLevels[i];
+                        break;
+                     }
+                  }
+               }
+
+               if (key == OF_KEY_DOWN)
+               {
+                  for (int i = (int)gStepVelocityLevels.size() - 1; i >= 0; --i)
+                  {
+                     if (data.mVelocity > gStepVelocityLevels[i])
+                     {
+                        data.mVelocity = gStepVelocityLevels[i];
+                        break;
+                     }
+                  }
+               }
+            }
+            else
+            {
+               int dirX = 0;
+               int dirY = 0;
+               if (key == OF_KEY_RIGHT)
+                  dirX = 1;
+               if (key == OF_KEY_LEFT)
+                  dirX = -1;
+               if (key == OF_KEY_UP)
+                  dirY = 1;
+               if (key == OF_KEY_DOWN)
+                  dirY = -1;
+               DotPosition newPos(mCurrentHover.mCol + dirX, mCurrentHover.mRow + dirY);
+               if (newPos.mCol >= 0 && newPos.mCol < mCols && newPos.mRow >= 0 && newPos.mRow < mRows)
+               {
+                  mData[GetDataIndex(newPos.mCol, newPos.mRow)] = data;
+                  data.mOn = false;
+                  mCurrentHover = newPos;
+               }
             }
          }
       }

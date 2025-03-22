@@ -26,6 +26,8 @@
 #include "FileStream.h"
 #include "ModularSynth.h"
 
+#include "juce_core/juce_core.h"
+
 //static
 bool FileStreamIn::s32BitMode = false;
 
@@ -47,6 +49,11 @@ FileStreamOut::FileStreamOut(juce::MemoryBlock& block, bool appendToExistingBloc
 {
 }
 
+FileStreamOut::FileStreamOut(std::unique_ptr<juce::OutputStream>&& stream)
+: mStream(std::move(stream))
+{
+}
+
 FileStreamOut::~FileStreamOut()
 {
    mStream->flush();
@@ -59,6 +66,11 @@ FileStreamIn::FileStreamIn(const std::string& file)
 
 FileStreamIn::FileStreamIn(const juce::MemoryBlock& block)
 : mStream(std::make_unique<juce::MemoryInputStream>(block, false))
+{
+}
+
+FileStreamIn::FileStreamIn(std::unique_ptr<juce::InputStream>&& stream)
+: mStream(std::move(stream))
 {
 }
 
@@ -118,7 +130,7 @@ void FileStreamOut::WriteGeneric(const void* buffer, int size)
    mStream->write(buffer, size);
 }
 
-juce::int64 FileStreamOut::GetSize() const
+std::int64_t FileStreamOut::GetSize() const
 {
    return mStream->getPosition();
 }

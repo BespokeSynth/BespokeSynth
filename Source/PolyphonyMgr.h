@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-#include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "ChannelBuffer.h"
 
@@ -65,13 +63,14 @@ public:
    void Init(VoiceType type,
              IVoiceParams* mVoiceParams);
 
-   void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
+   int Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
    void Stop(double time, int pitch, int voiceIdx);
    void Process(double time, ChannelBuffer* out, int bufferSize);
    void DrawDebug(float x, float y);
    void SetVoiceLimit(int limit) { mVoiceLimit = limit; }
    void KillAll();
    void SetOversampling(int oversampling) { mOversampling = oversampling; }
+   const VoiceInfo& GetVoiceInfo(int voiceIdx) const { return mVoices[voiceIdx]; }
 
 private:
    VoiceInfo mVoices[kNumVoices];

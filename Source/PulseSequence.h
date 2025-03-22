@@ -27,10 +27,8 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "Transport.h"
-#include "Checkbox.h"
 #include "DropdownList.h"
 #include "TextEntry.h"
 #include "ClickButton.h"
@@ -68,6 +66,10 @@ public:
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
+   //IDrawableModule
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
+
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -100,7 +102,9 @@ private:
 
    void Step(double time, float velocity, int flags);
 
-   static const int kMaxSteps = 32;
+   static const int kMaxSteps = 128;
+   float mWidth{ 254 };
+   float mHeight{ 58 };
    float mVels[kMaxSteps]{};
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
@@ -110,6 +114,10 @@ private:
    bool mHasExternalPulseSource{ false };
    ClickButton* mAdvanceBackwardButton{ nullptr };
    ClickButton* mAdvanceForwardButton{ nullptr };
+   ClickButton* mShiftLeftButton{ nullptr };
+   ClickButton* mShiftRightButton{ nullptr };
+   Checkbox* mPulseOnAdvanceCheckbox{ nullptr };
+   bool mPulseOnAdvance{ false };
 
    static const int kIndividualStepCables = kMaxSteps;
    PatchCableSource* mStepCables[kIndividualStepCables]{};

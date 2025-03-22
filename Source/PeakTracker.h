@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-
 class PeakTracker
 {
 public:
@@ -34,6 +32,7 @@ public:
    float GetPeak() const { return mPeak; }
    void SetDecayTime(float time) { mDecayTime = time; }
    void SetLimit(float limit) { mLimit = limit; }
+   float GetLimit() const { return mLimit; }
    void Reset() { mPeak = 0; }
    double GetLastHitLimitTime() const { return mHitLimitTime; }
 

@@ -65,11 +65,11 @@ void ModWheelToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    OnModulatorRepatch();
 }
 
-void ModWheelToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ModWheelToCV::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
-      mModWheel = modulation.modWheel;
+      mModWheel = note.modulation.modWheel;
    }
 }
 

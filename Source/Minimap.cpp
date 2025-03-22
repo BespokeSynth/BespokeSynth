@@ -1,12 +1,15 @@
 #include "Minimap.h"
+
+#include "EffectChain.h"
 #include "ModularSynth.h"
 #include "OpenFrameworksPort.h"
+#include "Prefab.h"
+#include "TitleBar.h"
+#include "UserPrefs.h"
 
 namespace
 {
    const float kMaxLength = 150;
-   const float kMarginRight = 10;
-   const float kMarginTop = 45;
    const float kBookmarkSize = 15;
    const float kNumBookmarks = 9;
 }
@@ -22,7 +25,7 @@ Minimap::~Minimap()
 void Minimap::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid("uigrid", 0, 0, kMaxLength, kBookmarkSize, kNumBookmarks, 1, this);
+   mGrid = new UIGrid(this, "uigrid", 0, 0, kMaxLength, kBookmarkSize, kNumBookmarks, 1);
 }
 
 void Minimap::GetDimensions(float& width, float& height)
@@ -34,12 +37,12 @@ void Minimap::GetDimensions(float& width, float& height)
    if (ofGetWidth() > ofGetHeight())
    {
       width = kMaxLength;
-      height = (kMaxLength / ratio) + kBookmarkSize;
+      height = floor(kMaxLength / ratio) + kBookmarkSize;
    }
    else
    {
       height = kMaxLength;
-      width = (kMaxLength * ratio) + kBookmarkSize;
+      width = floor(kMaxLength * ratio) + kBookmarkSize;
    }
 }
 
@@ -119,22 +122,41 @@ ofVec2f Minimap::CoordsToViewport(ofRectangle& boundingBox, float x, float y)
 void Minimap::DrawModulesOnMinimap(ofRectangle& boundingBox)
 {
    std::vector<IDrawableModule*> modules;
+   std::vector<IDrawableModule*> second_pass_modules;
    TheSynth->GetRootContainer()->GetAllModules(modules);
 
    ofPushStyle();
-   for (int i = 0; i < modules.size(); ++i)
+   for (auto& module : modules)
    {
-      if (!modules[i]->IsShowing())
+      if (!module->IsShowing() ||
+          (dynamic_cast<IDrawableModule*>(module->GetParent()) && dynamic_cast<IDrawableModule*>(module->GetParent())->Minimized()))
       {
          continue;
       }
-      ofRectangle moduleRect = modules[i]->GetRect();
-      ofColor moduleColor(IDrawableModule::GetColor(modules[i]->GetModuleCategory()));
-      ofSetColor(moduleColor);
-      ofFill();
-      ofRect(CoordsToMinimap(boundingBox, moduleRect));
+      if (dynamic_cast<Prefab*>(module->GetParent()) != nullptr || dynamic_cast<EffectChain*>(module->GetParent()) != nullptr)
+      {
+         second_pass_modules.push_back(module);
+         continue;
+      }
+      if (dynamic_cast<EffectChain*>(module) != nullptr && !module->GetChildren().empty() && !module->Minimized())
+         for (auto& effect : module->GetChildren())
+            second_pass_modules.push_back(effect);
+      DrawModuleOnMinimap(boundingBox, module);
    }
+   for (auto& module : second_pass_modules)
+      DrawModuleOnMinimap(boundingBox, module);
    ofPopStyle();
+}
+
+void Minimap::DrawModuleOnMinimap(ofRectangle& boundingBox, IDrawableModule* module)
+{
+   ofRectangle moduleRect = module->GetRect();
+   ofColor moduleColor(IDrawableModule::GetColor(module->GetModuleCategory()));
+   if (!module->GetChildren().empty())
+      moduleColor.a = 127;
+   ofSetColor(moduleColor);
+   ofFill();
+   ofRect(CoordsToMinimap(boundingBox, moduleRect));
 }
 
 void Minimap::RectUnion(ofRectangle& target, ofRectangle& unionRect)
@@ -172,7 +194,6 @@ void Minimap::DrawModule()
    float width;
    float height;
    ofRectangle boundingBox;
-   ofRectangle boundingBoxMM;
    ofRectangle viewport = TheSynth->GetDrawRect();
    ForcePosition();
    ComputeBoundingBox(boundingBox);
@@ -302,6 +323,25 @@ void Minimap::ForcePosition()
    float width, height, scale;
    scale = 1 / TheSynth->GetUIScale();
    GetDimensions(width, height);
-   mX = (ofGetWidth() * scale) - (width + kMarginRight);
-   mY = kMarginTop;
+   const int margin = static_cast<int>(UserPrefs.minimap_margin.Get());
+   switch (UserPrefs.minimap_corner.GetIndex())
+   {
+      default:
+      case static_cast<int>(MinimapCorner::TopRight):
+         mX = floor((ofGetWidth() * scale) - (width + margin));
+         mY = margin + TheTitleBar->GetRect().height;
+         break;
+      case static_cast<int>(MinimapCorner::TopLeft):
+         mX = margin;
+         mY = margin + TheTitleBar->GetRect().height;
+         break;
+      case static_cast<int>(MinimapCorner::BottomRight):
+         mX = floor((ofGetWidth() * scale) - (width + margin));
+         mY = floor((ofGetHeight() * scale) - (height + margin));
+         break;
+      case static_cast<int>(MinimapCorner::BottomLeft):
+         mX = margin;
+         mY = floor((ofGetHeight() * scale) - (height + margin));
+         break;
+   }
 }

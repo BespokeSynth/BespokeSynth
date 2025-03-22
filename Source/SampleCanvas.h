@@ -28,7 +28,6 @@
 #include "IDrawableModule.h"
 #include "IAudioSource.h"
 #include "Transport.h"
-#include "Checkbox.h"
 #include "Canvas.h"
 #include "Slider.h"
 #include "DropdownList.h"

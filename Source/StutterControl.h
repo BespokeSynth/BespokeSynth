@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "Checkbox.h"
@@ -57,7 +56,7 @@ public:
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx) override {}
 
    //IPush2GridController

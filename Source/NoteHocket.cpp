@@ -123,10 +123,10 @@ void NoteHocket::AdjustHeight()
    mHeight = height;
 }
 
-void NoteHocket::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteHocket::PlayNote(NoteMessage note)
 {
    int selectedDestination = 0;
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       ComputeSliders(0);
 
@@ -137,7 +137,7 @@ void NoteHocket::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       if (mDeterministic)
       {
          const int kStepResolution = 128;
-         uint64_t step = int(TheTransport->GetMeasureTime(time) * kStepResolution);
+         uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
          int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
          random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0f) * totalWeight;
       }
@@ -153,24 +153,24 @@ void NoteHocket::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          random -= mWeight[selectedDestination];
       }
 
-      if (mLastNoteDestinations[pitch] != -1 && mLastNoteDestinations[pitch] != selectedDestination)
-         SendNoteToIndex(mLastNoteDestinations[pitch], time, pitch, 0, voiceIdx, modulation);
-      mLastNoteDestinations[pitch] = selectedDestination;
+      if (mLastNoteDestinations[note.pitch] != -1 && mLastNoteDestinations[note.pitch] != selectedDestination)
+         SendNoteToIndex(mLastNoteDestinations[note.pitch], note.MakeNoteOff());
+      mLastNoteDestinations[note.pitch] = selectedDestination;
    }
    else
    {
-      selectedDestination = mLastNoteDestinations[pitch];
+      selectedDestination = mLastNoteDestinations[note.pitch];
       if (selectedDestination == -1)
          return;
-      mLastNoteDestinations[pitch] = -1;
+      mLastNoteDestinations[note.pitch] = -1;
    }
 
-   SendNoteToIndex(selectedDestination, time, pitch, velocity, voiceIdx, modulation);
+   SendNoteToIndex(selectedDestination, note);
 }
 
-void NoteHocket::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteHocket::SendNoteToIndex(int index, NoteMessage note)
 {
-   mDestinationCables[index]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   mDestinationCables[index]->PlayNoteOutput(note);
 }
 
 void NoteHocket::Reseed()

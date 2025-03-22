@@ -112,11 +112,11 @@ void VelocityToChance::DrawModule()
    }
 }
 
-void VelocityToChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VelocityToChance::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
@@ -124,29 +124,33 @@ void VelocityToChance::PlayNote(double time, int pitch, int velocity, int voiceI
    if (mDeterministic)
    {
       const int kStepResolution = 128;
-      uint64_t step = int(TheTransport->GetMeasureTime(time) * kStepResolution);
+      uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
       int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
-      random = ((abs(DeterministicRandom(mSeed + pitch * 13, randomIndex)) % 10000) / 10000.0f);
+      random = ((abs(DeterministicRandom(mSeed + note.pitch * 13, randomIndex)) % 10000) / 10000.0f);
    }
    else
    {
       random = ofRandom(1);
    }
 
-   bool accept = (random <= velocity / 127.0f);
+   bool accept = (random <= note.velocity / 127.0f);
    if (accept)
-      PlayNoteOutput(time, pitch, mFullVelocity ? 127 : velocity, voiceIdx, modulation);
+   {
+      if (mFullVelocity)
+         note.velocity = 127;
+      PlayNoteOutput(note);
+   }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       if (accept)
-         mLastAcceptTime = time;
+         mLastAcceptTime = note.time;
       else
-         mLastRejectTime = time;
+         mLastRejectTime = note.time;
    }
    else
    {
-      PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+      PlayNoteOutput(note.MakeNoteOff());
    }
 }
 

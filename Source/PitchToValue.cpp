@@ -31,7 +31,6 @@
 #include "ModulationChain.h"
 
 PitchToValue::PitchToValue()
-: mValue(0)
 {
 }
 
@@ -42,9 +41,9 @@ PitchToValue::~PitchToValue()
 void PitchToValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+
+   mControlCable = new PatchCableSource(this, kConnectionType_ValueSetter);
+   AddPatchCableSource(mControlCable);
 }
 
 void PitchToValue::DrawModule()
@@ -55,29 +54,29 @@ void PitchToValue::DrawModule()
 
 void PitchToValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   OnModulatorRepatch();
-}
-
-void PitchToValue::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
-{
-   if (mEnabled && velocity > 0)
+   for (size_t i = 0; i < mTargets.size(); ++i)
    {
-      mValue = pitch;
+      if (i < mControlCable->GetPatchCables().size())
+         mTargets[i] = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[i]->GetTarget());
+      else
+         mTargets[i] = nullptr;
    }
 }
 
-float PitchToValue::Value(int samplesIn)
+void PitchToValue::PlayNote(NoteMessage note)
 {
-   return mValue;
+   if (mEnabled && note.velocity > 0)
+   {
+      for (size_t i = 0; i < mTargets.size(); ++i)
+      {
+         if (mTargets[i] != nullptr)
+            mTargets[i]->SetValue(note.pitch, note.time);
+      }
+   }
 }
 
 void PitchToValue::SaveLayout(ofxJSONElement& moduleInfo)
 {
-}
-
-void PitchToValue::LoadLayout(const ofxJSONElement& moduleInfo)
-{
-   SetUpFromSaveData();
 }
 
 void PitchToValue::SetUpFromSaveData()

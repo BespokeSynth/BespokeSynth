@@ -213,6 +213,9 @@ void CircleSequencerRing::Draw()
       case 3:
          ofSetColor(150, 150, 255);
          break;
+      default:
+         ofSetColor(255, 255, 255);
+         break;
    }
 
    ofSetCircleResolution(40);
@@ -305,7 +308,7 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
    PROFILER(CircleSequencerRing);
 
    TransportListenerInfo info(nullptr, kInterval_CustomDivisor, OffsetInfo(mOffset, false), false);
-   info.mCustomDivisor = mLength;
+   info.mCustomDivisor = mLength + (mLength == 1); // +1 if mLength(Steps) == 1: fixes not playing onset 1 when mLength = 1: force oldStep <> newStep
 
    double remainderMs;
    const int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
@@ -313,11 +316,16 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
    const int oldMeasure = TheTransport->GetMeasure(NextBufferTime(true) - gBufferSizeMs);
    const int newMeasure = TheTransport->GetMeasure(NextBufferTime(true));
 
-   if ((oldMeasure != newMeasure || oldStep != newStep) && mSteps[newStep] > 0)
+   if (oldStep != newStep && mSteps[newStep] > 0)
    {
       const double time = NextBufferTime(true) - remainderMs;
-      mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
-      mOwner->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
+      mOwner->PlayNoteOutput(NoteMessage(time, mPitch, mSteps[newStep] * 127));
+      NoteInterval interval = kInterval_16n;
+      if (mLength > 10 && mLength < 24)
+         interval = kInterval_32n;
+      else if (mLength >= 24)
+         interval = kInterval_64n;
+      mOwner->PlayNoteOutput(NoteMessage(time + TheTransport->GetDuration(interval), mPitch, 0));
    }
 }
 

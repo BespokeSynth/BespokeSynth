@@ -27,7 +27,6 @@
 #include "SynthGlobals.h"
 #include "IAudioSource.h"
 #include "ModularSynth.h"
-#include "FillSaveDropdown.h"
 #include "PolyphonyMgr.h"
 #include "PatchCableSource.h"
 
@@ -127,7 +126,7 @@ void NoteChainNode::TriggerNote(double time)
       mStartTime = time;
       mDurationMs = mDuration / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       mNext = TheTransport->GetDuration(mNextInterval);
-      PlayNoteOutput(time, mPitch, mVelocity * 127);
+      PlayNoteOutput(NoteMessage(time, mPitch, mVelocity * 127));
    }
 }
 

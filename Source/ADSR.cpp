@@ -28,7 +28,6 @@
 #include "MathUtils.h"
 #include "FileStream.h"
 #include "SynthGlobals.h"
-#include "Profiler.h"
 
 void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
 {
@@ -58,19 +57,19 @@ void ::ADSR::Set(const ADSR& other)
    mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
-void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/)
+void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/, float curve /*=0*/)
 {
    Set(a, d, s, r);
-   Start(time, target, timeScale);
+   Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, float target, const ADSR& adsr, float timeScale)
+void ::ADSR::Start(double time, float target, const ADSR& adsr, float timeScale /*=1*/, float curve /*=0*/)
 {
    Set(adsr);
-   Start(time, target, timeScale);
+   Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, float target, float timeScale /*=1*/)
+void ::ADSR::Start(double time, float target, float timeScale /*=1*/, float curve /*=0*/)
 {
    mEvents[mNextEventPointer].Reset();
    mEvents[mNextEventPointer].mStartBlendFromValue = Value(time);
@@ -78,6 +77,7 @@ void ::ADSR::Start(double time, float target, float timeScale /*=1*/)
    mEvents[mNextEventPointer].mMult = target;
    mNextEventPointer = (mNextEventPointer + 1) % mEvents.size();
    mTimeScale = timeScale;
+   mCurve = curve;
 
    if (mMaxSustain >= 0 && mHasSustainStage)
    {
@@ -98,11 +98,6 @@ void ::ADSR::Stop(double time, bool warn /*= true*/)
    EventInfo* e = GetEvent(time);
 
    e->mStopBlendFromValue = Value(time);
-
-   /*if (time - mStartTime < 10)
-   {
-      ofLog() << "**********************short adsr: " << (time - mStartTime);
-   }*/
 
    if (time <= e->mStartTime)
    {
@@ -151,11 +146,6 @@ float ::ADSR::Value(double time) const
 
 float ::ADSR::Value(double time, const EventInfo* e) const
 {
-   //if (mStartTime < 0)
-   //   return 0;
-
-   //PROFILER(ADSR_Value);
-
    float stageStartValue;
    double stageStartTime;
    int stage = GetStage(time, stageStartTime, e);
@@ -175,8 +165,9 @@ float ::ADSR::Value(double time, const EventInfo* e) const
    float stageTimeScale = GetStageTimeScale(stage);
 
    float lerp = ofClamp((time - stageStartTime) / (mStages[stage].time * stageTimeScale), 0, 1);
-   if (mStages[stage].curve != 0)
-      lerp = MathUtils::Curve(lerp, mStages[stage].curve * ((stageStartValue < mStages[stage].target * e->mMult) ? 1 : -1));
+   float curve = mStages[stage].curve + mCurve;
+   if (curve != 0)
+      lerp = MathUtils::Curve(lerp, curve * ((stageStartValue < mStages[stage].target * e->mMult) ? 1 : -1));
 
    return ofLerp(stageStartValue, mStages[stage].target * e->mMult, lerp);
 }

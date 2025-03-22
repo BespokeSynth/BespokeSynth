@@ -26,7 +26,7 @@
 */
 
 #pragma once
-#include <iostream>
+
 #include "IDrawableModule.h"
 #include "UIGrid.h"
 #include "ClickButton.h"

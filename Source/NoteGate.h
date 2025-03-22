@@ -41,7 +41,7 @@ public:
    void CreateUIControls() override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
@@ -57,5 +57,5 @@ private:
 
    bool mGate{ true };
    Checkbox* mGateCheckbox{ nullptr };
-   std::array<NoteInputElement, 128> mActiveNotes{ false };
+   std::array<NoteMessage, 128> mActiveNotes{};
 };

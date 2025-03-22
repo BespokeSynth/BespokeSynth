@@ -102,13 +102,13 @@ void UnstablePitch::DrawModule()
    mNoiseSlider->Draw();
 }
 
-void UnstablePitch::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void UnstablePitch::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      if (voiceIdx == -1)
+      if (note.voiceIdx == -1)
       {
-         if (velocity > 0)
+         if (note.velocity > 0)
          {
             bool foundVoice = false;
             for (size_t i = 0; i < mIsVoiceUsed.size(); ++i)
@@ -116,7 +116,7 @@ void UnstablePitch::PlayNote(double time, int pitch, int velocity, int voiceIdx,
                int voiceToCheck = (i + mVoiceRoundRobin) % kNumVoices;
                if (mIsVoiceUsed[voiceToCheck] == false)
                {
-                  voiceIdx = voiceToCheck;
+                  note.voiceIdx = voiceToCheck;
                   mVoiceRoundRobin = (mVoiceRoundRobin + 1) % kNumVoices;
                   foundVoice = true;
                   break;
@@ -125,28 +125,28 @@ void UnstablePitch::PlayNote(double time, int pitch, int velocity, int voiceIdx,
 
             if (!foundVoice)
             {
-               voiceIdx = mVoiceRoundRobin;
+               note.voiceIdx = mVoiceRoundRobin;
                mVoiceRoundRobin = (mVoiceRoundRobin + 1) % kNumVoices;
             }
          }
          else
          {
-            voiceIdx = mPitchToVoice[pitch];
+            note.voiceIdx = mPitchToVoice[note.pitch];
          }
       }
 
-      if (voiceIdx < 0 || voiceIdx >= kNumVoices)
-         voiceIdx = 0;
+      if (note.voiceIdx < 0 || note.voiceIdx >= kNumVoices)
+         note.voiceIdx = 0;
 
-      mIsVoiceUsed[voiceIdx] = velocity > 0;
-      mPitchToVoice[pitch] = (velocity > 0) ? voiceIdx : -1;
+      mIsVoiceUsed[note.voiceIdx] = note.velocity > 0;
+      mPitchToVoice[note.pitch] = (note.velocity > 0) ? note.voiceIdx : -1;
 
-      mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
-      modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
+      mModulation.GetPitchBend(note.voiceIdx)->AppendTo(note.modulation.pitchBend);
+      note.modulation.pitchBend = mModulation.GetPitchBend(note.voiceIdx);
    }
 
-   FillModulationBuffer(time, voiceIdx);
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   FillModulationBuffer(note.time, note.voiceIdx);
+   PlayNoteOutput(note);
 }
 
 void UnstablePitch::OnTransportAdvanced(float amount)

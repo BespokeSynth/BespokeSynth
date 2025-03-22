@@ -25,7 +25,6 @@
 
 #include "MidiOutput.h"
 #include "SynthGlobals.h"
-#include "IAudioSource.h"
 #include "ModularSynth.h"
 #include "FillSaveDropdown.h"
 #include "ModulationChain.h"
@@ -94,20 +93,20 @@ void MidiOutputModule::BuildControllerList()
       mControllerList->AddLabel(devices[i].c_str(), i);
 }
 
-void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void MidiOutputModule::PlayNote(NoteMessage note)
 {
-   int channel = voiceIdx + 1;
-   if (voiceIdx == -1)
+   int channel = note.voiceIdx + 1;
+   if (note.voiceIdx == -1)
       channel = 1;
    channel = mUseVoiceAsChannel ? channel : mChannel;
 
-   mDevice.SendNote(time, pitch, velocity, false, channel);
+   mDevice.SendNote(note.time, note.pitch, note.velocity, false, channel);
 
    int modIdx = channel - 1;
-   if (voiceIdx == -1)
+   if (note.voiceIdx == -1)
       modIdx = kGlobalModulationIdx;
 
-   mChannelModulations[modIdx].mModulation = modulation;
+   mChannelModulations[modIdx].mModulation = note.modulation;
 }
 
 void MidiOutputModule::SendCC(int control, int value, int voiceIdx /*=-1*/)

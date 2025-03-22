@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "MidiDevice.h"
 #include "IDrawableModule.h"
 #include "DropdownList.h"

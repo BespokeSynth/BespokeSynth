@@ -27,15 +27,14 @@
 
 #include "LinnstrumentControl.h"
 #include "SynthGlobals.h"
-#include "IAudioSource.h"
 #include "ModularSynth.h"
-#include "FillSaveDropdown.h"
 #include "ModulationChain.h"
 #include "PolyphonyMgr.h"
 #include "MidiController.h"
-#if BESPOKE_LINUX | BESPOKE_MAC
-#include <unistd.h>
-#endif
+#include <chrono>
+#include <thread>
+
+using namespace std::chrono_literals;
 
 LinnstrumentControl::LinnstrumentControl()
 : mDevice(this)
@@ -274,21 +273,13 @@ void LinnstrumentControl::SendScaleInfo()
          int number = setMainNoteBase + pitch;
          SendNRPN(number, TheScale->IsInScale(pitch));
 
-#if BESPOKE_WINDOWS
-         _sleep(10);
-#else
-         usleep(10000);
-#endif
+         std::this_thread::sleep_for(10ms);
 
          //set accent note
          number = setAccentNoteBase + pitch;
          SendNRPN(number, TheScale->IsRoot(pitch));
 
-#if BESPOKE_WINDOWS
-         _sleep(10);
-#else
-         usleep(10000);
-#endif
+         std::this_thread::sleep_for(10ms);
       }
    }
 }
@@ -304,19 +295,19 @@ void LinnstrumentControl::SendNRPN(int param, int value)
    mDevice.SendData(channelHeader, 100, 127);
 }
 
-void LinnstrumentControl::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void LinnstrumentControl::PlayNote(NoteMessage note)
 {
-   if (voiceIdx == -1)
-      voiceIdx = 0;
+   if (note.voiceIdx == -1)
+      note.voiceIdx = 0;
 
-   mModulators[voiceIdx] = modulation;
+   mModulators[note.voiceIdx] = note.modulation;
 
-   if (pitch >= 0 && pitch < 128)
+   if (note.pitch >= 0 && note.pitch < 128)
    {
-      mNoteAge[pitch].mTime = velocity > 0 ? -1 : time;
-      if (velocity > 0)
-         mNoteAge[pitch].mVoiceIndex = voiceIdx;
-      mNoteAge[pitch].Update(pitch, this);
+      mNoteAge[note.pitch].mTime = note.velocity > 0 ? -1 : note.time;
+      if (note.velocity > 0)
+         mNoteAge[note.pitch].mVoiceIndex = note.voiceIdx;
+      mNoteAge[note.pitch].Update(note.pitch, this);
    }
 }
 

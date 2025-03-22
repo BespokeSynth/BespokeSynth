@@ -97,8 +97,8 @@ void NoteSinger::OnTransportAdvanced(float amount)
 
    if (pitch != mPitch && bestPeak > .01f)
    {
-      PlayNoteOutput(gTime, pitch, 80, -1);
-      PlayNoteOutput(gTime, mPitch, 0, -1);
+      PlayNoteOutput(NoteMessage(gTime, pitch, 80));
+      PlayNoteOutput(NoteMessage(gTime, mPitch, 0));
       mPitch = pitch;
    }
 
@@ -149,7 +149,7 @@ void NoteSinger::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      PlayNoteOutput(time, mPitch, 0, -1);
+      PlayNoteOutput(NoteMessage(time, mPitch, 0));
       mPitch = -1;
    }
 }

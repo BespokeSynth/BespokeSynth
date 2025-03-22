@@ -91,7 +91,11 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
       ComputeSliders(i);
 
-      float delay = MAX(mDelayRamp.Value(time), GetMinDelayMs());
+      float delay;
+      if (mDelaySlider->GetModulator() != nullptr)
+         delay = MAX(mDelay, GetMinDelayMs());
+      else
+         delay = MAX(mDelayRamp.Value(time), GetMinDelayMs());
 
       float delaySamps = delay / gInvSampleRateMs;
       if (mFeedbackModuleMode)
@@ -115,7 +119,7 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
          float delayInput = delayedSample * mFeedback * (mInvert ? -1 : 1);
          JUCE_UNDENORMALISE(delayInput);
-         if (delayInput == delayInput) //filter NaNs
+         if (!std::isnan(delayInput))
             buffer->GetChannel(ch)[i] += delayInput;
 
          if (mEcho && mAcceptInput) //continuous feedback so do it post

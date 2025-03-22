@@ -89,6 +89,9 @@ public:
       if (!animate)
          mMinimizeAnimation = minimized ? 1 : 0;
    }
+   void TogglePinned();
+   void SetPinned(bool pinned);
+   bool Pinned() const { return mPinned; }
    virtual void KeyPressed(int key, bool isRepeat);
    virtual void KeyReleased(int key);
    void DrawConnection(IClickable* target);
@@ -101,7 +104,7 @@ public:
    virtual void OnUIControlRequested(const char* name) {}
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);
-   IDrawableModule* FindChild(const char* name, bool fail) const;
+   IDrawableModule* FindChild(const std::string name, bool fail) const;
    void GetDimensions(float& width, float& height) override;
    virtual void GetModuleDimensions(float& width, float& height)
    {
@@ -162,6 +165,7 @@ public:
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
    virtual bool ShouldSuppressAutomaticOutputCable() { return false; }
+   virtual bool ShouldSerializeForSnapshot() { return false; }
 
    virtual void CheckboxUpdated(Checkbox* checkbox, double time) {}
 
@@ -233,6 +237,7 @@ private:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
    virtual void SetUpFromSaveData() {}
    virtual bool ShouldSavePatchCableSources() const { return true; }
+   void ForcePosition();
 
    std::vector<IUIControl*> mUIControls;
    std::vector<IDrawableModule*> mChildren;
@@ -244,6 +249,8 @@ private:
    ModuleContainer* mOwningContainer{ nullptr };
 
    bool mMinimized{ false };
+   bool mPinned{ false };
+   ofVec2f mPinnedPosition{ 0, 0 };
    bool mWasMinimizeAreaClicked{ false };
    float mMinimizeAnimation{ 0 };
    bool mUIControlsCreated{ false };

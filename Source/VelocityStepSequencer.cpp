@@ -28,8 +28,6 @@
 #include "Scale.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
-#include "VelocityStepSequencer.h"
-#include "LaunchpadInterpreter.h"
 #include "FillSaveDropdown.h"
 #include "MidiController.h"
 
@@ -111,15 +109,17 @@ void VelocityStepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void VelocityStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VelocityStepSequencer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   PlayNoteOutput(time, pitch, velocity > 0 ? mCurrentVelocity : 0, voiceIdx, modulation);
+   if (note.velocity > 0)
+      note.velocity = mCurrentVelocity;
+   PlayNoteOutput(note);
 }
 
 void VelocityStepSequencer::OnTimeEvent(double time)

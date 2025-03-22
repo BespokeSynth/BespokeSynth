@@ -47,29 +47,29 @@ void NoteLatch::CheckboxUpdated(Checkbox* checkbox, double time)
       {
          if (mNoteState[i])
          {
-            PlayNoteOutput(time, i, 0);
+            PlayNoteOutput(NoteMessage(time, i, 0));
             mNoteState[i] = false;
          }
       }
    }
 }
 
-void NoteLatch::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteLatch::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
-         if (!mNoteState[pitch])
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         if (!mNoteState[note.pitch])
+            PlayNoteOutput(note);
          else
-            PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
-         mNoteState[pitch] = !mNoteState[pitch];
+            PlayNoteOutput(note.MakeNoteOff());
+         mNoteState[note.pitch] = !mNoteState[note.pitch];
       }
    }
    else
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
    }
 }
 

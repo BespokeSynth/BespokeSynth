@@ -30,7 +30,6 @@
 #include "Scale.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "UIControlMacros.h"
 
 NoteSorter::NoteSorter()
 {
@@ -55,21 +54,21 @@ void NoteSorter::DrawModule()
    }
 }
 
-void NoteSorter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteSorter::PlayNote(NoteMessage note)
 {
    bool foundPitch = false;
 
    for (int i = 0; i < mDestinationCables.size(); ++i)
    {
-      if (pitch == mPitch[i])
+      if (note.pitch == mPitch[i])
       {
-         mDestinationCables[i]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         mDestinationCables[i]->PlayNoteOutput(note);
          foundPitch = true;
       }
    }
 
    if (!foundPitch)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
 }
 
 void NoteSorter::SendCC(int control, int value, int voiceIdx)

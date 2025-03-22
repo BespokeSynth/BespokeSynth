@@ -36,27 +36,32 @@ void PreviousNote::DrawModule()
       return;
 }
 
-void PreviousNote::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PreviousNote::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
+      int newPitch = note.pitch;
+      int newVelocity = note.velocity;
+
       if (mPitch != -1)
       {
-         PlayNoteOutput(time, mPitch, mVelocity, voiceIdx, modulation);
+         note.pitch = mPitch;
+         note.velocity = mVelocity;
+         PlayNoteOutput(note);
       }
 
-      mPitch = pitch;
-      mVelocity = velocity;
+      mPitch = newPitch;
+      mVelocity = newVelocity;
    }
    else
    {
-      mNoteOutput.Flush(time);
+      mNoteOutput.Flush(note.time);
    }
 }
 

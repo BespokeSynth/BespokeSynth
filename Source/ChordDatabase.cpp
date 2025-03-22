@@ -147,7 +147,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
    // Create a boolean vector with each pitch played, set to be in one octave
    std::set<int> octavePitches;
 
-   for (int pitch : pitches)
+   for (auto& pitch : pitches)
    {
       octavePitches.insert(pitch % 12);
    }
@@ -163,10 +163,10 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
    std::list<std::tuple<int, ChordShape>> bestChords; // Is this cursed?
 
    // For each note played
-   for (int rootOctavePitch : octavePitches)
+   for (auto& rootOctavePitch : octavePitches)
    {
       // Try note as the root, multiply with the weights of the notes to be played
-      for (ChordShape shape : mChordShapes)
+      for (auto& shape : mChordShapes)
       {
          float chordWeight = shape.mWeightSum;
 
@@ -174,7 +174,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
          chordWeight += rootOctavePitch == lowestPitch ? shape.mRootPosBias : 0;
 
          // Add the weights for the pitches in the chord
-         for (int octavePitch : octavePitches)
+         for (auto& octavePitch : octavePitches)
          {
             // Looping over the same stuff within the same loop, crazy!
             chordWeight += 2.0f * shape.mWeights[(12 + octavePitch - rootOctavePitch) % 12];
@@ -234,7 +234,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
    bool foundRoot = false;
 
    // Find hightest root before other notes (Needed to distinguish between notes in different octaves and for inverted chords)
-   for (int pitch : pitches)
+   for (auto& pitch : pitches)
    {
       if ((12 + pitch - root) % 12 == 0)
       {
@@ -247,14 +247,14 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
    }
 
    // Calculate pitches in the key of the root
-   for (int pitch : pitches)
+   for (auto& pitch : pitches)
    {
       // Use difference between highest root up to two octaves, otherwise use first octave
       rootScalePitches.insert(pitch - rootPitch >= 0 ? (pitch - rootPitch) % 24 : (12 + pitch - root) % 12);
    }
 
    // For all played notes
-   for (int shapePitch : shape.mElements)
+   for (auto& shapePitch : shape.mElements)
    {
       // If pitch played, continue
       if (rootScalePitches.find(shapePitch) != rootScalePitches.end() ||
@@ -304,7 +304,7 @@ std::string ChordDatabase::GetChordNameAdvanced(const std::vector<int>& pitches,
    }
 
    // Display left-over pitches as addX
-   for (int playedPitch : rootScalePitches)
+   for (auto& playedPitch : rootScalePitches)
    {
       alterations += "add" + Alterations[playedPitch];
    }
@@ -376,7 +376,7 @@ std::string ChordDatabase::GetChordName(std::vector<int> pitches) const
    sort(pitches.begin(), pitches.end());
    for (int inversion = 0; inversion < numPitches; ++inversion)
    {
-      for (ChordShape shape : mChordShapes)
+      for (auto& shape : mChordShapes)
       {
          if (shape.mElements.size() == numPitches)
          {
@@ -403,7 +403,7 @@ std::string ChordDatabase::GetChordName(std::vector<int> pitches) const
       return "Unknown";
 
    std::string ret = "";
-   for (std::string name : names)
+   for (auto& name : names)
       ret += name + "; ";
    return ret.substr(0, ret.length() - 2);
 }
@@ -411,7 +411,7 @@ std::string ChordDatabase::GetChordName(std::vector<int> pitches) const
 std::vector<int> ChordDatabase::GetChord(std::string name, int inversion) const
 {
    std::vector<int> ret;
-   for (auto shape : mChordShapes)
+   for (auto& shape : mChordShapes)
    {
       if (shape.mName == name)
       {
@@ -433,7 +433,7 @@ std::vector<std::string> ChordDatabase::GetChordNames() const
 {
    std::vector<std::string> ret;
 
-   for (auto shape : mChordShapes)
+   for (auto& shape : mChordShapes)
       ret.push_back(shape.mName);
 
    return ret;

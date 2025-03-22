@@ -46,7 +46,7 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> VSTPlayhead::getPosition() con
 
    pos.setBpm(TheTransport->GetTempo());
    pos.setTimeSignature(timeSignature);
-   pos.setTimeInSamples(gTime * gSampleRateMs);
+   pos.setTimeInSamples(int64_t(gTime * gSampleRateMs));
    pos.setTimeInSeconds(gTime / 1000);
 
    /*

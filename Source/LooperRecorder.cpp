@@ -32,7 +32,6 @@
 #include "ModularSynth.h"
 #include "ChaosEngine.h"
 #include "Profiler.h"
-#include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
 #include "UIControlMacros.h"
 
@@ -401,8 +400,8 @@ void LooperRecorder::DrawModule()
    ofSetColor(0, 0, 0, 20);
    for (int i = 1; i < 4; ++i)
    {
-      float x = 3 + i * kBufferSegmentWidth;
-      ofLine(x, 3, x, 3 + kBufferHeight);
+      const float bx = 3 + i * kBufferSegmentWidth;
+      ofLine(bx, 3, bx, 3 + kBufferHeight);
    }
    ofPopStyle();
 

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "Sample.h"
 #include "INoteReceiver.h"
@@ -74,7 +73,7 @@ public:
    int GetNumTargets() override { return 1 + (int)mIndividualOutputs.size(); }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IDrawableModule
@@ -166,6 +165,8 @@ private:
    int mSelectedHitIdx{ 0 };
    bool mMonoOutput{ false };
    Checkbox* mMonoCheckbox{ nullptr };
+   bool mSingleVoice{ false };
+   Checkbox* mSingleVoiceCheckbox{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
    NoteInputBuffer mNoteInputBuffer{ nullptr };
    bool mNeedSetup{ true };

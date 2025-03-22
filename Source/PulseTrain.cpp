@@ -52,7 +52,7 @@ void PulseTrain::CreateUIControls()
    mLengthSlider = new IntSlider(this, "length", 3, 2, 96, 15, &mLength, 1, kMaxSteps);
    mIntervalSelector = new DropdownList(this, "interval", mLengthSlider, kAnchor_Right, (int*)(&mInterval));
 
-   mVelocityGrid = new UIGrid("uigrid", 3, 20, 174, 15, mLength, 1, this);
+   mVelocityGrid = new UIGrid(this, "uigrid", 3, 20, 248, 20, mLength, 1);
 
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -72,7 +72,7 @@ void PulseTrain::CreateUIControls()
    for (int i = 0; i < kMaxSteps; ++i)
       mVelocityGrid->SetVal(i, 0, mVels[i], !K(notifyListener));
 
-   for (int i = 0; i < kIndividualStepCables; ++i)
+   for (int i = 0; i < kMaxSteps; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
       mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
@@ -97,7 +97,7 @@ void PulseTrain::DrawModule()
    mLengthSlider->Draw();
    mVelocityGrid->Draw();
 
-   for (int i = 0; i < kIndividualStepCables; ++i)
+   for (int i = 0; i < kMaxSteps; ++i)
    {
       if (i < mLength)
       {
@@ -133,7 +133,6 @@ void PulseTrain::OnTimeEvent(double time)
 void PulseTrain::OnPulse(double time, float velocity, int flags)
 {
    mStep = 0;
-   Step(time, velocity, kPulseFlag_Reset);
 }
 
 void PulseTrain::Step(double time, float velocity, int flags)
@@ -141,39 +140,42 @@ void PulseTrain::Step(double time, float velocity, int flags)
    if (!mEnabled)
       return;
 
-   bool isReset = (flags & kPulseFlag_Reset);
-   if (mStep >= mLength && !isReset)
-      return;
-
-   ++mStep;
-
+   const bool isReset = (flags & kPulseFlag_Reset);
    if (isReset)
       mStep = 0;
+
+   if (mStep >= mLength)
+      return;
 
    if (mStep < mLength)
    {
       float v = mVels[mStep] * velocity;
 
-      int flags = 0;
+      int new_flags = 0;
       if (mResetOnStart && mStep == 0)
-         flags = kPulseFlag_Reset;
+         new_flags = kPulseFlag_Reset;
 
       if (v > 0)
       {
-         DispatchPulse(GetPatchCableSource(), time, v, flags);
+         DispatchPulse(GetPatchCableSource(), time, v, new_flags);
 
-         if (mStep < kIndividualStepCables)
-            DispatchPulse(mStepCables[mStep], time, v, flags);
+         if (mStep < kMaxSteps)
+            DispatchPulse(mStepCables[mStep], time, v, new_flags);
       }
    }
 
-   mVelocityGrid->SetHighlightCol(time, mStep);
+   if (mStep < mLength)
+      mVelocityGrid->SetHighlightCol(time, mStep);
+   else
+      mVelocityGrid->SetHighlightCol(time, -1);
+
+   ++mStep;
 }
 
 void PulseTrain::GetModuleDimensions(float& width, float& height)
 {
-   width = 180;
-   height = 52;
+   width = mWidth;
+   height = mHeight;
 }
 
 void PulseTrain::OnClicked(float x, float y, bool right)
@@ -181,6 +183,13 @@ void PulseTrain::OnClicked(float x, float y, bool right)
    IDrawableModule::OnClicked(x, y, right);
 
    mVelocityGrid->TestClick(x, y, right);
+}
+
+void PulseTrain::Resize(float w, float h)
+{
+   mWidth = MAX(w, 254);
+   mHeight = MAX(h, 58);
+   mVelocityGrid->SetDimensions(mWidth - 6, mHeight - 38);
 }
 
 void PulseTrain::MouseReleased()
@@ -220,6 +229,8 @@ void PulseTrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
    if (slider == mLengthSlider)
    {
+      if (mLength > kMaxSteps)
+         mLength = kMaxSteps;
       mVelocityGrid->SetGrid(mLength, 1);
       GridUpdated(mVelocityGrid, 0, 0, 0, 0);
    }
@@ -257,11 +268,15 @@ void PulseTrain::LoadState(FileStreamIn& in, int rev)
 
 void PulseTrain::SaveLayout(ofxJSONElement& moduleInfo)
 {
+   moduleInfo["width"] = mWidth;
+   moduleInfo["height"] = mHeight;
 }
 
 void PulseTrain::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadInt("width", moduleInfo, 254, 254, 999999, K(isTextField));
+   mModuleSaveData.LoadInt("height", moduleInfo, 58, 58, 999999, K(isTextField));
 
    SetUpFromSaveData();
 }

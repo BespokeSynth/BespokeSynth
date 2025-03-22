@@ -29,7 +29,6 @@
 #include "INoteSource.h"
 #include "INoteReceiver.h"
 #include "IAudioReceiver.h"
-#include "IAudioSource.h"
 #include "IAudioEffect.h"
 #include "IUIControl.h"
 #include "Slider.h"
@@ -40,7 +39,6 @@
 #include "ModuleSaveDataPanel.h"
 #include "GridController.h"
 #include "ControlSequencer.h"
-#include "Snapshots.h"
 #include "PatchCableSource.h"
 #include "nanovg/nanovg.h"
 #include "IPulseReceiver.h"
@@ -183,6 +181,8 @@ bool IDrawableModule::IsVisible()
 
 void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleBarHeight, float& highlight)
 {
+   if (mPinned)
+      ForcePosition();
    titleBarHeight = mTitleBarHeight;
    if (!HasTitleBar())
       titleBarHeight = 0;
@@ -381,6 +381,21 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofRect(-.5f, -titleBarHeight - .5f, w + 1, h + titleBarHeight + 1, 4);
       ofPopStyle();
    }
+
+   const float kPinRadius = 2;
+   if (mPinned)
+   {
+      ofFill();
+      ofSetColor(color, 120);
+      ofCircle(0, -titleBarHeight, kPinRadius);
+      ofCircle(w, -titleBarHeight, kPinRadius);
+      ofCircle(w, h, kPinRadius);
+      ofCircle(0, h, kPinRadius);
+      ofCircle(0, -titleBarHeight, kPinRadius / 2);
+      ofCircle(w, -titleBarHeight, kPinRadius / 2);
+      ofCircle(w, h, kPinRadius / 2);
+      ofCircle(0, h, kPinRadius / 2);
+   }
 }
 
 void IDrawableModule::Render()
@@ -490,6 +505,8 @@ void IDrawableModule::RenderUnclipped()
 
 void IDrawableModule::DrawPatchCables(bool parentMinimized, bool inFront)
 {
+   if (mPinned)
+      ForcePosition();
    for (auto source : mPatchCableSources)
    {
       ConnectionType type = source->GetConnectionType();
@@ -766,12 +783,20 @@ IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/
    return nullptr;
 }
 
-IDrawableModule* IDrawableModule::FindChild(const char* name, bool fail) const
+IDrawableModule* IDrawableModule::FindChild(const std::string name, bool fail) const
 {
+   if (name.empty())
+      return nullptr;
    for (int i = 0; i < mChildren.size(); ++i)
    {
-      if (strcmp(mChildren[i]->Name(), name) == 0)
+      if (strcmp(mChildren[i]->Name(), name.c_str()) == 0)
          return mChildren[i];
+   }
+   if (mTypeName == "effectchain") // Due to an issue in the past where child modules of the effectchain module weren't saving their names correctly we are going to try and fix the loading here.
+   {
+      auto child = FindChild(name.substr(0, name.length() - 1), false);
+      if (child)
+         return child;
    }
    if (fail)
       throw UnknownModuleException(name);
@@ -999,6 +1024,18 @@ PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
    return cable;
 }
 
+void IDrawableModule::ForcePosition()
+{
+   if (TheSynth->GetMoveModule() != this)
+   {
+      auto pos = mPinnedPosition - TheSynth->GetDrawOffset();
+      mX = pos.x;
+      mY = pos.y;
+   }
+   else if (mPinned) // Moved while pinned.
+      SetPinned(true);
+}
+
 void IDrawableModule::FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly /*= false*/)
 {
    ofVec2f vDirs[4];
@@ -1065,6 +1102,20 @@ void IDrawableModule::ToggleMinimized()
       if (TheSaveDataPanel->GetModule() == this)
          TheSaveDataPanel->SetModule(nullptr);
    }
+}
+
+void IDrawableModule::TogglePinned()
+{
+   SetPinned(!mPinned);
+}
+
+void IDrawableModule::SetPinned(bool pinned)
+{
+   if (!HasTitleBar())
+      return;
+   mPinned = pinned;
+   if (mPinned)
+      mPinnedPosition = GetPosition() + TheSynth->GetDrawOffset();
 }
 
 bool IDrawableModule::CheckNeedsDraw()
@@ -1173,7 +1224,7 @@ void IDrawableModule::SetUpFromSaveDataBase()
 
 namespace
 {
-   const int kBaseSaveStateRev = 2;
+   const int kBaseSaveStateRev = 3;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
@@ -1186,6 +1237,10 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    out << GetModuleSaveStateRev();
 
    out << kBaseSaveStateRev;
+
+   out << mPinned;
+   out << mPinnedPosition.x;
+   out << mPinnedPosition.y;
 
    std::vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
@@ -1257,6 +1312,13 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 
    int baseRev;
    in >> baseRev;
+
+   if (baseRev > 2)
+   {
+      in >> mPinned;
+      in >> mPinnedPosition.x;
+      in >> mPinnedPosition.y;
+   }
 
    int numUIControls;
    in >> numUIControls;
@@ -1357,7 +1419,7 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
          std::string childName;
          in >> childName;
          //ofLog() << "Loading " << childName;
-         IDrawableModule* child = FindChild(childName.c_str(), true);
+         IDrawableModule* child = FindChild(childName, true);
          LoadStateValidate(child);
          child->LoadState(in, child->LoadModuleSaveStateRev(in));
       }

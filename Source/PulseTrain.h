@@ -26,7 +26,7 @@
 */
 
 #pragma once
-#include <iostream>
+
 #include "IDrawableModule.h"
 #include "Transport.h"
 #include "Checkbox.h"
@@ -65,6 +65,10 @@ public:
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
+   //IDrawableModule
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
+
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -92,7 +96,9 @@ private:
 
    void Step(double time, float velocity, int flags);
 
-   static const int kMaxSteps = 32;
+   static const int kMaxSteps = 128;
+   float mWidth{ 254 };
+   float mHeight{ 58 };
    float mVels[kMaxSteps]{};
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
@@ -102,8 +108,7 @@ private:
    bool mResetOnStart{ true };
    Checkbox* mResetOnStartCheckbox{ nullptr };
 
-   static const int kIndividualStepCables = 16;
-   PatchCableSource* mStepCables[kIndividualStepCables]{ nullptr };
+   PatchCableSource* mStepCables[kMaxSteps]{ nullptr };
 
    UIGrid* mVelocityGrid{ nullptr };
 };

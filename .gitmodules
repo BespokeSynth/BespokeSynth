@@ -19,3 +19,7 @@
 [submodule "libs/readerwriterqueue"]
 	path = libs/readerwriterqueue
 	url = https://github.com/cameron314/readerwriterqueue.git
+[submodule "libs/exprtk"]
+	path = libs/exprtk
+	url = https://github.com/ArashPartow/exprtk.git
+	branch = cmake

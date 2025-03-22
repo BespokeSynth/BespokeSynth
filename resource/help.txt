@@ -63,3 +63,5 @@ Key Commands
    * ctrl/command-'l': load
    * shift-'p': pause audio processing. this will stop all audio output. press shift-'p' again to resume
    * F2: toggle displaying all ADSR controls as sliders
+   * F3: pins or unpin a module so that it stays where it is regardless of the viewports position.
+         only works when not group selecting modules.

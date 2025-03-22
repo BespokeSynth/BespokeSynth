@@ -51,7 +51,7 @@ void BiquadFilter::SetFilterParams(double f, double q)
 
 void BiquadFilter::UpdateFilterCoeff()
 {
-   if (mF <= 0 || mF != mF)
+   if (mF <= 0 || std::isnan(mF))
    {
       mA0 = 1;
       mA1 = 0;
@@ -63,7 +63,7 @@ void BiquadFilter::UpdateFilterCoeff()
 
    double norm;
    double V = pow(10, fabs(mDbGain) / 20.0);
-   double K = tan(M_PI * (mF / mSampleRate));
+   double K = tan(M_PI * ofClamp(mF / mSampleRate, 0, 0.499999));
    switch (mType)
    {
       case kFilterType_Lowpass:

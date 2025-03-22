@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
@@ -69,7 +68,7 @@ public:
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //UIGridListener

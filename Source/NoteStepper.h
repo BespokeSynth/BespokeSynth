@@ -27,10 +27,7 @@
 
 #pragma once
 
-#include <iostream>
-#include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "INoteSource.h"
 #include "Slider.h"
 #include "ClickButton.h"
@@ -46,7 +43,7 @@ public:
 
    void CreateUIControls() override;
 
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
@@ -67,7 +64,7 @@ private:
       height = mHeight;
    }
 
-   void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+   void SendNoteToIndex(int index, NoteMessage note);
 
    static const int kMaxDestinations = 16;
    std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables{};

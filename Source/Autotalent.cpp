@@ -971,22 +971,22 @@ void Autotalent::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void Autotalent::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Autotalent::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mC = (pitch % 12) == 0 ? 1 : -1;
-      mDb = (pitch % 12) == 1 ? 1 : -1;
-      mD = (pitch % 12) == 2 ? 1 : -1;
-      mEb = (pitch % 12) == 3 ? 1 : -1;
-      mE = (pitch % 12) == 4 ? 1 : -1;
-      mF = (pitch % 12) == 5 ? 1 : -1;
-      mGb = (pitch % 12) == 6 ? 1 : -1;
-      mG = (pitch % 12) == 7 ? 1 : -1;
-      mAb = (pitch % 12) == 8 ? 1 : -1;
-      mA = (pitch % 12) == 9 ? 1 : -1;
-      mBb = (pitch % 12) == 10 ? 1 : -1;
-      mB = (pitch % 12) == 11 ? 1 : -1;
+      mC = (note.pitch % 12) == 0 ? 1 : -1;
+      mDb = (note.pitch % 12) == 1 ? 1 : -1;
+      mD = (note.pitch % 12) == 2 ? 1 : -1;
+      mEb = (note.pitch % 12) == 3 ? 1 : -1;
+      mE = (note.pitch % 12) == 4 ? 1 : -1;
+      mF = (note.pitch % 12) == 5 ? 1 : -1;
+      mGb = (note.pitch % 12) == 6 ? 1 : -1;
+      mG = (note.pitch % 12) == 7 ? 1 : -1;
+      mAb = (note.pitch % 12) == 8 ? 1 : -1;
+      mA = (note.pitch % 12) == 9 ? 1 : -1;
+      mBb = (note.pitch % 12) == 10 ? 1 : -1;
+      mB = (note.pitch % 12) == 11 ? 1 : -1;
       UpdateShiftSlider();
    }
 }

@@ -47,7 +47,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
    std::vector<std::string> tokens = ofSplitString(mReadPath, "/");
    mName = tokens[tokens.size() - 1];
 
-   juce::File file(ofToDataPath(mReadPath));
+   juce::File file(ofToSamplePath(mReadPath));
    delete mReader;
    mReader = TheSynth->GetAudioFormatManager().createReaderFor(file);
 
@@ -163,7 +163,7 @@ bool Sample::Write(const char* path /*=nullptr*/)
 bool Sample::WriteDataToFile(const std::string& path, float** data, int numSamples, int channels)
 {
    auto wavFormat = std::make_unique<juce::WavAudioFormat>();
-   juce::File outputFile(ofToDataPath(path));
+   juce::File outputFile(ofToSamplePath(path));
    outputFile.create();
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
@@ -212,7 +212,7 @@ bool Sample::ConsumeData(double time, ChannelBuffer* out, int size, bool replace
    if (mLooping && mOffset >= mNumSamples)
       mOffset -= mNumSamples;
 
-   if (mOffset >= end || mOffset != mOffset)
+   if (mOffset >= end || std::isnan(mOffset))
    {
       mPlayMutex.unlock();
       return false;

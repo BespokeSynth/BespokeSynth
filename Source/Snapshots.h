@@ -26,13 +26,11 @@
 
 #pragma once
 
-#include <iostream>
 #include "IDrawableModule.h"
 #include "UIGrid.h"
 #include "ClickButton.h"
 #include "Checkbox.h"
 #include "FloatSliderLFOControl.h"
-#include "Transport.h"
 #include "Slider.h"
 #include "Ramp.h"
 #include "INoteReceiver.h"
@@ -55,7 +53,7 @@ public:
    //IDrawableModule
    void Init() override;
    void Poll() override;
-   bool IsResizable() const override { return true; }
+   bool IsResizable() const override { return mDisplayMode == DisplayMode::Grid; }
    void Resize(float w, float h) override;
 
    bool HasSnapshot(int index) const;
@@ -69,7 +67,7 @@ public:
    void OnTransportAdvanced(float amount) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPush2GridController
@@ -83,12 +81,11 @@ public:
    void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
-   int GetModuleSaveStateRev() const override { return 3; }
+   int GetModuleSaveStateRev() const override { return 4; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 
@@ -105,6 +102,8 @@ private:
    bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
    void RandomizeControl(IUIControl* control);
+   void UpdateListGrid();
+   void ResizeSnapshotCollection(int size);
 
    //IDrawableModule
    void DrawModule() override;
@@ -112,6 +111,12 @@ private:
    void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
+
+   enum class DisplayMode
+   {
+      Grid,
+      List
+   };
 
    struct Snapshot
    {
@@ -137,9 +142,17 @@ private:
       std::string mString;
    };
 
+   struct SnapshotModuleData
+   {
+      SnapshotModuleData(IDrawableModule* module);
+      std::string mModulePath;
+      std::string mData;
+   };
+
    struct SnapshotCollection
    {
       std::list<Snapshot> mSnapshots;
+      std::list<SnapshotModuleData> mModuleData;
       std::string mLabel;
    };
 
@@ -169,13 +182,15 @@ private:
    int mQueuedSnapshotIndex{ -1 };
    bool mAllowSetOnAudioThread{ false };
    TextEntry* mSnapshotLabelEntry{ nullptr };
-   std::string mSnapshotLabel;
+   std::string mSnapshotLabel{};
    int mLoadRev{ -1 };
-   ClickButton* mClearButton;
    bool mStoreMode{ false };
-   Checkbox* mStoreCheckbox;
+   Checkbox* mStoreCheckbox{ nullptr };
    bool mDeleteMode{ false };
-   Checkbox* mDeleteCheckbox;
+   Checkbox* mDeleteCheckbox{ nullptr };
    bool mAutoStoreOnSwitch{ false };
-   Checkbox* mAutoStoreOnSwitchCheckbox;
+   DisplayMode mDisplayMode{ DisplayMode::List };
+   int mSnapshotRenameIndex{ -1 };
+   float mOldWidth{ 0 };
+   float mOldHeight{ 0 };
 };

@@ -25,9 +25,7 @@
 
 #pragma once
 
-#include <iostream>
 #include <limits>
-#include "IUIControl.h"
 #include "TextEntry.h"
 #include "Ramp.h"
 #include "IAudioPoller.h"
@@ -121,6 +119,7 @@ public:
    void Double() override;
    void Halve() override;
    void ResetToOriginal() override;
+   void Poll() override;
    void Increment(float amount) override;
 
    float PosToVal(float pos, bool ignoreSmooth) const;
@@ -287,6 +286,7 @@ private:
    bool mMouseDown;
    int mOriginalValue;
    IIntSliderListener* mOwner;
+   int mFineRefX{ -999 };
 
    int mLastDisplayedValue;
    int mLastSetValue;

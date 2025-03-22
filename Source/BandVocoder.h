@@ -25,10 +25,8 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
-#include "Checkbox.h"
 #include "RollingBuffer.h"
 #include "Slider.h"
 #include "BiquadFilterEffect.h"

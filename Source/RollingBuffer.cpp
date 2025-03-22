@@ -25,6 +25,7 @@
 
 #include "RollingBuffer.h"
 #include "SynthGlobals.h"
+#include "UserPrefs.h"
 
 RollingBuffer::RollingBuffer(int sizeInSamples)
 : mBuffer(sizeInSamples)
@@ -143,7 +144,7 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*
 
 namespace
 {
-   const int kSaveStateRev = 3;
+   const int kSaveStateRev = 4;
 }
 
 void RollingBuffer::SaveState(FileStreamOut& out)
@@ -152,6 +153,7 @@ void RollingBuffer::SaveState(FileStreamOut& out)
 
    out << mBuffer.NumActiveChannels();
    out << Size();
+   out << gSampleRate;
    for (int i = 0; i < mBuffer.NumActiveChannels(); ++i)
    {
       out << mOffsetToNow[i];
@@ -167,27 +169,55 @@ void RollingBuffer::LoadState(FileStreamIn& in)
    int channels = ChannelBuffer::kMaxNumChannels;
    if (rev >= 2)
       in >> channels;
+   mBuffer.SetNumActiveChannels(channels);
+
    int savedSize = Size();
    if (rev >= 3)
       in >> savedSize;
-   mBuffer.SetNumActiveChannels(channels);
+   if (rev < 3 && UserPrefs.oversampling.Get() > 1)
+      savedSize = savedSize / UserPrefs.oversampling.Get();
+
+   int savedSampleRate = gSampleRate;
+   if (rev >= 4)
+      in >> savedSampleRate;
+
    for (int i = 0; i < channels; ++i)
    {
       in >> mOffsetToNow[i];
       mOffsetToNow[i] %= Size();
-      if (savedSize <= Size())
+      if (savedSampleRate == gSampleRate)
       {
-         in.Read(mBuffer.GetChannel(i), savedSize);
+         if (savedSize <= Size())
+         {
+            in.Read(mBuffer.GetChannel(i), savedSize);
+         }
+         else
+         {
+            //saved with a longer buffer than we have... not sure what the right solution here is, but lets just fill the buffer over and over again until we consume all of the samples
+            int sizeLeft = savedSize;
+            while (sizeLeft > 0)
+            {
+               in.Read(mBuffer.GetChannel(i), MIN(sizeLeft, Size()));
+               sizeLeft -= Size();
+            }
+         }
       }
       else
       {
-         //saved with a longer buffer than we have... not sure what the right solution here is, but lets just fill the buffer over and over again until we consume all of the samples
-         int sizeLeft = savedSize;
-         while (sizeLeft > 0)
+         float sampleRateRatio = (float)savedSampleRate / gSampleRate;
+         mOffsetToNow[i] = int(mOffsetToNow[i] / sampleRateRatio);
+         float* sampleLoader = new float[savedSize];
+         in.Read(sampleLoader, savedSize);
+         float* destinationBuffer = mBuffer.GetChannel(i);
+         for (int j = 0; j < Size(); ++j)
          {
-            in.Read(mBuffer.GetChannel(i), MIN(sizeLeft, Size()));
-            sizeLeft -= Size();
+            float pos = j * sampleRateRatio;
+            int posA = MIN(int(pos), savedSize - 1);
+            int posB = MIN(posA + 1, savedSize - 1);
+            float alpha = pos - posA;
+            destinationBuffer[j] = sampleLoader[posA] * (1 - alpha) + sampleLoader[posB] * alpha;
          }
+         delete[] sampleLoader;
       }
    }
 }

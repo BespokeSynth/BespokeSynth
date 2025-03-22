@@ -1,5 +1,3 @@
-#pragma once
-
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_opengl/juce_opengl.h"
@@ -233,8 +231,7 @@ public:
          preferredSetupOptions.inputDeviceName = inputDevice;
 
 #ifdef JUCE_WINDOWS
-      HRESULT hr;
-      hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+      CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
 
       int inputChannels = UserPrefs.max_input_channels.Get();
@@ -318,6 +315,7 @@ public:
          if (argument.endsWith(".bsk") || argument.endsWith(".bskt"))
          {
             mSynth.SetStartupSaveStateFile(argument.toStdString());
+            TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup, a user who uses the command line arguments likely doesn't need it
             break;
          }
       }
@@ -535,7 +533,7 @@ private:
    void filesDropped(const StringArray& files, int x, int y) override
    {
       std::vector<std::string> strFiles;
-      for (auto file : files)
+      for (auto& file : files)
          strFiles.push_back(file.toStdString());
       mSynth.FilesDropped(strFiles, x, y);
    }

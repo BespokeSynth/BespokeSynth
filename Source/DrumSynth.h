@@ -25,16 +25,13 @@
 
 #pragma once
 
-#include <iostream>
 #include "IAudioSource.h"
 #include "Sample.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Checkbox.h"
 #include "ClickButton.h"
-#include "Transport.h"
 #include "EnvOscillator.h"
 #include "ADSR.h"
 #include "RadioButton.h"
@@ -70,7 +67,7 @@ public:
    int GetNumTargets() override { return mUseIndividualOuts ? (int)mHits.size() + 1 : 1; }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;

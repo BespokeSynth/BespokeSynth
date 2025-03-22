@@ -45,18 +45,19 @@ void WhiteKeys::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void WhiteKeys::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void WhiteKeys::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   int octave = pitch / TheScale->GetPitchesPerOctave();
+   int octave = note.pitch / TheScale->GetPitchesPerOctave();
    int degree = -1;
-   switch (pitch % TheScale->GetPitchesPerOctave())
+   switch (note.pitch % TheScale->GetPitchesPerOctave())
    {
+      default:
       case 0: degree = 0; break;
       case 2: degree = 1; break;
       case 4: degree = 2; break;
@@ -68,9 +69,9 @@ void WhiteKeys::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 
    if (degree != -1)
    {
-      pitch = TheScale->GetPitchFromTone(degree);
-      pitch += octave * TheScale->GetPitchesPerOctave();
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      note.pitch = TheScale->GetPitchFromTone(degree);
+      note.pitch += octave * TheScale->GetPitchesPerOctave();
+      PlayNoteOutput(note);
    }
 }
 

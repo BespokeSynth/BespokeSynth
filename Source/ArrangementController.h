@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <iostream>
-
 class ArrangementController
 {
 public:

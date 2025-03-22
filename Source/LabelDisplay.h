@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <utility>
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
@@ -59,8 +58,8 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
 
-   float mWidth;
-   float mHeight;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
    Checkbox* mShowControlsCheckbox{ nullptr };
    bool mShowControls{ true };

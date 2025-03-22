@@ -25,6 +25,7 @@
 #include "KontrolKommunicator.h"
 #include <mach/mach.h>
 #include "NIMessage.h"
+#include <iostream>
 
 #define KEYS_MESSAGE "75 67 56 02  73 79 65 4b"
 #define RKEY_MESSAGE "75 67 56 02  79 65 4b 52"

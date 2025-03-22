@@ -73,15 +73,15 @@ void NoteVibrato::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void NoteVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteVibrato::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
-      modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
+      mModulation.GetPitchBend(note.voiceIdx)->AppendTo(note.modulation.pitchBend);
+      note.modulation.pitchBend = mModulation.GetPitchBend(note.voiceIdx);
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

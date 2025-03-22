@@ -1,6 +1,5 @@
 #include "ModularSynth.h"
 #include "IAudioSource.h"
-#include "IAudioEffect.h"
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
@@ -20,7 +19,6 @@
 #include "fenv.h"
 #include <stdlib.h>
 #include "GridController.h"
-#include "PerformanceTimer.h"
 #include "FileStream.h"
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
@@ -241,7 +239,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    juce::File(ofToDataPath("savestate")).createDirectory();
    juce::File(ofToDataPath("savestate/autosave")).createDirectory();
    juce::File(ofToDataPath("recordings")).createDirectory();
-   juce::File(ofToDataPath("samples")).createDirectory();
+   juce::File(ofToSamplePath("")).createDirectory();
    juce::File(ofToDataPath("scripts")).createDirectory();
    juce::File(ofToDataPath("internal")).createDirectory();
    juce::File(ofToDataPath("vst")).createDirectory();
@@ -347,8 +345,8 @@ void ModularSynth::Poll()
    {
       for (auto p : mExtraPollers)
          p->Poll();
-      mModuleContainer.Poll();
       mUILayerModuleContainer.Poll();
+      mModuleContainer.Poll();
    }
 
    if (mShowLoadStatePopup)
@@ -412,7 +410,8 @@ void ModularSynth::Poll()
    if (shiftPressed && !mIsShiftPressed && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr)
    {
       double timeBetweenPresses = gTime - mLastShiftPressTime;
-      if (timeBetweenPresses < 400)
+      float mouseMoveBetweenPressesSq = (mMousePos - mLastShiftPressMousePos).distanceSquared();
+      if (timeBetweenPresses < 400 && mouseMoveBetweenPressesSq < 3 * 3)
       {
          ToggleQuickSpawn();
          mLastShiftPressTime = -9999; //clear timer
@@ -420,6 +419,7 @@ void ModularSynth::Poll()
       else
       {
          mLastShiftPressTime = gTime;
+         mLastShiftPressMousePos = mMousePos;
       }
    }
    mIsShiftPressed = shiftPressed;
@@ -429,6 +429,9 @@ void ModularSynth::Poll()
       ArrangeAudioSourceDependencies();
       mArrangeDependenciesWhenLoadCompletes = false;
    }
+
+   if (gHoveredUIControl != nullptr && gHoveredUIControl->IsShowing() == false)
+      gHoveredUIControl = nullptr;
 
    ++sFrameCount;
 }
@@ -527,7 +530,7 @@ void ModularSynth::Draw(void* vg)
    }
 
    if (UserPrefs.draw_background_lissajous.Get())
-      DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
+      DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB, UserPrefs.background_lissajous_autocorrelate.Get());
 
    if (gTime == 1 && mFatalError == "")
    {
@@ -1065,6 +1068,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       ADSRDisplay::ToggleDisplayMode();
    }
 
+   if (key == KeyPress::F3Key && !isRepeat)
+   {
+      if (gHoveredModule && mGroupSelectedModules.empty())
+         gHoveredModule->TogglePinned();
+   }
+
    if (key == '`' && !isRepeat)
    {
       if (GetKeyModifiers() == kModifier_Shift)
@@ -1130,8 +1139,8 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       gHotBindUIControl[num] = gHoveredUIControl;
    }
 
-   mModuleContainer.KeyPressed(key, isRepeat);
    mUILayerModuleContainer.KeyPressed(key, isRepeat);
+   mModuleContainer.KeyPressed(key, isRepeat);
 
    //if (key == '/' && !isRepeat)
    //   ofToggleFullscreen();
@@ -1164,8 +1173,8 @@ void ModularSynth::KeyReleased(int key)
    //if (key == 'c')
    //   mouseReleased(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 0);
 
-   mModuleContainer.KeyReleased(key);
    mUILayerModuleContainer.KeyReleased(key);
+   mModuleContainer.KeyReleased(key);
 }
 
 float ModularSynth::GetMouseX(ModuleContainer* context, float rawX /*= FLT_MAX*/)
@@ -1338,13 +1347,13 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
    if (changed)
    {
-      float x = GetMouseX(&mModuleContainer);
-      float y = GetMouseY(&mModuleContainer);
-      mModuleContainer.MouseMoved(x, y);
-
-      x = GetMouseX(&mUILayerModuleContainer);
-      y = GetMouseY(&mUILayerModuleContainer);
+      float x = GetMouseX(&mUILayerModuleContainer);
+      float y = GetMouseY(&mUILayerModuleContainer);
       mUILayerModuleContainer.MouseMoved(x, y);
+
+      x = GetMouseX(&mModuleContainer);
+      y = GetMouseY(&mModuleContainer);
+      mModuleContainer.MouseMoved(x, y);
    }
 
    if (gHoveredUIControl && changed)
@@ -1373,7 +1382,6 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
 
-   ofVec2f drag = ofVec2f(x, y) - mLastMouseDragPos;
    mLastMouseDragPos = ofVec2f(x, y);
 
    if (button == 3)
@@ -1418,12 +1426,12 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
 
    if (mGroupSelectContext != nullptr)
    {
-      float x = GetMouseX(mGroupSelectContext);
-      float y = GetMouseY(mGroupSelectContext);
-      ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, x), MIN(mClickStartY, y)), ofPoint(MAX(mClickStartX, x), MAX(mClickStartY, y)));
+      const float gx = GetMouseX(mGroupSelectContext);
+      const float gy = GetMouseY(mGroupSelectContext);
+      ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, gx), MIN(mClickStartY, gy)), ofPoint(MAX(mClickStartX, gx), MAX(mClickStartY, gy)));
       if (rect.width > 10 || rect.height > 10)
       {
-         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules);
+         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules, true);
          if (mGroupSelectedModules.size() > 0)
          {
             for (int i = (int)mGroupSelectedModules.size() - 1; i >= 0; --i) //do this backwards to preserve existing order
@@ -1546,23 +1554,26 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       return;
    }
 
-   if (gHoveredUIControl != nullptr &&
-       gHoveredUIControl->GetModuleParent() && !gHoveredUIControl->GetModuleParent()->IsDeleted() && !gHoveredUIControl->GetModuleParent()->IsHoveringOverResizeHandle() &&
+   IDrawableModule* hoveredUIControlModuleParent = nullptr;
+   if (gHoveredUIControl != nullptr)
+      hoveredUIControlModuleParent = gHoveredUIControl->GetModuleParent();
+
+   if (hoveredUIControlModuleParent != nullptr && !hoveredUIControlModuleParent->IsDeleted() && !hoveredUIControlModuleParent->IsHoveringOverResizeHandle() &&
        !IUIControl::WasLastHoverSetManually() &&
        mGroupSelectedModules.empty() &&
        mQuickSpawn->IsShowing() == false &&
-       (GetTopModalFocusItem() == nullptr || gHoveredUIControl->GetModuleParent() == GetTopModalFocusItem()))
+       (GetTopModalFocusItem() == nullptr || hoveredUIControlModuleParent == GetTopModalFocusItem()))
    {
       //if we have a hovered UI control, clamp clicks within its rect and direct them straight to it
-      ofVec2f controlClickPos(GetMouseX(gHoveredUIControl->GetModuleParent()->GetOwningContainer()), GetMouseY(gHoveredUIControl->GetModuleParent()->GetOwningContainer()));
+      ofVec2f controlClickPos(GetMouseX(hoveredUIControlModuleParent->GetOwningContainer()), GetMouseY(hoveredUIControlModuleParent->GetOwningContainer()));
       controlClickPos -= gHoveredUIControl->GetParent()->GetPosition();
 
       ofRectangle controlRect = gHoveredUIControl->GetRect(K(local));
       controlClickPos.x = std::clamp(controlClickPos.x, controlRect.getMinX(), controlRect.getMaxX());
       controlClickPos.y = std::clamp(controlClickPos.y, controlRect.getMinY(), controlRect.getMaxY());
 
-      if (gHoveredUIControl->GetModuleParent() != TheTitleBar)
-         mLastClickedModule = gHoveredUIControl->GetModuleParent();
+      if (hoveredUIControlModuleParent != TheTitleBar)
+         mLastClickedModule = hoveredUIControlModuleParent;
 
       gHoveredUIControl->TestClick(controlClickPos.x, controlClickPos.y, rightButton);
    }
@@ -1980,8 +1991,8 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
       }
    }
 
-   mModuleContainer.MouseReleased();
    mUILayerModuleContainer.MouseReleased();
+   mModuleContainer.MouseReleased();
 
    if (mHeldSample)
    {
@@ -3349,7 +3360,7 @@ void ModularSynth::SaveOutput()
    bool b1{ false };
    auto writer = std::unique_ptr<juce::AudioFormatWriter>(wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, 16, b1, 0));
 
-   long long samplesRemaining = mRecordingLength;
+   int samplesRemaining = mRecordingLength;
    const int chunkSize = 256;
    float leftChannel[chunkSize];
    float rightChannel[chunkSize];

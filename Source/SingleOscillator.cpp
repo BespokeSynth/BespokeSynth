@@ -54,7 +54,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mPhaseOffset = 0;
    mVoiceParams.mUnison = 1;
    mVoiceParams.mUnisonWidth = 0;
-   mVoiceParams.mVelToVolume = .5f;
+   mVoiceParams.mVelToVolume = 1.0f;
    mVoiceParams.mVelToEnvelope = 0;
    mVoiceParams.mSoften = 0;
    mVoiceParams.mLiteCPUMode = false;
@@ -111,8 +111,8 @@ void SingleOscillator::CreateUIControls()
    FLOATSLIDER(mFilterCutoffMaxSlider, "fmax", &mVoiceParams.mFilterCutoffMax, 10, SINGLEOSCILLATOR_NO_CUTOFF);
    FLOATSLIDER(mFilterCutoffMinSlider, "fmin", &mVoiceParams.mFilterCutoffMin, 10, SINGLEOSCILLATOR_NO_CUTOFF);
    FLOATSLIDER_DIGITS(mFilterQSlider, "q", &mVoiceParams.mFilterQ, .1, 20, 3);
-   FLOATSLIDER(mVelToVolumeSlider, "vel2vol", &mVoiceParams.mVelToVolume, 0, 1);
-   FLOATSLIDER(mVelToEnvelopeSlider, "vel2env", &mVoiceParams.mVelToEnvelope, -1, 1);
+   FLOATSLIDER(mVelToVolumeSlider, "vel2vol", &mVoiceParams.mVelToVolume, 0, 2);
+   FLOATSLIDER(mVelToEnvelopeSlider, "vel2env", &mVoiceParams.mVelToEnvelope, -1, 2);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
    mHeight = MAX(height, mHeight);
@@ -187,35 +187,34 @@ void SingleOscillator::Process(double time)
    }
 }
 
-void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void SingleOscillator::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget())
+   if (!NoteInputBuffer::IsTimeWithinFrame(note.time) && GetTarget())
    {
-      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      mNoteInputBuffer.QueueNote(note);
       return;
    }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
-      float adsrScale = SingleOscillatorVoice::GetADSRScale(velocity / 127.0f, mVoiceParams.mVelToEnvelope);
-      mVoiceParams.mAdsr.Start(time, 1, adsrScale); //for visualization
-      mVoiceParams.mFilterAdsr.Start(time, 1, adsrScale); //for visualization
+      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      mVoiceParams.mAdsr.Start(note.time, 1); //for visualization
+      mVoiceParams.mFilterAdsr.Start(note.time, 1); //for visualization
    }
    else
    {
-      mPolyMgr.Stop(time, pitch, voiceIdx);
-      mVoiceParams.mAdsr.Stop(time, false); //for visualization
-      mVoiceParams.mFilterAdsr.Stop(time, false); //for visualization
+      mPolyMgr.Stop(note.time, note.pitch, note.voiceIdx);
+      mVoiceParams.mAdsr.Stop(note.time, false); //for visualization
+      mVoiceParams.mFilterAdsr.Stop(note.time, false); //for visualization
    }
 
    if (mDrawDebug)
    {
-      mDebugLines[mDebugLinesPos].text = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
-      if (velocity > 0)
+      mDebugLines[mDebugLinesPos].text = "PlayNote(" + ofToString(note.time / 1000) + ", " + ofToString(note.pitch) + ", " + ofToString(note.velocity) + ", " + ofToString(note.voiceIdx) + ")";
+      if (note.velocity > 0)
          mDebugLines[mDebugLinesPos].color = ofColor::lime;
       else
          mDebugLines[mDebugLinesPos].color = ofColor::red;
@@ -372,8 +371,9 @@ void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal, double ti
          mVoiceParams.mMult = mMult;
       else if (mMult == -1) //-1 is special case for 1.5
          mVoiceParams.mMult = 1.5f;
-      else //other negative numbers mean 1/-x
+      else if (mMult < 0) //other negative numbers mean 1/-x
          mVoiceParams.mMult = -1.0f / mMult;
+      // If (mMult == 0) we ignore it; It can become 0 through modulation or the snapshots blending.
    }
    if (list == mOscSelector)
       mDrawOsc.SetType(mVoiceParams.mOscType);

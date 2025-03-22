@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <climits>
 #include "IUIControl.h"
 #include "SynthGlobals.h"
@@ -71,6 +70,7 @@ public:
    const char* GetText() const { return mString; }
    TextEntryType GetTextEntryType() const { return mType; }
    void SetText(std::string text);
+   void SelectAll();
 
    void GetDimensions(float& width, float& height) override;
 
@@ -102,7 +102,6 @@ private:
    void AcceptEntry(bool pressedEnter) override;
    void CancelEntry() override;
    void MoveCaret(int pos, bool allowSelection = true);
-   void SelectAll();
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 

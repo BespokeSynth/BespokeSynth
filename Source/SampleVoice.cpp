@@ -24,11 +24,11 @@
 //
 
 #include "SampleVoice.h"
-#include "EnvOscillator.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "Profiler.h"
 #include "ChannelBuffer.h"
+#include "Sample.h"
 
 SampleVoice::SampleVoice(IDrawableModule* owner)
 : mOwner(owner)
@@ -49,8 +49,8 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
    PROFILER(SampleVoice);
 
    if (IsDone(time) ||
-       mVoiceParams->mSampleData == nullptr ||
-       mVoiceParams->mSampleLength == 0)
+       mVoiceParams->mSample == nullptr ||
+       mVoiceParams->mSample->Data() == nullptr)
       return false;
 
    float volSq = mVoiceParams->mVol * mVoiceParams->mVol;
@@ -60,28 +60,36 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
       if (mOwner)
          mOwner->ComputeSliders(pos);
 
-      if (mPos <= mVoiceParams->mSampleLength || mVoiceParams->mLoop)
+      int stopSample = mVoiceParams->mSample->LengthInSamples();
+      if (mVoiceParams->mStopSample != -1)
+         stopSample = mVoiceParams->mStopSample;
+
+      int jumpFrom = -1;
+      int jumpTo = -1;
+      bool isSustaining = !mAdsr.IsDone(time);
+      if (isSustaining && mVoiceParams->mSustainLoopStart != -1 && mVoiceParams->mSustainLoopEnd != -1)
+      {
+         jumpFrom = mVoiceParams->mSustainLoopEnd;
+         jumpTo = mVoiceParams->mSustainLoopStart;
+      }
+
+      if (mPos <= stopSample)
       {
          float freq = TheScale->PitchToFreq(GetPitch(pos));
-         float speed;
-         if (mVoiceParams->mDetectedFreq != -1)
-            speed = freq / mVoiceParams->mDetectedFreq;
-         else
-            speed = freq / TheScale->PitchToFreq(TheScale->ScaleRoot() + 48);
+         float speed = freq / TheScale->PitchToFreq(mVoiceParams->mSamplePitch);
 
-         float sample = GetInterpolatedSample(mPos, mVoiceParams->mSampleData, mVoiceParams->mSampleLength) * mAdsr.Value(time) * volSq;
-
-         if (out->NumActiveChannels() == 1)
+         for (int i = 0; i < 2; ++i)
          {
-            out->GetChannel(0)[pos] += sample;
-         }
-         else
-         {
-            out->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
-            out->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
+            int ch = MIN(i, mVoiceParams->mSample->Data()->NumActiveChannels() - 1);
+            float sample = GetInterpolatedSample(mPos, mVoiceParams->mSample->Data()->GetChannel(ch), mVoiceParams->mSample->LengthInSamples()) * mAdsr.Value(time) * volSq;
+            float pan = i == 0 ? GetLeftPanGain(GetPan()) : GetRightPanGain(GetPan());
+            out->GetChannel(i)[pos] += sample * pan;
          }
 
          mPos += speed;
+
+         if (jumpFrom != -1 && mPos >= jumpFrom)
+            mPos += (jumpTo - jumpFrom);
       }
 
       time += gInvSampleRateMs;
@@ -92,7 +100,7 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
 void SampleVoice::Start(double time, float target)
 {
-   mPos = 0;
+   mPos = mVoiceParams->mStartSample;
    mAdsr.Start(time, target, mVoiceParams->mAdsr);
 }
 

@@ -27,15 +27,11 @@
 #include "INoteSource.h"
 #include "ModularSynth.h"
 
-void NoteOutputQueue::QueuePlayNote(NoteOutput* target, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteOutputQueue::QueuePlayNote(NoteOutput* target, NoteMessage note)
 {
    PendingNoteOutput output;
    output.target = target;
-   output.time = time;
-   output.pitch = pitch;
-   output.velocity = velocity;
-   output.voiceIdx = voiceIdx;
-   output.modulation = modulation;
+   output.note = note;
    mQueue.enqueue(output);
 }
 
@@ -44,7 +40,7 @@ void NoteOutputQueue::QueueFlush(NoteOutput* target, double time)
    PendingNoteOutput output;
    output.target = target;
    output.isFlush = true;
-   output.time = time;
+   output.note.time = time;
    mQueue.enqueue(output);
 }
 
@@ -61,12 +57,12 @@ void NoteOutputQueue::Process()
 
       if (output.isFlush)
       {
-         output.target->Flush(output.time);
+         output.target->Flush(output.note.time);
       }
       else
       {
          //ofLog() << "playing queued note " << output.time << " " << output.pitch << " " << output.velocity << " " << gTime;
-         output.target->PlayNoteInternal(output.time, output.pitch, output.velocity, output.voiceIdx, output.modulation, false);
+         output.target->PlayNoteInternal(output.note, false);
       }
    }
 }

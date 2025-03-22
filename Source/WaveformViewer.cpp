@@ -185,13 +185,13 @@ void WaveformViewer::DrawModule()
    mDoubleBufferFlip = !mDoubleBufferFlip;
 }
 
-void WaveformViewer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void WaveformViewer::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      float floatPitch = pitch;
-      if (modulation.pitchBend != nullptr)
-         floatPitch += modulation.pitchBend->GetValue(0);
+      float floatPitch = note.pitch;
+      if (note.modulation.pitchBend != nullptr)
+         floatPitch += note.modulation.pitchBend->GetValue(0);
       mDisplayFreq = TheScale->PitchToFreq(floatPitch);
    }
 }

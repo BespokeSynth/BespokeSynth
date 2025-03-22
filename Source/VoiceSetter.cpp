@@ -47,11 +47,10 @@ void VoiceSetter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
       mNoteOutput.Flush(time);
 }
 
-void VoiceSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VoiceSetter::PlayNote(NoteMessage note)
 {
-   voiceIdx = mVoiceIdx;
-
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   note.voiceIdx = mVoiceIdx;
+   PlayNoteOutput(note);
 }
 
 void VoiceSetter::LoadLayout(const ofxJSONElement& moduleInfo)

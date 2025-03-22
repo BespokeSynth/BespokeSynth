@@ -68,20 +68,22 @@ void NoteEcho::DrawModule()
       mDelaySlider[i]->Draw();
 }
 
-void NoteEcho::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteEcho::PlayNote(NoteMessage note)
 {
    ComputeSliders(0);
 
    for (int i = 0; i < kMaxDestinations; ++i)
    {
       double delayMs = mDelay[i] / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
-      SendNoteToIndex(i, time + delayMs, pitch, velocity, voiceIdx, modulation);
+      NoteMessage delayedNote = note.MakeClone();
+      delayedNote.time += delayMs;
+      SendNoteToIndex(i, delayedNote);
    }
 }
 
-void NoteEcho::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteEcho::SendNoteToIndex(int index, NoteMessage note)
 {
-   mDestinationCables[index]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   mDestinationCables[index]->PlayNoteOutput(note);
 }
 
 void NoteEcho::SendCC(int control, int value, int voiceIdx)
