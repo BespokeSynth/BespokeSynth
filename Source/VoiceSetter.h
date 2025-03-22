@@ -44,9 +44,6 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
 
-   bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
-
    bool IsEnabled() const override { return true; }
 
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
