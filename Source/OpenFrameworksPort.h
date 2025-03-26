@@ -398,7 +398,7 @@ T ofLerp(T start, T stop, T amt)
 template <class T, class T1, class T2>
 T ofLerp(T start, T1 stop, T2 amt)
 {
-   return ofLerp(start, static_cast<T>(stop), static_cast<T>(amt));
+   return ofLerp(start, static_cast<T>(stop), amt);
 }
 
 template <class T>
