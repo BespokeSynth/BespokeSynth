@@ -167,10 +167,8 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(double& width, double& height) override;
-   void OnClicked(double x, double y, bool right) override;
 
    std::array<DrumSynthHit*, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mHits;
-   std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity{};
 
    double mVolume{ 1 };
    FloatSlider* mVolSlider{ nullptr };

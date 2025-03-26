@@ -59,7 +59,7 @@ void MultitapDelay::CreateUIControls()
 
    for (int i = 0; i < mNumTaps; ++i)
    {
-      float y = mBufferY + mBufferH + 10 + i * 100;
+      double y = mBufferY + mBufferH + 10 + i * 100;
       mTaps[i].mDelayMsSlider = new FloatSlider(this, ("delay " + ofToString(i + 1)).c_str(), 10, y, 150, 15, &mTaps[i].mDelayMs, gBufferSize / gSampleRateMs, mDelayBuffer.Size() / gSampleRateMs);
       mTaps[i].mGainSlider = new FloatSlider(this, ("gain " + ofToString(i + 1)).c_str(), mTaps[i].mDelayMsSlider, kAnchor_Below, 150, 15, &mTaps[i].mGain, 0, 1);
       mTaps[i].mFeedbackSlider = new FloatSlider(this, ("feedback " + ofToString(i + 1)).c_str(), mTaps[i].mGainSlider, kAnchor_Below, 150, 15, &mTaps[i].mFeedback, 0, 1);

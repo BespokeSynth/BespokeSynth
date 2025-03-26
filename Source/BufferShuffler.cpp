@@ -114,7 +114,7 @@ void BufferShuffler::Process(double time)
             mQueuedPlaybackStyle = PlaybackStyle::None;
             if (GetSlicePlaybackRate() < 0)
                slicePosIndex += 1;
-            float slicePos = (slicePosIndex % numSlices) / (float)numSlices;
+            double slicePos = (slicePosIndex % numSlices) / static_cast<double>(numSlices);
             mPlaybackSampleIndex = int(GetLengthInSamples() * slicePos);
             mPlaybackSampleStartTime = -1;
             mSwitchAndRamp.StartSwitch();

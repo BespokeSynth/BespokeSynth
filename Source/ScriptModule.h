@@ -338,7 +338,7 @@ private:
    double mWidth{ 750 };
    double mHeight{ 335 };
    ofVec2d mScrollOffset;
-   float mMaxScrollAmount{ 0 };
+   double mMaxScrollAmount{ 0 };
 };
 
 

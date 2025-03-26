@@ -168,7 +168,7 @@ void BassLineSequencer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   float displayWidth = GetDisplayWidth();
+   double displayWidth = GetDisplayWidth();
 
    ofPushMatrix();
    ofTranslate(kDisplayX, mNoteDisplayY);
@@ -176,7 +176,7 @@ void BassLineSequencer::DrawModule()
    ofFill();
    ofSetColor(100, 100, 100, 0.5f * gModuleDrawAlpha);
    ofRect(0, 0, displayWidth, kDisplayHeight);
-   float noteWidth = displayWidth / mLength;
+   double noteWidth = displayWidth / mLength;
    for (int i = 0; i < mLength; ++i)
    {
       if (i % 2 == 0)
@@ -189,17 +189,17 @@ void BassLineSequencer::DrawModule()
       }
    }
 
-   float toneHeight = kDisplayHeight / mNoteRange;
+   double toneHeight = kDisplayHeight / mNoteRange;
    /*ofSetColor(255, 255, 255, gModuleDrawAlpha * .2f);
    ofSetLineWidth(0.5f);
    for (int i = 1; i < toneRange; ++i)
       ofLine(0, toneHeight * i, displayWidth, toneHeight * i);*/
 
-   float noteHeight = kDisplayHeight / mNoteRange;
-   float lineWidth = MIN(noteHeight, 5);
+   double noteHeight = kDisplayHeight / mNoteRange;
+   double lineWidth = MIN(noteHeight, 5);
    ofPushStyle();
    ofSetLineWidth(lineWidth);
-   float playingVelocity = mSteps[0].mVelocity;
+   double playingVelocity = mSteps[0].mVelocity;
    for (int i = 0; i < mLength; ++i)
    {
       if (mSteps[i].mVelocity > 0)
@@ -217,7 +217,7 @@ void BassLineSequencer::DrawModule()
          {
             playingVelocity = mSteps[i].mVelocity;
 
-            ofVec2f center = GetNoteDrawPos(i, displayWidth, kDisplayHeight, lineWidth, false);
+            ofVec2d center = GetNoteDrawPos(i, displayWidth, kDisplayHeight, lineWidth, false);
             if (playingVelocity > kVelocityNormal)
             {
                ofSetColor(255, 255, 255, gModuleDrawAlpha);
@@ -255,15 +255,15 @@ void BassLineSequencer::DrawModule()
    int numNotesOnPage = mNumVisibleStepControls;
    if (mEditPage == GetPageCount() - 1 && mLength % mNumVisibleStepControls != 0)
       numNotesOnPage = mLength % mNumVisibleStepControls;
-   float editX = kDisplayX + mEditPage * mNumVisibleStepControls * noteWidth;
-   float editW = numNotesOnPage * noteWidth;
-   ofSetLineWidth(0.5f);
+   double editX = kDisplayX + mEditPage * mNumVisibleStepControls * noteWidth;
+   double editW = numNotesOnPage * noteWidth;
+   ofSetLineWidth(0.5);
    ofRect(editX, mNoteDisplayY, editW, kDisplayHeight);
    if (mEditStepControl != -1)
    {
       ofPushStyle();
       ofSetColor(255, 255, 255, gModuleDrawAlpha * ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2f, .8f));
-      float editStepControlX = kDisplayX + (mEditPage * mNumVisibleStepControls + mEditStepControl) * noteWidth;
+      double editStepControlX = kDisplayX + (mEditPage * mNumVisibleStepControls + mEditStepControl) * noteWidth;
       ofRect(editStepControlX + 1, mNoteDisplayY + 1, noteWidth - 2, kDisplayHeight - 2);
       ofPopStyle();
    }

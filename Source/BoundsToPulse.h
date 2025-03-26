@@ -51,7 +51,7 @@ public:
 
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
-   float GetValue() const { return mValue; }
+   double GetValue() const { return mValue; }
    FloatSlider* GetSlider() { return mSlider; }
 
 private:

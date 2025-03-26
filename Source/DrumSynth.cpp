@@ -94,7 +94,7 @@ void DrumSynth::Process(double time)
       sampleRate *= oversampling;
    }
 
-   float volSq = mVolume * mVolume;
+   double volSq = mVolume * mVolume;
 
    if (mUseIndividualOuts)
    {
@@ -161,30 +161,6 @@ void DrumSynth::PlayNote(NoteMessage note)
    {
       if (note.velocity > 0)
          mHits[note.pitch]->Play(note.time, note.velocity / 127.0);
-   }
-}
-
-void DrumSynth::OnClicked(double x, double y, bool right)
-{
-   IDrawableModule::OnClicked(x, y, right);
-
-   if (right)
-      return;
-
-   x -= 5;
-   y -= kPadYOffset;
-   if (x < 0 || y < 0)
-      return;
-   x /= DRUMSYNTH_PAD_WIDTH;
-   y /= DRUMSYNTH_PAD_HEIGHT;
-   if (x < DRUMSYNTH_PADS_HORIZONTAL && y < DRUMSYNTH_PADS_VERTICAL)
-   {
-      int sampleIdx = GetAssociatedSampleIndex(x, y);
-      if (sampleIdx != -1)
-      {
-         //mHits[sampleIdx]->Play(gTime);
-         //mVelocity[sampleIdx] = 1;
-      }
    }
 }
 

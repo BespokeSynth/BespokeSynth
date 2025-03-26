@@ -105,7 +105,7 @@ private:
    void SetIndex(int i, double time);
    void CalcSliderVal();
    void UpdateDimensions();
-   void SetValueDirect(float value, double time, bool forceUpdate);
+   void SetValueDirect(double value, double time, bool forceUpdate);
 
    void OnClicked(double x, double y, bool right) override;
 

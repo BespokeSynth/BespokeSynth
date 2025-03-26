@@ -149,7 +149,7 @@ private:
    {
       ClickButton* mStoreButton{ nullptr };
       ClickButton* mLoadButton{ nullptr };
-      float mNumMeasures{ 1 };
+      int mNumMeasures{ 1 };
       std::array<double, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
       bool mHasSequence{ false };
    };

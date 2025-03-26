@@ -144,11 +144,11 @@ void SampleCanvas::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
-   /*float canvasX,canvasY;
+   /*double canvasX,canvasY;
    mCanvas->GetPosition(canvasX, canvasY, true);
    if (y >= 0 && y < canvasY)
    {
-      float pos = float(x - canvasX)/mCanvas->GetWidth() * mCanvas->GetNumCols();
+      double pos = double(x - canvasX)/mCanvas->GetWidth() * mCanvas->GetNumCols();
       TheTransport->SetMeasureTime(pos);
    }*/
 }

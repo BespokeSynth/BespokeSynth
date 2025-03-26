@@ -157,7 +157,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
 
    // Considering each played note as a possible root, find the root and chord with the greatest weight
 
-   float maxWeight = 0.0f;
+   double maxWeight = 0.0;
    int lowestPitch = pitches[0] % 12;
 
    std::list<std::tuple<int, ChordShape>> bestChords; // Is this cursed?
@@ -168,7 +168,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
       // Try note as the root, multiply with the weights of the notes to be played
       for (auto& shape : mChordShapes)
       {
-         float chordWeight = shape.mWeightSum;
+         double chordWeight = shape.mWeightSum;
 
          // Add some extra weight if the lowest played note is the root
          chordWeight += rootOctavePitch == lowestPitch ? shape.mRootPosBias : 0;
@@ -177,7 +177,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
          for (auto& octavePitch : octavePitches)
          {
             // Looping over the same stuff within the same loop, crazy!
-            chordWeight += 2.0f * shape.mWeights[(12 + octavePitch - rootOctavePitch) % 12];
+            chordWeight += 2.0 * shape.mWeights[(12 + octavePitch - rootOctavePitch) % 12];
          }
 
          // Consider the chords with the highest weight as the best fit

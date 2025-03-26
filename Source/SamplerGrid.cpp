@@ -104,14 +104,14 @@ void SamplerGrid::Process(double time)
 
    Clear(gWorkBuffer, gBufferSize);
 
-   float volSq = mVolume * mVolume;
+   double volSq = mVolume * mVolume;
 
    for (int i = 0; i < gBufferSize; ++i)
    {
       for (int j = 0; j < mRows * mCols; ++j)
       {
          GridSample& sample = mGridSamples[j];
-         float rampVal = sample.mRamp.Value(time);
+         double rampVal = sample.mRamp.Value(time);
          if (rampVal > 0 && sample.mPlayhead < sample.mSampleEnd)
          {
             gWorkBuffer[i] += sample.mSampleData[sample.mPlayhead] * rampVal * volSq;

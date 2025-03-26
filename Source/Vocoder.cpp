@@ -158,7 +158,7 @@ void Vocoder::Process(double time)
 
       //cartesian to polar
       double amp = 2. * sqrt(real * real + imag * imag);
-      //float phase = atan2(imag,real);
+      //double phase = atan2(imag,real);
 
       double carrierReal = mCarrierFFTData.mRealValues[i];
       double carrierImag = mCarrierFFTData.mImaginaryValues[i];

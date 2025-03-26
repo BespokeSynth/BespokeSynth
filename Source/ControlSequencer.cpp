@@ -425,11 +425,11 @@ void ControlSequencer::LoadState(FileStreamIn& in, int rev)
    if (mLoadRev == 0)
    {
       //port old data
-      float len = 0;
+      double len = 0;
       if (mOldLengthStr == "4n")
-         len = .25f;
+         len = .25;
       if (mOldLengthStr == "2n")
-         len = .5f;
+         len = .5;
       if (mOldLengthStr == "1")
          len = 1;
       if (mOldLengthStr == "2")

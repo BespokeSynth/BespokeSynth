@@ -332,7 +332,7 @@ void RadioButton::SetValueDirect(double value, double time)
    SetValueDirect(value, time, false);
 }
 
-void RadioButton::SetValueDirect(float value, double time, bool forceUpdate)
+void RadioButton::SetValueDirect(double value, double time, bool forceUpdate)
 {
    int oldVal = *mVar;
 

@@ -115,7 +115,7 @@ void BiquadFilterEffect::DrawModule()
    mQSlider->Draw();
    mGSlider->Draw();
 
-   auto FreqForPos = [](float pos)
+   auto FreqForPos = [](double pos)
    {
       return 20.0 * std::pow(2.0, pos * 10);
    };

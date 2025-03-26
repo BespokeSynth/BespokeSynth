@@ -952,9 +952,9 @@ void VSTPlugin::PreDrawModule()
       {
          mOverlayWidth = 500;
          mOverlayHeight = 500;
-         float contentMult = gDrawScale;
-         float width = mOverlayWidth * contentMult;
-         float height = mOverlayHeight * contentMult;
+         double contentMult = gDrawScale;
+         double width = mOverlayWidth * contentMult;
+         double height = mOverlayHeight * contentMult;
          mWindow->setSize(width, height);
       }
       mWindowOverlay->UpdatePosition(this);
@@ -1125,6 +1125,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
                if (mParameterSliders[i].mShowing)
                   exposedParams.push_back(i);
             }
+
             output.writeInt((int)exposedParams.size());
             for (auto& i : exposedParams)
                output.writeInt(i);

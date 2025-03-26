@@ -157,7 +157,7 @@ private:
    bool MouseMoved(double x, double y) override;
 
    bool HiddenByZoom() const;
-   float GetPixelWidth() const;
+   double GetPixelWidth() const;
 
    ClickButton* mPlayPauseButton{ nullptr };
    ClickButton* mSaveLayoutButton{ nullptr };

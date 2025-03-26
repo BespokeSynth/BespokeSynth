@@ -450,7 +450,7 @@ private:
    INonstandardController* mNonstandardController{ nullptr };
    bool mIsConnected{ false };
    bool mHasCreatedConnectionUIControls{ false };
-   float mReconnectWaitTimer{ 0 };
+   double mReconnectWaitTimer{ 0 };
    ChannelFilter mChannelFilter{ ChannelFilter::kAny };
    std::string mLastLoadedLayoutFile;
    ofxJSONElement mLayoutData;

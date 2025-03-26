@@ -490,7 +490,7 @@ void Looper::ProcessBeatwheel(double time, int sampleIdx)
 {
    bool bothHeld = false;
    bool noneHeld = false;
-   float clockPos = 0;
+   double clockPos = 0;
    if (mBeatwheelDepthRight > 0 && mBeatwheelDepthLeft > 0 &&
        mBeatwheelPosRight >= 0 && mBeatwheelPosLeft >= 0)
    {
@@ -962,7 +962,7 @@ void Looper::CopyBuffer(Looper* sourceLooper)
    mNumBars = sourceLooper->mNumBars;
 }
 
-void Looper::Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float offsetMs)
+void Looper::Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, double offsetMs)
 {
    if (mRecorder)
    {

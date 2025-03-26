@@ -158,7 +158,7 @@ void Transport::Advance(double ms)
    }
 }
 
-float QuadraticBezier(float x, float a, float b)
+float QuadraticBezier(float x, float a, float b) //TODO(Noxy) Unused? Update to double? Template?
 {
    // adapted from BEZMATH.PS (1993)
    // by Don Lancaster, SYNERGETICS Inc.

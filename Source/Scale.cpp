@@ -215,12 +215,12 @@ double Scale::PitchToFreq(double pitch)
          {
             referencePitch += mPitchesPerOctave;
          }while (referencePitch < mReferencePitch && abs(referencePitch - mReferencePitch) > mPitchesPerOctave);
-         float referenceFreq = Pow2((referencePitch-mReferencePitch)/mPitchesPerOctave)*mReferenceFreq;
+         double referenceFreq = Pow2((referencePitch-mReferencePitch)/mPitchesPerOctave)*mReferenceFreq;
          
          int intPitch = (int)pitch;
-         float remainder = pitch - intPitch;
-         float ratio1 = RationalizeNumber(Pow2(float(intPitch-referencePitch)/mPitchesPerOctave));
-         float ratio2 = RationalizeNumber(Pow2(float((intPitch+1)-referencePitch)/mPitchesPerOctave));
+         double remainder = pitch - intPitch;
+         double ratio1 = RationalizeNumber(Pow2(static_cast<double>(intPitch - referencePitch)/mPitchesPerOctave));
+         double ratio2 = RationalizeNumber(Pow2(static_cast<double>((intPitch + 1) - referencePitch)/mPitchesPerOctave));
          return ofLerp(ratio1,ratio2,remainder)*referenceFreq;
       }*/
       case kIntonation_Pythagorean:

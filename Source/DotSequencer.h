@@ -79,7 +79,7 @@ private:
    bool IsResizable() const override { return true; }
    void Resize(double w, double h) override;
 
-   void OnStep(double time, float velocity, int flags);
+   void OnStep(double time, double velocity, int flags);
    int RowToPitch(int row) const;
 
    enum class NoteMode

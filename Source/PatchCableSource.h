@@ -122,7 +122,7 @@ public:
    void ClearTypeFilter() { mTypeFilter.clear(); }
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
-   bool TestHover(float x, float y) const;
+   bool TestHover(double x, double y) const;
    void SetOverrideCableDir(ofVec2d dir, Side side)
    {
       mHasOverrideCableDir = true;
@@ -173,7 +173,7 @@ protected:
 
 private:
    bool InAddCableMode() const;
-   int GetHoverIndex(float x, float y) const;
+   int GetHoverIndex(double x, double y) const;
 
    std::vector<PatchCable*> mPatchCables;
    int mHoverIndex{ -1 }; //-1 = not hovered

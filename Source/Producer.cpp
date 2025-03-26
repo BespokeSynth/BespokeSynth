@@ -95,7 +95,7 @@ void Producer::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   float volSq = mVolume * mVolume;
+   double volSq = mVolume * mVolume;
 
    const float* data = mSample->Data()->GetChannel(0);
    int numSamples = mSample->LengthInSamples();
@@ -238,7 +238,7 @@ int Producer::GetMeasureSample(int measure)
    return mStartOffset + measure * GetSamplesPerMeasure();
 }
 
-float Producer::GetBufferPos(int sample)
+double Producer::GetBufferPos(int sample)
 {
    return (sample - mZoomStart) / (mZoomEnd - mZoomStart);
 }

@@ -74,14 +74,14 @@ void GridSliders::Poll()
       {
          GridColor color = GridColor::kGridColorOff;
 
-         float value = 0;
+         double value = 0;
          if (mControlCables[i]->GetTarget())
             value = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget())->GetMidiValue();
 
          for (int j = 0; j < length; ++j)
          {
-            float squareValue = j / float(length - 1);
-            if (squareValue <= value + .01f)
+            double squareValue = j / static_cast<double>(length - 1);
+            if (squareValue <= value + .01)
                color = GridColor::kGridColor1Bright;
             else
                color = GridColor::kGridColorOff;

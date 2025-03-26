@@ -51,7 +51,7 @@ public:
    void CreateUIControls() override;
 
    void SetRecording(bool on);
-   float GetLength() const { return mLength; }
+   double GetLength() const { return mLength; }
 
    //IDrawableModule
    void Init() override;

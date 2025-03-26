@@ -564,7 +564,7 @@ bool PatchCableSource::TestClick(double x, double y, bool right, bool testOnly /
    return false;
 }
 
-bool PatchCableSource::TestHover(float x, float y) const
+bool PatchCableSource::TestHover(double x, double y) const
 {
    if (!Enabled())
       return false;
@@ -575,10 +575,10 @@ bool PatchCableSource::TestHover(float x, float y) const
    return GetHoverIndex(x, y) != -1;
 }
 
-int PatchCableSource::GetHoverIndex(float x, float y) const
+int PatchCableSource::GetHoverIndex(double x, double y) const
 {
-   float cableX = mX;
-   float cableY = mY;
+   double cableX = mX;
+   double cableY = mY;
    for (int i = 0; i < mPatchCables.size() || i == 0; ++i)
    {
       if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceClickRadius * kPatchCableSourceClickRadius)

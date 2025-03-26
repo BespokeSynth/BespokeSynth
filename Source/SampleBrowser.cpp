@@ -306,7 +306,7 @@ void SampleBrowser::ShowPage(int page)
 
 int SampleBrowser::GetNumPages() const
 {
-   return MAX((int)ceil((float)mDirectoryListing.size() / mButtons.size()), 1);
+   return MAX((int)ceil(static_cast<double>(mDirectoryListing.size()) / mButtons.size()), 1);
 }
 
 void SampleBrowser::LoadLayout(const ofxJSONElement& moduleInfo)

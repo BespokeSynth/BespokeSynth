@@ -165,9 +165,6 @@ private:
    ClickButton* mRnd3Button{ nullptr };
    ClickButton* mClearButton{ nullptr };
 
-   float mOffset{ 0 };
-   FloatSlider* mOffsetSlider{ nullptr };
-
    double mRndLengthChance{ 0.5 };
    FloatSlider* mRndLengthChanceSlider{ nullptr };
    double mRndLengthLo{ 1 };

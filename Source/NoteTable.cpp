@@ -44,7 +44,7 @@ NoteTable::NoteTable()
 void NoteTable::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   float width, height;
+   double width, height;
    UIBLOCK(140);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, kMaxLength);
    UIBLOCK_SHIFTRIGHT();

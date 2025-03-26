@@ -285,10 +285,10 @@ void QuickSpawnMenu::UpdateDisplay()
          mScrollOffset = 0;
       }
 
-      float width = 150;
+      double width = 150;
       for (auto& element : mElements)
       {
-         float elementWidth = GetStringWidth(element.mLabel + " " + element.mDecorator) + 10 + (mMenuMode == MenuMode::SingleLetter ? 0 : kRightClickShiftX);
+         double elementWidth = GetStringWidth(element.mLabel + " " + element.mDecorator) + 10 + (mMenuMode == MenuMode::SingleLetter ? 0 : kRightClickShiftX);
          if (elementWidth > width)
             width = elementWidth;
       }

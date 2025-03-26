@@ -40,9 +40,9 @@ namespace
 
 Razor::Razor()
 {
-   std::memset(mAmp, 0, sizeof(float) * NUM_PARTIALS);
-   std::memset(mPeakHistory, 0, sizeof(float) * (VIZ_WIDTH + 1) * RAZOR_HISTORY);
-   std::memset(mPhases, 0, sizeof(float) * NUM_PARTIALS);
+   std::memset(mAmp, 0, sizeof(double) * NUM_PARTIALS);
+   std::memset(mPeakHistory, 0, sizeof(double) * (VIZ_WIDTH + 1) * RAZOR_HISTORY);
+   std::memset(mPhases, 0, sizeof(double) * NUM_PARTIALS);
 
    for (int i = 0; i < NUM_PARTIALS; ++i)
       mDetune[i] = 1;
@@ -307,7 +307,7 @@ void Razor::CalcAmp()
    double baseFreq = TheScale->PitchToFreq(mPitch);
    int oscNyquistLimitIdx = int(gNyquistLimit / baseFreq);
 
-   std::memset(mAmp, 0, sizeof(float) * NUM_PARTIALS);
+   std::memset(mAmp, 0, sizeof(double) * NUM_PARTIALS);
    for (int i = 1; i <= mUseNumPartials && i <= oscNyquistLimitIdx; ++i)
    {
       if ((mHarmonicSelector == 0 && IsPrime(i)) ||

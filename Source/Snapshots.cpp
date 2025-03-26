@@ -902,7 +902,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
          in >> snapshotData.mControlPath;
-         if (rev < 4)
+         if (rev < 5)
          {
             float a;
             in >> a;

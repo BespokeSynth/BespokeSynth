@@ -169,7 +169,7 @@ protected:
 private:
    void OnClicked(double x, double y, bool right) override;
    void CalcSliderVal();
-   int FindItemIndex(float val) const;
+   int FindItemIndex(double val) const;
    void CalculateWidth();
    ofVec2d GetModalListPosition() const;
 

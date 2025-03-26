@@ -527,11 +527,11 @@ double DropdownList::GetMidiValue() const
    return mSliderVal;
 }
 
-int DropdownList::FindItemIndex(float val) const
+int DropdownList::FindItemIndex(double val) const
 {
    for (int i = 0; i < mElements.size(); ++i)
    {
-      if (mElements[i].mValue == val)
+      if (ofAlmostEquel(mElements[i].mValue, val))
          return i;
    }
 

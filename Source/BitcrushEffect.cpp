@@ -53,8 +53,8 @@ void BitcrushEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
    ComputeSliders(0);
 
-   float bitDepth = powf(2, 25 - mCrush);
-   float invBitDepth = 1.f / bitDepth;
+   double bitDepth = std::pow(2, 25 - mCrush);
+   double invBitDepth = 1.0 / bitDepth;
 
    for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
    {

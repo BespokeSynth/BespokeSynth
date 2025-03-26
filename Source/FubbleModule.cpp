@@ -210,11 +210,11 @@ void FubbleModule::DrawModule()
    ofSetColor(220,220,220,100);
    int numPoints = mAxisH.mCurve.GetNumPoints();
    const int kMaxDrawPoints = 100;
-   float step = MAX(1, numPoints/kMaxDrawPoints);
-   for (float i=0; int(i)<numPoints; i+=step)
+   double step = MAX(1, numPoints/kMaxDrawPoints);
+   for (double i=0; int(i)<numPoints; i+=step)
    {
-      float x = mAxisH.mCurve.GetPoint(int(i))->mValue * rect.width;
-      float y = (1 - mAxisV.mCurve.GetPoint(int(i))->mValue) * rect.height;
+      double x = mAxisH.mCurve.GetPoint(int(i))->mValue * rect.width;
+      double y = (1 - mAxisV.mCurve.GetPoint(int(i))->mValue) * rect.height;
       //ofRect(x-3,y-3,6,6,0);
       ofCircle(x,y,2.5f);
    }*/

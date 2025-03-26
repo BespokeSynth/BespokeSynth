@@ -75,24 +75,24 @@ void Stutter::ProcessAudio(double time, ChannelBuffer* buffer)
          else
             mStutterLength = int(mStutterLengthRamp.Value(time));
 
-         float offset = mStutterPos;
+         double offset = mStutterPos;
          if (offset > mStutterLength)
             offset -= mStutterLength;
          int pos = int(offset);
          int posNext = int(offset + 1) % mStutterLength;
-         float a = offset - pos;
+         double a = offset - pos;
 
          for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
          {
             float sample = GetStutterSampleWithWraparoundBlend(pos, ch);
             float nextSample = GetStutterSampleWithWraparoundBlend(posNext, ch);
-            float stutterOut = (1 - a) * sample + a * nextSample; //interpolate
+            double stutterOut = (1 - a) * sample + a * nextSample; //interpolate
 
-            float fade = 1;
+            double fade = 1;
             if (mFadeStutter)
                fade -= (offset / mStutterLength) * (offset / mStutterLength);
 
-            float blend = mBlendRamp.Value(time);
+            double blend = mBlendRamp.Value(time);
 
             buffer->GetChannel(ch)[i] = stutterOut * blend * fade + buffer->GetChannel(ch)[i] * (1 - blend);
             buffer->GetChannel(ch)[i] = mJumpBlender[ch].Process(buffer->GetChannel(ch)[i], i);

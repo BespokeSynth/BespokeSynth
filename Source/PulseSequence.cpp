@@ -177,7 +177,7 @@ void PulseSequence::Step(double time, double velocity, int flags)
    if (flags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int numMeasures = ceil(float(mLength) / stepsPerMeasure);
+      int numMeasures = ceil(static_cast<double>(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
       mStep = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
    }

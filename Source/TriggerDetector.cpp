@@ -51,7 +51,7 @@ void TriggerDetector::Process(float sample)
    mHistory.Write(sample, 0);
 }
 
-float TriggerDetector::GetValue()
+double TriggerDetector::GetValue()
 {
    return mHistory.GetSample(1, 0);
 }

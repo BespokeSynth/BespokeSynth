@@ -88,8 +88,8 @@ void Pumper::ProcessAudio(double time, ChannelBuffer* buffer)
    ADSR::EventInfo adsrEvent(0, kAdsrTime);
    adsrEvent.mStartBlendFromValue = 1;
 
-   /*const float smoothingTimeMs = 35;
-   float smoothingOffset = smoothingTimeMs / TheTransport->GetDuration(mInterval);
+   /*const double smoothingTimeMs = 35;
+   double smoothingOffset = smoothingTimeMs / TheTransport->GetDuration(mInterval);
    mLFO.SetOffset(mOffset + smoothingOffset);*/
 
    for (int i = 0; i < bufferSize; ++i)

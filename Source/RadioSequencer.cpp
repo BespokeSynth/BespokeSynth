@@ -98,7 +98,7 @@ void RadioSequencer::OnGridButton(int x, int y, double velocity, IGridController
 {
    if (velocity > 0)
    {
-      float currentVal = mGrid->GetVal(x, y);
+      double currentVal = mGrid->GetVal(x, y);
       mGrid->SetVal(x, y, currentVal > 0 ? 0 : 1);
    }
    UpdateGridLights();
@@ -155,7 +155,7 @@ void RadioSequencer::Step(double time, int pulseFlags)
    if (pulseFlags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int numMeasures = ceil(float(length) / stepsPerMeasure);
+      int numMeasures = ceil(static_cast<double>(length) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
       int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % length;
       mStep = step;

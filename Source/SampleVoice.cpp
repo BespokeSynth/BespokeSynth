@@ -82,7 +82,7 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
          {
             int ch = MIN(i, mVoiceParams->mSample->Data()->NumActiveChannels() - 1);
             float sample = GetInterpolatedSample(mPos, mVoiceParams->mSample->Data()->GetChannel(ch), mVoiceParams->mSample->LengthInSamples()) * mAdsr.Value(time) * volSq;
-            float pan = i == 0 ? GetLeftPanGain(GetPan()) : GetRightPanGain(GetPan());
+            double pan = i == 0 ? GetLeftPanGain(GetPan()) : GetRightPanGain(GetPan());
             out->GetChannel(i)[pos] += sample * pan;
          }
 

@@ -69,12 +69,6 @@ void* operator new[](std::size_t size, const char* file, int line) throw(std::ba
 
 #define USE_VECTOR_OPS
 
-#ifdef BESPOKE_BUFFERTYPE_DOUBLE //@todo(Noxy) Actually make use of this in the many places
-#define BESPOKE_BUFFERTYPE double
-#else
-#define BESPOKE_BUFFERTYPE float
-#endif
-
 //bool labeling technique that I stole from Ableton
 #define K(x) true
 #define L(x, y) y
@@ -107,9 +101,9 @@ extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;
 extern RetinaTrueTypeFont gFontFixedWidth;
 extern double gModuleDrawAlpha;
-extern BESPOKE_BUFFERTYPE gNullBuffer[kWorkBufferSize];
-extern BESPOKE_BUFFERTYPE gZeroBuffer[kWorkBufferSize];
-extern BESPOKE_BUFFERTYPE gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
+extern float gNullBuffer[kWorkBufferSize];
+extern float gZeroBuffer[kWorkBufferSize];
+extern float gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;
 extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;

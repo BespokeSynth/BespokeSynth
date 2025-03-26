@@ -195,9 +195,9 @@ void KeyboardDisplay::RefreshOctaveCount()
 {
    if (mForceNumOctaves == 0)
    {
-      float ratio = mWidth / mHeight;
+      double ratio = mWidth / mHeight;
 
-      constexpr float baseRatioForOneElement = 250.0f / 180.0f;
+      constexpr double baseRatioForOneElement = 250.0 / 180.0;
 
       int elements = static_cast<int>(ratio / baseRatioForOneElement);
 

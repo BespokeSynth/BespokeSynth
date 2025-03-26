@@ -44,7 +44,7 @@ ControlRecorder::~ControlRecorder()
 void ControlRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   float controlH;
+   double controlH;
    UIBLOCK0();
    CHECKBOX(mRecordCheckbox, "record", &mRecord);
    UIBLOCK_SHIFTRIGHT();
@@ -91,7 +91,7 @@ void ControlRecorder::Poll()
 
 double ControlRecorder::GetPlaybackTime(double time)
 {
-   float measureTime = TheTransport->GetMeasureTime(time) - mRecordStartOffset;
+   double measureTime = TheTransport->GetMeasureTime(time) - mRecordStartOffset;
    if (!mQuantizeLength)
       measureTime *= mSpeed;
 

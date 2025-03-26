@@ -159,7 +159,7 @@ void DotSequencer::OnTimeEvent(double time)
    OnStep(time, 1, 0);
 }
 
-void DotSequencer::OnStep(double time, float velocity, int flags)
+void DotSequencer::OnStep(double time, double velocity, int flags)
 {
    if (mEnabled)
    {

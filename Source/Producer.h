@@ -83,7 +83,7 @@ private:
    void DoWrite();
    void UpdateZoomExtents();
    int GetMeasureSample(int measure);
-   float GetBufferPos(int sample);
+   double GetBufferPos(int sample);
    int GetMeasureForSample(int sample);
    int GetSamplesPerMeasure();
    bool IsSkipMeasure(int measure);

@@ -218,7 +218,7 @@ private:
    {
       std::string name;
       std::string channel;
-      float lengthSeconds{ 0 };
+      double lengthSeconds{ 0 };
       std::string youtubeId;
    };
    RunningProcessType mRunningProcessType{ RunningProcessType::None };

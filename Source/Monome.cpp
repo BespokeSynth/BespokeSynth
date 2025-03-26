@@ -126,7 +126,7 @@ void Monome::Poll()
          ++updatedLightCount;
       }
 
-      static float kRateLimit = 8;
+      static int kRateLimit = 8;
       if (updatedLightCount > kRateLimit)
          break;
    }

@@ -324,10 +324,10 @@ bool TitleBar::MouseMoved(double x, double y)
 
 namespace
 {
-   const float kDoubleHeightThreshold = 1200;
+   const double kDoubleHeightThreshold = 1200;
 }
 
-float TitleBar::GetPixelWidth() const
+double TitleBar::GetPixelWidth() const
 {
    return ofGetWidth() / GetOwningContainer()->GetDrawScale();
 }

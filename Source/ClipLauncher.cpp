@@ -225,7 +225,7 @@ void ClipLauncher::RecalcPos(double time, int idx)
 
    if (sample)
    {
-      float measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
+      double measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
       int pos = ofMap(measurePos / numBars, 0, 1, 0, sample->LengthInSamples(), true);
       sample->SetPlayPosition(pos);
    }

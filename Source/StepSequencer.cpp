@@ -212,7 +212,7 @@ GridColor StepSequencer::GetGridColor(int x, int y)
    if (gridPos.x >= GetNumSteps(mStepInterval, mNumMeasures))
       return kGridColorOff;
 
-   float val = mGrid->GetVal(gridPos.x, gridPos.y);
+   double val = mGrid->GetVal(gridPos.x, gridPos.y);
    bool cellOn = val > 0;
    bool cellDim = val > 0 && val <= kVelocityGhost;
    bool cellBright = val > kVelocityNormal;
@@ -864,7 +864,7 @@ void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
       mGrid->SetGrid(GetNumSteps(mStepInterval, mNumMeasures), mNumRows);
       if (mNumMeasures > oldVal)
       {
-         int newChunkCount = ceil(float(mNumMeasures) / oldVal);
+         int newChunkCount = ceil(static_cast<double>(mNumMeasures) / oldVal);
          int stepsPerChunk = GetNumSteps(mStepInterval, oldVal);
          for (int chunk = 1; chunk < newChunkCount; ++chunk)
          {
@@ -926,7 +926,7 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
       {
          for (int j = 0; j < newNumSteps; ++j)
          {
-            float div = j * ((float)oldNumSteps / newNumSteps);
+            double div = j * (static_cast<double>(oldNumSteps) / newNumSteps);
             int col = (int)div;
             if (div == col)
                mGrid->SetVal(j, i, oldGrid->GetVal(col, i));

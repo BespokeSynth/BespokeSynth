@@ -879,7 +879,7 @@ void NoteStepSequencer::Step(double time, double velocity, int pulseFlags)
    if (pulseFlags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int numMeasures = ceil(float(mLength) / stepsPerMeasure);
+      int numMeasures = ceil(static_cast<double>(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
       int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
       mArpIndex = step;
@@ -1104,7 +1104,7 @@ void NoteStepSequencer::ShiftSteps(int amount)
    double newLengths[NSS_MAX_STEPS];
    memcpy(newTones, mTones, NSS_MAX_STEPS * sizeof(int));
    memcpy(newVels, mVels, NSS_MAX_STEPS * sizeof(int));
-   memcpy(newLengths, mNoteLengths, NSS_MAX_STEPS * sizeof(float));
+   memcpy(newLengths, mNoteLengths, NSS_MAX_STEPS * sizeof(double));
    for (int i = 0; i < mLength; ++i)
    {
       int dest = (i + mLength + amount) % mLength;
@@ -1114,7 +1114,7 @@ void NoteStepSequencer::ShiftSteps(int amount)
    }
    memcpy(mTones, newTones, NSS_MAX_STEPS * sizeof(int));
    memcpy(mVels, newVels, NSS_MAX_STEPS * sizeof(int));
-   memcpy(mNoteLengths, newLengths, NSS_MAX_STEPS * sizeof(float));
+   memcpy(mNoteLengths, newLengths, NSS_MAX_STEPS * sizeof(double));
    SyncGridToSeq();
 }
 

@@ -44,9 +44,9 @@ public:
 private:
    struct ChordShape
    {
-      ChordShape(std::string name, std::vector<int> elements, float rootPosBias = 0.0f)
+      ChordShape(std::string name, std::vector<int> elements, double rootPosBias = 0.0)
       {
-         std::vector<float> weights(12);
+         std::vector<double> weights(12);
          mName = name;
          mElements = elements;
          mWeights = weights;
@@ -54,24 +54,24 @@ private:
          mRootPosBias = rootPosBias;
       }
 
-      ChordShape(std::string name, std::vector<int> elements, std::vector<float> weights, float rootPosBias = 0.0f)
+      ChordShape(std::string name, std::vector<int> elements, std::vector<double> weights, double rootPosBias = 0.0)
       {
          mName = name;
          mElements = elements;
          mWeights = weights;
-         auto lambda = [&](float a, float b)
+         auto lambda = [&](double a, double b)
          {
-            return b > 0.0f ? a - b : a;
+            return b > 0.0 ? a - b : a;
          };
          mWeightSum = std::accumulate(
-         mWeights.begin(), mWeights.end(), 0.0f, lambda);
+         mWeights.begin(), mWeights.end(), 0.0, lambda);
          mRootPosBias = rootPosBias;
       }
       std::string mName;
       std::vector<int> mElements;
-      std::vector<float> mWeights;
-      float mWeightSum;
-      float mRootPosBias;
+      std::vector<double> mWeights;
+      double mWeightSum;
+      double mRootPosBias;
    };
    std::vector<ChordShape> mChordShapes;
 
