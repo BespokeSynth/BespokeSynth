@@ -390,15 +390,10 @@ double ofGetWidth();
 double ofGetHeight();
 double ofGetFrameRate();
 
-template <class T>
-T ofLerp(T start, T stop, T amt)
-{
-   return start + (stop - start) * amt;
-}
 template <class T, class T1, class T2>
 T ofLerp(T start, T1 stop, T2 amt)
 {
-   return ofLerp(start, static_cast<T>(stop), amt);
+   return start + (stop - start) * amt;
 }
 
 template <class T>
