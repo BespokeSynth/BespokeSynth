@@ -128,7 +128,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
       // transfer function
       double reduction = overdB * (invRatio - 1.0); // gain reduction (dB)
       double makeup = (-mThreshold * .5) * (1.0 - invRatio);
-      mOutputGain = ofLerp(1, dB2lin(reduction + makeup) * mDrive * mOutputAdjust, mMix);
+      mOutputGain = ofLerp(1.0, dB2lin(reduction + makeup) * mDrive * mOutputAdjust, mMix);
 
       // output gain
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)

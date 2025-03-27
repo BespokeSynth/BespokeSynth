@@ -138,7 +138,7 @@ void ControlRecorder::DrawModule()
    if (mLength > 0 && !mRecord)
    {
       double playbackTime = GetPlaybackTime(gTime);
-      double lineX = ofLerp(3, mWidth - 6, playbackTime / mLength);
+      double lineX = ofLerp(3.0, mWidth - 6, playbackTime / mLength);
       ofLine(lineX, 0, lineX, mHeight - 5 - mDisplayStartY);
    }
 

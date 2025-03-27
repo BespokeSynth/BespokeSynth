@@ -152,8 +152,8 @@ void Waveshaper::Process(double time)
       GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
    }
 
-   mSmoothMax = max > mSmoothMax ? max : ofLerp(mSmoothMax, max, .01f);
-   mSmoothMin = min < mSmoothMin ? min : ofLerp(mSmoothMin, min, .01f);
+   mSmoothMax = max > mSmoothMax ? max : ofLerp(mSmoothMax, max, .01);
+   mSmoothMin = min < mSmoothMin ? min : ofLerp(mSmoothMin, min, .01);
 
    GetBuffer()->Reset();
 }

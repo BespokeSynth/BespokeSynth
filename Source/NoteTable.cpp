@@ -193,7 +193,7 @@ void NoteTable::DrawModule()
          double fade = ofClamp(1 - (gTime - mLastColumnPlayTime[i]) / kPlayHighlightDurationMs, 0, 1);
          ofPushStyle();
          ofFill();
-         ofSetColor(ofColor::white, ofLerp(20, 80, fade));
+         ofSetColor(ofColor::white, ofLerp(20.0, 80, fade));
          ofRect(mGrid->GetPosition(true).x + mGrid->GetWidth() / mLength * i, mGrid->GetPosition(true).y, mGrid->GetWidth() / mLength, mGrid->GetHeight());
          ofNoFill();
          ofSetLineWidth(3 * fade);
