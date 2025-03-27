@@ -225,7 +225,7 @@ void SamplePlayer::Poll()
                            name += tokens[i];
                         resultToAdd.name = name;
                         resultToAdd.channel = channel;
-                        resultToAdd.lengthSeconds = ofToFloat(lengthStr);
+                        resultToAdd.lengthSeconds = ofToDouble(lengthStr);
                         resultToAdd.youtubeId = id;
                         mYoutubeSearchResults.push_back(resultToAdd);
                      }

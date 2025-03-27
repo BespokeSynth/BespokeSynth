@@ -174,7 +174,7 @@ void BassLineSequencer::DrawModule()
    ofTranslate(kDisplayX, mNoteDisplayY);
    ofPushStyle();
    ofFill();
-   ofSetColor(100, 100, 100, 0.5f * gModuleDrawAlpha);
+   ofSetColor(100, 100, 100, 0.5 * gModuleDrawAlpha);
    ofRect(0, 0, displayWidth, kDisplayHeight);
    double noteWidth = displayWidth / mLength;
    for (int i = 0; i < mLength; ++i)
@@ -182,9 +182,9 @@ void BassLineSequencer::DrawModule()
       if (i % 2 == 0)
       {
          if (i % 8 == 0)
-            ofSetColor(120, 120, 120, 0.5f * gModuleDrawAlpha);
+            ofSetColor(120, 120, 120, 0.5 * gModuleDrawAlpha);
          else
-            ofSetColor(80, 80, 80, 0.5f * gModuleDrawAlpha);
+            ofSetColor(80, 80, 80, 0.5 * gModuleDrawAlpha);
          ofRect(i * noteWidth, 0, noteWidth, kDisplayHeight);
       }
    }
@@ -239,7 +239,7 @@ void BassLineSequencer::DrawModule()
       }
    }
    ofPopStyle();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha * .2f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .2);
    ofRect(mStepIdx * noteWidth, 0, noteWidth, kDisplayHeight);
    if (mHighlightDisplayStepIdx != -1)
    {
@@ -271,9 +271,9 @@ void BassLineSequencer::DrawModule()
    for (int i = 0; i < numNotesOnPage; ++i)
    {
       if (i % 2 == 0)
-         ofSetColor(120, 120, 120, gModuleDrawAlpha * .3f);
+         ofSetColor(120, 120, 120, gModuleDrawAlpha * .3);
       else
-         ofSetColor(80, 80, 80, gModuleDrawAlpha * .3f);
+         ofSetColor(80, 80, 80, gModuleDrawAlpha * .3);
       ofBeginShape();
       ofVertex(editX + i * noteWidth, mNoteDisplayY + kDisplayHeight);
       ofVertex(mStepControls[i].xPos, mStepControls[i].yPos - 2);
@@ -911,7 +911,7 @@ void BassLineSequencer::ButtonClicked(ClickButton* button, double time)
             step.mVelocity = 0;
          }
 
-         step.mTie = ofRandom(1.0f) <= mRandomTies ? true : false;
+         step.mTie = ofRandom(1.0) <= mRandomTies ? true : false;
       }
 
       for (size_t i = 1; i < mSteps.size(); ++i)

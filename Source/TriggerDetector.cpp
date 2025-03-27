@@ -35,7 +35,7 @@ void TriggerDetector::Process(float sample)
 {
    if (mSharpness > 0)
    {
-      float filter = 1 - mSharpness * .001f;
+      double filter = 1 - mSharpness * .001;
       mAvg = filter * mAvg + (1 - filter) * sample;
       sample -= mAvg; //highpass
    }

@@ -1406,7 +1406,7 @@ void NoteStepSequencer::KeyPressed(int key, bool isRepeat)
          {
             for (int i = 0; i < (int)gStepVelocityLevels.size(); ++i)
             {
-               if (velocity < gStepVelocityLevels[i] - .01f)
+               if (velocity < gStepVelocityLevels[i] - .01)
                {
                   mVelocityGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
                   mVels[cell.mCol] = gStepVelocityLevels[i] * 127;
@@ -1419,7 +1419,7 @@ void NoteStepSequencer::KeyPressed(int key, bool isRepeat)
          {
             for (int i = (int)gStepVelocityLevels.size() - 1; i >= 0; --i)
             {
-               if (velocity > gStepVelocityLevels[i] + .01f)
+               if (velocity > gStepVelocityLevels[i] + .01)
                {
                   mVelocityGrid->SetVal(cell.mCol, cell.mRow, gStepVelocityLevels[i]);
                   mVels[cell.mCol] = gStepVelocityLevels[i] * 127;

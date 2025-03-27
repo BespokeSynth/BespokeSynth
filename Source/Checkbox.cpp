@@ -92,7 +92,7 @@ void Checkbox::Render()
    DrawBeacon(mX + 6, mY + 8);
 
    ofColor color;
-   if (IsPreset())
+   if (false) //IsPreset())
       color.set(0, 255, 0);
    else if (mUseCircleLook)
       color = mCustomColor;
