@@ -294,14 +294,7 @@ void ControlRecorder::LoadState(FileStreamIn& in, int rev)
    else
       in >> mLength;
    mCurve.SetExtents(0, mLength);
-   if (rev < 2)
-   {
-      float a;
-      in >> a;
-      mRecordStartOffset = static_cast<double>(a);
-   }
-   else
-      in >> mRecordStartOffset;
+   in >> mRecordStartOffset;
 }
 
 double ControlRecorder::Value(int samplesIn)
