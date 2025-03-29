@@ -329,12 +329,12 @@ void VSTPlugin::AddExtraOutputCable()
    mAdditionalVizBuffers.push_back(NewBuffer);
    mAdditionalOutCableSources.push_back(NewCableSource);
 
-   mModuleSaveData.SetInt("numAdditionalStereoOutputs", mAdditionalOutCables.size());
+   mModuleSaveData.SetInt("numAdditionalStereoOutputs", (int)mAdditionalOutCables.size());
 }
 
 void VSTPlugin::RemoveExtraOutputCable()
 {
-   int IndexToRemove = mAdditionalOutCables.size() - 1;
+   int IndexToRemove = (int)mAdditionalOutCables.size() - 1;
 
    mAdditionalOutCables.pop_back();
    mAdditionalVizBuffers.pop_back();
@@ -342,7 +342,7 @@ void VSTPlugin::RemoveExtraOutputCable()
    RemovePatchCableSource(SourceToRemove);
    mAdditionalOutCableSources.pop_back();
 
-   mModuleSaveData.SetInt("numAdditionalStereoOutputs", mAdditionalOutCables.size());
+   mModuleSaveData.SetInt("numAdditionalStereoOutputs", (int)mAdditionalOutCables.size());
 }
 
 void VSTPlugin::CreateUIControls()
@@ -379,7 +379,7 @@ void VSTPlugin::CreateUIControls()
 
 void VSTPlugin::RecreateUIOutputCables()
 {
-   int NumCables = mAdditionalOutCables.size() + 1;
+   int NumCables = (int)mAdditionalOutCables.size() + 1;
    int UIWidth = 208;
    int DesiredGap = 15;
    int IconWidth = 5;
