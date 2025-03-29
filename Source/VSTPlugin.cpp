@@ -359,7 +359,7 @@ void VSTPlugin::CreateUIControls()
    mPanicButton = new ClickButton(this, "panic", 166, 38);
    mAddExtraOutputButton = new ClickButton(this, "+", 86, 56);
    mRemoveExtraOutputButton = new ClickButton(this, " - ", 105, 56);
-   
+
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
 
@@ -803,7 +803,7 @@ void VSTPlugin::Process(double time)
 
       RecreateUIOutputCables();
    }
-   
+
    int inputChannels = MAX(2, mNumInputChannels);
    int outputChannels = MAX(2, mNumOutputChannels);
    ChannelBuffer* AllChannelsBuffer = GetBuffer();
@@ -938,7 +938,7 @@ void VSTPlugin::Process(double time)
       {
          int sourceStereoChannel = sourceChannel % 2;
          int stereoIndex = floor(sourceChannel / 2);
-         
+
          IAudioReceiver* CurrentTargetAudioReceiver;
          RollingBuffer* CurrentVizBuffer;
 
@@ -961,7 +961,7 @@ void VSTPlugin::Process(double time)
          {
             AllChannelsBuffer->GetChannel(sourceChannel)[sampleIndex] += buffer.getSample(sourceChannel, sampleIndex) * mVol;
          }
-         
+
          // Copy the outputs from the single buffer into our multiple output buffers
          if (CurrentTargetAudioReceiver)
          {
@@ -970,12 +970,12 @@ void VSTPlugin::Process(double time)
 
             float* Destination = targetBuffer->GetChannel(sourceStereoChannel);
             float* Source = AllChannelsBuffer->GetChannel(sourceChannel);
-            
+
             // Add the samples to the destination Audio Receiver buffer
             Add(
-                Destination,
-                Source,
-                AllChannelsBuffer->BufferSize());
+            Destination,
+            Source,
+            AllChannelsBuffer->BufferSize());
 
             // Also write the samples to the Visualizer Buffer for this cable output
             CurrentVizBuffer->WriteChunk(Source, targetBuffer->BufferSize(), sourceStereoChannel);
@@ -989,9 +989,9 @@ void VSTPlugin::Process(double time)
       {
          if (target)
             Add(
-                target->GetBuffer()->GetChannel(ch), 
-                AllChannelsBuffer->GetChannel(ch), 
-                AllChannelsBuffer->BufferSize());
+            target->GetBuffer()->GetChannel(ch),
+            AllChannelsBuffer->GetChannel(ch),
+            AllChannelsBuffer->BufferSize());
          GetVizBuffer()->WriteChunk(AllChannelsBuffer->GetChannel(ch), AllChannelsBuffer->BufferSize(), ch);
       }
    }
@@ -1145,13 +1145,13 @@ void VSTPlugin::GetModuleDimensions(float& width, float& height)
       else
       {*/
       width = 206;
-      height = 58;
+      height = 76;
       //}
    }
    else
    {
       width = 206;
-      height = 58;
+      height = 76;
       for (auto& slider : mParameterSliders)
       {
          if (slider.mSlider && slider.mShowing)
@@ -1387,7 +1387,7 @@ void VSTPlugin::SetUpFromSaveData()
 
    // Add VST output pins
    int numAdditionalStereoOutputs = mModuleSaveData.GetInt("numAdditionalStereoOutputs");
-   for (int newOutputCount = 0; newOutputCount < numAdditionalStereoOutputs; newOutputCount ++)
+   for (int newOutputCount = 0; newOutputCount < numAdditionalStereoOutputs; newOutputCount++)
    {
       AddExtraOutputCable();
    }

@@ -184,7 +184,7 @@ private:
    // juce supports a max of 16 stereo output channels
    static const int maxStereoOutputChannels{ 16 };
 
-   std::vector <RollingBuffer*> mAdditionalVizBuffers;
+   std::vector<RollingBuffer*> mAdditionalVizBuffers;
    std::vector<AdditionalNoteCable*> mAdditionalOutCables;
    std::vector<PatchCableSource*> mAdditionalOutCableSources;
 
