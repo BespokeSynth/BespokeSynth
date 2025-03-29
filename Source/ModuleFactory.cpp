@@ -269,6 +269,7 @@
 #include "BassLineSequencer.h"
 #include "Acciaccatura.h"
 #include "ModulatorWander.h"
+#include "DopplerShift.h"
 
 #include <juce_core/juce_core.h>
 
@@ -492,6 +493,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(BassLineSequencer, basslinesequencer, kModuleCategory_Instrument);
    REGISTER(Acciaccatura, acciaccatura, kModuleCategory_Note);
    REGISTER(ModulatorWander, wander, kModuleCategory_Modulator);
+   REGISTER(DopplerShift, dopplershift, kModuleCategory_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
