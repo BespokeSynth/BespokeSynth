@@ -62,7 +62,7 @@ public:
    void OnMidiNote(MidiNote& note);
    void OnMidiControl(MidiControl& control);
    void UpdateLights(std::vector<LightUpdate> lightUpdates, bool force = false);
-   void Draw(ofVec2f vPos);
+   void Draw(ofVec2d vPos);
    void ResetLaunchpad();
    bool HasLaunchpad() { return mController != nullptr; }
 

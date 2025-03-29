@@ -102,8 +102,8 @@ void Panner::Process(double time)
 
       ComputeSliders(i);
 
-      float left = GetBuffer()->GetChannel(0)[i];
-      float right = secondChannel[i];
+      double left = GetBuffer()->GetChannel(0)[i];
+      double right = secondChannel[i];
       GetBuffer()->GetChannel(0)[i] = left * ofMap(mPan, 0, 1, 1, 0, true) + right * ofMap(mPan, -1, 0, 1, 0, true);
       secondChannel[i] = right * ofMap(mPan, -1, 0, 0, 1, true) + left * ofMap(mPan, 0, 1, 0, 1, true);
 
@@ -131,7 +131,7 @@ void Panner::DrawModule()
    GetRightPanGain(mPan);
 }
 
-void Panner::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Panner::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

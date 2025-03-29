@@ -47,7 +47,7 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -57,26 +57,26 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mSpread{ 1 };
+   double mSpread{ 1 };
    FloatSlider* mSpreadSlider{ nullptr };
-   float mCenter{ 0 };
+   double mCenter{ 0 };
    FloatSlider* mCenterSlider{ nullptr };
 
    static const int kPanHistoryDisplaySize = 10;
    struct PanHistoryDisplayItem
    {
-      float time{ -9999 };
-      float pan{ 0 };
+      double time{ -9999 };
+      double pan{ 0 };
    };
    PanHistoryDisplayItem mPanHistoryDisplay[kPanHistoryDisplaySize];
    int mPanHistoryDisplayIndex{ 0 };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 };

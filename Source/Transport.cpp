@@ -55,7 +55,7 @@ void Transport::CreateUIControls()
    mTempoSlider = new FloatSlider(this, "tempo", 5, 4, 93, 15, &mTempo, 20, 225);
    mIncreaseTempoButton = new ClickButton(this, " + ", 118, 4);
    mDecreaseTempoButton = new ClickButton(this, " - ", 101, 4);
-   mSwingSlider = new FloatSlider(this, "swing", 5, 22, 93, 15, &mSwing, .5f, .7f);
+   mSwingSlider = new FloatSlider(this, "swing", 5, 22, 93, 15, &mSwing, .5, .7);
    mSwingIntervalDropdown = new DropdownList(this, "swing interval", 101, 22, &mSwingInterval);
    mTimeSigTopDropdown = new DropdownList(this, "timesigtop", 101, 42, &mTimeSigTop);
    mTimeSigBottomDropdown = new DropdownList(this, "timesigbottom", 101, 60, &mTimeSigBottom);
@@ -115,12 +115,12 @@ void Transport::KeyPressed(int key, bool isRepeat)
 
 void Transport::Advance(double ms)
 {
-   if (mNudgeFactor != 0)
+   if (!ofAlmostEquel(mNudgeFactor, 0))
    {
-      const float kNudgePower = .05f;
-      float nudgeScale = (1 + mNudgeFactor * kNudgePower);
+      const double kNudgePower = .05;
+      double nudgeScale = (1 + mNudgeFactor * kNudgePower);
 
-      const float kRamp = .005f;
+      const double kRamp = .005;
       if (mNudgeFactor > 0)
          mNudgeFactor = MAX(0, mNudgeFactor - ms * kRamp);
       if (mNudgeFactor < 0)
@@ -158,7 +158,7 @@ void Transport::Advance(double ms)
    }
 }
 
-float QuadraticBezier(float x, float a, float b)
+float QuadraticBezier(float x, float a, float b) //TODO(Noxy) Unused? Update to double? Template?
 {
    // adapted from BEZMATH.PS (1993)
    // by Don Lancaster, SYNERGETICS Inc.
@@ -219,11 +219,11 @@ void Transport::DrawModule()
    DrawTextNormal(display, 5, 52);
 
    ofPushStyle();
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    ofFill();
    ofSetColor(255, 255, 255, 50);
-   float beatWidth = w / mTimeSigTop;
+   double beatWidth = w / mTimeSigTop;
    ofRect((count - 1) * beatWidth, 0, beatWidth, h, 0);
    if (count % 2)
       ofSetColor(255, 0, 255);
@@ -252,25 +252,25 @@ void Transport::DrawModule()
    ofBeginShape();
    for (int i = 0; i < w - 1; ++i)
    {
-      float pos = i / float(w - 1);
-      float swung = Swing(pos);
+      double pos = i / (w - 1);
+      double swung = Swing(pos);
       ofVertex(i + 1, h - 1 - swung * (h - 1));
    }
    ofEndShape();
    ofRect(0, h - Swing(measurePos) * h, 4, 1);
 
-   float nudgeMinX = mNudgeBackButton->GetRect(true).getMinX();
-   float nudgeMaxX = mNudgeForwardButton->GetRect(true).getMaxX();
-   float nudgeX = ofLerp(nudgeMinX, nudgeMaxX, (mNudgeFactor / 15) + .5f);
+   double nudgeMinX = mNudgeBackButton->GetRect(true).getMinX();
+   double nudgeMaxX = mNudgeForwardButton->GetRect(true).getMaxX();
+   double nudgeX = ofLerp(nudgeMinX, nudgeMaxX, (mNudgeFactor / 15) + .5);
    ofLine(nudgeX, mNudgeBackButton->GetRect(true).getMinY(), nudgeX, mNudgeBackButton->GetRect(true).getMaxY());
 }
 
 void Transport::Reset()
 {
    if (mLoopEndMeasure != -1)
-      mMeasureTime = mLoopEndMeasure - .01f;
+      mMeasureTime = mLoopEndMeasure - .01;
    else
-      mMeasureTime = .99f;
+      mMeasureTime = .99;
    SetQueuedMeasure(NextBufferTime(true), 0);
 
    if (TheSynth->IsAudioPaused())
@@ -419,7 +419,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
          if (remainderMs != nullptr)
          {
             double remainder = ret - (int)ret;
-            if (mSwing == .5f)
+            if (mSwing == .5)
                *remainderMs = remainder * GetDuration(interval);
             else
                *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
@@ -435,7 +435,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
          if (remainderMs != nullptr)
          {
             double remainder = ret - (int)ret;
-            if (mSwing == .5f)
+            if (mSwing == .5)
                *remainderMs = remainder * GetDuration(interval);
             else
                *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
@@ -448,7 +448,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
          if (remainderMs != nullptr)
          {
             double remainder = ret - (int)ret;
-            if (mSwing == .5f)
+            if (mSwing == .5)
                *remainderMs = remainder * (MsPerBar() / listenerInfo->mCustomDivisor);
             else
                *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
@@ -693,7 +693,7 @@ void Transport::OnDrumEvent(NoteInterval drumEvent)
    }
 }
 
-void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Transport::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -708,9 +708,9 @@ void Transport::CheckboxUpdated(Checkbox* checkbox, double time)
       else if (mStartRecordTime != -1)
       {
          int numBars = 1;
-         float recordedTime = time - mStartRecordTime;
+         double recordedTime = time - mStartRecordTime;
          int beats = numBars * GetTimeSigTop();
-         float minutes = recordedTime / 1000.0f / 60.0f;
+         double minutes = recordedTime / 1000.0 / 60.0;
          SetTempo(beats / minutes);
          SetDownbeat();
       }
@@ -763,7 +763,7 @@ void Transport::LoadState(FileStreamIn& in, int rev)
    {
       float measurePos;
       in >> measurePos;
-      mMeasureTime = measurePos;
+      mMeasureTime = static_cast<double>(measurePos);
    }
    else
    {

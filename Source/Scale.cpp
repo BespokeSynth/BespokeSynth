@@ -171,7 +171,7 @@ void Scale::Init()
    SetRandomRootAndScale();
 }
 
-float Scale::PitchToFreq(float pitch)
+double Scale::PitchToFreq(double pitch)
 {
    if (mIntonation == kIntonation_SclFile)
    {
@@ -215,12 +215,12 @@ float Scale::PitchToFreq(float pitch)
          {
             referencePitch += mPitchesPerOctave;
          }while (referencePitch < mReferencePitch && abs(referencePitch - mReferencePitch) > mPitchesPerOctave);
-         float referenceFreq = Pow2((referencePitch-mReferencePitch)/mPitchesPerOctave)*mReferenceFreq;
+         double referenceFreq = Pow2((referencePitch-mReferencePitch)/mPitchesPerOctave)*mReferenceFreq;
          
          int intPitch = (int)pitch;
-         float remainder = pitch - intPitch;
-         float ratio1 = RationalizeNumber(Pow2(float(intPitch-referencePitch)/mPitchesPerOctave));
-         float ratio2 = RationalizeNumber(Pow2(float((intPitch+1)-referencePitch)/mPitchesPerOctave));
+         double remainder = pitch - intPitch;
+         double ratio1 = RationalizeNumber(Pow2(static_cast<double>(intPitch - referencePitch)/mPitchesPerOctave));
+         double ratio2 = RationalizeNumber(Pow2(static_cast<double>((intPitch + 1) - referencePitch)/mPitchesPerOctave));
          return ofLerp(ratio1,ratio2,remainder)*referenceFreq;
       }*/
       case kIntonation_Pythagorean:
@@ -233,13 +233,13 @@ float Scale::PitchToFreq(float pitch)
          {
             referencePitch += mPitchesPerOctave;
          } while (referencePitch < mReferencePitch && abs(referencePitch - mReferencePitch) > mPitchesPerOctave);
-         float referenceFreq = Pow2((referencePitch - mReferencePitch) / mPitchesPerOctave) * mReferenceFreq;
+         auto referenceFreq = Pow2((referencePitch - mReferencePitch) / mPitchesPerOctave) * mReferenceFreq;
 
          int intPitch = (int)pitch;
-         float remainder = pitch - intPitch;
-         float ratio1 = GetTuningTableRatio(intPitch - referencePitch);
-         float ratio2 = GetTuningTableRatio((intPitch + 1) - referencePitch);
-         float freq = MAX(ofLerp(ratio1, ratio2, remainder), .001f) * referenceFreq;
+         double remainder = pitch - intPitch;
+         double ratio1 = GetTuningTableRatio(intPitch - referencePitch);
+         double ratio2 = GetTuningTableRatio((intPitch + 1) - referencePitch);
+         double freq = MAX(ofLerp(ratio1, ratio2, remainder), .001) * referenceFreq;
          return freq;
 
          break;
@@ -251,7 +251,7 @@ float Scale::PitchToFreq(float pitch)
    return 0;
 }
 
-float Scale::FreqToPitch(float freq)
+double Scale::FreqToPitch(double freq)
 {
    //TODO(Ryan) always use equal for now
    //switch (mIntonation)
@@ -441,7 +441,7 @@ void Scale::DrawModule()
    }
 }
 
-void Scale::GetModuleDimensions(float& width, float& height)
+void Scale::GetModuleDimensions(double& width, double& height)
 {
    width = 164;
    height = mIntonation == kIntonation_SclFile ? 109 : 62;
@@ -496,7 +496,7 @@ void Scale::Poll()
    }
 }
 
-float Scale::RationalizeNumber(float input)
+float Scale::RationalizeNumber(float input) //TODO(Noxy) Add double support, template or overload?
 {
    int m[2][2];
    float x = input;
@@ -624,7 +624,7 @@ void Scale::UpdateTuningTable()
    else if (mIntonation == kIntonation_Rational)
    {
       for (int i = 0; i < 256; ++i)
-         mTuningTable[i] = RationalizeNumber(Pow2(float(i - 128) / mPitchesPerOctave));
+         mTuningTable[i] = RationalizeNumber(Pow2(static_cast<double>(i - 128) / mPitchesPerOctave));
    }
    else if (mIntonation == kIntonation_Pythagorean ||
             mIntonation == kIntonation_Just ||
@@ -637,50 +637,50 @@ void Scale::UpdateTuningTable()
          NotifyListeners();
       }
 
-      float tunings[12];
+      double tunings[12];
       if (mIntonation == kIntonation_Pythagorean)
       {
          tunings[0] = 1;
-         tunings[1] = 256.0f / 243.0f;
-         tunings[2] = 9.0f / 8.0f;
-         tunings[3] = 32.0f / 27.0f;
-         tunings[4] = 81.0f / 64.0f;
-         tunings[5] = 4.0f / 3.0f;
-         tunings[6] = 729.f / 512.f;
-         tunings[7] = 3.0f / 2.0f;
-         tunings[8] = 128.0f / 81.0f;
-         tunings[9] = 27.0f / 16.0f;
-         tunings[10] = 16.0f / 9.0f;
-         tunings[11] = 243.0f / 128.0f;
+         tunings[1] = 256.0 / 243.0;
+         tunings[2] = 9.0 / 8.0;
+         tunings[3] = 32.0 / 27.0;
+         tunings[4] = 81.0 / 64.0;
+         tunings[5] = 4.0 / 3.0;
+         tunings[6] = 729.0 / 512.0;
+         tunings[7] = 3.0 / 2.0;
+         tunings[8] = 128.0 / 81.0;
+         tunings[9] = 27.0 / 16.0;
+         tunings[10] = 16.0 / 9.0;
+         tunings[11] = 243.0 / 128.0;
       }
       if (mIntonation == kIntonation_Just)
       {
          tunings[0] = 1;
-         tunings[1] = 25.0f / 24.0f;
-         tunings[2] = 9.0f / 8.0f;
-         tunings[3] = 6.0f / 5.0f;
-         tunings[4] = 5.0f / 4.0f;
-         tunings[5] = 4.0f / 3.0f;
-         tunings[6] = 45.0f / 32.0f;
-         tunings[7] = 3.0f / 2.0f;
-         tunings[8] = 8.0f / 5.0f;
-         tunings[9] = 5.0f / 3.0f;
-         tunings[10] = 9.0f / 5.0f;
-         tunings[11] = 15.0f / 8.0f;
+         tunings[1] = 25.0 / 24.0;
+         tunings[2] = 9.0 / 8.0;
+         tunings[3] = 6.0 / 5.0;
+         tunings[4] = 5.0 / 4.0;
+         tunings[5] = 4.0 / 3.0;
+         tunings[6] = 45.0 / 32.0;
+         tunings[7] = 3.0 / 2.0;
+         tunings[8] = 8.0 / 5.0;
+         tunings[9] = 5.0 / 3.0;
+         tunings[10] = 9.0 / 5.0;
+         tunings[11] = 15.0 / 8.0;
       }
       if (mIntonation == kIntonation_Meantone)
       {
-         float fifth = pow(5, .25f);
-         float rootFive = sqrtf(5);
+         double fifth = pow(5, .25);
+         double rootFive = sqrt(5);
          tunings[0] = 1;
          tunings[1] = 8 * fifth * rootFive / 25;
          tunings[2] = rootFive / 2;
          tunings[3] = 4 * fifth / 5;
-         tunings[4] = 5.0f / 4.0f;
+         tunings[4] = 5.0 / 4.0;
          tunings[5] = 2 * rootFive * fifth / 5;
          tunings[6] = 16 * rootFive / 25;
          tunings[7] = fifth;
-         tunings[8] = 8.0f / 5.0f;
+         tunings[8] = 8.0 / 5.0;
          tunings[9] = rootFive * fifth / 2;
          tunings[10] = 4 * rootFive / 5;
          tunings[11] = 5 * fifth / 4;
@@ -688,8 +688,8 @@ void Scale::UpdateTuningTable()
 
       for (int i = 0; i < 256; ++i)
       {
-         int octave = floor((i - 128) / 12.0f);
-         float ratio = powf(2, octave);
+         int octave = floor((i - 128) / 12.0);
+         double ratio = std::pow(2, octave);
          mTuningTable[i] = tunings[(i - 128 + 144) % 12] * ratio; //+144 to keep modulo arithmetic positive
       }
 
@@ -708,7 +708,7 @@ void Scale::UpdateTuningTable()
    }
 }
 
-float Scale::GetTuningTableRatio(int semitonesFromCenter)
+double Scale::GetTuningTableRatio(int semitonesFromCenter) const
 {
    return mTuningTable[CLAMP(128 + semitonesFromCenter, 0, 255)];
 }
@@ -723,7 +723,7 @@ void Scale::DropdownUpdated(DropdownList* list, int oldVal, double time)
       UpdateTuningTable();
 }
 
-void Scale::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Scale::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

@@ -129,7 +129,7 @@ void Profiler::Draw()
    ofPushStyle();
    ofFill();
    ofSetColor(0, 0, 0, 140);
-   //ofRect(-5,-15,600,sCosts.size()*15+10);
+   //ofRect(-5, -15, 600, sCosts.size() * 15 + 10);
    long entireFrameUs = GetSafeFrameLengthNanoseconds();
    for (int i = 0; i < PROFILER_MAX_TRACK; ++i)
    {
@@ -145,7 +145,7 @@ void Profiler::Draw()
          ofSetColor(255, 0, 0);
       else
          ofSetColor(0, 255, 0);
-      ofRect(250, -10, (float)maxCost / entireFrameUs * (ofGetWidth() - 300) * .1f, 10);
+      ofRect(250, -10, static_cast<double>(maxCost) / entireFrameUs * (ofGetWidth() - 300) * .1, 10);
 
       ofTranslate(0, 15);
    }
@@ -158,7 +158,7 @@ long Profiler::GetSafeFrameLengthNanoseconds()
 {
    //using about 70% of the length of buffer size doing processing seems to be safe
    //for avoiding starvation issues
-   return long((gBufferSize / float(gSampleRate)) * 1000000000 * .7f);
+   return static_cast<long>((gBufferSize / static_cast<double>(gSampleRate)) * 1000000000 * .7);
 }
 
 //static

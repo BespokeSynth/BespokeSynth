@@ -81,7 +81,7 @@ void PulseSequence::CreateUIControls()
    for (int i = 0; i < kIndividualStepCables; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+      mStepCables[i]->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]);
    }
 }
@@ -117,8 +117,8 @@ void PulseSequence::DrawModule()
    {
       if (i < mLength)
       {
-         ofVec2f pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
-         pos.x += mVelocityGrid->GetWidth() / float(mLength) * .5f;
+         ofVec2d pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
+         pos.x += mVelocityGrid->GetWidth() / static_cast<double>(mLength) * .5;
          pos.y += mVelocityGrid->GetHeight() + 8;
          mStepCables[i]->SetManualPosition(pos.x, pos.y);
          mStepCables[i]->SetEnabled(true);
@@ -134,7 +134,7 @@ void PulseSequence::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void PulseSequence::OnTransportAdvanced(float amount)
+void PulseSequence::OnTransportAdvanced(double amount)
 {
    PROFILER(PulseSequence);
 
@@ -147,13 +147,13 @@ void PulseSequence::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
-void PulseSequence::OnPulse(double time, float velocity, int flags)
+void PulseSequence::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
    Step(time, velocity, flags);
 }
 
-void PulseSequence::Step(double time, float velocity, int flags)
+void PulseSequence::Step(double time, double velocity, int flags)
 {
    if (!mEnabled)
       return;
@@ -177,12 +177,12 @@ void PulseSequence::Step(double time, float velocity, int flags)
    if (flags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int numMeasures = ceil(float(mLength) / stepsPerMeasure);
+      int numMeasures = ceil(static_cast<double>(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
       mStep = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
    }
 
-   float v = mVels[mStep] * velocity;
+   double v = mVels[mStep] * velocity;
 
    if (v > 0)
    {
@@ -195,20 +195,20 @@ void PulseSequence::Step(double time, float velocity, int flags)
    mVelocityGrid->SetHighlightCol(time, mStep);
 }
 
-void PulseSequence::GetModuleDimensions(float& width, float& height)
+void PulseSequence::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void PulseSequence::OnClicked(float x, float y, bool right)
+void PulseSequence::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
    mVelocityGrid->TestClick(x, y, right);
 }
 
-void PulseSequence::Resize(float w, float h)
+void PulseSequence::Resize(double w, double h)
 {
    mWidth = MAX(w, 254);
    mHeight = MAX(h, 58);
@@ -221,14 +221,14 @@ void PulseSequence::MouseReleased()
    mVelocityGrid->MouseReleased();
 }
 
-bool PulseSequence::MouseMoved(float x, float y)
+bool PulseSequence::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mVelocityGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
-bool PulseSequence::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool PulseSequence::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
@@ -247,7 +247,7 @@ void PulseSequence::ButtonClicked(ClickButton* button, double time)
       {
          const int start = (shift == 1) ? mVelocityGrid->GetCols() - 1 : 0;
          const int end = (shift == 1) ? 0 : mVelocityGrid->GetCols() - 1;
-         const float startVal = mVelocityGrid->GetVal(start, row);
+         const double startVal = mVelocityGrid->GetVal(start, row);
          for (int col = start; col != end; col -= shift)
             mVelocityGrid->SetVal(col, row, mVelocityGrid->GetVal(col - shift, row));
          mVelocityGrid->SetVal(end, row, startVal);
@@ -265,7 +265,7 @@ void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PulseSequence::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -279,7 +279,7 @@ void PulseSequence::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
    }
 }
 
-void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mVelocityGrid)
    {

@@ -43,12 +43,12 @@ class PatchCableSource;
 struct StutterParams
 {
    StutterParams() {}
-   StutterParams(NoteInterval _interval, float _speed)
+   StutterParams(NoteInterval _interval, double _speed)
    : interval(_interval)
    , speedStart(_speed)
    , speedEnd(_speed)
    {}
-   StutterParams(NoteInterval _interval, float _speedStart, float _speedEnd, float _speedBlendTime)
+   StutterParams(NoteInterval _interval, double _speedStart, double _speedEnd, double _speedBlendTime)
    : interval(_interval)
    , speedStart(_speedStart)
    , speedEnd(_speedEnd)
@@ -57,15 +57,15 @@ struct StutterParams
    bool operator==(const StutterParams& other) const
    {
       return interval == other.interval &&
-             speedStart == other.speedStart &&
-             speedEnd == other.speedEnd &&
-             speedBlendTime == other.speedBlendTime;
+             ofAlmostEquel(speedStart, other.speedStart) &&
+             ofAlmostEquel(speedEnd, other.speedEnd) &&
+             ofAlmostEquel(speedBlendTime, other.speedBlendTime);
    }
 
    NoteInterval interval{ NoteInterval::kInterval_16n };
-   float speedStart{ 1 };
-   float speedEnd{ 1 };
-   float speedBlendTime{ 0 };
+   double speedStart{ 1 };
+   double speedEnd{ 1 };
+   double speedBlendTime{ 0 };
 };
 
 class Stutter : public ITimeListener
@@ -76,7 +76,7 @@ public:
 
    void Init();
 
-   void DrawStutterBuffer(float x, float y, float width, float height);
+   void DrawStutterBuffer(double x, double y, double width, double height);
    void StartStutter(double time, StutterParams stutter);
    void EndStutter(double time, StutterParams stutter);
    void SetEnabled(double time, bool enabled);
@@ -87,15 +87,15 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   float mFreeStutterLength{ .1 };
-   float mFreeStutterSpeed{ 1 };
+   double mFreeStutterLength{ .1 };
+   double mFreeStutterSpeed{ 1 };
 
 private:
    void DoCapture();
    float GetStutterSampleWithWraparoundBlend(int pos, int ch);
    void DoStutter(double time, StutterParams stutter);
    void StopStutter(double time);
-   float GetBufferReadPos(float stutterPos);
+   double GetBufferReadPos(double stutterPos);
 
    RollingBuffer mRecordBuffer;
    ChannelBuffer mStutterBuffer;
@@ -105,7 +105,7 @@ private:
    int mCaptureLength{ 1 };
    int mStutterLength{ 1 };
    Ramp mStutterSpeed;
-   float mStutterPos{ 0 };
+   double mStutterPos{ 0 };
    bool mAutoStutter{ false };
    Checkbox* mAutoCheckbox{ nullptr };
    Ramp mBlendRamp;

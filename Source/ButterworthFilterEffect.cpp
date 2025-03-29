@@ -62,11 +62,11 @@ void ButterworthFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
    mDryBuffer.SetNumActiveChannels(buffer->NumActiveChannels());
 
-   const float fadeOutStart = mFSlider->GetMax() * .75f;
-   const float fadeOutEnd = mFSlider->GetMax();
+   const double fadeOutStart = mFSlider->GetMax() * .75;
+   const double fadeOutEnd = mFSlider->GetMax();
    bool fadeOut = mF > fadeOutStart;
    if (fadeOut)
       mDryBuffer.CopyFrom(buffer);
@@ -89,7 +89,7 @@ void ButterworthFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    {
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
-         float dryness = ofMap(mF, fadeOutStart, fadeOutEnd, 0, 1);
+         double dryness = ofMap(mF, fadeOutStart, fadeOutEnd, 0, 1);
          Mult(buffer->GetChannel(ch), 1 - dryness, bufferSize);
          Mult(mDryBuffer.GetChannel(ch), dryness, bufferSize);
          Add(buffer->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
@@ -103,11 +103,11 @@ void ButterworthFilterEffect::DrawModule()
    mQSlider->Draw();
 }
 
-float ButterworthFilterEffect::GetEffectAmount()
+double ButterworthFilterEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp(1 - (mF / (mFSlider->GetMax() * .75f)), 0, 1);
+   return ofClamp(1 - (mF / (mFSlider->GetMax() * .75)), 0, 1);
 }
 
 void ButterworthFilterEffect::ResetFilter()
@@ -128,7 +128,7 @@ void ButterworthFilterEffect::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void ButterworthFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ButterworthFilterEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mFSlider || slider == mQSlider)
       mCoefficientsHaveChanged = true;

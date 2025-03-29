@@ -47,8 +47,8 @@ public:
    void DrawModule() override;
 
    bool AlwaysOnTop() override { return true; };
-   void GetDimensions(float& width, float& height) override;
-   void GetDimensionsMinimap(float& width, float& height);
+   void GetDimensions(double& width, double& height) override;
+   void GetDimensionsMinimap(double& width, double& height);
 
 private:
    bool IsSingleton() const override { return true; };
@@ -59,10 +59,10 @@ private:
    void DrawModulesOnMinimap(ofRectangle& boundingBox);
    void DrawModuleOnMinimap(ofRectangle& boundingBox, IDrawableModule* module);
    void RectUnion(ofRectangle& target, ofRectangle& unionRect);
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   ofVec2f CoordsToViewport(ofRectangle& boundingBox, float x, float y);
+   bool MouseMoved(double x, double y) override;
+   ofVec2d CoordsToViewport(ofRectangle& boundingBox, double x, double y);
    void ForcePosition();
 
    bool mClick{ false };

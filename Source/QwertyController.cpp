@@ -50,7 +50,7 @@ void QwertyController::OnKeyPressed(int key)
 
       MidiNote note;
       note.mPitch = key;
-      note.mVelocity = 127.0f;
+      note.mVelocity = 127.0;
       note.mChannel = 0;
       note.mDeviceName = "keyboard";
       mListener->OnMidiNote(note);
@@ -65,7 +65,7 @@ void QwertyController::OnKeyReleased(int key)
 
       MidiNote note;
       note.mPitch = key;
-      note.mVelocity = 0.0f;
+      note.mVelocity = 0.0;
       note.mChannel = 0;
       note.mDeviceName = "keyboard";
       mListener->OnMidiNote(note);

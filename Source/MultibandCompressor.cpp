@@ -46,8 +46,8 @@ void MultibandCompressor::CreateUIControls()
    mNumBandsSlider = new IntSlider(this, "bands", 110, 29, 100, 15, &mNumBands, 1, COMPRESSOR_MAX_BANDS);
    mFMinSlider = new FloatSlider(this, "fmin", 110, 47, 100, 15, &mFreqMin, 70, 400);
    mFMaxSlider = new FloatSlider(this, "fmax", 110, 65, 100, 15, &mFreqMax, 300, gSampleRate / 2 - 1);
-   mRingTimeSlider = new FloatSlider(this, "ring", 110, 101, 100, 15, &mRingTime, .0001f, .1f, 4);
-   mMaxBandSlider = new FloatSlider(this, "max band", 5, 101, 100, 15, &mMaxBand, 0.001f, 1);
+   mRingTimeSlider = new FloatSlider(this, "ring", 110, 101, 100, 15, &mRingTime, .0001, .1, 4);
+   mMaxBandSlider = new FloatSlider(this, "max band", 5, 101, 100, 15, &mMaxBand, 0.001, 1);
 }
 
 MultibandCompressor::~MultibandCompressor()
@@ -66,7 +66,7 @@ void MultibandCompressor::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    IAudioReceiver* target = GetTarget();
    if (target)
    {
@@ -134,7 +134,7 @@ void MultibandCompressor::DrawModule()
    ofPushStyle();
    ofFill();
    ofSetColor(0, 255, 0);
-   const float width = 25;
+   const double width = 25;
    for (int i = 0; i < mNumBands; ++i)
    {
       ofRect(i * (width + 3), -mPeaks[i].GetPeak() * 200, width, mPeaks[i].GetPeak() * 200);
@@ -146,8 +146,8 @@ void MultibandCompressor::CalcFilters()
 {
    for (int i = 0; i < mNumBands; ++i)
    {
-      float a = float(i) / mNumBands;
-      float f = mFreqMin * powf(mFreqMax / mFreqMin, a);
+      const double a = static_cast<double>(i) / mNumBands;
+      const double f = mFreqMin * pow(mFreqMax / mFreqMin, a);
 
       mFilters[i].SetCrossoverFreq(f);
    }
@@ -161,7 +161,7 @@ void MultibandCompressor::IntSliderUpdated(IntSlider* slider, int oldVal, double
    }
 }
 
-void MultibandCompressor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MultibandCompressor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mFMinSlider || slider == mFMaxSlider)
    {

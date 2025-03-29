@@ -52,7 +52,7 @@ void NotePanAlternator::DrawModule()
    ofPushStyle();
    ofSetColor(0, 255, 0, 50);
    ofFill();
-   ofVec2f activePos = mFlip ? mPanTwoSlider->GetPosition(true) : mPanOneSlider->GetPosition(true);
+   ofVec2d activePos = mFlip ? mPanTwoSlider->GetPosition(true) : mPanOneSlider->GetPosition(true);
    ofRect(activePos.x, activePos.y, 100, 15);
    ofPopStyle();
 }

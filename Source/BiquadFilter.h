@@ -64,14 +64,23 @@ public:
    void CopyCoeffFrom(BiquadFilter& other);
    bool UsesGain() { return mType == kFilterType_Peak || mType == kFilterType_HighShelf || mType == kFilterType_LowShelf; }
    bool UsesQ() { return true; } // return mType == kFilterType_Lowpass || mType == kFilterType_Highpass || mType == kFilterType_Bandpass || mType == kFilterType_Notch || mType == kFilterType_Peak; }
-   float GetMagnitudeResponseAt(float f);
+   double GetMagnitudeResponseAt(double f);
 
-   float Filter(float sample);
+   template <class T>
+   T Filter(T in)
+   {
+      T out = in * mA0 + mZ1;
+      mZ1 = in * mA1 + mZ2 - mB1 * out;
+      mZ2 = in * mA2 - mB2 * out;
+      if (std::isnan(out) || std::isinf(out))
+         Clear();
+      return out;
+   }
    void Filter(float* buffer, int bufferSize);
 
-   float mF{ 4000 };
-   float mQ{ static_cast<float>(sqrt(2.0f) / 2) };
-   float mDbGain{ 0 };
+   double mF{ 4000 };
+   double mQ{ sqrt(2.0) / 2 };
+   double mDbGain{ 0 };
    FilterType mType{ FilterType::kFilterType_Lowpass };
 
 private:
@@ -84,13 +93,3 @@ private:
    double mZ2{ 0 };
    double mSampleRate;
 };
-
-inline float BiquadFilter::Filter(float in)
-{
-   double out = in * mA0 + mZ1;
-   mZ1 = in * mA1 + mZ2 - mB1 * out;
-   mZ2 = in * mA2 - mB2 * out;
-   if (std::isnan(out) || std::isinf(out))
-      Clear();
-   return out;
-}

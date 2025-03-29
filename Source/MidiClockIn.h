@@ -103,7 +103,7 @@ public:
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -114,19 +114,19 @@ public:
 private:
    void InitDevice();
    void BuildDeviceList();
-   float GetRoundedTempo();
+   double GetRoundedTempo();
 
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = mWidth;
       h = mHeight;
    }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 
    enum class TempoRoundMode
    {
@@ -143,7 +143,7 @@ private:
    DropdownList* mDeviceList{ nullptr };
    TempoRoundMode mTempoRoundMode{ TempoRoundMode::kWhole };
    DropdownList* mTempoRoundModeList{ nullptr };
-   float mStartOffsetMs{ 0 };
+   double mStartOffsetMs{ 0 };
    FloatSlider* mStartOffsetMsSlider{ nullptr };
    int mSmoothAmount{ kMaxHistory / 2 };
    IntSlider* mSmoothAmountSlider{ nullptr };
@@ -151,7 +151,7 @@ private:
 
    MidiDevice mDevice;
 
-   std::array<float, kMaxHistory> mTempoHistory;
+   std::array<double, kMaxHistory> mTempoHistory;
    int mTempoIdx{ -1 };
    double mLastTimestamp{ -1 };
    int mReceivedPulseCount{ 0 };

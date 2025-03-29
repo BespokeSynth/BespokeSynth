@@ -53,7 +53,7 @@ void NoteChainNode::CreateUIControls()
    mPitchEntry = new TextEntry(this, "pitch", 5, 3, 3, &mPitch, 0, 127);
    mTriggerButton = new ClickButton(this, "trigger", 50, 3);
    mVelocitySlider = new FloatSlider(this, "velocity", 5, 21, 100, 15, &mVelocity, 0, 1);
-   mDurationSlider = new FloatSlider(this, "duration", 5, 39, 100, 15, &mDuration, 0.01f, 4, 4);
+   mDurationSlider = new FloatSlider(this, "duration", 5, 39, 100, 15, &mDuration, 0.01, 4, 4);
    mNextSelector = new DropdownList(this, "next", 5, 57, (int*)(&mNextInterval));
 
    mNextSelector->AddLabel("1n", kInterval_1n);
@@ -93,7 +93,7 @@ void NoteChainNode::OnTimeEvent(double time)
    }
 }
 
-void NoteChainNode::OnTransportAdvanced(float amount)
+void NoteChainNode::OnTransportAdvanced(double amount)
 {
    if (mNoteOn && NextBufferTime(true) > mStartTime + mDurationMs)
    {
@@ -112,7 +112,7 @@ void NoteChainNode::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 {
 }
 
-void NoteChainNode::OnPulse(double time, float velocity, int flags)
+void NoteChainNode::OnPulse(double time, double velocity, int flags)
 {
    TriggerNote(time);
 }
@@ -124,7 +124,7 @@ void NoteChainNode::TriggerNote(double time)
       mNoteOn = true;
       mWaitingToTrigger = true;
       mStartTime = time;
-      mDurationMs = mDuration / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      mDurationMs = mDuration / (static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       mNext = TheTransport->GetDuration(mNextInterval);
       PlayNoteOutput(NoteMessage(time, mPitch, mVelocity * 127));
    }

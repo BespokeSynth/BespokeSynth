@@ -56,7 +56,7 @@ public:
    void Poll() override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
 
    bool IsEnabled() const override { return true; }
@@ -64,14 +64,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 130;
       height = 77;
    }
 
    int dummy{ 0 };
-   float dummy2{ 0 };
+   double dummy2{ 0 };
    DropdownList* mIntervalSelector{ nullptr };
    DropdownList* mOscSelector{ nullptr };
    FloatSlider* mMinSlider{ nullptr };

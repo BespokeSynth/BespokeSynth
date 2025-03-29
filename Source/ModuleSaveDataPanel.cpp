@@ -37,7 +37,7 @@
 
 ModuleSaveDataPanel* TheSaveDataPanel = nullptr;
 
-const float kItemSpacing = 20;
+const double kItemSpacing = 20;
 
 ModuleSaveDataPanel::ModuleSaveDataPanel()
 {
@@ -99,8 +99,8 @@ void ModuleSaveDataPanel::ReloadSaveData()
       maxWidth = MAX(maxWidth, GetStringWidth(*iter));
 
    mAlignmentX = 10 + maxWidth;
-   float x = mAlignmentX;
-   float y = 5 + kItemSpacing;
+   double x = mAlignmentX;
+   double y = 5 + kItemSpacing;
 
    mNameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
    mNameEntry->SetNoHover(true);
@@ -271,7 +271,7 @@ void ModuleSaveDataPanel::UpdatePosition()
 {
    if (mSaveModule)
    {
-      float moduleX, moduleY, moduleW, moduleH;
+      double moduleX, moduleY, moduleW, moduleH;
       mSaveModule->GetPosition(moduleX, moduleY);
       mSaveModule->GetDimensions(moduleW, moduleH);
 
@@ -359,7 +359,7 @@ void ModuleSaveDataPanel::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void ModuleSaveDataPanel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ModuleSaveDataPanel::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -431,7 +431,7 @@ void ModuleSaveDataPanel::RefreshPresetFiles()
    }
 }
 
-void ModuleSaveDataPanel::GetModuleDimensions(float& width, float& height)
+void ModuleSaveDataPanel::GetModuleDimensions(double& width, double& height)
 {
    if (mShowing)
    {
