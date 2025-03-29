@@ -922,7 +922,7 @@ void VSTPlugin::Process(double time)
 
       AllChannelsBuffer->Clear();
 
-      int numChannels = 2 + (mAdditionalOutCableSources.size() * 2);
+      int numChannels = 2 + ((int)mAdditionalOutCableSources.size() * 2);
 
       AllChannelsBuffer->SetNumActiveChannels(numChannels);
       AllChannelsBuffer->SetMaxAllowedChannels(numChannels);
