@@ -334,6 +334,9 @@ void VSTPlugin::AddExtraOutputCable()
 
 void VSTPlugin::RemoveExtraOutputCable()
 {
+   if ((int)mAdditionalOutCables.size() == 0)
+      return;
+
    int IndexToRemove = (int)mAdditionalOutCables.size() - 1;
 
    mAdditionalOutCables.pop_back();
