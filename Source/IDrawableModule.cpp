@@ -1337,8 +1337,16 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
       in >> uicontrolname;
       if (baseRev >= 2)
       {
-         float rawValue;
-         in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
+         if (baseRev < 4)
+         {
+            float rawValue;
+            in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
+         }
+         else
+         {
+            double rawValue;
+            in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
+         }
       }
       UpdateOldControlName(uicontrolname);
 
