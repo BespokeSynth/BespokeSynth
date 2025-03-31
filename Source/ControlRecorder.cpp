@@ -269,30 +269,13 @@ void ControlRecorder::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   if (rev < 2)
-   {
-      float a, b;
-      in >> a >> b;
-      mWidth = static_cast<double>(a);
-      mHeight = static_cast<double>(b);
-   }
-   else
-   {
-      in >> mWidth;
-      in >> mHeight;
-   }
+   in >> FloatAsDouble >> mWidth;
+   in >> FloatAsDouble >> mHeight;
 
    mCurve.LoadState(in);
    in >> mHasRecorded;
 
-   if (rev < 2)
-   {
-      float a;
-      in >> a;
-      mLength = static_cast<double>(a);
-   }
-   else
-      in >> mLength;
+   in >> FloatAsDouble >> mLength;
    mCurve.SetExtents(0, mLength);
    in >> mRecordStartOffset;
 }

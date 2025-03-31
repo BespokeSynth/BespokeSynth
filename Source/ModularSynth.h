@@ -289,7 +289,7 @@ public:
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
-   static constexpr int kSaveStateRev = 426;
+   static constexpr int kSaveStateRev = 427;
 
 private:
    void ResetLayout();
