@@ -102,7 +102,7 @@ void MPETweaker::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void MPETweaker::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MPETweaker::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mPitchBendMultiplierSlider)
    {

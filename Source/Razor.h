@@ -41,9 +41,9 @@
 
 struct RazorBump
 {
-   float mFreq{ 100 };
-   float mAmt{ 0 };
-   float mDecay{ .005 };
+   double mFreq{ 100 };
+   double mAmt{ 0 };
+   double mDecay{ .005 };
 };
 
 class Razor : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IButtonListener
@@ -67,7 +67,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
 
@@ -77,24 +77,24 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float SinSample(float phase); //phase 0-512
+   double SinSample(double phase); //phase 0-512
    void CalcAmp();
    void DrawViz();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 1020;
       h = 420;
    }
 
-   float mVol{ .05 };
+   double mVol{ .05 };
    float mPhase{ 0 };
    ::ADSR mAdsr[NUM_PARTIALS]{};
-   float mAmp[NUM_PARTIALS]{};
+   double mAmp[NUM_PARTIALS]{};
    float mPhases[NUM_PARTIALS]{};
-   float mDetune[NUM_PARTIALS]{};
+   double mDetune[NUM_PARTIALS]{};
 
    int mPitch{ -1 };
 
@@ -116,11 +116,11 @@ private:
    FloatSlider* mRSlider{ nullptr };
    int mHarmonicSelector{ 1 };
    IntSlider* mHarmonicSelectorSlider{ nullptr };
-   float mPowFalloff{ 1 };
+   double mPowFalloff{ 1 };
    FloatSlider* mPowFalloffSlider{ nullptr };
    int mNegHarmonics{ 0 };
    IntSlider* mNegHarmonicsSlider{ nullptr };
-   float mHarshnessCut{ 0 };
+   double mHarshnessCut{ 0 };
    FloatSlider* mHarshnessCutSlider{ nullptr };
 
    bool mManualControl{ false };
@@ -129,10 +129,10 @@ private:
    FloatSlider* mDetuneSliders[NUM_AMP_SLIDERS]{ nullptr };
    ClickButton* mResetDetuneButton{ nullptr };
 
-   float mA{ 1 };
-   float mD{ 0 };
-   float mS{ 1 };
-   float mR{ 1 };
+   double mA{ 1 };
+   double mD{ 0 };
+   double mS{ 1 };
+   double mR{ 1 };
 
    ModulationChain* mPitchBend{ nullptr };
    ModulationChain* mModWheel{ nullptr };

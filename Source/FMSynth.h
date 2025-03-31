@@ -55,7 +55,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -71,7 +71,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 180;
       height = 203;
@@ -89,7 +89,7 @@ private:
    FloatSlider* mModSlider{ nullptr };
    ADSRDisplay* mAdsrDisplayMod{ nullptr };
    int mHarmRatioBase{ 1 }; //negative means 1/val
-   float mHarmRatioTweak{ 1 };
+   double mHarmRatioTweak{ 1 };
    DropdownList* mHarmRatioBaseDropdown{ nullptr };
    FloatSlider* mPhaseOffsetSlider1{ nullptr };
 
@@ -98,7 +98,7 @@ private:
    FloatSlider* mModSlider2{ nullptr };
    ADSRDisplay* mAdsrDisplayMod2{ nullptr };
    int mHarmRatioBase2{ 1 }; //negative means 1/val
-   float mHarmRatioTweak2{ 1 };
+   double mHarmRatioTweak2{ 1 };
    DropdownList* mHarmRatioBaseDropdown2{ nullptr };
    FloatSlider* mPhaseOffsetSlider2{ nullptr };
 

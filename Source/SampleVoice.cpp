@@ -53,7 +53,7 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
        mVoiceParams->mSample->Data() == nullptr)
       return false;
 
-   float volSq = mVoiceParams->mVol * mVoiceParams->mVol;
+   double volSq = mVoiceParams->mVol * mVoiceParams->mVol;
 
    for (int pos = 0; pos < out->BufferSize(); ++pos)
    {
@@ -75,14 +75,14 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
       if (mPos <= stopSample)
       {
-         float freq = TheScale->PitchToFreq(GetPitch(pos));
-         float speed = freq / TheScale->PitchToFreq(mVoiceParams->mSamplePitch);
+         double freq = TheScale->PitchToFreq(GetPitch(pos));
+         double speed = freq / TheScale->PitchToFreq(mVoiceParams->mSamplePitch);
 
          for (int i = 0; i < 2; ++i)
          {
             int ch = MIN(i, mVoiceParams->mSample->Data()->NumActiveChannels() - 1);
             float sample = GetInterpolatedSample(mPos, mVoiceParams->mSample->Data()->GetChannel(ch), mVoiceParams->mSample->LengthInSamples()) * mAdsr.Value(time) * volSq;
-            float pan = i == 0 ? GetLeftPanGain(GetPan()) : GetRightPanGain(GetPan());
+            double pan = i == 0 ? GetLeftPanGain(GetPan()) : GetRightPanGain(GetPan());
             out->GetChannel(i)[pos] += sample * pan;
          }
 
@@ -98,7 +98,7 @@ bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
    return true;
 }
 
-void SampleVoice::Start(double time, float target)
+void SampleVoice::Start(double time, double target)
 {
    mPos = mVoiceParams->mStartSample;
    mAdsr.Start(time, target, mVoiceParams->mAdsr);

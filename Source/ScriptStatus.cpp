@@ -101,7 +101,7 @@ void ScriptStatus::DrawModule()
    DrawTextNormal(mStatus, 3, 35);
 }
 
-void ScriptStatus::OnClicked(float x, float y, bool right)
+void ScriptStatus::OnClicked(double x, double y, bool right)
 {
    if (ScriptModule::sHasPythonEverSuccessfullyInitialized)
    {
@@ -146,6 +146,16 @@ void ScriptStatus::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   if (rev < 2)
+   {
+      float a, b;
+      in >> a >> b;
+      mWidth = static_cast<double>(a);
+      mHeight = static_cast<double>(b);
+   }
+   else
+   {
+      in >> mWidth;
+      in >> mHeight;
+   }
 }

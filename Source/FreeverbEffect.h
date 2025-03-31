@@ -44,27 +44,27 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "freeverb"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    revmodel mFreeverb;
    bool mNeedUpdate{ false };
    bool mFreeze{ false };
-   float mRoomSize{ .5 };
-   float mDamp{ 50 };
-   float mWet{ .5 };
-   float mDry{ 1 };
-   float mVerbWidth{ 50 };
+   double mRoomSize{ .5 };
+   double mDamp{ 50 };
+   double mWet{ .5 };
+   double mDry{ 1 };
+   double mVerbWidth{ 50 };
    FloatSlider* mRoomSizeSlider{ nullptr };
    FloatSlider* mDampSlider{ nullptr };
    FloatSlider* mWetSlider{ nullptr };

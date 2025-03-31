@@ -47,7 +47,7 @@ public:
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
    void ButtonClicked(ClickButton* button, double time) override;
@@ -61,7 +61,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -73,11 +73,11 @@ private:
 
    static const int kMaxDestinations = 16;
    int mNumDestinations{ 5 };
-   float mWeight[kMaxDestinations]{};
+   double mWeight[kMaxDestinations]{};
    FloatSlider* mWeightSlider[kMaxDestinations]{ nullptr };
    std::vector<AdditionalNoteCable*> mDestinationCables;
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    int mLastNoteDestinations[128];
    bool mDeterministic{ false };
    int mLength{ 4 };

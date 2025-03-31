@@ -44,7 +44,7 @@ class IPulseReceiver
 {
 public:
    virtual ~IPulseReceiver() {}
-   virtual void OnPulse(double time, float velocity, int flags) = 0;
+   virtual void OnPulse(double time, double velocity, int flags) = 0;
 };
 
 class IPulseSource
@@ -52,5 +52,5 @@ class IPulseSource
 public:
    IPulseSource() {}
    virtual ~IPulseSource() {}
-   void DispatchPulse(PatchCableSource* destination, double time, float velocity, int flags);
+   void DispatchPulse(PatchCableSource* destination, double time, double velocity, int flags);
 };

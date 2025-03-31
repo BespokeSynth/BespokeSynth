@@ -75,7 +75,7 @@ void PulseTrain::CreateUIControls()
    for (int i = 0; i < kMaxSteps; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+      mStepCables[i]->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mStepCables[i]);
    }
 }
@@ -101,8 +101,8 @@ void PulseTrain::DrawModule()
    {
       if (i < mLength)
       {
-         ofVec2f pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
-         pos.x += mVelocityGrid->GetWidth() / float(mLength) * .5f;
+         ofVec2d pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
+         pos.x += mVelocityGrid->GetWidth() / static_cast<double>(mLength) * .5;
          pos.y += mVelocityGrid->GetHeight() + 8;
          mStepCables[i]->SetManualPosition(pos.x, pos.y);
          mStepCables[i]->SetEnabled(true);
@@ -118,7 +118,7 @@ void PulseTrain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void PulseTrain::OnTransportAdvanced(float amount)
+void PulseTrain::OnTransportAdvanced(double amount)
 {
    PROFILER(PulseTrain);
 
@@ -130,12 +130,12 @@ void PulseTrain::OnTimeEvent(double time)
    Step(time, 1, 0);
 }
 
-void PulseTrain::OnPulse(double time, float velocity, int flags)
+void PulseTrain::OnPulse(double time, double velocity, int flags)
 {
    mStep = 0;
 }
 
-void PulseTrain::Step(double time, float velocity, int flags)
+void PulseTrain::Step(double time, double velocity, int flags)
 {
    if (!mEnabled)
       return;
@@ -149,7 +149,7 @@ void PulseTrain::Step(double time, float velocity, int flags)
 
    if (mStep < mLength)
    {
-      float v = mVels[mStep] * velocity;
+      double v = mVels[mStep] * velocity;
 
       int new_flags = 0;
       if (mResetOnStart && mStep == 0)
@@ -172,20 +172,20 @@ void PulseTrain::Step(double time, float velocity, int flags)
    ++mStep;
 }
 
-void PulseTrain::GetModuleDimensions(float& width, float& height)
+void PulseTrain::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void PulseTrain::OnClicked(float x, float y, bool right)
+void PulseTrain::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
    mVelocityGrid->TestClick(x, y, right);
 }
 
-void PulseTrain::Resize(float w, float h)
+void PulseTrain::Resize(double w, double h)
 {
    mWidth = MAX(w, 254);
    mHeight = MAX(h, 58);
@@ -198,14 +198,14 @@ void PulseTrain::MouseReleased()
    mVelocityGrid->MouseReleased();
 }
 
-bool PulseTrain::MouseMoved(float x, float y)
+bool PulseTrain::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mVelocityGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
-bool PulseTrain::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool PulseTrain::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
@@ -221,7 +221,7 @@ void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PulseTrain::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -236,7 +236,7 @@ void PulseTrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
    }
 }
 
-void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void PulseTrain::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mVelocityGrid)
    {

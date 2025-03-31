@@ -48,7 +48,7 @@ public:
    void PlayNote(NoteMessage note) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -59,7 +59,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -70,8 +70,8 @@ private:
    int mInitialPitch{ -1 };
    int mLastPlayedPitch{ -1 };
    int mLastVelocity{ 0 };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    int mVoiceIdx{ 0 };
 
    enum class PortamentoMode
@@ -83,7 +83,7 @@ private:
 
    PortamentoMode mPortamentoMode{ PortamentoMode::kAlways };
    DropdownList* mPortamentoModeSelector{ nullptr };
-   float mGlideTime{ 0 };
+   double mGlideTime{ 0 };
    FloatSlider* mGlideSlider{ nullptr };
    ModulationChain mPitchBend{ ModulationParameters::kDefaultPitchBend };
 };

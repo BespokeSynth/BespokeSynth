@@ -46,13 +46,13 @@ public:
 
    void CreateUIControls() override;
 
-   void SetPan(float pan) { mPan = pan; }
+   void SetPan(double pan) { mPan = pan; }
 
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -65,16 +65,16 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 120;
       h = 40;
    }
 
-   float mPan{ 0 };
+   double mPan{ 0 };
    Ramp mPanRamp;
    FloatSlider* mPanSlider{ nullptr };
-   float mWiden{ 0 };
+   double mWiden{ 0 };
    FloatSlider* mWidenSlider{ nullptr };
    RollingBuffer mWidenerBuffer{ 2048 };
 };

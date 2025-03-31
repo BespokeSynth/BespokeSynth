@@ -39,7 +39,7 @@ PitchShifter::PitchShifter(int fftBins)
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[mFFTBins];
    for (int i = 0; i < mFFTBins; ++i)
-      mWindower[i] = -.5 * cos(FTWO_PI * i / mFFTBins) + .5;
+      mWindower[i] = -.5 * std::cos(TWO_PI * i / mFFTBins) + .5;
    mLastPhase = new float[mFFTBins / 2 + 1];
    mSumPhase = new float[mFFTBins / 2 + 1];
    mAnalysisMag = new float[mFFTBins];

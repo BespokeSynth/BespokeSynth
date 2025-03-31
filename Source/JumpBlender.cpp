@@ -59,6 +59,6 @@ float JumpBlender::Process(float sample, int samplesIn)
    if (!mBlending)
       return sample;
 
-   float rampVal = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
+   auto rampVal = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
    return sample * (1 - rampVal) + mSamples[mBlendSample++] * rampVal;
 }

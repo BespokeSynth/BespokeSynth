@@ -42,29 +42,29 @@ class CircleSequencerRing
 public:
    CircleSequencerRing(CircleSequencer* owner, int index);
    void Draw();
-   void OnClicked(float x, float y, bool right);
+   void OnClicked(double x, double y, bool right);
    void MouseReleased();
-   void MouseMoved(float x, float y);
+   void MouseMoved(double x, double y);
    void CreateUIControls();
-   void OnTransportAdvanced(float amount);
+   void OnTransportAdvanced(double amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
 private:
-   float GetRadius() { return 90 - mIndex * 15; }
-   int GetStepIndex(int x, int y, float& radiusOut);
+   double GetRadius() { return 90 - mIndex * 15; }
+   int GetStepIndex(int x, int y, double& radiusOut);
    int mLength{ 4 };
    DropdownList* mLengthSelector{ nullptr };
    int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
    CircleSequencer* mOwner{ nullptr };
    int mIndex{ 0 };
-   std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
-   float mOffset{ 0 };
+   std::array<double, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
-   float mLastMouseRadius{ -1 };
+   double mLastMouseRadius{ -1 };
 };
 
 class CircleSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener
@@ -83,20 +83,20 @@ public:
    void SetEnabled(bool on) override { mEnabled = on; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
@@ -105,12 +105,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 400;
       height = 200;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    std::vector<CircleSequencerRing*> mCircleSequencerRings;
 };

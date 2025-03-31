@@ -68,7 +68,7 @@ void TimelineControl::DrawModule()
 
    if (mDock)
    {
-      float w, h;
+      double w, h;
       GetModuleDimensions(w, h);
       SetPosition(0, ofGetHeight() / GetOwningContainer()->GetDrawScale() - h);
       Resize(ofGetWidth() / GetOwningContainer()->GetDrawScale(), h);
@@ -85,13 +85,13 @@ void TimelineControl::DrawModule()
    mLoopEndSlider->Draw();
 }
 
-void TimelineControl::GetModuleDimensions(float& w, float& h)
+void TimelineControl::GetModuleDimensions(double& w, double& h)
 {
    w = mWidth;
    h = mLoop ? 74 : 38;
 }
 
-void TimelineControl::Resize(float width, float height)
+void TimelineControl::Resize(double width, double height)
 {
    mWidth = width;
    mTimeSlider->SetDimensions(GetSliderWidth(), 15);
@@ -116,7 +116,7 @@ void TimelineControl::CheckboxUpdated(Checkbox* checkbox, double time)
       if (mDock && GetOwningContainer() == TheSynth->GetRootContainer())
       {
          TheSynth->GetUIContainer()->TakeModule(this);
-         float w, h;
+         double w, h;
          GetModuleDimensions(w, h);
          Resize(ofGetWidth() / GetOwningContainer()->GetDrawScale(), h);
          gHoveredUIControl = nullptr;
@@ -125,7 +125,7 @@ void TimelineControl::CheckboxUpdated(Checkbox* checkbox, double time)
       if (!mDock && GetOwningContainer() == TheSynth->GetUIContainer())
       {
          TheSynth->GetRootContainer()->TakeModule(this);
-         float w, h;
+         double w, h;
          GetModuleDimensions(w, h);
          Resize(ofGetWidth() / GetOwningContainer()->GetDrawScale(), h);
          SetPosition(-TheSynth->GetDrawOffset().x, -TheSynth->GetDrawOffset().y + ofGetHeight() / GetOwningContainer()->GetDrawScale() - h);
@@ -134,7 +134,7 @@ void TimelineControl::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void TimelineControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void TimelineControl::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mTimeSlider)
    {

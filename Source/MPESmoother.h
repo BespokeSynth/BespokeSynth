@@ -50,9 +50,9 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -63,20 +63,20 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 
-   float mPitchSmooth{ .02 };
+   double mPitchSmooth{ .02 };
    FloatSlider* mPitchSmoothSlider{ nullptr };
-   float mPressureSmooth{ .02 };
+   double mPressureSmooth{ .02 };
    FloatSlider* mPressureSmoothSlider{ nullptr };
-   float mModWheelSmooth{ .02 };
+   double mModWheelSmooth{ .02 };
    FloatSlider* mModWheelSmoothSlider{ nullptr };
 
    std::array<ModulationParameters, kNumVoices> mModulationInput;

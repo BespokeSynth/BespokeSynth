@@ -51,7 +51,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -62,7 +62,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 115;
       h = 125;
@@ -73,7 +73,7 @@ private:
    IAudioReceiver* mFeedbackTarget{ nullptr };
    PatchCableSource* mFeedbackTargetCable{ nullptr };
    RollingBuffer mFeedbackVizBuffer;
-   float mSignalLimit{ 1 };
+   double mSignalLimit{ 1 };
    double mGainScale[ChannelBuffer::kMaxNumChannels];
    FloatSlider* mSignalLimitSlider{ nullptr };
 };

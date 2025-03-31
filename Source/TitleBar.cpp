@@ -80,7 +80,7 @@ void SpawnList::SetList(std::vector<ModuleFactory::Spawnable> spawnables)
 
 namespace
 {
-   ofVec2f kModuleGrabOffset(-40, 10);
+   ofVec2d kModuleGrabOffset(-40, 10);
 }
 
 void SpawnList::OnSelection(DropdownList* list)
@@ -109,7 +109,7 @@ IDrawableModule* SpawnList::Spawn(int index)
 
 void SpawnList::Draw()
 {
-   float x, y;
+   double x, y;
    mSpawnList->GetPosition(x, y, true);
    //DrawTextNormal(mLabel,x,y-2);
    mSpawnList->Draw();
@@ -302,7 +302,7 @@ void TitleBar::Poll()
    mHelpDisplay->Poll();
 }
 
-void TitleBar::OnClicked(float x, float y, bool right)
+void TitleBar::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -310,7 +310,7 @@ void TitleBar::OnClicked(float x, float y, bool right)
       TheSynth->GetLocationZoomer()->EnterVanityPanningMode();
 }
 
-bool TitleBar::MouseMoved(float x, float y)
+bool TitleBar::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -324,10 +324,10 @@ bool TitleBar::MouseMoved(float x, float y)
 
 namespace
 {
-   const float kDoubleHeightThreshold = 1200;
+   const double kDoubleHeightThreshold = 1200;
 }
 
-float TitleBar::GetPixelWidth() const
+double TitleBar::GetPixelWidth() const
 {
    return ofGetWidth() / GetOwningContainer()->GetDrawScale();
 }
@@ -361,7 +361,7 @@ void TitleBar::DrawModule()
    if (IKeyboardFocusListener::GetActiveKeyboardFocus())
       info += " (entering text)";
 
-   float pixelWidth = GetPixelWidth();
+   double pixelWidth = GetPixelWidth();
 
    DrawTextRightJustify(info, pixelWidth - 140, 32);
 
@@ -378,8 +378,8 @@ void TitleBar::DrawModule()
       mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
    mPlayPauseButton->Draw();
 
-   float startX = 400;
-   float startY = 2;
+   double startX = 400;
+   double startY = 2;
 
    if (pixelWidth < kDoubleHeightThreshold)
    {
@@ -387,12 +387,12 @@ void TitleBar::DrawModule()
       startY += 16 * 2 + 4;
    }
 
-   float x = startX;
-   float y = startY;
+   double x = startX;
+   double y = startY;
    for (auto* spawnList : mSpawnLists.GetDropdowns())
    {
       spawnList->SetPosition(x, y);
-      float w, h;
+      double w, h;
       spawnList->GetList()->GetDimensions(w, h);
       x += w + 5;
 
@@ -412,7 +412,7 @@ void TitleBar::DrawModule()
    }
    mModuleCategory = type;
 
-   float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
+   double usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
    std::string stats;
    stats += "fps:" + ofToString(ofGetFrameRate(), 0);
    stats += "  audio cpu:" + ofToString(usage * 100, 1);
@@ -437,24 +437,24 @@ void TitleBar::DrawModuleUnclipped()
    {
       ofPushStyle();
       ofSetColor(255, 255, 255);
-      float titleBarWidth, titleBarHeight;
+      double titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
-      float x = 100;
-      float y = 50 + titleBarHeight;
+      double x = 100;
+      double y = 50 + titleBarHeight;
       gFontBold.DrawString("please close plugin manager to continue", 48, x, y);
       ofPopStyle();
       return;
    }
 
-   float displayMessageCooldown = 1 - ofClamp((gTime - mDisplayMessageTime) / 1000, 0, 1);
+   double displayMessageCooldown = 1 - ofClamp((gTime - mDisplayMessageTime) / 1000, 0, 1);
    if (displayMessageCooldown > 0)
    {
       ofPushStyle();
       ofSetColor(255, 255, 255, displayMessageCooldown * 255);
-      float titleBarWidth, titleBarHeight;
+      double titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
-      float x = 100;
-      float y = 40 + titleBarHeight;
+      double x = 100;
+      double y = 40 + titleBarHeight;
       gFontBold.DrawString(mDisplayMessage, 48, x, y);
       ofPopStyle();
    }
@@ -467,15 +467,15 @@ void TitleBar::DrawModuleUnclipped()
       ofPushStyle();
       ofSetColor(255, 255, 255);
       std::string text = "click ? to view help and toggle tooltips";
-      float size = 26;
-      float titleBarWidth, titleBarHeight;
+      double size = 26;
+      double titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       ofRectangle helpButtonRect = mDisplayHelpButton->GetRect(true);
-      float x = helpButtonRect.getCenter().x;
-      float y = helpButtonRect.getCenter().y + 15 + titleBarHeight;
+      double x = helpButtonRect.getCenter().x;
+      double y = helpButtonRect.getCenter().y + 15 + titleBarHeight;
       gFontBold.DrawString(text, size, x - gFontBold.GetStringWidth(text, size) - 15 * GetOwningContainer()->GetDrawScale(), y);
       ofSetLineWidth(2);
-      float scale = GetOwningContainer()->GetDrawScale();
+      double scale = GetOwningContainer()->GetDrawScale();
       ofLine(x - 10, y - 6 * scale, x, y - 6 * scale);
       ofLine(x, y - 6 * scale, x, y - 18 * scale);
       ofLine(x - 3 * scale, y - 15 * scale, x, y - 18 * scale);
@@ -485,7 +485,7 @@ void TitleBar::DrawModuleUnclipped()
 
    //midicontroller
    {
-      const float kDisplayMs = 500;
+      const double kDisplayMs = 500;
       std::string displayString;
 
       IUIControl* drawControl = nullptr;
@@ -506,9 +506,9 @@ void TitleBar::DrawModuleUnclipped()
       {
          ofPushStyle();
          ofFill();
-         ofVec2f pos(50, ofGetHeight() / GetOwningContainer()->GetDrawScale() - 100);
-         const float kWidth = 600;
-         const float kHeight = 70;
+         ofVec2d pos(50, ofGetHeight() / GetOwningContainer()->GetDrawScale() - 100);
+         const double kWidth = 600;
+         const double kHeight = 70;
          ofSetColor(80, 80, 80, 150);
          ofRect(pos.x, pos.y, kWidth, kHeight);
          ofSetColor(120, 120, 120, 150);
@@ -531,7 +531,7 @@ bool TitleBar::HiddenByZoom() const
    return false; //ofGetWidth() / GetOwningContainer()->GetDrawScale() < 620;
 }
 
-void TitleBar::GetModuleDimensions(float& width, float& height)
+void TitleBar::GetModuleDimensions(double& width, double& height)
 {
    if (HiddenByZoom())
    {
@@ -592,7 +592,7 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
       TheSynth->SaveOutput();
    if (button == mDisplayHelpButton)
    {
-      float x, y, w, h, butW, butH;
+      double x, y, w, h, butW, butH;
       mDisplayHelpButton->GetPosition(x, y);
       mDisplayHelpButton->GetDimensions(butW, butH);
       mHelpDisplay->GetDimensions(w, h);

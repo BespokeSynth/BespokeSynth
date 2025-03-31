@@ -134,7 +134,7 @@ void ChordHolder::PlayNote(NoteMessage note)
    mNoteInputHeld[note.pitch] = note.velocity > 0;
 }
 
-void ChordHolder::OnPulse(double time, float velocity, int flags)
+void ChordHolder::OnPulse(double time, double velocity, int flags)
 {
    for (int i = 0; i < 128; ++i)
    {

@@ -37,7 +37,7 @@ public:
    virtual ~PitchShifter();
 
    void Process(float* buffer, int bufferSize);
-   void SetRatio(float ratio) { mRatio = ratio; }
+   void SetRatio(double ratio) { mRatio = ratio; }
    void SetOversampling(int oversampling) { mOversampling = oversampling; }
    int GetLatency() const { return mLatency; }
 

@@ -383,13 +383,13 @@ void LinnstrumentControl::NoteAge::Update(int pitch, LinnstrumentControl* linnst
    if (!linnstrument->mControlPlayedLights)
       return;
 
-   float age = gTime - mTime;
+   double age = gTime - mTime;
    LinnstrumentColor newColor;
    if (mTime < 0 || age < 0)
       newColor = kLinnColor_Red;
-   else if (age < linnstrument->mDecayMs * .25f)
+   else if (age < linnstrument->mDecayMs * .25)
       newColor = kLinnColor_Pink;
-   else if (age < linnstrument->mDecayMs * .5f)
+   else if (age < linnstrument->mDecayMs * .5)
       newColor = kLinnColor_Cyan;
    else if (age < linnstrument->mDecayMs)
       newColor = kLinnColor_Blue;
