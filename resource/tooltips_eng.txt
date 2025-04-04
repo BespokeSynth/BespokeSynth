@@ -2138,12 +2138,9 @@ dataprovider~provides modulation values normally not easily accessible.
 
 
 pulselimit~limit the number of pulses allowed to pass through
-~reset the counter of seen pulses
-~limit number of pulses to pass through
-
-
 ~reset~reset the counter of seen pulses
 ~limit~limit number of pulses to pass through
+
 
 audiosplitter~send an audio signal to multiple destinations
 
