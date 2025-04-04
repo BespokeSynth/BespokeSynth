@@ -81,7 +81,7 @@ public:
    void SetEnabled(bool enabled) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
    void SendMidi(const juce::MidiMessage& message) override;
 

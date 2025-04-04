@@ -51,6 +51,6 @@ bool PerformanceTimer::SortCosts(const PerformanceTimer::Cost& a, const Performa
 void PerformanceTimer::PrintCosts()
 {
    sort(mCostTable.begin(), mCostTable.end(), SortCosts);
-   for (Cost cost : mCostTable)
+   for (auto& cost : mCostTable)
       ofLog() << cost.mName << " " << ofToString(cost.mCost);
 }

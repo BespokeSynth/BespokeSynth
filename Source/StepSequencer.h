@@ -74,6 +74,8 @@ private:
    int mPlayedStepsRoundRobin{ 0 };
    TextEntry* mRowPitchEntry{ nullptr };
    int mRowPitch{ 0 };
+   Checkbox* mPlayRowCheckbox{ nullptr };
+   bool mPlayRow{ true };
 };
 
 class NoteRepeat : public ITimeListener
@@ -134,7 +136,7 @@ public:
    int GetRowPitch(int row) const { return mRows[row]->GetRowPitch(); }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
@@ -223,9 +225,24 @@ private:
       RepeatHeld
    };
 
+   enum class StepVelocityEntryMode
+   {
+      Dropdown,
+      Slider
+   };
+
+   enum class GridControllerMode
+   {
+      FitMultipleRows,
+      SingleRow
+   };
+
    UIGrid* mGrid{ nullptr };
-   float mStrength{ 1 };
+   float mStrength{ kVelocityNormal };
    FloatSlider* mStrengthSlider{ nullptr };
+   StepVelocityType mVelocityType{ StepVelocityType::Normal };
+   DropdownList* mVelocityTypeDropdown{ nullptr };
+   StepVelocityEntryMode mStepVelocityEntryMode{ StepVelocityEntryMode::Dropdown };
    int mGridYOff{ 0 };
    ClickButton* mClearButton{ nullptr };
    int mColorOffset{ 3 };
@@ -264,6 +281,7 @@ private:
    float mRandomizationDensity{ .25 };
    FloatSlider* mRandomizationDensitySlider{ nullptr };
    ClickButton* mRandomizeButton{ nullptr };
+   GridControllerMode mGridControllerMode{ GridControllerMode::FitMultipleRows };
 
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 };

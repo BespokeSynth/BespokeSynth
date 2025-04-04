@@ -101,7 +101,7 @@ void LooperGranulator::ProcessFrame(double time, float bufferOffset, float* outp
    {
       int bufferLength;
       auto* buffer = mLooper->GetLoopBuffer(bufferLength);
-      mGranulator.ProcessFrame(time, buffer, bufferLength, bufferOffset, output);
+      mGranulator.ProcessFrame(time, buffer, bufferLength, bufferOffset, 1.0f, output);
    }
 }
 

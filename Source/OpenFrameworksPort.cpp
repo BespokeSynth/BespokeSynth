@@ -29,6 +29,7 @@
 #include <windows.h>
 #endif
 
+#include "UserPrefs.h"
 #include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
 using namespace juce;
@@ -58,6 +59,31 @@ ofColor ofColor::clear(0, 0, 0, 0);
 
 NVGcontext* gNanoVG = nullptr;
 NVGcontext* gFontBoundsNanoVG = nullptr;
+
+std::string ofToSamplePath(const std::string& path)
+{
+   if (!path.empty() && (path[0] == '.' || juce::File::isAbsolutePath(path)))
+      return path;
+
+   auto result = ofToDataPath(path);
+
+   auto samplesPath = UserPrefs.samples_path.Get();
+   if (samplesPath.empty())
+      samplesPath = "samples/";
+
+   if (juce::File::isAbsolutePath(samplesPath))
+      result = samplesPath;
+   else
+      result += samplesPath;
+
+#if BESPOKE_WINDOWS
+   std::replace(begin(result), end(result), '\\', '/');
+#endif
+   if (result.back() != '/')
+      result += '/';
+
+   return result + path;
+}
 
 std::string ofToDataPath(const std::string& path)
 {
@@ -468,7 +494,7 @@ std::vector<std::string> ofSplitString(std::string str, std::string splitter, bo
       tokens.trim();
 
    std::vector<std::string> ret;
-   for (auto s : tokens)
+   for (auto& s : tokens)
       ret.push_back(s.toStdString());
 
    return ret;
@@ -550,6 +576,17 @@ void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
    ofVertex(x3, y3);
    ofVertex(x1, y1);
    ofEndShape();
+}
+
+//static
+ofRectangle ofRectangle::include(const ofRectangle& a, const ofRectangle& b)
+{
+   ofRectangle ret;
+   ret.x = MIN(a.getMinX(), b.getMinX());
+   ret.y = MIN(a.getMinY(), b.getMinY());
+   ret.width = MAX(a.getMaxX(), b.getMaxX()) - ret.x;
+   ret.height = MAX(a.getMaxY(), b.getMaxY()) - ret.y;
+   return ret;
 }
 
 float ofRectangle::getMinX() const

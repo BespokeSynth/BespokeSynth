@@ -57,12 +57,12 @@ void NoteToFreq::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    OnModulatorRepatch();
 }
 
-void NoteToFreq::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteToFreq::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
-      mPitch = pitch;
-      mPitchBend = modulation.pitchBend;
+      mPitch = note.pitch;
+      mPitchBend = note.modulation.pitchBend;
    }
 }
 

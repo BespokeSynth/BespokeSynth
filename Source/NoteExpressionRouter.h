@@ -32,7 +32,7 @@
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 #include "TextEntry.h"
-#include "exprtk/exprtk.hpp"
+#include "exprtk.hpp"
 
 class NoteExpressionRouter : public INoteReceiver, public INoteSource, public IDrawableModule, public ITextEntryListener
 {
@@ -45,7 +45,7 @@ public:
 
    void CreateUIControls() override;
 
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
    void TextEntryComplete(TextEntry* entry) override;

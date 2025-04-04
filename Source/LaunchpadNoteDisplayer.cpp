@@ -42,12 +42,12 @@ void LaunchpadNoteDisplayer::DrawModuleUnclipped()
    DrawConnection(mLaunchpad);
 }
 
-void LaunchpadNoteDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void LaunchpadNoteDisplayer::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 
    if (mLaunchpad)
-      mLaunchpad->DisplayNote(pitch, velocity);
+      mLaunchpad->DisplayNote(note.pitch, note.velocity);
 }
 
 void LaunchpadNoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)

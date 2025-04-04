@@ -53,7 +53,7 @@ void GridModule::CreateUIControls()
 
    mMomentaryCheckbox = new Checkbox(this, "momentary", 40, 3, &mMomentary);
 
-   mGrid = new UIGrid("uigrid", 40, 22, 90, 90, 8, 8, this);
+   mGrid = new UIGrid(this, "uigrid", 40, 22, 90, 90, 8, 8);
    mGrid->SetListener(this);
    mGridControlTarget = new GridControlTarget(this, "grid", 4, 4);
 
@@ -103,9 +103,9 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
    UpdateLights();
 }
 
-void GridModule::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void GridModule::PlayNote(NoteMessage note)
 {
-   OnGridButton(pitch % GetCols(), ((pitch / GetCols()) % GetRows()), velocity / 127.0f, nullptr);
+   OnGridButton(note.pitch % GetCols(), ((note.pitch / GetCols()) % GetRows()), note.velocity / 127.0f, nullptr);
 }
 
 void GridModule::UpdateLights()
@@ -350,12 +350,12 @@ void GridModule::SaveState(FileStreamOut& out)
    out << mGrid->GetRows();
    out << mGrid->GetMajorColSize();
    out << (int)mLabels.size();
-   for (auto label : mLabels)
+   for (auto& label : mLabels)
       out << label;
    out << (int)mColors.size();
-   for (auto color : mColors)
+   for (auto& color : mColors)
       out << color.r << color.g << color.b;
-   for (auto overlay : mGridOverlay)
+   for (auto& overlay : mGridOverlay)
       out << overlay;
 }
 

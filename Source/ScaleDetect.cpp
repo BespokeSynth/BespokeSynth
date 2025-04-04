@@ -86,14 +86,14 @@ void ScaleDetect::DrawModule()
    }
 }
 
-void ScaleDetect::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ScaleDetect::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 
-   if (velocity > 0 && pitch >= 0 && pitch < 128)
+   if (note.velocity > 0 && note.pitch >= 0 && note.pitch < 128)
    {
-      mPitchOn[pitch] = true;
-      mLastPitch = pitch;
+      mPitchOn[note.pitch] = true;
+      mLastPitch = note.pitch;
       mNeedsUpdate = true;
    }
 }

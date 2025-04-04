@@ -65,10 +65,10 @@ void ControlSequencer::CreateUIControls()
    CHECKBOX(mRecordCheckbox, "record", &mRecord);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, height + 3, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1, this);
+   mGrid = new UIGrid(this, "uigrid", 5, height + 3, mRandomize->GetRect().getMaxX() - 6, 40, mLength, 1);
 
    UIBLOCK(15, height + 5);
-   for (size_t i = 0; i < mStepSliders.size(); ++i)
+   for (int i = 0; i < (int)mStepSliders.size(); ++i)
    {
       FLOATSLIDER(mStepSliders[i], ("step " + ofToString(i)).c_str(), &mGrid->GetVal(i, 0), 0, 1);
    }
@@ -166,13 +166,13 @@ void ControlSequencer::OnTimeEvent(double time)
       Step(time, 0);
 }
 
-void ControlSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ControlSequencer::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
       mHasExternalPulseSource = true;
-      mStep = pitch % std::max(1, mLength);
-      Step(time, kPulseFlag_Repeat);
+      mStep = note.pitch % std::max(1, mLength);
+      Step(note.time, kPulseFlag_Repeat);
    }
 }
 
@@ -201,7 +201,7 @@ void ControlSequencer::DrawModule()
       ofPopStyle();
    }
 
-   for (size_t i = 0; i < mStepSliders.size(); ++i)
+   for (int i = 0; i < (int)mStepSliders.size(); ++i)
    {
       if (mSliderMode)
       {

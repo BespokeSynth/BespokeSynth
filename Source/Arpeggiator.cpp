@@ -143,27 +143,27 @@ void Arpeggiator::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Arpeggiator::PlayNote(NoteMessage note)
 {
-   if (!mEnabled || pitch < 0 || pitch >= 128)
+   if (!mEnabled || note.pitch < 0 || note.pitch >= 128)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (velocity > 0 && !mInputNotes[pitch])
+   if (note.velocity > 0 && !mInputNotes[note.pitch])
    {
       mChordMutex.lock();
-      mChord.push_back(ArpNote(pitch, velocity, voiceIdx, modulation));
+      mChord.push_back(ArpNote(note.pitch, note.velocity, note.voiceIdx, note.modulation));
       mChordMutex.unlock();
    }
 
-   if (velocity == 0 && mInputNotes[pitch])
+   if (note.velocity == 0 && mInputNotes[note.pitch])
    {
       mChordMutex.lock();
       for (auto iter = mChord.begin(); iter != mChord.end(); ++iter)
       {
-         if (iter->pitch == pitch)
+         if (iter->pitch == note.pitch)
          {
             mChord.erase(iter);
             break;
@@ -172,7 +172,7 @@ void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       mChordMutex.unlock();
    }
 
-   mInputNotes[pitch] = velocity > 0;
+   mInputNotes[note.pitch] = note.velocity > 0;
 }
 
 void Arpeggiator::OnTimeEvent(double time)
@@ -183,7 +183,10 @@ void Arpeggiator::OnTimeEvent(double time)
    if (mChord.size() == 0)
    {
       if (mLastPitch != -1)
-         PlayNoteOutput(time, mLastPitch, 0, -1);
+      {
+         NoteMessage note(time, mLastPitch, 0);
+         PlayNoteOutput(note);
+      }
       mLastPitch = -1;
       return;
    }
@@ -243,16 +246,16 @@ void Arpeggiator::OnTimeEvent(double time)
 
       if (mLastPitch == outPitch) //same note, play noteoff first
       {
-         PlayNoteOutput(time, mLastPitch, 0, -1);
+         PlayNoteOutput(NoteMessage(time, mLastPitch, 0));
          offPitch = -1;
       }
       float pressure = current.modulation.pressure ? current.modulation.pressure->GetValue(0) : 0;
-      PlayNoteOutput(time, outPitch, ofClamp(current.vel + 127 * pressure, 0, 127), current.voiceIdx, current.modulation);
+      PlayNoteOutput(NoteMessage(time, outPitch, ofClamp(current.vel + 127 * pressure, 0, 127), current.voiceIdx, current.modulation));
       mLastPitch = outPitch;
    }
    if (offPitch != -1)
    {
-      PlayNoteOutput(time, offPitch, 0, -1);
+      PlayNoteOutput(NoteMessage(time, offPitch, 0));
       if (offPitch == mLastPitch)
          mLastPitch = -1;
    }

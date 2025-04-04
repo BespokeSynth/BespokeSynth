@@ -1,0 +1,34 @@
+{
+   "groups" : [
+      {
+         "rows": 2,
+         "cols": 4,
+         "position" : [ 0, 0 ],
+         "dimensions" : [28, 28],
+         "spacing" : [32, 32],
+         "controls" : [40, 41, 42, 43, 36, 37, 38, 39],
+         "messageType" : "note",
+         "drawType" : "button"
+      },
+      {
+         "rows": 2,
+         "cols": 4,
+         "position" : [ 0, 96 ],
+         "dimensions" : [28, 28],
+         "spacing" : [32, 32],
+         "controls" : [4, 5, 6, 7, 0, 1, 2, 3],
+         "messageType" : "program",
+         "drawType" : "button"
+      },
+      {
+         "rows": 2,
+         "cols": 4,
+         "position" : [ 0, 192 ],
+         "dimensions" : [28, 28],
+         "spacing" : [32, 32],
+         "controls" : [1, 2, 3, 4, 5, 6, 7, 8],
+         "messageType" : "control",
+         "drawType" : "knob"
+      }
+   ]
+}

@@ -49,3 +49,6 @@ class module:
    def adjust(this, path, amount):
       pass
 
+   def set_focus(this, zoom):
+      pass
+

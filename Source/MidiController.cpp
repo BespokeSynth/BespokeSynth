@@ -91,10 +91,10 @@ void MidiController::CreateUIControls()
    mLayoutFileDropdown->AddLabel(kDefaultLayout, 0);
    File dir(ofToDataPath("controllers"));
    Array<File> files;
-   for (auto file : dir.findChildFiles(File::findFiles, false, "*.json"))
+   for (auto& file : dir.findChildFiles(File::findFiles, false, "*.json"))
       files.add(file);
    files.sort();
-   for (auto file : files)
+   for (auto& file : files)
       mLayoutFileDropdown->AddLabel(file.getFileName().toStdString(), mLayoutFileDropdown->GetNumValues());
 }
 
@@ -254,6 +254,9 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
       if (!connection["midi_off_value"].isNull())
          controlConnection->mMidiOffValue = connection["midi_off_value"].asInt();
 
+      if (!connection["scale"].isNull())
+         controlConnection->mScaleOutput = connection["scale"].asBool();
+
       if (!connection["blink"].isNull())
          controlConnection->mBlink = connection["blink"].asBool();
 
@@ -331,7 +334,7 @@ void MidiController::OnTransportAdvanced(float amount)
             playTime += .01; //hack to handle note on/off in the same frame
       }
       lastPlayTime = playTime;
-      PlayNoteOutput(playTime, note->mPitch + mNoteOffset, MIN(127, note->mVelocity * mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0));
+      PlayNoteOutput(NoteMessage(playTime, note->mPitch + mNoteOffset, MIN(127, note->mVelocity * mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0)));
 
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
          (*i)->OnMidiNote(*note);
@@ -479,8 +482,13 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 void MidiController::OnMidi(const MidiMessage& message)
 {
-   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !message.isSysEx()))
+   int is_sysex = message.isSysEx();
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !is_sysex))
       return;
+   if (mEnabled && mSendSysex && is_sysex)
+      for (auto* script : mScriptListeners)
+         script->SysExReceived(message.getSysExData(), message.getSysExDataSize());
+
    mNoteOutput.SendMidi(message);
 }
 
@@ -2412,6 +2420,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, true);
    mModuleSaveData.LoadBool("resend_feedback_on_release", moduleInfo, false);
    mModuleSaveData.LoadBool("show_activity_ui_overlay", moduleInfo, true);
+   mModuleSaveData.LoadBool("send_sysex", moduleInfo, false);
 
    mConnectionsJson = moduleInfo["connections"];
 
@@ -2444,6 +2453,7 @@ void MidiController::SetUpFromSaveData()
    mSendTwoWayOnChange = mModuleSaveData.GetBool("twoway_on_change");
    mResendFeedbackOnRelease = mModuleSaveData.GetBool("resend_feedback_on_release");
    mShowActivityUIOverlay = mModuleSaveData.GetBool("show_activity_ui_overlay");
+   mSendSysex = mModuleSaveData.GetBool("send_sysex");
 
    BuildControllerList();
 
@@ -2541,6 +2551,8 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
          mConnectionsJson[i]["midi_off_value"] = connection->mMidiOffValue;
       if (connection->mMidiOnValue != 127)
          mConnectionsJson[i]["midi_on_value"] = connection->mMidiOnValue;
+      if (connection->mScaleOutput)
+         mConnectionsJson[i]["scale"] = true;
       if (connection->mBlink)
          mConnectionsJson[i]["blink"] = true;
       if (connection->mIncrementAmount != 0)
@@ -2811,6 +2823,7 @@ void UIControlConnection::PreDraw()
 
    mControlEntry->SetShowing(mMessageType != kMidiMessage_PitchBend);
    mValueEntry->SetShowing((mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease) && mIncrementAmount == 0);
+   m14BitModeCheckbox->SetShowing(mMessageType == kMidiMessage_Control && mControl >= 32);
    mIncrementalEntry->SetShowing(mType == kControlType_Slider || mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease);
 }
 

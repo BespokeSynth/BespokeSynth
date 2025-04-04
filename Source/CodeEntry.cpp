@@ -122,7 +122,7 @@ void CodeEntry::Poll()
                      auto signatures = ret.cast<std::list<py::object> >();
 
                      size_t i = 0;
-                     for (auto signature : signatures)
+                     for (auto& signature : signatures)
                      {
                         mWantToShowAutocomplete = true;
                         if (i < mAutocompleteSignatures.size())
@@ -166,7 +166,7 @@ void CodeEntry::Poll()
 
                         if (!isPathAutocomplete) //normal autocomplete
                         {
-                           for (auto autocomplete : autocompletes)
+                           for (auto& autocomplete : autocompletes)
                            {
                               //ofLog() << "    --" << autocomplete;
                               std::string full = py::str(autocomplete.attr("name"));

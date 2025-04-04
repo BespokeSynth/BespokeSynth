@@ -158,6 +158,14 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       }
       return paths;
    });
+   m.def("location_recall", [](char location)
+   {
+      TheSynth->GetLocationZoomer()->MoveToLocation(location);
+   });
+   m.def("location_store", [](char location)
+   {
+      TheSynth->GetLocationZoomer()->WriteCurrentLocation(location);
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
@@ -213,6 +221,18 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          return 0.0f;
       })
       ///example: pulsewidth = me.get("oscillator~pulsewidth")
+      .def("get_path_prefix", [](ScriptModule& module)
+      {
+         std::string path = module.Path();
+         if (ofIsStringInString(path, "~"))
+         {
+            return path.substr(0, path.rfind('~') + 1);
+         }
+         else 
+         {
+            return std::string("");
+         }
+      })
       .def("adjust", [](ScriptModule& module, std::string path, float amount)
       {
          IUIControl* control = module.GetUIControl(path);
@@ -419,7 +439,7 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
          modulation.pitchBend->SetValue(log2(speedMult));
          modulation.modWheel = scriptModule->GetModWheel(cue);
          modulation.modWheel->SetValue(startOffsetSeconds);
-         player.PlayNote(time, cue, 127, -1, modulation);
+         player.PlayNote(NoteMessage(time, cue, 127, -1, modulation));
       }, "cue"_a, "speedMult"_a = 1, "startOffsetSeconds"_a = 0)
       .def("get_length_seconds", [](SamplePlayer& player)
       {
@@ -804,6 +824,25 @@ PYBIND11_EMBEDDED_MODULE(module, m)
             float value = ofClamp(control->GetValue() + amount, min, max);
             control->SetValue(value, ScriptModule::sMostRecentRunTime);
          }
+      })
+      .def("set_focus", [](IDrawableModule& module, float zoom)
+      {
+         ofRectangle module_rect = module.GetRect();
+         if (zoom >= 0.1)
+            gDrawScale = ofClamp(zoom, 0.1, 8);
+         else if (fabs(zoom) < 0.1) // Close to 0
+         {
+            //calculate zoom to view the entire module
+            float margin = 60;
+            float w_ratio = ofGetWidth() / (module_rect.width + margin);
+            float h_ratio = ofGetHeight() / (module_rect.height + margin);
+            float ratio = (w_ratio < h_ratio) ? w_ratio : h_ratio;
+            gDrawScale = ofClamp(ratio, 0.1, 8);
+         }
+         // Move viewport to centered on the module
+         float w, h;
+         TheTitleBar->GetDimensions(w, h);
+         TheSynth->SetDrawOffset(ofVec2f(-module_rect.x + ofGetWidth() / gDrawScale / 2 - module_rect.width / 2, -module_rect.y + ofGetHeight() / gDrawScale / 2 - (module_rect.height - h / 2) / 2));
       });
 }
 
