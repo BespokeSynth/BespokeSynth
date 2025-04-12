@@ -621,7 +621,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
       {
          targetModuleParent->GetPosition(xThat, yThat);
          targetModuleParent->GetDimensions(wThat, hThat);
-         if (targetModuleParent->HasTitleBar() && !mDragging)
+         if (targetModuleParent->HasTitleBar())
             yThatAdjust = IDrawableModule::TitleBarHeight();
       }
       if (targetModuleGrandparent && (targetModuleGrandparent->Minimized() || target->IsShowing() == false))
