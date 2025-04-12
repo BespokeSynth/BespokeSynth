@@ -720,18 +720,33 @@ ModuleCategory ModuleFactory::GetModuleCategory(std::string typeName)
 
 ModuleCategory ModuleFactory::GetModuleCategory(Spawnable spawnable)
 {
-   if (spawnable.mSpawnMethod == SpawnMethod::Module && mFactoryMap.find(spawnable.mLabel) != mFactoryMap.end())
-      return mFactoryMap[spawnable.mLabel].mCategory;
-   if (spawnable.mSpawnMethod == SpawnMethod::Plugin)
-      return kModuleCategory_Synth;
-   if (spawnable.mSpawnMethod == SpawnMethod::MidiController)
-      return kModuleCategory_Instrument;
-   if (spawnable.mSpawnMethod == SpawnMethod::EffectChain)
-      return kModuleCategory_Audio;
-   if (spawnable.mSpawnMethod == SpawnMethod::Prefab)
-      return kModuleCategory_Other;
-   if (spawnable.mSpawnMethod == SpawnMethod::Preset)
-      return mFactoryMap[spawnable.mPresetModuleType].mCategory;
+   switch (spawnable.mSpawnMethod)
+   {
+      case SpawnMethod::Module:
+         if (mFactoryMap.find(spawnable.mLabel) != mFactoryMap.end())
+            return mFactoryMap[spawnable.mLabel].mCategory;
+         break;
+
+      case SpawnMethod::Plugin:
+         return kModuleCategory_Synth;
+         break;
+
+      case SpawnMethod::MidiController:
+         return kModuleCategory_Instrument;
+         break;
+
+      case SpawnMethod::EffectChain:
+         return kModuleCategory_Audio;
+         break;
+
+      case SpawnMethod::Prefab:
+         return kModuleCategory_Other;
+         break;
+
+      case SpawnMethod::Preset:
+         return mFactoryMap[spawnable.mPresetModuleType].mCategory;
+         break;
+   }
    return kModuleCategory_Other;
 }
 
