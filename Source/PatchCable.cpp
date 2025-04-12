@@ -514,7 +514,12 @@ IClickable* PatchCable::GetDropTarget()
    {
       PatchCablePos cable = GetPatchCablePos();
       IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
-      if (potentialTarget && (GetConnectionType() == kConnectionType_Pulse || GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_ValueSetter || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
+      if (potentialTarget &&
+          (GetConnectionType() == kConnectionType_Pulse ||
+           GetConnectionType() == kConnectionType_Modulator ||
+           GetConnectionType() == kConnectionType_ValueSetter ||
+           GetConnectionType() == kConnectionType_Grid ||
+           GetConnectionType() == kConnectionType_UIControl))
       {
          IClickable* potentialUIControl = nullptr;
 
@@ -608,7 +613,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
 
       IDrawableModule* targetModuleParent = dynamic_cast<IDrawableModule*>(target->GetParent());
       IDrawableModule* targetModuleGrandparent = dynamic_cast<IDrawableModule*>(targetModuleParent ? targetModuleParent->GetParent() : nullptr);
-      ModuleContainer* targetModuleParentContainer = targetModuleParent ? targetModuleParent->GetOwningContainer() : nullptr;
+      const ModuleContainer* targetModuleParentContainer = targetModuleParent ? targetModuleParent->GetOwningContainer() : nullptr;
       IDrawableModule* targetModuleParentContainerModule = targetModuleParentContainer ? targetModuleParentContainer->GetOwner() : nullptr;
       if (targetModuleParentContainerModule && targetModuleParentContainerModule->Minimized())
          targetModuleParent = targetModuleParentContainerModule;
@@ -616,7 +621,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
       {
          targetModuleParent->GetPosition(xThat, yThat);
          targetModuleParent->GetDimensions(wThat, hThat);
-         if (targetModuleParent->HasTitleBar() && !mDragging)
+         if (targetModuleParent->HasTitleBar())
             yThatAdjust = IDrawableModule::TitleBarHeight();
       }
       if (targetModuleGrandparent && (targetModuleGrandparent->Minimized() || target->IsShowing() == false))
