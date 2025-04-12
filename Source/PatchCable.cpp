@@ -613,7 +613,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
 
       IDrawableModule* targetModuleParent = dynamic_cast<IDrawableModule*>(target->GetParent());
       IDrawableModule* targetModuleGrandparent = dynamic_cast<IDrawableModule*>(targetModuleParent ? targetModuleParent->GetParent() : nullptr);
-      ModuleContainer* targetModuleParentContainer = targetModuleParent ? targetModuleParent->GetOwningContainer() : nullptr;
+      const ModuleContainer* targetModuleParentContainer = targetModuleParent ? targetModuleParent->GetOwningContainer() : nullptr;
       IDrawableModule* targetModuleParentContainerModule = targetModuleParentContainer ? targetModuleParentContainer->GetOwner() : nullptr;
       if (targetModuleParentContainerModule && targetModuleParentContainerModule->Minimized())
          targetModuleParent = targetModuleParentContainerModule;
