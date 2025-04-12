@@ -1,0 +1,217 @@
+/**
+    bespoke synth, a software modular synthesizer
+    Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+**/
+//
+//  PadSynthVoice.cpp
+//  modularSynth
+//
+//  Created by Andrius Merkys on 4/8/25.
+//
+//
+
+// Contains PADsynth code generously donated to public domain by
+// Nasca Octavian Paul, accessible at
+// https://zynaddsubfx.sourceforge.io/doc/PADsynth/PADsynth.htm
+
+#include "PadSynthVoice.h"
+#include "PadSynth.h"
+#include "EnvOscillator.h"
+#include "FFT.h"
+#include "SynthGlobals.h"
+#include "Scale.h"
+#include "Profiler.h"
+#include "ChannelBuffer.h"
+#include "PolyphonyMgr.h"
+#include "SingleOscillatorVoice.h"
+
+#include "juce_core/juce_core.h"
+
+PadSynthVoice::PadSynthVoice(IDrawableModule* owner)
+: mBuffer(gSampleRate)
+, mOwner(owner)
+{
+   ClearVoice();
+
+   mPadSynthModule = dynamic_cast<PadSynth*>(mOwner);
+}
+
+PadSynthVoice::~PadSynthVoice()
+{
+   delete mFFT;
+}
+
+bool PadSynthVoice::IsDone(double time)
+{
+   return mAdsr.IsDone(time);
+}
+
+bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
+{
+   PROFILER(PadSynthVoice);
+
+   if (IsDone(time))
+      return false;
+
+   int bufferSize = out->BufferSize();
+   int channels = out->NumActiveChannels();
+   double sampleIncrementMs = gInvSampleRateMs;
+   double sampleRate = gSampleRate;
+   ChannelBuffer* destBuffer = out;
+
+   if (oversampling != 1)
+   {
+      gMidiVoiceWorkChannelBuffer.SetNumActiveChannels(channels);
+      destBuffer = &gMidiVoiceWorkChannelBuffer;
+      gMidiVoiceWorkChannelBuffer.Clear();
+      bufferSize *= oversampling;
+      sampleIncrementMs /= oversampling;
+      sampleRate *= oversampling;
+   }
+
+   float freq;
+   float pitch;
+
+   if (mVoiceParams->mLiteCPUMode)
+      DoParameterUpdate(0, oversampling, pitch, freq);
+
+   float A[mVoiceParams->mHarmonics];
+   A[0] = 0.0; // A[0] is not used
+   for (int i = 1; i < mVoiceParams->mHarmonics; i++) {
+      A[i] = 1.0 / i;
+      if ((i % 2) == 0)
+         A[i] *= 2.0;
+   }
+
+   // Setting mUndersample to a number greater than 1 increases the
+   // internal buffer size to allow for longer wavetables
+   float freq_amp[bufferSize * mUndersample / 2];
+   for (int i = 0; i < bufferSize * mUndersample / 2; i++)
+      freq_amp[i] = 0.0;
+
+   for (int nh = 1; nh < mVoiceParams->mHarmonics; nh++) { // for each harmonic
+      float relf = nh * (1.0 + nh * mVoiceParams->mDetune);
+      float bw_Hz = (pow(2.0, mVoiceParams->mBandwidth / 1200.0) - 1.0) * freq * pow(relf, mVoiceParams->mBandwidthScale); // bandwidth of the current harmonic measured in Hz
+      float bwi = bw_Hz / (2.0 * sampleRate);
+      float fi = freq * relf / sampleRate;
+
+      for (int i = 0; i < bufferSize * mUndersample / 2; i++) {
+         float hprofile = 0.0;
+            float x = ((i / ((float)bufferSize * (float)mUndersample)) - fi) / bwi;
+            x = x * x;
+            if (x <= 14.71280603) // this avoids computing the e^(-x^2) where it's results are very close to zero
+               hprofile = exp(-x) / bwi;
+         freq_amp[i] += hprofile * A[nh];
+      }
+   }
+
+   // Add random phases
+   float freq_phase[bufferSize * mUndersample / 2];
+   for (int i=0; i < bufferSize * mUndersample / 2; i++)
+      freq_phase[i] = ((abs(DeterministicRandom(mSeed, i)) % 10000) / 10000.0f) * 2.0 * PI;
+
+   float smp[bufferSize * mUndersample];
+   mFFT = new ::FFT(bufferSize * mUndersample);
+   mFFT->Inverse(freq_amp, freq_phase, smp);
+
+   // Normalize the sound to 1/sqrt(2)
+   float max = 0.0;
+   for (int i = 0; i < bufferSize * mUndersample; i++)
+      if (fabs(smp[i]) > max)
+         max = fabs(smp[i]);
+   if (max < 1e-5)
+      max = 1e-5;
+   for (int i=0; i < bufferSize * mUndersample; i++)
+      smp[i] /= max * 1.4142;
+
+   for (int pos = 0; pos < bufferSize; ++pos)
+   {
+      if (!mVoiceParams->mLiteCPUMode)
+         DoParameterUpdate(pos / oversampling, oversampling, pitch, freq);
+
+      if (channels == 1)
+      {
+         destBuffer->GetChannel(0)[pos / oversampling] += smp[mSample * bufferSize + pos] * mAdsr.Value(time);
+      }
+      else
+      {
+         int channel_offset = bufferSize * mUndersample * mVoiceParams->mChannelOffset;
+         destBuffer->GetChannel(0)[pos / oversampling] += smp[mSample * bufferSize + pos] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(1)[pos / oversampling] += smp[(mSample * bufferSize + pos + channel_offset) % (bufferSize * mUndersample)] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
+      }
+
+      time += sampleIncrementMs;
+   }
+
+   if (oversampling != 1)
+   {
+      //assume power-of-two
+      while (oversampling > 1)
+      {
+         for (int i = 0; i < bufferSize; ++i)
+         {
+            for (int ch = 0; ch < channels; ++ch)
+               destBuffer->GetChannel(ch)[i] = (destBuffer->GetChannel(ch)[i * 2] + destBuffer->GetChannel(ch)[i * 2 + 1]) / 2;
+         }
+         oversampling /= 2;
+         bufferSize /= 2;
+      }
+
+      for (int ch = 0; ch < channels; ++ch)
+         Add(out->GetChannel(ch), destBuffer->GetChannel(ch), bufferSize);
+   }
+
+   mSample = (mSample + 1) % mUndersample;
+
+   return true;
+}
+
+void PadSynthVoice::DoParameterUpdate(int samplesIn,
+                                           int oversampling,
+                                           float& pitch,
+                                           float& freq)
+{
+   if (mOwner)
+      mOwner->ComputeSliders(samplesIn);
+
+   pitch = GetPitch(samplesIn);
+   freq = TheScale->PitchToFreq(pitch);
+}
+
+void PadSynthVoice::Start(double time, float target)
+{
+   float volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target * target);
+   float adsrCurve = SingleOscillatorVoice::GetADSRCurve(target, mVoiceParams->mVelToEnvelope);
+   mAdsr.Start(time, volume, mVoiceParams->mAdsr, 1, adsrCurve);
+   mActive = true;
+}
+
+void PadSynthVoice::Stop(double time)
+{
+   mAdsr.Stop(time);
+}
+
+void PadSynthVoice::ClearVoice()
+{
+   mAdsr.Clear();
+   mBuffer.ClearBuffer();
+   mActive = false;
+}
+
+void PadSynthVoice::SetVoiceParams(IVoiceParams* params)
+{
+   mVoiceParams = dynamic_cast<PadSynthVoiceParams*>(params);
+}

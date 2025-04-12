@@ -2148,3 +2148,12 @@ acciaccatura~adds a quick grace note before playing the input pitch
 ~notemode~should the offset be in scale steps, or chromatically in semitones?
 ~hold ms~how long to hold offset pitch before transitioning to input pitch
 ~glide ms~how long to spend bending between offset pitch and input pitch after hold ms
+
+
+padsynth~synth based on padsynth algorithm
+~bandwidth~bandwidth of first harmonic in cents
+~harmonics~number of harmonics
+~detune~shift of overtones from their exact positions
+~scale~how much the bandwidth of a harmonic increases according to its frequency
+~vol~output volume
+~offset~difference between left and right channels, in fraction of the buffer
