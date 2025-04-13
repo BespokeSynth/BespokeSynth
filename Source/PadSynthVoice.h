@@ -82,5 +82,4 @@ private:
 
    int mUndersample{ 1 };
    int mSample{ 0 };
-   int mSeed{ 0 };
 };

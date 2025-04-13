@@ -117,7 +117,7 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    // Add random phases
    float freq_phase[bufferSize * mUndersample / 2];
    for (int i=0; i < bufferSize * mUndersample / 2; i++)
-      freq_phase[i] = ((abs(DeterministicRandom(mSeed, i)) % 10000) / 10000.0f) * 2.0 * PI;
+      freq_phase[i] = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
 
    float smp[bufferSize * mUndersample];
    mFFT = new ::FFT(bufferSize * mUndersample);
