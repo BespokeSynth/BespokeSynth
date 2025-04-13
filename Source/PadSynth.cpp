@@ -200,6 +200,7 @@ void PadSynth::LoadLayout(const ofxJSONElement& moduleInfo)
    oversamplingMap["4"] = 4;
    oversamplingMap["8"] = 8;
    mModuleSaveData.LoadEnum<int>("oversampling", moduleInfo, 1, nullptr, &oversamplingMap);
+   mModuleSaveData.LoadInt("undersampling", moduleInfo, 0, 0, 16);
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -220,4 +221,7 @@ void PadSynth::SetUpFromSaveData()
 
    int oversampling = mModuleSaveData.GetEnum<int>("oversampling");
    mPolyMgr.SetOversampling(oversampling);
+
+   int undersampling = mModuleSaveData.GetInt("undersampling");
+   mVoiceParams.mUndersample = undersampling;
 }

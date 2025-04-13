@@ -53,6 +53,7 @@ public:
    float mBandwidthScale{ 1.0 };
    float mDetune{ 0.0 };
    float mChannelOffset{ 0.5 };
+   int mUndersample{ 0 };
 };
 
 class PadSynthVoice : public IMidiVoice
@@ -80,6 +81,5 @@ private:
    IDrawableModule* mOwner{ nullptr };
    ::FFT* mFFT;
 
-   int mUndersample{ 1 };
    int mSample{ 0 };
 };
