@@ -68,7 +68,7 @@ void PadSynth::CreateUIControls()
    UIBLOCK(3, 3, kColumnWidth);
    FLOATSLIDER(mBandwidthSlider, "bandwidth", &mVoiceParams.mBandwidth, 0.01f, 100);
    INTSLIDER(mHarmonicsSlider, "harmonics", &mVoiceParams.mHarmonics, 1, 128);
-   FLOATSLIDER(mDetuneSlider, "detune", &mVoiceParams.mDetune, 0.0, 1.0);
+   FLOATSLIDER(mDetuneSlider, "detune", &mVoiceParams.mDetune, -1.0, 1.0);
    FLOATSLIDER(mBandwidthScaleSlider, "scale", &mVoiceParams.mBandwidthScale, 0.01f, 2);
    ENDUIBLOCK(width, height);
 
@@ -200,6 +200,7 @@ void PadSynth::LoadLayout(const ofxJSONElement& moduleInfo)
    oversamplingMap["4"] = 4;
    oversamplingMap["8"] = 8;
    mModuleSaveData.LoadEnum<int>("oversampling", moduleInfo, 1, nullptr, &oversamplingMap);
+   mModuleSaveData.LoadInt("undersampling", moduleInfo, 0, 0, 16);
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -220,4 +221,7 @@ void PadSynth::SetUpFromSaveData()
 
    int oversampling = mModuleSaveData.GetEnum<int>("oversampling");
    mPolyMgr.SetOversampling(oversampling);
+
+   int undersampling = mModuleSaveData.GetInt("undersampling");
+   mVoiceParams.mUndersample = undersampling;
 }
