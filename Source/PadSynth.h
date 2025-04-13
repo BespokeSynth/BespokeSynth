@@ -86,18 +86,11 @@ private:
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    PadSynthVoiceParams mVoiceParams;
-   FloatSlider* mFilterSlider{ nullptr };
-   FloatSlider* mFeedbackSlider{ nullptr };
    float mVolume{ 1 };
    FloatSlider* mVolSlider{ nullptr };
-   DropdownList* mSourceDropdown{ nullptr };
    BiquadFilterEffect mBiquad;
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
 
-   Checkbox* mStretchCheckbox{ nullptr };
-   FloatSlider* mPitchToneSlider{ nullptr };
-   FloatSlider* mVelToVolumeSlider{ nullptr };
-   FloatSlider* mVelToEnvelopeSlider{ nullptr };
    FloatSlider* mBandwidthSlider{ nullptr };
    FloatSlider* mBandwidthScaleSlider{ nullptr };
    FloatSlider* mDetuneSlider{ nullptr };

@@ -76,10 +76,8 @@ private:
                           float& pitch,
                           float& freq);
 
-   EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
    ::ADSR mAdsr;
    PadSynthVoiceParams* mVoiceParams{ nullptr };
-   RollingBuffer mBuffer;
    bool mActive{ false };
    IDrawableModule* mOwner{ nullptr };
    PadSynth* mPadSynthModule{ nullptr };

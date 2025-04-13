@@ -41,8 +41,7 @@
 #include "juce_core/juce_core.h"
 
 PadSynthVoice::PadSynthVoice(IDrawableModule* owner)
-: mBuffer(gSampleRate)
-, mOwner(owner)
+: mOwner(owner)
 {
    ClearVoice();
 
@@ -207,7 +206,6 @@ void PadSynthVoice::Stop(double time)
 void PadSynthVoice::ClearVoice()
 {
    mAdsr.Clear();
-   mBuffer.ClearBuffer();
    mActive = false;
 }
 
