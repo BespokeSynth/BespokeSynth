@@ -33,7 +33,6 @@
 
 class FFT;
 class IDrawableModule;
-class PadSynth;
 
 class PadSynthVoiceParams : public IVoiceParams
 {
@@ -78,9 +77,7 @@ private:
 
    ::ADSR mAdsr;
    PadSynthVoiceParams* mVoiceParams{ nullptr };
-   bool mActive{ false };
    IDrawableModule* mOwner{ nullptr };
-   PadSynth* mPadSynthModule{ nullptr };
    ::FFT* mFFT;
 
    int mUndersample{ 1 };

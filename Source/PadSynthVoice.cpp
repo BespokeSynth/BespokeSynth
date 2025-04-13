@@ -43,9 +43,6 @@
 PadSynthVoice::PadSynthVoice(IDrawableModule* owner)
 : mOwner(owner)
 {
-   ClearVoice();
-
-   mPadSynthModule = dynamic_cast<PadSynth*>(mOwner);
 }
 
 PadSynthVoice::~PadSynthVoice()
@@ -195,7 +192,6 @@ void PadSynthVoice::Start(double time, float target)
    float volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target * target);
    float adsrCurve = SingleOscillatorVoice::GetADSRCurve(target, mVoiceParams->mVelToEnvelope);
    mAdsr.Start(time, volume, mVoiceParams->mAdsr, 1, adsrCurve);
-   mActive = true;
 }
 
 void PadSynthVoice::Stop(double time)
@@ -206,7 +202,6 @@ void PadSynthVoice::Stop(double time)
 void PadSynthVoice::ClearVoice()
 {
    mAdsr.Clear();
-   mActive = false;
 }
 
 void PadSynthVoice::SetVoiceParams(IVoiceParams* params)
