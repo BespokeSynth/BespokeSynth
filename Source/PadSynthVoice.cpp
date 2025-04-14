@@ -92,7 +92,10 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
          A[i] *= 2.0;
    }
 
-   int extendedBufferSize = bufferSize * (2 >> mVoiceParams->mUndersample);
+   int undersample = 1;
+   if (mVoiceParams->mUndersample)
+      undersample *= 2 << (mVoiceParams->mUndersample - 1);
+   int extendedBufferSize = bufferSize * undersample;
 
    // Setting mUndersample to a number greater than 1 increases the
    // internal buffer size to allow for longer wavetables
@@ -172,7 +175,7 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
          Add(out->GetChannel(ch), destBuffer->GetChannel(ch), bufferSize);
    }
 
-   mSample = (mSample + 1) % (2 >> mVoiceParams->mUndersample);
+   mSample = (mSample + 1) % undersample;
 
    return true;
 }
