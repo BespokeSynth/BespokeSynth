@@ -124,7 +124,7 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    for (int i=0; i < extendedBufferSize / 2; i++)
       freq_phase[i] = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
 
-   float smp[extendedBufferSize];
+   float* smp = (float*)calloc(extendedBufferSize, sizeof(float));
    mFFT = new ::FFT(extendedBufferSize);
    mFFT->Inverse(freq_amp, freq_phase, smp);
 
@@ -156,6 +156,8 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
       time += sampleIncrementMs;
    }
+
+   free(smp);
 
    if (oversampling != 1)
    {
