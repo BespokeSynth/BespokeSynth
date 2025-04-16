@@ -121,7 +121,7 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
    // Add random phases
    float freq_phase[extendedBufferSize / 2];
-   for (int i=0; i < extendedBufferSize / 2; i++)
+   for (int i = 0; i < extendedBufferSize / 2; i++)
       freq_phase[i] = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
 
    float* smp = (float*)calloc(extendedBufferSize, sizeof(float));
@@ -135,7 +135,7 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
          max = fabs(smp[i]);
    if (max < 1e-5)
       max = 1e-5;
-   for (int i=0; i < extendedBufferSize; i++)
+   for (int i = 0; i < extendedBufferSize; i++)
       smp[i] /= max * 1.4142;
 
    for (int pos = 0; pos < bufferSize; ++pos)
