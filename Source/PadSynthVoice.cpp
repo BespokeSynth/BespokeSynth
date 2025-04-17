@@ -111,10 +111,10 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
       for (int i = 0; i < extendedBufferSize / 2; i++) {
          float hprofile = 0.0;
-            float x = ((i / (float)extendedBufferSize) - fi) / bwi;
-            x = x * x;
-            if (x <= 14.71280603) // this avoids computing the e^(-x^2) where it's results are very close to zero
-               hprofile = exp(-x) / bwi;
+         float x = ((i / (float)extendedBufferSize) - fi) / bwi;
+         x = x * x;
+         if (x <= 14.71280603) // this avoids computing the e^(-x^2) where it's results are very close to zero
+            hprofile = exp(-x) / bwi;
          freq_amp[i] += hprofile * A[nh];
       }
    }
