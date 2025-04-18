@@ -68,7 +68,7 @@ void PadSynth::CreateUIControls()
    UIBLOCK(3, 3, kColumnWidth);
    FLOATSLIDER(mBandwidthSlider, "bandwidth", &mVoiceParams.mBandwidth, 0.01f, 100);
    INTSLIDER(mHarmonicsSlider, "harmonics", &mVoiceParams.mHarmonics, 1, 128);
-   FLOATSLIDER(mDetuneSlider, "detune", &mVoiceParams.mDetune, 0.0, 1.0);
+   FLOATSLIDER(mDetuneSlider, "detune", &mVoiceParams.mDetune, -1.0, 1.0);
    FLOATSLIDER(mBandwidthScaleSlider, "scale", &mVoiceParams.mBandwidthScale, 0.01f, 2);
    ENDUIBLOCK(width, height);
 
