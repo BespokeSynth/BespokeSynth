@@ -93,7 +93,7 @@ private:
 
    FloatSlider* mBandwidthSlider{ nullptr };
    FloatSlider* mBandwidthScaleSlider{ nullptr };
-   FloatSlider* mDetuneSlider{ nullptr };
+   FloatSlider* mSpreadSlider{ nullptr };
    IntSlider* mHarmonicsSlider{ nullptr };
    Checkbox* mLiteCPUModeCheckbox{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
