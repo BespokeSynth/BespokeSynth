@@ -122,13 +122,15 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    }
 
    // Add random phases
-   float freq_phase[extendedBufferSize / 2];
+   float* freq_phase = (float*)calloc(extendedBufferSize / 2, sizeof(float));
    for (int i = 0; i < extendedBufferSize / 2; i++)
       freq_phase[i] = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
 
    float* sample = (float*)calloc(extendedBufferSize, sizeof(float));
    mFFT = new ::FFT(extendedBufferSize);
    mFFT->Inverse(freq_amp, freq_phase, sample);
+
+   free(freq_phase);
 
    // Normalize the sound to 1/sqrt(2)
    float max = 0.0;
