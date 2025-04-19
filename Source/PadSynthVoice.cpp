@@ -103,13 +103,15 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    for (int i = 0; i < extendedBufferSize / 2; i++)
       freq_amp[i] = 0.0;
 
-   for (int nh = 1; nh < mVoiceParams->mHarmonics; nh++) { // for each harmonic
+   for (int nh = 1; nh < mVoiceParams->mHarmonics; nh++) // for each harmonic
+   {
       float relf = nh * (1.0 + nh * mVoiceParams->mDetune);
       float bw_Hz = (pow(2.0, mVoiceParams->mBandwidth / 1200.0) - 1.0) * freq * pow(relf, mVoiceParams->mBandwidthScale); // bandwidth of the current harmonic measured in Hz
       float bwi = bw_Hz / (2.0 * sampleRate);
       float fi = freq * relf / sampleRate;
 
-      for (int i = 0; i < extendedBufferSize / 2; i++) {
+      for (int i = 0; i < extendedBufferSize / 2; i++)
+      {
          float hprofile = 0.0;
          float x = ((i / (float)extendedBufferSize) - fi) / bwi;
          x = x * x;
@@ -182,10 +184,7 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    return true;
 }
 
-void PadSynthVoice::DoParameterUpdate(int samplesIn,
-                                           int oversampling,
-                                           float& pitch,
-                                           float& freq)
+void PadSynthVoice::DoParameterUpdate(int samplesIn, int oversampling, float& pitch, float& freq)
 {
    if (mOwner)
       mOwner->ComputeSliders(samplesIn);

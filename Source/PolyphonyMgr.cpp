@@ -82,7 +82,7 @@ void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
    }
    else if (type == kVoiceType_PadSynth)
    {
-	  for (int i = 0; i < kNumVoices; ++i)
+      for (int i = 0; i < kNumVoices; ++i)
       {
          mVoices[i].mVoice = new PadSynthVoice(mOwner);
          mVoices[i].mVoice->SetVoiceParams(params);

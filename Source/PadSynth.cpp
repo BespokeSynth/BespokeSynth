@@ -109,7 +109,7 @@ void PadSynth::Process(double time)
    for (int ch = 0; ch < mWriteBuffer.NumActiveChannels(); ++ch)
    {
       Mult(mWriteBuffer.GetChannel(ch), mVolume, bufferSize);
-	  mDCRemover[ch].Filter(mWriteBuffer.GetChannel(ch), bufferSize);
+      mDCRemover[ch].Filter(mWriteBuffer.GetChannel(ch), bufferSize);
    }
 
    mBiquad.ProcessAudio(time, &mWriteBuffer);
