@@ -126,19 +126,19 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    for (int i = 0; i < extendedBufferSize / 2; i++)
       freq_phase[i] = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
 
-   float* smp = (float*)calloc(extendedBufferSize, sizeof(float));
+   float* sample = (float*)calloc(extendedBufferSize, sizeof(float));
    mFFT = new ::FFT(extendedBufferSize);
-   mFFT->Inverse(freq_amp, freq_phase, smp);
+   mFFT->Inverse(freq_amp, freq_phase, sample);
 
    // Normalize the sound to 1/sqrt(2)
    float max = 0.0;
    for (int i = 0; i < extendedBufferSize; i++)
-      if (fabsf(smp[i]) > max)
-         max = fabsf(smp[i]);
+      if (fabsf(sample[i]) > max)
+         max = fabsf(sample[i]);
    if (max < 1e-5)
       max = 1e-5;
    for (int i = 0; i < extendedBufferSize; i++)
-      smp[i] /= max * 1.4142;
+      sample[i] /= max * 1.4142;
 
    for (int pos = 0; pos < bufferSize; ++pos)
    {
@@ -147,19 +147,19 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
       if (channels == 1)
       {
-         destBuffer->GetChannel(0)[pos / oversampling] += smp[mSample * bufferSize + pos] * mAdsr.Value(time);
+         destBuffer->GetChannel(0)[pos / oversampling] += sample[mSample * bufferSize + pos] * mAdsr.Value(time);
       }
       else
       {
          int channel_offset = extendedBufferSize * mVoiceParams->mChannelOffset;
-         destBuffer->GetChannel(0)[pos / oversampling] += smp[mSample * bufferSize + pos] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
-         destBuffer->GetChannel(1)[pos / oversampling] += smp[(mSample * bufferSize + pos + channel_offset) % extendedBufferSize] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(0)[pos / oversampling] += sample[mSample * bufferSize + pos] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(1)[pos / oversampling] += sample[(mSample * bufferSize + pos + channel_offset) % extendedBufferSize] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
       }
 
       time += sampleIncrementMs;
    }
 
-   free(smp);
+   free(sample);
 
    if (oversampling != 1)
    {
