@@ -84,56 +84,60 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    if (mVoiceParams->mLiteCPUMode)
       DoParameterUpdate(0, oversampling, pitch, freq);
 
-   float A[mVoiceParams->mHarmonics];
-   A[0] = 0.0; // A[0] is not used
-   for (int i = 1; i < mVoiceParams->mHarmonics; i++) {
-      A[i] = 1.0 / i;
-      if ((i % 2) == 0)
-         A[i] *= 2.0;
-   }
-
-   int extendedBufferSize = bufferSize * (2 >> mVoiceParams->mUndersample);
-
-   // Setting mUndersample to a number greater than 1 increases the
+   // Setting undersample to a number greater than 1 increases the
    // internal buffer size to allow for longer wavetables
-   float freq_amp[extendedBufferSize / 2];
+   int undersample = 1;
+   if (mVoiceParams->mUndersample > 0)
+      undersample *= 2 << (mVoiceParams->mUndersample - 1);
+   int extendedBufferSize = bufferSize * undersample;
+
+   float* freq_amp = (float*)calloc(extendedBufferSize / 2, sizeof(float));
    for (int i = 0; i < extendedBufferSize / 2; i++)
       freq_amp[i] = 0.0;
 
-   for (int nh = 1; nh < mVoiceParams->mHarmonics; nh++) { // for each harmonic
-      float relf = nh * (1.0 + nh * mVoiceParams->mDetune);
+   for (int nh = 1; nh < abs(mVoiceParams->mHarmonics); nh++) // for each harmonic
+   {
+      float relf = pow(nh, abs(mVoiceParams->mHarmonics)/mVoiceParams->mHarmonics) * (1.0 + nh * mVoiceParams->mSpread);
       float bw_Hz = (pow(2.0, mVoiceParams->mBandwidth / 1200.0) - 1.0) * freq * pow(relf, mVoiceParams->mBandwidthScale); // bandwidth of the current harmonic measured in Hz
       float bwi = bw_Hz / (2.0 * sampleRate);
       float fi = freq * relf / sampleRate;
 
-      for (int i = 0; i < extendedBufferSize / 2; i++) {
+      float A = 1.0 / nh;
+      if ((nh % 2) == 0)
+         A *= 2.0;
+
+      for (int i = 0; i < extendedBufferSize / 2; i++)
+      {
          float hprofile = 0.0;
-            float x = ((i / (float)extendedBufferSize) - fi) / bwi;
-            x = x * x;
-            if (x <= 14.71280603) // this avoids computing the e^(-x^2) where it's results are very close to zero
-               hprofile = exp(-x) / bwi;
-         freq_amp[i] += hprofile * A[nh];
+         float x = ((i / (float)extendedBufferSize) - fi) / bwi;
+         x = x * x;
+         if (x <= 14.71280603) // this avoids computing the e^(-x^2) where it's results are very close to zero
+            hprofile = exp(-x) / bwi;
+         freq_amp[i] += hprofile * A;
       }
    }
 
    // Add random phases
-   float freq_phase[extendedBufferSize / 2];
-   for (int i=0; i < extendedBufferSize / 2; i++)
+   float* freq_phase = (float*)calloc(extendedBufferSize / 2, sizeof(float));
+   for (int i = 0; i < extendedBufferSize / 2; i++)
       freq_phase[i] = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
 
-   float smp[extendedBufferSize];
+   float* sample = (float*)calloc(extendedBufferSize, sizeof(float));
    mFFT = new ::FFT(extendedBufferSize);
-   mFFT->Inverse(freq_amp, freq_phase, smp);
+   mFFT->Inverse(freq_amp, freq_phase, sample);
+
+   free(freq_amp);
+   free(freq_phase);
 
    // Normalize the sound to 1/sqrt(2)
    float max = 0.0;
    for (int i = 0; i < extendedBufferSize; i++)
-      if (fabs(smp[i]) > max)
-         max = fabs(smp[i]);
+      if (fabsf(sample[i]) > max)
+         max = fabsf(sample[i]);
    if (max < 1e-5)
       max = 1e-5;
-   for (int i=0; i < extendedBufferSize; i++)
-      smp[i] /= max * 1.4142;
+   for (int i = 0; i < extendedBufferSize; i++)
+      sample[i] /= max * 1.4142;
 
    for (int pos = 0; pos < bufferSize; ++pos)
    {
@@ -142,17 +146,19 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
       if (channels == 1)
       {
-         destBuffer->GetChannel(0)[pos / oversampling] += smp[mSample * bufferSize + pos] * mAdsr.Value(time);
+         destBuffer->GetChannel(0)[pos / oversampling] += sample[mSample * bufferSize + pos] * mAdsr.Value(time);
       }
       else
       {
          int channel_offset = extendedBufferSize * mVoiceParams->mChannelOffset;
-         destBuffer->GetChannel(0)[pos / oversampling] += smp[mSample * bufferSize + pos] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
-         destBuffer->GetChannel(1)[pos / oversampling] += smp[(mSample * bufferSize + pos + channel_offset) % extendedBufferSize] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(0)[pos / oversampling] += sample[mSample * bufferSize + pos] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(1)[pos / oversampling] += sample[(mSample * bufferSize + pos + channel_offset) % extendedBufferSize] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
       }
 
       time += sampleIncrementMs;
    }
+
+   free(sample);
 
    if (oversampling != 1)
    {
@@ -172,15 +178,12 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
          Add(out->GetChannel(ch), destBuffer->GetChannel(ch), bufferSize);
    }
 
-   mSample = (mSample + 1) % (2 >> mVoiceParams->mUndersample);
+   mSample = (mSample + 1) % undersample;
 
    return true;
 }
 
-void PadSynthVoice::DoParameterUpdate(int samplesIn,
-                                           int oversampling,
-                                           float& pitch,
-                                           float& freq)
+void PadSynthVoice::DoParameterUpdate(int samplesIn, int oversampling, float& pitch, float& freq)
 {
    if (mOwner)
       mOwner->ComputeSliders(samplesIn);

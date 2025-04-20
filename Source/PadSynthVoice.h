@@ -51,7 +51,7 @@ public:
    float mBandwidth{ 40.0 };
    int mHarmonics{ 64 };
    float mBandwidthScale{ 1.0 };
-   float mDetune{ 0.0 };
+   float mSpread{ 0.0 };
    float mChannelOffset{ 0.5 };
    int mUndersample{ 0 };
 };
