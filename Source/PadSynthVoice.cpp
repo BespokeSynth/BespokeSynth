@@ -84,22 +84,13 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    if (mVoiceParams->mLiteCPUMode)
       DoParameterUpdate(0, oversampling, pitch, freq);
 
-   float* A = (float*)calloc(mVoiceParams->mHarmonics, sizeof(float));
-   A[0] = 0.0; // A[0] is not used
-   for (int i = 1; i < mVoiceParams->mHarmonics; i++)
-   {
-      A[i] = 1.0 / i;
-      if ((i % 2) == 0)
-         A[i] *= 2.0;
-   }
-
+   // Setting undersample to a number greater than 1 increases the
+   // internal buffer size to allow for longer wavetables
    int undersample = 1;
-   if (mVoiceParams->mUndersample)
+   if (mVoiceParams->mUndersample > 0)
       undersample *= 2 << (mVoiceParams->mUndersample - 1);
    int extendedBufferSize = bufferSize * undersample;
 
-   // Setting mUndersample to a number greater than 1 increases the
-   // internal buffer size to allow for longer wavetables
    float* freq_amp = (float*)calloc(extendedBufferSize / 2, sizeof(float));
    for (int i = 0; i < extendedBufferSize / 2; i++)
       freq_amp[i] = 0.0;
@@ -111,6 +102,10 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
       float bwi = bw_Hz / (2.0 * sampleRate);
       float fi = freq * relf / sampleRate;
 
+      float A = 1.0 / nh;
+      if ((nh % 2) == 0)
+         A *= 2.0;
+
       for (int i = 0; i < extendedBufferSize / 2; i++)
       {
          float hprofile = 0.0;
@@ -118,10 +113,9 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
          x = x * x;
          if (x <= 14.71280603) // this avoids computing the e^(-x^2) where it's results are very close to zero
             hprofile = exp(-x) / bwi;
-         freq_amp[i] += hprofile * A[nh];
+         freq_amp[i] += hprofile * A;
       }
    }
-   free(A);
 
    // Add random phases
    float* freq_phase = (float*)calloc(extendedBufferSize / 2, sizeof(float));
