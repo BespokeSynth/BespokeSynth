@@ -86,7 +86,8 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
    float A[mVoiceParams->mHarmonics];
    A[0] = 0.0; // A[0] is not used
-   for (int i = 1; i < mVoiceParams->mHarmonics; i++) {
+   for (int i = 1; i < mVoiceParams->mHarmonics; i++)
+   {
       A[i] = 1.0 / i;
       if ((i % 2) == 0)
          A[i] *= 2.0;
