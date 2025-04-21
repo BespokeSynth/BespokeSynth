@@ -154,6 +154,9 @@ void PadSynth::DrawModule()
    mSpreadSlider->Draw();
    mADSRDisplay->Draw();
    mVolSlider->Draw();
+
+   mChannelOffsetSlider->SetShowing(mWriteBuffer.NumActiveChannels() > 1);
+
    mChannelOffsetSlider->Draw();
 
    mBiquad.Draw();
