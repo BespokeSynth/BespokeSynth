@@ -60,7 +60,7 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    bool HasDebugDraw() const override { return true; }
@@ -93,7 +93,7 @@ private:
 
    FloatSlider* mBandwidthSlider{ nullptr };
    FloatSlider* mBandwidthScaleSlider{ nullptr };
-   FloatSlider* mDetuneSlider{ nullptr };
+   FloatSlider* mSpreadSlider{ nullptr };
    IntSlider* mHarmonicsSlider{ nullptr };
    Checkbox* mLiteCPUModeCheckbox{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };

@@ -68,7 +68,7 @@ void PadSynth::CreateUIControls()
    UIBLOCK(3, 3, kColumnWidth);
    FLOATSLIDER(mBandwidthSlider, "bandwidth", &mVoiceParams.mBandwidth, 0.01f, 100);
    INTSLIDER(mHarmonicsSlider, "harmonics", &mVoiceParams.mHarmonics, 1, 128);
-   FLOATSLIDER(mDetuneSlider, "detune", &mVoiceParams.mDetune, -1.0, 1.0);
+   FLOATSLIDER(mSpreadSlider, "spread", &mVoiceParams.mSpread, -1.0, 1.0);
    FLOATSLIDER(mBandwidthScaleSlider, "scale", &mVoiceParams.mBandwidthScale, 0.01f, 2);
    ENDUIBLOCK(width, height);
 
@@ -109,7 +109,7 @@ void PadSynth::Process(double time)
    for (int ch = 0; ch < mWriteBuffer.NumActiveChannels(); ++ch)
    {
       Mult(mWriteBuffer.GetChannel(ch), mVolume, bufferSize);
-	  mDCRemover[ch].Filter(mWriteBuffer.GetChannel(ch), bufferSize);
+      mDCRemover[ch].Filter(mWriteBuffer.GetChannel(ch), bufferSize);
    }
 
    mBiquad.ProcessAudio(time, &mWriteBuffer);
@@ -151,9 +151,12 @@ void PadSynth::DrawModule()
    mBandwidthSlider->Draw();
    mHarmonicsSlider->Draw();
    mBandwidthScaleSlider->Draw();
-   mDetuneSlider->Draw();
+   mSpreadSlider->Draw();
    mADSRDisplay->Draw();
    mVolSlider->Draw();
+
+   mChannelOffsetSlider->SetShowing(mWriteBuffer.NumActiveChannels() > 1);
+
    mChannelOffsetSlider->Draw();
 
    mBiquad.Draw();
