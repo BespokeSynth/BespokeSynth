@@ -12,6 +12,7 @@ using namespace juce;
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "Push2Control.h" //TODO(Ryan) remove
+#include "AbletonMoveControl.h" //TODO(Ryan) remove
 #include "SpaceMouseControl.h"
 #include "UserPrefs.h"
 
@@ -194,6 +195,7 @@ public:
          printf("Could not init font bounds nanovg.\n");
 
       Push2Control::CreateStaticFramebuffer();
+      AbletonMoveControl::CreateStaticFramebuffer();
 
       mSynth.LoadResources(mVG, mFontBoundsVG);
 

@@ -51,6 +51,9 @@ using namespace juce::gl;
 #include "ControlRecorder.h"
 #include "push2/JuceToPush2DisplayBridge.h"
 #include "push2/Push2-Bitmap.h"
+#include "AbletonDeviceShared.h"
+
+using namespace AbletonDevice;
 
 bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
@@ -60,62 +63,6 @@ namespace
 {
    ableton::Push2DisplayBridge ThePushBridge; // The bridge allowing to use juce::graphics for push
 }
-
-//https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
-
-#include "leathers/push"
-#include "leathers/unused-variable"
-namespace
-{
-   const int kTapTempoButton = 3;
-   const int kMetronomeButton = 9;
-   const int kBelowScreenButtonRow = 20;
-   const int kMasterButton = 28;
-   const int kStopClipButton = 29;
-   const int kSetupButton = 30;
-   const int kLayoutButton = 31;
-   const int kConvertButton = 35;
-   const int kQuantizeButtonSection = 36;
-   const int kLeftButton = 44;
-   const int kRightButton = 45;
-   const int kUpButton = 46;
-   const int kDownButton = 47;
-   const int kSelectButton = 48;
-   const int kShiftButton = 49;
-   const int kNoteButton = 50;
-   const int kSessionButton = 51;
-   const int kAddDeviceButton = 52;
-   const int kAddTrackButton = 53;
-   const int kOctaveDownButton = 54;
-   const int kOctaveUpButton = 55;
-   const int kRepeatButton = 56;
-   const int kAccentButton = 57;
-   const int kScaleButton = 58;
-   const int kUserButton = 59;
-   const int kMuteButton = 60;
-   const int kSoloButton = 61;
-   const int kPageLeftButton = 62;
-   const int kPageRightButton = 63;
-   const int kCornerKnob = 79;
-   const int kPlayButton = 85;
-   const int kCircleButton = 86;
-   const int kNewButton = 87;
-   const int kDuplicateButton = 88;
-   const int kAutomateButton = 89;
-   const int kFixedLengthButton = 90;
-   const int kAboveScreenButtonRow = 102;
-   const int kDeviceButton = 110;
-   const int kBrowseButton = 111;
-   const int kMixButton = 112;
-   const int kClipButton = 113;
-   const int kQuantizeButton = 116;
-   const int kDoubleLoopButton = 117;
-   const int kDeleteButton = 118;
-   const int kUndoButton = 119;
-
-   const int kNumQuantizeButtons = 8;
-}
-#include "leathers/pop"
 
 Push2Control::Push2Control()
 : mSpawnLists(this)
@@ -390,7 +337,7 @@ bool Push2Control::Initialize()
 {
    if (!ThePushBridge.IsInitialized())
    {
-      if (auto result = ThePushBridge.Init(); result.Failed())
+      if (auto result = ThePushBridge.Init(ableton::DeviceType::Push2); result.Failed())
       {
          mPushBridgeInitErrMsg = result.GetDescription();
          ofLog() << mPushBridgeInitErrMsg;
@@ -1501,7 +1448,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
 
       if (note.mVelocity > 0)
          mHeldKnobIndex = note.mPitch;
-      else
+      else if (note.mPitch == mHeldKnobIndex)
          mHeldKnobIndex = -1;
    }
    else if (note.mPitch >= 36 && note.mPitch <= 99 && mGridControlInterface == nullptr) //pads
