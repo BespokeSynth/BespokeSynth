@@ -67,7 +67,7 @@ void PadSynth::CreateUIControls()
 
    UIBLOCK(3, 3, kColumnWidth);
    FLOATSLIDER(mBandwidthSlider, "bandwidth", &mVoiceParams.mBandwidth, 0.01f, 100);
-   INTSLIDER(mHarmonicsSlider, "harmonics", &mVoiceParams.mHarmonics, -128, 128);
+   FLOATSLIDER_DIGITS(mHarmonicsSlider, "harmonics", &mHarmonics, -128, 128, 0);
    FLOATSLIDER(mSpreadSlider, "spread", &mVoiceParams.mSpread, -1.0, 1.0);
    FLOATSLIDER(mBandwidthScaleSlider, "scale", &mVoiceParams.mBandwidthScale, 0.01f, 2);
    ENDUIBLOCK(width, height);
@@ -176,6 +176,8 @@ void PadSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
 
 void PadSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
+   if (slider == mHarmonicsSlider)
+      mVoiceParams.mHarmonics = (int)mHarmonics;
 }
 
 void PadSynth::IntSliderUpdated(IntSlider* slider, int oldVal, double time)

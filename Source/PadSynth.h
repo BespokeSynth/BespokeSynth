@@ -87,6 +87,7 @@ private:
    NoteInputBuffer mNoteInputBuffer;
    PadSynthVoiceParams mVoiceParams;
    float mVolume{ 1 };
+   float mHarmonics{ 64 };
    FloatSlider* mVolSlider{ nullptr };
    BiquadFilterEffect mBiquad;
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
@@ -94,7 +95,7 @@ private:
    FloatSlider* mBandwidthSlider{ nullptr };
    FloatSlider* mBandwidthScaleSlider{ nullptr };
    FloatSlider* mSpreadSlider{ nullptr };
-   IntSlider* mHarmonicsSlider{ nullptr };
+   FloatSlider* mHarmonicsSlider{ nullptr };
    Checkbox* mLiteCPUModeCheckbox{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
    FloatSlider* mChannelOffsetSlider{ nullptr };
