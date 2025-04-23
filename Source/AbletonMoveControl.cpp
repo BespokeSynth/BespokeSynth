@@ -59,10 +59,10 @@ using namespace juce::gl;
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #endif
 #define SSFN_IMPLEMENTATION
-#define SSFN_memcmp  memcmp
-#define SSFN_memset  memset
+#define SSFN_memcmp memcmp
+#define SSFN_memset memset
 #define SSFN_realloc realloc
-#define SSFN_free    free
+#define SSFN_free free
 #include "ssfn.h"
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
@@ -86,18 +86,30 @@ namespace
 
    ssfn_font_t* load_file(const char* filename, int* size)
    {
-      char *fontdata = NULL;
-      FILE *f;
+      char* fontdata = NULL;
+      FILE* f;
 
       f = fopen(filename, "rb");
-      if(!f) { fprintf(stderr,"unable to load %s\n", filename); exit(3); }
+      if (!f)
+      {
+         fprintf(stderr, "unable to load %s\n", filename);
+         exit(3);
+      }
       *size = 0;
       fseek(f, 0, SEEK_END);
       *size = (int)ftell(f);
       fseek(f, 0, SEEK_SET);
-      if(!*size) { fprintf(stderr,"unable to load %s\n", filename); exit(3); }
+      if (!*size)
+      {
+         fprintf(stderr, "unable to load %s\n", filename);
+         exit(3);
+      }
       fontdata = (char*)malloc(*size);
-      if(!fontdata) { fprintf(stderr,"memory allocation error\n"); exit(2); }
+      if (!fontdata)
+      {
+         fprintf(stderr, "memory allocation error\n");
+         exit(2);
+      }
       fread(fontdata, *size, 1, f);
       fclose(f);
       return (ssfn_font_t*)fontdata;
@@ -106,7 +118,7 @@ namespace
    void set_up_ssfn_font(uint8_t* pixels, int width, int height)
    {
       int ret, size;
-      ssfn_font_t *font;
+      ssfn_font_t* font;
 
       /* initialize the normal renderer */
       memset(&ssfn_ctx, 0, sizeof(ssfn_t));
@@ -120,7 +132,11 @@ namespace
       /* load and select a font */
       font = load_file(ofToResourcePath("galmuri7.sfn.gz").c_str(), &size);
       ret = ssfn_load(&ssfn_ctx, font);
-      if(ret != SSFN_OK) { fprintf(stderr, "ssfn load error: err=%d %s\n", ret, ssfn_error(ret)); exit(2); }
+      if (ret != SSFN_OK)
+      {
+         fprintf(stderr, "ssfn load error: err=%d %s\n", ret, ssfn_error(ret));
+         exit(2);
+      }
 
       //ssfn_free(&ssfn_ctx);
       //free(font);
@@ -131,13 +147,17 @@ namespace
       int ret;
 
       ret = ssfn_select(&ssfn_ctx, SSFN_FAMILY_ANY, NULL, style | SSFN_STYLE_NOAA, fontSize);
-      if(ret != SSFN_OK) { fprintf(stderr, "ssfn select error: err=%d %s\n", ret, ssfn_error(ret)); exit(2); }
+      if (ret != SSFN_OK)
+      {
+         fprintf(stderr, "ssfn select error: err=%d %s\n", ret, ssfn_error(ret));
+         exit(2);
+      }
 
       ssfn_buf.x = x;
       ssfn_buf.y = y;
 
       const char* str = text;
-      while((ret = ssfn_render(&ssfn_ctx, &ssfn_buf, str)) > 0)
+      while ((ret = ssfn_render(&ssfn_ctx, &ssfn_buf, str)) > 0)
          str += ret;
    }
 }
