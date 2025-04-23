@@ -54,19 +54,12 @@ using namespace juce::gl;
 #include "push2/../../Push2-Display.h"
 #include "AbletonDeviceShared.h"
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-warning-option"
-#endif
 #define SSFN_IMPLEMENTATION
 #define SSFN_memcmp memcmp
 #define SSFN_memset memset
 #define SSFN_realloc realloc
 #define SSFN_free free
 #include "ssfn.h"
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
 
 using namespace AbletonDevice;
 
