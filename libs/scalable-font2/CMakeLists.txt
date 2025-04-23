@@ -14,8 +14,4 @@ target_include_directories(
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-if(WIN32)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE BESPOKE_WINDOWS=1)
-endif()
-
 add_library(bespoke::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
