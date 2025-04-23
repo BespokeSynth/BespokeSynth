@@ -38,12 +38,12 @@ Push2DisplayBridge::~Push2DisplayBridge() = default;
 
 //------------------------------------------------------------------------------
 
-NBase::Result Push2DisplayBridge::Init()
+NBase::Result Push2DisplayBridge::Init(DeviceType deviceType)
 {
    std::unique_ptr<Push2Display> display{Push2Display::create()};
    if (!display)
      return {"no push 2 support"};
-   auto result{display->Init()};
+   auto result{display->Init(deviceType)};
    if (result.Failed())
      return {"no push 2 found"};
    push2Display_ = std::move(display);
