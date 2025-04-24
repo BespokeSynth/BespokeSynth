@@ -97,7 +97,7 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
    for (int nh = 1; nh < abs(mVoiceParams->mHarmonics); nh++) // for each harmonic
    {
-      float relf = pow(nh, abs(mVoiceParams->mHarmonics)/mVoiceParams->mHarmonics) * (1.0 + nh * mVoiceParams->mSpread);
+      float relf = pow(nh, abs(mVoiceParams->mHarmonics) / mVoiceParams->mHarmonics) * (1.0 + nh * mVoiceParams->mSpread);
       float bw_Hz = (pow(2.0, mVoiceParams->mBandwidth / 1200.0) - 1.0) * freq * pow(relf, mVoiceParams->mBandwidthScale); // bandwidth of the current harmonic measured in Hz
       float bwi = bw_Hz / (2.0 * sampleRate);
       float fi = freq * relf / sampleRate;
