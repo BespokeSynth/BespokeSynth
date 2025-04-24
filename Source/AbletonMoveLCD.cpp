@@ -27,8 +27,10 @@
 
 #include "AbletonMoveLCD.h"
 
+#if BESPOKE_WINDOWS
 #define _STRING_H_ 1
 #define size_t uint32
+#endif
 
 #define SSFN_IMPLEMENTATION
 #define SSFN_memcmp memcmp
@@ -39,9 +41,6 @@
 
 namespace
 {
-   int kMoveDisplayWidth = 128;
-   int kMoveDisplayHeight = 64;
-
    ssfn_t ssfn_ctx;
    ssfn_buf_t ssfn_buf;
    ssfn_font_t* ssfn_font;
