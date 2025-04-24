@@ -25,16 +25,9 @@
   ==============================================================================
 */
 
-#include "juce_opengl/juce_opengl.h"
-using namespace juce::gl;
-
 #include "AbletonMoveControl.h"
 #include <cctype>
 #include "SynthGlobals.h"
-#include "nanovg/nanovg.h"
-#define NANOVG_GLES2_IMPLEMENTATION
-#include "nanovg/nanovg_gl.h"
-#include "nanovg/nanovg_gl_utils.h"
 #include "OpenFrameworksPort.h"
 #include "UIControlMacros.h"
 #include "TitleBar.h"
@@ -54,105 +47,12 @@ using namespace juce::gl;
 #include "push2/../../Push2-Display.h"
 #include "AbletonDeviceShared.h"
 
-#define SSFN_IMPLEMENTATION
-#define SSFN_memcmp memcmp
-#define SSFN_memset memset
-#define SSFN_realloc realloc
-#define SSFN_free free
-#include "ssfn.h"
-
 using namespace AbletonDevice;
 
-bool AbletonMoveControl::sDrawingPush2Display = false;
-NVGcontext* AbletonMoveControl::sVG = nullptr;
-NVGLUframebuffer* AbletonMoveControl::sFB = nullptr;
 IUIControl* AbletonMoveControl::sBindToUIControl = nullptr;
 namespace
 {
    ableton::Push2DisplayBridge ThePushBridge; // The bridge allowing to use juce::graphics for push
-
-   int kMoveDisplayWidth = 128;
-   int kMoveDisplayHeight = 64;
-
-   ssfn_t ssfn_ctx;
-   ssfn_buf_t ssfn_buf;
-
-   ssfn_font_t* load_file(const char* filename, int* size)
-   {
-      char* fontdata = NULL;
-      FILE* f;
-
-      f = fopen(filename, "rb");
-      if (!f)
-      {
-         fprintf(stderr, "unable to load %s\n", filename);
-         exit(3);
-      }
-      *size = 0;
-      fseek(f, 0, SEEK_END);
-      *size = (int)ftell(f);
-      fseek(f, 0, SEEK_SET);
-      if (!*size)
-      {
-         fprintf(stderr, "unable to load %s\n", filename);
-         exit(3);
-      }
-      fontdata = (char*)malloc(*size);
-      if (!fontdata)
-      {
-         fprintf(stderr, "memory allocation error\n");
-         exit(2);
-      }
-      fread(fontdata, *size, 1, f);
-      fclose(f);
-      return (ssfn_font_t*)fontdata;
-   }
-
-   void set_up_ssfn_font(uint8_t* pixels, int width, int height)
-   {
-      int ret, size;
-      ssfn_font_t* font;
-
-      /* initialize the normal renderer */
-      memset(&ssfn_ctx, 0, sizeof(ssfn_t));
-      ssfn_buf.ptr = pixels;
-      ssfn_buf.p = width * 4;
-      ssfn_buf.w = width;
-      ssfn_buf.h = height;
-      ssfn_buf.fg = 0xFFFFFFFF;
-      ssfn_buf.bg = 0;
-
-      /* load and select a font */
-      font = load_file(ofToResourcePath("galmuri7.sfn.gz").c_str(), &size);
-      ret = ssfn_load(&ssfn_ctx, font);
-      if (ret != SSFN_OK)
-      {
-         fprintf(stderr, "ssfn load error: err=%d %s\n", ret, ssfn_error(ret));
-         exit(2);
-      }
-
-      //ssfn_free(&ssfn_ctx);
-      //free(font);
-   }
-
-   void draw_ssfn_text(const char* text, int x, int y, int style = SSFN_STYLE_REGULAR, int fontSize = 12)
-   {
-      int ret;
-
-      ret = ssfn_select(&ssfn_ctx, SSFN_FAMILY_ANY, NULL, style | SSFN_STYLE_NOAA, fontSize);
-      if (ret != SSFN_OK)
-      {
-         fprintf(stderr, "ssfn select error: err=%d %s\n", ret, ssfn_error(ret));
-         exit(2);
-      }
-
-      ssfn_buf.x = x;
-      ssfn_buf.y = y;
-
-      const char* str = text;
-      while ((ret = ssfn_render(&ssfn_ctx, &ssfn_buf, str)) > 0)
-         str += ret;
-   }
 }
 
 AbletonMoveControl::AbletonMoveControl()
@@ -182,11 +82,7 @@ void AbletonMoveControl::Exit()
       SetLed(kMidiMessage_Control, i, 0);
    }
 
-   if (mPixels != nullptr)
-   {
-      memset(mPixels, 0, sizeof(uint8_t) * GetNumDisplayPixels());
-      ThePushBridge.Flip(mPixels);
-   }
+   mLCD.Clear();
 
    mDevice.DisconnectInput();
    mDevice.DisconnectOutput();
@@ -263,7 +159,7 @@ void AbletonMoveControl::DrawModule()
 
 void AbletonMoveControl::DrawModuleUnclipped()
 {
-   if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() && !sDrawingPush2Display &&
+   if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() && 
        mDisplayModule->GetOwningContainer() != nullptr && mDisplayModule->IsShowing())
    {
       ofPushMatrix();
@@ -410,19 +306,6 @@ void AbletonMoveControl::LoadState(FileStreamIn& in, int rev)
    }
 }
 
-//static
-void AbletonMoveControl::CreateStaticFramebuffer()
-{
-   sVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-   assert(sVG);
-
-   const auto width = kMoveDisplayWidth;
-   const auto height = kMoveDisplayHeight;
-
-   sFB = nvgluCreateFramebuffer(sVG, width, height, 0);
-   assert(sFB);
-}
-
 bool AbletonMoveControl::Initialize()
 {
    if (!ThePushBridge.IsInitialized())
@@ -436,17 +319,13 @@ bool AbletonMoveControl::Initialize()
       ofLog() << "ableton move connected";
    }
 
-   mPixels = new uint8_t[GetNumDisplayPixels()];
-   set_up_ssfn_font(mPixels, kMoveDisplayWidth, kMoveDisplayHeight);
-
-   mFontHandle = nvgCreateFont(sVG, ofToResourcePath("iosevka-type-light.ttf").c_str(), ofToResourcePath("iosevka-type-light.ttf").c_str());
-   mFontHandleBold = nvgCreateFont(sVG, ofToResourcePath("frabk_m.ttf").c_str(), ofToResourcePath("frabk_m.ttf").c_str());
+   mLCD.Init();
 
    const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i = 0; i < devices.size(); ++i)
    {
 #if JUCE_WINDOWS
-      if (strcmp(devices[i].c_str(), "Ableton Move") == 0)
+      if (strcmp(devices[i].c_str(), "Ableton Move MIDI") == 0)
 #else
       if (strcmp(devices[i].c_str(), "Ableton Move Live Port") == 0)
 #endif
@@ -463,226 +342,22 @@ bool AbletonMoveControl::Initialize()
    return true;
 }
 
-int AbletonMoveControl::GetNumDisplayPixels() const
+void AbletonMoveControl::DrawToFramebuffer()
 {
-   return kMoveDisplayWidth * kMoveDisplayHeight * 4;
-}
-
-void AbletonMoveControl::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb)
-{
-   int winWidth, winHeight;
-   int fboWidth, fboHeight;
-
-   if (fb == NULL)
-      return;
-
-   nvgImageSize(vg, fb->image, &fboWidth, &fboHeight);
-   winWidth = (int)(fboWidth);
-   winHeight = (int)(fboHeight);
-
-   nvgluBindFramebuffer(fb);
-   glViewport(0, 0, fboWidth, fboHeight);
-   glClearColor(0, 0, 0, 0);
-   glClear(juce::gl::GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-   nvgBeginFrame(vg, winWidth, winHeight, 1);
-
-   nvgLineCap(vg, NVG_ROUND);
-   nvgLineJoin(vg, NVG_ROUND);
-   static float sSpacing = -.3f;
-   nvgTextLetterSpacing(vg, sSpacing);
-
-   /*DrawTextNormal("bespoke", 3, 10);
-   DrawTextNormal("bespoke", 20, 40);
-
-   nvgStrokeColor(gNanoVG, nvgRGBA(255, 255, 255, 255));
-   nvgFillColor(gNanoVG, nvgRGBA(255, 255, 255, 255));
-
-   nvgBeginPath(sVG);
-   nvgCircle(sVG, 20, 20, 10);
-   nvgStroke(sVG);
-
-   nvgBeginPath(sVG);
-   nvgRect(sVG, 64, 30, 40, 10);
-   nvgStroke(sVG);*/
-
-   memset(mPixels, 0, sizeof(uint8_t) * GetNumDisplayPixels());
+   mLCD.Clear();
 
    if (mDisplayModule != nullptr)
-      draw_ssfn_text(mDisplayModule->Name(), 3, 13, SSFN_STYLE_UNDERLINE);
+      mLCD.DrawText(mDisplayModule->Name(), 3, 13, LCDFONT_STYLE_UNDERLINE);
 
    if (mHeldKnobIndex != -1 && mHeldKnobIndex < (int)mSliderControls.size())
    {
       auto* control = mSliderControls[mHeldKnobIndex];
-      draw_ssfn_text(control->GetDisplayName().c_str(), 3, 26);
-      draw_ssfn_text(control->GetDisplayValue(control->GetValue()).c_str(), 3, 40);
+      mLCD.DrawText(control->GetDisplayName().c_str(), 3, 26);
+      mLCD.DrawText(control->GetDisplayValue(control->GetValue()).c_str(), 3, 40);
 
-      DrawPixelRect(3, 42, 100, 10, false);
-      DrawPixelRect(4 + 97 * control->GetMidiValue(), 44, 1, 6, false);
+      mLCD.DrawRect(3, 42, 100, 10, false);
+      mLCD.DrawRect(4 + 97 * control->GetMidiValue(), 44, 1, 6, false);
    }
-
-   /*mModules.clear();
-   std::vector<IDrawableModule*> modules;
-   TheSynth->GetAllModules(modules);
-   for (int i = 0; i < modules.size(); ++i)
-   {
-      if (!IsIgnorableModule(modules[i]))
-         mModules.push_back(modules[i]);
-   }
-   mModules = SortModules(mModules);
-
-   SetModuleGridLights();
-
-   mModuleViewOffsetSmoothed = ofLerp(mModuleViewOffsetSmoothed, mModuleViewOffset, .3f);
-   mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3f);
-
-   if (mScreenDisplayMode == ScreenDisplayMode::kNormal || mScreenDisplayMode == ScreenDisplayMode::kMap)
-   {
-      DrawLowerModuleSelector();
-      DrawDisplayModuleControls();
-
-      std::string stateInfo = "";
-      if (gTime - mTextPopupTime < 1000)
-         stateInfo = mTextPopup;
-      else if (AllowRepatch() && mHeldModule != nullptr)
-         stateInfo = "repatch mode: tap destination for " + std::string(mHeldModule->Name());
-      else if (mNewButtonHeld)
-         stateInfo = "tap control to add favorite...";
-      else if (mDeleteButtonHeld)
-         stateInfo = "tap control to remove favorite...";
-      else if (mLFOButtonHeld)
-         stateInfo = "tap a control to add/edit LFO...";
-      else if (mAutomateButtonHeld && mCurrentControlRecorder == nullptr)
-         stateInfo = "move a control to record automation...";
-      else if (mAutomateButtonHeld && mCurrentControlRecorder != nullptr)
-         stateInfo = "recording automation, length = " + ofToString(mCurrentControlRecorder->GetLength(), 2);
-      else if (mAddModuleBookmarkButtonHeld && mDisplayModule != nullptr)
-         stateInfo = "tap a button in the column below this button to bookmark the \"" + std::string(mDisplayModule->Name()) + "\" module...";
-      else if (mInMidiControllerBindMode)
-         stateInfo = "MIDI bind mode: hold a knob or button, then move/press a MIDI control to bind to that module control";
-      else if (mAddTrackHeld && mDisplayModule != nullptr && mDisplayModuleSnapshots == nullptr)
-         stateInfo = "press one of the 4 buttons to the right of this screen to create a snapshot";
-      else if (mAddTrackHeld && mDisplayModule != nullptr && mDisplayModuleSnapshots != nullptr)
-         stateInfo = "press one of the 4 buttons to the right of this screen to store a snapshot";
-
-      if (stateInfo != "")
-      {
-         ofPushStyle();
-
-         ofFill();
-         ofColor bgColor(175, 255, 221);
-         bgColor = bgColor * ofMap(sin(gTime / 300 * PI * 2), -1, 1, .7f, 1);
-         ofSetColor(bgColor);
-         ofRect(1, 120, kMoveDisplayWidth - 2, kMoveDisplayHeight - 120);
-
-         ofNoFill();
-         ofSetColor(255, 0, 0);
-         ofRect(1, 1, kMoveDisplayWidth - 2, kMoveDisplayHeight - 2);
-
-         ofSetColor(0, 0, 0);
-         DrawTextBold(stateInfo, 10, 147, 18);
-
-         ofPopStyle();
-      }
-   }
-   else if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
-   {
-      ofPushMatrix();
-      ofPushStyle();
-
-      if (mSelectedGridSpawnListIndex == -1)
-      {
-         ofSetColor(255, 255, 255);
-         std::string text = "choose a module, then tap a grid square";
-         std::string moduleTypeToSpawn = GetModuleTypeToSpawn();
-         if (moduleTypeToSpawn != "")
-         {
-            ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleCategory(moduleTypeToSpawn)));
-            text = "\ntap grid to spawn " + moduleTypeToSpawn;
-         }
-         DrawTextBold(text, 5, 80, 18);
-
-         ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other));
-         ofNoFill();
-
-         ofTranslate(-kColumnSpacing * mModuleViewOffsetSmoothed, 0);
-
-         nvgFontSize(sVG, 12);
-         DrawControls(mButtonControls, false, 60);
-         DrawControls(mSliderControls, true, 20);
-      }
-      else if (mSelectedGridSpawnListIndex < (int)mSpawnLists.GetDropdowns().size())
-      {
-         auto* list = mSpawnLists.GetDropdowns()[mSelectedGridSpawnListIndex]->GetList();
-         int boxWidth = 120;
-         int boxHeight = 18;
-         ofFill();
-         ofSetColor(IDrawableModule::GetColor(GetModuleTypeForSpawnList(list)));
-         ofRect(mSelectedGridSpawnListIndex * boxWidth, -5, boxWidth, 12);
-         for (int i = mModuleViewOffset * 8; i < list->GetNumValues(); ++i)
-         {
-            int x = (i % 8) * boxWidth;
-            int y = (i / 8) * boxHeight + 10 - mModuleViewOffsetSmoothed * boxHeight;
-            ofPushMatrix();
-            ofClipWindow(x, y, boxWidth, boxHeight, false);
-            ofSetColor(GetSpawnGridColor(i, GetModuleTypeForSpawnList(list)));
-            ofRect(x, y, boxWidth, boxHeight);
-            ofSetColor(255, 255, 255);
-            DrawTextBold(list->GetLabel(i), x + 4, y + 12);
-            ofPopMatrix();
-         }
-      }
-      ofPopMatrix();
-      ofPopStyle();
-
-      for (int i = 0; i < 8; ++i)
-      {
-         if (mSelectedGridSpawnListIndex != -1 && i != mSelectedGridSpawnListIndex)
-            SetLed(kMidiMessage_Control, i + kAboveScreenButtonRow, 0);
-         else if (i < (int)mSpawnModuleControls.size())
-            SetLed(kMidiMessage_Control, i + kAboveScreenButtonRow, GetPadColorForType(GetModuleTypeForSpawnList(mSpawnModuleControls[i]), true));
-         else
-            SetLed(kMidiMessage_Control, i + kAboveScreenButtonRow, 0);
-         SetLed(kMidiMessage_Control, i + kBelowScreenButtonRow, 0);
-      }
-   }
-   else if (mScreenDisplayMode == ScreenDisplayMode::kRouting)
-   {
-      DrawRoutingDisplay();
-   }
-
-   if (mScreenDisplayMode == ScreenDisplayMode::kMap)
-   {
-      ofPushStyle();
-      ofPushMatrix();
-
-      ofPushStyle();
-      ofFill();
-      ofSetColor(0, 0, 0, 150);
-      ofRect(0, 0, kMoveDisplayWidth * kPixelRatio, kMoveDisplayHeight * kPixelRatio);
-      ofPopStyle();
-
-      float screenScale = .2f;
-      ofScale(screenScale * gDrawScale, screenScale * gDrawScale, screenScale * gDrawScale);
-      ofTranslate(TheSynth->GetDrawOffset().x, TheSynth->GetDrawOffset().y);
-      ofTranslate(1500 / gDrawScale, -100 / gDrawScale); //center on display
-
-      TheSynth->GetRootContainer()->DrawContents();
-
-      if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() &&
-          mDisplayModule->GetOwningContainer() != nullptr && mDisplayModule->IsShowing())
-         DrawDisplayModuleRect(mDisplayModule->GetRect(), 6);
-
-      ofPopMatrix();
-      ofPopStyle();
-   }*/
-
-   nvgEndFrame(vg);
-
-   glFinish();
-   glReadBuffer(juce::gl::GL_COLOR_ATTACHMENT0);
-   //glReadPixels(0, 0, winWidth, winHeight, juce::gl::GL_RED, GL_UNSIGNED_BYTE, mPixels);
-
-   nvgluBindFramebuffer(NULL);
 }
 
 void AbletonMoveControl::UpdateLeds()
@@ -768,18 +443,6 @@ void AbletonMoveControl::UpdateLeds()
    //test led colors
    //SetLed(kMidiMessage_Note, 92, (int)mModuleListOffset);
    //ofLog() << (int)mModuleListOffset;
-}
-
-void AbletonMoveControl::DrawPixelRect(int x, int y, int width, int height, bool filled)
-{
-   for (int penX = x; penX < x + width && penX < kMoveDisplayWidth; ++penX)
-   {
-      for (int penY = y; penY < y + height && penY < kMoveDisplayHeight; ++penY)
-      {
-         if (filled || penX == x || penY == y || penX == x + width - 1 || penY == y + height - 1)
-            mPixels[(penX + penY * kMoveDisplayWidth) * 4] = 255;
-      }
-   }
 }
 
 ofColor AbletonMoveControl::GetSpawnGridColor(int index, ModuleCategory moduleType) const
@@ -902,195 +565,6 @@ void AbletonMoveControl::SetModuleGridLights()
       //all touchstrip LEDs off
       std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
       GetDevice()->SendSysEx(touchStripLights);
-   }
-}
-
-void AbletonMoveControl::DrawDisplayModuleControls()
-{
-   if (mDisplayModule != nullptr && mDisplayModule->IsDeleted())
-   {
-      SetDisplayModule(nullptr, false);
-      return;
-   }
-
-   ofSetColor(255, 255, 255);
-   if (mDisplayModule != nullptr)
-   {
-      ofPushMatrix();
-      ofPushStyle();
-
-      //nvgFontSize(mVG, 16);
-      //nvgText(mVG, 10, 10, mDisplayModule->Name(), nullptr);
-      float x;
-      float y;
-      mDisplayModule->GetPosition(x, y, true);
-      mDisplayModule->SetPosition(5 - kColumnSpacing * mModuleViewOffsetSmoothed, 15);
-      float titleBarHeight;
-      float highlight;
-      mDisplayModule->DrawFrame(kColumnSpacing * MAX(1, MAX(mSliderControls.size(), mButtonControls.size())) - 14, 80, false, titleBarHeight, highlight);
-      mDisplayModule->SetPosition(x, y);
-
-      ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleCategory()));
-      ofNoFill();
-
-      nvgFontSize(sVG, 16);
-      bool screenDrawingHandled = mDisplayModule->DrawToPush2Screen();
-      if (!screenDrawingHandled)
-      {
-         DrawControls(mButtonControls, false, 60);
-         DrawControls(mSliderControls, true, 20);
-      }
-
-      int topRowLedColors[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-      for (int i = 0; i < mButtonControls.size(); ++i)
-      {
-         if (i - mModuleViewOffset >= 0 && i - mModuleViewOffset < 8)
-            topRowLedColors[i - mModuleViewOffset] = GetPadColorForType(mButtonControls[i]->GetModuleParent()->GetModuleCategory(), true);
-      }
-      for (int i = 0; i < 8; ++i)
-         SetLed(kMidiMessage_Control, i + kAboveScreenButtonRow, topRowLedColors[i]);
-
-      ofPopMatrix();
-      ofPopStyle();
-
-      ofPushStyle();
-      ofSetLineWidth(.5f);
-      int length = MAX((int)mButtonControls.size(), (int)mSliderControls.size());
-      if (length > 8)
-      {
-         ofRectangle bar(kMoveDisplayWidth - 100, 3, 80, 10);
-         ofNoFill();
-         ofSetColor(100, 100, 100);
-         ofRect(bar);
-         ofFill();
-         ofSetColor(255, 255, 255);
-         bar.x += bar.width * mModuleViewOffsetSmoothed / length;
-         bar.width *= 8.0f / length;
-         ofRect(bar);
-      }
-      ofPopStyle();
-   }
-   else
-   {
-      for (int i = 0; i < 8; ++i)
-         SetLed(kMidiMessage_Control, i + kAboveScreenButtonRow, 0);
-   }
-}
-
-void AbletonMoveControl::DrawLowerModuleSelector()
-{
-   int bottomRowLedColors[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-   for (int i = 0; i < mModules.size(); ++i)
-   {
-      if (i - mModuleListOffset < -1 || i - mModuleListOffset > 8)
-         continue;
-
-      ofPushMatrix();
-      ofPushStyle();
-
-      ofClipWindow(kColumnSpacing * (i - mModuleListOffsetSmoothed), 0, kColumnSpacing, kMoveDisplayHeight, true);
-
-      float x;
-      float y;
-      mModules[i]->GetPosition(x, y, true);
-      mModules[i]->SetPosition(3 + kColumnSpacing * (i - mModuleListOffsetSmoothed), 120);
-      float titleBarHeight;
-      float highlight;
-      mModules[i]->DrawFrame(kColumnSpacing - 14, 80, true, titleBarHeight, highlight);
-      if (mModules[i] == mDisplayModule)
-         DrawDisplayModuleRect(ofRectangle(0, 0, kColumnSpacing - 14, 80), 3);
-      mModules[i]->SetPosition(x, y);
-
-      if (i - round(mModuleListOffset) >= 0 && i - round(mModuleListOffset) < 8)
-         bottomRowLedColors[i - (int)round(mModuleListOffset)] = GetPadColorForType(mModules[i]->GetModuleCategory(), true);
-
-      ofPopMatrix();
-      ofPopStyle();
-   }
-
-   for (int i = 0; i < 8; ++i)
-      SetLed(kMidiMessage_Control, i + kBelowScreenButtonRow, bottomRowLedColors[i]);
-}
-
-void AbletonMoveControl::DrawRoutingDisplay()
-{
-   int topRowLedColors[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-   int bottomRowLedColors[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-   for (int i = 0; i < mRoutingInputModules.size(); ++i)
-   {
-      ofPushMatrix();
-      ofPushStyle();
-
-      ofSetColor(mRoutingInputModules[i].mConnectionColor);
-      ofLine(kColumnSpacing * (i + .5f), 37, kColumnSpacing * .5f, 60);
-
-      ofClipWindow(kColumnSpacing * i, 0, kColumnSpacing, kMoveDisplayHeight, true);
-
-      float x;
-      float y;
-      mRoutingInputModules[i].mModule->GetPosition(x, y, true);
-      mRoutingInputModules[i].mModule->SetPosition(3 + kColumnSpacing * i, 12);
-      float titleBarHeight;
-      float highlight;
-      mRoutingInputModules[i].mModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
-      mRoutingInputModules[i].mModule->SetPosition(x, y);
-
-      if (i >= 0 && i < 8)
-         topRowLedColors[i] = GetPadColorForType(mRoutingInputModules[i].mModule->GetModuleCategory(), true);
-
-      ofPopMatrix();
-      ofPopStyle();
-   }
-
-   for (int i = 0; i < mRoutingOutputModules.size(); ++i)
-   {
-      ofPushMatrix();
-      ofPushStyle();
-
-      ofSetColor(mRoutingOutputModules[i].mConnectionColor);
-      ofLine(kColumnSpacing * .5f, 97, kColumnSpacing * (i + .5f), 120);
-
-      ofClipWindow(kColumnSpacing * i, 0, kColumnSpacing, kMoveDisplayHeight, true);
-
-      float x;
-      float y;
-      mRoutingOutputModules[i].mModule->GetPosition(x, y, true);
-      mRoutingOutputModules[i].mModule->SetPosition(3 + kColumnSpacing * i, 132);
-      float titleBarHeight;
-      float highlight;
-      mRoutingOutputModules[i].mModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
-      mRoutingOutputModules[i].mModule->SetPosition(x, y);
-
-      if (i >= 0 && i < 8)
-         bottomRowLedColors[i] = GetPadColorForType(mRoutingOutputModules[i].mModule->GetModuleCategory(), true);
-
-      ofPopMatrix();
-      ofPopStyle();
-   }
-
-   {
-      ofPushMatrix();
-      ofPushStyle();
-
-      ofClipWindow(0, 0, kColumnSpacing, kMoveDisplayHeight, true);
-
-      float x;
-      float y;
-      mDisplayModule->GetPosition(x, y, true);
-      mDisplayModule->SetPosition(3, 72);
-      float titleBarHeight;
-      float highlight;
-      mDisplayModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
-      mDisplayModule->SetPosition(x, y);
-
-      ofPopMatrix();
-      ofPopStyle();
-   }
-
-   for (int i = 0; i < 8; ++i)
-   {
-      SetLed(kMidiMessage_Control, i + kAboveScreenButtonRow, topRowLedColors[i]);
-      SetLed(kMidiMessage_Control, i + kBelowScreenButtonRow, bottomRowLedColors[i]);
    }
 }
 
@@ -1221,27 +695,24 @@ void AbletonMoveControl::DrawControls(std::vector<IUIControl*> controls, bool sl
 
 void AbletonMoveControl::RenderPush2Display()
 {
-   auto mainVG = gNanoVG;
-   gNanoVG = sVG;
-   sDrawingPush2Display = true;
-   DrawToFramebuffer(sVG, sFB);
-   sDrawingPush2Display = false;
-   gNanoVG = mainVG;
+   DrawToFramebuffer();
 
-   //memset(mPixels, 0, sizeof(uint8_t) * GetNumDisplayPixels());
+   uint8_t* lcdPixels = mLCD.GetPixels();
+
+   //memset(lcdPixels, 0, sizeof(uint8_t) * mLCD.GetNumDisplayPixels());
    /*for (int x = 0; x < kMoveDisplayWidth; ++x)
    {
       for (int y = 0; y < kMoveDisplayHeight; ++y)
       {
          if (x > 64 && x < 90 && y > 10 && y < 20)
          {
-            mPixels[x + y * kMoveDisplayWidth] = 255;
+            lcdPixels[x + y * kMoveDisplayWidth] = 255;
          }
       }
    }*/
 
    uint16_t* pixels = ThePushBridge.GetDisplay()->GetRawBitmap();
-   memset(pixels, 0, sizeof(uint16_t) * GetNumDisplayPixels());
+   memset(pixels, 0, sizeof(uint16_t) * mLCD.GetNumDisplayPixels());
    const int kPixelBlockRows = 8;
    const int kPixelBlockColumns = 64;
    const int kPixelBlockCellWidth = 2;
@@ -1257,15 +728,12 @@ void AbletonMoveControl::RenderPush2Display()
          {
             int pixelX = pixelXStart + i / kPixelBlockCellHeight;
             int pixelY = pixelYStart + i % kPixelBlockCellHeight;
-            int pixelIndex = (pixelX + pixelY * kMoveDisplayWidth) * 4;
-            if (mPixels[pixelIndex] > 100)
+            int pixelIndex = (pixelX + pixelY * AbletonMoveLCD::kMoveDisplayWidth) * 4;
+            if (lcdPixels[pixelIndex] > 100)
                pixels[cellIndex] |= 1 << i;
          }
       }
    }
-
-   // Tells the bridge we're done with drawing and the frame can be sent to the display
-   //ThePushBridge.Flip(mPixels);
 }
 
 void AbletonMoveControl::Poll()

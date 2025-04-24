@@ -32,10 +32,8 @@
 #include "MidiController.h"
 #include "TitleBar.h"
 #include "DropdownList.h"
-//#include "ssfn.h"
+#include "AbletonMoveLCD.h"
 
-class NVGcontext;
-class NVGLUframebuffer;
 class IUIControl;
 class IAbletonMoveGridController;
 class Snapshots;
@@ -78,10 +76,6 @@ public:
    int GetGridControllerOption1Control() const;
    int GetGridControllerOption2Control() const;
 
-   static bool sDrawingPush2Display;
-   static NVGcontext* sVG;
-   static NVGLUframebuffer* sFB;
-   static void CreateStaticFramebuffer(); //windows was having trouble creating a nanovg context and fbo on the fly
    static IUIControl* sBindToUIControl;
 
    bool IsEnabled() const override { return true; }
@@ -99,14 +93,11 @@ private:
    void OnClicked(float x, float y, bool right) override;
 
    bool Initialize();
-   void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb);
+   void DrawToFramebuffer();
    void RenderPush2Display();
    void UpdateLeds();
 
    void SetModuleGridLights();
-   void DrawDisplayModuleControls();
-   void DrawLowerModuleSelector();
-   void DrawRoutingDisplay();
    void DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
@@ -127,13 +118,11 @@ private:
    ModuleCategory GetModuleTypeForSpawnList(IUIControl* control);
    ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
    int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
-   int GetNumDisplayPixels() const;
    bool AllowRepatch() const;
    void UpdateRoutingModules();
    void SetGridControlInterface(IAbletonMoveGridController* controller, IDrawableModule* module);
-   void DrawPixelRect(int x, int y, int width, int height, bool filled);
 
-   uint8_t* mPixels{ nullptr };
+   AbletonMoveLCD mLCD;
 
    const float kColumnSpacing = 121;
 
