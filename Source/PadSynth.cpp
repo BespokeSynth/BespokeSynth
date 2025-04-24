@@ -70,7 +70,12 @@ void PadSynth::CreateUIControls()
    FLOATSLIDER_DIGITS(mHarmonicsSlider, "harmonics", &mHarmonics, -128, 128, 0);
    FLOATSLIDER(mSpreadSlider, "spread", &mVoiceParams.mSpread, -1.0, 1.0);
    FLOATSLIDER(mBandwidthScaleSlider, "scale", &mVoiceParams.mBandwidthScale, 0.01f, 2);
+   DROPDOWN(mAmplitudeTypeSelector, "amplitudetype", (int*)&mVoiceParams.mAmplitudeType, kColumnWidth);
    ENDUIBLOCK(width, height);
+
+   mAmplitudeTypeSelector->AddLabel("step", kAmplitudeTypeStep);
+   mAmplitudeTypeSelector->AddLabel("sqrt", kAmplitudeTypeSqrt);
+   mAmplitudeTypeSelector->AddLabel("equal", kAmplitudeTypeEqual);
 
    UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
    UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth, 36, &mVoiceParams.mAdsr));
@@ -152,6 +157,7 @@ void PadSynth::DrawModule()
    mHarmonicsSlider->Draw();
    mBandwidthScaleSlider->Draw();
    mSpreadSlider->Draw();
+   mAmplitudeTypeSelector->Draw();
    mADSRDisplay->Draw();
    mVolSlider->Draw();
 

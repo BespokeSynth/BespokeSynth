@@ -97,6 +97,7 @@ private:
    FloatSlider* mSpreadSlider{ nullptr };
    FloatSlider* mHarmonicsSlider{ nullptr };
    Checkbox* mLiteCPUModeCheckbox{ nullptr };
+   DropdownList* mAmplitudeTypeSelector{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
    FloatSlider* mChannelOffsetSlider{ nullptr };
 

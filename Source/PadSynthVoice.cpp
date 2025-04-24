@@ -102,9 +102,11 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
       float bwi = bw_Hz / (2.0 * sampleRate);
       float fi = freq * relf / sampleRate;
 
-      float A = 1.0 / nh;
-      if ((nh % 2) == 0)
-         A *= 2.0;
+      float A = 1.0;
+      if (mVoiceParams->mAmplitudeType == kAmplitudeTypeStep)
+         A = A / nh * (2 - (nh % 2));
+      else if (mVoiceParams->mAmplitudeType == kAmplitudeTypeSqrt)
+         A = A / pow((float)nh, 0.5);
 
       for (int i = 0; i < extendedBufferSize / 2; i++)
       {
