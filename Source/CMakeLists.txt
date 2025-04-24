@@ -44,6 +44,8 @@ target_sources(BespokeSynth PRIVATE
     AbletonLink.h
     AbletonMoveControl.cpp
     AbletonMoveControl.h
+    AbletonMoveLCD.cpp
+    AbletonMoveLCD.h
     Acciaccatura.cpp
     Acciaccatura.h
     Amplifier.cpp
