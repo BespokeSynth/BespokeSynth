@@ -159,7 +159,7 @@ void AbletonMoveControl::DrawModule()
 
 void AbletonMoveControl::DrawModuleUnclipped()
 {
-   if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() && 
+   if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() &&
        mDisplayModule->GetOwningContainer() != nullptr && mDisplayModule->IsShowing())
    {
       ofPushMatrix();

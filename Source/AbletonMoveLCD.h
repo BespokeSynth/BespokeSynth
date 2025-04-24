@@ -29,19 +29,19 @@
 
 #include "SynthGlobals.h"
 
-#define LCDFONT_STYLE_REGULAR      0
-#define LCDFONT_STYLE_BOLD         1
-#define LCDFONT_STYLE_ITALIC       2
-#define LCDFONT_STYLE_UNDERLINE   16     /* under line glyph */
-#define LCDFONT_STYLE_STHROUGH    32     /* strike through glyph */
-#define LCDFONT_STYLE_NOAA        64     /* no anti-aliasing */
-#define LCDFONT_STYLE_NOKERN     128     /* no kerning */
-#define LCDFONT_STYLE_NODEFGLYPH 256     /* don't draw default glyph */
-#define LCDFONT_STYLE_NOCACHE    512     /* don't cache rasterized glyph */
-#define LCDFONT_STYLE_NOHINTING 1024     /* no auto hinting grid (not used as of now) */
-#define LCDFONT_STYLE_RTL       2048     /* render right-to-left */
-#define LCDFONT_STYLE_ABS_SIZE  4096     /* scale absoulte height */
-#define LCDFONT_STYLE_NOSMOOTH  8192     /* no edge-smoothing for bitmaps */
+#define LCDFONT_STYLE_REGULAR 0
+#define LCDFONT_STYLE_BOLD 1
+#define LCDFONT_STYLE_ITALIC 2
+#define LCDFONT_STYLE_UNDERLINE 16 /* under line glyph */
+#define LCDFONT_STYLE_STHROUGH 32 /* strike through glyph */
+#define LCDFONT_STYLE_NOAA 64 /* no anti-aliasing */
+#define LCDFONT_STYLE_NOKERN 128 /* no kerning */
+#define LCDFONT_STYLE_NODEFGLYPH 256 /* don't draw default glyph */
+#define LCDFONT_STYLE_NOCACHE 512 /* don't cache rasterized glyph */
+#define LCDFONT_STYLE_NOHINTING 1024 /* no auto hinting grid (not used as of now) */
+#define LCDFONT_STYLE_RTL 2048 /* render right-to-left */
+#define LCDFONT_STYLE_ABS_SIZE 4096 /* scale absoulte height */
+#define LCDFONT_STYLE_NOSMOOTH 8192 /* no edge-smoothing for bitmaps */
 
 class AbletonMoveLCD
 {
