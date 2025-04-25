@@ -211,7 +211,7 @@ void PadSynth::LoadLayout(const ofxJSONElement& moduleInfo)
    oversamplingMap["4"] = 4;
    oversamplingMap["8"] = 8;
    mModuleSaveData.LoadEnum<int>("oversampling", moduleInfo, 1, nullptr, &oversamplingMap);
-   mModuleSaveData.LoadInt("undersampling", moduleInfo, 0, 0, 16);
+   mModuleSaveData.LoadInt("undersampling", moduleInfo, 0, 0, (int)(log(MAX_BUFFER_SIZE / gBufferSize) / log(2)));
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();
