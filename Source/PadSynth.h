@@ -60,7 +60,7 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
    bool HasDebugDraw() const override { return true; }
@@ -87,15 +87,17 @@ private:
    NoteInputBuffer mNoteInputBuffer;
    PadSynthVoiceParams mVoiceParams;
    float mVolume{ 1 };
+   float mHarmonics{ 64 };
    FloatSlider* mVolSlider{ nullptr };
    BiquadFilterEffect mBiquad;
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
 
    FloatSlider* mBandwidthSlider{ nullptr };
    FloatSlider* mBandwidthScaleSlider{ nullptr };
-   FloatSlider* mDetuneSlider{ nullptr };
-   IntSlider* mHarmonicsSlider{ nullptr };
+   FloatSlider* mSpreadSlider{ nullptr };
+   FloatSlider* mHarmonicsSlider{ nullptr };
    Checkbox* mLiteCPUModeCheckbox{ nullptr };
+   DropdownList* mAmplitudeTypeSelector{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
    FloatSlider* mChannelOffsetSlider{ nullptr };
 

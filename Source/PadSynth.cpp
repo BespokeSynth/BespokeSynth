@@ -67,10 +67,15 @@ void PadSynth::CreateUIControls()
 
    UIBLOCK(3, 3, kColumnWidth);
    FLOATSLIDER(mBandwidthSlider, "bandwidth", &mVoiceParams.mBandwidth, 0.01f, 100);
-   INTSLIDER(mHarmonicsSlider, "harmonics", &mVoiceParams.mHarmonics, 1, 128);
-   FLOATSLIDER(mDetuneSlider, "detune", &mVoiceParams.mDetune, -1.0, 1.0);
+   FLOATSLIDER_DIGITS(mHarmonicsSlider, "harmonics", &mHarmonics, -128, 128, 0);
+   FLOATSLIDER(mSpreadSlider, "spread", &mVoiceParams.mSpread, -1.0, 1.0);
    FLOATSLIDER(mBandwidthScaleSlider, "scale", &mVoiceParams.mBandwidthScale, 0.01f, 2);
+   DROPDOWN(mAmplitudeTypeSelector, "amplitudetype", (int*)&mVoiceParams.mAmplitudeType, kColumnWidth);
    ENDUIBLOCK(width, height);
+
+   mAmplitudeTypeSelector->AddLabel("step", kAmplitudeTypeStep);
+   mAmplitudeTypeSelector->AddLabel("sqrt", kAmplitudeTypeSqrt);
+   mAmplitudeTypeSelector->AddLabel("equal", kAmplitudeTypeEqual);
 
    UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
    UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth, 36, &mVoiceParams.mAdsr));
@@ -109,7 +114,7 @@ void PadSynth::Process(double time)
    for (int ch = 0; ch < mWriteBuffer.NumActiveChannels(); ++ch)
    {
       Mult(mWriteBuffer.GetChannel(ch), mVolume, bufferSize);
-	  mDCRemover[ch].Filter(mWriteBuffer.GetChannel(ch), bufferSize);
+      mDCRemover[ch].Filter(mWriteBuffer.GetChannel(ch), bufferSize);
    }
 
    mBiquad.ProcessAudio(time, &mWriteBuffer);
@@ -151,9 +156,13 @@ void PadSynth::DrawModule()
    mBandwidthSlider->Draw();
    mHarmonicsSlider->Draw();
    mBandwidthScaleSlider->Draw();
-   mDetuneSlider->Draw();
+   mSpreadSlider->Draw();
+   mAmplitudeTypeSelector->Draw();
    mADSRDisplay->Draw();
    mVolSlider->Draw();
+
+   mChannelOffsetSlider->SetShowing(mWriteBuffer.NumActiveChannels() > 1);
+
    mChannelOffsetSlider->Draw();
 
    mBiquad.Draw();
@@ -173,6 +182,8 @@ void PadSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
 
 void PadSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
+   if (slider == mHarmonicsSlider)
+      mVoiceParams.mHarmonics = (int)mHarmonics;
 }
 
 void PadSynth::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
@@ -200,7 +211,7 @@ void PadSynth::LoadLayout(const ofxJSONElement& moduleInfo)
    oversamplingMap["4"] = 4;
    oversamplingMap["8"] = 8;
    mModuleSaveData.LoadEnum<int>("oversampling", moduleInfo, 1, nullptr, &oversamplingMap);
-   mModuleSaveData.LoadInt("undersampling", moduleInfo, 0, 0, 16);
+   mModuleSaveData.LoadInt("undersampling", moduleInfo, 0, 0, (int)(log(MAX_BUFFER_SIZE / gBufferSize) / log(2)));
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();

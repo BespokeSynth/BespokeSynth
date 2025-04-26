@@ -34,6 +34,13 @@
 class FFT;
 class IDrawableModule;
 
+enum PadSynthAmplitudeType
+{
+   kAmplitudeTypeStep,
+   kAmplitudeTypeSqrt,
+   kAmplitudeTypeEqual
+};
+
 class PadSynthVoiceParams : public IVoiceParams
 {
 public:
@@ -44,6 +51,7 @@ public:
 
    float mFilter{ 1 };
    float mFeedback{ .98 };
+   PadSynthAmplitudeType mAmplitudeType{ PadSynthAmplitudeType::kAmplitudeTypeStep };
    float mPitchTone{ 0 };
    float mVelToVolume{ 1.0 };
    float mVelToEnvelope{ .5 };
@@ -51,7 +59,7 @@ public:
    float mBandwidth{ 40.0 };
    int mHarmonics{ 64 };
    float mBandwidthScale{ 1.0 };
-   float mDetune{ 0.0 };
+   float mSpread{ 0.0 };
    float mChannelOffset{ 0.5 };
    int mUndersample{ 0 };
 };
