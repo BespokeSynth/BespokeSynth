@@ -148,13 +148,13 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
       if (channels == 1)
       {
-         destBuffer->GetChannel(0)[pos / oversampling] += sample[mSample * bufferSize + pos] * mAdsr.Value(time);
+         destBuffer->GetChannel(0)[pos] += sample[mSample * bufferSize + pos / oversampling] * mAdsr.Value(time);
       }
       else
       {
          int channel_offset = extendedBufferSize * mVoiceParams->mChannelOffset;
-         destBuffer->GetChannel(0)[pos / oversampling] += sample[mSample * bufferSize + pos] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
-         destBuffer->GetChannel(1)[pos / oversampling] += sample[(mSample * bufferSize + pos + channel_offset) % extendedBufferSize] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(0)[pos] += sample[mSample * bufferSize + pos / oversampling] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(1)[pos] += sample[(mSample * bufferSize + pos / oversampling + channel_offset) % extendedBufferSize] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
       }
 
       time += sampleIncrementMs;
