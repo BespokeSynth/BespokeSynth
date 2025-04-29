@@ -58,6 +58,7 @@ public:
    bool mLiteCPUMode{ true };
    float mBandwidth{ 40.0 };
    int mHarmonics{ 64 };
+   bool mHarmonicsRelative{ true };
    float mBandwidthScale{ 1.0 };
    float mSpread{ 0.0 };
    float mChannelOffset{ 0.5 };
