@@ -273,6 +273,10 @@
 #include "StereoRotation.h"
 #include "LatencyCalculator.h"
 
+#ifdef BESPOKE_FLUIDSYNTH
+#include "FluidSynth.h"
+#endif
+
 #include <juce_core/juce_core.h>
 
 #include "PulseRouter.h"
@@ -499,6 +503,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(StereoRotation, stereorotation, kModuleCategory_Audio);
    REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
    REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
+#ifdef BESPOKE_FLUIDSYNTH
+   REGISTER(FluidSynth, fluidsynth, kModuleCategory_Synth);
+#endif
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
