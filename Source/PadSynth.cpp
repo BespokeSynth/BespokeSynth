@@ -68,6 +68,7 @@ void PadSynth::CreateUIControls()
    UIBLOCK(3, 3, kColumnWidth);
    FLOATSLIDER(mBandwidthSlider, "bandwidth", &mVoiceParams.mBandwidth, 0.01f, 100);
    FLOATSLIDER_DIGITS(mHarmonicsSlider, "harmonics", &mHarmonics, -128, 128, 0);
+   CHECKBOX(mHarmonicsRelativeCheckbox, "relative", &mVoiceParams.mHarmonicsRelative);
    FLOATSLIDER(mSpreadSlider, "spread", &mVoiceParams.mSpread, -1.0, 1.0);
    FLOATSLIDER(mBandwidthScaleSlider, "scale", &mVoiceParams.mBandwidthScale, 0.01f, 2);
    DROPDOWN(mAmplitudeTypeSelector, "amplitudetype", (int*)&mVoiceParams.mAmplitudeType, kColumnWidth);
@@ -155,6 +156,7 @@ void PadSynth::DrawModule()
 
    mBandwidthSlider->Draw();
    mHarmonicsSlider->Draw();
+   mHarmonicsRelativeCheckbox->Draw();
    mBandwidthScaleSlider->Draw();
    mSpreadSlider->Draw();
    mAmplitudeTypeSelector->Draw();

@@ -81,7 +81,7 @@ private:
    }
 
    float mWidth{ 317 };
-   float mHeight{ 87 };
+   float mHeight{ 107 };
 
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
@@ -96,6 +96,7 @@ private:
    FloatSlider* mBandwidthScaleSlider{ nullptr };
    FloatSlider* mSpreadSlider{ nullptr };
    FloatSlider* mHarmonicsSlider{ nullptr };
+   Checkbox* mHarmonicsRelativeCheckbox{ nullptr };
    Checkbox* mLiteCPUModeCheckbox{ nullptr };
    DropdownList* mAmplitudeTypeSelector{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
