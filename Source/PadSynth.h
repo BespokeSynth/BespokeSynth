@@ -100,6 +100,7 @@ private:
    Checkbox* mLiteCPUModeCheckbox{ nullptr };
    DropdownList* mAmplitudeTypeSelector{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
+   FloatSlider* mVolThresholdSlider{ nullptr };
    FloatSlider* mChannelOffsetSlider{ nullptr };
 
    ChannelBuffer mWriteBuffer;

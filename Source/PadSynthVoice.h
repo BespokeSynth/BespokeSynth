@@ -62,6 +62,7 @@ public:
    float mBandwidthScale{ 1.0 };
    float mSpread{ 0.0 };
    float mChannelOffset{ 0.5 };
+   float mVolThreshold{ 1e-5 };
    int mUndersample{ 0 };
 };
 
