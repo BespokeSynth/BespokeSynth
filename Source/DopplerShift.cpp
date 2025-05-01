@@ -66,6 +66,7 @@ void DopplerShift::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 float DopplerShift::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
+
    if (GetSliderTarget())
       return ofClamp((mSpeedOfSound + mSpeed1) / (mSpeedOfSound - mSpeed2), GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
    else
