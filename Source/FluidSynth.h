@@ -99,6 +99,7 @@ private:
    void UpdateVolume();
    void UpdatePresets();
    void PollPresetLocked(int channel);
+   void PollAllPresetsLocked();
    void ReloadSoundFont();
    void SetMidiBankSelect();
    void RecreateSynth();
