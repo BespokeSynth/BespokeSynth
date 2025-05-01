@@ -81,7 +81,6 @@ void PadSynth::CreateUIControls()
    UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
    UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth, 36, &mVoiceParams.mAdsr));
    FLOATSLIDER(mVolSlider, "vol", &mVolume, 0, 2);
-   FLOATSLIDER_DIGITS(mVolThresholdSlider, "vol", &mVoiceParams.mVolThreshold, 0, 1, 6);
    FLOATSLIDER(mChannelOffsetSlider, "offset", &mVoiceParams.mChannelOffset, 0, 1);
    //CHECKBOX(mLiteCPUModeCheckbox, "lite cpu", &mVoiceParams.mLiteCPUMode);
    ENDUIBLOCK(width, height);
@@ -163,7 +162,6 @@ void PadSynth::DrawModule()
    mAmplitudeTypeSelector->Draw();
    mADSRDisplay->Draw();
    mVolSlider->Draw();
-   mVolThresholdSlider->Draw();
 
    mChannelOffsetSlider->SetShowing(mWriteBuffer.NumActiveChannels() > 1);
 

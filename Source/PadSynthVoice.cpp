@@ -152,8 +152,8 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    for (int i = 0; i < extendedBufferSize; i++)
       if (fabsf(sample[i]) > max)
          max = fabsf(sample[i]);
-   if (max < mVoiceParams->mVolThreshold)
-      max = mVoiceParams->mVolThreshold;
+   if (max < 1e-5)
+      max = 1e-5;
    for (int i = 0; i < extendedBufferSize; i++)
       sample[i] /= max * 1.4142;
 
