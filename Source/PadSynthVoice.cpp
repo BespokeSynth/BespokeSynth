@@ -131,9 +131,18 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    for (int i = 0; i < extendedBufferSize / 2; i++)
       freq_phase[i] = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
 
+   float* freq_real = (float*)calloc(extendedBufferSize / 2, sizeof(float));
+   float* freq_imag = (float*)calloc(extendedBufferSize / 2, sizeof(float));
+
+   for (int i = 0; i < extendedBufferSize / 2; i++)
+   {
+      freq_real[i] = freq_amp[i] * cos(freq_phase[i]);
+      freq_imag[i] = freq_amp[i] * sin(freq_phase[i]);
+   }
+
    float* sample = (float*)calloc(extendedBufferSize, sizeof(float));
    mFFT = new ::FFT(extendedBufferSize);
-   mFFT->Inverse(freq_amp, freq_phase, sample);
+   mFFT->Inverse(freq_real, freq_imag, sample);
 
    free(freq_amp);
    free(freq_phase);
