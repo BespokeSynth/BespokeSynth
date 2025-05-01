@@ -343,6 +343,14 @@ void FluidSynth::PollPresetLocked(int channel)
    mPresetsDropdown[channel]->Poll();
 }
 
+void FluidSynth::PollAllPresetsLocked()
+{
+   for (int i = 0; i < kNumVoices; i++)
+   {
+      PollPresetLocked(i);
+   }
+}
+
 void FluidSynth::ReloadSoundFont()
 {
    ScopedMutex mutex(&mSynthMutex, "reloadSoundFont()");
@@ -390,10 +398,7 @@ void FluidSynth::ReloadSoundFont()
       }
    }
 
-   for (int i = 0; i < kNumVoices; i++)
-   {
-      PollPresetLocked(i);
-   }
+   PollAllPresetsLocked();
 }
 
 void FluidSynth::SetMidiBankSelect()
@@ -548,6 +553,8 @@ void FluidSynth::SendMidi(const juce::MidiMessage& message)
    else if (message.isSysEx())
    {
       fluid_synth_sysex(mSynth, reinterpret_cast<const char*>(message.getSysExData()), message.getSysExDataSize(), nullptr, nullptr, nullptr, false);
+      // May have changed presets due to system reset
+      PollAllPresetsLocked();
    }
    else if (message.isController())
    {
