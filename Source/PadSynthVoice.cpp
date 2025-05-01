@@ -87,10 +87,12 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
    int harmonics = mVoiceParams->mHarmonics;
    if (mVoiceParams->mHarmonicsRelative && harmonics != 0)
+   {
       if (harmonics > 0)
          harmonics = 440.0 / freq * harmonics;
       else
          harmonics = freq / 440.0 * harmonics;
+   }
 
    for (int nh = 1; nh <= abs(harmonics); nh++) // for each harmonic
    {
