@@ -116,22 +116,18 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
       }
    }
 
-   // Add random phases
-   float* freq_phase = (float*)calloc(extendedBufferSize / 2, sizeof(float));
-   for (int i = 0; i < extendedBufferSize / 2; i++)
-      freq_phase[i] = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
-
    float* freq_real = (float*)calloc(extendedBufferSize / 2, sizeof(float));
    float* freq_imag = (float*)calloc(extendedBufferSize / 2, sizeof(float));
 
    for (int i = 0; i < extendedBufferSize / 2; i++)
    {
-      freq_real[i] = freq_amp[i] * cos(freq_phase[i]);
-      freq_imag[i] = freq_amp[i] * sin(freq_phase[i]);
+      // Use random phase
+      float phase = ((abs(DeterministicRandom((int)pitch, i)) % 10000) / 10000.0f) * 2.0 * PI;
+      freq_real[i] = freq_amp[i] * cos(phase);
+      freq_imag[i] = freq_amp[i] * sin(phase);
    }
 
    free(freq_amp);
-   free(freq_phase);
 
    float* sample = (float*)calloc(extendedBufferSize, sizeof(float));
    mFFT = new ::FFT(extendedBufferSize);
