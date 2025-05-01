@@ -2153,7 +2153,9 @@ acciaccatura~adds a quick grace note before playing the input pitch
 padsynth~synth based on padsynth algorithm
 ~bandwidth~bandwidth of first harmonic in cents
 ~harmonics~number of harmonics
+~relative~should the number of harmonics be scaled to fit the frequency domain?
 ~spread~shift of overtones from their exact positions
 ~scale~how much the bandwidth of a harmonic increases according to its frequency
+~amplitude type~method used to determine amplitudes for harmonics
 ~vol~output volume
-~offset~difference between left and right channels, in fraction of the buffer
+~stereo offset~difference between left and right channels, in fraction of the buffer
