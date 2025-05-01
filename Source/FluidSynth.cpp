@@ -512,11 +512,6 @@ void FluidSynth::SendMidi(const juce::MidiMessage& message)
       // Handled by PlayNote()
       return;
    }
-   else if (message.isController())
-   {
-      // Handled by SendCC
-      return;
-   }
 
    if (message.isAftertouch() || message.isMidiClock() || message.isMidiStart() || message.isMidiStop() || message.isMidiContinue() || message.isSongPositionPointer() || message.isQuarterFrame())
    {
@@ -545,5 +540,10 @@ void FluidSynth::SendMidi(const juce::MidiMessage& message)
    else if (message.isSysEx())
    {
       fluid_synth_sysex(mSynth, reinterpret_cast<const char*>(message.getSysExData()), message.getSysExDataSize(), nullptr, nullptr, nullptr, false);
+   }
+   else if (message.isController())
+   {
+      int channel = message.getChannel() - 1;
+      fluid_synth_cc(mSynth, channel, message.getControllerNumber(), message.getControllerValue());
    }
 }
