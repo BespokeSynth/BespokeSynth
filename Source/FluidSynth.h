@@ -115,10 +115,10 @@ private:
    MidiBankSelect mMidiBankSelect{ 0 };
    DropdownList* mMidiBankSelectDropdown{ nullptr };
 
-   std::vector<int> mPresets{};
-   std::vector<DropdownList*> mPresetsDropdown{};
-   std::vector<int> mNotesActive{};
-   std::vector<float> mLastNotePlayTime{};
+   std::array<int, kNumVoices> mPresets{ 0 };
+   std::array<DropdownList*, kNumVoices> mPresetsDropdown{ nullptr };
+   std::array<int, kNumVoices> mNotesActive{ 0 };
+   std::array<float, kNumVoices> mLastNotePlayTime{ -1 };
 
    NoteInputBuffer mNoteInputBuffer;
    ChannelBuffer mWriteBuffer;
