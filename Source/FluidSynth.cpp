@@ -288,7 +288,7 @@ void FluidSynth::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void FluidSynth::ClearNotes(bool disabled)
+void FluidSynth::ClearNotes(bool soundsOff)
 {
    for (int i = 0; i < kNumVoices; i++)
    {
@@ -300,7 +300,7 @@ void FluidSynth::ClearNotes(bool disabled)
    if (mSynth == nullptr)
       return;
 
-   if (disabled)
+   if (soundsOff)
    {
       fluid_synth_all_sounds_off(mSynth, -1);
    }
@@ -536,6 +536,14 @@ void FluidSynth::SendMidi(const juce::MidiMessage& message)
    else if (message.isChannelPressure())
    {
       fluid_synth_channel_pressure(mSynth, message.getChannel() - 1, message.getChannelPressureValue());
+   }
+   else if (message.isAllNotesOff())
+   {
+      ClearNotes(false);
+   }
+   else if (message.isAllSoundOff())
+   {
+      ClearNotes(true);
    }
    else if (message.isSysEx())
    {
