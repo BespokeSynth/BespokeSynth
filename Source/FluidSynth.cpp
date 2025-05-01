@@ -390,7 +390,7 @@ void FluidSynth::ReloadSoundFont()
       int num = fluid_preset_get_num(preset);
 
       std::stringstream label;
-      label << bank + 1 << "/" << num + 1 << ": " << fluid_preset_get_name(preset);
+      label << bank << "/" << num << ": " << fluid_preset_get_name(preset);
 
       for (int i = 0; i < kNumVoices; i++)
       {
