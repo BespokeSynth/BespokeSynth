@@ -85,7 +85,7 @@ void FluidSynth::CreateUIControls()
    for (int i = 0; i < kNumVoices; i++)
    {
       std::stringstream label;
-      label << "channel " << i + 1 << " preset";
+      label << "preset " << (i < 9 ? "   " : "") << i + 1;
       DROPDOWN(mPresetsDropdown[i], label.str().c_str(), &mPresets[i], 250);
       mPresetsDropdown[i]->DrawLabel(true);
    }
