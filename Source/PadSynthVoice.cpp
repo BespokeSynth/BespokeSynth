@@ -130,12 +130,15 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
       freq_imag[i] = freq_amp[i] * sin(freq_phase[i]);
    }
 
+   free(freq_amp);
+   free(freq_phase);
+
    float* sample = (float*)calloc(extendedBufferSize, sizeof(float));
    mFFT = new ::FFT(extendedBufferSize);
    mFFT->Inverse(freq_real, freq_imag, sample);
 
-   free(freq_amp);
-   free(freq_phase);
+   free(freq_real);
+   free(freq_imag);
 
    // Normalize the sound to 1/sqrt(2)
    float max = 0.0;
