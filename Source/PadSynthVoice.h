@@ -81,7 +81,6 @@ public:
 
 private:
    void DoParameterUpdate(int samplesIn,
-                          int oversampling,
                           float& pitch,
                           float& freq);
 

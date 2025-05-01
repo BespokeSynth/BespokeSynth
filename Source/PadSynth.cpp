@@ -207,12 +207,6 @@ void PadSynth::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
-   EnumMap oversamplingMap;
-   oversamplingMap["1"] = 1;
-   oversamplingMap["2"] = 2;
-   oversamplingMap["4"] = 4;
-   oversamplingMap["8"] = 8;
-   mModuleSaveData.LoadEnum<int>("oversampling", moduleInfo, 1, nullptr, &oversamplingMap);
    mModuleSaveData.LoadInt("undersampling", moduleInfo, 0, 0, (int)(log(MAX_BUFFER_SIZE / gBufferSize) / log(2)));
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
@@ -231,9 +225,6 @@ void PadSynth::SetUpFromSaveData()
 
    bool mono = mModuleSaveData.GetBool("mono");
    mWriteBuffer.SetNumActiveChannels(mono ? 1 : 2);
-
-   int oversampling = mModuleSaveData.GetEnum<int>("oversampling");
-   mPolyMgr.SetOversampling(oversampling);
 
    int undersampling = mModuleSaveData.GetInt("undersampling");
    mVoiceParams.mUndersample = undersampling;

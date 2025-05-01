@@ -68,21 +68,11 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    double sampleRate = gSampleRate;
    ChannelBuffer* destBuffer = out;
 
-   if (oversampling != 1)
-   {
-      gMidiVoiceWorkChannelBuffer.SetNumActiveChannels(channels);
-      destBuffer = &gMidiVoiceWorkChannelBuffer;
-      gMidiVoiceWorkChannelBuffer.Clear();
-      bufferSize *= oversampling;
-      sampleIncrementMs /= oversampling;
-      sampleRate *= oversampling;
-   }
-
    float freq;
    float pitch;
 
    if (mVoiceParams->mLiteCPUMode)
-      DoParameterUpdate(0, oversampling, pitch, freq);
+      DoParameterUpdate(0, pitch, freq);
 
    // Setting undersample to a number greater than 1 increases the
    // internal buffer size to allow for longer wavetables
@@ -160,17 +150,17 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
    for (int pos = 0; pos < bufferSize; ++pos)
    {
       if (!mVoiceParams->mLiteCPUMode)
-         DoParameterUpdate(pos / oversampling, oversampling, pitch, freq);
+         DoParameterUpdate(pos, pitch, freq);
 
       if (channels == 1)
       {
-         destBuffer->GetChannel(0)[pos] += sample[mSample * bufferSize + pos / oversampling] * mAdsr.Value(time);
+         destBuffer->GetChannel(0)[pos] += sample[mSample * bufferSize + pos] * mAdsr.Value(time);
       }
       else
       {
          int channel_offset = extendedBufferSize * mVoiceParams->mChannelOffset;
-         destBuffer->GetChannel(0)[pos] += sample[mSample * bufferSize + pos / oversampling] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
-         destBuffer->GetChannel(1)[pos] += sample[(mSample * bufferSize + pos / oversampling + channel_offset) % extendedBufferSize] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(0)[pos] += sample[mSample * bufferSize + pos] * GetLeftPanGain(GetPan()) * mAdsr.Value(time);
+         destBuffer->GetChannel(1)[pos] += sample[(mSample * bufferSize + pos + channel_offset) % extendedBufferSize] * GetRightPanGain(GetPan()) * mAdsr.Value(time);
       }
 
       time += sampleIncrementMs;
@@ -178,30 +168,12 @@ bool PadSynthVoice::Process(double time, ChannelBuffer* out, int oversampling)
 
    free(sample);
 
-   if (oversampling != 1)
-   {
-      //assume power-of-two
-      while (oversampling > 1)
-      {
-         for (int i = 0; i < bufferSize; ++i)
-         {
-            for (int ch = 0; ch < channels; ++ch)
-               destBuffer->GetChannel(ch)[i] = (destBuffer->GetChannel(ch)[i * 2] + destBuffer->GetChannel(ch)[i * 2 + 1]) / 2;
-         }
-         oversampling /= 2;
-         bufferSize /= 2;
-      }
-
-      for (int ch = 0; ch < channels; ++ch)
-         Add(out->GetChannel(ch), destBuffer->GetChannel(ch), bufferSize);
-   }
-
    mSample = (mSample + 1) % undersample;
 
    return true;
 }
 
-void PadSynthVoice::DoParameterUpdate(int samplesIn, int oversampling, float& pitch, float& freq)
+void PadSynthVoice::DoParameterUpdate(int samplesIn, float& pitch, float& freq)
 {
    if (mOwner)
       mOwner->ComputeSliders(samplesIn);
