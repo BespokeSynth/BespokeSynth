@@ -82,10 +82,6 @@ void FluidSynth::CreateUIControls()
    TEXTENTRY(mSoundFontPathEntry, "soundfont", 15, &mSoundFontPath);
    DROPDOWN(mMidiBankSelectDropdown, "midi bank select", (int*)&mMidiBankSelect, 30);
 
-   mPresets.resize(kNumVoices, 0);
-   mPresetsDropdown.resize(kNumVoices, nullptr);
-   mNotesActive.resize(kNumVoices, 0);
-   mLastNotePlayTime.resize(kNumVoices, -1);
    for (int i = 0; i < kNumVoices; i++)
    {
       std::stringstream label;
