@@ -71,7 +71,7 @@ void PadSynth::CreateUIControls()
    CHECKBOX(mHarmonicsRelativeCheckbox, "relative", &mVoiceParams.mHarmonicsRelative);
    FLOATSLIDER(mSpreadSlider, "spread", &mVoiceParams.mSpread, -1.0, 1.0);
    FLOATSLIDER(mBandwidthScaleSlider, "scale", &mVoiceParams.mBandwidthScale, 0.01f, 2);
-   DROPDOWN(mAmplitudeTypeSelector, "amplitudetype", (int*)&mVoiceParams.mAmplitudeType, kColumnWidth);
+   DROPDOWN(mAmplitudeTypeSelector, "amplitude type", (int*)&mVoiceParams.mAmplitudeType, kColumnWidth);
    ENDUIBLOCK(width, height);
 
    mAmplitudeTypeSelector->AddLabel("step", kAmplitudeTypeStep);

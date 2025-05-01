@@ -2158,4 +2158,4 @@ padsynth~synth based on padsynth algorithm
 ~scale~how much the bandwidth of a harmonic increases according to its frequency
 ~amplitude type~method used to determine amplitudes for harmonics
 ~vol~output volume
-~stereo offset~difference between left and right channels, in fraction of the buffer
+~offset~difference between left and right channels, in fraction of the buffer
