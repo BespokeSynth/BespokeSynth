@@ -95,7 +95,7 @@ private:
       MMA
    };
 
-   void ClearNotes(bool disabled);
+   void ClearNotes(bool soundsOff);
    void UpdateVolume();
    void UpdatePresets();
    void PollPresetLocked(int channel);
