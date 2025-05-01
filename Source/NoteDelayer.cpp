@@ -93,34 +93,30 @@ void NoteDelayer::OnTransportAdvanced(float amount)
       end += kQueueSize;
    for (int i = mConsumeIndex; i < end; ++i)
    {
-      const NoteInfo& info = mInputNotes[i % kQueueSize];
-      if (NextBufferTime(true) >= info.mTriggerTime)
+      const NoteMessage note = mInputNotes[i % kQueueSize];
+      if (NextBufferTime(true) >= note.time)
       {
-         PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
+         PlayNoteOutput(note);
          mConsumeIndex = (mConsumeIndex + 1) % kQueueSize;
       }
    }
 }
 
-void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteDelayer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation); // Passthrough notes.
+      PlayNoteOutput(note); // Passthrough notes.
       return;
    }
 
-   if (velocity > 0)
-      mLastNoteOnTime = time;
+   if (note.velocity > 0)
+      mLastNoteOnTime = note.time;
 
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
-      NoteInfo info;
-      info.mPitch = pitch;
-      info.mVelocity = velocity;
-      info.mTriggerTime = time + mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
-      info.mModulation = modulation;
-      mInputNotes[mAppendIndex] = info;
+      mInputNotes[mAppendIndex] = note;
+      mInputNotes[mAppendIndex].time += mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;
    }
 }

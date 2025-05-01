@@ -434,6 +434,7 @@ private:
    int mMonomeDeviceIndex{ -1 };
    DropdownList* mMonomeDeviceDropdown{ nullptr };
    bool mShouldSendControllerInfoStrings{ false };
+   bool mSendSysex{ false };
 
    int mControllerIndex{ -1 };
    double mLastActivityTime{ -9999 };

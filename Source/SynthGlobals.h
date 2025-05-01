@@ -140,6 +140,20 @@ enum KeyModifiers
    kModifier_Command = 8
 };
 
+enum class StepVelocityType
+{
+   Off = 0,
+   Ghost = 1,
+   Normal = 2,
+   Accent = 3,
+   NumVelocityLevels = 4
+};
+constexpr float kVelocityOff = 0.0f;
+constexpr float kVelocityGhost = 0.4f;
+constexpr float kVelocityNormal = 0.75f;
+constexpr float kVelocityAccent = 1.0f;
+extern std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
+
 class LoadingJSONException : public std::exception
 {
 };
@@ -197,7 +211,7 @@ float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize
 void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float sample);
 std::string GetRomanNumeralForDegree(int degree);
 void UpdateTarget(IDrawableModule* module);
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r = .2f, float g = .7f, float b = .2f);
+void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r = .2f, float g = .7f, float b = .2f, bool autocorrelationMode = true);
 void StringCopy(char* dest, const char* source, int destLength);
 int GetKeyModifiers();
 bool IsKeyHeld(int key, int modifiers = kModifier_None);

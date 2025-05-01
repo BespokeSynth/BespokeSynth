@@ -52,19 +52,19 @@ void ModulationVisualizer::DrawModule()
    }
 }
 
-void ModulationVisualizer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ModulationVisualizer::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 
-   if (voiceIdx == -1)
+   if (note.voiceIdx == -1)
    {
-      mGlobalModulation.mActive = velocity > 0;
-      mGlobalModulation.mModulators = modulation;
+      mGlobalModulation.mActive = note.velocity > 0;
+      mGlobalModulation.mModulators = note.modulation;
    }
    else
    {
-      mVoices[voiceIdx].mActive = velocity > 0;
-      mVoices[voiceIdx].mModulators = modulation;
+      mVoices[note.voiceIdx].mActive = note.velocity > 0;
+      mVoices[note.voiceIdx].mModulators = note.modulation;
    }
 }
 

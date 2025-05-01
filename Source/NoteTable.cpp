@@ -67,7 +67,7 @@ void NoteTable::CreateUIControls()
    INTSLIDER(mGridControlOffsetYSlider, "y offset", &mGridControlOffsetY, 0, 16);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid("uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange, this);
+   mGrid = new UIGrid(this, "uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange);
 
    mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
    mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);
@@ -332,33 +332,38 @@ void NoteTable::Resize(float w, float h)
    mGrid->SetDimensions(MAX(w - ExtraWidth(), 210), MAX(h - ExtraHeight(), 80));
 }
 
-void NoteTable::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteTable::PlayNote(NoteMessage note)
 {
-   if ((mEnabled || velocity == 0) && pitch < kMaxLength)
-      PlayColumn(time, pitch, velocity, voiceIdx, modulation);
+   if ((mEnabled || note.velocity == 0) && note.pitch < kMaxLength)
+      PlayColumn(note);
 }
 
-void NoteTable::PlayColumn(double time, int column, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteTable::PlayColumn(NoteMessage note)
 {
-   if (velocity == 0)
+   int column = note.pitch;
+   if (note.velocity == 0)
    {
       mLastColumnPlayTime[column] = -1;
-      for (int i = 0; i < 128; ++i)
+      for (int i = 0; i < mLastColumnNoteOnPitches.size(); ++i)
       {
          if (mLastColumnNoteOnPitches[column][i])
          {
-            PlayNoteOutput(time, i, 0, voiceIdx, modulation);
-            mColumnCables[column]->PlayNoteOutput(time, i, 0, voiceIdx, modulation);
+            PlayNoteOutput(NoteMessage(note.time, i, 0, note.voiceIdx, note.modulation));
+            mColumnCables[column]->PlayNoteOutput(NoteMessage(note.time, i, 0, note.voiceIdx, note.modulation));
             mLastColumnNoteOnPitches[column][i] = false;
          }
       }
    }
    else
    {
-      mLastColumnPlayTime[column] = time;
+      mLastColumnPlayTime[column] = note.time;
       for (int row = 0; row < mGrid->GetRows(); ++row)
       {
          int outputPitch = RowToPitch(row);
+
+         // don't play notes > 127, and also to avoid bufferoverflow for mQueuedPitches and mPitchPlayTimes below
+         if (outputPitch >= mPitchPlayTimes.size() || outputPitch >= mQueuedPitches.size())
+            continue;
 
          if (mQueuedPitches[outputPitch])
          {
@@ -369,10 +374,10 @@ void NoteTable::PlayColumn(double time, int column, int velocity, int voiceIdx, 
          if (mGrid->GetVal(column, row) == 0)
             continue;
 
-         PlayNoteOutput(time, outputPitch, velocity, voiceIdx, modulation);
-         mColumnCables[column]->PlayNoteOutput(time, outputPitch, velocity, voiceIdx, modulation);
+         PlayNoteOutput(NoteMessage(note.time, outputPitch, note.velocity, note.voiceIdx, note.modulation));
+         mColumnCables[column]->PlayNoteOutput(NoteMessage(note.time, outputPitch, note.velocity, note.voiceIdx, note.modulation));
          mLastColumnNoteOnPitches[column][outputPitch] = true;
-         mPitchPlayTimes[outputPitch] = time;
+         mPitchPlayTimes[outputPitch] = note.time;
       }
    }
 }

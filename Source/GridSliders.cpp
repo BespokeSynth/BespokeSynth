@@ -51,7 +51,7 @@ void GridSliders::CreateUIControls()
    mDirectionSelector->AddLabel("vertical", (int)Direction::kVertical);
    mDirectionSelector->AddLabel("horizontal", (int)Direction::kHorizontal);
 
-   for (size_t i = 0; i < mControlCables.size(); ++i)
+   for (int i = 0; i < (int)mControlCables.size(); ++i)
    {
       mControlCables[i] = new PatchCableSource(this, kConnectionType_ValueSetter);
       mControlCables[i]->SetManualPosition(i * 12 + 8, 28);
@@ -70,7 +70,7 @@ void GridSliders::Poll()
       else
          length = mGridControlTarget->GetGridController()->NumCols();
 
-      for (size_t i = 0; i < mControlCables.size(); ++i)
+      for (int i = 0; i < (int)mControlCables.size(); ++i)
       {
          GridColor color = GridColor::kGridColorOff;
 

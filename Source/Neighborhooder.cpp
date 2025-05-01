@@ -62,19 +62,19 @@ void Neighborhooder::IntSliderUpdated(IntSlider* slider, int oldVal, double time
       mNoteOutput.Flush(time);
 }
 
-void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Neighborhooder::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   while (pitch >= mMinPitch + mPitchRange)
-      pitch -= TheScale->GetPitchesPerOctave();
-   while (pitch < mMinPitch)
-      pitch += TheScale->GetPitchesPerOctave();
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   while (note.pitch >= mMinPitch + mPitchRange)
+      note.pitch -= TheScale->GetPitchesPerOctave();
+   while (note.pitch < mMinPitch)
+      note.pitch += TheScale->GetPitchesPerOctave();
+   PlayNoteOutput(note);
 }
 
 void Neighborhooder::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -81,35 +81,35 @@ void NoteStepper::DrawModule()
    }
 }
 
-void NoteStepper::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteStepper::PlayNote(NoteMessage note)
 {
    int selectedDestination = 0;
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      if (time > mLastNoteOnTime + 10 || !mAllowChords) //slop, to make a chord count as a single step
+      if (note.time > mLastNoteOnTime + 10 || !mAllowChords) //slop, to make a chord count as a single step
          mCurrentDestinationIndex = (mCurrentDestinationIndex + 1) % mLength;
 
       selectedDestination = mCurrentDestinationIndex;
-      mLastNoteOnTime = time;
+      mLastNoteOnTime = note.time;
 
-      if (mLastNoteDestinations[pitch] != -1 && mLastNoteDestinations[pitch] != selectedDestination)
-         SendNoteToIndex(mLastNoteDestinations[pitch], time, pitch, 0, voiceIdx, modulation);
-      mLastNoteDestinations[pitch] = selectedDestination;
+      if (mLastNoteDestinations[note.pitch] != -1 && mLastNoteDestinations[note.pitch] != selectedDestination)
+         SendNoteToIndex(mLastNoteDestinations[note.pitch], note.MakeNoteOff());
+      mLastNoteDestinations[note.pitch] = selectedDestination;
    }
    else
    {
-      selectedDestination = mLastNoteDestinations[pitch];
+      selectedDestination = mLastNoteDestinations[note.pitch];
       if (selectedDestination == -1)
          return;
-      mLastNoteDestinations[pitch] = -1;
+      mLastNoteDestinations[note.pitch] = -1;
    }
 
-   SendNoteToIndex(selectedDestination, time, pitch, velocity, voiceIdx, modulation);
+   SendNoteToIndex(selectedDestination, note);
 }
 
-void NoteStepper::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteStepper::SendNoteToIndex(int index, NoteMessage note)
 {
-   mDestinationCables[index]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   mDestinationCables[index]->PlayNoteOutput(note);
 }
 
 void NoteStepper::SendCC(int control, int value, int voiceIdx)

@@ -266,22 +266,22 @@ void BufferShuffler::DrawBuffer(float x, float y, float w, float h)
    ofPopStyle();
 }
 
-void BufferShuffler::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void BufferShuffler::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mQueuedSlice = pitch;
+      mQueuedSlice = note.pitch;
       if (mUseVelocitySpeedControl)
-         mQueuedPlaybackStyle = VelocityToPlaybackStyle(velocity);
-      mPlaybackSampleStartTime = time;
+         mQueuedPlaybackStyle = VelocityToPlaybackStyle(note.velocity);
+      mPlaybackSampleStartTime = note.time;
       mPlaybackSampleStopTime = -1;
    }
    else
    {
-      if (mQueuedSlice == pitch)
+      if (mQueuedSlice == note.pitch)
       {
          mQueuedSlice = -1;
-         mPlaybackSampleStopTime = time;
+         mPlaybackSampleStopTime = note.time;
       }
    }
 }

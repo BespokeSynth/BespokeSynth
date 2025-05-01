@@ -576,7 +576,7 @@ void VSTPlugin::Poll()
       mRescanParameterNames = false;
       const auto& parameters = mPlugin->getParameters();
 
-      int numParameters = MIN(mParameterSliders.size(), parameters.size());
+      int numParameters = MIN((int)mParameterSliders.size(), (int)parameters.size());
       for (int i = 0; i < numParameters; ++i)
       {
          mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
@@ -658,15 +658,17 @@ void VSTPlugin::Poll()
 
          int64 vstStateSize = input->readInt64();
          char* vstState = new char[vstStateSize];
-         input->read(vstState, vstStateSize);
-         mPlugin->setStateInformation(vstState, vstStateSize);
+         //TODO(Ryan) is vstStateSize ever bigger than an int, so we shouldn't cast away the int64-ness?
+         input->read(vstState, (int)vstStateSize);
+         mPlugin->setStateInformation(vstState, (int)vstStateSize);
 
          int64 vstProgramStateSize = input->readInt64();
          if (vstProgramStateSize > 0)
          {
             char* vstProgramState = new char[vstProgramStateSize];
-            input->read(vstProgramState, vstProgramStateSize);
-            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+            //TODO(Ryan) is vstProgramStateSize ever bigger than an int, so we shouldn't cast away the int64-ness?
+            input->read(vstProgramState, (int)vstProgramStateSize);
+            mPlugin->setCurrentProgramStateInformation(vstProgramState, (int)vstProgramStateSize);
          }
 
          if (rev >= 2 && mModuleSaveData.GetBool("preset_file_sets_params"))
@@ -819,11 +821,11 @@ void VSTPlugin::Process(double time)
                auto tMidi = time + (*midiIt).samplePosition * gInvSampleRateMs;
                if (msg.isNoteOn())
                {
-                  mMidiOutCable->PlayNoteOutput(tMidi, msg.getNoteNumber(), msg.getVelocity());
+                  mMidiOutCable->PlayNoteOutput(NoteMessage(tMidi, msg.getNoteNumber(), msg.getVelocity()));
                }
                else if (msg.isNoteOff())
                {
-                  mMidiOutCable->PlayNoteOutput(tMidi, msg.getNoteNumber(), 0);
+                  mMidiOutCable->PlayNoteOutput(NoteMessage(tMidi, msg.getNoteNumber(), 0));
                }
                else if (msg.isController())
                {
@@ -871,7 +873,7 @@ void VSTPlugin::Process(double time)
    GetBuffer()->Clear();
 }
 
-void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VSTPlugin::PlayNote(NoteMessage note)
 {
    if (!mPluginReady || mPlugin == nullptr)
       return;
@@ -879,34 +881,34 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    if (!mEnabled)
       return;
 
-   if (pitch < 0 || pitch > 127)
+   if (note.pitch < 0 || note.pitch > 127)
       return;
 
-   int channel = voiceIdx + 1;
-   if (voiceIdx == -1)
+   int channel = note.voiceIdx + 1;
+   if (note.voiceIdx == -1)
       channel = 1;
 
    const juce::ScopedLock lock(mMidiInputLock);
 
-   int sampleNumber = (time - gTime) * gSampleRateMs;
+   int sampleNumber = (note.time - gTime) * gSampleRateMs;
    //ofLog() << sampleNumber;
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mMidiBuffer.addEvent(juce::MidiMessage::noteOn(mUseVoiceAsChannel ? channel : mChannel, pitch, (uint8)velocity), sampleNumber);
+      mMidiBuffer.addEvent(juce::MidiMessage::noteOn(mUseVoiceAsChannel ? channel : mChannel, note.pitch, (uint8)note.velocity), sampleNumber);
       //ofLog() << "+ vst note on: " << (mUseVoiceAsChannel ? channel : mChannel) << " " << pitch << " " << (uint8)velocity;
    }
    else
    {
-      mMidiBuffer.addEvent(juce::MidiMessage::noteOff(mUseVoiceAsChannel ? channel : mChannel, pitch), sampleNumber);
+      mMidiBuffer.addEvent(juce::MidiMessage::noteOff(mUseVoiceAsChannel ? channel : mChannel, note.pitch), sampleNumber);
       //ofLog() << "- vst note off: " << (mUseVoiceAsChannel ? channel : mChannel) << " " << pitch;
    }
 
-   int modIdx = voiceIdx;
-   if (voiceIdx == -1)
+   int modIdx = note.voiceIdx;
+   if (note.voiceIdx == -1)
       modIdx = kGlobalModulationIdx;
 
-   mChannelModulations[modIdx].mModulation = modulation;
+   mChannelModulations[modIdx].mModulation = note.modulation;
 }
 
 void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)
@@ -1017,7 +1019,7 @@ void VSTPlugin::GetModuleDimensions(float& width, float& height)
    {
       width = 206;
       height = 58;
-      for (auto slider : mParameterSliders)
+      for (auto& slider : mParameterSliders)
       {
          if (slider.mSlider && slider.mShowing)
          {
@@ -1124,7 +1126,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
                   exposedParams.push_back(i);
             }
             output.writeInt((int)exposedParams.size());
-            for (int i : exposedParams)
+            for (auto& i : exposedParams)
                output.writeInt(i);
 
             output.flush(); // (called explicitly to force an fsync on posix)
@@ -1270,7 +1272,7 @@ void VSTPlugin::SaveState(FileStreamOut& out)
             exposedParams.push_back(i);
       }
       out << (int)exposedParams.size();
-      for (int i : exposedParams)
+      for (auto& i : exposedParams)
          out << i;
    }
    else

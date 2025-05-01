@@ -295,19 +295,19 @@ void LinnstrumentControl::SendNRPN(int param, int value)
    mDevice.SendData(channelHeader, 100, 127);
 }
 
-void LinnstrumentControl::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void LinnstrumentControl::PlayNote(NoteMessage note)
 {
-   if (voiceIdx == -1)
-      voiceIdx = 0;
+   if (note.voiceIdx == -1)
+      note.voiceIdx = 0;
 
-   mModulators[voiceIdx] = modulation;
+   mModulators[note.voiceIdx] = note.modulation;
 
-   if (pitch >= 0 && pitch < 128)
+   if (note.pitch >= 0 && note.pitch < 128)
    {
-      mNoteAge[pitch].mTime = velocity > 0 ? -1 : time;
-      if (velocity > 0)
-         mNoteAge[pitch].mVoiceIndex = voiceIdx;
-      mNoteAge[pitch].Update(pitch, this);
+      mNoteAge[note.pitch].mTime = note.velocity > 0 ? -1 : note.time;
+      if (note.velocity > 0)
+         mNoteAge[note.pitch].mVoiceIndex = note.voiceIdx;
+      mNoteAge[note.pitch].Update(note.pitch, this);
    }
 }
 

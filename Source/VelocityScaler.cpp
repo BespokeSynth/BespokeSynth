@@ -46,16 +46,16 @@ void VelocityScaler::DrawModule()
    mScaleSlider->Draw();
 }
 
-void VelocityScaler::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VelocityScaler::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
       ComputeSliders(0);
-      if (velocity > 0)
-         velocity = MAX(1, velocity * mScale);
+      if (note.velocity > 0)
+         note.velocity = MAX(1, note.velocity * mScale);
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void VelocityScaler::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -79,11 +79,11 @@ void FreqDelay::Process(double time)
    GetBuffer()->Reset();
 }
 
-void FreqDelay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void FreqDelay::PlayNote(NoteMessage note)
 {
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      float freq = TheScale->PitchToFreq(pitch);
+      float freq = TheScale->PitchToFreq(note.pitch);
       float ms = 1000 / freq;
       mDelayEffect.SetDelay(ms);
    }

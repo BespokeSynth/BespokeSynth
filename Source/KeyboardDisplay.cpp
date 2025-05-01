@@ -58,20 +58,20 @@ void KeyboardDisplay::DrawModule()
    DrawKeyboard(0, kKeyboardYOffset, mWidth, mHeight - kKeyboardYOffset);
 }
 
-void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void KeyboardDisplay::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 
-   if (pitch >= 0 && pitch < 128)
+   if (note.pitch >= 0 && note.pitch < 128)
    {
-      if (velocity > 0)
+      if (note.velocity > 0)
       {
-         mLastOnTime[pitch] = time;
-         mLastOffTime[pitch] = 0;
+         mLastOnTime[note.pitch] = note.time;
+         mLastOffTime[note.pitch] = 0;
       }
       else
       {
-         mLastOffTime[pitch] = time;
+         mLastOffTime[note.pitch] = note.time;
       }
    }
 }
@@ -115,15 +115,15 @@ void KeyboardDisplay::OnClicked(float x, float y, bool right)
 
                if (mPlayingMousePitch == -1 || !mLatch)
                {
-                  PlayNote(time, pitch, noteVelocity);
+                  PlayNote(NoteMessage(time, pitch, noteVelocity));
                   mPlayingMousePitch = pitch;
                }
                else
                {
                   bool newNote = (mPlayingMousePitch != pitch);
                   if (newNote)
-                     PlayNote(time, pitch, noteVelocity);
-                  PlayNote(time, mPlayingMousePitch, 0);
+                     PlayNote(NoteMessage(time, pitch, noteVelocity));
+                  PlayNote(NoteMessage(time, mPlayingMousePitch, 0));
                   mPlayingMousePitch = newNote ? pitch : -1;
                }
                return;
@@ -139,7 +139,7 @@ void KeyboardDisplay::MouseReleased()
    if (mPlayingMousePitch != -1 && !mLatch)
    {
       double time = NextBufferTime(false);
-      PlayNote(time, mPlayingMousePitch, 0);
+      PlayNote(NoteMessage(time, mPlayingMousePitch, 0));
       mPlayingMousePitch = -1;
    }
 }
@@ -201,16 +201,16 @@ void KeyboardDisplay::RefreshOctaveCount()
 
       int elements = static_cast<int>(ratio / baseRatioForOneElement);
 
-      elements = std::clamp(elements, 1, 10);
+      elements = std::clamp(elements, 1, 11);
 
-      if (mRootOctave + elements > 9) //Ensure that we can't go into octaves where it begins to break...
-         mRootOctave = 10 - mNumOctaves;
+      if (mRootOctave + elements > 10) //Ensure that we can't go into octaves where it begins to break...
+         mRootOctave = 11 - mNumOctaves;
       mNumOctaves = elements;
    }
    else
    {
       mNumOctaves = mForceNumOctaves;
-      mRootOctave = 10 - mNumOctaves;
+      mRootOctave = 11 - mNumOctaves;
    }
 }
 
@@ -224,6 +224,8 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    {
       for (int i = 0; i < NumKeys(); ++i)
       {
+         if (i + RootKey() > 127)
+            break;
          bool isBlackKey;
          ofRectangle key = GetKeyboardKeyRect(i + RootKey(), w, h, isBlackKey);
 
@@ -247,7 +249,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       for (int i = 0; i < NumKeys(); i += 7)
       {
          ofSetColor(108, 37, 62, 255);
-         DrawTextNormal("C" + std::to_string(oct), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 12);
+         DrawTextNormal(NoteName(oct * 12, false, true), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 12);
          oct++;
       }
    }
@@ -255,7 +257,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPushStyle();
    ofFill();
    ofSetLineWidth(2);
-   for (int pitch = RootKey(); pitch < RootKey() + NumKeys(); ++pitch)
+   for (int pitch = RootKey(); pitch < MIN(RootKey() + NumKeys(), mLastOnTime.size()); ++pitch)
    {
       if (gTime >= mLastOnTime[pitch] && (gTime <= mLastOffTime[pitch] || mLastOffTime[pitch] < mLastOnTime[pitch]))
       {
@@ -321,14 +323,14 @@ void KeyboardDisplay::OnKeyPressed(int key, bool isRepeat)
       if (res.mOctaveShift != 0)
       {
          int newRootOctave = mRootOctave + res.mOctaveShift;
-         if (newRootOctave > 0 && newRootOctave + mNumOctaves <= 12)
+         if (newRootOctave >= 0 && newRootOctave + mNumOctaves < 12)
             mRootOctave = newRootOctave;
       }
       if (res.mPitch != -1)
       {
          int pitch = res.mPitch + mRootOctave * 12;
          mKeyPressRegister[key] = pitch;
-         PlayNote(NextBufferTime(false), pitch, 127);
+         PlayNote(NoteMessage(NextBufferTime(false), pitch, 127));
       }
    }
 }
@@ -345,7 +347,7 @@ void KeyboardDisplay::KeyReleased(int key)
 
       mKeyPressRegister.erase(key);
       if (pitch != -1)
-         PlayNote(NextBufferTime(false), pitch, 0);
+         PlayNote(NoteMessage(NextBufferTime(false), pitch, 0));
    }
 }
 

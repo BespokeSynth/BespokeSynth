@@ -42,7 +42,7 @@ public:
 
    void CreateUIControls() override;
 
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
@@ -62,7 +62,7 @@ private:
       height = mHeight;
    }
 
-   void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+   void SendNoteToIndex(int index, NoteMessage note);
 
    static const int kMaxDestinations = 5;
    std::array<float, kMaxDestinations> mDelay;

@@ -32,18 +32,39 @@ namespace juce
    class MidiMessage;
 }
 
-class INoteReceiver
+struct NoteMessage
 {
-public:
-   virtual ~INoteReceiver() {}
-   virtual void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) = 0;
-   virtual void SendPressure(int pitch, int pressure) {}
-   virtual void SendCC(int control, int value, int voiceIdx = -1) = 0;
-   virtual void SendMidi(const juce::MidiMessage& message) {}
-};
+   NoteMessage()
+   {
+   }
 
-struct NoteInputElement
-{
+   NoteMessage(double _time, int _pitch, int _velocity, int _voiceIdx = -1, ModulationParameters _modulation = ModulationParameters())
+   : time(_time)
+   , pitch(_pitch)
+   , velocity(_velocity)
+   , voiceIdx(_voiceIdx)
+   , modulation(_modulation)
+   {
+   }
+
+   NoteMessage MakeClone()
+   {
+      NoteMessage clone;
+      clone.time = time;
+      clone.pitch = pitch;
+      clone.velocity = velocity;
+      clone.voiceIdx = voiceIdx;
+      clone.modulation = modulation;
+      //generate new note id here
+
+      return clone;
+   }
+
+   NoteMessage MakeNoteOff()
+   {
+      return NoteMessage(time, pitch, 0, voiceIdx, modulation);
+   }
+
    double time{ 0 };
    int pitch{ 0 };
    float velocity{ 0 };
@@ -51,16 +72,26 @@ struct NoteInputElement
    ModulationParameters modulation;
 };
 
+class INoteReceiver
+{
+public:
+   virtual ~INoteReceiver() {}
+   virtual void PlayNote(NoteMessage note) = 0;
+   virtual void SendPressure(int pitch, int pressure) {}
+   virtual void SendCC(int control, int value, int voiceIdx = -1) = 0;
+   virtual void SendMidi(const juce::MidiMessage& message) {}
+};
+
 class NoteInputBuffer
 {
 public:
    NoteInputBuffer(INoteReceiver* receiver);
    void Process(double time);
-   void QueueNote(double time, int pitch, float velocity, int voiceIdx, ModulationParameters modulation);
+   void QueueNote(NoteMessage note);
    static bool IsTimeWithinFrame(double time);
 
 private:
    static const int kBufferSize = 50;
-   NoteInputElement mBuffer[kBufferSize];
+   NoteMessage mBuffer[kBufferSize];
    INoteReceiver* mReceiver{ nullptr };
 };

@@ -54,7 +54,7 @@ void ChordDisplayer::DrawModule()
       {
          int drawY = 14;
          int drawHeight = 20;
-         for (std::string chordName : chordNames)
+         for (auto& chordName : chordNames)
          {
             DrawTextNormal(chordName, 4, drawY);
             drawY += drawHeight;
@@ -72,9 +72,9 @@ void ChordDisplayer::DrawModule()
    }
 }
 
-void ChordDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ChordDisplayer::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void ChordDisplayer::GetModuleDimensions(float& width, float& height)

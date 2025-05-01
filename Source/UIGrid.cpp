@@ -32,7 +32,7 @@
 
 #include <cstring>
 
-UIGrid::UIGrid(std::string name, int x, int y, int w, int h, int cols, int rows, IClickable* parent)
+UIGrid::UIGrid(IClickable* parent, std::string name, int x, int y, int w, int h, int cols, int rows)
 : mWidth(w)
 , mHeight(h)
 {
@@ -76,6 +76,7 @@ void UIGrid::Render()
       {
          float x = GetX(i, j);
          float y = GetY(j);
+         bool drawDragLevels = false;
 
          float data = mData[GetDataIndex(i, j)];
          if (data)
@@ -106,7 +107,19 @@ void UIGrid::Render()
                float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
                ofRect(x, y + ysize * (.5f - sliderFillAmount / 2), xsize, ysize * sliderFillAmount);
+               drawDragLevels = true;
+            }
+            else if (mGridMode == kMultisliderGrow)
+            {
+               float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
+               ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
+               ofVec2f center(x + xsize * 0.5f, y + ysize * 0.5f);
+               ofRect(center.x - (sliderFillAmount * sliderFillAmount * xsize * 0.5f), center.y - (sliderFillAmount * sliderFillAmount * ysize * 0.5f), sliderFillAmount * sliderFillAmount * xsize, sliderFillAmount * sliderFillAmount * ysize);
+               drawDragLevels = true;
+            }
 
+            if (drawDragLevels)
+            {
                if (mClick && mHoldVal != 0 && CanAdjustMultislider())
                {
                   if (j == mHoldRow)
@@ -242,7 +255,14 @@ float UIGrid::GetSubdividedValue(float position) const
 
 bool UIGrid::CanBeTargetedBy(PatchCableSource* source) const
 {
-   return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
+   if (source->GetConnectionType() == kConnectionType_UIControl)
+   {
+      if (mCanBeUIControlTarget)
+         return true;
+      if (dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr)
+         return true;
+   }
+   return false;
 }
 
 void UIGrid::OnClicked(float x, float y, bool right)
@@ -258,7 +278,7 @@ void UIGrid::OnClicked(float x, float y, bool right)
    int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
    float oldValue = mData[dataIndex];
 
-   if (mGridMode == kMultislider || mGridMode == kMultisliderBipolar)
+   if (mGridMode == kMultislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow)
    {
       if (CanAdjustMultislider())
       {
@@ -398,11 +418,7 @@ bool UIGrid::MouseMoved(float x, float y)
       int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
       float oldValue = mData[dataIndex];
 
-      if (mGridMode == kMultislider && mHoldVal != 0 && CanAdjustMultislider())
-      {
-         mData[dataIndex] = clickHeight;
-      }
-      else if (mGridMode == kMultisliderBipolar && mHoldVal != 0 && CanAdjustMultislider())
+      if ((mGridMode == kMultislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow) && mHoldVal != 0 && CanAdjustMultislider())
       {
          mData[dataIndex] = clickHeight;
       }
@@ -450,7 +466,7 @@ bool UIGrid::MouseMoved(float x, float y)
 
 bool UIGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar)
+   if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow)
    {
       bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
@@ -483,6 +499,13 @@ void UIGrid::SetGrid(int cols, int rows)
 void UIGrid::Clear()
 {
    mData.fill(0);
+}
+
+float UIGrid::GetVal(int col, int row) const
+{
+   col = ofClamp(col, 0, MAX_GRID_COLS - 1);
+   row = ofClamp(row, 0, MAX_GRID_ROWS - 1);
+   return mData[GetDataIndex(col, row)];
 }
 
 float& UIGrid::GetVal(int col, int row)
@@ -535,6 +558,43 @@ int UIGrid::GetHighlightCol(double time) const
       }
    }
    return ret;
+}
+
+void UIGrid::SetFromMidiCC(float slider, double time, bool setViaModulator)
+{
+   SetValue(slider, time);
+}
+
+float UIGrid::GetValueForMidiCC(float slider) const
+{
+   return slider;
+}
+
+void UIGrid::SetValue(float value, double time, bool forceUpdate)
+{
+   if (mValueSetTargetCol >= 0 && mValueSetTargetRow < mCols && mValueSetTargetRow >= 0 && mValueSetTargetRow < mRows)
+   {
+      float currentValue = GetVal(mValueSetTargetCol, mValueSetTargetRow);
+      if (value != currentValue || forceUpdate)
+         SetVal(mValueSetTargetCol, mValueSetTargetRow, value);
+   }
+}
+
+float UIGrid::GetMidiValue() const
+{
+   return GetValue();
+}
+
+float UIGrid::GetValue() const
+{
+   if (mValueSetTargetCol >= 0 && mValueSetTargetRow < mCols && mValueSetTargetRow >= 0 && mValueSetTargetRow < mRows)
+      return GetVal(mValueSetTargetCol, mValueSetTargetRow);
+   return 0;
+}
+
+std::string UIGrid::GetDisplayValue(float val) const
+{
+   return ofToString(GetValue());
 }
 
 namespace

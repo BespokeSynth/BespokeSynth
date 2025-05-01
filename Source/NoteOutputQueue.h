@@ -27,13 +27,14 @@
 
 #include "readerwriterqueue.h"
 #include "ModulationChain.h"
+#include "INoteReceiver.h"
 
 class NoteOutput;
 
 class NoteOutputQueue
 {
 public:
-   void QueuePlayNote(NoteOutput* target, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+   void QueuePlayNote(NoteOutput* target, NoteMessage note);
    void QueueFlush(NoteOutput* target, double time);
    void Process();
 
@@ -42,11 +43,7 @@ private:
    {
       NoteOutput* target;
       bool isFlush{ false };
-      double time{ 0 };
-      int pitch{ 0 };
-      int velocity{ 0 };
-      int voiceIdx{ -1 };
-      ModulationParameters modulation{};
+      NoteMessage note;
    };
 
    moodycamel::ReaderWriterQueue<PendingNoteOutput> mQueue;

@@ -878,24 +878,24 @@ void EuclideanSequencerRing::OnTransportAdvanced(float amount)
    if (oldStep != newStep && mSteps[newStep] > 0)
    {
       const double time = NextBufferTime(true) - remainderMs;
-      mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
+      mOwner->PlayNoteOutput(NoteMessage(time, mPitch, mSteps[newStep] * 127));
       if (mOwner->PlayShortNotes())
       {
-         mOwner->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
+         mOwner->PlayNoteOutput(NoteMessage(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0));
       }
       else
       {
-         mOwner->PlayNoteOutput(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0, -1);
+         mOwner->PlayNoteOutput(NoteMessage(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0));
       }
 
-      mDestinationCable->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
+      mDestinationCable->PlayNoteOutput(NoteMessage(time, mPitch, mSteps[newStep] * 127));
       if (mOwner->PlayShortNotes())
       {
-         mDestinationCable->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
+         mDestinationCable->PlayNoteOutput(NoteMessage(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0));
       }
       else
       {
-         mDestinationCable->PlayNoteOutput(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0, -1);
+         mDestinationCable->PlayNoteOutput(NoteMessage(time + 32.0 / mLength * TheTransport->GetDuration(kInterval_32n), mPitch, 0));
       }
    }
 }

@@ -783,12 +783,20 @@ IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/
    return nullptr;
 }
 
-IDrawableModule* IDrawableModule::FindChild(const char* name, bool fail) const
+IDrawableModule* IDrawableModule::FindChild(const std::string name, bool fail) const
 {
+   if (name.empty())
+      return nullptr;
    for (int i = 0; i < mChildren.size(); ++i)
    {
-      if (strcmp(mChildren[i]->Name(), name) == 0)
+      if (strcmp(mChildren[i]->Name(), name.c_str()) == 0)
          return mChildren[i];
+   }
+   if (mTypeName == "effectchain") // Due to an issue in the past where child modules of the effectchain module weren't saving their names correctly we are going to try and fix the loading here.
+   {
+      auto child = FindChild(name.substr(0, name.length() - 1), false);
+      if (child)
+         return child;
    }
    if (fail)
       throw UnknownModuleException(name);
@@ -1411,7 +1419,7 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
          std::string childName;
          in >> childName;
          //ofLog() << "Loading " << childName;
-         IDrawableModule* child = FindChild(childName.c_str(), true);
+         IDrawableModule* child = FindChild(childName, true);
          LoadStateValidate(child);
          child->LoadState(in, child->LoadModuleSaveStateRev(in));
       }

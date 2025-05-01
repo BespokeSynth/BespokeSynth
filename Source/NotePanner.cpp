@@ -48,15 +48,15 @@ void NotePanner::DrawModule()
    mPanSlider->Draw();
 }
 
-void NotePanner::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NotePanner::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
       ComputeSliders(0);
-      modulation.pan = mPan;
+      note.modulation.pan = mPan;
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void NotePanner::LoadLayout(const ofxJSONElement& moduleInfo)

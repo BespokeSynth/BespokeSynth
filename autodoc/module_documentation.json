@@ -90,6 +90,14 @@
       "description" : "selector for switching where audio is routed to. connect to targets to add them to the list.",
       "type" : "audio effects"
    },
+   "audiosplitter" : 
+   {
+      "canReceiveAudio" : true,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "description" : "send an audio signal to multiple destinations",
+      "type" : "audio effects"
+   },
    "audiotocv" : 
    {
       "canReceiveAudio" : true,
@@ -230,7 +238,10 @@
       "canReceivePulses" : false,
       "controls" : 
       {
+         "fourtet" : "use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this \"fourtetified\" audio.",
+         "fourtetslices" : "chunk size to use for \"fourtet\" effect",
          "freeze input" : "retain the current buffer, without writing in new input",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "interval" : "slice size",
          "num bars" : "number of bars to capture",
          "playback style" : "how to play clicked slices. or, with input notes, velocity range determines playback style."
@@ -374,6 +385,22 @@
       "description" : "try to keep volume at a certain level",
       "type" : "effect chain"
    },
+   "controlrecorder" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "clear" : "clear the recording",
+         "length" : "the interval to quantize to",
+         "quantize" : "should we quantize playback to a specified rhythmic interval?",
+         "record" : "should we be recording input? playback starts after the recording is complete",
+         "speed" : "speed up or slow down playback"
+      },
+      "description" : "record and play back changes made to a control",
+      "type" : "modulators"
+   },
    "controlsequencer" : 
    {
       "canReceiveAudio" : false,
@@ -384,6 +411,7 @@
          "interval" : "rate to advance",
          "length" : "length of the sequence",
          "random" : "randomize sequence values",
+         "record" : "record targeted value to steps",
          "step *" : "value for this step"
       },
       "description" : "modulate a control step-wise at an interval",
@@ -412,6 +440,21 @@
          "randomize" : "create a random curve"
       },
       "description" : "modulate a value over time with a looping curve",
+      "type" : "modulators"
+   },
+   "dataprovider" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
+         "interval" : "the interval to measure",
+         "realtime" : "if enabled this module will work on the audio thread which is more accurate but also more resource intense",
+         "set" : "click here to send the value (or, send a pulse to this module for the same result)",
+         "type" : "the type of value to provide"
+      },
+      "description" : "provides modulation values normally not easily accessible.",
       "type" : "modulators"
    },
    "dcoffset" : 
@@ -469,6 +512,26 @@
       "description" : "waveshaping distortion",
       "type" : "effect chain"
    },
+   "dotsequencer" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "clear" : "clear the contents of the dot grid",
+         "cols" : "number of columns",
+         "dotgrid" : "the dot grid",
+         "double" : "double the length of this sequence",
+         "interval" : "rate to play notes at",
+         "notemode" : "which set of pitches should the rows represent?",
+         "octave" : "octave of the bottom pitch of this sequence",
+         "row offset" : "amount to offset the mapping of row to pitch",
+         "rows" : "number of rows"
+      },
+      "description" : "polyphonic note sequencer with adjustable note length and velocity. click and drag horizontally to adjust length. click and drag vertically to adjust the velocity. hover and use the arrow keys to move dots. hover and use the mouse wheel to tweak dot lengths.",
+      "type" : "instruments"
+   },
    "drumplayer" : 
    {
       "canReceiveAudio" : false,
@@ -499,6 +562,7 @@
          "repeat" : "if quantizing, should held notes repeat at that interval?",
          "shuffle" : "random is samples, speeds, and pans",
          "single out *" : "should the sample have its own individual output?",
+         "single voice" : "only play a single drum hit at once, choking all others out (as if they all shared the same linkid)",
          "speed" : "global sample speed multiplier",
          "speed *" : "speed of sample",
          "speed rnd" : "global sample speed randomization amount",
@@ -538,9 +602,10 @@
          "step" : "length of each step",
          "vel" : "velocity to use when setting a step",
          "velocity" : "patch a grid in here from a \"midicontroller\" module to control the velocity",
+         "velocitytype" : "velocity to use when setting a step",
          "yoff" : "vertical offset for grid controller's view of the pattern"
       },
-      "description" : "step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.",
+      "description" : "step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity, or hover over a step and press the up and down arrow keys to adjust velocity.",
       "type" : "instruments"
    },
    "drumsynth" : 
@@ -643,6 +708,41 @@
       },
       "description" : "multi-band equalizer, to adjust output levels at frequency ranges",
       "type" : "audio effects"
+   },
+   "euclideansequencer" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "clear" : "clear all steps, onsets, rotation and offset in all rings",
+         "note" : "randomize notes in all rings",
+         "note chance" : "what is the chance a note gets changed",
+         "note*" : "pitch to use for this ring",
+         "o *" : "in what range is offset created",
+         "oct*" : "in what octave range are notes created",
+         "offset" : "randomize offset in all rings",
+         "offset chance" : "what is the chance that an offset gets changed",
+         "offset*" : "timing offset for this ring",
+         "ons *" : "in what range are onsets created",
+         "onset chance" : "what is the chance that an onset gets changed",
+         "onsets" : "randomize onsets in all rings",
+         "onsets*" : "number of onsets in this ring",
+         "random" : "randomize all steps, onsets and rotation in all rings",
+         "random*" : "randomize steps, onsets and rotation in this ring",
+         "rot chance" : "what is the chance that rotation gets changed",
+         "rot hi" : "in what range is rotation created",
+         "rot lo" : "in what range is rotation created",
+         "rotation" : "randomize rotation in all rings",
+         "rotation*" : "rotation of this ring",
+         "step chance" : "what is the chance a step gets changed",
+         "steps" : "randomize steps in all rings",
+         "steps*" : "number of steps in this ring",
+         "stp*" : "in what range are steps created"
+      },
+      "description" : "euclidean sequencer displays a loop as a circle. the notes are calculated using the euclidean rhythm algorithm.",
+      "type" : "instruments"
    },
    "eventcanvas" : 
    {
@@ -885,6 +985,8 @@
          "background b" : "amount of blue in background color",
          "background g" : "amount of green in background color",
          "background r" : "amount of red in background color",
+         "cable alpha" : "opacity of the cables",
+         "corner radius" : "how round bespoke's rectangles are",
          "lissajous b" : "amount of blue in background lissajous curve",
          "lissajous g" : "amount of green in background lissajous curve",
          "lissajous r" : "amount of red in background lissajous curve",
@@ -1064,6 +1166,22 @@
       "description" : "displays input notes on a keyboard, and allows you to click the keyboard to create notes",
       "type" : "instruments"
    },
+   "label" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "color" : "The color of the label",
+         "font" : "The font of the label",
+         "label" : "The label that will be displayed",
+         "showcontrols" : "Hide and show the controls to modify the label",
+         "size" : "The font size of the label"
+      },
+      "description" : "A module to display a label, helpful in marking what is where in large patches",
+      "type" : "other"
+   },
    "leveltocv" : 
    {
       "canReceiveAudio" : true,
@@ -1222,7 +1340,8 @@
          "resample" : "resample all connected loopers to new tempo",
          "resample & set key" : "snap tempo to nearest value that matches a key (based upon the current key and the tempo change), resample all connected loopers to that new tempo, and change global scale to the new key",
          "snap to pitch" : "snap tempo to nearest value that matches a key",
-         "target" : "looper to commit audio to when using the on-buffer capture buttons to the left"
+         "target" : "looper to commit audio to when using the on-buffer capture buttons to the left",
+         "write*" : "writes to this looper, with a loop length matching the nearest power of 2 (1, 2, 4, 8, etc) of how long this checkbox was enabled"
       },
       "description" : "command center to manage recording into multiple loopers, and allow retroactive loop capture (i.e., always-on recording)",
       "type" : "audio effects"
@@ -1318,6 +1437,7 @@
       "controls" : 
       {
          " x " : "delete this connection",
+         "14bit" : "is this a 14-bit midi control, with this control as the LSB and the control 32 less than this as the MSB?",
          "add" : "add a mapping manually",
          "bind (hold shift)" : "when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift, and then using desired midi input",
          "blink" : "when the targeted control is enabled, send alternating on/off messages, to blink the associated LED",
@@ -1591,7 +1711,8 @@
       "controls" : 
       {
          "*" : "generate a new random seed",
-         "<" : "go to next seed",
+         "<" : "go to previous seed",
+         ">" : "go to next seed",
          "beat length" : "restart the deterministic random sequence at this interval",
          "chance" : "probability that a note is allowed",
          "deterministic" : "allow for randomness to be repeated over an interval",
@@ -1607,10 +1728,15 @@
       "canReceivePulses" : true,
       "controls" : 
       {
+         "*" : "generate a new random seed",
+         "<" : "go to previous seed",
+         ">" : "go to next seed",
+         "beat length" : "length over which the random sequence should deterministically repeat",
          "div" : "measure division, when using \"div\" as the interval",
          "interval" : "rate to advance",
          "length" : "length of the sequence",
          "random" : "output random pitches within the range, rather than sequential",
+         "seed" : "number that determines the random sequence",
          "start" : "pitch at the start of the sequence",
          "sync" : "if the output pitch should be synchronized to the global transport"
       },
@@ -1740,7 +1866,8 @@
       "controls" : 
       {
          "*" : "generate a new random seed",
-         "<" : "go to next seed",
+         "<" : "go to previous seed",
+         ">" : "go to next seed",
          "beat length" : "restart the deterministic random sequence at this interval",
          "seed" : "number that determines the random sequence",
          "weight *" : "chance that note goes to this destination"
@@ -2070,8 +2197,9 @@
          "q" : "resonance of lowpass filter",
          "shuffle" : "stretches and squeezes every other cycle of the waveform",
          "soften" : "soften edges of square and saw waveforms",
-         "sync" : "turns on \"sync\" mode, to reset the phase at syncf's frequency",
-         "syncf" : "frequency to reset the phase, when \"sync\" is enabled",
+         "syncf" : "frequency to reset the phase, when \"syncmode\" is set to \"freq\"",
+         "syncmode" : "turns on sync mode, to reset the phase at a specified frequency",
+         "syncratio" : "ratio of oscillator frequency to reset the phase, when \"syncmode\" is set to \"ratio\"",
          "unison" : "how many oscillators to play for one note",
          "vel2env" : "how much should the input velocity affect the speed of the volume and filter envelopes?",
          "vel2vol" : "how much should the input velocity affect the output volume?",
@@ -2235,6 +2363,14 @@
       "description" : "convert an input pitch to a speed ratio. you could use this to control a sample's playback speed and make it playable with a keyboard.",
       "type" : "modulators"
    },
+   "pitchtovalue" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "description" : "output midi pitch value",
+      "type" : "modulators"
+   },
    "playsequencer" : 
    {
       "canReceiveAudio" : false,
@@ -2387,7 +2523,8 @@
       "controls" : 
       {
          "*" : "generate a new random seed",
-         "<" : "go to next seed",
+         "<" : "go to previous seed",
+         ">" : "go to next seed",
          "chance" : "chance that pulses are allowed through",
          "deterministic" : "allow for randomness to be repeated over an interval",
          "seed" : "number that determines the random sequence. send reset pulses to restart the deterministic random sequence."
@@ -2448,11 +2585,25 @@
       "controls" : 
       {
          "*" : "generate a new random seed",
-         "<" : "go to next seed",
+         "<" : "go to previous seed",
+         ">" : "go to next seed",
          "seed" : "number that determines the random sequence. send reset pulses to restart the deterministic random sequence.",
          "weight *" : "chance that pulse goes to this destination"
       },
       "description" : "sends pulses to randomized destinations",
+      "type" : "pulse"
+   },
+   "pulselimit" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
+         "limit" : "limit number of pulses to pass through",
+         "reset" : "reset the counter of seen pulses"
+      },
+      "description" : "limit the number of pulses allowed to pass through",
       "type" : "pulse"
    },
    "pulser" : 
@@ -2467,10 +2618,23 @@
          "offset" : "pulse time offset, in fractions of the interval",
          "random" : "tell pulsed modules to randomize their position",
          "reset" : "length of sequence before sending reset pulse",
+         "restart" : "restart timer on \"free\" counter",
          "t" : "pulse interval in milliseconds",
          "timemode" : "when to send downbeat pulses, or set to \"free\" for pulses not locked to the transport"
       },
       "description" : "send pulse messages at an interval",
+      "type" : "pulse"
+   },
+   "pulserouter" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
+         "route" : "the pulserouter's destination module"
+      },
+      "description" : "allows you to control where pulses are routed to using a UI control. to add destinations to the list, patch them as a target",
       "type" : "pulse"
    },
    "pulsesequence" : 
@@ -2480,10 +2644,13 @@
       "canReceivePulses" : true,
       "controls" : 
       {
+         " - " : "advance the sequence backwards",
+         "+" : "advance the sequence forward",
          "<" : "shift sequence to the left",
          ">" : "shift sequence to the right",
          "interval" : "length of each step within the sequence",
-         "length" : "length of the sequence"
+         "length" : "length of the sequence",
+         "pulse" : "when enabled will send out pulses as per sequence when advancing with the buttons"
       },
       "description" : "defines a looping sequence of pulses",
       "type" : "pulse"
@@ -2582,6 +2749,28 @@
       },
       "description" : "play a note at a given interval with a random chance",
       "type" : "instruments"
+   },
+   "rhythmsequencer" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : true,
+      "controls" : 
+      {
+         "action *" : "action for this step. on = play note, hold = sustain note, off = no note",
+         "degree *" : "scale degree offset for this step",
+         "interval" : "rate to play notes at",
+         "len act" : "length of the action column",
+         "len deg" : "length of the scale degree offset column",
+         "len oct" : "length of the octave offset column",
+         "len vel" : "length of the velocity column",
+         "length" : "length of the sequence",
+         "link lengths" : "should there be one global length, or a length for each column?",
+         "octave *" : "octave offset for this step",
+         "vel *" : "velocity for this step"
+      },
+      "description" : "repeats held input notes, to turn a sustained note into a rhythm",
+      "type" : "note effects"
    },
    "ringmodulator" : 
    {
@@ -2730,6 +2919,18 @@
       },
       "description" : "record input onto pads, and play back the pads. intended to be used with an 64-pad grid controller.",
       "type" : "audio effects"
+   },
+   "savestateloader" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "load *" : "loads specified savestate file. shift-click to choose a new file."
+      },
+      "description" : "loads other savestate files (and unloads the current savestate). the number of buttons can be adjusted in the triangle menu.",
+      "type" : "other"
    },
    "scale" : 
    {
@@ -2898,8 +3099,9 @@
          "shuffle" : "stretches and squeezes every other cycle of the waveform",
          "slider" : "slider to interpolate between last two input pitches",
          "soften" : "soften edges of square and saw waveforms",
-         "sync" : "turns on \"sync\" mode, to reset the phase at syncf's frequency",
-         "syncf" : "frequency to reset the phase, when \"sync\" is enabled",
+         "syncf" : "frequency to reset the phase, when \"syncmode\" is set to \"freq\"",
+         "syncmode" : "turns on sync mode, to reset the phase at a specified frequency",
+         "syncratio" : "ratio of oscillator frequency to reset the phase, when \"syncmode\" is set to \"ratio\"",
          "vol" : "output volume"
       },
       "description" : "basic oscillator signal. send a note into it to set the frequency, and send a pulse to reset the phase.",
@@ -2942,16 +3144,14 @@
       "controls" : 
       {
          "add" : "snapshot the currently connected controls to the next available snapshot slot",
-         "auto-store on switch" : "when switching to a new slot, automatically store state in the current slot",
          "blend" : "length of time in milliseconds over which to blend snapshot values",
-         "clear" : "clear all snapshots",
          "delete" : "when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)",
          "random" : "randomize connected controls",
          "snapshot" : "jump to a snapshot",
          "snapshot label" : "assign a label to this snapshot",
          "store" : "when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)"
       },
-      "description" : "save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.",
+      "description" : "save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a snapshot to that square, and click on a grid square to load that snapshot. alt/option-click to delete a snapshot, and ctrl/command-click to rename a snapshot.",
       "type" : "other"
    },
    "songbuilder" : 
@@ -2966,6 +3166,7 @@
          "bars*" : "length in bars that this scene should play for",
          "change quantize" : "when a change should happen after pressing the play button on a scene. \"switch\" changes immediately, and \"jump\" changes immediately and also resets the global transport.",
          "checkbox*" : "value to use for target in this scene",
+         "color*" : "color to theme this target",
          "context*" : "options for this scene",
          "contextmenu*" : "options for this step",
          "dropdown*" : "value to use for target in this scene",
@@ -3110,6 +3311,7 @@
       {
          " ? " : "show help",
          "autosave" : "every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.",
+         "home" : "Moves the viewport to the \"home\" position, useful if you lost where you are in your savestate",
          "load" : "load a saved .bsk file to restore state",
          "load layout" : "[none]",
          "lookahead (exp.)" : "use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.",
@@ -3232,6 +3434,7 @@
          "background_g" : "green RGB value of canvas background",
          "background_r" : "red RGB value of canvas background",
          "buffersize" : "what buffer size to use with your audio device. lower values use require more CPU power, higher values add more latency. (requires restart)",
+         "cable_alpha" : "opacity of the cables",
          "cable_drop_behavior" : "what should be behavior be when you drag a cable and drop it into empty space?",
          "cable_quality" : "visual resolution of the cables",
          "devicetype" : "what kind of audio device bespoke should use (requires restart)",
@@ -3239,7 +3442,7 @@
          "draw_module_highlights" : "should modules visually flash in response to activity",
          "fade_cable_middle" : "should longer cables draw with a fadeout effect in the middle",
          "ffmpeg_path" : "the path to your ffmpeg installation (used for youtube downloading in sampleplayer module)",
-         "grid_snap_size" : "grid size to use when snapping module position (hold alt/option while dragging a module)",
+         "grid_snap_size" : "grid size to use when snapping module position (hold command on mac or control everywhere else while dragging a module)",
          "height" : "height of bespoke's window on startup",
          "immediate_paste" : "when enabled, pasting values on UI controls will apply immediately instead of requiring you to press enter",
          "layout" : "what template bespoke should use on startup",
@@ -3255,6 +3458,7 @@
          "plugin_preference_order" : "semicolon-separated list of plugin formats, in preferred order. if a plugin exists with multiple formats, only the most preferred format will be shown. leave this blank to always show all plugins. (default value: \"VST3;VST;AudioUnit;LV2\")",
          "position_x" : "desired x position of upper-left corner",
          "position_y" : "desired y position of upper-left corner",
+         "qwerty_to_pitch_mode" : "some modules can hear computer keyboard keys and automatically translate them to MIDI notes. This setting defines how your keyboard is interpreted based on other DAWs with a similar feature. \nAbleton:\noctave#1: A->L\ndown octave: Z\nup octave: X\n\nFruity:\noctave#1: Z->M\noctave#2: Q->I\ndown octave: ,\nup octave: .",
          "record_buffer_length_minutes" : "length of always-on recording buffer for \"write audio\" button in the title bar (requires restart)",
          "recordings_path" : "where \"write audio\" and multitrackrecorder wav files save",
          "samplerate" : "what sample rate to use with your audio device (requires restart)",
@@ -3267,6 +3471,7 @@
          "ui_scale" : "scale of UI layer (title bar, quickspawn menu, etc)",
          "vst_always_on_top" : "should plugin windows always stay on top of bespoke when opened",
          "width" : "width of bespoke's window on startup",
+         "wrap_mouse_on_pan" : "when panning canvas, wrap mouse position around when it goes offscreen, to allow you to pan endlessly",
          "youtube_dl_path" : "the path to your youtube-dl installation (used for youtube downloading in sampleplayer module)",
          "zoom" : "desired canvas zoom level on startup"
       },
@@ -3355,7 +3560,8 @@
       "controls" : 
       {
          "*" : "generate a new random seed",
-         "<" : "go to next seed",
+         "<" : "go to previous seed",
+         ">" : "go to next seed",
          "beat length" : "restart the deterministic random sequence at this interval",
          "full velocity" : "set velocity to full for notes that pass through",
          "seed" : "number that determines the random sequence"
@@ -3431,6 +3637,18 @@
       "canReceivePulses" : false,
       "description" : "connect to \"vocoder\" or \"fftvocoder\" modules. send the synth audio into this module, and the voice audio into the vocoder module.",
       "type" : "audio effects"
+   },
+   "voicesetter" : 
+   {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : 
+      {
+         "voice index" : "current set voice channel index"
+      },
+      "description" : "set a specific Voice channel index for a note",
+      "type" : "note effects"
    },
    "volcabeatscontrol" : 
    {

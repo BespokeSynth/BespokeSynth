@@ -69,6 +69,7 @@ private:
    void SetDirectory(juce::String dirPath);
    int GetNumPages() const;
    void ShowPage(int page);
+   bool IsSamplePlaying(int index) const;
 
    juce::String mCurrentDirectory;
    juce::StringArray mDirectoryListing;
