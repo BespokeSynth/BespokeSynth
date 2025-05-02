@@ -76,7 +76,7 @@ void TapTempo::PlayNote(NoteMessage note)
    if (!mEnabled || !note.velocity)
       return;
 
-   for (int i = mBeats.size() - 1; i > 0; i--)
+   for (int i = (int)mBeats.size() - 1; i > 0; i--)
       mBeats[i] = mBeats[i - 1];
    mBeats[0] = note.time;
 
@@ -89,7 +89,7 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
    if (!mEnabled || !velocity)
       return;
 
-   for (int i = mBeats.size() - 1; i > 0; i--)
+   for (int i = (int)mBeats.size() - 1; i > 0; i--)
       mBeats[i] = mBeats[i - 1];
    mBeats[0] = time;
 
@@ -117,7 +117,7 @@ void TapTempo::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTapButton)
    {
-      for (int i = mBeats.size() - 1; i > 0; i--)
+      for (int i = (int)mBeats.size() - 1; i > 0; i--)
          mBeats[i] = mBeats[i - 1];
       mBeats[0] = time;
 
