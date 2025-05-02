@@ -81,7 +81,7 @@ public:
       mHeight = h;
    }
    void SetBezierControl(float control) { mBezierControl = control; }
-   void SetModulator(IModulator* modulator);
+   void SetModulator(IModulator* modulator, bool shouldCallRepatch = true);
    IModulator* GetModulator() { return mModulator; }
    float& GetModulatorMin() { return mModulatorMin; }
    float& GetModulatorMax() { return mModulatorMax; }
