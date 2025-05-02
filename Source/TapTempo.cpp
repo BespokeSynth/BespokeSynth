@@ -76,12 +76,7 @@ void TapTempo::PlayNote(NoteMessage note)
    if (!mEnabled || !note.velocity)
       return;
 
-   for (int i = (int)mBeats.size() - 1; i > 0; i--)
-      mBeats[i] = mBeats[i - 1];
-   mBeats[0] = note.time;
-
-   if (mCount < mWindow)
-      mCount++;
+   Tap(note.time);
 }
 
 void TapTempo::OnPulse(double time, float velocity, int flags)
@@ -89,12 +84,7 @@ void TapTempo::OnPulse(double time, float velocity, int flags)
    if (!mEnabled || !velocity)
       return;
 
-   for (int i = (int)mBeats.size() - 1; i > 0; i--)
-      mBeats[i] = mBeats[i - 1];
-   mBeats[0] = time;
-
-   if (mCount < mWindow)
-      mCount++;
+   Tap(time);
 }
 
 void TapTempo::TextEntryComplete(TextEntry* entry)
@@ -116,17 +106,20 @@ float TapTempo::Value(int samplesIn)
 void TapTempo::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTapButton)
-   {
-      for (int i = (int)mBeats.size() - 1; i > 0; i--)
-         mBeats[i] = mBeats[i - 1];
-      mBeats[0] = time;
-
-      if (mCount < mWindow)
-         mCount++;
-   }
+      Tap(time);
 
    if (button == mResetButton)
       mCount = 0;
+}
+
+void TapTempo::Tap(double time)
+{
+   for (int i = (int)mBeats.size() - 1; i > 0; i--)
+      mBeats[i] = mBeats[i - 1];
+   mBeats[0] = time;
+
+   if (mCount < mWindow)
+      mCount++;
 }
 
 void TapTempo::SaveLayout(ofxJSONElement& moduleInfo)

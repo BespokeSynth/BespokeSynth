@@ -72,6 +72,8 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
+   void Tap(double time);
+
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
