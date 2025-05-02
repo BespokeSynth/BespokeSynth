@@ -68,14 +68,14 @@ void TapTempo::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    OnModulatorRepatch();
 }
 
-void TapTempo::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void TapTempo::PlayNote(NoteMessage note)
 {
-   if (!mEnabled || !velocity)
+   if (!mEnabled || !note.velocity)
       return;
 
    for (int i = mBeats.size() - 1; i > 0; i--)
       mBeats[i] = mBeats[i - 1];
-   mBeats[0] = time;
+   mBeats[0] = note.time;
 
    if (mCount < mWindow)
       mCount++;
