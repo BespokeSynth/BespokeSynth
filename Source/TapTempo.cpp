@@ -107,9 +107,10 @@ void TapTempo::TextEntryComplete(TextEntry* entry)
 float TapTempo::Value(int samplesIn)
 {
    if (mCount < mWindow)
-      return 0;
+      return mTempo;
 
-   return (mCount - 1) / ((mBeats.front() - mBeats.back()) / 60 / 1000) * 4 * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+   mTempo = (mCount - 1) / ((mBeats.front() - mBeats.back()) / 60 / 1000) * 4 * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+   return mTempo;
 }
 
 void TapTempo::ButtonClicked(ClickButton* button, double time)
