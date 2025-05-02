@@ -46,6 +46,8 @@ void TapTempo::CreateUIControls()
    UIBLOCK0();
    UICONTROL_CUSTOM(mWindowEntry, new TextEntry(UICONTROL_BASICS("window"), 7, &mWindow, 2, 99999); mWindowEntry->DrawLabel(false););
    UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mTapButton, new ClickButton(UICONTROL_BASICS("tap")));
+   UIBLOCK_SHIFTRIGHT();
    UICONTROL_CUSTOM(mResetButton, new ClickButton(UICONTROL_BASICS("reset")));
    ENDUIBLOCK(mWidth, mHeight);
 
@@ -60,6 +62,7 @@ void TapTempo::DrawModule()
       return;
 
    mWindowEntry->Draw();
+   mTapButton->Draw();
    mResetButton->Draw();
 }
 
@@ -111,7 +114,18 @@ float TapTempo::Value(int samplesIn)
 
 void TapTempo::ButtonClicked(ClickButton* button, double time)
 {
-   mCount = 0;
+   if (button == mTapButton)
+   {
+      for (int i = mBeats.size() - 1; i > 0; i--)
+         mBeats[i] = mBeats[i - 1];
+      mBeats[0] = time;
+
+      if (mCount < mWindow)
+         mCount++;
+   }
+
+   if (button == mResetButton)
+      mCount = 0;
 }
 
 void TapTempo::SaveLayout(ofxJSONElement& moduleInfo)

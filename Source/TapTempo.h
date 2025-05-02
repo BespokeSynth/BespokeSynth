@@ -81,6 +81,7 @@ private:
    }
 
    TextEntry* mWindowEntry{ nullptr };
+   ClickButton* mTapButton{ nullptr };
    ClickButton* mResetButton{ nullptr };
 
    int mCount{ 0 };
