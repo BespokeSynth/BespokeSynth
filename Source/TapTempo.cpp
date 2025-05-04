@@ -69,6 +69,8 @@ void TapTempo::DrawModule()
 void TapTempo::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
+   if (GetSliderTarget() && fromUserClick)
+      mTempo = GetSliderTarget()->GetValue();
 }
 
 void TapTempo::PlayNote(NoteMessage note)
