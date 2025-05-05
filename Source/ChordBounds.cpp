@@ -109,7 +109,7 @@ void ChordBounds::PlayNote(NoteMessage note)
 
       if (minNotePlaying == -1 || minNotePlaying > note.pitch)
       {
-         mNoteOutput.Flush(note.time);
+         PlayNoteOutput(note);
          if (minNotePlaying != -1)
          {
             mActiveNotes[minNotePlaying].time = NextBufferTime(false);
@@ -118,7 +118,7 @@ void ChordBounds::PlayNote(NoteMessage note)
       }
       if (maxNotePlaying == -1 || maxNotePlaying < note.pitch)
       {
-         mPatchCableSource2->Flush(note.time);
+         mPatchCableSource2->PlayNoteOutput(note);
          if (maxNotePlaying != -1)
          {
             mActiveNotes[maxNotePlaying].time = NextBufferTime(false);
