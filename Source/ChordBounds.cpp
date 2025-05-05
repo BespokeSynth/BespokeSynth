@@ -56,16 +56,16 @@ void ChordBounds::DrawModule()
       return;
 }
 
-void ChordBounds::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ChordBounds::PlayNote(NoteMessage note)
 {
-   if (velocity > 0) // New note playing
+   if (note.velocity > 0) // New note playing
    {
       // Detect previous min and max notes
       int minNotePlaying = -1;
       int maxNotePlaying = -1;
       for (int i = 0; i < 128; ++i)
       {
-         if (mVelocityPlaying[i])
+         if (mActiveNotes[i].velocity)
          {
             if (minNotePlaying == -1)
                minNotePlaying = i;
@@ -74,34 +74,32 @@ void ChordBounds::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       }
 
       // Store the note
-      mVelocityPlaying[pitch] = velocity;
-      mVoiceIdxPlaying[pitch] = voiceIdx;
-      mModulationParametersPlaying[pitch] = modulation;
+      mActiveNotes[note.pitch] = note;
 
-      if (minNotePlaying == -1 || minNotePlaying > pitch)
+      if (minNotePlaying == -1 || minNotePlaying > note.pitch)
       {
-         mNoteOutput.Flush(time);
-         PlayNoteOutput(NextBufferTime(false), pitch, velocity, voiceIdx, modulation);
+         mNoteOutput.Flush(note.time);
+         note.time = NextBufferTime(false);
+         PlayNoteOutput(note);
       }
-      if (maxNotePlaying == -1 || maxNotePlaying < pitch)
+      if (maxNotePlaying == -1 || maxNotePlaying < note.pitch)
       {
-         mPatchCableSource2->Flush(time);
-         mPatchCableSource2->PlayNoteOutput(NextBufferTime(false), pitch, velocity, voiceIdx, modulation);
+         mPatchCableSource2->Flush(note.time);
+         note.time = NextBufferTime(false);
+         mPatchCableSource2->PlayNoteOutput(note);
       }
    }
    else
    { // played note is stopped
       // Unset the note
-      mVelocityPlaying[pitch] = velocity;
-      mVoiceIdxPlaying[pitch] = voiceIdx;
-      mModulationParametersPlaying[pitch] = modulation;
+      mActiveNotes[note.pitch] = note;
 
       // Detect new min and max notes
       int minNotePlaying = -1;
       int maxNotePlaying = -1;
       for (int i = 0; i < 128; ++i)
       {
-         if (mVelocityPlaying[i])
+         if (mActiveNotes[i].velocity)
          {
             if (minNotePlaying == -1)
                minNotePlaying = i;
@@ -109,17 +107,23 @@ void ChordBounds::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
          }
       }
 
-      if (minNotePlaying == -1 || minNotePlaying > pitch)
+      if (minNotePlaying == -1 || minNotePlaying > note.pitch)
       {
-         mNoteOutput.Flush(time);
+         mNoteOutput.Flush(note.time);
          if (minNotePlaying != -1)
-            PlayNoteOutput(NextBufferTime(false), minNotePlaying, mVelocityPlaying[minNotePlaying], mVoiceIdxPlaying[minNotePlaying], mModulationParametersPlaying[pitch]);
+         {
+            mActiveNotes[minNotePlaying].time = NextBufferTime(false);
+            PlayNoteOutput(mActiveNotes[minNotePlaying]);
+         }
       }
-      if (maxNotePlaying == -1 || maxNotePlaying < pitch)
+      if (maxNotePlaying == -1 || maxNotePlaying < note.pitch)
       {
-         mPatchCableSource2->Flush(time);
+         mPatchCableSource2->Flush(note.time);
          if (maxNotePlaying != -1)
-            mPatchCableSource2->PlayNoteOutput(NextBufferTime(false), maxNotePlaying, mVelocityPlaying[maxNotePlaying], mVoiceIdxPlaying[maxNotePlaying], mModulationParametersPlaying[pitch]);
+         {
+            mActiveNotes[maxNotePlaying].time = NextBufferTime(false);
+            mPatchCableSource2->PlayNoteOutput(mActiveNotes[maxNotePlaying]);
+         }
       }
    }
 }

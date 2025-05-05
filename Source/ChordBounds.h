@@ -43,7 +43,7 @@ public:
    void CreateUIControls() override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -61,10 +61,7 @@ private:
    bool IsEnabled() const override { return true; }
 
    AdditionalNoteCable* mPatchCableSource2{ nullptr };
-
-   std::array<int, 128> mVelocityPlaying{ 0 };
-   std::array<int, 128> mVoiceIdxPlaying{ 0 };
-   ModulationParameters mModulationParametersPlaying[128];
+   std::array<NoteMessage, 128> mActiveNotes{};
 };
 
 #endif /* defined(__Bespoke__ChordBounds__) */
