@@ -58,24 +58,29 @@ void ChordBounds::DrawModule()
 
 void ChordBounds::PlayNote(NoteMessage note)
 {
-   if (note.velocity > 0) // New note playing
-   {
-      // Detect previous min and max notes
-      int minNotePlaying = -1;
-      int maxNotePlaying = -1;
-      for (int i = 0; i < 128; ++i)
-      {
-         if (mActiveNotes[i].velocity)
-         {
-            if (minNotePlaying == -1)
-               minNotePlaying = i;
-            maxNotePlaying = i;
-         }
-      }
-
-      // Store the note
+   // unset a played note if it is off now
+   if (!note.velocity)
       mActiveNotes[note.pitch] = note;
 
+   // detect min and max notes
+   int minNotePlaying = -1;
+   int maxNotePlaying = -1;
+   for (int i = 0; i < 128; ++i)
+   {
+      if (mActiveNotes[i].velocity)
+      {
+         if (minNotePlaying == -1)
+            minNotePlaying = i;
+         maxNotePlaying = i;
+      }
+   }
+
+   // store the new note
+   if (note.velocity)
+      mActiveNotes[note.pitch] = note;
+
+   if (note.velocity > 0)
+   { // new note playing
       if (minNotePlaying == -1 || minNotePlaying > note.pitch)
       {
          mNoteOutput.Flush(note.time);
@@ -91,22 +96,6 @@ void ChordBounds::PlayNote(NoteMessage note)
    }
    else
    { // played note is stopped
-      // Unset the note
-      mActiveNotes[note.pitch] = note;
-
-      // Detect new min and max notes
-      int minNotePlaying = -1;
-      int maxNotePlaying = -1;
-      for (int i = 0; i < 128; ++i)
-      {
-         if (mActiveNotes[i].velocity)
-         {
-            if (minNotePlaying == -1)
-               minNotePlaying = i;
-            maxNotePlaying = i;
-         }
-      }
-
       if (minNotePlaying == -1 || minNotePlaying > note.pitch)
       {
          PlayNoteOutput(note);
