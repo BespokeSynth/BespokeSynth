@@ -41,8 +41,8 @@ namespace
 Razor::Razor()
 {
    std::memset(mAmp, 0, sizeof(double) * NUM_PARTIALS);
-   std::memset(mPeakHistory, 0, sizeof(double) * (VIZ_WIDTH + 1) * RAZOR_HISTORY);
-   std::memset(mPhases, 0, sizeof(double) * NUM_PARTIALS);
+   std::memset(mPeakHistory, 0, sizeof(float) * (VIZ_WIDTH + 1) * RAZOR_HISTORY);
+   std::memset(mPhases, 0, sizeof(float) * NUM_PARTIALS);
 
    for (int i = 0; i < NUM_PARTIALS; ++i)
       mDetune[i] = 1;
