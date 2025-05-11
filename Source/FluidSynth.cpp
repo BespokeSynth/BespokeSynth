@@ -263,9 +263,6 @@ void FluidSynth::SetUpFromSaveData()
 
 void FluidSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
-   if (TheSynth->IsLoadingState())
-      return;
-
    if (list == mMidiBankSelectDropdown)
    {
       RecreateSynth();
@@ -278,9 +275,6 @@ void FluidSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
 
 void FluidSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   if (TheSynth->IsLoadingState())
-      return;
-
    if (slider == mVolumeSlider)
    {
       UpdateVolume();
@@ -289,9 +283,6 @@ void FluidSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double ti
 
 void FluidSynth::TextEntryComplete(TextEntry* entry)
 {
-   if (TheSynth->IsLoadingState())
-      return;
-
    if (entry == mSoundFontPathEntry)
    {
       ReloadSoundFont();
