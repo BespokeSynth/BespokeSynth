@@ -141,11 +141,11 @@ void FluidSynth::Process(double time)
    mWriteBuffer.Clear();
 
    {
-      ScopedMutex mutex(&mSynthMutex, "process()");
-      if (mSynth == nullptr)
-         return;
-
-      fluid_synth_write_float(mSynth, bufferSize, mWriteBuffer.GetChannel(0), 0, 1, mWriteBuffer.GetChannel(1), 0, 1);
+      ScopedTryMutex mutex(&mSynthMutex, "process()");
+      if (mutex.IsLocked() && mSynth != nullptr)
+      {
+         fluid_synth_write_float(mSynth, bufferSize, mWriteBuffer.GetChannel(0), 0, 1, mWriteBuffer.GetChannel(1), 0, 1);
+      }
    }
 
    SyncOutputBuffer(mWriteBuffer.NumActiveChannels());
