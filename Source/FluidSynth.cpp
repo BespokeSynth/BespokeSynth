@@ -346,23 +346,38 @@ void FluidSynth::UpdatePresets()
 
    for (int i = 0; i < kNumVoices; i++)
    {
-      int bank = mPresets[i] >> 16;
-      int preset = mPresets[i] & 0x7f;
-      fluid_synth_program_select(mSynth, i, mSoundFontId, bank, preset);
+      if (mPresets[i] < 0)
+      {
+         fluid_synth_unset_program(mSynth, i);
+      }
+      else
+      {
+         int bank = mPresets[i] >> 16;
+         int preset = mPresets[i] & 0x7f;
+         fluid_synth_program_select(mSynth, i, mSoundFontId, bank, preset);
+      }
    }
 }
 
 void FluidSynth::PollPresetLocked(int channel)
 {
-   fluid_preset_t* preset = fluid_synth_get_channel_preset(mSynth, channel);
+   fluid_preset_t* preset = nullptr;
+   if (mSynth != nullptr)
+      preset = fluid_synth_get_channel_preset(mSynth, channel);
+
    if (preset == nullptr)
-      return;
+   {
+      mPresets[channel] = -1;
+   }
+   else
+   {
+      int bank = fluid_preset_get_banknum(preset);
+      int num = fluid_preset_get_num(preset);
 
-   int bank = fluid_preset_get_banknum(preset);
-   int num = fluid_preset_get_num(preset);
+      ofLog() << "poll preset " << channel << " bank " << bank << " preset " << num;
+      mPresets[channel] = PRESET(bank, num);
+   }
 
-   ofLog() << "poll preset " << channel << " bank " << bank << " preset " << num;
-   mPresets[channel] = PRESET(bank, num);
    mPresetsDropdown[channel]->Poll();
 }
 
@@ -407,6 +422,7 @@ void FluidSynth::ReloadSoundFont()
    for (int i = 0; i < kNumVoices; i++)
    {
       mPresetsDropdown[i]->Clear();
+      mPresetsDropdown[i]->AddLabel("unset", -1);
    }
 
    ScopedMutex mutex(&mSynthMutex, "reloadSoundFont()");
