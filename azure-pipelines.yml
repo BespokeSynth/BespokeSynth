@@ -120,11 +120,6 @@ jobs:
         condition: variables.isMac
         displayName: mac - install dependencies needed for distribution build
 
-      - bash: |
-          vcpkg install glib
-        condition: variables.isWindows
-        displayName: win - install dependencies needed for FluidSynth
-
       - task: InstallAppleCertificate@2
         inputs:
           certSecureFile: 'bespoke_dev_id_app.p12'
