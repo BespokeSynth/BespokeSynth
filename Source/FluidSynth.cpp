@@ -143,7 +143,6 @@ void FluidSynth::Process(double time)
    PROFILER(FluidSynth);
 
    IAudioReceiver* target = GetTarget();
-
    if (!mEnabled || target == nullptr)
       return;
 
@@ -544,7 +543,7 @@ void FluidSynth::PlayNote(NoteMessage note)
 
 void FluidSynth::SendCC(int control, int value, int voiceIdx)
 {
-   if (!mEnabled || GetTarget() == nullptr)
+   if (!mEnabled)
       return;
 
    ofLog() << "fluidsynth cc";
@@ -560,7 +559,7 @@ void FluidSynth::SendCC(int control, int value, int voiceIdx)
 
 void FluidSynth::SendMidi(const juce::MidiMessage& message)
 {
-   if (!mEnabled || GetTarget() == nullptr)
+   if (!mEnabled)
       return;
 
    if (message.isNoteOnOrOff())
