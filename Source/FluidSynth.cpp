@@ -289,7 +289,7 @@ void FluidSynth::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSelectSoundFontButton)
    {
-      juce::FileChooser chooser("Select SoundFont", juce::File(mSoundFontPath), "*.sf2;*.sf3", true, false, TheSynth->GetFileChooserParent());
+      juce::FileChooser chooser("Select SoundFont", juce::File(mSoundFontPath), "*.sf2", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToOpen())
       {
          mSoundFontPathEntry->SetText(chooser.getResult().getFullPathName().toStdString());
