@@ -99,22 +99,36 @@ void FluidSynth::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
+   int yStart;
+
    UIBLOCK0();
    FLOATSLIDER(mVolumeSlider, "volume", &mVolume, 0, 10);
    BUTTON(mSelectSoundFontButton, "select soundfont");
-   TEXTENTRY(mSoundFontPathEntry, "soundfont", 15, &mSoundFontPath);
+   TEXTENTRY(mSoundFontPathEntry, "soundfont", 39, &mSoundFontPath);
    DROPDOWN(mMidiBankSelectDropdown, "midi bank select", (int*)&mMidiBankSelect, 30);
+   ENDUIBLOCK1(yStart);
 
+   UIBLOCK3(3, yStart, 200);
    for (int i = 0; i < kNumVoices; i++)
    {
+      if (i == 8)
+      {
+         UIBLOCK_NEWCOLUMN();
+         xOffset = 8;
+      }
+      else if (i == 10)
+      {
+         xOffset = 0;
+      }
+
       std::stringstream label;
-      label << "preset " << (i < 9 ? "   " : "") << i + 1;
-      DROPDOWN(mPresetsDropdown[i], label.str().c_str(), &mPresets[i], 250);
+      label << "voice " << i;
+      DROPDOWN(mPresetsDropdown[i], label.str().c_str(), &mPresets[i], 150);
       mPresetsDropdown[i]->DrawLabel(true);
    }
    ENDUIBLOCK0();
 
-   mSoundFontPathEntry->SetFlexibleWidth(true);
+   mSoundFontPathEntry->SetFlexibleWidth(false);
    mSoundFontPathEntry->DrawLabel(true);
 
    mMidiBankSelectDropdown->AddLabel("gs", (int)MidiBankSelect::GS);
@@ -237,16 +251,8 @@ void FluidSynth::DrawModule()
 void FluidSynth::GetModuleDimensions(float& width, float& height)
 {
    mSoundFontPathEntry->GetDimensions(width, height);
-
-   float dimension;
-   for (int i = 0; i < kNumVoices; i++)
-   {
-      mPresetsDropdown[i]->GetDimensions(dimension, height);
-      width = std::max(width, dimension);
-   }
-
    width += 4;
-   height = (7 + kNumVoices) * height;
+   height = (6 + kNumVoices / 2) * height;
 }
 
 void FluidSynth::LoadLayout(const ofxJSONElement& moduleInfo)
