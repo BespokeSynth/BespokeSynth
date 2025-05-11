@@ -102,7 +102,7 @@ void FluidSynth::CreateUIControls()
    int yStart;
 
    UIBLOCK0();
-   FLOATSLIDER(mVolumeSlider, "volume", &mVolume, 0, 10);
+   FLOATSLIDER(mVolumeSlider, "volume", &mVolume, 0, 2);
    BUTTON(mSelectSoundFontButton, "select soundfont");
    TEXTENTRY(mSoundFontPathEntry, "soundfont", 39, &mSoundFontPath);
    DROPDOWN(mMidiBankSelectDropdown, "midi bank select", (int*)&mMidiBankSelect, 30);
