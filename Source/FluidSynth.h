@@ -100,6 +100,7 @@ private:
    void UpdatePresets();
    void PollPresetLocked(int channel);
    void PollAllPresetsLocked();
+   fluid_sfont_t* LoadSoundFontLocked();
    void ReloadSoundFont();
    void SetMidiBankSelect();
    void RecreateSynth();
@@ -120,6 +121,7 @@ private:
    std::array<DropdownList*, kNumVoices> mPresetsDropdown{ nullptr };
    std::array<int, kNumVoices> mNotesActive{ 0 };
    std::array<float, kNumVoices> mLastNotePlayTime{ -1 };
+   bool mInitialLoadDone{ false };
 
    NoteInputBuffer mNoteInputBuffer;
    ChannelBuffer mWriteBuffer;
