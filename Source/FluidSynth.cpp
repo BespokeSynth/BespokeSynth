@@ -36,6 +36,29 @@
    ((bank << 16) | preset)
 
 
+class ScopedDisabler
+{
+public:
+   ScopedDisabler(IDrawableModule* theModule)
+   : mModule(theModule)
+   , mWasEnabled(theModule->IsEnabled())
+   {
+      if (mWasEnabled)
+         mModule->SetEnabled(false);
+   }
+
+   ~ScopedDisabler()
+   {
+      if (mWasEnabled)
+         mModule->SetEnabled(true);
+   }
+
+private:
+   IDrawableModule* mModule;
+   bool mWasEnabled;
+};
+
+
 FluidSynth::FluidSynth()
 : mNoteInputBuffer(this)
 , mWriteBuffer(gBufferSize)
@@ -69,7 +92,7 @@ void FluidSynth::Init()
 
 void FluidSynth::PostLoadState()
 {
-   RecreateSynth();
+   ReloadSoundFont();
 }
 
 void FluidSynth::CreateUIControls()
@@ -351,12 +374,8 @@ void FluidSynth::PollAllPresetsLocked()
    }
 }
 
-void FluidSynth::ReloadSoundFont()
+fluid_sfont_t* FluidSynth::LoadSoundFontLocked()
 {
-   ScopedMutex mutex(&mSynthMutex, "reloadSoundFont()");
-   if (mSynth == nullptr || mSoundFontPath == mLoadedSoundFontPath)
-      return;
-
    if (mSoundFontId != FLUID_FAILED)
    {
       fluid_synth_sfunload(mSynth, mSoundFontId, true);
@@ -364,38 +383,59 @@ void FluidSynth::ReloadSoundFont()
       ClearNotes(false);
    }
 
-   if (mSoundFontPath.empty() || !juce::File(mSoundFontPath).existsAsFile())
-      return;
-
    mLoadedSoundFontPath = mSoundFontPath;
+   if (mSoundFontPath.empty() || !juce::File(mSoundFontPath).existsAsFile())
+      return nullptr;
+
    mSoundFontId = fluid_synth_sfload(mSynth, mSoundFontPath.c_str(), true);
    if (mSoundFontId == FLUID_FAILED)
    {
       ofLog() << "loading soundfont failed: " << mSoundFontPath;
-      return;
+      return nullptr;
    }
 
-   fluid_sfont_t* font = fluid_synth_get_sfont_by_id(mSynth, mSoundFontId);
+   return fluid_synth_get_sfont_by_id(mSynth, mSoundFontId);
+}
+
+void FluidSynth::ReloadSoundFont()
+{
+   if (mSoundFontPath == mLoadedSoundFontPath)
+      return;
+
+   ScopedDisabler disabler(this);
 
    for (int i = 0; i < kNumVoices; i++)
    {
       mPresetsDropdown[i]->Clear();
    }
 
-   fluid_sfont_iteration_start(font);
-   for (fluid_preset_t* preset = fluid_sfont_iteration_next(font);
-        preset != nullptr; preset = fluid_sfont_iteration_next(font))
+   ScopedMutex mutex(&mSynthMutex, "reloadSoundFont()");
+   fluid_sfont_t* font = nullptr;
+   if (mSynth != nullptr)
+      font = LoadSoundFontLocked();
+
+   if (font != nullptr)
    {
-      int bank = fluid_preset_get_banknum(preset);
-      int num = fluid_preset_get_num(preset);
-
-      std::stringstream label;
-      label << bank << "/" << num << ": " << fluid_preset_get_name(preset);
-
-      for (int i = 0; i < kNumVoices; i++)
+      fluid_sfont_iteration_start(font);
+      for (fluid_preset_t* preset = fluid_sfont_iteration_next(font);
+           preset != nullptr; preset = fluid_sfont_iteration_next(font))
       {
-         mPresetsDropdown[i]->AddLabel(label.str(), PRESET(bank, num));
+         int bank = fluid_preset_get_banknum(preset);
+         int num = fluid_preset_get_num(preset);
+
+         std::stringstream label;
+         label << bank << "/" << num << ": " << fluid_preset_get_name(preset);
+
+         for (int i = 0; i < kNumVoices; i++)
+         {
+            mPresetsDropdown[i]->AddLabel(label.str(), PRESET(bank, num));
+         }
       }
+
+      if (mInitialLoadDone)
+         UpdatePresets();
+
+      mInitialLoadDone = true;
    }
 
    PollAllPresetsLocked();
@@ -427,24 +467,22 @@ void FluidSynth::SetMidiBankSelect()
 
 void FluidSynth::RecreateSynth()
 {
+   ScopedDisabler disabler(this);
+   ScopedMutex mutex(&mSynthMutex, "recreateSynth()");
+   if (mSynth != nullptr)
    {
-      ScopedMutex mutex(&mSynthMutex, "recreateSynth()");
-      if (mSynth != nullptr)
-      {
-         delete_fluid_synth(mSynth);
-         mSoundFontId = FLUID_FAILED;
-         mLoadedSoundFontPath.clear();
-         mSynth = nullptr;
-      }
-
-      UpdateVolume();
-      SetMidiBankSelect();
-
-      mSynth = new_fluid_synth(mSettings);
+      delete_fluid_synth(mSynth);
+      mSoundFontId = FLUID_FAILED;
+      mLoadedSoundFontPath.clear();
+      mSynth = nullptr;
    }
 
+   UpdateVolume();
+   SetMidiBankSelect();
+
+   mSynth = new_fluid_synth(mSettings);
+
    ReloadSoundFont();
-   UpdatePresets();
 }
 
 void FluidSynth::PlayNote(NoteMessage note)
