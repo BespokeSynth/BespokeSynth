@@ -191,17 +191,8 @@ void FluidSynth::DrawModule()
 
    mSelectSoundFontButton->Draw();
 
+   mSoundFontPathEntry->SetInErrorMode(mSoundFontId == FLUID_FAILED);
    mSoundFontPathEntry->Draw();
-   if (mSoundFontId == FLUID_FAILED)
-   {
-      ofPushStyle();
-      ofNoFill();
-      ofSetColor(255, 0, 0, 75);
-      ofSetLineWidth(2);
-      ofRectangle rect = mSoundFontPathEntry->GetRect(K(local));
-      ofRect(rect);
-      ofPopStyle();
-   }
 
    mMidiBankSelectDropdown->Draw();
 
