@@ -94,8 +94,11 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
    if (y < GetRows() && x < GetCols())
    {
       for (auto listener : mScriptListeners)
-         listener->RunCode(gTime, "on_grid_button(" + ofToString(x) + ", " + ofToString(y) + ", " + ofToString(velocity) + ")");
-
+         // use callAsync as RunCode should only be called from main thread
+         juce::MessageManager::callAsync([listener, time = gTime, x, y, velocity]()
+                                         {
+                                            listener->RunCode(time, "on_grid_button(" + ofToString(x) + ", " + ofToString(y) + ", " + ofToString(velocity) + ")");
+                                         });
       if (mGridControllerOwner)
          mGridControllerOwner->OnGridButton(x, y, velocity, this);
    }
