@@ -27,12 +27,12 @@ jobs:
           cmakeArguments: "-A x64"
           cmakeTarget: "BespokeSynth"
         code-formatting:
-          imageName: 'ubuntu-latest'
+          imageName: 'ubuntu-20.04'
           isLinux: True
           cmakeArguments: ""
           cmakeTarget: "code-quality-pipeline-checks"
         linux-x64:
-          imageName: 'ubuntu-latest'
+          imageName: 'ubuntu-20.04'
           isLinux: True
           cmakeArguments: "-GNinja"
           cmakeTarget: "BespokeSynth"
