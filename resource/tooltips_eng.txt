@@ -735,6 +735,8 @@ circlesequencer~polyrhythmic sequencer that displays a loop as a circle
 ~length*~number of steps in this ring
 ~note*~pitch to use for this ring
 ~offset*~timing offset for this ring
+~<~rotate this ring to the left
+~>~rotate this ring to the right
 
 
 
