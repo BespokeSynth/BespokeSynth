@@ -77,7 +77,7 @@ void FollowingSong::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   double volSq = mVolume * mVolume * .5;
+   float volSq = mVolume * mVolume * .5;
 
    if (!mLoadingSong && mPlay)
    {
@@ -88,7 +88,7 @@ void FollowingSong::Process(double time)
       {
          for (int i = 0; i < bufferSize; ++i)
          {
-            double sample = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
+            float sample = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
             if (mMute)
                sample = 0;
             out[i] += sample;

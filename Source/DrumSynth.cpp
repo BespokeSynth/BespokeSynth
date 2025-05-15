@@ -94,7 +94,7 @@ void DrumSynth::Process(double time)
       sampleRate *= oversampling;
    }
 
-   double volSq = mVolume * mVolume;
+   float volSq = mVolume * mVolume;
 
    if (mUseIndividualOuts)
    {

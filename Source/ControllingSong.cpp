@@ -155,7 +155,7 @@ void ControllingSong::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   double volSq = mVolume * mVolume * .5;
+   float volSq = mVolume * mVolume * .5;
 
    mSample.SetRate(mSpeed);
 

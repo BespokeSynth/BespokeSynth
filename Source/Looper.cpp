@@ -297,7 +297,7 @@ void Looper::Process(double time)
    {
       double smooth = .001;
       mSmoothedVol = mSmoothedVol * (1 - smooth) + mVol * smooth;
-      double volSq = mSmoothedVol * mSmoothedVol;
+      float volSq = mSmoothedVol * mSmoothedVol;
 
       mLoopPosOffsetSlider->Compute(i);
 
@@ -333,7 +333,7 @@ void Looper::Process(double time)
          }
 
          //write one sample the past so we don't end up feeding into the next output
-         double writeAmount = mWriteInputRamp.Value(time);
+         float writeAmount = mWriteInputRamp.Value(time);
          if (writeAmount > 0)
             WriteInterpolatedSample(offset - 1, mBuffer->GetChannel(ch), mLoopLength, mLastInputSample[ch] * writeAmount);
          mLastInputSample[ch] = GetBuffer()->GetChannel(ch)[i];

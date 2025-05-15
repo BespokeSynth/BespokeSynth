@@ -330,22 +330,22 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
 {
    if (mGain > 0)
    {
-      double delaySamps = mDelayMs / gInvSampleRateMs;
+      float delaySamps = mDelayMs / gInvSampleRateMs;
       delaySamps = ofClamp(delaySamps - offset, 0.1, mOwner->mDelayBuffer.Size() - 2);
 
       int sampsAgoA = int(delaySamps);
       int sampsAgoB = sampsAgoA + 1;
 
-      double sample = mOwner->mDelayBuffer.GetSample(sampsAgoA, ch);
-      double nextSample = mOwner->mDelayBuffer.GetSample(sampsAgoB, ch);
-      double a = delaySamps - sampsAgoA;
-      double delayedSample = (1 - a) * sample + a * nextSample; //interpolate
+      float sample = mOwner->mDelayBuffer.GetSample(sampsAgoA, ch);
+      float nextSample = mOwner->mDelayBuffer.GetSample(sampsAgoB, ch);
+      float a = delaySamps - sampsAgoA;
+      float delayedSample = (1 - a) * sample + a * nextSample; //interpolate
 
-      double outputSample = delayedSample * mGain;
+      float outputSample = delayedSample * mGain;
       mTapBuffer.GetChannel(ch)[offset] = outputSample;
 
       *sampleOut += outputSample;
-      double panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
+      float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
       mOwner->mDelayBuffer.Accum(gBufferSize - offset, outputSample * mFeedback * panGain, ch);
    }
 }

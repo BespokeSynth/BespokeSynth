@@ -332,7 +332,7 @@ void SamplePlayer::Process(double time)
       auto bufferSize = target->GetBuffer()->BufferSize();
       assert(bufferSize == gBufferSize);
 
-      double volSq = mVolume * mVolume;
+      float volSq = mVolume * mVolume;
 
       const double kBlendSpeed = 1;
       if (mOscWheelGrabbed)

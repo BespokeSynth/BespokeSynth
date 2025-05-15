@@ -444,21 +444,21 @@ void AssertIfDenormal(double input)
    assert(input == 0 || input != input || std::abs(input) > std::numeric_limits<double>::min());
 }
 
-double GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
+float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
 {
    offset = DoubleWrap(offset, bufferSize);
    int pos = int(offset);
    int posNext = int(offset + 1) % bufferSize;
 
-   double sample = buffer[pos];
-   double nextSample = buffer[posNext];
-   double a = offset - pos;
-   double output = (1 - a) * sample + a * nextSample; //interpolate
+   float sample = buffer[pos];
+   float nextSample = buffer[posNext];
+   float a = offset - pos;
+   float output = (1 - a) * sample + a * nextSample; //interpolate
 
    return output;
 }
 
-double GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, double channelBlend)
+float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, float channelBlend)
 {
    assert(channelBlend <= buffer->NumActiveChannels());
    assert(channelBlend >= 0);
@@ -805,12 +805,12 @@ bool IsAudioThread()
    return std::this_thread::get_id() == ModularSynth::GetAudioThreadID();
 }
 
-double GetLeftPanGain(double pan)
+float GetLeftPanGain(float pan)
 {
    return 1 - ofClamp(pan, -1, 1);
 }
 
-double GetRightPanGain(double pan)
+float GetRightPanGain(float pan)
 {
    return ofClamp(pan, -1, 1) + 1;
 }

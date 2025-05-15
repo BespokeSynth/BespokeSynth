@@ -102,10 +102,10 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       else
          mOsc.SetType(kOsc_Sin);
       mOscPhase += oscPhaseInc;
-      double sample = 0;
-      double oscSample = mOsc.Audio(time, mOscPhase);
-      double noiseSample = RandomSample();
-      double pitchBlend = ofClamp((pitch - 40) / 60.0, 0, 1);
+      float sample = 0;
+      float oscSample = mOsc.Audio(time, mOscPhase);
+      float noiseSample = RandomSample();
+      float pitchBlend = ofClamp((pitch - 40) / 60.0, 0, 1);
       pitchBlend *= pitchBlend;
       if (mVoiceParams->mSourceType == kSourceTypeSin || mVoiceParams->mSourceType == kSourceTypeSaw)
          sample = oscSample;
@@ -119,9 +119,9 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       if (mVoiceParams->mSourceType != kSourceTypeInputNoEnvelope)
          sample *= mEnv.Value(time) + mVoiceParams->mExcitation;
 
-      double samplesAgo = sampleRate / freq;
+      float samplesAgo = sampleRate / freq;
       AssertIfDenormal(samplesAgo);
-      double feedbackSample = 0;
+      float feedbackSample = 0;
       if (samplesAgo < mBuffer.Size())
       {
          //interpolated delay
@@ -129,9 +129,9 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
          int posNext = int(samplesAgo) + 1;
          if (delay_pos < mBuffer.Size())
          {
-            double delay_sample = delay_pos < 0 ? 0 : mBuffer.GetSample(delay_pos, 0);
-            double nextSample = posNext >= mBuffer.Size() ? 0 : mBuffer.GetSample(posNext, 0);
-            double a = samplesAgo - delay_pos;
+            float delay_sample = delay_pos < 0 ? 0 : mBuffer.GetSample(delay_pos, 0);
+            float nextSample = posNext >= mBuffer.Size() ? 0 : mBuffer.GetSample(posNext, 0);
+            float a = samplesAgo - delay_pos;
             feedbackSample = (1 - a) * delay_sample + a * nextSample; //interpolate
             JUCE_UNDENORMALISE(feedbackSample);
          }
@@ -139,12 +139,12 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       mFilteredSample = ofLerp(feedbackSample, mFilteredSample, filterLerp);
       JUCE_UNDENORMALISE(mFilteredSample);
       //sample += mFeedbackRamp.Value(time) * mFilterSample;
-      double feedback = mFilteredSample * std::sqrt(mVoiceParams->mFeedback + GetPressure(pos) * .02) * mMuteRamp.Value(time);
+      float feedback = mFilteredSample * std::sqrt(mVoiceParams->mFeedback + GetPressure(pos) * .02) * mMuteRamp.Value(time);
       if (mVoiceParams->mInvert)
          feedback *= -1;
 
-      double sampleForFeedbackBuffer = sample + feedback;
-      double outputSample;
+      float sampleForFeedbackBuffer = sample + feedback;
+      float outputSample;
       if (mVoiceParams->mSourceType == kSourceTypeInputNoEnvelope)
          outputSample = feedback; //don't include dry input in the output
       else

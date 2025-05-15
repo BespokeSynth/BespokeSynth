@@ -95,7 +95,7 @@ void Producer::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   double volSq = mVolume * mVolume;
+   float volSq = mVolume * mVolume;
 
    const float* data = mSample->Data()->GetChannel(0);
    int numSamples = mSample->LengthInSamples();
@@ -351,7 +351,7 @@ void Producer::OnClicked(double x, double y, bool right)
       if (IsKeyHeld('x'))
       {
          double pos = (x - mBufferX) / mBufferW;
-         double sample = pos * (mZoomEnd - mZoomStart) + mZoomStart;
+         float sample = pos * (mZoomEnd - mZoomStart) + mZoomStart;
          int measure = GetMeasureForSample(sample);
          if (IsSkipMeasure(measure))
             mSkipMeasures.remove(measure);

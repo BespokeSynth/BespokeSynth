@@ -25,7 +25,7 @@
 
 #include "EnvOscillator.h"
 
-double EnvOscillator::Audio(double time, double phase)
+float EnvOscillator::Audio(double time, float phase)
 {
    return mOsc.Value(phase) * mAdsr.Value(time);
 }

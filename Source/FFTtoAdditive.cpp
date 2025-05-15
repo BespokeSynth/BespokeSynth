@@ -95,8 +95,8 @@ void FFTtoAdditive::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   double inputPreampSq = mInputPreamp * mInputPreamp;
-   double volSq = mVolume * mVolume;
+   float inputPreampSq = mInputPreamp * mInputPreamp;
+   float volSq = mVolume * mVolume;
 
    auto bufferSize = GetBuffer()->BufferSize();
 
@@ -113,12 +113,12 @@ void FFTtoAdditive::Process(double time)
 
    for (int i = 0; i < fftFreqDomainSize; ++i)
    {
-      double real = mFFTData.mRealValues[i];
-      double imag = mFFTData.mImaginaryValues[i];
+      float real = mFFTData.mRealValues[i];
+      float imag = mFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      double amp = 2. * std::sqrt(real * real + imag * imag);
-      double phase = atan2(imag, real);
+      float amp = 2. * std::sqrt(real * real + imag * imag);
+      float phase = atan2(imag, real);
 
       mFFTData.mRealValues[i] = amp / (fftWindowSize / 2);
       mFFTData.mImaginaryValues[i] = phase;
@@ -127,11 +127,11 @@ void FFTtoAdditive::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    for (int i = 0; i < bufferSize; ++i)
    {
-      double write = 0;
+      float write = 0;
       for (int j = 1; j < numPartials; ++j)
       {
          double phase = ((mFFTData.mImaginaryValues[j + 1] + i * mPhaseInc[j]) / TWO_PI) * 512;
-         double sample = SinSample(phase) * mFFTData.mRealValues[j + 1] * volSq * .4;
+         float sample = SinSample(phase) * mFFTData.mRealValues[j + 1] * volSq * .4;
          write += sample;
       }
 

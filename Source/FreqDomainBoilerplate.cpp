@@ -74,8 +74,8 @@ void FreqDomainBoilerplate::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   double inputPreampSq = mInputPreamp * mInputPreamp;
-   double volSq = mVolume * mVolume;
+   float inputPreampSq = mInputPreamp * mInputPreamp;
+   float volSq = mVolume * mVolume;
 
    auto bufferSize = GetBuffer()->BufferSize();
 

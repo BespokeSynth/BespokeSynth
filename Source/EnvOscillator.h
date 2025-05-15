@@ -46,7 +46,7 @@ public:
       mAdsr.Start(time, target);
    }
    void Stop(double time) { mAdsr.Stop(time); }
-   double Audio(double time, double phase);
+   float Audio(double time, float phase);
    ::ADSR* GetADSR() { return &mAdsr; }
    void SetPulseWidth(double width) { mOsc.SetPulseWidth(width); }
    Oscillator mOsc{ OscillatorType::kOsc_Sin };

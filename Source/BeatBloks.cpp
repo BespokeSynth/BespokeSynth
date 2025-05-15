@@ -118,7 +118,7 @@ void BeatBloks::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   double volSq = mVolume * mVolume;
+   float volSq = mVolume * mVolume;
 
    double clipStart = mClipStart;
    double clipEnd = mClipEnd;
@@ -128,7 +128,7 @@ void BeatBloks::Process(double time)
 
       const float* data = mSample->Data()->GetChannel(0);
       int numSamples = mSample->LengthInSamples();
-      double sampleRateRatio = mSample->GetSampleRateRatio();
+      auto sampleRateRatio = mSample->GetSampleRateRatio();
 
       mPlayheadRemainder = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % mNumBars);
       mPlayheadRemainder /= mNumBars;
@@ -160,7 +160,7 @@ void BeatBloks::Process(double time)
 
       const float* data = mSample->Data()->GetChannel(0);
       int numSamples = mSample->LengthInSamples();
-      double sampleRateRatio = mSample->GetSampleRateRatio();
+      auto sampleRateRatio = mSample->GetSampleRateRatio();
 
       double previewTime = time;
       for (int i = 0; i < bufferSize; ++i)

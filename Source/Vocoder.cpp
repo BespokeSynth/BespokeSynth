@@ -98,7 +98,7 @@ void Vocoder::Process(double time)
 
    double inputPreampSq = mInputPreamp * mInputPreamp;
    double carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
-   double volSq = mVolume * mVolume;
+   float volSq = mVolume * mVolume;
 
    auto bufferSize = GetBuffer()->BufferSize();
 
@@ -153,26 +153,26 @@ void Vocoder::Process(double time)
 
    for (int i = 0; i < FFT_FREQDOMAIN_SIZE; ++i)
    {
-      double real = mFFTData.mRealValues[i];
-      double imag = mFFTData.mImaginaryValues[i];
+      float real = mFFTData.mRealValues[i];
+      float imag = mFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      double amp = 2. * sqrt(real * real + imag * imag);
-      //double phase = atan2(imag,real);
+      float amp = 2.f * sqrt(real * real + imag * imag);
+      //float phase = atan2(imag,real);
 
-      double carrierReal = mCarrierFFTData.mRealValues[i];
-      double carrierImag = mCarrierFFTData.mImaginaryValues[i];
+      float carrierReal = mCarrierFFTData.mRealValues[i];
+      float carrierImag = mCarrierFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      double carrierAmp = 2. * sqrt(carrierReal * carrierReal + carrierImag * carrierImag);
-      double carrierPhase = atan2(carrierImag, carrierReal);
+      float carrierAmp = 2.f * sqrt(carrierReal * carrierReal + carrierImag * carrierImag);
+      float carrierPhase = atan2(carrierImag, carrierReal);
 
       amp *= carrierAmp;
-      double phase = carrierPhase;
+      float phase = carrierPhase;
 
-      phase += ofRandom(mWhisper * TWO_PI);
+      phase += ofRandom(mWhisper * FTWO_PI);
       mPhaseOffsetSlider->Compute();
-      phase = DoubleWrap(phase + mPhaseOffset, TWO_PI);
+      phase = FloatWrap(phase + mPhaseOffset, FTWO_PI);
 
       if (i < mCut) //cut out superbass
          amp = 0;

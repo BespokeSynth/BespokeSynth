@@ -200,8 +200,8 @@ void IDrawableModule::DrawFrame(double w, double h, bool drawModule, double& tit
       {
          RollingBuffer* vizBuff = audioSource->GetVizBuffer();
          int numSamples = std::min(500, vizBuff->Size());
-         double sample;
-         double mag = 0;
+         float sample;
+         float mag = 0;
          for (int ch = 0; ch < vizBuff->NumChannels(); ++ch)
          {
             for (int i = 0; i < numSamples; ++i)
@@ -217,7 +217,7 @@ void IDrawableModule::DrawFrame(double w, double h, bool drawModule, double& tit
          mag = ofClamp(mag, 0, 1);
 
          if (UserPrefs.draw_module_highlights.Get())
-            highlight = mag * .15;
+            highlight = mag * .15f;
       }
 
       if (GetPatchCableSource() != nullptr)

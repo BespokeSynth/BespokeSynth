@@ -76,7 +76,7 @@ void ClipLauncher::Process(double time)
    }
 
    Sample* sample = nullptr;
-   double volSq = 1;
+   float volSq = 1;
    if (sampleToPlay != -1)
    {
       mSampleMutex.lock();

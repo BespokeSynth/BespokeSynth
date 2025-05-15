@@ -44,7 +44,7 @@ public:
 
    OscillatorType GetType() const { return mType; }
    void SetType(OscillatorType type) { mType = type; }
-   double Value(double phase) const;
+   float Value(float phase) const;
    double GetPulseWidth() const { return mPulseWidth; }
    void SetPulseWidth(double width) { mPulseWidth = width; }
    double GetShuffle() const { return mShuffle; }
@@ -54,7 +54,7 @@ public:
    OscillatorType mType{ OscillatorType::kOsc_Sin };
 
 private:
-   double SawSample(double phase) const;
+   float SawSample(float phase) const;
 
    double mPulseWidth{ .5 };
    double mShuffle{ 0 };

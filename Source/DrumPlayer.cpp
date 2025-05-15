@@ -284,7 +284,7 @@ void DrumPlayer::Process(double time)
 
    int bufferSize = gBufferSize;
 
-   double volSq = mVolume * mVolume * .5;
+   float volSq = mVolume * mVolume * .5;
 
    mOutputBuffer.Clear();
 
@@ -406,14 +406,14 @@ bool DrumPlayer::DrumHit::Process(double time, double speed, double vol, Channel
             for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
             {
                int dataChannel = MIN(ch, sampleData->NumActiveChannels() - 1);
-               double sample = GetInterpolatedSample(mPlayheads[playhead].mOffset, sampleData->GetChannel(dataChannel), mSample.LengthInSamples());
+               float sample = GetInterpolatedSample(mPlayheads[playhead].mOffset, sampleData->GetChannel(dataChannel), mSample.LengthInSamples());
                sample *= mVelocity * vol * mVol * mVol;
                if (mUseEnvelope)
                   sample *= mEnvelope.Value(mPlayheads[playhead].mEnvelopeTime);
 
                if (mPlayheads[playhead].mCutOffTime != -1 && time > mPlayheads[playhead].mCutOffTime)
                {
-                  double fade = ofMap(time - mPlayheads[playhead].mCutOffTime, 0, .25, 1, 0, K(clamp));
+                  float fade = ofMap(time - mPlayheads[playhead].mCutOffTime, 0, .25, 1, 0, K(clamp));
                   sample *= fade;
                   if (fade == 0)
                      mPlayheads[playhead].mStartTime = -1;
@@ -429,8 +429,8 @@ bool DrumPlayer::DrumHit::Process(double time, double speed, double vol, Channel
       }
 
       int secondChannel = out->NumActiveChannels() == 1 ? 0 : 1;
-      double left = gWorkBuffer[0];
-      double right = gWorkBuffer[secondChannel];
+      float left = gWorkBuffer[0];
+      float right = gWorkBuffer[secondChannel];
 
       if (mPan + mPanInput != 0 && mOwner->mMonoOutput == false)
       {

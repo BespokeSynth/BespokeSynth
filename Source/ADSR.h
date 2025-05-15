@@ -46,7 +46,7 @@ public:
 
    struct EventInfo
    {
-      EventInfo(){};
+      EventInfo() {};
       EventInfo(double startTime, double stopTime)
       {
          mStartBlendFromValue = 0;

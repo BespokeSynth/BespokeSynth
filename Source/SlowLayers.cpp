@@ -82,7 +82,7 @@ void SlowLayers::Process(double time)
    {
       double smooth = .001;
       mSmoothedVol = mSmoothedVol * (1 - smooth) + mVol * smooth;
-      double volSq = mSmoothedVol * mSmoothedVol;
+      float volSq = mSmoothedVol * mSmoothedVol;
 
       double measurePos = TheTransport->GetMeasureTime(time);
       measurePos = DoubleWrap(measurePos, 1 << layers * mNumBars);

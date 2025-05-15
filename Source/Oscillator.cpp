@@ -25,16 +25,16 @@
 
 #include "Oscillator.h"
 
-double Oscillator::Value(double phase) const
+float Oscillator::Value(float phase) const
 {
    if (mType == kOsc_Tri)
-      phase += .5 * PI; //shift phase to make triangle start at zero instead of 1, to eliminate click on start
+      phase += .5f * FPI; //shift phase to make triangle start at zero instead of 1, to eliminate click on start
 
    if (mShuffle > 0)
    {
-      phase = fmod(phase, TWO_PI * 2);
+      phase = fmod(phase, FTWO_PI * 2);
 
-      double shufflePoint = TWO_PI * (1 + mShuffle);
+      float shufflePoint = FTWO_PI * (1 + mShuffle);
 
       if (phase < shufflePoint)
          phase = phase / (1 + mShuffle);
@@ -42,9 +42,9 @@ double Oscillator::Value(double phase) const
          phase = (phase - shufflePoint) / (1 - mShuffle);
    }
 
-   phase = fmod(phase, TWO_PI);
+   phase = fmod(phase, FTWO_PI);
 
-   double sample = 0;
+   float sample = 0;
    switch (mType)
    {
       case kOsc_Sin:
@@ -59,11 +59,11 @@ double Oscillator::Value(double phase) const
       case kOsc_Square:
          if (ofAlmostEquel(mSoften, 0.0))
          {
-            sample = phase > (TWO_PI * mPulseWidth) ? -1 : 1;
+            sample = phase > (FTWO_PI * mPulseWidth) ? -1 : 1;
          }
          else
          {
-            double phase01 = phase / TWO_PI;
+            float phase01 = phase / FTWO_PI;
             phase01 += .75;
             phase01 -= (mPulseWidth - .5) / 2;
             phase01 -= static_cast<int>(phase01);
@@ -71,7 +71,7 @@ double Oscillator::Value(double phase) const
          }
          break;
       case kOsc_Tri:
-         sample = abs(phase / TWO_PI - .5) * 4 - 1;
+         sample = abs(phase / FTWO_PI - .5f) * 4 - 1;
          break;
       case kOsc_Random:
          sample = ofRandom(-1.0, 1.0);
@@ -87,9 +87,9 @@ double Oscillator::Value(double phase) const
    return sample;
 }
 
-double Oscillator::SawSample(double phase) const
+float Oscillator::SawSample(float phase) const
 {
-   phase /= TWO_PI;
+   phase /= FTWO_PI;
    if (ofAlmostEquel(mSoften, 0.0))
       return phase * 2 - 1;
    if (phase < 1 - mSoften)

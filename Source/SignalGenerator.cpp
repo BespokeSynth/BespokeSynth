@@ -157,7 +157,7 @@ void SignalGenerator::Process(double time)
          mResetPhaseAtMs = -9999;
       }
 
-      double volSq = mVol * mVol;
+      float volSq = mVol * mVol;
 
       if (mFreqMode == kFreqMode_Root)
          mFreq = TheScale->PitchToFreq(TheScale->ScaleRoot() + 24);
@@ -166,13 +166,13 @@ void SignalGenerator::Process(double time)
       else if (mFreqMode == kFreqMode_Slider)
          mFreq = ofLerp(mFreqSliderStart, mFreqSliderEnd, mFreqSliderAmount);
 
-      double mult = mMult;
+      float mult = mMult;
       if (mult < 0)
          mult = -1.0 / mult;
-      double outputFreq = mFreq * exp2(mDetune) * mult;
-      double phaseInc = GetPhaseInc(outputFreq);
+      float outputFreq = mFreq * exp2(mDetune) * mult;
+      float phaseInc = GetPhaseInc(outputFreq);
 
-      double syncPhaseInc = 0;
+      float syncPhaseInc = 0;
       if (mSyncMode == Oscillator::SyncMode::Frequency)
          syncPhaseInc = GetPhaseInc(mSyncFreq);
       else if (mSyncMode == Oscillator::SyncMode::Ratio)

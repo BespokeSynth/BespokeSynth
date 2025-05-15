@@ -289,7 +289,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
    Sample* beat = mBeatData.mBeat;
    if (beat && mSampleIndex != -1)
    {
-      double volSq = mVolume * mVolume * .25;
+      float volSq = mVolume * mVolume * .25;
 
       double speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
       if (mDoubleTime)
@@ -309,7 +309,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
             double channelTime = time;
             for (int i = 0; i < bufferSize; ++i)
             {
-               double filter = mFilterRamp.Value(channelTime);
+               auto filter = mFilterRamp.Value(channelTime);
 
                mLowpass[ch].SetFilterParams(ofMap(std::sqrt(ofClamp(-filter, 0, 1)), 0, 1, 6000, 80), std::sqrt(2) / 2);
                mHighpass[ch].SetFilterParams(ofMap(ofClamp(filter, 0, 1), 0, 1, 10, 6000), std::sqrt(2) / 2);
@@ -322,10 +322,10 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
                int sampleChannel = ch;
                if (beat->NumChannels() == 1)
                   sampleChannel = 0;
-               double normal = gWorkChannelBuffer.GetChannel(sampleChannel)[i];
-               double lowPassed = mLowpass[ch].Filter(normal);
-               double highPassed = mHighpass[ch].Filter(normal);
-               double sample = normal * normalAmount + lowPassed * lowAmount + highPassed * highAmount;
+               float normal = gWorkChannelBuffer.GetChannel(sampleChannel)[i];
+               float lowPassed = mLowpass[ch].Filter(normal);
+               float highPassed = mHighpass[ch].Filter(normal);
+               float sample = normal * normalAmount + lowPassed * lowAmount + highPassed * highAmount;
 
                sample *= volSq * panGain;
                buffer->GetChannel(ch)[i] += sample;

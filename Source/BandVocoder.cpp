@@ -110,9 +110,9 @@ void BandVocoder::Process(double time)
 
    ComputeSliders(0);
 
-   double inputPreampSq = mInputPreamp * mInputPreamp;
-   double carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
-   double volSq = mVolume * mVolume;
+   float inputPreampSq = mInputPreamp * mInputPreamp;
+   float carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
+   float volSq = mVolume * mVolume;
 
    auto bufferSize = GetBuffer()->BufferSize();
 
@@ -127,7 +127,7 @@ void BandVocoder::Process(double time)
       BufferCopy(mWorkBuffer, GetBuffer()->GetChannel(0), bufferSize);
       mBiquadCarrier[i].Filter(mWorkBuffer, bufferSize);
 
-      double oldPeak = mPeaks[i].GetPeak();
+      auto oldPeak = mPeaks[i].GetPeak();
 
       //calculate modulator band level
       mPeaks[i].Process(mWorkBuffer, bufferSize);
