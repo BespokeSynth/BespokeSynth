@@ -917,18 +917,7 @@ void LooperRecorder::LoadState(FileStreamIn& in, int rev)
    if (ModularSynth::sLoadingFileSaveStateRev < 423)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
-
-   if (rev < 1)
-   {
-      float a, b;
-      in >> a >> b;
-      mBaseTempo = static_cast<double>(a);
-      mSpeed = static_cast<double>(b);
-   }
-   else
-   {
-      in >> mBaseTempo;
-      in >> mSpeed;
-   }
+   in >> FloatAsDouble >> mBaseTempo;
+   in >> FloatAsDouble >> mSpeed;
    mRecordBuffer.LoadState(in);
 }

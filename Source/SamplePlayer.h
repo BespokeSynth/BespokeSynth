@@ -99,7 +99,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 3; }
+   int GetModuleSaveStateRev() const override { return 2; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    bool IsEnabled() const override { return mEnabled; }

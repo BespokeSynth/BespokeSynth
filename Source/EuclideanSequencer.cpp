@@ -374,18 +374,8 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    double width, height;
-   if (rev < 3)
-   {
-      float a, b;
-      in >> a >> b;
-      width = static_cast<double>(a);
-      height = static_cast<double>(b);
-   }
-   else
-   {
-      in >> width;
-      in >> height;
-   }
+   in >> FloatAsDouble >> width;
+   in >> FloatAsDouble >> height;
    Resize(width, height);
 
    int numRings;
@@ -395,44 +385,21 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
 
    if (rev >= 2)
    {
-      if (rev < 3)
-      {
-         float a, b, c, d, e, f, g, h, i, j, k, l, m, n, o;
-         in >> a >> b >> c >> d >> e >> f >> g >> h >> i >> j >> k >> l >> m >> n >> o;
-         mRndLengthChance = static_cast<double>(a);
-         mRndLengthLo = static_cast<double>(b);
-         mRndLengthHi = static_cast<double>(c);
-         mRndOnsetChance = static_cast<double>(d);
-         mRndOnsetLo = static_cast<double>(e);
-         mRndOnsetHi = static_cast<double>(f);
-         mRndRotationChance = static_cast<double>(g);
-         mRndRotationLo = static_cast<double>(h);
-         mRndRotationHi = static_cast<double>(i);
-         mRndOffsetChance = static_cast<double>(j);
-         mRndOffsetLo = static_cast<double>(k);
-         mRndOffsetHi = static_cast<double>(l);
-         mRndNoteChance = static_cast<double>(m);
-         mRndOctaveLo = static_cast<double>(n);
-         mRndOctaveHi = static_cast<double>(o);
-      }
-      else
-      {
-         in >> mRndLengthChance;
-         in >> mRndLengthLo;
-         in >> mRndLengthHi;
-         in >> mRndOnsetChance;
-         in >> mRndOnsetLo;
-         in >> mRndOnsetHi;
-         in >> mRndRotationChance;
-         in >> mRndRotationLo;
-         in >> mRndRotationHi;
-         in >> mRndOffsetChance;
-         in >> mRndOffsetLo;
-         in >> mRndOffsetHi;
-         in >> mRndNoteChance;
-         in >> mRndOctaveLo;
-         in >> mRndOctaveHi;
-      }
+      in >> FloatAsDouble >> mRndLengthChance;
+      in >> FloatAsDouble >> mRndLengthLo;
+      in >> FloatAsDouble >> mRndLengthHi;
+      in >> FloatAsDouble >> mRndOnsetChance;
+      in >> FloatAsDouble >> mRndOnsetLo;
+      in >> FloatAsDouble >> mRndOnsetHi;
+      in >> FloatAsDouble >> mRndRotationChance;
+      in >> FloatAsDouble >> mRndRotationLo;
+      in >> FloatAsDouble >> mRndRotationHi;
+      in >> FloatAsDouble >> mRndOffsetChance;
+      in >> FloatAsDouble >> mRndOffsetLo;
+      in >> FloatAsDouble >> mRndOffsetHi;
+      in >> FloatAsDouble >> mRndNoteChance;
+      in >> FloatAsDouble >> mRndOctaveLo;
+      in >> FloatAsDouble >> mRndOctaveHi;
    }
 }
 
@@ -931,14 +898,7 @@ void EuclideanSequencerRing::LoadState(FileStreamIn& in)
    int numSteps;
    in >> numSteps;
    for (size_t i = 0; i < mSteps.size() && i < numSteps; ++i)
-      if (this->mOwner->GetModuleSaveStateRev() < 3)
-      {
-         float a;
-         in >> a;
-         mSteps[i] = static_cast<double>(a);
-      }
-      else
-         in >> mSteps[i];
+      in >> FloatAsDouble >> mSteps[i];
 }
 
 void EuclideanSequencerRing::SetSteps(int steps)

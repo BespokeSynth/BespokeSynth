@@ -1061,14 +1061,7 @@ void BassLineSequencer::LoadState(FileStreamIn& in, int rev)
    for (auto& step : mSteps)
    {
       in >> step.mTone;
-      if (rev < 1)
-      {
-         float a;
-         in >> a;
-         step.mVelocity = static_cast<double>(a);
-      }
-      else
-         in >> step.mVelocity;
+      in >> FloatAsDouble >> step.mVelocity;
       in >> step.mTie;
    }
 

@@ -902,14 +902,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
          in >> snapshotData.mControlPath;
-         if (rev < 5)
-         {
-            float a;
-            in >> a;
-            snapshotData.mValue = static_cast<double>(a);
-         }
-         else
-            in >> snapshotData.mValue;
+         in >> FloatAsDouble >> snapshotData.mValue;
          in >> snapshotData.mHasLFO;
          snapshotData.mLFOSettings.LoadState(in);
          in >> snapshotData.mGridCols;
@@ -925,16 +918,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
          }
          snapshotData.mGridContents.resize(size_t(snapshotData.mGridCols) * snapshotData.mGridRows);
          for (int k = 0; k < snapshotData.mGridCols * snapshotData.mGridRows; ++k)
-         {
-            if (rev < 5)
-            {
-               float a;
-               in >> a;
-               snapshotData.mGridContents[k] = static_cast<double>(a);
-            }
-            else
-               in >> snapshotData.mGridContents[k];
-         }
+            in >> FloatAsDouble >> snapshotData.mGridContents[k];
          in >> snapshotData.mString;
       }
       in >> mSnapshotCollection[i].mLabel;
@@ -988,18 +972,8 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
    if (rev >= 4)
    {
       double w, h;
-      if (rev < 5)
-      {
-         float a, b;
-         in >> a >> b;
-         w = static_cast<double>(a);
-         h = static_cast<double>(b);
-      }
-      else
-      {
-         in >> w;
-         in >> h;
-      }
+      in >> FloatAsDouble >> w;
+      in >> FloatAsDouble >> h;
       if (mDisplayMode == DisplayMode::Grid)
          SetGridSize(w, h);
    }

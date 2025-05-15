@@ -298,7 +298,7 @@ void CanvasElement::ButtonClicked(std::string label, double time)
 
 namespace
 {
-   const int kCESaveStateRev = 2;
+   const int kCESaveStateRev = 1;
 }
 
 void CanvasElement::SaveState(FileStreamOut& out)
@@ -320,18 +320,8 @@ void CanvasElement::LoadState(FileStreamIn& in)
       in >> mRow;
       in >> mCol;
    }
-   if (rev < 2)
-   {
-      float a, b;
-      in >> a >> b;
-      mOffset = static_cast<double>(a);
-      mLength = static_cast<double>(b);
-   }
-   else
-   {
-      in >> mOffset;
-      in >> mLength;
-   }
+   in >> FloatAsDouble >> mOffset;
+   in >> FloatAsDouble >> mLength;
 }
 
 ////////////////////
@@ -457,14 +447,7 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
    in >> rev;
    LoadStateValidate(rev <= kNCESaveStateRev);
 
-   if (rev < 1)
-   {
-      float a;
-      in >> a;
-      mVelocity = static_cast<double>(a);
-   }
-   else
-      in >> mVelocity;
+   in >> FloatAsDouble >> mVelocity;
 
    if (rev > 0)
    {
@@ -598,7 +581,7 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2d offset)
 
 namespace
 {
-   const int kSCESaveStateRev = 3;
+   const int kSCESaveStateRev = 2;
 }
 
 void SampleCanvasElement::SaveState(FileStreamOut& out)
@@ -636,14 +619,7 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
       in >> dummy;
       in >> dummy;
    }
-   if (rev < 3)
-   {
-      float a;
-      in >> a;
-      mVolume = static_cast<double>(a);
-   }
-   else
-      in >> mVolume;
+   in >> FloatAsDouble >> mVolume;
    if (rev == 0)
    {
       bool dummy;
@@ -764,7 +740,7 @@ double EventCanvasElement::GetEnd() const
 
 namespace
 {
-   const int kECESaveStateRev = 2;
+   const int kECESaveStateRev = 1;
 }
 
 void EventCanvasElement::SaveState(FileStreamOut& out)
@@ -784,14 +760,8 @@ void EventCanvasElement::LoadState(FileStreamIn& in)
    in >> rev;
    LoadStateValidate(rev <= kECESaveStateRev);
 
-   if (rev < 2)
-   {
-      float a;
-      in >> a;
-      mValue = static_cast<double>(a);
-   }
-   else
-      in >> mValue;
+   in >> FloatAsDouble >> mValue;
+
    if (rev < 1)
    {
       std::string dummy;

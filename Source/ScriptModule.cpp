@@ -1578,18 +1578,8 @@ void ScriptModule::LoadState(FileStreamIn& in, int rev)
    }
 
    double w, h;
-   if (rev < 3)
-   {
-      float a, b;
-      in >> a >> b;
-      w = static_cast<double>(a);
-      h = static_cast<double>(b);
-   }
-   else
-   {
-      in >> w;
-      in >> h;
-   }
+   in >> FloatAsDouble >> w;
+   in >> FloatAsDouble >> h;
    Resize(w, h);
 
    juce::String checksum = GetScriptChecksum();

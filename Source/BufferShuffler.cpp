@@ -519,18 +519,8 @@ void BufferShuffler::LoadState(FileStreamIn& in, int rev)
 
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   if (rev < 1)
-   {
-      float a, b;
-      in >> a >> b;
-      mWidth = static_cast<double>(a);
-      mHeight = static_cast<double>(b);
-   }
-   else
-   {
-      in >> mWidth;
-      in >> mHeight;
-   }
+   in >> FloatAsDouble >> mWidth;
+   in >> FloatAsDouble >> mHeight;
    Resize(mWidth, mHeight);
 
    int savedSampleRate;

@@ -921,14 +921,7 @@ void SongBuilder::LoadState(FileStreamIn& in, int rev)
       {
          mScenes[i]->mValues[j] = new ControlValue();
          in >> mScenes[i]->mValues[j]->mId;
-         if (rev < 2)
-         {
-            float a;
-            in >> a;
-            mScenes[i]->mValues[j]->mFloatValue = static_cast<double>(a);
-         }
-         else
-            in >> mScenes[i]->mValues[j]->mFloatValue;
+         in >> FloatAsDouble >> mScenes[i]->mValues[j]->mFloatValue;
          in >> mScenes[i]->mValues[j]->mBoolValue;
          in >> mScenes[i]->mValues[j]->mIntValue;
          mScenes[i]->mValues[j]->CreateUIControls(this);

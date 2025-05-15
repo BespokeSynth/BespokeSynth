@@ -51,7 +51,7 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
    bool IsEnabled() const override { return true; }
 

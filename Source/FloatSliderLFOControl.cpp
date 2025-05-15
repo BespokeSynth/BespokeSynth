@@ -539,7 +539,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
 
 namespace
 {
-   const int kSaveStateRev = 7;
+   const int kSaveStateRev = 6;
    const int kFixNonRevvedData = 999;
 }
 
@@ -576,81 +576,29 @@ void LFOSettings::LoadState(FileStreamIn& in)
    mInterval = (NoteInterval)temp;
    in >> temp;
    mOscType = (OscillatorType)temp;
-   if (rev < 7)
-   {
-      float a, b;
-      in >> a >> b;
-      mLFOOffset = static_cast<double>(a);
-      mBias = static_cast<double>(b);
-   }
-   else
-   {
-      in >> mLFOOffset;
-      in >> mBias;
-   }
+   in >> FloatAsDouble >> mLFOOffset;
+   in >> FloatAsDouble >> mBias;
+
    if (rev >= 1)
-   {
-      if (rev < 7)
-      {
-         float a;
-         in >> a;
-         mSpread = static_cast<double>(a);
-      }
-      else
-         in >> mSpread;
-   }
+      in >> FloatAsDouble >> mSpread;
    if (rev >= 2)
    {
-      if (rev < 7)
-      {
-         float a, b;
-         in >> a >> b;
-         mSoften = static_cast<double>(a);
-         mShuffle = static_cast<double>(b);
-      }
-      else
-      {
-         in >> mSoften;
-         in >> mShuffle;
-      }
+      in >> FloatAsDouble >> mSoften;
+      in >> FloatAsDouble >> mShuffle;
    }
    if (rev >= 3)
    {
-      if (rev < 7)
-      {
-         float a;
-         in >> a;
-         mFreeRate = static_cast<double>(a);
-      }
-      else
-         in >> mFreeRate;
+      in >> FloatAsDouble >> mFreeRate;
    }
    if (rev >= 4)
    {
-      if (rev < 7)
-      {
-         float a;
-         in >> a;
-         mLength = static_cast<double>(a);
-      }
-      else
-         in >> mLength;
+      in >> FloatAsDouble >> mLength;
    }
    if (rev >= 5)
       in >> mLowResMode;
    if (rev >= 6)
    {
-      if (rev < 7)
-      {
-         float a, b;
-         in >> a >> b;
-         mMinValue = static_cast<double>(a);
-         mMaxValue = static_cast<double>(b);
-      }
-      else
-      {
-         in >> mMinValue;
-         in >> mMaxValue;
-      }
+      in >> FloatAsDouble >> mMinValue;
+      in >> FloatAsDouble >> mMaxValue;
    }
 }

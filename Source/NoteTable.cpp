@@ -785,18 +785,8 @@ void NoteTable::LoadState(FileStreamIn& in, int rev)
    if (rev >= 3)
    {
       double width, height;
-      if (rev < 4)
-      {
-         float a, b;
-         in >> a >> b;
-         width = static_cast<double>(a);
-         height = static_cast<double>(b);
-      }
-      else
-      {
-         in >> width;
-         in >> height;
-      }
+      in >> FloatAsDouble >> width;
+      in >> FloatAsDouble >> height;
       mGrid->SetDimensions(width, height);
    }
 }

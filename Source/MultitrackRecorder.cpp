@@ -234,14 +234,7 @@ void MultitrackRecorder::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   if (rev < 1)
-   {
-      float a;
-      in >> a;
-      mWidth = static_cast<double>(a);
-   }
-   else
-      in >> mWidth;
+   in >> FloatAsDouble >> mWidth;
 
    //preserve order
    int numTracks;

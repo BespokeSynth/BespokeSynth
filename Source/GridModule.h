@@ -95,7 +95,7 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 5; }
+   int GetModuleSaveStateRev() const override { return 4; }
 
    bool IsEnabled() const override { return mEnabled; }
 

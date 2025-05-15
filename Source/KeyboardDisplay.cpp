@@ -418,18 +418,9 @@ void KeyboardDisplay::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   if (rev < 3)
-   {
-      float a, b;
-      in >> a >> b;
-      mWidth = static_cast<double>(a);
-      mHeight = static_cast<double>(b);
-   }
-   else
-   {
-      in >> mWidth;
-      in >> mHeight;
-   }
+   in >> FloatAsDouble >> mWidth;
+   in >> FloatAsDouble >> mHeight;
+
    if (rev >= 2)
    {
       in >> mNumOctaves;

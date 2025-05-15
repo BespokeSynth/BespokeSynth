@@ -371,18 +371,8 @@ void GridModule::LoadState(FileStreamIn& in, int rev)
    {
       mGrid->LoadState(in);
       double w, h;
-      if (rev < 5)
-      {
-         float a, b;
-         in >> a >> b;
-         w = static_cast<double>(a);
-         h = static_cast<double>(b);
-      }
-      else
-      {
-         in >> w;
-         in >> h;
-      }
+      in >> FloatAsDouble >> w;
+      in >> FloatAsDouble >> h;
       mGrid->SetDimensions(w, h);
    }
 

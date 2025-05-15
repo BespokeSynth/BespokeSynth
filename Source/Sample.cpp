@@ -316,7 +316,7 @@ void Sample::CopyFrom(Sample* sample)
 
 namespace
 {
-   const int kSaveStateRev = 2;
+   const int kSaveStateRev = 1;
 }
 
 void Sample::SaveState(FileStreamOut& out)
@@ -357,24 +357,10 @@ void Sample::LoadState(FileStreamIn& in)
    }
    in >> mNumBars;
    in >> mLooping;
-   if (rev < 2)
-   {
-      float a;
-      in >> a;
-      mRate = static_cast<double>(a);
-   }
-   else
-      in >> mRate;
+   in >> FloatAsDouble >> mRate;
    if (rev == 0)
    {
-      if (rev < 2)
-      {
-         float a;
-         in >> a;
-         mSampleRateRatio = static_cast<double>(a);
-      }
-      else
-         in >> mSampleRateRatio;
+      in >> FloatAsDouble >> mSampleRateRatio;
       mOriginalSampleRate = gSampleRate * mSampleRateRatio;
    }
    else

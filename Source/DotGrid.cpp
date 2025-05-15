@@ -434,7 +434,7 @@ int DotGrid::GetHighlightCol(double time) const
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 0;
 }
 
 void DotGrid::SaveState(FileStreamOut& out)
@@ -469,18 +469,8 @@ void DotGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
       {
          int dataIndex = GetDataIndex(col, row);
          in >> mData[dataIndex].mOn;
-         if (rev < 1)
-         {
-            float a, b;
-            in >> a >> b;
-            mData[dataIndex].mVelocity = static_cast<double>(a);
-            mData[dataIndex].mLength = static_cast<double>(b);
-         }
-         else
-         {
-            in >> mData[dataIndex].mVelocity;
-            in >> mData[dataIndex].mLength;
-         }
+         in >> FloatAsDouble >> mData[dataIndex].mVelocity;
+         in >> FloatAsDouble >> mData[dataIndex].mLength;
       }
    }
 }

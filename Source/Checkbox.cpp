@@ -226,7 +226,7 @@ void Checkbox::OnPulse(double time, double velocity, int flags)
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 0;
 }
 
 void Checkbox::SaveState(FileStreamOut& out)
@@ -243,14 +243,8 @@ void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
    LoadStateValidate(rev <= kSaveStateRev);
 
    double var;
-   if (rev < 1)
-   {
-      float a;
-      in >> a;
-      var = static_cast<double>(a);
-   }
-   else
-      in >> var;
+   in >> FloatAsDouble >> var;
+
    if (shouldSetValue)
       SetValueDirect(var, gTime);
 }

@@ -1290,18 +1290,8 @@ void DrumPlayer::LoadState(FileStreamIn& in, int rev)
    {
       mDrumHits[i].mSample.LoadState(in);
       in >> mDrumHits[i].mLinkId;
-      if (rev < 2)
-      {
-         float a, b;
-         in >> a >> b;
-         mDrumHits[i].mVol = static_cast<double>(a);
-         mDrumHits[i].mSpeed = static_cast<double>(b);
-      }
-      else
-      {
-         in >> mDrumHits[i].mVol;
-         in >> mDrumHits[i].mSpeed;
-      }
+      in >> FloatAsDouble >> mDrumHits[i].mVol;
+      in >> FloatAsDouble >> mDrumHits[i].mSpeed;
       if (rev >= 1)
       {
          in >> mDrumHits[i].mHitCategory;

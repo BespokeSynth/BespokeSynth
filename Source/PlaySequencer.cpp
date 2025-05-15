@@ -631,13 +631,6 @@ void PlaySequencer::LoadState(FileStreamIn& in, int rev)
       in >> size;
       LoadStateValidate(size == (int)mSavedPatterns[i].mData.size());
       for (int j = 0; j < size; ++j)
-         if (rev < 1)
-         {
-            float a;
-            in >> a;
-            mSavedPatterns[i].mData[j] = static_cast<double>(a);
-         }
-         else
-            in >> mSavedPatterns[i].mData[j];
+         in >> FloatAsDouble >> mSavedPatterns[i].mData[j];
    }
 }

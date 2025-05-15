@@ -300,17 +300,7 @@ void SampleCanvas::LoadState(FileStreamIn& in, int rev)
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    double w, h;
-   if (rev < 2)
-   {
-      float a, b;
-      in >> a >> b;
-      w = static_cast<double>(a);
-      h = static_cast<double>(b);
-   }
-   else
-   {
-      in >> w;
-      in >> h;
-   }
+   in >> FloatAsDouble >> w;
+   in >> FloatAsDouble >> h;
    mCanvas->SetDimensions(w, h);
 }

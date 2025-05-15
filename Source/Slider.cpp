@@ -735,7 +735,7 @@ void FloatSlider::OnTransportAdvanced(double amount)
 
 namespace
 {
-   const int kFloatSliderSaveStateRev = 7;
+   const int kFloatSliderSaveStateRev = 6;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
@@ -766,18 +766,9 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    int rev;
    in >> rev;
 
-   float var{ 0 };
-   double vard{ 0 };
-   if (rev < 7)
-   {
-      in >> var;
-      mRamp.SetValue(var);
-   }
-   else
-   {
-      in >> vard;
-      mRamp.SetValue(vard);
-   }
+   double var{ 0 };
+   in >> FloatAsDouble >> var;
+   mRamp.SetValue(var);
 
    if (rev < 5)
    {
@@ -804,34 +795,14 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 
    if (rev >= 2)
    {
-      if (rev < 7)
-      {
-         float a, b;
-         in >> a >> b;
-         mModulatorMin = static_cast<double>(a);
-         mModulatorMax = static_cast<double>(b);
-      }
-      else
-      {
-         in >> mModulatorMin;
-         in >> mModulatorMax;
-      }
+      in >> FloatAsDouble >> mModulatorMin;
+      in >> FloatAsDouble >> mModulatorMax;
    }
 
    if (rev >= 3)
    {
-      if (rev < 7)
-      {
-         float a, b;
-         in >> a >> b;
-         mSmooth = static_cast<double>(a);
-         mSmoothTarget = static_cast<double>(b);
-      }
-      else
-      {
-         in >> mSmooth;
-         in >> mSmoothTarget;
-      }
+      in >> FloatAsDouble >> mSmooth;
+      in >> FloatAsDouble >> mSmoothTarget;
       in >> mIsSmoothing;
 
       if (mIsSmoothing)
@@ -840,18 +811,8 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 
    if (rev >= 4)
    {
-      if (rev < 7)
-      {
-         float a, b;
-         in >> a >> b;
-         mMin = static_cast<double>(a);
-         mMax = static_cast<double>(b);
-      }
-      else
-      {
-         in >> mMin;
-         in >> mMax;
-      }
+      in >> FloatAsDouble >> mMin;
+      in >> FloatAsDouble >> mMax;
    }
 
    if (rev >= 6)
@@ -885,12 +846,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    }
 
    if (shouldSetValue && (mModulator == nullptr || !mModulator->Active()))
-   {
-      if (rev < 7)
-         SetValueDirect(var, gTime);
-      else
-         SetValueDirect(vard, gTime);
-   }
+      SetValueDirect(var, gTime);
 }
 
 IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y, int w, int h, int* var, int min, int max)
@@ -1255,7 +1211,7 @@ void IntSlider::TextEntryCancelled(TextEntry* entry)
 
 namespace
 {
-   const int kIntSliderSaveStateRev = 2;
+   const int kIntSliderSaveStateRev = 1;
 }
 
 void IntSlider::SaveState(FileStreamOut& out)
@@ -1274,14 +1230,7 @@ void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    LoadStateValidate(rev <= kIntSliderSaveStateRev);
 
    double var;
-   if (rev < 2)
-   {
-      float a;
-      in >> a;
-      var = static_cast<double>(a);
-   }
-   else
-      in >> var;
+   in >> FloatAsDouble >> var;
 
    if (rev >= 1)
    {

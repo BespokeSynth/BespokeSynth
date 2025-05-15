@@ -221,7 +221,7 @@ bool ::ADSR::IsDone(double time) const
 
 namespace
 {
-   const int kSaveStateRev = 2;
+   const int kSaveStateRev = 1;
 }
 
 void ::ADSR::SaveState(FileStreamOut& out)
@@ -254,14 +254,7 @@ void ::ADSR::LoadState(FileStreamIn& in)
    float dummy;
    in >> dummy;
    in >> mSustainStage;
-   if (rev < 2)
-   {
-      float a;
-      in >> a;
-      mMaxSustain = static_cast<double>(a);
-   }
-   else
-      in >> mMaxSustain;
+   in >> FloatAsDouble >> mMaxSustain;
    in >> mNumStages;
    in >> mHasSustainStage;
    in >> mFreeReleaseLevel;
@@ -270,33 +263,11 @@ void ::ADSR::LoadState(FileStreamIn& in)
    assert(maxNumStages == MAX_ADSR_STAGES);
    for (int i = 0; i < maxNumStages; ++i)
    {
-      if (rev < 2)
-      {
-         float a, b, c;
-         in >> a;
-         in >> b;
-         in >> c;
-         mStages[i].curve = static_cast<double>(a);
-         mStages[i].target = static_cast<double>(b);
-         mStages[i].time = static_cast<double>(c);
-      }
-      else
-      {
-         in >> mStages[i].curve;
-         in >> mStages[i].target;
-         in >> mStages[i].time;
-      }
+      in >> FloatAsDouble >> mStages[i].curve;
+      in >> FloatAsDouble >> mStages[i].target;
+      in >> FloatAsDouble >> mStages[i].time;
    }
 
    if (rev >= 1)
-   {
-      if (rev < 2)
-      {
-         float a;
-         in >> a;
-         mTimeScale = static_cast<double>(a);
-      }
-      else
-         in >> mTimeScale;
-   }
+      in >> FloatAsDouble >> mTimeScale;
 }

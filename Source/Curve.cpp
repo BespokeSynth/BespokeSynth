@@ -177,7 +177,7 @@ bool Curve::MouseScrolled(double x, double y, double scrollX, double scrollY, bo
 
 namespace
 {
-   const int kSaveStateRev = 2;
+   const int kSaveStateRev = 1;
 }
 
 void Curve::SaveState(FileStreamOut& out)
@@ -198,14 +198,6 @@ void Curve::LoadState(FileStreamIn& in)
    in >> mNumCurvePoints;
    for (int i = 0; i < mNumCurvePoints; ++i)
    {
-      if (rev < 2)
-      {
-         float a, b;
-         in >> a >> b;
-         mPoints[i].mTime = static_cast<double>(a);
-         mPoints[i].mValue = static_cast<double>(b);
-      }
-      else
-         in >> mPoints[i].mTime >> mPoints[i].mValue;
+      in >> FloatAsDouble >> mPoints[i].mTime >> FloatAsDouble >> mPoints[i].mValue;
    }
 }

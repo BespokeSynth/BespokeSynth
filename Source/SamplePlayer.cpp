@@ -1451,20 +1451,9 @@ void SamplePlayer::LoadState(FileStreamIn& in, int rev)
       mSampleCuePoints.resize(size);
       for (size_t i = 0; i < size; ++i)
       {
-         if (rev < 3)
-         {
-            float a, b, c;
-            in >> a >> b >> c;
-            mSampleCuePoints[i].startSeconds = static_cast<double>(a);
-            mSampleCuePoints[i].lengthSeconds = static_cast<double>(b);
-            mSampleCuePoints[i].speed = static_cast<double>(c);
-         }
-         else
-         {
-            in >> mSampleCuePoints[i].startSeconds;
-            in >> mSampleCuePoints[i].lengthSeconds;
-            in >> mSampleCuePoints[i].speed;
-         }
+         in >> FloatAsDouble >> mSampleCuePoints[i].startSeconds;
+         in >> FloatAsDouble >> mSampleCuePoints[i].lengthSeconds;
+         in >> FloatAsDouble >> mSampleCuePoints[i].speed;
          if (rev >= 2)
             in >> mSampleCuePoints[i].stopOnNoteOff;
       }

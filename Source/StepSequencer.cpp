@@ -1097,18 +1097,8 @@ void StepSequencer::LoadState(FileStreamIn& in, int rev)
    if (rev >= 3)
    {
       double gridWidth, gridHeight;
-      if (rev < 4)
-      {
-         float a, b;
-         in >> a >> b;
-         gridWidth = static_cast<double>(a);
-         gridHeight = static_cast<double>(b);
-      }
-      else
-      {
-         in >> gridWidth;
-         in >> gridHeight;
-      }
+      in >> FloatAsDouble >> gridWidth;
+      in >> FloatAsDouble >> gridHeight;
       mGrid->SetDimensions(gridWidth, gridHeight);
    }
 }

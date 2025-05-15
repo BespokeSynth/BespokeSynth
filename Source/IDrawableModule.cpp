@@ -1224,7 +1224,7 @@ void IDrawableModule::SetUpFromSaveDataBase()
 
 namespace
 {
-   const int kBaseSaveStateRev = 4;
+   const int kBaseSaveStateRev = 3;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
@@ -1316,17 +1316,8 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
    if (baseRev > 2)
    {
       in >> mPinned;
-      if (baseRev < 4)
-      {
-         float a, b;
-         in >> a >> b;
-         mPinnedPosition = { static_cast<double>(a), static_cast<double>(b) };
-      }
-      else
-      {
-         in >> mPinnedPosition.x;
-         in >> mPinnedPosition.y;
-      }
+      in >> FloatAsDouble >> mPinnedPosition.x;
+      in >> FloatAsDouble >> mPinnedPosition.y;
    }
 
    int numUIControls;
@@ -1337,16 +1328,8 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
       in >> uicontrolname;
       if (baseRev >= 2)
       {
-         if (baseRev < 4)
-         {
-            float rawValue;
-            in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
-         }
-         else
-         {
-            double rawValue;
-            in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
-         }
+         double rawValue;
+         in >> FloatAsDouble >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
       }
       UpdateOldControlName(uicontrolname);
 

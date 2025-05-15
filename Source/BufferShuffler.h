@@ -80,7 +80,7 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 0; }
 
    bool IsEnabled() const override { return mEnabled; }
    bool HasDebugDraw() const override { return true; }

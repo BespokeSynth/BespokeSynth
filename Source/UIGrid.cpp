@@ -599,7 +599,7 @@ std::string UIGrid::GetDisplayValue(double val) const
 
 namespace
 {
-   const int kSaveStateRev = 3;
+   const int kSaveStateRev = 2;
 }
 
 void UIGrid::SaveState(FileStreamOut& out)
@@ -652,14 +652,7 @@ void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
          else
             dataIndex = GetDataIndex(col, row);
          double oldVal = mData[dataIndex];
-         if (rev < 3)
-         {
-            float a;
-            in >> a;
-            mData[dataIndex] = static_cast<double>(a);
-         }
-         else
-            in >> mData[dataIndex];
+         in >> FloatAsDouble >> mData[dataIndex];
          if (mListener)
             mListener->GridUpdated(this, col, row, mData[dataIndex], oldVal);
       }

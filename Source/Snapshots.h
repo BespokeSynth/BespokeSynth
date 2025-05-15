@@ -85,7 +85,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
-   int GetModuleSaveStateRev() const override { return 5; }
+   int GetModuleSaveStateRev() const override { return 4; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 

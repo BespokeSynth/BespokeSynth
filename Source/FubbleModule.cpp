@@ -549,14 +549,7 @@ void FubbleModule::LoadState(FileStreamIn& in, int rev)
 
    if (rev >= 3)
    {
-      if (rev < 4)
-      {
-         float a;
-         in >> a;
-         mLength = static_cast<double>(a);
-      }
-      else
-         in >> mLength;
+      in >> FloatAsDouble >> mLength;
       mAxisH.mCurve.SetExtents(0, mLength);
       mAxisV.mCurve.SetExtents(0, mLength);
       in >> mRecordStartOffset;
