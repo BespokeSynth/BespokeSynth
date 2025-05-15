@@ -11,10 +11,10 @@ Push2Display *Push2Display::create()
 #endif
 }
 
-NBase::Result Push2Display::Init()
+NBase::Result Push2Display::Init(DeviceType deviceType)
 {
 #if BESPOKE_PUSH2_SUPPORT
-  return communicator_.Init(dataSource_);
+  return communicator_.Init(dataSource_, deviceType);
 #else
   return {""}; // unreachable unless this is nullptr
 #endif
