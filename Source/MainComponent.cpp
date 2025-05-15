@@ -30,6 +30,9 @@ class MainContentComponent : public OpenGLAppComponent,
                              private Timer
 {
 public:
+   static constexpr const char* kAutoDevice = "auto";
+   static constexpr const char* kNoneDevice = "none";
+
    //==============================================================================
    MainContentComponent()
    : mSpaceMouseReader(mSynth)
@@ -145,6 +148,22 @@ public:
       mScreenPosition = getScreenPosition();
 
       mSpaceMouseReader.Poll();
+
+      if (mAudioDeviceConnectionState == AudioDeviceConnectionState::CheckForDisconnection)
+      {
+         if (!HasDesiredAudioDevice())
+            mAudioDeviceConnectionState = AudioDeviceConnectionState::Disconnected;
+      }
+
+      if (mAudioDeviceConnectionState == AudioDeviceConnectionState::Disconnected)
+      {
+         if (HasDesiredAudioDevice())
+         {
+            String audioError = InitializeAudioDevice();
+            if (audioError.isEmpty())
+               mAudioDeviceConnectionState = AudioDeviceConnectionState::Connected;
+         }
+      }
    }
 
    //==============================================================================
@@ -155,6 +174,8 @@ public:
 
       // You can use this function to initialise any resources you might need,
       // but be careful - it will be called on the audio thread, not the GUI thread.
+
+      ofLog() << "audioDeviceAboutToStart()";
    }
 
    void audioDeviceIOCallbackWithContext(const float* const* inputChannelData,
@@ -171,6 +192,8 @@ public:
 
    void audioDeviceStopped() override
    {
+      ofLog() << "audioDeviceStopped()";
+      mAudioDeviceConnectionState = AudioDeviceConnectionState::CheckForDisconnection;
    }
 
    void shutdownAudio()
@@ -207,9 +230,6 @@ public:
             ofLog() << output.toStdString();
       }*/
 
-      const std::string kAutoDevice = "auto";
-      const std::string kNoneDevice = "none";
-
       if (UserPrefs.devicetype.Get() != kAutoDevice)
          mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(UserPrefs.devicetype.Get(), true);
 
@@ -217,37 +237,13 @@ public:
 
       mSynth.Setup(&mGlobalManagers.mDeviceManager, &mGlobalManagers.mAudioFormatManager, this, &openGLContext);
 
-      std::string outputDevice = UserPrefs.audio_output_device.Get();
-      std::string inputDevice = UserPrefs.audio_input_device.Get();
-      if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
-         inputDevice = outputDevice; //asio must have identical input and output
-
-      AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
-      preferredSetupOptions.sampleRate = gSampleRate / UserPrefs.oversampling.Get();
-      preferredSetupOptions.bufferSize = gBufferSize / UserPrefs.oversampling.Get();
-      if (outputDevice != kAutoDevice && outputDevice != kNoneDevice)
-         preferredSetupOptions.outputDeviceName = outputDevice;
-      if (inputDevice != kAutoDevice && inputDevice != kNoneDevice)
-         preferredSetupOptions.inputDeviceName = inputDevice;
-
 #ifdef JUCE_WINDOWS
       CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
 
-      int inputChannels = UserPrefs.max_input_channels.Get();
-      int outputChannels = UserPrefs.max_output_channels.Get();
-
-      if (inputDevice == kNoneDevice)
-         inputChannels = 0;
-      if (outputDevice == kNoneDevice)
-         outputChannels = 0;
-
-      String audioError = mGlobalManagers.mDeviceManager.initialise(inputChannels,
-                                                                    outputChannels,
-                                                                    nullptr,
-                                                                    true,
-                                                                    "",
-                                                                    &preferredSetupOptions);
+      std::string inputDevice = GetInputDeviceName();
+      std::string outputDevice = GetOutputDeviceName();
+      String audioError = InitializeAudioDevice();
 
       if (audioError.isEmpty())
       {
@@ -297,6 +293,8 @@ public:
             mSynth.InitIOBuffers(numInputChannels, numOutputChannels);
 
             mGlobalManagers.mDeviceManager.addAudioCallback(this);
+
+            mAudioDeviceConnectionState = AudioDeviceConnectionState::Connected;
          }
       }
       else
@@ -322,6 +320,78 @@ public:
 
       UserPrefs.LastTargetFramerate = UserPrefs.target_framerate.Get();
       startTimerHz(UserPrefs.target_framerate.Get());
+   }
+
+   std::string GetInputDeviceName() const
+   {
+      std::string inputDevice = UserPrefs.audio_input_device.Get();
+      if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
+         inputDevice = GetOutputDeviceName(); //asio must have identical input and output
+      return inputDevice;
+   }
+
+   std::string GetOutputDeviceName() const
+   {
+      return UserPrefs.audio_output_device.Get();
+   }
+
+   AudioDeviceManager::AudioDeviceSetup GetPreferredSetupOptions() const
+   {
+      std::string inputDevice = GetInputDeviceName();
+      std::string outputDevice = GetOutputDeviceName();
+      AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
+      preferredSetupOptions.sampleRate = gSampleRate / UserPrefs.oversampling.Get();
+      preferredSetupOptions.bufferSize = gBufferSize / UserPrefs.oversampling.Get();
+      if (outputDevice != kAutoDevice && outputDevice != kNoneDevice)
+         preferredSetupOptions.outputDeviceName = outputDevice;
+      if (inputDevice != kAutoDevice && inputDevice != kNoneDevice)
+         preferredSetupOptions.inputDeviceName = inputDevice;
+      return preferredSetupOptions;
+   }
+
+   String InitializeAudioDevice()
+   {
+      std::string inputDevice = GetInputDeviceName();
+      std::string outputDevice = GetOutputDeviceName();
+      AudioDeviceManager::AudioDeviceSetup preferredSetupOptions = GetPreferredSetupOptions();
+
+      int inputChannels = UserPrefs.max_input_channels.Get();
+      int outputChannels = UserPrefs.max_output_channels.Get();
+
+      if (inputDevice == kNoneDevice)
+         inputChannels = 0;
+      if (outputDevice == kNoneDevice)
+         outputChannels = 0;
+
+      String audioError = mGlobalManagers.mDeviceManager.initialise(inputChannels,
+                                                                    outputChannels,
+                                                                    nullptr,
+                                                                    true,
+                                                                    "",
+                                                                    &preferredSetupOptions);
+
+      return audioError;
+   }
+
+   bool HasDesiredAudioDevice()
+   {
+      String inputName = GetInputDeviceName();
+      String outputName = GetOutputDeviceName();
+      bool foundInputDevice = false;
+      bool foundOutputDevice = false;
+      for (auto& deviceType : mGlobalManagers.mDeviceManager.getAvailableDeviceTypes())
+      {
+         for (auto& deviceName : deviceType->getDeviceNames(K(isInput)))
+            if (deviceName.trim().equalsIgnoreCase(inputName.trim()))
+               foundInputDevice = true;
+         for (auto& deviceName : deviceType->getDeviceNames(!K(isInput)))
+            if (deviceName.trim().equalsIgnoreCase(outputName.trim()))
+               foundOutputDevice = true;
+      }
+      if (foundInputDevice && foundOutputDevice)
+         return true;
+      else
+         return false;
    }
 
    void shutdown() override
@@ -584,6 +654,15 @@ private:
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;
    SpaceMouseMessageWindow mSpaceMouseReader;
+
+   enum class AudioDeviceConnectionState
+   {
+      None,
+      Connected,
+      CheckForDisconnection,
+      Disconnected
+   };
+   AudioDeviceConnectionState mAudioDeviceConnectionState{ AudioDeviceConnectionState::None };
 
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };
