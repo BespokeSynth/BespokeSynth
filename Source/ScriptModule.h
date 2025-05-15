@@ -59,11 +59,11 @@ public:
 
    void Poll() override;
 
-   void PlayNoteFromScript(float pitch, float velocity, float pan, int noteOutputIndex);
-   void PlayNoteFromScriptAfterDelay(float pitch, float velocity, double delayMeasureTime, float pan, int noteOutputIndex);
+   void PlayNoteFromScript(double pitch, double velocity, double pan, int noteOutputIndex);
+   void PlayNoteFromScriptAfterDelay(double pitch, double velocity, double delayMeasureTime, double pan, int noteOutputIndex);
    void SendCCFromScript(int control, int value, int noteOutputIndex);
    void ScheduleMethod(std::string method, double delayMeasureTime);
-   void ScheduleUIControlValue(IUIControl* control, float value, double delayMeasureTime);
+   void ScheduleUIControlValue(IUIControl* control, double value, double delayMeasureTime);
    void HighlightLine(int lineNum, int scriptModuleIndex);
    void PrintText(std::string text);
    IUIControl* GetUIControl(std::string path);
@@ -72,7 +72,7 @@ public:
    void SetNumNoteOutputs(int num);
    void ConnectOscInput(int port);
    void SysExReceived(const uint8_t* data, int data_size);
-   void MidiReceived(MidiMessageType messageType, int control, float value, int channel);
+   void MidiReceived(MidiMessageType messageType, int control, double value, int channel);
    void OnModuleReferenceBound(IDrawableModule* target);
    void SetContext();
    void ClearContext();
@@ -80,9 +80,9 @@ public:
 
    void RunCode(double time, std::string code);
 
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldValue, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldValue, double time) override {}
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldValue, double time) override;
 
@@ -110,11 +110,11 @@ public:
    static std::list<ScriptModule*> sScriptsRequestingInitExecution;
    static ScriptModule* sMostRecentLineExecutedModule;
    static ScriptModule* sPriorExecutedModule;
-   static float GetScriptMeasureTime();
-   static float GetTimeSigRatio();
+   static double GetScriptMeasureTime();
+   static double GetTimeSigRatio();
    static std::string sBackgroundTextString;
-   static float sBackgroundTextSize;
-   static ofVec2f sBackgroundTextPos;
+   static double sBackgroundTextSize;
+   static ofVec2d sBackgroundTextPos;
    static ofColor sBackgroundTextColor;
    static bool sPythonInitialized;
    static bool sHasPythonEverSuccessfullyInitialized;
@@ -130,11 +130,11 @@ public:
    bool IsEnabled() const override { return true; }
 
 private:
-   void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
-   void AdjustUIControl(IUIControl* control, float value, double time, int lineNum);
+   void PlayNote(double time, double pitch, double velocity, double pan, int noteOutputIndex, int lineNum);
+   void AdjustUIControl(IUIControl* control, double value, double time, int lineNum);
    std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
-   void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
+   void ScheduleNote(double time, double pitch, double velocity, double pan, int noteOutputIndex);
    void SendNoteToIndex(int index, NoteMessage note);
    std::string GetThisName();
    std::string GetIndentation(std::string line);
@@ -152,11 +152,11 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void Resize(double w, double h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -181,13 +181,13 @@ private:
    bool mHotloadScripts{ false };
    bool mDrawBoundModuleConnections{ true };
    static ofxJSONElement sStyleJSON;
-   float mA{ 0 };
-   float mB{ 0 };
-   float mC{ 0 };
-   float mD{ 0 };
+   double mA{ 0 };
+   double mB{ 0 };
+   double mC{ 0 };
+   double mD{ 0 };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    std::array<double, 20> mScheduledPulseTimes{};
    std::string mLastError;
    size_t mScriptModuleIndex;
@@ -201,9 +201,9 @@ private:
    {
       double startTime{ 0 };
       double time{ 0 };
-      float pitch{ 0 };
-      float velocity{ 0 };
-      float pan{ .5 };
+      double pitch{ 0 };
+      double velocity{ 0 };
+      double pan{ .5 };
       int noteOutputIndex{ -1 };
       int lineNum{ -1 };
    };
@@ -223,7 +223,7 @@ private:
       double startTime{ 0 };
       double time{ 0 };
       IUIControl* control{ nullptr };
-      float value{ 0 };
+      double value{ 0 };
       int lineNum{ -1 };
    };
    std::array<ScheduledUIControlValue, 50> mScheduledUIControlValue;
@@ -247,8 +247,8 @@ private:
    struct UIControlModificationDisplay
    {
       double time{ 0 };
-      ofVec2f position;
-      float value{ 0 };
+      ofVec2d position;
+      double value{ 0 };
       int lineNum{ -1 };
    };
    std::array<UIControlModificationDisplay, 10> mUIControlModifications;
@@ -322,23 +322,23 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
+   void GetModuleDimensions(double& w, double& h) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override
+   void Resize(double w, double h) override
    {
       mWidth = w;
       mHeight = h;
    }
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void LoadText();
 
    std::vector<std::string> mText;
    ClickButton* mCloseButton{ nullptr };
-   float mWidth{ 750 };
-   float mHeight{ 335 };
-   ofVec2f mScrollOffset;
-   float mMaxScrollAmount{ 0 };
+   double mWidth{ 750 };
+   double mHeight{ 335 };
+   ofVec2d mScrollOffset;
+   double mMaxScrollAmount{ 0 };
 };
 
 
@@ -355,7 +355,7 @@ public:
    void CreateUIControls() override;
    void Poll() override;
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;

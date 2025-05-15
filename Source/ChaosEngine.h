@@ -109,7 +109,7 @@ private:
    struct Song
    {
       std::string mName;
-      float mTempo{ 120 };
+      double mTempo{ 120 };
       int mTimeSigTop{ 4 };
       int mTimeSigBottom{ 4 };
       int mScaleRoot{ 0 };
@@ -118,8 +118,8 @@ private:
    };
 
    void SetPitchColor(int pitch);
-   void DrawKeyboard(float x, float y);
-   void DrawGuitar(float x, float y);
+   void DrawKeyboard(double x, double y);
+   void DrawGuitar(double x, double y);
    bool IsChordRoot(int pitch);
    void ReadSongs();
    void UpdateProgression(int beat);
@@ -129,12 +129,12 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 610;
       height = 700;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    ClickButton* mChaosButton{ nullptr };
    bool mTotalChaos{ false };

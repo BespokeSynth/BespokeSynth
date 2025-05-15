@@ -97,7 +97,7 @@ public:
    void SetOverrideVizBuffer(RollingBuffer* viz) { mOverrideVizBuffer = viz; }
    RollingBuffer* GetOverrideVizBuffer() const { return mOverrideVizBuffer; }
    void UpdatePosition(bool parentMinimized);
-   void SetManualPosition(int x, int y)
+   void SetManualPosition(double x, double y)
    {
       mManualPositionX = x;
       mManualPositionY = y;
@@ -122,15 +122,16 @@ public:
    void ClearTypeFilter() { mTypeFilter.clear(); }
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
-   bool TestHover(float x, float y) const;
-   void SetOverrideCableDir(ofVec2f dir, Side side)
+   bool TestHover(double x, double y) const;
+   void SetOverrideCableDir(ofVec2d dir, Side side)
    {
       mHasOverrideCableDir = true;
       mOverrideCableDir = dir;
       mManualSide = side;
    }
-   ofVec2f GetCableStart(int index) const;
-   ofVec2f GetCableStartDir(int index, ofVec2f dest) const;
+
+   ofVec2d GetCableStart(int index) const;
+   ofVec2d GetCableStartDir(int index, ofVec2d dest) const;
    void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
    IModulator* GetModulatorOwner() const { return mModulatorOwner; }
    void SetIsPartOfCircularDependency(bool set) { mIsPartOfCircularDependency = set; }
@@ -150,10 +151,10 @@ public:
    void DrawSource();
    void DrawCables(bool parentMinimized);
    void Render() override;
-   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
-   bool MouseMoved(float x, float y) override;
+   bool TestClick(double x, double y, bool right, bool testOnly = false) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = 10;
       height = 10;
@@ -168,11 +169,11 @@ public:
    static bool sIsLoadingModulePreset;
 
 protected:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
 private:
    bool InAddCableMode() const;
-   int GetHoverIndex(float x, float y) const;
+   int GetHoverIndex(double x, double y) const;
 
    std::vector<PatchCable*> mPatchCables;
    int mHoverIndex{ -1 }; //-1 = not hovered
@@ -183,15 +184,15 @@ private:
    IDrawableModule* mOwner{ nullptr };
    RollingBuffer* mOverrideVizBuffer{ nullptr };
    bool mAutomaticPositioning{ true };
-   int mManualPositionX{ 0 };
-   int mManualPositionY{ 0 };
+   double mManualPositionX{ 0 };
+   double mManualPositionY{ 0 };
    ofColor mColor;
    bool mEnabled{ true };
    bool mClickable{ true };
    Side mSide{ Side::kNone };
    Side mManualSide{ Side::kNone };
    bool mHasOverrideCableDir{ false };
-   ofVec2f mOverrideCableDir;
+   ofVec2d mOverrideCableDir;
    bool mIsPartOfCircularDependency{ false };
 
    std::vector<INoteReceiver*> mNoteReceivers;

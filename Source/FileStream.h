@@ -59,6 +59,14 @@ private:
    std::unique_ptr<juce::OutputStream> mStream;
 };
 
+struct FloatAsDoubleVersioner
+{
+   // dummy class used as a flag to load a variable that had been saved as a
+   // float prior to kSaveStateRev 427 into a double instead
+};
+
+extern FloatAsDoubleVersioner FloatAsDouble;
+
 class FileStreamIn
 {
 public:
@@ -74,6 +82,7 @@ public:
    FileStreamIn& operator>>(double& var);
    FileStreamIn& operator>>(std::string& var);
    FileStreamIn& operator>>(char& var);
+   FileStreamIn& operator>>(FloatAsDoubleVersioner& flag);
    void Read(float* buffer, int size);
    void ReadGeneric(void* buffer, int size);
    void Peek(void* buffer, int size);
@@ -85,4 +94,5 @@ public:
 
 private:
    std::unique_ptr<juce::InputStream> mStream;
+   bool mLoadNextDoubleFromFloat{ false };
 };

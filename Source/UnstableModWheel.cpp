@@ -73,11 +73,11 @@ void UnstableModWheel::DrawModule()
    ofFill();
    for (int col = 0; col < kGridSize; ++col)
    {
-      float x = rect.x + col * (rect.width / kGridSize);
-      float y = rect.y;
-      float val = mPerlin.GetValue(gTime, x / rect.width * 10, 0) * ofClamp(mPerlin.mPerlinAmount * 5, 0, 1);
+      double x = rect.x + col * (rect.width / kGridSize);
+      double y = rect.y;
+      double val = mPerlin.GetValue(gTime, x / rect.width * 10, 0) * ofClamp(mPerlin.mPerlinAmount * 5, 0, 1);
       ofSetColor(val * 255, 0, val * 255);
-      ofRect(x, y, (rect.width / kGridSize) + .5f, rect.height + .5f, 0);
+      ofRect(x, y, (rect.width / kGridSize) + .5, rect.height + .5, 0);
    }
 
    ofNoFill();
@@ -89,7 +89,7 @@ void UnstableModWheel::DrawModule()
          ofBeginShape();
          for (int i = 0; i < gBufferSize; ++i)
          {
-            float sample = ofClamp(mModulation.GetModWheel(voice)->GetBufferValue(i), -1, 1);
+            double sample = ofClamp(mModulation.GetModWheel(voice)->GetBufferValue(i), -1, 1);
             ofVertex((i * rect.width) / gBufferSize + rect.x, rect.y + (1 - sample) * rect.height);
          }
          ofEndShape();
@@ -150,7 +150,7 @@ void UnstableModWheel::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void UnstableModWheel::OnTransportAdvanced(float amount)
+void UnstableModWheel::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 
@@ -169,7 +169,7 @@ void UnstableModWheel::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetModWheel(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

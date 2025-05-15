@@ -327,7 +327,7 @@ void VSTPlugin::CreateUIControls()
 
    mMidiOutCable = new AdditionalNoteCable();
    mMidiOutCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-   mMidiOutCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+   mMidiOutCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
    AddPatchCableSource(mMidiOutCable->GetPatchCableSource());
    mMidiOutCable->GetPatchCableSource()->SetManualPosition(206 - 10, 10);
 
@@ -598,8 +598,8 @@ void VSTPlugin::Poll()
    {
       for (int i = 0; i < mParameterSliders.size(); ++i)
       {
-         float value = mParameterSliders[i].mParameter->getValue();
-         if (mParameterSliders[i].mValue != value)
+         double value = mParameterSliders[i].mParameter->getValue();
+         if (!ofAlmostEquel(mParameterSliders[i].mValue, value))
             mParameterSliders[i].mValue = value;
       }
 
@@ -741,7 +741,7 @@ void VSTPlugin::Process(double time)
 
    const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    juce::AudioBuffer<float> buffer(bufferChannels, bufferSize);
@@ -952,9 +952,9 @@ void VSTPlugin::PreDrawModule()
       {
          mOverlayWidth = 500;
          mOverlayHeight = 500;
-         float contentMult = gDrawScale;
-         float width = mOverlayWidth * contentMult;
-         float height = mOverlayHeight * contentMult;
+         double contentMult = gDrawScale;
+         double width = mOverlayWidth * contentMult;
+         double height = mOverlayHeight * contentMult;
          mWindow->setSize(width, height);
       }
       mWindowOverlay->UpdatePosition(this);
@@ -1000,7 +1000,7 @@ void VSTPlugin::DrawModule()
    }
 }
 
-void VSTPlugin::GetModuleDimensions(float& width, float& height)
+void VSTPlugin::GetModuleDimensions(double& width, double& height)
 {
    if (mDisplayMode == kDisplayMode_PluginOverlay)
    {
@@ -1058,7 +1058,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (int i = 0; i < mParameterSliders.size(); ++i)
    {
@@ -1125,6 +1125,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
                if (mParameterSliders[i].mShowing)
                   exposedParams.push_back(i);
             }
+
             output.writeInt((int)exposedParams.size());
             for (auto& i : exposedParams)
                output.writeInt(i);

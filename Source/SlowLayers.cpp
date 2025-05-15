@@ -72,7 +72,7 @@ void SlowLayers::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
 
    int loopLengthInSamples = LoopLength();
@@ -80,7 +80,7 @@ void SlowLayers::Process(double time)
    int layers = 4;
    for (int i = 0; i < bufferSize; ++i)
    {
-      float smooth = .001f;
+      double smooth = .001;
       mSmoothedVol = mSmoothedVol * (1 - smooth) + mVol * smooth;
       float volSq = mSmoothedVol * mSmoothedVol;
 
@@ -92,7 +92,7 @@ void SlowLayers::Process(double time)
 
       float output = (1 - mFeedIn) * GetBuffer()->GetChannel(0)[i];
       for (int j = 0; j < layers; ++j)
-         output += GetInterpolatedSample(offset / float(1 << j), mBuffer, loopLengthInSamples);
+         output += GetInterpolatedSample(offset / static_cast<double>(1 << j), mBuffer, loopLengthInSamples);
 
       output *= volSq;
 
@@ -126,7 +126,7 @@ void SlowLayers::DrawModule()
    ofSetColor(255, 255, 0, gModuleDrawAlpha);
    for (int i = 1; i < mNumBars; ++i)
    {
-      float x = BUFFER_W / mNumBars * i;
+      double x = BUFFER_W / mNumBars * i;
       ofLine(x, BUFFER_H / 2 - 5, x, BUFFER_H / 2 + 5);
    }
    ofSetColor(255, 255, 255, gModuleDrawAlpha);
@@ -149,7 +149,7 @@ void SlowLayers::SetNumBars(int numBars)
    mNumBars = numBars;
 }
 
-void SlowLayers::GetModuleDimensions(float& width, float& height)
+void SlowLayers::GetModuleDimensions(double& width, double& height)
 {
    width = 197;
    height = 155;
@@ -161,7 +161,7 @@ void SlowLayers::ButtonClicked(ClickButton* button, double time)
       ::Clear(mBuffer, MAX_BUFFER_SIZE);
 }
 
-void SlowLayers::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SlowLayers::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

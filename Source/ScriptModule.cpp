@@ -66,9 +66,9 @@ double ScriptModule::sMostRecentRunTime = 0;
 //static
 std::string ScriptModule::sBackgroundTextString = "";
 //static
-float ScriptModule::sBackgroundTextSize = 30;
+double ScriptModule::sBackgroundTextSize = 30;
 //static
-ofVec2f ScriptModule::sBackgroundTextPos;
+ofVec2d ScriptModule::sBackgroundTextPos;
 //static
 ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
 //static
@@ -196,7 +196,7 @@ void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
    }
 }
 
-void ScriptModule::OnClicked(float x, float y, bool right)
+void ScriptModule::OnClicked(double x, double y, bool right)
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
@@ -277,7 +277,7 @@ void ScriptModule::DrawModule()
    if (mLastError != "")
    {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
-      ofVec2f errorPos = mStopButton->GetPosition(true);
+      ofVec2d errorPos = mStopButton->GetPosition(true);
       errorPos.x += 60;
       errorPos.y += 12;
       DrawTextNormal(mLastError, errorPos.x, errorPos.y);
@@ -316,11 +316,11 @@ void ScriptModule::DrawModule()
       if (mPrintDisplay[i].time == -1)
          continue;
 
-      float fadeMs = 500;
+      double fadeMs = 500;
       if (gTime - mPrintDisplay[i].time >= 0 && gTime - mPrintDisplay[i].time < fadeMs)
       {
          ofSetColor(ofColor::white, 255 * (1 - (gTime - mPrintDisplay[i].time) / fadeMs));
-         ofVec2f linePos = mCodeEntry->GetLinePos(mPrintDisplay[i].lineNum, K(end));
+         ofVec2d linePos = mCodeEntry->GetLinePos(mPrintDisplay[i].lineNum, K(end));
          DrawTextNormal(mPrintDisplay[i].text, linePos.x + 10, linePos.y + 15);
       }
       else
@@ -334,11 +334,11 @@ void ScriptModule::DrawModule()
       if (mUIControlModifications[i].time == -1)
          continue;
 
-      float fadeMs = 500;
+      double fadeMs = 500;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Modulator), 255 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
-         ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, K(end));
+         ofVec2d linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, K(end));
          DrawTextNormal(ofToString(mUIControlModifications[i].value), linePos.x + 10, linePos.y + 15);
       }
       else
@@ -354,8 +354,8 @@ void ScriptModule::DrawModule()
       ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
       ofFill();
       ofSetColor(255, 255, 0);
-      float x = buttonRect.getMaxX() + 10;
-      float y = buttonRect.getCenter().y;
+      double x = buttonRect.getMaxX() + 10;
+      double y = buttonRect.getCenter().y;
       ofCircle(x, y, 6);
       ofSetColor(0, 0, 0);
       DrawTextBold("!", x - 2, y + 5, 15);
@@ -417,12 +417,12 @@ void ScriptModule::DrawModuleUnclipped()
       if (mUIControlModifications[i].time == -1)
          continue;
 
-      float fadeMs = 200;
+      double fadeMs = 200;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Modulator), 100 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
 
-         ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, false);
+         ofVec2d linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, false);
 
          ofPushMatrix();
          ofTranslate(-mX, -mY);
@@ -444,19 +444,19 @@ void ScriptModule::DrawModuleUnclipped()
             continue;
          }
 
-         ofVec2f linePos = mCodeEntry->GetLinePos(mBoundModuleConnections[i].mLineIndex, false);
+         ofVec2d linePos = mCodeEntry->GetLinePos(mBoundModuleConnections[i].mLineIndex, false);
 
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other), 30);
          ofFill();
-         float codeY = mCodeEntry->GetPosition(true).y;
-         float topY = ofClamp(linePos.y + 3, codeY, codeY + mCodeEntry->GetRect().height);
-         float bottomY = ofClamp(linePos.y + 3 + mCodeEntry->GetCharHeight(), codeY, codeY + mCodeEntry->GetRect().height);
+         double codeY = mCodeEntry->GetPosition(true).y;
+         double topY = ofClamp(linePos.y + 3, codeY, codeY + mCodeEntry->GetRect().height);
+         double bottomY = ofClamp(linePos.y + 3 + mCodeEntry->GetCharHeight(), codeY, codeY + mCodeEntry->GetRect().height);
          ofRectangle lineRect(linePos.x, topY, mCodeEntry->GetRect().width, bottomY - topY);
          ofRect(lineRect, L(corner, 0));
 
          ofSetLineWidth(2);
          ofSetColor(IDrawableModule::GetColor(kModuleCategory_Other), 30);
-         float startX, startY, endX, endY;
+         double startX, startY, endX, endY;
          ofRectangle targetRect = mBoundModuleConnections[i].mTarget->GetRect();
          FindClosestSides(lineRect.x, lineRect.y, lineRect.width, lineRect.height, targetRect.x - mX, targetRect.y - mY, targetRect.width, targetRect.height, startX, startY, endX, endY, K(sidesOnly));
          ofLine(startX, startY, endX, endY);
@@ -472,13 +472,13 @@ void ScriptModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
       Transport::sDoEventLookahead = true; //scripts that output notes require lookahead to be able to schedule on time
 }
 
-bool ScriptModule::MouseMoved(float x, float y)
+bool ScriptModule::MouseMoved(double x, double y)
 {
    if (CodeEntry::HasJediNotInstalledWarning())
    {
       ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
-      float warningX = buttonRect.getMaxX() + 10;
-      float warningY = buttonRect.getCenter().y;
+      double warningX = buttonRect.getMaxX() + 10;
+      double warningY = buttonRect.getCenter().y;
       if (ofDistSquared(x, y, warningX, warningY) <= 6 * 6)
          mShowJediWarning = true;
       else
@@ -490,18 +490,18 @@ bool ScriptModule::MouseMoved(float x, float y)
 
 void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled)
 {
-   ofVec2f linePos = mCodeEntry->GetLinePos(lineNum, false);
+   ofVec2d linePos = mCodeEntry->GetLinePos(lineNum, false);
    linePos.x += 11;
    linePos.y += 10;
-   float t = (gTime - startTime) / (endTime - startTime);
+   double t = (gTime - startTime) / (endTime - startTime);
    if (t > 0 && t < 1)
    {
-      const float kRadius = 5;
+      const double kRadius = 5;
       ofPushStyle();
       if (filled)
          ofSetColor(color);
       else
-         ofSetColor(color * .5f);
+         ofSetColor(color * .5);
       ofNoFill();
       ofCircle(linePos.x, linePos.y, kRadius);
       if (filled)
@@ -645,15 +645,15 @@ void ScriptModule::Poll()
 }
 
 //static
-float ScriptModule::GetScriptMeasureTime()
+double ScriptModule::GetScriptMeasureTime()
 {
    return TheTransport->GetMeasureTime(sMostRecentRunTime);
 }
 
 //static
-float ScriptModule::GetTimeSigRatio()
+double ScriptModule::GetTimeSigRatio()
 {
-   return float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
+   return static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
 }
 
 double ScriptModule::GetScheduledTime(double delayMeasureTime)
@@ -661,12 +661,12 @@ double ScriptModule::GetScheduledTime(double delayMeasureTime)
    return sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
 }
 
-void ScriptModule::PlayNoteFromScript(float pitch, float velocity, float pan, int noteOutputIndex)
+void ScriptModule::PlayNoteFromScript(double pitch, double velocity, double pan, int noteOutputIndex)
 {
    PlayNote(sMostRecentRunTime, pitch, velocity, pan, noteOutputIndex, mNextLineToExecute);
 }
 
-void ScriptModule::PlayNoteFromScriptAfterDelay(float pitch, float velocity, double delayMeasureTime, float pan, int noteOutputIndex)
+void ScriptModule::PlayNoteFromScriptAfterDelay(double pitch, double velocity, double delayMeasureTime, double pan, int noteOutputIndex)
 {
    double time = GetScheduledTime(delayMeasureTime);
    //if (velocity == 0)
@@ -700,11 +700,11 @@ void ScriptModule::SendCCFromScript(int control, int value, int noteOutputIndex)
    }
 }
 
-void ScriptModule::ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex)
+void ScriptModule::ScheduleNote(double time, double pitch, double velocity, double pan, int noteOutputIndex)
 {
    for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
    {
-      if (mScheduledNoteOutput[i].time == -1)
+      if (ofAlmostEquel(mScheduledNoteOutput[i].time, -1))
       {
          mScheduledNoteOutput[i].time = time;
          mScheduledNoteOutput[i].startTime = sMostRecentRunTime;
@@ -722,7 +722,7 @@ void ScriptModule::ScheduleMethod(std::string method, double delayMeasureTime)
 {
    for (size_t i = 0; i < mScheduledMethodCall.size(); ++i)
    {
-      if (mScheduledMethodCall[i].time == -1)
+      if (ofAlmostEquel(mScheduledMethodCall[i].time, -1))
       {
          double time = GetScheduledTime(delayMeasureTime);
 
@@ -735,11 +735,11 @@ void ScriptModule::ScheduleMethod(std::string method, double delayMeasureTime)
    }
 }
 
-void ScriptModule::ScheduleUIControlValue(IUIControl* control, float value, double delayMeasureTime)
+void ScriptModule::ScheduleUIControlValue(IUIControl* control, double value, double delayMeasureTime)
 {
    for (size_t i = 0; i < mScheduledUIControlValue.size(); ++i)
    {
-      if (mScheduledUIControlValue[i].time == -1)
+      if (ofAlmostEquel(mScheduledUIControlValue[i].time, -1))
       {
          double time = GetScheduledTime(delayMeasureTime);
 
@@ -810,7 +810,7 @@ IUIControl* ScriptModule::GetUIControl(std::string path)
    return control;
 }
 
-void ScriptModule::AdjustUIControl(IUIControl* control, float value, double time, int lineNum)
+void ScriptModule::AdjustUIControl(IUIControl* control, double value, double time, int lineNum)
 {
    control->SetValue(value, time);
 
@@ -829,7 +829,7 @@ void ScriptModule::AdjustUIControl(IUIControl* control, float value, double time
    }
 }
 
-void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum)
+void ScriptModule::PlayNote(double time, double pitch, double velocity, double pan, int noteOutputIndex, int lineNum)
 {
    if (velocity > 0)
    {
@@ -848,7 +848,7 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
    }
 
    //ofLog() << "ScriptModule::PlayNote() " << velocity << " " << time;
-   int intPitch = int(pitch + .5f);
+   int intPitch = static_cast<int>(pitch + .5);
    ModulationParameters modulation;
    modulation.pan = pan;
    if (pitch - intPitch != 0)
@@ -882,7 +882,7 @@ void ScriptModule::SetNumNoteOutputs(int num)
    {
       auto noteCable = new AdditionalNoteCable();
       noteCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1, 0), PatchCableSource::Side::kLeft);
+      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(-1, 0), PatchCableSource::Side::kLeft);
       AddPatchCableSource(noteCable->GetPatchCableSource());
       noteCable->GetPatchCableSource()->SetManualPosition(0, 30 + 20 * (int)mExtraNoteOutputs.size());
       mExtraNoteOutputs.push_back(noteCable);
@@ -930,7 +930,7 @@ void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
    mMidiMessageQueueMutex.unlock();
 }
 
-void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
+void ScriptModule::MidiReceived(MidiMessageType messageType, int control, double value, int channel)
 {
    mMidiMessageQueueMutex.lock();
    mMidiMessageQueue.push_back("on_midi(" + ofToString((int)messageType) + ", " + ofToString(control) + ", " + ofToString(value) + ", " + ofToString(channel) + ")");
@@ -1031,7 +1031,7 @@ void ScriptModule::ButtonClicked(ClickButton* button, double time)
 
    if (button == mShowReferenceButton)
    {
-      float moduleX, moduleY, moduleW, moduleH;
+      double moduleX, moduleY, moduleW, moduleH;
       GetPosition(moduleX, moduleY);
       GetDimensions(moduleW, moduleH);
       ModuleFactory::Spawnable spawnable;
@@ -1129,7 +1129,7 @@ void ScriptModule::OnCodeUpdated()
    }
 }
 
-void ScriptModule::OnPulse(double time, float velocity, int flags)
+void ScriptModule::OnPulse(double time, double velocity, int flags)
 {
    for (size_t i = 0; i < mScheduledPulseTimes.size(); ++i)
    {
@@ -1455,15 +1455,15 @@ void ScriptModule::Reset()
       mPrintDisplay[i].time = -1;
 }
 
-void ScriptModule::GetModuleDimensions(float& w, float& h)
+void ScriptModule::GetModuleDimensions(double& w, double& h)
 {
    w = mWidth;
    h = mHeight;
 }
 
-void ScriptModule::Resize(float w, float h)
+void ScriptModule::Resize(double w, double h)
 {
-   float entryW, entryH;
+   double entryW, entryH;
    mCodeEntry->GetDimensions(entryW, entryH);
    mCodeEntry->SetDimensions(entryW + w - mWidth, entryH + h - mHeight);
    mRunButton->SetPosition(mRunButton->GetPosition(true).x, mRunButton->GetPosition(true).y + h - mHeight);
@@ -1577,9 +1577,9 @@ void ScriptModule::LoadState(FileStreamIn& in, int rev)
       LoadStateValidate(rev <= GetModuleSaveStateRev());
    }
 
-   float w, h;
-   in >> w;
-   in >> h;
+   double w, h;
+   in >> FloatAsDouble >> w;
+   in >> FloatAsDouble >> h;
    Resize(w, h);
 
    juce::String checksum = GetScriptChecksum();
@@ -1622,12 +1622,12 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
    ofFill();
    for (int i = 0; i < (int)mText.size(); ++i)
    {
-      float alpha = style == 0 ? 200 : 150;
-      float fadeMs = style == 0 ? 200 : 150;
+      double alpha = style == 0 ? 200 : 150;
+      double fadeMs = style == 0 ? 200 : 150;
       if (gTime - mTimes[i] > 0 && gTime - mTimes[i] < fadeMs)
       {
          ofSetColor(color, alpha * (1 - (gTime - mTimes[i]) / fadeMs));
-         ofVec2f linePos = codeEntry->GetLinePos(i, false);
+         ofVec2d linePos = codeEntry->GetLinePos(i, false);
          if (style == 0)
             ofRect(linePos.x + 1, linePos.y + 3, 4, codeEntry->GetCharHeight(), L(corner, 0));
          if (style == 1)
@@ -1676,7 +1676,7 @@ void ScriptReferenceDisplay::DrawModule()
 {
    mCloseButton->Draw();
 
-   float y = 34;
+   double y = 34;
    for (size_t i = 0; i < mText.size(); ++i)
    {
       DrawTextNormal(mText[i], 4 - mScrollOffset.x, y - mScrollOffset.y);
@@ -1684,13 +1684,13 @@ void ScriptReferenceDisplay::DrawModule()
    }
 }
 
-bool ScriptReferenceDisplay::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool ScriptReferenceDisplay::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mScrollOffset.y = ofClamp(mScrollOffset.y - scrollY * 10, 0, mMaxScrollAmount);
    return true;
 }
 
-void ScriptReferenceDisplay::GetModuleDimensions(float& w, float& h)
+void ScriptReferenceDisplay::GetModuleDimensions(double& w, double& h)
 {
    w = mWidth;
    h = mHeight;

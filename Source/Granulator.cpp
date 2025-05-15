@@ -54,7 +54,7 @@ void Granulator::Reset()
    }
 }
 
-void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float speed, float* output)
+void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, double speed, float* output)
 {
    if (time + gInvSampleRateMs >= mNextGrainSpawnMs)
    {
@@ -71,36 +71,36 @@ void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLeng
    for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
    {
       if (mGrainOverlap > 4)
-         output[ch] *= ofMap(mGrainOverlap, MAX_GRAINS, 4, .5f, 1); //lower volume on dense granulation, starting at 4 overlap
+         output[ch] *= ofMap(mGrainOverlap, MAX_GRAINS, 4, .5, 1); //lower volume on dense granulation, starting at 4 overlap
       output[ch] = mBiquad[ch].Filter(output[ch]);
    }
 }
 
-void Granulator::SpawnGrain(double time, double offset, float width, float speed)
+void Granulator::SpawnGrain(double time, double offset, double width, double speed)
 {
    if (mLiveMode)
    {
-      float speedMult = speed + mSpeedRandomize;
+      double speedMult = speed + mSpeedRandomize;
       if (mOctaves)
-         speedMult *= 1.5f;
-      float extraSpeed = MAX(0, speedMult * mSpeed - 1);
-      float extraMs = mGrainLengthMs * extraSpeed + mPosRandomizeMs;
-      float extraSamples = extraMs / gInvSampleRateMs;
+         speedMult *= 1.5;
+      double extraSpeed = MAX(0, speedMult * mSpeed - 1);
+      double extraMs = mGrainLengthMs * extraSpeed + mPosRandomizeMs;
+      double extraSamples = extraMs / gInvSampleRateMs;
       offset -= extraSamples;
    }
-   float speedMult = speed + ofRandom(-mSpeedRandomize, mSpeedRandomize);
-   float vol = 1;
+   double speedMult = speed + ofRandom(-mSpeedRandomize, mSpeedRandomize);
+   double vol = 1;
    if (mOctaves)
    {
-      int random = gRandom() % 5;
+      auto random = gRandom() % 5;
       if (random == 2) //fewer high-pitched ones
       {
-         speedMult *= 1.5f;
-         vol = .5f;
+         speedMult *= 1.5;
+         vol = .5;
       }
       else if (random == 3 || random == 4)
       {
-         speedMult *= .75f;
+         speedMult *= .75;
       }
    }
    offset += ofRandom(-mPosRandomizeMs, mPosRandomizeMs) / gInvSampleRateMs;
@@ -109,7 +109,7 @@ void Granulator::SpawnGrain(double time, double offset, float width, float speed
    mNextGrainIdx = (mNextGrainIdx + 1) % MAX_GRAINS;
 }
 
-void Granulator::Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength)
+void Granulator::Draw(double x, double y, double w, double h, int bufferStart, int viewLength, int bufferLength)
 {
    for (int i = 0; i < MAX_GRAINS; ++i)
       mGrains[i].DrawGrain(i, x, y, w, h, bufferStart, viewLength, bufferLength);
@@ -121,7 +121,7 @@ void Granulator::ClearGrains()
       mGrains[i].Clear();
 }
 
-void Grain::Spawn(Granulator* owner, double time, double pos, float speedMult, float lengthInMs, float vol, float width)
+void Grain::Spawn(Granulator* owner, double time, double pos, double speedMult, double lengthInMs, double vol, double width)
 {
    mOwner = owner;
    mPos = pos;
@@ -147,23 +147,23 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
    if (time >= mStartTime && time <= mEndTime && mVol != 0)
    {
       mPos += mSpeedMult * mOwner->mSpeed;
-      float window = GetWindow(time);
+      auto window = GetWindow(time);
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
-         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0.f, 1.f));
+         auto sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0., 1.));
          output[ch] += sample * window * mVol * (1 + (ch == 0 ? mStereoPosition : -mStereoPosition));
       }
    }
 }
 
-void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength)
+void Grain::DrawGrain(int idx, double x, double y, double w, double h, int bufferStart, int viewLength, int bufferLength)
 {
-   float a = fmod((mPos - bufferStart), bufferLength) / viewLength;
+   double a = std::fmod((mPos - bufferStart), bufferLength) / viewLength;
    if (a < 0 || a > 1)
       return;
    ofPushStyle();
    ofFill();
-   float alpha = GetWindow(std::clamp(gTime, mStartTime, mEndTime));
+   double alpha = GetWindow(std::clamp(gTime, mStartTime, mEndTime));
    ofSetColor(255, 0, 0, alpha * 255);
    ofCircle(x + a * w, y + mDrawPos * h, MAX(3, h / MAX_GRAINS / 2));
    ofPopStyle();

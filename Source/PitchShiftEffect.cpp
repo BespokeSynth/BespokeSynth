@@ -43,7 +43,7 @@ PitchShiftEffect::~PitchShiftEffect()
 void PitchShiftEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRatioSlider = new FloatSlider(this, "ratio", 5, 4, 85, 15, &mRatio, .5f, 2.0f);
+   mRatioSlider = new FloatSlider(this, "ratio", 5, 4, 85, 15, &mRatio, .5, 2.0);
    mRatioSelector = new RadioButton(this, "ratioselector", 5, 20, &mRatioSelection, kRadioHorizontal);
 
    mRatioSelector->AddLabel(".5", 5);
@@ -59,7 +59,7 @@ void PitchShiftEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
@@ -79,7 +79,7 @@ void PitchShiftEffect::DrawModule()
    mRatioSelector->Draw();
 }
 
-void PitchShiftEffect::GetModuleDimensions(float& width, float& height)
+void PitchShiftEffect::GetModuleDimensions(double& width, double& height)
 {
    if (mEnabled)
    {
@@ -93,18 +93,18 @@ void PitchShiftEffect::GetModuleDimensions(float& width, float& height)
    }
 }
 
-float PitchShiftEffect::GetEffectAmount()
+double PitchShiftEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp(fabsf((mRatio - 1) * 10), 0, 1);
+   return ofClamp(std::abs((mRatio - 1) * 10), 0, 1);
 }
 
 void PitchShiftEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void PitchShiftEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PitchShiftEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mRatioSlider)
       mRatioSelection = -1;
@@ -113,5 +113,5 @@ void PitchShiftEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, dou
 void PitchShiftEffect::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
 {
    if (radio == mRatioSelector)
-      mRatio = mRatioSelection / 10.0f;
+      mRatio = mRatioSelection / 10.0;
 }

@@ -82,12 +82,12 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -105,26 +105,26 @@ public:
 private:
    void SyncLoopLengths();
    void UpdateSpeed();
-   float AdjustedRootForSpeed();
+   double AdjustedRootForSpeed();
    void SnapToClosestPitch();
    void Resample(bool setKey);
-   void DrawCircleHash(ofVec2f center, float progress, float width, float innerRadius, float outerRadius);
+   void DrawCircleHash(ofVec2d center, double progress, double width, double innerRadius, double outerRadius);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    static constexpr int kMaxLoopers = 8;
 
-   float mWidth{ 235 };
-   float mHeight{ 126 };
+   double mWidth{ 235 };
+   double mHeight{ 126 };
    RollingBuffer mRecordBuffer;
    std::array<Looper*, kMaxLoopers> mLoopers{ nullptr };
    int mNumLoopers{ 4 };
    int mNumBars{ 1 };
    DropdownList* mNumBarsSelector{ nullptr };
-   float mSpeed{ 1 };
-   float mBaseTempo{ 120 };
+   double mSpeed{ 1 };
+   double mBaseTempo{ 120 };
    ClickButton* mResampleButton{ nullptr };
    ClickButton* mResampAndSetButton{ nullptr };
    Looper* mMergeSource{ nullptr };
@@ -141,7 +141,7 @@ private:
    ClickButton* mShiftDownbeatButton{ nullptr };
    ClickButton* mOrigSpeedButton{ nullptr };
    ClickButton* mSnapPitchButton{ nullptr };
-   float mCommitDelay{ 0 };
+   double mCommitDelay{ 0 };
    FloatSlider* mCommitDelaySlider{ nullptr };
    ChannelBuffer mWriteBuffer;
    Looper* mCommitToLooper{ nullptr };
@@ -158,7 +158,7 @@ private:
    std::array<Checkbox*, kMaxLoopers> mWriteForLooperCheckbox{ nullptr };
    std::array<bool, kMaxLoopers> mWriteForLooper{ false };
    std::array<double, kMaxLoopers> mStartRecordMeasureTime{ 0 };
-   float mLatencyFixMs{ 0 };
+   double mLatencyFixMs{ 0 };
    FloatSlider* mLatencyFixMsSlider{ nullptr };
 
    bool mFreeRecording{ false };

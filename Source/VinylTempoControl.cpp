@@ -82,9 +82,9 @@ void VinylTempoControl::Process(double time)
 
       if (mUseVinylControl)
       {
-         float speed = mVinylProcessor.GetPitch() / mReferencePitch;
-         if (speed == 0 || mVinylProcessor.GetStopped())
-            speed = .0001f;
+         double speed = mVinylProcessor.GetPitch() / mReferencePitch;
+         if (ofAlmostEquel(speed, 0) || mVinylProcessor.GetStopped())
+            speed = .0001;
          mSpeed = speed;
       }
       else
@@ -101,7 +101,7 @@ void VinylTempoControl::PostRepatch(PatchCableSource* cableSource, bool fromUser
    OnModulatorRepatch();
 }
 
-float VinylTempoControl::Value(int samplesIn)
+double VinylTempoControl::Value(int samplesIn)
 {
    //return mModulationBuffer[samplesIn];
    return mSpeed;
@@ -109,7 +109,7 @@ float VinylTempoControl::Value(int samplesIn)
 
 bool VinylTempoControl::CanStartVinylControl()
 {
-   return !mVinylProcessor.GetStopped() && fabsf(mVinylProcessor.GetPitch()) > .001f;
+   return !mVinylProcessor.GetStopped() && std::abs(mVinylProcessor.GetPitch()) > .001;
 }
 
 void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox, double time)

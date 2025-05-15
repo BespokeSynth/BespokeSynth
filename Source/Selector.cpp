@@ -49,7 +49,7 @@ void Selector::DrawModule()
 
    for (int i = 0; i < (int)mControlCables.size(); ++i)
    {
-      mControlCables[i]->SetManualPosition(GetRect(true).width - 5, 3 + RadioButton::GetSpacing() * (i + .5f));
+      mControlCables[i]->SetManualPosition(GetRect(true).width - 5, 3 + RadioButton::GetSpacing() * (i + .5));
    }
 
    mSelector->Draw();
@@ -110,11 +110,11 @@ void Selector::SetIndex(int index, double time)
 
 namespace
 {
-   const float extraW = 20;
-   const float extraH = 6;
+   const double extraW = 20;
+   const double extraH = 6;
 }
 
-void Selector::GetModuleDimensions(float& width, float& height)
+void Selector::GetModuleDimensions(double& width, double& height)
 {
    width = mSelector->GetRect().width + extraW;
    height = mSelector->GetRect().height + extraH;

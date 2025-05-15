@@ -54,7 +54,7 @@ public:
    void CreatePrefsFileIfNonexistent();
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -70,14 +70,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
    void UpdateDropdowns(std::vector<DropdownList*> toUpdate);
-   void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);
+   void DrawRightLabel(IUIControl* control, std::string text, ofColor color, double offsetX = 12);
    void CleanUpSave(std::string& json);
    bool PrefRequiresRestart(UserPref* pref) const;
    void Save();
@@ -87,6 +87,6 @@ private:
    ClickButton* mSaveButton{ nullptr };
    ClickButton* mCancelButton{ nullptr };
 
-   float mWidth{ 1150 };
-   float mHeight{ 50 };
+   double mWidth{ 1150 };
+   double mHeight{ 50 };
 };

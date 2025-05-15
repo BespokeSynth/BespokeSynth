@@ -45,19 +45,19 @@ public:
    std::string GetType() override { return "gainstage"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 120;
       height = 20;
    }
 
-   float mGain{ 1 };
+   double mGain{ 1 };
    FloatSlider* mGainSlider{ nullptr };
 };

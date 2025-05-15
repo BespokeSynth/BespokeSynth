@@ -70,7 +70,7 @@ public:
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -92,13 +92,13 @@ private:
       EnvOscillator mNoise{ OscillatorType::kOsc_Random };
       ::ADSR mFreqAdsr;
       ::ADSR mFilterAdsr;
-      float mFreqMax{ 150 };
-      float mFreqMin{ 10 };
-      float mVol{ 0 };
-      float mVolNoise{ 0 };
-      float mCutoffMax{ DRUMSYNTH_NO_CUTOFF };
-      float mCutoffMin{ 10 };
-      float mQ{ float(sqrt(2)) / 2 };
+      double mFreqMax{ 150 };
+      double mFreqMin{ 10 };
+      double mVol{ 0 };
+      double mVolNoise{ 0 };
+      double mCutoffMax{ DRUMSYNTH_NO_CUTOFF };
+      double mCutoffMin{ 10 };
+      double mQ{ sqrt(2) / 2 };
    };
 
    struct IndividualOutput;
@@ -110,13 +110,13 @@ private:
       ~DrumSynthHit();
 
       void CreateUIControls();
-      void Play(double time, float velocity);
+      void Play(double time, double velocity);
       void Process(double time, float* out, int bufferSize, int oversampling, double sampleRate, double sampleIncrementMs);
-      float Level() { return mLevel.GetPeak(); }
+      double Level() { return mLevel.GetPeak(); }
       void Draw();
 
       DrumSynthHitSerialData mData;
-      float mPhase{ 0 };
+      double mPhase{ 0 };
       ADSRDisplay* mToneAdsrDisplay{ nullptr };
       ADSRDisplay* mFreqAdsrDisplay{ nullptr };
       ADSRDisplay* mNoiseAdsrDisplay{ nullptr };
@@ -166,13 +166,11 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    std::array<DrumSynthHit*, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mHits;
-   std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity{};
 
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolSlider{ nullptr };
    bool mUseIndividualOuts{ false };
    bool mMonoOutput{ false };

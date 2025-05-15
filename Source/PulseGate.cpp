@@ -55,7 +55,7 @@ void PulseGate::DrawModule()
    mAllowCheckbox->Draw();
 }
 
-void PulseGate::OnPulse(double time, float velocity, int flags)
+void PulseGate::OnPulse(double time, double velocity, int flags)
 {
    ComputeSliders(0);
 

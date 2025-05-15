@@ -62,7 +62,7 @@ void FreqDelay::Process(double time)
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    mDryBuffer.CopyFrom(GetBuffer());
    mDelayEffect.ProcessAudio(time, GetBuffer());
@@ -83,8 +83,8 @@ void FreqDelay::PlayNote(NoteMessage note)
 {
    if (note.velocity > 0)
    {
-      float freq = TheScale->PitchToFreq(note.pitch);
-      float ms = 1000 / freq;
+      double freq = TheScale->PitchToFreq(note.pitch);
+      double ms = 1000 / freq;
       mDelayEffect.SetDelay(ms);
    }
 }
@@ -99,7 +99,7 @@ void FreqDelay::DrawModule()
    mDryWetSlider->Draw();
 }
 
-void FreqDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FreqDelay::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

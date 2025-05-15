@@ -43,7 +43,7 @@ public:
 
    void SetGridControllerOwner(IGridControllerListener* owner) override { mOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
-   void SetLightDirect(int x, int y, int color, bool force = false) override;
+   void SetLightDirect(int x, int y, double color, bool force = false) override;
    void ResetLights() override;
    int NumCols() override { return mCols; }
    int NumRows() override { return mRows; }
@@ -51,7 +51,7 @@ public:
    bool IsConnected() const override { return true; }
 
    void OnControllerPageSelected() override {}
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -71,7 +71,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    unsigned int mRows{ 0 };
    unsigned int mCols{ 0 };

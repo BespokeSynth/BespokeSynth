@@ -48,7 +48,7 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -58,15 +58,15 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 108;
       height = 40;
    }
 
    bool mFlip{ false };
-   float mPanOne{ -1 };
+   double mPanOne{ -1 };
    FloatSlider* mPanOneSlider{ nullptr };
-   float mPanTwo{ 1 };
+   double mPanTwo{ 1 };
    FloatSlider* mPanTwoSlider{ nullptr };
 };

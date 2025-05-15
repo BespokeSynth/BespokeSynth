@@ -79,7 +79,7 @@ void NoteToggle::PlayNote(NoteMessage note)
    }
 }
 
-void NoteToggle::GetModuleDimensions(float& width, float& height)
+void NoteToggle::GetModuleDimensions(double& width, double& height)
 {
    width = 100;
    height = 10;

@@ -51,7 +51,7 @@ void SampleFinder::CreateUIControls()
    mClipStartSlider = new IntSlider(this, "start", 5, 395, 900, 15, &mClipStart, 0, gSampleRate * 200);
    mClipEndSlider = new IntSlider(this, "end", 5, 410, 900, 15, &mClipEnd, 0, gSampleRate * 200);
    mNumBarsSlider = new IntSlider(this, "num bars", 215, 3, 220, 15, &mNumBars, 1, 16);
-   mOffsetSlider = new FloatSlider(this, "offset", 215, 20, 110, 15, &mOffset, gSampleRate * -.5f, gSampleRate * .5f, 4);
+   mOffsetSlider = new FloatSlider(this, "offset", 215, 20, 110, 15, &mOffset, gSampleRate * -.5, gSampleRate * .5, 4);
    mWriteButton = new ClickButton(this, "write", 600, 50);
    mDoubleLengthButton = new ClickButton(this, "double", 600, 10);
    mHalveLengthButton = new ClickButton(this, "halve", 600, 28);
@@ -81,18 +81,18 @@ void SampleFinder::Process(double time)
       mWantWrite = false;
    }
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
    float volSq = mVolume * mVolume;
 
-   float speed = GetSpeed();
+   double speed = GetSpeed();
 
    //TODO(Ryan) multichannel
    const float* data = mSample->Data()->GetChannel(0);
    int numSamples = mSample->LengthInSamples();
-   float sampleRateRatio = mSample->GetSampleRateRatio();
+   double sampleRateRatio = mSample->GetSampleRateRatio();
 
    mPlayhead = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % mNumBars);
    if (mReverse)
@@ -168,20 +168,20 @@ void SampleFinder::DrawModule()
    }
 }
 
-bool SampleFinder::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool SampleFinder::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   ofVec2f bufferPos = ofVec2f(ofMap(x, 5, 5 + 900, 0, 1),
-                               ofMap(y, 80, 80 + 310, 0, 1));
+   auto bufferPos = ofVec2d(ofMap(x, 5, 5 + 900, 0, 1),
+                            ofMap(y, 80, 80 + 310, 0, 1));
    if (IsInUnitBox(bufferPos))
    {
-      float zoomCenter = ofLerp(mZoomStart, mZoomEnd, bufferPos.x);
-      float distFromStart = zoomCenter - mZoomStart;
-      float distFromEnd = zoomCenter - mZoomEnd;
+      double zoomCenter = ofLerp(mZoomStart, mZoomEnd, bufferPos.x);
+      double distFromStart = zoomCenter - mZoomStart;
+      double distFromEnd = zoomCenter - mZoomEnd;
 
       distFromStart *= 1 - scrollY / 100;
       distFromEnd *= 1 - scrollY / 100;
 
-      float slideX = (mZoomEnd - mZoomStart) * -scrollX / 300;
+      double slideX = (mZoomEnd - mZoomStart) * -scrollX / 300;
 
       mZoomStart = ofClamp(zoomCenter - distFromStart + slideX, 0, mSample->LengthInSamples());
       mZoomEnd = ofClamp(zoomCenter - distFromEnd + slideX, 0, mSample->LengthInSamples());
@@ -191,7 +191,7 @@ bool SampleFinder::MouseScrolled(float x, float y, float scrollX, float scrollY,
    return false;
 }
 
-void SampleFinder::FilesDropped(std::vector<std::string> files, int x, int y)
+void SampleFinder::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mSample->Reset();
 
@@ -204,9 +204,9 @@ void SampleFinder::FilesDropped(std::vector<std::string> files, int x, int y)
    UpdateZoomExtents();
 }
 
-float SampleFinder::GetSpeed()
+double SampleFinder::GetSpeed()
 {
-   return float(mClipEnd - mClipStart) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars * (mReverse ? -1 : 1);
+   return static_cast<double>(mClipEnd - mClipStart) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars * (mReverse ? -1 : 1);
 }
 
 void SampleFinder::DropdownClicked(DropdownList* list)
@@ -229,7 +229,7 @@ void SampleFinder::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoubleLengthButton)
    {
-      float newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
+      double newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
       if (newEnd < mSample->LengthInSamples())
       {
          mClipEnd = newEnd;
@@ -240,7 +240,7 @@ void SampleFinder::ButtonClicked(ClickButton* button, double time)
    {
       if (mNumBars % 2 == 0)
       {
-         float newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
+         double newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
          mClipEnd = newEnd;
          mNumBars /= 2;
       }
@@ -282,7 +282,7 @@ void SampleFinder::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void SampleFinder::GetModuleDimensions(float& width, float& height)
+void SampleFinder::GetModuleDimensions(double& width, double& height)
 {
    if (mEditMode)
    {
@@ -296,7 +296,7 @@ void SampleFinder::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void SampleFinder::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SampleFinder::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -328,7 +328,7 @@ void SampleFinder::PlayNote(NoteMessage note)
          int slice = (note.pitch / 8) * 8 + 7 - (note.pitch % 8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = -mOffset * barLength + (barLength / 4) * slice + mClipStart;
-         mSample->Play(note.time, 1, position);
+         mSample->Play(note.time, 1, position, -1);
       }
    }
 }

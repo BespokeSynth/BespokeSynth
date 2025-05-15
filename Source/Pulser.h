@@ -53,7 +53,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -62,7 +62,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -73,9 +73,9 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
-   float GetOffset();
+   double GetOffset();
 
    enum TimeMode
    {
@@ -99,12 +99,12 @@ private:
    Checkbox* mRandomStepCheckbox{ nullptr };
 
    bool mWaitingForDownbeat{ false };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
 
    FloatSlider* mFreeTimeSlider{ nullptr };
-   float mFreeTimeStep{ 30 };
-   float mFreeTimeCounter{ 0 };
+   double mFreeTimeStep{ 30 };
+   double mFreeTimeCounter{ 0 };
    int mResetLength{ 8 };
    IntSlider* mResetLengthSlider{ nullptr };
    int mCustomDivisor{ 8 };

@@ -84,12 +84,12 @@ void GridModule::OnControllerPageSelected()
    UpdateLights();
 }
 
-void GridModule::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void GridModule::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    OnGridButton(col, row, value, nullptr);
 }
 
-void GridModule::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void GridModule::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (y < GetRows() && x < GetCols())
    {
@@ -108,7 +108,7 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
 
 void GridModule::PlayNote(NoteMessage note)
 {
-   OnGridButton(note.pitch % GetCols(), ((note.pitch / GetCols()) % GetRows()), note.velocity / 127.0f, nullptr);
+   OnGridButton(note.pitch % GetCols(), ((note.pitch / GetCols()) % GetRows()), note.velocity / 127.0, nullptr);
 }
 
 void GridModule::UpdateLights()
@@ -143,11 +143,11 @@ void GridModule::DrawModule()
    mGridControlTarget->Draw();
 
    ofPushStyle();
-   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
+   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
    for (int i = 0; i < mGrid->GetRows() && i < (int)mLabels.size(); ++i)
    {
-      ofVec2f pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
-      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 10);
+      ofVec2d pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
+      double scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows() - 2, 10);
       DrawTextNormal(mLabels[i], 2, pos.y - (scale / 8), scale);
    }
    ofPopStyle();
@@ -161,9 +161,9 @@ void GridModule::DrawModule()
          Vec2i cell(i % kGridOverlayMaxDim, i / kGridOverlayMaxDim);
          if (cell.x < GetCols() && cell.y < GetRows())
          {
-            ofVec2f pos = mGrid->GetCellPosition(cell.x, cell.y) + mGrid->GetPosition(true);
-            float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-            float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+            ofVec2d pos = mGrid->GetCellPosition(cell.x, cell.y) + mGrid->GetPosition(true);
+            double xsize = mGrid->GetWidth() / mGrid->GetCols();
+            double ysize = mGrid->GetHeight() / mGrid->GetRows();
             ofSetColor(GetColor(mGridOverlay[i]));
             ofRect(pos.x + 3, pos.y + 3, xsize - 6, ysize - 6);
          }
@@ -181,9 +181,9 @@ void GridModule::DrawModule()
          {
             if (gTime - mHighlightCells[i].time > 0)
             {
-               ofVec2f pos = mGrid->GetCellPosition(mHighlightCells[i].position.x, mHighlightCells[i].position.y) + mGrid->GetPosition(true);
-               float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-               float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+               ofVec2d pos = mGrid->GetCellPosition(mHighlightCells[i].position.x, mHighlightCells[i].position.y) + mGrid->GetPosition(true);
+               double xsize = mGrid->GetWidth() / mGrid->GetCols();
+               double ysize = mGrid->GetHeight() / mGrid->GetRows();
                ofSetColor(mHighlightCells[i].color, (1 - (gTime - mHighlightCells[i].time) / mHighlightCells[i].duration) * 255);
                ofRect(pos.x, pos.y, xsize, ysize);
             }
@@ -252,21 +252,21 @@ void GridModule::Clear()
    UpdateLights();
 }
 
-void GridModule::GetModuleDimensions(float& width, float& height)
+void GridModule::GetModuleDimensions(double& width, double& height)
 {
    ofRectangle rect = mGrid->GetRect(true);
    width = rect.x + rect.width + 2;
    height = rect.y + rect.height + 6;
 }
 
-void GridModule::Resize(float w, float h)
+void GridModule::Resize(double w, double h)
 {
-   float curW, curH;
+   double curW, curH;
    GetModuleDimensions(curW, curH);
    mGrid->SetDimensions(mGrid->GetWidth() + w - curW, mGrid->GetHeight() + h - curH);
 }
 
-void GridModule::OnClicked(float x, float y, bool right)
+void GridModule::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -290,7 +290,7 @@ void GridModule::SetLight(int x, int y, GridColor color, bool force)
    SetLightDirect(x, y, colorIdx, force);
 }
 
-void GridModule::SetLightDirect(int x, int y, int color, bool force)
+void GridModule::SetLightDirect(int x, int y, double color, bool force)
 {
    if (mGridControlTarget->GetGridController())
       mGridControlTarget->GetGridController()->SetLightDirect(x, y, color, force);
@@ -373,9 +373,9 @@ void GridModule::LoadState(FileStreamIn& in, int rev)
    if (rev >= 1)
    {
       mGrid->LoadState(in);
-      float w, h;
-      in >> w;
-      in >> h;
+      double w, h;
+      in >> FloatAsDouble >> w;
+      in >> FloatAsDouble >> h;
       mGrid->SetDimensions(w, h);
    }
 
