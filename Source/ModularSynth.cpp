@@ -3200,7 +3200,7 @@ void ModularSynth::DoAutosave()
 
    juce::File parentDirectory(ofToDataPath("savestate/autosave"));
    Array<juce::File> autosaveFiles;
-   parentDirectory.findChildFiles(autosaveFiles, juce::File::findFiles, false, "*.bsk");
+   parentDirectory.findChildFiles(autosaveFiles, juce::File::findFiles, false, "*.bsk;*.bskt");
    if (autosaveFiles.size() >= kMaxAutosaveSlots)
    {
       FileTimeComparator cmp;
@@ -3209,7 +3209,7 @@ void ModularSynth::DoAutosave()
          autosaveFiles[i].deleteFile();
    }
 
-   SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk")), true);
+   SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bskt")), true);
 }
 
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spawnable, float x, float y, bool addToContainer, std::string name)
