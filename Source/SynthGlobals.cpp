@@ -11502,19 +11502,19 @@ bool EvaluateExpression(std::string expressionStr, double currentValue, double& 
 {
    exprtk::symbol_table<double> symbolTable;
    exprtk::expression<double> expression;
-   symbolTable.add_variable("current_value", currentValue);
+   symbolTable.add_variable("x", currentValue);
    symbolTable.add_constants();
    expression.register_symbol_table(symbolTable);
 
    juce::String input = expressionStr;
    if (input.startsWith("+="))
-      input = input.replace("+=", "current_value+");
+      input = input.replace("+=", "x+");
    if (input.startsWith("*="))
-      input = input.replace("*=", "current_value*");
+      input = input.replace("*=", "x*");
    if (input.startsWith("/="))
-      input = input.replace("/=", "current_value/");
+      input = input.replace("/=", "x/");
    if (input.startsWith("-="))
-      input = input.replace("-=", "current_value-");
+      input = input.replace("-=", "x-");
 
    exprtk::parser<double> parser;
    bool expressionValid = parser.compile(input.toStdString(), expression);

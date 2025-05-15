@@ -74,7 +74,7 @@ void Selector::SyncList()
 
 void Selector::PlayNote(NoteMessage note)
 {
-   int range = (int)mControlCables.size() - 1;
+   int range = (int)mControlCables.size();
    if (note.velocity > 0 && range > 0)
       SetIndex(note.pitch % range, note.time);
 }

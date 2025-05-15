@@ -161,8 +161,11 @@ void EffectChain::Process(double time)
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
       float* buffer = GetBuffer()->GetChannel(ch);
-      double volSq = mVolume * mVolume;
-      Mult(buffer, volSq, bufferSize);
+      if (mEnabled)
+      {
+         float volSq = mVolume * mVolume;
+         Mult(buffer, volSq, bufferSize);
+      }
       Add(target->GetBuffer()->GetChannel(ch), buffer, bufferSize);
       GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
    }

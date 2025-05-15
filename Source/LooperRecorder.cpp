@@ -895,7 +895,7 @@ void LooperRecorder::LoadLayout(const ofxJSONElement& moduleInfo)
 void LooperRecorder::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   mNumLoopers = mModuleSaveData.GetInt("num_loopers");
+   mNumLoopers = ofClamp(mModuleSaveData.GetInt("num_loopers"), 1, kMaxLoopers);
    mTemporarilySilenceAfterCommit = mModuleSaveData.GetBool("temp_silence_after_commit");
 }
 
