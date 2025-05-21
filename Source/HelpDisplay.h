@@ -64,8 +64,8 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void RenderScreenshot(int x, int y, int width, int height, std::string filename);
 
@@ -96,16 +96,16 @@ private:
    ClickButton* mTutorialVideoLinkButton{ nullptr };
    ClickButton* mDocsLinkButton{ nullptr };
    ClickButton* mDiscordLinkButton{ nullptr };
-   float mWidth{ 700 };
-   float mHeight{ 700 };
+   double mWidth{ 700 };
+   double mHeight{ 700 };
    static bool sTooltipsLoaded;
    static std::list<ModuleTooltipInfo> sTooltips;
 
    std::list<ModuleFactory::Spawnable> mScreenshotsToProcess;
    IDrawableModule* mScreenshotModule{ nullptr };
 
-   float mScrollOffsetY{ 0 };
-   float mMaxScrollAmount{ 0 };
+   double mScrollOffsetY{ 0 };
+   double mMaxScrollAmount{ 0 };
 
    enum class ScreenshotState
    {

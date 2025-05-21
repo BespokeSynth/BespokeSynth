@@ -45,20 +45,20 @@ public:
    void Init() override;
 
    void SetFilterType(FilterType type) { mBiquad[0].SetFilterType(type); }
-   void SetFilterParams(float f, float q) { mBiquad[0].SetFilterParams(f, q); }
+   void SetFilterParams(double f, double q) { mBiquad[0].SetFilterParams(f, q); }
    void Clear();
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "biquad"; }
 
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& info) override;
@@ -69,7 +69,7 @@ public:
 
 private:
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    void DrawModule() override;
 
    void ResetFilter();

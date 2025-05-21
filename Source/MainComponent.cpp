@@ -423,12 +423,12 @@ public:
       mouse -= mScreenPosition;
       mSynth.MouseMoved(mouse.x, mouse.y);
 
-      float width = getWidth();
-      float height = getHeight();
+      double width = getWidth();
+      double height = getHeight();
 
-      static float kMotionTrails = .4f;
+      static double kMotionTrails = .4;
 
-      ofVec3f bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
+      ofVec3d bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
       glViewport(0, 0, width * mPixelRatio, height * mPixelRatio);
       glClearColor(bgColor.x, bgColor.y, bgColor.z, 0);
       if (UserPrefs.motion_trails.Get() <= 0)
@@ -438,14 +438,14 @@ public:
 
       if (UserPrefs.motion_trails.Get() > 0)
       {
-         ofSetColor(bgColor.x * 255, bgColor.y * 255, bgColor.z * 255, (1 - (UserPrefs.motion_trails.Get() * kMotionTrails) * (ofGetFrameRate() / 60.0f)) * 255);
+         ofSetColor(bgColor.x * 255, bgColor.y * 255, bgColor.z * 255, (1 - (UserPrefs.motion_trails.Get() * kMotionTrails) * (ofGetFrameRate() / 60.0)) * 255);
          ofFill();
          ofRect(0, 0, width, height);
       }
 
       nvgLineCap(mVG, NVG_ROUND);
       nvgLineJoin(mVG, NVG_ROUND);
-      static float sSpacing = -.3f;
+      static double sSpacing = -.3;
       nvgTextLetterSpacing(mVG, sSpacing);
       nvgTextLetterSpacing(mFontBoundsVG, sSpacing);
 
@@ -463,7 +463,7 @@ public:
       const int64 kCalcFpsIntervalMs = 1000;
       if (time - mLastFpsUpdateTime >= kCalcFpsIntervalMs)
       {
-         mSynth.UpdateFrameRate(mFrameCountAccum / (kCalcFpsIntervalMs / 1000.0f));
+         mSynth.UpdateFrameRate(mFrameCountAccum / (kCalcFpsIntervalMs / 1000.0));
 
          mFrameCountAccum = 0;
          mLastFpsUpdateTime = time;
@@ -515,11 +515,11 @@ private:
 
    void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& wheel) override
    {
-      float invert = 1;
+      double invert = 1;
       if (wheel.isReversed)
          invert = -1;
 
-      float scale = 6;
+      double scale = 6;
       if (wheel.isSmooth)
          scale = 30;
 

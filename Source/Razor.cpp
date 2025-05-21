@@ -40,7 +40,7 @@ namespace
 
 Razor::Razor()
 {
-   std::memset(mAmp, 0, sizeof(float) * NUM_PARTIALS);
+   std::memset(mAmp, 0, sizeof(double) * NUM_PARTIALS);
    std::memset(mPeakHistory, 0, sizeof(float) * (VIZ_WIDTH + 1) * RAZOR_HISTORY);
    std::memset(mPhases, 0, sizeof(float) * NUM_PARTIALS);
 
@@ -54,19 +54,19 @@ void Razor::CreateUIControls()
    mNumPartialsSlider = new IntSlider(this, "partials", 5, 40, 320, 15, &mUseNumPartials, 1, NUM_PARTIALS);
    mBumpAmpSlider = new FloatSlider(this, "bump freq 1", 5, 60, 320, 15, &mBumps[0].mFreq, 0, 10000);
    mBumpAmpAmtSlider = new FloatSlider(this, "amt 1", 5, 80, 320, 15, &mBumps[0].mAmt, -1, 1);
-   mBumpAmpDecaySlider = new FloatSlider(this, "decay 1", 5, 100, 320, 15, &mBumps[0].mDecay, 0.00001f, .01f, 4);
+   mBumpAmpDecaySlider = new FloatSlider(this, "decay 1", 5, 100, 320, 15, &mBumps[0].mDecay, 0.00001, .01, 4);
    mBumpAmpSlider2 = new FloatSlider(this, "bump freq 2", 330, 60, 320, 15, &mBumps[1].mFreq, 0, 10000);
    mBumpAmpAmtSlider2 = new FloatSlider(this, "amt 2", 330, 80, 320, 15, &mBumps[1].mAmt, -1, 1);
-   mBumpAmpDecaySlider2 = new FloatSlider(this, "decay 2", 330, 100, 320, 15, &mBumps[1].mDecay, 0.00001f, .01f, 4);
+   mBumpAmpDecaySlider2 = new FloatSlider(this, "decay 2", 330, 100, 320, 15, &mBumps[1].mDecay, 0.00001, .01, 4);
    mBumpAmpSlider3 = new FloatSlider(this, "bump freq 3", 660, 60, 320, 15, &mBumps[2].mFreq, 0, 10000);
    mBumpAmpAmtSlider3 = new FloatSlider(this, "amt 3", 660, 80, 320, 15, &mBumps[2].mAmt, -1, 1);
-   mBumpAmpDecaySlider3 = new FloatSlider(this, "decay 3", 660, 100, 320, 15, &mBumps[2].mDecay, 0.00001f, .01f, 4);
+   mBumpAmpDecaySlider3 = new FloatSlider(this, "decay 3", 660, 100, 320, 15, &mBumps[2].mDecay, 0.00001, .01, 4);
    mASlider = new FloatSlider(this, "A", 450, 342, 80, 15, &mA, 1, 1000);
    mDSlider = new FloatSlider(this, "D", 450, 358, 80, 15, &mD, 1, 1000);
    mSSlider = new FloatSlider(this, "S", 450, 374, 80, 15, &mS, 0, 1);
    mRSlider = new FloatSlider(this, "R", 450, 390, 80, 15, &mR, 1, 1000);
    mHarmonicSelectorSlider = new IntSlider(this, "harmonics", 5, 120, 160, 15, &mHarmonicSelector, -1, 10);
-   mPowFalloffSlider = new FloatSlider(this, "pow falloff", 170, 120, 160, 15, &mPowFalloff, .1f, 2);
+   mPowFalloffSlider = new FloatSlider(this, "pow falloff", 170, 120, 160, 15, &mPowFalloff, .1, 2);
    mNegHarmonicsSlider = new IntSlider(this, "neg harmonics", 335, 120, 160, 15, &mNegHarmonics, 1, 10);
    mHarshnessCutSlider = new FloatSlider(this, "harshness cut", 500, 120, 160, 15, &mHarshnessCut, 0, 20000);
    mManualControlCheckbox = new Checkbox(this, "manual control", 4, 145, &mManualControl);
@@ -74,7 +74,7 @@ void Razor::CreateUIControls()
    for (int i = 0; i < NUM_AMP_SLIDERS; ++i)
    {
       mAmpSliders[i] = new FloatSlider(this, ("amp" + ofToString(i)).c_str(), 4, 160 + i * 16, 200, 15, &mAmp[i], -1, 1);
-      mDetuneSliders[i] = new FloatSlider(this, ("detune" + ofToString(i)).c_str(), 210, 160 + i * 16, 200, 15, &mDetune[i], .98f, 1.02f);
+      mDetuneSliders[i] = new FloatSlider(this, ("detune" + ofToString(i)).c_str(), 210, 160 + i * 16, 200, 15, &mDetune[i], .98, 1.02);
    }
 
    mResetDetuneButton = new ClickButton(this, "reset detune", 210, 145);
@@ -99,7 +99,7 @@ void Razor::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
@@ -108,7 +108,7 @@ void Razor::Process(double time)
 
    for (int i = 0; i < bufferSize; ++i)
    {
-      float freq = TheScale->PitchToFreq(mPitch + (mPitchBend ? mPitchBend->GetValue(i) : 0));
+      double freq = TheScale->PitchToFreq(mPitch + (mPitchBend ? mPitchBend->GetValue(i) : 0));
 
       int oscNyquistLimitIdx = int(gNyquistLimit / freq);
 
@@ -142,16 +142,12 @@ void Razor::PlayNote(NoteMessage note)
 
    if (note.velocity > 0)
    {
-      float amount = note.velocity / 127.0f;
+      double amount = note.velocity / 127.0;
 
       mPitch = note.pitch;
       for (int i = 1; i <= NUM_PARTIALS; ++i)
       {
-         mAdsr[i - 1].Start(note.time, amount,
-                            mA,
-                            mD,
-                            mS,
-                            mR);
+         mAdsr[i - 1].Start(note.time, amount);
       }
 
       mPitchBend = note.modulation.pitchBend;
@@ -207,12 +203,12 @@ void Razor::DrawViz()
    ofPushStyle();
 
    int zeroHeight = 240;
-   float baseFreq = TheScale->PitchToFreq(mPitch);
+   double baseFreq = TheScale->PitchToFreq(mPitch);
    int oscNyquistLimitIdx = int(gNyquistLimit / baseFreq);
 
    for (int i = 1; i < RAZOR_HISTORY - 1; ++i)
    {
-      float age = 1 - float(i) / RAZOR_HISTORY;
+      double age = 1 - double(i) / RAZOR_HISTORY;
       ofSetColor(0, 200 * age, 255 * age);
       for (int x = 0; x < VIZ_WIDTH; ++x)
       {
@@ -267,10 +263,10 @@ void Razor::DrawViz()
    ofPopStyle();
 }
 
-float Razor::SinSample(float phase)
+double Razor::SinSample(double phase)
 {
    int intPhase = int(phase) % 512;
-   float remainder = phase - int(phase);
+   double remainder = phase - int(phase);
    return ((1 - remainder) * sineBuffer[intPhase] + remainder * sineBuffer[1 + intPhase]);
 }
 
@@ -308,10 +304,10 @@ bool IsPow2(int n)
 
 void Razor::CalcAmp()
 {
-   float baseFreq = TheScale->PitchToFreq(mPitch);
+   double baseFreq = TheScale->PitchToFreq(mPitch);
    int oscNyquistLimitIdx = int(gNyquistLimit / baseFreq);
 
-   std::memset(mAmp, 0, sizeof(float) * NUM_PARTIALS);
+   std::memset(mAmp, 0, sizeof(double) * NUM_PARTIALS);
    for (int i = 1; i <= mUseNumPartials && i <= oscNyquistLimitIdx; ++i)
    {
       if ((mHarmonicSelector == 0 && IsPrime(i)) ||
@@ -319,15 +315,15 @@ void Razor::CalcAmp()
           mHarmonicSelector == 1 ||
           (mHarmonicSelector > 0 && i % mHarmonicSelector == 1))
       {
-         float freq = baseFreq * i;
+         double freq = baseFreq * i;
 
-         mAmp[i - 1] = 1.0f / powf(i, mPowFalloff);
+         mAmp[i - 1] = 1.0 / std::pow(i, mPowFalloff);
 
          for (int j = 0; j < NUM_BUMPS; ++j)
          {
-            float freqDist = fabs(mBumps[j].mFreq - freq);
-            float dist = PI / 2 - freqDist * mBumps[j].mDecay;
-            float bumpAmt = mBumps[j].mAmt * (MIN(1, (tanh(dist) + 1) / 2)); // * ofRandom(1);
+            double freqDist = std::abs(mBumps[j].mFreq - freq);
+            double dist = PI / 2 - freqDist * mBumps[j].mDecay;
+            double bumpAmt = mBumps[j].mAmt * (MIN(1, (tanh(dist) + 1) / 2)); // * ofRandom(1);
             mAmp[i - 1] += bumpAmt;
          }
 
@@ -336,7 +332,7 @@ void Razor::CalcAmp()
 
          if (mHarshnessCut > 0)
          {
-            float cutPoint = gNyquistLimit - mHarshnessCut;
+            double cutPoint = gNyquistLimit - mHarshnessCut;
             if (freq > cutPoint)
                mAmp[i - 1] *= 1 - ((freq - cutPoint) / mHarshnessCut);
          }
@@ -360,7 +356,7 @@ void Razor::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Razor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Razor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

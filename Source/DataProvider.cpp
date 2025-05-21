@@ -186,7 +186,7 @@ void DataProvider::OnTimeEvent(double time)
 {
 }
 
-void DataProvider::OnPulse(double time, float velocity, int flags)
+void DataProvider::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0 && mEnabled && !mRealtime)
       Go(time);
@@ -196,7 +196,7 @@ void DataProvider::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void DataProvider::OnTransportAdvanced(float amount)
+void DataProvider::OnTransportAdvanced(double amount)
 {
    Go(gTime);
 }

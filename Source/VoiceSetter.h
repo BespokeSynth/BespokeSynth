@@ -52,14 +52,14 @@ private:
    //IDrawableModule
    void DrawModule() override;
 
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mWidth{ 90 };
-   float mHeight{ 20 };
+   double mWidth{ 90 };
+   double mHeight{ 20 };
 
    int mVoiceIdx{ 0 };
    IntSlider* mVoiceSlider{ nullptr };

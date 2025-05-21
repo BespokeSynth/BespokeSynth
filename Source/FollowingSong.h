@@ -49,7 +49,7 @@ public:
    void CreateUIControls() override;
 
    void LoadSample(const char* file);
-   void SetPlaybackInfo(bool play, int position, float speed, float volume);
+   void SetPlaybackInfo(bool play, double position, double speed, double volume);
 
    //IAudioSource
    void Process(double time) override;
@@ -60,7 +60,7 @@ public:
    void ButtonClicked(ClickButton* button, double time) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -70,7 +70,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 560;
       height = 130;
@@ -80,7 +80,7 @@ private:
    bool mLoadingSong{ true };
 
    Sample mSample;
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    bool mPlay{ false };
    bool mMute{ false };
    Checkbox* mMuteCheckbox{ nullptr };

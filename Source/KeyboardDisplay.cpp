@@ -33,7 +33,7 @@
 
 namespace
 {
-   const float kKeyboardYOffset = 0;
+   const double kKeyboardYOffset = 0;
 }
 
 KeyboardDisplay::KeyboardDisplay()
@@ -76,7 +76,7 @@ void KeyboardDisplay::PlayNote(NoteMessage note)
    }
 }
 
-void KeyboardDisplay::OnClicked(float x, float y, bool right)
+void KeyboardDisplay::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -95,18 +95,18 @@ void KeyboardDisplay::OnClicked(float x, float y, bool right)
             {
                int pitch = i + RootKey();
 
-               float minVelocityY;
-               float maxVelocityY;
+               double minVelocityY;
+               double maxVelocityY;
 
                if (isBlackKey)
                {
                   minVelocityY = 0;
-                  maxVelocityY = (mHeight / 2) * .9f;
+                  maxVelocityY = (mHeight / 2) * .9;
                }
                else
                {
                   minVelocityY = mHeight / 2;
-                  maxVelocityY = mHeight * .9f;
+                  maxVelocityY = mHeight * .9;
                }
 
                int noteVelocity = 127;
@@ -183,7 +183,7 @@ void KeyboardDisplay::SetPitchColor(int pitch)
    }
 }
 
-void KeyboardDisplay::Resize(float w, float h)
+void KeyboardDisplay::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;
@@ -195,9 +195,9 @@ void KeyboardDisplay::RefreshOctaveCount()
 {
    if (mForceNumOctaves == 0)
    {
-      float ratio = mWidth / mHeight;
+      double ratio = mWidth / mHeight;
 
-      constexpr float baseRatioForOneElement = 250.0f / 180.0f;
+      constexpr double baseRatioForOneElement = 250.0 / 180.0;
 
       int elements = static_cast<int>(ratio / baseRatioForOneElement);
 
@@ -241,7 +241,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       }
    }
 
-   float keySpace = (float)w / ((float)NumKeys() - mNumOctaves * 5);
+   double keySpace = static_cast<double>(w) / (static_cast<double>(NumKeys()) - mNumOctaves * 5);
 
    int oct = mRootOctave;
    if (keySpace > 16 && h > 34 && !mHideLabels)
@@ -249,7 +249,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       for (int i = 0; i < NumKeys(); i += 7)
       {
          ofSetColor(108, 37, 62, 255);
-         DrawTextNormal(NoteName(oct * 12, false, true), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 12);
+         DrawTextNormal(NoteName(oct * 12, false, true), keySpace * 0.5 - 6.5 + i * keySpace, h - 8, 12);
          oct++;
       }
    }
@@ -265,7 +265,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
          ofRectangle key = GetKeyboardKeyRect(pitch, w, h, isBlackKey);
          key.height /= 3;
          key.y += key.height * 2;
-         ofSetColor(255, 255, 255, ofLerp(255, 150, ofClamp((gTime - mLastOnTime[pitch]) / 150.0f, 0, 1)));
+         ofSetColor(255, 255, 255, ofLerp(255, 150, ofClamp((gTime - mLastOnTime[pitch]) / 150.0, 0, 1)));
          ofRect(key);
       }
    }
@@ -277,25 +277,25 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
 
 ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const
 {
-   float extraKeyWidth = w / (mNumOctaves * 7 + 1);
-   float octaveWidth = (w - extraKeyWidth) / mNumOctaves;
+   double extraKeyWidth = w / (mNumOctaves * 7 + 1);
+   double octaveWidth = (w - extraKeyWidth) / mNumOctaves;
 
    pitch -= RootKey();
 
-   float offset = pitch / TheScale->GetPitchesPerOctave() * (octaveWidth);
+   double offset = pitch / TheScale->GetPitchesPerOctave() * (octaveWidth);
    pitch %= 12;
 
    if ((pitch <= 4 && pitch % 2 == 0) || (pitch >= 5 && pitch % 2 == 1)) //white key
    {
       int whiteKey = (pitch + 1) / 2;
       isBlackKey = false;
-      return ofRectangle(offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, h);
+      return { offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, static_cast<double>(h) };
    }
    else //black key
    {
       int blackKey = pitch / 2;
       isBlackKey = true;
-      return ofRectangle(offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1f, 0, octaveWidth / 7 * .8f, h / 2);
+      return { offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1, 0, octaveWidth / 7 * .8, static_cast<double>(h) / 2 };
    }
 }
 
@@ -418,8 +418,9 @@ void KeyboardDisplay::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   in >> FloatAsDouble >> mWidth;
+   in >> FloatAsDouble >> mHeight;
+
    if (rev >= 2)
    {
       in >> mNumOctaves;

@@ -52,10 +52,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    std::array<bool, 128> mGate;
-   std::array<float, 128> mLastPlayTime;
+   std::array<double, 128> mLastPlayTime;
    std::vector<Checkbox*> mGateCheckboxes;
    int mMinPitch{ 0 };
    int mMaxPitch{ 7 };

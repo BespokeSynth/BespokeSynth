@@ -48,15 +48,15 @@ public:
 
    IUIControl* GetUIControl() const { return mUIControl; }
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -75,15 +75,15 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    IUIControl* mUIControl{ nullptr };
    FloatSlider* mFloatSlider{ nullptr };
    PatchCableSource* mControlCable{ nullptr };
-   float mWidth{ 200 };
-   float mHeight{ 120 };
-   float mSpeed{ 1 };
+   double mWidth{ 200 };
+   double mHeight{ 120 };
+   double mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
-   std::array<float, 100000> mValues{};
+   std::array<double, 100000> mValues{};
    int mValueDisplayPointer{ 0 };
 };

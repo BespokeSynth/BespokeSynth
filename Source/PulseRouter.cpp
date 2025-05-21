@@ -1,4 +1,4 @@
-﻿/**
+/**
 bespoke synth, a software modular synthesizer
     Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
 
@@ -53,7 +53,7 @@ void PulseRouter::DrawModule()
    mRouteSelector->Draw();
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
-      ofVec2f pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
+      ofVec2d pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
       mDestinationCables[i]->SetManualPosition(pos.x + 10, pos.y + 4);
    }
 }
@@ -70,7 +70,7 @@ bool PulseRouter::IsIndexActive(int idx) const
    return mRouteMask & (1 << idx);
 }
 
-void PulseRouter::OnPulse(double time, float velocity, int flags)
+void PulseRouter::OnPulse(double time, double velocity, int flags)
 {
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
@@ -108,9 +108,9 @@ void PulseRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void PulseRouter::GetModuleDimensions(float& width, float& height)
+void PulseRouter::GetModuleDimensions(double& width, double& height)
 {
-   float w, h;
+   double w, h;
    mRouteSelector->GetDimensions(w, h);
    width = 20 + w;
    height = 8 + h;
@@ -136,7 +136,7 @@ void PulseRouter::SetUpFromSaveData()
          mDestinationCables.push_back(new PatchCableSource(this, kConnectionType_Pulse));
          mRouteSelector->AddLabel("                      ", i);
          AddPatchCableSource(mDestinationCables[i]);
-         mDestinationCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+         mDestinationCables[i]->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
          ofRectangle rect = GetRect(true);
          mDestinationCables[i]->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
       }

@@ -36,15 +36,15 @@ public:
    CanvasTimeline(Canvas* canvas, std::string name);
    ~CanvasTimeline() {}
 
-   void SetDimensions(float width, float height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    void KeyPressed(int key, bool isRepeat) override {}
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -54,12 +54,12 @@ public:
 
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
 private:
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -73,14 +73,14 @@ private:
       kMiddle
    };
 
-   void DrawTriangle(float posX, int direction);
-   float GetQuantizedForX(float posX, HoverMode clampSide);
+   void DrawTriangle(double posX, int direction);
+   double GetQuantizedForX(double posX, HoverMode clampSide);
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    bool mClick{ false };
-   ofVec2f mClickMousePos;
-   ofVec2f mDragOffset;
+   ofVec2d mClickMousePos;
+   ofVec2d mDragOffset;
    HoverMode mHoverMode{ HoverMode::kNone };
 
    Canvas* mCanvas{ nullptr };

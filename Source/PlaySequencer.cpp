@@ -41,7 +41,7 @@ void PlaySequencer::Init()
    IDrawableModule::Init();
 
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
-   TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false), false);
+   TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5, false), false);
 }
 
 void PlaySequencer::CreateUIControls()
@@ -50,7 +50,7 @@ void PlaySequencer::CreateUIControls()
 
    mGridControlTarget = new GridControlTarget(this, "grid", mWidth - 50, 4);
 
-   float width, height;
+   double width, height;
    UIBLOCK0();
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 50);
    UIBLOCK_SHIFTRIGHT();
@@ -81,7 +81,7 @@ void PlaySequencer::CreateUIControls()
    ofRectangle gridRect = mGrid->GetRect(true);
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
-      ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
+      ofVec2d cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
       mLanes[i].mMuteOrEraseCheckbox = new Checkbox(this, ("mute/delete" + ofToString(i)).c_str(), gridRect.getMaxX() + 3, cellPos.y + 1, &mLanes[i].mMuteOrErase);
       mLanes[i].mMuteOrEraseCheckbox->SetDisplayText(false);
       mLanes[i].mMuteOrEraseCheckbox->SetBoxSize(10);
@@ -147,14 +147,14 @@ void PlaySequencer::DrawModule()
       if (mLanes[i].mMuteOrErase)
       {
          ofRectangle gridRect = mGrid->GetRect(true);
-         ofVec2f cellPos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
+         ofVec2d cellPos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
          ofRect(cellPos.x, cellPos.y + 1, gridRect.width, gridRect.height / mGrid->GetRows());
       }
    }
    ofPopStyle();
 }
 
-void PlaySequencer::OnClicked(float x, float y, bool right)
+void PlaySequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -170,7 +170,7 @@ void PlaySequencer::MouseReleased()
    mGrid->MouseReleased();
 }
 
-bool PlaySequencer::MouseMoved(float x, float y)
+bool PlaySequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
@@ -225,7 +225,7 @@ void PlaySequencer::OnTimeEvent(double time)
 
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
-      float gridVal = mGrid->GetVal(step, i);
+      double gridVal = mGrid->GetVal(step, i);
       int playVelocity = (int)(gridVal * 127);
 
       if (mLanes[i].mMuteOrErase)
@@ -237,7 +237,7 @@ void PlaySequencer::OnTimeEvent(double time)
 
       if (mLanes[i].mInputVelocity > 0)
       {
-         float velMult;
+         double velMult;
          switch (GetVelocityLevel())
          {
             case 1: velMult = mVelocityLight; break;
@@ -247,7 +247,7 @@ void PlaySequencer::OnTimeEvent(double time)
          }
          playVelocity = mLanes[i].mInputVelocity * velMult;
          if (mWrite)
-            mGrid->SetVal(step, i, playVelocity / 127.0f);
+            mGrid->SetVal(step, i, playVelocity / 127.0);
          if (!mNoteRepeat)
             mLanes[i].mInputVelocity = 0;
       }
@@ -307,7 +307,7 @@ void PlaySequencer::UpdateInterval()
    if (noteOffListenerInfo != nullptr)
    {
       noteOffListenerInfo->mInterval = mInterval;
-      noteOffListenerInfo->mOffsetInfo = OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false);
+      noteOffListenerInfo->mOffsetInfo = OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5, false);
    }
 
    UpdateNumMeasures(mNumMeasures);
@@ -393,7 +393,7 @@ void PlaySequencer::OnControllerPageSelected()
    UpdateLights();
 }
 
-void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void PlaySequencer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (grid == mGridControlTarget->GetGridController())
    {
@@ -538,17 +538,17 @@ void PlaySequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 namespace
 {
-   const float extraW = 25;
-   const float extraH = 100;
+   const double extraW = 25;
+   const double extraH = 100;
 }
 
-void PlaySequencer::GetModuleDimensions(float& width, float& height)
+void PlaySequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH;
 }
 
-void PlaySequencer::Resize(float w, float h)
+void PlaySequencer::Resize(double w, double h)
 {
    w = MAX(w - extraW, 219);
    h = MAX(h - extraH, 111);
@@ -557,13 +557,13 @@ void PlaySequencer::Resize(float w, float h)
    ofRectangle gridRect = mGrid->GetRect(true);
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
-      ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
+      ofVec2d cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
       mLanes[i].mMuteOrEraseCheckbox->SetPosition(gridRect.getMaxX() + 3, cellPos.y + 1);
       mLanes[i].mMuteOrEraseCheckbox->SetBoxSize(MAX(10, mGrid->GetHeight() / mLanes.size()));
    }
 }
 
-void PlaySequencer::SetGridSize(float w, float h)
+void PlaySequencer::SetGridSize(double w, double h)
 {
    mGrid->SetDimensions(w, h);
 }
@@ -573,8 +573,8 @@ void PlaySequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("sustain", moduleInfo, false);
    mModuleSaveData.LoadFloat("velocity_full", moduleInfo, 1, 0, 1, K(isTextField));
-   mModuleSaveData.LoadFloat("velocity_med", moduleInfo, .5f, 0, 1, K(isTextField));
-   mModuleSaveData.LoadFloat("velocity_light", moduleInfo, .25f, 0, 1, K(isTextField));
+   mModuleSaveData.LoadFloat("velocity_med", moduleInfo, .5, 0, 1, K(isTextField));
+   mModuleSaveData.LoadFloat("velocity_light", moduleInfo, .25, 0, 1, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -631,6 +631,6 @@ void PlaySequencer::LoadState(FileStreamIn& in, int rev)
       in >> size;
       LoadStateValidate(size == (int)mSavedPatterns[i].mData.size());
       for (int j = 0; j < size; ++j)
-         in >> mSavedPatterns[i].mData[j];
+         in >> FloatAsDouble >> mSavedPatterns[i].mData[j];
    }
 }

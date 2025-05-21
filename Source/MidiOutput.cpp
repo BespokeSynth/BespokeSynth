@@ -118,7 +118,7 @@ void MidiOutputModule::SendCC(int control, int value, int voiceIdx /*=-1*/)
    mDevice.SendCC(control, value, mUseVoiceAsChannel ? channel : mChannel);
 }
 
-void MidiOutputModule::OnTransportAdvanced(float amount)
+void MidiOutputModule::OnTransportAdvanced(double amount)
 {
    for (int i = 0; i < mChannelModulations.size(); ++i)
    {

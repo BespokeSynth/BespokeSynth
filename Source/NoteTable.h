@@ -61,14 +61,14 @@ public:
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -76,17 +76,17 @@ public:
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -100,13 +100,13 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
    void UpdateGridControllerLights(bool force);
 
    void PlayColumn(NoteMessage note);
-   float ExtraWidth() const;
-   float ExtraHeight() const;
+   double ExtraWidth() const;
+   double ExtraHeight() const;
    void RandomizePitches(bool fifths);
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
    void SetColumnRow(int column, int row);
@@ -131,8 +131,8 @@ private:
    int mRowOffset{ 0 };
 
    ClickButton* mRandomizePitchButton{ nullptr };
-   float mRandomizePitchChance{ 1 };
-   float mRandomizePitchRange{ 1 };
+   double mRandomizePitchChance{ 1 };
+   double mRandomizePitchRange{ 1 };
    FloatSlider* mRandomizePitchChanceSlider{ nullptr };
    FloatSlider* mRandomizePitchRangeSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };

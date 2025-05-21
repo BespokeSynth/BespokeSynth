@@ -56,7 +56,7 @@ void VelocitySetter::PlayNote(NoteMessage note)
 {
    ComputeSliders(0);
 
-   float random = ofRandom(1 - mRandomness, 1);
+   double random = ofRandom(1 - mRandomness, 1.0);
 
    if (mEnabled && note.velocity != 0)
       note.velocity = int(mVelocity * 127 * random);

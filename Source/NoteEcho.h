@@ -45,7 +45,7 @@ public:
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -56,7 +56,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -65,9 +65,9 @@ private:
    void SendNoteToIndex(int index, NoteMessage note);
 
    static const int kMaxDestinations = 5;
-   std::array<float, kMaxDestinations> mDelay;
+   std::array<double, kMaxDestinations> mDelay;
    std::array<FloatSlider*, kMaxDestinations> mDelaySlider{};
    std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables{};
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 };

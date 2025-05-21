@@ -45,8 +45,8 @@ EventCanvas::EventCanvas()
 
    for (auto& color : mRowColors)
    {
-      color.setBrightness(color.getBrightness() * .8f);
-      color.setSaturation(color.getSaturation() * .7f);
+      color.setBrightness(color.getBrightness() * .8);
+      color.setSaturation(color.getSaturation() * .7);
    }
 
    mRowConnections.resize(kMaxEventRows);
@@ -105,7 +105,7 @@ EventCanvas::~EventCanvas()
    TheTransport->RemoveAudioPoller(this);
 }
 
-void EventCanvas::OnTransportAdvanced(float amount)
+void EventCanvas::OnTransportAdvanced(double amount)
 {
    PROFILER(EventCanvas);
 
@@ -127,11 +127,11 @@ void EventCanvas::OnTransportAdvanced(float amount)
 
    for (auto* canvasElement : mCanvas->GetElements())
    {
-      float elementStart = canvasElement->GetStart();
+      double elementStart = canvasElement->GetStart();
       bool startPassed = (lookaheadPos >= elementStart && mPreviousPosition < elementStart);
-      float elementEnd = canvasElement->GetEnd();
+      double elementEnd = canvasElement->GetEnd();
       if (elementEnd > mCanvas->GetLength())
-         elementEnd = FloatWrap(elementEnd, mCanvas->GetLength());
+         elementEnd = DoubleWrap(elementEnd, mCanvas->GetLength());
       bool endPassed = (lookaheadPos >= elementEnd && mPreviousPosition < elementEnd);
       if (startPassed || endPassed)
       {
@@ -161,12 +161,12 @@ void EventCanvas::OnTransportAdvanced(float amount)
    {
       if (mRowConnections[i].mUIControl)
       {
-         float value = mRowConnections[i].mUIControl->GetValue();
+         double value = mRowConnections[i].mUIControl->GetValue();
 
          if (mRecord && mRowConnections[i].mLastValue != value)
          {
-            float colPos = lookaheadPos * mCanvas->GetNumCols();
-            int col = int(colPos + .5f);
+            double colPos = lookaheadPos * mCanvas->GetNumCols();
+            int col = int(colPos + .5);
             EventCanvasElement* element = new EventCanvasElement(mCanvas, col, i, colPos - col);
             element->SetUIControl(mRowConnections[i].mUIControl);
             element->SetValue(value);
@@ -180,7 +180,7 @@ void EventCanvas::OnTransportAdvanced(float amount)
    mPreviousPosition = lookaheadPos;
 }
 
-double EventCanvas::GetTriggerTime(double lookaheadTime, double lookaheadPos, float eventPos)
+double EventCanvas::GetTriggerTime(double lookaheadTime, double lookaheadPos, double eventPos)
 {
    double cursorAdvanceSinceEvent = lookaheadPos - eventPos;
    if (cursorAdvanceSinceEvent < 0)
@@ -251,8 +251,8 @@ void EventCanvas::DrawModule()
       color.a = 50;
       ofSetColor(color);
 
-      float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
-      float y = mCanvas->GetPosition(true).y + i * boxHeight;
+      double boxHeight = mCanvas->GetHeight() / mCanvas->GetNumVisibleRows();
+      double y = mCanvas->GetPosition(true).y + i * boxHeight;
       ofRect(mCanvas->GetPosition(true).x, y, mCanvas->GetWidth(), boxHeight);
    }
    ofPopStyle();
@@ -275,7 +275,7 @@ void EventCanvas::DrawModule()
    {
       if (mCanvas->IsRowVisible(i))
       {
-         mControlCables[i]->SetManualPosition(GetRect().width, canvasRect.y + (canvasRect.height / mCanvas->GetNumVisibleRows()) * (i - mCanvas->GetRowOffset() + .5f));
+         mControlCables[i]->SetManualPosition(GetRect().width, canvasRect.y + (canvasRect.height / mCanvas->GetNumVisibleRows()) * (i - mCanvas->GetRowOffset() + .5));
          mControlCables[i]->SetEnabled(true);
       }
       else
@@ -297,7 +297,7 @@ void EventCanvas::SyncControlCablesToCanvas()
       for (int i = oldSize; i < mControlCables.size(); ++i)
       {
          mControlCables[i] = new PatchCableSource(this, kConnectionType_UIControl);
-         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+         mControlCables[i]->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
          mControlCables[i]->SetColor(GetRowColor(i));
          AddPatchCableSource(mControlCables[i]);
       }
@@ -312,18 +312,18 @@ void EventCanvas::SyncControlCablesToCanvas()
 
 namespace
 {
-   const float extraW = 10;
-   const float extraH = 150;
+   const double extraW = 10;
+   const double extraH = 150;
 }
 
-void EventCanvas::Resize(float w, float h)
+void EventCanvas::Resize(double w, double h)
 {
    w = MAX(w - extraW, 390);
    h = MAX(h - extraH, 100);
    mCanvas->SetDimensions(w, h);
 }
 
-void EventCanvas::GetModuleDimensions(float& width, float& height)
+void EventCanvas::GetModuleDimensions(double& width, double& height)
 {
    width = mCanvas->GetWidth() + extraW;
    height = mCanvas->GetHeight() + extraH;
@@ -333,7 +333,7 @@ void EventCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mPreviousPosition = mPosition + .001f;
+      mPreviousPosition = mPosition + .001;
    }
 }
 
@@ -354,14 +354,14 @@ void EventCanvas::ButtonClicked(ClickButton* button, double time)
       {
          if (anyHighlighted == false || element->GetHighlighted())
          {
-            element->mCol = int(element->mCol + element->mOffset + .5f) % mCanvas->GetNumCols();
+            element->mCol = int(element->mCol + element->mOffset + .5) % mCanvas->GetNumCols();
             element->mOffset = 0;
          }
       }
    }
 }
 
-void EventCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EventCanvas::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

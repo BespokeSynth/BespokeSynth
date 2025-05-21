@@ -31,7 +31,7 @@
 #include "PatchCableSource.h"
 #include "Snapshots.h"
 
-Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator)
+Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, double length, int rows, int cols, CreateCanvasElementFn elementCreator)
 : mWidth(w)
 , mHeight(h)
 , mLength(length)
@@ -61,8 +61,8 @@ void Canvas::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   ofSetLineWidth(.5f);
-   float w, h;
+   ofSetLineWidth(.5);
+   double w, h;
    GetDimensions(w, h);
    ofNoFill();
    ofRect(0, 0, mWidth, mHeight, 0);
@@ -70,19 +70,19 @@ void Canvas::Render()
 
    ofPushStyle();
    ofFill();
-   const float rowHeight = GetHeight() / GetNumVisibleRows();
+   const double rowHeight = GetHeight() / GetNumVisibleRows();
    for (int i = 0; i < GetNumVisibleRows(); ++i)
    {
       int row = mRowOffset + i;
       if (row >= 0 && row < mRowColors.size())
-         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1f), ofVec2f(0, i * rowHeight + rowHeight * 0.0f), ofVec2f(0, i * rowHeight + rowHeight));
+         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1), ofVec2d(0, i * rowHeight + rowHeight * 0.0), ofVec2d(0, i * rowHeight + rowHeight));
       ofRect(0, i * rowHeight, GetWidth(), rowHeight, 0);
    }
    ofPopStyle();
 
    for (int i = 0; i < GetNumCols(); ++i)
    {
-      float pos = ofMap(float(i) / GetNumCols(), mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
+      double pos = ofMap(static_cast<double>(i) / GetNumCols(), mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
       if (pos >= 0 && pos < GetWidth())
       {
          ofPushStyle();
@@ -100,9 +100,9 @@ void Canvas::Render()
                              mElements[i]->GetStart() <= mViewEnd / GetLength() && mElements[i]->GetEnd() >= mViewStart / GetLength();
       if (visibleOnCanvas)
       {
-         ofVec2f offset(0, 0);
+         ofVec2d offset(0, 0);
          if (mClick && mClickedElement != nullptr && mElements[i]->GetHighlighted() && mDragEnd == kHighlightEnd_None)
-            offset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
+            offset = (ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
          mElements[i]->Draw(offset);
       }
 
@@ -118,7 +118,7 @@ void Canvas::Render()
       ofPopStyle();
    }
 
-   float pos = ofMap(mCursorPos, mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
+   double pos = ofMap(mCursorPos, mViewStart / mLength, mViewEnd / mLength, 0, 1) * GetWidth();
    if (pos >= 0 && pos < GetWidth())
    {
       ofPushStyle();
@@ -198,12 +198,12 @@ void Canvas::SelectElements(std::vector<CanvasElement*> elements)
    }
 }
 
-ofVec2f Canvas::RescaleForZoom(float x, float y) const
+ofVec2d Canvas::RescaleForZoom(double x, double y) const
 {
-   return ofVec2f(ofMap(x / mWidth, 0, 1, mViewStart, mViewEnd) * mWidth, y);
+   return { ofMap(x / mWidth, 0, 1, mViewStart, mViewEnd) * mWidth, y };
 }
 
-bool Canvas::IsOnElement(CanvasElement* element, float x, float y) const
+bool Canvas::IsOnElement(CanvasElement* element, double x, double y) const
 {
    return element->GetRect(true, false).contains(x, y) || (mWrap && element->GetRect(true, true).contains(x, y));
 }
@@ -213,7 +213,7 @@ bool Canvas::IsRowVisible(int row) const
    return row >= mRowOffset && row < mRowOffset + GetNumVisibleRows();
 }
 
-void Canvas::OnClicked(float x, float y, bool right)
+void Canvas::OnClicked(double x, double y, bool right)
 {
    mClick = true;
    mHasDuplicatedThisDrag = false;
@@ -276,9 +276,9 @@ void Canvas::OnClicked(float x, float y, bool right)
       mListener->CanvasUpdated(this);
 }
 
-float Canvas::QuantizeToGrid(float input) const
+double Canvas::QuantizeToGrid(double input) const
 {
-   float col = int(input * GetNumCols() + .5f);
+   double col = int(input * GetNumCols() + .5);
    return col / GetNumCols();
 }
 
@@ -287,7 +287,7 @@ bool Canvas::CanBeTargetedBy(PatchCableSource* source) const
    return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
 }
 
-bool Canvas::MouseMoved(float x, float y)
+bool Canvas::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
 
@@ -295,17 +295,17 @@ bool Canvas::MouseMoved(float x, float y)
 
    if (mDragEnd != kHighlightEnd_None)
    {
-      ofVec2f scaled = RescaleForZoom(x, y);
+      ofVec2d scaled = RescaleForZoom(x, y);
       if (mDragEnd == kHighlightEnd_Start)
       {
-         float oldStart = mClickedElement->GetStart();
-         float newStart = scaled.x / GetWidth() / mLength;
-         float startDelta = newStart - oldStart;
+         double oldStart = mClickedElement->GetStart();
+         double newStart = scaled.x / GetWidth() / mLength;
+         double startDelta = newStart - oldStart;
          for (auto* element : mElements)
          {
             if (element->GetHighlighted())
             {
-               float start = element->GetStart() + startDelta;
+               double start = element->GetStart() + startDelta;
                if (quantize)
                   start = QuantizeToGrid(start);
                element->SetStart(start, false);
@@ -314,14 +314,14 @@ bool Canvas::MouseMoved(float x, float y)
       }
       if (mDragEnd == kHighlightEnd_End)
       {
-         float oldEnd = mClickedElement->GetEnd();
-         float newEnd = scaled.x / GetWidth() / mLength;
-         float endDelta = newEnd - oldEnd;
+         double oldEnd = mClickedElement->GetEnd();
+         double newEnd = scaled.x / GetWidth() / mLength;
+         double endDelta = newEnd - oldEnd;
          for (auto* element : mElements)
          {
             if (element->GetHighlighted())
             {
-               float end = element->GetEnd() + endDelta;
+               double end = element->GetEnd() + endDelta;
                if (quantize)
                   end = QuantizeToGrid(end);
                element->SetEnd(end);
@@ -337,7 +337,7 @@ bool Canvas::MouseMoved(float x, float y)
       {
          if (mClickedElement != nullptr)
          {
-            ofVec2f dragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
+            ofVec2d dragOffset = (ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
 
             if (GetKeyModifiers() & kModifier_Shift && !mHasDuplicatedThisDrag && dragOffset.distanceSquared() > 9)
             {
@@ -360,18 +360,18 @@ bool Canvas::MouseMoved(float x, float y)
          if (element->GetHighlighted())
          {
             ofRectangle rect = element->GetRect(!K(clamp), !K(wrapped));
-            float startX = rect.x;
+            double startX = rect.x;
             if (element->GetEnd() > 1 && mWrap)
                rect = element->GetRect(!K(clamp), K(wrapped));
-            float endX = rect.x + rect.width;
+            double endX = rect.x + rect.width;
             if (y >= rect.y && y < rect.y + rect.height)
             {
-               if (fabsf(startX - x) < 3 / gDrawScale && element->IsResizable())
+               if (std::abs(startX - x) < 3 / gDrawScale && element->IsResizable())
                {
                   mHighlightEnd = kHighlightEnd_Start;
                   mHighlightEndElement = element;
                }
-               if (fabsf(endX - x) < 3 / gDrawScale && element->IsResizable())
+               if (std::abs(endX - x) < 3 / gDrawScale && element->IsResizable())
                {
                   mHighlightEnd = kHighlightEnd_End;
                   mHighlightEndElement = element;
@@ -393,16 +393,16 @@ bool Canvas::MouseMoved(float x, float y)
    if (mDragCanvasMoving && (GetKeyModifiers() & kModifier_Alt))
    {
 
-      ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
-      ofVec2f delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
+      ofVec2d mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
+      ofVec2d delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
 
-      float viewLength = mViewEnd - mViewStart;
-      float moveX = -delta.x / mWidth * viewLength;
+      double viewLength = mViewEnd - mViewStart;
+      double moveX = -delta.x / mWidth * viewLength;
       mViewStart = ofClamp(mDragCanvasStartCanvasPos.x + moveX, 0, mLength - viewLength);
       mViewEnd = mViewStart + viewLength;
 
-      float moveY = -delta.y / mHeight * GetNumVisibleRows();
-      mRowOffset = ofClamp(int(mDragCanvasStartCanvasPos.y + moveY + .5f), 0, GetNumRows() - GetNumVisibleRows());
+      double moveY = -delta.y / mHeight * GetNumVisibleRows();
+      mRowOffset = ofClamp(int(mDragCanvasStartCanvasPos.y + moveY + .5), 0, GetNumRows() - GetNumVisibleRows());
    }
    else
    {
@@ -411,23 +411,23 @@ bool Canvas::MouseMoved(float x, float y)
 
    if (mDragCanvasZooming && (GetKeyModifiers() & kModifier_Command))
    {
-      ofVec2f mousePos(x, y);
-      ofVec2f delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
+      ofVec2d mousePos(x, y);
+      ofVec2d delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
 
       {
-         float originalViewLength = mDragZoomStartDimensions.x;
-         float originalViewCenterX = mDragCanvasStartCanvasPos.x;
-         float newViewLength = MAX((1 - delta.x / mWidth) * originalViewLength, .01f);
+         double originalViewLength = mDragZoomStartDimensions.x;
+         double originalViewCenterX = mDragCanvasStartCanvasPos.x;
+         double newViewLength = MAX((1 - delta.x / mWidth) * originalViewLength, .01);
          mViewStart = ofClamp(originalViewCenterX - newViewLength * (mDragCanvasStartMousePos.x / mWidth), 0, mLength);
          mViewEnd = ofClamp(originalViewCenterX + newViewLength * (1 - mDragCanvasStartMousePos.x / mWidth), 0, mLength);
       }
 
       {
-         float originalViewHeight = mDragZoomStartDimensions.y;
-         float originalViewCenterY = mDragCanvasStartCanvasPos.y;
-         float newViewHeight = MAX((1 + delta.y / mHeight) * originalViewHeight, .01f);
-         mRowOffset = int(ofClamp(originalViewCenterY - newViewHeight * (mDragCanvasStartMousePos.y / mHeight), 0, mNumRows - 1) + .5f);
-         mNumVisibleRows = int(ofClamp(originalViewCenterY + newViewHeight * (1 - mDragCanvasStartMousePos.y / mHeight), mRowOffset + 1, mNumRows) + .5f) - mRowOffset;
+         double originalViewHeight = mDragZoomStartDimensions.y;
+         double originalViewCenterY = mDragCanvasStartCanvasPos.y;
+         double newViewHeight = MAX((1 + delta.y / mHeight) * originalViewHeight, .01);
+         mRowOffset = int(ofClamp(originalViewCenterY - newViewHeight * (mDragCanvasStartMousePos.y / mHeight), 0, mNumRows - 1) + .5);
+         mNumVisibleRows = int(ofClamp(originalViewCenterY + newViewHeight * (1 - mDragCanvasStartMousePos.y / mHeight), mRowOffset + 1, mNumRows) + .5) - mRowOffset;
       }
    }
    else
@@ -445,7 +445,7 @@ void Canvas::MouseReleased()
       for (auto* element : mElements)
       {
          if (element->GetHighlighted())
-            element->MoveElementByDrag((ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale);
+            element->MoveElementByDrag((ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale);
       }
 
       if (mListener)
@@ -475,7 +475,7 @@ void Canvas::MouseReleased()
    mDragCanvasZooming = false;
 }
 
-bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool Canvas::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (GetKeyModifiers() & kModifier_Alt)
    {
@@ -485,15 +485,15 @@ bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool 
 
    if (GetKeyModifiers() & kModifier_Shift)
    {
-      float canvasX, canvasY;
+      double canvasX, canvasY;
       GetPosition(canvasX, canvasY, false);
-      ofVec2f canvasPos = ofVec2f(ofMap(x, canvasX, canvasX + GetWidth(), 0, 1),
+      ofVec2d canvasPos = ofVec2d(ofMap(x, canvasX, canvasX + GetWidth(), 0, 1),
                                   ofMap(y, canvasY, canvasY + GetHeight(), 0, 1));
       if (IsInUnitBox(canvasPos))
       {
-         float zoomCenter = ofLerp(mViewStart, mViewEnd, canvasPos.x);
-         float distFromStart = zoomCenter - mViewStart;
-         float distFromEnd = zoomCenter - mViewEnd;
+         double zoomCenter = ofLerp(mViewStart, mViewEnd, canvasPos.x);
+         double distFromStart = zoomCenter - mViewStart;
+         double distFromEnd = zoomCenter - mViewEnd;
 
          distFromStart *= 1 - scrollY / 50;
          distFromEnd *= 1 - scrollY / 50;
@@ -515,7 +515,7 @@ bool Canvas::MouseScrolled(float x, float y, float scrollX, float scrollY, bool 
          SetRowOffset(GetRowOffset() + scrollWhole);
       }
 
-      float slideX = (mViewEnd - mViewStart) * -scrollX / 50;
+      double slideX = (mViewEnd - mViewStart) * -scrollX / 50;
       if (slideX > 0)
          slideX = MIN(slideX, mLength - mViewEnd);
       if (slideX < 0)
@@ -580,7 +580,7 @@ void Canvas::KeyPressed(int key, bool isRepeat)
 
 void Canvas::RescaleNumCols(int cols)
 {
-   float ratio = (float)cols / mNumCols;
+   double ratio = static_cast<double>(cols) / mNumCols;
    for (auto* element : mElements)
    {
       element->SetStart(element->GetStart() * ratio, true);
@@ -591,7 +591,7 @@ void Canvas::RescaleNumCols(int cols)
 
 void Canvas::SetRowColor(int row, ofColor color)
 {
-   if (row >= 0 && row <= mRowColors.size())
+   if (row >= 0 && row < mRowColors.size())
       mRowColors[row] = color;
 }
 
@@ -611,7 +611,7 @@ juce::MouseCursor Canvas::GetMouseCursorType()
    return MouseCursor::NormalCursor;
 }
 
-CanvasElement* Canvas::GetElementAt(float pos, int row)
+CanvasElement* Canvas::GetElementAt(double pos, int row)
 {
    for (int i = 0; i < mElements.size(); ++i)
    {
@@ -623,7 +623,7 @@ CanvasElement* Canvas::GetElementAt(float pos, int row)
    return nullptr;
 }
 
-void Canvas::FillElementsAt(float pos, std::vector<CanvasElement*>& elementsAt) const
+void Canvas::FillElementsAt(double pos, std::vector<CanvasElement*>& elementsAt) const
 {
    for (int i = 0; i < mElements.size(); ++i)
    {
@@ -640,7 +640,7 @@ void Canvas::FillElementsAt(float pos, std::vector<CanvasElement*>& elementsAt) 
    }
 }
 
-void Canvas::EraseElementsAt(float pos)
+void Canvas::EraseElementsAt(double pos)
 {
    std::vector<CanvasElement*> toErase;
    for (int i = 0; i < mElements.size(); ++i)
@@ -713,8 +713,8 @@ void Canvas::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> mRowOffset;
    if (rev >= 3)
    {
-      in >> mLoopStart;
-      in >> mLoopEnd;
+      in >> FloatAsDouble >> mLoopStart;
+      in >> FloatAsDouble >> mLoopEnd;
    }
    mElements.clear();
    int size;

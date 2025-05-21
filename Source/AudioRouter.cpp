@@ -76,7 +76,7 @@ void AudioRouter::Process(double time)
       if (doSwitchAndRamp)
          mSwitchAndRampIn[ch].Start(time, outputBuffer[0], 0, time + 100);
 
-      if (abs(mSwitchAndRampIn[ch].Value(time)) > .01f)
+      if (abs(mSwitchAndRampIn[ch].Value(time)) > .01)
       {
          BufferCopy(gWorkBuffer, outputBuffer, GetBuffer()->BufferSize());
          outputBuffer = gWorkBuffer;
@@ -109,7 +109,7 @@ void AudioRouter::DrawModule()
 
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
-      ofVec2f pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
+      ofVec2d pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
       mDestinationCables[i]->SetManualPosition(pos.x + 10, pos.y + 4);
    }
 }
@@ -129,9 +129,9 @@ void AudioRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void AudioRouter::GetModuleDimensions(float& width, float& height)
+void AudioRouter::GetModuleDimensions(double& width, double& height)
 {
-   float w, h;
+   double w, h;
    mRouteSelector->GetDimensions(w, h);
    width = 10 + w;
    height = 8 + h;

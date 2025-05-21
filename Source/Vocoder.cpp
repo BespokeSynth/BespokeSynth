@@ -33,7 +33,7 @@ Vocoder::Vocoder()
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[VOCODER_WINDOW_SIZE];
    for (int i = 0; i < VOCODER_WINDOW_SIZE; ++i)
-      mWindower[i] = -.5 * cos(FTWO_PI * i / VOCODER_WINDOW_SIZE) + .5;
+      mWindower[i] = -.5 * cos(TWO_PI * i / VOCODER_WINDOW_SIZE) + .5;
 
    mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
@@ -96,11 +96,11 @@ void Vocoder::Process(double time)
 
    ComputeSliders(0);
 
-   float inputPreampSq = mInputPreamp * mInputPreamp;
-   float carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
+   double inputPreampSq = mInputPreamp * mInputPreamp;
+   double carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
    float volSq = mVolume * mVolume;
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    int zerox = 0; //count up zero crossings
    bool positive = true;
@@ -157,14 +157,14 @@ void Vocoder::Process(double time)
       float imag = mFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      float amp = 2. * sqrtf(real * real + imag * imag);
+      float amp = 2.f * sqrt(real * real + imag * imag);
       //float phase = atan2(imag,real);
 
       float carrierReal = mCarrierFFTData.mRealValues[i];
       float carrierImag = mCarrierFFTData.mImaginaryValues[i];
 
       //cartesian to polar
-      float carrierAmp = 2. * sqrtf(carrierReal * carrierReal + carrierImag * carrierImag);
+      float carrierAmp = 2.f * sqrt(carrierReal * carrierReal + carrierImag * carrierImag);
       float carrierPhase = atan2(carrierImag, carrierReal);
 
       amp *= carrierAmp;
@@ -234,7 +234,7 @@ void Vocoder::DrawModule()
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255, 0, 0, gModuleDrawAlpha * .4f);
+      ofSetColor(255, 0, 0, gModuleDrawAlpha * .4);
       ofRect(5, 101, 100, 14);
       ofPopStyle();
       mFricDetected = false;

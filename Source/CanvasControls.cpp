@@ -99,7 +99,7 @@ void CanvasControls::AllowDragModeSelection(bool allow)
 
 void CanvasControls::PreDrawModule()
 {
-   float x, y;
+   double x, y;
    mCanvas->GetPosition(x, y, K(localOnly));
    SetPosition(x, y + 13 + mCanvas->GetHeight());
 }
@@ -122,7 +122,7 @@ void CanvasControls::DrawModule()
    }
 }
 
-void CanvasControls::GetModuleDimensions(float& width, float& height)
+void CanvasControls::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = 92;
@@ -137,7 +137,7 @@ void CanvasControls::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void CanvasControls::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void CanvasControls::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (auto* element : mCanvas->GetElements())
    {

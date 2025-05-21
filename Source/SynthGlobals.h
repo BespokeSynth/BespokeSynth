@@ -100,7 +100,7 @@ extern IUIControl* gBindToUIControl;
 extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;
 extern RetinaTrueTypeFont gFontFixedWidth;
-extern float gModuleDrawAlpha;
+extern double gModuleDrawAlpha;
 extern float gNullBuffer[kWorkBufferSize];
 extern float gZeroBuffer[kWorkBufferSize];
 extern float gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
@@ -108,16 +108,16 @@ extern ChannelBuffer gWorkChannelBuffer;
 extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;
 extern IUIControl* gHotBindUIControl[10];
-extern float gControlTactileFeedback;
-extern float gDrawScale;
+extern double gControlTactileFeedback;
+extern double gDrawScale;
 extern bool gShowDevModules;
-extern float gCornerRoundness;
+extern double gCornerRoundness;
 
 extern std::random_device gRandomDevice;
 
 extern bespoke::core::Xoshiro256ss gRandom;
-extern std::uniform_real_distribution<float> gRandom01;
-extern std::uniform_real_distribution<float> gRandomBipolarDist;
+extern std::uniform_real_distribution<double> gRandom01;
+extern std::uniform_real_distribution<double> gRandomBipolarDist;
 
 enum OscillatorType
 {
@@ -148,11 +148,11 @@ enum class StepVelocityType
    Accent = 3,
    NumVelocityLevels = 4
 };
-constexpr float kVelocityOff = 0.0f;
-constexpr float kVelocityGhost = 0.4f;
-constexpr float kVelocityNormal = 0.75f;
-constexpr float kVelocityAccent = 1.0f;
-extern std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
+constexpr double kVelocityOff = 0.0;
+constexpr double kVelocityGhost = 0.4;
+constexpr double kVelocityNormal = 0.75;
+constexpr double kVelocityAccent = 1.0;
+extern std::array<double, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels;
 
 class LoadingJSONException : public std::exception
 {
@@ -187,56 +187,59 @@ void LoadGlobalResources();
 
 void SetGlobalSampleRateAndBufferSize(int rate, int size);
 std::string GetBuildInfoString();
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
+void DrawAudioBuffer(double width, double height, ChannelBuffer* buffer, double start, double end, double pos, double vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
+void DrawAudioBuffer(double width, double height, const float* buffer, double start, double end, double pos, double vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
 void Add(float* buff1, const float* buff2, int bufferSize);
 void Subtract(float* buff1, const float* buff2, int bufferSize);
 void Mult(float* buff, float val, int bufferSize);
 void Mult(float* buff1, const float* buff2, int bufferSize);
 void Clear(float* buffer, int bufferSize);
+void Clear(double* buffer, int bufferSize);
 void BufferCopy(float* dst, const float* src, int bufferSize);
 std::string NoteName(int pitch, bool flat = false, bool includeOctave = false);
 int PitchFromNoteName(std::string noteName);
 float Interp(float a, float start, float end);
-double GetPhaseInc(float freq);
+double Interp(double a, double start, double end);
+double GetPhaseInc(double freq);
 float FloatWrap(float num, float space);
-double DoubleWrap(double num, float space);
-void DrawTextNormal(std::string text, int x, int y, float size = 13);
-void DrawTextRightJustify(std::string text, int x, int y, float size = 13);
-void DrawTextBold(std::string text, int x, int y, float size = 13);
-float GetStringWidth(std::string text, float size = 13);
+double DoubleWrap(double num, double space);
+void DrawTextNormal(std::string text, double x, double y, double size = 13);
+void DrawTextRightJustify(std::string text, double x, double y, double size = 13);
+void DrawTextBold(std::string text, double x, double y, double size = 13);
+double GetStringWidth(std::string text, double size = 13);
 void AssertIfDenormal(float input);
+void AssertIfDenormal(double input);
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize);
 float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, float channelBlend);
 void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float sample);
 std::string GetRomanNumeralForDegree(int degree);
 void UpdateTarget(IDrawableModule* module);
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r = .2f, float g = .7f, float b = .2f, bool autocorrelationMode = true);
+void DrawLissajous(RollingBuffer* buffer, double x, double y, double w, double h, double r = .2, double g = .7, double b = .2, bool autocorrelationMode = true);
 void StringCopy(char* dest, const char* source, int destLength);
 int GetKeyModifiers();
 bool IsKeyHeld(int key, int modifiers = kModifier_None);
 int KeyToLower(int key);
-float EaseIn(float start, float end, float a);
-float EaseOut(float start, float end, float a);
-float Bias(float value, float bias);
-float Pow2(float in);
+double EaseIn(double start, double end, double a);
+double EaseOut(double start, double end, double a);
+double Bias(double value, double bias);
+double Pow2(double in);
 void PrintCallstack();
-bool IsInUnitBox(ofVec2f pos);
+bool IsInUnitBox(ofVec2d pos);
 std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existing);
 std::string GetUniqueName(std::string name, std::vector<std::string> existing);
 void SetMemoryTrackingEnabled(bool enabled);
 void DumpUnfreedMemory();
-float DistSqToLine(ofVec2f point, ofVec2f a, ofVec2f b);
+double DistSqToLine(ofVec2d point, ofVec2d a, ofVec2d b);
 uint32_t JenkinsHash(const char* key);
 void LoadStateValidate(bool assertion);
 float GetLeftPanGain(float pan);
 float GetRightPanGain(float pan);
-void DrawFallbackText(const char* text, float posX, float posY);
-bool EvaluateExpression(std::string expression, float currentValue, float& output);
+void DrawFallbackText(const char* text, double posX, double posY);
+bool EvaluateExpression(std::string expression, double currentValue, double& output);
 double NextBufferTime(bool includeLookahead);
 bool IsAudioThread();
 
-inline static float RandomSample()
+static double RandomSample()
 {
    return gRandomBipolarDist(gRandom);
 }

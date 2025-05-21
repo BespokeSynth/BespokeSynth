@@ -52,7 +52,7 @@ void Amplifier::Process(double time)
       return;
 
    SyncBuffers();
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    mNumChannels = GetBuffer()->NumActiveChannels();
 

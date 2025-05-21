@@ -53,7 +53,7 @@ public:
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var);
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, std::string* var);
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max);
-   TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max);
+   TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, double* var, double min, double max);
    void OnKeyPressed(int key, bool isRepeat) override;
    void Render() override;
    void Delete() override;
@@ -72,18 +72,18 @@ public:
    void SetText(std::string text);
    void SelectAll();
 
-   void GetDimensions(float& width, float& height) override;
+   void GetDimensions(double& width, double& height) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   float GetValueForMidiCC(float slider) const override;
-   float GetMidiValue() const override;
-   void GetRange(float& min, float& max) override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   float GetValue() const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   double GetMidiValue() const override;
+   void GetRange(double& min, double& max) override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override;
    int GetNumValues() override;
-   std::string GetDisplayValue(float val) const override;
-   void Increment(float amount) override;
+   std::string GetDisplayValue(double val) const override;
+   void Increment(double amount) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
@@ -102,8 +102,8 @@ private:
    void AcceptEntry(bool pressedEnter) override;
    void CancelEntry() override;
    void MoveCaret(int pos, bool allowSelection = true);
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
 
    int mCharWidth{ 3 };
    ITextEntryListener* mListener{ nullptr };
@@ -111,21 +111,21 @@ private:
    char* mVarCString{ nullptr };
    std::string* mVarString{ nullptr };
    int* mVarInt{ nullptr };
-   float* mVarFloat{ nullptr };
+   double* mVarFloat{ nullptr };
    int mIntMin{ 0 };
    int mIntMax{ 0 };
-   float mFloatMin{ 0 };
-   float mFloatMax{ 0 };
+   double mFloatMin{ 0 };
+   double mFloatMax{ 0 };
    int mCaretPosition{ 0 };
    int mCaretPosition2{ 0 };
-   float mCaretBlinkTimer{ 0 };
+   double mCaretBlinkTimer{ 0 };
    bool mCaretBlink{ true };
    TextEntryType mType{ TextEntryType::kTextEntry_Text };
    TextEntry* mNextTextEntry{ nullptr };
    TextEntry* mPreviousTextEntry{ nullptr };
    bool mInErrorMode{ false };
    bool mDrawLabel{ false };
-   float mLabelSize{ 0 };
+   double mLabelSize{ 0 };
    bool mFlexibleWidth{ false };
    bool mHovered{ false };
    bool mRequireEnterToAccept{ false };
