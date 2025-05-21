@@ -109,7 +109,11 @@ void Snapshots::Poll()
    {
       --mDrawSetSnapshotCountdown;
       if (mDrawSetSnapshotCountdown == 0)
+      {
+         for (const auto control : sSnapshotHighlightControls)
+            control->SetSnapshotHighlight(false);
          sSnapshotHighlightControls.clear();
+      }
    }
 
    if (!mBlending && !mBlendRamps.empty())
@@ -379,6 +383,8 @@ void Snapshots::SetSnapshot(int idx, double time)
       mBlendRamps.clear();
    }
 
+   for (const auto control : sSnapshotHighlightControls)
+      control->SetSnapshotHighlight(false);
    sSnapshotHighlightControls.clear();
    const SnapshotCollection& coll = mSnapshotCollection[idx];
    for (const auto& snapshot : coll.mSnapshots)
@@ -441,6 +447,7 @@ void Snapshots::SetSnapshot(int idx, double time)
             mBlendRamps.push_back(ramp);
          }
 
+         control->SetSnapshotHighlight(true);
          sSnapshotHighlightControls.push_back(control);
       }
    }

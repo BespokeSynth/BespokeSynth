@@ -43,9 +43,9 @@ IUIControl::~IUIControl()
       gBindToUIControl = nullptr;
 }
 
-bool IUIControl::IsPreset()
+bool IUIControl::IsSnapshot()
 {
-   return VectorContains(this, Snapshots::sSnapshotHighlightControls);
+   return mSnapshotHighlight;
 }
 
 bool IUIControl::TestHover(double x, double y)
@@ -199,7 +199,7 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
    double h, s, b;
    color.getHsb(h, s, b);
    color.setHsb(h, s * .4, ofLerp(b, 0, .6));
-   if (IsPreset())
+   if (IsSnapshot())
    {
       color.getHsb(h, s, b);
       color.setHsb(85, s, b);
