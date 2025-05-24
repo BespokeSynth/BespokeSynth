@@ -36,7 +36,7 @@ StereoRotation::StereoRotation()
 void StereoRotation::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGainSlider = new FloatSlider(this, "gain", 5, 2, 110, 15, &mGain, 0, 4);
+   mPhaseSlider = new FloatSlider(this, "phase", 5, 2, 110, 15, &mPhase, 0, 1);
 }
 
 void StereoRotation::ProcessAudio(double time, ChannelBuffer* buffer)

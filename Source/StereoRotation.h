@@ -42,7 +42,7 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   std::string GetType() override { return "gainstage"; }
+   std::string GetType() override { return "stereorotation"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
@@ -58,6 +58,6 @@ private:
       height = 20;
    }
 
-   float mGain{ 1 };
-   FloatSlider* mGainSlider{ nullptr };
+   float mPhase{ 0 };
+   FloatSlider* mPhaseSlider{ nullptr };
 };
