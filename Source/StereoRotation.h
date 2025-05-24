@@ -26,26 +26,32 @@
 */
 
 #pragma once
-#include "IAudioEffect.h"
-#include "Slider.h"
-#include "Checkbox.h"
 
-class StereoRotation : public IAudioEffect, public IFloatSliderListener
+#include "IAudioProcessor.h"
+#include "IDrawableModule.h"
+#include "Slider.h"
+
+class StereoRotation : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
 {
 public:
    StereoRotation();
-   static IAudioEffect* Create() { return new StereoRotation(); }
-
+   virtual ~StereoRotation();
+   static IDrawableModule* Create() { return new StereoRotation(); }
+   static bool AcceptsAudio() { return true; }
+   static bool AcceptsNotes() { return false; }
+   static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
 
-   //IAudioEffect
-   void ProcessAudio(double time, ChannelBuffer* buffer) override;
+   //IAudioSource
+   void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   std::string GetType() override { return "stereorotation"; }
 
-   void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+
+   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   virtual void SetUpFromSaveData() override;
 
    bool IsEnabled() const override { return mEnabled; }
 

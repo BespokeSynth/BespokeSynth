@@ -26,10 +26,11 @@
 */
 
 #include "StereoRotation.h"
-#include "SynthGlobals.h"
+#include "ModularSynth.h"
 #include "Profiler.h"
 
 StereoRotation::StereoRotation()
+: IAudioProcessor(gBufferSize)
 {
 }
 
@@ -39,41 +40,54 @@ void StereoRotation::CreateUIControls()
    mPhaseSlider = new FloatSlider(this, "phase", 5, 2, 110, 15, &mPhase, 0, 1);
 }
 
-void StereoRotation::ProcessAudio(double time, ChannelBuffer* buffer)
+StereoRotation::~StereoRotation()
+{
+}
+
+void StereoRotation::Process(double time)
 {
    PROFILER(StereoRotation);
 
-   if (!mEnabled)
-      return;
+   SyncBuffers();
 
-   bool mono = buffer->NumActiveChannels() == 1;
+   IAudioReceiver* target = GetTarget();
 
-   float bufferSize = buffer->BufferSize();
-
-   for (int i = 0; i < bufferSize; ++i)
+   if (target)
    {
-      ComputeSliders(i);
+      ChannelBuffer* out = target->GetBuffer();
+
+      bool mono = GetBuffer()->NumActiveChannels() == 1;
       if (mono)
       {
-         buffer->GetChannel(0)[i] = (buffer->GetChannel(0)[i] * cos(mPhase * 2 * PI) - buffer->GetChannel(0)[i] * sin(mPhase * 2 * PI)) / 2;
       }
       else
       {
-         buffer->GetChannel(0)[i] = (buffer->GetChannel(0)[i] * cos(mPhase * 2 * PI) - buffer->GetChannel(1)[i] * sin(mPhase * 2 * PI)) / 2;
-         buffer->GetChannel(1)[i] = (buffer->GetChannel(0)[i] * sin(mPhase * 2 * PI) + buffer->GetChannel(1)[i] * cos(mPhase * 2 * PI)) / 2;
       }
    }
+
+   GetBuffer()->Reset();
 }
 
 void StereoRotation::DrawModule()
 {
-   mPhaseSlider->Draw();
-}
+   if (Minimized() || IsVisible() == false)
+      return;
 
-void StereoRotation::CheckboxUpdated(Checkbox* checkbox, double time)
-{
+   mPhaseSlider->Draw();
 }
 
 void StereoRotation::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
+}
+
+void StereoRotation::LoadLayout(const ofxJSONElement& moduleInfo)
+{
+   mModuleSaveData.LoadString("target", moduleInfo);
+
+   SetUpFromSaveData();
+}
+
+void StereoRotation::SetUpFromSaveData()
+{
+   SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
