@@ -46,19 +46,28 @@ void StereoRotation::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
+   bool mono = buffer->NumActiveChannels() == 1;
+
    float bufferSize = buffer->BufferSize();
 
    for (int i = 0; i < bufferSize; ++i)
    {
       ComputeSliders(i);
-      for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
-         buffer->GetChannel(ch)[i] *= mGain;
+      if (mono)
+      {
+         buffer->GetChannel(0)[i] = (buffer->GetChannel(0)[i] * cos(mPhase * 2 * PI) - buffer->GetChannel(0)[i] * sin(mPhase * 2 * PI)) / 2;
+      }
+      else
+      {
+         buffer->GetChannel(0)[i] = (buffer->GetChannel(0)[i] * cos(mPhase * 2 * PI) - buffer->GetChannel(1)[i] * sin(mPhase * 2 * PI)) / 2;
+         buffer->GetChannel(1)[i] = (buffer->GetChannel(0)[i] * sin(mPhase * 2 * PI) + buffer->GetChannel(1)[i] * cos(mPhase * 2 * PI)) / 2;
+      }
    }
 }
 
 void StereoRotation::DrawModule()
 {
-   mGainSlider->Draw();
+   mPhaseSlider->Draw();
 }
 
 void StereoRotation::CheckboxUpdated(Checkbox* checkbox, double time)
