@@ -23,6 +23,7 @@
 #include "push2/Push2-Bitmap.h"
 #include "push2/Result.h"
 #include "Push2-UsbCommunicator.h"
+#include "push2/JuceToPush2DisplayBridge.h"
 
 namespace ableton
 {
@@ -35,7 +36,7 @@ namespace ableton
 
     static Push2Display *create();
 
-    NBase::Result Init();
+    NBase::Result Init(DeviceType deviceType);
 
     // Transfers the bitmap into the output buffer sent to
     // the push display. The push display buffer has a larger stride
@@ -56,6 +57,11 @@ namespace ableton
       }
 
       return NBase::Result::NoError;
+    }
+
+    pixel_t* GetRawBitmap()
+    {
+       return dataSource_;
     }
 
   private:
