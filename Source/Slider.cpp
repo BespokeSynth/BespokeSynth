@@ -90,7 +90,7 @@ void FloatSlider::SetLFO(FloatSliderLFOControl* lfo)
    }
 }
 
-void FloatSlider::SetModulator(IModulator* modulator)
+void FloatSlider::SetModulator(IModulator* modulator, bool shouldCallRepatch /* = true */)
 {
    if (modulator != mModulator)
    {
@@ -98,7 +98,7 @@ void FloatSlider::SetModulator(IModulator* modulator)
       mModulator = modulator;
       mLFOControl = nullptr;
       if (oldModulator != nullptr)
-         oldModulator->OnRemovedFrom(this);
+         oldModulator->OnRemovedFrom(this, shouldCallRepatch);
    }
 }
 

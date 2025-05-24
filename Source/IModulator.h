@@ -41,24 +41,30 @@ public:
    virtual bool Active() const = 0;
    virtual bool CanAdjustRange() const { return true; }
    virtual bool InitializeWithZeroRange() const { return false; }
-   float& GetMin() { return mTargets[0].mSliderTarget ? mTargets[0].mSliderTarget->GetModulatorMin() : mDummyMin; }
-   float& GetMax() { return mTargets[0].mSliderTarget ? mTargets[0].mSliderTarget->GetModulatorMax() : mDummyMax; }
+   float& GetMin() { return (!mTargets.empty() && mTargets[0].mSliderTarget) ? mTargets[0].mSliderTarget->GetModulatorMin() : mDummyMin; }
+   float& GetMax() { return (!mTargets.empty() && mTargets[0].mSliderTarget) ? mTargets[0].mSliderTarget->GetModulatorMax() : mDummyMax; }
    void OnModulatorRepatch();
    void Poll() override;
    float GetRecentChange() const;
-   void OnRemovedFrom(IUIControl* control);
+   void OnRemovedFrom(IUIControl* control, bool shouldCallRepatch = true);
    int GetNumTargets() const;
 
 protected:
    void InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode);
 
-   FloatSlider* GetSliderTarget() const { return mTargets[0].mSliderTarget; }
+   FloatSlider* GetSliderTarget() const { return !mTargets.empty() ? mTargets[0].mSliderTarget : nullptr; }
 
    float mDummyMin{ 0 };
    float mDummyMax{ 1 };
 
    struct Target
    {
+      Target(IUIControl* control, FloatSlider* slider)
+      : mSliderTarget(slider)
+      , mUIControlTarget(control)
+      {
+      }
+
       FloatSlider* mSliderTarget{ nullptr };
       IUIControl* mUIControlTarget{ nullptr };
 
@@ -68,7 +74,7 @@ protected:
    PatchCableSource* mTargetCable{ nullptr };
    FloatSlider* mMinSlider{ nullptr };
    FloatSlider* mMaxSlider{ nullptr };
-   std::array<Target, 10> mTargets;
+   std::vector<Target> mTargets;
    float mLastPollValue{ 0 };
    float mSmoothedValue{ 0 };
 };

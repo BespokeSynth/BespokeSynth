@@ -253,8 +253,13 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
    if (owner != nullptr)
       owner->SetLFO(this);
 
-   mTargets[0].mSliderTarget = owner;
-   mTargets[0].mUIControlTarget = owner;
+   if (mTargets.empty())
+      mTargets.emplace_back(owner, owner);
+   else
+   {
+      mTargets[0].mSliderTarget = owner;
+      mTargets[0].mUIControlTarget = owner;
+   }
 
    if (GetSliderTarget() != nullptr)
       InitializeRange(GetSliderTarget()->GetValue(), GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax(), GetSliderTarget()->GetMode());
