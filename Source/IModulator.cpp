@@ -41,7 +41,9 @@ IModulator::~IModulator()
 
 void IModulator::OnModulatorRepatch()
 {
-   bool wasEmpty = (mTargets[0].mUIControlTarget == nullptr);
+   int targetCount = 0;
+   for (size_t i = 0; i < mTargets.size() && mTargets[i].mSliderTarget != nullptr; i++)
+      targetCount++;
 
    for (size_t i = 0; i < mTargets.size(); ++i)
    {
@@ -79,12 +81,12 @@ void IModulator::OnModulatorRepatch()
             if (mTargets[i].mSliderTarget != nullptr)
             {
                mTargets[i].mSliderTarget->SetModulator(this);
-               if (wasEmpty)
+               if (i == 0 && targetCount <= 1)
                   InitializeRange(mTargets[i].mSliderTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), mTargets[i].mSliderTarget->GetMode());
             }
             else
             {
-               if (wasEmpty)
+               if (targetCount == 0)
                   InitializeRange(mTargets[i].mUIControlTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), FloatSlider::kNormal);
             }
          }
