@@ -71,24 +71,35 @@ void StereoRotation::Process(double time)
          Clear(rbuf, bufferSize);
 
          Add(lbuf, GetBuffer()->GetChannel(0), bufferSize);
-         Add(rbuf, GetBuffer()->GetChannel(1), bufferSize);
-         Mult(lbuf, cos(mPhase * 2 * PI), bufferSize);
-         Mult(rbuf, -sin(mPhase * 2 * PI), bufferSize);
+         if (mEnabled)
+         {
+            Add(rbuf, GetBuffer()->GetChannel(1), bufferSize);
+            Mult(lbuf, cos(mPhase * 2 * PI), bufferSize);
+            Mult(rbuf, -sin(mPhase * 2 * PI), bufferSize);
+         }
          Add(out->GetChannel(0), lbuf, bufferSize);
-         Add(out->GetChannel(0), rbuf, bufferSize);
-         Mult(out->GetChannel(0), 0.5, bufferSize);
+         if (mEnabled)
+         {
+            Add(out->GetChannel(0), rbuf, bufferSize);
+            Mult(out->GetChannel(0), 0.5, bufferSize);
+         }
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
 
          Clear(lbuf, bufferSize);
          Clear(rbuf, bufferSize);
 
-         Add(lbuf, GetBuffer()->GetChannel(0), bufferSize);
+         if (mEnabled)
+            Add(lbuf, GetBuffer()->GetChannel(0), bufferSize);
          Add(rbuf, GetBuffer()->GetChannel(1), bufferSize);
-         Mult(lbuf, sin(mPhase * 2 * PI), bufferSize);
-         Mult(rbuf, cos(mPhase * 2 * PI), bufferSize);
-         Add(out->GetChannel(1), lbuf, bufferSize);
+         if (mEnabled)
+         {
+            Mult(lbuf, sin(mPhase * 2 * PI), bufferSize);
+            Mult(rbuf, cos(mPhase * 2 * PI), bufferSize);
+            Add(out->GetChannel(1), lbuf, bufferSize);
+         }
          Add(out->GetChannel(1), rbuf, bufferSize);
-         Mult(out->GetChannel(1), 0.5, bufferSize);
+         if (mEnabled)
+            Mult(out->GetChannel(1), 0.5, bufferSize);
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(1), bufferSize, 1);
       }
    }
