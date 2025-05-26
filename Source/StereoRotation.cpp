@@ -52,9 +52,14 @@ void StereoRotation::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
+   int bufferSize = GetBuffer()->BufferSize();
+
    if (target)
    {
       ChannelBuffer* out = target->GetBuffer();
+
+   float* lbuf = new float[GetBuffer()->BufferSize()];
+   float* rbuf = new float[GetBuffer()->BufferSize()];
 
       bool mono = GetBuffer()->NumActiveChannels() == 1;
       if (mono)
@@ -62,6 +67,29 @@ void StereoRotation::Process(double time)
       }
       else
       {
+         Clear(lbuf, bufferSize);
+         Clear(rbuf, bufferSize);
+
+         Add(lbuf, GetBuffer()->GetChannel(0), bufferSize);
+         Add(rbuf, GetBuffer()->GetChannel(1), bufferSize);
+         Mult(lbuf, cos(mPhase * 2 * PI), bufferSize);
+         Mult(rbuf, -sin(mPhase * 2 * PI), bufferSize);
+         Add(out->GetChannel(0), lbuf, bufferSize);
+         Add(out->GetChannel(0), rbuf, bufferSize);
+         Mult(out->GetChannel(0), 0.5, bufferSize);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
+
+         Clear(lbuf, bufferSize);
+         Clear(rbuf, bufferSize);
+
+         Add(lbuf, GetBuffer()->GetChannel(0), bufferSize);
+         Add(rbuf, GetBuffer()->GetChannel(1), bufferSize);
+         Mult(lbuf, sin(mPhase * 2 * PI), bufferSize);
+         Mult(rbuf, cos(mPhase * 2 * PI), bufferSize);
+         Add(out->GetChannel(1), lbuf, bufferSize);
+         Add(out->GetChannel(1), rbuf, bufferSize);
+         Mult(out->GetChannel(1), 0.5, bufferSize);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(1), bufferSize, 1);
       }
    }
 
