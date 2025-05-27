@@ -48,39 +48,37 @@ void StereoRotation::Process(double time)
 {
    PROFILER(StereoRotation);
 
-   SyncBuffers();
-
    IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
+      return;
 
    int bufferSize = GetBuffer()->BufferSize();
 
-   if (target)
+   ChannelBuffer* out = target->GetBuffer();
+
+   SyncBuffers(2);
+
+   float half_sin = sin(mPhase * 2 * PI) / 2.0;
+   float half_cos = cos(mPhase * 2 * PI) / 2.0;
+
+   bool mono = GetBuffer()->NumActiveChannels() == 1;
+   for (int i = 0; i < bufferSize; ++i)
    {
-      ChannelBuffer* out = target->GetBuffer();
-
-      SyncBuffers(2);
-
-      float half_sin = sin(mPhase * 2 * PI) / 2.0;
-      float half_cos = cos(mPhase * 2 * PI) / 2.0;
-
-      bool mono = GetBuffer()->NumActiveChannels() == 1;
-      for (int i = 0; i < bufferSize; ++i)
+      if (mEnabled)
       {
-         if (mEnabled)
-         {
-            out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i] * half_cos - GetBuffer()->GetChannel(mono ? 0 : 1)[i] * half_sin;
-            out->GetChannel(1)[i] = GetBuffer()->GetChannel(0)[i] * half_sin + GetBuffer()->GetChannel(mono ? 0 : 1)[i] * half_cos;
-         }
-         else
-         {
-            out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i];
-            out->GetChannel(1)[i] = GetBuffer()->GetChannel(mono ? 0 : 1)[i];
-         }
+         out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i] * half_cos - GetBuffer()->GetChannel(mono ? 0 : 1)[i] * half_sin;
+         out->GetChannel(1)[i] = GetBuffer()->GetChannel(0)[i] * half_sin + GetBuffer()->GetChannel(mono ? 0 : 1)[i] * half_cos;
       }
-
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(1), bufferSize, 1);
+      else
+      {
+         out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i];
+         out->GetChannel(1)[i] = GetBuffer()->GetChannel(mono ? 0 : 1)[i];
+      }
    }
+
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
 
    GetBuffer()->Reset();
 }
