@@ -58,32 +58,28 @@ void StereoRotation::Process(double time)
    {
       ChannelBuffer* out = target->GetBuffer();
 
+      SyncBuffers(2);
+
       float half_sin = sin(mPhase * 2 * PI) / 2.0;
       float half_cos = cos(mPhase * 2 * PI) / 2.0;
 
       bool mono = GetBuffer()->NumActiveChannels() == 1;
-      if (mono)
+      for (int i = 0; i < bufferSize; ++i)
       {
-      }
-      else
-      {
-         for (int i = 0; i < bufferSize; ++i)
+         if (mEnabled)
          {
-            if (mEnabled)
-            {
-               out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i] * half_cos - GetBuffer()->GetChannel(1)[i] * half_sin;
-               out->GetChannel(1)[i] = GetBuffer()->GetChannel(0)[i] * half_sin + GetBuffer()->GetChannel(1)[i] * half_cos;
-            }
-            else
-            {
-               out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i];
-               out->GetChannel(1)[i] = GetBuffer()->GetChannel(1)[i];
-            }
+            out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i] * half_cos - GetBuffer()->GetChannel(mono ? 0 : 1)[i] * half_sin;
+            out->GetChannel(1)[i] = GetBuffer()->GetChannel(0)[i] * half_sin + GetBuffer()->GetChannel(mono ? 0 : 1)[i] * half_cos;
          }
-
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(1), bufferSize, 1);
+         else
+         {
+            out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i];
+            out->GetChannel(1)[i] = GetBuffer()->GetChannel(mono ? 0 : 1)[i];
+         }
       }
+
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(1), bufferSize, 1);
    }
 
    GetBuffer()->Reset();
