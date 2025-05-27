@@ -58,8 +58,8 @@ void StereoRotation::Process(double time)
    {
       ChannelBuffer* out = target->GetBuffer();
 
-   float* lbuf = new float[GetBuffer()->BufferSize()];
-   float* rbuf = new float[GetBuffer()->BufferSize()];
+      float half_sin = sin(mPhase * 2 * PI) / 2.0;
+      float half_cos = cos(mPhase * 2 * PI) / 2.0;
 
       bool mono = GetBuffer()->NumActiveChannels() == 1;
       if (mono)
@@ -67,39 +67,21 @@ void StereoRotation::Process(double time)
       }
       else
       {
-         Clear(lbuf, bufferSize);
-         Clear(rbuf, bufferSize);
+         for (int i = 0; i < bufferSize; ++i)
+         {
+            if (mEnabled)
+            {
+               out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i] * half_cos - GetBuffer()->GetChannel(1)[i] * half_sin;
+               out->GetChannel(1)[i] = GetBuffer()->GetChannel(0)[i] * half_sin + GetBuffer()->GetChannel(1)[i] * half_cos;
+            }
+            else
+            {
+               out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i];
+               out->GetChannel(1)[i] = GetBuffer()->GetChannel(1)[i];
+            }
+         }
 
-         Add(lbuf, GetBuffer()->GetChannel(0), bufferSize);
-         if (mEnabled)
-         {
-            Add(rbuf, GetBuffer()->GetChannel(1), bufferSize);
-            Mult(lbuf, cos(mPhase * 2 * PI), bufferSize);
-            Mult(rbuf, -sin(mPhase * 2 * PI), bufferSize);
-         }
-         Add(out->GetChannel(0), lbuf, bufferSize);
-         if (mEnabled)
-         {
-            Add(out->GetChannel(0), rbuf, bufferSize);
-            Mult(out->GetChannel(0), 0.5, bufferSize);
-         }
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
-
-         Clear(lbuf, bufferSize);
-         Clear(rbuf, bufferSize);
-
-         if (mEnabled)
-            Add(lbuf, GetBuffer()->GetChannel(0), bufferSize);
-         Add(rbuf, GetBuffer()->GetChannel(1), bufferSize);
-         if (mEnabled)
-         {
-            Mult(lbuf, sin(mPhase * 2 * PI), bufferSize);
-            Mult(rbuf, cos(mPhase * 2 * PI), bufferSize);
-            Add(out->GetChannel(1), lbuf, bufferSize);
-         }
-         Add(out->GetChannel(1), rbuf, bufferSize);
-         if (mEnabled)
-            Mult(out->GetChannel(1), 0.5, bufferSize);
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(1), bufferSize, 1);
       }
    }
