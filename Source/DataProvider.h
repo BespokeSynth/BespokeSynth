@@ -55,17 +55,17 @@ public:
    void OnTimeEvent(double time) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
@@ -78,7 +78,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -101,6 +101,6 @@ private:
    NoteInterval mInterval{ kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 };

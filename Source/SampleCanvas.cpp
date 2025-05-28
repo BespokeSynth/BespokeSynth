@@ -92,11 +92,11 @@ void SampleCanvas::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
 
-   float canvasPos = GetCurPos(time);
+   double canvasPos = GetCurPos(time);
 
    mCanvas->SetCursorPos(canvasPos);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    gWorkChannelBuffer.Clear();
@@ -106,17 +106,14 @@ void SampleCanvas::Process(double time)
    {
       SampleCanvasElement* element = static_cast<SampleCanvasElement*>(elements[elemIdx]);
       Sample* clip = element->GetSample();
-      float vol = element->GetVolume();
+      double vol = element->GetVolume();
       if (clip == nullptr || element->IsMuted())
          continue;
 
       for (int i = 0; i < bufferSize; ++i)
       {
-         float sampleIndex = 0;
-
-         float pos = GetCurPos(time + i * gInvSampleRateMs);
-
-         sampleIndex = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
+         double pos = GetCurPos(time + i * gInvSampleRateMs);
+         double sampleIndex = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
 
          if (sampleIndex >= 0 && sampleIndex < clip->LengthInSamples())
          {
@@ -143,15 +140,15 @@ double SampleCanvas::GetCurPos(double time) const
    return (((TheTransport->GetMeasure(time) % loopMeasures) + TheTransport->GetMeasurePos(time)) + mCanvas->mLoopStart) / mCanvas->GetLength();
 }
 
-void SampleCanvas::OnClicked(float x, float y, bool right)
+void SampleCanvas::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
-   /*float canvasX,canvasY;
+   /*double canvasX,canvasY;
    mCanvas->GetPosition(canvasX, canvasY, true);
    if (y >= 0 && y < canvasY)
    {
-      float pos = float(x - canvasX)/mCanvas->GetWidth() * mCanvas->GetNumCols();
+      double pos = double(x - canvasX)/mCanvas->GetWidth() * mCanvas->GetNumCols();
       TheTransport->SetMeasureTime(pos);
    }*/
 }
@@ -165,31 +162,31 @@ void SampleCanvas::CanvasUpdated(Canvas* canvas)
 
 namespace
 {
-   const float extraW = 20;
-   const float extraH = 163;
+   const double extraW = 20;
+   const double extraH = 163;
 }
 
-void SampleCanvas::Resize(float w, float h)
+void SampleCanvas::Resize(double w, double h)
 {
    w = MAX(w - extraW, 390);
    h = MAX(h - extraH, 40);
    mCanvas->SetDimensions(w, h);
 }
 
-void SampleCanvas::GetModuleDimensions(float& width, float& height)
+void SampleCanvas::GetModuleDimensions(double& width, double& height)
 {
    width = mCanvas->GetWidth() + extraW;
    height = mCanvas->GetHeight() + extraH;
 }
 
-void SampleCanvas::FilesDropped(std::vector<std::string> files, int x, int y)
+void SampleCanvas::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
    SampleDropped(x, y, &sample);
 }
 
-void SampleCanvas::SampleDropped(int x, int y, Sample* sample)
+void SampleCanvas::SampleDropped(double x, double y, Sample* sample)
 {
    CanvasCoord coord = mCanvas->GetCoordAt(x - mCanvas->GetPosition(true).x, y - mCanvas->GetPosition(true).y);
    coord.col = MAX(0, coord.col);
@@ -247,7 +244,7 @@ void SampleCanvas::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SampleCanvas::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -302,8 +299,8 @@ void SampleCanvas::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   float w, h;
-   in >> w;
-   in >> h;
+   double w, h;
+   in >> FloatAsDouble >> w;
+   in >> FloatAsDouble >> h;
    mCanvas->SetDimensions(w, h);
 }

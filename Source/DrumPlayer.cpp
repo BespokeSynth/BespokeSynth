@@ -64,8 +64,8 @@ void DrumPlayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this, "vol", 4, 2, 100, 15, &mVolume, 0, 2);
-   mSpeedSlider = new FloatSlider(this, "speed", 4, 18, 100, 15, &mSpeed, 0.2f, 3);
-   mSpeedRandomizationSlider = new FloatSlider(this, "speed rnd", 4, 34, 100, 15, &mSpeedRandomization, 0, .2f);
+   mSpeedSlider = new FloatSlider(this, "speed", 4, 18, 100, 15, &mSpeed, 0.2, 3);
+   mSpeedRandomizationSlider = new FloatSlider(this, "speed rnd", 4, 34, 100, 15, &mSpeedRandomization, 0, .2);
    mKitSelector = new DropdownList(this, "kit", 4, 50, &mLoadedKit);
    mEditCheckbox = new Checkbox(this, "edit", 73, 52, &mEditMode);
    //mSaveButton = new ClickButton(this,"save current",200,22);
@@ -110,7 +110,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
 #undef UIBLOCK_OWNER
 #define UIBLOCK_OWNER owner //change owner
    FLOATSLIDER_DIGITS(mVolSlider, ("vol " + ofToString(index)).c_str(), &mVol, 0, 2, 2);
-   FLOATSLIDER_DIGITS(mSpeedSlider, ("speed " + ofToString(index)).c_str(), &mSpeed, .2f, 3, 2);
+   FLOATSLIDER_DIGITS(mSpeedSlider, ("speed " + ofToString(index)).c_str(), &mSpeed, .2, 3, 2);
    FLOATSLIDER(mPanSlider, ("pan " + ofToString(index)).c_str(), &mPan, -1, 1);
    INTSLIDER(mWidenSlider, ("widen " + ofToString(index)).c_str(), &mWiden, -150, 150);
    FLOATSLIDER(mStartOffsetSlider, ("start " + ofToString(index)).c_str(), &mStartOffset, 0, 1);
@@ -284,7 +284,7 @@ void DrumPlayer::Process(double time)
 
    int bufferSize = gBufferSize;
 
-   float volSq = mVolume * mVolume * .5f;
+   float volSq = mVolume * mVolume * .5;
 
    mOutputBuffer.Clear();
 
@@ -337,7 +337,7 @@ void DrumPlayer::Process(double time)
    }
 }
 
-void DrumPlayer::DrumHit::StartPlayhead(double time, float startOffsetPercent, float velocity)
+void DrumPlayer::DrumHit::StartPlayhead(double time, double startOffsetPercent, double velocity)
 {
    mCurrentPlayheadIndex = (mCurrentPlayheadIndex + 1) % mPlayheads.size();
    for (size_t i = 0; i < mPlayheads.size(); ++i)
@@ -348,7 +348,7 @@ void DrumPlayer::DrumHit::StartPlayhead(double time, float startOffsetPercent, f
          mPlayheads[i].mCutOffTime = -1;
          mPlayheads[i].mOffset = startOffsetPercent * mSample.LengthInSamples();
          mPlayheads[i].mEnvelopeTime = 0;
-         mPlayheads[i].mEnvelopeScale = ofLerp(.2f, 1, velocity);
+         mPlayheads[i].mEnvelopeScale = ofLerp(.2, 1, velocity);
          mPlayheads[i].mSpeedTweak = ofRandom(1 - mOwner->mSpeedRandomization, 1 + mOwner->mSpeedRandomization);
       }
       else
@@ -362,12 +362,12 @@ void DrumPlayer::DrumHit::StopLinked(double time)
 {
    for (size_t i = 0; i < mPlayheads.size(); ++i)
    {
-      if (mPlayheads[i].mCutOffTime == -1)
+      if (ofAlmostEquel(mPlayheads[i].mCutOffTime, -1.0))
          mPlayheads[i].mCutOffTime = time;
    }
 }
 
-float DrumPlayer::DrumHit::GetPlayProgress(double time)
+double DrumPlayer::DrumHit::GetPlayProgress(double time)
 {
    int playheadIdx = -1;
    double startTime = -1;
@@ -380,21 +380,21 @@ float DrumPlayer::DrumHit::GetPlayProgress(double time)
       }
    }
 
-   if (startTime != -1 && mSample.Data() != nullptr)
+   if (!ofAlmostEquel(startTime, -1.0) && mSample.Data() != nullptr)
       return mPlayheads[playheadIdx].mOffset / mSample.LengthInSamples();
    return 1;
 }
 
-bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize)
+bool DrumPlayer::DrumHit::Process(double time, double speed, double vol, ChannelBuffer* out, int bufferSize)
 {
    ChannelBuffer* sampleData = mSample.Data();
    speed *= mSpeed;
 
    for (int i = 0; i < bufferSize; ++i)
    {
-      float sampleSpeed = speed;
+      double sampleSpeed = speed;
       if (mPitchBend != nullptr)
-         sampleSpeed *= ofMap(mPitchBend->GetValue(i), -.5f, .5f, 0, 2);
+         sampleSpeed *= ofMap(mPitchBend->GetValue(i), -.5, .5, 0, 2);
 
       for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
          gWorkBuffer[ch] = 0;
@@ -413,7 +413,7 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
 
                if (mPlayheads[playhead].mCutOffTime != -1 && time > mPlayheads[playhead].mCutOffTime)
                {
-                  float fade = ofMap(time - mPlayheads[playhead].mCutOffTime, 0, .25f, 1, 0, K(clamp));
+                  float fade = ofMap(time - mPlayheads[playhead].mCutOffTime, 0, .25, 1, 0, K(clamp));
                   sample *= fade;
                   if (fade == 0)
                      mPlayheads[playhead].mStartTime = -1;
@@ -509,18 +509,18 @@ void DrumPlayer::PlayNote(NoteMessage note)
          }
 
          //play this one
-         mDrumHits[note.pitch].mVelocity = note.velocity / 127.0f;
+         mDrumHits[note.pitch].mVelocity = note.velocity / 127.0;
          mDrumHits[note.pitch].mPanInput = note.modulation.pan;
          mDrumHits[note.pitch].mPitchBend = note.modulation.pitchBend;
-         float startOffsetPercent = mDrumHits[note.pitch].mStartOffset;
+         double startOffsetPercent = mDrumHits[note.pitch].mStartOffset;
          if (note.modulation.modWheel != nullptr)
             startOffsetPercent += MAX((note.modulation.modWheel->GetValue(0) - ModulationParameters::kDefaultModWheel) * 2, 0);
-         mDrumHits[note.pitch].StartPlayhead(note.time, startOffsetPercent, note.velocity / 127.0f);
+         mDrumHits[note.pitch].StartPlayhead(note.time, startOffsetPercent, note.velocity / 127.0);
       }
    }
 }
 
-bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -532,7 +532,7 @@ bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int c
 
          if (x < 4 && y < 4)
          {
-            OnGridButton(x, 3 - y, midiValue / 127.0f, nullptr);
+            OnGridButton(x, 3 - y, midiValue / 127.0, nullptr);
          }
          else if (x < 4 && midiValue > 0)
          {
@@ -622,7 +622,7 @@ void DrumPlayer::GetPush2OverrideControls(std::vector<IUIControl*>& controls) co
    }
 }
 
-void DrumPlayer::FilesDropped(std::vector<std::string> files, int x, int y)
+void DrumPlayer::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    x -= 5;
    y -= 70;
@@ -667,7 +667,7 @@ void DrumPlayer::FilesDropped(std::vector<std::string> files, int x, int y)
    }
 }
 
-void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
+void DrumPlayer::SampleDropped(double x, double y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();
@@ -720,7 +720,7 @@ void DrumPlayer::SetHitSample(int sampleIndex, Sample* sample)
    mDrumHits[sampleIndex].mEnvelopeLength = mDrumHits[sampleIndex].mSample.LengthInSamples() * gInvSampleRateMs;
 }
 
-void DrumPlayer::OnClicked(float x, float y, bool right)
+void DrumPlayer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -748,7 +748,7 @@ void DrumPlayer::OnClicked(float x, float y, bool right)
    }
 }
 
-void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void DrumPlayer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    int sampleIdx = GetAssociatedSampleIndex(x, y);
    if (sampleIdx >= 0)
@@ -831,7 +831,7 @@ void DrumPlayer::DrawModule()
             ofNoFill();
             ofRect(i * 70, j * 70, 70, 70);
 
-            float alpha = sqrt(1 - mDrumHits[sampleIdx].GetPlayProgress(gTime));
+            double alpha = sqrt(1 - mDrumHits[sampleIdx].GetPlayProgress(gTime));
             ofSetColor(200, 100, 0, gModuleDrawAlpha * alpha);
             ofFill();
             ofRect(i * 70, j * 70, 70, 70);
@@ -862,7 +862,7 @@ void DrumPlayer::DrawModule()
          mDrumHits[mSelectedHitIdx].DrawUIControls();
    }
 
-   float moduleW, moduleH;
+   double moduleW, moduleH;
    GetDimensions(moduleW, moduleH);
    for (int i = 0; i < mIndividualOutputs.size(); ++i)
    {
@@ -885,7 +885,7 @@ void DrumPlayer::UpdateLights()
             sample = &(mDrumHits[sampleIdx].mSample);
          if (mGridControlTarget->GetGridController())
          {
-            if (mDrumHits[sampleIdx].GetPlayProgress(gTime) < .75f)
+            if (mDrumHits[sampleIdx].GetPlayProgress(gTime) < .75)
                mGridControlTarget->GetGridController()->SetLight(x, y, kGridColor3Bright);
             else if (sample)
                mGridControlTarget->GetGridController()->SetLight(x, y, kGridColor3Dim);
@@ -903,7 +903,7 @@ void DrumPlayer::OnControllerPageSelected()
 
 void DrumPlayer::DrumHit::DrawUIControls()
 {
-   float displayLength = mSample.LengthInSamples();
+   double displayLength = mSample.LengthInSamples();
    if (mUseEnvelope)
       displayLength = MIN(mEnvelopeLength * gSampleRateMs, displayLength);
    ofPushMatrix();
@@ -1051,13 +1051,13 @@ void DrumPlayer::ShuffleKit()
    for (int j = 0; j < NUM_DRUM_HITS; ++j)
    {
       mDrumHits[j].LoadRandomSample();
-      mDrumHits[j].mVol *= ofRandom(.9f, 1.1f);
-      mDrumHits[j].mSpeed *= ofRandom(.9f, 1.1f);
-      mDrumHits[j].mPan = ofRandom(-1.0f, 1.0f);
+      mDrumHits[j].mVol *= ofRandom(.9, 1.1);
+      mDrumHits[j].mSpeed *= ofRandom(.9, 1.1);
+      mDrumHits[j].mPan = ofRandom(-1.0, 1.0);
    }
 }
 
-void DrumPlayer::GetModuleDimensions(float& width, float& height)
+void DrumPlayer::GetModuleDimensions(double& width, double& height)
 {
    if (mEditMode)
    {
@@ -1074,7 +1074,7 @@ void DrumPlayer::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAuditionSlider)
    {
@@ -1094,7 +1094,7 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double ti
             mDrumHits[mSelectedHitIdx].mSample.Read(file.c_str());
             LoadSampleUnlock();
             mDrumHits[mSelectedHitIdx].StartPlayhead(time, 0, 1);
-            mDrumHits[mSelectedHitIdx].mVelocity = .5f;
+            mDrumHits[mSelectedHitIdx].mVelocity = .5;
             mDrumHits[mSelectedHitIdx].mEnvelopeLength = mDrumHits[mSelectedHitIdx].mSample.LengthInSamples() * gInvSampleRateMs;
          }
       }
@@ -1290,8 +1290,8 @@ void DrumPlayer::LoadState(FileStreamIn& in, int rev)
    {
       mDrumHits[i].mSample.LoadState(in);
       in >> mDrumHits[i].mLinkId;
-      in >> mDrumHits[i].mVol;
-      in >> mDrumHits[i].mSpeed;
+      in >> FloatAsDouble >> mDrumHits[i].mVol;
+      in >> FloatAsDouble >> mDrumHits[i].mSpeed;
       if (rev >= 1)
       {
          in >> mDrumHits[i].mHitCategory;

@@ -64,7 +64,7 @@ void ClipLauncher::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
@@ -85,7 +85,7 @@ void ClipLauncher::Process(double time)
       volSq = mVolume * mSamples[sampleToPlay].mVolume;
       volSq *= volSq;
 
-      float speed = sample->LengthInSamples() * gInvSampleRateMs / TheTransport->MsPerBar() / mSamples[sampleToPlay].mNumBars;
+      double speed = sample->LengthInSamples() * gInvSampleRateMs / TheTransport->MsPerBar() / mSamples[sampleToPlay].mNumBars;
       RecalcPos(time, sampleToPlay);
       sample->SetRate(speed);
    }
@@ -208,13 +208,13 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void ClipLauncher::GetModuleDimensions(float& width, float& height)
+void ClipLauncher::GetModuleDimensions(double& width, double& height)
 {
    width = 180;
    height = 180;
 }
 
-void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -225,7 +225,7 @@ void ClipLauncher::RecalcPos(double time, int idx)
 
    if (sample)
    {
-      float measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
+      double measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
       int pos = ofMap(measurePos / numBars, 0, 1, 0, sample->LengthInSamples(), true);
       sample->SetPlayPosition(pos);
    }

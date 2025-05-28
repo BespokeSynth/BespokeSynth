@@ -41,7 +41,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IDrivableSequencer
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
@@ -64,9 +64,9 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
-   void StepBy(double time, float velocity, int flags);
+   void StepBy(double time, double velocity, int flags);
    void ResetStep();
    void FindNextStep();
 
@@ -86,7 +86,7 @@ private:
       int mPulseCount{ 0 };
       GateType mGate{ GateType::kGate_Repeat };
 
-      float xPos{ 0 }, yPos{ 0 };
+      double xPos{ 0 }, yPos{ 0 };
 
       IntSlider* mPitchSlider{ nullptr };
       IntSlider* mPulseCountSlider{ nullptr };
@@ -94,7 +94,7 @@ private:
    };
 
    std::array<Step, NUM_M185SEQUENCER_STEPS> mSteps;
-   float mWidth{ 0 }, mHeight{ 0 };
+   double mWidth{ 0 }, mHeight{ 0 };
    bool mHasExternalPulseSource{ false };
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 

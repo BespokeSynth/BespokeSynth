@@ -35,10 +35,10 @@ class UIControlConnection;
 
 struct PatchCablePos
 {
-   ofVec2f start;
-   ofVec2f end;
-   ofVec2f plug;
-   ofVec2f startDirection;
+   ofVec2d start;
+   ofVec2d end;
+   ofVec2d plug;
+   ofVec2d startDirection;
 };
 
 enum ConnectionType
@@ -69,10 +69,10 @@ public:
    virtual ~PatchCable();
 
    void Render() override;
-   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
-   bool MouseMoved(float x, float y) override;
+   bool TestClick(double x, double y, bool right, bool testOnly = false) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = 10;
       height = 10;
@@ -98,12 +98,12 @@ public:
    static PatchCable* sActivePatchCable;
 
 protected:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
 private:
    void SetCableTarget(IClickable* target);
    PatchCablePos GetPatchCablePos();
-   ofVec2f FindClosestSide(float x, float y, float w, float h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
+   ofVec2d FindClosestSide(double x, double y, double w, double h, ofVec2d start, ofVec2d startDirection, ofVec2d& endDirection);
 
    PatchCableSource* mOwner{ nullptr };
    IClickable* mTarget{ nullptr };
@@ -114,7 +114,7 @@ private:
 
    bool mHovered{ false };
    bool mDragging{ false };
-   ofVec2f mGrabPos;
+   ofVec2d mGrabPos;
    bool mHoveringOnSource{ false };
    int mSourceIndex{ 0 };
 };

@@ -52,7 +52,7 @@ void NoteStepper::CreateUIControls()
    {
       mDestinationCables[i] = new AdditionalNoteCable();
       mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
       AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
       mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(10 + i * 15, mHeight - 8);
    }

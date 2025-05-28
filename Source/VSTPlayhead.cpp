@@ -50,7 +50,7 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> VSTPlayhead::getPosition() con
    pos.setTimeInSeconds(gTime / 1000);
 
    /*
-   * getMeasureTime is a float of how many measures we are through with fractional
+   * getMeasureTime is a double of how many measures we are through with fractional
    * measures. We want to know the number of quarter notes from the epoch which is
    * just the tsRatio times measure count, and for start of measure we simply floor
    * the measure time

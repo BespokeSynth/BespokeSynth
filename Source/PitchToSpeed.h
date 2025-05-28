@@ -52,14 +52,14 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IModulator
-   virtual float Value(int samplesIn = 0) override;
+   virtual double Value(int samplesIn = 0) override;
    virtual bool Active() const override { return mEnabled; }
    virtual bool CanAdjustRange() const override { return false; }
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -70,15 +70,15 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 106;
       height = 17 * 2 + 2;
    }
 
-   float mPitch{ 0 };
+   double mPitch{ 0 };
    ModulationChain* mPitchBend{ nullptr };
 
    FloatSlider* mReferenceFreqSlider{ nullptr };
-   float mReferenceFreq{ 440 };
+   double mReferenceFreq{ 440 };
 };

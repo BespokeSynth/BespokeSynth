@@ -40,7 +40,7 @@ Sampler::Sampler()
 , mNoteInputBuffer(this)
 , mWriteBuffer(gBufferSize)
 {
-   mVoiceParams.mVol = .5f;
+   mVoiceParams.mVol = .5;
    mVoiceParams.mAdsr.Set(10, 0, 1, 10);
    mVoiceParams.mSample = &mSample;
    mVoiceParams.mSamplePitch = 48;
@@ -98,7 +98,7 @@ void Sampler::Process(double time)
    SyncOutputBuffer(numChannels);
    mWriteBuffer.SetNumActiveChannels(numChannels);
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    mWriteBuffer.Clear();
 
@@ -107,7 +107,7 @@ void Sampler::Process(double time)
       for (int i = 0; i < gBufferSize; ++i)
       {
          //if we've already started recording, or if it's a new recording and there's sound
-         if (mRecordPos > 0 || fabsf(GetBuffer()->GetChannel(0)[i]) > mThresh)
+         if (mRecordPos > 0 || std::abs(GetBuffer()->GetChannel(0)[i]) > mThresh)
          {
             mSample.Data()->GetChannel(0)[mRecordPos] = GetBuffer()->GetChannel(0)[i];
             if (mPassthrough)
@@ -152,7 +152,7 @@ void Sampler::PlayNote(NoteMessage note)
 
    if (note.velocity > 0)
    {
-      mMostRecentVoiceIdx = mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      mMostRecentVoiceIdx = mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0, note.voiceIdx, note.modulation);
       mVoiceParams.mAdsr.Start(note.time, 1); //for visualization
    }
    else
@@ -201,7 +201,7 @@ void Sampler::DrawModule()
 
    ofPushMatrix();
    ofTranslate(106, 3);
-   float pos = 0;
+   double pos = 0;
    if (mMostRecentVoiceIdx != -1)
    {
       auto& voiceInfo = mPolyMgr.GetVoiceInfo(mMostRecentVoiceIdx);
@@ -224,7 +224,7 @@ void Sampler::DrawModuleUnclipped()
    if (mDrawDebug)
    {
       mPolyMgr.DrawDebug(mWidth + 3, 0);
-      float y = mHeight + 15;
+      double y = mHeight + 15;
       for (size_t i = 0; i < mDebugLines.size(); ++i)
       {
          const DebugLine& line = mDebugLines[(mDebugLinesPos + i) % mDebugLines.size()];
@@ -241,9 +241,9 @@ void Sampler::StopRecording()
    mSample.SetStopPoint(mRecordPos);
 }
 
-float Sampler::DetectSamplePitch()
+double Sampler::DetectSamplePitch()
 {
-   float pitch = mPitchDetector.DetectPitch(mSample.Data()->GetChannel(0), mSample.LengthInSamples());
+   double pitch = mPitchDetector.DetectPitch(mSample.Data()->GetChannel(0), mSample.LengthInSamples());
    ofLog() << "Detected pitch: " << pitch;
    return pitch;
 }
@@ -260,7 +260,7 @@ void Sampler::UpdateForNewSample()
    mVoiceParams.mSustainLoopEnd = -1;
 }
 
-void Sampler::FilesDropped(std::vector<std::string> files, int x, int y)
+void Sampler::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mSample.LockDataMutex(true);
    mSample.Read(files[0].c_str());
@@ -268,7 +268,7 @@ void Sampler::FilesDropped(std::vector<std::string> files, int x, int y)
    UpdateForNewSample();
 }
 
-void Sampler::SampleDropped(int x, int y, Sample* sample)
+void Sampler::SampleDropped(double x, double y, Sample* sample)
 {
    mSample.LockDataMutex(true);
    mSample.CopyFrom(sample);
@@ -293,7 +293,7 @@ void Sampler::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void Sampler::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Sampler::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

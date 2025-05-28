@@ -35,8 +35,8 @@ void GateEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mThresholdSlider = new FloatSlider(this, "threshold", 5, 2, 110, 15, &mThreshold, 0, 1);
-   mAttackSlider = new FloatSlider(this, "attack", 5, 18, 110, 15, &mAttackTime, .1f, 500);
-   mReleaseSlider = new FloatSlider(this, "release", 5, 34, 110, 15, &mReleaseTime, .1f, 500);
+   mAttackSlider = new FloatSlider(this, "attack", 5, 18, 110, 15, &mAttackTime, .1, 500);
+   mReleaseSlider = new FloatSlider(this, "release", 5, 34, 110, 15, &mReleaseTime, .1, 500);
 
    mThresholdSlider->SetMode(FloatSlider::kSquare);
 }
@@ -48,17 +48,17 @@ void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
    for (int i = 0; i < bufferSize; ++i)
    {
-      const float decayTime = .01f;
-      float scalar = powf(0.5f, 1.0f / (decayTime * gSampleRate));
-      float input = 0;
+      const double decayTime = .01;
+      double scalar = std::pow(0.5, 1.0 / (decayTime * gSampleRate));
+      double input = 0;
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
-         input = MAX(input, fabsf(buffer->GetChannel(ch)[i]));
+         input = MAX(input, std::abs(buffer->GetChannel(ch)[i]));
 
       if (input >= mPeak)
       {
@@ -93,9 +93,9 @@ void GateEffect::DrawModule()
 
    ofPushStyle();
    ofFill();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4f);
-   ofRect(5, 2, 110 * sqrtf(mPeak), 7);
-   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4);
+   ofRect(5, 2, 110 * std::sqrt(mPeak), 7);
+   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4);
    ofRect(5, 9, 110 * mEnvelope, 7);
    ofPopStyle();
 }
@@ -108,6 +108,6 @@ void GateEffect::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void GateEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void GateEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }

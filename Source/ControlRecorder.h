@@ -51,17 +51,17 @@ public:
    void CreateUIControls() override;
 
    void SetRecording(bool on);
-   float GetLength() const { return mLength; }
+   double GetLength() const { return mLength; }
 
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return IsEnabled() && mHasRecorded && !mRecord; }
    bool CanAdjustRange() const override { return false; }
 
@@ -71,7 +71,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -84,27 +84,27 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float GetPlaybackTime(double time);
+   double GetPlaybackTime(double time);
    void RecordPoint();
    void Clear();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    Curve mCurve{ 0 };
    bool mHasRecorded{ false };
-   float mLength{ 0 };
+   double mLength{ 0 };
    bool mQuantizeLength{ true };
    Checkbox* mQuantizeLengthCheckbox{ nullptr };
    NoteInterval mQuantizeInterval{ NoteInterval::kInterval_1n };
    DropdownList* mQuantizeLengthSelector{ nullptr };
-   float mSpeed{ 1 };
+   double mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
-   float mDisplayStartY{ 0 };
-   float mWidth{ 220 };
-   float mHeight{ 100 };
+   double mDisplayStartY{ 0 };
+   double mWidth{ 220 };
+   double mHeight{ 100 };
    double mRecordStartOffset{ 0 };
    Checkbox* mRecordCheckbox{ nullptr };
    bool mRecord{ false };

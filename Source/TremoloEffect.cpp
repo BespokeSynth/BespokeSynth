@@ -71,7 +71,7 @@ void TremoloEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
@@ -80,9 +80,9 @@ void TremoloEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       for (int i = 0; i < bufferSize; ++i)
       {
          //smooth out LFO a bit to avoid pops with square/saw LFOs
-         mWindow[mWindowPos] = mLFO.Value(i + kAntiPopWindowSize / 2);
+         mWindow[mWindowPos] = mLFO.Value(i + kAntiPopWindowSize / 2, -1);
          mWindowPos = (mWindowPos + 1) % kAntiPopWindowSize;
-         float lfoVal = 0;
+         double lfoVal = 0;
          for (int j = 0; j < kAntiPopWindowSize; ++j)
             lfoVal += mWindow[j];
          lfoVal /= kAntiPopWindowSize;
@@ -105,13 +105,13 @@ void TremoloEffect::DrawModule()
    mDutySlider->Draw();
 
    ofPushStyle();
-   ofSetColor(0, 200, 0, gModuleDrawAlpha * .3f);
+   ofSetColor(0, 200, 0, gModuleDrawAlpha * .3);
    ofFill();
-   ofRect(5, 4, mLFO.Value() * 85 * mAmount, 14);
+   ofRect(5, 4, mLFO.Value(0, -1) * 85 * mAmount, 14);
    ofPopStyle();
 }
 
-float TremoloEffect::GetEffectAmount()
+double TremoloEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
@@ -130,7 +130,7 @@ void TremoloEffect::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void TremoloEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void TremoloEffect::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mOffsetSlider)
       mLFO.SetOffset(mOffset);

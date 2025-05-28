@@ -35,21 +35,21 @@ class Granulator;
 class Grain
 {
 public:
-   void Spawn(Granulator* owner, double time, double pos, float speedMult, float lengthInMs, float vol, float width);
+   void Spawn(Granulator* owner, double time, double pos, double speedMult, double lengthInMs, double vol, double width);
    void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output);
-   void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength);
+   void DrawGrain(int idx, double x, double y, double w, double h, int bufferStart, int viewLength, int bufferLength);
    void Clear() { mVol = 0; }
 
 private:
    double GetWindow(double time);
    double mPos{ 0 };
-   float mSpeedMult{ 1 };
+   double mSpeedMult{ 1 };
    double mStartTime{ 0 };
    double mEndTime{ 1 };
    double mStartToEnd{ 1 }, mStartToEndInv{ 1 };
-   float mVol{ 0 };
-   float mStereoPosition{ 0 };
-   float mDrawPos{ .5 };
+   double mVol{ 0 };
+   double mStereoPosition{ 0 };
+   double mDrawPos{ .5 };
    Granulator* mOwner{ nullptr };
 };
 
@@ -57,23 +57,23 @@ class Granulator
 {
 public:
    Granulator();
-   void ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float speed, float* output);
-   void Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength);
+   void ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, double speed, float* output);
+   void Draw(double x, double y, double w, double h, int bufferStart, int viewLength, int bufferLength);
    void Reset();
    void ClearGrains();
    void SetLiveMode(bool live) { mLiveMode = live; }
 
-   float mSpeed{ 1 };
-   float mGrainLengthMs{ 60 };
-   float mGrainOverlap{ 10 };
-   float mPosRandomizeMs{ 5 };
-   float mSpeedRandomize{ 0 };
-   float mSpacingRandomize{ 1 };
+   double mSpeed{ 1 };
+   double mGrainLengthMs{ 60 };
+   double mGrainOverlap{ 10 };
+   double mPosRandomizeMs{ 5 };
+   double mSpeedRandomize{ 0 };
+   double mSpacingRandomize{ 1 };
    bool mOctaves{ false };
-   float mWidth{ 1 };
+   double mWidth{ 1 };
 
 private:
-   void SpawnGrain(double time, double offset, float width, float speed);
+   void SpawnGrain(double time, double offset, double width, double speed);
 
    double mNextGrainSpawnMs{ 0 };
    int mNextGrainIdx{ 0 };

@@ -26,13 +26,13 @@
 #include "Ramp.h"
 #include "SynthGlobals.h"
 
-void Ramp::Start(double curTime, float end, double endTime)
+void Ramp::Start(double curTime, double end, double endTime)
 {
-   float startValue = Value(curTime);
+   double startValue = Value(curTime);
    Start(curTime, startValue, end, endTime);
 }
 
-void Ramp::Start(double curTime, float start, float end, double endTime)
+void Ramp::Start(double curTime, double start, double end, double endTime)
 {
    mRampDatas[mRampDataPointer].mStartTime = curTime;
    mRampDatas[mRampDataPointer].mStartValue = start;
@@ -41,7 +41,7 @@ void Ramp::Start(double curTime, float start, float end, double endTime)
    mRampDataPointer = (mRampDataPointer + 1) % mRampDatas.size();
 }
 
-void Ramp::SetValue(float val)
+void Ramp::SetValue(double val)
 {
    for (size_t i = 0; i < mRampDatas.size(); ++i)
    {
@@ -59,7 +59,7 @@ bool Ramp::HasValue(double time) const
    return true;
 }
 
-float Ramp::Value(double time) const
+double Ramp::Value(double time) const
 {
    const RampData* rampData = GetCurrentRampData(time);
    if (rampData->mStartTime == -1 || time <= rampData->mStartTime)
@@ -68,8 +68,8 @@ float Ramp::Value(double time) const
       return rampData->mEndValue;
 
    double blend = (time - rampData->mStartTime) / (rampData->mEndTime - rampData->mStartTime);
-   float retVal = rampData->mStartValue + blend * (rampData->mEndValue - rampData->mStartValue);
-   if (fabsf(retVal) < FLT_EPSILON)
+   double retVal = rampData->mStartValue + blend * (rampData->mEndValue - rampData->mStartValue);
+   if (std::abs(retVal) < FLT_EPSILON)
       return 0;
    return retVal;
 }

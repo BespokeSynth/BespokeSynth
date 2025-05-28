@@ -52,13 +52,13 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
@@ -67,10 +67,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void KeyPressed(int key, bool isRepeat) override;
    void MouseReleased() override;
 
@@ -78,14 +78,14 @@ private:
    static const int kBinIgnore = 2;
    static const int kDrawYOffset = 100;
 
-   float FreqForBin(int bin) { return (float(bin) / kNumFFTBins) * gSampleRate; };
-   float PosForFreq(float freq) { return log2(freq / 20) / 10; };
-   float FreqForPos(float pos) { return 20.0 * std::pow(2.0, pos * 10); };
-   float PosForGain(float gain) { return .5f - gain / 30.0f; };
-   float GainForPos(float pos) { return (.5f - pos) * 30; }
+   double FreqForBin(int bin) { return (static_cast<double>(bin) / kNumFFTBins) * gSampleRate; }
+   double PosForFreq(double freq) { return log2(freq / 20) / 10; };
+   double FreqForPos(double pos) { return 20.0 * std::pow(2.0, pos * 10); }
+   double PosForGain(double gain) { return .5 - gain / 30.0; }
+   double GainForPos(double pos) { return (.5 - pos) * 30; }
 
-   float mWidth{ 825 };
-   float mHeight{ 255 };
+   double mWidth{ 825 };
+   double mHeight{ 255 };
 
    float* mWindower{ nullptr };
    float* mSmoother{ nullptr };
@@ -111,8 +111,8 @@ private:
    std::array<Filter, 8> mFilters;
    int mHoveredFilterHandleIndex{ -1 };
    int mDragging{ false };
-   std::array<float, 1024> mFrequencyResponse{};
+   std::array<double, 1024> mFrequencyResponse{};
    bool mNeedToUpdateFrequencyResponseGraph{ true };
-   float mDrawGain{ 1 };
+   double mDrawGain{ 1 };
    bool mLiteCpuModulation{ true };
 };

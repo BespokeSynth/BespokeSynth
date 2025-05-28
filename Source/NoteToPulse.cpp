@@ -53,7 +53,7 @@ void NoteToPulse::DrawModule()
 void NoteToPulse::PlayNote(NoteMessage note)
 {
    if (mEnabled && note.velocity > 0)
-      DispatchPulse(GetPatchCableSource(), note.time, note.velocity / 127.0f, 0);
+      DispatchPulse(GetPatchCableSource(), note.time, note.velocity / 127.0, 0);
 }
 
 void NoteToPulse::SaveLayout(ofxJSONElement& moduleInfo)

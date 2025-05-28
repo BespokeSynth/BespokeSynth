@@ -51,12 +51,12 @@ public:
 
    void SetGrid(int cols, int rows) { mGrid->SetGrid(cols, rows); }
    void SetLabel(int row, std::string label);
-   void Set(int col, int row, float value)
+   void Set(int col, int row, double value)
    {
       mGrid->SetVal(col, row, value, !K(notifyListener));
       UpdateLights();
    }
-   float Get(int col, int row) { return mGrid->GetVal(col, row); }
+   double Get(int col, int row) { return mGrid->GetVal(col, row); }
    void HighlightCell(int col, int row, double time, double duration, int colorIndex);
    void SetDivision(int steps) { return mGrid->SetMajorColSize(steps); }
    int GetCols() const { return mGrid->GetCols(); }
@@ -70,19 +70,19 @@ public:
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //IGridController
    void SetGridControllerOwner(IGridControllerListener* owner) override { mGridControllerOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
-   void SetLightDirect(int x, int y, int color, bool force = false) override;
+   void SetLightDirect(int x, int y, double color, bool force = false) override;
    void ResetLights() override;
    int NumCols() override { return GetCols(); }
    int NumRows() override { return GetRows(); }
@@ -102,11 +102,11 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
    void MouseReleased() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    ofColor GetColor(int colorIndex) const;
