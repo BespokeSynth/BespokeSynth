@@ -3228,20 +3228,26 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
 
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::EffectChain)
-      moduleType = "effectchain";
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Prefab)
-      moduleType = "prefab";
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
-      moduleType = "vstplugin";
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::MidiController)
-      moduleType = "midicontroller";
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Preset)
-      moduleType = spawnable.mPresetModuleType;
+   switch (spawnable.mSpawnMethod)
+   {
+      case ModuleFactory::SpawnMethod::Module:
+         break;
+      case ModuleFactory::SpawnMethod::EffectChain:
+         moduleType = "effectchain";
+         break;
+      case ModuleFactory::SpawnMethod::Prefab:
+         moduleType = "prefab";
+         break;
+      case ModuleFactory::SpawnMethod::Plugin:
+         moduleType = "vstplugin";
+         break;
+      case ModuleFactory::SpawnMethod::MidiController:
+         moduleType = "midicontroller";
+         break;
+      case ModuleFactory::SpawnMethod::Preset:
+         moduleType = spawnable.mPresetModuleType;
+         break;
+   }
 
    if (name == "")
       name = moduleType;
@@ -3277,42 +3283,55 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
       LogEvent("Error spawning \"" + spawnable.mLabel + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
    }
 
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::EffectChain)
+   switch (spawnable.mSpawnMethod)
    {
-      EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
-      if (effectChain != nullptr)
-         effectChain->AddEffect(spawnable.mLabel, spawnable.mLabel, K(onTheFly));
-   }
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Prefab)
-   {
-      Prefab* prefab = dynamic_cast<Prefab*>(module);
-      if (prefab != nullptr)
-         prefab->LoadPrefab("prefabs" + GetPathSeparator() + spawnable.mLabel);
-   }
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
-   {
-      VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      if (plugin != nullptr)
-         plugin->SetVST(spawnable.mPluginDesc);
-   }
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::MidiController)
-   {
-      MidiController* controller = dynamic_cast<MidiController*>(module);
-      if (controller != nullptr)
+      case ModuleFactory::SpawnMethod::EffectChain:
       {
-         controller->GetSaveData().SetString("devicein", spawnable.mLabel);
-         controller->SetUpFromSaveDataBase();
+         EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
+         if (effectChain != nullptr)
+            effectChain->AddEffect(spawnable.mLabel, spawnable.mLabel, K(onTheFly));
       }
-   }
+      break;
 
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Preset)
-   {
-      std::string presetFilePath = ofToDataPath("presets/" + spawnable.mPresetModuleType + "/" + spawnable.mLabel);
-      ModuleSaveDataPanel::LoadPreset(module, presetFilePath);
-      module->SetName(GetUniqueName(juce::String(spawnable.mLabel).replace(".preset", "").toStdString(), modules).c_str());
+      case ModuleFactory::SpawnMethod::Prefab:
+      {
+         Prefab* prefab = dynamic_cast<Prefab*>(module);
+         if (prefab != nullptr)
+            prefab->LoadPrefab("prefabs" + GetPathSeparator() + spawnable.mLabel);
+      }
+      break;
+
+      case ModuleFactory::SpawnMethod::Plugin:
+      {
+         VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+         if (plugin != nullptr)
+            plugin->SetVST(spawnable.mPluginDesc);
+      }
+      break;
+
+      case ModuleFactory::SpawnMethod::MidiController:
+      {
+         MidiController* controller = dynamic_cast<MidiController*>(module);
+         if (controller != nullptr)
+         {
+            controller->GetSaveData().SetString("devicein", spawnable.mLabel);
+            controller->SetUpFromSaveDataBase();
+         }
+      }
+      break;
+
+      case ModuleFactory::SpawnMethod::Preset:
+      {
+         std::string presetFilePath = ofToDataPath("presets/" + spawnable.mPresetModuleType + "/" + spawnable.mLabel);
+         ModuleSaveDataPanel::LoadPreset(module, presetFilePath);
+         module->SetName(GetUniqueName(juce::String(spawnable.mLabel).replace(".preset", "").toStdString(), modules).c_str());
+      }
+      break;
+
+      case ModuleFactory::SpawnMethod::Module:
+      {
+      }
+      break;
    }
 
    return module;

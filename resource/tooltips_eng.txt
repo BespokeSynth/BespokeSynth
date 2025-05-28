@@ -74,6 +74,9 @@ snapshots~save and restore sets of values. connect the grey circle to modules to
 ~store~when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)
 ~delete~when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)
 ~snapshot label~assign a label to this snapshot
+~grid~patch a grid in here from a "midicontroller" module
+~x offset~x offset of attached grid controller
+~y offset~y offset of attached grid controller
 
 
 
@@ -735,6 +738,8 @@ circlesequencer~polyrhythmic sequencer that displays a loop as a circle
 ~length*~number of steps in this ring
 ~note*~pitch to use for this ring
 ~offset*~timing offset for this ring
+~<~rotate this ring to the left
+~>~rotate this ring to the right
 
 
 

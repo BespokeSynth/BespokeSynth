@@ -37,8 +37,10 @@
 #include "DropdownList.h"
 #include "TextEntry.h"
 #include "Push2Control.h"
+#include "GridController.h"
 
-class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IPush2GridController
+
+class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IIntSliderListener, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IPush2GridController, public IGridControllerListener
 {
 public:
    Snapshots();
@@ -70,12 +72,17 @@ public:
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
+   //IGridControllerListener
+   void OnControllerPageSelected() override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
+
    //IPush2GridController
    bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
@@ -111,6 +118,7 @@ private:
    void GetModuleDimensions(double& w, double& h) override;
    void OnClicked(double x, double y, bool right) override;
    bool MouseMoved(double x, double y) override;
+   void UpdateGridControllerLights(bool force);
 
    enum class DisplayMode
    {
@@ -193,4 +201,10 @@ private:
    int mSnapshotRenameIndex{ -1 };
    double mOldWidth{ 0 };
    double mOldHeight{ 0 };
+   bool mPush2Connected{ false };
+   GridControlTarget* mGridControlTarget{ nullptr };
+   int mGridControlOffsetX{ 0 };
+   int mGridControlOffsetY{ 0 };
+   IntSlider* mGridControlOffsetXSlider{ nullptr };
+   IntSlider* mGridControlOffsetYSlider{ nullptr };
 };

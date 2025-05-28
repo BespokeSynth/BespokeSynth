@@ -58,6 +58,10 @@ void Snapshots::CreateUIControls()
    mAddButton = new ClickButton(this, "add", mCurrentSnapshotSelector, kAnchor_Right);
    mStoreCheckbox = new Checkbox(this, "store", mAddButton, kAnchor_Right, &mStoreMode);
    mDeleteCheckbox = new Checkbox(this, "delete", mStoreCheckbox, kAnchor_Right, &mDeleteMode);
+   mGridControlTarget = new GridControlTarget(this, "grid", 4, 4);
+   mGridControlTarget->PositionTo(mDeleteCheckbox, kAnchor_Right);
+   mGridControlOffsetXSlider = new IntSlider(this, "x offset", mStoreCheckbox, kAnchor_Below, 60, 15, &mGridControlOffsetX, 0, 16);
+   mGridControlOffsetYSlider = new IntSlider(this, "y offset", mGridControlOffsetXSlider, kAnchor_Right, 60, 15, &mGridControlOffsetY, 0, 16);
    mSnapshotLabelEntry = new TextEntry(this, "snapshot label", -1, -1, 12, &mSnapshotLabel);
 
    {
@@ -137,6 +141,12 @@ void Snapshots::DrawModule()
       mSnapshotLabelEntry->SetPosition(pos.x, pos.y);
       mStoreCheckbox->PositionTo(mGrid, kAnchor_Below);
       mDeleteCheckbox->PositionTo(mStoreCheckbox, kAnchor_Right_Padded);
+
+      mGridControlTarget->PositionTo(mDeleteCheckbox, kAnchor_Right);
+      mGridControlOffsetXSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && mGrid->GetCols() > mGridControlTarget->GetGridController()->NumCols()) || mPush2Connected);
+      mGridControlOffsetYSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && mGrid->GetRows() > mGridControlTarget->GetGridController()->NumRows()) || mPush2Connected);
+      mGridControlOffsetXSlider->PositionTo(mStoreCheckbox, kAnchor_Below);
+      mGridControlOffsetYSlider->PositionTo(mGridControlOffsetXSlider, kAnchor_Right);
    }
 
    if (mDisplayMode == DisplayMode::List)
@@ -147,6 +157,12 @@ void Snapshots::DrawModule()
 
       mStoreCheckbox->PositionTo(mGrid, kAnchor_Below);
       mDeleteCheckbox->PositionTo(mStoreCheckbox, kAnchor_Right_Padded);
+
+      mGridControlTarget->PositionTo(mDeleteCheckbox, kAnchor_Right);
+      mGridControlOffsetXSlider->SetShowing(false);
+      mGridControlOffsetYSlider->SetShowing((mGridControlTarget->GetGridController() != nullptr && kListRowHeight > mGridControlTarget->GetGridController()->NumRows()) || mPush2Connected);
+      mGridControlOffsetXSlider->PositionTo(mStoreCheckbox, kAnchor_Below);
+      mGridControlOffsetYSlider->PositionTo(mGridControlOffsetXSlider, kAnchor_Right);
    }
 
    mGrid->Draw();
@@ -156,6 +172,9 @@ void Snapshots::DrawModule()
    mAddButton->Draw();
    mStoreCheckbox->Draw();
    mDeleteCheckbox->Draw();
+   mGridControlTarget->Draw();
+   mGridControlOffsetXSlider->Draw();
+   mGridControlOffsetYSlider->Draw();
 
    if (mDisplayMode == DisplayMode::List)
    {
@@ -232,6 +251,30 @@ void Snapshots::DrawModule()
       ofPopStyle();
    }
    mSnapshotLabelEntry->Draw();
+
+   if (mGridControlTarget->GetGridController())
+   {
+      int controllerCols = 8;
+      int controllerRows = 8;
+      if (mGridControlTarget->GetGridController() != nullptr)
+      {
+         controllerCols = MIN(mGridControlTarget->GetGridController()->NumCols(), mGrid->GetCols());
+         controllerRows = MIN(mGridControlTarget->GetGridController()->NumRows(), mGrid->GetRows());
+      }
+
+      ofPushStyle();
+      ofNoFill();
+      ofSetLineWidth(4);
+      ofSetColor(255, 0, 0, 50);
+      float squareh = float(mGrid->GetHeight()) / mGrid->GetRows();
+      float squarew = float(mGrid->GetWidth()) / mGrid->GetCols();
+      ofRectangle gridRect = mGrid->GetRect(K(local));
+      ofRect(gridRect.x + squarew * mGridControlOffsetX,
+             gridRect.y + squareh * mGridControlOffsetY,
+             squarew * controllerCols,
+             squareh * controllerRows);
+      ofPopStyle();
+   }
 }
 
 void Snapshots::DrawModuleUnclipped()
@@ -278,6 +321,21 @@ void Snapshots::UpdateGridValues()
          val = .5;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
+
+   if (mGridControlTarget->GetGridController())
+   {
+      int maxXOffset = mGrid->GetCols() - mGridControlTarget->GetGridController()->NumCols();
+      if (maxXOffset >= 0)
+         mGridControlOffsetXSlider->SetExtents(0, maxXOffset);
+      int maxYOffset = mGrid->GetRows() - mGridControlTarget->GetGridController()->NumRows();
+      if (maxYOffset >= 0)
+         mGridControlOffsetYSlider->SetExtents(0, maxYOffset);
+
+      mGridControlOffsetX = MAX(MIN(mGridControlOffsetX, maxXOffset), 0);
+      mGridControlOffsetY = MAX(MIN(mGridControlOffsetY, maxYOffset), 0);
+   }
+
+   UpdateGridControllerLights(true);
 }
 
 bool Snapshots::IsTargetingModule(IDrawableModule* module) const
@@ -610,8 +668,66 @@ void Snapshots::DeleteSnapshot(int idx)
    }
 }
 
+void Snapshots::UpdateGridControllerLights(bool force)
+{
+   if (mGridControlTarget->GetGridController())
+   {
+      for (int x = 0; x < mGridControlTarget->GetGridController()->NumCols(); ++x)
+      {
+         for (int y = 0; y < mGridControlTarget->GetGridController()->NumRows(); ++y)
+         {
+            int column = x + mGridControlOffsetX;
+            int row = y + mGridControlOffsetY;
+
+            GridColor color = GridColor::kGridColorOff;
+            if (column < mGrid->GetCols())
+            {
+               if (mGrid->GetVal(column, row) > 0)
+               {
+                  color = GridColor::kGridColor1Bright;
+               }
+
+               if (column == mCurrentSnapshot % mGrid->GetCols() && row == mCurrentSnapshot / mGrid->GetCols())
+               {
+                  if (mGrid->GetVal(column, row) > 0)
+                     color = GridColor::kGridColor3Bright;
+                  else
+                     color = GridColor::kGridColor2Bright;
+               }
+            }
+            mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
+         }
+      }
+   }
+}
+
+void Snapshots::OnControllerPageSelected()
+{
+   UpdateGridControllerLights(true);
+}
+
+void Snapshots::OnGridButton(int x, int y, double velocity, IGridController* grid)
+{
+   int col = x + mGridControlOffsetX;
+   int row = y + mGridControlOffsetY;
+   if (grid == mGridControlTarget->GetGridController() && col >= 0 && col < mGrid->GetCols() && velocity > 0)
+   {
+      int btnIdx = row * mGrid->GetCols() + col;
+      if (mStoreMode)
+         StoreSnapshot(btnIdx, true);
+      else if (mDeleteMode)
+         DeleteSnapshot(btnIdx);
+      else
+         SetSnapshot(btnIdx, gTime);
+
+      UpdateGridValues();
+   }
+}
+
 bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
+   mPush2Connected = true;
+
    if (type == kMidiMessage_Note)
    {
       if (controlIndex >= 36 && controlIndex <= 99)
@@ -650,6 +766,8 @@ bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int co
 
 void Snapshots::UpdatePush2Leds(Push2Control* push2)
 {
+   mPush2Connected = true;
+
    for (int x = 0; x < 8; ++x)
    {
       for (int y = 0; y < 8; ++y)
@@ -737,6 +855,12 @@ void Snapshots::ButtonClicked(ClickButton* button, double time)
    }
 }
 
+void Snapshots::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
+{
+   if (slider == mGridControlOffsetXSlider || slider == mGridControlOffsetYSlider)
+      UpdateGridControllerLights(true);
+}
+
 void Snapshots::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mCurrentSnapshotSelector)
@@ -772,7 +896,7 @@ void Snapshots::TextEntryComplete(TextEntry* entry)
 void Snapshots::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + extraW;
-   height = mGrid->GetHeight() + extraH;
+   height = mGrid->GetHeight() + extraH + ((mGridControlOffsetXSlider->IsShowing() || mGridControlOffsetYSlider->IsShowing()) ? 18 : 0);
 }
 
 void Snapshots::Resize(double w, double h)
@@ -835,6 +959,18 @@ void Snapshots::UpdateListGrid()
    int numSnapshots = (int)mSnapshotCollection.size();
    mGrid->SetGrid(1, numSnapshots);
    mGrid->SetDimensions(kListModeGridWidth, kListRowHeight * numSnapshots);
+
+   if (mGridControlTarget->GetGridController())
+   {
+      mGridControlOffsetXSlider->SetExtents(0, 0);
+      int maxYOffset = mGrid->GetRows() - mGridControlTarget->GetGridController()->NumRows();
+      if (maxYOffset >= 0)
+         mGridControlOffsetYSlider->SetExtents(0, maxYOffset);
+
+      mGridControlOffsetX = 0;
+      mGridControlOffsetY = MAX(MIN(mGridControlOffsetY, maxYOffset), 0);
+   }
+
    UpdateGridValues();
 }
 

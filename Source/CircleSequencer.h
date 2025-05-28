@@ -31,6 +31,7 @@
 #include "DropdownList.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
+#include "ClickButton.h"
 #include "TextEntry.h"
 
 class CircleSequencer;
@@ -42,6 +43,7 @@ class CircleSequencerRing
 public:
    CircleSequencerRing(CircleSequencer* owner, int index);
    void Draw();
+   void ButtonClicked(ClickButton* button);
    void OnClicked(double x, double y, bool right);
    void MouseReleased();
    void MouseMoved(double x, double y);
@@ -53,6 +55,7 @@ public:
 private:
    double GetRadius() { return 90 - mIndex * 15; }
    int GetStepIndex(int x, int y, double& radiusOut);
+   int GetStepAngle(int i);
    int mLength{ 4 };
    DropdownList* mLengthSelector{ nullptr };
    int mPitch{ 0 };
@@ -61,13 +64,16 @@ private:
    int mIndex{ 0 };
    std::array<double, CIRCLE_SEQUENCER_MAX_STEPS> mSteps{};
    double mOffset{ 0 };
+   int mAngle{ 0 };
+   ClickButton* mAnglePrev{ nullptr };
+   ClickButton* mAngleNext{ nullptr };
    FloatSlider* mOffsetSlider{ nullptr };
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
    double mLastMouseRadius{ -1 };
 };
 
-class CircleSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener
+class CircleSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IButtonListener, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    CircleSequencer();
@@ -84,6 +90,9 @@ public:
 
    //IAudioPoller
    void OnTransportAdvanced(double amount) override;
+
+   //IButtonListener
+   void ButtonClicked(ClickButton* button, double time) override;
 
    //IClickable
    void MouseReleased() override;
@@ -107,7 +116,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(double& width, double& height) override
    {
-      width = 400;
+      width = 425;
       height = 200;
    }
    void OnClicked(double x, double y, bool right) override;
