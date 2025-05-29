@@ -270,6 +270,10 @@
 #include "Acciaccatura.h"
 #include "ModulatorWander.h"
 
+#ifdef BESPOKE_FLUIDSYNTH
+#include "FluidSynth.h"
+#endif
+
 #include <juce_core/juce_core.h>
 
 #include "PulseRouter.h"
@@ -492,6 +496,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(BassLineSequencer, basslinesequencer, kModuleCategory_Instrument);
    REGISTER(Acciaccatura, acciaccatura, kModuleCategory_Note);
    REGISTER(ModulatorWander, wander, kModuleCategory_Modulator);
+#ifdef BESPOKE_FLUIDSYNTH
+   REGISTER(FluidSynth, fluidsynth, kModuleCategory_Synth);
+#endif
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
