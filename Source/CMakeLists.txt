@@ -673,6 +673,8 @@ target_sources(BespokeSynth PRIVATE
     Splitter.h
     StepSequencer.cpp
     StepSequencer.h
+    StereoRotation.cpp
+    StereoRotation.h
     Stutter.cpp
     Stutter.h
     StutterControl.cpp
