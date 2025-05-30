@@ -39,8 +39,13 @@ target_sources(BespokeSynth PRIVATE
     ADSR.h
     ADSRDisplay.cpp
     ADSRDisplay.h
+    AbletonDeviceShared.h
     AbletonLink.cpp
     AbletonLink.h
+    AbletonMoveControl.cpp
+    AbletonMoveControl.h
+    AbletonMoveLCD.cpp
+    AbletonMoveLCD.h
     Acciaccatura.cpp
     Acciaccatura.h
     Amplifier.cpp
@@ -891,6 +896,7 @@ target_link_libraries(BespokeSynth PRIVATE
     bespoke::push2
     bespoke::pybind11
     bespoke::xwax
+    bespoke::scalable-font2
 
     $<$<STREQUAL:${BESPOKE_SYSTEM_TUNING_LIBRARY},OFF>:tuning-library>
     oddsound-mts
