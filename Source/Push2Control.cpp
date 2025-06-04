@@ -1173,7 +1173,7 @@ void Push2Control::Poll()
       }
       else
       {
-         newModulePos = ofVec2d(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
+         newModulePos = ofVec2d(ofMap(static_cast<double>(gridX), 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(static_cast<double>(gridY), 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
       }
 
       for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)

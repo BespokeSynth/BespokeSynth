@@ -139,7 +139,7 @@ void BandVocoder::Process(double time)
       //multiply carrier band by modulator band level
       //Mult(mWorkBuffer, mPeaks[i].GetPeak(), bufferSize);
       for (int j = 0; j < bufferSize; ++j)
-         mWorkBuffer[j] *= ofMap(j, 0, bufferSize, oldPeak, mPeaks[i].GetPeak());
+         mWorkBuffer[j] *= ofMap(static_cast<double>(j), 0, bufferSize, oldPeak, mPeaks[i].GetPeak());
 
       //don't allow a band to go crazy
       /*mOutputPeaks[i].Process(mWorkBuffer, bufferSize);

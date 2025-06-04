@@ -1078,7 +1078,7 @@ void SamplePlayer::DrawModule()
 
       if (playPosition >= 0)
       {
-         double x = ofMap(playPosition, GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
+         double x = ofMap(static_cast<double>(playPosition), GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
          DrawTextNormal(ofToString(playPosition / (gSampleRate * mSample->GetSampleRateRatio()), 1), x + 2, mHeight - 65, 9);
       }
 

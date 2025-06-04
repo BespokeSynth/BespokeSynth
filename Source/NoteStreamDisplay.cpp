@@ -107,7 +107,7 @@ void NoteStreamDisplay::DrawModuleUnclipped()
 
 double NoteStreamDisplay::GetYPos(int pitch, double noteHeight) const
 {
-   return ofMap(pitch, mPitchMin, mPitchMax + 1, mHeight - noteHeight, -noteHeight);
+   return ofMap(static_cast<double>(pitch), mPitchMin, mPitchMax + 1, mHeight - noteHeight, -noteHeight);
 }
 
 void NoteStreamDisplay::PlayNote(NoteMessage note)

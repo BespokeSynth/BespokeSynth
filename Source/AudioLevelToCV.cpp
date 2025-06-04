@@ -84,7 +84,7 @@ void AudioLevelToCV::DrawModule()
    mGainSlider->GetDimensions(w, h);
    for (int i = 0; i < gBufferSize; ++i)
    {
-      ofVertex(ofMap(static_cast<double>(mModulationBuffer[i]), 0, 1, x, x + w, K(clamp)), ofMap(i, 0, gBufferSize, y, y + h), K(clamp));
+      ofVertex(ofMap(static_cast<double>(mModulationBuffer[i]), 0, 1, x, x + w, K(clamp)), ofMap(static_cast<double>(i), 0, gBufferSize, y, y + h), K(clamp));
    }
    ofEndShape();
    ofPopStyle();

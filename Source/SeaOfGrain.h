@@ -104,6 +104,7 @@ private:
    double GetSourceStartSample();
    double GetSourceEndSample();
    double GetSourceBufferOffset();
+   int GetSampleNumChannels();
 
    struct GrainMPEVoice
    {

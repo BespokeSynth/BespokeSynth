@@ -151,7 +151,7 @@ void ModulatorExpression::DrawModule()
       double drawMaxOutput = mLastDrawMaxOutput;
       for (int i = 0; i <= kGraphWidth; ++i)
       {
-         mExpressionInputDraw = ofMap(i, 0, kGraphWidth, mExpressionInputSlider->GetMin(), mExpressionInputSlider->GetMax());
+         mExpressionInputDraw = ofMap(static_cast<double>(i), 0, kGraphWidth, mExpressionInputSlider->GetMin(), mExpressionInputSlider->GetMax());
          double output = mExpressionDraw.value();
          ofVertex(i + kGraphX, ofMap(output, drawMinOutput, drawMaxOutput, kGraphHeight, 0) + kGraphY);
 

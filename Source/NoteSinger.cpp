@@ -116,7 +116,7 @@ void NoteSinger::DrawModule()
    {
       double x = ofMap(i, 0, mNumBuckets, 0, 100);
       ofSetColor(255, 0, 255);
-      ofLine(x, 50, x, 50 - ofMap(MIN(mPeaks[i].GetPeak(), 1), 0, 1, 0, 50));
+      ofLine(x, 50, x, 50 - ofMap(MIN(mPeaks[i].GetPeak(), 1.0), 0, 1, 0, 50));
    }
 }
 

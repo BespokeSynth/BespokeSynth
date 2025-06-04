@@ -261,6 +261,11 @@ double SeaOfGrain::GetSourceBufferOffset()
       return 0;
 }
 
+int SeaOfGrain::GetSampleNumChannels()
+{
+   return mSample->NumChannels();
+}
+
 void SeaOfGrain::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mLoading = true;
@@ -475,7 +480,7 @@ void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize)
          double pos = (mPitch + pitchBend + MIN(.125, mPlay) - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches;
          mGranulator.ProcessFrame(time, mOwner->GetSourceBuffer(), mOwner->GetSourceBuffer()->BufferSize(), ofLerp(mOwner->GetSourceStartSample(), mOwner->GetSourceEndSample(), pos) + mOwner->GetSourceBufferOffset(), speed, outSample);
          for (int ch = 0; ch < output->NumActiveChannels(); ++ch)
-            output->GetChannel(ch)[i] += outSample[ch] * std::sqrt(mGain) * mADSR.Value(time);
+            output->GetChannel(ch)[i] += outSample[mOwner->GetSampleNumChannels() == 1 ? 0 : ch] * std::sqrt(mGain) * mADSR.Value(time);
 
          time += gInvSampleRateMs;
          mPlay += .001;
@@ -533,7 +538,7 @@ void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize
          Clear(outSample, ChannelBuffer::kMaxNumChannels);
          mGranulator.ProcessFrame(time, mOwner->GetSourceBuffer(), mOwner->GetSourceBuffer()->BufferSize(), ofLerp(mOwner->GetSourceStartSample(), mOwner->GetSourceEndSample(), mPosition) + mOwner->GetSourceBufferOffset(), speed, outSample);
          for (int ch = 0; ch < output->NumActiveChannels(); ++ch)
-            output->GetChannel(ch)[i] += outSample[ch] * mGain * (ch == 0 ? panLeft : panRight);
+            output->GetChannel(ch)[i] += outSample[mOwner->GetSampleNumChannels() == 1 ? 0 : ch] * mGain * (ch == 0 ? panLeft : panRight);
          time += gInvSampleRateMs;
       }
    }

@@ -81,7 +81,7 @@ double CanvasScrollbar::GetBarStart() const
    if (mStyle == Style::kHorizontal)
       return mCanvas->mViewStart / mCanvas->GetLength() * mWidth;
    if (mStyle == Style::kVertical)
-      return ofMap(mCanvas->GetRowOffset(), 0, mCanvas->GetNumRows(), 0, mHeight);
+      return ofMap(static_cast<double>(mCanvas->GetRowOffset()), 0, mCanvas->GetNumRows(), 0, mHeight);
    return 0;
 }
 
@@ -90,7 +90,7 @@ double CanvasScrollbar::GetBarEnd() const
    if (mStyle == Style::kHorizontal)
       return mCanvas->mViewEnd / mCanvas->GetLength() * mWidth;
    if (mStyle == Style::kVertical)
-      return ofMap(mCanvas->GetRowOffset() + mCanvas->GetNumVisibleRows(), 0, mCanvas->GetNumRows(), 0, mHeight);
+      return ofMap(static_cast<double>(mCanvas->GetRowOffset()) + mCanvas->GetNumVisibleRows(), 0, mCanvas->GetNumRows(), 0, mHeight);
    return 1;
 }
 
