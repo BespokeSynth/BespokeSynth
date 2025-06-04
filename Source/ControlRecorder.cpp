@@ -44,7 +44,7 @@ ControlRecorder::~ControlRecorder()
 void ControlRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   float controlH;
+   double controlH;
    UIBLOCK0();
    CHECKBOX(mRecordCheckbox, "record", &mRecord);
    UIBLOCK_SHIFTRIGHT();
@@ -52,7 +52,7 @@ void ControlRecorder::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mQuantizeLengthSelector, "length", (int*)(&mQuantizeInterval), 60);
    UIBLOCK_SHIFTLEFT();
-   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .1f, 10);
+   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .1, 10);
    UIBLOCK_NEWLINE();
    BUTTON(mClearButton, "clear");
    ENDUIBLOCK(mWidth, controlH);
@@ -89,9 +89,9 @@ void ControlRecorder::Poll()
       RecordPoint();
 }
 
-float ControlRecorder::GetPlaybackTime(double time)
+double ControlRecorder::GetPlaybackTime(double time)
 {
-   float measureTime = TheTransport->GetMeasureTime(time) - mRecordStartOffset;
+   double measureTime = TheTransport->GetMeasureTime(time) - mRecordStartOffset;
    if (!mQuantizeLength)
       measureTime *= mSpeed;
 
@@ -137,8 +137,8 @@ void ControlRecorder::DrawModule()
 
    if (mLength > 0 && !mRecord)
    {
-      float playbackTime = GetPlaybackTime(gTime);
-      float lineX = ofLerp(3, mWidth - 6, playbackTime / mLength);
+      double playbackTime = GetPlaybackTime(gTime);
+      double lineX = ofLerp(3.0, mWidth - 6, playbackTime / mLength);
       ofLine(lineX, 0, lineX, mHeight - 5 - mDisplayStartY);
    }
 
@@ -160,7 +160,7 @@ void ControlRecorder::RecordPoint()
    IUIControl* target = dynamic_cast<IUIControl*>(GetPatchCableSource()->GetTarget());
    if (target)
    {
-      float time = TheTransport->GetMeasureTime(gTime) - mRecordStartOffset;
+      double time = TheTransport->GetMeasureTime(gTime) - mRecordStartOffset;
       mCurve.AddPointAtEnd(CurvePoint(time, target->GetMidiValue()));
       mCurve.SetExtents(0, time);
       mHasRecorded = true;
@@ -181,11 +181,11 @@ void ControlRecorder::SetRecording(bool record)
    {
       if (mQuantizeLength)
       {
-         float quantizeResolution = TheTransport->GetMeasureFraction(mQuantizeInterval);
+         double quantizeResolution = TheTransport->GetMeasureFraction(mQuantizeInterval);
          int quantizeIntervalSteps = juce::roundToInt(mLength / quantizeResolution);
          if (quantizeIntervalSteps <= 0)
             quantizeIntervalSteps = 1;
-         float quantizedLength = quantizeResolution * quantizeIntervalSteps;
+         double quantizedLength = quantizeResolution * quantizeIntervalSteps;
          mLength = quantizedLength;
          mCurve.SetExtents(0, mLength);
       }
@@ -219,13 +219,13 @@ void ControlRecorder::ButtonClicked(ClickButton* button, double time)
       Clear();
 }
 
-void ControlRecorder::GetModuleDimensions(float& width, float& height)
+void ControlRecorder::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void ControlRecorder::Resize(float w, float h)
+void ControlRecorder::Resize(double w, double h)
 {
    w = MAX(w, 220);
    h = MAX(h, 100);
@@ -269,21 +269,21 @@ void ControlRecorder::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   in >> FloatAsDouble >> mWidth;
+   in >> FloatAsDouble >> mHeight;
 
    mCurve.LoadState(in);
    in >> mHasRecorded;
 
-   in >> mLength;
+   in >> FloatAsDouble >> mLength;
    mCurve.SetExtents(0, mLength);
    in >> mRecordStartOffset;
 }
 
-float ControlRecorder::Value(int samplesIn)
+double ControlRecorder::Value(int samplesIn)
 {
-   float playbackTime = GetPlaybackTime(gTime + samplesIn * gInvSampleRateMs);
-   float val = mCurve.Evaluate(playbackTime, true);
+   double playbackTime = GetPlaybackTime(gTime + samplesIn * gInvSampleRateMs);
+   double val = mCurve.Evaluate(playbackTime, true);
    if (mConnectedControl != nullptr && mConnectedControl->ModulatorUsesLiteralValue())
       return mConnectedControl->GetValueForMidiCC(val);
    return val;

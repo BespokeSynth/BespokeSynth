@@ -100,7 +100,7 @@ void SamplerGrid::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    Clear(gWorkBuffer, gBufferSize);
 
@@ -186,12 +186,12 @@ void SamplerGrid::InitGrid()
    mGrid->SetGrid(mCols, mRows);
 }
 
-void SamplerGrid::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void SamplerGrid::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    OnGridButton(col, row, value, nullptr);
 }
 
-void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void SamplerGrid::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    bool bOn = velocity > 0;
    if (y < mRows && x < mCols)
@@ -261,7 +261,7 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
 
 void SamplerGrid::PlayNote(NoteMessage note)
 {
-   OnGridButton(note.pitch % mCols, (note.pitch / mCols) % mRows, note.velocity / 127.0f, nullptr);
+   OnGridButton(note.pitch % mCols, (note.pitch / mCols) % mRows, note.velocity / 127.0, nullptr);
 }
 
 void SamplerGrid::SetEditSample(SamplerGrid::GridSample* sample)
@@ -323,9 +323,9 @@ void SamplerGrid::DrawModule()
          int idx = GridToIdx(x, y);
          if (mGridSamples[idx].mHasSample)
          {
-            ofVec2f cellPos = mGrid->GetCellPosition(x, y);
-            ofVec2f gridSize = mGrid->IClickable::GetDimensions();
-            ofVec2f gridPos = mGrid->IClickable::GetPosition();
+            ofVec2d cellPos = mGrid->GetCellPosition(x, y);
+            ofVec2d gridSize = mGrid->IClickable::GetDimensions();
+            ofVec2d gridPos = mGrid->IClickable::GetPosition();
             ofRect(gridPos.x + cellPos.x, gridPos.y + cellPos.y, gridSize.x / mCols, gridSize.y / mCols);
          }
       }
@@ -343,8 +343,8 @@ void SamplerGrid::DrawModule()
          ofPushStyle();
          ofFill();
          ofSetColor(0, 0, 0, 80);
-         float clipStartAmount = float(mEditSample->mSampleStart) / mEditSample->mSampleLength;
-         float clipEndAmount = float(mEditSample->mSampleEnd) / mEditSample->mSampleLength;
+         double clipStartAmount = static_cast<double>(mEditSample->mSampleStart) / mEditSample->mSampleLength;
+         double clipEndAmount = static_cast<double>(mEditSample->mSampleEnd) / mEditSample->mSampleLength;
          ofRect(0, 0, mEditSampleWidth * clipStartAmount, mEditSampleHeight);
          ofRect(mEditSampleWidth * clipEndAmount, 0, mEditSampleWidth * (1 - clipEndAmount), mEditSampleHeight);
          ofPopStyle();
@@ -355,7 +355,7 @@ void SamplerGrid::DrawModule()
    }
 }
 
-void SamplerGrid::GetModuleDimensions(float& width, float& height)
+void SamplerGrid::GetModuleDimensions(double& width, double& height)
 {
    if (mEditMode)
    {
@@ -369,7 +369,7 @@ void SamplerGrid::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void SamplerGrid::OnClicked(float x, float y, bool right)
+void SamplerGrid::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -394,14 +394,14 @@ void SamplerGrid::MouseReleased()
    mGrid->MouseReleased();
 }
 
-void SamplerGrid::FilesDropped(std::vector<std::string> files, int x, int y)
+void SamplerGrid::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
    SampleDropped(x, y, &sample);
 }
 
-void SamplerGrid::SampleDropped(int x, int y, Sample* sample)
+void SamplerGrid::SampleDropped(double x, double y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();
@@ -443,7 +443,7 @@ void SamplerGrid::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void SamplerGrid::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SamplerGrid::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

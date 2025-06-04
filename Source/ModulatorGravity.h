@@ -53,19 +53,19 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    //IButtonListener
    void ButtonClicked(ClickButton* button, double time) override;
@@ -77,24 +77,24 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   void Kick(float strength);
+   void Kick(double strength);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = mWidth;
       h = mHeight;
    }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
-   float mValue{ 0 };
-   float mVelocity{ 0 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
+   double mValue{ 0 };
+   double mVelocity{ 0 };
    Ramp mRamp;
-   float mGravity{ -.1 };
-   float mKickAmount{ 1 };
-   float mDrag{ .005 };
+   double mGravity{ -.1 };
+   double mKickAmount{ 1 };
+   double mDrag{ .005 };
 
    FloatSlider* mGravitySlider{ nullptr };
    FloatSlider* mKickAmountSlider{ nullptr };

@@ -62,7 +62,7 @@ void BiquadFilter::UpdateFilterCoeff()
    }
 
    double norm;
-   double V = pow(10, fabs(mDbGain) / 20.0);
+   double V = pow(10, std::abs(mDbGain) / 20.0);
    double K = tan(M_PI * ofClamp(mF / mSampleRate, 0, 0.499999));
    switch (mType)
    {
@@ -235,7 +235,7 @@ void BiquadFilter::CopyCoeffFrom(BiquadFilter& other)
    mB2 = other.mB2;
 }
 
-float BiquadFilter::GetMagnitudeResponseAt(float f)
+double BiquadFilter::GetMagnitudeResponseAt(double f)
 {
    auto const piw0 = (f / mSampleRate) * M_PI * 2;
    auto const cosw = std::cos(piw0);

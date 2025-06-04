@@ -42,7 +42,7 @@ void VelocityStepSequencer::Init()
 {
    IDrawableModule::Init();
 
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1, true), false);
 }
 
 void VelocityStepSequencer::CreateUIControls()
@@ -164,7 +164,7 @@ void VelocityStepSequencer::DropdownUpdated(DropdownList* list, int oldVal, doub
       if (transportListenerInfo != nullptr)
       {
          transportListenerInfo->mInterval = mInterval;
-         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1f, true);
+         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1, true);
       }
    }
 }

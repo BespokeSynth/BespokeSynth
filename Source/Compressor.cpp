@@ -43,7 +43,7 @@ namespace
       return exp(dB * DB_2_LOG);
    }
 
-   const float kMaxLookaheadMs = 50;
+   const double kMaxLookaheadMs = 50;
 }
 
 Compressor::Compressor()
@@ -56,12 +56,12 @@ void Compressor::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
    FLOATSLIDER(mMixSlider, "mix", &mMix, 0, 1);
-   FLOATSLIDER(mDriveSlider, "drive", &mDrive, .01f, 2);
+   FLOATSLIDER(mDriveSlider, "drive", &mDrive, .01, 2);
    FLOATSLIDER(mThresholdSlider, "threshold", &mThreshold, -70, 0);
    FLOATSLIDER(mRatioSlider, "ratio", &mRatio, 1, 40);
    UIBLOCK_NEWCOLUMN();
-   FLOATSLIDER(mAttackSlider, "attack", &mAttack, .1f, kMaxLookaheadMs);
-   FLOATSLIDER(mReleaseSlider, "release", &mRelease, .1f, 500);
+   FLOATSLIDER(mAttackSlider, "attack", &mAttack, .1, kMaxLookaheadMs);
+   FLOATSLIDER(mReleaseSlider, "release", &mRelease, .1, 500);
    FLOATSLIDER(mLookaheadSlider, "lookahead", &mLookahead, 0, kMaxLookaheadMs);
    FLOATSLIDER(mOutputAdjustSlider, "output", &mOutputAdjust, 0, 2);
    ENDUIBLOCK(mWidth, mHeight);
@@ -83,7 +83,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   int bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
    mDelayBuffer.SetNumChannels(buffer->NumActiveChannels());
 
    for (int i = 0; i < bufferSize; ++i)
@@ -94,7 +94,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
 
       float input = 0;
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
-         input = MAX(input, fabsf(buffer->GetChannel(ch)[i]));
+         input = MAX(input, std::abs(buffer->GetChannel(ch)[i]));
       input *= mDrive;
 
       /* if desired, one could use another EnvelopeDetector to smooth
@@ -128,7 +128,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
       // transfer function
       double reduction = overdB * (invRatio - 1.0); // gain reduction (dB)
       double makeup = (-mThreshold * .5) * (1.0 - invRatio);
-      mOutputGain = ofLerp(1, dB2lin(reduction + makeup) * mDrive * mOutputAdjust, mMix);
+      mOutputGain = ofLerp(1.0, dB2lin(reduction + makeup) * mDrive * mOutputAdjust, mMix);
 
       // output gain
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
@@ -152,17 +152,17 @@ void Compressor::DrawModule()
 
    ofPushStyle();
    ofSetColor(0, 255, 0, gModuleDrawAlpha);
-   float x, y, w, h;
+   double x, y, w, h;
 
    mThresholdSlider->GetPosition(x, y, K(local));
    mThresholdSlider->GetDimensions(w, h);
-   float currentInputX = ofMap(mCurrentInputDb, mThresholdSlider->GetMin(), mThresholdSlider->GetMax(), x, x + w, K(clamp));
+   double currentInputX = ofMap(mCurrentInputDb, mThresholdSlider->GetMin(), mThresholdSlider->GetMax(), x, x + w, K(clamp));
    ofLine(currentInputX, y, currentInputX, y + h);
 
    mRatioSlider->GetPosition(x, y, K(local));
    mRatioSlider->GetDimensions(w, h);
-   float outputNormalized = ofClamp(mOutputGain / 10, 0, 1);
-   float currentOutputX = ofLerp(x, x + w, sqrtf(outputNormalized));
+   double outputNormalized = ofClamp(mOutputGain / 10, 0, 1);
+   double currentOutputX = ofLerp(x, x + w, sqrtf(outputNormalized));
    ofLine(currentOutputX, y, currentOutputX, y + h);
 
    ofPopStyle();
@@ -174,12 +174,12 @@ void Compressor::CheckboxUpdated(Checkbox* checkbox, double time)
       envdB_ = DC_OFFSET; //reset state
 }
 
-void Compressor::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Compressor::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAttackSlider)
-      mEnv.setAttack(MAX(.1f, mAttack));
+      mEnv.setAttack(MAX(.1, mAttack));
    if (slider == mReleaseSlider)
-      mEnv.setRelease(MAX(.1f, mRelease));
+      mEnv.setRelease(MAX(.1, mRelease));
 }
 
 //-------------------------------------------------------------

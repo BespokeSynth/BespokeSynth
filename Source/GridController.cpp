@@ -53,12 +53,12 @@ void GridControlTarget::Render()
 }
 
 //static
-void GridControlTarget::DrawGridIcon(float x, float y)
+void GridControlTarget::DrawGridIcon(double x, double y)
 {
    ofPushStyle();
 
    ofSetLineWidth(1);
-   float gridSize = 12;
+   double gridSize = 12;
    ofRect(x, y, gridSize, gridSize, 0);
    ofRect(x + gridSize / 3, y, gridSize / 3, 12, 0);
    ofRect(x, y + gridSize / 3, 12, gridSize / 3, 0);
@@ -71,7 +71,7 @@ bool GridControlTarget::CanBeTargetedBy(PatchCableSource* source) const
    return source->GetConnectionType() == kConnectionType_Grid;
 }
 
-bool GridControlTarget::MouseMoved(float x, float y)
+bool GridControlTarget::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    return false;
@@ -113,7 +113,7 @@ void GridControllerMidi::OnControllerPageSelected()
    }
 }
 
-void GridControllerMidi::OnInput(int control, float velocity)
+void GridControllerMidi::OnInput(int control, double velocity)
 {
    int x = 0;
    int y = 0;
@@ -183,7 +183,7 @@ void GridControllerMidi::SetLight(int x, int y, GridColor color, bool force)
    SetLightDirect(x, y, rawColor, force);
 }
 
-void GridControllerMidi::SetLightDirect(int x, int y, int color, bool force)
+void GridControllerMidi::SetLightDirect(int x, int y, double color, bool force)
 {
    if (mLights[x][y] != color || force)
    {

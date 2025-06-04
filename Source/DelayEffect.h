@@ -46,9 +46,9 @@ public:
    void CreateUIControls() override;
    bool IsEnabled() const override { return mEnabled; }
 
-   void SetDelay(float delay);
+   void SetDelay(double delay);
    void SetShortMode(bool on);
-   void SetFeedback(float feedback) { mFeedback = feedback; }
+   void SetFeedback(double feedback) { mFeedback = feedback; }
    void Clear() { mDelayBuffer.ClearBuffer(); }
    void SetDry(bool dry) { mDry = dry; }
    void SetFeedbackModuleMode();
@@ -56,11 +56,11 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override;
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "delay"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    void SaveState(FileStreamOut& out) override;
@@ -69,17 +69,17 @@ public:
 
 private:
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
    void DrawModule() override;
 
-   float GetMinDelayMs() const;
+   double GetMinDelayMs() const;
 
-   float mDelay{ 500 };
-   float mFeedback{ 0 };
+   double mDelay{ 500 };
+   double mFeedback{ 0 };
    bool mEcho{ true };
    RollingBuffer mDelayBuffer;
    FloatSlider* mFeedbackSlider{ nullptr };
@@ -99,8 +99,8 @@ private:
    Checkbox* mAcceptInputCheckbox{ nullptr };
    Checkbox* mInvertCheckbox{ nullptr };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 
    bool mFeedbackModuleMode{ false }; //special mode when this delay effect is being used in a FeedbackModule
 };

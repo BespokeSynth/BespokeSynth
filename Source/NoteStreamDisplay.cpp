@@ -53,31 +53,31 @@ void NoteStreamDisplay::DrawModule()
    for (int i = 0; i < barLines; ++i)
    {
       double measureStartTime = gTime - TheTransport->MsPerBar() * (TheTransport->GetMeasurePos(gTime) + i);
-      float x = ofMap(gTime - measureStartTime, mDurationMs, 0, 0, mWidth);
+      double x = ofMap(gTime - measureStartTime, mDurationMs, 0, 0, mWidth);
       ofLine(x, 0, x, mHeight);
    }
 
    ofFill();
    if (mPitchMin <= mPitchMax)
    {
-      float noteHeight = mHeight / (mPitchMax - mPitchMin + 1);
+      double noteHeight = mHeight / (mPitchMax - mPitchMin + 1);
 
       for (int i = 0; i < kNoteStreamCapacity; ++i)
       {
          if (IsElementActive(i))
          {
-            float xStart = ofMap(gTime - mNoteStream[i].timeOn, mDurationMs, 0, 0, mWidth);
-            float xEnd;
+            double xStart = ofMap(gTime - mNoteStream[i].timeOn, mDurationMs, 0, 0, mWidth);
+            double xEnd;
             if (mNoteStream[i].timeOff == -1)
                xEnd = mWidth;
             else
                xEnd = ofMap(gTime - mNoteStream[i].timeOff, mDurationMs, 0, 0, mWidth);
-            float yStart = GetYPos(mNoteStream[i].pitch, noteHeight);
+            double yStart = GetYPos(mNoteStream[i].pitch, noteHeight);
 
-            ofSetColor(0, ofMap(mNoteStream[i].velocity, 0, 127.0f, 50, 200), 0);
+            ofSetColor(0, ofMap(mNoteStream[i].velocity, 0, 127.0, 50, 200), 0);
             ofRect(xStart, yStart, xEnd - xStart, noteHeight, L(cornerRadius, 2));
 
-            ofSetColor(mNoteStream[i].velocity / 127.0f * 255, mNoteStream[i].velocity / 127.0f * 255, mNoteStream[i].velocity / 127.0f * 255);
+            ofSetColor(mNoteStream[i].velocity / 127.0 * 255, mNoteStream[i].velocity / 127.0 * 255, mNoteStream[i].velocity / 127.0 * 255);
             ofRect(xStart, yStart, 3, noteHeight, L(cornerRadius, 2));
 
             ofSetColor(0, 0, 0);
@@ -105,9 +105,9 @@ void NoteStreamDisplay::DrawModuleUnclipped()
    }
 }
 
-float NoteStreamDisplay::GetYPos(int pitch, float noteHeight) const
+double NoteStreamDisplay::GetYPos(int pitch, double noteHeight) const
 {
-   return ofMap(pitch, mPitchMin, mPitchMax + 1, mHeight - noteHeight, -noteHeight);
+   return ofMap(static_cast<double>(pitch), mPitchMin, mPitchMax + 1, mHeight - noteHeight, -noteHeight);
 }
 
 void NoteStreamDisplay::PlayNote(NoteMessage note)
@@ -193,7 +193,7 @@ void NoteStreamDisplay::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void NoteStreamDisplay::Resize(float w, float h)
+void NoteStreamDisplay::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

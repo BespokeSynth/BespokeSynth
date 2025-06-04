@@ -49,7 +49,7 @@ public:
    void PlayNote(NoteMessage note) override;
 
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
@@ -61,7 +61,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -73,16 +73,16 @@ private:
       Chromatic
    };
 
-   float mWidth;
-   float mHeight;
+   double mWidth;
+   double mHeight;
 
    int mOffset{ -1 };
    IntSlider* mOffsetSlider{ nullptr };
    NoteMode mNoteMode{ NoteMode::Scale };
    DropdownList* mNoteModeDropdown{ nullptr };
-   float mHoldTimeMs{ 35.0f };
+   double mHoldTimeMs{ 35.0 };
    FloatSlider* mHoldTimeSlider{ nullptr };
-   float mGlideTimeMs{ 5.0f };
+   double mGlideTimeMs{ 5.0 };
    FloatSlider* mGlideTimeSlider{ nullptr };
 
    Modulations mModulation{ false };

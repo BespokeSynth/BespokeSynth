@@ -48,7 +48,7 @@ void Waveshaper::CreateUIControls()
    mTextEntry = new TextEntry(this, "y=", 2, 2, MAX_TEXTENTRY_LENGTH - 1, &mEntryString);
    mTextEntry->SetFlexibleWidth(true);
    mTextEntry->DrawLabel(true);
-   mRescaleSlider = new FloatSlider(this, "rescale", mTextEntry, kAnchor_Below, 110, 15, &mRescale, .1f, 10);
+   mRescaleSlider = new FloatSlider(this, "rescale", mTextEntry, kAnchor_Below, 110, 15, &mRescale, .1, 10);
    mASlider = new FloatSlider(this, "a", mRescaleSlider, kAnchor_Below, 110, 15, &mA, -10, 10, 4);
    mBSlider = new FloatSlider(this, "b", mASlider, kAnchor_Below, 110, 15, &mB, -10, 10, 4);
    mCSlider = new FloatSlider(this, "c", mBSlider, kAnchor_Below, 110, 15, &mC, -10, 10, 4);
@@ -113,10 +113,10 @@ void Waveshaper::Process(double time)
       return;
    }
 
-   float max = 0;
-   float min = 0;
+   double max = 0;
+   double min = 0;
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    ChannelBuffer* out = target->GetBuffer();
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
@@ -152,15 +152,15 @@ void Waveshaper::Process(double time)
       GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
    }
 
-   mSmoothMax = max > mSmoothMax ? max : ofLerp(mSmoothMax, max, .01f);
-   mSmoothMin = min < mSmoothMin ? min : ofLerp(mSmoothMin, min, .01f);
+   mSmoothMax = max > mSmoothMax ? max : ofLerp(mSmoothMax, max, .01);
+   mSmoothMin = min < mSmoothMin ? min : ofLerp(mSmoothMin, min, .01);
 
    GetBuffer()->Reset();
 }
 
 void Waveshaper::TextEntryComplete(TextEntry* entry)
 {
-   exprtk::parser<float> parser;
+   exprtk::parser<double> parser;
    mExpressionValid = parser.compile(mEntryString, mExpression);
    if (mExpressionValid)
       parser.compile(mEntryString, mExpressionDraw);
@@ -217,7 +217,7 @@ void Waveshaper::DrawModule()
    mESlider->Draw();
 }
 
-void Waveshaper::GetModuleDimensions(float& w, float& h)
+void Waveshaper::GetModuleDimensions(double& w, double& h)
 {
    w = MAX(kGraphX + kGraphWidth + 2, 4 + mTextEntry->GetRect().width);
    h = kGraphY + kGraphHeight;

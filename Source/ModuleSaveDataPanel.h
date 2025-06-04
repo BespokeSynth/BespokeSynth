@@ -60,7 +60,7 @@ public:
    void ReloadSaveData();
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
    void DropdownClicked(DropdownList* list) override;
@@ -80,7 +80,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    IDrawableModule* mSaveModule{ nullptr };
    TextEntry* mNameEntry{ nullptr };
@@ -96,8 +96,8 @@ private:
    std::map<DropdownList*, ModuleSaveData::SaveVal*> mStringDropdowns;
 
    int mHeight{ 100 };
-   float mAppearAmount{ 0 };
-   float mAlignmentX{ 100 };
+   double mAppearAmount{ 0 };
+   double mAlignmentX{ 100 };
    int mPresetFileIndex{ 0 };
    bool mPresetFileUpdateQueued{ false };
    std::vector<std::string> mPresetFilePaths;

@@ -111,8 +111,8 @@ public:
 
    static void SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const juce::MidiMessage& message);
 
-   static constexpr float kPitchBendCenter{ 8192.0f };
-   static constexpr float kPitchBendMax{ 16320.0f };
+   static constexpr double kPitchBendCenter{ 8192.0 };
+   static constexpr double kPitchBendMax{ 16320.0 };
 
 private:
    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;

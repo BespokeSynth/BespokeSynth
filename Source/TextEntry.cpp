@@ -65,7 +65,7 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
    Construct(owner, name, x, y, charWidth);
 }
 
-TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max)
+TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, double* var, double min, double max)
 : mVarFloat(var)
 , mType(kTextEntry_Float)
 , mFloatMin(min)
@@ -106,9 +106,9 @@ void TextEntry::Render()
 {
    ofPushStyle();
 
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
 
-   float xOffset = 0;
+   double xOffset = 0;
    if (mDrawLabel)
    {
       DrawTextNormal(Name(), mX, mY + 12);
@@ -124,11 +124,11 @@ void TextEntry::Render()
    if (!isCurrent)
       UpdateDisplayString();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    if (isCurrent)
    {
-      ofSetColor(color, gModuleDrawAlpha * .1f);
+      ofSetColor(color, gModuleDrawAlpha * .1);
       ofFill();
       ofRect(mX + xOffset, mY, w - xOffset, h);
    }
@@ -155,9 +155,9 @@ void TextEntry::Render()
          ofRect(caretX, caretY, 1, 12, L(corner, 1));
       }
       mCaretBlinkTimer += ofGetLastFrameTime();
-      if (mCaretBlinkTimer > .3f)
+      if (mCaretBlinkTimer > .3)
       {
-         mCaretBlinkTimer -= .3f;
+         mCaretBlinkTimer -= .3;
          mCaretBlink = !mCaretBlink;
       }
    }
@@ -204,10 +204,10 @@ void TextEntry::Render()
    DrawHover(mX + xOffset, mY, w - xOffset, h);
 }
 
-void TextEntry::GetDimensions(float& width, float& height)
+void TextEntry::GetDimensions(double& width, double& height)
 {
    if (mFlexibleWidth)
-      width = MAX(30.0f, gFontFixedWidth.GetStringWidth(mString, 12) + 4);
+      width = MAX(30.0, gFontFixedWidth.GetStringWidth(mString, 12) + 4);
    else
       width = mCharWidth * 9;
 
@@ -217,12 +217,12 @@ void TextEntry::GetDimensions(float& width, float& height)
    height = 15;
 }
 
-void TextEntry::OnClicked(float x, float y, bool right)
+void TextEntry::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
 
-   float xOffset = 2;
+   double xOffset = 2;
    if (mDrawLabel)
       xOffset += mLabelSize;
 
@@ -244,7 +244,7 @@ void TextEntry::OnClicked(float x, float y, bool right)
 
          int substrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 12);
          //ofLog() << x << " " << i << " " << (xOffset + substrWidth);
-         if (x > xOffset + ((substrWidth + lastSubstrWidth) * .5f))
+         if (x > xOffset + ((substrWidth + lastSubstrWidth) * .5))
          {
             mCaretPosition = i + 1;
             break;
@@ -497,7 +497,7 @@ void TextEntry::SetText(std::string text)
    mCaretPosition2 = 0;
 }
 
-void TextEntry::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void TextEntry::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    if (mType == kTextEntry_Int)
    {
@@ -512,7 +512,7 @@ void TextEntry::SetFromMidiCC(float slider, double time, bool setViaModulator)
    }
 }
 
-float TextEntry::GetValueForMidiCC(float slider) const
+double TextEntry::GetValueForMidiCC(double slider) const
 {
    if (mType == kTextEntry_Int)
    {
@@ -529,7 +529,7 @@ float TextEntry::GetValueForMidiCC(float slider) const
    return 0;
 }
 
-float TextEntry::GetMidiValue() const
+double TextEntry::GetMidiValue() const
 {
    if (mType == kTextEntry_Int)
       return ofMap(*mVarInt, mIntMin, mIntMax, 0, 1);
@@ -540,7 +540,7 @@ float TextEntry::GetMidiValue() const
    return 0;
 }
 
-void TextEntry::GetRange(float& min, float& max)
+void TextEntry::GetRange(double& min, double& max)
 {
    if (mType == kTextEntry_Int)
    {
@@ -559,7 +559,7 @@ void TextEntry::GetRange(float& min, float& max)
    }
 }
 
-void TextEntry::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void TextEntry::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    if (mType == kTextEntry_Int)
    {
@@ -574,7 +574,7 @@ void TextEntry::SetValue(float value, double time, bool forceUpdate /*= false*/)
    }
 }
 
-float TextEntry::GetValue() const
+double TextEntry::GetValue() const
 {
    if (mType == kTextEntry_Int)
       return *mVarInt;
@@ -592,9 +592,9 @@ int TextEntry::GetNumValues()
    return 0;
 }
 
-std::string TextEntry::GetDisplayValue(float val) const
+std::string TextEntry::GetDisplayValue(double val) const
 {
-   if (mType == kTextEntry_Int || mType == kTextEntry_Float)
+   if (mType == TextEntryType::kTextEntry_Int || mType == TextEntryType::kTextEntry_Float)
       return ofToString(val);
    return mString;
 }
@@ -618,7 +618,7 @@ void TextEntry::AcceptEntry(bool pressedEnter)
    }
    if (mVarFloat && mString[0] != 0)
    {
-      *mVarFloat = ofClamp(ofToFloat(mString), mFloatMin, mFloatMax);
+      *mVarFloat = ofClamp(ofToDouble(mString), mFloatMin, mFloatMax);
       StringCopy(mString, ofToString(*mVarFloat).c_str(), MAX_TEXTENTRY_LENGTH);
    }
 
@@ -652,11 +652,11 @@ bool TextEntry::AllowCharacter(char c)
    return false;
 }
 
-void TextEntry::Increment(float amount)
+void TextEntry::Increment(double amount)
 {
    if (mType == kTextEntry_Float)
    {
-      float newVal = *mVarFloat + amount;
+      const double newVal = *mVarFloat + amount;
       if (newVal >= mFloatMin && newVal <= mFloatMax)
       {
          *mVarFloat = newVal;
@@ -666,7 +666,7 @@ void TextEntry::Increment(float amount)
    }
    else if (mType == kTextEntry_Int)
    {
-      int newVal = *mVarInt + (int)amount;
+      const int newVal = *mVarInt + (int)amount;
       if (newVal >= mIntMin && newVal <= mIntMax)
       {
          *mVarInt = newVal;
@@ -683,7 +683,7 @@ void TextEntry::SetNextTextEntry(TextEntry* entry)
       entry->mPreviousTextEntry = this;
 }
 
-bool TextEntry::MouseMoved(float x, float y)
+bool TextEntry::MouseMoved(double x, double y)
 {
    mHovered = TestHover(x, y);
    CheckHover(x, y);

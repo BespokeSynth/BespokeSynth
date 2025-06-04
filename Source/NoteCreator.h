@@ -47,12 +47,12 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -60,11 +60,11 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 protected:
-   void TriggerNote(double time, float velocity);
+   void TriggerNote(double time, double velocity);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = mWidth;
       h = mHeight;
@@ -79,8 +79,8 @@ protected:
    FloatSlider* mDurationSlider{ nullptr };
    Checkbox* mNoteOnCheckbox{ nullptr };
    int mPitch{ 48 };
-   float mVelocity{ 1 };
-   float mDuration{ 100 };
+   double mVelocity{ 1 };
+   double mDuration{ 100 };
    double mStartTime{ 0 };
    bool mNoteOn{ false };
    int mVoiceIndex{ -1 };

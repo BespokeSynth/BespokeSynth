@@ -86,7 +86,7 @@ ModulatorExpression::~ModulatorExpression()
 {
 }
 
-float ModulatorExpression::Value(int samplesIn)
+double ModulatorExpression::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    if (mExpressionValid)
@@ -114,7 +114,7 @@ void ModulatorExpression::PostRepatch(PatchCableSource* cableSource, bool fromUs
 void ModulatorExpression::TextEntryComplete(TextEntry* entry)
 {
    mExpressionValid = false;
-   exprtk::parser<float> parser;
+   exprtk::parser<double> parser;
    mExpressionValid = parser.compile(mEntryString, mExpression);
    if (mExpressionValid)
       parser.compile(mEntryString, mExpressionDraw);
@@ -147,12 +147,12 @@ void ModulatorExpression::DrawModule()
       ofSetColor(0, 255, 0, gModuleDrawAlpha);
       ofNoFill();
       ofBeginShape();
-      float drawMinOutput = mLastDrawMinOutput;
-      float drawMaxOutput = mLastDrawMaxOutput;
+      double drawMinOutput = mLastDrawMinOutput;
+      double drawMaxOutput = mLastDrawMaxOutput;
       for (int i = 0; i <= kGraphWidth; ++i)
       {
-         mExpressionInputDraw = ofMap(i, 0, kGraphWidth, mExpressionInputSlider->GetMin(), mExpressionInputSlider->GetMax());
-         float output = mExpressionDraw.value();
+         mExpressionInputDraw = ofMap(static_cast<double>(i), 0, kGraphWidth, mExpressionInputSlider->GetMin(), mExpressionInputSlider->GetMax());
+         double output = mExpressionDraw.value();
          ofVertex(i + kGraphX, ofMap(output, drawMinOutput, drawMaxOutput, kGraphHeight, 0) + kGraphY);
 
          if (i == 0)
@@ -175,8 +175,8 @@ void ModulatorExpression::DrawModule()
       ofCircle(kGraphX + ofMap(mExpressionInputDraw, mExpressionInputSlider->GetMin(), mExpressionInputSlider->GetMax(), 0, kGraphWidth), ofMap(mExpressionDraw.value(), mLastDrawMinOutput, mLastDrawMaxOutput, kGraphHeight, 0) + kGraphY, 3);
       ofPopStyle();
 
-      DrawTextNormal(ofToString(drawMinOutput, 2), kGraphX + kGraphWidth * .35f, kGraphY + kGraphHeight - 1);
-      DrawTextNormal(ofToString(drawMaxOutput, 2), kGraphX + kGraphWidth * .35f, kGraphY + 12);
+      DrawTextNormal(ofToString(drawMinOutput, 2), kGraphX + kGraphWidth * .35, kGraphY + kGraphHeight - 1);
+      DrawTextNormal(ofToString(drawMaxOutput, 2), kGraphX + kGraphWidth * .35, kGraphY + 12);
       DrawTextNormal(ofToString(mExpressionInputSlider->GetMin()), kGraphX + 1, kGraphY + kGraphHeight / 2 + 6);
       DrawTextRightJustify(ofToString(mExpressionInputSlider->GetMax()), kGraphX + kGraphWidth - 1, kGraphY + kGraphHeight / 2 + 6);
 
@@ -194,7 +194,7 @@ void ModulatorExpression::DrawModule()
    mESlider->Draw();
 }
 
-void ModulatorExpression::GetModuleDimensions(float& w, float& h)
+void ModulatorExpression::GetModuleDimensions(double& w, double& h)
 {
    w = MAX(kGraphX + kGraphWidth + 2, 4 + mTextEntry->GetRect().width);
    h = kGraphY + kGraphHeight;

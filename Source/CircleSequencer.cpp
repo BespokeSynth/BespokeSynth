@@ -29,20 +29,6 @@
 #include "Profiler.h"
 #include "DrumPlayer.h"
 
-namespace
-{
-   ofVec2f PolToCar(float pos, float radius)
-   {
-      return ofVec2f(radius * sin(pos * TWO_PI), radius * -cos(pos * TWO_PI));
-   }
-
-   ofVec2f CarToPol(float x, float y)
-   {
-      float pos = FloatWrap(atan2(x, -y) / TWO_PI, 1);
-      return ofVec2f(pos, sqrtf(x * x + y * y));
-   }
-}
-
 CircleSequencer::CircleSequencer()
 {
 
@@ -72,7 +58,7 @@ CircleSequencer::~CircleSequencer()
       delete mCircleSequencerRings[i];
 }
 
-void CircleSequencer::OnTransportAdvanced(float amount)
+void CircleSequencer::OnTransportAdvanced(double amount)
 {
    PROFILER(CircleSequencer);
 
@@ -95,13 +81,13 @@ void CircleSequencer::DrawModule()
 
    ofPushStyle();
    ofSetColor(ofColor::lime);
-   float pos = TheTransport->GetMeasurePos(gTime);
-   ofVec2f end = PolToCar(pos, 100);
+   double pos = TheTransport->GetMeasurePos(gTime);
+   ofVec2d end = ofPolToCar(pos, 100);
    ofLine(100, 100, 100 + end.x, 100 + end.y);
    ofPopStyle();
 }
 
-void CircleSequencer::OnClicked(float x, float y, bool right)
+void CircleSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mCircleSequencerRings.size(); ++i)
@@ -115,7 +101,7 @@ void CircleSequencer::MouseReleased()
       mCircleSequencerRings[i]->MouseReleased();
 }
 
-bool CircleSequencer::MouseMoved(float x, float y)
+bool CircleSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    for (int i = 0; i < mCircleSequencerRings.size(); ++i)
@@ -127,7 +113,7 @@ void CircleSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void CircleSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void CircleSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -197,7 +183,7 @@ void CircleSequencerRing::CreateUIControls()
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), 260, y, 4, &mPitch, 0, 127);
    mAnglePrev = new ClickButton(mOwner, "<", 300, y);
    mAngleNext = new ClickButton(mOwner, ">", 315, y);
-   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 330, y, 90, 15, &mOffset, -.25f, .25f, 2);
+   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 330, y, 90, 15, &mOffset, -.25, .25, 2);
 
    for (int i = 0; i < CIRCLE_SEQUENCER_MAX_STEPS; ++i)
       mLengthSelector->AddLabel(ofToString(i + 1).c_str(), i + 1);
@@ -249,11 +235,11 @@ void CircleSequencerRing::Draw()
    ofFill();
    for (int i = 0; i < mLength; ++i)
    {
-      float pos = float(i) / mLength - mOffset;
-      ofVec2f p1 = PolToCar(pos, GetRadius() - 3);
-      ofVec2f p2 = PolToCar(pos, GetRadius() + 3);
+      double pos = static_cast<double>(i) / mLength - mOffset;
+      ofVec2d p1 = ofPolToCar(pos, GetRadius() - 3);
+      ofVec2d p2 = ofPolToCar(pos, GetRadius() + 3);
       ofLine(p1.x + 100, p1.y + 100, p2.x + 100, p2.y + 100);
-      ofVec2f point = PolToCar(pos, GetRadius());
+      ofVec2d point = ofPolToCar(pos, GetRadius());
 
       const int idx = GetStepAngle(i);
       if (mSteps[idx] > 0)
@@ -263,7 +249,7 @@ void CircleSequencerRing::Draw()
       {
          ofPushStyle();
          ofSetColor(255, 255, 255, 100);
-         ofSetLineWidth(.5f);
+         ofSetLineWidth(.5);
          ofNoFill();
          ofCircle(100 + point.x, 100 + point.y, 3 + 6);
          ofPopStyle();
@@ -277,13 +263,13 @@ void CircleSequencerRing::Draw()
    mOffsetSlider->Draw();
 }
 
-int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
+int CircleSequencerRing::GetStepIndex(int x, int y, double& radiusOut)
 {
-   ofVec2f polar = CarToPol(x - 100, y - 100);
-   float pos = FloatWrap(polar.x + mOffset, 1);
-   int idx = int(pos * mLength + .5f) % mLength;
+   ofVec2d polar = ofCarToPol(x - 100, y - 100);
+   double pos = DoubleWrap(polar.x + mOffset, 1);
+   int idx = int(pos * mLength + .5) % mLength;
 
-   ofVec2f stepPos = PolToCar(float(idx) / mLength - mOffset, GetRadius());
+   ofVec2d stepPos = ofPolToCar(static_cast<double>(idx) / mLength - mOffset, GetRadius());
    if (ofDistSquared(x, y, stepPos.x + 100, stepPos.y + 100) < 7 * 7)
    {
       radiusOut = polar.y;
@@ -293,7 +279,7 @@ int CircleSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
    return -1;
 }
 
-void CircleSequencerRing::OnClicked(float x, float y, bool right)
+void CircleSequencerRing::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -305,7 +291,7 @@ void CircleSequencerRing::OnClicked(float x, float y, bool right)
       if (mSteps[mCurrentlyClickedStepIdx])
          mSteps[mCurrentlyClickedStepIdx] = 0;
       else
-         mSteps[mCurrentlyClickedStepIdx] = .5f;
+         mSteps[mCurrentlyClickedStepIdx] = .5;
    }
 }
 
@@ -314,12 +300,12 @@ void CircleSequencerRing::MouseReleased()
    mCurrentlyClickedStepIdx = -1;
 }
 
-void CircleSequencerRing::MouseMoved(float x, float y)
+void CircleSequencerRing::MouseMoved(double x, double y)
 {
    if (mCurrentlyClickedStepIdx != -1)
    {
-      ofVec2f polar = CarToPol(x - 100, y - 100);
-      float change = (polar.y - mLastMouseRadius) / 50.0f;
+      ofVec2d polar = ofCarToPol(x - 100, y - 100);
+      double change = (polar.y - mLastMouseRadius) / 50.0;
 
       mSteps[mCurrentlyClickedStepIdx] = ofClamp(mSteps[mCurrentlyClickedStepIdx] + change, 0, 1);
 
@@ -327,12 +313,12 @@ void CircleSequencerRing::MouseMoved(float x, float y)
    }
    else
    {
-      float radius;
+      double radius;
       mHighlightStepIdx = GetStepIndex(x, y, radius);
    }
 }
 
-void CircleSequencerRing::OnTransportAdvanced(float amount)
+void CircleSequencerRing::OnTransportAdvanced(double amount)
 {
    PROFILER(CircleSequencerRing);
 
@@ -370,5 +356,5 @@ void CircleSequencerRing::LoadState(FileStreamIn& in)
    int numSteps;
    in >> numSteps;
    for (size_t i = 0; i < mSteps.size() && i < numSteps; ++i)
-      in >> mSteps[i];
+      in >> FloatAsDouble >> mSteps[i];
 }

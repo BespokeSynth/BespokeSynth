@@ -49,37 +49,37 @@ class EuclideanSequencerRing
 public:
    EuclideanSequencerRing(EuclideanSequencer* owner, int index);
    void Draw();
-   void OnClicked(float x, float y, bool right);
+   void OnClicked(double x, double y, bool right);
    void SetSteps(int steps);
    int GetSteps();
    void SetOnsets(int onsets);
    void SetRotation(int rotation);
-   void SetOffset(float offset);
+   void SetOffset(double offset);
    void SetPitch(int pitch);
    int GetPitch();
    void MouseReleased();
-   void MouseMoved(float x, float y);
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time);
+   void MouseMoved(double x, double y);
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time);
    void CreateUIControls();
    void InitialState(int state);
    void Clear();
-   void OnTransportAdvanced(float amount);
+   void OnTransportAdvanced(double amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 
 private:
-   float GetRadius() { return 90 - mIndex * 15; }
-   int GetStepIndex(int x, int y, float& radiusOut);
+   double GetRadius() { return 90.0 - mIndex * 15; }
+   int GetStepIndex(int x, int y, double& radiusOut);
    EuclideanSequencer* mOwner{ nullptr };
    int mIndex{ 0 };
-   std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mSteps{};
-   float mLength{ 4 };
+   std::array<double, EUCLIDEAN_SEQUENCER_MAX_STEPS> mSteps{};
+   double mLength{ 4 };
    FloatSlider* mLengthSlider{ nullptr };
-   float mOnset{ 4 };
+   double mOnset{ 4 };
    FloatSlider* mOnsetSlider{ nullptr };
-   float mRotation{ 0 };
+   double mRotation{ 0 };
    FloatSlider* mRotationSlider{ nullptr };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
@@ -88,7 +88,7 @@ private:
 
    int mCurrentlyClickedStepIdx{ -1 };
    int mHighlightStepIdx{ -1 };
-   float mLastMouseRadius{ -1 };
+   double mLastMouseRadius{ -1 };
 
    std::string GetEuclideanRhythm(int pulses, int steps, int rotation);
 };
@@ -110,17 +110,17 @@ public:
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
@@ -139,16 +139,16 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   float mWidth{ 785 }; // was 650 = random buttons visible
-   float mHeight{ 200 };
-   const float mWidthMin = 590;
-   const float mWidthMax = 785;
-   void OnClicked(float x, float y, bool right) override;
+   double mWidth{ 785 }; // was 650 = random buttons visible
+   double mHeight{ 200 };
+   const double mWidthMin = 590;
+   const double mWidthMax = 785;
+   void OnClicked(double x, double y, bool right) override;
 
    // ModuleSaveData
    bool mPlayShortNotes{ false };
@@ -165,38 +165,35 @@ private:
    ClickButton* mRnd3Button{ nullptr };
    ClickButton* mClearButton{ nullptr };
 
-   float mOffset{ 0 };
-   FloatSlider* mOffsetSlider{ nullptr };
-
-   float mRndLengthChance{ 0.5f };
+   double mRndLengthChance{ 0.5 };
    FloatSlider* mRndLengthChanceSlider{ nullptr };
-   float mRndLengthLo{ 1 };
+   double mRndLengthLo{ 1 };
    FloatSlider* mRndLengthLoSlider{ nullptr };
-   float mRndLengthHi{ 24 };
+   double mRndLengthHi{ 24 };
    FloatSlider* mRndLengthHiSlider{ nullptr };
-   float mRndOnsetChance{ 0.5f };
+   double mRndOnsetChance{ 0.5 };
    FloatSlider* mRndOnsetChanceSlider{ nullptr };
-   float mRndOnsetLo{ 1 };
+   double mRndOnsetLo{ 1 };
    FloatSlider* mRndOnsetLoSlider{ nullptr };
-   float mRndOnsetHi{ 12 };
+   double mRndOnsetHi{ 12 };
    FloatSlider* mRndOnsetHiSlider{ nullptr };
-   float mRndRotationChance{ 0.5f };
+   double mRndRotationChance{ 0.5 };
    FloatSlider* mRndRotationChanceSlider{ nullptr };
-   float mRndRotationLo{ 0 };
+   double mRndRotationLo{ 0 };
    FloatSlider* mRndRotationLoSlider{ nullptr };
-   float mRndRotationHi{ 4 };
+   double mRndRotationHi{ 4 };
    FloatSlider* mRndRotationHiSlider{ nullptr };
-   float mRndOffsetChance{ 0.0f };
+   double mRndOffsetChance{ 0.0 };
    FloatSlider* mRndOffsetChanceSlider{ nullptr };
-   float mRndOffsetLo{ -0.1f };
+   double mRndOffsetLo{ -0.1 };
    FloatSlider* mRndOffsetLoSlider{ nullptr };
-   float mRndOffsetHi{ 0.1f };
+   double mRndOffsetHi{ 0.1 };
    FloatSlider* mRndOffsetHiSlider{ nullptr };
-   float mRndNoteChance{ 0.5f };
+   double mRndNoteChance{ 0.5 };
    FloatSlider* mRndNoteChanceSlider{ nullptr };
-   float mRndOctaveLo{ 2 };
+   double mRndOctaveLo{ 2 };
    FloatSlider* mRndOctaveLoSlider{ nullptr };
-   float mRndOctaveHi{ 4 };
+   double mRndOctaveHi{ 4 };
    FloatSlider* mRndOctaveHiSlider{ nullptr };
 
    void RandomizeLength(int ringIndex);

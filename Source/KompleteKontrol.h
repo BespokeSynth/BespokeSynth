@@ -90,22 +90,22 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 100;
       height = 18;
    }
 
    KontrolKommunicator mKontrol;
-   bool mInitialized;
-   int mKeyOffset;
-   bool mNeedKeysUpdate;
+   bool mInitialized{ false };
+   int mKeyOffset{ 0 };
+   bool mNeedKeysUpdate{ false };
    std::string mCurrentText;
    uint16_t mCurrentSliders[NUM_SLIDER_SEGMENTS];
    TextBox mTextBoxes[9];
-   MidiController* mController;
+   MidiController* mController{ nullptr };
 
-   PatchCableSource* mMidiControllerCable;
+   PatchCableSource* mMidiControllerCable{ nullptr };
 };
 
 #endif /* defined(__Bespoke__KompleteKontrol__) */

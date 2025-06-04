@@ -48,7 +48,7 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -62,9 +62,9 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
 
    static const int kMaxSampleLengthSeconds = 3;

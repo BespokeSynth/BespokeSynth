@@ -51,19 +51,19 @@ void CanvasScrollbar::Render()
       SetDimensions(10, canvasRect.height);
    }
 
-   if (mAutoHide && GetBarStart() == 0)
+   if (mAutoHide && ofAlmostEquel(GetBarStart(), 0))
    {
-      if (mStyle == Style::kHorizontal && GetBarEnd() == mWidth)
+      if (mStyle == Style::kHorizontal && ofAlmostEquel(GetBarEnd(), mWidth))
          return;
-      if (mStyle == Style::kVertical && GetBarEnd() == mHeight)
+      if (mStyle == Style::kVertical && ofAlmostEquel(GetBarEnd(), mHeight))
          return;
    }
 
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   ofSetLineWidth(.5f);
-   float w, h;
+   ofSetLineWidth(.5);
+   double w, h;
    GetDimensions(w, h);
    ofFill();
    ofRect(0, 0, mWidth, mHeight);
@@ -76,25 +76,25 @@ void CanvasScrollbar::Render()
    ofPopMatrix();
 }
 
-float CanvasScrollbar::GetBarStart() const
+double CanvasScrollbar::GetBarStart() const
 {
    if (mStyle == Style::kHorizontal)
       return mCanvas->mViewStart / mCanvas->GetLength() * mWidth;
    if (mStyle == Style::kVertical)
-      return ofMap(mCanvas->GetRowOffset(), 0, mCanvas->GetNumRows(), 0, mHeight);
+      return ofMap(static_cast<double>(mCanvas->GetRowOffset()), 0, mCanvas->GetNumRows(), 0, mHeight);
    return 0;
 }
 
-float CanvasScrollbar::GetBarEnd() const
+double CanvasScrollbar::GetBarEnd() const
 {
    if (mStyle == Style::kHorizontal)
       return mCanvas->mViewEnd / mCanvas->GetLength() * mWidth;
    if (mStyle == Style::kVertical)
-      return ofMap(mCanvas->GetRowOffset() + mCanvas->GetNumVisibleRows(), 0, mCanvas->GetNumRows(), 0, mHeight);
+      return ofMap(static_cast<double>(mCanvas->GetRowOffset()) + mCanvas->GetNumVisibleRows(), 0, mCanvas->GetNumRows(), 0, mHeight);
    return 1;
 }
 
-void CanvasScrollbar::OnClicked(float x, float y, bool right)
+void CanvasScrollbar::OnClicked(double x, double y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
@@ -110,27 +110,27 @@ void CanvasScrollbar::MouseReleased()
    mClick = false;
 }
 
-bool CanvasScrollbar::MouseMoved(float x, float y)
+bool CanvasScrollbar::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
 
    if (mClick)
    {
-      mDragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
+      mDragOffset = (ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
       if (mStyle == Style::kHorizontal)
       {
-         float viewLength = mCanvas->mViewEnd - mCanvas->mViewStart;
+         double viewLength = mCanvas->mViewEnd - mCanvas->mViewStart;
          mCanvas->mViewStart = ofClamp((x - mScrollBarOffset) / mWidth * mCanvas->GetLength(), 0, mCanvas->GetLength() - viewLength);
          mCanvas->mViewEnd = mCanvas->mViewStart + viewLength;
       }
       if (mStyle == Style::kVertical)
-         mCanvas->SetRowOffset(ofClamp(int(ofMap(y - mScrollBarOffset, 0, mHeight, 0, mCanvas->GetNumRows()) + .5f), 0, mCanvas->GetNumRows() - mCanvas->GetNumVisibleRows()));
+         mCanvas->SetRowOffset(ofClamp(int(ofMap(y - mScrollBarOffset, 0, mHeight, 0, mCanvas->GetNumRows()) + .5), 0, mCanvas->GetNumRows() - mCanvas->GetNumVisibleRows()));
    }
 
    return false;
 }
 
-bool CanvasScrollbar::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool CanvasScrollbar::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }

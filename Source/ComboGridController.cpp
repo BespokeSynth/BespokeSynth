@@ -80,7 +80,7 @@ void ComboGridController::DrawModule()
       return;
 }
 
-void ComboGridController::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void ComboGridController::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (mArrangement == kHorizontal)
    {
@@ -157,7 +157,7 @@ void ComboGridController::SetLight(int x, int y, GridColor color, bool force)
    }
 }
 
-void ComboGridController::SetLightDirect(int x, int y, int color, bool force)
+void ComboGridController::SetLightDirect(int x, int y, double color, bool force)
 {
    assert(false); //TODO(Ryan) implement, maybe
 }
@@ -173,7 +173,7 @@ void ComboGridController::ResetLights()
    }
 }
 
-void ComboGridController::GetModuleDimensions(float& w, float& h)
+void ComboGridController::GetModuleDimensions(double& w, double& h)
 {
    w = 0;
    h = 0;

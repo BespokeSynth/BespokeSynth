@@ -41,15 +41,15 @@ struct LFOSettings
 {
    NoteInterval mInterval{ kInterval_1n };
    OscillatorType mOscType{ kOsc_Sin };
-   float mLFOOffset{ 0 };
-   float mBias{ 0 };
-   float mSpread{ 0 };
-   float mSoften{ 0 };
-   float mShuffle{ 0 };
-   float mFreeRate{ 1 };
-   float mLength{ 1 };
-   float mMinValue{ 0 };
-   float mMaxValue{ 1 };
+   double mLFOOffset{ 0 };
+   double mBias{ 0 };
+   double mSpread{ 0 };
+   double mSoften{ 0 };
+   double mShuffle{ 0 };
+   double mFreeRate{ 1 };
+   double mLength{ 1 };
+   double mMinValue{ 0 };
+   double mMaxValue{ 1 };
    bool mLowResMode{ false };
 
    void SaveState(FileStreamOut& out) const;
@@ -89,23 +89,23 @@ public:
    bool DrawToPush2Screen() override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool InitializeWithZeroRange() const override { return true; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -120,9 +120,9 @@ protected:
 
 private:
    void UpdateVisibleControls();
-   float GetLFOValue(int samplesIn = 0, float forcePhase = -1);
-   float GetTargetMin() const;
-   float GetTargetMax() const;
+   double GetLFOValue(int samplesIn = 0, double forcePhase = -1);
+   double GetTargetMin() const;
+   double GetTargetMax() const;
 
    LFOSettings mLFOSettings;
 
@@ -139,8 +139,8 @@ private:
    ClickButton* mPinButton{ nullptr };
    Checkbox* mEnableLFOCheckbox{ nullptr };
    Checkbox* mLowResModeCheckbox{ nullptr };
-   float mWidth{ 100 };
-   float mHeight{ 20 };
+   double mWidth{ 100 };
+   double mHeight{ 20 };
 
    bool mPinned{ false };
 };

@@ -65,24 +65,24 @@ void UIGrid::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   ofSetLineWidth(.5f);
-   float w, h;
+   ofSetLineWidth(.5);
+   double w, h;
    GetDimensions(w, h);
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   double xsize = mWidth / mCols;
+   double ysize = mHeight / mRows;
    for (int j = 0; j < mRows; ++j)
    {
       for (int i = 0; i < mCols; ++i)
       {
-         float x = GetX(i, j);
-         float y = GetY(j);
+         double x = GetX(i, j);
+         double y = GetY(j);
          bool drawDragLevels = false;
 
-         float data = mData[GetDataIndex(i, j)];
+         double data = mData[GetDataIndex(i, j)];
          if (data)
          {
             ofFill();
-            float sliderFillAmount = ofClamp(ofLerp(.15f, 1, data), 0, 1);
+            double sliderFillAmount = ofClamp(ofLerp(.15, 1, data), 0, 1);
             if (mGridMode == kNormal)
             {
                ofSetColor(255 * data, 255 * data, 255 * data, gModuleDrawAlpha);
@@ -90,12 +90,12 @@ void UIGrid::Render()
             }
             else if (mGridMode == kMultislider)
             {
-               float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
+               double fadeAmount = ofClamp(ofLerp(.5, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
-               ofRect(x + .5f, y + .5f + (ysize * (1 - sliderFillAmount)), xsize - 1, ysize * sliderFillAmount - 1, 0);
+               ofRect(x + .5, y + .5 + (ysize * (1 - sliderFillAmount)), xsize - 1, ysize * sliderFillAmount - 1, 0);
                /*ofSetColor(255, 255, 255, gModuleDrawAlpha);
                ofNoFill();
-               ofRect(x+1,y+1,xsize-2,ysize-2, gCornerRoundness*.99f);*/
+               ofRect(x + 1, y + 1, xsize - 2, ysize - 2, gCornerRoundness * .99);*/
             }
             else if (mGridMode == kHorislider)
             {
@@ -104,17 +104,17 @@ void UIGrid::Render()
             }
             else if (mGridMode == kMultisliderBipolar)
             {
-               float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
+               double fadeAmount = ofClamp(ofLerp(.5, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
-               ofRect(x, y + ysize * (.5f - sliderFillAmount / 2), xsize, ysize * sliderFillAmount);
+               ofRect(x, y + ysize * (.5 - sliderFillAmount / 2), xsize, ysize * sliderFillAmount);
                drawDragLevels = true;
             }
             else if (mGridMode == kMultisliderGrow)
             {
-               float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
+               double fadeAmount = ofClamp(ofLerp(.5, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
-               ofVec2f center(x + xsize * 0.5f, y + ysize * 0.5f);
-               ofRect(center.x - (sliderFillAmount * sliderFillAmount * xsize * 0.5f), center.y - (sliderFillAmount * sliderFillAmount * ysize * 0.5f), sliderFillAmount * sliderFillAmount * xsize, sliderFillAmount * sliderFillAmount * ysize);
+               ofVec2d center(x + xsize * 0.5, y + ysize * 0.5);
+               ofRect(center.x - (sliderFillAmount * sliderFillAmount * xsize * 0.5), center.y - (sliderFillAmount * sliderFillAmount * ysize * 0.5), sliderFillAmount * sliderFillAmount * xsize, sliderFillAmount * sliderFillAmount * ysize);
                drawDragLevels = true;
             }
 
@@ -125,7 +125,7 @@ void UIGrid::Render()
                   if (j == mHoldRow)
                   {
                      ofSetColor(0, 255, 0, gModuleDrawAlpha);
-                     ofRect(x + .5f, y + .5f + (ysize * (1 - sliderFillAmount)), xsize - 1, 2, 0);
+                     ofRect(x + .5, y + .5 + (ysize * (1 - sliderFillAmount)), xsize - 1, 2, 0);
                   }
                }
             }
@@ -197,50 +197,50 @@ void UIGrid::Render()
    ofPopMatrix();
 }
 
-float UIGrid::GetX(int col, int row) const
+double UIGrid::GetX(int col, int row) const
 {
-   float xsize = float(mWidth) / mCols;
+   double xsize = double(mWidth) / mCols;
    return (col + mDrawOffset[std::clamp(row, 0, (int)mDrawOffset.size() - 1)]) * xsize;
 }
 
-float UIGrid::GetY(int row) const
+double UIGrid::GetY(int row) const
 {
-   float ysize = float(mHeight) / mRows;
+   double ysize = double(mHeight) / mRows;
    if (mFlip)
       return mHeight - (row + 1) * ysize;
    else
       return row * ysize;
 }
 
-GridCell UIGrid::GetGridCellAt(float x, float y, float* clickHeight, float* clickWidth)
+GridCell UIGrid::GetGridCellAt(double x, double y, double* clickHeight, double* clickWidth)
 {
    if (mFlip)
       y = (mHeight - 1) - y;
 
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   const double xsize = mWidth / mCols;
+   const double ysize = mHeight / mRows;
 
    int col = ofClamp(x / xsize, 0, mCols - 1);
    int row = ofClamp(y / ysize, 0, mRows - 1);
 
    if (clickHeight)
    {
-      *clickHeight = ofClamp(1 - (y / ysize - ofClamp((int)(y / ysize), 0, mRows - 1)), 0, 1);
+      *clickHeight = ofClamp(1 - (y / ysize - ofClamp(static_cast<int>(y / ysize), 0, mRows - 1)), 0, 1);
       if (mFlip)
          *clickHeight = 1 - *clickHeight;
    }
 
    if (clickWidth)
    {
-      *clickWidth = ofClamp(x / xsize - ofClamp((int)(x / xsize), 0, mCols - 1), 0, 1);
+      *clickWidth = ofClamp(x / xsize - ofClamp(static_cast<int>(x / xsize), 0, mCols - 1), 0, 1);
    }
 
-   return GridCell(col, row);
+   return { col, row };
 }
 
-ofVec2f UIGrid::GetCellPosition(int col, int row)
+ofVec2d UIGrid::GetCellPosition(int col, int row)
 {
-   return ofVec2f(GetX(col, row), GetY(row));
+   return { GetX(col, row), GetY(row) };
 }
 
 bool UIGrid::CanAdjustMultislider() const
@@ -248,9 +248,9 @@ bool UIGrid::CanAdjustMultislider() const
    return !mRequireShiftForMultislider || (GetKeyModifiers() & kModifier_Shift);
 }
 
-float UIGrid::GetSubdividedValue(float position) const
+double UIGrid::GetSubdividedValue(double position) const
 {
-   return ofClamp(ceil(position * mClickSubdivisions) / mClickSubdivisions, 1.0f / mClickSubdivisions, 1);
+   return ofClamp(ceil(position * mClickSubdivisions) / mClickSubdivisions, 1.0 / mClickSubdivisions, 1);
 }
 
 bool UIGrid::CanBeTargetedBy(PatchCableSource* source) const
@@ -265,7 +265,7 @@ bool UIGrid::CanBeTargetedBy(PatchCableSource* source) const
    return false;
 }
 
-void UIGrid::OnClicked(float x, float y, bool right)
+void UIGrid::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -273,10 +273,10 @@ void UIGrid::OnClicked(float x, float y, bool right)
    mClick = true;
    mLastClickWasClear = false;
 
-   float clickHeight, clickWidth;
+   double clickHeight, clickWidth;
    GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
    int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
-   float oldValue = mData[dataIndex];
+   double oldValue = mData[dataIndex];
 
    if (mGridMode == kMultislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow)
    {
@@ -305,7 +305,7 @@ void UIGrid::OnClicked(float x, float y, bool right)
       }
       else
       {
-         float val = mStrength;
+         double val = mStrength;
 
          if (mSingleColumn)
          {
@@ -364,7 +364,7 @@ void UIGrid::MouseReleased()
 {
    if (mClick && mMomentary)
    {
-      float oldValue = mData[GetDataIndex(mHoldCol, mHoldRow)];
+      double oldValue = mData[GetDataIndex(mHoldCol, mHoldRow)];
       mData[GetDataIndex(mHoldCol, mHoldRow)] = 0;
       mListener->GridUpdated(this, mHoldCol, mHoldRow, 0, oldValue);
    }
@@ -372,11 +372,11 @@ void UIGrid::MouseReleased()
    mClick = false;
 }
 
-bool UIGrid::MouseMoved(float x, float y)
+bool UIGrid::MouseMoved(double x, double y)
 {
    bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
-   float clickHeight, clickWidth;
+   double clickHeight, clickWidth;
    GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
 
    if (mClick && mRestrictDragToRow)
@@ -416,7 +416,7 @@ bool UIGrid::MouseMoved(float x, float y)
    if (mClick && !mMomentary)
    {
       int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
-      float oldValue = mData[dataIndex];
+      double oldValue = mData[dataIndex];
 
       if ((mGridMode == kMultislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow) && mHoldVal != 0 && CanAdjustMultislider())
       {
@@ -424,7 +424,7 @@ bool UIGrid::MouseMoved(float x, float y)
       }
       else if (mGridMode == kHorislider)
       {
-         float val = mHoldVal;
+         double val = mHoldVal;
          mHoldCol = cell.mCol;
 
          if (mSingleColumn)
@@ -464,21 +464,21 @@ bool UIGrid::MouseMoved(float x, float y)
    return false;
 }
 
-bool UIGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool UIGrid::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar || mGridMode == kMultisliderGrow)
    {
       bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
-      float clickHeight, clickWidth;
+      double clickHeight, clickWidth;
       GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
       if (isMouseOver)
       {
-         float& data = mData[GetDataIndex(cell.mCol, cell.mRow)];
+         double& data = mData[GetDataIndex(cell.mCol, cell.mRow)];
          if (!mSingleColumn || data > 0)
          {
-            float oldValue = data;
-            data = ofClamp(data + scrollY / 100, FLT_EPSILON, 1);
+            double oldValue = data;
+            data = ofClamp(data + scrollY / 100, std::numeric_limits<double>::epsilon(), 1);
             if (mListener)
                mListener->GridUpdated(this, cell.mCol, cell.mRow, data, oldValue);
          }
@@ -501,27 +501,27 @@ void UIGrid::Clear()
    mData.fill(0);
 }
 
-float UIGrid::GetVal(int col, int row) const
+double UIGrid::GetVal(int col, int row) const
 {
    col = ofClamp(col, 0, MAX_GRID_COLS - 1);
    row = ofClamp(row, 0, MAX_GRID_ROWS - 1);
    return mData[GetDataIndex(col, row)];
 }
 
-float& UIGrid::GetVal(int col, int row)
+double& UIGrid::GetVal(int col, int row)
 {
    col = ofClamp(col, 0, MAX_GRID_COLS - 1);
    row = ofClamp(row, 0, MAX_GRID_ROWS - 1);
    return mData[GetDataIndex(col, row)];
 }
 
-void UIGrid::SetVal(int col, int row, float val, bool notifyListener)
+void UIGrid::SetVal(int col, int row, double val, bool notifyListener)
 {
    col = ofClamp(col, 0, MAX_GRID_COLS - 1);
    row = ofClamp(row, 0, MAX_GRID_ROWS - 1);
    if (val != mData[GetDataIndex(col, row)])
    {
-      float oldValue = mData[GetDataIndex(col, row)];
+      double oldValue = mData[GetDataIndex(col, row)];
       mData[GetDataIndex(col, row)] = val;
 
       if (mSingleColumn && val > 0)
@@ -560,39 +560,39 @@ int UIGrid::GetHighlightCol(double time) const
    return ret;
 }
 
-void UIGrid::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void UIGrid::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    SetValue(slider, time);
 }
 
-float UIGrid::GetValueForMidiCC(float slider) const
+double UIGrid::GetValueForMidiCC(double slider) const
 {
    return slider;
 }
 
-void UIGrid::SetValue(float value, double time, bool forceUpdate)
+void UIGrid::SetValue(double value, double time, bool forceUpdate)
 {
    if (mValueSetTargetCol >= 0 && mValueSetTargetRow < mCols && mValueSetTargetRow >= 0 && mValueSetTargetRow < mRows)
    {
-      float currentValue = GetVal(mValueSetTargetCol, mValueSetTargetRow);
+      double currentValue = GetVal(mValueSetTargetCol, mValueSetTargetRow);
       if (value != currentValue || forceUpdate)
          SetVal(mValueSetTargetCol, mValueSetTargetRow, value);
    }
 }
 
-float UIGrid::GetMidiValue() const
+double UIGrid::GetMidiValue() const
 {
    return GetValue();
 }
 
-float UIGrid::GetValue() const
+double UIGrid::GetValue() const
 {
    if (mValueSetTargetCol >= 0 && mValueSetTargetRow < mCols && mValueSetTargetRow >= 0 && mValueSetTargetRow < mRows)
       return GetVal(mValueSetTargetCol, mValueSetTargetRow);
    return 0;
 }
 
-std::string UIGrid::GetDisplayValue(float val) const
+std::string UIGrid::GetDisplayValue(double val) const
 {
    return ofToString(GetValue());
 }
@@ -651,8 +651,8 @@ void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
             dataIndex = GetDataIndex(row, col);
          else
             dataIndex = GetDataIndex(col, row);
-         float oldVal = mData[dataIndex];
-         in >> mData[dataIndex];
+         double oldVal = mData[dataIndex];
+         in >> FloatAsDouble >> mData[dataIndex];
          if (mListener)
             mListener->GridUpdated(this, col, row, mData[dataIndex], oldVal);
       }

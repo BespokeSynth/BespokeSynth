@@ -51,7 +51,7 @@ void SignalGenerator::CreateUIControls()
    DROPDOWN(mOscSelector, "osc", (int*)(&mOscType), 50);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_PUSHSLIDERWIDTH(60);
-   FLOATSLIDER(mPulseWidthSlider, "pw", &mPulseWidth, 0.01f, .99f);
+   FLOATSLIDER(mPulseWidthSlider, "pw", &mPulseWidth, 0.01, .99);
    UIBLOCK_NEWLINE();
    UIBLOCK_PUSHSLIDERWIDTH(80);
    FLOATSLIDER(mFreqSliderAmountSlider, "slider", &mFreqSliderAmount, 0, 1);
@@ -72,15 +72,15 @@ void SignalGenerator::CreateUIControls()
    DROPDOWN(mSyncModeSelector, "syncmode", (int*)(&mSyncMode), 60);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_PUSHSLIDERWIDTH(60);
-   FLOATSLIDER(mSyncFreqSlider, "syncf", &mSyncFreq, 10, 999.9f);
+   FLOATSLIDER(mSyncFreqSlider, "syncf", &mSyncFreq, 10, 999.9);
    UIBLOCK_SHIFTLEFT();
-   FLOATSLIDER(mSyncRatioSlider, "syncratio", &mSyncRatio, .1f, 10.0f);
+   FLOATSLIDER(mSyncRatioSlider, "syncratio", &mSyncRatio, .1, 10.0);
    UIBLOCK_NEWLINE();
    UIBLOCK_PUSHSLIDERWIDTH(80);
    FLOATSLIDER(mVolSlider, "vol", &mVol, 0, 1);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(8);
-   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mDetune, -.05f, .05f, 3);
+   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mDetune, -.05, .05, 3);
    ENDUIBLOCK0();
 
    mSyncModeSelector->AddLabel("no sync", (int)Oscillator::SyncMode::None);
@@ -142,7 +142,7 @@ void SignalGenerator::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
@@ -168,7 +168,7 @@ void SignalGenerator::Process(double time)
 
       float mult = mMult;
       if (mult < 0)
-         mult = -1.0f / mult;
+         mult = -1.0 / mult;
       float outputFreq = mFreq * exp2(mDetune) * mult;
       float phaseInc = GetPhaseInc(outputFreq);
 
@@ -179,15 +179,15 @@ void SignalGenerator::Process(double time)
          syncPhaseInc = GetPhaseInc(outputFreq * mSyncRatio);
 
       mPhase += phaseInc;
-      if (mPhase == INFINITY)
+      if (ofAlmostEquel(mPhase, std::numeric_limits<double>::infinity()))
       {
          ofLog() << "Infinite phase.";
       }
       else
       {
-         while (mPhase > FTWO_PI * 2)
+         while (mPhase > TWO_PI * 2)
          {
-            mPhase -= FTWO_PI * 2;
+            mPhase -= TWO_PI * 2;
             mSyncPhase = 0;
          }
       }
@@ -196,7 +196,7 @@ void SignalGenerator::Process(double time)
       if (mSyncMode != Oscillator::SyncMode::None)
          mWriteBuffer[pos] += mOsc.Audio(time, mSyncPhase) * volSq;
       else
-         mWriteBuffer[pos] += mOsc.Audio(time, mPhase + mPhaseOffset * FTWO_PI) * volSq;
+         mWriteBuffer[pos] += mOsc.Audio(time, mPhase + mPhaseOffset * TWO_PI) * volSq;
 
       time += gInvSampleRateMs;
    }
@@ -219,7 +219,7 @@ void SignalGenerator::PlayNote(NoteMessage note)
       }
       else if (mFreqMode == kFreqMode_Slider)
       {
-         float freq = TheScale->PitchToFreq(note.pitch);
+         double freq = TheScale->PitchToFreq(note.pitch);
          if (freq >= mFreq)
          {
             mFreqSliderAmount = 0;
@@ -236,7 +236,7 @@ void SignalGenerator::PlayNote(NoteMessage note)
    }
 }
 
-void SignalGenerator::OnPulse(double time, float velocity, int flags)
+void SignalGenerator::OnPulse(double time, double velocity, int flags)
 {
    mResetPhaseAtMs = time;
 }
@@ -271,7 +271,7 @@ void SignalGenerator::DrawModule()
    mPhaseOffsetSlider->Draw();
 }
 
-void SignalGenerator::GetModuleDimensions(float& width, float& height)
+void SignalGenerator::GetModuleDimensions(double& width, double& height)
 {
    width = 180;
    height = 108;
@@ -331,7 +331,7 @@ void SignalGenerator::DropdownUpdated(DropdownList* list, int oldVal, double tim
       SetFreqMode(mFreqMode);
 }
 
-void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mPulseWidthSlider)
       mOsc.SetPulseWidth(mPulseWidth);

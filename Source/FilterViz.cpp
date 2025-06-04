@@ -82,7 +82,7 @@ void FilterViz::DrawModule()
    for (int i = 0; i < mFilters.size(); ++i)
       mFilters[i]->Draw();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofPushStyle();
@@ -91,8 +91,8 @@ void FilterViz::DrawModule()
       ofPoint lastPoint(0, 0);
       for (int i = 0; i < FILTER_VIZ_BINS / 2 - 1; ++i)
       {
-         float a = float(i) / (FILTER_VIZ_BINS / 2 - 1);
-         a = sqrtf(a);
+         double a = static_cast<double>(i) / (FILTER_VIZ_BINS / 2 - 1);
+         a = sqrt(a);
          ofPoint point(a * w, h - (mFFTOutReal[i] / 12 * h));
          if (i != 0)
             ofLine(lastPoint, point);
@@ -105,8 +105,8 @@ void FilterViz::DrawModule()
       ofPoint lastPoint(0, 0);
       for (int i = 0; i < FILTER_VIZ_BINS / 2 - 1; ++i)
       {
-         float a = float(i) / (FILTER_VIZ_BINS / 2 - 1);
-         a = sqrtf(a);
+         double a = static_cast<double>(i) / (FILTER_VIZ_BINS / 2 - 1);
+         a = sqrt(a);
          ofPoint point(a * w, h / 2 - (mFFTOutImag[i] / (PI * 2) * h));
          if (i != 0)
             ofLine(lastPoint, point);
@@ -133,7 +133,7 @@ void FilterViz::GraphFilter()
       float imag = mFFTOutImag[j];
 
       //cartesian to polar
-      float amp = 2. * sqrtf(real * real + imag * imag);
+      float amp = 2.f * std::sqrt(real * real + imag * imag);
       float phase = atan2(imag, real);
 
       mFFTOutReal[j] = amp;
@@ -145,7 +145,7 @@ void FilterViz::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void FilterViz::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FilterViz::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

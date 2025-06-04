@@ -212,7 +212,7 @@ GridColor StepSequencer::GetGridColor(int x, int y)
    if (gridPos.x >= GetNumSteps(mStepInterval, mNumMeasures))
       return kGridColorOff;
 
-   float val = mGrid->GetVal(gridPos.x, gridPos.y);
+   double val = mGrid->GetVal(gridPos.x, gridPos.y);
    bool cellOn = val > 0;
    bool cellDim = val > 0 && val <= kVelocityGhost;
    bool cellBright = val > kVelocityNormal;
@@ -250,7 +250,7 @@ void StepSequencer::UpdateVelocityLights()
    if (mVelocityGridController->GetGridController() == nullptr)
       return;
 
-   float stepVelocity = 0;
+   double stepVelocity = 0;
    if (mHeldButtons.size() > 0)
       stepVelocity = mGrid->GetVal(mHeldButtons.begin()->mCol, mHeldButtons.begin()->mRow);
 
@@ -259,7 +259,7 @@ void StepSequencer::UpdateVelocityLights()
       for (int y = 0; y < mVelocityGridController->GetGridController()->NumRows(); ++y)
       {
          GridColor color;
-         if (stepVelocity >= (8 - y) / 8.0f)
+         if (stepVelocity >= (8 - y) / 8.0)
             color = kGridColor2Bright;
          else
             color = kGridColorOff;
@@ -301,7 +301,7 @@ void StepSequencer::OnControllerPageSelected()
    UpdateLights(true);
 }
 
-void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void StepSequencer::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (mPush2Connected || grid == mGridControlTarget->GetGridController())
    {
@@ -319,8 +319,8 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
             if (press)
             {
                mHeldButtons.push_back(HeldButton(gridPos.x, gridPos.y));
-               float val = mGrid->GetVal(gridPos.x, gridPos.y);
-               if (val != mStrength)
+               double val = mGrid->GetVal(gridPos.x, gridPos.y);
+               if (!ofAlmostEquel(val, mStrength))
                   mGrid->SetVal(gridPos.x, gridPos.y, mStrength);
                else
                   mGrid->SetVal(gridPos.x, gridPos.y, 0);
@@ -349,7 +349,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
       {
          for (auto& iter : mHeldButtons)
          {
-            float strength = (8 - y) / 8.0f;
+            double strength = (8 - y) / 8.0;
             mGrid->SetVal(iter.mCol, iter.mRow, strength);
          }
          UpdateVelocityLights();
@@ -375,7 +375,7 @@ int StepSequencer::GetStep(int step, int pitch)
 
 void StepSequencer::SetStep(int step, int pitch, int velocity)
 {
-   mGrid->SetVal(step, pitch, ofClamp(velocity / 127.0f, 0, 1));
+   mGrid->SetVal(step, pitch, ofClamp(velocity / 127.0, 0, 1));
    UpdateLights();
 }
 
@@ -464,13 +464,13 @@ void StepSequencer::DrawModule()
    mRandomizationDensitySlider->Draw();
    mRandomizeButton->Draw();
 
-   float gridX, gridY;
+   double gridX, gridY;
    mGrid->GetPosition(gridX, gridY, true);
    for (int i = 0; i < NUM_STEPSEQ_ROWS; ++i)
    {
       if (i < mNumRows)
       {
-         float y = gridY + mGrid->GetHeight() - (i + 1) * (mGrid->GetHeight() / float(mNumRows));
+         double y = gridY + mGrid->GetHeight() - (i + 1) * (mGrid->GetHeight() / static_cast<double>(mNumRows));
 
          if (mAdjustOffsets)
          {
@@ -499,10 +499,10 @@ void StepSequencer::DrawModule()
       ofNoFill();
       ofSetLineWidth(4);
       ofSetColor(255, 0, 0, 50);
-      float squareh = float(mGrid->GetHeight()) / mNumRows;
-      float squarew = float(mGrid->GetWidth()) / GetNumSteps(mStepInterval, mNumMeasures);
+      double squareh = mGrid->GetHeight() / mNumRows;
+      double squarew = mGrid->GetWidth() / GetNumSteps(mStepInterval, mNumMeasures);
       int chunkSize = mGrid->GetRows() / GetNumControllerChunks();
-      float width = MIN(mGrid->GetWidth(), squarew * GetGridControllerCols() * GetNumControllerChunks());
+      double width = MIN(mGrid->GetWidth(), squarew * GetGridControllerCols() * GetNumControllerChunks());
       ofRect(gridX, gridY + squareh * (mNumRows - chunkSize) - squareh * mGridYOff * chunkSize, width, squareh * chunkSize);
       ofPopStyle();
    }
@@ -514,21 +514,21 @@ void StepSequencer::DrawModule()
       for (int row = 0; row < mGrid->GetRows(); ++row)
       {
          auto mask = mMetaStepMasks[GetMetaStepMaskIndex(col, row)];
-         ofVec2f pos = mGrid->GetCellPosition(col, row) + mGrid->GetPosition(true);
-         float cellWidth = (float)mGrid->GetWidth() / mGrid->GetCols();
-         float cellHeight = (float)mGrid->GetHeight() / mGrid->GetRows();
+         auto pos = mGrid->GetCellPosition(col, row) + mGrid->GetPosition(true);
+         double cellWidth = mGrid->GetWidth() / mGrid->GetCols();
+         double cellHeight = mGrid->GetHeight() / mGrid->GetRows();
          for (int i = 0; i < kMetaStepLoop; ++i)
          {
             if (mask != 0xff)
             {
-               float x = pos.x + ((i % 4) + 1.5f) * (cellWidth / 6);
-               float y = pos.y + ((i / 4 + 1.5f) * (cellHeight / 4)) - cellHeight;
-               float radius = cellHeight * .08f;
+               double x = pos.x + ((i % 4) + 1.5) * (cellWidth / 6);
+               double y = pos.y + ((i / 4 + 1.5) * (cellHeight / 4)) - cellHeight;
+               double radius = cellHeight * .08;
 
                if (i == GetMetaStep(gTime))
                {
                   ofSetColor(255, 220, 0);
-                  ofCircle(x, y, radius * 1.5f);
+                  ofCircle(x, y, radius * 1.5);
                }
 
                if ((mask & (1 << i)) == 0)
@@ -546,10 +546,10 @@ void StepSequencer::DrawModule()
 
 void StepSequencer::DrawRowLabel(const char* label, int row, int x, int y)
 {
-   DrawTextRightJustify(label, x, y + row * 9.4f);
+   DrawTextRightJustify(label, x, y + row * 9.4);
 }
 
-void StepSequencer::GetModuleDimensions(float& width, float& height)
+void StepSequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + 57;
    if (mAdjustOffsets)
@@ -557,16 +557,16 @@ void StepSequencer::GetModuleDimensions(float& width, float& height)
    height = mGrid->GetHeight() + 50;
 }
 
-void StepSequencer::Resize(float w, float h)
+void StepSequencer::Resize(double w, double h)
 {
-   float extraW = 45;
-   float extraH = 50;
+   double extraW = 45;
+   double extraH = 50;
    if (mAdjustOffsets)
       extraW += 100;
    mGrid->SetDimensions(MAX(w - extraW, 185), MAX(h - extraH, 46 + 13 * mNumRows));
 }
 
-void StepSequencer::OnClicked(float x, float y, bool right)
+void StepSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    if (mGrid->TestClick(x, y, right))
@@ -580,7 +580,7 @@ void StepSequencer::MouseReleased()
    UpdateLights();
 }
 
-bool StepSequencer::MouseMoved(float x, float y)
+bool StepSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    if (mGrid->NotifyMouseMoved(x, y))
@@ -588,7 +588,7 @@ bool StepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    mPush2Connected = true;
 
@@ -606,7 +606,7 @@ bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, in
 
    if (type == kMidiMessage_PitchBend)
    {
-      float val = midiValue / MidiDevice::kPitchBendMax;
+      double val = midiValue / MidiDevice::kPitchBendMax;
       mGridYOffDropdown->SetFromMidiCC(val, gTime, true);
 
       return true;
@@ -659,8 +659,8 @@ void StepSequencer::UpdatePush2Leds(Push2Control* push2)
    std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19 };
    for (int i = 0; i < 16; ++i)
    {
-      int ledLow = (int(((i * 2) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
-      int ledHigh = (int(((i * 2 + 1) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
+      int ledLow = (int(((i * 2) / 32.0) * numYChunks) == mGridYOff) ? 7 : 0;
+      int ledHigh = (int(((i * 2 + 1) / 32.0) * numYChunks) == mGridYOff) ? 7 : 0;
       unsigned char c = ledLow + (ledHigh << 3);
       touchStripLights += c;
    }
@@ -686,7 +686,7 @@ void StepSequencer::OnTimeEvent(double time)
       Step(time, 1, 0);
 }
 
-void StepSequencer::Step(double time, float velocity, int pulseFlags)
+void StepSequencer::Step(double time, double velocity, int pulseFlags)
 {
    if (!mIsSetUp)
       return;
@@ -718,7 +718,7 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
    if (pulseFlags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int numMeasures = ceil(float(GetNumSteps(mStepInterval, mNumMeasures)) / stepsPerMeasure);
+      int numMeasures = ceil(static_cast<double>(GetNumSteps(mStepInterval, mNumMeasures)) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
       int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % GetNumSteps(mStepInterval, mNumMeasures);
       mCurrentColumn = step;
@@ -735,7 +735,7 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
    }
 }
 
-void StepSequencer::PlayStepNote(double time, int note, float val)
+void StepSequencer::PlayStepNote(double time, int note, double val)
 {
    mNoteOutput.PlayNote(NoteMessage(time, note, val * 127));
 }
@@ -755,7 +755,7 @@ void StepSequencer::PlayNote(NoteMessage note)
          }
 
          mCurrentColumn = note.pitch % GetNumSteps(mStepInterval, mNumMeasures);
-         Step(note.time, note.velocity / 127.0f, kPulseFlag_Repeat);
+         Step(note.time, note.velocity / 127.0, kPulseFlag_Repeat);
       }
    }
    else
@@ -767,7 +767,7 @@ void StepSequencer::PlayNote(NoteMessage note)
    }
 }
 
-void StepSequencer::OnPulse(double time, float velocity, int flags)
+void StepSequencer::OnPulse(double time, double velocity, int flags)
 {
    if (!mHasExternalPulseSource)
    {
@@ -816,7 +816,7 @@ void StepSequencer::RandomizeRow(int row)
    {
       if (ofRandom(1) < mRandomizationAmount)
       {
-         float value = 0;
+         double value = 0;
          if (ofRandom(1) < mRandomizationDensity)
             value = ofRandom(1);
          mGrid->SetVal(col, row, value);
@@ -830,7 +830,7 @@ void StepSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void StepSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mStrengthSlider)
    {
@@ -845,7 +845,7 @@ void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double
    {
       if (slider == mOffsetSlider[i])
       {
-         float offset = -mOffsets[i] / 32; //up to 1/32nd late or early
+         double offset = -mOffsets[i] / 32; //up to 1/32nd late or early
          mRows[i]->SetOffset(offset);
          mNoteRepeats[i]->SetOffset(offset);
          mGrid->SetDrawOffset(i, mOffsets[i] / 2);
@@ -864,7 +864,7 @@ void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
       mGrid->SetGrid(GetNumSteps(mStepInterval, mNumMeasures), mNumRows);
       if (mNumMeasures > oldVal)
       {
-         int newChunkCount = ceil(float(mNumMeasures) / oldVal);
+         int newChunkCount = ceil(static_cast<double>(mNumMeasures) / oldVal);
          int stepsPerChunk = GetNumSteps(mStepInterval, oldVal);
          for (int chunk = 1; chunk < newChunkCount; ++chunk)
          {
@@ -890,7 +890,7 @@ void StepSequencer::ButtonClicked(ClickButton* button, double time)
       {
          int start = (shift == 1) ? mGrid->GetCols() - 1 : 0;
          int end = (shift == 1) ? 0 : mGrid->GetCols() - 1;
-         float startVal = mGrid->GetVal(start, row);
+         double startVal = mGrid->GetVal(start, row);
          for (int col = start; col != end; col -= shift)
             mGrid->SetVal(col, row, mGrid->GetVal(col - shift, row));
          mGrid->SetVal(end, row, startVal);
@@ -926,7 +926,7 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double time)
       {
          for (int j = 0; j < newNumSteps; ++j)
          {
-            float div = j * ((float)oldNumSteps / newNumSteps);
+            double div = j * (static_cast<double>(oldNumSteps) / newNumSteps);
             int col = (int)div;
             if (div == col)
                mGrid->SetVal(j, i, oldGrid->GetVal(col, i));
@@ -967,7 +967,7 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
 
-   ofVec2f mousePos(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
+   ofVec2d mousePos(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
    if (mGrid->GetRect().contains(mousePos.x, mousePos.y))
    {
       auto cell = mGrid->GetGridCellAt(mousePos.x - mGrid->GetPosition().x, mousePos.y - mGrid->GetPosition().y);
@@ -978,7 +978,7 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
       }
       if (key == OF_KEY_UP || key == OF_KEY_DOWN)
       {
-         float velocity = mGrid->GetVal(cell.mCol, cell.mRow);
+         double velocity = mGrid->GetVal(cell.mCol, cell.mRow);
 
          if (key == OF_KEY_UP)
          {
@@ -1096,9 +1096,9 @@ void StepSequencer::LoadState(FileStreamIn& in, int rev)
       in >> mHasExternalPulseSource;
    if (rev >= 3)
    {
-      float gridWidth, gridHeight;
-      in >> gridWidth;
-      in >> gridHeight;
+      double gridWidth, gridHeight;
+      in >> FloatAsDouble >> gridWidth;
+      in >> FloatAsDouble >> gridHeight;
       mGrid->SetDimensions(gridWidth, gridHeight);
    }
 }
@@ -1129,14 +1129,14 @@ void StepSequencerRow::OnTimeEvent(double time)
    if (mSeq->IsEnabled() == false || mSeq->HasExternalPulseSource())
       return;
 
-   float offsetMs = mOffset * TheTransport->MsPerBar();
+   double offsetMs = mOffset * TheTransport->MsPerBar();
    int step = mSeq->GetStepNum(time + offsetMs);
    PlayStep(time, step);
 }
 
 void StepSequencerRow::PlayStep(double time, int step)
 {
-   float val = mGrid->GetVal(step, mRow);
+   double val = mGrid->GetVal(step, mRow);
    if (mPlayRow && val > 0 && mSeq->IsMetaStepActive(time, step, mRow))
    {
       mSeq->PlayStepNote(time, mRowPitch, val * val);
@@ -1146,7 +1146,7 @@ void StepSequencerRow::PlayStep(double time, int step)
    }
 }
 
-void StepSequencerRow::SetOffset(float offset)
+void StepSequencerRow::SetOffset(double offset)
 {
    mOffset = offset;
    UpdateTimeListener();
@@ -1162,10 +1162,10 @@ void StepSequencerRow::UpdateTimeListener()
    }
 }
 
-void StepSequencerRow::Draw(float x, float y)
+void StepSequencerRow::Draw(double x, double y)
 {
-   float xCellSize = float(mGrid->GetWidth()) / mGrid->GetCols();
-   float yCellSize = float(mGrid->GetHeight()) / mGrid->GetRows();
+   double xCellSize = mGrid->GetWidth() / mGrid->GetCols();
+   double yCellSize = mGrid->GetHeight() / mGrid->GetRows();
 
    bool showTextEntry = yCellSize > 14;
    mRowPitchEntry->SetShowing(showTextEntry);
@@ -1179,7 +1179,7 @@ void StepSequencerRow::Draw(float x, float y)
    if (!showTextEntry)
       DrawTextRightJustify(ofToString(mRowPitch), x - 7, y + 10);
 
-   const float kPlayHighlightDurationMs = 250;
+   const double kPlayHighlightDurationMs = 250;
    for (size_t i = 0; i < mPlayedSteps.size(); ++i)
    {
       if (mPlayedSteps[i].time != -1)
@@ -1188,10 +1188,10 @@ void StepSequencerRow::Draw(float x, float y)
          {
             if (gTime - mPlayedSteps[i].time > 0)
             {
-               float fade = (1 - (gTime - mPlayedSteps[i].time) / kPlayHighlightDurationMs);
+               double fade = (1 - (gTime - mPlayedSteps[i].time) / kPlayHighlightDurationMs);
                ofPushStyle();
                ofSetLineWidth(3 * fade);
-               ofVec2f pos = mGrid->GetCellPosition(mPlayedSteps[i].step, mRow) + mGrid->GetPosition(true);
+               ofVec2d pos = mGrid->GetCellPosition(mPlayedSteps[i].step, mRow) + mGrid->GetPosition(true);
                ofSetColor(ofColor::white, fade * 255);
                ofRect(pos.x, pos.y, xCellSize, yCellSize);
                ofPopStyle();
@@ -1223,7 +1223,7 @@ void NoteRepeat::OnTimeEvent(double time)
 {
    int pressure = mSeq->GetPadPressure(mRow);
    if (pressure > 10)
-      mSeq->PlayStepNote(time, mSeq->GetRowPitch(mRow), pressure / 85.0f);
+      mSeq->PlayStepNote(time, mSeq->GetRowPitch(mRow), pressure / 85.0);
 }
 
 void NoteRepeat::SetInterval(NoteInterval interval)
@@ -1237,7 +1237,7 @@ void NoteRepeat::SetInterval(NoteInterval interval)
    }
 }
 
-void NoteRepeat::SetOffset(float offset)
+void NoteRepeat::SetOffset(double offset)
 {
    mOffset = offset;
    TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
@@ -1251,7 +1251,7 @@ void NoteRepeat::SetOffset(float offset)
 StepSequencerNoteFlusher::StepSequencerNoteFlusher(StepSequencer* seq)
 : mSeq(seq)
 {
-   TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(.01f, false), true);
+   TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(.01, false), true);
 }
 
 StepSequencerNoteFlusher::~StepSequencerNoteFlusher()
@@ -1265,7 +1265,7 @@ void StepSequencerNoteFlusher::SetInterval(NoteInterval interval)
    if (transportListenerInfo != nullptr)
    {
       transportListenerInfo->mInterval = interval;
-      transportListenerInfo->mOffsetInfo = OffsetInfo(.01f, false);
+      transportListenerInfo->mOffsetInfo = OffsetInfo(.01, false);
    }
 }
 
