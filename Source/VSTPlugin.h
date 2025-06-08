@@ -63,6 +63,8 @@ public:
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
 
+   static const int kMaxJuceMidiStereoChannels = 16;
+
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
    void AddExtraOutputCable();

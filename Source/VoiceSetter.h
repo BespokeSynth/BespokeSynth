@@ -58,8 +58,6 @@ private:
       height = mHeight;
    }
 
-   static const int kMaxJuceMidiChannels = 16;
-
    float mWidth{ 90 };
    float mHeight{ 20 };
 

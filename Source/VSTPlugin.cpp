@@ -888,9 +888,9 @@ void VSTPlugin::Process(double time)
             mWantsPanic = false;
 
             mMidiBuffer.clear();
-            for (int channel = 1; channel <= 16; ++channel)
+            for (int channel = 1; channel <= kMaxJuceMidiStereoChannels; ++channel)
                mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(channel), 0);
-            for (int channel = 1; channel <= 16; ++channel)
+            for (int channel = 1; channel <= kMaxJuceMidiStereoChannels; ++channel)
                mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(channel), 1);
          }
 
