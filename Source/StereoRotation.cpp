@@ -67,13 +67,13 @@ void StereoRotation::Process(double time)
    {
       if (mEnabled)
       {
-         out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i] * phaseCos - GetBuffer()->GetChannel(secondChannel)[i] * phaseSin;
-         out->GetChannel(1)[i] = GetBuffer()->GetChannel(0)[i] * phaseSin + GetBuffer()->GetChannel(secondChannel)[i] * phaseCos;
+         out->GetChannel(0)[i] += GetBuffer()->GetChannel(0)[i] * phaseCos - GetBuffer()->GetChannel(secondChannel)[i] * phaseSin;
+         out->GetChannel(1)[i] += GetBuffer()->GetChannel(0)[i] * phaseSin + GetBuffer()->GetChannel(secondChannel)[i] * phaseCos;
       }
       else
       {
-         out->GetChannel(0)[i] = GetBuffer()->GetChannel(0)[i];
-         out->GetChannel(1)[i] = GetBuffer()->GetChannel(secondChannel)[i];
+         out->GetChannel(0)[i] += GetBuffer()->GetChannel(0)[i];
+         out->GetChannel(1)[i] += GetBuffer()->GetChannel(secondChannel)[i];
       }
    }
 
