@@ -941,6 +941,11 @@ void SamplePlayer::SetCuePoint(int pitch, float startSeconds, float lengthSecond
    }
 }
 
+bool SamplePlayer::validCuePoint(int cueIndex)
+{
+   return mSample != nullptr && cueIndex > 0 && cueIndex < mSampleCuePoints.size() - 1 && mSampleCuePoints[cueIndex].lengthSeconds > 0;
+}
+
 void SamplePlayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
