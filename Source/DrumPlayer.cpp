@@ -698,7 +698,7 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
 
 void DrumPlayer::ImportSampleCuePoint(SamplePlayer* player, int sourceCueIndex, int destHitIndex)
 {
-   if (player != nullptr)
+   if (player != nullptr && player->validCuePoint(sourceCueIndex))
    {
       ChannelBuffer* data = player->GetCueSampleData(sourceCueIndex);
       Sample sample;
