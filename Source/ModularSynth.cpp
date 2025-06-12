@@ -1403,15 +1403,57 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
                mLastClickedModule = newModule;
          }
       }
-      for (auto module : newGroupSelectedModules)
+      TheSynth->FindUIControl("");
+      auto updateCables = [&oldToNewModuleMap](PatchCableSource* cableSource, PatchCable* cable)
+      {
+         if (cable->GetTarget() == nullptr)
+            return;
+         // Try to find a parent module that is in the new module list
+         auto temp_module = cable->GetTarget();
+         IDrawableModule *oldmodule, *newmodule;
+         for (int i = 0; i < 10; i++)
+         {
+            oldmodule = dynamic_cast<IDrawableModule*>(temp_module);
+            newmodule = oldToNewModuleMap[oldmodule];
+            if (oldmodule != nullptr && newmodule != nullptr)
+               break;
+            temp_module = temp_module->GetParent();
+            if (!temp_module)
+               break;
+         }
+         if (oldmodule == nullptr || newmodule == nullptr)
+            return;
+         // Find the new target using the path
+         auto oldpath = oldmodule->Path();
+         auto newpath = newmodule->Path();
+         auto targetpath = cable->GetTarget()->Path();
+         ofLog() << " op " << oldpath << " np " << newpath << " tp " << targetpath;
+         ofStringReplace(targetpath, oldpath, newpath, true);
+         ofLog() << " tp " << targetpath;
+         IClickable* newtarget;
+         if (dynamic_cast<IUIControl*>(cable->GetTarget()))
+            newtarget = TheSynth->FindUIControl(targetpath);
+         else
+            newtarget = TheSynth->FindModule(targetpath);
+
+         cableSource->SetPatchCableTarget(cable, newtarget, false);
+      };
+      for (const auto module : newGroupSelectedModules)
       {
          for (auto* cableSource : module->GetPatchCableSources())
          {
             for (auto* cable : cableSource->GetPatchCables())
             {
-               if (VectorContains(dynamic_cast<IDrawableModule*>(cable->GetTarget()), mGroupSelectedModules))
+               updateCables(cableSource, cable);
+            }
+         }
+         for (const auto child : module->GetChildren())
+         {
+            for (auto* cableSource : child->GetPatchCableSources())
+            {
+               for (auto* cable : cableSource->GetPatchCables())
                {
-                  cableSource->SetPatchCableTarget(cable, oldToNewModuleMap[dynamic_cast<IDrawableModule*>(cable->GetTarget())], false);
+                  updateCables(cableSource, cable);
                }
             }
          }
