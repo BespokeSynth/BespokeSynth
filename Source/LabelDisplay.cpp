@@ -27,6 +27,8 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 
+#include <cstring>
+
 #include "Slider.h"
 #include "UIControlMacros.h"
 
