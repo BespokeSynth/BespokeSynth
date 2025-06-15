@@ -37,7 +37,7 @@ StereoRotation::StereoRotation()
 void StereoRotation::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPhaseSlider = new FloatSlider(this, "phase", 5, 2, 110, 15, &mPhase, 0, 1);
+   mPhaseSlider = new FloatSlider(this, "phase", 5, 2, 110, 15, &mPhase, -0.5, 0.5);
 }
 
 StereoRotation::~StereoRotation()
