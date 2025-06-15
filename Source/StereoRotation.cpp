@@ -59,14 +59,14 @@ void StereoRotation::Process(double time)
 
    SyncBuffers(2);
 
-   float phaseSin = sin(mPhase * 2 * PI);
-   float phaseCos = cos(mPhase * 2 * PI);
-
    int secondChannel = GetBuffer()->NumActiveChannels() - 1;
    for (int i = 0; i < bufferSize; ++i)
    {
       if (mEnabled)
       {
+         float phaseSin = sin(mPhase * 2 * PI);
+         float phaseCos = cos(mPhase * 2 * PI);
+
          out->GetChannel(0)[i] += GetBuffer()->GetChannel(0)[i] * phaseCos - GetBuffer()->GetChannel(secondChannel)[i] * phaseSin;
          out->GetChannel(1)[i] += GetBuffer()->GetChannel(0)[i] * phaseSin + GetBuffer()->GetChannel(secondChannel)[i] * phaseCos;
       }
