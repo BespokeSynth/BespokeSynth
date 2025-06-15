@@ -2153,3 +2153,6 @@ acciaccatura~adds a quick grace note before playing the input pitch
 ~notemode~should the offset be in scale steps, or chromatically in semitones?
 ~hold ms~how long to hold offset pitch before transitioning to input pitch
 ~glide ms~how long to spend bending between offset pitch and input pitch after hold ms
+
+stereorotation~rotates the phase of input audio
+~phase~phase offset
