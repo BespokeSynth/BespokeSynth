@@ -45,6 +45,10 @@ jobs:
         fetchDepth: 5
         # submodules: recursive # can't do submodules here b'cuz depth=1 fails with Github
 
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.13.3'
+
       - bash: |
           echo "BUILD REASON   = " $(Build.Reason)
           echo "cmakeArguments = " $(cmakeArguments)
