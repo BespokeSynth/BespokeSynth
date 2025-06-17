@@ -47,7 +47,7 @@ jobs:
 
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: '3.13.3'
+          versionSpec: '3.12'
 
       - bash: |
           echo "BUILD REASON   = " $(Build.Reason)
