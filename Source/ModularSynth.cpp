@@ -1438,7 +1438,8 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
 
          cableSource->SetPatchCableTarget(cable, newtarget, false);
       };
-      for (const auto module : newGroupSelectedModules)
+      std::function<void(IDrawableModule*)> checkModuleCables;
+      checkModuleCables = [&updateCables, &checkModuleCables](IDrawableModule* module)
       {
          for (auto* cableSource : module->GetPatchCableSources())
          {
@@ -1447,18 +1448,14 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
                updateCables(cableSource, cable);
             }
          }
-         // Check children (Prefabs for instance. This may need recursion when we allow recursive prefabs.)
          for (const auto child : module->GetChildren())
          {
-            for (auto* cableSource : child->GetPatchCableSources())
-            {
-               for (auto* cable : cableSource->GetPatchCables())
-               {
-                  updateCables(cableSource, cable);
-               }
-            }
+            checkModuleCables(child); // Check children (Prefabs for instance.)
          }
-      }
+      };
+      for (const auto module : newGroupSelectedModules)
+         checkModuleCables(module);
+
       mGroupSelectedModules = newGroupSelectedModules;
 
       if (mMoveModule && !mMoveModule->IsSingleton())
