@@ -1447,6 +1447,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
                updateCables(cableSource, cable);
             }
          }
+         // Check children (Prefabs for instance. This may need recursion when we allow recursive prefabs.)
          for (const auto child : module->GetChildren())
          {
             for (auto* cableSource : child->GetPatchCableSources())
