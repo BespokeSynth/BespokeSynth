@@ -402,7 +402,7 @@ float BufferShuffler::GetSlicePlaybackRate() const
    }
 }
 
-bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool BufferShuffler::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -432,7 +432,7 @@ bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, i
    return false;
 }
 
-void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
+void BufferShuffler::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    for (int x = 0; x < 8; ++x)
    {
@@ -459,7 +459,7 @@ void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
                pushColor = 16;
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
 }

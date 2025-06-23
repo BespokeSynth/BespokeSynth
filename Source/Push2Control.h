@@ -32,15 +32,16 @@
 #include "MidiController.h"
 #include "TitleBar.h"
 #include "DropdownList.h"
+#include "AbletonDeviceShared.h"
 
 class NVGcontext;
 class NVGLUframebuffer;
 class IUIControl;
-class IPush2GridController;
+class IAbletonGridController;
 class Snapshots;
 class ControlRecorder;
 
-class Push2Control : public IDrawableModule, public MidiDeviceListener, public IDropdownListener
+class Push2Control : public IDrawableModule, public MidiDeviceListener, public IDropdownListener, public IAbletonGridDevice
 {
 public:
    Push2Control();
@@ -55,15 +56,15 @@ public:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 
-   void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
-   void SetDisplayModule(IDrawableModule* module, bool addToHistory = true);
-   IDrawableModule* GetDisplayModule() const { return mDisplayModule; }
+   void SetLed(MidiMessageType type, int index, int color, int flashColor = -1) override;
+   void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
+   IDrawableModule* GetDisplayModule() const override { return mDisplayModule; }
 
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
 
-   MidiDevice* GetDevice() { return &mDevice; }
+   MidiDevice* GetDevice() override { return &mDevice; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
@@ -74,8 +75,8 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
-   int GetGridControllerOption1Control() const;
-   int GetGridControllerOption2Control() const;
+   int GetGridControllerOption1Control() const override;
+   int GetGridControllerOption2Control() const override;
 
    static bool sDrawingPush2Display;
    static NVGcontext* sVG;
@@ -128,7 +129,7 @@ private:
    int GetNumDisplayPixels() const;
    bool AllowRepatch() const;
    void UpdateRoutingModules();
-   void SetGridControlInterface(IPush2GridController* controller, IDrawableModule* module);
+   void SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module);
 
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
@@ -214,7 +215,7 @@ private:
    };
    ScreenDisplayMode mScreenDisplayMode{ ScreenDisplayMode::kNormal };
 
-   IPush2GridController* mGridControlInterface{ nullptr };
+   IAbletonGridController* mGridControlInterface{ nullptr };
    IDrawableModule* mGridControlModule{ nullptr };
    bool mDisplayModuleCanControlGrid{ false };
 
@@ -226,14 +227,4 @@ private:
    int mPendingSpawnPitch{ -1 };
    int mSelectedGridSpawnListIndex{ -1 };
    std::string mPushBridgeInitErrMsg;
-};
-
-//https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
-class IPush2GridController
-{
-public:
-   virtual ~IPush2GridController() {}
-   virtual void OnPush2Connect() {}
-   virtual bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) = 0;
-   virtual void UpdatePush2Leds(Push2Control* push2) = 0;
 };

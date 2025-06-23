@@ -472,7 +472,7 @@ void SongBuilder::PlaySequence(double time, int startIndex)
    }
 }
 
-bool SongBuilder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool SongBuilder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -508,7 +508,7 @@ bool SongBuilder::OnPush2Control(Push2Control* push2, MidiMessageType type, int 
    return false;
 }
 
-void SongBuilder::UpdatePush2Leds(Push2Control* push2)
+void SongBuilder::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    for (int x = 0; x < 8; ++x)
    {
@@ -550,7 +550,7 @@ void SongBuilder::UpdatePush2Leds(Push2Control* push2)
             }
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor, pushColorBlink);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor, pushColorBlink);
       }
    }
 }

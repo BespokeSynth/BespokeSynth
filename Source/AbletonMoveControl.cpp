@@ -45,7 +45,6 @@
 #include "push2/JuceToPush2DisplayBridge.h"
 #include "push2/Push2-Bitmap.h"
 #include "push2/../../Push2-Display.h"
-#include "AbletonDeviceShared.h"
 
 using namespace AbletonDevice;
 
@@ -546,7 +545,7 @@ void AbletonMoveControl::SetModuleGridLights()
    }
    else if (mGridControlInterface != nullptr)
    {
-      mGridControlInterface->UpdateAbletonMoveLeds(this);
+      mGridControlInterface->UpdateAbletonGridLeds(this);
    }
    else
    {
@@ -843,7 +842,7 @@ std::string AbletonMoveControl::GetModuleTypeToSpawn()
 void AbletonMoveControl::SetDisplayModule(IDrawableModule* module, bool addToHistory)
 {
    mDisplayModule = module;
-   if (dynamic_cast<IAbletonMoveGridController*>(mDisplayModule) != nullptr)
+   if (dynamic_cast<IAbletonGridController*>(mDisplayModule) != nullptr)
       mDisplayModuleCanControlGrid = true;
    else
       mDisplayModuleCanControlGrid = false;
@@ -967,7 +966,7 @@ void AbletonMoveControl::SetLed(MidiMessageType type, int index, int color, int 
    }
 }
 
-void AbletonMoveControl::SetGridControlInterface(IAbletonMoveGridController* controller, IDrawableModule* module)
+void AbletonMoveControl::SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module)
 {
    mGridControlInterface = controller;
    mGridControlModule = module;
@@ -979,7 +978,7 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
 {
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnAbletonMoveControl(this, kMidiMessage_Note, note.mPitch, note.mVelocity);
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kMidiMessage_Note, note.mPitch, note.mVelocity);
       if (handled)
          return;
    }
@@ -1181,7 +1180,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
 {
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnAbletonMoveControl(this, kMidiMessage_Control, control.mControl, control.mValue);
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kMidiMessage_Control, control.mControl, control.mValue);
       if (handled)
          return;
    }
@@ -1560,7 +1559,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
    {
       if (control.mValue > 0)
       {
-         IAbletonMoveGridController* controller = dynamic_cast<IAbletonMoveGridController*>(mDisplayModule);
+         IAbletonGridController* controller = dynamic_cast<IAbletonGridController*>(mDisplayModule);
          if (controller != nullptr && controller != mGridControlInterface)
          {
             SetGridControlInterface(controller, mDisplayModule);
@@ -1570,7 +1569,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
             //turn touch strip off
             std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
             GetDevice()->SendSysEx(touchStripLights);
-            mGridControlInterface->OnAbletonMoveConnect();
+            mGridControlInterface->OnAbletonGridConnect();
 
             mScreenDisplayMode = ScreenDisplayMode::kNormal;
             UpdateControlList();
@@ -1683,7 +1682,7 @@ void AbletonMoveControl::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnAbletonMoveControl(this, kMidiMessage_PitchBend, pitchBend.mChannel, pitchBend.mValue);
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kMidiMessage_PitchBend, pitchBend.mChannel, pitchBend.mValue);
       if (handled)
          return;
    }

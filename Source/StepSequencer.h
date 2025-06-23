@@ -106,7 +106,7 @@ private:
    StepSequencer* mSeq;
 };
 
-class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IPush2GridController, public IPulseReceiver, public ITextEntryListener, public IDrivableSequencer
+class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IAbletonGridController, public IPulseReceiver, public ITextEntryListener, public IDrivableSequencer
 {
 public:
    StepSequencer();
@@ -158,9 +158,9 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    bool IsMetaStepActive(double time, int col, int row);
 

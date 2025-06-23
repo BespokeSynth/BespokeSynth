@@ -588,7 +588,7 @@ bool StepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool StepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    mPush2Connected = true;
 
@@ -615,7 +615,7 @@ bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, in
    return false;
 }
 
-void StepSequencer::UpdatePush2Leds(Push2Control* push2)
+void StepSequencer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    mPush2Connected = true;
    int numYChunks = GetNumControllerChunks();
@@ -652,7 +652,7 @@ void StepSequencer::UpdatePush2Leds(Push2Control* push2)
                pushColor = 115;
                break;
          }
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
 
@@ -664,7 +664,7 @@ void StepSequencer::UpdatePush2Leds(Push2Control* push2)
       unsigned char c = ledLow + (ledHigh << 3);
       touchStripLights += c;
    }
-   push2->GetDevice()->SendSysEx(touchStripLights);
+   abletonGrid->GetDevice()->SendSysEx(touchStripLights);
 }
 
 int StepSequencer::GetNumSteps(NoteInterval interval, int numMeasures) const

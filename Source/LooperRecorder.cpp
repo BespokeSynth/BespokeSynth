@@ -576,7 +576,7 @@ void LooperRecorder::CancelFreeRecord()
    mStartFreeRecordTime = 0;
 }
 
-bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool LooperRecorder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -608,7 +608,7 @@ bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, i
             if (mLoopers[looperIndex] != nullptr)
             {
                if (x == 0)
-                  push2->SetDisplayModule(mLoopers[looperIndex]);
+                  abletonGrid->SetDisplayModule(mLoopers[looperIndex]);
                if (x == 1)
                   mLoopers[looperIndex]->SetMute(gTime, !mLoopers[looperIndex]->GetMute());
             }
@@ -621,7 +621,7 @@ bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, i
    return false;
 }
 
-void LooperRecorder::UpdatePush2Leds(Push2Control* push2)
+void LooperRecorder::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    for (int x = 0; x < 8; ++x)
    {
@@ -651,13 +651,13 @@ void LooperRecorder::UpdatePush2Leds(Push2Control* push2)
             if (mLoopers[looperIndex] != nullptr)
             {
                if (x == 0)
-                  pushColor = (push2->GetDisplayModule() == mLoopers[looperIndex]) ? 125 : 33;
+                  pushColor = (abletonGrid->GetDisplayModule() == mLoopers[looperIndex]) ? 125 : 33;
                if (x == 1)
                   pushColor = mLoopers[looperIndex]->GetMute() ? 127 : 68;
             }
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
 }

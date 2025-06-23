@@ -739,7 +739,7 @@ void Snapshots::OnGridButton(int x, int y, float velocity, IGridController* grid
    }
 }
 
-bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool Snapshots::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    mPush2Connected = true;
 
@@ -779,7 +779,7 @@ bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int co
    return false;
 }
 
-void Snapshots::UpdatePush2Leds(Push2Control* push2)
+void Snapshots::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    mPush2Connected = true;
 
@@ -818,7 +818,7 @@ void Snapshots::UpdatePush2Leds(Push2Control* push2)
             pushColor = 0;
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
 }

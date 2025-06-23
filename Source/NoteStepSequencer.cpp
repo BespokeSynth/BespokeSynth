@@ -534,7 +534,7 @@ void NoteStepSequencer::GetPush2Layout(int& sequenceRows, int& pitchCols, int& p
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteStepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool NoteStepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {
@@ -674,7 +674,7 @@ bool NoteStepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type
 
    if (type == kMidiMessage_Control)
    {
-      if (controlIndex == push2->GetGridControllerOption1Control())
+      if (controlIndex == abletonGrid->GetGridControllerOption1Control())
       {
          if (midiValue > 0)
          {
@@ -707,7 +707,7 @@ bool NoteStepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type
    return false;
 }
 
-void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
+void NoteStepSequencer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    int sequenceRows, pitchCols, pitchRows;
    GetPush2Layout(sequenceRows, pitchCols, pitchRows);
@@ -798,7 +798,7 @@ void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
             }
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
 
@@ -813,9 +813,9 @@ void NoteStepSequencer::UpdatePush2Leds(Push2Control* push2)
       unsigned char c = ledLow + (ledHigh << 3);
       touchStripLights += c;
    }
-   push2->GetDevice()->SendSysEx(touchStripLights);
+   abletonGrid->GetDevice()->SendSysEx(touchStripLights);
 
-   push2->SetLed(kMidiMessage_Control, push2->GetGridControllerOption1Control(), 127);
+   abletonGrid->SetLed(kMidiMessage_Control, abletonGrid->GetGridControllerOption1Control(), 127);
 }
 
 void NoteStepSequencer::OnTransportAdvanced(float amount)

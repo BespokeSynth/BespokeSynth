@@ -25,6 +25,10 @@
   ==============================================================================
 */
 
+#pragma once
+
+class MidiDevice;
+
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
 
 #include "leathers/push"
@@ -80,3 +84,24 @@ namespace AbletonDevice
    const int kNumQuantizeButtons = 8;
 }
 #include "leathers/pop"
+
+class IAbletonGridDevice
+{
+public:
+   virtual void SetLed(MidiMessageType type, int index, int color, int flashColor = -1) = 0;
+   virtual int GetGridControllerOption1Control() const = 0;
+   virtual int GetGridControllerOption2Control() const = 0;
+   virtual MidiDevice* GetDevice() = 0;
+   virtual void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) = 0;
+   virtual IDrawableModule* GetDisplayModule() const = 0;
+};
+
+//https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
+class IAbletonGridController
+{
+public:
+   virtual ~IAbletonGridController() {}
+   virtual void OnAbletonGridConnect() {}
+   virtual bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) = 0;
+   virtual void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) = 0;
+};

@@ -500,7 +500,7 @@ void NoteTable::GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool NoteTable::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {
@@ -577,7 +577,7 @@ bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int co
 
    if (type == kMidiMessage_Control)
    {
-      if (controlIndex == push2->GetGridControllerOption1Control())
+      if (controlIndex == abletonGrid->GetGridControllerOption1Control())
       {
          if (midiValue > 0)
          {
@@ -593,7 +593,7 @@ bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int co
    return false;
 }
 
-void NoteTable::UpdatePush2Leds(Push2Control* push2)
+void NoteTable::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    int sequenceRows, pitchCols, pitchRows;
    GetPush2Layout(sequenceRows, pitchCols, pitchRows);
@@ -684,11 +684,11 @@ void NoteTable::UpdatePush2Leds(Push2Control* push2)
             }
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
 
-   push2->SetLed(kMidiMessage_Control, push2->GetGridControllerOption1Control(), 127);
+   abletonGrid->SetLed(kMidiMessage_Control, abletonGrid->GetGridControllerOption1Control(), 127);
 }
 
 void NoteTable::DropdownUpdated(DropdownList* list, int oldVal, double time)

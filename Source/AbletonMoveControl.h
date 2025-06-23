@@ -33,13 +33,13 @@
 #include "TitleBar.h"
 #include "DropdownList.h"
 #include "AbletonMoveLCD.h"
+#include "AbletonDeviceShared.h"
 
 class IUIControl;
-class IAbletonMoveGridController;
 class Snapshots;
 class ControlRecorder;
 
-class AbletonMoveControl : public IDrawableModule, public MidiDeviceListener, public IDropdownListener
+class AbletonMoveControl : public IDrawableModule, public MidiDeviceListener, public IDropdownListener, public IAbletonGridDevice
 {
 public:
    AbletonMoveControl();
@@ -54,15 +54,15 @@ public:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 
-   void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
-   void SetDisplayModule(IDrawableModule* module, bool addToHistory = true);
-   IDrawableModule* GetDisplayModule() const { return mDisplayModule; }
+   void SetLed(MidiMessageType type, int index, int color, int flashColor = -1) override;
+   void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
+   IDrawableModule* GetDisplayModule() const override { return mDisplayModule; }
 
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
 
-   MidiDevice* GetDevice() { return &mDevice; }
+   MidiDevice* GetDevice() override { return &mDevice; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
@@ -73,8 +73,8 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
-   int GetGridControllerOption1Control() const;
-   int GetGridControllerOption2Control() const;
+   int GetGridControllerOption1Control() const override;
+   int GetGridControllerOption2Control() const override;
 
    static IUIControl* sBindToUIControl;
 
@@ -120,7 +120,7 @@ private:
    int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
    bool AllowRepatch() const;
    void UpdateRoutingModules();
-   void SetGridControlInterface(IAbletonMoveGridController* controller, IDrawableModule* module);
+   void SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module);
 
    AbletonMoveLCD mLCD;
 
@@ -205,7 +205,7 @@ private:
    };
    ScreenDisplayMode mScreenDisplayMode{ ScreenDisplayMode::kNormal };
 
-   IAbletonMoveGridController* mGridControlInterface{ nullptr };
+   IAbletonGridController* mGridControlInterface{ nullptr };
    IDrawableModule* mGridControlModule{ nullptr };
    bool mDisplayModuleCanControlGrid{ false };
 
@@ -217,14 +217,4 @@ private:
    int mPendingSpawnPitch{ -1 };
    int mSelectedGridSpawnListIndex{ -1 };
    std::string mPushBridgeInitErrMsg;
-};
-
-//https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
-class IAbletonMoveGridController
-{
-public:
-   virtual ~IAbletonMoveGridController() {}
-   virtual void OnAbletonMoveConnect() {}
-   virtual bool OnAbletonMoveControl(AbletonMoveControl* push2, MidiMessageType type, int controlIndex, float midiValue) = 0;
-   virtual void UpdateAbletonMoveLeds(AbletonMoveControl* push2) = 0;
 };
