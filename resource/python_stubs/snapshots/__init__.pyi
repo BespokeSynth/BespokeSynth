@@ -19,6 +19,6 @@ class snapshots:
    def store_snapshot(this, index, label = ""):
       pass
 
-   def delete_snapshot(this, ):
+   def delete_snapshot(this, index):
       pass
 
