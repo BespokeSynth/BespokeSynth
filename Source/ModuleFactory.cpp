@@ -273,7 +273,7 @@
 #include "LatencyCalculator.h"
 
 #ifdef BESPOKE_FLUIDSYNTH
-#include "FluidSynth.h"
+#include "FluidSynthModule.h"
 #endif
 
 #include <juce_core/juce_core.h>
