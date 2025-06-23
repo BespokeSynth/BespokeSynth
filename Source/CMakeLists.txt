@@ -200,7 +200,7 @@ target_sources(BespokeSynth PRIVATE
     FilterViz.h
     FloatSliderLFOControl.cpp
     FloatSliderLFOControl.h
-    $<$<STREQUAL:${BESPOKE_FLUIDSYNTH},ON>:FluidSynth.cpp FluidSynth.h>
+    $<$<STREQUAL:${BESPOKE_FLUIDSYNTH},ON>:FluidSynthModule.cpp FluidSynthModule.h>
     FollowingSong.cpp
     FollowingSong.h
     FormantFilterEffect.cpp

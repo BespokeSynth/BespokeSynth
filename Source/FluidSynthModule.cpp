@@ -23,7 +23,7 @@
 //
 //
 
-#include "FluidSynth.h"
+#include "FluidSynthModule.h"
 #include "IAudioReceiver.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
