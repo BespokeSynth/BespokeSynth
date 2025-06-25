@@ -730,9 +730,7 @@ PYBIND11_EMBEDDED_MODULE(snapshots, m)
          if (index >= 0 && index < snapshots.GetSize())
          {
             if (!label.empty())
-            {
                snapshots.SetLabel(index, label);
-            }
             snapshots.StoreSnapshot(index, true);
          }
       }, "index"_a, "label"_a = "")

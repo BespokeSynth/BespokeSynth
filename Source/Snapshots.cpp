@@ -308,13 +308,9 @@ void Snapshots::DrawModuleUnclipped()
 bool Snapshots::HasSnapshot(int index) const
 {
    if (index >= 0 && index < mSnapshotCollection.size())
-   {
       return !mSnapshotCollection[index].mSnapshots.empty();
-   }
    else
-   {
       return false;
-   }
 }
 
 
