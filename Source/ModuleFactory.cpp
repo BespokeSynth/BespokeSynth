@@ -270,6 +270,7 @@
 #include "Acciaccatura.h"
 #include "ModulatorWander.h"
 #include "StereoRotation.h"
+#include "LatencyCalculator.h"
 
 #include <juce_core/juce_core.h>
 
@@ -494,6 +495,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(Acciaccatura, acciaccatura, kModuleCategory_Note);
    REGISTER(ModulatorWander, wander, kModuleCategory_Modulator);
    REGISTER(StereoRotation, stereorotation, kModuleCategory_Audio);
+   REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
+   REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
