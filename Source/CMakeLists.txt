@@ -278,6 +278,8 @@ target_sources(BespokeSynth PRIVATE
     LFO.h
     LFOController.cpp
     LFOController.h
+    LatencyCalculator.cpp
+    LatencyCalculator.h
     LaunchpadInterpreter.cpp
     LaunchpadInterpreter.h
     LaunchpadKeyboard.cpp
