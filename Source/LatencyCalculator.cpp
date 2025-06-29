@@ -154,31 +154,30 @@ void LatencyCalculatorReceiver::Process(double time)
 
    SyncBuffers();
 
-   IAudioReceiver* target = GetTarget();
    int bufferSize = GetBuffer()->BufferSize();
+   float* in = GetBuffer()->GetChannel(0);
+   assert(bufferSize == gBufferSize);
 
-   if (target)
+   for (int i = 0; i < bufferSize; ++i)
    {
-      float* in = GetBuffer()->GetChannel(0);
-      assert(bufferSize == gBufferSize);
-
-      for (int i = 0; i < bufferSize; ++i)
+      if (mState == State::Testing)
       {
-         if (mState == State::Testing)
+         if (fabsf(in[i]) > .01f)
          {
-            if (fabsf(in[i]) > .01f)
-            {
-               mState = State::DisplayResult;
-               mTestEndTime = time;
-            }
+            mState = State::DisplayResult;
+            mTestEndTime = time;
          }
-
-         time += gInvSampleRateMs;
-
-         if (mState == State::Testing)
-            ++mTestSamplesElapsed;
       }
 
+      time += gInvSampleRateMs;
+
+      if (mState == State::Testing)
+         ++mTestSamplesElapsed;
+   }
+
+   IAudioReceiver* target = GetTarget();
+   if (target)
+   {
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());

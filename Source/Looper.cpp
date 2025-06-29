@@ -332,10 +332,13 @@ void Looper::Process(double time)
             output[ch] += GetInterpolatedSample(normalOffset, mBuffer->GetChannel(ch), mLoopLength) * (1 - mFourTet);
          }
 
-         //write one sample the past so we don't end up feeding into the next output
          float writeAmount = mWriteInputRamp.Value(time);
          if (writeAmount > 0)
-            WriteInterpolatedSample(offset - 1, mBuffer->GetChannel(ch), mLoopLength, mLastInputSample[ch] * writeAmount);
+         {
+            //write at least one sample the past so we don't end up feeding into the next output
+            int writeOffsetSamples = MAX(int(mWriteMsOffset * gSampleRateMs), 1);
+            WriteInterpolatedSample(offset - writeOffsetSamples, mBuffer->GetChannel(ch), mLoopLength, mLastInputSample[ch] * writeAmount);
+         }
          mLastInputSample[ch] = GetBuffer()->GetChannel(ch)[i];
 
          output[ch] = mSwitchAndRamp.Process(ch, output[ch] * volSq);
@@ -1269,7 +1272,7 @@ void Looper::PlayNote(NoteMessage note)
 void Looper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("decay", moduleInfo, false);
+   mModuleSaveData.LoadFloat("write_offset_ms", moduleInfo, 0, 0, 2000, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -1277,8 +1280,7 @@ void Looper::LoadLayout(const ofxJSONElement& moduleInfo)
 void Looper::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-
-   mDecay = mModuleSaveData.GetFloat("decay");
+   mWriteMsOffset = mModuleSaveData.GetFloat("write_offset_ms");
 }
 
 void Looper::SaveState(FileStreamOut& out)
