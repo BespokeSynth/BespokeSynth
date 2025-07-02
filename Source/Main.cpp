@@ -176,14 +176,17 @@ public:
          buffer,
          &bufferSize);
 
-         // Win32 registry values are in little endian
-         int i = int(buffer[3] << 24 |
-                     buffer[2] << 16 |
-                     buffer[1] << 8 |
-                     buffer[0]);
+         if (result == ERROR_SUCCESS)
+         {
+            // Windows registry values are in little endian
+            int i = int(buffer[3] << 24 |
+                        buffer[2] << 16 |
+                        buffer[1] << 8 |
+                        buffer[0]);
 
-         BOOL darkMode = i != 1;
-         DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &darkMode, sizeof(darkMode));
+            BOOL darkMode = i != 1;
+            DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &darkMode, sizeof(darkMode));
+         }
 #endif
       }
 
