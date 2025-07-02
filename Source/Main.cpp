@@ -17,6 +17,7 @@
 
 #if BESPOKE_WINDOWS
 #include <dwmapi.h>
+#include <windows.h>
 #endif
 
 using namespace juce;
@@ -164,8 +165,25 @@ public:
 #if BESPOKE_WINDOWS
          auto hwnd = getPeer()->getNativeHandle();
 
-         BOOL USE_DARK_MODE = true;
-         auto result = DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &USE_DARK_MODE, sizeof(USE_DARK_MODE));
+         char buffer[4];
+         DWORD bufferSize = sizeof(buffer);
+         auto result = RegGetValueW(
+         HKEY_CURRENT_USER,
+         L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+         L"AppsUseLightTheme",
+         RRF_RT_REG_DWORD,
+         nullptr,
+         buffer,
+         &bufferSize);
+
+         // Win32 registry values are in little endian
+         int i = int(buffer[3] << 24 |
+                     buffer[2] << 16 |
+                     buffer[1] << 8 |
+                     buffer[0]);
+
+         BOOL darkMode = i != 1;
+         DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &darkMode, sizeof(darkMode));
 #endif
       }
 
