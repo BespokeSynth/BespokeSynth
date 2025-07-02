@@ -15,6 +15,10 @@
 
 #include "VersionInfo.h"
 
+#if BESPOKE_WINDOWS
+#include <dwmapi.h>
+#endif
+
 using namespace juce;
 
 Component* createMainContentComponent();
@@ -156,6 +160,13 @@ public:
 
          centreWithSize(getWidth(), getHeight());
          setVisible(true);
+
+#if BESPOKE_WINDOWS
+         auto hwnd = getPeer()->getNativeHandle();
+
+         BOOL USE_DARK_MODE = true;
+         auto result = DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &USE_DARK_MODE, sizeof(USE_DARK_MODE));
+#endif
       }
 
       void closeButtonPressed() override
