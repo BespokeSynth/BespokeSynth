@@ -106,6 +106,14 @@ public:
 
       appProperties = std::make_unique<juce::ApplicationProperties>();
       appProperties->setStorageParameters(options);
+
+#if BESPOKE_WINDOWS
+      HWND hwnd = (HWND)this->mainWindow.get()->getWindowHandle();
+
+      BOOL darkMode = Desktop::getInstance().isDarkModeActive();
+      DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &darkMode, sizeof(darkMode));
+      UpdateWindow(hwnd);
+#endif
    }
 
    // Prints an error for arguments that expected an argument but were not given one
@@ -161,14 +169,6 @@ public:
 
          centreWithSize(getWidth(), getHeight());
          setVisible(true);
-
-#if BESPOKE_WINDOWS
-         auto hwnd = getPeer()->getNativeHandle();
-
-         BOOL darkMode = Desktop::getInstance().isDarkModeActive();
-         DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &darkMode, sizeof(darkMode));
-         UpdateWindow((HWND)hwnd);
-#endif
       }
 
       void closeButtonPressed() override
