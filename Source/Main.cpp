@@ -186,6 +186,7 @@ public:
 
             BOOL darkMode = i != 1;
             DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &darkMode, sizeof(darkMode));
+            UpdateWindow((HWND)hwnd);
          }
 #endif
       }
