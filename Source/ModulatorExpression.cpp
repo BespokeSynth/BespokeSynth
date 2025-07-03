@@ -55,9 +55,9 @@ void ModulatorExpression::CreateUIControls()
    mDSlider = new FloatSlider(this, "d", mCSlider, kAnchor_Below, 110, 15, &mD, -10, 10, 4);
    mESlider = new FloatSlider(this, "e", mDSlider, kAnchor_Below, 110, 15, &mE, -10, 10, 4);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 
    mSymbolTable.add_variable("x", mExpressionInput);
    mSymbolTable.add_variable("t", mT);

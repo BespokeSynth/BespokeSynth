@@ -119,19 +119,19 @@ MacroSlider::Mapping::~Mapping()
    mOwner->GetOwningContainer()->DeleteCablesForControl(mMaxSlider);
    mOwner->RemoveUIControl(mMinSlider);
    mOwner->RemoveUIControl(mMaxSlider);
-   mTargetCable->ClearPatchCables();
-   mOwner->RemovePatchCableSource(mTargetCable);
+   mTargetCableSource->ClearPatchCables();
+   mOwner->RemovePatchCableSource(mTargetCableSource);
 }
 
 void MacroSlider::Mapping::CreateUIControls()
 {
    mMinSlider = new FloatSlider(mOwner, ("start" + ofToString(mIndex + 1)).c_str(), 5, 25 + mIndex * kMappingSpacing, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(mOwner, ("end" + ofToString(mIndex + 1)).c_str(), 5, 39 + mIndex * kMappingSpacing, 100, 15, &mDummyMax, 0, 1);
-   mTargetCable = new PatchCableSource(mOwner, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   mTargetCable->SetManualPosition(110, 39 + mIndex * kMappingSpacing);
-   mTargetCable->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
-   mOwner->AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(mOwner, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   mTargetCableSource->SetManualPosition(110, 39 + mIndex * kMappingSpacing);
+   mTargetCableSource->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+   mOwner->AddPatchCableSource(mTargetCableSource);
 }
 
 void MacroSlider::Mapping::UpdateControl()

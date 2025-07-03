@@ -48,9 +48,9 @@ void VinylTempoControl::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mUseVinylControlCheckbox = new Checkbox(this, "control", 4, 2, &mUseVinylControl);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 }
 
 void VinylTempoControl::DrawModule()
@@ -146,9 +146,9 @@ void VinylTempoControl::LoadState(FileStreamIn& in, int rev)
    if (rev < 1)
    {
       // Temporary additional cable source
-      mTargetCable = new PatchCableSource(this, kConnectionType_Audio);
-      mTargetCable->SetModulatorOwner(this);
-      AddPatchCableSource(mTargetCable);
+      mTargetCableSource = new PatchCableSource(this, kConnectionType_Audio);
+      mTargetCableSource->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCableSource);
    }
 
    IDrawableModule::LoadState(in, rev);
@@ -159,7 +159,7 @@ void VinylTempoControl::LoadState(FileStreamIn& in, int rev)
       if (target != nullptr)
          GetPatchCableSource()->SetTarget(target);
       RemovePatchCableSource(GetPatchCableSource(1));
-      mTargetCable = GetPatchCableSource();
+      mTargetCableSource = GetPatchCableSource();
    }
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)

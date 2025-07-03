@@ -109,8 +109,8 @@ private:
       {
       }
       void UpdateControl() { OnModulatorRepatch(); }
-      void SetCableSource(PatchCableSource* cableSource) { mTargetCable = cableSource; }
-      PatchCableSource* GetCableSource() const { return mTargetCable; }
+      void SetCableSource(PatchCableSource* cableSource) { mTargetCableSource = cableSource; }
+      PatchCableSource* GetCableSource() const { return mTargetCableSource; }
 
       //IModulator
       virtual float Value(int samplesIn = 0) override;

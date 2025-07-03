@@ -1391,6 +1391,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    {
       std::vector<IDrawableModule*> newGroupSelectedModules;
       std::map<IDrawableModule*, IDrawableModule*> oldToNewModuleMap;
+      std::map<IDrawableModule*, IDrawableModule*> newToOldModuleMap;
       for (auto module : mGroupSelectedModules)
       {
          if (!module->IsSingleton())
@@ -1398,24 +1399,154 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
             IDrawableModule* newModule = DuplicateModule(module);
             newGroupSelectedModules.push_back(newModule);
             oldToNewModuleMap[module] = newModule;
+            newToOldModuleMap[newModule] = module;
 
             if (module == mLastClickedModule)
                mLastClickedModule = newModule;
          }
       }
-      for (auto module : newGroupSelectedModules)
+      auto updateCables = [&oldToNewModuleMap, &newToOldModuleMap](PatchCableSource* cableSource, PatchCable* cable)
       {
+         if (cable->GetTarget() == nullptr) // The duplicated cable has no target, so we need to check the original module cables to see if it should have a target.
+         {
+            // Acquire cable index
+            auto allCables = cableSource->GetPatchCables();
+            int cableIndex = -1;
+            for (auto i = 0; i < static_cast<int>(allCables.size()); i++)
+            {
+               if (allCables[i] == cable)
+               {
+                  cableIndex = i;
+                  break;
+               }
+            }
+            if (cableIndex == -1)
+               return;
+            // Try to find a parent module that is in the duplicated module list
+            IClickable* temp_module{ nullptr };
+            temp_module = dynamic_cast<IClickable*>(cableSource->GetModulatorOwner());
+            if (temp_module == nullptr)
+               temp_module = dynamic_cast<IClickable*>(cableSource->GetOwner());
+            if (temp_module == nullptr)
+               temp_module = cableSource->GetParent();
+            if (temp_module == nullptr)
+               return;
+            IDrawableModule *oldmodule{ nullptr }, *newmodule{ nullptr };
+            for (int i = 0; i < 10; i++) // Limit to 10 iterations to avoid infinite loops
+            {
+               newmodule = dynamic_cast<IDrawableModule*>(temp_module);
+               oldmodule = newToOldModuleMap[newmodule];
+               if (oldmodule != nullptr && newmodule != nullptr)
+                  break;
+               temp_module = temp_module->GetParent();
+               if (!temp_module)
+                  break;
+            }
+            if (oldmodule == nullptr || newmodule == nullptr)
+               return;
+            // Acquire cable source index
+            int cableSourceIndex = -1;
+            for (auto i = 0; i < newmodule->GetPatchCableSources().size(); i++)
+            {
+               if (newmodule->GetPatchCableSources()[i] == cableSource)
+               {
+                  cableSourceIndex = i;
+                  break;
+               }
+            }
+            if (cableSourceIndex == -1)
+               return;
+            // See if we have a target in the orignal module
+            auto oldCableSource = oldmodule->GetPatchCableSources()[cableSourceIndex];
+            if (oldCableSource == nullptr)
+               return;
+            auto oldCable = oldCableSource->GetPatchCables()[cableIndex];
+            if (oldCable == nullptr)
+               return;
+            if (oldCable->GetTarget() == nullptr)
+               return;
+            // Try to find a parent module that is in the duplicated module list
+            temp_module = oldCable->GetTarget();
+            oldmodule = newmodule = nullptr;
+            for (int i = 0; i < 10; i++) // Limit to 10 iterations to avoid infinite loops
+            {
+               oldmodule = dynamic_cast<IDrawableModule*>(temp_module);
+               newmodule = oldToNewModuleMap[oldmodule];
+               if (oldmodule != nullptr && newmodule != nullptr)
+                  break;
+               temp_module = temp_module->GetParent();
+               if (!temp_module)
+                  break;
+            }
+            if (oldmodule == nullptr || newmodule == nullptr)
+               return;
+            // Transform the old path to new path so we acquire our new target
+            auto oldpath = oldmodule->Path();
+            auto newpath = newmodule->Path();
+            auto targetpath = oldCable->GetTarget()->Path();
+            ofStringReplace(targetpath, oldpath, newpath, true);
+            IClickable* newtarget = TheSynth->FindUIControl(targetpath);
+            if (newtarget == nullptr)
+               newtarget = TheSynth->FindModule(targetpath);
+            if (newtarget == nullptr)
+               return;
+            // Set the new target
+            cableSource->SetPatchCableTarget(cable, newtarget, false);
+            auto modulationOwner = cableSource->GetModulatorOwner();
+            if (modulationOwner)
+               modulationOwner->OnModulatorRepatch();
+            return;
+         } // The duplicated cable has a target, so we need to update it
+         // Try to find a parent module that is in the duplicated module list
+         auto temp_module = cable->GetTarget();
+         IDrawableModule *oldmodule, *newmodule;
+         for (int i = 0; i < 10; i++)
+         {
+            oldmodule = dynamic_cast<IDrawableModule*>(temp_module);
+            newmodule = oldToNewModuleMap[oldmodule];
+            if (oldmodule != nullptr && newmodule != nullptr)
+               break;
+            temp_module = temp_module->GetParent();
+            if (!temp_module)
+               break;
+         }
+         if (oldmodule == nullptr || newmodule == nullptr)
+            return;
+         // Find the new target using the path
+         auto oldpath = oldmodule->Path();
+         auto newpath = newmodule->Path();
+         auto targetpath = cable->GetTarget()->Path();
+         ofStringReplace(targetpath, oldpath, newpath, true);
+         IClickable* newtarget = TheSynth->FindUIControl(targetpath);
+         if (newtarget == nullptr)
+            newtarget = TheSynth->FindModule(targetpath);
+         if (newtarget == nullptr)
+            return;
+         // Set the new target
+         cableSource->SetPatchCableTarget(cable, newtarget, false);
+         auto modulationOwner = cableSource->GetModulatorOwner();
+         if (modulationOwner)
+            modulationOwner->OnModulatorRepatch();
+      };
+      std::function<void(IDrawableModule*)> checkModuleCables =
+      [&updateCables, &checkModuleCables](IDrawableModule* module)
+      {
+         auto mod = dynamic_cast<IModulator*>(module);
          for (auto* cableSource : module->GetPatchCableSources())
          {
             for (auto* cable : cableSource->GetPatchCables())
             {
-               if (VectorContains(dynamic_cast<IDrawableModule*>(cable->GetTarget()), mGroupSelectedModules))
-               {
-                  cableSource->SetPatchCableTarget(cable, oldToNewModuleMap[dynamic_cast<IDrawableModule*>(cable->GetTarget())], false);
-               }
+               updateCables(cableSource, cable);
             }
          }
-      }
+         for (const auto child : module->GetChildren())
+         {
+            checkModuleCables(child); // Check children (Prefabs for instance.)
+         }
+      };
+      for (const auto module : newGroupSelectedModules)
+         checkModuleCables(module);
+
       mGroupSelectedModules = newGroupSelectedModules;
 
       if (mMoveModule && !mMoveModule->IsSingleton())

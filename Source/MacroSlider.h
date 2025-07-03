@@ -79,7 +79,7 @@ private:
       void CreateUIControls();
       void UpdateControl();
       void Draw();
-      PatchCableSource* GetCableSource() const { return mTargetCable; }
+      PatchCableSource* GetCableSource() const { return mTargetCableSource; }
 
       //IModulator
       virtual float Value(int samplesIn = 0) override;

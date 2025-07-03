@@ -44,9 +44,9 @@ void AudioToCV::CreateUIControls()
    mMinSlider = new FloatSlider(this, "min", mGainSlider, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 }
 
 AudioToCV::~AudioToCV()
@@ -133,9 +133,9 @@ void AudioToCV::LoadState(FileStreamIn& in, int rev)
    if (rev < 1)
    {
       // Temporary additional cable source
-      mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-      mTargetCable->SetModulatorOwner(this);
-      AddPatchCableSource(mTargetCable);
+      mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+      mTargetCableSource->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCableSource);
    }
 
    IDrawableModule::LoadState(in, rev);
@@ -146,7 +146,7 @@ void AudioToCV::LoadState(FileStreamIn& in, int rev)
       if (target != nullptr)
          GetPatchCableSource()->SetTarget(target);
       RemovePatchCableSource(GetPatchCableSource(1));
-      mTargetCable = GetPatchCableSource();
+      mTargetCableSource = GetPatchCableSource();
    }
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)

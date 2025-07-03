@@ -59,9 +59,9 @@ void ControlRecorder::CreateUIControls()
 
    mDisplayStartY = controlH + 3;
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 
    mQuantizeLengthSelector->AddLabel("8n", kInterval_8n);
    mQuantizeLengthSelector->AddLabel("4n", kInterval_4n);
