@@ -40,6 +40,7 @@
 #include "EnvelopeModulator.h"
 #include "DrumPlayer.h"
 #include "VSTPlugin.h"
+#include "Snapshots.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -695,6 +696,48 @@ PYBIND11_EMBEDDED_MODULE(vstplugin, m)
    {
       vstplugin.SendMidi(juce::MidiMessage(a, b, c));
    });
+}
+
+PYBIND11_EMBEDDED_MODULE(snapshots, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<Snapshots*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<Snapshots, IDrawableModule>(m, "snapshots")
+      .def("get_size", [](Snapshots& snapshots)
+      {
+         return snapshots.GetSize();
+      })
+      .def("get_current_snapshot", [](Snapshots& snapshots)
+      {
+         return snapshots.GetCurrentSnapshot();
+      })
+      .def("has_snapshot", [](Snapshots& snapshots, int index)
+      {
+         return snapshots.HasSnapshot(index);
+      })
+      .def("set_snapshot", [](Snapshots& snapshots, int index)
+      {
+         snapshots.SetSnapshot(index, gTime);
+      })
+      .def("store_snapshot", [](Snapshots& snapshots, int index, std::string label)
+      {
+         if (index >= 0 && index < snapshots.GetSize())
+         {
+            if (!label.empty())
+               snapshots.SetLabel(index, label);
+            snapshots.StoreSnapshot(index, true);
+         }
+      }, "index"_a, "label"_a = "")
+      .def("delete_snapshot", [](Snapshots& snapshots, int index)
+      {
+         snapshots.DeleteSnapshot(index);
+      });
 }
 
 PYBIND11_EMBEDDED_MODULE(module, m)

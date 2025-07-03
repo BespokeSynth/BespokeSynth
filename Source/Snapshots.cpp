@@ -307,8 +307,12 @@ void Snapshots::DrawModuleUnclipped()
 
 bool Snapshots::HasSnapshot(int index) const
 {
-   return !mSnapshotCollection[index].mSnapshots.empty();
+   if (index >= 0 && index < mSnapshotCollection.size())
+      return !mSnapshotCollection[index].mSnapshots.empty();
+   else
+      return false;
 }
+
 
 void Snapshots::UpdateGridValues()
 {
@@ -665,6 +669,17 @@ void Snapshots::DeleteSnapshot(int idx)
       coll.mSnapshots.clear();
       coll.mLabel = "snapshot" + ofToString(idx);
       mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
+
+      UpdateGridValues();
+   }
+}
+
+void Snapshots::SetLabel(int idx, const std::string& label)
+{
+   if (idx >= 0 && idx < mSnapshotCollection.size() && !label.empty())
+   {
+      mSnapshotCollection[idx].mLabel = label;
+      mCurrentSnapshotSelector->SetLabel(label, idx);
    }
 }
 

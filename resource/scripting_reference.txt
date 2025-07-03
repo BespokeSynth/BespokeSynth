@@ -204,6 +204,19 @@ import vstplugin
       v.send_data(a, b, c)
 
 
+import snapshots
+   static:
+      snapshots.get(path)
+   instance:
+      s.get_size()
+      s.get_current_snapshot()
+      s.has_snapshot(index)
+      s.set_snapshot(index)
+      s.store_snapshot(index, label)
+         optional: label
+      s.delete_snapshot(index)
+
+
 import module
    static:
       module.get(path)
