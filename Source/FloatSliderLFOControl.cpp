@@ -283,10 +283,10 @@ void FloatSliderLFOControl::RandomizeSettings()
 
 void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (mTargetCable == nullptr)
+   if (mTargetCableSource == nullptr)
       return;
-   if (GetSliderTarget() != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
-      SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
+   if (GetSliderTarget() != mTargetCableSource->GetTarget() || mTargetCableSource->GetTarget() == nullptr)
+      SetOwner(dynamic_cast<FloatSlider*>(mTargetCableSource->GetTarget()));
    OnModulatorRepatch();
 }
 
@@ -455,12 +455,12 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button, double time)
 
          SetName(GetUniqueName("lfo", TheSynth->GetModuleNames<FloatSliderLFOControl*>()).c_str());
 
-         if (mTargetCable == nullptr)
+         if (mTargetCableSource == nullptr)
          {
-            mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-            mTargetCable->SetModulatorOwner(this);
-            AddPatchCableSource(mTargetCable);
-            mTargetCable->SetTarget(GetSliderTarget());
+            mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+            mTargetCableSource->SetModulatorOwner(this);
+            AddPatchCableSource(mTargetCableSource);
+            mTargetCableSource->SetTarget(GetSliderTarget());
          }
       }
    }
@@ -485,11 +485,11 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    UpdateFromSettings();
    UpdateVisibleControls();
 
-   if (mTargetCable == nullptr)
+   if (mTargetCableSource == nullptr)
    {
-      mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-      mTargetCable->SetModulatorOwner(this);
-      AddPatchCableSource(mTargetCable);
+      mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+      mTargetCableSource->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCableSource);
    }
 }
 

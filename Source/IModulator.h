@@ -48,6 +48,16 @@ public:
    float GetRecentChange() const;
    void OnRemovedFrom(IUIControl* control);
    int GetNumTargets() const;
+   IUIControl* GetTarget(int index) const
+   {
+      if (index < 0 || index >= static_cast<int>(mTargets.size()))
+         return nullptr;
+      if (mTargets[index].mSliderTarget != nullptr)
+         return mTargets[index].mSliderTarget;
+      if (mTargets[index].mUIControlTarget != nullptr)
+         return mTargets[index].mUIControlTarget;
+      return nullptr;
+   }
 
 protected:
    void InitializeRange(float currentValue, float min, float max, FloatSlider::Mode sliderMode);
@@ -65,7 +75,7 @@ protected:
       bool RequiresManualPolling() { return mUIControlTarget != nullptr && mSliderTarget == nullptr; }
    };
 
-   PatchCableSource* mTargetCable{ nullptr };
+   PatchCableSource* mTargetCableSource{ nullptr };
    FloatSlider* mMinSlider{ nullptr };
    FloatSlider* mMaxSlider{ nullptr };
    std::array<Target, 10> mTargets;

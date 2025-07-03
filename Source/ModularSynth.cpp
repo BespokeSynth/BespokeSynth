@@ -1391,6 +1391,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    {
       std::vector<IDrawableModule*> newGroupSelectedModules;
       std::map<IDrawableModule*, IDrawableModule*> oldToNewModuleMap;
+      std::map<IDrawableModule*, IDrawableModule*> newToOldModuleMap;
       for (auto module : mGroupSelectedModules)
       {
          if (!module->IsSingleton())
@@ -1398,16 +1399,117 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
             IDrawableModule* newModule = DuplicateModule(module);
             newGroupSelectedModules.push_back(newModule);
             oldToNewModuleMap[module] = newModule;
+            newToOldModuleMap[newModule] = module;
 
             if (module == mLastClickedModule)
                mLastClickedModule = newModule;
          }
       }
-      TheSynth->FindUIControl("");
-      auto updateCables = [&oldToNewModuleMap](PatchCableSource* cableSource, PatchCable* cable)
+      auto updateCables = [&oldToNewModuleMap, &newToOldModuleMap](PatchCableSource* cableSource, PatchCable* cable)
       {
          if (cable->GetTarget() == nullptr)
+         {
+            ofLog() << "- No Target";
+            auto allCables = cableSource->GetPatchCables();
+            int cableIndex = -1;
+            for (auto i = 0; i < static_cast<int>(allCables.size()); i++)
+            {
+               if (allCables[i] == cable)
+               {
+                  cableIndex = i;
+                  break;
+               }
+            }
+            ofLog() << "-  cableIndex: " << cableIndex;
+            if (cableIndex == -1)
+               return;
+            IClickable* temp_module{ nullptr };
+            temp_module = dynamic_cast<IClickable*>(cableSource->GetModulatorOwner());
+            if (temp_module == nullptr)
+               temp_module = dynamic_cast<IClickable*>(cableSource->GetOwner());
+            if (temp_module == nullptr)
+               temp_module = cableSource->GetParent();
+            if (temp_module == nullptr)
+               return;
+            ofLog() << "-  temp_module: " << (temp_module ? temp_module->Path() : "nullptr");
+            IDrawableModule *oldmodule{ nullptr }, *newmodule{ nullptr };
+            for (int i = 0; i < 10; i++)
+            {
+               newmodule = dynamic_cast<IDrawableModule*>(temp_module);
+               oldmodule = newToOldModuleMap[newmodule];
+               if (oldmodule != nullptr && newmodule != nullptr)
+                  break;
+               temp_module = temp_module->GetParent();
+               if (!temp_module)
+                  break;
+            }
+            ofLog() << "-  newmodule: " << (newmodule ? newmodule->Path() : "nullptr");
+            ofLog() << "-  oldmodule: " << (oldmodule ? oldmodule->Path() : "nullptr");
+            if (oldmodule == nullptr || newmodule == nullptr)
+               return;
+            int cableSourceIndex = -1;
+            ofLog() << "-   oldmodule PCS size: " << oldmodule->GetPatchCableSources().size();
+            ofLog() << "-   newmodule PCS size: " << newmodule->GetPatchCableSources().size();
+            for (auto i = 0; i < newmodule->GetPatchCableSources().size(); i++)
+            {
+               if (newmodule->GetPatchCableSources()[i] == cableSource)
+               {
+                  cableSourceIndex = i;
+                  break;
+               }
+            }
+            ofLog() << "-  cableSourceIndex: " << cableSourceIndex;
+            if (cableSourceIndex == -1)
+               return;
+            auto oldCableSource = oldmodule->GetPatchCableSources()[cableSourceIndex];
+            ofLog() << "-  oldCableSource: " << (oldCableSource ? oldCableSource->Name() : "nullptr");
+            if (oldCableSource == nullptr)
+               return;
+            auto oldCable = oldCableSource->GetPatchCables()[cableIndex];
+            ofLog() << "-  oldCable: " << (oldCable ? oldCable->Name() : "nullptr");
+            if (oldCable == nullptr)
+               return;
+            ofLog() << "-  oldCable->GetTarget(): " << (oldCable->GetTarget() ? oldCable->GetTarget()->Path() : "nullptr");
+            if (oldCable->GetTarget() == nullptr)
+               return;
+            // Try to find a parent module that is in the new module list
+            temp_module = oldCable->GetTarget();
+            oldmodule = newmodule = nullptr;
+            for (int i = 0; i < 10; i++)
+            {
+               oldmodule = dynamic_cast<IDrawableModule*>(temp_module);
+               newmodule = oldToNewModuleMap[oldmodule];
+               if (oldmodule != nullptr && newmodule != nullptr)
+                  break;
+               temp_module = temp_module->GetParent();
+               if (!temp_module)
+                  break;
+            }
+            if (oldmodule == nullptr || newmodule == nullptr)
+               return;
+
+            auto oldpath = oldmodule->Path();
+            ofLog() << "-   oldpath: " << oldpath;
+            auto newpath = newmodule->Path();
+            ofLog() << "-   newpath: " << newpath;
+
+            auto targetpath = oldCable->GetTarget()->Path();
+
+            ofLog() << "-  old: " << targetpath;
+            ofStringReplace(targetpath, oldpath, newpath, true);
+            ofLog() << "-  new: " << targetpath;
+            IClickable* newtarget = TheSynth->FindUIControl(targetpath);
+            if (newtarget == nullptr)
+               newtarget = TheSynth->FindModule(targetpath);
+            if (newtarget == nullptr)
+               return;
+            ofLog() << "-   target: " << newtarget->Path();
+            cableSource->SetPatchCableTarget(cable, newtarget, false);
+            auto modulationOwner = cableSource->GetModulatorOwner();
+            if (modulationOwner)
+               modulationOwner->OnModulatorRepatch();
             return;
+         }
          // Try to find a parent module that is in the new module list
          auto temp_module = cable->GetTarget();
          IDrawableModule *oldmodule, *newmodule;
@@ -1427,24 +1529,30 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
          auto oldpath = oldmodule->Path();
          auto newpath = newmodule->Path();
          auto targetpath = cable->GetTarget()->Path();
-         ofLog() << " op " << oldpath << " np " << newpath << " tp " << targetpath;
+         ofLog() << " old: " << targetpath;
          ofStringReplace(targetpath, oldpath, newpath, true);
-         ofLog() << " tp " << targetpath;
-         IClickable* newtarget;
-         if (dynamic_cast<IUIControl*>(cable->GetTarget()))
-            newtarget = TheSynth->FindUIControl(targetpath);
-         else
+         ofLog() << " new: " << targetpath;
+         IClickable* newtarget = TheSynth->FindUIControl(targetpath);
+         if (newtarget == nullptr)
             newtarget = TheSynth->FindModule(targetpath);
-
+         if (newtarget == nullptr)
+            return;
          cableSource->SetPatchCableTarget(cable, newtarget, false);
+         auto modulationOwner = cableSource->GetModulatorOwner();
+         if (modulationOwner)
+            modulationOwner->OnModulatorRepatch();
       };
-      std::function<void(IDrawableModule*)> checkModuleCables;
-      checkModuleCables = [&updateCables, &checkModuleCables](IDrawableModule* module)
+      std::function<void(IDrawableModule*)> checkModuleCables =
+      [&updateCables, &checkModuleCables](IDrawableModule* module)
       {
+         auto mod = dynamic_cast<IModulator*>(module);
+         ofLog() << "Checking module: " << module->Name() << " S: " << module->GetPatchCableSources().size() << " IMod: " << (mod != nullptr);
          for (auto* cableSource : module->GetPatchCableSources())
          {
+            ofLog() << " CableSource: " << cableSource->Name() << " C: " << cableSource->GetPatchCables().size();
             for (auto* cable : cableSource->GetPatchCables())
             {
+               ofLog() << "  Cable: " << cable->Name() << " T: " << (cable->GetTarget() ? cable->GetTarget()->Path() : "nullptr");
                updateCables(cableSource, cable);
             }
          }

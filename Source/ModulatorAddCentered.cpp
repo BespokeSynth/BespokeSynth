@@ -42,9 +42,9 @@ void ModulatorAddCentered::CreateUIControls()
    mValue2Slider = new FloatSlider(this, "value 2", mValue1Slider, kAnchor_Below, 100, 15, &mValue2, -1, 1);
    mValue2RangeSlider = new FloatSlider(this, "range 2", mValue2Slider, kAnchor_Below, 100, 15, &mValue2Range, 0, 1);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 }
 
 ModulatorAddCentered::~ModulatorAddCentered()
