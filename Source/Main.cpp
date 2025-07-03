@@ -18,6 +18,7 @@
 #if BESPOKE_WINDOWS
 #include <dwmapi.h>
 #include <windows.h>
+#include <string>
 #endif
 
 using namespace juce;
@@ -165,24 +166,37 @@ public:
 #if BESPOKE_WINDOWS
          auto hwnd = getPeer()->getNativeHandle();
 
-         char buffer[4];
-         DWORD bufferSize = sizeof(buffer);
-         auto result = RegGetValueW(
+         char themeBuffer[4];
+         DWORD themeBufferSize = sizeof(themeBuffer);
+         auto themeResult = RegGetValueW(
          HKEY_CURRENT_USER,
          L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
          L"AppsUseLightTheme",
          RRF_RT_REG_DWORD,
          nullptr,
-         buffer,
-         &bufferSize);
+         themeBuffer,
+         &themeBufferSize);
 
-         if (result == ERROR_SUCCESS)
+         WCHAR versionBuffer[512];
+         DWORD versionBufferSize = sizeof(versionBuffer);
+         auto versionResult = RegGetValueW(
+         HKEY_LOCAL_MACHINE,
+         L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+         L"CurrentBuildNumber",
+         RRF_RT_ANY,
+         nullptr,
+         versionBuffer,
+         &versionBufferSize);
+
+         int versionNumber = versionResult == ERROR_SUCCESS ? std::stoi(versionBuffer) : 0;
+
+         if (themeResult == ERROR_SUCCESS && versionNumber > 2200)
          {
             // Windows registry values are in little endian
-            int i = int(buffer[3] << 24 |
-                        buffer[2] << 16 |
-                        buffer[1] << 8 |
-                        buffer[0]);
+            int i = int(themeBuffer[3] << 24 |
+                        themeBuffer[2] << 16 |
+                        themeBuffer[1] << 8 |
+                        themeBuffer[0]);
 
             BOOL darkMode = i != 1;
             DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &darkMode, sizeof(darkMode));
