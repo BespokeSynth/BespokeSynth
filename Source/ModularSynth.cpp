@@ -1422,7 +1422,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
             }
             if (cableIndex == -1)
                return;
-            // Find the new and old module matching pair
+            // Try to find a parent module that is in the duplicated module list
             IClickable* temp_module{ nullptr };
             temp_module = dynamic_cast<IClickable*>(cableSource->GetModulatorOwner());
             if (temp_module == nullptr)
@@ -1432,7 +1432,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
             if (temp_module == nullptr)
                return;
             IDrawableModule *oldmodule{ nullptr }, *newmodule{ nullptr };
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++) // Limit to 10 iterations to avoid infinite loops
             {
                newmodule = dynamic_cast<IDrawableModule*>(temp_module);
                oldmodule = newToOldModuleMap[newmodule];
@@ -1465,10 +1465,10 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
                return;
             if (oldCable->GetTarget() == nullptr)
                return;
-            // Try to find a parent module that is in the new module list
+            // Try to find a parent module that is in the duplicated module list
             temp_module = oldCable->GetTarget();
             oldmodule = newmodule = nullptr;
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++) // Limit to 10 iterations to avoid infinite loops
             {
                oldmodule = dynamic_cast<IDrawableModule*>(temp_module);
                newmodule = oldToNewModuleMap[oldmodule];
@@ -1497,7 +1497,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
                modulationOwner->OnModulatorRepatch();
             return;
          } // The duplicated cable has a target, so we need to update it
-         // Try to find a parent module that is in the new module list
+         // Try to find a parent module that is in the duplicated module list
          auto temp_module = cable->GetTarget();
          IDrawableModule *oldmodule, *newmodule;
          for (int i = 0; i < 10; i++)
