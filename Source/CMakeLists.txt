@@ -127,6 +127,8 @@ target_sources(BespokeSynth PRIVATE
     CommentDisplay.h
     Compressor.cpp
     Compressor.h
+    ControlInterface.cpp
+    ControlInterface.h
     ControlRecorder.cpp
     ControlRecorder.h
     ControlSequencer.cpp
