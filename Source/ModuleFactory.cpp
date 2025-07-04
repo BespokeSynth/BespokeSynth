@@ -263,6 +263,7 @@
 #include "LabelDisplay.h"
 #include "ControlRecorder.h"
 #include "EuclideanSequencer.h"
+#include "ControlInterface.h"
 #include "SaveStateLoader.h"
 #include "DataProvider.h"
 #include "PulseLimit.h"
@@ -488,6 +489,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(VoiceSetter, voicesetter, kModuleCategory_Note);
    REGISTER(ControlRecorder, controlrecorder, kModuleCategory_Modulator);
    REGISTER(EuclideanSequencer, euclideansequencer, kModuleCategory_Instrument);
+   REGISTER(ControlInterface, interface, kModuleCategory_Modulator);
    REGISTER(SaveStateLoader, savestateloader, kModuleCategory_Other);
    REGISTER(DataProvider, dataprovider, kModuleCategory_Modulator);
    REGISTER(PulseLimit, pulselimit, kModuleCategory_Pulse);
