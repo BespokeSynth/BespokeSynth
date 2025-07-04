@@ -15,6 +15,11 @@
 
 #include "VersionInfo.h"
 
+#if BESPOKE_WINDOWS
+#include <dwmapi.h>
+#include <windows.h>
+#endif
+
 using namespace juce;
 
 Component* createMainContentComponent();
@@ -101,6 +106,14 @@ public:
 
       appProperties = std::make_unique<juce::ApplicationProperties>();
       appProperties->setStorageParameters(options);
+
+#if BESPOKE_WINDOWS
+      HWND hwnd = (HWND)this->mainWindow.get()->getWindowHandle();
+
+      BOOL darkMode = Desktop::getInstance().isDarkModeActive();
+      DwmSetWindowAttribute((HWND)hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &darkMode, sizeof(darkMode));
+      UpdateWindow(hwnd);
+#endif
    }
 
    // Prints an error for arguments that expected an argument but were not given one

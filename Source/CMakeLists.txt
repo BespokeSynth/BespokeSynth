@@ -851,6 +851,7 @@ if (APPLE)
     endif()
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
+    target_link_libraries(BespokeSynth PRIVATE "dwmapi.lib")
 
     IF (MINGW)
         target_link_libraries(BespokeSynth PRIVATE iphlpapi)
