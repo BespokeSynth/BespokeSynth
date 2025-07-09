@@ -48,8 +48,8 @@ void IModulator::OnModulatorRepatch()
    for (size_t i = 0; i < mTargets.size(); ++i)
    {
       IUIControl* newTarget = nullptr;
-      if (mTargetCable != nullptr && i < mTargetCable->GetPatchCables().size())
-         newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[i]->GetTarget());
+      if (mTargetCableSource != nullptr && i < mTargetCableSource->GetPatchCables().size())
+         newTarget = dynamic_cast<IUIControl*>(mTargetCableSource->GetPatchCables()[i]->GetTarget());
       if (newTarget != mTargets[i].mUIControlTarget)
       {
          if (mTargets[i].mSliderTarget != nullptr && mTargets[i].mSliderTarget->GetModulator() == this)
@@ -136,16 +136,16 @@ float IModulator::GetRecentChange() const
 
 void IModulator::OnRemovedFrom(IUIControl* control)
 {
-   if (mTargetCable)
+   if (mTargetCableSource)
    {
-      auto& cables = mTargetCable->GetPatchCables();
+      auto& cables = mTargetCableSource->GetPatchCables();
       for (size_t i = 0; i < mTargets.size(); ++i)
       {
          for (auto& cable : cables)
          {
             if (cable->GetTarget() == control && cable->GetTarget() == mTargets[i].mUIControlTarget)
             {
-               mTargetCable->RemovePatchCable(cable);
+               mTargetCableSource->RemovePatchCable(cable);
                break;
             }
          }
