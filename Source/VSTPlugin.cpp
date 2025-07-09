@@ -334,10 +334,10 @@ void VSTPlugin::AddExtraOutputCable()
 
 void VSTPlugin::RemoveExtraOutputCable()
 {
-   if ((int)mAdditionalOutCables.size() == 0)
+   if (static_cast<int>(mAdditionalOutCables.size()) == 0)
       return;
 
-   int IndexToRemove = (int)mAdditionalOutCables.size() - 1;
+   int IndexToRemove = static_cast<int>(mAdditionalOutCables.size()) - 1;
 
    mAdditionalOutCables.pop_back();
    mAdditionalVizBuffers.pop_back();
@@ -352,16 +352,14 @@ void VSTPlugin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   RecreateUIOutputCables();
-
    mVolSlider = new FloatSlider(this, "vol", 3, 3, 80, 15, &mVol, 0, 4);
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
    mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 110);
    mSavePresetFileButton = new ClickButton(this, "save as", -1, -1);
    mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 38, &mShowParameterIndex, 160);
-   mPanicButton = new ClickButton(this, "panic", 166, 38);
-   mAddExtraOutputButton = new ClickButton(this, "+", 86, 56);
-   mRemoveExtraOutputButton = new ClickButton(this, " - ", 105, 56);
+   mPanicButton = new ClickButton(this, "panic", mShowParameterDropdown, kAnchor_Right);
+   mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 56);
+   mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
 
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
@@ -377,28 +375,43 @@ void VSTPlugin::CreateUIControls()
       CreateParameterSliders();
    }
 
-   //const auto* editor = mPlugin->createEditor();
+   RecreateUIOutputCables();
 }
 
 void VSTPlugin::RecreateUIOutputCables()
 {
-   int NumCables = (int)mAdditionalOutCables.size() + 1;
-   int UIWidth = 208;
-   int DesiredGap = 15;
-   int IconWidth = 5;
-   int CableFullUIWidth = (DesiredGap + IconWidth);
-   int StartPos = (UIWidth / 2) - ((NumCables - 1) * ((CableFullUIWidth / 2)) + (IconWidth / 2));
+   // Need to recalculate slider postitions so that the cablesources can be positioned correctly on load (before a draw call).
+   constexpr int kRows = 20;
+   int sliderCount{ 0 };
+   for (const auto& slider : mParameterSliders)
+   {
+      if (slider.mSlider)
+      {
+         slider.mSlider->SetShowing(slider.mShowing);
+         if (slider.mShowing)
+         {
+            slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 74 + (17 * (sliderCount % kRows)));
+            ++sliderCount;
+         }
+      }
+   }
+
+   float width, height;
+   GetModuleDimensions(width, height);
+
+   auto NumCables = static_cast<float>(mAdditionalOutCables.size()) + 1;
+   float DesiredGap = width / (NumCables + 1);
 
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
-   GetPatchCableSource()->SetManualPosition(StartPos, 79); // 93, very middle, next one is way off?
+   GetPatchCableSource()->SetManualPosition(DesiredGap, height + 3);
 
    for (int CableCount = 0; CableCount < NumCables - 1; CableCount++)
    {
-      int NewOffset = StartPos + ((CableCount + 1) * CableFullUIWidth);
+      float NewOffset = DesiredGap + ((CableCount + 1) * DesiredGap);
 
       PatchCableSource* NewSource = mAdditionalOutCableSources[CableCount];
       NewSource->SetManualSide(PatchCableSource::Side::kBottom);
-      NewSource->SetManualPosition(NewOffset, 79);
+      NewSource->SetManualPosition(NewOffset, height + 3);
    }
 
    GetBuffer()->SetMaxAllowedChannels(NumCables);
@@ -654,29 +667,27 @@ void VSTPlugin::Poll()
          }
       }
    }
-   if (mDisplayMode == kDisplayMode_Sliders)
+
+   for (int i = 0; i < mParameterSliders.size(); ++i)
    {
-      for (int i = 0; i < mParameterSliders.size(); ++i)
+      float value = mParameterSliders[i].mParameter->getValue();
+      if (mParameterSliders[i].mValue != value)
+         mParameterSliders[i].mValue = value;
+   }
+
+   if (mChangeGestureParameterIndex != -1)
+   {
+      if (mChangeGestureParameterIndex < (int)mParameterSliders.size() &&
+          !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList &&
+          mTemporarilyDisplayedParamIndex != mChangeGestureParameterIndex)
       {
-         float value = mParameterSliders[i].mParameter->getValue();
-         if (mParameterSliders[i].mValue != value)
-            mParameterSliders[i].mValue = value;
+         if (mTemporarilyDisplayedParamIndex != -1)
+            mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
+         mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
+         mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mDisplayName, mChangeGestureParameterIndex);
       }
 
-      if (mChangeGestureParameterIndex != -1)
-      {
-         if (mChangeGestureParameterIndex < (int)mParameterSliders.size() &&
-             !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList &&
-             mTemporarilyDisplayedParamIndex != mChangeGestureParameterIndex)
-         {
-            if (mTemporarilyDisplayedParamIndex != -1)
-               mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
-            mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mDisplayName, mChangeGestureParameterIndex);
-         }
-
-         mChangeGestureParameterIndex = -1;
-      }
+      mChangeGestureParameterIndex = -1;
    }
 
    if (mWantOpenVstWindow)
@@ -1072,24 +1083,6 @@ void VSTPlugin::SetEnabled(bool enabled)
    mEnabled = enabled;
 }
 
-void VSTPlugin::PreDrawModule()
-{
-   /*if (mDisplayMode == kDisplayMode_PluginOverlay && mWindowOverlay)
-   {
-      mWindowOverlay->GetDimensions(mOverlayWidth, mOverlayHeight);
-      if (mWindow)
-      {
-         mOverlayWidth = 500;
-         mOverlayHeight = 500;
-         float contentMult = gDrawScale;
-         float width = mOverlayWidth * contentMult;
-         float height = mOverlayHeight * contentMult;
-         mWindow->setSize(width, height);
-      }
-      mWindowOverlay->UpdatePosition(this);
-   }*/
-}
-
 void VSTPlugin::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -1100,8 +1093,8 @@ void VSTPlugin::DrawModule()
    mSavePresetFileButton->Draw();
    mOpenEditorButton->Draw();
    mPanicButton->Draw();
-   mAddExtraOutputButton->Draw();
    mRemoveExtraOutputButton->Draw();
+   mAddExtraOutputButton->Draw();
    mShowParameterDropdown->Draw();
 
    ofPushStyle();
@@ -1110,27 +1103,30 @@ void VSTPlugin::DrawModule()
    ofPopStyle();
 
    ofPushStyle();
-   ofSetColor(ofColor::lime);
+   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth));
    DrawTextNormal("extra outputs:", 3, 68);
    ofPopStyle();
 
-   if (mDisplayMode == kDisplayMode_Sliders)
+   ofPushStyle();
+   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth), 50);
+   auto attachingControlRect = mAddExtraOutputButton->GetRect(true);
+   DrawTextRightJustify(std::string("p:") + ofToString(mParameterSliders.size()), GetRect().width - 3, 68);
+   ofPopStyle();
+
+   int sliderCount = 0;
+   for (auto& slider : mParameterSliders)
    {
-      int sliderCount = 0;
-      for (auto& slider : mParameterSliders)
+      if (slider.mSlider)
       {
-         if (slider.mSlider)
+         slider.mSlider->SetShowing(slider.mShowing);
+         if (slider.mShowing)
          {
-            slider.mSlider->SetShowing(slider.mShowing);
-            if (slider.mShowing)
-            {
-               const int kRows = 20;
-               slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 60 + (17 * (sliderCount % kRows)));
+            const int kRows = 20;
+            slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 74 + (17 * (sliderCount % kRows)));
 
-               slider.mSlider->Draw();
+            slider.mSlider->Draw();
 
-               ++sliderCount;
-            }
+            ++sliderCount;
          }
       }
    }
@@ -1138,30 +1134,14 @@ void VSTPlugin::DrawModule()
 
 void VSTPlugin::GetModuleDimensions(float& width, float& height)
 {
-   if (mDisplayMode == kDisplayMode_PluginOverlay)
+   width = 204;
+   height = 76;
+   for (auto& slider : mParameterSliders)
    {
-      /*if (mWindowOverlay)
+      if (slider.mSlider && slider.mShowing)
       {
-         width = mOverlayWidth;
-         height = mOverlayHeight+20;
-      }
-      else
-      {*/
-      width = 206;
-      height = 76;
-      //}
-   }
-   else
-   {
-      width = 206;
-      height = 76;
-      for (auto& slider : mParameterSliders)
-      {
-         if (slider.mSlider && slider.mShowing)
-         {
-            width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 3);
-            height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
-         }
+         width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 3);
+         height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
       }
    }
 }
@@ -1394,7 +1374,6 @@ void VSTPlugin::SetUpFromSaveData()
    {
       AddExtraOutputCable();
    }
-   RecreateUIOutputCables();
 
    mChannel = mModuleSaveData.GetInt("channel");
    mUseVoiceAsChannel = mModuleSaveData.GetBool("usevoiceaschannel");
@@ -1462,6 +1441,8 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
 
    if (rev < 3)
       LoadVSTFromSaveData(in, rev);
+
+   RecreateUIOutputCables();
 }
 
 void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)

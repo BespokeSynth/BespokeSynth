@@ -110,7 +110,6 @@ public:
 
 private:
    //IDrawableModule
-   void PreDrawModule() override;
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    void LoadVST(juce::PluginDescription desc);
@@ -203,18 +202,9 @@ private:
    ofMutex mVSTMutex;
    VSTPlayhead mPlayhead;
 
-   //NSWindowOverlay* mWindowOverlay{ nullptr };
-
-   enum DisplayMode
-   {
-      kDisplayMode_Sliders,
-      kDisplayMode_PluginOverlay
-   };
-
-   DisplayMode mDisplayMode{ DisplayMode::kDisplayMode_Sliders };
    int mShowParameterIndex{ -1 };
    DropdownList* mShowParameterDropdown{ nullptr };
-   static constexpr int kMaxParametersInDropdown{ 30 };
+   static constexpr int kMaxParametersInDropdown{ 100 };
    int mTemporarilyDisplayedParamIndex{ -1 };
 
    /*
