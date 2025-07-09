@@ -43,6 +43,8 @@ public:
 
    void TextEntryComplete(TextEntry* entry) override;
 
+   std::string GetComment() const { return mComment; }
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;

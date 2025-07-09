@@ -41,6 +41,7 @@
 #include "DrumPlayer.h"
 #include "VSTPlugin.h"
 #include "Snapshots.h"
+#include "CommentDisplay.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -854,6 +855,13 @@ PYBIND11_EMBEDDED_MODULE(module, m)
          if (control != nullptr)
             return control->GetValue();
          return 0.0f;
+      })
+      .def("get_text", [](IDrawableModule& module)
+      {
+         CommentDisplay* commentModule = dynamic_cast<CommentDisplay*>(&module);
+         if (commentModule != nullptr)
+            return commentModule->GetComment();
+         return std::string("");
       })
       .def("adjust", [](IDrawableModule& module, std::string path, float amount)
       {
