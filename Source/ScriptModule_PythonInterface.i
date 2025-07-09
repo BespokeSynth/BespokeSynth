@@ -223,6 +223,19 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          return 0.0f;
       })
       ///example: pulsewidth = me.get("oscillator~pulsewidth")
+      .def("get_text", [](ScriptModule& module, std::string path)
+      {
+         if (ofIsStringInString(path, "~comment"))
+         {
+            std::string modulePath = path.substr(0, path.find("~"));
+            IDrawableModule* targetModule = TheSynth->FindModule(modulePath);
+            CommentDisplay* commentModule = dynamic_cast<CommentDisplay*>(targetModule);
+            if (commentModule != nullptr)
+               return commentModule->GetComment();
+         }
+         return std::string("");
+      })
+      ///example: comment_text = me.get_text("comment01~comment")
       .def("get_path_prefix", [](ScriptModule& module)
       {
          std::string path = module.Path();
@@ -856,11 +869,14 @@ PYBIND11_EMBEDDED_MODULE(module, m)
             return control->GetValue();
          return 0.0f;
       })
-      .def("get_text", [](IDrawableModule& module)
+      .def("get_text", [](IDrawableModule& module, std::string path)
       {
-         CommentDisplay* commentModule = dynamic_cast<CommentDisplay*>(&module);
-         if (commentModule != nullptr)
-            return commentModule->GetComment();
+         if (path == "comment")
+         {
+            CommentDisplay* commentModule = dynamic_cast<CommentDisplay*>(&module);
+            if (commentModule != nullptr)
+               return commentModule->GetComment();
+         }
          return std::string("");
       })
       .def("adjust", [](IDrawableModule& module, std::string path, float amount)
