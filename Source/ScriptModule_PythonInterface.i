@@ -207,6 +207,12 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          if (control != nullptr)
             module.ScheduleUIControlValue(control, value, 0);
       })
+      .def("set_text", [](ScriptModule& module, std::string path, std::string value)
+      {
+         auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
+         if (control != nullptr)
+            control->SetText(value);
+      })
       ///example: me.set("oscillator~pw", .2)
       .def("schedule_set", [](ScriptModule& module, float delay, std::string path, float value)
       {
@@ -220,6 +226,13 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          if (control != nullptr)
             return control->GetValue();
          return 0.0f;
+      })
+      .def("get_text", [](ScriptModule& module, std::string path) -> std::string
+      {
+         auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
+         if (control != nullptr)
+            return control->GetText();
+         return "";
       })
       ///example: pulsewidth = me.get("oscillator~pulsewidth")
       .def("get_path_prefix", [](ScriptModule& module)
