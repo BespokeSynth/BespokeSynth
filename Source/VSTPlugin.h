@@ -63,8 +63,13 @@ public:
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
 
+   static const int kMaxJuceMidiStereoChannels = 16;
+
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
+   void AddExtraOutputCable();
+   void RemoveExtraOutputCable();
+   void RecreateUIOutputCables();
 
    void SetVol(float vol) { mVol = vol; }
 
@@ -132,7 +137,11 @@ private:
    std::vector<std::string> mPresetFilePaths;
    ClickButton* mOpenEditorButton{ nullptr };
    ClickButton* mPanicButton{ nullptr };
+   ClickButton* mAddExtraOutputButton{ nullptr };
+   ClickButton* mRemoveExtraOutputButton{ nullptr };
    std::atomic<bool> mWantsPanic{ false };
+   std::atomic<bool> mWantsAddExtraOutput{ false };
+   std::atomic<bool> mWantsRemoveExtraOutput{ false };
 
    bool mPluginReady{ false };
    std::unique_ptr<juce::AudioProcessor> mPlugin;
@@ -173,6 +182,13 @@ private:
    int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
    std::string mOldVstPath{ "" }; //for loading save files that predate pluginId-style saving
    int mParameterVersion{ 1 };
+
+   // juce supports a max of 16 stereo output channels
+   static const int maxStereoOutputChannels{ 16 };
+
+   std::vector<RollingBuffer*> mAdditionalVizBuffers;
+   std::vector<AdditionalNoteCable*> mAdditionalOutCables;
+   std::vector<PatchCableSource*> mAdditionalOutCableSources;
 
    struct ChannelModulations
    {

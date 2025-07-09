@@ -1928,6 +1928,8 @@ plugin~a hosted plugin instance, such as a VST
 ~preset~choose from saved plugin presets
 ~save as~save the current plugin settings as a preset to load again later
 ~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
+~+~Manually add a new Stereo output from the plugin
+~ - ~Remove the last manually added Stereo output from the plugin
 
 
 
