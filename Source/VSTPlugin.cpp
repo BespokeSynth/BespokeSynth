@@ -607,6 +607,7 @@ void VSTPlugin::CreateParameterSliders()
    mParameterSliders.resize(numParameters);
    for (int i = 0; i < numParameters; ++i)
    {
+
       mParameterSliders[i].mOwner = this;
       mParameterSliders[i].mValue = parameters[i]->getValue();
       mParameterSliders[i].mParameter = parameters[i];
@@ -849,7 +850,7 @@ void VSTPlugin::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (mEnabled && mPlugin != nullptr && target != nullptr)
+   if (mEnabled && mPlugin != nullptr)
    {
       mVSTMutex.lock();
 
