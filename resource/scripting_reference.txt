@@ -53,11 +53,15 @@ script-relative:
       example: me.schedule_call(1.0/4, "dotask()")
    me.note_msg(pitch, velocity, pan, output_index)
       optional: pan = 0, output_index = 0
-   me.set(path, value)
-      example: me.set("oscillator~pw", .2)
-   me.schedule_set(delay, path, value)
    me.get(path)
       example: pulsewidth = me.get("oscillator~pulsewidth")
+   me.set(path, value)
+      example: me.set("oscillator~pw", .2)
+   me.get_text(path)
+      example: comment = me.get_text("comment~comment")
+   me.set_text(path, text)
+      example: me.set_text("comment~comment", "BespokeSynth is Awesome!")
+   me.schedule_set(delay, path, value)
    me.get_path_prefix(): returns prefix if script is run in prefab (example: prefab~), or return empty string if run on main screen
       example: active = me.get(me.get_path_prefix() + 'notesequencer~enabled')
    me.adjust(path, amount)
