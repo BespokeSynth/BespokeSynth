@@ -407,14 +407,10 @@ void VSTPlugin::RecreateUIOutputCables()
 
    for (int CableCount = 0; CableCount < NumCables - 1; CableCount++)
    {
-      float NewOffset = DesiredGap + ((CableCount + 1) * DesiredGap);
-
       PatchCableSource* NewSource = mAdditionalOutCableSources[CableCount];
       NewSource->SetManualSide(PatchCableSource::Side::kBottom);
-      NewSource->SetManualPosition(NewOffset, height + 3);
+      NewSource->SetManualPosition(DesiredGap + (CableCount + 1) * DesiredGap, height + 3);
    }
-
-   GetBuffer()->SetMaxAllowedChannels(NumCables);
 }
 
 VSTPlugin::~VSTPlugin()
@@ -651,7 +647,7 @@ void VSTPlugin::Poll()
       mRescanParameterNames = false;
       const auto& parameters = mPlugin->getParameters();
 
-      int numParameters = MIN((int)mParameterSliders.size(), (int)parameters.size());
+      const int numParameters = MIN((int)mParameterSliders.size(), (int)parameters.size());
       for (int i = 0; i < numParameters; ++i)
       {
          mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
@@ -664,31 +660,22 @@ void VSTPlugin::Poll()
          mShowParameterDropdown->Clear();
          for (int i = 0; i < numParameters; ++i)
          {
-            mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
+            mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName, i);
             mParameterSliders[i].mInSelectorList = true;
          }
       }
    }
 
-   for (int i = 0; i < mParameterSliders.size(); ++i)
-   {
-      float value = mParameterSliders[i].mParameter->getValue();
-      if (mParameterSliders[i].mValue != value)
-         mParameterSliders[i].mValue = value;
-   }
+   for (auto& mParameterSlider : mParameterSliders)
+      mParameterSlider.mValue = mParameterSlider.mParameter->getValue();
 
    if (mChangeGestureParameterIndex != -1)
    {
-      if (mChangeGestureParameterIndex < (int)mParameterSliders.size() &&
-          !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList &&
-          mTemporarilyDisplayedParamIndex != mChangeGestureParameterIndex)
+      if (mChangeGestureParameterIndex < (int)mParameterSliders.size() && !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList)
       {
-         if (mTemporarilyDisplayedParamIndex != -1)
-            mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
-         mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
          mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mDisplayName, mChangeGestureParameterIndex);
+         mParameterSliders[mChangeGestureParameterIndex].mInSelectorList = true;
       }
-
       mChangeGestureParameterIndex = -1;
    }
 
@@ -846,7 +833,7 @@ void VSTPlugin::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (mEnabled && mPlugin != nullptr)
+   if (mEnabled && mPlugin != nullptr && target != nullptr)
    {
       mVSTMutex.lock();
 
@@ -939,8 +926,12 @@ void VSTPlugin::Process(double time)
 
       int numChannels = 2 + ((int)mAdditionalOutCableSources.size() * 2);
 
-      AllChannelsBuffer->SetNumActiveChannels(numChannels);
-      AllChannelsBuffer->SetMaxAllowedChannels(numChannels);
+      if (numChannels != mLastNumChannels)
+      {
+         AllChannelsBuffer->SetNumActiveChannels(numChannels);
+         AllChannelsBuffer->SetMaxAllowedChannels(numChannels);
+         mLastNumChannels = numChannels;
+      }
 
       /*
        * Until we support multi output we end up with this requirement that

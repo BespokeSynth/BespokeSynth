@@ -181,6 +181,7 @@ private:
    int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
    std::string mOldVstPath{ "" }; //for loading save files that predate pluginId-style saving
    int mParameterVersion{ 1 };
+   int mLastNumChannels{ -1 };
 
    // juce supports a max of 16 stereo output channels
    static const int maxStereoOutputChannels{ 16 };
