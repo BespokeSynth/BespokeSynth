@@ -593,6 +593,8 @@ void VSTPlugin::CreateParameterSliders()
          RemoveUIControl(slider.mRemoveButton);
          slider.mSlider->Delete();
          slider.mRemoveButton->Delete();
+         slider.mSlider = nullptr;
+         slider.mRemoveButton = nullptr;
       }
    }
    mParameterSliders.clear();
@@ -1237,6 +1239,11 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
 
    if (button == mLoadParameterButton)
    {
+      if (GetKeyModifiers() & kModifier_Command)
+      {
+         CreateParameterSliders();
+         return;
+      }
       mWantLoadParameters = true;
       return;
    }
