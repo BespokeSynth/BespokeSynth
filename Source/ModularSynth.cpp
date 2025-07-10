@@ -1878,9 +1878,24 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
 
       float val = gHoveredUIControl->GetMidiValue();
       float movementScale = 3;
-      FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(gHoveredUIControl);
-      IntSlider* intSlider = dynamic_cast<IntSlider*>(gHoveredUIControl);
-      ClickButton* clickButton = dynamic_cast<ClickButton*>(gHoveredUIControl);
+      const auto floatSlider = dynamic_cast<FloatSlider*>(gHoveredUIControl);
+      const auto intSlider = dynamic_cast<IntSlider*>(gHoveredUIControl);
+      const auto clickButton = dynamic_cast<ClickButton*>(gHoveredUIControl);
+      const auto dropDownList = dynamic_cast<DropdownList*>(gHoveredUIControl);
+
+      if (dropDownList)
+      {
+         auto increment = (yScroll > 0 ? 1. : -1.) / dropDownList->GetNumValues();
+         if (GetKeyModifiers() & kModifier_Shift)
+            increment *= 3 * UserPrefs.scroll_multiplier_vertical.Get();
+         if (gHoveredUIControl->InvertScrollDirection())
+            increment *= -1;
+         auto value = dropDownList->GetMidiValue();
+         value += increment;
+         dropDownList->SetFromMidiCC(value, NextBufferTime(false), false);
+         return;
+      }
+
       if (floatSlider || intSlider)
       {
          float w, h;
