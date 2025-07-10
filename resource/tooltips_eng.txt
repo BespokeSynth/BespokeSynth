@@ -1925,6 +1925,7 @@ plugin~a hosted plugin instance, such as a VST
 ~program change~send a program change message to the plugin instance
 ~open~show the plugin window
 ~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a plugin has more than 100 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle or change it within the plugin's interface.
+~load parameter~This shows the number of parameters exposed by the plugin. If you click here, up to a 100 parameters are attempted to be added to the parameter dropdown list. If you hold `shift` while clicking, the parameter sliders will be added as well.
 ~preset~choose from saved plugin presets
 ~save as~save the current plugin settings as a preset to load again later
 ~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately

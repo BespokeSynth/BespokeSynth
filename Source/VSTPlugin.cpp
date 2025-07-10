@@ -357,6 +357,7 @@ void VSTPlugin::CreateUIControls()
    mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 142);
    mSavePresetFileButton = new ClickButton(this, "save as", -1, -1);
    mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 56, &mShowParameterIndex, 190);
+   mLoadParameterButton = new ClickButton(this, "load parameter", mShowParameterDropdown, kAnchor_Right);
    mPanicButton = new ClickButton(this, "panic", mOpenEditorButton, kAnchor_Right_Padded);
    mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 38);
    mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
@@ -381,7 +382,7 @@ void VSTPlugin::CreateUIControls()
 void VSTPlugin::RecreateUIOutputCables()
 {
    // Need to recalculate slider postitions so that the cablesources can be positioned correctly on load (before a draw call).
-   constexpr int kRows = 20;
+   constexpr int kRows = 25;
    int sliderCount{ 0 };
    for (const auto& slider : mParameterSliders)
    {
@@ -419,6 +420,10 @@ void VSTPlugin::RecreateUIOutputCables()
       NewSource->SetManualSide(PatchCableSource::Side::kBottom);
       NewSource->SetManualPosition(DesiredGap + (CableCount + 1) * DesiredGap, height + 3);
    }
+
+   mLoadParameterButton->SetPosition(
+   GetRect(true).width - 3 - mLoadParameterButton->GetRect(true).width,
+   mShowParameterDropdown->GetRect(true).y);
 }
 
 VSTPlugin::~VSTPlugin()
@@ -796,6 +801,31 @@ void VSTPlugin::Process(double time)
 
    AllChannelsBuffer->SetNumActiveChannels(inputChannels);
    SyncBuffers();
+
+   if (mWantLoadParameters)
+   {
+      auto numParametersAdded{ 0 };
+      bool addSliders = GetKeyModifiers() & kModifier_Shift;
+      for (int i = 0; i < mParameterSliders.size(); ++i)
+      {
+         if (mParameterSliders[i].mInSelectorList == false)
+         {
+            mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName, i);
+            mParameterSliders[i].mInSelectorList = true;
+            if (addSliders && mParameterSliders[i].mSlider == nullptr)
+            {
+               mParameterSliders[i].MakeSlider();
+               mParameterSliders[i].mShowing = true;
+            }
+            numParametersAdded++;
+         }
+         if (numParametersAdded >= 100)
+            break;
+      }
+      mWantLoadParameters = false;
+      if (numParametersAdded > 0)
+         RecreateUIOutputCables();
+   }
 
    /*
     * Multi-out VSTs which can't disable those outputs will expect *something* in the
@@ -1202,6 +1232,12 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
    if (button == mRemoveExtraOutputButton)
    {
       mWantsRemoveExtraOutput = true;
+      return;
+   }
+
+   if (button == mLoadParameterButton)
+   {
+      mWantLoadParameters = true;
       return;
    }
 

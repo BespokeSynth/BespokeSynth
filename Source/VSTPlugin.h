@@ -135,12 +135,14 @@ private:
    ClickButton* mSavePresetFileButton{ nullptr };
    std::vector<std::string> mPresetFilePaths;
    ClickButton* mOpenEditorButton{ nullptr };
+   ClickButton* mLoadParameterButton{ nullptr };
    ClickButton* mPanicButton{ nullptr };
    ClickButton* mAddExtraOutputButton{ nullptr };
    ClickButton* mRemoveExtraOutputButton{ nullptr };
    std::atomic<bool> mWantsPanic{ false };
    std::atomic<bool> mWantsAddExtraOutput{ false };
    std::atomic<bool> mWantsRemoveExtraOutput{ false };
+   std::atomic<bool> mWantLoadParameters{ false };
    std::atomic<bool> mWantRemoveSlider{ false };
    std::atomic<int> mWantRemoveSliderIndex{ -1 };
 
