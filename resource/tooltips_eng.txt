@@ -1924,13 +1924,13 @@ plugin~a hosted plugin instance, such as a VST
 ~vol~adjust the output volume
 ~program change~send a program change message to the plugin instance
 ~open~show the plugin window
-~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a plugin has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the plugin's interface.
+~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a plugin has more than 100 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle or change it within the plugin's interface.
 ~preset~choose from saved plugin presets
 ~save as~save the current plugin settings as a preset to load again later
 ~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
-~+~Manually add a new Stereo output from the plugin
-~ - ~Remove the last manually added Stereo output from the plugin
-
+~ + ~Manually add a new Stereo output from the plugin
+~  -  ~Remove the last manually added Stereo output from the plugin
+~ X ~Remove the parameter and all modulation connected to it
 
 
 transport~controls tempo and current time position

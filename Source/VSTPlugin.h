@@ -141,6 +141,8 @@ private:
    std::atomic<bool> mWantsPanic{ false };
    std::atomic<bool> mWantsAddExtraOutput{ false };
    std::atomic<bool> mWantsRemoveExtraOutput{ false };
+   std::atomic<bool> mWantRemoveSlider{ false };
+   std::atomic<int> mWantRemoveSliderIndex{ -1 };
 
    bool mPluginReady{ false };
    std::unique_ptr<juce::AudioProcessor> mPlugin;
@@ -164,6 +166,7 @@ private:
       VSTPlugin* mOwner{ nullptr };
       float mValue{ 0 };
       FloatSlider* mSlider{ nullptr };
+      ClickButton* mRemoveButton{ nullptr };
       juce::AudioProcessorParameter* mParameter{ nullptr };
       bool mShowing{ false };
       bool mInSelectorList{ true };

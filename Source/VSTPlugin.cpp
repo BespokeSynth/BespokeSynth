@@ -354,11 +354,11 @@ void VSTPlugin::CreateUIControls()
 
    mVolSlider = new FloatSlider(this, "vol", 3, 3, 80, 15, &mVol, 0, 4);
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
-   mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 110);
+   mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 142);
    mSavePresetFileButton = new ClickButton(this, "save as", -1, -1);
-   mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 38, &mShowParameterIndex, 160);
-   mPanicButton = new ClickButton(this, "panic", mShowParameterDropdown, kAnchor_Right);
-   mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 56);
+   mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 56, &mShowParameterIndex, 190);
+   mPanicButton = new ClickButton(this, "panic", mOpenEditorButton, kAnchor_Right_Padded);
+   mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 38);
    mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
 
    mPresetFileSelector->DrawLabel(true);
@@ -388,9 +388,15 @@ void VSTPlugin::RecreateUIOutputCables()
       if (slider.mSlider)
       {
          slider.mSlider->SetShowing(slider.mShowing);
+         slider.mRemoveButton->SetShowing(slider.mShowing);
          if (slider.mShowing)
          {
-            slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 74 + (17 * (sliderCount % kRows)));
+            slider.mSlider->SetPosition(
+            3 + (slider.mSlider->GetRect().width + slider.mRemoveButton->GetRect().width + 9) * (sliderCount / kRows),
+            74 + 17 * (sliderCount % kRows));
+            slider.mRemoveButton->SetPosition(
+            6 + slider.mSlider->GetRect().width + (slider.mSlider->GetRect().width + slider.mRemoveButton->GetRect().width + 9) * (sliderCount / kRows),
+            74 + 17 * (sliderCount % kRows));
             ++sliderCount;
          }
       }
@@ -404,6 +410,8 @@ void VSTPlugin::RecreateUIOutputCables()
 
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
    GetPatchCableSource()->SetManualPosition(DesiredGap, height + 3);
+
+   mMidiOutCable->GetPatchCableSource()->SetManualPosition(width - 8, 10);
 
    for (int CableCount = 0; CableCount < NumCables - 1; CableCount++)
    {
@@ -516,8 +524,6 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
    {
       VSTWindow* window = mWindow.release();
       delete window;
-      //delete mWindowOverlay;
-      //mWindowOverlay = nullptr;
    }
 
    LoadVST(pluginDesc);
@@ -526,31 +532,6 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
 void VSTPlugin::LoadVST(juce::PluginDescription desc)
 {
    mPluginReady = false;
-
-   /*auto completionCallback = [this, &callbackDone] (std::unique_ptr<juce::AudioPluginInstance> instance, const String& error)
-         {
-            if (instance == nullptr)
-            {
-               ofLog() << error;
-            }
-            else
-            {
-               mVSTMutex.lock();
-               //instance->enableAllBuses();
-               instance->prepareToPlay(gSampleRate, gBufferSize);
-               instance->setPlayHead(&mPlayhead);
-               mNumInputChannels = CLAMP(instance->getTotalNumInputChannels(), 1, 4);
-               mNumOutputChannels = CLAMP(instance->getTotalNumOutputChannels(), 1, 4);
-               ofLog() << "vst inputs: " << mNumInputChannels << "  vst outputs: " << mNumOutputChannels;
-               mPlugin = std::move(instance);
-               mVSTMutex.unlock();
-            }
-            if (mPlugin != nullptr)
-               CreateParameterSliders();
-            callbackDone = true;
-         };
-
-         TheSynth->GetAudioPluginFormatManager().getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
 
    mVSTMutex.lock();
    juce::String errorMessage;
@@ -602,8 +583,11 @@ void VSTPlugin::CreateParameterSliders()
       if (slider.mSlider)
       {
          slider.mSlider->SetShowing(false);
+         slider.mRemoveButton->SetShowing(false);
          RemoveUIControl(slider.mSlider);
+         RemoveUIControl(slider.mRemoveButton);
          slider.mSlider->Delete();
+         slider.mRemoveButton->Delete();
       }
    }
    mParameterSliders.clear();
@@ -628,7 +612,7 @@ void VSTPlugin::CreateParameterSliders()
       mParameterSliders[i].mShowing = false;
       if (numParameters <= kMaxParametersInDropdown) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
-         mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
+         mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName, i);
          mParameterSliders[i].mInSelectorList = true;
       }
       else
@@ -666,8 +650,8 @@ void VSTPlugin::Poll()
       }
    }
 
-   for (auto& mParameterSlider : mParameterSliders)
-      mParameterSlider.mValue = mParameterSlider.mParameter->getValue();
+   for (auto& parameterSlider : mParameterSliders)
+      parameterSlider.mValue = parameterSlider.mParameter->getValue();
 
    if (mChangeGestureParameterIndex != -1)
    {
@@ -838,6 +822,21 @@ void VSTPlugin::Process(double time)
       mVSTMutex.lock();
 
       ComputeSliders(0);
+
+      if (mWantRemoveSlider)
+      {
+         mParameterSliders[mWantRemoveSliderIndex].mSlider->SetShowing(false);
+         mParameterSliders[mWantRemoveSliderIndex].mRemoveButton->SetShowing(false);
+         RemoveUIControl(mParameterSliders[mWantRemoveSliderIndex].mSlider);
+         RemoveUIControl(mParameterSliders[mWantRemoveSliderIndex].mRemoveButton);
+         mParameterSliders[mWantRemoveSliderIndex].mSlider->Delete();
+         mParameterSliders[mWantRemoveSliderIndex].mRemoveButton->Delete();
+         mParameterSliders[mWantRemoveSliderIndex].mSlider = nullptr;
+         mParameterSliders[mWantRemoveSliderIndex].mRemoveButton = nullptr;
+         mParameterSliders[mWantRemoveSliderIndex].mInSelectorList = false;
+         mWantRemoveSlider = false;
+         RecreateUIOutputCables();
+      }
 
       {
          const juce::ScopedLock lock(mMidiInputLock);
@@ -1094,48 +1093,37 @@ void VSTPlugin::DrawModule()
 
    ofPushStyle();
    ofSetColor(IDrawableModule::GetColor(kModuleCategory_Note));
-   DrawTextRightJustify("midi out:", 206 - 18, 14);
+   DrawTextRightJustify("midi out:", GetRect().width - 15, 14);
    ofPopStyle();
 
    ofPushStyle();
    ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth));
-   DrawTextNormal("extra outputs:", 3, 68);
+   DrawTextNormal("extra outputs:", 3, 50);
    ofPopStyle();
 
    ofPushStyle();
-   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth), 50);
-   auto attachingControlRect = mAddExtraOutputButton->GetRect(true);
-   DrawTextRightJustify(std::string("p:") + ofToString(mParameterSliders.size()), GetRect().width - 3, 68);
+   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth), 75);
+   DrawTextRightJustify(ofToString(mParameterSliders.size()), GetRect().width - 3, 67);
    ofPopStyle();
 
-   int sliderCount = 0;
-   for (auto& slider : mParameterSliders)
-   {
-      if (slider.mSlider)
+   for (const auto& slider : mParameterSliders)
+      if (slider.mSlider && slider.mShowing)
       {
-         slider.mSlider->SetShowing(slider.mShowing);
-         if (slider.mShowing)
-         {
-            const int kRows = 20;
-            slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 74 + (17 * (sliderCount % kRows)));
-
-            slider.mSlider->Draw();
-
-            ++sliderCount;
-         }
+         slider.mSlider->Draw();
+         slider.mRemoveButton->Draw();
       }
-   }
 }
+
 
 void VSTPlugin::GetModuleDimensions(float& width, float& height)
 {
-   width = 204;
+   width = 236;
    height = 76;
    for (auto& slider : mParameterSliders)
    {
       if (slider.mSlider && slider.mShowing)
       {
-         width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 3);
+         width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 23);
          height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
       }
    }
@@ -1173,11 +1161,12 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
 
 void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   for (int i = 0; i < mParameterSliders.size(); ++i)
+   for (const auto& parameterSlider : mParameterSliders)
    {
-      if (mParameterSliders[i].mSlider == slider)
+      if (parameterSlider.mSlider == slider)
       {
-         mParameterSliders[i].mParameter->setValue(mParameterSliders[i].mValue);
+         parameterSlider.mParameter->setValue(parameterSlider.mValue);
+         break;
       }
    }
 }
@@ -1193,21 +1182,27 @@ void VSTPlugin::CheckboxUpdated(Checkbox* checkbox, double time)
 void VSTPlugin::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mOpenEditorButton)
+   {
       mWantOpenVstWindow = true;
+      return;
+   }
 
    if (button == mPanicButton)
    {
       mWantsPanic = true;
+      return;
    }
 
    if (button == mAddExtraOutputButton)
    {
       mWantsAddExtraOutput = true;
+      return;
    }
 
    if (button == mRemoveExtraOutputButton)
    {
       mWantsRemoveExtraOutput = true;
+      return;
    }
 
    if (button == mSavePresetFileButton && mPlugin != nullptr)
@@ -1278,6 +1273,15 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
                break;
             }
          }
+      }
+   }
+
+   for (int i = 0; i < mParameterSliders.size(); ++i)
+   {
+      if (mParameterSliders[i].mRemoveButton == button)
+      {
+         mWantRemoveSlider = true;
+         mWantRemoveSliderIndex = i;
       }
    }
 }
@@ -1501,8 +1505,9 @@ void VSTPlugin::ParameterSlider::MakeSlider()
       sliderID = mDisplayName.c_str(); //old save files used unstable parameters names
    else
       sliderID = mID.c_str(); //now we use parameter IDs for more stability
-   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 200, 15, &mValue, 0, 1);
+   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 210, 15, &mValue, 0, 1);
    mSlider->SetOverrideDisplayName(mDisplayName);
+   mRemoveButton = new ClickButton(mOwner, " X ", -1, -1);
 }
 
 void VSTPlugin::OnUIControlRequested(const char* name)
