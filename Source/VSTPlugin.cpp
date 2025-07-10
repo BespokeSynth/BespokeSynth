@@ -640,6 +640,8 @@ void VSTPlugin::CreateParameterSliders()
          mParameterSliders[i].mInSelectorList = false;
       }
    }
+   // Move output cables
+   RecreateUIOutputCables();
 }
 
 void VSTPlugin::Poll()
@@ -698,9 +700,6 @@ void VSTPlugin::Poll()
          if (mWindow == nullptr)
             mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
          mWindow->ShowWindow();
-
-         //if (mWindow->GetNSViewComponent())
-         //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
       }
    }
 
@@ -757,6 +756,8 @@ void VSTPlugin::Poll()
                      mParameterSliders[index].MakeSlider();
                }
             }
+            // Move output cables
+            RecreateUIOutputCables();
          }
       }
    }
@@ -973,7 +974,10 @@ void VSTPlugin::Process(double time)
          int numMonoSamples = buffer.getNumSamples();
          for (int sampleIndex = 0; sampleIndex < numMonoSamples; ++sampleIndex)
          {
-            AllChannelsBuffer->GetChannel(sourceChannel)[sampleIndex] += buffer.getSample(sourceChannel, sampleIndex) * mVol;
+            auto temp_buffer = AllChannelsBuffer->GetChannel(sourceChannel);
+            if (temp_buffer == nullptr)
+               continue;
+            temp_buffer[sampleIndex] += buffer.getSample(sourceChannel, sampleIndex) * mVol;
          }
 
          // Copy the outputs from the single buffer into our multiple output buffers
@@ -1171,6 +1175,8 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
       mParameterSliders[mShowParameterIndex].mInSelectorList = true;
       mShowParameterIndex = -1;
       mTemporarilyDisplayedParamIndex = -1;
+      // Move output cables
+      RecreateUIOutputCables();
    }
 }
 
