@@ -84,10 +84,13 @@ void Polyrhythms::OnTransportAdvanced(float amount)
 
          if (mRhythmLine->mLastPitch != mRhythmLine->mPitch && mRhythmLine->mLastVelocity > 0)
             PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLine->mLastPitch, 0));
-         else if (mRhythmLine->mLastVelocity != velocity)
+         if (mRhythmLine->mLastVelocity != velocity)
+            PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLine->mPitch, velocity));
+         else if (velocity > 0)
+         {
             PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLine->mPitch, 0));
-         if (!(mRhythmLine->mLastVelocity == 0 && velocity == 0))
-            PlayNoteOutput(NoteMessage(time - remainderMs + 1, mRhythmLine->mPitch, velocity));
+            PlayNoteOutput(NoteMessage(time - remainderMs + 0.01, mRhythmLine->mPitch, velocity));
+         }
          mRhythmLine->mLastPitch = mRhythmLine->mPitch;
          mRhythmLine->mLastVelocity = velocity;
       }
