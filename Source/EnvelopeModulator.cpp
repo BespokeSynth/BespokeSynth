@@ -126,7 +126,7 @@ float EnvelopeModulator::Value(int samplesIn /*= 0*/)
    ComputeSliders(samplesIn);
    if (GetSliderTarget())
       return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
-   return 0;
+   return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), GetMin(), GetMax());
 }
 
 void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
