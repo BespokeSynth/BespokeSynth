@@ -109,6 +109,13 @@ private:
       None
    };
 
+   struct ShuffleEvent
+   {
+      double mTime{ 0.0 };
+      int mSlice{ 0 };
+      PlaybackStyle mStyle{ PlaybackStyle::Normal };
+   };
+
    int GetWritePositionInSamples(double time);
    int GetLengthInSamples();
    void DrawBuffer(float x, float y, float w, float h);
@@ -116,6 +123,8 @@ private:
    int GetNumSlices();
    float GetSlicePlaybackRate() const;
    PlaybackStyle VelocityToPlaybackStyle(int velocity) const;
+   void QueueEvent(double time, int slice, PlaybackStyle style = PlaybackStyle::Normal);
+   int ConsumeEvent(double time);
 
    ChannelBuffer mInputBuffer;
 
@@ -133,15 +142,16 @@ private:
    FloatSlider* mFourTetSlider{ nullptr };
    int mFourTetSlices{ 4 };
    DropdownList* mFourTetSlicesDropdown{ nullptr };
-   int mQueuedSlice{ -1 };
    PlaybackStyle mQueuedPlaybackStyle{ PlaybackStyle::None };
    float mPlaybackSampleIndex{ -1 };
-   double mPlaybackSampleStartTime{ -1 };
-   double mPlaybackSampleStopTime{ -1 };
    GridControlTarget* mGridControlTarget{ nullptr };
    bool mUseVelocitySpeedControl{ false };
    bool mOnlyPlayWhenTriggered{ false };
    float mFourTetSampleIndex{ 0 };
 
    SwitchAndRamp mSwitchAndRamp;
+
+   std::array<ShuffleEvent, 10> mEvents{};
+   int mNextEventWriteRoundRobin{ 0 };
+   int mNextEventReadRoundRobin{ 0 };
 };
