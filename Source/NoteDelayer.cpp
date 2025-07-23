@@ -50,6 +50,7 @@ void NoteDelayer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mDelaySlider = new FloatSlider(this, "delay", 4, 4, 100, 15, &mDelay, 0, 1, 4);
+   mDelayMsSlider = new FloatSlider(this, "delay ms", 4, 4, 100, 15, &mDelayMs, 0, 500);
 }
 
 void NoteDelayer::DrawModule()
@@ -57,9 +58,18 @@ void NoteDelayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mDelaySlider->SetShowing(!mDelayInMs);
+   mDelayMsSlider->SetShowing(mDelayInMs);
    mDelaySlider->Draw();
+   mDelayMsSlider->Draw();
 
-   double t = (gTime - mLastNoteOnTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
+   double delayMs;
+   if (mDelayInMs)
+      delayMs = mDelayMs;
+   else
+      delayMs = mDelay / (double(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+
+   double t = (gTime - mLastNoteOnTime) / delayMs;
    if (t > 0 && t < 1)
    {
       ofPushStyle();
@@ -116,7 +126,12 @@ void NoteDelayer::PlayNote(NoteMessage note)
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
       mInputNotes[mAppendIndex] = note;
-      mInputNotes[mAppendIndex].time += mDelay / (static_cast<double>(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      double delayMs;
+      if (mDelayInMs)
+         delayMs = mDelayMs;
+      else
+         delayMs = mDelay / (double(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      mInputNotes[mAppendIndex].time += delayMs;
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;
    }
 }
@@ -128,6 +143,7 @@ void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double 
 void NoteDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("delay_in_milliseconds", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -135,4 +151,5 @@ void NoteDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteDelayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mDelayInMs = mModuleSaveData.GetBool("delay_in_milliseconds");
 }

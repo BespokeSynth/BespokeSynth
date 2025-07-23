@@ -49,9 +49,9 @@ void ModulatorSmoother::CreateUIControls()
    mSmoothSlider = new FloatSlider(this, "smooth", mInputSlider, kAnchor_Below, 100, 15, &mSmooth, 0, 1);
    mSmoothSlider->SetMode(FloatSlider::kSquare);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 }
 
 ModulatorSmoother::~ModulatorSmoother()

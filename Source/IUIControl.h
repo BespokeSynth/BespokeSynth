@@ -62,6 +62,7 @@ public:
    virtual void KeyPressed(int key, bool isRepeat) {}
    void StartBeacon() override;
    bool IsSnapshot();
+   void SetSnapshotHighlight(bool highlight) { mSnapshotHighlight = highlight; }
    virtual void GetRange(double& min, double& max)
    {
       min = 0;
@@ -105,8 +106,6 @@ public:
 
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
-
-   void SetSnapshotHighlight(bool highlight) { mSnapshotHighlight = highlight; }
 
 protected:
    virtual ~IUIControl();

@@ -52,6 +52,8 @@ public:
    int mLength{ 4 };
    DropdownList* mLengthSelector{ nullptr };
    int mPitch{ 0 };
+   int mLastPitch{ -1 };
+   int mLastVelocity{ 0 };
    TextEntry* mNoteSelector{ nullptr };
    Polyrhythms* mOwner{ nullptr };
 };

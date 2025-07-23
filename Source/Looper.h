@@ -186,7 +186,7 @@ private:
    ClickButton* mUndoButton{ nullptr };
    bool mWantUndo{ false };
    bool mReplaceOnCommit{ false };
-   double mCommitMsOffset{ 0 };
+   double mCommitMsOffset{ 0 }; //offset passed in from looperrecorder, to use when capturing a loop from it
    double mLoopPosOffset{ 0 };
    FloatSlider* mLoopPosOffsetSlider{ nullptr };
    ClickButton* mWriteOffsetButton{ nullptr };
@@ -232,6 +232,7 @@ private:
    bool mBeatwheelControlFlip{ false };
    static bool mBeatwheelSingleMeasure;
    Checkbox* mBeatwheelSingleMeasureCheckbox{ nullptr };
+   double mWriteMsOffset{ 0.0 }; //offset to use when writing with direct input
 
    //pitch shifter
    PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];

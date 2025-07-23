@@ -127,6 +127,8 @@ target_sources(BespokeSynth PRIVATE
     CommentDisplay.h
     Compressor.cpp
     Compressor.h
+    ControlInterface.cpp
+    ControlInterface.h
     ControlRecorder.cpp
     ControlRecorder.h
     ControlSequencer.cpp
@@ -278,6 +280,8 @@ target_sources(BespokeSynth PRIVATE
     LFO.h
     LFOController.cpp
     LFOController.h
+    LatencyCalculator.cpp
+    LatencyCalculator.h
     LaunchpadInterpreter.cpp
     LaunchpadInterpreter.h
     LaunchpadKeyboard.cpp
@@ -847,6 +851,7 @@ if (APPLE)
     endif()
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
+    target_link_libraries(BespokeSynth PRIVATE "dwmapi.lib")
 
     IF (MINGW)
         target_link_libraries(BespokeSynth PRIVATE iphlpapi)

@@ -406,6 +406,32 @@ void CodeEntry::Render()
       DrawTextNormal(Name(), mX, mY);
    }*/
 
+   const auto& lines = GetLines(false);
+   float totalHeight = MAX(lines.size() * mCharHeight, mScroll.y + mHeight);
+   if (mScroll.y > 0 || totalHeight > mHeight)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(255, 255, 255, .5f * gModuleDrawAlpha);
+      ofRect(mX + mWidth - 6, mY + (mScroll.y / totalHeight) * mHeight, 3, (mHeight / totalHeight) * mHeight);
+      ofPopStyle();
+   }
+   float totalWidth = mWidth;
+   for (const auto& line : lines)
+   {
+      float lineWidth = line.length() * mCharWidth;
+      if (lineWidth > totalWidth)
+         totalWidth = lineWidth;
+   }
+   if (mScroll.x > 0 || totalWidth > mWidth)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(255, 255, 255, .5f * gModuleDrawAlpha);
+      ofRect(mX + (mScroll.x / totalWidth) * mWidth, mY + mHeight - 6, (mWidth / totalWidth) * mWidth, 3);
+      ofPopStyle();
+   }
+
    ofPopMatrix();
    ofPopStyle();
 }
@@ -1160,6 +1186,19 @@ void CodeEntry::MoveCaret(int pos, bool allowSelection /*=true*/)
       mCaretPosition2 = mCaretPosition;
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
+
+   //if caret is offscreen, move scroll to show caret
+   ofVec2f coords = GetCaretCoords(mCaretPosition);
+   coords.x *= mCharWidth;
+   coords.y *= mCharHeight;
+   if (coords.x < mScroll.x)
+      mScroll.x = coords.x;
+   if (coords.x + mCharWidth > mScroll.x + mWidth)
+      mScroll.x = coords.x + mCharWidth - mWidth;
+   if (coords.y < mScroll.y)
+      mScroll.y = coords.y;
+   if (coords.y + mCharHeight > mScroll.y + mHeight)
+      mScroll.y = coords.y + mCharHeight - mHeight;
 }
 
 void CodeEntry::MoveCaretToStart()

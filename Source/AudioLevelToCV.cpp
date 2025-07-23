@@ -54,9 +54,9 @@ void AudioLevelToCV::CreateUIControls()
    FloatSliderUpdated(mAttackSlider, 0, gTime);
    FloatSliderUpdated(mReleaseSlider, 0, gTime);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 }
 
 AudioLevelToCV::~AudioLevelToCV()
@@ -160,9 +160,9 @@ void AudioLevelToCV::LoadState(FileStreamIn& in, int rev)
    if (rev < 1)
    {
       // Temporary additional cable source
-      mTargetCable = new PatchCableSource(this, kConnectionType_Audio);
-      mTargetCable->SetModulatorOwner(this);
-      AddPatchCableSource(mTargetCable);
+      mTargetCableSource = new PatchCableSource(this, kConnectionType_Audio);
+      mTargetCableSource->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCableSource);
    }
 
    IDrawableModule::LoadState(in, rev);
@@ -173,7 +173,7 @@ void AudioLevelToCV::LoadState(FileStreamIn& in, int rev)
       if (target != nullptr)
          GetPatchCableSource()->SetTarget(target);
       RemovePatchCableSource(GetPatchCableSource(1));
-      mTargetCable = GetPatchCableSource();
+      mTargetCableSource = GetPatchCableSource();
    }
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)

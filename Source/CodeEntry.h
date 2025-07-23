@@ -85,6 +85,7 @@ public:
    ofVec2d GetLinePos(int lineNum, bool end, bool published = true);
    double GetCharHeight() const { return mCharHeight; }
    double GetCharWidth() const { return mCharWidth; }
+   void ResetScroll() { mScroll.set(0, 0); }
 
    void SetStyleFromJSON(const ofxJSONElement& vdict);
 

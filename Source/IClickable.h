@@ -71,7 +71,7 @@ public:
    }
    const char* Name() const { return mName; }
    char* NameMutable() { return mName; }
-   std::string Path(bool ignoreContext = false, bool useDisplayName = false);
+   std::string Path(bool ignoreContext = false, bool useDisplayName = false, IClickable* relativeTo = nullptr);
    virtual bool CheckNeedsDraw();
    virtual void SetShowing(bool showing) { mShowing = showing; }
    bool IsShowing() const { return mShowing; }
@@ -80,7 +80,7 @@ public:
    void DrawBeacon(double x, double y);
    IClickable* GetRootParent();
    IDrawableModule* GetModuleParent();
-   void SetOverrideDisplayName(std::string name)
+   virtual void SetOverrideDisplayName(std::string name)
    {
       mHasOverrideDisplayName = true;
       mOverrideDisplayName = name;

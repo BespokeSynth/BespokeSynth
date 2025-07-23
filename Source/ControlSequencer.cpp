@@ -283,7 +283,7 @@ void ControlSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserC
          mTargets[i] = nullptr;
    }
 
-   if (wasEmpty && mControlCable->GetPatchCables().size() == 1)
+   if (wasEmpty && mControlCable->GetPatchCables().size() == 1 && GetUIControl() != nullptr)
    {
       for (int i = 0; i < mGrid->GetCols(); ++i)
          mGrid->SetVal(i, 0, GetUIControl()->GetMidiValue());

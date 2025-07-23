@@ -36,7 +36,7 @@
 #include "Scale.h"
 #include "NoteStepSequencer.h"
 
-class BassLineSequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource, public INoteReceiver, IDrivableSequencer, public UIGridListener, public IFloatSliderListener, public IScaleListener
+class BassLineSequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource, public INoteReceiver, public IDrivableSequencer, public UIGridListener, public IFloatSliderListener, public IScaleListener
 {
 public:
    BassLineSequencer();

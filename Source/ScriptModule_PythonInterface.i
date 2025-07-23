@@ -40,6 +40,7 @@
 #include "EnvelopeModulator.h"
 #include "DrumPlayer.h"
 #include "VSTPlugin.h"
+#include "Snapshots.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -181,113 +182,121 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
    py::return_value_policy::reference);
    py::class_<ScriptModule, IDrawableModule>(m, "scriptmodule")
    .def("play_note", [](ScriptModule& module, double pitch, double velocity, double length, double pan, int output_index)
-        {
-           module.PlayNoteFromScript(pitch, velocity, pan, output_index);
-           module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0, output_index);
-        },
-        "pitch"_a, "velocity"_a, "length"_a = 1.0 / 16.0, "pan"_a = 0, "output_index"_a = 0)
-   ///example: me.play_note(60, 127, 1.0/8)
+      {
+         module.PlayNoteFromScript(pitch, velocity, pan, output_index);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0, output_index);
+      }, "pitch"_a, "velocity"_a, "length"_a=1.0/16.0, "pan"_a = 0, "output_index"_a = 0)
+      ///example: me.play_note(60, 127, 1.0/8)
    .def("schedule_note", [](ScriptModule& module, double delay, double pitch, double velocity, double length, double pan, int output_index)
-        {
-           module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
-           module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, output_index);
-        },
-        "delay"_a, "pitch"_a, "velocity"_a, "length"_a = 1.0 / 16.0, "pan"_a = 0, "output_index"_a = 0)
-   ///example: me.schedule_note(1.0/4, 60, 127, 1.0/8)
+      {
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, output_index);
+      }, "delay"_a, "pitch"_a, "velocity"_a, "length"_a=1.0/16.0, "pan"_a = 0, "output_index"_a = 0)
+      ///example: me.schedule_note(1.0/4, 60, 127, 1.0/8)
    .def("schedule_note_msg", [](ScriptModule& module, double delay, double pitch, double velocity, double pan, int output_index)
-        {
-           module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
-        },
-        "delay"_a, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
+      {
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
+      }, "delay"_a, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
    .def("schedule_call", [](ScriptModule& module, double delay, std::string method)
-        {
-           module.ScheduleMethod(method, delay);
-        })
-   ///example: me.schedule_call(1.0/4, "dotask()")
+      {
+         module.ScheduleMethod(method, delay);
+      })
+      ///example: me.schedule_call(1.0/4, "dotask()")
    .def("note_msg", [](ScriptModule& module, double pitch, double velocity, double pan, int output_index)
-        {
-           module.PlayNoteFromScript(pitch, velocity, pan, output_index);
-        },
-        "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
+      {
+         module.PlayNoteFromScript(pitch, velocity, pan, output_index);
+      }, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
    .def("set", [](ScriptModule& module, std::string path, double value)
-        {
-           IUIControl* control = module.GetUIControl(path);
-           if (control != nullptr)
-              module.ScheduleUIControlValue(control, value, 0);
-        })
-   ///example: me.set("oscillator~pw", .2)
+      {
+         IUIControl* control = module.GetUIControl(path);
+         if (control != nullptr)
+            module.ScheduleUIControlValue(control, value, 0);
+      })
+      .def("set_text", [](ScriptModule& module, std::string path, std::string value)
+      {
+         auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
+         if (control != nullptr)
+            control->SetText(value);
+      })
+      ///example: me.set("oscillator~pw", .2)
    .def("schedule_set", [](ScriptModule& module, double delay, std::string path, double value)
-        {
-           IUIControl* control = module.GetUIControl(path);
-           if (control != nullptr)
-              module.ScheduleUIControlValue(control, value, delay);
-        })
-   .def("get", [](ScriptModule& module, std::string path)
-        {
-           IUIControl* control = module.GetUIControl(path);
-           if (control != nullptr)
-              return control->GetValue();
-           return 0.0;
-        })
-   ///example: pulsewidth = me.get("oscillator~pulsewidth")
-   .def("get_path_prefix", [](ScriptModule& module)
-        {
-           std::string path = module.Path();
-           if (ofIsStringInString(path, "~"))
-           {
-              return path.substr(0, path.rfind('~') + 1);
-           }
-           else
-           {
-              return std::string("");
-           }
-        })
+      {
+         IUIControl* control = module.GetUIControl(path);
+         if (control != nullptr)
+            module.ScheduleUIControlValue(control, value, delay);
+      })
+      .def("get", [](ScriptModule& module, std::string path)
+      {
+         IUIControl* control = module.GetUIControl(path);
+         if (control != nullptr)
+            return control->GetValue();
+         return 0.0;
+      })
+      .def("get_text", [](ScriptModule& module, std::string path) -> std::string
+      {
+         auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
+         if (control != nullptr)
+            return control->GetText();
+         return "";
+      })
+      ///example: pulsewidth = me.get("oscillator~pulsewidth")
+      .def("get_path_prefix", [](ScriptModule& module)
+      {
+         std::string path = module.Path();
+         if (ofIsStringInString(path, "~"))
+         {
+            return path.substr(0, path.rfind('~') + 1);
+         }
+         else 
+         {
+            return std::string("");
+         }
+      })
    .def("adjust", [](ScriptModule& module, std::string path, double amount)
-        {
-           IUIControl* control = module.GetUIControl(path);
-           if (control != nullptr)
-           {
-              double min, max;
-              control->GetRange(min, max);
-              double value = ofClamp(control->GetValue() + amount, min, max);
-              module.ScheduleUIControlValue(control, value, 0);
-           }
-        })
-   .def("highlight_line", [](ScriptModule& module, int lineNum, int scriptModuleIndex)
-        {
-           module.HighlightLine(lineNum, scriptModuleIndex);
-        })
-   .def("output", [](ScriptModule& module, py::object obj)
-        {
-           module.PrintText(py::str(obj));
-        })
-   ///example: me.output("hello world!")
-   .def("me", [](ScriptModule& module)
-        {
-           return &module;
-        })
-   .def("stop", [](ScriptModule& module)
-        {
-           return module.Stop();
-        })
-   .def("get_caller", [](ScriptModule& module)
-        ///example: me.get_caller().play_note(60,127)
-        {
-           return ScriptModule::sPriorExecutedModule;
-        })
-   .def("set_num_note_outputs", [](ScriptModule& module, int num)
-        {
-           module.SetNumNoteOutputs(num);
-        })
-   .def("connect_osc_input", [](ScriptModule& module, int port)
-        {
-           module.ConnectOscInput(port);
-        })
-   .def("send_cc", [](ScriptModule& module, int control, int value, int output_index)
-        {
-           module.SendCCFromScript(control, value, output_index);
-        },
-        "control"_a, "value"_a, "output_index"_a = 0);
+      {
+         IUIControl* control = module.GetUIControl(path);
+         if (control != nullptr)
+         {
+            double min, max;
+            control->GetRange(min, max);
+            double value = ofClamp(control->GetValue() + amount, min, max);
+            module.ScheduleUIControlValue(control, value, 0);
+         }
+      })
+      .def("highlight_line", [](ScriptModule& module, int lineNum, int scriptModuleIndex)
+      {
+         module.HighlightLine(lineNum, scriptModuleIndex);
+      })
+      .def("output", [](ScriptModule& module, py::object obj)
+      {
+         module.PrintText(py::str(obj));
+      })
+      ///example: me.output("hello world!")
+      .def("me", [](ScriptModule& module)
+      {
+         return &module;
+      })
+      .def("stop", [](ScriptModule& module)
+      {
+         return module.Stop();
+      })
+      .def("get_caller", [](ScriptModule& module)
+      ///example: me.get_caller().play_note(60,127)
+      {
+         return ScriptModule::sPriorExecutedModule;
+      })
+      .def("set_num_note_outputs", [](ScriptModule& module, int num)
+      {
+         module.SetNumNoteOutputs(num);
+      })
+      .def("connect_osc_input", [](ScriptModule& module, int port)
+      {
+         module.ConnectOscInput(port);
+      })
+      .def("send_cc", [](ScriptModule& module, int control, int value, int output_index)
+      {
+         module.SendCCFromScript(control, value, output_index);
+      }, "control"_a, "value"_a, "output_index"_a = 0);
 }
 
 PYBIND11_EMBEDDED_MODULE(notesequencer, m)
@@ -742,6 +751,48 @@ PYBIND11_EMBEDDED_MODULE(vstplugin, m)
         {
            vstplugin.SendMidi(juce::MidiMessage(a, b, c));
         });
+}
+
+PYBIND11_EMBEDDED_MODULE(snapshots, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<Snapshots*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<Snapshots, IDrawableModule>(m, "snapshots")
+      .def("get_size", [](Snapshots& snapshots)
+      {
+         return snapshots.GetSize();
+      })
+      .def("get_current_snapshot", [](Snapshots& snapshots)
+      {
+         return snapshots.GetCurrentSnapshot();
+      })
+      .def("has_snapshot", [](Snapshots& snapshots, int index)
+      {
+         return snapshots.HasSnapshot(index);
+      })
+      .def("set_snapshot", [](Snapshots& snapshots, int index)
+      {
+         snapshots.SetSnapshot(index, gTime);
+      })
+      .def("store_snapshot", [](Snapshots& snapshots, int index, std::string label)
+      {
+         if (index >= 0 && index < snapshots.GetSize())
+         {
+            if (!label.empty())
+               snapshots.SetLabel(index, label);
+            snapshots.StoreSnapshot(index, true);
+         }
+      }, "index"_a, "label"_a = "")
+      .def("delete_snapshot", [](Snapshots& snapshots, int index)
+      {
+         snapshots.DeleteSnapshot(index);
+      });
 }
 
 PYBIND11_EMBEDDED_MODULE(module, m)

@@ -68,8 +68,11 @@ private:
       height = 22;
    }
 
+   bool mDelayInMs{ false };
    double mDelay{ .25 };
    FloatSlider* mDelaySlider{ nullptr };
+   double mDelayMs{ 100 };
+   FloatSlider* mDelayMsSlider{ nullptr };
 
    double mLastNoteOnTime{ 0 };
 

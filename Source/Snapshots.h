@@ -65,6 +65,8 @@ public:
    void SetSnapshot(int idx, double time);
    void StoreSnapshot(int idx, bool setAsCurrent);
    void DeleteSnapshot(int idx);
+   int GetSize() { return (int)mSnapshotCollection.size(); }
+   void SetLabel(int idx, const std::string& label);
 
    void OnTransportAdvanced(double amount) override;
 

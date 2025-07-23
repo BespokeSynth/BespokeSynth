@@ -105,30 +105,36 @@ void BufferShuffler::Process(double time)
       {
          ComputeSliders(0);
 
-         if (mPlaybackSampleStartTime != -1 && time >= mPlaybackSampleStartTime)
-         {
-            int numSlices = GetNumSlices();
-            int slicePosIndex = mQueuedSlice;
-            if (mQueuedPlaybackStyle != PlaybackStyle::None)
-               mPlaybackStyle = mQueuedPlaybackStyle;
-            mQueuedPlaybackStyle = PlaybackStyle::None;
-            if (GetSlicePlaybackRate() < 0)
-               slicePosIndex += 1;
-            double slicePos = (slicePosIndex % numSlices) / static_cast<double>(numSlices);
-            mPlaybackSampleIndex = int(GetLengthInSamples() * slicePos);
-            mPlaybackSampleStartTime = -1;
-            mSwitchAndRamp.StartSwitch();
-            if (mDrawDebug)
-               AddDebugLine(ofToString(gTime) + " switch and ramp for slice start", 10);
-         }
+         int eventIndex = ConsumeEvent(time);
 
-         if (mPlaybackSampleStopTime != -1 && time >= mPlaybackSampleStopTime)
+         if (eventIndex != -1)
          {
-            mPlaybackSampleIndex = -1;
-            mPlaybackSampleStopTime = -1;
-            mSwitchAndRamp.StartSwitch();
-            if (mDrawDebug)
-               AddDebugLine(ofToString(gTime) + " switch and ramp for slice end", 10);
+            ShuffleEvent& event = mEvents[eventIndex];
+
+            if (event.mSlice != -1)
+            {
+               int numSlices = GetNumSlices();
+               int slicePosIndex = event.mSlice;
+               if (mQueuedPlaybackStyle != PlaybackStyle::None)
+                  mPlaybackStyle = mQueuedPlaybackStyle;
+               mQueuedPlaybackStyle = PlaybackStyle::None;
+               if (GetSlicePlaybackRate() < 0)
+                  slicePosIndex += 1;
+               float slicePos = (slicePosIndex % numSlices) / (float)numSlices;
+               mPlaybackSampleIndex = int(GetLengthInSamples() * slicePos);
+               mSwitchAndRamp.StartSwitch();
+               if (mDrawDebug)
+                  AddDebugLine(ofToString(gTime) + " switch and ramp for slice start", 10);
+            }
+            else
+            {
+               mPlaybackSampleIndex = -1;
+               mSwitchAndRamp.StartSwitch();
+               if (mDrawDebug)
+                  AddDebugLine(ofToString(gTime) + " switch and ramp for slice end", 10);
+            }
+
+            event.mTime = -1;
          }
 
          for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
@@ -270,19 +276,13 @@ void BufferShuffler::PlayNote(NoteMessage note)
 {
    if (note.velocity > 0)
    {
-      mQueuedSlice = note.pitch;
       if (mUseVelocitySpeedControl)
          mQueuedPlaybackStyle = VelocityToPlaybackStyle(note.velocity);
-      mPlaybackSampleStartTime = note.time;
-      mPlaybackSampleStopTime = -1;
+      QueueEvent(note.time, note.pitch, mPlaybackStyle);
    }
    else
    {
-      if (mQueuedSlice == note.pitch)
-      {
-         mQueuedSlice = -1;
-         mPlaybackSampleStopTime = note.time;
-      }
+      QueueEvent(note.time, -1);
    }
 }
 
@@ -306,15 +306,53 @@ void BufferShuffler::OnClicked(double x, double y, bool right)
 
 void BufferShuffler::PlayOneShot(int slice)
 {
-   mQueuedSlice = slice;
    double sliceSizeMs = TheTransport->GetMeasureFraction(mInterval) * TheTransport->MsPerBar();
    double currentTime = NextBufferTime(false);
    double remainderMs;
    TransportListenerInfo timeInfo(nullptr, mInterval, OffsetInfo(0, false), false);
    TheTransport->GetQuantized(currentTime, &timeInfo, &remainderMs);
    double timeUntilNextInterval = sliceSizeMs - remainderMs;
-   mPlaybackSampleStartTime = currentTime + timeUntilNextInterval;
-   mPlaybackSampleStopTime = mPlaybackSampleStartTime + sliceSizeMs / std::abs(GetSlicePlaybackRate());
+   double startTime = currentTime + timeUntilNextInterval;
+   double endTime = startTime + sliceSizeMs / std::abs(GetSlicePlaybackRate());
+   QueueEvent(startTime, slice, mPlaybackStyle);
+   QueueEvent(endTime, -1);
+}
+
+void BufferShuffler::QueueEvent(double time, int slice, PlaybackStyle style /*=PlaybackStyle::Normal*/)
+{
+   for (int i = 0; i < (int)mEvents.size(); ++i)
+   {
+      //skip note-off if we're note-on'ing at the same time
+      if (mEvents[i].mSlice == -1 &&
+          mEvents[i].mTime != -1 &&
+          time <= mEvents[i].mTime)
+      {
+         mNextEventWriteRoundRobin = i;
+      }
+
+      //don't queue up note-off if there's a note-on at the same time
+      if (slice == -1 &&
+          time <= mEvents[i].mTime)
+      {
+         return;
+      }
+   }
+   mEvents[mNextEventWriteRoundRobin].mTime = time;
+   mEvents[mNextEventWriteRoundRobin].mSlice = slice;
+   mEvents[mNextEventWriteRoundRobin].mStyle = style;
+   mNextEventWriteRoundRobin = (mNextEventWriteRoundRobin + 1) % (int)mEvents.size();
+}
+
+int BufferShuffler::ConsumeEvent(double time)
+{
+   if (mEvents[mNextEventReadRoundRobin].mTime != -1 &&
+       time >= mEvents[mNextEventReadRoundRobin].mTime)
+   {
+      int ret = mNextEventReadRoundRobin;
+      mNextEventReadRoundRobin = (mNextEventReadRoundRobin + 1) % (int)mEvents.size();
+      return ret;
+   }
+   return -1;
 }
 
 int BufferShuffler::GetWritePositionInSamples(double time)
@@ -411,7 +449,7 @@ void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
          }
          else if (index < GetNumSlices())
          {
-            if (index == mQueuedSlice && mPlaybackSampleStartTime != -1)
+            if (index == mEvents[mNextEventReadRoundRobin].mSlice && mEvents[mNextEventReadRoundRobin].mTime != -1)
                pushColor = 32;
             else if (mPlaybackSampleIndex >= 0 && index == playSlice)
                pushColor = 126;
@@ -465,7 +503,7 @@ void BufferShuffler::UpdateGridControllerLights(bool force)
          int playSlice = mPlaybackSampleIndex * GetNumSlices() / GetLengthInSamples();
          if (index < GetNumSlices())
          {
-            if (index == mQueuedSlice && mPlaybackSampleStartTime != -1)
+            if (index == mEvents[mNextEventReadRoundRobin].mSlice && mEvents[mNextEventReadRoundRobin].mTime != -1)
                color = kGridColor2Dim;
             else if (mPlaybackSampleIndex >= 0 && index == playSlice)
                color = kGridColor2Bright;

@@ -89,6 +89,12 @@ void Beats::Process(double time)
    }
 }
 
+void Beats::PlayNote(NoteMessage note)
+{
+   for (BeatColumn* column : mBeatColumns)
+      column->PlayNote(note);
+}
+
 void Beats::DropdownClicked(DropdownList* list)
 {
 }
@@ -456,6 +462,12 @@ void BeatColumn::ButtonClicked(ClickButton* button, double time)
             mSelector->AddLabel(mSamples[i]->Name().c_str(), i);
       }
    }
+}
+
+void BeatColumn::PlayNote(const NoteMessage& note)
+{
+   if (note.pitch >= 0 && note.pitch < static_cast<int>(mSamples.size()) + 1)
+      mSelector->SetValue(note.pitch - 1, gTime);
 }
 
 void BeatColumn::SaveState(FileStreamOut& out)

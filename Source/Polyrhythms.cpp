@@ -66,23 +66,35 @@ void Polyrhythms::OnTransportAdvanced(double amount)
    if (!mEnabled)
       return;
 
-   double time = NextBufferTime(true);
+   const double time = NextBufferTime(true);
 
-   for (int i = 0; i < mRhythmLines.size(); ++i)
+   for (const auto& mRhythmLine : mRhythmLines)
    {
-      int beats = mRhythmLines[i]->mGrid->GetCols();
+      const int beats = mRhythmLine->mGrid->GetCols();
 
       TransportListenerInfo info(nullptr, kInterval_CustomDivisor, OffsetInfo(0, false), false);
       info.mCustomDivisor = beats;
 
       double remainderMs;
-      int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
-      int newStep = TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs);
-      double val = mRhythmLines[i]->mGrid->GetVal(newStep, 0);
-      if (newStep != oldStep && val > 0)
-         PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLines[i]->mPitch, val * 127));
+      const int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
+      const int newStep = TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs);
+      const int velocity = mRhythmLine->mGrid->GetVal(newStep, 0) * 127;
+      if (newStep != oldStep)
+      {
 
-      mRhythmLines[i]->mGrid->SetHighlightCol(time, newStep);
+         if (mRhythmLine->mLastPitch != mRhythmLine->mPitch && mRhythmLine->mLastVelocity > 0)
+            PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLine->mLastPitch, 0));
+         if (mRhythmLine->mLastVelocity != velocity)
+            PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLine->mPitch, velocity));
+         else if (velocity > 0)
+         {
+            PlayNoteOutput(NoteMessage(time - remainderMs, mRhythmLine->mPitch, 0));
+            PlayNoteOutput(NoteMessage(time - remainderMs + 0.01, mRhythmLine->mPitch, velocity));
+         }
+         mRhythmLine->mLastPitch = mRhythmLine->mPitch;
+         mRhythmLine->mLastVelocity = velocity;
+      }
+      mRhythmLine->mGrid->SetHighlightCol(time, newStep);
    }
 }
 

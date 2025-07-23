@@ -499,7 +499,8 @@ void BassLineSequencer::StepBy(double time, double velocity, int flags)
                   SendCCOutput(102, 127);
 
                PlayNoteOutput(NoteMessage(time, pitch, outputVelocity, -1, mModulation));
-               PlayNoteOutput(NoteMessage(time, mPlayingPitch, 0, -1, mModulation));
+               if (mPlayingPitch != pitch || mGlideMode != GlideMode::SlideCC)
+                  PlayNoteOutput(NoteMessage(time, mPlayingPitch, 0, -1, mModulation));
                mPlayingPitch = pitch;
             }
          }

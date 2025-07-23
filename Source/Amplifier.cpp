@@ -116,7 +116,7 @@ void Amplifier::DrawModule()
 void Amplifier::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("show_level_meter", moduleInfo, true);
+   mModuleSaveData.LoadBool("show_level_meter", moduleInfo, false);
 
    SetUpFromSaveData();
 }

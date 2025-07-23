@@ -78,6 +78,7 @@ public:
    }
 
    void SetCuePoint(int pitch, double startSeconds, double lengthSeconds, double speed);
+   bool validCuePoint(int cueIndex);
    void FillData(std::vector<float> data);
    ChannelBuffer* GetCueSampleData(int cueIndex);
    double GetLengthInSeconds() const;

@@ -577,7 +577,6 @@ void NoteCanvas::LoadMidi()
       MidiFile midifile;
       if (midifile.readFrom(inputStream))
       {
-         midifile.convertTimestampTicksToSeconds();
          int ticksPerQuarterNote = midifile.getTimeFormat();
          int trackToGet = 0;
          if (midifile.getNumTracks() > 1)
