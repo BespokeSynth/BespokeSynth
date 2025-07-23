@@ -50,9 +50,14 @@ Looper::Looper()
 : IAudioProcessor(gBufferSize)
 , mWorkBuffer(gBufferSize)
 {
-   //TODO(Ryan) buffer sizes
-   mBuffer = new ChannelBuffer(MAX_BUFFER_SIZE);
-   mUndoBuffer = new ChannelBuffer(MAX_BUFFER_SIZE);
+   //TODO(Ryan) buffer sizes.
+   //    (Noxy) The buffersize is dependant on the tempo which can be altered realtime and is not update in the
+   //           looper. For now I have this "workaround" which is more correct provided one does not lower the
+   //           tempo with a spawned in looper.
+   const auto sampsPerBar = abs(static_cast<int>(TheTransport->MsPerBar() / 1000 * gSampleRate));
+   const auto samplesNeeded = sampsPerBar * kMaxNumBars * 2 /* channels? */;
+   mBuffer = new ChannelBuffer(samplesNeeded);
+   mUndoBuffer = new ChannelBuffer(samplesNeeded);
    Clear();
 
    mMuteRamp.SetValue(1);
@@ -886,7 +891,7 @@ void Looper::BakeVolume()
 
 void Looper::UpdateNumBars(int oldNumBars)
 {
-   assert(mNumBars > 0);
+   assert(mNumBars > 0 && mNumBars <= kMaxNumBars);
    int sampsPerBar = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate));
    SetLoopLength(MIN(sampsPerBar * mNumBars, MAX_BUFFER_SIZE - 1));
    while (mLoopPos > sampsPerBar)
