@@ -467,7 +467,11 @@ double FloatSlider::PosToVal(double pos, bool ignoreSmooth) const
    if (mMode == kNormal)
       return mMin + pos * (mMax - mMin);
    if (mMode == kLogarithmic)
-      return mMin * pow(mMax / mMin, pos);
+   {
+      // Avoid NaN cause by devide by zero
+      double minVal = (mMin == 0.0) ? std::numeric_limits<decltype(mMin)>::epsilon() : mMin;
+      return minVal * powf(mMax / minVal, pos);
+   }
    if (mMode == kSquare)
       return mMin + pos * pos * (mMax - mMin);
    if (mMode == kBezier)
@@ -487,7 +491,11 @@ double FloatSlider::ValToPos(double val, bool ignoreSmooth) const
    if (mMode == kNormal)
       return (val - mMin) / (mMax - mMin);
    if (mMode == kLogarithmic)
-      return log(val / mMin) / log(mMax / mMin);
+   {
+      // Avoid NaN cause by devide by zero
+      double minVal = (mMin == 0.0) ? std::numeric_limits<decltype(mMin)>::epsilon() : mMin;
+      return log(val / minVal) / log(mMax / minVal);
+   }
    if (mMode == kSquare)
       return sqrt((val - mMin) / (mMax - mMin));
    if (mMode == kBezier)

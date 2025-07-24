@@ -34,7 +34,7 @@
 
 class PatchCableSource;
 
-class CurveLooper : public IDrawableModule, public IDropdownListener, public IButtonListener, public IAudioPoller
+class CurveLooper : public IDrawableModule, public IDropdownListener, public IButtonListener, public IAudioPoller, public IFloatSliderListener
 {
 public:
    CurveLooper();
@@ -58,6 +58,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -88,7 +89,9 @@ private:
    PatchCableSource* mControlCable{ nullptr };
    double mWidth{ 200 };
    double mHeight{ 120 };
-   EnvelopeControl mEnvelopeControl{ ofVec2d(5, 25), ofVec2d(mWidth - 10, mHeight - 30) };
+   EnvelopeControl mEnvelopeControl{ ofVec2d(5, 25), ofVec2d(mWidth - 10, mHeight - 30), nullptr };
    ::ADSR mAdsr;
    ClickButton* mRandomizeButton{ nullptr };
+   double mFreeRate{ 1000 };
+   FloatSlider* mFreeRateSlider{ nullptr };
 };

@@ -37,9 +37,10 @@ namespace
    double pointClickRadius = 4;
 }
 
-EnvelopeControl::EnvelopeControl(ofVec2d position, ofVec2d dimensions)
+EnvelopeControl::EnvelopeControl(ofVec2d position, ofVec2d dimensions, EnvelopeEditor* editor)
 : mPosition(position)
 , mDimensions(dimensions)
+, mEditor(editor)
 {
 }
 
@@ -332,8 +333,10 @@ void EnvelopeControl::MouseMoved(double x, double y)
       {
          ::ADSR::Stage& stage = mAdsr->GetStageData(mHighlightCurve);
          ::ADSR::Stage& originalStage = mClickAdsr.GetStageData(mHighlightCurve);
-
-         stage.curve = ofClamp(originalStage.curve + ((mClickStart.y - y) / mDimensions.y), -1, 1);
+         ofVec2d sliderLimits{ -2, 2 };
+         if (mEditor)
+            sliderLimits = mEditor->GetCurveSliderExtentsForStage(mHighlightCurve);
+         stage.curve = ofClamp(originalStage.curve + ((mClickStart.y - y) / mDimensions.y), sliderLimits.x, sliderLimits.y);
       }
    }
 }
@@ -387,7 +390,7 @@ double EnvelopeControl::GetYForValue(double value)
 }
 
 EnvelopeEditor::EnvelopeEditor()
-: mEnvelopeControl(ofVec2d(5, 25), ofVec2d(380, 200))
+: mEnvelopeControl(ofVec2d(5, 25), ofVec2d(380, 200), this)
 {
 }
 
@@ -413,7 +416,7 @@ void EnvelopeEditor::CreateUIControls()
    {
       FLOATSLIDER(mStageControls[i].mTargetSlider, ("target" + ofToString(i)).c_str(), &dummyFloat, 0, 1);
       FLOATSLIDER(mStageControls[i].mTimeSlider, ("time" + ofToString(i)).c_str(), &dummyFloat, 1, 1000);
-      FLOATSLIDER(mStageControls[i].mCurveSlider, ("curve" + ofToString(i)).c_str(), &dummyFloat, -1, 1);
+      FLOATSLIDER(mStageControls[i].mCurveSlider, ("curve" + ofToString(i)).c_str(), &dummyFloat, -2, 2);
       CHECKBOX(mStageControls[i].mSustainCheckbox, ("sustain" + ofToString(i)).c_str(), &mStageControls[i].mIsSustainStage);
       UIBLOCK_NEWCOLUMN();
 
@@ -583,6 +586,16 @@ void EnvelopeEditor::ButtonClicked(ClickButton* button, double time)
          Pin();
       }
    }
+}
+
+ofVec2d EnvelopeEditor::GetCurveSliderExtentsForStage(int stage) const
+{
+   if (stage < 0 || stage >= static_cast<int>(mStageControls.size()))
+      return { -2, 2 };
+   return {
+      mStageControls[stage].mCurveSlider->GetMin(),
+      mStageControls[stage].mCurveSlider->GetMax()
+   };
 }
 
 void EnvelopeEditor::Pin()

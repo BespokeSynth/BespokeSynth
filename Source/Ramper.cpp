@@ -78,9 +78,8 @@ void Ramper::OnTransportAdvanced(double amount)
       mRamping = false;
    if (mRamping)
    {
-      double curMeasure = TheTransport->GetMeasure(gTime) + TheTransport->GetMeasurePos(gTime);
-      double measureProgress = curMeasure - mStartMeasure;
-      double length = TheTransport->GetDuration(mLength) / TheTransport->MsPerBar();
+      double measureProgress = gTime - mStartTime;
+      double length = TheTransport->GetDuration(mLength);
       double progress = measureProgress / length;
       if (progress >= 0 && progress < 1)
       {
@@ -153,7 +152,7 @@ void Ramper::Go(double time)
    if (mUIControls[0] != nullptr)
    {
       mStartValue = mUIControls[0]->GetValue();
-      mStartMeasure = TheTransport->GetMeasureTime(time);
+      mStartTime = time;
       mRamping = true;
    }
 }
