@@ -89,7 +89,7 @@ private:
    PatchCableSource* mControlCable{ nullptr };
    float mWidth{ 200 };
    float mHeight{ 120 };
-   EnvelopeControl mEnvelopeControl{ ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30) };
+   EnvelopeControl mEnvelopeControl{ ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30), nullptr };
    ::ADSR mAdsr;
    ClickButton* mRandomizeButton{ nullptr };
    float mFreeRate{ 1000 };
