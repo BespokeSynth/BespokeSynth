@@ -899,7 +899,10 @@ void Looper::UpdateNumBars(int oldNumBars)
       for (int i = 1; i < mNumBars / oldNumBars; ++i)
       {
          for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
-            BufferCopy(mBuffer->GetChannel(ch) + oldLoopLength * i, mBuffer->GetChannel(ch), oldLoopLength);
+         {
+            if (oldLoopLength * i + oldLoopLength < MAX_BUFFER_SIZE)
+               BufferCopy(mBuffer->GetChannel(ch) + oldLoopLength * i, mBuffer->GetChannel(ch), oldLoopLength);
+         }
       }
    }
 }
