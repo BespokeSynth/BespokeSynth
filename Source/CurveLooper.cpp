@@ -82,8 +82,12 @@ void CurveLooper::CreateUIControls()
    mLengthSelector->AddLabel("32", 32);
    mLengthSelector->AddLabel("64", 64);
    mLengthSelector->AddLabel("128", 128);
+   mLengthSelector->AddLabel("free", 0);
 
    mRandomizeButton->PositionTo(mLengthSelector, kAnchor_Right);
+
+   mFreeRateSlider = new FloatSlider(this, "rate", mRandomizeButton, kAnchor_Right, 50, 15, &mFreeRate, 20, 20000);
+   mFreeRateSlider->SetShowing(false);
 }
 
 void CurveLooper::Poll()
@@ -107,8 +111,8 @@ void CurveLooper::OnTransportAdvanced(float amount)
 float CurveLooper::GetPlaybackPosition()
 {
    if (mLength == 0)
-      mLength = 1;
-   else if (mLength < 0)
+      return ofMap(fmod(gTime, mFreeRate), 0, mFreeRate, 0, 1, true);
+   if (mLength < 0)
    {
       float ret = TheTransport->GetMeasurePos(gTime) * (-mLength);
       return FloatWrap(ret, 1);
@@ -123,6 +127,7 @@ void CurveLooper::DrawModule()
 
    mLengthSelector->Draw();
    mRandomizeButton->Draw();
+   mFreeRateSlider->Draw();
 
    mEnvelopeControl.Draw();
 
@@ -156,6 +161,7 @@ bool CurveLooper::MouseMoved(float x, float y)
    return false;
 }
 
+
 void CurveLooper::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    for (size_t i = 0; i < mUIControls.size(); ++i)
@@ -173,6 +179,8 @@ void CurveLooper::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
+   if (list == mLengthSelector)
+      mFreeRateSlider->SetShowing(mLength == 0);
    /*int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
    {
@@ -226,6 +234,7 @@ void CurveLooper::Resize(float w, float h)
    mWidth = MAX(w, 200);
    mHeight = MAX(h, 120);
    mEnvelopeControl.SetDimensions(ofVec2f(mWidth - 10, mHeight - 30));
+   mFreeRateSlider->SetDimensions(mWidth - 4 - mFreeRateSlider->GetRect(true).x, mFreeRateSlider->GetRect(true).height);
 }
 
 void CurveLooper::SaveLayout(ofxJSONElement& moduleInfo)
