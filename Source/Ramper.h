@@ -87,7 +87,7 @@ private:
    ClickButton* mTriggerButton{ nullptr };
    FloatSlider* mTargetValueSlider{ nullptr };
    float mTargetValue{ 0 };
-   float mStartMeasure{ 0 };
+   float mStartTime{ 0 };
    float mStartValue{ 0 };
    bool mRamping{ false };
 };
