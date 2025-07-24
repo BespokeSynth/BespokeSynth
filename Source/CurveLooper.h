@@ -58,7 +58,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {};
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;

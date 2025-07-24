@@ -223,6 +223,10 @@ void CurveLooper::ButtonClicked(ClickButton* button, double time)
    }
 }
 
+void CurveLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+{
+}
+
 void CurveLooper::GetModuleDimensions(float& width, float& height)
 {
    width = mWidth;
