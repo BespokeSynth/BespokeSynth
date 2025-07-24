@@ -47,6 +47,7 @@ ModulatorCurve::ModulatorCurve()
    mAdsr.GetStageData(0).time = 0.01f;
    mAdsr.GetStageData(1).target = 1;
    mAdsr.GetStageData(1).time = kAdsrTime - .02f;
+   mAdsr.SetZeroValueIsFirstStage(true);
 }
 
 void ModulatorCurve::CreateUIControls()

@@ -40,12 +40,15 @@ CurveLooper::CurveLooper()
    mEnvelopeControl.SetViewLength(kAdsrTime);
    mEnvelopeControl.SetFixedLengthMode(true);
    mAdsr.GetFreeReleaseLevel() = true;
-   mAdsr.SetNumStages(2);
+   mAdsr.SetNumStages(3);
    mAdsr.GetHasSustainStage() = false;
-   mAdsr.GetStageData(0).target = .5f;
-   mAdsr.GetStageData(0).time = kAdsrTime * .1f;
+   mAdsr.GetStageData(0).target = 0;
+   mAdsr.GetStageData(0).time = 1;
    mAdsr.GetStageData(1).target = .5f;
-   mAdsr.GetStageData(1).time = kAdsrTime * .8f;
+   mAdsr.GetStageData(1).time = kAdsrTime * .1f;
+   mAdsr.GetStageData(2).target = .5f;
+   mAdsr.GetStageData(2).time = kAdsrTime * .8f;
+   mAdsr.SetZeroValueIsFirstStage(true);
 }
 
 void CurveLooper::Init()
