@@ -67,7 +67,7 @@ void Snapshots::CreateUIControls()
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
       ofColor color = IDrawableModule::GetColor(kModuleCategory_Other);
-      color.a *= .3f;
+      color.a *= .3;
       mModuleCable->SetColor(color);
       mModuleCable->SetManualPosition(10, 10);
       mModuleCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
@@ -78,7 +78,7 @@ void Snapshots::CreateUIControls()
    {
       mUIControlCable = new PatchCableSource(this, kConnectionType_UIControl);
       ofColor color = IDrawableModule::GetColor(kModuleCategory_Modulator);
-      color.a *= .3f;
+      color.a *= .3;
       mUIControlCable->SetColor(color);
       mUIControlCable->SetManualPosition(25, 10);
       mUIControlCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
@@ -137,7 +137,7 @@ void Snapshots::DrawModule()
 
    if (mDisplayMode == DisplayMode::Grid)
    {
-      ofVec2f pos = mGrid->GetPosition(K(local));
+      ofVec2d pos = mGrid->GetPosition(K(local));
       mSnapshotLabelEntry->SetPosition(pos.x, pos.y);
       mStoreCheckbox->PositionTo(mGrid, kAnchor_Below);
       mDeleteCheckbox->PositionTo(mStoreCheckbox, kAnchor_Right_Padded);
@@ -151,7 +151,7 @@ void Snapshots::DrawModule()
 
    if (mDisplayMode == DisplayMode::List)
    {
-      ofVec2f pos = mGrid->GetPosition(K(local));
+      ofVec2d pos = mGrid->GetPosition(K(local));
       pos.y += mSnapshotRenameIndex * kListRowHeight;
       mSnapshotLabelEntry->SetPosition(pos.x, pos.y);
 
@@ -183,7 +183,7 @@ void Snapshots::DrawModule()
          if (!mSnapshotCollection[i].mSnapshots.empty() && mSnapshotRenameIndex != i)
          {
             std::string label = mSnapshotCollection[i].mLabel;
-            ofVec2f pos = mGrid->GetCellPosition(i % mGrid->GetCols(), i / mGrid->GetCols()) + mGrid->GetPosition(true);
+            ofVec2d pos = mGrid->GetCellPosition(i % mGrid->GetCols(), i / mGrid->GetCols()) + mGrid->GetPosition(true);
             DrawTextNormal(label, pos.x + 5, pos.y + 12);
          }
       }
@@ -197,8 +197,8 @@ void Snapshots::DrawModule()
    {
       if (hover >= 0 && hover < mGrid->GetCols() * mGrid->GetRows())
       {
-         ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
-         float squareSize = float(mGrid->GetHeight()) / mGrid->GetRows();
+         ofVec2d pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
+         double squareSize = mGrid->GetHeight() / mGrid->GetRows();
 
          ofPushStyle();
          ofSetColor(0, 0, 0);
@@ -228,9 +228,9 @@ void Snapshots::DrawModule()
    {
       if (mCurrentSnapshot < mGrid->GetCols() * mGrid->GetRows())
       {
-         ofVec2f pos = mGrid->GetCellPosition(mCurrentSnapshot % mGrid->GetCols(), mCurrentSnapshot / mGrid->GetCols()) + mGrid->GetPosition(true);
-         float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-         float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+         ofVec2d pos = mGrid->GetCellPosition(mCurrentSnapshot % mGrid->GetCols(), mCurrentSnapshot / mGrid->GetCols()) + mGrid->GetPosition(true);
+         double xsize = mGrid->GetWidth() / mGrid->GetCols();
+         double ysize = mGrid->GetHeight() / mGrid->GetRows();
 
          ofPushStyle();
          ofSetColor(255, 255, 255);
@@ -285,11 +285,11 @@ void Snapshots::DrawModuleUnclipped()
       if (hover >= 0 && hover < mSnapshotCollection.size())
       {
          std::string tooltip = mSnapshotCollection[hover].mLabel;
-         ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
+         ofVec2d pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
          pos.x += (mGrid->GetWidth() / mGrid->GetCols()) + 3;
          pos.y += (mGrid->GetHeight() / mGrid->GetRows()) / 2;
 
-         float width = GetStringWidth(tooltip);
+         double width = GetStringWidth(tooltip);
 
          ofFill();
          ofSetColor(50, 50, 50);
@@ -313,16 +313,15 @@ bool Snapshots::HasSnapshot(int index) const
       return false;
 }
 
-
 void Snapshots::UpdateGridValues()
 {
    mGrid->Clear();
    for (int i = 0; i < mGrid->GetRows() * mGrid->GetCols(); ++i)
    {
-      float val = 0;
+      double val = 0;
       if (i < mSnapshotCollection.size() &&
           mSnapshotCollection[i].mSnapshots.empty() == false)
-         val = .5f;
+         val = .5;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
 
@@ -356,7 +355,7 @@ void Snapshots::AddSnapshotTarget(IDrawableModule* target)
    }
 }
 
-void Snapshots::OnClicked(float x, float y, bool right)
+void Snapshots::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -365,7 +364,7 @@ void Snapshots::OnClicked(float x, float y, bool right)
 
    if (mGrid->TestClick(x, y, right, true))
    {
-      float gridX, gridY;
+      double gridX, gridY;
       mGrid->GetPosition(gridX, gridY, true);
       GridCell cell = mGrid->GetGridCellAt(x - gridX, y - gridY);
 
@@ -399,7 +398,7 @@ void Snapshots::OnClicked(float x, float y, bool right)
    }
 }
 
-bool Snapshots::MouseMoved(float x, float y)
+bool Snapshots::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
@@ -557,7 +556,7 @@ void Snapshots::RandomizeControl(IUIControl* control)
    control->SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
 }
 
-void Snapshots::OnTransportAdvanced(float amount)
+void Snapshots::OnTransportAdvanced(double amount)
 {
    if (mBlending)
    {
@@ -721,7 +720,7 @@ void Snapshots::OnControllerPageSelected()
    UpdateGridControllerLights(true);
 }
 
-void Snapshots::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void Snapshots::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    int col = x + mGridControlOffsetX;
    int row = y + mGridControlOffsetY;
@@ -739,7 +738,7 @@ void Snapshots::OnGridButton(int x, int y, float velocity, IGridController* grid
    }
 }
 
-bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    mPush2Connected = true;
 
@@ -839,9 +838,9 @@ void Snapshots::ResizeSnapshotCollection(int size)
 
 namespace
 {
-   const float extraW = 9;
-   const float extraH = 58;
-   const float gridSquareDimension = 18;
+   const double extraW = 9;
+   const double extraH = 58;
+   const double gridSquareDimension = 18;
    const int maxGridSide = 20;
 }
 
@@ -908,18 +907,18 @@ void Snapshots::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void Snapshots::GetModuleDimensions(float& width, float& height)
+void Snapshots::GetModuleDimensions(double& width, double& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH + ((mGridControlOffsetXSlider->IsShowing() || mGridControlOffsetYSlider->IsShowing()) ? 18 : 0);
 }
 
-void Snapshots::Resize(float w, float h)
+void Snapshots::Resize(double w, double h)
 {
    SetGridSize(MAX(w - extraW, 137), MAX(h - extraH, gridSquareDimension));
 }
 
-void Snapshots::SetGridSize(float w, float h)
+void Snapshots::SetGridSize(double w, double h)
 {
    assert(mDisplayMode == DisplayMode::Grid);
    mGrid->SetDimensions(w, h);
@@ -942,8 +941,8 @@ void Snapshots::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("auto_store_on_switch", moduleInfo, false);
 
    //for rev < 4
-   mOldWidth = moduleInfo["gridwidth"].asFloat();
-   mOldHeight = moduleInfo["gridheight"].asFloat();
+   mOldWidth = moduleInfo["gridwidth"].asDouble();
+   mOldHeight = moduleInfo["gridheight"].asDouble();
 
    SetUpFromSaveData();
 }
@@ -957,7 +956,7 @@ void Snapshots::SetUpFromSaveData()
    if (mDisplayMode == DisplayMode::Grid)
    {
       // set up the grid
-      float w, h;
+      double w, h;
       GetModuleDimensions(w, h);
       Resize(w, h);
    }
@@ -1060,7 +1059,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       for (auto& snapshotData : mSnapshotCollection[i].mSnapshots)
       {
          in >> snapshotData.mControlPath;
-         in >> snapshotData.mValue;
+         in >> FloatAsDouble >> snapshotData.mValue;
          in >> snapshotData.mHasLFO;
          snapshotData.mLFOSettings.LoadState(in);
          in >> snapshotData.mGridCols;
@@ -1076,7 +1075,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
          }
          snapshotData.mGridContents.resize(size_t(snapshotData.mGridCols) * snapshotData.mGridRows);
          for (int k = 0; k < snapshotData.mGridCols * snapshotData.mGridRows; ++k)
-            in >> snapshotData.mGridContents[k];
+            in >> FloatAsDouble >> snapshotData.mGridContents[k];
          in >> snapshotData.mString;
       }
       in >> mSnapshotCollection[i].mLabel;
@@ -1129,9 +1128,9 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
 
    if (rev >= 4)
    {
-      float w, h;
-      in >> w;
-      in >> h;
+      double w, h;
+      in >> FloatAsDouble >> w;
+      in >> FloatAsDouble >> h;
       if (mDisplayMode == DisplayMode::Grid)
          SetGridSize(w, h);
    }

@@ -63,7 +63,7 @@ public:
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
    //IButtonListener
@@ -79,7 +79,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 260;
       height = 360;
@@ -132,18 +132,18 @@ private:
    int mGb{ 0 };
    int mG{ 0 };
    int mAb{ 0 };
-   float mAmount{ 1 };
-   float mSmooth{ 0 };
+   double mAmount{ 1 };
+   double mSmooth{ 0 };
    int mShift{ 0 };
    int mScwarp{ 0 };
-   float mLfoamp{ 0 };
-   float mLforate{ 0 };
+   double mLfoamp{ 0 };
+   double mLforate{ 0 };
    int mLfoshape{ 0 };
-   float mLfosymm{ 0 };
+   double mLfosymm{ 0 };
    bool mLfoquant{ false };
    bool mFcorr{ false };
-   float mFwarp{ 0 };
-   float mMix{ 1 };
+   double mFwarp{ 0 };
+   double mMix{ 1 };
    float mPitch{ 0 };
    float mConfidence{ 0 };
    float mLatency{ 0 };

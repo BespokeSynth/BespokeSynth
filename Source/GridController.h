@@ -50,7 +50,7 @@ class IGridControllerListener
 public:
    virtual ~IGridControllerListener() {}
    virtual void OnControllerPageSelected() = 0;
-   virtual void OnGridButton(int x, int y, float velocity, IGridController* grid) = 0;
+   virtual void OnGridButton(int x, int y, double velocity, IGridController* grid) = 0;
 };
 
 class IGridController
@@ -59,7 +59,7 @@ public:
    virtual ~IGridController() {}
    virtual void SetGridControllerOwner(IGridControllerListener* owner) = 0;
    virtual void SetLight(int x, int y, GridColor color, bool force = false) = 0;
-   virtual void SetLightDirect(int x, int y, int color, bool force = false) = 0;
+   virtual void SetLightDirect(int x, int y, double color, bool force = false) = 0;
    virtual void ResetLights() = 0;
    virtual int NumCols() = 0;
    virtual int NumRows() = 0;
@@ -75,7 +75,7 @@ public:
    virtual ~GridControlTarget() {}
 
    void Render() override;
-   static void DrawGridIcon(float x, float y);
+   static void DrawGridIcon(double x, double y);
 
    void SetGridController(IGridController* gridController)
    {
@@ -85,8 +85,8 @@ public:
    IGridController* GetGridController() { return mGridController; }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -95,12 +95,12 @@ public:
    bool GetNoHover() const override { return true; }
 
 private:
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = 30;
       height = 15;
    }
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    IGridControllerListener* mOwner{ nullptr };
    IGridController* mGridController{ nullptr };
@@ -118,7 +118,7 @@ public:
    //IGridController
    void SetGridControllerOwner(IGridControllerListener* owner) override { mOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
-   void SetLightDirect(int x, int y, int color, bool force = false) override;
+   void SetLightDirect(int x, int y, double color, bool force = false) override;
    void ResetLights() override;
    int NumCols() override { return mCols; }
    int NumRows() override { return mRows; }
@@ -127,13 +127,13 @@ public:
    bool IsConnected() const override { return mMidiController != nullptr; }
 
    void OnControllerPageSelected();
-   void OnInput(int control, float velocity);
+   void OnInput(int control, double velocity);
 
 private:
    unsigned int mRows{ 8 };
    unsigned int mCols{ 8 };
    int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
-   float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
+   double mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
    int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS]{};
    std::vector<int> mColors;
    MidiMessageType mMessageType{ MidiMessageType::kMidiMessage_Note };

@@ -73,8 +73,8 @@ void MultitrackRecorder::DrawModule()
    if (mStatusStringTime + 5000 > gTime)
       DrawTextNormal(mStatusString, 120, 33);
 
-   float posX = 5;
-   float posY = 42;
+   double posX = 5;
+   double posY = 42;
    for (auto* track : mTracks)
    {
       track->SetPosition(posX, posY);
@@ -234,7 +234,7 @@ void MultitrackRecorder::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
+   in >> FloatAsDouble >> mWidth;
 
    //preserve order
    int numTracks;
@@ -347,12 +347,12 @@ void MultitrackRecorderTrack::DrawModule()
 {
    mDeleteButton->Draw();
 
-   float width, height;
+   double width, height;
    GetModuleDimensions(width, height);
 
    ofPushMatrix();
    ofTranslate(5, 3);
-   float sampleWidth = width - 10;
+   double sampleWidth = width - 10;
 
    ofSetColor(255, 255, 255, 30);
    ofFill();
@@ -367,7 +367,7 @@ void MultitrackRecorderTrack::DrawModule()
 
    ofPushMatrix();
    int numChunks = mRecordingLength / kRecordingChunkSize + 1;
-   float chunkWidth = sampleWidth / numChunks;
+   double chunkWidth = sampleWidth / numChunks;
    for (int i = 0; i < numChunks; ++i)
    {
       if (i < (int)mRecordChunks.size())
@@ -448,7 +448,7 @@ void MultitrackRecorderTrack::Clear()
    MultitrackRecorderTrack::Poll();
 }
 
-void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -471,11 +471,11 @@ void MultitrackRecorderTrack::SetUpFromSaveData()
 {
 }
 
-void MultitrackRecorderTrack::GetModuleDimensions(float& width, float& height)
+void MultitrackRecorderTrack::GetModuleDimensions(double& width, double& height)
 {
    if (mRecorder)
    {
-      float parentWidth, parentHeight;
+      double parentWidth, parentHeight;
       mRecorder->GetDimensions(parentWidth, parentHeight);
 
       width = parentWidth - 15;

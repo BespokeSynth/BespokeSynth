@@ -117,7 +117,7 @@ void Checkbox::Render()
    }
    else
    {
-      ofSetColor(color.r, color.g, color.b, color.a * .2f);
+      ofSetColor(color.r, color.g, color.b, color.a * .2);
       ofRect(mX, mY + 1, mHeight - 3, mHeight - 3);
    }
 
@@ -138,7 +138,7 @@ void Checkbox::Render()
    DrawHover(mX, mY, mWidth, mHeight);
 }
 
-void Checkbox::OnClicked(float x, float y, bool right)
+void Checkbox::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -154,17 +154,17 @@ void Checkbox::CalcSliderVal()
    mSliderVal = *mVar ? 1 : 0;
 }
 
-bool Checkbox::MouseMoved(float x, float y)
+bool Checkbox::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    return false;
 }
 
-void Checkbox::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void Checkbox::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
    mSliderVal = slider;
-   bool on = GetValueForMidiCC(slider) > 0.5f;
+   bool on = GetValueForMidiCC(slider) > 0.5;
    if (*mVar != on)
    {
       *mVar = on;
@@ -173,14 +173,14 @@ void Checkbox::SetFromMidiCC(float slider, double time, bool setViaModulator)
    }
 }
 
-float Checkbox::GetValueForMidiCC(float slider) const
+double Checkbox::GetValueForMidiCC(double slider) const
 {
-   return slider > .5f ? 1 : 0;
+   return slider > .5 ? 1 : 0;
 }
 
-void Checkbox::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void Checkbox::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
-   bool on = value > 0.5f;
+   bool on = value > 0.5;
    if (*mVar != on || forceUpdate)
    {
       *mVar = on;
@@ -189,22 +189,22 @@ void Checkbox::SetValue(float value, double time, bool forceUpdate /*= false*/)
    }
 }
 
-float Checkbox::GetMidiValue() const
+double Checkbox::GetMidiValue() const
 {
    return mSliderVal;
 }
 
-float Checkbox::GetValue() const
+double Checkbox::GetValue() const
 {
    return *mVar;
 }
 
-std::string Checkbox::GetDisplayValue(float val) const
+std::string Checkbox::GetDisplayValue(double val) const
 {
    return val > 0 ? "on" : "off";
 }
 
-void Checkbox::Increment(float amount)
+void Checkbox::Increment(double amount)
 {
    *mVar = !*mVar;
    CalcSliderVal();
@@ -225,7 +225,7 @@ bool Checkbox::CheckNeedsDraw()
    return *mVar != mLastDisplayedValue;
 }
 
-void Checkbox::OnPulse(double time, float velocity, int flags)
+void Checkbox::OnPulse(double time, double velocity, int flags)
 {
    SetValue(*mVar ? 0 : 1, time, false);
 }
@@ -239,7 +239,7 @@ void Checkbox::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
 
-   out << (float)*mVar;
+   out << static_cast<double>(*mVar);
 }
 
 void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -248,8 +248,9 @@ void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
 
-   float var;
-   in >> var;
+   double var;
+   in >> FloatAsDouble >> var;
+
    if (shouldSetValue)
       SetValueDirect(var, gTime);
 }

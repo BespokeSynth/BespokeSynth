@@ -73,9 +73,9 @@ void PressureToCV::PlayNote(NoteMessage note)
    }
 }
 
-float PressureToCV::Value(int samplesIn)
+double PressureToCV::Value(int samplesIn)
 {
-   float pressure = mPressure ? mPressure->GetValue(samplesIn) : ModulationParameters::kDefaultPressure;
+   double pressure = mPressure ? mPressure->GetValue(samplesIn) : ModulationParameters::kDefaultPressure;
    return ofMap(pressure, 0, 1, GetMin(), GetMax(), K(clamped));
 }
 

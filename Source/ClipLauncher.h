@@ -59,7 +59,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -76,7 +76,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    class SampleData
    {
@@ -89,7 +89,7 @@ private:
 
       Sample* mSample{ nullptr };
       int mNumBars{ 1 };
-      float mVolume{ 1 };
+      double mVolume{ 1 };
       Checkbox* mGrabCheckbox{ nullptr };
       Checkbox* mPlayCheckbox{ nullptr };
       ClipLauncher* mClipLauncher{ nullptr };
@@ -100,7 +100,7 @@ private:
 
    Looper* mLooper{ nullptr };
 
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
 
    std::vector<SampleData> mSamples;

@@ -54,19 +54,19 @@ public:
    //IDrawableModule
    void Init() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -80,7 +80,7 @@ public:
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -93,10 +93,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
 
-   void SetGridSize(float w, float h);
+   void SetGridSize(double w, double h);
    int GetStep(double time);
    void UpdateInterval();
    void UpdateNumMeasures(int oldNumMeasures);
@@ -116,15 +116,15 @@ private:
    bool mWrite{ false };
    bool mNoteRepeat{ false };
    bool mLinkColumns{ false };
-   float mWidth{ 240 };
-   float mHeight{ 20 };
+   double mWidth{ 240 };
+   double mHeight{ 20 };
    bool mUseLightVelocity{ false };
    bool mUseMedVelocity{ false };
    bool mClearLane{ false };
    bool mSustain{ false };
-   float mVelocityFull{ 1 };
-   float mVelocityMed{ .5 };
-   float mVelocityLight{ .25 };
+   double mVelocityFull{ 1 };
+   double mVelocityMed{ .5 };
+   double mVelocityLight{ .25 };
 
    DropdownList* mIntervalSelector{ nullptr };
    Checkbox* mWriteCheckbox{ nullptr };
@@ -149,8 +149,8 @@ private:
    {
       ClickButton* mStoreButton{ nullptr };
       ClickButton* mLoadButton{ nullptr };
-      float mNumMeasures{ 1 };
-      std::array<float, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
+      int mNumMeasures{ 1 };
+      std::array<double, MAX_GRID_COLS * MAX_GRID_ROWS> mData{};
       bool mHasSequence{ false };
    };
 

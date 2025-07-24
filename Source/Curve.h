@@ -35,34 +35,34 @@ struct CurvePoint
 {
 public:
    CurvePoint() {}
-   CurvePoint(float time, float value)
+   CurvePoint(double time, double value)
    : mTime(time)
    , mValue(value)
    {}
-   float mTime{ 0 };
-   float mValue{ 0 };
+   double mTime{ 0 };
+   double mValue{ 0 };
 };
 
 class Curve : public IClickable
 {
 public:
-   Curve(float defaultValue);
+   Curve(double defaultValue);
    void AddPoint(CurvePoint point);
    void AddPointAtEnd(CurvePoint point); //only use this if you are sure that there are no points already added at an earlier time
-   float Evaluate(float time, bool holdEndForLoop = false);
+   double Evaluate(double time, bool holdEndForLoop = false);
    void Render() override;
-   void SetExtents(float start, float end)
+   void SetExtents(double start, double end)
    {
       mStart = start;
       mEnd = end;
    }
    void SetColor(ofColor color) { mColor = color; }
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   void SetDimensions(float width, float height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;
@@ -75,20 +75,20 @@ public:
    void LoadState(FileStreamIn& in);
 
 protected:
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
 private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
-   int FindIndexForTime(float time);
+   int FindIndexForTime(double time);
    std::array<CurvePoint, 5000> mPoints;
    int mNumCurvePoints{ 0 };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
-   float mStart{ 0 };
-   float mEnd{ 1 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
+   double mStart{ 0 };
+   double mEnd{ 1 };
    ofColor mColor{ ofColor::white };
    int mLastEvalIndex{ 0 };
-   float mDefaultValue{ 0 };
+   double mDefaultValue{ 0 };
 };

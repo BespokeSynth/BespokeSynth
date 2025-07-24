@@ -65,21 +65,21 @@ public:
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
@@ -94,8 +94,8 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
    void MouseReleased() override;
 
    void InitGrid();
@@ -126,7 +126,7 @@ private:
    bool mPassthrough{ true };
    Checkbox* mPassthroughCheckbox{ nullptr };
 
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
    bool mEditMode{ false };
    Checkbox* mEditCheckbox{ nullptr };
@@ -140,8 +140,8 @@ private:
 
    int mEditSampleX{ 2 };
    int mEditSampleY{ 95 };
-   float mEditSampleWidth{ 395 };
-   float mEditSampleHeight{ 200 };
+   double mEditSampleWidth{ 395 };
+   double mEditSampleHeight{ 200 };
    GridSample* mEditSample{ nullptr };
    IntSlider* mEditStartSlider{ nullptr };
    IntSlider* mEditEndSlider{ nullptr };

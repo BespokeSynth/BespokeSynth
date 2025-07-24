@@ -25,15 +25,15 @@
 
 #include "ModulationChain.h"
 
-ModulationChain::ModulationChain(float initialValue)
+ModulationChain::ModulationChain(double initialValue)
 {
    mRamp.SetValue(initialValue);
    mLFO.SetMode(kLFOMode_Oscillator);
 }
 
-float ModulationChain::GetValue(int samplesIn) const
+double ModulationChain::GetValue(int samplesIn) const
 {
-   float value = GetIndividualValue(samplesIn);
+   double value = GetIndividualValue(samplesIn);
    if (mMultiplyIn)
       value *= mMultiplyIn->GetIndividualValue(samplesIn);
    if (mSidechain)
@@ -45,32 +45,32 @@ float ModulationChain::GetValue(int samplesIn) const
    return value;
 }
 
-float ModulationChain::GetIndividualValue(int samplesIn) const
+double ModulationChain::GetIndividualValue(int samplesIn) const
 {
    double time = gTime + gInvSampleRateMs * samplesIn;
-   float value;
+   double value;
    if (mRamp.HasValue(time))
       value = mRamp.Value(time);
    else
       value = 0;
    if (mLFOAmount != 0)
-      value += mLFO.Value(samplesIn) * mLFOAmount;
+      value += mLFO.Value(samplesIn, -1) * mLFOAmount;
    if (mBuffer != nullptr && samplesIn >= 0 && samplesIn < gBufferSize)
       value += mBuffer[samplesIn];
    return value;
 }
 
-void ModulationChain::SetValue(float value)
+void ModulationChain::SetValue(double value)
 {
    mRamp.Start(gTime, value, gTime + gInvSampleRateMs * gBufferSize);
 }
 
-void ModulationChain::RampValue(double time, float from, float to, double length)
+void ModulationChain::RampValue(double time, double from, double to, double length)
 {
    mRamp.Start(time, from, to, time + length);
 }
 
-void ModulationChain::SetLFO(NoteInterval interval, float amount)
+void ModulationChain::SetLFO(NoteInterval interval, double amount)
 {
    mLFO.SetPeriod(interval);
    mLFOAmount = amount;

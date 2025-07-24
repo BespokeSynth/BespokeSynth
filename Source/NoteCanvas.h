@@ -55,7 +55,7 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void KeyPressed(int key, bool isRepeat) override;
 
    void PlayNote(NoteMessage note) override;
@@ -69,12 +69,12 @@ public:
     */
    void FitNotes();
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CanvasUpdated(Canvas* canvas) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -92,7 +92,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    double GetCurPos(double time) const;
    void UpdateNumColumns();

@@ -52,7 +52,7 @@ void ValueStream::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .4f, 5);
+   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, .4, 5);
    ENDUIBLOCK0();
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mControlCable);
@@ -62,7 +62,7 @@ void ValueStream::Poll()
 {
 }
 
-void ValueStream::OnTransportAdvanced(float amount)
+void ValueStream::OnTransportAdvanced(double amount)
 {
    if (mUIControl && mEnabled)
    {
@@ -88,11 +88,11 @@ void ValueStream::DrawModule()
       ofBeginShape();
       for (int i = 0; i < mWidth; ++i)
       {
-         float x = mWidth - i;
+         double x = mWidth - i;
          int samplesAgo = int(i / (mSpeed / 200)) + 1;
          if (samplesAgo < mValues.size())
          {
-            float y = ofMap(mValues[(mValueDisplayPointer - samplesAgo + mValues.size()) % mValues.size()], mFloatSlider->GetMin(), mFloatSlider->GetMax(), mHeight - 10, 10);
+            double y = ofMap(mValues[(mValueDisplayPointer - samplesAgo + mValues.size()) % mValues.size()], mFloatSlider->GetMin(), mFloatSlider->GetMax(), mHeight - 10, 10);
             ofVertex(x, y);
          }
       }
@@ -110,13 +110,13 @@ void ValueStream::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    mFloatSlider = dynamic_cast<FloatSlider*>(mUIControl);
 }
 
-void ValueStream::GetModuleDimensions(float& width, float& height)
+void ValueStream::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void ValueStream::Resize(float w, float h)
+void ValueStream::Resize(double w, double h)
 {
    mWidth = MAX(w, 200);
    mHeight = MAX(h, 120);

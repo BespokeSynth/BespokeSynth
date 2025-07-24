@@ -49,13 +49,13 @@ void LocationZoomer::Update()
    if (mCurrentProgress < 1)
    {
       mCurrentProgress = ofClamp(mCurrentProgress + ofGetLastFrameTime() * mSpeed, 0, 1);
-      float ease;
+      double ease;
       if (mInVanityPanningMode) //ease in/out
          ease = mCurrentProgress < 0.5 ? 2 * mCurrentProgress * mCurrentProgress : 1 - pow(-2 * mCurrentProgress + 2, 2) / 2;
       else //ease out
          ease = -1 * mCurrentProgress * (mCurrentProgress - 2);
       gDrawScale = ofLerp(mStart.mZoomLevel, mDestination.mZoomLevel, ease);
-      ofVec2f offset;
+      ofVec2d offset;
       offset.x = ofLerp(mStart.mOffset.x, mDestination.mOffset.x, ease);
       offset.y = ofLerp(mStart.mOffset.y, mDestination.mOffset.y, ease);
       TheSynth->SetDrawOffset(offset);
@@ -125,25 +125,25 @@ void LocationZoomer::PickNewVanityPanningDestination()
    std::vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
 
-   ofVec2f allModulesCenter;
+   ofVec2d allModulesCenter;
    for (int i = 0; i < (int)modules.size(); ++i)
    {
       if (modules[i]->IsShowing() && !modules[i]->Minimized())
       {
-         ofVec2f modulePos = modules[i]->GetRect().getCenter();
+         ofVec2d modulePos = modules[i]->GetRect().getCenter();
          allModulesCenter += modulePos / (int)modules.size();
       }
    }
 
    const int kRandomChoices = 3;
-   ofVec2f randomModulesCenter;
+   ofVec2d randomModulesCenter;
    int attempts = 0;
    for (int i = 0; i < kRandomChoices; ++i)
    {
       int choice = gRandom() % ((int)modules.size());
       if (modules[choice]->IsShowing() && !modules[choice]->Minimized())
       {
-         ofVec2f modulePos = modules[choice]->GetRect().getCenter();
+         ofVec2d modulePos = modules[choice]->GetRect().getCenter();
          randomModulesCenter += modulePos / kRandomChoices;
       }
       else
@@ -156,18 +156,18 @@ void LocationZoomer::PickNewVanityPanningDestination()
          break;
    }
 
-   ofVec2f center = allModulesCenter * .5f + randomModulesCenter * .5f;
+   ofVec2d center = allModulesCenter * .5 + randomModulesCenter * .5;
 
-   float newScale = ofRandom(1, 1.5f) * UserPrefs.zoom.Get();
+   double newScale = ofRandom(1., 1.5) * UserPrefs.zoom.Get();
 
    mStart.mZoomLevel = gDrawScale;
    mStart.mOffset = TheSynth->GetDrawOffset();
 
    mDestination.mZoomLevel = newScale;
-   mDestination.mOffset = (center * -1) + ofVec2f(ofGetWidth(), ofGetHeight()) / newScale * .5f;
+   mDestination.mOffset = (center * -1) + ofVec2d(ofGetWidth(), ofGetHeight()) / newScale * .5;
 
    mCurrentProgress = 0;
-   mSpeed = ofRandom(.03f, .1f);
+   mSpeed = ofRandom(.03, .1);
 }
 
 ofxJSONElement LocationZoomer::GetSaveData()
@@ -205,5 +205,5 @@ void LocationZoomer::LoadFromSaveData(const ofxJSONElement& saveData)
       }
    }
    MoveToLocation(-1);
-   mCurrentProgress = .999f;
+   mCurrentProgress = .999;
 }

@@ -32,10 +32,10 @@
 #include "Profiler.h"
 #include "ModulationChain.h"
 
-const float mBufferX = 5;
-const float mBufferY = 50;
-const float mBufferW = 800;
-const float mBufferH = 200;
+const double mBufferX = 5;
+const double mBufferY = 50;
+const double mBufferW = 800;
+const double mBufferH = 200;
 
 MultitapDelay::MultitapDelay()
 : IAudioProcessor(gBufferSize)
@@ -57,7 +57,7 @@ void MultitapDelay::CreateUIControls()
    int tapBoxW = (mBufferW - 30) / 4;
 
    mDryAmountSlider = new FloatSlider(this, "dry", 5, 10, tapBoxW, 15, &mDryAmount, 0, 1);
-   mDisplayLengthSlider = new FloatSlider(this, "display length", mDryAmountSlider, kAnchor_Below, tapBoxW, 15, &mDisplayLength, .1f, mDelayBuffer.Size() / gSampleRate);
+   mDisplayLengthSlider = new FloatSlider(this, "display length", mDryAmountSlider, kAnchor_Below, tapBoxW, 15, &mDisplayLength, .1, mDelayBuffer.Size() / gSampleRate);
    mDisplayLength = mDisplayLengthSlider->GetMax();
 
    for (int i = 0; i < mNumTaps; ++i)
@@ -104,7 +104,7 @@ void MultitapDelay::Process(double time)
    for (int t = 0; t < mNumTaps; ++t)
       mTaps[t].mTapBuffer.SetNumActiveChannels(mWriteBuffer.NumActiveChannels());
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();
@@ -179,7 +179,7 @@ void MultitapDelay::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void MultitapDelay::OnClicked(float x, float y, bool right)
+void MultitapDelay::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -189,7 +189,7 @@ void MultitapDelay::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool MultitapDelay::MouseMoved(float x, float y)
+bool MultitapDelay::MouseMoved(double x, double y)
 {
    return IDrawableModule::MouseMoved(x, y);
 }
@@ -198,13 +198,13 @@ void MultitapDelay::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void MultitapDelay::GetModuleDimensions(float& width, float& height)
+void MultitapDelay::GetModuleDimensions(double& width, double& height)
 {
    width = mBufferW + 10;
    height = mBufferY + mBufferH + 10 + 80 * ceil(mNumTaps / 4.0);
 }
 
-void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -336,7 +336,7 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
    if (mGain > 0)
    {
       float delaySamps = mDelayMs / gInvSampleRateMs;
-      delaySamps = ofClamp(delaySamps - offset, 0.1f, mOwner->mDelayBuffer.Size() - 2);
+      delaySamps = ofClamp(delaySamps - offset, 0.1, mOwner->mDelayBuffer.Size() - 2);
 
       int sampsAgoA = int(delaySamps);
       int sampsAgoB = sampsAgoA + 1;
@@ -355,12 +355,12 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
    }
 }
 
-void MultitapDelay::DelayTap::Draw(float w, float h)
+void MultitapDelay::DelayTap::Draw(double w, double h)
 {
    ofPushStyle();
    ofFill();
-   float x = ofClamp(1 - (mDelayMs * gSampleRateMs) / (mOwner->mDisplayLength * gSampleRate), 0, 1) * w;
-   float y = h - mGain * h;
+   double x = ofClamp(1 - (mDelayMs * gSampleRateMs) / (mOwner->mDisplayLength * gSampleRate), 0, 1) * w;
+   double y = h - mGain * h;
    ofLine(x, y, x, h);
    ofRect(x - 5, y - 5, 10, 10);
    ofPopStyle();

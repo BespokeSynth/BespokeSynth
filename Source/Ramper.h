@@ -52,14 +52,14 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -73,9 +73,9 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
 
    void Go(double time);
@@ -86,8 +86,8 @@ private:
    PatchCableSource* mControlCable{ nullptr };
    ClickButton* mTriggerButton{ nullptr };
    FloatSlider* mTargetValueSlider{ nullptr };
-   float mTargetValue{ 0 };
-   float mStartTime{ 0 };
-   float mStartValue{ 0 };
+   double mTargetValue{ 0 };
+   double mStartTime{ 0 };
+   double mStartValue{ 0 };
    bool mRamping{ false };
 };

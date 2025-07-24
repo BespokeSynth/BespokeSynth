@@ -28,7 +28,7 @@
 #include "IPulseReceiver.h"
 #include "PatchCableSource.h"
 
-void IPulseSource::DispatchPulse(PatchCableSource* destination, double time, float velocity, int flags)
+void IPulseSource::DispatchPulse(PatchCableSource* destination, double time, double velocity, int flags)
 {
    if (time == destination->GetLastOnEventTime()) //avoid stack overflow
       return;

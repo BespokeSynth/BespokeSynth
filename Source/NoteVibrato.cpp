@@ -68,7 +68,7 @@ void NoteVibrato::DrawModule()
    mIntervalSelector->Draw();
 }
 
-void NoteVibrato::OnTransportAdvanced(float amount)
+void NoteVibrato::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 }
@@ -84,7 +84,7 @@ void NoteVibrato::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteVibrato::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mVibratoSlider)
       mModulation.GetPitchBend(-1)->SetLFO(mVibratoInterval, mVibratoAmount);

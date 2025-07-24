@@ -90,12 +90,12 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void PostRender() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight + (mShowManualGrid ? 98 : 0);
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    bool Initialize();
    void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio);
@@ -105,7 +105,7 @@ private:
    void DrawDisplayModuleControls();
    void DrawLowerModuleSelector();
    void DrawRoutingDisplay();
-   void DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos);
+   void DrawControls(std::vector<IUIControl*> controls, bool sliders, double yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
    void RemoveFavoriteControl(IUIControl* control);
@@ -120,7 +120,7 @@ private:
    bool IsIgnorableModule(IDrawableModule* module);
    std::vector<IDrawableModule*> SortModules(std::vector<IDrawableModule*> modules);
    void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
-   void DrawDisplayModuleRect(ofRectangle rect, float thickness);
+   void DrawDisplayModuleRect(ofRectangle rect, double thickness);
    std::string GetModuleTypeToSpawn();
    ModuleCategory GetModuleTypeForSpawnList(IUIControl* control);
    ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
@@ -133,13 +133,13 @@ private:
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
 
-   const float kColumnSpacing = 121;
+   const double kColumnSpacing = 121;
 
    int mFontHandle{ 0 };
    int mFontHandleBold{ 0 };
 
-   float mWidth{ 100 };
-   float mHeight{ 20 };
+   double mWidth{ 100 };
+   double mHeight{ 20 };
 
    IDrawableModule* mDisplayModule{ nullptr };
    Snapshots* mDisplayModuleSnapshots{ nullptr };
@@ -149,11 +149,11 @@ private:
    std::vector<IUIControl*> mDisplayedControls;
    bool mDisplayModuleIsShowingOverrideControls{ false };
    int mModuleViewOffset{ 0 };
-   float mModuleViewOffsetSmoothed{ 0 };
+   double mModuleViewOffsetSmoothed{ 0 };
 
    std::vector<IDrawableModule*> mModules;
-   float mModuleListOffset{ 0 };
-   float mModuleListOffsetSmoothed{ 0 };
+   double mModuleListOffset{ 0 };
+   double mModuleListOffsetSmoothed{ 0 };
    std::array<IDrawableModule*, 8 * 8> mModuleGrid;
    std::array<PatchCableSource*, 8 * 8> mModuleGridManualCables;
    ofRectangle mModuleGridRect;
@@ -234,6 +234,6 @@ class IPush2GridController
 public:
    virtual ~IPush2GridController() {}
    virtual void OnPush2Connect() {}
-   virtual bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) = 0;
+   virtual bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) = 0;
    virtual void UpdatePush2Leds(Push2Control* push2) = 0;
 };

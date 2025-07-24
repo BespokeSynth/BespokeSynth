@@ -54,19 +54,19 @@ public:
    IUIControl* GetUIControl() const { return mTargets.size() == 0 ? nullptr : mTargets[0]; }
 
    //IGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //IDrawableModule
    void Poll() override;
    bool IsResizable() const override { return !mSliderMode; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //ITimeListener
    void OnTimeEvent(double time) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -78,7 +78,7 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
 
@@ -100,13 +100,13 @@ public:
 
 private:
    void Step(double time, int pulseFlags);
-   void SetGridSize(float w, float h);
+   void SetGridSize(double w, double h);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
 
    UIGrid* mGrid{ nullptr };

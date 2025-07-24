@@ -367,7 +367,7 @@ void VSTPlugin::CreateUIControls()
 
    mMidiOutCable = new AdditionalNoteCable();
    mMidiOutCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-   mMidiOutCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+   mMidiOutCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
    AddPatchCableSource(mMidiOutCable->GetPatchCableSource());
    mMidiOutCable->GetPatchCableSource()->SetManualPosition(206 - 10, 10);
 
@@ -403,11 +403,11 @@ void VSTPlugin::RecreateUIOutputCables()
       }
    }
 
-   float width, height;
+   double width, height;
    GetModuleDimensions(width, height);
 
    auto NumCables = static_cast<float>(mAdditionalOutCables.size()) + 1;
-   float DesiredGap = width / (NumCables + 1);
+   double DesiredGap = width / (NumCables + 1);
 
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
    GetPatchCableSource()->SetManualPosition(DesiredGap, height + 3);
@@ -841,7 +841,7 @@ void VSTPlugin::Process(double time)
 
    const int kSafetyMaxStereoChannels = VSTPlugin::maxStereoOutputChannels; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    juce::AudioBuffer<float> buffer(juceBufferChannelCount, bufferSize);
@@ -1147,8 +1147,7 @@ void VSTPlugin::DrawModule()
       }
 }
 
-
-void VSTPlugin::GetModuleDimensions(float& width, float& height)
+void VSTPlugin::GetModuleDimensions(double& width, double& height)
 {
    width = 236;
    height = 76;
@@ -1192,7 +1191,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (const auto& parameterSlider : mParameterSliders)
    {
@@ -1287,6 +1286,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
                if (mParameterSliders[i].mShowing)
                   exposedParams.push_back(i);
             }
+
             output.writeInt((int)exposedParams.size());
             for (auto& i : exposedParams)
                output.writeInt(i);

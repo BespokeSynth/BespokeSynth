@@ -43,7 +43,7 @@ void GlobalControls::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   FLOATSLIDER(mZoomSlider, "zoom", &gDrawScale, .1f, 8.0f);
+   FLOATSLIDER(mZoomSlider, "zoom", &gDrawScale, .1, 8);
    FLOATSLIDER(mXSlider, "x pos", &(TheSynth->GetDrawOffset().x), -10000, 10000);
    FLOATSLIDER(mYSlider, "y pos", &(TheSynth->GetDrawOffset().y), -10000, 10000);
    FLOATSLIDER(mMouseScrollXSlider, "scroll x", &mMouseScrollX, -100, 100);
@@ -84,32 +84,32 @@ void GlobalControls::DrawModule()
    mCableAlphaSlider->Draw();
 }
 
-void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void GlobalControls::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mZoomSlider && gHoveredUIControl != mZoomSlider) //avoid bad behavior when adjusting these via mouse
    {
       //zoom in on center of screen
-      float zoomAmount = (gDrawScale - oldVal) / oldVal;
-      ofVec2f zoomCenter = ofVec2f(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer())) + TheSynth->GetDrawOffset();
+      double zoomAmount = (gDrawScale - oldVal) / oldVal;
+      ofVec2d zoomCenter = ofVec2d(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer())) + TheSynth->GetDrawOffset();
       TheSynth->GetDrawOffset() -= zoomCenter * zoomAmount;
    }
 
    if (slider == mMouseScrollXSlider && gHoveredUIControl != mMouseScrollXSlider) //avoid bad behavior when adjusting these via mouse
    {
-      float delta = mMouseScrollX - oldVal;
+      double delta = mMouseScrollX - oldVal;
       TheSynth->MouseScrolled(-delta, 0, false, false, false);
       mMouseScrollX = 0;
    }
 
    if (slider == mMouseScrollYSlider && gHoveredUIControl != mMouseScrollYSlider) //avoid bad behavior when adjusting these via mouse
    {
-      float delta = mMouseScrollY - oldVal;
+      double delta = mMouseScrollY - oldVal;
       TheSynth->MouseScrolled(0, -delta, false, false, false);
       mMouseScrollY = 0;
    }
 }
 
-void GlobalControls::GetModuleDimensions(float& w, float& h)
+void GlobalControls::GetModuleDimensions(double& w, double& h)
 {
    w = mWidth;
    h = mHeight;

@@ -79,9 +79,9 @@ void MidiClockIn::InitDevice()
    }
 }
 
-float MidiClockIn::GetRoundedTempo()
+double MidiClockIn::GetRoundedTempo()
 {
-   float avgTempo = 0;
+   double avgTempo = 0;
    int temposToCount = std::min((int)mTempoHistory.size(), mSmoothAmount);
 
    for (int i = 0; i < temposToCount; ++i)
@@ -154,7 +154,7 @@ void MidiClockIn::OnMidi(const juce::MidiMessage& message)
          mDelayLockedLoop.update(time);
       }
 
-      if (mReceivedPulseCount >= kMinRequiredPulseCount && time - mLastTimestamp > .001f)
+      if (mReceivedPulseCount >= kMinRequiredPulseCount && time - mLastTimestamp > .001)
       {
          double deltaSeconds = mDelayLockedLoop.timeDiff();
          double pulsesPerSecond = 1 / deltaSeconds;

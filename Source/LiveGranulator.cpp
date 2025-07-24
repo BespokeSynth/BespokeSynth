@@ -47,22 +47,22 @@ void LiveGranulator::Init()
 
 namespace
 {
-   const float kBufferWidth = 80;
-   const float kBufferHeight = 65;
+   const double kBufferWidth = 80;
+   const double kBufferHeight = 65;
 }
 
 void LiveGranulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK(80);
-   FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5f, MAX_GRAINS);
+   FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5, MAX_GRAINS);
    FLOATSLIDER(mGranSpeed, "speed", &mGranulator.mSpeed, -3, 3);
    FLOATSLIDER(mGranLengthMs, "len ms", &mGranulator.mGrainLengthMs, 1, 1000);
    FLOATSLIDER(mDrySlider, "dry", &mDry, 0, 1);
    DROPDOWN(mAutoCaptureDropdown, "autocapture", (int*)(&mAutoCaptureInterval), 45);
    UIBLOCK_NEWCOLUMN();
    FLOATSLIDER(mGranPosRandomize, "pos r", &mGranulator.mPosRandomizeMs, 0, 200);
-   FLOATSLIDER(mGranSpeedRandomize, "spd r", &mGranulator.mSpeedRandomize, 0, .3f);
+   FLOATSLIDER(mGranSpeedRandomize, "spd r", &mGranulator.mSpeedRandomize, 0, .3);
    FLOATSLIDER(mGranSpacingRandomize, "spa r", &mGranulator.mSpacingRandomize, 0, 1);
    CHECKBOX(mFreezeCheckbox, "frz", &mFreeze);
    UIBLOCK_SHIFTX(35);
@@ -97,7 +97,7 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    PROFILER(LiveGranulator);
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
    mBuffer.SetNumChannels(buffer->NumActiveChannels());
 
    for (int i = 0; i < bufferSize; ++i)
@@ -121,7 +121,7 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          float sample[ChannelBuffer::kMaxNumChannels];
          Clear(sample, ChannelBuffer::kMaxNumChannels);
-         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0) - mFreezeExtraSamples - 1 + mPos, 1.0f, sample);
+         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0) - mFreezeExtraSamples - 1 + mPos, 1.0, sample);
          for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
             buffer->GetChannel(ch)[i] = mDry * buffer->GetChannel(ch)[i] + sample[ch];
       }
@@ -157,11 +157,11 @@ void LiveGranulator::DrawModule()
    }
 }
 
-float LiveGranulator::GetEffectAmount()
+double LiveGranulator::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp(.5f + fabsf(mGranulator.mSpeed - 1), 0, 1);
+   return ofClamp(.5 + std::abs(mGranulator.mSpeed - 1), 0, 1);
 }
 
 void LiveGranulator::Freeze()
@@ -205,7 +205,7 @@ void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal, double time
    }
 }
 
-void LiveGranulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void LiveGranulator::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mPosSlider)
    {

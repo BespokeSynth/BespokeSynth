@@ -153,7 +153,7 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
          {
             mAddControlCable->Clear();
 
-            float y = 3;
+            double y = 3;
             bool hasCollision = false;
             do
             {
@@ -232,7 +232,7 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    }
 }
 
-void ControlInterface::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ControlInterface::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    for (auto* control : mControls)
    {
@@ -513,11 +513,11 @@ void ControlInterface::ControlElement::UpdateInfoFromControl()
    }
 }
 
-float ControlInterface::ControlElement::GetInfo(std::string name, float defaultVal) const
+double ControlInterface::ControlElement::GetInfo(std::string name, double defaultVal) const
 {
    const auto& entry = mInfo[name];
    if (!entry.isNull())
-      return entry.asFloat();
+      return entry.asDouble();
    return defaultVal;
 }
 

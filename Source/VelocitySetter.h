@@ -46,7 +46,7 @@ public:
    void PlayNote(NoteMessage note) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -56,14 +56,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 90;
       height = 38;
    }
 
-   float mVelocity{ 1 };
+   double mVelocity{ 1 };
    FloatSlider* mVelocitySlider{ nullptr };
-   float mRandomness{ 0 };
+   double mRandomness{ 0 };
    FloatSlider* mRandomnessSlider{ nullptr };
 };

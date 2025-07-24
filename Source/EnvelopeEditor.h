@@ -38,36 +38,36 @@
 class EnvelopeControl
 {
 public:
-   EnvelopeControl(ofVec2f position, ofVec2f dimensions, EnvelopeEditor* editor);
+   EnvelopeControl(ofVec2d position, ofVec2d dimensions, EnvelopeEditor* editor);
    void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
-   void OnClicked(float x, float y, bool right);
-   void MouseMoved(float x, float y);
+   void OnClicked(double x, double y, bool right);
+   void MouseMoved(double x, double y);
    void MouseReleased();
    void Draw();
-   void SetViewLength(float length) { mViewLength = length; }
-   ofVec2f GetPosition() const { return mPosition; }
-   ofVec2f GetDimensions() const { return mDimensions; }
-   void SetPosition(ofVec2f pos) { mPosition = pos; }
-   void SetDimensions(ofVec2f dim) { mDimensions = dim; }
+   void SetViewLength(double length) { mViewLength = length; }
+   ofVec2d GetPosition() const { return mPosition; }
+   ofVec2d GetDimensions() const { return mDimensions; }
+   void SetPosition(ofVec2d pos) { mPosition = pos; }
+   void SetDimensions(ofVec2d dim) { mDimensions = dim; }
    void SetFixedLengthMode(bool fixed) { mFixedLengthMode = fixed; }
 
 private:
-   void AddVertex(float x, float y);
-   float GetPreSustainTime();
-   float GetReleaseTime();
-   float GetTimeForX(float x);
-   float GetValueForY(float y);
-   float GetXForTime(float time);
-   float GetYForValue(float value);
+   void AddVertex(double x, double y);
+   double GetPreSustainTime();
+   double GetReleaseTime();
+   double GetTimeForX(double x);
+   double GetValueForY(double y);
+   double GetXForTime(double time);
+   double GetYForValue(double value);
 
-   ofVec2f mPosition;
-   ofVec2f mDimensions;
+   ofVec2d mPosition;
+   ofVec2d mDimensions;
    EnvelopeEditor* mEditor{ nullptr };
    ::ADSR* mAdsr{ nullptr };
    ::ADSR mClickAdsr;
    bool mClick{ false };
-   ofVec2f mClickStart;
-   float mViewLength{ 2000 };
+   ofVec2d mClickStart;
+   double mViewLength{ 2000 };
    int mHighlightPoint{ -1 };
    int mHighlightCurve{ -1 };
    double mLastClickTime{ 0 };
@@ -91,9 +91,9 @@ public:
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    bool IsPinned() const { return mPinned; }
    void SetADSRDisplay(ADSRDisplay* adsrDisplay);
@@ -103,12 +103,12 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   ofVec2f GetCurveSliderExtentsForStage(int stage) const;
+   ofVec2d GetCurveSliderExtentsForStage(int stage) const;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -122,7 +122,7 @@ protected:
    ~EnvelopeEditor();
 
 private:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    void Pin();
 
    struct StageControls
@@ -136,8 +136,8 @@ private:
 
    EnvelopeControl mEnvelopeControl;
 
-   float mWidth{ 320 };
-   float mHeight{ 210 };
+   double mWidth{ 320 };
+   double mHeight{ 210 };
 
    ADSRDisplay* mADSRDisplay{ nullptr };
    ClickButton* mPinButton{ nullptr };

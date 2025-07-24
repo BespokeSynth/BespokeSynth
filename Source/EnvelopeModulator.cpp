@@ -83,28 +83,28 @@ void EnvelopeModulator::PlayNote(NoteMessage note)
    }
    else if (note.velocity > 0)
    {
-      mAdsr.Start(note.time, mUseVelocity ? note.velocity / 127.0f : 1);
+      mAdsr.Start(note.time, mUseVelocity ? note.velocity / 127.0 : 1);
    }
 }
 
-void EnvelopeModulator::OnPulse(double time, float velocity, int flags)
+void EnvelopeModulator::OnPulse(double time, double velocity, int flags)
 {
-   mAdsr.Start(time, mUseVelocity ? velocity / 127.0f : 1);
+   mAdsr.Start(time, mUseVelocity ? velocity / 127.0 : 1);
 }
 
-void EnvelopeModulator::GetModuleDimensions(float& width, float& height)
+void EnvelopeModulator::GetModuleDimensions(double& width, double& height)
 {
    width = 208;
    height = 73;
 }
 
-void EnvelopeModulator::Resize(float w, float h)
+void EnvelopeModulator::Resize(double w, double h)
 {
    mWidth = MAX(w, 250);
    mHeight = MAX(h, 102);
 }
 
-void EnvelopeModulator::OnClicked(float x, float y, bool right)
+void EnvelopeModulator::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -114,14 +114,14 @@ void EnvelopeModulator::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool EnvelopeModulator::MouseMoved(float x, float y)
+bool EnvelopeModulator::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
    return false;
 }
 
-float EnvelopeModulator::Value(int samplesIn /*= 0*/)
+double EnvelopeModulator::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
    if (GetSliderTarget())
@@ -142,7 +142,7 @@ void EnvelopeModulator::ButtonClicked(ClickButton* button, double time)
 {
 }
 
-void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

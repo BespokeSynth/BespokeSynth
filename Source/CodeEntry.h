@@ -42,7 +42,7 @@ public:
 class CodeEntry : public IUIControl, public IKeyboardFocusListener
 {
 public:
-   CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h);
+   CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, double w, double h);
    void OnKeyPressed(int key, bool isRepeat) override;
    void Render() override;
    void Poll() override;
@@ -65,16 +65,16 @@ public:
 
    static void OnPythonInit();
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   void SetDimensions(float width, float height);
+   void SetDimensions(double width, double height);
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
@@ -82,9 +82,9 @@ public:
    bool IsTextEntry() const override { return true; }
    bool GetNoHover() const override { return true; }
 
-   ofVec2f GetLinePos(int lineNum, bool end, bool published = true);
-   float GetCharHeight() const { return mCharHeight; }
-   float GetCharWidth() const { return mCharWidth; }
+   ofVec2d GetLinePos(int lineNum, bool end, bool published = true);
+   double GetCharHeight() const { return mCharHeight; }
+   double GetCharWidth() const { return mCharWidth; }
    void ResetScroll() { mScroll.set(0, 0); }
 
    void SetStyleFromJSON(const ofxJSONElement& vdict);
@@ -97,9 +97,9 @@ private:
    void AddString(std::string s);
    bool AllowCharacter(char c);
    int GetCaretPosition(int col, int row);
-   int GetColForX(float x);
-   int GetRowForY(float y);
-   ofVec2f GetCaretCoords(int caret);
+   int GetColForX(double x);
+   int GetRowForY(double y);
+   ofVec2d GetCaretCoords(int caret);
    void RemoveSelectedText();
    void ShiftLines(bool backwards);
    void MoveCaret(int pos, bool allowSelection = true);
@@ -116,9 +116,9 @@ private:
    bool IsAutocompleteShowing();
    void AcceptAutocompletion();
 
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    static bool sWarnJediNotInstalled;
 
@@ -144,10 +144,10 @@ private:
    };
 
    ICodeEntryListener* mListener;
-   float mWidth{ 200 };
-   float mHeight{ 20 };
-   float mCharWidth{ 5.85 };
-   float mCharHeight{ 15 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
+   double mCharWidth{ 5.85 };
+   double mCharHeight{ 15 };
    std::string mString;
    std::string mPublishedString;
    std::array<UndoBufferEntry, 50> mUndoBuffer;
@@ -156,7 +156,7 @@ private:
    int mRedosLeft{ 0 };
    int mCaretPosition{ 0 };
    int mCaretPosition2{ 0 };
-   float mCaretBlinkTimer{ 0 };
+   double mCaretBlinkTimer{ 0 };
    bool mCaretBlink{ true };
    bool mHovered{ false };
    double mLastPublishTime{ -999 };
@@ -164,7 +164,7 @@ private:
    int mLastPublishedLineEnd{ 0 };
    bool mHasError{ false };
    int mErrorLine{ -1 };
-   ofVec2f mScroll;
+   ofVec2d mScroll;
    std::vector<int> mSyntaxHighlightMapping;
    /*
     * For syntax highlighting we have both a static (system wide) and mDo (per insdtance)
@@ -176,8 +176,8 @@ private:
 
    std::array<AutocompleteSignatureInfo, 10> mAutocompleteSignatures;
    std::array<AutocompleteInfo, 10> mAutocompletes;
-   float mAutocompleteUpdateTimer{ 0 };
-   ofVec2f mAutocompleteCaretCoords;
+   double mAutocompleteUpdateTimer{ 0 };
+   ofVec2d mAutocompleteCaretCoords;
    bool mWantToShowAutocomplete{ false };
    int mAutocompleteHighlightIndex{ 0 };
    bool mCodeUpdated{ false };
@@ -207,5 +207,5 @@ private:
    ofColor jediParamsHighlight{ 230, 230, 255 };
    ofColor unknownColor = ofColor::white;
 
-   float mFontSize{ 12 };
+   double mFontSize{ 12 };
 };

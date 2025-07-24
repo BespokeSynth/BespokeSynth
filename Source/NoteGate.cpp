@@ -76,7 +76,7 @@ void NoteGate::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void NoteGate::GetModuleDimensions(float& width, float& height)
+void NoteGate::GetModuleDimensions(double& width, double& height)
 {
    width = 80;
    height = 20;

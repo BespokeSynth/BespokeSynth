@@ -32,17 +32,17 @@ class TriggerDetector
 public:
    TriggerDetector();
    void Process(float sample);
-   float GetValue();
+   double GetValue();
    bool CheckTriggered();
-   void SetThreshold(float thresh) { mThreshold = thresh; }
+   void SetThreshold(double thresh) { mThreshold = thresh; }
    void Draw(int x, int y);
 
-   float mSharpness{ 0 };
+   double mSharpness{ 0 };
 
 private:
-   float mThreshold{ .2 };
+   double mThreshold{ .2 };
    bool mTriggered{ false };
    bool mWaitingForFall{ false };
    RollingBuffer mHistory;
-   float mAvg{ 0 };
+   double mAvg{ 0 };
 };

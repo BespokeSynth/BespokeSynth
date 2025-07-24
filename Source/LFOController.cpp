@@ -142,7 +142,7 @@ void LFOController::DropdownUpdated(DropdownList* list, int oldVal, double time)
    mLFO->UpdateFromSettings();
 }
 
-void LFOController::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void LFOController::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (mLFO == nullptr)
       return;

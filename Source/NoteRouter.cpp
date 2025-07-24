@@ -55,7 +55,7 @@ void NoteRouter::DrawModule()
    mRouteSelector->Draw();
    for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
-      ofVec2f pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
+      ofVec2d pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
       mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(pos.x + 10, pos.y + 4);
    }
 }
@@ -127,9 +127,9 @@ void NoteRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void NoteRouter::GetModuleDimensions(float& width, float& height)
+void NoteRouter::GetModuleDimensions(double& width, double& height)
 {
-   float w, h;
+   double w, h;
    mRouteSelector->GetDimensions(w, h);
    width = 20 + w;
    height = 8 + h;

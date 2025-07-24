@@ -83,7 +83,7 @@ void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void ValueSetter::OnPulse(double time, float velocity, int flags)
+void ValueSetter::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0 && mEnabled)
    {

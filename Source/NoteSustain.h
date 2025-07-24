@@ -49,12 +49,12 @@ public:
       mNoteOutput.Flush(NextBufferTime(false));
    }
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -64,13 +64,13 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 110;
       height = 22;
    }
 
-   float mSustain{ .25 };
+   double mSustain{ .25 };
    FloatSlider* mSustainSlider{ nullptr };
    std::list<NoteMessage> mNoteOffs;
 };

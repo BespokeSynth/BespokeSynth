@@ -47,7 +47,7 @@ void FeedbackModule::CreateUIControls()
 
    mFeedbackTargetCable = new PatchCableSource(this, kConnectionType_Audio);
    mFeedbackTargetCable->SetManualPosition(108, 8);
-   mFeedbackTargetCable->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+   mFeedbackTargetCable->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
    mFeedbackTargetCable->SetOverrideVizBuffer(&mFeedbackVizBuffer);
    AddPatchCableSource(mFeedbackTargetCable);
 
@@ -55,7 +55,7 @@ void FeedbackModule::CreateUIControls()
    mDelay.SetFeedbackModuleMode();
 
    ofRectangle delayModuleRect = mDelay.GetRect(true);
-   mSignalLimitSlider = new FloatSlider(this, "limit", delayModuleRect.x, delayModuleRect.getMaxY() + 3, delayModuleRect.width, 15, &mSignalLimit, 0.01f, 1);
+   mSignalLimitSlider = new FloatSlider(this, "limit", delayModuleRect.x, delayModuleRect.getMaxY() + 3, delayModuleRect.width, 15, &mSignalLimit, 0.01, 1);
    mSignalLimitSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -71,7 +71,7 @@ void FeedbackModule::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    IAudioReceiver* target = GetTarget();
 
    if (target)

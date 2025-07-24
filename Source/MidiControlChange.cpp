@@ -57,7 +57,7 @@ void MidiControlChange::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void MidiControlChange::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MidiControlChange::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mValueSlider && mEnabled)
    {

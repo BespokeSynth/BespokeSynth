@@ -29,16 +29,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace
 {
-   const float kLeftMarginX = 3;
-   const float kSongSequencerWidth = 175;
-   const float kGridStartY = 20;
-   const float kSceneTabWidth = 165;
-   const float kTargetTabHeightTop = 30;
-   const float kTargetTabHeightBottom = 10;
-   const float kRowHeight = 20;
-   const float kColumnWidth = 50;
-   const float kSpacingX = 3;
-   const float kSpacingY = 3;
+   const double kLeftMarginX = 3;
+   const double kSongSequencerWidth = 175;
+   const double kGridStartY = 20;
+   const double kSceneTabWidth = 165;
+   const double kTargetTabHeightTop = 30;
+   const double kTargetTabHeightBottom = 10;
+   const double kRowHeight = 20;
+   const double kColumnWidth = 50;
+   const double kSpacingX = 3;
+   const double kSpacingY = 3;
 }
 
 SongBuilder::SongBuilder()
@@ -53,7 +53,7 @@ SongBuilder::SongBuilder()
       mSequencerContextMenuSelection[i] = ContextMenuItems::kNone;
    }
 
-   const float kColorDim = .7f;
+   const double kColorDim = .7;
    ofColor grey = IDrawableModule::GetColor(kModuleCategory_Other);
    mColors.push_back(TargetColor("grey", grey * kColorDim));
    mColors.push_back(TargetColor("red", ofColor::red * kColorDim));
@@ -81,7 +81,7 @@ void SongBuilder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   float width, height;
+   double width, height;
    UIBLOCK0();
    CHECKBOX(mUseSequencerCheckbox, "use sequencer", &mUseSequencer);
    UIBLOCK_SHIFTRIGHT();
@@ -248,7 +248,7 @@ void SongBuilder::DrawModule()
 
          ofSetColor(0, 255, 0, 100);
          ofRectangle lengthEntryRect = mSequencerStepLengthEntry[mSequenceStepIndex]->GetRect(K(local));
-         float progress = MIN(TheTransport->GetMeasureTime(gTime) / mSequencerStepLength[mSequenceStepIndex], 1.0f);
+         double progress = MIN(TheTransport->GetMeasureTime(gTime) / mSequencerStepLength[mSequenceStepIndex], 1.0);
          lengthEntryRect.width *= progress;
          ofRect(lengthEntryRect);
       }
@@ -341,7 +341,7 @@ void SongBuilder::OnTimeEvent(double time)
    }
 }
 
-void SongBuilder::OnPulse(double time, float velocity, int flags)
+void SongBuilder::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0 && mCurrentScene < (int)mScenes.size() - 1)
       SetActiveScene(time, mCurrentScene + 1);
@@ -401,7 +401,7 @@ void SongBuilder::RefreshSequencerDropdowns()
    }
 }
 
-void SongBuilder::GetModuleDimensions(float& width, float& height)
+void SongBuilder::GetModuleDimensions(double& width, double& height)
 {
    width = kLeftMarginX + kSceneTabWidth + (int)mTargets.size() * (kColumnWidth + kSpacingX) + 3;
    if (ShowSongSequencer())
@@ -472,7 +472,7 @@ void SongBuilder::PlaySequence(double time, int startIndex)
    }
 }
 
-bool SongBuilder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool SongBuilder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -921,7 +921,7 @@ void SongBuilder::LoadState(FileStreamIn& in, int rev)
       {
          mScenes[i]->mValues[j] = new ControlValue();
          in >> mScenes[i]->mValues[j]->mId;
-         in >> mScenes[i]->mValues[j]->mFloatValue;
+         in >> FloatAsDouble >> mScenes[i]->mValues[j]->mFloatValue;
          in >> mScenes[i]->mValues[j]->mBoolValue;
          in >> mScenes[i]->mValues[j]->mIntValue;
          mScenes[i]->mValues[j]->CreateUIControls(this);
@@ -1030,10 +1030,10 @@ void SongBuilder::SongScene::TargetControlUpdated(SongBuilder::ControlTarget* ta
    }
 }
 
-void SongBuilder::SongScene::Draw(SongBuilder* owner, float x, float y, int sceneIndex)
+void SongBuilder::SongScene::Draw(SongBuilder* owner, double x, double y, int sceneIndex)
 {
-   float width = GetWidth();
-   float height = kRowHeight;
+   double width = GetWidth();
+   double height = kRowHeight;
    ofPushStyle();
    ofNoFill();
    ofSetColor(ofColor(150, 150, 150));
@@ -1073,7 +1073,7 @@ void SongBuilder::SongScene::MoveValue(int index, int amount)
    }
 }
 
-float SongBuilder::SongScene::GetWidth() const
+double SongBuilder::SongScene::GetWidth() const
 {
    return kSceneTabWidth + (int)mValues.size() * (kColumnWidth + kSpacingX);
 }
@@ -1105,7 +1105,7 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
    mCable = new PatchCableSource(owner, kConnectionType_UIControl);
    owner->AddPatchCableSource(mCable);
    mCable->SetAllowMultipleTargets(true);
-   mCable->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+   mCable->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
    mMoveLeftButton = new ClickButton(owner, "move left", -1, -1, ButtonDisplayStyle::kArrowLeft);
    mMoveRightButton = new ClickButton(owner, "move right", -1, -1, ButtonDisplayStyle::kArrowRight);
    mCycleDisplayTypeButton = new ClickButton(owner, "type", -1, -1);
@@ -1121,11 +1121,11 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
    mColorSelector->SetDrawTriangle(false);
 }
 
-void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
+void SongBuilder::ControlTarget::Draw(double x, double y, int numRows)
 {
    ofPushStyle();
    ofFill();
-   ofSetColor(GetColor() * .7f);
+   ofSetColor(GetColor() * .7);
    ofRect(x, y, kColumnWidth, kTargetTabHeightTop);
    ofRect(x, y + kTargetTabHeightTop + kSpacingY + numRows * (kRowHeight + kSpacingY), kColumnWidth, kTargetTabHeightBottom);
    ofPopStyle();
@@ -1147,8 +1147,8 @@ void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
       DrawTextNormal(displayString, x + 2, y + 9, 7);
       ofPopMatrix();
    }
-   float bottomY = y + kTargetTabHeightTop + kSpacingY + numRows * (kRowHeight + kSpacingY);
-   mCable->SetManualPosition(x + kColumnWidth * .5f, bottomY + 5);
+   double bottomY = y + kTargetTabHeightTop + kSpacingY + numRows * (kRowHeight + kSpacingY);
+   mCable->SetManualPosition(x + kColumnWidth * .5, bottomY + 5);
    mCable->SetColor(GetColor());
    mMoveLeftButton->SetPosition(x, bottomY - 3);
    if (gHoveredUIControl == mMoveLeftButton)
@@ -1219,11 +1219,11 @@ void SongBuilder::ControlValue::CreateUIControls(SongBuilder* owner)
    mValueSelector->SetShowing(false);
 }
 
-void SongBuilder::ControlValue::Draw(float x, float y, int sceneIndex, ControlTarget* target)
+void SongBuilder::ControlValue::Draw(double x, double y, int sceneIndex, ControlTarget* target)
 {
    ofPushStyle();
    ofFill();
-   ofSetColor(target->GetColor() * .7f);
+   ofSetColor(target->GetColor() * .7);
    ofRect(x, y + 2, kColumnWidth, kRowHeight - 4);
    ofPopStyle();
 

@@ -112,7 +112,7 @@ void SpectralDisplay::DrawModule()
    ofPushStyle();
    ofPushMatrix();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofSetColor(255, 255, 255);
@@ -123,9 +123,9 @@ void SpectralDisplay::DrawModule()
    ofBeginShape();
    for (int i = kBinIgnore; i < end; i++)
    {
-      float x = sqrtf(float(i - kBinIgnore) / (end - kBinIgnore - 1)) * w;
-      float samp = sqrtf(fabsf(mFFTData.mRealValues[i]) / end) * 3;
-      float y = ofClamp(samp, 0, 1) * h;
+      double x = std::sqrt(static_cast<double>(i - kBinIgnore) / (end - kBinIgnore - 1)) * w;
+      double samp = std::sqrt(std::abs(mFFTData.mRealValues[i]) / end) * 3;
+      double y = ofClamp(samp, 0, 1) * h;
       ofVertex(x, h - y);
 
       mSmoother[i - kBinIgnore] = ofLerp(mSmoother[i - kBinIgnore], samp, .1f);
@@ -139,8 +139,8 @@ void SpectralDisplay::DrawModule()
    ofBeginShape();
    for (int i = kBinIgnore; i < end; i++)
    {
-      float x = sqrtf(float(i - kBinIgnore) / (end - kBinIgnore - 1)) * w;
-      float y = ofClamp(mSmoother[i - kBinIgnore], 0, 1) * h;
+      double x = std::sqrt(static_cast<double>(i - kBinIgnore) / (end - kBinIgnore - 1)) * w;
+      double y = ofClamp(mSmoother[i - kBinIgnore], 0, 1) * h;
       ofVertex(x, h - y);
    }
    ofEndShape(false);
@@ -149,7 +149,7 @@ void SpectralDisplay::DrawModule()
    ofPopStyle();
 }
 
-void SpectralDisplay::Resize(float w, float h)
+void SpectralDisplay::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

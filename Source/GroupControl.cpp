@@ -100,10 +100,10 @@ void GroupControl::CheckboxUpdated(Checkbox* checkbox, double time)
 
 namespace
 {
-   const float extraW = 20;
+   const double extraW = 20;
 }
 
-void GroupControl::GetModuleDimensions(float& width, float& height)
+void GroupControl::GetModuleDimensions(double& width, double& height)
 {
    width = mGroupCheckbox->GetRect().width + extraW;
    height = 38;

@@ -193,7 +193,7 @@ void LatencyCalculatorReceiver::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   const int kMaxTestDurationMs = 2000.0f;
+   const int kMaxTestDurationMs = 2000;
    if (mState == State::Testing && gTime > mTestStartTime + kMaxTestDurationMs)
       mState = State::NoResult;
 
@@ -209,7 +209,7 @@ void LatencyCalculatorReceiver::DrawModule()
       case State::DisplayResult:
       {
          double duration = mTestEndTime - mTestStartTime;
-         float durationBuffers = (float)mTestSamplesElapsed / gBufferSize;
+         double durationBuffers = static_cast<double>(mTestSamplesElapsed) / gBufferSize;
          DrawTextNormal("latency result: " + ofToString(duration, 2) + " ms (" + ofToString(mTestSamplesElapsed) + " samples, " + ofToString(durationBuffers, 2) + " buffers)", 3, 15);
          DrawTextNormal("buffer size: " + ofToString(gBufferSize) + "   sample rate: " + ofToString(gSampleRate), 3, 30);
          break;

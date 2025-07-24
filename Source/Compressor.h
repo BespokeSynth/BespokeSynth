@@ -120,27 +120,27 @@ public:
    std::string GetType() override { return "compressor"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mMix{ 1 };
-   float mDrive{ 1 };
-   float mThreshold{ -24 };
-   float mRatio{ 4 };
-   float mAttack{ .1f };
-   float mRelease{ 100 };
-   float mLookahead{ 3 };
-   float mOutputAdjust{ 1 };
+   double mMix{ 1 };
+   double mDrive{ 1 };
+   double mThreshold{ -24 };
+   double mRatio{ 4 };
+   double mAttack{ .1 };
+   double mRelease{ 100 };
+   double mLookahead{ 3 };
+   double mOutputAdjust{ 1 };
    FloatSlider* mMixSlider{ nullptr };
    FloatSlider* mDriveSlider{ nullptr };
    FloatSlider* mThresholdSlider{ nullptr };
@@ -152,8 +152,8 @@ private:
 
    double mCurrentInputDb{ 0 };
    double mOutputGain{ 1 };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 
    // runtime variables
    double envdB_{ DC_OFFSET }; // over-threshold envelope (dB)

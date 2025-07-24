@@ -99,7 +99,7 @@ void RandomNoteGenerator::CheckboxUpdated(Checkbox* checkbox, double time)
       mNoteOutput.Flush(time);
 }
 
-void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mOffsetSlider)
    {

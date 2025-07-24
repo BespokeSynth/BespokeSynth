@@ -60,9 +60,9 @@ public:
 
    void SetRecorder(LooperRecorder* recorder);
    void Clear();
-   void Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float offsetMs);
+   void Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, double offsetMs);
    void Fill(ChannelBuffer* buffer, int length);
-   void ResampleForSpeed(float speed);
+   void ResampleForSpeed(double speed);
    int GetNumBars() const { return mNumBars; }
    int GetRecorderNumBars() const;
    void SetNumBars(int numBars);
@@ -76,9 +76,9 @@ public:
    void SetLoopBuffer(ChannelBuffer* buffer);
    void LockBufferMutex() { mBufferMutex.lock(); }
    void UnlockBufferMutex() { mBufferMutex.unlock(); }
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
-   float* GetLoopPosVar() { return &mLoopPos; }
+   double* GetLoopPosVar() { return &mLoopPos; }
    int GetLoopLength() { return mLoopLength; }
    void SetGranulator(LooperGranulator* granulator) { mGranulator = granulator; }
    double GetPlaybackSpeed() const;
@@ -95,7 +95,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IDrawableModule
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
    bool DrawToPush2Screen() override;
 
    void MergeIn(Looper* otherLooper);
@@ -112,7 +112,7 @@ public:
    //IButtonListener
    void ButtonClicked(ClickButton* button, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
@@ -142,25 +142,25 @@ private:
    void ProcessBeatwheel(double time, int sampleIdx);
    int GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar);
    void DrawBeatwheel();
-   float GetActualLoopPos(int samplesIn) const;
+   double GetActualLoopPos(int samplesIn) const;
    int GetBeatwheelDepthLevel() const;
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
 
    ChannelBuffer* mBuffer{ nullptr };
    ChannelBuffer mWorkBuffer;
    int mLoopLength{ -1 };
-   float mLoopPos{ 0 };
+   double mLoopPos{ 0 };
    int mNumBars{ 1 };
    ClickButton* mClearButton{ nullptr };
    DropdownList* mNumBarsSelector{ nullptr };
-   float mVol{ 1 };
-   float mSmoothedVol{ 1 };
+   double mVol{ 1 };
+   double mSmoothedVol{ 1 };
    FloatSlider* mVolSlider{ nullptr };
-   float mSpeed{ 1 };
+   double mSpeed{ 1 };
    LooperRecorder* mRecorder{ nullptr };
    ClickButton* mMergeButton{ nullptr };
    ClickButton* mSwapButton{ nullptr };
@@ -186,16 +186,16 @@ private:
    ClickButton* mUndoButton{ nullptr };
    bool mWantUndo{ false };
    bool mReplaceOnCommit{ false };
-   float mCommitMsOffset{ 0 }; //offset passed in from looperrecorder, to use when capturing a loop from it
-   float mLoopPosOffset{ 0 };
+   double mCommitMsOffset{ 0 }; //offset passed in from looperrecorder, to use when capturing a loop from it
+   double mLoopPosOffset{ 0 };
    FloatSlider* mLoopPosOffsetSlider{ nullptr };
    ClickButton* mWriteOffsetButton{ nullptr };
-   float mScratchSpeed{ 1 };
+   double mScratchSpeed{ 1 };
    bool mAllowScratch{ false };
    FloatSlider* mScratchSpeedSlider{ nullptr };
    Checkbox* mAllowScratchCheckbox{ nullptr };
    double mLastCommitTime{ 0 };
-   float mFourTet{ 0 };
+   double mFourTet{ 0 };
    FloatSlider* mFourTetSlider{ nullptr };
    int mFourTetSlices{ 4 };
    DropdownList* mFourTetSlicesDropdown{ nullptr };
@@ -207,7 +207,7 @@ private:
    bool mWantRewrite{ false };
    int mLoopCount{ 0 };
    ChannelBuffer* mQueuedNewBuffer{ nullptr };
-   float mDecay{ 0 };
+   double mDecay{ 0 };
    FloatSlider* mDecaySlider{ nullptr };
    bool mWriteInput{ false };
    Checkbox* mWriteInputCheckbox{ nullptr };
@@ -215,15 +215,15 @@ private:
    bool mCaptureQueued{ false };
    Ramp mWriteInputRamp;
    float mLastInputSample[ChannelBuffer::kMaxNumChannels];
-   float mBufferTempo{ -1 };
+   double mBufferTempo{ -1 };
    ClickButton* mResampleButton{ nullptr };
 
    //beatwheel
    bool mBeatwheel{ false };
-   static float mBeatwheelPosRight;
-   static float mBeatwheelDepthRight;
-   static float mBeatwheelPosLeft;
-   static float mBeatwheelDepthLeft;
+   static double mBeatwheelPosRight;
+   static double mBeatwheelDepthRight;
+   static double mBeatwheelPosLeft;
+   static double mBeatwheelDepthLeft;
    Checkbox* mBeatwheelCheckbox{ nullptr };
    FloatSlider* mBeatwheelPosRightSlider{ nullptr };
    FloatSlider* mBeatwheelDepthRightSlider{ nullptr };
@@ -232,11 +232,11 @@ private:
    bool mBeatwheelControlFlip{ false };
    static bool mBeatwheelSingleMeasure;
    Checkbox* mBeatwheelSingleMeasureCheckbox{ nullptr };
-   float mWriteMsOffset{ 0.0f }; //offset to use when writing with direct input
+   double mWriteMsOffset{ 0.0 }; //offset to use when writing with direct input
 
    //pitch shifter
    PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
-   float mPitchShift{ 1 };
+   double mPitchShift{ 1 };
    FloatSlider* mPitchShiftSlider{ nullptr };
    bool mKeepPitch{ false };
    Checkbox* mKeepPitchCheckbox{ nullptr };

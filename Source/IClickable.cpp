@@ -45,15 +45,15 @@ void IClickable::Draw()
    Render();
 }
 
-bool IClickable::TestClick(float x, float y, bool right, bool testOnly /* = false */)
+bool IClickable::TestClick(double x, double y, bool right, bool testOnly /* = false */)
 {
    if (!mShowing)
       return false;
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
-   float titleBarHeight = 0;
+   double titleBarHeight = 0;
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(this);
    if (module && module->HasTitleBar())
       titleBarHeight = IDrawableModule::TitleBarHeight();
@@ -67,21 +67,21 @@ bool IClickable::TestClick(float x, float y, bool right, bool testOnly /* = fals
    return false;
 }
 
-bool IClickable::NotifyMouseMoved(float x, float y)
+bool IClickable::NotifyMouseMoved(double x, double y)
 {
    if (!mShowing)
       return false;
    return MouseMoved(x - mX, y - mY);
 }
 
-bool IClickable::NotifyMouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool IClickable::NotifyMouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    if (!mShowing)
       return false;
    return MouseScrolled(x - mX, y - mY, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
 }
 
-void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
+void IClickable::GetPosition(double& x, double& y, bool local /*= false*/) const
 {
    if (mParent && !local)
    {
@@ -96,26 +96,26 @@ void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
    }
 }
 
-ofVec2f IClickable::GetPosition(bool local /*= false*/) const
+ofVec2d IClickable::GetPosition(bool local /*= false*/) const
 {
-   float x, y;
+   double x, y;
    GetPosition(x, y, local);
-   return ofVec2f(x, y);
+   return { x, y };
 }
 
-ofVec2f IClickable::GetDimensions()
+ofVec2d IClickable::GetDimensions()
 {
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
-   return ofVec2f(w, h);
+   return { w, h };
 }
 
 ofRectangle IClickable::GetRect(bool local /*=false*/)
 {
-   float x, y, w, h;
+   double x, y, w, h;
    GetPosition(x, y, local);
    GetDimensions(w, h);
-   return ofRectangle(x, y, w, h);
+   return { x, y, w, h };
 }
 
 IClickable* IClickable::GetRootParent()
@@ -182,14 +182,14 @@ bool IClickable::CheckNeedsDraw()
    return mShowing;
 }
 
-float IClickable::GetBeaconAmount() const
+double IClickable::GetBeaconAmount() const
 {
    return ofClamp(((mBeaconTime + 250) - gTime) / 250, 0, 1);
 }
 
-void IClickable::DrawBeacon(int x, int y)
+void IClickable::DrawBeacon(double x, double y)
 {
-   float size = GetBeaconAmount();
+   double size = GetBeaconAmount();
    if (size > 0)
    {
       ofPushStyle();

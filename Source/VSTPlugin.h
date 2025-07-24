@@ -71,7 +71,7 @@ public:
    void RemoveExtraOutputCable();
    void RecreateUIOutputCables();
 
-   void SetVol(float vol) { mVol = vol; }
+   void SetVol(double vol) { mVol = vol; }
 
    void Poll() override;
    void Exit() override;
@@ -92,7 +92,7 @@ public:
 
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
@@ -111,7 +111,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    void LoadVST(juce::PluginDescription desc);
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
    void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
@@ -127,7 +127,7 @@ private:
    void audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details) override;
    void audioProcessorParameterChangeGestureBegin(juce::AudioProcessor* processor, int parameterIndex) override;
 
-   float mVol{ 1 };
+   double mVol{ 1 };
    FloatSlider* mVolSlider{ nullptr };
    int mPresetFileIndex{ -1 };
    DropdownList* mPresetFileSelector{ nullptr };
@@ -166,7 +166,7 @@ private:
    struct ParameterSlider
    {
       VSTPlugin* mOwner{ nullptr };
-      float mValue{ 0 };
+      double mValue{ 0 };
       FloatSlider* mSlider{ nullptr };
       ClickButton* mRemoveButton{ nullptr };
       juce::AudioProcessorParameter* mParameter{ nullptr };

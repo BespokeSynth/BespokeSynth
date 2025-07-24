@@ -49,12 +49,12 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -64,23 +64,23 @@ public:
 private:
    struct PulseInfo
    {
-      float mVelocity{ 0 };
+      double mVelocity{ 0 };
       int mFlags{ 0 };
       double mTriggerTime{ 0 };
    };
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 108;
       height = 22;
    }
 
-   float mDelay{ .25 };
+   double mDelay{ .25 };
    FloatSlider* mDelaySlider{ nullptr };
 
-   float mLastPulseTime{ 0 };
+   double mLastPulseTime{ 0 };
 
    static const int kQueueSize = 50;
    PulseInfo mInputPulses[kQueueSize]{};

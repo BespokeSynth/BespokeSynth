@@ -66,7 +66,7 @@ public:
    void AddDummyController(MidiCapturerDummyController* controller);
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -80,7 +80,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 300;
       height = 150;

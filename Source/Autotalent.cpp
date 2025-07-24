@@ -169,7 +169,7 @@ void Autotalent::CreateUIControls()
    mGSelector = new RadioButton(this, "G", 204, 40, &mG);
    mAbSelector = new RadioButton(this, "Ab", 224, 40, &mAb);
    mAmountSlider = new FloatSlider(this, "amount", 4, 100, 150, 15, &mAmount, 0, 1);
-   mSmoothSlider = new FloatSlider(this, "smooth", 4, 120, 150, 15, &mSmooth, 0, .8f);
+   mSmoothSlider = new FloatSlider(this, "smooth", 4, 120, 150, 15, &mSmooth, 0, .8);
    mShiftSlider = new IntSlider(this, "shift", 4, 140, 150, 15, &mShift, -6, 6);
    mScwarpSlider = new IntSlider(this, "scwarp", 4, 160, 150, 15, &mScwarp, -3, 3);
    mLfoampSlider = new FloatSlider(this, "lfoamp", 4, 180, 150, 15, &mLfoamp, 0, 1);
@@ -320,7 +320,7 @@ void Autotalent::Process(double time)
 
    float* pfInput = GetBuffer()->GetChannel(0);
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    Clear(mWorkingBuffer, GetBuffer()->BufferSize());
    float* pfOutput = mWorkingBuffer;

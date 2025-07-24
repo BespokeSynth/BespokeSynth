@@ -85,7 +85,7 @@ void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
    }
 }
 
-int PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation)
+int PolyphonyMgr::Start(double time, int pitch, double amount, int voiceIdx, ModulationParameters modulation)
 {
    assert(voiceIdx < kNumVoices);
 
@@ -193,14 +193,14 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    mFadeOutBuffer.SetNumActiveChannels(out->NumActiveChannels());
    mFadeOutWorkBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
-   float debugRef = 0;
+   double debugRef = 0;
    for (int i = 0; i < mVoiceLimit; ++i)
    {
       if (mVoices[i].mPitch != -1)
       {
          mVoices[i].mVoice->Process(time, out, mOversampling);
 
-         float testSample = out->GetChannel(0)[0];
+         double testSample = out->GetChannel(0)[0];
          mVoices[i].mActivity = testSample - debugRef;
 
          if (!mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))
@@ -223,7 +223,7 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    mFadeOutBufferPos += bufferSize;
 }
 
-void PolyphonyMgr::DrawDebug(float x, float y)
+void PolyphonyMgr::DrawDebug(double x, double y)
 {
    ofPushMatrix();
    ofPushStyle();

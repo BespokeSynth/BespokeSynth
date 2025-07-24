@@ -44,13 +44,13 @@ public:
    void CreateUIControls() override;
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -61,18 +61,18 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = mWidth;
       h = mHeight;
    }
 
-   float mWidth{ 500 };
-   float mHeight{ 500 };
-   float mScale{ 1 };
+   double mWidth{ 500 };
+   double mHeight{ 500 };
+   double mScale{ 1 };
    FloatSlider* mScaleSlider{ nullptr };
 
-   ofVec2f mLissajousPoints[NUM_LISSAJOUS_POINTS];
+   ofVec2d mLissajousPoints[NUM_LISSAJOUS_POINTS];
    int mOffset{ 0 };
    bool mAutocorrelationMode{ true };
    bool mOnlyHasOneChannel{ true };

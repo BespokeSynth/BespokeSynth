@@ -72,11 +72,11 @@ public:
 private:
    RadioButton* mSelector{ nullptr };
    int mSampleIndex{ -1 };
-   float mVolume{ 0 };
+   double mVolume{ 0 };
    FloatSlider* mVolumeSlider{ nullptr };
    BeatData mBeatData;
    int mIndex{ 0 };
-   float mFilter{ 0 };
+   double mFilter{ 0 };
    FloatSlider* mFilterSlider{ nullptr };
    std::array<BiquadFilter, 2> mLowpass;
    std::array<BiquadFilter, 2> mHighpass;
@@ -87,7 +87,7 @@ private:
    int mNumBars{ 4 };
    IntSlider* mNumBarsSlider{ nullptr };
    std::vector<Sample*> mSamples;
-   float mPan{ 0 };
+   double mPan{ 0 };
    FloatSlider* mPanSlider{ nullptr };
    ClickButton* mDeleteButton{ nullptr };
 };
@@ -116,13 +116,13 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IDrawableModule
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -144,7 +144,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    ChannelBuffer mWriteBuffer;
    std::vector<BeatColumn*> mBeatColumns;

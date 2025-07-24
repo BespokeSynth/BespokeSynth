@@ -39,7 +39,7 @@ NoteExpressionRouter::NoteExpressionRouter()
    for (auto i = 0; i < kMaxDestinations; ++i)
    {
       mExpressions[i].register_symbol_table(mSymbolTable);
-      auto p = exprtk::parser<float>();
+      auto p = exprtk::parser<double>();
       p.compile("1", mExpressions[i]);
    }
 }
@@ -54,7 +54,7 @@ void NoteExpressionRouter::CreateUIControls()
       TEXTENTRY(mExpressionWidget[i], ("expression" + ofToString(i)).c_str(), 30, mExpressionText[i]);
       mDestinationCables[i] = new AdditionalNoteCable();
       mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
       AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
       ofRectangle rect = mExpressionWidget[i]->GetRect(true);
       mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
@@ -115,7 +115,7 @@ void NoteExpressionRouter::TextEntryComplete(TextEntry* entry)
    {
       if (entry == mExpressionWidget[i])
       {
-         auto p = exprtk::parser<float>();
+         auto p = exprtk::parser<double>();
          if (!p.compile(entry->GetText(), mExpressions[i]))
          {
             ofLog() << "Error parsing expression '" << entry->GetText() << "' " << p.error();

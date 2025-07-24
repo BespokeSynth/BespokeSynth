@@ -47,23 +47,23 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
-   float GetValue() const { return mValue; }
+   double GetValue() const { return mValue; }
    FloatSlider* GetSlider() { return mSlider; }
 
 private:
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 110;
       height = 40;
    }
 
    FloatSlider* mSlider;
-   float mValue;
+   double mValue;
 
    PatchCableSource* mMinCable{};
    PatchCableSource* mMaxCable{};

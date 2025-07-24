@@ -64,7 +64,7 @@ IUIControl* gBindToUIControl = nullptr;
 RetinaTrueTypeFont gFont;
 RetinaTrueTypeFont gFontBold;
 RetinaTrueTypeFont gFontFixedWidth;
-float gModuleDrawAlpha = 255;
+double gModuleDrawAlpha = 255;
 float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
 float gWorkBuffer[kWorkBufferSize];
@@ -72,16 +72,16 @@ ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
 IDrawableModule* gHoveredModule = nullptr;
 IUIControl* gHoveredUIControl = nullptr;
 IUIControl* gHotBindUIControl[10];
-float gControlTactileFeedback = 0;
-float gDrawScale = 1;
+double gControlTactileFeedback = 0;
+double gDrawScale = 1;
 bool gShowDevModules = false;
-float gCornerRoundness = 1;
-std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
+double gCornerRoundness = 1;
+std::array<double, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
 
 std::random_device gRandomDevice;
 bespoke::core::Xoshiro256ss gRandom(gRandomDevice);
-std::uniform_real_distribution<float> gRandom01(0.0f, 1.f);
-std::uniform_real_distribution<float> gRandomBipolarDist(-1.f, 1.f);
+std::uniform_real_distribution<double> gRandom01(0.0, 1.);
+std::uniform_real_distribution<double> gRandomBipolarDist(-1., 1.);
 
 void SynthInit()
 {
@@ -120,7 +120,7 @@ void SetGlobalSampleRateAndBufferSize(int rate, int size)
    gSampleRateMs = gSampleRate / 1000.0;
    gInvSampleRateMs = 1000.0 / gSampleRate;
    gBufferSizeMs = gBufferSize / gSampleRateMs;
-   gNyquistLimit = gSampleRate / 2.0f;
+   gNyquistLimit = gSampleRate / 2.0;
 }
 
 std::string GetBuildInfoString()
@@ -135,7 +135,7 @@ std::string GetBuildInfoString()
    juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")";
 }
 
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/)
+void DrawAudioBuffer(double width, double height, ChannelBuffer* buffer, double start, double end, double pos, double vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/)
 {
    ofPushMatrix();
    if (buffer != nullptr)
@@ -150,9 +150,9 @@ void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float sta
    ofPopMatrix();
 }
 
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, int bufferSize /*=-1*/)
+void DrawAudioBuffer(double width, double height, const float* buffer, double start, double end, double pos, double vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, int bufferSize /*=-1*/)
 {
-   vol = MAX(.1f, vol); //make sure we at least draw something if there is waveform data
+   vol = MAX(.1, vol); //make sure we at least draw something if there is waveform data
 
    ofPushStyle();
 
@@ -164,7 +164,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    else
       ofRect(width, 0, -width, height);
 
-   float length = end - 1 - start;
+   double length = end - 1 - start;
    if (length < 0)
       length = length + wraparoundFrom - wraparoundTo;
    if (length < 0)
@@ -172,20 +172,20 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
 
    if (length > 0)
    {
-      const float kStepSize = 3;
-      float samplesPerStep = length / abs(width) * kStepSize;
+      const double kStepSize = 3;
+      double samplesPerStep = length / std::abs(width) * kStepSize;
       start = start - (int(start) % MAX(1, int(samplesPerStep)));
 
       if (buffer && length > 0)
       {
-         float step = width > 0 ? kStepSize : -kStepSize;
+         double step = width > 0 ? kStepSize : -kStepSize;
          samplesPerStep = length / width * step;
 
          ofSetColor(color);
 
-         for (float i = 0; abs(i) < abs(width); i += step)
+         for (double i = 0; abs(i) < std::abs(width); i += step)
          {
-            float mag = 0;
+            double mag = 0;
             int position = i / width * length + start;
             //rms
             int j;
@@ -197,9 +197,9 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
                   sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
                if (bufferSize > 0)
                   sampleIdx %= bufferSize;
-               mag = MAX(mag, fabsf(buffer[sampleIdx]));
+               mag = MAX(mag, std::abs(buffer[sampleIdx]));
             }
-            mag = pow(mag, .25f);
+            mag = std::pow(mag, .25);
             mag *= height / 2 * vol;
             if (mag > height / 2)
             {
@@ -210,12 +210,12 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
             {
                //ofSetColor(color);
             }
-            if (mag == 0)
-               mag = .1f;
+            if (ofAlmostEquel(mag, 0))
+               mag = .1;
             ofLine(i, height / 2 - mag, i, height / 2 + mag);
          }
 
-         if (pos != -1)
+         if (!ofAlmostEquel(pos, -1))
          {
             ofSetColor(0, 255, 0);
             int position = ofMap(pos, start, end, 0, width, true);
@@ -281,6 +281,15 @@ void Clear(float* buffer, int bufferSize)
    FloatVectorOperations::clear(buffer, bufferSize);
 #else
    bzero(buffer, bufferSize * sizeof(float));
+#endif
+}
+
+void Clear(double* buffer, int bufferSize)
+{
+#ifdef USE_VECTOR_OPS
+   FloatVectorOperations::clear(buffer, bufferSize);
+#else
+   bzero(buffer, bufferSize * sizeof(double));
 #endif
 }
 
@@ -380,7 +389,12 @@ float Interp(float a, float start, float end)
    return a * (end - start) + start;
 }
 
-double GetPhaseInc(float freq)
+double Interp(double a, double start, double end)
+{
+   return a * (end - start) + start;
+}
+
+double GetPhaseInc(double freq)
 {
    return freq * gTwoPiOverSampleRate;
 }
@@ -393,7 +407,7 @@ float FloatWrap(float num, float space)
    return num;
 }
 
-double DoubleWrap(double num, float space)
+double DoubleWrap(double num, double space)
 {
    if (space == 0)
       num = 0;
@@ -401,29 +415,33 @@ double DoubleWrap(double num, float space)
    return num;
 }
 
-void DrawTextNormal(std::string text, int x, int y, float size)
+void DrawTextNormal(std::string text, double x, double y, double size)
 {
    gFont.DrawString(text, size, x, y);
 }
 
-void DrawTextRightJustify(std::string text, int x, int y, float size)
+void DrawTextRightJustify(std::string text, double x, double y, double size)
 {
    gFont.DrawString(text, size, x - gFont.GetStringWidth(text, size), y);
 }
 
-void DrawTextBold(std::string text, int x, int y, float size)
+void DrawTextBold(std::string text, double x, double y, double size)
 {
    gFontBold.DrawString(text, size, x, y);
 }
 
-float GetStringWidth(std::string text, float size)
+double GetStringWidth(std::string text, double size)
 {
    return gFont.GetStringWidth(text, size);
 }
 
 void AssertIfDenormal(float input)
 {
-   assert(input == 0 || input != input || fabsf(input) > std::numeric_limits<float>::min());
+   assert(input == 0 || input != input || std::abs(input) > std::numeric_limits<float>::min());
+}
+void AssertIfDenormal(double input)
+{
+   assert(input == 0 || input != input || std::abs(input) > std::numeric_limits<double>::min());
 }
 
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
@@ -463,7 +481,7 @@ void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float
    int pos = int(offset);
    int posNext = int(offset + 1) % bufferSize;
 
-   float a = offset - pos;
+   double a = offset - pos;
    buffer[pos] += (1 - a) * sample;
    buffer[posNext] += a * sample;
 }
@@ -525,10 +543,10 @@ void UpdateTarget(IDrawableModule* module)
    }
 }
 
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b, bool autocorrelationMode /* = true */)
+void DrawLissajous(RollingBuffer* buffer, double x, double y, double w, double h, double r, double g, double b, bool autocorrelationMode /* = true */)
 {
    ofPushStyle();
-   ofSetLineWidth(1.5f);
+   ofSetLineWidth(1.5);
 
    int secondChannel = 1;
    if (buffer->NumChannels() == 1)
@@ -537,16 +555,16 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
    ofSetColor(r * 255, g * 255, b * 255, 70);
    ofBeginShape();
    const int delaySamps = 90;
-   int numPoints = MIN(buffer->Size() - delaySamps - 1, .02f * gSampleRate);
+   int numPoints = MIN(buffer->Size() - delaySamps - 1, .02 * gSampleRate);
    for (int i = 100; i < numPoints; ++i)
    {
-      float vx = x + w / 2 + buffer->GetSample(i, 0) * .8f * MIN(w, h);
-      float vy;
+      double vx = x + w / 2 + buffer->GetSample(i, 0) * .8 * MIN(w, h);
+      double vy;
       if (autocorrelationMode)
-         vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+         vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8 * MIN(w, h);
       else
-         vy = y + h / 2 + buffer->GetSample(i, secondChannel) * .8f * MIN(w, h);
-      //float alpha = 1 - (i/float(numPoints));
+         vy = y + h / 2 + buffer->GetSample(i, secondChannel) * .8 * MIN(w, h);
+      //double alpha = 1 - (i/double(numPoints));
       //ofSetColor(r*255,g*255,b*255,alpha*alpha*255);
       ofVertex(vx, vy);
    }
@@ -636,28 +654,28 @@ int KeyToLower(int key)
    return key;
 }
 
-float EaseIn(float start, float end, float a)
+double EaseIn(double start, double end, double a)
 {
    return (end - start) * a * a + start;
 }
 
-float EaseOut(float start, float end, float a)
+double EaseOut(double start, double end, double a)
 {
    return -(end - start) * a * (a - 2) + start;
 }
 
-float Bias(float value, float bias)
+double Bias(double value, double bias)
 {
    assert(bias >= 0 && bias <= 1);
-   const float kLog25 = log(25);
-   bias = .2f * expf(kLog25 * bias); //pow(25,bias)
+   const double kLog25 = log(25);
+   bias = .2 * exp(kLog25 * bias); //pow(25,bias)
    return pow(value, bias);
 }
 
-float Pow2(float in)
+double Pow2(double in)
 {
-   const float kLog2 = log(2);
-   return expf(kLog2 * in);
+   const double kLog2 = log(2);
+   return exp(kLog2 * in);
 }
 
 void PrintCallstack()
@@ -679,7 +697,7 @@ void PrintCallstack()
 #endif
 }
 
-bool IsInUnitBox(ofVec2f pos)
+bool IsInUnitBox(ofVec2d pos)
 {
    return pos.x >= 0 && pos.x < 1 && pos.y >= 0 && pos.y < 1;
 }
@@ -738,18 +756,18 @@ std::string GetUniqueName(std::string name, std::vector<std::string> existing)
    return name;
 }
 
-float DistSqToLine(ofVec2f point, ofVec2f a, ofVec2f b)
+double DistSqToLine(ofVec2d point, ofVec2d a, ofVec2d b)
 {
-   float l2 = a.distanceSquared(b);
-   if (l2 == 0.0f)
+   double l2 = a.distanceSquared(b);
+   if (l2 == 0.0)
       return point.distanceSquared(a);
 
-   float t = ((point.x - b.x) * (a.x - b.x) + (point.y - b.y) * (a.y - b.y)) / l2;
-   if (t < 0.0f)
+   double t = ((point.x - b.x) * (a.x - b.x) + (point.y - b.y) * (a.y - b.y)) / l2;
+   if (t < 0.0)
       return point.distanceSquared(a);
-   if (t > 1.0f)
+   if (t > 1.0)
       return point.distanceSquared(b);
-   return point.distanceSquared(ofVec2f(b.x + t * (a.x - b.x), b.y + t * (a.y - b.y)));
+   return point.distanceSquared(ofVec2d(b.x + t * (a.x - b.x), b.y + t * (a.y - b.y)));
 }
 
 //Jenkins one-at-a-time hash
@@ -797,7 +815,7 @@ float GetRightPanGain(float pan)
    return ofClamp(pan, -1, 1) + 1;
 }
 
-void DrawFallbackText(const char* text, float posX, float posY)
+void DrawFallbackText(const char* text, double posX, double posY)
 {
    static int simplex[95][112] = {
       0,
@@ -11442,8 +11460,8 @@ void DrawFallbackText(const char* text, float posX, float posY)
       -1,
    };
 
-   float scale = .5f;
-   ofVec2f pen;
+   double scale = .5;
+   ofVec2d pen;
    pen.set(posX, posY);
 
    for (const auto* c = text; *c; ++c)
@@ -11461,29 +11479,29 @@ void DrawFallbackText(const char* text, float posX, float posY)
       const auto nvtcs = *it++;
       const auto spacing = *it++;
 
-      auto from = ofVec2f(-1, -1);
+      auto from = ofVec2d(-1, -1);
 
       for (size_t i = 0; i < nvtcs; ++i)
       {
          const auto x = *it++;
          const auto y = *it++;
 
-         const auto to = ofVec2f(x, y);
+         const auto to = ofVec2d(x, y);
 
-         if ((from.x != -1 || from.y != -1) && (to.x != -1 || to.y != -1))
+         if ((!ofAlmostEquel(from.x, -1) || !ofAlmostEquel(from.y, -1)) && (!ofAlmostEquel(to.x, -1) || !ofAlmostEquel(to.y, -1)))
             ofLine(pen.x + from.x * scale, pen.y - from.y * scale, pen.x + to.x * scale, pen.y - to.y * scale);
 
          from = to;
       }
 
-      pen += ofVec2f(spacing * scale, 0);
+      pen += ofVec2d(spacing * scale, 0);
    }
 }
 
-bool EvaluateExpression(std::string expressionStr, float currentValue, float& output)
+bool EvaluateExpression(std::string expressionStr, double currentValue, double& output)
 {
-   exprtk::symbol_table<float> symbolTable;
-   exprtk::expression<float> expression;
+   exprtk::symbol_table<double> symbolTable;
+   exprtk::expression<double> expression;
    symbolTable.add_variable("x", currentValue);
    symbolTable.add_constants();
    expression.register_symbol_table(symbolTable);
@@ -11498,7 +11516,7 @@ bool EvaluateExpression(std::string expressionStr, float currentValue, float& ou
    if (input.startsWith("-="))
       input = input.replace("-=", "x-");
 
-   exprtk::parser<float> parser;
+   exprtk::parser<double> parser;
    bool expressionValid = parser.compile(input.toStdString(), expression);
    if (expressionValid)
    {

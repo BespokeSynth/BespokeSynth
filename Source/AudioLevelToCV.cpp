@@ -41,8 +41,8 @@ void AudioLevelToCV::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mGainSlider = new FloatSlider(this, "gain", 3, 2, 100, 15, &mGain, 1, 100);
-   mAttackSlider = new FloatSlider(this, "attack", mGainSlider, kAnchor_Below, 100, 15, &mAttack, .01f, 1000);
-   mReleaseSlider = new FloatSlider(this, "release", mAttackSlider, kAnchor_Below, 100, 15, &mRelease, .01f, 1000);
+   mAttackSlider = new FloatSlider(this, "attack", mGainSlider, kAnchor_Below, 100, 15, &mAttack, .01, 1000);
+   mReleaseSlider = new FloatSlider(this, "release", mAttackSlider, kAnchor_Below, 100, 15, &mRelease, .01, 1000);
    mMinSlider = new FloatSlider(this, "min", mReleaseSlider, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 
@@ -78,13 +78,13 @@ void AudioLevelToCV::DrawModule()
    ofPushStyle();
    ofSetColor(0, 255, 0, gModuleDrawAlpha);
    ofBeginShape();
-   float x, y;
-   float w, h;
+   double x, y;
+   double w, h;
    mGainSlider->GetPosition(x, y, K(local));
    mGainSlider->GetDimensions(w, h);
    for (int i = 0; i < gBufferSize; ++i)
    {
-      ofVertex(ofMap(mModulationBuffer[i], 0, 1, x, x + w, K(clamp)), ofMap(i, 0, gBufferSize, y, y + h), K(clamp));
+      ofVertex(ofMap(static_cast<double>(mModulationBuffer[i]), 0, 1, x, x + w, K(clamp)), ofMap(static_cast<double>(i), 0, gBufferSize, y, y + h), K(clamp));
    }
    ofEndShape();
    ofPopStyle();
@@ -106,7 +106,7 @@ void AudioLevelToCV::Process(double time)
       Add(gWorkBuffer, GetBuffer()->GetChannel(ch), gBufferSize);
    for (int i = 0; i < gBufferSize; ++i)
    {
-      float sample = fabsf(gWorkBuffer[i]);
+      float sample = std::abs(gWorkBuffer[i]);
       if (sample > mVal)
          mVal = mAttackFactor * (mVal - sample) + sample;
       else
@@ -122,17 +122,17 @@ void AudioLevelToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
    OnModulatorRepatch();
 }
 
-float AudioLevelToCV::Value(int samplesIn)
+double AudioLevelToCV::Value(int samplesIn)
 {
    return ofMap(mModulationBuffer[samplesIn], 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
-void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void AudioLevelToCV::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mAttackSlider)
-      mAttackFactor = powf(.01f, 1.0f / (mAttack * gSampleRateMs));
+      mAttackFactor = std::pow(.01, 1.0 / (mAttack * gSampleRateMs));
    if (slider == mReleaseSlider)
-      mReleaseFactor = powf(.01f, 1.0f / (mRelease * gSampleRateMs));
+      mReleaseFactor = std::pow(.01, 1.0 / (mRelease * gSampleRateMs));
 }
 
 void AudioLevelToCV::SaveLayout(ofxJSONElement& moduleInfo)

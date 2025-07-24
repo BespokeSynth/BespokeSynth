@@ -54,7 +54,7 @@ public:
    void AllowDragModeSelection(bool allow);
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
@@ -70,9 +70,9 @@ private:
    //IDrawableModule
    void PreDrawModule() override;
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
-   float mWidth{ 200 };
+   double mWidth{ 200 };
    Canvas* mCanvas{ nullptr };
    CanvasElement* mSelectedElement{ nullptr };
    ClickButton* mRemoveElementButton{ nullptr };

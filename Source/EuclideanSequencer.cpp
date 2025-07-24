@@ -31,20 +31,6 @@
 #include "DrumPlayer.h"
 #include "PatchCableSource.h"
 
-namespace
-{
-   ofVec2f PolToCar(float pos, float radius)
-   {
-      return ofVec2f(radius * sin(pos * TWO_PI), radius * -cos(pos * TWO_PI));
-   }
-
-   ofVec2f CarToPol(float x, float y)
-   {
-      float pos = FloatWrap(atan2(x, -y) / TWO_PI, 1);
-      return ofVec2f(pos, sqrtf(x * x + y * y));
-   }
-}
-
 EuclideanSequencer::EuclideanSequencer()
 {
    for (int i = 0; i < 4; ++i)
@@ -65,21 +51,21 @@ void EuclideanSequencer::CreateUIControls()
    int x = 210;
    int y = 5;
    int xcolumn = 115;
-   mRndLengthChanceSlider = new FloatSlider(this, "step chance", 0 * xcolumn + x, y, 110, 15, &mRndLengthChance, 0.00f, 1.00f, 2);
+   mRndLengthChanceSlider = new FloatSlider(this, "step chance", 0 * xcolumn + x, y, 110, 15, &mRndLengthChance, 0.0, 1.0, 2);
    mRndLengthLoSlider = new FloatSlider(this, "stp lo", 0 * xcolumn + x, y + 20, 55, 15, &mRndLengthLo, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mRndLengthHiSlider = new FloatSlider(this, "stp hi", 0 * xcolumn + x + 55, y + 20, 55, 15, &mRndLengthHi, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
-   mRndOnsetChanceSlider = new FloatSlider(this, "onset chance", 1 * xcolumn + x, y, 110, 15, &mRndOnsetChance, 0.00f, 1.00f, 2);
+   mRndOnsetChanceSlider = new FloatSlider(this, "onset chance", 1 * xcolumn + x, y, 110, 15, &mRndOnsetChance, 0.0, 1.0, 2);
    mRndOnsetLoSlider = new FloatSlider(this, "ons lo", 1 * xcolumn + x, y + 20, 55, 15, &mRndOnsetLo, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mRndOnsetHiSlider = new FloatSlider(this, "ons hi", 1 * xcolumn + x + 55, y + 20, 55, 15, &mRndOnsetHi, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
-   mRndRotationChanceSlider = new FloatSlider(this, "rot chance", 2 * xcolumn + x, y, 110, 15, &mRndRotationChance, 0.00f, 1.00f, 2);
+   mRndRotationChanceSlider = new FloatSlider(this, "rot chance", 2 * xcolumn + x, y, 110, 15, &mRndRotationChance, 0.0, 1.0, 2);
    mRndRotationLoSlider = new FloatSlider(this, "rot lo", 2 * xcolumn + x, y + 20, 55, 15, &mRndRotationLo, EUCLIDEAN_ROTATION_MIN, EUCLIDEAN_ROTATION_MAX, 0);
    mRndRotationHiSlider = new FloatSlider(this, "rot hi", 2 * xcolumn + x + 55, y + 20, 55, 15, &mRndRotationHi, EUCLIDEAN_ROTATION_MIN, EUCLIDEAN_ROTATION_MAX, 0);
-   mRndOffsetChanceSlider = new FloatSlider(this, "offset chance", 3 * xcolumn + x, y, 110, 15, &mRndOffsetChance, 0.00f, 1.00f, 2);
-   mRndOffsetLoSlider = new FloatSlider(this, "o lo", 3 * xcolumn + x, y + 20, 55, 15, &mRndOffsetLo, -0.25f, 0.25f, 2);
-   mRndOffsetHiSlider = new FloatSlider(this, "o hi", 3 * xcolumn + x + 55, y + 20, 55, 15, &mRndOffsetHi, -0.25f, 0.25f, 2);
-   mRndNoteChanceSlider = new FloatSlider(this, "note chance", 4 * xcolumn + x, y, 110, 15, &mRndNoteChance, 0.00f, 1.00f, 2);
-   mRndOctaveLoSlider = new FloatSlider(this, "oct lo", 4 * xcolumn + x, y + 20, 55, 15, &mRndOctaveLo, 0.00f, 5.00f, 0);
-   mRndOctaveHiSlider = new FloatSlider(this, "oct hi", 4 * xcolumn + x + 55, y + 20, 55, 15, &mRndOctaveHi, 0.00f, 5.00f, 0);
+   mRndOffsetChanceSlider = new FloatSlider(this, "offset chance", 3 * xcolumn + x, y, 110, 15, &mRndOffsetChance, 0.0, 1.0, 2);
+   mRndOffsetLoSlider = new FloatSlider(this, "o lo", 3 * xcolumn + x, y + 20, 55, 15, &mRndOffsetLo, -0.25, 0.25, 2);
+   mRndOffsetHiSlider = new FloatSlider(this, "o hi", 3 * xcolumn + x + 55, y + 20, 55, 15, &mRndOffsetHi, -0.25, 0.25, 2);
+   mRndNoteChanceSlider = new FloatSlider(this, "note chance", 4 * xcolumn + x, y, 110, 15, &mRndNoteChance, 0.0, 1.0, 2);
+   mRndOctaveLoSlider = new FloatSlider(this, "oct lo", 4 * xcolumn + x, y + 20, 55, 15, &mRndOctaveLo, 0.0, 5.0, 0);
+   mRndOctaveHiSlider = new FloatSlider(this, "oct hi", 4 * xcolumn + x + 55, y + 20, 55, 15, &mRndOctaveHi, 0.0, 5.0, 0);
 
    x = 210;
    y = 65;
@@ -100,7 +86,7 @@ void EuclideanSequencer::CreateUIControls()
    mRndOffsetButton = new ClickButton(this, "offset", x, y + 60);
    mRndNoteButton = new ClickButton(this, "note", x, y + 80);
 
-   int aInitState = (int)ofRandom(0, EUCLIDEAN_INITIALSTATE_MAX - 0.01); // select a random default state between 0 and max-1
+   int aInitState = (int)ofRandom(0., EUCLIDEAN_INITIALSTATE_MAX - 0.01); // select a random default state between 0 and max-1
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
    {
       mEuclideanSequencerRings[i]->CreateUIControls();
@@ -117,14 +103,14 @@ EuclideanSequencer::~EuclideanSequencer()
       delete mEuclideanSequencerRings[i];
 }
 
-void EuclideanSequencer::Resize(float w, float h)
+void EuclideanSequencer::Resize(double w, double h)
 {
    mWidth = MAX(w, mWidthMin); // limit minimum width
    mWidth = MIN(mWidth, mWidthMax); // limit maximum width
    // mHeight = 200; // fixed height
 }
 
-void EuclideanSequencer::OnTransportAdvanced(float amount)
+void EuclideanSequencer::OnTransportAdvanced(double amount)
 {
    PROFILER(EuclideanSequencer);
 
@@ -176,7 +162,7 @@ void EuclideanSequencer::DrawModule()
    // Grey lines around circle sliders
    ofPushStyle();
    ofSetColor(128, 128, 128);
-   ofSetLineWidth(.1f);
+   ofSetLineWidth(.1);
    ofLine(210, 85, 590, 85);
    ofLine(590, 85, 590, 185);
    ofPopStyle();
@@ -184,13 +170,13 @@ void EuclideanSequencer::DrawModule()
    // Rotating tranposrt line
    ofPushStyle();
    ofSetColor(ofColor::lime);
-   float pos = TheTransport->GetMeasurePos(gTime);
-   ofVec2f end = PolToCar(pos, 100);
+   double pos = TheTransport->GetMeasurePos(gTime);
+   ofVec2d end = ofPolToCar(pos, 100);
    ofLine(100, 100, 100 + end.x, 100 + end.y);
    ofPopStyle();
 }
 
-void EuclideanSequencer::OnClicked(float x, float y, bool right)
+void EuclideanSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
@@ -204,7 +190,7 @@ void EuclideanSequencer::MouseReleased()
       mEuclideanSequencerRings[i]->MouseReleased();
 }
 
-bool EuclideanSequencer::MouseMoved(float x, float y)
+bool EuclideanSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    for (int i = 0; i < mEuclideanSequencerRings.size(); ++i)
@@ -216,7 +202,7 @@ void EuclideanSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EuclideanSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    // Check if Lo > Hi or Hi < Lo
    if (slider == mRndLengthLoSlider)
@@ -351,7 +337,7 @@ void EuclideanSequencer::SaveState(FileStreamOut& out)
 
    IDrawableModule::SaveState(out);
 
-   float width, height;
+   double width, height;
    GetModuleDimensions(width, height);
    out << width;
    out << height;
@@ -387,9 +373,9 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   float width, height;
-   in >> width;
-   in >> height;
+   double width, height;
+   in >> FloatAsDouble >> width;
+   in >> FloatAsDouble >> height;
    Resize(width, height);
 
    int numRings;
@@ -399,21 +385,21 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
 
    if (rev >= 2)
    {
-      in >> mRndLengthChance;
-      in >> mRndLengthLo;
-      in >> mRndLengthHi;
-      in >> mRndOnsetChance;
-      in >> mRndOnsetLo;
-      in >> mRndOnsetHi;
-      in >> mRndRotationChance;
-      in >> mRndRotationLo;
-      in >> mRndRotationHi;
-      in >> mRndOffsetChance;
-      in >> mRndOffsetLo;
-      in >> mRndOffsetHi;
-      in >> mRndNoteChance;
-      in >> mRndOctaveLo;
-      in >> mRndOctaveHi;
+      in >> FloatAsDouble >> mRndLengthChance;
+      in >> FloatAsDouble >> mRndLengthLo;
+      in >> FloatAsDouble >> mRndLengthHi;
+      in >> FloatAsDouble >> mRndOnsetChance;
+      in >> FloatAsDouble >> mRndOnsetLo;
+      in >> FloatAsDouble >> mRndOnsetHi;
+      in >> FloatAsDouble >> mRndRotationChance;
+      in >> FloatAsDouble >> mRndRotationLo;
+      in >> FloatAsDouble >> mRndRotationHi;
+      in >> FloatAsDouble >> mRndOffsetChance;
+      in >> FloatAsDouble >> mRndOffsetLo;
+      in >> FloatAsDouble >> mRndOffsetHi;
+      in >> FloatAsDouble >> mRndNoteChance;
+      in >> FloatAsDouble >> mRndOctaveLo;
+      in >> FloatAsDouble >> mRndOctaveHi;
    }
 }
 
@@ -431,7 +417,7 @@ void EuclideanSequencer::RandomizeLength(int ringIndex)
    for (int i = iFrom; i < iTo; ++i)
    {
       if (ofRandom(1) < mRndLengthChance)
-         mEuclideanSequencerRings[i]->SetSteps((int)ofRandom(mRndLengthLo, mRndLengthHi + 0.9f));
+         mEuclideanSequencerRings[i]->SetSteps((int)ofRandom(mRndLengthLo, mRndLengthHi + 0.9));
    }
 }
 
@@ -449,7 +435,7 @@ void EuclideanSequencer::RandomizeOnset(int ringIndex)
    for (int i = iFrom; i < iTo; ++i)
    {
       if (ofRandom(1) < mRndOnsetChance)
-         mEuclideanSequencerRings[i]->SetOnsets((int)ofRandom(mRndOnsetLo, mRndOnsetHi + 0.9f));
+         mEuclideanSequencerRings[i]->SetOnsets((int)ofRandom(mRndOnsetLo, mRndOnsetHi + 0.9));
    }
 }
 
@@ -472,7 +458,7 @@ void EuclideanSequencer::RandomizeRotation(int ringIndex)
          int maxRotation = mEuclideanSequencerRings[i]->GetSteps();
          maxRotation = MIN(mRndRotationHi, maxRotation);
 
-         mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(mRndRotationLo, maxRotation + 0.9f));
+         mEuclideanSequencerRings[i]->SetRotation((int)ofRandom(mRndRotationLo, maxRotation + 0.9));
       }
    }
 }
@@ -493,7 +479,7 @@ void EuclideanSequencer::RandomizeOffset(int ringIndex)
       if (ofRandom(1) < mRndOffsetChance)
       {
          if (i == 0)
-            mEuclideanSequencerRings[i]->SetOffset(ofRandom(0, MIN(0.04, mRndOffsetHi)));
+            mEuclideanSequencerRings[i]->SetOffset(ofRandom(0., MIN(0.04, mRndOffsetHi)));
          else
             mEuclideanSequencerRings[i]->SetOffset(ofRandom(mRndOffsetLo, mRndOffsetHi));
       }
@@ -530,7 +516,7 @@ void EuclideanSequencer::RandomizeNote(int ringIndex, bool force)
             int noteTo = numPitchesInScale * (mRndOctaveHi - mRndOctaveLo + 1) + noteFrom;
 
             // Try 5 times to generate a unique random pitch. This prevents stuck notes on some synths
-            float newPitch;
+            int newPitch;
             bool isUnique;
             int attempts = 0;
             do
@@ -573,12 +559,12 @@ void EuclideanSequencerRing::CreateUIControls()
    mLengthSlider = new FloatSlider(mOwner, ("steps" + ofToString(mIndex)).c_str(), x, y, 90, 15, &mLength, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mOnsetSlider = new FloatSlider(mOwner, ("onsets" + ofToString(mIndex)).c_str(), x, y + 20, 90, 15, &mOnset, 0, EUCLIDEAN_SEQUENCER_MAX_STEPS, 0);
    mRotationSlider = new FloatSlider(mOwner, ("rotation" + ofToString(mIndex)).c_str(), x, y + 40, 90, 15, &mRotation, EUCLIDEAN_ROTATION_MIN, EUCLIDEAN_ROTATION_MAX, 0);
-   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), x, y + 60, 90, 15, &mOffset, -.25f, .25f, 2);
+   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), x, y + 60, 90, 15, &mOffset, -.25, .25, 2);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), x, y + 80, 4, &mPitch, 0, 127);
 
    mDestinationCable = new AdditionalNoteCable();
    mDestinationCable->SetPatchCableSource(new PatchCableSource(mOwner, kConnectionType_Note));
-   mDestinationCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1), PatchCableSource::Side::kBottom);
+   mDestinationCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2d(0, 1), PatchCableSource::Side::kBottom);
    mOwner->AddPatchCableSource(mDestinationCable->GetPatchCableSource());
    mDestinationCable->GetPatchCableSource()->SetManualPosition(x + 50, y + 105);
 
@@ -693,11 +679,11 @@ void EuclideanSequencerRing::Draw()
    ofFill();
    for (int i = 0; i < (int)mLength; ++i)
    {
-      float pos = float(i) / (int)mLength - mOffset;
-      ofVec2f p1 = PolToCar(pos, GetRadius() - 3);
-      ofVec2f p2 = PolToCar(pos, GetRadius() + 3);
+      double pos = static_cast<double>(i) / static_cast<int>(mLength) - mOffset;
+      ofVec2d p1 = ofPolToCar(pos, GetRadius() - 3);
+      ofVec2d p2 = ofPolToCar(pos, GetRadius() + 3);
       ofLine(p1.x + 100, p1.y + 100, p2.x + 100, p2.y + 100);
-      ofVec2f point = PolToCar(pos, GetRadius());
+      ofVec2d point = ofPolToCar(pos, GetRadius());
 
       if (mSteps[i] > 0)
          ofCircle(100 + point.x, 100 + point.y, 3 + 6 * mSteps[i]);
@@ -706,7 +692,7 @@ void EuclideanSequencerRing::Draw()
       {
          ofPushStyle();
          ofSetColor(255, 255, 255, 100);
-         ofSetLineWidth(.5f);
+         ofSetLineWidth(.5);
          ofNoFill();
          ofCircle(100 + point.x, 100 + point.y, 3 + 6);
          ofPopStyle();
@@ -720,7 +706,7 @@ void EuclideanSequencerRing::Draw()
    mNoteSelector->Draw();
 }
 
-int EuclideanSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
+int EuclideanSequencerRing::GetStepIndex(int x, int y, double& radiusOut)
 {
    // use tempLength to avoid div by zero: mLength may change after check == 0
    int tempLength = (int)mLength;
@@ -728,11 +714,11 @@ int EuclideanSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
    {
       return -1;
    }
-   ofVec2f polar = CarToPol(x - 100, y - 100);
-   float pos = FloatWrap(polar.x + mOffset, 1);
-   int idx = int(pos * mLength + .5f) % tempLength;
+   ofVec2d polar = ofCarToPol(x - 100, y - 100);
+   double pos = DoubleWrap(polar.x + mOffset, 1);
+   int idx = static_cast<int>(pos * mLength + .5) % tempLength;
 
-   ofVec2f stepPos = PolToCar(float(idx) / tempLength - mOffset, GetRadius());
+   ofVec2d stepPos = ofPolToCar(static_cast<double>(idx) / tempLength - mOffset, GetRadius());
    if (ofDistSquared(x, y, stepPos.x + 100, stepPos.y + 100) < 7 * 7)
    {
       radiusOut = polar.y;
@@ -742,7 +728,7 @@ int EuclideanSequencerRing::GetStepIndex(int x, int y, float& radiusOut)
    return -1;
 }
 
-void EuclideanSequencerRing::OnClicked(float x, float y, bool right)
+void EuclideanSequencerRing::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -753,7 +739,7 @@ void EuclideanSequencerRing::OnClicked(float x, float y, bool right)
       if (mSteps[mCurrentlyClickedStepIdx])
          mSteps[mCurrentlyClickedStepIdx] = 0;
       else
-         mSteps[mCurrentlyClickedStepIdx] = .5f;
+         mSteps[mCurrentlyClickedStepIdx] = .5;
    }
 }
 
@@ -762,12 +748,12 @@ void EuclideanSequencerRing::MouseReleased()
    mCurrentlyClickedStepIdx = -1;
 }
 
-void EuclideanSequencerRing::MouseMoved(float x, float y)
+void EuclideanSequencerRing::MouseMoved(double x, double y)
 {
    if (mCurrentlyClickedStepIdx != -1)
    {
-      ofVec2f polar = CarToPol(x - 100, y - 100);
-      float change = (polar.y - mLastMouseRadius) / 50.0f;
+      ofVec2d polar = ofCarToPol(x - 100, y - 100);
+      double change = (polar.y - mLastMouseRadius) / 50.0;
 
       mSteps[mCurrentlyClickedStepIdx] = ofClamp(mSteps[mCurrentlyClickedStepIdx] + change, 0, 1);
 
@@ -775,12 +761,12 @@ void EuclideanSequencerRing::MouseMoved(float x, float y)
    }
    else
    {
-      float radius;
+      double radius;
       mHighlightStepIdx = GetStepIndex(x, y, radius);
    }
 }
 
-void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    bool forceUpdate{ false };
 
@@ -798,7 +784,7 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
       if (tempLength == 0 || mOnset == 0)
          return; // use tempLength to avoid divide by zero later for: % mLength
 
-      std::array<float, EUCLIDEAN_SEQUENCER_MAX_STEPS> mTempSteps{};
+      std::array<double, EUCLIDEAN_SEQUENCER_MAX_STEPS> mTempSteps{};
       int rotOffset = (int)(mRotation - oldVal) % tempLength;
 
       if (rotOffset == 0)
@@ -853,7 +839,7 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
       {
          if (sEuclid[i] == '1')
          {
-            mSteps[i] = .5f;
+            mSteps[i] = .5;
          }
          else
          {
@@ -864,12 +850,12 @@ void EuclideanSequencerRing::FloatSliderUpdated(FloatSlider* slider, float oldVa
 }
 
 
-void EuclideanSequencerRing::OnTransportAdvanced(float amount)
+void EuclideanSequencerRing::OnTransportAdvanced(double amount)
 {
    PROFILER(EuclideanSequencerRing);
 
    TransportListenerInfo info(nullptr, kInterval_CustomDivisor, OffsetInfo(mOffset, false), false);
-   info.mCustomDivisor = mLength + (mLength == 1); // +1 if mLength(Steps) == 1: fixes not playing onset 1 when mLength = 1: force oldStep <> newStep
+   info.mCustomDivisor = mLength + ofAlmostEquel(mLength, 1); // +1 if mLength(Steps) == 1: fixes not playing onset 1 when mLength = 1: force oldStep <> newStep
 
    double remainderMs;
    const int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
@@ -912,7 +898,7 @@ void EuclideanSequencerRing::LoadState(FileStreamIn& in)
    int numSteps;
    in >> numSteps;
    for (size_t i = 0; i < mSteps.size() && i < numSteps; ++i)
-      in >> mSteps[i];
+      in >> FloatAsDouble >> mSteps[i];
 }
 
 void EuclideanSequencerRing::SetSteps(int steps)
@@ -938,7 +924,7 @@ void EuclideanSequencerRing::SetRotation(int rotation)
    mRotationSlider->SetValue(mRotation, gTime, true);
 }
 
-void EuclideanSequencerRing::SetOffset(float offset)
+void EuclideanSequencerRing::SetOffset(double offset)
 {
    mOffset = offset;
    mOffsetSlider->SetValue(mOffset, gTime, true);

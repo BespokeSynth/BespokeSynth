@@ -34,10 +34,10 @@
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
-const float mBufferX = 5;
-const float mBufferY = 100;
-const float mBufferW = 800;
-const float mBufferH = 200;
+const double mBufferX = 5;
+const double mBufferY = 100;
+const double mBufferW = 800;
+const double mBufferH = 200;
 
 SeaOfGrain::SeaOfGrain()
 : IAudioProcessor(gBufferSize)
@@ -78,14 +78,14 @@ void SeaOfGrain::CreateUIControls()
 
    for (int i = 0; i < kNumManualVoices; ++i)
    {
-      float x = 10 + i * 130;
+      int x = 10 + i * 130;
       mManualVoices[i].mGainSlider = new FloatSlider(this, ("gain " + ofToString(i + 1)).c_str(), x, mBufferY + mBufferH + 12, 120, 15, &mManualVoices[i].mGain, 0, 1);
       mManualVoices[i].mPositionSlider = new FloatSlider(this, ("pos " + ofToString(i + 1)).c_str(), mManualVoices[i].mGainSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mPosition, 0, 1);
       mManualVoices[i].mOverlapSlider = new FloatSlider(this, ("overlap " + ofToString(i + 1)).c_str(), mManualVoices[i].mPositionSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mGrainOverlap, .25, MAX_GRAINS);
       mManualVoices[i].mSpeedSlider = new FloatSlider(this, ("speed " + ofToString(i + 1)).c_str(), mManualVoices[i].mOverlapSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mSpeed, -3, 3);
       mManualVoices[i].mLengthMsSlider = new FloatSlider(this, ("len ms " + ofToString(i + 1)).c_str(), mManualVoices[i].mSpeedSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mGrainLengthMs, 1, 1000);
       mManualVoices[i].mPosRandomizeSlider = new FloatSlider(this, ("pos r " + ofToString(i + 1)).c_str(), mManualVoices[i].mLengthMsSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mPosRandomizeMs, 0, 200);
-      mManualVoices[i].mSpeedRandomizeSlider = new FloatSlider(this, ("speed r " + ofToString(i + 1)).c_str(), mManualVoices[i].mPosRandomizeSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mSpeedRandomize, 0, .3f);
+      mManualVoices[i].mSpeedRandomizeSlider = new FloatSlider(this, ("speed r " + ofToString(i + 1)).c_str(), mManualVoices[i].mPosRandomizeSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mSpeedRandomize, 0, .3);
       mManualVoices[i].mSpacingRandomizeSlider = new FloatSlider(this, ("spacing r " + ofToString(i + 1)).c_str(), mManualVoices[i].mSpeedRandomizeSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mSpacingRandomize, 0, 1);
       mManualVoices[i].mOctaveCheckbox = new Checkbox(this, ("octaves " + ofToString(i + 1)).c_str(), mManualVoices[i].mSpacingRandomizeSlider, kAnchor_Below, &mManualVoices[i].mGranulator.mOctaves);
       mManualVoices[i].mWidthSlider = new FloatSlider(this, ("width " + ofToString(i + 1)).c_str(), mManualVoices[i].mOctaveCheckbox, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mWidth, 0, 1);
@@ -130,7 +130,7 @@ void SeaOfGrain::Process(double time)
    SyncBuffers(numChannels);
    mRecordBuffer.SetNumChannels(numChannels);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    ChannelBuffer* out = target->GetBuffer();
    assert(bufferSize == gBufferSize);
 
@@ -207,7 +207,7 @@ void SeaOfGrain::DrawModule()
       for (int i = 0; i < mKeyboardNumPitches; ++i)
       {
          ofSetColor(i % 2 * 200, 200, 0);
-         ofRect(mBufferW * float(i) / mKeyboardNumPitches, mBufferH, mBufferW / mKeyboardNumPitches, 10);
+         ofRect(mBufferW * static_cast<double>(i) / mKeyboardNumPitches, mBufferH, mBufferW / mKeyboardNumPitches, 10);
       }
       ofPopStyle();
 
@@ -221,10 +221,10 @@ void SeaOfGrain::DrawModule()
    }
 }
 
-float SeaOfGrain::GetSampleRateRatio() const
+double SeaOfGrain::GetSampleRateRatio() const
 {
    if (mHasRecordedInput)
-      return 1.0f;
+      return 1.0;
    else
       return mSample->GetSampleRateRatio();
 }
@@ -237,7 +237,7 @@ ChannelBuffer* SeaOfGrain::GetSourceBuffer()
       return mSample->Data();
 }
 
-float SeaOfGrain::GetSourceStartSample()
+double SeaOfGrain::GetSourceStartSample()
 {
    if (mHasRecordedInput)
       return -mDisplayLength * gSampleRate;
@@ -245,7 +245,7 @@ float SeaOfGrain::GetSourceStartSample()
       return mDisplayStartSamples;
 }
 
-float SeaOfGrain::GetSourceEndSample()
+double SeaOfGrain::GetSourceEndSample()
 {
    if (mHasRecordedInput)
       return 0;
@@ -253,7 +253,7 @@ float SeaOfGrain::GetSourceEndSample()
       return mDisplayEndSamples;
 }
 
-float SeaOfGrain::GetSourceBufferOffset()
+double SeaOfGrain::GetSourceBufferOffset()
 {
    if (mHasRecordedInput)
       return mRecordBuffer.GetRawBufferOffset(0);
@@ -266,7 +266,7 @@ int SeaOfGrain::GetSampleNumChannels()
    return mSample->NumChannels();
 }
 
-void SeaOfGrain::FilesDropped(std::vector<std::string> files, int x, int y)
+void SeaOfGrain::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mLoading = true;
 
@@ -280,7 +280,7 @@ void SeaOfGrain::FilesDropped(std::vector<std::string> files, int x, int y)
    mLoading = false;
 }
 
-void SeaOfGrain::SampleDropped(int x, int y, Sample* sample)
+void SeaOfGrain::SampleDropped(double x, double y, Sample* sample)
 {
    mLoading = true;
 
@@ -302,7 +302,7 @@ void SeaOfGrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 
 void SeaOfGrain::UpdateSample()
 {
-   float sampleLengthSeconds = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRate;
+   double sampleLengthSeconds = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRate;
    mDisplayLength = MIN(mDisplayLength, MIN(10, sampleLengthSeconds));
    mDisplayLengthSlider->SetExtents(0, sampleLengthSeconds);
    UpdateDisplaySamples();
@@ -310,7 +310,7 @@ void SeaOfGrain::UpdateSample()
 
 void SeaOfGrain::UpdateDisplaySamples()
 {
-   float ratio = 1;
+   double ratio = 1;
    if (!mHasRecordedInput)
       ratio = mSample->GetSampleRateRatio();
    mDisplayStartSamples = mDisplayOffset * gSampleRate * ratio;
@@ -341,7 +341,7 @@ void SeaOfGrain::ButtonClicked(ClickButton* button, double time)
       LoadFile();
 }
 
-void SeaOfGrain::OnClicked(float x, float y, bool right)
+void SeaOfGrain::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -351,7 +351,7 @@ void SeaOfGrain::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool SeaOfGrain::MouseMoved(float x, float y)
+bool SeaOfGrain::MouseMoved(double x, double y)
 {
    return IDrawableModule::MouseMoved(x, y);
 }
@@ -368,13 +368,13 @@ void SeaOfGrain::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void SeaOfGrain::GetModuleDimensions(float& width, float& height)
+void SeaOfGrain::GetModuleDimensions(double& width, double& height)
 {
    width = mBufferW + 10;
    height = mBufferY + mBufferH + 202;
 }
 
-void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mDisplayOffsetSlider || slider == mDisplayLengthSlider)
       UpdateDisplaySamples();
@@ -459,31 +459,31 @@ void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize)
    if (!mADSR.IsDone(gTime) && mOwner->GetSourceBuffer()->BufferSize() > 0)
    {
       double time = gTime;
-      float speed = mOwner->GetSampleRateRatio();
+      double speed = mOwner->GetSampleRateRatio();
       for (int i = 0; i < bufferSize; ++i)
       {
-         float pitchBend = mPitchBend ? mPitchBend->GetValue(i) : ModulationParameters::kDefaultPitchBend;
-         float pressure = mPressure ? mPressure->GetValue(i) : ModulationParameters::kDefaultPressure;
-         float modwheel = mModWheel ? mModWheel->GetValue(i) : ModulationParameters::kDefaultModWheel;
+         double pitchBend = mPitchBend ? mPitchBend->GetValue(i) : ModulationParameters::kDefaultPitchBend;
+         double pressure = mPressure ? mPressure->GetValue(i) : ModulationParameters::kDefaultPressure;
+         double modwheel = mModWheel ? mModWheel->GetValue(i) : ModulationParameters::kDefaultModWheel;
          if (pressure > 0)
          {
             mGranulator.mGrainOverlap = ofMap(pressure * pressure, 0, 1, 3, MAX_GRAINS);
-            mGranulator.mPosRandomizeMs = ofMap(pressure * pressure, 0, 1, 100, .03f);
+            mGranulator.mPosRandomizeMs = ofMap(pressure * pressure, 0, 1, 100, .03);
          }
          mGranulator.mGrainLengthMs = ofMap(modwheel, -1, 1, 10, 700);
 
-         float blend = .0005f;
+         double blend = .0005;
          mGain = mGain * (1 - blend) + pressure * blend;
 
          float outSample[ChannelBuffer::kMaxNumChannels];
          Clear(outSample, ChannelBuffer::kMaxNumChannels);
-         float pos = (mPitch + pitchBend + MIN(.125f, mPlay) - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches;
+         double pos = (mPitch + pitchBend + MIN(.125, mPlay) - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches;
          mGranulator.ProcessFrame(time, mOwner->GetSourceBuffer(), mOwner->GetSourceBuffer()->BufferSize(), ofLerp(mOwner->GetSourceStartSample(), mOwner->GetSourceEndSample(), pos) + mOwner->GetSourceBufferOffset(), speed, outSample);
          for (int ch = 0; ch < output->NumActiveChannels(); ++ch)
-            output->GetChannel(ch)[i] += outSample[mOwner->GetSampleNumChannels() == 1 ? 0 : ch] * sqrtf(mGain) * mADSR.Value(time);
+            output->GetChannel(ch)[i] += outSample[mOwner->GetSampleNumChannels() == 1 ? 0 : ch] * std::sqrt(mGain) * mADSR.Value(time);
 
          time += gInvSampleRateMs;
-         mPlay += .001f;
+         mPlay += .001;
       }
    }
    else
@@ -492,19 +492,19 @@ void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize)
    }
 }
 
-void SeaOfGrain::GrainMPEVoice::Draw(float w, float h)
+void SeaOfGrain::GrainMPEVoice::Draw(double w, double h)
 {
    if (!mADSR.IsDone(gTime))
    {
       if (mPitch - mOwner->mKeyboardBasePitch >= 0 && mPitch - mOwner->mKeyboardBasePitch < mOwner->mKeyboardNumPitches)
       {
-         float pitchBend = mPitchBend ? mPitchBend->GetValue(0) : 0;
-         float pressure = mPressure ? mPressure->GetValue(0) : 0;
+         double pitchBend = mPitchBend ? mPitchBend->GetValue(0) : 0;
+         double pressure = mPressure ? mPressure->GetValue(0) : 0;
 
          ofPushStyle();
          ofFill();
-         float keyX = (mPitch - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches * w;
-         float keyXTop = keyX + pitchBend * w / mOwner->mKeyboardNumPitches;
+         double keyX = (mPitch - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches * w;
+         double keyXTop = keyX + pitchBend * w / mOwner->mKeyboardNumPitches;
          ofBeginShape();
          ofVertex(keyX, h);
          ofVertex(keyXTop, h - pressure * h);
@@ -529,9 +529,9 @@ void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize
    if (mGain > 0 && mOwner->GetSourceBuffer()->BufferSize() > 0)
    {
       double time = gTime;
-      float panLeft = GetLeftPanGain(mPan);
-      float panRight = GetRightPanGain(mPan);
-      float speed = mOwner->GetSampleRateRatio();
+      double panLeft = GetLeftPanGain(mPan);
+      double panRight = GetRightPanGain(mPan);
+      double speed = mOwner->GetSampleRateRatio();
       for (int i = 0; i < bufferSize; ++i)
       {
          float outSample[ChannelBuffer::kMaxNumChannels];
@@ -548,14 +548,14 @@ void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize
    }
 }
 
-void SeaOfGrain::GrainManualVoice::Draw(float w, float h)
+void SeaOfGrain::GrainManualVoice::Draw(double w, double h)
 {
    if (mGain > 0)
    {
       ofPushStyle();
       ofFill();
-      float x = mPosition * w;
-      float y = h - mGain * h;
+      double x = mPosition * w;
+      double y = h - mGain * h;
       ofLine(x, y, x, h);
       ofRect(x - 5, y - 5, 10, 10);
       ofPopStyle();

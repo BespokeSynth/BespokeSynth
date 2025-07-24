@@ -40,9 +40,9 @@ class RhythmLine
 public:
    RhythmLine(Polyrhythms* owner, int index);
    void Draw();
-   void OnClicked(float x, float y, bool right);
+   void OnClicked(double x, double y, bool right);
    void MouseReleased();
-   void MouseMoved(float x, float y);
+   void MouseMoved(double x, double y);
    void CreateUIControls();
    void OnResize();
    void UpdateGrid();
@@ -71,16 +71,16 @@ public:
    void CreateUIControls() override;
    void Init() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    void SetEnabled(bool on) override { mEnabled = on; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
@@ -96,14 +96,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
-   float mWidth{ 350 };
-   float mHeight;
+   double mWidth{ 350 };
+   double mHeight;
    std::array<RhythmLine*, 8> mRhythmLines;
 };

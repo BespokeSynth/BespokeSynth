@@ -77,7 +77,7 @@ void ChordDisplayer::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void ChordDisplayer::GetModuleDimensions(float& width, float& height)
+void ChordDisplayer::GetModuleDimensions(double& width, double& height)
 {
    if (mAdvancedDetection)
    {

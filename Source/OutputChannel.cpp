@@ -67,10 +67,10 @@ void OutputChannel::Process(double time)
       auto getBufferGetChannel0 = GetBuffer()->GetChannel(0);
       if (channel >= 0 && channel < TheSynth->GetNumOutputChannels())
       {
-         if (mLimit > std::numeric_limits<float>::epsilon())
+         if (mLimit > std::numeric_limits<double>::epsilon())
          {
             for (int i = 0; i < gBufferSize; ++i)
-               TheSynth->GetOutputBuffer(channel)[i] += std::clamp(getBufferGetChannel0[i], -mLimit, mLimit);
+               TheSynth->GetOutputBuffer(channel)[i] += ofClamp(getBufferGetChannel0[i], -mLimit, mLimit);
          }
          else
          {
@@ -88,7 +88,7 @@ void OutputChannel::Process(double time)
       if (channel1 >= 0 && channel1 < TheSynth->GetNumOutputChannels())
       {
          auto getBufferGetChannel0 = GetBuffer()->GetChannel(0);
-         if (mLimit > std::numeric_limits<float>::epsilon())
+         if (mLimit > std::numeric_limits<double>::epsilon())
          {
             for (int i = 0; i < gBufferSize; ++i)
                TheSynth->GetOutputBuffer(channel1)[i] += CLAMP(getBufferGetChannel0[i], -mLimit, mLimit);
@@ -105,7 +105,7 @@ void OutputChannel::Process(double time)
       if (channel2 >= 0 && channel2 < TheSynth->GetNumOutputChannels())
       {
          auto getBufferGetChannel2 = GetBuffer()->GetChannel(inputChannel2);
-         if (mLimit > std::numeric_limits<float>::epsilon())
+         if (mLimit > std::numeric_limits<double>::epsilon())
          {
             for (int i = 0; i < gBufferSize; ++i)
                TheSynth->GetOutputBuffer(channel2)[i] += CLAMP(getBufferGetChannel2[i], -mLimit, mLimit);

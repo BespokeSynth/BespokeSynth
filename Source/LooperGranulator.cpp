@@ -47,13 +47,13 @@ void LooperGranulator::CreateUIControls()
 
    UIBLOCK(3, 3, 120);
    CHECKBOX(mOnCheckbox, "on", &mOn);
-   FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5f, MAX_GRAINS);
+   FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5, MAX_GRAINS);
    FLOATSLIDER(mGranSpeed, "speed", &mGranulator.mSpeed, -3, 3);
    FLOATSLIDER(mGranLengthMs, "len ms", &mGranulator.mGrainLengthMs, 1, 1000);
    FLOATSLIDER(mPosSlider, "loop pos", &mDummyPos, 0, 1);
    CHECKBOX(mFreezeCheckbox, "freeze", &mFreeze);
    FLOATSLIDER(mGranPosRandomize, "pos rand", &mGranulator.mPosRandomizeMs, 0, 200);
-   FLOATSLIDER(mGranSpeedRandomize, "speed rand", &mGranulator.mSpeedRandomize, 0, .3f);
+   FLOATSLIDER(mGranSpeedRandomize, "speed rand", &mGranulator.mSpeedRandomize, 0, .3);
    FLOATSLIDER(mGranSpacingRandomize, "spacing rand", &mGranulator.mSpacingRandomize, 0, 1);
    CHECKBOX(mGranOctaveCheckbox, "octaves", &mGranulator.mOctaves);
    FLOATSLIDER(mGranWidthSlider, "width", &mGranulator.mWidth, 0, 1);
@@ -95,13 +95,13 @@ void LooperGranulator::DrawOverlay(ofRectangle bufferRect, int loopLength)
       mGranulator.Draw(bufferRect.x, bufferRect.y, bufferRect.width, bufferRect.height, 0, loopLength, loopLength);
 }
 
-void LooperGranulator::ProcessFrame(double time, float bufferOffset, float* output)
+void LooperGranulator::ProcessFrame(double time, double bufferOffset, float* output)
 {
    if (mLooper != nullptr)
    {
       int bufferLength;
       auto* buffer = mLooper->GetLoopBuffer(bufferLength);
-      mGranulator.ProcessFrame(time, buffer, bufferLength, bufferOffset, 1.0f, output);
+      mGranulator.ProcessFrame(time, buffer, bufferLength, bufferOffset, 1.0, output);
    }
 }
 
@@ -134,7 +134,7 @@ void LooperGranulator::DropdownUpdated(DropdownList* list, int oldVal, double ti
 {
 }
 
-void LooperGranulator::GetModuleDimensions(float& width, float& height)
+void LooperGranulator::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;

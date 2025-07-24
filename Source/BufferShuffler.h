@@ -46,7 +46,7 @@ public:
    void Poll() override;
    void CreateUIControls() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override
+   void Resize(double w, double h) override
    {
       mWidth = MAX(w, 245);
       mHeight = MAX(h, 85);
@@ -62,17 +62,17 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    void UpdateGridControllerLights(bool force);
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void DropdownUpdated(DropdownList* dropdown, int oldVal, double time) override {}
 
@@ -89,14 +89,14 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    bool DrawToPush2Screen() override;
-   float GetFourTetPosition(double time);
+   double GetFourTetPosition(double time);
 
    enum class PlaybackStyle
    {
@@ -118,18 +118,18 @@ private:
 
    int GetWritePositionInSamples(double time);
    int GetLengthInSamples();
-   void DrawBuffer(float x, float y, float w, float h);
+   void DrawBuffer(double x, double y, double w, double h);
    void PlayOneShot(int slice);
    int GetNumSlices();
-   float GetSlicePlaybackRate() const;
+   double GetSlicePlaybackRate() const;
    PlaybackStyle VelocityToPlaybackStyle(int velocity) const;
    void QueueEvent(double time, int slice, PlaybackStyle style = PlaybackStyle::Normal);
    int ConsumeEvent(double time);
 
    ChannelBuffer mInputBuffer;
 
-   float mWidth{ 245 };
-   float mHeight{ 85 };
+   double mWidth{ 245 };
+   double mHeight{ 85 };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    NoteInterval mInterval{ kInterval_8n };
@@ -138,16 +138,16 @@ private:
    Checkbox* mFreezeInputCheckbox{ nullptr };
    PlaybackStyle mPlaybackStyle{ PlaybackStyle::Normal };
    DropdownList* mPlaybackStyleDropdown{ nullptr };
-   float mFourTet{ 0 };
+   double mFourTet{ 0 };
    FloatSlider* mFourTetSlider{ nullptr };
    int mFourTetSlices{ 4 };
    DropdownList* mFourTetSlicesDropdown{ nullptr };
    PlaybackStyle mQueuedPlaybackStyle{ PlaybackStyle::None };
-   float mPlaybackSampleIndex{ -1 };
+   double mPlaybackSampleIndex{ -1 };
    GridControlTarget* mGridControlTarget{ nullptr };
    bool mUseVelocitySpeedControl{ false };
    bool mOnlyPlayWhenTriggered{ false };
-   float mFourTetSampleIndex{ 0 };
+   double mFourTetSampleIndex{ 0 };
 
    SwitchAndRamp mSwitchAndRamp;
 

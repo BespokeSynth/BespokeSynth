@@ -233,7 +233,7 @@ void SpaceMouseMessageWindow::Impl::SbMotionEvent(SiSpwEvent* pEvent)
 
    float rawTwist = ry;
    float rawZoom = ty;
-   ofVec2f rawPan(rz + tx, rx - tz);
+   ofVec2d rawPan(rz + tx, rx - tz);
 
    float panMag = sqrtf(tx * tx + tz * tz);
    float panAngle = atan2(-tz, tx);

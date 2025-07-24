@@ -45,7 +45,7 @@ void NoteLooper::Init()
 void NoteLooper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   float w, h;
+   double w, h;
    UIBLOCK(80);
    CHECKBOX(mWriteCheckbox, "write", &mWrite);
    CHECKBOX(mDeleteOrMuteCheckbox, "del/mute", &mDeleteOrMute);
@@ -123,7 +123,7 @@ bool NoteLooper::DrawToPush2Screen()
    return false;
 }
 
-void NoteLooper::Resize(float w, float h)
+void NoteLooper::Resize(double w, double h)
 {
    mWidth = MAX(w, 370);
    mHeight = MAX(h, 140);
@@ -135,7 +135,7 @@ double NoteLooper::GetCurPos(double time) const
    return ((TheTransport->GetMeasure(time) % mNumMeasures) + TheTransport->GetMeasurePos(time)) / mNumMeasures;
 }
 
-void NoteLooper::OnTransportAdvanced(float amount)
+void NoteLooper::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteLooper);
 
@@ -203,7 +203,7 @@ void NoteLooper::OnTransportAdvanced(float amount)
    {
       if (mInputNotes[pitch])
       {
-         float endPos = curPos;
+         double endPos = curPos;
          if (mInputNotes[pitch]->GetStart() > endPos)
             endPos += 1; //wrap
          mInputNotes[pitch]->SetEnd(endPos);
@@ -211,9 +211,9 @@ void NoteLooper::OnTransportAdvanced(float amount)
          int modIdx = mInputNotes[pitch]->GetVoiceIdx();
          if (modIdx == -1)
             modIdx = kNumVoices;
-         float bend = ModulationParameters::kDefaultPitchBend;
-         float mod = ModulationParameters::kDefaultModWheel;
-         float pressure = ModulationParameters::kDefaultPressure;
+         double bend = ModulationParameters::kDefaultPitchBend;
+         double mod = ModulationParameters::kDefaultModWheel;
+         double pressure = ModulationParameters::kDefaultPressure;
          if (mVoiceModulations[modIdx].pitchBend)
             bend = mVoiceModulations[modIdx].pitchBend->GetValue(0);
          if (mVoiceModulations[modIdx].modWheel)
@@ -264,12 +264,12 @@ void NoteLooper::PlayNote(NoteMessage note)
 NoteCanvasElement* NoteLooper::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx /*=-1*/, ModulationParameters modulation /* = ModulationParameters()*/)
 {
    double canvasPos = measurePos / mNumMeasures * mCanvas->GetNumCols();
-   int col = int(canvasPos + .5f); //round off
+   int col = std::round(canvasPos); //round off
    int row = mCanvas->GetNumRows() - pitch - 1;
    NoteCanvasElement* element = static_cast<NoteCanvasElement*>(mCanvas->CreateElement(col, row));
    element->mOffset = canvasPos - element->mCol; //the rounded off part
    element->mLength = length / mNumMeasures * mCanvas->GetNumCols();
-   element->SetVelocity(velocity / 127.0f);
+   element->SetVelocity(velocity / 127.0);
    element->SetVoiceIdx(voiceIdx);
    int modIdx = voiceIdx;
    if (modIdx == -1)
@@ -315,7 +315,7 @@ void NoteLooper::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void NoteLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteLooper::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -439,8 +439,8 @@ void NoteLooper::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   in >> FloatAsDouble >> mWidth;
+   in >> FloatAsDouble >> mHeight;
    Resize(mWidth, mHeight);
 
    in >> mMinRow;

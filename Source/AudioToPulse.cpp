@@ -47,7 +47,7 @@ void AudioToPulse::CreateUIControls()
 
    UIBLOCK0();
    FLOATSLIDER(mThresholdSlider, "threshold", &mThreshold, 0, 1);
-   FLOATSLIDER(mReleaseSlider, "release", &mRelease, .01f, 1000);
+   FLOATSLIDER(mReleaseSlider, "release", &mRelease, .01, 1000);
    ENDUIBLOCK(mWidth, mHeight);
 
    mThresholdSlider->SetMode(FloatSlider::kSquare);
@@ -69,15 +69,15 @@ void AudioToPulse::DrawModule()
 
    ofPushStyle();
    ofFill();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4);
    ofRectangle rect = mThresholdSlider->GetRect(true);
-   rect.width *= ofClamp(sqrtf(mPeak), 0, 1);
-   rect.height *= .5f;
+   rect.width *= ofClamp(sqrt(mPeak), 0, 1);
+   rect.height *= .5;
    ofRect(rect);
-   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4f);
+   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4);
    rect = mThresholdSlider->GetRect(true);
    rect.width *= ofClamp(mEnvelope, 0, 1);
-   rect.height *= .5f;
+   rect.height *= .5;
    rect.y += rect.height;
    ofRect(rect);
    ofPopStyle();
@@ -93,7 +93,7 @@ void AudioToPulse::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   const float kAttackTimeMs = 1;
+   const double kAttackTimeMs = 1;
 
    assert(GetBuffer()->BufferSize());
    Clear(gWorkBuffer, gBufferSize);
@@ -102,9 +102,9 @@ void AudioToPulse::Process(double time)
    Mult(gWorkBuffer, 1.0f / GetBuffer()->NumActiveChannels(), gBufferSize);
    for (int i = 0; i < gBufferSize; ++i)
    {
-      const float decayTime = .01f;
-      float scalar = powf(0.5f, 1.0f / (decayTime * gSampleRate));
-      float input = fabsf(gWorkBuffer[i]);
+      const double decayTime = .01;
+      double scalar = std::pow(0.5, 1.0 / (decayTime * gSampleRate));
+      double input = std::abs(gWorkBuffer[i]);
 
       if (input >= mPeak)
       {
@@ -119,23 +119,23 @@ void AudioToPulse::Process(double time)
             mPeak = 0.0;
       }
 
-      float oldEnvelope = mEnvelope;
+      double oldEnvelope = mEnvelope;
       if (mPeak >= mThreshold && mEnvelope < 1)
          mEnvelope = MIN(1, mEnvelope + gInvSampleRateMs / kAttackTimeMs);
       if (mPeak < mThreshold && mEnvelope > 0)
          mEnvelope = MAX(0, mEnvelope - gInvSampleRateMs / mRelease);
 
-      if (mEnvelope >= 0.01f && oldEnvelope < 0.01f)
+      if (mEnvelope >= 0.01 && oldEnvelope < 0.01)
          DispatchPulse(GetPatchCableSource(), time + i * gInvSampleRateMs, 1, 0);
    }
 
    GetBuffer()->Reset();
 }
 
-void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void AudioToPulse::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mReleaseSlider)
-      mReleaseFactor = powf(.01f, 1.0f / (mRelease * gSampleRateMs));
+      mReleaseFactor = pow(.01, 1.0 / (mRelease * gSampleRateMs));
 }
 
 void AudioToPulse::SaveLayout(ofxJSONElement& moduleInfo)

@@ -45,8 +45,8 @@ void CanvasTimeline::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
 
-   float startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
-   float endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+   double startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+   double endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
 
    if (mClick && (mHoverMode == HoverMode::kStart || mHoverMode == HoverMode::kMiddle))
       startX += mDragOffset.x;
@@ -58,10 +58,10 @@ void CanvasTimeline::Render()
    {
       ofSetColor(150, 150, 150);
       ofNoFill();
-      float quantizedStart = GetQuantizedForX(startX, HoverMode::kMiddle);
-      float quantizedStartX = ofMap(quantizedStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
-      float quantizedEnd = GetQuantizedForX(endX, HoverMode::kMiddle);
-      float quantizedEndX = ofMap(quantizedEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+      double quantizedStart = GetQuantizedForX(startX, HoverMode::kMiddle);
+      double quantizedStartX = ofMap(quantizedStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+      double quantizedEnd = GetQuantizedForX(endX, HoverMode::kMiddle);
+      double quantizedEndX = ofMap(quantizedEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
       ofRect(quantizedStartX, 0, quantizedEndX - quantizedStartX, mHeight / 2, 0);
    }
    if (mHoverMode == HoverMode::kMiddle)
@@ -75,8 +75,8 @@ void CanvasTimeline::Render()
    {
       ofSetColor(150, 150, 150);
       ofNoFill();
-      float quantized = GetQuantizedForX(startX, HoverMode::kStart);
-      float quantizedX = ofMap(quantized, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+      double quantized = GetQuantizedForX(startX, HoverMode::kStart);
+      double quantizedX = ofMap(quantized, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
       DrawTriangle(quantizedX, 1);
    }
    if (mHoverMode == HoverMode::kStart)
@@ -91,8 +91,8 @@ void CanvasTimeline::Render()
    {
       ofSetColor(150, 150, 150);
       ofNoFill();
-      float quantized = GetQuantizedForX(endX, HoverMode::kEnd);
-      float quantizedX = ofMap(quantized, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+      double quantized = GetQuantizedForX(endX, HoverMode::kEnd);
+      double quantizedX = ofMap(quantized, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
       DrawTriangle(quantizedX, -1);
    }
    if (mHoverMode == HoverMode::kEnd)
@@ -106,7 +106,7 @@ void CanvasTimeline::Render()
    ofPopMatrix();
 }
 
-void CanvasTimeline::DrawTriangle(float posX, int direction)
+void CanvasTimeline::DrawTriangle(double posX, int direction)
 {
    ofBeginShape();
    ofVertex(posX, 0);
@@ -116,10 +116,10 @@ void CanvasTimeline::DrawTriangle(float posX, int direction)
    ofEndShape();
 }
 
-float CanvasTimeline::GetQuantizedForX(float posX, HoverMode clampSide)
+double CanvasTimeline::GetQuantizedForX(double posX, HoverMode clampSide)
 {
-   float pos = ((posX / mWidth) * (mCanvas->mViewEnd - mCanvas->mViewStart)) + mCanvas->mViewStart;
-   int measure = CLAMP(int(pos + .5f), 0, mCanvas->GetLength());
+   double pos = ((posX / mWidth) * (mCanvas->mViewEnd - mCanvas->mViewStart)) + mCanvas->mViewStart;
+   int measure = CLAMP(std::round(pos), 0.0, mCanvas->GetLength());
    if (clampSide == HoverMode::kStart)
    {
       if (measure >= mCanvas->mLoopEnd)
@@ -133,7 +133,7 @@ float CanvasTimeline::GetQuantizedForX(float posX, HoverMode clampSide)
    return measure;
 }
 
-void CanvasTimeline::OnClicked(float x, float y, bool right)
+void CanvasTimeline::OnClicked(double x, double y, bool right)
 {
    mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
@@ -144,19 +144,19 @@ void CanvasTimeline::MouseReleased()
 {
    if (mClick)
    {
-      float loopLength = mCanvas->mLoopEnd - mCanvas->mLoopStart;
+      double loopLength = mCanvas->mLoopEnd - mCanvas->mLoopStart;
       if (mHoverMode == HoverMode::kStart || mHoverMode == HoverMode::kMiddle)
       {
-         float startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+         double startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
          startX += mDragOffset.x;
-         float quantized = GetQuantizedForX(startX, mHoverMode);
+         double quantized = GetQuantizedForX(startX, mHoverMode);
          mCanvas->mLoopStart = quantized;
       }
       if (mHoverMode == HoverMode::kEnd || mHoverMode == HoverMode::kMiddle)
       {
-         float endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+         double endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
          endX += mDragOffset.x;
-         float quantized = GetQuantizedForX(endX, mHoverMode);
+         double quantized = GetQuantizedForX(endX, mHoverMode);
          mCanvas->mLoopEnd = quantized;
       }
 
@@ -169,7 +169,7 @@ void CanvasTimeline::MouseReleased()
    mClick = false;
 }
 
-bool CanvasTimeline::MouseMoved(float x, float y)
+bool CanvasTimeline::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
 
@@ -177,8 +177,8 @@ bool CanvasTimeline::MouseMoved(float x, float y)
    {
       mHoverMode = HoverMode::kNone;
 
-      float startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
-      float endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+      double startX = ofMap(mCanvas->mLoopStart, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
+      double endX = ofMap(mCanvas->mLoopEnd, mCanvas->mViewStart, mCanvas->mViewEnd, 0, mWidth);
 
       ofRectangle betweenRect(startX, 0, endX - startX, mHeight);
       if (betweenRect.contains(x, y))
@@ -194,13 +194,13 @@ bool CanvasTimeline::MouseMoved(float x, float y)
    }
    else
    {
-      mDragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
+      mDragOffset = (ofVec2d(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
    }
 
    return false;
 }
 
-bool CanvasTimeline::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool CanvasTimeline::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    return false;
 }

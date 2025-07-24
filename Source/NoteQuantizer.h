@@ -52,7 +52,7 @@ public:
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void OnTimeEvent(double time) override;
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -62,12 +62,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 80;
       height = 40;
    }
-   void OnEvent(double time, float strength);
+   void OnEvent(double time, double strength);
 
    struct InputInfo
    {

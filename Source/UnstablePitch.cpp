@@ -72,11 +72,11 @@ void UnstablePitch::DrawModule()
    ofFill();
    for (int col = 0; col < kGridSize; ++col)
    {
-      float x = rect.x + col * (rect.width / kGridSize);
-      float y = rect.y;
-      float val = mPerlin.GetValue(gTime, x / rect.width * 10, 0) * ofClamp(mPerlin.mPerlinAmount * 5, 0, 1);
+      double x = rect.x + col * (rect.width / kGridSize);
+      double y = rect.y;
+      double val = mPerlin.GetValue(gTime, x / rect.width * 10, 0) * ofClamp(mPerlin.mPerlinAmount * 5, 0, 1);
       ofSetColor(val * 255, 0, val * 255);
-      ofRect(x, y, (rect.width / kGridSize) + .5f, rect.height + .5f, 0);
+      ofRect(x, y, (rect.width / kGridSize) + .5, rect.height + .5, 0);
    }
 
    ofNoFill();
@@ -88,8 +88,8 @@ void UnstablePitch::DrawModule()
          ofBeginShape();
          for (int i = 0; i < gBufferSize; ++i)
          {
-            float sample = ofClamp(mModulation.GetPitchBend(voice)->GetBufferValue(i) * 5, -1, 1);
-            ofVertex((i * rect.width) / gBufferSize + rect.x, rect.y + (-sample * .5f + .5f) * rect.height);
+            double sample = ofClamp(mModulation.GetPitchBend(voice)->GetBufferValue(i) * 5, -1, 1);
+            ofVertex((i * rect.width) / gBufferSize + rect.x, rect.y + (-sample * .5 + .5) * rect.height);
          }
          ofEndShape();
       }
@@ -149,7 +149,7 @@ void UnstablePitch::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void UnstablePitch::OnTransportAdvanced(float amount)
+void UnstablePitch::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 
@@ -168,7 +168,7 @@ void UnstablePitch::FillModulationBuffer(double time, int voiceIdx)
    mModulation.GetPitchBend(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
-void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

@@ -42,9 +42,9 @@ public:
    void Draw();
    void CreateUIControls();
 
-   float mPoint{ 0 };
+   double mPoint{ 0 };
    FloatSlider* mSlider{ nullptr };
-   float mVelocity{ 0 };
+   double mVelocity{ 0 };
    FloatSlider* mVelocitySlider{ nullptr };
    int mPitch{ 0 };
    TextEntry* mNoteSelector{ nullptr };
@@ -73,10 +73,10 @@ public:
    void SetEnabled(bool on) override { mEnabled = on; }
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
@@ -91,13 +91,13 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 320;
       height = 165;
    }
 
-   float mLastMeasurePos{ 0 };
+   double mLastMeasurePos{ 0 };
    std::vector<SliderLine*> mSliderLines;
    int mDivision{ 1 };
    IntSlider* mDivisionSlider{ nullptr };

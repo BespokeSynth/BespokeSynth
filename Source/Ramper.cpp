@@ -72,15 +72,15 @@ void Ramper::CreateUIControls()
    mLengthSelector->AddLabel("64n", kInterval_64n);
 }
 
-void Ramper::OnTransportAdvanced(float amount)
+void Ramper::OnTransportAdvanced(double amount)
 {
    if (!mEnabled)
       mRamping = false;
    if (mRamping)
    {
-      float measureProgress = gTime - mStartTime;
-      float length = TheTransport->GetDuration(mLength);
-      float progress = measureProgress / length;
+      double measureProgress = gTime - mStartTime;
+      double length = TheTransport->GetDuration(mLength);
+      double progress = measureProgress / length;
       if (progress >= 0 && progress < 1)
       {
          for (auto* control : mUIControls)
@@ -110,7 +110,7 @@ void Ramper::DrawModule()
    mTargetValueSlider->Draw();
 }
 
-void Ramper::OnClicked(float x, float y, bool right)
+void Ramper::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 }
@@ -120,7 +120,7 @@ void Ramper::MouseReleased()
    IDrawableModule::MouseReleased();
 }
 
-bool Ramper::MouseMoved(float x, float y)
+bool Ramper::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    return false;
@@ -157,7 +157,7 @@ void Ramper::Go(double time)
    }
 }
 
-void Ramper::OnPulse(double time, float velocity, int flags)
+void Ramper::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0 && mEnabled)
       Go(time);
@@ -169,7 +169,7 @@ void Ramper::ButtonClicked(ClickButton* button, double time)
       Go(time);
 }
 
-void Ramper::GetModuleDimensions(float& width, float& height)
+void Ramper::GetModuleDimensions(double& width, double& height)
 {
    width = 100;
    height = 38;

@@ -66,12 +66,12 @@ public:
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void TextEntryComplete(TextEntry* entry) override {}
@@ -89,27 +89,27 @@ public:
 
 private:
    void StopRecording();
-   float DetectSamplePitch();
+   double DetectSamplePitch();
    void UpdateForNewSample();
 
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mWidth{ 100 };
-   float mHeight{ 100 };
+   double mWidth{ 100 };
+   double mHeight{ 100 };
 
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    SampleVoiceParams mVoiceParams;
    FloatSlider* mVolSlider{ nullptr };
    ADSRDisplay* mADSRDisplay{ nullptr };
-   float mThresh{ .2 };
+   double mThresh{ .2 };
    FloatSlider* mThreshSlider{ nullptr };
    IntSlider* mStartSlider{ nullptr };
    IntSlider* mStopSlider{ nullptr };

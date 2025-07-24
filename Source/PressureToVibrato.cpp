@@ -74,7 +74,7 @@ void PressureToVibrato::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void PressureToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PressureToVibrato::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

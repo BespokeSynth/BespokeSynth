@@ -44,7 +44,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -54,10 +54,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
-   float mWidth{ 150 };
-   float mHeight{ 30 };
+   double mWidth{ 150 };
+   double mHeight{ 30 };
 
    int mLastReceivedFlags{ 0 };
    double mLastReceivedFlagTime{ 0 };

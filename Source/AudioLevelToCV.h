@@ -53,11 +53,11 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -71,20 +71,20 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 106;
       h = 17 * 5 + 2;
    }
 
-   float mGain{ 1 };
+   double mGain{ 1 };
    float* mModulationBuffer;
    FloatSlider* mGainSlider{ nullptr };
    FloatSlider* mAttackSlider{ nullptr };
    FloatSlider* mReleaseSlider{ nullptr };
-   float mVal{ 0 };
-   float mAttack{ 10 };
-   float mRelease{ 10 };
-   float mAttackFactor{ .99 };
-   float mReleaseFactor{ .99 };
+   double mVal{ 0 };
+   double mAttack{ 10 };
+   double mRelease{ 10 };
+   double mAttackFactor{ .99 };
+   double mReleaseFactor{ .99 };
 };

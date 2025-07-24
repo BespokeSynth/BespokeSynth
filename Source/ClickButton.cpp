@@ -63,7 +63,7 @@ void ClickButton::UpdateWidth()
 {
    if (mDisplayStyle == ButtonDisplayStyle::kText || mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
    {
-      mWidth = GetStringWidth(GetDisplayName()) + 3 + .25f * strnlen(GetDisplayName().c_str(), 50);
+      mWidth = GetStringWidth(GetDisplayName()) + 3 + .25 * strnlen(GetDisplayName().c_str(), 50);
       if (mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
          mWidth += 20;
    }
@@ -73,17 +73,17 @@ void ClickButton::Render()
 {
    ofPushStyle();
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofColor color, textColor;
    IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5);
    ofRect(mX + 1, mY + 1, w, h);
    DrawBeacon(mX + w / 2, mY + h / 2);
-   float press = ofClamp((1 - (gTime - mClickTime) / 200), 0, 1);
+   double press = ofClamp((1 - (gTime - mClickTime) / 200), 0, 1);
    color.r = ofLerp(color.r, 0, press);
    color.g = ofLerp(color.g, 0, press);
    color.b = ofLerp(color.b, 0, press);
@@ -119,8 +119,8 @@ void ClickButton::Render()
       ofSetColor(textColor);
       for (int i = 0; i < 5; ++i)
       {
-         float height = (i % 2 == 0) ? 6 : 10;
-         float x = mX + 4 + i * 3;
+         double height = (i % 2 == 0) ? 6 : 10;
+         double x = mX + 4 + i * 3;
          ofLine(x, mY + 7 - height / 2, x, mY + 7 + height / 2);
       }
    }
@@ -129,8 +129,8 @@ void ClickButton::Render()
       ofSetColor(textColor);
       for (int i = 0; i < 5; ++i)
       {
-         float height = (i % 2 == 0) ? 6 : 10;
-         float x = mX + 4 + i * 3;
+         double height = (i % 2 == 0) ? 6 : 10;
+         double x = mX + 4 + i * 3;
          ofLine(x, mY + 7 - height / 2, x, mY + 7 + height / 2);
       }
       DrawTextNormal(GetDisplayName(), mX + 22, mY + 12);
@@ -158,23 +158,23 @@ void ClickButton::Render()
    else if (mDisplayStyle == ButtonDisplayStyle::kPlus)
    {
       ofSetColor(textColor);
-      ofSetLineWidth(1.5f);
+      ofSetLineWidth(1.5);
       ofLine(mX + 10, mY + 3, mX + 10, mY + 12);
-      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofLine(mX + 6, mY + 7.5, mX + 14, mY + 7.5);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kMinus)
    {
       ofSetColor(textColor);
-      ofSetLineWidth(1.5f);
-      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
+      ofSetLineWidth(1.5);
+      ofLine(mX + 6, mY + 7.5, mX + 14, mY + 7.5);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kHamburger)
    {
       ofSetColor(textColor);
-      ofSetLineWidth(1.0f);
-      ofLine(mX + 6, mY + 4.5f, mX + 14, mY + 4.5f);
-      ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
-      ofLine(mX + 6, mY + 10.5f, mX + 14, mY + 10.5f);
+      ofSetLineWidth(1.0);
+      ofLine(mX + 6, mY + 4.5, mX + 14, mY + 4.5);
+      ofLine(mX + 6, mY + 7.5, mX + 14, mY + 7.5);
+      ofLine(mX + 6, mY + 10.5, mX + 14, mY + 10.5);
    }
 
    ofPopStyle();
@@ -194,13 +194,13 @@ bool ClickButton::CanBeTargetedBy(PatchCableSource* source) const
    return IUIControl::CanBeTargetedBy(source);
 }
 
-void ClickButton::OnPulse(double time, float velocity, int flags)
+void ClickButton::OnPulse(double time, double velocity, int flags)
 {
    if (velocity > 0)
       DoClick(time);
 }
 
-void ClickButton::OnClicked(float x, float y, bool right)
+void ClickButton::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -219,13 +219,13 @@ void ClickButton::MouseReleased()
    mClickTime = 0;
 }
 
-bool ClickButton::MouseMoved(float x, float y)
+bool ClickButton::MouseMoved(double x, double y)
 {
    CheckHover(x, y);
    return false;
 }
 
-void ClickButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void ClickButton::SetFromMidiCC(double slider, double time, bool setViaModulator)
 {
    if (slider > 0)
       DoClick(time);
@@ -233,7 +233,7 @@ void ClickButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
       MouseReleased();
 }
 
-void ClickButton::SetValue(float value, double time, bool forceUpdate /*= false*/)
+void ClickButton::SetValue(double value, double time, bool forceUpdate /*= false*/)
 {
    if (value > 0)
       DoClick(time);
@@ -241,21 +241,21 @@ void ClickButton::SetValue(float value, double time, bool forceUpdate /*= false*
       MouseReleased();
 }
 
-float ClickButton::GetMidiValue() const
+double ClickButton::GetMidiValue() const
 {
    if (ButtonLit())
       return 1;
    return 0;
 }
 
-std::string ClickButton::GetDisplayValue(float val) const
+std::string ClickButton::GetDisplayValue(double val) const
 {
    if (val > 0)
       return "click";
    return "_";
 }
 
-void ClickButton::Increment(float amount)
+void ClickButton::Increment(double amount)
 {
    DoClick(NextBufferTime(false));
 }

@@ -71,7 +71,7 @@ void PitchDive::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void PitchDive::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PitchDive::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

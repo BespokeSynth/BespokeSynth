@@ -56,7 +56,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 100;
       h = 25;
@@ -64,7 +64,7 @@ private:
 
    ClickButton* mTestButton{ nullptr };
 
-   float mPhase{ 0 };
+   double mPhase{ 0 };
    bool mTestRequested{ false };
    double mTestRequestTime{ 0.0 };
    double mTestStartTime{ 0.0 };
@@ -108,7 +108,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 400;
       h = 35;

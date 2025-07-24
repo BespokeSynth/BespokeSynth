@@ -52,7 +52,7 @@ public:
    void CreateUIControls() override;
 
    void SetType(OscillatorType type) { mVoiceParams.mOscType = type; }
-   void SetDetune(float detune) { mVoiceParams.mDetune = detune; }
+   void SetDetune(double detune) { mVoiceParams.mDetune = detune; }
 
    //IAudioSource
    void Process(double time) override;
@@ -63,7 +63,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal, double time) override;
@@ -84,15 +84,15 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
    void UpdateOldControlName(std::string& oldName) override;
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    OscillatorVoiceParams mVoiceParams;

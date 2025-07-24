@@ -29,17 +29,17 @@
 #include "FileStream.h"
 #include "SynthGlobals.h"
 
-void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
+void ::ADSR::Set(double a, double d, double s, double r, double h /*=-1*/)
 {
    mStages[0].target = 1;
    mStages[0].time = MAX(a, 1);
    mStages[0].curve = 0;
-   mStages[1].target = MAX(s, .0001f);
+   mStages[1].target = MAX(s, .0001);
    mStages[1].time = MAX(d, 1);
-   mStages[1].curve = -.5f;
+   mStages[1].curve = -.5;
    mStages[2].target = 0;
    mStages[2].time = MAX(r, 1);
-   mStages[2].curve = -.5f;
+   mStages[2].curve = -.5;
    mNumStages = 3;
    mSustainStage = 1;
    mMaxSustain = h;
@@ -57,19 +57,19 @@ void ::ADSR::Set(const ADSR& other)
    mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
-void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/, float curve /*=0*/)
+void ::ADSR::Start(double time, double target, double a, double d, double s, double r, double timeScale /*=1*/, double curve /*=0*/)
 {
    Set(a, d, s, r);
    Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, float target, const ADSR& adsr, float timeScale /*=1*/, float curve /*=0*/)
+void ::ADSR::Start(double time, double target, const ADSR& adsr, double timeScale /*=1*/, double curve /*=0*/)
 {
    Set(adsr);
    Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, float target, float timeScale /*=1*/, float curve /*=0*/)
+void ::ADSR::Start(double time, double target, double timeScale /*=1*/, double curve /*=0*/)
 {
    mEvents[mNextEventPointer].Reset();
    mEvents[mNextEventPointer].mStartBlendFromValue = Value(time);
@@ -81,7 +81,7 @@ void ::ADSR::Start(double time, float target, float timeScale /*=1*/, float curv
 
    if (mMaxSustain >= 0 && mHasSustainStage)
    {
-      float stopTime = time;
+      double stopTime = time;
       for (int i = 0; i < mNumStages; ++i)
       {
          stopTime += mStages[i].time * timeScale;
@@ -103,7 +103,7 @@ void ::ADSR::Stop(double time, bool warn /*= true*/)
    {
       if (warn)
          ofLog() << "trying to stop before we started (" << time << "<=" << e->mStartTime << ")";
-      time = e->mStartTime + .0001f; //must be after start
+      time = e->mStartTime + .0001; //must be after start
    }
    e->mStopTime = time;
 }
@@ -138,15 +138,15 @@ const ::ADSR::EventInfo* ::ADSR::GetEventConst(double time) const
    return &(mEvents[ret]);
 }
 
-float ::ADSR::Value(double time) const
+double ::ADSR::Value(double time) const
 {
    const EventInfo* e = GetEventConst(time);
    return Value(time, e);
 }
 
-float ::ADSR::Value(double time, const EventInfo* e) const
+double ::ADSR::Value(double time, const EventInfo* e) const
 {
-   float stageStartValue;
+   double stageStartValue;
    double stageStartTime;
    int stage = GetStage(time, stageStartTime, e);
    if (stage == mNumStages) //done
@@ -157,7 +157,7 @@ float ::ADSR::Value(double time, const EventInfo* e) const
          stageStartValue = mStages[0].target;
       else
          stageStartValue = e->mStartBlendFromValue;
-   else if (mHasSustainStage && stage == mSustainStage + 1 && e->mStopBlendFromValue != std::numeric_limits<float>::max())
+   else if (mHasSustainStage && stage == mSustainStage + 1 && e->mStopBlendFromValue != std::numeric_limits<double>::max())
       stageStartValue = e->mStopBlendFromValue;
    else
       stageStartValue = mStages[stage - 1].target * e->mMult;
@@ -165,17 +165,17 @@ float ::ADSR::Value(double time, const EventInfo* e) const
    if (mHasSustainStage && stage == mSustainStage && time > stageStartTime + (mStages[mSustainStage].time * GetStageTimeScale(mSustainStage)))
       return mStages[mSustainStage].target * e->mMult;
 
-   float stageTimeScale = GetStageTimeScale(stage);
+   double stageTimeScale = GetStageTimeScale(stage);
 
-   float lerp = ofClamp((time - stageStartTime) / (mStages[stage].time * stageTimeScale), 0, 1);
-   float curve = mStages[stage].curve + mCurve;
-   if (curve != 0)
+   double lerp = ofClamp((time - stageStartTime) / (mStages[stage].time * stageTimeScale), 0, 1);
+   double curve = mStages[stage].curve + mCurve;
+   if (!ofAlmostEquel(curve, 0))
       lerp = MathUtils::Curve(lerp, curve * ((stageStartValue < mStages[stage].target * e->mMult) ? 1 : -1));
 
    return ofLerp(stageStartValue, mStages[stage].target * e->mMult, lerp);
 }
 
-float ::ADSR::GetStageTimeScale(int stage) const
+double ::ADSR::GetStageTimeScale(int stage) const
 {
    if (stage >= mNumStages - 1)
       return 1;
@@ -257,7 +257,7 @@ void ::ADSR::LoadState(FileStreamIn& in)
    float dummy;
    in >> dummy;
    in >> mSustainStage;
-   in >> mMaxSustain;
+   in >> FloatAsDouble >> mMaxSustain;
    in >> mNumStages;
    in >> mHasSustainStage;
    in >> mFreeReleaseLevel;
@@ -266,11 +266,11 @@ void ::ADSR::LoadState(FileStreamIn& in)
    assert(maxNumStages == MAX_ADSR_STAGES);
    for (int i = 0; i < maxNumStages; ++i)
    {
-      in >> mStages[i].curve;
-      in >> mStages[i].target;
-      in >> mStages[i].time;
+      in >> FloatAsDouble >> mStages[i].curve;
+      in >> FloatAsDouble >> mStages[i].target;
+      in >> FloatAsDouble >> mStages[i].time;
    }
 
    if (rev >= 1)
-      in >> mTimeScale;
+      in >> FloatAsDouble >> mTimeScale;
 }

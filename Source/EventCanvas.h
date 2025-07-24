@@ -55,9 +55,9 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CanvasUpdated(Canvas* canvas) override;
 
@@ -66,7 +66,7 @@ public:
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -84,22 +84,21 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    void UpdateNumColumns();
    void SyncControlCablesToCanvas();
-   double GetTriggerTime(double lookaheadTime, double lookaheadPos, float eventPos);
+   double GetTriggerTime(double lookaheadTime, double lookaheadPos, double eventPos);
 
    Canvas* mCanvas{ nullptr };
    CanvasControls* mCanvasControls{ nullptr };
    CanvasScrollbar* mCanvasScrollbarHorizontal{ nullptr };
-   float mScrollPartial{ 0 };
    TextEntry* mNumMeasuresEntry{ nullptr };
    int mNumMeasures{ 1 };
    ClickButton* mQuantizeButton{ nullptr };
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
-   float mPosition{ 0 };
+   double mPosition{ 0 };
    std::vector<PatchCableSource*> mControlCables{};
    std::vector<ofColor> mRowColors{};
    bool mRecord{ false };
@@ -109,7 +108,7 @@ private:
    struct ControlConnection
    {
       IUIControl* mUIControl{ nullptr };
-      float mLastValue{ 0 };
+      double mLastValue{ 0 };
    };
 
    const int kMaxEventRows = 256;

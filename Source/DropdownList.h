@@ -63,29 +63,29 @@ public:
    }
    bool HasTitleBar() const override { return false; }
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    std::string GetHoveredLabel();
-   float GetMouseX() { return mMouseX; }
-   float GetMouseY() { return mMouseY; }
+   double GetMouseX() { return mMouseX; }
+   double GetMouseY() { return mMouseY; }
    void SetShowPagingControls(bool show);
    void SetIsScrolling(bool scrolling) { mIsScrolling = scrolling; }
 
    void ButtonClicked(ClickButton* button, double time) override;
 
 private:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    int mWidth{ 1 };
    int mHeight{ 1 };
    int mColumnWidth{ 1 };
-   float mMouseX{ -1 };
-   float mMouseY{ -1 };
+   double mMouseX{ -1 };
+   double mMouseY{ -1 };
    DropdownList* mOwner;
    ClickButton* mPagePrevButton{ nullptr };
    ClickButton* mPageNextButton{ nullptr };
@@ -101,8 +101,8 @@ enum class DropdownDisplayStyle
 class DropdownList : public IUIControl, public IPulseReceiver
 {
 public:
-   DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
-   DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
+   DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, double width = -1);
+   DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, double width = -1);
    IDropdownListener* GetOwner() { return mOwner; }
    void AddLabel(std::string label, int value);
    void RemoveLabel(int value);
@@ -110,9 +110,9 @@ public:
    std::string GetLabel(int val) const;
    void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
-   void DrawDropdown(int w, int h, bool isScrolling);
+   void DrawDropdown(double w, double h, bool isScrolling);
    bool DropdownClickedAt(int x, int y);
    void SetIndex(int i, double time, bool forceUpdate);
    void Clear();
@@ -125,9 +125,9 @@ public:
       CalculateWidth();
    }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
-   void SetWidth(int width);
+   void SetWidth(double width);
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
-   void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
+   void GetPopupDimensions(double& width, double& height) { mModalList.GetDimensions(width, height); }
    void SetMaxPerColumn(int max)
    {
       mMaxPerColumn = max;
@@ -136,31 +136,31 @@ public:
    int GetItemIndexAt(int x, int y);
    DropdownListElement GetElement(int index) { return mElements[index]; }
    DropdownListModal* GetModalDropdown() { return &mModalList; }
-   float GetMaxItemWidth() const { return mMaxItemWidth; }
+   double GetMaxItemWidth() const { return mMaxItemWidth; }
    void ChangePage(int direction);
    void AddSeparator(int index) { mSeparators.push_back(index); }
    void ClearSeparators() { mSeparators.clear(); }
    void CopyContentsTo(DropdownList* list) const;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   float GetValue() const override;
-   float GetMidiValue() const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override;
+   double GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
-   std::string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(double val) const override;
    bool InvertScrollDirection() override { return true; }
-   void Increment(float amount) override;
+   void Increment(double amount) override;
    void Poll() override;
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
 
-   void GetDimensions(float& width, float& height) override;
+   void GetDimensions(double& width, double& height) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    static constexpr int kItemSpacing = 15;
    static constexpr int kPageBarSpacing = 20;
@@ -169,15 +169,15 @@ protected:
    ~DropdownList(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    void CalcSliderVal();
-   int FindItemIndex(float val) const;
+   int FindItemIndex(double val) const;
    void CalculateWidth();
-   ofVec2f GetModalListPosition() const;
+   ofVec2d GetModalListPosition() const;
 
-   int mWidth{ 35 };
-   int mHeight{ DropdownList::kItemSpacing };
-   int mMaxItemWidth{ 20 };
+   double mWidth{ 35 };
+   double mHeight{ DropdownList::kItemSpacing };
+   double mMaxItemWidth{ 20 };
    int mMaxPerColumn{ 40 };
    int mDisplayColumns{ 1 };
    int mTotalColumns{ 1 };
@@ -189,8 +189,8 @@ private:
    IDropdownListener* mOwner{ nullptr };
    std::string mUnknownItemString{ "-----" };
    bool mDrawLabel{ false };
-   float mLabelSize{ 0 };
-   float mSliderVal{ 0 };
+   double mLabelSize{ 0 };
+   double mSliderVal{ 0 };
    int mLastSetValue{ 0 };
    bool mAutoCalculateWidth{ false };
    bool mDrawTriangle{ true };

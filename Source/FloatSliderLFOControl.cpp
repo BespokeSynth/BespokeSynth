@@ -34,7 +34,7 @@ FloatSliderLFOControl::FloatSliderLFOControl()
    mLFOSettings.mInterval = kInterval_1n;
    mLFOSettings.mOscType = kOsc_Sin;
    mLFOSettings.mLFOOffset = 0;
-   mLFOSettings.mBias = .5f;
+   mLFOSettings.mBias = .5;
    mLFOSettings.mSpread = 0;
    mLFOSettings.mSoften = 0;
    mLFOSettings.mShuffle = 0;
@@ -115,13 +115,13 @@ void FloatSliderLFOControl::DrawModule()
 {
    /*if (!mPinned)
    {
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
 
       ofPushStyle();
       ofSetColor(0, 0, 0);
       ofFill();
-      ofSetLineWidth(.5f);
+      ofSetLineWidth(.5);
       ofRect(0, 0, w, h);
       ofNoFill();
       ofSetColor(255, 255, 255);
@@ -153,28 +153,28 @@ void FloatSliderLFOControl::DrawModule()
    int height = 35;
    int width = 90;
 
-   ofSetColor(100, 100, 204, .8f * gModuleDrawAlpha);
-   ofSetLineWidth(.5f);
+   ofSetColor(100, 100, 204, .8 * gModuleDrawAlpha);
+   ofSetLineWidth(.5);
    ofRect(x, y, width, height, 0);
 
    ofSetColor(245, 58, 0, gModuleDrawAlpha);
    ofSetLineWidth(1);
 
    ofBeginShape();
-   for (float i = 0; i < width; i += (.25f / gDrawScale))
+   for (double i = 0; i < width; i += (.25 / gDrawScale))
    {
-      float phase = i / width;
+      double phase = i / width;
       if (mLFO.GetOsc()->GetShuffle() > 0)
          phase *= 2;
       if (mLFO.GetOsc()->GetType() != kOsc_Perlin)
          phase += 1 - mLFOSettings.mLFOOffset;
-      float value = GetLFOValue(0, mLFO.TransformPhase(phase));
+      double value = GetLFOValue(0, mLFO.TransformPhase(phase));
       ofVertex(i + x, ofMap(value, GetTargetMax(), GetTargetMin(), 0, height) + y);
    }
    ofEndShape(false);
 
-   float currentPhase = mLFO.CalculatePhase(0, false);
-   float squeeze;
+   double currentPhase = mLFO.CalculatePhase(0, false);
+   double squeeze;
    if (mLFO.GetOsc()->GetShuffle() == 0)
    {
       squeeze = 1;
@@ -186,7 +186,7 @@ void FloatSliderLFOControl::DrawModule()
    }
    if (mLFO.GetOsc()->GetType() == kOsc_Perlin)
       currentPhase = 0;
-   float displayPhase = currentPhase;
+   double displayPhase = currentPhase;
    displayPhase -= 1 - mLFOSettings.mLFOOffset;
    if (displayPhase < 0)
       displayPhase += squeeze;
@@ -203,16 +203,16 @@ bool FloatSliderLFOControl::DrawToPush2Screen()
       ofSetColor(100, 100, 100);
       ofRect(rect);
 
-      float screenPos = rect.x + 1 + (rect.width - 2) * slider->ValToPos(slider->GetValue(), true);
-      float lfomax = ofClamp(GetMax(), slider->GetMin(), slider->GetMax());
-      float screenPosMax = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomax, true);
-      float lfomin = ofClamp(GetMin(), slider->GetMin(), slider->GetMax());
-      float screenPosMin = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomin, true);
+      double screenPos = rect.x + 1 + (rect.width - 2) * slider->ValToPos(slider->GetValue(), true);
+      double lfomax = ofClamp(GetMax(), slider->GetMin(), slider->GetMax());
+      double screenPosMax = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomax, true);
+      double lfomin = ofClamp(GetMin(), slider->GetMin(), slider->GetMax());
+      double screenPosMin = rect.x + 1 + (rect.width - 2) * slider->ValToPos(lfomin, true);
 
       ofPushStyle();
       ofSetColor(0, 200, 0);
       ofFill();
-      if (fabs(screenPos - screenPosMin) > 1)
+      if (std::abs(screenPos - screenPosMin) > 1)
          ofRect(screenPosMin, rect.y, screenPos - screenPosMin, rect.height, 1); //lfo bar
       ofPopStyle();
 
@@ -274,7 +274,7 @@ void FloatSliderLFOControl::RandomizeSettings()
       case 7:
       default:
          mLFOSettings.mInterval = kInterval_Free;
-         mLFOSettings.mFreeRate = ofRandom(.1f, 20);
+         mLFOSettings.mFreeRate = ofRandom(.1, 20.);
          break;
    }
    UpdateFromSettings();
@@ -299,21 +299,21 @@ void FloatSliderLFOControl::Load(LFOSettings settings)
    mEnabled = true;
 }
 
-float FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
+double FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
-   return GetLFOValue(samplesIn);
+   return GetLFOValue(samplesIn, -1);
 }
 
-float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase /*= -1*/)
+double FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, double forcePhase /*= -1*/)
 {
-   float val = mLFO.Value(samplesIn, forcePhase);
+   double val = mLFO.Value(samplesIn, forcePhase);
    if (mLFOSettings.mSpread > 0)
-      val = val * (1 - mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
+      val = val * (1 - mLFOSettings.mSpread) + (-std::cos(val * FPI) + 1) * .5 * mLFOSettings.mSpread;
    return ofClamp(Interp(val, GetMin(), GetMax()), GetTargetMin(), GetTargetMax());
 }
 
-float FloatSliderLFOControl::GetTargetMin() const
+double FloatSliderLFOControl::GetTargetMin() const
 {
    if (GetSliderTarget() != nullptr)
       return GetSliderTarget()->GetMin();
@@ -322,7 +322,7 @@ float FloatSliderLFOControl::GetTargetMin() const
    return 0;
 }
 
-float FloatSliderLFOControl::GetTargetMax() const
+double FloatSliderLFOControl::GetTargetMax() const
 {
    if (GetSliderTarget() != nullptr)
       return GetSliderTarget()->GetMax();
@@ -331,7 +331,7 @@ float FloatSliderLFOControl::GetTargetMax() const
    return 1;
 }
 
-void FloatSliderLFOControl::OnPulse(double time, float velocity, int flags)
+void FloatSliderLFOControl::OnPulse(double time, double velocity, int flags)
 {
    mLFO.ResetPhase(time);
 }
@@ -414,7 +414,7 @@ void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal, doub
    }
 }
 
-void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mOffsetSlider)
       mLFO.SetOffset(mLFOSettings.mLFOOffset);
@@ -576,24 +576,29 @@ void LFOSettings::LoadState(FileStreamIn& in)
    mInterval = (NoteInterval)temp;
    in >> temp;
    mOscType = (OscillatorType)temp;
-   in >> mLFOOffset;
-   in >> mBias;
+   in >> FloatAsDouble >> mLFOOffset;
+   in >> FloatAsDouble >> mBias;
+
    if (rev >= 1)
-      in >> mSpread;
+      in >> FloatAsDouble >> mSpread;
    if (rev >= 2)
    {
-      in >> mSoften;
-      in >> mShuffle;
+      in >> FloatAsDouble >> mSoften;
+      in >> FloatAsDouble >> mShuffle;
    }
    if (rev >= 3)
-      in >> mFreeRate;
+   {
+      in >> FloatAsDouble >> mFreeRate;
+   }
    if (rev >= 4)
-      in >> mLength;
+   {
+      in >> FloatAsDouble >> mLength;
+   }
    if (rev >= 5)
       in >> mLowResMode;
    if (rev >= 6)
    {
-      in >> mMinValue;
-      in >> mMaxValue;
+      in >> FloatAsDouble >> mMinValue;
+      in >> FloatAsDouble >> mMaxValue;
    }
 }

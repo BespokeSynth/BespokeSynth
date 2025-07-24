@@ -31,5 +31,5 @@ class IAudioPoller
 {
 public:
    virtual ~IAudioPoller() {}
-   virtual void OnTransportAdvanced(float amount) = 0;
+   virtual void OnTransportAdvanced(double amount) = 0;
 };

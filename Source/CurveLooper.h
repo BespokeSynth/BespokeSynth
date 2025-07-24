@@ -46,19 +46,19 @@ public:
 
    void CreateUIControls() override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -74,24 +74,24 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float GetPlaybackPosition();
+   double GetPlaybackPosition();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
 
    std::array<IUIControl*, 16> mUIControls{ nullptr };
    int mLength{ 1 };
    DropdownList* mLengthSelector{ nullptr };
    PatchCableSource* mControlCable{ nullptr };
-   float mWidth{ 200 };
-   float mHeight{ 120 };
-   EnvelopeControl mEnvelopeControl{ ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30), nullptr };
+   double mWidth{ 200 };
+   double mHeight{ 120 };
+   EnvelopeControl mEnvelopeControl{ ofVec2d(5, 25), ofVec2d(mWidth - 10, mHeight - 30), nullptr };
    ::ADSR mAdsr;
    ClickButton* mRandomizeButton{ nullptr };
-   float mFreeRate{ 1000 };
+   double mFreeRate{ 1000 };
    FloatSlider* mFreeRateSlider{ nullptr };
 };

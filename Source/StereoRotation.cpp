@@ -91,7 +91,7 @@ void StereoRotation::DrawModule()
    mPhaseSlider->Draw();
 }
 
-void StereoRotation::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void StereoRotation::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

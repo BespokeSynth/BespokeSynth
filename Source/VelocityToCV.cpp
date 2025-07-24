@@ -75,9 +75,9 @@ void VelocityToCV::PlayNote(NoteMessage note)
    }
 }
 
-float VelocityToCV::Value(int samplesIn)
+double VelocityToCV::Value(int samplesIn)
 {
-   return ofMap(mVelocity, 0, 127, GetMin(), GetMax(), K(clamped));
+   return ofMap(static_cast<double>(mVelocity), 0, 127, GetMin(), GetMax(), K(clamped));
 }
 
 void VelocityToCV::SaveLayout(ofxJSONElement& moduleInfo)

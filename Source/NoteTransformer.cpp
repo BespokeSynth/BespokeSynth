@@ -56,7 +56,7 @@ void NoteTransformer::DrawModule()
 
       if (gTime - mLastTimeTonePlayed[i] > 0 && gTime - mLastTimeTonePlayed[i] < 200)
       {
-         float alpha = 1 - (gTime - mLastTimeTonePlayed[i]) / 200;
+         double alpha = 1 - (gTime - mLastTimeTonePlayed[i]) / 200;
          ofSetColor(0, 255, 0, alpha * 255);
          ofRect(2, 118 - i * 17, 10, 10);
       }

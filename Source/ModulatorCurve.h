@@ -50,16 +50,16 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -74,16 +74,16 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 106;
       h = 121;
    }
 
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
-   float mInput{ 0 };
-   EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100), nullptr };
+   double mInput{ 0 };
+   EnvelopeControl mEnvelopeControl{ ofVec2d(3, 19), ofVec2d(100, 100), nullptr };
    ::ADSR mAdsr;
 
    FloatSlider* mInputSlider{ nullptr };

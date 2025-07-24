@@ -57,12 +57,12 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IDrawableModule
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
 
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -77,15 +77,15 @@ private:
    void UpdateSample();
    void DoWrite();
    void UpdateZoomExtents();
-   float GetSpeed();
+   double GetSpeed();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    Sample* mSample{ nullptr };
 
-   float mVolume{ .6 };
+   double mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    float* mWriteBuffer{ nullptr };
    bool mPlay{ false };
@@ -99,9 +99,9 @@ private:
    IntSlider* mClipStartSlider{ nullptr };
    int mClipEnd{ 1 };
    IntSlider* mClipEndSlider{ nullptr };
-   float mZoomStart{ 0 };
-   float mZoomEnd{ 1 };
-   float mOffset{ 0 };
+   double mZoomStart{ 0 };
+   double mZoomEnd{ 1 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };

@@ -31,12 +31,12 @@
 class ModulationChain
 {
 public:
-   ModulationChain(float initialValue);
-   float GetValue(int samplesIn) const;
-   float GetIndividualValue(int samplesIn) const;
-   void SetValue(float value);
-   void RampValue(double time, float from, float to, double length);
-   void SetLFO(NoteInterval interval, float amount);
+   ModulationChain(double initialValue);
+   double GetValue(int samplesIn) const;
+   double GetIndividualValue(int samplesIn) const;
+   void SetValue(double value);
+   void RampValue(double time, double from, double to, double length);
+   void SetLFO(NoteInterval interval, double amount);
    void AppendTo(ModulationChain* chain);
    void SetSidechain(ModulationChain* chain);
    void MultiplyIn(ModulationChain* chain);
@@ -47,7 +47,7 @@ public:
 private:
    Ramp mRamp;
    LFO mLFO;
-   float mLFOAmount{ 0 };
+   double mLFOAmount{ 0 };
    float* mBuffer{ nullptr };
    ModulationChain* mPrev{ nullptr };
    ModulationChain* mSidechain{ nullptr };
@@ -59,8 +59,7 @@ struct ModulationParameters
    ModulationParameters() {}
    ModulationParameters(ModulationChain* _pitchBend,
                         ModulationChain* _modWheel,
-                        ModulationChain* _pressure,
-                        float _pan)
+                        ModulationChain* _pressure, double _pan)
    : pitchBend(_pitchBend)
    , modWheel(_modWheel)
    , pressure(_pressure)
@@ -69,11 +68,11 @@ struct ModulationParameters
    ModulationChain* pitchBend{ nullptr };
    ModulationChain* modWheel{ nullptr };
    ModulationChain* pressure{ nullptr };
-   float pan{ 0 };
+   double pan{ 0 };
 
-   static constexpr float kDefaultPitchBend{ 0 };
-   static constexpr float kDefaultModWheel{ 0 };
-   static constexpr float kDefaultPressure{ .5f };
+   static constexpr double kDefaultPitchBend{ 0 };
+   static constexpr double kDefaultModWheel{ 0 };
+   static constexpr double kDefaultPressure{ .5 };
 };
 
 struct ModulationCollection

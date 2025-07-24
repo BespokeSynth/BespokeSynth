@@ -59,7 +59,7 @@ Polyrhythms::~Polyrhythms()
       delete mRhythmLines[i];
 }
 
-void Polyrhythms::OnTransportAdvanced(float amount)
+void Polyrhythms::OnTransportAdvanced(double amount)
 {
    PROFILER(Polyrhythms);
 
@@ -107,7 +107,7 @@ void Polyrhythms::DrawModule()
       mRhythmLines[i]->Draw();
 }
 
-void Polyrhythms::Resize(float w, float h)
+void Polyrhythms::Resize(double w, double h)
 {
    mWidth = MAX(150, w);
    mHeight = mRhythmLines.size() * 17 + 5;
@@ -115,7 +115,7 @@ void Polyrhythms::Resize(float w, float h)
       mRhythmLines[i]->OnResize();
 }
 
-void Polyrhythms::OnClicked(float x, float y, bool right)
+void Polyrhythms::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    for (int i = 0; i < mRhythmLines.size(); ++i)
@@ -129,7 +129,7 @@ void Polyrhythms::MouseReleased()
       mRhythmLines[i]->MouseReleased();
 }
 
-bool Polyrhythms::MouseMoved(float x, float y)
+bool Polyrhythms::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    for (int i = 0; i < mRhythmLines.size(); ++i)
@@ -242,7 +242,7 @@ void RhythmLine::Draw()
    mNoteSelector->Draw();
 }
 
-void RhythmLine::OnClicked(float x, float y, bool right)
+void RhythmLine::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -255,7 +255,7 @@ void RhythmLine::MouseReleased()
    mGrid->MouseReleased();
 }
 
-void RhythmLine::MouseMoved(float x, float y)
+void RhythmLine::MouseMoved(double x, double y)
 {
    mGrid->NotifyMouseMoved(x, y);
 }

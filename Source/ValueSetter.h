@@ -49,7 +49,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
 
@@ -57,7 +57,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void TextEntryComplete(TextEntry* entry) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -68,7 +68,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -78,12 +78,12 @@ private:
 
    PatchCableSource* mControlCable{ nullptr };
    std::array<IUIControl*, IDrawableModule::kMaxOutputsPerPatchCableSource> mTargets{};
-   float mValue{ 0 };
+   double mValue{ 0 };
    TextEntry* mValueEntry{ nullptr };
    FloatSlider* mValueSlider{ nullptr };
    ClickButton* mButton{ nullptr };
    double mLastClickTime{ 0 };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 };

@@ -48,10 +48,10 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IClickable
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -74,12 +74,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    bool IsEnabled() const override { return mEnabled; }
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
-   void OnStep(double time, float velocity, int flags);
+   void OnStep(double time, double velocity, int flags);
    int RowToPitch(int row) const;
 
    enum class NoteMode
@@ -88,7 +88,7 @@ private:
       Chromatic
    };
 
-   float mWidth{ 400 }, mHeight{ 200 };
+   double mWidth{ 400 }, mHeight{ 200 };
    bool mHasExternalPulseSource{ false };
    int mStepIdx{ -1 };
    TransportListenerInfo* mTransportListenerInfo{ nullptr };

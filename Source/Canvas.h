@@ -75,24 +75,25 @@ public:
    };
 
 public:
-   Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator);
+   Canvas(IDrawableModule* parent, int x, int y, int w, int h, double length, int rows, int cols, CreateCanvasElementFn elementCreator);
    ~Canvas();
 
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void Clear();
    void SetListener(ICanvasListener* listener) { mListener = listener; }
-   void SetDimensions(int width, int height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;
    }
-   float GetWidth() const { return mWidth; }
-   float GetHeight() const { return mHeight; }
-   void SetLength(float length) { mLength = length; }
-   float GetLength() const { return mLength; }
+
+   double GetWidth() const { return mWidth; }
+   double GetHeight() const { return mHeight; }
+   void SetLength(double length) { mLength = length; }
+   double GetLength() const { return mLength; }
    void SetNumRows(int rows) { mNumRows = rows; }
    void SetNumCols(int cols) { mNumCols = cols; }
    int GetNumRows() const { return mNumRows; }
@@ -105,11 +106,11 @@ public:
    void SetControls(CanvasControls* controls) { mControls = controls; }
    CanvasControls* GetControls() { return mControls; }
    std::vector<CanvasElement*>& GetElements() { return mElements; }
-   void FillElementsAt(float pos, std::vector<CanvasElement*>& elements) const;
-   void EraseElementsAt(float pos);
-   CanvasElement* GetElementAt(float pos, int row);
-   void SetCursorPos(float pos) { mCursorPos = pos; }
-   float GetCursorPos() const { return mCursorPos; }
+   void FillElementsAt(double pos, std::vector<CanvasElement*>& elements) const;
+   void EraseElementsAt(double pos);
+   CanvasElement* GetElementAt(double pos, int row);
+   void SetCursorPos(double pos) { mCursorPos = pos; }
+   double GetCursorPos() const { return mCursorPos; }
    CanvasElement* CreateElement(int col, int row) { return mElementCreator(this, col, row); }
    CanvasCoord GetCoordAt(int x, int y);
    void SetNumVisibleRows(int rows) { mNumVisibleRows = rows; }
@@ -124,11 +125,11 @@ public:
    bool IsRowVisible(int row) const;
    void SetRowColor(int row, ofColor color);
    juce::MouseCursor GetMouseCursorType();
-   ofVec2f RescaleForZoom(float x, float y) const;
+   ofVec2d RescaleForZoom(double x, double y) const;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
-   void SetValue(float value, double time, bool forceUpdate = false) override {}
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override {}
+   void SetValue(double value, double time, bool forceUpdate = false) override {}
    void KeyPressed(int key, bool isRepeat) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -138,32 +139,32 @@ public:
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    bool ShouldSerializeForSnapshot() const override { return true; }
 
-   float mViewStart{ 0 };
-   float mViewEnd;
-   float mLoopStart{ 0 };
-   float mLoopEnd;
+   double mViewStart{ 0 };
+   double mViewEnd;
+   double mLoopStart{ 0 };
+   double mLoopEnd;
 
 private:
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   bool IsOnElement(CanvasElement* element, float x, float y) const;
-   float QuantizeToGrid(float input) const;
+   bool IsOnElement(CanvasElement* element, double x, double y) const;
+   double QuantizeToGrid(double input) const;
 
    bool mClick{ false };
    CanvasElement* mClickedElement{ nullptr };
-   ofVec2f mClickedElementStartMousePos;
-   float mWidth;
-   float mHeight;
-   float mLength;
+   ofVec2d mClickedElementStartMousePos;
+   double mWidth;
+   double mHeight;
+   double mLength;
    ICanvasListener* mListener{ nullptr };
    std::vector<CanvasElement*> mElements;
    CanvasControls* mControls{ nullptr };
-   float mCursorPos{ -1 };
+   double mCursorPos{ -1 };
    CreateCanvasElementFn mElementCreator;
    int mRowOffset{ 0 };
    bool mWrap{ false };
@@ -171,15 +172,15 @@ private:
    ofRectangle mDragSelectRect;
    bool mDragCanvasMoving{ false };
    bool mDragCanvasZooming{ false };
-   ofVec2f mDragCanvasStartMousePos;
-   ofVec2f mDragCanvasStartCanvasPos;
-   ofVec2f mDragZoomStartDimensions;
+   ofVec2d mDragCanvasStartMousePos;
+   ofVec2d mDragCanvasStartCanvasPos;
+   ofVec2d mDragZoomStartDimensions;
    HighlightEnd mHighlightEnd{ HighlightEnd::kHighlightEnd_None };
    CanvasElement* mHighlightEndElement{ nullptr };
    HighlightEnd mDragEnd{ HighlightEnd::kHighlightEnd_None };
    int mMajorColumnInterval{ -1 };
    bool mHasDuplicatedThisDrag{ false };
-   float mScrollVerticalPartial{ 0 };
+   double mScrollVerticalPartial{ 0 };
    std::array<ofColor, 128> mRowColors;
 
    int mNumRows;

@@ -42,41 +42,41 @@ class LFO : public ITimeListener, public IAudioPoller
 public:
    LFO();
    ~LFO();
-   float Value(int samplesIn = 0, float forcePhase = -1) const;
-   void SetOffset(float offset)
+   double Value(int samplesIn = 0, double forcePhase = -1) const;
+   void SetOffset(double offset)
    {
       mPhaseOffset = offset;
       mAdjustOffset = 0;
    }
    void SetPeriod(NoteInterval interval);
    void SetType(OscillatorType type);
-   void SetPulseWidth(float width) { mOsc.SetPulseWidth(width); }
+   void SetPulseWidth(double width) { mOsc.SetPulseWidth(width); }
    void SetMode(LFOMode mode) { mMode = mode; }
-   float CalculatePhase(int samplesIn = 0, bool doTransform = true) const;
+   double CalculatePhase(int samplesIn = 0, bool doTransform = true) const;
    Oscillator* GetOsc() { return &mOsc; }
-   void SetFreeRate(float rate) { mFreeRate = rate; }
-   void SetLength(float length) { mLength = length; }
-   float TransformPhase(float phase) const;
+   void SetFreeRate(double rate) { mFreeRate = rate; }
+   void SetLength(double length) { mLength = length; }
+   double TransformPhase(double phase) const;
    void ResetPhase(double time);
 
    //ITimeListener
    void OnTimeEvent(double time) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
 private:
    NoteInterval mPeriod{ NoteInterval::kInterval_1n };
-   float mPhaseOffset{ 0 };
+   double mPhaseOffset{ 0 };
    Oscillator mOsc{ OscillatorType::kOsc_Sin };
    LFOMode mMode{ LFOMode::kLFOMode_Envelope };
    Ramp mRandom;
-   float mDrunk{ 0 };
+   double mDrunk{ 0 };
    double mFreePhase{ 0 };
-   float mFreeRate{ 1 };
-   float mLength{ 1 };
+   double mFreeRate{ 1 };
+   double mLength{ 1 };
    int mPerlinSeed{ 0 };
-   float mAdjustOffset{ 0 };
+   double mAdjustOffset{ 0 };
 
    static PerlinNoise sPerlinNoise;
 };

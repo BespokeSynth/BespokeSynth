@@ -42,12 +42,16 @@ CurveLooper::CurveLooper()
    mAdsr.GetFreeReleaseLevel() = true;
    mAdsr.SetNumStages(3);
    mAdsr.GetHasSustainStage() = false;
+   mAdsr.GetStageData(0).target = .5;
+   mAdsr.GetStageData(0).time = kAdsrTime * .1;
+   mAdsr.GetStageData(1).target = .5;
+   mAdsr.GetStageData(1).time = kAdsrTime * .8;
    mAdsr.GetStageData(0).target = 0;
    mAdsr.GetStageData(0).time = 1;
    mAdsr.GetStageData(1).target = .5f;
-   mAdsr.GetStageData(1).time = kAdsrTime * .1f;
-   mAdsr.GetStageData(2).target = .5f;
-   mAdsr.GetStageData(2).time = kAdsrTime * .8f;
+   mAdsr.GetStageData(1).time = kAdsrTime * .1;
+   mAdsr.GetStageData(2).target = .5;
+   mAdsr.GetStageData(2).time = kAdsrTime * .8;
    mAdsr.SetZeroValueIsFirstStage(true);
 }
 
@@ -97,7 +101,7 @@ void CurveLooper::Poll()
 {
 }
 
-void CurveLooper::OnTransportAdvanced(float amount)
+void CurveLooper::OnTransportAdvanced(double amount)
 {
    if (mEnabled)
    {
@@ -111,14 +115,14 @@ void CurveLooper::OnTransportAdvanced(float amount)
    }
 }
 
-float CurveLooper::GetPlaybackPosition()
+double CurveLooper::GetPlaybackPosition()
 {
    if (mLength == 0)
       return ofMap(fmod(gTime, mFreeRate), 0, mFreeRate, 0, 1, true);
    if (mLength < 0)
    {
-      float ret = TheTransport->GetMeasurePos(gTime) * (-mLength);
-      return FloatWrap(ret, 1);
+      double ret = TheTransport->GetMeasurePos(gTime) * (-mLength);
+      return DoubleWrap(ret, 1);
    }
    return (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % mLength) / mLength;
 }
@@ -136,12 +140,12 @@ void CurveLooper::DrawModule()
 
    ofPushStyle();
    ofSetColor(ofColor::lime);
-   float x = ofLerp(mEnvelopeControl.GetPosition().x, mEnvelopeControl.GetPosition().x + mEnvelopeControl.GetDimensions().x, GetPlaybackPosition());
+   double x = ofLerp(mEnvelopeControl.GetPosition().x, mEnvelopeControl.GetPosition().x + mEnvelopeControl.GetDimensions().x, GetPlaybackPosition());
    ofLine(x, mEnvelopeControl.GetPosition().y, x, mEnvelopeControl.GetPosition().y + mEnvelopeControl.GetDimensions().y);
    ofPopStyle();
 }
 
-void CurveLooper::OnClicked(float x, float y, bool right)
+void CurveLooper::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -155,7 +159,7 @@ void CurveLooper::MouseReleased()
    mEnvelopeControl.MouseReleased();
 }
 
-bool CurveLooper::MouseMoved(float x, float y)
+bool CurveLooper::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -210,37 +214,37 @@ void CurveLooper::ButtonClicked(ClickButton* button, double time)
    if (button == mRandomizeButton)
    {
       mAdsr.SetNumStages(gRandom() % 6 + 2);
-      std::vector<float> times;
+      std::vector<double> times;
       for (int i = 0; i < mAdsr.GetNumStages(); ++i)
          times.push_back(ofRandom(1, kAdsrTime - 1));
       std::sort(times.begin(), times.end());
-      float timeElapsed = 0;
+      double timeElapsed = 0;
       for (int i = 0; i < mAdsr.GetNumStages(); ++i)
       {
          mAdsr.GetStageData(i).time = times[i] - timeElapsed;
          mAdsr.GetStageData(i).target = ofRandom(0, 1);
-         float val = ofRandom(-1, 1);
+         double val = ofRandom(-1, 1);
          mAdsr.GetStageData(i).curve = val * val * (val > 0 ? 1 : -1);
          timeElapsed += mAdsr.GetStageData(i).time;
       }
    }
 }
 
-void CurveLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void CurveLooper::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
-void CurveLooper::GetModuleDimensions(float& width, float& height)
+void CurveLooper::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void CurveLooper::Resize(float w, float h)
+void CurveLooper::Resize(double w, double h)
 {
    mWidth = MAX(w, 200);
    mHeight = MAX(h, 120);
-   mEnvelopeControl.SetDimensions(ofVec2f(mWidth - 10, mHeight - 30));
+   mEnvelopeControl.SetDimensions(ofVec2d(mWidth - 10, mHeight - 30));
    mFreeRateSlider->SetDimensions(mWidth - 4 - mFreeRateSlider->GetRect(true).x, mFreeRateSlider->GetRect(true).height);
 }
 

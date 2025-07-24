@@ -44,9 +44,9 @@ ModulatorCurve::ModulatorCurve()
    mAdsr.SetNumStages(2);
    mAdsr.GetHasSustainStage() = false;
    mAdsr.GetStageData(0).target = 0;
-   mAdsr.GetStageData(0).time = 0.01f;
+   mAdsr.GetStageData(0).time = 0.01;
    mAdsr.GetStageData(1).target = 1;
-   mAdsr.GetStageData(1).time = kAdsrTime - .02f;
+   mAdsr.GetStageData(1).time = kAdsrTime - .02;
    mAdsr.SetZeroValueIsFirstStage(true);
 }
 
@@ -82,17 +82,17 @@ void ModulatorCurve::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
       mInput = GetSliderTarget()->GetValue();
 }
 
-float ModulatorCurve::Value(int samplesIn)
+double ModulatorCurve::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    ADSR::EventInfo adsrEvent(0, kAdsrTime);
-   float val = ofClamp(mAdsr.Value(mInput * kAdsrTime, &adsrEvent), 0, 1);
+   double val = ofClamp(mAdsr.Value(mInput * kAdsrTime, &adsrEvent), 0, 1);
    if (std::isnan(val))
       val = 0;
    return ofLerp(GetMin(), GetMax(), val);
 }
 
-void ModulatorCurve::OnClicked(float x, float y, bool right)
+void ModulatorCurve::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -106,7 +106,7 @@ void ModulatorCurve::MouseReleased()
    mEnvelopeControl.MouseReleased();
 }
 
-bool ModulatorCurve::MouseMoved(float x, float y)
+bool ModulatorCurve::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 

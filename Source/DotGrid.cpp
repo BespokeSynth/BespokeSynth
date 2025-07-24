@@ -58,17 +58,17 @@ void DotGrid::Init(int x, int y, int w, int h, int cols, int rows, IClickable* p
    SetParent(parent);
 }
 
-void DotGrid::DrawGridCircle(int col, int row, float radiusPercent) const
+void DotGrid::DrawGridCircle(int col, int row, double radiusPercent) const
 {
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
-   ofCircle(GetX(col) + xsize * .5f, GetY(row) + ysize * .5f, GetDotSize() * .5f * radiusPercent);
+   const double xsize = static_cast<double>(mWidth) / mCols;
+   const double ysize = static_cast<double>(mHeight) / mRows;
+   ofCircle(GetX(col) + xsize * .5, GetY(row) + ysize * .5, GetDotSize() * .5 * radiusPercent);
 }
 
-float DotGrid::GetDotSize() const
+double DotGrid::GetDotSize() const
 {
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   const double xsize = static_cast<double>(mWidth) / mCols;
+   const double ysize = static_cast<double>(mHeight) / mRows;
    return std::min(xsize, ysize);
 }
 
@@ -77,16 +77,16 @@ void DotGrid::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   ofSetLineWidth(.5f);
-   float w, h;
+   ofSetLineWidth(.5);
+   double w, h;
    GetDimensions(w, h);
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   double xsize = mWidth / mCols;
+   double ysize = mHeight / mRows;
 
    if (GetHighlightCol(gTime) != -1)
    {
       ofFill();
-      ofSetColor(255, 255, 255, gModuleDrawAlpha * .2f);
+      ofSetColor(255, 255, 255, gModuleDrawAlpha * .2);
       ofRect(GetX(GetHighlightCol(gTime)), 0, xsize, mHeight);
    }
 
@@ -112,7 +112,7 @@ void DotGrid::Render()
          {
             ofSetColor(100, 100, 100, gModuleDrawAlpha);
          }
-         DrawGridCircle(i, j, .3f);
+         DrawGridCircle(i, j, .3);
       }
    }
    for (int j = 0; j < mRows; ++j)
@@ -122,8 +122,8 @@ void DotGrid::Render()
          DotData& data = mData[GetDataIndex(i, j)];
          if (data.mOn)
          {
-            float bump = ofClamp((data.mLastPlayTime + 250.0f - gTime) / 250.0f, 0, 1);
-            float radius = ofLerp(.65f, 1.0f, bump);
+            double bump = ofClamp((data.mLastPlayTime + 250.0 - gTime) / 250.0, 0, 1);
+            double radius = ofLerp(.65, 1.0, bump);
 
             //white outer ring
             ofFill();
@@ -137,10 +137,10 @@ void DotGrid::Render()
             ofFill();
             ofSetColor(255 * data.mVelocity, 255 * data.mVelocity, 255 * data.mVelocity);
             ofPushStyle();
-            ofSetLineWidth(GetDotSize() * radius * .23f);
-            ofLine(GetX(i) + xsize * .5f, GetY(j) + ysize * .5f, GetX(i) + xsize * .5f + xsize * data.mLength, GetY(j) + ysize * .5f);
+            ofSetLineWidth(GetDotSize() * radius * .23);
+            ofLine(GetX(i) + xsize * .5, GetY(j) + ysize * .5, GetX(i) + xsize * .5 + xsize * data.mLength, GetY(j) + ysize * .5);
             ofPopStyle();
-            DrawGridCircle(i, j, radius * .9f * data.mVelocity);
+            DrawGridCircle(i, j, radius * .9 * data.mVelocity);
          }
 
          if (mCurrentHover.mCol == i && mCurrentHover.mRow == j && gHoveredUIControl == nullptr)
@@ -151,14 +151,14 @@ void DotGrid::Render()
                {
                   DotData& currentHoverData = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
                   ofSetColor(0, 255, 0);
-                  DrawTextNormal(ofToString(currentHoverData.mVelocity, 2), GetX(i), GetY(j), 8.0f);
+                  DrawTextNormal(ofToString(currentHoverData.mVelocity, 2), GetX(i), GetY(j), 8.0);
                }
             }
             else
             {
                ofFill();
                ofSetColor(180, 180, 0, 160);
-               DrawGridCircle(i, j, .8f);
+               DrawGridCircle(i, j, .8);
             }
          }
       }
@@ -169,24 +169,24 @@ void DotGrid::Render()
    ofPopMatrix();
 }
 
-float DotGrid::GetX(int col) const
+double DotGrid::GetX(int col) const
 {
-   float xsize = float(mWidth) / mCols;
+   double xsize = static_cast<double>(mWidth) / mCols;
    return (col)*xsize;
 }
 
-float DotGrid::GetY(int row) const
+double DotGrid::GetY(int row) const
 {
-   float ysize = float(mHeight) / mRows;
+   double ysize = static_cast<double>(mHeight) / mRows;
    return mHeight - (row + 1) * ysize;
 }
 
-DotGrid::DotPosition DotGrid::GetGridCellAt(float x, float y, bool clamp /*= true*/)
+DotGrid::DotPosition DotGrid::GetGridCellAt(double x, double y, bool clamp /*= true*/)
 {
    y = (mHeight - 1) - y; //flip
 
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
+   double xsize = mWidth / mCols;
+   double ysize = mHeight / mRows;
 
    int col = x / xsize;
    int row = y / ysize;
@@ -200,9 +200,9 @@ DotGrid::DotPosition DotGrid::GetGridCellAt(float x, float y, bool clamp /*= tru
    return DotPosition(col, row);
 }
 
-ofVec2f DotGrid::GetCellPosition(int col, int row)
+ofVec2d DotGrid::GetCellPosition(int col, int row)
 {
-   return ofVec2f(GetX(col), GetY(row));
+   return { GetX(col), GetY(row) };
 }
 
 bool DotGrid::CanBeTargetedBy(PatchCableSource* source) const
@@ -210,7 +210,7 @@ bool DotGrid::CanBeTargetedBy(PatchCableSource* source) const
    return source->GetConnectionType() == kConnectionType_UIControl && dynamic_cast<Snapshots*>(source->GetOwner()) != nullptr;
 }
 
-void DotGrid::OnClicked(float x, float y, bool right)
+void DotGrid::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
@@ -251,7 +251,7 @@ void DotGrid::MouseReleased()
    mMouseReleaseCanClear = false;
 }
 
-bool DotGrid::MouseMoved(float x, float y)
+bool DotGrid::MouseMoved(double x, double y)
 {
    bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
@@ -280,7 +280,7 @@ bool DotGrid::MouseMoved(float x, float y)
          if (mDragBehavior == DragBehavior::Velocity)
          {
             int dataIndex = GetDataIndex(mHoldCell.mCol, mHoldCell.mRow);
-            mData[dataIndex].mVelocity = std::clamp(mData[dataIndex].mVelocity - (y - mLastDragPosition.y) * .01f, 0.0f, 1.0f);
+            mData[dataIndex].mVelocity = std::clamp(mData[dataIndex].mVelocity - (y - mLastDragPosition.y) * .01, 0.0, 1.0);
          }
       }
 
@@ -298,7 +298,7 @@ bool DotGrid::MouseMoved(float x, float y)
    return false;
 }
 
-bool DotGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool DotGrid::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
 
@@ -306,7 +306,7 @@ bool DotGrid::MouseScrolled(float x, float y, float scrollX, float scrollY, bool
    {
       DotData& data = mData[GetDataIndex(mCurrentHover.mCol, mCurrentHover.mRow)];
       if (data.mOn)
-         data.mLength = std::max(data.mLength + scrollY * .1f, 0.0f);
+         data.mLength = std::max(data.mLength + scrollY * .1, 0.0);
    }
 
    return false;
@@ -469,8 +469,8 @@ void DotGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
       {
          int dataIndex = GetDataIndex(col, row);
          in >> mData[dataIndex].mOn;
-         in >> mData[dataIndex].mVelocity;
-         in >> mData[dataIndex].mLength;
+         in >> FloatAsDouble >> mData[dataIndex].mVelocity;
+         in >> FloatAsDouble >> mData[dataIndex].mLength;
       }
    }
 }

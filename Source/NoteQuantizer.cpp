@@ -115,7 +115,7 @@ void NoteQuantizer::PlayNote(NoteMessage note)
    }
 }
 
-void NoteQuantizer::OnEvent(double time, float strength)
+void NoteQuantizer::OnEvent(double time, double strength)
 {
    for (int i = 0; i < (int)mInputInfos.size(); ++i)
    {
@@ -153,7 +153,7 @@ void NoteQuantizer::OnTimeEvent(double time)
       OnEvent(time, 1);
 }
 
-void NoteQuantizer::OnPulse(double time, float velocity, int flags)
+void NoteQuantizer::OnPulse(double time, double velocity, int flags)
 {
    mHasReceivedPulse = true;
    OnEvent(time, velocity);

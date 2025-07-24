@@ -65,7 +65,7 @@ void MacroSlider::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
-void MacroSlider::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void MacroSlider::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -130,7 +130,7 @@ void MacroSlider::Mapping::CreateUIControls()
    mTargetCableSource = new PatchCableSource(mOwner, kConnectionType_Modulator);
    mTargetCableSource->SetModulatorOwner(this);
    mTargetCableSource->SetManualPosition(110, 39 + mIndex * kMappingSpacing);
-   mTargetCableSource->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+   mTargetCableSource->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
    mOwner->AddPatchCableSource(mTargetCableSource);
 }
 
@@ -139,7 +139,7 @@ void MacroSlider::Mapping::UpdateControl()
    OnModulatorRepatch();
 }
 
-float MacroSlider::Mapping::Value(int samplesIn)
+double MacroSlider::Mapping::Value(int samplesIn)
 {
    mOwner->ComputeSliders(samplesIn);
    return ofMap(mOwner->GetValue(), 0, 1, GetMin(), GetMax(), K(clamp));
@@ -152,7 +152,7 @@ void MacroSlider::Mapping::Draw()
 
    if (GetSliderTarget())
    {
-      float x, y, w, h;
+      double x, y, w, h;
       mMinSlider->GetPosition(x, y, K(local));
       mMinSlider->GetDimensions(w, h);
 

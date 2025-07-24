@@ -46,12 +46,12 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   float GetValue() const { return mValue; }
+   double GetValue() const { return mValue; }
    FloatSlider* GetSlider() { return mSlider; }
    void SetOutputTarget(int index, IUIControl* target);
 
@@ -66,7 +66,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 110;
       height = 25 + (int)mMappings.size() * kMappingSpacing;
@@ -82,7 +82,7 @@ private:
       PatchCableSource* GetCableSource() const { return mTargetCableSource; }
 
       //IModulator
-      virtual float Value(int samplesIn = 0) override;
+      virtual double Value(int samplesIn = 0) override;
       virtual bool Active() const override { return mOwner->IsEnabled(); }
 
       MacroSlider* mOwner{ nullptr };
@@ -90,6 +90,6 @@ private:
    };
 
    FloatSlider* mSlider{ nullptr };
-   float mValue{ 0 };
+   double mValue{ 0 };
    std::vector<Mapping*> mMappings;
 };

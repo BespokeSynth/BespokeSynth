@@ -129,7 +129,7 @@ void ControlSequencer::Step(double time, int pulseFlags)
    if (pulseFlags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int numMeasures = ceil(float(length) / stepsPerMeasure);
+      int numMeasures = ceil(double(length) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
       int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % length;
       mStep = step;
@@ -153,7 +153,7 @@ void ControlSequencer::Step(double time, int pulseFlags)
    }
 }
 
-void ControlSequencer::OnPulse(double time, float velocity, int flags)
+void ControlSequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
 
@@ -196,7 +196,7 @@ void ControlSequencer::DrawModule()
    {
       ofPushStyle();
       ofSetColor(ofColor::grey);
-      float val = mGrid->GetVal(currentHover % mGrid->GetCols(), currentHover / mGrid->GetCols());
+      double val = mGrid->GetVal(currentHover % mGrid->GetCols(), currentHover / mGrid->GetCols());
       DrawTextNormal(GetUIControl()->GetDisplayValue(GetUIControl()->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y + 12);
       ofPopStyle();
    }
@@ -213,7 +213,7 @@ void ControlSequencer::DrawModule()
 
          if (showing && GetUIControl())
          {
-            float val = mGrid->GetVal(i, 0);
+            double val = mGrid->GetVal(i, 0);
 
             DrawTextNormal(GetUIControl()->GetDisplayValue(GetUIControl()->GetValueForMidiCC(val)), rect.getMaxX() + 5, rect.y + 12);
          }
@@ -234,7 +234,7 @@ void ControlSequencer::DrawModule()
    }
 }
 
-void ControlSequencer::OnClicked(float x, float y, bool right)
+void ControlSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -247,14 +247,14 @@ void ControlSequencer::MouseReleased()
    mGrid->MouseReleased();
 }
 
-bool ControlSequencer::MouseMoved(float x, float y)
+bool ControlSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    mGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
-void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    if (grid == mGrid)
    {
@@ -263,8 +263,8 @@ void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, 
       {
          for (int i = 0; i < mGrid->GetCols(); ++i)
          {
-            float val = mGrid->GetVal(i, 0);
-            val = int((val * (numValues - 1)) + .5f) / float(numValues - 1); //quantize to match the number of allowed values
+            double val = mGrid->GetVal(i, 0);
+            val = std::round(val * (numValues - 1)) / static_cast<double>(numValues - 1); //quantize to match the number of allowed values
             mGrid->SetVal(i, 0, val);
          }
       }
@@ -326,11 +326,11 @@ void ControlSequencer::ButtonClicked(ClickButton* button, double time)
 
 namespace
 {
-   const float extraW = 10;
-   const float extraH = 47;
+   const double extraW = 10;
+   const double extraH = 47;
 }
 
-void ControlSequencer::GetModuleDimensions(float& width, float& height)
+void ControlSequencer::GetModuleDimensions(double& width, double& height)
 {
    if (mSliderMode)
    {
@@ -344,14 +344,14 @@ void ControlSequencer::GetModuleDimensions(float& width, float& height)
    }
 }
 
-void ControlSequencer::Resize(float w, float h)
+void ControlSequencer::Resize(double w, double h)
 {
    w = MAX(w - extraW, 130);
    h = MAX(h - extraH, 40);
    SetGridSize(w, h);
 }
 
-void ControlSequencer::SetGridSize(float w, float h)
+void ControlSequencer::SetGridSize(double w, double h)
 {
    mGrid->SetDimensions(w, h);
 }
@@ -406,20 +406,21 @@ void ControlSequencer::LoadState(FileStreamIn& in, int rev)
 
    if (mLoadRev >= 1)
    {
-      float width, height;
-      in >> width;
-      in >> height;
+      double width, height;
+      in >> FloatAsDouble >> width;
+      in >> FloatAsDouble >> height;
+
       mGrid->SetDimensions(width, height);
    }
 
    if (mLoadRev == 0)
    {
       //port old data
-      float len = 0;
+      double len = 0;
       if (mOldLengthStr == "4n")
-         len = .25f;
+         len = .25;
       if (mOldLengthStr == "2n")
-         len = .5f;
+         len = .5;
       if (mOldLengthStr == "1")
          len = 1;
       if (mOldLengthStr == "2")

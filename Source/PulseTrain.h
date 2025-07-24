@@ -54,30 +54,30 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
@@ -91,15 +91,15 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
 
-   void Step(double time, float velocity, int flags);
+   void Step(double time, double velocity, int flags);
 
    static const int kMaxSteps = 128;
-   float mWidth{ 254 };
-   float mHeight{ 58 };
-   float mVels[kMaxSteps]{};
+   double mWidth{ 254 };
+   double mHeight{ 58 };
+   double mVels[kMaxSteps]{};
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };
    int mStep{ 9999 };

@@ -123,7 +123,7 @@ void Pulser::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Pulser::OnTransportAdvanced(float amount)
+void Pulser::OnTransportAdvanced(double amount)
 {
    PROFILER(Pulser);
 
@@ -131,7 +131,7 @@ void Pulser::OnTransportAdvanced(float amount)
 
    if (mTimeMode == kTimeMode_Free)
    {
-      float ms = amount * TheTransport->MsPerBar();
+      double ms = amount * TheTransport->MsPerBar();
       mFreeTimeCounter += ms;
       if (mFreeTimeCounter > mFreeTimeStep)
       {
@@ -146,7 +146,7 @@ void Pulser::OnTimeEvent(double time)
    if (!mEnabled)
       return;
 
-   float offsetMs = GetOffset() * TheTransport->MsPerBar();
+   double offsetMs = GetOffset() * TheTransport->MsPerBar();
 
    int flags = 0;
 
@@ -194,7 +194,7 @@ void Pulser::OnTimeEvent(double time)
    DispatchPulse(GetPatchCableSource(), time, 1, flags);
 }
 
-void Pulser::GetModuleDimensions(float& width, float& height)
+void Pulser::GetModuleDimensions(double& width, double& height)
 {
    width = 121;
    height = 52;
@@ -208,7 +208,7 @@ void Pulser::ButtonClicked(ClickButton* button, double time)
       mFreeTimeCounter = mFreeTimeStep;
 }
 
-float Pulser::GetOffset()
+double Pulser::GetOffset()
 {
    if (mInterval == kInterval_None)
       return 0;
@@ -266,7 +266,7 @@ void Pulser::DropdownUpdated(DropdownList* list, int oldVal, double time)
    }
 }
 
-void Pulser::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Pulser::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mOffsetSlider)
    {

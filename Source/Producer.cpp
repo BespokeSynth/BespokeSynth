@@ -30,10 +30,10 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 
-const float mBufferX = 5;
-const float mBufferY = 80;
-const float mBufferW = 900;
-const float mBufferH = 300;
+const double mBufferX = 5;
+const double mBufferY = 80;
+const double mBufferW = 900;
+const double mBufferH = 300;
 
 Producer::Producer()
 {
@@ -91,7 +91,7 @@ void Producer::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
@@ -129,7 +129,7 @@ void Producer::Process(double time)
    GetVizBuffer()->WriteChunk(out, bufferSize, 0);
 }
 
-void Producer::FilesDropped(std::vector<std::string> files, int x, int y)
+void Producer::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mSample->Reset();
 
@@ -164,7 +164,7 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoubleLengthButton)
    {
-      float newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
+      double newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
       if (newEnd < mSample->LengthInSamples())
       {
          mClipEnd = newEnd;
@@ -175,7 +175,7 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    {
       if (mNumBars % 2 == 0)
       {
-         float newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
+         double newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
          mClipEnd = newEnd;
          mNumBars /= 2;
       }
@@ -184,8 +184,8 @@ void Producer::ButtonClicked(ClickButton* button, double time)
    {
       if (mClipStart < mClipEnd)
       {
-         float samplesPerMeasure = mClipEnd - mClipStart;
-         float secondsPerMeasure = samplesPerMeasure / gSampleRate;
+         double samplesPerMeasure = mClipEnd - mClipStart;
+         double secondsPerMeasure = samplesPerMeasure / gSampleRate;
          mTempo = 1 / secondsPerMeasure * 4 * 60 * mNumBars;
          mStartOffset = ((mClipStart / samplesPerMeasure) - int(mClipStart / samplesPerMeasure)) * samplesPerMeasure;
       }
@@ -214,7 +214,7 @@ void Producer::DoWrite()
          }
       }
 
-      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%Y-%m-%d_%H-%M.wav").c_str(), &toWrite, pos);
+      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%Y-%m-%d_%H-%M.wav"), &toWrite, pos);
       mClipStart = 0;
       mClipEnd = mSample->LengthInSamples();
       mOffset = 0;
@@ -238,7 +238,7 @@ int Producer::GetMeasureSample(int measure)
    return mStartOffset + measure * GetSamplesPerMeasure();
 }
 
-float Producer::GetBufferPos(int sample)
+double Producer::GetBufferPos(int sample)
 {
    return (sample - mZoomStart) / (mZoomEnd - mZoomStart);
 }
@@ -283,7 +283,7 @@ void Producer::DrawModule()
       {
          if (GetMeasureSample(measure) >= mZoomStart)
          {
-            float pos = GetBufferPos(GetMeasureSample(measure));
+            double pos = GetBufferPos(GetMeasureSample(measure));
             ofSetColor(0, 0, 255);
             ofRect(pos * mBufferW, 0, 1, mBufferH);
 
@@ -300,20 +300,20 @@ void Producer::DrawModule()
        
        for (int i = 0; i < mNumBars; i++)
        {
-       float barSpacing = float(end-start)/mNumBars;
+       double barSpacing = double(end-start) / mNumBars;
        int x =  barSpacing * i + start;
        x += barSpacing * -mOffset;
-       ofSetColor(255,255,0);
+       ofSetColor(255, 255, 0);
        ofLine(x, 0, x, height);
        }
        
-       ofSetColor(255,0,0);
-       ofLine(start,0,start,height);
-       ofLine(end,0,end,height);
+       ofSetColor(255, 0, 0);
+       ofLine(start, 0, start, height);
+       ofLine(end, 0, end, height);
        
        ofSetColor(0,255,0);
        int position =  ofMap(pos, 0, length, 0, width, true);
-       ofLine(position,0,position,height);*/
+       ofLine(position, 0, position, height);*/
 
       ofPopStyle();
       ofPopMatrix();
@@ -339,7 +339,7 @@ void Producer::DrawModule()
       mBiquad[i].Draw();
 }
 
-void Producer::OnClicked(float x, float y, bool right)
+void Producer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -350,7 +350,7 @@ void Producer::OnClicked(float x, float y, bool right)
    {
       if (IsKeyHeld('x'))
       {
-         float pos = (x - mBufferX) / mBufferW;
+         double pos = (x - mBufferX) / mBufferW;
          float sample = pos * (mZoomEnd - mZoomStart) + mZoomStart;
          int measure = GetMeasureForSample(sample);
          if (IsSkipMeasure(measure))
@@ -374,13 +374,13 @@ void Producer::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Producer::GetModuleDimensions(float& width, float& height)
+void Producer::GetModuleDimensions(double& width, double& height)
 {
    width = 910;
    height = 430;
 }
 
-void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Producer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {
@@ -424,7 +424,7 @@ void Producer::PlayNote(NoteMessage note)
          int slice = (note.pitch / 8) * 8 + 7 - (note.pitch % 8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = -mOffset * barLength + (barLength / 4) * slice + mClipStart;
-         mSample->Play(note.time, 1, position);
+         mSample->Play(note.time, 1, position, -1);
       }
    }
 }

@@ -66,7 +66,7 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName) override;
@@ -80,7 +80,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    int GetRowHeight(int row) const;
@@ -88,7 +88,7 @@ private:
    void DeleteEffect(int index);
    void MoveEffect(int index, int direction);
    void UpdateReshuffledDryWetSliders();
-   ofVec2f GetEffectPos(int index) const;
+   ofVec2d GetEffectPos(int index) const;
 
    struct EffectControls
    {
@@ -102,14 +102,14 @@ private:
    std::vector<IAudioEffect*> mEffects{};
    ChannelBuffer mDryBuffer;
    std::vector<EffectControls> mEffectControls;
-   std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels{};
+   std::array<double, MAX_EFFECTS_IN_CHAIN> mDryWetLevels{};
 
    double mSwapTime{ -1 };
    int mSwapFromIdx{ -1 };
    int mSwapToIdx{ -1 };
-   ofVec2f mSwapFromPos;
-   ofVec2f mSwapToPos;
-   float mVolume{ 1 };
+   ofVec2d mSwapFromPos;
+   ofVec2d mSwapToPos;
+   double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
    int mNumFXWide{ 3 };
    bool mInitialized{ false };

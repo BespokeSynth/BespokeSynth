@@ -104,39 +104,39 @@ void DotSequencer::DrawModule()
       return;
 
    ofPushStyle();
-   ofSetLineWidth(mDotGrid->GetDotSize() * .25f);
-   float ysize = mHeight / mDotGrid->GetRows();
+   ofSetLineWidth(mDotGrid->GetDotSize() * .25);
+   double ysize = mHeight / mDotGrid->GetRows();
    for (int i = 0; i < mDotGrid->GetRows(); ++i)
    {
-      ofVec2f pos = mDotGrid->GetCellPosition(0, i - 1) + mDotGrid->GetPosition(true);
-      ofVec2f lineAcrossStart(pos.x + 5, pos.y - ysize * .5f + 2);
-      ofVec2f lineAcrossEnd(pos.x + mDotGrid->GetWidth() - 10, pos.y - ysize * .5f + 2);
+      ofVec2d pos = mDotGrid->GetCellPosition(0, i - 1) + mDotGrid->GetPosition(true);
+      ofVec2d lineAcrossStart(pos.x + 5, pos.y - ysize * .5 + 2);
+      ofVec2d lineAcrossEnd(pos.x + mDotGrid->GetWidth() - 10, pos.y - ysize * .5 + 2);
 
       if (RowToPitch(i) % TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot() % TheScale->GetPitchesPerOctave())
       {
-         ofSetColor(0, 255, 0, gModuleDrawAlpha * .05f);
+         ofSetColor(0, 255, 0, gModuleDrawAlpha * .05);
          ofLine(lineAcrossStart, lineAcrossEnd);
-         ofSetColor(0, 255, 0, gModuleDrawAlpha * .8f);
+         ofSetColor(0, 255, 0, gModuleDrawAlpha * .8);
       }
       else if (TheScale->GetPitchesPerOctave() == 12 && RowToPitch(i) % TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot() + 7) % TheScale->GetPitchesPerOctave())
       {
-         ofSetColor(200, 150, 0, gModuleDrawAlpha * .05f);
+         ofSetColor(200, 150, 0, gModuleDrawAlpha * .05);
          ofLine(lineAcrossStart, lineAcrossEnd);
-         ofSetColor(200, 150, 0, gModuleDrawAlpha * .8f);
+         ofSetColor(200, 150, 0, gModuleDrawAlpha * .8);
       }
       else if (mNoteMode == NoteMode::Chromatic && TheScale->IsInScale(RowToPitch(i)))
       {
-         ofSetColor(175, 100, 0, gModuleDrawAlpha * .05f);
+         ofSetColor(175, 100, 0, gModuleDrawAlpha * .05);
          ofLine(lineAcrossStart, lineAcrossEnd);
-         ofSetColor(175, 100, 0, gModuleDrawAlpha * .8f);
+         ofSetColor(175, 100, 0, gModuleDrawAlpha * .8);
       }
       else
       {
-         ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
+         ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
       }
 
-      float scale = std::min(mDotGrid->IClickable::GetDimensions().y / mDotGrid->GetRows() - 2, 10.0f);
-      DrawTextRightJustify(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x - 3, pos.y - ysize * .5f + (scale / 2), scale);
+      double scale = std::min(mDotGrid->IClickable::GetDimensions().y / mDotGrid->GetRows() - 2, 10.0);
+      DrawTextRightJustify(NoteName(RowToPitch(i), false, true) + "(" + ofToString(RowToPitch(i)) + ")", pos.x - 3, pos.y - ysize * .5 + (scale / 2), scale);
    }
    ofPopStyle();
 
@@ -159,7 +159,7 @@ void DotSequencer::OnTimeEvent(double time)
    OnStep(time, 1, 0);
 }
 
-void DotSequencer::OnStep(double time, float velocity, int flags)
+void DotSequencer::OnStep(double time, double velocity, int flags)
 {
    if (mEnabled)
    {
@@ -200,7 +200,7 @@ void DotSequencer::OnStep(double time, float velocity, int flags)
    }
 }
 
-void DotSequencer::OnTransportAdvanced(float amount)
+void DotSequencer::OnTransportAdvanced(double amount)
 {
    for (int i = 0; i < (int)mPlayingDots.size(); ++i)
    {
@@ -215,7 +215,7 @@ void DotSequencer::OnTransportAdvanced(float amount)
          }
          else
          {
-            double noteEnd = mPlayingDots[i].mPlayedTime + TheTransport->GetDuration(mInterval) * std::max(.5f, data.mLength);
+            double noteEnd = mPlayingDots[i].mPlayedTime + TheTransport->GetDuration(mInterval) * std::max(.5, data.mLength);
             if (noteEnd < NextBufferTime(K(includeLookahead)))
                noteOffTime = noteEnd;
          }
@@ -257,23 +257,23 @@ int DotSequencer::RowToPitch(int row) const
    return row;
 }
 
-bool DotSequencer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool DotSequencer::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    mDotGrid->NotifyMouseScrolled(x, y, scrollX, scrollY, isSmoothScroll, isInvertedScroll);
    return false;
 }
 
-void DotSequencer::Resize(float w, float h)
+void DotSequencer::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;
 
-   ofVec2f gridPos = mDotGrid->GetPosition(K(local));
+   ofVec2d gridPos = mDotGrid->GetPosition(K(local));
 
    mDotGrid->SetDimensions(w - 8 - gridPos.x, h - 5 - gridPos.y);
 }
 
-void DotSequencer::GetModuleDimensions(float& width, float& height)
+void DotSequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
@@ -362,8 +362,8 @@ void DotSequencer::LoadState(FileStreamIn& in, int rev)
    mInterval = (NoteInterval)interval;
 
    in >> mHasExternalPulseSource;
-   in >> mWidth;
-   in >> mHeight;
+   in >> FloatAsDouble >> mWidth;
+   in >> FloatAsDouble >> mHeight;
    Resize(mWidth, mHeight);
 
    mDotGrid->LoadState(in);

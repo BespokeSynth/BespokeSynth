@@ -59,19 +59,19 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IDrawableModule
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    void Poll() override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    //IFloatSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
@@ -96,29 +96,29 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
 
-   float GetSampleRateRatio() const;
+   double GetSampleRateRatio() const;
    ChannelBuffer* GetSourceBuffer();
-   float GetSourceStartSample();
-   float GetSourceEndSample();
-   float GetSourceBufferOffset();
+   double GetSourceStartSample();
+   double GetSourceEndSample();
+   double GetSourceBufferOffset();
    int GetSampleNumChannels();
 
    struct GrainMPEVoice
    {
       GrainMPEVoice();
       void Process(ChannelBuffer* output, int bufferSize);
-      void Draw(float w, float h);
+      void Draw(double w, double h);
 
-      float mPlay{ 0 };
-      float mPitch{ 0 };
+      double mPlay{ 0 };
+      double mPitch{ 0 };
       ModulationChain* mPitchBend{ nullptr };
       ModulationChain* mPressure{ nullptr };
       ModulationChain* mModWheel{ nullptr };
 
-      float mGain{ 0 };
+      double mGain{ 0 };
 
       ::ADSR mADSR{ 100, 0, 1, 100 };
       Granulator mGranulator;
@@ -129,11 +129,11 @@ private:
    {
       GrainManualVoice();
       void Process(ChannelBuffer* output, int bufferSize);
-      void Draw(float w, float h);
+      void Draw(double w, double h);
 
-      float mGain{ 0 };
-      float mPosition{ 0 };
-      float mPan{ 0 };
+      double mGain{ 0 };
+      double mPosition{ 0 };
+      double mPan{ 0 };
 
       Granulator mGranulator;
       SeaOfGrain* mOwner{ nullptr };
@@ -164,13 +164,13 @@ private:
    Checkbox* mRecordInputCheckbox{ nullptr };
    bool mHasRecordedInput{ false };
 
-   float mVolume{ .6 };
+   double mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    bool mLoading{ false };
    FloatSlider* mDisplayOffsetSlider{ nullptr };
-   float mDisplayOffset{ 0 };
+   double mDisplayOffset{ 0 };
    FloatSlider* mDisplayLengthSlider{ nullptr };
-   float mDisplayLength{ 10 };
+   double mDisplayLength{ 10 };
    int mDisplayStartSamples{ 0 };
    int mDisplayEndSamples{ 0 };
    DropdownList* mKeyboardBasePitchSelector{ nullptr };

@@ -58,7 +58,7 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
@@ -82,14 +82,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = mWidth;
       h = mHeight;
    }
 
-   float mWidth{ 130 };
-   float mHeight{ 20 };
+   double mWidth{ 130 };
+   double mHeight{ 20 };
 
    class ControlElement
    {
@@ -101,7 +101,7 @@ private:
       void SetUpControl();
       void UpdateInfoFromControl();
       void ApplyInfoToControl();
-      float GetInfo(std::string name, float defaultVal) const;
+      double GetInfo(std::string name, double defaultVal) const;
 
       void SaveState(FileStreamOut& out);
       void LoadState(FileStreamIn& in, int rev);
@@ -116,7 +116,7 @@ private:
       ClickButton* mButton{ nullptr };
       DropdownList* mDropdown{ nullptr };
       RadioButton* mRadioButton{ nullptr };
-      float* mFloatVar{ nullptr };
+      double* mFloatVar{ nullptr };
       int* mIntVar{ nullptr };
       bool* mBoolVar{ nullptr };
       ControlInterface* mOwner{ nullptr };
@@ -128,7 +128,7 @@ private:
    ControlElement* mCurrentEditControl{ nullptr };
    CodeEntry* mControlEditorBox{ nullptr };
    bool mShowCables{ true };
-   float mDummyFloat{ 0.0 };
+   double mDummyFloat{ 0.0 };
    int mDummyInt{ 0 };
    bool mDummyBool{ false };
 };

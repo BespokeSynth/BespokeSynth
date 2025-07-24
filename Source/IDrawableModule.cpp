@@ -47,12 +47,12 @@
 #include "UserPrefs.h"
 #include "Prefab.h"
 
-float IDrawableModule::sHueNote = 27;
-float IDrawableModule::sHueAudio = 135;
-float IDrawableModule::sHueInstrument = 79;
-float IDrawableModule::sHueNoteSource = 240;
-float IDrawableModule::sSaturation = 145;
-float IDrawableModule::sBrightness = 220;
+double IDrawableModule::sHueNote = 27;
+double IDrawableModule::sHueAudio = 135;
+double IDrawableModule::sHueInstrument = 79;
+double IDrawableModule::sHueNoteSource = 240;
+double IDrawableModule::sSaturation = 145;
+double IDrawableModule::sBrightness = 220;
 
 IDrawableModule::IDrawableModule()
 {
@@ -162,12 +162,12 @@ void IDrawableModule::BasePoll()
 
 bool IDrawableModule::IsWithinRect(const ofRectangle& rect)
 {
-   float x, y;
+   double x, y;
    GetPosition(x, y);
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
-   float titleBarHeight = mTitleBarHeight;
+   double titleBarHeight = mTitleBarHeight;
    if (!HasTitleBar())
       titleBarHeight = 0;
 
@@ -179,7 +179,7 @@ bool IDrawableModule::IsVisible()
    return IsWithinRect(TheSynth->GetDrawRect());
 }
 
-void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleBarHeight, float& highlight)
+void IDrawableModule::DrawFrame(double w, double h, bool drawModule, double& titleBarHeight, double& highlight)
 {
    if (mPinned)
       ForcePosition();
@@ -211,8 +211,8 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
             }
          }
          mag /= numSamples * vizBuff->NumChannels();
-         mag = sqrtf(mag);
-         mag = sqrtf(mag);
+         mag = std::sqrt(mag);
+         mag = std::sqrt(mag);
          mag *= 3;
          mag = ofClamp(mag, 0, 1);
 
@@ -222,17 +222,17 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
 
       if (GetPatchCableSource() != nullptr)
       {
-         float elapsed = float(gTime - GetPatchCableSource()->GetHistory().GetLastOnEventTime()) / NOTE_HISTORY_LENGTH;
+         double elapsed = gTime - GetPatchCableSource()->GetHistory().GetLastOnEventTime() / NOTE_HISTORY_LENGTH;
          if (UserPrefs.draw_module_highlights.Get())
-            highlight = MAX(highlight, .15f * ofClamp(1 - elapsed, 0, 1));
+            highlight = MAX(highlight, .15 * ofClamp(1 - elapsed, 0, 1));
       }
    }
 
    const bool kUseDropshadow = false;
    if (kUseDropshadow && GetParent() == nullptr && GetModuleCategory() != kModuleCategory_Other)
    {
-      const float shadowSize = 20;
-      float shadowStrength = .2f + highlight;
+      const double shadowSize = 20;
+      double shadowStrength = .2 + highlight;
       NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, -shadowSize / 2, -titleBarHeight - shadowSize / 2, w + shadowSize, h + titleBarHeight + shadowSize, gCornerRoundness * shadowSize * .5f, shadowSize, nvgRGBA(color.r * shadowStrength, color.g * shadowStrength, color.b * shadowStrength, 128), nvgRGBA(0, 0, 0, 0));
       nvgBeginPath(gNanoVG);
       nvgRect(gNanoVG, -shadowSize, -shadowSize - titleBarHeight, w + shadowSize * 2, h + titleBarHeight + shadowSize * 2);
@@ -241,15 +241,15 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    ofFill();
-   float backgroundAlpha = IsEnabled() ? 180 : 120;
+   double backgroundAlpha = IsEnabled() ? 180 : 120;
    if (dynamic_cast<Prefab*>(this) != nullptr)
       backgroundAlpha = 60;
    if (IsEnabled())
-      ofSetColor(color.r * (.25f + highlight), color.g * (.25f + highlight), color.b * (.25f + highlight), backgroundAlpha);
+      ofSetColor(color.r * (.25 + highlight), color.g * (.25 + highlight), color.b * (.25 + highlight), backgroundAlpha);
    else
-      ofSetColor(color.r * .2f, color.g * .2f, color.b * .2f, backgroundAlpha);
+      ofSetColor(color.r * .2, color.g * .2, color.b * .2, backgroundAlpha);
    //gModuleShader.begin();
-   const float kHighlightGrowAmount = 40;
+   const double kHighlightGrowAmount = 40;
    ofRect(0 - highlight * kHighlightGrowAmount, -titleBarHeight - highlight * kHighlightGrowAmount,
           w + highlight * kHighlightGrowAmount * 2, h + titleBarHeight + highlight * kHighlightGrowAmount * 2, 3 + highlight * kHighlightGrowAmount);
    //gModuleShader.end();
@@ -263,9 +263,9 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    bool dimModule = TheSynth->ShouldDimModule(this);
 
    if (dimModule)
-      gModuleDrawAlpha *= .2f;
+      gModuleDrawAlpha *= .2;
 
-   float enableToggleOffset = 0;
+   double enableToggleOffset = 0;
    if (HasTitleBar())
    {
       ofPushStyle();
@@ -289,7 +289,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
             ofSetColor(255, 255, 255, gModuleDrawAlpha);
          else
             ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
-         float squareSize = titleBarHeight / 2 - 1;
+         double squareSize = titleBarHeight / 2 - 1;
          ofRect(w - 25, -titleBarHeight + 1, squareSize, squareSize, 1);
          ofRect(w - 25, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
          ofRect(w - 25 - squareSize - 1, -titleBarHeight / 2 + 1, squareSize, squareSize, 1);
@@ -298,7 +298,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mKeyboardFocusListener)
          {
             ofPushStyle();
-            ofSetLineWidth(.5f);
+            ofSetLineWidth(.5);
             ofNoFill();
             ofRect(w - 25 - squareSize - 2 - 1, -titleBarHeight,
                    2 + squareSize + 1 + squareSize + 1 + squareSize + 2, titleBarHeight, 2);
@@ -328,10 +328,10 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    const bool kDrawInnerFade = true;
    if (kDrawInnerFade && !Push2Control::sDrawingPush2Display)
    {
-      float fadeRoundness = 100;
-      float fadeLength = w / 3;
-      const float kFadeStrength = .9f;
-      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2f, color.g * .2f, color.b * .2f, backgroundAlpha * kFadeStrength), nvgRGBA(0, 0, 0, 0));
+      double fadeRoundness = 100;
+      double fadeLength = w / 3;
+      const double kFadeStrength = .9;
+      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2, color.g * .2, color.b * .2, backgroundAlpha * kFadeStrength), nvgRGBA(0, 0, 0, 0));
       nvgBeginPath(gNanoVG);
       nvgRect(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight);
       nvgFillPaint(gNanoVG, shadowPaint);
@@ -364,25 +364,25 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
 
       if (groupSelected)
       {
-         float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2f, 1);
+         double pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2, 1);
          ofSetColor(ofLerp(color.r, 255, pulse), ofLerp(color.g, 255, pulse), ofLerp(color.b, 255, pulse), 255);
-         ofSetLineWidth(1.5f);
+         ofSetLineWidth(1.5);
       }
       else if (TheSynth->GetMoveModule() == this)
       {
          ofSetColor(255, 255, 255);
-         ofSetLineWidth(.5f);
+         ofSetLineWidth(.5);
       }
       else
       {
-         ofSetColor(color.r * (.5f + highlight), color.g * (.5f + highlight), color.b * (.5f + highlight), 200);
-         ofSetLineWidth(.5f);
+         ofSetColor(color.r * (.5 + highlight), color.g * (.5 + highlight), color.b * (.5 + highlight), 200);
+         ofSetLineWidth(.5);
       }
-      ofRect(-.5f, -titleBarHeight - .5f, w + 1, h + titleBarHeight + 1, 4);
+      ofRect(-.5, -titleBarHeight - .5, w + 1, h + titleBarHeight + 1, 4);
       ofPopStyle();
    }
 
-   const float kPinRadius = 2;
+   const double kPinRadius = 2;
    if (mPinned)
    {
       ofFill();
@@ -411,41 +411,41 @@ void IDrawableModule::Render()
       mMinimizeAnimation -= ofGetLastFrameTime() * 5;
    mMinimizeAnimation = ofClamp(mMinimizeAnimation, 0, 1);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofPushMatrix();
    ofPushStyle();
 
-   float titleBarHeight;
-   float highlight;
+   double titleBarHeight;
+   double highlight;
    DrawFrame(w, h, true, titleBarHeight, highlight);
 
    if (Minimized() || IsVisible() == false)
       DrawBeacon(30, -titleBarHeight / 2);
 
    ofPushStyle();
-   const float kPipWidth = 8;
-   const float kPipSpacing = 2;
-   float receiveIndicatorX = w - (kPipWidth + kPipSpacing);
+   const double kPipWidth = 8;
+   const double kPipSpacing = 2;
+   double receiveIndicatorX = w - (kPipWidth + kPipSpacing);
    ofFill();
 
    if (CanReceiveAudio())
    {
       ofSetColor(GetColor(kModuleCategory_Audio));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceiveNotes())
    {
       ofSetColor(GetColor(kModuleCategory_Note));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    if (CanReceivePulses())
    {
       ofSetColor(GetColor(kModuleCategory_Pulse));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0);
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    ofPopStyle();
@@ -558,8 +558,8 @@ ofColor IDrawableModule::GetColor(ModuleCategory type)
 
 void IDrawableModule::DrawConnection(IClickable* target)
 {
-   float lineWidth = 1;
-   float plugWidth = 4;
+   double lineWidth = 1;
+   double plugWidth = 4;
    int lineAlpha = 100;
 
    IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(target);
@@ -582,11 +582,11 @@ void IDrawableModule::DrawConnection(IClickable* target)
    PatchCableOld cable = GetPatchCableOld(target);
 
    ofColor lineColor = GetColor(kModuleCategory_Other);
-   lineColor.setBrightness(lineColor.getBrightness() * .8f);
+   lineColor.setBrightness(lineColor.getBrightness() * .8);
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a = lineAlpha;
 
-   float wThis, hThis, xThis, yThis;
+   double wThis, hThis, xThis, yThis;
    GetDimensions(wThis, hThis);
    GetPosition(xThis, yThis);
 
@@ -647,7 +647,7 @@ void IDrawableModule::Exit()
    }
 }
 
-bool IDrawableModule::TestClick(float x, float y, bool right, bool testOnly /*=false*/)
+bool IDrawableModule::TestClick(double x, double y, bool right, bool testOnly /*=false*/)
 {
    if (IsResizable() && mHoveringOverResizeHandle)
    {
@@ -668,9 +668,9 @@ bool IDrawableModule::TestClick(float x, float y, bool right, bool testOnly /*=f
    return false;
 }
 
-void IDrawableModule::OnClicked(float x, float y, bool right)
+void IDrawableModule::OnClicked(double x, double y, bool right)
 {
-   float w, h;
+   double w, h;
    GetModuleDimensions(w, h);
 
    if (IsResizable() && mHoveringOverResizeHandle)
@@ -728,9 +728,9 @@ void IDrawableModule::OnClicked(float x, float y, bool right)
    TheSynth->MoveToFront(this);
 }
 
-bool IDrawableModule::MouseMoved(float x, float y)
+bool IDrawableModule::MouseMoved(double x, double y)
 {
-   float w, h;
+   double w, h;
    GetModuleDimensions(w, h);
    if (mShowing && !Minimized() && IsResizable() && x > w - sResizeCornerSize && y > h - sResizeCornerSize && x <= w && y <= h)
       mHoveringOverResizeHandle = true;
@@ -851,12 +851,12 @@ std::vector<UIGrid*> IDrawableModule::GetUIGrids() const
    return grids;
 }
 
-void IDrawableModule::GetDimensions(float& width, float& height)
+void IDrawableModule::GetDimensions(double& width, double& height)
 {
    int minimizedWidth = GetMinimizedWidth();
    int minimizedHeight = 0;
 
-   float moduleWidth, moduleHeight;
+   double moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
    if (moduleWidth == 1 && moduleHeight == 1)
    {
@@ -864,7 +864,7 @@ void IDrawableModule::GetDimensions(float& width, float& height)
       height = 1;
       return; //special case for repatch stub, let it be 1 pixel
    }
-   ofVec2f minimumDimensions = GetMinimumDimensions();
+   ofVec2d minimumDimensions = GetMinimumDimensions();
    moduleWidth = MAX(moduleWidth, minimumDimensions.x);
    moduleHeight = MAX(moduleHeight, minimumDimensions.y);
 
@@ -872,7 +872,7 @@ void IDrawableModule::GetDimensions(float& width, float& height)
    height = EaseOut(moduleHeight, minimizedHeight, mMinimizeAnimation);
 }
 
-float IDrawableModule::GetMinimizedWidth()
+double IDrawableModule::GetMinimizedWidth()
 {
    std::string titleLabel = GetTitleLabel();
    if (titleLabel != mLastTitleLabel)
@@ -880,16 +880,16 @@ float IDrawableModule::GetMinimizedWidth()
       mLastTitleLabel = titleLabel;
       mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 14);
    }
-   float width = mTitleLabelWidth;
+   double width = mTitleLabelWidth;
    width += 10; //padding
    if (mEnabledCheckbox)
       width += TitleBarHeight();
    return MAX(width, 50);
 }
 
-ofVec2f IDrawableModule::GetMinimumDimensions()
+ofVec2d IDrawableModule::GetMinimumDimensions()
 {
-   return ofVec2f(GetMinimizedWidth() + 10, 10);
+   return { GetMinimizedWidth() + 10, 10 };
 }
 
 void IDrawableModule::KeyPressed(int key, bool isRepeat)
@@ -973,7 +973,7 @@ void IDrawableModule::ComputeSliders(int samplesIn)
 
 PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
 {
-   float wThis, hThis, xThis, yThis, wThat, hThat, xThat, yThat;
+   double wThis, hThis, xThis, yThis, wThat, hThat, xThat, yThat;
    GetDimensions(wThis, hThis);
    GetPosition(xThis, yThis);
    if (target)
@@ -1003,13 +1003,13 @@ PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
       hThat += mTitleBarHeight;
    }
 
-   float startX, startY, endX, endY;
+   double startX, startY, endX, endY;
    FindClosestSides(xThis, yThis, wThis, hThis, xThat, yThat, wThat, hThat, startX, startY, endX, endY);
 
-   float diffX = endX - startX;
-   float diffY = endY - startY;
-   float length = sqrtf(diffX * diffX + diffY * diffY);
-   float endCap = MIN(.5f, 20 / length);
+   double diffX = endX - startX;
+   double diffY = endY - startY;
+   double length = sqrt(diffX * diffX + diffY * diffY);
+   double endCap = MIN(.5, 20 / length);
    int plugX = int((startX - endX) * endCap) + endX;
    int plugY = int((startY - endY) * endCap) + endY;
 
@@ -1036,26 +1036,26 @@ void IDrawableModule::ForcePosition()
       SetPinned(true);
 }
 
-void IDrawableModule::FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly /*= false*/)
+void IDrawableModule::FindClosestSides(double xThis, double yThis, double wThis, double hThis, double xThat, double yThat, double wThat, double hThat, double& startX, double& startY, double& endX, double& endY, bool sidesOnly /*= false*/)
 {
-   ofVec2f vDirs[4];
+   ofVec2d vDirs[4];
    vDirs[0].set(-1, 0);
    vDirs[1].set(1, 0);
    vDirs[2].set(0, -1);
    vDirs[3].set(0, 1);
 
-   ofVec2f vThis[4];
+   ofVec2d vThis[4];
    vThis[0].set(xThis, yThis + hThis / 2); //left
    vThis[1].set(xThis + wThis, yThis + hThis / 2); //right
    vThis[2].set(xThis + wThis / 2, yThis); //top
    vThis[3].set(xThis + wThis / 2, yThis + hThis); //bottom
-   ofVec2f vThat[4];
+   ofVec2d vThat[4];
    vThat[0].set(xThat, yThat + hThat / 2);
    vThat[1].set(xThat + wThat, yThat + hThat / 2);
    vThat[2].set(xThat + wThat / 2, yThat);
    vThat[3].set(xThat + wThat / 2, yThat + hThat);
 
-   float closest = FLT_MAX;
+   double closest = std::numeric_limits<double>::max();
    int closestPair = 0;
    for (int i = 0; i < 4; ++i)
    {
@@ -1067,12 +1067,12 @@ void IDrawableModule::FindClosestSides(float xThis, float yThis, float wThis, fl
 
       for (int j = 0; j < 4; ++j)
       {
-         ofVec2f vDiff = vThat[j] - vThis[i];
-         float distSq = vDiff.lengthSquared();
+         ofVec2d vDiff = vThat[j] - vThis[i];
+         double distSq = vDiff.lengthSquared();
          if (distSq < closest &&
              //i/2 == j/2 &&   //only connect horizontal-horizontal, vertical-vertical
-             //((i/2 == 0 && fabs(vDiff.x) > 10) ||
-             // (i/2 == 1 && fabs(vDiff.y) > 10)
+             //((i/2 == 0 && std::abs(vDiff.x) > 10) ||
+             // (i/2 == 1 && std::abs(vDiff.y) > 10)
              //) &&
              vDiff.dot(vDirs[i]) > 0 &&
              vDiff.dot(vDirs[j]) < 0)
@@ -1316,8 +1316,8 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
    if (baseRev > 2)
    {
       in >> mPinned;
-      in >> mPinnedPosition.x;
-      in >> mPinnedPosition.y;
+      in >> FloatAsDouble >> mPinnedPosition.x;
+      in >> FloatAsDouble >> mPinnedPosition.y;
    }
 
    int numUIControls;
@@ -1328,8 +1328,8 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
       in >> uicontrolname;
       if (baseRev >= 2)
       {
-         float rawValue;
-         in >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
+         double rawValue;
+         in >> FloatAsDouble >> rawValue; //we don't use this here, but it'll likely be useful in the future if an option is renamed/removed and we need to port the old data
       }
       UpdateOldControlName(uicontrolname);
 

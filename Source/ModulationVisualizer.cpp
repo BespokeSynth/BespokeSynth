@@ -93,7 +93,7 @@ std::string ModulationVisualizer::VizVoice::GetInfoString()
    return info;
 }
 
-void ModulationVisualizer::Resize(float w, float h)
+void ModulationVisualizer::Resize(double w, double h)
 {
    mWidth = w;
    mHeight = h;

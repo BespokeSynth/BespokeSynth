@@ -31,7 +31,7 @@
 
 class IAudioReceiver;
 
-#define VIZ_BUFFER_SECONDS .1f
+#define VIZ_BUFFER_SECONDS .1
 
 class IAudioSource : public virtual IPatchable
 {

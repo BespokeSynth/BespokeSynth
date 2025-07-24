@@ -54,7 +54,7 @@ void FollowingSong::LoadSample(const char* file)
    mLoadingSong = false;
 }
 
-void FollowingSong::SetPlaybackInfo(bool play, int position, float speed, float volume)
+void FollowingSong::SetPlaybackInfo(bool play, double position, double speed, double volume)
 {
    mPlay = play;
    mSample.SetRate(speed);
@@ -73,11 +73,11 @@ void FollowingSong::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   float volSq = mVolume * mVolume * .5f;
+   float volSq = mVolume * mVolume * .5;
 
    if (!mLoadingSong && mPlay)
    {
@@ -121,11 +121,11 @@ void FollowingSong::DrawModule()
    ofPopMatrix();
 
    ofPushStyle();
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    ofFill();
    ofSetColor(255, 255, 255, 50);
-   float beatWidth = w / 4;
+   double beatWidth = w / 4;
    ofRect(int(TheTransport->GetMeasurePos(gTime) * 4) * beatWidth, 0, beatWidth, h);
    ofPopStyle();
 }
@@ -150,7 +150,7 @@ void FollowingSong::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void FollowingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FollowingSong::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

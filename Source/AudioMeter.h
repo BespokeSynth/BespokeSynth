@@ -48,7 +48,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -58,14 +58,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = 120;
       h = 40;
    }
 
-   float mLevel{ 0 };
-   float mMaxLevel{ 1 };
+   double mLevel{ 0 };
+   double mMaxLevel{ 1 };
    FloatSlider* mLevelSlider{ nullptr };
    PeakTracker mPeakTracker;
    float* mAnalysisBuffer{ nullptr };

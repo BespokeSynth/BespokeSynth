@@ -53,7 +53,7 @@ bool CodeEntry::sWarnJediNotInstalled = false;
 bool CodeEntry::sDoPythonAutocomplete = false;
 bool CodeEntry::sDoSyntaxHighlighting = false;
 
-CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
+CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, double w, double h)
 : mListener(owner)
 {
    SetName(name);
@@ -242,9 +242,9 @@ void CodeEntry::Render()
    ofPushStyle();
    ofPushMatrix();
 
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(.5);
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
 
    ofClipWindow(mX, mY, w, h, true);
@@ -289,7 +289,7 @@ void CodeEntry::Render()
    }
    else if (hasUnpublishedCode)
    {
-      float highlight = 1 - ofClamp(timeSincePublished / 150, 0, 1);
+      double highlight = 1 - ofClamp(timeSincePublished / 150, 0, 1);
       ofSetColor(ofLerp(170, 255, highlight), 255, ofLerp(170, 255, highlight), gModuleDrawAlpha);
       ofSetLineWidth(2 + highlight * 3);
    }
@@ -304,7 +304,7 @@ void CodeEntry::Render()
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255, 0, 0, gModuleDrawAlpha * .5f);
+      ofSetColor(255, 0, 0, gModuleDrawAlpha * .5);
       ofRect(mX, mErrorLine * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight, L(corner, 2));
       ofFill();
    }
@@ -314,7 +314,7 @@ void CodeEntry::Render()
 
    if (hasUnpublishedCode)
    {
-      ofSetColor(color, gModuleDrawAlpha * .05f);
+      ofSetColor(color, gModuleDrawAlpha * .05);
       gFontFixedWidth.DrawString(mPublishedString, mFontSize, mX + 2 - mScroll.x, mY + mCharHeight - mScroll.y);
    }
 
@@ -323,7 +323,7 @@ void CodeEntry::Render()
    std::string drawString = GetVisibleCode();
 
    ofPushStyle();
-   const float dim = .7f;
+   const double dim = .7;
    DrawSyntaxHighlight(drawString, stringColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 3, -1);
    DrawSyntaxHighlight(drawString, numberColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 2, -1);
    DrawSyntaxHighlight(drawString, name1Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 1, -1);
@@ -349,8 +349,8 @@ void CodeEntry::Render()
 
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
    {
-      ofVec2f coords = GetCaretCoords(mCaretPosition);
-      ofVec2f caretPos = ofVec2f(coords.x * mCharWidth + mX + 1.5f - mScroll.x, coords.y * mCharHeight + mY + 2 - mScroll.y);
+      ofVec2d coords = GetCaretCoords(mCaretPosition);
+      ofVec2d caretPos = ofVec2d(coords.x * mCharWidth + mX + 1.5 - mScroll.x, coords.y * mCharHeight + mY + 2 - mScroll.y);
 
       if (mCaretBlink)
       {
@@ -359,9 +359,9 @@ void CodeEntry::Render()
          ofRect(caretPos.x, caretPos.y, 1, mCharHeight, L(corner, 1));
       }
       mCaretBlinkTimer += ofGetLastFrameTime();
-      if (mCaretBlinkTimer > .3f)
+      if (mCaretBlinkTimer > .3)
       {
-         mCaretBlinkTimer -= .3f;
+         mCaretBlinkTimer -= .3;
          mCaretBlink = !mCaretBlink;
       }
 
@@ -372,8 +372,8 @@ void CodeEntry::Render()
          ofSetColor(selectedOverlay);
          int caretStart = MIN(mCaretPosition, mCaretPosition2);
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
-         ofVec2f coordsStart = GetCaretCoords(caretStart);
-         ofVec2f coordsEnd = GetCaretCoords(caretEnd);
+         ofVec2d coordsStart = GetCaretCoords(caretStart);
+         ofVec2d coordsEnd = GetCaretCoords(caretEnd);
 
          int startLineNum = (int)round(coordsStart.y);
          int endLineNum = (int)round(coordsEnd.y);
@@ -390,7 +390,7 @@ void CodeEntry::Render()
                begin = startCol;
             if (i == endLineNum)
                end = endCol;
-            ofRect(begin * mCharWidth + mX + 1.5f - mScroll.x, i * mCharHeight + mY + 3 - mScroll.y, (end - begin) * mCharWidth, mCharHeight, L(corner, 2));
+            ofRect(begin * mCharWidth + mX + 1.5 - mScroll.x, i * mCharHeight + mY + 3 - mScroll.y, (end - begin) * mCharWidth, mCharHeight, L(corner, 2));
          }
 
          ofPopStyle();
@@ -444,7 +444,7 @@ void CodeEntry::RenderOverlay()
    if (!IsAutocompleteShowing())
       return;
 
-   ofVec2f caretPos = ofVec2f(mAutocompleteCaretCoords.x * mCharWidth + mX + 1.5f - mScroll.x, mAutocompleteCaretCoords.y * mCharHeight + mY + 2 - mScroll.y);
+   ofVec2d caretPos = ofVec2d(mAutocompleteCaretCoords.x * mCharWidth + mX + 1.5 - mScroll.x, mAutocompleteCaretCoords.y * mCharHeight + mY + 2 - mScroll.y);
 
    ofFill();
 
@@ -453,8 +453,8 @@ void CodeEntry::RenderOverlay()
       if (mAutocompletes[i].valid)
       {
          int charactersLeft = (int)mAutocompletes[i].autocompleteFull.length() - (int)mAutocompletes[i].autocompleteRest.length();
-         float x = caretPos.x - charactersLeft * mCharWidth;
-         float y = caretPos.y + mCharHeight * (i + 2) - 2;
+         double x = caretPos.x - charactersLeft * mCharWidth;
+         double y = caretPos.y + mCharHeight * (i + 2) - 2;
          if (i == mAutocompleteHighlightIndex)
             ofSetColor(jediIndexBg);
          else
@@ -502,8 +502,8 @@ void CodeEntry::RenderOverlay()
          }
          params += ")";
          highlightParamString += " ";
-         float x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
-         float y = caretPos.y + mCharHeight * (i + 1) - 2;
+         double x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
+         double y = caretPos.y + mCharHeight * (i + 1) - 2;
          ofSetColor(jediBg);
          ofRect(x, y - mCharHeight + 2, gFontFixedWidth.GetStringWidth(params, mFontSize), mCharHeight + 2);
          ofSetColor(jediParams);
@@ -556,11 +556,11 @@ void CodeEntry::DrawSyntaxHighlight(std::string input, ofColor color, std::vecto
    std::string filtered = FilterText(input, mapping, filter1, filter2);
    ofSetColor(color, gModuleDrawAlpha);
 
-   float shake = (1 - ofClamp((gTime - mLastPublishTime) / 150, 0, 1)) * 3.0f;
+   double shake = (1 - ofClamp((gTime - mLastPublishTime) / 150, 0, 1)) * 3.0;
    if (TheSynth->IsAudioPaused())
       shake = 0;
-   float offsetX = ofRandom(-shake, shake);
-   float offsetY = ofRandom(-shake, shake);
+   double offsetX = ofRandom(-shake, shake);
+   double offsetY = ofRandom(-shake, shake);
 
    gFontFixedWidth.DrawString(filtered, mFontSize, mX + 2 - mScroll.x + offsetX, mY + mCharHeight - mScroll.y + offsetY);
 }
@@ -740,7 +740,7 @@ bool CodeEntry::IsAutocompleteShowing()
 
    if (mAutocompleteUpdateTimer <= 0)
    {
-      ofVec2f coords = GetCaretCoords(mCaretPosition);
+      ofVec2d coords = GetCaretCoords(mCaretPosition);
       return coords.x == mAutocompleteCaretCoords.x && coords.y == mAutocompleteCaretCoords.y;
    }
 
@@ -753,13 +753,13 @@ void CodeEntry::SetError(bool error, int errorLine)
    mErrorLine = errorLine;
 }
 
-void CodeEntry::OnClicked(float x, float y, bool right)
+void CodeEntry::OnClicked(double x, double y, bool right)
 {
    if (right)
       return;
 
-   float col = GetColForX(x);
-   float row = GetRowForY(y);
+   double col = GetColForX(x);
+   double row = GetRowForY(y);
    MoveCaret(GetCaretPosition(col, row));
 
    MakeActive();
@@ -816,7 +816,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else
       {
-         ofVec2f coords = GetCaretCoords(mCaretPosition);
+         ofVec2d coords = GetCaretCoords(mCaretPosition);
          int spacesNeeded = kTabSize - (int)coords.x % kTabSize;
          std::string tab;
          for (int i = 0; i < spacesNeeded; ++i)
@@ -889,7 +889,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else
       {
-         ofVec2f coords = GetCaretCoords(mCaretPosition);
+         ofVec2d coords = GetCaretCoords(mCaretPosition);
          if (coords.y > 0)
             --coords.y;
          MoveCaret(GetCaretPosition(coords.x, coords.y));
@@ -903,7 +903,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else
       {
-         ofVec2f coords = GetCaretCoords(mCaretPosition);
+         ofVec2d coords = GetCaretCoords(mCaretPosition);
          ++coords.y;
          MoveCaret(GetCaretPosition(coords.x, coords.y));
       }
@@ -919,7 +919,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
          if (mCaretPosition != mCaretPosition2)
             RemoveSelectedText();
 
-         ofVec2f coords = GetCaretCoords(mCaretPosition);
+         ofVec2d coords = GetCaretCoords(mCaretPosition);
          int lineNum = (int)round(coords.y);
          auto lines = GetLines(false);
          int numSpaces = 0;
@@ -1091,7 +1091,7 @@ void CodeEntry::AddCharacter(char c)
       s += c;
       AddString(s);
 
-      mAutocompleteUpdateTimer = .2f;
+      mAutocompleteUpdateTimer = .2;
    }
 }
 
@@ -1130,8 +1130,8 @@ void CodeEntry::ShiftLines(bool backwards)
 {
    int caretStart = MIN(mCaretPosition, mCaretPosition2);
    int caretEnd = MAX(mCaretPosition, mCaretPosition2);
-   ofVec2f coordsStart = GetCaretCoords(caretStart);
-   ofVec2f coordsEnd = GetCaretCoords(caretEnd);
+   ofVec2d coordsStart = GetCaretCoords(caretStart);
+   ofVec2d coordsEnd = GetCaretCoords(caretEnd);
 
    auto lines = GetLines(false);
    std::string newString = "";
@@ -1203,7 +1203,7 @@ void CodeEntry::MoveCaret(int pos, bool allowSelection /*=true*/)
 
 void CodeEntry::MoveCaretToStart()
 {
-   ofVec2f coords = GetCaretCoords(mCaretPosition);
+   ofVec2d coords = GetCaretCoords(mCaretPosition);
    auto lines = GetLines(false);
    int x = 0;
    if (coords.y < lines.size())
@@ -1223,30 +1223,30 @@ void CodeEntry::MoveCaretToStart()
 
 void CodeEntry::MoveCaretToEnd()
 {
-   ofVec2f coords = GetCaretCoords(mCaretPosition);
+   ofVec2d coords = GetCaretCoords(mCaretPosition);
    MoveCaret(GetCaretPosition(9999, coords.y));
 }
 
 void CodeEntry::MoveCaretToNextToken(bool backwards)
 {
    //eh... just move it more for now
-   ofVec2f coords = GetCaretCoords(mCaretPosition);
+   ofVec2d coords = GetCaretCoords(mCaretPosition);
    int amount = 5;
    if (backwards)
       amount *= -1;
    MoveCaret(GetCaretPosition(MAX(0, coords.x + amount), coords.y));
 }
 
-bool CodeEntry::MouseMoved(float x, float y)
+bool CodeEntry::MouseMoved(double x, double y)
 {
    mHovered = TestHover(x, y);
    CheckHover(x, y);
    return false;
 }
 
-bool CodeEntry::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+bool CodeEntry::MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
-   if (fabs(scrollX) > fabsf(scrollY))
+   if (std::abs(scrollX) > std::abs(scrollY))
       scrollY = 0;
    else
       scrollX = 0;
@@ -1261,7 +1261,7 @@ bool CodeEntry::MouseScrolled(float x, float y, float scrollX, float scrollY, bo
    return false;
 }
 
-void CodeEntry::SetDimensions(float width, float height)
+void CodeEntry::SetDimensions(double width, double height)
 {
    mWidth = width;
    mHeight = height;
@@ -1281,7 +1281,7 @@ int CodeEntry::GetCaretPosition(int col, int row)
    return MIN(caretPos, (int)mString.length());
 }
 
-int CodeEntry::GetColForX(float x)
+int CodeEntry::GetColForX(double x)
 {
    x -= 2;
 
@@ -1293,7 +1293,7 @@ int CodeEntry::GetColForX(float x)
    return round(x / mCharWidth);
 }
 
-int CodeEntry::GetRowForY(float y)
+int CodeEntry::GetRowForY(double y)
 {
    y -= 2;
 
@@ -1305,10 +1305,10 @@ int CodeEntry::GetRowForY(float y)
    return int(y / mCharHeight);
 }
 
-ofVec2f CodeEntry::GetLinePos(int lineNum, bool end, bool published /*= true*/)
+ofVec2d CodeEntry::GetLinePos(int lineNum, bool end, bool published /*= true*/)
 {
-   float x = mX - mScroll.x;
-   float y = lineNum * mCharHeight + mY - mScroll.y;
+   double x = mX - mScroll.x;
+   double y = lineNum * mCharHeight + mY - mScroll.y;
 
    if (end)
    {
@@ -1318,12 +1318,12 @@ ofVec2f CodeEntry::GetLinePos(int lineNum, bool end, bool published /*= true*/)
          x += lines[lineNum].length() * mCharWidth;
    }
 
-   return ofVec2f(x, y);
+   return { x, y };
 }
 
-ofVec2f CodeEntry::GetCaretCoords(int caret)
+ofVec2d CodeEntry::GetCaretCoords(int caret)
 {
-   ofVec2f coords;
+   ofVec2d coords;
    int caretRemaining = caret;
    auto lines = GetLines(false);
    for (size_t i = 0; i < lines.size(); ++i)

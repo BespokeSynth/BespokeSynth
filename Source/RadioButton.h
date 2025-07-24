@@ -70,37 +70,37 @@ public:
    void CopyContentsTo(DropdownList* list) const;
    RadioButtonElement GetElement(int index) { return mElements[index]; }
 
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    static int GetSpacing();
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   void SetValueDirect(float value, double time) override;
-   float GetValue() const override;
-   float GetMidiValue() const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   void SetValueDirect(double value, double time) override;
+   double GetValue() const override;
+   double GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
-   std::string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(double val) const override;
    bool IsBitmask() override { return mMultiSelect; }
    bool InvertScrollDirection() override { return mDirection == kRadioVertical; }
-   void Increment(float amount) override;
+   void Increment(double amount) override;
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool CanBeTargetedBy(PatchCableSource* source) const override;
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   ofVec2f GetOptionPosition(int optionIndex);
+   ofVec2d GetOptionPosition(int optionIndex);
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
 protected:
    ~RadioButton(); //protected so that it can't be created on the stack
@@ -109,19 +109,19 @@ private:
    void SetIndex(int i, double time);
    void CalcSliderVal();
    void UpdateDimensions();
-   void SetValueDirect(float value, double time, bool forceUpdate);
+   void SetValueDirect(double value, double time, bool forceUpdate);
 
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
 
    int mWidth{ 15 };
    int mHeight{ 15 };
-   float mElementWidth{ 8 };
+   double mElementWidth{ 8 };
    std::vector<RadioButtonElement> mElements;
    int* mVar;
    IRadioButtonListener* mOwner;
    bool mMultiSelect{ false }; //makes this... not a radio button. mVar becomes a bitmask
    RadioDirection mDirection;
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    int mLastSetValue{ 0 };
    int mForcedWidth{ -1 };
 };

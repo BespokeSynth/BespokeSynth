@@ -68,7 +68,7 @@ double SliderSequencer::MeasurePos(double time)
    return pos;
 }
 
-void SliderSequencer::OnTransportAdvanced(float amount)
+void SliderSequencer::OnTransportAdvanced(double amount)
 {
    PROFILER(SliderSequencer);
 
@@ -124,7 +124,7 @@ void SliderSequencer::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void SliderSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void SliderSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -160,7 +160,7 @@ SliderLine::SliderLine(SliderSequencer* owner, int x, int y, int index)
 void SliderLine::CreateUIControls()
 {
    mSlider = new FloatSlider(mOwner, ("time" + ofToString(mIndex)).c_str(), mX, mY, 180, 15, &mPoint, 0, 1);
-   mVelocitySlider = new FloatSlider(mOwner, ("vel" + ofToString(mIndex)).c_str(), mX + 185, mY, 80, 15, &mVelocity, 0, .99f, 2);
+   mVelocitySlider = new FloatSlider(mOwner, ("vel" + ofToString(mIndex)).c_str(), mX + 185, mY, 80, 15, &mVelocity, 0, .99, 2);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), mX + 270, mY, 4, &mPitch, 0, 127);
    mPlayingCheckbox = new Checkbox(mOwner, ("playing" + ofToString(mIndex)).c_str(), HIDDEN_UICONTROL, HIDDEN_UICONTROL, &mPlaying);
 }

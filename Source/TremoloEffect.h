@@ -44,7 +44,7 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "tremolo"; }
 
    //IDropdownListener
@@ -52,22 +52,22 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mAmount{ 0 };
+   double mAmount{ 0 };
    FloatSlider* mAmountSlider{ nullptr };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
 
    LFO mLFO;
@@ -76,10 +76,10 @@ private:
    OscillatorType mOscType{ OscillatorType::kOsc_Square };
    DropdownList* mOscSelector{ nullptr };
    FloatSlider* mDutySlider{ nullptr };
-   float mDuty{ .5 };
+   double mDuty{ .5 };
    static const int kAntiPopWindowSize = 300;
-   float mWindow[kAntiPopWindowSize]{};
+   double mWindow[kAntiPopWindowSize]{};
    int mWindowPos{ 0 };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 };

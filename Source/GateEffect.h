@@ -38,8 +38,8 @@ public:
 
    void CreateUIControls() override;
 
-   void SetAttack(float ms) { mAttackTime = ms; }
-   void SetRelease(float ms) { mReleaseTime = ms; }
+   void SetAttack(double ms) { mAttackTime = ms; }
+   void SetRelease(double ms) { mReleaseTime = ms; }
    bool IsGateOpen() const { return mEnvelope > 0; }
 
    //IAudioEffect
@@ -49,25 +49,25 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 120;
       height = 50;
    }
 
-   float mThreshold{ .1 };
-   float mAttackTime{ 1 };
-   float mReleaseTime{ 1 };
+   double mThreshold{ .1 };
+   double mAttackTime{ 1 };
+   double mReleaseTime{ 1 };
    FloatSlider* mThresholdSlider{ nullptr };
    FloatSlider* mAttackSlider{ nullptr };
    FloatSlider* mReleaseSlider{ nullptr };
-   float mEnvelope{ 0 };
-   float mPeak{ 0 };
+   double mEnvelope{ 0 };
+   double mPeak{ 0 };
 };

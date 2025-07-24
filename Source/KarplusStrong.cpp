@@ -59,11 +59,11 @@ void KarplusStrong::CreateUIControls()
    mVolSlider = new FloatSlider(this, "vol", 3, 2, 80, 15, &mVolume, 0, 2);
    mInvertCheckbox = new Checkbox(this, "invert", mVolSlider, kAnchor_Right, &mVoiceParams.mInvert);
    mFilterSlider = new FloatSlider(this, "filter", mVolSlider, kAnchor_Below, 140, 15, &mVoiceParams.mFilter, 0, 5);
-   mFeedbackSlider = new FloatSlider(this, "feedback", mFilterSlider, kAnchor_Below, 140, 15, &mVoiceParams.mFeedback, .5f, .9999f, 4);
+   mFeedbackSlider = new FloatSlider(this, "feedback", mFilterSlider, kAnchor_Below, 140, 15, &mVoiceParams.mFeedback, .5, .9999, 4);
    mSourceDropdown = new DropdownList(this, "source type", mFeedbackSlider, kAnchor_Below, (int*)&mVoiceParams.mSourceType, 52);
    mExciterFreqSlider = new FloatSlider(this, "x freq", mSourceDropdown, kAnchor_Right, 85, 15, &mVoiceParams.mExciterFreq, 10, 1000);
-   mExciterAttackSlider = new FloatSlider(this, "x att", mSourceDropdown, kAnchor_Below, 69, 15, &mVoiceParams.mExciterAttack, 0.01f, 40);
-   mExciterDecaySlider = new FloatSlider(this, "x dec", mExciterAttackSlider, kAnchor_Right, 68, 15, &mVoiceParams.mExciterDecay, 0.01f, 40);
+   mExciterAttackSlider = new FloatSlider(this, "x att", mSourceDropdown, kAnchor_Below, 69, 15, &mVoiceParams.mExciterAttack, 0.01, 40);
+   mExciterDecaySlider = new FloatSlider(this, "x dec", mExciterAttackSlider, kAnchor_Right, 68, 15, &mVoiceParams.mExciterDecay, 0.01, 40);
    mVelToVolumeSlider = new FloatSlider(this, "vel2vol", mExciterAttackSlider, kAnchor_Below, 140, 15, &mVoiceParams.mVelToVolume, 0, 1);
    mVelToEnvelopeSlider = new FloatSlider(this, "vel2env", mVelToVolumeSlider, kAnchor_Below, 140, 15, &mVoiceParams.mVelToEnvelope, -1, 1);
    mPitchToneSlider = new FloatSlider(this, "pitchtone", mVelToVolumeSlider, kAnchor_Right, 125, 15, &mVoiceParams.mPitchTone, -2, 2);
@@ -104,7 +104,7 @@ void KarplusStrong::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();
@@ -140,7 +140,7 @@ void KarplusStrong::PlayNote(NoteMessage note)
    }
 
    if (note.velocity > 0)
-      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0, note.voiceIdx, note.modulation);
    else
       mPolyMgr.Stop(note.time, note.pitch, note.voiceIdx);
 }
@@ -189,7 +189,7 @@ void KarplusStrong::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
 }
 
-void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

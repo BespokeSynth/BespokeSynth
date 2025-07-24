@@ -47,11 +47,11 @@ enum VoiceType
 
 struct VoiceInfo
 {
-   float mPitch{ -1 };
+   double mPitch{ -1 };
    IMidiVoice* mVoice{ nullptr };
    double mTime{ 0 };
    bool mNoteOn{ false };
-   float mActivity{ 0 };
+   double mActivity{ 0 };
 };
 
 class PolyphonyMgr
@@ -63,10 +63,10 @@ public:
    void Init(VoiceType type,
              IVoiceParams* mVoiceParams);
 
-   int Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
+   int Start(double time, int pitch, double amount, int voiceIdx, ModulationParameters modulation);
    void Stop(double time, int pitch, int voiceIdx);
    void Process(double time, ChannelBuffer* out, int bufferSize);
-   void DrawDebug(float x, float y);
+   void DrawDebug(double x, double y);
    void SetVoiceLimit(int limit) { mVoiceLimit = limit; }
    void KillAll();
    void SetOversampling(int oversampling) { mOversampling = oversampling; }

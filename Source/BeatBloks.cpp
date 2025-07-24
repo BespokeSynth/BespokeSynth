@@ -35,11 +35,11 @@
 #define pclose _pclose
 #endif
 
-const float mBufferX = 5;
-const float mBufferY = 80;
-const float mBufferW = 900;
-const float mBufferH = 200;
-const float mRemixBufferY = mBufferY + mBufferH + 60;
+const double mBufferX = 5;
+const double mBufferY = 80;
+const double mBufferW = 900;
+const double mBufferH = 200;
+const double mRemixBufferY = mBufferY + mBufferH + 60;
 
 BeatBloks::BeatBloks()
 : mRemixZoomEnd(gSampleRate * 25)
@@ -114,21 +114,21 @@ void BeatBloks::Process(double time)
       mWantWrite = false;
    }
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
    float volSq = mVolume * mVolume;
 
-   float clipStart = mClipStart;
-   float clipEnd = mClipEnd;
+   double clipStart = mClipStart;
+   double clipEnd = mClipEnd;
    if (mPlay && (clipStart < clipEnd))
    {
-      float speed = float(clipEnd - clipStart) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
+      double speed = static_cast<double>(clipEnd - clipStart) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
 
       const float* data = mSample->Data()->GetChannel(0);
       int numSamples = mSample->LengthInSamples();
-      float sampleRateRatio = mSample->GetSampleRateRatio();
+      auto sampleRateRatio = mSample->GetSampleRateRatio();
 
       mPlayheadRemainder = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % mNumBars);
       mPlayheadRemainder /= mNumBars;
@@ -138,7 +138,7 @@ void BeatBloks::Process(double time)
       mPlayheadWhole += int(clipStart);
       mPlayheadRemainder += clipStart - int(clipStart);
       mPlayheadWhole = MAX(0, mPlayheadWhole);
-      mPlayheadRemainder = MAX(0.0f, mPlayheadRemainder);
+      mPlayheadRemainder = MAX(0.0, mPlayheadRemainder);
 
       for (int i = 0; i < bufferSize; ++i)
       {
@@ -156,11 +156,11 @@ void BeatBloks::Process(double time)
    Blok* heldBlok = mHeldBlok; //hold onto it in case it gets nulled in the main thread
    if (mPlayBlokPreview && heldBlok)
    {
-      float speed = 1;
+      double speed = 1;
 
       const float* data = mSample->Data()->GetChannel(0);
       int numSamples = mSample->LengthInSamples();
-      float sampleRateRatio = mSample->GetSampleRateRatio();
+      auto sampleRateRatio = mSample->GetSampleRateRatio();
 
       double previewTime = time;
       for (int i = 0; i < bufferSize; ++i)
@@ -180,7 +180,7 @@ void BeatBloks::Process(double time)
             }
          }
 
-         float lookupPlayhead = StartTime(*heldBlok) * numSamples + mBlokPreviewPlayhead;
+         double lookupPlayhead = StartTime(*heldBlok) * numSamples + mBlokPreviewPlayhead;
 
          out[i] = GetInterpolatedSample(lookupPlayhead, data, numSamples);
          out[i] *= mBlokPreviewRamp.Value(previewTime);
@@ -193,15 +193,15 @@ void BeatBloks::Process(double time)
 
    if (mPlayRemix)
    {
-      float speed = 1;
+      double speed = 1;
 
       const float* data = mSample->Data()->GetChannel(0);
       int numSamples = mSample->LengthInSamples();
-      float sampleRateRatio = mSample->GetSampleRateRatio();
+      double sampleRateRatio = mSample->GetSampleRateRatio();
 
       for (int i = 0; i < bufferSize; ++i)
       {
-         float remixPlayheadLeft = mRemixPlayhead;
+         double remixPlayheadLeft = mRemixPlayhead;
          Blok* currentBlok = nullptr;
          for (auto iter = mRemixBloks.begin(); iter != mRemixBloks.end(); ++iter)
          {
@@ -226,7 +226,7 @@ void BeatBloks::Process(double time)
             mRemixJumpBlender.CaptureForJump(mLastLookupPlayhead, data, numSamples, i);
          }
 
-         float lookupPlayhead = StartTime(*currentBlok) * numSamples + remixPlayheadLeft;
+         double lookupPlayhead = StartTime(*currentBlok) * numSamples + remixPlayheadLeft;
          mLastLookupPlayhead = lookupPlayhead;
 
          out[i] = GetInterpolatedSample(lookupPlayhead, data, numSamples);
@@ -244,7 +244,7 @@ void BeatBloks::Process(double time)
    GetVizBuffer()->WriteChunk(out, bufferSize, 0);
 }
 
-void BeatBloks::FilesDropped(std::vector<std::string> files, int x, int y)
+void BeatBloks::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    mLoading = true;
 
@@ -353,17 +353,17 @@ void BeatBloks::ReadEchonestLine(const char* line)
    }
    else
    {
-      float lengthInSeconds = mSample->LengthInSamples() / gSampleRate;
+      double lengthInSeconds = mSample->LengthInSamples() / gSampleRate;
 
       if (mReadState == kReadState_Bars || mReadState == kReadState_Beats || mReadState == kReadState_Tatums)
          assert(tokens.size() == 3);
       if (mReadState == kReadState_Sections || mReadState == kReadState_Segments)
          assert(tokens.size() == 2);
 
-      float adjustSeconds = -.062f;
-      float start = (ofToFloat(tokens[0]) + adjustSeconds) / lengthInSeconds;
-      float duration = ofToFloat(tokens[1]) / lengthInSeconds;
-      float confidence = tokens.size() == 3 ? ofToFloat(tokens[2]) : 1;
+      double adjustSeconds = -.062;
+      double start = (ofToDouble(tokens[0]) + adjustSeconds) / lengthInSeconds;
+      double duration = ofToDouble(tokens[1]) / lengthInSeconds;
+      double confidence = tokens.size() == 3 ? ofToDouble(tokens[2]) : 1;
 
       Blok blok(start, duration, confidence);
       if (mReadState == kReadState_Bars)
@@ -420,7 +420,7 @@ void BeatBloks::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDoubleLengthButton)
    {
-      float newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
+      double newEnd = (mClipEnd - mClipStart) * 2 + mClipStart;
       if (newEnd < mSample->LengthInSamples())
       {
          mClipEnd = newEnd;
@@ -431,7 +431,7 @@ void BeatBloks::ButtonClicked(ClickButton* button, double time)
    {
       if (mNumBars % 2 == 0)
       {
-         float newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
+         double newEnd = (mClipEnd - mClipStart) / 2 + mClipStart;
          mClipEnd = newEnd;
          mNumBars /= 2;
       }
@@ -483,7 +483,7 @@ void BeatBloks::UpdateZoomExtents()
    mClipEndSlider->SetExtents(mZoomStart, mZoomEnd);
 }
 
-void BeatBloks::OnClicked(float x, float y, bool right)
+void BeatBloks::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -499,8 +499,8 @@ void BeatBloks::OnClicked(float x, float y, bool right)
       y -= mBufferY;
       if (y < MEASURE_ZONE_HEIGHT) //clicked measure
       {
-         float zoomPos = x / mBufferW;
-         float pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
+         double zoomPos = x / mBufferW;
+         double pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
          for (int i = 0; i < mBars.size(); ++i)
          {
             if (StartTime(mBars[i]) < pos && pos < StartTime(mBars[i]) + mBars[i].mDuration)
@@ -509,8 +509,8 @@ void BeatBloks::OnClicked(float x, float y, bool right)
       }
       else if (y > mBufferH - BEAT_ZONE_HEIGHT) //clicked beat
       {
-         float zoomPos = x / mBufferW;
-         float pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
+         double zoomPos = x / mBufferW;
+         double pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
          for (int i = 0; i < mBeats.size(); ++i)
          {
             if (StartTime(mBeats[i]) < pos && pos < StartTime(mBeats[i]) + mBeats[i].mDuration)
@@ -519,8 +519,8 @@ void BeatBloks::OnClicked(float x, float y, bool right)
       }
       else //clicked tatum
       {
-         float zoomPos = x / mBufferW;
-         float pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
+         double zoomPos = x / mBufferW;
+         double pos = ofMap(zoomPos, 0, 1, mZoomStart / sampleLength, mZoomEnd / sampleLength);
          for (int i = 0; i < mTatums.size(); ++i)
          {
             if (StartTime(mTatums[i]) < pos && pos < StartTime(mTatums[i]) + mTatums[i].mDuration)
@@ -537,7 +537,7 @@ void BeatBloks::OnClicked(float x, float y, bool right)
          }
          else
          {
-            float pos = ofMap(StartTime(*mHeldBlok), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
+            double pos = ofMap(StartTime(*mHeldBlok), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
             mGrabOffsetX = x - mBufferW * pos;
 
             mGrabOffsetY = y;
@@ -623,7 +623,7 @@ void BeatBloks::MouseReleased()
       mHeldBlok = nullptr;
 }
 
-bool BeatBloks::MouseMoved(float x, float y)
+bool BeatBloks::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -688,7 +688,7 @@ void BeatBloks::DrawModule()
 
          for (int i = 0; i < drawBloks.size(); ++i)
          {
-            float pos = ofMap(StartTime(drawBloks[i]), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
+            double pos = ofMap(StartTime(drawBloks[i]), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
             if (pos >= 0 && pos <= 1)
                ofLine(mBufferW * pos, 0, mBufferW * pos, mBufferH);
          }
@@ -697,9 +697,9 @@ void BeatBloks::DrawModule()
          for (int i = 0; i < mBars.size(); ++i)
          {
             ofSetColor(255, 0, (i % 2) * 255, 60);
-            float pos = ofMap(StartTime(mBars[i]), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
-            float dur = ofMap(mBars[i].mDuration, 0, (mZoomEnd - mZoomStart) / sampleLength, 0, 1);
-            float end = pos + dur;
+            double pos = ofMap(StartTime(mBars[i]), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
+            double dur = ofMap(mBars[i].mDuration, 0, (mZoomEnd - mZoomStart) / sampleLength, 0, 1);
+            double end = pos + dur;
             if ((pos >= 0 && pos <= 1) || (end >= 0 && end <= 1))
             {
                pos = ofClamp(pos, 0, 1);
@@ -711,9 +711,9 @@ void BeatBloks::DrawModule()
          for (int i = 0; i < mBeats.size(); ++i)
          {
             ofSetColor(255, 255, (i % 2) * 255, 60);
-            float pos = ofMap(StartTime(mBeats[i]), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
-            float dur = ofMap(mBeats[i].mDuration, 0, (mZoomEnd - mZoomStart) / sampleLength, 0, 1);
-            float end = pos + dur;
+            double pos = ofMap(StartTime(mBeats[i]), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
+            double dur = ofMap(mBeats[i].mDuration, 0, (mZoomEnd - mZoomStart) / sampleLength, 0, 1);
+            double end = pos + dur;
             if ((pos >= 0 && pos <= 1) || (end >= 0 && end <= 1))
             {
                pos = ofClamp(pos, 0, 1);
@@ -725,9 +725,9 @@ void BeatBloks::DrawModule()
          for (int i = 0; i < mTatums.size(); ++i)
          {
             ofSetColor(0, 255, 255, ((i + 1) % 2) * 20);
-            float pos = ofMap(StartTime(mTatums[i]), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
-            float dur = ofMap(mTatums[i].mDuration, 0, (mZoomEnd - mZoomStart) / sampleLength, 0, 1);
-            float end = pos + dur;
+            double pos = ofMap(StartTime(mTatums[i]), mZoomStart / sampleLength, mZoomEnd / sampleLength, 0, 1);
+            double dur = ofMap(mTatums[i].mDuration, 0, (mZoomEnd - mZoomStart) / sampleLength, 0, 1);
+            double end = pos + dur;
             if ((pos >= 0 && pos <= 1) || (end >= 0 && end <= 1))
             {
                pos = ofClamp(pos, 0, 1);
@@ -765,9 +765,9 @@ void BeatBloks::DrawModule()
    int i = 0;
    for (auto iter = mRemixBloks.begin(); iter != mRemixBloks.end(); ++iter, ++i)
    {
-      float dur = ofMap((*iter)->mDuration * sourceSampleLength, mRemixZoomStart, mRemixZoomEnd, 0, 1);
+      double dur = ofMap((*iter)->mDuration * sourceSampleLength, mRemixZoomStart, mRemixZoomEnd, 0, 1);
 
-      float width = MAX(0.0f, mBufferW * dur);
+      double width = MAX(0.0, mBufferW * dur);
       DrawAudioBuffer(width, mBufferH, mSample->Data(), StartTime(*(*iter)) * sourceSampleLength, (StartTime(*(*iter)) + (*iter)->mDuration) * sourceSampleLength, -1);
 
       if ((*iter)->mType == kBlok_Bar)
@@ -811,7 +811,7 @@ void BeatBloks::DrawModule()
    if (mPlayRemix)
    {
       ofSetColor(0, 255, 0);
-      float pos = mBufferW * ofMap(mRemixPlayhead, mRemixZoomStart, mRemixZoomEnd, 0, 1);
+      double pos = mBufferW * ofMap(mRemixPlayhead, mRemixZoomStart, mRemixZoomEnd, 0, 1);
       ofLine(pos, 0, pos, mBufferH);
    }
    ofPopStyle();
@@ -821,15 +821,15 @@ void BeatBloks::DrawModule()
    {
       ofPushStyle();
       ofSetColor(255, 200, 0, 200);
-      float posRemix = 0;
+      double posRemix = 0;
       for (auto iter = mRemixBloks.begin(); iter != mRemixBloks.end(); ++iter)
       {
-         float dur = ofMap((*iter)->mDuration * sourceSampleLength, mRemixZoomStart, mRemixZoomEnd, 0, 1);
+         double dur = ofMap((*iter)->mDuration * sourceSampleLength, mRemixZoomStart, mRemixZoomEnd, 0, 1);
 
          posRemix += dur / 2;
 
-         float posSrc = ofMap(StartTime(*(*iter)), mZoomStart / sourceSampleLength, mZoomEnd / sourceSampleLength, 0, 1);
-         float durSrc = ofMap((*iter)->mDuration, 0, (mZoomEnd - mZoomStart) / sourceSampleLength, 0, 1);
+         double posSrc = ofMap(StartTime(*(*iter)), mZoomStart / sourceSampleLength, mZoomEnd / sourceSampleLength, 0, 1);
+         double durSrc = ofMap((*iter)->mDuration, 0, (mZoomEnd - mZoomStart) / sourceSampleLength, 0, 1);
          posSrc += durSrc / 2;
          posSrc = ofClamp(posSrc, 0, 1);
          ofLine(mBufferX + mBufferW * posRemix, mRemixBufferY, mBufferX + mBufferW * posSrc, mBufferY + mBufferH);
@@ -845,9 +845,9 @@ void BeatBloks::DrawModule()
       ofTranslate(mMouseX - mGrabOffsetX, mMouseY - mGrabOffsetY);
 
       int sampleLength = MAX(1, mSample->LengthInSamples());
-      float dur = ofMap(mHeldBlok->mDuration, 0, (mZoomEnd - mZoomStart) / sampleLength, 0, 1);
+      double dur = ofMap(mHeldBlok->mDuration, 0, (mZoomEnd - mZoomStart) / sampleLength, 0, 1);
 
-      float width = mBufferW * dur;
+      double width = mBufferW * dur;
       DrawAudioBuffer(width, mBufferH, mSample->Data(), StartTime(*mHeldBlok) * sampleLength, (StartTime(*mHeldBlok) + mHeldBlok->mDuration) * sampleLength, -1);
 
       ofPopMatrix();
@@ -857,29 +857,29 @@ void BeatBloks::DrawModule()
          ofPushStyle();
          ofSetColor(255, 255, 0);
          int insertIndex;
-         float insertPos = GetInsertPosition(insertIndex);
+         double insertPos = GetInsertPosition(insertIndex);
          ofLine(insertPos, mRemixBufferY, insertPos, mRemixBufferY + mBufferH);
          ofPopStyle();
       }
    }
 }
 
-float BeatBloks::StartTime(const BeatBloks::Blok& blok)
+double BeatBloks::StartTime(const BeatBloks::Blok& blok)
 {
-   float numSamples = mSample ? mSample->LengthInSamples() : 1;
+   double numSamples = mSample ? mSample->LengthInSamples() : 1;
    return blok.mStartTime + mOffset / numSamples;
 }
 
-float BeatBloks::GetInsertPosition(int& insertIndex)
+double BeatBloks::GetInsertPosition(int& insertIndex)
 {
-   float insertPos = mBufferX;
+   double insertPos = mBufferX;
    int sourceSampleLength = mSample->LengthInSamples();
    int i = 0;
    for (auto iter = mRemixBloks.begin(); iter != mRemixBloks.end(); ++iter, ++i)
    {
-      float dur = ofMap((*iter)->mDuration * sourceSampleLength, mRemixZoomStart, mRemixZoomEnd, 0, 1);
+      double dur = ofMap((*iter)->mDuration * sourceSampleLength, mRemixZoomStart, mRemixZoomEnd, 0, 1);
 
-      float width = MAX(0.0f, mBufferW * dur);
+      double width = MAX(0.0, mBufferW * dur);
 
       if (mMouseX < insertPos + width / 2)
       {
@@ -896,13 +896,13 @@ float BeatBloks::GetInsertPosition(int& insertIndex)
 BeatBloks::Blok* BeatBloks::RemoveBlokAt(int x)
 {
    int sourceSampleLength = mSample->LengthInSamples();
-   float pos = mBufferX;
+   double pos = mBufferX;
    int i = 0;
    for (auto iter = mRemixBloks.begin(); iter != mRemixBloks.end(); ++iter, ++i)
    {
-      float dur = ofMap((*iter)->mDuration * sourceSampleLength, mRemixZoomStart, mRemixZoomEnd, 0, 1);
+      double dur = ofMap((*iter)->mDuration * sourceSampleLength, mRemixZoomStart, mRemixZoomEnd, 0, 1);
 
-      float width = MAX(0.0f, mBufferW * dur);
+      double width = MAX(0.0, mBufferW * dur);
 
       if (mMouseX < pos + width)
       {
@@ -931,13 +931,13 @@ void BeatBloks::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void BeatBloks::GetModuleDimensions(float& width, float& height)
+void BeatBloks::GetModuleDimensions(double& width, double& height)
 {
    width = 910;
    height = mRemixBufferY + mBufferH + 45;
 }
 
-void BeatBloks::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BeatBloks::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mClipStartSlider)
    {
@@ -985,7 +985,7 @@ void BeatBloks::PlayNote(NoteMessage note)
          int slice = (note.pitch / 8) * 8 + 7 - (note.pitch % 8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = (barLength / 4) * slice + mClipStart;
-         mSample->Play(note.time, 1, position);
+         mSample->Play(note.time, 1, position, -1);
       }
    }
 }

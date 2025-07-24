@@ -74,31 +74,31 @@ public:
    static int RowToPitch(NoteMode noteMode, int row, int octave, int rowOffset);
 
    int PitchToRow(int pitch);
-   void SetStep(int index, int step, int velocity, float length);
-   void SetPitch(int index, int pitch, int velocity, float length);
+   void SetStep(int index, int step, int velocity, double length);
+   void SetPitch(int index, int pitch, int velocity, double length);
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void Poll() override;
 
    //IClickable
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseMoved(double x, double y) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IScaleListener
    void OnScaleChanged() override;
@@ -108,7 +108,7 @@ public:
    void OnMidiControl(MidiControl& control) override;
 
    //UIGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -116,7 +116,7 @@ public:
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //IDrivableSequencer
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
@@ -126,7 +126,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -140,8 +140,8 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
    void KeyPressed(int key, bool isRepeat) override;
 
    void UpdateGridControllerLights(bool force);
@@ -152,18 +152,18 @@ private:
    void ShiftSteps(int amount);
    void UpdateVelocityGridPos();
    void SetUpStepControls();
-   float ExtraWidth() const;
-   float ExtraHeight() const;
+   double ExtraWidth() const;
+   double ExtraHeight() const;
    void RandomizePitches(bool fifths);
    void RandomizeVelocities();
    void RandomizeLengths();
-   void Step(double time, float velocity, int pulseFlags);
+   void Step(double time, double velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
 
    int mTones[NSS_MAX_STEPS]{};
    int mVels[NSS_MAX_STEPS]{};
-   float mNoteLengths[NSS_MAX_STEPS]{};
+   double mNoteLengths[NSS_MAX_STEPS]{};
 
    NoteInterval mInterval{ NoteInterval::kInterval_8n };
    int mArpIndex{ -1 };
@@ -173,7 +173,7 @@ private:
    UIGrid* mVelocityGrid{ nullptr };
    int mLastPitch{ -1 };
    int mLastStepIndex{ -1 };
-   float mLastNoteLength{ 1 };
+   double mLastNoteLength{ 1 };
    double mLastNoteEndTime{ 0 };
    bool mAlreadyDidNoteOff{ false };
    int mOctave{ 3 };
@@ -201,12 +201,12 @@ private:
    ClickButton* mRandomizePitchButton{ nullptr };
    ClickButton* mRandomizeLengthButton{ nullptr };
    ClickButton* mRandomizeVelocityButton{ nullptr };
-   float mRandomizePitchChance{ 1 };
+   double mRandomizePitchChance{ 1 };
    int mRandomizePitchVariety{ 4 };
-   float mRandomizeLengthChance{ 1 };
-   float mRandomizeLengthRange{ 1 };
-   float mRandomizeVelocityChance{ 1 };
-   float mRandomizeVelocityDensity{ .6 };
+   double mRandomizeLengthChance{ 1 };
+   double mRandomizeLengthRange{ 1 };
+   double mRandomizeVelocityChance{ 1 };
+   double mRandomizeVelocityDensity{ .6 };
    FloatSlider* mRandomizePitchChanceSlider{ nullptr };
    IntSlider* mRandomizePitchVarietySlider{ nullptr };
    FloatSlider* mRandomizeLengthChanceSlider{ nullptr };
@@ -234,7 +234,7 @@ private:
    double mPush2ButtonPressTime{ -1 };
    int mQueuedPush2Tone{ -1 };
    int mQueuedPush2Vel{ 127 };
-   float mQueuedPush2Length{ 1 };
+   double mQueuedPush2Length{ 1 };
    bool mGridSyncQueued{ false };
    bool mPush2VelocityHeld{ false };
    bool mPush2LengthHeld{ false };

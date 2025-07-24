@@ -75,7 +75,7 @@ void ModulatorAddCentered::PostRepatch(PatchCableSource* cableSource, bool fromU
    }
 }
 
-float ModulatorAddCentered::Value(int samplesIn)
+double ModulatorAddCentered::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    if (GetSliderTarget())

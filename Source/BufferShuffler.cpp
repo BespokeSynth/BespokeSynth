@@ -95,7 +95,7 @@ void BufferShuffler::Process(double time)
    SyncBuffers();
    mInputBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
 
    if (mEnabled)
    {
@@ -143,7 +143,7 @@ void BufferShuffler::Process(double time)
                mInputBuffer.GetChannel(ch)[writePosition] = GetBuffer()->GetChannel(ch)[i];
 
             float outputSample = mOnlyPlayWhenTriggered ? 0 : GetBuffer()->GetChannel(ch)[i];
-            if (mPlaybackSampleIndex != -1)
+            if (!ofAlmostEquel(mPlaybackSampleIndex, -1))
             {
                outputSample = GetInterpolatedSample(mPlaybackSampleIndex, mInputBuffer.GetChannel(ch), GetLengthInSamples());
             }
@@ -155,7 +155,7 @@ void BufferShuffler::Process(double time)
 
             if (mFourTet > 0)
             {
-               float readPosition = GetFourTetPosition(time);
+               double readPosition = GetFourTetPosition(time);
                if (ch == 0)
                {
                   if (abs(readPosition - mFourTetSampleIndex) > 1000)
@@ -173,7 +173,7 @@ void BufferShuffler::Process(double time)
                   mFourTetSampleIndex = readPosition;
                }
 
-               float fourTetSample = GetInterpolatedSample(readPosition, mInputBuffer.GetChannel(ch), GetLengthInSamples());
+               double fourTetSample = GetInterpolatedSample(readPosition, mInputBuffer.GetChannel(ch), GetLengthInSamples());
                outputSample = ofLerp(outputSample, fourTetSample, mFourTet);
             }
 
@@ -181,7 +181,7 @@ void BufferShuffler::Process(double time)
          }
 
          if (mPlaybackSampleIndex != -1)
-            mPlaybackSampleIndex = FloatWrap(mPlaybackSampleIndex + GetSlicePlaybackRate(), GetLengthInSamples());
+            mPlaybackSampleIndex = DoubleWrap(mPlaybackSampleIndex + GetSlicePlaybackRate(), GetLengthInSamples());
 
          writePosition = (writePosition + 1) % GetLengthInSamples();
 
@@ -198,22 +198,22 @@ void BufferShuffler::Process(double time)
    GetBuffer()->Reset();
 }
 
-float BufferShuffler::GetFourTetPosition(double time)
+double BufferShuffler::GetFourTetPosition(double time)
 {
-   float measurePos = TheTransport->GetMeasurePos(time);
+   double measurePos = TheTransport->GetMeasurePos(time);
    measurePos += TheTransport->GetMeasure(time) % mNumBars;
    measurePos /= mNumBars;
    int numSlices = mFourTetSlices * 2 * mNumBars;
    measurePos *= numSlices;
-   int slice = (int)measurePos;
-   float sliceProgress = measurePos - slice;
-   float offset;
+   int slice = static_cast<int>(measurePos);
+   double sliceProgress = measurePos - slice;
+   double offset;
    if (slice % 2 == 0)
-      offset = (sliceProgress + slice / 2) * (GetLengthInSamples() / float(numSlices) * 2);
+      offset = (sliceProgress + slice / 2) * (GetLengthInSamples() / static_cast<double>(numSlices) * 2);
    else
-      offset = (1 - sliceProgress + slice / 2) * (GetLengthInSamples() / float(numSlices) * 2);
+      offset = (1 - sliceProgress + slice / 2) * (GetLengthInSamples() / static_cast<double>(numSlices) * 2);
 
-   return FloatWrap(offset, GetLengthInSamples());
+   return DoubleWrap(offset, GetLengthInSamples());
 }
 
 void BufferShuffler::DrawModule()
@@ -238,7 +238,7 @@ void BufferShuffler::DrawModuleUnclipped()
       DrawTextNormal(mDebugDisplayText, 0, mHeight + 20);
 }
 
-void BufferShuffler::DrawBuffer(float x, float y, float w, float h)
+void BufferShuffler::DrawBuffer(double x, double y, double w, double h)
 {
    ofPushMatrix();
    ofTranslate(x, y);
@@ -248,18 +248,18 @@ void BufferShuffler::DrawBuffer(float x, float y, float w, float h)
    ofPushStyle();
    ofFill();
 
-   float writePosX = x + GetWritePositionInSamples(gTime) / (float)GetLengthInSamples() * w;
+   double writePosX = x + GetWritePositionInSamples(gTime) / static_cast<double>(GetLengthInSamples()) * w;
    ofSetColor(200, 200, 200);
    ofCircle(writePosX, y, 3);
    if (mPlaybackSampleIndex != -1)
    {
-      float playPosX = x + mPlaybackSampleIndex / (float)GetLengthInSamples() * w;
+      double playPosX = x + mPlaybackSampleIndex / static_cast<double>(GetLengthInSamples()) * w;
       ofSetColor(0, 255, 0);
       ofLine(playPosX, y, playPosX, y + h);
    }
    if (mFourTet > 0)
    {
-      float playPosX = x + mFourTetSampleIndex / (float)GetLengthInSamples() * w;
+      double playPosX = x + mFourTetSampleIndex / static_cast<double>(GetLengthInSamples()) * w;
       ofSetColor(0, 255, 0);
       ofLine(playPosX, y, playPosX, y + h);
    }
@@ -291,14 +291,14 @@ int BufferShuffler::GetNumSlices()
    return TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom() * mNumBars;
 }
 
-void BufferShuffler::OnClicked(float x, float y, bool right)
+void BufferShuffler::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
    if (!right && x >= 5 && x <= mWidth - 5 && y > 20)
    {
-      float bufferWidth = mWidth - 10;
-      float pos = (x - 5) / bufferWidth;
+      double bufferWidth = mWidth - 10;
+      double pos = (x - 5) / bufferWidth;
       int slice = int(pos * GetNumSlices());
       PlayOneShot(slice);
    }
@@ -313,7 +313,7 @@ void BufferShuffler::PlayOneShot(int slice)
    TheTransport->GetQuantized(currentTime, &timeInfo, &remainderMs);
    double timeUntilNextInterval = sliceSizeMs - remainderMs;
    double startTime = currentTime + timeUntilNextInterval;
-   double endTime = startTime + sliceSizeMs / abs(GetSlicePlaybackRate());
+   double endTime = startTime + sliceSizeMs / std::abs(GetSlicePlaybackRate());
    QueueEvent(startTime, slice, mPlaybackStyle);
    QueueEvent(endTime, -1);
 }
@@ -381,7 +381,7 @@ BufferShuffler::PlaybackStyle BufferShuffler::VelocityToPlaybackStyle(int veloci
       return PlaybackStyle::HalfReverse;
 }
 
-float BufferShuffler::GetSlicePlaybackRate() const
+double BufferShuffler::GetSlicePlaybackRate() const
 {
    switch (mPlaybackStyle)
    {
@@ -390,19 +390,19 @@ float BufferShuffler::GetSlicePlaybackRate() const
       case PlaybackStyle::Double:
          return 2;
       case PlaybackStyle::Half:
-         return .5f;
+         return .5;
       case PlaybackStyle::Reverse:
          return -1;
       case PlaybackStyle::DoubleReverse:
          return -2;
       case PlaybackStyle::HalfReverse:
-         return -.5f;
+         return -.5;
       default:
          return 1;
    }
 }
 
-bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue)
 {
    if (type == kMidiMessage_Note)
    {
@@ -477,7 +477,7 @@ void BufferShuffler::OnControllerPageSelected()
    UpdateGridControllerLights(true);
 }
 
-void BufferShuffler::OnGridButton(int x, int y, float velocity, IGridController* grid)
+void BufferShuffler::OnGridButton(int x, int y, double velocity, IGridController* grid)
 {
    if (velocity > 0)
    {
@@ -557,8 +557,8 @@ void BufferShuffler::LoadState(FileStreamIn& in, int rev)
 
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   in >> FloatAsDouble >> mWidth;
+   in >> FloatAsDouble >> mHeight;
    Resize(mWidth, mHeight);
 
    int savedSampleRate;
@@ -576,7 +576,7 @@ void BufferShuffler::LoadState(FileStreamIn& in, int rev)
       ChannelBuffer readBuffer(savedLength);
       readBuffer.Load(in, savedLength, ChannelBuffer::LoadMode::kAnyBufferSize);
 
-      float sampleRateRatio = (float)gSampleRate / savedSampleRate;
+      const double sampleRateRatio = static_cast<double>(gSampleRate) / savedSampleRate;
       int adjustedLength = savedLength * sampleRateRatio;
       mInputBuffer.SetNumActiveChannels(savedChannelCount);
       for (int ch = 0; ch < savedChannelCount; ++ch)

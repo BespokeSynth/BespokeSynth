@@ -92,12 +92,12 @@ void PulseHocket::DrawModule()
 
 void PulseHocket::AdjustHeight()
 {
-   float deterministicPad = 28;
+   double deterministicPad = 28;
 
    if (!mDeterministic)
       deterministicPad = 3;
 
-   float height = mNumDestinations * 17 + deterministicPad;
+   double height = mNumDestinations * 17 + deterministicPad;
    mSeedEntry->Move(0, height - mHeight);
    mPrevSeedButton->Move(0, height - mHeight);
    mReseedButton->Move(0, height - mHeight);
@@ -105,20 +105,20 @@ void PulseHocket::AdjustHeight()
    mHeight = height;
 }
 
-void PulseHocket::OnPulse(double time, float velocity, int flags)
+void PulseHocket::OnPulse(double time, double velocity, int flags)
 {
    ComputeSliders(0);
 
    if (flags & kPulseFlag_Reset)
       mRandomIndex = 0;
 
-   float totalWeight = 0;
+   double totalWeight = 0;
    for (int i = 0; i < mNumDestinations; ++i)
       totalWeight += mWeight[i];
-   float random;
+   double random;
    if (mDeterministic)
    {
-      random = ((abs(DeterministicRandom(mSeed, mRandomIndex)) % 10000) / 10000.0f) * totalWeight;
+      random = abs(DeterministicRandom(mSeed, mRandomIndex)) % 10000 / 10000.0 * totalWeight;
       ++mRandomIndex;
    }
    else
@@ -172,7 +172,7 @@ void PulseHocket::SetUpFromSaveData()
       for (int i = oldNumItems; i < mNumDestinations; ++i)
       {
          mDestinationCables.push_back(new PatchCableSource(this, kConnectionType_Pulse));
-         mDestinationCables[i]->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
+         mDestinationCables[i]->SetOverrideCableDir(ofVec2d(1, 0), PatchCableSource::Side::kRight);
          AddPatchCableSource(mDestinationCables[i]);
          ofRectangle rect = mWeightSlider[i]->GetRect(true);
          mDestinationCables[i]->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);

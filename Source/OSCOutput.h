@@ -60,7 +60,7 @@ public:
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -72,11 +72,11 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    std::string mLabels[OSC_OUTPUT_MAX_PARAMS];
    std::list<TextEntry*> mLabelEntry{};
-   float mParams[OSC_OUTPUT_MAX_PARAMS];
+   double mParams[OSC_OUTPUT_MAX_PARAMS];
    std::list<FloatSlider*> mSliders{};
 
    std::string mOscOutAddress{ "127.0.0.1" };
@@ -89,6 +89,6 @@ private:
 
    juce::OSCSender mOscOut;
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 };

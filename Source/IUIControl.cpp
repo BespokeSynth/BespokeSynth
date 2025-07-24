@@ -48,7 +48,7 @@ bool IUIControl::IsSnapshot()
    return mSnapshotHighlight;
 }
 
-bool IUIControl::TestHover(int x, int y)
+bool IUIControl::TestHover(double x, double y)
 {
    if (mNoHover)
       return false;
@@ -56,20 +56,20 @@ bool IUIControl::TestHover(int x, int y)
    if (!mShowing)
       return false;
 
-   float w, h;
+   double w, h;
    GetDimensions(w, h);
    if (x >= 0 && x < w && y >= 0 && y < h) //make sure we're hovered over the control
    {
       IDrawableModule* moduleParent = GetModuleParent();
-      float thisX, thisY;
+      double thisX, thisY;
       GetPosition(thisX, thisY);
       x += thisX;
       y += thisY;
       if (moduleParent->GetOwningContainer()->GetModuleAt(x, y) == moduleParent)
       {
-         float localX, localY;
+         double localX, localY;
          GetPosition(localX, localY, K(localOnly));
-         float parentW, parentH;
+         double parentW, parentH;
          GetParent()->GetDimensions(parentW, parentH);
          if (localX < parentW && localY < parentH)
             return true;
@@ -79,7 +79,7 @@ bool IUIControl::TestHover(int x, int y)
    return false;
 }
 
-void IUIControl::CheckHover(int x, int y)
+void IUIControl::CheckHover(double x, double y)
 {
    static long sLastHoveredUIControlFrame = 0;
    if (TheSynth->GetFrameCount() != sLastHoveredUIControlFrame &&
@@ -95,7 +95,7 @@ void IUIControl::CheckHover(int x, int y)
    }
 }
 
-void IUIControl::DrawHover(float x, float y, float w, float h)
+void IUIControl::DrawHover(double x, double y, double w, double h)
 {
    if (Push2Control::sDrawingPush2Display)
       return;
@@ -141,11 +141,11 @@ void IUIControl::DrawPatchCableHover()
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Grid) &&
        PatchCable::sActivePatchCable->IsValidTarget(this))
    {
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
       ofPushStyle();
       ofNoFill();
-      ofSetLineWidth(1.5f);
+      ofSetLineWidth(1.5);
       ofSetColor(255, 0, 255, 200);
       ofRect(mX, mY, w, h);
       ofPopStyle();
@@ -171,7 +171,7 @@ void IUIControl::StartBeacon()
 
 void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)
 {
-   ofRectangle rect = anchor->GetRect(true);
+   auto rect = anchor->GetRect(true);
    if (direction == kAnchor_Below)
    {
       mX = rect.x;
@@ -196,9 +196,9 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
       color = IDrawableModule::GetColor(module->GetModuleCategory());
    else
       color = ofColor::white;
-   float h, s, b;
+   double h, s, b;
    color.getHsb(h, s, b);
-   color.setHsb(h, s * .4f, ofLerp(b, 0, .6f));
+   color.setHsb(h, s * .4, ofLerp(b, 0, .6));
    if (IsSnapshot())
    {
       color.getHsb(h, s, b);
@@ -261,20 +261,20 @@ void IUIControl::SetNewManualHoverViaTab(int direction)
 namespace
 {
    //only supports cardinal directions
-   float GetDistanceScore(ofVec2f direction, ofRectangle rectA, ofRectangle rectB)
+   double GetDistanceScore(ofVec2d direction, ofRectangle rectA, ofRectangle rectB)
    {
-      float score = 0;
-      ofVec2f edgeA = rectA.getCenter() + ofVec2f(rectA.width * .5f * direction.x, rectA.height * .5f * direction.y);
-      ofVec2f edgeB = rectB.getCenter() + ofVec2f(rectB.width * -.5f * direction.x, rectB.height * -.5f * direction.y);
-      ofVec2f toRect = edgeB - edgeA;
-      float dot = direction.dot(toRect);
+      double score = 0;
+      ofVec2d edgeA = rectA.getCenter() + ofVec2d(rectA.width * .5 * direction.x, rectA.height * .5 * direction.y);
+      ofVec2d edgeB = rectB.getCenter() + ofVec2d(rectB.width * -.5 * direction.x, rectB.height * -.5 * direction.y);
+      ofVec2d toRect = edgeB - edgeA;
+      double dot = direction.dot(toRect);
       if (dot > 0)
       {
-         ofVec2f perpendicularDirection(direction.y, direction.x);
-         float minExtentA = fabsf(rectA.getMinX() * perpendicularDirection.x + rectA.getMinY() * perpendicularDirection.y);
-         float maxExtentA = fabsf(rectA.getMaxX() * perpendicularDirection.x + rectA.getMaxY() * perpendicularDirection.y);
-         float minExtentB = fabsf(rectB.getMinX() * perpendicularDirection.x + rectB.getMinY() * perpendicularDirection.y);
-         float maxExtentB = fabsf(rectB.getMaxX() * perpendicularDirection.x + rectB.getMaxY() * perpendicularDirection.y);
+         ofVec2d perpendicularDirection(direction.y, direction.x);
+         double minExtentA = std::abs(rectA.getMinX() * perpendicularDirection.x + rectA.getMinY() * perpendicularDirection.y);
+         double maxExtentA = std::abs(rectA.getMaxX() * perpendicularDirection.x + rectA.getMaxY() * perpendicularDirection.y);
+         double minExtentB = std::abs(rectB.getMinX() * perpendicularDirection.x + rectB.getMinY() * perpendicularDirection.y);
+         double maxExtentB = std::abs(rectB.getMaxX() * perpendicularDirection.x + rectB.getMaxY() * perpendicularDirection.y);
          if (minExtentA <= maxExtentB && maxExtentA >= minExtentB) //overlap, score based upon closest in the specified direction
             score = 1 / direction.dot(toRect) + 1000; //bonus points so that overlapping ones win
          else //no overlap,but still in the requested direction. score based upon overall distance
@@ -286,7 +286,7 @@ namespace
 }
 
 //static
-void IUIControl::SetNewManualHoverViaArrow(ofVec2f direction)
+void IUIControl::SetNewManualHoverViaArrow(ofVec2d direction)
 {
    if (gHoveredUIControl == nullptr)
    {
@@ -300,13 +300,13 @@ void IUIControl::SetNewManualHoverViaArrow(ofVec2f direction)
       {
          const auto& controls = uiControlModule->GetUIControls();
          ofRectangle currentControlRect = gHoveredUIControl->GetRect();
-         float bestScore = 0;
+         double bestScore = 0;
          int bestScoreIndex = -1;
          for (int i = 0; i < (int)controls.size(); ++i)
          {
             if (controls[i]->IsShowing() && !controls[i]->GetNoHover() && controls[i] != gHoveredUIControl)
             {
-               float score = GetDistanceScore(direction, currentControlRect, controls[i]->GetRect());
+               double score = GetDistanceScore(direction, currentControlRect, controls[i]->GetRect());
                if (score > bestScore)
                {
                   bestScore = score;
@@ -331,13 +331,13 @@ void IUIControl::DestroyCablesTargetingControls(std::vector<IUIControl*> control
    std::vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
    std::vector<PatchCable*> cablesToDestroy;
-   for (const auto module_iter : modules)
+   for (const auto& module_iter : modules)
    {
-      for (const auto source : module_iter->GetPatchCableSources())
+      for (const auto& source : module_iter->GetPatchCableSources())
       {
-         for (const auto cable : source->GetPatchCables())
+         for (const auto& cable : source->GetPatchCables())
          {
-            for (const auto control : controls)
+            for (const auto& control : controls)
             {
                if (cable->GetTarget() == control)
                {
@@ -348,6 +348,6 @@ void IUIControl::DestroyCablesTargetingControls(std::vector<IUIControl*> control
          }
       }
    }
-   for (const auto cable : cablesToDestroy)
+   for (const auto& cable : cablesToDestroy)
       cable->Destroy(false);
 }

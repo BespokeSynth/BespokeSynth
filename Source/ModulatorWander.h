@@ -52,14 +52,14 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //IModulator
-   float Value(int samplesIn = 0) override;
+   double Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -69,28 +69,28 @@ public:
 
 private:
    void UpdateRange();
-   float GetPerlin(double sampleOffset);
+   double GetPerlin(double sampleOffset);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
+   void GetModuleDimensions(double& w, double& h) override
    {
       w = mWidth;
       h = mHeight;
    }
 
-   float mWidth{ 100 };
-   float mHeight{ 100 };
+   double mWidth{ 100 };
+   double mHeight{ 100 };
 
    PerlinNoise mPerlinNoise;
    int mPerlinSeed{ 0 };
    double mPerlinPos{ 0.0 };
-   float mCenter{ 0.5f };
+   double mCenter{ 0.5 };
    FloatSlider* mCenterSlider{ nullptr };
-   float mRange{ 1.0f };
+   double mRange{ 1.0 };
    FloatSlider* mRangeSlider{ nullptr };
-   float mSpeed{ 1.0f };
+   double mSpeed{ 1.0 };
    FloatSlider* mSpeedSlider{ nullptr };
-   float mBias{ 0.5f };
+   double mBias{ 0.5 };
    FloatSlider* mBiasSlider{ nullptr };
 };

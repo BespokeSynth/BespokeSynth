@@ -188,7 +188,7 @@ void VolcaBeatsControl::PlayNote(NoteMessage note)
       PlayNoteOutput(note);
 }
 
-void VolcaBeatsControl::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void VolcaBeatsControl::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mClapSpeedSlider)
       SendCC(50, (int)(mClapSpeed * 127));

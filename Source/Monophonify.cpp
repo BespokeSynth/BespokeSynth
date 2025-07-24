@@ -180,7 +180,7 @@ void Monophonify::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Monophonify::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Monophonify::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

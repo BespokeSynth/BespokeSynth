@@ -56,10 +56,10 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
 
    bool mono = (out->NumActiveChannels() == 1);
 
-   float pitch;
-   float freq;
-   float vol;
-   float syncPhaseInc;
+   double pitch;
+   double freq;
+   double vol;
+   double syncPhaseInc;
 
    if (mVoiceParams->mLiteCPUMode)
       DoParameterUpdate(0, pitch, freq, vol, syncPhaseInc);
@@ -69,7 +69,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
       if (!mVoiceParams->mLiteCPUMode)
          DoParameterUpdate(pos, pitch, freq, vol, syncPhaseInc);
 
-      float adsrVal = mAdsr.Value(time);
+      double adsrVal = mAdsr.Value(time);
 
       float summedLeft = 0;
       float summedRight = 0;
@@ -91,9 +91,9 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
             }
             else
             {
-               while (mOscData[u].mPhase > FTWO_PI * 2)
+               while (mOscData[u].mPhase > TWO_PI * 2)
                {
-                  mOscData[u].mPhase -= FTWO_PI * 2;
+                  mOscData[u].mPhase -= TWO_PI * 2;
                   mOscData[u].mSyncPhase = 0;
                }
             }
@@ -113,11 +113,11 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
             if (mVoiceParams->mSyncMode != Oscillator::SyncMode::None)
                sample = mOscData[u].mOsc.Value(mOscData[u].mSyncPhase) * adsrVal * vol;
             else
-               sample = mOscData[u].mOsc.Value(mOscData[u].mPhase + mVoiceParams->mPhaseOffset * (1 + (float(u) / mVoiceParams->mUnison))) * adsrVal * vol;
+               sample = mOscData[u].mOsc.Value(mOscData[u].mPhase + mVoiceParams->mPhaseOffset * (1 + (static_cast<double>(u) / mVoiceParams->mUnison))) * adsrVal * vol;
          }
 
          if (u >= 2)
-            sample *= 1 - (mOscData[u].mDetuneFactor * .5f);
+            sample *= 1 - (mOscData[u].mDetuneFactor * .5);
 
          if (mono)
          {
@@ -126,7 +126,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
          else
          {
             //PROFILER(SingleOscillatorVoice_pan);
-            float unisonPan;
+            double unisonPan;
             if (mVoiceParams->mUnison == 1)
                unisonPan = 0;
             else if (u == 0)
@@ -135,7 +135,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
                unisonPan = 1;
             else
                unisonPan = mOscData[u].mDetuneFactor;
-            float pan = GetPan() + unisonPan * mVoiceParams->mUnisonWidth;
+            double pan = GetPan() + unisonPan * mVoiceParams->mUnisonWidth;
             summedLeft += sample * GetLeftPanGain(pan);
             summedRight += sample * GetRightPanGain(pan);
          }
@@ -144,8 +144,8 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
       if (mUseFilter)
       {
          //PROFILER(SingleOscillatorVoice_filter);
-         float f = ofLerp(mVoiceParams->mFilterCutoffMin, mVoiceParams->mFilterCutoffMax, mFilterAdsr.Value(time)) * (1 - GetModWheel(pos) * .9f);
-         float q = mVoiceParams->mFilterQ;
+         double f = ofLerp(mVoiceParams->mFilterCutoffMin, mVoiceParams->mFilterCutoffMax, mFilterAdsr.Value(time)) * (1 - GetModWheel(pos) * .9);
+         double q = mVoiceParams->mFilterQ;
          if (f != mFilterLeft.mF || q != mFilterLeft.mQ)
             mFilterLeft.SetFilterParams(f, q);
          summedLeft = mFilterLeft.Filter(summedLeft);
@@ -175,17 +175,17 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
 }
 
 void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
-                                              float& pitch,
-                                              float& freq,
-                                              float& vol,
-                                              float& syncPhaseInc)
+                                              double& pitch,
+                                              double& freq,
+                                              double& vol,
+                                              double& syncPhaseInc)
 {
    if (mOwner)
       mOwner->ComputeSliders(samplesIn);
 
    pitch = GetPitch(samplesIn);
    freq = TheScale->PitchToFreq(pitch) * mVoiceParams->mMult;
-   vol = mVoiceParams->mVol * .4f / mVoiceParams->mUnison;
+   vol = mVoiceParams->mVol * .4 / mVoiceParams->mUnison;
    if (mVoiceParams->mSyncMode == Oscillator::SyncMode::Frequency)
       syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
    else if (mVoiceParams->mSyncMode == Oscillator::SyncMode::Ratio)
@@ -195,37 +195,37 @@ void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
 
    for (int u = 0; u < mVoiceParams->mUnison && u < kMaxUnison; ++u)
    {
-      float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 - GetPressure(samplesIn)));
+      double detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 - GetPressure(samplesIn)));
       mOscData[u].mCurrentPhaseInc = GetPhaseInc(freq * detune);
    }
 }
 
 //static
-float SingleOscillatorVoice::GetADSRScale(float velocity, float velToEnvelope)
+double SingleOscillatorVoice::GetADSRScale(double velocity, double velToEnvelope)
 {
    if (velToEnvelope >= 0)
       return ofLerp(ofClamp(1 - velToEnvelope, 0, 1), 1, velocity);
-   return ofClamp(ofLerp(1, 1 + velToEnvelope, velocity), 0.001f, 1);
+   return ofClamp(ofLerp(1.0, 1 + velToEnvelope, velocity), 0.001, 1);
 }
 
 //static
-float SingleOscillatorVoice::GetADSRCurve(float velocity, float velToEnvelope)
+double SingleOscillatorVoice::GetADSRCurve(double velocity, double velToEnvelope)
 {
    if (velToEnvelope < -1)
-      return -(velToEnvelope + 1) * 0.25f;
+      return -(velToEnvelope + 1) * 0.25;
    if (velToEnvelope > 1)
-      return -(velToEnvelope - 1) * 0.25f;
+      return -(velToEnvelope - 1) * 0.25;
    return 0;
 }
 
-void SingleOscillatorVoice::Start(double time, float target)
+void SingleOscillatorVoice::Start(double time, double target)
 {
    if (mVoiceParams->mVelToVolume > 1)
       target = pow(target, mVoiceParams->mVelToVolume);
-   float volume = ofLerp(MAX(0, 1 - mVoiceParams->mVelToVolume), MAX(1, mVoiceParams->mVelToVolume), target);
-   float cutoffScale = 1 + MAX(0, mVoiceParams->mVelToEnvelope - 1);
-   float adsrTimeScale = GetADSRScale(target, mVoiceParams->mVelToEnvelope);
-   float adsrCurve = GetADSRCurve(target, mVoiceParams->mVelToEnvelope);
+   double volume = ofLerp(MAX(0.0, 1 - mVoiceParams->mVelToVolume), MAX(1, mVoiceParams->mVelToVolume), target);
+   double cutoffScale = 1 + MAX(0, mVoiceParams->mVelToEnvelope - 1);
+   double adsrTimeScale = GetADSRScale(target, mVoiceParams->mVelToEnvelope);
+   double adsrCurve = GetADSRCurve(target, mVoiceParams->mVelToEnvelope);
    mAdsr.Start(time, volume, mVoiceParams->mAdsr, 1, adsrCurve);
 
    if (mVoiceParams->mFilterCutoffMax != SINGLEOSCILLATOR_NO_CUTOFF)

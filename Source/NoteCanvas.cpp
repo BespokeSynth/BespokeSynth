@@ -141,7 +141,7 @@ bool NoteCanvas::FreeRecordParityMatched()
    return currentMeasureParity == recordStartMeasureParity;
 }
 
-void NoteCanvas::OnTransportAdvanced(float amount)
+void NoteCanvas::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteCanvas);
 
@@ -157,7 +157,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          SetNumMeasures(mNumMeasures);
 
          for (auto* element : mCanvas->GetElements())
-            element->SetStart(element->GetStart() + float(shift) / mNumMeasures, true);
+            element->SetStart(element->GetStart() + static_cast<double>(shift) / mNumMeasures, true);
       }
    }
 
@@ -228,7 +228,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
    {
       if (mInputNotes[pitch])
       {
-         float endPos = curPos;
+         double endPos = curPos;
          if (mInputNotes[pitch]->GetStart() > endPos)
             endPos += 1; //wrap
          mInputNotes[pitch]->SetEnd(endPos);
@@ -236,9 +236,9 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          int modIdx = mInputNotes[pitch]->GetVoiceIdx();
          if (modIdx == -1)
             modIdx = kNumVoices;
-         float bend = ModulationParameters::kDefaultPitchBend;
-         float mod = ModulationParameters::kDefaultModWheel;
-         float pressure = ModulationParameters::kDefaultPressure;
+         double bend = ModulationParameters::kDefaultPitchBend;
+         double mod = ModulationParameters::kDefaultModWheel;
+         double pressure = ModulationParameters::kDefaultPressure;
          if (mVoiceModulations[modIdx].pitchBend)
             bend = mVoiceModulations[modIdx].pitchBend->GetValue(0);
          if (mVoiceModulations[modIdx].modWheel)
@@ -286,12 +286,12 @@ void NoteCanvas::Clear(double time)
 NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx /*=-1*/, ModulationParameters modulation /* = ModulationParameters()*/)
 {
    double canvasPos = measurePos / mNumMeasures * mCanvas->GetNumCols();
-   int col = int(canvasPos + .5f); //round off
+   int col = std::round(canvasPos); //round off
    int row = mCanvas->GetNumRows() - pitch - 1;
    NoteCanvasElement* element = static_cast<NoteCanvasElement*>(mCanvas->CreateElement(col, row));
    element->mOffset = canvasPos - element->mCol; //the rounded off part
    element->mLength = length / mNumMeasures * mCanvas->GetNumCols();
-   element->SetVelocity(velocity / 127.0f);
+   element->SetVelocity(velocity / 127.0);
    element->SetVoiceIdx(voiceIdx);
    int modIdx = voiceIdx;
    if (modIdx == -1)
@@ -304,7 +304,7 @@ NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocit
 
 void NoteCanvas::FitNotes()
 {
-   float latest = 0.0;
+   double latest = 0.0;
    for (auto* element : mCanvas->GetElements())
    {
       if (element->GetEnd() > latest)
@@ -349,13 +349,13 @@ void NoteCanvas::DrawModule()
    mCanvasScrollbarVertical->Draw();
 
    ofPushStyle();
-   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
+   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8);
    for (int i = 0; i < mCanvas->GetNumVisibleRows(); ++i)
    {
       int pitch = 127 - mCanvas->GetRowOffset() - i;
-      float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
-      float y = mCanvas->GetPosition(true).y + i * boxHeight;
-      float scale = MIN(boxHeight - 2, 18);
+      double boxHeight = mCanvas->GetHeight() / mCanvas->GetNumVisibleRows();
+      double y = mCanvas->GetPosition(true).y + i * boxHeight;
+      double scale = MIN(boxHeight - 2, 18);
       DrawTextNormal(NoteName(pitch, false, true) + "(" + ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale / 8) + boxHeight, scale);
    }
    ofPopStyle();
@@ -380,7 +380,7 @@ void NoteCanvas::DrawModule()
                   {
                      auto rect1 = e1->GetRect(true, false);
                      auto rect2 = e2->GetRect(true, false);
-                     float offset = 0;
+                     double offset = 0;
                      if (interval == 3)
                      {
                         ofSetColor(255, 0, 0, 50);
@@ -433,7 +433,7 @@ void NoteCanvas::DrawModule()
    if (mRecord)
    {
       ofPushStyle();
-      ofSetColor(205 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)), 0, 0);
+      ofSetColor(205 + 50 * (cos(TheTransport->GetMeasurePos(gTime) * 4 * TWO_PI)), 0, 0);
       ofSetLineWidth(4);
       ofRect(mCanvas->GetPosition(true).x, mCanvas->GetPosition(true).y, mCanvas->GetWidth(), mCanvas->GetHeight());
       ofPopStyle();
@@ -442,18 +442,18 @@ void NoteCanvas::DrawModule()
 
 namespace
 {
-   const float extraW = 20;
-   const float extraH = 163;
+   const double extraW = 20;
+   const double extraH = 163;
 }
 
-void NoteCanvas::Resize(float w, float h)
+void NoteCanvas::Resize(double w, double h)
 {
    w = MAX(w - extraW, 390);
    h = MAX(h - extraH, 40);
    mCanvas->SetDimensions(w, h);
 }
 
-void NoteCanvas::GetModuleDimensions(float& width, float& height)
+void NoteCanvas::GetModuleDimensions(double& width, double& height)
 {
    width = mCanvas->GetWidth() + extraW;
    height = mCanvas->GetHeight() + extraH;
@@ -488,8 +488,8 @@ void NoteCanvas::SetRecording(bool rec)
 void NoteCanvas::ClipNotes()
 {
    bool anyHighlighted = false;
-   float earliest = FLT_MAX;
-   float latest = 0;
+   double earliest = std::numeric_limits<double>::max();
+   double latest = 0;
    std::vector<CanvasElement*> toDelete;
    for (auto* element : mCanvas->GetElements())
    {
@@ -533,7 +533,7 @@ void NoteCanvas::ClipNotes()
       int shift = -clipStart;
 
       for (auto* element : mCanvas->GetElements())
-         element->SetStart(element->GetStart() + float(shift) / mNumMeasures, true);
+         element->SetStart(element->GetStart() + static_cast<double>(shift) / mNumMeasures, true);
    }
 }
 
@@ -552,7 +552,7 @@ void NoteCanvas::QuantizeNotes()
    {
       if (anyHighlighted == false || element->GetHighlighted())
       {
-         element->mCol = int(element->mCol + element->mOffset + .5f) % mCanvas->GetNumCols();
+         element->mCol = int(element->mCol + element->mOffset + .5) % mCanvas->GetNumCols();
          element->mOffset = 0;
       }
    }
@@ -595,7 +595,7 @@ void NoteCanvas::LoadMidi()
                AddNote(start, note, veloc, length, -1, ModulationParameters());
             }
          }
-         float latest = 0.0;
+         double latest = 0.0;
          for (auto* element : mCanvas->GetElements())
          {
             if (element->GetEnd() > latest)
@@ -626,14 +626,14 @@ void NoteCanvas::SaveMidi()
       {
          NoteCanvasElement* noteOnElement = static_cast<NoteCanvasElement*>(element);
          int noteNumber = mCanvas->GetNumRows() - noteOnElement->mRow - 1;
-         float noteStart = (element->mCol + element->mOffset) * ticksPerQuarterNote *
-                           +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
+         double noteStart = (element->mCol + element->mOffset) * ticksPerQuarterNote *
+                            +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
          float velocity = noteOnElement->GetVelocity();
          MidiMessage messageOn = MidiMessage::noteOn(1, noteNumber, velocity);
          messageOn.setTimeStamp(noteStart);
          track1.addEvent(messageOn);
-         float noteEnd = (element->mCol + element->mOffset + element->mLength) * ticksPerQuarterNote *
-                         +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
+         double noteEnd = (element->mCol + element->mOffset + element->mLength) * ticksPerQuarterNote *
+                          +TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
          MidiMessage messageOff = MidiMessage::noteOff(1, noteNumber, velocity);
          messageOff.setTimeStamp(noteEnd);
          track1.addEvent(messageOff);
@@ -691,7 +691,7 @@ void NoteCanvas::ButtonClicked(ClickButton* button, double time)
       SaveMidi();
 }
 
-void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

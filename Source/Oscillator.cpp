@@ -57,32 +57,32 @@ float Oscillator::Value(float phase) const
          sample = -SawSample(phase);
          break;
       case kOsc_Square:
-         if (mSoften == 0)
+         if (ofAlmostEquel(mSoften, 0.0))
          {
             sample = phase > (FTWO_PI * mPulseWidth) ? -1 : 1;
          }
          else
          {
             float phase01 = phase / FTWO_PI;
-            phase01 += .75f;
-            phase01 -= (mPulseWidth - .5f) / 2;
-            phase01 -= int(phase01);
-            sample = ofClamp((fabs(phase01 - .5f) * 4 - 1 + (mPulseWidth - .5f) * 2) / mSoften, -1, 1);
+            phase01 += .75;
+            phase01 -= (mPulseWidth - .5) / 2;
+            phase01 -= static_cast<int>(phase01);
+            sample = ofClamp((abs(phase01 - .5) * 4 - 1 + (mPulseWidth - .5) * 2) / mSoften, -1, 1);
          }
          break;
       case kOsc_Tri:
-         sample = fabs(phase / FTWO_PI - .5f) * 4 - 1;
+         sample = abs(phase / FTWO_PI - .5f) * 4 - 1;
          break;
       case kOsc_Random:
-         sample = ofRandom(-1, 1);
+         sample = ofRandom(-1.0, 1.0);
          break;
       default:
          //assert(false);
          break;
    }
 
-   if (mType != kOsc_Square && mPulseWidth != .5f)
-      sample = (Bias(sample / 2 + .5f, mPulseWidth) - .5f) * 2; //give "pulse width" to non-square oscillators
+   if (mType != kOsc_Square && mPulseWidth != .5)
+      sample = (Bias(sample / 2 + .5, mPulseWidth) - .5) * 2; //give "pulse width" to non-square oscillators
 
    return sample;
 }
@@ -90,7 +90,7 @@ float Oscillator::Value(float phase) const
 float Oscillator::SawSample(float phase) const
 {
    phase /= FTWO_PI;
-   if (mSoften == 0)
+   if (ofAlmostEquel(mSoften, 0.0))
       return phase * 2 - 1;
    if (phase < 1 - mSoften)
       return phase / (1 - mSoften) * 2 - 1;

@@ -36,9 +36,9 @@ class SampleVoiceParams : public IVoiceParams
 {
 public:
    ::ADSR mAdsr{ 1, 0, 1, 10 };
-   float mVol{ 1 };
+   double mVol{ 1 };
    Sample* mSample{ nullptr };
-   float mSamplePitch{ 48 };
+   double mSamplePitch{ 48 };
    int mStartSample{ 0 };
    int mStopSample{ -1 };
    int mSustainLoopStart{ -1 };
@@ -51,10 +51,10 @@ public:
    SampleVoice(IDrawableModule* owner = nullptr);
    ~SampleVoice();
 
-   float GetSamplePosition() const { return mPos; }
+   double GetSamplePosition() const { return mPos; }
 
    // IMidiVoice
-   void Start(double time, float amount) override;
+   void Start(double time, double target) override;
    void Stop(double time) override;
    void ClearVoice() override;
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
@@ -64,6 +64,6 @@ public:
 private:
    ::ADSR mAdsr;
    SampleVoiceParams* mVoiceParams{};
-   float mPos{ 0 };
+   double mPos{ 0 };
    IDrawableModule* mOwner{ nullptr };
 };

@@ -49,10 +49,10 @@ void ModulatorWander::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK(3, 50);
-   FLOATSLIDER(mCenterSlider, "center", &mCenter, 0.0f, 1.0f);
-   FLOATSLIDER(mRangeSlider, "range", &mRange, 0.0f, 1.0f);
-   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, 0.0f, 20.0f);
-   FLOATSLIDER(mBiasSlider, "bias", &mBias, 0.0f, 1.0f);
+   FLOATSLIDER(mCenterSlider, "center", &mCenter, 0.0, 1.0);
+   FLOATSLIDER(mRangeSlider, "range", &mRange, 0.0, 1.0);
+   FLOATSLIDER(mSpeedSlider, "speed", &mSpeed, 0.0, 20.0);
+   FLOATSLIDER(mBiasSlider, "bias", &mBias, 0.0, 1.0);
    ENDUIBLOCK(mWidth, mHeight);
 
    mSpeedSlider->SetMode(FloatSlider::kBezier);
@@ -68,7 +68,7 @@ ModulatorWander::~ModulatorWander()
    TheTransport->RemoveAudioPoller(this);
 }
 
-void ModulatorWander::OnTransportAdvanced(float amount)
+void ModulatorWander::OnTransportAdvanced(double amount)
 {
    mPerlinPos += gBufferSizeMs * mSpeed * .001;
 }
@@ -89,15 +89,15 @@ void ModulatorWander::DrawModule()
       int height = 44;
       int width = 100;
 
-      ofSetColor(100, 100, 204, .8f * gModuleDrawAlpha);
-      ofSetLineWidth(.5f);
+      ofSetColor(100, 100, 204, .8 * gModuleDrawAlpha);
+      ofSetLineWidth(.5);
       ofRect(x, y, width, height, 0);
 
       ofFill();
-      ofSetColor(200, 200, 200, .1f * gModuleDrawAlpha);
-      float scaledMin = ofMap(GetMin(), mCenterSlider->GetMin(), mCenterSlider->GetMax(), height, y);
-      float scaledMax = ofMap(GetMax(), mCenterSlider->GetMin(), mCenterSlider->GetMax(), height, y);
-      float scaledCenter = ofMap((GetMin() + GetMax()) / 2.0f, mCenterSlider->GetMin(), mCenterSlider->GetMax(), height, y);
+      ofSetColor(200, 200, 200, .1 * gModuleDrawAlpha);
+      double scaledMin = ofMap(GetMin(), mCenterSlider->GetMin(), mCenterSlider->GetMax(), height, y);
+      double scaledMax = ofMap(GetMax(), mCenterSlider->GetMin(), mCenterSlider->GetMax(), height, y);
+      double scaledCenter = ofMap((GetMin() + GetMax()) / 2.0, mCenterSlider->GetMin(), mCenterSlider->GetMax(), height, y);
       ofRect(x, scaledMax, width, scaledMin - scaledMax);
       ofLine(x, scaledCenter, x + width, scaledCenter);
       ofNoFill();
@@ -106,10 +106,10 @@ void ModulatorWander::DrawModule()
       ofSetLineWidth(1);
 
       ofBeginShape();
-      for (float i = 0; i < width; i += (.25f / gDrawScale))
+      for (double i = 0; i < width; i += (.25 / gDrawScale))
       {
-         float phase = i / width;
-         float value = Interp(GetPerlin(phase * 100000), GetMin(), GetMax());
+         double phase = i / width;
+         double value = Interp(GetPerlin(phase * 100000), GetMin(), GetMax());
          ofVertex(i + x, ofMap(value, mCenterSlider->GetMin(), mCenterSlider->GetMax(), height, y));
       }
       ofEndShape(false);
@@ -118,14 +118,14 @@ void ModulatorWander::DrawModule()
    }
 }
 
-float ModulatorWander::GetPerlin(double sampleOffset)
+double ModulatorWander::GetPerlin(double sampleOffset)
 {
    double pos = mPerlinPos + sampleOffset * gInvSampleRateMs * mSpeed * .001;
-   float value = mPerlinNoise.noise(pos, mPerlinSeed, -pos);
+   double value = mPerlinNoise.noise(pos, mPerlinSeed, -pos);
    return Bias(value, 1 - mBias);
 }
 
-void ModulatorWander::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ModulatorWander::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mCenterSlider || slider == mRangeSlider)
       UpdateRange();
@@ -133,8 +133,8 @@ void ModulatorWander::FloatSliderUpdated(FloatSlider* slider, float oldVal, doub
 
 void ModulatorWander::UpdateRange()
 {
-   float sliderExtent = mCenterSlider->GetMax() - mCenterSlider->GetMin();
-   float scaledRange = (mRange * 0.5f) * sliderExtent;
+   double sliderExtent = mCenterSlider->GetMax() - mCenterSlider->GetMin();
+   double scaledRange = (mRange * 0.5) * sliderExtent;
    if (mCenter - scaledRange < mCenterSlider->GetMin())
       scaledRange = mCenter - mCenterSlider->GetMin();
    if (mCenter + scaledRange > mCenterSlider->GetMax())
@@ -155,7 +155,7 @@ void ModulatorWander::PostRepatch(PatchCableSource* cableSource, bool fromUserCl
    }
 }
 
-float ModulatorWander::Value(int samplesIn)
+double ModulatorWander::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    return Interp(GetPerlin(samplesIn), GetMin(), GetMax());

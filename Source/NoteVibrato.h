@@ -46,12 +46,12 @@ public:
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
@@ -63,7 +63,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 138;
       height = 22;
@@ -71,7 +71,7 @@ private:
 
    NoteInterval mVibratoInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
-   float mVibratoAmount{ 0 };
+   double mVibratoAmount{ 0 };
    FloatSlider* mVibratoSlider{ nullptr };
 
    Modulations mModulation{ true };

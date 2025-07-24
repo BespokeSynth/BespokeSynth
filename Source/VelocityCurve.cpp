@@ -42,9 +42,9 @@ VelocityCurve::VelocityCurve()
    mAdsr.SetNumStages(2);
    mAdsr.GetHasSustainStage() = false;
    mAdsr.GetStageData(0).target = 0;
-   mAdsr.GetStageData(0).time = 0.01f;
+   mAdsr.GetStageData(0).time = 0.01;
    mAdsr.GetStageData(1).target = 1;
-   mAdsr.GetStageData(1).time = kAdsrTime - .02f;
+   mAdsr.GetStageData(1).time = kAdsrTime - .02;
 }
 
 void VelocityCurve::CreateUIControls()
@@ -62,7 +62,7 @@ void VelocityCurve::DrawModule()
    const double kDisplayInputMs = 400;
    if (gTime < mLastInputTime + kDisplayInputMs)
    {
-      float pos = mLastInputVelocity / 127.0f * mEnvelopeControl.GetDimensions().x + mEnvelopeControl.GetPosition().x;
+      double pos = mLastInputVelocity / 127.0 * mEnvelopeControl.GetDimensions().x + mEnvelopeControl.GetPosition().x;
       ofPushStyle();
       ofSetColor(0, 255, 0, (1 - (gTime - mLastInputTime) / kDisplayInputMs) * 255);
       ofLine(pos, mEnvelopeControl.GetPosition().y, pos, mEnvelopeControl.GetPosition().y + mEnvelopeControl.GetDimensions().y);
@@ -81,7 +81,7 @@ void VelocityCurve::PlayNote(NoteMessage note)
 
          ComputeSliders(0);
          ADSR::EventInfo adsrEvent(0, kAdsrTime);
-         float val = ofClamp(mAdsr.Value(note.velocity / 127.0f * kAdsrTime, &adsrEvent), 0, 1);
+         double val = ofClamp(mAdsr.Value(note.velocity / 127.0 * kAdsrTime, &adsrEvent), 0, 1);
          if (std::isnan(val))
             val = 0;
          note.velocity = val * 127;
@@ -93,7 +93,7 @@ void VelocityCurve::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void VelocityCurve::OnClicked(float x, float y, bool right)
+void VelocityCurve::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -107,7 +107,7 @@ void VelocityCurve::MouseReleased()
    mEnvelopeControl.MouseReleased();
 }
 
-bool VelocityCurve::MouseMoved(float x, float y)
+bool VelocityCurve::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 

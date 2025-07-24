@@ -51,28 +51,28 @@ public:
    void CreateUIControls() override;
    void Poll() override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
    }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
 
-   float mOffsetMs{ 0 };
+   double mOffsetMs{ 0 };
    FloatSlider* mOffsetMsSlider{ nullptr };
    ClickButton* mResetButton{ nullptr };
 

@@ -47,9 +47,9 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void TextEntryComplete(TextEntry* entry) override {}
    void ButtonClicked(ClickButton* button, double time) override;
 
@@ -61,7 +61,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -72,11 +72,11 @@ private:
 
    static const int kMaxDestinations = 16;
    int mNumDestinations{ 5 };
-   float mWeight[kMaxDestinations]{};
+   double mWeight[kMaxDestinations]{};
    FloatSlider* mWeightSlider[kMaxDestinations]{};
    std::vector<PatchCableSource*> mDestinationCables;
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   double mWidth{ 200 };
+   double mHeight{ 20 };
    bool mDeterministic{ false };
    int mSeed{ 0 };
    int mRandomIndex{ 0 };

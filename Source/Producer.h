@@ -59,12 +59,12 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IDrawableModule
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
 
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    //IFloatSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    //IDropdownListener
@@ -83,40 +83,40 @@ private:
    void DoWrite();
    void UpdateZoomExtents();
    int GetMeasureSample(int measure);
-   float GetBufferPos(int sample);
+   double GetBufferPos(int sample);
    int GetMeasureForSample(int sample);
    int GetSamplesPerMeasure();
    bool IsSkipMeasure(int measure);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
 
    Sample* mSample{ nullptr };
 
-   float mVolume{ .6 };
+   double mVolume{ .6 };
    FloatSlider* mVolumeSlider{ nullptr };
    float* mWriteBuffer{ nullptr };
    bool mPlay{ false };
    Checkbox* mPlayCheckbox{ nullptr };
    bool mLoop{ false };
    Checkbox* mLoopCheckbox{ nullptr };
-   float mClipStart{ 0 };
+   double mClipStart{ 0 };
    FloatSlider* mClipStartSlider{ nullptr };
-   float mClipEnd{ 1 };
+   double mClipEnd{ 1 };
    FloatSlider* mClipEndSlider{ nullptr };
-   float mZoomStart{ 0 };
+   double mZoomStart{ 0 };
    FloatSlider* mZoomStartSlider{ nullptr };
-   float mZoomEnd{ 1 };
+   double mZoomEnd{ 1 };
    FloatSlider* mZoomEndSlider{ nullptr };
-   float mOffset{ 0 };
+   double mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    ClickButton* mWriteButton{ nullptr };
    int mPlayhead{ 0 };
-   float mTempo{ 120 };
+   double mTempo{ 120 };
    FloatSlider* mTempoSlider{ nullptr };
    int mStartOffset{ 0 };
    ClickButton* mCalcTempoButton{ nullptr };

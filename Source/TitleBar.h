@@ -61,7 +61,7 @@ private:
    int mSpawnIndex{ -1 };
    DropdownList* mSpawnList{ nullptr };
    IDropdownListener* mOwner{ nullptr };
-   ofVec2f mPos;
+   ofVec2d mPos;
    ModuleCategory mModuleCategory;
    bool mShowDecorators{ false };
 };
@@ -99,7 +99,7 @@ public:
    void DrawModule() override;
    bool HasTitleBar() const override { return false; }
 
-   void GetDimensions(float& width, float& height) override
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -142,7 +142,7 @@ public:
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
 
    static bool sShowInitialHelpOverlay;
 
@@ -152,12 +152,12 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
 
    bool HiddenByZoom() const;
-   float GetPixelWidth() const;
+   double GetPixelWidth() const;
 
    ClickButton* mPlayPauseButton{ nullptr };
    ClickButton* mSaveLayoutButton{ nullptr };

@@ -47,7 +47,7 @@ public:
    void CreateUIControls() override;
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    bool IsResizable() const override { return true; }
-   void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); }
+   void Resize(double width, double height) override { mWidth = ofClamp(width, 210, 9999); }
 
    void RemoveTrack(MultitrackRecorderTrack* track);
 
@@ -64,7 +64,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -73,8 +73,8 @@ private:
    void AddTrack();
    int GetRecordingLength();
 
-   float mWidth{ 700 };
-   float mHeight{ 142 };
+   double mWidth{ 700 };
+   double mHeight{ 142 };
 
    ModuleContainer mModuleContainer;
 
@@ -111,7 +111,7 @@ public:
    void Clear();
    int GetRecordingLength() const { return mRecordingLength; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
 
@@ -121,7 +121,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    MultitrackRecorder* mRecorder{ nullptr };
 

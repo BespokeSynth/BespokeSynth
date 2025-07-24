@@ -105,9 +105,9 @@ void NoteChance::DrawModule()
       ofPushStyle();
       ofSetColor(0, 255, 0);
       ofFill();
-      float pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
-      const float kPipSize = 3;
-      float moduleWidth, moduleHeight;
+      double pos = fmod(TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() / mLength, 1);
+      const double kPipSize = 3;
+      double moduleWidth, moduleHeight;
       GetModuleDimensions(moduleWidth, moduleHeight);
       ofRect(ofMap(pos, 0, 1, 0, moduleWidth - kPipSize), lengthRect.y - 5, kPipSize, kPipSize);
       ofPopStyle();
@@ -125,17 +125,17 @@ void NoteChance::PlayNote(NoteMessage note)
    if (note.velocity > 0)
       ComputeSliders(0);
 
-   float random;
+   double random;
    if (mDeterministic)
    {
       const int kStepResolution = 128;
       uint64_t step = int(TheTransport->GetMeasureTime(note.time) * kStepResolution);
       int randomIndex = step % ((mLength * kStepResolution) / TheTransport->GetTimeSigTop());
-      random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0f);
+      random = ((abs(DeterministicRandom(mSeed, randomIndex)) % 10000) / 10000.0);
    }
    else
    {
-      random = ofRandom(1);
+      random = ofRandom(1.0);
    }
 
    bool accept = random <= mChance;
@@ -166,7 +166,7 @@ void NoteChance::ButtonClicked(ClickButton* button, double time)
       mSeed = (mSeed + 1) % 10000;
 }
 
-void NoteChance::GetModuleDimensions(float& width, float& height)
+void NoteChance::GetModuleDimensions(double& width, double& height)
 {
    width = 118;
    height = mDeterministic ? 78 : 38;

@@ -46,13 +46,13 @@ public:
 
    void CreateUIControls() override;
 
-   void AddTone(int tone, float velocity = 1);
+   void AddTone(int tone, double velocity = 1);
    void RemoveTone(int tone);
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* dropdown, int oldVal, double time) override;
@@ -71,14 +71,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 135;
       height = 75;
    }
-   void OnClicked(float x, float y, bool right) override;
+   void OnClicked(double x, double y, bool right) override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    void PlayChorderNote(NoteMessage note);
    void CheckLeftovers();

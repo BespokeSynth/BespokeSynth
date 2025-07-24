@@ -35,10 +35,10 @@
 #include "Rewriter.h"
 #include "LooperGranulator.h"
 
-float Looper::mBeatwheelPosRight = 0;
-float Looper::mBeatwheelDepthRight = 0;
-float Looper::mBeatwheelPosLeft = 0;
-float Looper::mBeatwheelDepthLeft = 0;
+double Looper::mBeatwheelPosRight = 0;
+double Looper::mBeatwheelDepthRight = 0;
+double Looper::mBeatwheelPosLeft = 0;
+double Looper::mBeatwheelDepthLeft = 0;
 bool Looper::mBeatwheelSingleMeasure = 0;
 
 namespace
@@ -63,7 +63,7 @@ Looper::Looper()
       mLastInputSample[i] = 0;
    }
 
-   SetLoopLength(4 * 60.0f / TheTransport->GetTempo() * gSampleRate);
+   SetLoopLength(4 * 60.0 / TheTransport->GetTempo() * gSampleRate);
 }
 
 void Looper::CreateUIControls()
@@ -93,7 +93,7 @@ void Looper::CreateUIControls()
    mScratchSpeedSlider = new FloatSlider(this, "scrspd", -1, -1, 130, 15, &mScratchSpeed, -2, 2);
    mFourTetSlider = new FloatSlider(this, "fourtet", 4, 65, 65, 15, &mFourTet, 0, 1, 1);
    mFourTetSlicesDropdown = new DropdownList(this, "fourtetslices", -1, -1, &mFourTetSlices);
-   mPitchShiftSlider = new FloatSlider(this, "pitch", -1, -1, 130, 15, &mPitchShift, .5f, 2);
+   mPitchShiftSlider = new FloatSlider(this, "pitch", -1, -1, 130, 15, &mPitchShift, .5, 2);
    mBeatwheelCheckbox = new Checkbox(this, "beatwheel on", HIDDEN_UICONTROL, HIDDEN_UICONTROL, &mBeatwheel);
    mBeatwheelPosRightSlider = new FloatSlider(this, "beatwheel pos right", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 1, 1, &mBeatwheelPosRight, 0, 1);
    mBeatwheelDepthRightSlider = new FloatSlider(this, "beatwheel depth right", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 1, 1, &mBeatwheelDepthRight, 0, 1);
@@ -236,9 +236,9 @@ void Looper::Process(double time)
    if (mWantShiftDownbeat)
       DoShiftDownbeat();
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
-   float oldLoopPos = mLoopPos;
+   double oldLoopPos = mLoopPos;
    int sampsPerBar = mLoopLength / mNumBars;
    if (!doGranular || !mGranulator->ShouldFreeze())
       mLoopPos = sampsPerBar * ((TheTransport->GetMeasure(time) % mNumBars) + TheTransport->GetMeasurePos(time));
@@ -295,7 +295,7 @@ void Looper::Process(double time)
    double processStartTime = time;
    for (int i = 0; i < bufferSize; ++i)
    {
-      float smooth = .001f;
+      double smooth = .001;
       mSmoothedVol = mSmoothedVol * (1 - smooth) + mVol * smooth;
       float volSq = mSmoothedVol * mSmoothedVol;
 
@@ -310,7 +310,7 @@ void Looper::Process(double time)
       if (mBeatwheel)
          ProcessBeatwheel(processStartTime, i);
 
-      float offset = mLoopPos + i * speed + mLoopPosOffset + latencyOffset;
+      double offset = mLoopPos + i * speed + mLoopPosOffset + latencyOffset;
       float output[ChannelBuffer::kMaxNumChannels];
       ::Clear(output, ChannelBuffer::kMaxNumChannels);
 
@@ -328,7 +328,7 @@ void Looper::Process(double time)
          if (mFourTet > 0 && mFourTet < 1) //fourtet wet/dry
          {
             output[ch] *= mFourTet;
-            float normalOffset = mLoopPos + i * speed;
+            double normalOffset = mLoopPos + i * speed;
             output[ch] += GetInterpolatedSample(normalOffset, mBuffer->GetChannel(ch), mLoopLength) * (1 - mFourTet);
          }
 
@@ -463,29 +463,29 @@ double Looper::GetPlaybackSpeed() const
 
 void Looper::ProcessScratch()
 {
-   mLoopPosOffset = FloatWrap(mLoopPosOffset - GetPlaybackSpeed() + mScratchSpeed, mLoopLength);
+   mLoopPosOffset = DoubleWrap(mLoopPosOffset - GetPlaybackSpeed() + mScratchSpeed, mLoopLength);
 }
 
 void Looper::ProcessFourTet(double time, int sampleIdx)
 {
-   float measurePos = TheTransport->GetMeasurePos(time) + sampleIdx / (TheTransport->MsPerBar() / gInvSampleRateMs);
+   double measurePos = TheTransport->GetMeasurePos(time) + sampleIdx / (TheTransport->MsPerBar() / gInvSampleRateMs);
    measurePos += TheTransport->GetMeasure(time) % mNumBars;
    measurePos /= mNumBars;
    int numSlices = mFourTetSlices * 2 * mNumBars;
    measurePos *= numSlices;
-   int slice = (int)measurePos;
-   float sliceProgress = measurePos - slice;
-   float oldOffset = mLoopPosOffset;
+   int slice = static_cast<int>(measurePos);
+   double sliceProgress = measurePos - slice;
+   double oldOffset = mLoopPosOffset;
    if (slice % 2 == 0)
-      mLoopPosOffset = (sliceProgress + slice / 2) * (mLoopLength / float(numSlices) * 2);
+      mLoopPosOffset = (sliceProgress + slice / 2.0) * (mLoopLength / static_cast<double>(numSlices) * 2);
    else
-      mLoopPosOffset = (1 - sliceProgress + slice / 2) * (mLoopLength / float(numSlices) * 2);
+      mLoopPosOffset = (1 - sliceProgress + slice / 2.0) * (mLoopLength / static_cast<double>(numSlices) * 2);
 
    //offset regular movement
-   mLoopPosOffset = FloatWrap(mLoopPosOffset - (mLoopPos + sampleIdx * GetPlaybackSpeed()), mLoopLength);
+   mLoopPosOffset = DoubleWrap(mLoopPosOffset - (mLoopPos + sampleIdx * GetPlaybackSpeed()), mLoopLength);
 
    //smooth discontinuity
-   if (oldOffset >= mLoopLength * .5f && mLoopPosOffset < mLoopLength * .5f)
+   if (oldOffset >= mLoopLength * .5 && mLoopPosOffset < mLoopLength * .5)
       mSwitchAndRamp.StartSwitch();
 }
 
@@ -493,7 +493,7 @@ void Looper::ProcessBeatwheel(double time, int sampleIdx)
 {
    bool bothHeld = false;
    bool noneHeld = false;
-   float clockPos = 0;
+   double clockPos = 0;
    if (mBeatwheelDepthRight > 0 && mBeatwheelDepthLeft > 0 &&
        mBeatwheelPosRight >= 0 && mBeatwheelPosLeft >= 0)
    {
@@ -549,30 +549,29 @@ void Looper::ProcessBeatwheel(double time, int sampleIdx)
          mLoopPosOffset = playSlice * (loopLength / numSlices);
 
          //offset regular movement
-         mLoopPosOffset = FloatWrap(mLoopPosOffset - (mLoopPos + sampleIdx * GetPlaybackSpeed()), mLoopLength);
+         mLoopPosOffset = DoubleWrap(mLoopPosOffset - (mLoopPos + sampleIdx * GetPlaybackSpeed()), mLoopLength);
       }
    }
 }
 
 int Looper::GetBeatwheelDepthLevel() const
 {
-   float depth = MAX(mBeatwheelDepthLeft, mBeatwheelDepthRight);
-   if (depth == 0)
+   double depth = MAX(mBeatwheelDepthLeft, mBeatwheelDepthRight);
+   if (ofAlmostEquel(depth, 0))
       return 0;
    if (depth < 1)
       return 1;
    return 2;
 }
 
-float Looper::GetActualLoopPos(int samplesIn) const
+double Looper::GetActualLoopPos(int samplesIn) const
 {
-   float pos = FloatWrap(mLoopPos + mLoopPosOffset + samplesIn, mLoopLength);
-   return pos;
+   return DoubleWrap(mLoopPos + mLoopPosOffset + samplesIn, mLoopLength);
 }
 
 int Looper::GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar)
 {
-   float measurePos = TheTransport->GetMeasurePos(time) + sampleIdx / (TheTransport->MsPerBar() / gInvSampleRateMs);
+   double measurePos = TheTransport->GetMeasurePos(time) + sampleIdx / (TheTransport->MsPerBar() / gInvSampleRateMs);
    measurePos += TheTransport->GetMeasure(time) % mNumBars;
    measurePos /= mNumBars;
    int numSlices = slicesPerBar * mNumBars;
@@ -581,7 +580,7 @@ int Looper::GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar)
    return slice;
 }
 
-void Looper::ResampleForSpeed(float speed)
+void Looper::ResampleForSpeed(double speed)
 {
    int oldLoopLength = mLoopLength;
    SetLoopLength(MIN(int(abs(mLoopLength / speed)), MAX_BUFFER_SIZE - 1));
@@ -594,7 +593,7 @@ void Looper::ResampleForSpeed(float speed)
       BufferCopy(oldBuffer, mBuffer->GetChannel(ch), oldLoopLength);
       for (int i = 0; i < mLoopLength; ++i)
       {
-         float offset = i * speed;
+         double offset = i * speed;
          mBuffer->GetChannel(ch)[i] = GetInterpolatedSample(offset, oldBuffer, oldLoopLength);
       }
       delete[] oldBuffer;
@@ -612,10 +611,10 @@ void Looper::ResampleForSpeed(float speed)
 
 namespace
 {
-   const float kBufferX = 3;
-   const float kBufferY = 3;
-   const float kBufferWidth = 170;
-   const float kBufferHeight = 93;
+   const double kBufferX = 3;
+   const double kBufferY = 3;
+   const double kBufferWidth = 170;
+   const double kBufferHeight = 93;
 }
 
 void Looper::DrawModule()
@@ -629,14 +628,14 @@ void Looper::DrawModule()
 
    assert(mLoopLength > 0);
 
-   float displayPos = GetActualLoopPos(0);
+   double displayPos = GetActualLoopPos(0);
    mBufferMutex.lock();
    DrawAudioBuffer(kBufferWidth, kBufferHeight, mBuffer, 0, mLoopLength, displayPos, mVol);
    mBufferMutex.unlock();
    ofSetColor(255, 255, 0, gModuleDrawAlpha);
    for (int i = 1; i < mNumBars; ++i)
    {
-      float x = kBufferWidth / mNumBars * i;
+      double x = kBufferWidth / mNumBars * i;
       ofLine(x, kBufferHeight / 2 - 5, x, kBufferHeight / 2 + 5);
    }
    ofSetColor(255, 255, 255, gModuleDrawAlpha);
@@ -662,7 +661,7 @@ void Looper::DrawModule()
    mKeepPitchCheckbox->Draw();
    mWriteInputCheckbox->Draw();
    mQueueCaptureButton->Draw();
-   mResampleButton->SetShowing(mBufferTempo != TheTransport->GetTempo());
+   mResampleButton->SetShowing(!ofAlmostEquel(mBufferTempo, TheTransport->GetTempo()));
    mResampleButton->Draw();
    if (mCaptureQueued)
    {
@@ -671,7 +670,7 @@ void Looper::DrawModule()
       if (mWriteInput)
          ofSetColor(255, 0, 0, 150);
       else
-         ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)));
+         ofSetColor(255, 100, 0, 100 + 50 * std::cos(TheTransport->GetMeasurePos(gTime) * 4 * TWO_PI));
       ofRect(mQueueCaptureButton->GetRect(true));
       ofPopStyle();
    }
@@ -720,7 +719,7 @@ void Looper::DrawModule()
    if (mRecorder != nullptr && mRecorder->GetNextCommitTarget() == this)
    {
       ofPushStyle();
-      float w, h;
+      double w, h;
       GetDimensions(w, h);
       ofSetColor(255, 255, 255, 200);
       ofSetLineWidth(3);
@@ -734,25 +733,25 @@ void Looper::DrawBeatwheel()
    ofPushMatrix();
    ofPushStyle();
 
-   float size = 197;
+   double size = 197;
 
    ofTranslate(0, -size);
 
    ofFill();
-   ofSetColor(50, 50, 50, gModuleDrawAlpha * .65f);
+   ofSetColor(50, 50, 50, gModuleDrawAlpha * .65);
    ofRect(0, 0, size, size);
 
-   float centerX = size / 2;
-   float centerY = size / 2;
-   float innerRad = size * .2f;
-   float outerRad = size * .45f;
-   float waveformCenter = (innerRad + outerRad) / 2;
-   float waveformHeight = (outerRad - innerRad) / 2;
+   double centerX = size / 2;
+   double centerY = size / 2;
+   double innerRad = size * .2;
+   double outerRad = size * .45;
+   double waveformCenter = (innerRad + outerRad) / 2;
+   double waveformHeight = (outerRad - innerRad) / 2;
 
    ofSetCircleResolution(100);
-   ofSetColor(100, 100, 100, gModuleDrawAlpha * .8f);
+   ofSetColor(100, 100, 100, gModuleDrawAlpha * .8);
    ofCircle(size / 2, size / 2, outerRad);
-   ofSetColor(50, 50, 50, gModuleDrawAlpha * .5f);
+   ofSetColor(50, 50, 50, gModuleDrawAlpha * .5);
    ofCircle(size / 2, size / 2, innerRad);
 
    ofSetLineWidth(1);
@@ -769,17 +768,17 @@ void Looper::DrawBeatwheel()
    }
 
    ofSetColor(0, 0, 0, gModuleDrawAlpha);
-   float subdivisions = 600;
+   double subdivisions = 600;
    int samplesPerPixel = loopLength / subdivisions;
 
    for (int i = 0; i < subdivisions; i++)
    {
-      float radians = (i * TWO_PI) / subdivisions;
+      double radians = (i * TWO_PI) / subdivisions;
       //ofSetColor(200,200,200,gModuleDrawAlpha);
-      float sinR = sin(radians);
-      float cosR = cos(radians);
+      double sinR = std::sin(radians);
+      double cosR = std::cos(radians);
       //ofLine(centerX+sinR*innerRad, centerY-cosR*innerRad, centerX+sinR*outerRad, centerY-cosR*outerRad);
-      float mag = 0;
+      double mag = 0;
       int position = i * samplesPerPixel;
       //rms
       int j;
@@ -789,22 +788,22 @@ void Looper::DrawBeatwheel()
             mag += mBuffer->GetChannel(ch)[position + j];
       }
       mag /= j;
-      mag = sqrtf(mag);
-      mag = sqrtf(mag);
-      mag = MIN(1.0f, mag);
-      float inner = (waveformCenter - mag * waveformHeight);
-      float outer = (waveformCenter + mag * waveformHeight);
+      mag = std::sqrt(mag);
+      mag = std::sqrt(mag);
+      mag = MIN(1.0, mag);
+      double inner = (waveformCenter - mag * waveformHeight);
+      double outer = (waveformCenter + mag * waveformHeight);
       //ofSetColor(0,0,0,gModuleDrawAlpha);
       ofLine(centerX + sinR * inner, centerY - cosR * inner, centerX + sinR * outer, centerY - cosR * outer);
    }
 
    ofSetLineWidth(3);
    ofSetColor(0, 255, 0, gModuleDrawAlpha);
-   float displayPos = GetActualLoopPos(0);
-   float position = displayPos / loopLength;
-   float radians = position * TWO_PI;
-   float sinR = sin(radians);
-   float cosR = cos(radians);
+   double displayPos = GetActualLoopPos(0);
+   double position = displayPos / loopLength;
+   double radians = position * TWO_PI;
+   double sinR = std::sin(radians);
+   double cosR = std::cos(radians);
    ofLine(centerX + sinR * innerRad, centerY - cosR * innerRad, centerX + sinR * outerRad, centerY - cosR * outerRad);
 
    ofSetLineWidth(4);
@@ -812,16 +811,16 @@ void Looper::DrawBeatwheel()
    if (mBeatwheelDepthRight > 0 && mBeatwheelPosRight >= 0)
    {
       radians = mBeatwheelPosRight * TWO_PI;
-      sinR = sin(radians);
-      cosR = cos(radians);
-      ofLine(centerX + sinR * outerRad * .9f, centerY - cosR * outerRad * .9f, centerX + sinR * outerRad, centerY - cosR * outerRad);
+      sinR = std::sin(radians);
+      cosR = std::cos(radians);
+      ofLine(centerX + sinR * outerRad * .9, centerY - cosR * outerRad * .9, centerX + sinR * outerRad, centerY - cosR * outerRad);
    }
    if (mBeatwheelDepthLeft > 0 && mBeatwheelPosLeft >= 0)
    {
       radians = mBeatwheelPosLeft * TWO_PI;
-      sinR = sin(radians);
-      cosR = cos(radians);
-      ofLine(centerX + sinR * outerRad * .9f, centerY - cosR * outerRad * .9f, centerX + sinR * outerRad, centerY - cosR * outerRad);
+      sinR = std::sin(radians);
+      cosR = std::cos(radians);
+      ofLine(centerX + sinR * outerRad * .9, centerY - cosR * outerRad * .9, centerX + sinR * outerRad, centerY - cosR * outerRad);
    }
 
    if (depthLevel > 0)
@@ -831,8 +830,8 @@ void Looper::DrawBeatwheel()
       for (int i = 0; i < numSlices; ++i)
       {
          radians = (i * TWO_PI) / numSlices;
-         sinR = sin(radians);
-         cosR = cos(radians);
+         sinR = std::sin(radians);
+         cosR = std::cos(radians);
          ofLine(centerX + sinR * waveformCenter, centerY - cosR * waveformCenter, centerX + sinR * outerRad, centerY - cosR * outerRad);
       }
    }
@@ -846,7 +845,7 @@ bool Looper::DrawToPush2Screen()
    ofPushMatrix();
 
    ofTranslate(60, 3);
-   float displayPos = GetActualLoopPos(0);
+   double displayPos = GetActualLoopPos(0);
    mBufferMutex.lock();
    DrawAudioBuffer(180, 74, mBuffer, 0, mLoopLength, displayPos, mVol);
    mBufferMutex.unlock();
@@ -924,7 +923,7 @@ void Looper::MergeIn(Looper* otherLooper)
 
    otherLooper->SetNumBars(newNumBars);
 
-   if (mVol > 0.01f)
+   if (mVol > 0.01)
    {
       for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
       {
@@ -950,7 +949,7 @@ void Looper::SwapBuffers(Looper* otherLooper)
    ChannelBuffer* temp = otherLooper->mBuffer;
    int length = otherLooper->mLoopLength;
    int numBars = otherLooper->mNumBars;
-   float vol = otherLooper->mVol;
+   double vol = otherLooper->mVol;
    otherLooper->mVol = mVol;
    otherLooper->mBuffer = mBuffer;
    otherLooper->SetLoopLength(mLoopLength);
@@ -969,7 +968,7 @@ void Looper::CopyBuffer(Looper* sourceLooper)
    mNumBars = sourceLooper->mNumBars;
 }
 
-void Looper::Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float offsetMs)
+void Looper::Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, double offsetMs)
 {
    if (mRecorder)
    {
@@ -1001,14 +1000,14 @@ void Looper::SetMute(double time, bool mute)
    mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
 }
 
-void Looper::FilesDropped(std::vector<std::string> files, int x, int y)
+void Looper::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
    SampleDropped(x, y, &sample);
 }
 
-void Looper::SampleDropped(int x, int y, Sample* sample)
+void Looper::SampleDropped(double x, double y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();
@@ -1019,29 +1018,29 @@ void Looper::SampleDropped(int x, int y, Sample* sample)
    if (sample->GetNumBars() > 0)
       SetNumBars(sample->GetNumBars());
 
-   float lengthRatio = float(numSamples) / mLoopLength;
+   double lengthRatio = static_cast<double>(numSamples) / mLoopLength;
    mBuffer->SetNumActiveChannels(sample->NumChannels());
    for (int i = 0; i < mLoopLength; ++i)
    {
-      float offset = i * lengthRatio;
+      double offset = i * lengthRatio;
       for (int ch = 0; ch < sample->NumChannels(); ++ch)
          mBuffer->GetChannel(ch)[i] = GetInterpolatedSample(offset, sample->Data()->GetChannel(ch), numSamples);
    }
 }
 
-void Looper::GetModuleDimensions(float& width, float& height)
+void Looper::GetModuleDimensions(double& width, double& height)
 {
    width = kBufferX * 2 + kBufferWidth;
    height = 182;
 }
 
-void Looper::OnClicked(float x, float y, bool right)
+void Looper::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
    if (x >= kBufferX + kBufferWidth / 3 && x < kBufferX + (kBufferWidth * 2) / 3 &&
        y >= kBufferY + kBufferHeight / 3 && y < kBufferY + (kBufferHeight * 2) / 3 &&
-       mBufferTempo == TheTransport->GetTempo() &&
+       ofAlmostEquel(mBufferTempo, TheTransport->GetTempo()) &&
        gHoveredUIControl == nullptr)
    {
       ChannelBuffer grab(mLoopLength);
@@ -1069,13 +1068,13 @@ void Looper::ButtonClicked(ClickButton* button, double time)
       mWantBakeVolume = true;
    if (button == mSaveButton)
    {
-      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%Y-%m-%d_%H-%M-%S.wav").c_str(), mBuffer, mLoopLength);
+      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%Y-%m-%d_%H-%M-%S.wav"), mBuffer, mLoopLength);
    }
    if (button == mCommitButton && mRecorder)
       mRecorder->Commit(this);
    if (button == mDoubleSpeedButton)
    {
-      if (mSpeed == 1)
+      if (ofAlmostEquel(mSpeed, 1))
       {
          HalveNumBars();
          mSpeed = 2;
@@ -1084,10 +1083,10 @@ void Looper::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mHalveSpeedButton)
    {
-      if (mSpeed == 1 && mLoopLength < MAX_BUFFER_SIZE / 2)
+      if (ofAlmostEquel(mSpeed, 1) && mLoopLength < MAX_BUFFER_SIZE / 2)
       {
          DoubleNumBars();
-         mSpeed = .5f;
+         mSpeed = .5;
          ResampleForSpeed(GetPlaybackSpeed());
       }
    }
@@ -1110,7 +1109,7 @@ void Looper::ButtonClicked(ClickButton* button, double time)
       ResampleForSpeed(GetPlaybackSpeed());
 }
 
-void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Looper::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mScratchSpeedSlider)
    {
@@ -1119,7 +1118,7 @@ void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
    }
    if (slider == mFourTetSlider)
    {
-      if (mFourTet == 0 && !TheSynth->IsLoadingState())
+      if (ofAlmostEquel(mFourTet, 0) && !TheSynth->IsLoadingState())
          mLoopPosOffset = 0;
    }
    if (slider == mVolSlider)
@@ -1159,7 +1158,7 @@ void Looper::CheckboxUpdated(Checkbox* checkbox, double time)
    {
       if (mWriteInput)
       {
-         if (mBufferTempo != TheTransport->GetTempo())
+         if (!ofAlmostEquel(mBufferTempo, TheTransport->GetTempo()))
             ResampleForSpeed(GetPlaybackSpeed());
          mWriteInputRamp.Start(time, 1, time + 10);
       }
@@ -1263,9 +1262,9 @@ void Looper::PlayNote(NoteMessage note)
    //jump around in loop
    if (note.velocity > 0)
    {
-      float measurePos = fmod(note.pitch / 16.0f, mNumBars);
-      float sampsPerBar = TheTransport->MsPerBar() / 1000.0f * gSampleRate;
-      mLoopPosOffset = (measurePos - fmod(TheTransport->GetMeasureTime(note.time), mNumBars)) * sampsPerBar;
+      double measurePos = std::fmod(note.pitch / 16.0, mNumBars);
+      double sampsPerBar = TheTransport->MsPerBar() / 1000.0 * gSampleRate;
+      mLoopPosOffset = (measurePos - std::fmod(TheTransport->GetMeasureTime(note.time), mNumBars)) * sampsPerBar;
       if (mLoopPosOffset < 0)
          mLoopPosOffset += mLoopLength;
       mLoopPosOffsetSlider->DisableLFO();
@@ -1307,7 +1306,7 @@ void Looper::LoadState(FileStreamIn& in, int rev)
 
    in >> mLoopLength;
    if (rev >= 1)
-      in >> mBufferTempo;
+      in >> FloatAsDouble >> mBufferTempo;
    int readLength;
    mBuffer->Load(in, readLength, ChannelBuffer::LoadMode::kAnyBufferSize);
    assert(mLoopLength == readLength);

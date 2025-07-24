@@ -38,7 +38,7 @@ struct NoteMessage
    {
    }
 
-   NoteMessage(double _time, int _pitch, int _velocity, int _voiceIdx = -1, ModulationParameters _modulation = ModulationParameters())
+   NoteMessage(double _time, int _pitch, double _velocity, int _voiceIdx = -1, ModulationParameters _modulation = ModulationParameters())
    : time(_time)
    , pitch(_pitch)
    , velocity(_velocity)
@@ -67,7 +67,7 @@ struct NoteMessage
 
    double time{ 0 };
    int pitch{ 0 };
-   float velocity{ 0 };
+   double velocity{ 0 };
    int voiceIdx{ -1 };
    ModulationParameters modulation;
 };

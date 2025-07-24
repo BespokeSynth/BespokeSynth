@@ -52,7 +52,7 @@ void Stutter::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    PROFILER(Stutter);
 
-   float bufferSize = buffer->BufferSize();
+   auto bufferSize = buffer->BufferSize();
 
    mRecordBuffer.SetNumChannels(buffer->NumActiveChannels());
    mStutterBuffer.SetNumActiveChannels(buffer->NumActiveChannels());
@@ -75,24 +75,24 @@ void Stutter::ProcessAudio(double time, ChannelBuffer* buffer)
          else
             mStutterLength = int(mStutterLengthRamp.Value(time));
 
-         float offset = mStutterPos;
+         double offset = mStutterPos;
          if (offset > mStutterLength)
             offset -= mStutterLength;
          int pos = int(offset);
          int posNext = int(offset + 1) % mStutterLength;
-         float a = offset - pos;
+         double a = offset - pos;
 
          for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
          {
             float sample = GetStutterSampleWithWraparoundBlend(pos, ch);
             float nextSample = GetStutterSampleWithWraparoundBlend(posNext, ch);
-            float stutterOut = (1 - a) * sample + a * nextSample; //interpolate
+            double stutterOut = (1 - a) * sample + a * nextSample; //interpolate
 
-            float fade = 1;
+            double fade = 1;
             if (mFadeStutter)
                fade -= (offset / mStutterLength) * (offset / mStutterLength);
 
-            float blend = mBlendRamp.Value(time);
+            double blend = mBlendRamp.Value(time);
 
             buffer->GetChannel(ch)[i] = stutterOut * blend * fade + buffer->GetChannel(ch)[i] * (1 - blend);
             buffer->GetChannel(ch)[i] = mJumpBlender[ch].Process(buffer->GetChannel(ch)[i], i);
@@ -117,7 +117,7 @@ float Stutter::GetStutterSampleWithWraparoundBlend(int pos, int ch)
 {
    if (pos > mStutterLength - STUTTER_BLEND_WRAPAROUND_SAMPLES)
    {
-      float a = float(mStutterLength - pos) / STUTTER_BLEND_WRAPAROUND_SAMPLES;
+      double a = static_cast<double>(mStutterLength - pos) / STUTTER_BLEND_WRAPAROUND_SAMPLES;
       int blendPos = pos - mStutterLength;
       pos = GetBufferReadPos(pos);
       blendPos = GetBufferReadPos(blendPos);
@@ -133,7 +133,7 @@ float Stutter::GetStutterSampleWithWraparoundBlend(int pos, int ch)
    }
 }
 
-float Stutter::GetBufferReadPos(float stutterPos)
+double Stutter::GetBufferReadPos(double stutterPos)
 {
    return stutterPos; // + mCaptureLength - mStutterLength;
 }
@@ -241,7 +241,7 @@ void Stutter::DoStutter(double time, StutterParams stutter)
    mStutterLengthRamp.SetValue(mStutterLength);
 }
 
-void Stutter::DrawStutterBuffer(float x, float y, float width, float height)
+void Stutter::DrawStutterBuffer(double x, double y, double width, double height)
 {
    ofPushMatrix();
    ofTranslate(x, y);
@@ -263,7 +263,7 @@ void Stutter::OnTimeEvent(double time)
 {
    if (mEnabled)
    {
-      if (mAutoStutter && TheTransport->GetMeasurePos(time) > .001f) //don't auto-stutter downbeat
+      if (mAutoStutter && TheTransport->GetMeasurePos(time) > .001) //don't auto-stutter downbeat
       {
          if (gRandom() % 4 == 0)
          {
@@ -274,7 +274,7 @@ void Stutter::OnTimeEvent(double time)
                                                      StutterParams(kInterval_32n, 1),
                                                      StutterParams(kInterval_64n, 1),
                                                      StutterParams(kInterval_2n, -1),
-                                                     StutterParams(kInterval_8n, .5f),
+                                                     StutterParams(kInterval_8n, .5),
                                                      StutterParams(kInterval_8n, 2) };
             DoStutter(time, randomStutters[gRandom() % 9]);
          }

@@ -52,7 +52,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -60,7 +60,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
    bool DrawToPush2Screen() override;
 
@@ -81,7 +81,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    bool IsResizable() const override { return false; }
    void PostRepatch(PatchCableSource* cable, bool fromUserClick) override;
    bool ShouldSavePatchCableSources() const override { return false; }
@@ -106,7 +106,7 @@ private:
    struct ControlTarget
    {
       void CreateUIControls(SongBuilder* owner);
-      void Draw(float x, float y, int numRows);
+      void Draw(double x, double y, int numRows);
       void TargetControlUpdated();
       IUIControl* GetTarget() const;
       void CleanUp();
@@ -135,11 +135,11 @@ private:
    struct ControlValue
    {
       void CreateUIControls(SongBuilder* owner);
-      void Draw(float x, float y, int sceneIndex, ControlTarget* target);
+      void Draw(double x, double y, int sceneIndex, ControlTarget* target);
       void CleanUp();
       void UpdateDropdownContents(ControlTarget* target);
 
-      float mFloatValue{ 0 };
+      double mFloatValue{ 0 };
       TextEntry* mValueEntry{ nullptr };
       bool mBoolValue{ false };
       Checkbox* mCheckbox{ nullptr };
@@ -154,11 +154,11 @@ private:
       : mName(name)
       {}
       void CreateUIControls(SongBuilder* owner);
-      void Draw(SongBuilder* owner, float x, float y, int sceneIndex);
+      void Draw(SongBuilder* owner, double x, double y, int sceneIndex);
       void TargetControlUpdated(SongBuilder::ControlTarget* target, int targetIndex, bool wasManuallyPatched);
       void AddValue(SongBuilder* owner);
       void MoveValue(int index, int amount);
-      float GetWidth() const;
+      double GetWidth() const;
       void CleanUp();
 
       std::string mName{};

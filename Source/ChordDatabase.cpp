@@ -33,91 +33,91 @@ ChordDatabase::ChordDatabase()
 {
    // Major scale like chords
    //
-   // { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -1.0f } // Based on Mixolydian/Ionian mode
+   // { 10.0, -2.0, -1.0, 10.0, -2.0, -1.0, -2.0, 10.0, -2.0, -1.0, -1.0, -1.0 } // Based on Mixolydian/Ionian mode
 
    // ref:                           {  0/12,  1/13,  2/14,  3/15,  4/16,  5/17,  6/18,  7/19,  8/20,  9/21, 10/22, 11/23}));
    //                                {     C,    C#,     D,    D#,     E,     F,    F#,     G,    G#,     A,    A#,     B}));
 
    mChordShapes.push_back(ChordShape("", { 0, 4, 7 },
-                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -1.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, -5.0, 10.0, -1.0, -2.0, 10.0, -2.0, -1.0, -1.0, -1.0 }, 2.0));
    mChordShapes.push_back(ChordShape("sus4", { 0, 5, 7 },
-                                     { 10.0f, -2.0f, -1.0f, -5.0f, -5.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, -5.0, -5.0, 10.0, -2.0, 10.0, -2.0, -1.0, -1.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("sus2", { 0, 2, 7 },
-                                     { 10.0f, -2.0f, 10.0f, -5.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, 10.0, -5.0, -5.0, -1.0, -2.0, 10.0, -2.0, -1.0, -1.0, -2.0 }, 2.0));
 
    mChordShapes.push_back(ChordShape("2", { 0, 2, 4, 7 },
-                                     { 10.0f, -2.0f, 10.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, 10.0, -5.0, 10.0, -1.f, -2.0, 10.0, -2.0, -1.0, -1.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("4", { 0, 4, 5, 7 },
-                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, -5.0, 10.0, 10.0, -2.0, 10.0, -2.0, -1.0, -1.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("6", { 0, 4, 7, 9 },
-                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, 10.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, -5.0, 10.0, -1.0, -2.0, 10.0, -2.0, 10.0, -1.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("7", { 0, 4, 7, 10 },
-                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, -5.0, 10.0, -1.0, -2.0, 10.0, -2.0, -1.0, 10.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("9", { 0, 4, 7, 10, 14 },
-                                     { 10.0f, -2.0f, 10.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 8.00f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, 10.0, -5.0, 10.0, -1.0, -2.0, 10.0, -2.0, -1.0, 8.00, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("11", { 0, 4, 7, 10, 14, 17 },
-                                     { 10.0f, -2.0f, 8.00f, -5.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, 8.00f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, 8.00, -5.0, 10.0, 10.0, -2.0, 10.0, -2.0, -1.0, 8.00, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("13", { 0, 4, 7, 10, 14, 17, 21 },
-                                     { 10.0f, -2.0f, 8.00f, -2.0f, 10.0f, 8.00f, -2.0f, 10.0f, -2.0f, 10.0f, 8.00f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, 8.00, -2.0, 10.0, 8.00, -2.0, 10.0, -2.0, 10.0, 8.00, -2.0 }, 2.0));
 
 
    mChordShapes.push_back(ChordShape("6/9", { 0, 4, 7, 9, 14 },
-                                     { 10.0f, -2.0f, 10.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, 10.0f, -5.0f, -5.0f }, 2.0f));
+                                     { 10.0, -2.0, 10.0, -5.0, 10.0, -1.0, -2.0, 10.0, -2.0, 10.0, -5.0, -5.0 }, 2.0));
 
 
    mChordShapes.push_back(ChordShape("maj7", { 0, 4, 7, 11 },
-                                     { 10.0f, -2.0f, -1.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, -5.0, 10.0, -1.0, -2.0, 10.0, -2.0, -1.0, -2.0, 10.0 }, 2.0));
    mChordShapes.push_back(ChordShape("maj9", { 0, 4, 7, 11, 14 },
-                                     { 10.0f, -2.0f, 10.0f, -5.0f, 10.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, 8.00f }, 2.0f));
+                                     { 10.0, -2.0, 10.0, -5.0, 10.0, -1.0, -2.0, 10.0, -2.0, -1.0, -2.0, 8.00 }, 2.0));
    mChordShapes.push_back(ChordShape("maj11", { 0, 4, 7, 11, 14, 17 },
-                                     { 10.0f, -2.0f, 8.00f, -5.0f, 10.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, 8.00f }, 2.0f));
+                                     { 10.0, -2.0, 8.00, -5.0, 10.0, 10.0, -2.0, 10.0, -2.0, -1.0, -2.0, 8.00 }, 2.0));
    mChordShapes.push_back(ChordShape("maj13", { 0, 4, 7, 11, 14, 17, 21 },
-                                     { 10.0f, -2.0f, 8.00f, -5.0f, 10.0f, 8.00f, -2.0f, 10.0f, -2.0f, 10.0f, -2.0f, 8.00f }, 2.0f));
+                                     { 10.0, -2.0, 8.00, -5.0, 10.0, 8.00, -2.0, 10.0, -2.0, 10.0, -2.0, 8.00 }, 2.0));
 
    // Minor scale like chords
-   // { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -2.0f, -1.0f } // Based on Dorian/Aeolian mode
+   // { 10.0, -2.0, -1.0, 10.0, -2.0, -1.0, -2.0, 10.0, -2.0, -1.0, -2.0, -1.0 } // Based on Dorian/Aeolian mode
 
    // ref:                           {  0/12,  1/13,  2/14,  3/15,  4/16,  5/17,  6/18,  7/19,  8/20,  9/21, 10/22, 11/23}));
    //                                {     C,    C#,     D,    D#,     E,     F,    F#,     G,    G#,     A,    A#,     B}));
 
    mChordShapes.push_back(ChordShape("m", { 0, 3, 7 },
-                                     { 10.0f, -2.0f, -1.0f, 10.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, 10.0, -5.0, -1.0, -2.0, 10.0, -2.0, -1.0, -1.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("m6", { 0, 3, 7, 9 },
-                                     { 10.0f, -2.0f, -1.0f, 10.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, 10.0f, -1.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, 10.0, -5.0, -1.0, -2.0, 10.0, -2.0, 10.0, -1.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("m7", { 0, 3, 7, 10 },
-                                     { 10.0f, -2.0f, -1.0f, 10.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -1.0, 10.0, -5.0, -1.0, -2.0, 10.0, -2.0, -1.0, 10.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("m9", { 0, 3, 7, 10, 14 },
-                                     { 10.0f, -2.0f, 10.0f, 10.0f, -5.0f, -1.0f, -2.0f, 10.0f, -2.0f, -1.0f, 8.00f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, 10.0, 10.0, -5.0, -1.0, -2.0, 10.0, -2.0, -1.0, 8.00, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("m11", { 0, 3, 7, 10, 14, 17 },
-                                     { 10.0f, -2.0f, 8.00f, 10.0f, -5.0f, 10.0f, -2.0f, 10.0f, -2.0f, -1.0f, 8.00f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, 8.00, 10.0, -5.0, 10.0, -2.0, 10.0, -2.0, -1.0, 8.00, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("m13", { 0, 3, 7, 10, 14, 17, 21 },
-                                     { 10.0f, -2.0f, 8.00f, 10.0f, -5.0f, 8.00f, -2.0f, 10.0f, -2.0f, 10.0f, 8.00f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, 8.00, 10.0, -5.0, 8.00, -2.0, 10.0, -2.0, 10.0, 8.00, -2.0 }, 2.0));
 
    // Mixed
-   // { 10.0f, -2.0f, -2.0f, -1.0f, 10.0f, -2.0f, -2.0f, -1.0f, 10.0f, -2.0f, -2.0f, -1.0f } // Based on augmented scale
-   // { 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, 10.0f, -2.0f, -1.0f, -1.0f, -2.0f, -1.0f } // Based on diminished scale
-   // { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, -2.0f, -2.0f } // no scale? {:^c (i.e. don't alter mixed chords)
+   // { 10.0, -2.0, -2.0, -1.0, 10.0, -2.0, -2.0, -1.0, 10.0, -2.0, -2.0, -1.0 } // Based on augmented scale
+   // { 10.0, -2.0, -1.0, 10.0, -2.0, -1.0, 10.0, -2.0, -1.0, -1.0, -2.0, -1.0 } // Based on diminished scale
+   // { 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, -2.0, -2.0, -2.0 } // no scale? {:^c (i.e. don't alter mixed chords)
 
    // ref:                           {  0/12,  1/13,  2/14,  3/15,  4/16,  5/17,  6/18,  7/19,  8/20,  9/21, 10/22, 11/23}));
    //                                {     C,    C#,     D,    D#,     E,     F,    F#,     G,    G#,     A,    A#,     B}));
    mChordShapes.push_back(ChordShape("aug", { 0, 4, 8 },
-                                     { 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -2.0, -2.0, 10.0, -2.0, -2.0, -2.0, 10.0, -2.0, -2.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("aug7", { 0, 4, 8, 10 },
-                                     { 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -2.0, -2.0, 10.0, -2.0, -2.0, -2.0, 10.0, -2.0, 10.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("aug/maj7", { 0, 4, 8, 11 },
-                                     { 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f }, 2.0f));
+                                     { 10.0, -2.0, -2.0, -2.0, 10.0, -2.0, -2.0, -2.0, 10.0, -2.0, -2.0, 10.0 }, 2.0));
 
    mChordShapes.push_back(ChordShape("dim", { 0, 3, 6 },
-                                     { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, -2.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, -2.0, -2.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("dim7", { 0, 3, 6, 9 },
-                                     { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, 10.0, -2.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("min7dim5", { 0, 3, 6, 10 },
-                                     { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, -2.0, 10.0, -2.0 }, 2.0));
 
    mChordShapes.push_back(ChordShape("dom7dim5", { 0, 4, 6, 10 },
-                                     { 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, 10.0f, -2.0f }, 2.0f));
+                                     { 10.0, -2.0, -2.0, -2.0, 10.0, -2.0, 10.0, -2.0, -2.0, -2.0, 10.0, -2.0 }, 2.0));
    mChordShapes.push_back(ChordShape("min/maj7", { 0, 3, 7, 11 },
-                                     { 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, 10.0f, -2.0f, -2.0f, -2.0f, -2.0f, 10.0f }, 2.0f));
+                                     { 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, 10.0, -2.0, -2.0, -2.0, -2.0, 10.0 }, 2.0));
 }
 
 std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int>& pitches, bool useScaleDegrees, bool showIntervals) const
@@ -157,7 +157,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
 
    // Considering each played note as a possible root, find the root and chord with the greatest weight
 
-   float maxWeight = 0.0f;
+   double maxWeight = 0.0;
    int lowestPitch = pitches[0] % 12;
 
    std::list<std::tuple<int, ChordShape>> bestChords; // Is this cursed?
@@ -168,7 +168,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
       // Try note as the root, multiply with the weights of the notes to be played
       for (auto& shape : mChordShapes)
       {
-         float chordWeight = shape.mWeightSum;
+         double chordWeight = shape.mWeightSum;
 
          // Add some extra weight if the lowest played note is the root
          chordWeight += rootOctavePitch == lowestPitch ? shape.mRootPosBias : 0;
@@ -177,7 +177,7 @@ std::set<std::string> ChordDatabase::GetChordNamesAdvanced(const std::vector<int
          for (auto& octavePitch : octavePitches)
          {
             // Looping over the same stuff within the same loop, crazy!
-            chordWeight += 2.0f * shape.mWeights[(12 + octavePitch - rootOctavePitch) % 12];
+            chordWeight += 2.0 * shape.mWeights[(12 + octavePitch - rootOctavePitch) % 12];
          }
 
          // Consider the chords with the highest weight as the best fit

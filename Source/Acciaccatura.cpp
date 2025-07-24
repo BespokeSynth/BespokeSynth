@@ -69,7 +69,7 @@ void Acciaccatura::PlayNote(NoteMessage note)
    {
       ComputeSliders(0);
       auto* pitchBend = mModulation.GetPitchBend(note.voiceIdx);
-      float bendStart;
+      double bendStart;
       if (mNoteMode == NoteMode::Scale)
       {
          int tone = TheScale->GetToneFromPitch(note.pitch);
@@ -90,7 +90,7 @@ void Acciaccatura::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void Acciaccatura::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Acciaccatura::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

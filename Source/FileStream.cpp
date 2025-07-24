@@ -30,6 +30,8 @@
 
 //static
 bool FileStreamIn::s32BitMode = false;
+//extern
+FloatAsDoubleVersioner FloatAsDouble;
 
 static std::unique_ptr<juce::FileOutputStream> MakeFileOutStream(const std::string& path)
 {
@@ -161,7 +163,17 @@ FileStreamIn& FileStreamIn::operator>>(float& var)
 
 FileStreamIn& FileStreamIn::operator>>(double& var)
 {
-   mStream->read(&var, sizeof(double));
+   if (mLoadNextDoubleFromFloat)
+   {
+      float f;
+      mStream->read(&f, sizeof(float));
+      var = static_cast<double>(f);
+      mLoadNextDoubleFromFloat = false;
+   }
+   else
+   {
+      mStream->read(&var, sizeof(double));
+   }
    return *this;
 }
 
@@ -193,6 +205,13 @@ FileStreamIn& FileStreamIn::operator>>(std::string& var)
 FileStreamIn& FileStreamIn::operator>>(char& var)
 {
    mStream->read(&var, sizeof(char));
+   return *this;
+}
+
+FileStreamIn& FileStreamIn::operator>>(FloatAsDoubleVersioner& flag)
+{
+   if (ModularSynth::sLoadingFileSaveStateRev < 427)
+      mLoadNextDoubleFromFloat = true;
    return *this;
 }
 

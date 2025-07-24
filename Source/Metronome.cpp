@@ -59,7 +59,7 @@ void Metronome::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
@@ -95,7 +95,7 @@ void Metronome::OnTimeEvent(double time)
    else
    {
       mPhaseInc = GetPhaseInc(440);
-      mOsc.Start(gTime, .8f, 0, 50, 0, 0);
+      mOsc.Start(gTime, .8, 0, 50, 0, 0);
    }
 }
 

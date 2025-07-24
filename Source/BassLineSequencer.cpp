@@ -168,38 +168,38 @@ void BassLineSequencer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   float displayWidth = GetDisplayWidth();
+   double displayWidth = GetDisplayWidth();
 
    ofPushMatrix();
    ofTranslate(kDisplayX, mNoteDisplayY);
    ofPushStyle();
    ofFill();
-   ofSetColor(100, 100, 100, 0.5f * gModuleDrawAlpha);
+   ofSetColor(100, 100, 100, 0.5 * gModuleDrawAlpha);
    ofRect(0, 0, displayWidth, kDisplayHeight);
-   float noteWidth = displayWidth / mLength;
+   double noteWidth = displayWidth / mLength;
    for (int i = 0; i < mLength; ++i)
    {
       if (i % 2 == 0)
       {
          if (i % 8 == 0)
-            ofSetColor(120, 120, 120, 0.5f * gModuleDrawAlpha);
+            ofSetColor(120, 120, 120, 0.5 * gModuleDrawAlpha);
          else
-            ofSetColor(80, 80, 80, 0.5f * gModuleDrawAlpha);
+            ofSetColor(80, 80, 80, 0.5 * gModuleDrawAlpha);
          ofRect(i * noteWidth, 0, noteWidth, kDisplayHeight);
       }
    }
 
-   float toneHeight = kDisplayHeight / mNoteRange;
+   double toneHeight = kDisplayHeight / mNoteRange;
    /*ofSetColor(255, 255, 255, gModuleDrawAlpha * .2f);
    ofSetLineWidth(0.5f);
    for (int i = 1; i < toneRange; ++i)
       ofLine(0, toneHeight * i, displayWidth, toneHeight * i);*/
 
-   float noteHeight = kDisplayHeight / mNoteRange;
-   float lineWidth = MIN(noteHeight, 5);
+   double noteHeight = kDisplayHeight / mNoteRange;
+   double lineWidth = MIN(noteHeight, 5);
    ofPushStyle();
    ofSetLineWidth(lineWidth);
-   float playingVelocity = mSteps[0].mVelocity;
+   double playingVelocity = mSteps[0].mVelocity;
    for (int i = 0; i < mLength; ++i)
    {
       if (mSteps[i].mVelocity > 0)
@@ -217,7 +217,7 @@ void BassLineSequencer::DrawModule()
          {
             playingVelocity = mSteps[i].mVelocity;
 
-            ofVec2f center = GetNoteDrawPos(i, displayWidth, kDisplayHeight, lineWidth, false);
+            ofVec2d center = GetNoteDrawPos(i, displayWidth, kDisplayHeight, lineWidth, false);
             if (playingVelocity > kVelocityNormal)
             {
                ofSetColor(255, 255, 255, gModuleDrawAlpha);
@@ -239,7 +239,7 @@ void BassLineSequencer::DrawModule()
       }
    }
    ofPopStyle();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha * .2f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .2);
    ofRect(mStepIdx * noteWidth, 0, noteWidth, kDisplayHeight);
    if (mHighlightDisplayStepIdx != -1)
    {
@@ -255,15 +255,15 @@ void BassLineSequencer::DrawModule()
    int numNotesOnPage = mNumVisibleStepControls;
    if (mEditPage == GetPageCount() - 1 && mLength % mNumVisibleStepControls != 0)
       numNotesOnPage = mLength % mNumVisibleStepControls;
-   float editX = kDisplayX + mEditPage * mNumVisibleStepControls * noteWidth;
-   float editW = numNotesOnPage * noteWidth;
-   ofSetLineWidth(0.5f);
+   double editX = kDisplayX + mEditPage * mNumVisibleStepControls * noteWidth;
+   double editW = numNotesOnPage * noteWidth;
+   ofSetLineWidth(0.5);
    ofRect(editX, mNoteDisplayY, editW, kDisplayHeight);
    if (mEditStepControl != -1)
    {
       ofPushStyle();
       ofSetColor(255, 255, 255, gModuleDrawAlpha * ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2f, .8f));
-      float editStepControlX = kDisplayX + (mEditPage * mNumVisibleStepControls + mEditStepControl) * noteWidth;
+      double editStepControlX = kDisplayX + (mEditPage * mNumVisibleStepControls + mEditStepControl) * noteWidth;
       ofRect(editStepControlX + 1, mNoteDisplayY + 1, noteWidth - 2, kDisplayHeight - 2);
       ofPopStyle();
    }
@@ -271,9 +271,9 @@ void BassLineSequencer::DrawModule()
    for (int i = 0; i < numNotesOnPage; ++i)
    {
       if (i % 2 == 0)
-         ofSetColor(120, 120, 120, gModuleDrawAlpha * .3f);
+         ofSetColor(120, 120, 120, gModuleDrawAlpha * .3);
       else
-         ofSetColor(80, 80, 80, gModuleDrawAlpha * .3f);
+         ofSetColor(80, 80, 80, gModuleDrawAlpha * .3);
       ofBeginShape();
       ofVertex(editX + i * noteWidth, mNoteDisplayY + kDisplayHeight);
       ofVertex(mStepControls[i].xPos, mStepControls[i].yPos - 2);
@@ -340,7 +340,7 @@ void BassLineSequencer::DrawModule()
          {
             ofPushStyle();
             ofSetColor(255, 255, 255, gModuleDrawAlpha);
-            ofSetLineWidth(0.5f);
+            ofSetLineWidth(0.5);
             ofLine(mStepControls[i].xPos - 2, mStepControls[i].yPos, mStepControls[i].xPos - 2, mStepControls[i].yMax);
             ofPopStyle();
          }
@@ -348,10 +348,10 @@ void BassLineSequencer::DrawModule()
    }
 }
 
-ofVec2f BassLineSequencer::GetNoteDrawPos(int stepIdx, float displayWidth, float displayHeight, float lineWidth, bool end)
+ofVec2d BassLineSequencer::GetNoteDrawPos(int stepIdx, double displayWidth, double displayHeight, double lineWidth, bool end)
 {
-   float noteHeight = displayHeight / mNoteRange;
-   float noteWidth = displayWidth / mLength;
+   double noteHeight = displayHeight / mNoteRange;
+   double noteWidth = displayWidth / mLength;
    int radiusScootch = lineWidth;
    int x = stepIdx * noteWidth;
    if (end)
@@ -361,21 +361,21 @@ ofVec2f BassLineSequencer::GetNoteDrawPos(int stepIdx, float displayWidth, float
    {
       if (!mSteps[stepIdx].mTie)
          x -= radiusScootch;
-      return ofVec2f(x, y + radiusScootch);
+      return ofVec2d(x, y + radiusScootch);
    }
    else
    {
       bool tiePrevious = stepIdx > 0 && (mSteps[stepIdx - 1].mTie && mSteps[stepIdx - 1].mVelocity > 0);
       if (tiePrevious)
       {
-         float glideDuration = MIN(mGlideTime / TheTransport->GetDuration(mInterval), 1.0f);
+         double glideDuration = MIN(mGlideTime / TheTransport->GetDuration(mInterval), 1.0);
          x += glideDuration * noteWidth;
       }
       else
       {
          x += radiusScootch;
       }
-      return ofVec2f(x, y + radiusScootch);
+      return ofVec2d(x, y + radiusScootch);
    }
 }
 
@@ -388,7 +388,7 @@ void BassLineSequencer::PlayNote(NoteMessage note)
       if (mHeldInputPitch == -1)
          mWriteNewNotePitch = note.pitch;
       mHeldInputPitch = note.pitch;
-      mLastInputVelocity = note.velocity / 127.0f;
+      mLastInputVelocity = note.velocity / 127.0;
    }
 }
 
@@ -400,13 +400,13 @@ void BassLineSequencer::OnTimeEvent(double time)
    StepBy(time, 1, kPulseFlag_SyncToTransport);
 }
 
-void BassLineSequencer::OnPulse(double time, float velocity, int flags)
+void BassLineSequencer::OnPulse(double time, double velocity, int flags)
 {
    mHasExternalPulseSource = true;
    StepBy(time, velocity, flags);
 }
 
-void BassLineSequencer::StepBy(double time, float velocity, int flags)
+void BassLineSequencer::StepBy(double time, double velocity, int flags)
 {
    mStepIdx = (mStepIdx + 1) % mLength;
 
@@ -475,7 +475,7 @@ void BassLineSequencer::StepBy(double time, float velocity, int flags)
          int pitch = NoteStepSequencer::RowToPitch(mNoteMode, mSteps[mStepIdx].mTone, mOctave, 0);
          if (mLastWasTied)
          {
-            float bendDistance = pitch - mPlayingPitch;
+            double bendDistance = pitch - mPlayingPitch;
             bool retrigger = outputVelocity > mLastVelocity || isAccent;
             if (mGlideMode == GlideMode::PitchBend)
             {
@@ -539,7 +539,7 @@ void BassLineSequencer::ResetStep()
 
 void BassLineSequencer::UpdateStepControls()
 {
-   for (int i = 0; i < (int)mStepControls.size(); ++i)
+   for (int i = 0; i < (int)mStepControls.size() - 1; ++i)
    {
       mStepControls[i].mTone = mSteps[i + mEditPage * mNumVisibleStepControls].mTone;
       mStepControls[i].mVelocity = mSteps[i + mEditPage * mNumVisibleStepControls].mVelocity;
@@ -574,13 +574,13 @@ void BassLineSequencer::UpdatePitchLabels()
    }
 }
 
-void BassLineSequencer::GetModuleDimensions(float& width, float& height)
+void BassLineSequencer::GetModuleDimensions(double& width, double& height)
 {
    width = mWidth;
    height = mHeight;
 }
 
-void BassLineSequencer::OnClicked(float x, float y, bool right)
+void BassLineSequencer::OnClicked(double x, double y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
@@ -589,14 +589,14 @@ void BassLineSequencer::OnClicked(float x, float y, bool right)
 
    if (x >= kDisplayX && x < kDisplayX + GetDisplayWidth() && y >= mNoteDisplayY && y < mNoteDisplayY + kDisplayHeight)
    {
-      float noteWidth = GetDisplayWidth() / mLength;
+      double noteWidth = GetDisplayWidth() / mLength;
       int numNotesOnPage = mNumVisibleStepControls;
       if (mEditPage == GetPageCount() - 1 && mLength % mNumVisibleStepControls != 0)
          numNotesOnPage = mLength % mNumVisibleStepControls;
-      float editW = numNotesOnPage * noteWidth;
+      double editW = numNotesOnPage * noteWidth;
       for (int i = 0; i < GetPageCount(); ++i)
       {
-         float editX = kDisplayX + i * mNumVisibleStepControls * noteWidth;
+         double editX = kDisplayX + i * mNumVisibleStepControls * noteWidth;
          if (x >= editX && x < editX + editW)
          {
             if (i == mEditPage)
@@ -636,7 +636,7 @@ void BassLineSequencer::MouseReleased()
       stepControl.mGridSquare->MouseReleased();
 }
 
-bool BassLineSequencer::MouseMoved(float x, float y)
+bool BassLineSequencer::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
    for (auto& stepControl : mStepControls)
@@ -653,10 +653,10 @@ bool BassLineSequencer::MouseMoved(float x, float y)
    mHighlightStepControlIdx = -1;
    if (x >= kDisplayX && x < kDisplayX + GetDisplayWidth() && y >= mNoteDisplayY && y < mNoteDisplayY + kDisplayHeight)
    {
-      float noteWidth = GetDisplayWidth() / mLength;
+      double noteWidth = GetDisplayWidth() / mLength;
       for (int i = 0; i < mLength; ++i)
       {
-         float noteX = kDisplayX + i * noteWidth;
+         double noteX = kDisplayX + i * noteWidth;
          if (x >= noteX && x < noteX + noteWidth)
          {
             int controlOffset = mNumVisibleStepControls * mEditPage;
@@ -675,8 +675,8 @@ void BassLineSequencer::KeyPressed(int key, bool isRepeat)
 {
    bool consumed = false;
 
-   float x = mMouseHoverPos.x;
-   float y = mMouseHoverPos.y;
+   double x = mMouseHoverPos.x;
+   double y = mMouseHoverPos.y;
 
    if (key == OF_KEY_UP || key == OF_KEY_DOWN)
    {
@@ -684,7 +684,7 @@ void BassLineSequencer::KeyPressed(int key, bool isRepeat)
       {
          if (mStepControls[i].mGridSquare->GetRect(K(local)).contains(x, y))
          {
-            float newVelocity = -1;
+            double newVelocity = -1;
 
             if (key == OF_KEY_UP)
             {
@@ -733,10 +733,10 @@ void BassLineSequencer::KeyPressed(int key, bool isRepeat)
    {
       if (x >= kDisplayX && x < kDisplayX + GetDisplayWidth() && y >= mNoteDisplayY && y < mNoteDisplayY + kDisplayHeight)
       {
-         float noteWidth = GetDisplayWidth() / mLength;
+         double noteWidth = GetDisplayWidth() / mLength;
          for (int i = 0; i < mLength; ++i)
          {
-            float noteX = kDisplayX + i * noteWidth;
+            double noteX = kDisplayX + i * noteWidth;
             if (x >= noteX && x < noteX + noteWidth)
             {
                int adjustToneAmount = 0;
@@ -840,7 +840,7 @@ void BassLineSequencer::KeyPressed(int key, bool isRepeat)
       IDrawableModule::KeyPressed(key, isRepeat);
 }
 
-void BassLineSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+void BassLineSequencer::GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue)
 {
    for (int i = 0; i < (int)mStepControls.size(); ++i)
    {
@@ -900,26 +900,26 @@ void BassLineSequencer::ButtonClicked(ClickButton* button, double time)
       for (auto& step : mSteps)
       {
          step.mTone = tones[gRandom() % tones.size()];
-         if (ofRandom(1.0f) < mRandomDensity)
+         if (ofRandom(1.0) < mRandomDensity)
          {
-            if (ofRandom(1.0f) <= mRandomAccents)
+            if (ofRandom(1.0) <= mRandomAccents)
                step.mVelocity = kVelocityAccent;
             else
-               step.mVelocity = ofRandom(1.0f) <= 0.3f ? kVelocityGhost : kVelocityNormal;
+               step.mVelocity = ofRandom(1.0) <= 0.3 ? kVelocityGhost : kVelocityNormal;
          }
          else
          {
             step.mVelocity = 0;
          }
 
-         step.mTie = ofRandom(1.0f) <= mRandomTies ? true : false;
+         step.mTie = ofRandom(1.0) <= mRandomTies ? true : false;
       }
 
       for (size_t i = 1; i < mSteps.size(); ++i)
       {
-         if (mSteps[i].mVelocity == 0)
+         if (ofAlmostEquel(mSteps[i].mVelocity, 0))
             mSteps[i - 1].mTie = false;
-         else if (mSteps[i - 1].mTie && ofRandom(1.0f) < 0.5f)
+         else if (mSteps[i - 1].mTie && ofRandom(1.0) < 0.5)
             mSteps[i].mTone = mSteps[i - 1].mTone;
       }
    }
@@ -987,7 +987,7 @@ void BassLineSequencer::IntSliderUpdated(IntSlider* slider, int oldVal, double t
    }
 }
 
-void BassLineSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void BassLineSequencer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -1062,7 +1062,7 @@ void BassLineSequencer::LoadState(FileStreamIn& in, int rev)
    for (auto& step : mSteps)
    {
       in >> step.mTone;
-      in >> step.mVelocity;
+      in >> FloatAsDouble >> step.mVelocity;
       in >> step.mTie;
    }
 

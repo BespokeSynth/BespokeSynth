@@ -40,7 +40,7 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
+   double GetEffectAmount() override;
    std::string GetType() override { return "dcremover"; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -49,7 +49,7 @@ public:
 
 private:
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
    void DrawModule() override;
 
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};

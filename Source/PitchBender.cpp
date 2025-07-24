@@ -71,12 +71,12 @@ void PitchBender::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void PitchBender::OnTransportAdvanced(float amount)
+void PitchBender::OnTransportAdvanced(double amount)
 {
    ComputeSliders(0);
 }
 
-void PitchBender::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void PitchBender::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (mEnabled && slider == mBendSlider)
       mModulation.GetPitchBend(-1)->SetValue(mBend);

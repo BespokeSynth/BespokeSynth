@@ -59,7 +59,7 @@ public:
    bool CheckNeedsDraw() override { return true; }
 
    void ButtonClicked(ClickButton* button, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -72,7 +72,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(double& width, double& height) override;
 
    int LoopLength() const;
 
@@ -84,9 +84,9 @@ private:
    float* mBuffer{ nullptr };
    float mLoopPos{ 0 };
    int mNumBars{ 1 };
-   float mVol{ 1 };
-   float mFeedIn{ 1 };
-   float mSmoothedVol{ 1 };
+   double mVol{ 1 };
+   double mFeedIn{ 1 };
+   double mSmoothedVol{ 1 };
    FloatSlider* mVolSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
    DropdownList* mNumBarsSelector{ nullptr };

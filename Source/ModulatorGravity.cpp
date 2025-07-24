@@ -49,7 +49,7 @@ void ModulatorGravity::CreateUIControls()
    UIBLOCK0();
    FLOATSLIDER(mGravitySlider, "gravity", &mGravity, -1, 1);
    FLOATSLIDER(mKickAmountSlider, "kick amt", &mKickAmount, -5, 5);
-   FLOATSLIDER(mDragSlider, "drag", &mDrag, 0, .01f);
+   FLOATSLIDER(mDragSlider, "drag", &mDrag, 0, .01);
    BUTTON(mKickButton, "kick");
    ENDUIBLOCK(mWidth, mHeight);
 
@@ -79,24 +79,24 @@ void ModulatorGravity::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    OnModulatorRepatch();
 }
 
-void ModulatorGravity::OnTransportAdvanced(float amount)
+void ModulatorGravity::OnTransportAdvanced(double amount)
 {
-   float dt = amount * TheTransport->MsPerBar();
-   float newVelocity = mVelocity + mGravity / 100000 * dt;
+   double dt = amount * TheTransport->MsPerBar();
+   double newVelocity = mVelocity + mGravity / 100000 * dt;
    newVelocity -= newVelocity * mDrag * dt;
-   float newValue = ofClamp(mValue + newVelocity * dt, 0, 1);
+   double newValue = ofClamp(mValue + newVelocity * dt, 0, 1);
    mVelocity = (newValue - mValue) / dt;
    mValue = newValue;
 }
 
-float ModulatorGravity::Value(int samplesIn)
+double ModulatorGravity::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
    //return ofClamp(mRamp.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax());
    return ofLerp(GetMin(), GetMax(), mValue); //TODO(integrate over samples)
 }
 
-void ModulatorGravity::OnPulse(double time, float velocity, int flags)
+void ModulatorGravity::OnPulse(double time, double velocity, int flags)
 {
    Kick(velocity);
 }
@@ -107,7 +107,7 @@ void ModulatorGravity::ButtonClicked(ClickButton* button, double time)
       Kick(1);
 }
 
-void ModulatorGravity::Kick(float strength)
+void ModulatorGravity::Kick(double strength)
 {
    mVelocity += mKickAmount / 1000 * strength;
 }

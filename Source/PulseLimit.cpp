@@ -59,7 +59,7 @@ void PulseLimit::DrawModule()
    mResetButton->Draw();
 }
 
-void PulseLimit::OnPulse(double time, float velocity, int flags)
+void PulseLimit::OnPulse(double time, double velocity, int flags)
 {
    ComputeSliders(0);
 

@@ -98,7 +98,7 @@ void PulseChance::DrawModule()
    mNextSeedButton->Draw();
 }
 
-void PulseChance::OnPulse(double time, float velocity, int flags)
+void PulseChance::OnPulse(double time, double velocity, int flags)
 {
    ComputeSliders(0);
 
@@ -111,10 +111,10 @@ void PulseChance::OnPulse(double time, float velocity, int flags)
    if (flags & kPulseFlag_Reset)
       mRandomIndex = 0;
 
-   float random;
+   double random;
    if (mDeterministic)
    {
-      random = ((abs(DeterministicRandom(mSeed, mRandomIndex)) % 10000) / 10000.0f);
+      random = ((abs(DeterministicRandom(mSeed, mRandomIndex)) % 10000) / 10000.0);
       ++mRandomIndex;
    }
    else
@@ -147,7 +147,7 @@ void PulseChance::ButtonClicked(ClickButton* button, double time)
       mSeed = (mSeed + 1) % 10000;
 }
 
-void PulseChance::GetModuleDimensions(float& width, float& height)
+void PulseChance::GetModuleDimensions(double& width, double& height)
 {
    width = 118;
    height = mDeterministic ? 61 : 38;

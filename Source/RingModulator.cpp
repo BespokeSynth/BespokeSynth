@@ -64,7 +64,7 @@ void RingModulator::Process(double time)
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
 
    if (mEnabled)
    {
@@ -77,7 +77,7 @@ void RingModulator::Process(double time)
          for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
             GetBuffer()->GetChannel(ch)[i] *= mModOsc.Audio(time, mPhase);
 
-         float phaseInc = GetPhaseInc(mFreqRamp.Value(time));
+         double phaseInc = GetPhaseInc(mFreqRamp.Value(time));
          mPhase += phaseInc;
          while (mPhase > FTWO_PI)
          {
@@ -121,7 +121,7 @@ void RingModulator::PlayNote(NoteMessage note)
 {
    if (note.velocity > 0)
    {
-      float freq = TheScale->PitchToFreq(note.pitch);
+      double freq = TheScale->PitchToFreq(note.pitch);
       mFreqRamp.Start(note.time, freq, note.time + mGlideTime);
       mFreq = freq;
    }
@@ -135,7 +135,7 @@ void RingModulator::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void RingModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void RingModulator::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mFreqSlider)
    {

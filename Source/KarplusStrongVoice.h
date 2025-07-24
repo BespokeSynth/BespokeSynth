@@ -51,17 +51,17 @@ public:
    KarplusStrongVoiceParams()
    {
    }
-   float mFilter{ 1 };
-   float mFeedback{ .98 };
+   double mFilter{ 1 };
+   double mFeedback{ .98 };
    KarplusStrongSourceType mSourceType{ KarplusStrongSourceType::kSourceTypeMix };
    bool mInvert{ false };
-   float mExciterFreq{ 100 };
-   float mExciterAttack{ 1 };
-   float mExciterDecay{ 3 };
-   float mExcitation{ 0 };
-   float mPitchTone{ 0 };
-   float mVelToVolume{ 1.0 };
-   float mVelToEnvelope{ .5 };
+   double mExciterFreq{ 100 };
+   double mExciterAttack{ 1 };
+   double mExciterDecay{ 3 };
+   double mExcitation{ 0 };
+   double mPitchTone{ 0 };
+   double mVelToVolume{ 1.0 };
+   double mVelToEnvelope{ .5 };
    bool mLiteCPUMode{ false };
 };
 
@@ -72,7 +72,7 @@ public:
    ~KarplusStrongVoice();
 
    // IMidiVoice
-   void Start(double time, float amount) override;
+   void Start(double time, double target) override;
    void Stop(double time) override;
    void ClearVoice() override;
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
@@ -81,21 +81,15 @@ public:
 
 private:
    void DoParameterUpdate(int samplesIn,
-                          int oversampling,
-                          float& pitch,
-                          float& freq,
-                          float& filterRate,
-                          float& filterLerp,
-                          float& oscPhaseInc);
+                          int oversampling, double& pitch, double& freq, double& filterRate, double& filterLerp, double& oscPhaseInc);
 
-   float mOscPhase{ 0 };
+   double mOscPhase{ 0 };
    EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
    ::ADSR mEnv;
    KarplusStrongVoiceParams* mVoiceParams{ nullptr };
    RollingBuffer mBuffer;
-   float mFilteredSample{ 0 };
+   double mFilteredSample{ 0 };
    Ramp mMuteRamp;
-   float mLastBufferSample{ 0 };
    bool mActive{ false };
    IDrawableModule* mOwner{ nullptr };
    KarplusStrong* mKarplusStrongModule{ nullptr };

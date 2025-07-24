@@ -62,7 +62,7 @@ FMSynth::FMSynth()
    mVoiceParams.mHarmRatio2 = 1;
    mVoiceParams.mModIdx2 = 0;
    mVoiceParams.mPhaseOffset2 = 0;
-   mVoiceParams.mVol = 1.f;
+   mVoiceParams.mVol = 1.0;
 
    mPolyMgr.Init(kVoiceType_FM, &mVoiceParams);
 }
@@ -78,13 +78,13 @@ void FMSynth::CreateUIControls()
    mAdsrDisplayMod2 = new ADSRDisplay(this, "adsrmod2", 94, 127, 80, 40, &mVoiceParams.mModIdxADSRParams2);
    mHarmRatioBaseDropdown = new DropdownList(this, "harmratio", mAdsrDisplayHarm, kAnchor_Below, &mHarmRatioBase);
    mHarmRatioBaseDropdown2 = new DropdownList(this, "harmratio2", mAdsrDisplayHarm2, kAnchor_Below, &mHarmRatioBase2);
-   mHarmSlider = new FloatSlider(this, "tweak", mHarmRatioBaseDropdown, kAnchor_Below, 80, 15, &mHarmRatioTweak, .5f, 2, 3);
+   mHarmSlider = new FloatSlider(this, "tweak", mHarmRatioBaseDropdown, kAnchor_Below, 80, 15, &mHarmRatioTweak, .5, 2, 3);
    mModSlider = new FloatSlider(this, "mod", mAdsrDisplayMod, kAnchor_Below, 80, 15, &mVoiceParams.mModIdx, 0, 20);
-   mHarmSlider2 = new FloatSlider(this, "tweak2", mHarmRatioBaseDropdown2, kAnchor_Below, 80, 15, &mHarmRatioTweak2, .5f, 2, 3);
+   mHarmSlider2 = new FloatSlider(this, "tweak2", mHarmRatioBaseDropdown2, kAnchor_Below, 80, 15, &mHarmRatioTweak2, .5, 2, 3);
    mModSlider2 = new FloatSlider(this, "mod2", mAdsrDisplayMod2, kAnchor_Below, 80, 15, &mVoiceParams.mModIdx2, 0, 20);
-   mPhaseOffsetSlider0 = new FloatSlider(this, "phase0", mVolSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset0, 0, FTWO_PI);
-   mPhaseOffsetSlider1 = new FloatSlider(this, "phase1", mModSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset1, 0, FTWO_PI);
-   mPhaseOffsetSlider2 = new FloatSlider(this, "phase2", mModSlider2, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset2, 0, FTWO_PI);
+   mPhaseOffsetSlider0 = new FloatSlider(this, "phase0", mVolSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset0, 0, TWO_PI);
+   mPhaseOffsetSlider1 = new FloatSlider(this, "phase1", mModSlider, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset1, 0, TWO_PI);
+   mPhaseOffsetSlider2 = new FloatSlider(this, "phase2", mModSlider2, kAnchor_Below, 80, 15, &mVoiceParams.mPhaseOffset2, 0, TWO_PI);
 
    mHarmRatioBaseDropdown->AddLabel(".125", -8);
    mHarmRatioBaseDropdown->AddLabel(".2", -5);
@@ -131,7 +131,7 @@ void FMSynth::Process(double time)
 
    ComputeSliders(0);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();
@@ -158,7 +158,7 @@ void FMSynth::PlayNote(NoteMessage note)
 
    if (note.velocity > 0)
    {
-      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0, note.voiceIdx, note.modulation);
       mVoiceParams.mOscADSRParams.Start(note.time, 1); //for visualization
    }
    else
@@ -208,7 +208,7 @@ void FMSynth::DrawModuleUnclipped()
 {
    if (mDrawDebug)
    {
-      float width, height;
+      double width, height;
       GetModuleDimensions(width, height);
       mPolyMgr.DrawDebug(width + 3, 0);
       DrawTextNormal(mDebugDisplayText, 0, height + 15);
@@ -218,13 +218,13 @@ void FMSynth::DrawModuleUnclipped()
 void FMSynth::UpdateHarmonicRatio()
 {
    if (mHarmRatioBase < 0)
-      mVoiceParams.mHarmRatio = 1.0f / (-mHarmRatioBase);
+      mVoiceParams.mHarmRatio = 1.0 / (-mHarmRatioBase);
    else
       mVoiceParams.mHarmRatio = mHarmRatioBase;
    mVoiceParams.mHarmRatio *= mHarmRatioTweak;
 
    if (mHarmRatioBase2 < 0)
-      mVoiceParams.mHarmRatio2 = 1.0f / (-mHarmRatioBase2);
+      mVoiceParams.mHarmRatio2 = 1.0 / (-mHarmRatioBase2);
    else
       mVoiceParams.mHarmRatio2 = mHarmRatioBase2;
    mVoiceParams.mHarmRatio2 *= mHarmRatioTweak2;
@@ -236,7 +236,7 @@ void FMSynth::DropdownUpdated(DropdownList* list, int oldVal, double time)
       UpdateHarmonicRatio();
 }
 
-void FMSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void FMSynth::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
    if (slider == mHarmSlider || slider == mHarmSlider2)
       UpdateHarmonicRatio();

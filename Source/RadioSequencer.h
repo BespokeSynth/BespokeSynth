@@ -53,20 +53,20 @@ public:
    void CreateUIControls() override;
 
    //IGridListener
-   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, double value, double oldValue) override;
 
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //ITimeListener
    void OnTimeEvent(double time) override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -74,7 +74,7 @@ public:
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //IDrivableSequencer
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
@@ -100,15 +100,15 @@ public:
 
 private:
    void Step(double time, int pulseFlags);
-   void SetGridSize(float w, float h);
+   void SetGridSize(double w, double h);
    void SyncControlCablesToGrid();
    void UpdateGridLights();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
 
    UIGrid* mGrid{ nullptr };

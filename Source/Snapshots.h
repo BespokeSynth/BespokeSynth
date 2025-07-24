@@ -56,7 +56,7 @@ public:
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return mDisplayMode == DisplayMode::Grid; }
-   void Resize(float w, float h) override;
+   void Resize(double w, double h) override;
 
    bool HasSnapshot(int index) const;
    int GetCurrentSnapshot() const { return mCurrentSnapshot; }
@@ -68,7 +68,7 @@ public:
    int GetSize() { return (int)mSnapshotCollection.size(); }
    void SetLabel(int idx, const std::string& label);
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -76,16 +76,16 @@ public:
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
-   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   void OnGridButton(int x, int y, double velocity, IGridController* grid) override;
 
    //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, double midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
 
@@ -107,7 +107,7 @@ public:
 
 private:
    void UpdateGridValues();
-   void SetGridSize(float w, float h);
+   void SetGridSize(double w, double h);
    bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
    void RandomizeControl(IUIControl* control);
@@ -117,9 +117,9 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& w, float& h) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& w, double& h) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void UpdateGridControllerLights(bool force);
 
    enum class DisplayMode
@@ -131,7 +131,7 @@ private:
    struct Snapshot
    {
       Snapshot() {}
-      Snapshot(std::string path, float val)
+      Snapshot(std::string path, double val)
       : mControlPath(path)
       , mValue(val)
       {}
@@ -143,12 +143,12 @@ private:
                 mHasLFO == other.mHasLFO;
       }
       std::string mControlPath;
-      float mValue{ 0 };
+      double mValue{ 0 };
       bool mHasLFO{ false };
       LFOSettings mLFOSettings;
       int mGridCols{ 0 };
       int mGridRows{ 0 };
-      std::vector<float> mGridContents{};
+      std::vector<double> mGridContents{};
       std::string mString;
    };
 
@@ -180,9 +180,9 @@ private:
    std::vector<IDrawableModule*> mSnapshotModules{};
    std::vector<IUIControl*> mSnapshotControls{};
    bool mBlending{ false };
-   float mBlendTime{ 0 };
+   double mBlendTime{ 0 };
    FloatSlider* mBlendTimeSlider{ nullptr };
-   float mBlendProgress{ 0 };
+   double mBlendProgress{ 0 };
    std::vector<ControlRamp> mBlendRamps;
    ofMutex mRampMutex;
    int mCurrentSnapshot{ 0 };
@@ -201,8 +201,8 @@ private:
    bool mAutoStoreOnSwitch{ false };
    DisplayMode mDisplayMode{ DisplayMode::List };
    int mSnapshotRenameIndex{ -1 };
-   float mOldWidth{ 0 };
-   float mOldHeight{ 0 };
+   double mOldWidth{ 0 };
+   double mOldHeight{ 0 };
    bool mPush2Connected{ false };
    GridControlTarget* mGridControlTarget{ nullptr };
    int mGridControlOffsetX{ 0 };

@@ -34,12 +34,12 @@ class SampleDrawer
 public:
    SampleDrawer() {}
    void SetSample(Sample* sample) { mSample = sample; }
-   void SetPosition(float x, float y)
+   void SetPosition(double x, double y)
    {
       mX = x;
       mY = y;
    }
-   void SetDimensions(float w, float h)
+   void SetDimensions(double w, double h)
    {
       mWidth = w;
       mHeight = h;
@@ -49,7 +49,7 @@ public:
       mStartSample = startSample;
       mEndSample = endSample;
    }
-   void Draw(int playPosition = -1, float vol = 1, ofColor color = ofColor::black);
+   void Draw(int playPosition = -1, double vol = 1, ofColor color = ofColor::black);
    void DrawLine(int sample, ofColor color);
    int GetSampleAtMouse(int x, int y);
 
@@ -57,8 +57,8 @@ private:
    Sample* mSample{ nullptr };
    int mStartSample{ 0 };
    int mEndSample{ 0 };
-   float mX{ 0 };
-   float mY{ 0 };
-   float mWidth{ 1 };
-   float mHeight{ 1 };
+   double mX{ 0 };
+   double mY{ 0 };
+   double mWidth{ 1 };
+   double mHeight{ 1 };
 };

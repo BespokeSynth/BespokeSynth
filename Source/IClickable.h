@@ -38,30 +38,31 @@ public:
    virtual ~IClickable() {}
    void Draw();
    virtual void Render() {}
-   void SetPosition(float x, float y)
+   void SetPosition(double x, double y)
    {
       mX = x;
       mY = y;
    }
-   void GetPosition(float& x, float& y, bool local = false) const;
-   ofVec2f GetPosition(bool local = false) const;
-   virtual void Move(float moveX, float moveY)
+   void GetPosition(double& x, double& y, bool local = false) const;
+   ofVec2d GetPosition(bool local = false) const;
+   virtual void Move(double moveX, double moveY)
    {
       mX += moveX;
       mY += moveY;
    }
-   virtual bool TestClick(float x, float y, bool right, bool testOnly = false);
+   virtual bool TestClick(double x, double y, bool right, bool testOnly = false);
    IClickable* GetParent() const { return mParent; }
    void SetParent(IClickable* parent) { mParent = parent; }
-   bool NotifyMouseMoved(float x, float y);
-   bool NotifyMouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll);
+   bool NotifyMouseMoved(double x, double y);
+   bool NotifyMouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll);
    virtual void MouseReleased() {}
-   virtual void GetDimensions(float& width, float& height)
+   virtual void GetDimensions(double& width, double& height)
    {
       width = 10;
       height = 10;
    }
-   ofVec2f GetDimensions();
+
+   ofVec2d GetDimensions();
    ofRectangle GetRect(bool local = false);
    void SetName(const char* name)
    {
@@ -75,8 +76,8 @@ public:
    virtual void SetShowing(bool showing) { mShowing = showing; }
    bool IsShowing() const { return mShowing; }
    virtual void StartBeacon() { mBeaconTime = gTime; }
-   float GetBeaconAmount() const;
-   void DrawBeacon(int x, int y);
+   double GetBeaconAmount() const;
+   void DrawBeacon(double x, double y);
    IClickable* GetRootParent();
    IDrawableModule* GetModuleParent();
    virtual void SetOverrideDisplayName(std::string name)
@@ -98,12 +99,12 @@ public:
    static std::string sPathSaveContext;
 
 protected:
-   virtual void OnClicked(float x, float y, bool right) {}
-   virtual bool MouseMoved(float x, float y) { return false; }
-   virtual bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) { return false; }
+   virtual void OnClicked(double x, double y, bool right) {}
+   virtual bool MouseMoved(double x, double y) { return false; }
+   virtual bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) { return false; }
 
-   float mX{ 0 };
-   float mY{ 0 };
+   double mX{ 0 };
+   double mY{ 0 };
    IClickable* mParent{ nullptr };
    bool mShowing{ true };
 

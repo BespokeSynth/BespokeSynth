@@ -49,10 +49,10 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
 
-   void OnTransportAdvanced(float amount) override;
+   void OnTransportAdvanced(double amount) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -62,19 +62,19 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
+   void GetModuleDimensions(double& width, double& height) override
    {
       width = 108;
       height = 22;
    }
 
    bool mDelayInMs{ false };
-   float mDelay{ .25 };
+   double mDelay{ .25 };
    FloatSlider* mDelaySlider{ nullptr };
-   float mDelayMs{ 100 };
+   double mDelayMs{ 100 };
    FloatSlider* mDelayMsSlider{ nullptr };
 
-   float mLastNoteOnTime{ 0 };
+   double mLastNoteOnTime{ 0 };
 
    static const int kQueueSize = 500;
    NoteMessage mInputNotes[kQueueSize]{};

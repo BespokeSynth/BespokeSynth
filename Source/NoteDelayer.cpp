@@ -63,13 +63,13 @@ void NoteDelayer::DrawModule()
    mDelaySlider->Draw();
    mDelayMsSlider->Draw();
 
-   float delayMs;
+   double delayMs;
    if (mDelayInMs)
       delayMs = mDelayMs;
    else
-      delayMs = mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      delayMs = mDelay / (double(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
 
-   float t = (gTime - mLastNoteOnTime) / delayMs;
+   double t = (gTime - mLastNoteOnTime) / delayMs;
    if (t > 0 && t < 1)
    {
       ofPushStyle();
@@ -92,7 +92,7 @@ void NoteDelayer::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void NoteDelayer::OnTransportAdvanced(float amount)
+void NoteDelayer::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteDelayer);
 
@@ -126,17 +126,17 @@ void NoteDelayer::PlayNote(NoteMessage note)
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
       mInputNotes[mAppendIndex] = note;
-      float delayMs;
+      double delayMs;
       if (mDelayInMs)
          delayMs = mDelayMs;
       else
-         delayMs = mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+         delayMs = mDelay / (double(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       mInputNotes[mAppendIndex].time += delayMs;
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;
    }
 }
 
-void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

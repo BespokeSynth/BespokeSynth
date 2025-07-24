@@ -64,24 +64,24 @@ public:
    void UpdateWidth();
    void Render() override;
    void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
    void SetDisplayText(bool display) { mDisplayStyle = ButtonDisplayStyle::kNoLabel; }
    void SetDisplayStyle(ButtonDisplayStyle style) { mDisplayStyle = style; }
-   void SetDimensions(float width, float height)
+   void SetDimensions(double width, double height)
    {
       mWidth = width;
       mHeight = height;
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   float GetValue() const override { return GetMidiValue(); }
-   float GetMidiValue() const override;
-   std::string GetDisplayValue(float val) const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override { return GetMidiValue(); }
+   double GetMidiValue() const override;
+   std::string GetDisplayValue(double val) const override;
    int GetNumValues() override { return 2; }
-   void Increment(float amount) override;
-   void GetDimensions(float& width, float& height) override
+   void Increment(double amount) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -94,7 +94,7 @@ public:
    bool CanBeTargetedBy(PatchCableSource* source) const override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
 protected:
    ~ClickButton(); //protected so that it can't be created on the stack
@@ -103,9 +103,9 @@ private:
    void DoClick(double time);
    bool ButtonLit() const;
 
-   void OnClicked(float x, float y, bool right) override;
-   float mWidth{ 20 };
-   float mHeight{ 15 };
+   void OnClicked(double x, double y, bool right) override;
+   double mWidth{ 20 };
+   double mHeight{ 15 };
    double mClickTime{ -9999 };
    IButtonListener* mOwner{ nullptr };
    ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };

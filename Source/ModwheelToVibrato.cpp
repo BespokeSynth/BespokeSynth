@@ -74,7 +74,7 @@ void ModwheelToVibrato::PlayNote(NoteMessage note)
    PlayNoteOutput(note);
 }
 
-void ModwheelToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void ModwheelToVibrato::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 

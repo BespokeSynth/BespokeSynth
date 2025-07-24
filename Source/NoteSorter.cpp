@@ -89,7 +89,7 @@ void NoteSorter::TextEntryComplete(TextEntry* entry)
       mDestinationCables[i]->Flush(NextBufferTime(false));
 }
 
-void NoteSorter::GetModuleDimensions(float& width, float& height)
+void NoteSorter::GetModuleDimensions(double& width, double& height)
 {
    width = 80;
    height = 12 + (mDestinationCables.size() * 19);

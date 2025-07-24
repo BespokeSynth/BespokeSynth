@@ -73,11 +73,11 @@ void SampleBrowser::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   float fontSize = 13;
-   float stringWidth = gFont.GetStringWidth(mCurrentDirectory.toStdString(), fontSize);
-   float moduleWidth, moduleHeight;
+   double fontSize = 13;
+   double stringWidth = gFont.GetStringWidth(mCurrentDirectory.toStdString(), fontSize);
+   double moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
-   float textX = 3;
+   double textX = 3;
    if (stringWidth > moduleWidth)
       textX = moduleWidth - 3 - stringWidth;
    gFont.DrawString(mCurrentDirectory.toStdString(), fontSize, textX, 15);
@@ -149,7 +149,7 @@ void SampleBrowser::ButtonClicked(ClickButton* button, double time)
                      mSampleMutex.lock();
                      mPlayingSample.SetName(clicked.toStdString().c_str());
                      mPlayingSample.Read(clicked.toStdString().c_str());
-                     mPlayingSample.Play(NextBufferTime(false), 1, 0);
+                     mPlayingSample.Play(NextBufferTime(false), 1, 0, -1);
                      mSampleMutex.unlock();
                   }
                }
@@ -168,7 +168,7 @@ void SampleBrowser::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    gWorkChannelBuffer.Clear();
@@ -306,7 +306,7 @@ void SampleBrowser::ShowPage(int page)
 
 int SampleBrowser::GetNumPages() const
 {
-   return MAX((int)ceil((float)mDirectoryListing.size() / mButtons.size()), 1);
+   return MAX((int)ceil(static_cast<double>(mDirectoryListing.size()) / mButtons.size()), 1);
 }
 
 void SampleBrowser::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -61,33 +61,33 @@ public:
 
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample) override;
+   void FilesDropped(std::vector<std::string> files, double x, double y) override;
+   void SampleDropped(double x, double y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    bool IsResizable() const override { return true; }
-   void Resize(float width, float height) override
+   void Resize(double width, double height) override
    {
       mWidth = ofClamp(width, 210, 9999);
       mHeight = ofClamp(height, 125, 9999);
    }
 
-   void SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed);
+   void SetCuePoint(int pitch, double startSeconds, double lengthSeconds, double speed);
    bool validCuePoint(int cueIndex);
    void FillData(std::vector<float> data);
    ChannelBuffer* GetCueSampleData(int cueIndex);
-   float GetLengthInSeconds() const;
+   double GetLengthInSeconds() const;
 
    void oscMessageReceived(const juce::OSCMessage& msg) override;
    void oscBundleReceived(const juce::OSCBundle& bundle) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, double oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -107,45 +107,45 @@ public:
 
 private:
    void UpdateSample(Sample* sample, bool ownsSample);
-   float GetPlayPositionForMouse(float mouseX) const;
-   float GetSecondsForMouse(float mouseX) const;
-   void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed, bool& stopOnNoteOff) const;
+   double GetPlayPositionForMouse(double mouseX) const;
+   double GetSecondsForMouse(double mouseX) const;
+   void GetPlayInfoForPitch(int pitch, double& startSeconds, double& lengthSeconds, double& speed, bool& stopOnNoteOff) const;
    void DownloadYoutube(std::string url, std::string titles);
    void SearchYoutube(std::string searchTerm);
    void LoadFile();
    void SaveFile();
    void OnYoutubeSearchComplete(std::string searchTerm, double searchStartTime);
    void OnYoutubeDownloadComplete(std::string filename, std::string title);
-   void SetCuePointForX(float mouseX);
+   void SetCuePointForX(double mouseX);
    int GetZoomStartSample() const;
    int GetZoomEndSample() const;
-   float GetZoomStartSeconds() const;
-   float GetZoomEndSeconds() const;
+   double GetZoomStartSeconds() const;
+   double GetZoomEndSeconds() const;
    void UpdateActiveCuePoint();
-   void PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds);
+   void PlayCuePoint(double time, int index, int velocity, double speedMult, double startOffsetSeconds);
    void RunProcess(const juce::StringArray& args);
    void AutoSlice(int slices);
    void StopRecording();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
+   void GetModuleDimensions(double& width, double& height) override;
+   void OnClicked(double x, double y, bool right) override;
+   bool MouseMoved(double x, double y) override;
    void MouseReleased() override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+   bool MouseScrolled(double x, double y, double scrollX, double scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
-   float mWidth{ 608 };
-   float mHeight{ 150 };
+   double mWidth{ 608 };
+   double mHeight{ 150 };
 
    Sample* mSample{ nullptr };
    bool mOwnsSample{ true };
 
-   float mVolume{ 1 };
+   double mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
-   float mSpeed{ 1 };
-   float mPlaySpeed{ 1 };
-   float mCuePointSpeed{ 1 };
+   double mSpeed{ 1 };
+   double mPlaySpeed{ 1 };
+   double mCuePointSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mPlayButton{ nullptr };
    ClickButton* mPauseButton{ nullptr };
@@ -163,13 +163,13 @@ private:
    ClickButton* mLoadFileButton{ nullptr };
    ClickButton* mSaveFileButton{ nullptr };
    bool mIsLoadingSample{ false };
-   float mZoomLevel{ 1 };
-   float mZoomOffset{ 0 };
+   double mZoomLevel{ 1 };
+   double mZoomOffset{ 0 };
    ClickButton* mTrimToZoomButton{ nullptr };
 
    bool mOscWheelGrabbed{ false };
-   float mOscWheelPos{ 0 };
-   float mOscWheelSpeed{ 0 };
+   double mOscWheelPos{ 0 };
+   double mOscWheelSpeed{ 0 };
 
    ChannelBuffer mDrawBuffer{ 0 };
 
@@ -178,9 +178,9 @@ private:
 
    struct SampleCuePoint
    {
-      float startSeconds{ 0 };
-      float lengthSeconds{ 0 };
-      float speed{ 1 };
+      double startSeconds{ 0 };
+      double lengthSeconds{ 0 };
+      double speed{ 1 };
       bool stopOnNoteOff{ false };
    };
    std::vector<SampleCuePoint> mSampleCuePoints{ 128 };
@@ -219,7 +219,7 @@ private:
    {
       std::string name;
       std::string channel;
-      float lengthSeconds{ 0 };
+      double lengthSeconds{ 0 };
       std::string youtubeId;
    };
    RunningProcessType mRunningProcessType{ RunningProcessType::None };

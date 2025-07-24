@@ -804,7 +804,7 @@ void ModuleFactory::GetPresets(std::vector<ModuleFactory::Spawnable>& presets)
       std::string moduleTypeName = moduleDir.getFileName().toStdString();
       Array<File> files;
       moduleDir.findChildFiles(files, File::findFiles, false);
-      for (auto file : files)
+      for (auto& file : files)
       {
          if (file.getFileExtension() == ".preset")
          {

@@ -74,7 +74,7 @@ void Beats::Process(double time)
    SyncOutputBuffer(numChannels);
    mWriteBuffer.SetNumActiveChannels(numChannels);
 
-   int bufferSize = target->GetBuffer()->BufferSize();
+   auto bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();
@@ -126,7 +126,7 @@ void Beats::DrawModule()
          ofPushStyle();
          ofFill();
          ofSetColor(255, 255, 255, 40);
-         float width, height;
+         double width, height;
          GetModuleDimensions(width, height);
          ofRect(i * BEAT_COLUMN_WIDTH + 1, 3, BEAT_COLUMN_WIDTH - 2, height - 6);
          ofPopStyle();
@@ -136,7 +136,7 @@ void Beats::DrawModule()
    }
 }
 
-void Beats::FilesDropped(std::vector<std::string> files, int x, int y)
+void Beats::FilesDropped(std::vector<std::string> files, double x, double y)
 {
    for (auto& file : files)
    {
@@ -148,7 +148,7 @@ void Beats::FilesDropped(std::vector<std::string> files, int x, int y)
    mHighlightColumn = -1;
 }
 
-void Beats::SampleDropped(int x, int y, Sample* sample)
+void Beats::SampleDropped(double x, double y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();
@@ -164,7 +164,7 @@ void Beats::SampleDropped(int x, int y, Sample* sample)
    mHighlightColumn = -1;
 }
 
-bool Beats::MouseMoved(float x, float y)
+bool Beats::MouseMoved(double x, double y)
 {
    IDrawableModule::MouseMoved(x, y);
 
@@ -188,7 +188,7 @@ void Beats::CheckboxUpdated(Checkbox* checkbox, double time)
 {
 }
 
-void Beats::GetModuleDimensions(float& width, float& height)
+void Beats::GetModuleDimensions(double& width, double& height)
 {
    width = BEAT_COLUMN_WIDTH * (int)mBeatColumns.size();
    height = 0;
@@ -196,7 +196,7 @@ void Beats::GetModuleDimensions(float& width, float& height)
       height = MAX(height, 132 + 15 * (mBeatColumns[i]->GetNumSamples() + 1));
 }
 
-void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
+void Beats::FloatSliderUpdated(FloatSlider* slider, double oldVal, double time)
 {
 }
 
@@ -261,8 +261,8 @@ void BeatData::LoadBeat(Sample* sample)
 
 void BeatData::RecalcPos(double time, bool doubleTime, int numBars)
 {
-   float measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
-   float pos = ofMap(measurePos / numBars, 0, 1, 0, mBeat->LengthInSamples(), true);
+   double measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
+   double pos = ofMap(measurePos / numBars, 0, 1, 0, mBeat->LengthInSamples(), true);
    if (doubleTime)
    {
       pos *= 2;
@@ -295,9 +295,9 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
    Sample* beat = mBeatData.mBeat;
    if (beat && mSampleIndex != -1)
    {
-      float volSq = mVolume * mVolume * .25f;
+      float volSq = mVolume * mVolume * .25;
 
-      float speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
+      double speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
       if (mDoubleTime)
          speed *= 2;
       mBeatData.RecalcPos(time, mDoubleTime, mNumBars);
@@ -311,19 +311,19 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
 
          for (int ch = 0; ch < numChannels; ++ch)
          {
-            float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
+            double panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
             double channelTime = time;
             for (int i = 0; i < bufferSize; ++i)
             {
-               float filter = mFilterRamp.Value(channelTime);
+               auto filter = mFilterRamp.Value(channelTime);
 
-               mLowpass[ch].SetFilterParams(ofMap(sqrtf(ofClamp(-filter, 0, 1)), 0, 1, 6000, 80), sqrt(2) / 2);
-               mHighpass[ch].SetFilterParams(ofMap(ofClamp(filter, 0, 1), 0, 1, 10, 6000), sqrt(2) / 2);
+               mLowpass[ch].SetFilterParams(ofMap(std::sqrt(ofClamp(-filter, 0, 1)), 0, 1, 6000, 80), std::sqrt(2) / 2);
+               mHighpass[ch].SetFilterParams(ofMap(ofClamp(filter, 0, 1), 0, 1, 10, 6000), std::sqrt(2) / 2);
 
-               const float crossfade = .1f;
-               float normalAmount = ofClamp(1 - fabsf(filter / crossfade), 0, 1);
-               float lowAmount = ofClamp(-filter / crossfade, 0, 1);
-               float highAmount = ofClamp(filter / crossfade, 0, 1);
+               const double crossfade = .1;
+               double normalAmount = ofClamp(1 - std::abs(filter / crossfade), 0, 1);
+               double lowAmount = ofClamp(-filter / crossfade, 0, 1);
+               double highAmount = ofClamp(filter / crossfade, 0, 1);
 
                int sampleChannel = ch;
                if (beat->NumChannels() == 1)
@@ -417,7 +417,7 @@ void BeatColumn::CreateUIControls()
       suffix = ofToString(mIndex);
 
    int controlWidth = BEAT_COLUMN_WIDTH - 6;
-   mVolumeSlider = new FloatSlider(mOwner, ("volume" + suffix).c_str(), 0, 0, controlWidth, 15, &mVolume, 0, 1.5f, 2);
+   mVolumeSlider = new FloatSlider(mOwner, ("volume" + suffix).c_str(), 0, 0, controlWidth, 15, &mVolume, 0, 1.5, 2);
    mFilterSlider = new FloatSlider(mOwner, ("filter" + suffix).c_str(), 0, 0, controlWidth, 15, &mFilter, -1, 1, 2);
    mPanSlider = new FloatSlider(mOwner, ("pan" + suffix).c_str(), 0, 0, controlWidth, 15, &mPan, -1, 1, 2);
    mDoubleTimeCheckbox = new Checkbox(mOwner, ("double" + suffix).c_str(), 0, 0, &mDoubleTime);

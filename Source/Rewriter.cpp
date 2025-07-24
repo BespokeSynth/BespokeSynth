@@ -61,7 +61,7 @@ void Rewriter::CreateUIControls()
    mLooperCable->SetManualPosition(mWidth - 10, 10);
    mLooperCable->AddTypeFilter("looper");
    ofColor color = mLooperCable->GetColor();
-   color.a *= .3f;
+   color.a *= .3;
    mLooperCable->SetColor(color);
    AddPatchCableSource(mLooperCable);
 }
@@ -94,7 +94,7 @@ void Rewriter::Process(double time)
    SyncBuffers();
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
 
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
@@ -116,9 +116,9 @@ void Rewriter::DrawModule()
    mRewriteButton->Draw();
    mStartRecordTimeButton->Draw();
 
-   if (mStartRecordTime != -1)
+   if (!ofAlmostEquel(mStartRecordTime, -1))
    {
-      ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)));
+      ofSetColor(255, 100, 0, 100 + 50 * (cos(TheTransport->GetMeasurePos(gTime) * 4 * TWO_PI)));
       ofRect(mStartRecordTimeButton->GetRect(true));
    }
 
@@ -126,7 +126,7 @@ void Rewriter::DrawModule()
    {
       int loopSamples = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate)) * mConnectedLooper->GetNumBars();
       ofRectangle rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
-      float playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->GetNumBars()) / mConnectedLooper->GetNumBars();
+      double playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->GetNumBars()) / mConnectedLooper->GetNumBars();
       //mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height, loopSamples, L(channel,0), loopSamples * playhead);
       //mRecordBuffer.Draw(rect.x, rect.y, rect.width * playhead, rect.height, loopSamples * playhead, L(channel, 0));
 
@@ -178,14 +178,14 @@ void Rewriter::Go(double time)
    {
       if (mStartRecordTime != -1)
       {
-         float recordedMs = time - mStartRecordTime;
-         float numBarsCurrentTempo = recordedMs / TheTransport->MsPerBar();
-         int numBars = int(numBarsCurrentTempo + .5f);
+         double recordedMs = time - mStartRecordTime;
+         double numBarsCurrentTempo = recordedMs / TheTransport->MsPerBar();
+         int numBars = std::round(numBarsCurrentTempo);
          numBars = MAX(1, int(Pow2(floor(log2(numBars))))); //find closest power of 2
 
          int beats = numBars * TheTransport->GetTimeSigTop();
-         float minutes = recordedMs / 1000.0f / 60.0f;
-         float bpm = beats / minutes;
+         double minutes = recordedMs / 1000.0 / 60.0;
+         double bpm = beats / minutes;
          TheTransport->SetTempo(bpm);
          TheTransport->SetDownbeat();
          mConnectedLooper->SetNumBars(numBars);

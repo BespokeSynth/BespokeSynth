@@ -58,7 +58,7 @@ void PitchChorus::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   int bufferSize = GetBuffer()->BufferSize();
+   auto bufferSize = GetBuffer()->BufferSize();
    IAudioReceiver* target = GetTarget();
    if (target)
    {
@@ -94,7 +94,7 @@ void PitchChorus::PlayNote(NoteMessage note)
    {
       if (note.velocity > 0 && mShifters[i].mOn == false)
       {
-         float ratio = TheScale->PitchToFreq(note.pitch) / TheScale->PitchToFreq(60);
+         double ratio = TheScale->PitchToFreq(note.pitch) / TheScale->PitchToFreq(60);
          mShifters[i].mOn = true;
          mShifters[i].mShifter.SetRatio(ratio);
          mShifters[i].mPitch = note.pitch;

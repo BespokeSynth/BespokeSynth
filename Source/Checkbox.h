@@ -45,37 +45,37 @@ public:
    void UseCircleLook(ofColor color);
    void DisableCircleLook() { mUseCircleLook = false; }
 
-   bool MouseMoved(float x, float y) override;
+   bool MouseMoved(double x, double y) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
-   float GetValueForMidiCC(float slider) const override;
-   void SetValue(float value, double time, bool forceUpdate = false) override;
-   float GetValue() const override;
-   float GetMidiValue() const override;
+   void SetFromMidiCC(double slider, double time, bool setViaModulator) override;
+   double GetValueForMidiCC(double slider) const override;
+   void SetValue(double value, double time, bool forceUpdate = false) override;
+   double GetValue() const override;
+   double GetMidiValue() const override;
    int GetNumValues() override { return 2; }
-   std::string GetDisplayValue(float val) const override;
-   void Increment(float amount) override;
+   std::string GetDisplayValue(double val) const override;
+   void Increment(double amount) override;
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
-   void SetBoxSize(float size) { mHeight = size; }
+   void SetBoxSize(double size) { mHeight = size; }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SetOverrideDisplayName(std::string name) override;
 
    bool CheckNeedsDraw() override;
 
    //IPulseReceiver
-   void OnPulse(double time, float velocity, int flags) override;
+   void OnPulse(double time, double velocity, int flags) override;
 
 protected:
    ~Checkbox(); //protected so that it can't be created on the stack
 
 private:
-   void OnClicked(float x, float y, bool right) override;
-   void GetDimensions(float& width, float& height) override
+   void OnClicked(double x, double y, bool right) override;
+   void GetDimensions(double& width, double& height) override
    {
       width = mWidth;
       height = mHeight;
@@ -83,14 +83,14 @@ private:
    void CalcSliderVal();
    void UpdateWidth();
 
-   float mWidth{ 15 };
-   float mHeight{ 15 };
+   double mWidth{ 15 };
+   double mHeight{ 15 };
    bool* mVar{ nullptr };
    IDrawableModule* mOwner{ nullptr };
    bool mLastDisplayedValue{ false };
    bool mDisplayText{ true };
    bool mUseCircleLook{ false };
    ofColor mCustomColor;
-   float mSliderVal{ 0 };
+   double mSliderVal{ 0 };
    bool mLastSetValue{ false };
 };

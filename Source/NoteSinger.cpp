@@ -58,7 +58,7 @@ NoteSinger::~NoteSinger()
    TheScale->RemoveListener(this);
 }
 
-void NoteSinger::OnTransportAdvanced(float amount)
+void NoteSinger::OnTransportAdvanced(double amount)
 {
    PROFILER(NoteSinger);
 
@@ -114,9 +114,9 @@ void NoteSinger::DrawModule()
 
    for (int i = 0; i < mNumBuckets; ++i)
    {
-      float x = ofMap(i, 0, mNumBuckets, 0, 100);
+      double x = ofMap(i, 0, mNumBuckets, 0, 100);
       ofSetColor(255, 0, 255);
-      ofLine(x, 50, x, 50 - ofMap(MIN(mPeaks[i].GetPeak(), 1), 0, 1, 0, 50));
+      ofLine(x, 50, x, 50 - ofMap(MIN(mPeaks[i].GetPeak(), 1.0), 0, 1, 0, 50));
    }
 }
 
@@ -127,12 +127,12 @@ void NoteSinger::OnScaleChanged()
    for (int i = 0; i < mNumBuckets; ++i)
    {
       int pitch = GetPitchForBucket(i);
-      float f = TheScale->PitchToFreq(pitch);
+      double f = TheScale->PitchToFreq(pitch);
 
       mBands[i].SetFilterType(kFilterType_Bandpass);
       mBands[i].SetFilterParams(f, 40 + mNumBuckets * 2 - i * 2);
 
-      mPeaks[i].SetDecayTime(.05f);
+      mPeaks[i].SetDecayTime(.05);
    }
 }
 

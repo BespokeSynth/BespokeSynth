@@ -28,8 +28,8 @@ public:
    void SetVibration(int id, float amount);
    void SetColor(int id, float r, float g, float b);
 
-   void GetGyros(int id, ofVec3f& gyros);
-   void GetAccel(int id, ofVec3f& accel);
+   void GetGyros(int id, ofVec3d& gyros);
+   void GetAccel(int id, ofVec3d& accel);
    bool IsButtonDown(int id, PSMove_Button button);
    float GetBattery(int id);
 
