@@ -46,7 +46,7 @@ public:
 
    struct EventInfo
    {
-      EventInfo(){};
+      EventInfo() {};
       EventInfo(double startTime, double stopTime)
       {
          mStartBlendFromValue = 0;
@@ -115,6 +115,7 @@ public:
    int& GetSustainStage() { return mSustainStage; }
    bool& GetHasSustainStage() { return mHasSustainStage; }
    bool& GetFreeReleaseLevel() { return mFreeReleaseLevel; }
+   void SetZeroValueIsFirstStage(const bool value) { mZeroValueIsFirstStage = value; }
 
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
@@ -132,6 +133,7 @@ private:
    int mNumStages{ 0 };
    bool mHasSustainStage{ false };
    bool mFreeReleaseLevel{ false };
+   bool mZeroValueIsFirstStage{ false };
    float mTimeScale{ 1 };
    float mCurve{ 0 };
 };
