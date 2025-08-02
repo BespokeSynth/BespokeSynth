@@ -19,7 +19,7 @@
   ==============================================================================
 
     AbletonMoveControl.h
-    Created: 24 Feb 2020 8:57:57pm
+    Created: 22 Apr 2025
     Author:  Ryan Challinor
 
   ==============================================================================
@@ -38,6 +38,7 @@
 class IUIControl;
 class Snapshots;
 class ControlRecorder;
+class TrackOrganizer;
 
 class AbletonMoveControl : public IDrawableModule, public MidiDeviceListener, public IDropdownListener, public IAbletonGridDevice
 {
@@ -55,8 +56,16 @@ public:
    void KeyPressed(int key, bool isRepeat) override;
 
    void SetLed(MidiMessageType type, int index, int color, int flashColor = -1) override;
+   bool GetButtonState(MidiMessageType type, int index) const override;
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
+   void SetDisplayModuleWithContext(IDrawableModule* module, std::string context);
+   void DisplayScreenMessage(std::string message, float durationMs = 500) override;
    IDrawableModule* GetDisplayModule() const override { return mDisplayModule; }
+   AbletonDeviceType GetAbletonDeviceType() const override { return AbletonDeviceType::Move; }
+   int GetGridStartIndex() const override { return AbletonDevice::kMovePadsSection; }
+   int GetGridNumPads() const override { return AbletonDevice::kNumMovePads; }
+   int GetGridNumCols() const override { return 8; }
+   int GetGridNumRows() const override { return 4; }
 
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
@@ -71,7 +80,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    int GetGridControllerOption1Control() const override;
    int GetGridControllerOption2Control() const override;
@@ -88,7 +97,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override
    {
       width = mWidth;
-      height = mHeight + (mShowManualGrid ? 98 : 0);
+      height = mHeight;
    }
    void OnClicked(float x, float y, bool right) override;
 
@@ -96,125 +105,81 @@ private:
    void DrawToFramebuffer();
    void RenderPush2Display();
    void UpdateLeds();
+   void SendLeds();
 
-   void SetModuleGridLights();
-   void DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
-   void AddFavoriteControl(IUIControl* control);
-   void RemoveFavoriteControl(IUIControl* control);
-   void BookmarkModuleToSlot(int slotIndex, IDrawableModule* module);
-   void SwitchToBookmarkedModule(int slotIndex);
-   int GetPadColorForType(ModuleCategory type, bool enabled) const;
-   bool GetGridIndex(int gridX, int gridY, int& gridIndex) const
-   {
-      gridIndex = gridX + gridY * 8;
-      return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8;
-   }
-   bool IsIgnorableModule(IDrawableModule* module);
-   std::vector<IDrawableModule*> SortModules(std::vector<IDrawableModule*> modules);
-   void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
+   int GetControlOffset() const;
+
    void DrawDisplayModuleRect(ofRectangle rect, float thickness);
-   std::string GetModuleTypeToSpawn();
-   ModuleCategory GetModuleTypeForSpawnList(IUIControl* control);
-   ofColor GetSpawnGridColor(int index, ModuleCategory moduleType) const;
-   int GetSpawnGridPadColor(int index, ModuleCategory moduleType) const;
-   bool AllowRepatch() const;
-   void UpdateRoutingModules();
    void SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module);
+   void SetActiveTrackRow(int row);
+   TrackOrganizer* GetActiveTrackRow() const;
+   void AdjustGlobalModuleIndex(int amount);
+   IDrawableModule* GetCurrentGlobalModule() const;
+   void AdjustControlWithEncoder(IUIControl* control, float midiInputValue);
+   int GetDisplayKnobIndex();
+   bool ShouldDisplayMixer();
+   bool ShouldDisplaySnapshotView();
 
    AbletonMoveLCD mLCD;
-
-   const float kColumnSpacing = 121;
-
-   int mFontHandle{ 0 };
-   int mFontHandleBold{ 0 };
+   double mScreenOverrideTimeout{ 0.0 };
 
    float mWidth{ 100 };
-   float mHeight{ 20 };
+   float mHeight{ 100 };
 
    IDrawableModule* mDisplayModule{ nullptr };
-   Snapshots* mDisplayModuleSnapshots{ nullptr };
-   ControlRecorder* mCurrentControlRecorder{ nullptr };
-   std::vector<IUIControl*> mSliderControls;
-   std::vector<IUIControl*> mButtonControls;
+   std::string mDisplayModuleContext{};
+   std::vector<IUIControl*> mControls;
    std::vector<IUIControl*> mDisplayedControls;
    bool mDisplayModuleIsShowingOverrideControls{ false };
-   int mModuleViewOffset{ 0 };
-   float mModuleViewOffsetSmoothed{ 0 };
+   float mModuleViewOffset{ 0 };
 
-   std::vector<IDrawableModule*> mModules;
-   float mModuleListOffset{ 0 };
-   float mModuleListOffsetSmoothed{ 0 };
-   std::array<IDrawableModule*, 8 * 8> mModuleGrid;
-   std::array<PatchCableSource*, 8 * 8> mModuleGridManualCables;
-   ofRectangle mModuleGridRect;
+   std::array<PatchCableSource*, 8> mTrackCables;
+   int mTrackRowOffset{ 0 };
+   int mSelectedTrackRow{ -1 };
+   int mPreviousSelectedTrackRow{ -1 };
+   double mLastTrackSelectButtonPressTime{ 0 };
 
-   enum class ModuleGridLayoutStyle
-   {
-      Automatic,
-      Manual
-   };
+   std::array<PatchCableSource*, 5> mGlobalModuleCables{};
+   int mGlobalModuleIndex{ 0 };
 
-   ModuleGridLayoutStyle mModuleGridLayoutStyle{ ModuleGridLayoutStyle::Automatic };
-   DropdownList* mModuleGridLayoutStyleDropdown{ nullptr };
-   bool mShowManualGrid{ false };
-   Checkbox* mShowManualGridCheckbox{ nullptr };
-   std::vector<IUIControl*> mFavoriteControls;
-   std::vector<IUIControl*> mSpawnModuleControls;
-   bool mNewButtonHeld{ false };
-   bool mDeleteButtonHeld{ false };
-   bool mLFOButtonHeld{ false };
-   bool mAutomateButtonHeld{ false };
-   bool mAddModuleBookmarkButtonHeld{ false };
-   std::array<bool, 128> mNoteHeldState;
-   IDrawableModule* mHeldModule{ nullptr };
-   double mModuleHeldTime{ -1 };
-   bool mRepatchedHeldModule{ false };
-   std::vector<IDrawableModule*> mModuleHistory;
-   int mModuleHistoryPosition{ -1 };
-   std::vector<IDrawableModule*> mBookmarkSlots;
-   bool mInMidiControllerBindMode{ false };
+   PatchCableSource* mSongBuilderCable{ nullptr };
+
    bool mShiftHeld{ false };
-   bool mAddTrackHeld{ false };
-   int mHeldKnobIndex{ -1 };
+   int mMostRecentlyTouchedKnobIndex{ -1 };
+   int mLastAdjustedKnobIndex{ -1 };
+   double mLastAdjustedKnobTime{ -1 };
    double mLastResetTime{ -1 };
-   int mHeldModulePatchCableIndex{ 0 };
-   std::string mTextPopup;
-   double mTextPopupTime{ -1 };
-
-   struct Routing
-   {
-      Routing(IDrawableModule* module, ofColor connectionColor)
-      {
-         mModule = module;
-         mConnectionColor = connectionColor;
-      }
-      IDrawableModule* mModule;
-      ofColor mConnectionColor;
-   };
-
-   std::vector<Routing> mRoutingInputModules;
-   std::vector<Routing> mRoutingOutputModules;
-
-   enum class ScreenDisplayMode
-   {
-      kNormal,
-      kAddModule,
-      kMap,
-      kRouting
-   };
-   ScreenDisplayMode mScreenDisplayMode{ ScreenDisplayMode::kNormal };
+   int mLastGainAdjustTrackIndex{ -1 };
+   double mLastGainAdjustTrackTime{ -1 };
+   float mTrackRowOffsetSmoothed{ 0 };
 
    IAbletonGridController* mGridControlInterface{ nullptr };
-   IDrawableModule* mGridControlModule{ nullptr };
-   bool mDisplayModuleCanControlGrid{ false };
 
-   int mLedState[128 * 2]{}; //bottom 128 are notes, top 128 are CCs
+   struct LedState
+   {
+      LedState() {}
+      LedState(int _color, int _flashColor)
+      : color(_color)
+      , flashColor(_flashColor)
+      {}
+      bool operator==(LedState& other) const
+      {
+         return color == other.color && flashColor == other.flashColor;
+      }
+      bool operator!=(LedState& other) const
+      {
+         return color != other.color || flashColor != other.flashColor;
+      }
+      int color{ -1 };
+      int flashColor{ -1 };
+   };
+
+   std::array<LedState, 128 * 2> mQueuedLedState{}; //bottom 128 are notes, top 128 are CCs
+   std::array<LedState, 128 * 2> mLedState{}; //bottom 128 are notes, top 128 are CCs
+   std::array<int, 128 * 2> mButtonState{}; //bottom 128 are notes, top 128 are CCs
 
    MidiDevice mDevice;
 
-   SpawnListManager mSpawnLists;
-   int mPendingSpawnPitch{ -1 };
-   int mSelectedGridSpawnListIndex{ -1 };
    std::string mPushBridgeInitErrMsg;
 };

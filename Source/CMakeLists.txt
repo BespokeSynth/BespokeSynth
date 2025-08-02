@@ -250,6 +250,7 @@ target_sources(BespokeSynth PRIVATE
     IDrawableModule.cpp
     IDrawableModule.h
     IDrivableSequencer.h
+    IInputRecordable.h
     IMidiVoice.h
     IModulator.cpp
     IModulator.h
@@ -704,6 +705,8 @@ target_sources(BespokeSynth PRIVATE
     TimerDisplay.h
     TitleBar.cpp
     TitleBar.h
+    TrackOrganizer.cpp
+    TrackOrganizer.h
     Transport.cpp
     Transport.h
     TransposeFrom.cpp

@@ -57,8 +57,15 @@ public:
    void KeyPressed(int key, bool isRepeat) override;
 
    void SetLed(MidiMessageType type, int index, int color, int flashColor = -1) override;
+   bool GetButtonState(MidiMessageType type, int index) const override;
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
+   void DisplayScreenMessage(std::string message, float durationMs = 500) override { ofLog() << "todo: handle push 2 screen message"; }
    IDrawableModule* GetDisplayModule() const override { return mDisplayModule; }
+   AbletonDeviceType GetAbletonDeviceType() const override { return AbletonDeviceType::Push2; }
+   int GetGridStartIndex() const override { return AbletonDevice::kPadsSection; }
+   int GetGridNumPads() const override { return AbletonDevice::kNumPads; }
+   int GetGridNumCols() const override { return 8; }
+   int GetGridNumRows() const override { return 8; }
 
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
@@ -112,7 +119,6 @@ private:
    void RemoveFavoriteControl(IUIControl* control);
    void BookmarkModuleToSlot(int slotIndex, IDrawableModule* module);
    void SwitchToBookmarkedModule(int slotIndex);
-   int GetPadColorForType(ModuleCategory type, bool enabled) const;
    bool GetGridIndex(int gridX, int gridY, int& gridIndex) const
    {
       gridIndex = gridX + gridY * 8;
@@ -176,7 +182,6 @@ private:
    bool mLFOButtonHeld{ false };
    bool mAutomateButtonHeld{ false };
    bool mAddModuleBookmarkButtonHeld{ false };
-   std::array<bool, 128> mNoteHeldState;
    IDrawableModule* mHeldModule{ nullptr };
    double mModuleHeldTime{ -1 };
    bool mRepatchedHeldModule{ false };
@@ -220,6 +225,7 @@ private:
    bool mDisplayModuleCanControlGrid{ false };
 
    int mLedState[128 * 2]{}; //bottom 128 are notes, top 128 are CCs
+   bool mButtonState[128 * 2]{}; //bottom 128 are notes, top 128 are CCs
 
    MidiDevice mDevice;
 

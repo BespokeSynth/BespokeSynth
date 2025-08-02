@@ -99,6 +99,7 @@ public:
    void UpdateOldControlName(std::string& oldName) override;
 
    static std::vector<IUIControl*> sSnapshotHighlightControls;
+   static bool sSerializingModuleStateForSnapshot;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

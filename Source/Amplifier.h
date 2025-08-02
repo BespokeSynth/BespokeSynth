@@ -42,6 +42,11 @@ public:
 
    void CreateUIControls() override;
 
+   FloatSlider* GetGainSlider() { return mGainSlider; }
+   void GetLevel(float& level, float& watermarkLevel) const;
+   void SetShowLevelMeter(bool show);
+   void DrawLevelMeter(float x, float y, float w, float h);
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

@@ -273,6 +273,7 @@
 #include "StereoRotation.h"
 #include "LatencyCalculator.h"
 #include "AbletonMoveControl.h"
+#include "TrackOrganizer.h"
 
 #include <juce_core/juce_core.h>
 
@@ -501,6 +502,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
    REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
    REGISTER(AbletonMoveControl, abletonmovecontrol, kModuleCategory_Other);
+   REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

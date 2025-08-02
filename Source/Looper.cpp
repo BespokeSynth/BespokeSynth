@@ -1157,16 +1157,27 @@ void Looper::CheckboxUpdated(Checkbox* checkbox, double time)
    }
    if (checkbox == mWriteInputCheckbox)
    {
-      if (mWriteInput)
-      {
-         if (mBufferTempo != TheTransport->GetTempo())
-            ResampleForSpeed(GetPlaybackSpeed());
-         mWriteInputRamp.Start(time, 1, time + 10);
-      }
-      else
-      {
-         mWriteInputRamp.Start(time, 0, time + 10);
-      }
+      SetRecording(time, mWriteInput);
+   }
+}
+
+void Looper::SetRecording(bool record)
+{
+   SetRecording(NextBufferTime(false), record);
+}
+
+void Looper::SetRecording(double time, bool record)
+{
+   mWriteInput = record;
+   if (mWriteInput)
+   {
+      if (mBufferTempo != TheTransport->GetTempo())
+         ResampleForSpeed(GetPlaybackSpeed());
+      mWriteInputRamp.Start(time, 1, time + 10);
+   }
+   else
+   {
+      mWriteInputRamp.Start(time, 0, time + 10);
    }
 }
 

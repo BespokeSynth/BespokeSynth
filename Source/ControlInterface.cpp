@@ -67,6 +67,8 @@ void ControlInterface::DrawModule()
          control->mUIControl->Draw();
    }
 
+   mAddControlCable->SetShowing(mShowCables);
+
    mWidth = 90;
    mHeight = 20;
    for (auto* control : mControls)

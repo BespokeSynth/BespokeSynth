@@ -42,10 +42,19 @@ NBase::Result Push2DisplayBridge::Init(DeviceType deviceType)
 {
    std::unique_ptr<Push2Display> display{Push2Display::create()};
    if (!display)
+   {
+     if (deviceType == DeviceType::Move)
+        return {"no move support"};
      return {"no push 2 support"};
+   }
+
    auto result{display->Init(deviceType)};
    if (result.Failed())
-     return {"no push 2 found"};
+   {
+      if (deviceType == DeviceType::Move)
+         return {"no move found"};
+      return {"no push 2 found"};
+   }
    push2Display_ = std::move(display);
    return result;
 }

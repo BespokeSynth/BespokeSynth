@@ -476,7 +476,7 @@ bool SongBuilder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMess
 {
    if (type == kMidiMessage_Note)
    {
-      if (controlIndex >= 36 && controlIndex <= 99 && midiValue > 0)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads() && midiValue > 0)
       {
          int gridIndex = controlIndex - 36;
          int x = gridIndex % 8;
@@ -568,6 +568,24 @@ bool SongBuilder::DrawToPush2Screen()
    return false;
 }
 
+void SongBuilder::SetScene(int scene, double time)
+{
+   mSequenceStepIndex = -1; //stop playing
+   if (mChangeQuantizeInterval == kInterval_Free) //switch
+   {
+      SetActiveScene(time, scene);
+   }
+   else if (mChangeQuantizeInterval == kInterval_None) //jump
+   {
+      mQueuedScene = scene;
+      TheTransport->Reset();
+   }
+   else
+   {
+      mQueuedScene = scene;
+   }
+}
+
 void SongBuilder::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mPlaySequenceButton)
@@ -603,20 +621,7 @@ void SongBuilder::ButtonClicked(ClickButton* button, double time)
    {
       if (button == mScenes[i]->mActivateButton)
       {
-         mSequenceStepIndex = -1; //stop playing
-         if (mChangeQuantizeInterval == kInterval_Free) //switch
-         {
-            SetActiveScene(time, i);
-         }
-         else if (mChangeQuantizeInterval == kInterval_None) //jump
-         {
-            mQueuedScene = i;
-            TheTransport->Reset();
-         }
-         else
-         {
-            mQueuedScene = i;
-         }
+         SetScene(i, time);
       }
    }
 

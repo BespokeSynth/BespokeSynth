@@ -148,9 +148,9 @@ void AbletonMoveLCD::DrawText(const char* text, int x, int y, int style, int fon
 
 void AbletonMoveLCD::DrawRect(int x, int y, int width, int height, bool filled)
 {
-   for (int penX = x; penX < x + width && penX < kMoveDisplayWidth; ++penX)
+   for (int penX = x; penX < x + width && penX >= 0 && penX < kMoveDisplayWidth; ++penX)
    {
-      for (int penY = y; penY < y + height && penY < kMoveDisplayHeight; ++penY)
+      for (int penY = y; penY < y + height && penY >= 0 && penY < kMoveDisplayHeight; ++penY)
       {
          if (filled || penX == x || penY == y || penX == x + width - 1 || penY == y + height - 1)
             mPixels[(penX + penY * kMoveDisplayWidth) * 4] = 255;

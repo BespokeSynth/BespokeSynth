@@ -275,7 +275,9 @@ private:
    bool mIsSetUp{ false };
    NoteInputMode mNoteInputMode{ NoteInputMode::PlayStepIndex };
    bool mHasExternalPulseSource{ false };
-   bool mPush2Connected{ false };
+   bool mAbletonGridConnected{ false };
+   int mAbletonGridCols{ 8 };
+   int mAbletonGridRows{ 8 };
    float mRandomizationAmount{ 1 };
    FloatSlider* mRandomizationAmountSlider{ nullptr };
    float mRandomizationDensity{ .25 };

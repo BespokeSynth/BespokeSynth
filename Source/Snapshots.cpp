@@ -31,6 +31,7 @@
 #include "juce_core/juce_core.h"
 
 std::vector<IUIControl*> Snapshots::sSnapshotHighlightControls;
+bool Snapshots::sSerializingModuleStateForSnapshot = false;
 
 namespace
 {
@@ -87,7 +88,7 @@ void Snapshots::CreateUIControls()
    }
 
    for (int i = 0; i < 32; ++i)
-      mCurrentSnapshotSelector->AddLabel(("snapshot" + ofToString(i)).c_str(), i);
+      mCurrentSnapshotSelector->AddLabel((ofToString(i)).c_str(), i);
 }
 
 void Snapshots::Init()
@@ -524,7 +525,9 @@ void Snapshots::SetSnapshot(int idx, double time)
          FileStreamIn in(outputStream);
          int dataRev;
          in >> dataRev;
+         sSerializingModuleStateForSnapshot = true;
          module->LoadState(in, dataRev);
+         sSerializingModuleStateForSnapshot = false;
       }
    }
 
@@ -667,7 +670,7 @@ void Snapshots::DeleteSnapshot(int idx)
    {
       SnapshotCollection& coll = mSnapshotCollection[idx];
       coll.mSnapshots.clear();
-      coll.mLabel = "snapshot" + ofToString(idx);
+      coll.mLabel = ofToString(idx);
       mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
 
       UpdateGridValues();
@@ -745,7 +748,7 @@ bool Snapshots::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessag
 
    if (type == kMidiMessage_Note)
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
       {
          int gridIndex = controlIndex - 36;
          int x = gridIndex % 8;
@@ -830,7 +833,7 @@ void Snapshots::ResizeSnapshotCollection(int size)
    {
       mSnapshotCollection.resize(size);
       for (int i = oldSize; i < size; ++i)
-         mSnapshotCollection[i].mLabel = "snapshot" + ofToString(i);
+         mSnapshotCollection[i].mLabel = ofToString(i);
 
       if (mDisplayMode == DisplayMode::List)
          mModuleSaveData.SetInt("num_list_snapshots", size);
@@ -1081,7 +1084,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       }
       in >> mSnapshotCollection[i].mLabel;
       if (rev < 2 && mSnapshotCollection[i].mLabel.empty())
-         mSnapshotCollection[i].mLabel = "snapshot" + ofToString(i);
+         mSnapshotCollection[i].mLabel = ofToString(i);
       mCurrentSnapshotSelector->SetLabel(mSnapshotCollection[i].mLabel, i);
    }
 
@@ -1259,7 +1262,9 @@ Snapshots::SnapshotModuleData::SnapshotModuleData(IDrawableModule* module)
    juce::MemoryBlock tempBlock;
    {
       FileStreamOut out(tempBlock);
+      sSerializingModuleStateForSnapshot = true;
       module->SaveState(out);
+      sSerializingModuleStateForSnapshot = false;
    }
    mData = tempBlock.toBase64Encoding().toStdString();
 }

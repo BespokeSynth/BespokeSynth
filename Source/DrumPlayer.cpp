@@ -524,9 +524,9 @@ bool DrumPlayer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessa
 {
    if (type == kMidiMessage_Note)
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
       {
-         int gridIndex = controlIndex - 36;
+         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
          int x = gridIndex % 8;
          int y = gridIndex / 8;
 

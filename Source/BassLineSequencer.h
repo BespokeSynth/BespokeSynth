@@ -94,7 +94,7 @@ private:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    void KeyPressed(int key, bool isRepeat) override;
-   bool ShouldSerializeForSnapshot() override { return true; }
+   bool ShouldSerializeForSnapshot() const override { return true; }
 
    void StepBy(double time, float velocity, int flags);
    void ResetStep();

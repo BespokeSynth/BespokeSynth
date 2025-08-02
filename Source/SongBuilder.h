@@ -48,6 +48,11 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void Poll() override;
 
+   int GetCurrentScene() const { return mCurrentScene; }
+   int GetQueuedScene() const { return mQueuedScene; }
+   int GetNumScenes() const { return (int)mScenes.size(); }
+   void SetScene(int scene, double time);
+
    //ITimeListener
    void OnTimeEvent(double time) override;
 

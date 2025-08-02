@@ -264,7 +264,7 @@ bool StutterControl::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiM
 {
    if (type == kMidiMessage_Note)
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
       {
          int gridIndex = controlIndex - 36;
          int x = gridIndex % 8;
@@ -275,6 +275,7 @@ bool StutterControl::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiM
             int index = x + y * 8;
             mStutter[index] = midiValue > 0;
             SendStutter(gTime, GetStutter((StutterType)index), mStutter[index]);
+            abletonGrid->DisplayScreenMessage(mStutterCheckboxes[index]->GetDisplayName());
          }
 
          return true;

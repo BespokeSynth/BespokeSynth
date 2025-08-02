@@ -90,6 +90,7 @@ public:
    //IAbletonGridController
    bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
@@ -159,7 +160,8 @@ private:
    void RandomizeLengths();
    void Step(double time, float velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
-   void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
+   void GetPush2Layout(AbletonDeviceType deviceType, int& sequenceRows, int& pitchCols, int& pitchRows);
+   void Clear();
 
    int mTones[NSS_MAX_STEPS]{};
    int mVels[NSS_MAX_STEPS]{};

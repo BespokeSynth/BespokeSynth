@@ -34,6 +34,7 @@
 #include "INoteSource.h"
 #include "GridController.h"
 #include "Push2Control.h"
+#include "AbletonMoveControl.h"
 
 class LaunchpadNoteDisplayer;
 
@@ -57,6 +58,7 @@ public:
    void SetDisplayer(LaunchpadNoteDisplayer* displayer) { mDisplayer = displayer; }
    void DisplayNote(int pitch, int velocity);
    void SetChorder(Chorder* chorder) { mChorder = chorder; }
+   void AdjustOctave(int amount);
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
@@ -158,4 +160,6 @@ private:
    bool mPreserveChordRoot{ true };
    Checkbox* mPreserveChordRootCheckbox{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
+   int mRows{ 8 };
+   int mCols{ 8 };
 };

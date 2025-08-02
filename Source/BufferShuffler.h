@@ -111,7 +111,7 @@ private:
 
    struct ShuffleEvent
    {
-      double mTime{ 0.0 };
+      double mTime{ -1 };
       int mSlice{ 0 };
       PlaybackStyle mStyle{ PlaybackStyle::Normal };
    };

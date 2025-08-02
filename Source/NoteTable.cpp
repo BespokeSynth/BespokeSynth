@@ -509,7 +509,7 @@ bool NoteTable::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessag
 
       if (type == kMidiMessage_Note)
       {
-         if (controlIndex >= 36 && controlIndex <= 99)
+         if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
          {
             int gridIndex = controlIndex - 36;
             int x = gridIndex % 8;
