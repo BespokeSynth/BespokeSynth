@@ -574,17 +574,21 @@ void LooperRecorder::CancelFreeRecord()
 {
    mFreeRecording = false;
    mStartFreeRecordTime = 0;
+   for (int i = 0; i < (int)mWriteForLooper.size(); ++i)
+   {
+      mWriteForLooper[i] = false;
+   }
 }
 
-bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool LooperRecorder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note)
    {
-      if (controlIndex >= 36 && controlIndex <= 99 && midiValue > 0)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads() && midiValue > 0)
       {
-         int gridIndex = controlIndex - 36;
-         int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
+         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+         int x = gridIndex % abletonGrid->GetGridNumCols();
+         int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
 
          if (y == 0)
          {
@@ -602,16 +606,17 @@ bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, i
             if (x < mLoopers.size())
                mNextCommitTargetIndex = x;
          }
-         else if (y - 2 < mLoopers.size())
+         else if (y == 2)
          {
-            int looperIndex = y - 2;
+            int looperIndex = x;
             if (mLoopers[looperIndex] != nullptr)
-            {
-               if (x == 0)
-                  push2->SetDisplayModule(mLoopers[looperIndex]);
-               if (x == 1)
-                  mLoopers[looperIndex]->SetMute(gTime, !mLoopers[looperIndex]->GetMute());
-            }
+               abletonGrid->SetDisplayModule(mLoopers[looperIndex]);
+         }
+         else if (y == 3)
+         {
+            int looperIndex = x;
+            if (mLoopers[looperIndex] != nullptr)
+               mLoopers[looperIndex]->SetMute(gTime, !mLoopers[looperIndex]->GetMute());
          }
 
          return true;
@@ -621,7 +626,7 @@ bool LooperRecorder::OnPush2Control(Push2Control* push2, MidiMessageType type, i
    return false;
 }
 
-void LooperRecorder::UpdatePush2Leds(Push2Control* push2)
+void LooperRecorder::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    for (int x = 0; x < 8; ++x)
    {
@@ -633,33 +638,59 @@ void LooperRecorder::UpdatePush2Leds(Push2Control* push2)
          {
             switch (x)
             {
-               case 0: pushColor = mCommit8BarsButton->GetValue() > 0 ? 125 : 33; break;
-               case 1: pushColor = mCommit4BarsButton->GetValue() > 0 ? 125 : 33; break;
-               case 2: pushColor = mCommit2BarsButton->GetValue() > 0 ? 125 : 33; break;
-               case 3: pushColor = mCommit1BarButton->GetValue() > 0 ? 125 : 33; break;
+               case 0: pushColor = mCommit8BarsButton->GetValue() > 0 ? AbletonDevice::kColorBlue : 33; break;
+               case 1: pushColor = mCommit4BarsButton->GetValue() > 0 ? AbletonDevice::kColorBlue : 33; break;
+               case 2: pushColor = mCommit2BarsButton->GetValue() > 0 ? AbletonDevice::kColorBlue : 33; break;
+               case 3: pushColor = mCommit1BarButton->GetValue() > 0 ? AbletonDevice::kColorBlue : 33; break;
                default: break;
             }
          }
          else if (y == 1)
          {
             if (x < mLoopers.size())
-               pushColor = (x == mNextCommitTargetIndex) ? 126 : 86;
+               pushColor = (x == mNextCommitTargetIndex) ? AbletonDevice::kColorGreen : 86;
          }
-         else if (y - 2 < mLoopers.size())
+         else if (y == 2)
          {
-            int looperIndex = y - 2;
+            int looperIndex = x;
             if (mLoopers[looperIndex] != nullptr)
-            {
-               if (x == 0)
-                  pushColor = (push2->GetDisplayModule() == mLoopers[looperIndex]) ? 125 : 33;
-               if (x == 1)
-                  pushColor = mLoopers[looperIndex]->GetMute() ? 127 : 68;
-            }
+               pushColor = (abletonGrid->GetDisplayModule() == mLoopers[looperIndex]) ? AbletonDevice::kColorBlue : 33;
+         }
+         else if (y == 3)
+         {
+            int looperIndex = x;
+            if (mLoopers[looperIndex] != nullptr)
+               pushColor = mLoopers[looperIndex]->GetMute() ? AbletonDevice::kColorRed : 68;
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
       }
    }
+}
+
+//IInputRecordable
+void LooperRecorder::SetRecording(bool record)
+{
+   mWriteForLooperCheckbox[0]->SetValue(record ? 1 : 0, NextBufferTime(false));
+}
+
+//IInputRecordable
+bool LooperRecorder::IsRecording() const
+{
+   return mWriteForLooper[0];
+}
+
+//IInputRecordable
+void LooperRecorder::ClearRecording()
+{
+   if (mLoopers[0] != nullptr)
+      mLoopers[0]->ClearRecording();
+}
+
+//IInputRecordable
+void LooperRecorder::CancelRecording()
+{
+   mWriteForLooper[0] = false;
 }
 
 void LooperRecorder::ButtonClicked(ClickButton* button, double time)

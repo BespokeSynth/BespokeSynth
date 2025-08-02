@@ -30,6 +30,7 @@
 #include "Chorder.h"
 #include "MidiController.h"
 #include "FillSaveDropdown.h"
+#include "AbletonDeviceShared.h"
 
 #define INVALID_PITCH -999
 #define CHORD_BUTTON_OFFSET -100
@@ -368,25 +369,54 @@ void LaunchpadKeyboard::OnTimeEvent(double time)
 {
 }
 
-bool LaunchpadKeyboard::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool LaunchpadKeyboard::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note && controlIndex >= 36 && controlIndex <= 99)
+   int rangeStart = abletonGrid->GetGridStartIndex();
+   int rangeEnd = abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads();
+   mRows = abletonGrid->GetGridNumRows(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
+
+   if (type == kMidiMessage_Note && controlIndex >= rangeStart && controlIndex < rangeEnd)
    {
-      int gridIndex = controlIndex - 36;
+      int gridIndex = controlIndex - rangeStart;
       int gridX = gridIndex % 8;
-      int gridY = 7 - gridIndex / 8;
+      int gridY = abletonGrid->GetGridNumRows() - 1 - gridIndex / 8;
       OnGridButton(gridX, gridY, midiValue / 127, nullptr);
       return true;
+   }
+
+   if (type == kMidiMessage_Control)
+   {
+      if (controlIndex == AbletonDevice::kOctaveUpButton)
+      {
+         if (midiValue > 0)
+         {
+            AdjustOctave(1);
+            abletonGrid->DisplayScreenMessage("Octave: " + ofToString(mOctave));
+            return true;
+         }
+      }
+      else if (controlIndex == AbletonDevice::kOctaveDownButton)
+      {
+         if (midiValue > 0)
+         {
+            AdjustOctave(-1);
+            abletonGrid->DisplayScreenMessage("Octave: " + ofToString(mOctave));
+            return true;
+         }
+      }
    }
 
    return false;
 }
 
-void LaunchpadKeyboard::UpdatePush2Leds(Push2Control* push2)
+void LaunchpadKeyboard::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
-   for (int x = 0; x < 8; ++x)
+   int offset = abletonGrid->GetGridStartIndex();
+   mRows = abletonGrid->GetGridNumRows(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
+
+   for (int x = 0; x < abletonGrid->GetGridNumCols(); ++x)
    {
-      for (int y = 0; y < 8; ++y)
+      for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
       {
          GridColor color = GetGridSquareColor(x, y);
          int pushColor = 0;
@@ -414,8 +444,8 @@ void LaunchpadKeyboard::UpdatePush2Leds(Push2Control* push2)
                pushColor = 115;
                break;
          }
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
-         //push2->SetLed(kMidiMessage_Note, x + (7-y)*8 + 36, x + y*8 + 64);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + offset, pushColor);
+         //abletonGrid->SetLed(kMidiMessage_Note, x + (7-y)*8 + 36, x + y*8 + 64);
       }
    }
 }
@@ -426,6 +456,11 @@ void LaunchpadKeyboard::DisplayNote(int pitch, int velocity)
       mCurrentNotes[pitch] = velocity;
 
    UpdateLights();
+}
+
+void LaunchpadKeyboard::AdjustOctave(int amount)
+{
+   mOctave = std::clamp(mOctave + amount, mOctaveSlider->GetMin(), mOctaveSlider->GetMax());
 }
 
 void LaunchpadKeyboard::DrawModule()
@@ -456,7 +491,7 @@ void LaunchpadKeyboard::DrawModuleUnclipped()
 
 int LaunchpadKeyboard::GridToPitch(int x, int y)
 {
-   y = 7 - y;
+   y = mRows - 1 - y;
    if (mArrangementMode == kSix)
    {
       if (x < 2)
@@ -585,7 +620,7 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
    else if (mLayout == kDrum)
    {
       if (x < 4 && y < 4)
-         return x + y * 4;
+         return x + y * 4 + mOctave * 12;
       else
          return INVALID_PITCH;
    }

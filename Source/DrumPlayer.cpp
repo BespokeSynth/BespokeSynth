@@ -520,13 +520,13 @@ void DrumPlayer::PlayNote(NoteMessage note)
    }
 }
 
-bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool DrumPlayer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note)
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
       {
-         int gridIndex = controlIndex - 36;
+         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
          int x = gridIndex % 8;
          int y = gridIndex / 8;
 
@@ -556,7 +556,7 @@ bool DrumPlayer::OnPush2Control(Push2Control* push2, MidiMessageType type, int c
    return false;
 }
 
-void DrumPlayer::UpdatePush2Leds(Push2Control* push2)
+void DrumPlayer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    for (int x = 0; x < 8; ++x)
    {
@@ -589,7 +589,7 @@ void DrumPlayer::UpdatePush2Leds(Push2Control* push2)
             }
          }
 
-         push2->SetLed(kMidiMessage_Note, x + y * 8 + 36, pushColor, pushColorBlink);
+         abletonGrid->SetLed(kMidiMessage_Note, x + y * 8 + 36, pushColor, pushColorBlink);
       }
    }
 }

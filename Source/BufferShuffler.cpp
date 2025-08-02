@@ -402,23 +402,28 @@ float BufferShuffler::GetSlicePlaybackRate() const
    }
 }
 
-bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool BufferShuffler::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
 {
    if (type == kMidiMessage_Note)
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex <= abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
       {
-         int gridIndex = controlIndex - 36;
-         int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
-         int index = x + y * 8;
+         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+         int x = gridIndex % abletonGrid->GetGridNumCols();
+         int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+         int index = x + y * abletonGrid->GetGridNumCols();
 
-         if (y == 7)
+         if (y == abletonGrid->GetGridNumRows() - 1)
          {
             if (midiValue > 0 && x < 5)
+            {
                mPlaybackStyle = PlaybackStyle(x + 1);
+               abletonGrid->DisplayScreenMessage(mPlaybackStyleDropdown->GetDisplayValue((int)mPlaybackStyle));
+            }
             else
+            {
                mPlaybackStyle = PlaybackStyle::Normal;
+            }
          }
          else if (index < GetNumSlices() && midiValue > 0)
          {
@@ -432,17 +437,17 @@ bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, i
    return false;
 }
 
-void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
+void BufferShuffler::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
-   for (int x = 0; x < 8; ++x)
+   for (int x = 0; x < abletonGrid->GetGridNumCols(); ++x)
    {
-      for (int y = 0; y < 8; ++y)
+      for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
       {
          int pushColor = 0;
-         int index = x + y * 8;
+         int index = x + y * abletonGrid->GetGridNumCols();
          int writeSlice = GetWritePositionInSamples(gTime) * GetNumSlices() / GetLengthInSamples();
          int playSlice = mPlaybackSampleIndex * GetNumSlices() / GetLengthInSamples();
-         if (y == 7)
+         if (y == abletonGrid->GetGridNumRows() - 1)
          {
             if (x < 5)
                pushColor = (x == (int)mPlaybackStyle - 1) ? 2 : 1;
@@ -459,7 +464,7 @@ void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
                pushColor = 16;
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
       }
    }
 }

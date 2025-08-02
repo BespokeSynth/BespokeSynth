@@ -114,6 +114,12 @@ private:
    std::string mOverrideDisplayName{ "" };
 };
 
+template <class T>
+bool IsOfType(IClickable* clickable)
+{
+   return dynamic_cast<T>(clickable) != nullptr;
+}
+
 class IKeyboardFocusListener
 {
 public:

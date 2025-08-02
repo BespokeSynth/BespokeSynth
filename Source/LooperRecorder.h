@@ -36,11 +36,12 @@
 #include "Ramp.h"
 #include "DropdownList.h"
 #include "Push2Control.h"
+#include "IInputRecordable.h"
 
 class Stutter;
 class PatchCableSource;
 
-class LooperRecorder : public IAudioProcessor, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IIntSliderListener, public IDropdownListener, public IPush2GridController
+class LooperRecorder : public IAudioProcessor, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IIntSliderListener, public IDropdownListener, public IAbletonGridController, public IInputRecordable
 {
 public:
    LooperRecorder();
@@ -81,9 +82,15 @@ public:
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
+
+   //IInputRecordable
+   void SetRecording(bool record) override;
+   bool IsRecording() const override;
+   void ClearRecording() override;
+   void CancelRecording() override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;

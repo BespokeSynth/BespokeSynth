@@ -38,6 +38,7 @@
 #include "PitchShifter.h"
 #include "INoteReceiver.h"
 #include "SwitchAndRamp.h"
+#include "IInputRecordable.h"
 
 class LooperRecorder;
 class Rewriter;
@@ -46,7 +47,7 @@ class LooperGranulator;
 
 #define LOOPER_COMMIT_FADE_SAMPLES 200
 
-class Looper : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public INoteReceiver
+class Looper : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public INoteReceiver, public IInputRecordable
 {
 public:
    Looper();
@@ -98,6 +99,13 @@ public:
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    bool DrawToPush2Screen() override;
 
+   //IInputRecordable
+   void SetRecording(bool record) override;
+   bool IsRecording() const override { return mWriteInput; }
+   void ClearRecording() override { Clear(); }
+   void CancelRecording() override { SetRecording(false); }
+
+   void SetRecording(double time, bool record);
    void MergeIn(Looper* otherLooper);
    void SwapBuffers(Looper* otherLooper);
    void CopyBuffer(Looper* sourceLooper);

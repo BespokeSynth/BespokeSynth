@@ -40,7 +40,7 @@
 #include "GridController.h"
 
 
-class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IIntSliderListener, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IPush2GridController, public IGridControllerListener
+class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IIntSliderListener, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IAbletonGridController, public IGridControllerListener
 {
 public:
    Snapshots();
@@ -78,9 +78,9 @@ public:
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
@@ -99,6 +99,7 @@ public:
    void UpdateOldControlName(std::string& oldName) override;
 
    static std::vector<IUIControl*> sSnapshotHighlightControls;
+   static bool sSerializingModuleStateForSnapshot;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

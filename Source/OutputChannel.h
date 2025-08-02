@@ -59,15 +59,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
+   void GetModuleDimensions(float& width, float& height) override;
 
    int GetNumChannels() const { return mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2; }
 
-   float mWidth{ 64 };
    float mHeight{ 40 };
    DropdownList* mChannelSelector{ nullptr };
    int mChannelSelectionIndex{ 0 };

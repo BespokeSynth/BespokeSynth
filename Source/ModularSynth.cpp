@@ -1207,6 +1207,13 @@ bool ModularSynth::ShouldShowGridSnap() const
    return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1))) && (GetKeyModifiers() & kModifier_Command);
 }
 
+void ModularSynth::SetGroupSelectedModules(std::list<IDrawableModule*> modules)
+{
+   mGroupSelectedModules.clear();
+   for (auto* module : modules)
+      mGroupSelectedModules.push_back(module);
+}
+
 void ModularSynth::MouseMoved(int intX, int intY)
 {
    bool changed = (mMousePos.x != intX || mMousePos.y != intY);

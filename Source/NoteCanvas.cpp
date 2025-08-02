@@ -33,6 +33,7 @@
 #include "Profiler.h"
 #include "CanvasTimeline.h"
 #include "CanvasScrollbar.h"
+#include "FillSaveDropdown.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -318,6 +319,130 @@ void NoteCanvas::CanvasUpdated(Canvas* canvas)
    if (canvas == mCanvas)
    {
    }
+}
+
+bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (mGridKeyboardInterface != nullptr)
+   {
+      bool handled = mGridKeyboardInterface->OnAbletonGridControl(abletonGrid, type, controlIndex, midiValue);
+      if (handled)
+         return true;
+   }
+
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
+      {
+         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+         int x = gridIndex % abletonGrid->GetGridNumCols();
+         int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+         int index = x + y * abletonGrid->GetGridNumCols();
+
+
+         return true;
+      }
+
+      int stepIndex = -1;
+      if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
+         stepIndex = controlIndex - AbletonDevice::kStepButtonSection;
+      if (stepIndex >= 0 && stepIndex < AbletonDevice::kNumStepButtons)
+      {
+         if (midiValue > 0) //button press
+         {
+            mEditHoldStep = stepIndex;
+            mEditHoldTime = gTime;
+            int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+            int totalNumSteps = stepsPerMeasure * mNumMeasures;
+            float pos = (stepIndex + mEditMeasureOffset * stepsPerMeasure) / float(totalNumSteps);
+            float nextPos = (stepIndex + mEditMeasureOffset * stepsPerMeasure + 1) / float(totalNumSteps);
+            const auto& elements = mCanvas->GetElements();
+
+            for (auto* element : elements)
+            {
+               if (element->GetStart() >= pos && element->GetStart() < nextPos)
+                  mCurrentEditElements.push_back(element);
+            }
+         }
+         else //button release
+         {
+            double holdTime = gTime - mEditHoldTime;
+            if (holdTime < 500) //held for short time, delete steps
+            {
+               for (auto* element : mCurrentEditElements)
+                  mCanvas->RemoveElement(element);
+            }
+
+            mCurrentEditElements.clear();
+
+            mEditHoldStep = -1;
+         }
+      }
+   }
+
+   return false;
+}
+
+void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
+{
+   /*for (int x = 0; x < abletonGrid->GetGridNumCols(); ++x)
+   {
+      for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
+      {
+         int pushColor = 0;
+         int index = x + y * abletonGrid->GetGridNumCols();
+
+
+         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + abletonGrid->GetGridStartIndex(), pushColor);
+      }
+   }*/
+
+   if (mGridKeyboardInterface != nullptr)
+      mGridKeyboardInterface->UpdateAbletonGridLeds(abletonGrid);
+
+   if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
+   {
+      float curPos = GetCurPos(gTime);
+      const auto& elements = mCanvas->GetElements();
+      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+      int totalNumSteps = stepsPerMeasure * mNumMeasures;
+      for (int step = 0; step < AbletonDevice::kNumStepButtons; ++step)
+      {
+         int pushColor = 0;
+         float pos = (step + mEditMeasureOffset * stepsPerMeasure) / float(totalNumSteps);
+         float nextPos = (step + mEditMeasureOffset * stepsPerMeasure + 1) / float(totalNumSteps);
+
+         bool hasNoteOn = false;
+         bool hasNoteSustain = false;
+         for (const auto* element : elements)
+         {
+            if (element->GetStart() >= pos && element->GetStart() < nextPos)
+               hasNoteOn = true;
+            if (element->GetStart() < nextPos && element->GetEnd() > pos)
+               hasNoteSustain = true;
+         }
+
+         if (hasNoteOn)
+            pushColor = AbletonDevice::kColorWhite;
+         else if (hasNoteSustain)
+            pushColor = AbletonDevice::kColorDarkGrey;
+
+         if (curPos >= pos && curPos < nextPos)
+            pushColor = AbletonDevice::kColorGreen;
+
+         abletonGrid->SetLed(kMidiMessage_Note, step + AbletonDevice::kStepButtonSection, pushColor);
+      }
+   }
+}
+
+bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd)
+{
+   if (!mCurrentEditElements.empty())
+   {
+      lcd->DrawText(("holding " + ofToString((int)mCurrentEditElements.size()) + " elements").c_str(), 3, 13, LCDFONT_STYLE_REGULAR);
+      return true;
+   }
+   return false;
 }
 
 void NoteCanvas::DrawModule()
@@ -716,6 +841,7 @@ void NoteCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("canvaswidth", moduleInfo, 390, 390, 99999, K(isTextField));
    mModuleSaveData.LoadFloat("canvasheight", moduleInfo, 200, 40, 99999, K(isTextField));
+   mModuleSaveData.LoadString("grid_keyboard_interface", moduleInfo, "", FillDropdown<LaunchpadKeyboard*>);
 
    SetUpFromSaveData();
 }
@@ -724,6 +850,8 @@ void NoteCanvas::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mCanvas->SetDimensions(mModuleSaveData.GetFloat("canvaswidth"), mModuleSaveData.GetFloat("canvasheight"));
+   IDrawableModule* gridKeyboardInterface = TheSynth->FindModule(mModuleSaveData.GetString("grid_keyboard_interface"), false);
+   mGridKeyboardInterface = dynamic_cast<LaunchpadKeyboard*>(gridKeyboardInterface);
 }
 
 void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
