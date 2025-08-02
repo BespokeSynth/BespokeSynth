@@ -138,7 +138,8 @@ void AbletonMoveLCD::Init()
 
 void AbletonMoveLCD::Clear()
 {
-   memset(mPixels, 0, sizeof(uint8_t) * GetNumDisplayPixels());
+   if (mPixels)
+      memset(mPixels, 0, sizeof(uint8_t) * GetNumDisplayPixels());
 }
 
 void AbletonMoveLCD::DrawText(const char* text, int x, int y, int style, int fontSize)
