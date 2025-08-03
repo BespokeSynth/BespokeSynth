@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace
 {
    const float kLeftMarginX = 3;
-   const float kSongSequencerWidth = 175;
+   const float kSongSequencerWidth = 255;
    const float kGridStartY = 20;
-   const float kSceneTabWidth = 165;
+   const float kSceneTabWidth = 205;
    const float kTargetTabHeightTop = 30;
    const float kTargetTabHeightBottom = 10;
    const float kRowHeight = 20;
@@ -103,7 +103,7 @@ void SongBuilder::CreateUIControls()
    UIBLOCK(10, height + 4);
    for (int i = 0; i < kMaxSequencerScenes; ++i)
    {
-      DROPDOWN(mSequencerSceneSelector[i], ("scene" + ofToString(i)).c_str(), &mSequencerSceneId[i], 80);
+      DROPDOWN(mSequencerSceneSelector[i], ("scene" + ofToString(i)).c_str(), &mSequencerSceneId[i], 160);
       mSequencerSceneSelector[i]->SetCableTargetable(false);
       mSequencerSceneSelector[i]->SetDrawTriangle(false);
       UIBLOCK_SHIFTRIGHT();
@@ -991,7 +991,7 @@ void SongBuilder::SongScene::CreateUIControls(SongBuilder* owner)
 #define UIBLOCK_OWNER owner //change owner
    UIBLOCK0();
    BUTTON_STYLE(mActivateButton, ("go" + ofToString(mId)).c_str(), ButtonDisplayStyle::kPlay);
-   TEXTENTRY(mNameEntry, ("name" + ofToString(mId)).c_str(), 12, &mName);
+   TEXTENTRY(mNameEntry, ("name" + ofToString(mId)).c_str(), 17, &mName);
    DROPDOWN(mContextMenu, ("context " + ofToString(mId)).c_str(), (int*)(&mContextMenuSelection), 20);
    ENDUIBLOCK0();
 #undef UIBLOCK_OWNER
