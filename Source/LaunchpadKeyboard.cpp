@@ -638,14 +638,14 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
       int octave = (x / 7) + y / 2 * std::max(mCols / 7, 1);
       if (y % 2 == 1) //black keys
       {
-         const int kBlackKeys[] = {INVALID_PITCH, 1, 3, INVALID_PITCH, 6, 8, 10};
+         const int kBlackKeys[] = { INVALID_PITCH, 1, 3, INVALID_PITCH, 6, 8, 10 };
          if ((x % 7) == 0 || (x % 7) == 3)
             return INVALID_PITCH;
          return kBlackKeys[x % 7] + (mOctave + octave) * 12;
       }
       else //white keys
       {
-         const int kWhiteKeys[] = {0, 2, 4, 5, 7, 9, 11};
+         const int kWhiteKeys[] = { 0, 2, 4, 5, 7, 9, 11 };
          return kWhiteKeys[x % 7] + (mOctave + octave) * 12;
       }
    }
@@ -656,8 +656,8 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
    else if (mLayout == LaunchpadLayout::kPentatonic)
    {
       bool isMinor = TheScale->IsInScale(TheScale->ScaleRoot() + 3);
-      const int kMinorPentatonic[] = {0, 3, 5, 7, 10};
-      const int kMajorPentatonic[] = {0, 2, 4, 7, 9};
+      const int kMinorPentatonic[] = { 0, 3, 5, 7, 10 };
+      const int kMajorPentatonic[] = { 0, 2, 4, 7, 9 };
       int number = x + y * mCols;
       int index = number % 5;
       int octave = number / 5;
