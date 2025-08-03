@@ -91,7 +91,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   enum LaunchpadLayout
+   enum class LaunchpadLayout
    {
       kChromatic,
       kMajorThirds,
@@ -101,10 +101,13 @@ private:
       kGuitar,
       kSeptatonic,
       kDrum,
-      kAllPads
+      kAllPads,
+      kPiano,
+      kScaleRows,
+      kPentatonic
    };
 
-   enum ArrangementMode
+   enum class ArrangementMode
    {
       kFull,
       kFive,
