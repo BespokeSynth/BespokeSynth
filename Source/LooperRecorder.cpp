@@ -414,9 +414,20 @@ void LooperRecorder::DrawModule()
    for (int i=0; i<mNumBars; ++i)
       DrawCircleHash(center, float(i)/mNumBars, 1, radius * .8f, radius);
    ofPopStyle();*/
+}
 
+void LooperRecorder::DrawModuleUnclipped()
+{
    if (mDrawDebug)
-      mRecordBuffer.Draw(0, 162, 800, 100);
+   {
+      ofPushStyle();
+      ofRectangle rect(0, 162, 800, 100);
+      mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height);
+      float x = (float(mRecordBuffer.GetRawBufferOffset(0)) / mRecordBuffer.Size()) * rect.width + rect.x;
+      ofSetColor(0, 255, 0, 255);
+      ofLine(x, rect.y, x, rect.y + rect.height);
+      ofPopStyle();
+   }
 }
 
 void LooperRecorder::RemoveLooper(Looper* looper)
