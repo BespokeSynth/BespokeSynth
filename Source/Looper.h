@@ -142,6 +142,7 @@ private:
    void DoShiftDownbeat();
    void DoShiftOffset();
    void DoCommit(double time);
+   void ProcessCommit(int numSamplesToProcess);
    void UpdateNumBars(int oldNumBars);
    void BakeVolume();
    void DoUndo();
@@ -173,7 +174,12 @@ private:
    ClickButton* mMergeButton{ nullptr };
    ClickButton* mSwapButton{ nullptr };
    ClickButton* mCopyButton{ nullptr };
-   RollingBuffer* mCommitBuffer{ nullptr }; //if this is set, a commit happens next audio frame
+   bool mDoCommit{ false }; //if this is set, a commit happens next audio frame
+   RollingBuffer* mCommitBuffer{ nullptr };
+   int mCommitBufferStartSample{ -1 };
+   int mCommitTargetBufferOffset{ -1 };
+   int mCommitSamplesProgress{ -1 };
+   int mCommitLength{ -1 };
    ClickButton* mVolumeBakeButton{ nullptr };
    bool mWantBakeVolume{ false };
    int mLastCommit{ 0 };

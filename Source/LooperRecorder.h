@@ -119,6 +119,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override;
 
    static constexpr int kMaxLoopers = 8;
