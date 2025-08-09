@@ -36,6 +36,7 @@ void Amplifier::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGainSlider = new FloatSlider(this, "gain", 5, 2, 110, 15, &mGain, 0, 2);
+   mGainSlider->SetMode(FloatSlider::kSquare);
 }
 
 Amplifier::~Amplifier()
