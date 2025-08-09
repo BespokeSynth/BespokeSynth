@@ -897,6 +897,7 @@ looperrecorder~command center to manage recording into multiple loopers, and all
 ~2~capture the last 2 measures to the currently-targeted looper
 ~4~capture the last 4 measures to the currently-targeted looper
 ~8~capture the last 8 measures to the currently-targeted looper
+~16~capture the last 16 measures to the currently-targeted looper
 ~length~length in measures to use when connected loopers use the "commit" button
 ~2xtempo~double global transport tempo, while keeping connected loopers sounding the same
 ~.5tempo~halve global transport tempo, while keeping connected loopers sounding the same
