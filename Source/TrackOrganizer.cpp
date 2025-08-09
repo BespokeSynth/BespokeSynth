@@ -200,7 +200,7 @@ void TrackOrganizer::DrawModuleUnclipped()
    ofPushStyle();
    ofColor color = AbletonDevice::kColors[mColorIndex].color;
    //if we don't have bounds to connect the modules, at make them blink when you click this to make them easier to see
-   if (!mDrawTrackBounds && (gHoveredModule == this || TheSynth->GetLastClickedModule() == this))
+   if (!mDrawTrackBounds && ShouldShowCables())
       color.a = ofMap(sin(gTime / 500 * PI * 2), -1, 1, 50, 255);
    else
       color.a = 100;
@@ -303,14 +303,23 @@ void TrackOrganizer::Poll()
       mSelectModulesOnMouseRelease = false;
    }
 
+   bool showCables = ShouldShowCables();
    ofColor cableColor = IDrawableModule::GetColor(kModuleCategory_Other);
-   if ((gHoveredModule == this || TheSynth->GetLastClickedModule() == this) && !Minimized())
+   if (showCables)
       cableColor.a *= .3f;
    else
       cableColor.a *= 0;
 
    for (auto* source : GetPatchCableSources())
+   {
       source->SetColor(cableColor);
+      source->SetClickable(showCables);
+   }
+}
+
+bool TrackOrganizer::ShouldShowCables() const
+{
+   return (gHoveredModule == this || TheSynth->GetLastClickedModule() == this) && !Minimized();
 }
 
 void TrackOrganizer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
