@@ -80,6 +80,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
 
    std::list<IDrawableModule*> GetAllTrackModules();
+   bool ShouldShowCables() const;
 
    float mWidth{ 200 };
    float mHeight{ 68 };
