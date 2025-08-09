@@ -391,7 +391,7 @@ void Looper::Process(double time)
    }
 
    if (mCommitSamplesProgress >= 0)
-      ProcessCommit(1000);
+      ProcessCommit(std::max(1000, gBufferSize));
 }
 
 void Looper::DoCommit(double time)

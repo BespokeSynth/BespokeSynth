@@ -53,30 +53,35 @@ void LooperRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mCommit1BarButton = new ClickButton(this, "1", 3 + kBufferSegmentWidth * 3, 3);
-   mCommit2BarsButton = new ClickButton(this, "2", 3 + kBufferSegmentWidth * 2, 3);
-   mCommit4BarsButton = new ClickButton(this, "4", 3 + kBufferSegmentWidth, 3);
-   mCommit8BarsButton = new ClickButton(this, "8", 3, 3);
+   for (int i = 0; i < kNumRetroactiveCommitButtons; ++i)
+   {
+      int numBars = (int)pow(2, i);
+      mRetroactiveCommitButton[i] = new ClickButton(this, ofToString(numBars).c_str(), 3 + kBufferSegmentWidth * (kNumRetroactiveCommitButtons - 1 - i), 3);
+   }
 
    float width, height;
 
-   UIBLOCK(kBufferSegmentWidth * 4 + 6, 3, 60);
+   UIBLOCK(kBufferSegmentWidth * kNumRetroactiveCommitButtons + 6, 3, 60);
    DROPDOWN(mNumBarsSelector, "length", &mNumBars, 50);
    BUTTON(mDoubleTempoButton, "2xtempo");
    BUTTON(mHalfTempoButton, ".5tempo");
    //BUTTON(mShiftMeasureButton, "shift"); UIBLOCK_SHIFTUP(); UIBLOCK_SHIFTX(30);
    //BUTTON(mHalfShiftButton, "half"); UIBLOCK_NEWLINE();
    //BUTTON(mShiftDownbeatButton, "downbeat");
-   UIBLOCK_SHIFTDOWN();
-   UIBLOCK_SHIFTDOWN();
-   INTSLIDER(mNextCommitTargetSlider, "target", &mNextCommitTargetIndex, 0, 3);
-   CHECKBOX(mAutoAdvanceThroughLoopersCheckbox, "auto-advance", &mAutoAdvanceThroughLoopers);
    UIBLOCK_NEWCOLUMN();
    UIBLOCK_PUSHSLIDERWIDTH(80);
    DROPDOWN(mModeSelector, "mode", ((int*)(&mRecorderMode)), 60);
    BUTTON(mClearOverdubButton, "clear");
    CHECKBOX(mFreeRecordingCheckbox, "free rec", &mFreeRecording);
    BUTTON(mCancelFreeRecordButton, "cancel free rec");
+   ENDUIBLOCK(width, height);
+
+   mWidth = MAX(mWidth, width);
+   mHeight = MAX(mHeight, height);
+
+   UIBLOCK(126, 88);
+   INTSLIDER(mNextCommitTargetSlider, "target", &mNextCommitTargetIndex, 0, 3);
+   CHECKBOX(mAutoAdvanceThroughLoopersCheckbox, "auto-advance", &mAutoAdvanceThroughLoopers);
    ENDUIBLOCK(width, height);
 
    mWidth = MAX(mWidth, width);
@@ -111,19 +116,17 @@ void LooperRecorder::CreateUIControls()
    mNumBarsSelector->AddLabel(" 6 ", 6);
    mNumBarsSelector->AddLabel(" 8 ", 8);
    mNumBarsSelector->AddLabel("12 ", 12);
+   mNumBarsSelector->AddLabel("16 ", 16);
 
    mModeSelector->AddLabel("record", kRecorderMode_Record);
    mModeSelector->AddLabel("overdub", kRecorderMode_Overdub);
    mModeSelector->AddLabel("loop", kRecorderMode_Loop);
 
-   mCommit1BarButton->SetDisplayText(false);
-   mCommit1BarButton->SetDimensions(kBufferSegmentWidth, kBufferHeight);
-   mCommit2BarsButton->SetDisplayText(false);
-   mCommit2BarsButton->SetDimensions(kBufferSegmentWidth * 2, kBufferHeight);
-   mCommit4BarsButton->SetDisplayText(false);
-   mCommit4BarsButton->SetDimensions(kBufferSegmentWidth * 3, kBufferHeight);
-   mCommit8BarsButton->SetDisplayText(false);
-   mCommit8BarsButton->SetDimensions(kBufferSegmentWidth * 4, kBufferHeight);
+   for (int i = 0; i < kNumRetroactiveCommitButtons; ++i)
+   {
+      mRetroactiveCommitButton[i]->SetDisplayText(false);
+      mRetroactiveCommitButton[i]->SetDimensions(kBufferSegmentWidth * (i + 1), kBufferHeight);
+   }
 
    for (int i = 0; i < kMaxLoopers; ++i)
    {
@@ -362,43 +365,32 @@ void LooperRecorder::DrawModule()
       if (cents < 0)
          detune += " -" + ofToString(-cents) + " cents";
 
-      DrawTextNormal(speed + detune, 100, 80);
+      DrawTextNormal(speed + detune, 70, 65);
    }
 
-   if (mCommit1BarButton == gHoveredUIControl)
-      mCommit1BarButton->Draw();
-   if (mCommit2BarsButton == gHoveredUIControl)
-      mCommit2BarsButton->Draw();
-   if (mCommit4BarsButton == gHoveredUIControl)
-      mCommit4BarsButton->Draw();
-   if (mCommit8BarsButton == gHoveredUIControl)
-      mCommit8BarsButton->Draw();
+   for (int i = 0; i < kNumRetroactiveCommitButtons; ++i)
+   {
+      if (mRetroactiveCommitButton[i] == gHoveredUIControl)
+         mRetroactiveCommitButton[i]->Draw();
+   }
 
    ofPushStyle();
    int sampsPerBar = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate));
-   for (int i = 0; i < 4; ++i) //segments
+   int kNumSegments = 5;
+   for (int i = 0; i < kNumRetroactiveCommitButtons; ++i)
    {
       int bars = 1;
       int barOffset = 0;
-      if (i == 1)
+      for (int j = 0; j < i; ++j)
       {
-         barOffset = 1;
+         barOffset += bars;
+         bars = barOffset;
       }
-      if (i == 2)
-      {
-         bars = 2;
-         barOffset = 2;
-      }
-      if (i == 3)
-      {
-         bars = 4;
-         barOffset = 4;
-      }
-      mRecordBuffer.Draw(3 + (3 - i) * kBufferSegmentWidth, 3, kBufferSegmentWidth, kBufferHeight, sampsPerBar * bars, -1, sampsPerBar * barOffset);
+      mRecordBuffer.Draw(3 + (kNumSegments - 1 - i) * kBufferSegmentWidth, 3, kBufferSegmentWidth, kBufferHeight, sampsPerBar * bars, -1, sampsPerBar * barOffset);
    }
 
    ofSetColor(0, 0, 0, 20);
-   for (int i = 1; i < 4; ++i)
+   for (int i = 1; i < kNumSegments; ++i)
    {
       const float bx = 3 + i * kBufferSegmentWidth;
       ofLine(bx, 3, bx, 3 + kBufferHeight);
@@ -603,18 +595,15 @@ bool LooperRecorder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiM
 
          if (y == 0)
          {
-            switch (x)
+            if (x < kNumRetroactiveCommitButtons)
             {
-               case 0: mCommit8BarsButton->SetValue(1, gTime); break;
-               case 1: mCommit4BarsButton->SetValue(1, gTime); break;
-               case 2: mCommit2BarsButton->SetValue(1, gTime); break;
-               case 3: mCommit1BarButton->SetValue(1, gTime); break;
-               default: break;
+               int index = (kNumRetroactiveCommitButtons - 1 - x);
+               mRetroactiveCommitButton[index]->SetValue(1, gTime);
             }
          }
          else if (y == 1)
          {
-            if (x < mLoopers.size())
+            if (x < mNumLoopers)
                mNextCommitTargetIndex = x;
          }
          else if (y == 2)
@@ -639,42 +628,61 @@ bool LooperRecorder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiM
 
 void LooperRecorder::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
-   for (int x = 0; x < 8; ++x)
+   for (int x = 0; x < abletonGrid->GetGridNumCols(); ++x)
    {
-      for (int y = 0; y < 8; ++y)
+      for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
       {
          int pushColor = 0;
 
          if (y == 0)
          {
-            switch (x)
+            if (x < kNumRetroactiveCommitButtons)
             {
-               case 0: pushColor = mCommit8BarsButton->GetValue() > 0 ? AbletonDevice::kColorBlue : 33; break;
-               case 1: pushColor = mCommit4BarsButton->GetValue() > 0 ? AbletonDevice::kColorBlue : 33; break;
-               case 2: pushColor = mCommit2BarsButton->GetValue() > 0 ? AbletonDevice::kColorBlue : 33; break;
-               case 3: pushColor = mCommit1BarButton->GetValue() > 0 ? AbletonDevice::kColorBlue : 33; break;
-               default: break;
+               int index = (kNumRetroactiveCommitButtons - 1 - x);
+               if (mRetroactiveCommitButton[index]->GetValue() > 0)
+               {
+                  pushColor = AbletonDevice::kColorBlue;
+               }
+               else
+               {
+                  int numBars;
+                  if (x == 0)
+                     numBars = 16;
+                  else if (x == 1)
+                     numBars = 8;
+                  else if (x == 2)
+                     numBars = 4;
+                  else if (x == 3)
+                     numBars = 2;
+                  else
+                     numBars = 1;
+                  bool flip = (TheTransport->GetMeasure(gTime) / numBars) % 2 == 0;
+                  if (flip)
+                     pushColor = AbletonDevice::kColorJeanBlue;
+                  else
+                     pushColor = AbletonDevice::kColorLightBlue;
+               }
             }
          }
          else if (y == 1)
          {
-            if (x < mLoopers.size())
-               pushColor = (x == mNextCommitTargetIndex) ? AbletonDevice::kColorGreen : 86;
+            if (x < mNumLoopers)
+               pushColor = (x == mNextCommitTargetIndex) ? AbletonDevice::kColorGreen : AbletonDevice::kColorMossGreen;
          }
          else if (y == 2)
          {
             int looperIndex = x;
             if (mLoopers[looperIndex] != nullptr)
-               pushColor = (abletonGrid->GetDisplayModule() == mLoopers[looperIndex]) ? AbletonDevice::kColorBlue : 33;
+               pushColor = (abletonGrid->GetDisplayModule() == mLoopers[looperIndex]) ? AbletonDevice::kColorBlue : AbletonDevice::kColorJeanBlue;
          }
          else if (y == 3)
          {
             int looperIndex = x;
             if (mLoopers[looperIndex] != nullptr)
-               pushColor = mLoopers[looperIndex]->GetMute() ? AbletonDevice::kColorRed : 68;
+               pushColor = mLoopers[looperIndex]->GetMute() ? AbletonDevice::kColorRed : AbletonDevice::kColorDimRed;
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(kMidiMessage_Note, x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
       }
    }
 }
@@ -814,31 +822,21 @@ void LooperRecorder::ButtonClicked(ClickButton* button, double time)
    if (button == mCancelFreeRecordButton)
       CancelFreeRecord();
 
-   if (button == mCommit1BarButton ||
-       button == mCommit2BarsButton ||
-       button == mCommit4BarsButton ||
-       button == mCommit8BarsButton)
+   for (int i = 0; i < kNumRetroactiveCommitButtons; ++i)
    {
-      int numBars = 1;
-      if (button == mCommit1BarButton)
-         numBars = 1;
-      if (button == mCommit2BarsButton)
-         numBars = 2;
-      if (button == mCommit4BarsButton)
-         numBars = 4;
-      if (button == mCommit8BarsButton)
-         numBars = 8;
-
-      mNumBars = numBars;
-      if (mNextCommitTargetIndex < (int)mLoopers.size())
-         Commit(mLoopers[mNextCommitTargetIndex]);
-      if (mAutoAdvanceThroughLoopers)
+      if (button == mRetroactiveCommitButton[i])
       {
-         for (int i = 0; i < (int)mLoopers.size(); ++i)
+         mNumBars = (int)pow(2, i);
+         if (mNextCommitTargetIndex < (int)mLoopers.size())
+            Commit(mLoopers[mNextCommitTargetIndex]);
+         if (mAutoAdvanceThroughLoopers)
          {
-            mNextCommitTargetIndex = (mNextCommitTargetIndex + 1) % mLoopers.size();
-            if (mLoopers[mNextCommitTargetIndex] != nullptr)
-               break;
+            for (int i = 0; i < (int)mLoopers.size(); ++i)
+            {
+               mNextCommitTargetIndex = (mNextCommitTargetIndex + 1) % mNumLoopers;
+               if (mLoopers[mNextCommitTargetIndex] != nullptr)
+                  break;
+            }
          }
       }
    }
@@ -938,6 +936,7 @@ void LooperRecorder::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    mNumLoopers = ofClamp(mModuleSaveData.GetInt("num_loopers"), 1, kMaxLoopers);
+   mNextCommitTargetSlider->SetExtents(0, mNumLoopers - 1);
    mTemporarilySilenceAfterCommit = mModuleSaveData.GetBool("temp_silence_after_commit");
 }
 
