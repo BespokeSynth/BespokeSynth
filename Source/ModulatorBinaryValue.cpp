@@ -31,6 +31,14 @@
 #include "PatchCableSource.h"
 
 ModulatorBinaryValue::ModulatorBinaryValue()
+: mBit0(this)
+, mBit1(this)
+, mBit2(this)
+, mBit3(this)
+, mBit4(this)
+, mBit5(this)
+, mBit6(this)
+, mBit7(this)
 {
 }
 
@@ -38,11 +46,13 @@ void ModulatorBinaryValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mInputSlider = new FloatSlider(this, "input", 3, 2, 100, 15, &mInput, 0, 1);
+   mInputSlider = new FloatSlider(this, "input", 3, 2, 128, 15, &mInput, 0, 1);
 
-   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCableSource->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCableSource);
+   for (size_t i = 0; i < 8; ++i)
+   {
+      mBits[i].SetCableSource(new PatchCableSource(this, kConnectionType_Modulator));
+      AddPatchCableSource(mBits[i].GetCableSource());
+   }
 }
 
 ModulatorBinaryValue::~ModulatorBinaryValue()
@@ -55,11 +65,17 @@ void ModulatorBinaryValue::DrawModule()
       return;
 
    mInputSlider->Draw();
+   for (size_t i = 0; i < 8; ++i)
+      mBits[i].GetCableSource()->SetManualPosition(140 / 9 * (i + 1), 17 * 2 + 4);
 }
 
 void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   OnModulatorRepatch();
+   for (size_t i = 0; i < 8; ++i)
+   {
+      if (cableSource == mBits[i].GetCableSource())
+         mBits[i].UpdateControl();
+   }
 }
 
 void ModulatorBinaryValue::SaveLayout(ofxJSONElement& moduleInfo)
@@ -73,4 +89,9 @@ void ModulatorBinaryValue::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ModulatorBinaryValue::SetUpFromSaveData()
 {
+}
+
+float ModulatorBinaryValue::BitModulator::Value(int samplesIn)
+{
+   return 0;
 }

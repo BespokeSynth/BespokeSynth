@@ -48,8 +48,6 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   FloatSlider* GetTarget() { return GetSliderTarget(); }
-
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
@@ -64,11 +62,39 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override
    {
-      w = 106;
+      w = 140;
       h = 17 * 2 + 4;
    }
 
    float mInput{ 0 };
+
+   struct BitModulator : public IModulator
+   {
+      BitModulator(ModulatorBinaryValue* owner)
+      : mOwner(owner)
+      {
+      }
+      void UpdateControl() { OnModulatorRepatch(); }
+      void SetCableSource(PatchCableSource* cableSource) { mTargetCableSource = cableSource; }
+      PatchCableSource* GetCableSource() const { return mTargetCableSource; }
+
+      //IModulator
+      virtual float Value(int samplesIn = 0) override;
+      virtual bool Active() const override { return mOwner->IsEnabled(); }
+
+      ModulatorBinaryValue* mOwner{ nullptr };
+   };
+
+   BitModulator mBit0;
+   BitModulator mBit1;
+   BitModulator mBit2;
+   BitModulator mBit3;
+   BitModulator mBit4;
+   BitModulator mBit5;
+   BitModulator mBit6;
+   BitModulator mBit7;
+
+   std::array<BitModulator, 8> mBits{ mBit0, mBit1, mBit2, mBit3, mBit4, mBit5, mBit6, mBit7 };
 
    FloatSlider* mInputSlider{ nullptr };
 };
