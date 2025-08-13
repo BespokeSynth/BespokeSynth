@@ -73,9 +73,7 @@ private:
       h = 17 * 2 + 4;
    }
 
-   float mValue1{ 0 };
-   float mValue2{ 0 };
+   float mInput{ 0 };
 
-   FloatSlider* mValue1Slider{ nullptr };
-   FloatSlider* mValue2Slider{ nullptr };
+   FloatSlider* mInputSlider{ nullptr };
 };

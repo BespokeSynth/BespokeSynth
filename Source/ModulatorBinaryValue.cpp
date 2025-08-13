@@ -38,8 +38,7 @@ void ModulatorBinaryValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mValue1Slider = new FloatSlider(this, "value 1", 3, 2, 100, 15, &mValue1, 0, 1);
-   mValue2Slider = new FloatSlider(this, "value 2", mValue1Slider, kAnchor_Below, 100, 15, &mValue2, 0, 1);
+   mInputSlider = new FloatSlider(this, "input", 3, 2, 100, 15, &mInput, 0, 1);
 
    mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCableSource->SetModulatorOwner(this);
@@ -55,21 +54,12 @@ void ModulatorBinaryValue::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   mValue1Slider->Draw();
-   mValue2Slider->Draw();
+   mInputSlider->Draw();
 }
 
 void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
-
-   if (GetSliderTarget() && fromUserClick)
-   {
-      mValue1 = GetSliderTarget()->GetValue();
-      mValue2 = 0;
-      mValue1Slider->SetExtents(GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
-      mValue1Slider->SetMode(GetSliderTarget()->GetMode());
-   }
 }
 
 float ModulatorBinaryValue::Value(int samplesIn)
