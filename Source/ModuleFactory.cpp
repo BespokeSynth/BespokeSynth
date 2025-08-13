@@ -274,6 +274,7 @@
 #include "LatencyCalculator.h"
 #include "AbletonMoveControl.h"
 #include "TrackOrganizer.h"
+#include "ModulatorBinaryValue.h"
 
 #include <juce_core/juce_core.h>
 
@@ -503,6 +504,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
    REGISTER(AbletonMoveControl, abletonmovecontrol, kModuleCategory_Other);
    REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
+   REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
