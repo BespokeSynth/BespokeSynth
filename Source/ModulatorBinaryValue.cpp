@@ -62,15 +62,6 @@ void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromU
    OnModulatorRepatch();
 }
 
-float ModulatorBinaryValue::Value(int samplesIn)
-{
-   ComputeSliders(samplesIn);
-   if (GetSliderTarget())
-      return ofClamp(mValue1 + mValue2, GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
-   else
-      return mValue1 + mValue2;
-}
-
 void ModulatorBinaryValue::SaveLayout(ofxJSONElement& moduleInfo)
 {
 }

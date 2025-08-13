@@ -32,7 +32,7 @@
 
 class PatchCableSource;
 
-class ModulatorBinaryValue : public IDrawableModule, public IFloatSliderListener, public IModulator
+class ModulatorBinaryValue : public IDrawableModule, public IFloatSliderListener
 {
 public:
    ModulatorBinaryValue();
@@ -47,11 +47,6 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-
-   //IModulator
-   float Value(int samplesIn = 0) override;
-   bool Active() const override { return mEnabled; }
-   bool CanAdjustRange() const override { return false; }
 
    FloatSlider* GetTarget() { return GetSliderTarget(); }
 
