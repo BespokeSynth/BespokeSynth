@@ -1108,22 +1108,29 @@ void ScriptModule::OnCodeUpdated()
    {
       std::vector<std::string> lines = mCodeEntry->GetLines(false);
 
-      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      for (auto mBoundModuleConnection = mBoundModuleConnections.begin(); mBoundModuleConnection != mBoundModuleConnections.end(); ++mBoundModuleConnection)
       {
-         if (mBoundModuleConnections[i].mLineText != lines[mBoundModuleConnections[i].mLineIndex])
+         if (mBoundModuleConnection->mLineIndex >= lines.size())
+         {
+            mBoundModuleConnection = mBoundModuleConnections.erase(mBoundModuleConnection);
+            if (mBoundModuleConnection == mBoundModuleConnections.end())
+               break;
+            continue;
+         }
+         if (mBoundModuleConnection->mLineText != lines[mBoundModuleConnection->mLineIndex])
          {
             bool found = false;
             for (int j = 0; j < (int)lines.size(); ++j)
             {
-               if (lines[j] == mBoundModuleConnections[i].mLineText)
+               if (lines[j] == mBoundModuleConnection->mLineText)
                {
                   found = true;
-                  mBoundModuleConnections[i].mLineIndex = j;
+                  mBoundModuleConnection->mLineIndex = j;
                }
             }
 
             if (!found)
-               mBoundModuleConnections[i].mTarget = nullptr;
+               mBoundModuleConnection->mTarget = nullptr;
          }
       }
    }

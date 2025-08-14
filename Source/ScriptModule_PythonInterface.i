@@ -159,6 +159,19 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       }
       return paths;
    });
+   m.def("get_controls", [](std::string path)
+   {
+      const auto module = TheSynth->FindModule(std::move(path));
+      std::vector<std::string> paths;
+      if (module == nullptr)
+         return paths;
+      for (auto* control : module->GetUIControls())
+      {
+         if (control && control->IsShowing())
+            paths.push_back(control->Path());
+      }
+      return paths;
+   });
    m.def("location_recall", [](char location)
    {
       TheSynth->GetLocationZoomer()->MoveToLocation(location);
