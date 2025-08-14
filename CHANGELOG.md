@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added a free running mode to the `curvelooper`
 - Added the ability to remove parameter sliders from the `plugin` module.
 - Added a hidden button over the parameter count in the `plugin` module that allows one to load parameters in bundles of a 100
-- Added a way to reset the parameter dropdown list and sliders to a state as if the `plugin` module was newly spawned
+- Added a way to reset the parameter drop down list and sliders to a state as if the `plugin` module was newly spawned
 - Added text getter and setter to the `script` module
 - Added multi channel output to `plugins`
 - Added `interface` module, for creating custom interfaces to control other modules
@@ -33,7 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added module.set_focus() to python script module, based on OSC focus command
 - Added the ability save and load view locations in the `script` module with the functions bespoke.location_recall and bespoke.location_store
 - Added new features to long-neglected `sampler` module
-- Added teh `acciaccatura` note effect module for adding quick bends when a note is played
+- Added the `acciaccatura` note effect module for adding quick bends when a note is played
 - Added the ability to reset LFO phase with a pulse
 
 
@@ -54,7 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Made the `multitapdelay` module more compact
 - Changed effect chains to no longer affect volume when they are disabled
 - Made the current slider value accessible as `x` instead of `current_value`
-- Made autosaves use template files
+- Made auto saves use template files
 
 
 ### Fixed
@@ -63,7 +63,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed an issue where a cue at the very start of a `sampleplayer` couldn't be grabbed/played
 - Spread the `looper` module commit over multiple process calls, to fix hitch when committing to loop buffer from the `looperrecorder` and `looperrewriter` modules
 - Prevent a crash when removing a not connected `abletonmovecontrol` module
-- Fixed a bug in the boundstopulse module when going below min or above max
+- Fixed a bug in the `boundstopulse` module when going below min or above max
 - Fixed midi input not disconnecting properly
 - Fixed a bug where the `ramper` would not handle a resetting transport
 - Make it so float sliders don't cause NaN's to be created when a logarithmic type has its min value set to 0
@@ -88,8 +88,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Made BespokeSynth able to recover from an audio interface being disconnected and reconnected
 - Fixed `selector` not being able to select the last item on the list
 - Fixed stuck notes on retrigger in `noteoctaver`
-- Fixed a nullptr dereference when GridModule::OnGridButton is calling ScriptModule::RunCode triggered from a Midicontroller MIDI event thread
-- Clamp num_loopers in `looperrecorder` between 1 and maximum allowed number of loopers preventing crashes
+- Fixed a nullptr dereference when GridModule::OnGridButton is calling ScriptModule::RunCode triggered from a `midicontroller` MIDI event thread
+- Clamp num_loopers in `looperrecorder` between 1 and maximum allowed number of `looper`s preventing crashes
 - Reduce the number of copying for loops by using references (significant performance boost with `plugins`)
 - Fixed a buffer overflow in NoteTable::PlayColumn causing unexpected crashes
 - Fixed the `script` module to allow multiples to receive on_sysex events
