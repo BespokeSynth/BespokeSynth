@@ -29,6 +29,7 @@
 #include "Profiler.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "UIControlMacros.h"
 
 ModulatorBinaryValue::ModulatorBinaryValue()
 : mBit0(this, 0)
@@ -46,7 +47,15 @@ void ModulatorBinaryValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mInputSlider = new FloatSlider(this, "input", 3, 2, 128, 15, &mInput, 0, 255);
+   float width, height;
+
+   UIBLOCK(3, 3, 134);
+   FLOATSLIDER_DIGITS(mInputSlider, "input", &mInput, 0, 255, 0);
+   DROPDOWN(mCodeSelector, "code", (int*)&mCode, 134);
+   ENDUIBLOCK(width, height);
+
+   mCodeSelector->AddLabel("byte", kCodeByte);
+   mCodeSelector->AddLabel("gray", kCodeGray);
 
    for (size_t i = 0; i < 8; ++i)
    {
@@ -65,6 +74,8 @@ void ModulatorBinaryValue::DrawModule()
       return;
 
    mInputSlider->Draw();
+   mCodeSelector->Draw();
+
    for (size_t i = 0; i < 8; ++i)
       mBits[i].GetCableSource()->SetManualPosition(140 / 9 * (i + 1), 17 * 2 + 4);
 }
@@ -80,7 +91,10 @@ void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromU
 
 int ModulatorBinaryValue::GetBitValue(int index)
 {
-   return ((int)mInput & (1 << index)) != 0;
+   int value = (int)mInput;
+   if (mCode == kCodeGray)
+      value = value ^ (value >> 1);
+   return (value & (1 << index)) != 0;
 }
 
 void ModulatorBinaryValue::SaveLayout(ofxJSONElement& moduleInfo)

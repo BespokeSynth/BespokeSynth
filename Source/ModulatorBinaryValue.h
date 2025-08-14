@@ -27,6 +27,7 @@
 
 #pragma once
 #include "IDrawableModule.h"
+#include "DropdownList.h"
 #include "Slider.h"
 #include "IModulator.h"
 
@@ -38,7 +39,7 @@ enum BinaryValueCode
 
 class PatchCableSource;
 
-class ModulatorBinaryValue : public IDrawableModule, public IFloatSliderListener
+class ModulatorBinaryValue : public IDrawableModule, public IDropdownListener, public IFloatSliderListener
 {
 public:
    ModulatorBinaryValue();
@@ -54,7 +55,7 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   //IFloatSliderListener
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {};
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -74,6 +75,7 @@ private:
    int GetBitValue(int);
 
    float mInput{ 0 };
+   int mCode{ kCodeByte };
 
    struct BitModulator : public IModulator
    {
@@ -106,4 +108,5 @@ private:
    std::array<BitModulator, 8> mBits{ mBit7, mBit6, mBit5, mBit4, mBit3, mBit2, mBit1, mBit0 };
 
    FloatSlider* mInputSlider{ nullptr };
+   DropdownList* mCodeSelector{ nullptr };
 };
