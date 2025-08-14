@@ -70,7 +70,7 @@ private:
    void GetModuleDimensions(float& w, float& h) override
    {
       w = 140;
-      h = 17 * 2 + 4;
+      h = 17 * 2 + 4 + 20;
    }
    int GetBitValue(int);
 

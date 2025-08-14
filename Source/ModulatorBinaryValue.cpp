@@ -77,7 +77,10 @@ void ModulatorBinaryValue::DrawModule()
    mCodeSelector->Draw();
 
    for (size_t i = 0; i < 8; ++i)
-      mBits[i].GetCableSource()->SetManualPosition(140 / 9 * (i + 1), 17 * 2 + 4);
+   {
+      mBits[i].GetCableSource()->SetManualPosition(140 / 9 * (i + 1), 17 * 2 + 4 + 20);
+      DrawTextNormal(ofToString(GetBitValue(i)), 140 / 9 * (i + 1) - 4, 17 * 2 + 15);
+   }
 }
 
 void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
