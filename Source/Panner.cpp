@@ -150,7 +150,6 @@ void Panner::CheckboxUpdated(Checkbox* checkbox, double time)
 void Panner::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("pan", moduleInfo, 0, mPanSlider);
 
    SetUpFromSaveData();
 }
@@ -158,5 +157,4 @@ void Panner::LoadLayout(const ofxJSONElement& moduleInfo)
 void Panner::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   SetPan(mModuleSaveData.GetFloat("pan"));
 }
