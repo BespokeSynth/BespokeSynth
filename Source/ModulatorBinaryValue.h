@@ -30,6 +30,12 @@
 #include "Slider.h"
 #include "IModulator.h"
 
+enum BinaryValueCode
+{
+   kCodeByte,
+   kCodeGray
+};
+
 class PatchCableSource;
 
 class ModulatorBinaryValue : public IDrawableModule, public IFloatSliderListener
@@ -97,7 +103,7 @@ private:
    BitModulator mBit6;
    BitModulator mBit7;
 
-   std::array<BitModulator, 8> mBits{ mBit0, mBit1, mBit2, mBit3, mBit4, mBit5, mBit6, mBit7 };
+   std::array<BitModulator, 8> mBits{ mBit7, mBit6, mBit5, mBit4, mBit3, mBit2, mBit1, mBit0 };
 
    FloatSlider* mInputSlider{ nullptr };
 };

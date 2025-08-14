@@ -46,7 +46,7 @@ void ModulatorBinaryValue::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mInputSlider = new FloatSlider(this, "input", 3, 2, 128, 15, &mInput, 0, 1);
+   mInputSlider = new FloatSlider(this, "input", 3, 2, 128, 15, &mInput, 0, 255);
 
    for (size_t i = 0; i < 8; ++i)
    {
@@ -80,7 +80,7 @@ void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromU
 
 int ModulatorBinaryValue::GetBitValue(int index)
 {
-   return (mInput && 1 << index) != 0;
+   return ((int)mInput & (1 << index)) != 0;
 }
 
 void ModulatorBinaryValue::SaveLayout(ofxJSONElement& moduleInfo)
