@@ -65,17 +65,13 @@ void CommentDisplay::TextEntryComplete(TextEntry* entry)
 
 void CommentDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("comment", moduleInfo, "insert comment here");
-
    SetUpFromSaveData();
 }
 
 void CommentDisplay::SetUpFromSaveData()
 {
-   mComment = mModuleSaveData.GetString("comment");
 }
 
 void CommentDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["comment"] = mComment;
 }
