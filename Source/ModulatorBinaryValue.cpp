@@ -31,14 +31,14 @@
 #include "PatchCableSource.h"
 
 ModulatorBinaryValue::ModulatorBinaryValue()
-: mBit0(this)
-, mBit1(this)
-, mBit2(this)
-, mBit3(this)
-, mBit4(this)
-, mBit5(this)
-, mBit6(this)
-, mBit7(this)
+: mBit0(this, 0)
+, mBit1(this, 1)
+, mBit2(this, 2)
+, mBit3(this, 3)
+, mBit4(this, 4)
+, mBit5(this, 5)
+, mBit6(this, 6)
+, mBit7(this, 7)
 {
 }
 
@@ -78,6 +78,11 @@ void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromU
    }
 }
 
+int ModulatorBinaryValue::GetBitValue(int index)
+{
+   return (mInput && 1 << index) != 0;
+}
+
 void ModulatorBinaryValue::SaveLayout(ofxJSONElement& moduleInfo)
 {
 }
@@ -93,5 +98,5 @@ void ModulatorBinaryValue::SetUpFromSaveData()
 
 float ModulatorBinaryValue::BitModulator::Value(int samplesIn)
 {
-   return 0;
+   return mOwner->GetBitValue(mIndex);
 }

@@ -65,13 +65,15 @@ private:
       w = 140;
       h = 17 * 2 + 4;
    }
+   int GetBitValue(int);
 
    float mInput{ 0 };
 
    struct BitModulator : public IModulator
    {
-      BitModulator(ModulatorBinaryValue* owner)
+      BitModulator(ModulatorBinaryValue* owner, int index)
       : mOwner(owner)
+      , mIndex(index)
       {
       }
       void UpdateControl() { OnModulatorRepatch(); }
@@ -83,6 +85,7 @@ private:
       virtual bool Active() const override { return mOwner->IsEnabled(); }
 
       ModulatorBinaryValue* mOwner{ nullptr };
+      int mIndex{ 0 };
    };
 
    BitModulator mBit0;
