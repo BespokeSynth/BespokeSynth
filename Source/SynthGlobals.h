@@ -101,7 +101,6 @@ extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;
 extern RetinaTrueTypeFont gFontFixedWidth;
 extern float gModuleDrawAlpha;
-extern float gNullBuffer[kWorkBufferSize];
 extern float gZeroBuffer[kWorkBufferSize];
 extern float gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;

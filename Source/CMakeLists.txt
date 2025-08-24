@@ -760,6 +760,8 @@ target_sources(BespokeSynth PRIVATE
     Vocoder.h
     VocoderCarrierInput.cpp
     VocoderCarrierInput.h
+    VoiceManager.cpp
+    VoiceManager.h
     VoiceSetter.cpp
     VoiceSetter.h
     VolcaBeatsControl.cpp
