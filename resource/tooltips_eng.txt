@@ -779,6 +779,13 @@ vocoder~frequency band-based vocoder. this must be paired with a "vocodercarrier
 ~ring~how long it should take the bands to "cool down"
 
 
+voicemanager~distribute, filter or remap incoming notes to voices
+~voice distribution mode~the mode of distribution. Rotate: Selects next unused voice on every note. Reuse: Same as rotate except that it tries to reuse voice that had the same pitch. Reset: Always try to use the first unused voice. Random: Randomly select a voice that is unused 
+~voices~how many voices this module should distribute to
+~voice action *~what action to perform with this selected voice. Distribution is done first followed by voice limiting, filtering and lastly remapping.
+~voice dest *~the destination of the remapping of this voice
+
+
 voicesetter~set a specific Voice channel index for a note
 ~voice index~current set voice channel index
 

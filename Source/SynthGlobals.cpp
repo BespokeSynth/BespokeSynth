@@ -65,7 +65,6 @@ RetinaTrueTypeFont gFont;
 RetinaTrueTypeFont gFontBold;
 RetinaTrueTypeFont gFontFixedWidth;
 float gModuleDrawAlpha = 255;
-float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
 float gWorkBuffer[kWorkBufferSize];
 ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
