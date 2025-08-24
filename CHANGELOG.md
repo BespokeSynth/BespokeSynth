@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Added the `voicemanager` module
+- Added the function `bespoke.get_controls` to the script module
 - Added the ability to capture 16 bars retroactively in the `looperrecorder` module
 - Added new layouts to `gridkeyboard` module
 - Added the `abletonmovecontrol` and `trackorganizer` modules
@@ -39,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Made the `voicesetter` module capable of setting `-1` as voice (meaning no specific voice)
 - Updated the `gain` slider to have a curve in their slider rather than linear response, to better reflect how it affects perceived volume
 - Make the Songbuilder module labels a bit wider
 - Increased how steep one can set curves by default and make it use the editor slider's limits
@@ -59,6 +62,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Removed a unused buffer saving a bit of memory
+- Make it so the `comment` module does not use the moduleSaveData
 - Fixed `trackorganizer` cables still being grabbable when they're not drawing
 - Fixed an issue where a cue at the very start of a `sampleplayer` couldn't be grabbed/played
 - Spread the `looper` module commit over multiple process calls, to fix hitch when committing to loop buffer from the `looperrecorder` and `looperrewriter` modules
@@ -94,6 +99,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed a buffer overflow in NoteTable::PlayColumn causing unexpected crashes
 - Fixed the `script` module to allow multiples to receive on_sysex events
 - Fixed python script functions me.get() and me.set() to use correct module paths in a prefab script
+
+
+### Removed
+
+- Removed the `pan` setting from the triangle menu of the `panner` module
 
 
 ## [1.3.0] - 2024-12-22
