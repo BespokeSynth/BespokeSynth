@@ -241,6 +241,8 @@ struct ControlLayoutElement
 
    float mLastValue{ 0 };
    float mLastActivityTime{ -9999 };
+   bool mCatchFlag{ false }; // Control set to catch mode?
+   float mCatchValue{ 0 }; // Control value must be matched ("catched") before midi CC is being passed on
 };
 
 struct GridLayout
@@ -322,6 +324,8 @@ public:
    void OnMidi(const juce::MidiMessage& message) override;
 
    void OnTransportAdvanced(float amount) override;
+
+   void OnCatchControl(int control, float value);
 
    //IKeyboardFocusListener
    void OnKeyPressed(int key, bool isRepeat) override;
