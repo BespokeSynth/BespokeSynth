@@ -31,6 +31,9 @@
 #include "PatchCableSource.h"
 #include "UIControlMacros.h"
 
+const float mWidth = 140;
+const float mHeight = 58;
+
 ModulatorBinaryValue::ModulatorBinaryValue()
 : mBit0(this, 0)
 , mBit1(this, 1)
@@ -49,9 +52,9 @@ void ModulatorBinaryValue::CreateUIControls()
 
    float width, height;
 
-   UIBLOCK(3, 3, 134);
+   UIBLOCK(3, 3, mWidth - 6);
    FLOATSLIDER_DIGITS(mInputSlider, "input", &mInput, 0, 255, 0);
-   DROPDOWN(mCodeSelector, "code", (int*)&mCode, 134);
+   DROPDOWN(mCodeSelector, "code", (int*)&mCode, mWidth - 6);
    ENDUIBLOCK(width, height);
 
    mCodeSelector->AddLabel("byte", kCodeByte);
@@ -78,9 +81,15 @@ void ModulatorBinaryValue::DrawModule()
 
    for (size_t i = 0; i < 8; ++i)
    {
-      mBits[i].GetCableSource()->SetManualPosition(140 / 9 * (i + 1), 17 * 2 + 4 + 20);
-      DrawTextNormal(ofToString(GetBitValue(i)), 140 / 9 * (i + 1) - 4, 17 * 2 + 15);
+      mBits[i].GetCableSource()->SetManualPosition(mWidth / 9 * (i + 1), mHeight);
+      DrawTextNormal(ofToString(GetBitValue(i)), mWidth / 9 * (i + 1) - 4, mHeight - 9);
    }
+}
+
+void ModulatorBinaryValue::GetModuleDimensions(float& w, float& h)
+{
+   w = mWidth;
+   h = mHeight;
 }
 
 void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
