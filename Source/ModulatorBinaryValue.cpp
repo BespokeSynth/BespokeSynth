@@ -82,7 +82,7 @@ void ModulatorBinaryValue::DrawModule()
    for (size_t i = 0; i < 8; ++i)
    {
       mBits[i].GetCableSource()->SetManualPosition(mWidth / 9 * (i + 1), mHeight);
-      DrawTextNormal(ofToString(GetBitValue(i)), mWidth / 9 * (i + 1) - 4, mHeight - 9);
+      DrawTextNormal(ofToString(GetBitValue(7 - i)), mWidth / 9 * (i + 1) - 4, mHeight - 9);
    }
 }
 
