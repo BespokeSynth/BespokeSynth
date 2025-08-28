@@ -28,6 +28,7 @@
 #include "UIControlMacros.h"
 
 VoiceManager::VoiceManager()
+: IDrawableModule(204, 22)
 {
 }
 

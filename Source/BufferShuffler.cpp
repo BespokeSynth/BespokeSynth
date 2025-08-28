@@ -30,6 +30,7 @@
 
 BufferShuffler::BufferShuffler()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(245, 85)
 , mInputBuffer(20 * 48000)
 {
 }

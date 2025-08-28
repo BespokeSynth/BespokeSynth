@@ -50,7 +50,6 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -69,11 +68,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
 
    float mAudioView[BUFFER_VIZ_SIZE][2]{};
    bool mDoubleBufferFlip{ false };
@@ -85,8 +79,6 @@ private:
    int mLengthSamples{ 2048 };
    float mDrawGain{ 2 };
    bool mPhaseAlign{ true };
-   float mWidth{ 600 };
-   float mHeight{ 150 };
    bool mDrawWaveform{ true };
    bool mDrawCircle{ false };
 

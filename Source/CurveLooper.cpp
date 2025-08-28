@@ -35,6 +35,7 @@ namespace
 }
 
 CurveLooper::CurveLooper()
+: IDrawableModule(200, 120)
 {
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);
@@ -230,12 +231,6 @@ void CurveLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double t
 {
 }
 
-void CurveLooper::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
-}
-
 void CurveLooper::Resize(float w, float h)
 {
    mWidth = MAX(w, 200);
@@ -246,23 +241,15 @@ void CurveLooper::Resize(float w, float h)
 
 void CurveLooper::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void CurveLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadInt("width", moduleInfo, 200, 120, 1000);
-   mModuleSaveData.LoadInt("height", moduleInfo, 120, 15, 1000);
-
    SetUpFromSaveData();
 }
 
 void CurveLooper::SetUpFromSaveData()
 {
-   mWidth = mModuleSaveData.GetInt("width");
-   mHeight = mModuleSaveData.GetInt("height");
-   Resize(mWidth, mHeight);
 }
 
 void CurveLooper::SaveState(FileStreamOut& out)

@@ -31,6 +31,7 @@
 #include "UIControlMacros.h"
 
 NoteStreamDisplay::NoteStreamDisplay()
+: IDrawableModule(400, 200)
 {
 }
 
@@ -193,32 +194,20 @@ void NoteStreamDisplay::ButtonClicked(ClickButton* button, double time)
    }
 }
 
-void NoteStreamDisplay::Resize(float w, float h)
-{
-   mWidth = w;
-   mHeight = h;
-}
-
 void NoteStreamDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("duration_ms", moduleInfo, 2000, 0, 999999, K(isTextField));
-   mModuleSaveData.LoadInt("width", moduleInfo, 400, 50, 999999, K(isTextField));
-   mModuleSaveData.LoadInt("height", moduleInfo, 200, 50, 999999, K(isTextField));
 
    SetUpFromSaveData();
 }
 
 void NoteStreamDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void NoteStreamDisplay::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mDurationMs = mModuleSaveData.GetFloat("duration_ms");
-   mWidth = mModuleSaveData.GetInt("width");
-   mHeight = mModuleSaveData.GetInt("height");
 }

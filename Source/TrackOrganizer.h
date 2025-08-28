@@ -77,13 +77,9 @@ private:
    void DrawModule() override;
    void PreDrawModuleUnclipped() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override;
 
    std::list<IDrawableModule*> GetAllTrackModules();
    bool ShouldShowCables() const;
-
-   float mWidth{ 200 };
-   float mHeight{ 68 };
 
    PatchCableSource* mSnapshotsCable{ nullptr };
    PatchCableSource* mGridInterfaceCable{ nullptr };

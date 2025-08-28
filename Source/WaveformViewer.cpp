@@ -30,6 +30,7 @@
 
 WaveformViewer::WaveformViewer()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(600, 150)
 {
    mBufferVizOffset[0] = 0;
    mBufferVizOffset[1] = 0;
@@ -196,17 +197,9 @@ void WaveformViewer::PlayNote(NoteMessage note)
    }
 }
 
-void WaveformViewer::Resize(float w, float h)
-{
-   mWidth = w;
-   mHeight = h;
-}
-
 void WaveformViewer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("width", moduleInfo, 600, 50, 2000, K(isTextField));
-   mModuleSaveData.LoadInt("height", moduleInfo, 150, 50, 2000, K(isTextField));
    mModuleSaveData.LoadBool("draw_waveform", moduleInfo, true);
    mModuleSaveData.LoadBool("draw_circle", moduleInfo, false);
 
@@ -215,15 +208,11 @@ void WaveformViewer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void WaveformViewer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void WaveformViewer::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   mWidth = mModuleSaveData.GetInt("width");
-   mHeight = mModuleSaveData.GetInt("height");
    mDrawWaveform = mModuleSaveData.GetBool("draw_waveform");
    mDrawCircle = mModuleSaveData.GetBool("draw_circle");
 }

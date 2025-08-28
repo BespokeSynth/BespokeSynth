@@ -139,8 +139,6 @@ private:
    ClickButton* mPinButton{ nullptr };
    Checkbox* mEnableLFOCheckbox{ nullptr };
    Checkbox* mLowResModeCheckbox{ nullptr };
-   float mWidth{ 100 };
-   float mHeight{ 20 };
 
    bool mPinned{ false };
 };

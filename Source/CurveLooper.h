@@ -78,7 +78,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
@@ -87,8 +86,6 @@ private:
    int mLength{ 1 };
    DropdownList* mLengthSelector{ nullptr };
    PatchCableSource* mControlCable{ nullptr };
-   float mWidth{ 200 };
-   float mHeight{ 120 };
    EnvelopeControl mEnvelopeControl{ ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30), nullptr };
    ::ADSR mAdsr;
    ClickButton* mRandomizeButton{ nullptr };

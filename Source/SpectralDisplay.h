@@ -50,11 +50,10 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
 
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
-   virtual void SetUpFromSaveData() override;
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SaveLayout(ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
@@ -63,14 +62,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
-
-   float mWidth{ 400 };
-   float mHeight{ 100 };
 
    float* mWindower{ nullptr };
    float* mSmoother{ nullptr };

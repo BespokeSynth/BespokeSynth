@@ -29,6 +29,7 @@
 
 Amplifier::Amplifier()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(120, 40)
 {
 }
 

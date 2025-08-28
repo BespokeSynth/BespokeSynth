@@ -30,6 +30,7 @@
 #include "DrumPlayer.h"
 
 Polyrhythms::Polyrhythms()
+: IDrawableModule(350, 0)
 {
    mHeight = mRhythmLines.size() * 17 + 5;
 }

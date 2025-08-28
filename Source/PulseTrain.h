@@ -91,14 +91,11 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
    void Step(double time, float velocity, int flags);
 
    static const int kMaxSteps = 128;
-   float mWidth{ 254 };
-   float mHeight{ 58 };
    float mVels[kMaxSteps]{};
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };

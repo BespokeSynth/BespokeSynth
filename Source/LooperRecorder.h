@@ -125,8 +125,6 @@ private:
    static constexpr int kMaxLoopers = 8;
    static constexpr int kNumRetroactiveCommitButtons = 5;
 
-   float mWidth{ 235 };
-   float mHeight{ 126 };
    RollingBuffer mRecordBuffer;
    std::array<Looper*, kMaxLoopers> mLoopers{ nullptr };
    int mNumLoopers{ 4 };

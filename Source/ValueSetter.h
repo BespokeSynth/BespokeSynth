@@ -68,11 +68,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    void Go(double time);
 
@@ -83,7 +78,4 @@ private:
    FloatSlider* mValueSlider{ nullptr };
    ClickButton* mButton{ nullptr };
    double mLastClickTime{ 0 };
-
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 };

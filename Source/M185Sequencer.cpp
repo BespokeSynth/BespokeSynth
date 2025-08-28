@@ -50,9 +50,7 @@ void M185Sequencer::CreateUIControls()
 
       ++i;
    }
-   mWidth = UIBLOCKWIDTH();
-   mHeight = UIBLOCKHEIGHT();
-   ENDUIBLOCK0();
+   ENDUIBLOCK(mWidth, mHeight);
 
    mIntervalSelector->AddLabel("4", kInterval_4);
    mIntervalSelector->AddLabel("3", kInterval_3);
@@ -210,12 +208,6 @@ void M185Sequencer::ResetStep()
 
    if (mSteps[mStepIdx].mPulseCount == 0) //if we don't have any pulses on the first step, find a step that does
       FindNextStep();
-}
-
-void M185Sequencer::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
 }
 
 void M185Sequencer::ButtonClicked(ClickButton* button, double time)

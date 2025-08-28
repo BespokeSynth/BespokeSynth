@@ -58,14 +58,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    int mMinPitch{ 24 };
    IntSlider* mMinPitchSlider{ nullptr };
    int mMaxPitch{ 36 };

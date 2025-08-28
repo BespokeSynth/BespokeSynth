@@ -79,7 +79,7 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -90,7 +90,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
 
    Curve mCurve{ 0 };
    bool mHasRecorded{ false };
@@ -103,8 +102,6 @@ private:
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
    float mDisplayStartY{ 0 };
-   float mWidth{ 220 };
-   float mHeight{ 100 };
    double mRecordStartOffset{ 0 };
    Checkbox* mRecordCheckbox{ nullptr };
    bool mRecord{ false };

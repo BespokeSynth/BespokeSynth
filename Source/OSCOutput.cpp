@@ -135,12 +135,6 @@ void OSCOutput::SendString(std::string address, std::string val)
    mOscOut.send(msg);
 }
 
-void OSCOutput::GetModuleDimensions(float& w, float& h)
-{
-   w = mWidth;
-   h = mHeight;
-}
-
 void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
    juce::String address = "/bespoke/";

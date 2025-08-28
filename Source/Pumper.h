@@ -61,11 +61,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
+
    double GetIntervalPos(double time);
    void SyncToAdsr();
 
@@ -81,7 +77,4 @@ private:
    float mAmount{ 0 };
    float mLength{ 0 };
    float mAttack{ 0 };
-
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 };

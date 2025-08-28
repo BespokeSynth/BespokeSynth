@@ -49,6 +49,7 @@ namespace
 
 SamplePlayer::SamplePlayer()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(608, 150)
 , mNoteInputBuffer(this)
 {
    mYoutubeSearch[0] = 0;
@@ -1373,12 +1374,6 @@ void SamplePlayer::StopRecording()
       UpdateSample(sample, true);
       mRecordingLength = recordedLength;
    }
-}
-
-void SamplePlayer::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
 }
 
 void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

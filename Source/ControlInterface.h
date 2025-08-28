@@ -82,14 +82,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
-
-   float mWidth{ 130 };
-   float mHeight{ 20 };
 
    class ControlElement
    {

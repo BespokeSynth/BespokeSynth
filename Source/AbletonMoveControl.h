@@ -124,9 +124,6 @@ private:
    AbletonMoveLCD mLCD;
    double mScreenOverrideTimeout{ 0.0 };
 
-   float mWidth{ 100 };
-   float mHeight{ 100 };
-
    IDrawableModule* mDisplayModule{ nullptr };
    std::string mDisplayModuleContext{};
    std::vector<IUIControl*> mControls;
@@ -134,7 +131,7 @@ private:
    bool mDisplayModuleIsShowingOverrideControls{ false };
    float mModuleViewOffset{ 0 };
 
-   std::array<PatchCableSource*, 8> mTrackCables;
+   std::array<PatchCableSource*, 8> mTrackCables{ nullptr };
    int mTrackRowOffset{ 0 };
    int mSelectedTrackRow{ -1 };
    int mPreviousSelectedTrackRow{ -1 };

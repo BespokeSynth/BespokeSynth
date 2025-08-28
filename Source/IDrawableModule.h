@@ -67,6 +67,7 @@ class IDrawableModule : public IClickable, public IPollable, public virtual IPat
 {
 public:
    IDrawableModule();
+   IDrawableModule(float width, float height);
    virtual ~IDrawableModule();
    static bool CanCreate() { return true; }
    static bool AcceptsAudio() { return false; }
@@ -109,8 +110,8 @@ public:
    void GetDimensions(float& width, float& height) override;
    virtual void GetModuleDimensions(float& width, float& height)
    {
-      width = 10;
-      height = 10;
+      width = mWidth;
+      height = mHeight;
    }
    virtual void Init();
    virtual void Exit();
@@ -133,7 +134,11 @@ public:
    bool IsVisible();
    std::vector<IDrawableModule*> GetChildren() const { return mChildren; }
    virtual bool IsResizable() const { return false; }
-   virtual void Resize(float width, float height) { assert(false); }
+   virtual void Resize(float width, float height)
+   {
+      mWidth = width;
+      mHeight = height;
+   }
    bool IsHoveringOverResizeHandle() const { return mHoveringOverResizeHandle; }
    void SetTypeName(std::string type, ModuleCategory category)
    {
@@ -227,6 +232,8 @@ protected:
    bool mEnabled{ true };
    ModuleCategory mModuleCategory{ ModuleCategory::kModuleCategory_Unknown };
    std::string mDebugDisplayText;
+   float mWidth{ 200 };
+   float mHeight{ 20 };
 
 private:
    virtual void PreDrawModuleUnclipped() {}

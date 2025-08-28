@@ -59,14 +59,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    int mControl{ 0 };
    TextEntry* mControlEntry{ nullptr };
    float mValue{ 0 };

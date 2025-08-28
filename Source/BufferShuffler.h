@@ -89,11 +89,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
    void OnClicked(float x, float y, bool right) override;
    bool DrawToPush2Screen() override;
    float GetFourTetPosition(double time);
@@ -128,8 +123,6 @@ private:
 
    ChannelBuffer mInputBuffer;
 
-   float mWidth{ 245 };
-   float mHeight{ 85 };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    NoteInterval mInterval{ kInterval_8n };

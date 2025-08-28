@@ -74,10 +74,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    PatchCableSource* mLooperCable{ nullptr };
    Looper* mLooper{ nullptr };
    bool mOn{ false };

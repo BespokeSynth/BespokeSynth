@@ -152,7 +152,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void OnClicked(float x, float y, bool right) override;
@@ -186,8 +185,6 @@ private:
    float mC{ 0 };
    float mD{ 0 };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    std::array<double, 20> mScheduledPulseTimes{};
    std::string mLastError;
    size_t mScriptModuleIndex;
@@ -322,21 +319,13 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override
-   {
-      mWidth = w;
-      mHeight = h;
-   }
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    void LoadText();
 
    std::vector<std::string> mText;
    ClickButton* mCloseButton{ nullptr };
-   float mWidth{ 750 };
-   float mHeight{ 335 };
    ofVec2f mScrollOffset;
    float mMaxScrollAmount{ 0 };
 };
@@ -345,7 +334,9 @@ private:
 class ScriptWarningPopup : public IDrawableModule
 {
 public:
-   ScriptWarningPopup() {}
+   ScriptWarningPopup()
+   : IDrawableModule(600, 120)
+   {}
    virtual ~ScriptWarningPopup() {}
    static IDrawableModule* Create() { return new ScriptWarningPopup(); }
    static bool AcceptsAudio() { return false; }
@@ -365,9 +356,6 @@ public:
 
 private:
    void DrawModule() override;
-
-   int mWidth{ 600 };
-   int mHeight{ 120 };
 
    int mRemainingUntrustedScriptModules{ 0 };
 };

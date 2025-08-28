@@ -61,7 +61,8 @@ namespace
 }
 
 AbletonMoveControl::AbletonMoveControl()
-: mDevice(this)
+: IDrawableModule(100, 100)
+, mDevice(this)
 {
    Initialize();
    for (int i = 0; i < 128 * 2; ++i)

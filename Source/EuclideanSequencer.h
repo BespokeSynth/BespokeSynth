@@ -128,7 +128,7 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
@@ -139,13 +139,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
-   float mWidth{ 785 }; // was 650 = random buttons visible
-   float mHeight{ 200 };
    const float mWidthMin = 590;
    const float mWidthMax = 785;
    void OnClicked(float x, float y, bool right) override;

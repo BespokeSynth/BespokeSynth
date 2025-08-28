@@ -37,6 +37,7 @@
 static ableton::link::HostTimeFilter<ableton::link::platform::Clock> sHostTimeFilter;
 
 AbletonLink::AbletonLink()
+: IDrawableModule(200, 20)
 {
    sHostTimeFilter.reset();
 
