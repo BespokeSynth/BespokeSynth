@@ -526,6 +526,8 @@ void SamplePlayer::ButtonClicked(ClickButton* button, double time)
       {
          mCuePointSpeed = 1;
          mStopOnNoteOff = false;
+         if (mSpeed < 0)
+            mSample->SetPlayPosition(mSample->LengthInSamples() - 1);
          mPlay = true;
          mAdsr.Clear();
          mAdsr.Start(time * gInvSampleRateMs, 1);
