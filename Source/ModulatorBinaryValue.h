@@ -55,7 +55,7 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {};
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
