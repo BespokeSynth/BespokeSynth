@@ -35,15 +35,12 @@ const float mWidth = 140;
 const float mHeight = 58;
 
 ModulatorBinaryValue::ModulatorBinaryValue()
-: mBit0(this, 0)
-, mBit1(this, 1)
-, mBit2(this, 2)
-, mBit3(this, 3)
-, mBit4(this, 4)
-, mBit5(this, 5)
-, mBit6(this, 6)
-, mBit7(this, 7)
 {
+   for (int i = 0; i < NUM_BITS; ++i)
+   {
+      mBits[i].SetOwner(this);
+      mBits[i].SetIndex(NUM_BITS - i - 1);
+   }
 }
 
 void ModulatorBinaryValue::CreateUIControls()
@@ -60,7 +57,7 @@ void ModulatorBinaryValue::CreateUIControls()
    mCodeSelector->AddLabel("byte", kCodeByte);
    mCodeSelector->AddLabel("gray", kCodeGray);
 
-   for (int i = 0; i < 8; ++i)
+   for (int i = 0; i < NUM_BITS; ++i)
    {
       mBits[i].SetCableSource(new PatchCableSource(this, kConnectionType_Modulator));
       AddPatchCableSource(mBits[i].GetCableSource());
@@ -79,10 +76,11 @@ void ModulatorBinaryValue::DrawModule()
    mInputSlider->Draw();
    mCodeSelector->Draw();
 
-   for (int i = 0; i < 8; ++i)
+   int width_per_bit = mWidth / (NUM_BITS + 1);
+   for (int i = 0; i < NUM_BITS; ++i)
    {
-      mBits[i].GetCableSource()->SetManualPosition(mWidth / 9 * (i + 1), mHeight);
-      DrawTextNormal(ofToString(GetBitValue(7 - i)), mWidth / 9 * (i + 1) - 4, mHeight - 9);
+      mBits[i].GetCableSource()->SetManualPosition(width_per_bit * (i + 1), mHeight);
+      DrawTextNormal(ofToString(GetBitValue(NUM_BITS - i - 1)), width_per_bit * (i + 1) - 4, mHeight - 9);
    }
 }
 
@@ -94,7 +92,7 @@ void ModulatorBinaryValue::GetModuleDimensions(float& w, float& h)
 
 void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   for (int i = 0; i < 8; ++i)
+   for (int i = 0; i < NUM_BITS; ++i)
    {
       if (cableSource == mBits[i].GetCableSource())
          mBits[i].UpdateControl();

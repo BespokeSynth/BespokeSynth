@@ -31,6 +31,8 @@
 #include "Slider.h"
 #include "IModulator.h"
 
+#define NUM_BITS 8
+
 enum BinaryValueCode
 {
    kCodeByte,
@@ -75,11 +77,8 @@ private:
 
    struct BitModulator : public IModulator
    {
-      BitModulator(ModulatorBinaryValue* owner, int index)
-      : mOwner(owner)
-      , mIndex(index)
-      {
-      }
+      void SetOwner(ModulatorBinaryValue* owner) { mOwner = owner; }
+      void SetIndex(int index) { mIndex = index; }
       void UpdateControl() { OnModulatorRepatch(); }
       void SetCableSource(PatchCableSource* cableSource) { mTargetCableSource = cableSource; }
       PatchCableSource* GetCableSource() const { return mTargetCableSource; }
@@ -92,16 +91,7 @@ private:
       int mIndex{ 0 };
    };
 
-   BitModulator mBit0;
-   BitModulator mBit1;
-   BitModulator mBit2;
-   BitModulator mBit3;
-   BitModulator mBit4;
-   BitModulator mBit5;
-   BitModulator mBit6;
-   BitModulator mBit7;
-
-   std::array<BitModulator, 8> mBits{ mBit7, mBit6, mBit5, mBit4, mBit3, mBit2, mBit1, mBit0 };
+   std::array<BitModulator, NUM_BITS> mBits;
 
    FloatSlider* mInputSlider{ nullptr };
    DropdownList* mCodeSelector{ nullptr };
