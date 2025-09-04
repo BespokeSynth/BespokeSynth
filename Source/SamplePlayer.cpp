@@ -1387,8 +1387,6 @@ void SamplePlayer::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 void SamplePlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("width", moduleInfo, mWidth);
-   mModuleSaveData.LoadFloat("height", moduleInfo, mHeight);
    mModuleSaveData.LoadBool("show_youtube_process_output", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -1396,14 +1394,11 @@ void SamplePlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void SamplePlayer::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void SamplePlayer::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   Resize(mModuleSaveData.GetFloat("width"), mModuleSaveData.GetFloat("height"));
 }
 
 void SamplePlayer::SaveState(FileStreamOut& out)

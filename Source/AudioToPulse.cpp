@@ -33,8 +33,7 @@
 #include "UIControlMacros.h"
 
 AudioToPulse::AudioToPulse()
-: IDrawableModule(200, 20)
-, IAudioProcessor(gBufferSize)
+: IAudioProcessor(gBufferSize)
 {
 }
 

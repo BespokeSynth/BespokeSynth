@@ -41,6 +41,7 @@ namespace
 }
 
 Snapshots::Snapshots()
+: IDrawableModule(148, 202)
 {
 }
 
@@ -842,7 +843,7 @@ void Snapshots::ResizeSnapshotCollection(int size)
 
 namespace
 {
-   const float extraW = 9;
+   const float extraW = 11;
    const float extraH = 58;
    const float gridSquareDimension = 18;
    const int maxGridSide = 20;
@@ -911,22 +912,34 @@ void Snapshots::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void Snapshots::GetModuleDimensions(float& width, float& height)
-{
-   width = mGrid->GetWidth() + extraW;
-   height = mGrid->GetHeight() + extraH + ((mGridControlOffsetXSlider->IsShowing() || mGridControlOffsetYSlider->IsShowing()) ? 18 : 0);
-}
-
 void Snapshots::Resize(float w, float h)
 {
-   SetGridSize(MAX(w - extraW, 137), MAX(h - extraH, gridSquareDimension));
+   auto gridOffset = mGridControlOffsetXSlider->IsShowing() || mGridControlOffsetYSlider->IsShowing() ? 18.f : 0.f;
+   if (mDisplayMode == DisplayMode::Grid)
+   {
+
+      mWidth = MAX(w, kListModeGridWidth + extraW);
+      mHeight = MAX(h, extraH + gridSquareDimension + gridOffset);
+   }
+   else
+   {
+      mWidth = kListModeGridWidth + extraW;
+      mHeight = MAX(h, extraH + mGrid->GetRect().height + gridOffset);
+   }
+   SetGridSize(MAX(w - extraW, 137), MAX(h - extraH - gridOffset, gridSquareDimension));
 }
 
 void Snapshots::SetGridSize(float w, float h)
 {
-   assert(mDisplayMode == DisplayMode::Grid);
+   if (mDisplayMode == DisplayMode::List)
+   {
+      h = MAX(h, 8 * gridSquareDimension);
+      w = kListModeGridWidth;
+   }
    mGrid->SetDimensions(w, h);
-   int cols = MIN(w / gridSquareDimension, maxGridSide);
+   int cols = 1;
+   if (mDisplayMode == DisplayMode::Grid)
+      cols = MIN(w / gridSquareDimension, maxGridSide);
    int rows = MIN(h / gridSquareDimension, maxGridSide);
    mGrid->SetGrid(cols, rows);
    ResizeSnapshotCollection(cols * rows);
@@ -944,10 +957,6 @@ void Snapshots::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("allow_set_on_audio_thread", moduleInfo, true);
    mModuleSaveData.LoadBool("auto_store_on_switch", moduleInfo, false);
 
-   //for rev < 4
-   mOldWidth = moduleInfo["gridwidth"].asFloat();
-   mOldHeight = moduleInfo["gridheight"].asFloat();
-
    SetUpFromSaveData();
 }
 
@@ -957,19 +966,7 @@ void Snapshots::SetUpFromSaveData()
    mDisplayMode = mModuleSaveData.GetEnum<DisplayMode>("display_mode");
    mAutoStoreOnSwitch = mModuleSaveData.GetBool("auto_store_on_switch");
 
-   if (mDisplayMode == DisplayMode::Grid)
-   {
-      // set up the grid
-      float w, h;
-      GetModuleDimensions(w, h);
-      Resize(w, h);
-   }
-
-   if (mDisplayMode == DisplayMode::List)
-   {
-      ResizeSnapshotCollection(mModuleSaveData.GetInt("num_list_snapshots"));
-      UpdateListGrid();
-   }
+   Resize(mWidth, mHeight);
 }
 
 void Snapshots::UpdateListGrid()
@@ -1037,9 +1034,6 @@ void Snapshots::SaveState(FileStreamOut& out)
    }
 
    out << mCurrentSnapshot;
-
-   out << mGrid->GetWidth();
-   out << mGrid->GetHeight();
 }
 
 void Snapshots::LoadState(FileStreamIn& in, int rev)
@@ -1130,17 +1124,13 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       mModuleSaveData.SetEnum("display_mode", DisplayMode::Grid);
    }
 
-   if (rev >= 4)
+   if (rev == 4)
    {
       float w, h;
       in >> w;
       in >> h;
       if (mDisplayMode == DisplayMode::Grid)
          SetGridSize(w, h);
-   }
-   else
-   {
-      SetGridSize(mOldWidth, mOldHeight);
    }
 }
 
