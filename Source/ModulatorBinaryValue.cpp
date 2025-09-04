@@ -60,7 +60,7 @@ void ModulatorBinaryValue::CreateUIControls()
    mCodeSelector->AddLabel("byte", kCodeByte);
    mCodeSelector->AddLabel("gray", kCodeGray);
 
-   for (size_t i = 0; i < 8; ++i)
+   for (int i = 0; i < 8; ++i)
    {
       mBits[i].SetCableSource(new PatchCableSource(this, kConnectionType_Modulator));
       AddPatchCableSource(mBits[i].GetCableSource());
@@ -79,7 +79,7 @@ void ModulatorBinaryValue::DrawModule()
    mInputSlider->Draw();
    mCodeSelector->Draw();
 
-   for (size_t i = 0; i < 8; ++i)
+   for (int i = 0; i < 8; ++i)
    {
       mBits[i].GetCableSource()->SetManualPosition(mWidth / 9 * (i + 1), mHeight);
       DrawTextNormal(ofToString(GetBitValue(7 - i)), mWidth / 9 * (i + 1) - 4, mHeight - 9);
@@ -94,7 +94,7 @@ void ModulatorBinaryValue::GetModuleDimensions(float& w, float& h)
 
 void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   for (size_t i = 0; i < 8; ++i)
+   for (int i = 0; i < 8; ++i)
    {
       if (cableSource == mBits[i].GetCableSource())
          mBits[i].UpdateControl();
