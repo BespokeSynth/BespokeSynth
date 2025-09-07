@@ -153,7 +153,7 @@ void LiveGranulator::DrawModule()
       if (mFreeze)
          drawLength = MIN(mBufferLength, drawLength + mFreezeExtraSamples);
       mBuffer.Draw(mBufferX, 3, kBufferWidth, kBufferHeight, drawLength);
-      mGranulator.Draw(mBufferX, 3 + 20, kBufferWidth, kBufferHeight - 20 * 2, mBuffer.GetRawBufferOffset(0) - drawLength, drawLength, mBufferLength);
+      mGranulator.Draw(mBufferX, 3 + 20, kBufferWidth, kBufferHeight - 20 * 2, mBuffer.GetRawBufferOffset(0) - drawLength, drawLength, mBufferLength, 1.0f);
    }
 }
 

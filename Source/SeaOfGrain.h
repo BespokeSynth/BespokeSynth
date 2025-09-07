@@ -129,15 +129,17 @@ private:
    {
       GrainManualVoice();
       void Process(ChannelBuffer* output, int bufferSize);
-      void Draw(float w, float h);
+      void Draw(int index, float w, float h);
 
       float mGain{ 0 };
       float mPosition{ 0 };
       float mPan{ 0 };
+      float mLastInputVelocity{ 1.0f };
 
       Granulator mGranulator;
       SeaOfGrain* mOwner{ nullptr };
 
+      Checkbox* mEnabledCheckbox{ nullptr };
       FloatSlider* mGainSlider{ nullptr };
       FloatSlider* mPositionSlider{ nullptr };
       FloatSlider* mOverlapSlider{ nullptr };
