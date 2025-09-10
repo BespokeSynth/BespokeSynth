@@ -88,6 +88,8 @@ private:
    NoteInterval mAutoCaptureInterval{ NoteInterval::kInterval_None };
    DropdownList* mAutoCaptureDropdown{ nullptr };
    FloatSlider* mWidthSlider{ nullptr };
+   DropdownList* mGrainWindowTypeSelector{ nullptr };
+   FloatSlider* mGrainWindowShapeSlider{ nullptr };
 
    float mBufferX{ 0 };
 };

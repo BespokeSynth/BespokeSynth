@@ -913,7 +913,7 @@ target_link_libraries(BespokeSynth PRIVATE
     $<$<STREQUAL:${BESPOKE_SYSTEM_TUNING_LIBRARY},OFF>:tuning-library>
     oddsound-mts
     Ableton::Link
-    readerwriterqueue
+    $<$<STREQUAL:${BESPOKE_SYSTEM_READERWRITERQUEUE},OFF>:readerwriterqueue>
 
     juce::juce_audio_basics
     juce::juce_audio_devices
