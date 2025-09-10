@@ -56,15 +56,34 @@ void Granulator::Reset()
 
 void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float speed, float* output)
 {
-   if (time + gInvSampleRateMs >= mNextGrainSpawnMs && mSpawnGrains)
+   while (true)
    {
-      double startFromMs = std::max(mNextGrainSpawnMs, time);
-      SpawnGrain(startFromMs, offset, buffer->NumActiveChannels() == 2 ? mWidth : 0, speed);
-      mNextGrainSpawnMs = startFromMs + mGrainLengthMs * 1 / mGrainOverlap * ofRandom(1 - mSpacingRandomize / 2, 1 + mSpacingRandomize / 2);
+      double spawnTime;
+      if (mPendingQueuedGrainSpawnTime != -1) // don't consume any more of the queue until we play this one
+      {
+         spawnTime = mPendingQueuedGrainSpawnTime;
+         mPendingQueuedGrainSpawnTime = -1;
+      }
+      else
+      {
+         bool hasData = mQueuedGrainSpawnTimes.try_dequeue(spawnTime);
+         if (!hasData)
+            break;
+      }
+
+      bool spawned = SpawnGrainIfReady(time, spawnTime, buffer, offset, speed);
+      if (!spawned) // haven't gotten to spawnTime yet, hold onto this spawn time
+      {
+         mPendingQueuedGrainSpawnTime = spawnTime;
+         break;
+      }
    }
 
+   if (mSpawnGrains)
+      SpawnGrainIfReady(time, mNextGrainSpawnMs, buffer, offset, speed);
+
    for (int i = 0; i < MAX_GRAINS; ++i)
-      mGrains[i].Process(time, buffer, bufferLength, output);
+      mGrains[i].Process(time, buffer, bufferLength, output, this);
 
    for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
    {
@@ -72,6 +91,17 @@ void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLeng
          output[ch] *= ofMap(mGrainOverlap, MAX_GRAINS, 4, .5f, 1); //lower volume on dense granulation, starting at 4 overlap
       output[ch] = mBiquad[ch].Filter(output[ch]);
    }
+}
+
+bool Granulator::SpawnGrainIfReady(double currentTime, double spawnTime, ChannelBuffer* buffer, double offset, float speed)
+{
+   if (currentTime + gInvSampleRateMs >= spawnTime)
+   {
+      double startFromMs = std::max(spawnTime, currentTime);
+      SpawnGrain(startFromMs, offset, buffer->NumActiveChannels() == 2 ? mWidth : 0, speed);
+      return true;
+   }
+   return false;
 }
 
 void Granulator::SpawnGrain(double time, double offset, float width, float speed)
@@ -102,15 +132,44 @@ void Granulator::SpawnGrain(double time, double offset, float width, float speed
       }
    }
    offset += ofRandom(-mPosRandomizeMs, mPosRandomizeMs) / gInvSampleRateMs;
-   mGrains[mNextGrainIdx].Spawn(this, time, offset, speedMult, mGrainLengthMs, vol, width);
+   mGrains[mNextGrainIdx].Spawn(time, offset, speedMult, mGrainLengthMs, vol, width);
 
    mNextGrainIdx = (mNextGrainIdx + 1) % MAX_GRAINS;
+   mNextGrainSpawnMs = time + mGrainLengthMs * 1 / mGrainOverlap * ofRandom(1 - mSpacingRandomize / 2, 1 + mSpacingRandomize / 2);
+}
+
+void Granulator::QueueGrainSpawn(double spawnTime)
+{
+   mQueuedGrainSpawnTimes.enqueue(spawnTime);
 }
 
 void Granulator::Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain)
 {
    for (int i = 0; i < MAX_GRAINS; ++i)
-      mGrains[i].DrawGrain(i, x, y, w, h, bufferStart, viewLength, bufferLength, gain);
+      mGrains[i].DrawGrain(i, x, y, w, h, bufferStart, viewLength, bufferLength, gain, this);
+}
+
+void Granulator::DrawWindow(float x, float y, float w, float h)
+{
+   ofPushStyle();
+
+   ofSetColor(100, 100, 100, .8f * gModuleDrawAlpha);
+   ofSetLineWidth(.5f);
+   ofFill();
+   ofRect(x, y, w, h, 0);
+
+   ofSetColor(245, 58, 0, gModuleDrawAlpha);
+   ofSetLineWidth(1);
+   ofNoFill();
+   ofBeginShape();
+   const int stepSize = 3;
+   for (int i = 0; i < (int)w; i += stepSize)
+   {
+      ofVertex(x + i, y + h - GetWindow(i / w) * h);
+   }
+   ofEndShape();
+
+   ofPopStyle();
 }
 
 void Granulator::ClearGrains()
@@ -119,9 +178,39 @@ void Granulator::ClearGrains()
       mGrains[i].Clear();
 }
 
-void Grain::Spawn(Granulator* owner, double time, double pos, float speedMult, float lengthInMs, float vol, float width)
+inline double Granulator::GetWindow(double phase) const
 {
-   mOwner = owner;
+   if (mWindowType == GrainWindowType::Round)
+   {
+      if (phase < mWindowShape)
+         phase = phase / mWindowShape * 0.5;
+      else
+         phase = (phase - mWindowShape) / (1.0 - mWindowShape) * 0.5 + 0.5;
+      return .5 + .5 * juce::dsp::FastMathApproximations::cos<double>(phase * TWO_PI - PI);
+   }
+   else if (mWindowType == GrainWindowType::Triangle)
+   {
+      if (phase < mWindowShape)
+         return phase / mWindowShape;
+      return 1.0 - ((phase - mWindowShape) / (1.0 - mWindowShape));
+   }
+   else if (mWindowType == GrainWindowType::Envelope)
+   {
+      const double kFadeInMs = 1.0;
+      const double kFadeIn = kFadeInMs / mGrainLengthMs;
+      if (phase < kFadeIn)
+         return phase / kFadeIn;
+      if (phase > mWindowShape)
+         return 1.0 - ((phase - mWindowShape) / (1.0 - mWindowShape));
+      if (phase >= 1.0)
+         return 0.0;
+      return 1.0;
+   }
+   return 0.0;
+}
+
+void Grain::Spawn(double time, double pos, float speedMult, float lengthInMs, float vol, float width)
+{
    mPos = pos;
    mSpeedMult = speedMult;
    mStartTime = time;
@@ -133,18 +222,13 @@ void Grain::Spawn(Granulator* owner, double time, double pos, float speedMult, f
    mDrawPos = ofRandom(1);
 }
 
-inline double Grain::GetWindow(double time)
-{
-   double phase = (time - mStartTime) * mStartToEndInv;
-   return .5 + .5 * juce::dsp::FastMathApproximations::cos<double>(phase * TWO_PI - PI);
-}
-
-void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float* output)
+void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float* output, const Granulator* granulator)
 {
    if (time >= mStartTime && time <= mEndTime && mVol != 0)
    {
-      mPos += mSpeedMult * mOwner->mSpeed;
-      float window = GetWindow(time);
+      mPos += mSpeedMult * granulator->mSpeed;
+      double phase = (time - mStartTime) * mStartToEndInv;
+      double window = granulator->GetWindow(phase);
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
          float sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0.f, 1.f));
@@ -153,14 +237,15 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
    }
 }
 
-void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain)
+void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain, const Granulator* granulator)
 {
    float a = fmod((mPos - bufferStart), bufferLength) / viewLength;
    if (a < 0 || a > 1)
       return;
    ofPushStyle();
    ofFill();
-   float alpha = GetWindow(std::clamp(gTime, mStartTime, mEndTime)) * gain;
+   double phase = (std::clamp(gTime, mStartTime, mEndTime) - mStartTime) * mStartToEndInv;
+   float alpha = granulator->GetWindow(phase) * gain;
    ofSetColor(255, 0, 0, alpha * 255);
    ofCircle(x + a * w, y + mDrawPos * h, MAX(3, h / MAX_GRAINS / 2));
    ofPopStyle();
