@@ -153,6 +153,7 @@ private:
       FloatSlider* mPanSlider{ nullptr };
    };
 
+   bool mMPEMode{ false };
    static const int kNumMPEVoices = 16;
    GrainMPEVoice mMPEVoices[kNumMPEVoices];
    static const int kNumManualVoices = 6;
@@ -179,4 +180,8 @@ private:
    int mKeyboardBasePitch{ 36 };
    DropdownList* mKeyboardNumPitchesSelector{ nullptr };
    int mKeyboardNumPitches{ 24 };
+   GrainWindowType mGrainWindowType{ GrainWindowType::Round };
+   DropdownList* mGrainWindowTypeSelector{ nullptr };
+   float mGrainWindowShape{ 0.5f };
+   FloatSlider* mGrainWindowShapeSlider{ nullptr };
 };

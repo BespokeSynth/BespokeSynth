@@ -30,6 +30,7 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 #include "ModulationChain.h"
+#include "UIControlMacros.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -55,13 +56,24 @@ SeaOfGrain::SeaOfGrain()
 void SeaOfGrain::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mLoadButton = new ClickButton(this, "load", 5, 3);
-   mRecordInputCheckbox = new Checkbox(this, "record", 50, 3, &mRecordInput);
-   mVolumeSlider = new FloatSlider(this, "volume", 5, 20, 150, 15, &mVolume, 0, 2);
-   mDisplayOffsetSlider = new FloatSlider(this, "offset", 5, 40, 150, 15, &mDisplayOffset, 0, 10);
-   mDisplayLengthSlider = new FloatSlider(this, "display length", 5, 60, 150, 15, &mDisplayLength, 1, 10);
-   mKeyboardBasePitchSelector = new DropdownList(this, "keyboard base pitch", 5, 80, &mKeyboardBasePitch, 60);
-   mKeyboardNumPitchesSelector = new DropdownList(this, "keyboard num pitches", mKeyboardBasePitchSelector, kAnchor_Right, &mKeyboardNumPitches);
+
+   UIBLOCK0();
+   UIBLOCK_PUSHSLIDERWIDTH(150);
+   BUTTON(mLoadButton, "load");
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mRecordInputCheckbox, "record", &mRecordInput)
+   UIBLOCK_NEWLINE();
+   FLOATSLIDER(mVolumeSlider, "volume", &mVolume, 0, 2);
+   FLOATSLIDER(mDisplayOffsetSlider, "offset", &mDisplayOffset, 0, 10);
+   FLOATSLIDER(mDisplayLengthSlider, "display length", &mDisplayLength, 1, 10);
+   DROPDOWN(mKeyboardBasePitchSelector, "keyboard base pitch", &mKeyboardBasePitch, 60);
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mKeyboardNumPitchesSelector, "keyboard num pitches", &mKeyboardNumPitches, 60);
+   UIBLOCK_NEWLINE();
+   UIBLOCK_NEWCOLUMN();
+   DROPDOWN(mGrainWindowTypeSelector, "window type", ((int*)(&mGrainWindowType)), 80);
+   FLOATSLIDER(mGrainWindowShapeSlider, "window shape", &mGrainWindowShape, 0, 1);
+   ENDUIBLOCK0();
 
    mKeyboardBasePitchSelector->AddLabel("0", 0);
    mKeyboardBasePitchSelector->AddLabel("12", 12);
@@ -75,6 +87,10 @@ void SeaOfGrain::CreateUIControls()
    mKeyboardNumPitchesSelector->AddLabel("36", 36);
    mKeyboardNumPitchesSelector->AddLabel("48", 48);
    mKeyboardNumPitchesSelector->AddLabel("60", 60);
+
+   mGrainWindowTypeSelector->AddLabel("round", (int)GrainWindowType::Round);
+   mGrainWindowTypeSelector->AddLabel("triangle", (int)GrainWindowType::Triangle);
+   mGrainWindowTypeSelector->AddLabel("envelope", (int)GrainWindowType::Envelope);
 
    for (int i = 0; i < kNumManualVoices; ++i)
    {
@@ -169,6 +185,8 @@ void SeaOfGrain::DrawModule()
    mDisplayLengthSlider->Draw();
    mKeyboardBasePitchSelector->Draw();
    mKeyboardNumPitchesSelector->Draw();
+   mGrainWindowTypeSelector->Draw();
+   mGrainWindowShapeSlider->Draw();
 
    for (int i = 0; i < kNumManualVoices; ++i)
    {
@@ -221,6 +239,8 @@ void SeaOfGrain::DrawModule()
       ofPopStyle();
       ofPopMatrix();
    }
+
+   mManualVoices[0].mGranulator.DrawWindow(156, 40, 150, 50);
 }
 
 float SeaOfGrain::GetSampleRateRatio() const
@@ -300,6 +320,14 @@ void SeaOfGrain::DropdownClicked(DropdownList* list)
 
 void SeaOfGrain::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
+   if (list == mGrainWindowTypeSelector)
+   {
+      for (int i = 0; i < kNumMPEVoices; ++i)
+         mMPEVoices[i].mGranulator.mWindowType = mGrainWindowType;
+
+      for (int i = 0; i < kNumManualVoices; ++i)
+         mManualVoices[i].mGranulator.mWindowType = mGrainWindowType;
+   }
 }
 
 void SeaOfGrain::UpdateSample()
@@ -380,6 +408,14 @@ void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, float oldVal, double ti
 {
    if (slider == mDisplayOffsetSlider || slider == mDisplayLengthSlider)
       UpdateDisplaySamples();
+   if (slider == mGrainWindowShapeSlider)
+   {
+      for (int i = 0; i < kNumMPEVoices; ++i)
+         mMPEVoices[i].mGranulator.mWindowShape = mGrainWindowShape;
+
+      for (int i = 0; i < kNumManualVoices; ++i)
+         mManualVoices[i].mGranulator.mWindowShape = mGrainWindowShape;
+   }
 }
 
 void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
@@ -388,30 +424,39 @@ void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void SeaOfGrain::PlayNote(NoteMessage note)
 {
-   if (note.pitch >= 0 && note.pitch < kNumManualVoices)
+   if (mMPEMode)
    {
+      if (note.voiceIdx == -1 || note.voiceIdx >= kNumMPEVoices)
+         return;
+
       if (note.velocity > 0)
-         mManualVoices[note.pitch].mLastInputVelocity = note.velocity / 127.0f;
-      mManualVoices[note.pitch].mGranulator.mSpawnGrains = note.velocity > 0;
+         mMPEVoices[note.voiceIdx].mADSR.Start(note.time, 1);
+      else
+         mMPEVoices[note.voiceIdx].mADSR.Stop(note.time);
+      mMPEVoices[note.voiceIdx].mPitch = note.pitch;
+      mMPEVoices[note.voiceIdx].mPlay = 0;
+      mMPEVoices[note.voiceIdx].mPitchBend = note.modulation.pitchBend;
+      mMPEVoices[note.voiceIdx].mPressure = note.modulation.pressure;
+      mMPEVoices[note.voiceIdx].mModWheel = note.modulation.modWheel;
    }
-
-   if (note.voiceIdx == -1 || note.voiceIdx >= kNumMPEVoices)
-      return;
-
-   if (note.velocity > 0)
-      mMPEVoices[note.voiceIdx].mADSR.Start(note.time, 1);
    else
-      mMPEVoices[note.voiceIdx].mADSR.Stop(note.time);
-   mMPEVoices[note.voiceIdx].mPitch = note.pitch;
-   mMPEVoices[note.voiceIdx].mPlay = 0;
-   mMPEVoices[note.voiceIdx].mPitchBend = note.modulation.pitchBend;
-   mMPEVoices[note.voiceIdx].mPressure = note.modulation.pressure;
-   mMPEVoices[note.voiceIdx].mModWheel = note.modulation.modWheel;
+   {
+      if (note.pitch >= 0 && note.pitch < kNumManualVoices)
+      {
+         if (note.velocity > 0)
+         {
+            mManualVoices[note.pitch].mLastInputVelocity = note.velocity / 127.0f;
+            mManualVoices[note.pitch].mGranulator.QueueGrainSpawn(note.time);
+         }
+         mManualVoices[note.pitch].mGranulator.mSpawnGrains = note.velocity > 0;
+      }
+   }
 }
 
 void SeaOfGrain::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("mpe_mode", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -419,6 +464,7 @@ void SeaOfGrain::LoadLayout(const ofxJSONElement& moduleInfo)
 void SeaOfGrain::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   mMPEMode = mModuleSaveData.GetBool("mpe_mode");
 }
 
 void SeaOfGrain::SaveState(FileStreamOut& out)
