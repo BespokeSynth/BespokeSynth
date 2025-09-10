@@ -365,6 +365,8 @@ target_sources(BespokeSynth PRIVATE
     ModulatorAddCentered.h
     BoundsToPulse.cpp
     BoundsToPulse.h
+    ModulatorBinaryValue.cpp
+    ModulatorBinaryValue.h
     ModulatorCurve.cpp
     ModulatorCurve.h
     ModulatorExpression.cpp
