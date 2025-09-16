@@ -29,6 +29,14 @@
 #include "UIGrid.h"
 
 
+enum class MinimapCorner
+{
+   TopRight,
+   TopLeft,
+   BottomRight,
+   BottomLeft
+};
+
 class Minimap : public IDrawableModule
 {
 public:
@@ -49,6 +57,7 @@ private:
    void ComputeBoundingBox(ofRectangle& rect);
    ofRectangle CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& source);
    void DrawModulesOnMinimap(ofRectangle& boundingBox);
+   void DrawModuleOnMinimap(ofRectangle& boundingBox, IDrawableModule* module);
    void RectUnion(ofRectangle& target, ofRectangle& unionRect);
    void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;

@@ -161,6 +161,7 @@
 #include "VolcaBeatsControl.h"
 #include "RadioSequencer.h"
 #include "TakeRecorder.h"
+#include "AudioSplitter.h"
 #include "Splitter.h"
 #include "Panner.h"
 #include "SamplePlayer.h"
@@ -259,12 +260,22 @@
 #include "RhythmSequencer.h"
 #include "DotSequencer.h"
 #include "VoiceSetter.h"
+#include "VoiceManager.h"
 #include "LabelDisplay.h"
 #include "ControlRecorder.h"
 #include "EuclideanSequencer.h"
+#include "ControlInterface.h"
 #include "SaveStateLoader.h"
 #include "DataProvider.h"
 #include "PulseLimit.h"
+#include "BassLineSequencer.h"
+#include "Acciaccatura.h"
+#include "ModulatorWander.h"
+#include "StereoRotation.h"
+#include "LatencyCalculator.h"
+#include "AbletonMoveControl.h"
+#include "TrackOrganizer.h"
+#include "ModulatorBinaryValue.h"
 #include "VelocityToDuration.h"
 
 #include <juce_core/juce_core.h>
@@ -378,6 +389,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteHumanizer, notehumanizer, kModuleCategory_Note);
    REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleCategory_Note);
    REGISTER(RadioSequencer, radiosequencer, kModuleCategory_Other);
+   REGISTER(AudioSplitter, audiosplitter, kModuleCategory_Audio);
    REGISTER(Splitter, splitter, kModuleCategory_Audio);
    REGISTER(Panner, panner, kModuleCategory_Audio);
    REGISTER(SamplePlayer, sampleplayer, kModuleCategory_Synth);
@@ -480,11 +492,22 @@ ModuleFactory::ModuleFactory()
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
    REGISTER(VoiceSetter, voicesetter, kModuleCategory_Note);
+   REGISTER(VoiceManager, voicemanager, kModuleCategory_Note);
    REGISTER(ControlRecorder, controlrecorder, kModuleCategory_Modulator);
    REGISTER(EuclideanSequencer, euclideansequencer, kModuleCategory_Instrument);
+   REGISTER(ControlInterface, interface, kModuleCategory_Modulator);
    REGISTER(SaveStateLoader, savestateloader, kModuleCategory_Other);
    REGISTER(DataProvider, dataprovider, kModuleCategory_Modulator);
    REGISTER(PulseLimit, pulselimit, kModuleCategory_Pulse);
+   REGISTER(BassLineSequencer, basslinesequencer, kModuleCategory_Instrument);
+   REGISTER(Acciaccatura, acciaccatura, kModuleCategory_Note);
+   REGISTER(ModulatorWander, wander, kModuleCategory_Modulator);
+   REGISTER(StereoRotation, stereorotation, kModuleCategory_Audio);
+   REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
+   REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
+   REGISTER(AbletonMoveControl, abletonmovecontrol, kModuleCategory_Other);
+   REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
+   REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
    REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
@@ -561,10 +584,11 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleC
       }
    }
 
+   // Put effect modules at the end of the Audio category
    if (moduleCategory == kModuleCategory_Audio)
    {
       std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
-      for (auto effect : effects)
+      for (const auto& effect : effects)
       {
          ModuleFactory::Spawnable spawnable{};
          spawnable.mLabel = effect;
@@ -650,14 +674,14 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
 
    std::vector<Spawnable> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
-   for (auto prefab : prefabs)
+   for (const auto& prefab : prefabs)
    {
       if (CheckHeldKeysMatch(prefab.mLabel, keys, continuousString) || keys[0] == ';')
          modules.push_back(prefab);
    }
 
    std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
-   for (auto midicontroller : midicontrollers)
+   for (const auto& midicontroller : midicontrollers)
    {
       if (CheckHeldKeysMatch(midicontroller, keys, continuousString))
       {
@@ -670,7 +694,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
    }
 
    std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
-   for (auto effect : effects)
+   for (const auto& effect : effects)
    {
       if (CheckHeldKeysMatch(effect, keys, continuousString))
       {
@@ -684,7 +708,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
 
    std::vector<Spawnable> presets;
    ModuleFactory::GetPresets(presets);
-   for (auto preset : presets)
+   for (const auto& preset : presets)
    {
       if (CheckHeldKeysMatch(preset.mLabel, keys, continuousString) || keys[0] == ';')
          modules.push_back(preset);
@@ -714,18 +738,33 @@ ModuleCategory ModuleFactory::GetModuleCategory(std::string typeName)
 
 ModuleCategory ModuleFactory::GetModuleCategory(Spawnable spawnable)
 {
-   if (spawnable.mSpawnMethod == SpawnMethod::Module && mFactoryMap.find(spawnable.mLabel) != mFactoryMap.end())
-      return mFactoryMap[spawnable.mLabel].mCategory;
-   if (spawnable.mSpawnMethod == SpawnMethod::Plugin)
-      return kModuleCategory_Synth;
-   if (spawnable.mSpawnMethod == SpawnMethod::MidiController)
-      return kModuleCategory_Instrument;
-   if (spawnable.mSpawnMethod == SpawnMethod::EffectChain)
-      return kModuleCategory_Audio;
-   if (spawnable.mSpawnMethod == SpawnMethod::Prefab)
-      return kModuleCategory_Other;
-   if (spawnable.mSpawnMethod == SpawnMethod::Preset)
-      return mFactoryMap[spawnable.mPresetModuleType].mCategory;
+   switch (spawnable.mSpawnMethod)
+   {
+      case SpawnMethod::Module:
+         if (mFactoryMap.find(spawnable.mLabel) != mFactoryMap.end())
+            return mFactoryMap[spawnable.mLabel].mCategory;
+         break;
+
+      case SpawnMethod::Plugin:
+         return kModuleCategory_Synth;
+         break;
+
+      case SpawnMethod::MidiController:
+         return kModuleCategory_Instrument;
+         break;
+
+      case SpawnMethod::EffectChain:
+         return kModuleCategory_Audio;
+         break;
+
+      case SpawnMethod::Prefab:
+         return kModuleCategory_Other;
+         break;
+
+      case SpawnMethod::Preset:
+         return mFactoryMap[spawnable.mPresetModuleType].mCategory;
+         break;
+   }
    return kModuleCategory_Other;
 }
 
@@ -750,7 +789,7 @@ void ModuleFactory::GetPrefabs(std::vector<ModuleFactory::Spawnable>& prefabs)
    File dir(ofToDataPath("prefabs"));
    Array<File> files;
    dir.findChildFiles(files, File::findFiles, false);
-   for (auto file : files)
+   for (auto& file : files)
    {
       if (file.getFileExtension() == ".pfb")
       {
@@ -770,7 +809,7 @@ void ModuleFactory::GetPresets(std::vector<ModuleFactory::Spawnable>& presets)
    File dir(ofToDataPath("presets"));
    Array<File> directories;
    dir.findChildFiles(directories, File::findDirectories, false);
-   for (auto moduleDir : directories)
+   for (auto& moduleDir : directories)
    {
       std::string moduleTypeName = moduleDir.getFileName().toStdString();
       Array<File> files;

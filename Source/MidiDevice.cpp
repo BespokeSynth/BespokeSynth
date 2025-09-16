@@ -127,7 +127,7 @@ void MidiDevice::DisconnectInput()
    if (mDeviceInInfo.identifier.isNotEmpty())
    {
       deviceManager.setMidiInputDeviceEnabled(mDeviceInInfo.identifier, false);
-      deviceManager.removeMidiInputDeviceCallback(mDeviceOutInfo.identifier, this);
+      deviceManager.removeMidiInputDeviceCallback(mDeviceInInfo.identifier, this);
    }
 }
 
@@ -256,7 +256,7 @@ void MidiDevice::SendSysEx(std::string data)
 {
    if (mMidiOut)
    {
-      mMidiOut->sendMessageNow(MidiMessage::createSysExMessage(data.c_str(), data.length()));
+      mMidiOut->sendMessageNow(MidiMessage::createSysExMessage(data.c_str(), (int)data.length()));
    }
 }
 

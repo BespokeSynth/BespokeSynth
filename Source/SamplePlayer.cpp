@@ -384,26 +384,26 @@ void SamplePlayer::Process(double time)
    GetBuffer()->Reset();
 }
 
-void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
+void SamplePlayer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
    if (mSelectPlayedCuePoint)
-      mRecentPlayedCuePoint = pitch;
+      mRecentPlayedCuePoint = note.pitch;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget() && mSample)
+   if (!NoteInputBuffer::IsTimeWithinFrame(note.time) && GetTarget() && mSample)
    {
-      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      mNoteInputBuffer.QueueNote(note);
       return;
    }
 
-   if (velocity > 0 && mSample != nullptr)
-      PlayCuePoint(time, pitch, velocity, modulation.pitchBend ? exp2(modulation.pitchBend->GetValue(0)) : 1, (modulation.modWheel ? modulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel) - ModulationParameters::kDefaultModWheel);
+   if (note.velocity > 0 && mSample != nullptr)
+      PlayCuePoint(note.time, note.pitch, note.velocity, note.modulation.pitchBend ? exp2(note.modulation.pitchBend->GetValue(0)) : 1, (note.modulation.modWheel ? note.modulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel) - ModulationParameters::kDefaultModWheel);
 
-   if (velocity == 0 && mStopOnNoteOff)
+   if (note.velocity == 0 && mStopOnNoteOff)
    {
-      mAdsr.Stop(time);
+      mAdsr.Stop(note.time);
    }
 }
 
@@ -526,6 +526,8 @@ void SamplePlayer::ButtonClicked(ClickButton* button, double time)
       {
          mCuePointSpeed = 1;
          mStopOnNoteOff = false;
+         if (mSpeed < 0)
+            mSample->SetPlayPosition(mSample->LengthInSamples() - 1);
          mPlay = true;
          mAdsr.Clear();
          mAdsr.Start(time * gInvSampleRateMs, 1);
@@ -746,7 +748,7 @@ void SamplePlayer::LoadFile()
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
-   FileChooser chooser("Load sample", File(ofToDataPath("samples")),
+   FileChooser chooser("Load sample", File(ofToSamplePath("")),
                        file_pattern, true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
@@ -761,7 +763,7 @@ void SamplePlayer::LoadFile()
 
 void SamplePlayer::SaveFile()
 {
-   FileChooser chooser("Save sample", File(ofToDataPath("samples")),
+   FileChooser chooser("Save sample", File(ofToSamplePath("")),
                        "*.wav", true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
    {
@@ -862,13 +864,13 @@ bool SamplePlayer::MouseMoved(float x, float y)
 
          // find cue point closest to but not exceeding the cursor position
          int bestCuePointIndex = -1;
-         float bestCuePointStart = 0.;
-         for (size_t i = 0; i < mSampleCuePoints.size(); ++i)
+         float bestCuePointStart = -1.0f;
+         for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
          {
             float startSeconds = mSampleCuePoints[i].startSeconds;
             float lengthSeconds = mSampleCuePoints[i].lengthSeconds;
 
-            if (lengthSeconds > 0.)
+            if (lengthSeconds > 0.0f)
             {
                if (seconds >= startSeconds && seconds <= startSeconds + lengthSeconds &&
                    startSeconds > bestCuePointStart)
@@ -939,6 +941,11 @@ void SamplePlayer::SetCuePoint(int pitch, float startSeconds, float lengthSecond
       mSampleCuePoints[pitch].lengthSeconds = lengthSeconds;
       mSampleCuePoints[pitch].speed = speed;
    }
+}
+
+bool SamplePlayer::validCuePoint(int cueIndex)
+{
+   return mSample != nullptr && cueIndex >= 0 && cueIndex < mSampleCuePoints.size() - 1 && mSampleCuePoints[cueIndex].lengthSeconds > 0;
 }
 
 void SamplePlayer::DrawModule()

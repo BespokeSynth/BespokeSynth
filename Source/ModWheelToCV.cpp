@@ -43,9 +43,9 @@ ModWheelToCV::~ModWheelToCV()
 void ModWheelToCV::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 
    mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
@@ -65,11 +65,11 @@ void ModWheelToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    OnModulatorRepatch();
 }
 
-void ModWheelToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ModWheelToCV::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
-      mModWheel = modulation.modWheel;
+      mModWheel = note.modulation.modWheel;
    }
 }
 

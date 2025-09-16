@@ -53,17 +53,22 @@ MultitapDelay::MultitapDelay()
 void MultitapDelay::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mDryAmountSlider = new FloatSlider(this, "dry", 5, 10, 150, 15, &mDryAmount, 0, 1);
-   mDisplayLengthSlider = new FloatSlider(this, "display length", mDryAmountSlider, kAnchor_Below, 150, 15, &mDisplayLength, .1f, mDelayBuffer.Size() / gSampleRate);
+
+   int tapBoxW = (mBufferW - 30) / 4;
+
+   mDryAmountSlider = new FloatSlider(this, "dry", 5, 10, tapBoxW, 15, &mDryAmount, 0, 1);
+   mDisplayLengthSlider = new FloatSlider(this, "display length", mDryAmountSlider, kAnchor_Below, tapBoxW, 15, &mDisplayLength, .1f, mDelayBuffer.Size() / gSampleRate);
    mDisplayLength = mDisplayLengthSlider->GetMax();
 
    for (int i = 0; i < mNumTaps; ++i)
    {
-      float y = mBufferY + mBufferH + 10 + i * 100;
-      mTaps[i].mDelayMsSlider = new FloatSlider(this, ("delay " + ofToString(i + 1)).c_str(), 10, y, 150, 15, &mTaps[i].mDelayMs, gBufferSize / gSampleRateMs, mDelayBuffer.Size() / gSampleRateMs);
-      mTaps[i].mGainSlider = new FloatSlider(this, ("gain " + ofToString(i + 1)).c_str(), mTaps[i].mDelayMsSlider, kAnchor_Below, 150, 15, &mTaps[i].mGain, 0, 1);
-      mTaps[i].mFeedbackSlider = new FloatSlider(this, ("feedback " + ofToString(i + 1)).c_str(), mTaps[i].mGainSlider, kAnchor_Below, 150, 15, &mTaps[i].mFeedback, 0, 1);
-      mTaps[i].mPanSlider = new FloatSlider(this, ("pan " + ofToString(i + 1)).c_str(), mTaps[i].mFeedbackSlider, kAnchor_Below, 150, 15, &mTaps[i].mPan, -1, 1);
+      int row = i / 4;
+      int column = i % 4;
+
+      mTaps[i].mDelayMsSlider = new FloatSlider(this, ("delay " + ofToString(i + 1)).c_str(), 5 + column * (tapBoxW + 10), mBufferY + mBufferH + 10 + row * 80, tapBoxW, 15, &mTaps[i].mDelayMs, gBufferSize / gSampleRateMs, mDelayBuffer.Size() / gSampleRateMs);
+      mTaps[i].mGainSlider = new FloatSlider(this, ("gain " + ofToString(i + 1)).c_str(), mTaps[i].mDelayMsSlider, kAnchor_Below, tapBoxW, 15, &mTaps[i].mGain, 0, 1);
+      mTaps[i].mFeedbackSlider = new FloatSlider(this, ("feedback " + ofToString(i + 1)).c_str(), mTaps[i].mGainSlider, kAnchor_Below, tapBoxW, 15, &mTaps[i].mFeedback, 0, 1);
+      mTaps[i].mPanSlider = new FloatSlider(this, ("pan " + ofToString(i + 1)).c_str(), mTaps[i].mFeedbackSlider, kAnchor_Below, tapBoxW, 15, &mTaps[i].mPan, -1, 1);
    }
 }
 
@@ -196,7 +201,7 @@ void MultitapDelay::CheckboxUpdated(Checkbox* checkbox, double time)
 void MultitapDelay::GetModuleDimensions(float& width, float& height)
 {
    width = mBufferW + 10;
-   height = mBufferY + mBufferH + 10 + 100 * mNumTaps;
+   height = mBufferY + mBufferH + 10 + 80 * ceil(mNumTaps / 4.0);
 }
 
 void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
@@ -207,9 +212,9 @@ void MultitapDelay::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 {
 }
 
-void MultitapDelay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void MultitapDelay::PlayNote(NoteMessage note)
 {
-   if (voiceIdx == -1 || voiceIdx >= kNumMPETaps)
+   if (note.voiceIdx == -1 || note.voiceIdx >= kNumMPETaps)
       return;
 
    /*if (velocity > 0)

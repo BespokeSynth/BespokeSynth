@@ -65,7 +65,7 @@ protected:
       bool RequiresManualPolling() { return mUIControlTarget != nullptr && mSliderTarget == nullptr; }
    };
 
-   PatchCableSource* mTargetCable{ nullptr };
+   PatchCableSource* mTargetCableSource{ nullptr };
    FloatSlider* mMinSlider{ nullptr };
    FloatSlider* mMaxSlider{ nullptr };
    std::array<Target, 10> mTargets;

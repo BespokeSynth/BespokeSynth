@@ -210,6 +210,7 @@ public:
    IDrawableModule* GetLastClickedModule() const;
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
    const std::vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
+   void SetGroupSelectedModules(std::list<IDrawableModule*> modules);
    bool ShouldAccentuateActiveModules() const;
    bool ShouldDimModule(IDrawableModule* module);
    LocationZoomer* GetLocationZoomer() { return &mZoomer; }
@@ -350,7 +351,7 @@ private:
    UserPrefsEditor* mUserPrefsEditor{ nullptr };
 
    RollingBuffer* mGlobalRecordBuffer{ nullptr };
-   long long mRecordingLength{ 0 };
+   int mRecordingLength{ 0 };
 
    struct LogEventItem
    {
@@ -383,6 +384,7 @@ private:
    bool mLastClickWasEmptySpace{ false };
    bool mIsShiftPressed{ false };
    double mLastShiftPressTime{ -9999 };
+   ofVec2f mLastShiftPressMousePos{};
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout{ false };

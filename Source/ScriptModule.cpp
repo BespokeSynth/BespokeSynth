@@ -634,7 +634,9 @@ void ScriptModule::Poll()
       if (mLoadedScriptFiletime < scriptFile.getLastModificationTime())
       {
          std::unique_ptr<FileInputStream> input(scriptFile.createInputStream());
-         mCodeEntry->SetText(input->readString().toStdString());
+         std::string text = input->readString().toStdString();
+         ofStringReplace(text, "\r", "");
+         mCodeEntry->SetText(text);
          mCodeEntry->Publish();
          ExecuteCode();
          mLoadedScriptFiletime = scriptFile.getLastModificationTime();
@@ -779,11 +781,31 @@ void ScriptModule::PrintText(std::string text)
 
 IUIControl* ScriptModule::GetUIControl(std::string path)
 {
-   IUIControl* control;
-   if (ofIsStringInString(path, "~"))
-      control = TheSynth->FindUIControl(path);
+   if (path == "")
+      return nullptr;
+
+   std::string fullPath = path;
+
+   if (path[0] == '$')
+      //absolute path provided by the user
+      fullPath = path;
+   else if (std::count(path.begin(), path.end(), '~') >= 2)
+      //absolute path within a prefab
+      fullPath = path;
+   else if (ofIsStringInString(Path(), "~") && !ofIsStringInString(path, "~"))
+      //in a prefab, referencing a script variable
+      fullPath = Path() + "~" + path;
+   else if (!ofIsStringInString(Path(), "~") && ofIsStringInString(path, "~"))
+      //main screen, referencing a module
+      fullPath = path;
+   else if (ofIsStringInString(Path(), "~") && ofIsStringInString(path, "~"))
+      //in a prefab, referencing module in the current or nested prefab
+      fullPath = Path().substr(0, Path().rfind('~') + 1) + path;
    else
-      control = TheSynth->FindUIControl(Path() + "~" + path);
+      //main screen, referencing a script variable
+      fullPath = Path() + "~" + path;
+
+   IUIControl* control = TheSynth->FindUIControl(fullPath);
 
    return control;
 }
@@ -834,23 +856,23 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
       modulation.pitchBend = &mPitchBends[intPitch];
       modulation.pitchBend->SetValue(pitch - intPitch);
    }
-   SendNoteToIndex(noteOutputIndex, time, intPitch, (int)velocity, -1, modulation);
+   SendNoteToIndex(noteOutputIndex, NoteMessage(time, intPitch, (int)velocity, -1, modulation));
 
    if (velocity > 0)
       mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan, 1));
 }
 
-void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ScriptModule::SendNoteToIndex(int index, NoteMessage note)
 {
    if (index == 0)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
+      PlayNoteOutput(note, true);
       return;
    }
 
    if (index - 1 < (int)mExtraNoteOutputs.size())
    {
-      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation, true);
+      mExtraNoteOutputs[index - 1]->PlayNoteOutput(note, true);
    }
 }
 
@@ -893,6 +915,19 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
    }
 
    RunCode(gTime, "on_osc(\"" + messageString + "\")");
+}
+
+void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
+{
+   // Avoid code injection by preventing the sysex payload to be interpreted as Python
+   // - convert the sysex payload to hex
+   // - use bytes.fromhex in Python to parse it
+   std::ostringstream ss;
+   for (size_t i = 0; i < data_size; i++)
+      ss << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(data[i]);
+   mMidiMessageQueueMutex.lock();
+   mMidiMessageQueue.push_back("on_sysex(bytes.fromhex('" + ss.str() + "'))");
+   mMidiMessageQueueMutex.unlock();
 }
 
 void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
@@ -988,7 +1023,9 @@ void ScriptModule::ButtonClicked(ClickButton* button, double time)
 
          mLoadedScriptFiletime = resourceFile.getLastModificationTime();
 
-         mCodeEntry->SetText(input->readString().toStdString());
+         std::string text = input->readString().toStdString();
+         ofStringReplace(text, "\r", "");
+         mCodeEntry->SetText(text);
       }
    }
 
@@ -1071,22 +1108,29 @@ void ScriptModule::OnCodeUpdated()
    {
       std::vector<std::string> lines = mCodeEntry->GetLines(false);
 
-      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      for (auto mBoundModuleConnection = mBoundModuleConnections.begin(); mBoundModuleConnection != mBoundModuleConnections.end(); ++mBoundModuleConnection)
       {
-         if (mBoundModuleConnections[i].mLineText != lines[mBoundModuleConnections[i].mLineIndex])
+         if (mBoundModuleConnection->mLineIndex >= lines.size())
+         {
+            mBoundModuleConnection = mBoundModuleConnections.erase(mBoundModuleConnection);
+            if (mBoundModuleConnection == mBoundModuleConnections.end())
+               break;
+            continue;
+         }
+         if (mBoundModuleConnection->mLineText != lines[mBoundModuleConnection->mLineIndex])
          {
             bool found = false;
             for (int j = 0; j < (int)lines.size(); ++j)
             {
-               if (lines[j] == mBoundModuleConnections[i].mLineText)
+               if (lines[j] == mBoundModuleConnection->mLineText)
                {
                   found = true;
-                  mBoundModuleConnections[i].mLineIndex = j;
+                  mBoundModuleConnection->mLineIndex = j;
                }
             }
 
             if (!found)
-               mBoundModuleConnections[i].mTarget = nullptr;
+               mBoundModuleConnection->mTarget = nullptr;
          }
       }
    }
@@ -1105,15 +1149,15 @@ void ScriptModule::OnPulse(double time, float velocity, int flags)
 }
 
 //INoteReceiver
-void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
+void ScriptModule::PlayNote(NoteMessage note)
 {
    for (size_t i = 0; i < mPendingNoteInput.size(); ++i)
    {
       if (mPendingNoteInput[i].time == -1)
       {
-         mPendingNoteInput[i].time = time;
-         mPendingNoteInput[i].pitch = pitch;
-         mPendingNoteInput[i].velocity = velocity;
+         mPendingNoteInput[i].time = note.time;
+         mPendingNoteInput[i].pitch = note.pitch;
+         mPendingNoteInput[i].velocity = note.velocity;
          break;
       }
    }
@@ -1271,6 +1315,7 @@ void ScriptModule::FixUpCode(std::string& code)
    ofStringReplace(code, "on_grid_button(", "on_grid_button__" + prefix + "(");
    ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
    ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
+   ofStringReplace(code, "on_sysex(", "on_sysex__" + prefix + "(");
    ofStringReplace(code, "this.", GetThisName() + ".");
    ofStringReplace(code, "me.", GetThisName() + ".");
 }

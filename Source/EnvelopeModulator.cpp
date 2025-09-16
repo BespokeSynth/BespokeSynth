@@ -39,9 +39,9 @@ void EnvelopeModulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 
    mAdsrDisplay = new ADSRDisplay(this, "adsr", 105, 2, 100, 66, &mAdsr);
 
@@ -73,17 +73,17 @@ void EnvelopeModulator::Start(double time, const ::ADSR& adsr)
    mAdsr.Start(time, 1, adsr);
 }
 
-void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void EnvelopeModulator::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 
    if (mNoteOutput.HasHeldNotes() == false)
    {
-      mAdsr.Stop(time);
+      mAdsr.Stop(note.time);
    }
-   else if (velocity > 0)
+   else if (note.velocity > 0)
    {
-      mAdsr.Start(time, mUseVelocity ? velocity / 127.0f : 1);
+      mAdsr.Start(note.time, mUseVelocity ? note.velocity / 127.0f : 1);
    }
 }
 
@@ -126,7 +126,7 @@ float EnvelopeModulator::Value(int samplesIn /*= 0*/)
    ComputeSliders(samplesIn);
    if (GetSliderTarget())
       return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), GetSliderTarget()->GetMin(), GetSliderTarget()->GetMax());
-   return 0;
+   return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), GetMin(), GetMax());
 }
 
 void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
@@ -173,9 +173,9 @@ void EnvelopeModulator::LoadState(FileStreamIn& in, int rev)
    if (rev < 1)
    {
       // Temporary additional cable source
-      mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-      mTargetCable->SetModulatorOwner(this);
-      AddPatchCableSource(mTargetCable);
+      mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+      mTargetCableSource->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCableSource);
    }
 
    IDrawableModule::LoadState(in, rev);
@@ -186,7 +186,7 @@ void EnvelopeModulator::LoadState(FileStreamIn& in, int rev)
       if (target != nullptr)
          GetPatchCableSource()->SetTarget(target);
       RemovePatchCableSource(GetPatchCableSource(1));
-      mTargetCable = GetPatchCableSource();
+      mTargetCableSource = GetPatchCableSource();
    }
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)

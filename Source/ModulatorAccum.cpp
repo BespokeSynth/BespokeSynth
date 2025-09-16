@@ -52,9 +52,9 @@ void ModulatorAccum::CreateUIControls()
    FLOATSLIDER(mVelocitySlider, "velocity", &mVelocity, -1, 1);
    ENDUIBLOCK(mWidth, mHeight);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 }
 
 ModulatorAccum::~ModulatorAccum()

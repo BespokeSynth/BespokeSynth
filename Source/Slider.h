@@ -46,6 +46,8 @@ class FloatSlider : public IUIControl, public ITextEntryListener, public IAudioP
 public:
    FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits = -1);
    FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, float* var, float min, float max, int digits = -1);
+   IFloatSliderListener* GetOwner() { return mOwner; }
+   float* GetVar() { return mVar; }
    void SetVar(float* var) { mVar = var; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
@@ -208,6 +210,8 @@ class IntSlider : public IUIControl, public ITextEntryListener
 public:
    IntSlider(IIntSliderListener* owner, const char* label, int x, int y, int w, int h, int* var, int min, int max);
    IntSlider(IIntSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, int* var, int min, int max);
+   IIntSliderListener* GetOwner() { return mOwner; }
+   int* GetVar() { return mVar; }
    void SetVar(int* var) { mVar = var; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
@@ -286,6 +290,7 @@ private:
    bool mMouseDown;
    int mOriginalValue;
    IIntSliderListener* mOwner;
+   int mFineRefX{ -999 };
 
    int mLastDisplayedValue;
    int mLastSetValue;

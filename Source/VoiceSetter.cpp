@@ -30,7 +30,7 @@ void VoiceSetter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mVoiceSlider = new IntSlider(this, "voice index", 5, 2, 80, 15, &mVoiceIdx, 0, kNumVoices - 1);
+   mVoiceSlider = new IntSlider(this, "voice index", 5, 2, 80, 15, &mVoiceIdx, -1, kNumVoices - 1);
 }
 
 void VoiceSetter::DrawModule()
@@ -47,9 +47,10 @@ void VoiceSetter::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
       mNoteOutput.Flush(time);
 }
 
-void VoiceSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void VoiceSetter::PlayNote(NoteMessage note)
 {
-   PlayNoteOutput(time, pitch, velocity, mVoiceIdx, modulation);
+   note.voiceIdx = mVoiceIdx;
+   PlayNoteOutput(note);
 }
 
 void VoiceSetter::LoadLayout(const ofxJSONElement& moduleInfo)

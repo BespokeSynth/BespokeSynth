@@ -74,6 +74,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void Render() override;
+   void PreRenderUnclipped();
    void RenderUnclipped();
    virtual void PostRender() {}
    void DrawFrame(float width, float height, bool drawModule, float& titleBarHeight, float& highlight);
@@ -165,6 +166,7 @@ public:
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
    virtual bool ShouldSuppressAutomaticOutputCable() { return false; }
+   virtual bool ShouldSerializeForSnapshot() const { return false; }
 
    virtual void CheckboxUpdated(Checkbox* checkbox, double time) {}
 
@@ -227,6 +229,7 @@ protected:
    std::string mDebugDisplayText;
 
 private:
+   virtual void PreDrawModuleUnclipped() {}
    virtual void PreDrawModule() {}
    virtual void DrawModule() = 0;
    virtual void DrawModuleUnclipped() {}

@@ -40,6 +40,7 @@
 #include "EnvelopeModulator.h"
 #include "DrumPlayer.h"
 #include "VSTPlugin.h"
+#include "Snapshots.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -158,6 +159,27 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       }
       return paths;
    });
+   m.def("get_controls", [](std::string path)
+   {
+      const auto module = TheSynth->FindModule(std::move(path));
+      std::vector<std::string> paths;
+      if (module == nullptr)
+         return paths;
+      for (auto* control : module->GetUIControls())
+      {
+         if (control && control->IsShowing())
+            paths.push_back(control->Path());
+      }
+      return paths;
+   });
+   m.def("location_recall", [](char location)
+   {
+      TheSynth->GetLocationZoomer()->MoveToLocation(location);
+   });
+   m.def("location_store", [](char location)
+   {
+      TheSynth->GetLocationZoomer()->WriteCurrentLocation(location);
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
@@ -198,6 +220,12 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          if (control != nullptr)
             module.ScheduleUIControlValue(control, value, 0);
       })
+      .def("set_text", [](ScriptModule& module, std::string path, std::string value)
+      {
+         auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
+         if (control != nullptr)
+            control->SetText(value);
+      })
       ///example: me.set("oscillator~pw", .2)
       .def("schedule_set", [](ScriptModule& module, float delay, std::string path, float value)
       {
@@ -212,7 +240,26 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
             return control->GetValue();
          return 0.0f;
       })
+      .def("get_text", [](ScriptModule& module, std::string path) -> std::string
+      {
+         auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
+         if (control != nullptr)
+            return control->GetText();
+         return "";
+      })
       ///example: pulsewidth = me.get("oscillator~pulsewidth")
+      .def("get_path_prefix", [](ScriptModule& module)
+      {
+         std::string path = module.Path();
+         if (ofIsStringInString(path, "~"))
+         {
+            return path.substr(0, path.rfind('~') + 1);
+         }
+         else 
+         {
+            return std::string("");
+         }
+      })
       .def("adjust", [](ScriptModule& module, std::string path, float amount)
       {
          IUIControl* control = module.GetUIControl(path);
@@ -419,7 +466,7 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
          modulation.pitchBend->SetValue(log2(speedMult));
          modulation.modWheel = scriptModule->GetModWheel(cue);
          modulation.modWheel->SetValue(startOffsetSeconds);
-         player.PlayNote(time, cue, 127, -1, modulation);
+         player.PlayNote(NoteMessage(time, cue, 127, -1, modulation));
       }, "cue"_a, "speedMult"_a = 1, "startOffsetSeconds"_a = 0)
       .def("get_length_seconds", [](SamplePlayer& player)
       {
@@ -677,6 +724,48 @@ PYBIND11_EMBEDDED_MODULE(vstplugin, m)
    });
 }
 
+PYBIND11_EMBEDDED_MODULE(snapshots, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<Snapshots*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<Snapshots, IDrawableModule>(m, "snapshots")
+      .def("get_size", [](Snapshots& snapshots)
+      {
+         return snapshots.GetSize();
+      })
+      .def("get_current_snapshot", [](Snapshots& snapshots)
+      {
+         return snapshots.GetCurrentSnapshot();
+      })
+      .def("has_snapshot", [](Snapshots& snapshots, int index)
+      {
+         return snapshots.HasSnapshot(index);
+      })
+      .def("set_snapshot", [](Snapshots& snapshots, int index)
+      {
+         snapshots.SetSnapshot(index, gTime);
+      })
+      .def("store_snapshot", [](Snapshots& snapshots, int index, std::string label)
+      {
+         if (index >= 0 && index < snapshots.GetSize())
+         {
+            if (!label.empty())
+               snapshots.SetLabel(index, label);
+            snapshots.StoreSnapshot(index, true);
+         }
+      }, "index"_a, "label"_a = "")
+      .def("delete_snapshot", [](Snapshots& snapshots, int index)
+      {
+         snapshots.DeleteSnapshot(index);
+      });
+}
+
 PYBIND11_EMBEDDED_MODULE(module, m)
 {
    m.def("get", [](std::string path)
@@ -804,6 +893,25 @@ PYBIND11_EMBEDDED_MODULE(module, m)
             float value = ofClamp(control->GetValue() + amount, min, max);
             control->SetValue(value, ScriptModule::sMostRecentRunTime);
          }
+      })
+      .def("set_focus", [](IDrawableModule& module, float zoom)
+      {
+         ofRectangle module_rect = module.GetRect();
+         if (zoom >= 0.1)
+            gDrawScale = ofClamp(zoom, 0.1, 8);
+         else if (fabs(zoom) < 0.1) // Close to 0
+         {
+            //calculate zoom to view the entire module
+            float margin = 60;
+            float w_ratio = ofGetWidth() / (module_rect.width + margin);
+            float h_ratio = ofGetHeight() / (module_rect.height + margin);
+            float ratio = (w_ratio < h_ratio) ? w_ratio : h_ratio;
+            gDrawScale = ofClamp(ratio, 0.1, 8);
+         }
+         // Move viewport to centered on the module
+         float w, h;
+         TheTitleBar->GetDimensions(w, h);
+         TheSynth->SetDrawOffset(ofVec2f(-module_rect.x + ofGetWidth() / gDrawScale / 2 - module_rect.width / 2, -module_rect.y + ofGetHeight() / gDrawScale / 2 - (module_rect.height - h / 2) / 2));
       });
 }
 

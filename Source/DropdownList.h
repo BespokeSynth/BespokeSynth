@@ -28,6 +28,8 @@
 #include "IUIControl.h"
 #include "IDrawableModule.h"
 #include "ClickButton.h"
+#include "IPulseReceiver.h"
+#include "PatchCableSource.h"
 
 struct DropdownListElement
 {
@@ -96,11 +98,12 @@ enum class DropdownDisplayStyle
    kHamburger
 };
 
-class DropdownList : public IUIControl
+class DropdownList : public IUIControl, public IPulseReceiver
 {
 public:
    DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
+   IDropdownListener* GetOwner() { return mOwner; }
    void AddLabel(std::string label, int value);
    void RemoveLabel(int value);
    void SetLabel(std::string label, int value);
@@ -113,6 +116,7 @@ public:
    bool DropdownClickedAt(int x, int y);
    void SetIndex(int i, double time, bool forceUpdate);
    void Clear();
+   int* GetVar() { return mVar; }
    void SetVar(int* var) { mVar = var; }
    EnumMap GetEnumMap();
    void SetUnknownItemString(std::string str)
@@ -149,10 +153,14 @@ public:
    bool InvertScrollDirection() override { return true; }
    void Increment(float amount) override;
    void Poll() override;
+   bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
 
    void GetDimensions(float& width, float& height) override;
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
 
    static constexpr int kItemSpacing = 15;
    static constexpr int kPageBarSpacing = 20;

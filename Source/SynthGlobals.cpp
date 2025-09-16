@@ -36,7 +36,7 @@
 #include "PatchCableSource.h"
 #include "ChannelBuffer.h"
 #include "IPulseReceiver.h"
-#include "exprtk/exprtk.hpp"
+#include "exprtk.hpp"
 #include "UserPrefs.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
@@ -65,7 +65,6 @@ RetinaTrueTypeFont gFont;
 RetinaTrueTypeFont gFontBold;
 RetinaTrueTypeFont gFontFixedWidth;
 float gModuleDrawAlpha = 255;
-float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
 float gWorkBuffer[kWorkBufferSize];
 ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
@@ -76,6 +75,7 @@ float gControlTactileFeedback = 0;
 float gDrawScale = 1;
 bool gShowDevModules = false;
 float gCornerRoundness = 1;
+std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
 
 std::random_device gRandomDevice;
 bespoke::core::Xoshiro256ss gRandom(gRandomDevice);
@@ -94,6 +94,11 @@ void SynthInit()
    TheSynth->GetAudioFormatManager().registerBasicFormats();
 
    assert(kNumVoices <= 16); //assumption that we don't have more voices than midi channels
+
+   gStepVelocityLevels[(int)StepVelocityType::Off] = kVelocityOff;
+   gStepVelocityLevels[(int)StepVelocityType::Ghost] = kVelocityGhost;
+   gStepVelocityLevels[(int)StepVelocityType::Normal] = kVelocityNormal;
+   gStepVelocityLevels[(int)StepVelocityType::Accent] = kVelocityAccent;
 }
 
 void LoadGlobalResources()
@@ -519,7 +524,7 @@ void UpdateTarget(IDrawableModule* module)
    }
 }
 
-void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b)
+void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r, float g, float b, bool autocorrelationMode /* = true */)
 {
    ofPushStyle();
    ofSetLineWidth(1.5f);
@@ -535,7 +540,11 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
    for (int i = 100; i < numPoints; ++i)
    {
       float vx = x + w / 2 + buffer->GetSample(i, 0) * .8f * MIN(w, h);
-      float vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+      float vy;
+      if (autocorrelationMode)
+         vy = y + h / 2 + buffer->GetSample(i + delaySamps, secondChannel) * .8f * MIN(w, h);
+      else
+         vy = y + h / 2 + buffer->GetSample(i, secondChannel) * .8f * MIN(w, h);
       //float alpha = 1 - (i/float(numPoints));
       //ofSetColor(r*255,g*255,b*255,alpha*alpha*255);
       ofVertex(vx, vy);
@@ -11474,19 +11483,19 @@ bool EvaluateExpression(std::string expressionStr, float currentValue, float& ou
 {
    exprtk::symbol_table<float> symbolTable;
    exprtk::expression<float> expression;
-   symbolTable.add_variable("current_value", currentValue);
+   symbolTable.add_variable("x", currentValue);
    symbolTable.add_constants();
    expression.register_symbol_table(symbolTable);
 
    juce::String input = expressionStr;
    if (input.startsWith("+="))
-      input = input.replace("+=", "current_value+");
+      input = input.replace("+=", "x+");
    if (input.startsWith("*="))
-      input = input.replace("*=", "current_value*");
+      input = input.replace("*=", "x*");
    if (input.startsWith("/="))
-      input = input.replace("/=", "current_value/");
+      input = input.replace("/=", "x/");
    if (input.startsWith("-="))
-      input = input.replace("-=", "current_value-");
+      input = input.replace("-=", "x-");
 
    exprtk::parser<float> parser;
    bool expressionValid = parser.compile(input.toStdString(), expression);

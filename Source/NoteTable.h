@@ -38,7 +38,7 @@
 
 class PatchCableSource;
 
-class NoteTable : public IDrawableModule, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public UIGridListener, public INoteReceiver, public IGridControllerListener, public IPush2GridController
+class NoteTable : public IDrawableModule, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public UIGridListener, public INoteReceiver, public IGridControllerListener, public IAbletonGridController
 {
 public:
    NoteTable();
@@ -71,16 +71,16 @@ public:
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -104,7 +104,7 @@ private:
    void OnClicked(float x, float y, bool right) override;
    void UpdateGridControllerLights(bool force);
 
-   void PlayColumn(double time, int column, int velocity, int voiceIdx, ModulationParameters modulation);
+   void PlayColumn(NoteMessage note);
    float ExtraWidth() const;
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);

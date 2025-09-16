@@ -57,19 +57,19 @@ void ::ADSR::Set(const ADSR& other)
    mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
-void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/)
+void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/, float curve /*=0*/)
 {
    Set(a, d, s, r);
-   Start(time, target, timeScale);
+   Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, float target, const ADSR& adsr, float timeScale)
+void ::ADSR::Start(double time, float target, const ADSR& adsr, float timeScale /*=1*/, float curve /*=0*/)
 {
    Set(adsr);
-   Start(time, target, timeScale);
+   Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, float target, float timeScale /*=1*/)
+void ::ADSR::Start(double time, float target, float timeScale /*=1*/, float curve /*=0*/)
 {
    mEvents[mNextEventPointer].Reset();
    mEvents[mNextEventPointer].mStartBlendFromValue = Value(time);
@@ -77,6 +77,7 @@ void ::ADSR::Start(double time, float target, float timeScale /*=1*/)
    mEvents[mNextEventPointer].mMult = target;
    mNextEventPointer = (mNextEventPointer + 1) % mEvents.size();
    mTimeScale = timeScale;
+   mCurve = curve;
 
    if (mMaxSustain >= 0 && mHasSustainStage)
    {
@@ -152,7 +153,10 @@ float ::ADSR::Value(double time, const EventInfo* e) const
       return mStages[stage - 1].target;
 
    if (stage == 0)
-      stageStartValue = e->mStartBlendFromValue;
+      if (mZeroValueIsFirstStage)
+         stageStartValue = mStages[0].target;
+      else
+         stageStartValue = e->mStartBlendFromValue;
    else if (mHasSustainStage && stage == mSustainStage + 1 && e->mStopBlendFromValue != std::numeric_limits<float>::max())
       stageStartValue = e->mStopBlendFromValue;
    else
@@ -164,8 +168,9 @@ float ::ADSR::Value(double time, const EventInfo* e) const
    float stageTimeScale = GetStageTimeScale(stage);
 
    float lerp = ofClamp((time - stageStartTime) / (mStages[stage].time * stageTimeScale), 0, 1);
-   if (mStages[stage].curve != 0)
-      lerp = MathUtils::Curve(lerp, mStages[stage].curve * ((stageStartValue < mStages[stage].target * e->mMult) ? 1 : -1));
+   float curve = mStages[stage].curve + mCurve;
+   if (curve != 0)
+      lerp = MathUtils::Curve(lerp, curve * ((stageStartValue < mStages[stage].target * e->mMult) ? 1 : -1));
 
    return ofLerp(stageStartValue, mStages[stage].target * e->mMult, lerp);
 }

@@ -33,7 +33,7 @@
 #include "Push2Control.h"
 #include "GridController.h"
 
-class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IPush2GridController, public IGridControllerListener
+class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IAbletonGridController, public IGridControllerListener
 {
 public:
    BufferShuffler();
@@ -58,12 +58,12 @@ public:
    void Process(double time) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
@@ -109,6 +109,13 @@ private:
       None
    };
 
+   struct ShuffleEvent
+   {
+      double mTime{ -1 };
+      int mSlice{ 0 };
+      PlaybackStyle mStyle{ PlaybackStyle::Normal };
+   };
+
    int GetWritePositionInSamples(double time);
    int GetLengthInSamples();
    void DrawBuffer(float x, float y, float w, float h);
@@ -116,6 +123,8 @@ private:
    int GetNumSlices();
    float GetSlicePlaybackRate() const;
    PlaybackStyle VelocityToPlaybackStyle(int velocity) const;
+   void QueueEvent(double time, int slice, PlaybackStyle style = PlaybackStyle::Normal);
+   int ConsumeEvent(double time);
 
    ChannelBuffer mInputBuffer;
 
@@ -133,15 +142,16 @@ private:
    FloatSlider* mFourTetSlider{ nullptr };
    int mFourTetSlices{ 4 };
    DropdownList* mFourTetSlicesDropdown{ nullptr };
-   int mQueuedSlice{ -1 };
    PlaybackStyle mQueuedPlaybackStyle{ PlaybackStyle::None };
    float mPlaybackSampleIndex{ -1 };
-   double mPlaybackSampleStartTime{ -1 };
-   double mPlaybackSampleStopTime{ -1 };
    GridControlTarget* mGridControlTarget{ nullptr };
    bool mUseVelocitySpeedControl{ false };
    bool mOnlyPlayWhenTriggered{ false };
    float mFourTetSampleIndex{ 0 };
 
    SwitchAndRamp mSwitchAndRamp;
+
+   std::array<ShuffleEvent, 10> mEvents{};
+   int mNextEventWriteRoundRobin{ 0 };
+   int mNextEventReadRoundRobin{ 0 };
 };

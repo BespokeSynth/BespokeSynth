@@ -73,6 +73,7 @@ private:
    int mCount{ 0 };
    TextEntry* mLimitEntry{ nullptr };
    ClickButton* mResetButton{ nullptr };
+   bool mResetOnLoad{ false };
 
    float mWidth{ 200 };
    float mHeight{ 20 };

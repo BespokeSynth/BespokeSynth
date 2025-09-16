@@ -42,7 +42,7 @@ SamplerGrid::SamplerGrid()
 void SamplerGrid::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid("uigrid", 2, 2, 90, 90, mCols, mRows, this);
+   mGrid = new UIGrid(this, "uigrid", 2, 2, 90, 90, mCols, mRows);
    mGrid->SetListener(this);
    mGrid->SetMomentary(true);
    mPassthroughCheckbox = new Checkbox(this, "passthrough", mGrid, kAnchor_Right, &mPassthrough);
@@ -259,9 +259,9 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
    UpdateLights();
 }
 
-void SamplerGrid::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void SamplerGrid::PlayNote(NoteMessage note)
 {
-   OnGridButton(pitch % mCols, (pitch / mCols) % mRows, velocity / 127.0f, nullptr);
+   OnGridButton(note.pitch % mCols, (note.pitch / mCols) % mRows, note.velocity / 127.0f, nullptr);
 }
 
 void SamplerGrid::SetEditSample(SamplerGrid::GridSample* sample)

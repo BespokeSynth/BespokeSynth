@@ -48,7 +48,7 @@
 
 class SamplePlayer;
 
-class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener, public IPush2GridController
+class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener, public IAbletonGridController
 {
 public:
    DrumPlayer();
@@ -73,7 +73,7 @@ public:
    int GetNumTargets() override { return 1 + (int)mIndividualOutputs.size(); }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IDrawableModule
@@ -88,9 +88,9 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool HasPush2OverrideControls() const override { return mPush2SelectedHitIdx != -1; }
    void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
 

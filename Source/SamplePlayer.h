@@ -59,7 +59,7 @@ public:
    void Init() override;
    void Poll() override;
 
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    void OnPulse(double time, float velocity, int flags) override;
 
@@ -78,6 +78,7 @@ public:
    }
 
    void SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed);
+   bool validCuePoint(int cueIndex);
    void FillData(std::vector<float> data);
    ChannelBuffer* GetCueSampleData(int cueIndex);
    float GetLengthInSeconds() const;

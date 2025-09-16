@@ -52,6 +52,8 @@ using namespace juce::gl;
 #include "push2/JuceToPush2DisplayBridge.h"
 #include "push2/Push2-Bitmap.h"
 
+using namespace AbletonDevice;
+
 bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
 NVGLUframebuffer* Push2Control::sFB = nullptr;
@@ -60,62 +62,6 @@ namespace
 {
    ableton::Push2DisplayBridge ThePushBridge; // The bridge allowing to use juce::graphics for push
 }
-
-//https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
-
-#include "leathers/push"
-#include "leathers/unused-variable"
-namespace
-{
-   const int kTapTempoButton = 3;
-   const int kMetronomeButton = 9;
-   const int kBelowScreenButtonRow = 20;
-   const int kMasterButton = 28;
-   const int kStopClipButton = 29;
-   const int kSetupButton = 30;
-   const int kLayoutButton = 31;
-   const int kConvertButton = 35;
-   const int kQuantizeButtonSection = 36;
-   const int kLeftButton = 44;
-   const int kRightButton = 45;
-   const int kUpButton = 46;
-   const int kDownButton = 47;
-   const int kSelectButton = 48;
-   const int kShiftButton = 49;
-   const int kNoteButton = 50;
-   const int kSessionButton = 51;
-   const int kAddDeviceButton = 52;
-   const int kAddTrackButton = 53;
-   const int kOctaveDownButton = 54;
-   const int kOctaveUpButton = 55;
-   const int kRepeatButton = 56;
-   const int kAccentButton = 57;
-   const int kScaleButton = 58;
-   const int kUserButton = 59;
-   const int kMuteButton = 60;
-   const int kSoloButton = 61;
-   const int kPageLeftButton = 62;
-   const int kPageRightButton = 63;
-   const int kCornerKnob = 79;
-   const int kPlayButton = 85;
-   const int kCircleButton = 86;
-   const int kNewButton = 87;
-   const int kDuplicateButton = 88;
-   const int kAutomateButton = 89;
-   const int kFixedLengthButton = 90;
-   const int kAboveScreenButtonRow = 102;
-   const int kDeviceButton = 110;
-   const int kBrowseButton = 111;
-   const int kMixButton = 112;
-   const int kClipButton = 113;
-   const int kQuantizeButton = 116;
-   const int kDoubleLoopButton = 117;
-   const int kDeleteButton = 118;
-   const int kUndoButton = 119;
-
-   const int kNumQuantizeButtons = 8;
-}
-#include "leathers/pop"
 
 Push2Control::Push2Control()
 : mSpawnLists(this)
@@ -126,8 +72,6 @@ Push2Control::Push2Control()
       mLedState[i] = -1;
    for (int i = 0; i < (int)mModuleGrid.size(); ++i)
       mModuleGrid[i] = nullptr;
-   for (int i = 0; i < 128; ++i)
-      mNoteHeldState[i] = 0;
    for (int i = 0; i < kNumQuantizeButtons; ++i)
       mBookmarkSlots.push_back(nullptr);
 }
@@ -248,7 +192,7 @@ void Push2Control::DrawDisplayModuleRect(ofRectangle rect, float thickness)
    ofSetColor(255, 255, 255, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, 60, 100));
    ofSetLineWidth(thickness);
    ofNoFill();
-   ofRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6);
+   ofRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, 6);
 }
 
 void Push2Control::PostRender()
@@ -259,6 +203,8 @@ void Push2Control::PostRender()
 
 void Push2Control::KeyPressed(int key, bool isRepeat)
 {
+   IDrawableModule::KeyPressed(key, isRepeat);
+
    if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
    {
       for (int i = 0; i < (int)mModuleGridManualCables.size(); ++i)
@@ -341,7 +287,7 @@ void Push2Control::LoadState(FileStreamIn& in, int rev)
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
       return; //this was saved before we added versioning, bail out
 
-   LoadStateValidate(rev >= GetModuleSaveStateRev());
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int numBookmarks;
    in >> numBookmarks;
@@ -388,7 +334,7 @@ bool Push2Control::Initialize()
 {
    if (!ThePushBridge.IsInitialized())
    {
-      if (auto result = ThePushBridge.Init(); result.Failed())
+      if (auto result = ThePushBridge.Init(ableton::DeviceType::Push2); result.Failed())
       {
          mPushBridgeInitErrMsg = result.GetDescription();
          ofLog() << mPushBridgeInitErrMsg;
@@ -805,7 +751,7 @@ void Push2Control::SetModuleGridLights()
    }
    else if (mGridControlInterface != nullptr)
    {
-      mGridControlInterface->UpdatePush2Leds(this);
+      mGridControlInterface->UpdateAbletonGridLeds(this);
    }
    else
    {
@@ -877,7 +823,7 @@ void Push2Control::DrawDisplayModuleControls()
 
       ofPushStyle();
       ofSetLineWidth(.5f);
-      int length = MAX(mButtonControls.size(), mSliderControls.size());
+      int length = MAX((int)mButtonControls.size(), (int)mSliderControls.size());
       if (length > 8)
       {
          ofRectangle bar(ableton::Push2DisplayBitmap::kWidth * kPixelRatio - 100, 3, 80, 10);
@@ -1016,36 +962,6 @@ void Push2Control::DrawRoutingDisplay()
    }
 }
 
-int Push2Control::GetPadColorForType(ModuleCategory type, bool enabled) const
-{
-   int color;
-   switch (type)
-   {
-      case kModuleCategory_Instrument:
-         color = enabled ? 26 : 116;
-         break;
-      case kModuleCategory_Note:
-         color = enabled ? 8 : 80;
-         break;
-      case kModuleCategory_Synth:
-         color = enabled ? 11 : 86;
-         break;
-      case kModuleCategory_Audio:
-         color = enabled ? 18 : 96;
-         break;
-      case kModuleCategory_Modulator:
-         color = enabled ? 22 : 110;
-         break;
-      case kModuleCategory_Pulse:
-         color = enabled ? 9 : 82;
-         break;
-      default:
-         color = enabled ? 118 : 119;
-         break;
-   }
-   return color;
-}
-
 ModuleCategory Push2Control::GetModuleTypeForSpawnList(IUIControl* control)
 {
    ModuleCategory moduleType = kModuleCategory_Other;
@@ -1117,7 +1033,7 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
 
       ofPushStyle();
       int pushControlIndex = i - mModuleViewOffset;
-      if (sliders && pushControlIndex >= 0 && pushControlIndex < 8 && mNoteHeldState[pushControlIndex])
+      if (sliders && pushControlIndex >= 0 && pushControlIndex < 8 && GetButtonState(kMidiMessage_Note, pushControlIndex))
       {
          DropdownList* dropdown = dynamic_cast<DropdownList*>(mSliderControls[i]);
          if (dropdown != nullptr)
@@ -1259,7 +1175,7 @@ std::string Push2Control::GetModuleTypeToSpawn()
 void Push2Control::SetDisplayModule(IDrawableModule* module, bool addToHistory)
 {
    mDisplayModule = module;
-   if (dynamic_cast<IPush2GridController*>(mDisplayModule) != nullptr)
+   if (dynamic_cast<IAbletonGridController*>(mDisplayModule) != nullptr)
       mDisplayModuleCanControlGrid = true;
    else
       mDisplayModuleCanControlGrid = false;
@@ -1383,7 +1299,16 @@ void Push2Control::SetLed(MidiMessageType type, int index, int color, int flashC
    }
 }
 
-void Push2Control::SetGridControlInterface(IPush2GridController* controller, IDrawableModule* module)
+bool Push2Control::GetButtonState(MidiMessageType type, int index) const
+{
+   if (type == kMidiMessage_Control)
+      index += 128;
+   assert(index >= 0 && index < 128 * 2);
+
+   return mButtonState[index];
+}
+
+void Push2Control::SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module)
 {
    mGridControlInterface = controller;
    mGridControlModule = module;
@@ -1393,18 +1318,20 @@ void Push2Control::SetGridControlInterface(IPush2GridController* controller, IDr
 
 void Push2Control::OnMidiNote(MidiNote& note)
 {
+   mButtonState[note.mPitch] = note.mVelocity > 0;
+
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnPush2Control(this, kMidiMessage_Note, note.mPitch, note.mVelocity);
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kMidiMessage_Note, note.mPitch, note.mVelocity);
       if (handled)
          return;
    }
 
-   if (note.mPitch >= 0 && note.mPitch <= 7) //main encoders
+   if (note.mPitch >= kMainEncoderTouchSection && note.mPitch < kMainEncoderTouchSection + kNumMainEncoders) //main encoders
    {
       if (mScreenDisplayMode == ScreenDisplayMode::kNormal || mScreenDisplayMode == ScreenDisplayMode::kMap)
       {
-         int controlIndex = note.mPitch + mModuleViewOffset;
+         int controlIndex = note.mPitch - kMainEncoderTouchSection + mModuleViewOffset;
          if (controlIndex < mSliderControls.size())
          {
             if (note.mVelocity > 0)
@@ -1499,17 +1426,17 @@ void Push2Control::OnMidiNote(MidiNote& note)
 
       if (note.mVelocity > 0)
          mHeldKnobIndex = note.mPitch;
-      else
+      else if (note.mPitch == mHeldKnobIndex)
          mHeldKnobIndex = -1;
    }
-   else if (note.mPitch >= 36 && note.mPitch <= 99 && mGridControlInterface == nullptr) //pads
+   else if (note.mPitch >= kPadsSection && note.mPitch < kPadsSection + kNumPads && mGridControlInterface == nullptr) //pads
    {
       if (mScreenDisplayMode == ScreenDisplayMode::kAddModule && mSelectedGridSpawnListIndex != -1 && mSelectedGridSpawnListIndex < (int)mSpawnLists.GetDropdowns().size())
       {
          if (note.mVelocity > 0)
          {
             auto* list = mSpawnLists.GetDropdowns()[mSelectedGridSpawnListIndex]->GetList();
-            int padNum = note.mPitch - 36;
+            int padNum = note.mPitch - kPadsSection;
             int gridX = padNum % 8;
             int gridY = padNum / 8;
             int gridIndex = gridX + (7 - gridY) * 8 + mModuleViewOffset * 8;
@@ -1589,22 +1516,22 @@ void Push2Control::OnMidiNote(MidiNote& note)
    {
       //ofLog() << "note " << note.mPitch << " " << note.mVelocity;
    }
-
-   mNoteHeldState[note.mPitch] = note.mVelocity > 0;
 }
 
 void Push2Control::OnMidiControl(MidiControl& control)
 {
+   mButtonState[control.mControl + 128] = control.mValue > 0;
+
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnPush2Control(this, kMidiMessage_Control, control.mControl, control.mValue);
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kMidiMessage_Control, control.mControl, control.mValue);
       if (handled)
          return;
    }
 
-   if (control.mControl >= 71 && control.mControl <= 78) //main encoders
+   if (control.mControl >= kMainEncoderSection && control.mControl < kMainEncoderSection + kNumMainEncoders) //main encoders
    {
-      int controlIndex = control.mControl - 71 + mModuleViewOffset;
+      int controlIndex = control.mControl - kMainEncoderSection + mModuleViewOffset;
       bool justResetParameter = gTime - mLastResetTime < 1000;
       if (controlIndex < mSliderControls.size() && !justResetParameter)
       {
@@ -1696,7 +1623,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
             SetDisplayModule(mRoutingInputModules[index].mModule, true);
       }
    }
-   else if (control.mControl == 14) //leftmost clicky encoder
+   else if (control.mControl == kClickyEncoder) //leftmost clicky encoder
    {
       int increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
       if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
@@ -1976,17 +1903,17 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       if (control.mValue > 0)
       {
-         IPush2GridController* controller = dynamic_cast<IPush2GridController*>(mDisplayModule);
+         IAbletonGridController* controller = dynamic_cast<IAbletonGridController*>(mDisplayModule);
          if (controller != nullptr && controller != mGridControlInterface)
          {
             SetGridControlInterface(controller, mDisplayModule);
 
-            for (int i = 36; i <= 99; ++i)
+            for (int i = kPadsSection; i < kPadsSection + kNumPads; ++i)
                SetLed(kMidiMessage_Note, i, 0);
             //turn touch strip off
             std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
             GetDevice()->SendSysEx(touchStripLights);
-            mGridControlInterface->OnPush2Connect();
+            mGridControlInterface->OnAbletonGridConnect(this);
 
             mScreenDisplayMode = ScreenDisplayMode::kNormal;
             UpdateControlList();
@@ -2099,7 +2026,7 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
    if (mGridControlInterface != nullptr)
    {
-      bool handled = mGridControlInterface->OnPush2Control(this, kMidiMessage_PitchBend, pitchBend.mChannel, pitchBend.mValue);
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kMidiMessage_PitchBend, pitchBend.mChannel, pitchBend.mValue);
       if (handled)
          return;
    }

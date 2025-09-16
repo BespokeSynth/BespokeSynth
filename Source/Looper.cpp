@@ -332,10 +332,13 @@ void Looper::Process(double time)
             output[ch] += GetInterpolatedSample(normalOffset, mBuffer->GetChannel(ch), mLoopLength) * (1 - mFourTet);
          }
 
-         //write one sample the past so we don't end up feeding into the next output
          float writeAmount = mWriteInputRamp.Value(time);
          if (writeAmount > 0)
-            WriteInterpolatedSample(offset - 1, mBuffer->GetChannel(ch), mLoopLength, mLastInputSample[ch] * writeAmount);
+         {
+            //write at least one sample the past so we don't end up feeding into the next output
+            int writeOffsetSamples = MAX(int(mWriteMsOffset * gSampleRateMs), 1);
+            WriteInterpolatedSample(offset - writeOffsetSamples, mBuffer->GetChannel(ch), mLoopLength, mLastInputSample[ch] * writeAmount);
+         }
          mLastInputSample[ch] = GetBuffer()->GetChannel(ch)[i];
 
          output[ch] = mSwitchAndRamp.Process(ch, output[ch] * volSq);
@@ -370,7 +373,7 @@ void Looper::Process(double time)
 
    GetBuffer()->Reset();
 
-   if (mCommitBuffer && !mClearCommitBuffer && !mWantRewrite)
+   if (mDoCommit)
       DoCommit(time);
    if (mWantShiftMeasure)
       DoShiftMeasure();
@@ -386,51 +389,73 @@ void Looper::Process(double time)
       if (mRewriter)
          mRewriter->Go(time);
    }
+
+   if (mCommitSamplesProgress >= 0)
+      ProcessCommit(std::max(1000, gBufferSize));
 }
 
 void Looper::DoCommit(double time)
 {
-   PROFILER(LooperDoCommit);
-
    assert(mCommitBuffer);
+   mDoCommit = false;
 
-   {
-      PROFILER(Looper_DoCommit_undo);
-      mUndoBuffer->CopyFrom(mBuffer, mLoopLength);
-   }
-
-   if (mReplaceOnCommit)
-      Clear();
+   int commitSamplesBack = int(mCommitMsOffset / gInvSampleRateMs);
+   mCommitLength = mLoopLength + LOOPER_COMMIT_FADE_SAMPLES;
+   mCommitBufferStartSample = (mCommitBuffer->GetRawBufferOffset(0) - mCommitLength + commitSamplesBack + mCommitBuffer->Size()) % mCommitBuffer->Size();
+   mCommitTargetBufferOffset = mLoopPos - LOOPER_COMMIT_FADE_SAMPLES;
+   mCommitSamplesProgress = 0;
 
    if (mMute)
    {
-      Clear();
       mMute = false;
       mMuteRamp.Start(time, mMute ? 0 : 1, time + 1);
    }
+}
 
+void Looper::ProcessCommit(int numSamplesToProcess)
+{
+   if (mCommitSamplesProgress == 0)
+      numSamplesToProcess = std::max(numSamplesToProcess, gBufferSize); //always commit at least 1 buffer's worth for the first chunk
+
+   bool done = false;
+   int commitSamplesLeft = mCommitLength - mCommitSamplesProgress;
+   if (numSamplesToProcess > commitSamplesLeft)
    {
-      PROFILER(LooperDoCommit_commit);
-      int commitSamplesBack = mCommitMsOffset / gInvSampleRateMs;
-      int commitLength = mLoopLength + LOOPER_COMMIT_FADE_SAMPLES;
-      for (int i = 0; i < commitLength; ++i)
-      {
-         int idx = i - LOOPER_COMMIT_FADE_SAMPLES;
-         int pos = int(mLoopPos + (idx * GetPlaybackSpeed()) + mLoopLength) % mLoopLength;
-         float fade = 1;
-         if (idx < 0)
-            fade = float(LOOPER_COMMIT_FADE_SAMPLES + idx) / LOOPER_COMMIT_FADE_SAMPLES;
-         if (idx >= mLoopLength - LOOPER_COMMIT_FADE_SAMPLES)
-            fade = 1 - (float(idx - (mLoopLength - LOOPER_COMMIT_FADE_SAMPLES)) / LOOPER_COMMIT_FADE_SAMPLES);
-
-         for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
-         {
-            mBuffer->GetChannel(ch)[pos] += mCommitBuffer->GetSample(ofClamp(commitLength - i - commitSamplesBack, 0, MAX_BUFFER_SIZE - 1), ch) * fade;
-         }
-      }
+      numSamplesToProcess = commitSamplesLeft;
+      done = true;
    }
 
-   mClearCommitBuffer = true;
+   int undoSamplesToCopy = numSamplesToProcess;
+   if (mCommitSamplesProgress + undoSamplesToCopy > mLoopLength)
+      undoSamplesToCopy = mLoopLength - mCommitSamplesProgress;
+   if (undoSamplesToCopy > 0)
+      mUndoBuffer->CopyFrom(mBuffer, numSamplesToProcess, mCommitSamplesProgress);
+
+   for (int i = 0; i < numSamplesToProcess; ++i)
+   {
+      float fade = 1;
+      if (mCommitSamplesProgress < LOOPER_COMMIT_FADE_SAMPLES)
+         fade = float(mCommitSamplesProgress) / LOOPER_COMMIT_FADE_SAMPLES;
+      if (mCommitSamplesProgress >= mLoopLength)
+         fade = 1 - (float(mCommitSamplesProgress - mLoopLength) / LOOPER_COMMIT_FADE_SAMPLES);
+      for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
+      {
+         float writeSample = mCommitBuffer->GetRawBuffer()->GetChannel(ch)[(mCommitBufferStartSample + mCommitSamplesProgress) % mCommitBuffer->Size()] * fade;
+         int writeToIndex = (mCommitSamplesProgress + mCommitTargetBufferOffset) % mLoopLength;
+         if (mMute || mReplaceOnCommit)
+            mBuffer->GetChannel(ch)[writeToIndex] = writeSample;
+         else
+            mBuffer->GetChannel(ch)[writeToIndex] += writeSample;
+      }
+
+      ++mCommitSamplesProgress;
+   }
+
+   if (done)
+   {
+      mCommitSamplesProgress = -1;
+      mClearCommitBuffer = true;
+   }
 }
 
 void Looper::Fill(ChannelBuffer* buffer, int length)
@@ -896,7 +921,10 @@ void Looper::UpdateNumBars(int oldNumBars)
       for (int i = 1; i < mNumBars / oldNumBars; ++i)
       {
          for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
-            BufferCopy(mBuffer->GetChannel(ch) + oldLoopLength * i, mBuffer->GetChannel(ch), oldLoopLength);
+         {
+            if (oldLoopLength * i + oldLoopLength < MAX_BUFFER_SIZE)
+               BufferCopy(mBuffer->GetChannel(ch) + oldLoopLength * i, mBuffer->GetChannel(ch), oldLoopLength);
+         }
       }
    }
 }
@@ -987,6 +1015,7 @@ void Looper::Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float off
    mCommitBuffer = commitBuffer;
    mReplaceOnCommit = replaceOnCommit;
    mCommitMsOffset = offsetMs;
+   mDoCommit = true;
 }
 
 void Looper::SetMute(double time, bool mute)
@@ -1151,16 +1180,27 @@ void Looper::CheckboxUpdated(Checkbox* checkbox, double time)
    }
    if (checkbox == mWriteInputCheckbox)
    {
-      if (mWriteInput)
-      {
-         if (mBufferTempo != TheTransport->GetTempo())
-            ResampleForSpeed(GetPlaybackSpeed());
-         mWriteInputRamp.Start(time, 1, time + 10);
-      }
-      else
-      {
-         mWriteInputRamp.Start(time, 0, time + 10);
-      }
+      SetRecording(time, mWriteInput);
+   }
+}
+
+void Looper::SetRecording(bool record)
+{
+   SetRecording(NextBufferTime(false), record);
+}
+
+void Looper::SetRecording(double time, bool record)
+{
+   mWriteInput = record;
+   if (mWriteInput)
+   {
+      if (mBufferTempo != TheTransport->GetTempo())
+         ResampleForSpeed(GetPlaybackSpeed());
+      mWriteInputRamp.Start(time, 1, time + 10);
+   }
+   else
+   {
+      mWriteInputRamp.Start(time, 0, time + 10);
    }
 }
 
@@ -1252,14 +1292,14 @@ void Looper::Rewrite()
    mWantRewrite = true;
 }
 
-void Looper::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void Looper::PlayNote(NoteMessage note)
 {
    //jump around in loop
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      float measurePos = fmod(pitch / 16.0f, mNumBars);
+      float measurePos = fmod(note.pitch / 16.0f, mNumBars);
       float sampsPerBar = TheTransport->MsPerBar() / 1000.0f * gSampleRate;
-      mLoopPosOffset = (measurePos - fmod(TheTransport->GetMeasureTime(time), mNumBars)) * sampsPerBar;
+      mLoopPosOffset = (measurePos - fmod(TheTransport->GetMeasureTime(note.time), mNumBars)) * sampsPerBar;
       if (mLoopPosOffset < 0)
          mLoopPosOffset += mLoopLength;
       mLoopPosOffsetSlider->DisableLFO();
@@ -1269,7 +1309,7 @@ void Looper::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modula
 void Looper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("decay", moduleInfo, false);
+   mModuleSaveData.LoadFloat("write_offset_ms", moduleInfo, 0, 0, 2000, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -1277,8 +1317,7 @@ void Looper::LoadLayout(const ofxJSONElement& moduleInfo)
 void Looper::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-
-   mDecay = mModuleSaveData.GetFloat("decay");
+   mWriteMsOffset = mModuleSaveData.GetFloat("write_offset_ms");
 }
 
 void Looper::SaveState(FileStreamOut& out)

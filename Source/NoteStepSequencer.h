@@ -44,7 +44,7 @@
 
 class PatchCableSource;
 
-class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver, public IGridControllerListener, public IDrivableSequencer, public IPush2GridController
+class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver, public IGridControllerListener, public IDrivableSequencer, public IAbletonGridController
 {
 public:
    NoteStepSequencer();
@@ -63,7 +63,16 @@ public:
 
    UIGrid* GetGrid() const { return mGrid; }
 
-   int RowToPitch(int row);
+   enum NoteMode
+   {
+      kNoteMode_Scale,
+      kNoteMode_Chromatic,
+      kNoteMode_Pentatonic,
+      kNoteMode_Fifths
+   };
+
+   static int RowToPitch(NoteMode noteMode, int row, int octave, int rowOffset);
+
    int PitchToRow(int pitch);
    void SetStep(int index, int step, int velocity, float length);
    void SetPitch(int index, int pitch, int velocity, float length);
@@ -78,9 +87,10 @@ public:
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
@@ -102,7 +112,7 @@ public:
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IGridControllerListener
@@ -133,8 +143,9 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
-   void UpdateGridControllerLights(bool force);
+   void KeyPressed(int key, bool isRepeat) override;
 
+   void UpdateGridControllerLights(bool force);
    int ButtonToStep(int button);
    int StepToButton(int step);
    void SyncGridToSeq();
@@ -149,15 +160,8 @@ private:
    void RandomizeLengths();
    void Step(double time, float velocity, int pulseFlags);
    void SendNoteToCable(int index, double time, int pitch, int velocity);
-   void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
-
-   enum NoteMode
-   {
-      kNoteMode_Scale,
-      kNoteMode_Chromatic,
-      kNoteMode_Pentatonic,
-      kNoteMode_Fifths
-   };
+   void GetPush2Layout(AbletonDeviceType deviceType, int& sequenceRows, int& pitchCols, int& pitchRows);
+   void Clear();
 
    int mTones[NSS_MAX_STEPS]{};
    int mVels[NSS_MAX_STEPS]{};

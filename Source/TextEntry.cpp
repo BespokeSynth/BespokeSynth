@@ -276,7 +276,7 @@ void TextEntry::MakeActiveTextEntry(bool setCaretToEnd)
 void TextEntry::RemoveSelectedText()
 {
    int caretStart = MAX(0, MIN(mCaretPosition, mCaretPosition2));
-   int caretEnd = MIN(strlen(mString), MAX(mCaretPosition, mCaretPosition2));
+   int caretEnd = MIN((int)strlen(mString), MAX(mCaretPosition, mCaretPosition2));
    std::string newString = mString;
    strcpy(mString, (newString.substr(0, caretStart) + newString.substr(caretEnd)).c_str());
    MoveCaret(caretStart, false);
@@ -285,7 +285,7 @@ void TextEntry::RemoveSelectedText()
 void TextEntry::SelectAll()
 {
    mCaretPosition = 0;
-   mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+   mCaretPosition2 = (int)strnlen(mString, MAX_TEXTENTRY_LENGTH);
 }
 
 void TextEntry::OnKeyPressed(int key, bool isRepeat)
@@ -563,13 +563,13 @@ void TextEntry::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    if (mType == kTextEntry_Int)
    {
-      *mVarInt = std::round(value);
+      *mVarInt = ofClamp(std::round(value), mIntMin, mIntMax);
       UpdateDisplayString();
    }
 
    if (mType == kTextEntry_Float)
    {
-      *mVarFloat = value;
+      *mVarFloat = ofClamp(value, mFloatMin, mFloatMax);
       UpdateDisplayString();
    }
 }

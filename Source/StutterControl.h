@@ -35,7 +35,7 @@
 #include "INoteReceiver.h"
 #include "Push2Control.h"
 
-class StutterControl : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IGridControllerListener, public INoteReceiver, public IPush2GridController
+class StutterControl : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IGridControllerListener, public INoteReceiver, public IAbletonGridController
 {
 public:
    StutterControl();
@@ -56,12 +56,12 @@ public:
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx) override {}
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;

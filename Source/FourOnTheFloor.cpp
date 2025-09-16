@@ -64,7 +64,7 @@ void FourOnTheFloor::OnTimeEvent(double time)
       return;
 
    int kick = 0;
-   PlayNoteOutput(time, kick, 127, -1);
+   PlayNoteOutput(NoteMessage(time, kick, 127));
 }
 
 void FourOnTheFloor::CheckboxUpdated(Checkbox* checkbox, double time)

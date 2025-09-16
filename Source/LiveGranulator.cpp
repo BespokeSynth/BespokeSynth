@@ -78,6 +78,12 @@ void LiveGranulator::CreateUIControls()
    FLOATSLIDER(mPosSlider, "pos", &mPos, -gSampleRate, gSampleRate);
    ENDUIBLOCK0();
 
+   float dummyHeight;
+   UIBLOCK(mBufferX + kBufferWidth + 3, 3, 80);
+   DROPDOWN(mGrainWindowTypeSelector, "window type", ((int*)(&mGranulator.mWindowType)), 80);
+   FLOATSLIDER(mGrainWindowShapeSlider, " shape", &mGranulator.mWindowShape, 0, 1);
+   ENDUIBLOCK(mWidth, dummyHeight);
+
    mAutoCaptureDropdown->AddLabel("none", kInterval_None);
    mAutoCaptureDropdown->AddLabel("4n", kInterval_4n);
    mAutoCaptureDropdown->AddLabel("8n", kInterval_8n);
@@ -86,6 +92,10 @@ void LiveGranulator::CreateUIControls()
    mGranPosRandomize->SetMode(FloatSlider::kSquare);
    mGranSpeedRandomize->SetMode(FloatSlider::kSquare);
    mGranLengthMs->SetMode(FloatSlider::kSquare);
+
+   mGrainWindowTypeSelector->AddLabel("round", (int)GrainWindowType::Round);
+   mGrainWindowTypeSelector->AddLabel("triangle", (int)GrainWindowType::Triangle);
+   mGrainWindowTypeSelector->AddLabel("envelope", (int)GrainWindowType::Envelope);
 }
 
 LiveGranulator::~LiveGranulator()
@@ -121,9 +131,11 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          float sample[ChannelBuffer::kMaxNumChannels];
          Clear(sample, ChannelBuffer::kMaxNumChannels);
-         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0) - mFreezeExtraSamples - 1 + mPos, sample);
+         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0) - mFreezeExtraSamples - 1 - gBufferSize + mPos, 1.0f, sample);
+         float grainProportion = std::clamp((mGranulator.mGrainOverlap - 1) / (MAX_GRAINS - 1), 0.0f, 1.0f);
+         float gainScale = ofLerp(.333f, 1.0f, (1 - grainProportion) * (1 - grainProportion) * (1 - grainProportion));
          for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
-            buffer->GetChannel(ch)[i] = mDry * buffer->GetChannel(ch)[i] + sample[ch];
+            buffer->GetChannel(ch)[i] = mDry * buffer->GetChannel(ch)[i] + sample[ch] * gainScale;
       }
 
       time += gInvSampleRateMs;
@@ -147,14 +159,19 @@ void LiveGranulator::DrawModule()
    mAutoCaptureDropdown->Draw();
    mGranSpacingRandomize->Draw();
    mWidthSlider->Draw();
+   mGrainWindowTypeSelector->Draw();
+   mGrainWindowShapeSlider->Draw();
    if (mEnabled)
    {
       int drawLength = MIN(mBufferLength, gSampleRate * 2);
       if (mFreeze)
          drawLength = MIN(mBufferLength, drawLength + mFreezeExtraSamples);
       mBuffer.Draw(mBufferX, 3, kBufferWidth, kBufferHeight, drawLength);
-      mGranulator.Draw(mBufferX, 3 + 20, kBufferWidth, kBufferHeight - 20 * 2, mBuffer.GetRawBufferOffset(0) - drawLength, drawLength, mBufferLength);
+      mGranulator.Draw(mBufferX, 3 + 20, kBufferWidth, kBufferHeight - 20 * 2, mBuffer.GetRawBufferOffset(0) - drawLength, drawLength, mBufferLength, 1.0f);
    }
+
+   ofRectangle sliderRect = mGrainWindowShapeSlider->GetRect(K(local));
+   mGranulator.DrawWindow(sliderRect.x + 3, sliderRect.getMaxY() + 3, sliderRect.width, 40);
 }
 
 float LiveGranulator::GetEffectAmount()

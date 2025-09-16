@@ -50,6 +50,7 @@ void NoteDelayer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mDelaySlider = new FloatSlider(this, "delay", 4, 4, 100, 15, &mDelay, 0, 1, 4);
+   mDelayMsSlider = new FloatSlider(this, "delay ms", 4, 4, 100, 15, &mDelayMs, 0, 500);
 }
 
 void NoteDelayer::DrawModule()
@@ -57,9 +58,18 @@ void NoteDelayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mDelaySlider->SetShowing(!mDelayInMs);
+   mDelayMsSlider->SetShowing(mDelayInMs);
    mDelaySlider->Draw();
+   mDelayMsSlider->Draw();
 
-   float t = (gTime - mLastNoteOnTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
+   float delayMs;
+   if (mDelayInMs)
+      delayMs = mDelayMs;
+   else
+      delayMs = mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+
+   float t = (gTime - mLastNoteOnTime) / delayMs;
    if (t > 0 && t < 1)
    {
       ofPushStyle();
@@ -93,34 +103,35 @@ void NoteDelayer::OnTransportAdvanced(float amount)
       end += kQueueSize;
    for (int i = mConsumeIndex; i < end; ++i)
    {
-      const NoteInfo& info = mInputNotes[i % kQueueSize];
-      if (NextBufferTime(true) >= info.mTriggerTime)
+      const NoteMessage note = mInputNotes[i % kQueueSize];
+      if (NextBufferTime(true) >= note.time)
       {
-         PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
+         PlayNoteOutput(note);
          mConsumeIndex = (mConsumeIndex + 1) % kQueueSize;
       }
    }
 }
 
-void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteDelayer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation); // Passthrough notes.
+      PlayNoteOutput(note); // Passthrough notes.
       return;
    }
 
-   if (velocity > 0)
-      mLastNoteOnTime = time;
+   if (note.velocity > 0)
+      mLastNoteOnTime = note.time;
 
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
-      NoteInfo info;
-      info.mPitch = pitch;
-      info.mVelocity = velocity;
-      info.mTriggerTime = time + mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
-      info.mModulation = modulation;
-      mInputNotes[mAppendIndex] = info;
+      mInputNotes[mAppendIndex] = note;
+      float delayMs;
+      if (mDelayInMs)
+         delayMs = mDelayMs;
+      else
+         delayMs = mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      mInputNotes[mAppendIndex].time += delayMs;
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;
    }
 }
@@ -132,6 +143,7 @@ void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double t
 void NoteDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("delay_in_milliseconds", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -139,4 +151,5 @@ void NoteDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteDelayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mDelayInMs = mModuleSaveData.GetBool("delay_in_milliseconds");
 }

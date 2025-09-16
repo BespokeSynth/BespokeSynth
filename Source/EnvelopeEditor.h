@@ -38,7 +38,7 @@
 class EnvelopeControl
 {
 public:
-   EnvelopeControl(ofVec2f position, ofVec2f dimensions);
+   EnvelopeControl(ofVec2f position, ofVec2f dimensions, EnvelopeEditor* editor);
    void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
    void OnClicked(float x, float y, bool right);
    void MouseMoved(float x, float y);
@@ -62,6 +62,7 @@ private:
 
    ofVec2f mPosition;
    ofVec2f mDimensions;
+   EnvelopeEditor* mEditor{ nullptr };
    ::ADSR* mAdsr{ nullptr };
    ::ADSR mClickAdsr;
    bool mClick{ false };
@@ -104,6 +105,7 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
+   ofVec2f GetCurveSliderExtentsForStage(int stage) const;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void GetModuleDimensions(float& width, float& height) override

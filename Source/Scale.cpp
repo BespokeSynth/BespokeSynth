@@ -785,7 +785,7 @@ void Scale::LoadState(FileStreamIn& in, int rev)
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)
       in >> rev;
-   LoadStateValidate(rev >= GetModuleSaveStateRev());
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
 
    int inton;
    in >> inton;

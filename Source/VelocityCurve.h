@@ -44,7 +44,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -69,7 +69,7 @@ private:
 
    void OnClicked(float x, float y, bool right) override;
 
-   EnvelopeControl mEnvelopeControl{ ofVec2f{ 3, 3 }, ofVec2f{ 100, 100 } };
+   EnvelopeControl mEnvelopeControl{ ofVec2f{ 3, 3 }, ofVec2f{ 100, 100 }, nullptr };
    ::ADSR mAdsr;
    float mLastInputVelocity{ 0 };
    double mLastInputTime{ -9999 };

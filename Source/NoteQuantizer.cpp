@@ -71,47 +71,45 @@ void NoteQuantizer::DrawModule()
    mNoteRepeatCheckbox->Draw();
 }
 
-void NoteQuantizer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteQuantizer::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
    if (mQuantizeInterval == kInterval_None)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
    }
    else
    {
-      if (pitch < mInputInfos.size())
+      if (note.pitch < mInputInfos.size())
       {
-         if (velocity > 0)
+         if (note.velocity > 0)
          {
-            if ((mScheduledOffs[pitch] || mPreScheduledOffs[pitch] || mInputInfos[pitch].held) && mInputInfos[pitch].voiceIdx != voiceIdx)
+            if ((mScheduledOffs[note.pitch] || mPreScheduledOffs[note.pitch] || mInputInfos[note.pitch].held) && mInputInfos[note.pitch].note.voiceIdx != note.voiceIdx)
             {
-               PlayNoteOutput(time, pitch, 0, mInputInfos[pitch].voiceIdx, mInputInfos[pitch].modulation);
-               mScheduledOffs[pitch] = false;
-               mPreScheduledOffs[pitch] = false;
+               PlayNoteOutput(mInputInfos[note.pitch].note.MakeNoteOff());
+               mScheduledOffs[note.pitch] = false;
+               mPreScheduledOffs[note.pitch] = false;
             }
-            mInputInfos[pitch].velocity = velocity;
-            mInputInfos[pitch].voiceIdx = voiceIdx;
-            mInputInfos[pitch].modulation = modulation;
-            mInputInfos[pitch].held = true;
-            mInputInfos[pitch].hasPlayedYet = false;
+            mInputInfos[note.pitch].note = note;
+            mInputInfos[note.pitch].held = true;
+            mInputInfos[note.pitch].hasPlayedYet = false;
          }
          else
          {
-            if (mInputInfos[pitch].hasPlayedYet)
-               mScheduledOffs[pitch] = true;
+            if (mInputInfos[note.pitch].hasPlayedYet)
+               mScheduledOffs[note.pitch] = true;
             else
-               mPreScheduledOffs[pitch] = true;
+               mPreScheduledOffs[note.pitch] = true;
 
             if (mNoteRepeat)
-               mInputInfos[pitch].velocity = 0;
+               mInputInfos[note.pitch].note.velocity = 0;
 
-            mInputInfos[pitch].held = false;
+            mInputInfos[note.pitch].held = false;
          }
       }
    }
@@ -123,16 +121,21 @@ void NoteQuantizer::OnEvent(double time, float strength)
    {
       if (mScheduledOffs[i])
       {
-         PlayNoteOutput(time, i, 0, mInputInfos[i].voiceIdx, mInputInfos[i].modulation);
+         NoteMessage noteOff = mInputInfos[i].note.MakeNoteOff();
+         noteOff.time = time;
+         PlayNoteOutput(noteOff);
          mScheduledOffs[i] = false;
       }
 
-      if (mInputInfos[i].velocity > 0)
+      if (mInputInfos[i].note.velocity > 0)
       {
-         PlayNoteOutput(time, i, mInputInfos[i].velocity * strength, mInputInfos[i].voiceIdx, mInputInfos[i].modulation);
+         NoteMessage note = mInputInfos[i].note;
+         note.time = time;
+         note.velocity *= strength;
+         PlayNoteOutput(note);
          mInputInfos[i].hasPlayedYet = true;
          if (!mNoteRepeat)
-            mInputInfos[i].velocity = 0;
+            mInputInfos[i].note.velocity = 0;
          else
             mScheduledOffs[i] = true;
          if (mPreScheduledOffs[i])

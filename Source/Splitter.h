@@ -44,6 +44,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   bool CanMinimize() override { return false; }
 
    //IAudioSource
    void Process(double time) override;

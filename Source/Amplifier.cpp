@@ -35,7 +35,8 @@ Amplifier::Amplifier()
 void Amplifier::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGainSlider = new FloatSlider(this, "gain", 5, 2, 110, 15, &mGain, 0, 4);
+   mGainSlider = new FloatSlider(this, "gain", 5, 2, 110, 15, &mGain, 0, 2);
+   mGainSlider->SetMode(FloatSlider::kSquare);
 }
 
 Amplifier::~Amplifier()
@@ -54,6 +55,8 @@ void Amplifier::Process(double time)
    SyncBuffers();
    int bufferSize = GetBuffer()->BufferSize();
 
+   mNumChannels = GetBuffer()->NumActiveChannels();
+
    ChannelBuffer* out = target->GetBuffer();
    for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
@@ -65,11 +68,18 @@ void Amplifier::Process(double time)
             ComputeSliders(i);
             gWorkBuffer[i] = getBufferChannelCh[i] * mGain;
          }
+
+         if (mShowLevelMeter)
+            mLevelMeterDisplay.Process(ch, gWorkBuffer, bufferSize);
+
          Add(out->GetChannel(ch), gWorkBuffer, GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), ch);
       }
       else
       {
+         if (mShowLevelMeter)
+            mLevelMeterDisplay.Process(ch, getBufferChannelCh, bufferSize);
+
          Add(out->GetChannel(ch), getBufferChannelCh, GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(getBufferChannelCh, GetBuffer()->BufferSize(), ch);
       }
@@ -83,12 +93,55 @@ void Amplifier::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   if (mShowLevelMeter)
+   {
+      if (mNumChannels == 1)
+      {
+         DrawLevelMeter(3, 20, 114, 8);
+         mHeight = 30;
+      }
+      else
+      {
+         DrawLevelMeter(3, 20, 114, 18);
+         mHeight = 40;
+      }
+   }
+   else
+   {
+      mHeight = 22;
+   }
+
    mGainSlider->Draw();
+}
+
+void Amplifier::DrawLevelMeter(float x, float y, float w, float h)
+{
+   mLevelMeterDisplay.Draw(x, y, w, h, mNumChannels);
+}
+
+void Amplifier::GetLevel(float& level, float& watermarkLevel) const
+{
+   level = 0;
+   watermarkLevel = 0;
+   for (int i = 0; i < mNumChannels; ++i)
+   {
+      float channelLevel, channelWatermarkLevel;
+      mLevelMeterDisplay.GetLevel(i, channelLevel, channelWatermarkLevel);
+      level = std::max(level, channelLevel);
+      watermarkLevel = std::max(watermarkLevel, channelWatermarkLevel);
+   }
+}
+
+void Amplifier::SetShowLevelMeter(bool show)
+{
+   mShowLevelMeter = show;
+   mModuleSaveData.SetBool("show_level_meter", show);
 }
 
 void Amplifier::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("show_level_meter", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -96,4 +149,5 @@ void Amplifier::LoadLayout(const ofxJSONElement& moduleInfo)
 void Amplifier::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   mShowLevelMeter = mModuleSaveData.GetBool("show_level_meter");
 }

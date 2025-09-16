@@ -50,7 +50,7 @@ void NoteFlusher::ButtonClicked(ClickButton* button, double time)
    {
       mNoteOutput.Flush(time);
       for (int i = 0; i < 127; ++i)
-         mNoteOutput.PlayNote(time, i, 0);
+         mNoteOutput.PlayNote(NoteMessage(time, i, 0));
    }
 }
 

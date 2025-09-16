@@ -61,9 +61,9 @@ void NoteSustain::OnTransportAdvanced(float amount)
 {
    for (auto iter = mNoteOffs.begin(); iter != mNoteOffs.end();)
    {
-      if (iter->mTime < gTime)
+      if (iter->time < NextBufferTime(false))
       {
-         PlayNoteOutput(gTime, iter->mPitch, 0, iter->mVoiceIdx);
+         PlayNoteOutput(*iter);
          iter = mNoteOffs.erase(iter);
       }
       else
@@ -73,19 +73,18 @@ void NoteSustain::OnTransportAdvanced(float amount)
    }
 }
 
-void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void NoteSustain::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      PlayNoteOutput(note);
       return;
    }
 
-   if (velocity > 0)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
+      PlayNoteOutput(note);
+
       ComputeSliders(0);
 
       float durationMs = mSustain / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
@@ -93,17 +92,21 @@ void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       bool found = false;
       for (auto& queued : mNoteOffs)
       {
-         if (queued.mPitch == pitch)
+         if (queued.pitch == note.pitch)
          {
-            queued.mTime = time + durationMs;
-            queued.mVoiceIdx = voiceIdx;
+            queued.time = note.time + durationMs;
+            queued.voiceIdx = note.voiceIdx;
             found = true;
             break;
          }
       }
 
       if (!found)
-         mNoteOffs.push_back(QueuedNoteOff(time + durationMs, pitch, voiceIdx));
+      {
+         NoteMessage noteOff = note.MakeNoteOff();
+         noteOff.time = note.time + durationMs;
+         mNoteOffs.push_back(noteOff);
+      }
    }
 }
 

@@ -170,6 +170,7 @@ struct ofRectangle
       height += amount * 2;
       return *this;
    }
+   static ofRectangle include(const ofRectangle& a, const ofRectangle& b);
    float getMinX() const;
    float getMaxX() const;
    float getMinY() const;
@@ -238,6 +239,7 @@ private:
 
 typedef ofVec2f ofPoint;
 
+std::string ofToSamplePath(const std::string& path);
 std::string ofToDataPath(const std::string& path);
 std::string ofToFactoryPath(const std::string& path);
 std::string ofToResourcePath(const std::string& path);

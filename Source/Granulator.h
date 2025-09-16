@@ -27,21 +27,28 @@
 
 #include "BiquadFilter.h"
 #include "ChannelBuffer.h"
+#include "readerwriterqueue.h"
 
 #define MAX_GRAINS 32
 
 class Granulator;
 
+enum class GrainWindowType
+{
+   Round,
+   Triangle,
+   Envelope
+};
+
 class Grain
 {
 public:
-   void Spawn(Granulator* owner, double time, double pos, float speedMult, float lengthInMs, float vol, float width);
-   void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output);
-   void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength);
+   void Spawn(double time, double pos, float speedMult, float lengthInMs, float vol, float width);
+   void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output, const Granulator* granulator);
+   void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain, const Granulator* granulator);
    void Clear() { mVol = 0; }
 
 private:
-   double GetWindow(double time);
    double mPos{ 0 };
    float mSpeedMult{ 1 };
    double mStartTime{ 0 };
@@ -50,19 +57,22 @@ private:
    float mVol{ 0 };
    float mStereoPosition{ 0 };
    float mDrawPos{ .5 };
-   Granulator* mOwner{ nullptr };
 };
 
 class Granulator
 {
 public:
    Granulator();
-   void ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float* output);
-   void Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength);
+   void ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float speed, float* output);
+   void Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain);
+   void DrawWindow(float x, float y, float w, float h);
    void Reset();
    void ClearGrains();
    void SetLiveMode(bool live) { mLiveMode = live; }
+   void QueueGrainSpawn(double spawnTime);
+   inline double GetWindow(double phase) const;
 
+   bool mSpawnGrains{ true };
    float mSpeed{ 1 };
    float mGrainLengthMs{ 60 };
    float mGrainOverlap{ 10 };
@@ -71,13 +81,18 @@ public:
    float mSpacingRandomize{ 1 };
    bool mOctaves{ false };
    float mWidth{ 1 };
+   GrainWindowType mWindowType{ GrainWindowType::Round };
+   float mWindowShape{ 0.5f };
 
 private:
-   void SpawnGrain(double time, double offset, float width);
+   bool SpawnGrainIfReady(double currentTime, double spawnTime, ChannelBuffer* buffer, double offset, float speed);
+   void SpawnGrain(double time, double offset, float width, float speed);
 
    double mNextGrainSpawnMs{ 0 };
    int mNextGrainIdx{ 0 };
    Grain mGrains[MAX_GRAINS]{};
    bool mLiveMode{ false };
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels]{};
+   moodycamel::ReaderWriterQueue<double> mQueuedGrainSpawnTimes;
+   double mPendingQueuedGrainSpawnTime{ -1 };
 };

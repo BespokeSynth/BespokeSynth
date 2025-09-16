@@ -66,16 +66,17 @@ radiosequencer~sequence to only enable one value at a time. patch it to the "ena
 
 
 
-snapshots~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
+snapshots~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a snapshot to that square, and click on a grid square to load that snapshot. alt/option-click to delete a snapshot, and ctrl/command-click to rename a snapshot.
 ~blend~length of time in milliseconds over which to blend snapshot values
 ~snapshot~jump to a snapshot
 ~random~randomize connected controls
 ~add~snapshot the currently connected controls to the next available snapshot slot
-~clear~clear all snapshots
 ~store~when clicking/selecting a snapshot, store into that slot (alternately: hold the shift key)
 ~delete~when clicking/selecting a snapshot, delete that slot (alternately: hold the alt/option key)
-~auto-store on switch~when switching to a new slot, automatically store state in the current slot
 ~snapshot label~assign a label to this snapshot
+~grid~patch a grid in here from a "midicontroller" module
+~x offset~x offset of attached grid controller
+~y offset~y offset of attached grid controller
 
 
 
@@ -141,7 +142,7 @@ globalcontrols~interface controls, intended to allow you to use midi controllers
 ~background r~amount of red in background color
 ~background g~amount of green in background color
 ~background b~amount of blue in background color
-~corner roundness~how round bespoke's rectangles are
+~corner radius~how round bespoke's rectangles are
 ~cable alpha~opacity of the cables
 
 
@@ -230,7 +231,7 @@ pulsehocket~sends pulses to randomized destinations
 ~seed~number that determines the random sequence. send reset pulses to restart the deterministic random sequence.
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 
@@ -260,7 +261,7 @@ pulsechance~randomly allow pulses through, based on chance
 ~seed~number that determines the random sequence. send reset pulses to restart the deterministic random sequence.
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 pulsebutton~trigger a pulse with a button press
@@ -600,6 +601,11 @@ notecounter~advance through pitches sequentially. useful for driving the "notese
 ~length~length of the sequence
 ~random~output random pitches within the range, rather than sequential
 ~div~measure division, when using "div" as the interval
+~beat length~length over which the random sequence should deterministically repeat
+~seed~number that determines the random sequence
+~<~go to previous seed
+~*~generate a new random seed
+~>~go to next seed
 
 
 
@@ -683,11 +689,12 @@ fouronthefloor~sends note 0 every beat, to trigger a kick drum
 
 
 
-drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.
+drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity, or hover over a step and press the up and down arrow keys to adjust velocity.
 ~vel~velocity to use when setting a step
 ~measures~length of the sequence in measures
 ~clear~clear sequence
 ~yoff~vertical offset for grid controller's view of the pattern
+~velocitytype~velocity to use when setting a step
 ~offsets~show "offsets" sliders
 ~repeat~repeat input notes at this rate
 ~step~length of each step
@@ -731,6 +738,8 @@ circlesequencer~polyrhythmic sequencer that displays a loop as a circle
 ~length*~number of steps in this ring
 ~note*~pitch to use for this ring
 ~offset*~timing offset for this ring
+~<~rotate this ring to the left
+~>~rotate this ring to the right
 
 
 
@@ -768,6 +777,13 @@ vocoder~frequency band-based vocoder. this must be paired with a "vocodercarrier
 ~f range~frequency range to highest band
 ~q~resonance of the bands
 ~ring~how long it should take the bands to "cool down"
+
+
+voicemanager~distribute, filter or remap incoming notes to voices
+~voice distribution mode~the mode of distribution. Rotate: Selects next unused voice on every note. Reuse: Same as rotate except that it tries to reuse voice that had the same pitch. Reset: Always try to use the first unused voice. Random: Randomly select a voice that is unused 
+~voices~how many voices this module should distribute to
+~voice action *~what action to perform with this selected voice. Distribution is done first followed by voice limiting, filtering and lastly remapping.
+~voice dest *~the destination of the remapping of this voice
 
 
 voicesetter~set a specific Voice channel index for a note
@@ -888,6 +904,7 @@ looperrecorder~command center to manage recording into multiple loopers, and all
 ~2~capture the last 2 measures to the currently-targeted looper
 ~4~capture the last 4 measures to the currently-targeted looper
 ~8~capture the last 8 measures to the currently-targeted looper
+~16~capture the last 16 measures to the currently-targeted looper
 ~length~length in measures to use when connected loopers use the "commit" button
 ~2xtempo~double global transport tempo, while keeping connected loopers sounding the same
 ~.5tempo~halve global transport tempo, while keeping connected loopers sounding the same
@@ -1525,7 +1542,7 @@ velocitytochance~use a note's velocity to determine the chance that the note pla
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 
@@ -1740,7 +1757,7 @@ notehocket~sends notes to random destinations
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 
@@ -1787,7 +1804,7 @@ notechance~randomly allow notes through
 ~seed~number that determines the random sequence
 ~<~go to previous seed
 ~*~generate a new random seed
-~<~go to next seed
+~>~go to next seed
 
 
 
@@ -1915,11 +1932,14 @@ plugin~a hosted plugin instance, such as a VST
 ~vol~adjust the output volume
 ~program change~send a program change message to the plugin instance
 ~open~show the plugin window
-~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a plugin has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the plugin's interface.
+~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a plugin has more than 100 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle or change it within the plugin's interface.
+~load parameter~This shows the number of parameters exposed by the plugin. If you click here, up to a 100 parameters are attempted to be added to the parameter dropdown list. If you hold `shift` while clicking, the parameter sliders will be added as well. If you hold `control` the parameter list will be reset and recreated as if the plugin was spawned new.
 ~preset~choose from saved plugin presets
 ~save as~save the current plugin settings as a preset to load again later
 ~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
-
+~ + ~Manually add a new Stereo output from the plugin
+~  -  ~Remove the last manually added Stereo output from the plugin
+~ X ~Remove the parameter and all modulation connected to it
 
 
 transport~controls tempo and current time position
@@ -2091,6 +2111,7 @@ dotsequencer~polyphonic note sequencer with adjustable note length and velocity.
 ~octave~octave of the bottom pitch of this sequence
 ~row offset~amount to offset the mapping of row to pitch
 ~clear~clear the contents of the dot grid
+~double~double the length of this sequence
 ~dotgrid~the dot grid
 
 
@@ -2133,5 +2154,27 @@ dataprovider~provides modulation values normally not easily accessible.
 
 
 pulselimit~limit the number of pulses allowed to pass through
-~reset the counter of seen pulses
-~limit number of pulses to pass through
+~reset~reset the counter of seen pulses
+~limit~limit number of pulses to pass through
+
+audiosplitter~send an audio signal to multiple destinations
+
+acciaccatura~adds a quick grace note before playing the input pitch
+~offset~how far to offset initial pitch bend
+~notemode~should the offset be in scale steps, or chromatically in semitones?
+~hold ms~how long to hold offset pitch before transitioning to input pitch
+~glide ms~how long to spend bending between offset pitch and input pitch after hold ms
+
+stereorotation~rotates the phase of input audio
+~phase~phase offset
+
+latencycalculator~pair with a latencycalculatorreceiver to determine the latency with a system (either within bespoke, or external I/O latency with a microphone)
+~test~fire a test pulse that the receiver will listen for
+
+latencycalculatorreceiver~place this at the receiving end of a signal generated by latencycalculator (which could be directly within bespoke, or indirectly via microphone input)
+
+interface~create a custom collection of controls that refer to other controls. for detailed editing of the created controls, hover over the created control and press shift-enter to display an editor view.
+
+binaryvalue~convert modulated value to binary and send each bit to separate modulation cable
+~input~input value
+~code~code to use for conversion into binary representation

@@ -47,7 +47,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void OnTransportAdvanced(float amount) override;
 
@@ -60,14 +60,6 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   struct NoteInfo
-   {
-      int mPitch{ 0 };
-      int mVelocity{ 0 };
-      double mTriggerTime{ 0 };
-      ModulationParameters mModulation;
-   };
-
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
@@ -76,13 +68,16 @@ private:
       height = 22;
    }
 
+   bool mDelayInMs{ false };
    float mDelay{ .25 };
    FloatSlider* mDelaySlider{ nullptr };
+   float mDelayMs{ 100 };
+   FloatSlider* mDelayMsSlider{ nullptr };
 
    float mLastNoteOnTime{ 0 };
 
    static const int kQueueSize = 500;
-   NoteInfo mInputNotes[kQueueSize]{};
+   NoteMessage mInputNotes[kQueueSize]{};
    int mConsumeIndex{ 0 };
    int mAppendIndex{ 0 };
 };

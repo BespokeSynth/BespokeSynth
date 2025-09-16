@@ -111,6 +111,12 @@ void InputChannel::DrawModule()
       TheSynth->SetNextDrawTooltip("selected input device has zero channels. choose a new audio_input_device in 'settings'.");
 }
 
+void InputChannel::GetModuleDimensions(float& width, float& height)
+{
+   width = MAX(64, (mChannelSelector ? (mChannelSelector->GetRect(true).getMaxX() + 3) : 0));
+   height = 20;
+}
+
 void InputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadEnum<int>("channels", moduleInfo, 0, mChannelSelector);

@@ -51,7 +51,7 @@ public:
    void CreateUIControls() override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IAudioSource
@@ -99,10 +99,12 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
+   float GetSampleRateRatio() const;
    ChannelBuffer* GetSourceBuffer();
    float GetSourceStartSample();
    float GetSourceEndSample();
    float GetSourceBufferOffset();
+   int GetSampleNumChannels();
 
    struct GrainMPEVoice
    {
@@ -127,15 +129,17 @@ private:
    {
       GrainManualVoice();
       void Process(ChannelBuffer* output, int bufferSize);
-      void Draw(float w, float h);
+      void Draw(int index, float w, float h);
 
       float mGain{ 0 };
       float mPosition{ 0 };
       float mPan{ 0 };
+      float mLastInputVelocity{ 1.0f };
 
       Granulator mGranulator;
       SeaOfGrain* mOwner{ nullptr };
 
+      Checkbox* mEnabledCheckbox{ nullptr };
       FloatSlider* mGainSlider{ nullptr };
       FloatSlider* mPositionSlider{ nullptr };
       FloatSlider* mOverlapSlider{ nullptr };
@@ -149,6 +153,7 @@ private:
       FloatSlider* mPanSlider{ nullptr };
    };
 
+   bool mMPEMode{ false };
    static const int kNumMPEVoices = 16;
    GrainMPEVoice mMPEVoices[kNumMPEVoices];
    static const int kNumManualVoices = 6;
@@ -175,4 +180,8 @@ private:
    int mKeyboardBasePitch{ 36 };
    DropdownList* mKeyboardNumPitchesSelector{ nullptr };
    int mKeyboardNumPitches{ 24 };
+   GrainWindowType mGrainWindowType{ GrainWindowType::Round };
+   DropdownList* mGrainWindowTypeSelector{ nullptr };
+   float mGrainWindowShape{ 0.5f };
+   FloatSlider* mGrainWindowShapeSlider{ nullptr };
 };

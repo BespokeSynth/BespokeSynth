@@ -31,10 +31,8 @@ PitchBender::PitchBender()
 : mBend(0)
 , mBendSlider(nullptr)
 , mRange(2)
-//, mBendingCheckbox(this,"bending",HIDDEN_UICONTROL,HIDDEN_UICONTROL,mBendSlider->mTouching)
 , mModulation(true)
 {
-   //mBendSlider->SetRelative(true);
 }
 
 void PitchBender::Init()
@@ -62,15 +60,15 @@ void PitchBender::DrawModule()
    mBendSlider->Draw();
 }
 
-void PitchBender::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchBender::PlayNote(NoteMessage note)
 {
    if (mEnabled)
    {
-      mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
-      modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
+      mModulation.GetPitchBend(note.voiceIdx)->AppendTo(note.modulation.pitchBend);
+      note.modulation.pitchBend = mModulation.GetPitchBend(note.voiceIdx);
    }
 
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(note);
 }
 
 void PitchBender::OnTransportAdvanced(float amount)
@@ -80,16 +78,16 @@ void PitchBender::OnTransportAdvanced(float amount)
 
 void PitchBender::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   if (slider == mBendSlider)
+   if (mEnabled && slider == mBendSlider)
       mModulation.GetPitchBend(-1)->SetValue(mBend);
 }
 
 void PitchBender::CheckboxUpdated(Checkbox* checkbox, double time)
 {
-   /*if (checkbox == &mBendingCheckbox)
+   if (checkbox == mEnabledCheckbox && mEnabled)
    {
-      mBendSlider->UpdateTouching();
-   }*/
+      mModulation.GetPitchBend(-1)->SetValue(mBend);
+   }
 }
 
 void PitchBender::LoadLayout(const ofxJSONElement& moduleInfo)

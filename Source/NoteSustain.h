@@ -52,7 +52,7 @@ public:
    void OnTransportAdvanced(float amount) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void PlayNote(NoteMessage note) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
@@ -70,19 +70,7 @@ private:
       height = 22;
    }
 
-   struct QueuedNoteOff
-   {
-      QueuedNoteOff(double time, double pitch, double voiceIdx)
-      : mTime(time)
-      , mPitch(pitch)
-      , mVoiceIdx(voiceIdx)
-      {}
-      double mTime{ 0 };
-      int mPitch{ 0 };
-      int mVoiceIdx{ -1 };
-   };
-
    float mSustain{ .25 };
    FloatSlider* mSustainSlider{ nullptr };
-   std::list<QueuedNoteOff> mNoteOffs;
+   std::list<NoteMessage> mNoteOffs;
 };

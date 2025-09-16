@@ -43,9 +43,9 @@ PitchToSpeed::~PitchToSpeed()
 void PitchToSpeed::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 
    mReferenceFreqSlider = new FloatSlider(this, "ref freq", 3, 2, 100, 15, &mReferenceFreq, 10, 1000);
 }
@@ -63,12 +63,12 @@ void PitchToSpeed::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    OnModulatorRepatch();
 }
 
-void PitchToSpeed::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PitchToSpeed::PlayNote(NoteMessage note)
 {
-   if (mEnabled && velocity > 0)
+   if (mEnabled && note.velocity > 0)
    {
-      mPitch = pitch;
-      mPitchBend = modulation.pitchBend;
+      mPitch = note.pitch;
+      mPitchBend = note.modulation.pitchBend;
    }
 }
 

@@ -57,8 +57,6 @@ void FloatSliderLFOControl::CreateUIControls()
    DROPDOWN(mOscSelector, "osc", reinterpret_cast<int*>(&mLFOSettings.mOscType), 47);
    UIBLOCK_NEWLINE();
    FLOATSLIDER(mOffsetSlider, "offset", &mLFOSettings.mLFOOffset, 0, 1);
-   UIBLOCK_SHIFTUP();
-   FLOATSLIDER(mFreeRateSlider, "free rate", &mLFOSettings.mFreeRate, 0, 20);
    FLOATSLIDER(mMinSlider, "low", &mDummyMin, 0, 1);
    FLOATSLIDER(mMaxSlider, "high", &mDummyMax, 0, 1);
    FLOATSLIDER(mSpreadSlider, "spread", &mLFOSettings.mSpread, 0, 1);
@@ -66,6 +64,7 @@ void FloatSliderLFOControl::CreateUIControls()
    FLOATSLIDER(mLengthSlider, "length", &mLFOSettings.mLength, 0, 1);
    FLOATSLIDER(mShuffleSlider, "shuffle", &mLFOSettings.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider, "soften", &mLFOSettings.mSoften, 0, 1);
+   FLOATSLIDER(mFreeRateSlider, "free rate", &mLFOSettings.mFreeRate, 0, 20);
    CHECKBOX(mLowResModeCheckbox, "lite cpu", &mLFOSettings.mLowResMode);
    ENDUIBLOCK(mWidth, mHeight);
 
@@ -154,7 +153,7 @@ void FloatSliderLFOControl::DrawModule()
    int height = 35;
    int width = 90;
 
-   ofSetColor(100, 100, .8f * gModuleDrawAlpha);
+   ofSetColor(100, 100, 204, .8f * gModuleDrawAlpha);
    ofSetLineWidth(.5f);
    ofRect(x, y, width, height, 0);
 
@@ -284,10 +283,10 @@ void FloatSliderLFOControl::RandomizeSettings()
 
 void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (mTargetCable == nullptr)
+   if (mTargetCableSource == nullptr)
       return;
-   if (GetSliderTarget() != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
-      SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
+   if (GetSliderTarget() != mTargetCableSource->GetTarget() || mTargetCableSource->GetTarget() == nullptr)
+      SetOwner(dynamic_cast<FloatSlider*>(mTargetCableSource->GetTarget()));
    OnModulatorRepatch();
 }
 
@@ -295,6 +294,8 @@ void FloatSliderLFOControl::Load(LFOSettings settings)
 {
    mLFOSettings = settings;
    UpdateFromSettings();
+   mMaxSlider->SetValue(settings.mMaxValue, gTime, true);
+   mMinSlider->SetValue(settings.mMinValue, gTime, true);
    mEnabled = true;
 }
 
@@ -330,6 +331,11 @@ float FloatSliderLFOControl::GetTargetMax() const
    return 1;
 }
 
+void FloatSliderLFOControl::OnPulse(double time, float velocity, int flags)
+{
+   mLFO.ResetPhase(time);
+}
+
 void FloatSliderLFOControl::UpdateFromSettings()
 {
    mLFO.SetPeriod(mLFOSettings.mInterval);
@@ -347,13 +353,13 @@ void FloatSliderLFOControl::UpdateVisibleControls()
    bool isDrunk = mLFO.GetOsc()->GetType() == kOsc_Drunk;
    bool isRandom = mLFO.GetOsc()->GetType() == kOsc_Random;
    bool showFreeRate = mLFOSettings.mInterval == kInterval_Free || isPerlin;
-   mOffsetSlider->SetShowing(!showFreeRate && !isDrunk && !isRandom);
-   mFreeRateSlider->SetShowing(showFreeRate);
+   mOffsetSlider->SetShowing(!isDrunk && !isRandom);
    mIntervalSelector->SetShowing(!isPerlin);
    mShuffleSlider->SetShowing(!isPerlin && !isDrunk && !isRandom);
    mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square || mLFO.GetOsc()->GetType() == kOsc_NegSaw || isRandom);
    mSpreadSlider->SetShowing(mLFO.GetOsc()->GetType() != kOsc_Square);
    mLengthSlider->SetShowing(!isPerlin && !isDrunk && !isRandom);
+   mFreeRateSlider->SetShowing(showFreeRate);
 }
 
 void FloatSliderLFOControl::SetRate(NoteInterval rate)
@@ -422,6 +428,10 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
       mLFO.SetFreeRate(mLFOSettings.mFreeRate);
    if (slider == mLengthSlider)
       mLFO.SetLength(mLFOSettings.mLength);
+   if (slider == mMinSlider)
+      mLFOSettings.mMinValue = mMinSlider->GetValue();
+   if (slider == mMaxSlider)
+      mLFOSettings.mMaxValue = mMaxSlider->GetValue();
 }
 
 void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -445,12 +455,12 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button, double time)
 
          SetName(GetUniqueName("lfo", TheSynth->GetModuleNames<FloatSliderLFOControl*>()).c_str());
 
-         if (mTargetCable == nullptr)
+         if (mTargetCableSource == nullptr)
          {
-            mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-            mTargetCable->SetModulatorOwner(this);
-            AddPatchCableSource(mTargetCable);
-            mTargetCable->SetTarget(GetSliderTarget());
+            mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+            mTargetCableSource->SetModulatorOwner(this);
+            AddPatchCableSource(mTargetCableSource);
+            mTargetCableSource->SetTarget(GetSliderTarget());
          }
       }
    }
@@ -475,11 +485,11 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    UpdateFromSettings();
    UpdateVisibleControls();
 
-   if (mTargetCable == nullptr)
+   if (mTargetCableSource == nullptr)
    {
-      mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-      mTargetCable->SetModulatorOwner(this);
-      AddPatchCableSource(mTargetCable);
+      mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+      mTargetCableSource->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCableSource);
    }
 }
 
@@ -493,8 +503,8 @@ void LFOPool::Init()
    {
       sLFOPool[i] = new FloatSliderLFOControl();
       sLFOPool[i]->CreateUIControls();
-      sLFOPool[i]->Init();
       sLFOPool[i]->SetTypeName("lfo", kModuleCategory_Modulator);
+      sLFOPool[i]->Init();
       sLFOPool[i]->SetLFOEnabled(false);
    }
    sInitialized = true;
@@ -529,7 +539,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
 
 namespace
 {
-   const int kSaveStateRev = 5;
+   const int kSaveStateRev = 6;
    const int kFixNonRevvedData = 999;
 }
 
@@ -548,6 +558,8 @@ void LFOSettings::SaveState(FileStreamOut& out) const
    out << mFreeRate;
    out << mLength;
    out << mLowResMode;
+   out << mMinValue;
+   out << mMaxValue;
 }
 
 void LFOSettings::LoadState(FileStreamIn& in)
@@ -579,4 +591,9 @@ void LFOSettings::LoadState(FileStreamIn& in)
       in >> mLength;
    if (rev >= 5)
       in >> mLowResMode;
+   if (rev >= 6)
+   {
+      in >> mMinValue;
+      in >> mMaxValue;
+   }
 }

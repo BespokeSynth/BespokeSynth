@@ -145,30 +145,30 @@ void FMSynth::Process(double time)
    }
 }
 
-void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void FMSynth::PlayNote(NoteMessage note)
 {
    if (!mEnabled)
       return;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget())
+   if (!NoteInputBuffer::IsTimeWithinFrame(note.time) && GetTarget())
    {
-      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      mNoteInputBuffer.QueueNote(note);
       return;
    }
 
-   if (velocity > 0)
+   if (note.velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
-      mVoiceParams.mOscADSRParams.Start(time, 1); //for visualization
+      mPolyMgr.Start(note.time, note.pitch, note.velocity / 127.0f, note.voiceIdx, note.modulation);
+      mVoiceParams.mOscADSRParams.Start(note.time, 1); //for visualization
    }
    else
    {
-      mPolyMgr.Stop(time, pitch, voiceIdx);
-      mVoiceParams.mOscADSRParams.Stop(time); //for visualization
+      mPolyMgr.Stop(note.time, note.pitch, note.voiceIdx);
+      mVoiceParams.mOscADSRParams.Stop(note.time); //for visualization
    }
 
    if (mDrawDebug)
-      AddDebugLine("PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")", 10);
+      AddDebugLine("PlayNote(" + ofToString(note.time / 1000) + ", " + ofToString(note.pitch) + ", " + ofToString(note.velocity) + ", " + ofToString(note.voiceIdx) + ")", 10);
 }
 
 void FMSynth::SetEnabled(bool enabled)

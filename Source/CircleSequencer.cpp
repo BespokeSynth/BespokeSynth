@@ -135,6 +135,12 @@ void CircleSequencer::DropdownUpdated(DropdownList* list, int oldVal, double tim
 {
 }
 
+void CircleSequencer::ButtonClicked(ClickButton* button, double time)
+{
+   for (int i = 0; i < mCircleSequencerRings.size(); ++i)
+      mCircleSequencerRings[i]->ButtonClicked(button);
+}
+
 void CircleSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
@@ -189,10 +195,29 @@ void CircleSequencerRing::CreateUIControls()
    int y = mIndex * 20 + 20;
    mLengthSelector = new DropdownList(mOwner, ("length" + ofToString(mIndex)).c_str(), 220, y, &mLength);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), 260, y, 4, &mPitch, 0, 127);
-   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 300, y, 90, 15, &mOffset, -.25f, .25f, 2);
+   mAnglePrev = new ClickButton(mOwner, "<", 300, y);
+   mAngleNext = new ClickButton(mOwner, ">", 315, y);
+   mOffsetSlider = new FloatSlider(mOwner, ("offset" + ofToString(mIndex)).c_str(), 330, y, 90, 15, &mOffset, -.25f, .25f, 2);
 
    for (int i = 0; i < CIRCLE_SEQUENCER_MAX_STEPS; ++i)
       mLengthSelector->AddLabel(ofToString(i + 1).c_str(), i + 1);
+}
+
+// Return the step index, taking the angle into account.
+int CircleSequencerRing::GetStepAngle(int i)
+{
+   int idx = (i + mAngle) % mLength;
+   if (idx < 0)
+      idx += mLength;
+   return idx;
+}
+
+void CircleSequencerRing::ButtonClicked(ClickButton* button)
+{
+   if (button == mAnglePrev)
+      mAngle++;
+   else if (button == mAngleNext)
+      mAngle--;
 }
 
 void CircleSequencerRing::Draw()
@@ -230,8 +255,9 @@ void CircleSequencerRing::Draw()
       ofLine(p1.x + 100, p1.y + 100, p2.x + 100, p2.y + 100);
       ofVec2f point = PolToCar(pos, GetRadius());
 
-      if (mSteps[i] > 0)
-         ofCircle(100 + point.x, 100 + point.y, 3 + 6 * mSteps[i]);
+      const int idx = GetStepAngle(i);
+      if (mSteps[idx] > 0)
+         ofCircle(100 + point.x, 100 + point.y, 3 + 6 * mSteps[idx]);
 
       if (i == mHighlightStepIdx)
       {
@@ -246,6 +272,8 @@ void CircleSequencerRing::Draw()
    ofPopStyle();
    mLengthSelector->Draw();
    mNoteSelector->Draw();
+   mAnglePrev->Draw();
+   mAngleNext->Draw();
    mOffsetSlider->Draw();
 }
 
@@ -273,6 +301,7 @@ void CircleSequencerRing::OnClicked(float x, float y, bool right)
    mCurrentlyClickedStepIdx = GetStepIndex(x, y, mLastMouseRadius);
    if (mCurrentlyClickedStepIdx != -1)
    {
+      mCurrentlyClickedStepIdx = GetStepAngle(mCurrentlyClickedStepIdx);
       if (mSteps[mCurrentlyClickedStepIdx])
          mSteps[mCurrentlyClickedStepIdx] = 0;
       else
@@ -311,21 +340,21 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
    info.mCustomDivisor = mLength + (mLength == 1); // +1 if mLength(Steps) == 1: fixes not playing onset 1 when mLength = 1: force oldStep <> newStep
 
    double remainderMs;
-   const int oldStep = TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info);
-   const int newStep = TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs);
+   const int oldStep = GetStepAngle(TheTransport->GetQuantized(NextBufferTime(true) - gBufferSizeMs, &info));
+   const int newStep = GetStepAngle(TheTransport->GetQuantized(NextBufferTime(true), &info, &remainderMs));
    const int oldMeasure = TheTransport->GetMeasure(NextBufferTime(true) - gBufferSizeMs);
    const int newMeasure = TheTransport->GetMeasure(NextBufferTime(true));
 
    if (oldStep != newStep && mSteps[newStep] > 0)
    {
       const double time = NextBufferTime(true) - remainderMs;
-      mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
+      mOwner->PlayNoteOutput(NoteMessage(time, mPitch, mSteps[newStep] * 127));
       NoteInterval interval = kInterval_16n;
       if (mLength > 10 && mLength < 24)
          interval = kInterval_32n;
       else if (mLength >= 24)
          interval = kInterval_64n;
-      mOwner->PlayNoteOutput(time + TheTransport->GetDuration(interval), mPitch, 0, -1);
+      mOwner->PlayNoteOutput(NoteMessage(time + TheTransport->GetDuration(interval), mPitch, 0));
    }
 }
 
