@@ -717,6 +717,8 @@ target_sources(BespokeSynth PRIVATE
     VelocityToCV.h
     VelocityToChance.cpp
     VelocityToChance.h
+    VelocityToDuration.cpp
+    VelocityToDuration.h
     VinylTempoControl.cpp
     VinylTempoControl.h
     Vocoder.cpp
