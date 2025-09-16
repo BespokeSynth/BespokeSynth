@@ -66,7 +66,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
-      width = 110;
+      width = 150;
       height = 22;
    }
 

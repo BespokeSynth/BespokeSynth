@@ -40,7 +40,7 @@ void VelocityToDuration::Init()
 void VelocityToDuration::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mMaxDurationSlider = new FloatSlider(this, "max_duration", 5, 2, 100, 15, &mMaxDuration, 0.01f, 4, 4);
+   mMaxDurationSlider = new FloatSlider(this, "max duration", 5, 2, 140, 15, &mMaxDuration, 0.01f, 4, 4);
    mMaxDurationSlider->SetMode(FloatSlider::kSquare);
 }
 
