@@ -56,9 +56,6 @@ public:
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
-   void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SetUpFromSaveData() override;
-
    bool IsEnabled() const override { return mEnabled; }
 
 private:

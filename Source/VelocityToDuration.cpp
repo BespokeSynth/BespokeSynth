@@ -113,15 +113,3 @@ void VelocityToDuration::PlayNote(NoteMessage note)
 void VelocityToDuration::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
 }
-
-void VelocityToDuration::LoadLayout(const ofxJSONElement& moduleInfo)
-{
-   mModuleSaveData.LoadString("target", moduleInfo);
-
-   SetUpFromSaveData();
-}
-
-void VelocityToDuration::SetUpFromSaveData()
-{
-   SetUpPatchCables(mModuleSaveData.GetString("target"));
-}
