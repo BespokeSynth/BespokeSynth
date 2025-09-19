@@ -2178,3 +2178,6 @@ interface~create a custom collection of controls that refer to other controls. f
 binaryvalue~convert modulated value to binary and send each bit to separate modulation cable
 ~input~input value
 ~code~code to use for conversion into binary representation
+
+velocitytoduration~use a note's velocity to set its duration
+~max duration~duration (in measures) corresponding to the maximum velocity value
