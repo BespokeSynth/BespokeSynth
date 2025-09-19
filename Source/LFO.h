@@ -58,6 +58,7 @@ public:
    void SetLength(float length) { mLength = length; }
    float TransformPhase(float phase) const;
    void ResetPhase(double time);
+   void SetRandomSeed(int seed) { mRandomSeed = seed; }
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -73,9 +74,10 @@ private:
    Ramp mRandom;
    float mDrunk{ 0 };
    double mFreePhase{ 0 };
+   double mPhaseResetTime{ 0.0 };
    float mFreeRate{ 1 };
    float mLength{ 1 };
-   int mPerlinSeed{ 0 };
+   int mRandomSeed{ 0 };
    float mAdjustOffset{ 0 };
 
    static PerlinNoise sPerlinNoise;
