@@ -68,9 +68,8 @@ void NoteFilter::PlayNote(NoteMessage note)
    {
       if (note.pitch >= 0 && note.pitch < 128)
       {
-         if (note.velocity > 0)
-            mLastPlayTime[note.pitch] = note.time;
-         if ((note.pitch >= mMinPitch && note.pitch <= mMaxPitch && mGate[note.pitch]) || note.velocity == 0)
+         mLastPlayTime[note.pitch] = note.time;
+         if (note.pitch >= mMinPitch && note.pitch <= mMaxPitch && mGate[note.pitch])
             PlayNoteOutput(note);
       }
    }

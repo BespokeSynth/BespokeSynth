@@ -141,6 +141,12 @@ void OutputChannel::DrawModule()
    }
 }
 
+void OutputChannel::GetModuleDimensions(float& width, float& height)
+{
+   width = MAX(64, (mChannelSelector ? (mChannelSelector->GetRect(true).getMaxX() + 3) : 0));
+   height = mHeight;
+}
+
 void OutputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    if (!moduleInfo["channel"].isNull())

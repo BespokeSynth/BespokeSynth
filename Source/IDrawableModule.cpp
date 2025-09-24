@@ -46,6 +46,7 @@
 #include "UIGrid.h"
 #include "UserPrefs.h"
 #include "Prefab.h"
+#include "Snapshots.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
@@ -483,6 +484,24 @@ void IDrawableModule::Render()
          source->DrawSource();
       }
    }
+}
+
+void IDrawableModule::PreRenderUnclipped()
+{
+   if (!mShowing)
+      return;
+
+   ofPushMatrix();
+   ofPushStyle();
+
+   ofTranslate(mX, mY, 0);
+   ofColor color = GetColor(mModuleCategory);
+   ofSetColor(color);
+
+   PreDrawModuleUnclipped();
+
+   ofPopMatrix();
+   ofPopStyle();
 }
 
 void IDrawableModule::RenderUnclipped()
@@ -1234,6 +1253,9 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    if (!CanModuleTypeSaveState())
       return;
 
+   if (Snapshots::sSerializingModuleStateForSnapshot)
+      return;
+
    out << GetModuleSaveStateRev();
 
    out << kBaseSaveStateRev;
@@ -1301,6 +1323,9 @@ int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
 void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 {
    if (!CanModuleTypeSaveState())
+      return;
+
+   if (Snapshots::sSerializingModuleStateForSnapshot)
       return;
 
    if (rev != -1 && ModularSynth::sLoadingFileSaveStateRev >= 423)

@@ -36,7 +36,7 @@
 #include "Scale.h"
 #include "NoteStepSequencer.h"
 
-class BassLineSequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource, public INoteReceiver, IDrivableSequencer, public UIGridListener, public IFloatSliderListener, public IScaleListener
+class BassLineSequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource, public INoteReceiver, public IDrivableSequencer, public UIGridListener, public IFloatSliderListener, public IScaleListener
 {
 public:
    BassLineSequencer();
@@ -94,7 +94,7 @@ private:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    void KeyPressed(int key, bool isRepeat) override;
-   bool ShouldSerializeForSnapshot() override { return true; }
+   bool ShouldSerializeForSnapshot() const override { return true; }
 
    void StepBy(double time, float velocity, int flags);
    void ResetStep();

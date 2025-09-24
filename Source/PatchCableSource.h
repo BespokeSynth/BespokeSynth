@@ -120,6 +120,7 @@ public:
    bool Enabled() const;
    void AddTypeFilter(std::string type) { mTypeFilter.push_back(type); }
    void ClearTypeFilter() { mTypeFilter.clear(); }
+   void SetPredicateFilter(bool (*predicate)(IClickable*)) { mFilterPredicate = predicate; }
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
@@ -214,4 +215,6 @@ private:
    DrawPass mDrawPass{ DrawPass::kSource };
    bool mParentMinimized{ false };
    IDrawableModule* mLastSeenAutopatchableModule{ nullptr };
+
+   bool (*mFilterPredicate)(IClickable*){ nullptr };
 };

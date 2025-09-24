@@ -94,7 +94,7 @@ void NoteOctaver::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
       {
          if (mInputNotes[pitch].mOn)
          {
-            PlayNoteOutput(NoteMessage(time + .01, pitch + oldVal, 0, mInputNotes[pitch].mVoiceIdx));
+            PlayNoteOutput(NoteMessage(time + .01, pitch + oldVal * TheScale->GetPitchesPerOctave(), 0, mInputNotes[pitch].mVoiceIdx));
             PlayNoteOutput(NoteMessage(time, pitch + mOctave * TheScale->GetPitchesPerOctave(), mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx));
          }
       }

@@ -37,6 +37,7 @@ public:
    void Process(int channel, float* buffer, int bufferSize);
    void Draw(float x, float y, float width, float height, int numChannels);
    void SetLimit(float limit);
+   void GetLevel(int channel, float& levelFast, float& levelSlow) const;
 
 private:
    struct LevelMeter

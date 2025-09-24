@@ -1207,6 +1207,13 @@ bool ModularSynth::ShouldShowGridSnap() const
    return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1))) && (GetKeyModifiers() & kModifier_Command);
 }
 
+void ModularSynth::SetGroupSelectedModules(std::list<IDrawableModule*> modules)
+{
+   mGroupSelectedModules.clear();
+   for (auto* module : modules)
+      mGroupSelectedModules.push_back(module);
+}
+
 void ModularSynth::MouseMoved(int intX, int intY)
 {
    bool changed = (mMousePos.x != intX || mMousePos.y != intY);
@@ -1391,6 +1398,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    {
       std::vector<IDrawableModule*> newGroupSelectedModules;
       std::map<IDrawableModule*, IDrawableModule*> oldToNewModuleMap;
+      std::map<IDrawableModule*, IDrawableModule*> newToOldModuleMap;
       for (auto module : mGroupSelectedModules)
       {
          if (!module->IsSingleton())
@@ -1398,24 +1406,154 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
             IDrawableModule* newModule = DuplicateModule(module);
             newGroupSelectedModules.push_back(newModule);
             oldToNewModuleMap[module] = newModule;
+            newToOldModuleMap[newModule] = module;
 
             if (module == mLastClickedModule)
                mLastClickedModule = newModule;
          }
       }
-      for (auto module : newGroupSelectedModules)
+      auto updateCables = [&oldToNewModuleMap, &newToOldModuleMap](PatchCableSource* cableSource, PatchCable* cable)
       {
+         if (cable->GetTarget() == nullptr) // The duplicated cable has no target, so we need to check the original module cables to see if it should have a target.
+         {
+            // Acquire cable index
+            auto allCables = cableSource->GetPatchCables();
+            int cableIndex = -1;
+            for (auto i = 0; i < static_cast<int>(allCables.size()); i++)
+            {
+               if (allCables[i] == cable)
+               {
+                  cableIndex = i;
+                  break;
+               }
+            }
+            if (cableIndex == -1)
+               return;
+            // Try to find a parent module that is in the duplicated module list
+            IClickable* temp_module{ nullptr };
+            temp_module = dynamic_cast<IClickable*>(cableSource->GetModulatorOwner());
+            if (temp_module == nullptr)
+               temp_module = dynamic_cast<IClickable*>(cableSource->GetOwner());
+            if (temp_module == nullptr)
+               temp_module = cableSource->GetParent();
+            if (temp_module == nullptr)
+               return;
+            IDrawableModule *oldmodule{ nullptr }, *newmodule{ nullptr };
+            for (int i = 0; i < 10; i++) // Limit to 10 iterations to avoid infinite loops
+            {
+               newmodule = dynamic_cast<IDrawableModule*>(temp_module);
+               oldmodule = newToOldModuleMap[newmodule];
+               if (oldmodule != nullptr && newmodule != nullptr)
+                  break;
+               temp_module = temp_module->GetParent();
+               if (!temp_module)
+                  break;
+            }
+            if (oldmodule == nullptr || newmodule == nullptr)
+               return;
+            // Acquire cable source index
+            int cableSourceIndex = -1;
+            for (auto i = 0; i < newmodule->GetPatchCableSources().size(); i++)
+            {
+               if (newmodule->GetPatchCableSources()[i] == cableSource)
+               {
+                  cableSourceIndex = i;
+                  break;
+               }
+            }
+            if (cableSourceIndex == -1)
+               return;
+            // See if we have a target in the orignal module
+            auto oldCableSource = oldmodule->GetPatchCableSources()[cableSourceIndex];
+            if (oldCableSource == nullptr)
+               return;
+            auto oldCable = oldCableSource->GetPatchCables()[cableIndex];
+            if (oldCable == nullptr)
+               return;
+            if (oldCable->GetTarget() == nullptr)
+               return;
+            // Try to find a parent module that is in the duplicated module list
+            temp_module = oldCable->GetTarget();
+            oldmodule = newmodule = nullptr;
+            for (int i = 0; i < 10; i++) // Limit to 10 iterations to avoid infinite loops
+            {
+               oldmodule = dynamic_cast<IDrawableModule*>(temp_module);
+               newmodule = oldToNewModuleMap[oldmodule];
+               if (oldmodule != nullptr && newmodule != nullptr)
+                  break;
+               temp_module = temp_module->GetParent();
+               if (!temp_module)
+                  break;
+            }
+            if (oldmodule == nullptr || newmodule == nullptr)
+               return;
+            // Transform the old path to new path so we acquire our new target
+            auto oldpath = oldmodule->Path();
+            auto newpath = newmodule->Path();
+            auto targetpath = oldCable->GetTarget()->Path();
+            ofStringReplace(targetpath, oldpath, newpath, true);
+            IClickable* newtarget = TheSynth->FindUIControl(targetpath);
+            if (newtarget == nullptr)
+               newtarget = TheSynth->FindModule(targetpath);
+            if (newtarget == nullptr)
+               return;
+            // Set the new target
+            cableSource->SetPatchCableTarget(cable, newtarget, false);
+            auto modulationOwner = cableSource->GetModulatorOwner();
+            if (modulationOwner)
+               modulationOwner->OnModulatorRepatch();
+            return;
+         } // The duplicated cable has a target, so we need to update it
+         // Try to find a parent module that is in the duplicated module list
+         auto temp_module = cable->GetTarget();
+         IDrawableModule *oldmodule, *newmodule;
+         for (int i = 0; i < 10; i++)
+         {
+            oldmodule = dynamic_cast<IDrawableModule*>(temp_module);
+            newmodule = oldToNewModuleMap[oldmodule];
+            if (oldmodule != nullptr && newmodule != nullptr)
+               break;
+            temp_module = temp_module->GetParent();
+            if (!temp_module)
+               break;
+         }
+         if (oldmodule == nullptr || newmodule == nullptr)
+            return;
+         // Find the new target using the path
+         auto oldpath = oldmodule->Path();
+         auto newpath = newmodule->Path();
+         auto targetpath = cable->GetTarget()->Path();
+         ofStringReplace(targetpath, oldpath, newpath, true);
+         IClickable* newtarget = TheSynth->FindUIControl(targetpath);
+         if (newtarget == nullptr)
+            newtarget = TheSynth->FindModule(targetpath);
+         if (newtarget == nullptr)
+            return;
+         // Set the new target
+         cableSource->SetPatchCableTarget(cable, newtarget, false);
+         auto modulationOwner = cableSource->GetModulatorOwner();
+         if (modulationOwner)
+            modulationOwner->OnModulatorRepatch();
+      };
+      std::function<void(IDrawableModule*)> checkModuleCables =
+      [&updateCables, &checkModuleCables](IDrawableModule* module)
+      {
+         auto mod = dynamic_cast<IModulator*>(module);
          for (auto* cableSource : module->GetPatchCableSources())
          {
             for (auto* cable : cableSource->GetPatchCables())
             {
-               if (VectorContains(dynamic_cast<IDrawableModule*>(cable->GetTarget()), mGroupSelectedModules))
-               {
-                  cableSource->SetPatchCableTarget(cable, oldToNewModuleMap[dynamic_cast<IDrawableModule*>(cable->GetTarget())], false);
-               }
+               updateCables(cableSource, cable);
             }
          }
-      }
+         for (const auto child : module->GetChildren())
+         {
+            checkModuleCables(child); // Check children (Prefabs for instance.)
+         }
+      };
+      for (const auto module : newGroupSelectedModules)
+         checkModuleCables(module);
+
       mGroupSelectedModules = newGroupSelectedModules;
 
       if (mMoveModule && !mMoveModule->IsSingleton())
@@ -1747,9 +1885,24 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
 
       float val = gHoveredUIControl->GetMidiValue();
       float movementScale = 3;
-      FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(gHoveredUIControl);
-      IntSlider* intSlider = dynamic_cast<IntSlider*>(gHoveredUIControl);
-      ClickButton* clickButton = dynamic_cast<ClickButton*>(gHoveredUIControl);
+      const auto floatSlider = dynamic_cast<FloatSlider*>(gHoveredUIControl);
+      const auto intSlider = dynamic_cast<IntSlider*>(gHoveredUIControl);
+      const auto clickButton = dynamic_cast<ClickButton*>(gHoveredUIControl);
+      const auto dropDownList = dynamic_cast<DropdownList*>(gHoveredUIControl);
+
+      if (dropDownList)
+      {
+         auto increment = (yScroll > 0 ? 1. : -1.) / dropDownList->GetNumValues();
+         if (GetKeyModifiers() & kModifier_Shift)
+            increment *= 3 * UserPrefs.scroll_multiplier_vertical.Get();
+         if (gHoveredUIControl->InvertScrollDirection())
+            increment *= -1;
+         auto value = dropDownList->GetMidiValue();
+         value += increment;
+         dropDownList->SetFromMidiCC(value, NextBufferTime(false), false);
+         return;
+      }
+
       if (floatSlider || intSlider)
       {
          float w, h;
@@ -3200,7 +3353,7 @@ void ModularSynth::DoAutosave()
 
    juce::File parentDirectory(ofToDataPath("savestate/autosave"));
    Array<juce::File> autosaveFiles;
-   parentDirectory.findChildFiles(autosaveFiles, juce::File::findFiles, false, "*.bsk");
+   parentDirectory.findChildFiles(autosaveFiles, juce::File::findFiles, false, "*.bsk;*.bskt");
    if (autosaveFiles.size() >= kMaxAutosaveSlots)
    {
       FileTimeComparator cmp;
@@ -3209,7 +3362,7 @@ void ModularSynth::DoAutosave()
          autosaveFiles[i].deleteFile();
    }
 
-   SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk")), true);
+   SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bskt")), true);
 }
 
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spawnable, float x, float y, bool addToContainer, std::string name)
@@ -3224,20 +3377,26 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
 
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::EffectChain)
-      moduleType = "effectchain";
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Prefab)
-      moduleType = "prefab";
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
-      moduleType = "vstplugin";
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::MidiController)
-      moduleType = "midicontroller";
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Preset)
-      moduleType = spawnable.mPresetModuleType;
+   switch (spawnable.mSpawnMethod)
+   {
+      case ModuleFactory::SpawnMethod::Module:
+         break;
+      case ModuleFactory::SpawnMethod::EffectChain:
+         moduleType = "effectchain";
+         break;
+      case ModuleFactory::SpawnMethod::Prefab:
+         moduleType = "prefab";
+         break;
+      case ModuleFactory::SpawnMethod::Plugin:
+         moduleType = "vstplugin";
+         break;
+      case ModuleFactory::SpawnMethod::MidiController:
+         moduleType = "midicontroller";
+         break;
+      case ModuleFactory::SpawnMethod::Preset:
+         moduleType = spawnable.mPresetModuleType;
+         break;
+   }
 
    if (name == "")
       name = moduleType;
@@ -3273,42 +3432,55 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
       LogEvent("Error spawning \"" + spawnable.mLabel + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
    }
 
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::EffectChain)
+   switch (spawnable.mSpawnMethod)
    {
-      EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
-      if (effectChain != nullptr)
-         effectChain->AddEffect(spawnable.mLabel, spawnable.mLabel, K(onTheFly));
-   }
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Prefab)
-   {
-      Prefab* prefab = dynamic_cast<Prefab*>(module);
-      if (prefab != nullptr)
-         prefab->LoadPrefab("prefabs" + GetPathSeparator() + spawnable.mLabel);
-   }
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Plugin)
-   {
-      VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      if (plugin != nullptr)
-         plugin->SetVST(spawnable.mPluginDesc);
-   }
-
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::MidiController)
-   {
-      MidiController* controller = dynamic_cast<MidiController*>(module);
-      if (controller != nullptr)
+      case ModuleFactory::SpawnMethod::EffectChain:
       {
-         controller->GetSaveData().SetString("devicein", spawnable.mLabel);
-         controller->SetUpFromSaveDataBase();
+         EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
+         if (effectChain != nullptr)
+            effectChain->AddEffect(spawnable.mLabel, spawnable.mLabel, K(onTheFly));
       }
-   }
+      break;
 
-   if (spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Preset)
-   {
-      std::string presetFilePath = ofToDataPath("presets/" + spawnable.mPresetModuleType + "/" + spawnable.mLabel);
-      ModuleSaveDataPanel::LoadPreset(module, presetFilePath);
-      module->SetName(GetUniqueName(juce::String(spawnable.mLabel).replace(".preset", "").toStdString(), modules).c_str());
+      case ModuleFactory::SpawnMethod::Prefab:
+      {
+         Prefab* prefab = dynamic_cast<Prefab*>(module);
+         if (prefab != nullptr)
+            prefab->LoadPrefab("prefabs" + GetPathSeparator() + spawnable.mLabel);
+      }
+      break;
+
+      case ModuleFactory::SpawnMethod::Plugin:
+      {
+         VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+         if (plugin != nullptr)
+            plugin->SetVST(spawnable.mPluginDesc);
+      }
+      break;
+
+      case ModuleFactory::SpawnMethod::MidiController:
+      {
+         MidiController* controller = dynamic_cast<MidiController*>(module);
+         if (controller != nullptr)
+         {
+            controller->GetSaveData().SetString("devicein", spawnable.mLabel);
+            controller->SetUpFromSaveDataBase();
+         }
+      }
+      break;
+
+      case ModuleFactory::SpawnMethod::Preset:
+      {
+         std::string presetFilePath = ofToDataPath("presets/" + spawnable.mPresetModuleType + "/" + spawnable.mLabel);
+         ModuleSaveDataPanel::LoadPreset(module, presetFilePath);
+         module->SetName(GetUniqueName(juce::String(spawnable.mLabel).replace(".preset", "").toStdString(), modules).c_str());
+      }
+      break;
+
+      case ModuleFactory::SpawnMethod::Module:
+      {
+      }
+      break;
    }
 
    return module;

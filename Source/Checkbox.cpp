@@ -63,10 +63,16 @@ void Checkbox::SetDisplayText(bool display)
    UpdateWidth();
 }
 
+void Checkbox::SetOverrideDisplayName(std::string name)
+{
+   IUIControl::SetOverrideDisplayName(name);
+   UpdateWidth();
+}
+
 void Checkbox::UpdateWidth()
 {
    if (mDisplayText)
-      mWidth = 15 + GetStringWidth(Name());
+      mWidth = 15 + GetStringWidth(GetDisplayName());
    else
       mWidth = mHeight - 3;
 }
@@ -92,7 +98,7 @@ void Checkbox::Render()
    DrawBeacon(mX + 6, mY + 8);
 
    ofColor color;
-   if (IsPreset())
+   if (IsSnapshot())
       color.set(0, 255, 0);
    else if (mUseCircleLook)
       color = mCustomColor;
@@ -118,7 +124,7 @@ void Checkbox::Render()
    ofSetColor(color);
 
    if (mDisplayText)
-      DrawTextNormal(Name(), mX + 13, mY + 12);
+      DrawTextNormal(GetDisplayName(), mX + 13, mY + 12);
    if (*mVar)
    {
       if (mUseCircleLook)

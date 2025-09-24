@@ -37,8 +37,10 @@
 #include "DropdownList.h"
 #include "TextEntry.h"
 #include "Push2Control.h"
+#include "GridController.h"
 
-class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IPush2GridController
+
+class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IIntSliderListener, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IAbletonGridController, public IGridControllerListener
 {
 public:
    Snapshots();
@@ -63,6 +65,8 @@ public:
    void SetSnapshot(int idx, double time);
    void StoreSnapshot(int idx, bool setAsCurrent);
    void DeleteSnapshot(int idx);
+   int GetSize() { return (int)mSnapshotCollection.size(); }
+   void SetLabel(int idx, const std::string& label);
 
    void OnTransportAdvanced(float amount) override;
 
@@ -70,12 +74,17 @@ public:
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IGridControllerListener
+   void OnControllerPageSelected() override;
+   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
@@ -90,6 +99,7 @@ public:
    void UpdateOldControlName(std::string& oldName) override;
 
    static std::vector<IUIControl*> sSnapshotHighlightControls;
+   static bool sSerializingModuleStateForSnapshot;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -111,6 +121,7 @@ private:
    void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
+   void UpdateGridControllerLights(bool force);
 
    enum class DisplayMode
    {
@@ -193,4 +204,10 @@ private:
    int mSnapshotRenameIndex{ -1 };
    float mOldWidth{ 0 };
    float mOldHeight{ 0 };
+   bool mPush2Connected{ false };
+   GridControlTarget* mGridControlTarget{ nullptr };
+   int mGridControlOffsetX{ 0 };
+   int mGridControlOffsetY{ 0 };
+   IntSlider* mGridControlOffsetXSlider{ nullptr };
+   IntSlider* mGridControlOffsetYSlider{ nullptr };
 };

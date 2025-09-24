@@ -45,7 +45,7 @@ namespace
 
   // Uses libusb to create a device handle for the push display
 
-  NBase::Result SFindPushDisplayDeviceHandle(libusb_device_handle** pHandle)
+  NBase::Result SFindPushDisplayDeviceHandle(libusb_device_handle** pHandle, DeviceType deviceType)
   {
     using namespace NBase;
 
@@ -92,10 +92,29 @@ namespace
 
       const uint16_t kAbletonVendorID = 0x2982;
       const uint16_t kPush2ProductID = 0x1967;
+      const uint16_t kMoveProductID = 0x1958;
 
-      if (descriptor.bDeviceClass == LIBUSB_CLASS_PER_INTERFACE
-          && descriptor.idVendor == kAbletonVendorID
-          && descriptor.idProduct == kPush2ProductID)
+      uint16_t desiredDeviceClass = LIBUSB_CLASS_PER_INTERFACE;
+      uint16_t desiredVendorId = kAbletonVendorID;
+      uint16_t desiredProductId = kPush2ProductID;
+
+      if (deviceType == DeviceType::Push2)
+      {
+         desiredDeviceClass = LIBUSB_CLASS_PER_INTERFACE;
+         desiredVendorId = kAbletonVendorID;
+         desiredProductId = kPush2ProductID;
+      }
+
+      if (deviceType == DeviceType::Move)
+      {
+         desiredDeviceClass = 0xef; //LIBUSB_CLASS_MISCELLANEOUS
+         desiredVendorId = kAbletonVendorID;
+         desiredProductId = kMoveProductID;
+      }
+
+      if (descriptor.bDeviceClass == desiredDeviceClass
+          && descriptor.idVendor == desiredVendorId
+          && descriptor.idProduct == desiredProductId)
       {
         if ((errorCode = libusb_open(device, &device_handle)) < 0)
         {
@@ -169,7 +188,7 @@ UsbCommunicator::UsbCommunicator()
 
 //------------------------------------------------------------------------------
 
-NBase::Result UsbCommunicator::Init(const pixel_t* dataSource)
+NBase::Result UsbCommunicator::Init(const pixel_t* dataSource, DeviceType deviceType)
 {
   using namespace NBase;
 
@@ -177,7 +196,7 @@ NBase::Result UsbCommunicator::Init(const pixel_t* dataSource)
   dataSource_ = dataSource;
 
   // Initialise the handle
-  NBase::Result result = SFindPushDisplayDeviceHandle(&handle_);
+  NBase::Result result = SFindPushDisplayDeviceHandle(&handle_, deviceType);
   RETURN_IF_FAILED_MESSAGE(result, "Failed to initialize handle");
   assert(handle_ != NULL);
 

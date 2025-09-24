@@ -57,7 +57,7 @@ void* operator new[](std::size_t size, const char* file, int line) throw(std::ba
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
-#define MAX_BUFFER_SIZE 30 * gSampleRate
+#define MAX_BUFFER_SIZE 60 * gSampleRate
 #define MAX_TEXTENTRY_LENGTH 1024
 
 #ifndef M_PI
@@ -101,7 +101,6 @@ extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;
 extern RetinaTrueTypeFont gFontFixedWidth;
 extern float gModuleDrawAlpha;
-extern float gNullBuffer[kWorkBufferSize];
 extern float gZeroBuffer[kWorkBufferSize];
 extern float gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;
@@ -241,13 +240,23 @@ inline static float RandomSample()
    return gRandomBipolarDist(gRandom);
 }
 
-inline static int DeterministicRandom(int seed, int index)
+inline static uint64_t DeterministicRandomInt64(int seed, int index)
 {
    uint64_t x = seed + ((uint64_t)index << 32);
    x = (x ^ (x >> 30)) * (0xbf58476d1ce4e5b9);
    x = (x ^ (x >> 27)) * (0x94d049bb133111eb);
    x = x ^ (x >> 31);
-   return (int)x;
+   return x;
+}
+
+inline static int DeterministicRandom(int seed, int index)
+{
+   return (int)DeterministicRandomInt64(seed, index);
+}
+
+inline static float DeterministicRandomFloat01(int seed, int index)
+{
+   return float(DeterministicRandomInt64(seed, index)) / UINT64_MAX;
 }
 
 inline static std::string GetPathSeparator()

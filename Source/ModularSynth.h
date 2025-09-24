@@ -210,6 +210,7 @@ public:
    IDrawableModule* GetLastClickedModule() const;
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
    const std::vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
+   void SetGroupSelectedModules(std::list<IDrawableModule*> modules);
    bool ShouldAccentuateActiveModules() const;
    bool ShouldDimModule(IDrawableModule* module);
    LocationZoomer* GetLocationZoomer() { return &mZoomer; }

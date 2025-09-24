@@ -35,12 +35,15 @@
 #include "ClickButton.h"
 #include "DropdownList.h"
 #include "TextEntry.h"
+#include "AbletonDeviceShared.h"
+#include "LaunchpadKeyboard.h"
+#include "IInputRecordable.h"
 
 class CanvasControls;
 class CanvasTimeline;
 class CanvasScrollbar;
 
-class NoteCanvas : public IDrawableModule, public INoteSource, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public INoteReceiver, public IButtonListener, public IDropdownListener, public ITextEntryListener
+class NoteCanvas : public IDrawableModule, public INoteSource, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public INoteReceiver, public IButtonListener, public IDropdownListener, public ITextEntryListener, public IAbletonGridController, public IInputRecordable
 {
 public:
    NoteCanvas();
@@ -73,6 +76,17 @@ public:
 
    void CanvasUpdated(Canvas* canvas) override;
 
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
+
+   //IInputRecordable
+   void SetRecording(bool record) override;
+   bool IsRecording() const override { return mRecord; }
+   void ClearRecording() override { Clear(NextBufferTime(false)); }
+   void CancelRecording() override { SetRecording(false); }
+
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
@@ -96,7 +110,6 @@ private:
 
    double GetCurPos(double time) const;
    void UpdateNumColumns();
-   void SetRecording(bool rec);
    void SetNumMeasures(int numMeasures);
    bool FreeRecordParityMatched();
    void ClipNotes();
@@ -132,6 +145,13 @@ private:
    int mFreeRecordStartMeasure{ 0 };
    bool mShowIntervals{ false };
    Checkbox* mShowIntervalsCheckbox{ nullptr };
+   LaunchpadKeyboard* mGridKeyboardInterface{ nullptr };
+
+   int mEditMeasureOffset{ 0 };
+   double mEditHoldTime{ 0.0 };
+   int mEditHoldStep{ -1 };
+   int mEditCurrentPitchContext{ -1 };
+   std::vector<CanvasElement*> mCurrentEditElements{};
 
    std::vector<ModulationParameters> mVoiceModulations;
 };

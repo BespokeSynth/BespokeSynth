@@ -35,7 +35,8 @@ Amplifier::Amplifier()
 void Amplifier::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGainSlider = new FloatSlider(this, "gain", 5, 2, 110, 15, &mGain, 0, 4);
+   mGainSlider = new FloatSlider(this, "gain", 5, 2, 110, 15, &mGain, 0, 2);
+   mGainSlider->SetMode(FloatSlider::kSquare);
 }
 
 Amplifier::~Amplifier()
@@ -96,12 +97,12 @@ void Amplifier::DrawModule()
    {
       if (mNumChannels == 1)
       {
-         mLevelMeterDisplay.Draw(3, 20, 114, 8, mNumChannels);
+         DrawLevelMeter(3, 20, 114, 8);
          mHeight = 30;
       }
       else
       {
-         mLevelMeterDisplay.Draw(3, 20, 114, 18, mNumChannels);
+         DrawLevelMeter(3, 20, 114, 18);
          mHeight = 40;
       }
    }
@@ -113,10 +114,34 @@ void Amplifier::DrawModule()
    mGainSlider->Draw();
 }
 
+void Amplifier::DrawLevelMeter(float x, float y, float w, float h)
+{
+   mLevelMeterDisplay.Draw(x, y, w, h, mNumChannels);
+}
+
+void Amplifier::GetLevel(float& level, float& watermarkLevel) const
+{
+   level = 0;
+   watermarkLevel = 0;
+   for (int i = 0; i < mNumChannels; ++i)
+   {
+      float channelLevel, channelWatermarkLevel;
+      mLevelMeterDisplay.GetLevel(i, channelLevel, channelWatermarkLevel);
+      level = std::max(level, channelLevel);
+      watermarkLevel = std::max(watermarkLevel, channelWatermarkLevel);
+   }
+}
+
+void Amplifier::SetShowLevelMeter(bool show)
+{
+   mShowLevelMeter = show;
+   mModuleSaveData.SetBool("show_level_meter", show);
+}
+
 void Amplifier::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("show_level_meter", moduleInfo, true);
+   mModuleSaveData.LoadBool("show_level_meter", moduleInfo, false);
 
    SetUpFromSaveData();
 }

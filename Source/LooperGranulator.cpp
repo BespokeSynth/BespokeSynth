@@ -92,7 +92,7 @@ void LooperGranulator::DrawModule()
 void LooperGranulator::DrawOverlay(ofRectangle bufferRect, int loopLength)
 {
    if (mOn)
-      mGranulator.Draw(bufferRect.x, bufferRect.y, bufferRect.width, bufferRect.height, 0, loopLength, loopLength);
+      mGranulator.Draw(bufferRect.x, bufferRect.y, bufferRect.width, bufferRect.height, 0, loopLength, loopLength, 1.0f);
 }
 
 void LooperGranulator::ProcessFrame(double time, float bufferOffset, float* output)

@@ -526,6 +526,8 @@ void SamplePlayer::ButtonClicked(ClickButton* button, double time)
       {
          mCuePointSpeed = 1;
          mStopOnNoteOff = false;
+         if (mSpeed < 0)
+            mSample->SetPlayPosition(mSample->LengthInSamples() - 1);
          mPlay = true;
          mAdsr.Clear();
          mAdsr.Start(time * gInvSampleRateMs, 1);
@@ -862,13 +864,13 @@ bool SamplePlayer::MouseMoved(float x, float y)
 
          // find cue point closest to but not exceeding the cursor position
          int bestCuePointIndex = -1;
-         float bestCuePointStart = 0.;
+         float bestCuePointStart = -1.0f;
          for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
          {
             float startSeconds = mSampleCuePoints[i].startSeconds;
             float lengthSeconds = mSampleCuePoints[i].lengthSeconds;
 
-            if (lengthSeconds > 0.)
+            if (lengthSeconds > 0.0f)
             {
                if (seconds >= startSeconds && seconds <= startSeconds + lengthSeconds &&
                    startSeconds > bestCuePointStart)
@@ -939,6 +941,11 @@ void SamplePlayer::SetCuePoint(int pitch, float startSeconds, float lengthSecond
       mSampleCuePoints[pitch].lengthSeconds = lengthSeconds;
       mSampleCuePoints[pitch].speed = speed;
    }
+}
+
+bool SamplePlayer::validCuePoint(int cueIndex)
+{
+   return mSample != nullptr && cueIndex >= 0 && cueIndex < mSampleCuePoints.size() - 1 && mSampleCuePoints[cueIndex].lengthSeconds > 0;
 }
 
 void SamplePlayer::DrawModule()
