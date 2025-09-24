@@ -276,6 +276,7 @@
 #include "AbletonMoveControl.h"
 #include "TrackOrganizer.h"
 #include "ModulatorBinaryValue.h"
+#include "VelocityToDuration.h"
 
 #include <juce_core/juce_core.h>
 
@@ -507,6 +508,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(AbletonMoveControl, abletonmovecontrol, kModuleCategory_Other);
    REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
    REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
+   REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
