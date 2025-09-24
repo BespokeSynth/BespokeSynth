@@ -68,4 +68,5 @@ private:
    int mCount{ 0 };
    TextEntry* mLimitEntry{ nullptr };
    ClickButton* mResetButton{ nullptr };
+   bool mResetOnLoad{ false };
 };

@@ -36,6 +36,7 @@
 #include "DropdownList.h"
 #include "IModulator.h"
 #include "IPulseReceiver.h"
+#include "TextEntry.h"
 
 struct LFOSettings
 {
@@ -51,12 +52,13 @@ struct LFOSettings
    float mMinValue{ 0 };
    float mMaxValue{ 1 };
    bool mLowResMode{ false };
+   int mRandomSeed{ 0 };
 
    void SaveState(FileStreamOut& out) const;
    void LoadState(FileStreamIn& in);
 };
 
-class FloatSliderLFOControl : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IModulator, public IPulseReceiver
+class FloatSliderLFOControl : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IModulator, public IPulseReceiver, public ITextEntryListener
 {
 public:
    FloatSliderLFOControl();
@@ -104,6 +106,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void TextEntryComplete(TextEntry* entry) override;
 
    void GetModuleDimensions(float& width, float& height) override
    {
@@ -114,6 +117,9 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, int rev) override;
+   int GetModuleSaveStateRev() const override { return 1; }
 
 protected:
    virtual ~FloatSliderLFOControl();
@@ -139,8 +145,10 @@ private:
    ClickButton* mPinButton{ nullptr };
    Checkbox* mEnableLFOCheckbox{ nullptr };
    Checkbox* mLowResModeCheckbox{ nullptr };
+   TextEntry* mRandomSeedEntry{ nullptr };
 
    bool mPinned{ false };
+   bool mUseOldSpreadStyle{ false };
 };
 
 class LFOPool

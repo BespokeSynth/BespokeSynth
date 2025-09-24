@@ -33,6 +33,7 @@ PerlinNoise LFO::sPerlinNoise;
 LFO::LFO()
 {
    SetPeriod(kInterval_1n);
+   mRandomSeed = gRandom() % 10000;
 }
 
 LFO::~LFO()
@@ -105,11 +106,11 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
    {
       nonstandardOsc = true;
 
-      double perlinPos = gTime + gInvSampleRateMs * samplesIn;
+      double perlinPos = (gTime - mPhaseResetTime) + gInvSampleRateMs * samplesIn + mPhaseOffset * 1000;
       if (forcePhase != -1 && !std::isnan(forcePhase))
          perlinPos += forcePhase * 1000;
       double perlinPhase = perlinPos * mFreeRate / 1000.0f;
-      sample = sPerlinNoise.noise(perlinPhase, mPerlinSeed, -perlinPhase);
+      sample = sPerlinNoise.noise(perlinPhase, mRandomSeed, -perlinPhase);
    }
    else
    {
@@ -158,9 +159,6 @@ void LFO::SetType(OscillatorType type)
    else
       TheTransport->RemoveListener(this);
 
-   if (type == kOsc_Perlin)
-      mPerlinSeed = gRandom() % 10000;
-
    if (mOsc.GetType() == kOsc_Drunk || mOsc.GetType() == kOsc_Perlin || mPeriod == kInterval_Free)
       TheTransport->AddAudioPoller(this);
    else
@@ -169,10 +167,13 @@ void LFO::SetType(OscillatorType type)
 
 void LFO::OnTimeEvent(double time)
 {
+   double randomResolution = gSampleRateMs;
+   float value = DeterministicRandomFloat01(mRandomSeed, int((time - mPhaseResetTime) * randomResolution));
+   //ofLog() << ofToString(mRandomSeed) << " " << ofToString(int((time - mPhaseResetTime) * randomResolution));
    if (mOsc.GetSoften() == 0)
-      mRandom.SetValue(ofRandom(1));
+      mRandom.SetValue(value);
    else
-      mRandom.Start(time, ofRandom(1), time + mOsc.GetSoften() * 30);
+      mRandom.Start(time, value, time + mOsc.GetSoften() * 30);
 }
 
 void LFO::OnTransportAdvanced(float amount)
@@ -188,7 +189,8 @@ void LFO::OnTransportAdvanced(float amount)
       {
          distance = TheTransport->GetDuration(kInterval_64n) / TheTransport->GetDuration(mPeriod);
       }
-      float drunk = ofRandom(-distance, distance);
+      double time = gTime + amount * TheTransport->MsPerBar();
+      float drunk = (DeterministicRandomFloat01(mRandomSeed, int((time - mPhaseResetTime) * gSampleRate)) * 2 - 1) * distance;
       if (mDrunk + drunk > 1 || mDrunk + drunk < 0)
          drunk *= -1;
       mDrunk = ofClamp(mDrunk + drunk, 0, 1);
@@ -211,4 +213,5 @@ void LFO::ResetPhase(double time)
    mFreePhase = 1 - mPhaseOffset;
    mAdjustOffset = 0;
    mAdjustOffset = CalculatePhase() + mPhaseOffset;
+   mPhaseResetTime = time;
 }
