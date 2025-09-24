@@ -87,7 +87,7 @@ void Sampler::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (!mEnabled || target == nullptr)
+   if (!mEnabled || target == nullptr || !mSample.LengthInSamples())
       return;
 
    mNoteInputBuffer.Process(time);
