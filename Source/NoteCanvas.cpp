@@ -38,6 +38,7 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 NoteCanvas::NoteCanvas()
+: IDrawableModule(410, 363)
 {
    mVoiceModulations.resize(kNumVoices + 1);
 }
@@ -573,15 +574,11 @@ namespace
 
 void NoteCanvas::Resize(float w, float h)
 {
-   w = MAX(w - extraW, 390);
-   h = MAX(h - extraH, 40);
-   mCanvas->SetDimensions(w, h);
-}
-
-void NoteCanvas::GetModuleDimensions(float& width, float& height)
-{
-   width = mCanvas->GetWidth() + extraW;
-   height = mCanvas->GetHeight() + extraH;
+   w = MAX(w, 390);
+   h = MAX(h, 200);
+   mWidth = w;
+   mHeight = h;
+   mCanvas->SetDimensions(w - extraW, h - extraH);
 }
 
 void NoteCanvas::SetNumMeasures(int numMeasures)
