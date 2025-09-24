@@ -77,8 +77,8 @@ void StereoRotation::Process(double time)
       }
    }
 
-   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
+   for (int ch = 0; ch < 2; ++ch)
+      GetVizBuffer()->WriteChunk(out->GetChannel(ch), bufferSize, ch);
 
    GetBuffer()->Reset();
 }
