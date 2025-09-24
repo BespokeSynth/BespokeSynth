@@ -129,15 +129,17 @@ private:
    {
       GrainManualVoice();
       void Process(ChannelBuffer* output, int bufferSize);
-      void Draw(float w, float h);
+      void Draw(int index, float w, float h);
 
       float mGain{ 0 };
       float mPosition{ 0 };
       float mPan{ 0 };
+      float mLastInputVelocity{ 1.0f };
 
       Granulator mGranulator;
       SeaOfGrain* mOwner{ nullptr };
 
+      Checkbox* mEnabledCheckbox{ nullptr };
       FloatSlider* mGainSlider{ nullptr };
       FloatSlider* mPositionSlider{ nullptr };
       FloatSlider* mOverlapSlider{ nullptr };
@@ -151,6 +153,7 @@ private:
       FloatSlider* mPanSlider{ nullptr };
    };
 
+   bool mMPEMode{ false };
    static const int kNumMPEVoices = 16;
    GrainMPEVoice mMPEVoices[kNumMPEVoices];
    static const int kNumManualVoices = 6;
@@ -177,4 +180,8 @@ private:
    int mKeyboardBasePitch{ 36 };
    DropdownList* mKeyboardNumPitchesSelector{ nullptr };
    int mKeyboardNumPitches{ 24 };
+   GrainWindowType mGrainWindowType{ GrainWindowType::Round };
+   DropdownList* mGrainWindowTypeSelector{ nullptr };
+   float mGrainWindowShape{ 0.5f };
+   FloatSlider* mGrainWindowShapeSlider{ nullptr };
 };

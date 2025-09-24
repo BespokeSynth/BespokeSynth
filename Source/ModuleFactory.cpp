@@ -260,6 +260,7 @@
 #include "RhythmSequencer.h"
 #include "DotSequencer.h"
 #include "VoiceSetter.h"
+#include "VoiceManager.h"
 #include "LabelDisplay.h"
 #include "ControlRecorder.h"
 #include "EuclideanSequencer.h"
@@ -274,6 +275,8 @@
 #include "LatencyCalculator.h"
 #include "AbletonMoveControl.h"
 #include "TrackOrganizer.h"
+#include "ModulatorBinaryValue.h"
+#include "VelocityToDuration.h"
 
 #include <juce_core/juce_core.h>
 
@@ -489,6 +492,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
    REGISTER(VoiceSetter, voicesetter, kModuleCategory_Note);
+   REGISTER(VoiceManager, voicemanager, kModuleCategory_Note);
    REGISTER(ControlRecorder, controlrecorder, kModuleCategory_Modulator);
    REGISTER(EuclideanSequencer, euclideansequencer, kModuleCategory_Instrument);
    REGISTER(ControlInterface, interface, kModuleCategory_Modulator);
@@ -503,6 +507,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
    REGISTER(AbletonMoveControl, abletonmovecontrol, kModuleCategory_Other);
    REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
+   REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
+   REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

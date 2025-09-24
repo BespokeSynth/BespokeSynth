@@ -30,7 +30,7 @@ void VoiceSetter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mVoiceSlider = new IntSlider(this, "voice index", 5, 2, 80, 15, &mVoiceIdx, 0, kNumVoices - 1);
+   mVoiceSlider = new IntSlider(this, "voice index", 5, 2, 80, 15, &mVoiceIdx, -1, kNumVoices - 1);
 }
 
 void VoiceSetter::DrawModule()

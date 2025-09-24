@@ -681,14 +681,16 @@ void AbletonMoveControl::UpdateLeds()
             LooperRecorder* looperRecorder = dynamic_cast<LooperRecorder*>(recorder);
             if (looperRecorder != nullptr)
             {
-               if (i < 4)
+               if (i < 5)
                {
                   int numBars;
                   if (i == 0)
-                     numBars = 8;
+                     numBars = 16;
                   else if (i == 1)
-                     numBars = 4;
+                     numBars = 8;
                   else if (i == 2)
+                     numBars = 4;
+                  else if (i == 3)
                      numBars = 2;
                   else
                      numBars = 1;
@@ -1073,14 +1075,16 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
                if (looperRecorder != nullptr)
                {
                   int buttonIndex = note.mPitch - kStepButtonSection;
-                  if (buttonIndex < 4)
+                  if (buttonIndex < 5)
                   {
                      int numBars;
                      if (buttonIndex == 0)
-                        numBars = 8;
+                        numBars = 16;
                      else if (buttonIndex == 1)
-                        numBars = 4;
+                        numBars = 8;
                      else if (buttonIndex == 2)
+                        numBars = 4;
+                     else if (buttonIndex == 3)
                         numBars = 2;
                      else
                         numBars = 1;
@@ -1094,7 +1098,7 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
    }
    else
    {
-      ofLog() << "unhandled note " << note.mPitch << " " << note.mVelocity;
+      //ofLog() << "unhandled note " << note.mPitch << " " << note.mVelocity;
    }
 }
 

@@ -365,6 +365,8 @@ target_sources(BespokeSynth PRIVATE
     ModulatorAddCentered.h
     BoundsToPulse.cpp
     BoundsToPulse.h
+    ModulatorBinaryValue.cpp
+    ModulatorBinaryValue.h
     ModulatorCurve.cpp
     ModulatorCurve.h
     ModulatorExpression.cpp
@@ -754,12 +756,16 @@ target_sources(BespokeSynth PRIVATE
     VelocityToCV.h
     VelocityToChance.cpp
     VelocityToChance.h
+    VelocityToDuration.cpp
+    VelocityToDuration.h
     VinylTempoControl.cpp
     VinylTempoControl.h
     Vocoder.cpp
     Vocoder.h
     VocoderCarrierInput.cpp
     VocoderCarrierInput.h
+    VoiceManager.cpp
+    VoiceManager.h
     VoiceSetter.cpp
     VoiceSetter.h
     VolcaBeatsControl.cpp
@@ -911,7 +917,7 @@ target_link_libraries(BespokeSynth PRIVATE
     $<$<STREQUAL:${BESPOKE_SYSTEM_TUNING_LIBRARY},OFF>:tuning-library>
     oddsound-mts
     Ableton::Link
-    readerwriterqueue
+    $<$<STREQUAL:${BESPOKE_SYSTEM_READERWRITERQUEUE},OFF>:readerwriterqueue>
 
     juce::juce_audio_basics
     juce::juce_audio_devices

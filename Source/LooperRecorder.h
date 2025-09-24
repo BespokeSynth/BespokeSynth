@@ -119,9 +119,11 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override;
 
    static constexpr int kMaxLoopers = 8;
+   static constexpr int kNumRetroactiveCommitButtons = 5;
 
    float mWidth{ 235 };
    float mHeight{ 126 };
@@ -153,10 +155,7 @@ private:
    ChannelBuffer mWriteBuffer;
    Looper* mCommitToLooper{ nullptr };
    std::array<PatchCableSource*, kMaxLoopers> mLooperPatchCables{ nullptr };
-   ClickButton* mCommit1BarButton{ nullptr };
-   ClickButton* mCommit2BarsButton{ nullptr };
-   ClickButton* mCommit4BarsButton{ nullptr };
-   ClickButton* mCommit8BarsButton{ nullptr };
+   std::array<ClickButton*, kNumRetroactiveCommitButtons> mRetroactiveCommitButton{ nullptr };
    IntSlider* mNextCommitTargetSlider{ nullptr };
    int mNextCommitTargetIndex{ 0 };
    Checkbox* mAutoAdvanceThroughLoopersCheckbox{ nullptr };
