@@ -51,9 +51,9 @@ void TapTempo::CreateUIControls()
    UICONTROL_CUSTOM(mResetButton, new ClickButton(UICONTROL_BASICS("reset")));
    ENDUIBLOCK(mWidth, mHeight);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 }
 
 void TapTempo::DrawModule()
