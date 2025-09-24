@@ -26,6 +26,11 @@
 #include "NoteDisplayer.h"
 #include "SynthGlobals.h"
 
+NoteDisplayer::NoteDisplayer()
+: IDrawableModule(160, 60)
+{
+}
+
 void NoteDisplayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -68,10 +73,4 @@ void NoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteDisplayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-}
-
-void NoteDisplayer::Resize(float w, float h)
-{
-   mWidth = w;
-   mHeight = h;
 }

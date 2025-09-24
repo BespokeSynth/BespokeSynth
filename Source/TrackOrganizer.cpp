@@ -36,6 +36,7 @@
 #include <cstring>
 
 TrackOrganizer::TrackOrganizer()
+: IDrawableModule(200, 68)
 {
    mColorIndex = rand() % 27 + 1;
 }
@@ -336,12 +337,6 @@ void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSelectModulesButton)
       mSelectModulesOnMouseRelease = TheSynth->IsMouseButtonHeld(1);
-}
-
-void TrackOrganizer::GetModuleDimensions(float& w, float& h)
-{
-   w = mWidth;
-   h = mHeight;
 }
 
 void TrackOrganizer::AdjustModuleIndex(int amount)

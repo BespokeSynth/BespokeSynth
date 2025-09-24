@@ -34,6 +34,7 @@
 #include "UIControlMacros.h"
 
 ControlInterface::ControlInterface()
+: IDrawableModule(130, 20)
 {
 }
 

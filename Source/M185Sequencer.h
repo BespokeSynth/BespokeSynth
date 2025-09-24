@@ -64,7 +64,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
 
    void StepBy(double time, float velocity, int flags);
    void ResetStep();
@@ -94,7 +93,6 @@ private:
    };
 
    std::array<Step, NUM_M185SEQUENCER_STEPS> mSteps;
-   float mWidth{ 0 }, mHeight{ 0 };
    bool mHasExternalPulseSource{ false };
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 

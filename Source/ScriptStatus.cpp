@@ -133,9 +133,6 @@ void ScriptStatus::SaveState(FileStreamOut& out)
    out << GetModuleSaveStateRev();
 
    IDrawableModule::SaveState(out);
-
-   out << mWidth;
-   out << mHeight;
 }
 
 void ScriptStatus::LoadState(FileStreamIn& in, int rev)
@@ -146,6 +143,9 @@ void ScriptStatus::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   if (rev < 2)
+   {
+      in >> mWidth;
+      in >> mHeight;
+   }
 }

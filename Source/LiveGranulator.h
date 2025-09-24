@@ -67,11 +67,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
 
    float mBufferLength;
    RollingBuffer mBuffer;
@@ -96,7 +91,5 @@ private:
    DropdownList* mGrainWindowTypeSelector{ nullptr };
    FloatSlider* mGrainWindowShapeSlider{ nullptr };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    float mBufferX{ 0 };
 };

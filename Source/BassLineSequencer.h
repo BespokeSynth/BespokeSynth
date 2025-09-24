@@ -89,7 +89,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -145,7 +144,6 @@ private:
 
    std::array<Step, kMaxSteps> mSteps;
    std::array<StepControl, kMaxStepControls + 1> mStepControls;
-   float mWidth{ 0 }, mHeight{ 0 };
    bool mHasExternalPulseSource{ false };
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 

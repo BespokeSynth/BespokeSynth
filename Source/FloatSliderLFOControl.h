@@ -146,8 +146,6 @@ private:
    Checkbox* mEnableLFOCheckbox{ nullptr };
    Checkbox* mLowResModeCheckbox{ nullptr };
    TextEntry* mRandomSeedEntry{ nullptr };
-   float mWidth{ 100 };
-   float mHeight{ 20 };
 
    bool mPinned{ false };
    bool mUseOldSpreadStyle{ false };

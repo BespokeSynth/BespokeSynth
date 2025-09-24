@@ -59,7 +59,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
 
    FloatSlider* mZoomSlider{ nullptr };
    FloatSlider* mXSlider{ nullptr };
@@ -75,8 +74,6 @@ private:
    FloatSlider* mCornerRadiusSlider{ nullptr };
    FloatSlider* mCableAlphaSlider{ nullptr };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    float mMouseScrollX{ 0 };
    float mMouseScrollY{ 0 };
 };

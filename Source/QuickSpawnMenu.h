@@ -75,11 +75,6 @@ public:
    void MouseReleased() override;
 
    bool IsSingleton() const override { return true; }
-   void GetDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
 private:
    const ModuleFactory::Spawnable* GetElementAt(int x, int y) const;
@@ -103,8 +98,6 @@ private:
       Search
    };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    int mLastHoverX{ 0 };
    int mLastHoverY{ 0 };
    juce::String mHeldKeys;

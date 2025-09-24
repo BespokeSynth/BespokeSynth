@@ -36,6 +36,7 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 UserPrefsEditor::UserPrefsEditor()
+: IDrawableModule(1150, 50)
 {
 }
 

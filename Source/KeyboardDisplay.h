@@ -59,18 +59,13 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
    void OnClicked(float x, float y, bool right) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
@@ -83,8 +78,6 @@ private:
    int RootKey() const;
    int NumKeys() const;
 
-   float mWidth{ 500 };
-   float mHeight{ 110 };
    int mRootOctave{ 3 };
    int mNumOctaves{ 3 };
    int mForceNumOctaves{ 0 };

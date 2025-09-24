@@ -59,6 +59,12 @@ IDrawableModule::IDrawableModule()
 {
 }
 
+IDrawableModule::IDrawableModule(float width, float height)
+: mWidth(width)
+, mHeight(height)
+{
+}
+
 IDrawableModule::~IDrawableModule()
 {
    for (int i = 0; i < mUIControls.size(); ++i)
@@ -1243,7 +1249,7 @@ void IDrawableModule::SetUpFromSaveDataBase()
 
 namespace
 {
-   const int kBaseSaveStateRev = 3;
+   const int kBaseSaveStateRev = 4;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
@@ -1263,6 +1269,12 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    out << mPinned;
    out << mPinnedPosition.x;
    out << mPinnedPosition.y;
+
+   if (IsResizable())
+   {
+      out << mWidth;
+      out << mHeight;
+   }
 
    std::vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
@@ -1343,6 +1355,15 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
       in >> mPinned;
       in >> mPinnedPosition.x;
       in >> mPinnedPosition.y;
+   }
+
+   if (baseRev >= 4 && IsResizable())
+   {
+      in >> mWidth;
+      in >> mHeight;
+      mWidth = MAX(mWidth, GetMinimumDimensions().x);
+      mHeight = MAX(mHeight, GetMinimumDimensions().y);
+      Resize(mWidth, mHeight);
    }
 
    int numUIControls;

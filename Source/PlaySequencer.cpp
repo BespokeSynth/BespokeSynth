@@ -32,6 +32,7 @@
 #include "UIControlMacros.h"
 
 PlaySequencer::PlaySequencer()
+: IDrawableModule(240, 20)
 {
    mNoteOffScheduler.mOwner = this;
 }

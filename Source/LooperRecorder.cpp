@@ -37,6 +37,7 @@
 
 LooperRecorder::LooperRecorder()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(235, 126)
 , mRecordBuffer(MAX_BUFFER_SIZE)
 , mWriteBuffer(gBufferSize)
 {

@@ -1462,12 +1462,6 @@ void ScriptModule::Reset()
       mPrintDisplay[i].time = -1;
 }
 
-void ScriptModule::GetModuleDimensions(float& w, float& h)
-{
-   w = mWidth;
-   h = mHeight;
-}
-
 void ScriptModule::Resize(float w, float h)
 {
    float entryW, entryH;
@@ -1651,6 +1645,7 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 }
 
 ScriptReferenceDisplay::ScriptReferenceDisplay()
+: IDrawableModule(750, 335)
 {
    LoadText();
 }
@@ -1695,12 +1690,6 @@ bool ScriptReferenceDisplay::MouseScrolled(float x, float y, float scrollX, floa
 {
    mScrollOffset.y = ofClamp(mScrollOffset.y - scrollY * 10, 0, mMaxScrollAmount);
    return true;
-}
-
-void ScriptReferenceDisplay::GetModuleDimensions(float& w, float& h)
-{
-   w = mWidth;
-   h = mHeight;
 }
 
 void ScriptReferenceDisplay::ButtonClicked(ClickButton* button, double time)

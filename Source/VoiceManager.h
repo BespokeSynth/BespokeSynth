@@ -80,9 +80,6 @@ private:
 
    void GetModuleDimensions(float& width, float& height) override;
 
-   float mWidth{ 204 };
-   float mHeight{ 22 };
-
    int mLastOutputVoice{ -1 };
    int mVoiceMapping[128]{ 0 };
    std::vector<AdditionalNoteCable*> mDestinationCables;

@@ -61,11 +61,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = 150;
-      height = 22;
-   }
 
    float mMaxDuration{ .25 };
    FloatSlider* mMaxDurationSlider{ nullptr };

@@ -126,8 +126,6 @@ void BassLineSequencer::CreateUIControls()
 
       ++i;
    }
-   mWidth = UIBLOCKWIDTH();
-   mHeight = UIBLOCKHEIGHT();
    ENDUIBLOCK(mWidth, mHeight);
 
    UpdatePitchLabels();
@@ -572,12 +570,6 @@ void BassLineSequencer::UpdatePitchLabels()
       for (int j = mNoteRange - 1; j >= 0; --j)
          stepControl.mToneDropdown->AddLabel(NoteName(NoteStepSequencer::RowToPitch(mNoteMode, j, mOctave, 0), false, true), j);
    }
-}
-
-void BassLineSequencer::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
 }
 
 void BassLineSequencer::OnClicked(float x, float y, bool right)

@@ -35,6 +35,7 @@
 #include "CanvasScrollbar.h"
 
 EventCanvas::EventCanvas()
+: IDrawableModule(400, 250)
 {
    mRowColors.push_back(ofColor::red);
    mRowColors.push_back(ofColor::green);
@@ -318,15 +319,11 @@ namespace
 
 void EventCanvas::Resize(float w, float h)
 {
-   w = MAX(w - extraW, 390);
-   h = MAX(h - extraH, 100);
-   mCanvas->SetDimensions(w, h);
-}
-
-void EventCanvas::GetModuleDimensions(float& width, float& height)
-{
-   width = mCanvas->GetWidth() + extraW;
-   height = mCanvas->GetHeight() + extraH;
+   w = MAX(w, 400);
+   h = MAX(h, 250);
+   mWidth = w;
+   mHeight = h;
+   mCanvas->SetDimensions(w - extraW, h - extraH);
 }
 
 void EventCanvas::CheckboxUpdated(Checkbox* checkbox, double time)

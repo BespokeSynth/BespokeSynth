@@ -134,12 +134,6 @@ void LooperGranulator::DropdownUpdated(DropdownList* list, int oldVal, double ti
 {
 }
 
-void LooperGranulator::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
-}
-
 void LooperGranulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
    std::string targetPath = "";

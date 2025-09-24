@@ -145,9 +145,6 @@ private:
    int mFontHandle{ 0 };
    int mFontHandleBold{ 0 };
 
-   float mWidth{ 100 };
-   float mHeight{ 20 };
-
    IDrawableModule* mDisplayModule{ nullptr };
    Snapshots* mDisplayModuleSnapshots{ nullptr };
    ControlRecorder* mCurrentControlRecorder{ nullptr };

@@ -63,18 +63,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    int mLimit{ 0 };
    int mCount{ 0 };
    TextEntry* mLimitEntry{ nullptr };
    ClickButton* mResetButton{ nullptr };
    bool mResetOnLoad{ false };
-
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 };

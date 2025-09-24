@@ -42,7 +42,6 @@ public:
    static bool AcceptsPulses() { return false; }
 
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
@@ -61,11 +60,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
+
    bool IsElementActive(int index) const;
    float GetYPos(int pitch, float noteHeight) const;
 
@@ -79,8 +74,6 @@ private:
 
    static const int kNoteStreamCapacity = 100;
    NoteStreamElement mNoteStream[kNoteStreamCapacity];
-   float mWidth{ 400 };
-   float mHeight{ 200 };
    float mDurationMs{ 2000 };
    int mPitchMin{ 127 };
    int mPitchMax{ 0 };

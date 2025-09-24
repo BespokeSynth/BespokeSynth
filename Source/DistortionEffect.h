@@ -69,11 +69,7 @@ private:
    };
 
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 
    DistortionType mType{ DistortionType::kClean };
    float mClip{ 1 };

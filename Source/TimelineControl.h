@@ -65,7 +65,6 @@ private:
 
    float GetSliderWidth() { return mWidth - 6; }
 
-   float mWidth{ 400 };
    int mNumMeasures{ 32 };
    TextEntry* mNumMeasuresEntry{ nullptr };
    float mTime{ 0 };

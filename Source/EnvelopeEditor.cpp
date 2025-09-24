@@ -390,7 +390,8 @@ float EnvelopeControl::GetYForValue(float value)
 }
 
 EnvelopeEditor::EnvelopeEditor()
-: mEnvelopeControl(ofVec2f(5, 25), ofVec2f(380, 200), this)
+: IDrawableModule(320, 210)
+, mEnvelopeControl(ofVec2f(5, 25), ofVec2f(380, 200), this)
 {
 }
 

@@ -27,6 +27,7 @@
 #include "SynthGlobals.h"
 
 VelocityToDuration::VelocityToDuration()
+: IDrawableModule(150, 22)
 {
 }
 

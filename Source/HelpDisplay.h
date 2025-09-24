@@ -96,8 +96,6 @@ private:
    ClickButton* mTutorialVideoLinkButton{ nullptr };
    ClickButton* mDocsLinkButton{ nullptr };
    ClickButton* mDiscordLinkButton{ nullptr };
-   float mWidth{ 700 };
-   float mHeight{ 700 };
    static bool sTooltipsLoaded;
    static std::list<ModuleTooltipInfo> sTooltips;
 

@@ -109,12 +109,6 @@ void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal, doubl
    }
 }
 
-void GlobalControls::GetModuleDimensions(float& w, float& h)
-{
-   w = mWidth;
-   h = mHeight;
-}
-
 void GlobalControls::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();

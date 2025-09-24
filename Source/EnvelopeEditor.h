@@ -108,12 +108,6 @@ public:
    ofVec2f GetCurveSliderExtentsForStage(int stage) const;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
-
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -135,9 +129,6 @@ private:
    };
 
    EnvelopeControl mEnvelopeControl;
-
-   float mWidth{ 320 };
-   float mHeight{ 210 };
 
    ADSRDisplay* mADSRDisplay{ nullptr };
    ClickButton* mPinButton{ nullptr };

@@ -37,6 +37,7 @@
 #include "CanvasScrollbar.h"
 
 SampleCanvas::SampleCanvas()
+: IDrawableModule(810, 263)
 {
 }
 
@@ -171,15 +172,11 @@ namespace
 
 void SampleCanvas::Resize(float w, float h)
 {
-   w = MAX(w - extraW, 390);
-   h = MAX(h - extraH, 40);
-   mCanvas->SetDimensions(w, h);
-}
-
-void SampleCanvas::GetModuleDimensions(float& width, float& height)
-{
-   width = mCanvas->GetWidth() + extraW;
-   height = mCanvas->GetHeight() + extraH;
+   w = MAX(w, 390);
+   h = MAX(h, 200);
+   mWidth = w;
+   mHeight = h;
+   mCanvas->SetDimensions(w - extraW, h - extraH);
 }
 
 void SampleCanvas::FilesDropped(std::vector<std::string> files, int x, int y)

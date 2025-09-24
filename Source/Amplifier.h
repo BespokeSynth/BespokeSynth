@@ -63,15 +63,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
 
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
-
-   float mWidth{ 120 };
-   float mHeight{ 40 };
-
    float mGain{ 1 };
    FloatSlider* mGainSlider{ nullptr };
    int mNumChannels{ 1 };
