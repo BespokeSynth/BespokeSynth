@@ -277,6 +277,7 @@
 #include "TrackOrganizer.h"
 #include "ModulatorBinaryValue.h"
 #include "VelocityToDuration.h"
+#include "TapTempo.h"
 
 #include <juce_core/juce_core.h>
 
@@ -509,6 +510,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
    REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
    REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
+   REGISTER(TapTempo, taptempo, kModuleCategory_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
