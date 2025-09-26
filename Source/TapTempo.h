@@ -61,11 +61,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    void CalculateTempo();
 
@@ -73,8 +68,6 @@ private:
    ClickButton* mSendTempoButton{ nullptr };
    bool mRoundTempo{ true };
    Checkbox* mRoundTempoCheckbox{ nullptr };
-   float mWidth{ 10 };
-   float mHeight{ 200 };
 
    std::array<double, 14> mTimeSamples{};
    int mNumAccumulatedSamples{ 0 };
