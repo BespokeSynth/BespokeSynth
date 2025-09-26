@@ -699,6 +699,8 @@ target_sources(BespokeSynth PRIVATE
     SynthGlobals.h
     TakeRecorder.cpp
     TakeRecorder.h
+    TapTempo.cpp
+    TapTempo.h
     TextEntry.cpp
     TextEntry.h
     TimelineControl.cpp
