@@ -89,8 +89,10 @@ void SeaOfGrain::CreateUIControls()
    mKeyboardNumPitchesSelector->AddLabel("60", 60);
 
    mGrainWindowTypeSelector->AddLabel("round", (int)GrainWindowType::Round);
+   mGrainWindowTypeSelector->AddLabel("fast", (int)GrainWindowType::Fast);
    mGrainWindowTypeSelector->AddLabel("triangle", (int)GrainWindowType::Triangle);
    mGrainWindowTypeSelector->AddLabel("envelope", (int)GrainWindowType::Envelope);
+   mGrainWindowTypeSelector->AddLabel("hybrid", (int)GrainWindowType::Hybrid);
 
    for (int i = 0; i < kNumManualVoices; ++i)
    {
