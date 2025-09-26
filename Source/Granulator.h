@@ -36,8 +36,10 @@ class Granulator;
 enum class GrainWindowType
 {
    Round,
+   Fast,
    Triangle,
-   Envelope
+   Envelope,
+   Hybrid
 };
 
 class Grain
@@ -70,7 +72,7 @@ public:
    void ClearGrains();
    void SetLiveMode(bool live) { mLiveMode = live; }
    void QueueGrainSpawn(double spawnTime);
-   inline double GetWindow(double phase) const;
+   static inline double GetWindow(GrainWindowType type, double shape, double grainLengthMs, double phase);
 
    bool mSpawnGrains{ true };
    float mSpeed{ 1 };

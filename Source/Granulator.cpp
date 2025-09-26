@@ -165,7 +165,7 @@ void Granulator::DrawWindow(float x, float y, float w, float h)
    const int stepSize = 3;
    for (int i = 0; i < (int)w; i += stepSize)
    {
-      ofVertex(x + i, y + h - GetWindow(i / w) * h);
+      ofVertex(x + i, y + h - GetWindow(mWindowType, mWindowShape, mGrainLengthMs, i / w) * h);
    }
    ofEndShape();
 
@@ -178,33 +178,62 @@ void Granulator::ClearGrains()
       mGrains[i].Clear();
 }
 
-inline double Granulator::GetWindow(double phase) const
+namespace
 {
-   if (mWindowType == GrainWindowType::Round)
+   inline static double FastCosWindow(double x)
    {
-      if (phase < mWindowShape)
-         phase = phase / mWindowShape * 0.5;
+      double factor = 5.385;
+      double z = 2.0 * factor * x - factor;
+      double z2 = z * z;
+      double z4 = z2 * z2;
+
+      // [4/4] Pade approximant of cos(z)
+      double cos_approx = (z4 - 56.0 * z2 + 840.0) /
+                          (z4 + 28.0 * z2 + 840.0);
+
+      return cos_approx;
+   }
+}
+
+inline double Granulator::GetWindow(GrainWindowType type, double shape, double grainLengthMs, double phase)
+{
+   if (type == GrainWindowType::Round)
+   {
+      if (phase < shape)
+         phase = phase / shape * 0.5;
       else
-         phase = (phase - mWindowShape) / (1.0 - mWindowShape) * 0.5 + 0.5;
+         phase = (phase - shape) / (1.0 - shape) * 0.5 + 0.5;
       return .5 + .5 * juce::dsp::FastMathApproximations::cos<double>(phase * TWO_PI - PI);
    }
-   else if (mWindowType == GrainWindowType::Triangle)
+   else if (type == GrainWindowType::Fast)
    {
-      if (phase < mWindowShape)
-         return phase / mWindowShape;
-      return 1.0 - ((phase - mWindowShape) / (1.0 - mWindowShape));
+      if (phase < shape)
+         phase = phase / shape * 0.5;
+      else
+         phase = (phase - shape) / (1.0 - shape) * 0.5 + 0.5;
+      return FastCosWindow(phase);
    }
-   else if (mWindowType == GrainWindowType::Envelope)
+   else if (type == GrainWindowType::Triangle)
+   {
+      if (phase < shape)
+         return phase / shape;
+      return 1.0 - ((phase - shape) / (1.0 - shape));
+   }
+   else if (type == GrainWindowType::Envelope)
    {
       const double kFadeInMs = 1.0;
-      const double kFadeIn = kFadeInMs / mGrainLengthMs;
+      const double kFadeIn = kFadeInMs / grainLengthMs;
       if (phase < kFadeIn)
          return phase / kFadeIn;
-      if (phase > mWindowShape)
-         return 1.0 - ((phase - mWindowShape) / (1.0 - mWindowShape));
+      if (phase > shape)
+         return 1.0 - ((phase - shape) / (1.0 - shape));
       if (phase >= 1.0)
          return 0.0;
       return 1.0;
+   }
+   else if (type == GrainWindowType::Hybrid)
+   {
+      return (GetWindow(GrainWindowType::Round, 0.5, grainLengthMs, phase) + GetWindow(GrainWindowType::Envelope, shape, grainLengthMs, phase)) * 0.5;
    }
    return 0.0;
 }
@@ -228,7 +257,7 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
    {
       mPos += mSpeedMult * granulator->mSpeed;
       double phase = (time - mStartTime) * mStartToEndInv;
-      double window = granulator->GetWindow(phase);
+      double window = Granulator::GetWindow(granulator->mWindowType, granulator->mWindowShape, granulator->mGrainLengthMs, phase);
       for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       {
          float sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0.f, 1.f));
@@ -245,7 +274,7 @@ void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferSta
    ofPushStyle();
    ofFill();
    double phase = (std::clamp(gTime, mStartTime, mEndTime) - mStartTime) * mStartToEndInv;
-   float alpha = granulator->GetWindow(phase) * gain;
+   float alpha = Granulator::GetWindow(granulator->mWindowType, granulator->mWindowShape, granulator->mGrainLengthMs, phase) * gain;
    ofSetColor(255, 0, 0, alpha * 255);
    ofCircle(x + a * w, y + mDrawPos * h, MAX(3, h / MAX_GRAINS / 2));
    ofPopStyle();

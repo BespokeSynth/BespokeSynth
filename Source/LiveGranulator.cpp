@@ -94,8 +94,10 @@ void LiveGranulator::CreateUIControls()
    mGranLengthMs->SetMode(FloatSlider::kSquare);
 
    mGrainWindowTypeSelector->AddLabel("round", (int)GrainWindowType::Round);
+   mGrainWindowTypeSelector->AddLabel("fast", (int)GrainWindowType::Fast);
    mGrainWindowTypeSelector->AddLabel("triangle", (int)GrainWindowType::Triangle);
    mGrainWindowTypeSelector->AddLabel("envelope", (int)GrainWindowType::Envelope);
+   mGrainWindowTypeSelector->AddLabel("hybrid", (int)GrainWindowType::Hybrid);
 }
 
 LiveGranulator::~LiveGranulator()
