@@ -53,6 +53,7 @@ public:
    void ResetStackDepth() { mStackDepth = 0; }
    bool* GetNotes() { return mNotes; }
    bool HasHeldNotes();
+   bool IsNoteHeld(int pitch) const { return mNotes[pitch]; }
    std::list<int> GetHeldNotesList();
 
 private:

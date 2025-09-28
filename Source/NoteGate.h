@@ -58,4 +58,7 @@ private:
    bool mGate{ true };
    Checkbox* mGateCheckbox{ nullptr };
    std::array<NoteMessage, 128> mActiveNotes{};
+   bool mStopCurrentNotes{ true };
+   double mLastGateOnTime{ 0.0 };
+   double mLastGateOffTime{ 0.0 };
 };

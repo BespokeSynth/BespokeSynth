@@ -89,7 +89,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool HasPush2OverrideControls() const override { return mPush2SelectedHitIdx != -1; }
    void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;

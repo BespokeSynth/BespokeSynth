@@ -56,8 +56,8 @@ public:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 
-   void SetLed(MidiMessageType type, int index, int color, int flashColor = -1) override;
-   bool GetButtonState(MidiMessageType type, int index) const override;
+   void SetLed(int index, int color, int flashColor = -1) override;
+   bool GetButtonState(int index) const override;
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
    void DisplayScreenMessage(std::string message, float durationMs = 500) override { ofLog() << "todo: handle push 2 screen message"; }
    IDrawableModule* GetDisplayModule() const override { return mDisplayModule; }

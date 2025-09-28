@@ -68,18 +68,19 @@ public:
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
 
    /**
-    * @brief FitNotes adapt measures to fit all added notes
+    * @brief FitNotes adapt measures and pitch range to fit all added notes
     */
-   void FitNotes();
+   void FitNotes(bool length = true, bool pitchRange = false);
 
    void OnTransportAdvanced(float amount) override;
 
    void CanvasUpdated(Canvas* canvas) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
+   bool HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid) override;
 
    //IInputRecordable
    void SetRecording(bool record) override;
@@ -115,6 +116,10 @@ private:
    void QuantizeNotes();
    void LoadMidi();
    void SaveMidi();
+   bool ToggleEditPitch(int pitch);
+   void DoubleLoop();
+   void CopyNotesToClipboard(int stepIndex);
+   std::string GetCurrentEditMeasureString() const;
 
    Canvas* mCanvas{ nullptr };
    CanvasControls* mCanvasControls{ nullptr };
@@ -148,9 +153,15 @@ private:
 
    int mEditMeasureOffset{ 0 };
    double mEditHoldTime{ 0.0 };
+   double mCopyHoldTime{ 0.0 };
    int mEditHoldStep{ -1 };
    int mEditCurrentPitchContext{ -1 };
-   std::vector<CanvasElement*> mCurrentEditElements{};
+   bool mHasMadeStepEdit{ false };
+   std::vector<NoteCanvasElement*> mCurrentEditElements{};
+   std::vector<NoteCanvasElement*> mClipboardElements{};
+   int mClipboardCopyFromStep{ 0 };
+   std::array<bool, 128> mPitchMuted{};
+   float mPlaceNoteVelocity{ kVelocityNormal };
 
    std::vector<ModulationParameters> mVoiceModulations;
 };

@@ -139,7 +139,7 @@ void NoteChance::PlayNote(NoteMessage note)
    }
 
    bool accept = random <= mChance;
-   if (accept || note.velocity == 0)
+   if (accept || (note.velocity == 0 && mNoteOutput.IsNoteHeld(note.pitch)))
       PlayNoteOutput(note);
 
    if (note.velocity > 0)

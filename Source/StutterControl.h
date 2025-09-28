@@ -60,7 +60,7 @@ public:
    void SendCC(int control, int value, int voiceIdx) override {}
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;

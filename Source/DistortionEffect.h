@@ -76,7 +76,7 @@ private:
    float mGain{ 1 };
    float mPreamp{ 1 };
    float mFuzzAmount{ 0 };
-   bool mRemoveInputDC{ true };
+   bool mRemoveInputDC{ false };
 
    DropdownList* mTypeDropdown{ nullptr };
    FloatSlider* mClipSlider{ nullptr };

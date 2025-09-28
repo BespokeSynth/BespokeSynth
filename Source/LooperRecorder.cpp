@@ -584,44 +584,41 @@ void LooperRecorder::CancelFreeRecord()
    }
 }
 
-bool LooperRecorder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool LooperRecorder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads() && midiValue > 0)
    {
-      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads() && midiValue > 0)
+      int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+      int x = gridIndex % abletonGrid->GetGridNumCols();
+      int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+
+      if (y == 0)
       {
-         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
-         int x = gridIndex % abletonGrid->GetGridNumCols();
-         int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
-
-         if (y == 0)
+         if (x < kNumRetroactiveCommitButtons)
          {
-            if (x < kNumRetroactiveCommitButtons)
-            {
-               int index = (kNumRetroactiveCommitButtons - 1 - x);
-               mRetroactiveCommitButton[index]->SetValue(1, gTime);
-            }
+            int index = (kNumRetroactiveCommitButtons - 1 - x);
+            mRetroactiveCommitButton[index]->SetValue(1, gTime);
          }
-         else if (y == 1)
-         {
-            if (x < mNumLoopers)
-               mNextCommitTargetIndex = x;
-         }
-         else if (y == 2)
-         {
-            int looperIndex = x;
-            if (mLoopers[looperIndex] != nullptr)
-               abletonGrid->SetDisplayModule(mLoopers[looperIndex]);
-         }
-         else if (y == 3)
-         {
-            int looperIndex = x;
-            if (mLoopers[looperIndex] != nullptr)
-               mLoopers[looperIndex]->SetMute(gTime, !mLoopers[looperIndex]->GetMute());
-         }
-
-         return true;
       }
+      else if (y == 1)
+      {
+         if (x < mNumLoopers)
+            mNextCommitTargetIndex = x;
+      }
+      else if (y == 2)
+      {
+         int looperIndex = x;
+         if (mLoopers[looperIndex] != nullptr)
+            abletonGrid->SetDisplayModule(mLoopers[looperIndex]);
+      }
+      else if (y == 3)
+      {
+         int looperIndex = x;
+         if (mLoopers[looperIndex] != nullptr)
+            mLoopers[looperIndex]->SetMute(gTime, !mLoopers[looperIndex]->GetMute());
+      }
+
+      return true;
    }
 
    return false;
@@ -683,7 +680,7 @@ void LooperRecorder::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
                pushColor = mLoopers[looperIndex]->GetMute() ? AbletonDevice::kColorRed : AbletonDevice::kColorDimRed;
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
+         abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
       }
    }
 }
@@ -691,26 +688,56 @@ void LooperRecorder::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 //IInputRecordable
 void LooperRecorder::SetRecording(bool record)
 {
-   mWriteForLooperCheckbox[0]->SetValue(record ? 1 : 0, NextBufferTime(false));
+   SetRecording(0, record);
 }
 
 //IInputRecordable
 bool LooperRecorder::IsRecording() const
 {
-   return mWriteForLooper[0];
+   return IsRecording(0);
 }
 
 //IInputRecordable
 void LooperRecorder::ClearRecording()
 {
-   if (mLoopers[0] != nullptr)
-      mLoopers[0]->ClearRecording();
+   ClearRecording(0);
 }
 
 //IInputRecordable
 void LooperRecorder::CancelRecording()
 {
-   mWriteForLooper[0] = false;
+   CancelRecording(0);
+}
+
+int LooperRecorder::GetLooperIndex(const Looper* looper) const
+{
+   for (int i = 0; i < (int)mLoopers.size(); ++i)
+   {
+      if (mLoopers[i] == looper)
+         return i;
+   }
+   return 0;
+}
+
+void LooperRecorder::SetRecording(int looperIndex, bool record)
+{
+   mWriteForLooperCheckbox[looperIndex]->SetValue(record ? 1 : 0, NextBufferTime(false));
+}
+
+bool LooperRecorder::IsRecording(int looperIndex) const
+{
+   return mWriteForLooper[looperIndex];
+}
+
+void LooperRecorder::ClearRecording(int looperIndex)
+{
+   if (mLoopers[looperIndex] != nullptr)
+      mLoopers[looperIndex]->ClearRecording();
+}
+
+void LooperRecorder::CancelRecording(int looperIndex)
+{
+   mWriteForLooper[looperIndex] = false;
 }
 
 void LooperRecorder::ButtonClicked(ClickButton* button, double time)

@@ -130,10 +130,10 @@ void NoteStepSequencer::CreateUIControls()
    mIntervalSelector->AddLabel("64n", kInterval_64n);
    mIntervalSelector->AddLabel("none", kInterval_None);
 
-   mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
-   mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);
-   mNoteModeSelector->AddLabel("pentatonic", kNoteMode_Pentatonic);
-   mNoteModeSelector->AddLabel("5ths", kNoteMode_Fifths);
+   mNoteModeSelector->AddLabel("scale", (int)NoteMode::Scale);
+   mNoteModeSelector->AddLabel("chromatic", (int)NoteMode::Chromatic);
+   mNoteModeSelector->AddLabel("pentatonic", (int)NoteMode::Pentatonic);
+   mNoteModeSelector->AddLabel("5ths", (int)NoteMode::Fifths);
 
    mGrid->SetSingleColumnMode(true);
    mGrid->SetFlip(true);
@@ -294,7 +294,7 @@ void NoteStepSequencer::DrawModule()
          ofSetColor(0, 255, 0, 80);
       else if (TheScale->GetPitchesPerOctave() == 12 && NoteStepSequencer::RowToPitch(mNoteMode, i, mOctave, mRowOffset) % TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot() + 7) % TheScale->GetPitchesPerOctave())
          ofSetColor(200, 150, 0, 80);
-      else if (mNoteMode == kNoteMode_Chromatic && TheScale->IsInScale(NoteStepSequencer::RowToPitch(mNoteMode, i, mOctave, mRowOffset)))
+      else if (mNoteMode == NoteMode::Chromatic && TheScale->IsInScale(NoteStepSequencer::RowToPitch(mNoteMode, i, mOctave, mRowOffset)))
          ofSetColor(100, 75, 0, 80);
       else
          continue;
@@ -464,11 +464,11 @@ int NoteStepSequencer::RowToPitch(NoteMode noteMode, int row, int octave, int ro
    int numPitchesInScale = TheScale->NumTonesInScale();
    switch (noteMode)
    {
-      case kNoteMode_Scale:
+      case NoteMode::Scale:
          return TheScale->GetPitchFromTone(row + octave * numPitchesInScale + TheScale->GetScaleDegree());
-      case kNoteMode_Chromatic:
+      case NoteMode::Chromatic:
          return row + octave * TheScale->GetPitchesPerOctave();
-      case kNoteMode_Pentatonic:
+      case NoteMode::Pentatonic:
       {
          bool isMinor = TheScale->IsInScale(TheScale->ScaleRoot() + 3);
          const int minorPentatonic[5] = { 0, 3, 5, 7, 10 };
@@ -479,7 +479,7 @@ int NoteStepSequencer::RowToPitch(NoteMode noteMode, int row, int octave, int ro
          else
             return TheScale->ScaleRoot() + (row / 5 + octave) * TheScale->GetPitchesPerOctave() + majorPentatonic[row % 5];
       }
-      case kNoteMode_Fifths:
+      case NoteMode::Fifths:
       {
          int oct = (row / 2) * numPitchesInScale;
          bool isFifth = row % 2 == 1;
@@ -490,6 +490,23 @@ int NoteStepSequencer::RowToPitch(NoteMode noteMode, int row, int octave, int ro
       }
    }
    return row;
+}
+
+//static
+int NoteStepSequencer::PitchesPerNoteModeOctave(NoteMode noteMode)
+{
+   switch (noteMode)
+   {
+      case NoteMode::Scale:
+         return TheScale->NumTonesInScale();
+      case NoteMode::Chromatic:
+         return TheScale->GetPitchesPerOctave();
+      case NoteMode::Pentatonic:
+         return 5;
+      case NoteMode::Fifths:
+         return 2;
+   }
+   return TheScale->GetPitchesPerOctave();
 }
 
 int NoteStepSequencer::PitchToRow(int pitch)
@@ -530,188 +547,208 @@ void NoteStepSequencer::GetPush2Layout(AbletonDeviceType deviceType, int& sequen
       sequenceRows = 0;
    else
       sequenceRows = (mLength - 1) / 8 + 1;
-   if (mNoteMode == kNoteMode_Scale && TheScale->NumTonesInScale() == 7)
+   if (mNoteMode == NoteMode::Scale && TheScale->NumTonesInScale() == 7)
       pitchCols = 7;
    else
       pitchCols = 8;
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteStepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool NoteStepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {
       int sequenceRows, pitchCols, pitchRows;
       GetPush2Layout(abletonGrid->GetAbletonDeviceType(), sequenceRows, pitchCols, pitchRows);
 
-      if (type == kMidiMessage_Note)
+      if (controlIndex == 12)
       {
-         if (controlIndex == 12)
-         {
-            mPush2VelocityHeld = (midiValue > 0);
-            return true;
-         }
-
-         bool isMoveStepButton = (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move && controlIndex >= AbletonDevice::kStepButtonSection && controlIndex <= AbletonDevice::kStepButtonSection + AbletonDevice::kNumStepButtons);
-
-         if ((controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads()) ||
-             isMoveStepButton)
-         {
-            int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
-            int x = gridIndex % abletonGrid->GetGridNumCols();
-            int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
-
-            if ((gridIndex >= 0 && gridIndex < 64 && y < sequenceRows) || isMoveStepButton)
-            {
-               int index = x + y * abletonGrid->GetGridNumCols();
-               if (isMoveStepButton)
-                  index = controlIndex - AbletonDevice::kStepButtonSection + mGridControlOffsetX * AbletonDevice::kNumStepButtons;
-               if (index >= 0 && index < NSS_MAX_STEPS)
-               {
-                  if (midiValue > 0)
-                  {
-                     mPush2HeldStep = index;
-                     mPush2HeldStepWasEdited = false;
-                     mPush2ButtonPressTime = gTime;
-                  }
-                  else if (index == mPush2HeldStep)
-                  {
-                     if (mVels[mPush2HeldStep] == 0)
-                        mVels[mPush2HeldStep] = mQueuedPush2Vel;
-                     else if (!mPush2HeldStepWasEdited && gTime - mPush2ButtonPressTime < 500)
-                        mVels[index] = 0;
-                     mPush2HeldStep = -1;
-                  }
-               }
-            }
-            else if (y < sequenceRows + pitchRows)
-            {
-               if (midiValue > 0)
-               {
-                  int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
-                  if (index < 0 || index >= mNoteRange || x >= pitchCols)
-                  {
-                     //out of range
-                     mQueuedPush2Tone = -2;
-                  }
-                  else if (mPush2HeldStep != -1)
-                  {
-                     mTones[mPush2HeldStep] = index;
-                     mPush2HeldStepWasEdited = true;
-                  }
-                  else
-                  {
-                     mQueuedPush2Tone = index;
-                  }
-               }
-            }
-            else if (y == 7)
-            {
-               if (midiValue > 0)
-               {
-                  mPush2LengthHeld = true;
-                  if (mPush2HeldStep != -1)
-                  {
-                     mNoteLengths[mPush2HeldStep] = (x + 1) / 8.0f;
-                     mPush2HeldStepWasEdited = true;
-                  }
-                  else
-                  {
-                     mQueuedPush2Length = (x + 1) / 8.0f;
-                  }
-               }
-               else
-               {
-                  mPush2LengthHeld = false;
-               }
-            }
-
-            SyncGridToSeq();
-
-            return true;
-         }
+         mPush2VelocityHeld = (midiValue > 0);
+         return true;
       }
-   }
-   else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
-   {
-      if (type == kMidiMessage_Note)
+
+      bool isMoveStepButton = (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move && controlIndex >= AbletonDevice::kStepButtonSection && controlIndex <= AbletonDevice::kStepButtonSection + AbletonDevice::kNumStepButtons);
+
+      if ((controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads()) ||
+          isMoveStepButton)
       {
          int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
          int x = gridIndex % abletonGrid->GetGridNumCols();
          int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
-         int col = x + mGridControlOffsetX;
-         int row = y - mGridControlOffsetY;
-         if (gridIndex >= 0 && gridIndex < 64 &&
-             col >= 0 && col < mLength &&
-             row >= abletonGrid->GetGridNumRows() - mNoteRange && row < abletonGrid->GetGridNumRows())
-         {
-            if (midiValue > 0)
-            {
-               mPush2HeldStep = col;
-               mPush2HeldStepWasEdited = false;
-               mPush2ButtonPressTime = gTime;
-            }
 
-            int tone = abletonGrid->GetGridNumRows() - 1 - row;
-            if (mTones[col] == tone && mVels[col] > 0)
-            {
-               if (midiValue == 0 && !mPush2HeldStepWasEdited && gTime - mPush2ButtonPressTime < 500)
-               {
-                  if (mNoteLengths[col] < 1)
-                     mNoteLengths[col] = 1;
-                  else
-                     mVels[col] = 0;
-                  SyncGridToSeq();
-               }
-            }
-            else
+         if ((gridIndex >= 0 && gridIndex < 64 && y < sequenceRows) || isMoveStepButton)
+         {
+            int index = x + y * abletonGrid->GetGridNumCols();
+            if (isMoveStepButton)
+               index = controlIndex - AbletonDevice::kStepButtonSection + mGridControlOffsetX * AbletonDevice::kNumStepButtons;
+            if (index >= 0 && index < NSS_MAX_STEPS)
             {
                if (midiValue > 0)
                {
-                  mTones[col] = tone;
-                  mVels[col] = mQueuedPush2Vel;
-                  mNoteLengths[col] = .5f;
-                  mPush2HeldStepWasEdited = true;
-                  SyncGridToSeq();
+                  mPush2HeldStep = index;
+                  mPush2HeldStepWasEdited = false;
+                  mPush2ButtonPressTime = gTime;
+               }
+               else if (index == mPush2HeldStep)
+               {
+                  if (mVels[mPush2HeldStep] == 0)
+                     mVels[mPush2HeldStep] = mQueuedPush2Vel;
+                  else if (!mPush2HeldStepWasEdited && gTime - mPush2ButtonPressTime < 500)
+                     mVels[index] = 0;
+                  mPush2HeldStep = -1;
                }
             }
-
-            if (midiValue == 0)
-               mPush2HeldStep = -1;
-
-            return true;
          }
+         else if (y < sequenceRows + pitchRows)
+         {
+            if (midiValue > 0)
+            {
+               int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+               if (index < 0 || index >= mNoteRange || x >= pitchCols)
+               {
+                  //out of range
+                  mQueuedPush2Tone = -2;
+               }
+               else if (mPush2HeldStep != -1)
+               {
+                  mTones[mPush2HeldStep] = index;
+                  mPush2HeldStepWasEdited = true;
+               }
+               else
+               {
+                  mQueuedPush2Tone = index;
+               }
+            }
+         }
+         else if (y == 7)
+         {
+            if (midiValue > 0)
+            {
+               mPush2LengthHeld = true;
+               if (mPush2HeldStep != -1)
+               {
+                  mNoteLengths[mPush2HeldStep] = (x + 1) / 8.0f;
+                  mPush2HeldStepWasEdited = true;
+               }
+               else
+               {
+                  mQueuedPush2Length = (x + 1) / 8.0f;
+               }
+            }
+            else
+            {
+               mPush2LengthHeld = false;
+            }
+         }
+
+         SyncGridToSeq();
+
+         return true;
       }
    }
-
-   if (type == kMidiMessage_Control)
+   else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
    {
-      if (controlIndex == abletonGrid->GetGridControllerOption1Control())
+      int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+      int x = gridIndex % abletonGrid->GetGridNumCols();
+      int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+      int col = x + mGridControlOffsetX;
+      int row = y - mGridControlOffsetY;
+      if (gridIndex >= 0 && gridIndex < 64 &&
+          col >= 0 && col < mLength &&
+          row >= abletonGrid->GetGridNumRows() - mNoteRange && row < abletonGrid->GetGridNumRows())
       {
          if (midiValue > 0)
          {
-            if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
-               mPush2GridDisplayMode = Push2GridDisplayMode::GridView;
-            else
-               mPush2GridDisplayMode = Push2GridDisplayMode::PerStep;
+            mPush2HeldStep = col;
+            mPush2HeldStepWasEdited = false;
+            mPush2ButtonPressTime = gTime;
          }
+
+         int tone = abletonGrid->GetGridNumRows() - 1 - row;
+         if (mTones[col] == tone && mVels[col] > 0)
+         {
+            if (midiValue == 0 && !mPush2HeldStepWasEdited && gTime - mPush2ButtonPressTime < 500)
+            {
+               if (mNoteLengths[col] < 1)
+                  mNoteLengths[col] = 1;
+               else
+                  mVels[col] = 0;
+               SyncGridToSeq();
+            }
+         }
+         else
+         {
+            if (midiValue > 0)
+            {
+               mTones[col] = tone;
+               mVels[col] = mQueuedPush2Vel;
+               mNoteLengths[col] = .5f;
+               mPush2HeldStepWasEdited = true;
+               SyncGridToSeq();
+            }
+         }
+
+         if (midiValue == 0)
+            mPush2HeldStep = -1;
+
          return true;
       }
-
-      if (controlIndex == AbletonDevice::kPageLeftButton && midiValue > 0)
-      {
-         mGridControlOffsetXSlider->Increment(-AbletonDevice::kNumStepButtons);
-      }
-      if (controlIndex == AbletonDevice::kPageRightButton && midiValue > 0)
-      {
-         mGridControlOffsetXSlider->Increment(AbletonDevice::kNumStepButtons);
-      }
-
-      if (controlIndex == AbletonDevice::kMoveDeleteButton && midiValue > 0 && abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
-         Clear();
    }
 
-   if (type == kMidiMessage_PitchBend)
+   if (controlIndex == abletonGrid->GetGridControllerOption1Control())
+   {
+      if (midiValue > 0)
+      {
+         if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
+            mPush2GridDisplayMode = Push2GridDisplayMode::GridView;
+         else
+            mPush2GridDisplayMode = Push2GridDisplayMode::PerStep;
+      }
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kOctaveUpButton)
+   {
+      if (midiValue > 0)
+      {
+         mGridControlOffsetYSlider->Increment(1);
+         abletonGrid->DisplayScreenMessage("y offset " + ofToString(mGridControlOffsetY));
+      }
+      return true;
+   }
+   if (controlIndex == AbletonDevice::kOctaveDownButton)
+   {
+      if (midiValue > 0)
+      {
+         mGridControlOffsetYSlider->Increment(-1);
+         abletonGrid->DisplayScreenMessage("y offset " + ofToString(mGridControlOffsetY));
+      }
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kPageLeftButton)
+   {
+      if (midiValue > 0)
+      {
+         mGridControlOffsetXSlider->Increment(-1); //-AbletonDevice::kNumStepButtons);
+         abletonGrid->DisplayScreenMessage("x offset " + ofToString(mGridControlOffsetX));
+      }
+      return true;
+   }
+   if (controlIndex == AbletonDevice::kPageRightButton)
+   {
+      if (midiValue > 0)
+      {
+         mGridControlOffsetXSlider->Increment(1); //AbletonDevice::kNumStepButtons);
+         abletonGrid->DisplayScreenMessage("x offset " + ofToString(mGridControlOffsetX));
+      }
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kMoveDeleteButton && midiValue > 0 && abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
+      Clear();
+
+   if (controlIndex == AbletonDevice::kPitchBendIndex)
    {
       float val = midiValue / MidiDevice::kPitchBendMax;
       if (mPush2HeldStep != -1)
@@ -822,9 +859,14 @@ void NoteStepSequencer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
             }
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
+         abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
       }
    }
+
+   abletonGrid->SetLed(AbletonDevice::kOctaveUpButton, 127);
+   abletonGrid->SetLed(AbletonDevice::kOctaveDownButton, 127);
+   abletonGrid->SetLed(AbletonDevice::kPageLeftButton, 127);
+   abletonGrid->SetLed(AbletonDevice::kPageRightButton, 127);
 
    if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
    {
@@ -847,7 +889,7 @@ void NoteStepSequencer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
                pushColor = AbletonDevice::kColorDarkGrey;
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, AbletonDevice::kStepButtonSection + x, pushColor);
+         abletonGrid->SetLed(AbletonDevice::kStepButtonSection + x, pushColor);
       }
    }
 
@@ -864,16 +906,16 @@ void NoteStepSequencer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
    }
    abletonGrid->GetDevice()->SendSysEx(touchStripLights);
 
-   abletonGrid->SetLed(kMidiMessage_Control, abletonGrid->GetGridControllerOption1Control(), 127);
+   abletonGrid->SetLed(abletonGrid->GetGridControllerOption1Control(), 127);
    if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
-      abletonGrid->SetLed(kMidiMessage_Control, AbletonDevice::kMoveDeleteButton, 127);
+      abletonGrid->SetLed(AbletonDevice::kMoveDeleteButton, 127);
 }
 
 bool NoteStepSequencer::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd)
 {
    /*if (abletonGrid->GetButtonState(kMidiMessage_Note, AbletonDevice::kVolumeEncoderTouch))
    {
-      lcd->DrawText(("view offset: " + ofToString(mGridControlOffsetX)).c_str(), 3, 13, LCDFONT_STYLE_REGULAR);
+      lcd->DrawText(("view offset: " + ofToString(mGridControlOffsetX)).c_str(), 5, 13, LCDFONT_STYLE_REGULAR);
       return true;
    }*/
    return false;
@@ -1375,7 +1417,7 @@ void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal, double t
    }
    if (list == mNoteModeSelector)
    {
-      if (mNoteMode != oldVal)
+      if ((int)mNoteMode != oldVal)
          mRowOffset = 0;
       SetUpStepControls();
    }

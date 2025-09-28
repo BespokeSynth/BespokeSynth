@@ -159,6 +159,34 @@ void AbletonMoveLCD::DrawRect(int x, int y, int width, int height, bool filled)
    }
 }
 
+void AbletonMoveLCD::ClearRect(int x, int y, int width, int height)
+{
+   for (int penX = x; penX < x + width && penX >= 0 && penX < kMoveDisplayWidth; ++penX)
+   {
+      for (int penY = y; penY < y + height && penY >= 0 && penY < kMoveDisplayHeight; ++penY)
+      {
+         mPixels[(penX + penY * kMoveDisplayWidth) * 4] = 0;
+      }
+   }
+}
+
+void AbletonMoveLCD::DrawPixel(int x, int y)
+{
+   if (x >= 0 && y >= 0 && x < kMoveDisplayWidth && y < kMoveDisplayHeight)
+      mPixels[(x + y * kMoveDisplayWidth) * 4] = 255;
+}
+
+void AbletonMoveLCD::TogglePixel(int x, int y)
+{
+   if (x >= 0 && y >= 0 && x < kMoveDisplayWidth && y < kMoveDisplayHeight)
+   {
+      if (mPixels[(x + y * kMoveDisplayWidth) * 4] > 0)
+         mPixels[(x + y * kMoveDisplayWidth) * 4] = 0;
+      else
+         mPixels[(x + y * kMoveDisplayWidth) * 4] = 255;
+   }
+}
+
 int AbletonMoveLCD::GetNumDisplayPixels() const
 {
    return kMoveDisplayWidth * kMoveDisplayHeight * 4;

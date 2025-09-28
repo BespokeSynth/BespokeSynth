@@ -83,7 +83,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    //IInputRecordable
@@ -91,6 +91,12 @@ public:
    bool IsRecording() const override;
    void ClearRecording() override;
    void CancelRecording() override;
+
+   int GetLooperIndex(const Looper* looper) const;
+   void SetRecording(int looperIndex, bool record);
+   bool IsRecording(int looperIndex) const;
+   void ClearRecording(int looperIndex);
+   void CancelRecording(int looperIndex);
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;

@@ -237,6 +237,7 @@ public:
    float GetFrameRate() const { return mFrameRate; }
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
+   static std::thread::id GetMainThreadID() { return sMainThreadId; }
    static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
    NoteOutputQueue* GetNoteOutputQueue() { return mNoteOutputQueue; }
 
@@ -270,6 +271,7 @@ public:
    void ToggleQuickSpawn();
    QuickSpawnMenu* GetQuickSpawn() { return mQuickSpawn; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
+   RollingBuffer* GetGlobalRecordBuffer() const { return mGlobalRecordBuffer; }
 
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
    juce::Component* GetFileChooserParent() const;
@@ -368,6 +370,7 @@ private:
    std::list<std::string> mErrors;
 
    NamedMutex mAudioThreadMutex;
+   static std::thread::id sMainThreadId;
    static std::thread::id sAudioThreadId;
    NoteOutputQueue* mNoteOutputQueue{ nullptr };
 

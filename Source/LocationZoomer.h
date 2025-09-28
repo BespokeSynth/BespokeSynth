@@ -44,6 +44,7 @@ public:
    void WriteCurrentLocation(char key);
    bool HasLocation(char key);
    void MoveToLocation(char key);
+   void MoveToLocation(float zoomLevel, ofVec2f offset);
 
 private:
    void PickNewVanityPanningDestination();

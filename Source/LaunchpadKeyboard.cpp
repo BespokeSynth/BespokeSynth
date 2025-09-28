@@ -372,41 +372,38 @@ void LaunchpadKeyboard::OnTimeEvent(double time)
 {
 }
 
-bool LaunchpadKeyboard::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool LaunchpadKeyboard::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    int rangeStart = abletonGrid->GetGridStartIndex();
    int rangeEnd = abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads();
    mCols = abletonGrid->GetGridNumCols(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
    mRows = abletonGrid->GetGridNumRows(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
 
-   if (type == kMidiMessage_Note && controlIndex >= rangeStart && controlIndex < rangeEnd)
+   if (controlIndex >= rangeStart && controlIndex < rangeEnd)
    {
       int gridIndex = controlIndex - rangeStart;
-      int gridX = gridIndex % 8;
-      int gridY = abletonGrid->GetGridNumRows() - 1 - gridIndex / 8;
+      int gridX = gridIndex % abletonGrid->GetGridNumCols();
+      int gridY = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
       OnGridButton(gridX, gridY, midiValue / 127, nullptr);
       return true;
    }
 
-   if (type == kMidiMessage_Control)
+   if (controlIndex == AbletonDevice::kOctaveUpButton)
    {
-      if (controlIndex == AbletonDevice::kOctaveUpButton)
+      if (midiValue > 0)
       {
-         if (midiValue > 0)
-         {
-            AdjustOctave(1);
-            abletonGrid->DisplayScreenMessage("Octave: " + ofToString(mOctave));
-            return true;
-         }
+         AdjustOctave(1);
+         abletonGrid->DisplayScreenMessage("Octave: " + ofToString(mOctave));
+         return true;
       }
-      else if (controlIndex == AbletonDevice::kOctaveDownButton)
+   }
+   else if (controlIndex == AbletonDevice::kOctaveDownButton)
+   {
+      if (midiValue > 0)
       {
-         if (midiValue > 0)
-         {
-            AdjustOctave(-1);
-            abletonGrid->DisplayScreenMessage("Octave: " + ofToString(mOctave));
-            return true;
-         }
+         AdjustOctave(-1);
+         abletonGrid->DisplayScreenMessage("Octave: " + ofToString(mOctave));
+         return true;
       }
    }
 
@@ -423,6 +420,10 @@ void LaunchpadKeyboard::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
    {
       for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
       {
+         int pitch = GridToPitch(x, y);
+         bool isPreviewNote = pitch >= 0 && pitch < 128 && mPreviewNotes[pitch];
+         bool isCurrentNote = pitch >= 0 && pitch < 128 && mCurrentNotes[pitch] > 0;
+
          GridColor color = GetGridSquareColor(x, y);
          int pushColor = 0;
          switch (color)
@@ -449,16 +450,28 @@ void LaunchpadKeyboard::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
                pushColor = 115;
                break;
          }
-         abletonGrid->SetLed(kMidiMessage_Note, x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + offset, pushColor);
-         //abletonGrid->SetLed(kMidiMessage_Note, x + (7-y)*8 + 36, x + y*8 + 64);
+
+         if (isPreviewNote)
+            pushColor = AbletonDevice::kColorWhite;
+
+         abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + offset, pushColor);
+         //abletonGrid->SetLed(x + (7-y)*8 + 36, x + y*8 + 64);
       }
    }
 }
 
 void LaunchpadKeyboard::DisplayNote(int pitch, int velocity)
 {
-   if (pitch >= 0 && pitch < 128)
+   if (pitch >= 0 && pitch < (int)mCurrentNotes.size())
       mCurrentNotes[pitch] = velocity;
+
+   UpdateLights();
+}
+
+void LaunchpadKeyboard::SetPreviewNotes(const std::function<bool(int)>& IsPreviewNote)
+{
+   for (int i = 0; i < (int)mPreviewNotes.size(); ++i)
+      mPreviewNotes[i] = IsPreviewNote(i);
 
    UpdateLights();
 }
@@ -688,6 +701,40 @@ int LaunchpadKeyboard::GridToPitchChordSection(int x, int y)
    return INVALID_PITCH;
 }
 
+int LaunchpadKeyboard::TransposePitchInScale(int pitch, int amount, bool octaveMultiplier)
+{
+   switch (mLayout)
+   {
+      case LaunchpadLayout::kChromatic:
+      case LaunchpadLayout::kMajorThirds:
+      case LaunchpadLayout::kGuitar:
+      case LaunchpadLayout::kAllPads:
+      case LaunchpadLayout::kPiano:
+         return pitch + amount * (octaveMultiplier ? TheScale->GetPitchesPerOctave() : 1);
+      case LaunchpadLayout::kDiatonic:
+      case LaunchpadLayout::kChordIndividual:
+      case LaunchpadLayout::kChord:
+      case LaunchpadLayout::kSeptatonic:
+      case LaunchpadLayout::kScaleRows:
+         return TheScale->GetPitchFromTone(TheScale->GetToneFromPitch(pitch) + amount * (octaveMultiplier ? TheScale->NumTonesInScale() : 1));
+      case LaunchpadLayout::kDrum:
+         return pitch + amount * (octaveMultiplier ? 4 : 1);
+      case LaunchpadLayout::kPentatonic:
+      {
+         int direction = amount > 0 ? 1 : -1;
+         int transpose = amount * (octaveMultiplier ? 5 : 1) * direction;
+         for (int i = 0; i < transpose; ++i)
+         {
+            do
+            {
+               pitch += direction;
+            } while (pitch >= 0 && pitch < 127 && !TheScale->IsInPentatonic(pitch));
+         }
+         return pitch;
+      }
+   }
+   return pitch + amount * (octaveMultiplier ? TheScale->GetPitchesPerOctave() : 1);
+}
 
 void LaunchpadKeyboard::UpdateLights(bool force)
 {
@@ -716,6 +763,7 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
    bool isChordButton = pitch != INVALID_PITCH && pitch < 0;
    bool isPressedChordButton = isChordButton && IsChordButtonPressed(pitch);
    bool isChorderEnabled = mChorder && mChorder->IsEnabled();
+   bool isPreviewNote = pitch >= 0 && pitch < 128 && mPreviewNotes[pitch];
 
    GridColor color;
    if (pitch == INVALID_PITCH)
@@ -742,6 +790,10 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
          color = kGridColor1Bright;
       else
          color = kGridColor1Dim;
+   }
+   else if (isPreviewNote)
+   {
+      color = kGridColor1Bright;
    }
    else if (isPressedChordButton && isChorderEnabled)
    {

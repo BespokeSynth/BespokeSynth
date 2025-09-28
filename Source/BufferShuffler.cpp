@@ -403,36 +403,33 @@ float BufferShuffler::GetSlicePlaybackRate() const
    }
 }
 
-bool BufferShuffler::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool BufferShuffler::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex <= abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
-      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex <= abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
+      int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+      int x = gridIndex % abletonGrid->GetGridNumCols();
+      int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+      int index = x + y * abletonGrid->GetGridNumCols();
+
+      if (y == abletonGrid->GetGridNumRows() - 1)
       {
-         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
-         int x = gridIndex % abletonGrid->GetGridNumCols();
-         int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
-         int index = x + y * abletonGrid->GetGridNumCols();
-
-         if (y == abletonGrid->GetGridNumRows() - 1)
+         if (midiValue > 0 && x < 5)
          {
-            if (midiValue > 0 && x < 5)
-            {
-               mPlaybackStyle = PlaybackStyle(x + 1);
-               abletonGrid->DisplayScreenMessage(mPlaybackStyleDropdown->GetDisplayValue((int)mPlaybackStyle));
-            }
-            else
-            {
-               mPlaybackStyle = PlaybackStyle::Normal;
-            }
+            mPlaybackStyle = PlaybackStyle(x + 1);
+            abletonGrid->DisplayScreenMessage(mPlaybackStyleDropdown->GetDisplayValue((int)mPlaybackStyle));
          }
-         else if (index < GetNumSlices() && midiValue > 0)
+         else
          {
-            PlayOneShot(index);
+            mPlaybackStyle = PlaybackStyle::Normal;
          }
-
-         return true;
       }
+      else if (index < GetNumSlices() && midiValue > 0)
+      {
+         PlayOneShot(index);
+      }
+
+      return true;
    }
 
    return false;
@@ -465,7 +462,7 @@ void BufferShuffler::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
                pushColor = 16;
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
+         abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
       }
    }
 }

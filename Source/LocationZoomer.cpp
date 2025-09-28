@@ -90,22 +90,22 @@ bool LocationZoomer::HasLocation(char key)
 void LocationZoomer::MoveToLocation(char key)
 {
    if (mLocations.count(key) > 0)
-   {
-      mStart.mZoomLevel = gDrawScale;
-      mStart.mOffset = TheSynth->GetDrawOffset();
-      mDestination = mLocations[key];
-      mCurrentProgress = 0;
-      mSpeed = 2;
-   }
+      MoveToLocation(mLocations[key].mZoomLevel, mLocations[key].mOffset);
+}
+
+void LocationZoomer::MoveToLocation(float zoomLevel, ofVec2f offset)
+{
+   mStart.mZoomLevel = gDrawScale;
+   mStart.mOffset = TheSynth->GetDrawOffset();
+   mDestination.mZoomLevel = zoomLevel;
+   mDestination.mOffset = offset;
+   mCurrentProgress = 0;
+   mSpeed = 2;
 }
 
 void LocationZoomer::GoHome()
 {
-   mStart.mZoomLevel = gDrawScale;
-   mStart.mOffset = TheSynth->GetDrawOffset();
-   mDestination = mHome;
-   mCurrentProgress = 0;
-   mSpeed = 2;
+   MoveToLocation(mHome.mZoomLevel, mHome.mOffset);
 }
 
 void LocationZoomer::EnterVanityPanningMode()

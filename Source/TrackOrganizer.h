@@ -49,18 +49,28 @@ public:
    void CreateUIControls() override;
    void Poll() override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+   void KeyPressed(int key, bool isRepeat) override;
 
    int GetModuleIndex() const { return mModuleIndex; }
-   void SetModuleIndex(int index) { mModuleIndex = index; }
-   void AdjustModuleIndex(int amount);
+   float GetModuleViewOffset() const { return mModuleViewOffset; }
+   void ResetModuleIndex()
+   {
+      mModuleIndex = 0;
+      mModuleViewOffset = 0.0f;
+   }
+   bool AdjustModuleIndex(int amount);
+   void SetModuleViewOffset(float offset) { mModuleViewOffset = offset; }
    IDrawableModule* GetCurrentModule() const;
+   IAbletonGridController* GetCurrentGridInterface() const;
    Snapshots* GetSnapshots() const;
-   IAbletonGridController* GetGridInterface() const;
-   std::vector<IDrawableModule*> GetModuleList() const;
+   int GetNumPages() const { return (int)mControlModuleCables.size(); }
+   std::vector<IDrawableModule*> GetControlModules() const;
+   std::vector<IAbletonGridController*> GetGridInterfaces() const;
    IInputRecordable* GetRecorder() const;
    Amplifier* GetGain() const;
    int GetColorIndex() const { return mColorIndex; }
    std::string GetTrackName() const { return mTrackName; }
+   ofRectangle GetBoundingRect();
 
    void TextEntryComplete(TextEntry* entry) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
@@ -80,16 +90,20 @@ private:
 
    std::list<IDrawableModule*> GetAllTrackModules();
    bool ShouldShowCables() const;
+   void GatherModules(const std::vector<IDrawableModule*>& modulesToAdd);
 
    PatchCableSource* mSnapshotsCable{ nullptr };
-   PatchCableSource* mGridInterfaceCable{ nullptr };
-   std::array<PatchCableSource*, 5> mControlModuleCables{};
+   static constexpr int kNumPages{ 5 };
+   std::array<PatchCableSource*, kNumPages> mControlModuleCables{};
+   std::array<PatchCableSource*, kNumPages> mGridInterfaceCables{};
    PatchCableSource* mRecorderCable{ nullptr };
    PatchCableSource* mGainCable{ nullptr };
    PatchCableSource* mOtherTrackModulesCable{ nullptr };
    int mModuleIndex{ 0 };
+   float mModuleViewOffset{ 0.0f };
    bool mSelectModulesOnMouseRelease{ false };
    bool mDrawTrackBounds{ true };
+   bool mDrawTrackName{ true };
 
    TextEntry* mNameEntry{ nullptr };
    std::string mTrackName{ "track" };

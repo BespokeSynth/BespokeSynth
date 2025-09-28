@@ -472,37 +472,34 @@ void SongBuilder::PlaySequence(double time, int startIndex)
    }
 }
 
-bool SongBuilder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool SongBuilder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads() && midiValue > 0)
    {
-      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads() && midiValue > 0)
-      {
-         int gridIndex = controlIndex - 36;
-         int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
+      int gridIndex = controlIndex - 36;
+      int x = gridIndex % 8;
+      int y = 7 - gridIndex / 8;
 
-         if (x == 0)
+      if (x == 0)
+      {
+         if (mUseSequencer)
          {
-            if (mUseSequencer)
+            switch (y)
             {
-               switch (y)
-               {
-                  case 0: mPlaySequenceButton->SetValue(1, gTime); break;
-                  case 1: mStopSequenceButton->SetValue(1, gTime); break;
-                  default: break;
-               }
+               case 0: mPlaySequenceButton->SetValue(1, gTime); break;
+               case 1: mStopSequenceButton->SetValue(1, gTime); break;
+               default: break;
             }
          }
-         else
-         {
-            int index = y + (x - 1) * 8;
-            if (index < mScenes.size())
-               mScenes[index]->mActivateButton->SetValue(1, gTime);
-         }
-
-         return true;
       }
+      else
+      {
+         int index = y + (x - 1) * 8;
+         if (index < mScenes.size())
+            mScenes[index]->mActivateButton->SetValue(1, gTime);
+      }
+
+      return true;
    }
 
    return false;
@@ -550,7 +547,7 @@ void SongBuilder::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
             }
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor, pushColorBlink);
+         abletonGrid->SetLed(x + (7 - y) * 8 + 36, pushColor, pushColorBlink);
       }
    }
 }

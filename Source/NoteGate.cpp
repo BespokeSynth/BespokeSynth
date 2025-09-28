@@ -51,7 +51,14 @@ void NoteGate::DrawModule()
 
 void NoteGate::PlayNote(NoteMessage note)
 {
-   if (mGate || (note.velocity == 0 && mActiveNotes[note.pitch].velocity > 0))
+   bool canPlay = false;
+
+   if (mGate && note.time >= mLastGateOnTime)
+      canPlay = true;
+   if (!mGate && note.time < mLastGateOffTime)
+      canPlay = true;
+
+   if (canPlay || (note.velocity == 0 && mActiveNotes[note.pitch].velocity > 0))
    {
       PlayNoteOutput(note);
       mActiveNotes[note.pitch] = note;
@@ -62,7 +69,12 @@ void NoteGate::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mGateCheckbox)
    {
+      if (mGate)
+         mLastGateOnTime = time;
       if (!mGate)
+         mLastGateOffTime = time;
+
+      if (!mGate && mStopCurrentNotes)
       {
          for (int pitch = 0; pitch < 128; ++pitch)
          {
@@ -85,6 +97,7 @@ void NoteGate::GetModuleDimensions(float& width, float& height)
 void NoteGate::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("stop_current_notes", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -92,4 +105,5 @@ void NoteGate::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteGate::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mStopCurrentNotes = mModuleSaveData.GetBool("stop_current_notes");
 }

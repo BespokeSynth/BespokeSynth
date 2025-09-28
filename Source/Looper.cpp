@@ -1186,7 +1186,31 @@ void Looper::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void Looper::SetRecording(bool record)
 {
-   SetRecording(NextBufferTime(false), record);
+   if (mRecorder)
+      mRecorder->SetRecording(mRecorder->GetLooperIndex(this), record);
+   else
+      SetRecording(NextBufferTime(false), record);
+}
+
+bool Looper::IsRecording() const
+{
+   if (mRecorder)
+      return mRecorder->IsRecording(mRecorder->GetLooperIndex(this));
+   else
+      return mWriteInput;
+}
+
+void Looper::ClearRecording()
+{
+   Clear();
+}
+
+void Looper::CancelRecording()
+{
+   if (mRecorder)
+      mRecorder->CancelRecording(mRecorder->GetLooperIndex(this));
+   else
+      SetRecording(false);
 }
 
 void Looper::SetRecording(double time, bool record)
