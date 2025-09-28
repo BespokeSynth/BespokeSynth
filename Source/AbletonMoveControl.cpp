@@ -29,7 +29,6 @@
 #include "SynthGlobals.h"
 #include "OpenFrameworksPort.h"
 #include "UIControlMacros.h"
-#include "TitleBar.h"
 #include "ModuleSaveDataPanel.h"
 #include "QuickSpawnMenu.h"
 #include "PatchCableSource.h"
@@ -438,8 +437,9 @@ void AbletonMoveControl::DrawToFramebuffer()
 
    //scroll module offset
    int trackRowSpacingY = 8;
-   if (needToDraw && ((GetButtonState(kClickyEncoderTouch) && (mShiftHeld || GetButtonState(kClickyEncoderButton)) ||
-                       fabsf(mTrackRowOffsetSmoothed - mTrackRowOffset) > .05f)))
+   bool holdingModuleSelectInput = GetButtonState(kClickyEncoderTouch) && (mShiftHeld || GetButtonState(kClickyEncoderButton));
+   bool moduleIsScrolling = fabsf(mTrackRowOffsetSmoothed - mTrackRowOffset) > .05f;
+   if (needToDraw && (holdingModuleSelectInput || moduleIsScrolling))
    {
       mTrackRowOffsetSmoothed = ofLerp(mTrackRowOffsetSmoothed, mTrackRowOffset, 0.3f);
       for (int i = 0; i < (int)mTrackCables.size(); ++i)

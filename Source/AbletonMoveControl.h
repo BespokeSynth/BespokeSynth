@@ -143,7 +143,7 @@ private:
 
    std::array<PatchCableSource*, 8> mTrackCables{ nullptr };
    int mTrackRowOffset{ 0 };
-   int mSelectedTrackRow{ -1 };
+   int mSelectedTrackRow{ kTrackRowMixer };
    int mPreviousSelectedTrackRow{ -1 };
    double mDisplayModuleSelectTimeout{ 0.0 };
 
