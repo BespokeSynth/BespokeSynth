@@ -103,6 +103,10 @@ public:
       mManualPositionY = y;
       mAutomaticPositioning = false;
    }
+   ofVec2f GetManualPosition() const
+   {
+      return ofVec2f(mManualPositionX, mManualPositionY);
+   }
    void RemovePatchCable(PatchCable* cable, bool fromUserAction = false);
    void ClearPatchCables();
    void SetPatchCableTarget(PatchCable* cable, IClickable* target, bool fromUserClick);

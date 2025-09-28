@@ -60,6 +60,7 @@ public:
    void CreateUIControls() override;
 
    void SetRecorder(LooperRecorder* recorder);
+   LooperRecorder* GetRecorder() const { return mRecorder; }
    void Clear();
    void Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float offsetMs);
    void Fill(ChannelBuffer* buffer, int length);
@@ -101,9 +102,9 @@ public:
 
    //IInputRecordable
    void SetRecording(bool record) override;
-   bool IsRecording() const override { return mWriteInput; }
-   void ClearRecording() override { Clear(); }
-   void CancelRecording() override { SetRecording(false); }
+   bool IsRecording() const override;
+   void ClearRecording() override;
+   void CancelRecording() override;
 
    void SetRecording(double time, bool record);
    void MergeIn(Looper* otherLooper);

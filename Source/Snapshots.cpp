@@ -743,41 +743,38 @@ void Snapshots::OnGridButton(int x, int y, float velocity, IGridController* grid
    }
 }
 
-bool Snapshots::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool Snapshots::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    mPush2Connected = true;
 
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
-      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
+      int gridIndex = controlIndex - 36;
+      int x = gridIndex % 8;
+      int y = 7 - gridIndex / 8;
+      int index = x + (y - 1) * 8;
+
+      if (x == 0 && y == 0)
       {
-         int gridIndex = controlIndex - 36;
-         int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
-         int index = x + (y - 1) * 8;
-
-         if (x == 0 && y == 0)
-         {
-            mStoreMode = midiValue > 0;
-         }
-         else if (x == 1 && y == 0)
-         {
-            mDeleteMode = midiValue > 0;
-         }
-         else if (midiValue > 0 && index >= 0 && index < (int)mSnapshotCollection.size())
-         {
-            if (mStoreMode)
-               StoreSnapshot(index, true);
-            else if (mDeleteMode)
-               DeleteSnapshot(index);
-            else
-               SetSnapshot(index, gTime);
-
-            UpdateGridValues();
-         }
-
-         return true;
+         mStoreMode = midiValue > 0;
       }
+      else if (x == 1 && y == 0)
+      {
+         mDeleteMode = midiValue > 0;
+      }
+      else if (midiValue > 0 && index >= 0 && index < (int)mSnapshotCollection.size())
+      {
+         if (mStoreMode)
+            StoreSnapshot(index, true);
+         else if (mDeleteMode)
+            DeleteSnapshot(index);
+         else
+            SetSnapshot(index, gTime);
+
+         UpdateGridValues();
+      }
+
+      return true;
    }
 
    return false;
@@ -822,7 +819,7 @@ void Snapshots::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
             pushColor = 0;
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(x + (7 - y) * 8 + 36, pushColor);
       }
    }
 }

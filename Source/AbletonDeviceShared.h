@@ -46,97 +46,115 @@ namespace AbletonDevice
 {
    //push 2
    const int kMainEncoderTouchSection = 0;
-   const int kMainEncoderSection = 71;
+   const int kMainEncoderSection = 71 + 128;
    const int kPadsSection = 36;
-   const int kTapTempoButton = 3;
-   const int kMetronomeButton = 9;
-   const int kBelowScreenButtonRow = 20;
-   const int kMasterButton = 28;
-   const int kStopClipButton = 29;
-   const int kSetupButton = 30;
-   const int kLayoutButton = 31;
-   const int kConvertButton = 35;
-   const int kQuantizeButtonSection = 36;
-   const int kLeftButton = 44;
-   const int kRightButton = 45;
-   const int kUpButton = 46;
-   const int kDownButton = 47;
-   const int kSelectButton = 48;
-   const int kShiftButton = 49;
-   const int kNoteButton = 50;
-   const int kSessionButton = 51;
-   const int kAddDeviceButton = 52;
-   const int kAddTrackButton = 53;
-   const int kOctaveDownButton = 54;
-   const int kOctaveUpButton = 55;
-   const int kRepeatButton = 56;
-   const int kAccentButton = 57;
-   const int kScaleButton = 58;
-   const int kUserButton = 59;
-   const int kMuteButton = 60;
-   const int kSoloButton = 61;
-   const int kPageLeftButton = 62;
-   const int kPageRightButton = 63;
-   const int kCornerKnob = 79;
-   const int kPlayButton = 85;
-   const int kCircleButton = 86;
-   const int kNewButton = 87;
-   const int kDuplicateButton = 88;
-   const int kAutomateButton = 89;
-   const int kFixedLengthButton = 90;
-   const int kAboveScreenButtonRow = 102;
-   const int kDeviceButton = 110;
-   const int kBrowseButton = 111;
-   const int kMixButton = 112;
-   const int kClipButton = 113;
-   const int kQuantizeButton = 116;
-   const int kDoubleLoopButton = 117;
-   const int kDeleteButton = 118;
-   const int kUndoButton = 119;
-   const int kClickyEncoder = 14;
+   const int kTapTempoButton = 3 + 128;
+   const int kMetronomeButton = 9 + 128;
+   const int kBelowScreenButtonRow = 20 + 128;
+   const int kMasterButton = 28 + 128;
+   const int kStopClipButton = 29 + 128;
+   const int kSetupButton = 30 + 128;
+   const int kLayoutButton = 31 + 128;
+   const int kConvertButton = 35 + 128;
+   const int kQuantizeButtonSection = 36 + 128;
+   const int kLeftButton = 44 + 128;
+   const int kRightButton = 45 + 128;
+   const int kUpButton = 46 + 128;
+   const int kDownButton = 47 + 128;
+   const int kSelectButton = 48 + 128;
+   const int kShiftButton = 49 + 128;
+   const int kNoteButton = 50 + 128;
+   const int kSessionButton = 51 + 128;
+   const int kAddDeviceButton = 52 + 128;
+   const int kAddTrackButton = 53 + 128;
+   const int kOctaveDownButton = 54 + 128;
+   const int kOctaveUpButton = 55 + 128;
+   const int kRepeatButton = 56 + 128;
+   const int kAccentButton = 57 + 128;
+   const int kScaleButton = 58 + 128;
+   const int kUserButton = 59 + 128;
+   const int kMuteButton = 60 + 128;
+   const int kSoloButton = 61 + 128;
+   const int kPageLeftButton = 62 + 128;
+   const int kPageRightButton = 63 + 128;
+   const int kCornerKnob = 79 + 128;
+   const int kPlayButton = 85 + 128;
+   const int kCircleButton = 86 + 128;
+   const int kNewButton = 87 + 128;
+   const int kDuplicateButton = 88 + 128;
+   const int kAutomateButton = 89 + 128;
+   const int kFixedLengthButton = 90 + 128;
+   const int kAboveScreenButtonRow = 102 + 128;
+   const int kDeviceButton = 110 + 128;
+   const int kBrowseButton = 111 + 128;
+   const int kMixButton = 112 + 128;
+   const int kClipButton = 113 + 128;
+   const int kQuantizeButton = 116 + 128;
+   const int kDoubleLoopButton = 117 + 128;
+   const int kDeleteButton = 118 + 128;
+   const int kUndoButton = 119 + 128;
+   const int kClickyEncoderTurn = 14 + 128;
    const int kClickyEncoderTouch = 9;
 
    const int kNumQuantizeButtons = 8;
    const int kNumMainEncoders = 8;
    const int kNumPads = 64;
-
+   const int kPitchBendIndex = 128 + 128;
 
    //move
-   const int kTrackButtonSection = 40;
+   const int kTrackButtonSection = 40 + 128;
    const int kStepButtonSection = 16;
    const int kMovePadsSection = 68;
    const int kVolumeEncoderTouch = 8;
-   const int kVolumeEncoder = 79;
-   const int kHamburgerButton = 50;
-   const int kBackButton = 51;
-   const int kCaptureButton = 52;
-   const int kLoopButton = 58;
-   const int kMoveDeleteButton = 119;
-   const int kMoveUndoButton = 56;
-   const int kDotButton = 118;
-   const int kMoveMuteButton = 88;
-   const int kCopyButton = 60;
+   const int kVolumeEncoderTurn = 79 + 128;
+   const int kHamburgerButton = 50 + 128;
+   const int kBackButton = 51 + 128;
+   const int kCaptureButton = 52 + 128;
+   const int kLoopButton = 58 + 128;
+   const int kMoveDeleteButton = 119 + 128;
+   const int kMoveUndoButton = 56 + 128;
+   const int kDotButton = 118 + 128;
+   const int kMoveMuteButton = 88 + 128;
+   const int kCopyButton = 60 + 128;
+   const int kClickyEncoderButton = 3 + 128;
 
    const int kNumTrackButtons = 4;
    const int kNumStepButtons = 16;
    const int kNumMovePads = 32;
 
-   const int kLedNew = 16;
-   const int kLedSettings = 17;
-   const int kLedBranch = 18;
-   const int kLedDowel = 19;
-   const int kLedTempo = 20;
-   const int kLedMetronome = 21;
-   const int kLedGroove = 22;
-   const int kLedLayout = 23;
-   const int kLedScale = 24;
-   const int kLedFullVelocity = 25;
-   const int kLedRepeat = 26;
-   const int kLedChord = 27;
-   const int kLedStar = 28;
-   const int kLedAdd = 29;
-   const int kLedDuplicate = 30;
-   const int kLedQuantize = 31;
+   const int kButtonNew = 16;
+   const int kButtonSettings = 17;
+   const int kButtonBranch = 18;
+   const int kButtonDowel = 19;
+   const int kButtonTempo = 20;
+   const int kButtonMetronome = 21;
+   const int kButtonGroove = 22;
+   const int kButtonLayout = 23;
+   const int kButtonScale = 24;
+   const int kButtonFullVelocity = 25;
+   const int kButtonRepeat = 26;
+   const int kButtonChord = 27;
+   const int kButtonStar = 28;
+   const int kButtonAdd = 29;
+   const int kButtonDuplicate = 30;
+   const int kButtonQuantize = 31;
+
+   const int kLedNew = 16 + 128;
+   const int kLedSettings = 17 + 128;
+   const int kLedBranch = 18 + 128;
+   const int kLedDowel = 19 + 128;
+   const int kLedTempo = 20 + 128;
+   const int kLedMetronome = 21 + 128;
+   const int kLedGroove = 22 + 128;
+   const int kLedLayout = 23 + 128;
+   const int kLedScale = 24 + 128;
+   const int kLedFullVelocity = 25 + 128;
+   const int kLedRepeat = 26 + 128;
+   const int kLedChord = 27 + 128;
+   const int kLedStar = 28 + 128;
+   const int kLedAdd = 29 + 128;
+   const int kLedDuplicate = 30 + 128;
+   const int kLedQuantize = 31 + 128;
 
    const int kColorOff = 0;
    const int kColorLightCoral = 1;
@@ -440,14 +458,20 @@ namespace AbletonDevice
       }
       return color;
    }
+
+   static float GetEncoderIncrement(float midiInputValue)
+   {
+      float increment = midiInputValue < 64 ? midiInputValue : midiInputValue - 128;
+      return increment * .005f;
+   }
 }
 #include "leathers/pop"
 
 class IAbletonGridDevice
 {
 public:
-   virtual void SetLed(MidiMessageType type, int index, int color, int flashColor = -1) = 0;
-   virtual bool GetButtonState(MidiMessageType type, int index) const = 0;
+   virtual void SetLed(int index, int color, int flashColor = -1) = 0;
+   virtual bool GetButtonState(int index) const = 0;
    virtual int GetGridControllerOption1Control() const = 0;
    virtual int GetGridControllerOption2Control() const = 0;
    virtual MidiDevice* GetDevice() = 0;
@@ -467,7 +491,8 @@ class IAbletonGridController
 public:
    virtual ~IAbletonGridController() {}
    virtual void OnAbletonGridConnect(IAbletonGridDevice* abletonGrid) {}
-   virtual bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) = 0;
+   virtual bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) = 0;
    virtual void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) = 0;
    virtual bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) { return false; }
+   virtual bool HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid) { return false; }
 };

@@ -57,8 +57,12 @@ public:
 
    void SetDisplayer(LaunchpadNoteDisplayer* displayer) { mDisplayer = displayer; }
    void DisplayNote(int pitch, int velocity);
+   void SetPreviewNotes(const std::function<bool(int)>& IsPreviewNote);
    void SetChorder(Chorder* chorder) { mChorder = chorder; }
    void AdjustOctave(int amount);
+   int GridToPitch(int x, int y);
+   bool IsDrumMode() const { return mLayout == LaunchpadLayout::kDrum; }
+   int TransposePitchInScale(int pitch, int amount, bool octaveMultiplier);
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
@@ -77,7 +81,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -126,7 +130,6 @@ private:
    void PlayKeyboardNote(double time, int pitch, int velocity);
    void UpdateLights(bool force = false);
    GridColor GetGridSquareColor(int x, int y);
-   int GridToPitch(int x, int y);
    void HandleChordButton(int pitch, bool bOn);
    bool IsChordButtonPressed(int pitch);
    void PressedNoteFor(int x, int y, int velocity);
@@ -142,8 +145,8 @@ private:
 
    int mRootNote{ 4 }; // 4 = E
 
-   int mCurrentNotes[128]{};
-   bool mTestKeyHeld{ false };
+   std::array<int, 128> mCurrentNotes{};
+   std::array<bool, 128> mPreviewNotes{};
    int mOctave{ 3 };
    IntSlider* mOctaveSlider{ nullptr };
    bool mLatch{ false };

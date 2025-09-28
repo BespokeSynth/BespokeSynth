@@ -1171,6 +1171,7 @@ std::string ScriptModule::GetThisName()
 std::pair<int, int> ScriptModule::RunScript(double time, int lineStart /*=-1*/, int lineEnd /*=-1*/)
 {
    //should only be called from main thread
+   assert(IsMainThread());
 
    if (!sPythonInitialized)
    {

@@ -63,15 +63,16 @@ public:
 
    UIGrid* GetGrid() const { return mGrid; }
 
-   enum NoteMode
+   enum class NoteMode
    {
-      kNoteMode_Scale,
-      kNoteMode_Chromatic,
-      kNoteMode_Pentatonic,
-      kNoteMode_Fifths
+      Scale,
+      Chromatic,
+      Pentatonic,
+      Fifths
    };
 
    static int RowToPitch(NoteMode noteMode, int row, int octave, int rowOffset);
+   static int PitchesPerNoteModeOctave(NoteMode noteMode);
 
    int PitchToRow(int pitch);
    void SetStep(int index, int step, int velocity, float length);
@@ -88,7 +89,7 @@ public:
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
 
@@ -180,7 +181,7 @@ private:
    bool mAlreadyDidNoteOff{ false };
    int mOctave{ 3 };
    IntSlider* mOctaveSlider{ nullptr };
-   NoteMode mNoteMode{ NoteMode::kNoteMode_Scale };
+   NoteMode mNoteMode{ NoteMode::Scale };
    DropdownList* mNoteModeSelector{ nullptr };
    IntSlider* mLoopResetPointSlider{ nullptr };
    int mLoopResetPoint{ 0 };

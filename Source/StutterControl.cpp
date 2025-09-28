@@ -260,26 +260,24 @@ void StutterControl::UpdateGridLights()
    }
 }
 
-bool StutterControl::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool StutterControl::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
-      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
+      int gridIndex = controlIndex - 36;
+      int x = gridIndex % 8;
+      int y = 7 - gridIndex / 8;
+
+      if (y < 2)
       {
-         int gridIndex = controlIndex - 36;
-         int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
-
-         if (y < 2)
-         {
-            int index = x + y * 8;
-            mStutter[index] = midiValue > 0;
-            SendStutter(gTime, GetStutter((StutterType)index), mStutter[index]);
+         int index = x + y * 8;
+         mStutter[index] = midiValue > 0;
+         SendStutter(gTime, GetStutter((StutterType)index), mStutter[index]);
+         if (midiValue > 0)
             abletonGrid->DisplayScreenMessage(mStutterCheckboxes[index]->GetDisplayName());
-         }
-
-         return true;
       }
+
+      return true;
    }
 
    return false;
@@ -306,7 +304,7 @@ void StutterControl::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
             pushColor = 0;
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(x + (7 - y) * 8 + 36, pushColor);
       }
    }
 }

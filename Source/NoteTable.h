@@ -35,6 +35,7 @@
 #include "Scale.h"
 #include "GridController.h"
 #include "Push2Control.h"
+#include "NoteStepSequencer.h"
 
 class PatchCableSource;
 
@@ -79,7 +80,7 @@ public:
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
@@ -111,18 +112,10 @@ private:
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
    void SetColumnRow(int column, int row);
 
-   enum NoteMode
-   {
-      kNoteMode_Scale,
-      kNoteMode_Chromatic,
-      kNoteMode_Pentatonic,
-      kNoteMode_Fifths
-   };
-
    UIGrid* mGrid{ nullptr };
    int mOctave{ 3 };
    IntSlider* mOctaveSlider{ nullptr };
-   NoteMode mNoteMode{ NoteMode::kNoteMode_Scale };
+   NoteStepSequencer::NoteMode mNoteMode{ NoteStepSequencer::NoteMode::Scale };
    DropdownList* mNoteModeSelector{ nullptr };
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };

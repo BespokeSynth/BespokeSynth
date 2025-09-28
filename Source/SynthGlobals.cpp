@@ -817,6 +817,11 @@ double NextBufferTime(bool includeLookahead)
    return time;
 }
 
+bool IsMainThread()
+{
+   return std::this_thread::get_id() == ModularSynth::GetMainThreadID();
+}
+
 bool IsAudioThread()
 {
    return std::this_thread::get_id() == ModularSynth::GetAudioThreadID();

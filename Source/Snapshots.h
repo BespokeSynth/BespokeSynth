@@ -79,7 +79,7 @@ public:
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void ButtonClicked(ClickButton* button, double time) override;

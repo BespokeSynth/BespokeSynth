@@ -63,6 +63,7 @@ float ModularSynth::sBackgroundB = 0.09f;
 float ModularSynth::sCableAlpha = 1.0f;
 int ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev;
 int ModularSynth::sLastLoadedFileSaveStateRev = ModularSynth::kSaveStateRev;
+std::thread::id ModularSynth::sMainThreadId;
 std::thread::id ModularSynth::sAudioThreadId;
 
 #if BESPOKE_WINDOWS
@@ -319,6 +320,8 @@ std::string ModularSynth::GetUserPrefsPath()
 static int sFrameCount = 0;
 void ModularSynth::Poll()
 {
+   sMainThreadId = std::this_thread::get_id();
+
    if (mFatalError == "")
    {
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load

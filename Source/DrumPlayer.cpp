@@ -520,37 +520,34 @@ void DrumPlayer::PlayNote(NoteMessage note)
    }
 }
 
-bool DrumPlayer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool DrumPlayer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
-      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
+      int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+      int x = gridIndex % 8;
+      int y = gridIndex / 8;
+
+      if (x < 4 && y < 4)
       {
-         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
-         int x = gridIndex % 8;
-         int y = gridIndex / 8;
-
-         if (x < 4 && y < 4)
-         {
-            OnGridButton(x, 3 - y, midiValue / 127.0f, nullptr);
-         }
-         else if (x < 4 && midiValue > 0)
-         {
-            int index = x + (y - 4) * 4;
-            if (index == mPush2SelectedHitIdx)
-            {
-               mPush2SelectedHitIdx = -1;
-            }
-            else
-            {
-               mPush2SelectedHitIdx = index;
-               mSelectedHitIdx = index;
-               UpdateVisibleControls();
-            }
-         }
-
-         return true;
+         OnGridButton(x, 3 - y, midiValue / 127.0f, nullptr);
       }
+      else if (x < 4 && midiValue > 0)
+      {
+         int index = x + (y - 4) * 4;
+         if (index == mPush2SelectedHitIdx)
+         {
+            mPush2SelectedHitIdx = -1;
+         }
+         else
+         {
+            mPush2SelectedHitIdx = index;
+            mSelectedHitIdx = index;
+            UpdateVisibleControls();
+         }
+      }
+
+      return true;
    }
 
    return false;
@@ -589,7 +586,7 @@ void DrumPlayer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
             }
          }
 
-         abletonGrid->SetLed(kMidiMessage_Note, x + y * 8 + 36, pushColor, pushColorBlink);
+         abletonGrid->SetLed(x + y * 8 + 36, pushColor, pushColorBlink);
       }
    }
 }

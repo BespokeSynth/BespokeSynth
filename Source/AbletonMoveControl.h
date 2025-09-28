@@ -34,6 +34,7 @@
 #include "DropdownList.h"
 #include "AbletonMoveLCD.h"
 #include "AbletonDeviceShared.h"
+#include "pybind11/attr.h"
 
 class IUIControl;
 class Snapshots;
@@ -55,8 +56,9 @@ public:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 
-   void SetLed(MidiMessageType type, int index, int color, int flashColor = -1) override;
-   bool GetButtonState(MidiMessageType type, int index) const override;
+   void SetLed(int index, int color, int flashColor = -1) override;
+   void SetLedFlashColor(int index, int flashColor = -1);
+   bool GetButtonState(int index) const override;
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
    void SetDisplayModuleWithContext(IDrawableModule* module, std::string context);
    void DisplayScreenMessage(std::string message, float durationMs = 500) override;
@@ -105,42 +107,75 @@ private:
    void DrawToFramebuffer();
    void RenderPush2Display();
    void UpdateLeds();
-   void SendLeds();
+   void SendLeds(bool force);
 
    void UpdateControlList();
+   static bool IsDisplayableControl(IUIControl* control);
    int GetControlOffset() const;
 
    void DrawDisplayModuleRect(ofRectangle rect, float thickness);
    void SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module);
-   void SetActiveTrackRow(int row);
+   void SetActiveTrackRow(int row, bool resetModuleIndex);
    TrackOrganizer* GetActiveTrackRow() const;
-   void AdjustGlobalModuleIndex(int amount);
+   bool AdjustGlobalModuleIndex(int amount);
    IDrawableModule* GetCurrentGlobalModule() const;
+   IAbletonGridController* GetCurrentGlobalGridInterface() const;
    void AdjustControlWithEncoder(IUIControl* control, float midiInputValue);
    int GetDisplayKnobIndex();
    bool ShouldDisplayMixer();
    bool ShouldDisplaySnapshotView();
+   float GetModuleViewOffset() const;
+   void SetModuleViewOffset(float offset);
+   void DetermineTrackControlLayout();
+
+   const int kTrackRowGlobal = -1;
+   const int kTrackRowMixer = -2;
 
    AbletonMoveLCD mLCD;
    double mScreenOverrideTimeout{ 0.0 };
+   std::string mTemporaryScreenMessage{};
+   double mTemporaryScreenMessageTimeout{ 0.0 };
 
    IDrawableModule* mDisplayModule{ nullptr };
    std::string mDisplayModuleContext{};
    std::vector<IUIControl*> mControls;
-   std::vector<IUIControl*> mDisplayedControls;
    bool mDisplayModuleIsShowingOverrideControls{ false };
-   float mModuleViewOffset{ 0 };
 
    std::array<PatchCableSource*, 8> mTrackCables{ nullptr };
    int mTrackRowOffset{ 0 };
    int mSelectedTrackRow{ -1 };
    int mPreviousSelectedTrackRow{ -1 };
-   double mLastTrackSelectButtonPressTime{ 0 };
+   double mDisplayModuleSelectTimeout{ 0.0 };
 
-   std::array<PatchCableSource*, 5> mGlobalModuleCables{};
+   static constexpr int kNumPages{ 5 };
+   std::array<PatchCableSource*, kNumPages> mGlobalControlModuleCables{};
+   std::array<PatchCableSource*, kNumPages> mGlobalGridInterfaceCables{};
    int mGlobalModuleIndex{ 0 };
+   float mGlobalModuleViewOffset{ 0.0f };
+
+   struct TrackLayoutEntry
+   {
+      TrackLayoutEntry(std::string name, int pageCount)
+      : mName(name)
+      , mPageCount(pageCount)
+      {}
+
+      std::string mName{};
+      int mPageCount{ 0 };
+   };
+
+   std::vector<TrackLayoutEntry> mTrackControlLayout{};
+
+   enum class LissajousDisplayMode
+   {
+      Always,
+      MixerTrack,
+      Never
+   };
+   LissajousDisplayMode mLissajousDisplayMode{ LissajousDisplayMode::MixerTrack };
 
    PatchCableSource* mSongBuilderCable{ nullptr };
+   PatchCableSource* mOutputGainCable{ nullptr };
 
    bool mShiftHeld{ false };
    int mMostRecentlyTouchedKnobIndex{ -1 };
@@ -172,9 +207,15 @@ private:
       int flashColor{ -1 };
    };
 
-   std::array<LedState, 128 * 2> mQueuedLedState{}; //bottom 128 are notes, top 128 are CCs
-   std::array<LedState, 128 * 2> mLedState{}; //bottom 128 are notes, top 128 are CCs
-   std::array<int, 128 * 2> mButtonState{}; //bottom 128 are notes, top 128 are CCs
+   struct ControlState
+   {
+      LedState mQueuedLedState{};
+      LedState mLedState{};
+      int mButtonState{ 0 };
+      double mLastChangeTime{ 0.0 };
+   };
+
+   std::array<ControlState, 128 * 2> mControlState{}; //bottom 128 are notes, top 128 are CCs
 
    MidiDevice mDevice;
 

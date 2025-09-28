@@ -588,25 +588,41 @@ bool StepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool StepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, MidiMessageType type, int controlIndex, float midiValue)
+bool StepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    mAbletonGridConnected = true;
    mAbletonGridCols = abletonGrid->GetGridNumCols();
    mAbletonGridRows = abletonGrid->GetGridNumRows();
 
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
-      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
-      {
-         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
-         int gridX = gridIndex % mAbletonGridCols;
-         int gridY = (mAbletonGridRows - 1) - gridIndex / mAbletonGridCols;
-         OnGridButton(gridX, gridY, midiValue / 127, mGridControlTarget->GetGridController());
-         return true;
-      }
+      int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+      int gridX = gridIndex % mAbletonGridCols;
+      int gridY = (mAbletonGridRows - 1) - gridIndex / mAbletonGridCols;
+      OnGridButton(gridX, gridY, midiValue / 127, mGridControlTarget->GetGridController());
+      return true;
    }
 
-   if (type == kMidiMessage_PitchBend)
+   if (controlIndex == AbletonDevice::kOctaveUpButton)
+   {
+      if (midiValue > 0)
+      {
+         mGridYOffDropdown->Increment(1);
+         abletonGrid->DisplayScreenMessage("row offset " + ofToString(mGridYOff));
+      }
+      return true;
+   }
+   if (controlIndex == AbletonDevice::kOctaveDownButton)
+   {
+      if (midiValue > 0)
+      {
+         mGridYOffDropdown->Increment(-1);
+         abletonGrid->DisplayScreenMessage("row offset " + ofToString(mGridYOff));
+      }
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kPitchBendIndex)
    {
       float val = midiValue / MidiDevice::kPitchBendMax;
       mGridYOffDropdown->SetFromMidiCC(val, gTime, true);
@@ -656,9 +672,12 @@ void StepSequencer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
                pushColor = AbletonDevice::kColorBrightMagenta;
                break;
          }
-         abletonGrid->SetLed(kMidiMessage_Note, x + (mAbletonGridRows - 1 - y) * mAbletonGridCols + abletonGrid->GetGridStartIndex(), pushColor);
+         abletonGrid->SetLed(x + (mAbletonGridRows - 1 - y) * mAbletonGridCols + abletonGrid->GetGridStartIndex(), pushColor);
       }
    }
+
+   abletonGrid->SetLed(AbletonDevice::kOctaveUpButton, 127);
+   abletonGrid->SetLed(AbletonDevice::kOctaveDownButton, 127);
 
    if (abletonGrid->GetAbletonDeviceType() != AbletonDeviceType::Move)
    {

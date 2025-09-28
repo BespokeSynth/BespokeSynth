@@ -128,6 +128,32 @@ void ControlInterface::ExecuteCode()
    }
 }
 
+ofVec2f ControlInterface::FindNewUIControlPos()
+{
+   float x = 5;
+   float y = 3;
+   bool hasCollision = false;
+   do
+   {
+      hasCollision = false;
+      for (auto* otherControl : mControls)
+      {
+         if (otherControl != nullptr && otherControl->mUIControl != nullptr)
+         {
+            ofRectangle rect = otherControl->mUIControl->GetRect(K(local));
+            if (rect.intersects(ofRectangle(5, y, 80, 15)))
+            {
+               hasCollision = true;
+               y += 18;
+               break;
+            }
+         }
+      }
+   } while (hasCollision);
+
+   return ofVec2f(x, y);
+}
+
 void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    if (fromUserClick)
@@ -156,25 +182,7 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
          {
             mAddControlCable->Clear();
 
-            float y = 3;
-            bool hasCollision = false;
-            do
-            {
-               hasCollision = false;
-               for (auto* otherControl : mControls)
-               {
-                  if (otherControl != nullptr && otherControl->mUIControl != nullptr)
-                  {
-                     ofRectangle rect = otherControl->mUIControl->GetRect(K(local));
-                     if (rect.intersects(ofRectangle(5, y, 80, 15)))
-                     {
-                        hasCollision = true;
-                        y += 18;
-                        break;
-                     }
-                  }
-               }
-            } while (hasCollision);
+            ofVec2f controlPos = FindNewUIControlPos();
 
             ControlElement* control = new ControlElement();
             mControls.push_back(control);
@@ -182,28 +190,43 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
 
             control->mInfo["path"] = targetUIControl->Path(false, false, GetParent());
             control->mInfo["display_name"] = targetUIControl->Name();
-            control->mInfo["x"] = 5;
-            control->mInfo["y"] = y;
+            control->mInfo["x"] = controlPos.x;
+            control->mInfo["y"] = controlPos.y;
 
             FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(targetUIControl);
             if (floatSlider)
             {
+               control->mInfo["type"] = "floatslider";
                control->mInfo["min"] = floatSlider->GetMin();
                control->mInfo["max"] = floatSlider->GetMax();
-               control->mInfo["width"] = 80;
+               control->mInfo["width"] = kDefaultSliderWidth;
             }
 
             IntSlider* intSlider = dynamic_cast<IntSlider*>(targetUIControl);
             if (intSlider)
             {
+               control->mInfo["type"] = "intslider";
                control->mInfo["min"] = intSlider->GetMin();
                control->mInfo["max"] = intSlider->GetMax();
-               control->mInfo["width"] = 80;
+               control->mInfo["width"] = kDefaultSliderWidth;
+            }
+
+            Checkbox* checkbox = dynamic_cast<Checkbox*>(targetUIControl);
+            if (checkbox)
+            {
+               control->mInfo["type"] = "checkbox";
+            }
+
+            ClickButton* button = dynamic_cast<ClickButton*>(targetUIControl);
+            if (button)
+            {
+               control->mInfo["type"] = "button";
             }
 
             DropdownList* dropdown = dynamic_cast<DropdownList*>(targetUIControl);
             if (dropdown)
             {
+               control->mInfo["type"] = "dropdown";
                control->mInfo["values"].clear();
                for (int i = 0; i < dropdown->GetNumValues(); ++i)
                {
@@ -218,6 +241,7 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
             RadioButton* radioButton = dynamic_cast<RadioButton*>(targetUIControl);
             if (radioButton)
             {
+               control->mInfo["type"] = "radiobutton";
                control->mInfo["values"].clear();
                for (int i = 0; i < radioButton->GetNumValues(); ++i)
                {
@@ -231,8 +255,107 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
 
             control->SetUpControl();
          }
+         else
+         {
+         }
       }
    }
+}
+
+ControlInterface::ControlElement* ControlInterface::FindOrCreateNewControl(std::string identifier, std::string type, bool& isNewControl)
+{
+   ControlElement* control = nullptr;
+   for (auto* existingControl : mControls)
+   {
+      if (existingControl->mInfo["identifier"] == identifier)
+      {
+         if (existingControl->mInfo["type"] == type)
+         {
+            //we already have a control with this name, so just update the settings
+            control = existingControl;
+            isNewControl = false;
+         }
+         else
+         {
+            //we already have a control with this name but it's a different type, delete it and make a new one
+            RemovePatchCableSource(control->mTargetCable);
+            if (control->mUIControl != nullptr)
+               RemoveUIControl(control->mUIControl);
+            mControls.remove(control);
+         }
+         break;
+      }
+   }
+
+   if (control == nullptr)
+   {
+      control = new ControlElement();
+      mControls.push_back(control);
+      control->Init(this);
+      control->mInfo["type"] = type;
+      isNewControl = true;
+   }
+
+   return control;
+}
+
+FloatSlider* ControlInterface::AddFloatSlider(std::string name, float defaultVal, float min, float max)
+{
+   ofVec2f controlPos = FindNewUIControlPos();
+   bool isNewControl = false;
+   ControlElement* control = FindOrCreateNewControl(name, "floatslider", isNewControl);
+   if (isNewControl)
+      control->mDummyFloat = defaultVal;
+   else
+      controlPos = control->mUIControl->GetPosition(K(local));
+
+   control->mInfo["path"] = "";
+   control->mInfo["display_name"] = name;
+   control->mInfo["identifier"] = name;
+   control->mInfo["x"] = controlPos.x;
+   control->mInfo["y"] = controlPos.y;
+   control->mInfo["min"] = min;
+   control->mInfo["max"] = max;
+   control->mInfo["width"] = kDefaultSliderWidth;
+
+   control->SetUpControl();
+
+   return control->mFloatSlider;
+}
+
+IntSlider* ControlInterface::AddIntSlider(std::string name, int defaultVal, int min, int max)
+{
+   ofVec2f controlPos = FindNewUIControlPos();
+   bool isNewControl = false;
+   ControlElement* control = FindOrCreateNewControl(name, "intslider", isNewControl);
+   if (isNewControl)
+      control->mDummyInt = defaultVal;
+   else
+      controlPos = control->mUIControl->GetPosition(K(local));
+
+   control->mInfo["path"] = "";
+   control->mInfo["display_name"] = name;
+   control->mInfo["identifier"] = name;
+   control->mInfo["x"] = controlPos.x;
+   control->mInfo["y"] = controlPos.y;
+   control->mInfo["min"] = min;
+   control->mInfo["max"] = max;
+   control->mInfo["width"] = kDefaultSliderWidth;
+
+   control->SetUpControl();
+
+   return control->mIntSlider;
+}
+
+void ControlInterface::ClearAllControls()
+{
+   for (auto* control : mControls)
+   {
+      RemovePatchCableSource(control->mTargetCable);
+      if (control->mUIControl != nullptr)
+         RemoveUIControl(control->mUIControl);
+   }
+   mControls.clear();
 }
 
 void ControlInterface::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
@@ -352,17 +475,17 @@ void ControlInterface::LoadLayout(const ofxJSONElement& moduleInfo)
       std::string controlType = moduleInfo["controls"][i]["type"].asString();
       const char* identifier = moduleInfo["controls"][i]["identifier"].asCString();
       if (controlType == "floatslider")
-         control->mFloatSlider = new FloatSlider(this, identifier, -1, -1, 80, 15, &mDummyFloat, 0, 1);
+         control->mFloatSlider = new FloatSlider(this, identifier, -1, -1, 80, 15, &control->mDummyFloat, 0, 1);
       if (controlType == "intslider")
-         control->mIntSlider = new IntSlider(this, identifier, -1, -1, 80, 15, &mDummyInt, 0, 1);
+         control->mIntSlider = new IntSlider(this, identifier, -1, -1, 80, 15, &control->mDummyInt, 0, 1);
       if (controlType == "checkbox")
-         control->mCheckbox = new Checkbox(this, identifier, -1, -1, &mDummyBool);
+         control->mCheckbox = new Checkbox(this, identifier, -1, -1, &control->mDummyBool);
       if (controlType == "button")
          control->mButton = new ClickButton(this, identifier, -1, -1);
       if (controlType == "dropdown")
-         control->mDropdown = new DropdownList(this, identifier, -1, -1, &mDummyInt);
+         control->mDropdown = new DropdownList(this, identifier, -1, -1, &control->mDummyInt);
       if (controlType == "radiobutton")
-         control->mRadioButton = new RadioButton(this, identifier, -1, -1, &mDummyInt);
+         control->mRadioButton = new RadioButton(this, identifier, -1, -1, &control->mDummyInt);
    }
 
    SetUpFromSaveData();
@@ -415,36 +538,49 @@ ControlInterface::ControlElement::~ControlElement()
 
 void ControlInterface::ControlElement::SetUpControl()
 {
+   std::string type = mInfo["type"].asString();
    mAttachedToUIControl = TheSynth->FindUIControl(mInfo["path"].asString());
    mTargetCable->SetTarget(mAttachedToUIControl);
-   if (mAttachedToUIControl == nullptr)
+   juce::String identifier;
+   if (mAttachedToUIControl != nullptr)
    {
-      mUIControl = nullptr;
-      return;
+      identifier = mAttachedToUIControl->Path();
+      identifier = identifier.replace("~", "-");
+      std::vector<std::string> uiControlNames;
+      for (auto* uiControl : mOwner->GetUIControls())
+         uiControlNames.push_back(uiControl->Name());
+      identifier = GetUniqueName(identifier.toStdString(), uiControlNames);
+   }
+   else
+   {
+      identifier = mInfo["identifier"].asString();
    }
 
-   juce::String identifier = mAttachedToUIControl->Path();
-   identifier = identifier.replace("~", "-");
-   std::vector<std::string> uiControlNames;
-   for (auto* uiControl : mOwner->GetUIControls())
-      uiControlNames.push_back(uiControl->Name());
-   identifier = GetUniqueName(identifier.toStdString(), uiControlNames);
-
    FloatSlider* attachedToFloatSlider = dynamic_cast<FloatSlider*>(mAttachedToUIControl);
-   if (attachedToFloatSlider)
+   if (type == "floatslider" || attachedToFloatSlider != nullptr)
    {
-      mFloatVar = attachedToFloatSlider->GetVar();
+      if (attachedToFloatSlider)
+         mFloatVar = attachedToFloatSlider->GetVar();
+      else
+         mFloatVar = &mDummyFloat;
       if (mFloatSlider == nullptr)
          mFloatSlider = new FloatSlider(mOwner, identifier.toRawUTF8(), -1, -1, 100, 15, mFloatVar, -1, -1);
       else
          mFloatSlider->SetVar(mFloatVar);
+
+      if (attachedToFloatSlider)
+         mFloatSlider->SetMode(attachedToFloatSlider->GetMode());
+
       mUIControl = mFloatSlider;
    }
 
    IntSlider* attachedToIntSlider = dynamic_cast<IntSlider*>(mAttachedToUIControl);
-   if (attachedToIntSlider)
+   if (type == "intslider" || attachedToIntSlider != nullptr)
    {
-      mIntVar = attachedToIntSlider->GetVar();
+      if (attachedToIntSlider)
+         mIntVar = attachedToIntSlider->GetVar();
+      else
+         mIntVar = &mDummyInt;
       if (mIntSlider == nullptr)
          mIntSlider = new IntSlider(mOwner, identifier.toRawUTF8(), -1, -1, 100, 15, mIntVar, -1, -1);
       else
