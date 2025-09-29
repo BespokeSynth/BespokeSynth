@@ -1359,11 +1359,12 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 
    if (baseRev >= 4 && IsResizable())
    {
-      in >> mWidth;
-      in >> mHeight;
-      mWidth = MAX(mWidth, GetMinimumDimensions().x);
-      mHeight = MAX(mHeight, GetMinimumDimensions().y);
-      Resize(mWidth, mHeight);
+      float width, height;
+      in >> width;
+      in >> height;
+      width = MAX(width, GetMinimumDimensions().x);
+      height = MAX(height, GetMinimumDimensions().y);
+      Resize(width, height);
    }
 
    int numUIControls;
