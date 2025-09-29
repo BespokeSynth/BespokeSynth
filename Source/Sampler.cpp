@@ -141,7 +141,7 @@ void Sampler::Process(double time)
 
 void Sampler::PlayNote(NoteMessage note)
 {
-   if (!mEnabled)
+   if (!mEnabled || !mSample.LengthInSamples())
       return;
 
    if (!NoteInputBuffer::IsTimeWithinFrame(note.time) && GetTarget())
