@@ -30,6 +30,26 @@
 #include "IPulseReceiver.h"
 #include "ClickButton.h"
 
+class TapTempoDetector
+{
+public:
+   void Tap(double time);
+   float GetCalculatedTempo() const { return mLastCalculatedTempo; }
+   float GetCalculationStandardDeviation() const { return mStandardDeviation; }
+   bool HasEnoughSamples() const { return mNumAccumulatedSamples > 1; }
+   double GetLastTapTime() const { return mTimeSamples[mLastTimeSamplesWriteIdx]; }
+   void Clear() { mNumAccumulatedSamples = 0; }
+
+private:
+   void CalculateTempo();
+
+   std::array<double, 14> mTimeSamples{};
+   int mNumAccumulatedSamples{ 0 };
+   int mLastTimeSamplesWriteIdx{ 0 };
+   float mLastCalculatedTempo{ 120.0f };
+   float mStandardDeviation{ 0.0f };
+};
+
 class TapTempo : public IDrawableModule, public IPulseReceiver, public IButtonListener, public IKeyboardFocusListener
 {
 public:
@@ -62,16 +82,10 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
 
-   void CalculateTempo();
-
    ClickButton* mTapButton{ nullptr };
    ClickButton* mSendTempoButton{ nullptr };
    bool mRoundTempo{ true };
    Checkbox* mRoundTempoCheckbox{ nullptr };
 
-   std::array<double, 14> mTimeSamples{};
-   int mNumAccumulatedSamples{ 0 };
-   int mLastTimeSamplesWriteIdx{ 0 };
-   float mLastCalculatedTempo{ 120.0f };
-   float mStandardDeviation{ 0.0f };
+   TapTempoDetector mTapTempoDetector;
 };

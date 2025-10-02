@@ -114,7 +114,7 @@ private:
    int GetControlOffset() const;
 
    void DrawDisplayModuleRect(ofRectangle rect, float thickness);
-   void SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module);
+   void SetGridControlInterface(IAbletonGridController* controller);
    void SetActiveTrackRow(int row, bool resetModuleIndex);
    TrackOrganizer* GetActiveTrackRow() const;
    bool AdjustGlobalModuleIndex(int amount);
@@ -127,9 +127,12 @@ private:
    float GetModuleViewOffset() const;
    void SetModuleViewOffset(float offset);
    void DetermineTrackControlLayout();
+   bool WasPeekHold(int controlIndex) const { return gTime - mControlState[controlIndex].mLastChangeTime > 300; }
 
    const int kTrackRowGlobal = -1;
    const int kTrackRowMixer = -2;
+   const int kTrackRowTransport = -3;
+   const int kTrackRowScale = -4;
 
    AbletonMoveLCD mLCD;
    double mScreenOverrideTimeout{ 0.0 };
@@ -185,6 +188,7 @@ private:
    int mLastGainAdjustTrackIndex{ -1 };
    double mLastGainAdjustTrackTime{ -1 };
    float mTrackRowOffsetSmoothed{ 0 };
+   bool mShowLCDOnScreen{ false };
 
    IAbletonGridController* mGridControlInterface{ nullptr };
 

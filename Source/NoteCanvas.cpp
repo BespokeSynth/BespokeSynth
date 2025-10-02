@@ -891,10 +891,10 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
 
       for (const auto* element : mCurrentEditElements)
       {
-         lcd->DrawText(NoteName(element->GetPitch(), false, true).c_str(), 10, y, LCDFONT_STYLE_REGULAR);
-         lcd->DrawText(ofToString(element->GetVelocity(), 2).c_str(), 35, y, LCDFONT_STYLE_REGULAR);
-         lcd->DrawText(ofToString((element->mCol + element->mOffset) / stepsPerBeat, 3).c_str(), 60, y, LCDFONT_STYLE_REGULAR);
-         lcd->DrawText(ofToString(element->mLength / stepsPerBeat, 3).c_str(), 90, y, LCDFONT_STYLE_REGULAR);
+         lcd->DrawLCDText(NoteName(element->GetPitch(), false, true).c_str(), 10, y, LCDFONT_STYLE_REGULAR);
+         lcd->DrawLCDText(ofToString(element->GetVelocity(), 2).c_str(), 35, y, LCDFONT_STYLE_REGULAR);
+         lcd->DrawLCDText(ofToString((element->mCol + element->mOffset) / stepsPerBeat, 3).c_str(), 60, y, LCDFONT_STYLE_REGULAR);
+         lcd->DrawLCDText(ofToString(element->mLength / stepsPerBeat, 3).c_str(), 90, y, LCDFONT_STYLE_REGULAR);
          y += AbletonMoveLCD::kTextLineSpacing;
       }
       return true;
@@ -902,8 +902,8 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
 
    if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
    {
-      lcd->DrawText(("num measures: " + ofToString(mNumMeasures)).c_str(), 10, 13, LCDFONT_STYLE_REGULAR);
-      lcd->DrawText(GetCurrentEditMeasureString().c_str(), 10, 13 + AbletonMoveLCD::kTextLineSpacing, LCDFONT_STYLE_REGULAR);
+      lcd->DrawLCDText(("num measures: " + ofToString(mNumMeasures)).c_str(), 10, 13, LCDFONT_STYLE_REGULAR);
+      lcd->DrawLCDText(GetCurrentEditMeasureString().c_str(), 10, 13 + AbletonMoveLCD::kTextLineSpacing, LCDFONT_STYLE_REGULAR);
       return true;
    }
    return false;
