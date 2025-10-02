@@ -487,9 +487,9 @@ void AbletonMoveControl::DrawToFramebuffer()
    int mixerAdjustTrackIndex = -1;
    if (needToDraw && ShouldDisplayMixer())
    {
-      mLCD.DrawText("mixer", 5, 7, LCDFONT_STYLE_UNDERLINE);
+      mLCD.DrawText("mixer", 5, 10, LCDFONT_STYLE_UNDERLINE);
 
-      const int kBarPadBelow = 5;
+      const int kBarPadBelow = 3;
       const int kMaxBarHeight = mLCD.kMoveDisplayHeight - 16;
       for (int i = 0; i < (int)mTrackCables.size(); ++i)
       {
@@ -545,7 +545,7 @@ void AbletonMoveControl::DrawToFramebuffer()
       {
          TrackOrganizer* track = dynamic_cast<TrackOrganizer*>(mTrackCables[mixerAdjustTrackIndex]->GetTarget());
          if (track != nullptr)
-            mLCD.DrawText(track->GetTrackName().c_str(), 52, 7, LCDFONT_STYLE_REGULAR);
+            mLCD.DrawText(track->GetTrackName().c_str(), 52, 10, LCDFONT_STYLE_REGULAR);
       }
 
       needToDraw = false;
@@ -638,6 +638,13 @@ void AbletonMoveControl::DrawToFramebuffer()
       }
    }
 
+   float measurePos = TheTransport->GetMeasurePos(gTime);
+   mLCD.DrawRect(0, 0, ((measurePos + (TheTransport->GetMeasure(gTime) % 4)) / 4) * mLCD.kMoveDisplayWidth, 1, true);
+   float numBeats = TheTransport->GetTimeSigTop();
+   int beat = int(measurePos * numBeats);
+   float beatWidth = mLCD.kMoveDisplayWidth / numBeats;
+   mLCD.DrawRect(beat * beatWidth, 1, beatWidth, 1, true);
+
    if (!ShouldDisplayMixer())
    {
       TrackOrganizer* track = GetActiveTrackRow();
@@ -648,8 +655,8 @@ void AbletonMoveControl::DrawToFramebuffer()
          {
             float level, watermarkLevel;
             gain->GetLevel(level, watermarkLevel);
-            mLCD.DrawRect(0, 0, std::clamp(int(level * mLCD.kMoveDisplayWidth), 0, mLCD.kMoveDisplayWidth), 1, true);
-            mLCD.DrawRect(std::clamp(int(watermarkLevel * mLCD.kMoveDisplayWidth), 0, mLCD.kMoveDisplayWidth), 0, 1, 2, true);
+            mLCD.DrawRect(0, 2, std::clamp(int(level * mLCD.kMoveDisplayWidth), 0, mLCD.kMoveDisplayWidth), 1, true);
+            mLCD.DrawRect(std::clamp(int(watermarkLevel * mLCD.kMoveDisplayWidth), 0, mLCD.kMoveDisplayWidth), 2, 1, 2, true);
          }
       }
    }
@@ -1194,7 +1201,7 @@ bool AbletonMoveControl::GetButtonState(int index) const
    return mControlState[index].mButtonState;
 }
 
-void AbletonMoveControl::SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module)
+void AbletonMoveControl::SetGridControlInterface(IAbletonGridController* controller)
 {
    mGridControlInterface = controller;
 }
@@ -1210,14 +1217,32 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
       if (note.mPitch == kButtonTempo)
       {
          if (note.mVelocity > 0)
-            SetDisplayModule(TheTransport);
-         return;
+         {
+            SetActiveTrackRow(kTrackRowTransport, false);
+         }
+         else
+         {
+            bool wasHold = WasPeekHold(note.mPitch);
+
+            //if we held it, then we were just "peeking" into the transport page, so switch back
+            if (wasHold)
+               SetActiveTrackRow(mPreviousSelectedTrackRow, false);
+         }
       }
       if (note.mPitch == kButtonScale)
       {
          if (note.mVelocity > 0)
-            SetDisplayModule(TheScale);
-         return;
+         {
+            SetActiveTrackRow(kTrackRowScale, false);
+         }
+         else
+         {
+            bool wasHold = WasPeekHold(note.mPitch);
+
+            //if we held it, then we were just "peeking" into the scale page, so switch back
+            if (wasHold)
+               SetActiveTrackRow(mPreviousSelectedTrackRow, false);
+         }
       }
       if (note.mPitch == kButtonStar)
       {
@@ -1237,7 +1262,6 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
             else if (mLissajousDisplayMode == LissajousDisplayMode::Never)
                DisplayScreenMessage("lissajous: hide");
          }
-         return;
       }
    }
 
@@ -1457,7 +1481,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
             mLCD.Clear();
             mLCD.DrawRect(3, 4, mLCD.kMoveDisplayWidth - 6, 4, !K(filled));
             mLCD.DrawRect(3, 4, (mLCD.kMoveDisplayWidth - 6) * gainSlider->GetMidiValue(), 4, K(filled));
-            mLCD.DrawText(("output gain: " + ofToString(gainSlider->GetValue())).c_str(), 5, 23, LCDFONT_STYLE_REGULAR);
+            mLCD.DrawText(("output gain: " + ofToString(gainSlider->GetValue(), 2)).c_str(), 5, 23, LCDFONT_STYLE_REGULAR);
             mScreenOverrideTimeout = gTime + 500;
          }
       }
@@ -1521,7 +1545,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
       }
       else
       {
-         bool wasHold = gTime - mControlState[control.mControl].mLastChangeTime > 300;
+         bool wasHold = WasPeekHold(control.mControl);
 
          //if we held it, then we were just "peeking" into the other track, so switch back
          if (wasHold)
@@ -1540,7 +1564,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
       }
       else
       {
-         bool wasHold = gTime - mControlState[control.mControl].mLastChangeTime > 300;
+         bool wasHold = WasPeekHold(control.mControl);
 
          //if we held it, then we were just "peeking" into the global page, so switch back
          if (wasHold)
@@ -1559,7 +1583,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
       }
       else
       {
-         bool wasHold = gTime - mControlState[control.mControl].mLastChangeTime > 300;
+         bool wasHold = WasPeekHold(control.mControl);
 
          //if we held it, then we were just "peeking" into the global page, so switch back
          if (wasHold)
@@ -1591,7 +1615,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
                   trackRow->SetModuleViewOffset(trackRow->GetModuleIndex() < (int)mTrackControlLayout.size() ? mTrackControlLayout[trackRow->GetModuleIndex()].mPageCount - 1 : 0);
 
                SetDisplayModuleWithContext(trackRow->GetCurrentModule(), trackRow->GetTrackName());
-               SetGridControlInterface(trackRow->GetCurrentGridInterface(), dynamic_cast<IDrawableModule*>(trackRow->GetCurrentGridInterface()));
+               SetGridControlInterface(trackRow->GetCurrentGridInterface());
             }
          }
          else
@@ -1615,7 +1639,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
                   mGlobalModuleViewOffset = mGlobalModuleIndex < (int)mTrackControlLayout.size() ? mTrackControlLayout[mGlobalModuleIndex].mPageCount - 1 : 0;
 
                SetDisplayModuleWithContext(GetCurrentGlobalModule(), "global");
-               SetGridControlInterface(GetCurrentGlobalGridInterface(), dynamic_cast<IDrawableModule*>(GetCurrentGlobalGridInterface()));
+               SetGridControlInterface(GetCurrentGlobalGridInterface());
             }
          }
          else
@@ -1987,26 +2011,35 @@ void AbletonMoveControl::SetActiveTrackRow(int row, bool resetModuleIndex)
    if (resetModuleIndex)
       mDisplayModuleSelectTimeout = gTime + 500.0;
 
+   mSelectedTrackRow = row;
+
    if (row == kTrackRowGlobal)
    {
-      mSelectedTrackRow = row;
       if (resetModuleIndex)
       {
          mGlobalModuleIndex = 0;
          mGlobalModuleViewOffset = 0.0f;
       }
       SetDisplayModuleWithContext(GetCurrentGlobalModule(), "global");
-      SetGridControlInterface(GetCurrentGlobalGridInterface(), dynamic_cast<IDrawableModule*>(GetCurrentGlobalGridInterface()));
+      SetGridControlInterface(GetCurrentGlobalGridInterface());
    }
    else if (row == kTrackRowMixer)
    {
-      mSelectedTrackRow = row;
-      SetGridControlInterface(nullptr, nullptr);
+      SetGridControlInterface(nullptr);
       SetDisplayModuleWithContext(nullptr, "mixer");
+   }
+   else if (row == kTrackRowTransport)
+   {
+      SetDisplayModule(TheTransport);
+      SetGridControlInterface(TheTransport);
+   }
+   else if (row == kTrackRowScale)
+   {
+      SetDisplayModule(TheScale);
+      SetGridControlInterface(nullptr);
    }
    else if (row >= 0 && row < (int)mTrackCables.size())
    {
-      mSelectedTrackRow = row;
       TrackOrganizer* trackRow = GetActiveTrackRow();
       if (trackRow != nullptr)
       {
@@ -2021,7 +2054,7 @@ void AbletonMoveControl::SetActiveTrackRow(int row, bool resetModuleIndex)
       {
          if (controller != nullptr)
          {
-            SetGridControlInterface(controller, mDisplayModule);
+            SetGridControlInterface(controller);
 
             for (int i = kMovePadsSection; i < kMovePadsSection + kNumMovePads; ++i)
                SetLed(i, 0);
@@ -2029,7 +2062,7 @@ void AbletonMoveControl::SetActiveTrackRow(int row, bool resetModuleIndex)
          }
          else
          {
-            SetGridControlInterface(nullptr, nullptr);
+            SetGridControlInterface(nullptr);
          }
       }
    }

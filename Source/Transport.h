@@ -31,6 +31,8 @@
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "IAudioPoller.h"
+#include "AbletonDeviceShared.h"
+#include "TapTempo.h"
 
 class ITimeListener
 {
@@ -99,7 +101,7 @@ struct TransportListenerInfo
    int mCustomDivisor{ 8 };
 };
 
-class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener
+class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener, public IAbletonGridController
 {
 public:
    Transport();
@@ -114,10 +116,10 @@ public:
       mTimeSigTop = top;
       mTimeSigBottom = bottom;
    }
-   int GetTimeSigTop() { return mTimeSigTop; }
-   int GetTimeSigBottom() { return mTimeSigBottom; }
+   int GetTimeSigTop() const { return mTimeSigTop; }
+   int GetTimeSigBottom() const { return mTimeSigBottom; }
    void SetSwing(float swing) { mSwing = swing; }
-   float GetSwing() { return mSwing; }
+   float GetSwing() const { return mSwing; }
    double MsPerBar() const { return 60.0 / mTempo * 1000 * mTimeSigTop * 4.0 / mTimeSigBottom; }
    void Advance(double ms);
    TransportListenerInfo* AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
@@ -159,12 +161,18 @@ public:
 
    bool CheckNeedsDraw() override { return true; }
 
-   double GetEventLookaheadMs() { return sDoEventLookahead ? sEventEarlyMs : 0; }
+   static double GetEventLookaheadMs() { return sDoEventLookahead ? sEventEarlyMs : 0; }
 
    //IDrawableModule
    void Init() override;
    void KeyPressed(int key, bool isRepeat) override;
    bool IsSingleton() const override { return true; }
+
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
+   bool HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid) override { return true; }
 
    void ButtonClicked(ClickButton* button, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
@@ -230,6 +238,8 @@ private:
 
    std::list<TransportListenerInfo> mListeners;
    std::list<IAudioPoller*> mAudioPollers;
+
+   TapTempoDetector mTapTempoDetector;
 };
 
 extern Transport* TheTransport;

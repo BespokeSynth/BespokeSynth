@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include "MidiController.h"
 #include "AbletonMoveLCD.h"
 
 class MidiDevice;
