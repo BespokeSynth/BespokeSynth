@@ -188,6 +188,7 @@ private:
    int mLastGainAdjustTrackIndex{ -1 };
    double mLastGainAdjustTrackTime{ -1 };
    float mTrackRowOffsetSmoothed{ 0 };
+   bool mShowLCDOnScreen{ false };
 
    IAbletonGridController* mGridControlInterface{ nullptr };
 

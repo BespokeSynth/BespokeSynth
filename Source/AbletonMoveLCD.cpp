@@ -142,7 +142,7 @@ void AbletonMoveLCD::Clear()
       memset(mPixels, 0, sizeof(uint8_t) * GetNumDisplayPixels());
 }
 
-void AbletonMoveLCD::DrawText(const char* text, int x, int y, int style, int fontSize)
+void AbletonMoveLCD::DrawLCDText(const char* text, int x, int y, int style, int fontSize)
 {
    draw_ssfn_text(text, x, y, style, fontSize);
 }
@@ -185,6 +185,13 @@ void AbletonMoveLCD::TogglePixel(int x, int y)
       else
          mPixels[(x + y * kMoveDisplayWidth) * 4] = 255;
    }
+}
+
+uint8_t AbletonMoveLCD::GetPixel(int x, int y) const
+{
+   if (x >= 0 && y >= 0 && x < kMoveDisplayWidth && y < kMoveDisplayHeight)
+      return mPixels[(x + y * kMoveDisplayWidth) * 4];
+   return 0;
 }
 
 int AbletonMoveLCD::GetNumDisplayPixels() const

@@ -138,6 +138,7 @@ namespace AbletonDevice
    const int kButtonDuplicate = 30;
    const int kButtonQuantize = 31;
 
+   const int kStepButtonLedSection = 16 + 128;
    const int kLedNew = 16 + 128;
    const int kLedSettings = 17 + 128;
    const int kLedBranch = 18 + 128;

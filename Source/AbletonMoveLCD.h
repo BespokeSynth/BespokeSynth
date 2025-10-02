@@ -51,13 +51,14 @@ public:
 
    void Init();
    void Clear();
-   void DrawText(const char* text, int x, int y, int style = LCDFONT_STYLE_REGULAR, int fontSize = 12);
+   void DrawLCDText(const char* text, int x, int y, int style = LCDFONT_STYLE_REGULAR, int fontSize = 12);
    void DrawRect(int x, int y, int width, int height, bool filled);
    void ClearRect(int x, int y, int width, int height);
    void DrawPixel(int x, int y);
    void TogglePixel(int x, int y);
 
    uint8_t* GetPixels() const { return mPixels; }
+   uint8_t GetPixel(int x, int y) const;
    int GetNumDisplayPixels() const;
 
    static constexpr int kMoveDisplayWidth = 128;
