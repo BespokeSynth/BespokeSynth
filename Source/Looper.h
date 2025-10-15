@@ -38,6 +38,7 @@
 #include "PitchShifter.h"
 #include "INoteReceiver.h"
 #include "SwitchAndRamp.h"
+#include "IInputRecordable.h"
 
 class LooperRecorder;
 class Rewriter;
@@ -46,7 +47,7 @@ class LooperGranulator;
 
 #define LOOPER_COMMIT_FADE_SAMPLES 200
 
-class Looper : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public INoteReceiver
+class Looper : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public INoteReceiver, public IInputRecordable
 {
 public:
    Looper();
@@ -59,6 +60,7 @@ public:
    void CreateUIControls() override;
 
    void SetRecorder(LooperRecorder* recorder);
+   LooperRecorder* GetRecorder() const { return mRecorder; }
    void Clear();
    void Commit(RollingBuffer* commitBuffer, bool replaceOnCommit, float offsetMs);
    void Fill(ChannelBuffer* buffer, int length);
@@ -98,6 +100,13 @@ public:
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    bool DrawToPush2Screen() override;
 
+   //IInputRecordable
+   void SetRecording(bool record) override;
+   bool IsRecording() const override;
+   void ClearRecording() override;
+   void CancelRecording() override;
+
+   void SetRecording(double time, bool record);
    void MergeIn(Looper* otherLooper);
    void SwapBuffers(Looper* otherLooper);
    void CopyBuffer(Looper* sourceLooper);
@@ -134,6 +143,7 @@ private:
    void DoShiftDownbeat();
    void DoShiftOffset();
    void DoCommit(double time);
+   void ProcessCommit(int numSamplesToProcess);
    void UpdateNumBars(int oldNumBars);
    void BakeVolume();
    void DoUndo();
@@ -165,7 +175,12 @@ private:
    ClickButton* mMergeButton{ nullptr };
    ClickButton* mSwapButton{ nullptr };
    ClickButton* mCopyButton{ nullptr };
-   RollingBuffer* mCommitBuffer{ nullptr }; //if this is set, a commit happens next audio frame
+   bool mDoCommit{ false }; //if this is set, a commit happens next audio frame
+   RollingBuffer* mCommitBuffer{ nullptr };
+   int mCommitBufferStartSample{ -1 };
+   int mCommitTargetBufferOffset{ -1 };
+   int mCommitSamplesProgress{ -1 };
+   int mCommitLength{ -1 };
    ClickButton* mVolumeBakeButton{ nullptr };
    bool mWantBakeVolume{ false };
    int mLastCommit{ 0 };
@@ -186,7 +201,7 @@ private:
    ClickButton* mUndoButton{ nullptr };
    bool mWantUndo{ false };
    bool mReplaceOnCommit{ false };
-   float mCommitMsOffset{ 0 };
+   float mCommitMsOffset{ 0 }; //offset passed in from looperrecorder, to use when capturing a loop from it
    float mLoopPosOffset{ 0 };
    FloatSlider* mLoopPosOffsetSlider{ nullptr };
    ClickButton* mWriteOffsetButton{ nullptr };
@@ -232,6 +247,7 @@ private:
    bool mBeatwheelControlFlip{ false };
    static bool mBeatwheelSingleMeasure;
    Checkbox* mBeatwheelSingleMeasureCheckbox{ nullptr };
+   float mWriteMsOffset{ 0.0f }; //offset to use when writing with direct input
 
    //pitch shifter
    PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];

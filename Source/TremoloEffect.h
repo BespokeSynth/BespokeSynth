@@ -38,7 +38,6 @@ public:
 
    static IAudioEffect* Create() { return new TremoloEffect(); }
 
-
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -59,11 +58,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    float mAmount{ 0 };
    FloatSlider* mAmountSlider{ nullptr };
@@ -80,6 +74,4 @@ private:
    static const int kAntiPopWindowSize = 300;
    float mWindow[kAntiPopWindowSize]{};
    int mWindowPos{ 0 };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 };

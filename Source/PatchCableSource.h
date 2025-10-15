@@ -103,6 +103,10 @@ public:
       mManualPositionY = y;
       mAutomaticPositioning = false;
    }
+   ofVec2f GetManualPosition() const
+   {
+      return ofVec2f(mManualPositionX, mManualPositionY);
+   }
    void RemovePatchCable(PatchCable* cable, bool fromUserAction = false);
    void ClearPatchCables();
    void SetPatchCableTarget(PatchCable* cable, IClickable* target, bool fromUserClick);
@@ -120,6 +124,7 @@ public:
    bool Enabled() const;
    void AddTypeFilter(std::string type) { mTypeFilter.push_back(type); }
    void ClearTypeFilter() { mTypeFilter.clear(); }
+   void SetPredicateFilter(bool (*predicate)(IClickable*)) { mFilterPredicate = predicate; }
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
@@ -214,4 +219,6 @@ private:
    DrawPass mDrawPass{ DrawPass::kSource };
    bool mParentMinimized{ false };
    IDrawableModule* mLastSeenAutopatchableModule{ nullptr };
+
+   bool (*mFilterPredicate)(IClickable*){ nullptr };
 };

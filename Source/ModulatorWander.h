@@ -73,14 +73,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
-
-   float mWidth{ 100 };
-   float mHeight{ 100 };
 
    PerlinNoise mPerlinNoise;
    int mPerlinSeed{ 0 };

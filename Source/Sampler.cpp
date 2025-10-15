@@ -87,7 +87,7 @@ void Sampler::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (!mEnabled || target == nullptr)
+   if (!mEnabled || target == nullptr || !mSample.LengthInSamples())
       return;
 
    mNoteInputBuffer.Process(time);
@@ -372,5 +372,8 @@ void Sampler::LoadState(FileStreamIn& in, int rev)
       int sampleLength;
       if (rev >= 1)
          in >> sampleLength;
+
+      // offset to account for some older behavior
+      mVoiceParams.mSamplePitch += TheScale->ScaleRoot();
    }
 }

@@ -52,6 +52,8 @@ public:
    int mLength{ 4 };
    DropdownList* mLengthSelector{ nullptr };
    int mPitch{ 0 };
+   int mLastPitch{ -1 };
+   int mLastVelocity{ 0 };
    TextEntry* mNoteSelector{ nullptr };
    Polyrhythms* mOwner{ nullptr };
 };
@@ -94,14 +96,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
    void OnClicked(float x, float y, bool right) override;
 
-   float mWidth{ 350 };
-   float mHeight;
    std::array<RhythmLine*, 8> mRhythmLines;
 };

@@ -348,6 +348,29 @@ Key Commands
    * F3: pins or unpin a module so that it stays where it is regardless of the viewports position.
          only works when not group selecting modules.
 
+Musical durations notation
+   Some modules have an interval control with options like "2", "1n", "2nt" or "4nd" denoting musical durations.
+
+   * bare numbers are a number of measures
+      - "2" is two measures long
+      - "3" is three measures long
+      - etc.
+   * <b>n</b> options are the length of an nth note
+      - "1n" is a whole note or one measure long (this would be the same as "1" if that appeared in the options)
+      - "2n" is a half note long or two beats
+      - "4n" is a quarter note long or one beat
+      - "8n" is an eigth note long or 0.5 beats
+      - etc.
+      - the number of beats in a measure is determined by the "timesigtop" control in the transport module
+   * <b>nt</b> options are the length of a triplet nth note or 2/3 the length of an nth note
+      - "4nt" is a triplet quarter note long or 0.6666... beats
+      - "8nt" is a triplet eigth note long or 0.3333... beats
+      - etc.
+   * <b>nd</b> options are the length of a dotted nth note or 3/2 the length of an nth note
+      - "4nd" is a dotted quarter note long or 1.5 beats
+      - "8nd" is a dotted eigth note long or 0.75 beats
+      - etc.
+   * "free" denotes a freely adjustable duration and there will be a slider control elsewhere on the module to set it
          </p>
          <h2>instruments</h2>
          <a name=circlesequencer></a></br>

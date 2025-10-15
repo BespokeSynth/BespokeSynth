@@ -127,11 +127,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    float mMix{ 1 };
    float mDrive{ 1 };
@@ -152,8 +147,6 @@ private:
 
    double mCurrentInputDb{ 0 };
    double mOutputGain{ 1 };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 
    // runtime variables
    double envdB_{ DC_OFFSET }; // over-threshold envelope (dB)

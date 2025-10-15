@@ -40,6 +40,7 @@ bool HelpDisplay::sTooltipsLoaded = false;
 std::list<HelpDisplay::ModuleTooltipInfo> HelpDisplay::sTooltips;
 
 HelpDisplay::HelpDisplay()
+: IDrawableModule(700, 700)
 {
    LoadHelp();
 

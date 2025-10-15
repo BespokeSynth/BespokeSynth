@@ -45,6 +45,20 @@ void LevelMeterDisplay::Process(int channel, float* buffer, int bufferSize)
    mLevelMeters[channel].mPeakTrackerSlow.Process(buffer, bufferSize);
 }
 
+void LevelMeterDisplay::GetLevel(int channel, float& level, float& watermarkLevel) const
+{
+   if (channel >= 0 && channel < (int)mLevelMeters.size())
+   {
+      level = mLevelMeters[channel].mPeakTracker.GetPeak();
+      watermarkLevel = mLevelMeters[channel].mPeakTrackerSlow.GetPeak();
+   }
+   else
+   {
+      level = 0;
+      watermarkLevel = 0;
+   }
+}
+
 void LevelMeterDisplay::Draw(float x, float y, float width, float height, int numChannels)
 {
    for (int i = 0; i < numChannels; ++i)
@@ -56,19 +70,21 @@ void LevelMeterDisplay::Draw(float x, float y, float width, float height, int nu
       const int kPaddingVertical = 2;
       float barHeight = (height - (kPaddingVertical * (numChannels - 1))) / numChannels;
       float segmentWidth = width / kNumSegments;
+      float level, watermarkLevel;
+      GetLevel(i, level, watermarkLevel);
+      level = level / (limit > 0 ? limit : 1);
+      watermarkLevel = watermarkLevel / (limit > 0 ? limit : 1);
       for (int j = 0; j < kNumSegments; ++j)
       {
          ofPushStyle();
          ofFill();
-         float level = mLevelMeters[i].mPeakTracker.GetPeak() / (limit > 0 ? limit : 1);
-         float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak() / (limit > 0 ? limit : 1);
          ofColor color(0, 255, 0);
          if (j > kNumSegments - 3)
             color.set(255, 0, 0);
          else if (j > kNumSegments - 6)
             color.set(255, 255, 0);
 
-         if (slowLevel > 0 && ofClamp(int(slowLevel * kNumSegments), 0, kNumSegments - 1) == j)
+         if (watermarkLevel > 0 && ofClamp(int(watermarkLevel * kNumSegments), 0, kNumSegments - 1) == j)
             ofSetColor(color);
          else if (level > 0 && level >= j / (float)kNumSegments)
             ofSetColor(color * .9f);

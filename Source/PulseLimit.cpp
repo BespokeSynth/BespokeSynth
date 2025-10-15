@@ -84,6 +84,7 @@ void PulseLimit::ButtonClicked(ClickButton* button, double time)
 void PulseLimit::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("reset_on_load", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -91,6 +92,7 @@ void PulseLimit::LoadLayout(const ofxJSONElement& moduleInfo)
 void PulseLimit::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mResetOnLoad = mModuleSaveData.GetBool("reset_on_load");
 }
 
 void PulseLimit::SaveState(FileStreamOut& out)
@@ -107,4 +109,6 @@ void PulseLimit::LoadState(FileStreamIn& in, int rev)
    IDrawableModule::LoadState(in, rev);
 
    in >> mCount;
+   if (mResetOnLoad)
+      mCount = 0;
 }

@@ -29,7 +29,6 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ModulationChain.h"
-#include "Transport.h"
 #include "DropdownList.h"
 
 class Acciaccatura : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
@@ -61,20 +60,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    enum class NoteMode
    {
       Scale,
       Chromatic
    };
-
-   float mWidth;
-   float mHeight;
 
    int mOffset{ -1 };
    IntSlider* mOffsetSlider{ nullptr };

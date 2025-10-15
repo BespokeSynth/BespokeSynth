@@ -67,14 +67,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
-
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 
    double mStartRecordTime{ -1 };
 

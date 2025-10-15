@@ -139,6 +139,13 @@ void Transport::Advance(double ms)
       if (mQueuedMeasure != -1)
       {
          SetMeasure(mQueuedMeasure);
+
+         if (mSeekMsAfterJump != 0.0)
+         {
+            mMeasureTime += mSeekMsAfterJump / MsPerBar();
+            mSeekMsAfterJump = 0.0;
+         }
+
          if (mLoopStartMeasure != -1)
             mQueuedMeasure = mLoopStartMeasure;
          else
@@ -265,12 +272,16 @@ void Transport::DrawModule()
    ofLine(nudgeX, mNudgeBackButton->GetRect(true).getMinY(), nudgeX, mNudgeBackButton->GetRect(true).getMaxY());
 }
 
-void Transport::Reset()
+void Transport::Reset(bool timeSensitive /*= false*/)
 {
    if (mLoopEndMeasure != -1)
-      mMeasureTime = mLoopEndMeasure - .01f;
+      mMeasureTime = mLoopEndMeasure - .0001f;
    else
-      mMeasureTime = .99f;
+      mMeasureTime = .9999f;
+
+   if (timeSensitive) //try to line up downbeat with when user actually gave this input
+      mSeekMsAfterJump = gBufferSizeMs;
+
    SetQueuedMeasure(NextBufferTime(true), 0);
 
    if (TheSynth->IsAudioPaused())

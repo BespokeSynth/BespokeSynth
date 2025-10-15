@@ -77,7 +77,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 0; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -88,11 +88,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    struct SavedPattern
    {
@@ -101,8 +96,6 @@ private:
       std::vector<CanvasElement*> mNotes;
    };
 
-   float mWidth{ 370 };
-   float mHeight{ 140 };
    int mMinRow{ 127 };
    int mMaxRow{ 0 };
    bool mWrite{ false };

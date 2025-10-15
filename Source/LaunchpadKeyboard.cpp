@@ -30,6 +30,7 @@
 #include "Chorder.h"
 #include "MidiController.h"
 #include "FillSaveDropdown.h"
+#include "AbletonDeviceShared.h"
 
 #define INVALID_PITCH -999
 #define CHORD_BUTTON_OFFSET -100
@@ -140,19 +141,22 @@ void LaunchpadKeyboard::CreateUIControls()
    mPreserveChordRootCheckbox = new Checkbox(this, "p.root", 70, 4, &mPreserveChordRoot);
    mGridControlTarget = new GridControlTarget(this, "grid", 90, 22);
 
-   mLayoutDropdown->AddLabel("chromatic", kChromatic);
-   mLayoutDropdown->AddLabel("diatonic", kDiatonic);
-   mLayoutDropdown->AddLabel("major thirds", kMajorThirds);
-   mLayoutDropdown->AddLabel("chord indiv", kChordIndividual);
-   mLayoutDropdown->AddLabel("chord", kChord);
-   mLayoutDropdown->AddLabel("guitar", kGuitar);
-   mLayoutDropdown->AddLabel("septatonic", kSeptatonic);
-   mLayoutDropdown->AddLabel("drum", kDrum);
-   mLayoutDropdown->AddLabel("all pads", kAllPads);
+   mLayoutDropdown->AddLabel("chromatic", (int)LaunchpadLayout::kChromatic);
+   mLayoutDropdown->AddLabel("diatonic", (int)LaunchpadLayout::kDiatonic);
+   mLayoutDropdown->AddLabel("major thirds", (int)LaunchpadLayout::kMajorThirds);
+   mLayoutDropdown->AddLabel("chord indiv", (int)LaunchpadLayout::kChordIndividual);
+   mLayoutDropdown->AddLabel("chord", (int)LaunchpadLayout::kChord);
+   mLayoutDropdown->AddLabel("guitar", (int)LaunchpadLayout::kGuitar);
+   mLayoutDropdown->AddLabel("septatonic", (int)LaunchpadLayout::kSeptatonic);
+   mLayoutDropdown->AddLabel("drum", (int)LaunchpadLayout::kDrum);
+   mLayoutDropdown->AddLabel("all pads", (int)LaunchpadLayout::kAllPads);
+   mLayoutDropdown->AddLabel("piano", (int)LaunchpadLayout::kPiano);
+   mLayoutDropdown->AddLabel("scale rows", (int)LaunchpadLayout::kScaleRows);
+   mLayoutDropdown->AddLabel("pentatonic", (int)LaunchpadLayout::kPentatonic);
 
-   mArrangementModeDropdown->AddLabel("full", kFull);
-   mArrangementModeDropdown->AddLabel("five", kFive);
-   mArrangementModeDropdown->AddLabel("six", kSix);
+   mArrangementModeDropdown->AddLabel("full", (int)ArrangementMode::kFull);
+   mArrangementModeDropdown->AddLabel("five", (int)ArrangementMode::kFive);
+   mArrangementModeDropdown->AddLabel("six", (int)ArrangementMode::kSix);
 }
 
 LaunchpadKeyboard::~LaunchpadKeyboard()
@@ -206,7 +210,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
 
       return;
    }
-   if (!mLatch && mLayout != kChord)
+   if (!mLatch && mLayout != LaunchpadLayout::kChord)
    {
       //handled below
    }
@@ -239,7 +243,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
       }
    }
 
-   if (mLayout == kChord)
+   if (mLayout == LaunchpadLayout::kChord)
    {
       if (bOn)
       {
@@ -368,26 +372,58 @@ void LaunchpadKeyboard::OnTimeEvent(double time)
 {
 }
 
-bool LaunchpadKeyboard::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool LaunchpadKeyboard::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note && controlIndex >= 36 && controlIndex <= 99)
+   int rangeStart = abletonGrid->GetGridStartIndex();
+   int rangeEnd = abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads();
+   mCols = abletonGrid->GetGridNumCols(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
+   mRows = abletonGrid->GetGridNumRows(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
+
+   if (controlIndex >= rangeStart && controlIndex < rangeEnd)
    {
-      int gridIndex = controlIndex - 36;
-      int gridX = gridIndex % 8;
-      int gridY = 7 - gridIndex / 8;
+      int gridIndex = controlIndex - rangeStart;
+      int gridX = gridIndex % abletonGrid->GetGridNumCols();
+      int gridY = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
       OnGridButton(gridX, gridY, midiValue / 127, nullptr);
       return true;
+   }
+
+   if (controlIndex == AbletonDevice::kOctaveUpButton)
+   {
+      if (midiValue > 0)
+      {
+         AdjustOctave(1);
+         abletonGrid->DisplayScreenMessage("Octave: " + ofToString(mOctave));
+         return true;
+      }
+   }
+   else if (controlIndex == AbletonDevice::kOctaveDownButton)
+   {
+      if (midiValue > 0)
+      {
+         AdjustOctave(-1);
+         abletonGrid->DisplayScreenMessage("Octave: " + ofToString(mOctave));
+         return true;
+      }
    }
 
    return false;
 }
 
-void LaunchpadKeyboard::UpdatePush2Leds(Push2Control* push2)
+void LaunchpadKeyboard::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
-   for (int x = 0; x < 8; ++x)
+   int offset = abletonGrid->GetGridStartIndex();
+   mCols = abletonGrid->GetGridNumCols(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
+   mRows = abletonGrid->GetGridNumRows(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
+
+   for (int x = 0; x < abletonGrid->GetGridNumCols(); ++x)
    {
-      for (int y = 0; y < 8; ++y)
+      for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
       {
+         int pitch = GridToPitch(x, y);
+         bool isPreviewNote = pitch >= 0 && pitch < 128 && mPreviewNotes[pitch];
+         bool isCurrentNote = pitch >= 0 && pitch < 128 && mCurrentNotes[pitch] > 0;
+
          GridColor color = GetGridSquareColor(x, y);
          int pushColor = 0;
          switch (color)
@@ -414,18 +450,35 @@ void LaunchpadKeyboard::UpdatePush2Leds(Push2Control* push2)
                pushColor = 115;
                break;
          }
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
-         //push2->SetLed(kMidiMessage_Note, x + (7-y)*8 + 36, x + y*8 + 64);
+
+         if (isPreviewNote)
+            pushColor = AbletonDevice::kColorWhite;
+
+         abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + offset, pushColor);
+         //abletonGrid->SetLed(x + (7-y)*8 + 36, x + y*8 + 64);
       }
    }
 }
 
 void LaunchpadKeyboard::DisplayNote(int pitch, int velocity)
 {
-   if (pitch >= 0 && pitch < 128)
+   if (pitch >= 0 && pitch < (int)mCurrentNotes.size())
       mCurrentNotes[pitch] = velocity;
 
    UpdateLights();
+}
+
+void LaunchpadKeyboard::SetPreviewNotes(const std::function<bool(int)>& IsPreviewNote)
+{
+   for (int i = 0; i < (int)mPreviewNotes.size(); ++i)
+      mPreviewNotes[i] = IsPreviewNote(i);
+
+   UpdateLights();
+}
+
+void LaunchpadKeyboard::AdjustOctave(int amount)
+{
+   mOctave = std::clamp(mOctave + amount, mOctaveSlider->GetMin(), mOctaveSlider->GetMax());
 }
 
 void LaunchpadKeyboard::DrawModule()
@@ -456,8 +509,8 @@ void LaunchpadKeyboard::DrawModuleUnclipped()
 
 int LaunchpadKeyboard::GridToPitch(int x, int y)
 {
-   y = 7 - y;
-   if (mArrangementMode == kSix)
+   y = mRows - 1 - y;
+   if (mArrangementMode == ArrangementMode::kSix)
    {
       if (x < 2)
       {
@@ -469,9 +522,9 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
       }
       return TheScale->ScaleRoot() + x + 6 * y + TheScale->GetPitchesPerOctave() * mOctave;
    }
-   if (mLayout == kChromatic)
+   if (mLayout == LaunchpadLayout::kChromatic)
    {
-      if (mArrangementMode == kFive)
+      if (mArrangementMode == ArrangementMode::kFive)
       {
          if (x < 3)
          {
@@ -484,9 +537,9 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
       }
       return mRootNote + x + 5 * y + TheScale->GetPitchesPerOctave() * mOctave;
    }
-   if (mLayout == kMajorThirds)
+   if (mLayout == LaunchpadLayout::kMajorThirds)
    {
-      if (mArrangementMode == kFive)
+      if (mArrangementMode == ArrangementMode::kFive)
       {
          if (x < 3)
          {
@@ -499,13 +552,13 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
       }
       return mRootNote + x + 4 * y + TheScale->GetPitchesPerOctave() * mOctave;
    }
-   if (mLayout == kGuitar)
+   if (mLayout == LaunchpadLayout::kGuitar)
    {
       return mRootNote + x + 5 * y + TheScale->GetPitchesPerOctave() * mOctave + (y >= 4 ? -1 : 0);
    }
-   else if (mLayout == kDiatonic)
+   else if (mLayout == LaunchpadLayout::kDiatonic)
    {
-      if (mArrangementMode == kFive)
+      if (mArrangementMode == ArrangementMode::kFive)
       {
          if (x < 3)
          {
@@ -522,22 +575,22 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
       }
       return TheScale->GetPitchFromTone(x + 3 * y) + TheScale->GetPitchesPerOctave() * (mRootNote / TheScale->GetPitchesPerOctave()) + TheScale->GetPitchesPerOctave() * mOctave;
    }
-   else if (mLayout == kChordIndividual)
+   else if (mLayout == LaunchpadLayout::kChordIndividual)
    {
       int note = x % mChords[mCurrentChord].size();
       int oct = x / mChords[mCurrentChord].size();
       return TheScale->MakeDiatonic(TheScale->GetPitchFromTone(y) + mChords[mCurrentChord][note]) + TheScale->GetPitchesPerOctave() * (mOctave + oct);
    }
-   else if (mLayout == kChord)
+   else if (mLayout == LaunchpadLayout::kChord)
    {
       if (x < mChords.size())
          return TheScale->GetPitchFromTone(y) + TheScale->GetPitchesPerOctave() * mOctave;
       else
          return INVALID_PITCH;
    }
-   else if (mLayout == kSeptatonic)
+   else if (mLayout == LaunchpadLayout::kSeptatonic)
    {
-      if (mArrangementMode == kFive)
+      if (mArrangementMode == ArrangementMode::kFive)
       {
          if (x < 3)
          {
@@ -582,16 +635,46 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
 
       return TheScale->GetPitchFromTone(tone) + TheScale->GetPitchesPerOctave() * (mRootNote / TheScale->GetPitchesPerOctave()) + TheScale->GetPitchesPerOctave() * mOctave;
    }
-   else if (mLayout == kDrum)
+   else if (mLayout == LaunchpadLayout::kDrum)
    {
       if (x < 4 && y < 4)
-         return x + y * 4;
+         return x + y * 4 + mOctave * 12;
       else
          return INVALID_PITCH;
    }
-   else if (mLayout == kAllPads)
+   else if (mLayout == LaunchpadLayout::kAllPads)
    {
       return x + y * 8;
+   }
+   else if (mLayout == LaunchpadLayout::kPiano)
+   {
+      int octave = (x / 7) + y / 2 * std::max(mCols / 7, 1);
+      if (y % 2 == 1) //black keys
+      {
+         const int kBlackKeys[] = { INVALID_PITCH, 1, 3, INVALID_PITCH, 6, 8, 10 };
+         if ((x % 7) == 0 || (x % 7) == 3)
+            return INVALID_PITCH;
+         return kBlackKeys[x % 7] + (mOctave + octave) * 12;
+      }
+      else //white keys
+      {
+         const int kWhiteKeys[] = { 0, 2, 4, 5, 7, 9, 11 };
+         return kWhiteKeys[x % 7] + (mOctave + octave) * 12;
+      }
+   }
+   else if (mLayout == LaunchpadLayout::kScaleRows)
+   {
+      return TheScale->GetPitchFromTone(x) + (y + mOctave) * TheScale->GetPitchesPerOctave();
+   }
+   else if (mLayout == LaunchpadLayout::kPentatonic)
+   {
+      bool isMinor = TheScale->IsInScale(TheScale->ScaleRoot() + 3);
+      const int kMinorPentatonic[] = { 0, 3, 5, 7, 10 };
+      const int kMajorPentatonic[] = { 0, 2, 4, 7, 9 };
+      int number = x + y * mCols;
+      int index = number % 5;
+      int octave = number / 5;
+      return TheScale->ScaleRoot() + (isMinor ? kMinorPentatonic[index] : kMajorPentatonic[index]) + (mOctave + octave) * TheScale->GetPitchesPerOctave();
    }
 
    return 0;
@@ -618,13 +701,50 @@ int LaunchpadKeyboard::GridToPitchChordSection(int x, int y)
    return INVALID_PITCH;
 }
 
+int LaunchpadKeyboard::TransposePitchInScale(int pitch, int amount, bool octaveMultiplier)
+{
+   switch (mLayout)
+   {
+      case LaunchpadLayout::kChromatic:
+      case LaunchpadLayout::kMajorThirds:
+      case LaunchpadLayout::kGuitar:
+      case LaunchpadLayout::kAllPads:
+      case LaunchpadLayout::kPiano:
+         return pitch + amount * (octaveMultiplier ? TheScale->GetPitchesPerOctave() : 1);
+      case LaunchpadLayout::kDiatonic:
+      case LaunchpadLayout::kChordIndividual:
+      case LaunchpadLayout::kChord:
+      case LaunchpadLayout::kSeptatonic:
+      case LaunchpadLayout::kScaleRows:
+         return TheScale->GetPitchFromTone(TheScale->GetToneFromPitch(pitch) + amount * (octaveMultiplier ? TheScale->NumTonesInScale() : 1));
+      case LaunchpadLayout::kDrum:
+         return pitch + amount * (octaveMultiplier ? 4 : 1);
+      case LaunchpadLayout::kPentatonic:
+      {
+         int direction = amount > 0 ? 1 : -1;
+         int transpose = amount * (octaveMultiplier ? 5 : 1) * direction;
+         for (int i = 0; i < transpose; ++i)
+         {
+            do
+            {
+               pitch += direction;
+            } while (pitch >= 0 && pitch < 127 && !TheScale->IsInPentatonic(pitch));
+         }
+         return pitch;
+      }
+   }
+   return pitch + amount * (octaveMultiplier ? TheScale->GetPitchesPerOctave() : 1);
+}
+
 void LaunchpadKeyboard::UpdateLights(bool force)
 {
    if (mGridControlTarget->GetGridController())
    {
-      for (int x = 0; x < mGridControlTarget->GetGridController()->NumCols(); ++x)
+      mCols = mGridControlTarget->GetGridController()->NumCols();
+      mRows = mGridControlTarget->GetGridController()->NumRows();
+      for (int x = 0; x < mCols; ++x)
       {
-         for (int y = 0; y < mGridControlTarget->GetGridController()->NumRows(); ++y)
+         for (int y = 0; y < mRows; ++y)
          {
             GridColor color = GetGridSquareColor(x, y);
             mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
@@ -643,6 +763,7 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
    bool isChordButton = pitch != INVALID_PITCH && pitch < 0;
    bool isPressedChordButton = isChordButton && IsChordButtonPressed(pitch);
    bool isChorderEnabled = mChorder && mChorder->IsEnabled();
+   bool isPreviewNote = pitch >= 0 && pitch < 128 && mPreviewNotes[pitch];
 
    GridColor color;
    if (pitch == INVALID_PITCH)
@@ -670,6 +791,10 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
       else
          color = kGridColor1Dim;
    }
+   else if (isPreviewNote)
+   {
+      color = kGridColor1Bright;
+   }
    else if (isPressedChordButton && isChorderEnabled)
    {
       color = kGridColor2Bright;
@@ -686,9 +811,16 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
    {
       color = kGridColor1Bright;
    }
-   else if (mLayout == kDrum || mLayout == kAllPads)
+   else if (mLayout == LaunchpadLayout::kDrum || mLayout == LaunchpadLayout::kAllPads)
    {
       color = kGridColor3Bright;
+   }
+   else if (mLayout == LaunchpadLayout::kPiano)
+   {
+      if (y % 2 == 0) //black keys
+         color = kGridColor2Bright;
+      else //white keys
+         color = kGridColor3Bright;
    }
    else if (isRoot)
    {
@@ -797,8 +929,8 @@ void LaunchpadKeyboard::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("chorder", moduleInfo, "", FillDropdown<Chorder*>);
-   mModuleSaveData.LoadEnum<ArrangementMode>("arrangement", moduleInfo, kFull, mArrangementModeDropdown);
-   mModuleSaveData.LoadEnum<LaunchpadLayout>("layout", moduleInfo, kChromatic, mLayoutDropdown);
+   mModuleSaveData.LoadEnum<ArrangementMode>("arrangement", moduleInfo, (int)ArrangementMode::kFull, mArrangementModeDropdown);
+   mModuleSaveData.LoadEnum<LaunchpadLayout>("layout", moduleInfo, (int)LaunchpadLayout::kChromatic, mLayoutDropdown);
 
    SetUpFromSaveData();
 }

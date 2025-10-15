@@ -26,12 +26,14 @@
 #pragma once
 
 #include "IDrawableModule.h"
+#include "FileStream.h"
 #include "NoteEffectBase.h"
 
 class NoteDisplayer : public NoteEffectBase, public IDrawableModule
 {
 public:
-   NoteDisplayer() = default;
+   NoteDisplayer();
+
    static IDrawableModule* Create() { return new NoteDisplayer(); }
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return true; }
@@ -42,25 +44,16 @@ public:
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override;
 
    bool IsEnabled() const override { return true; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    void DrawNoteName(int pitch, float y) const;
 
-   float mWidth{ 160 };
-   float mHeight{ 60 };
    int mVelocities[128]{};
    int mVoiceIds[128]{};
 };

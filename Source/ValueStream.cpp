@@ -32,6 +32,7 @@
 #include "UIControlMacros.h"
 
 ValueStream::ValueStream()
+: IDrawableModule(200, 120)
 {
 }
 
@@ -110,12 +111,6 @@ void ValueStream::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    mFloatSlider = dynamic_cast<FloatSlider*>(mUIControl);
 }
 
-void ValueStream::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
-}
-
 void ValueStream::Resize(float w, float h)
 {
    mWidth = MAX(w, 200);
@@ -124,22 +119,15 @@ void ValueStream::Resize(float w, float h)
 
 void ValueStream::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void ValueStream::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadInt("width", moduleInfo, 200, 120, 1000);
-   mModuleSaveData.LoadInt("height", moduleInfo, 120, 15, 1000);
-
    SetUpFromSaveData();
 }
 
 void ValueStream::SetUpFromSaveData()
 {
-   mWidth = mModuleSaveData.GetInt("width");
-   mHeight = mModuleSaveData.GetInt("height");
 }
 
 void ValueStream::SaveState(FileStreamOut& out)

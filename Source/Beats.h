@@ -38,6 +38,7 @@
 #include "BiquadFilter.h"
 #include "Ramp.h"
 #include "ChannelBuffer.h"
+#include "INoteReceiver.h"
 
 class Beats;
 
@@ -66,6 +67,7 @@ public:
 
    void RadioButtonUpdated(RadioButton* list, int oldVal, double time);
    void ButtonClicked(ClickButton* button, double time);
+   void PlayNote(const NoteMessage& note);
 
 private:
    RadioButton* mSelector{ nullptr };
@@ -90,14 +92,14 @@ private:
    ClickButton* mDeleteButton{ nullptr };
 };
 
-class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener
+class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener, public INoteReceiver
 {
 public:
    Beats();
    virtual ~Beats();
    static IDrawableModule* Create() { return new Beats(); }
    static bool AcceptsAudio() { return false; }
-   static bool AcceptsNotes() { return false; }
+   static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
@@ -108,6 +110,10 @@ public:
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+
+   //INoteReceiver
+   void PlayNote(NoteMessage note) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;

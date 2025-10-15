@@ -273,12 +273,6 @@ void DotSequencer::Resize(float w, float h)
    mDotGrid->SetDimensions(w - 8 - gridPos.x, h - 5 - gridPos.y);
 }
 
-void DotSequencer::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
-}
-
 void DotSequencer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mClearButton)
@@ -347,8 +341,6 @@ void DotSequencer::SaveState(FileStreamOut& out)
 
    out << (int)mInterval;
    out << mHasExternalPulseSource;
-   out << mWidth;
-   out << mHeight;
 
    mDotGrid->SaveState(out);
 }
@@ -362,9 +354,12 @@ void DotSequencer::LoadState(FileStreamIn& in, int rev)
    mInterval = (NoteInterval)interval;
 
    in >> mHasExternalPulseSource;
-   in >> mWidth;
-   in >> mHeight;
-   Resize(mWidth, mHeight);
+   if (rev < 1)
+   {
+      in >> mWidth;
+      in >> mHeight;
+      Resize(mWidth, mHeight);
+   }
 
    mDotGrid->LoadState(in);
 }

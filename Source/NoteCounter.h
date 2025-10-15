@@ -84,8 +84,6 @@ private:
    void Reseed();
    std::uint64_t GetRandom(double time, int seedOffset) const;
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
    int mStart{ 0 };

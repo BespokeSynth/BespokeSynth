@@ -30,6 +30,7 @@
 #include "Transport.h"
 
 PulseDisplayer::PulseDisplayer()
+: IDrawableModule(150, 30)
 {
 }
 
@@ -75,12 +76,6 @@ void PulseDisplayer::OnPulse(double time, float velocity, int flags)
    mLastReceivedFlagTime = gTime;
 
    DispatchPulse(GetPatchCableSource(), time, velocity, flags);
-}
-
-void PulseDisplayer::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
 }
 
 void PulseDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)

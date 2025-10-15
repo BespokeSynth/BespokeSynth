@@ -1108,22 +1108,29 @@ void ScriptModule::OnCodeUpdated()
    {
       std::vector<std::string> lines = mCodeEntry->GetLines(false);
 
-      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      for (auto mBoundModuleConnection = mBoundModuleConnections.begin(); mBoundModuleConnection != mBoundModuleConnections.end(); ++mBoundModuleConnection)
       {
-         if (mBoundModuleConnections[i].mLineText != lines[mBoundModuleConnections[i].mLineIndex])
+         if (mBoundModuleConnection->mLineIndex >= lines.size())
+         {
+            mBoundModuleConnection = mBoundModuleConnections.erase(mBoundModuleConnection);
+            if (mBoundModuleConnection == mBoundModuleConnections.end())
+               break;
+            continue;
+         }
+         if (mBoundModuleConnection->mLineText != lines[mBoundModuleConnection->mLineIndex])
          {
             bool found = false;
             for (int j = 0; j < (int)lines.size(); ++j)
             {
-               if (lines[j] == mBoundModuleConnections[i].mLineText)
+               if (lines[j] == mBoundModuleConnection->mLineText)
                {
                   found = true;
-                  mBoundModuleConnections[i].mLineIndex = j;
+                  mBoundModuleConnection->mLineIndex = j;
                }
             }
 
             if (!found)
-               mBoundModuleConnections[i].mTarget = nullptr;
+               mBoundModuleConnection->mTarget = nullptr;
          }
       }
    }
@@ -1164,6 +1171,7 @@ std::string ScriptModule::GetThisName()
 std::pair<int, int> ScriptModule::RunScript(double time, int lineStart /*=-1*/, int lineEnd /*=-1*/)
 {
    //should only be called from main thread
+   assert(IsMainThread());
 
    if (!sPythonInitialized)
    {
@@ -1455,12 +1463,6 @@ void ScriptModule::Reset()
       mPrintDisplay[i].time = -1;
 }
 
-void ScriptModule::GetModuleDimensions(float& w, float& h)
-{
-   w = mWidth;
-   h = mHeight;
-}
-
 void ScriptModule::Resize(float w, float h)
 {
    float entryW, entryH;
@@ -1644,6 +1646,7 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 }
 
 ScriptReferenceDisplay::ScriptReferenceDisplay()
+: IDrawableModule(750, 335)
 {
    LoadText();
 }
@@ -1688,12 +1691,6 @@ bool ScriptReferenceDisplay::MouseScrolled(float x, float y, float scrollX, floa
 {
    mScrollOffset.y = ofClamp(mScrollOffset.y - scrollY * 10, 0, mMaxScrollAmount);
    return true;
-}
-
-void ScriptReferenceDisplay::GetModuleDimensions(float& w, float& h)
-{
-   w = mWidth;
-   h = mHeight;
 }
 
 void ScriptReferenceDisplay::ButtonClicked(ClickButton* button, double time)

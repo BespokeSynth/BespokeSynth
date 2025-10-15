@@ -116,8 +116,6 @@ private:
    bool mWrite{ false };
    bool mNoteRepeat{ false };
    bool mLinkColumns{ false };
-   float mWidth{ 240 };
-   float mHeight{ 20 };
    bool mUseLightVelocity{ false };
    bool mUseMedVelocity{ false };
    bool mClearLane{ false };

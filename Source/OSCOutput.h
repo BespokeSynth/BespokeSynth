@@ -72,7 +72,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
 
    std::string mLabels[OSC_OUTPUT_MAX_PARAMS];
    std::list<TextEntry*> mLabelEntry{};
@@ -88,7 +87,4 @@ private:
    TextEntry* mNoteOutLabelEntry{ nullptr };
 
    juce::OSCSender mOscOut;
-
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 };

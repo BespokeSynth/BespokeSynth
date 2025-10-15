@@ -135,7 +135,7 @@ public:
    void SetMeasure(int count) { mMeasureTime = mMeasureTime - (int)mMeasureTime + count; }
    void SetDownbeat() { mMeasureTime = mMeasureTime - (int)mMeasureTime - .001; }
    static int CountInStandardMeasure(NoteInterval interval);
-   void Reset();
+   void Reset(bool timeSensitive = false);
    void OnDrumEvent(NoteInterval drumEvent);
    void SetLoop(int measureStart, int measureEnd)
    {
@@ -226,6 +226,7 @@ private:
    int mJumpFromMeasure{ -1 };
    bool mWantSetRandomTempo{ false };
    float mNudgeFactor{ 0 };
+   double mSeekMsAfterJump{ 0.0 };
 
    std::list<TransportListenerInfo> mListeners;
    std::list<IAudioPoller*> mAudioPollers;

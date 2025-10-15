@@ -37,6 +37,7 @@ namespace
 
 SpectralDisplay::SpectralDisplay()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(400, 100)
 , mFFT(kNumFFTBins)
 , mFFTData(kNumFFTBins, kNumFFTBins / 2 + 1)
 , mRollingInputBuffer(kNumFFTBins)
@@ -149,32 +150,18 @@ void SpectralDisplay::DrawModule()
    ofPopStyle();
 }
 
-void SpectralDisplay::Resize(float w, float h)
-{
-   mWidth = w;
-   mHeight = h;
-   mModuleSaveData.SetInt("width", w);
-   mModuleSaveData.SetInt("height", h);
-}
-
 void SpectralDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("width", moduleInfo, 600, 50, 2000, K(isTextField));
-   mModuleSaveData.LoadInt("height", moduleInfo, 100, 50, 2000, K(isTextField));
 
    SetUpFromSaveData();
 }
 
 void SpectralDisplay::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void SpectralDisplay::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   mWidth = mModuleSaveData.GetInt("width");
-   mHeight = mModuleSaveData.GetInt("height");
 }

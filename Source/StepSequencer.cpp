@@ -303,7 +303,7 @@ void StepSequencer::OnControllerPageSelected()
 
 void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
-   if (mPush2Connected || grid == mGridControlTarget->GetGridController())
+   if (mAbletonGridConnected || grid == mGridControlTarget->GetGridController())
    {
       bool press = velocity > 0;
       if (x >= 0 && y >= 0)
@@ -383,8 +383,8 @@ int StepSequencer::GetGridControllerRows()
 {
    if (mGridControlTarget->GetGridController())
       return mGridControlTarget->GetGridController()->NumRows();
-   if (mPush2Connected)
-      return 8;
+   if (mAbletonGridConnected)
+      return mAbletonGridRows;
    return 8;
 }
 
@@ -392,8 +392,8 @@ int StepSequencer::GetGridControllerCols()
 {
    if (mGridControlTarget->GetGridController())
       return mGridControlTarget->GetGridController()->NumCols();
-   if (mPush2Connected)
-      return 8;
+   if (mAbletonGridConnected)
+      return mAbletonGridCols;
    return 8;
 }
 
@@ -588,23 +588,41 @@ bool StepSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool StepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   mPush2Connected = true;
+   mAbletonGridConnected = true;
+   mAbletonGridCols = abletonGrid->GetGridNumCols();
+   mAbletonGridRows = abletonGrid->GetGridNumRows();
 
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
-      {
-         int gridIndex = controlIndex - 36;
-         int gridX = gridIndex % 8;
-         int gridY = 7 - gridIndex / 8;
-         OnGridButton(gridX, gridY, midiValue / 127, mGridControlTarget->GetGridController());
-         return true;
-      }
+      int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+      int gridX = gridIndex % mAbletonGridCols;
+      int gridY = (mAbletonGridRows - 1) - gridIndex / mAbletonGridCols;
+      OnGridButton(gridX, gridY, midiValue / 127, mGridControlTarget->GetGridController());
+      return true;
    }
 
-   if (type == kMidiMessage_PitchBend)
+   if (controlIndex == AbletonDevice::kOctaveUpButton)
+   {
+      if (midiValue > 0)
+      {
+         mGridYOffDropdown->Increment(1);
+         abletonGrid->DisplayScreenMessage("row offset " + ofToString(mGridYOff));
+      }
+      return true;
+   }
+   if (controlIndex == AbletonDevice::kOctaveDownButton)
+   {
+      if (midiValue > 0)
+      {
+         mGridYOffDropdown->Increment(-1);
+         abletonGrid->DisplayScreenMessage("row offset " + ofToString(mGridYOff));
+      }
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kPitchBendIndex)
    {
       float val = midiValue / MidiDevice::kPitchBendMax;
       mGridYOffDropdown->SetFromMidiCC(val, gTime, true);
@@ -615,14 +633,16 @@ bool StepSequencer::OnPush2Control(Push2Control* push2, MidiMessageType type, in
    return false;
 }
 
-void StepSequencer::UpdatePush2Leds(Push2Control* push2)
+void StepSequencer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
-   mPush2Connected = true;
+   mAbletonGridConnected = true;
+   mAbletonGridCols = abletonGrid->GetGridNumCols();
+   mAbletonGridRows = abletonGrid->GetGridNumRows();
    int numYChunks = GetNumControllerChunks();
 
-   for (int x = 0; x < 8; ++x)
+   for (int x = 0; x < mAbletonGridCols; ++x)
    {
-      for (int y = 0; y < 8; ++y)
+      for (int y = 0; y < mAbletonGridRows; ++y)
       {
          int rowsPerChunk = std::max(1, (8 / numYChunks));
          int chunkIndex = y / rowsPerChunk;
@@ -631,40 +651,46 @@ void StepSequencer::UpdatePush2Leds(Push2Control* push2)
          switch (color)
          {
             case kGridColorOff: //off
-               pushColor = (chunkIndex % 2 == 0) ? 0 : 124;
+               pushColor = (chunkIndex % 2 == 0) ? AbletonDevice::kColorOff : AbletonDevice::kColorDarkGrey;
                break;
             case kGridColor1Dim: //
-               pushColor = 86;
+               pushColor = AbletonDevice::kColorMossGreen;
                break;
             case kGridColor1Bright: //pressed
-               pushColor = 32;
+               pushColor = AbletonDevice::kColorBrightGreen;
                break;
             case kGridColor2Dim:
-               pushColor = 114;
+               pushColor = AbletonDevice::kColorPinkRed;
                break;
             case kGridColor2Bright: //root
-               pushColor = 25;
+               pushColor = AbletonDevice::kColorBrightPink;
                break;
             case kGridColor3Dim: //not in pentatonic
-               pushColor = 116;
+               pushColor = AbletonDevice::kColorPaleMagenta;
                break;
             case kGridColor3Bright: //in pentatonic
-               pushColor = 115;
+               pushColor = AbletonDevice::kColorBrightMagenta;
                break;
          }
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(x + (mAbletonGridRows - 1 - y) * mAbletonGridCols + abletonGrid->GetGridStartIndex(), pushColor);
       }
    }
 
-   std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19 };
-   for (int i = 0; i < 16; ++i)
+   abletonGrid->SetLed(AbletonDevice::kOctaveUpButton, 127);
+   abletonGrid->SetLed(AbletonDevice::kOctaveDownButton, 127);
+
+   if (abletonGrid->GetAbletonDeviceType() != AbletonDeviceType::Move)
    {
-      int ledLow = (int(((i * 2) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
-      int ledHigh = (int(((i * 2 + 1) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
-      unsigned char c = ledLow + (ledHigh << 3);
-      touchStripLights += c;
+      std::string touchStripLights = { 0x00, 0x21, 0x1D, 0x01, 0x01, 0x19 };
+      for (int i = 0; i < 16; ++i)
+      {
+         int ledLow = (int(((i * 2) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
+         int ledHigh = (int(((i * 2 + 1) / 32.0f) * numYChunks) == mGridYOff) ? 7 : 0;
+         unsigned char c = ledLow + (ledHigh << 3);
+         touchStripLights += c;
+      }
+      abletonGrid->GetDevice()->SendSysEx(touchStripLights);
    }
-   push2->GetDevice()->SendSysEx(touchStripLights);
 }
 
 int StepSequencer::GetNumSteps(NoteInterval interval, int numMeasures) const
@@ -805,7 +831,7 @@ bool StepSequencer::IsMetaStepActive(double time, int col, int row)
 
 bool StepSequencer::HasGridController()
 {
-   if (mPush2Connected)
+   if (mAbletonGridConnected)
       return true;
    return mGridControlTarget->GetGridController() != nullptr && mGridControlTarget->GetGridController()->IsConnected();
 }

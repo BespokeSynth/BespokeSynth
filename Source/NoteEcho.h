@@ -56,11 +56,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    void SendNoteToIndex(int index, NoteMessage note);
 
@@ -68,6 +63,4 @@ private:
    std::array<float, kMaxDestinations> mDelay;
    std::array<FloatSlider*, kMaxDestinations> mDelaySlider{};
    std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables{};
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 };

@@ -34,6 +34,7 @@
 #include "UserPrefs.h"
 
 MultitrackRecorder::MultitrackRecorder()
+: IDrawableModule(700, 142)
 {
    mModuleContainer.SetOwner(this);
 }
@@ -218,8 +219,6 @@ void MultitrackRecorder::SaveState(FileStreamOut& out)
 
    IDrawableModule::SaveState(out);
 
-   out << mWidth;
-
    //preserve order
    out << (int)mTracks.size();
    for (auto* track : mTracks)
@@ -234,7 +233,10 @@ void MultitrackRecorder::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
+   if (rev < 1)
+   {
+      in >> mWidth;
+   }
 
    //preserve order
    int numTracks;

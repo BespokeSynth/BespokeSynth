@@ -65,4 +65,7 @@ private:
 
    static Cost sCosts[PROFILER_MAX_TRACK];
    static bool sEnableProfiler;
+
+   static std::array<float, 50> sCpuUsageHistory;
+   static int sCpuUsageHistoryIndex;
 };

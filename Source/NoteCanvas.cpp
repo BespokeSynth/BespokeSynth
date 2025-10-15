@@ -33,10 +33,12 @@
 #include "Profiler.h"
 #include "CanvasTimeline.h"
 #include "CanvasScrollbar.h"
+#include "FillSaveDropdown.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
 NoteCanvas::NoteCanvas()
+: IDrawableModule(410, 363)
 {
    mVoiceModulations.resize(kNumVoices + 1);
 }
@@ -125,7 +127,7 @@ void NoteCanvas::PlayNote(NoteMessage note)
       double measurePos = GetCurPos(note.time) * mNumMeasures;
       NoteCanvasElement* element = AddNote(measurePos, note.pitch, note.velocity, 1 / mCanvas->GetNumCols(), note.voiceIdx, note.modulation);
       mInputNotes[note.pitch] = element;
-      mCanvas->SetRowOffset(element->mRow - mCanvas->GetNumVisibleRows() / 2);
+      FitNotes(false, true);
    }
 }
 
@@ -185,7 +187,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
    mCanvas->FillElementsAt(curPos, mNoteChecker);
    for (int i = 0; i < 128; ++i)
    {
-      int pitch = 128 - i - 1;
+      int pitch = 127 - i;
       bool wasOn = mCurrentNotes[pitch] != nullptr || mInputNotes[pitch];
       bool nowOn = mNoteChecker[i] != nullptr || mInputNotes[pitch];
       bool hasChanged = (nowOn || wasOn) && mCurrentNotes[pitch] != static_cast<NoteCanvasElement*>(mNoteChecker[i]);
@@ -205,7 +207,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
             mCurrentNotes[pitch] = nullptr;
          }
       }
-      if (nowOn && mInputNotes[pitch] == nullptr && hasChanged)
+      if (nowOn && mInputNotes[pitch] == nullptr && hasChanged && !mPitchMuted[pitch])
       {
          //note on
          NoteCanvasElement* note = static_cast<NoteCanvasElement*>(mNoteChecker[i]);
@@ -302,15 +304,32 @@ NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocit
    return element;
 }
 
-void NoteCanvas::FitNotes()
+void NoteCanvas::FitNotes(bool length /* = true*/, bool pitchRange /* = false*/)
 {
    float latest = 0.0;
+   int minPitch = 128;
+   int maxPitch = -1;
    for (auto* element : mCanvas->GetElements())
    {
-      if (element->GetEnd() > latest)
+      NoteCanvasElement* noteElement = static_cast<NoteCanvasElement*>(element);
+      if (noteElement->GetEnd() > latest)
          latest = element->GetEnd();
+      if (noteElement->GetPitch() < minPitch)
+         minPitch = noteElement->GetPitch();
+      if (noteElement->GetPitch() > maxPitch)
+         maxPitch = noteElement->GetPitch();
    }
-   SetNumMeasures(static_cast<int>(std::ceil(latest)));
+
+   if (length)
+      SetNumMeasures(static_cast<int>(std::ceil(latest)));
+
+   if (pitchRange && maxPitch != -1)
+   {
+      int currentNumRows = mCanvas->GetNumVisibleRows();
+      int newNumRows = std::max(currentNumRows, maxPitch - minPitch + 1);
+      mCanvas->SetRowOffset(127 - minPitch - newNumRows + 1);
+      mCanvas->SetNumVisibleRows(newNumRows);
+   }
 }
 
 void NoteCanvas::CanvasUpdated(Canvas* canvas)
@@ -318,6 +337,576 @@ void NoteCanvas::CanvasUpdated(Canvas* canvas)
    if (canvas == mCanvas)
    {
    }
+}
+
+std::string NoteCanvas::GetCurrentEditMeasureString() const
+{
+   return "measure: " + ofToString(mEditMeasureOffset + 1) + " / " + ofToString(mNumMeasures);
+}
+
+bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+{
+   /*if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
+   {
+      int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+      int x = gridIndex % abletonGrid->GetGridNumCols();
+      int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+      int index = x + y * abletonGrid->GetGridNumCols();
+
+      // what should the grid do if there's no gridkeyboard?
+
+      return true;
+   }*/
+
+   if (!mCurrentEditElements.empty())
+   {
+      if (controlIndex == AbletonDevice::kVolumeEncoderTurn ||
+          controlIndex == AbletonDevice::kClickyEncoderTurn ||
+          controlIndex == AbletonDevice::kOctaveUpButton ||
+          controlIndex == AbletonDevice::kOctaveDownButton ||
+          controlIndex == AbletonDevice::kPageLeftButton ||
+          controlIndex == AbletonDevice::kPageRightButton)
+      {
+         for (auto* element : mCurrentEditElements)
+         {
+            if (controlIndex == AbletonDevice::kVolumeEncoderTurn)
+            {
+               float newVelocity = std::clamp(element->GetVelocity() + AbletonDevice::GetEncoderIncrement(midiValue), 0.01f, 1.0f);
+               element->SetVelocity(newVelocity);
+               mPlaceNoteVelocity = newVelocity;
+            }
+
+            if (controlIndex == AbletonDevice::kClickyEncoderTurn)
+            {
+               float length = element->mLength;
+               int direction = midiValue <= 64 ? 1 : -1;
+               if (abletonGrid->GetButtonState(AbletonDevice::kShiftButton) ||
+                   abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderButton))
+               {
+                  length = std::clamp(length + direction * 0.1f, 0.1f, mCanvas->GetNumCols() - (element->mCol + element->mOffset));
+               }
+               else
+               {
+                  float rounded = std::round(length);
+                  if ((rounded < length && direction < 0) || (rounded > length && direction > 0))
+                     length = rounded;
+                  else
+                     length = rounded + direction;
+                  if (length <= 0)
+                     length = 0.5f;
+               }
+               element->mLength = length;
+            }
+
+            if (midiValue > 0)
+            {
+               if (controlIndex == AbletonDevice::kOctaveUpButton ||
+                   controlIndex == AbletonDevice::kOctaveDownButton)
+               {
+                  int direction = (controlIndex == AbletonDevice::kOctaveUpButton) ? 1 : -1;
+                  bool octaveShift = abletonGrid->GetButtonState(AbletonDevice::kShiftButton);
+                  int newPitch;
+                  if (mGridKeyboardInterface != nullptr)
+                     newPitch = mGridKeyboardInterface->TransposePitchInScale(element->GetPitch(), direction, octaveShift);
+                  else
+                     newPitch = element->GetPitch() + direction * (octaveShift ? 12 : 1);
+                  element->SetPitch(std::clamp(newPitch, 0, 127));
+               }
+
+               if (controlIndex == AbletonDevice::kPageLeftButton ||
+                   controlIndex == AbletonDevice::kPageRightButton)
+               {
+                  int direction = (controlIndex == AbletonDevice::kPageRightButton) ? 1 : -1;
+                  float pos = element->mCol + element->mOffset;
+                  if (abletonGrid->GetButtonState(AbletonDevice::kShiftButton))
+                  {
+                     pos += direction * 0.1f;
+                  }
+                  else
+                  {
+                     float rounded = std::round(pos);
+                     if ((rounded < pos && direction < 0) || (rounded > pos && direction > 0))
+                        pos = rounded;
+                     else
+                        pos = rounded + direction;
+                  }
+                  pos = std::clamp(pos, 0.0f, float(mCanvas->GetNumCols() - 1));
+                  element->mCol = int(pos);
+                  element->mOffset = pos - int(pos);
+               }
+            }
+         }
+
+         FitNotes(false, true);
+         mHasMadeStepEdit = true;
+         return true;
+      }
+   }
+
+   int stepIndex = -1;
+   if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
+      stepIndex = controlIndex - AbletonDevice::kStepButtonSection;
+   if (stepIndex >= 0 && stepIndex < AbletonDevice::kNumStepButtons)
+   {
+      if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
+      {
+         if (midiValue > 0) //button press
+         {
+            if (stepIndex < mNumMeasures)
+               mEditMeasureOffset = stepIndex;
+         }
+      }
+      else
+      {
+         if (midiValue > 0) //button press
+         {
+            mEditHoldStep = stepIndex;
+            mEditHoldTime = gTime;
+            mHasMadeStepEdit = false;
+
+            int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+            int totalNumSteps = stepsPerMeasure * mNumMeasures;
+            float pos = (stepIndex + mEditMeasureOffset * stepsPerMeasure) / float(totalNumSteps);
+            float nextPos = (stepIndex + mEditMeasureOffset * stepsPerMeasure + 1) / float(totalNumSteps);
+            const auto& elements = mCanvas->GetElements();
+            bool hasEditPitch = false;
+            for (auto* element : elements)
+            {
+               auto* noteElement = static_cast<NoteCanvasElement*>(element);
+               if (mEditCurrentPitchContext != -1 && noteElement->GetPitch() != mEditCurrentPitchContext)
+                  continue;
+               if (noteElement->GetStart() >= pos && noteElement->GetStart() < nextPos)
+               {
+                  mCurrentEditElements.push_back(noteElement);
+
+                  if (noteElement->GetPitch() == mEditCurrentPitchContext)
+                     hasEditPitch = true;
+               }
+            }
+
+            if (mEditCurrentPitchContext != -1 && !hasEditPitch)
+            {
+               // turn note on
+               ToggleEditPitch(mEditCurrentPitchContext);
+               mHasMadeStepEdit = true;
+            }
+
+            if (abletonGrid->GetButtonState(AbletonDevice::kCopyButton))
+            {
+               if (mClipboardElements.empty())
+               {
+                  //copy
+                  CopyNotesToClipboard(stepIndex);
+                  abletonGrid->DisplayScreenMessage(ofToString((int)mClipboardElements.size()) + " notes copied");
+                  mHasMadeStepEdit = true;
+               }
+               else
+               {
+                  //paste
+                  mCurrentEditElements.clear();
+                  int pasteToStep = stepIndex + mEditMeasureOffset * stepsPerMeasure;
+                  int pasteOffset = pasteToStep - mClipboardCopyFromStep;
+                  for (auto* element : mClipboardElements)
+                  {
+                     auto* newNote = static_cast<NoteCanvasElement*>(element->CreateDuplicate());
+                     newNote->mCol += pasteOffset;
+                     mCurrentEditElements.push_back(newNote);
+                     mCanvas->AddElement(newNote);
+                  }
+                  abletonGrid->DisplayScreenMessage(ofToString((int)mClipboardElements.size()) + " notes pasted");
+                  mHasMadeStepEdit = true;
+               }
+            }
+
+            if (abletonGrid->GetButtonState(AbletonDevice::kMoveDeleteButton))
+            {
+               for (auto* element : mCurrentEditElements)
+                  mCanvas->RemoveElement(element);
+               mCurrentEditElements.clear();
+               mHasMadeStepEdit = true;
+            }
+         }
+         else //button release
+         {
+            double holdTime = gTime - mEditHoldTime;
+            if (holdTime < 500) //held for short time
+            {
+               if (!mHasMadeStepEdit && mEditCurrentPitchContext != -1)
+               {
+                  bool added = ToggleEditPitch(mEditCurrentPitchContext);
+                  if (added)
+                     abletonGrid->DisplayScreenMessage("added " + NoteName(mEditCurrentPitchContext, false, true));
+                  else
+                     abletonGrid->DisplayScreenMessage("removed " + NoteName(mEditCurrentPitchContext, false, true));
+               }
+            }
+
+            if (!abletonGrid->GetButtonState(AbletonDevice::kCopyButton))
+               mCurrentEditElements.clear();
+
+            mEditHoldStep = -1;
+         }
+      }
+
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kMoveDeleteButton)
+   {
+      if (midiValue > 0)
+      {
+         for (auto* element : mCurrentEditElements)
+            mCanvas->RemoveElement(element);
+         mCurrentEditElements.clear();
+         mHasMadeStepEdit = true;
+      }
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kPageRightButton)
+   {
+      if (midiValue > 0)
+      {
+         mEditMeasureOffset = std::clamp(mEditMeasureOffset + 1, 0, mNumMeasures - 1);
+         abletonGrid->DisplayScreenMessage(GetCurrentEditMeasureString());
+      }
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kPageLeftButton)
+   {
+      if (midiValue > 0)
+      {
+         mEditMeasureOffset = std::clamp(mEditMeasureOffset - 1, 0, mNumMeasures - 1);
+         abletonGrid->DisplayScreenMessage(GetCurrentEditMeasureString());
+      }
+      return true;
+   }
+
+   if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton) &&
+       controlIndex == AbletonDevice::kClickyEncoderTurn)
+   {
+      int direction = midiValue <= 64 ? 1 : -1;
+      SetNumMeasures(std::clamp(mNumMeasures + direction, mNumMeasuresSlider->GetMin(), mNumMeasuresSlider->GetMax()));
+      return true;
+   }
+
+   if (controlIndex == AbletonDevice::kCopyButton)
+   {
+      if (midiValue > 0)
+      {
+         mCopyHoldTime = gTime;
+         if (mEditHoldStep != -1 && !mCurrentEditElements.empty())
+         {
+            CopyNotesToClipboard(mEditHoldStep);
+            abletonGrid->DisplayScreenMessage(ofToString((int)mClipboardElements.size()) + " notes copied");
+         }
+      }
+      else
+      {
+         double holdTime = gTime - mCopyHoldTime;
+         if (holdTime < 500) //held for short time
+         {
+            if (mClipboardElements.empty()) //never added anything to clipboard
+            {
+               DoubleLoop();
+               abletonGrid->DisplayScreenMessage("loop doubled");
+            }
+         }
+         mClipboardElements.clear();
+         mCurrentEditElements.clear();
+      }
+
+      return true;
+   }
+
+   if (mGridKeyboardInterface != nullptr)
+   {
+      int pressedPitch = -1;
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
+      {
+         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+         int gridX = gridIndex % abletonGrid->GetGridNumCols();
+         int gridY = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+         int pitch = mGridKeyboardInterface->GridToPitch(gridX, gridY);
+         if (pitch >= 0 && pitch <= 127)
+         {
+            pressedPitch = pitch;
+         }
+      }
+
+      if (pressedPitch != -1)
+      {
+         if (abletonGrid->GetButtonState(AbletonDevice::kShiftButton))
+         {
+            if (midiValue > 0)
+            {
+               if (mEditCurrentPitchContext == pressedPitch)
+                  mEditCurrentPitchContext = -1;
+               else
+                  mEditCurrentPitchContext = pressedPitch;
+            }
+
+            return true;
+         }
+
+         if (abletonGrid->GetButtonState(AbletonDevice::kMoveMuteButton))
+         {
+            if (midiValue > 0)
+               mPitchMuted[pressedPitch] = !mPitchMuted[pressedPitch];
+
+            return true;
+         }
+
+         if (abletonGrid->GetButtonState(AbletonDevice::kMoveDeleteButton))
+         {
+            if (midiValue > 0)
+            {
+               std::list<CanvasElement*> toRemove;
+               for (auto* element : mCanvas->GetElements())
+               {
+                  NoteCanvasElement* noteElement = static_cast<NoteCanvasElement*>(element);
+                  if (noteElement->GetPitch() == pressedPitch)
+                     toRemove.push_back(element);
+               }
+
+               for (auto* remove : toRemove)
+                  mCanvas->RemoveElement(remove);
+
+               mHasMadeStepEdit = true;
+            }
+
+            return true;
+         }
+      }
+
+      if (mEditHoldStep != -1 && pressedPitch != -1)
+      {
+         if (midiValue > 0)
+         {
+            bool added = ToggleEditPitch(pressedPitch);
+            /*if (added)
+               abletonGrid->DisplayScreenMessage("added " + NoteName(pressedPitch, false, true));
+            else
+               abletonGrid->DisplayScreenMessage("removed " + NoteName(pressedPitch, false, true));*/
+         }
+         return true;
+      }
+
+      return mGridKeyboardInterface->OnAbletonGridControl(abletonGrid, controlIndex, midiValue);
+   }
+
+   return false;
+}
+
+bool NoteCanvas::ToggleEditPitch(int pitch)
+{
+   bool removed = false;
+   for (std::vector<NoteCanvasElement*>::iterator iter = mCurrentEditElements.begin(); iter != mCurrentEditElements.end();)
+   {
+      if ((*iter)->GetPitch() == pitch)
+      {
+         mCanvas->RemoveElement(*iter);
+         iter = mCurrentEditElements.erase(iter);
+         removed = true;
+      }
+      else
+      {
+         ++iter;
+      }
+   }
+
+   if (!removed)
+   {
+      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+      float pos = mEditHoldStep / float(stepsPerMeasure) + mEditMeasureOffset;
+      NoteCanvasElement* element = AddNote(pos, pitch, mPlaceNoteVelocity * 127, 1.0f / stepsPerMeasure, -1);
+      mCurrentEditElements.push_back(element);
+      FitNotes(false, true);
+   }
+
+   return !removed;
+}
+
+void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
+{
+   /*for (int x = 0; x < abletonGrid->GetGridNumCols(); ++x)
+   {
+      for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
+      {
+         int pushColor = 0;
+         int index = x + y * abletonGrid->GetGridNumCols();
+
+
+         abletonGrid->SetLed(x + (7 - y) * 8 + abletonGrid->GetGridStartIndex(), pushColor);
+      }
+   }*/
+
+   if (!mCurrentEditElements.empty())
+   {
+      abletonGrid->SetLed(AbletonDevice::kMoveDeleteButton, 127);
+      abletonGrid->SetLed(AbletonDevice::kOctaveUpButton, 127, 1);
+      abletonGrid->SetLed(AbletonDevice::kOctaveDownButton, 127, 1);
+      abletonGrid->SetLed(AbletonDevice::kCopyButton, 127);
+   }
+   else
+   {
+      abletonGrid->SetLed(AbletonDevice::kMoveDeleteButton, 10);
+      abletonGrid->SetLed(AbletonDevice::kOctaveUpButton, 10);
+      abletonGrid->SetLed(AbletonDevice::kOctaveDownButton, 10);
+      abletonGrid->SetLed(AbletonDevice::kCopyButton, 10);
+   }
+
+   abletonGrid->SetLed(AbletonDevice::kMoveMuteButton, 127);
+   abletonGrid->SetLed(AbletonDevice::kLoopButton, 127);
+
+   if (mGridKeyboardInterface != nullptr)
+   {
+      std::vector<int> heldPitches;
+      for (const auto* element : mCurrentEditElements)
+         heldPitches.push_back(element->GetPitch());
+      mGridKeyboardInterface->SetPreviewNotes([heldPitches](const int pitch) -> bool
+                                              {
+                                                 return VectorContains(pitch, heldPitches);
+                                              });
+
+      mGridKeyboardInterface->UpdateAbletonGridLeds(abletonGrid);
+
+      AbletonMoveControl* abletonMove = dynamic_cast<AbletonMoveControl*>(abletonGrid); //TODO(Ryan) make this not specific to move
+      for (int x = 0; x < abletonMove->GetGridNumCols(); ++x)
+      {
+         for (int y = 0; y < abletonMove->GetGridNumRows(); ++y)
+         {
+            int pitch = mGridKeyboardInterface->GridToPitch(x, y);
+            int ledIndex = x + (abletonMove->GetGridNumRows() - 1 - y) * abletonMove->GetGridNumCols() + abletonMove->GetGridStartIndex();
+
+            if (mPitchMuted[pitch])
+               abletonMove->SetLed(ledIndex, AbletonDevice::kColorDarkRed);
+
+            int flashColor = -1;
+            if (pitch == mEditCurrentPitchContext)
+               flashColor = AbletonDevice::kColorLightBlue;
+            abletonMove->SetLedFlashColor(ledIndex, flashColor);
+         }
+      }
+   }
+
+   if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
+   {
+      float curPos = GetCurPos(gTime);
+      const auto& elements = mCanvas->GetElements();
+      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+      int totalNumSteps = stepsPerMeasure * mNumMeasures;
+      for (int step = 0; step < AbletonDevice::kNumStepButtons; ++step)
+      {
+         int pushColor = 0;
+
+         if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
+         {
+            if (step == mEditMeasureOffset)
+               pushColor = AbletonDevice::kColorGreen;
+            else if (step < mNumMeasures)
+               pushColor = AbletonDevice::kColorDarkGreen;
+         }
+         else
+         {
+            float pos = (step + mEditMeasureOffset * stepsPerMeasure) / float(totalNumSteps);
+            float nextPos = (step + mEditMeasureOffset * stepsPerMeasure + 1) / float(totalNumSteps);
+
+            int desiredPitch = -1;
+            //if (mGridKeyboardInterface != nullptr && mGridKeyboardInterface->IsDrumMode())
+            desiredPitch = mEditCurrentPitchContext;
+            bool hasNoteOn = false;
+            bool hasNoteSustain = false;
+            for (const auto* element : elements)
+            {
+               const auto* noteElement = static_cast<const NoteCanvasElement*>(element);
+               if (desiredPitch == -1 || noteElement->GetPitch() == desiredPitch)
+               {
+                  if (noteElement->GetStart() >= pos && noteElement->GetStart() < nextPos)
+                     hasNoteOn = true;
+                  if (noteElement->GetStart() < nextPos && noteElement->GetEnd() > pos)
+                     hasNoteSustain = true;
+               }
+            }
+
+            if (hasNoteOn)
+               pushColor = AbletonDevice::kColorWhite; //AbletonDevice::kColorPowderBlue;
+            else if (hasNoteSustain)
+               pushColor = AbletonDevice::kColorBlueEyes;
+            else
+               pushColor = AbletonDevice::kColorDarkGrey;
+
+            if (curPos >= pos && curPos < nextPos)
+               pushColor = AbletonDevice::kColorGreen;
+         }
+
+         abletonGrid->SetLed(step + AbletonDevice::kStepButtonSection, pushColor);
+      }
+   }
+}
+
+bool NoteCanvas::HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid)
+{
+   if (!mCurrentEditElements.empty() && abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch))
+      return true;
+   if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
+      return true;
+   return false;
+}
+
+bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd)
+{
+   if (!mCurrentEditElements.empty())
+   {
+      /*if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
+      {
+         int y = 13;
+         lcd->DrawText("velocity: ", 5, y, LCDFONT_STYLE_REGULAR);
+         for (const auto* element : mCurrentEditElements)
+         {
+            lcd->DrawText(ofToString(element->GetVelocity(), 2).c_str(), 50, y, LCDFONT_STYLE_REGULAR);
+            y += AbletonMoveLCD::kTextLineSpacing;
+         }
+      }
+      else
+      {
+         lcd->DrawText(("holding " + ofToString((int)mCurrentEditElements.size()) + " elements").c_str(), 5, 13, LCDFONT_STYLE_REGULAR);
+      }*/
+
+      int y = 20;
+
+      if (abletonGrid->GetButtonState(AbletonDevice::kOctaveUpButton) ||
+          abletonGrid->GetButtonState(AbletonDevice::kOctaveDownButton))
+         lcd->DrawRect(17, 6, 4, 4, !K(filled));
+      if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
+         lcd->DrawRect(42, 6, 4, 4, !K(filled));
+      if (abletonGrid->GetButtonState(AbletonDevice::kPageLeftButton) ||
+          abletonGrid->GetButtonState(AbletonDevice::kPageRightButton))
+         lcd->DrawRect(67, 6, 4, 4, !K(filled));
+      if (abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch))
+         lcd->DrawRect(97, 6, 4, 4, !K(filled));
+
+      int stepsPerBeat = TheTransport->CountInStandardMeasure(mInterval) / TheTransport->GetTimeSigBottom();
+
+      for (const auto* element : mCurrentEditElements)
+      {
+         lcd->DrawText(NoteName(element->GetPitch(), false, true).c_str(), 10, y, LCDFONT_STYLE_REGULAR);
+         lcd->DrawText(ofToString(element->GetVelocity(), 2).c_str(), 35, y, LCDFONT_STYLE_REGULAR);
+         lcd->DrawText(ofToString((element->mCol + element->mOffset) / stepsPerBeat, 3).c_str(), 60, y, LCDFONT_STYLE_REGULAR);
+         lcd->DrawText(ofToString(element->mLength / stepsPerBeat, 3).c_str(), 90, y, LCDFONT_STYLE_REGULAR);
+         y += AbletonMoveLCD::kTextLineSpacing;
+      }
+      return true;
+   }
+
+   if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
+   {
+      lcd->DrawText(("num measures: " + ofToString(mNumMeasures)).c_str(), 10, 13, LCDFONT_STYLE_REGULAR);
+      lcd->DrawText(GetCurrentEditMeasureString().c_str(), 10, 13 + AbletonMoveLCD::kTextLineSpacing, LCDFONT_STYLE_REGULAR);
+      return true;
+   }
+   return false;
 }
 
 void NoteCanvas::DrawModule()
@@ -440,6 +1029,45 @@ void NoteCanvas::DrawModule()
    }
 }
 
+void NoteCanvas::DoubleLoop()
+{
+   //crop contents to current length
+   std::list<CanvasElement*> toRemove;
+   for (auto* element : mCanvas->GetElements())
+   {
+      NoteCanvasElement* noteElement = static_cast<NoteCanvasElement*>(element);
+      if (noteElement->mCol >= mCanvas->GetNumCols())
+         toRemove.push_back(element);
+   }
+   for (auto* remove : toRemove)
+      mCanvas->RemoveElement(remove);
+
+   //duplicate current contents and shift
+   std::list<NoteCanvasElement*> newElements;
+   for (auto* element : mCanvas->GetElements())
+   {
+      auto* newNote = static_cast<NoteCanvasElement*>(element->CreateDuplicate());
+      newNote->mCol += mCanvas->GetNumCols();
+      newElements.push_back(newNote);
+   }
+
+   SetNumMeasures(mNumMeasures * 2);
+
+   for (auto* element : newElements)
+   {
+      mCanvas->AddElement(element);
+   }
+}
+
+void NoteCanvas::CopyNotesToClipboard(int stepIndex)
+{
+   mClipboardElements.clear();
+   for (auto* element : mCurrentEditElements)
+      mClipboardElements.push_back(element);
+   int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+   mClipboardCopyFromStep = stepIndex + mEditMeasureOffset * stepsPerMeasure;
+}
+
 namespace
 {
    const float extraW = 20;
@@ -448,15 +1076,11 @@ namespace
 
 void NoteCanvas::Resize(float w, float h)
 {
-   w = MAX(w - extraW, 390);
-   h = MAX(h - extraH, 40);
-   mCanvas->SetDimensions(w, h);
-}
-
-void NoteCanvas::GetModuleDimensions(float& width, float& height)
-{
-   width = mCanvas->GetWidth() + extraW;
-   height = mCanvas->GetHeight() + extraH;
+   w = MAX(w, 390);
+   h = MAX(h, 200);
+   mWidth = w;
+   mHeight = h;
+   mCanvas->SetDimensions(w - extraW, h - extraH);
 }
 
 void NoteCanvas::SetNumMeasures(int numMeasures)
@@ -577,7 +1201,6 @@ void NoteCanvas::LoadMidi()
       MidiFile midifile;
       if (midifile.readFrom(inputStream))
       {
-         midifile.convertTimestampTicksToSeconds();
          int ticksPerQuarterNote = midifile.getTimeFormat();
          int trackToGet = 0;
          if (midifile.getNumTracks() > 1)
@@ -603,7 +1226,7 @@ void NoteCanvas::LoadMidi()
                latest = element->GetEnd();
          }
          mNumMeasuresSlider->SetExtents(0, static_cast<int>(std::ceil(latest)));
-         FitNotes();
+         FitNotes(true, true);
       }
 
       mPlay = wasPlaying;
@@ -717,6 +1340,7 @@ void NoteCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("canvaswidth", moduleInfo, 390, 390, 99999, K(isTextField));
    mModuleSaveData.LoadFloat("canvasheight", moduleInfo, 200, 40, 99999, K(isTextField));
+   mModuleSaveData.LoadString("grid_keyboard_interface", moduleInfo, "", FillDropdown<LaunchpadKeyboard*>);
 
    SetUpFromSaveData();
 }
@@ -725,6 +1349,8 @@ void NoteCanvas::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mCanvas->SetDimensions(mModuleSaveData.GetFloat("canvaswidth"), mModuleSaveData.GetFloat("canvasheight"));
+   IDrawableModule* gridKeyboardInterface = TheSynth->FindModule(mModuleSaveData.GetString("grid_keyboard_interface"), false);
+   mGridKeyboardInterface = dynamic_cast<LaunchpadKeyboard*>(gridKeyboardInterface);
 }
 
 void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)

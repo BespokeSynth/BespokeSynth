@@ -91,6 +91,8 @@ class NoteCanvasElement : public CanvasElement
 public:
    NoteCanvasElement(Canvas* canvas, int col, int row, float offset, float length);
    static CanvasElement* Create(Canvas* canvas, int col, int row) { return new NoteCanvasElement(canvas, col, row, 0, 1); }
+   void SetPitch(int pitch) { mRow = 127 - pitch; }
+   int GetPitch() const { return 127 - mRow; }
    void SetVelocity(float vel) { mVelocity = vel; }
    float GetVelocity() const { return mVelocity; }
    void SetVoiceIdx(int voiceIdx) { mVoiceIdx = voiceIdx; }
