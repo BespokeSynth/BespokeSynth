@@ -34,6 +34,18 @@ ChordBounds::ChordBounds()
 {
 }
 
+void ChordBounds::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
+}
+
+ChordBounds::~ChordBounds()
+{
+   TheTransport->RemoveAudioPoller(this);
+}
+
 void ChordBounds::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
@@ -58,10 +70,11 @@ void ChordBounds::DrawModule()
 
 void ChordBounds::PlayNote(NoteMessage note)
 {
-   // unset a played note if it is off now
-   if (!note.velocity)
-      mActiveNotes[note.pitch] = note;
+   mActiveNotes[note.pitch] = note;
+}
 
+void ChordBounds::OnTransportAdvanced(float amount)
+{
    // detect min and max notes
    int minNotePlaying = -1;
    int maxNotePlaying = -1;
@@ -75,45 +88,36 @@ void ChordBounds::PlayNote(NoteMessage note)
       }
    }
 
-   // store the new note
-   if (note.velocity)
-      mActiveNotes[note.pitch] = note;
-
-   if (note.velocity > 0)
-   { // new note playing
-      if (minNotePlaying == -1 || minNotePlaying > note.pitch)
-      {
-         mNoteOutput.Flush(note.time);
-         note.time = NextBufferTime(false);
-         PlayNoteOutput(note);
-      }
-      if (maxNotePlaying == -1 || maxNotePlaying < note.pitch)
-      {
-         mPatchCableSource2->Flush(note.time);
-         note.time = NextBufferTime(false);
-         mPatchCableSource2->PlayNoteOutput(note);
-      }
+   if (minNotePlaying > -1 && (mNoteMin == -1 || mNoteMin > minNotePlaying))
+   {
+      // new low note
+      mNoteMin = minNotePlaying;
+      mNoteOutput.Flush(mActiveNotes[mNoteMin].time);
+      mActiveNotes[mNoteMin].time = NextBufferTime(false);
+      PlayNoteOutput(mActiveNotes[mNoteMin]);
    }
-   else
-   { // played note is stopped
-      if (minNotePlaying == -1 || minNotePlaying > note.pitch)
-      {
-         PlayNoteOutput(note);
-         if (minNotePlaying != -1)
-         {
-            mActiveNotes[minNotePlaying].time = NextBufferTime(false);
-            PlayNoteOutput(mActiveNotes[minNotePlaying]);
-         }
-      }
-      if (maxNotePlaying == -1 || maxNotePlaying < note.pitch)
-      {
-         mPatchCableSource2->PlayNoteOutput(note);
-         if (maxNotePlaying != -1)
-         {
-            mActiveNotes[maxNotePlaying].time = NextBufferTime(false);
-            mPatchCableSource2->PlayNoteOutput(mActiveNotes[maxNotePlaying]);
-         }
-      }
+
+   if (maxNotePlaying > -1 && (mNoteMax == -1 || mNoteMax < maxNotePlaying))
+   {
+      // new high note
+      mNoteMax = maxNotePlaying;
+      mPatchCableSource2->Flush(mActiveNotes[mNoteMax].time);
+      mActiveNotes[mNoteMax].time = NextBufferTime(false);
+      mPatchCableSource2->PlayNoteOutput(mActiveNotes[mNoteMax]);
+   }
+
+   if (minNotePlaying == -1 && mNoteMin > -1)
+   {
+      // no more low notes
+      mNoteOutput.Flush(NextBufferTime(false));
+      mNoteMin = -1;
+   }
+
+   if (maxNotePlaying == -1 && mNoteMax > -1)
+   {
+      // no more high notes
+      mPatchCableSource2->Flush(NextBufferTime(false));
+      mNoteMax = -1;
    }
 }
 

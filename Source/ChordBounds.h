@@ -32,19 +32,25 @@
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
+#include "Transport.h"
 
-class ChordBounds : public INoteReceiver, public INoteSource, public IDrawableModule
+class ChordBounds : public INoteReceiver, public INoteSource, public IDrawableModule, public IAudioPoller
 {
 public:
    ChordBounds();
+   virtual ~ChordBounds();
    static IDrawableModule* Create() { return new ChordBounds(); }
    static bool AcceptsNotes() { return true; }
 
    void CreateUIControls() override;
+   void Init() override;
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
+
+   //IAudioPoller
+   void OnTransportAdvanced(float amount) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -62,6 +68,8 @@ private:
 
    AdditionalNoteCable* mPatchCableSource2{ nullptr };
    std::array<NoteMessage, 128> mActiveNotes{};
+   int mNoteMin = -1;
+   int mNoteMax = -1;
 };
 
 #endif /* defined(__Bespoke__ChordBounds__) */
