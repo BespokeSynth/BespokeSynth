@@ -92,7 +92,7 @@ void ChordBounds::OnTransportAdvanced(float amount)
    {
       // new low note
       mNoteMin = minNotePlaying;
-      mNoteOutput.Flush(mActiveNotes[mNoteMin].time);
+      mNoteOutput.Flush(gTime);
       mActiveNotes[mNoteMin].time = gTime;
       PlayNoteOutput(mActiveNotes[mNoteMin]);
    }
@@ -101,7 +101,7 @@ void ChordBounds::OnTransportAdvanced(float amount)
    {
       // new high note
       mNoteMax = maxNotePlaying;
-      mPatchCableSource2->Flush(mActiveNotes[mNoteMax].time);
+      mPatchCableSource2->Flush(gTime);
       mActiveNotes[mNoteMax].time = gTime;
       mPatchCableSource2->PlayNoteOutput(mActiveNotes[mNoteMax]);
    }
