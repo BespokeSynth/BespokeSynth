@@ -88,7 +88,7 @@ void ChordBounds::OnTransportAdvanced(float amount)
       }
    }
 
-   if (minNotePlaying > -1 && (mNoteMin == -1 || mNoteMin > minNotePlaying))
+   if (minNotePlaying > -1 && mNoteMin != minNotePlaying)
    {
       // new low note
       mNoteMin = minNotePlaying;
@@ -97,7 +97,7 @@ void ChordBounds::OnTransportAdvanced(float amount)
       PlayNoteOutput(mActiveNotes[mNoteMin]);
    }
 
-   if (maxNotePlaying > -1 && (mNoteMax == -1 || mNoteMax < maxNotePlaying))
+   if (maxNotePlaying > -1 && mNoteMax != maxNotePlaying)
    {
       // new high note
       mNoteMax = maxNotePlaying;
