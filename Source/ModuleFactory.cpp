@@ -148,6 +148,7 @@
 #include "Selector.h"
 #include "GroupControl.h"
 #include "CurveLooper.h"
+#include "FishbowlSynth.h"
 #include "ScaleDegree.h"
 #include "NoteChainNode.h"
 #include "NoteDelayer.h"
@@ -319,6 +320,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteSinger, notesinger, kModuleCategory_Instrument);
    REGISTER(NoteOctaver, noteoctaver, kModuleCategory_Note);
    REGISTER(FourOnTheFloor, fouronthefloor, kModuleCategory_Instrument);
+   REGISTER(FishbowlSynth, fishbowlsynth, kModuleCategory_Instrument);
    REGISTER(Amplifier, gain, kModuleCategory_Audio);
    REGISTER(Snapshots, snapshots, kModuleCategory_Other);
    REGISTER(NoteStepSequencer, notesequencer, kModuleCategory_Instrument);

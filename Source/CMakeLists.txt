@@ -203,6 +203,8 @@ target_sources(BespokeSynth PRIVATE
     FilterButterworth24db.h
     FilterViz.cpp
     FilterViz.h
+    FishbowlSynth.cpp
+    FishbowlSynth.h
     FloatSliderLFOControl.cpp
     FloatSliderLFOControl.h
     FollowingSong.cpp
